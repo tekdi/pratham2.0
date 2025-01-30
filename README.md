@@ -1,4 +1,4 @@
-# Shikshav20
+# Pratham 2.0
 
 ## Host App
 
