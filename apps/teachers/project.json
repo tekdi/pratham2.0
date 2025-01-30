@@ -1,0 +1,9 @@
+{
+  "name": "teachers",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/teachers",
+  "projectType": "application",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project teachers --web",
+  "targets": {}
+}

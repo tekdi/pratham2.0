@@ -1,0 +1,81 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+.player-grid {
+  height: 100%;
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  gap: 1.5rem;
+  /* padding-top: 4rem; */
+
+  @media screen and (max-width: 768px) {
+    grid-template-columns: 100%;
+    gap: 0px;
+  }
+}
+
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: 'red';
+  font-family: Poppins, sans-serif !important;
+}
+
+.ka-thead-cell {
+  font-weight: 600;
+}
+
+.ka-thead-cell-content {
+  font-weight: normal !important;
+}
+
+
+.ka-thead-background {
+  z-index: 1;
+  color: white;
+  background: #a8a6a6;
+  background-color: #F8EFE7 !important;
+  ;
+}
+
+.ka-table-wrapper {
+  height: 50vh !important;
+}
+
+.css-1bxxajt-MuiInputBase-root-MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #FDBE16 !important;
+}
+
+/* .delete-icon {
+  background-image: url('../Assets/image/delete.png') !important;
+  height: 18px;
+  width: 18px;
+} */
+
+div h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p .css-1ydl6z0-MuiTypography-root {
+  font-family: Poppins, sans-serif !important;
+}
+
+.two-line-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.one-line-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
