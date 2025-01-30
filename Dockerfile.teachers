@@ -1,0 +1,46 @@
+# Stage 1: Build Stage
+FROM node:20 AS builder
+
+# Set the working directory
+WORKDIR /workspace
+
+# Explicitly configure SHELL and PNPM_HOME
+ENV SHELL=/bin/bash
+ENV PNPM_HOME=/root/.local/share/pnpm
+ENV PATH=$PNPM_HOME:$PNPM_HOME/bin:$PATH
+
+# Install pnpm globally and ensure PNPM_HOME exists
+RUN npm install -g pnpm && mkdir -p $PNPM_HOME
+
+# Use bash to run the setup commands
+RUN /bin/bash -c "echo 'export SHELL=/bin/bash' >> ~/.bashrc && . ~/.bashrc && pnpm setup"
+
+# Copy package.json and pnpm-lock.yaml (pnpm-lock.json for pnpm v7+)
+COPY package.json pnpm-lock.yaml ./
+
+# Install dependencies using pnpm (this will be cached unless package.json or pnpm-lock.yaml changes)
+RUN pnpm install --frozen-lockfile
+
+# Copy the entire workspace after installing dependencies to leverage cache
+COPY . .
+
+# Build specific applications
+RUN npx nx run-many --target=build --projects=teachers,authentication,scp-teacher,youthNet --parallel=10 --verbose || true
+
+# Stage 2: Production Stage
+FROM node:20
+
+# Set the working directory in the production stage
+WORKDIR /workspace
+
+# Copy only the built assets from the builder stage
+COPY --from=builder /workspace/dist /workspace/dist
+
+# Install PM2 globally and ensure it's available in the PATH
+RUN npm install -g pnpm && pnpm install -g pm2
+
+# Expose necessary ports
+EXPOSE 3001 4101 4102 4103
+
+# Use PM2 to run the application
+CMD ["pm2-runtime", "ecosystem.teachers.config.js"]

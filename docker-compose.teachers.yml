@@ -1,0 +1,13 @@
+version: '3'
+services:
+  teachers:
+    build:
+      context: .
+      dockerfile: Dockerfile.teachers
+    ports:
+      - '3001:3001'
+      - '4101:4101'
+      - '4102:4102'
+      - '4103:4103'
+    environment:
+      - NODE_ENV=production
