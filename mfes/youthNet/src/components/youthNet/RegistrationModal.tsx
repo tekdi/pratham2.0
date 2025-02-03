@@ -1,7 +1,7 @@
 import { Avatar, Box } from '@mui/material';
 import React from 'react';
 import { useTheme } from '@mui/material/styles';
-import { RegistrationModalProps } from '@/utils/Interfaces';
+import { RegistrationModalProps } from '../../utils/Interfaces';
 
 const RegistrationModal: React.FC<RegistrationModalProps> = ({
   avatar,

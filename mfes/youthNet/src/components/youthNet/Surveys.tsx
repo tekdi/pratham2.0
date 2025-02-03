@@ -1,7 +1,7 @@
 import { Box, Typography } from '@mui/material';
 import React from 'react';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import { SurveysProps } from '@/utils/Interfaces';
+import { SurveysProps } from '../../utils/Interfaces';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
@@ -13,15 +13,13 @@ function Surveys({
   status,
   villages,
   actionRequired,
-  minHeight
+  minHeight,
 }: SurveysProps) {
   const theme = useTheme<any>();
   const { t } = useTranslation();
 
   return (
-    <Box
-      onClick={onClick}
-    >
+    <Box onClick={onClick}>
       <Box
         sx={{
           border: `1px solid ${theme.palette.warning['A100']}`,
@@ -29,7 +27,7 @@ function Surveys({
           padding: '12px',
           cursor: 'pointer',
           background: theme.palette.warning['A400'],
-          minHeight: minHeight || '100%'
+          minHeight: minHeight || '100%',
         }}
         display="flex"
         justifyContent="space-between"
