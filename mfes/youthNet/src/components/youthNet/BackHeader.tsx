@@ -3,7 +3,7 @@ import { Box, IconButton, Typography } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 interface BackHeaderProps {
-  headingOne: string;
+  headingOne?: string;
   headingTwo?: string;
   headingThree?: string;
   onBackClick?: () => void;
@@ -38,7 +38,7 @@ const BackHeader: React.FC<BackHeaderProps> = ({
         </IconButton>
       )}
       <Box>
-        <Typography textAlign="left" fontSize="22px">
+        <Typography color={'#1F1B13'} textAlign="left" fontSize="22px">
           {headingOne}
         </Typography>
 

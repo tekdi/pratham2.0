@@ -26,13 +26,15 @@ const YouthAndVolunteers: React.FC<Props> = ({ selectOptions, data }) => {
 
   return (
     <div style={{ padding: '16px' }}>
-      <Typography
-        variant="h2"
-        sx={{ fontSize: '16px', color: 'black' }}
-        gutterBottom
-      >
-        Total Youth and Volunteers
-      </Typography>
+      {data && (
+        <Typography
+          variant="h2"
+          sx={{ fontSize: '16px', color: 'black' }}
+          gutterBottom
+        >
+           Total Youth and Volunteers{/* to do */}
+        </Typography>
+      )}
       <FormControl style={{ marginBottom: '8px', width: '100%' }}>
         <Select
           value={selectedValue}
@@ -54,24 +56,26 @@ const YouthAndVolunteers: React.FC<Props> = ({ selectOptions, data }) => {
       <Typography variant="body1" style={{ fontWeight: 300, color: 'black' }}>
         {data}
       </Typography>
-      <Box p={2}>
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
-            <RegistrationStatistics
-              avatar={true}
-              statistic={4}
-              subtile={'Youth'}
-            />
+      {data && (
+        <Box p={2}>
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              <RegistrationStatistics
+                avatar={true}
+                statistic={4}
+                subtile={'Youth'}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <RegistrationStatistics
+                avatar={true}
+                statistic={4}
+                subtile={'Volunteer'}
+              />
+            </Grid>
           </Grid>
-          <Grid item xs={6}>
-            <RegistrationStatistics
-              avatar={true}
-              statistic={4}
-              subtile={'Volunteer'}
-            />
-          </Grid>
-        </Grid>
-      </Box>
+        </Box>
+      )}
     </div>
   );
 };

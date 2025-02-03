@@ -84,6 +84,7 @@ const login = () => {
   const handleLoginSuccess = async (receivedToken: any) => {
     const userId = receivedToken?.userId;
     const token = localStorage.getItem('token');
+    console.log(receivedToken, token);
 
     if (receivedToken.tenantData && receivedToken.tenantData.length > 0) {
       const tenantName = receivedToken.tenantData[0].tenantName;
@@ -134,7 +135,7 @@ const login = () => {
         'temporaryPassword',
         receivedToken?.temporaryPassword ?? 'false'
       );
-
+      localStorage.setItem('userData', JSON.stringify(receivedToken));
       setUserRole(receivedToken?.tenantData[0]?.roleName);
       setAccessToken(token);
 

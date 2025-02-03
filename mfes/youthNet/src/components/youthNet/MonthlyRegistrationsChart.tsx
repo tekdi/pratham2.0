@@ -77,7 +77,14 @@ const MonthlyRegistrationsChart: React.FC = () => {
               <Tooltip />
               <Bar
                 dataKey="count"
-                onClick={(data, index) => handleBarClick(data, index)}
+                onClick={(data: any, index: number) => {
+                  const transformedData: DataPoint = {
+                    date: data.payload?.date,
+                    count: data.payload?.count,
+                  };
+
+                  handleBarClick(transformedData, index);
+                }}
                 radius={[4, 4, 0, 0]}
                 shape={(props: any) => {
                   const { x, y, width, height, index } = props;
@@ -85,8 +92,8 @@ const MonthlyRegistrationsChart: React.FC = () => {
                   const barColor = isSelected
                     ? '#008000'
                     : props.payload.count >= 5
-                    ? '#90ee90'
-                    : '#ffcccb';
+                      ? '#90ee90'
+                      : '#ffcccb';
 
                   return (
                     <g>
@@ -97,9 +104,7 @@ const MonthlyRegistrationsChart: React.FC = () => {
                           <path
                             d={`M0,0 L20,-10 L50,-10 L50,10 L20,10 Z`}
                             fill="#008000"
-                            transform={`translate(${x + width + 10}, ${
-                              y - 20
-                            })`} // Always positions above the bar
+                            transform={`translate(${x + width + 10}, ${y - 20})`} // Always positions above the bar
                           />
                           {/* Count value inside the indicator */}
                           <text

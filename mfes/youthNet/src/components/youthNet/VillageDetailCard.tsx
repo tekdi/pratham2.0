@@ -39,7 +39,7 @@ const VillageDetailCard: React.FC<VillageDetailProps> = ({
             <Image src={imageSrc} alt="Icon" width={40} height={40} />
           )}
 
-          <Box display="flex" flexDirection="column" justifyContent="center">
+          <Box display="flex" flexDirection="column" minHeight="40px" mt={2.5}>
             {title && (
               <Typography
                 variant="subtitle1"
@@ -62,8 +62,6 @@ const VillageDetailCard: React.FC<VillageDetailProps> = ({
                 variant="body2"
                 sx={{
                   fontSize: '12px',
-                  fontWeight: 400,
-                  lineHeight: '1.2',
                   color: '#635E57',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',

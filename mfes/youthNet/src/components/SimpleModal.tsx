@@ -22,6 +22,7 @@ interface SimpleModalProps {
   open: boolean;
   onClose: () => void;
   modalTitle: string;
+  handleNext?: any;
 }
 const SimpleModal: React.FC<SimpleModalProps> = ({
   open,
@@ -33,6 +34,7 @@ const SimpleModal: React.FC<SimpleModalProps> = ({
   secondaryActionHandler,
   children,
   modalTitle,
+  handleNext,
 }) => {
   const theme = useTheme<any>();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -68,11 +70,7 @@ const SimpleModal: React.FC<SimpleModalProps> = ({
   return (
     <Modal
       open={open}
-      onClose={(event, reason) => {
-        if (reason !== 'backdropClick') {
-          onClose();
-        }
-      }}
+      onClose={onClose}
       aria-labelledby="child-modal-title"
       aria-describedby="child-modal-description"
     >
@@ -107,8 +105,12 @@ const SimpleModal: React.FC<SimpleModalProps> = ({
               <Button
                 variant="outlined"
                 color="secondary"
-                sx={buttonStyle}
                 onClick={secondaryActionHandler}
+                className="one-line-text"
+                sx={{
+                  ...buttonStyle,
+                  display: '-webkit-box !important',
+                }}
               >
                 {secondaryText}
               </Button>
@@ -118,7 +120,8 @@ const SimpleModal: React.FC<SimpleModalProps> = ({
                 variant="contained"
                 color="primary"
                 sx={buttonStyle}
-                onClick={primaryActionHandler}
+                onClick={primaryActionHandler || handleNext}
+                className="one-line-text"
               >
                 {primaryText}
               </Button>
