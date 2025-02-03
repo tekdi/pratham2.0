@@ -14,7 +14,16 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@collection": ["mfes/editors/src/components/QuestionSetEditor.tsx"],
+      "@login": ["mfes/authentication/src/pages/login.tsx"],
+      "@logout": ["mfes/authentication/src/pages/logout.tsx"],
+      "@players": ["mfes/players/src/pages/play.tsx"],
+      "@questionSet": ["mfes/editors/src/components/CollectionEditor.tsx"],
+      "@scp-teacher": ["mfes/scp-teacher/src/pages/index.tsx"],
+      "@shared-lib": ["libs/shared-lib/src/index.ts"],
+      "@youthNet": ["mfes/youthNet/src/pages/index.tsx"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }
