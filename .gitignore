@@ -45,5 +45,5 @@ Thumbs.db
 .next
 out
 
-#env ignore
+# ignore env
 .env
