@@ -5,9 +5,7 @@ import { accessGranted } from '../utils/Helper';
 import { AcademicYear } from '../utils/Interfaces';
 import ClearIcon from '@mui/icons-material/Clear';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
-import EditNoteIcon from '@mui/icons-material/EditNote';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import EventAvailableOutlinedIcon from '@mui/icons-material/EventAvailableOutlined';
 import LocalLibraryOutlinedIcon from '@mui/icons-material/LocalLibraryOutlined';
 import {
   Button,
@@ -30,10 +28,13 @@ import { accessControl, TENANT_DATA } from '../utils/app.config';
 import config from '../../config.json';
 import { isEliminatedFromBuild } from '../../featureEliminationUtil';
 import board from '../assets/images/Board.svg';
+import support from '../assets/images/Support.svg';
 import checkBook from '../assets/images/checkbook.svg';
+import assessment from '../assets/images/assessment.svg';
+import surveyForm from '../assets/images/surveyForm.svg';
 import { useDirection } from '../hooks/useDirection';
 import GroupsIcon from '@mui/icons-material/Groups';
-
+import { YOUTHNET_USER_ROLE } from './youthNet/tempConfigs';
 interface DrawerProps {
   toggleDrawer?: (open: boolean) => () => void;
   open: boolean;
@@ -57,7 +58,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
     AcademicYear[]
   >([]);
   const [selectedSessionId, setSelectedSessionId] = useState<string>('');
-  const [tenantName, setTenantName] = useState<any>('');
+  const [tenantName, setTenantName] = useState<string>('');
   const queryClient = useQueryClient();
   const { i18n, t } = useTranslation();
   const router = useRouter();
@@ -116,7 +117,6 @@ const MenuDrawer: React.FC<DrawerProps> = ({
         setModifiedAcademicYearList(modifiedList);
         const selectedAcademicYearId = localStorage.getItem('academicYearId');
         setSelectedSessionId(selectedAcademicYearId ?? '');
-        console.log('Retrieved academicYearList:', parsedList);
       } catch (error) {
         console.error('Error parsing stored academic year list:', error);
         setAcademicYearList([]);
@@ -136,7 +136,6 @@ const MenuDrawer: React.FC<DrawerProps> = ({
 
   const handleSelectChange = (event: SelectChangeEvent) => {
     setSelectedSessionId(event.target.value);
-    console.log('selected academic year id', event.target.value);
     localStorage.setItem('academicYearId', event.target.value);
 
     // Check if the selected academic year is active
@@ -188,16 +187,18 @@ const MenuDrawer: React.FC<DrawerProps> = ({
   ].includes(router.pathname);
   const isTeacherCenter = router.pathname.includes('/centers');
   const isCoursePlanner = [
-    '/course-planner',
+    '/curriculum-planner',
     '/topic-detail-view',
-    '/course-planner/center/[cohortId]',
+    '/curriculum-planner/center/[cohortId]',
     '/play/content/[identifier]',
   ].includes(router.pathname);
   const isObservation = router.pathname.includes('/observation');
 
   const isAssessments = router.pathname.includes('/assessments');
   const isBoard = router.pathname.includes('/board-enrollment');
-  const isVillagesAndYouths = router.pathname.includes('/youthboard/villages');
+  const isSupportRequest = router.pathname.includes('/support-request');
+  const isVillagesAndYouths = router.pathname.includes('/villages');
+  const isSurveys = router.pathname.includes('/surveys');
 
   return (
     <Drawer
@@ -388,6 +389,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
             >
               {t('DASHBOARD.DASHBOARD')}
             </Button>
+
             {/* villages and youth */}
             <Button
               className="fs-14"
@@ -418,7 +420,46 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 router.push(`/villages`);
               }}
             >
-              {t('YOUTHNET_DASHBOARD.VILLAGES_AND_YOUTH')}
+              {YOUTHNET_USER_ROLE.MENTOR_LEAD === TENANT_DATA.LEADER
+                ? t('DASHBOARD.USERS_&_VILLAGES')
+                : t('DASHBOARD.VILLAGES_AND_YOUTH')}
+            </Button>
+
+            <Button
+              className="fs-14"
+              sx={{
+                gap: '10px',
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'flex-start',
+                background: isSurveys
+                  ? theme.palette.primary.main
+                  : 'transparent',
+                padding: isSurveys
+                  ? '16px 18px !important'
+                  : '0px 18px !important',
+                marginTop: '25px',
+                color: isSurveys ? '#2E1500' : theme.palette.warning.A200,
+                fontWeight: isSurveys ? '600' : 500,
+                '&:hover': {
+                  background: isSurveys
+                    ? theme.palette.primary.main
+                    : 'transparent',
+                },
+              }}
+              startIcon={
+                <Image
+                  src={surveyForm}
+                  alt="SurveyForm-Icon"
+                  width={24}
+                  height={24}
+                />
+              }
+              onClick={() => {
+                router.push(`/surveys`);
+              }}
+            >
+              {t('SURVEYS.SURVEYS')}
             </Button>
           </Box>
         )}
@@ -487,7 +528,14 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 },
                 marginTop: '15px',
               }}
-              startIcon={<EditNoteIcon sx={{ fontSize: '24px !important' }} />}
+              startIcon={
+                <Image
+                  src={surveyForm}
+                  alt="SurveyForm-Icon"
+                  width={24}
+                  height={24}
+                />
+              }
               onClick={navigateToObservation}
             >
               {t('OBSERVATION.SURVEY_FORMS')}
@@ -528,7 +576,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 />
               }
               onClick={() => {
-                router.push(`/course-planner`);
+                router.push(`/curriculum-planner`);
               }}
             >
               {t('COURSE_PLANNER.COURSE_PLANNER')}
@@ -563,8 +611,11 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                   gap: '10px',
                 }}
                 startIcon={
-                  <EventAvailableOutlinedIcon
-                    sx={{ fontSize: '24px !important' }}
+                  <Image
+                    src={assessment}
+                    alt="Assessment Icon"
+                    width={24}
+                    height={24}
                   />
                 }
                 onClick={() => {
@@ -608,6 +659,48 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               }}
             >
               {t('BOARD_ENROLMENT.BOARD_ENROLLMENT')}
+            </Button>
+          </Box>
+        )}
+        {isActiveYear && !tenantName && (
+          <Box sx={{ marginTop: '18px' }}>
+            <Button
+              className="fs-14"
+              sx={{
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'flex-start',
+                background: isSupportRequest
+                  ? theme.palette.primary.main
+                  : 'transparent',
+                gap: '10px',
+                padding: isSupportRequest
+                  ? '16px 18px !important'
+                  : '0px 18px !important',
+                color: isSupportRequest
+                  ? '#2E1500'
+                  : theme.palette.warning.A200,
+                fontWeight: isSupportRequest ? '600' : 500,
+                '&:hover': {
+                  background: isSupportRequest
+                    ? theme.palette.primary.main
+                    : 'transparent',
+                },
+                marginTop: '15px',
+              }}
+              startIcon={
+                <Image
+                  src={support}
+                  alt="support-icon"
+                  width={24}
+                  height={24}
+                />
+              }
+              onClick={() => {
+                router.push(`/support-request`);
+              }}
+            >
+              {t('COMMON.SUPPORT_REQUEST')}
             </Button>
           </Box>
         )}

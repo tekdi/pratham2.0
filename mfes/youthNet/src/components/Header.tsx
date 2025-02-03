@@ -1,6 +1,9 @@
 'use client';
 
+import { UpdateDeviceNotification } from '../services/NotificationService';
+import { Telemetry } from '../utils/app.constant';
 import { logEvent } from '../utils/googleAnalytics';
+import { telemetryFactory } from '../utils/telemetry';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
@@ -18,8 +21,7 @@ import { useDirection } from '../hooks/useDirection';
 import useStore from '../store/store';
 import ConfirmationModal from './ConfirmationModal';
 import StyledMenu from './StyledMenu';
-import { UpdateDeviceNotification } from '../services/NotificationService';
-import { getUserId } from '../services/ProfileService';
+import { TENANT_DATA } from '../utils/app.config';
 
 interface HeaderProps {
   toggleDrawer?: (newOpen: boolean) => () => void;
@@ -47,7 +49,7 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
   const [selectedLanguage, setSelectedLanguage] = useState<string>('en');
   const [language, setLanguage] = useState<string>(selectedLanguage);
   const [darkMode, setDarkMode] = useState<string | null>(null);
-  const { dir, isRTL } = useDirection();
+  const { isRTL } = useDirection();
 
   // Retrieve stored userId and language
   useEffect(() => {
@@ -62,8 +64,16 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
   }, []);
 
   const handleProfileClick = () => {
+    const tenant = localStorage.getItem('tenantName');
     if (pathname !== `/user-profile/${userId}`) {
-      router.push(`/user-profile/${userId}`);
+      if (tenant?.toLowerCase() === TENANT_DATA.YOUTHNET?.toLowerCase()) {
+        router.push(`/user-profile/${userId}`);
+      } else if (
+        tenant?.toLowerCase() ===
+        TENANT_DATA.SECOND_CHANCE_PROGRAM?.toLowerCase()
+      ) {
+        router.push(`/user-profile/${userId}`);
+      }
       logEvent({
         action: 'my-profile-clicked-header',
         category: 'Dashboard',
@@ -73,7 +83,7 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
   };
 
   const handleLogoutClick = async () => {
-    router.push('/logout');
+    router.replace('/logout');
     logEvent({
       action: 'logout-clicked-header',
       category: 'Dashboard',
@@ -83,6 +93,23 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
 
     const tenantid = localStorage.getItem('tenantId');
     const deviceID = localStorage.getItem('deviceID');
+    const windowUrl = window.location.pathname;
+    const cleanedUrl = windowUrl.replace(/^\//, '');
+    const env = cleanedUrl.split('/')[0];
+    const telemetryInteract = {
+      context: {
+        env: env,
+        cdata: [],
+      },
+      edata: {
+        id: 'logout-user',
+
+        type: Telemetry.CLICK,
+        subtype: '',
+        pageid: cleanedUrl,
+      },
+    };
+    telemetryFactory.interact(telemetryInteract);
     if (deviceID) {
       try {
         const tenantId = tenantid;
@@ -92,15 +119,10 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
           Authorization: `Bearer ${token}`,
         };
 
-        const updateResponse = await UpdateDeviceNotification(
+        await UpdateDeviceNotification(
           { deviceId: deviceID, action: 'remove' },
           userId,
           headers
-        );
-
-        console.log(
-          'Device notification updated successfully:',
-          updateResponse
         );
       } catch (updateError) {
         console.error('Error updating device notification:', updateError);

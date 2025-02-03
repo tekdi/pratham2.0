@@ -1,21 +1,21 @@
 import Header from '../../components/Header';
+import withRole from '../../components/withRole';
 import BackHeader from '../../components/youthNet/BackHeader';
+import EntryContent from '../../components/youthNet/EntryContent';
+import EntrySlider from '../../components/youthNet/EntrySlider';
 import { CAMP_DATA } from '../../components/youthNet/tempConfigs';
-import { Box, Divider, Tab, Tabs, Typography } from '@mui/material';
-import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import { Box, Tab, Tabs, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
-import EntrySlider from '../../components/youthNet/EntrySlider';
-import EntryContent from '../../components/youthNet/EntryContent';
-import withRole from '../../components/withRole';
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
 import { TENANT_DATA } from '../../utils/app.config';
 
-const SurveyClassDetails = () => {
+const villageSurveyName = () => {
   const { t } = useTranslation();
   const router = useRouter();
   const theme = useTheme<any>();
-  const { surveyCamp } = router.query;
+  const { villageSurveyName } = router.query;
   const [value, setValue] = React.useState(1);
   const [village, setVillage] = useState<string>('');
   const [camp, setCamp] = useState<string>('');
@@ -33,14 +33,16 @@ const SurveyClassDetails = () => {
   const files = ['Uploaded_file1.mp4', 'Uploaded_file2.mp4'];
 
   useEffect(() => {
-    if (surveyCamp) {
-      const [villageName, ...rest] = (surveyCamp as string).split(/(?=[A-Z])/);
+    if (villageSurveyName) {
+      const [villageName, ...rest] = (villageSurveyName as string).split(
+        /(?=[A-Z])/
+      );
       const surveyTitle = rest.join('');
 
       setVillage(villageName);
       setCamp(surveyTitle);
     }
-  }, [surveyCamp]);
+  }, [villageSurveyName]);
 
   const handleBack = () => {
     router.back();
@@ -49,7 +51,6 @@ const SurveyClassDetails = () => {
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
-
   return (
     <Box minHeight="100vh">
       <Box>
@@ -57,8 +58,8 @@ const SurveyClassDetails = () => {
       </Box>
       <Box>
         <BackHeader
-          headingOne={camp}
-          headingTwo={village}
+          headingOne={village}
+          headingTwo={'Creativity Mahotsav'}
           showBackButton={true}
           onBackClick={handleBack}
         />
@@ -119,7 +120,6 @@ const SurveyClassDetails = () => {
                 files={files}
                 youthListUsers={youthListUser2}
               />
-              {/* Add more entries as needed */}
             </EntrySlider>
           </Box>
         </Box>
@@ -129,4 +129,4 @@ const SurveyClassDetails = () => {
   );
 };
 
-export default withRole(TENANT_DATA.YOUTHNET)(SurveyClassDetails);
+export default withRole(TENANT_DATA.YOUTHNET)(villageSurveyName);

@@ -3,7 +3,7 @@ import { Box, Typography } from '@mui/material';
 import { VillageDetailProps } from '../../utils/Interfaces';
 import { useTheme } from '@mui/material/styles';
 import Image from 'next/image';
-import mp from './../../assets/images/mp.png';
+import mp from '../../assets/images/mp.png';
 import GetAppIcon from '@mui/icons-material/GetApp';
 
 const UploadedFile: React.FC<VillageDetailProps> = ({ title }) => {
@@ -12,7 +12,7 @@ const UploadedFile: React.FC<VillageDetailProps> = ({ title }) => {
     <Box
       sx={{
         border: `1px solid ${theme.palette.warning['A100']}`,
-        bgcolor: 'white',
+        bgcolor: theme.palette.warning['A400'],
         padding: '12px',
         marginTop: '5px',
         borderRadius: '16px',

@@ -22,11 +22,8 @@ type UserCardProps = {
   showMore?: boolean;
   totalCount?: number;
   newRegistrations?: number;
-};
-
-type UserListProps = {
-  users: UserCardProps[];
-  layout?: 'list' | 'grid'; // Added layout prop
+  onClick?: (name: string) => void;
+  onToggleClick?: (name: string) => void;
 };
 
 const UserCard: React.FC<UserCardProps> = ({
@@ -40,21 +37,19 @@ const UserCard: React.FC<UserCardProps> = ({
   showAvtar,
   totalCount,
   newRegistrations,
+  onClick,
+  onToggleClick,
 }) => {
   const theme = useTheme<any>();
+
   return (
     <Box
       display={'flex'}
-      borderBottom={`1px solid ${theme.palette.warning['A100']}`}
       width={'100%'}
       justifyContent={'space-between'}
       sx={{
-        cursor: 'pointer',
         ...(!totalCount && {
           '@media (min-width: 600px)': {
-            border: `1px solid ${theme.palette.action.selected}`,
-            padding: '4px 10px',
-            borderRadius: '8px',
             background: theme.palette.warning.A400,
           },
         }),
@@ -68,11 +63,13 @@ const UserCard: React.FC<UserCardProps> = ({
             sx={{
               width: 48,
               height: 48,
-              backgroundColor: image ? 'transparent' : '#f5f5f5',
+              backgroundColor: image
+                ? 'transparent'
+                : theme.palette.warning['800'],
               fontSize: 18,
               fontWeight: '400',
               color: 'black',
-              border: '2px solid #CDC5BD',
+              border: `2px solid ${theme.palette.warning['800']}`,
               boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
             }}
           >
@@ -89,24 +86,36 @@ const UserCard: React.FC<UserCardProps> = ({
         >
           <Typography
             sx={{
-              fontSize: '16px',
-              color: '#0D599E',
-              textDecoration: 'underline',
               cursor: 'pointer',
+              fontSize: '16px',
+              color: theme.palette.secondary.main,
+              textDecoration: 'underline',
+
               padding: '5px 5px',
             }}
+            onClick={() => onClick?.(name)}
           >
             {name}
           </Typography>
           <Box display={'flex'} justifyContent={'space-between'} width={'100%'}>
             <Box sx={{ display: 'flex', gap: '8px' }}>
-              {age && (
+              {age ? (
                 <Typography variant="body2" color="textSecondary">
                   {age} y/o • {village || joinOn}
                 </Typography>
+              ) : (
+                village && (
+                  <Typography variant="body2" color="textSecondary">
+                    {village || joinOn}
+                  </Typography>
+                )
               )}
               {isNew && (
-                <Typography variant="body2" color="#1A8825" fontWeight={600}>
+                <Typography
+                  variant="body2"
+                  color={theme.palette.success.main}
+                  fontWeight={600}
+                >
                   NEW
                 </Typography>
               )}
@@ -140,6 +149,7 @@ const UserCard: React.FC<UserCardProps> = ({
                   color: theme.palette.warning['300'],
                   cursor: 'pointer',
                 }}
+                onClick={() => onToggleClick?.(name)}
               />
             )}
           </Box>
@@ -149,9 +159,18 @@ const UserCard: React.FC<UserCardProps> = ({
   );
 };
 
+type UserListProps = {
+  users: UserCardProps[];
+  layout?: 'list' | 'grid';
+  onUserClick?: (name: string) => void;
+  onToggleUserClick?: (name: string) => void;
+};
+
 export const UserList: React.FC<UserListProps> = ({
   users,
   layout = 'grid',
+  onUserClick,
+  onToggleUserClick,
 }) => {
   return layout === 'grid' ? (
     <List>
@@ -165,7 +184,11 @@ export const UserList: React.FC<UserListProps> = ({
               md={user.totalCount ? 12 : 6}
               lg={user.totalCount ? 12 : 4}
             >
-              <UserCard {...user} />
+              <UserCard
+                {...user}
+                onClick={onUserClick}
+                onToggleClick={onToggleUserClick}
+              />{' '}
             </Grid>
             {index < users.length - 1 && <Divider />}
           </React.Fragment>
@@ -176,7 +199,11 @@ export const UserList: React.FC<UserListProps> = ({
     <List>
       {users.map((user, index) => (
         <React.Fragment key={index}>
-          <UserCard {...user} />
+          <UserCard
+            {...user}
+            onClick={onUserClick}
+            onToggleClick={onToggleUserClick}
+          />
           {index < users.length - 1 && <Divider />}
         </React.Fragment>
       ))}

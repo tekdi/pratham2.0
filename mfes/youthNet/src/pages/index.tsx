@@ -11,6 +11,7 @@ import { useRouter } from 'next/router';
 import {
   locations,
   SURVEY_DATA,
+  YOUTHNET_USER_ROLE,
   users,
 } from '../components/youthNet/tempConfigs';
 import BackHeader from '../components/youthNet/BackHeader';
@@ -19,9 +20,11 @@ import RegistrationStatistics from '../components/youthNet/RegistrationStatistic
 import YouthAndVolunteers from '../components/youthNet/YouthAndVolunteers';
 import VillageNewRegistration from '../components/youthNet/VillageNewRegistration';
 import { UserList } from '../components/youthNet/UserCard';
-import { GetServerSideProps } from 'next';
+import Dropdown from '../components/youthNet/DropDown';
+import { fetchUserData } from '../services/youthNet/Dashboard/UserServices';
+import Loader from '../components/Loader';
 
-const index = () => {
+const Index = () => {
   const { t } = useTranslation();
   const router = useRouter();
   const [isSurveyAvailable, setIsSurveyAvailable] = useState<boolean>(false);
@@ -30,6 +33,7 @@ const index = () => {
   const [abvmodalOpen, setAbvModalOpen] = useState<boolean>(false);
   const [belmodalOpen, setBelModalOpen] = useState<boolean>(false);
   const [vilmodalOpen, setVilModalOpen] = useState<boolean>(false);
+  const [userData, setUserData] = useState<any>(null);
 
   useEffect(() => {
     const getSurveyData = async () => {
@@ -41,6 +45,15 @@ const index = () => {
     getSurveyData();
   }, []);
 
+  useEffect(() => {
+    const getData = async () => {
+      const data = await fetchUserData();
+      setUserData(data);
+    };
+
+    getData();
+  }, []);
+
   const handleModalClose = () => {
     setModalOpen(false),
       setBelModalOpen(false),
@@ -49,7 +62,7 @@ const index = () => {
   };
 
   const handleAddVolunteers = () => {
-    router.push('volunteerList');
+    router.push('/volunteerList');
   };
 
   const handleClick = (type: string) => {
@@ -76,13 +89,42 @@ const index = () => {
       <Box ml={2}>
         <BackHeader headingOne={t('DASHBOARD.DASHBOARD')} />
       </Box>
+      {YOUTHNET_USER_ROLE.MENTOR_LEAD === TENANT_DATA.LEADER && (
+        <Box
+          sx={{
+            px: '20px',
+            mt: '15px',
+          }}
+        >
+          {userData ? (
+            <Dropdown
+              name={userData?.MENTOR_NAME}
+              values={userData?.MENTOR_OPTIONS}
+              defaultValue={userData?.MENTOR_OPTIONS[0]}
+              onSelect={(value) => console.log('Selected:', value)}
+            />
+          ) : (
+            <Loader showBackdrop={true} />
+          )}
+        </Box>
+      )}
       <Box ml={2}>
-        <Typography>
-          {t('YOUTHNET_DASHBOARD.VILLAGES_MANAGED_BY_YOU', {
-            totalVillageCount: SURVEY_DATA.FIFTY_TWO,
-          })}
-        </Typography>
+        {YOUTHNET_USER_ROLE.MENTOR_LEAD === TENANT_DATA.LEADER ? (
+          <Box mt={2}>
+            <Typography>
+              {t(`YOUTHNET_DASHBOARD.MANAGES`)} {SURVEY_DATA.FIFTY_TWO}{' '}
+              {t(`YOUTHNET_DASHBOARD.VILLAGES`)}
+            </Typography>
+          </Box>
+        ) : (
+          <Typography>
+            {t('YOUTHNET_DASHBOARD.VILLAGES_MANAGED_BY_YOU', {
+              totalVillageCount: SURVEY_DATA.FIFTY_TWO,
+            })}
+          </Typography>
+        )}
       </Box>
+
       <Box pl={2} pr={2} mt={2}>
         <RegistrationStatistics title={'7 New Registrations Today'} />
       </Box>
@@ -170,7 +212,7 @@ const index = () => {
         onClose={handleModalClose}
       >
         {' '}
-        <UserList users={users} />
+        <UserList users={users} layout="list" />
       </SimpleModal>
 
       <SimpleModal
@@ -179,7 +221,7 @@ const index = () => {
         onClose={handleModalClose}
       >
         {' '}
-        <UserList users={users} />
+        <UserList users={users} layout="list" />
       </SimpleModal>
       <SimpleModal
         modalTitle={t('YOUTHNET_DASHBOARD.VLLAGE_18')}
@@ -206,8 +248,9 @@ export async function getStaticProps({ locale }: any) {
   return {
     props: {
       ...(await serverSideTranslations(locale, ['common'])),
+      // Will be passed to the page component as props
     },
   };
 }
 
-export default withRole(TENANT_DATA.YOUTHNET)(index);
+export default withRole(TENANT_DATA.YOUTHNET)(Index);

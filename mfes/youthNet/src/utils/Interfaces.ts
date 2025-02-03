@@ -96,6 +96,7 @@ export interface CohortMemberList {
     role?: string;
     status?: string[];
     name?: string | undefined;
+    firstName?: string;
   };
   includeArchived?: boolean;
 }
@@ -114,9 +115,11 @@ export interface UserList {
 
 export interface UserData {
   name?: any;
+  username?: string;
   district: string;
   state: string;
   mobile?: string;
+  firstName?: string;
 }
 
 export interface IUserData {
@@ -267,6 +270,7 @@ export interface ICohort {
   value: string;
   state: string;
   customField?: any;
+  firstName?: string;
 }
 
 export interface LearListHeaderProps {
@@ -398,11 +402,7 @@ export interface Session {
   subtopic?: string;
   url?: string;
 }
-export interface CoursePlanner {
-  id: number;
-  subject?: string;
-  circular?: number;
-}
+
 export interface CoursePlanner {
   id: number;
   subject?: string;
@@ -435,11 +435,18 @@ export interface FieldOption {
 
 export interface Field {
   name: string;
-  type: 'text' | 'numeric' | 'drop_down' | 'checkbox' | 'radio' | 'email';
+  type:
+    | 'text'
+    | 'numeric'
+    | 'drop_down'
+    | 'checkbox'
+    | 'radio'
+    | 'email'
+    | 'date';
   label: string;
   order: string;
   coreField: number;
-  dependsOn: string | boolean | null;
+  dependsOn: string | null;
   isEditable: boolean;
   isPIIField: boolean | null;
   validation?: string[];
@@ -655,7 +662,6 @@ export interface IAssessmentStatusOptions {
 
 export interface GetTargetedSolutionsParams {
   subject: any;
-  state: any;
   medium: any;
   class: any;
   board: any;
@@ -910,8 +916,13 @@ export interface RegistrationModalProps {
 }
 export interface SurveysProps {
   title: string;
-  date: string;
-  onClick: () => void;
+  date?: string;
+  villages?: number;
+  status?: string;
+  actionRequired?: string;
+  isActionRequired?: boolean;
+  onClick?: () => void;
+  minHeight?: string;
 }
 
 export interface VillageDetailProps {
@@ -919,4 +930,29 @@ export interface VillageDetailProps {
   imageSrc?: any;
   subtitle?: string;
   onClick?: () => void;
+}
+
+export interface Block {
+  id: number;
+  name: string;
+  selectedCount: number;
+  handleNext?: any;
+}
+
+export interface BlockItemProps {
+  name: string;
+  selectedCount: number;
+  onClick: () => void;
+  handleNext?: any;
+}
+
+export interface AssignVillagesProps {
+  district: string;
+  blocks: Block[];
+  onBlockClick: (block: Block) => void;
+  handleNext?: any;
+}
+
+export interface ExamplePageProps {
+  handleNext: () => void;
 }

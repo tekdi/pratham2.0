@@ -1,7 +1,7 @@
 import { Avatar, Box } from '@mui/material';
 import React from 'react';
 import { useTheme } from '@mui/material/styles';
-import { RegistrationStatisticsProps } from '../../utils/Interfaces';
+import { RegistrationStatisticsProps } from '@/utils/Interfaces';
 
 const RegistrationStatistics: React.FC<RegistrationStatisticsProps> = ({
   title,

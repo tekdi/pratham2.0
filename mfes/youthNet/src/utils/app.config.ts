@@ -9,6 +9,8 @@ export const eventDaysLimit: number = 7;
 export const toastAutoHideDuration: number = 5000; // 5 seconds
 export const idealTimeForSession: string = '120';
 export const timeZone: string = 'Asia/Kolkata';
+// export const jotFormId = '250065095006449';
+
 export const dropoutReasons = [
   {
     label: 'UNABLE_TO_COPE_WITH_STUDIES',
@@ -69,7 +71,7 @@ export const DaysOfWeek = {
   Sat: 6,
 };
 
-export const Program = ['Second Chance', 'secondchance'];
+export const Program = ['SCP'];
 
 export const tenantId =
   (typeof window !== 'undefined' && localStorage.getItem('tenantId')) ||
@@ -89,10 +91,10 @@ if (!frameworkId) {
 }
 
 export enum AssessmentType {
-  PRE_TEST = 'pre-test',
-  POST_TEST = 'post-test',
+  PRE_TEST = 'Pre Test',
+  POST_TEST = 'Post Test',
+  OTHER = 'Other',
 }
-
 export const RequisiteType = {
   PRE_REQUISITES: 'prerequisite',
   POST_REQUISITES: 'postrequisite',
@@ -122,4 +124,21 @@ export const TENANT_DATA = {
   SECOND_CHANCE_PROGRAM: 'Second Chance Program',
   PRATHAM_SCP: 'pratham SCP',
   YOUTHNET: 'YouthNet',
+  MENTOR: 'mentor',
+  LEADER: 'leader',
+};
+
+export const jotFormId = process.env.NEXT_PUBLIC_JOTFORM_ID || '';
+if (!jotFormId) {
+  console.warn(
+    'NEXT_PUBLIC_JOTFORM_ID is not set in the environment variables.'
+  );
+}
+
+export const BOTTOM_DRAWER_CONSTANTS = {
+  MARK_VOLUNTEER: 'Marked as Volunteer',
+  ADD_REASSIGN: 'Add or Reassign',
+  REQUEST_REASSIGN: 'Request to Reassign',
+  DELETE: 'Delete User',
+  UNKNOWN_ACTION: 'Unknown Action',
 };
