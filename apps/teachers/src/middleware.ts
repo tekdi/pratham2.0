@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 export function middleware(request: { nextUrl: { clone: () => any } }) {
   const url = request.nextUrl.clone();
 
-  if (url.pathname.startsWith('/scp-teacher')) {
+  if (url.pathname.startsWith('/scp-teacher-repo')) {
     url.hostname = 'localhost';
     url.port = '4102';
     return NextResponse.rewrite(url);

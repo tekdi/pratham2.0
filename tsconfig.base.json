@@ -29,7 +29,8 @@
       "@shared-lib": ["libs/shared-lib/src/index.ts"],
       "@test-next-route": ["mfes/test-next-route/src/pages/index.tsx"],
       "@test-react-vite": ["mfes/mfes/test-react-vite"],
-      "@youthNet": ["mfes/youthNet/src/pages/index.tsx"]
+      "@youthNet": ["mfes/youthNet/src/pages/index.tsx"],
+      "@/*": ["mfes/scp-teacher-repo/src/*"]
     }
   },
   "exclude": ["node_modules", "tmp"]

@@ -14,7 +14,7 @@ const Login = dynamic(() => import('@login'), {
   ssr: false,
 });
 
-const login = () => {
+const LoginComponent = () => {
   const setUserId = manageUserStore((state) => state.setUserId);
   const setUserRole = useStore(
     (state: { setUserRole: any }) => state.setUserRole
@@ -206,4 +206,4 @@ export async function getStaticProps({ locale }: any) {
   };
 }
 
-export default login;
+export default LoginComponent;
