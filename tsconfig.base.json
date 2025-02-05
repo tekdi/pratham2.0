@@ -25,7 +25,7 @@
       "@players": ["mfes/players/src/pages/play.tsx"],
       "@questionSet": ["mfes/editors/src/components/CollectionEditor.tsx"],
       "@registration": ["mfes/registration/src/app/page.tsx"],
-      "@scp-teacher": ["mfes/scp-teacher/src/pages/index.tsx"],
+      "@scp-teacher-repo": ["mfes/scp-teacher-repo/src/pages/index.tsx"],
       "@shared-lib": ["libs/shared-lib/src/index.ts"],
       "@test-next-route": ["mfes/test-next-route/src/pages/index.tsx"],
       "@test-react-vite": ["mfes/mfes/test-react-vite"],

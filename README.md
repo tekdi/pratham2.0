@@ -10,6 +10,14 @@ Next JS, run:
 nx dev teachers --port=3001 --verbose
 ```
 
+### admin
+
+Next JS, run:
+
+```sh
+nx dev admin-app-repo --port=3002 --verbose
+```
+
 ##
 
 ## Micro Frontend List
@@ -33,7 +41,7 @@ Next JS, run:
 nx dev scp-teacher-repo --port=4102 --verbose
 ```
 
-basePath : `http://localhost:4102/scp-teacher/`
+basePath : `http://localhost:4102/scp-teacher-repo/`
 Port : `4102`
 
 ### youthNet

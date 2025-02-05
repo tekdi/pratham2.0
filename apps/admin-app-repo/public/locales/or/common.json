@@ -1,0 +1,173 @@
+{
+  "COMMON": {
+    "LANGUAGE": "ଭାଷା",
+    "LOADING": "ଲୋଡ୍ ହେଉଛି",
+    "ADD_NEW": "ନୂତନ ଯୋଡନ୍ତୁ",
+    "PAGE_SIZE": "ପୃଷ୍ଠା ଆକାର",
+    "DELETE_USER": "ଉପଭୋକ୍ତାକୁ ଶାଶ୍ଵତ ଭାବରେ ହଟାନ୍ତୁ",
+    "DELETE_USER_WITH_REASON": "ଉପଭୋକ୍ତାକୁ ହଟାନ୍ତୁ",
+    "USER_DELETED_PERMANENTLY": "ଉପଭୋକ୍ତାକୁ ସଫଳତାର ସହ ହଟାଯାଇଛି!",
+    "OTHER_REASON": "ଅନ୍ୟାନ୍ୟ କାରଣ",
+    "OTHER_REASON_PLACEHOLDER": "ଅନ୍ୟାନ୍ୟ କାରଣ ଲେଖନ୍ତୁ",
+    "REASON_FOR_DELETION": "ହଟାଇବାର କାରଣ",
+    "INCORRECT_DATA_ENTRY": "ତ୍ରୁଟିପୂର୍ଣ୍ଣ ତଥ୍ୟ ଆବେଶ",
+    "DUPLICATED_USER": "ଡୁପ୍ଲିକେଟ୍ ଉପଭୋକ୍ତା",
+    "NO_USER_FOUND": "ଉପଭୋକ୍ତାକୁ ପାଇଁ ହେବନାହିଁ",
+    "ALL": "ସମସ୍ତ",
+    "NO_GO_BACK": "ନାହିଁ, ପଛକୁ ଯାଆନ୍ତୁ",
+    "YES": "ହଁ",
+    "SURE_REASSIGN_CENTER": "ଆପଣ ନିଶ୍ଚିତ କି ଏହି ଉପଭୋକ୍ତାଙ୍କୁ କେନ୍ଦ୍ର ପୁନର୍ନିୟୁକ୍ତ କରିବାକୁ ଚାହୁଁଛନ୍ତି?",
+    "OTHER": "ଅନ୍ୟାନ୍ୟ",
+    "SORT": "ବିନ୍ୟାସ",
+    "EDIT_COHORT_NAME": "ଗୋଷ୍ଠୀ ସମ୍ପାଦନା",
+    "NAME": "ନାମ",
+    "UPDATE_COHORT": "ଗୋଷ୍ଠୀ ଅଦ୍ୟତନ କରନ୍ତୁ",
+    "EDIT": "ସମ୍ପାଦନା",
+    "DELETE": "ହଟାନ୍ତୁ",
+    "NO_DATA_FOUND": "ତଥ୍ୟ ମିଳିଲା ନାହିଁ",
+    "SUBMIT": "ଦାଖଲ କରନ୍ତୁ",
+    "BACK": "ପଛକୁ ଯାଆନ୍ତୁ"
+    
+  },
+  "LOGIN_PAGE": {
+    "USERNAME": "ଉପଭୋକ୍ତା ନାମ",
+    "PASSWORD": "ପ୍ରବେଶ କୋଡ଼",
+    "LOGIN": "ପ୍ରବେଶ",
+    "USERNAME_PLACEHOLDER": "ଉପଭୋକ୍ତା ନାମ ଲେଖନ୍ତୁ",
+    "PASSWORD_PLACEHOLDER": "ପ୍ରବେଶ କୋଡ଼ ଲେଖନ୍ତୁ",
+    "USERNAME_PASSWORD_NOT_CORRECT": "ଆପଣ ଲେଖିଥିବା ଉପଭୋକ୍ତା ନାମ କିମ୍ବା ପ୍ରବେଶ କୋଡ଼ ତ୍ରୁଟିପୂର୍ଣ୍ଣ",
+    "FORGOT_PASSWORD": "ପ୍ରବେଶ କୋଡ଼କୁ ଭୁଲିଗଲେ?",
+    "REMEMBER_ME": "ମୋତେ ମନେ ରଖନ୍ତୁ"
+  },
+  "SIDEBAR": {
+    "HI": "ନମସ୍କାର",
+    "DASHBOARD": "ଡ୍ୟାସବୋର୍ଡ",
+    "MANAGE_USERS": "ଉପଭୋକ୍ତାମାନଙ୍କୁ ପରିଚାଳନା କରନ୍ତୁ",
+    "COURSE_PLANNER": "ପାଠ୍ୟକ୍ରମ ପ୍ରଣାଳୀକାରୀ",
+    "COHORTS": "ଗୋଷ୍ଠୀମାନେ",
+    "FACILITATORS": "ସହଜକାରୀମାନେ",
+    "LEARNERS": "ଶିକ୍ଷାର୍ଥୀମାନେ",
+    "TEAM_LEADERS": "ଦଳ ନେତାମାନେ",
+    "CREATE_PLAN": "ଯୋଜନା ସୃଷ୍ଟି କରନ୍ତୁ",
+    "VIEW_PLANS": "ଯୋଜନାଗୁଡ଼ିକୁ ଦେଖନ୍ତୁ"
+   
+  },
+  "FACILITATORS": {
+    "ALL_STATES": "ସମସ୍ତ ରାଜ୍ୟ",
+    "ALL_DISTRICTS": "ସମସ୍ତ ଜିଲ୍ଲା",
+    "ALL_BLOCKS": "ସମସ୍ତ ବ୍ଲକ୍",
+    "SEARCHBAR_PLACEHOLDER": "ସହଜକାରୀମାନଙ୍କୁ ଖୋଜନ୍ତୁ.."
+   
+  },
+  "NAVBAR": {
+    "SEARCHBAR_PLACEHOLDER": "ପାଠ୍ୟକ୍ରମ, ବିଷୟ, ଛାତ୍ର, ପିଡ଼ଏଫ୍ ଇତ୍ୟାଦି ଖୋଜନ୍ତୁ.."
+  },
+  "LEARNERS": {
+    "SEARCHBAR_PLACEHOLDER": "ଶିକ୍ଷାର୍ଥୀମାନଙ୍କୁ ଖୋଜନ୍ତୁ..",
+    "NEW_LEARNER": "ନୂତନ ଶିକ୍ଷାର୍ଥୀ",
+    "FIRST_SELECT_REQUIRED_FIELDS": "ପ୍ରଥମେ ଆବଶ୍ୟକ ତଥ୍ୟଗୁଡ଼ିକୁ ଚୟନ କରନ୍ତୁ"
+   
+  },
+  "TEAM_LEADERS": {
+    "SEARCHBAR_PLACEHOLDER": "ଦଳ ନେତାମାନଙ୍କୁ ଖୋଜନ୍ତୁ.."
+    
+  },
+  "COHORTS": {
+    "SEARCHBAR_PLACEHOLDER": "ଗୋଷ୍ଠୀମାନଙ୍କୁ ଖୋଜନ୍ତୁ.."
+  },
+  "MASTER": {
+    "STATE": "ରାଜ୍ୟ",
+    "STATE_NAMES": "ରାଜ୍ୟ ନାମଗୁଡ଼ିକ",
+    "SORT": "ବିନ୍ୟାସ",
+    "DISTRICT_NAMES": "ଜିଲ୍ଲା ନାମଗୁଡ଼ିକ",
+    "BLOCK_NAMES": "ବ୍ଲକ୍ ନାମଗୁଡ଼ିକ",
+    "ACTIONS": "କାର୍ଯ୍ୟ",
+    "DISTRICTS": "ଜିଲ୍ଲାମାନେ",
+    "SEARCHBAR_PLACEHOLDER_STATE": "ରାଜ୍ୟଗୁଡ଼ିକୁ ଖୋଜନ୍ତୁ",
+    "SEARCHBAR_PLACEHOLDER_DISTRICT": "ଜିଲ୍ଲାମାନଙ୍କୁ ଖୋଜନ୍ତୁ",
+    "SEARCHBAR_PLACEHOLDER_BLOCK": "ବ୍ଲକ୍ ଗୁଡ଼ିକୁ ଖୋଜନ୍ତୁ",
+    "BLOCKS": "ବ୍ଲକ୍ମାନେ"
+    
+  },
+  "CENTERS": {
+    "CENTERS": "କେନ୍ଦ୍ରଗୁଡ଼ିକ",
+    "REGULAR_CENTERS": "ନିୟମିତ କେନ୍ଦ୍ରଗୁଡ଼ିକ",
+    "REMOTE_CENTERS": "ଦୂରସ୍ଥ କେନ୍ଦ୍ରଗୁଡ଼ିକ",
+    "REMOTE_CENTER": "ଦୂରସ୍ଥ କେନ୍ଦ୍ର",
+    "REGULAR": "ନିୟମିତ",
+    "REMOTE": "ଦୂରସ୍ଥ",
+    "SEARCH_BLOCKS": "ବ୍ଲକ୍ଗୁଡ଼ିକୁ ଖୋଜନ୍ତୁ",
+    "BLOCK_REQUEST": "ଆପଣ ଏହି ଉପଭୋକ୍ତାଙ୍କୁ ବ୍ଲକ୍ ପୁନର୍ନିୟୁକ୍ତ କରିବା ପାଇଁ ରାଜ୍ୟ ଟିମ୍ ଲିଡର୍କୁ ଅନୁରୋଧ ପଠାଉଛନ୍ତି",
+    "NEW_CENTER": "ନୂତନ କେନ୍ଦ୍ର",
+    "CENTER_TYPE": "କେନ୍ଦ୍ର ପ୍ରକାର",
+    "UNIT_NAME": "ଏକକ ନାମ",
+    "NOTE": "ଦୟାକରି ଲକ୍ଷ୍ୟ କରନ୍ତୁ: ଏହା କେନ୍ଦ୍ରର ନାମ ହେବ",
+    "CENTER_CREATED": "କେନ୍ଦ୍ର ସଫଳତାର ସହ ସୃଷ୍ଟି ହେଲା!",
+    "RENAME_CENTER": "କେନ୍ଦ୍ରର ନାମ ପରିବର",
+    "REQUEST_TO_DELETE": "ମିଟିବା ପାଇଁ ଅନୁରୋଧ",
+    "RENAME": "ପୁନର୍ନାମକରଣ",
+    "CENTER_RENAMED": "କେନ୍ଦ୍ର ଶୁଭକାମନାର ସହିତ ପୁନର୍ନାମ କରାଯାଇଛି!",
+    "SEND_REQUEST": "ଅନୁରୋଧ ପଠାନ୍ତୁ",
+    "REQUEST_TO_DELETE_HAS_BEEN_SENT": "ମିଟିବା ପାଇଁ ଅନୁରୋଧ ପଠାଇ ଦିଆଯାଇଛି"
+    
+  },
+  "FORM": {
+    "FULL_NAME": "ପୂର୍ଣ୍ଣ ନାମ",
+    "ENTER_FULL_NAME": "ପୂର୍ଣ୍ଣ ନାମ ଭରନ୍ତୁ",
+    "CONTACT_NUMBER": "ସମ୍ପର୍କ ସଂଖ୍ୟା",
+    "ENTER_CONTACT_NUMBER": "ସମ୍ପର୍କ ସଂଖ୍ୟା ଭରନ୍ତୁ",
+    "HOW_WAS_LEARNER_MOBILISED": "ଶିକ୍ଷାର୍ଥୀ କିପରି ସଙ୍ଗଠିତ ହେଲେ?",
+    "SECOND_CHANCE_ALUMNI": "ଦ୍ବିତୀୟ ସୁଯୋଗ ପାଠଶାଳୀ",
+    "PRATHAM_TEAM_MEMBER": "ପ୍ରଥମ ଟିମ୍ ସଦସ୍ୟ",
+    "OTHER": "ଅନ୍ୟ",
+    "AGE": "ବୟସ",
+    "GENDER": "ଲିଙ୍ଗ",
+    "MALE": "ପୁରୁଷ",
+    "FEMALE": "ସ୍ତ୍ରୀ",
+    "LEARNERS_PRIMARY_WORK": "ଶିକ୍ଷାର୍ଥୀର ପ୍ରାଥମିକ କାମ",
+    "ENROLLED_IN_EDUCATIONAL_INSTITUTE": "ଶିକ୍ଷା ସଂସ୍ଥାରେ ଭର୍ତ୍ତି ହୋଇଛନ୍ତି",
+    "OWN_FARMING": "ନିଜର କୃଷି",
+    "AGRICULTURAL_FARM_LABORER": "କୃଷି କଷ୍ଟକର୍ମୀ",
+    "NON_AGRICULTURAL_LABORER": "ଅକୃଷି କଷ୍ଟକର୍ମୀ",
+    "SALARIED_WORK": "ଶାଳୀତ କାମ",
+    "SELF_EMPLOYMENT": "ସ୍ୱୟଂ ସେବା",
+    "UNEMPLOYED": "ବେକାର",
+    "INVOLVED_IN_DOMESTIC_WORK": "ଘରୋଇ କାମରେ ଲିପ୍ତ",
+    "FATHER_NAME": "ବାପାଙ୍କ ନାମ",
+    "ENTER_YOUR_FATHER_NAME": "ଆପଣଙ୍କ ବାପାଙ୍କ ନାମ ଭରନ୍ତୁ",
+    "CLASS_OR_LAST_PASSED_GRADE": "କ୍ଲାସ୍ (ଶେଷ ପାଠାଗତ ଶ୍ରେଣୀ)",
+    "NO_SCHOOLING": "କୌଣସି ଶିକ୍ଷା ନାହିଁ",
+    "REASON_FOR_DROPOUT_FROM_SCHOOL": "ପାଠଶାଳାରୁ ତ୍ୟାଗ କରିବାର କାରଣ",
+    "SCHOOL_INACCESSIBLE": "ପାଠଶାଳା ଅପହେଲିତ",
+    "FINANCIAL_CONSTRAINTS": "ଆର୍ଥିକ ଅସୁବିଧା",
+    "LACK_OF_INTEREST": "ରୁଚିର ଅଭାବ",
+    "FAMILY_RESPONSIBILITIES": "ପରିବାରିକ ଦାୟିତ୍ୱ",
+    "FAILED": "ବିଫଳ",
+    "ILLNESS": "ରୋଗ",
+    "MARRIAGE": "ବିବାହ",
+    "MIGRATION": "ପରିବର୍ତ୍ତନ",
+    "STARTED_VOCATIONAL_COURSE": "ପେଶାଗତ ପାଠ୍ୟକ୍ରମ ଆରମ୍ଭ କରିଛନ୍ତି",
+    "STARTED_A_JOB": "ଏକ କାମ ଆରମ୍ଭ କରିଛନ୍ତି",
+    "SCHOOL_CLOSURE_DUE_TO_COVID": "କୋଭିଡ୍ ଦ୍ବାରା ପାଠଶାଳା ବନ୍ଦ",
+    "MARITAL_STATUS": "ବିବାହିତ ଅବସ୍ଥା",
+    "UNMARRIED": "ବିବାହିତ ନୁହେଁ",
+    "MARRIED": "ବିବାହିତ",
+    "DIVORCED": "ବିବାହ ବିଚ୍ଛିନ୍ନ",
+    "PHONE_TYPE_AVAILABLE": "ଉପଲବ୍ଧ ଫୋନର ପ୍ରକାର",
+    "SMARTPHONE": "ସ୍ମାର୍ଟଫୋନ୍",
+    "KEYPAD": "କୀପ୍ୟାଡ୍",
+    "NO_PHONE": "କୌଣସି ଫୋନ୍ ନାହିଁ",
+    "IS_IT_YOUR_OWN_PHONE": "ଏହା ଆପଣଙ୍କ ନିଜର ଫୋନ୍ କି?",
+    "YES": "ହଁ",
+    "NO": "ନାହିଁ",
+    "TYPE_OF_PHONE_AVAILABLE": "ଉପଲବ୍ଧ ଫୋନର ପ୍ରକାର",
+    "REASON_FOR_DROP_OUT_FROM_SCHOOL": "ପାଠଶାଳାରୁ ତ୍ୟାଗ କରିବାର କାରଣ",
+    "EMAIL": "ଇମେଲ୍",
+    "YEAR_OF_ JOINING_SCP": "SCP ମଧ୍ୟରେ ସାମିଲ ହେବାର ବର୍ଷ",
+    "ASSIGN_CENTERS": "କେନ୍ଦ୍ର ସୁପର୍ଦ୍ଦ କରନ୍ତୁ"
+   
+  }
+ 
+  
+  
+}

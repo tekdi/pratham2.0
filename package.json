@@ -85,7 +85,10 @@
     "uuid": "^10.0.0",
     "webpack": "^5.95.0",
     "zustand": "^4.5.4",
-    "react-infinite-scroll-component": "^6.1.0"
+    "react-infinite-scroll-component": "^6.1.0",
+    "@aws-sdk/s3-request-presigner": "^3.726.0",
+    "@module-federation/nextjs-mf": "^8.5.5",
+    "@module-federation/utilities": "3.0.11"
   },
   "devDependencies": {
     "@module-federation/nextjs-mf": "^8.5.5",
