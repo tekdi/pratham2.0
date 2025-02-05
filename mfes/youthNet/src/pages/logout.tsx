@@ -1,5 +1,6 @@
 import dynamic from 'next/dynamic';
 import React from 'react';
+const loginUrl = process.env.NEXT_PUBLIC_LOGIN_URL;
 
 const Logout = dynamic(() => import('@logout'), {
   ssr: false,
@@ -8,6 +9,10 @@ const Logout = dynamic(() => import('@logout'), {
 const logout = () => {
   const handleLogoutSuccess = (response: string) => {
     console.log(response);
+
+    if (window.parent && response === 'loggedOut' && loginUrl) {
+      window.parent.location.href = loginUrl;
+    }
   };
 
   return <Logout onLogoutSuccess={handleLogoutSuccess} />;
