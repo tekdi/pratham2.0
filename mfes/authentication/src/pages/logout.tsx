@@ -7,6 +7,7 @@ import { Telemetry } from '../utils/app.constant';
 import { useQueryClient } from '@tanstack/react-query';
 // import useStore from '@/store/store';
 
+
 type LogoutPageProps = {
   onLogoutSuccess: (response: any) => void;
 };
@@ -81,7 +82,7 @@ const Logout: React.FC<LogoutPageProps> = ({ onLogoutSuccess }) => {
     };
     userLogout();
     clearLocalStorage();
-    router.replace('/login');
+
     if (onLogoutSuccess) {
       onLogoutSuccess('loggedOut');
     }

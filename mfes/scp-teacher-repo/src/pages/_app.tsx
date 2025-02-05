@@ -36,7 +36,9 @@ import { telemetryFactory } from '../utils/telemetry';
 import AllowNotification from '@/components/AllowNotification';
 import dynamic from 'next/dynamic';
 
-const InstallPopup = dynamic(() => import(`@/components/InstallPopup`), { ssr: false });
+const InstallPopup = dynamic(() => import(`@/components/InstallPopup`), {
+  ssr: false,
+});
 
 const ColorModeContext = React.createContext({ toggleColorMode: () => {} });
 const poppins = Poppins({
@@ -201,7 +203,6 @@ function App({ Component, pageProps }: AppProps) {
             />
             <Notification />
             {!login && <AllowNotification />}
-            
           </Box>
         </CssVarsProvider>
       </CacheProvider>

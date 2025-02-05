@@ -159,7 +159,7 @@ export const telemetryFactory = {
 };
 
 function getEventData(eventInput) {
-  const timestamp = Date.now();
+  const timestamp = new Date().toISOString();
   const event = {
     edata: eventInput.edata,
     options: {
