@@ -1,0 +1,256 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Poppins, sans-serif !important;
+background: #fff !important;
+overflow-y: auto !important;
+height: 100vh !important;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+.sidebar-link {
+  color: "inherit";
+  text-decoration: "none";
+  cursor: "pointer";
+}
+
+.circular-progressbar {
+  width: 25px;
+  margin-top: 8px;
+}
+
+/* To Hide the caret icon on input type number */
+input[type="number"] {
+  appearance: textfield;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
+}
+
+.rjsf-default-submit {
+  display: none !important;
+}
+
+/* To show legend in black or inherited color instead of primary color */
+legend.Mui-focused {
+  color: inherit !important;
+}
+
+.MuiPagination-ul li button {
+  color: inherit !important;
+}
+
+/* To hide the empty menu item */
+ul.MuiList-root li.MuiMenuItem-root[data-value=""] {
+  display: none !important;
+}
+
+.Toastify__toast-icon svg {
+  fill: #fff !important;
+}
+
+.ka-thead-cell {
+  font-weight: 600;
+}
+
+.ka-thead-cell-content {
+  font-weight: normal !important;
+}
+
+.css-14cfeht-MuiContainer-root {
+  background-color: white;
+}
+
+.css-14cfeht-MuiContainer-root {
+  background-color: white;
+}
+
+/* .add-to-library {
+  overflow-y: auto;
+} */
+
+.player-grid {
+  height: 100vh !important;
+  border: solid 1px #ccc;
+}
+
+.player {}
+
+#overlay-button[aria-label="Player Menu Open"] {
+  margin-top: 4rem !important;
+}
+
+:has(#overlay-button[aria-label="Player Menu Close"]) header {
+  display: none !important;
+}
+
+.Request-btn {
+  background: #FDBE16 !important;
+  border-radius: 100px !important;
+  box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2),
+    0px 2px 2px 0px rgba(0, 0, 0, 0.14),
+    0px 1px 5px 0px rgba(0, 0, 0, 0.12) !important;
+  color: #1E1B16 !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+
+.table-ka-container .ka-table-wrapper {
+  /* max-height: calc(100vh - 390px) !important; */
+  min-height: 100% !important;
+}
+
+.css-6hp17o-MuiList-root-MuiMenu-list {
+  max-height: 300px !important;
+  min-height: 100% !important;
+}
+
+
+/* .css-1latkvx-MuiFormLabel-root-MuiInputLabel-root.Mui-focused {
+  color: #000 !important;
+} */
+
+.Mui-focused {
+  color: #000 !important;
+}
+
+.css-1bxxajt-MuiInputBase-root-MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #FDBE16 !important;
+}
+
+.css-9ddj71-MuiInputBase-root-MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #FDBE16 !important;
+}
+
+div h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p .css-1ydl6z0-MuiTypography-root .css-b7ovn5-MuiTypography-root  .menu-list-content{
+  font-family: Poppins, sans-serif !important;
+}
+
+
+.two-line-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.one-line-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ka-thead-cell-content {
+  font-size: 12px !important;
+  color: #635E57 !important;
+  font-weight: 400 !important;
+}
+
+.create-card{
+  min-height: 118px !important;
+}
+
+.img-fluid{    width: 100%;
+    height: auto;
+    max-width: 300px;
+}
+
+lib-editor .h-100vh{
+  overflow-y: auto !important;
+}
+.swiper-button-next:after {
+  font-size: 16px !important;
+  color: #1E1B16!important;
+  background-color: #EBE1D4 !important;
+  border-radius: 20% !important; 
+  width: 20px!important; 
+  height: 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25)!important; 
+}
+
+.swiper-button-next:hover:after {
+  background-color: #FDBE16 !important; /* Replace with your desired hover color */
+}
+
+
+.swiper-button-prev:after {
+  font-size: 16px !important;
+  color: #1E1B16 !important; 
+  background-color: #EBE1D4 !important;
+  border-radius: 20% !important; 
+  width: 20px !important; 
+  height: 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25) !important; 
+}
+.swiper-button-prev:hover:after {
+  background-color: #FDBE16 !important; /* Replace with your desired hover color */
+}
+.swiper-pagination-bullet {
+  background-color: #CDC5BD !important; 
+  width: 40px!important; 
+  height: 4px!important;
+  border-radius: 8px!important;
+  opacity: 4 !important; 
+}
+
+/* Highlight the active dot */
+.swiper-pagination-bullet-active {
+  background-color: #FFC107 !important; 
+  width: 40px !important; 
+  height: 4px !important;
+  border-radius: 8px !important;
+  opacity: 9 !important; 
+}
+
+/* .swiper-container {
+  position: relative;
+
+} */
+
+
+.swiper-pagination {
+  position: static !important; /* Reset default absolute positioning */
+  
+  text-align: center; 
+}
+
+

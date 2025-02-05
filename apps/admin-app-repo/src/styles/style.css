@@ -1,0 +1,29 @@
+.ka-thead-background {
+  z-index: 1;
+  color: white;
+ background: #a8a6a6;
+  background-color: #F8EFE7 !important;;
+}
+
+.ka-tbody .ka-tr {
+  border-bottom: 2px solid #ececec;
+}
+
+.table-cell {
+  font-size: 14px;
+}
+
+.ka-table {
+  font-size: 14px;
+}
+
+.ka-cell {
+  line-height: 24px !important;
+  word-wrap: break-word;
+}
+
+@media (max-width: 768px) {
+  .ka-cell {
+    word-wrap: break-word;
+  }
+}
