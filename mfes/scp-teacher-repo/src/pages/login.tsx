@@ -115,13 +115,23 @@ const LoginPage = () => {
       setLang(lang);
       const token = localStorage.getItem('token');
       const tenant = localStorage.getItem('tenantName');
-      if (token && (tenant?.toLocaleLowerCase() === TENANT_DATA?.SECOND_CHANCE_PROGRAM?.toLowerCase() || tenant?.toLocaleLowerCase() === TENANT_DATA?.PRATHAM_SCP?.toLowerCase())) {
-        localStorage.setItem("previousPage", "login");
-        router.push('/dashboard');
-      } else if (token && tenant?.toLowerCase() == TENANT_DATA?.YOUTHNET?.toLowerCase()) {
-        router.push('/youthboard');
-        localStorage.setItem("previousPage", "login");
+      console.log('🚀 ~ useEffect ~ tenant:', tenant);
 
+      if (
+        token &&
+        (tenant?.toLocaleLowerCase() ===
+          TENANT_DATA?.SECOND_CHANCE_PROGRAM?.toLowerCase() ||
+          tenant?.toLocaleLowerCase() ===
+            TENANT_DATA?.PRATHAM_SCP?.toLowerCase())
+      ) {
+        localStorage.setItem('previousPage', 'login');
+        router.push('/dashboard');
+      } else if (
+        token &&
+        tenant?.toLowerCase() == TENANT_DATA?.YOUTHNET?.toLowerCase()
+      ) {
+        router.push('/youthboard');
+        localStorage.setItem('previousPage', 'login');
       }
     }
   }, []);
@@ -264,7 +274,6 @@ const LoginPage = () => {
                     userId,
                     headers
                   );
-
                 } catch (updateError) {
                   console.error(
                     'Error updating device notification:',
@@ -295,7 +304,12 @@ const LoginPage = () => {
             setAccessToken(token);
 
             const tenant = localStorage.getItem('tenantName');
-            if (tenant?.toLocaleLowerCase() === TENANT_DATA?.SECOND_CHANCE_PROGRAM?.toLowerCase() || tenant?.toLocaleLowerCase() === TENANT_DATA?.PRATHAM_SCP?.toLowerCase()) {
+            if (
+              tenant?.toLocaleLowerCase() ===
+                TENANT_DATA?.SECOND_CHANCE_PROGRAM?.toLowerCase() ||
+              tenant?.toLocaleLowerCase() ===
+                TENANT_DATA?.PRATHAM_SCP?.toLowerCase()
+            ) {
               const userDetails = await getUserDetails(userId, true);
               if (userDetails?.result?.userData) {
                 const activeSessionId = await getAcademicYearList();
@@ -336,7 +350,10 @@ const LoginPage = () => {
                   router.push('/dashboard');
                 }
               }
-            } else if (token && tenant?.toLowerCase() === TENANT_DATA.YOUTHNET?.toLowerCase()) {
+            } else if (
+              token &&
+              tenant?.toLowerCase() === TENANT_DATA.YOUTHNET?.toLowerCase()
+            ) {
               router.push('/youthboard');
             }
           }
@@ -359,22 +376,22 @@ const LoginPage = () => {
         }
 
         const windowUrl = window.location.pathname;
-    const cleanedUrl = windowUrl.replace(/^\//, '');
-    const env = cleanedUrl.split("/")[0];
-    const telemetryInteract = {
-      context: {
-        env: env,
-        cdata: [],
-      },
-      edata: {
-        id: 'failed-login',
+        const cleanedUrl = windowUrl.replace(/^\//, '');
+        const env = cleanedUrl.split('/')[0];
+        const telemetryInteract = {
+          context: {
+            env: env,
+            cdata: [],
+          },
+          edata: {
+            id: 'failed-login',
 
-        type: Telemetry.CLICK,
-        subtype: '',
-        pageid: cleanedUrl,
-      },
-    };
-    telemetryFactory.interact(telemetryInteract);
+            type: Telemetry.CLICK,
+            subtype: '',
+            pageid: cleanedUrl,
+          },
+        };
+        telemetryFactory.interact(telemetryInteract);
       }
     }
   };
@@ -541,7 +558,7 @@ const LoginPage = () => {
                     alignItems={'center'}
                     justifyContent={'center'}
                     zIndex={99}
-                  // sx={{ margin: '5px 10px 25px', }}
+                    // sx={{ margin: '5px 10px 25px', }}
                   >
                     <Box
                       sx={{
@@ -713,7 +730,9 @@ const LoginPage = () => {
                         logEvent({
                           action: 'remember-me-button-clicked',
                           category: 'Login Page',
-                          label: `Remember Me ${rememberMe ? 'Checked' : 'Unchecked'}`,
+                          label: `Remember Me ${
+                            rememberMe ? 'Checked' : 'Unchecked'
+                          }`,
                         });
                       }}
                     >

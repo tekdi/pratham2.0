@@ -41,6 +41,7 @@ const nextConfig = {
   experimental: {
     esmExternals: false,
   },
+  basePath: '/scp-teacher-repo', // This should match the path set in Nginx
   async rewrites() {
     return [
       {

@@ -39,7 +39,7 @@ const telemetryConfig = {
   host: hostURL,
   endpoint: '/v1/telemetry',
   tags: [],
-  enableValidation: true,
+  enableValidation: false,
 };
 
 if (typeof window !== 'undefined') {
