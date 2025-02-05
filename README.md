@@ -25,12 +25,12 @@ nx dev authentication --port=4101 --verbose
 basePath : `http://localhost:4101/authentication/`
 Port : `4101`
 
-### scp-teacher
+### scp-teacher-repo
 
 Next JS, run:
 
 ```sh
-nx dev scp-teacher --port=4102 --verbose
+nx dev scp-teacher-repo --port=4102 --verbose
 ```
 
 basePath : `http://localhost:4102/scp-teacher/`

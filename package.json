@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "fetch_shiksha": ""
   },
   "private": true,
   "dependencies": {
@@ -83,7 +84,8 @@
     "url": "^0.11.3",
     "uuid": "^10.0.0",
     "webpack": "^5.95.0",
-    "zustand": "^4.5.4"
+    "zustand": "^4.5.4",
+    "react-infinite-scroll-component": "^6.1.0"
   },
   "devDependencies": {
     "@module-federation/nextjs-mf": "^8.5.5",

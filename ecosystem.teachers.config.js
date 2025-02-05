@@ -19,10 +19,10 @@ module.exports = {
       },
     },
     {
-      name: 'scp-teacher',
+      name: 'scp-teacher-repo',
       script: 'node_modules/.bin/next',
       args: 'start -p 4102',
-      cwd: 'mfes/scp-teacher',
+      cwd: 'mfes/scp-teacher-repo',
       env: {
         NODE_ENV: 'production',
       },

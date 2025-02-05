@@ -1,0 +1,1 @@
+self.__REACT_LOADABLE_MANIFEST="{\"pages/_app.tsx -> @/components/InstallPopup\":{\"id\":\"pages/_app.tsx -> @/components/InstallPopup\",\"files\":[\"static/chunks/src_components_InstallPopup_tsx.js\"]}}"
