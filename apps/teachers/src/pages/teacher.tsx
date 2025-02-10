@@ -7,7 +7,6 @@ const teacher = () => {
   return (
     <div
       style={{
-        margin: -10,
         padding: 0,
         height: '100vh',
         width: '100vw',
@@ -17,8 +16,11 @@ const teacher = () => {
       <iframe
         src={mfe_scp_teacher}
         style={{
-          width: '100%',
-          height: '100%',
+          display: 'block', // Ensures no extra space around the iframe
+          margin: 0,
+          padding: 0,
+          width: '100vw',
+          height: '100vh',
           border: 'none',
         }}
         title="Embedded Localhost"
