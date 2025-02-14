@@ -161,7 +161,13 @@
     "RELOAD": "Update Now",
     "UPDATE_AVAILABLE": "New Update Available!",
     "RELOAD_TO_UPDATE": "Get the latest features and improvements—update now to enjoy a smoother experience and stay up-to-date!",
-    "NO_ASSIGNED_BOARDS":"No assigned Board for selected Center"
+    "NO_ASSIGNED_BOARDS":"No assigned Board for selected Center",
+    "YOU_HAVE_UNSAVED_CHANGES": "You have unsaved changes. Are you sure you want to go back?",
+    "ATTENDANCE_IS_USUALLY":" Attendance is usually auto-marked after the first session of the day.",
+   "ARE_YOU_SURE_MANUALLY" : "Are you sure you want to mark attendance manually?",
+   "USE_MANUAL":"Use manual marking only for technical issues, sessions on other platforms, or if not conducted online.",
+   "NOTE_MANUALLY":"Note: Manually marked attendance will override auto-attendance if it is later recorded.",
+    "YES_MANUALLY":"Yes, Mark Manually"
   
   },
   "LOGIN_PAGE": {
@@ -271,7 +277,10 @@
     "CENTER_NAME": "Center Name",
     "ALL_CENTERS": "All Centers",
     "NO_LEARNER_WITH_LOW_ATTENDANCE": "None",
-    "ATTENDANCE_MARKED_OUT_OF_DAYS": "Attendance marked: {{count}} out of last 7 days"
+    "ATTENDANCE_MARKED_OUT_OF_DAYS": "Attendance marked: {{count}} out of last 7 days",
+    "MARK_MANUAL_ATTENDANCE_CONFIRMATION": "Are you sure you want to mark attendance manually?",
+    "MANUAL_ATTENDANCE_INFO": "Attendance is usually auto-marked after the first session of the day. Use manual marking only for technical issues, sessions on other platforms, or if not conducted online.",
+    "MANUAL_ATTENDANCE_NOTE": "Note: Manually marked attendance will override auto-attendance if it is later recorded."
   },
   "PROFILE": {
     "EDIT_PROFILE": "Edit Profile",
@@ -603,6 +612,8 @@
     "DIVORCED/WIDOW": "Divorced/Widow",
     "AVAILABLE_SUGGESTIONS": "Available suggestions:",
     "USERNAME_ALREADY_EXIST": "This username already exists",
+    "EMAIL_ALREADY_EXIST": "Email is already exists",
+
     "GRADUATE": "Graduate",
     "POST_GRADUATE": "Post Graduate"
   },
@@ -710,7 +721,8 @@
     "SURVEY_FORMS": "Survey Forms",
     "OBSERVATION_STATUS": "Survey Status",
     "OBSERVATION_NOT_STARTED_YET": "Survey not started yet",
-    "EXPIRED": "Expired"
+    "EXPIRED": "Expired",
+    "ARE_YOU_SURE_YOU_TO_SUBMIT_FORM": "Are you sure to submit the form?"
   },
   "YOUTHNET_SURVEY": {
     "SURVEY": "Surveys",

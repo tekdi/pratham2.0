@@ -36,9 +36,7 @@ import { telemetryFactory } from '../utils/telemetry';
 import AllowNotification from '@/components/AllowNotification';
 import dynamic from 'next/dynamic';
 
-const InstallPopup = dynamic(() => import(`@/components/InstallPopup`), {
-  ssr: false,
-});
+const InstallPopup = dynamic(() => import(`@/components/InstallPopup`), { ssr: false });
 
 const ColorModeContext = React.createContext({ toggleColorMode: () => {} });
 const poppins = Poppins({
@@ -181,11 +179,7 @@ function App({ Component, pageProps }: AppProps) {
             sx={{
               padding: '0',
               '@media (min-width: 900px)': {
-                width: !isFullWidthPage ? 'calc(100% - 22rem)' : '100%',
-                marginLeft: !isFullWidthPage ? '351px' : '0',
-              },
-              '@media (min-width: 2000px)': {
-                width: '100%',
+                width: !isFullWidthPage ? 'calc(100% - 351px)' : '100%',
                 marginLeft: !isFullWidthPage ? '351px' : '0',
               },
               background: theme.palette.warning['A400'],
@@ -203,6 +197,7 @@ function App({ Component, pageProps }: AppProps) {
             />
             <Notification />
             {!login && <AllowNotification />}
+            
           </Box>
         </CssVarsProvider>
       </CacheProvider>

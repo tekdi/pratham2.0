@@ -39,7 +39,7 @@ const telemetryConfig = {
   host: hostURL,
   endpoint: '/v1/telemetry',
   tags: [],
-  enableValidation: false,
+  enableValidation: true,
 };
 
 if (typeof window !== 'undefined') {
@@ -159,7 +159,7 @@ export const telemetryFactory = {
 };
 
 function getEventData(eventInput) {
-  const timestamp = new Date().toISOString();
+  const timestamp = Date.now();
   const event = {
     edata: eventInput.edata,
     options: {

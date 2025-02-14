@@ -12,7 +12,7 @@ import {
   getTodayDate,
   handleKeyDown,
   sortAttendanceNumber,
-  toPascalCase,
+  toPascalCase
 } from '@/utils/Helper';
 import { CohortAttendancePercentParam, ICohort } from '@/utils/Interfaces';
 import {
@@ -26,11 +26,7 @@ import {
   Typography,
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import {
-  accessControl,
-  AttendanceAPILimit,
-  lowLearnerAttendanceLimit,
-} from './../../app.config';
+import { accessControl, AttendanceAPILimit, lowLearnerAttendanceLimit } from './../../app.config';
 
 import CohortAttendanceListView from '@/components/CohortAttendanceListView';
 import CohortSelectionSection from '@/components/CohortSelectionSection';
@@ -170,6 +166,7 @@ const AttendanceOverview: React.FC<AttendanceOverviewProps> = () => {
         sort: ['present_percentage', 'asc'],
       };
       try {
+
         const res = await getCohortAttendance(cohortAttendanceData);
         const response = res?.data?.result?.attendanceDate;
         if (response) {
@@ -187,9 +184,9 @@ const AttendanceOverview: React.FC<AttendanceOverviewProps> = () => {
   }, [
     classId,
     selectedValue ===
-      t('DASHBOARD.LAST_SEVEN_DAYS_RANGE', {
-        date_range: dateRange,
-      }),
+    t('DASHBOARD.LAST_SEVEN_DAYS_RANGE', {
+      date_range: dateRange,
+    }),
   ]);
 
   const handleDateRangeSelected = ({ fromDate, toDate }: any) => {
@@ -216,10 +213,7 @@ const AttendanceOverview: React.FC<AttendanceOverviewProps> = () => {
         if (resp) {
           const nameUserIdArray = resp?.map((entry: any) => ({
             userId: entry.userId,
-            name:
-              toPascalCase(entry?.firstName || '') +
-              ' ' +
-              (entry?.lastName ? toPascalCase(entry.lastName) : ''),
+            name: toPascalCase(entry?.firstName || '') + ' ' + (entry?.lastName ? toPascalCase(entry.lastName) : ""),
 
             memberStatus: entry.status,
           }));
@@ -267,6 +261,7 @@ const AttendanceOverview: React.FC<AttendanceOverviewProps> = () => {
                 );
                 setLearnerData(mergedArray);
                 setDisplayStudentList(mergedArray);
+
 
                 const studentsWithLowestAttendance = mergedArray.filter(
                   (user) =>
@@ -389,6 +384,7 @@ const AttendanceOverview: React.FC<AttendanceOverviewProps> = () => {
               })
               .filter((item) => item.presentPercentage !== null); // Filter out items with no valid percentage
 
+
             setAllCenterAttendanceData(nameIDAttendanceArray);
           } catch (error) {
             console.error('Error fetching attendance data:', error);
@@ -411,6 +407,7 @@ const AttendanceOverview: React.FC<AttendanceOverviewProps> = () => {
     getCohortMemberList();
   }, [classId, isToDate, isFromDate]);
 
+
   const handleSearchClear = () => {
     setSearchWord('');
     debouncedSearch.cancel();
@@ -427,7 +424,7 @@ const AttendanceOverview: React.FC<AttendanceOverviewProps> = () => {
 
   // handle search student data
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const trimmedValue = event.target.value.replace(/\s{2,}/g, ' ').trimStart();
+    const trimmedValue = event.target.value.replace(/\s{2,}/g, " ").trimStart();
     setSearchWord(trimmedValue);
     if (trimmedValue.length >= 1) {
       debouncedSearch(trimmedValue);
@@ -516,14 +513,14 @@ const AttendanceOverview: React.FC<AttendanceOverviewProps> = () => {
 
     // Sorting by AttendancePercentage
     switch (sortByAttendancePercentage) {
-      case 'more':
-        sortedData = filterAttendancePercentage(sortedData, 'more');
+      case "more":
+        sortedData = filterAttendancePercentage(sortedData, "more");
         break;
-      case 'between':
-        sortedData = filterAttendancePercentage(sortedData, 'between');
+      case "between":
+        sortedData = filterAttendancePercentage(sortedData, "between");
         break;
-      case 'less':
-        sortedData = filterAttendancePercentage(sortedData, 'less');
+      case "less":
+        sortedData = filterAttendancePercentage(sortedData, "less");
         break;
       default:
         // Handle default case if needed
@@ -676,10 +673,8 @@ const AttendanceOverview: React.FC<AttendanceOverviewProps> = () => {
                     }
                     valuePartTwo={
                       Array.isArray(lowAttendanceLearnerList) &&
-                      lowAttendanceLearnerList.length > 2
-                        ? `${t('COMMON.AND')} ${
-                            lowAttendanceLearnerList.length - 2
-                          } ${t('COMMON.MORE')}`
+                        lowAttendanceLearnerList.length > 2
+                        ? `${t('COMMON.AND')} ${lowAttendanceLearnerList.length - 2} ${t('COMMON.MORE')}`
                         : null
                     }
                   />
@@ -783,14 +778,14 @@ const AttendanceOverview: React.FC<AttendanceOverviewProps> = () => {
                   </Grid>
                 </Grid>
               </Box>
-              {modalOpen && (
-                <SortingModal
+              {
+                modalOpen && <SortingModal
                   isModalOpen={modalOpen}
                   handleCloseModal={handleCloseModal}
                   handleSorting={handleSorting}
                   routeName={pathname}
                 />
-              )}
+              }
             </Stack>
           ) : null}
           {classId !== 'all' ? (
@@ -811,19 +806,14 @@ const AttendanceOverview: React.FC<AttendanceOverviewProps> = () => {
                       marginTop: '20px',
                     }}
                   >
-                    <Loader
-                      showBackdrop={false}
-                      loadingText={t('COMMON.LOADING')}
-                    />
+                    <Loader showBackdrop={false} loadingText={t('COMMON.LOADING')} />
                   </Box>
                 ) : displayStudentList?.length > 0 ? (
                   displayStudentList.map((user: any) => (
                     <StudentsStatsList
                       key={user.userId}
                       name={user.name}
-                      presentPercent={
-                        Math.floor(parseFloat(user.present_percent)) || 0
-                      }
+                      presentPercent={Math.floor(parseFloat(user.present_percent)) || 0}
                       classesMissed={user.absent || 0}
                       userId={user.userId}
                       cohortId={classId}
@@ -836,6 +826,7 @@ const AttendanceOverview: React.FC<AttendanceOverviewProps> = () => {
                   </>
                 )}
               </Box>
+
             </Box>
           ) : (
             <Box>
