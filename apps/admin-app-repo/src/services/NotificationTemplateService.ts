@@ -1,4 +1,5 @@
 import { deleteApi, patch, post } from './RestClient';
+import API_ENDPOINTS from './APIEndpoints';
 
 interface TemplateTypeDetails {
     subject: string;
@@ -15,7 +16,7 @@ export interface TemplatePayload {
     push?: TemplateTypeDetails;
 }
 
-const API_URL: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/notification-templates`;
+const API_URL: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}${API_ENDPOINTS.notificationTemplate}`;
 
 export const getNotificationTemplates = async ({ context }: { context: string }): Promise<any> => {
     try {

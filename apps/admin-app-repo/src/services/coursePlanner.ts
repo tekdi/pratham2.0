@@ -6,10 +6,26 @@ import {
 } from "@/utils/Interfaces";
 import { get, post } from "./RestClient";
 import axios from "axios";
+import { FRAMEWORK_ID } from "../../app.config";
 import { URL_CONFIG } from "@/utils/url.config";
+import API_ENDPOINTS from "./APIEndpoints";
 
-export const getFrameworkDetails = async (frameworkId: any): Promise<any> => {
-  const apiUrl: string = `/api/framework/v1/read/${frameworkId}`;
+export const getChannelDetails = async (): Promise<any> => {
+  const apiUrl: string = `/api/framework/v1/read/${FRAMEWORK_ID}`;
+
+  try {
+    const response = await axios.get(apiUrl);
+    return response?.data;
+  } catch (error) {
+    console.error("Error in getting Channel Details", error);
+    return error;
+  }
+};
+
+export const getFrameworkDetails = async (
+  frameworkId: string
+): Promise<any> => {
+  const apiUrl: string = `/api/framework/v1/read/${frameworkId}?categories=gradeLevel,medium,class,subject`;
 
   try {
     const response = await axios.get(apiUrl);
@@ -24,7 +40,7 @@ export const uploadCoursePlanner = async (
   file: File,
   metaData: CoursePlannerMetaData
 ): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/prathamservice/v1/course-planner/upload`;
+  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}${API_ENDPOINTS.coursePlannerUpload}`;
   const formData = new FormData();
   formData.append("file", file);
   formData.append("metaData", JSON.stringify(metaData));
@@ -45,7 +61,7 @@ export const getTargetedSolutions = async ({
   board,
   courseType,
 }: GetTargetedSolutionsParams): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_COURSE_PLANNER_API_URL}/solutions/targetedSolutions?type=improvementProject&currentScopeOnly=true`;
+  const apiUrl: string = `${process.env.NEXT_PUBLIC_COURSE_PLANNER_API_URL}${API_ENDPOINTS.targetedSolutions}`;
 
   const headers = {
     "X-auth-token": localStorage.getItem("token"),

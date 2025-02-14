@@ -1,9 +1,10 @@
+import API_ENDPOINTS from "./APIEndpoints";
 import { patch } from "./RestClient";
 export const deleteUser = async (
   userId: string,
   userData: object,
 ): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/interface/v1/user/update/${userId}`;
+  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}${API_ENDPOINTS.userUpdate(userId)}`;
   try {
     const response = await patch(apiUrl, userData);
     return response?.data;
