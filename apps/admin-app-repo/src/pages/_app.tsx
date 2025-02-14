@@ -78,7 +78,7 @@ function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
     // Initialize GA only once
     if (!window.GA_INITIALIZED) {
-      initGA(`${process.env.NEXT_PUBLIC_MEASUREMENT_ID_ADMIN}`)
+      initGA(`${process.env.NEXT_PUBLIC_MEASUREMENT_ID}`)
             window.GA_INITIALIZED = true;
     }
 
