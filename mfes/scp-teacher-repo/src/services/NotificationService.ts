@@ -57,7 +57,7 @@ export const sendEmailOnFacilitatorCreation = async (
 
 export const sendEmailOnLearnerCreation = async (
   name: string,
-  username: string,
+  username: string, 
   password: string,
   email: string,
   learnerName: string
@@ -66,7 +66,8 @@ export const sendEmailOnLearnerCreation = async (
     '{FirstName}': toPascalCase(name),
     '{UserName}': username,
     '{Password}': password,
-    '{LearnerName}': learnerName,
+    '{LearnerName}': toPascalCase(learnerName),
+    "{appUrl}": window.location.origin,
   };
 
   const sendTo = {

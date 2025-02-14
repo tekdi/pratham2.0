@@ -38,13 +38,15 @@ const CohortLearnerList: React.FC<CohortLearnerListProp> = ({
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [loading, setLoading] = React.useState<boolean>(false);
   const [userData, setUserData] = React.useState<UserDataProps[]>();
+  const [resData, setResData] = React.useState<UserDataProps[]>();
+  console.log(userData);
 
   const [filteredData, setFilteredData] =  React.useState(userData);
   const [searchTerm, setSearchTerm] =  React.useState('');
   const setCohortFacilitatorsCount = useStore((state) => state.setCohortFacilitatorsCount);
 
 
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [offset, setOffset] = useState(0);
 
   const [infinitePage, setInfinitePage] = useState(1);
@@ -66,9 +68,12 @@ const CohortLearnerList: React.FC<CohortLearnerListProp> = ({
       }
       try {
         if (cohortId) {
-          const filters = { cohortId: cohortId };
-          const limit = pagesLimit
-          const page=offset
+          const filters = {
+            cohortId: cohortId,
+          };
+          const limit = pagesLimit;
+          const page = offset;
+
           const response = await getMyCohortFacilitatorList({
             limit,
             page,
@@ -96,13 +101,14 @@ const CohortLearnerList: React.FC<CohortLearnerListProp> = ({
             if (isMobile) {
               setInfiniteData([...infiniteData, ...userDetails]);
               setFilteredData(userDetails);
-              
+              setUserData([...infiniteData, ...userDetails]);
+
             } else {
               setUserData(userDetails);
               setFilteredData(userDetails);
               setInfiniteData(userDetails);
+              setOffset(0);
             }
-           
 
             setTotalCount(response.result?.totalCount);
             setCohortFacilitatorsCount(userDetails.length);
@@ -123,29 +129,23 @@ const CohortLearnerList: React.FC<CohortLearnerListProp> = ({
     getCohortMemberList();
   }, [cohortId, reloadState, page, infinitePage]);
 
+
   const onDelete = () => {};
-  const handleSearch = (searchTerm: string) => {
-    
+  
 
-    const filtered = userData?.filter((data) =>
-    data?.name?.toLowerCase()?.includes(searchTerm) || data?.enrollmentNumber?.toLowerCase()?.includes(searchTerm)
-  );
-  setFilteredData(filtered);
-  };
-
+ 
+  
   const PAGINATION_CONFIG = {
     ITEMS_PER_PAGE: pagesLimit,
     INFINITE_SCROLL_INCREMENT: pagesLimit,
   };
 
   const fetchData = async () => {
+    setUserData(resData);
+    setFilteredData(resData);
     if (infiniteData && (infiniteData.length >= totalCount)) {
       return;
     }
-
-    console.log(infiniteData.length);
-    console.log(totalCount);
-
     try {
       setOffset((prev) => {
         if (totalCount && prev + PAGINATION_CONFIG.ITEMS_PER_PAGE <= totalCount) {
@@ -153,16 +153,40 @@ const CohortLearnerList: React.FC<CohortLearnerListProp> = ({
         }
         return prev;
       });
-
       setInfinitePage((prev) => prev + PAGINATION_CONFIG.INFINITE_SCROLL_INCREMENT);
     } catch (error) {
       console.error('Error fetching more data:', error);
       showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
     }
   }
+  const handleSearch = async (searchTerm: string) => {
+    const filtered = userData?.filter((data) =>{
+      return data?.name?.toLowerCase()?.includes(searchTerm.toLowerCase()) || data?.enrollmentNumber?.toLowerCase()?.includes(searchTerm)
+    }
+    );
+    // const filters = {
+    //   cohortId: cohortId,
+    //   firstName: searchTerm
+    // };
+    // const limit = pagesLimit;
+    // const page = offset;
+    // const response = await getMyCohortFacilitatorList({
+    //   limit,
+    //   page,
+    //   filters,
+    // });
+
+    setUserData(resData || []);
+    setFilteredData(resData || []);
+
+  };
+
   const handlePageChange = (newPage: number) => {
-    setPage(newPage-1);
-    setOffset((newPage - 1) * pagesLimit)
+    if (!isMobile) {
+      
+      setPage(newPage);
+    }
+    setOffset((newPage - 1) * PAGINATION_CONFIG.ITEMS_PER_PAGE)
   };
   
   
@@ -221,21 +245,21 @@ const CohortLearnerList: React.FC<CohortLearnerListProp> = ({
                   justifyContent: 'end',
                 }}
               >
-                {
-                  (isMobile ? infiniteData.length > pagesLimit : (filteredData && filteredData?.length > pagesLimit)) && (
+               
+                 
                     <CustomPagination
                       count={Math.ceil(totalCount / PAGINATION_CONFIG.ITEMS_PER_PAGE)}
-                      page={page + 1}
+                      page={page }
                       onPageChange={handlePageChange}
-                      // fetchMoreData={fetchData}
+                      fetchMoreData={() => fetchData()}
+                      hasMore={hasMore}
                       TotalCount={totalCount}
-                      hasMore={infinitePage * pagesLimit < totalCount}
-                      items={(infiniteData || []).map((user: UserDataProps) => (
+                      items={infiniteData.map((user) => (
                         <Box key={user.userId}></Box>
                       ))}
                     />
-                  )
-                }
+                  
+                
                 
               </Box>
 
