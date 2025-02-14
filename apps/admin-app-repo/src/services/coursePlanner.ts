@@ -10,17 +10,7 @@ import { FRAMEWORK_ID } from "../../app.config";
 import { URL_CONFIG } from "@/utils/url.config";
 import API_ENDPOINTS from "./APIEndpoints";
 
-export const getChannelDetails = async (): Promise<any> => {
-  const apiUrl: string = `/api/framework/v1/read/${FRAMEWORK_ID}`;
 
-  try {
-    const response = await axios.get(apiUrl);
-    return response?.data;
-  } catch (error) {
-    console.error("Error in getting Channel Details", error);
-    return error;
-  }
-};
 
 export const getFrameworkDetails = async (
   frameworkId: string
