@@ -181,7 +181,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
 
   const isDashboard = [
     '/dashboard',
-    '/youthboard',
+    '/',
     '/attendance-history',
     '/attendance-overview',
   ].includes(router.pathname);

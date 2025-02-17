@@ -7,6 +7,7 @@ import { Telemetry } from '@/utils/app.constant';
 import { useQueryClient } from '@tanstack/react-query';
 import useStore from '@/store/store';
 import { preserveLocalStorage } from '@/utils/Helper';
+const loginUrl = process.env.NEXT_PUBLIC_LOGIN_URL;
 
 function Logout() {
   const queryClient = useQueryClient();
@@ -54,7 +55,8 @@ function Logout() {
     };
     userLogout();
     clearLocalStorage();
-    router.replace('/login');
+    //@ts-ignore
+    window.parent.location.href = loginUrl;
   }, []);
 
   return '';
