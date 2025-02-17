@@ -5,7 +5,7 @@ import { AxiosRequestConfig, AxiosResponse } from "axios";
 import { TENANT_ID } from "../../app.config";
 import TenantService from "./TenantService";
 
-import API_ENDPOINTS from "./APIEndpoints";
+import API_ENDPOINTS from '@/utils/API/APIEndpoints';
 
 export interface UserDetailParam {
   userData?: object;
@@ -30,7 +30,7 @@ export const getFormRead = async (
       }
 
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}${API_ENDPOINTS.formRead}`,
+        API_ENDPOINTS.formRead,
         {
           params: {
             context,
@@ -64,7 +64,7 @@ export const getFormRead = async (
 
 
 export const createUser = async (userData: any): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}${API_ENDPOINTS.accountCreate}`;
+  const apiUrl: string = API_ENDPOINTS.accountCreate
   try {
     const response = await post(apiUrl, userData);
     return response?.data?.result;
@@ -78,8 +78,8 @@ export const updateUser = async (
   userId: string,
   { userData, customFields }: UserDetailParam
 ): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}${API_ENDPOINTS.userUpdate(userId)}
-  `;
+  const apiUrl: string = API_ENDPOINTS.userUpdate(userId)
+
   try {
     const response = await patch(apiUrl, { userData, customFields });
     return response;

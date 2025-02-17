@@ -1,4 +1,4 @@
-import API_ENDPOINTS from "./APIEndpoints";
+import API_ENDPOINTS from '@/utils/API/APIEndpoints';
 import { post, get } from "./RestClient";
 
 export interface userListParam {
@@ -24,7 +24,7 @@ export const userList = async ({
   offset,
   fields,
 }: userListParam): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}${API_ENDPOINTS.userList}`;
+  const apiUrl: string = API_ENDPOINTS.userList
   try {
     const response = await post(apiUrl, {
       limit,
@@ -48,7 +48,7 @@ export const cohortMemberList = async ({
   offset,
   fields,
 }: userListParam): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}${API_ENDPOINTS.cohortMemberList}`;
+  const apiUrl: string = API_ENDPOINTS.cohortMemberList
   try {
     const response = await post(apiUrl, {
       limit,
@@ -68,7 +68,7 @@ export const getUserDetailsInfo = async (
   userId: string | string[],
   fieldValue: boolean = true
 ): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}${API_ENDPOINTS.userRead(userId, fieldValue)}`;
+  const apiUrl: string = API_ENDPOINTS.userRead(userId, fieldValue)
   try {
     const response = await get(apiUrl);
     return response?.data?.result;
@@ -79,7 +79,7 @@ export const getUserDetailsInfo = async (
 };
 
 export const userNameExist = async (userData: any): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}${API_ENDPOINTS.suggestUsername}`;
+  const apiUrl: string = API_ENDPOINTS.suggestUsername
   try {
     const response = await post(apiUrl, userData);
     return response?.data?.result;

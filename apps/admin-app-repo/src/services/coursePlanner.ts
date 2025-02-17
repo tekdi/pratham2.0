@@ -8,7 +8,7 @@ import { get, post } from "./RestClient";
 import axios from "axios";
 import { FRAMEWORK_ID } from "../../app.config";
 import { URL_CONFIG } from "@/utils/url.config";
-import API_ENDPOINTS from "./APIEndpoints";
+import API_ENDPOINTS from '@/utils/API/APIEndpoints';
 
 
 
@@ -30,7 +30,7 @@ export const uploadCoursePlanner = async (
   file: File,
   metaData: CoursePlannerMetaData
 ): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}${API_ENDPOINTS.coursePlannerUpload}`;
+  const apiUrl: string = API_ENDPOINTS.coursePlannerUpload
   const formData = new FormData();
   formData.append("file", file);
   formData.append("metaData", JSON.stringify(metaData));

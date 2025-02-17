@@ -5,13 +5,14 @@ import {
   UserList,
 } from '../utils/Interfaces';
 import { post, put } from './RestClient';
+import API_ENDPOINTS from '@/utils/API/APIEndpoints';
 
 const fetchCohortMemberList = async ({
   limit,
   page,
   filters,
 }: CohortMemberList): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/v1/cohortmember/list`;
+  const apiUrl: string = API_ENDPOINTS.cohortMemberList
   try {
     const response = await post(apiUrl, {
       limit,
@@ -34,7 +35,7 @@ export const getMyUserList = async ({
   filters,
   fields,
 }: UserList): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/v1/list`;
+  const apiUrl: string = API_ENDPOINTS.userList
   try {
     const response = await post(apiUrl, {
       limit,
@@ -96,7 +97,7 @@ export const updateCohortMemberStatus = async ({
   membershipId,
   dynamicBody = {},
 }: UpdateCohortMemberStatusParams): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/v1/cohortmember/update/${membershipId}`;
+  const apiUrl: string = API_ENDPOINTS.cohortMemberUpdate(membershipId)
 
   // Utility to stringify only the values of the customFields
   const prepareCustomFields = (customFields: any[]): any[] => {

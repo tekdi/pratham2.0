@@ -1,9 +1,9 @@
-import API_ENDPOINTS from "./APIEndpoints";
+import API_ENDPOINTS from '@/utils/API/APIEndpoints';
 import { get } from "./RestClient";
 export const getCohortList = async (
   userId: string | string[],
 ): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}${API_ENDPOINTS.myCohorts(userId)}`;
+  const apiUrl: string = API_ENDPOINTS.myCohorts(userId);
   try {
     const response = await get(apiUrl);
     return response?.data;

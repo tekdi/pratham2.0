@@ -1,6 +1,6 @@
 import { SendCredentialsRequest } from '@/utils/Interfaces';
 import { post, get } from './RestClient';
-import API_ENDPOINTS from './APIEndpoints';
+import API_ENDPOINTS from '@/utils/API/APIEndpoints';
 
 export const sendCredentialService = async ({
   isQueue,
@@ -10,7 +10,7 @@ export const sendCredentialService = async ({
   email,
   push
 }: SendCredentialsRequest): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}${API_ENDPOINTS.notificationSend}`;
+  const apiUrl: string = API_ENDPOINTS.notificationSend
   try {
     const response = await post(apiUrl, {
       isQueue,

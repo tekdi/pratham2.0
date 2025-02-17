@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { get, patch } from '@shared-lib';
+import API_ENDPOINTS from '../utils/API/APIEndpoints';
 
 export const getUserId = async (): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/v1/auth`;
+  const apiUrl: string = API_ENDPOINTS.userAuth;
 
   try {
     const token = localStorage.getItem('token');
@@ -24,10 +25,10 @@ export const getUserId = async (): Promise<any> => {
 };
 
 export const editEditUser = async (
-  userId?: string | string[],
+  userId: string | string[],
   userDetails?: object
 ): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/v1/update/${userId}`;
+  const apiUrl: string = API_ENDPOINTS.userUpdate(userId);
   try {
     const response = await patch(apiUrl, userDetails);
     return response?.data;
@@ -38,10 +39,10 @@ export const editEditUser = async (
 };
 
 export const getUserDetails = async (
-  userId?: string | string[],
+  userId: string | string[],
   fieldValue?: boolean
 ): Promise<any> => {
-  let apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/v1/read/${userId}`;
+  let apiUrl: string =  API_ENDPOINTS.userRead(userId)
   apiUrl = fieldValue ? `${apiUrl}?fieldvalue=true` : apiUrl;
 
   try {

@@ -2,7 +2,7 @@ import { CohortMemberList } from "@/utils/Interfaces";
 import { get, post, put } from "../RestClient";
 import axios from 'axios';
 import { showToastMessage } from "@/components/Toastify";
-import API_ENDPOINTS from "../APIEndpoints";
+import API_ENDPOINTS from "@/utils/API/APIEndpoints";
 
 export interface cohortListFilter {
   type: string;
@@ -24,7 +24,7 @@ export interface UpdateCohortMemberStatusParams {
   membershipId: string | number;
 }
 export const getCohortList = async (data: cohortListData): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}${API_ENDPOINTS.cohortSearch}`;
+  const apiUrl: string = API_ENDPOINTS.cohortSearch
 
   try {
     const response = await post(apiUrl, data);
@@ -40,7 +40,7 @@ export const updateCohortUpdate = async (
   cohortDetails: any
 ): Promise<any> => {
   // const { name, status, type } = cohortDetails;
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}${API_ENDPOINTS.cohortUpdateUser(userId)}`;
+  const apiUrl: string = API_ENDPOINTS.cohortUpdateUser(userId)
 
   try {
     const response = await put(apiUrl, cohortDetails);
@@ -55,7 +55,7 @@ export const getFormRead = async (
   context: string,
   contextType: string
 ): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}${API_ENDPOINTS.formReadWithContext(context, contextType)}`;
+  const apiUrl: string = API_ENDPOINTS.formReadWithContext(context, contextType)
   try {
     const response = await get(apiUrl);
     const sortedFields = response?.data?.result.fields?.sort(
@@ -74,7 +74,7 @@ export const getFormRead = async (
   }
 };
 export const createUser = async (userData: any): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}${API_ENDPOINTS.accountCreate}`;
+  const apiUrl: string = API_ENDPOINTS.accountCreate
   try {
     const response = await post(apiUrl, userData);
     return response?.data?.result;
@@ -85,7 +85,7 @@ export const createUser = async (userData: any): Promise<any> => {
 };
 
 export const createCohort = async (userData: any, t?:any): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}${API_ENDPOINTS.cohortUpdateUser}`;
+  const apiUrl: string = API_ENDPOINTS.cohortCreate
 
   try {
 
@@ -110,7 +110,7 @@ export const fetchCohortMemberList = async ({
   offset,
   filters,
 }: CohortMemberList): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}${API_ENDPOINTS.cohortMemberList}`;
+  const apiUrl: string = API_ENDPOINTS.cohortMemberList
   try {
     const response = await post(apiUrl, {
       limit,
@@ -128,7 +128,7 @@ export const fetchCohortMemberList = async ({
 
 
 export const bulkCreateCohortMembers = async (payload: any): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}${API_ENDPOINTS.cohortMemberBulkCreate}`;
+  const apiUrl: string = API_ENDPOINTS.cohortMemberBulkCreate
   try {
     const response = await post(apiUrl, payload);
     return response.data;
@@ -144,7 +144,7 @@ export const updateCohortMemberStatus = async ({
   statusReason,
   membershipId,
 }: UpdateCohortMemberStatusParams): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}${API_ENDPOINTS.cohortMemberUpdate(membershipId)}`;
+  const apiUrl: string = API_ENDPOINTS.cohortMemberUpdate(membershipId)
   try {
     const response = await put(apiUrl, {
       status: memberStatus,

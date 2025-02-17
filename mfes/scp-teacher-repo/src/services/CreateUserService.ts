@@ -1,3 +1,4 @@
+import API_ENDPOINTS from '@/utils/API/APIEndpoints';
 import { post } from './RestClient';
 
 //     const sortedFields = response?.data?.result.fields?.sort(
@@ -17,7 +18,7 @@ import { post } from './RestClient';
 // };
 
 export const createUser = async (userData: any): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/v1/create`;
+  const apiUrl: string = API_ENDPOINTS.accountCreate
   try {
     const response = await post(apiUrl, userData);
     return response?.data?.result;
@@ -28,7 +29,7 @@ export const createUser = async (userData: any): Promise<any> => {
 };
 
 export const userNameExist = async (userData: any): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/v1/suggestUsername`;
+  const apiUrl: string = API_ENDPOINTS.suggestUsername
   try {
     const response = await post(apiUrl, userData);
     return response?.data?.result;
@@ -39,7 +40,7 @@ export const userNameExist = async (userData: any): Promise<any> => {
 };
 
 export const createCohort = async (userData: any): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/v1/cohort/create`;
+  const apiUrl: string = API_ENDPOINTS.cohortCreate
   try {
     const response = await post(apiUrl, userData);
     return response?.data?.result;

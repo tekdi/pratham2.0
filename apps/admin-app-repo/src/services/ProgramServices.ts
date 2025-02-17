@@ -2,7 +2,7 @@ import { showToastMessage } from "@/components/Toastify";
 import { get, patch, deleteApi } from "./RestClient";
 import { post } from "./RestClient";
 import axios from "axios";
-import API_ENDPOINTS from "./APIEndpoints";
+import API_ENDPOINTS from '@/utils/API/APIEndpoints';
 export interface programListData {
   limit?: Number;
   offset?: Number;
@@ -10,7 +10,7 @@ export interface programListData {
 }
 export const getProgramList = async (
 ): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}${API_ENDPOINTS.tenantRead}`;
+  const apiUrl: string = API_ENDPOINTS.tenantRead
   try {
     const response = await get(apiUrl);
     return response?.data;
@@ -22,7 +22,7 @@ export const getProgramList = async (
 
 export const createProgram = async (programData: FormData,   t?:any
   ): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}${API_ENDPOINTS.tenantCreate}`;
+  const apiUrl: string = API_ENDPOINTS.tenantCreate
   try {
     const headers = {
       'Content-Type': 'multipart/form-data' 
@@ -44,7 +44,7 @@ export const createProgram = async (programData: FormData,   t?:any
 };
 
 export const updateProgram = async (programData: any, tenantId: string): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}${API_ENDPOINTS.tenantUpdate(tenantId)}`;
+  const apiUrl: string = API_ENDPOINTS.tenantUpdate(tenantId)
   try {
    
     const response = await patch(apiUrl, programData, 
@@ -57,7 +57,7 @@ export const updateProgram = async (programData: any, tenantId: string): Promise
   }
 };
 export const deleteProgram = async ( tenantId: string): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}${API_ENDPOINTS.tenantDelete(tenantId)}`;
+  const apiUrl: string = API_ENDPOINTS.tenantDelete(tenantId)
   try {
    
     const response = await deleteApi(apiUrl);
@@ -69,7 +69,7 @@ export const deleteProgram = async ( tenantId: string): Promise<any> => {
 };
 
 export const programSearch = async (data: programListData): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}${API_ENDPOINTS.tenantSearch}`;
+  const apiUrl: string = API_ENDPOINTS.tenantSearch
 
   try {
     const response = await post(apiUrl, data);
