@@ -7,7 +7,6 @@ import programIcon from "../../../../public/images/programIcon.svg";
 import coursePlannerIcon from "../../../../public/images/event_available.svg";
 import { store } from "@/store/store";
 import { Role } from "@/utils/app.constant";
-const ENV = process.env.NEXT_PUBLIC_SHOW_WORKSPACE;
 const isActiveYear = store.getState().isActiveYearSelected;
 
 const Menuitems = [
@@ -57,6 +56,11 @@ const Menuitems = [
       },
     ],
   },
+  {
+    title: "SIDEBAR.MANAGE_NOTIFICATION",
+    icon: centerIcon,
+    href: ["/notification-templates"],
+  },
   ...(isActiveYear
     ? [
         {
@@ -66,7 +70,7 @@ const Menuitems = [
         },
       ]
     : []),
-  ...(isActiveYear && ENV === "true"
+  ...(isActiveYear
     ? [
         {
           title: "SIDEBAR.WORKSPACE",
@@ -103,7 +107,9 @@ export const getFilteredMenuItems = () => {
         (item) =>
           item.title !== "SIDEBAR.COURSE_PLANNER" &&
           item.title !== "SIDEBAR.WORKSPACE" &&
-          item.title !== "PROGRAM_MANAGEMENT.PROGRAMS"
+          item.title !== "PROGRAM_MANAGEMENT.PROGRAMS" &&
+          item.title !== "SIDEBAR.MANAGE_NOTIFICATION"
+
 
       );
     }
