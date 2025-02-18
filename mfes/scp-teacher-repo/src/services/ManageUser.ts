@@ -4,13 +4,14 @@ import {
   FacilitatorListParam,
 } from '@/utils/Interfaces';
 import { patch, post, put } from './RestClient';
+import API_ENDPOINTS from '@/utils/API/APIEndpoints';
 
 export const getFacilitatorList = async ({
   limit,
   page,
   filters,
 }: FacilitatorListParam): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/v1/list`;
+  const apiUrl: string =  API_ENDPOINTS.userList;
   try {
     const response = await post(apiUrl, { limit, page, filters });
     return response?.data?.result;
@@ -24,7 +25,7 @@ export const assignCentersToFacilitator = async ({
   userId,
   cohortId,
 }: AssignCentersToFacilitatorListParam): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/v1/cohortmember/bulkCreate`;
+  const apiUrl: string = API_ENDPOINTS.cohortMemberBulkCreate
   try {
     const response = await post(apiUrl, { userId, cohortId });
     return response?.data?.result;
@@ -38,7 +39,7 @@ export const updateFacilitator = async (
   userId: string,
   userData: FacilitatorDeleteUserData
 ): Promise<any> => {
-  const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/v1/update/${userId}`;
+  const apiUrl = API_ENDPOINTS.userUpdate(userId)
   try {
     const response = await patch(apiUrl, { userData });
     return response.data.result;
@@ -52,7 +53,7 @@ export const renameFacilitator = async (
   userId: string,
   name: string
 ): Promise<any> => {
-  const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/v1/cohort/update/${userId}`;
+  const apiUrl = API_ENDPOINTS.updateCohortUser(userId)
   try {
     const response = await put(apiUrl, { name });
     return response.data.result;

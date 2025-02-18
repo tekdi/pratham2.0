@@ -1,3 +1,4 @@
+import API_ENDPOINTS from '@/utils/API/APIEndpoints';
 import { post } from './RestClient';
 
 export interface ContentStatus {
@@ -19,7 +20,7 @@ export interface ContentCreate {
 }
 
 export const getContentTrackingStatus = async (reqBody: ContentStatus) => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/v1/tracking/content/search/status`;
+  const apiUrl: string = API_ENDPOINTS.contentSearchStatus
   try {
     const response = await post(apiUrl, reqBody);
     return response?.data;
@@ -30,7 +31,7 @@ export const getContentTrackingStatus = async (reqBody: ContentStatus) => {
 };
 
 export const createContentTracking = async (reqBody: ContentCreate) => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/v1/tracking/content/create`;
+  const apiUrl: string = API_ENDPOINTS.contentCreate
   try {
     const response = await post(apiUrl, reqBody);
     return response?.data;

@@ -1,12 +1,13 @@
 import { scheduleEventParam, CreateEvent, EditEvent } from '@/utils/Interfaces';
 import { patch, post } from './RestClient';
+import API_ENDPOINTS from '@/utils/API/APIEndpoints';
 
 export const getEventList = async ({
   limit,
   offset,
   filters,
 }: scheduleEventParam): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/event-service/event/v1/list`;
+  const apiUrl: string = API_ENDPOINTS.eventList
   try {
     const response = await post(apiUrl, { limit, offset, filters });
     return response?.data?.result;
@@ -17,7 +18,7 @@ export const getEventList = async ({
 };
 
 export const createEvent = async (apiBody: CreateEvent): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/event-service/event/v1/create`;
+  const apiUrl: string = API_ENDPOINTS.eventCreate
   try {
     const response = await post(apiUrl, apiBody);
     return response?.data;
@@ -31,7 +32,7 @@ export const editEvent = async (
   eventRepetitionId: string,
   apiBody: EditEvent
 ): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/event-service/event/v1/${eventRepetitionId}`;
+  const apiUrl: string = API_ENDPOINTS.eventDetails(eventRepetitionId)
   try {
     const response = await patch(apiUrl, apiBody);
     return response?.data;

@@ -6,13 +6,14 @@ import {
 } from '@/utils/Interfaces';
 import { post } from './RestClient';
 import { URL_CONFIG } from '@/utils/url.config';
+import API_ENDPOINTS from '@/utils/API/APIEndpoints';
 
 export const getAssessmentList = async ({
   sort,
   pagination,
   filters,
 }: AssessmentListParam): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/v1/tracking/assessment/list`;
+  const apiUrl: string = API_ENDPOINTS.assessmentList;
   try {
     const response = await post(apiUrl, { pagination, filters, sort });
     return response?.data;
@@ -52,7 +53,7 @@ export const getDoIdForAssessmentDetails = async ({
 };
 
 export const getAssessmentStatus = async (body: IAssessmentStatusOptions) => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/v1/tracking/assessment/search/status`;
+  const apiUrl: string = API_ENDPOINTS.assessmentSearchStatus
   try {
     const response = await post(apiUrl, body);
     return response?.data?.data;
@@ -64,7 +65,7 @@ export const getAssessmentStatus = async (body: IAssessmentStatusOptions) => {
 };
 
 export const searchAssessment = async (body: ISearchAssessment) => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/v1/tracking/assessment/search`;
+  const apiUrl: string = API_ENDPOINTS.assessmentSearch
   try {
     const response = await post(apiUrl, body);
     return response?.data?.data;
