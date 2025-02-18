@@ -1,23 +1,16 @@
 import {
   getLocalStoredUserId,
   getLocalStoredUserRole,
-} from './LocalStorageService';
-import { delApi, get, post } from './RestClient';
-import axios from 'axios';
-import {
-  MIME_TYPE,
-  CHANNEL_ID,
-  TENANT_ID,
-  FRAMEWORK_ID,
-} from '../utils/app.config';
-import { v4 as uuidv4 } from 'uuid';
-import { PrimaryCategoryValue, Role } from '../utils/app.constant';
-
+} from "./LocalStorageService";
+import { delApi, get, post } from "./RestClient";
+import { MIME_TYPE } from "@/utils/app.config";
+import { v4 as uuidv4 } from "uuid";
+import { PrimaryCategoryValue, Role } from "@/utils/app.constant";
 const userId = getLocalStoredUserId();
-console.log('userId ==>', userId);
+console.log("userId ==>", userId);
 
-export const getPrimaryCategory = async () => {
-  const apiURL = `/api/channel/v1/read/${CHANNEL_ID}`;
+export const getPrimaryCategory = async (channelId: any) => {
+  const apiURL = `/api/channel/v1/read/${channelId}`;
   try {
     const response = await get(apiURL);
     return response?.data?.result;
@@ -26,13 +19,26 @@ export const getPrimaryCategory = async () => {
   }
 };
 
+// const PrimaryCategoryData = async () => {
+//   const response = await getPrimaryCategory();
+//   const collectionPrimaryCategories =
+//     response?.channel?.collectionPrimaryCategories;
+//   const contentPrimaryCategories = response?.channel?.contentPrimaryCategories;
+
+//   const PrimaryCategory = [
+//     ...collectionPrimaryCategories,
+//     ...contentPrimaryCategories,
+//   ];
+//   return PrimaryCategory;
+// };
+
 const defaultReqBody = {
   request: {
     filters: {
       createdBy: userId,
     },
     sort_by: {
-      lastUpdatedOn: 'desc',
+      lastUpdatedOn: "desc",
     },
   },
 };
@@ -42,7 +48,7 @@ const upForReviewReqBody = {
       //  createdBy: { userId},
     },
     sort_by: {
-      lastUpdatedOn: 'desc',
+      lastUpdatedOn: "desc",
     },
   },
 };
@@ -53,17 +59,18 @@ const getReqBodyWithStatus = (
   offset: number,
   primaryCategory: any,
   sort_by: any,
+  channel: string,
   contentType?: string,
-  state?: string
+  state?: string,
 ) => {
-  if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+  if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
     var PrimaryCategory =
-      JSON.parse(localStorage.getItem('PrimaryCategory') as string) ||
+      JSON.parse(localStorage.getItem("PrimaryCategory") as string) ||
       PrimaryCategoryValue;
   }
   primaryCategory =
     primaryCategory.length === 0 ? PrimaryCategory : primaryCategory;
-  if (contentType === 'discover-contents') {
+  if (contentType === "discover-contents") {
     const userRole = getLocalStoredUserRole();
 
     if (state) {
@@ -75,7 +82,7 @@ const getReqBodyWithStatus = (
             ...upForReviewReqBody.request.filters,
             status,
             primaryCategory,
-            createdBy: { '!=': getLocalStoredUserId() },
+            createdBy: { "!=": getLocalStoredUserId() },
             state: state,
           },
 
@@ -95,7 +102,8 @@ const getReqBodyWithStatus = (
           ...upForReviewReqBody.request.filters,
           status,
           primaryCategory,
-          createdBy: { '!=': getLocalStoredUserId() },
+          createdBy: { "!=": getLocalStoredUserId() },
+          channel: channel
         },
 
         query,
@@ -104,7 +112,7 @@ const getReqBodyWithStatus = (
         sort_by,
       },
     };
-  } else if (contentType === 'upReview') {
+  } else if (contentType === "upReview") {
     return {
       ...upForReviewReqBody,
       request: {
@@ -113,6 +121,7 @@ const getReqBodyWithStatus = (
           ...upForReviewReqBody.request.filters,
           status,
           primaryCategory,
+          channel: channel
         },
         query,
         limit,
@@ -130,6 +139,7 @@ const getReqBodyWithStatus = (
         ...defaultReqBody.request.filters,
         status,
         primaryCategory,
+        channel: channel
       },
       query,
       limit,
@@ -146,10 +156,11 @@ export const getContent = async (
   offset: number,
   primaryCategory: string[],
   sort_by: any,
+  channel: any,
   contentType?: string,
   state?: string
 ) => {
-  const apiURL = '/action/composite/v3/search';
+  const apiURL = "/action/composite/v3/search";
   try {
     const reqBody = getReqBodyWithStatus(
       status,
@@ -158,6 +169,7 @@ export const getContent = async (
       offset,
       primaryCategory,
       sort_by,
+      channel,
       contentType,
       state
     );
@@ -168,28 +180,23 @@ export const getContent = async (
   }
 };
 
-export const createQuestionSet = async () => {
+export const createQuestionSet = async (frameworkId: any) => {
   const apiURL = `/action/questionset/v2/create`;
   const reqBody = {
     request: {
       questionset: {
-        name: 'Untitled QuestionSet',
-        mimeType: 'application/vnd.sunbird.questionset',
-        primaryCategory: 'Practice Question Set',
+        name: "Untitled QuestionSet",
+        mimeType: "application/vnd.sunbird.questionset",
+        primaryCategory: "Practice Question Set",
         code: uuidv4(),
         createdBy: userId,
-        framework: FRAMEWORK_ID,
+        framework: frameworkId,
       },
     },
   };
 
   try {
-    const response = await axios.post(apiURL, reqBody, {
-      headers: {
-        'Content-Type': 'application/json',
-        tenantId: TENANT_ID,
-      },
-    });
+    const response = await post(apiURL, reqBody);
     return response?.data;
   } catch (error) {
     throw error;
@@ -199,7 +206,7 @@ export const createQuestionSet = async () => {
 export const deleteContent = async (identifier: string, mimeType: string) => {
   const questionsetRetireURL = `/action/questionset/v2/retire/${identifier}`;
   const contentRetireURL = `/action/content/v3/retire/${identifier}`;
-  let apiURL = '';
+  let apiURL = "";
   if (mimeType === MIME_TYPE.QUESTIONSET_MIME_TYPE) {
     apiURL = questionsetRetireURL;
   } else if (
@@ -216,73 +223,82 @@ export const deleteContent = async (identifier: string, mimeType: string) => {
   }
 };
 
-export const createCourse = async (userId: any) => {
+export const createCourse = async (userId: any, channelId: any, contentFW: any, targetFW: any) => {
   const apiURL = `/action/content/v3/create`;
 
   const reqBody = {
     request: {
       content: {
         code: uuidv4(), // Generate a unique ID for 'code'
-        name: 'Untitled Course',
-        description: 'Enter description for Course',
+        name: "Untitled Course",
         createdBy: userId,
-        createdFor: [CHANNEL_ID],
+        createdFor: [channelId],
         mimeType: MIME_TYPE.COURSE_MIME_TYPE,
-        resourceType: 'Course',
-        primaryCategory: 'Course',
-        contentType: 'Course',
-        framework: FRAMEWORK_ID,
+        resourceType: "Course",
+        primaryCategory: "Course",
+        contentType: "Course",
+        framework: contentFW,
+        targetFWIds: [targetFW]
       },
     },
   };
 
   try {
-    const response = await axios.post(apiURL, reqBody, {});
+    const response = await post(apiURL, reqBody);
     return response?.data;
   } catch (error) {
-    console.error('Error creating course:', error);
+    console.error("Error creating course:", error);
     throw error;
   }
 };
 
-export const publishContent = async (identifier: any) => {
+export const publishContent = async (
+  identifier: any,
+  publishChecklist?: any
+) => {
   const requestBody = {
     request: {
       content: {
         lastPublishedBy: userId,
+        publishChecklist: publishChecklist,
       },
     },
   };
 
   try {
-    const response = await axios.post(
+    const response = await post(
       `/action/content/v3/publish/${identifier}`,
       requestBody
     );
     return response.data;
   } catch (error) {
-    console.error('Error during publishing:', error);
+    console.error("Error during publishing:", error);
     throw error;
   }
 };
 
-export const submitComment = async (identifier: any, comment: any) => {
+export const submitComment = async (
+  identifier: any,
+  comment: any,
+  rejectReasons?: any
+) => {
   const requestBody = {
     request: {
       content: {
         rejectComment: comment,
+        rejectReasons: rejectReasons,
       },
     },
   };
 
   try {
-    const response = await axios.post(
+    const response = await post(
       `/action/content/v3/reject/${identifier}`,
       requestBody
     );
     return response.data;
   } catch (error) {
-    console.error('Error submitting comment:', error);
+    console.error("Error submitting comment:", error);
     throw error;
   }
 };
@@ -295,23 +311,40 @@ export const getContentHierarchy = async ({
   const apiUrl: string = `/action/content/v3/hierarchy/${doId}`;
 
   try {
-    console.log('Request data', apiUrl);
+    console.log("Request data", apiUrl);
     const response = await get(apiUrl);
     // console.log('response', response);
     return response;
   } catch (error) {
-    console.error('Error in getContentHierarchy Service', error);
+    console.error("Error in getContentHierarchy Service", error);
     throw error;
   }
 };
-export const getFrameworkDetails = async (): Promise<any> => {
-  const apiUrl: string = `/api/framework/v1/read/${FRAMEWORK_ID}`;
+export const getFrameworkDetails = async (frameworkId:any): Promise<any> => {
+  const apiUrl: string = `/api/framework/v1/read/${frameworkId}`;
 
   try {
-    const response = await axios.get(apiUrl);
+    const response = await get(apiUrl);
     return response?.data;
   } catch (error) {
-    console.error('Error in getting Framework Details', error);
+    console.error("Error in getting Framework Details", error);
+    return error;
+  }
+};
+export const getFormFields = async (): Promise<any> => {
+  const apiUrl: string = `/action/data/v1/form/read`;
+
+  try {
+    const response = await post(apiUrl, {
+      request: {
+        action: "publish",
+        type: "content",
+        subType: "resource",
+      },
+    });
+    return response?.data;
+  } catch (error) {
+    console.error("Error in getting Framework Details", error);
     return error;
   }
 };

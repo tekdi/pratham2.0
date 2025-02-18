@@ -1,49 +1,70 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import Layout from '../../../../components/Layout';
-import { Typography, Box, CircularProgress } from '@mui/material';
-
-import { getContent } from '../../../../services/ContentService';
-import SearchBox from '../../../../components/SearchBox';
-import PaginationComponent from '../../../../components/PaginationComponent';
-import { LIMIT } from '../../../../utils/app.constant';
-import { useRouter } from 'next/router';
-import { MIME_TYPE } from '../../../../utils/app.config';
-import WorkspaceText from '../../../../components/WorkspaceText';
-import { DataType } from 'ka-table/enums';
-import KaTableComponent from '../../../../components/KaTableComponent';
-import { timeAgo } from '../../../../utils/Helper';
-import useSharedStore from '../../../../utils/useSharedState';
-
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import Layout from "../../../../components/Layout";
+import {
+  Typography,
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  IconButton,
+  CircularProgress,
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { getContent } from "@/services/ContentService";
+import SearchBox from "../../../../components/SearchBox";
+import PaginationComponent from "@/components/PaginationComponent";
+import NoDataFound from "@/components/NoDataFound";
+import { LIMIT } from "@/utils/app.constant";
+import { useRouter } from "next/router";
+import { MIME_TYPE } from "@/utils/app.config";
+import WorkspaceText from "@/components/WorkspaceText";
+import { DataType } from "ka-table/enums";
+import KaTableComponent from "@/components/KaTableComponent";
+import { timeAgo } from "@/utils/Helper";
+import useSharedStore from "@/utils/useSharedState";
+import useTenantConfig from "@/hooks/useTenantConfig";
 const columns = [
   {
-    key: 'title_and_description',
-    title: 'TITLE & DESCRIPTION',
+    key: "title_and_description",
+    title: "TITLE & DESCRIPTION",
     dataType: DataType.String,
-    width: '450px',
+    width: "450px",
   },
   {
-    key: 'contentType',
-    title: 'CONTENT TYPE',
+    key: "contentType",
+    title: "CONTENT TYPE",
     dataType: DataType.String,
-    width: '200px',
+    width: "200px",
   },
   // { key: 'status', title: 'STATUS', dataType: DataType.String, width: "100px" },
   {
-    key: 'lastUpdatedOn',
-    title: 'LAST MODIFIED',
+    key: "lastUpdatedOn",
+    title: "LAST MODIFIED",
     dataType: DataType.String,
-    width: '180px',
+    width: "180px",
   },
-  { key: 'action', title: 'ACTION', dataType: DataType.String, width: '100px' },
+  { key: "action", title: "ACTION", dataType: DataType.String, width: "100px" },
 ];
 const PublishPage = () => {
-  const [selectedKey, setSelectedKey] = useState('publish');
+  const tenantConfig = useTenantConfig();
+  const router = useRouter();
+
+  const [selectedKey, setSelectedKey] = useState("publish");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filter, setFilter] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState('Modified On');
-  const [contentList, setContentList] = React.useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const filterOption: string[] = router.query.filterOptions
+  ? JSON.parse(router.query.filterOptions as string)
+  : [];
+  const [filter, setFilter] = useState<string[]>(filterOption);
+  const sort: string = typeof router.query.sort === "string" 
+  ? router.query.sort 
+  : "Modified On";
+    const [sortBy, setSortBy] = useState(sort);
+      const [contentList, setContentList] = React.useState([]);
   const [contentDeleted, setContentDeleted] = React.useState(false);
   const [loading, setLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
@@ -52,7 +73,7 @@ const PublishPage = () => {
   const [debouncedSearchTerm, setDebouncedSearchTerm] =
     useState<string>(searchTerm);
 
-  const router = useRouter();
+  const prevFilterRef = useRef(filter);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -94,14 +115,14 @@ const PublishPage = () => {
 
   const openEditor = (content: any) => {
     const identifier = content?.identifier;
-    const mode = 'read';
+    const mode = "read";
     if (content?.mimeType === MIME_TYPE.QUESTIONSET_MIME_TYPE) {
       router.push({ pathname: `/editor`, query: { identifier, mode } });
     } else if (
       content?.mimeType &&
       MIME_TYPE.GENERIC_MIME_TYPE.includes(content?.mimeType)
     ) {
-      sessionStorage.setItem('previousPage', window.location.href);
+      sessionStorage.setItem("previousPage", window.location.href);
       router.push({ pathname: `/upload-editor`, query: { identifier } });
     } else if (
       content?.mimeType &&
@@ -114,19 +135,28 @@ const PublishPage = () => {
   useEffect(() => {
     const getPublishContentList = async () => {
       try {
+        if (!tenantConfig) return;
         setLoading(true);
-        const query = debouncedSearchTerm || '';
-        const offset = debouncedSearchTerm !== '' ? 0 : page * LIMIT;
+        const query = debouncedSearchTerm || "";
+        let offset = debouncedSearchTerm !== "" ? 0 : page * LIMIT;
+        
         const primaryCategory = filter.length ? filter : [];
-        const order = sortBy === 'Created On' ? 'asc' : 'desc';
+        if (prevFilterRef.current !== filter) {
+          offset = 0;
+          setPage(0);
+
+          prevFilterRef.current = filter;
+        }
+        const order = sortBy === "Created On" ? "asc" : "desc";
         const sort_by = { lastUpdatedOn: order };
         const response = await getContent(
-          ['Live'],
+          ["Live"],
           query,
           LIMIT,
           offset,
           primaryCategory,
-          sort_by
+          sort_by,
+          tenantConfig?.CHANNEL_ID
         );
         const contentList = (response?.content || []).concat(
           response?.QuestionSet || []
@@ -141,6 +171,7 @@ const PublishPage = () => {
     };
     getPublishContentList();
   }, [
+    tenantConfig,
     debouncedSearchTerm,
     filter,
     sortBy,
@@ -155,16 +186,16 @@ const PublishPage = () => {
       <Box p={3}>
         <Box
           sx={{
-            background: '#fff',
-            borderRadius: '8px',
-            boxShadow: '0px 2px 6px 2px #00000026',
-            pb: totalCount > LIMIT ? '15px' : '0px',
+            background: "#fff",
+            borderRadius: "8px",
+            boxShadow: "0px 2px 6px 2px #00000026",
+            pb: totalCount > LIMIT ? "15px" : "0px",
           }}
         >
           <Box p={2}>
             <Typography
               variant="h4"
-              sx={{ fontWeight: 'bold', fontSize: '16px' }}
+              sx={{ fontWeight: "bold", fontSize: "16px" }}
             >
               Published
             </Typography>

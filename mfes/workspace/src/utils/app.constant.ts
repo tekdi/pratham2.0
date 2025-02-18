@@ -7,9 +7,19 @@ export enum Status {
 export enum ContentType {
   QUESTION_SET = "QuestionSet",
 }
+export enum Editor {
+  CONTENT = "content",
+  QUESTION_SET = "questionset",
+  COLLECTION="collection"
+
+}
 export enum Role {
-  SCTA = "State Admin SCTA",
-  CCTA="Central Admin CCTA"
+  SCTA = "State Content Team Associate (SCTA)",
+  CCTA="Central Content Team Associate (CCTA)"
+}
+export enum ContentStatus {
+  PUBLISHED = "Published",
+  REJECTED="Rejected"
 }
 export const SortOptions = ["Modified On", "Created On"];
 export const StatusOptions = ["Live", "Review" ,  "Draft", "All"];

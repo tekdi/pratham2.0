@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Box, Tooltip, useTheme } from '@mui/material';
-import DeleteConfirmation from './DeleteConfirmation';
+import React, { useState } from "react";
+import { Box, Typography, Tooltip, useTheme } from "@mui/material";
+import DeleteConfirmation from "./DeleteConfirmation";
 
 interface ActionCellProps {
   rowData?: any;
@@ -22,13 +22,13 @@ const ActionIcon: React.FC<ActionCellProps> = ({
   return (
     <Box
       sx={{
-        display: 'flex',
-        flexDirection: 'row',
-        gap: '20px',
-        alignItems: 'center',
+        display: "flex",
+        flexDirection: "row",
+        gap: "20px",
+        alignItems: "center",
       }}
     >
-      <Tooltip title={'Delete'}>
+      <Tooltip title={"Delete"}>
         <Box
           onClick={() => {
             console.log(rowData);
@@ -36,15 +36,15 @@ const ActionIcon: React.FC<ActionCellProps> = ({
             handleOpen();
           }}
           sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            cursor: 'pointer',
-            backgroundColor: '#F8EFE7',
-            p: '10px',
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            cursor: "pointer",
+            backgroundColor: "#F8EFE7",
+            p: "10px",
           }}
         >
-          <img src={'/delete.png'} height="20px" alt="Image" />
+          <img src={"/delete.png"} height="20px" alt="Image" />
         </Box>
       </Tooltip>
 

@@ -1,33 +1,34 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/router';
-import { v4 as uuidv4 } from 'uuid';
-import {
-  TENANT_ID,
-  CHANNEL_ID,
-  FRAMEWORK_ID,
-  CLOUD_STORAGE_URL,
-} from '../utils/app.config';
+import React, { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/router";
+import { v4 as uuidv4 } from "uuid";
+import { CLOUD_STORAGE_URL } from "@/utils/app.config";
 import {
   getLocalStoredUserId,
   getLocalStoredUserName,
-} from '../services/LocalStorageService';
+  getLocalStoredUserSpecificBoard
+} from "@/services/LocalStorageService";
+import { fetchCCTAList, getUserDetailsInfo } from "@/services/userServices";
+import { sendCredentialService } from "@/services/NotificationService";
+import useTenantConfig from "@/hooks/useTenantConfig";
+import { sendContentNotification } from "@/services/sendContentNotification";
+import { ContentStatus, Editor } from "@/utils/app.constant";
 const QuestionSetEditor: React.FC = () => {
+  const tenantConfig = useTenantConfig();
   const router = useRouter();
   const { identifier } = router.query;
   const [mode, setMode] = useState<any>();
-  const [fullName, setFullName] = useState('Anonymous User');
-  const [userId, setUserId] = useState(TENANT_ID);
-  const [deviceId, setDeviceId] = useState('7e85b4967aebd6704ba1f604f20056b6');
+  const [fullName, setFullName] = useState("Anonymous User");
+  const [deviceId, setDeviceId] = useState("7e85b4967aebd6704ba1f604f20056b6");
 
-  const [firstName, lastName] = fullName.split(' ');
+  const [firstName, lastName] = fullName.split(" ");
 
   useEffect(() => {
     const storedFullName = getLocalStoredUserName();
-    const storedUserId = getLocalStoredUserId() || TENANT_ID;
-    const storedMode = localStorage.getItem('contentMode');
-    setMode(storedMode || 'edit');
-    setFullName(storedFullName ?? 'Anonymous User');
-    setUserId(storedUserId);
+    const storedUserId = getLocalStoredUserId();
+    const storedMode = localStorage.getItem("contentMode");
+    setMode(storedMode || "edit");
+    setFullName(storedFullName ?? "Anonymous User");
+
 
     const generatedDeviceId = uuidv4();
     setDeviceId(generatedDeviceId);
@@ -36,127 +37,187 @@ const QuestionSetEditor: React.FC = () => {
   const questionSetEditorConfig = {
     context: {
       user: {
-        id: userId,
+        id: getLocalStoredUserId(),
         fullName: fullName,
-        firstName: firstName || 'Anonymous',
-        lastName: lastName || 'Anonymous',
-        orgIds: [CHANNEL_ID],
+        firstName: firstName || "Anonymous",
+        lastName: lastName || "Anonymous",
+        orgIds: [tenantConfig?.CHANNEL_ID],
       },
       identifier: identifier,
       sid: uuidv4(),
       did: deviceId,
-      uid: userId,
-      channel: CHANNEL_ID,
+      uid: getLocalStoredUserId(),
+      channel: tenantConfig?.CHANNEL_ID,
       pdata: {
-        id: 'pratham.admin.portal',
-        ver: '1.0.0',
-        pid: 'pratham-portal',
+        id: "pratham.admin.portal",
+        ver: "1.0.0",
+        pid: "pratham-portal",
       },
       contextRollup: {
-        l1: CHANNEL_ID,
+        l1: tenantConfig?.CHANNEL_ID,
       },
-      tags: [CHANNEL_ID],
+      tags: [tenantConfig?.CHANNEL_ID],
       cdata: [
         {
-          id: CHANNEL_ID,
-          type: 'pratham-portal',
+          id: tenantConfig?.CHANNEL_ID,
+          type: "pratham-portal",
         },
       ],
       timeDiff: 5,
       objectRollup: {},
-      host: '',
-      defaultLicense: 'CC BY 4.0',
-      endpoint: '/data/v3/telemetry',
-      env: 'questionset_editor',
-      framework: FRAMEWORK_ID,
+      host: "",
+      defaultLicense: "CC BY 4.0",
+      endpoint: "/data/v3/telemetry",
+      env: "questionset_editor",
+      framework: tenantConfig?.COLLECTION_FRAMEWORK,
       cloudStorageUrls: [CLOUD_STORAGE_URL],
       labels: {
-        save_collection_btn_label: 'Save as Draft',
+        save_collection_btn_label: "Save as Draft",
       },
       correctionComments: false,
       sourcingResourceStatus: true,
       cloudStorage: {
-        provider: 'aws',
+        provider: "aws",
         presigned_headers: {},
       },
     },
     config: {
-      mode: mode || 'edit',
+      mode: mode || "edit",
+      userSpecificFrameworkField: getLocalStoredUserSpecificBoard(),
       enableQuestionCreation: true,
       enableAddFromLibrary: true,
       editableFields: {
-        sourcingreview: ['instructions'],
-        orgreview: ['name', 'instructions', 'learningOutcome'],
-        review: ['name', 'description'],
+        sourcingreview: ["instructions"],
+        orgreview: ["name", "instructions", "learningOutcome"],
+        review: ["name", "description"],
       },
       maxDepth: 4,
-      objectType: 'QuestionSet',
-      primaryCategory: 'Practice Question Set',
+      objectType: "QuestionSet",
+      primaryCategory: "Practice Question Set",
       isRoot: true,
-      iconClass: 'fa fa-book',
+      iconClass: "fa fa-book",
       hideSubmitForReviewBtn: false,
       children: {
-        Question: ['Multiple Choice Question', 'Subjective Question'],
+        Question: ["Multiple Choice Question", "Subjective Question"],
       },
       addFromLibrary: false,
       hierarchy: {
         level1: {
-          name: 'Section',
-          type: 'Unit',
-          mimeType: 'application/vnd.sunbird.questionset',
-          primaryCategory: 'Practice Question Set',
-          iconClass: 'fa fa-folder-o',
+          name: "Section",
+          type: "Unit",
+          mimeType: "application/vnd.sunbird.questionset",
+          primaryCategory: "Practice Question Set",
+          iconClass: "fa fa-folder-o",
           children: {},
           addFromLibrary: true,
         },
         level2: {
-          name: 'Sub Section',
-          type: 'Unit',
-          mimeType: 'application/vnd.sunbird.questionset',
-          primaryCategory: 'Practice Question Set',
-          iconClass: 'fa fa-folder-o',
+          name: "Sub Section",
+          type: "Unit",
+          mimeType: "application/vnd.sunbird.questionset",
+          primaryCategory: "Practice Question Set",
+          iconClass: "fa fa-folder-o",
           children: {
-            Question: ['Multiple Choice Question', 'Subjective Question'],
+            Question: ["Multiple Choice Question", "Subjective Question"],
           },
           addFromLibrary: true,
         },
         level3: {
-          name: 'Sub Section',
-          type: 'Unit',
-          mimeType: 'application/vnd.sunbird.questionset',
-          primaryCategory: 'Practice Question Set',
-          iconClass: 'fa fa-folder-o',
+          name: "Sub Section",
+          type: "Unit",
+          mimeType: "application/vnd.sunbird.questionset",
+          primaryCategory: "Practice Question Set",
+          iconClass: "fa fa-folder-o",
           children: {
-            Question: ['Subjective Question'],
+            Question: ["Subjective Question"],
           },
         },
       },
-      contentPolicyUrl: '/term-of-use.html',
-      assetProxyUrl: '/assets/public/',
-      commonFrameworkLicenseUrl: 'https://creativecommons.org/licenses/',
+      contentPolicyUrl: "/term-of-use.html",
+      assetProxyUrl: "/assets/public/",
+      commonFrameworkLicenseUrl: "https://creativecommons.org/licenses/",
     },
   };
+
+  console.log('questionSetEditorConfig ====>', questionSetEditorConfig)
 
   const editorRef = useRef<HTMLDivElement | null>(null);
   const isAppendedRef = useRef(false);
   const [assetsLoaded, setAssetsLoaded] = useState(false);
+  const sendReviewNotification = async (notificationData: any) => {
+   
+  
+    const isQueue = false;
+    const context = "CMS";
+    const key = "onContentReview";
+    const url = `${window.location.origin}/editor?identifier=${notificationData?.contentId}`  
+    try {
+      const response = await fetchCCTAList();
+      const cctaList = response;
+      const ContentDetail = await fetch(
+        `/action/content/v3/read/${notificationData?.contentId}`
+      );
+      const data = await ContentDetail.json();
 
+ 
+      const promises = cctaList.map(async (user: any) => {
+        const replacements = {
+          "{reviewerName}": user?.name,
+          "{creatorName}": notificationData?.creator,
+          "{contentId}": notificationData?.contentId,
+          "{appUrl}": url,
+          "{submissionDate}": new Date().toLocaleDateString(),
+        "{contentType}":"Course",
+        "{contentTitle}":data?.result?.content?.name
+        };
+  
+        return sendCredentialService({
+          isQueue,
+          context,
+          key,
+          replacements,
+          email: { receipients: [user?.email] },
+        });
+      });
+  
+      await Promise.all(promises);
+  
+      console.log("All emails sent successfully.");
+      
+      window.history.back(); 
+    } catch (error) {
+      console.error("Error sending email notifications:", error);
+    }
+  };
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
+  
+ 
+  const sendCreatorNotification = () => sendContentNotification(ContentStatus.PUBLISHED, Editor.QUESTION_SET ,"", identifier, undefined, router);
+  const sendContentRejectNotification = () => sendContentNotification(ContentStatus.REJECTED, Editor.QUESTION_SET ,"", identifier, undefined, router);
+ 
   useEffect(() => {
     const loadAssets = () => {
-      if (!document.getElementById('sunbird-editor-css')) {
-        const link = document.createElement('link');
-        link.id = 'sunbird-editor-css';
-        link.rel = 'stylesheet';
+      if (!document.getElementById("sunbird-editor-css")) {
+        const link = document.createElement("link");
+        link.id = "sunbird-editor-css";
+        link.rel = "stylesheet";
         link.href =
-          'https://cdn.jsdelivr.net/npm/@tekdi/sunbird-questionset-editor-web-component@3.0.1/styles.css';
+          "https://cdn.jsdelivr.net/npm/@tekdi/sunbird-questionset-editor-web-component@5.0.0-beta.5/styles.css";
         document.head.appendChild(link);
       }
 
-      if (!document.getElementById('sunbird-editor-js')) {
-        const script = document.createElement('script');
-        script.id = 'sunbird-editor-js';
+      if (!document.getElementById("sunbird-editor-js")) {
+        const script = document.createElement("script");
+        script.id = "sunbird-editor-js";
         script.src =
-          'https://cdn.jsdelivr.net/npm/@tekdi/sunbird-questionset-editor-web-component@3.0.1/sunbird-questionset-editor.js';
+          "https://cdn.jsdelivr.net/npm/@tekdi/sunbird-questionset-editor-web-component@5.0.0-beta.5/sunbird-questionset-editor.js";
         script.async = true;
         script.onload = () => setAssetsLoaded(true);
         document.body.appendChild(script);
@@ -168,8 +229,8 @@ const QuestionSetEditor: React.FC = () => {
     loadAssets();
 
     return () => {
-      const editorCss = document.getElementById('sunbird-editor-css');
-      const editorScript = document.getElementById('sunbird-editor-js');
+      const editorCss = document.getElementById("sunbird-editor-css");
+      const editorScript = document.getElementById("sunbird-editor-js");
 
       if (editorCss) document.head.removeChild(editorCss);
       if (editorScript) document.body.removeChild(editorScript);
@@ -179,28 +240,54 @@ const QuestionSetEditor: React.FC = () => {
   useEffect(() => {
     if (assetsLoaded && editorRef.current && !isAppendedRef.current) {
       const questionsetEditorElement = document.createElement(
-        'lib-questionset-editor'
+        "lib-questionset-editor"
       );
 
       questionsetEditorElement.setAttribute(
-        'editor-config',
+        "editor-config",
         JSON.stringify(questionSetEditorConfig)
       );
 
       questionsetEditorElement.addEventListener(
-        'editorEmitter',
+        "editorEmitter",
         (event: any) => {
-          console.log('Editor event:', event);
+          console.log("Editor event:", event);
           if (
-            event.detail?.action === 'backContent' ||
-            event.detail?.action === 'submitContent' ||
-            event.detail?.action === 'publishContent' ||
-            event.detail?.action === 'rejectContent'
+            event.detail?.action === "backContent" ||
+            event.detail?.action === "submitContent" ||
+            event.detail?.action === "publishContent" ||
+            event.detail?.action === "rejectContent"
           ) {
-            localStorage.removeItem('contentMode');
-            window.history.back();
+            if (event.detail?.action === "submitContent") {
+              console.log("collection");
+            
+              sendReviewNotification({
+                contentId: identifier,
+                creator: getLocalStoredUserName(),
+              })
+                .then(() => {
+                  window.history.back(); 
+                })
+                .catch((error) => {
+                  console.error("Error in sendReviewNotification:", error);
+                });
+            } 
+            else if (event.detail?.action === "publishContent")
+            {
+              sendCreatorNotification()
+            }
+            else if(event.detail?.action === "rejectContent")
+            {
+              sendContentRejectNotification()
+            }
+            
+            else {
+              window.history.back();
+            }
+            localStorage.removeItem("contentMode");
+          //  window.history.back();
             window.addEventListener(
-              'popstate',
+              "popstate",
               () => {
                 window.location.reload();
               },
