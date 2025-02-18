@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Box,
   Checkbox,
@@ -14,15 +14,17 @@ import {
   Select,
   useTheme,
   SelectChangeEvent,
-} from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import ClearIcon from '@mui/icons-material/Clear';
-import { debounce, getOptionsByCategory } from '../utils/Helper';
+} from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import ClearIcon from "@mui/icons-material/Clear";
+import { debounce, getOptionsByCategory } from "@/utils/Helper";
 import {
   getFrameworkDetails,
   getPrimaryCategory,
-} from '../services/ContentService';
-import { SortOptions, StatusOptions } from '../utils/app.constant';
+} from "@workspace/services/ContentService";
+import { SortOptions, StatusOptions } from "@workspace/utils/app.constant";
+import { useRouter } from "next/router";
+import useTenantConfig from "@workspace/hooks/useTenantConfig";
 
 export interface SearchBarProps {
   onSearch: (value: string) => void;
@@ -42,8 +44,8 @@ const sortOptions = SortOptions;
 
 const SearchBox: React.FC<SearchBarProps> = ({
   onSearch,
-  value = '',
-  placeholder = 'Search...',
+  value = "",
+  placeholder = "Search...",
   onFilterChange,
   onSortChange,
   onStatusChange,
@@ -51,19 +53,39 @@ const SearchBox: React.FC<SearchBarProps> = ({
   allContents = false,
   discoverContents = false,
 }) => {
+  const router = useRouter();
+
   const theme = useTheme<any>();
+  const tenantConfig = useTenantConfig();
   const [searchTerm, setSearchTerm] = useState(value);
-  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState<string>('Modified On');
-  const [status, setStatus] = useState<string>('All');
-  const [state, setState] = useState<string>('All');
+  const sort: string = typeof router.query.sort === "string" 
+  ? router.query.sort 
+  : "Modified On";
+
+  const [sortBy, setSortBy] = useState<string>(sort);
+  const statusQuery : string = typeof router.query.status === "string" 
+  ? router.query.status 
+  : "All";
+  const [status, setStatus] = useState<string>(statusQuery);
+  const stateQuery : string = typeof router.query.state === "string" 
+  ? router.query.state 
+  : "All";
+  const [state, setState] = useState<string>(stateQuery);
   const [stateOptions, setStateOptions] = useState<string[]>([]);
 
-  const [primaryCategory, setPrimaryCategory] = useState<string[]>();
+  const filterOption: string[] = router.query.filterOptions
+  ? JSON.parse(router.query.filterOptions as string)
+  : [];
+    const [selectedFilters, setSelectedFilters] = useState<string[]>(filterOption);
 
+console.log("filterOption", filterOption);
+  const [primaryCategory, setPrimaryCategory] = useState<string[]>();
+ 
   useEffect(() => {
+    if (!tenantConfig) return;
     const PrimaryCategoryData = async () => {
-      const response = await getPrimaryCategory();
+      const response = await getPrimaryCategory(tenantConfig.CHANNEL_ID);
+      if (!response?.channel) return;
       const collectionPrimaryCategories =
         response?.channel?.collectionPrimaryCategories;
       const contentPrimaryCategories =
@@ -73,26 +95,28 @@ const SearchBox: React.FC<SearchBarProps> = ({
         ...collectionPrimaryCategories,
         ...contentPrimaryCategories,
       ];
-      setPrimaryCategory(PrimaryCategory);
-      localStorage.setItem('PrimaryCategory', JSON.stringify(PrimaryCategory));
+      setPrimaryCategory(PrimaryCategory || []);
+      localStorage.setItem("PrimaryCategory", JSON.stringify(PrimaryCategory));
     };
     PrimaryCategoryData();
-  }, []);
+  }, [tenantConfig]);
 
   const filterOptions = primaryCategory;
   useEffect(() => {
+    if (!tenantConfig) return;
     const fetchStates = async (stateName?: string) => {
       try {
-        const data = await getFrameworkDetails();
+        const data = await getFrameworkDetails(tenantConfig?.COLLECTION_FRAMEWORK);
+        if (!data?.result?.framework) return;
         const framework = data?.result?.framework;
 
-        const states = await getOptionsByCategory(framework, 'state');
+        const states = await getOptionsByCategory(framework, "state");
 
         {
           const stateNames = states.map((state: any) => state.name);
-          setStateOptions(['All', ...stateNames]);
+          setStateOptions(["All", ...stateNames]);
 
-          console.log('stateNames', stateNames);
+          console.log("stateNames", stateNames);
         }
       } catch (err) {
         console.error(err);
@@ -100,11 +124,11 @@ const SearchBox: React.FC<SearchBarProps> = ({
       }
     };
     fetchStates();
-  }, []);
+  }, [tenantConfig]);
 
   const handleSearchClear = () => {
-    onSearch('');
-    setSearchTerm('');
+    onSearch("");
+    setSearchTerm("");
   };
 
   const handleSearch = useCallback(
@@ -120,7 +144,7 @@ const SearchBox: React.FC<SearchBarProps> = ({
 
     if (searchTerm.length >= 3) {
       handleSearch(searchTerm);
-    } else if (searchTerm.length === 0 || searchTerm === '') {
+    } else if (searchTerm.length === 0 || searchTerm === "") {
       handleSearchClear();
       handleSearch(searchTerm);
     }
@@ -128,23 +152,55 @@ const SearchBox: React.FC<SearchBarProps> = ({
 
   const handleFilterChange = (event: SelectChangeEvent<string[]>) => {
     const value = event.target.value as string[];
+    router.push(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, page: 1 , filterOptions: JSON.stringify(value)}, 
+      },
+      undefined,
+      { shallow: true } 
+    );
     setSelectedFilters(value);
     onFilterChange && onFilterChange(value);
   };
 
   const handleSortChange = (event: SelectChangeEvent<string>) => {
     const value = event.target.value as string;
+    router.push(
+      {
+        pathname: router.pathname,
+        query: { ...router.query,  sort: value}, 
+      },
+      undefined,
+      { shallow: true } 
+    );
     setSortBy(value);
     onSortChange && onSortChange(value);
   };
 
   const handleStatusChange = (event: SelectChangeEvent<string>) => {
     const value = event.target.value as string;
+    router.push(
+      {
+        pathname: router.pathname,
+        query: { ...router.query,  status: value}, 
+      },
+      undefined,
+      { shallow: true } 
+    );
     setStatus(value);
     onStatusChange && onStatusChange(value);
   };
   const handleStateChange = (event: SelectChangeEvent<string>) => {
     const value = event.target.value as string;
+    router.push(
+      {
+        pathname: router.pathname,
+        query: { ...router.query,  state: value}, 
+      },
+      undefined,
+      { shallow: true } 
+    );
     setState(value);
     onStateChange && onStateChange(value);
   };
@@ -157,12 +213,12 @@ const SearchBox: React.FC<SearchBarProps> = ({
               component="form"
               onSubmit={(e) => e.preventDefault()}
               sx={{
-                display: 'flex',
-                alignItems: 'center',
-                backgroundColor: theme.palette.warning['A700'],
-                borderRadius: '8px',
-                '& .MuiOutlinedInput-root fieldset': { border: 'none' },
-                '& .MuiOutlinedInput-input': { borderRadius: 8 },
+                display: "flex",
+                alignItems: "center",
+                backgroundColor: theme.palette.warning["A700"],
+                borderRadius: "8px",
+                "& .MuiOutlinedInput-root fieldset": { border: "none" },
+                "& .MuiOutlinedInput-input": { borderRadius: 8 },
               }}
             >
               <InputBase
@@ -171,18 +227,18 @@ const SearchBox: React.FC<SearchBarProps> = ({
                 sx={{
                   ml: theme.spacing(3),
                   flex: 1,
-                  fontSize: '16px',
-                  fontFamily: 'Poppins',
-                  color: '#000000DB',
+                  fontSize: "16px",
+                  fontFamily: "Poppins",
+                  color: "#000000DB",
                 }}
                 placeholder={placeholder}
-                inputProps={{ 'aria-label': placeholder }}
+                inputProps={{ "aria-label": placeholder }}
               />
               <IconButton
                 type="button"
                 onClick={searchTerm ? handleSearchClear : undefined}
                 sx={{ p: theme.spacing(1.25) }}
-                aria-label={searchTerm ? 'Clear' : 'Search'}
+                aria-label={searchTerm ? "Clear" : "Search"}
               >
                 {searchTerm ? <ClearIcon /> : <SearchIcon />}
               </IconButton>
@@ -195,24 +251,24 @@ const SearchBox: React.FC<SearchBarProps> = ({
           xs={12}
           md={12}
           lg={allContents || discoverContents ? 2 : 3}
-          justifySelf={'end'}
+          justifySelf={"end"}
         >
-          <FormControl sx={{ width: '100%', mt: 2 }}>
-            <InputLabel sx={{ color: '#000000DB' }}>Filter By</InputLabel>
+          <FormControl sx={{ width: "100%", mt: 2 }}>
+            <InputLabel sx={{ color: "#000000DB" }}>Filter By</InputLabel>
             <Select
               multiple
               value={selectedFilters}
               onChange={handleFilterChange}
               input={<OutlinedInput label="Filter By" />}
-              renderValue={(selected) => (selected as string[]).join(', ')}
+              renderValue={(selected) => (selected as string[]).join(", ")}
               sx={{
-                '& .MuiOutlinedInput-root': {
-                  '&.Mui-focused fieldset': { borderColor: '#000' },
+                "& .MuiOutlinedInput-root": {
+                  "&.Mui-focused fieldset": { borderColor: "#000" },
                 },
-                '& .MuiSelect-select': {
-                  height: '20px',
-                  display: 'flex',
-                  alignItems: 'center',
+                "& .MuiSelect-select": {
+                  height: "20px",
+                  display: "flex",
+                  alignItems: "center",
                 },
               }}
             >
@@ -221,22 +277,22 @@ const SearchBox: React.FC<SearchBarProps> = ({
                   key={option}
                   value={option}
                   sx={{
-                    color: '#000',
-                    '& .MuiCheckbox-root': {
-                      color: '#000',
-                      '&.Mui-checked, &.MuiCheckbox-indeterminate': {
-                        color: '#000',
+                    color: "#000",
+                    "& .MuiCheckbox-root": {
+                      color: "#000",
+                      "&.Mui-checked, &.MuiCheckbox-indeterminate": {
+                        color: "#000",
                       },
                     },
-                    '& .MuiSvgIcon-root': { fontSize: '20px' },
+                    "& .MuiSvgIcon-root": { fontSize: "20px" },
                   }}
                 >
                   <Checkbox
                     checked={selectedFilters.indexOf(option) > -1}
                     sx={{
-                      color: '#000',
-                      '&.Mui-checked, &.MuiCheckbox-indeterminate': {
-                        color: '#000',
+                      color: "#000",
+                      "&.Mui-checked, &.MuiCheckbox-indeterminate": {
+                        color: "#000",
                       },
                     }}
                   />
@@ -252,9 +308,9 @@ const SearchBox: React.FC<SearchBarProps> = ({
           xs={12}
           md={12}
           lg={allContents || discoverContents ? 2 : 3}
-          justifySelf={'end'}
+          justifySelf={"end"}
         >
-          <FormControl sx={{ width: '100%', mt: 2 }}>
+          <FormControl sx={{ width: "100%", mt: 2 }}>
             <InputLabel>Sort By</InputLabel>
             <Select
               value={sortBy}
@@ -271,8 +327,8 @@ const SearchBox: React.FC<SearchBarProps> = ({
         </Grid>
 
         {allContents && (
-          <Grid item xs={12} md={12} lg={2} justifySelf={'end'}>
-            <FormControl sx={{ width: '100%', mt: 2 }}>
+          <Grid item xs={12} md={12} lg={2} justifySelf={"end"}>
+            <FormControl sx={{ width: "100%", mt: 2 }}>
               <InputLabel>Filter By Status</InputLabel>
               <Select
                 value={status}
@@ -288,9 +344,9 @@ const SearchBox: React.FC<SearchBarProps> = ({
             </FormControl>
           </Grid>
         )}
-        {discoverContents && (
-          <Grid item xs={12} md={12} lg={2} justifySelf={'end'}>
-            <FormControl sx={{ width: '100%', mt: 2 }}>
+        {/* {discoverContents && (
+          <Grid item xs={12} md={12} lg={2} justifySelf={"end"}>
+            <FormControl sx={{ width: "100%", mt: 2 }}>
               <InputLabel>Filter By State</InputLabel>
               <Select
                 value={state}
@@ -305,7 +361,7 @@ const SearchBox: React.FC<SearchBarProps> = ({
               </Select>
             </FormControl>
           </Grid>
-        )}
+        )} */}
       </Grid>
     </Box>
   );

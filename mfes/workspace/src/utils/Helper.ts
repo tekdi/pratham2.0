@@ -88,3 +88,11 @@ export const getTelemetryEvents = (eventData: any, contentType: string) => {
 
   localStorage.setItem(telemetryKey, JSON.stringify(telemetryData));
 };
+export const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-US", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+};

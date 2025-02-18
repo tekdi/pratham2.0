@@ -93,6 +93,8 @@ const nextConfig = {
       },
     ];
   },
+
+  
 };
 
 const plugins = [

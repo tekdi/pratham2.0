@@ -1,6 +1,6 @@
 import { AxiosRequestConfig, AxiosResponse } from "axios";
-import axios from "axios";
-const axiosInstance = axios.create();
+import axiosInstance from "./Interceptor";
+
 
 export async function get(
   url: string,

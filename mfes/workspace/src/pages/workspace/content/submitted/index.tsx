@@ -1,42 +1,67 @@
-import React, { useEffect, useState } from 'react';
-import Layout from '../../../../components/Layout';
-import { Typography, Box, CircularProgress } from '@mui/material';
-import { getContent } from '../../../../services/ContentService';
-import SearchBox from '../../../../components/SearchBox';
-import PaginationComponent from '../../../../components/PaginationComponent';
-import { LIMIT } from '../../../../utils/app.constant';
-import WorkspaceText from '../../../../components/WorkspaceText';
-import { DataType } from 'ka-table/enums';
-import KaTableComponent from '../../../../components/KaTableComponent';
-import { timeAgo } from '../../../../utils/Helper';
-import useSharedStore from '../../../../utils/useSharedState';
+import React, { useEffect, useRef, useState } from "react";
+import Layout from "../../../../components/Layout";
+import {
+  Typography,
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  IconButton,
+  CircularProgress,
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { getContent } from "@workspace/services/ContentService";
+import SearchBox from "../../../../components/SearchBox";
+import PaginationComponent from "@workspace/components/PaginationComponent";
+import NoDataFound from "@workspace/components/NoDataFound";
+import { LIMIT } from "@workspace/utils/app.constant";
+import { MIME_TYPE } from "@workspace/utils/app.config";
+import  { useRouter } from "next/router";
+import WorkspaceText from "@workspace/components/WorkspaceText";
+import { DataType } from "ka-table/enums";
+import KaTableComponent from "@workspace/components/KaTableComponent";
+import { timeAgo } from "@workspace/utils/Helper";
+import useSharedStore from "@workspace/utils/useSharedState";
+import useTenantConfig from "@workspace/hooks/useTenantConfig";
 const columns = [
   {
-    key: 'title_and_description',
-    title: 'TITLE & DESCRIPTION',
+    key: "title_and_description",
+    title: "TITLE & DESCRIPTION",
     dataType: DataType.String,
-    width: '450px',
+    width: "450px",
   },
   {
-    key: 'contentType',
-    title: 'CONTENT TYPE',
+    key: "contentType",
+    title: "CONTENT TYPE",
     dataType: DataType.String,
-    width: '200px',
+    width: "200px",
   },
   // { key: 'status', title: 'STATUS', dataType: DataType.String, width: "100px" },
   {
-    key: 'lastUpdatedOn',
-    title: 'LAST MODIFIED',
+    key: "lastUpdatedOn",
+    title: "LAST MODIFIED",
     dataType: DataType.String,
-    width: '180px',
+    width: "180px",
   },
-  { key: 'action', title: 'ACTION', dataType: DataType.String, width: '100px' },
+  { key: "action", title: "ACTION", dataType: DataType.String, width: "100px" },
 ];
 const SubmittedForReviewPage = () => {
-  const [selectedKey, setSelectedKey] = useState('submitted');
-  const [filter, setFilter] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState('Modified On');
-  const [searchTerm, setSearchTerm] = useState('');
+  const tenantConfig = useTenantConfig();
+  const router = useRouter();
+
+  const [selectedKey, setSelectedKey] = useState("submitted");
+  const filterOption: string[] = router.query.filterOptions
+  ? JSON.parse(router.query.filterOptions as string)
+  : [];
+  const [filter, setFilter] = useState<string[]>(filterOption);
+  const sort: string = typeof router.query.sort === "string" 
+  ? router.query.sort 
+  : "Modified On";
+    const [sortBy, setSortBy] = useState(sort);
+      const [searchTerm, setSearchTerm] = useState("");
   const [contentList, setContentList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [contentDeleted, setContentDeleted] = useState(false);
@@ -45,6 +70,8 @@ const SubmittedForReviewPage = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [data, setData] = React.useState<any[]>([]);
   const fetchContentAPI = useSharedStore((state: any) => state.fetchContentAPI);
+  const prevFilterRef = useRef(filter);
+
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
@@ -86,19 +113,27 @@ const SubmittedForReviewPage = () => {
   useEffect(() => {
     const getReviewContentList = async () => {
       try {
+        if (!tenantConfig) return;
         setLoading(true);
-        const query = debouncedSearchTerm || '';
-        const offset = debouncedSearchTerm !== '' ? 0 : page * LIMIT;
+        const query = debouncedSearchTerm || "";
+        let offset = debouncedSearchTerm !== "" ? 0 : page * LIMIT;
         const primaryCategory = filter.length ? filter : [];
-        const order = sortBy === 'Created On' ? 'asc' : 'desc';
+        if (prevFilterRef.current !== filter) {
+          offset = 0;
+          setPage(0);
+
+          prevFilterRef.current = filter;
+        }
+        const order = sortBy === "Created On" ? "asc" : "desc";
         const sort_by = { lastUpdatedOn: order };
         const response = await getContent(
-          ['Review', 'FlagReview'],
+          ["Review", "FlagReview"],
           query,
           LIMIT,
           offset,
           primaryCategory,
-          sort_by
+          sort_by,
+          tenantConfig?.CHANNEL_ID
         );
         const contentList = (response?.content || []).concat(
           response?.QuestionSet || []
@@ -113,6 +148,7 @@ const SubmittedForReviewPage = () => {
     };
     getReviewContentList();
   }, [
+    tenantConfig,
     debouncedSearchTerm,
     filter,
     sortBy,
@@ -127,16 +163,16 @@ const SubmittedForReviewPage = () => {
       <Box p={3}>
         <Box
           sx={{
-            background: '#fff',
-            borderRadius: '8px',
-            boxShadow: '0px 2px 6px 2px #00000026',
-            pb: totalCount > LIMIT ? '15px' : '0px',
+            background: "#fff",
+            borderRadius: "8px",
+            boxShadow: "0px 2px 6px 2px #00000026",
+            pb: totalCount > LIMIT ? "15px" : "0px",
           }}
         >
           <Box p={2}>
             <Typography
               variant="h4"
-              sx={{ fontWeight: 'bold', fontSize: '16px' }}
+              sx={{ fontWeight: "bold", fontSize: "16px" }}
             >
               Submitted For Review
             </Typography>
