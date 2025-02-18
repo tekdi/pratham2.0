@@ -1,5 +1,5 @@
 import Cookies from "js-cookie";
-import { fetchTenantConfig, TenantConfig } from "@/utils/fetchTenantConfig";
+import { fetchTenantConfig, TenantConfig } from "@workspace/utils/fetchTenantConfig";
 
 class TenantService {
   private static instance: TenantService;

@@ -5,7 +5,7 @@ import React, {
   useCallback,
   useRef,
 } from "react";
-import Layout from "../../../../components/Layout";
+import Layout from "@workspace/components/Layout";
 import {
   Typography,
   Box,
@@ -22,20 +22,20 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import UpReviewTinyImage from "@mui/icons-material/LibraryBooks";
 import SearchBox from "../../../../components/SearchBox";
 import { deleteContent, getContent } from "../../../../services/ContentService";
-import { timeAgo } from "@/utils/Helper";
-import Loader from "@/components/Loader";
-import NoDataFound from "@/components/NoDataFound";
-import { MIME_TYPE } from "@/utils/app.config";
+import { timeAgo } from "@workspace/utils/Helper";
+import Loader from "@workspace/components/Loader";
+import NoDataFound from "@workspace/components/NoDataFound";
+import { MIME_TYPE } from "@workspace/utils/app.config";
 import { useRouter } from "next/router";
-import PaginationComponent from "@/components/PaginationComponent";
-import { LIMIT } from "@/utils/app.constant";
-import WorkspaceText from "@/components/WorkspaceText";
+import PaginationComponent from "@workspace/components/PaginationComponent";
+import { LIMIT } from "@workspace/utils/app.constant";
+import WorkspaceText from "@workspace/components/WorkspaceText";
 import { Table as KaTable } from "ka-table";
 import { DataType } from "ka-table/enums";
 import "ka-table/style.css";
-import KaTableComponent from "@/components/KaTableComponent";
-import useSharedStore from "@/utils/useSharedState";
-import useTenantConfig from "@/hooks/useTenantConfig";
+import KaTableComponent from "@workspace/components/KaTableComponent";
+import useSharedStore from "@workspace/utils/useSharedState";
+import useTenantConfig from "@workspace/hooks/useTenantConfig";
 // const columns = [
 //   { key: 'name', title: 'Content', dataType: DataType.String, width: "450px" },
 //   { key: 'lastUpdatedOn', title: 'Last Updated', dataType: DataType.String, width: "300px" },

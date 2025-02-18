@@ -1,18 +1,18 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { v4 as uuidv4 } from "uuid";
-import { CLOUD_STORAGE_URL } from "@/utils/app.config";
+import { CLOUD_STORAGE_URL } from "@workspace/utils/app.config";
 import {
   getLocalStoredUserName,
   getLocalStoredUserId,
   getLocalStoredUserSpecificBoard
-} from "@/services/LocalStorageService";
-import { fetchCCTAList, getUserDetailsInfo } from "@/services/userServices";
-import { sendCredentialService } from "@/services/NotificationService";
-import { formatDate } from "@/utils/Helper";
-import { sendContentNotification } from "@/services/sendContentNotification";
-import { ContentStatus, Editor } from "@/utils/app.constant";
-import useTenantConfig from "@/hooks/useTenantConfig";
+} from "@workspace/services/LocalStorageService";
+import { fetchCCTAList, getUserDetailsInfo } from "@workspace/services/userServices";
+import { sendCredentialService } from "@workspace/services/NotificationService";
+import { formatDate } from "@workspace/utils/Helper";
+import { sendContentNotification } from "@workspace/services/sendContentNotification";
+import { ContentStatus, Editor } from "@workspace/utils/app.constant";
+import useTenantConfig from "@workspace/hooks/useTenantConfig";
 const CollectionEditor: React.FC = () => {
   const router = useRouter();
   const { identifier } = router.query;

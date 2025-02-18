@@ -13,20 +13,19 @@ import {
   CircularProgress,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { getContent } from "@/services/ContentService";
+import { getContent } from "@workspace/services/ContentService";
 import SearchBox from "../../../../components/SearchBox";
-import PaginationComponent from "@/components/PaginationComponent";
-import NoDataFound from "@/components/NoDataFound";
-import { LIMIT } from "@/utils/app.constant";
+import PaginationComponent from "@workspace/components/PaginationComponent";
+import NoDataFound from "@workspace/components/NoDataFound";
+import { LIMIT } from "@workspace/utils/app.constant";
 import { useRouter } from "next/router";
-import { MIME_TYPE } from "@/utils/app.config";
-import WorkspaceText from "@/components/WorkspaceText";
+import { MIME_TYPE } from "@workspace/utils/app.config";
+import WorkspaceText from "@workspace/components/WorkspaceText";
 import { DataType } from "ka-table/enums";
-import KaTableComponent from "@/components/KaTableComponent";
-import Paper from "@mui/material/Paper";
-import { timeAgo } from "@/utils/Helper";
-import useSharedStore from "@/utils/useSharedState";
-import useTenantConfig from "@/hooks/useTenantConfig";
+import KaTableComponent from "@workspace/components/KaTableComponent";
+import { timeAgo } from "@workspace/utils/Helper";
+import useSharedStore from "@workspace/utils/useSharedState";
+import useTenantConfig from "@workspace/hooks/useTenantConfig";
 
 const columns = [
   {

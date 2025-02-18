@@ -1,10 +1,10 @@
-import Players from "@/components/players/Players";
-import V1Player from "@/components/V1-Player/V1Player";
-import { publishContent, submitComment } from "@/services/ContentService";
-import { getLocalStoredUserName, getLocalStoredUserRole } from "@/services/LocalStorageService";
-import { fetchContent } from "@/services/PlayerService";
-import { MIME_TYPE } from "@/utils/app.config";
-import { ContentStatus, Editor, Role } from "@/utils/app.constant";
+import Players from "@workspace/components/players/Players";
+import V1Player from "@workspace/components/V1-Player/V1Player";
+import { publishContent, submitComment } from "@workspace/services/ContentService";
+import { getLocalStoredUserName, getLocalStoredUserRole } from "@workspace/services/LocalStorageService";
+import { fetchContent } from "@workspace/services/PlayerService";
+import { MIME_TYPE } from "@workspace/utils/app.config";
+import { ContentStatus, Editor, Role } from "@workspace/utils/app.constant";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CloseIcon from "@mui/icons-material/Close";
 import {
@@ -24,11 +24,11 @@ import {
   V1PlayerConfig,
 } from "../../../../components/players/PlayerConfig";
 import ReviewCommentPopup from "../../../../components/ReviewCommentPopup";
-import ToastNotification from "@/components/CommonToast";
-import { sendCredentialService } from "@/services/NotificationService";
-import { getUserDetailsInfo } from "@/services/userServices";
-import { sendContentNotification } from "@/services/sendContentNotification";
-import useTenantConfig from "@/hooks/useTenantConfig";
+import ToastNotification from "@workspace/components/CommonToast";
+import { sendCredentialService } from "@workspace/services/NotificationService";
+import { getUserDetailsInfo } from "@workspace/services/userServices";
+import { sendContentNotification } from "@workspace/services/sendContentNotification";
+import useTenantConfig from "@workspace/hooks/useTenantConfig";
 
 const userFullName = getLocalStoredUserName() || "Anonymous User";
 const [firstName, lastName] = userFullName.split(" ");

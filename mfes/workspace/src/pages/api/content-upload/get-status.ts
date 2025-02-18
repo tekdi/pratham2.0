@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { getCookie } from "../../../utils/cookieHelper";
+import { getCookie } from "@workspace/utils/cookieHelper";
 import axios from "axios";
 
 /**

@@ -6,7 +6,7 @@ import UpReviewTinyImage from "@mui/icons-material/LibraryBooks";
 import "ka-table/style.css";
 import DeleteIcon from "@mui/icons-material/Delete";
 import router from "next/router";
-import { MIME_TYPE } from "@/utils/app.config";
+import { MIME_TYPE } from "@workspace/utils/app.config";
 import Image from "next/image";
 import ActionIcon from "./ActionIcon";
 import { Padding } from "@mui/icons-material";

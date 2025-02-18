@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import TenantService from "@/services/TenantService";
-import { TenantConfig } from "@/utils/fetchTenantConfig";
+import TenantService from "@workspace/services/TenantService";
+import { TenantConfig } from "@workspace/utils/fetchTenantConfig";
 
 const useTenantConfig = () => {
   const [tenantConfig, setTenantConfig] = useState<TenantConfig>();

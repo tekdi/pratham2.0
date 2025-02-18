@@ -3,9 +3,9 @@ import {
   getLocalStoredUserRole,
 } from "./LocalStorageService";
 import { delApi, get, post } from "./RestClient";
-import { MIME_TYPE } from "@/utils/app.config";
+import { MIME_TYPE } from "@workspace/utils/app.config";
 import { v4 as uuidv4 } from "uuid";
-import { PrimaryCategoryValue, Role } from "@/utils/app.constant";
+import { PrimaryCategoryValue, Role } from "@workspace/utils/app.constant";
 const userId = getLocalStoredUserId();
 console.log("userId ==>", userId);
 

@@ -21,10 +21,10 @@ import { debounce, getOptionsByCategory } from "@/utils/Helper";
 import {
   getFrameworkDetails,
   getPrimaryCategory,
-} from "@/services/ContentService";
-import { SortOptions, StatusOptions } from "@/utils/app.constant";
+} from "@workspace/services/ContentService";
+import { SortOptions, StatusOptions } from "@workspace/utils/app.constant";
 import { useRouter } from "next/router";
-import useTenantConfig from "@/hooks/useTenantConfig";
+import useTenantConfig from "@workspace/hooks/useTenantConfig";
 
 export interface SearchBarProps {
   onSearch: (value: string) => void;

@@ -1,10 +1,10 @@
-import KaTableComponent from "@/components/KaTableComponent";
-import Loader from "@/components/Loader";
-import PaginationComponent from "@/components/PaginationComponent";
-import WorkspaceText from "@/components/WorkspaceText";
-import { timeAgo } from "@/utils/Helper";
-import { LIMIT } from "@/utils/app.constant";
-import useSharedStore from "@/utils/useSharedState";
+import KaTableComponent from "@workspace/components/KaTableComponent";
+import Loader from "@workspace/components/Loader";
+import PaginationComponent from "@workspace/components/PaginationComponent";
+import WorkspaceText from "@workspace/components/WorkspaceText";
+import { timeAgo } from "@workspace/utils/Helper";
+import { LIMIT } from "@workspace/utils/app.constant";
+import useSharedStore from "@workspace/utils/useSharedState";
 import {
   Box,
   Typography,
@@ -22,7 +22,7 @@ import React, {
 import Layout from "../../../../components/Layout";
 import SearchBox from "../../../../components/SearchBox";
 import { getContent } from "../../../../services/ContentService";
-import useTenantConfig from "@/hooks/useTenantConfig";
+import useTenantConfig from "@workspace/hooks/useTenantConfig";
 // const columns = [
 //   { key: 'name', title: 'Content', dataType: DataType.String, width: "450px" },
 //   { key: 'lastUpdatedOn', title: 'Last Updated', dataType: DataType.String, width: "300px" },

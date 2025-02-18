@@ -1,5 +1,5 @@
 import Cors from "cors";
-import initMiddleware from "../../../src/utils/init-middleware";
+import initMiddleware from "@workspace/utils/init-middleware";
 import type { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
 

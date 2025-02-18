@@ -12,8 +12,8 @@ import {
   Divider,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { deleteContent } from "@/services/ContentService";
-import useSharedStore from "@/utils/useSharedState";
+import { deleteContent } from "@workspace/services/ContentService";
+import useSharedStore from "@workspace/utils/useSharedState";
 import { toast } from "react-hot-toast";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 

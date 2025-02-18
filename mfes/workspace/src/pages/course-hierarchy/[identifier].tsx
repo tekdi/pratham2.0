@@ -8,9 +8,9 @@ import {
   Box,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { getContentHierarchy } from '@/services/ContentService';
+import { getContentHierarchy } from '@workspace/services/ContentService';
 import { useRouter } from 'next/router';
-import Loader from '@/components/Loader';
+import Loader from '@workspace/components/Loader';
 
 const RecursiveAccordion = ({ data }: { data: any[] }) => {
   let router = useRouter();

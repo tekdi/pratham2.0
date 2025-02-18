@@ -6,7 +6,7 @@ import {
   genericEditorRequestForChangesFormResponse,
   publishResourceFormResponse,
 } from "./mocked-response";
-import { getCookie } from '../../utils/cookieHelper';
+import { getCookie } from '@workspace/utils/cookieHelper';
 import { mockData } from "./tenantConfig";
 
 export default async function handler(

@@ -2,7 +2,7 @@ import multer, { MulterError } from 'multer';
 import FormData from 'form-data';
 import axios from 'axios';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getCookie } from '../../utils/cookieHelper';
+import { getCookie } from '@workspace/utils/cookieHelper';
 
 const upload = multer({
   limits: {
