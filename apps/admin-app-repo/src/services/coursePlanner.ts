@@ -3,25 +3,20 @@ import {
   GetSolutionDetailsParams,
   GetTargetedSolutionsParams,
   GetUserProjectTemplateParams,
-} from "@/utils/Interfaces";
-import { get, post } from "./RestClient";
-import axios from "axios";
-import { FRAMEWORK_ID } from "../../app.config";
-import { URL_CONFIG } from "@/utils/url.config";
+} from '@/utils/Interfaces';
+import { get, post } from './RestClient';
+import axios from 'axios';
+import { URL_CONFIG } from '@/utils/url.config';
 import API_ENDPOINTS from '@/utils/API/APIEndpoints';
 
-
-
-export const getFrameworkDetails = async (
-  frameworkId: string
-): Promise<any> => {
-  const apiUrl: string = `/api/framework/v1/read/${frameworkId}?categories=gradeLevel,medium,class,subject`;
+export const getFrameworkDetails = async (frameworkId: any): Promise<any> => {
+  const apiUrl: string = `/api/framework/v1/read/${frameworkId}`;
 
   try {
     const response = await axios.get(apiUrl);
     return response?.data;
   } catch (error) {
-    console.error("Error in getting Framework Details", error);
+    console.error('Error in getting Framework Details', error);
     return error;
   }
 };
@@ -30,15 +25,15 @@ export const uploadCoursePlanner = async (
   file: File,
   metaData: CoursePlannerMetaData
 ): Promise<any> => {
-  const apiUrl: string = API_ENDPOINTS.coursePlannerUpload
+  const apiUrl: string = API_ENDPOINTS.coursePlannerUpload;
   const formData = new FormData();
-  formData.append("file", file);
-  formData.append("metaData", JSON.stringify(metaData));
+  formData.append('file', file);
+  formData.append('metaData', JSON.stringify(metaData));
   try {
     const response = await post(apiUrl, formData, {});
     return response?.data;
   } catch (error) {
-    console.error("Error uploading course planner", error);
+    console.error('Error uploading course planner', error);
     throw error;
   }
 };
@@ -54,8 +49,8 @@ export const getTargetedSolutions = async ({
   const apiUrl: string = `${process.env.NEXT_PUBLIC_COURSE_PLANNER_API_URL}${API_ENDPOINTS.targetedSolutions}`;
 
   const headers = {
-    "X-auth-token": localStorage.getItem("token"),
-    "Content-Type": "application/json",
+    'X-auth-token': localStorage.getItem('token'),
+    'Content-Type': 'application/json',
   };
 
   const data = {
@@ -71,7 +66,7 @@ export const getTargetedSolutions = async ({
     const response = await axios.post(apiUrl, data, { headers });
     return response?.data;
   } catch (error) {
-    console.error("Error in getting Targeted Solutions", error);
+    console.error('Error in getting Targeted Solutions', error);
     return error;
   }
 };
@@ -85,16 +80,16 @@ export const getUserProjectDetails = async ({
   const apiUrl: string = `${process.env.NEXT_PUBLIC_COURSE_PLANNER_API_URL}/userProjects/details/${id}`;
 
   const headers = {
-    Authorization: localStorage.getItem("token"),
-    "Content-Type": "application/json",
-    "x-auth-token": localStorage.getItem("token"),
+    Authorization: localStorage.getItem('token'),
+    'Content-Type': 'application/json',
+    'x-auth-token': localStorage.getItem('token'),
   };
 
   try {
     const response = await axios.post(apiUrl, {}, { headers });
     return response?.data;
   } catch (error) {
-    console.error("Error in getting User Project Details", error);
+    console.error('Error in getting User Project Details', error);
     return error;
   }
 };
@@ -106,8 +101,8 @@ export const getSolutionDetails = async ({
   const apiUrl: string = `${process.env.NEXT_PUBLIC_COURSE_PLANNER_API_URL}/solutions/details/${id}`;
 
   const headers = {
-    "X-auth-token": localStorage.getItem("token"),
-    "Content-Type": "application/json",
+    'X-auth-token': localStorage.getItem('token'),
+    'Content-Type': 'application/json',
   };
 
   const data = {
@@ -118,7 +113,7 @@ export const getSolutionDetails = async ({
     const response = await axios.post(apiUrl, data, { headers });
     return response?.data;
   } catch (error) {
-    console.error("Error in getting Solution Details", error);
+    console.error('Error in getting Solution Details', error);
     return error;
   }
 };
@@ -131,8 +126,8 @@ export const getUserProjectTemplate = async ({
   const apiUrl: string = `${process.env.NEXT_PUBLIC_COURSE_PLANNER_API_URL}/userProjects/details?templateId=${templateId}&solutionId=${solutionId}`;
 
   const headers = {
-    "X-auth-token": localStorage.getItem("token"),
-    "Content-Type": "application/json",
+    'X-auth-token': localStorage.getItem('token'),
+    'Content-Type': 'application/json',
   };
 
   const data = {
@@ -143,7 +138,7 @@ export const getUserProjectTemplate = async ({
     const response = await axios.post(apiUrl, data, { headers });
     return response?.data;
   } catch (error) {
-    console.error("Error in getting User Project Details", error);
+    console.error('Error in getting User Project Details', error);
     throw error;
   }
 };
@@ -155,11 +150,11 @@ export const getContentHierarchy = async ({
 }): Promise<any> => {
   const apiUrl: string = `${URL_CONFIG.API.CONTENT_HIERARCHY}/${doId}`;
 
-  try { 
-    const response = await get(apiUrl); 
+  try {
+    const response = await get(apiUrl);
     return response;
   } catch (error) {
-    console.error("Error in getContentHierarchy Service", error);
+    console.error('Error in getContentHierarchy Service', error);
     throw error;
   }
 };
