@@ -52,6 +52,10 @@ const nextConfig = {
         destination: '/api/proxy?path=/action/content/:path*', // Forward other /action/asset requests to proxy.js
       },
       {
+        source: "/action/v1/telemetry",
+        destination: `${process.env.NEXT_PUBLIC_TELEMETRY_URL}/v1/telemetry`,
+      },
+      {
         source: '/action/data/v3/telemetry',
         destination: `${process.env.NEXT_PUBLIC_TELEMETRY_URL}/v1/telemetry`,
       },
