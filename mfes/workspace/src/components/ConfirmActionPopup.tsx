@@ -14,7 +14,7 @@ import {
     TextField,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import {getFormFields} from '@/services/ContentService';
+import {getFormFields} from '@workspace/services/ContentService';
 interface ConfirmActionPopupProps {
     open: boolean;
     onClose: () => void;

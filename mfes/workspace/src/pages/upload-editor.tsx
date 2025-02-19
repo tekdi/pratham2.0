@@ -1,8 +1,5 @@
-import dynamic from 'next/dynamic';
-
-const GenericEditor = dynamic(() => import('../components/GenericEditor'), {
-  ssr: false,
-});
+import React from 'react';
+import { GenericEditor} from '@shared-lib'
 
 const UploadEditor = () => {
   return <GenericEditor />;
