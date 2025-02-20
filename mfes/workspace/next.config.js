@@ -24,6 +24,7 @@ const nextConfig = {
     // See: https://github.com/gregberge/svgr
     svgr: false,
   },
+  basePath: '/mfe_workspace', // This should match the path set in Nginx
   async rewrites() {
     return [
       {

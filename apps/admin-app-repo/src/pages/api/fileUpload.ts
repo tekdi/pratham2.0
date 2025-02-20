@@ -27,8 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         req.on('data', (chunk) => {
           chunks.push(Buffer.from(chunk));
         });
-        req.on('end', () => {
-          resolve(Buffer.concat(chunks));
+        req.on('end', () => {resolve(Buffer.concat(chunks));
         });
         req.on('error', (err) => {
           reject(err);

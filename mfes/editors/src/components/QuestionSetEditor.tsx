@@ -1,17 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { v4 as uuidv4 } from "uuid";
-import { CLOUD_STORAGE_URL } from "@workspace/utils/app.config";
+import { CLOUD_STORAGE_URL } from "../utils/app.config";
 import {
   getLocalStoredUserId,
   getLocalStoredUserName,
   getLocalStoredUserSpecificBoard
-} from "@workspace/services/LocalStorageService";
-import { fetchCCTAList } from "@workspace/services/userServices";
-import { sendCredentialService } from "@workspace/services/NotificationService";
-import useTenantConfig from "@workspace/hooks/useTenantConfig";
-import { sendContentNotification } from "@workspace/services/sendContentNotification";
-import { ContentStatus, Editor } from "@workspace/utils/app.constant";
+} from "../services/LocalStorageService";
+import { fetchCCTAList } from "../services/userServices";
+import { sendCredentialService } from "../services/NotificationService";
+import useTenantConfig from "../hooks/useTenantConfig";
+import { sendContentNotification } from "../services/sendContentNotification";
+import { ContentStatus, Editor } from "../utils/app.constant";
 const QuestionSetEditor: React.FC = () => {
   const tenantConfig = useTenantConfig();
   const router = useRouter();
