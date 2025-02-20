@@ -13,9 +13,9 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import ImageIcon from "@mui/icons-material/Image";
 import { Status } from "@/utils/app.constant";
-import { MIME_TYPE } from "@/utils/app.config";
+import { MIME_TYPE } from "@workspace/utils/app.config";
 import router from "next/router";
-import { deleteContent } from "@/services/ContentService";
+import { deleteContent } from "@workspace/services/ContentService";
 
 interface ContentCardProps {
   title: string;

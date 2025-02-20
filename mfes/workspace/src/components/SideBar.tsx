@@ -26,6 +26,7 @@ import logo from "/public/logo.png";
 import { Role } from "@workspace/utils/app.constant";
 import { getLocalStoredUserRole } from "@workspace/services/LocalStorageService";
 const userRole = getLocalStoredUserRole();
+const route = process.env.NEXT_PUBLIC_WORKSPACE_ROUTES;
 
 let isAdmin: boolean;
 if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
@@ -96,8 +97,9 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
       const userInfo = JSON.parse(localStorage.getItem("adminInfo") || "{}");
       console.log("userInfo", userInfo);
       if (userInfo?.role === Role.SCTA || userInfo?.role === Role.CCTA) {
-        router.push("/course-planner");
-      } else router.push("/");
+        // router.push("/course-planner");
+        window.parent.location.href = `${route}course-planner`
+      } else window.parent.location.href = `${route}`
     }
   };
 

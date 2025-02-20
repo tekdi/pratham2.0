@@ -173,6 +173,7 @@ const SubmittedForReviewPage = () => {
             <Typography
               variant="h4"
               sx={{ fontWeight: "bold", fontSize: "16px" }}
+           
             >
               Submitted For Review
             </Typography>
