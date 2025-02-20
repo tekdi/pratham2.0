@@ -15,10 +15,10 @@ import editorConfig from "./editor.config.json";
 import {
   getLocalStoredUserId,
   getLocalStoredUserName,
-} from "@workspace/services/LocalStorageService";
-import { fetchCCTAList } from "@workspace/services/userServices";
-import { sendCredentialService } from "@workspace/services/NotificationService";
-import useTenantConfig from "@workspace/hooks/useTenantConfig";
+} from "../services/LocalStorageService";
+import { fetchCCTAList } from "../services/userServices";
+import { sendCredentialService } from "../services/NotificationService";
+import useTenantConfig from "../hooks/useTenantConfig";
 const GenericEditor: React.FC = () => {
   const tenantConfig = useTenantConfig();
   const router = useRouter();
