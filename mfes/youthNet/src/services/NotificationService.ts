@@ -2,6 +2,8 @@ import { SendCredentialsRequest } from '../utils/Interfaces';
 import { post, get } from '@shared-lib';
 import { toPascalCase } from '../utils/Helper';
 import axios from 'axios';
+import API_ENDPOINTS from '../utils/API/APIEndpoints';
+import { use } from 'node_modules/i18next';
 
 export const sendCredentialService = async ({
   isQueue,
@@ -11,7 +13,7 @@ export const sendCredentialService = async ({
   email,
   push,
 }: SendCredentialsRequest): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/notification/send`;
+  const apiUrl: string =  API_ENDPOINTS.notificationSend;
   try {
     const response = await post(apiUrl, {
       isQueue,
@@ -87,7 +89,7 @@ export const UpdateDeviceNotification = async (
   userId: string,
   headers: { tenantId: any; Authorization: string }
 ): Promise<any> => {
-  const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/v1/update/${userId}`;
+  const apiUrl =  API_ENDPOINTS.userUpdate(userId);
 
   try {
     const response = await axios.patch(apiUrl, { userData }, { headers });
@@ -99,10 +101,10 @@ export const UpdateDeviceNotification = async (
 };
 
 export const readUserId = async (
-  userId?: string | string[],
+  userId: string | string[],
   fieldValue?: boolean
 ): Promise<any> => {
-  let apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/v1/read/${userId}?fieldvalue=false`;
+  let apiUrl: string =  API_ENDPOINTS.userReadWithField(userId);
   try {
     const response = await get(apiUrl);
     return response?.data;
@@ -118,7 +120,7 @@ export const sendNotification = async ({
   key,
   push,
 }: SendCredentialsRequest): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/notification/send`;
+  const apiUrl: string =  API_ENDPOINTS.notificationSend;
   try {
     const response = await post(apiUrl, {
       isQueue,

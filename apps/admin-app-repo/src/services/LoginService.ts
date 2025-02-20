@@ -1,3 +1,4 @@
+import API_ENDPOINTS from '@/utils/API/APIEndpoints';
 import { get, post } from "./RestClient";
 
 interface LoginParams {
@@ -13,7 +14,8 @@ export const login = async ({
   username,
   password,
 }: LoginParams): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/v1/auth/login`;
+  const apiUrl: string =  API_ENDPOINTS.accountLogin;
+  
 
   try {
     const response = await post(apiUrl, { username, password });
@@ -27,7 +29,7 @@ export const login = async ({
 export const refresh = async ({
   refresh_token,
 }: RefreshParams): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/v1/auth/refresh`;
+  const apiUrl: string = API_ENDPOINTS.authRefresh;
   try {
     const response = await post(apiUrl, { refresh_token });
     return response?.data;
@@ -36,9 +38,8 @@ export const refresh = async ({
     throw error;
   }
 };
-
 export const logout = async (refreshToken: string): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/v1/auth/logout`;
+  const apiUrl: string = API_ENDPOINTS.authLogout;
   try {
     const response = await post(apiUrl, { refresh_token: refreshToken });
     return response;
@@ -49,7 +50,7 @@ export const logout = async (refreshToken: string): Promise<any> => {
 };
 
 export const getUserId = async (): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/v1/auth`;
+  const apiUrl: string = API_ENDPOINTS.userAuth;
   try {
     const response = await get(apiUrl);
     return response?.data?.result;
@@ -61,7 +62,7 @@ export const getUserId = async (): Promise<any> => {
 
 export const resetPassword = async (
   newPassword: any): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/v1/reset-password`;
+  const apiUrl: string = API_ENDPOINTS.resetPassword;
   try {
     const response = await post(apiUrl, { newPassword });
     return response?.data;

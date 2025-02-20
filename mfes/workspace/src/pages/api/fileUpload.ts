@@ -2,7 +2,7 @@ import multer, { MulterError } from 'multer';
 import FormData from 'form-data';
 import axios from 'axios';
 import type { NextApiRequest, NextApiResponse } from 'next';
-const cookie = require("cookie");
+import { getCookie } from '@workspace/utils/cookieHelper';
 
 const upload = multer({
   limits: {
@@ -81,12 +81,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
       }
 
-      const cookies = cookie.parse(req.headers.cookie || "");
-
       // Set your base URL
-      const baseURL = process.env.BASE_URL as string;
-      const authApiToken = cookies?.authToken || process.env.AUTH_API_TOKEN;
-      const tenantId = process.env.NEXT_PUBLIC_TENANT_ID as string;
+      const baseURL = process.env.NEXT_PUBLIC_BASE_URL as string;
+      const authApiToken = getCookie(req, 'authToken') || process.env.AUTH_API_TOKEN;
+      const tenantId = getCookie(req, 'tenantId') || process.env.NEXT_PUBLIC_TENANT_ID;
 
       console.log("Using token for file upload:", authApiToken);
 

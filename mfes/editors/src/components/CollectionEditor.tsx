@@ -1,33 +1,81 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/router';
-import { v4 as uuidv4 } from 'uuid';
-import {
-  TENANT_ID,
-  CHANNEL_ID,
-  FRAMEWORK_ID,
-  CLOUD_STORAGE_URL,
-} from '../utils/app.config';
+import React, { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/router";
+import { v4 as uuidv4 } from "uuid";
+import { CLOUD_STORAGE_URL } from "../utils/app.config";
 import {
   getLocalStoredUserName,
   getLocalStoredUserId,
-} from '../utils/LocalStorageService';
+  getLocalStoredUserSpecificBoard
+} from "../services/LocalStorageService";
+import { fetchCCTAList } from "../services/userServices";
+import { sendCredentialService } from "../services/NotificationService";
+import { sendContentNotification } from "../services/sendContentNotification";
+import { ContentStatus, Editor } from "../utils/app.constant";
+import useTenantConfig from "../hooks/useTenantConfig";
 const CollectionEditor: React.FC = () => {
   const router = useRouter();
   const { identifier } = router.query;
   const [mode, setMode] = useState<any>();
-  const [fullName, setFullName] = useState('Anonymous User');
-  const [userId, setUserId] = useState(TENANT_ID);
-  const [deviceId, setDeviceId] = useState('');
+  const [fullName, setFullName] = useState("Anonymous User");
+  const [deviceId, setDeviceId] = useState("");
 
-  const [firstName, lastName] = fullName.split(' ');
+  const [firstName, lastName] = fullName.split(" ");
+  const tenantConfig = useTenantConfig();
 
+  const sendReviewNotification = async (notificationData: any) => {
+    console.log("notificationData", notificationData);
+   
+  
+    const isQueue = false;
+    const context = "CMS";
+    const key = "onContentReview";
+    const url = `${window.location.origin}/collection?identifier=${notificationData?.contentId}`;
+  
+    try {
+      const response = await fetchCCTAList();
+      const cctaList = response;
+      const ContentDetail = await fetch(
+        `/action/content/v3/read/${notificationData?.contentId}`
+      );
+      const data = await ContentDetail.json();
+ 
+      const promises = cctaList.map(async (user: any) => {
+        const replacements = {
+          "{reviewerName}": user?.name,
+          "{creatorName}": notificationData?.creator,
+          "{contentId}": notificationData?.contentId,
+          "{appUrl}": url,
+          "{submissionDate}": new Date().toLocaleDateString(),
+        "{contentType}":"Course",
+        "{contentTitle}":data?.result?.content?.name
+        };
+  
+        return sendCredentialService({
+          isQueue,
+          context,
+          key,
+          replacements,
+          email: { receipients: [user?.email] },
+        });
+      });
+  
+      // Wait for all API calls to complete
+      await Promise.all(promises);
+  
+      console.log("All emails sent successfully.");
+      
+      window.history.back(); 
+    } catch (error) {
+      console.error("Error sending email notifications:", error);
+    }
+  };
+  
+  
   useEffect(() => {
     const storedFullName = getLocalStoredUserName();
-    const storedUserId = getLocalStoredUserId() || TENANT_ID;
-    const storedMode = localStorage.getItem('contentMode');
-    setMode(storedMode || 'edit');
-    setFullName(storedFullName ?? 'Anonymous User');
-    setUserId(storedUserId);
+    const storedMode = localStorage.getItem("contentMode");
+    setMode(storedMode || "edit");
+    setFullName(storedFullName ?? "Anonymous User");
 
     const generatedDeviceId = uuidv4();
     setDeviceId(generatedDeviceId);
@@ -36,224 +84,252 @@ const CollectionEditor: React.FC = () => {
   const editorConfig = {
     context: {
       user: {
-        id: userId,
+        id: getLocalStoredUserId(),
         fullName: fullName,
-        firstName: firstName || 'Anonymous',
-        lastName: lastName || 'User',
-        orgIds: [CHANNEL_ID],
+        firstName: firstName || "Anonymous",
+        lastName: lastName || "User",
+        orgIds: [tenantConfig?.CHANNEL_ID],
       },
-      identifier: identifier || 'do_214193483155898368160',
-      channel: CHANNEL_ID,
-      framework: FRAMEWORK_ID,
+      identifier: identifier,
+      channel: tenantConfig?.CHANNEL_ID,
+      framework: tenantConfig?.COLLECTION_FRAMEWORK,
       sid: uuidv4(),
       did: deviceId,
-      uid: getLocalStoredUserId() || TENANT_ID,
+      uid: getLocalStoredUserId(),
       additionalCategories: [],
       pdata: {
-        id: 'pratham.admin.portal',
-        ver: '1.0.0',
-        pid: 'pratham-portal',
+        id: "pratham.admin.portal",
+        ver: "1.0.0",
+        pid: "pratham-portal",
       },
       contextRollup: {
-        l1: CHANNEL_ID,
+        l1: tenantConfig?.CHANNEL_ID,
       },
-      tags: [CHANNEL_ID],
+      tags: [tenantConfig?.CHANNEL_ID],
       cdata: [
         {
-          id: CHANNEL_ID,
-          type: 'pratham-portal',
+          id: tenantConfig?.CHANNEL_ID,
+          type: "pratham-portal",
         },
       ],
       timeDiff: 5,
       objectRollup: {},
-      host: '',
-      defaultLicense: 'CC BY 4.0',
-      endpoint: '/data/v3/telemetry',
-      env: 'collection_editor',
+      host: "",
+      defaultLicense: "CC BY 4.0",
+      endpoint: "/data/v3/telemetry",
+      env: "collection_editor",
       cloudStorageUrls: [CLOUD_STORAGE_URL],
     },
     config: {
-      mode: mode || 'edit', // edit / review / read / sourcingReview
+      mode: mode || "edit", // edit / review / read / sourcingReview
+      userSpecificFrameworkField: getLocalStoredUserSpecificBoard(),
       maxDepth: 4,
-      objectType: 'Collection',
-      primaryCategory: 'Course', // Professional Development Course, Curriculum Course
+      objectType: "Collection",
+      primaryCategory: "Course", // Professional Development Course, Curriculum Course
       isRoot: true,
       dialcodeMinLength: 2,
       dialcodeMaxLength: 250,
-      iconClass: 'fa fa-book',
+      iconClass: "fa fa-book",
       showAddCollaborator: false,
       enableBulkUpload: false,
       children: {},
       hierarchy: {
         level1: {
-          name: 'Module',
-          type: 'Unit',
-          mimeType: 'application/vnd.ekstep.content-collection',
-          contentType: 'CourseUnit',
-          primaryCategory: 'Course Unit',
-          iconClass: 'fa fa-folder-o',
+          name: "Module",
+          type: "Unit",
+          mimeType: "application/vnd.ekstep.content-collection",
+          contentType: "CourseUnit",
+          primaryCategory: "Course Unit",
+          iconClass: "fa fa-folder-o",
           children: {},
         },
         level2: {
-          name: 'Sub-Module',
-          type: 'Unit',
-          mimeType: 'application/vnd.ekstep.content-collection',
-          contentType: 'CourseUnit',
-          primaryCategory: 'Course Unit',
-          iconClass: 'fa fa-folder-o',
+          name: "Sub-Module",
+          type: "Unit",
+          mimeType: "application/vnd.ekstep.content-collection",
+          contentType: "CourseUnit",
+          primaryCategory: "Course Unit",
+          iconClass: "fa fa-folder-o",
           children: {
             Content: [
-              'Explanation Content',
-              'Learning Resource',
-              'eTextbook',
-              'Teacher Resource',
-              'Course Assessment',
+              "Explanation Content",
+              "Learning Resource",
+              "eTextbook",
+              "Teacher Resource",
+              "Course Assessment",
             ],
           },
         },
         level3: {
-          name: 'Sub-Sub-Module',
-          type: 'Unit',
-          mimeType: 'application/vnd.ekstep.content-collection',
-          contentType: 'CourseUnit',
-          primaryCategory: 'Course Unit',
-          iconClass: 'fa fa-folder-o',
+          name: "Sub-Sub-Module",
+          type: "Unit",
+          mimeType: "application/vnd.ekstep.content-collection",
+          contentType: "CourseUnit",
+          primaryCategory: "Course Unit",
+          iconClass: "fa fa-folder-o",
           children: {
             Content: [
-              'Explanation Content',
-              'Learning Resource',
-              'eTextbook',
-              'Teacher Resource',
-              'Course Assessment',
+              "Explanation Content",
+              "Learning Resource",
+              "eTextbook",
+              "Teacher Resource",
+              "Course Assessment",
             ],
           },
         },
         level4: {
-          name: 'Sub-Sub-Module',
-          type: 'Unit',
-          mimeType: 'application/vnd.ekstep.content-collection',
-          contentType: 'CourseUnit',
-          primaryCategory: 'Course Unit',
-          iconClass: 'fa fa-folder-o',
+          name: "Sub-Sub-Module",
+          type: "Unit",
+          mimeType: "application/vnd.ekstep.content-collection",
+          contentType: "CourseUnit",
+          primaryCategory: "Course Unit",
+          iconClass: "fa fa-folder-o",
           children: {
             Content: [
-              'Explanation Content',
-              'Learning Resource',
-              'eTextbook',
-              'Teacher Resource',
-              'Course Assessment',
+              "Explanation Content",
+              "Learning Resource",
+              "eTextbook",
+              "Teacher Resource",
+              "Course Assessment",
             ],
           },
         },
       },
-      contentPolicyUrl: '/term-of-use.html',
+      contentPolicyUrl: "/term-of-use.html",
     },
   };
-
+  
+  
+  const sendContentPublishNotification = () => sendContentNotification(ContentStatus.PUBLISHED, Editor.COLLECTION,"", identifier, undefined, router);
+  const sendContentRejectNotification = () => sendContentNotification(ContentStatus.REJECTED,Editor.COLLECTION,"", identifier, undefined , router);
+ 
   const editorRef = useRef<HTMLDivElement | null>(null);
   const isAppendedRef = useRef(false);
   const [assetsLoaded, setAssetsLoaded] = useState(false);
 
   useEffect(() => {
     const loadAssets = () => {
-      const assets = [
-        {
-          id: 'collection-editor-js',
-          src: 'https://cdn.jsdelivr.net/npm/@project-sunbird/sunbird-collection-editor-web-component@latest/sunbird-collection-editor.js',
-          type: 'script',
-        },
-        {
-          id: 'collection-editor-css',
-          src: 'https://cdn.jsdelivr.net/npm/@project-sunbird/sunbird-collection-editor-web-component@latest/styles.css',
-          type: 'link',
-        },
-        {
-          id: 'sunbird-pdf-player-js',
-          src: 'https://cdn.jsdelivr.net/npm/@project-sunbird/sunbird-pdf-player-web-component@1.4.0/sunbird-pdf-player.js',
-          type: 'script',
-        },
-        {
-          id: 'sunbird-pdf-player-css',
-          src: 'https://cdn.jsdelivr.net/npm/@project-sunbird/sunbird-pdf-player-web-component@1.4.0/styles.css',
-          type: 'link',
-        },
-        {
-          id: 'sunbird-video-player.js',
-          src: 'https://cdn.jsdelivr.net/npm/@project-sunbird/sunbird-video-player-web-component@1.2.5/sunbird-video-player.js',
-          type: 'script',
-        },
-        {
-          id: 'sunbird-video-player-css',
-          src: 'https://cdn.jsdelivr.net/npm/@project-sunbird/sunbird-video-player-web-component@1.2.5/styles.css',
-          type: 'link',
-        },
-      ];
+      if (!document.getElementById("collection-editor-js")) {
+        const script = document.createElement("script");
+        console.log("Hello");
 
-      assets.forEach((asset) => {
-        if (!document.getElementById(asset.id)) {
-          if (asset.type === 'script') {
-            const script = document.createElement('script');
-            script.id = asset.id;
-            script.src = asset.src;
-            script.async = true;
-            script.onload = () => setAssetsLoaded(true);
-            document.body.appendChild(script);
-          } else if (asset.type === 'link') {
-            const link = document.createElement('link');
-            link.id = asset.id;
-            link.rel = 'stylesheet';
-            link.href = asset.src;
-            document.head.appendChild(link);
-          }
-        }
-      });
-    };
-
-    const removeAsset = (id: string) => {
-      const element = document.getElementById(id);
-      if (element) {
-        element.parentNode?.removeChild(element);
+        script.id = "collection-editor-js";
+        script.src =
+          "https://cdn.jsdelivr.net/npm/@tekdi/sunbird-collection-editor-web-component@6.1.0-beta.2/sunbird-collection-editor.js";
+        script.async = true;
+        script.onload = () => setAssetsLoaded(true);
+        document.body.appendChild(script);
+      } else {
+        setAssetsLoaded(true);
       }
+
+      // Load Collection Editor CSS if not already loaded
+      if (!document.getElementById("collection-editor-css")) {
+        const link = document.createElement("link");
+        console.log("PDF Player loaded");
+        link.id = "collection-editor-css";
+        link.rel = "stylesheet";
+        link.href =
+          "https://cdn.jsdelivr.net/npm/@tekdi/sunbird-collection-editor-web-component@6.1.0-beta.2/styles.css";
+        document.head.appendChild(link);
+      }
+
+      if (!document.getElementById("sunbird-pdf-player-js")) {
+        const pdfScript = document.createElement("script");
+        pdfScript.id = "sunbird-pdf-player-js";
+        pdfScript.src =
+          "https://cdn.jsdelivr.net/npm/@project-sunbird/sunbird-pdf-player-web-component@1.4.0/sunbird-pdf-player.js";
+        pdfScript.async = true;
+        document.body.appendChild(pdfScript);
+      }
+
+      if (!document.getElementById("sunbird-pdf-player-css")) {
+        const pdfLink = document.createElement("link");
+        pdfLink.id = "sunbird-pdf-player-css";
+        pdfLink.rel = "stylesheet";
+        pdfLink.href =
+          "https://cdn.jsdelivr.net/npm/@project-sunbird/sunbird-pdf-player-web-component@1.4.0/styles.css";
+        document.head.appendChild(pdfLink);
+      }
+
+      const videoScript = document.createElement("script");
+      console.log("Video Player loaded");
+      videoScript.id = "sunbird-video-player.js";
+      videoScript.src =
+        "https://cdn.jsdelivr.net/npm/@project-sunbird/sunbird-video-player-web-component@1.2.5/sunbird-video-player.js";
+      videoScript.async = true;
+      document.body.appendChild(videoScript);
+
+      const videoLink = document.createElement("link");
+      videoLink.id = "sunbird-video-player-css";
+      videoLink.rel = "stylesheet";
+      videoLink.href =
+        "https://cdn.jsdelivr.net/npm/@project-sunbird/sunbird-video-player-web-component@1.2.5/styles.css";
+      document.head.appendChild(videoLink);
     };
 
     loadAssets();
 
     return () => {
-      const assetIds = [
-        'collection-editor-js',
-        'collection-editor-css',
-        'sunbird-pdf-player-js',
-        'sunbird-pdf-player-css',
-        'sunbird-video-player.js',
-        'sunbird-video-player-css',
-      ];
-      assetIds.forEach(removeAsset);
+      const reflectScript = document.getElementById("reflect-metadata");
+      const editorScript = document.getElementById("collection-editor-js");
+      const editorCSS = document.getElementById("collection-editor-css");
+
+      if (reflectScript) document.head.removeChild(reflectScript);
+      if (editorScript) document.body.removeChild(editorScript);
+      if (editorCSS) document.head.removeChild(editorCSS);
     };
   }, []);
 
   useEffect(() => {
     if (assetsLoaded && editorRef.current && !isAppendedRef.current) {
-      const collectionEditorElement = document.createElement('lib-editor');
+      const collectionEditorElement = document.createElement("lib-editor");
 
       collectionEditorElement.setAttribute(
-        'editor-config',
+        "editor-config",
         JSON.stringify(editorConfig)
       );
 
       collectionEditorElement.addEventListener(
-        'editorEmitter',
+        "editorEmitter",
         (event: any) => {
-          console.log('Editor event:', event);
+          console.log("Editor event:", event);
           if (
-            event.detail?.action === 'backContent' ||
-            event.detail?.action === 'submitContent' ||
-            event.detail?.action === 'publishContent' ||
-            event.detail?.action === 'rejectContent'
+            event.detail?.action === "backContent" ||
+            event.detail?.action === "submitContent" ||
+            event.detail?.action === "publishContent" ||
+            event.detail?.action === "rejectContent"
           ) {
-            localStorage.removeItem('contentMode');
-            window.history.back();
+            if (event.detail?.action === "submitContent") {
+              console.log("collection");
+            
+              sendReviewNotification({
+                contentId: identifier,
+                creator: getLocalStoredUserName(),
+              })
+                .then(() => {
+                  window.history.back(); 
+                })
+                .catch((error) => {
+                  console.error("Error in sendReviewNotification:", error);
+                });
+            } 
+            else if( event.detail?.action === "publishContent")
+            {
+              sendContentPublishNotification();
+            }
+            else if( event.detail?.action === "rejectContent")
+            {
+              sendContentRejectNotification();
+            }
+            else {
+              window.history.back();
+            }
+            localStorage.removeItem("contentMode");
+
+            
             window.addEventListener(
-              'popstate',
+              "popstate",
               () => {
                 window.location.reload();
               },

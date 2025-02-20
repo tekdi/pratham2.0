@@ -9,5 +9,14 @@ module.exports = {
         NODE_ENV: 'production',
       },
     },
+    {
+      name: 'workspace',
+      script: 'node_modules/.bin/next',
+      args: 'start -p 4104',
+      cwd: 'mfes/workspace',
+      env: {
+        NODE_ENV: 'production',
+      },
+    },
   ],
 };

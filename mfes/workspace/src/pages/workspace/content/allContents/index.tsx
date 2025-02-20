@@ -1,17 +1,41 @@
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import Layout from '../../../../components/Layout';
-import { Typography, Box, useTheme } from '@mui/material';
-import SearchBox from '../../../../components/SearchBox';
-import { getContent } from '../../../../services/ContentService';
-import { timeAgo } from '../../../../utils/Helper';
-import Loader from '../../../../components/Loader';
-import PaginationComponent from '../../../../components/PaginationComponent';
-import { LIMIT } from '../../../../utils/app.constant';
-import WorkspaceText from '../../../../components/WorkspaceText';
-import { DataType } from 'ka-table/enums';
-import 'ka-table/style.css';
-import KaTableComponent from '../../../../components/KaTableComponent';
-import useSharedStore from '../../../../utils/useSharedState';
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+  useCallback,
+  useRef,
+} from "react";
+import Layout from "@workspace/components/Layout";
+import {
+  Typography,
+  Box,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  TablePagination,
+  IconButton,
+  useTheme,
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import UpReviewTinyImage from "@mui/icons-material/LibraryBooks";
+import SearchBox from "../../../../components/SearchBox";
+import { deleteContent, getContent } from "../../../../services/ContentService";
+import { timeAgo } from "@workspace/utils/Helper";
+import Loader from "@workspace/components/Loader";
+import NoDataFound from "@workspace/components/NoDataFound";
+import { MIME_TYPE } from "@workspace/utils/app.config";
+import { useRouter } from "next/router";
+import PaginationComponent from "@workspace/components/PaginationComponent";
+import { LIMIT } from "@workspace/utils/app.constant";
+import WorkspaceText from "@workspace/components/WorkspaceText";
+import { Table as KaTable } from "ka-table";
+import { DataType } from "ka-table/enums";
+import "ka-table/style.css";
+import KaTableComponent from "@workspace/components/KaTableComponent";
+import useSharedStore from "@workspace/utils/useSharedState";
+import useTenantConfig from "@workspace/hooks/useTenantConfig";
 // const columns = [
 //   { key: 'name', title: 'Content', dataType: DataType.String, width: "450px" },
 //   { key: 'lastUpdatedOn', title: 'Last Updated', dataType: DataType.String, width: "300px" },
@@ -21,47 +45,60 @@ import useSharedStore from '../../../../utils/useSharedState';
 // ]
 const columns = [
   {
-    key: 'title_and_description',
-    title: 'TITLE & DESCRIPTION',
+    key: "title_and_description",
+    title: "TITLE & DESCRIPTION",
     dataType: DataType.String,
-    width: '450px',
+    width: "450px",
   },
   {
-    key: 'contentType',
-    title: 'CONTENT TYPE',
+    key: "contentType",
+    title: "CONTENT TYPE",
     dataType: DataType.String,
-    width: '200px',
+    width: "200px",
   },
-  { key: 'status', title: 'STATUS', dataType: DataType.String, width: '100px' },
+  { key: "status", title: "STATUS", dataType: DataType.String, width: "100px" },
   {
-    key: 'lastUpdatedOn',
-    title: 'LAST MODIFIED',
+    key: "lastUpdatedOn",
+    title: "LAST MODIFIED",
     dataType: DataType.String,
-    width: '180px',
+    width: "180px",
   },
   {
-    key: 'contentAction',
-    title: 'ACTION',
+    key: "contentAction",
+    title: "ACTION",
     dataType: DataType.String,
-    width: '100px',
+    width: "100px",
   },
 ];
 const AllContentsPage = () => {
+  const tenantConfig = useTenantConfig();
   const theme = useTheme<any>();
+  const router = useRouter();
 
-  const [selectedKey, setSelectedKey] = useState('allContents');
+  const [selectedKey, setSelectedKey] = useState("allContents");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filter, setFilter] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState('Modified On');
-  const [statusBy, setStatusBy] = useState('All');
+  const [searchTerm, setSearchTerm] = useState("");
+  const filterOption: string[] = router.query.filterOptions
+  ? JSON.parse(router.query.filterOptions as string)
+  : [];
+  const [filter, setFilter] = useState<string[]>(filterOption);
+  const sort: string = typeof router.query.sort === "string" 
+  ? router.query.sort 
+  : "Modified On";
+    const [sortBy, setSortBy] = useState(sort);
+    const statusQuery : string = typeof router.query.status === "string" 
+    ? router.query.status 
+    : "All";
+    const [statusBy, setStatusBy] = useState<string>(statusQuery);
 
   const [contentList, setContentList] = React.useState<content[]>([]);
   const [data, setData] = React.useState<any[]>([]);
 
   const [loading, setLoading] = useState(false);
   const [contentDeleted, setContentDeleted] = React.useState(false);
+  const prevFilterRef = useRef(filter);
+
   const fetchContentAPI = useSharedStore((state: any) => state.fetchContentAPI);
   const [debouncedSearchTerm, setDebouncedSearchTerm] =
     useState<string>(searchTerm);
@@ -97,7 +134,7 @@ const AllContentsPage = () => {
   };
 
   const handleSortChange = (sortBy: string) => {
-    console.log('sortBy', sortBy);
+    console.log("sortBy", sortBy);
     setSortBy(sortBy);
   };
   const handleStatusChange = (statusBy: string) => {
@@ -107,53 +144,81 @@ const AllContentsPage = () => {
   useEffect(() => {
     const getContentList = async () => {
       try {
+        if (!tenantConfig) return;
         setLoading(true);
         let status = [
-          'Draft',
-          'FlagDraft',
-          'Review',
-          'Processing',
-          'Live',
-          'Unlisted',
-          'FlagReview',
+          "Draft",
+          "FlagDraft",
+          "Review",
+          "Processing",
+          "Live",
+          "Unlisted",
+          "FlagReview",
         ];
-        if (statusBy === '' || statusBy === 'All') {
-          status = [
-            'Draft',
-            'FlagDraft',
-            'Review',
-            'Processing',
-            'Live',
-            'Unlisted',
-            'FlagReview',
-          ];
-        } else if (statusBy === 'Live') {
-          status = ['Live'];
-        } else if (statusBy === 'Review') {
-          status = ['Review'];
-        } else if (statusBy === 'Draft') {
-          status = ['Draft'];
-        } else if (statusBy === 'Unlisted') {
-          status = ['Unlisted'];
-        } else if (statusBy === 'FlagReview') {
-          status = ['FlagReview'];
-        }
 
-        const query = debouncedSearchTerm || '';
-        const primaryCategory = filter.length ? filter : [];
-        const order = sortBy === 'Created On' ? 'asc' : 'desc';
+        switch (statusBy) {
+          case "":
+          case "All":
+            status = [
+              "Draft",
+              "FlagDraft",
+              "Review",
+              "Processing",
+              "Live",
+              "Unlisted",
+              "FlagReview",
+            ];
+            break;
+          case "Live":
+            status = ["Live"];
+            break;
+          case "Review":
+            status = ["Review"];
+            break;
+          case "Draft":
+            status = ["Draft"];
+            break;
+          case "Unlisted":
+            status = ["Unlisted"];
+            break;
+          case "FlagReview":
+            status = ["FlagReview"];
+            break;
+          default:
+             status = [
+              "Draft",
+              "FlagDraft",
+              "Review",
+              "Processing",
+              "Live",
+              "Unlisted",
+              "FlagReview",
+            ];; 
+        }
+        
+
+        const query = debouncedSearchTerm || "";
+          const primaryCategory = filter.length ? filter : [];
+         const order = sortBy === "Created On" ? "asc" : "desc";
         const sort_by = {
           lastUpdatedOn: order,
         };
-        const offset = debouncedSearchTerm !== '' ? 0 : page * LIMIT;
-        console.log('seraching', debouncedSearchTerm);
+        let offset = debouncedSearchTerm !== "" ? 0 : page * LIMIT;
+        if (prevFilterRef.current !== filter) {
+          offset = 0;
+          setPage(0);
+
+          prevFilterRef.current = filter;
+        }
+        console.log("seraching", debouncedSearchTerm);
         const response = await getContent(
           status,
           query,
           LIMIT,
           offset,
           primaryCategory,
-          sort_by
+          sort_by,
+          tenantConfig?.CHANNEL_ID
         );
         const contentList = (response?.content || []).concat(
           response?.QuestionSet || []
@@ -166,7 +231,7 @@ const AllContentsPage = () => {
       }
     };
     getContentList();
-  }, [debouncedSearchTerm, filter, fetchContentAPI, sortBy, statusBy, page]);
+  }, [tenantConfig, debouncedSearchTerm, filter, fetchContentAPI, sortBy, statusBy, page]);
 
   useEffect(() => {
     const filteredArray = contentList.map((item) => ({
@@ -198,7 +263,7 @@ const AllContentsPage = () => {
     page * rowsPerPage + rowsPerPage
   );
 
-  console.log('contentList', contentList);
+  console.log("contentList", contentList);
   return (
     <Layout selectedKey={selectedKey} onSelect={setSelectedKey}>
       <WorkspaceText />
@@ -206,16 +271,16 @@ const AllContentsPage = () => {
       <Box p={3}>
         <Box
           sx={{
-            background: '#fff',
-            borderRadius: '8px',
-            boxShadow: '0px 2px 6px 2px #00000026',
-            pb: totalCount > LIMIT ? '15px' : '0px',
+            background: "#fff",
+            borderRadius: "8px",
+            boxShadow: "0px 2px 6px 2px #00000026",
+            pb: totalCount > LIMIT ? "15px" : "0px",
           }}
         >
           <Box p={2}>
             <Typography
               variant="h4"
-              sx={{ fontWeight: 'bold', fontSize: '16px' }}
+              sx={{ fontWeight: "bold", fontSize: "16px" }}
             >
               All My Contents
             </Typography>
@@ -233,7 +298,7 @@ const AllContentsPage = () => {
             />
           </Box>
           {loading ? (
-            <Loader showBackdrop={true} loadingText={'Loading'} />
+            <Loader showBackdrop={true} loadingText={"Loading"} />
           ) : (
             <>
               <Box className="table-ka-container">

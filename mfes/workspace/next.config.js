@@ -24,6 +24,7 @@ const nextConfig = {
     // See: https://github.com/gregberge/svgr
     svgr: false,
   },
+  basePath: '/mfe_workspace', // This should match the path set in Nginx
   async rewrites() {
     return [
       {
@@ -50,6 +51,10 @@ const nextConfig = {
       {
         source: '/action/content/:path*', // Match other /action/asset routes
         destination: '/api/proxy?path=/action/content/:path*', // Forward other /action/asset requests to proxy.js
+      },
+      {
+        source: "/action/v1/telemetry",
+        destination: `${process.env.NEXT_PUBLIC_TELEMETRY_URL}/v1/telemetry`,
       },
       {
         source: '/action/data/v3/telemetry',
@@ -93,6 +98,8 @@ const nextConfig = {
       },
     ];
   },
+
+  
 };
 
 const plugins = [

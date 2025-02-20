@@ -181,7 +181,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
 
   const isDashboard = [
     '/dashboard',
-    '/youthboard',
+    '/',
     '/attendance-history',
     '/attendance-overview',
   ].includes(router.pathname);
@@ -211,7 +211,9 @@ const MenuDrawer: React.FC<DrawerProps> = ({
       sx={{
         '& .MuiPaper-root': {
           borderRight: `1px solid ${theme.palette.warning['A100']}`,
+          '@media (max-width: 900px)': { 
           zIndex: '998 !important',
+          },
           left: isRTL ? '0px !important' : '0px !important',
 
           width: isRTL ? '350px !important' : 'unset !important',

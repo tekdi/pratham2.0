@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { tenantId } from '../../app.config';
+import API_ENDPOINTS from '@/utils/API/APIEndpoints';
 
 export const getFormRead = async (
   context: string,
@@ -10,7 +11,7 @@ export const getFormRead = async (
     if (typeof window !== 'undefined' && window.localStorage) {
       const token = localStorage.getItem('token');
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/v1/form/read`,
+        API_ENDPOINTS.formRead,
         {
           params: {
             context,
