@@ -50,6 +50,9 @@ export enum Status {
   PUBLISHED="published",
   DRAFT="draft",
   UNPUBLISHED="Unpublished",
+  ISSUED="Issued",
+  NOT_ISSUED="Not Issued",
+
 }
 export enum SORT {
   ASCENDING = "asc",

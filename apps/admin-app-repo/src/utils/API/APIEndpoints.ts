@@ -35,6 +35,13 @@ const API_ENDPOINTS = {
   cohortMemberBulkCreate: `${baseurl}/interface/v1/cohortmember/bulkCreate`,
   cohortMemberUpdate: (membershipId: string | number) => `${baseurl}/interface/v1/cohortmember/update/${membershipId}`,
   notificationTemplate: `${baseurl}/notification-templates`,
+  courseStatus:`${baseurl}/interface/v1/tracking/user_certificate/user_course_status`,
+  courseWiseLernerList: `${baseurl}/interface/v1/tracking/user_certificate/status/search`,
+  getCourseName: `https://dev-middleware.prathamdigital.org/action/composite/v3/search`,
+  issueCertificate: `${baseurl}/interface/v1/tracking/certificate/issue`,
+  renderCertificate: `${baseurl}/interface/v1/tracking/certificate/render`,
+
+
 };
 
 export default API_ENDPOINTS;
