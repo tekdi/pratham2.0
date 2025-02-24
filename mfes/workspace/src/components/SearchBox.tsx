@@ -112,7 +112,7 @@ console.log("filterOption", filterOption);
 
         const states = await getOptionsByCategory(framework, "state");
 
-        {
+        if(states){
           const stateNames = states.map((state: any) => state.name);
           setStateOptions(["All", ...stateNames]);
 

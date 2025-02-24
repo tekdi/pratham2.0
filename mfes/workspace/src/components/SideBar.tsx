@@ -20,52 +20,17 @@ import {
 } from "@mui/material";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ManageSearchIcon from "@mui/icons-material/ManageSearch";
 import logo from "/public/logo.png";
 import { Role } from "@workspace/utils/app.constant";
 import { getLocalStoredUserRole } from "@workspace/services/LocalStorageService";
-const userRole = getLocalStoredUserRole();
 const route = process.env.NEXT_PUBLIC_WORKSPACE_ROUTES;
 
 let isAdmin: boolean;
 if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
   isAdmin = localStorage.getItem("adminInfo") ? true : false;
 }
-// Updated menu items with icons
-const menuItems = [
-  { text: "Create", key: "create", icon: <AddOutlinedIcon /> },
-  { text: "Drafts", key: "draft", icon: <CreateOutlinedIcon /> },
-  ...(userRole !== Role.CCTA
-    ? [
-        {
-          text: "Submitted for Review",
-          key: "submitted",
-          icon: <PreviewOutlinedIcon />,
-        },
-      ]
-    : []),
-  ...(userRole === Role.CCTA
-    ? [
-        {
-          text: "Up for Review",
-          key: "up-review",
-          icon: <PreviewOutlinedIcon />,
-        },
-      ]
-    : []),
-  {
-    text: "My Published Contents",
-    key: "publish",
-    icon: <OutlinedFlagOutlinedIcon />,
-  },
-  { text: "All My Contents", key: "allContents", icon: <AppsOutlinedIcon /> },
-  {
-    text: "Discover Contents",
-    key: "discover-contents",
-    icon: <ManageSearchIcon />,
-  },
-];
 
 interface SidebarProps {
   selectedKey: string;
@@ -73,10 +38,51 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
+  const [userRole, setUserRole] = useState<Role | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const router = useRouter();
   const theme = useTheme<any>();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
+  useEffect(() => {
+    setUserRole(getLocalStoredUserRole());
+  }, []);
+
+  if (userRole === null) return null;
+
+  const menuItems = [
+    { text: "Create", key: "create", icon: <AddOutlinedIcon /> },
+    { text: "Drafts", key: "draft", icon: <CreateOutlinedIcon /> },
+    ...(userRole !== Role.CCTA
+      ? [
+          {
+            text: "Submitted for Review",
+            key: "submitted",
+            icon: <PreviewOutlinedIcon />,
+          },
+        ]
+      : []),
+    ...(userRole === Role.CCTA
+      ? [
+          {
+            text: "Up for Review",
+            key: "up-review",
+            icon: <PreviewOutlinedIcon />,
+          },
+        ]
+      : []),
+    {
+      text: "My Published Contents",
+      key: "publish",
+      icon: <OutlinedFlagOutlinedIcon />,
+    },
+    { text: "All My Contents", key: "allContents", icon: <AppsOutlinedIcon /> },
+    {
+      text: "Discover Contents",
+      key: "discover-contents",
+      icon: <ManageSearchIcon />,
+    },
+  ];
 
   const handleNavigation = (key: string) => {
     console.log(key);
