@@ -104,8 +104,14 @@ const Header = ({
       storedUserData?.role === Role.SCTA ||
       storedUserData?.role === Role.CCTA
     ) {
-      if (locale) router.push("/course-planner", undefined, { locale: locale });
-      else router.push("/course-planner");
+      if(storedUserData?.tenantData[0]?.tenantName != "Second Chance Program" ) {
+        router.push("/workspace");
+      } else {
+        if (locale) 
+          router.push("/course-planner", undefined, { locale: locale });
+        else
+          router.push("/course-planner");
+      }
     } else {
       if (locale) {
         if (storedUserData?.role === Role.CENTRAL_ADMIN) {
