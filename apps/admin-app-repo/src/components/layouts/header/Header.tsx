@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import FeatherIcon from "feather-icons-react";
+// import FeatherIcon from "feather-icons-react";
 import { AppBar, Box, IconButton, Toolbar } from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
@@ -167,7 +167,7 @@ const Header = ({
             },
           }}
         >
-          {showIcon === false ? "" : <FeatherIcon icon="menu" size="20" />}
+          {/* {showIcon === false ? "" : <FeatherIcon icon="menu" size="20" />} */}
         </IconButton>
         {/* ------------------------------------------- */}
         {/* Search Dropdown */}
