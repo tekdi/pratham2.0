@@ -6,7 +6,7 @@ import deleteIcon from '../../public/images/deleteIcon.svg';
 import editIcon from '../../public/images/editIcon.svg';
 import reissueIcon from '../../public/images/reissue.png';
 
-import { Role, TelemetryEventType } from '@/utils/app.constant';
+import { Role, Status, TelemetryEventType } from '@/utils/app.constant';
 import { telemetryFactory } from '@/utils/telemetry';
 import Image from 'next/image';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
@@ -42,7 +42,7 @@ const ActionIcon: React.FC<ActionCellProps> = ({
 }) => {
   const { t } = useTranslation();
   const theme = useTheme<any>();
-  if (rowData.courseStatus === 'Issued' && onViewCertificate && onIssueCertificate) {
+  if (rowData.courseStatus === Status.ISSUED && onViewCertificate && onIssueCertificate) {
     return (
       <Box
         sx={{

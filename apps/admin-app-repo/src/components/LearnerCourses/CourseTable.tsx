@@ -19,6 +19,7 @@ import TenantService from '@/services/TenantService';
 import { showToastMessage } from '../Toastify';
 import CustomModal from '../CustomModal';
 import { formatDate } from '@/utils/Helper';
+import { Status } from '@/utils/app.constant';
 
 type FilterDetails = {
   status?: string[];
@@ -102,11 +103,11 @@ const CourseTable: React.FC = () => {
 
   const handleViewCertificate = async (rowData: any) => {
     try {
-      const responce = await renderCertificate({
+      const response = await renderCertificate({
         credentialId: rowData.certificateId,
         templateId: 'cm74egxc0000aoc3gqp2p4fvk',
       });
-      setCertificateHtml(responce);
+      setCertificateHtml(response);
       setShowCertificate(true);
     } catch (e) {}
   };
@@ -126,8 +127,8 @@ const CourseTable: React.FC = () => {
       try{
       const limit = pageLimit;
       let offset = pageOffset * limit;
-      const responce = await courseWiseLernerList({ limit, offset, filters });
-       const totalCount=responce.count
+      const response = await courseWiseLernerList({ limit, offset, filters });
+       const totalCount=response.count
       if (totalCount >= 15) {
         setPagination(true);
 
@@ -146,7 +147,7 @@ const CourseTable: React.FC = () => {
       }
 
       
-      const data = responce.data;
+      const data = response.data;
       const courseIds: string[] = Array.from(
         new Set(data.map((item: any) => item?.courseid))
       );
@@ -190,7 +191,7 @@ const CourseTable: React.FC = () => {
             courseId: course?.courseId,
             username: course?.username,
             courseStatus:
-              course?.status === 'viewCertificate' ? 'Issued' : 'Not Issued',
+              course?.status === 'viewCertificate' ? Status.ISSUED : Status.NOT_ISSUED,
             courseName: course?.courseName,
             issuedDate: course?.status === 'completed' ? '-' : formatDate(course?.issuedOn),
             userId: course?.userId,
@@ -286,7 +287,7 @@ const CourseTable: React.FC = () => {
             open={true}
             onClose={handleCloseCertificate}
             showFooter={true}
-            modalTitle={'Courses certificate'}
+            modalTitle={t('CERTIFICATES.COURSE_CERTIFICATE')}
             isFullwidth={showCertificate ? true : false}
           >
             <CertificatePage htmlContent={certificateHtml} />
@@ -296,12 +297,12 @@ const CourseTable: React.FC = () => {
           width="30%"
           open={alertIssueModal}
           handleClose={handleCloseCertificate}
-          primaryBtnText={'Yes'}
+          primaryBtnText={t('COMMON.YES')}
           primaryBtnClick={handleIssueCertificate}
           primaryBtnDisabled={false}
           secondaryBtnText={t('COMMON.CANCEL')}
           secondaryBtnClick={handleCloseCertificate}
-          title={ selectedRowData.courseStatus === 'Issued'? "Reissue certificate confirmation" : "Issue certificate confirmation"}
+          title={ selectedRowData.courseStatus === 'Issued'?  t('CERTIFICATES.REISSUE_CERTIFICATE_CONFIRMATION') : t('CERTIFICATES.ISSUE_CERTIFICATE_CONFIRMATION')}
         >
            {selectedRowData.courseStatus === 'Issued' ?(<Typography variant="body1" align="center" gutterBottom>
    {t('CERTIFICATES.REISSUE_CERTIFICATE_ALERT')}

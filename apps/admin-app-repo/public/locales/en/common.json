@@ -600,7 +600,11 @@
   "FIRST_NAME":"First Name:",
   "MIDDLE_NAME":"Middle Name:",
   "LAST_NAME":"Last Name:",
-  "COURSE_NAME":"Course Name:"
+  "COURSE_NAME":"Course Name:",
+  "REISSUE_CERTIFICATE_CONFIRMATION":"Reissue certificate confirmation",
+  "ISSUE_CERTIFICATE_CONFIRMATION":"Issue certificate confirmation",
+  "COURSE_CERTIFICATE":"Course certificate"
+
 
 
 }
