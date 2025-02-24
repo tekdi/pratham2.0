@@ -203,7 +203,8 @@
     "SCTA": "State Content Team Associate",
     "WORKSPACE": "Workspace",
     "MENTOR":"Mentor",
-    "MENTOR_LEADER":"Mentor Leader"
+    "MENTOR_LEADER":"Mentor Leader",
+    "CERTIFICATE_ISSUANCE": "Certificate Issuance"
   },
   "FACILITATORS": {
     "STATE": "State",
@@ -513,7 +514,12 @@
     "ID":"Id",
     "TITLE":"Title",
     "KEY":"Key",
-    "CONTEXT":"Context"
+    "CONTEXT":"Context",
+    "COURSE_NAME": "Course Name",
+    "COURSE_STATUS":"Course Status",
+    "ISSUED_DATE":"Issued Date",
+    "USER_ID":"User Id",
+    "COURSE_ID":"Course Id"
     
   },
   "WORKSPACE": {
@@ -580,5 +586,22 @@
 "Add_TEMPLATE":"Add new Template",
 "DELETE_TEMPLATE_ALERT":"Are you sure you want to delete this template?",
 "TEMPLATE_DELETED_SUCCESS":"Template with id {{templateId}} deleted successfully"
+},
+"CERTIFICATES":
+{
+  "SEARCHBAR_PLACEHOLDER":"Search...",
+  "REISSUE_CERTIFICATE":"Reissue Certificate",
+  "VIEW_CERTIFICATE":"View Certificate",
+  "ISSUE_CERTIFICATE":"Issue Certificate",
+  "ISSUED_CERTIFICATE_SUCCESSFULLY":"Issued Certificate Successfully",
+  "REISSUED_CERTIFICATE_SUCCESSFULLY":"Reissued Certificate Successfully",
+  "ISSUE_CERTIFICATE_ALERT":"Are you sure you want to issue a certificate for the following details?",
+  "REISSUE_CERTIFICATE_ALERT":"Are you sure you want to reissue a certificate for the following details?",
+  "FIRST_NAME":"First Name:",
+  "MIDDLE_NAME":"Middle Name:",
+  "LAST_NAME":"Last Name:",
+  "COURSE_NAME":"Course Name:"
+
+
 }
 }

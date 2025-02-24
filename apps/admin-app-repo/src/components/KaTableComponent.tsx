@@ -42,7 +42,13 @@ interface KaTableComponentProps {
   pagination?: boolean;
   reassignType?: string;
   handleMemberClick?: any;
-  rowKeyField?: string
+  rowKeyField?: string,
+  tableDataType?:string;
+  onViewCourses?:any
+  onViewCertificate?:any
+  onIssueCertificate?:any
+
+  
 }
 
 const KaTableComponent: React.FC<KaTableComponentProps> = ({
@@ -60,7 +66,12 @@ const KaTableComponent: React.FC<KaTableComponentProps> = ({
   pagination = true,
   reassignType,
   handleMemberClick,
-  rowKeyField
+  rowKeyField,
+  tableDataType,
+  onViewCourses,
+  onViewCertificate,
+  onIssueCertificate
+
 }) => {
   const [selectedRowIds, setSelectedRowIds] = useState<number[]>([]);
   const { t, i18n } = useTranslation();
@@ -135,6 +146,10 @@ const KaTableComponent: React.FC<KaTableComponentProps> = ({
                       userAction={props.rowData?.userId}
                       disable={props.rowData?.status === Status.ARCHIVED}
                       reassignType={reassignType}
+                      role={tableDataType}
+                      onViewCourses={onViewCourses}
+                      onIssueCertificate={onIssueCertificate}
+                      onViewCertificate={onViewCertificate}
                     />
                   );
                 }
