@@ -20,6 +20,7 @@ const Menuitems = [
     icon: programIcon,
     href: ["/programs"],
   },
+
   {
     title: "SIDEBAR.MANAGE_USERS",
     icon: userIcon,
@@ -61,6 +62,11 @@ const Menuitems = [
     icon: centerIcon,
     href: ["/notification-templates"],
   },
+     {
+    title: "Support Request",
+    icon: programIcon,
+    href: ["/support-request"],
+  },
   ...(isActiveYear
     ? [
         {
@@ -95,7 +101,7 @@ export const getFilteredMenuItems = () => {
       return Menuitems.filter(
         (item) =>
           item.title === "SIDEBAR.COURSE_PLANNER" ||
-          item.title === "SIDEBAR.WORKSPACE"
+          item.title === "SIDEBAR.WORKSPACE" || item.title === "Support Request"
       );
     }
 

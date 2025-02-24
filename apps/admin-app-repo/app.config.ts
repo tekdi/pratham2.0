@@ -13,3 +13,9 @@ if (!CONTENT_FRAMEWORK_ID) {
   console.warn('NEXT_PUBLIC_CONTENT_FRAMEWORK_ID is not set in the environment variables.');
 }
 
+export const jotFormId = process.env.NEXT_PUBLIC_JOTFORM_ID || '';
+if (!jotFormId) {
+  console.warn(
+    'NEXT_PUBLIC_JOTFORM_ID is not set in the environment variables.'
+  );
+}

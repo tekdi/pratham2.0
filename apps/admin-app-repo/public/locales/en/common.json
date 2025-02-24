@@ -27,11 +27,12 @@
     "DELETE": "Delete",
     "NO_DATA_FOUND": "No data found",
     "SUBMIT": "Submit",
+      "SUBMIT_YOUR_REQUEST_FOR_ISSUES": "Submit your request and let us assist you with any issues or concerns.",
     "BACK": "Back",
     "CANCEL": "Cancel",
     "ARE_YOU_SURE_DELETE": "There are {{block}} active blocks in this district you cannot delete it.",
     "ARE_YOU_SURE_DELETE_STATE": "There are {{district}} active districts in this state you cannot delete it.",
-
+    "WE_ARE_HERE_TO_HELP": "We’re Here to Help",
     "NO_ACTIVE_BLOCKS_DELETE": "There are no active blocks in this district. Do you want to delete it?",
     "ARE_YOU_SURE_DELETE_BLOCK": "There are {{centerCount}} active centers in this block you cannot delete it",
     "NO_ACTIVE_CENTERS_DELETE": "There are no active centers in this block. Do you want to delete it?",
