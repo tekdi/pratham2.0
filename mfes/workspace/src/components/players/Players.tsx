@@ -2,27 +2,27 @@ import dynamic from "next/dynamic";
 import React from "react";
 
 const SunbirdPdfPlayer = dynamic(
-  () => import("@/components/players/SunbirdPdfPlayer"),
+  () => import("@workspace/components/players/SunbirdPdfPlayer"),
   {
     ssr: false,
   }
 );
 
 const SunbirdVideoPlayer = dynamic(
-  () => import("@/components/players/SunbirdVideoPlayer"),
+  () => import("@workspace/components/players/SunbirdVideoPlayer"),
   {
     ssr: false,
   }
 );
 const SunbirdEpubPlayer = dynamic(
-  () => import("@/components/players/SunbirdEpubPlayer"),
+  () => import("@workspace/components/players/SunbirdEpubPlayer"),
   {
     ssr: false,
   }
 );
 
 const SunbirdQuMLPlayer = dynamic(
-  () => import("@/components/players/SunbirdQuMLPlayer"),
+  () => import("@workspace/components/players/SunbirdQuMLPlayer"),
   {
     ssr: false,
   }

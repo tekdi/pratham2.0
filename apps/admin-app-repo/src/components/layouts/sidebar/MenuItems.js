@@ -82,7 +82,7 @@ const Menuitems = [
         {
           title: "SIDEBAR.WORKSPACE",
           icon: dashboardIcon,
-          href: ["/workspace/content/create", "/course-hierarchy/[identifier]"],
+          href: ["/workspace", "/course-hierarchy/[identifier]"],
         },
       ]
     : []),
@@ -98,6 +98,13 @@ export const getFilteredMenuItems = () => {
     } 
 
     if (userInfo?.role === Role.SCTA || userInfo?.role === Role.CCTA) {
+      if(userInfo?.tenantData[0]?.tenantName != "Second Chance Program" ) {
+        return Menuitems.filter(
+          (item) =>
+            item.title === "SIDEBAR.WORKSPACE"
+        );
+   
+      }
       // For SCTA and CCTA, show only Course Planner and Workspace
       return Menuitems.filter(
         (item) =>

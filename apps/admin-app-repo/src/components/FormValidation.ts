@@ -18,6 +18,7 @@ const validateDob = (formData: Record<string, any>, errors: FormValidation, fiel
     if (formData[field] && formData[field] < minDate) {
         errors[field]?.addError(t(`FORM_ERROR_MESSAGES.DATE_MUST_BE_ON_OR_AFTER`, { date: minDate }));
     }
+      //@ts-ignore
     if (formData[field] && formData[field] > maxDate) {
         errors[field]?.addError(t(`FORM_ERROR_MESSAGES.DATE_MUST_BE_ON_OR_BEFORE`, { date: maxDate }));
     }

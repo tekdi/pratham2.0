@@ -538,6 +538,7 @@ const Center: React.FC = () => {
     setSelectedBlock([]);
     setSelectedDistrict(selected);
     setSelectedBlockCode("");
+    //@ts-ignore
     localStorage.setItem('selectedDistrict', selected[0])
 
     setSelectedDistrictStore(selected[0])
@@ -611,7 +612,7 @@ const Center: React.FC = () => {
     }
 
 
-
+      //@ts-ignore
     localStorage.setItem('selectedBlock', selected[0])
     setSelectedBlockStore(selected[0])
     if (selected[0] === "" || selected[0] === t("COMMON.ALL_BLOCKS")) {
