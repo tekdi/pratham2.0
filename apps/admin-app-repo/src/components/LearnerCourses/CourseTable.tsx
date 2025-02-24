@@ -20,6 +20,7 @@ import { showToastMessage } from '../Toastify';
 import CustomModal from '../CustomModal';
 import { formatDate } from '@/utils/Helper';
 import { Status } from '@/utils/app.constant';
+import { TEMPLATE_ID } from '../../../app.config';
 
 type FilterDetails = {
   status?: string[];
@@ -74,11 +75,11 @@ const CourseTable: React.FC = () => {
       setData((prevData) =>
       prevData.map((course) =>
         course.courseId === selectedRowData?.courseId
-          ? { ...course, courseStatus: 'Issued' , certificateId: response?.credential?.id}
+          ? { ...course, courseStatus: Status.ISSUED , certificateId: response?.credential?.id}
           : course
       )
     );
-      if (selectedRowData.courseStatus === 'Issued') {
+      if (selectedRowData.courseStatus === Status.ISSUED) {
         showToastMessage(
           t('CERTIFICATES.REISSUED_CERTIFICATE_SUCCESSFULLY'),
           'success'
@@ -105,7 +106,7 @@ const CourseTable: React.FC = () => {
     try {
       const response = await renderCertificate({
         credentialId: rowData.certificateId,
-        templateId: 'cm74egxc0000aoc3gqp2p4fvk',
+        templateId: TEMPLATE_ID,
       });
       setCertificateHtml(response);
       setShowCertificate(true);
@@ -302,9 +303,9 @@ const CourseTable: React.FC = () => {
           primaryBtnDisabled={false}
           secondaryBtnText={t('COMMON.CANCEL')}
           secondaryBtnClick={handleCloseCertificate}
-          title={ selectedRowData.courseStatus === 'Issued'?  t('CERTIFICATES.REISSUE_CERTIFICATE_CONFIRMATION') : t('CERTIFICATES.ISSUE_CERTIFICATE_CONFIRMATION')}
+          title={ selectedRowData.courseStatus === Status.ISSUED?  t('CERTIFICATES.REISSUE_CERTIFICATE_CONFIRMATION') : t('CERTIFICATES.ISSUE_CERTIFICATE_CONFIRMATION')}
         >
-           {selectedRowData.courseStatus === 'Issued' ?(<Typography variant="body1" align="center" gutterBottom>
+           {selectedRowData.courseStatus ===  Status.ISSUED ?(<Typography variant="body1" align="center" gutterBottom>
    {t('CERTIFICATES.REISSUE_CERTIFICATE_ALERT')}
     </Typography>): (<Typography variant="body1" align="center" gutterBottom>
     {t('CERTIFICATES.ISSUE_CERTIFICATE_ALERT')}
