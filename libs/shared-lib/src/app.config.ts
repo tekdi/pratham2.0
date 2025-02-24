@@ -75,22 +75,11 @@ export const Program = ['Second Chance', 'secondchance'];
 //below line cause issue in react vite build as vite not able to access next env public variables
 export const tenantId =
   (typeof window !== 'undefined' && localStorage.getItem('tenantId')) ||
-  (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_TENANT_ID) ||
-  (typeof import.meta !== 'undefined' && import.meta.env.VITE_TENANT_ID);
+  (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_TENANT_ID);
 
 if (!tenantId && typeof window !== 'undefined') {
   console.warn(
-    'import.meta.env.VITE_TENANT_ID is not set in the environment variables.'
-  );
-}
-
-export const frameworkId =
-  (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_FRAMEWORK_ID) ||
-  (typeof import.meta !== 'undefined' && import.meta.env.VITE_FRAMEWORK_ID);
-
-if (!frameworkId) {
-  console.warn(
-    'import.meta.env.VITE_FRAMEWORK_ID is not set in the environment variables.'
+    'TENANT_ID is not set in the environment variables.'
   );
 }
 
