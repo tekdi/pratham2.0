@@ -1,7 +1,7 @@
 import CommonUserModal from "@/components/CommonUserModal";
 import { FormContextType, Role, TelemetryEventType } from "@/utils/app.constant";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import FeatherIcon from "feather-icons-react";
+// import FeatherIcon from "feather-icons-react";
 import { useTranslation } from "next-i18next";
 import React, { useEffect } from "react";
 
@@ -266,8 +266,8 @@ const Profile = () => {
             >
               {t("COMMON.HI", { name: firstLetterInUpperCase(userName ?? "") })}
             </Typography>
-
-            <FeatherIcon icon="chevron-down" size="20" />
+{/* 
+            <FeatherIcon icon="chevron-down" size="20" /> */}
           </Box>
         </Box>
       </Button>
