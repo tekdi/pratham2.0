@@ -79,7 +79,10 @@ const Sidebar = ({
                   }}
                 >
                   <ListItemIcon>
-                    <Image src={item.icon} alt="" />
+                    {"SIDEBAR.CERTIFICATE_ISSUANCE" === item.title ? (
+                    <Image src={item.icon} alt="" width={33} height={33} />
+
+                    ):(  <Image src={item.icon} alt="" />)}
                   </ListItemIcon>
                   <ListItemText>
                     <Typography variant="h2" sx={{ fontWeight: "700px" }}>
