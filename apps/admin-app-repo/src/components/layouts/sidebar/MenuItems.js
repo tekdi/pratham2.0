@@ -4,6 +4,7 @@ import dashboardIcon from "../../../../public/images/dashboard.svg";
 import userIcon from "../../../../public/images/group.svg";
 import programIcon from "../../../../public/images/programIcon.svg";
 import certificateIcon from "../../../../public/images/certificate_custom.svg";
+import support from '../../../assets/images/Support.svg';
 
 import coursePlannerIcon from "../../../../public/images/event_available.svg";
 import { store } from "@/store/store";
@@ -71,7 +72,7 @@ const Menuitems = [
   },
      {
     title: "Support Request",
-    icon: programIcon,
+    icon: support,
     href: ["/support-request"],
   },
   ...(isActiveYear
