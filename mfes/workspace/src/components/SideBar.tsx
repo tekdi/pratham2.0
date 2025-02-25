@@ -1,11 +1,11 @@
-import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
-import AppsOutlinedIcon from "@mui/icons-material/AppsOutlined";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import CloseIcon from "@mui/icons-material/Close";
-import CreateOutlinedIcon from "@mui/icons-material/CreateOutlined";
-import MenuIcon from "@mui/icons-material/Menu";
-import OutlinedFlagOutlinedIcon from "@mui/icons-material/OutlinedFlagOutlined";
-import PreviewOutlinedIcon from "@mui/icons-material/PreviewOutlined";
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import AppsOutlinedIcon from '@mui/icons-material/AppsOutlined';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CloseIcon from '@mui/icons-material/Close';
+import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
+import MenuIcon from '@mui/icons-material/Menu';
+import OutlinedFlagOutlinedIcon from '@mui/icons-material/OutlinedFlagOutlined';
+import PreviewOutlinedIcon from '@mui/icons-material/PreviewOutlined';
 import {
   Box,
   Drawer,
@@ -17,19 +17,21 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
-} from "@mui/material";
-import Image from "next/image";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import ManageSearchIcon from "@mui/icons-material/ManageSearch";
-import logo from "/public/logo.png";
-import { Role } from "@workspace/utils/app.constant";
-import { getLocalStoredUserRole } from "@workspace/services/LocalStorageService";
+} from '@mui/material';
+import Image from 'next/image';
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
+import logo from '/public/logo.png';
+import { Role } from '@workspace/utils/app.constant';
+import { getLocalStoredUserRole } from '@workspace/services/LocalStorageService';
+import { TENANT_DATA } from '@workspace/utils/app.constant';
+import TenantService from '@workspace/services/TenantService';
 const route = process.env.NEXT_PUBLIC_WORKSPACE_ROUTES;
 
 let isAdmin: boolean;
-if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
-  isAdmin = localStorage.getItem("adminInfo") ? true : false;
+if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+  isAdmin = localStorage.getItem('adminInfo') ? true : false;
 }
 
 interface SidebarProps {
@@ -40,24 +42,28 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
   const [userRole, setUserRole] = useState<Role | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [tenantName, setTenantName] = useState();
   const router = useRouter();
   const theme = useTheme<any>();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   useEffect(() => {
     setUserRole(getLocalStoredUserRole());
+    const userData = localStorage.getItem('userData');
+    const tenant = userData ? JSON.parse(userData) : null;
+    setTenantName(tenant?.tenantData[0]?.tenantName);
   }, []);
 
   if (userRole === null) return null;
 
   const menuItems = [
-    { text: "Create", key: "create", icon: <AddOutlinedIcon /> },
-    { text: "Drafts", key: "draft", icon: <CreateOutlinedIcon /> },
+    { text: 'Create', key: 'create', icon: <AddOutlinedIcon /> },
+    { text: 'Drafts', key: 'draft', icon: <CreateOutlinedIcon /> },
     ...(userRole !== Role.CCTA
       ? [
           {
-            text: "Submitted for Review",
-            key: "submitted",
+            text: 'Submitted for Review',
+            key: 'submitted',
             icon: <PreviewOutlinedIcon />,
           },
         ]
@@ -65,21 +71,21 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
     ...(userRole === Role.CCTA
       ? [
           {
-            text: "Up for Review",
-            key: "up-review",
+            text: 'Up for Review',
+            key: 'up-review',
             icon: <PreviewOutlinedIcon />,
           },
         ]
       : []),
     {
-      text: "My Published Contents",
-      key: "publish",
+      text: 'My Published Contents',
+      key: 'publish',
       icon: <OutlinedFlagOutlinedIcon />,
     },
-    { text: "All My Contents", key: "allContents", icon: <AppsOutlinedIcon /> },
+    { text: 'All My Contents', key: 'allContents', icon: <AppsOutlinedIcon /> },
     {
-      text: "Discover Contents",
-      key: "discover-contents",
+      text: 'Discover Contents',
+      key: 'discover-contents',
       icon: <ManageSearchIcon />,
     },
   ];
@@ -87,7 +93,7 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
   const handleNavigation = (key: string) => {
     console.log(key);
     router.push(`/workspace/content/${key}`);
-    localStorage.setItem("selectedFilters", JSON.stringify([]));
+    localStorage.setItem('selectedFilters', JSON.stringify([]));
     onSelect(key);
     if (isMobile) {
       setDrawerOpen(false); // Close drawer after selecting in mobile view
@@ -99,13 +105,13 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
   };
 
   const goBack = () => {
-    if (typeof window !== "undefined" && window.localStorage) {
-      const userInfo = JSON.parse(localStorage.getItem("adminInfo") || "{}");
-      console.log("userInfo", userInfo);
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const userInfo = JSON.parse(localStorage.getItem('adminInfo') || '{}');
+      console.log('userInfo', userInfo);
       if (userInfo?.role === Role.SCTA || userInfo?.role === Role.CCTA) {
         // router.push("/course-planner");
-        window.parent.location.href = `${route}course-planner`
-      } else window.parent.location.href = `${route}`
+        window.parent.location.href = `${route}course-planner`;
+      } else window.parent.location.href = `${route}`;
     }
   };
 
@@ -116,38 +122,40 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
       width="284px !important"
       height="100%"
       sx={{
-        fontSize: "16px",
-        "@media (max-width: 900px)": {
-          background: "linear-gradient(to bottom, white, #F8EFDA)",
-          fontSize: "12px",
+        fontSize: '16px',
+        '@media (max-width: 900px)': {
+          background: 'linear-gradient(to bottom, white, #F8EFDA)',
+          fontSize: '12px',
         },
       }}
     >
       <Box
-        sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}
+        sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
       >
-        <img src={"/logo.png"} alt="logo" height={60} />
+        <img src={'/logo.png'} alt="logo" height={60} />
       </Box>
       <Box
         display="flex"
         alignItems="center"
         justifyContent="space-between"
-        paddingTop={"1rem"}
+        paddingTop={'1rem'}
       >
-        <Box display="flex" alignItems="center">
-          <ListItemIcon>
-            <IconButton onClick={goBack}>
-              <ArrowBackIcon sx={{ color: theme.palette.warning["100"] }} />
-            </IconButton>
-          </ListItemIcon>
-          <Typography
-            variant="h2"
-            fontSize={"16px"}
-            sx={{ color: theme.palette.warning["100"], fontWeight: 500 }}
-          >
-            Back to Main Page
-          </Typography>
-        </Box>
+        {tenantName === TENANT_DATA.SECOND_CHANCE_PROGRAM && (
+      <Box display="flex" alignItems="center">
+        <ListItemIcon>
+          <IconButton onClick={goBack}>
+            <ArrowBackIcon sx={{ color: theme.palette.warning['100'] }} />
+          </IconButton>
+        </ListItemIcon>
+        <Typography
+          variant="h2"
+          fontSize={'16px'}
+          sx={{ color: theme.palette.warning['100'], fontWeight: 500 }}
+        >
+          Back to Main Page
+        </Typography>
+      </Box>
+       )}
         {isMobile && (
           <IconButton onClick={toggleDrawer}>
             <CloseIcon />
@@ -158,26 +166,26 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
         {menuItems.map((item) => (
           <ListItemButton
             sx={{
-              gap: "4px",
-              width: "100%",
-              display: "flex",
-              justifyContent: "flex-start",
-              borderRadius: "4rem",
+              gap: '4px',
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'flex-start',
+              borderRadius: '4rem',
               backgroundColor:
                 selectedKey === item.key
-                  ? "var(--mui-palette-primary-main)"
-                  : "transparent",
-              color: "#000",
+                  ? 'var(--mui-palette-primary-main)'
+                  : 'transparent',
+              color: '#000',
 
-              fontSize: "16px !important",
+              fontSize: '16px !important',
 
-              "&:hover": {
+              '&:hover': {
                 background:
                   selectedKey === item.key
-                    ? "var(--mui-palette-primary-main)"
-                    : "transparent",
+                    ? 'var(--mui-palette-primary-main)'
+                    : 'transparent',
               },
-              margin: selectedKey === item.key ? "10px 0" : "0",
+              margin: selectedKey === item.key ? '10px 0' : '0',
             }}
             key={item?.key}
             onClick={() => handleNavigation(item?.key)}
@@ -186,11 +194,11 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
               sx={{
                 color:
                   selectedKey === item?.key
-                    ? "#2E1500"
+                    ? '#2E1500'
                     : theme.palette.warning.A200,
-                minWidth: "40px",
-                fontWeight: selectedKey === item?.key ? "500" : "500",
-                fontSize: "16px !important",
+                minWidth: '40px',
+                fontWeight: selectedKey === item?.key ? '500' : '500',
+                fontSize: '16px !important',
               }}
             >
               {item?.icon}
@@ -198,10 +206,10 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
             <ListItemText
               className="menu-list-content"
               primaryTypographyProps={{
-                fontSize: "16px",
-                fontFamily: "Poppins",
-                fontWeight: selectedKey === item?.key ? "600" : "500",
-                color: "black",
+                fontSize: '16px',
+                fontFamily: 'Poppins',
+                fontWeight: selectedKey === item?.key ? '600' : '500',
+                color: 'black',
               }}
               primary={item?.text}
             />
@@ -218,8 +226,8 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
           <MenuIcon
             sx={{
               margin: 2,
-              cursor: "pointer",
-              color: isAdmin ? "white" : "black",
+              cursor: 'pointer',
+              color: isAdmin ? 'white' : 'black',
             }}
             onClick={toggleDrawer}
           />
@@ -227,7 +235,7 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
           <Drawer
             anchor="left"
             sx={{
-              width: "284px",
+              width: '284px',
               // background: "linear-gradient(to bottom, white, #F8EFDA)",
             }}
             open={drawerOpen}
@@ -242,8 +250,8 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
       ) : (
         <Box
           sx={{
-            display: "flex",
-            justifyContent: "flex-start",
+            display: 'flex',
+            justifyContent: 'flex-start',
             width: 284,
           }}
         >
