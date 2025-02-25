@@ -1,7 +1,7 @@
 import { showToastMessage } from "@/components/Toastify";
 import { deleteApi, patch, post, put } from "./RestClient";
 import axios from "axios";
-import API_ENDPOINTS from '@/utils/API/APIEndpoints';
+import { API_ENDPOINTS } from '@/utils/API/APIEndpoints';
 export interface CenterListParam {
   limit?: number;
   filters?: any;

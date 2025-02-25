@@ -1,6 +1,6 @@
 import { SendCredentialsRequest } from '@/utils/Interfaces';
 import { post, get } from './RestClient';
-import API_ENDPOINTS from '@/utils/API/APIEndpoints';
+import { API_ENDPOINTS } from '@/utils/API/APIEndpoints';
 
 export const sendCredentialService = async ({
   isQueue,
