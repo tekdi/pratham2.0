@@ -3,6 +3,7 @@ import centerIcon from "../../../../public/images/centers.svg";
 import dashboardIcon from "../../../../public/images/dashboard.svg";
 import userIcon from "../../../../public/images/group.svg";
 import programIcon from "../../../../public/images/programIcon.svg";
+import certificateIcon from "../../../../public/images/certificate_custom.svg";
 
 import coursePlannerIcon from "../../../../public/images/event_available.svg";
 import { store } from "@/store/store";
@@ -36,7 +37,13 @@ const Menuitems = [
         title: "SIDEBAR.LEARNERS",
         href: ["/learners"],
       },
+     
     ],
+  },
+  {
+    title: "SIDEBAR.CERTIFICATE_ISSUANCE",
+    icon: certificateIcon,
+    href: ["/certificate-issuance"],
   },
   {
     title: "MASTER.MASTER",

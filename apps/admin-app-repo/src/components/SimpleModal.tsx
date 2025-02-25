@@ -21,6 +21,7 @@ interface SimpleModalProps {
   open: boolean;
   onClose: () => void;
   modalTitle: string;
+  isFullwidth?:boolean
 }
 
 const SimpleModal: React.FC<SimpleModalProps> = ({
@@ -34,6 +35,7 @@ const SimpleModal: React.FC<SimpleModalProps> = ({
   footer,
   children,
   modalTitle,
+  isFullwidth=false
 }) => {
   const theme = useTheme<any>();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
@@ -46,8 +48,8 @@ const SimpleModal: React.FC<SimpleModalProps> = ({
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: isSmallScreen ? "90%" : "40%",
-    maxHeight: "80vh",
+    width: isFullwidth ? "90%" : isSmallScreen ? "90%" : "40%",
+    maxHeight: isFullwidth ? "100vh":"80vh",
     backgroundColor: "#fff",
     borderRadius: "8px",
     boxShadow: theme.shadows[5],

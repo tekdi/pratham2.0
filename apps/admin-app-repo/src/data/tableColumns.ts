@@ -72,13 +72,15 @@ export const getLearnerTableColumns = (t: any, isMobile: boolean, isArchived?:an
     // { key: "createdBy", titleKey: "TABLE_TITLE.CREATED_BY", width: 130, sortDirection: SortDirection.Ascend },
     // { key: "createdAt", titleKey: "TABLE_TITLE.CREATED_DATE", width: 160, sortDirection: SortDirection.Ascend },
     { key: "updatedAt", titleKey: "TABLE_TITLE.UPDATED_DATE", width: 160 },
+    { key: "updatedAt", titleKey: "TABLE_TITLE.Course", width: 160 },
+
   ];
   // Conditionally add the "actions" column if isActiveYear is true
   if (isActiveYear && !isArchived) {
     configs.push({
       key: "actions",
       titleKey: "TABLE_TITLE.ACTIONS",
-      width: 170,
+      width: 240,
       isSortable: false,
     });
   }
@@ -344,6 +346,28 @@ export const getNotificationTableData = (t: any, isMobile: boolean, isArchived?:
     { key: 'templateType', titleKey: 'TABLE_TITLE.TYPE', dataType: DataType.Object, width: 100, style: { textAlign: 'center' } },
     { key: 'actions', titleKey: 'TABLE_TITLE.ACTIONS',  width: 120 }
   ];
+ 
+
+  return generateColumns(t, configs, isMobile);
+};
+
+
+export const getCoursesTableData = (t: any, isMobile: boolean, isArchived?:any) => {
+
+
+  const configs: ColumnConfig[] = [
+
+    { key: "name", titleKey: "TABLE_TITLE.NAME", width: 130 },
+    { key: 'courseName', titleKey: 'TABLE_TITLE.COURSE_NAME', dataType: DataType.Number, width: 100,  },
+    { key: 'courseStatus', titleKey: 'TABLE_TITLE.COURSE_STATUS', dataType: DataType.String, width: 90,  },
+    { key: 'issuedDate', titleKey: 'TABLE_TITLE.ISSUED_DATE', dataType: DataType.String, width: 90,  },
+     { key: 'userId', titleKey: 'TABLE_TITLE.USER_ID', dataType: DataType.String, width: 180,  },
+     { key: 'courseId', titleKey: 'TABLE_TITLE.COURSE_ID', dataType: DataType.String, width: 180,  },
+     
+     { key: 'actions', titleKey: 'TABLE_TITLE.ACTIONS', dataType: DataType.String, width: 180,  },
+
+
+];
  
 
   return generateColumns(t, configs, isMobile);
