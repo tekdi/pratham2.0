@@ -2,7 +2,7 @@ import { showToastMessage } from "@/components/Toastify";
 import { get, patch, deleteApi } from "./RestClient";
 import { post } from "./RestClient";
 import axios from "axios";
-import API_ENDPOINTS from '@/utils/API/APIEndpoints';
+import { API_ENDPOINTS } from '@/utils/API/APIEndpoints';
 export interface programListData {
   limit?: Number;
   offset?: Number;
