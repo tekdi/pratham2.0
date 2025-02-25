@@ -35,3 +35,7 @@ export const PrimaryCategoryValue = [
   "Practice Question Set",
   "Teacher Resource"
 ];
+
+export const TENANT_DATA = {
+  SECOND_CHANCE_PROGRAM: 'Second Chance Program',
+};
