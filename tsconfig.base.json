@@ -15,7 +15,9 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@questionSet": ["mfes/editors/src/components/QuestionSetEditor.tsx"],
+      "@/*": ["mfes/scp-teacher-repo/src/*"],
+      "@collection": ["mfes/editors/src/components/CollectionEditor.tsx"],
+      "@generic-editor": ["mfes/editors/src/components/GenericEditor.tsx"],
       "@login": ["mfes/authentication/src/pages/login.tsx"],
       "@logout": ["mfes/authentication/src/pages/logout.tsx"],
       "@mfe-next": ["mfes/mfe-next/src/app/page.tsx"],
@@ -23,16 +25,15 @@
       "@mfe-next-page-1": ["mfes/mfe-next-page-1/src/pages/_app.tsx"],
       "@mfe-next-page-2": ["mfes/mfe-next-page-2/src/pages/_app.tsx"],
       "@players": ["mfes/players/src/pages/play.tsx"],
-      "@collection": ["mfes/editors/src/components/CollectionEditor.tsx"],
-      "@generic-editor": ["mfes/editors/src/components/GenericEditor.tsx"],
+      "@questionSet": ["mfes/editors/src/components/QuestionSetEditor.tsx"],
       "@registration": ["mfes/registration/src/app/page.tsx"],
       "@scp-teacher-repo": ["mfes/scp-teacher-repo/src/pages/index.tsx"],
       "@shared-lib": ["libs/shared-lib/src/index.ts"],
+      "@sunbirdPlayers": ["mfes/workspace/src/pages/sunbirdPlayers.tsx"],
       "@test-next-route": ["mfes/test-next-route/src/pages/index.tsx"],
       "@test-react-vite": ["mfes/mfes/test-react-vite"],
-      "@youthNet": ["mfes/youthNet/src/pages/index.tsx"],
-      "@/*": ["mfes/scp-teacher-repo/src/*"],
-      "@workspace/*": ["mfes/workspace/src/*"]
+      "@workspace/*": ["mfes/workspace/src/*"],
+      "@youthNet": ["mfes/youthNet/src/pages/index.tsx"]
     }
   },
   "exclude": ["node_modules", "tmp"]
