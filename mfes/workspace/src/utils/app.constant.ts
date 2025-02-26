@@ -15,7 +15,7 @@ export enum Editor {
 }
 export enum Role {
   SCTA = "State Content Team Associate (SCTA)",
-  CCTA="Central Content Team Associate (CCTA)"
+  CCTA = "Central Content Team Associate (CCTA)"
 }
 export enum ContentStatus {
   PUBLISHED = "Published",
@@ -35,3 +35,7 @@ export const PrimaryCategoryValue = [
   "Practice Question Set",
   "Teacher Resource"
 ];
+
+export const TENANT_DATA = {
+  SECOND_CHANCE_PROGRAM: 'Second Chance Program',
+};

@@ -5,7 +5,7 @@ import { AxiosRequestConfig, AxiosResponse } from "axios";
 import { TENANT_ID } from "../../app.config";
 import TenantService from "./TenantService";
 
-import API_ENDPOINTS from '@/utils/API/APIEndpoints';
+import { API_ENDPOINTS } from '@/utils/API/APIEndpoints';
 
 export interface UserDetailParam {
   userData?: object;

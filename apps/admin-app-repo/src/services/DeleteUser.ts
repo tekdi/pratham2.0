@@ -1,4 +1,4 @@
-import API_ENDPOINTS from '@/utils/API/APIEndpoints';
+import { API_ENDPOINTS } from '@/utils/API/APIEndpoints';
 import { patch } from "./RestClient";
 export const deleteUser = async (
   userId: string,
