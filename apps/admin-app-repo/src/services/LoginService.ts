@@ -1,4 +1,4 @@
-import API_ENDPOINTS from '@/utils/API/APIEndpoints';
+import { API_ENDPOINTS } from '@/utils/API/APIEndpoints';
 import { get, post } from "./RestClient";
 
 interface LoginParams {

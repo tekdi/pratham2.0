@@ -7,7 +7,7 @@ import {
 import { get, post } from './RestClient';
 import axios from 'axios';
 import { URL_CONFIG } from '@/utils/url.config';
-import API_ENDPOINTS from '@/utils/API/APIEndpoints';
+import {COURSE_PLANNER_UPLOAD_ENDPOINTS, TARGET_SOLUTION_ENDPOINTS} from '@/utils/API/APIEndpoints';
 
 export const getFrameworkDetails = async (frameworkId: any): Promise<any> => {
   const apiUrl: string = `/api/framework/v1/read/${frameworkId}`;
@@ -25,7 +25,7 @@ export const uploadCoursePlanner = async (
   file: File,
   metaData: CoursePlannerMetaData
 ): Promise<any> => {
-  const apiUrl: string = API_ENDPOINTS.coursePlannerUpload;
+  const apiUrl: string = COURSE_PLANNER_UPLOAD_ENDPOINTS;
   const formData = new FormData();
   formData.append('file', file);
   formData.append('metaData', JSON.stringify(metaData));
@@ -46,7 +46,7 @@ export const getTargetedSolutions = async ({
   board,
   courseType,
 }: GetTargetedSolutionsParams): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_COURSE_PLANNER_API_URL}${API_ENDPOINTS.targetedSolutions}`;
+  const apiUrl: string = TARGET_SOLUTION_ENDPOINTS;
 
   const headers = {
     'X-auth-token': localStorage.getItem('token'),

@@ -2,7 +2,7 @@ import { CohortMemberList } from "@/utils/Interfaces";
 import { get, post, put } from "../RestClient";
 import axios from 'axios';
 import { showToastMessage } from "@/components/Toastify";
-import API_ENDPOINTS from "@/utils/API/APIEndpoints";
+import { API_ENDPOINTS } from "@/utils/API/APIEndpoints";
 
 export interface cohortListFilter {
   type: string;

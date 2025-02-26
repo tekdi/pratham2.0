@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import FeatherIcon from "feather-icons-react";
+// import FeatherIcon from "feather-icons-react";
 import { AppBar, Box, IconButton, Toolbar } from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
@@ -104,8 +104,14 @@ const Header = ({
       storedUserData?.role === Role.SCTA ||
       storedUserData?.role === Role.CCTA
     ) {
-      if (locale) router.push("/course-planner", undefined, { locale: locale });
-      else router.push("/course-planner");
+      if(storedUserData?.tenantData[0]?.tenantName != "Second Chance Program" ) {
+        router.push("/workspace");
+      } else {
+        if (locale) 
+          router.push("/course-planner", undefined, { locale: locale });
+        else
+          router.push("/course-planner");
+      }
     } else {
       if (locale) {
         if (storedUserData?.role === Role.CENTRAL_ADMIN) {
@@ -167,7 +173,7 @@ const Header = ({
             },
           }}
         >
-          {showIcon === false ? "" : <FeatherIcon icon="menu" size="20" />}
+          {/* {showIcon === false ? "" : <FeatherIcon icon="menu" size="20" />} */}
         </IconButton>
         {/* ------------------------------------------- */}
         {/* Search Dropdown */}
