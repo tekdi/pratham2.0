@@ -1,22 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import CloseIcon from '@mui/icons-material/Close';
 import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
+    Box,
     Button,
     Checkbox,
-    FormControlLabel,
-    Typography,
-    Box,
+    Divider,
     Grid,
     IconButton,
-    TextField,
-    Divider,
     Modal,
+    TextField,
+    Typography
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import {getFormFields} from '@workspace/services/ContentService';
+import { getFormFields } from '@workspace/services/ContentService';
+import { Publish } from '@workspace/utils/app.constant';
+import React, { useEffect, useState } from 'react';
 interface ConfirmActionPopupProps {
     open: boolean;
     onClose: () => void;
@@ -43,9 +39,9 @@ const ConfirmActionPopup: React.FC<ConfirmActionPopupProps> = ({
     };
 
     const handleClose = () => {
-        setCheckedItems([]); // Clear all checked items
-        setComment(''); // Clear the comment
-        onClose(); // Call the parent-provided onClose handler
+        setCheckedItems([]); 
+        setComment(''); 
+        onClose(); 
     };
 
     const handleConfirm = () => {
@@ -113,7 +109,7 @@ const ConfirmActionPopup: React.FC<ConfirmActionPopupProps> = ({
                         fontWeight: 500,
                         fontSize: '16px',
                     }}>
-                        {actionType === 'publish' ? 'Confirm Publish Action' : 'Confirm Reject Action'}
+                        {actionType === Publish.PUBLISH ? 'Confirm Publish Action' : 'Confirm Reject Action'}
                     </Typography>
                     <IconButton onClick={handleClose} sx={{ color: 'black' }}>
                         <CloseIcon />
@@ -213,9 +209,9 @@ const ConfirmActionPopup: React.FC<ConfirmActionPopupProps> = ({
                         variant="contained"
                         color="primary"
                         sx={{ minWidth: 120, textTransform: 'capitalize', borderRadius: '50px', ml: 2 }}
-                        disabled={(comment === '' && actionType === 'reject') || (actionType === 'publish' && !allChecked)}
+                        disabled={(comment === '' && actionType === Publish.REJECT ) || (actionType === Publish.PUBLISH  && !allChecked)}
                     >
-                        {actionType === 'publish' ? 'Publish' : 'Reject'}
+                        {actionType === Publish.PUBLISH ? 'Publish' : 'Reject'}
                     </Button>
                 </Box>
             </Box>
