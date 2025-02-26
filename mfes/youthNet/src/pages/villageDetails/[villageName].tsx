@@ -27,14 +27,14 @@ const VillageDetails = () => {
     : villageName || '';
   const { id } = router.query; // Extract the slug from the URL
   const [yuthCount, setYuthCount] = useState<number>(0);
-  const [todaysRegistrationCount, settodaysRegistrationCount] = useState<number>(0);
+  const [todaysRegistrationCount, setTodaysRegistrationCount] = useState<number>(0);
 
   const handleBack = () => {
     router.back();
   };
   const getTodayDate = () => {
     const today = new Date();
-    return today.toISOString().split("T")[0]; 
+    return today.toLocaleDateString("en-CA"); 
 };
   useEffect(() => {
     const getYouthData = async () => {
@@ -57,7 +57,7 @@ const VillageDetails = () => {
         const todayUsers = response?.getUserDetails.filter((user: any )=> {
           return user.createdAt.startsWith(getTodayDate());
       });
-      settodaysRegistrationCount(todayUsers.length)
+      setTodaysRegistrationCount(todayUsers.length)
        }
       } catch (error) {
         console.log(error);

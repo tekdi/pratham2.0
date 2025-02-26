@@ -14,10 +14,14 @@ import { VILLAGE_DATA } from '../../components/youthNet/tempConfigs';
 import VillageDetailCard from '../../components/youthNet/VillageDetailCard';
 import Frame2 from '../../assets/images/SurveyFrame2.png';
 import Profile from '../../components/youthNet/Profile';
+import { getAge } from '../../utils/Helper';
+import { useRouter } from 'next/router';
 
 const UserId = () => {
   const { t } = useTranslation();
   const theme = useTheme<any>();
+  const router = useRouter();
+  const { userId } = router.query; 
 
   const [user, setUser] = React.useState<{
     userRole: string | null;
@@ -27,6 +31,7 @@ const UserId = () => {
     email: string | null;
     phone: string | null;
     gender: string | null;
+    dob?:string|null
   }>({
     userRole: null,
     userID: null,
@@ -35,22 +40,27 @@ const UserId = () => {
     email: null,
     phone: null,
     gender: null,
+    dob: null
   });
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.localStorage) {
       const role = localStorage.getItem('role');
       const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-
-      setUser({
-        firstName: userData?.firstName || '',
-        lastName: userData?.lastName || '',
-        email: userData?.email || '',
-        userID: userData?.userId || '',
-        phone: userData?.mobile || '',
-        gender: userData?.gender || '',
-        userRole: role || '',
-      });
+         if(userId===localStorage.getItem("userId"))
+         {
+          setUser({
+            firstName: userData?.firstName || '',
+            lastName: userData?.lastName || '',
+            email: userData?.email || '',
+            userID: userData?.userId || '',
+            phone: userData?.mobile || '',
+            gender: userData?.gender || '',
+            userRole: role || '',
+            dob:userData?.dob || ''
+          });
+         }
+    
     }
   }, []);
   return (
@@ -62,7 +72,7 @@ const UserId = () => {
       <Box ml={2}>
         <BackHeader headingOne={t('YOUTHNET_PROFILE.MY_PROFILE')} />
       </Box>
-      <Box ml={2}>
+      {/* <Box ml={2}>
         {' '}
         <Typography
           sx={{
@@ -73,14 +83,14 @@ const UserId = () => {
         >
           {t('YOUTHNET_PROFILE.ACTIVITIES_CONDUCTED')}
         </Typography>
-      </Box>
-      <Box>
+      </Box> */}
+      {/* <Box>
         <VillageDetailCard
           imageSrc={Frame2}
           title={VILLAGE_DATA.THREE}
           subtitle={VILLAGE_DATA.SURVEYS_CONDUCTED}
         />
-      </Box>
+      </Box> */}
       <Box
         sx={{
           background: theme.palette.info.gradient,
@@ -108,6 +118,8 @@ const UserId = () => {
           state="Maharashtra"
           district="Pune"
           block="Bhor"
+          dob={user.dob || ''}
+          age={getAge(user?.dob)}
         />
       </Box>
     </Box>

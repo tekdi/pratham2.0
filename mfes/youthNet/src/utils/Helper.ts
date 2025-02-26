@@ -89,16 +89,13 @@ export const countUsersByFilter = ({ users, filter }: { users: any[]; filter: st
   const today = new Date();
 
   if (filter === "This month") {
-    // Get first day of the month
     const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
 
-    // Initialize counts with all dates in the month
     for (let d = new Date(firstDay); d <= today; d.setDate(d.getDate() + 1)) {
       let formattedDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}`;
       counts[formattedDate] = 0;
     }
 
-    // Count users per date
     users.forEach((user: any) => {
       let date = new Date(user.createdAt);
       let formattedDate = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}`;
@@ -113,14 +110,12 @@ export const countUsersByFilter = ({ users, filter }: { users: any[]; filter: st
   else if (filter === "Last 6 months" || filter === "Last 12 months") {
     let monthsToInclude = filter === "Last 6 months" ? 6 : 12;
 
-    // Initialize counts with the last X months
-    for (let i = monthsToInclude - 1; i >= 0; i--) {
+    for (let i = monthsToInclude; i > 0; i--) { // Start from monthsToInclude and decrement
       let date = new Date(today.getFullYear(), today.getMonth() - i, 1);
       let formattedMonth = date.toLocaleString('en-US', { month: 'short' });
       counts[formattedMonth] = 0;
     }
 
-    // Count users per month
     users.forEach((user: any) => {
       let date = new Date(user.createdAt);
       let formattedMonth = date.toLocaleString('en-US', { month: 'short' });

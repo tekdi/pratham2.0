@@ -30,7 +30,7 @@ const MonthlyRegistrationsChart: React.FC = () => {
     const now = new Date();
     const month = now.toLocaleString('en-US', { month: 'short' }); // e.g., "Feb"
     
-    return [`1 ${month}`, `${now.getDate()} ${month}`];
+    return [`(1 ${month} `, ` ${now.getDate()} ${month})`];
 };
 
   useEffect(() => {
@@ -114,7 +114,7 @@ const MonthlyRegistrationsChart: React.FC = () => {
             value={selectedRange}
             onChange={(e) => setSelectedRange(e.target.value)}
           >
-            <MenuItem value="This month">{t('YOUTHNET_DASHBOARD.THIS_MONTH', {dateInfo:getDateRangeForThisMonth()})}</MenuItem>
+            <MenuItem value="This month">{t('YOUTHNET_DASHBOARD.THIS_MONTH', {dateDetails:getDateRangeForThisMonth()})}</MenuItem>
             <MenuItem value="Last 6 months">{t('YOUTHNET_DASHBOARD.LAST_SIX_MONTH')}</MenuItem>
             <MenuItem value="Last 12 months">{t('YOUTHNET_DASHBOARD.LAST_TWL_MONTH')}</MenuItem>
           </Select>

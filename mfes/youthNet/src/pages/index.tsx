@@ -84,6 +84,7 @@ const Index = () => {
     const getYouthData = async () => {
       try {
         const response = await getYouthDataByDate(new Date(), new Date());
+        if(response?.totalCount)
         setTodaysRegistrationCount(response?.totalCount);
         //  const youthData=response.getUserDetails.find((item:any)=>{
         //    return item.role==="Content creator"
@@ -231,9 +232,9 @@ const Index = () => {
       <Box>
         <YouthAndVolunteers
           selectOptions={[
-            { label:t('YOUTHNET_SURVEY.AS_OF_TODAY'), value: 'today' },
-            { label:t('YOUTHNET_SURVEY.AS_OF_LAST_SIX_MONTH'), value: 'month' },
-            { label: t('YOUTHNET_SURVEY.AS_OF_LAST_YEAR'), value: 'year' },
+            { label:t('YOUTHNET_DASHBOARD.AS_OF_TODAY'), value: 'today' },
+            { label:t('YOUTHNET_DASHBOARD.AS_OF_LAST_SIX_MONTH'), value: 'month' },
+            { label: t('YOUTHNET_DASHBOARD.AS_OF_LAST_YEAR'), value: 'year' },
 
           ]}
           data="577 Youth & Volunteers"
