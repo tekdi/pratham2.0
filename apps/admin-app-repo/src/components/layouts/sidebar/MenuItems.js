@@ -4,6 +4,7 @@ import dashboardIcon from "../../../../public/images/dashboard.svg";
 import userIcon from "../../../../public/images/group.svg";
 import programIcon from "../../../../public/images/programIcon.svg";
 import certificateIcon from "../../../../public/images/certificate_custom.svg";
+import support from '../../../assets/images/Support.svg';
 
 import coursePlannerIcon from "../../../../public/images/event_available.svg";
 import { store } from "@/store/store";
@@ -21,6 +22,7 @@ const Menuitems = [
     icon: programIcon,
     href: ["/programs"],
   },
+
   {
     title: "SIDEBAR.MANAGE_USERS",
     icon: userIcon,
@@ -68,6 +70,11 @@ const Menuitems = [
     icon: centerIcon,
     href: ["/notification-templates"],
   },
+     {
+    title: "SIDEBAR.SUPPORT_REQUEST",
+    icon: support,
+    href: ["/support-request"],
+  },
   ...(isActiveYear
     ? [
         {
@@ -109,7 +116,7 @@ export const getFilteredMenuItems = () => {
       return Menuitems.filter(
         (item) =>
           item.title === "SIDEBAR.COURSE_PLANNER" ||
-          item.title === "SIDEBAR.WORKSPACE"
+          item.title === "SIDEBAR.WORKSPACE" || item.title === "SIDEBAR.SUPPORT_REQUEST"
       );
     }
 

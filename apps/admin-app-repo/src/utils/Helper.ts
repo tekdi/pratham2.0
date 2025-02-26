@@ -573,3 +573,9 @@ export const preserveLocalStorage = () => {
     year: 'numeric',
   });
 };
+
+export const toPascalCase = (name: string | any) => {
+  if (typeof name !== 'string') {
+    return name;
+  }
+}
