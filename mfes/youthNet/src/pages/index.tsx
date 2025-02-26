@@ -21,13 +21,20 @@ import YouthAndVolunteers from '../components/youthNet/YouthAndVolunteers';
 import VillageNewRegistration from '../components/youthNet/VillageNewRegistration';
 import { UserList } from '../components/youthNet/UserCard';
 import Dropdown from '../components/youthNet/DropDown';
-import { fetchUserData } from '../services/youthNet/Dashboard/UserServices';
+import { fetchUserData,  getUserDetails, getYouthDataByDate } from '../services/youthNet/Dashboard/UserServices';
 import Loader from '../components/Loader';
+import { filterUsersByAge, getLoggedInUserRole } from '../utils/Helper';
+
 
 const Index = () => {
   const { t } = useTranslation();
   const router = useRouter();
   const [isSurveyAvailable, setIsSurveyAvailable] = useState<boolean>(false);
+  const [villageCount, setVillageCount] = useState<number>(0);
+  const [registeredVillages, setRegisteredVillages] = useState<any>([]);
+  const [todaysRegistrationCount, setTodaysRegistrationCount] = useState<number>(0);
+  const [aboveEighteenUsers, setAboveEighteenUsers] = useState<any>([]);
+  const [belowEighteenUsers, setBelowEighteenUsers] = useState<any>([]);
   const [surveymodalOpen, setSurveyModalOpen] = useState<boolean>(false);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [abvmodalOpen, setAbvModalOpen] = useState<boolean>(false);
@@ -53,7 +60,71 @@ const Index = () => {
 
     getData();
   }, []);
+  useEffect(() => {
+    const getVillageData = async () => {
+      const userId = localStorage.getItem('userId');
+      if (userId) {
+        const data = await getUserDetails(userId, true);
+        console.log(data);
+        const result = data?.userData?.customFields?.find(
+          (item: any) => item.label === 'VILLAGE'
+        );
+        localStorage.setItem(
+          'villageData',
+          JSON.stringify(result?.selectedValues)
+        );
+        setVillageCount(result?.selectedValues?.length);
+      }
+      // setUserData(data);
+    };
 
+    getVillageData();
+  }, []);
+  useEffect(() => {
+    const getYouthData = async () => {
+      try {
+        const response = await getYouthDataByDate(new Date(), new Date());
+        setTodaysRegistrationCount(response?.totalCount);
+        //  const youthData=response.getUserDetails.find((item:any)=>{
+        //    return item.role==="Content creator"
+        //  })
+        const youthData = filterUsersByAge(response.getUserDetails);
+        console.log(response.getUserDetails);
+        setAboveEighteenUsers(youthData?.above18);
+        setBelowEighteenUsers(youthData?.below18);
+        console.log(youthData?.below18);
+        //  console.log(users)
+        let users = response.getUserDetails;
+        const villageSet = new Set();
+
+        const villageMap = new Map<number, string>();
+
+        users.forEach((user: any) => {
+          if (user.customFields) {
+            user.customFields.forEach((field: any) => {
+              if (field.label === 'VILLAGE') {
+                field.selectedValues.forEach((value: any) => {
+                  villageMap.set(value.id, value.value); // Ensures unique villages by ID
+                });
+              }
+            });
+          }
+        });
+
+        const uniqueVillages = Array.from(villageMap, ([id, value]) => ({
+          id,
+          value,
+        }));
+        console.log(uniqueVillages);
+        setRegisteredVillages(uniqueVillages);
+      } catch (error) {
+        console.log(error);
+      }
+      // setUserData(data);
+    };
+
+    getYouthData();
+  }, []);
   const handleModalClose = () => {
     setModalOpen(false),
       setBelModalOpen(false),
@@ -89,7 +160,7 @@ const Index = () => {
       <Box ml={2}>
         <BackHeader headingOne={t('DASHBOARD.DASHBOARD')} />
       </Box>
-      {YOUTHNET_USER_ROLE.MENTOR_LEAD === TENANT_DATA.LEADER && (
+      {YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() && (
         <Box
           sx={{
             px: '20px',
@@ -109,7 +180,7 @@ const Index = () => {
         </Box>
       )}
       <Box ml={2}>
-        {YOUTHNET_USER_ROLE.MENTOR_LEAD === TENANT_DATA.LEADER ? (
+        {YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() ? (
           <Box mt={2}>
             <Typography>
               {t(`YOUTHNET_DASHBOARD.MANAGES`)} {SURVEY_DATA.FIFTY_TWO}{' '}
@@ -119,14 +190,15 @@ const Index = () => {
         ) : (
           <Typography>
             {t('YOUTHNET_DASHBOARD.VILLAGES_MANAGED_BY_YOU', {
-              totalVillageCount: SURVEY_DATA.FIFTY_TWO,
+              totalVillageCount: villageCount,
             })}
           </Typography>
         )}
       </Box>
 
       <Box pl={2} pr={2} mt={2}>
-        <RegistrationStatistics title={'7 New Registrations Today'} />
+        <RegistrationStatistics title= { t('YOUTHNET_DASHBOARD.TODAYS_NEW_REGISTRATION', {totalCount: todaysRegistrationCount,})} 
+            />
       </Box>
       <Box p={2}>
         <Grid container spacing={2}>
@@ -134,21 +206,21 @@ const Index = () => {
             <RegistrationStatistics
               onPrimaryClick={() => handleClick('above')}
               cardTitle={'Above 18 y/o'}
-              statistic={4}
+              statistic={aboveEighteenUsers.length}
             />
           </Grid>
           <Grid item xs={4}>
             <RegistrationStatistics
               onPrimaryClick={() => handleClick('below')}
               cardTitle={'Below 18 y/o'}
-              statistic={3}
+              statistic={belowEighteenUsers.length}
             />
           </Grid>
           <Grid item xs={4}>
             <RegistrationStatistics
               onPrimaryClick={() => handleClick('village')}
               cardTitle={'From'}
-              statistic={12}
+              statistic={registeredVillages.length +" villages"} 
             />
           </Grid>
         </Grid>
@@ -159,8 +231,10 @@ const Index = () => {
       <Box>
         <YouthAndVolunteers
           selectOptions={[
-            { label: 'As of today, 5th Sep', value: 'today' },
-            { label: 'As of yesterday, 4th Sep', value: 'yesterday' },
+            { label:t('YOUTHNET_SURVEY.AS_OF_TODAY'), value: 'today' },
+            { label:t('YOUTHNET_SURVEY.AS_OF_LAST_SIX_MONTH'), value: 'month' },
+            { label: t('YOUTHNET_SURVEY.AS_OF_LAST_YEAR'), value: 'year' },
+
           ]}
           data="577 Youth & Volunteers"
         />
@@ -212,7 +286,7 @@ const Index = () => {
         onClose={handleModalClose}
       >
         {' '}
-        <UserList users={users} layout="list" />
+        <UserList users={aboveEighteenUsers} layout="list" />
       </SimpleModal>
 
       <SimpleModal
@@ -221,7 +295,7 @@ const Index = () => {
         onClose={handleModalClose}
       >
         {' '}
-        <UserList users={users} layout="list" />
+        <UserList users={belowEighteenUsers} layout="list" />
       </SimpleModal>
       <SimpleModal
         modalTitle={t('YOUTHNET_DASHBOARD.VLLAGE_18')}
@@ -237,7 +311,7 @@ const Index = () => {
             mt: 2,
           }}
         >
-          <VillageNewRegistration locations={locations} />
+          <VillageNewRegistration locations={registeredVillages} />
         </Box>
       </SimpleModal>
     </Box>

@@ -10,11 +10,15 @@ import {
 } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useTheme } from '@mui/material/styles';
+import { getAge } from '../../utils/Helper';
 
 type UserCardProps = {
   name: string;
-  showAvtar?: boolean;
+  firstName?: string;
+  lastName?: string;
+  //showAvtar?: boolean;
   age?: string | number;
+  dob?: string;
   village?: string;
   image?: string;
   joinOn?: string;
@@ -24,6 +28,7 @@ type UserCardProps = {
   newRegistrations?: number;
   onClick?: (name: string) => void;
   onToggleClick?: (name: string) => void;
+  customFields?: any
 };
 
 const UserCard: React.FC<UserCardProps> = ({
@@ -34,14 +39,17 @@ const UserCard: React.FC<UserCardProps> = ({
   joinOn,
   isNew,
   showMore,
-  showAvtar,
   totalCount,
   newRegistrations,
   onClick,
   onToggleClick,
+  firstName,
+  lastName,
+  dob,
+  customFields
 }) => {
   const theme = useTheme<any>();
-
+const villageName=customFields?.find((item: any) => item.label === 'VILLAGE')?.selectedValues[0]?.value
   return (
     <Box
       display={'flex'}
@@ -56,7 +64,7 @@ const UserCard: React.FC<UserCardProps> = ({
       }}
     >
       <ListItem>
-        {showAvtar && (
+        {firstName && (
           <Avatar
             src={image}
             alt={name}
@@ -73,7 +81,7 @@ const UserCard: React.FC<UserCardProps> = ({
               boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
             }}
           >
-            {!image && name[0]}
+{!image && (firstName ? firstName.charAt(0).toUpperCase() : "") + (lastName ? lastName.charAt(0).toUpperCase() : "")}
           </Avatar>
         )}
         <Box
@@ -95,18 +103,18 @@ const UserCard: React.FC<UserCardProps> = ({
             }}
             onClick={() => onClick?.(name)}
           >
-            {name}
+            {firstName && lastName ? `${firstName} ${lastName}` : firstName}
           </Typography>
           <Box display={'flex'} justifyContent={'space-between'} width={'100%'}>
             <Box sx={{ display: 'flex', gap: '8px' }}>
-              {age ? (
+              {dob ? (
                 <Typography variant="body2" color="textSecondary">
-                  {age} y/o • {village || joinOn}
+                  {getAge(dob)} y/o • {villageName || joinOn}
                 </Typography>
               ) : (
-                village && (
+                villageName && (
                   <Typography variant="body2" color="textSecondary">
-                    {village || joinOn}
+                    {villageName || joinOn}
                   </Typography>
                 )
               )}

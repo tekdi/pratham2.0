@@ -1,5 +1,5 @@
 import { Box, FormControl, MenuItem, Select } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Bar,
@@ -11,19 +11,81 @@ import {
   YAxis,
 } from 'recharts';
 import { DataPoint, sampleData } from './tempConfigs';
+import {  getYouthDataByDate } from '../../services/youthNet/Dashboard/UserServices';
+import { countUsersByFilter } from '../../utils/Helper';
 
 const MonthlyRegistrationsChart: React.FC = () => {
   const { t } = useTranslation();
   const [selectedRange, setSelectedRange] = useState<string>('This month');
   const [selectedBar, setSelectedBar] = useState<number | null>(null);
+  const [visibleData, setVisibleData] = useState<any>([]);
+
 
   const data = sampleData[selectedRange];
 
   const handleBarClick = (data: DataPoint, index: number) => {
     setSelectedBar(index);
   };
+  const getDateRangeForThisMonth = () => {
+    const now = new Date();
+    const month = now.toLocaleString('en-US', { month: 'short' }); // e.g., "Feb"
+    
+    return [`1 ${month}`, `${now.getDate()} ${month}`];
+};
 
-  const visibleData = data; // Show all data but make only x-axis scrollable
+  useEffect(() => {
+    const getYouthData = async () => {
+      try {
+        let fromDate;
+        let toDate;
+        if (selectedRange === 'This month') {
+          const today = new Date();
+          const firstDayOfMonth = new Date(
+            today.getFullYear(),
+            today.getMonth(),
+            1
+          );
+          console.log(firstDayOfMonth);
+          fromDate = firstDayOfMonth;
+            toDate = today;
+        }
+        else if (selectedRange === 'Last month') {
+          const today = new Date();
+          const firstDayOfLastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+          const lastDayOfLastMonth = new Date(today.getFullYear(), today.getMonth(), 0); // Last day of last month
+           fromDate = firstDayOfLastMonth;
+          toDate = lastDayOfLastMonth;
+      } else if (selectedRange === 'Last 6 months') {
+          const today = new Date();
+          const firstDayOfLast6Months = new Date(today.getFullYear(), today.getMonth() - 6, 1);
+          const lastDayOfLastMonth = new Date(today.getFullYear(), today.getMonth(), 0); 
+            fromDate = firstDayOfLast6Months;
+          toDate = lastDayOfLastMonth;
+      }
+      else if (selectedRange === 'Last 12 months') {
+        const today = new Date();
+        const firstDayOfLast12Months = new Date(today.getFullYear(), today.getMonth() - 12, 1);
+        const lastDayOfLastMonth = new Date(today.getFullYear(), today.getMonth(), 0); // Last day of last month
+         fromDate = firstDayOfLast12Months;
+        toDate = lastDayOfLastMonth;
+    }
+     if(fromDate && toDate)
+         {
+          const response = await getYouthDataByDate(
+          fromDate,
+          toDate
+        );
+       const graphdata= countUsersByFilter({users:response.getUserDetails, filter:selectedRange})
+      setVisibleData(graphdata)
+      }
+
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    getYouthData();
+  }, [selectedRange]);
 
   return (
     <div style={{ padding: '20px', background: '#EDE1CF' }}>
@@ -52,9 +114,9 @@ const MonthlyRegistrationsChart: React.FC = () => {
             value={selectedRange}
             onChange={(e) => setSelectedRange(e.target.value)}
           >
-            <MenuItem value="This month">This month (1 sep - 16 Sep)</MenuItem>
-            <MenuItem value="Last month">Last Month</MenuItem>
-            <MenuItem value="Last 6 months">Last 6 Months</MenuItem>
+            <MenuItem value="This month">{t('YOUTHNET_DASHBOARD.THIS_MONTH', {dateInfo:getDateRangeForThisMonth()})}</MenuItem>
+            <MenuItem value="Last 6 months">{t('YOUTHNET_DASHBOARD.LAST_SIX_MONTH')}</MenuItem>
+            <MenuItem value="Last 12 months">{t('YOUTHNET_DASHBOARD.LAST_TWL_MONTH')}</MenuItem>
           </Select>
         </FormControl>
         <div
@@ -65,15 +127,44 @@ const MonthlyRegistrationsChart: React.FC = () => {
             overflowY: 'hidden',
           }}
         >
-          <ResponsiveContainer width={visibleData.length * 80} height="100%">
+          <ResponsiveContainer width={visibleData?.length * 80} height="100%">
             <BarChart
               data={visibleData}
               margin={{ top: 20, right: 40, bottom: 20, left: 0 }}
               barCategoryGap="20%"
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis orientation="right" />
+              <XAxis
+                dataKey={selectedRange === 'This month' ? 'date' : 'month'}
+              />
+
+              <YAxis
+                orientation="right"
+                domain={[
+                  0,
+                  Math.ceil(
+                    Math.max(...visibleData.map((d: any) => d.count), 0) / 5
+                  ) * 5,
+                ]} 
+                tick={{ fontSize: 12 }}
+                interval={0} 
+                tickFormatter={(value) => value} 
+                ticks={Array.from(
+                  {
+                    length:
+                      Math.floor(
+                        (Math.ceil(
+                          Math.max(...visibleData.map((d: any) => d.count), 0) /
+                            5
+                        ) *
+                          5) /
+                          5
+                      ) + 1,
+                  },
+                  (_, i) => i * 5
+                )} 
+              />
+
               <Tooltip />
               <Bar
                 dataKey="count"

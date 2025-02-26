@@ -14,6 +14,9 @@ import {
 import VillageDetailCard from '../../components/youthNet/VillageDetailCard';
 import Frame1 from '../../assets/images/SurveyFrame1.png';
 import Frame2 from '../../assets/images/SurveyFrame2.png';
+import { useEffect, useState } from 'react';
+import { fetchUserList } from '../../services/youthNet/Dashboard/UserServices';
+import { Role, Status } from '../../utils/app.constant';
 
 const VillageDetails = () => {
   const router = useRouter();
@@ -22,10 +25,46 @@ const VillageDetails = () => {
   const villageNameString = Array.isArray(villageName)
     ? villageName[0]
     : villageName || '';
+  const { id } = router.query; // Extract the slug from the URL
+  const [yuthCount, setYuthCount] = useState<number>(0);
+  const [todaysRegistrationCount, settodaysRegistrationCount] = useState<number>(0);
+
   const handleBack = () => {
     router.back();
   };
-
+  const getTodayDate = () => {
+    const today = new Date();
+    return today.toISOString().split("T")[0]; 
+};
+  useEffect(() => {
+    const getYouthData = async () => {
+      try {
+        const limit=100;
+        const offset=0;
+        let filters;
+        if(id)
+        {
+          filters={
+            role:Role.LEARNER,
+                  status:[Status.ACTIVE],
+                  village:[id.toString()]
+            }
+        }
+       if(filters)
+       {
+        const response=await fetchUserList({limit, offset,filters})
+        setYuthCount(response?.totalCount)
+        const todayUsers = response?.getUserDetails.filter((user: any )=> {
+          return user.createdAt.startsWith(getTodayDate());
+      });
+      settodaysRegistrationCount(todayUsers.length)
+       }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getYouthData();
+  }, []);
   const handleYouthVolunteers = () => {
     console.log('handleYouthVolunteers');
   };
@@ -42,8 +81,8 @@ const VillageDetails = () => {
       <Box>
         <BackHeader
           headingOne={villageNameString}
-          headingTwo={VILLAGE_DATA.TWENTY_SIX}
-          headingThree={VILLAGE_DATA.ZERO}
+          headingTwo={yuthCount.toString()}
+          headingThree={"+"+todaysRegistrationCount.toString()}
           showBackButton={true}
           onBackClick={handleBack}
         />
@@ -59,24 +98,24 @@ const VillageDetails = () => {
           {VILLAGE_DATA.VILLAGE_ID}
         </Typography>
         <Typography pl={5} sx={{ fontSize: '12px' }}>
-          {VILLAGE_DATA.ID}
+          {id}
         </Typography>
       </Box>
       <Box>
         <VillageDetailCard
           imageSrc={Frame1}
-          title={VILLAGE_DATA.YOUTH_VOL}
-          onClick={handleYouthVolunteers}
+          title={t('YOUTHNET_DASHBOARD.YOUTH_COUNT', {count:yuthCount})}
+        onClick={handleYouthVolunteers}
         />
       </Box>
-      <Box>
+      {/* <Box>
         <VillageDetailCard
           imageSrc={Frame2}
           title={VILLAGE_DATA.THREE}
           subtitle={VILLAGE_DATA.SURVEYS_CONDUCTED}
           onClick={handleSurveys}
         />
-      </Box>
+      </Box> */}
     </Box>
   );
 };
