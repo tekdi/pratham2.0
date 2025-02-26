@@ -12,6 +12,8 @@ import {
     Grid,
     IconButton,
     TextField,
+    Divider,
+    Modal,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import {getFormFields} from '@workspace/services/ContentService';
@@ -82,69 +84,105 @@ const ConfirmActionPopup: React.FC<ConfirmActionPopupProps> = ({
         };
         fetchFields();
       }, [open]);
+    const style = {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 550,
+        bgcolor: 'background.paper',
+        boxShadow: 24,
+        borderRadius:'16px'
+    };
     return (
-        <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-            <DialogTitle
-                sx={{
-                    color: 'black',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                }}
-            >
-                {actionType === 'publish' ? 'Confirm Publish Action' : 'Confirm Reject Action'}
-                <IconButton onClick={handleClose} sx={{ color: 'black' }}>
-                    <CloseIcon />
-                </IconButton>
-            </DialogTitle>
+        <Modal open={open} onClose={handleClose}>
+            <Box sx={style}>
+                <Box
+                    sx={{
+                        color: 'black',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding:"16px 16px 10px"
+                    }}
+                >
+                    <Typography variant="h6" sx={{
+                        margin: 0,
+                        fontFamily: 'inherit',
+                        lineHeight: '24px',
+                        fontWeight: 500,
+                        fontSize: '16px',
+                    }}>
+                        {actionType === 'publish' ? 'Confirm Publish Action' : 'Confirm Reject Action'}
+                    </Typography>
+                    <IconButton onClick={handleClose} sx={{ color: 'black' }}>
+                        <CloseIcon />
+                    </IconButton>
+                </Box>
 
-            <DialogContent>
-                <Typography gutterBottom mt="20px">
-                    {actionType === 'publish' ?`Please confirm that ALL the following items are verified (by ticking the checkboxes) before you can ${actionType}`:'Please select the reason(s) for rejection by ticking the checkboxes below and provide a comment to proceed with rejecting the action:'}
-                </Typography>
+                <Divider />
 
-                <Box mt={2}>
-                    <Grid container spacing={3}>
+                <Box p={2} sx={{
+                    maxHeight: '49vh',
+                    minHeight: '100%',
+                    overflowY: 'auto',
+                    overflowX: 'hidden',
+                }}>
+                    <Typography gutterBottom >
+                        {actionType === 'publish'
+                            ? `Please confirm that ALL the following items are verified (by ticking the checkboxes) before you can ${actionType}.`
+                            : 'Please select the reason(s) for rejection by ticking the checkboxes below and provide a comment to proceed with rejecting the action:'}
+                    </Typography>
+
+                    <Grid container spacing={2} mt={2}>
                         <Grid item xs={6}>
-                            <Typography variant="h6">Usability</Typography>
+                            <Typography
+                                sx={{
+                                    fontSize: '14px',
+                                    fontWeight: 500,
+                                    mb: 1,
+                                    marginLeft: '10px'
+                                }}
+                                variant="h6"
+                            >
+                                Usability
+                            </Typography>
                             {usabilityOptions.map((option) => (
-                                <FormControlLabel
-                                    key={option}
-                                    control={
+                                <Grid container spacing={2}>
+                                    <Grid xs={2} item>
                                         <Checkbox
                                             checked={checkedItems.includes(option)}
                                             onChange={() => handleCheckboxChange(option)}
-                                            sx={{
-                                                color: 'black',
-                                                '&.Mui-checked': {
-                                                    color: 'black',
-                                                },
-                                            }}
+                                            sx={{ color: 'black', '&.Mui-checked': { color: 'black' } }}
                                         />
-                                    }
-                                    label={option}
-                                />
+                                    </Grid>
+                                    <Grid xs={10} item>
+                                        <Box sx={{marginTop:'8px', marginLeft:'6px'}}>{option}</Box>
+                                    </Grid>
+                                </Grid>
                             ))}
                         </Grid>
                         <Grid item xs={6}>
-                            <Typography variant="h6">Content Details</Typography>
+                            <Typography sx={{
+                                fontSize: '14px',
+                                fontWeight: '500',
+                                mb:1,
+                                marginLeft: '10px'
+                            }} variant="h6">Content Details</Typography>
                             {contentDetailsOptions.map((option) => (
-                                <FormControlLabel
-                                    key={option}
-                                    control={
+                                <Grid container spacing={2}>
+                                    <Grid xs={2} item>
                                         <Checkbox
                                             checked={checkedItems.includes(option)}
                                             onChange={() => handleCheckboxChange(option)}
-                                            sx={{
-                                                color: 'black',
-                                                '&.Mui-checked': {
-                                                    color: 'black',
-                                                },
-                                            }}
+                                            sx={{ color: 'black', '&.Mui-checked': { color: 'black' } }}
                                         />
-                                    }
-                                    label={option}
-                                />
+                                    
+                                    </Grid>
+                                    <Grid xs={10} item>
+                                        <Box sx={{marginTop:'8px', marginLeft:'6px'}}>{option}</Box>
+                                    </Grid>
+                                </Grid>
                             ))}
                         </Grid>
                     </Grid>
@@ -158,39 +196,32 @@ const ConfirmActionPopup: React.FC<ConfirmActionPopupProps> = ({
                             variant="outlined"
                             value={comment}
                             onChange={(e) => setComment(e.target.value)}
+                            sx={{ mt: 2 }}
                         />
                     )}
                 </Box>
-            </DialogContent>
 
-            <DialogActions>
-                <Button onClick={handleClose} color="primary" sx={{ minWidth: '120px', textTransform: 'capitalize' }}>
-                    Cancel
-                </Button>
-                <Button
-                    onClick={handleConfirm}
-                    variant="contained"
-                    color="primary"
-                    className={
-                        (comment === '' && actionType === 'reject') ||
-                        (actionType === 'publish' && !allChecked)
-                            ? undefined
-                            : 'Request-btn'
-                    }
-                    sx={{
-                        minWidth: '120px',
-                        textTransform: 'capitalize',
-                        borderRadius: '100px',
-                    }}
-                    disabled={
-                        (comment === '' && actionType === 'reject') ||
-                        (actionType === 'publish' && !allChecked)
-                    }
-                >
-                    {actionType === 'publish' ? 'Publish' : 'Reject'}
-                </Button>
-            </DialogActions>
-        </Dialog>
+                <Divider />
+
+
+                <Box display="flex" justifyContent="flex-end" p={2}>
+                    <Button onClick={handleClose} color="primary" sx={{ minWidth: 120, textTransform: 'capitalize' }}>
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={handleConfirm}
+                        variant="contained"
+                        color="primary"
+                        sx={{ minWidth: 120, textTransform: 'capitalize', borderRadius: '50px', ml: 2 }}
+                        disabled={(comment === '' && actionType === 'reject') || (actionType === 'publish' && !allChecked)}
+                    >
+                        {actionType === 'publish' ? 'Publish' : 'Reject'}
+                    </Button>
+                </Box>
+            </Box>
+        </Modal>
+
+
     );
 };
 
