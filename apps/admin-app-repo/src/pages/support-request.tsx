@@ -31,7 +31,7 @@ const SupportRequest = () => {
 
   useEffect(() => {
     if (typeof window !== 'undefined' && typeof navigator !== 'undefined') {
-      const name = toPascalCase(getUserFullName()) || '';
+      const name = getUserFullName() || '';
       const loginUserName = localStorage.getItem('userIdName') || '';
       const userid = localStorage.getItem('userId') || '';
       const email = localStorage.getItem('userEmail') || '';
@@ -109,7 +109,7 @@ const SupportRequest = () => {
           ml={'1rem'}
           mb={0}
         >
-          <KeyboardBackspaceOutlinedIcon
+          <KeyboardBackspaceOutlinedIcon 
             cursor={'pointer'}
             sx={{
               color: theme.palette.warning['A200'],
