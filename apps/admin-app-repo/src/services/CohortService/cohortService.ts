@@ -28,7 +28,6 @@ export const getCohortList = async (data: cohortListData): Promise<any> => {
 
   try {
     const response = await post(apiUrl, data);
-    console.log(response)
     return response?.data?.result;
   } catch (error) {
     console.error("Error in Getting cohort List Details", error);
