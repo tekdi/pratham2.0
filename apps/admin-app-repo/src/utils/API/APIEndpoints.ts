@@ -33,13 +33,11 @@ export const API_ENDPOINTS = {
   cohortMemberBulkCreate: `${baseurl}/cohortmember/bulkCreate`,
   cohortMemberUpdate: (membershipId: string | number) => `${baseurl}/cohortmember/update/${membershipId}`,
   notificationTemplate: `${baseurl}/notification-templates`,
-  courseStatus:`${baseurl}/interface/v1/tracking/user_certificate/user_course_status`,
-  courseWiseLernerList: `${baseurl}/interface/v1/tracking/user_certificate/status/search`,
-  getCourseName: `https://dev-middleware.prathamdigital.org/action/composite/v3/search`,
-  issueCertificate: `${baseurl}/interface/v1/tracking/certificate/issue`,
-  renderCertificate: `${baseurl}/interface/v1/tracking/certificate/render`,
-
-
+  courseStatus:`${baseurl}/tracking/user_certificate/user_course_status`,
+  courseWiseLernerList: `${baseurl}/tracking/user_certificate/status/search`,
+  getCourseName: `/action/composite/v3/search`,
+  issueCertificate: `${baseurl}/tracking/certificate/issue`,
+  renderCertificate: `${baseurl}/tracking/certificate/render`,
 };
 
 export const COURSE_PLANNER_UPLOAD_ENDPOINTS = `${process.env.NEXT_PUBLIC_BASE_URL}/prathamservice/v1/course-planner/upload`;

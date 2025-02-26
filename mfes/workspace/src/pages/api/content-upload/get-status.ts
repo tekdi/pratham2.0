@@ -17,7 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const doId = parts.length > 2 ? parts[parts.length - 2] : null;
 
       if (doId) {
-        const baseURL = process.env.NEXT_PUBLIC_BASE_URL || "";
+        const baseURL = process.env.NEXT_PUBLIC_MIDDLEWARE_URL || "";
         const authApiToken = getCookie(req, "authToken") || process.env.AUTH_API_TOKEN;
         const tenantId = getCookie(req, "tenantId") || process.env.NEXT_PUBLIC_TENANT_ID;
 

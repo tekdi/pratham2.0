@@ -15,7 +15,7 @@ export enum Editor {
 }
 export enum Role {
   SCTA = "State Content Team Associate (SCTA)",
-  CCTA="Central Content Team Associate (CCTA)"
+  CCTA = "Central Content Team Associate (CCTA)"
 }
 export enum ContentStatus {
   PUBLISHED = "Published",
