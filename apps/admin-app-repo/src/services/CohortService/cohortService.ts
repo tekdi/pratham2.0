@@ -2,7 +2,7 @@ import { CohortMemberList } from "@/utils/Interfaces";
 import { get, post, put } from "../RestClient";
 import axios from 'axios';
 import { showToastMessage } from "@/components/Toastify";
-import API_ENDPOINTS from "@/utils/API/APIEndpoints";
+import { API_ENDPOINTS } from "@/utils/API/APIEndpoints";
 
 export interface cohortListFilter {
   type: string;
@@ -28,6 +28,7 @@ export const getCohortList = async (data: cohortListData): Promise<any> => {
 
   try {
     const response = await post(apiUrl, data);
+    console.log(response)
     return response?.data?.result;
   } catch (error) {
     console.error("Error in Getting cohort List Details", error);
