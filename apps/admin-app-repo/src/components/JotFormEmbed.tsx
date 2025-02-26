@@ -24,7 +24,7 @@ const JotFormEmbed: React.FC<JotFormEmbedProps> = ({ formId, queryParams }) => {
       <iframe
         id="jotform-embed"
         title="Query Form"
-        src={`https://form.jotform.com/${formId}?${queryString}`}
+        src={`${process.env.NEXT_PUBLIC_JOTFORM_URL}/${formId}?${queryString}`}
         style={{
           minWidth: "100%",
           maxWidth: "100%",

@@ -71,7 +71,7 @@ const Menuitems = [
     href: ["/notification-templates"],
   },
      {
-    title: "Support Request",
+    title: "SIDEBAR.SUPPORT_REQUEST",
     icon: support,
     href: ["/support-request"],
   },
@@ -116,7 +116,7 @@ export const getFilteredMenuItems = () => {
       return Menuitems.filter(
         (item) =>
           item.title === "SIDEBAR.COURSE_PLANNER" ||
-          item.title === "SIDEBAR.WORKSPACE" || item.title === "Support Request"
+          item.title === "SIDEBAR.WORKSPACE" || item.title === "SIDEBAR.SUPPORT_REQUEST"
       );
     }
 
