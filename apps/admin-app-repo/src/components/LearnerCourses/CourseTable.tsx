@@ -62,7 +62,7 @@ const CourseTable: React.FC = () => {
 
       const payload = {
         issuanceDate: new Date().toISOString(),
-        expirationDate: new Date().toISOString(),
+        expirationDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
         firstName: selectedRowData?.firstName,
         middleName: selectedRowData?.middleName,
         lastName: selectedRowData?.lastName,
