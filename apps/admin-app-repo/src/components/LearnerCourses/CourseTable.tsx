@@ -150,7 +150,7 @@ const CourseTable: React.FC = () => {
       
       const data = response.data;
       const courseIds: string[] = Array.from(
-        new Set(data.map((item: any) => item?.courseid))
+        new Set(data.map((item: any) => item?.courseId))
       );
       const userIds: string[] = Array.from(
         new Set(data.map((item: any) => item?.userId))
@@ -173,9 +173,10 @@ const CourseTable: React.FC = () => {
         acc[course.identifier] = course.name;
         return acc;
       }, {});
+      console.log("courseMap" ,courseMap)
       const newData = data.map((item: any) => ({
         ...item,
-        courseName: courseMap[item.courseid] || 'Unknown Course',
+        courseName: courseMap[item.courseId] || 'Test Course',
         name: userMap[item.userId]?.name || 'Unknown Learner',
         firstName: userMap[item.userId]?.firstName || '',
         middleName: userMap[item.userId]?.middleName || '',
