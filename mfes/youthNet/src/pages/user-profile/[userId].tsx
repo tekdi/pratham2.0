@@ -16,6 +16,7 @@ import Frame2 from '../../assets/images/SurveyFrame2.png';
 import Profile from '../../components/youthNet/Profile';
 import { getAge } from '../../utils/Helper';
 import { useRouter } from 'next/router';
+import { getUserDetails } from '../../services/youthNet/Dashboard/UserServices';
 
 const UserId = () => {
   const { t } = useTranslation();
@@ -31,7 +32,11 @@ const UserId = () => {
     email: string | null;
     phone: string | null;
     gender: string | null;
-    dob?:string|null
+    dob?:string|null;
+    state?:string|null;
+    district?:string| null;
+    block?:string|null;
+    village?:string|null;
   }>({
     userRole: null,
     userID: null,
@@ -40,10 +45,15 @@ const UserId = () => {
     email: null,
     phone: null,
     gender: null,
-    dob: null
+    dob: null,
+    state: null,
+    district: null,
+    block:null,
+    village: null
   });
 
   useEffect(() => {
+    const fetchData=async()=>{
     if (typeof window !== 'undefined' && window.localStorage) {
       const role = localStorage.getItem('role');
       const userData = JSON.parse(localStorage.getItem('userData') || '{}');
@@ -60,8 +70,15 @@ const UserId = () => {
             dob:userData?.dob || ''
           });
          }
+         else if(userId){
+          const data = await getUserDetails(userId, true)
+          console.log(data)
+          setUser({ ...data?.userData, userRole: data?.userData?.tenantData[0]?.roleName });
+        }
     
     }
+  }
+  fetchData()
   }, []);
   return (
     <Box minHeight="100vh">
@@ -69,9 +86,10 @@ const UserId = () => {
       <Box>
         <Header />
       </Box>
-      <Box ml={2}>
+     {(userId===localStorage.getItem("userId")) &&(<Box ml={2}>
         <BackHeader headingOne={t('YOUTHNET_PROFILE.MY_PROFILE')} />
-      </Box>
+      </Box>)
+      }
       {/* <Box ml={2}>
         {' '}
         <Typography
@@ -110,15 +128,15 @@ const UserId = () => {
         </Typography>
         <Profile
           fullName={`${user.firstName} ${user.lastName}` || ''}
-          emailId={user.email || ''}
-          designation={user.userRole || ''}
+          emailId={user.email || '-'}
+          designation={user.userRole || '-'}
           mentorId={user.userID || ''}
-          phoneNumber={user.phone || ''}
+          phoneNumber={user.phone || '-'}
           gender={user.gender || ''}
           state="Maharashtra"
           district="Pune"
           block="Bhor"
-          dob={user.dob || ''}
+          dob={user.dob || '-'}
           age={getAge(user?.dob)}
         />
       </Box>

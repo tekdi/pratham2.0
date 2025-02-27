@@ -1,5 +1,5 @@
 import FingerprintJS from 'fingerprintjs2';
-import { Role } from './app.constant';
+import { Role , DateFilter} from './app.constant';
 
 export const generateUUID = () => {
   let d = new Date().getTime();
@@ -88,7 +88,7 @@ export const countUsersByFilter = ({ users, filter }: { users: any[]; filter: st
   let result: { date?: string; month?: string; count: number }[] = [];
   const today = new Date();
 
-  if (filter === "This month") {
+  if (filter ===  DateFilter.THIS_MONTH) {
     const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
 
     for (let d = new Date(firstDay); d <= today; d.setDate(d.getDate() + 1)) {
@@ -107,8 +107,8 @@ export const countUsersByFilter = ({ users, filter }: { users: any[]; filter: st
     result = Object.entries(counts).map(([key, count]) => ({ date: key, count }));
   } 
   
-  else if (filter === "Last 6 months" || filter === "Last 12 months") {
-    let monthsToInclude = filter === "Last 6 months" ? 6 : 12;
+  else if (filter === DateFilter.LAST_SIX_MONTHS || filter === DateFilter.LAST_TWELEVE_MONTHS) {
+    let monthsToInclude = filter ===  DateFilter.LAST_SIX_MONTHS ? 6 : 12;
 
     for (let i = monthsToInclude; i > 0; i--) { // Start from monthsToInclude and decrement
       let date = new Date(today.getFullYear(), today.getMonth() - i, 1);

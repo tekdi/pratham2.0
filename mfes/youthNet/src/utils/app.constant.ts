@@ -71,6 +71,12 @@ export enum Status {
   ACTIVE = 'active',
   ARCHIVED = 'archived',
 }
+export enum DateFilter
+{
+  THIS_MONTH="This month",
+  LAST_SIX_MONTHS="Last 6 months",
+  LAST_TWELEVE_MONTHS="Last 12 months"
+}
 
 export enum cohortHierarchy {
   BLOCK = 'BLOCK',

@@ -11,6 +11,7 @@ import {
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useTheme } from '@mui/material/styles';
 import { getAge } from '../../utils/Helper';
+import {  useRouter } from 'next/navigation';
 
 type UserCardProps = {
   name: string;
@@ -19,6 +20,7 @@ type UserCardProps = {
   //showAvtar?: boolean;
   age?: string | number;
   dob?: string;
+  userId:string;
   village?: string;
   image?: string;
   joinOn?: string;
@@ -26,13 +28,14 @@ type UserCardProps = {
   showMore?: boolean;
   totalCount?: number;
   newRegistrations?: number;
-  onClick?: (name: string) => void;
+  onClick?: (userId: string) => void;
   onToggleClick?: (name: string) => void;
   customFields?: any
 };
 
 const UserCard: React.FC<UserCardProps> = ({
   name,
+  userId,
   age,
   village,
   image,
@@ -49,6 +52,7 @@ const UserCard: React.FC<UserCardProps> = ({
   customFields
 }) => {
   const theme = useTheme<any>();
+
 const villageName=customFields?.find((item: any) => item.label === 'VILLAGE')?.selectedValues[0]?.value
   return (
     <Box
@@ -101,7 +105,7 @@ const villageName=customFields?.find((item: any) => item.label === 'VILLAGE')?.s
 
               padding: '5px 5px',
             }}
-            onClick={() => onClick?.(name)}
+            onClick={() => onClick?.(userId)}
           >
             {firstName && lastName ? `${firstName} ${lastName}` : firstName}
           </Typography>
@@ -170,16 +174,23 @@ const villageName=customFields?.find((item: any) => item.label === 'VILLAGE')?.s
 type UserListProps = {
   users: UserCardProps[];
   layout?: 'list' | 'grid';
-  onUserClick?: (name: string) => void;
   onToggleUserClick?: (name: string) => void;
 };
 
 export const UserList: React.FC<UserListProps> = ({
   users,
   layout = 'grid',
-  onUserClick,
   onToggleUserClick,
 }) => {
+  console.log(users)
+    const router = useRouter();
+
+  const onUserClick=(userId: any)=>
+    {
+      console.log(userId)
+      router.push(`/user-profile/${userId}`);
+  
+    }
   return layout === 'grid' ? (
     <List>
       <Grid container spacing={2}>

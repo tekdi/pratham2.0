@@ -13,10 +13,11 @@ import {
 import { DataPoint, sampleData } from './tempConfigs';
 import {  getYouthDataByDate } from '../../services/youthNet/Dashboard/UserServices';
 import { countUsersByFilter } from '../../utils/Helper';
+import { DateFilter } from '../../utils/app.constant';
 
 const MonthlyRegistrationsChart: React.FC = () => {
   const { t } = useTranslation();
-  const [selectedRange, setSelectedRange] = useState<string>('This month');
+  const [selectedRange, setSelectedRange] = useState<string>(DateFilter.THIS_MONTH);
   const [selectedBar, setSelectedBar] = useState<number | null>(null);
   const [visibleData, setVisibleData] = useState<any>([]);
 
@@ -38,7 +39,7 @@ const MonthlyRegistrationsChart: React.FC = () => {
       try {
         let fromDate;
         let toDate;
-        if (selectedRange === 'This month') {
+        if (selectedRange === DateFilter.THIS_MONTH) {
           const today = new Date();
           const firstDayOfMonth = new Date(
             today.getFullYear(),
@@ -49,20 +50,20 @@ const MonthlyRegistrationsChart: React.FC = () => {
           fromDate = firstDayOfMonth;
             toDate = today;
         }
-        else if (selectedRange === 'Last month') {
+        else if (selectedRange ===  DateFilter.THIS_MONTH) {
           const today = new Date();
           const firstDayOfLastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
           const lastDayOfLastMonth = new Date(today.getFullYear(), today.getMonth(), 0); // Last day of last month
            fromDate = firstDayOfLastMonth;
           toDate = lastDayOfLastMonth;
-      } else if (selectedRange === 'Last 6 months') {
+      } else if (selectedRange ===  DateFilter.LAST_SIX_MONTHS) {
           const today = new Date();
           const firstDayOfLast6Months = new Date(today.getFullYear(), today.getMonth() - 6, 1);
           const lastDayOfLastMonth = new Date(today.getFullYear(), today.getMonth(), 0); 
             fromDate = firstDayOfLast6Months;
           toDate = lastDayOfLastMonth;
       }
-      else if (selectedRange === 'Last 12 months') {
+      else if (selectedRange ===  DateFilter.LAST_TWELEVE_MONTHS) {
         const today = new Date();
         const firstDayOfLast12Months = new Date(today.getFullYear(), today.getMonth() - 12, 1);
         const lastDayOfLastMonth = new Date(today.getFullYear(), today.getMonth(), 0); // Last day of last month
@@ -114,9 +115,9 @@ const MonthlyRegistrationsChart: React.FC = () => {
             value={selectedRange}
             onChange={(e) => setSelectedRange(e.target.value)}
           >
-            <MenuItem value="This month">{t('YOUTHNET_DASHBOARD.THIS_MONTH', {dateDetails:getDateRangeForThisMonth()})}</MenuItem>
-            <MenuItem value="Last 6 months">{t('YOUTHNET_DASHBOARD.LAST_SIX_MONTH')}</MenuItem>
-            <MenuItem value="Last 12 months">{t('YOUTHNET_DASHBOARD.LAST_TWL_MONTH')}</MenuItem>
+            <MenuItem value={DateFilter.THIS_MONTH}>{t('YOUTHNET_DASHBOARD.THIS_MONTH', {dateDetails:getDateRangeForThisMonth()})}</MenuItem>
+            <MenuItem value={DateFilter.LAST_SIX_MONTHS}>{t('YOUTHNET_DASHBOARD.LAST_SIX_MONTH')}</MenuItem>
+            <MenuItem value={DateFilter.LAST_TWELEVE_MONTHS}>{t('YOUTHNET_DASHBOARD.LAST_TWL_MONTH')}</MenuItem>
           </Select>
         </FormControl>
         <div
@@ -135,7 +136,7 @@ const MonthlyRegistrationsChart: React.FC = () => {
             >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis
-                dataKey={selectedRange === 'This month' ? 'date' : 'month'}
+                dataKey={selectedRange === DateFilter.THIS_MONTH ? 'date' : 'month'}
               />
 
               <YAxis
