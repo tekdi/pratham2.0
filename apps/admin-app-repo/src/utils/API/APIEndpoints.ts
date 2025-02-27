@@ -35,7 +35,7 @@ export const API_ENDPOINTS = {
   notificationTemplate: `${baseurl}/notification-templates`,
   courseStatus:`${baseurl}/tracking/user_certificate/user_course_status`,
   courseWiseLernerList: `${baseurl}/tracking/user_certificate/status/search`,
-  getCourseName: `/action/composite/v3/search`,
+  getCourseName: `${baseurl}/action/composite/v3/search`,
   issueCertificate: `${baseurl}/tracking/certificate/issue`,
   renderCertificate: `${baseurl}/tracking/certificate/render`,
 };
