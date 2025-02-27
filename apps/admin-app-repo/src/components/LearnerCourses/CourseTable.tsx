@@ -18,13 +18,14 @@ import { getUserDetailsInfo } from '@/services/UserList';
 import TenantService from '@/services/TenantService';
 import { showToastMessage } from '../Toastify';
 import CustomModal from '../CustomModal';
-import { formatDate } from '@/utils/Helper';
-import { Status } from '@/utils/app.constant';
+import { firstLetterInUpperCase, formatDate } from '@/utils/Helper';
+import { Numbers, Status } from '@/utils/app.constant';
 import { TEMPLATE_ID } from '../../../app.config';
 
 type FilterDetails = {
   status?: string[];
   tenantId?: string;
+  userId?:string
 };
 const CourseTable: React.FC = () => {
   const [alertIssueModal, setAlertIssueModal] = useState<boolean>(false);
@@ -33,9 +34,10 @@ const CourseTable: React.FC = () => {
   const [showCertificate, setShowCertificate] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState<string>('All');
   const [pageOffset, setPageOffset] = useState(0);
+  const [searchKeyword, setSearchKeyword] = useState("");
   const [pageLimit, setPageLimit] = useState(10);
   const [pageCount, setPageCount] = useState(1);
-  const [pageSize, setPageSize] = React.useState<string | number>('10');
+  const [pageSize, setPageSize] = React.useState<string | number>(10);
   const [pageSizeArray, setPageSizeArray] = React.useState<number[]>([]);
   const [pagination, setPagination] = useState(true);
   const [certificateHtml, setCertificateHtml] = React.useState<string>('');
@@ -63,9 +65,9 @@ const CourseTable: React.FC = () => {
       const payload = {
         issuanceDate: new Date().toISOString(),
         expirationDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
-        firstName: selectedRowData?.firstName,
-        middleName: selectedRowData?.middleName,
-        lastName: selectedRowData?.lastName,
+        firstName: firstLetterInUpperCase(selectedRowData?.firstName),
+        middleName: firstLetterInUpperCase(selectedRowData?.middleName),
+        lastName: firstLetterInUpperCase(selectedRowData?.lastName),
         userId: selectedRowData?.userId,
         courseId: selectedRowData?.courseId,
         courseName: selectedRowData?.courseName,
@@ -128,8 +130,14 @@ const CourseTable: React.FC = () => {
       try{
       const limit = pageLimit;
       let offset = pageOffset * limit;
-      const response = await courseWiseLernerList({ limit, offset, filters });
-       const totalCount=response.count
+      let response;
+      if(searchKeyword!=="")
+      response = await courseWiseLernerList({ limit, offset, filters });
+       else
+       response = await courseWiseLernerList({  offset, filters });
+        const totalCount=response.count
+       setPageCount(Math.ceil(totalCount / pageLimit));
+
       if (totalCount >= 15) {
         setPagination(true);
 
@@ -169,7 +177,7 @@ const CourseTable: React.FC = () => {
         };
       }
       const r = await getCourseName(courseIds);
-      const courseMap = r?.content?.reduce((acc: any, course: any) => {
+      const courseMap = r?.content?.reduce?.((acc: any, course: any) => {
         acc[course.identifier] = course.name;
         return acc;
       }, {});
@@ -206,20 +214,22 @@ const CourseTable: React.FC = () => {
             certificateId: course?.certificateId,
           };
         });
-
-      setData(finalResult);
+        const filteredData = finalResult.filter((item: any) =>
+          item.name.toLowerCase().includes(searchKeyword.toLowerCase())
+        );
+      setData(filteredData);
       }
       catch(e){
         console.log(e)
       }
     };
     fetchCourses();
-  }, []);
+  }, [pageLimit, pageOffset, filters, searchKeyword]);
   const handleSearch = (keyword: string) => {
-    // setPageOffset(Numbers.ZERO);
-    // setPageCount(Numbers.ONE);
-    // setSearchKeyword(keyword);
-  };
+    setPageOffset(Numbers.ZERO);
+    setPageCount(Numbers.ONE);
+    setSearchKeyword(keyword)
+     };
   const handlePaginationChange = (
     event: React.ChangeEvent<unknown>,
     value: number
