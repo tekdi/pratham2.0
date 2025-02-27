@@ -19,6 +19,7 @@ import { AcademicYear } from "@/utils/Interfaces";
 import useStore from "@/store/store";
 import { useQueryClient } from "@tanstack/react-query";
 import { Role } from "@/utils/app.constant";
+import MenuIcon from '@mui/icons-material/Menu';
 
 const Header = ({
   sx,
@@ -165,6 +166,7 @@ const Header = ({
           onClick={toggleMobileSidebar}
           sx={{
             display: {
+              color:theme.palette.warning['A400'],
               lg: "none",
               xs: "flex",
               "@media (max-width: 600px)": {
@@ -174,6 +176,7 @@ const Header = ({
           }}
         >
           {/* {showIcon === false ? "" : <FeatherIcon icon="menu" size="20" />} */}
+          <MenuIcon/>
         </IconButton>
         {/* ------------------------------------------- */}
         {/* Search Dropdown */}
