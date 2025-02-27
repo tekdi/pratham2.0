@@ -1,9 +1,4 @@
-import React from 'react';
-import dynamic from 'next/dynamic';
-
-const QuestionSetEditor = dynamic(() => import('@questionSet'), {
-  ssr: false,
-});
+import QuestionSetEditor from '@questionSet';
 
 export const QuestionSet = () => {
   return <QuestionSetEditor />;

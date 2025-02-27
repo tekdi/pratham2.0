@@ -1,5 +1,5 @@
 import FingerprintJS from 'fingerprintjs2';
-import { Role } from './app.constant';
+import { Role , DateFilter} from './app.constant';
 
 export const generateUUID = () => {
   let d = new Date().getTime();
@@ -31,7 +31,105 @@ export const getDeviceId = () => {
   });
 };
 
-//Function to convert names in capitalize case
+export const getLoggedInUserRole = () => {
+  return (localStorage.getItem('role') || "")
+};
+export const filterUsersByAge = (users: any[]) => {
+  const today = new Date();
+
+  return users.reduce(
+    (result, user) => {
+      if (!user || !user.dob) {
+        // If user has no dob, push them into "above18" (assuming unknown age is treated as adult)
+        result.above18.push(user);
+        return result;
+      }
+
+      const birthDate = new Date(user.dob);
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      const dayDiff = today.getDate() - birthDate.getDate();
+
+      // Adjust age if birthday hasn't occurred yet this year
+      if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+        age--;
+      }
+
+      if (age >= 18) {
+        result.above18.push(user);
+      } else {
+        result.below18.push(user);
+      }
+
+      return result;
+    },
+    { above18: [], below18: [] } // Initial value for the accumulator
+  );
+};
+export const getAge=(dobString: any)=> {
+  console.log(dobString)
+  const dob = new Date(dobString);
+  const today = new Date();
+
+  let age = today.getFullYear() - dob.getFullYear();
+  const monthDiff = today.getMonth() - dob.getMonth();
+  const dayDiff = today.getDate() - dob.getDate();
+
+  // Adjust age if birthday hasn't occurred yet this year
+  if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+      age--;
+  }
+console.log(age)
+  return age;
+}
+
+export const countUsersByFilter = ({ users, filter }: { users: any[]; filter: string }) => {
+  let counts: Record<string, number> = {}; 
+  let result: { date?: string; month?: string; count: number }[] = [];
+  const today = new Date();
+
+  if (filter ===  DateFilter.THIS_MONTH) {
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    for (let d = new Date(firstDay); d <= today; d.setDate(d.getDate() + 1)) {
+      let formattedDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}`;
+      counts[formattedDate] = 0;
+    }
+
+    users.forEach((user: any) => {
+      let date = new Date(user.createdAt);
+      let formattedDate = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+      if (counts.hasOwnProperty(formattedDate)) {
+        counts[formattedDate]++;
+      }
+    });
+
+    result = Object.entries(counts).map(([key, count]) => ({ date: key, count }));
+  } 
+  
+  else if (filter === DateFilter.LAST_SIX_MONTHS || filter === DateFilter.LAST_TWELEVE_MONTHS) {
+    let monthsToInclude = filter ===  DateFilter.LAST_SIX_MONTHS ? 6 : 12;
+
+    for (let i = monthsToInclude; i > 0; i--) { // Start from monthsToInclude and decrement
+      let date = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      let formattedMonth = date.toLocaleString('en-US', { month: 'short' });
+      counts[formattedMonth] = 0;
+    }
+
+    users.forEach((user: any) => {
+      let date = new Date(user.createdAt);
+      let formattedMonth = date.toLocaleString('en-US', { month: 'short' });
+      if (counts.hasOwnProperty(formattedMonth)) {
+        counts[formattedMonth]++;
+      }
+    });
+
+    result = Object.entries(counts).map(([key, count]) => ({ month: key, count }));
+  }
+
+  return result;
+};
+
 export const toPascalCase = (name: string | any) => {
   if (typeof name !== 'string') {
     return name;
