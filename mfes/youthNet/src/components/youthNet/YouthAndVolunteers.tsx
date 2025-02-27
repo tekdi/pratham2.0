@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   MenuItem,
   Select,
@@ -9,6 +9,8 @@ import {
   Box,
 } from '@mui/material';
 import RegistrationStatistics from './RegistrationStatistics';
+import { getYouthDataByDate } from '../../services/youthNet/Dashboard/UserServices';
+import { useTranslation } from 'next-i18next';
 
 interface Props {
   selectOptions: { label: string; value: string }[];
@@ -19,11 +21,44 @@ const YouthAndVolunteers: React.FC<Props> = ({ selectOptions, data }) => {
   const [selectedValue, setSelectedValue] = useState<string>(
     selectOptions[0]?.value || ''
   );
-
+  const { t } = useTranslation();
+ const [youthCount, setYouthCount] = useState<number>(0);
   const handleChange = (event: SelectChangeEvent<string>) => {
     setSelectedValue(event.target.value);
   };
+  useEffect(() => {
+    const getYouthData = async () => {
+      try {
+        let fromDate;
+       const toDate = new Date();
+        if (selectedValue === 'today') {
+         fromDate = new Date(2024, 3, 1)
+        }
+        if(selectedValue === 'month') {
+         fromDate = new Date(toDate.getFullYear(), toDate.getMonth() - 1, toDate.getDate())
+        }
+        if(selectedValue==='year') {
+           fromDate = new Date(toDate.getFullYear() - 1, toDate.getMonth(), toDate.getDate())
 
+        }
+        if(fromDate && toDate)
+         {const response = await getYouthDataByDate(
+          fromDate,
+          toDate
+        );
+        console.log(response?.getUserDetails);
+        setYouthCount(response?.totalCount);
+
+      }
+
+      } catch (error) {
+        console.log(error);
+      }
+      // setUserData(data);
+    };
+
+    getYouthData();
+  }, [selectedValue]);
   return (
     <div style={{ padding: '16px' }}>
       {data && (
@@ -32,7 +67,7 @@ const YouthAndVolunteers: React.FC<Props> = ({ selectOptions, data }) => {
           sx={{ fontSize: '16px', color: 'black' }}
           gutterBottom
         >
-           Total Youth and Volunteers{/* to do */}
+            {t('YOUTHNET_DASHBOARD.TOTAL_YOUTH')}
         </Typography>
       )}
       <FormControl style={{ marginBottom: '8px', width: '100%' }}>
@@ -54,7 +89,8 @@ const YouthAndVolunteers: React.FC<Props> = ({ selectOptions, data }) => {
         </Select>
       </FormControl>
       <Typography variant="body1" style={{ fontWeight: 300, color: 'black' }}>
-        {data}
+        {t('YOUTHNET_DASHBOARD.YOUTH_COUNT', {count: youthCount})}
+
       </Typography>
       {data && (
         <Box p={2}>
@@ -62,17 +98,17 @@ const YouthAndVolunteers: React.FC<Props> = ({ selectOptions, data }) => {
             <Grid item xs={6}>
               <RegistrationStatistics
                 avatar={true}
-                statistic={4}
+                statistic={youthCount}
                 subtile={'Youth'}
               />
             </Grid>
-            <Grid item xs={6}>
+            {/* <Grid item xs={6}>
               <RegistrationStatistics
                 avatar={true}
                 statistic={4}
                 subtile={'Volunteer'}
               />
-            </Grid>
+            </Grid> */}
           </Grid>
         </Box>
       )}
