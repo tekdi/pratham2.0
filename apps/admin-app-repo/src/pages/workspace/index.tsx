@@ -25,7 +25,7 @@ const index = () => {
         src={mfe_workspace}
         style={{
           display: 'block',
-          marginTop: 65,
+          // marginTop: 65,
           padding: 0,
           width: '100vw',
           height: '100vh',
