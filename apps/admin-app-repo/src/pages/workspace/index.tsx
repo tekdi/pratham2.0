@@ -11,21 +11,21 @@ const index = () => {
 
   return (
     <>
-    <HeaderWrapper />
-    <div
+    {/* <HeaderWrapper /> */}
+    {/* <div
       style={{
         padding: 0,
         height: '100vh',
         width: '100vw',
         overflow: 'hidden',
       }}
-    >
+    > */}
       
       <iframe
         src={mfe_workspace}
         style={{
           display: 'block',
-          marginTop: 65,
+          // marginTop: 65,
           padding: 0,
           width: '100vw',
           height: '100vh',
@@ -33,7 +33,7 @@ const index = () => {
         }}
         title="Embedded Localhost"
       />
-    </div>
+    {/* </div> */}
     </>
   );
 };

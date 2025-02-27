@@ -1,8 +1,5 @@
-import dynamic from 'next/dynamic';
+import UploadEditor from '@generic-editor';
 
-const UploadEditor = dynamic(() => import('@generic-editor').then((mod) => mod.default), {
-  ssr: false,
-});
 
 export const GenericEditor = () => {
   return <UploadEditor />;
