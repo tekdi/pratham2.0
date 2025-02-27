@@ -245,7 +245,8 @@ const ReviewContentSubmissions = () => {
                   border: "1px solid #ccc",
                   borderRadius: "16px",
                   padding: 2,
-                  backgroundColor: "white",
+                  backgroundColor: "white", 
+                  // height:'70vh'
 
                 }}
               >

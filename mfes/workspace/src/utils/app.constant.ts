@@ -11,7 +11,11 @@ export enum Editor {
   CONTENT = "content",
   QUESTION_SET = "questionset",
   COLLECTION="collection"
+}
 
+export enum Publish {
+ PUBLISH ='publish',
+ REJECT='reject'
 }
 export enum Role {
   SCTA = "State Content Team Associate (SCTA)",
