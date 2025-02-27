@@ -115,13 +115,22 @@ const CourseTable: React.FC = () => {
     } catch (e) {}
   };
 
-  const CertificatePage: React.FC<{ htmlContent: string }> = ({
-    htmlContent,
-  }) => {
+  const CertificatePage: React.FC<{ htmlContent: string }> = ({ htmlContent }) => {
+    const encodedHtml = encodeURIComponent(htmlContent);
+    const dataUri = `data:text/html;charset=utf-8,${encodedHtml}`;
+  
     return (
-      <>
-        <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
-      </>
+      <Box sx={{ width: "100%", height: "100%", display: "flex" }}>
+        <iframe
+          src={dataUri}
+          style={{
+            width: "100%",
+            height: "100vh",  
+            minHeight: "800px", 
+            border: "none",
+          }}
+        />
+      </Box>
     );
   };
 
