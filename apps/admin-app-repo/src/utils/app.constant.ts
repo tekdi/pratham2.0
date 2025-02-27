@@ -23,22 +23,37 @@ export const metaTags = {
  
 };
 
-export enum Role {
-  STUDENT = "Student",
-  TEACHER = "Teacher",
-  TEAM_LEADER = "Team Leader",
-  TEAM_LEADERS = "Team Leaders",
+// export enum Role {
+//   STUDENT = "Student",
+//   TEACHER = "Teacher",
+//   TEAM_LEADER = "Team Leader",
+//   TEAM_LEADERS = "Team Leaders",
 
-  ADMIN = "State Admin",
-  CENTRAL_ADMIN = "Central Admin",
+//   ADMIN = "State Admin",
+//   CENTRAL_ADMIN = "Central Admin",
+//   LEARNERS = "Learners",
+//   FACILITATORS = "Facilitators",
+//   CONTENT_CREATOR = "Content Creator",
+//   CONTENT_REVIEWER = "Content Reviewer",
+//   SCTA = "State Content Team Associate (SCTA)",
+//   CCTA = "Central Content Team Associate (CCTA)"
+
+// };
+
+export enum Role {
+  STUDENT = "Learner",
+  TEACHER = "Instructor",
+  TEAM_LEADER = "Lead",
+  ADMIN = "State Lead",
+  CENTRAL_ADMIN = "Central Lead",
   LEARNERS = "Learners",
   FACILITATORS = "Facilitators",
+  TEAM_LEADERS = "Team Leaders",
   CONTENT_CREATOR = "Content Creator",
   CONTENT_REVIEWER = "Content Reviewer",
   SCTA = "State Content Team Associate (SCTA)",
   CCTA = "Central Content Team Associate (CCTA)"
-
-}
+} ;
 
 export enum Status {
   ARCHIVED = "archived",

@@ -26,7 +26,7 @@ const Menuitems = [
   {
     title: "SIDEBAR.MANAGE_USERS",
     icon: userIcon,
-    subOptions: [
+    subOptions: [ 
       {
         title: "SIDEBAR.TEAM_LEADERS",
         href: ["/team-leader"],
@@ -121,7 +121,7 @@ export const getFilteredMenuItems = () => {
     }
 
     if (
-      userInfo?.role === Role.ADMIN 
+      userInfo?.role === Role.ADMIN  && userInfo?.tenantData[0]?.tenantName == "Second Chance Program" 
     ) {
       // Exclude Course Planner and Workspace for Admin and Central Admin
       return Menuitems.filter(
@@ -130,13 +130,11 @@ export const getFilteredMenuItems = () => {
           item.title !== "SIDEBAR.WORKSPACE" &&
           item.title !== "PROGRAM_MANAGEMENT.PROGRAMS" &&
           item.title !== "SIDEBAR.MANAGE_NOTIFICATION"
-
-
       );
     }
     if (
-      userInfo?.role === Role.ADMIN ||
-      userInfo?.role === Role.CENTRAL_ADMIN
+      (userInfo?.role === Role.ADMIN ||
+      userInfo?.role === Role.CENTRAL_ADMIN) && (userInfo?.tenantData[0]?.tenantName == "Second Chance Program")
     ) {
       // Exclude Course Planner and Workspace for Admin and Central Admin
       return Menuitems.filter(

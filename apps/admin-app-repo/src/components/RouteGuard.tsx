@@ -100,15 +100,17 @@ const RouteGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         router.push("/unauthorized");
       }
     }
+    console.log(user?.tenantData[0]?.tenantName , "shreyas");
+    
 
-    if (((user.role === Role.ADMIN || user.role === Role.CENTRAL_ADMIN) && (allowedPaths.includes(router.pathname) || isWorkspaceContent || isCoursePlannerContent)) ||  (user.role === Role.ADMIN && (router.pathname === "/programs" ||router.pathname === "/notification-templates" ))) {
+    if ((((user.role === Role.ADMIN && user?.tenantData[0]?.tenantName == "Second Chance Program") || (user.role === Role.CENTRAL_ADMIN &&  user?.tenantData[0]?.tenantName == "Second Chance Program")) && (allowedPaths.includes(router.pathname) || isWorkspaceContent || isCoursePlannerContent)) ||  (user.role === Role.ADMIN && (router.pathname === "/programs" ||router.pathname === "/notification-templates" ))) {
     
       if (router.pathname !== "/login" && router.pathname !== "/logout" && router.pathname !== "/edit-password") {
 
         router.push("/unauthorized");
       }
     }
-    if((user.role === Role.CENTRAL_ADMIN) && notAllowedPathsForCentralAdmin.includes(router.pathname))
+    if((user.role === Role.CENTRAL_ADMIN  && user?.tenantData[0]?.tenantName == "Second Chance Program") && notAllowedPathsForCentralAdmin.includes(router.pathname))
     {
       if (router.pathname !== "/login" && router.pathname !== "/logout" && router.pathname !== "/edit-password") {
 
