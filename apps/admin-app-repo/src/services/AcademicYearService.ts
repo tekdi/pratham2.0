@@ -1,5 +1,5 @@
 import { post } from './RestClient';
-import API_ENDPOINTS from '@/utils/API/APIEndpoints';
+import { API_ENDPOINTS } from '@/utils/API/APIEndpoints';
 
 export const getAcademicYear = async (): Promise<any> => {
   const apiUrl: string = API_ENDPOINTS.academicYearsList

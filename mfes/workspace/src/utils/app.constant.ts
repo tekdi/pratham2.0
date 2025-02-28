@@ -11,11 +11,15 @@ export enum Editor {
   CONTENT = "content",
   QUESTION_SET = "questionset",
   COLLECTION="collection"
+}
 
+export enum Publish {
+ PUBLISH ='publish',
+ REJECT='reject'
 }
 export enum Role {
-  SCTA = "State Content Team Associate (SCTA)",
-  CCTA="Central Content Team Associate (CCTA)"
+  SCTA = "Content creator",
+  CCTA = "Content reviewer"
 }
 export enum ContentStatus {
   PUBLISHED = "Published",
@@ -35,3 +39,7 @@ export const PrimaryCategoryValue = [
   "Practice Question Set",
   "Teacher Resource"
 ];
+
+export const TENANT_DATA = {
+  SECOND_CHANCE_PROGRAM: 'Second Chance Program',
+};

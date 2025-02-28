@@ -1,5 +1,5 @@
 import { deleteApi, patch, post } from './RestClient';
-import API_ENDPOINTS from '@/utils/API/APIEndpoints';
+import { API_ENDPOINTS } from '@/utils/API/APIEndpoints';
 
 interface TemplateTypeDetails {
     subject: string;

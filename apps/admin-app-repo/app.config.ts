@@ -2,14 +2,11 @@ export const TENANT_ID = process.env.NEXT_PUBLIC_TENANT_ID || "";
 if (!TENANT_ID) {
   console.warn('NEXT_PUBLIC_TENANT_ID is not set in the environment variables.');
 }
+export const TEMPLATE_ID: string = 'cm7nbogii000moc3gth63l863';
 
-export const FRAMEWORK_ID = process.env.NEXT_PUBLIC_FRAMEWORK_ID || "";
-if (!FRAMEWORK_ID) {
-  console.warn('NEXT_PUBLIC_FRAMEWORK_ID is not set in the environment variables.');
+export const jotFormId = process.env.NEXT_PUBLIC_JOTFORM_ID || '';
+if (!jotFormId) {
+  console.warn(
+    'NEXT_PUBLIC_JOTFORM_ID is not set in the environment variables.'
+  );
 }
-
-export const CONTENT_FRAMEWORK_ID = process.env.NEXT_PUBLIC_CONTENT_FRAMEWORK_ID || "";
-if (!CONTENT_FRAMEWORK_ID) {
-  console.warn('NEXT_PUBLIC_CONTENT_FRAMEWORK_ID is not set in the environment variables.');
-}
-

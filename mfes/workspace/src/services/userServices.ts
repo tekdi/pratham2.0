@@ -27,7 +27,7 @@ export const userList = async ({
   offset,
   fields,
 }: userListParam): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_BASE_URL}/user/v1/list`;
+  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/list`;
 
   try {
     console.log("Request data", apiUrl);
@@ -55,7 +55,7 @@ export const getUserDetailsInfo = async (
   userId?: string | string[],
   fieldValue: boolean = true
 ): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_BASE_URL}/user/v1/read/${userId}?fieldvalue=${fieldValue}`;
+  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/read/${userId}?fieldvalue=${fieldValue}`;
   const headers: Record<string, string> = {
     Authorization: `Bearer ${getLocalStoredToken()}`,
     tenantid: TenantService.getTenantId(),

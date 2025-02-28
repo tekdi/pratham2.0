@@ -70,6 +70,9 @@ export enum Status {
   DROPOUT = 'dropout',
   ACTIVE = 'active',
   ARCHIVED = 'archived',
+  DRAFT = "Draft",
+  LIVE = "Live",
+  SUBMITTED_FOR_REVIEW = "Review",
 }
 
 export enum cohortHierarchy {

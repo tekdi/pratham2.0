@@ -1,3 +1,4 @@
+import HeaderWrapper from '@/components/layouts/header/HeaderWrapper';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import dynamic from 'next/dynamic';
 import React from 'react';
@@ -9,19 +10,22 @@ const index = () => {
   
 
   return (
-    <div
+    <>
+    {/* <HeaderWrapper /> */}
+    {/* <div
       style={{
         padding: 0,
         height: '100vh',
         width: '100vw',
         overflow: 'hidden',
       }}
-    >
+    > */}
+      
       <iframe
         src={mfe_workspace}
         style={{
           display: 'block',
-          margin: 0,
+          // marginTop: 65,
           padding: 0,
           width: '100vw',
           height: '100vh',
@@ -29,7 +33,8 @@ const index = () => {
         }}
         title="Embedded Localhost"
       />
-    </div>
+    {/* </div> */}
+    </>
   );
 };
 

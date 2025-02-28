@@ -22,7 +22,13 @@ const Home: React.FC = () => {
           localStorage.getItem("adminInfo") || "{}"
         );
         if(storedUserData?.role === Role.SCTA || storedUserData?.role === Role.CCTA){
-          window.location.href = "/course-planner"; 
+          if(storedUserData?.tenantData[0]?.tenantName != "Second Chance Program" ) {
+            window.location.href = "/workspace";
+            // window.location.href = "/course-planner"; 
+          } else {
+            // window.location.href = "/workspace"; 
+            window.location.href = "/course-planner"; 
+          }
         }
         else
         {

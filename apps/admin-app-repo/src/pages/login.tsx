@@ -86,14 +86,14 @@ const LoginPage = () => {
           if (storedUserData) {
             role = JSON.parse(storedUserData);
             if (role?.role === Role.SCTA || role?.role === Role.CCTA) {
-              router.push('/course-planner', undefined, { locale: locale });
+              // To do :- hardcoding to be removed
+              if (role?.tenantData[0]?.tenantName != 'Second Chance Program') {
+                router.push('/workspace');
+              } else {
+                router.push('/course-planner', undefined, { locale: locale });
+              }
             } else if (role?.role === Role.CENTRAL_ADMIN) {
               router.push('/programs', undefined, { locale: locale });
-            } else if (
-              role?.role === Role.ADMIN ||
-              role?.role === Role.CENTRAL_ADMIN
-            ) {
-              router.push('/centers', undefined, { locale: locale });
             }
           }
         } else {
@@ -220,13 +220,22 @@ const LoginPage = () => {
                   userInfo?.role === Role.SCTA ||
                   userInfo?.role === Role.CCTA
                 ) {
-                  window.location.href = '/course-planner';
                   const { locale } = router;
-                  if (locale) {
-                    router.push('/course-planner', undefined, {
-                      locale: locale,
-                    });
-                  } else router.push('/course-planner');
+                  // To do :- hardcoding to be removed
+                  if (
+                    userInfo?.tenantData[0]?.tenantName !=
+                    'Second Chance Program'
+                  ) {
+                    window.location.href = '/workspace';
+                    router.push('/workspace');
+                  } else {
+                    window.location.href = '/course-planner';
+                    if (locale) {
+                      router.push('/course-planner', undefined, {
+                        locale: locale,
+                      });
+                    } else router.push('/course-planner');
+                  }
                 } else {
                   //window.location.href = "/centers";
                   const { locale } = router;
@@ -293,7 +302,9 @@ const LoginPage = () => {
                 Storage.USER_DATA,
                 JSON.stringify(userResponse)
               );
-              const tenantId = userResponse?.tenantData?.[0]?.tenantId;
+              const tenantId =
+                userResponse?.tenantData?.[0]?.tenantId ||
+                process.env.NEXT_PUBLIC_TENANT_ID;
               TenantService.setTenantId(tenantId);
               localStorage.setItem('tenantId', tenantId);
             }

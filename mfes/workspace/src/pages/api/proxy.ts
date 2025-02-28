@@ -18,7 +18,7 @@ export default async function handler(
 
   const token = getCookie(req, 'authToken') || process.env.AUTH_API_TOKEN as string;
 
-  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL as string;
+  const BASE_URL = process.env.NEXT_PUBLIC_MIDDLEWARE_URL as string;
   const tenantId = getCookie(req, 'tenantId') || process.env.NEXT_PUBLIC_TENANT_ID as string;
 
   const tenantConfig = mockData[tenantId];
@@ -35,7 +35,7 @@ export default async function handler(
     return res.status(401).json({ message: "Unauthorized: Token is required" });
   }
 
-  console.log("Using token:", token);
+  // console.log("Using token:", token);
 
   let pathString = Array.isArray(path) ? path.join("/") : (path as string);
 

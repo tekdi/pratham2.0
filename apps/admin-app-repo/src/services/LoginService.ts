@@ -1,5 +1,6 @@
-import API_ENDPOINTS from '@/utils/API/APIEndpoints';
+import { API_ENDPOINTS } from '@/utils/API/APIEndpoints';
 import { get, post } from "./RestClient";
+import axios from 'axios';
 
 interface LoginParams {
   username: string;
@@ -51,15 +52,25 @@ export const logout = async (refreshToken: string): Promise<any> => {
 
 export const getUserId = async (): Promise<any> => {
   const apiUrl: string = API_ENDPOINTS.userAuth;
+
   try {
-    const response = await get(apiUrl);
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('Authorization token not found');
+    }
+
+    const response = await axios.get(apiUrl, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
     return response?.data?.result;
   } catch (error) {
-    console.error("error in fetching user details", error);
+    console.error('Error in fetching user details', error);
     throw error;
   }
 };
-
 export const resetPassword = async (
   newPassword: any): Promise<any> => {
   const apiUrl: string = API_ENDPOINTS.resetPassword;

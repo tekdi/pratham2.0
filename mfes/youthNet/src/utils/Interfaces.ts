@@ -906,7 +906,7 @@ export interface RegistrationStatisticsProps {
   onPrimaryClick?: () => void;
 }
 export interface VillageNewRegistrationProps {
-  locations: any;
+  locations: { id: number; value: string }[]; 
 }
 export interface RegistrationModalProps {
   avatar?: string;

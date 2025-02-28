@@ -48,10 +48,15 @@ const EditForgotPassword = () => {
 
     if(storedUserData?.role === Role.SCTA || storedUserData?.role === Role.CCTA)
     {
-      if(locale)
-      router.push("/course-planner", undefined, { locale: locale });
-         else
-         router.push("/course-planner");
+      // To do :- hardcoding to be removed
+      if(storedUserData?.tenantData[0]?.tenantName != "Second Chance Program" ) {
+        router.push("/workspace");
+      } else {
+        if (locale) 
+          router.push("/course-planner", undefined, { locale: locale });
+        else
+          router.push("/course-planner");
+      }
     }else
     {
       if(locale)
