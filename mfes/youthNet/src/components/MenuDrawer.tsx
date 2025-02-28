@@ -315,13 +315,13 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               </FormControl>
             </Box>
           )}
-          {tenantName && (
+          {/* {tenantName && (
             <Box>
               <Typography sx={{ fontSize: '12px' }}>
                 (Development in progress)
               </Typography>
             </Box>
-          )}
+          )} */}
         </Box>
 
         {isActiveYear && !tenantName && (
