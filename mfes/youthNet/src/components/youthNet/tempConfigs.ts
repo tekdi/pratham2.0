@@ -60,7 +60,7 @@ type SampleData = {
 
 export const sampleData: SampleData = {
   'This month': [
-    { date: '1 Sep', count: 2 },
+    { date: '25/09', count: 2 },
     { date: '2 Sep', count: 7 },
     { date: '3 Sep', count: 4 },
     { date: '4 Sep', count: 6 },
@@ -401,5 +401,8 @@ export const surveysData = [
 ];
 
 export const YOUTHNET_USER_ROLE = {
-  MENTOR_LEAD: 'leader',
+  MENTOR_LEAD: '',
+  LEAD:"Lead",
+  INSTRUCTOR:"Instructor",
+  LEARNER:"Learner"
 };
