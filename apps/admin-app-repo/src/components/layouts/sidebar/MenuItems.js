@@ -11,89 +11,7 @@ import { store } from "@/store/store";
 import { Role } from "@/utils/app.constant";
 const isActiveYear = store.getState().isActiveYearSelected;
 
-const Menuitems = [
-  {
-    title: "SIDEBAR.CENTERS",
-    icon: centerIcon,
-    href: ["/centers"],
-  },
-  {
-    title: "PROGRAM_MANAGEMENT.PROGRAMS",
-    icon: programIcon,
-    href: ["/programs"],
-  },
 
-  {
-    title: "SIDEBAR.MANAGE_USERS",
-    icon: userIcon,
-    subOptions: [ 
-      {
-        title: "SIDEBAR.TEAM_LEADERS",
-        href: ["/team-leader"],
-      },
-      {
-        title: "SIDEBAR.FACILITATORS",
-        href: ["/faciliator"],
-      },
-      {
-        title: "SIDEBAR.LEARNERS",
-        href: ["/learners"],
-      },
-     
-    ],
-  },
-  {
-    title: "SIDEBAR.CERTIFICATE_ISSUANCE",
-    icon: certificateIcon,
-    href: ["/certificate-issuance"],
-  },
-  {
-    title: "MASTER.MASTER",
-    icon: masterIcon,
-    subOptions: [
-      {
-        title: "MASTER.STATE",
-        href: ["/state"],
-      },
-      {
-        title: "MASTER.DISTRICTS",
-        href: ["/district"],
-      },
-      {
-        title: "MASTER.BLOCKS",
-        href: ["/block"],
-      },
-    ],
-  },
-  {
-    title: "SIDEBAR.MANAGE_NOTIFICATION",
-    icon: centerIcon,
-    href: ["/notification-templates"],
-  },
-     {
-    title: "SIDEBAR.SUPPORT_REQUEST",
-    icon: support,
-    href: ["/support-request"],
-  },
-  ...(isActiveYear
-    ? [
-        {
-          title: "SIDEBAR.COURSE_PLANNER",
-          icon: coursePlannerIcon,
-          href: ["/course-planner", "/stateDetails", "/subjectDetails", "/importCsv", "/resourceList", "/play/content/[identifier]"],
-        },
-      ]
-    : []),
-  ...(isActiveYear
-    ? [
-        {
-          title: "SIDEBAR.WORKSPACE",
-          icon: dashboardIcon,
-          href: ["/workspace", "/course-hierarchy/[identifier]"],
-        },
-      ]
-    : []),
-];
 
 export const getFilteredMenuItems = () => {
   if (typeof window !== "undefined" && window.localStorage) {
@@ -104,26 +22,108 @@ export const getFilteredMenuItems = () => {
       userInfo = JSON.parse(adminInfo || "{}");
     } 
 
+    const Menuitems = [
+      {
+        title: "SIDEBAR.CENTERS",
+        icon: centerIcon,
+        href: ["/centers"],
+      },
+      {
+        title: "PROGRAM_MANAGEMENT.PROGRAMS",
+        icon: programIcon,
+        href: ["/programs"],
+      },
+      {
+        title: "SIDEBAR.MANAGE_USERS",
+        icon: userIcon,
+        subOptions: userInfo?.tenantData[0]?.tenantName === "Second Chance Program"
+          ? [
+              {
+                title: "SIDEBAR.TEAM_LEADERS",
+                href: "/team-leader",
+              },
+              {
+                title: "SIDEBAR.FACILITATORS",
+                href: "/facilitator",
+              },
+              {
+                title: "SIDEBAR.LEARNERS",
+                href: "/learners",
+              },
+            ]
+          : [
+              {
+                title: "SIDEBAR.MENTOR_LEADER",
+                href: "/",
+              },
+            ],
+      },
+      {
+        title: "SIDEBAR.CERTIFICATE_ISSUANCE",
+        icon: certificateIcon,
+        href: ["/certificate-issuance"],
+      },
+      {
+        title: "MASTER.MASTER",
+        icon: masterIcon,
+        subOptions: [
+          {
+            title: "MASTER.STATE",
+            href: ["/state"],
+          },
+          {
+            title: "MASTER.DISTRICTS",
+            href: ["/district"],
+          },
+          {
+            title: "MASTER.BLOCKS",
+            href: ["/block"],
+          },
+        ],
+      },
+      {
+        title: "SIDEBAR.MANAGE_NOTIFICATION",
+        icon: centerIcon,
+        href: ["/notification-templates"],
+      },
+      {
+        title: "SIDEBAR.SUPPORT_REQUEST",
+        icon: support,
+        href: ["/support-request"],
+      },
+      ...(isActiveYear
+        ? [
+            {
+              title: "SIDEBAR.COURSE_PLANNER",
+              icon: coursePlannerIcon,
+              href: ["/course-planner", "/stateDetails", "/subjectDetails", "/importCsv", "/resourceList", "/play/content/[identifier]"],
+            },
+          ]
+        : []),
+      ...(isActiveYear
+        ? [
+            {
+              title: "SIDEBAR.WORKSPACE",
+              icon: dashboardIcon,
+              href: ["/workspace", "/course-hierarchy/[identifier]"],
+            },
+          ]
+        : []),
+    ];
+
     if (userInfo?.role === Role.SCTA || userInfo?.role === Role.CCTA) {
-      if(userInfo?.tenantData[0]?.tenantName != "Second Chance Program" ) {
-        return Menuitems.filter(
-          (item) =>
-            item.title === "SIDEBAR.WORKSPACE"
-        );
-   
+      if (userInfo?.tenantData[0]?.tenantName !== "Second Chance Program") {
+        return Menuitems.filter((item) => item.title === "SIDEBAR.WORKSPACE");
       }
-      // For SCTA and CCTA, show only Course Planner and Workspace
       return Menuitems.filter(
         (item) =>
           item.title === "SIDEBAR.COURSE_PLANNER" ||
-          item.title === "SIDEBAR.WORKSPACE" || item.title === "SIDEBAR.SUPPORT_REQUEST"
+          item.title === "SIDEBAR.WORKSPACE" ||
+          item.title === "SIDEBAR.SUPPORT_REQUEST"
       );
     }
 
-    if (
-      userInfo?.role === Role.ADMIN  && userInfo?.tenantData[0]?.tenantName == "Second Chance Program" 
-    ) {
-      // Exclude Course Planner and Workspace for Admin and Central Admin
+    if (userInfo?.role === Role.ADMIN && userInfo?.tenantData[0]?.tenantName === "Second Chance Program") {
       return Menuitems.filter(
         (item) =>
           item.title !== "SIDEBAR.COURSE_PLANNER" &&
@@ -132,19 +132,17 @@ export const getFilteredMenuItems = () => {
           item.title !== "SIDEBAR.MANAGE_NOTIFICATION"
       );
     }
+
     if (
-      (userInfo?.role === Role.ADMIN ||
-      userInfo?.role === Role.CENTRAL_ADMIN) && (userInfo?.tenantData[0]?.tenantName == "Second Chance Program")
+      (userInfo?.role === Role.ADMIN || userInfo?.role === Role.CENTRAL_ADMIN) &&
+      userInfo?.tenantData[0]?.tenantName === "Second Chance Program"
     ) {
-      // Exclude Course Planner and Workspace for Admin and Central Admin
       return Menuitems.filter(
         (item) =>
           item.title !== "SIDEBAR.COURSE_PLANNER" &&
           item.title !== "SIDEBAR.WORKSPACE" &&
           item.title !== "SIDEBAR.CENTERS" &&
           item.title !== "SIDEBAR.MANAGE_USERS"
-
-
       );
     }
 
@@ -152,5 +150,3 @@ export const getFilteredMenuItems = () => {
   }
 };
 
-
-export default Menuitems;
