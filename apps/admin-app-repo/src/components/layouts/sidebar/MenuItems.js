@@ -8,7 +8,7 @@ import support from '../../../assets/images/Support.svg';
 
 import coursePlannerIcon from '../../../../public/images/event_available.svg';
 import { store } from '@/store/store';
-import { Role } from '@/utils/app.constant';
+import { Role, youthNetTenantName } from '@/utils/app.constant';
 const isActiveYear = store.getState().isActiveYearSelected;
 
 const Menuitems = [
@@ -120,7 +120,7 @@ export const getFilteredMenuItems = () => {
     }
 
     if (userInfo?.role === Role.SCTA || userInfo?.role === Role.CCTA) {
-      if (userInfo?.tenantData[0]?.tenantName != 'Second Chance Program') {
+      if (userInfo?.tenantData[0]?.tenantName != youthNetTenantName.SECOND_CHANCE_PROGRAM) {
         return Menuitems.filter((item) => item.title === 'SIDEBAR.WORKSPACE');
       }
       // For SCTA and CCTA, show only Course Planner and Workspace
@@ -134,7 +134,7 @@ export const getFilteredMenuItems = () => {
 
 if (
   userInfo?.role === Role.ADMIN &&
-  userInfo?.tenantData[0]?.tenantName === 'YouthNet'
+  userInfo?.tenantData[0]?.tenantName === youthNetTenantName.YOUTHNET
 ) {
   return Menuitems.filter(
     (item) =>
@@ -157,7 +157,7 @@ if (
 
 if (
   userInfo?.role === Role.ADMIN &&
-  userInfo?.tenantData[0]?.tenantName === 'Second Chance Program'
+  userInfo?.tenantData[0]?.tenantName === youthNetTenantName.SECOND_CHANCE_PROGRAM
 ) {
   return Menuitems.map((item) => {
     if (item.title === 'SIDEBAR.MANAGE_USERS' && item.subOptions) {
@@ -180,7 +180,7 @@ if (
 
     if (
       userInfo?.role === Role.ADMIN &&
-      userInfo?.tenantData[0]?.tenantName === 'Second Chance Program'
+      userInfo?.tenantData[0]?.tenantName === youthNetTenantName.SECOND_CHANCE_PROGRAM
     ) {
       // Exclude Course Planner and Workspace for Admin and Central Admin
       return Menuitems.filter(
@@ -194,7 +194,7 @@ if (
     if (
       (userInfo?.role === Role.ADMIN ||
         userInfo?.role === Role.CENTRAL_ADMIN) &&
-      userInfo?.tenantData[0]?.tenantName === 'Second Chance Program'
+      userInfo?.tenantData[0]?.tenantName === youthNetTenantName.SECOND_CHANCE_PROGRAM
     ) {
       // Exclude Course Planner and Workspace for Admin and Central Admin
       return Menuitems.filter(
