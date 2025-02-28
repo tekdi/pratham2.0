@@ -11,6 +11,104 @@ import { store } from '@/store/store';
 import { Role } from '@/utils/app.constant';
 const isActiveYear = store.getState().isActiveYearSelected;
 
+const Menuitems = [
+  {
+    title: 'SIDEBAR.CENTERS',
+    icon: centerIcon,
+    href: ['/centers'],
+  },
+  {
+    title: 'PROGRAM_MANAGEMENT.PROGRAMS',
+    icon: programIcon,
+    href: ['/programs'],
+  },
+
+  {
+    title: 'SIDEBAR.MANAGE_USERS',
+    icon: userIcon,
+    subOptions: [
+      {
+        title: 'SIDEBAR.TEAM_LEADERS',
+        href: ['/team-leader'],
+      },
+      {
+        title: 'SIDEBAR.FACILITATORS',
+        href: ['/faciliator'],
+      },
+      {
+        title: 'SIDEBAR.LEARNERS',
+        href: ['/learners'],
+      },
+      //  {
+      //   title: 'SIDEBAR.MENTOR',
+      //   href: '/mentor',
+      // },
+      // {
+      //   title: 'SIDEBAR.MENTOR_LEADER',
+      //   href: '/mentor-leader',
+      // },
+    ],
+  },
+  {
+    title: 'SIDEBAR.CERTIFICATE_ISSUANCE',
+    icon: certificateIcon,
+    href: ['/certificate-issuance'],
+  },
+  {
+    title: 'MASTER.MASTER',
+    icon: masterIcon,
+    subOptions: [
+      {
+        title: 'MASTER.STATE',
+        href: ['/state'],
+      },
+      {
+        title: 'MASTER.DISTRICTS',
+        href: ['/district'],
+      },
+      {
+        title: 'MASTER.BLOCKS',
+        href: ['/block'],
+      },
+    ],
+  },
+  {
+    title: 'SIDEBAR.MANAGE_NOTIFICATION',
+    icon: centerIcon,
+    href: ['/notification-templates'],
+  },
+  {
+    title: 'SIDEBAR.SUPPORT_REQUEST',
+    icon: support,
+    href: ['/support-request'],
+  },
+  ...(isActiveYear
+    ? [
+        {
+          title: 'SIDEBAR.COURSE_PLANNER',
+          icon: coursePlannerIcon,
+          href: [
+            '/course-planner',
+            '/stateDetails',
+            '/subjectDetails',
+            '/importCsv',
+            '/resourceList',
+            '/play/content/[identifier]',
+          ],
+        },
+      ]
+    : []),
+  ...(isActiveYear
+    ? [
+        {
+          title: 'SIDEBAR.WORKSPACE',
+          icon: dashboardIcon,
+          href: ['/workspace', '/course-hierarchy/[identifier]'],
+        },
+      ]
+    : []),
+];
+
 export const getFilteredMenuItems = () => {
   if (typeof window !== 'undefined' && window.localStorage) {
     const adminInfo = localStorage.getItem('adminInfo');
@@ -20,122 +118,11 @@ export const getFilteredMenuItems = () => {
       userInfo = JSON.parse(adminInfo || '{}');
     }
 
-    const Menuitems = [
-      {
-        title: 'SIDEBAR.CENTERS',
-        icon: centerIcon,
-        href: ['/centers'],
-      },
-      {
-        title: 'PROGRAM_MANAGEMENT.PROGRAMS',
-        icon: programIcon,
-        href: ['/programs'],
-      },
-      {
-        title: 'SIDEBAR.MANAGE_USERS',
-        icon: userIcon,
-        subOptions:
-          userInfo?.tenantData[0]?.tenantName === 'Second Chance Program'
-            ? [
-                {
-                  title: 'SIDEBAR.TEAM_LEADERS',
-                  href: '/team-leader',
-                },
-                {
-                  title: 'SIDEBAR.FACILITATORS',
-                  href: '/facilitator',
-                },
-                {
-                  title: 'SIDEBAR.LEARNERS',
-                  href: '/learners',
-                },
-              ]
-            : [
-                {
-                  title: 'SIDEBAR.MENTOR',
-                  href: '/mentor',
-                },
-                {
-                  title: 'SIDEBAR.MENTOR_LEADER',
-                  href: '/mentor-leader',
-                },
-              ],
-      },
-      {
-        title: 'SIDEBAR.CERTIFICATE_ISSUANCE',
-        icon: certificateIcon,
-        href: ['/certificate-issuance'],
-      },
-      {
-        title: 'MASTER.MASTER',
-        icon: masterIcon,
-        subOptions: [
-          {
-            title: 'MASTER.STATE',
-            href: ['/state'],
-          },
-          {
-            title: 'MASTER.DISTRICTS',
-            href: ['/district'],
-          },
-          {
-            title: 'MASTER.BLOCKS',
-            href: ['/block'],
-          },
-        ],
-      },
-      {
-        title: 'SIDEBAR.MANAGE_NOTIFICATION',
-        icon: centerIcon,
-        href: ['/notification-templates'],
-      },
-      {
-        title: 'SIDEBAR.SUPPORT_REQUEST',
-        icon: support,
-        href: ['/support-request'],
-      },
-      ...(isActiveYear
-        ? [
-            {
-              title: 'SIDEBAR.COURSE_PLANNER',
-              icon: coursePlannerIcon,
-              href: [
-                '/course-planner',
-                '/stateDetails',
-                '/subjectDetails',
-                '/importCsv',
-                '/resourceList',
-                '/play/content/[identifier]',
-              ],
-            },
-          ]
-        : []),
-      ...(isActiveYear
-        ? [
-            {
-              title: 'SIDEBAR.WORKSPACE',
-              icon: dashboardIcon,
-              href: ['/workspace', '/course-hierarchy/[identifier]'],
-            },
-          ]
-        : []),
-    ];
-
-    if (
-      userInfo?.role === Role.ADMIN &&
-      userInfo?.tenantData[0]?.tenantName === 'YouthNet'
-    ) {
-      return Menuitems.filter(
-        (item) =>
-          item.title === 'SIDEBAR.MANAGE_USERS' ||
-          item.title === 'SIDEBAR.SUPPORT_REQUEST'
-      );
-    }
-
     if (userInfo?.role === Role.SCTA || userInfo?.role === Role.CCTA) {
-      if (userInfo?.tenantData[0]?.tenantName !== 'Second Chance Program') {
+      if (userInfo?.tenantData[0]?.tenantName != 'Second Chance Program') {
         return Menuitems.filter((item) => item.title === 'SIDEBAR.WORKSPACE');
       }
+      // For SCTA and CCTA, show only Course Planner and Workspace
       return Menuitems.filter(
         (item) =>
           item.title === 'SIDEBAR.COURSE_PLANNER' ||
@@ -146,8 +133,34 @@ export const getFilteredMenuItems = () => {
 
     if (
       userInfo?.role === Role.ADMIN &&
+      userInfo?.tenantData[0]?.tenantName === 'YouthNet'
+    ) {
+      return Menuitems.filter(
+        (item) =>
+          item.title === 'SIDEBAR.MANAGE_USERS' ||
+          item.title === 'SIDEBAR.SUPPORT_REQUEST'
+      )
+        .map((item) => {
+          if (item.title === 'SIDEBAR.MANAGE_USERS' && item.subOptions) {
+            return {
+              ...item,
+              subOptions: item.subOptions.filter(
+                (subItem) =>
+                  subItem.title === 'SIDEBAR.MENTOR' ||
+                  subItem.title === 'SIDEBAR.MENTOR_LEADER'
+              ),
+            };
+          }
+          return item;
+        })
+        .filter((item) => item.subOptions?.length || !item.subOptions);
+    }
+
+    if (
+      userInfo?.role === Role.ADMIN &&
       userInfo?.tenantData[0]?.tenantName === 'Second Chance Program'
     ) {
+      // Exclude Course Planner and Workspace for Admin and Central Admin
       return Menuitems.filter(
         (item) =>
           item.title !== 'SIDEBAR.COURSE_PLANNER' &&
@@ -156,29 +169,24 @@ export const getFilteredMenuItems = () => {
           item.title !== 'SIDEBAR.MANAGE_NOTIFICATION'
       );
     }
-
     if (
       (userInfo?.role === Role.ADMIN ||
         userInfo?.role === Role.CENTRAL_ADMIN) &&
       userInfo?.tenantData[0]?.tenantName === 'Second Chance Program'
     ) {
-      if (userInfo?.role === Role.CENTRAL_ADMIN) {
-        return Menuitems.filter(
-          (item) =>
-            item.title !== 'SIDEBAR.COURSE_PLANNER' &&
-            item.title !== 'SIDEBAR.WORKSPACE' &&
-            item.title !== 'SIDEBAR.CENTERS' &&
-            item.title !== 'SIDEBAR.MANAGE_USERS' &&
-            item.title !== 'SIDEBAR.CERTIFICATE_ISSUANCE'
-        );
-      }
+      // Exclude Course Planner and Workspace for Admin and Central Admin
       return Menuitems.filter(
         (item) =>
           item.title !== 'SIDEBAR.COURSE_PLANNER' &&
-          item.title !== 'SIDEBAR.WORKSPACE'
+          item.title !== 'SIDEBAR.WORKSPACE' &&
+          item.title !== 'SIDEBAR.CENTERS' &&
+          item.title !== 'SIDEBAR.MANAGE_USERS' &&
+          item.title !== 'SIDEBAR.CERTIFICATE_ISSUANCE'
       );
     }
 
     return Menuitems;
   }
 };
+
+export default Menuitems;
