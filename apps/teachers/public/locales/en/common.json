@@ -150,7 +150,9 @@
     "MORE_THAN": "More than {{range}} %",
     "BETWEEN": "Between {{lowerLimit}} - {{upperLimit}} %",
     "LESS_THAN": "Less than {{range}} %",
-    "MODIFY_CENTER_ATTENDANCE": "Modify Center Attendance"
+    "MODIFY_CENTER_ATTENDANCE": "Modify Center Attendance",
+    "NO_VILLAGES": "No Villages",
+    "ALL_VILLAGES": "All Villages"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
