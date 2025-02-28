@@ -16,7 +16,7 @@ export interface userListParam {
     status?: string[];
     states?: string;
     district?: string[];
-    blocks?: string;
+    block?: string[];
     fromDate?:string;
     toDate?:string;
     village?:string[]
