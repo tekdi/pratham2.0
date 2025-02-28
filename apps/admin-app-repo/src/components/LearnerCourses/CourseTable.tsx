@@ -92,7 +92,18 @@ const CourseTable: React.FC = () => {
           'success'
         );
 
-    } catch (e) {}
+    } catch (e) {
+      if (selectedRowData.courseStatus === Status.ISSUED) {
+        showToastMessage(
+          t('CERTIFICATES.REISSUED_CERTIFICATE_FAILED'),
+          'error'
+        );
+      } else
+        showToastMessage(
+          t('CERTIFICATES.ISSUED_CERTIFICATE_FAILED'),
+          'error'
+        );
+    }
     finally{
      setAlertIssueModal(false);
      }
@@ -112,7 +123,14 @@ const CourseTable: React.FC = () => {
       });
       setCertificateHtml(response);
       setShowCertificate(true);
-    } catch (e) {}
+    } catch (e) {
+      if (selectedRowData.courseStatus === Status.ISSUED) {
+        showToastMessage(
+          t('CERTIFICATES.RENDER_CERTIFICATE_FAILED'),
+          'error'
+        );
+      }
+    }
   };
 
   const CertificatePage: React.FC<{ htmlContent: string }> = ({ htmlContent }) => {
