@@ -183,3 +183,61 @@ export const debounce = <T extends (...args: any[]) => any>(
 
   return debounced;
 };
+
+
+export const getVillageUserCounts = (userData: any, villageData: any) => {
+  try {
+    console.log("User Data:", userData);
+    console.log("Village Data:", villageData);
+
+    if (!Array.isArray(villageData) || !Array.isArray(userData?.getUserDetails)) {
+      throw new Error("Invalid data format: villageData or userData.getUserDetails is not an array.");
+    }
+
+    const villageMap = villageData.reduce((acc: Record<number, string>, village: any) => {
+      if (village?.Id && village?.name) {
+        acc[village.Id] = village.name;
+      }
+      return acc;
+    }, {});
+
+    const villageCounts: Record<number, { totalUserCount: number; todaysTotalUserCount: number }> = {};
+
+    Object.keys(villageMap).forEach((villageId) => {
+      villageCounts[Number(villageId)] = { totalUserCount: 0, todaysTotalUserCount: 0 };
+    });
+
+    const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+
+    userData.getUserDetails.forEach((user: any) => {
+      if (!user?.customFields) return; // Skip if customFields is missing
+
+      const villageField = user.customFields.find((field: any) => field.label === "VILLAGE");
+
+      if (villageField?.selectedValues?.length > 0) {
+        const villageId = villageField.selectedValues[0].id;
+
+        if (villageMap[villageId]) {
+          villageCounts[villageId].totalUserCount += 1;
+
+          if (user.createdAt.startsWith(today)) {
+            villageCounts[villageId].todaysTotalUserCount += 1;
+          }
+        }
+      }
+    });
+
+    return Object.keys(villageCounts).map((villageId) => ({
+      Id: Number(villageId),
+      name: villageMap[Number(villageId)],
+      totalCount: villageCounts[Number(villageId)].totalUserCount,
+      newRegistrations: villageCounts[Number(villageId)].todaysTotalUserCount
+    }));
+  } catch (error) {
+    console.error("Error in getVillageUserCounts:", error);
+    return [];
+  }
+};
+
+
+

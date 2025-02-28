@@ -736,8 +736,9 @@
        "TOTAL_YOUTH":"Total Youth",
        "AS_OF_TODAY":"As of today",
        "AS_OF_LAST_SIX_MONTH":"As of last month",
-       "AS_OF_LAST_YEAR":"As of last year"
-
+       "AS_OF_LAST_YEAR":"As of last year",
+         "VILLAGE_NAME":"Village Name",
+    "TOTAL_COUNT_NEW_REGISTRATION":"Total Count (+ New Registrations today)"
 
   },
   "YOUTHNET_VOLUNTEERLIST": {

@@ -49,7 +49,7 @@ import { useDirection } from '../../hooks/useDirection';
 import GenericForm from '../../components/youthNet/GenericForm';
 import ExamplePage from '../../components/youthNet/BlockItem';
 import VillageSelector from '../../components/youthNet/VillageSelector';
-import { getLoggedInUserRole } from '../../utils/Helper';
+import { getLoggedInUserRole, getVillageUserCounts } from '../../utils/Helper';
 import { fetchUserList } from '../../services/youthNet/Dashboard/UserServices';
 import { Role } from '../../utils/app.constant';
 
@@ -72,7 +72,11 @@ const Index = () => {
   const [openReassignVillage, setOpenReassignVillage] = useState(false);
   const [addNew, setAddNew] = useState(false);
   const [count, setCount] = useState(0);
-  const [villlageCount, setVilllageCount] = useState(0);
+  const [villageCount, setVillageCount] = useState(0);
+  const [villageList, setVillageList] = useState<any>([]);
+  const [villageListWithUsers, setVillageListWithUsers] = useState<any>([]);
+
+
   const [openDelete, setOpenDelete] = useState(false);
   const [selectedMentorId, setSelectedMentorId] = useState('');
   const [districtData, setDistrictData] = useState<any>(null);
@@ -90,33 +94,45 @@ const Index = () => {
 
     getData();
   }, []);
+  const handleLocationClick = (Id: any, name: any) => {
+    router.push({
+      pathname: `/villageDetails/${name}`,
+      query: {  id:Id }
+  });  };
+  
   useEffect(() => {
     const getVillageYouthData = async (userId: any) => {
       let userDataString = localStorage.getItem('userData');
       let userData: any = userDataString ? JSON.parse(userDataString) : null;
       const blockResult = userData.customFields.find((item: any) => item.label === 'BLOCK');
-      console.log(userData)
+      console.log(villageList)
      const blockIds= blockResult?.selectedValues?.map((item: any) => item.id) || []
       const filters={
         block:blockIds,
-        role:Role.LEARNER
+        role:Role.LEARNER,
+        status: ["active"]
       }
 
       const result=await fetchUserList({filters})
       console.log(result)
+     const villagewithUser= getVillageUserCounts(result, villageList)
+     setVillageListWithUsers([...villagewithUser]);
+
+    
     };
 const userId=localStorage.getItem('userId')
-if(userId)
+if(userId && villageList.lenght!==0)
   getVillageYouthData(userId);
-  }, []);
+  }, [villageList]);
   useEffect(() => {
     setValue(YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() ? 1 : 2);
     let villageDataString = localStorage.getItem('villageData');
     let villageData: any = villageDataString
       ? JSON.parse(villageDataString)
       : null;
+      setVillageList(villageData)
     if (YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole())
-      setVilllageCount(villageData.length);
+      setVillageCount(villageData.length);
   }, []);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -659,8 +675,7 @@ if(userId)
                   marginLeft: '2rem',
                 }}
               >
-                {villlageCount} Villages
-              </Typography>
+                {villageCount}  {t(`YOUTHNET_DASHBOARD.VILLAGES`)}</Typography>
 
               {/* <Box
                 sx={{
@@ -695,8 +710,8 @@ if(userId)
                 }}
                 className="one-line-text"
               >
-                Village Name
-              </Typography>
+             {t(`YOUTHNET_DASHBOARD.VILLAGES`)}
+           </Typography>
 
               <Typography
                 sx={{
@@ -706,7 +721,7 @@ if(userId)
                   pr: '20px',
                 }}
               >
-                Total Count (+ New Registrations today)
+                {t(`YOUTHNET_DASHBOARD.TOTAL_COUNT_NEW_REGISTRATION`)}
               </Typography>
             </Box>
             <Box
@@ -715,7 +730,12 @@ if(userId)
                 mt: '15px',
               }}
             >
-              <UserList layout="list" users={villageList} />
+    {villageListWithUsers.length!==0 ?
+     (<UserList layout="list" users={villageListWithUsers} onUserClick={handleLocationClick} />):
+     <Loader showBackdrop={true} />
+
+     }
+
             </Box>
           </>
         )}

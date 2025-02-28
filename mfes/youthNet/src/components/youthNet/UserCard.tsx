@@ -28,11 +28,12 @@ type UserCardProps = {
   showMore?: boolean;
   totalCount?: number;
   newRegistrations?: number;
-  onClick?: (userId: string) => void;
+  onClick?: (Id: string, name?:string) => void;
   onToggleClick?: (name: string) => void;
-  onUserClick?: (name: string) => void;
+  onUserClick?: ( name: string) => void;
   customFields?: any;
-  showAvtar?:any
+  showAvtar?:any;
+  Id?: any
 };
 
 const UserCard: React.FC<UserCardProps> = ({
@@ -53,11 +54,13 @@ const UserCard: React.FC<UserCardProps> = ({
   dob,
   customFields,
   onUserClick,
-  showAvtar
+  showAvtar,
+  Id
 }) => {
   const theme = useTheme<any>();
 
 const villageName=customFields?.find((item: any) => item.label === 'VILLAGE')?.selectedValues[0]?.value
+
   return (
     <Box
       display={'flex'}
@@ -109,9 +112,9 @@ const villageName=customFields?.find((item: any) => item.label === 'VILLAGE')?.s
 
               padding: '5px 5px',
             }}
-            onClick={() => onClick?.(userId || "")}
+            onClick={() => { onClick?.(Id, name)}}
           >
-            {firstName && lastName ? `${firstName} ${lastName}` : firstName}
+            {name}
           </Typography>
           <Box display={'flex'} justifyContent={'space-between'} width={'100%'}>
             <Box sx={{ display: 'flex', gap: '8px' }}>
@@ -153,7 +156,7 @@ const villageName=customFields?.find((item: any) => item.label === 'VILLAGE')?.s
                           : theme.palette.success.main,
                     }}
                   >
-                    (+{newRegistrations})
+                    (^{newRegistrations})
                   </span>
                 )}
               </Typography>
@@ -179,23 +182,23 @@ type UserListProps = {
   users: UserCardProps[];
   layout?: 'list' | 'grid';
   onToggleUserClick?: (name: string) => void;
-  onUserClick?: (name: string) => void
+  onUserClick?: (Id: string,name?: string) => void
 };
 
 export const UserList: React.FC<UserListProps> = ({
   users,
   layout = 'grid',
   onToggleUserClick,
+  onUserClick
 }) => {
   console.log(users)
     const router = useRouter();
-
-  const onUserClick=(userId: any)=>
-    {
-      console.log(userId)
-      router.push(`/user-profile/${userId}`);
+  // const onUserClick=(userId: any)=>
+  //   {
+  //     console.log(userId)
+  //     router.push(`/user-profile/${userId}`);
   
-    }
+  //   }
   return layout === 'grid' ? (
     <List>
       <Grid container spacing={2}>
