@@ -20,7 +20,7 @@ type UserCardProps = {
   //showAvtar?: boolean;
   age?: string | number;
   dob?: string;
-  userId:string;
+  userId?:string;
   village?: string;
   image?: string;
   joinOn?: string;
@@ -30,7 +30,9 @@ type UserCardProps = {
   newRegistrations?: number;
   onClick?: (userId: string) => void;
   onToggleClick?: (name: string) => void;
-  customFields?: any
+  onUserClick?: (name: string) => void;
+  customFields?: any;
+  showAvtar?:any
 };
 
 const UserCard: React.FC<UserCardProps> = ({
@@ -49,7 +51,9 @@ const UserCard: React.FC<UserCardProps> = ({
   firstName,
   lastName,
   dob,
-  customFields
+  customFields,
+  onUserClick,
+  showAvtar
 }) => {
   const theme = useTheme<any>();
 
@@ -105,7 +109,7 @@ const villageName=customFields?.find((item: any) => item.label === 'VILLAGE')?.s
 
               padding: '5px 5px',
             }}
-            onClick={() => onClick?.(userId)}
+            onClick={() => onClick?.(userId || "")}
           >
             {firstName && lastName ? `${firstName} ${lastName}` : firstName}
           </Typography>
@@ -175,6 +179,7 @@ type UserListProps = {
   users: UserCardProps[];
   layout?: 'list' | 'grid';
   onToggleUserClick?: (name: string) => void;
+  onUserClick?: (name: string) => void
 };
 
 export const UserList: React.FC<UserListProps> = ({

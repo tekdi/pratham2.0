@@ -1,4 +1,4 @@
-import { Role, RoleId } from "@/utils/app.constant";
+import { Role, RoleId, youthNetTenantName } from "@/utils/app.constant";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
@@ -45,11 +45,11 @@ const RouteGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const user = JSON.parse(adminInfo);
 
     const allowedPaths = ["/workspace","/course-planner", "/subjectDetails","/stateDetails" ];
-    const notAllowedPathsForCentralAdmin = ["/team-leader","/faciliator", "/learners","/centers" ];
+    const notAllowedPathsForCentralAdmin = ["/team-leader", "/faciliator", "/learners", "/centers", "/certificate-issuance", "/mentor", "/mentor-leader"  ];
     
     const isWorkspaceContent = router.pathname.startsWith("/workspace");
     const coursePlannerPaths = [
-      "/course-planner",
+      // "/course-planner",
       "/subjectDetails",
       "/stateDetails",
       "/upload-editor",
@@ -65,10 +65,31 @@ const RouteGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       "/course-hierarchy"
     ];
 
-    const youthNetAllowed = [
-      "/mentor",
-      "/mentor-leader",
-      "/support-request"
+    // const youthNetAllowed = [
+    //   "/mentor",
+    //   "/mentor-leader",
+    //   "/support-request"
+    // ];
+
+    const youthNetNotAllowed = [
+      '/centers',
+      '/programs',
+      '/team-leader',
+      '/faciliator',
+      '/learners',
+      '/certificate-issuance',
+      '/state',
+      '/district',
+      '/block',
+      '/notification-templates',
+      '/course-planner',
+      '/stateDetails',
+      '/subjectDetails',
+      '/importCsv',
+      '/resourceList',
+      '/play/content/[identifier]',
+      '/workspace',
+      '/course-hierarchy/[identifier]'
     ];
 
 
@@ -111,21 +132,21 @@ const RouteGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     
 
     if (
-      (user.role === Role.ADMIN || user.role === Role.CENTRAL_ADMIN) &&
-      user?.tenantData[0]?.tenantName === "Second Chance Program" &&
-      (router.pathname === "/mentor" || youthNetAllowed.includes(router.pathname))
+      user.role === Role.ADMIN &&
+      user?.tenantData[0]?.tenantName === youthNetTenantName.YOUTHNET &&
+      youthNetNotAllowed.some(route => router.pathname.startsWith(route))
     ) {
       router.push("/unauthorized");
     }
 
-    if ((((user.role === Role.ADMIN && user?.tenantData[0]?.tenantName == "Second Chance Program") || (user.role === Role.CENTRAL_ADMIN &&  user?.tenantData[0]?.tenantName == "Second Chance Program")) && (allowedPaths.includes(router.pathname) || isWorkspaceContent || isCoursePlannerContent)) ||  (user.role === Role.ADMIN && (router.pathname === "/programs" ||router.pathname === "/notification-templates" ))) {
+    if ((((user.role === Role.ADMIN && user?.tenantData[0]?.tenantName == youthNetTenantName.SECOND_CHANCE_PROGRAM) || (user.role === Role.CENTRAL_ADMIN && user?.tenantData[0]?.tenantName == youthNetTenantName.SECOND_CHANCE_PROGRAM)) && (allowedPaths.includes(router.pathname) || isWorkspaceContent || isCoursePlannerContent)) || (user.role === Role.ADMIN && (router.pathname === "/programs" || router.pathname === "/notification-templates"))) {
     
       if (router.pathname !== "/login" && router.pathname !== "/logout" && router.pathname !== "/edit-password") {
 
         router.push("/unauthorized");
       }
     }
-    if((user.role === Role.CENTRAL_ADMIN  && user?.tenantData[0]?.tenantName == "Second Chance Program") && notAllowedPathsForCentralAdmin.includes(router.pathname))
+    if((user.role === Role.CENTRAL_ADMIN  && user?.tenantData[0]?.tenantName == youthNetTenantName.SECOND_CHANCE_PROGRAM) && notAllowedPathsForCentralAdmin.includes(router.pathname))
     {
       if (router.pathname !== "/login" && router.pathname !== "/logout" && router.pathname !== "/edit-password") {
 

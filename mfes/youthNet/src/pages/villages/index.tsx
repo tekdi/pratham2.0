@@ -49,13 +49,18 @@ import { useDirection } from '../../hooks/useDirection';
 import GenericForm from '../../components/youthNet/GenericForm';
 import ExamplePage from '../../components/youthNet/BlockItem';
 import VillageSelector from '../../components/youthNet/VillageSelector';
+import { getLoggedInUserRole } from '../../utils/Helper';
+import { fetchUserList } from '../../services/youthNet/Dashboard/UserServices';
+import { Role } from '../../utils/app.constant';
 
 const Index = () => {
   const { isRTL } = useDirection();
   const { t } = useTranslation();
   const theme = useTheme<any>();
   const router = useRouter();
-  const [value, setValue] = useState<number>(1);
+  const [value, setValue] = useState<number>(
+    YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() ? 1 : 2
+  );
   const [searchInput, setSearchInput] = useState('');
   const [toggledUser, setToggledUser] = useState('');
   const [openMentorDrawer, setOpenMentorDrawer] = useState(false);
@@ -67,10 +72,12 @@ const Index = () => {
   const [openReassignVillage, setOpenReassignVillage] = useState(false);
   const [addNew, setAddNew] = useState(false);
   const [count, setCount] = useState(0);
-
+  const [villlageCount, setVilllageCount] = useState(0);
   const [openDelete, setOpenDelete] = useState(false);
-  const [selectedValue, setSelectedValue] = useState('');
+  const [selectedMentorId, setSelectedMentorId] = useState('');
   const [districtData, setDistrictData] = useState<any>(null);
+  const [selectedValue, setSelectedValue] = useState<any>();
+
   const [blockData, setBlockData] = useState<any>(null);
 
   useEffect(() => {
@@ -82,6 +89,34 @@ const Index = () => {
     };
 
     getData();
+  }, []);
+  useEffect(() => {
+    const getVillageYouthData = async (userId: any) => {
+      let userDataString = localStorage.getItem('userData');
+      let userData: any = userDataString ? JSON.parse(userDataString) : null;
+      const blockResult = userData.customFields.find((item: any) => item.label === 'BLOCK');
+      console.log(userData)
+     const blockIds= blockResult?.selectedValues?.map((item: any) => item.id) || []
+      const filters={
+        block:blockIds,
+        role:Role.LEARNER
+      }
+
+      const result=await fetchUserList({filters})
+      console.log(result)
+    };
+const userId=localStorage.getItem('userId')
+if(userId)
+  getVillageYouthData(userId);
+  }, []);
+  useEffect(() => {
+    setValue(YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() ? 1 : 2);
+    let villageDataString = localStorage.getItem('villageData');
+    let villageData: any = villageDataString
+      ? JSON.parse(villageDataString)
+      : null;
+    if (YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole())
+      setVilllageCount(villageData.length);
   }, []);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -181,7 +216,7 @@ const Index = () => {
   ];
 
   const handleRadioChange = (value: string) => {
-    setSelectedValue(value);
+   // setSelectedValue(value);
   };
 
   const formFields = [
@@ -248,7 +283,7 @@ const Index = () => {
               },
             }}
           >
-            {YOUTHNET_USER_ROLE.MENTOR_LEAD === TENANT_DATA.LEADER && (
+            {YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() && (
               <Tab value={1} label={t('YOUTHNET_USERS_AND_VILLAGES.MENTORS')} />
             )}
 
@@ -259,7 +294,7 @@ const Index = () => {
       </Box>
 
       <Box>
-        {value === 1 && (
+        {value === 1 && YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() && (
           <>
             <Box
               display={'flex'}
@@ -338,7 +373,7 @@ const Index = () => {
                   {t('YOUTHNET_USERS_AND_VILLAGES.MENTORS')}
                 </Typography>
 
-                <Box
+                {/* <Box
                   sx={{
                     display: 'flex',
                     alignItems: 'center',
@@ -358,7 +393,7 @@ const Index = () => {
                     {t('YOUTHNET_USERS_AND_VILLAGES.CSV')}
                   </Typography>
                   <DownloadIcon />
-                </Box>
+                </Box> */}
               </Box>
             </Box>
             <Box
@@ -550,7 +585,7 @@ const Index = () => {
       <Box>
         {value === 2 && (
           <>
-            {YOUTHNET_USER_ROLE.MENTOR_LEAD === TENANT_DATA.LEADER && (
+            {YOUTHNET_USER_ROLE.MENTOR_LEAD === getLoggedInUserRole() && (
               <Box
                 display={'flex'}
                 flexDirection={'row'}
@@ -608,14 +643,14 @@ const Index = () => {
               />
               <SortBy />
             </Box>
-            <Box>
+            {/* <Box>
               <YouthAndVolunteers
                 selectOptions={[
                   { label: 'As of today, 5th Sep', value: 'today' },
                   { label: 'As of yesterday, 4th Sep', value: 'yesterday' },
                 ]}
               />
-            </Box>
+            </Box> */}
             <Box display={'flex'} justifyContent={'space-between'}>
               <Typography
                 sx={{
@@ -624,10 +659,10 @@ const Index = () => {
                   marginLeft: '2rem',
                 }}
               >
-                52 Villages
+                {villlageCount} Villages
               </Typography>
 
-              <Box
+              {/* <Box
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
@@ -647,7 +682,7 @@ const Index = () => {
                   CSV
                 </Typography>
                 <DownloadIcon />
-              </Box>
+              </Box> */}
             </Box>
             <Box display={'flex'} mt={2} justifyContent={'space-between'}>
               <Typography
