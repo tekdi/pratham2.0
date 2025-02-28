@@ -69,38 +69,6 @@ export const genericEditorSaveFormResponse = {
                         "placeholder": "Enter Keywords",
                         "required": false,
                         "visible": true
-                    },
-                    {
-                        "code": "primaryUser",
-                        "dataType": "list",
-                        "description": "Primary User",
-                        "editable": true,
-                        "index": 5,
-                        "inputType": "multiselect",
-                        "label": "Primary User",
-                        "name": "Primary User",
-                        "range": [
-                            {
-                                "key": "Parents",
-                                "name": "Parents"
-                            },
-                            {
-                                "key": "Educators",
-                                "name": "Educators"
-                            },
-                            {
-                                "key": "Children",
-                                "name": "Children"
-                            },
-                            {
-                                "key": "Volunteer",
-                                "name": "Volunteer"
-                            }
-                        ],
-                        "placeholder": "Select Primary User",
-                        "renderingHints": {},
-                        "required": false,
-                        "visible": true
                     }
                 ]
             },
@@ -187,37 +155,37 @@ export const genericEditorReviewFormResponse = {
                         "visible": true
                     },
                     {
-                        "code": "learningCategory",
+                        "code": "domain",
                         "visible": true,
                         "depends": [
-                            "learningCategorySubset"
+                            "subDomain"
                         ],
                         "editable": true,
-                        "dataType": "text",
+                        "dataType": "list",
                         "renderingHints": {},
-                        "description": "Learning Category",
+                        "description": "Domain",
                         "index": 5,
-                        "label": "Learning Category",
+                        "label": "Domain",
                         "required": true,
-                        "name": "Learning Category",
-                        "inputType": "select",
-                        "placeholder": "Select Learning Category"
+                        "name": "Domain",
+                        "inputType": "multiselect",
+                        "placeholder": "Select Domain"
                     },
                     {
-                        "code": "learningCategorySubset",
+                        "code": "subDomain",
                         "visible": true,
                         "depends": [
                         ],
                         "editable": true,
-                        "dataType": "text",
+                        "dataType": "list",
                         "renderingHints": {},
-                        "description": "Learning Category Subset",
+                        "description": "Sub Domain",
                         "index": 6,
-                        "label": "Learning Category Subset",
+                        "label": "Sub Domain",
                         "required": true,
-                        "name": "Learning Category Subset",
-                        "inputType": "select",
-                        "placeholder": "Learning Category Subset"
+                        "name": "Sub Domain",
+                        "inputType": "multiselect",
+                        "placeholder": "Sub Domain"
                     },
                     {
                         "code": "targetAgeGroup",
@@ -230,32 +198,32 @@ export const genericEditorReviewFormResponse = {
                         "name": "Target Age group",
                         "range": [
                             {
-                                "key": "0-3 Years",
-                                "name": "0-3 Years"
+                                "key": "0-3 yrs",
+                                "name": "0-3 yrs"
                             },
                             {
-                                "key": "3-6 Years",
-                                "name": "3-6 Years"
+                                "key": "3-6 yrs",
+                                "name": "3-6 yrs"
                             },
                             {
-                                "key": "6-8 Years",
-                                "name": "6-8 Years"
+                                "key": "6-8 yrs",
+                                "name": "6-8 yrs"
                             },
                             {
-                                "key": "8-11 Years",
-                                "name": "8-11 Years"
+                                "key": "8-11 yrs",
+                                "name": "8-11 yrs"
                             },
                             {
-                                "key": "11-14 Years",
-                                "name": "11-14 Years"
+                                "key": "11-14 yrs",
+                                "name": "11-14 yrs"
                             },
                             {
-                                "key": "14-18 Years",
-                                "name": "14-18 Years"
+                                "key": "14-18 yrs",
+                                "name": "14-18 yrs"
                             },
                             {
-                                "key": "18 and above",
-                                "name": "18 and above"
+                                "key": "18 yrs +",
+                                "name": "18 yrs +"
                             }
                         ],
                         "placeholder": "Target Age group",
@@ -274,20 +242,16 @@ export const genericEditorReviewFormResponse = {
                         "name": "Primary User",
                         "range": [
                             {
-                                "key": "Parents",
-                                "name": "Parents"
+                                "key": "Parents/Care givers",
+                                "name": "Parents/Care givers"
                             },
                             {
                                 "key": "Educators",
                                 "name": "Educators"
                             },
                             {
-                                "key": "Children",
-                                "name": "Children"
-                            },
-                            {
-                                "key": "Volunteer",
-                                "name": "Volunteer"
+                                "key": "Learners/Children",
+                                "name": "Learners/Children"
                             }
                         ],
                         "placeholder": "Select Primary User",
@@ -296,14 +260,14 @@ export const genericEditorReviewFormResponse = {
                         "visible": true
                     },
                     {
-                        "code": "mediumOfLearning",
+                        "code": "contentLanguage",
                         "dataType": "text",
-                        "description": "Medium of Learning",
+                        "description": "Content Language",
                         "editable": true,
                         "index": 8,
                         "inputType": "select",
-                        "label": "Medium of Learning",
-                        "name": "Medium of Learning",
+                        "label": "Content Language",
+                        "name": "Content Language",
                         "range": [
                             {
                                 "key": "Hindi",
@@ -370,52 +334,48 @@ export const genericEditorReviewFormResponse = {
                                 "name": "Kashmiri"
                             }
                         ],
-                        "placeholder": "Medium of Learning",
+                        "placeholder": "Content Language",
                         "renderingHints": {},
                         "required": false,
                         "visible": true
                     },
                     {
-                        "code": "isForOpenSchool",
-                        "dataType": "text",
-                        "description": "Indicate if this should be visible on open school",
-                        "editable": true,
-                        "index": 9,
-                        "inputType": "select",
-                        "label": "Show on open school?",
-                        "name": "Open School Visibility",
-                        "range": [
-                            {
-                                "key": "Yes",
-                                "name": "Yes"
-                            },
-                            {
-                                "key": "No",
-                                "name": "No"
-                            }
-                        ],
-                        "placeholder": "Please select an option",
-                        "renderingHints": {},
-                        "required": true,
-                        "visible": true
-                    },
-                    {
                         "code": "program",
-                        "dataType": "text",
+                        "dataType": "list",
                         "description": "Program",
                         "editable": true,
                         "index": 10,
-                        "inputType": "select",
+                        "inputType": "multiselect",
                         "label": "Program",
                         "name": "Program",
                         "range": [
                             {
-                                "name": "Second Chance",
-                                "Value": "secondchance"
+                                "name": "Early Years",
+                                "Value": "Early Years"
                             },
                             {
-                                "name": "Youthnet",
-                                "value": "youthnet"
+                                "name": "TaRL(Elementary Education)",
+                                "Value": "TaRL(Elementary Education)"
+                            },
+                            {
+                                "name": "SCP",
+                                "Value": "SCP"
+                            },
+                            {
+                                "name": "YouthNet",
+                                "value": "YouthNet"
+                            },
+                            {
+                                "name": "Skilling Other",
+                                "value": "Skilling Other"
+                            },
+                            {
+                                "name": "Open School",
+                                "value": "Open School"
+                            },
+                            {
+                              "name": "Other",
+                              "value": "Other"
                             }
                         ],
                         "placeholder": "Please select an option",

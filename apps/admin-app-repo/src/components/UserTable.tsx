@@ -50,6 +50,7 @@ import {
   capitalizeFirstLetterOfEachWordInArray,
   firstLetterInUpperCase,
   getUserFullName,
+  transformLabel,
 } from "../utils/Helper";
 import CommonUserModal from "./CommonUserModal";
 import ReassignCenterModal from "./ReassignCenterModal";
@@ -830,9 +831,9 @@ const UserTable: React.FC<UserTableProps> = ({
           filters: {
             // "type":"COHORT",
             status: ["active"],
-            states: rowData.stateCode,
-            districts: rowData.districtCode,
-            blocks: rowData.blockCode,
+            state: rowData.stateCode,
+            district: rowData.districtCode,
+            block: rowData.blockCode,
             // "name": selected[0]
           },
         };
@@ -849,7 +850,7 @@ const UserTable: React.FC<UserTableProps> = ({
       } else {
         const object = {
           controllingfieldfk: rowData.districtCode,
-          fieldName: "blocks",
+          fieldName: "block",
         };
         const response = await getStateBlockDistrictList(object);
 
@@ -1175,7 +1176,7 @@ const UserTable: React.FC<UserTableProps> = ({
         const object = {
           // "limit": 20,
           // "offset": 0,
-          fieldName: "states",
+          fieldName: "state",
         };
         // const response = await getStateBlockDistrictList(object);
         // const result = response?.result?.values;
@@ -1183,11 +1184,11 @@ const UserTable: React.FC<UserTableProps> = ({
           const admin = localStorage.getItem("adminInfo");
           if (admin) {
             const stateField = JSON.parse(admin).customFields.find(
-              (field: any) => field.label === "STATES"
+              (field: any) => field.label === "STATE"
             );
 
             if (!stateField.value.includes(",")) {
-              setSelectedState([stateField.value]);
+              setSelectedState([transformLabel(stateField.value)]);
               setSelectedStateCode(stateField.code);
 
               // setFilters({

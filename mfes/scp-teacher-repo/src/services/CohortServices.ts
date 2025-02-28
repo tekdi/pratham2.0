@@ -1,13 +1,14 @@
 import { CohortListParam, GetCohortSearchParams } from '@/utils/Interfaces';
 import { Status } from '@/utils/app.constant';
 import { get, post } from './RestClient';
+import API_ENDPOINTS from '@/utils/API/APIEndpoints';
 
 export const cohortList = async ({
   limit,
   offset,
   filters,
 }: CohortListParam): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/v1/cohort/search`;
+  const apiUrl: string = API_ENDPOINTS.cohortSearch
   try {
     const response = await post(apiUrl, { limit, offset, filters });
     return response?.data?.result;
@@ -18,7 +19,7 @@ export const cohortList = async ({
 };
 
 export const getCohortDetails = async (cohortId: string): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/v1/cohort/cohortHierarchy/${cohortId}`;
+  const apiUrl: string = API_ENDPOINTS.cohortHierarchy(cohortId)
   try {
     const response = await get(apiUrl);
     return response?.data?.result;
@@ -33,7 +34,7 @@ export const getCohortList = async (
   filters: { [key: string]: string } = {},
   isCustomFields: boolean = false
 ): Promise<any> => {
-  let apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/v1/cohort/mycohorts/${userId}?children=true`;
+  let apiUrl: string = API_ENDPOINTS.myCohorts(userId)
   const filterParams = new URLSearchParams(filters).toString();
   if (filterParams) {
     apiUrl += `&${filterParams}`;
@@ -63,7 +64,7 @@ export const getCohortList = async (
 };
 
 export const bulkCreateCohortMembers = async (payload: any): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/v1/cohortmember/bulkCreate`;
+  const apiUrl: string = API_ENDPOINTS.cohortMemberBulkCreate
   try {
     const response = await post(apiUrl, payload);
     return response.data;
@@ -78,7 +79,7 @@ export const getCohortSearch = async ({
   limit = 20,
   offset = 0,
 }: GetCohortSearchParams): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/v1/cohort/search`;
+  const apiUrl: string = API_ENDPOINTS.cohortSearch
 
   const data = {
     filters: {

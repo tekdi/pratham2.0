@@ -63,24 +63,24 @@ export const getInitials = (name: any) => {
     : words[0][0].toUpperCase();
 }
 
-export const getUserFullName = (user?: { firstName?: string, lastName: string, name?: string }): string => {
-  let userData;
-  if (user) {
-    userData = user;
-  } else {
-    userData = localStorage.getItem(Storage.USER_DATA);
-    userData = JSON.parse(userData || "{}");
-  }
+  export const getUserFullName = (user?: { firstName?: string, lastName: string, name?: string }): string => {
+    let userData;
+    if (user) {
+      userData = user;
+    } else {
+      userData = localStorage.getItem(Storage.USER_DATA);
+      userData = JSON.parse(userData || "{}");
+    }
 
-  if (userData?.firstName) {
-    const lastName = userData?.lastName || "";
-    return `${userData.firstName} ${lastName}`;
-  } else if (userData?.name) {
-    return userData.name;
-  }
+    if (userData?.firstName) {
+      const lastName = userData?.lastName || "";
+      return `${userData.firstName} ${lastName}`;
+    } else if (userData?.firstName) {
+      return userData.firstName;
+    }
 
-  return '';
-}
+    return '';
+  }
 
 export const getDeviceId = () => {
   return new Promise((resolve) => {
@@ -124,7 +124,7 @@ export const transformLabel = (label: string): string => {
   }
   return label
     .toLowerCase() // Convert to lowercase to standardize
-    .replace(/_/g, " ") // Replace underscores with spaces
+    .replace(/[_-]/g, " ") // Replace underscores and hyphens with spaces
     .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize the first letter of each word
 };
 
@@ -564,3 +564,18 @@ export const preserveLocalStorage = () => {
     }
   });
 };
+
+ export const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+};
+
+export const toPascalCase = (name: string | any) => {
+  if (typeof name !== 'string') {
+    return name;
+  }
+}

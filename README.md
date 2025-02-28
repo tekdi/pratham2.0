@@ -55,6 +55,29 @@ nx dev youthNet --port=4103 --verbose
 basePath : `http://localhost:4103/youthnet/`
 Port : `4103`
 
+### workspace
+
+Next JS, run:
+
+```sh
+nx dev workspace --port=4104 --verbose
+```
+
+basePath : `http://localhost:4104/workspace/`
+Port : `4104`
+
+### notification
+
+Next JS, run:
+
+```sh
+nx dev notification --port=4105 --verbose
+```
+
+basePath : `http://localhost:4105`
+Port : `4105`
+
+
 ##
 
 ## NX Command

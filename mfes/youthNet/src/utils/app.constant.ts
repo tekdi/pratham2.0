@@ -63,12 +63,20 @@ export enum Role {
   TEACHER = 'Teacher',
   TEAM_LEADER = 'Team Leader',
   ADMIN = 'Admin',
+  LEARNER='Learner',
+  INSTRUCTOR="Instructor"
 }
 
 export enum Status {
   DROPOUT = 'dropout',
   ACTIVE = 'active',
   ARCHIVED = 'archived',
+}
+export enum DateFilter
+{
+  THIS_MONTH="This month",
+  LAST_SIX_MONTHS="Last 6 months",
+  LAST_TWELEVE_MONTHS="Last 12 months"
 }
 
 export enum cohortHierarchy {

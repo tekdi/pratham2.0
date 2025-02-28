@@ -18,47 +18,21 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
-import { Role } from '../utils/app.constant';
-import { getLocalStoredUserRole } from '../services/LocalStorageService';
-const userRole = getLocalStoredUserRole();
+import logo from '/public/logo.png';
+import { Role } from '@workspace/utils/app.constant';
+import { getLocalStoredUserRole } from '@workspace/services/LocalStorageService';
+import { TENANT_DATA } from '@workspace/utils/app.constant';
+import TenantService from '@workspace/services/TenantService';
+const route = process.env.NEXT_PUBLIC_WORKSPACE_ROUTES;
 
-// Updated menu items with icons
-const menuItems = [
-  { text: 'Create', key: 'create', icon: <AddOutlinedIcon /> },
-  { text: 'Drafts', key: 'draft', icon: <CreateOutlinedIcon /> },
-  ...(userRole !== Role.CCTA
-    ? [
-        {
-          text: 'Submitted for Review',
-          key: 'submitted',
-          icon: <PreviewOutlinedIcon />,
-        },
-      ]
-    : []),
-  ...(userRole === Role.CCTA
-    ? [
-        {
-          text: 'Up for Review',
-          key: 'up-review',
-          icon: <PreviewOutlinedIcon />,
-        },
-      ]
-    : []),
-  {
-    text: 'My Published Contents',
-    key: 'publish',
-    icon: <OutlinedFlagOutlinedIcon />,
-  },
-  { text: 'All My Contents', key: 'allContents', icon: <AppsOutlinedIcon /> },
-  {
-    text: 'Discover Contents',
-    key: 'discover-contents',
-    icon: <ManageSearchIcon />,
-  },
-];
+let isAdmin: boolean;
+if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+  isAdmin = localStorage.getItem('adminInfo') ? true : false;
+}
 
 interface SidebarProps {
   selectedKey: string;
@@ -66,14 +40,60 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
+  const [userRole, setUserRole] = useState<Role | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [tenantName, setTenantName] = useState();
   const router = useRouter();
   const theme = useTheme<any>();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
+  useEffect(() => {
+    setUserRole(getLocalStoredUserRole());
+    const userData = localStorage.getItem('userData');
+    const tenant = userData ? JSON.parse(userData) : null;
+    setTenantName(tenant?.tenantData[0]?.tenantName);
+  }, []);
+
+  if (userRole === null) return null;
+
+  const menuItems = [
+    { text: 'Create', key: 'create', icon: <AddOutlinedIcon /> },
+    { text: 'Drafts', key: 'draft', icon: <CreateOutlinedIcon /> },
+    ...(userRole !== Role.CCTA
+      ? [
+          {
+            text: 'Submitted for Review',
+            key: 'submitted',
+            icon: <PreviewOutlinedIcon />,
+          },
+        ]
+      : []),
+    ...(userRole === Role.CCTA
+      ? [
+          {
+            text: 'Up for Review',
+            key: 'up-review',
+            icon: <PreviewOutlinedIcon />,
+          },
+        ]
+      : []),
+    {
+      text: 'My Published Contents',
+      key: 'publish',
+      icon: <OutlinedFlagOutlinedIcon />,
+    },
+    { text: 'All My Contents', key: 'allContents', icon: <AppsOutlinedIcon /> },
+    {
+      text: 'Discover Contents',
+      key: 'discover-contents',
+      icon: <ManageSearchIcon />,
+    },
+  ];
+
   const handleNavigation = (key: string) => {
     console.log(key);
     router.push(`/workspace/content/${key}`);
+    localStorage.setItem('selectedFilters', JSON.stringify([]));
     onSelect(key);
     if (isMobile) {
       setDrawerOpen(false); // Close drawer after selecting in mobile view
@@ -89,8 +109,9 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
       const userInfo = JSON.parse(localStorage.getItem('adminInfo') || '{}');
       console.log('userInfo', userInfo);
       if (userInfo?.role === Role.SCTA || userInfo?.role === Role.CCTA) {
-        router.push('/course-planner');
-      } else router.push('/');
+        // router.push("/course-planner");
+        window.parent.location.href = `${route}course-planner`;
+      } else window.parent.location.href = `${route}`;
     }
   };
 
@@ -119,20 +140,22 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
         justifyContent="space-between"
         paddingTop={'1rem'}
       >
-        <Box display="flex" alignItems="center">
-          <ListItemIcon>
-            <IconButton onClick={goBack}>
-              <ArrowBackIcon sx={{ color: theme.palette.warning['100'] }} />
-            </IconButton>
-          </ListItemIcon>
-          <Typography
-            variant="h2"
-            fontSize={'16px'}
-            sx={{ color: theme.palette.warning['100'], fontWeight: 500 }}
-          >
-            Back to Main Page
-          </Typography>
-        </Box>
+        {tenantName === TENANT_DATA.SECOND_CHANCE_PROGRAM && (
+      <Box display="flex" alignItems="center">
+        <ListItemIcon>
+          <IconButton onClick={goBack}>
+            <ArrowBackIcon sx={{ color: theme.palette.warning['100'] }} />
+          </IconButton>
+        </ListItemIcon>
+        <Typography
+          variant="h2"
+          fontSize={'16px'}
+          sx={{ color: theme.palette.warning['100'], fontWeight: 500 }}
+        >
+          Back to Main Page
+        </Typography>
+      </Box>
+       )}
         {isMobile && (
           <IconButton onClick={toggleDrawer}>
             <CloseIcon />
@@ -201,7 +224,11 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
       {isMobile ? (
         <>
           <MenuIcon
-            sx={{ margin: 2, cursor: 'pointer' }}
+            sx={{
+              margin: 2,
+              cursor: 'pointer',
+              color: isAdmin ? 'white' : 'black',
+            }}
             onClick={toggleDrawer}
           />
 

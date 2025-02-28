@@ -25,6 +25,7 @@ import { useRouter } from "next/router";
 import { Role, TelemetryEventType, metaTags } from "@/utils/app.constant";
 import useSubmittedButtonStore from "@/utils/useSharedState";
 import RouteGuard from "@/components/RouteGuard";
+import TenantService from "@/services/TenantService";
 
 function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -32,6 +33,10 @@ function App({ Component, pageProps }: AppProps) {
     (state: any) => state.setIsArchived
   );
   useEffect(() => {
+    const tenantId = localStorage.getItem('tenantId');
+    if (tenantId) {
+      TenantService.setTenantId(tenantId);
+    }
     telemetryFactory.init();
   }, []);
 

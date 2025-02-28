@@ -10,11 +10,17 @@ import {
 } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useTheme } from '@mui/material/styles';
+import { getAge } from '../../utils/Helper';
+import {  useRouter } from 'next/navigation';
 
 type UserCardProps = {
   name: string;
-  showAvtar?: boolean;
+  firstName?: string;
+  lastName?: string;
+  //showAvtar?: boolean;
   age?: string | number;
+  dob?: string;
+  userId?:string;
   village?: string;
   image?: string;
   joinOn?: string;
@@ -22,26 +28,36 @@ type UserCardProps = {
   showMore?: boolean;
   totalCount?: number;
   newRegistrations?: number;
-  onClick?: (name: string) => void;
+  onClick?: (userId: string) => void;
   onToggleClick?: (name: string) => void;
+  onUserClick?: (name: string) => void;
+  customFields?: any;
+  showAvtar?:any
 };
 
 const UserCard: React.FC<UserCardProps> = ({
   name,
+  userId,
   age,
   village,
   image,
   joinOn,
   isNew,
   showMore,
-  showAvtar,
   totalCount,
   newRegistrations,
   onClick,
   onToggleClick,
+  firstName,
+  lastName,
+  dob,
+  customFields,
+  onUserClick,
+  showAvtar
 }) => {
   const theme = useTheme<any>();
 
+const villageName=customFields?.find((item: any) => item.label === 'VILLAGE')?.selectedValues[0]?.value
   return (
     <Box
       display={'flex'}
@@ -56,7 +72,7 @@ const UserCard: React.FC<UserCardProps> = ({
       }}
     >
       <ListItem>
-        {showAvtar && (
+        {firstName && (
           <Avatar
             src={image}
             alt={name}
@@ -73,7 +89,7 @@ const UserCard: React.FC<UserCardProps> = ({
               boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
             }}
           >
-            {!image && name[0]}
+{!image && (firstName ? firstName.charAt(0).toUpperCase() : "") + (lastName ? lastName.charAt(0).toUpperCase() : "")}
           </Avatar>
         )}
         <Box
@@ -93,20 +109,20 @@ const UserCard: React.FC<UserCardProps> = ({
 
               padding: '5px 5px',
             }}
-            onClick={() => onClick?.(name)}
+            onClick={() => onClick?.(userId || "")}
           >
-            {name}
+            {firstName && lastName ? `${firstName} ${lastName}` : firstName}
           </Typography>
           <Box display={'flex'} justifyContent={'space-between'} width={'100%'}>
             <Box sx={{ display: 'flex', gap: '8px' }}>
-              {age ? (
+              {dob ? (
                 <Typography variant="body2" color="textSecondary">
-                  {age} y/o • {village || joinOn}
+                  {getAge(dob)} y/o • {villageName || joinOn}
                 </Typography>
               ) : (
-                village && (
+                villageName && (
                   <Typography variant="body2" color="textSecondary">
-                    {village || joinOn}
+                    {villageName || joinOn}
                   </Typography>
                 )
               )}
@@ -162,16 +178,24 @@ const UserCard: React.FC<UserCardProps> = ({
 type UserListProps = {
   users: UserCardProps[];
   layout?: 'list' | 'grid';
-  onUserClick?: (name: string) => void;
   onToggleUserClick?: (name: string) => void;
+  onUserClick?: (name: string) => void
 };
 
 export const UserList: React.FC<UserListProps> = ({
   users,
   layout = 'grid',
-  onUserClick,
   onToggleUserClick,
 }) => {
+  console.log(users)
+    const router = useRouter();
+
+  const onUserClick=(userId: any)=>
+    {
+      console.log(userId)
+      router.push(`/user-profile/${userId}`);
+  
+    }
   return layout === 'grid' ? (
     <List>
       <Grid container spacing={2}>

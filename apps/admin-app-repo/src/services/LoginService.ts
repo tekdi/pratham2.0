@@ -1,5 +1,6 @@
-import axios from "axios";
+import { API_ENDPOINTS } from '@/utils/API/APIEndpoints';
 import { get, post } from "./RestClient";
+import axios from 'axios';
 
 interface LoginParams {
   username: string;
@@ -14,10 +15,11 @@ export const login = async ({
   username,
   password,
 }: LoginParams): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/interface/v1/account/login`;
+  const apiUrl: string =  API_ENDPOINTS.accountLogin;
+  
 
   try {
-    const response = await axios.post(apiUrl, { username, password });
+    const response = await post(apiUrl, { username, password });
     return response?.data;
   } catch (error) {
     console.error("error in login", error);
@@ -28,7 +30,7 @@ export const login = async ({
 export const refresh = async ({
   refresh_token,
 }: RefreshParams): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/interface/v1/account/auth/refresh`;
+  const apiUrl: string = API_ENDPOINTS.authRefresh;
   try {
     const response = await post(apiUrl, { refresh_token });
     return response?.data;
@@ -37,9 +39,8 @@ export const refresh = async ({
     throw error;
   }
 };
-
 export const logout = async (refreshToken: string): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/interface/v1/account/auth/logout`;
+  const apiUrl: string = API_ENDPOINTS.authLogout;
   try {
     const response = await post(apiUrl, { refresh_token: refreshToken });
     return response;
@@ -50,23 +51,29 @@ export const logout = async (refreshToken: string): Promise<any> => {
 };
 
 export const getUserId = async (): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/interface/v1/user/auth`;
+  const apiUrl: string = API_ENDPOINTS.userAuth;
+
   try {
-    const token = localStorage.getItem("token");
-    const headers: Record<string, string> = {
-      Authorization: `Bearer ${token}`,
-    };
-    const response =   await axios.get(apiUrl,{headers});
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('Authorization token not found');
+    }
+
+    const response = await axios.get(apiUrl, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
     return response?.data?.result;
   } catch (error) {
-    console.error("error in fetching user details", error);
+    console.error('Error in fetching user details', error);
     throw error;
   }
 };
-
 export const resetPassword = async (
   newPassword: any): Promise<any> => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/interface/v1/user/reset-password`;
+  const apiUrl: string = API_ENDPOINTS.resetPassword;
   try {
     const response = await post(apiUrl, { newPassword });
     return response?.data;

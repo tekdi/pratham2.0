@@ -7,9 +7,23 @@ export enum Status {
 export enum ContentType {
   QUESTION_SET = "QuestionSet",
 }
+export enum Editor {
+  CONTENT = "content",
+  QUESTION_SET = "questionset",
+  COLLECTION="collection"
+}
+
+export enum Publish {
+ PUBLISH ='publish',
+ REJECT='reject'
+}
 export enum Role {
-  SCTA = "State Admin SCTA",
-  CCTA="Central Admin CCTA"
+  SCTA = "Content creator",
+  CCTA = "Content reviewer"
+}
+export enum ContentStatus {
+  PUBLISHED = "Published",
+  REJECTED="Rejected"
 }
 export const SortOptions = ["Modified On", "Created On"];
 export const StatusOptions = ["Live", "Review" ,  "Draft", "All"];
@@ -25,3 +39,7 @@ export const PrimaryCategoryValue = [
   "Practice Question Set",
   "Teacher Resource"
 ];
+
+export const TENANT_DATA = {
+  SECOND_CHANCE_PROGRAM: 'Second Chance Program',
+};

@@ -15,6 +15,8 @@ interface ProfileDetailsProps {
   mentorId?: string;
   gender?: string;
   age?: number;
+  dob?:string;
+  village?:string|null
 }
 
 const Profile: React.FC<ProfileDetailsProps> = ({
@@ -29,6 +31,8 @@ const Profile: React.FC<ProfileDetailsProps> = ({
   mentorId,
   gender,
   age,
+  dob,
+  village
 }) => {
   const { t } = useTranslation();
   const theme = useTheme<any>();
@@ -70,36 +74,11 @@ const Profile: React.FC<ProfileDetailsProps> = ({
           {emailId}
         </Typography>
 
-        <Typography
-          color={theme.palette.warning['500']}
-          sx={{ fontSize: '12px', fontWeight: 600, mt: 2 }}
-        >
-          {t('YOUTHNET_PROFILE.STATE_DISTRICT_BLOCK')}
-        </Typography>
-        <Typography
-          color={theme.palette.warning['A200']}
-          sx={{ fontSize: '16px', fontWeight: 400 }}
-          gutterBottom
-        >
-          {state}, {district}, {block}
-        </Typography>
+        
 
         <Grid container spacing={2}>
-          <Grid item xs={6}>
-            <Typography
-              color={theme.palette.warning['500']}
-              sx={{ fontSize: '12px', fontWeight: 600, mt: 2 }}
-            >
-              {t('YOUTHNET_PROFILE.DESIGNATION')}
-            </Typography>
-            <Typography
-              color={theme.palette.warning['A200']}
-              sx={{ fontSize: '16px', fontWeight: 400 }}
-            >
-              {designation}
-            </Typography>
-          </Grid>
-          <Grid item xs={6}>
+         
+          {/* <Grid item xs={6}>
             <Typography
               color={theme.palette.warning['500']}
               sx={{ fontSize: '12px', fontWeight: 600, mt: 2 }}
@@ -112,7 +91,7 @@ const Profile: React.FC<ProfileDetailsProps> = ({
             >
               {joinedOn}
             </Typography>
-          </Grid>
+          </Grid> */}
         </Grid>
 
         <Grid container spacing={2}>
@@ -135,6 +114,20 @@ const Profile: React.FC<ProfileDetailsProps> = ({
               color={theme.palette.warning['500']}
               sx={{ fontSize: '12px', fontWeight: 600, mt: 2 }}
             >
+              {t('YOUTHNET_PROFILE.DESIGNATION')}
+            </Typography>
+            <Typography
+              color={theme.palette.warning['A200']}
+              sx={{ fontSize: '16px', fontWeight: 400 }}
+            >
+              {designation}
+            </Typography>
+          </Grid>
+          {/* <Grid item xs={6}>
+            <Typography
+              color={theme.palette.warning['500']}
+              sx={{ fontSize: '12px', fontWeight: 600, mt: 2 }}
+            >
               {t('YOUTHNET_PROFILE.MENTOR_ID')}
             </Typography>
             <Typography
@@ -143,7 +136,7 @@ const Profile: React.FC<ProfileDetailsProps> = ({
             >
               {mentorId}
             </Typography>
-          </Grid>
+          </Grid> */}
         </Grid>
 
         <Grid container spacing={2}>
@@ -163,13 +156,30 @@ const Profile: React.FC<ProfileDetailsProps> = ({
               color={theme.palette.warning['500']}
               sx={{ fontSize: '12px', fontWeight: 600, mt: 2 }}
             >
-              {t('YOUTHNET_PROFILE.AGE')}
+              {t('YOUTHNET_PROFILE.DOB')}
             </Typography>
             <Typography sx={{ fontSize: '16px', fontWeight: 400 }}>
-              {age}
+              {dob}
             </Typography>
           </Grid>
+          <Grid item xs={6}>
+          <Typography
+          color={theme.palette.warning['500']}
+          sx={{ fontSize: '12px', fontWeight: 600, mt: 2 }}
+        >
+          {village?t('YOUTHNET_PROFILE.STATE_DISTRICT_BLOCK_VILLAGE') : t('YOUTHNET_PROFILE.STATE_DISTRICT_BLOCK')}
+        </Typography>
+        <Typography
+          color={theme.palette.warning['A200']}
+          sx={{ fontSize: '16px', fontWeight: 400 }}
+          gutterBottom
+        >
+           {village? village+" , ":""}{block}, {district},  {state}
+        </Typography>
+          </Grid>
+        
         </Grid>
+        
       </CardContent>
     </Card>
   );

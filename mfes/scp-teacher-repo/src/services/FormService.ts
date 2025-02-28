@@ -1,9 +1,10 @@
+import API_ENDPOINTS from '@/utils/API/APIEndpoints';
 import { deleteApi } from './RestClient';
 
 export const deleteFormFields = async (
   fieldValues: { fieldId: string; itemId: string }[]
 ): Promise<any> => {
-  const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/v1/fields/values/delete`;
+  const apiUrl = API_ENDPOINTS.deleteFieldValues
 
   try {
     const response = await deleteApi(apiUrl, { fieldValues }, {});
