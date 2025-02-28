@@ -1,33 +1,8 @@
-import dynamic from "next/dynamic";
 import React from "react";
-
-const SunbirdPdfPlayer = dynamic(
-  () => import("@workspace/components/players/SunbirdPdfPlayer"),
-  {
-    ssr: false,
-  }
-);
-
-const SunbirdVideoPlayer = dynamic(
-  () => import("@workspace/components/players/SunbirdVideoPlayer"),
-  {
-    ssr: false,
-  }
-);
-const SunbirdEpubPlayer = dynamic(
-  () => import("@workspace/components/players/SunbirdEpubPlayer"),
-  {
-    ssr: false,
-  }
-);
-
-const SunbirdQuMLPlayer = dynamic(
-  () => import("@workspace/components/players/SunbirdQuMLPlayer"),
-  {
-    ssr: false,
-  }
-);
-
+import SunbirdPdfPlayer from "@workspace/components/players/SunbirdPdfPlayer";
+import SunbirdVideoPlayer from "@workspace/components/players/SunbirdVideoPlayer";
+import SunbirdEpubPlayer from "@workspace/components/players/SunbirdEpubPlayer";
+import SunbirdQuMLPlayer from "@workspace/components/players/SunbirdQuMLPlayer";
 interface PlayerProps {
   playerConfig: any;
 }

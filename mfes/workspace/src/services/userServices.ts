@@ -3,6 +3,7 @@ import { getLocalStoredToken } from "./LocalStorageService";
 import { post , get} from "./RestClient";
 import axios from "axios";
 import TenantService from "./TenantService";
+import { Role } from "../utils/app.constant";
 export interface userListParam {
   limit?: number;
   //  page: number;
@@ -72,7 +73,7 @@ export const getUserDetailsInfo = async (
  export const fetchCCTAList = async() => {
     try{
         const filter={
-            role: "Central Content Team Associate (CCTA)"
+            role: Role.CCTA
         
         }  
         const response= await userList({
