@@ -1,17 +1,17 @@
 import { MenuItem, FormControl, Select, InputLabel } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 interface DropdownProps {
   name?: string;
-  values?: string[];
+  values?: any[];
   onSelect: (value: string) => void;
   defaultValue?: string;
 }
 
 const Dropdown: React.FC<DropdownProps> = ({
   name,
-  values,
+  values = [],
   onSelect,
   defaultValue = '',
 }) => {
@@ -22,7 +22,9 @@ const Dropdown: React.FC<DropdownProps> = ({
     setSelectedValue(value);
     onSelect(value);
   };
-
+  useEffect(() => {
+      setSelectedValue(defaultValue);
+  }, [defaultValue,]);
   return (
     <FormControl fullWidth>
       <InputLabel>{name}</InputLabel>
@@ -32,9 +34,9 @@ const Dropdown: React.FC<DropdownProps> = ({
         onChange={handleChange}
         IconComponent={KeyboardArrowDownIcon}
       >
-        {values?.map((value, index) => (
-          <MenuItem key={index} value={value}>
-            {value}
+        {values.map((user) => (
+          <MenuItem key={user.userId} value={user.userId}>
+            {user.firstName} {user.lastName}
           </MenuItem>
         ))}
       </Select>

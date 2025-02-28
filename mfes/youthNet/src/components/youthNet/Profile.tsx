@@ -15,7 +15,8 @@ interface ProfileDetailsProps {
   mentorId?: string;
   gender?: string;
   age?: number;
-  dob?:string
+  dob?:string;
+  village?:string|null
 }
 
 const Profile: React.FC<ProfileDetailsProps> = ({
@@ -30,7 +31,8 @@ const Profile: React.FC<ProfileDetailsProps> = ({
   mentorId,
   gender,
   age,
-  dob
+  dob,
+  village
 }) => {
   const { t } = useTranslation();
   const theme = useTheme<any>();
@@ -165,14 +167,14 @@ const Profile: React.FC<ProfileDetailsProps> = ({
           color={theme.palette.warning['500']}
           sx={{ fontSize: '12px', fontWeight: 600, mt: 2 }}
         >
-          {t('YOUTHNET_PROFILE.STATE_DISTRICT_BLOCK')}
+          {village?t('YOUTHNET_PROFILE.STATE_DISTRICT_BLOCK_VILLAGE') : t('YOUTHNET_PROFILE.STATE_DISTRICT_BLOCK')}
         </Typography>
         <Typography
           color={theme.palette.warning['A200']}
           sx={{ fontSize: '16px', fontWeight: 400 }}
           gutterBottom
         >
-          {state}, {district}, {block}
+           {village? village+" , ":""}{block}, {district},  {state}
         </Typography>
           </Grid>
         
