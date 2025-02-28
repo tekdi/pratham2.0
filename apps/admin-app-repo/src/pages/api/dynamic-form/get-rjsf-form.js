@@ -1,35 +1,27 @@
 export default function handler(req, res) {
   if (req.method === 'POST') {
     try {
-      const { fetchUrl, tenantid } = req.body;
+      const { readForm } = req.body;
 
-      const axios = require('axios');
+      if (readForm && readForm.length > 0) {
+        fetchFormFields(readForm).then((fields) => {
+          // console.log('fieldFromFunction!!!', fields);
 
-      let config = {
-        method: 'get',
-        maxBodyLength: Infinity,
-        url: fetchUrl,
-        headers: {
-          Accept: '*/*',
-          tenantid: tenantid,
-        },
-      };
-
-      axios
-        .request(config)
-        .then((response) => {
-          const { schema, uiSchema } = generateSchemaAndUISchema(
-            response?.data?.result?.fields
-          );
-          res.status(200).json({
-            schema,
-            uiSchema,
-          });
-        })
-        .catch((error) => {
-          //    console.log(error);?
-          res.status(500).json({ error: error.message });
+          if (fields && fields.length > 0) {
+            const { schema, uiSchema } = generateSchemaAndUISchema(fields);
+            res.status(200).json({
+              schema,
+              uiSchema,
+            });
+          } else {
+            res
+              .status(500)
+              .json({ error: 'Form Fields Not Found in API Call' });
+          }
         });
+      } else {
+        res.status(500).json({ error: 'Form data is required' });
+      }
     } catch (error) {
       // console.log('error hgfgfh', error);
       res.status(500).json({ error: error.message });
@@ -38,6 +30,36 @@ export default function handler(req, res) {
     res.status(405).json({ error: 'Method not allowed' });
   }
 }
+
+const fetchFormFields = async (readForm) => {
+  const axios = require('axios');
+  let fields = [];
+  for (let i = 0; i < readForm.length; i++) {
+    let fetchUrl = readForm[i].fetchUrl;
+    let header = readForm[i].header;
+    let config = {
+      method: 'get',
+      maxBodyLength: Infinity,
+      url: fetchUrl,
+      headers: {
+        Accept: '*/*',
+        ...header,
+      },
+    };
+
+    await axios
+      .request(config)
+      .then((response) => {
+        fields = [...fields, ...response?.data?.result?.fields];
+        // console.log('response', response?.data);
+      })
+      .catch((error) => {
+        console.log('error', error);
+      });
+  }
+  // console.log('field!!!', fields);
+  return fields;
+};
 
 function generateSchemaAndUISchema(fields) {
   const schema = {

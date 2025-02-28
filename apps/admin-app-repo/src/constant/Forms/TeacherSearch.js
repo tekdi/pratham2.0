@@ -98,86 +98,30 @@ export const TeacherSearchSchema = {
   },
 };
 
-// export const TeacherSearchUISchema = {
-//   'ui:order': ['state', 'district', 'block', 'village', 'searchKey', 'sortBy'],
-//   state: {
-//     'ui:widget': 'select',
-//     'ui:options': { classNames: 'form-inline-item' },
-//   },
-//   district: {
-//     'ui:widget': 'select',
-//     'ui:options': { classNames: 'form-inline-item' },
-//   },
-//   block: {
-//     'ui:widget': 'select',
-//     'ui:options': { classNames: 'form-inline-item' },
-//   },
-//   village: {
-//     'ui:widget': 'select',
-//     'ui:options': { classNames: 'form-inline-item' },
-//   },
-//   searchKey: {
-//     'ui:widget': 'text',
-//     'ui:options': {
-//       classNames: 'form-inline-item',
-//       placeholder: 'Search...',
-//     },
-//   },
-//   sortBy: {
-//     'ui:widget': 'select',
-//     'ui:options': { classNames: 'form-inline-item' },
-//   },
-// };
-
 export const TeacherSearchUISchema = {
   'ui:order': ['state', 'district', 'block', 'village', 'searchKey', 'sortBy'],
 
   state: {
     'ui:widget': 'select',
-    'ui:options': {
-      classNames: 'form-inline-item',
-      grid: { xs: 12, sm: 4 },
-    },
   },
 
   district: {
     'ui:widget': 'select',
-    'ui:options': {
-      classNames: 'form-inline-item',
-      grid: { xs: 12, sm: 4 },
-    },
   },
 
   block: {
     'ui:widget': 'select',
-    'ui:options': {
-      classNames: 'form-inline-item',
-      grid: { xs: 12, sm: 4 },
-    },
   },
 
   village: {
     'ui:widget': 'select',
-    'ui:options': {
-      classNames: 'form-inline-item',
-      grid: { xs: 12, sm: 4 },
-    },
   },
 
   searchKey: {
     'ui:widget': 'text',
-    'ui:options': {
-      classNames: 'form-inline-item',
-      placeholder: 'Search...',
-      grid: { xs: 12, sm: 4 },
-    },
   },
 
   sortBy: {
     'ui:widget': 'select',
-    'ui:options': {
-      classNames: 'form-inline-item',
-      grid: { xs: 12, sm: 4 },
-    },
   },
 };

@@ -3,14 +3,18 @@ import React, { useState, useEffect, useRef } from 'react';
 import Form from '@rjsf/mui';
 import validator from '@rjsf/validator-ajv8';
 import axios from 'axios';
-import { Grid } from '@mui/material';
-
+import Grid from '@mui/material/Grid';
+import { Box } from '@mui/material';
+import CustomObjectFieldTemplate from './CustomObjectFieldTemplate';
+import CustomFieldTemplate from './CustomFieldTemplate';
+import { TextField, Container, Typography } from '@mui/material';
 const DynamicForm = ({
   schema,
   uiSchema,
   SubmitaFunction,
   isCallSubmitInHandle,
   prefilledFormData,
+  t,
 }) => {
   const [formSchema, setFormSchema] = useState(schema);
   const [formUiSchemaOriginal, setFormUiSchemaOriginal] = useState(uiSchema);
@@ -566,7 +570,7 @@ const DynamicForm = ({
       ) : (
         <Grid container spacing={2}>
           {Object.keys(formSchema.properties).map((key) => (
-            <Grid item xs={4} key={key}>
+            <Grid item xs={4} key={key} sx={{ mb: '-40px' }}>
               <Form
                 schema={{
                   type: 'object',
@@ -577,11 +581,20 @@ const DynamicForm = ({
                 onChange={handleChange}
                 onSubmit={handleSubmit}
                 validator={validator}
+                // submitButtonProps={{
+                //   style: { display: !isCallSubmitInHandle ? 'none' : 'block' },
+                // }}
                 liveValidate
-                {...(isCallSubmitInHandle
-                  ? { submitButtonProps: { style: { display: 'none' } } }
-                  : {})}
-              />
+                // {...(isCallSubmitInHandle
+                //   ? { submitButtonProps: { style: { display: 'none' } } }
+                //   : {})}
+              >
+                {!isCallSubmitInHandle ? null : (
+                  <button type="submit" style={{ display: 'none' }}>
+                    Submit
+                  </button>
+                )}
+              </Form>
             </Grid>
           ))}
         </Grid>
