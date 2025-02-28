@@ -70,7 +70,7 @@ const RegistrationStatistics: React.FC<RegistrationStatisticsProps> = ({
                 alt="logo"
                 src="/broken-image.jpg"
               >
-                {avatar}
+                {subtile?.charAt(0)}
               </Avatar>
             </Box>
           )}

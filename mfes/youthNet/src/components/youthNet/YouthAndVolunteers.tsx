@@ -9,15 +9,16 @@ import {
   Box,
 } from '@mui/material';
 import RegistrationStatistics from './RegistrationStatistics';
-import { getYouthDataByDate } from '../../services/youthNet/Dashboard/UserServices';
+import {  getVillages, getYouthDataByDate } from '../../services/youthNet/Dashboard/UserServices';
 import { useTranslation } from 'next-i18next';
 
 interface Props {
   selectOptions: { label: string; value: string }[];
   data?: string;
+  userId:string
 }
 
-const YouthAndVolunteers: React.FC<Props> = ({ selectOptions, data }) => {
+const YouthAndVolunteers: React.FC<Props> = ({ selectOptions, data , userId}) => {
   const [selectedValue, setSelectedValue] = useState<string>(
     selectOptions[0]?.value || ''
   );
@@ -30,6 +31,8 @@ const YouthAndVolunteers: React.FC<Props> = ({ selectOptions, data }) => {
     const getYouthData = async () => {
       try {
         let fromDate;
+            const villages=await getVillages(userId)
+            const villageIds=villages?.map((item: any) => item.id) || []
        const toDate = new Date();
         if (selectedValue === 'today') {
          fromDate = new Date(2024, 3, 1)
@@ -44,7 +47,8 @@ const YouthAndVolunteers: React.FC<Props> = ({ selectOptions, data }) => {
         if(fromDate && toDate)
          {const response = await getYouthDataByDate(
           fromDate,
-          toDate
+          toDate,
+          villageIds
         );
         console.log(response?.getUserDetails);
         setYouthCount(response?.totalCount);
@@ -56,9 +60,9 @@ const YouthAndVolunteers: React.FC<Props> = ({ selectOptions, data }) => {
       }
       // setUserData(data);
     };
-
+if(userId && userId!=="")
     getYouthData();
-  }, [selectedValue]);
+  }, [selectedValue, userId]);
   return (
     <div style={{ padding: '16px' }}>
       {data && (

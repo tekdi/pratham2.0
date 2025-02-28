@@ -65,6 +65,14 @@ const RouteGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       "/course-hierarchy"
     ];
 
+    const youthNetAllowed = [
+      "/mentor",
+      "/mentor-leader",
+      "/support-request"
+    ];
+
+
+
     const isCoursePlannerContent = coursePlannerPaths.some((path) =>
       router.pathname.startsWith(path)
     );
@@ -100,15 +108,24 @@ const RouteGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         router.push("/unauthorized");
       }
     }
+    
 
-    if (((user.role === Role.ADMIN || user.role === Role.CENTRAL_ADMIN) && (allowedPaths.includes(router.pathname) || isWorkspaceContent || isCoursePlannerContent)) ||  (user.role === Role.ADMIN && (router.pathname === "/programs" ||router.pathname === "/notification-templates" ))) {
+    if (
+      (user.role === Role.ADMIN || user.role === Role.CENTRAL_ADMIN) &&
+      user?.tenantData[0]?.tenantName === "Second Chance Program" &&
+      (router.pathname === "/mentor" || youthNetAllowed.includes(router.pathname))
+    ) {
+      router.push("/unauthorized");
+    }
+
+    if ((((user.role === Role.ADMIN && user?.tenantData[0]?.tenantName == "Second Chance Program") || (user.role === Role.CENTRAL_ADMIN &&  user?.tenantData[0]?.tenantName == "Second Chance Program")) && (allowedPaths.includes(router.pathname) || isWorkspaceContent || isCoursePlannerContent)) ||  (user.role === Role.ADMIN && (router.pathname === "/programs" ||router.pathname === "/notification-templates" ))) {
     
       if (router.pathname !== "/login" && router.pathname !== "/logout" && router.pathname !== "/edit-password") {
 
         router.push("/unauthorized");
       }
     }
-    if((user.role === Role.CENTRAL_ADMIN) && notAllowedPathsForCentralAdmin.includes(router.pathname))
+    if((user.role === Role.CENTRAL_ADMIN  && user?.tenantData[0]?.tenantName == "Second Chance Program") && notAllowedPathsForCentralAdmin.includes(router.pathname))
     {
       if (router.pathname !== "/login" && router.pathname !== "/logout" && router.pathname !== "/edit-password") {
 
