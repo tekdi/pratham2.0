@@ -53,8 +53,12 @@ export const getFilteredMenuItems = () => {
             ]
           : [
               {
+                title: "SIDEBAR.MENTOR",
+                href: "/mentor",
+              },
+              {
                 title: "SIDEBAR.MENTOR_LEADER",
-                href: "/",
+                href: "/mentor-leader",
               },
             ],
       },
@@ -137,12 +141,20 @@ export const getFilteredMenuItems = () => {
       (userInfo?.role === Role.ADMIN || userInfo?.role === Role.CENTRAL_ADMIN) &&
       userInfo?.tenantData[0]?.tenantName === "Second Chance Program"
     ) {
-      return Menuitems.filter(
+      if(userInfo?.role === Role.CENTRAL_ADMIN) {
+          return Menuitems.filter(
         (item) =>
           item.title !== "SIDEBAR.COURSE_PLANNER" &&
           item.title !== "SIDEBAR.WORKSPACE" &&
           item.title !== "SIDEBAR.CENTERS" &&
-          item.title !== "SIDEBAR.MANAGE_USERS"
+          item.title !== "SIDEBAR.MANAGE_USERS" && 
+          item.title !== "SIDEBAR.CERTIFICATE_ISSUANCE"
+      );
+      }
+      return Menuitems.filter(
+        (item) =>
+          item.title !== "SIDEBAR.COURSE_PLANNER" &&
+          item.title !== "SIDEBAR.WORKSPACE"
       );
     }
 
