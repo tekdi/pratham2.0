@@ -1,4 +1,4 @@
-export const TeacherSearchSchema = {
+export const CohortSearchSchema = {
   type: 'object',
   properties: {
     state: {
@@ -87,7 +87,7 @@ export const TeacherSearchSchema = {
     name: {
       type: 'string',
       title: 'Search Key',
-      description: 'Search for a specific user or entity',
+      // description: 'Search for a specific user or entity',
     },
     sortBy: {
       type: 'string',
@@ -98,7 +98,7 @@ export const TeacherSearchSchema = {
   },
 };
 
-export const TeacherSearchUISchema = {
+export const CohortSearchUISchema = {
   'ui:order': ['state', 'district', 'block', 'village', 'searchKey', 'sortBy'],
 
   state: {

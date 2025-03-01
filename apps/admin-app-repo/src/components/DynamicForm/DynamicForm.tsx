@@ -3,15 +3,22 @@ import React, { useState, useEffect, useRef } from 'react';
 import Form from '@rjsf/mui';
 import validator from '@rjsf/validator-ajv8';
 import axios from 'axios';
-import { Grid } from '@mui/material';
-
+import Grid from '@mui/material/Grid';
+import { Box } from '@mui/material';
+import CustomObjectFieldTemplate from './CustomObjectFieldTemplate';
+import CustomFieldTemplate from './CustomFieldTemplate';
+import { TextField, Container, Typography } from '@mui/material';
 const DynamicForm = ({
   schema,
   uiSchema,
   SubmitaFunction,
   isCallSubmitInHandle,
   prefilledFormData,
+  t,
+  FormSubmitFunction,
+  extraFields,
 }) => {
+  const [submitted, setSubmitted] = useState(false);
   const [formSchema, setFormSchema] = useState(schema);
   const [formUiSchemaOriginal, setFormUiSchemaOriginal] = useState(uiSchema);
   const [formUiSchema, setFormUiSchema] = useState(uiSchema);
@@ -328,6 +335,39 @@ const DynamicForm = ({
 
       //setFormData
       setFormData(temp_prefilled_form);
+
+      function getSkipKeys(skipHideObject, formData) {
+        let skipKeys = [];
+
+        Object.keys(skipHideObject).forEach((key) => {
+          if (formData[key] && skipHideObject[key][formData[key]]) {
+            skipKeys = skipKeys.concat(skipHideObject[key][formData[key]]);
+          }
+        });
+
+        return skipKeys;
+      }
+
+      const skipKeys = getSkipKeys(hideAndSkipFields, temp_prefilled_form);
+      console.log('skipKeys', skipKeys);
+      let updatedUISchema = formUiSchemaOriginal;
+      function hideFieldsInUISchema(uiSchema, fieldsToHide) {
+        const updatedUISchema = { ...uiSchema };
+
+        fieldsToHide.forEach((field) => {
+          if (updatedUISchema[field]) {
+            updatedUISchema[field] = {
+              ...updatedUISchema[field],
+              originalWidget: updatedUISchema[field]['ui:widget'], // Store original widget type
+              'ui:widget': 'hidden',
+            };
+          }
+        });
+
+        return updatedUISchema;
+      }
+      const hiddenUISchema = hideFieldsInUISchema(updatedUISchema, skipKeys);
+      setFormUiSchema(hiddenUISchema);
     }
   };
 
@@ -536,7 +576,6 @@ const DynamicForm = ({
 
     // Optional extra root-level fields
     // Extra Field for cohort creation
-    const extraFields = { type: 'COHORT' };
 
     const transformedFormData = transformFormData(
       filteredData,
@@ -547,6 +586,7 @@ const DynamicForm = ({
     // console.log('formSchema', transformedFormData);
     console.log('Form Data Submitted:', filteredData);
     console.log('formattedFormData', transformedFormData);
+    FormSubmitFunction(filteredData, transformedFormData);
   };
 
   return (
@@ -560,13 +600,16 @@ const DynamicForm = ({
             onChange={handleChange}
             onSubmit={handleSubmit}
             validator={validator}
-            liveValidate
+            noHtml5Validate
+            showErrorList={false} // Hides the error list card at the top
+            // liveValidate={submitted} // Only validate on submit or typing
+            // onChange={() => setSubmitted(true)} // Show validation when user starts typing
           />
         </Grid>
       ) : (
         <Grid container spacing={2}>
           {Object.keys(formSchema.properties).map((key) => (
-            <Grid item xs={4} key={key}>
+            <Grid item xs={4} key={key} sx={{ mb: '-40px' }}>
               <Form
                 schema={{
                   type: 'object',
@@ -577,11 +620,23 @@ const DynamicForm = ({
                 onChange={handleChange}
                 onSubmit={handleSubmit}
                 validator={validator}
-                liveValidate
-                {...(isCallSubmitInHandle
-                  ? { submitButtonProps: { style: { display: 'none' } } }
-                  : {})}
-              />
+                // submitButtonProps={{
+                //   style: { display: !isCallSubmitInHandle ? 'none' : 'block' },
+                // }}
+                noHtml5Validate
+                showErrorList={false} // Hides the error list card at the top
+                // liveValidate={submitted} // Only validate on submit or typing
+                // onChange={() => setSubmitted(true)} // Show validation when user starts typing
+                // {...(isCallSubmitInHandle
+                //   ? { submitButtonProps: { style: { display: 'none' } } }
+                //   : {})}
+              >
+                {!isCallSubmitInHandle ? null : (
+                  <button type="submit" style={{ display: 'none' }}>
+                    Submit
+                  </button>
+                )}
+              </Form>
             </Grid>
           ))}
         </Grid>
