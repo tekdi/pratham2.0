@@ -63,7 +63,8 @@ export enum Role {
   TEACHER = 'Teacher',
   TEAM_LEADER = 'Team Leader',
   ADMIN = 'Admin',
-  LEARNER='Learner'
+  LEARNER='Learner',
+  INSTRUCTOR="Instructor"
 }
 
 export enum Status {
@@ -81,6 +82,8 @@ export enum DateFilter
 export enum cohortHierarchy {
   BLOCK = 'BLOCK',
   COHORT = 'COHORT',
+  DISTRICT='DISTRICT',
+  VILLAGE='VILLAGE'
 }
 
 export enum sessionMode {

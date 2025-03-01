@@ -597,7 +597,11 @@
   "ISSUE_CERTIFICATE":"Issue Certificate",
   "ISSUED_CERTIFICATE_SUCCESSFULLY":"Issued Certificate Successfully",
   "REISSUED_CERTIFICATE_SUCCESSFULLY":"Reissued Certificate Successfully",
-  "ISSUE_CERTIFICATE_ALERT":"Are you sure you want to issue a certificate for the following details?",
+  "REISSUED_CERTIFICATE_FAILED":"Failed to Reissued Certificate",
+  "RENDER_CERTIFICATE_FAILED":"Failed to Render Certificate",
+  "ISSUED_CERTIFICATE_FAILED":" Failed to Issued Certificate",
+
+    "ISSUE_CERTIFICATE_ALERT":"Are you sure you want to issue a certificate for the following details?",
   "REISSUE_CERTIFICATE_ALERT":"Are you sure you want to reissue a certificate for the following details?",
   "FIRST_NAME":"First Name:",
   "MIDDLE_NAME":"Middle Name:",
