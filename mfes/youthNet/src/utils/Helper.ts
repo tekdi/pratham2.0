@@ -190,9 +190,12 @@ export const getVillageUserCounts = (userData: any, villageData: any) => {
     console.log("User Data:", userData);
     console.log("Village Data:", villageData);
 
-    if (!Array.isArray(villageData) || !Array.isArray(userData?.getUserDetails)) {
-      throw new Error("Invalid data format: villageData or userData.getUserDetails is not an array.");
+    if (!Array.isArray(villageData)) {
+      console.log("Invalid villageData format.");
+      throw new Error("Invalid data format: villageData is not an array.");
     }
+
+    const userDetails = userData?.getUserDetails ?? []; // Ensure it's always an array
 
     const villageMap = villageData.reduce((acc: Record<number, string>, village: any) => {
       if (village?.Id && village?.name) {
@@ -207,10 +210,20 @@ export const getVillageUserCounts = (userData: any, villageData: any) => {
       villageCounts[Number(villageId)] = { totalUserCount: 0, todaysTotalUserCount: 0 };
     });
 
-    const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+    if (userDetails.length === 0) {
+      console.log("No user details found. Returning all villages with zero counts.");
+      return Object.keys(villageCounts).map((villageId) => ({
+        Id: Number(villageId),
+        name: villageMap[Number(villageId)],
+        totalCount: 0,
+        newRegistrations: 0,
+      }));
+    }
 
-    userData.getUserDetails.forEach((user: any) => {
-      if (!user?.customFields) return; // Skip if customFields is missing
+    const today = new Date().toISOString().split("T")[0];
+
+    userDetails.forEach((user: any) => {
+      if (!user?.customFields) return;
 
       const villageField = user.customFields.find((field: any) => field.label === cohortHierarchy.VILLAGE);
 
@@ -231,13 +244,14 @@ export const getVillageUserCounts = (userData: any, villageData: any) => {
       Id: Number(villageId),
       name: villageMap[Number(villageId)],
       totalCount: villageCounts[Number(villageId)].totalUserCount,
-      newRegistrations: villageCounts[Number(villageId)].todaysTotalUserCount
+      newRegistrations: villageCounts[Number(villageId)].todaysTotalUserCount,
     }));
   } catch (error) {
     console.error("Error in getVillageUserCounts:", error);
     return [];
   }
 };
+
 
 
 
