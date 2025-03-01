@@ -103,7 +103,8 @@ export enum FormContextType {
   ADMIN = "ADMIN",
   ADMIN_CENTER = "ADMIN_CENTER",
   COHORT = "cohort",
-  CONTENT_CREATOR = "CONTENT CREATOR"
+  CONTENT_CREATOR = "CONTENT CREATOR",
+  
 }
 
 export enum RoleId {

@@ -1,3 +1,5 @@
+import { validate } from 'uuid';
+
 export default function handler(req, res) {
   if (req.method === 'POST') {
     try {
@@ -61,6 +63,15 @@ const fetchFormFields = async (readForm) => {
   return fields;
 };
 
+function normalizePattern(pattern) {
+  if (typeof pattern === 'string') {
+    return pattern.startsWith('/') && pattern.endsWith('/')
+      ? pattern.slice(1, -1)
+      : pattern;
+  }
+  return pattern;
+}
+
 function generateSchemaAndUISchema(fields) {
   const schema = {
     type: 'object',
@@ -81,6 +92,7 @@ function generateSchemaAndUISchema(fields) {
       pattern,
       isRequired,
       maxSelection,
+      validation,
       maxLength,
       minLength,
       //custom field attributes
@@ -97,10 +109,12 @@ function generateSchemaAndUISchema(fields) {
     };
 
     if (pattern) {
-      schemaField.pattern = String(pattern);
+      schemaField.pattern = normalizePattern(pattern);
     }
     if (maxSelection) {
       schemaField.maxSelection = parseInt(maxSelection, 10);
+    } else if (validation?.maxSelections) {
+      schemaField.maxSelection = parseInt(validation.maxSelections, 10);
     }
     if (maxLength) {
       schemaField.maxLength = parseInt(maxLength, 10);
