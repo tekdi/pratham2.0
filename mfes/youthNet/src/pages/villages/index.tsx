@@ -51,7 +51,7 @@ import ExamplePage from '../../components/youthNet/BlockItem';
 import VillageSelector from '../../components/youthNet/VillageSelector';
 import { getLoggedInUserRole, getVillageUserCounts } from '../../utils/Helper';
 import { fetchUserList } from '../../services/youthNet/Dashboard/UserServices';
-import { Role } from '../../utils/app.constant';
+import { Role, Status } from '../../utils/app.constant';
 
 const Index = () => {
   const { isRTL } = useDirection();
@@ -102,6 +102,7 @@ const Index = () => {
   
   useEffect(() => {
     const getVillageYouthData = async (userId: any) => {
+      try{
       let userDataString = localStorage.getItem('userData');
       let userData: any = userDataString ? JSON.parse(userDataString) : null;
       const blockResult = userData.customFields.find((item: any) => item.label === 'BLOCK');
@@ -110,18 +111,22 @@ const Index = () => {
       const filters={
         block:blockIds,
         role:Role.LEARNER,
-        status: ["active"]
+        status: [Status.ACTIVE]
       }
 
       const result=await fetchUserList({filters})
       console.log(result)
      const villagewithUser= getVillageUserCounts(result, villageList)
      setVillageListWithUsers([...villagewithUser]);
-
+      }
+      catch(e)
+      {
+        console.error(e)
+      }
     
     };
 const userId=localStorage.getItem('userId')
-if(userId && villageList.lenght!==0)
+if(userId && villageList?.lenght!==0 )
   getVillageYouthData(userId);
   }, [villageList]);
   useEffect(() => {
@@ -601,7 +606,7 @@ if(userId && villageList.lenght!==0)
       <Box>
         {value === 2 && (
           <>
-            {YOUTHNET_USER_ROLE.MENTOR_LEAD === getLoggedInUserRole() && (
+            {YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() && (
               <Box
                 display={'flex'}
                 flexDirection={'row'}

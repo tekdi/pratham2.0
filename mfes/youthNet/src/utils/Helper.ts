@@ -1,5 +1,5 @@
 import FingerprintJS from 'fingerprintjs2';
-import { Role , DateFilter} from './app.constant';
+import { Role , DateFilter, cohortHierarchy} from './app.constant';
 
 export const generateUUID = () => {
   let d = new Date().getTime();
@@ -212,7 +212,7 @@ export const getVillageUserCounts = (userData: any, villageData: any) => {
     userData.getUserDetails.forEach((user: any) => {
       if (!user?.customFields) return; // Skip if customFields is missing
 
-      const villageField = user.customFields.find((field: any) => field.label === "VILLAGE");
+      const villageField = user.customFields.find((field: any) => field.label === cohortHierarchy.VILLAGE);
 
       if (villageField?.selectedValues?.length > 0) {
         const villageId = villageField.selectedValues[0].id;
