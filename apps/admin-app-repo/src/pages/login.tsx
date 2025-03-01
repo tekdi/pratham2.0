@@ -31,7 +31,7 @@ import Link from '@mui/material/Link';
 import loginImage from '../../public/loginImage.jpg';
 import { useUserIdStore } from '@/store/useUserIdStore';
 import { getUserDetailsInfo } from '@/services/UserList';
-import { Storage } from '@/utils/app.constant';
+import { Storage, youthNetTenantName } from '@/utils/app.constant';
 import useSubmittedButtonStore from '@/utils/useSharedState';
 import { Role } from '@/utils/app.constant';
 import { AcademicYear } from '@/utils/Interfaces';
@@ -92,19 +92,32 @@ const LoginPage = () => {
               } else {
                 router.push('/course-planner', undefined, { locale: locale });
               }
-            } else if (role?.role === Role.CENTRAL_ADMIN) {
+            } else if (role?.role === Role.CENTRAL_ADMIN && role?.tenantData[0]?.tenantName == youthNetTenantName.SECOND_CHANCE_PROGRAM) {
               router.push('/programs', undefined, { locale: locale });
             }
+            else if (role?.role === Role.ADMIN && role?.tenantData[0]?.tenantName == youthNetTenantName.SECOND_CHANCE_PROGRAM) {
+              router.push("/centers", undefined, { locale: locale });
+            } else if (role?.role === Role.ADMIN && role?.tenantData[0]?.tenantName == youthNetTenantName.YOUTHNET) {
+              router.push("/mentor");
+            }
+
           }
-        } else {
+        }
+        else {
           let role;
           if (storedUserData) {
             role = JSON.parse(storedUserData);
             if (role?.role === Role.SCTA || role?.role === Role.CCTA) {
-              router.push('/course-planner');
-            } else if (role?.role === Role.CENTRAL_ADMIN) {
-              router.push('/programs');
-            } else router.push('/centers');
+              router.push("/course-planner");
+            }
+            if (role?.role === Role.CENTRAL_ADMIN && role?.tenantData[0]?.tenantName == youthNetTenantName.SECOND_CHANCE_PROGRAM) {
+              router.push("/programs");
+            }
+            else if (role?.role === Role.ADMIN && role?.tenantData[0]?.tenantName == youthNetTenantName.SECOND_CHANCE_PROGRAM) {
+              router.push("/centers");
+            } else if (role?.role === Role.ADMIN && role?.tenantData[0]?.tenantName == youthNetTenantName.YOUTHNET) {
+              router.push("/mentor");
+            }
           }
         }
       }
@@ -222,12 +235,9 @@ const LoginPage = () => {
                 ) {
                   const { locale } = router;
                   // To do :- hardcoding to be removed
-                  if (
-                    userInfo?.tenantData[0]?.tenantName !=
-                    'Second Chance Program'
-                  ) {
-                    window.location.href = '/workspace';
-                    router.push('/workspace');
+                  if(userInfo?.tenantData[0]?.tenantName != youthNetTenantName.SECOND_CHANCE_PROGRAM ) {
+                    window.location.href = "/workspace"; 
+                    router.push("/workspace");
                   } else {
                     window.location.href = '/course-planner';
                     if (locale) {
@@ -240,13 +250,25 @@ const LoginPage = () => {
                   //window.location.href = "/centers";
                   const { locale } = router;
                   if (locale) {
-                    if (userInfo?.role === Role.CENTRAL_ADMIN)
-                      router.push('/programs', undefined, { locale: locale });
-                    else router.push('/centers', undefined, { locale: locale });
-                  } else {
-                    if (userInfo?.role === Role.CENTRAL_ADMIN)
-                      router.push('/programs');
-                    else router.push('/centers');
+                    if (userInfo?.role === Role.CENTRAL_ADMIN && userInfo?.tenantData[0]?.tenantName == youthNetTenantName.SECOND_CHANCE_PROGRAM) {
+                      router.push("/programs", undefined, { locale: locale }); }
+                    else if (userInfo?.role === Role.ADMIN && userInfo?.tenantData[0]?.tenantName == youthNetTenantName.SECOND_CHANCE_PROGRAM){
+                      router.push("/centers", undefined, { locale: locale });
+                    }
+                    else if (userInfo?.role === Role.ADMIN && userInfo?.tenantData[0]?.tenantName == youthNetTenantName.YOUTHNET){
+                      router.push("/mentor", undefined, { locale: locale });
+                    }
+                  }
+                  else {
+                    if (userInfo?.role === Role.CENTRAL_ADMIN && userInfo?.tenantData[0]?.tenantName == youthNetTenantName.SECOND_CHANCE_PROGRAM) {
+                      router.push("/programs");
+                    }
+                    else if (userInfo?.role === Role.ADMIN && userInfo?.tenantData[0]?.tenantName == youthNetTenantName.SECOND_CHANCE_PROGRAM) {
+                      router.push("/centers");
+                    } else if (userInfo?.role === Role.ADMIN && userInfo?.tenantData[0]?.tenantName == youthNetTenantName.YOUTHNET) {
+                      router.push("/mentor");
+                    }
+
                   }
                 }
               }
