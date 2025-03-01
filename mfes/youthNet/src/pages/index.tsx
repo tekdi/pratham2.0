@@ -83,7 +83,11 @@ const Index = () => {
         district:[districtId],
       }
        const responce=await fetchUserList({filters})
-       setUserData(responce?.getUserDetails)
+       const transformedData = responce?.getUserDetails.map((user: any) => ({
+        id: user.userId,
+        name: user.lastName ? `${user.firstName} ${user.lastName}` : user.firstName
+      }));
+       setUserData(transformedData)
        let userDataString = localStorage.getItem('userData');
        let userData: any = userDataString ? JSON.parse(userDataString) : null;
        userData.customFields = data.userData.customFields;
@@ -239,7 +243,7 @@ setVillageCount(villageIds?.length)
             <Dropdown
               name={"Mentor"}
               values={userData}
-              defaultValue={userData?.[0]?.userId}
+              defaultValue={userData?.[0]?.id}
               onSelect={(value) => {
                 localStorage.setItem('selectedMentoruserId',value)
                 setSelectedMentorId(value)}}

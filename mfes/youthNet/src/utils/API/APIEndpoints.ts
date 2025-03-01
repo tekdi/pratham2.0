@@ -8,6 +8,8 @@ const API_ENDPOINTS = {
   userReadWithField: (userId: string | string[]) => `${baseurl}/user/v1/read/${userId}?fieldvalue=false`,
   academicYearsList: `${baseurl}/user/v1/academicyears/list`,
   userList: `${baseurl}/user/list`,
+  fieldOptionsRead: `${baseurl}/fields/options/read`,
+
 
 
 };

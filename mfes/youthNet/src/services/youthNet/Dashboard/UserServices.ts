@@ -57,11 +57,18 @@ export const fetchUserList = async ({
       fields,
     });
     return response?.data?.result;
-  } catch (error) {
-    console.error("error in getting user list", error);
-    throw error;
+  } catch (error: any) {
+    if (error.response) {
+      if (error.response.status === 404) {
+        return []; 
+      }
+      console.error("API error:", error.response.status, error.response.data);
+    } else {
+      console.error("Network or unknown error:", error);
+    }
   }
 };
+
 export const getUserDetails = async (
   userId: string | string[],
   fieldValue?: boolean

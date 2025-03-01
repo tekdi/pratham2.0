@@ -33,10 +33,17 @@ const Dropdown: React.FC<DropdownProps> = ({
         label={name}
         onChange={handleChange}
         IconComponent={KeyboardArrowDownIcon}
+        MenuProps={{
+          PaperProps: {
+            style: {
+              maxHeight: 200, 
+            },
+          },
+        }}
       >
-        {values.map((user) => (
-          <MenuItem key={user.userId} value={user.userId}>
-            {user.firstName} {user.lastName}
+        {values.map((item: any) => (
+          <MenuItem key={item.id} value={item.id}>
+            {item.name}
           </MenuItem>
         ))}
       </Select>
