@@ -40,7 +40,7 @@ const AddEditMentor = ({
       },
     ],
     username: 'youthnetmentor',
-    password: '98765',
+    password: Math.floor(10000 + Math.random() * 90000),
   };
 
   const FormSubmitFunction = async (formData: any, payload: any) => {
