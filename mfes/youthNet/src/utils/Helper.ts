@@ -41,7 +41,7 @@ export const filterUsersByAge = (users: any[]) => {
     (result, user) => {
       if (!user || !user.dob) {
         // If user has no dob, push them into "above18" (assuming unknown age is treated as adult)
-        result.above18.push(user);
+        result.below18.push(user);
         return result;
       }
 
@@ -79,7 +79,6 @@ export const getAge=(dobString: any)=> {
   if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
       age--;
   }
-console.log(age)
   return age;
 }
 
@@ -250,6 +249,17 @@ export const getVillageUserCounts = (userData: any, villageData: any) => {
     console.error("Error in getVillageUserCounts:", error);
     return [];
   }
+};
+
+export const filterData = (data: any[], searchKey: string) => {
+  if (!searchKey) return data; 
+
+  searchKey = searchKey.toLowerCase();
+
+  return data.filter((item: any) =>
+      item.name.toLowerCase().includes(searchKey) 
+      
+  );
 };
 
 

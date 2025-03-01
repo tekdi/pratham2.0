@@ -150,10 +150,9 @@ const MonthlyRegistrationsChart: React.FC<Props>= ({userId}) => {
   <CartesianGrid strokeDasharray="3 3" />
   <XAxis
     dataKey={selectedRange === DateFilter.THIS_MONTH ? 'date' : 'month'}
-    scale="point"
     padding={{
       left: visibleData.length > 1 ? (200 / visibleData.length) : 20, 
-      right: visibleData.length > 1 ? (2000 / visibleData.length) : 20,
+      right: visibleData.length > 1 ? (200 / visibleData.length) : 20,
     }}
   />
   <YAxis
