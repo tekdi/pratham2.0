@@ -82,6 +82,8 @@ export enum DateFilter
 export enum cohortHierarchy {
   BLOCK = 'BLOCK',
   COHORT = 'COHORT',
+  DISTRICT='DISTRICT',
+  VILLAGE='VILLAGE'
 }
 
 export enum sessionMode {

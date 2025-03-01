@@ -736,8 +736,9 @@
        "TOTAL_YOUTH":"Total Youth",
        "AS_OF_TODAY":"As of today",
        "AS_OF_LAST_SIX_MONTH":"As of last month",
-       "AS_OF_LAST_YEAR":"As of last year"
-
+       "AS_OF_LAST_YEAR":"As of last year",
+         "VILLAGE_NAME":"Village Name",
+    "TOTAL_COUNT_NEW_REGISTRATION":"Total Count (+ New Registrations today)"
 
   },
   "YOUTHNET_VOLUNTEERLIST": {
@@ -779,7 +780,12 @@
     "SELECT_DISTRICT": "Select District",
     "SELECT": "Select",
     "ASSIGN_VILLAGES_FROM_BLOCK": "Assign Villages from Block",
-    "ASSIGN_VILLAGES_FROM_BLOCK_INFO": "You can complete this later at your own pace. However, the villages will only be assigned once you click on ‘Finish.’"
+    "ASSIGN_VILLAGES_FROM_BLOCK_INFO": "You can complete this later at your own pace. However, the villages will only be assigned once you click on ‘Finish.’",
+    "NO_DATA_FOUND":"no data found",
+    "VILLAGE":"Village",
+    "BLOCK":"blocks",
+    "VILLAGES":"Villages",
+    "BLOCKS":"Blocks"
   },
 
   "YOUTHNET_CAMP_DETAILS": {

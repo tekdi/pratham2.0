@@ -83,7 +83,11 @@ const Index = () => {
         district:[districtId],
       }
        const responce=await fetchUserList({filters})
-       setUserData(responce?.getUserDetails)
+       const transformedData = responce?.getUserDetails.map((user: any) => ({
+        id: user.userId,
+        name: user.lastName ? `${user.firstName} ${user.lastName}` : user.firstName
+      }));
+       setUserData(transformedData)
        let userDataString = localStorage.getItem('userData');
        let userData: any = userDataString ? JSON.parse(userDataString) : null;
        userData.customFields = data.userData.customFields;
@@ -95,6 +99,11 @@ const Index = () => {
       
     }
     // setUserData(data);
+     const onUserClick=(userId: any)=>
+    {
+      router.push(`/user-profile/${userId}`);
+  
+    }
   useEffect(() => {
     if(YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole())
     getMentorDistrictData()
@@ -105,6 +114,14 @@ const Index = () => {
       try {
       
 const villages=await getVillages(userId)
+console.log(villages)
+
+if(userId===localStorage.getItem('userId'))
+{
+  const updatedData = (villages)?.map(({ id, value }: any) => ({ Id: id, name: value }));
+
+  localStorage.setItem('villageData', JSON.stringify(updatedData))
+}
 const villageIds=villages?.map((item: any) => item.id) || []
 setVillageCount(villageIds?.length)
         const response = await getYouthDataByDate(new Date(), new Date(), villageIds);
@@ -114,8 +131,34 @@ setVillageCount(villageIds?.length)
         //    return item.role==="Content creator"
         //  })
         const youthData = filterUsersByAge(response.getUserDetails);
-        setAboveEighteenUsers(youthData?.above18);
-        setBelowEighteenUsers(youthData?.below18);
+        const transformedAbove18 = youthData?.above18.map((user: any) => {
+          let name = user.firstName || "";
+          if (user.lastName) {
+              name += ` ${user.lastName}`;
+          }
+          return {
+              Id: user.userId,
+              name: name.trim() ,
+              dob:user?.dob ,
+            firstName:user?.firstName,
+            lastName:user?.lastName// Ensures there are no extra spaces if lastName is missing
+          };
+      });
+      const transformedBelow18 = youthData?.below18.map((user: any) => {
+        let name = user.firstName || "";
+        if (user.lastName) {
+            name += ` ${user.lastName}`;
+        }
+        return {
+            Id: user.userId,
+            name: name.trim(),
+            dob:user.dob ,
+            firstName:user?.firstName,
+            lastName:user?.lastName// Ensures there are no extra spaces if lastName is missing
+        };
+    });
+        setAboveEighteenUsers(transformedAbove18);
+        setBelowEighteenUsers(transformedBelow18);
         console.log(youthData?.below18);
         //  console.log(users)
         let users = response.getUserDetails;
@@ -200,7 +243,7 @@ setVillageCount(villageIds?.length)
             <Dropdown
               name={"Mentor"}
               values={userData}
-              defaultValue={userData?.[0]?.userId}
+              defaultValue={userData?.[0]?.id}
               onSelect={(value) => {
                 localStorage.setItem('selectedMentoruserId',value)
                 setSelectedMentorId(value)}}
@@ -274,7 +317,7 @@ setVillageCount(villageIds?.length)
         />
         
       </Box>
-      <SimpleModal
+      {/* <SimpleModal
         modalTitle={t('YOUTHNET_SURVEY.NEW_SURVEY')}
         primaryText={t('YOUTHNET_SURVEY.ASSIGN_VOLUNTEERS_NOW')}
         secondaryText={t('YOUTHNET_SURVEY.REMIND_ME_LATER')}
@@ -313,14 +356,14 @@ setVillageCount(villageIds?.length)
             {t('YOUTHNET_SURVEY.ASSIGN_VOLUNTEERS_TO_ENSURE')}
           </Typography>
         </Box>
-      </SimpleModal>
+      </SimpleModal> */}
       <SimpleModal
         modalTitle={t('YOUTHNET_DASHBOARD.ABOVE_18')}
         open={abvmodalOpen}
         onClose={handleModalClose}
       >
         {' '}
-        <UserList users={aboveEighteenUsers} layout="list" />
+        <UserList users={aboveEighteenUsers} layout="list"  onUserClick={onUserClick}/>
       </SimpleModal>
 
       <SimpleModal
@@ -329,7 +372,7 @@ setVillageCount(villageIds?.length)
         onClose={handleModalClose}
       >
         {' '}
-        <UserList users={belowEighteenUsers} layout="list" />
+        <UserList users={belowEighteenUsers} layout="list" onUserClick={onUserClick} />
       </SimpleModal>
       <SimpleModal
         modalTitle={t('YOUTHNET_DASHBOARD.VLLAGE_18')}

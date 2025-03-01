@@ -40,6 +40,7 @@ import Loader from '../../components/Loader';
 import {
   fetchBlockData,
   fetchDistrictData,
+  getStateBlockDistrictList,
 } from '../../services/youthNet/Dashboard/VillageServices';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import AddIcon from '@mui/icons-material/Add';
@@ -49,9 +50,9 @@ import { useDirection } from '../../hooks/useDirection';
 import GenericForm from '../../components/youthNet/GenericForm';
 import ExamplePage from '../../components/youthNet/BlockItem';
 import VillageSelector from '../../components/youthNet/VillageSelector';
-import { getLoggedInUserRole } from '../../utils/Helper';
+import { getLoggedInUserRole, getVillageUserCounts } from '../../utils/Helper';
 import { fetchUserList } from '../../services/youthNet/Dashboard/UserServices';
-import { Role } from '../../utils/app.constant';
+import { cohortHierarchy, Role, Status } from '../../utils/app.constant';
 
 const Index = () => {
   const { isRTL } = useDirection();
@@ -64,68 +65,255 @@ const Index = () => {
   const [searchInput, setSearchInput] = useState('');
   const [toggledUser, setToggledUser] = useState('');
   const [openMentorDrawer, setOpenMentorDrawer] = useState(false);
-
   const [toggledMentor, setToggledMentor] = useState('');
   const [openDrawer, setOpenDrawer] = useState(false);
-
   const [openReassignDistrict, setOpenReassignDistrict] = useState(false);
   const [openReassignVillage, setOpenReassignVillage] = useState(false);
   const [addNew, setAddNew] = useState(false);
   const [count, setCount] = useState(0);
-  const [villlageCount, setVilllageCount] = useState(0);
-  const [openDelete, setOpenDelete] = useState(false);
+  const [villageCount, setVillageCount] = useState(0);
+  const [mentorCount, setMentorCount] = useState(0);
+  const [villageList, setVillageList] = useState<any>([]);
+  const [mentorList, setMentorList] = useState<any>([]);
+  const [villageListWithUsers, setVillageListWithUsers] = useState<any>([]);  
+  const [youthList, setYouthList] = useState<any>([]);
+   const [openDelete, setOpenDelete] = useState(false);
   const [selectedMentorId, setSelectedMentorId] = useState('');
   const [districtData, setDistrictData] = useState<any>(null);
   const [selectedValue, setSelectedValue] = useState<any>();
+  const [selectedBlockValue, setSelectedBlockValue] = useState<any>('');
+  const [selectedVillageValue, setSelectedVillageValue] = useState<any>('');
+  const [selectedDistrictValue, setSelectedDistrictValue] = useState<any>('');
 
   const [blockData, setBlockData] = useState<any>(null);
 
   useEffect(() => {
     const getData = async () => {
-      const districtData = await fetchDistrictData();
-      const blockData = await fetchBlockData();
-      setDistrictData(districtData);
-      setBlockData(blockData);
-    };
+      let userDataString = localStorage.getItem('userData');
+      let userData: any = userDataString ? JSON.parse(userDataString) : null;
+      const districtResult = userData.customFields.find(
+        (item: any) => item.label === cohortHierarchy.DISTRICT
+      );
+      console.log(districtResult?.selectedValues);
+      const transformedData = districtResult?.selectedValues?.map(
+        (item: any) => ({
+          id: item?.id,
+          name: item?.value,
+        })
+      );
+      setDistrictData(transformedData);
+      setSelectedDistrictValue(transformedData[0]?.id);
+      const controllingfieldfk = transformedData[0]?.id?.toString();
+      const fieldName = 'block';
+      const blockResponce = await getStateBlockDistrictList({
+        controllingfieldfk,
+        fieldName,
+      });
+      console.log(blockResponce);
 
+      const transformedBlockData = blockResponce?.result?.values?.map(
+        (item: any) => ({
+          id: item?.value,
+          name: item?.label,
+        })
+      );
+      setBlockData(transformedBlockData);
+      setSelectedBlockValue(transformedBlockData[0]?.id);
+    };
     getData();
   }, []);
   useEffect(() => {
-    const getVillageYouthData = async (userId: any) => {
-      let userDataString = localStorage.getItem('userData');
-      let userData: any = userDataString ? JSON.parse(userDataString) : null;
-      const blockResult = userData.customFields.find((item: any) => item.label === 'BLOCK');
-      console.log(userData)
-     const blockIds= blockResult?.selectedValues?.map((item: any) => item.id) || []
-      const filters={
-        block:blockIds,
-        role:Role.LEARNER
-      }
+    const getYouthData = async () => {
+      try{const filters = {
+        village: [selectedVillageValue],
+        role: Role.LEARNER,
+        status: [Status.ACTIVE],
+      };
 
-      const result=await fetchUserList({filters})
-      console.log(result)
+      const result = await fetchUserList({ filters });
+      if(result.getUserDetails)
+      {
+        const transformedYouthData = result?.getUserDetails.map(
+          (user: any) => {
+            let name = user.firstName || '';
+            const villageField = user.customFields.find(
+              (field: any) => field.label === cohortHierarchy.BLOCK
+            );
+            const blockField = user.customFields.find(
+              (field: any) => field.label === cohortHierarchy.BLOCK
+            );
+            console.log(blockField?.selectedValues);
+            const blockValues = blockField?.selectedValues.map(
+              (block: any) => block.value
+            );
+
+            if (user.lastName) {
+              name += ` ${user.lastName}`;
+            }
+            return {
+              Id: user.userId,
+              name: name.trim(),
+              //  dob:user?.dob ,
+              firstName: user?.firstName,
+             // villageCount: villageField?.selectedValues.length,
+              lastName: user?.lastName,
+             // blockNames: blockValues,
+            };
+          }
+        );
+         setYouthList(transformedYouthData);
+      }
+      else
+      {
+        setYouthList([]);
+      }
+      }
+     catch(e)
+     {
+      console.error(e)
+     }
+    }
+  if (value === 3 && selectedVillageValue !== '') getYouthData();
+  }, [value, selectedVillageValue]);
+  useEffect(() => {
+    const getMentorData = async () => {
+      try {
+        if (selectedDistrictValue !== '' && value === 1) {
+          const filters = {
+            district: [selectedDistrictValue],
+            role: Role.INSTRUCTOR,
+            status: [Status.ACTIVE],
+          };
+          const result = await fetchUserList({ filters });
+          console.log(result?.getUserDetails);
+          const transformedMentorData = result?.getUserDetails.map(
+            (user: any) => {
+              let name = user.firstName || '';
+              const villageField = user.customFields.find(
+                (field: any) => field.label === cohortHierarchy.BLOCK
+              );
+              const blockField = user.customFields.find(
+                (field: any) => field.label === cohortHierarchy.BLOCK
+              );
+              console.log(blockField?.selectedValues);
+              const blockValues = blockField?.selectedValues.map(
+                (block: any) => block.value
+              );
+
+              if (user.lastName) {
+                name += ` ${user.lastName}`;
+              }
+              return {
+                Id: user.userId,
+                name: name.trim(),
+                //  dob:user?.dob ,
+                firstName: user?.firstName,
+                villageCount: villageField?.selectedValues.length,
+                lastName: user?.lastName,
+                blockNames: blockValues,
+              };
+            }
+          );
+          setMentorList(transformedMentorData);
+          setMentorCount(transformedMentorData.length);
+        }
+      } catch (e) {}
     };
-const userId=localStorage.getItem('userId')
-if(userId)
-  getVillageYouthData(userId);
-  }, []);
+
+    getMentorData();
+  }, [selectedDistrictValue]);
+  const handleLocationClick = (Id: any, name: any) => {
+    router.push({
+      pathname: `/villageDetails/${name}`,
+      query: { id: Id },
+    });
+  };
+
+  useEffect(() => {
+    const getVillageYouthData = async () => {
+      try {
+        let userDataString = localStorage.getItem('userData');
+        let userData: any = userDataString ? JSON.parse(userDataString) : null;
+        let blockIds: any;
+        if (YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole()) {
+          const blockResult = userData.customFields.find(
+            (item: any) => item.label === 'BLOCK'
+          );
+          console.log(villageList);
+          blockIds =
+            blockResult?.selectedValues?.map((item: any) => item.id) || [];
+        } else if (selectedBlockValue !== '') {
+          blockIds = [selectedBlockValue];
+        }
+        const filters = {
+          block: blockIds,
+          role: Role.LEARNER,
+          status: [Status.ACTIVE],
+        };
+
+        const result = await fetchUserList({ filters });
+        console.log(result);
+        let villagewithUser;
+        villagewithUser = getVillageUserCounts(result, villageList);
+        console.log(villagewithUser);
+
+        setVillageListWithUsers([...villagewithUser]);
+      } catch (e) {
+        setVillageListWithUsers([]);
+        console.log(e);
+      }
+    };
+    //const userId=localStorage.getItem('userId')
+    if (villageList?.length !== 0) getVillageYouthData();
+  }, [villageList, selectedBlockValue]);
+  useEffect(() => {
+    const getVillageList = async () => {
+      try {
+        if (YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole()) {
+          let villageDataString = localStorage.getItem('villageData');
+          let villageData: any = villageDataString
+            ? JSON.parse(villageDataString)
+            : null;
+          setVillageList(villageData);
+          setVillageCount(villageData.length);
+        } else if (selectedBlockValue !== '') {
+          const controllingfieldfk = selectedBlockValue?.toString();
+          const fieldName = 'village';
+          const villageResponce = await getStateBlockDistrictList({
+            controllingfieldfk,
+            fieldName,
+          });
+          console.log(villageResponce);
+
+          const transformedVillageData = villageResponce?.result?.values?.map(
+            (item: any) => ({
+              Id: item?.value,
+              name: item?.label,
+            })
+          );
+          setVillageCount(transformedVillageData.length);
+
+          setVillageList(transformedVillageData);
+          setSelectedVillageValue(transformedVillageData[0]?.Id);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    getVillageList();
+  }, [selectedBlockValue]);
   useEffect(() => {
     setValue(YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() ? 1 : 2);
-    let villageDataString = localStorage.getItem('villageData');
-    let villageData: any = villageDataString
-      ? JSON.parse(villageDataString)
-      : null;
-    if (YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole())
-      setVilllageCount(villageData.length);
   }, []);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
-  const handleUserClick = (name: any) => {
-    console.log('Clicked user:', name);
-    router.push(`/volunteer-profile/${name}`);
+  const handleUserClick = (userId: any) => {
+    // console.log('Clicked user:', name);
+    router.push(`/user-profile/${userId}`);
   };
 
   const handleToggledUserClick = (name: any) => {
@@ -216,7 +404,7 @@ if(userId)
   ];
 
   const handleRadioChange = (value: string) => {
-   // setSelectedValue(value);
+    // setSelectedValue(value);
   };
 
   const formFields = [
@@ -312,8 +500,8 @@ if(userId)
                 {districtData ? (
                   <Dropdown
                     name={districtData?.DISTRICT_NAME}
-                    values={districtData?.DISTRICT_OPTIONS}
-                    defaultValue={districtData?.DISTRICT_OPTIONS[0]}
+                    values={districtData}
+                    defaultValue={districtData[0]?.id}
                     onSelect={(value) => console.log('Selected:', value)}
                   />
                 ) : (
@@ -338,7 +526,7 @@ if(userId)
               <SortBy />
             </Box>
 
-            <Box mt={'18px'} px={'18px'} ml={'10px'}>
+            {/* <Box mt={'18px'} px={'18px'} ml={'10px'}>
               <Button
                 sx={{
                   border: `1px solid ${theme.palette.error.contrastText}`,
@@ -358,7 +546,7 @@ if(userId)
               >
                 {t('COMMON.ADD_NEW')}
               </Button>
-            </Box>
+            </Box> */}
 
             <Box>
               <Box display={'flex'} justifyContent={'space-between'}>
@@ -369,7 +557,7 @@ if(userId)
                     margin: '20px',
                   }}
                 >
-                  {SURVEY_DATA.FOUR} {''}
+                  {mentorCount} {''}
                   {t('YOUTHNET_USERS_AND_VILLAGES.MENTORS')}
                 </Typography>
 
@@ -585,7 +773,7 @@ if(userId)
       <Box>
         {value === 2 && (
           <>
-            {YOUTHNET_USER_ROLE.MENTOR_LEAD === getLoggedInUserRole() && (
+            {YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() && (
               <Box
                 display={'flex'}
                 flexDirection={'row'}
@@ -602,8 +790,8 @@ if(userId)
                   {districtData ? (
                     <Dropdown
                       name={districtData?.DISTRICT_NAME}
-                      values={districtData?.DISTRICT_OPTIONS}
-                      defaultValue={districtData?.DISTRICT_OPTIONS[0]}
+                      values={districtData}
+                      defaultValue={districtData?.[0]?.id}
                       onSelect={(value) => console.log('Selected:', value)}
                     />
                   ) : (
@@ -618,9 +806,11 @@ if(userId)
                   {blockData ? (
                     <Dropdown
                       name={blockData?.BLOCK_NAME}
-                      values={blockData?.BLOCK_OPTIONS}
-                      defaultValue={blockData?.BLOCK_OPTIONS[0]}
-                      onSelect={(value) => console.log('Selected:', value)}
+                      values={blockData}
+                      defaultValue={selectedBlockValue}
+                      onSelect={(value) =>
+                        console.log('Selected:', setSelectedBlockValue(value))
+                      }
                     />
                   ) : (
                     <Loader showBackdrop={true} />
@@ -659,7 +849,7 @@ if(userId)
                   marginLeft: '2rem',
                 }}
               >
-                {villlageCount} Villages
+                {villageCount} {t(`YOUTHNET_DASHBOARD.VILLAGES`)}
               </Typography>
 
               {/* <Box
@@ -695,7 +885,7 @@ if(userId)
                 }}
                 className="one-line-text"
               >
-                Village Name
+                {t(`YOUTHNET_DASHBOARD.VILLAGES`)}
               </Typography>
 
               <Typography
@@ -706,7 +896,7 @@ if(userId)
                   pr: '20px',
                 }}
               >
-                Total Count (+ New Registrations today)
+                {t(`YOUTHNET_DASHBOARD.TOTAL_COUNT_NEW_REGISTRATION`)}
               </Typography>
             </Box>
             <Box
@@ -715,7 +905,15 @@ if(userId)
                 mt: '15px',
               }}
             >
-              <UserList layout="list" users={villageList} />
+              {villageListWithUsers.length !== 0 ? (
+                <UserList
+                  layout="list"
+                  users={villageListWithUsers}
+                  onUserClick={handleLocationClick}
+                />
+              ) : (
+                <>{t('YOUTHNET_USERS_AND_VILLAGES.NO_DATA_FOUND')}</>
+              )}
             </Box>
           </>
         )}
@@ -723,7 +921,7 @@ if(userId)
       <Box>
         {value === 3 && (
           <>
-            {YOUTHNET_USER_ROLE.MENTOR_LEAD === TENANT_DATA.LEADER && (
+            {YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() && (
               <Box
                 display={'flex'}
                 flexDirection={'row'}
@@ -740,8 +938,8 @@ if(userId)
                   {districtData ? (
                     <Dropdown
                       name={districtData?.DISTRICT_NAME}
-                      values={districtData?.DISTRICT_OPTIONS}
-                      defaultValue={districtData?.DISTRICT_OPTIONS[0]}
+                      values={districtData}
+                      defaultValue={districtData?.[0]?.id}
                       onSelect={(value) => console.log('Selected:', value)}
                     />
                   ) : (
@@ -756,9 +954,11 @@ if(userId)
                   {blockData ? (
                     <Dropdown
                       name={blockData?.BLOCK_NAME}
-                      values={blockData?.BLOCK_OPTIONS}
-                      defaultValue={blockData?.BLOCK_OPTIONS[0]}
-                      onSelect={(value) => console.log('Selected:', value)}
+                      values={blockData}
+                      defaultValue={selectedBlockValue}
+                      onSelect={(value) =>
+                        console.log('Selected:', setSelectedBlockValue(value))
+                      }
                     />
                   ) : (
                     <Loader showBackdrop={true} />
@@ -774,9 +974,16 @@ if(userId)
             >
               <Dropdown
                 name={DROPDOWN_NAME}
-                values={VILLAGE_OPTIONS}
-                defaultValue={VILLAGE_OPTIONS[0]}
-                onSelect={(value) => console.log('Selected:', value)}
+                values={villageList.map((item: any) =>
+                  Array.isArray(item)
+                    ? item.map(({ Id, name }) => ({ id: Id, name }))
+                    : { id: item.Id, name: item.name }
+                )}
+                defaultValue={selectedVillageValue}
+                onSelect={(value) =>{console.log('Selected:', value) 
+                  setSelectedVillageValue(value)
+                }
+                }
               />
             </Box>
             <Box
