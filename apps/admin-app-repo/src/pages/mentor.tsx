@@ -30,6 +30,7 @@ import {
 import AddEditMentor from '@/components/EntityForms/AddEditMentor/AddEditMentor';
 import SimpleModal from '@/components/SimpleModal';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { updateCohortMemberStatus } from '@/services/CohortService/cohortService';
 
 //import { DynamicForm } from '@shared-lib';
 
@@ -50,6 +51,8 @@ const Mentor = () => {
   const [renderKey, setRenderKey] = useState(true);
   // const [open, setOpen] = useState(false);
   const [openModal, setOpenModal] = React.useState<boolean>(false);
+  const [isEdit, setIsEdit] = useState(false);
+  const [editableUserId, setEditableUserId] = useState('');
 
   const { t, i18n } = useTranslation();
 
@@ -228,12 +231,29 @@ const Mentor = () => {
         let tempFormData = extractMatchingKeys(row, addSchema);
         // console.log('tempFormData', tempFormData);
         setPrefilledAddFormData(tempFormData);
+        setIsEdit(true);
+        setEditableUserId(row?.userId);
         handleOpenModal();
       },
     },
     {
       icon: <DeleteIcon color="error" />,
-      callback: (row) => alert(`Deleting ${row.name}`),
+      callback: async (row) => {
+        console.log('row:', row);
+        // setEditableUserId(row?.userId);
+        const memberStatus = Status.ARCHIVED;
+        const statusReason = '';
+        const membershipId = row?.userId;
+
+        const response = await updateCohortMemberStatus({
+          memberStatus,
+          statusReason,
+          membershipId,
+        });
+        setPrefilledFormData({});
+        searchData(prefilledFormData, currentPage);
+        setOpenModal(false);
+      },
     },
   ];
 
@@ -302,6 +322,8 @@ const Mentor = () => {
             color="primary"
             onClick={() => {
               setPrefilledAddFormData({});
+              setIsEdit(false);
+              setEditableUserId('');
               handleOpenModal();
             }}
           >
@@ -313,7 +335,9 @@ const Mentor = () => {
           open={openModal}
           onClose={handleCloseModal}
           showFooter={false}
-          modalTitle={t('MENTOR.NEW_MENTOR')}
+          modalTitle={
+            isEdit ? t('MENTOR.UPDATE_MENTOR') : t('MENTOR.NEW_MENTOR')
+          }
         >
           <AddEditMentor
             SuccessCallback={() => {
@@ -324,6 +348,13 @@ const Mentor = () => {
             schema={addSchema}
             uiSchema={addUiSchema}
             editPrefilledFormData={prefilledAddFormData}
+            isEdit={isEdit}
+            editableUserId={editableUserId}
+            UpdateSuccessCallback={() => {
+              setPrefilledFormData({});
+              searchData(prefilledFormData, currentPage);
+              setOpenModal(false);
+            }}
           />
         </SimpleModal>
 

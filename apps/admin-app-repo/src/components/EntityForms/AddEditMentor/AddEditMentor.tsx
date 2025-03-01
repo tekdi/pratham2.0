@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { showToastMessage } from '../../Toastify';
 import { TelemetryEventType } from '@/utils/app.constant';
 import { telemetryFactory } from '@/utils/telemetry';
-import { createUser } from '@/services/CreateUserService';
+import { createUser, updateUser } from '@/services/CreateUserService';
 
 //import { DynamicForm } from '@shared-lib';
 
@@ -20,6 +20,9 @@ const AddEditMentor = ({
   schema,
   uiSchema,
   editPrefilledFormData,
+  isEdit,
+  editableUserId,
+  UpdateSuccessCallback,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -28,6 +31,7 @@ const AddEditMentor = ({
   );
 
   const { t, i18n } = useTranslation();
+  const extraFieldsUpdate = {};
   const extraFields = {
     tenantCohortRoleMapping: [
       {
@@ -41,41 +45,94 @@ const AddEditMentor = ({
 
   const FormSubmitFunction = async (formData: any, payload: any) => {
     setPrefilledFormData(formData);
-    //Manually setting userName as a email
-    payload.username = formData.email;
-
-    try {
-      const mentorData = await createUser(payload, t);
-
-      if (mentorData && mentorData.success) {
-        showToastMessage(t('MENTOR.MENTOR_CREATED_SUCCESSFULLY'), 'success');
-
-        const windowUrl = window.location.pathname;
-        const cleanedUrl = windowUrl.replace(/^\//, '');
-        const env = cleanedUrl.split('/')[0];
-
-        const telemetryInteract = {
-          context: {
-            env: env,
-            cdata: [],
-          },
-          edata: {
-            id: 'youthnet-mentor-created-successfully',
-            type: TelemetryEventType.CLICK,
-            subtype: '',
-            pageid: cleanedUrl,
-          },
+    if (isEdit) {
+      try {
+        // console.log('Payload!!!!', payload);
+        const splitUserData = (payload) => {
+          const { customFields, ...userData } = payload;
+          return { userData, customFields };
         };
+        const { userData, customFields } = splitUserData(payload);
+        delete userData?.email;
+        // console.log('userData!!!!', userData);
+        // console.log('customFields!!!!', customFields);
+        const object = {
+          userData: userData,
+          customFields: customFields,
+        };
+        const updateUserResponse = await updateUser(editableUserId, object);
+        // console.log('updatedResponse@@@@@', updateUserResponse);
 
-        telemetryFactory.interact(telemetryInteract);
-        SuccessCallback();
-        // localStorage.removeItem('BMGSData');
-      } else {
+        if (
+          updateUserResponse &&
+          updateUserResponse?.data?.params?.err === null
+        ) {
+          showToastMessage(t('MENTOR.MENTOR_UPDATED_SUCCESSFULLY'), 'success');
+
+          const windowUrl = window.location.pathname;
+          const cleanedUrl = windowUrl.replace(/^\//, '');
+          const env = cleanedUrl.split('/')[0];
+
+          const telemetryInteract = {
+            context: {
+              env: env,
+              cdata: [],
+            },
+            edata: {
+              id: 'youthnet-mentor-updated-successfully',
+              type: TelemetryEventType.CLICK,
+              subtype: '',
+              pageid: cleanedUrl,
+            },
+          };
+
+          telemetryFactory.interact(telemetryInteract);
+          UpdateSuccessCallback();
+          // localStorage.removeItem('BMGSData');
+        } else {
+          showToastMessage(t('MENTOR.NOT_ABLE_UPDATE_MENTOR'), 'error');
+        }
+      } catch (error) {
+        console.error('Error update mentor:', error);
+        showToastMessage(t('MENTOR.NOT_ABLE_UPDATE_MENTOR'), 'error');
+      }
+    } else {
+      //Manually setting userName as a email
+      payload.username = formData.email;
+
+      try {
+        const mentorData = await createUser(payload, t);
+
+        if (mentorData && mentorData?.userData?.userId) {
+          showToastMessage(t('MENTOR.MENTOR_CREATED_SUCCESSFULLY'), 'success');
+
+          const windowUrl = window.location.pathname;
+          const cleanedUrl = windowUrl.replace(/^\//, '');
+          const env = cleanedUrl.split('/')[0];
+
+          const telemetryInteract = {
+            context: {
+              env: env,
+              cdata: [],
+            },
+            edata: {
+              id: 'youthnet-mentor-created-successfully',
+              type: TelemetryEventType.CLICK,
+              subtype: '',
+              pageid: cleanedUrl,
+            },
+          };
+
+          telemetryFactory.interact(telemetryInteract);
+          SuccessCallback();
+          // localStorage.removeItem('BMGSData');
+        } else {
+          showToastMessage(t('MENTOR.NOT_ABLE_CREATE_MENTOR'), 'error');
+        }
+      } catch (error) {
+        console.error('Error creating mentor:', error);
         showToastMessage(t('MENTOR.NOT_ABLE_CREATE_MENTOR'), 'error');
       }
-    } catch (error) {
-      console.error('Error creating mentor:', error);
-      showToastMessage(t('MENTOR.NOT_ABLE_CREATE_MENTOR'), 'error');
     }
   };
 
@@ -94,7 +151,7 @@ const AddEditMentor = ({
             t={t}
             FormSubmitFunction={FormSubmitFunction}
             prefilledFormData={prefilledFormData || {}}
-            extraFields={extraFields}
+            extraFields={isEdit ? extraFieldsUpdate : extraFields}
           />
         )
       )}

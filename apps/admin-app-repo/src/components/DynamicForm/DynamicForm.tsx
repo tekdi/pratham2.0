@@ -18,6 +18,7 @@ const DynamicForm = ({
   FormSubmitFunction,
   extraFields,
 }) => {
+  const [submitted, setSubmitted] = useState(false);
   const [formSchema, setFormSchema] = useState(schema);
   const [formUiSchemaOriginal, setFormUiSchemaOriginal] = useState(uiSchema);
   const [formUiSchema, setFormUiSchema] = useState(uiSchema);
@@ -599,7 +600,10 @@ const DynamicForm = ({
             onChange={handleChange}
             onSubmit={handleSubmit}
             validator={validator}
-            liveValidate
+            noHtml5Validate
+            showErrorList={false} // Hides the error list card at the top
+            // liveValidate={submitted} // Only validate on submit or typing
+            // onChange={() => setSubmitted(true)} // Show validation when user starts typing
           />
         </Grid>
       ) : (
@@ -619,7 +623,10 @@ const DynamicForm = ({
                 // submitButtonProps={{
                 //   style: { display: !isCallSubmitInHandle ? 'none' : 'block' },
                 // }}
-                liveValidate
+                noHtml5Validate
+                showErrorList={false} // Hides the error list card at the top
+                // liveValidate={submitted} // Only validate on submit or typing
+                // onChange={() => setSubmitted(true)} // Show validation when user starts typing
                 // {...(isCallSubmitInHandle
                 //   ? { submitButtonProps: { style: { display: 'none' } } }
                 //   : {})}
