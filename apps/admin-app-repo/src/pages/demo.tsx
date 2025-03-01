@@ -21,9 +21,20 @@ const demo = () => {
     // Fetch form schema from API and set it in state.
     const fetchData = async () => {
       let data = JSON.stringify({
-        fetchUrl:
-          'https://dev-middleware.prathamdigital.org/user/v1/form/read?context=cohorts&contextType=cohort',
-        tenantid: 'ef99949b-7f3a-4a5f-806a-e67e683e38f3',
+        readForm: [
+          {
+            fetchUrl:
+              'https://dev-middleware.prathamdigital.org/user/v1/form/read?context=cohorts&contextType=cohort',
+            header: {},
+          },
+          {
+            fetchUrl:
+              'https://dev-middleware.prathamdigital.org/user/v1/form/read?context=cohorts&contextType=cohort',
+            header: {
+              tenantid: 'ef99949b-7f3a-4a5f-806a-e67e683e38f3',
+            },
+          },
+        ],
       });
 
       let config = {
