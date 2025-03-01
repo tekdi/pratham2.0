@@ -780,7 +780,12 @@
     "SELECT_DISTRICT": "Select District",
     "SELECT": "Select",
     "ASSIGN_VILLAGES_FROM_BLOCK": "Assign Villages from Block",
-    "ASSIGN_VILLAGES_FROM_BLOCK_INFO": "You can complete this later at your own pace. However, the villages will only be assigned once you click on ‘Finish.’"
+    "ASSIGN_VILLAGES_FROM_BLOCK_INFO": "You can complete this later at your own pace. However, the villages will only be assigned once you click on ‘Finish.’",
+    "NO_DATA_FOUND":"no data found",
+    "VILLAGE":"Village",
+    "BLOCK":"blocks",
+    "VILLAGES":"Villages",
+    "BLOCKS":"Blocks"
   },
 
   "YOUTHNET_CAMP_DETAILS": {

@@ -12,6 +12,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useTheme } from '@mui/material/styles';
 import { getAge } from '../../utils/Helper';
 import {  useRouter } from 'next/navigation';
+import { useTranslation } from 'next-i18next';
 
 type UserCardProps = {
   name: string;
@@ -33,7 +34,9 @@ type UserCardProps = {
   onUserClick?: ( name: string) => void;
   customFields?: any;
   showAvtar?:any;
-  Id?: any
+  Id?: any;
+  villageCount?:any;
+  blockNames?:string[]
 };
 
 const UserCard: React.FC<UserCardProps> = ({
@@ -55,9 +58,12 @@ const UserCard: React.FC<UserCardProps> = ({
   customFields,
   onUserClick,
   showAvtar,
-  Id
+  Id,
+  blockNames,
+  villageCount
 }) => {
   const theme = useTheme<any>();
+  const { t } = useTranslation();
 
 const villageName=customFields?.find((item: any) => item.label === 'VILLAGE')?.selectedValues[0]?.value
 
@@ -116,6 +122,12 @@ const villageName=customFields?.find((item: any) => item.label === 'VILLAGE')?.s
           >
             {name}
           </Typography>
+          {villageCount && blockNames &&
+          (<Typography>
+{villageCount === 1 ? `${villageCount} ${t('YOUTHNET_USERS_AND_VILLAGES.VILLAGE')}` : `${villageCount} ${t('YOUTHNET_USERS_AND_VILLAGES.VILLAGES')}`} 
+{blockNames.length > 1 ? ` (${blockNames} ${t('YOUTHNET_USERS_AND_VILLAGES.BLOCKS')}` : blockNames.length === 1 ? ` (${blockNames} ${t('YOUTHNET_USERS_AND_VILLAGES.BLOCK')})` : ""}
+            </Typography>)
+          }
           <Box display={'flex'} justifyContent={'space-between'} width={'100%'}>
             <Box sx={{ display: 'flex', gap: '8px' }}>
               {dob ? (
@@ -147,7 +159,7 @@ const villageName=customFields?.find((item: any) => item.label === 'VILLAGE')?.s
                 fontWeight={600}
               >
                 {totalCount}
-                {newRegistrations && (
+                {newRegistrations?.toString() && (
                   <span
                     style={{
                       color:
