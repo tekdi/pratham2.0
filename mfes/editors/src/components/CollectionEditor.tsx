@@ -123,78 +123,10 @@ const CollectionEditor: React.FC = () => {
     config: {
       mode: mode || "edit", // edit / review / read / sourcingReview
       userSpecificFrameworkField: getLocalStoredUserSpecificBoard(),
-      maxDepth: 4,
       objectType: "Collection",
       primaryCategory: "Course", // Professional Development Course, Curriculum Course
-      isRoot: true,
-      dialcodeMinLength: 2,
-      dialcodeMaxLength: 250,
-      iconClass: "fa fa-book",
       showAddCollaborator: false,
       enableBulkUpload: false,
-      children: {},
-      hierarchy: {
-        level1: {
-          name: "Module",
-          type: "Unit",
-          mimeType: "application/vnd.ekstep.content-collection",
-          contentType: "CourseUnit",
-          primaryCategory: "Course Unit",
-          iconClass: "fa fa-folder-o",
-          children: {},
-        },
-        level2: {
-          name: "Sub-Module",
-          type: "Unit",
-          mimeType: "application/vnd.ekstep.content-collection",
-          contentType: "CourseUnit",
-          primaryCategory: "Course Unit",
-          iconClass: "fa fa-folder-o",
-          children: {
-            Content: [
-              "Explanation Content",
-              "Learning Resource",
-              "eTextbook",
-              "Teacher Resource",
-              "Course Assessment",
-            ],
-          },
-        },
-        level3: {
-          name: "Sub-Sub-Module",
-          type: "Unit",
-          mimeType: "application/vnd.ekstep.content-collection",
-          contentType: "CourseUnit",
-          primaryCategory: "Course Unit",
-          iconClass: "fa fa-folder-o",
-          children: {
-            Content: [
-              "Explanation Content",
-              "Learning Resource",
-              "eTextbook",
-              "Teacher Resource",
-              "Course Assessment",
-            ],
-          },
-        },
-        level4: {
-          name: "Sub-Sub-Module",
-          type: "Unit",
-          mimeType: "application/vnd.ekstep.content-collection",
-          contentType: "CourseUnit",
-          primaryCategory: "Course Unit",
-          iconClass: "fa fa-folder-o",
-          children: {
-            Content: [
-              "Explanation Content",
-              "Learning Resource",
-              "eTextbook",
-              "Teacher Resource",
-              "Course Assessment",
-            ],
-          },
-        },
-      },
       contentPolicyUrl: "/term-of-use.html",
     },
   };
