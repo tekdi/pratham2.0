@@ -87,52 +87,12 @@ const QuestionSetEditor: React.FC = () => {
       enableQuestionCreation: true,
       enableAddFromLibrary: true,
       editableFields: {
-        sourcingreview: ["instructions"],
-        orgreview: ["name", "instructions", "learningOutcome"],
-        review: ["name", "description"],
+        sourcingreview: [],
+        orgreview: [],
+        review: [],
       },
-      maxDepth: 4,
       objectType: "QuestionSet",
       primaryCategory: "Practice Question Set",
-      isRoot: true,
-      iconClass: "fa fa-book",
-      hideSubmitForReviewBtn: false,
-      children: {
-        Question: ["Multiple Choice Question", "Subjective Question"],
-      },
-      addFromLibrary: false,
-      hierarchy: {
-        level1: {
-          name: "Section",
-          type: "Unit",
-          mimeType: "application/vnd.sunbird.questionset",
-          primaryCategory: "Practice Question Set",
-          iconClass: "fa fa-folder-o",
-          children: {},
-          addFromLibrary: true,
-        },
-        level2: {
-          name: "Sub Section",
-          type: "Unit",
-          mimeType: "application/vnd.sunbird.questionset",
-          primaryCategory: "Practice Question Set",
-          iconClass: "fa fa-folder-o",
-          children: {
-            Question: ["Multiple Choice Question", "Subjective Question"],
-          },
-          addFromLibrary: true,
-        },
-        level3: {
-          name: "Sub Section",
-          type: "Unit",
-          mimeType: "application/vnd.sunbird.questionset",
-          primaryCategory: "Practice Question Set",
-          iconClass: "fa fa-folder-o",
-          children: {
-            Question: ["Subjective Question"],
-          },
-        },
-      },
       contentPolicyUrl: "/term-of-use.html",
       assetProxyUrl: "/assets/public/",
       commonFrameworkLicenseUrl: "https://creativecommons.org/licenses/",
@@ -209,7 +169,7 @@ const QuestionSetEditor: React.FC = () => {
         link.id = "sunbird-editor-css";
         link.rel = "stylesheet";
         link.href =
-          "https://cdn.jsdelivr.net/npm/@tekdi/sunbird-questionset-editor-web-component@5.0.0-beta.7/styles.css";
+          "https://cdn.jsdelivr.net/npm/@tekdi/sunbird-questionset-editor-web-component@5.0.0-beta.8/styles.css";
         document.head.appendChild(link);
       }
 
@@ -217,7 +177,7 @@ const QuestionSetEditor: React.FC = () => {
         const script = document.createElement("script");
         script.id = "sunbird-editor-js";
         script.src =
-          "https://cdn.jsdelivr.net/npm/@tekdi/sunbird-questionset-editor-web-component@5.0.0-beta.7/sunbird-questionset-editor.js";
+          "https://cdn.jsdelivr.net/npm/@tekdi/sunbird-questionset-editor-web-component@5.0.0-beta.8/sunbird-questionset-editor.js";
         script.async = true;
         script.onload = () => setAssetsLoaded(true);
         document.body.appendChild(script);
