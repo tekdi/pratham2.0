@@ -9,11 +9,11 @@ import Loader from '@/components/Loader';
 import { GenerateSchemaAndUiSchema } from '@/components/GeneratedSchemas';
 import { useTranslation } from 'react-i18next';
 import {
-  CohortSearchSchema,
-  CohortSearchUISchema,
-} from '../constant/Forms/CohortSearch';
-import { CohortTypes, Status } from '@/utils/app.constant';
-import { getCohortList } from '@/services/CohortService/cohortService';
+  MentorSearchSchema,
+  MentorSearchUISchema,
+} from '../constant/Forms/MentorSearch';
+import { Status } from '@/utils/app.constant';
+import { userList } from '@/services/UserList';
 import { Box, Grid, Typography } from '@mui/material';
 import { debounce } from 'lodash';
 import { Numbers } from '@mui/icons-material';
@@ -27,16 +27,17 @@ import {
   DialogContent,
   DialogActions,
 } from '@mui/material';
-import AddEditCenter from '@/components/EntityForms/AddEditCenter/AddEditCenter';
+import AddEditMentor from '@/components/EntityForms/AddEditMentor/AddEditMentor';
 import SimpleModal from '@/components/SimpleModal';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { updateCohortMemberStatus } from '@/services/CohortService/cohortService';
 
 //import { DynamicForm } from '@shared-lib';
 
-const Centers = () => {
+const Mentor = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [schema, setSchema] = useState(CohortSearchSchema);
-  const [uiSchema, setUiSchema] = useState(CohortSearchUISchema);
+  const [schema, setSchema] = useState(MentorSearchSchema);
+  const [uiSchema, setUiSchema] = useState(MentorSearchUISchema);
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
   const [prefilledAddFormData, setPrefilledAddFormData] = useState({});
@@ -50,11 +51,13 @@ const Centers = () => {
   const [renderKey, setRenderKey] = useState(true);
   // const [open, setOpen] = useState(false);
   const [openModal, setOpenModal] = React.useState<boolean>(false);
+  const [isEdit, setIsEdit] = useState(false);
+  const [editableUserId, setEditableUserId] = useState('');
 
   const { t, i18n } = useTranslation();
 
   useEffect(() => {
-    if (response?.count !== 0) {
+    if (response?.result?.totalCount !== 0) {
       searchData(prefilledFormData, 0);
     }
   }, [pageLimit]);
@@ -65,14 +68,14 @@ const Centers = () => {
         readForm: [
           {
             fetchUrl:
-              'https://dev-middleware.prathamdigital.org/user/v1/form/read?context=cohorts&contextType=cohort',
+              'https://dev-middleware.prathamdigital.org/user/v1/form/read?context=USERS&contextType=INSTRUCTOR',
             header: {},
           },
           {
             fetchUrl:
-              'https://dev-middleware.prathamdigital.org/user/v1/form/read?context=cohorts&contextType=cohort',
+              'https://dev-middleware.prathamdigital.org/user/v1/form/read?context=USERS&contextType=INSTRUCTOR',
             header: {
-              tenantid: 'ef99949b-7f3a-4a5f-806a-e67e683e38f3',
+              tenantid: '6c8b810a-66c2-4f0d-8c0c-c025415a4414',
             },
           },
         ],
@@ -115,10 +118,12 @@ const Centers = () => {
     },
   };
 
-  const debouncedGetCohortList = debounce(async (data) => {
-    const resp = await getCohortList(data);
-    console.log('Debounced API Call:', resp?.results?.cohortDetails || []);
-    setResponse(resp);
+  const debouncedGetList = debounce(async (data) => {
+    const resp = await userList(data);
+    console.log('Debounced API Call:', resp);
+    // console.log('totalCount', result?.totalCount);
+    // console.log('userDetails', result?.getUserDetails);
+    setResponse({ result: resp });
   }, 300);
 
   const SubmitaFunction = async (formData: any) => {
@@ -130,7 +135,7 @@ const Centers = () => {
     const { sortBy, ...restFormData } = formData;
 
     const filters = {
-      type: CohortTypes.COHORT,
+      role: 'Instructor',
       status: [Status.ACTIVE],
       ...Object.entries(restFormData).reduce((acc, [key, value]) => {
         if (value !== undefined && value !== '') {
@@ -140,7 +145,7 @@ const Centers = () => {
       }, {} as Record<string, any>),
     };
 
-    const sort = ['name', sortBy || 'asc'];
+    const sort = ['firstName', sortBy || 'asc'];
     let limit = pageLimit;
     let offset = newPage * limit;
     let pageNumber = newPage;
@@ -158,28 +163,59 @@ const Centers = () => {
     };
 
     if (filters.searchKey) {
-      debouncedGetCohortList(data);
+      debouncedGetList(data);
     } else {
-      const resp = await getCohortList(data);
-      setResponse(resp);
-      console.log('Immediate API Call:', resp?.results?.cohortDetails || []);
+      const resp = await userList(data);
+      // console.log('totalCount', result?.totalCount);
+      // console.log('userDetails', result?.getUserDetails);
+      setResponse({ result: resp });
+      console.log('Immediate API Call:', resp);
     }
   };
 
   // Define table columns
   const columns = [
-    { key: 'name', label: 'Cohort Name' },
+    {
+      keys: ['firstName', 'middleName', 'lastName'],
+      label: 'Mentor Name',
+      render: (row) =>
+        `${row.firstName || ''} ${row.middleName || ''} ${
+          row.lastName || ''
+        }`.trim(),
+    },
     {
       key: 'status',
       label: 'Status',
       getStyle: (row) => ({ color: row.status === 'active' ? 'green' : 'red' }),
     },
     {
-      key: 'state',
+      key: 'STATE',
       label: 'State',
-      render: (row) =>
-        row.customFields.find((field) => field.label === 'STATE')
-          ?.selectedValues[0]?.value || '-',
+      render: (row) => {
+        const state =
+          row.customFields.find((field) => field.label === 'STATE')
+            ?.selectedValues[0]?.value || '-';
+        return `${state}`;
+      },
+    },
+    {
+      keys: ['STATE', 'DISTRICT', 'BLOCK', 'VILLAGE'],
+      label: 'Location (State / District / Block/ Village)',
+      render: (row) => {
+        const state =
+          row.customFields.find((field) => field.label === 'STATE')
+            ?.selectedValues[0]?.value || '-';
+        const district =
+          row.customFields.find((field) => field.label === 'DISTRICT')
+            ?.selectedValues[0]?.value || '-';
+        const block =
+          row.customFields.find((field) => field.label === 'BLOCK')
+            ?.selectedValues[0]?.value || '-';
+        const village =
+          row.customFields.find((field) => field.label === 'VILLAGE')
+            ?.selectedValues[0]?.value || '-';
+        return `${state} / ${district} /  ${block} /${village}`;
+      },
     },
   ];
 
@@ -195,12 +231,29 @@ const Centers = () => {
         let tempFormData = extractMatchingKeys(row, addSchema);
         // console.log('tempFormData', tempFormData);
         setPrefilledAddFormData(tempFormData);
+        setIsEdit(true);
+        setEditableUserId(row?.userId);
         handleOpenModal();
       },
     },
     {
       icon: <DeleteIcon color="error" />,
-      callback: (row) => alert(`Deleting ${row.name}`),
+      callback: async (row) => {
+        console.log('row:', row);
+        // setEditableUserId(row?.userId);
+        const memberStatus = Status.ARCHIVED;
+        const statusReason = '';
+        const membershipId = row?.userId;
+
+        const response = await updateCohortMemberStatus({
+          memberStatus,
+          statusReason,
+          membershipId,
+        });
+        setPrefilledFormData({});
+        searchData(prefilledFormData, currentPage);
+        setOpenModal(false);
+      },
     },
   ];
 
@@ -269,6 +322,8 @@ const Centers = () => {
             color="primary"
             onClick={() => {
               setPrefilledAddFormData({});
+              setIsEdit(false);
+              setEditableUserId('');
               handleOpenModal();
             }}
           >
@@ -280,9 +335,11 @@ const Centers = () => {
           open={openModal}
           onClose={handleCloseModal}
           showFooter={false}
-          modalTitle={t('CENTERS.NEW_CENTER')}
+          modalTitle={
+            isEdit ? t('MENTOR.UPDATE_MENTOR') : t('MENTOR.NEW_MENTOR')
+          }
         >
-          <AddEditCenter
+          <AddEditMentor
             SuccessCallback={() => {
               setPrefilledFormData({});
               searchData({}, 0);
@@ -291,15 +348,22 @@ const Centers = () => {
             schema={addSchema}
             uiSchema={addUiSchema}
             editPrefilledFormData={prefilledAddFormData}
+            isEdit={isEdit}
+            editableUserId={editableUserId}
+            UpdateSuccessCallback={() => {
+              setPrefilledFormData({});
+              searchData(prefilledFormData, currentPage);
+              setOpenModal(false);
+            }}
           />
         </SimpleModal>
 
-        {response && response?.results?.cohortDetails ? (
+        {response && response?.result?.getUserDetails ? (
           <Box sx={{ mt: 5 }}>
             <PaginatedTable
               key={renderKey ? 'defaultRender' : 'customRender'}
-              count={response?.count}
-              data={response?.results?.cohortDetails}
+              count={response?.result?.totalCount}
+              data={response?.result?.getUserDetails}
               columns={columns}
               actions={actions}
               onPageChange={handlePageChange}
@@ -316,7 +380,7 @@ const Centers = () => {
             height="20vh"
           >
             <Typography marginTop="10px" textAlign={'center'}>
-              {t('COMMON.NO_CENTER_FOUND')}
+              {t('COMMON.NO_MENTOR_FOUND')}
             </Typography>
           </Box>
         )}
@@ -332,4 +396,4 @@ export async function getStaticProps({ locale }: any) {
   };
 }
 
-export default Centers;
+export default Mentor;

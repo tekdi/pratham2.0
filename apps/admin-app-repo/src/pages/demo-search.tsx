@@ -9,24 +9,30 @@ import Loader from '@/components/Loader';
 import { GenerateSchemaAndUiSchema } from '@/components/GeneratedSchemas';
 import { useTranslation } from 'react-i18next';
 import {
-  TeacherSearchSchema,
-  TeacherSearchUISchema,
-} from '../constant/Forms/TeacherSearch';
+  CohortSearchSchema,
+  CohortSearchUISchema,
+} from '../constant/Forms/CohortSearch';
 import { CohortTypes, Status } from '@/utils/app.constant';
 import { getCohortList } from '@/services/CohortService/cohortService';
-import { Grid } from '@mui/material';
+import { Box, Grid, Typography } from '@mui/material';
 import { debounce } from 'lodash';
+import KaTableComponent from '@/components/KaTableComponent';
+import { getCenterTableData } from '@/data/tableColumns';
+import { Numbers } from '@mui/icons-material';
 
 //import { DynamicForm } from '@shared-lib';
 
 const DemoSearch = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [schema, setSchema] = useState(TeacherSearchSchema);
-  const [uiSchema, setUiSchema] = useState(TeacherSearchUISchema);
+  const [schema, setSchema] = useState(CohortSearchSchema);
+  const [uiSchema, setUiSchema] = useState(CohortSearchUISchema);
   const [sortBy, setSortBy] = useState<string>('name');
   const [pageLimit, setPageLimit] = useState<number>(10);
   const [pageOffset, setPageOffset] = useState<number>(0);
   const [prefilledFormData, setPrefilledFormData] = useState({});
+  const [loading, setLoading] = useState<boolean>(false);
+  const [cohortData, setCohortData] = useState([]);
+  const [totalCount, setTotalCount] = useState(0);
 
   const { t, i18n } = useTranslation();
 
@@ -39,7 +45,9 @@ const DemoSearch = () => {
 
   const debouncedGetCohortList = debounce(async (data) => {
     const resp = await getCohortList(data);
-    // console.log('Debounced API Call:', data);
+    console.log('Debounced API Call:', resp?.results?.cohortDetails || []);
+    setCohortData(resp?.results?.cohortDetails);
+    setTotalCount(resp?.count || 0);
   }, 300);
 
   const SubmitaFunction = async (formData: any) => {
@@ -71,20 +79,19 @@ const DemoSearch = () => {
       debouncedGetCohortList(data);
     } else {
       const resp = await getCohortList(data);
-      console.log('Immediate API Call:', data);
+      console.log('Immediate API Call:', resp?.results?.cohortDetails || []);
+      setCohortData(resp?.results?.cohortDetails || []);
+      setTotalCount(resp?.count || 0);
     }
   };
 
   return (
     <>
       {isLoading ? (
-        <>
-          <Loader />
-        </>
+        <Loader />
       ) : (
         schema &&
         uiSchema && (
-          // <Grid container spacing={2}>
           <DynamicForm
             schema={schema}
             uiSchema={updatedUiSchema}
@@ -92,8 +99,46 @@ const DemoSearch = () => {
             isCallSubmitInHandle={true}
             prefilledFormData={prefilledFormData || {}}
           />
-          // </Grid>
         )
+      )}
+      {loading ? (
+        <Box
+          width={'100%'}
+          id="check"
+          display={'flex'}
+          flexDirection={'column'}
+          alignItems={'center'}
+        >
+          <Loader showBackdrop={false} loadingText={t('COMMON.LOADING')} />
+        </Box>
+      ) : cohortData?.length > 0 ? (
+        <KaTableComponent
+          columns={getCenterTableData(t)}
+          data={cohortData}
+          limit={pageLimit}
+          offset={pageOffset}
+          paginationEnable={totalCount > Numbers.TEN}
+          // PagesSelector={PagesSelector}
+          // pagination={pagination}
+          // PageSizeSelector={PageSizeSelectorFunction}
+          // pageSizes={pageSizeArray}
+          // extraActions={extraActions}
+          // showIcons={true}
+          // onEdit={handleEdit}
+          // onDelete={handleDelete}
+          // handleMemberClick={handleMemberClick}
+        />
+      ) : (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          height="20vh"
+        >
+          <Typography marginTop="10px" textAlign={'center'}>
+            {t('COMMON.NO_CENTER_FOUND')}
+          </Typography>
+        </Box>
       )}
     </>
   );

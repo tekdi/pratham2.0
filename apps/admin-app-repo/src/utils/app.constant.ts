@@ -55,6 +55,11 @@ export enum Role {
   CCTA = "Content reviewer"
 } ;
 
+export enum youthNetTenantName {
+  SECOND_CHANCE_PROGRAM = "Second Chance Program",
+  YOUTHNET="YouthNet"
+} 
+
 export enum Status {
   ARCHIVED = "archived",
   ARCHIVED_LABEL = "Archived",
@@ -98,7 +103,8 @@ export enum FormContextType {
   ADMIN = "ADMIN",
   ADMIN_CENTER = "ADMIN_CENTER",
   COHORT = "cohort",
-  CONTENT_CREATOR = "CONTENT CREATOR"
+  CONTENT_CREATOR = "CONTENT CREATOR",
+  
 }
 
 export enum RoleId {

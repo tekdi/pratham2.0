@@ -1,4 +1,4 @@
-export const TeacherSearchSchema = {
+export const MentorSearchSchema = {
   type: 'object',
   properties: {
     state: {
@@ -84,10 +84,10 @@ export const TeacherSearchSchema = {
         dependent: 'block',
       },
     },
-    name: {
+    firstName: {
       type: 'string',
       title: 'Search Key',
-      description: 'Search for a specific user or entity',
+      // description: 'Search for a specific user or entity',
     },
     sortBy: {
       type: 'string',
@@ -98,7 +98,7 @@ export const TeacherSearchSchema = {
   },
 };
 
-export const TeacherSearchUISchema = {
+export const MentorSearchUISchema = {
   'ui:order': ['state', 'district', 'block', 'village', 'searchKey', 'sortBy'],
 
   state: {
