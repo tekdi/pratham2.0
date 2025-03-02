@@ -36,7 +36,12 @@ const UserId = () => {
     state?:string|null;
     district?:string| null;
     block?:string|null;
+    middleName?:string|null;
     village?:string|null;
+    userName?:string|null;
+    joinedOn?:string|null;
+
+
   }>({
     userRole: null,
     userID: null,
@@ -49,7 +54,11 @@ const UserId = () => {
     state: null,
     district: null,
     block:null,
-    village: null
+    village: null,
+    middleName: null,
+    userName: null,
+    joinedOn: null,
+
   });
 
   useEffect(() => {
@@ -74,6 +83,9 @@ const UserId = () => {
         setUser({
           firstName: userData?.firstName || '',
           lastName: userData?.lastName || '',
+          middleName:userData?.middleName || '',
+          userName:  userData?.username || '',
+          joinedOn: userData?.createdOn || '',
           email: userData?.email || '',
           userID: userData?.userId || '',
           phone: userData?.mobile || '',
@@ -156,6 +168,13 @@ const UserId = () => {
           dob={user.dob || '-'}
           age={getAge(user?.dob)}
           village={user.village || null}
+          middleName={user.middleName || '-'}
+          userName={user.userName || null}
+          joinedOn={user.joinedOn || null}
+          firstName={user.firstName || ''}
+          lastName={user.lastName || ''}
+
+
         />
       </Box>
     </Box>

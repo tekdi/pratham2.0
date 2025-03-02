@@ -81,7 +81,7 @@ const VillageDetails = () => {
       <Box>
         <BackHeader
           headingOne={villageNameString}
-          headingTwo={yuthCount.toString()}
+          headingTwo={yuthCount?.toString()}
           headingThree={"^"+todaysRegistrationCount.toString()}
           showBackButton={true}
           onBackClick={handleBack}
