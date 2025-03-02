@@ -136,6 +136,7 @@ const FilterModalCenter: React.FC<FilterModalProps> = ({
               label={t('COMMON.Z_TO_A')}
             />
           </RadioGroup>
+          
           <Typography fontSize="12px" variant="subtitle1" mt={2} mb={1}>
             {t('CENTERS.CENTER_TYPE')}
           </Typography>

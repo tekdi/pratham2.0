@@ -161,7 +161,8 @@
     "RELOAD": "Update Now",
     "UPDATE_AVAILABLE": "New Update Available!",
     "RELOAD_TO_UPDATE": "Get the latest features and improvements—update now to enjoy a smoother experience and stay up-to-date!",
-    "NO_ASSIGNED_BOARDS": "No assigned Board for selected Center"
+    "NO_ASSIGNED_BOARDS": "No assigned Board for selected Center",
+    "HIGHT-TO_LOW":"High to low"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -727,7 +728,7 @@
     "VILLAGES_MANAGED_BY_YOU": "Villages Managed by you : {{totalVillageCount}}",
     "MANAGES": "Manages",
     "VILLAGES": "Villages",
-    "MONTHLY_REGISTRATIONS_OVERVIEW": "Monthly Registrations Overview",
+    "MONTHLY_REGISTRATIONS_OVERVIEW": "Monthly Registrations",
     "CLOSED_ON": "Closed on",
     "ABOVE_18": "Over 18 Registrations",
     "BELOW_18": "Under 18 Registrations",
@@ -738,11 +739,17 @@
       "LAST_SIX_MONTH":"Last 6 months",
       "LAST_TWL_MONTH":"Last 12 months",
        "TOTAL_YOUTH":"Total Youth",
+       "TOTAL_YOUTH_COUNT":"Total Count of Youth",
        "AS_OF_TODAY":"As of today",
        "AS_OF_LAST_SIX_MONTH":"As of last month",
        "AS_OF_LAST_YEAR":"As of last year",
          "VILLAGE_NAME":"Village Name",
-    "TOTAL_COUNT_NEW_REGISTRATION":"Total Count (+ New Registrations today)"
+    "TOTAL_COUNT_NEW_REGISTRATION":"Total Count (+ New Registrations today)",
+    "NEW_REGISTRATION":"New Registrations Today",
+    "YOUTH_JOINERS":"Youth joiners",
+    "OLD_JOINER_FIRST":"New joiners first",
+    "NEW_JOINER_FIRST":"Old joiners first",
+    "TOTAL_COUNT_YOUTH":"Total Count of Youth"
 
   },
   "YOUTHNET_VOLUNTEERLIST": {

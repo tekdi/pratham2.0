@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useTheme } from '@mui/material/styles';
-import { getAge } from '../../utils/Helper';
+import { getAge, getAgeInMonths } from '../../utils/Helper';
 import {  useRouter } from 'next/navigation';
 import { useTranslation } from 'next-i18next';
 
@@ -132,12 +132,12 @@ const villageName=customFields?.find((item: any) => item.label === 'VILLAGE')?.s
             <Box sx={{ display: 'flex', gap: '8px' }}>
               {dob ? (
                 <Typography variant="body2" color="textSecondary">
-                  {getAge(dob)} y/o • {villageName || joinOn}
+                  {getAge(dob)<0? getAgeInMonths(dob)+" m/o" :getAge(dob)+" y/o"}   • {t('YOUTHNET_PROFILE.JOINED_ON')} {" "+joinOn}
                 </Typography>
               ) : (
-                villageName && (
+                joinOn && (
                   <Typography variant="body2" color="textSecondary">
-                    {villageName || joinOn}
+                   {t('YOUTHNET_PROFILE.JOINED_ON')} {" "+t('YOUTHNET_PROFILE.JOINED_ON')}
                   </Typography>
                 )
               )}
@@ -203,7 +203,6 @@ export const UserList: React.FC<UserListProps> = ({
   onToggleUserClick,
   onUserClick
 }) => {
-  console.log(users)
     const router = useRouter();
   // const onUserClick=(userId: any)=>
   //   {
