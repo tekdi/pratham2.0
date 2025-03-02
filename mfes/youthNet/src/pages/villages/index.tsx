@@ -50,7 +50,7 @@ import { useDirection } from '../../hooks/useDirection';
 import GenericForm from '../../components/youthNet/GenericForm';
 import ExamplePage from '../../components/youthNet/BlockItem';
 import VillageSelector from '../../components/youthNet/VillageSelector';
-import { getLoggedInUserRole, getVillageUserCounts } from '../../utils/Helper';
+import { filterData, getAge, getLoggedInUserRole, getVillageUserCounts } from '../../utils/Helper';
 import { fetchUserList } from '../../services/youthNet/Dashboard/UserServices';
 import { cohortHierarchy, Role, Status } from '../../utils/app.constant';
 
@@ -77,6 +77,9 @@ const Index = () => {
   const [mentorList, setMentorList] = useState<any>([]);
   const [villageListWithUsers, setVillageListWithUsers] = useState<any>([]);  
   const [youthList, setYouthList] = useState<any>([]);
+  const [filteredmentorList, setFilteredmentorList] = useState<any>([]);
+  const [filteredvillageListWithUsers, setFilteredVillageListWithUsers] = useState<any>([]);  
+  const [filteredyouthList, setFilteredYouthList] = useState<any>([]);
    const [openDelete, setOpenDelete] = useState(false);
   const [selectedMentorId, setSelectedMentorId] = useState('');
   const [districtData, setDistrictData] = useState<any>(null);
@@ -123,6 +126,23 @@ const Index = () => {
     getData();
   }, []);
   useEffect(() => {
+    if(value === 1)
+    {
+       const searchResult=filterData(mentorList,searchInput)
+       setFilteredmentorList(searchResult)
+    }
+    if(value === 2)
+    {
+      const searchResult=filterData(villageListWithUsers,searchInput)
+      setFilteredVillageListWithUsers(searchResult)
+    }
+    if(value === 3)
+    {
+      const searchResult=filterData(youthList,searchInput)
+      setFilteredYouthList(searchResult)
+    }
+  }, [searchInput]);
+  useEffect(() => {
     const getYouthData = async () => {
       try{const filters = {
         village: [selectedVillageValue],
@@ -150,22 +170,42 @@ const Index = () => {
             if (user.lastName) {
               name += ` ${user.lastName}`;
             }
+            let formattedDate;
+            let isToday=false
+            if(user.createdAt)
+            {
+              const date = new Date(user.createdAt);
+              const today = new Date(); 
+               isToday =
+    date.getUTCFullYear() === today.getUTCFullYear() &&
+    date.getUTCMonth() === today.getUTCMonth() &&
+    date.getUTCDate() === today.getUTCDate();
+        const options: Intl.DateTimeFormatOptions = { 
+          day: "2-digit", 
+          month: "short", 
+          year: "numeric" 
+      };
+      
+       formattedDate = date.toLocaleDateString("en-GB", options);     
+        }
             return {
               Id: user.userId,
               name: name.trim(),
-              //  dob:user?.dob ,
               firstName: user?.firstName,
-             // villageCount: villageField?.selectedValues.length,
+              dob:getAge(user?.dob),
               lastName: user?.lastName,
-             // blockNames: blockValues,
+              joinOn:formattedDate,
+              isNew:isToday
             };
           }
         );
          setYouthList(transformedYouthData);
+         setFilteredYouthList(transformedYouthData)
       }
       else
       {
         setYouthList([]);
+        setFilteredYouthList([])
       }
       }
      catch(e)
@@ -214,14 +254,17 @@ const Index = () => {
               };
             }
           );
+          console.log(transformedMentorData)
+          // const filteredMentoList= filterData( transformedMentorData , searchInput)
           setMentorList(transformedMentorData);
+          setFilteredmentorList(transformedMentorData)
           setMentorCount(transformedMentorData.length);
         }
       } catch (e) {}
     };
-
+    if(value === 1)
     getMentorData();
-  }, [selectedDistrictValue]);
+  }, [selectedDistrictValue,  value]);
   const handleLocationClick = (Id: any, name: any) => {
     router.push({
       pathname: `/villageDetails/${name}`,
@@ -258,8 +301,10 @@ const Index = () => {
         console.log(villagewithUser);
 
         setVillageListWithUsers([...villagewithUser]);
+        setFilteredVillageListWithUsers([...villagewithUser])
       } catch (e) {
         setVillageListWithUsers([]);
+        setFilteredVillageListWithUsers([])
         console.log(e);
       }
     };
@@ -275,6 +320,8 @@ const Index = () => {
             ? JSON.parse(villageDataString)
             : null;
           setVillageList(villageData);
+          setSelectedVillageValue(villageData[0]?.Id);
+
           setVillageCount(villageData.length);
         } else if (selectedBlockValue !== '') {
           const controllingfieldfk = selectedBlockValue?.toString();
@@ -523,7 +570,7 @@ const Index = () => {
                 placeholder={t('YOUTHNET_USERS_AND_VILLAGES.SEARCH_MENTORS')}
                 fullWidth={true}
               />
-              <SortBy />
+              {/* <SortBy /> */}
             </Box>
 
             {/* <Box mt={'18px'} px={'18px'} ml={'10px'}>
@@ -591,7 +638,7 @@ const Index = () => {
             >
               <UserList
                 layout="list"
-                users={mentorList}
+                users={filteredmentorList}
                 onUserClick={handleUserClick}
                 onToggleUserClick={handleToggledMentorClick}
               />
@@ -831,7 +878,7 @@ const Index = () => {
                 placeholder={t('DASHBOARD.SEARCH_VILLAGES')}
                 fullWidth={true}
               />
-              <SortBy />
+              {/* <SortBy /> */}
             </Box>
             {/* <Box>
               <YouthAndVolunteers
@@ -905,10 +952,10 @@ const Index = () => {
                 mt: '15px',
               }}
             >
-              {villageListWithUsers.length !== 0 ? (
+              {filteredvillageListWithUsers.length !== 0 ? (
                 <UserList
                   layout="list"
-                  users={villageListWithUsers}
+                  users={filteredvillageListWithUsers}
                   onUserClick={handleLocationClick}
                 />
               ) : (
@@ -996,10 +1043,10 @@ const Index = () => {
               <SearchBar
                 onSearch={setSearchInput}
                 value={searchInput}
-                placeholder={t('DASHBOARD.SEARCH_VILLAGES')}
+                placeholder={t('DASHBOARD.SEARCH_YOUTH')}
                 fullWidth={true}
               />
-              <SortBy />
+              {/* <SortBy /> */}
             </Box>
             <Box
               sx={{
@@ -1009,7 +1056,7 @@ const Index = () => {
             >
               <UserList
                 layout="list"
-                users={youthList}
+                users={filteredyouthList}
                 onUserClick={handleUserClick}
                 onToggleUserClick={handleToggledUserClick}
               />
