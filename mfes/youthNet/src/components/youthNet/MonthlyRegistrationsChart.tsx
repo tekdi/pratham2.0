@@ -195,35 +195,36 @@ const MonthlyRegistrationsChart: React.FC<Props>= ({userId}) => {
     shape={(props: any) => {
       const { x, y, width, height, index } = props;
       const isSelected = selectedBar === index;
-      const barColor = isSelected
-        ? '#008000'
-        : props.payload.count >= 5
-        ? '#90ee90'
-        : '#ffcccb';
+      // const barColor = isSelected
+      //   ? '#008000'
+      //   : props.payload.count >= 5
+      //   ? '#90ee90'
+      //   : '#ffcccb';
+        const barColor = props.payload.count >= 5 ? '#90ee90' : '#ffcccb';
 
       return (
         <g>
-          {isSelected && (
-            <>
-              <path
-                d={`M0,0 L20,-10 L50,-10 L50,10 L20,10 Z`}
-                fill="#008000"
-                transform={`translate(${x + width + 10}, ${y - 20})`}
-              />
-              <text
-                x={x + width + 40}
-                y={y - 15}
-                textAnchor="middle"
-                fontSize={14}
-                fill="#ffffff"
-                fontWeight="bold"
-              >
-                {props.payload.count}
-              </text>
-            </>
-          )}
-          <rect x={x} y={y} width={width} height={height} fill={barColor} />
-        </g>
+      {isSelected && (
+        <>
+          {/* <path
+            d={`M0,0 L20,-10 L50,-10 L50,10 L20,10 Z`}
+            fill="#008000"
+            transform={`translate(${x + width + 10}, ${y - 20})`}
+          />
+          <text
+            x={x + width + 40}
+            y={y - 15}
+            textAnchor="middle"
+            fontSize={14}
+            fill="#ffffff"
+            fontWeight="bold"
+          >
+            {props.payload.count}
+          </text> */}
+        </>
+      )}
+      <rect x={x} y={y} width={width} height={height} fill={barColor} />
+    </g>
       );
     }}
   />
