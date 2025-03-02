@@ -238,7 +238,11 @@
     "USERS_&_VILLAGES": "Users & Villages",
     "VILLAGES": "Villages",
     "YOUTH_VOLUNTEERS": "Youth/Volunteers",
-    "SEARCH_VILLAGES": "Search Villages"
+    "SEARCH_VILLAGES": "Search Village",
+    "SEARCH_YOUTH": "Search youth",
+    "SEARCH_MENTOR": "Search mentor"
+
+
   },
   "ATTENDANCE": {
     "TOTAL_STUDENTS": "Total: {{count}}",
