@@ -33,7 +33,7 @@ const MonthlyRegistrationsChart: React.FC<Props>= ({userId}) => {
     const now = new Date();
     const month = now.toLocaleString('en-US', { month: 'short' }); // e.g., "Feb"
     
-    return [`(1 ${month} `, ` ${now.getDate()} ${month})`];
+    return [`(1 ${month} - ${now.getDate()} ${month})`];
 };
 
   useEffect(() => {
