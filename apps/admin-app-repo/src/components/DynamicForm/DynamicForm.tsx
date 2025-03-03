@@ -609,7 +609,7 @@ const DynamicForm = ({
       ) : (
         <Grid container spacing={2}>
           {Object.keys(formSchema.properties).map((key) => (
-            <Grid item xs={12} md={6} lg={4}  key={key} sx={{ mb: '-40px' }}>
+            <Grid item xs={12} md={6} lg={6}  key={key} sx={{ mb: '-40px' }}>
               <Form
                 schema={{
                   type: 'object',

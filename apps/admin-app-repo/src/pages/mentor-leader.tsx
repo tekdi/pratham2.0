@@ -209,7 +209,19 @@ const MentorLead = () => {
   // Define actions
   const actions = [
     {
-      icon: <Image src={editIcon} alt="" />,
+      icon: 
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            cursor: "pointer",
+            backgroundColor: "rgb(227, 234, 240)",
+            padding: "10px",
+          }}
+        >
+      <Image src={editIcon} alt="" />
+      </Box>,
       callback: (row) => {
         console.log('row:', row);
         console.log('AddSchema', addSchema);
@@ -224,7 +236,16 @@ const MentorLead = () => {
       },
     },
     {
-      icon: <Image src={deleteIcon} alt="" /> ,
+      icon: <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          cursor: "pointer",
+          backgroundColor: "rgb(227, 234, 240)",
+          padding: "10px",
+        }}
+      > <Image src={deleteIcon} alt="" /> </Box>,
       callback: async (row) => {
         console.log('row:', row);
         // setEditableUserId(row?.userId);
@@ -305,7 +326,7 @@ const MentorLead = () => {
         )}
         <Box mt={4} sx={{display:'flex', justifyContent:"end"}}>
           <Button
-            variant="contained"
+            variant="outlined"
             color="primary"
             onClick={() => {
               setPrefilledAddFormData({});
