@@ -10,6 +10,8 @@ import { showToastMessage } from '../../Toastify';
 import { TelemetryEventType } from '@/utils/app.constant';
 import { telemetryFactory } from '@/utils/telemetry';
 import { createUser, updateUser } from '@/services/CreateUserService';
+import { firstLetterInUpperCase, getUserFullName } from '@/utils/Helper';
+import { sendCredentialService } from '@/services/NotificationService';
 
 const AddEditMentorLead = ({
   SuccessCallback,
@@ -128,6 +130,51 @@ const AddEditMentorLead = ({
           telemetryFactory.interact(telemetryInteract);
           SuccessCallback();
           // localStorage.removeItem('BMGSData');
+
+          //Send Notification with credentials to user
+
+          const messageKey = 'MENTORS.MENTOR_LEAD_CREATED_SUCCESSFULLY';
+          const isQueue = false;
+          const context = 'USER';
+          let creatorName;
+          const key = 'onMentorLeaderCreate';
+          if (typeof window !== 'undefined' && window.localStorage) {
+            creatorName = getUserFullName();
+          }
+          let replacements: { [key: string]: string };
+          replacements = {};
+          if (creatorName) {
+            replacements = {
+              '{FirstName}': firstLetterInUpperCase(payload?.firstName),
+              '{UserName}': payload?.email,
+              '{Password}': payload?.password,
+              '{appUrl}':
+                (process.env.NEXT_PUBLIC_TEACHER_APP_URL as string) || '', //TODO: check url
+            };
+          }
+
+          const sendTo = {
+            receipients: [payload?.email],
+          };
+          if (Object.keys(replacements).length !== 0 && sendTo) {
+            const response = await sendCredentialService({
+              isQueue,
+              context,
+              key,
+              replacements,
+              email: sendTo,
+            });
+
+            if (response?.result[0]?.data[0]?.status === 'success') {
+              showToastMessage(t(messageKey), 'success');
+            } else {
+              const messageKey = 'MENTOR.USER_CREDENTIALS_WILL_BE_SEND_SOON';
+
+              showToastMessage(t(messageKey), 'success');
+            }
+          } else {
+            showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
+          }
         } else {
           showToastMessage(t('MENTOR.NOT_ABLE_CREATE_MENTOR_LEAD'), 'error');
         }
