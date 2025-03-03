@@ -201,7 +201,9 @@ const MentorLead = () => {
           row.customFields.find((field) => field.label === 'DISTRICT')
             ?.selectedValues[0]?.value || '';
 
-        return `${state}, ${district}`;
+        return `${state == '' ? '' : `${state}`}${
+          district == '' ? '' : `, ${district}`
+        }`;
       },
     },
   ];
