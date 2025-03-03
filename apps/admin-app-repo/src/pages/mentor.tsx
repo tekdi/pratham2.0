@@ -16,7 +16,7 @@ import { Box, Grid, Typography } from '@mui/material';
 import { debounce } from 'lodash';
 import { Numbers } from '@mui/icons-material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
-import EditIcon from "@mui/icons-material/Edit";
+import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Button } from '@mui/material';
 import AddEditMentor from '@/components/EntityForms/AddEditMentor/AddEditMentor';
@@ -236,7 +236,7 @@ const Mentor = () => {
         console.log('row:', row);
         console.log('AddSchema', addSchema);
         console.log('AddUISchema', addUiSchema);
-     
+
         let tempFormData = extractMatchingKeys(row, addSchema);
         // console.log('tempFormData', tempFormData);
         setPrefilledAddFormData(tempFormData);
@@ -335,7 +335,7 @@ const Mentor = () => {
             />
           )
         )}
-        <Box sx={{display:'flex' , justifyContent:'flex-end'}} mt={4}>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }} mt={4}>
           <Button
             variant="outlined"
             color="primary"
@@ -355,7 +355,7 @@ const Mentor = () => {
           onClose={handleCloseModal}
           showFooter={false}
           modalTitle={
-            isEdit ? t('MENTOR.UPDATE_MENTOR') : t('MENTOR.NEW_MENTOR')
+            isEdit ? t('MENTORS.UPDATE_MENTOR') : t('MENTORS.NEW_MENTOR')
           }
         >
           <AddEditMentor
@@ -378,7 +378,7 @@ const Mentor = () => {
         </SimpleModal>
 
         {response && response?.result?.getUserDetails ? (
-          <Box sx={{ mt:1 }}>
+          <Box sx={{ mt: 1 }}>
             <PaginatedTable
               key={renderKey ? 'defaultRender' : 'customRender'}
               count={response?.result?.totalCount}

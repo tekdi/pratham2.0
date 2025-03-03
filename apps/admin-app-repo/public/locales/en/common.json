@@ -146,8 +146,8 @@
     "YOU_DONT_HAVE_PERMISSION_TO_ACCESS_THIS_PAGE": "You don't have access to this page",
     "RETURN_TO_LOGIN": "Return to Login",
     "COHORT_CODE_EXISTS": "Code already exists",
-    "NO_MENTOR_LEAD_FOUND":"No Mentor Lead Found",
-    "NO_MENTOR_FOUND":"No Mentor Found"
+    "NO_MENTOR_FOUND": "No Mentor Found",
+    "NO_MENTOR_LEAD_FOUND": "No Mentor Lead Found"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -240,16 +240,25 @@
     "MENTOR_CREATED_SUCCESSFULLY": "Mentor has been successfully created!",
     "USER_CREDENTIALS_WILL_BE_SEND_SOON": "Mentor is created, credentials will be sent soon",
     "MENTOR_UPDATED_SUCCESSFULLY": "Mentor has been successfully updated!",
-    "EDIT_MENTOR": "Edit Mentor"
+    "EDIT_MENTOR": "Edit Mentor",
+    "NOT_ABLE_UPDATE_MENTOR": "Not able to update mentor",
+    "NOT_ABLE_CREATE_MENTOR": "Not able to create mentor",
+    "UPDATE_MENTOR": "Update Mentor"
   },
   "MENTOR_LEADERS": {
     "SEARCHBAR_PLACEHOLDER": "Search mentor leaders..",
-    "NEW_MENTOR_LEADER": "New Mentor leaders",
+    "ER": "New Mentor leaders",
     "FIRST_SELECT_REQUIRED_FIELDS": "First select required fields",
     "MENTOR_LEADER_CREATED_SUCCESSFULLY": "Mentor leader has been successfully created!",
     "USER_CREDENTIALS_WILL_BE_SEND_SOON": "Mentor leader is created, credentials will be sent soon",
     "MENTOR_LEADER_UPDATED_SUCCESSFULLY": "Mentor leader has been successfully updated!",
-    "EDIT_MENTOR_LEADER": "Edit Mentor leader"
+    "EDIT_MENTOR_LEADER": "Edit Mentor leader",
+    "MENTOR_LEAD_UPDATED_SUCCESSFULLY": "Mentor Lead has been successfully updated!",
+    "NOT_ABLE_UPDATE_MENTOR_LEAD": "Not able to update mentor lead",
+    "MENTOR_LEAD_CREATED_SUCCESSFULLY": "Mentor Lead has been successfully created!",
+    "NOT_ABLE_CREATE_MENTOR_LEAD": "Not able to create mentor lead",
+    "UPDATE_MENTOR_LEAD": "Update Mentor Lead",
+    "NEW_MENTOR_LEAD": "New Mentor Lead"
   },
   "TEAM_LEADERS": {
     "SEARCHBAR_PLACEHOLDER": "Search Team leaders..",

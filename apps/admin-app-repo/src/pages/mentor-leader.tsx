@@ -324,7 +324,7 @@ const MentorLead = () => {
             />
           )
         )}
-        <Box mt={4} sx={{display:'flex', justifyContent:"end"}}>
+        <Box mt={4} sx={{ display: 'flex', justifyContent: 'end' }}>
           <Button
             variant="outlined"
             color="primary"
@@ -345,8 +345,8 @@ const MentorLead = () => {
           showFooter={false}
           modalTitle={
             isEdit
-              ? t('MENTOR.UPDATE_MENTOR_LEAD')
-              : t('MENTOR.NEW_MENTOR_LEAD')
+              ? t('MENTOR_LEADERS.UPDATE_MENTOR_LEAD')
+              : t('MENTOR_LEADERS.NEW_MENTOR_LEAD')
           }
         >
           <AddEditMentorLead
