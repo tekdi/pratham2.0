@@ -36,6 +36,7 @@ import "ka-table/style.css";
 import KaTableComponent from "@workspace/components/KaTableComponent";
 import useSharedStore from "@workspace/utils/useSharedState";
 import useTenantConfig from "@workspace/hooks/useTenantConfig";
+import WorkspaceHeader from "@workspace/components/WorkspaceHeader";
 // const columns = [
 //   { key: 'name', title: 'Content', dataType: DataType.String, width: "450px" },
 //   { key: 'lastUpdatedOn', title: 'Last Updated', dataType: DataType.String, width: "300px" },
@@ -103,7 +104,7 @@ const AllContentsPage = () => {
   const [debouncedSearchTerm, setDebouncedSearchTerm] =
     useState<string>(searchTerm);
   const [totalCount, setTotalCount] = useState(0);
-
+const [showHeader, setShowHeader] = useState<boolean | null>(null);
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage - 1);
   };
@@ -114,6 +115,11 @@ const AllContentsPage = () => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+
+   useEffect(() => {
+    const headerValue = localStorage.getItem("showHeader");
+    setShowHeader(headerValue === "true");
+   }, []);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -265,6 +271,8 @@ const AllContentsPage = () => {
 
   console.log("contentList", contentList);
   return (
+    <>
+    {showHeader && <WorkspaceHeader />}
     <Layout selectedKey={selectedKey} onSelect={setSelectedKey}>
       <WorkspaceText />
 
@@ -321,6 +329,7 @@ const AllContentsPage = () => {
         </Box>
       </Box>
     </Layout>
+    </>
   );
 };
 

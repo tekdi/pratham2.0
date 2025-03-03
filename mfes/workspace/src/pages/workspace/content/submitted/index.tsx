@@ -26,6 +26,7 @@ import KaTableComponent from "@workspace/components/KaTableComponent";
 import { timeAgo } from "@workspace/utils/Helper";
 import useSharedStore from "@workspace/utils/useSharedState";
 import useTenantConfig from "@workspace/hooks/useTenantConfig";
+import WorkspaceHeader from "@workspace/components/WorkspaceHeader";
 const columns = [
   {
     key: "title_and_description",
@@ -71,6 +72,12 @@ const SubmittedForReviewPage = () => {
   const [data, setData] = React.useState<any[]>([]);
   const fetchContentAPI = useSharedStore((state: any) => state.fetchContentAPI);
   const prevFilterRef = useRef(filter);
+const [showHeader, setShowHeader] = useState<boolean | null>(null);
+
+useEffect(() => {
+            const headerValue = localStorage.getItem("showHeader");
+            setShowHeader(headerValue === "true");
+           }, []);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -158,6 +165,8 @@ const SubmittedForReviewPage = () => {
   ]);
 
   return (
+    <>
+    {showHeader && <WorkspaceHeader />}
     <Layout selectedKey={selectedKey} onSelect={setSelectedKey}>
       <WorkspaceText />
       <Box p={3}>
@@ -226,6 +235,7 @@ const SubmittedForReviewPage = () => {
         </Box>
       </Box>
     </Layout>
+    </>
   );
 };
 

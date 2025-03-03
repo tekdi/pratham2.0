@@ -26,6 +26,7 @@ import KaTableComponent from "@workspace/components/KaTableComponent";
 import { timeAgo } from "@workspace/utils/Helper";
 import useSharedStore from "@workspace/utils/useSharedState";
 import useTenantConfig from "@workspace/hooks/useTenantConfig";
+import WorkspaceHeader from "@workspace/components/WorkspaceHeader";
 
 const columns = [
   {
@@ -52,7 +53,7 @@ const DraftPage = () => {
   const tenantConfig = useTenantConfig();
   const [selectedKey, setSelectedKey] = useState("draft");
   const router = useRouter();
-
+const [showHeader, setShowHeader] = useState<boolean | null>(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
@@ -74,6 +75,11 @@ const DraftPage = () => {
 
   const [debouncedSearchTerm, setDebouncedSearchTerm] =
     useState<string>(searchTerm);
+
+     useEffect(() => {
+          const headerValue = localStorage.getItem("showHeader");
+          setShowHeader(headerValue === "true");
+         }, []);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -169,6 +175,8 @@ const DraftPage = () => {
   ]);
 
   return (
+    <>
+    {showHeader && <WorkspaceHeader />}
     <Layout selectedKey={selectedKey} onSelect={setSelectedKey}>
       <WorkspaceText />
       <Box p={3}>
@@ -226,6 +234,7 @@ const DraftPage = () => {
         </Box>
       </Box>
     </Layout>
+    </>
   );
 };
 
