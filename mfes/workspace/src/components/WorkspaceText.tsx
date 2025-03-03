@@ -14,18 +14,6 @@ const WorkspaceText: React.FC<any> = () => {
         },
         '@media (max-width: 900px)': { padding: '18px 24px' }
     }} gap={2}>
-        <Typography
-            variant="h1"
-            sx={{
-                color: theme.palette.warning['300'],
-                marginRight: "10px",
-                fontSize: "22px",
-                fontWeight: 400,
-                '@media (max-width: 900px)': { paddingLeft: '34px' }
-            }}
-        >
-            Workspace
-        </Typography>
 
         <Typography
             variant="body1"
@@ -45,4 +33,4 @@ const WorkspaceText: React.FC<any> = () => {
     </Box>)
 }
 
-export default WorkspaceText;
+export default WorkspaceText;            

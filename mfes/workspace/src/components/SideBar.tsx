@@ -47,9 +47,14 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
   const theme = useTheme<any>();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
+  const [showHeader, setShowHeader] = useState<boolean | null>(null);
+
+
   useEffect(() => {
     setUserRole(getLocalStoredUserRole());
     const userData = localStorage.getItem('userData');
+    const headerValue = localStorage.getItem("showHeader");
+      setShowHeader(headerValue === "true");
     const tenant = userData ? JSON.parse(userData) : null;
     setTenantName(tenant?.tenantData[0]?.tenantName);
   }, []);
@@ -132,7 +137,24 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
       <Box
         sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
       >
-        <img src={'/logo.png'} alt="logo" height={60} />
+              {showHeader ? (
+        <img src="/logo.png" alt="logo" height={60} />
+      ) : (
+        <Box sx={{ textAlign: "center", mt: 2 }}>
+          <Typography variant="h2"
+            sx={{
+              color:"#635E57",
+                marginRight: "10px",
+                
+                fontSize: "22px",
+                fontWeight: 400,
+                '@media (max-width: 900px)': { paddingLeft: '34px' }
+            }}>
+            Workspace
+          </Typography>
+        </Box>
+      )}
+
       </Box>
       <Box
         display="flex"
@@ -144,7 +166,7 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
       <Box display="flex" alignItems="center">
         <ListItemIcon>
           <IconButton onClick={goBack}>
-            <ArrowBackIcon sx={{ color: theme.palette.warning['100'] }} />
+            <ArrowBackIcon sx={{  color:"#635E57", }} />
           </IconButton>
         </ListItemIcon>
         <Typography
@@ -152,7 +174,7 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
           fontSize={'16px'}
           sx={{ color: theme.palette.warning['100'], fontWeight: 500 }}
         >
-          Back to Main Page
+         Exit Workspace
         </Typography>
       </Box>
        )}

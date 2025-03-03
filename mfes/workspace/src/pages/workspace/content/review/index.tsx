@@ -29,6 +29,7 @@ import { sendCredentialService } from "@workspace/services/NotificationService";
 import { getUserDetailsInfo } from "@workspace/services/userServices";
 import { sendContentNotification } from "@workspace/services/sendContentNotification";
 import useTenantConfig from "@workspace/hooks/useTenantConfig";
+import WorkspaceHeader from "@workspace/components/WorkspaceHeader";
 
 const userFullName = getLocalStoredUserName() || "Anonymous User";
 const [firstName, lastName] = userFullName.split(" ");
@@ -42,7 +43,7 @@ const ReviewContentSubmissions = () => {
   const { isDiscoverContent } = router.query;
   const { isReadOnly } = router.query;
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
+ const [showHeader, setShowHeader] = useState<boolean | null>(null);
   const [contentDetails, setContentDetails] = useState<any>(undefined);
   const [openConfirmationPopup, setOpenConfirmationPopup] = useState(false);
   const [confirmationActionType, setConfirmationActionType] = useState<
@@ -52,7 +53,10 @@ const ReviewContentSubmissions = () => {
   const [publishOpenToast, setPublishOpenToast] = useState<boolean>(false);
   const [requestOpenToast, setRequestOpenToast] = useState<boolean>(false);
 
-
+ useEffect(() => {
+            const headerValue = localStorage.getItem("showHeader");
+            setShowHeader(headerValue === "true");
+           }, []);
 
   useEffect(() => {
     if (!tenantConfig?.CHANNEL_ID) return;
@@ -201,6 +205,8 @@ const ReviewContentSubmissions = () => {
   
 
   return (
+    <>
+    {showHeader && <WorkspaceHeader />}
     <Card sx={{ padding: 2, backgroundColor: "white" }}>
            { publishOpenToast && (<ToastNotification message="Content published Successfully" type= "success" />)}
            { requestOpenToast && (<ToastNotification message="Requested for changes successfully" type= "success" />)}
@@ -502,6 +508,7 @@ const ReviewContentSubmissions = () => {
         title="Submit Your Comment"
       /> */}
     </Card>
+    </>
   );
 };
 
