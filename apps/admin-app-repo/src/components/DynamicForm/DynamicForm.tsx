@@ -8,16 +8,18 @@ import { Box } from '@mui/material';
 import CustomObjectFieldTemplate from './CustomObjectFieldTemplate';
 import CustomFieldTemplate from './CustomFieldTemplate';
 import { TextField, Container, Typography } from '@mui/material';
+import { useTranslation } from 'next-i18next';
 const DynamicForm = ({
   schema,
   uiSchema,
   SubmitaFunction,
   isCallSubmitInHandle,
   prefilledFormData,
-  t,
   FormSubmitFunction,
   extraFields,
 }) => {
+  const { t } = useTranslation();
+
   const [submitted, setSubmitted] = useState(false);
   const [formSchema, setFormSchema] = useState(schema);
   const [formUiSchemaOriginal, setFormUiSchemaOriginal] = useState(uiSchema);
@@ -124,6 +126,33 @@ const DynamicForm = ({
 
     // Call the function
     fetchApiData(schema);
+
+    console.log('formSchema !!!!!', formSchema);
+    //replace title with language constant
+    const updateSchemaTitles = (schema, t) => {
+      if (!schema || typeof schema !== 'object') return schema;
+
+      const updatedSchema = { ...schema };
+
+      if (updatedSchema.title) {
+        updatedSchema.title = t(updatedSchema.title);
+      }
+
+      if (updatedSchema.properties) {
+        updatedSchema.properties = Object.keys(updatedSchema.properties).reduce(
+          (acc, key) => {
+            acc[key] = updateSchemaTitles(updatedSchema.properties[key], t);
+            return acc;
+          },
+          {}
+        );
+      }
+
+      return updatedSchema;
+    };
+    // Dynamically update schema titles
+    const translatedSchema = updateSchemaTitles(formSchema, t);
+    setFormSchema(translatedSchema);
   }, []);
 
   // console.log('schema', schema)
@@ -592,20 +621,18 @@ const DynamicForm = ({
   return (
     <>
       {!isCallSubmitInHandle ? (
-        
-          <Form
-            schema={formSchema}
-            uiSchema={formUiSchema}
-            formData={formData}
-            onChange={handleChange}
-            onSubmit={handleSubmit}
-            validator={validator}
-            noHtml5Validate
-            showErrorList={false} // Hides the error list card at the top
-            // liveValidate={submitted} // Only validate on submit or typing
-            // onChange={() => setSubmitted(true)} // Show validation when user starts typing
-          />
-       
+        <Form
+          schema={formSchema}
+          uiSchema={formUiSchema}
+          formData={formData}
+          onChange={handleChange}
+          onSubmit={handleSubmit}
+          validator={validator}
+          noHtml5Validate
+          showErrorList={false} // Hides the error list card at the top
+          // liveValidate={submitted} // Only validate on submit or typing
+          // onChange={() => setSubmitted(true)} // Show validation when user starts typing
+        />
       ) : (
         <Grid container spacing={2}>
           {Object.keys(formSchema.properties).map((key) => (

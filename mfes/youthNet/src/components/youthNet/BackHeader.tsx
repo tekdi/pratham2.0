@@ -5,7 +5,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 interface BackHeaderProps {
   headingOne?: string;
   headingTwo?: string;
-  headingThree?: string;
+  headingThree?: any;
   onBackClick?: () => void;
   showBackButton?: boolean;
 }
