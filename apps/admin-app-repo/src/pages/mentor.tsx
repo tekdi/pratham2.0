@@ -185,33 +185,33 @@ const Mentor = () => {
       label: 'Status',
       getStyle: (row) => ({ color: row.status === 'active' ? 'green' : 'red' }),
     },
-    {
-      key: 'STATE',
-      label: 'State',
-      render: (row) => {
-        const state =
-          row.customFields.find((field) => field.label === 'STATE')
-            ?.selectedValues[0]?.value || '-';
-        return `${state}`;
-      },
-    },
+    // {
+    //   key: 'STATE',
+    //   label: 'State',
+    //   render: (row) => {
+    //     const state =
+    //       row.customFields.find((field) => field.label === 'STATE')
+    //         ?.selectedValues[0]?.value || '-';
+    //     return `${state}`;
+    //   },
+    // },
     {
       keys: ['STATE', 'DISTRICT', 'BLOCK', 'VILLAGE'],
       label: 'Location (State / District / Block/ Village)',
       render: (row) => {
         const state =
           row.customFields.find((field) => field.label === 'STATE')
-            ?.selectedValues[0]?.value || '-';
+            ?.selectedValues[0]?.value || '';
         const district =
           row.customFields.find((field) => field.label === 'DISTRICT')
-            ?.selectedValues[0]?.value || '-';
+            ?.selectedValues[0]?.value || '';
         const block =
           row.customFields.find((field) => field.label === 'BLOCK')
-            ?.selectedValues[0]?.value || '-';
+            ?.selectedValues[0]?.value || '';
         const village =
           row.customFields.find((field) => field.label === 'VILLAGE')
-            ?.selectedValues[0]?.value || '-';
-        return `${state} / ${district} /  ${block} /${village}`;
+            ?.selectedValues[0]?.value || '';
+        return `${state} ${district} ${block} ${village}`;
       },
     },
   ];
@@ -219,19 +219,20 @@ const Mentor = () => {
   // Define actions
   const actions = [
     {
-      icon: 
+      icon: (
         <Box
           sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            cursor: "pointer",
-            backgroundColor: "rgb(227, 234, 240)",
-            padding: "10px",
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            backgroundColor: 'rgb(227, 234, 240)',
+            padding: '10px',
           }}
         >
-      <Image src={editIcon} alt="" />
-      </Box>,
+          <Image src={editIcon} alt="" />
+        </Box>
+      ),
       callback: (row) => {
         console.log('row:', row);
         console.log('AddSchema', addSchema);
@@ -246,17 +247,21 @@ const Mentor = () => {
       },
     },
     {
-      icon: <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          cursor: "pointer",
-          backgroundColor: "rgb(227, 234, 240)",
-          padding: "10px",
-        }}
-      > <Image src={deleteIcon} alt="" />
-      </Box>,
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            backgroundColor: 'rgb(227, 234, 240)',
+            padding: '10px',
+          }}
+        >
+          {' '}
+          <Image src={deleteIcon} alt="" />
+        </Box>
+      ),
       callback: async (row) => {
         console.log('row:', row);
         // setEditableUserId(row?.userId);

@@ -180,28 +180,28 @@ const MentorLead = () => {
       label: 'Status',
       getStyle: (row) => ({ color: row.status === 'active' ? 'green' : 'red' }),
     },
-    {
-      key: 'STATE',
-      label: 'State',
-      render: (row) => {
-        const state =
-          row.customFields.find((field) => field.label === 'STATE')
-            ?.selectedValues[0]?.value || '-';
-        return `${state}`;
-      },
-    },
+    // {
+    //   key: 'STATE',
+    //   label: 'State',
+    //   render: (row) => {
+    //     const state =
+    //       row.customFields.find((field) => field.label === 'STATE')
+    //         ?.selectedValues[0]?.value || '-';
+    //     return `${state}`;
+    //   },
+    // },
     {
       keys: ['STATE', 'DISTRICT'],
       label: 'Location (State / District )',
       render: (row) => {
         const state =
           row.customFields.find((field) => field.label === 'STATE')
-            ?.selectedValues[0]?.value || '-';
+            ?.selectedValues[0]?.value || '';
         const district =
           row.customFields.find((field) => field.label === 'DISTRICT')
-            ?.selectedValues[0]?.value || '-';
+            ?.selectedValues[0]?.value || '';
 
-        return `${state} / ${district}`;
+        return `${state}, ${district}`;
       },
     },
   ];
@@ -209,19 +209,20 @@ const MentorLead = () => {
   // Define actions
   const actions = [
     {
-      icon: 
+      icon: (
         <Box
           sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            cursor: "pointer",
-            backgroundColor: "rgb(227, 234, 240)",
-            padding: "10px",
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            backgroundColor: 'rgb(227, 234, 240)',
+            padding: '10px',
           }}
         >
-      <Image src={editIcon} alt="" />
-      </Box>,
+          <Image src={editIcon} alt="" />
+        </Box>
+      ),
       callback: (row) => {
         console.log('row:', row);
         console.log('AddSchema', addSchema);
@@ -236,16 +237,21 @@ const MentorLead = () => {
       },
     },
     {
-      icon: <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          cursor: "pointer",
-          backgroundColor: "rgb(227, 234, 240)",
-          padding: "10px",
-        }}
-      > <Image src={deleteIcon} alt="" /> </Box>,
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            backgroundColor: 'rgb(227, 234, 240)',
+            padding: '10px',
+          }}
+        >
+          {' '}
+          <Image src={deleteIcon} alt="" />{' '}
+        </Box>
+      ),
       callback: async (row) => {
         console.log('row:', row);
         // setEditableUserId(row?.userId);
