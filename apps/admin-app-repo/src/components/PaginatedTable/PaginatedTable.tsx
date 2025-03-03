@@ -111,6 +111,7 @@ import {
   TablePagination,
   Paper,
   IconButton,
+  Box,
 } from '@mui/material';
 
 const PaginatedTable = ({
@@ -175,14 +176,14 @@ const PaginatedTable = ({
                   </TableCell>
                 ))}
                 {actions.length > 0 && (
-                  <TableCell>
+                  <TableCell sx={{width:'100px'}}>
                     {actions.map((action, idx) => (
-                      <IconButton
-                        key={idx}
-                        onClick={() => action.callback(row)}
-                      >
-                        {action.icon}
-                      </IconButton>
+                    
+                        <IconButton key={idx} onClick={() => action.callback(row)}>
+                          {action.icon}
+                        </IconButton>
+            
+
                     ))}
                   </TableCell>
                 )}
