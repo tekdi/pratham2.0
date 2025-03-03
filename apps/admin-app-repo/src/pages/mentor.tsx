@@ -16,13 +16,18 @@ import { Box, Grid, Typography } from '@mui/material';
 import { debounce } from 'lodash';
 import { Numbers } from '@mui/icons-material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
-import EditIcon from '@mui/icons-material/Edit';
+import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Button } from '@mui/material';
 import AddEditMentor from '@/components/EntityForms/AddEditMentor/AddEditMentor';
 import SimpleModal from '@/components/SimpleModal';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { updateCohortMemberStatus } from '@/services/CohortService/cohortService';
+import AddBoxIcon from '@mui/icons-material/AddBox';
+import PreviewIcon from '@mui/icons-material/Preview';
+import editIcon from '../../public/images/editIcon.svg';
+import deleteIcon from '../../public/images/deleteIcon.svg';
+import Image from 'next/image';
 
 //import { DynamicForm } from '@shared-lib';
 
@@ -214,12 +219,12 @@ const Mentor = () => {
   // Define actions
   const actions = [
     {
-      icon: <EditIcon color="primary" />,
+      icon: <Image src={editIcon} alt="" />,
       callback: (row) => {
         console.log('row:', row);
         console.log('AddSchema', addSchema);
         console.log('AddUISchema', addUiSchema);
-
+     
         let tempFormData = extractMatchingKeys(row, addSchema);
         // console.log('tempFormData', tempFormData);
         setPrefilledAddFormData(tempFormData);
@@ -229,7 +234,7 @@ const Mentor = () => {
       },
     },
     {
-      icon: <DeleteIcon color="error" />,
+      icon: <Image src={deleteIcon} alt="" />,
       callback: async (row) => {
         console.log('row:', row);
         // setEditableUserId(row?.userId);
@@ -308,7 +313,7 @@ const Mentor = () => {
             />
           )
         )}
-        <Box mt={4}>
+        <Box sx={{display:'flex' , justifyContent:'flex-end'}} mt={4}>
           <Button
             variant="contained"
             color="primary"
@@ -351,7 +356,7 @@ const Mentor = () => {
         </SimpleModal>
 
         {response && response?.result?.getUserDetails ? (
-          <Box sx={{ mt: 5 }}>
+          <Box sx={{ mt:1 }}>
             <PaginatedTable
               key={renderKey ? 'defaultRender' : 'customRender'}
               count={response?.result?.totalCount}
