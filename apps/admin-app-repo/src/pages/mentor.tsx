@@ -211,7 +211,7 @@ const Mentor = () => {
         const village =
           row.customFields.find((field) => field.label === 'VILLAGE')
             ?.selectedValues[0]?.value || '';
-        return `${state} ${district} ${block} ${village}`;
+        return `${state}, ${district}, ${block}, ${village}`;
       },
     },
   ];
