@@ -145,7 +145,9 @@
     "ACCESS_DENIED": "Access Denied",
     "YOU_DONT_HAVE_PERMISSION_TO_ACCESS_THIS_PAGE": "You don't have access to this page",
     "RETURN_TO_LOGIN": "Return to Login",
-    "COHORT_CODE_EXISTS": "Code already exists"
+    "COHORT_CODE_EXISTS": "Code already exists",
+    "NO_MENTOR_LEAD_FOUND":"No Mentor Lead Found",
+    "NO_MENTOR_FOUND":"No Mentor Found"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -627,4 +629,6 @@
   "TRANSGENDER": "Transgender",
   "dob": "DOB",
   "email": "Email"
+
+
 }
