@@ -66,7 +66,7 @@ const AddEditMentorLead = ({
           updateUserResponse?.data?.params?.err === null
         ) {
           showToastMessage(
-            t('MENTOR.MENTOR_LEAD_UPDATED_SUCCESSFULLY'),
+            t('MENTOR_LEADERS.MENTOR_LEAD_UPDATED_SUCCESSFULLY'),
             'success'
           );
 
@@ -91,11 +91,17 @@ const AddEditMentorLead = ({
           UpdateSuccessCallback();
           // localStorage.removeItem('BMGSData');
         } else {
-          showToastMessage(t('MENTOR.NOT_ABLE_UPDATE_MENTOR_LEAD'), 'error');
+          showToastMessage(
+            t('MENTOR_LEADERS.NOT_ABLE_UPDATE_MENTOR_LEAD'),
+            'error'
+          );
         }
       } catch (error) {
         console.error('Error update mentor lead:', error);
-        showToastMessage(t('MENTOR.NOT_ABLE_UPDATE_MENTOR_LEAD'), 'error');
+        showToastMessage(
+          t('MENTOR_LEADERS.NOT_ABLE_UPDATE_MENTOR_LEAD'),
+          'error'
+        );
       }
     } else {
       //Manually setting userName as a email
@@ -106,7 +112,7 @@ const AddEditMentorLead = ({
 
         if (mentorLeadData && mentorLeadData?.userData?.userId) {
           showToastMessage(
-            t('MENTOR.MENTOR_LEAD_CREATED_SUCCESSFULLY'),
+            t('MENTOR_LEADERS.MENTOR_LEAD_CREATED_SUCCESSFULLY'),
             'success'
           );
 
@@ -168,7 +174,8 @@ const AddEditMentorLead = ({
             if (response?.result[0]?.data[0]?.status === 'success') {
               showToastMessage(t(messageKey), 'success');
             } else {
-              const messageKey = 'MENTOR.USER_CREDENTIALS_WILL_BE_SEND_SOON';
+              const messageKey =
+                'MENTOR_LEADERS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
 
               showToastMessage(t(messageKey), 'success');
             }
@@ -176,11 +183,17 @@ const AddEditMentorLead = ({
             showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
           }
         } else {
-          showToastMessage(t('MENTOR.NOT_ABLE_CREATE_MENTOR_LEAD'), 'error');
+          showToastMessage(
+            t('MENTOR_LEADERS.NOT_ABLE_CREATE_MENTOR_LEAD'),
+            'error'
+          );
         }
       } catch (error) {
         console.error('Error creating mentor lead:', error);
-        showToastMessage(t('MENTOR.NOT_ABLE_CREATE_MENTOR_LEAD'), 'error');
+        showToastMessage(
+          t('MENTOR_LEADERS.NOT_ABLE_CREATE_MENTOR_LEAD'),
+          'error'
+        );
       }
     }
   };
