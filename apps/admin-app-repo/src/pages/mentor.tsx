@@ -41,7 +41,7 @@ const Mentor = () => {
   const [sortBy, setSortBy] = useState<string>('name');
   const [pageLimit, setPageLimit] = useState<number>(10);
   const [pageOffset, setPageOffset] = useState<number>(0);
-  const [prefilledFormData, setPrefilledFormData] = useState({});
+  const [prefilledFormData, setPrefilledFormData] = useState({ state: '27' });
   const [loading, setLoading] = useState<boolean>(false);
   const [response, setResponse] = useState({});
   const [currentPage, setCurrentPage] = useState(0);
@@ -211,7 +211,11 @@ const Mentor = () => {
         const village =
           row.customFields.find((field) => field.label === 'VILLAGE')
             ?.selectedValues[0]?.value || '';
-        return `${state}, ${district}, ${block}, ${village}`;
+        return `${state == '' ? '' : `${state}`}${
+          district == '' ? '' : `, ${district}`
+        }${block == '' ? '' : `, ${block}`}${
+          village == '' ? '' : `, ${village}`
+        }`;
       },
     },
   ];
@@ -274,7 +278,7 @@ const Mentor = () => {
           statusReason,
           membershipId,
         });
-        setPrefilledFormData({});
+        setPrefilledFormData({ state: '27' });
         searchData(prefilledFormData, currentPage);
         setOpenModal(false);
       },
@@ -365,7 +369,7 @@ const Mentor = () => {
         >
           <AddEditMentor
             SuccessCallback={() => {
-              setPrefilledFormData({});
+              setPrefilledFormData({ state: '27' });
               searchData({}, 0);
               setOpenModal(false);
             }}
@@ -375,7 +379,7 @@ const Mentor = () => {
             isEdit={isEdit}
             editableUserId={editableUserId}
             UpdateSuccessCallback={() => {
-              setPrefilledFormData({});
+              setPrefilledFormData({ state: '27' });
               searchData(prefilledFormData, currentPage);
               setOpenModal(false);
             }}
