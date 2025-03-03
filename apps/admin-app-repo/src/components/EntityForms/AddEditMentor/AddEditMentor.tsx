@@ -10,6 +10,8 @@ import { showToastMessage } from '../../Toastify';
 import { TelemetryEventType } from '@/utils/app.constant';
 import { telemetryFactory } from '@/utils/telemetry';
 import { createUser, updateUser } from '@/services/CreateUserService';
+import { firstLetterInUpperCase, getUserFullName } from '@/utils/Helper';
+import { sendCredentialService } from '@/services/NotificationService';
 
 //import { DynamicForm } from '@shared-lib';
 
@@ -65,7 +67,7 @@ const AddEditMentor = ({
           updateUserResponse &&
           updateUserResponse?.data?.params?.err === null
         ) {
-          showToastMessage(t('MENTOR.MENTOR_UPDATED_SUCCESSFULLY'), 'success');
+          showToastMessage(t('MENTORS.MENTOR_UPDATED_SUCCESSFULLY'), 'success');
 
           const windowUrl = window.location.pathname;
           const cleanedUrl = windowUrl.replace(/^\//, '');
@@ -88,11 +90,11 @@ const AddEditMentor = ({
           UpdateSuccessCallback();
           // localStorage.removeItem('BMGSData');
         } else {
-          showToastMessage(t('MENTOR.NOT_ABLE_UPDATE_MENTOR'), 'error');
+          showToastMessage(t('MENTORS.NOT_ABLE_UPDATE_MENTOR'), 'error');
         }
       } catch (error) {
         console.error('Error update mentor:', error);
-        showToastMessage(t('MENTOR.NOT_ABLE_UPDATE_MENTOR'), 'error');
+        showToastMessage(t('MENTORS.NOT_ABLE_UPDATE_MENTOR'), 'error');
       }
     } else {
       //Manually setting userName as a email
@@ -102,7 +104,7 @@ const AddEditMentor = ({
         const mentorData = await createUser(payload, t);
 
         if (mentorData && mentorData?.userData?.userId) {
-          showToastMessage(t('MENTOR.MENTOR_CREATED_SUCCESSFULLY'), 'success');
+          showToastMessage(t('MENTORS.MENTOR_CREATED_SUCCESSFULLY'), 'success');
 
           const windowUrl = window.location.pathname;
           const cleanedUrl = windowUrl.replace(/^\//, '');
@@ -124,12 +126,57 @@ const AddEditMentor = ({
           telemetryFactory.interact(telemetryInteract);
           SuccessCallback();
           // localStorage.removeItem('BMGSData');
+
+          //Send Notification with credentials to user
+
+          const messageKey = 'MENTORS.MENTOR_CREATED_SUCCESSFULLY';
+          const isQueue = false;
+          const context = 'USER';
+          let creatorName;
+          const key = 'onMentorCreate';
+          if (typeof window !== 'undefined' && window.localStorage) {
+            creatorName = getUserFullName();
+          }
+          let replacements: { [key: string]: string };
+          replacements = {};
+          if (creatorName) {
+            replacements = {
+              '{FirstName}': firstLetterInUpperCase(payload?.firstName),
+              '{UserName}': payload?.email,
+              '{Password}': payload?.password,
+              '{appUrl}':
+                (process.env.NEXT_PUBLIC_TEACHER_APP_URL as string) || '', //TODO: check url
+            };
+          }
+
+          const sendTo = {
+            receipients: [payload?.email],
+          };
+          if (Object.keys(replacements).length !== 0 && sendTo) {
+            const response = await sendCredentialService({
+              isQueue,
+              context,
+              key,
+              replacements,
+              email: sendTo,
+            });
+
+            if (response?.result[0]?.data[0]?.status === 'success') {
+              showToastMessage(t(messageKey), 'success');
+            } else {
+              const messageKey = 'MENTORS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
+
+              showToastMessage(t(messageKey), 'success');
+            }
+          } else {
+            showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
+          }
         } else {
-          showToastMessage(t('MENTOR.NOT_ABLE_CREATE_MENTOR'), 'error');
+          showToastMessage(t('MENTORS.NOT_ABLE_CREATE_MENTOR'), 'error');
         }
       } catch (error) {
         console.error('Error creating mentor:', error);
-        showToastMessage(t('MENTOR.NOT_ABLE_CREATE_MENTOR'), 'error');
+        showToastMessage(t('MENTORS.NOT_ABLE_CREATE_MENTOR'), 'error');
       }
     }
   };

@@ -23,6 +23,9 @@ import AddEditMentorLead from '@/components/EntityForms/AddEditMentorLead/AddEdi
 import SimpleModal from '@/components/SimpleModal';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { updateCohortMemberStatus } from '@/services/CohortService/cohortService';
+import editIcon from '../../public/images/editIcon.svg';
+import deleteIcon from '../../public/images/deleteIcon.svg';
+import Image from 'next/image';
 
 const MentorLead = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -206,7 +209,19 @@ const MentorLead = () => {
   // Define actions
   const actions = [
     {
-      icon: <EditIcon color="primary" />,
+      icon: 
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            cursor: "pointer",
+            backgroundColor: "rgb(227, 234, 240)",
+            padding: "10px",
+          }}
+        >
+      <Image src={editIcon} alt="" />
+      </Box>,
       callback: (row) => {
         console.log('row:', row);
         console.log('AddSchema', addSchema);
@@ -221,7 +236,16 @@ const MentorLead = () => {
       },
     },
     {
-      icon: <DeleteIcon color="error" />,
+      icon: <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          cursor: "pointer",
+          backgroundColor: "rgb(227, 234, 240)",
+          padding: "10px",
+        }}
+      > <Image src={deleteIcon} alt="" /> </Box>,
       callback: async (row) => {
         console.log('row:', row);
         // setEditableUserId(row?.userId);
@@ -300,9 +324,9 @@ const MentorLead = () => {
             />
           )
         )}
-        <Box mt={4}>
+        <Box mt={4} sx={{ display: 'flex', justifyContent: 'end' }}>
           <Button
-            variant="contained"
+            variant="outlined"
             color="primary"
             onClick={() => {
               setPrefilledAddFormData({});
@@ -321,8 +345,8 @@ const MentorLead = () => {
           showFooter={false}
           modalTitle={
             isEdit
-              ? t('MENTOR.UPDATE_MENTOR_LEAD')
-              : t('MENTOR.NEW_MENTOR_LEAD')
+              ? t('MENTOR_LEADERS.UPDATE_MENTOR_LEAD')
+              : t('MENTOR_LEADERS.NEW_MENTOR_LEAD')
           }
         >
           <AddEditMentorLead
@@ -345,7 +369,7 @@ const MentorLead = () => {
         </SimpleModal>
 
         {response && response?.result?.getUserDetails ? (
-          <Box sx={{ mt: 5 }}>
+          <Box sx={{ mt: 1 }}>
             <PaginatedTable
               key={renderKey ? 'defaultRender' : 'customRender'}
               count={response?.result?.totalCount}
