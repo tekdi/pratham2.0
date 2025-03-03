@@ -18,9 +18,15 @@ const SortBy = ({ appliedFilters, setAppliedFilters, sortingContent }: { applied
   const [selectedCenters, setSelectedCenters] = useState<string[]>([]);
 
   const handleFilterApply = () => {
-    console.log(centerType)
 
     setAppliedFilters({ centerType, sortOrder });
+    handleFilterModalClose();
+  };
+    const handleFilterClear = () => {
+    const centerType="";
+    const sortOrder="";
+    setAppliedFilters({ centerType, sortOrder });
+    // setFilteredCenters(getFilteredCenters);
     handleFilterModalClose();
   };
 
@@ -77,6 +83,8 @@ const SortBy = ({ appliedFilters, setAppliedFilters, sortingContent }: { applied
         setCenterType={setCenterType}
         onApply={handleFilterApply}
         sortingContent={sortingContent}
+        clearFilters={handleFilterClear}
+
       />
     </>
   );
