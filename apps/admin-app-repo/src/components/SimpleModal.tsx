@@ -48,11 +48,12 @@ const SimpleModal: React.FC<SimpleModalProps> = ({
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: isFullwidth ? "60%" : isSmallScreen ? "90%" : "40%",
-    maxHeight: isFullwidth ? "100vh":"100vh",
+    maxWidth:'450px',
+    width:'100%',
+    maxHeight: isFullwidth ? "60vh":"60vh",
     backgroundColor: "#fff",
     borderRadius: "8px",
-    boxShadow: theme.shadows[5],
+    boxShadow: theme.shadows[5]
   };
 
   const titleStyle = {

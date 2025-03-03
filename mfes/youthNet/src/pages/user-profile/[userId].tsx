@@ -79,8 +79,22 @@ const UserId = () => {
       if (userData) {
         const getFieldValue = (label: string) =>
           toPascalCase(userData?.customFields?.find((item: any) => item.label === label)?.selectedValues?.[0]?.value || '');
+        let date;
+        let formattedDOBDate;
+        if(userData.dob)
+        {
+           date = new Date(userData.dob);
+          //const joinedDate = new Date(userData.createdAt);
   
-        setUser({
+          const options: Intl.DateTimeFormatOptions = { 
+            day: "2-digit", 
+            month: "short", 
+            year: "numeric" 
+        };
+   formattedDOBDate = date.toLocaleDateString("en-GB", options);       
+        }
+       
+       setUser({
           firstName: userData?.firstName || '',
           lastName: userData?.lastName || '',
           middleName:userData?.middleName || '',
@@ -91,7 +105,7 @@ const UserId = () => {
           phone: userData?.mobile || '',
           gender: userData?.gender || '',
           userRole: userData?.tenantData?.[0]?.roleName || role,
-          dob: userData?.dob || '',
+          dob: formattedDOBDate || '',
           district: getFieldValue('DISTRICT'),
           block: getFieldValue('BLOCK'),
           state: getFieldValue('STATE'),
@@ -161,7 +175,7 @@ const UserId = () => {
           designation={user.userRole || '-'}
           mentorId={user.userID || ''}
           phoneNumber={user.phone || '-'}
-          gender={user.gender || '-'}
+          gender={toPascalCase(user.gender) || '-'}
           state={user.state ||"-"}
           district={user.district ||"-"}
           block={user.block ||"-"}

@@ -592,7 +592,7 @@ const DynamicForm = ({
   return (
     <>
       {!isCallSubmitInHandle ? (
-        <Grid container spacing={2}>
+        
           <Form
             schema={formSchema}
             uiSchema={formUiSchema}
@@ -605,11 +605,11 @@ const DynamicForm = ({
             // liveValidate={submitted} // Only validate on submit or typing
             // onChange={() => setSubmitted(true)} // Show validation when user starts typing
           />
-        </Grid>
+       
       ) : (
         <Grid container spacing={2}>
           {Object.keys(formSchema.properties).map((key) => (
-            <Grid item xs={4} key={key} sx={{ mb: '-40px' }}>
+            <Grid item xs={12} md={6} lg={4}  key={key} sx={{ mb: '-40px' }}>
               <Form
                 schema={{
                   type: 'object',

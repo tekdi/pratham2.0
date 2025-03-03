@@ -17,6 +17,7 @@ const JotFormEmbed: React.FC<JotFormEmbedProps> = ({ formId, queryParams }) => {
       return acc;
     }, {} as Record<string, string>)
   ).toString();
+  
 
   return (
     <>

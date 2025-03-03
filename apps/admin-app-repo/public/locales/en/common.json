@@ -610,8 +610,23 @@
   "REISSUE_CERTIFICATE_CONFIRMATION":"Reissue certificate confirmation",
   "ISSUE_CERTIFICATE_CONFIRMATION":"Issue certificate confirmation",
   "COURSE_CERTIFICATE":"Course certificate"
-
-
-
+},
+  "MENTOR":{
+    "NEW_MENTOR":"New Mentor",
+    "NEW_MENTOR_LEAD" :"New Mentor Lead",
+    "NO_MENTOR_FOUND" :"No Mentor Found"
+  },
+  "WHATS_YOUR_GENDER" :"Gender",
+  "first_name" :" First Name",
+  "middle_name":"Middle Name",
+  "last_name":"Last Name",
+  "phone_number":"Phone Number",
+  "STATE" :"State",
+  "DISTRICT" :"District",
+  "BLOCK":"Block",
+  "VILLAGE":"Village",
+  "MALE":"Male",
+  "FEMALE":"Female",
+  "TRANSGENDER":"Transgender"
 }
-}
+
