@@ -30,7 +30,9 @@ interface FilterModalProps {
   centerType: CenterType;
   setCenterType: (type: CenterType) => void;
   onApply: () => void;
-  sortingContent: any
+  sortingContent: any,
+  clearFilters?: () => void;
+
 }
 
 const FilterModalCenter: React.FC<FilterModalProps> = ({
@@ -44,7 +46,9 @@ const FilterModalCenter: React.FC<FilterModalProps> = ({
   centerType,
   setCenterType,
   onApply,
-  sortingContent
+  sortingContent,
+  clearFilters
+
 }) => {
   const { t } = useTranslation();
   const [searchInput, setSearchInput] = useState('');
@@ -66,11 +70,11 @@ const FilterModalCenter: React.FC<FilterModalProps> = ({
     center?.toLowerCase().includes(searchInput?.toLowerCase())
   );
 
-  const clearFilters = () => {
-    setSortOrder('');
-    setCenterType('');
-    onApply();
-  };
+  // const clearFilters = () => {
+  //   setSortOrder('');
+  //   setCenterType('');
+  //   onApply();
+  // };
 
   const handleApplyClick = () => {
     onApply();

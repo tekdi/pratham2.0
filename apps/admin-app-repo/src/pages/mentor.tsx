@@ -4,9 +4,7 @@ import Form from '@rjsf/mui';
 import validator from '@rjsf/validator-ajv8';
 import axios from 'axios';
 import DynamicForm from '@/components/DynamicForm/DynamicForm';
-import { setSeconds } from 'date-fns';
 import Loader from '@/components/Loader';
-import { GenerateSchemaAndUiSchema } from '@/components/GeneratedSchemas';
 import { useTranslation } from 'react-i18next';
 import {
   MentorSearchSchema,
@@ -20,13 +18,7 @@ import { Numbers } from '@mui/icons-material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import {
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-} from '@mui/material';
+import { Button } from '@mui/material';
 import AddEditMentor from '@/components/EntityForms/AddEditMentor/AddEditMentor';
 import SimpleModal from '@/components/SimpleModal';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';

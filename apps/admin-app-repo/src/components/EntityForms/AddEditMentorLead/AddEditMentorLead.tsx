@@ -11,9 +11,7 @@ import { TelemetryEventType } from '@/utils/app.constant';
 import { telemetryFactory } from '@/utils/telemetry';
 import { createUser, updateUser } from '@/services/CreateUserService';
 
-//import { DynamicForm } from '@shared-lib';
-
-const AddEditMentor = ({
+const AddEditMentorLead = ({
   SuccessCallback,
   schema,
   uiSchema,
@@ -34,10 +32,10 @@ const AddEditMentor = ({
     tenantCohortRoleMapping: [
       {
         tenantId: '6c8b810a-66c2-4f0d-8c0c-c025415a4414',
-        roleId: 'a5f1dbc9-2ad4-442c-b762-0e3fc1f6c6da',
+        roleId: 'c4454929-954e-4c51-bb7d-cca834ab9375',
       },
     ],
-    username: 'youthnetmentor',
+    username: 'youthnetmentorlead',
     password: Math.floor(10000 + Math.random() * 90000),
   };
 
@@ -45,27 +43,30 @@ const AddEditMentor = ({
     setPrefilledFormData(formData);
     if (isEdit) {
       try {
-        // console.log('Payload!!!!', payload);
+        // console.log('Payload', payload);
         const splitUserData = (payload) => {
           const { customFields, ...userData } = payload;
           return { userData, customFields };
         };
         const { userData, customFields } = splitUserData(payload);
         delete userData?.email;
-        // console.log('userData!!!!', userData);
-        // console.log('customFields!!!!', customFields);
+        // console.log('userData', userData);
+        // console.log('customFields', customFields);
         const object = {
           userData: userData,
           customFields: customFields,
         };
         const updateUserResponse = await updateUser(editableUserId, object);
-        // console.log('updatedResponse@@@@@', updateUserResponse);
+        // console.log('updatedResponse', updateUserResponse);
 
         if (
           updateUserResponse &&
           updateUserResponse?.data?.params?.err === null
         ) {
-          showToastMessage(t('MENTOR.MENTOR_UPDATED_SUCCESSFULLY'), 'success');
+          showToastMessage(
+            t('MENTOR.MENTOR_LEAD_UPDATED_SUCCESSFULLY'),
+            'success'
+          );
 
           const windowUrl = window.location.pathname;
           const cleanedUrl = windowUrl.replace(/^\//, '');
@@ -77,7 +78,7 @@ const AddEditMentor = ({
               cdata: [],
             },
             edata: {
-              id: 'youthnet-mentor-updated-successfully',
+              id: 'youthnet-mentor-lead-updated-successfully',
               type: TelemetryEventType.CLICK,
               subtype: '',
               pageid: cleanedUrl,
@@ -88,21 +89,24 @@ const AddEditMentor = ({
           UpdateSuccessCallback();
           // localStorage.removeItem('BMGSData');
         } else {
-          showToastMessage(t('MENTOR.NOT_ABLE_UPDATE_MENTOR'), 'error');
+          showToastMessage(t('MENTOR.NOT_ABLE_UPDATE_MENTOR_LEAD'), 'error');
         }
       } catch (error) {
-        console.error('Error update mentor:', error);
-        showToastMessage(t('MENTOR.NOT_ABLE_UPDATE_MENTOR'), 'error');
+        console.error('Error update mentor lead:', error);
+        showToastMessage(t('MENTOR.NOT_ABLE_UPDATE_MENTOR_LEAD'), 'error');
       }
     } else {
       //Manually setting userName as a email
       payload.username = formData.email;
 
       try {
-        const mentorData = await createUser(payload, t);
+        const mentorLeadData = await createUser(payload, t);
 
-        if (mentorData && mentorData?.userData?.userId) {
-          showToastMessage(t('MENTOR.MENTOR_CREATED_SUCCESSFULLY'), 'success');
+        if (mentorLeadData && mentorLeadData?.userData?.userId) {
+          showToastMessage(
+            t('MENTOR.MENTOR_LEAD_CREATED_SUCCESSFULLY'),
+            'success'
+          );
 
           const windowUrl = window.location.pathname;
           const cleanedUrl = windowUrl.replace(/^\//, '');
@@ -114,7 +118,7 @@ const AddEditMentor = ({
               cdata: [],
             },
             edata: {
-              id: 'youthnet-mentor-created-successfully',
+              id: 'youthnet-mentor-lead-created-successfully',
               type: TelemetryEventType.CLICK,
               subtype: '',
               pageid: cleanedUrl,
@@ -125,11 +129,11 @@ const AddEditMentor = ({
           SuccessCallback();
           // localStorage.removeItem('BMGSData');
         } else {
-          showToastMessage(t('MENTOR.NOT_ABLE_CREATE_MENTOR'), 'error');
+          showToastMessage(t('MENTOR.NOT_ABLE_CREATE_MENTOR_LEAD'), 'error');
         }
       } catch (error) {
-        console.error('Error creating mentor:', error);
-        showToastMessage(t('MENTOR.NOT_ABLE_CREATE_MENTOR'), 'error');
+        console.error('Error creating mentor lead:', error);
+        showToastMessage(t('MENTOR.NOT_ABLE_CREATE_MENTOR_LEAD'), 'error');
       }
     }
   };
@@ -157,4 +161,4 @@ const AddEditMentor = ({
   );
 };
 
-export default AddEditMentor;
+export default AddEditMentorLead;
