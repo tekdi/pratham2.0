@@ -62,7 +62,6 @@ const Index = () => {
             status:[Status.ACTIVE],
           }
       const data = await fetchUserData()
-      console.log(data)
     //  setUserData(data);
     };
     if(YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole())

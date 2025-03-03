@@ -13,6 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { cohortHierarchy, Role } from 'mfes/youthNet/src/utils/app.constant';
 import { useTranslation } from 'next-i18next';
 import React, { useState } from 'react';
 
@@ -29,6 +30,9 @@ interface FilterModalProps {
   centerType: CenterType;
   setCenterType: (type: CenterType) => void;
   onApply: () => void;
+  sortingContent: any,
+  clearFilters?: () => void;
+
 }
 
 const FilterModalCenter: React.FC<FilterModalProps> = ({
@@ -42,6 +46,9 @@ const FilterModalCenter: React.FC<FilterModalProps> = ({
   centerType,
   setCenterType,
   onApply,
+  sortingContent,
+  clearFilters
+
 }) => {
   const { t } = useTranslation();
   const [searchInput, setSearchInput] = useState('');
@@ -63,11 +70,11 @@ const FilterModalCenter: React.FC<FilterModalProps> = ({
     center?.toLowerCase().includes(searchInput?.toLowerCase())
   );
 
-  const clearFilters = () => {
-    setSortOrder('');
-    setCenterType('');
-    onApply();
-  };
+  // const clearFilters = () => {
+  //   setSortOrder('');
+  //   setCenterType('');
+  //   onApply();
+  // };
 
   const handleApplyClick = () => {
     onApply();
@@ -92,8 +99,8 @@ const FilterModalCenter: React.FC<FilterModalProps> = ({
           </Box>
           <Divider sx={{ mb: 2, mx: -2 }} />
           <Typography fontSize="12px" variant="subtitle1">
-            {t('COMMON.NAMES')}
-          </Typography>
+           {t('COMMON.NAMES')}
+         </Typography>
           <RadioGroup
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value)}
@@ -133,7 +140,187 @@ const FilterModalCenter: React.FC<FilterModalProps> = ({
               label={t('COMMON.Z_TO_A')}
             />
           </RadioGroup>
-          <Typography fontSize="12px" variant="subtitle1" mt={2} mb={1}>
+         {sortingContent=== cohortHierarchy.VILLAGE && ( 
+          <>
+          
+          <Typography fontSize="12px" variant="subtitle1">
+            {t('YOUTHNET_DASHBOARD.NEW_REGISTRATION')}
+          </Typography>
+          <RadioGroup
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+          >
+            <FormControlLabel
+              sx={{ justifyContent: 'space-between' }}
+              value="new-registration-today-high-to-low"
+              control={
+                <Radio
+                  sx={{
+                    color: '#4D4639',
+                    '&.Mui-checked': {
+                      color: '#4D4639',
+                    },
+                  }}
+                />
+              }
+              className="modal_label"
+              labelPlacement="start"
+              label={t('COMMON.HIGHT-TO_LOW')}
+            />
+            <FormControlLabel
+              sx={{ justifyContent: 'space-between' }}
+              value="new-registration-today-low-to-high"
+              control={
+                <Radio
+                  sx={{
+                    color: '#4D4639',
+                    '&.Mui-checked': {
+                      color: '#4D4639',
+                    },
+                  }}
+                />
+              }
+              className="modal_label"
+              labelPlacement="start"
+              label={t('COMMON.LOW_TO_HIGH')}
+            />
+          </RadioGroup>
+          <Typography fontSize="12px" variant="subtitle1">
+            {t('YOUTHNET_DASHBOARD.TOTAL_COUNT_YOUTH')}
+          </Typography>
+          <RadioGroup
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+          >
+            <FormControlLabel
+              sx={{ justifyContent: 'space-between' }}
+              value="totalcount-high-to-low"
+              control={
+                <Radio
+                  sx={{
+                    color: '#4D4639',
+                    '&.Mui-checked': {
+                      color: '#4D4639',
+                    },
+                  }}
+                />
+              }
+              className="modal_label"
+              labelPlacement="start"
+              label={t('COMMON.HIGHT-TO_LOW')}
+            />
+            <FormControlLabel
+              sx={{ justifyContent: 'space-between' }}
+              value="totalcount-low-to-high"
+              control={
+                <Radio
+                  sx={{
+                    color: '#4D4639',
+                    '&.Mui-checked': {
+                      color: '#4D4639',
+                    },
+                  }}
+                />
+              }
+              className="modal_label"
+              labelPlacement="start"
+              label={t('COMMON.LOW_TO_HIGH')}
+            />
+          </RadioGroup>
+          </>
+         )
+          }
+          {
+           sortingContent=== Role.LEARNER && (
+            <>
+                <Typography fontSize="12px" variant="subtitle1">
+            {t('YOUTHNET_PROFILE.AGE')}
+          </Typography>
+          <RadioGroup
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+          >
+            <FormControlLabel
+              sx={{ justifyContent: 'space-between' }}
+              value="age-high-to-low"
+              control={
+                <Radio
+                  sx={{
+                    color: '#4D4639',
+                    '&.Mui-checked': {
+                      color: '#4D4639',
+                    },
+                  }}
+                />
+              }
+              className="modal_label"
+              labelPlacement="start"
+              label={t('COMMON.HIGHT-TO_LOW')}
+            />
+            <FormControlLabel
+              sx={{ justifyContent: 'space-between' }}
+              value="age-low-to-high"
+              control={
+                <Radio
+                  sx={{
+                    color: '#4D4639',
+                    '&.Mui-checked': {
+                      color: '#4D4639',
+                    },
+                  }}
+                />
+              }
+              className="modal_label"
+              labelPlacement="start"
+              label={t('COMMON.LOW_TO_HIGH')}
+            />
+          </RadioGroup>
+          <Typography fontSize="12px" variant="subtitle1">
+            {t('YOUTHNET_DASHBOARD.YOUTH_JOINERS')}
+          </Typography>
+          <RadioGroup
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+          >
+            <FormControlLabel
+              sx={{ justifyContent: 'space-between' }}
+              value="new-joiner-first"
+              control={
+                <Radio
+                  sx={{
+                    color: '#4D4639',
+                    '&.Mui-checked': {
+                      color: '#4D4639',
+                    },
+                  }}
+                />
+              }
+              className="modal_label"
+              labelPlacement="start"
+              label={t('YOUTHNET_DASHBOARD.NEW_JOINER_FIRST')}
+            />
+            <FormControlLabel
+              sx={{ justifyContent: 'space-between' }}
+              value="old-joiner-first"
+              control={
+                <Radio
+                  sx={{
+                    color: '#4D4639',
+                    '&.Mui-checked': {
+                      color: '#4D4639',
+                    },
+                  }}
+                />
+              }
+              className="modal_label"
+              labelPlacement="start"
+              label={t('YOUTHNET_DASHBOARD.OLD_JOINER_FIRST')}
+            />
+          </RadioGroup>
+            </>
+           )
+          }
+          {/* <Typography fontSize="12px" variant="subtitle1" mt={2} mb={1}>
             {t('CENTERS.CENTER_TYPE')}
           </Typography>
           <RadioGroup
@@ -174,7 +361,7 @@ const FilterModalCenter: React.FC<FilterModalProps> = ({
               labelPlacement="start"
               label={t('CENTERS.REMOTE')}
             />
-          </RadioGroup>
+          </RadioGroup> */}
           <Divider sx={{ mt: 2, mx: -2 }} />
           <Box
             sx={{
