@@ -138,9 +138,9 @@ const Index = () => {
         case SortOrder.DESC:
           return [...data].sort((a, b) => b.name.localeCompare(a.name));
         case SortOrder.NEW_REGISTRATION_LOW_TO_HIGH:
-          return [...data].sort((a, b) => a.newRegistrations - b.newRegistrations);
-        case SortOrder.NEW_REGISTRATION_HIGH_TO_LOW:
           return [...data].sort((a, b) => b.newRegistrations - a.newRegistrations);
+        case SortOrder.NEW_REGISTRATION_HIGH_TO_LOW:
+          return [...data].sort((a, b) => a.newRegistrations - b.newRegistrations);
         case SortOrder.TOTAL_COUNT_LOW_TO_HIGH:
           return [...data].sort((a, b) => a.totalCount - b.totalCount);
         case SortOrder.TOTAL_COUNT_HIGH_TO_LOW:

@@ -621,7 +621,7 @@
   },
   "MENTOR": {
     "NEW_MENTOR": "New Mentor",
-    "": "New Mentor Lead",
+    "NEW_MENTOR_LEAD": "New Mentor Lead",
     "NO_MENTOR_FOUND": "No Mentor Found"
   },
   "WHATS_YOUR_GENDER": "Gender",
@@ -635,5 +635,7 @@
   "VILLAGE": "Village",
   "MALE": "Male",
   "FEMALE": "Female",
-  "TRANSGENDER": "Transgender"
+  "TRANSGENDER": "Transgender",
+  "dob": "DOB",
+  "email": "Email"
 }
