@@ -52,7 +52,7 @@ import ExamplePage from '../../components/youthNet/BlockItem';
 import VillageSelector from '../../components/youthNet/VillageSelector';
 import { filterData, getAge, getLoggedInUserRole, getVillageUserCounts } from '../../utils/Helper';
 import { fetchUserList } from '../../services/youthNet/Dashboard/UserServices';
-import { cohortHierarchy, Role, Status } from '../../utils/app.constant';
+import { cohortHierarchy, Role, SortOrder, Status } from '../../utils/app.constant';
 
 const Index = () => {
   const { isRTL } = useDirection();
@@ -94,7 +94,7 @@ const Index = () => {
     sortOrder: '',
   });
   const [blockData, setBlockData] = useState<any>(null);
-
+  
   useEffect(() => {
     const getData = async () => {
       let userDataString = localStorage.getItem('userData');
@@ -131,36 +131,46 @@ const Index = () => {
     getData();
   }, []);
   useEffect(() => {
-    if(value === 1)
-    {
-       const searchResult=filterData(mentorList,searchInput)
-       setFilteredmentorList(searchResult)
-      
-      //  if(appliedFilters?.sortOrder==="asc")
-      //  {
-      //   const ascending = [...searchResult].sort((a, b) => a.name.localeCompare(b.name));
-      //   setFilteredmentorList(ascending)
-      //  }
-      // else if(appliedFilters?.sortOrder==="asc")
-      // {
-      //   const descending = [...searchResult].sort((a, b) => b.name.localeCompare(a.name));
-      //   setFilteredmentorList(descending)
-
-      // }
-
-    }
-    if(value === 2)
-    {
-      const searchResult=filterData(villageListWithUsers,searchInput)
-      console.log(filteredvillageListWithUsers)
-      setFilteredVillageListWithUsers(searchResult)
-    }
-    if(value === 3)
-    {
-      const searchResult=filterData(youthList,searchInput)
-      setFilteredYouthList(searchResult)
+    const getSortedData = (data: any, sortOrderType: any) => {
+      switch (sortOrderType) {
+        case SortOrder.ASC:
+          return [...data].sort((a, b) => a.name.localeCompare(b.name));
+        case SortOrder.DESC:
+          return [...data].sort((a, b) => b.name.localeCompare(a.name));
+        case SortOrder.NEW_REGISTRATION_LOW_TO_HIGH:
+          return [...data].sort((a, b) => a.newRegistrations - b.newRegistrations);
+        case SortOrder.NEW_REGISTRATION_HIGH_TO_LOW:
+          return [...data].sort((a, b) => b.newRegistrations - a.newRegistrations);
+        case SortOrder.TOTAL_COUNT_LOW_TO_HIGH:
+          return [...data].sort((a, b) => a.totalCount - b.totalCount);
+        case SortOrder.TOTAL_COUNT_HIGH_TO_LOW:
+          return [...data].sort((a, b) => b.totalCount - a.totalCount);
+        case SortOrder.AGE_LOW_TO_HIGH:
+          return [...data].sort((a, b) => a.age - b.age);
+        case SortOrder.AGE_HIGH_TO_LOW:
+          return [...data].sort((a, b) => b.age - a.age);
+        case SortOrder.OLD_JOINER_FIRST:
+          return [...data].sort((a, b) => new Date(a.joinOn).getTime() - new Date(b.joinOn).getTime());
+        case SortOrder.NEW_JOINER_FIRST:
+          return [...data].sort((a, b) => new Date(b.joinOn).getTime() - new Date(a.joinOn).getTime());
+        default:
+          return data;
+      }
+    };
+  
+    let filteredData = [];
+    if (value === 1) {
+      filteredData = filterData(mentorList, searchInput);
+      setFilteredmentorList(getSortedData(filteredData, appliedFilters?.sortOrder));
+    } else if (value === 2) {
+      filteredData = filterData(villageListWithUsers, searchInput);
+      setFilteredVillageListWithUsers(getSortedData(filteredData, appliedFilters?.sortOrder));
+    } else if (value === 3) {
+      filteredData = filterData(youthList, searchInput);
+      setFilteredYouthList(getSortedData(filteredData, appliedFilters?.sortOrder));
     }
   }, [searchInput, appliedFilters, value]);
+  
   useEffect(() => {
     const getYouthData = async () => {
       try{
@@ -213,10 +223,11 @@ const Index = () => {
               Id: user.userId,
               name: name.trim(),
               firstName: user?.firstName,
-              dob:getAge(user?.dob),
+              dob:user?.dob,
               lastName: user?.lastName,
               joinOn:formattedDate,
-              isNew:isToday
+              isNew:isToday,
+              age:getAge(user?.dob)
             };
           }
         );
@@ -393,6 +404,9 @@ const Index = () => {
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
     setSearchInput('')
+    const centerType=""
+    const sortOrder=""
+    setAppliedFilters({ centerType, sortOrder });
   };
 
   const handleUserClick = (userId: any) => {
@@ -606,10 +620,11 @@ const Index = () => {
                 placeholder={t('YOUTHNET_USERS_AND_VILLAGES.SEARCH_MENTORS')}
                 fullWidth={true}
               />
-              {/* <SortBy 
+              <SortBy 
               appliedFilters={appliedFilters}
               setAppliedFilters={setAppliedFilters}
-              /> */}
+              sortingContent={Role.INSTRUCTOR}
+              />
             </Box>
 
             {/* <Box mt={'18px'} px={'18px'} ml={'10px'}>
@@ -937,8 +952,11 @@ const Index = () => {
                 placeholder={t('DASHBOARD.SEARCH_VILLAGES')}
                 fullWidth={true}
               />
-              {/* <SortBy /> */}
-            </Box>
+   <SortBy 
+              appliedFilters={appliedFilters}
+              setAppliedFilters={setAppliedFilters}
+              sortingContent={cohortHierarchy.VILLAGE}
+              />            </Box>
             {/* <Box>
               <YouthAndVolunteers
                 selectOptions={[
@@ -1122,8 +1140,11 @@ const Index = () => {
                 placeholder={t('DASHBOARD.SEARCH_YOUTH')}
                 fullWidth={true}
               />
-              {/* <SortBy /> */}
-            </Box>
+<SortBy 
+              appliedFilters={appliedFilters}
+              setAppliedFilters={setAppliedFilters}
+              sortingContent={Role.LEARNER}
+              />               </Box>
             <Box
               sx={{
                 px: '20px',

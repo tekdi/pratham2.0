@@ -79,9 +79,19 @@ export const getAge=(dobString: any)=> {
   if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
       age--;
   }
+  console.log(age)
   return age;
 }
+export const getAgeInMonths = (dobString: any) => {
+  console.log(dobString);
+  const dob = new Date(dobString);
+  const today = new Date();
 
+  const monthsOld = (today.getFullYear() - dob.getFullYear()) * 12 + (today.getMonth() - dob.getMonth());
+
+  console.log(monthsOld);
+  return monthsOld;
+};
 export const countUsersByFilter = ({ users, filter }: { users: any[]; filter: string }) => {
   let counts: Record<string, number> = {}; 
   let result: { date?: string; month?: string; count: number }[] = [];
