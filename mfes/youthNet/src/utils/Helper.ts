@@ -1,5 +1,5 @@
 import FingerprintJS from 'fingerprintjs2';
-import { Role , DateFilter} from './app.constant';
+import { Role , DateFilter, cohortHierarchy} from './app.constant';
 
 export const generateUUID = () => {
   let d = new Date().getTime();
@@ -41,7 +41,7 @@ export const filterUsersByAge = (users: any[]) => {
     (result, user) => {
       if (!user || !user.dob) {
         // If user has no dob, push them into "above18" (assuming unknown age is treated as adult)
-        result.above18.push(user);
+        result.below18.push(user);
         return result;
       }
 
@@ -79,10 +79,19 @@ export const getAge=(dobString: any)=> {
   if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
       age--;
   }
-console.log(age)
+  console.log(age)
   return age;
 }
+export const getAgeInMonths = (dobString: any) => {
+  console.log(dobString);
+  const dob = new Date(dobString);
+  const today = new Date();
 
+  const monthsOld = (today.getFullYear() - dob.getFullYear()) * 12 + (today.getMonth() - dob.getMonth());
+
+  console.log(monthsOld);
+  return monthsOld;
+};
 export const countUsersByFilter = ({ users, filter }: { users: any[]; filter: string }) => {
   let counts: Record<string, number> = {}; 
   let result: { date?: string; month?: string; count: number }[] = [];
@@ -183,3 +192,86 @@ export const debounce = <T extends (...args: any[]) => any>(
 
   return debounced;
 };
+
+
+export const getVillageUserCounts = (userData: any, villageData: any) => {
+  try {
+    console.log("User Data:", userData);
+    console.log("Village Data:", villageData);
+
+    if (!Array.isArray(villageData)) {
+      console.log("Invalid villageData format.");
+      throw new Error("Invalid data format: villageData is not an array.");
+    }
+
+    const userDetails = userData?.getUserDetails ?? []; // Ensure it's always an array
+
+    const villageMap = villageData.reduce((acc: Record<number, string>, village: any) => {
+      if (village?.Id && village?.name) {
+        acc[village.Id] = village.name;
+      }
+      return acc;
+    }, {});
+
+    const villageCounts: Record<number, { totalUserCount: number; todaysTotalUserCount: number }> = {};
+
+    Object.keys(villageMap).forEach((villageId) => {
+      villageCounts[Number(villageId)] = { totalUserCount: 0, todaysTotalUserCount: 0 };
+    });
+
+    if (userDetails.length === 0) {
+      console.log("No user details found. Returning all villages with zero counts.");
+      return Object.keys(villageCounts).map((villageId) => ({
+        Id: Number(villageId),
+        name: villageMap[Number(villageId)],
+        totalCount: 0,
+        newRegistrations: 0,
+      }));
+    }
+
+    const today = new Date().toISOString().split("T")[0];
+
+    userDetails.forEach((user: any) => {
+      if (!user?.customFields) return;
+
+      const villageField = user.customFields.find((field: any) => field.label === cohortHierarchy.VILLAGE);
+
+      if (villageField?.selectedValues?.length > 0) {
+        const villageId = villageField.selectedValues[0].id;
+
+        if (villageMap[villageId]) {
+          villageCounts[villageId].totalUserCount += 1;
+
+          if (user.createdAt.startsWith(today)) {
+            villageCounts[villageId].todaysTotalUserCount += 1;
+          }
+        }
+      }
+    });
+
+    return Object.keys(villageCounts).map((villageId) => ({
+      Id: Number(villageId),
+      name: villageMap[Number(villageId)],
+      totalCount: villageCounts[Number(villageId)].totalUserCount,
+      newRegistrations: villageCounts[Number(villageId)].todaysTotalUserCount,
+    }));
+  } catch (error) {
+    console.error("Error in getVillageUserCounts:", error);
+    return [];
+  }
+};
+
+export const filterData = (data: any[], searchKey: string) => {
+  if (!searchKey) return data; 
+
+  searchKey = searchKey.toLowerCase();
+
+  return data.filter((item: any) =>
+      item.name.toLowerCase().includes(searchKey) 
+      
+  );
+};
+
+
+
+

@@ -1,5 +1,5 @@
 import { API_ENDPOINTS } from '@/utils/API/APIEndpoints';
-import { post, get } from "./RestClient";
+import { post, get } from './RestClient';
 
 export interface userListParam {
   limit?: number;
@@ -24,7 +24,7 @@ export const userList = async ({
   offset,
   fields,
 }: userListParam): Promise<any> => {
-  const apiUrl: string = API_ENDPOINTS.userList
+  const apiUrl: string = API_ENDPOINTS.userList;
   try {
     const response = await post(apiUrl, {
       limit,
@@ -35,8 +35,8 @@ export const userList = async ({
     });
     return response?.data?.result;
   } catch (error) {
-    console.error("error in getting user list", error);
-    throw error;
+    console.error('error in getting user list', error);
+    // throw error;
   }
 };
 
@@ -48,7 +48,7 @@ export const cohortMemberList = async ({
   offset,
   fields,
 }: userListParam): Promise<any> => {
-  const apiUrl: string = API_ENDPOINTS.cohortMemberList
+  const apiUrl: string = API_ENDPOINTS.cohortMemberList;
   try {
     const response = await post(apiUrl, {
       limit,
@@ -59,7 +59,7 @@ export const cohortMemberList = async ({
     });
     return response?.data?.result;
   } catch (error) {
-    console.error("error in getting user list", error);
+    console.error('error in getting user list', error);
     throw error;
   }
 };
@@ -68,18 +68,18 @@ export const getUserDetailsInfo = async (
   userId: string | string[],
   fieldValue: boolean = true
 ): Promise<any> => {
-  const apiUrl: string = API_ENDPOINTS.userRead(userId, fieldValue)
+  const apiUrl: string = API_ENDPOINTS.userRead(userId, fieldValue);
   try {
     const response = await get(apiUrl);
     return response?.data?.result;
   } catch (error) {
-    console.error("error in fetching user details", error);
+    console.error('error in fetching user details', error);
     return error;
   }
 };
 
 export const userNameExist = async (userData: any): Promise<any> => {
-  const apiUrl: string = API_ENDPOINTS.suggestUsername
+  const apiUrl: string = API_ENDPOINTS.suggestUsername;
   try {
     const response = await post(apiUrl, userData);
     return response?.data?.result;
@@ -88,4 +88,3 @@ export const userNameExist = async (userData: any): Promise<any> => {
     throw error;
   }
 };
-

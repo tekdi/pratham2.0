@@ -161,7 +161,8 @@
     "RELOAD": "Update Now",
     "UPDATE_AVAILABLE": "New Update Available!",
     "RELOAD_TO_UPDATE": "Get the latest features and improvements—update now to enjoy a smoother experience and stay up-to-date!",
-    "NO_ASSIGNED_BOARDS": "No assigned Board for selected Center"
+    "NO_ASSIGNED_BOARDS": "No assigned Board for selected Center",
+    "HIGHT-TO_LOW":"High to low"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -238,7 +239,11 @@
     "USERS_&_VILLAGES": "Users & Villages",
     "VILLAGES": "Villages",
     "YOUTH_VOLUNTEERS": "Youth/Volunteers",
-    "SEARCH_VILLAGES": "Search Villages"
+    "SEARCH_VILLAGES": "Search Village",
+    "SEARCH_YOUTH": "Search youth",
+    "SEARCH_MENTOR": "Search mentor"
+
+
   },
   "ATTENDANCE": {
     "TOTAL_STUDENTS": "Total: {{count}}",
@@ -723,7 +728,7 @@
     "VILLAGES_MANAGED_BY_YOU": "Villages Managed by you : {{totalVillageCount}}",
     "MANAGES": "Manages",
     "VILLAGES": "Villages",
-    "MONTHLY_REGISTRATIONS_OVERVIEW": "Monthly Registrations Overview",
+    "MONTHLY_REGISTRATIONS_OVERVIEW": "Registrations Overview",
     "CLOSED_ON": "Closed on",
     "ABOVE_18": "Over 18 Registrations",
     "BELOW_18": "Under 18 Registrations",
@@ -734,10 +739,17 @@
       "LAST_SIX_MONTH":"Last 6 months",
       "LAST_TWL_MONTH":"Last 12 months",
        "TOTAL_YOUTH":"Total Youth",
+       "TOTAL_YOUTH_COUNT":"Total Count of Youth",
        "AS_OF_TODAY":"As of today",
        "AS_OF_LAST_SIX_MONTH":"As of last month",
-       "AS_OF_LAST_YEAR":"As of last year"
-
+       "AS_OF_LAST_YEAR":"As of last year",
+         "VILLAGE_NAME":"Village Name",
+    "TOTAL_COUNT_NEW_REGISTRATION":"Total Count (+ New Registrations today)",
+    "NEW_REGISTRATION":"New Registrations Today",
+    "YOUTH_JOINERS":"Youth joiners",
+    "OLD_JOINER_FIRST":"New joiners first",
+    "NEW_JOINER_FIRST":"Old joiners first",
+    "TOTAL_COUNT_YOUTH":"Total Count of Youth"
 
   },
   "YOUTHNET_VOLUNTEERLIST": {
@@ -750,8 +762,9 @@
     "PROFILE_DETAILS": "Profile Details",
     "FULL_NAME": "Full Name",
     "EMAIL_ID": "Email ID",
-    "STATE_DISTRICT_BLOCK": "State District Block",
-    "DESIGNATION": "Designation",
+    "STATE_DISTRICT_BLOCK": "Block District State",
+    "STATE_DISTRICT_BLOCK_VILLAGE": "Village Block District State",
+     "DESIGNATION": "Designation",
     "JOINED_ON": "Joined on",
     "PHONE_NUMBER": "Phone Number",
     "MENTOR_ID": "Mentor ID",
@@ -759,7 +772,11 @@
     "AGE": "Age",
     "VOLUNTEERING_DETAILS": "Volunteering details",
     "MARK_AS_VOLUNTEER": "Mark as Volunteer",
-    "DOB":"Date of Birth"
+    "DOB":"Date of Birth",
+    "FIRST_NAME":"First Name",
+    "MIDDLE_NAME":"Middle Name",
+    "LAST_NAME":"Last Name",
+    "USERNAME":"Username"
   },
 
   "YOUTHNET_USERS_AND_VILLAGES": {
@@ -778,7 +795,12 @@
     "SELECT_DISTRICT": "Select District",
     "SELECT": "Select",
     "ASSIGN_VILLAGES_FROM_BLOCK": "Assign Villages from Block",
-    "ASSIGN_VILLAGES_FROM_BLOCK_INFO": "You can complete this later at your own pace. However, the villages will only be assigned once you click on ‘Finish.’"
+    "ASSIGN_VILLAGES_FROM_BLOCK_INFO": "You can complete this later at your own pace. However, the villages will only be assigned once you click on ‘Finish.’",
+    "NO_DATA_FOUND":"no data found",
+    "VILLAGE":"Village",
+    "BLOCK":"blocks",
+    "VILLAGES":"Villages",
+    "BLOCKS":"Blocks"
   },
 
   "YOUTHNET_CAMP_DETAILS": {

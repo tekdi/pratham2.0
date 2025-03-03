@@ -10,9 +10,10 @@ import {
 } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useTheme } from '@mui/material/styles';
-import { getAge } from '../../utils/Helper';
+import { getAge, getAgeInMonths } from '../../utils/Helper';
 import {  useRouter } from 'next/navigation';
-
+import { useTranslation } from 'next-i18next';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 type UserCardProps = {
   name: string;
   firstName?: string;
@@ -20,7 +21,7 @@ type UserCardProps = {
   //showAvtar?: boolean;
   age?: string | number;
   dob?: string;
-  userId:string;
+  userId?:string;
   village?: string;
   image?: string;
   joinOn?: string;
@@ -28,9 +29,14 @@ type UserCardProps = {
   showMore?: boolean;
   totalCount?: number;
   newRegistrations?: number;
-  onClick?: (userId: string) => void;
+  onClick?: (Id: string, name?:string) => void;
   onToggleClick?: (name: string) => void;
-  customFields?: any
+  onUserClick?: ( name: string) => void;
+  customFields?: any;
+  showAvtar?:any;
+  Id?: any;
+  villageCount?:any;
+  blockNames?:string[]
 };
 
 const UserCard: React.FC<UserCardProps> = ({
@@ -49,11 +55,18 @@ const UserCard: React.FC<UserCardProps> = ({
   firstName,
   lastName,
   dob,
-  customFields
+  customFields,
+  onUserClick,
+  showAvtar,
+  Id,
+  blockNames,
+  villageCount
 }) => {
   const theme = useTheme<any>();
+  const { t } = useTranslation();
 
 const villageName=customFields?.find((item: any) => item.label === 'VILLAGE')?.selectedValues[0]?.value
+
   return (
     <Box
       display={'flex'}
@@ -105,20 +118,26 @@ const villageName=customFields?.find((item: any) => item.label === 'VILLAGE')?.s
 
               padding: '5px 5px',
             }}
-            onClick={() => onClick?.(userId)}
+            onClick={() => { onClick?.(Id, name)}}
           >
-            {firstName && lastName ? `${firstName} ${lastName}` : firstName}
+            {name}
           </Typography>
+          {villageCount && blockNames &&
+          (<Typography>
+{villageCount === 1 ? `${villageCount} ${t('YOUTHNET_USERS_AND_VILLAGES.VILLAGE')}` : `${villageCount} ${t('YOUTHNET_USERS_AND_VILLAGES.VILLAGES')}`} 
+{blockNames.length > 1 ? ` (${blockNames} ${t('YOUTHNET_USERS_AND_VILLAGES.BLOCKS')}` : blockNames.length === 1 ? ` (${blockNames} ${t('YOUTHNET_USERS_AND_VILLAGES.BLOCK')})` : ""}
+            </Typography>)
+          }
           <Box display={'flex'} justifyContent={'space-between'} width={'100%'}>
             <Box sx={{ display: 'flex', gap: '8px' }}>
               {dob ? (
                 <Typography variant="body2" color="textSecondary">
-                  {getAge(dob)} y/o • {villageName || joinOn}
+                  {getAge(dob)<0? getAgeInMonths(dob)+" m/o" :getAge(dob)+" y/o"}   • {t('YOUTHNET_PROFILE.JOINED_ON')} {" "+joinOn}
                 </Typography>
               ) : (
-                villageName && (
+                joinOn && (
                   <Typography variant="body2" color="textSecondary">
-                    {villageName || joinOn}
+                   {t('YOUTHNET_PROFILE.JOINED_ON')} {" "+joinOn}
                   </Typography>
                 )
               )}
@@ -139,8 +158,8 @@ const villageName=customFields?.find((item: any) => item.label === 'VILLAGE')?.s
                 mt={'1rem'}
                 fontWeight={600}
               >
-                {totalCount}
-                {newRegistrations && (
+                {totalCount+" "}
+                {newRegistrations?.toString() && (
                   <span
                     style={{
                       color:
@@ -149,7 +168,7 @@ const villageName=customFields?.find((item: any) => item.label === 'VILLAGE')?.s
                           : theme.palette.success.main,
                     }}
                   >
-                    (+{newRegistrations})
+        (<ArrowUpwardIcon sx={{ height: 16, width: 16 }} /> {newRegistrations})
                   </span>
                 )}
               </Typography>
@@ -175,22 +194,22 @@ type UserListProps = {
   users: UserCardProps[];
   layout?: 'list' | 'grid';
   onToggleUserClick?: (name: string) => void;
+  onUserClick?: (Id: string,name?: string) => void
 };
 
 export const UserList: React.FC<UserListProps> = ({
   users,
   layout = 'grid',
   onToggleUserClick,
+  onUserClick
 }) => {
-  console.log(users)
     const router = useRouter();
-
-  const onUserClick=(userId: any)=>
-    {
-      console.log(userId)
-      router.push(`/user-profile/${userId}`);
+  // const onUserClick=(userId: any)=>
+  //   {
+  //     console.log(userId)
+  //     router.push(`/user-profile/${userId}`);
   
-    }
+  //   }
   return layout === 'grid' ? (
     <List>
       <Grid container spacing={2}>

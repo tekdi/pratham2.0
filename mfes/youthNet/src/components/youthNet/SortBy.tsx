@@ -5,27 +5,31 @@ import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
 import FilterModalCenter from '../../pages/blocks/components/FilterModalCenter';
 
-const SortBy = () => {
+const SortBy = ({ appliedFilters, setAppliedFilters, sortingContent }: { appliedFilters: any; setAppliedFilters: any ,sortingContent?: any}) => {
   const { t } = useTranslation();
   const theme = useTheme<any>();
 
   const [filterModalOpen, setFilterModalOpen] = useState(false);
   const handleFilterModalOpen = () => setFilterModalOpen(true);
   const handleFilterModalClose = () => setFilterModalOpen(false);
-  const [appliedFilters, setAppliedFilters] = useState({
-    centerType: '',
-    sortOrder: '',
-  });
-  const [centerType, setCenterType] = useState<'regular' | 'remote' | ''>('');
+
+  const [centerType, setCenterType] = useState<'regular' | 'remote' | ''>(appliedFilters.centerType || '');
+  const [sortOrder, setSortOrder] = useState(appliedFilters.sortOrder || '');
   const [selectedCenters, setSelectedCenters] = useState<string[]>([]);
 
-  const [sortOrder, setSortOrder] = useState('');
-
   const handleFilterApply = () => {
+
+    setAppliedFilters({ centerType, sortOrder });
+    handleFilterModalClose();
+  };
+    const handleFilterClear = () => {
+    const centerType="";
+    const sortOrder="";
     setAppliedFilters({ centerType, sortOrder });
     // setFilteredCenters(getFilteredCenters);
     handleFilterModalClose();
   };
+
   return (
     <>
       <Grid item xs={6} mt={'1rem'}>
@@ -41,16 +45,11 @@ const SortBy = () => {
             className="drawer-select"
             sx={{
               width: '100%',
-              '@media (min-width: 900px)': {
-                // width: '40%',
-              },
             }}
           >
             <Button
               variant="outlined"
-              onClick={() => {
-                handleFilterModalOpen();
-              }}
+              onClick={handleFilterModalOpen}
               size="medium"
               endIcon={<ArrowDropDown />}
               sx={{
@@ -76,16 +75,20 @@ const SortBy = () => {
         open={filterModalOpen}
         handleClose={handleFilterModalClose}
         centers={[]}
-        selectedCenters={[]}
+        selectedCenters={selectedCenters}
         setSelectedCenters={setSelectedCenters}
         sortOrder={sortOrder}
         setSortOrder={setSortOrder}
-        centerType={''}
+        centerType={centerType}
         setCenterType={setCenterType}
         onApply={handleFilterApply}
+        sortingContent={sortingContent}
+        clearFilters={handleFilterClear}
+
       />
     </>
   );
 };
+
 
 export default SortBy;

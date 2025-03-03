@@ -17,6 +17,7 @@ import Frame2 from '../../assets/images/SurveyFrame2.png';
 import { useEffect, useState } from 'react';
 import { fetchUserList } from '../../services/youthNet/Dashboard/UserServices';
 import { Role, Status } from '../../utils/app.constant';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 
 const VillageDetails = () => {
   const router = useRouter();
@@ -81,8 +82,9 @@ const VillageDetails = () => {
       <Box>
         <BackHeader
           headingOne={villageNameString}
-          headingTwo={yuthCount.toString()}
-          headingThree={"+"+todaysRegistrationCount.toString()}
+          headingTwo={yuthCount?.toString()}
+          headingThree={<><ArrowUpwardIcon sx={{ height: 16, width: 16 }} />
+ {todaysRegistrationCount.toString()}</>}
           showBackButton={true}
           onBackClick={handleBack}
         />

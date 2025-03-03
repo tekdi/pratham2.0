@@ -21,9 +21,10 @@ import YouthAndVolunteers from '../components/youthNet/YouthAndVolunteers';
 import VillageNewRegistration from '../components/youthNet/VillageNewRegistration';
 import { UserList } from '../components/youthNet/UserCard';
 import Dropdown from '../components/youthNet/DropDown';
-import { fetchUserData,  getUserDetails, getYouthDataByDate } from '../services/youthNet/Dashboard/UserServices';
+import { fetchUserData,  fetchUserList,  getUserDetails, getVillages, getYouthDataByDate } from '../services/youthNet/Dashboard/UserServices';
 import Loader from '../components/Loader';
 import { filterUsersByAge, getLoggedInUserRole } from '../utils/Helper';
+import { Role, Status } from '../utils/app.constant';
 
 
 const Index = () => {
@@ -40,7 +41,9 @@ const Index = () => {
   const [abvmodalOpen, setAbvModalOpen] = useState<boolean>(false);
   const [belmodalOpen, setBelModalOpen] = useState<boolean>(false);
   const [vilmodalOpen, setVilModalOpen] = useState<boolean>(false);
-  const [userData, setUserData] = useState<any>(null);
+  const [userData, setUserData] = useState<any>([]);
+  const [selectedMentorId, setSelectedMentorId] = useState<any>("");
+
 
   useEffect(() => {
     const getSurveyData = async () => {
@@ -53,54 +56,108 @@ const Index = () => {
   }, []);
 
   useEffect(() => {
-    const getData = async () => {
-      const data = await fetchUserData();
-      setUserData(data);
+    const getMentorData = async () => {
+      const filters={
+            role:Role.INSTRUCTOR,
+            status:[Status.ACTIVE],
+          }
+      const data = await fetchUserData()
+    //  setUserData(data);
     };
-
-    getData();
+    if(YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole())
+    getMentorData();
   }, []);
-  useEffect(() => {
-    const getVillageData = async () => {
-      const userId = localStorage.getItem('userId');
-      if (userId) {
-        const data = await getUserDetails(userId, true);
-        const userDataString = localStorage.getItem('userData')
-        if(userDataString)
-        {
-          const userData = JSON.parse(userDataString);
-          userData.customFields = data?.userData?.customFields;
-          localStorage.setItem('userData', JSON.stringify(userData));
-
-        }
-        console.log(data);
-        const result = data?.userData?.customFields?.find(
-          (item: any) => item.label === 'VILLAGE'
-        );
-        localStorage.setItem(
-          'villageData',
-          JSON.stringify(result?.selectedValues)
-        );
-        setVillageCount(result?.selectedValues?.length);
+  const getMentorDistrictData = async () => {
+    const userId=localStorage.getItem('userId')
+    if(userId)
+    {
+      const data = await getUserDetails(userId, true);
+      const result = data?.userData?.customFields?.find(
+        (item: any) => item.label === 'DISTRICT'
+      );
+      const districtId=result?.selectedValues[0]?.id;
+      const filters={
+        role:Role?.INSTRUCTOR,
+        status:[Status.ACTIVE],
+        district:[districtId],
       }
-      // setUserData(data);
-    };
+       const responce=await fetchUserList({filters})
+       const transformedData = responce?.getUserDetails.map((user: any) => ({
+        id: user.userId,
+        name: user.lastName ? `${user.firstName} ${user.lastName}` : user.firstName
+      }));
+       setUserData(transformedData)
+       let userDataString = localStorage.getItem('userData');
+       let userData: any = userDataString ? JSON.parse(userDataString) : null;
+       userData.customFields = data.userData.customFields;
+       localStorage.setItem('userData', JSON.stringify(userData));
+       setSelectedMentorId(responce?.getUserDetails[0]?.userId)
 
-    getVillageData();
+    }
+   
+      
+    }
+    // setUserData(data);
+     const onUserClick=(userId: any)=>
+    {
+      router.push(`/user-profile/${userId}`);
+  
+    }
+  useEffect(() => {
+    if(YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole())
+    getMentorDistrictData()
+   
   }, []);
   useEffect(() => {
-    const getYouthData = async () => {
+    const getYouthData = async (userId: any) => {
       try {
-        const response = await getYouthDataByDate(new Date(), new Date());
+      
+const villages=await getVillages(userId)
+console.log(villages)
+
+if(userId===localStorage.getItem('userId'))
+{
+  const updatedData = (villages)?.map(({ id, value }: any) => ({ Id: id, name: value }));
+
+  localStorage.setItem('villageData', JSON.stringify(updatedData))
+}
+const villageIds=villages?.map((item: any) => item.id) || []
+setVillageCount(villageIds?.length)
+        const response = await getYouthDataByDate(new Date(), new Date(), villageIds);
         if(response?.totalCount)
         setTodaysRegistrationCount(response?.totalCount);
         //  const youthData=response.getUserDetails.find((item:any)=>{
         //    return item.role==="Content creator"
         //  })
         const youthData = filterUsersByAge(response.getUserDetails);
-        console.log(response.getUserDetails);
-        setAboveEighteenUsers(youthData?.above18);
-        setBelowEighteenUsers(youthData?.below18);
+        const transformedAbove18 = youthData?.above18.map((user: any) => {
+          let name = user.firstName || "";
+          if (user.lastName) {
+              name += ` ${user.lastName}`;
+          }
+          return {
+              Id: user.userId,
+              name: name.trim() ,
+              dob:user?.dob ,
+            firstName:user?.firstName,
+            lastName:user?.lastName// Ensures there are no extra spaces if lastName is missing
+          };
+      });
+      const transformedBelow18 = youthData?.below18.map((user: any) => {
+        let name = user.firstName || "";
+        if (user.lastName) {
+            name += ` ${user.lastName}`;
+        }
+        return {
+            Id: user.userId,
+            name: name.trim(),
+            dob:user.dob ,
+            firstName:user?.firstName,
+            lastName:user?.lastName// Ensures there are no extra spaces if lastName is missing
+        };
+    });
+        setAboveEighteenUsers(transformedAbove18);
+        setBelowEighteenUsers(transformedBelow18);
         console.log(youthData?.below18);
         //  console.log(users)
         let users = response.getUserDetails;
@@ -124,16 +181,18 @@ const Index = () => {
           id,
           value,
         }));
-        console.log(uniqueVillages);
         setRegisteredVillages(uniqueVillages);
       } catch (error) {
         console.log(error);
       }
       // setUserData(data);
     };
+    if(YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole())
+    getYouthData(localStorage.getItem('userId'));
+    if(YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() && selectedMentorId!=="")
+      getYouthData(selectedMentorId);
 
-    getYouthData();
-  }, []);
+    }, [selectedMentorId]);
   const handleModalClose = () => {
     setModalOpen(false),
       setBelModalOpen(false),
@@ -148,12 +207,15 @@ const Index = () => {
   const handleClick = (type: string) => {
     switch (type) {
       case 'above':
+        if(aboveEighteenUsers.length!==0)
         setAbvModalOpen(true);
         break;
       case 'below':
+        if(belowEighteenUsers.length!==0)
         setBelModalOpen(true);
         break;
       case 'village':
+        if(registeredVillages.length!== 0)
         setVilModalOpen(true);
         break;
       default:
@@ -176,12 +238,14 @@ const Index = () => {
             mt: '15px',
           }}
         >
-          {userData ? (
+          {true ? (
             <Dropdown
-              name={userData?.MENTOR_NAME}
-              values={userData?.MENTOR_OPTIONS}
-              defaultValue={userData?.MENTOR_OPTIONS[0]}
-              onSelect={(value) => console.log('Selected:', value)}
+              name={"Mentor"}
+              values={userData}
+              defaultValue={userData?.[0]?.id}
+              onSelect={(value) => {
+                localStorage.setItem('selectedMentoruserId',value)
+                setSelectedMentorId(value)}}
             />
           ) : (
             <Loader showBackdrop={true} />
@@ -192,7 +256,7 @@ const Index = () => {
         {YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() ? (
           <Box mt={2}>
             <Typography>
-              {t(`YOUTHNET_DASHBOARD.MANAGES`)} {SURVEY_DATA.FIFTY_TWO}{' '}
+              {t(`YOUTHNET_DASHBOARD.MANAGES`)} {villageCount}{' '}
               {t(`YOUTHNET_DASHBOARD.VILLAGES`)}
             </Typography>
           </Box>
@@ -202,6 +266,8 @@ const Index = () => {
               totalVillageCount: villageCount,
             })}
           </Typography>
+           
+
         )}
       </Box>
 
@@ -235,7 +301,7 @@ const Index = () => {
         </Grid>
       </Box>
       <Box>
-        <MonthlyRegistrationsChart />
+        <MonthlyRegistrationsChart userId={ YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole()?selectedMentorId:localStorage.getItem('userId')|| ""} />
       </Box>
       <Box>
         <YouthAndVolunteers
@@ -246,10 +312,11 @@ const Index = () => {
 
           ]}
           data="577 Youth & Volunteers"
+          userId={YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole()?selectedMentorId:localStorage.getItem('userId')|| ""}
         />
         
       </Box>
-      <SimpleModal
+      {/* <SimpleModal
         modalTitle={t('YOUTHNET_SURVEY.NEW_SURVEY')}
         primaryText={t('YOUTHNET_SURVEY.ASSIGN_VOLUNTEERS_NOW')}
         secondaryText={t('YOUTHNET_SURVEY.REMIND_ME_LATER')}
@@ -288,14 +355,14 @@ const Index = () => {
             {t('YOUTHNET_SURVEY.ASSIGN_VOLUNTEERS_TO_ENSURE')}
           </Typography>
         </Box>
-      </SimpleModal>
+      </SimpleModal> */}
       <SimpleModal
         modalTitle={t('YOUTHNET_DASHBOARD.ABOVE_18')}
         open={abvmodalOpen}
         onClose={handleModalClose}
       >
         {' '}
-        <UserList users={aboveEighteenUsers} layout="list" />
+        <UserList users={aboveEighteenUsers} layout="list"  onUserClick={onUserClick}/>
       </SimpleModal>
 
       <SimpleModal
@@ -304,7 +371,7 @@ const Index = () => {
         onClose={handleModalClose}
       >
         {' '}
-        <UserList users={belowEighteenUsers} layout="list" />
+        <UserList users={belowEighteenUsers} layout="list" onUserClick={onUserClick} />
       </SimpleModal>
       <SimpleModal
         modalTitle={t('YOUTHNET_DASHBOARD.VLLAGE_18')}

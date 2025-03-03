@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent, Typography, Grid } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
+import { Role } from '../../utils/app.constant';
 
 interface ProfileDetailsProps {
   fullName: string;
@@ -10,12 +11,19 @@ interface ProfileDetailsProps {
   district?: string;
   block?: string;
   designation?: string;
-  joinedOn?: string;
+  joinedOn?: string | null;
   phoneNumber?: string;
   mentorId?: string;
   gender?: string;
   age?: number;
-  dob?:string
+  dob?:string;
+  village?:string|null,
+  middleName?:string|null;
+  userName?:string|null;
+  firstName?:string|null;
+  lastName?:string|null;
+
+
 }
 
 const Profile: React.FC<ProfileDetailsProps> = ({
@@ -30,7 +38,12 @@ const Profile: React.FC<ProfileDetailsProps> = ({
   mentorId,
   gender,
   age,
-  dob
+  dob,
+  village,
+  userName,
+  middleName,
+  firstName,
+  lastName
 }) => {
   const { t } = useTranslation();
   const theme = useTheme<any>();
@@ -44,7 +57,9 @@ const Profile: React.FC<ProfileDetailsProps> = ({
       }}
     >
       <CardContent>
-        <Typography
+        {designation!==Role.LEARNER  ?(
+          <>
+          <Typography
           color={theme.palette.warning['500']}
           sx={{ fontSize: '12px', fontWeight: 600 }}
         >
@@ -57,6 +72,65 @@ const Profile: React.FC<ProfileDetailsProps> = ({
         >
           {fullName}
         </Typography>
+        </>):
+         <>
+         <Typography
+         color={theme.palette.warning['500']}
+         sx={{ fontSize: '12px', fontWeight: 600 }}
+       >
+         {t('YOUTHNET_PROFILE.FIRST_NAME')}
+       </Typography>
+       <Typography
+         color={theme.palette.warning['A200']}
+         sx={{ fontSize: '16px', fontWeight: 400 }}
+         gutterBottom
+       >
+         {firstName}
+       </Typography>
+       <Typography
+         color={theme.palette.warning['500']}
+         sx={{ fontSize: '12px', fontWeight: 600 }}
+       >
+         {t('YOUTHNET_PROFILE.MIDDLE_NAME')}
+       </Typography>
+       <Typography
+         color={theme.palette.warning['A200']}
+         sx={{ fontSize: '16px', fontWeight: 400 }}
+         gutterBottom
+       >
+         {middleName}
+       </Typography>
+       <Typography
+         color={theme.palette.warning['500']}
+         sx={{ fontSize: '12px', fontWeight: 600 }}
+       >
+         {t('YOUTHNET_PROFILE.LAST_NAME')}
+       </Typography>
+       <Typography
+         color={theme.palette.warning['A200']}
+         sx={{ fontSize: '16px', fontWeight: 400 }}
+         gutterBottom
+       >
+         {lastName}
+       </Typography>
+       </>
+        }
+        {designation!==Role.LEAD  && (
+          <>
+          <Typography
+          color={theme.palette.warning['500']}
+          sx={{ fontSize: '12px', fontWeight: 600 }}
+        >
+          {t('YOUTHNET_PROFILE.USERNAME')}
+        </Typography>
+        <Typography
+          color={theme.palette.warning['A200']}
+          sx={{ fontSize: '16px', fontWeight: 400 }}
+          gutterBottom
+        >
+          {userName}
+        </Typography>
+        </>)}
 
         <Typography
           color={theme.palette.warning['500']}
@@ -165,14 +239,14 @@ const Profile: React.FC<ProfileDetailsProps> = ({
           color={theme.palette.warning['500']}
           sx={{ fontSize: '12px', fontWeight: 600, mt: 2 }}
         >
-          {t('YOUTHNET_PROFILE.STATE_DISTRICT_BLOCK')}
+          {village?t('YOUTHNET_PROFILE.STATE_DISTRICT_BLOCK_VILLAGE') : t('YOUTHNET_PROFILE.STATE_DISTRICT_BLOCK')}
         </Typography>
         <Typography
           color={theme.palette.warning['A200']}
           sx={{ fontSize: '16px', fontWeight: 400 }}
           gutterBottom
         >
-          {state}, {district}, {block}
+           {village? village+" , ":""}{block}, {district},  {state}
         </Typography>
           </Grid>
         

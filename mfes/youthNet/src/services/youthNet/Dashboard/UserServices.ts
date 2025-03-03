@@ -15,8 +15,8 @@ export interface userListParam {
     role?: string;
     status?: string[];
     states?: string;
-    districts?: string;
-    blocks?: string;
+    district?: string[];
+    block?: string[];
     fromDate?:string;
     toDate?:string;
     village?:string[]
@@ -57,11 +57,18 @@ export const fetchUserList = async ({
       fields,
     });
     return response?.data?.result;
-  } catch (error) {
-    console.error("error in getting user list", error);
-    throw error;
+  } catch (error: any) {
+    if (error.response) {
+      if (error.response.status === 404) {
+        return []; 
+      }
+      console.error("API error:", error.response.status, error.response.data);
+    } else {
+      console.error("Network or unknown error:", error);
+    }
   }
 };
+
 export const getUserDetails = async (
   userId: string | string[],
   fieldValue?: boolean
@@ -77,13 +84,15 @@ export const getUserDetails = async (
     return error;
   }
 };
-export const getYouthDataByDate = async (fromDate: Date, toDate:Date) => {
+export const getYouthDataByDate = async (fromDate: Date, toDate:Date, villageId:string[]) => {
   try{
+    
     const filters={
       role:Role.LEARNER,
       status:[Status.ACTIVE],
       fromDate:fromDate.toLocaleDateString('en-CA').split('T')[0],
-      toDate:toDate.toLocaleDateString('en-CA').split('T')[0]
+      toDate:toDate.toLocaleDateString('en-CA').split('T')[0],
+      village:villageId
 
     }
     const limit=100;
@@ -93,3 +102,48 @@ return response;
   }catch(error){
   }
   }
+
+  export const getVillages = async (userId: any) => {
+    try {
+      const storedUserId = localStorage.getItem('userId');
+      let userDataString = localStorage.getItem('userData');
+      let userData: any = userDataString ? JSON.parse(userDataString) : null;
+  
+      if (userData && userId === storedUserId && userData.customFields) {
+        // If cached userData exists and matches stored userId, return villages
+        const villageResult = userData.customFields.find((item: any) => item.label === 'VILLAGE');
+        return villageResult?.selectedValues;
+      }
+  
+      let selectedMentorDataString = localStorage.getItem('selectedmentorData');
+      let selectedmentorId = localStorage.getItem('selectedmentorId');
+
+      let selectedMentorData = selectedMentorDataString ? JSON.parse(selectedMentorDataString) : null;
+  
+      if (selectedMentorData && selectedMentorData.userId == userId) {
+        console.log("true")
+        // If selected mentor data matches, use it
+        userData = selectedMentorData;
+      } else {
+        // Fetch from API only if no valid local data
+        const data = await getUserDetails(userId, true);
+        if (!data?.userData) return null;
+  
+        userData = data.userData;
+        localStorage.setItem("selectedmentorData", JSON.stringify(userData));
+        localStorage.setItem("selectedmentorId", userId);
+
+        if (userId === storedUserId) {
+          userData.customFields = data.userData.customFields;
+          localStorage.setItem('userData', JSON.stringify(userData));
+        }
+      }
+  
+      const villageResult = userData?.customFields?.find((item: any) => item.label === 'VILLAGE');
+      return villageResult?.selectedValues;
+    } catch (error) {
+      console.error("Error fetching villages:", error);
+      return null;
+    }
+  };
+  

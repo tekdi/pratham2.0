@@ -63,7 +63,10 @@ export enum Role {
   TEACHER = 'Teacher',
   TEAM_LEADER = 'Team Leader',
   ADMIN = 'Admin',
-  LEARNER='Learner'
+  LEARNER='Learner',
+  INSTRUCTOR="Instructor",
+  LEAD="Lead"
+
 }
 
 export enum Status {
@@ -81,8 +84,21 @@ export enum DateFilter
 export enum cohortHierarchy {
   BLOCK = 'BLOCK',
   COHORT = 'COHORT',
+  DISTRICT='DISTRICT',
+  VILLAGE='VILLAGE'
 }
-
+export enum SortOrder {
+  ASC = "asc",
+  DESC = "desc",
+  NEW_REGISTRATION_LOW_TO_HIGH = "new-registration-today-low-to-high",
+  NEW_REGISTRATION_HIGH_TO_LOW = "new-registration-today-high-to-low",
+  TOTAL_COUNT_LOW_TO_HIGH = "totalcount-low-to-high",
+  TOTAL_COUNT_HIGH_TO_LOW = "totalcount-high-to-low",
+  AGE_LOW_TO_HIGH = "age-low-to-high",
+  AGE_HIGH_TO_LOW = "age-high-to-low",
+  OLD_JOINER_FIRST = "old-joiner-first",
+  NEW_JOINER_FIRST = "new-joiner-first",
+}
 export enum sessionMode {
   ONLINE = 'online',
   OFFLINE = 'offline',

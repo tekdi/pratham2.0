@@ -5,7 +5,9 @@ import React from 'react';
 
 const index = () => {
   const mfe_workspace = process.env.NEXT_PUBLIC_WORKSPACE;
-
+  if (typeof window !== "undefined" && window.localStorage) {
+  localStorage.setItem("showHeader"  , "true")
+  }
   console.log(mfe_workspace);
   
 

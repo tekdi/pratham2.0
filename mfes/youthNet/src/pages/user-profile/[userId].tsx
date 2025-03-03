@@ -14,7 +14,7 @@ import { VILLAGE_DATA } from '../../components/youthNet/tempConfigs';
 import VillageDetailCard from '../../components/youthNet/VillageDetailCard';
 import Frame2 from '../../assets/images/SurveyFrame2.png';
 import Profile from '../../components/youthNet/Profile';
-import { getAge } from '../../utils/Helper';
+import { getAge, toPascalCase } from '../../utils/Helper';
 import { useRouter } from 'next/router';
 import { getUserDetails } from '../../services/youthNet/Dashboard/UserServices';
 
@@ -36,7 +36,12 @@ const UserId = () => {
     state?:string|null;
     district?:string| null;
     block?:string|null;
+    middleName?:string|null;
     village?:string|null;
+    userName?:string|null;
+    joinedOn?:string|null;
+
+
   }>({
     userRole: null,
     userID: null,
@@ -49,47 +54,85 @@ const UserId = () => {
     state: null,
     district: null,
     block:null,
-    village: null
+    village: null,
+    middleName: null,
+    userName: null,
+    joinedOn: null,
+
   });
 
   useEffect(() => {
-    const fetchData=async()=>{
-    if (typeof window !== 'undefined' && window.localStorage) {
-      const role = localStorage.getItem('role');
-      const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-         if(userId===localStorage.getItem("userId"))
-         {
-          setUser({
-            firstName: userData?.firstName || '',
-            lastName: userData?.lastName || '',
-            email: userData?.email || '',
-            userID: userData?.userId || '',
-            phone: userData?.mobile || '',
-            gender: userData?.gender || '',
-            userRole: role || '',
-            dob:userData?.dob || ''
-          });
-         }
-         else if(userId){
-          const data = await getUserDetails(userId, true)
-          console.log(data)
-          setUser({ ...data?.userData, userRole: data?.userData?.tenantData[0]?.roleName });
+    const fetchData = async () => {
+      if (typeof window === 'undefined' || !window.localStorage) return;
+  
+      const storedUserId = localStorage.getItem("userId");
+      const role = localStorage.getItem('role') || '';
+      let userData: any = {};
+  
+      if (userId === storedUserId) {
+        userData = JSON.parse(localStorage.getItem('userData') || '{}');
+      } else if (userId) {
+        const data = await getUserDetails(userId, true);
+        userData = data?.userData || {};
+      }
+  
+      if (userData) {
+        const getFieldValue = (label: string) =>
+          toPascalCase(userData?.customFields?.find((item: any) => item.label === label)?.selectedValues?.[0]?.value || '');
+        let date;
+        let formattedDOBDate;
+        if(userData.dob)
+        {
+           date = new Date(userData.dob);
+          //const joinedDate = new Date(userData.createdAt);
+  
+          const options: Intl.DateTimeFormatOptions = { 
+            day: "2-digit", 
+            month: "short", 
+            year: "numeric" 
+        };
+   formattedDOBDate = date.toLocaleDateString("en-GB", options);       
         }
-    
-    }
-  }
-  fetchData()
-  }, []);
+       
+       setUser({
+          firstName: userData?.firstName || '',
+          lastName: userData?.lastName || '',
+          middleName:userData?.middleName || '',
+          userName:  userData?.username || '',
+          joinedOn: userData?.createdOn || '',
+          email: userData?.email || '',
+          userID: userData?.userId || '',
+          phone: userData?.mobile || '',
+          gender: userData?.gender || '',
+          userRole: userData?.tenantData?.[0]?.roleName || role,
+          dob: formattedDOBDate || '',
+          district: getFieldValue('DISTRICT'),
+          block: getFieldValue('BLOCK'),
+          state: getFieldValue('STATE'),
+          village: getFieldValue('VILLAGE'),
+        });
+      }
+    };
+  
+    fetchData();
+  }, [userId]);
+  
   return (
     <Box minHeight="100vh">
       {' '}
       <Box>
         <Header />
       </Box>
-     {(userId===localStorage.getItem("userId")) &&(<Box ml={2}>
-        <BackHeader headingOne={t('YOUTHNET_PROFILE.MY_PROFILE')} />
-      </Box>)
-      }
+     
+      <Box ml={2}>
+        <BackHeader headingOne={ userId===localStorage.getItem("userId")?t('YOUTHNET_PROFILE.MY_PROFILE'): user.firstName? user.lastName ?`${user.firstName} ${user.lastName}`:user.firstName : ''} 
+         showBackButton={userId===localStorage.getItem("userId")?false:true}
+         onBackClick={() => {
+          router.back();
+        }}
+
+         />
+      </Box>
       {/* <Box ml={2}>
         {' '}
         <Typography
@@ -132,12 +175,20 @@ const UserId = () => {
           designation={user.userRole || '-'}
           mentorId={user.userID || ''}
           phoneNumber={user.phone || '-'}
-          gender={user.gender || ''}
-          state="Maharashtra"
-          district="Pune"
-          block="Bhor"
+          gender={toPascalCase(user.gender) || '-'}
+          state={user.state ||"-"}
+          district={user.district ||"-"}
+          block={user.block ||"-"}
           dob={user.dob || '-'}
           age={getAge(user?.dob)}
+          village={user.village || null}
+          middleName={user.middleName || '-'}
+          userName={user.userName || null}
+          joinedOn={user.joinedOn || null}
+          firstName={user.firstName || ''}
+          lastName={user.lastName || ''}
+
+
         />
       </Box>
     </Box>

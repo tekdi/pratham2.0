@@ -24,6 +24,9 @@ import Loader from './components/Loader';
 import { useDirection } from '../hooks/useDirection';
 import config from '../../config.json';
 import ReactGA from 'react-ga4';
+import { Snackbar, Alert } from "@mui/material";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+
 
 type LoginPageProps = {
   onLoginSuccess: (response: any) => void;
@@ -43,6 +46,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
   const [selectedLanguage, setSelectedLanguage] = useState(lang);
   const [language, setLanguage] = useState(selectedLanguage);
   const [scrolling, setScrolling] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const { isRTL } = useDirection();
   const router = useRouter();
@@ -107,6 +111,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
           }
         }
       } catch (error: any) {
+        setOpen(true)
         setLoading(false);
       }
     }
@@ -124,7 +129,12 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
     const { value } = event.target;
     setPassword(value);
   };
-
+  const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen(false);
+  };
   const handleChange = (event: SelectChangeEvent) => {
     const newLocale = event.target.value;
     if (typeof window !== 'undefined' && window.localStorage) {
@@ -453,6 +463,20 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
           </form>
         </Grid>
       </Grid>
+      <Snackbar
+        open={open}
+        autoHideDuration={3000}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+<Alert
+          onClose={handleClose}
+          severity="error"
+          sx={{ width: "100%", color: "white", backgroundColor: "red" }}
+          icon={<ErrorOutlineIcon sx={{ color: "white" }} />} 
+        >          {t('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT')}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
