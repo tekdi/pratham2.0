@@ -13,7 +13,7 @@ import { useTheme } from '@mui/material/styles';
 import { getAge, getAgeInMonths } from '../../utils/Helper';
 import {  useRouter } from 'next/navigation';
 import { useTranslation } from 'next-i18next';
-
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 type UserCardProps = {
   name: string;
   firstName?: string;
@@ -137,7 +137,7 @@ const villageName=customFields?.find((item: any) => item.label === 'VILLAGE')?.s
               ) : (
                 joinOn && (
                   <Typography variant="body2" color="textSecondary">
-                   {t('YOUTHNET_PROFILE.JOINED_ON')} {" "+t('YOUTHNET_PROFILE.JOINED_ON')}
+                   {t('YOUTHNET_PROFILE.JOINED_ON')} {" "+joinOn}
                   </Typography>
                 )
               )}
@@ -158,7 +158,7 @@ const villageName=customFields?.find((item: any) => item.label === 'VILLAGE')?.s
                 mt={'1rem'}
                 fontWeight={600}
               >
-                {totalCount}
+                {totalCount+" "}
                 {newRegistrations?.toString() && (
                   <span
                     style={{
@@ -168,7 +168,7 @@ const villageName=customFields?.find((item: any) => item.label === 'VILLAGE')?.s
                           : theme.palette.success.main,
                     }}
                   >
-                    (^{newRegistrations})
+        (<ArrowUpwardIcon sx={{ height: 16, width: 16 }} /> {newRegistrations})
                   </span>
                 )}
               </Typography>
