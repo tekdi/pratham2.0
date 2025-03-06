@@ -89,6 +89,7 @@ const Mentor = () => {
 
   const searchData = async (formData: any, newPage: any) => {
     const staticFilter = { role: 'Instructor' };
+    const staticSort = ['firstName', sortBy || 'asc'];
     await searchListData(
       formData,
       newPage,
@@ -97,7 +98,8 @@ const Mentor = () => {
       setPageOffset,
       setCurrentPage,
       setResponse,
-      userList
+      userList,
+      staticSort
     );
   };
 
