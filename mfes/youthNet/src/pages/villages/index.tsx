@@ -54,6 +54,7 @@ import { filterData, getAge, getLoggedInUserRole, getVillageUserCounts } from '.
 import { fetchUserList } from '../../services/youthNet/Dashboard/UserServices';
 import { cohortHierarchy, Role, SortOrder, Status, VolunteerField } from '../../utils/app.constant';
 import { editEditUser } from '../../services/ProfileService';
+import { showToastMessage } from "@/components/Toastify";
 
 const Index = () => {
   const { isRTL } = useDirection();
@@ -454,9 +455,12 @@ const Index = () => {
   
         setYouthList(updatedYouthList); 
         setFilteredYouthList(updatedFilteredList); 
-  
+        showToastMessage(t("YOUTHNET_DASHBOARD.MARK_AS_VOLUNTEER_SUCCESSFULLY"), "success");
+
       }
     } catch (e) {
+      showToastMessage(t("YOUTHNET_DASHBOARD.MARK_AS_VOLUNTEER_FAILED"), "error");
+
       console.log(e);
     }
   };

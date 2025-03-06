@@ -101,7 +101,7 @@ const villageName=customFields?.find((item: any) => item.label === 'VILLAGE')?.s
               boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
             }}
           >
-{ isVolunteer ?  isVolunteer===VolunteerField.YES ?"Y": "V"  : (firstName ? firstName.charAt(0).toUpperCase() : "") + (lastName ? lastName.charAt(0).toUpperCase() : "")}
+{ isVolunteer ?  isVolunteer===VolunteerField.YES ?"V": "Y"  : (firstName ? firstName.charAt(0).toUpperCase() : "") + (lastName ? lastName.charAt(0).toUpperCase() : "")}
           </Avatar>
         )}
         <Box
