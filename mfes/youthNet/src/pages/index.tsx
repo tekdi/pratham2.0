@@ -313,6 +313,7 @@ setVillageCount(villageIds?.length)
           ]}
           data="577 Youth & Volunteers"
           userId={YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole()?selectedMentorId:localStorage.getItem('userId')|| ""}
+          managedVillageCount={villageCount}
         />
         
       </Box>
