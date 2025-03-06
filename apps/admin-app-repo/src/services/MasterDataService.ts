@@ -236,3 +236,19 @@ export const updateCohort = async (
     throw error;
   }
 };
+
+
+
+
+export const fetchStateOptions = async (data: any) => {
+  try {
+    const response = await axios.post(
+      API_ENDPOINTS.fieldOptionsRead,
+data 
+      
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching state options:", error);
+  }
+};

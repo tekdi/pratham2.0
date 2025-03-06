@@ -18,6 +18,7 @@ import { useEffect, useState } from 'react';
 import { fetchUserList } from '../../services/youthNet/Dashboard/UserServices';
 import { Role, Status } from '../../utils/app.constant';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import { categorizeUsers } from '../../utils/Helper';
 
 const VillageDetails = () => {
   const router = useRouter();
@@ -28,6 +29,8 @@ const VillageDetails = () => {
     : villageName || '';
   const { id } = router.query; // Extract the slug from the URL
   const [yuthCount, setYuthCount] = useState<number>(0);
+   const [volunteerCount, setVolunteerCount] = useState<number>(0);
+  
   const [todaysRegistrationCount, setTodaysRegistrationCount] = useState<number>(0);
 
   const handleBack = () => {
@@ -54,7 +57,10 @@ const VillageDetails = () => {
        if(filters)
        {
         const response=await fetchUserList({limit, offset,filters})
-        setYuthCount(response?.totalCount)
+       const { volunteerUsers, youthUsers } = categorizeUsers(response?.getUserDetails)
+        
+        setYuthCount(youthUsers?.length)
+        setVolunteerCount(volunteerUsers?.length)
         const todayUsers = response?.getUserDetails.filter((user: any )=> {
           return user.createdAt.startsWith(getTodayDate());
       });
@@ -106,7 +112,7 @@ const VillageDetails = () => {
       <Box>
         <VillageDetailCard
           imageSrc={Frame1}
-          title={t('YOUTHNET_DASHBOARD.YOUTH_COUNT', {count:yuthCount})}
+          title={t('YOUTHNET_DASHBOARD.YOUTH_AND_VOLUNTEER', {youthCount:yuthCount , volunteerCount:volunteerCount })}
         onClick={handleYouthVolunteers}
         />
       </Box>

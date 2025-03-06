@@ -55,7 +55,7 @@ export enum Role {
   CCTA = "Content reviewer"
 } ;
 
-export enum youthNetTenantName {
+export enum TenantName {
   SECOND_CHANCE_PROGRAM = "Second Chance Program",
   YOUTHNET="YouthNet"
 } 

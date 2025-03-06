@@ -4,7 +4,7 @@ export const API_ENDPOINTS = {
   contentRead: (doId: string) => `${baseurl}/api/content/v1/read/${doId}?fields=artifactUrl`,
   academicYearsList: `${baseurl}/academicyears/list`,
   formRead: `${baseurl}/form/read`,
-  accountCreate: `${baseurl}/account/create`,
+  accountCreate: `${baseurl}/account/create`, 
   userUpdate: (userId: string) => `${baseurl}/user/update/${userId}`,
   myCohorts: (userId: string | string[]) => `${baseurl}/cohort/mycohorts/${userId}`,
   accountLogin: `${baseurl}/account/login`,
