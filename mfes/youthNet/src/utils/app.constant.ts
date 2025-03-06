@@ -87,6 +87,12 @@ export enum cohortHierarchy {
   DISTRICT='DISTRICT',
   VILLAGE='VILLAGE'
 }
+export enum VolunteerField{
+  IS_VOLUNTEER="IS_VOLUNTEER",
+  YES="yes",
+  NO="no"
+
+}
 export enum SortOrder {
   ASC = "asc",
   DESC = "desc",
