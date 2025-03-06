@@ -92,31 +92,49 @@ const LoginPage = () => {
               } else {
                 router.push('/course-planner', undefined, { locale: locale });
               }
-            } else if (role?.role === Role.CENTRAL_ADMIN && role?.tenantData[0]?.tenantName == youthNetTenantName.SECOND_CHANCE_PROGRAM) {
+            } else if (
+              role?.role === Role.CENTRAL_ADMIN &&
+              role?.tenantData[0]?.tenantName ==
+                youthNetTenantName.SECOND_CHANCE_PROGRAM
+            ) {
               router.push('/programs', undefined, { locale: locale });
+            } else if (
+              role?.role === Role.ADMIN &&
+              role?.tenantData[0]?.tenantName ==
+                youthNetTenantName.SECOND_CHANCE_PROGRAM
+            ) {
+              router.push('/centers', undefined, { locale: locale });
+            } else if (
+              role?.role === Role.ADMIN &&
+              role?.tenantData[0]?.tenantName == youthNetTenantName.YOUTHNET
+            ) {
+              router.push('/mentor');
             }
-            else if (role?.role === Role.ADMIN && role?.tenantData[0]?.tenantName == youthNetTenantName.SECOND_CHANCE_PROGRAM) {
-              router.push("/centers", undefined, { locale: locale });
-            } else if (role?.role === Role.ADMIN && role?.tenantData[0]?.tenantName == youthNetTenantName.YOUTHNET) {
-              router.push("/mentor");
-            }
-
           }
-        }
-        else {
+        } else {
           let role;
           if (storedUserData) {
             role = JSON.parse(storedUserData);
             if (role?.role === Role.SCTA || role?.role === Role.CCTA) {
-              router.push("/course-planner");
+              router.push('/course-planner');
             }
-            if (role?.role === Role.CENTRAL_ADMIN && role?.tenantData[0]?.tenantName == youthNetTenantName.SECOND_CHANCE_PROGRAM) {
-              router.push("/programs");
-            }
-            else if (role?.role === Role.ADMIN && role?.tenantData[0]?.tenantName == youthNetTenantName.SECOND_CHANCE_PROGRAM) {
-              router.push("/centers");
-            } else if (role?.role === Role.ADMIN && role?.tenantData[0]?.tenantName == youthNetTenantName.YOUTHNET) {
-              router.push("/mentor");
+            if (
+              role?.role === Role.CENTRAL_ADMIN &&
+              role?.tenantData[0]?.tenantName ==
+                youthNetTenantName.SECOND_CHANCE_PROGRAM
+            ) {
+              router.push('/programs');
+            } else if (
+              role?.role === Role.ADMIN &&
+              role?.tenantData[0]?.tenantName ==
+                youthNetTenantName.SECOND_CHANCE_PROGRAM
+            ) {
+              router.push('/centers');
+            } else if (
+              role?.role === Role.ADMIN &&
+              role?.tenantData[0]?.tenantName == youthNetTenantName.YOUTHNET
+            ) {
+              router.push('/mentor');
             }
           }
         }
@@ -186,14 +204,16 @@ const LoginPage = () => {
             }
             localStorage.setItem('adminInfo', JSON.stringify(userInfo));
           }
-          localStorage.setItem(
-            'stateName',
-            transformLabel(
-              userInfo?.customFields?.find(
-                (item: { label: string }) => item.label === 'STATE'
-              )?.value
-            )
+          const selectedStateName = transformLabel(
+            userInfo?.customFields.find(
+              (field: { label: string }) => field?.label === 'STATE'
+            )?.selectedValues[0]?.value
           );
+          localStorage.setItem('stateName', selectedStateName);
+          const selectedStateId = userInfo?.customFields.find(
+            (field: { label: string }) => field?.label === 'STATE'
+          )?.selectedValues[0]?.id;
+          localStorage.setItem('stateId', selectedStateId);
         }
         if (
           userInfo?.role !== Role.ADMIN &&
@@ -235,9 +255,12 @@ const LoginPage = () => {
                 ) {
                   const { locale } = router;
                   // To do :- hardcoding to be removed
-                  if(userInfo?.tenantData[0]?.tenantName != youthNetTenantName.SECOND_CHANCE_PROGRAM ) {
-                    window.location.href = "/workspace"; 
-                    router.push("/workspace");
+                  if (
+                    userInfo?.tenantData[0]?.tenantName !=
+                    youthNetTenantName.SECOND_CHANCE_PROGRAM
+                  ) {
+                    window.location.href = '/workspace';
+                    router.push('/workspace');
                   } else {
                     window.location.href = '/course-planner';
                     if (locale) {
@@ -250,25 +273,45 @@ const LoginPage = () => {
                   //window.location.href = "/centers";
                   const { locale } = router;
                   if (locale) {
-                    if (userInfo?.role === Role.CENTRAL_ADMIN && userInfo?.tenantData[0]?.tenantName == youthNetTenantName.SECOND_CHANCE_PROGRAM) {
-                      router.push("/programs", undefined, { locale: locale }); }
-                    else if (userInfo?.role === Role.ADMIN && userInfo?.tenantData[0]?.tenantName == youthNetTenantName.SECOND_CHANCE_PROGRAM){
-                      router.push("/centers", undefined, { locale: locale });
+                    if (
+                      userInfo?.role === Role.CENTRAL_ADMIN &&
+                      userInfo?.tenantData[0]?.tenantName ==
+                        youthNetTenantName.SECOND_CHANCE_PROGRAM
+                    ) {
+                      router.push('/programs', undefined, { locale: locale });
+                    } else if (
+                      userInfo?.role === Role.ADMIN &&
+                      userInfo?.tenantData[0]?.tenantName ==
+                        youthNetTenantName.SECOND_CHANCE_PROGRAM
+                    ) {
+                      router.push('/centers', undefined, { locale: locale });
+                    } else if (
+                      userInfo?.role === Role.ADMIN &&
+                      userInfo?.tenantData[0]?.tenantName ==
+                        youthNetTenantName.YOUTHNET
+                    ) {
+                      router.push('/mentor', undefined, { locale: locale });
                     }
-                    else if (userInfo?.role === Role.ADMIN && userInfo?.tenantData[0]?.tenantName == youthNetTenantName.YOUTHNET){
-                      router.push("/mentor", undefined, { locale: locale });
+                  } else {
+                    if (
+                      userInfo?.role === Role.CENTRAL_ADMIN &&
+                      userInfo?.tenantData[0]?.tenantName ==
+                        youthNetTenantName.SECOND_CHANCE_PROGRAM
+                    ) {
+                      router.push('/programs');
+                    } else if (
+                      userInfo?.role === Role.ADMIN &&
+                      userInfo?.tenantData[0]?.tenantName ==
+                        youthNetTenantName.SECOND_CHANCE_PROGRAM
+                    ) {
+                      router.push('/centers');
+                    } else if (
+                      userInfo?.role === Role.ADMIN &&
+                      userInfo?.tenantData[0]?.tenantName ==
+                        youthNetTenantName.YOUTHNET
+                    ) {
+                      router.push('/mentor');
                     }
-                  }
-                  else {
-                    if (userInfo?.role === Role.CENTRAL_ADMIN && userInfo?.tenantData[0]?.tenantName == youthNetTenantName.SECOND_CHANCE_PROGRAM) {
-                      router.push("/programs");
-                    }
-                    else if (userInfo?.role === Role.ADMIN && userInfo?.tenantData[0]?.tenantName == youthNetTenantName.SECOND_CHANCE_PROGRAM) {
-                      router.push("/centers");
-                    } else if (userInfo?.role === Role.ADMIN && userInfo?.tenantData[0]?.tenantName == youthNetTenantName.YOUTHNET) {
-                      router.push("/mentor");
-                    }
-
                   }
                 }
               }

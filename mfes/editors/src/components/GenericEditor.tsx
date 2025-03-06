@@ -234,6 +234,7 @@ const GenericEditor: React.FC = () => {
       ) {
         window.context["uploadInfo"] = {
           isLargeFileUpload: true,
+          maxAllowedContentSize: "1" //1GB
         };
       }
     }
