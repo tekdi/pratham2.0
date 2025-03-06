@@ -11,19 +11,24 @@ import {
 import RegistrationStatistics from './RegistrationStatistics';
 import {  getVillages, getYouthDataByDate } from '../../services/youthNet/Dashboard/UserServices';
 import { useTranslation } from 'next-i18next';
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+import { categorizeUsers } from '../../utils/Helper';
 
 interface Props {
   selectOptions: { label: string; value: string }[];
   data?: string;
-  userId:string
+  userId:string;
+  managedVillageCount?:any
 }
 
-const YouthAndVolunteers: React.FC<Props> = ({ selectOptions, data , userId}) => {
+const YouthAndVolunteers: React.FC<Props> = ({ selectOptions,managedVillageCount, data , userId}) => {
   const [selectedValue, setSelectedValue] = useState<string>(
     selectOptions[0]?.value || ''
   );
   const { t } = useTranslation();
  const [youthCount, setYouthCount] = useState<number>(0);
+ const [volunteerCount, setVolunteerCount] = useState<number>(0);
+
   const handleChange = (event: SelectChangeEvent<string>) => {
     setSelectedValue(event.target.value);
   };
@@ -51,7 +56,9 @@ const YouthAndVolunteers: React.FC<Props> = ({ selectOptions, data , userId}) =>
           villageIds
         );
         console.log(response?.getUserDetails);
-        setYouthCount(response?.totalCount);
+        const { volunteerUsers, youthUsers } = categorizeUsers(response?.getUserDetails)
+     setYouthCount(youthUsers?.length)
+     setVolunteerCount(volunteerUsers?.length)
 
       }
 
@@ -92,10 +99,19 @@ if(userId && userId!=="")
           ))}
         </Select>
       </FormControl>
+      <Box display={'flex'} flexDirection="row" gap="10px">
       <Typography variant="body1" style={{ fontWeight: 300, color: 'black' }}>
-        {t('YOUTHNET_DASHBOARD.YOUTH_COUNT', {count: youthCount})}
+         {managedVillageCount} { t('YOUTHNET_DASHBOARD.VILLAGES')}
+      </Typography>
+      <FiberManualRecordIcon 
+      sx={{ color: '#B1AAA2', width: 12, height: 12  , marginTop:"8px"}} 
+    />
+      <Typography variant="body1" style={{ fontWeight: 300, color: 'black' }}>
+        {t('YOUTHNET_DASHBOARD.YOUTH_VOLUNTEER_COUNT', {count: youthCount+volunteerCount})}
 
       </Typography>
+      </Box>
+    
       {data && (
         <Box p={2}>
           <Grid container spacing={2}>
@@ -106,13 +122,13 @@ if(userId && userId!=="")
                 subtile={'Youth'}
               />
             </Grid>
-            {/* <Grid item xs={6}>
+            <Grid item xs={6}>
               <RegistrationStatistics
                 avatar={true}
-                statistic={4}
+                statistic={volunteerCount}
                 subtile={'Volunteer'}
               />
-            </Grid> */}
+            </Grid>
           </Grid>
         </Box>
       )}

@@ -14,6 +14,7 @@ import { getAge, getAgeInMonths } from '../../utils/Helper';
 import {  useRouter } from 'next/navigation';
 import { useTranslation } from 'next-i18next';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import { VolunteerField } from '../../utils/app.constant';
 type UserCardProps = {
   name: string;
   firstName?: string;
@@ -30,13 +31,14 @@ type UserCardProps = {
   totalCount?: number;
   newRegistrations?: number;
   onClick?: (Id: string, name?:string) => void;
-  onToggleClick?: (name: string) => void;
+  onToggleClick?: (name: string, id: string) => void;
   onUserClick?: ( name: string) => void;
   customFields?: any;
   showAvtar?:any;
   Id?: any;
   villageCount?:any;
   blockNames?:string[]
+  isVolunteer?: string
 };
 
 const UserCard: React.FC<UserCardProps> = ({
@@ -60,7 +62,8 @@ const UserCard: React.FC<UserCardProps> = ({
   showAvtar,
   Id,
   blockNames,
-  villageCount
+  villageCount,
+  isVolunteer
 }) => {
   const theme = useTheme<any>();
   const { t } = useTranslation();
@@ -88,7 +91,7 @@ const villageName=customFields?.find((item: any) => item.label === 'VILLAGE')?.s
             sx={{
               width: 48,
               height: 48,
-              backgroundColor: image
+              backgroundColor: isVolunteer===VolunteerField.YES
                 ? 'transparent'
                 : theme.palette.warning['800'],
               fontSize: 18,
@@ -98,7 +101,7 @@ const villageName=customFields?.find((item: any) => item.label === 'VILLAGE')?.s
               boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
             }}
           >
-{!image && (firstName ? firstName.charAt(0).toUpperCase() : "") + (lastName ? lastName.charAt(0).toUpperCase() : "")}
+{ isVolunteer ?  isVolunteer===VolunteerField.YES ?"V": "Y"  : (firstName ? firstName.charAt(0).toUpperCase() : "") + (lastName ? lastName.charAt(0).toUpperCase() : "")}
           </Avatar>
         )}
         <Box
@@ -173,14 +176,14 @@ const villageName=customFields?.find((item: any) => item.label === 'VILLAGE')?.s
                 )}
               </Typography>
             )}
-            {showMore && (
+            {showMore  && isVolunteer===VolunteerField.NO &&(
               <MoreVertIcon
                 sx={{
                   fontSize: '24px',
                   color: theme.palette.warning['300'],
                   cursor: 'pointer',
                 }}
-                onClick={() => onToggleClick?.(name)}
+                onClick={() => onToggleClick?.(name, Id)}
               />
             )}
           </Box>
