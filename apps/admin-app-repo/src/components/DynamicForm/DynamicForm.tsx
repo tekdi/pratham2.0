@@ -617,6 +617,7 @@ const DynamicForm = ({
     console.log('formattedFormData', transformedFormData);
     FormSubmitFunction(filteredData, transformedFormData);
   };
+  console.log(formSchema);
 
   return (
     <>

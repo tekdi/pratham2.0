@@ -236,3 +236,19 @@ export const updateCohort = async (
     throw error;
   }
 };
+
+
+
+
+export const fetchStateOptions = async (data: any) => {
+  try {
+    const response = await axios.post(
+      "https://dev-interface.prathamdigital.org/interface/v1/fields/options/read",
+data 
+      
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching state options:", error);
+  }
+};
