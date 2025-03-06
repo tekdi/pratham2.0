@@ -91,7 +91,6 @@ function generateSchemaAndUISchema(fields) {
       options,
       pattern,
       isRequired,
-      maxSelection,
       validation,
       maxLength,
       minLength,
@@ -111,10 +110,14 @@ function generateSchemaAndUISchema(fields) {
     if (pattern) {
       schemaField.pattern = normalizePattern(pattern);
     }
-    if (maxSelection) {
-      schemaField.maxSelection = parseInt(maxSelection, 10);
-    } else if (validation?.maxSelections) {
+    if (validation?.maxSelections) {
       schemaField.maxSelection = parseInt(validation.maxSelections, 10);
+    }
+    if (validation?.isMultiSelect) {
+      schemaField.isMultiSelect = validation.isMultiSelect;
+    }
+    if (validation?.isRequired) {
+      schemaField.isRequired = validation.isRequired;
     }
     if (maxLength) {
       schemaField.maxLength = parseInt(maxLength, 10);

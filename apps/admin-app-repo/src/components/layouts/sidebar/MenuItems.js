@@ -139,7 +139,8 @@ if (
   return Menuitems.filter(
     (item) =>
       item.title === 'SIDEBAR.MANAGE_USERS' ||
-      item.title === 'SIDEBAR.SUPPORT_REQUEST' 
+      item.title === 'SIDEBAR.SUPPORT_REQUEST' ||
+       item.title === 'SIDEBAR.CERTIFICATE_ISSUANCE'
   ).map((item) => {
     if (item.title === 'SIDEBAR.MANAGE_USERS' && item.subOptions) {
       return {
