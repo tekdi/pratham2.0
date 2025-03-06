@@ -70,6 +70,10 @@ const Menuitems = [
         title: 'MASTER.BLOCKS',
         href: ['/block'],
       },
+      {
+        title: 'Village',
+        href: ['/village'],
+      },
      
     ],
   },

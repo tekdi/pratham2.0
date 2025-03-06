@@ -82,7 +82,8 @@ const State = () => {
 
   const searchData = async (formData = [], newPage) => {
     const { sortBy, ...restFormData } = formData;
-
+    console.log(formData);
+   
     const filters = {
       // role: 'Instructor',
       status: [Status.ACTIVE],
@@ -112,15 +113,14 @@ const State = () => {
       offset,
       sort,
       fieldName: "state",
+      optionName: formData.firstName,
     };
 
     if (filters.searchKey) {
       debouncedGetList(data);
     } else {
       const resp = await fetchStateOptions(data);
-      // console.log('totalCount', result?.totalCount);
-      // console.log('userDetails', result?.getUserDetails);
-      setResponse({ result: resp.result });
+      setResponse({ result: resp?.result });
       console.log('Immediate API Call:', resp);
     }
   };
@@ -134,8 +134,13 @@ const State = () => {
     },
     {
       keys: ['state_code'],
-      label: 'Code',
+      label: 'CODE',
       render: (row) => row.state_code
+    },
+    {
+      keys: ['A'],
+      label: 'STATUS',
+      render: (row) => row.is_active ? "Active" : "Inactive" 
     }
   ];
 

@@ -243,7 +243,7 @@ export const updateCohort = async (
 export const fetchStateOptions = async (data: any) => {
   try {
     const response = await axios.post(
-      "https://dev-interface.prathamdigital.org/interface/v1/fields/options/read",
+      API_ENDPOINTS.fieldOptionsRead,
 data 
       
     );
