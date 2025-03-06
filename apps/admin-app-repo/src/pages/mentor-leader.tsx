@@ -19,13 +19,19 @@ import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Button } from '@mui/material';
-import AddEditMentorLead from '@/components/EntityForms/AddEditMentorLead/AddEditMentorLead';
+import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import SimpleModal from '@/components/SimpleModal';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { updateCohortMemberStatus } from '@/services/CohortService/cohortService';
 import editIcon from '../../public/images/editIcon.svg';
 import deleteIcon from '../../public/images/deleteIcon.svg';
 import Image from 'next/image';
+import {
+  extractMatchingKeys,
+  fetchForm,
+  searchListData,
+} from '@/components/DynamicForm/DynamicFormCallback';
+import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 
 const MentorLead = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -34,14 +40,12 @@ const MentorLead = () => {
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
   const [prefilledAddFormData, setPrefilledAddFormData] = useState({});
-  const [sortBy, setSortBy] = useState<string>('name');
   const [pageLimit, setPageLimit] = useState<number>(10);
   const [pageOffset, setPageOffset] = useState<number>(0);
   const [prefilledFormData, setPrefilledFormData] = useState({});
   const [loading, setLoading] = useState<boolean>(false);
   const [response, setResponse] = useState({});
   const [currentPage, setCurrentPage] = useState(0);
-  const [renderKey, setRenderKey] = useState(true);
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [isEdit, setIsEdit] = useState(false);
   const [editableUserId, setEditableUserId] = useState('');
@@ -56,49 +60,21 @@ const MentorLead = () => {
   useEffect(() => {
     // Fetch form schema from API and set it in state.
     const fetchData = async () => {
-      let data = JSON.stringify({
-        readForm: [
-          {
-            fetchUrl:
-              'https://dev-middleware.prathamdigital.org/user/v1/form/read?context=USERS&contextType=LEAD',
-            header: {},
-          },
-          {
-            fetchUrl:
-              'https://dev-middleware.prathamdigital.org/user/v1/form/read?context=USERS&contextType=LEAD',
-            header: {
-              tenantid: '6c8b810a-66c2-4f0d-8c0c-c025415a4414',
-            },
-          },
-        ],
-      });
-
-      let config = {
-        method: 'post',
-        maxBodyLength: Infinity,
-        url: '/api/dynamic-form/get-rjsf-form',
-        headers: {
-          'Content-Type': 'application/json',
+      const responseForm = await fetchForm([
+        {
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.mentorLead.context}&contextType=${FormContext.mentorLead.contextType}`,
+          header: {},
         },
-        data: data,
-      };
-
-      await axios
-        .request(config)
-        .then((response) => {
-          console.log(JSON.stringify(response.data));
-          if (response.data?.schema) {
-            console.log(`schema`, response.data?.schema);
-            setAddSchema(response.data?.schema);
-          }
-          if (response.data?.schema) {
-            console.log(`uiSchema`, response.data?.uiSchema);
-            setAddUiSchema(response.data?.uiSchema);
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+        {
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.mentorLead.context}&contextType=${FormContext.mentorLead.contextType}`,
+          header: {
+            tenantid: localStorage.getItem('tenantId'),
+          },
+        },
+      ]);
+      console.log('responseForm', responseForm);
+      setAddSchema(responseForm?.schema);
+      setAddUiSchema(responseForm?.uiSchema);
     };
     fetchData();
   }, []);
@@ -110,59 +86,23 @@ const MentorLead = () => {
     },
   };
 
-  const debouncedGetList = debounce(async (data) => {
-    const resp = await userList(data);
-    console.log('Debounced API Call:', resp);
-    // console.log('totalCount', result?.totalCount);
-    // console.log('userDetails', result?.getUserDetails);
-    setResponse({ result: resp });
-  }, 300);
-
   const SubmitaFunction = async (formData: any) => {
     setPrefilledFormData(formData);
     await searchData(formData, 0);
   };
 
   const searchData = async (formData, newPage) => {
-    const { sortBy, ...restFormData } = formData;
-
-    const filters = {
-      role: 'Lead',
-      status: [Status.ACTIVE],
-      ...Object.entries(restFormData).reduce((acc, [key, value]) => {
-        if (value !== undefined && value !== '') {
-          acc[key] = value;
-        }
-        return acc;
-      }, {} as Record<string, any>),
-    };
-
-    const sort = ['firstName', sortBy || 'asc'];
-    let limit = pageLimit;
-    let offset = newPage * limit;
-    let pageNumber = newPage;
-
-    setPageOffset(offset);
-    setCurrentPage(pageNumber);
-    setResponse({});
-    setRenderKey((renderKey) => !renderKey);
-
-    const data = {
-      limit,
-      offset,
-      sort,
-      filters,
-    };
-
-    if (filters.searchKey) {
-      debouncedGetList(data);
-    } else {
-      const resp = await userList(data);
-      // console.log('totalCount', result?.totalCount);
-      // console.log('userDetails', result?.getUserDetails);
-      setResponse({ result: resp });
-      console.log('Immediate API Call:', resp);
-    }
+    const staticFilter = { role: 'Lead' };
+    await searchListData(
+      formData,
+      newPage,
+      staticFilter,
+      pageLimit,
+      setPageOffset,
+      setCurrentPage,
+      setResponse,
+      userList
+    );
   };
 
   // Define table columns
@@ -226,9 +166,9 @@ const MentorLead = () => {
         </Box>
       ),
       callback: (row) => {
-        console.log('row:', row);
-        console.log('AddSchema', addSchema);
-        console.log('AddUISchema', addUiSchema);
+        // console.log('row:', row);
+        // console.log('AddSchema', addSchema);
+        // console.log('AddUISchema', addUiSchema);
 
         let tempFormData = extractMatchingKeys(row, addSchema);
         // console.log('tempFormData', tempFormData);
@@ -290,36 +230,36 @@ const MentorLead = () => {
     setOpenModal(false);
   };
 
-  function extractMatchingKeys(row, schema) {
-    let result = {};
-
-    for (const [key, value] of Object.entries(schema.properties)) {
-      if (value.coreField === 0) {
-        if (value.fieldId) {
-          const customField = row.customFields?.find(
-            (field) => field.fieldId === value.fieldId
-          );
-          if (customField) {
-            result[key] = customField.selectedValues
-              .map((v) => v.id)
-              .join(', ');
-          }
-        } else if (row[key] !== undefined) {
-          result[key] = row[key];
-        }
-      } else if (row[key] !== undefined) {
-        result[key] = row[key];
-      }
-    }
-
-    return result;
-  }
+  //Add Edit Props
+  const extraFieldsUpdate = {};
+  const extraFields = {
+    tenantCohortRoleMapping: [
+      {
+        tenantId: '6c8b810a-66c2-4f0d-8c0c-c025415a4414',
+        roleId: 'c4454929-954e-4c51-bb7d-cca834ab9375',
+      },
+    ],
+    username: 'youthnetmentorlead',
+    password: Math.floor(10000 + Math.random() * 90000),
+  };
+  const successUpdateMessage =
+    'MENTOR_LEADERS.MENTOR_LEAD_UPDATED_SUCCESSFULLY';
+  const telemetryUpdateKey = 'youthnet-mentor-lead-updated-successfully';
+  const failureUpdateMessage = 'MENTOR_LEADERS.NOT_ABLE_UPDATE_MENTOR_LEAD';
+  const successCreateMessage =
+    'MENTOR_LEADERS.MENTOR_LEAD_CREATED_SUCCESSFULLY';
+  const telemetryCreateKey = 'youthnet-mentor-lead-created-successfully';
+  const failureCreateMessage = 'MENTOR_LEADERS.NOT_ABLE_CREATE_MENTOR_LEAD';
+  const notificationKey = 'onMentorLeaderCreate';
+  const notificationMessage =
+    'MENTOR_LEADERS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
+  const notificationContext = 'USER';
 
   return (
     <>
       <Box display={'flex'} flexDirection={'column'} gap={2}>
         {isLoading ? (
-          <Loader />
+          <Loader showBackdrop={false} loadingText={t('COMMON.LOADING')} />
         ) : (
           schema &&
           uiSchema && (
@@ -343,7 +283,7 @@ const MentorLead = () => {
               handleOpenModal();
             }}
           >
-            Add New
+            {t('COMMON.ADD_NEW')}{' '}
           </Button>
         </Box>
 
@@ -357,7 +297,7 @@ const MentorLead = () => {
               : t('MENTOR_LEADERS.NEW_MENTOR_LEAD')
           }
         >
-          <AddEditMentorLead
+          <AddEditUser
             SuccessCallback={() => {
               setPrefilledFormData({});
               searchData({}, 0);
@@ -373,13 +313,23 @@ const MentorLead = () => {
               searchData(prefilledFormData, currentPage);
               setOpenModal(false);
             }}
+            extraFields={extraFields}
+            extraFieldsUpdate={extraFieldsUpdate}
+            successUpdateMessage={successUpdateMessage}
+            telemetryUpdateKey={telemetryUpdateKey}
+            failureUpdateMessage={failureUpdateMessage}
+            successCreateMessage={successCreateMessage}
+            telemetryCreateKey={telemetryCreateKey}
+            failureCreateMessage={failureCreateMessage}
+            notificationKey={notificationKey}
+            notificationMessage={notificationMessage}
+            notificationContext={notificationContext}
           />
         </SimpleModal>
 
         {response && response?.result?.getUserDetails ? (
           <Box sx={{ mt: 1 }}>
             <PaginatedTable
-              key={renderKey ? 'defaultRender' : 'customRender'}
               count={response?.result?.totalCount}
               data={response?.result?.getUserDetails}
               columns={columns}

@@ -15,7 +15,6 @@ import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Button } from '@mui/material';
-import AddEditMentor from '@/components/EntityForms/AddEditMentor/AddEditMentor';
 import SimpleModal from '@/components/SimpleModal';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { updateCohortMemberStatus } from '@/services/CohortService/cohortService';

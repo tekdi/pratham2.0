@@ -6,7 +6,10 @@ import axios from 'axios';
 import DynamicForm from '@/components/DynamicForm/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
-import { MasterDistrictsSearchSchema, MasterDistrictsUISchema } from '../constant/Forms/MaterDistrictSearch'
+import {
+  MasterDistrictsSearchSchema,
+  MasterDistrictsUISchema,
+} from '../constant/Forms/MaterDistrictSearch';
 import { Status } from '@/utils/app.constant';
 import { Box, Grid, Typography } from '@mui/material';
 import { debounce } from 'lodash';
@@ -15,7 +18,6 @@ import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Button } from '@mui/material';
-import AddEditMentor from '@/components/EntityForms/AddEditMentor/AddEditMentor';
 import SimpleModal from '@/components/SimpleModal';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { updateCohortMemberStatus } from '@/services/CohortService/cohortService';
@@ -57,7 +59,6 @@ const District = () => {
     }
   }, [pageLimit]);
 
-
   const updatedUiSchema = {
     ...uiSchema,
     'ui:submitButtonOptions': {
@@ -81,7 +82,6 @@ const District = () => {
   const searchData = async (formData = [], newPage) => {
     const { sortBy, ...restFormData } = formData;
     console.log(restFormData, formData);
-    
 
     const filters = {
       // role: 'Instructor',
@@ -94,10 +94,7 @@ const District = () => {
       }, {} as Record<string, any>),
     };
 
-    const sort = [
-      "district_name",
-      sortBy ? sortBy : "asc"
-    ];
+    const sort = ['district_name', sortBy ? sortBy : 'asc'];
     let limit = pageLimit;
     let offset = newPage * limit;
     let pageNumber = newPage;
@@ -111,7 +108,7 @@ const District = () => {
       limit,
       offset,
       sort,
-      fieldName: "district",
+      fieldName: 'district',
       controllingfieldfk: formData.state,
       optionName: formData.firstName,
     };
@@ -137,12 +134,9 @@ const District = () => {
     {
       keys: ['A'],
       label: 'STATUS',
-      render: (row) => row.is_active ? "Active" : "Inactive" 
-    }
+      render: (row) => (row.is_active ? 'Active' : 'Inactive'),
+    },
   ];
- 
-
-
 
   // Pagination handlers
   const handlePageChange = (newPage) => {
