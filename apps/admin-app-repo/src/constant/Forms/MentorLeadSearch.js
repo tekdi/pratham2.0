@@ -51,6 +51,12 @@ export const MentorLeadSearchSchema = {
       enum: ['asc', 'desc'],
       enumNames: ['A-Z', 'Z-A'],
     },
+    status: {
+      type: 'string',
+      title: 'Status',
+      enum: ['active', 'archived'],
+      enumNames: ['Active', 'Archived'], 
+    },
   },
 };
 
