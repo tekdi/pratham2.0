@@ -77,6 +77,7 @@ const MentorLead = () => {
       setAddUiSchema(responseForm?.uiSchema);
     };
     fetchData();
+    setPrefilledAddFormData({ state: localStorage.getItem('stateId') });
   }, []);
 
   const updatedUiSchema = {
@@ -271,7 +272,11 @@ const MentorLead = () => {
               uiSchema={updatedUiSchema}
               SubmitaFunction={SubmitaFunction}
               isCallSubmitInHandle={true}
-              prefilledFormData={prefilledFormData || {}}
+              prefilledFormData={
+                prefilledFormData === {}
+                  ? { state: localStorage.getItem('stateId') }
+                  : prefilledAddFormData
+              }
             />
           )
         )}
@@ -280,7 +285,9 @@ const MentorLead = () => {
             variant="outlined"
             color="primary"
             onClick={() => {
-              setPrefilledAddFormData({});
+              setPrefilledAddFormData({
+                state: localStorage.getItem('stateId'),
+              });
               setIsEdit(false);
               setEditableUserId('');
               handleOpenModal();
