@@ -37,7 +37,7 @@ const Mentor = () => {
   const [prefilledAddFormData, setPrefilledAddFormData] = useState({});
   const [pageLimit, setPageLimit] = useState<number>(10);
   const [pageOffset, setPageOffset] = useState<number>(0);
-  const [prefilledFormData, setPrefilledFormData] = useState({ state: '27' });
+  const [prefilledFormData, setPrefilledFormData] = useState({});
   const [loading, setLoading] = useState<boolean>(false);
   const [response, setResponse] = useState({});
   const [currentPage, setCurrentPage] = useState(0);
@@ -71,6 +71,8 @@ const Mentor = () => {
       setAddSchema(responseForm?.schema);
       setAddUiSchema(responseForm?.uiSchema);
     };
+
+    setPrefilledAddFormData({ state: localStorage.getItem('stateId') });
 
     fetchData();
   }, []);
@@ -218,7 +220,7 @@ const Mentor = () => {
           statusReason,
           membershipId,
         });
-        setPrefilledFormData({ state: '27' });
+        setPrefilledFormData({});
         searchData(prefilledFormData, currentPage);
         setOpenModal(false);
       },
@@ -277,7 +279,11 @@ const Mentor = () => {
               uiSchema={updatedUiSchema}
               SubmitaFunction={SubmitaFunction}
               isCallSubmitInHandle={true}
-              prefilledFormData={prefilledFormData || {}}
+              prefilledFormData={
+                prefilledFormData === {}
+                  ? { state: localStorage.getItem('stateId') }
+                  : prefilledFormData
+              }
             />
           )
         )}
@@ -286,7 +292,9 @@ const Mentor = () => {
             variant="outlined"
             color="primary"
             onClick={() => {
-              setPrefilledAddFormData({});
+              setPrefilledAddFormData({
+                state: localStorage.getItem('stateId'),
+              });
               setIsEdit(false);
               setEditableUserId('');
               handleOpenModal();
@@ -306,7 +314,7 @@ const Mentor = () => {
         >
           <AddEditUser
             SuccessCallback={() => {
-              setPrefilledFormData({ state: '27' });
+              setPrefilledFormData({});
               searchData({}, 0);
               setOpenModal(false);
             }}
@@ -316,7 +324,7 @@ const Mentor = () => {
             isEdit={isEdit}
             editableUserId={editableUserId}
             UpdateSuccessCallback={() => {
-              setPrefilledFormData({ state: '27' });
+              setPrefilledFormData({});
               searchData(prefilledFormData, currentPage);
               setOpenModal(false);
             }}
