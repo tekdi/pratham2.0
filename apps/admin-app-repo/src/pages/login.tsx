@@ -205,9 +205,11 @@ const LoginPage = () => {
             localStorage.setItem('adminInfo', JSON.stringify(userInfo));
             const roleId = userInfo.tenantData?.[0]?.roleId || '';
             const roleName = userInfo.tenantData?.[0]?.roleName || '';
+            const program = userInfo.tenantData?.[0]?.tenantName || '';
 
             localStorage.setItem('roleId', roleId);
             localStorage.setItem('roleName', roleName);
+            localStorage.setItem('program', program);
           }
           const selectedStateName = transformLabel(
             userInfo?.customFields.find(
