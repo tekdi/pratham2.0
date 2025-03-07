@@ -105,7 +105,15 @@ export const MentorSearchSchema = {
 };
 
 export const MentorSearchUISchema = {
-  'ui:order': ['state', 'district', 'block', 'village', 'searchKey', 'sortBy'],
+  'ui:order': [
+    'state',
+    'district',
+    'block',
+    'village',
+    'searchKey',
+    'sortBy',
+    'status',
+  ],
 
   state: {
     'ui:widget': 'select',
@@ -128,6 +136,10 @@ export const MentorSearchUISchema = {
   },
 
   sortBy: {
+    'ui:widget': 'select',
+  },
+
+  status: {
     'ui:widget': 'select',
   },
 };

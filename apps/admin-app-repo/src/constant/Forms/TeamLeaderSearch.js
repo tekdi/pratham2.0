@@ -1,4 +1,4 @@
-export const MentorLeadSearchSchema = {
+export const TeamLeaderSearchSchema = {
   type: 'object',
   properties: {
     state: {
@@ -40,6 +40,50 @@ export const MentorLeadSearchSchema = {
         dependent: 'state',
       },
     },
+    block: {
+      type: 'string',
+      title: 'Block',
+      enum: ['Select'],
+      enumNames: ['Select'],
+      api: {
+        url: 'https://dev-interface.prathamdigital.org/interface/v1/fields/options/read',
+        method: 'POST',
+        payload: {
+          fieldName: 'block',
+          controllingfieldfk: '**',
+          sort: ['block_name', 'asc'],
+        },
+        options: {
+          optionObj: 'result.values',
+          label: 'label',
+          value: 'value',
+        },
+        callType: 'dependent',
+        dependent: 'district',
+      },
+    },
+    village: {
+      type: 'string',
+      title: 'Village',
+      enum: ['Select'],
+      enumNames: ['Select'],
+      api: {
+        url: 'https://dev-interface.prathamdigital.org/interface/v1/fields/options/read',
+        method: 'POST',
+        payload: {
+          fieldName: 'village',
+          controllingfieldfk: '**',
+          sort: ['village_name', 'asc'],
+        },
+        options: {
+          optionObj: 'result.values',
+          label: 'label',
+          value: 'value',
+        },
+        callType: 'dependent',
+        dependent: 'block',
+      },
+    },
     firstName: {
       type: 'string',
       title: 'Search Key',
@@ -60,8 +104,16 @@ export const MentorLeadSearchSchema = {
   },
 };
 
-export const MentorLeadSearchUISchema = {
-  'ui:order': ['state', 'district', 'searchKey', 'sortBy', 'status'],
+export const TeamLeaderSearchUISchema = {
+  'ui:order': [
+    'state',
+    'district',
+    'block',
+    'village',
+    'searchKey',
+    'sortBy',
+    'status',
+  ],
 
   state: {
     'ui:widget': 'select',
