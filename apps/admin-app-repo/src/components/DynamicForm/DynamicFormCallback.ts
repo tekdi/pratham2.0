@@ -57,7 +57,8 @@ export const searchListData = async (
   setPageOffset: any,
   setCurrentPage: any,
   setResponse: any,
-  getListApiCall: any
+  getListApiCall: any,
+  staticSort: any
 ) => {
   const { sortBy, ...restFormData } = formData;
 
@@ -77,7 +78,7 @@ export const searchListData = async (
     }, {} as Record<string, any>),
   };
 
-  const sort = ['firstName', sortBy || 'asc'];
+  const sort = staticSort;
   let limit = pageLimit;
   let offset = newPage * limit;
   let pageNumber = newPage;
