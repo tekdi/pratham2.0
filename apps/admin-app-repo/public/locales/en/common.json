@@ -147,7 +147,8 @@
     "RETURN_TO_LOGIN": "Return to Login",
     "COHORT_CODE_EXISTS": "Code already exists",
     "NO_MENTOR_FOUND": "No Mentor Found",
-    "NO_MENTOR_LEAD_FOUND": "No Mentor Lead Found"
+    "NO_MENTOR_LEAD_FOUND": "No Mentor Lead Found",
+    "NO_CONTENT_CREATOR_FOUND": "No Content Creator (SCTA) Found"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -208,7 +209,8 @@
     "MENTOR": "Mentor",
     "MENTOR_LEADER": "Mentor Leader",
     "CERTIFICATE_ISSUANCE": "Certificate Issuance",
-    "SUPPORT_REQUEST": "Support Request"
+    "SUPPORT_REQUEST": "Support Request",
+    "CONTENT_CREATOR": "Content Creator"
   },
   "FACILITATORS": {
     "STATE": "State",

@@ -47,6 +47,10 @@ const Menuitems = [
         title: 'SIDEBAR.MENTOR_LEADER',
         href: ['/mentor-leader'],
       },
+      {
+        title: 'SIDEBAR.CONTENT_CREATOR',
+        href: ['/content-creator'],
+      }
     ],
   },
   {
@@ -192,11 +196,8 @@ if (
           item.title !== 'SIDEBAR.MANAGE_NOTIFICATION'
       );
     }
-    if (
-      (userInfo?.role === Role.ADMIN ||
-        userInfo?.role === Role.CENTRAL_ADMIN) &&
-      userInfo?.tenantData[0]?.tenantName === youthNetTenantName.SECOND_CHANCE_PROGRAM
-    ) {
+    if (userInfo?.role === Role.ADMIN &&
+      userInfo?.tenantData[0]?.tenantName === youthNetTenantName.SECOND_CHANCE_PROGRAM) {
       // Exclude Course Planner and Workspace for Admin and Central Admin
       return Menuitems.filter(
         (item) =>
@@ -204,6 +205,28 @@ if (
           item.title !== 'SIDEBAR.WORKSPACE' &&
           item.title !== 'SIDEBAR.CENTERS' &&
           item.title !== 'SIDEBAR.MANAGE_USERS' && 
+          item.title !== 'SIDEBAR.CERTIFICATE_ISSUANCE'
+      );
+    }
+
+    if (userInfo?.role === Role.CENTRAL_ADMIN) {
+      return Menuitems.map((item) => {
+        if (item.title === 'SIDEBAR.MANAGE_USERS' && item.subOptions) {
+          return {
+            ...item,
+            subOptions: item.subOptions.filter(
+              (subItem) =>
+                subItem.title === 'SIDEBAR.CONTENT_CREATOR' ||
+                subItem.title === 'SIDEBAR.MENTOR'
+            ),
+          };
+        }
+        return item;
+      }).filter(
+        (item) =>
+          item.title !== 'SIDEBAR.COURSE_PLANNER' &&
+          item.title !== 'SIDEBAR.WORKSPACE' &&
+          item.title !== 'SIDEBAR.CENTERS' &&
           item.title !== 'SIDEBAR.CERTIFICATE_ISSUANCE'
       );
     }
