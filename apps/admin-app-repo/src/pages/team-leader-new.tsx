@@ -7,9 +7,9 @@ import DynamicForm from '@/components/DynamicForm/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
 import {
-  MentorLeadSearchSchema,
-  MentorLeadSearchUISchema,
-} from '../constant/Forms/MentorLeadSearch';
+  TeamLeaderSearchSchema,
+  TeamLeaderSearchUISchema,
+} from '../constant/Forms/TeamLeaderSearch';
 import { Status } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
 import { Box, Grid, Typography } from '@mui/material';
@@ -33,10 +33,10 @@ import {
 } from '@/components/DynamicForm/DynamicFormCallback';
 import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 
-const MentorLead = () => {
+const TeamLeader = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [schema, setSchema] = useState(MentorLeadSearchSchema);
-  const [uiSchema, setUiSchema] = useState(MentorLeadSearchUISchema);
+  const [schema, setSchema] = useState(TeamLeaderSearchSchema);
+  const [uiSchema, setUiSchema] = useState(TeamLeaderSearchUISchema);
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
   const [prefilledAddFormData, setPrefilledAddFormData] = useState({});
@@ -77,8 +77,6 @@ const MentorLead = () => {
       setAddUiSchema(responseForm?.uiSchema);
     };
     fetchData();
-    setPrefilledAddFormData({ state: localStorage.getItem('stateId') });
-    setPrefilledFormData({ state: localStorage.getItem('stateId') });
   }, []);
 
   const updatedUiSchema = {
@@ -114,7 +112,7 @@ const MentorLead = () => {
   const columns = [
     {
       keys: ['firstName', 'middleName', 'lastName'],
-      label: 'Mentor Lead Name',
+      label: 'Team Lead Name',
       render: (row) =>
         `${row.firstName || ''} ${row.middleName || ''} ${
           row.lastName || ''
@@ -136,18 +134,29 @@ const MentorLead = () => {
     //   },
     // },
     {
-      keys: ['STATE', 'DISTRICT'],
-      label: 'Location (State / District )',
-      render: (row) => {
+      keys: ['STATE', 'DISTRICT', 'BLOCK', 'VILLAGE'],
+      label: 'Location (State / District / Block/ Village)',
+      render: (row: any) => {
         const state =
-          row.customFields.find((field) => field.label === 'STATE')
-            ?.selectedValues[0]?.value || '';
+          row.customFields.find(
+            (field: { label: string }) => field.label === 'STATE'
+          )?.selectedValues[0]?.value || '';
         const district =
-          row.customFields.find((field) => field.label === 'DISTRICT')
-            ?.selectedValues[0]?.value || '';
-
+          row.customFields.find(
+            (field: { label: string }) => field.label === 'DISTRICT'
+          )?.selectedValues[0]?.value || '';
+        const block =
+          row.customFields.find(
+            (field: { label: string }) => field.label === 'BLOCK'
+          )?.selectedValues[0]?.value || '';
+        const village =
+          row.customFields.find(
+            (field: { label: string }) => field.label === 'VILLAGE'
+          )?.selectedValues[0]?.value || '';
         return `${state == '' ? '' : `${state}`}${
           district == '' ? '' : `, ${district}`
+        }${block == '' ? '' : `, ${block}`}${
+          village == '' ? '' : `, ${village}`
         }`;
       },
     },
@@ -240,11 +249,11 @@ const MentorLead = () => {
   const extraFields = {
     tenantCohortRoleMapping: [
       {
-        tenantId: '6c8b810a-66c2-4f0d-8c0c-c025415a4414',
+        tenantId: localStorage.getItem('tenantId'),
         roleId: 'c4454929-954e-4c51-bb7d-cca834ab9375',
       },
     ],
-    username: 'youthnetmentorlead',
+    username: 'scpTeamLead',
     password: Math.floor(10000 + Math.random() * 90000),
   };
   const successUpdateMessage =
@@ -273,7 +282,7 @@ const MentorLead = () => {
               uiSchema={updatedUiSchema}
               SubmitaFunction={SubmitaFunction}
               isCallSubmitInHandle={true}
-              prefilledFormData={prefilledFormData}
+              prefilledFormData={prefilledFormData || {}}
             />
           )
         )}
@@ -282,9 +291,7 @@ const MentorLead = () => {
             variant="outlined"
             color="primary"
             onClick={() => {
-              setPrefilledAddFormData({
-                state: localStorage.getItem('stateId'),
-              });
+              setPrefilledAddFormData({});
               setIsEdit(false);
               setEditableUserId('');
               handleOpenModal();
@@ -371,4 +378,4 @@ export async function getStaticProps({ locale }: any) {
   };
 }
 
-export default MentorLead;
+export default TeamLeader;
