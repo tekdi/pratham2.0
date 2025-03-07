@@ -6,7 +6,10 @@ import axios from 'axios';
 import DynamicForm from '@/components/DynamicForm/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
-import { MasterBlocksUISchema, MasterBlockSchema } from '../constant/Forms/MaterBlockSearch'
+import {
+  MasterBlocksUISchema,
+  MasterBlockSchema,
+} from '../constant/Forms/MaterBlockSearch';
 import { Status } from '@/utils/app.constant';
 import { Box, Grid, Typography } from '@mui/material';
 import { debounce } from 'lodash';
@@ -56,6 +59,9 @@ const Block = () => {
     }
   }, [pageLimit]);
 
+  useEffect(() => {
+    setPrefilledFormData({ state: localStorage.getItem('stateId') });
+  }, []);
 
   const updatedUiSchema = {
     ...uiSchema,
@@ -79,7 +85,7 @@ const Block = () => {
 
   const searchData = async (formData = [], newPage) => {
     const { sortBy, ...restFormData } = formData;
-  
+
     const filters = {
       // role: 'Instructor',
       status: [Status.ACTIVE],
@@ -91,10 +97,7 @@ const Block = () => {
       }, {} as Record<string, any>),
     };
 
-    const sort = [
-      "block_name",
-      sortBy ? sortBy : "asc"
-    ];
+    const sort = ['block_name', sortBy ? sortBy : 'asc'];
     let limit = pageLimit;
     let offset = newPage * limit;
     let pageNumber = newPage;
@@ -108,8 +111,10 @@ const Block = () => {
       limit,
       offset,
       sort,
-      fieldName: "block",
-      controllingfieldfk: formData.district ? formData.district : formData.state,
+      fieldName: 'block',
+      controllingfieldfk: formData.district
+        ? formData.district
+        : formData.state,
       optionName: formData.firstName,
     };
 
@@ -134,10 +139,9 @@ const Block = () => {
     {
       keys: ['A'],
       label: 'STATUS',
-      render: (row) => row.is_active ? "Active" : "Inactive"
-    }
+      render: (row) => (row.is_active ? 'Active' : 'Inactive'),
+    },
   ];
-
 
   // Pagination handlers
   const handlePageChange = (newPage) => {
@@ -194,7 +198,7 @@ const Block = () => {
               uiSchema={updatedUiSchema}
               SubmitaFunction={SubmitaFunction}
               isCallSubmitInHandle={true}
-              prefilledFormData={prefilledFormData || {}}
+              prefilledFormData={prefilledFormData}
             />
           )
         )}

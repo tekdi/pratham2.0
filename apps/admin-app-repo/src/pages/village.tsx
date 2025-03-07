@@ -60,6 +60,10 @@ const Village = () => {
     }
   }, [pageLimit]);
 
+  useEffect(() => {
+    setPrefilledFormData({ state: localStorage.getItem('stateId') });
+  }, []);
+
   const updatedUiSchema = {
     ...uiSchema,
     'ui:submitButtonOptions': {
@@ -200,7 +204,7 @@ const Village = () => {
               uiSchema={updatedUiSchema}
               SubmitaFunction={SubmitaFunction}
               isCallSubmitInHandle={true}
-              prefilledFormData={prefilledFormData || {}}
+              prefilledFormData={prefilledFormData}
             />
           )
         )}
