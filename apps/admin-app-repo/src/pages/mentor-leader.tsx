@@ -78,6 +78,7 @@ const MentorLead = () => {
     };
     fetchData();
     setPrefilledAddFormData({ state: localStorage.getItem('stateId') });
+    setPrefilledFormData({ state: localStorage.getItem('stateId') });
   }, []);
 
   const updatedUiSchema = {
@@ -272,11 +273,7 @@ const MentorLead = () => {
               uiSchema={updatedUiSchema}
               SubmitaFunction={SubmitaFunction}
               isCallSubmitInHandle={true}
-              prefilledFormData={
-                prefilledFormData === {}
-                  ? { state: localStorage.getItem('stateId') }
-                  : prefilledFormData
-              }
+              prefilledFormData={prefilledFormData}
             />
           )
         )}
