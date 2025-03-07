@@ -1,5 +1,5 @@
 import FingerprintJS from 'fingerprintjs2';
-import { Role , DateFilter, cohortHierarchy} from './app.constant';
+import { Role , DateFilter, cohortHierarchy, VolunteerField} from './app.constant';
 
 export const generateUUID = () => {
   let d = new Date().getTime();
@@ -271,6 +271,33 @@ export const filterData = (data: any[], searchKey: string) => {
       
   );
 };
+
+export const categorizeUsers=(users: any) =>{
+  const volunteerUsers: any = [];
+  const youthUsers : any = [];
+
+  users.forEach((user : any) => {
+      const isVolunteerField = user.customFields.find(
+          (field : any) => field.label === VolunteerField.IS_VOLUNTEER
+      );
+
+      if (isVolunteerField && isVolunteerField.selectedValues === VolunteerField.YES) {
+          volunteerUsers.push({
+              userId: user.userId,
+              username: user.username,
+              email: user.email
+          });
+      } else {
+          youthUsers.push({
+              userId: user.userId,
+              username: user.username,
+              email: user.email
+          });
+      }
+  });
+
+  return { volunteerUsers, youthUsers };
+}
 
 
 
