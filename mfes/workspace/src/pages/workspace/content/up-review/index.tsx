@@ -26,6 +26,7 @@ import KaTableComponent from "@workspace/components/KaTableComponent";
 import { timeAgo } from "@workspace/utils/Helper";
 import useSharedStore from "@workspace/utils/useSharedState";
 import useTenantConfig from "@workspace/hooks/useTenantConfig";
+import WorkspaceHeader from "@workspace/components/WorkspaceHeader";
 const columns = [
   { key: 'title_and_description', title: 'TITLE & DESCRIPTION', dataType: DataType.String, width: "480px" },
 
@@ -40,7 +41,7 @@ const columns = [
 const UpForReviewPage = () => {
   const tenantConfig = useTenantConfig();
   const router = useRouter();
-
+const [showHeader, setShowHeader] = useState<boolean | null>(null);
   const [selectedKey, setSelectedKey] = useState("up-review");
   const filterOption: string[] = router.query.filterOptions
   ? JSON.parse(router.query.filterOptions as string)
@@ -63,6 +64,12 @@ const UpForReviewPage = () => {
   const fetchContentAPI = useSharedStore(
     (state: any) => state.fetchContentAPI
   );
+
+  useEffect(() => {
+              const headerValue = localStorage.getItem("showHeader");
+              setShowHeader(headerValue === "true");
+             }, []);
+
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
@@ -153,6 +160,8 @@ const UpForReviewPage = () => {
 
   
   return (
+    <>
+    {showHeader && <WorkspaceHeader />}
     <Layout selectedKey={selectedKey} onSelect={setSelectedKey}>
       <WorkspaceText />
       <Box p={3}>
@@ -210,6 +219,7 @@ const UpForReviewPage = () => {
         </Box>
       </Box>
     </Layout>
+    </>
   );
 };
 

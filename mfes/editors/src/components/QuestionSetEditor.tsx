@@ -169,7 +169,7 @@ const QuestionSetEditor: React.FC = () => {
         link.id = "sunbird-editor-css";
         link.rel = "stylesheet";
         link.href =
-          "https://cdn.jsdelivr.net/npm/@tekdi/sunbird-questionset-editor-web-component@5.0.0-beta.8/styles.css";
+          "https://cdn.jsdelivr.net/npm/@tekdi/sunbird-questionset-editor-web-component@5.0.0-beta.9/styles.css";
         document.head.appendChild(link);
       }
 
@@ -177,7 +177,7 @@ const QuestionSetEditor: React.FC = () => {
         const script = document.createElement("script");
         script.id = "sunbird-editor-js";
         script.src =
-          "https://cdn.jsdelivr.net/npm/@tekdi/sunbird-questionset-editor-web-component@5.0.0-beta.8/sunbird-questionset-editor.js";
+          "https://cdn.jsdelivr.net/npm/@tekdi/sunbird-questionset-editor-web-component@5.0.0-beta.9/sunbird-questionset-editor.js";
         script.async = true;
         script.onload = () => setAssetsLoaded(true);
         document.body.appendChild(script);

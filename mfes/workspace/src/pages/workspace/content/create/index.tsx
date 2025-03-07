@@ -15,16 +15,21 @@ import Image from "next/image";
 import WorkspaceText from '../../../../components/WorkspaceText';
 import { getLocalStoredUserId } from "@workspace/services/LocalStorageService";
 import useTenantConfig from "@workspace/hooks/useTenantConfig";
+import WorkspaceHeader from "@workspace/components/WorkspaceHeader";
 
 const CreatePage = () => {
   const tenantConfig = useTenantConfig();
   const theme = useTheme();
   const [selectedKey, setSelectedKey] = useState("create");
+  const [showHeader, setShowHeader] = useState<boolean | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     const userId = getLocalStoredUserId()
+
+    const headerValue = localStorage.getItem("showHeader");
+    setShowHeader(headerValue === "true");
 
     if (token && userId) {
       document.cookie = `authToken=${token}; path=/; secure; SameSite=Strict`;
@@ -108,14 +113,18 @@ const CreatePage = () => {
     },
   ];
 
+ 
+
   return (
+    <>
+    {showHeader && <WorkspaceHeader />}
     <Layout selectedKey={selectedKey} onSelect={setSelectedKey}>
       <WorkspaceText />
 
       {/* Outer box for "Create new content" heading and cards */}
       <Box
         sx={{
-          backgroundColor: "#F8EFE7",
+          background:  'linear-gradient(to bottom, white, #F8EFDA)',
           padding: "1.5rem",
           borderRadius: "12px",
           boxShadow: theme.shadows[3],
@@ -170,6 +179,7 @@ const CreatePage = () => {
         </Box>
       </Box>
     </Layout>
+    </>
   );
 };
 

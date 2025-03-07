@@ -272,7 +272,7 @@ const Centers = () => {
               handleOpenModal();
             }}
           >
-            Add New
+            {t('COMMON.ADD_NEW')}{' '}
           </Button>
         </Box>
 

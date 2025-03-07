@@ -6,7 +6,7 @@ import axios from 'axios';
 import DynamicForm from '@/components/DynamicForm/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
-import { MasterBlocksUISchema, MasterBlockSchema } from '../constant/Forms/MaterBlockSearch'
+
 import { Status } from '@/utils/app.constant';
 import { Box, Grid, Typography } from '@mui/material';
 import { debounce } from 'lodash';
@@ -25,13 +25,17 @@ import deleteIcon from '../../public/images/deleteIcon.svg';
 import Image from 'next/image';
 import UserNameCell from '@/components/UserNameCell';
 import { fetchStateOptions } from '@/services/MasterDataService';
+import {
+  MasterVillageSchema,
+  MasterVillageUISchema,
+} from '../constant/Forms/MasterVillageSearch';
 
 //import { DynamicForm } from '@shared-lib';
 
-const Block = () => {
+const Village = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [schema, setSchema] = useState(MasterBlockSchema);
-  const [uiSchema, setUiSchema] = useState(MasterBlocksUISchema);
+  const [schema, setSchema] = useState(MasterVillageSchema);
+  const [uiSchema, setUiSchema] = useState(MasterVillageUISchema);
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
   const [prefilledAddFormData, setPrefilledAddFormData] = useState({});
@@ -56,7 +60,6 @@ const Block = () => {
     }
   }, [pageLimit]);
 
-
   const updatedUiSchema = {
     ...uiSchema,
     'ui:submitButtonOptions': {
@@ -69,7 +72,7 @@ const Block = () => {
     console.log('Debounced API Call:', resp);
     // console.log('totalCount', result?.totalCount);
     console.log('userDetails', result?.values);
-    setResponse({ result: resp.result.values });
+    setResponse({ result: resp?.result?.values });
   }, 300);
 
   const SubmitaFunction = async (formData: any) => {
@@ -79,7 +82,8 @@ const Block = () => {
 
   const searchData = async (formData = [], newPage) => {
     const { sortBy, ...restFormData } = formData;
-  
+    console.log(formData, 'shreyas');
+
     const filters = {
       // role: 'Instructor',
       status: [Status.ACTIVE],
@@ -91,10 +95,7 @@ const Block = () => {
       }, {} as Record<string, any>),
     };
 
-    const sort = [
-      "block_name",
-      sortBy ? sortBy : "asc"
-    ];
+    const sort = ['village_name', sortBy ? sortBy : 'asc'];
     let limit = pageLimit;
     let offset = newPage * limit;
     let pageNumber = newPage;
@@ -108,8 +109,14 @@ const Block = () => {
       limit,
       offset,
       sort,
-      fieldName: "block",
-      controllingfieldfk: formData.district ? formData.district : formData.state,
+      fieldName: 'village',
+      controllingfieldfk: formData.state
+        ? formData.district
+          ? formData.block
+            ? formData.block
+            : formData.district
+          : formData.state
+        : '',
       optionName: formData.firstName,
     };
 
@@ -119,7 +126,7 @@ const Block = () => {
       const resp = await fetchStateOptions(data);
       // console.log('totalCount', result?.totalCount);
       // console.log('userDetails', result?.getUserDetails);
-      setResponse({ result: resp.result });
+      setResponse({ result: resp?.result });
       console.log('Immediate API Call:', resp);
     }
   };
@@ -127,17 +134,16 @@ const Block = () => {
   // Define table columns
   const columns = [
     {
-      keys: ['block_name'],
-      label: 'BLOCK',
-      render: (row) => row.block_name,
+      keys: ['village_name'],
+      label: 'VILLAGE',
+      render: (row) => row.village_name,
     },
     {
       keys: ['A'],
       label: 'STATUS',
-      render: (row) => row.is_active ? "Active" : "Inactive"
-    }
+      render: (row) => (row.is_active ? 'Active' : 'Inactive'),
+    },
   ];
-
 
   // Pagination handlers
   const handlePageChange = (newPage) => {
@@ -237,4 +243,4 @@ export async function getStaticProps({ locale }: any) {
   };
 }
 
-export default Block;
+export default Village;

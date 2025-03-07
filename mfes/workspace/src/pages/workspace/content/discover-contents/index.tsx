@@ -23,6 +23,7 @@ import Layout from "../../../../components/Layout";
 import SearchBox from "../../../../components/SearchBox";
 import { getContent } from "../../../../services/ContentService";
 import useTenantConfig from "@workspace/hooks/useTenantConfig";
+import WorkspaceHeader from "@workspace/components/WorkspaceHeader";
 // const columns = [
 //   { key: 'name', title: 'Content', dataType: DataType.String, width: "450px" },
 //   { key: 'lastUpdatedOn', title: 'Last Updated', dataType: DataType.String, width: "300px" },
@@ -64,7 +65,7 @@ const ContentsPage = () => {
   const tenantConfig = useTenantConfig();
   const theme = useTheme<any>();
   const router = useRouter();
-
+ const [showHeader, setShowHeader] = useState<boolean | null>(null);
   const [selectedKey, setSelectedKey] = useState("discover-contents");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -102,6 +103,10 @@ const ContentsPage = () => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+   useEffect(() => {
+      const headerValue = localStorage.getItem("showHeader");
+      setShowHeader(headerValue === "true");
+     }, []);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -218,7 +223,9 @@ const ContentsPage = () => {
   );
 
   console.log("contentList", contentList);
-  return (
+  return ( 
+  <>
+    {showHeader && <WorkspaceHeader />}
     <Layout selectedKey={selectedKey} onSelect={setSelectedKey}>
       <WorkspaceText />
 
@@ -275,6 +282,7 @@ const ContentsPage = () => {
         </Box>
       </Box>
     </Layout>
+    </>
   );
 };
 

@@ -114,6 +114,7 @@ const Layout: React.FC<LayoutProps> = ({ children, selectedKey, onSelect }) => {
           "@media (min-width: 900px)": {
             background: "linear-gradient(to bottom, white, #F8EFDA)",
             position: "fixed",
+            borderRight : '1px solid #ddd',
           },
         }}
       >
@@ -122,7 +123,7 @@ const Layout: React.FC<LayoutProps> = ({ children, selectedKey, onSelect }) => {
       <Box
         sx={{
           flex: 1,
-          background: "#F3F5F8",
+          // background: "#F3F5F8",
           "@media (min-width: 900px)": {
             width: "calc(100% - 251px)",
             marginLeft: "284px",

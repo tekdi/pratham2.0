@@ -1,8 +1,5 @@
 // @ts-nocheck
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import Form from '@rjsf/mui';
-import validator from '@rjsf/validator-ajv8';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 import DynamicForm from '@/components/DynamicForm/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
@@ -12,22 +9,22 @@ import {
 } from '../constant/Forms/MentorSearch';
 import { Status } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
-import { Box, Grid, Typography } from '@mui/material';
-import { debounce } from 'lodash';
-import { Numbers } from '@mui/icons-material';
+import { Box, Typography } from '@mui/material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { Button } from '@mui/material';
-import AddEditMentor from '@/components/EntityForms/AddEditMentor/AddEditMentor';
 import SimpleModal from '@/components/SimpleModal';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { updateCohortMemberStatus } from '@/services/CohortService/cohortService';
-import AddBoxIcon from '@mui/icons-material/AddBox';
-import PreviewIcon from '@mui/icons-material/Preview';
 import editIcon from '../../public/images/editIcon.svg';
 import deleteIcon from '../../public/images/deleteIcon.svg';
 import Image from 'next/image';
+import {
+  extractMatchingKeys,
+  fetchForm,
+  searchListData,
+} from '@/components/DynamicForm/DynamicFormCallback';
+import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
+import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 
 //import { DynamicForm } from '@shared-lib';
 
@@ -38,15 +35,12 @@ const Mentor = () => {
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
   const [prefilledAddFormData, setPrefilledAddFormData] = useState({});
-  const [sortBy, setSortBy] = useState<string>('name');
   const [pageLimit, setPageLimit] = useState<number>(10);
   const [pageOffset, setPageOffset] = useState<number>(0);
-  const [prefilledFormData, setPrefilledFormData] = useState({});
+  const [prefilledFormData, setPrefilledFormData] = useState({ state: '27' });
   const [loading, setLoading] = useState<boolean>(false);
   const [response, setResponse] = useState({});
   const [currentPage, setCurrentPage] = useState(0);
-  const [renderKey, setRenderKey] = useState(true);
-  // const [open, setOpen] = useState(false);
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [isEdit, setIsEdit] = useState(false);
   const [editableUserId, setEditableUserId] = useState('');
@@ -61,50 +55,23 @@ const Mentor = () => {
   useEffect(() => {
     // Fetch form schema from API and set it in state.
     const fetchData = async () => {
-      let data = JSON.stringify({
-        readForm: [
-          {
-            fetchUrl:
-              'https://dev-middleware.prathamdigital.org/user/v1/form/read?context=USERS&contextType=INSTRUCTOR',
-            header: {},
-          },
-          {
-            fetchUrl:
-              'https://dev-middleware.prathamdigital.org/user/v1/form/read?context=USERS&contextType=INSTRUCTOR',
-            header: {
-              tenantid: '6c8b810a-66c2-4f0d-8c0c-c025415a4414',
-            },
-          },
-        ],
-      });
-
-      let config = {
-        method: 'post',
-        maxBodyLength: Infinity,
-        url: '/api/dynamic-form/get-rjsf-form',
-        headers: {
-          'Content-Type': 'application/json',
+      const responseForm = await fetchForm([
+        {
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.mentor.context}&contextType=${FormContext.mentor.contextType}`,
+          header: {},
         },
-        data: data,
-      };
-
-      await axios
-        .request(config)
-        .then((response) => {
-          console.log(JSON.stringify(response.data));
-          if (response.data?.schema) {
-            console.log(`schema`, response.data?.schema);
-            setAddSchema(response.data?.schema);
-          }
-          if (response.data?.schema) {
-            console.log(`uiSchema`, response.data?.uiSchema);
-            setAddUiSchema(response.data?.uiSchema);
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+        {
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.mentor.context}&contextType=${FormContext.mentor.contextType}`,
+          header: {
+            tenantid: localStorage.getItem('tenantId'),
+          },
+        },
+      ]);
+      console.log('responseForm', responseForm);
+      setAddSchema(responseForm?.schema);
+      setAddUiSchema(responseForm?.uiSchema);
     };
+
     fetchData();
   }, []);
 
@@ -115,59 +82,26 @@ const Mentor = () => {
     },
   };
 
-  const debouncedGetList = debounce(async (data) => {
-    const resp = await userList(data);
-    console.log('Debounced API Call:', resp);
-    // console.log('totalCount', result?.totalCount);
-    // console.log('userDetails', result?.getUserDetails);
-    setResponse({ result: resp });
-  }, 300);
-
   const SubmitaFunction = async (formData: any) => {
     setPrefilledFormData(formData);
     await searchData(formData, 0);
   };
 
-  const searchData = async (formData, newPage) => {
-    const { sortBy, ...restFormData } = formData;
-
-    const filters = {
-      role: 'Instructor',
-      status: [Status.ACTIVE],
-      ...Object.entries(restFormData).reduce((acc, [key, value]) => {
-        if (value !== undefined && value !== '') {
-          acc[key] = value;
-        }
-        return acc;
-      }, {} as Record<string, any>),
-    };
-
-    const sort = ['firstName', sortBy || 'asc'];
-    let limit = pageLimit;
-    let offset = newPage * limit;
-    let pageNumber = newPage;
-
-    setPageOffset(offset);
-    setCurrentPage(pageNumber);
-    setResponse({});
-    setRenderKey((renderKey) => !renderKey);
-
-    const data = {
-      limit,
-      offset,
-      sort,
-      filters,
-    };
-
-    if (filters.searchKey) {
-      debouncedGetList(data);
-    } else {
-      const resp = await userList(data);
-      // console.log('totalCount', result?.totalCount);
-      // console.log('userDetails', result?.getUserDetails);
-      setResponse({ result: resp });
-      console.log('Immediate API Call:', resp);
-    }
+  const searchData = async (formData: any, newPage: any) => {
+    const staticFilter = { role: 'Instructor' };
+    const { sortBy } = formData;
+    const staticSort = ['firstName', sortBy || 'asc'];
+    await searchListData(
+      formData,
+      newPage,
+      staticFilter,
+      pageLimit,
+      setPageOffset,
+      setCurrentPage,
+      setResponse,
+      userList,
+      staticSort
+    );
   };
 
   // Define table columns
@@ -175,7 +109,7 @@ const Mentor = () => {
     {
       keys: ['firstName', 'middleName', 'lastName'],
       label: 'Mentor Name',
-      render: (row) =>
+      render: (row: any) =>
         `${row.firstName || ''} ${row.middleName || ''} ${
           row.lastName || ''
         }`.trim(),
@@ -183,35 +117,45 @@ const Mentor = () => {
     {
       key: 'status',
       label: 'Status',
-      getStyle: (row) => ({ color: row.status === 'active' ? 'green' : 'red' }),
+      getStyle: (row: any) => ({
+        color: row.status === 'active' ? 'green' : 'red',
+      }),
     },
-    {
-      key: 'STATE',
-      label: 'State',
-      render: (row) => {
-        const state =
-          row.customFields.find((field) => field.label === 'STATE')
-            ?.selectedValues[0]?.value || '-';
-        return `${state}`;
-      },
-    },
+    // {
+    //   key: 'STATE',
+    //   label: 'State',
+    //   render: (row) => {
+    //     const state =
+    //       row.customFields.find((field) => field.label === 'STATE')
+    //         ?.selectedValues[0]?.value || '-';
+    //     return `${state}`;
+    //   },
+    // },
     {
       keys: ['STATE', 'DISTRICT', 'BLOCK', 'VILLAGE'],
       label: 'Location (State / District / Block/ Village)',
-      render: (row) => {
+      render: (row: any) => {
         const state =
-          row.customFields.find((field) => field.label === 'STATE')
-            ?.selectedValues[0]?.value || '-';
+          row.customFields.find(
+            (field: { label: string }) => field.label === 'STATE'
+          )?.selectedValues[0]?.value || '';
         const district =
-          row.customFields.find((field) => field.label === 'DISTRICT')
-            ?.selectedValues[0]?.value || '-';
+          row.customFields.find(
+            (field: { label: string }) => field.label === 'DISTRICT'
+          )?.selectedValues[0]?.value || '';
         const block =
-          row.customFields.find((field) => field.label === 'BLOCK')
-            ?.selectedValues[0]?.value || '-';
+          row.customFields.find(
+            (field: { label: string }) => field.label === 'BLOCK'
+          )?.selectedValues[0]?.value || '';
         const village =
-          row.customFields.find((field) => field.label === 'VILLAGE')
-            ?.selectedValues[0]?.value || '-';
-        return `${state} / ${district} /  ${block} /${village}`;
+          row.customFields.find(
+            (field: { label: string }) => field.label === 'VILLAGE'
+          )?.selectedValues[0]?.value || '';
+        return `${state == '' ? '' : `${state}`}${
+          district == '' ? '' : `, ${district}`
+        }${block == '' ? '' : `, ${block}`}${
+          village == '' ? '' : `, ${village}`
+        }`;
       },
     },
   ];
@@ -219,20 +163,21 @@ const Mentor = () => {
   // Define actions
   const actions = [
     {
-      icon: 
+      icon: (
         <Box
           sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            cursor: "pointer",
-            backgroundColor: "rgb(227, 234, 240)",
-            padding: "10px",
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            backgroundColor: 'rgb(227, 234, 240)',
+            padding: '10px',
           }}
         >
-      <Image src={editIcon} alt="" />
-      </Box>,
-      callback: (row) => {
+          <Image src={editIcon} alt="" />
+        </Box>
+      ),
+      callback: (row: any) => {
         console.log('row:', row);
         console.log('AddSchema', addSchema);
         console.log('AddUISchema', addUiSchema);
@@ -246,18 +191,22 @@ const Mentor = () => {
       },
     },
     {
-      icon: <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          cursor: "pointer",
-          backgroundColor: "rgb(227, 234, 240)",
-          padding: "10px",
-        }}
-      > <Image src={deleteIcon} alt="" />
-      </Box>,
-      callback: async (row) => {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            backgroundColor: 'rgb(227, 234, 240)',
+            padding: '10px',
+          }}
+        >
+          {' '}
+          <Image src={deleteIcon} alt="" />
+        </Box>
+      ),
+      callback: async (row: any) => {
         console.log('row:', row);
         // setEditableUserId(row?.userId);
         const memberStatus = Status.ARCHIVED;
@@ -269,7 +218,7 @@ const Mentor = () => {
           statusReason,
           membershipId,
         });
-        setPrefilledFormData({});
+        setPrefilledFormData({ state: '27' });
         searchData(prefilledFormData, currentPage);
         setOpenModal(false);
       },
@@ -277,12 +226,12 @@ const Mentor = () => {
   ];
 
   // Pagination handlers
-  const handlePageChange = (newPage) => {
+  const handlePageChange = (newPage: any) => {
     console.log('Page changed to:', newPage);
     searchData(prefilledFormData, newPage);
   };
 
-  const handleRowsPerPageChange = (newRowsPerPage) => {
+  const handleRowsPerPageChange = (newRowsPerPage: any) => {
     console.log('Rows per page changed to:', newRowsPerPage);
     setPageLimit(newRowsPerPage);
   };
@@ -293,36 +242,33 @@ const Mentor = () => {
     setOpenModal(false);
   };
 
-  function extractMatchingKeys(row, schema) {
-    let result = {};
-
-    for (const [key, value] of Object.entries(schema.properties)) {
-      if (value.coreField === 0) {
-        if (value.fieldId) {
-          const customField = row.customFields?.find(
-            (field) => field.fieldId === value.fieldId
-          );
-          if (customField) {
-            result[key] = customField.selectedValues
-              .map((v) => v.id)
-              .join(', ');
-          }
-        } else if (row[key] !== undefined) {
-          result[key] = row[key];
-        }
-      } else if (row[key] !== undefined) {
-        result[key] = row[key];
-      }
-    }
-
-    return result;
-  }
+  //Add Edit Props
+  const extraFieldsUpdate = {};
+  const extraFields = {
+    tenantCohortRoleMapping: [
+      {
+        tenantId: '6c8b810a-66c2-4f0d-8c0c-c025415a4414',
+        roleId: 'a5f1dbc9-2ad4-442c-b762-0e3fc1f6c6da',
+      },
+    ],
+    username: 'youthnetmentor',
+    password: Math.floor(10000 + Math.random() * 90000),
+  };
+  const successUpdateMessage = 'MENTORS.MENTOR_UPDATED_SUCCESSFULLY';
+  const telemetryUpdateKey = 'youthnet-mentor-updated-successfully';
+  const failureUpdateMessage = 'MENTORS.NOT_ABLE_UPDATE_MENTOR';
+  const successCreateMessage = 'MENTORS.MENTOR_CREATED_SUCCESSFULLY';
+  const telemetryCreateKey = 'youthnet-mentor-created-successfully';
+  const failureCreateMessage = 'MENTORS.NOT_ABLE_CREATE_MENTOR';
+  const notificationKey = 'onMentorCreate';
+  const notificationMessage = 'MENTORS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
+  const notificationContext = 'USER';
 
   return (
     <>
       <Box display={'flex'} flexDirection={'column'} gap={2}>
         {isLoading ? (
-          <Loader />
+          <Loader showBackdrop={false} loadingText={t('COMMON.LOADING')} />
         ) : (
           schema &&
           uiSchema && (
@@ -346,7 +292,7 @@ const Mentor = () => {
               handleOpenModal();
             }}
           >
-            Add New
+            {t('COMMON.ADD_NEW')}{' '}
           </Button>
         </Box>
 
@@ -358,9 +304,9 @@ const Mentor = () => {
             isEdit ? t('MENTORS.UPDATE_MENTOR') : t('MENTORS.NEW_MENTOR')
           }
         >
-          <AddEditMentor
+          <AddEditUser
             SuccessCallback={() => {
-              setPrefilledFormData({});
+              setPrefilledFormData({ state: '27' });
               searchData({}, 0);
               setOpenModal(false);
             }}
@@ -370,17 +316,27 @@ const Mentor = () => {
             isEdit={isEdit}
             editableUserId={editableUserId}
             UpdateSuccessCallback={() => {
-              setPrefilledFormData({});
+              setPrefilledFormData({ state: '27' });
               searchData(prefilledFormData, currentPage);
               setOpenModal(false);
             }}
+            extraFields={extraFields}
+            extraFieldsUpdate={extraFieldsUpdate}
+            successUpdateMessage={successUpdateMessage}
+            telemetryUpdateKey={telemetryUpdateKey}
+            failureUpdateMessage={failureUpdateMessage}
+            successCreateMessage={successCreateMessage}
+            telemetryCreateKey={telemetryCreateKey}
+            failureCreateMessage={failureCreateMessage}
+            notificationKey={notificationKey}
+            notificationMessage={notificationMessage}
+            notificationContext={notificationContext}
           />
         </SimpleModal>
 
         {response && response?.result?.getUserDetails ? (
           <Box sx={{ mt: 1 }}>
             <PaginatedTable
-              key={renderKey ? 'defaultRender' : 'customRender'}
               count={response?.result?.totalCount}
               data={response?.result?.getUserDetails}
               columns={columns}
