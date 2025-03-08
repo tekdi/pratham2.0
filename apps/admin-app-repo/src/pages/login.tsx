@@ -203,6 +203,13 @@ const LoginPage = () => {
               }
             }
             localStorage.setItem('adminInfo', JSON.stringify(userInfo));
+            const roleId = userInfo.tenantData?.[0]?.roleId || '';
+            const roleName = userInfo.tenantData?.[0]?.roleName || '';
+            const program = userInfo.tenantData?.[0]?.tenantName || '';
+
+            localStorage.setItem('roleId', roleId);
+            localStorage.setItem('roleName', roleName);
+            localStorage.setItem('program', program);
           }
           const selectedStateName = transformLabel(
             userInfo?.customFields.find(
@@ -287,8 +294,7 @@ const LoginPage = () => {
                       router.push('/centers', undefined, { locale: locale });
                     } else if (
                       userInfo?.role === Role.ADMIN &&
-                      userInfo?.tenantData[0]?.tenantName ==
-                        TenantName.YOUTHNET
+                      userInfo?.tenantData[0]?.tenantName == TenantName.YOUTHNET
                     ) {
                       router.push('/mentor', undefined, { locale: locale });
                     }
@@ -307,8 +313,7 @@ const LoginPage = () => {
                       router.push('/centers');
                     } else if (
                       userInfo?.role === Role.ADMIN &&
-                      userInfo?.tenantData[0]?.tenantName ==
-                        TenantName.YOUTHNET
+                      userInfo?.tenantData[0]?.tenantName == TenantName.YOUTHNET
                     ) {
                       router.push('/mentor');
                     }
