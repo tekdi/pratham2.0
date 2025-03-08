@@ -11,4 +11,8 @@ export const FormContext = {
     context: 'COHORTS',
     contextType: 'COHORT',
   },
+    teamLead: {
+    context: 'USERS',
+    contextType: 'LEAD',
+  },
 };

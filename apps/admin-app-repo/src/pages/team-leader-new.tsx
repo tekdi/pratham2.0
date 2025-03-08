@@ -62,11 +62,11 @@ const TeamLeader = () => {
     const fetchData = async () => {
       const responseForm = await fetchForm([
         {
-          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.mentorLead.context}&contextType=${FormContext.mentorLead.contextType}`,
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.teamLead.context}&contextType=${FormContext.teamLead.contextType}`,
           header: {},
         },
         {
-          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.mentorLead.context}&contextType=${FormContext.mentorLead.contextType}`,
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.teamLead.context}&contextType=${FormContext.teamLead.contextType}`,
           header: {
             tenantid: localStorage.getItem('tenantId'),
           },
@@ -104,7 +104,7 @@ const TeamLeader = () => {
       setCurrentPage,
       setResponse,
       userList,
-      staticSort
+      staticSort  
     );
   };
 
@@ -249,7 +249,7 @@ const TeamLeader = () => {
   const extraFields = {
     tenantCohortRoleMapping: [
       {
-        tenantId: localStorage.getItem('tenantId'),
+        tenantId: "ef99949b-7f3a-4a5f-806a-e67e683e38f3",
         roleId: 'c4454929-954e-4c51-bb7d-cca834ab9375',
       },
     ],
@@ -257,16 +257,16 @@ const TeamLeader = () => {
     password: Math.floor(10000 + Math.random() * 90000),
   };
   const successUpdateMessage =
-    'MENTOR_LEADERS.MENTOR_LEAD_UPDATED_SUCCESSFULLY';
-  const telemetryUpdateKey = 'youthnet-mentor-lead-updated-successfully';
-  const failureUpdateMessage = 'MENTOR_LEADERS.NOT_ABLE_UPDATE_MENTOR_LEAD';
+    'TEAM_LEADERS.TEAM_LEADER_UPDATED_SUCCESSFULLY';
+  const telemetryUpdateKey = 'SCP-Team-lead-updated-successfully';
+  const failureUpdateMessage = 'TEAM_LEADERS.NOT_ABLE_UPDATE_TEAM_LEADER';
   const successCreateMessage =
-    'MENTOR_LEADERS.MENTOR_LEAD_CREATED_SUCCESSFULLY';
-  const telemetryCreateKey = 'youthnet-mentor-lead-created-successfully';
-  const failureCreateMessage = 'MENTOR_LEADERS.NOT_ABLE_CREATE_MENTOR_LEAD';
-  const notificationKey = 'onMentorLeaderCreate';
+    'TEAM_LEADERS.TEAM_LEADER_CREATED_SUCCESSFULLY';
+  const telemetryCreateKey = 'SCP-Team-lead-created-successfully';
+  const failureCreateMessage = 'TEAM_LEADERS.NOT_ABLE_CREATE_TEAM_LEADER';
+  const notificationKey = 'onTeamLeaderCreated';
   const notificationMessage =
-    'MENTOR_LEADERS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
+    'TEAM_LEADERS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
 
   return (
@@ -307,8 +307,8 @@ const TeamLeader = () => {
           showFooter={false}
           modalTitle={
             isEdit
-              ? t('MENTOR_LEADERS.UPDATE_MENTOR_LEAD')
-              : t('MENTOR_LEADERS.NEW_MENTOR_LEAD')
+              ? t('TEAM_LEADERS.EDIT_TEAM_LEADER')
+              : t('TEAM_LEADERS.NEW_TEAM_LEADER')
           }
         >
           <AddEditUser
@@ -362,7 +362,7 @@ const TeamLeader = () => {
             height="20vh"
           >
             <Typography marginTop="10px" textAlign={'center'}>
-              {t('COMMON.NO_MENTOR_LEAD_FOUND')}
+                {t('TEAM_LEADERS.NO_TEAM_LEADER_FOUND')}
             </Typography>
           </Box>
         )}

@@ -267,7 +267,10 @@
     "TEAM_LEADER_CREATED_SUCCESSFULLY": "Team Leader is created, and credentials sent successfully!",
     "USER_CREDENTIALS_WILL_BE_SEND_SOON": "Team Leader is created ,credentials will be sent soon",
     "TEAM_LEADER_UPDATED_SUCCESSFULLY": "Team Leader has been successfully updated!",
-    "EDIT_TEAM_LEADER": "Edit Team Leader"
+    "EDIT_TEAM_LEADER": "Edit Team Leader",
+    "NO_TEAM_LEADER_FOUND" :"No Team Leader Found",
+    "NOT_ABLE_CREATE_TEAM_LEADER" :"Not able to Team leader",
+    "NOT_ABLE_UPDATE_TEAM_LEADER":"Not able to update Team leader"
   },
   "ADMIN": {
     "ADMIN_UPDATED_SUCCESSFULLY": "Admin has been successfully updated!"
