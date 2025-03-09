@@ -1,4 +1,4 @@
-export const TeamLeaderSearchSchema = {
+export const facilitatorSearchSchema = {
   type: 'object',
   properties: {
     state: {
@@ -104,7 +104,7 @@ export const TeamLeaderSearchSchema = {
   },
 };
 
-export const TeamLeaderSearchUISchema = {
+export const facilitatorSearchUISchema = {
   'ui:order': [
     'state',
     'district',
@@ -123,6 +123,14 @@ export const TeamLeaderSearchUISchema = {
     'ui:widget': 'select',
   },
 
+  block: {
+    'ui:widget': 'select',
+  },
+
+  village: {
+    'ui:widget': 'select',
+  },
+
   searchKey: {
     'ui:widget': 'text',
   },
@@ -131,7 +139,7 @@ export const TeamLeaderSearchUISchema = {
     'ui:widget': 'select',
   },
 
-  // status: {
-  //   'ui:widget': 'select',
-  // },
+//   status: {
+//     'ui:widget': 'select',
+//   },
 };

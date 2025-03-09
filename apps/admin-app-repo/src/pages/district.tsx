@@ -128,14 +128,15 @@ const District = () => {
   const columns = [
     {
       keys: ['district_name'],
-      label: 'DISTRICT',
+      label: 'District',
       render: (row) => row.district_name,
     },
     {
-      keys: ['A'],
-      label: 'STATUS',
-      render: (row) => (row.is_active ? 'Active' : 'Inactive'),
-    },
+      keys: ['is_active'],
+      label: 'Status',
+      render: (row) => row.is_active === 1 ? "Active" : "Inactive",
+      getStyle: (row) => ({ color: row.is_active === 1 ? "green" : "red" })
+    }
   ];
 
   // Pagination handlers
@@ -220,7 +221,7 @@ const District = () => {
             height="20vh"
           >
             <Typography marginTop="10px" textAlign={'center'}>
-              {t('COMMON.NO_MENTOR_FOUND')}
+                {t('COMMON.NO_DISTRICTS_FOUND')}
             </Typography>
           </Box>
         )}
