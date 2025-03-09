@@ -49,6 +49,9 @@ const TeamLeader = () => {
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [isEdit, setIsEdit] = useState(false);
   const [editableUserId, setEditableUserId] = useState('');
+  const [roleId, setRoleID] = useState('');
+  const [tenantId, setTenantId] = useState('');
+
 
   const { t, i18n } = useTranslation();
 
@@ -77,7 +80,12 @@ const TeamLeader = () => {
       setAddUiSchema(responseForm?.uiSchema);
     };
     fetchData();
+    setRoleID(localStorage.getItem('roleId'))
+    setTenantId(localStorage.getItem('tenantId'))
   }, []);
+
+
+  
 
   const updatedUiSchema = {
     ...uiSchema,
@@ -135,7 +143,7 @@ const TeamLeader = () => {
     // },
     {
       keys: ['STATE', 'DISTRICT', 'BLOCK', 'VILLAGE'],
-      label: 'Location (State / District / Block/ Village)',
+      label: 'Location (State / District / Block / Village)',
       render: (row: any) => {
         const state =
           row.customFields.find(
@@ -160,6 +168,11 @@ const TeamLeader = () => {
         }`;
       },
     },
+    // {
+    //   keys: ['updatedBy'],
+    //   label: 'Updated By',
+    //   render: (row) => row.updatedBy
+    // },
   ];
 
   // Define actions
@@ -249,8 +262,8 @@ const TeamLeader = () => {
   const extraFields = {
     tenantCohortRoleMapping: [
       {
-        tenantId: "ef99949b-7f3a-4a5f-806a-e67e683e38f3",
-        roleId: 'c4454929-954e-4c51-bb7d-cca834ab9375',
+        tenantId: tenantId,
+        roleId: roleId,
       },
     ],
     username: 'scpTeamLead',

@@ -15,4 +15,12 @@ export const FormContext = {
     context: 'USERS',
     contextType: 'LEAD',
   },
+  facilitator:{
+    context: 'USERS',
+    contextType: 'INSTRUCTOR',
+  },
+    learner:{
+    context: 'LEARNER',
+    contextType: 'INSTRUCTOR',
+  }
 };

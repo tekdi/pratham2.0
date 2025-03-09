@@ -81,7 +81,7 @@ const State = () => {
 
   const searchData = async (formData = [], newPage) => {
     const { sortBy, ...restFormData } = formData;
-    console.log(formData);
+
    
     const filters = {
       // role: 'Instructor',
@@ -128,18 +128,19 @@ const State = () => {
   const columns = [
     {
       keys: ['state_name'],
-      label: 'STATE',
+      label: 'State',
       render: (row) => row.state_name,
     },
     {
       keys: ['state_code'],
-      label: 'CODE',
+      label: 'Code',
       render: (row) => row.state_code
     },
     {
-      keys: ['A'],
-      label: 'STATUS',
-      render: (row) => row.is_active ? "Active" : "Inactive" 
+      keys: ['is_active'],
+      label: 'Status',
+      render: (row) => row.is_active === 1 ? "Active" : "Inactive",
+      getStyle: (row) => ({ color: row.is_active === 1 ? "green" : "red" })
     }
   ];
 
@@ -226,7 +227,7 @@ const State = () => {
             height="20vh"
           >
             <Typography marginTop="10px" textAlign={'center'}>
-              {t('COMMON.NO_MENTOR_FOUND')}
+                {t('COMMON.NO_STATE_FOUND')}
             </Typography>
           </Box>
         )}

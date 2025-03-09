@@ -147,7 +147,16 @@
     "RETURN_TO_LOGIN": "Return to Login",
     "COHORT_CODE_EXISTS": "Code already exists",
     "NO_MENTOR_FOUND": "No Mentor Found",
-    "NO_MENTOR_LEAD_FOUND": "No Mentor Lead Found"
+    "NO_MENTOR_LEAD_FOUND": "No Mentor Lead Found",
+     "NO_STATE_FOUND":"No State Found",
+    "NO_VILLAGE_FOUND": "No Village Found",
+    "NO_DISTRICTS_FOUND" :"NO District Found",
+    "NO_BLOCK_FOUND":"NO Block Found",
+    "NO_FACILITATOR_FOUND":"NO FACILITATOR FOUND",
+    "NOT_ABLE_UPDATE_FACILITATOR":"Not Able To Update Teacher",
+    "NOT_ABLE_CREATE_FACILITATOR":"Not Able To Create Teacher",
+     "NOT_ABLE_UPDATE_LEARNER":"Not Able To Update Teacher",
+    "NOT_ABLE_CREATE_LEARNER":"Not Able To Create Teacher"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -231,7 +240,8 @@
     "LEARNER_CREATED_SUCCESSFULLY": "Learner has been successfully created!",
     "USER_CREDENTIALS_WILL_BE_SEND_SOON": "Learner is created, credentials will be sent soon",
     "LEARNER_UPDATED_SUCCESSFULLY": "Learner has been successfully updated!",
-    "EDIT_LEARNER": "Edit Learner"
+    "EDIT_LEARNER": "Edit Learner",
+    "NO_LEARNERS_FOUND":"No Learners Found"
   },
   "MENTORS": {
     "SEARCHBAR_PLACEHOLDER": "Search mentors..",
