@@ -7,7 +7,7 @@ export const MasterDistrictsSearchSchema = {
       enum: ['Select'],
       enumNames: ['Select'],
       api: {
-        url: 'https://dev-interface.prathamdigital.org/interface/v1/fields/options/read',
+        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
         method: 'POST',
         payload: { fieldName: 'state', sort: ['state_name', 'asc'] },
         options: {
@@ -33,13 +33,13 @@ export const MasterDistrictsSearchSchema = {
 };
 
 export const MasterDistrictsUISchema = {
-  'ui:order': ['searchKey', 'sortBy'],
+  'ui:order': ['firstName', 'sortBy'],
 
   state: {
     'ui:widget': 'select',
   },
 
-  searchKey: {
+  firstName: {
     'ui:widget': 'text',
   },
 

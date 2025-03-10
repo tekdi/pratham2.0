@@ -44,6 +44,8 @@ const Mentor = () => {
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [isEdit, setIsEdit] = useState(false);
   const [editableUserId, setEditableUserId] = useState('');
+  const [roleId, setRoleID] = useState('');
+  const [tenantId, setTenantId] = useState('');
 
   const { t, i18n } = useTranslation();
 
@@ -74,6 +76,8 @@ const Mentor = () => {
 
     setPrefilledAddFormData({ state: localStorage.getItem('stateId') });
     setPrefilledFormData({ state: localStorage.getItem('stateId') });
+    setRoleID(localStorage.getItem('roleId'))
+    setTenantId(localStorage.getItem('tenantId'))
     fetchData();
   }, []);
 
@@ -249,8 +253,8 @@ const Mentor = () => {
   const extraFields = {
     tenantCohortRoleMapping: [
       {
-        tenantId: '6c8b810a-66c2-4f0d-8c0c-c025415a4414',
-        roleId: 'a5f1dbc9-2ad4-442c-b762-0e3fc1f6c6da',
+        tenantId: tenantId,
+        roleId: roleId,
       },
     ],
     username: 'youthnetmentor',
