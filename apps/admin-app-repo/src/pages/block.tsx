@@ -52,6 +52,9 @@ const Block = () => {
   const [editableUserId, setEditableUserId] = useState('');
 
   const { t, i18n } = useTranslation();
+  const initialFormData = localStorage.getItem('stateId')
+    ? { state: localStorage.getItem('stateId') }
+    : {};
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -60,7 +63,7 @@ const Block = () => {
   }, [pageLimit]);
 
   useEffect(() => {
-    setPrefilledFormData({ state: localStorage.getItem('stateId') });
+    setPrefilledFormData(initialFormData);
   }, []);
 
   const updatedUiSchema = {
@@ -70,11 +73,14 @@ const Block = () => {
     },
   };
 
-  const debouncedGetList = useCallback(debounce(async (data) => {
-    console.log('Debounced API Call:', data);
-    const resp = await fetchStateOptions(data);
-    setResponse({ result: resp?.result });
-  }, 1000), []);
+  const debouncedGetList = useCallback(
+    debounce(async (data) => {
+      console.log('Debounced API Call:', data);
+      const resp = await fetchStateOptions(data);
+      setResponse({ result: resp?.result });
+    }, 1000),
+    []
+  );
 
   const SubmitaFunction = async (formData: any) => {
     setPrefilledFormData(formData);
@@ -134,9 +140,9 @@ const Block = () => {
     {
       keys: ['is_active'],
       label: 'Status',
-      render: (row) => row.is_active === 1 ? "Active" : "Inactive",
-      getStyle: (row) => ({ color: row.is_active === 1 ? "green" : "red" })
-    }
+      render: (row) => (row.is_active === 1 ? 'Active' : 'Inactive'),
+      getStyle: (row) => ({ color: row.is_active === 1 ? 'green' : 'red' }),
+    },
   ];
 
   // Pagination handlers
@@ -221,7 +227,7 @@ const Block = () => {
             height="20vh"
           >
             <Typography marginTop="10px" textAlign={'center'}>
-                {t('COMMON.NO_BLOCK_FOUND')}
+              {t('COMMON.NO_BLOCK_FOUND')}
             </Typography>
           </Box>
         )}
