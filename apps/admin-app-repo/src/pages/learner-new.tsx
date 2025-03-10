@@ -264,7 +264,7 @@ const Learner = () => {
     const failureUpdateMessage = 'COMMON.NOT_ABLE_UPDATE_LEARNER';
     const successCreateMessage =
         'LEARNERS.LEARNER_CREATED_SUCCESSFULLY';
-    const telemetryCreateKey = 'SCP-Learner-created-successfully';
+    const telemetryCreateKey = 'scp-learner-created-successfully';
     const failureCreateMessage = 'COMMON.NOT_ABLE_CREATE_LEARNER';
     const notificationKey = 'onLearnerCreated';
     const notificationMessage =

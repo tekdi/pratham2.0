@@ -258,7 +258,7 @@ const facilitator = () => {
     };
     const successUpdateMessage =
         'FACILITATORS.FACILITATOR_UPDATED_SUCCESSFULLY';
-    const telemetryUpdateKey = 'SCP-Facilitator-updated-successfully';
+    const telemetryUpdateKey = 'scp-facilitator-updated-successfully';
     const failureUpdateMessage = 'COMMON.NOT_ABLE_UPDATE_FACILITATOR';
     const successCreateMessage =
         'FACILITATORS.FACILITATOR_CREATED_SUCCESSFULLY';

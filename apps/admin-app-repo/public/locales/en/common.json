@@ -148,15 +148,15 @@
     "COHORT_CODE_EXISTS": "Code already exists",
     "NO_MENTOR_FOUND": "No Mentor Found",
     "NO_MENTOR_LEAD_FOUND": "No Mentor Lead Found",
-     "NO_STATE_FOUND":"No State Found",
+    "NO_STATE_FOUND": "No State Found",
     "NO_VILLAGE_FOUND": "No Village Found",
-    "NO_DISTRICTS_FOUND" :"NO District Found",
-    "NO_BLOCK_FOUND":"NO Block Found",
-    "NO_FACILITATOR_FOUND":"NO FACILITATOR FOUND",
-    "NOT_ABLE_UPDATE_FACILITATOR":"Not Able To Update Teacher",
-    "NOT_ABLE_CREATE_FACILITATOR":"Not Able To Create Teacher",
-     "NOT_ABLE_UPDATE_LEARNER":"Not Able To Update Teacher",
-    "NOT_ABLE_CREATE_LEARNER":"Not Able To Create Teacher"
+    "NO_DISTRICTS_FOUND": "N0 District Found",
+    "NO_BLOCK_FOUND": "No Block Found",
+    "NO_FACILITATOR_FOUND": "No Facilitator Found",
+    "NOT_ABLE_UPDATE_FACILITATOR": "Not Able To Update Teacher",
+    "NOT_ABLE_CREATE_FACILITATOR": "Not Able To Create Teacher",
+    "NOT_ABLE_UPDATE_LEARNER": "Not Able To Update Learner",
+    "NOT_ABLE_CREATE_LEARNER": "Not Able To Create Learner"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -241,7 +241,7 @@
     "USER_CREDENTIALS_WILL_BE_SEND_SOON": "Learner is created, credentials will be sent soon",
     "LEARNER_UPDATED_SUCCESSFULLY": "Learner has been successfully updated!",
     "EDIT_LEARNER": "Edit Learner",
-    "NO_LEARNERS_FOUND":"No Learners Found"
+    "NO_LEARNERS_FOUND": "No Learners Found"
   },
   "MENTORS": {
     "SEARCHBAR_PLACEHOLDER": "Search mentors..",
@@ -278,9 +278,9 @@
     "USER_CREDENTIALS_WILL_BE_SEND_SOON": "Team Leader is created ,credentials will be sent soon",
     "TEAM_LEADER_UPDATED_SUCCESSFULLY": "Team Leader has been successfully updated!",
     "EDIT_TEAM_LEADER": "Edit Team Leader",
-    "NO_TEAM_LEADER_FOUND" :"No Team Leader Found",
-    "NOT_ABLE_CREATE_TEAM_LEADER" :"Not able to Team leader",
-    "NOT_ABLE_UPDATE_TEAM_LEADER":"Not able to update Team leader"
+    "NO_TEAM_LEADER_FOUND": "No Team Leader Found",
+    "NOT_ABLE_CREATE_TEAM_LEADER": "Not Able To Create Team leader",
+    "NOT_ABLE_UPDATE_TEAM_LEADER": "Not Able to update Team leader"
   },
   "ADMIN": {
     "ADMIN_UPDATED_SUCCESSFULLY": "Admin has been successfully updated!"
@@ -651,6 +651,4 @@
   "TRANSGENDER": "Transgender",
   "dob": "DOB",
   "email": "Email"
-
-
 }

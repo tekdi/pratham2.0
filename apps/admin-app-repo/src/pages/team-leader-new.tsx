@@ -271,11 +271,11 @@ const TeamLeader = () => {
   };
   const successUpdateMessage =
     'TEAM_LEADERS.TEAM_LEADER_UPDATED_SUCCESSFULLY';
-  const telemetryUpdateKey = 'SCP-Team-lead-updated-successfully';
+  const telemetryUpdateKey = 'scp-team-lead-updated-successfully';
   const failureUpdateMessage = 'TEAM_LEADERS.NOT_ABLE_UPDATE_TEAM_LEADER';
   const successCreateMessage =
     'TEAM_LEADERS.TEAM_LEADER_CREATED_SUCCESSFULLY';
-  const telemetryCreateKey = 'SCP-Team-lead-created-successfully';
+  const telemetryCreateKey = 'scp-team-lead-created-successfully';
   const failureCreateMessage = 'TEAM_LEADERS.NOT_ABLE_CREATE_TEAM_LEADER';
   const notificationKey = 'onTeamLeaderCreated';
   const notificationMessage =
