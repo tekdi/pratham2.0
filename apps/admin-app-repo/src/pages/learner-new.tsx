@@ -260,7 +260,7 @@ const Learner = () => {
     };
     const successUpdateMessage =
         'LEARNERS.LEARNER_UPDATED_SUCCESSFULLY';
-    const telemetryUpdateKey = 'SCP-Learner-updated-successfully';
+    const telemetryUpdateKey = 'scp-learner-updated-successfully';
     const failureUpdateMessage = 'COMMON.NOT_ABLE_UPDATE_LEARNER';
     const successCreateMessage =
         'LEARNERS.LEARNER_CREATED_SUCCESSFULLY';

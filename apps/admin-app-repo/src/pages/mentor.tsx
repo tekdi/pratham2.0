@@ -255,7 +255,7 @@ const Mentor = () => {
       {
         tenantId: tenantId,
         roleId: roleId,
-      }, ,
+      },
     ],
     username: 'youthnetmentor',
     password: Math.floor(10000 + Math.random() * 90000),

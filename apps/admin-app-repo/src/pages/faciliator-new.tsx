@@ -31,7 +31,7 @@ import {
 } from '@/components/DynamicForm/DynamicFormCallback';
 import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 
-const facilitator = () => {
+const Facilitator = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [schema, setSchema] = useState(facilitatorSearchSchema);
     const [uiSchema, setUiSchema] = useState(facilitatorSearchUISchema);
@@ -382,4 +382,4 @@ export async function getStaticProps({ locale }: any) {
     };
 }
 
-export default facilitator;
+export default Facilitator;
