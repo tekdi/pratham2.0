@@ -115,7 +115,7 @@ const facilitator = () => {
     const columns = [
         {
             keys: ['firstName', 'middleName', 'lastName'],
-            label: 'facilitator Name',
+            label: 'Facilitator Name',
             render: (row) =>
                 `${row.firstName || ''} ${row.middleName || ''} ${row.lastName || ''
                     }`.trim(),

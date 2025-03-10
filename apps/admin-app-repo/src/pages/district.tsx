@@ -79,7 +79,6 @@ const District = () => {
 
   const searchData = async (formData = [], newPage) => {
     const { sortBy, ...restFormData } = formData;
-    console.log(restFormData, formData);
 
     const filters = {
       // role: 'Instructor',

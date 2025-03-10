@@ -7,7 +7,7 @@ export const MentorSearchSchema = {
       enum: ['Select'],
       enumNames: ['Select'],
       api: {
-        url: 'https://dev-interface.prathamdigital.org/interface/v1/fields/options/read',
+        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
         method: 'POST',
         payload: { fieldName: 'state', sort: ['state_name', 'asc'] },
         options: {
@@ -24,7 +24,7 @@ export const MentorSearchSchema = {
       enum: ['Select'],
       enumNames: ['Select'],
       api: {
-        url: 'https://dev-interface.prathamdigital.org/interface/v1/fields/options/read',
+        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
         method: 'POST',
         payload: {
           fieldName: 'district',
@@ -46,7 +46,7 @@ export const MentorSearchSchema = {
       enum: ['Select'],
       enumNames: ['Select'],
       api: {
-        url: 'https://dev-interface.prathamdigital.org/interface/v1/fields/options/read',
+        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
         method: 'POST',
         payload: {
           fieldName: 'block',
@@ -68,7 +68,7 @@ export const MentorSearchSchema = {
       enum: ['Select'],
       enumNames: ['Select'],
       api: {
-        url: 'https://dev-interface.prathamdigital.org/interface/v1/fields/options/read',
+        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
         method: 'POST',
         payload: {
           fieldName: 'village',
@@ -110,7 +110,7 @@ export const MentorSearchUISchema = {
     'district',
     'block',
     'village',
-    'searchKey',
+    'firstName',
     'sortBy',
     'status',
   ],
@@ -131,7 +131,7 @@ export const MentorSearchUISchema = {
     'ui:widget': 'select',
   },
 
-  searchKey: {
+  firstName: {
     'ui:widget': 'text',
   },
 

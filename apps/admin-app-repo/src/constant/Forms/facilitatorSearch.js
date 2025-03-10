@@ -7,7 +7,7 @@ export const facilitatorSearchSchema = {
       enum: ['Select'],
       enumNames: ['Select'],
       api: {
-        url: 'https://dev-interface.prathamdigital.org/interface/v1/fields/options/read',
+        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
         method: 'POST',
         payload: { fieldName: 'state', sort: ['state_name', 'asc'] },
         options: {
@@ -24,7 +24,7 @@ export const facilitatorSearchSchema = {
       enum: ['Select'],
       enumNames: ['Select'],
       api: {
-        url: 'https://dev-interface.prathamdigital.org/interface/v1/fields/options/read',
+        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
         method: 'POST',
         payload: {
           fieldName: 'district',
@@ -46,7 +46,7 @@ export const facilitatorSearchSchema = {
       enum: ['Select'],
       enumNames: ['Select'],
       api: {
-        url: 'https://dev-interface.prathamdigital.org/interface/v1/fields/options/read',
+        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
         method: 'POST',
         payload: {
           fieldName: 'block',
@@ -68,7 +68,7 @@ export const facilitatorSearchSchema = {
       enum: ['Select'],
       enumNames: ['Select'],
       api: {
-        url: 'https://dev-interface.prathamdigital.org/interface/v1/fields/options/read',
+        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
         method: 'POST',
         payload: {
           fieldName: 'village',
@@ -86,7 +86,7 @@ export const facilitatorSearchSchema = {
     },
     firstName: {
       type: 'string',
-      title: 'Search Key',
+      title: 'Search Facilitator',
       // description: 'Search for a specific user or entity',
     },
     sortBy: {
@@ -95,12 +95,12 @@ export const facilitatorSearchSchema = {
       enum: ['asc', 'desc'],
       enumNames: ['A-Z', 'Z-A'],
     },
-    // status: {
-    //   type: 'string',
-    //   title: 'Status',
-    //   enum: ['active', 'archived'],
-    //   enumNames: ['Active', 'Archived'],
-    // },
+    status: {
+      type: 'string',
+      title: 'Status',
+      enum: ['active', 'archived'],
+      enumNames: ['Active', 'Archived'],
+    },
   },
 };
 
@@ -110,7 +110,7 @@ export const facilitatorSearchUISchema = {
     'district',
     'block',
     'village',
-    'searchKey',
+    'firstName',
     'sortBy',
     'status',
   ],
@@ -131,7 +131,7 @@ export const facilitatorSearchUISchema = {
     'ui:widget': 'select',
   },
 
-  searchKey: {
+  firstName: {
     'ui:widget': 'text',
   },
 
@@ -139,7 +139,7 @@ export const facilitatorSearchUISchema = {
     'ui:widget': 'select',
   },
 
-//   status: {
-//     'ui:widget': 'select',
-//   },
+  status: {
+    'ui:widget': 'select',
+  },
 };
