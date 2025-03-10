@@ -73,7 +73,6 @@ const facilitator = () => {
                     },
                 },
             ]);
-            console.log('responseForm', responseForm);
             setAddSchema(responseForm?.schema);
             setAddUiSchema(responseForm?.uiSchema);
         };
@@ -254,7 +253,7 @@ const facilitator = () => {
                 roleId: roleId,
             },
         ],
-        username: 'scpTeamLead',
+        username: 'scpFacilitator',
         password: Math.floor(10000 + Math.random() * 90000),
     };
     const successUpdateMessage =
@@ -270,6 +269,10 @@ const facilitator = () => {
         'FACILITATORS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
     const notificationContext = 'USER';
 
+    useEffect(() => {
+        setPrefilledFormData({ state: localStorage.getItem('stateId') });
+    }, []);
+
     return (
         <>
             <Box display={'flex'} flexDirection={'column'} gap={2}>
@@ -283,7 +286,7 @@ const facilitator = () => {
                             uiSchema={updatedUiSchema}
                             SubmitaFunction={SubmitaFunction}
                             isCallSubmitInHandle={true}
-                            prefilledFormData={prefilledFormData || {}}
+                            prefilledFormData={prefilledFormData}
                         />
                     )
                 )}

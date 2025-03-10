@@ -282,6 +282,11 @@ const TeamLeader = () => {
     'TEAM_LEADERS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
 
+
+  useEffect(() => {
+    setPrefilledFormData({ state: localStorage.getItem('stateId') });
+  }, []);
+
   return (
     <>
       <Box display={'flex'} flexDirection={'column'} gap={2}>
@@ -295,7 +300,7 @@ const TeamLeader = () => {
               uiSchema={updatedUiSchema}
               SubmitaFunction={SubmitaFunction}
               isCallSubmitInHandle={true}
-              prefilledFormData={prefilledFormData || {}}
+              prefilledFormData={prefilledFormData}
             />
           )
         )}
