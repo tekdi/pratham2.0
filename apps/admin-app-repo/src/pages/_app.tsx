@@ -27,7 +27,7 @@ import RouteGuard from '@/components/RouteGuard';
 import TenantService from '@/services/TenantService';
 
 //menu config
-import AuthWrapper from '../config/AuthWrapper';
+import MenuWrapper from '../config/MenuWrapper';
 
 function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -50,7 +50,7 @@ function App({ Component, pageProps }: AppProps) {
     setIsArchived(false);
   }, [router]);
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (typeof window === 'undefined' || !window.localStorage) return; // Exit early if not in browser
 
     const adminInfo = localStorage.getItem('adminInfo');
@@ -76,7 +76,7 @@ function App({ Component, pageProps }: AppProps) {
         query: { role: userInfo?.role },
       });
     }
-  }, [router]);
+  }, [router]);*/
 
   useEffect(() => {
     // Initialize GA only once
@@ -147,18 +147,16 @@ function App({ Component, pageProps }: AppProps) {
       </Head>
       <QueryClientProvider client={client}>
         <AuthProvider>
-          <AuthWrapper>
-            {/* for dynamic menu */}
-            <CssVarsProvider theme={customTheme}>
-              <RouteGuard>{renderComponent()}</RouteGuard>
-
-              <ToastContainer
-                position="bottom-left"
-                autoClose={3000}
-                stacked={false}
-              />
-            </CssVarsProvider>
-          </AuthWrapper>
+          {/* for dynamic menu */}
+          <CssVarsProvider theme={customTheme}>
+            {/* <RouteGuard>{renderComponent()}</RouteGuard> */}
+            <MenuWrapper>{renderComponent()}</MenuWrapper>
+            <ToastContainer
+              position="bottom-left"
+              autoClose={3000}
+              stacked={false}
+            />
+          </CssVarsProvider>
         </AuthProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>

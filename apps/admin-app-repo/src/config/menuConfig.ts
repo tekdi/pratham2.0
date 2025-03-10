@@ -1,12 +1,14 @@
+import { Role, TenantName } from "@/utils/app.constant";
+
 export const MENU_CONFIG = {
-  'Second Chance Program': {
+  [TenantName.SECOND_CHANCE_PROGRAM]: {
     batch: {
       title: 'Batch',
       icon: '/images/centers.svg',
       link: '/batch',
       roles: [
-        'State Lead',
-        'Central Lead', //check
+        Role.ADMIN,
+        Role.CENTRAL_ADMIN, //check
       ],
     },
     centers: {
@@ -14,29 +16,29 @@ export const MENU_CONFIG = {
       icon: '/images/centers.svg',
       link: '/centers',
       roles: [
-        'State Lead',
-        'Central Lead', // check
+        Role.ADMIN,
+        Role.CENTRAL_ADMIN, // check
       ],
     },
     manageUsers: {
       title: 'Manage Users',
       icon: '/images/group.svg',
-      roles: ['State Lead', 'Central Lead'],
+      roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
       subMenu: [
         {
           title: 'Team Leaders',
           link: '/team-leader',
-          roles: ['State Lead', 'Central Lead'],
+          roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
         {
           title: 'Facilitators',
           link: '/facilitator',
-          roles: ['State Lead', 'Central Lead'],
+          roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
         {
           title: 'Learners',
           link: '/learners',
-          roles: ['State Lead', 'Central Lead'],
+          roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
       ],
     },
@@ -44,30 +46,30 @@ export const MENU_CONFIG = {
     master: {
       title: 'Master',
       icon: '/images/database.svg',
-      roles: ['State Lead', 'Central Lead'],
+      roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
       subMenu: [
         {
           title: 'States',
           link: '/state',
           roles: [
-            // 'State Lead',
-            'Central Lead',
+            // Role.ADMIN,
+            Role.CENTRAL_ADMIN,
           ],
         },
         {
           title: 'Districts',
           link: '/district',
-          roles: ['State Lead', 'Central Lead'],
+          roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
         {
           title: 'Blocks',
           link: '/block',
-          roles: ['State Lead', 'Central Lead'],
+          roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
         {
           title: 'Village',
           link: '/village',
-          roles: ['State Lead', 'Central Lead'],
+          roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
       ],
     },
@@ -75,25 +77,25 @@ export const MENU_CONFIG = {
       title: 'Programs',
       icon: '/images/programIcon.svg',
       link: '/programs',
-      roles: ['Central Lead'],
+      roles: [Role.CENTRAL_ADMIN],
     },
     manageNotificationTemplates: {
       title: 'Manage Notification Templates',
       icon: '/images/centers.svg',
       link: '/notification-templates',
-      roles: ['Central Lead'],
+      roles: [Role.CENTRAL_ADMIN],
     },
     coursePlanner: {
       title: 'Curriculum Planner',
       icon: '/images/event_available.svg',
       link: '/course-planner',
-      roles: ['Content Reviewer', 'Content Creator'],
+      roles: [Role.CCTA, Role.SCTA],
     },
     workspace: {
       title: 'Workspace',
       icon: '/images/dashboard.svg',
       link: '/workspace',
-      roles: ['Content Reviewer', 'Content Creator'],
+      roles: [Role.CCTA, Role.SCTA],
     },
 
     supportRequest: {
@@ -101,63 +103,63 @@ export const MENU_CONFIG = {
       icon: '/assets/images/Support.svg',
       link: '/support-request',
       roles: [
-        'State Lead',
-        'Central Lead',
-        'Content Reviewer',
-        'Content Creator',
+        Role.ADMIN,
+        Role.CENTRAL_ADMIN,
+        Role.CCTA,
+        Role.SCTA,
       ],
     },
   },
-  YouthNet: {
+  [TenantName.YOUTHNET]: {
     manageUsers: {
       title: 'Manage Users',
       icon: '/images/group.svg',
-      roles: ['State Lead', 'Central Lead'],
+      roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
       subMenu: [
         {
           title: 'Mentor',
           link: '/mentor',
-          roles: ['State Lead', 'Central Lead'],
+          roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
         {
           title: 'Mentor Leader',
           link: '/mentor-leader',
-          roles: ['State Lead', 'Central Lead'],
+          roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
         {
           title: 'Youth',
           link: '/youth',
-          roles: ['State Lead', 'Central Lead'], // yet to come
+          roles: [Role.ADMIN, Role.CENTRAL_ADMIN], // yet to come
         },
       ],
     },
     master: {
       title: 'Master',
       icon: '/images/database.svg',
-      roles: ['State Lead', 'Central Lead'],
+      roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
       subMenu: [
         {
           title: 'States',
           link: '/state',
           roles: [
-            // 'State Lead',
-            'Central Lead',
+            // Role.ADMIN,
+            Role.CENTRAL_ADMIN,
           ],
         },
         {
           title: 'Districts',
           link: '/district',
-          roles: ['State Lead', 'Central Lead'],
+          roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
         {
           title: 'Blocks',
           link: '/block',
-          roles: ['State Lead', 'Central Lead'],
+          roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
         {
           title: 'Village',
           link: '/village',
-          roles: ['State Lead', 'Central Lead'],
+          roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
       ],
     },
@@ -165,17 +167,17 @@ export const MENU_CONFIG = {
       title: 'Certificate Issuance',
       icon: '/images/certificate_custom.svg',
       link: '/certificate-issuance',
-      roles: ['State Lead'],
+      roles: [Role.ADMIN],
     },
     supportRequest: {
       title: 'Support Request',
       icon: 'assets/images/Support.svg',
       link: '/support-request',
       roles: [
-        'State Lead',
-        'Central Lead',
-        'Content Reviewer',
-        'Content Creator',
+        Role.ADMIN,
+        Role.CENTRAL_ADMIN,
+        Role.CCTA,
+        Role.SCTA,
       ],
     },
   },

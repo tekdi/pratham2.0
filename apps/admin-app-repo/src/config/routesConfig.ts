@@ -1,26 +1,24 @@
-export const PUBLIC_ROUTES = [
-  '/login',
-  '/register',
-  '/about',
-  '/help',
-  '/demo',
-  '/logout'
-];
+import { Role, TenantName } from '@/utils/app.constant';
 
+export const PUBLIC_ROUTES = [
+  '/',
+  '/404',
+  '/login',
+  '/demo',
+  '/logout',
+  '/unauthorized',
+];
 export const ROLE_BASED_ROUTES = {
-  'Second Chance Program': {
-    'State Lead': ['/scp/state-dashboard', '/scp/state-reports'],
-    'Central Lead': ['/scp/central-dashboard', '/scp/central-reports'],
-    'Content Reviewer': ['/scp/review-submissions','/course-planner'],
-    'Content Creator': ['/scp/create-content','/course-planner'],
+  [TenantName.SECOND_CHANCE_PROGRAM]: {
+    [Role.ADMIN]: ['/test-route/[identifier]'],
+    [Role.CENTRAL_ADMIN]: ['/test-route/[identifier]'],
+    [Role.CCTA]: ['/test-route/[identifier]'],
+    [Role.SCTA]: ['/test-route/[identifier]'],
   },
-  YouthNet: {
-    'State Lead': ['/youthnet/state-dashboard', '/youthnet/state-reports'],
-    'Central Lead': [
-      '/youthnet/central-dashboard',
-      '/youthnet/central-reports',
-    ],
-    'Content Reviewer': ['/youthnet/review-feedback'],
-    'Content Creator': ['/youthnet/upload-material'],
+  [TenantName.YOUTHNET]: {
+    [Role.ADMIN]: ['/test-route/[identifier]'],
+    [Role.CENTRAL_ADMIN]: ['/test-route/[identifier]'],
+    [Role.CCTA]: ['/test-route/[identifier]'],
+    [Role.SCTA]: ['/test-route/[identifier]'],
   },
 };
