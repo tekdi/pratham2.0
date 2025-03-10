@@ -52,8 +52,10 @@ const TeamLeader = () => {
   const [roleId, setRoleID] = useState('');
   const [tenantId, setTenantId] = useState('');
 
-
   const { t, i18n } = useTranslation();
+  const initialFormData = localStorage.getItem('stateId')
+    ? { state: localStorage.getItem('stateId') }
+    : {};
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -80,12 +82,9 @@ const TeamLeader = () => {
       setAddUiSchema(responseForm?.uiSchema);
     };
     fetchData();
-    setRoleID(localStorage.getItem('roleId'))
-    setTenantId(localStorage.getItem('tenantId'))
+    setRoleID(localStorage.getItem('roleId'));
+    setTenantId(localStorage.getItem('tenantId'));
   }, []);
-
-
-  
 
   const updatedUiSchema = {
     ...uiSchema,
@@ -112,7 +111,7 @@ const TeamLeader = () => {
       setCurrentPage,
       setResponse,
       userList,
-      staticSort  
+      staticSort
     );
   };
 
@@ -269,22 +268,18 @@ const TeamLeader = () => {
     username: 'scpTeamLead',
     password: Math.floor(10000 + Math.random() * 90000),
   };
-  const successUpdateMessage =
-    'TEAM_LEADERS.TEAM_LEADER_UPDATED_SUCCESSFULLY';
+  const successUpdateMessage = 'TEAM_LEADERS.TEAM_LEADER_UPDATED_SUCCESSFULLY';
   const telemetryUpdateKey = 'scp-team-lead-updated-successfully';
   const failureUpdateMessage = 'TEAM_LEADERS.NOT_ABLE_UPDATE_TEAM_LEADER';
-  const successCreateMessage =
-    'TEAM_LEADERS.TEAM_LEADER_CREATED_SUCCESSFULLY';
+  const successCreateMessage = 'TEAM_LEADERS.TEAM_LEADER_CREATED_SUCCESSFULLY';
   const telemetryCreateKey = 'scp-team-lead-created-successfully';
   const failureCreateMessage = 'TEAM_LEADERS.NOT_ABLE_CREATE_TEAM_LEADER';
   const notificationKey = 'onTeamLeaderCreated';
-  const notificationMessage =
-    'TEAM_LEADERS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
+  const notificationMessage = 'TEAM_LEADERS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
 
-
   useEffect(() => {
-    setPrefilledFormData({ state: localStorage.getItem('stateId') });
+    setPrefilledFormData(initialFormData);
   }, []);
 
   return (
@@ -380,7 +375,7 @@ const TeamLeader = () => {
             height="20vh"
           >
             <Typography marginTop="10px" textAlign={'center'}>
-                {t('TEAM_LEADERS.NO_TEAM_LEADER_FOUND')}
+              {t('TEAM_LEADERS.NO_TEAM_LEADER_FOUND')}
             </Typography>
           </Box>
         )}

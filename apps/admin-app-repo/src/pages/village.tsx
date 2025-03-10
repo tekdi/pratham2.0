@@ -53,6 +53,9 @@ const Village = () => {
   const [editableUserId, setEditableUserId] = useState('');
 
   const { t, i18n } = useTranslation();
+  const initialFormData = localStorage.getItem('stateId')
+    ? { state: localStorage.getItem('stateId') }
+    : {};
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -61,7 +64,7 @@ const Village = () => {
   }, [pageLimit]);
 
   useEffect(() => {
-    setPrefilledFormData({ state: localStorage.getItem('stateId') });
+    setPrefilledFormData(initialFormData);
   }, []);
 
   const updatedUiSchema = {
@@ -71,11 +74,14 @@ const Village = () => {
     },
   };
 
-  const debouncedGetList = useCallback(debounce(async (data) => {
-    console.log('Debounced API Call:', data);
-    const resp = await fetchStateOptions(data);
-    setResponse({ result: resp?.result });
-  }, 1000), []);
+  const debouncedGetList = useCallback(
+    debounce(async (data) => {
+      console.log('Debounced API Call:', data);
+      const resp = await fetchStateOptions(data);
+      setResponse({ result: resp?.result });
+    }, 1000),
+    []
+  );
 
   const SubmitaFunction = async (formData: any) => {
     setPrefilledFormData(formData);
@@ -84,7 +90,6 @@ const Village = () => {
 
   const searchData = async (formData = [], newPage) => {
     const { sortBy, ...restFormData } = formData;
-
 
     const filters = {
       // role: 'Instructor',
@@ -143,9 +148,9 @@ const Village = () => {
     {
       keys: ['is_active'],
       label: 'Status',
-      render: (row) => row.is_active === 1 ? "Active" : "Inactive",
-      getStyle: (row) => ({ color: row.is_active === 1 ? "green" : "red" })
-    }
+      render: (row) => (row.is_active === 1 ? 'Active' : 'Inactive'),
+      getStyle: (row) => ({ color: row.is_active === 1 ? 'green' : 'red' }),
+    },
   ];
 
   // Pagination handlers
@@ -230,7 +235,7 @@ const Village = () => {
             height="20vh"
           >
             <Typography marginTop="10px" textAlign={'center'}>
-                {t('COMMON.NO_VILLAGE_FOUND')}
+              {t('COMMON.NO_VILLAGE_FOUND')}
             </Typography>
           </Box>
         )}

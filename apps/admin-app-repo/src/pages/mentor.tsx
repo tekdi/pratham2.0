@@ -48,6 +48,9 @@ const Mentor = () => {
   const [tenantId, setTenantId] = useState('');
 
   const { t, i18n } = useTranslation();
+  const initialFormData = localStorage.getItem('stateId')
+    ? { state: localStorage.getItem('stateId') }
+    : {};
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -74,10 +77,10 @@ const Mentor = () => {
       setAddUiSchema(responseForm?.uiSchema);
     };
 
-    setPrefilledAddFormData({ state: localStorage.getItem('stateId') });
-    setPrefilledFormData({ state: localStorage.getItem('stateId') });
-    setRoleID(localStorage.getItem('roleId'))
-    setTenantId(localStorage.getItem('tenantId'))
+    setPrefilledAddFormData(initialFormData);
+    setPrefilledFormData(initialFormData);
+    setRoleID(localStorage.getItem('roleId'));
+    setTenantId(localStorage.getItem('tenantId'));
     fetchData();
   }, []);
 
@@ -292,9 +295,7 @@ const Mentor = () => {
             variant="outlined"
             color="primary"
             onClick={() => {
-              setPrefilledAddFormData({
-                state: localStorage.getItem('stateId'),
-              });
+              setPrefilledAddFormData(initialFormData);
               setIsEdit(false);
               setEditableUserId('');
               handleOpenModal();

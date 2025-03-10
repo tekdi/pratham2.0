@@ -216,11 +216,15 @@ const LoginPage = () => {
               (field: { label: string }) => field?.label === 'STATE'
             )?.selectedValues[0]?.value
           );
-          localStorage.setItem('stateName', selectedStateName);
+          if (selectedStateName) {
+            localStorage.setItem('stateName', selectedStateName);
+          }
           const selectedStateId = userInfo?.customFields.find(
             (field: { label: string }) => field?.label === 'STATE'
           )?.selectedValues[0]?.id;
-          localStorage.setItem('stateId', selectedStateId);
+          if (selectedStateId) {
+            localStorage.setItem('stateId', selectedStateId);
+          }
         }
         if (
           userInfo?.role !== Role.ADMIN &&
