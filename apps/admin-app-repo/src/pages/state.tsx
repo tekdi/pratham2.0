@@ -66,13 +66,11 @@ const State = () => {
     },
   };
 
-  const debouncedGetList = debounce(async (data) => {
+  const debouncedGetList = useCallback(debounce(async (data) => {
+    console.log('Debounced API Call:', data);
     const resp = await fetchStateOptions(data);
-    console.log('Debounced API Call:', resp);
-    // console.log('totalCount', result?.totalCount);
-    console.log('userDetails', result?.values);
-    setResponse({ result: resp.result.values });
-  }, 300);
+    setResponse({ result: resp?.result });  
+  }, 1000), []);
 
   const SubmitaFunction = async (formData: any) => {
     setPrefilledFormData(formData);
@@ -115,12 +113,11 @@ const State = () => {
       optionName: formData.firstName,
     };
 
-    if (filters.searchKey) {
+    if (filters.firstName) {
       debouncedGetList(data);
     } else {
       const resp = await fetchStateOptions(data);
       setResponse({ result: resp?.result });
-      console.log('Immediate API Call:', resp);
     }
   };
 
@@ -186,7 +183,7 @@ const State = () => {
 
     return result;
   } 
-
+  
   return (
     <>
       <Box display={'flex'} flexDirection={'column'} gap={2}>

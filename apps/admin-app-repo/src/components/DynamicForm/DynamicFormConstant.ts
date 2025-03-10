@@ -20,7 +20,7 @@ export const FormContext = {
     contextType: 'INSTRUCTOR',
   },
     learner:{
-    context: 'LEARNER',
-    contextType: 'INSTRUCTOR',
+    context: 'USERS',
+    contextType: 'LEARNER',
   }
 };
