@@ -51,17 +51,18 @@ const MenuWrapper = ({ children }: { children: React.ReactNode }) => {
       allowedMenuRoutes.includes(router.pathname) ||
       programSpecificRoutes.includes(router.pathname);
 
-    console.log('router.pathname', router.pathname);
-    console.log('router.pathname isPublicRoute', isPublicRoute);
-    console.log('router.pathname isAllowedRoute', isAllowedRoute);
-    console.log('router.pathname isDynamicAllowed', isDynamicAllowed);
+    // console.log('router.pathname', router.pathname);
+    // console.log(
+    //   'router.pathname allowedMenuRoutes',
+    //   JSON.stringify(allowedMenuRoutes)
+    // );
+    // console.log('router.pathname user', user);
+    // console.log('router.pathname isPublicRoute', isPublicRoute);
+    // console.log('router.pathname isAllowedRoute', isAllowedRoute);
+    // console.log('router.pathname isDynamicAllowed', isDynamicAllowed);
 
     // ✅ 6. Final route validation
-    if (
-      !isPublicRoute &&
-      !isAllowedRoute &&
-      !isDynamicAllowed 
-    ) {
+    if (!isPublicRoute && !isAllowedRoute && !isDynamicAllowed) {
       router.replace('/unauthorized');
     }
   }, [user, router.pathname]);

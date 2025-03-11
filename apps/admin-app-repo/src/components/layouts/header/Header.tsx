@@ -118,7 +118,8 @@ const Header = ({
         if (storedUserData?.role === Role.CENTRAL_ADMIN && storedUserData?.tenantData[0]?.tenantName == TenantName.SECOND_CHANCE_PROGRAM) {
           if (router.pathname === "/programs") window.location.reload();
           else router.push("/programs", undefined, { locale: locale });
-        } else if (storedUserData?.role === Role.CENTRAL_ADMIN && storedUserData?.tenantData[0]?.tenantName == TenantName.YOUTHNET){
+        } else if ((storedUserData?.role === Role.CENTRAL_ADMIN ||
+                    storedUserData?.role === Role.ADMIN) && storedUserData?.tenantData[0]?.tenantName == TenantName.YOUTHNET){
           if (router.pathname === "/mentor") window.location.reload();
           else router.push("/mentor", undefined, { locale: locale });
         } 
@@ -133,7 +134,8 @@ const Header = ({
         } else if (storedUserData?.role === Role.ADMIN && storedUserData?.tenantData[0]?.tenantName == TenantName.SECOND_CHANCE_PROGRAM) {
           if (router.pathname === "/centers") window.location.reload();
           else router.push("/centers");
-        } else if (storedUserData?.role === Role.CENTRAL_ADMIN && storedUserData?.tenantData[0]?.tenantName == TenantName.YOUTHNET) {
+        } else if ((storedUserData?.role === Role.CENTRAL_ADMIN ||
+                    storedUserData?.role === Role.ADMIN) && storedUserData?.tenantData[0]?.tenantName == TenantName.YOUTHNET) {
           if (router.pathname === "/mentor") window.location.reload();
           else router.push("/mentor", undefined, { locale: locale });
         }
