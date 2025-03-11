@@ -67,7 +67,8 @@ const EditForgotPassword = () => {
         } else if (storedUserData?.role === Role.ADMIN && storedUserData?.tenantData[0]?.tenantName == TenantName.SECOND_CHANCE_PROGRAM) {
 
           router.push("/centers", undefined, { locale: locale });
-        } else if (storedUserData?.role === Role.CENTRAL_ADMIN && storedUserData?.tenantData[0]?.tenantName == TenantName.YOUTHNET) {
+        } else if ((storedUserData?.role === Role.CENTRAL_ADMIN ||
+                    storedUserData?.role === Role.ADMIN)  && storedUserData?.tenantData[0]?.tenantName == TenantName.YOUTHNET) {
           router.push("/mentor", undefined, { locale: locale });
       }
    
@@ -82,7 +83,8 @@ const EditForgotPassword = () => {
 
           router.push("/centers");
         }
-        else if (storedUserData?.role === Role.CENTRAL_ADMIN && storedUserData?.tenantData[0]?.tenantName == TenantName.YOUTHNET) {
+        else if ((storedUserData?.role === Role.CENTRAL_ADMIN ||
+                    storedUserData?.role === Role.ADMIN)  && storedUserData?.tenantData[0]?.tenantName == TenantName.YOUTHNET) {
           router.push("/mentor", undefined, { locale: locale });
         }
 
