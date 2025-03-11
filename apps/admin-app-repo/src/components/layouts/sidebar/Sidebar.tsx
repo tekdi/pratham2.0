@@ -53,7 +53,7 @@ const Sidebar = ({
 
   const getActiveStyle = (link) =>
     router.pathname === link
-      ? { backgroundColor: '#fb9678', color: 'black', borderRadius: '100px' }
+      ? { backgroundColor: '#FDBF34', color: 'black', borderRadius: '100px' }
       : {};
 
   const menuItems = Object.entries(MENU_CONFIG[storedProgram] || {}).filter(
@@ -65,7 +65,7 @@ const Sidebar = ({
   const SidebarContent = (
     <Box
       p={2}
-      minHeight="100%"
+      // minHeight="100%"
       bgcolor="#F8EFDA"
       sx={{
         background: 'linear-gradient(to bottom, white, #F8EFDA)',
