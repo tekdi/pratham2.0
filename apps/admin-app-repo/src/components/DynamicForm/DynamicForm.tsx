@@ -165,75 +165,63 @@ const DynamicForm = ({
   const renderPrefilledForm = () => {
     const temp_prefilled_form = { ...prefilledFormData };
     console.log('temp', temp_prefilled_form);
+
     const dependentApis = extractApiProperties(schema, 'dependent');
     console.log('dependentFields', dependentApis);
+
     if (dependentApis.length > 0) {
       let dependentKeys = dependentApis.map((item) => item.key);
       console.log('dependentKeys', dependentKeys);
       console.log('prefilledFormData', temp_prefilled_form);
+
       const removeDependentKeys = (formData, keysToRemove) => {
         const updatedData = { ...formData };
         keysToRemove.forEach((key) => delete updatedData[key]);
         return updatedData;
       };
-      let updatedFormData = removeDependentKeys(
-        temp_prefilled_form,
-        dependentKeys
-      );
-      // console.log('updatedFormData', updatedFormData);
+
+      let updatedFormData = removeDependentKeys(temp_prefilled_form, dependentKeys);
       setFormData(updatedFormData);
 
-      //prefill other dependent keys
-      const filterDependentKeys = (
-        formData: Record<string, any>,
-        keysToKeep: string[]
-      ) => {
+      // Prefill other dependent keys
+      const filterDependentKeys = (formData, keysToKeep) => {
         return Object.fromEntries(
           Object.entries(formData).filter(([key]) => keysToKeep.includes(key))
         );
       };
-      let filteredFormData = filterDependentKeys(
-        temp_prefilled_form,
-        dependentKeys
-      );
+
+      let filteredFormData = filterDependentKeys(temp_prefilled_form, dependentKeys);
       console.log('filteredFormData', filteredFormData);
+
       const filteredFormDataKey = Object.keys(filteredFormData);
       console.log('filteredFormDataKey', filteredFormDataKey);
-      let filterDependentApis = [];
-      for (let i = 0; i < filteredFormDataKey.length; i++) {
-        filterDependentApis.push({
-          key: filteredFormDataKey[i],
-          data: schema.properties[filteredFormDataKey[i]],
-        });
-      }
+
+      let filterDependentApis = filteredFormDataKey.map((key) => ({
+        key,
+        data: schema.properties[key],
+      }));
+
       console.log('filterDependentApis', filterDependentApis);
-      //dependent calls
+
       const workingSchema = filterDependentApis;
 
       const getNestedValue = (obj, path) => {
-        if (path === '') {
-          return obj;
-        } else {
-          return path.split('.').reduce((acc, key) => acc && acc[key], obj);
-        }
+        if (path === '') return obj;
+        return path.split('.').reduce((acc, key) => acc && acc[key], obj);
       };
 
       const fetchDependentApis = async () => {
-        // Filter only the dependent APIs based on the changed field
-        const dependentApis = workingSchema;
         try {
-          console.log('dependentApis dependentApis', dependentApis);
-          const apiRequests = dependentApis.map((realField) => {
+          console.log('dependentApis:', workingSchema);
+          const apiRequests = workingSchema.map((realField) => {
             const field = realField?.data;
-            const { api } = realField?.data;
+            const { api } = field;
             const key = realField?.key;
 
-            console.log('API field:', field);
+            if (!api) return null; // Skip if there's no API defined
 
-            const changedField = field?.api?.dependent;
-            const changedFieldValue = temp_prefilled_form[changedField];
+            const changedFieldValue = temp_prefilled_form[field?.api?.dependent];
 
-            // Replace "**" in the payload with changedFieldValue
             const updatedPayload = JSON.parse(
               JSON.stringify(api.payload).replace(/\*\*/g, changedFieldValue)
             );
@@ -245,104 +233,18 @@ const DynamicForm = ({
               ...(api.method === 'POST' && { data: updatedPayload }),
             };
 
-            if (key) {
-              const changedField = key;
-
-              // console.log(`Field changed: ${changedField}, New Value: ${formData[changedField]}`);
-              // console.log('dependentSchema', dependentSchema);
-              const workingSchema1 = dependentSchema?.filter(
-                (item) => item.api && item.api.dependent === changedField
-              );
-              // console.log('workingSchema1', workingSchema1);
-              if (workingSchema1.length > 0) {
-                const changedFieldValue = temp_prefilled_form[changedField];
-
-                const getNestedValue = (obj, path) => {
-                  if (path === '') {
-                    return obj;
-                  } else {
-                    return path
-                      .split('.')
-                      .reduce((acc, key) => acc && acc[key], obj);
-                  }
-                };
-
-                const fetchDependentApis = async () => {
-                  // Filter only the dependent APIs based on the changed field
-                  const dependentApis = workingSchema1;
-                  try {
-                    const apiRequests = dependentApis.map((field) => {
-                      const { api, key } = field;
-
-                      // Replace "**" in the payload with changedFieldValue
-                      const updatedPayload = JSON.parse(
-                        JSON.stringify(api.payload).replace(
-                          /\*\*/g,
-                          changedFieldValue
-                        )
-                      );
-
-                      const config = {
-                        method: api.method,
-                        url: api.url,
-                        headers: { 'Content-Type': 'application/json' },
-                        ...(api.method === 'POST' && { data: updatedPayload }),
-                      };
-
-                      return axios(config).then((response) => ({
-                        fieldKey: field.key,
-                        data: getNestedValue(
-                          response.data,
-                          api.options.optionObj
-                        ),
-                      }));
-                    });
-
-                    const responses = await Promise.all(apiRequests);
-                    // console.log('API Responses:', responses);
-                    setFormSchema((prevSchema) => {
-                      const updatedProperties = { ...prevSchema.properties };
-                      responses.forEach(({ fieldKey, data }) => {
-                        // console.log('Data:', data);
-                        // console.log('fieldKey:', fieldKey);
-                        let label =
-                          prevSchema.properties[fieldKey].api.options.label;
-                        let value =
-                          prevSchema.properties[fieldKey].api.options.value;
-                        updatedProperties[fieldKey] = {
-                          ...updatedProperties[fieldKey],
-                          enum: data.map((item) => item?.[value].toString()),
-                          enumNames: data.map((item) =>
-                            item?.[label].toString()
-                          ),
-                        };
-                      });
-
-                      return { ...prevSchema, properties: updatedProperties };
-                    });
-                  } catch (error) {
-                    console.error('Error fetching dependent APIs:', error);
-                  }
-                };
-
-                // Call the function
-                fetchDependentApis();
-              }
-            }
-
             return axios(config).then((response) => ({
               fieldKey: key,
               data: getNestedValue(response.data, api.options.optionObj),
             }));
           });
 
-          const responses = await Promise.all(apiRequests);
+          const responses = await Promise.all(apiRequests.filter(Boolean)); // Remove null requests
           console.log('API Responses:', responses);
+
           setFormSchema((prevSchema) => {
             const updatedProperties = { ...prevSchema.properties };
             responses.forEach(({ fieldKey, data }) => {
-              console.log('Data:', data);
-              console.log('fieldKey:', fieldKey);
               let label = prevSchema.properties[fieldKey].api.options.label;
               let value = prevSchema.properties[fieldKey].api.options.value;
               updatedProperties[fieldKey] = {
@@ -359,44 +261,41 @@ const DynamicForm = ({
         }
       };
 
-      // Call the function
       fetchDependentApis();
-
-      //setFormData
-      setFormData(temp_prefilled_form);
 
       function getSkipKeys(skipHideObject, formData) {
         let skipKeys = [];
-
         Object.keys(skipHideObject).forEach((key) => {
           if (formData[key] && skipHideObject[key][formData[key]]) {
             skipKeys = skipKeys.concat(skipHideObject[key][formData[key]]);
           }
         });
-
         return skipKeys;
       }
 
       const skipKeys = getSkipKeys(hideAndSkipFields, temp_prefilled_form);
       console.log('skipKeys', skipKeys);
-      let updatedUISchema = formUiSchemaOriginal;
+
       function hideFieldsInUISchema(uiSchema, fieldsToHide) {
         const updatedUISchema = { ...uiSchema };
-
         fieldsToHide.forEach((field) => {
           if (updatedUISchema[field]) {
             updatedUISchema[field] = {
               ...updatedUISchema[field],
-              originalWidget: updatedUISchema[field]['ui:widget'], // Store original widget type
+              originalWidget: updatedUISchema[field]['ui:widget'],
               'ui:widget': 'hidden',
             };
           }
         });
-
         return updatedUISchema;
       }
-      const hiddenUISchema = hideFieldsInUISchema(updatedUISchema, skipKeys);
+
+      const hiddenUISchema = hideFieldsInUISchema(formUiSchemaOriginal, skipKeys);
       setFormUiSchema(hiddenUISchema);
+    } else {
+      // When dependentApis is empty, ensure formData is still set
+      console.log('No dependent APIs found, setting form data directly');
+      setFormData(temp_prefilled_form);
     }
   };
 

@@ -639,7 +639,20 @@
   "FEMALE": "Female",
   "TRANSGENDER": "Transgender",
   "dob": "DOB",
-  "email": "Email"
+  "email": "Email",
+
+  "CONTENT_CREATORS": {
+    "SEARCHBAR_PLACEHOLDER": "Search content creator..",
+    "NEW_CONTENT_CREATOR": "New Content Creator",
+    "FIRST_SELECT_REQUIRED_FIELDS": "First select required fields",
+    "CONTENT_CREATOR_CREATED_SUCCESSFULLY": "Content Creator has been successfully created!",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "Content Creator is created, credentials will be sent soon",
+    "CONTENT_CREATOR_UPDATED_SUCCESSFULLY": "Content Creator has been successfully updated!",
+    "EDIT_CONTENT_CREATOR": "Edit Content Creator",
+    "NOT_ABLE_UPDATE_CONTENT_CREATOR": "Not able to update Content Creator",
+    "NOT_ABLE_CREATE_CONTENT_CREATOR": "Not able to create Content Creator",
+    "UPDATE_CONTENT_CREATOR": "Update Content Creator"
+  }
 
 
 }

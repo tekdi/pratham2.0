@@ -224,7 +224,8 @@ if (
             subOptions: item.subOptions.filter(
               (subItem) =>
                 subItem.title === 'SIDEBAR.CONTENT_CREATOR' ||
-                subItem.title === 'SIDEBAR.MENTOR'
+                subItem.title === 'SIDEBAR.MENTOR' || // todo: remove later - added for testing
+                subItem.title === 'SIDEBAR.MENTOR_LEADER' // todo: remove later - added for testing
             ),
           };
         }
