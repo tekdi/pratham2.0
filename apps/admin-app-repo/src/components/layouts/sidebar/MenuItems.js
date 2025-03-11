@@ -204,7 +204,7 @@ if (
       );
     }
     if (userInfo?.role === Role.ADMIN &&
-      userInfo?.tenantData[0]?.tenantName === youthNetTenantName.SECOND_CHANCE_PROGRAM) {
+      userInfo?.tenantData[0]?.tenantName === TenantName.SECOND_CHANCE_PROGRAM) {
       // Exclude Course Planner and Workspace for Admin and Central Admin
       return Menuitems.filter(
         (item) =>
