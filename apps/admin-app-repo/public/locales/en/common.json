@@ -158,7 +158,7 @@
     "NOT_ABLE_UPDATE_LEARNER": "Not Able To Update Learner",
     "NOT_ABLE_CREATE_LEARNER": "Not Able To Create Learner",
     "NO_CONTENT_CREATOR_FOUND": "No Content Creator (SCTA) Found",
-    "NO_CONTENT_REVIEWER_FOUND": "No Content Creator (CCTA) Found"
+    "NO_CONTENT_REVIEWER_FOUND": "No Content Reviewer (CCTA) Found"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
