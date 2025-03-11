@@ -21,7 +21,6 @@ export const ROLE_BASED_ROUTES = {
   [TenantName.YOUTHNET]: {
     [Role.ADMIN]: [],
     [Role.CENTRAL_ADMIN]: [],
-
     [Role.CCTA]: [],
     [Role.SCTA]: [],
   },
