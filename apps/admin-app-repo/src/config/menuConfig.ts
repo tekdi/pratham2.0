@@ -171,7 +171,7 @@ export const MENU_CONFIG = {
     },
     supportRequest: {
       title: 'Support Request',
-      icon: 'assets/images/Support.svg',
+      icon: '/images/Support.svg',
       link: '/support-request',
       roles: [
         Role.ADMIN,

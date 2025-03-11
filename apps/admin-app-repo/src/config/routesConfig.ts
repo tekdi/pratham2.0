@@ -22,7 +22,7 @@ export const ROLE_BASED_ROUTES = {
   [TenantName.YOUTHNET]: {
     [Role.ADMIN]: ['/edit-password'],
     [Role.CENTRAL_ADMIN]: ['/edit-password'],
-    [Role.CCTA]: ['/edit-password'],
-    [Role.SCTA]: ['/edit-password'],
+    [Role.CCTA]: ['/edit-password', '/subjectDetails', '/importCsv ' ,],
+    [Role.SCTA]: ['/edit-password' , '/subjectDetails', '/importCsv ' ,],
   },
 };
