@@ -180,52 +180,6 @@ const mockedFields = [
         "maxSelections": 0,
         "sourceDetails": {}
     },
-    // {
-    //     "order": "3",
-    //     "fieldId": "cb407d11-f1c5-424c-a422-4755a1c4ab29",
-    //     "coreField": 0,
-    //     "label": "DESIGNATION",
-    //     "name": "designation",
-    //     "type": "radio",
-    //     "isRequired": false,
-    //     "isEditable": null,
-    //     "isHidden": null,
-    //     "isPIIField": null,
-    //     "placeholder": "",
-    //     "validation": {
-    //         "default": "facilitator",
-    //         "isEditable": false,
-    //         "isRequired": true,
-    //         "isMultiSelect": false
-    //     },
-    //     "options": [
-    //         {
-    //             "label": "Facilitator",
-    //             "value": "facilitator"
-    //         },
-    //         {
-    //             "label": "Team Leader",
-    //             "value": "team_leader"
-    //         }
-    //     ],
-    //     "isMultiSelect": false,
-    //     "maxSelections": null,
-    //     "hint": null,
-    //     "pattern": null,
-    //     "maxLength": null,
-    //     "minLength": null,
-    //     "dependsOn": false,
-    //     "sourceDetails": {
-    //         "source": "fieldparams"
-    //     },
-    //     "ordering": 1,
-    //     "default": {
-    //         "default": "facilitator",
-    //         "isEditable": false,
-    //         "isRequired": true,
-    //         "isMultiSelect": false
-    //     }
-    // },
     {
         "api": {
             "url": "https://dev-interface.prathamdigital.org/interface/v1/fields/options/read",
@@ -297,6 +251,8 @@ const mockedFields = [
             {},
             {},
             {},
+            {},
+            {},
             {}
         ],
         "isMultiSelect": false,
@@ -316,6 +272,223 @@ const mockedFields = [
             "isRequired": false,
             "isMultiSelect": true,
             "maxSelections": 1
+        }
+    },
+    {
+        "api": {
+            "url": "/api/dynamic-form/get-framework",
+            "method": "POST",
+            "options": {
+                "label": "label",
+                "value": "value",
+                "optionObj": "options"
+            },
+            "payload": {
+                "code": "board",
+                "fetchUrl": "https://dev-middleware.prathamdigital.org/api/framework/v1/read/scp-framework"
+            },
+            "callType": "initial"
+        },
+        "order": "1",
+        "fieldId": "f93c0ac3-f827-4794-9457-441fa1057b42",
+        "coreField": 0,
+        "label": "BOARD",
+        "name": "board",
+        "type": "drop_down",
+        "isRequired": false,
+        "isEditable": null,
+        "isHidden": null,
+        "isPIIField": null,
+        "placeholder": "",
+        "validation": {
+            "isHidden": true,
+            "isEditable": true,
+            "isRequired": false,
+            "isMultiSelect": true,
+            "maxSelections": 2
+        },
+        "options": [],
+        "isMultiSelect": false,
+        "maxSelections": null,
+        "hint": null,
+        "pattern": null,
+        "maxLength": null,
+        "minLength": null,
+        "dependsOn": false,
+        "sourceDetails": {
+            "externalsource": "/api/framework/v1/read/scp-framework"
+        },
+        "ordering": 0,
+        "default": {
+            "isHidden": true,
+            "isEditable": true,
+            "isRequired": false,
+            "isMultiSelect": true,
+            "maxSelections": 2
+        }
+    },
+    {
+        "api": {
+            "url": "/api/dynamic-form/get-framework",
+            "method": "POST",
+            "options": {
+                "label": "label",
+                "value": "value",
+                "optionObj": "options"
+            },
+            "payload": {
+                "code": "board",
+                "fetchUrl": "https://dev-middleware.prathamdigital.org/api/framework/v1/read/scp-framework",
+                "findcode": "medium",
+                "selectedvalue": "**"
+            },
+            "callType": "dependent",
+            "dependent": "board"
+        },
+        "order": "2",
+        "fieldId": "7b214a17-5a07-4ee0-bedc-271429862d30",
+        "coreField": 0,
+        "label": "MEDIUM",
+        "name": "medium",
+        "type": "drop_down",
+        "isRequired": false,
+        "isEditable": null,
+        "isHidden": null,
+        "isPIIField": null,
+        "placeholder": "",
+        "validation": {
+            "isHidden": true,
+            "isEditable": true,
+            "isRequired": true,
+            "isMultiSelect": true,
+            "maxSelections": 1
+        },
+        "options": [],
+        "isMultiSelect": false,
+        "maxSelections": null,
+        "hint": null,
+        "pattern": null,
+        "maxLength": null,
+        "minLength": null,
+        "dependsOn": "board",
+        "sourceDetails": {
+            "externalsource": "/api/framework/v1/read/scp-framework"
+        },
+        "ordering": 25,
+        "default": {
+            "isHidden": true,
+            "isEditable": true,
+            "isRequired": true,
+            "isMultiSelect": true,
+            "maxSelections": 1
+        }
+    },
+    {
+        "api": {
+            "url": "/api/dynamic-form/get-framework",
+            "method": "POST",
+            "options": {
+                "label": "label",
+                "value": "value",
+                "optionObj": "options"
+            },
+            "payload": {
+                "code": "medium",
+                "fetchUrl": "https://dev-middleware.prathamdigital.org/api/framework/v1/read/scp-framework",
+                "findcode": "gradeLevel",
+                "selectedvalue": "**"
+            },
+            "callType": "dependent",
+            "dependent": "medium"
+        },
+        "order": "3",
+        "fieldId": "5a2dbb89-bbe6-4aa8-b541-93e01ab07b70",
+        "coreField": 0,
+        "label": "GRADE",
+        "name": "grade",
+        "type": "drop_down",
+        "isRequired": false,
+        "isEditable": null,
+        "isHidden": null,
+        "isPIIField": null,
+        "placeholder": "",
+        "validation": {
+            "isHidden": true,
+            "isEditable": true,
+            "isRequired": true,
+            "isMultiSelect": true,
+            "maxSelections": 1
+        },
+        "options": [],
+        "isMultiSelect": false,
+        "maxSelections": null,
+        "hint": null,
+        "pattern": null,
+        "maxLength": null,
+        "minLength": null,
+        "dependsOn": "medium",
+        "sourceDetails": {
+            "externalsource": "/api/framework/v1/read/scp-framework"
+        },
+        "ordering": 25,
+        "default": {
+            "isHidden": true,
+            "isEditable": true,
+            "isRequired": true,
+            "isMultiSelect": true,
+            "maxSelections": 1
+        }
+    },
+    {
+        "api": {
+            "url": "/api/dynamic-form/get-framework",
+            "method": "POST",
+            "options": {
+                "label": "label",
+                "value": "value",
+                "optionObj": "options"
+            },
+            "payload": {
+                "code": "gradeLevel",
+                "fetchUrl": "https://dev-middleware.prathamdigital.org/api/framework/v1/read/scp-framework",
+                "findcode": "subject",
+                "selectedvalue": "**"
+            },
+            "callType": "dependent",
+            "dependent": "grade"
+        },
+        "order": "4",
+        "fieldId": "69a9dba2-e05e-40cd-a39c-047b9b676b5c",
+        "coreField": 0,
+        "label": "SUBJECT",
+        "name": "subject",
+        "type": "drop_down",
+        "isRequired": false,
+        "isEditable": null,
+        "isHidden": null,
+        "isPIIField": null,
+        "placeholder": "",
+        "validation": {
+            "isHidden": true,
+            "isEditable": true,
+            "isRequired": true
+        },
+        "options": [],
+        "isMultiSelect": false,
+        "maxSelections": null,
+        "hint": null,
+        "pattern": null,
+        "maxLength": null,
+        "minLength": null,
+        "dependsOn": "grade",
+        "sourceDetails": {
+            "externalsource": "/api/framework/v1/read/scp-framework"
+        },
+        "ordering": 25,
+        "default": {
+            "isHidden": true,
+            "isEditable": true,
+            "isRequired": true
         }
     }
 ]
