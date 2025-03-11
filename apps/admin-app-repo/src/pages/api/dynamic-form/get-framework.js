@@ -31,7 +31,7 @@ export default function handler(req, res) {
                   const categories_terms = categories?.terms;
 
                   const getAssociationsByCode = (data, code) => {
-                    const result = data.find((item) => item.code === code);
+                    const result = data.find((item) => item.name === code);
                     return result ? result.associations : [];
                   };
 
@@ -46,13 +46,13 @@ export default function handler(req, res) {
                     .filter((item) => item.category === findcode)
                     .map((item) => ({
                       label: item.name,
-                      value: item.code,
+                      value: item.name,
                     }));
                 } else {
                   // Transform terms into options
                   options = categories?.terms.map((term) => ({
                     label: term.name,
-                    value: term.code,
+                    value: term.name,
                   }));
                 }
                 // console.log('option', options);
