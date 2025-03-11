@@ -26,5 +26,9 @@ export const FormContext = {
   contentCreator: {
     context: 'USERS',
     contextType: 'Content Creator'
+  },
+  contentReviewer: {
+    context: 'USERS',
+    contextType: 'Content Reviewer'
   }
 };

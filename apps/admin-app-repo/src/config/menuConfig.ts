@@ -44,6 +44,11 @@ export const MENU_CONFIG = {
           title: 'Content Creator',
           link: '/content-creator',
           roles: [Role.CENTRAL_ADMIN],
+        },
+        {
+          title: 'Content Reviewer',
+          link: '/content-reviewer',
+          roles: [Role.CENTRAL_ADMIN],
         }
       ],
     },

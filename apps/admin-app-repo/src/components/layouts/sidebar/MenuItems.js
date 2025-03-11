@@ -50,6 +50,10 @@ const Menuitems = [
       {
         title: 'SIDEBAR.CONTENT_CREATOR',
         href: ['/content-creator'],
+      },
+      {
+        title: 'SIDEBAR.CONTENT_REVIEWER',
+        href: ['/content-reviewer'],
       }
     ],
   },
@@ -224,6 +228,7 @@ if (
             subOptions: item.subOptions.filter(
               (subItem) =>
                 subItem.title === 'SIDEBAR.CONTENT_CREATOR' ||
+                subItem.title === 'SIDEBAR.CONTENT_REVIEWER' ||
                 subItem.title === 'SIDEBAR.MENTOR' || // todo: remove later - added for testing
                 subItem.title === 'SIDEBAR.MENTOR_LEADER' // todo: remove later - added for testing
             ),

@@ -4,12 +4,10 @@ export default function handler(req, res) {
   if (req.method === 'POST') {
     try {
       const { readForm } = req.body;
-      console.log('readForm ===>', readForm)
-
 
       if (readForm && readForm.length > 0) {
         fetchFormFields(readForm).then((fields) => {
-          console.log('fieldFromFunction!!!', fields);
+          // console.log('fieldFromFunction!!!', fields);
 
           if (fields && fields.length > 0) {
             // fields = mockedFields; // todo: mocked the fields - need backend to support
