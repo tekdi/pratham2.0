@@ -49,8 +49,13 @@ const TeamLeader = () => {
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [isEdit, setIsEdit] = useState(false);
   const [editableUserId, setEditableUserId] = useState('');
+  const [roleId, setRoleID] = useState('');
+  const [tenantId, setTenantId] = useState('');
 
   const { t, i18n } = useTranslation();
+  const initialFormData = localStorage.getItem('stateId')
+    ? { state: localStorage.getItem('stateId') }
+    : {};
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -62,11 +67,11 @@ const TeamLeader = () => {
     const fetchData = async () => {
       const responseForm = await fetchForm([
         {
-          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.mentorLead.context}&contextType=${FormContext.mentorLead.contextType}`,
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.teamLead.context}&contextType=${FormContext.teamLead.contextType}`,
           header: {},
         },
         {
-          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.mentorLead.context}&contextType=${FormContext.mentorLead.contextType}`,
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.teamLead.context}&contextType=${FormContext.teamLead.contextType}`,
           header: {
             tenantid: localStorage.getItem('tenantId'),
           },
@@ -77,6 +82,8 @@ const TeamLeader = () => {
       setAddUiSchema(responseForm?.uiSchema);
     };
     fetchData();
+    setRoleID(localStorage.getItem('roleId'));
+    setTenantId(localStorage.getItem('tenantId'));
   }, []);
 
   const updatedUiSchema = {
@@ -135,7 +142,7 @@ const TeamLeader = () => {
     // },
     {
       keys: ['STATE', 'DISTRICT', 'BLOCK', 'VILLAGE'],
-      label: 'Location (State / District / Block/ Village)',
+      label: 'Location (State / District / Block / Village)',
       render: (row: any) => {
         const state =
           row.customFields.find(
@@ -160,6 +167,11 @@ const TeamLeader = () => {
         }`;
       },
     },
+    // {
+    //   keys: ['updatedBy'],
+    //   label: 'Updated By',
+    //   render: (row) => row.updatedBy
+    // },
   ];
 
   // Define actions
@@ -249,25 +261,26 @@ const TeamLeader = () => {
   const extraFields = {
     tenantCohortRoleMapping: [
       {
-        tenantId: localStorage.getItem('tenantId'),
-        roleId: 'c4454929-954e-4c51-bb7d-cca834ab9375',
+        tenantId: tenantId,
+        roleId: roleId,
       },
     ],
     username: 'scpTeamLead',
     password: Math.floor(10000 + Math.random() * 90000),
   };
-  const successUpdateMessage =
-    'MENTOR_LEADERS.MENTOR_LEAD_UPDATED_SUCCESSFULLY';
-  const telemetryUpdateKey = 'youthnet-mentor-lead-updated-successfully';
-  const failureUpdateMessage = 'MENTOR_LEADERS.NOT_ABLE_UPDATE_MENTOR_LEAD';
-  const successCreateMessage =
-    'MENTOR_LEADERS.MENTOR_LEAD_CREATED_SUCCESSFULLY';
-  const telemetryCreateKey = 'youthnet-mentor-lead-created-successfully';
-  const failureCreateMessage = 'MENTOR_LEADERS.NOT_ABLE_CREATE_MENTOR_LEAD';
-  const notificationKey = 'onMentorLeaderCreate';
-  const notificationMessage =
-    'MENTOR_LEADERS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
+  const successUpdateMessage = 'TEAM_LEADERS.TEAM_LEADER_UPDATED_SUCCESSFULLY';
+  const telemetryUpdateKey = 'scp-team-lead-updated-successfully';
+  const failureUpdateMessage = 'TEAM_LEADERS.NOT_ABLE_UPDATE_TEAM_LEADER';
+  const successCreateMessage = 'TEAM_LEADERS.TEAM_LEADER_CREATED_SUCCESSFULLY';
+  const telemetryCreateKey = 'scp-team-lead-created-successfully';
+  const failureCreateMessage = 'TEAM_LEADERS.NOT_ABLE_CREATE_TEAM_LEADER';
+  const notificationKey = 'onTeamLeaderCreated';
+  const notificationMessage = 'TEAM_LEADERS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
+
+  useEffect(() => {
+    setPrefilledFormData(initialFormData);
+  }, []);
 
   return (
     <>
@@ -282,7 +295,7 @@ const TeamLeader = () => {
               uiSchema={updatedUiSchema}
               SubmitaFunction={SubmitaFunction}
               isCallSubmitInHandle={true}
-              prefilledFormData={prefilledFormData || {}}
+              prefilledFormData={prefilledFormData}
             />
           )
         )}
@@ -307,8 +320,8 @@ const TeamLeader = () => {
           showFooter={false}
           modalTitle={
             isEdit
-              ? t('MENTOR_LEADERS.UPDATE_MENTOR_LEAD')
-              : t('MENTOR_LEADERS.NEW_MENTOR_LEAD')
+              ? t('TEAM_LEADERS.EDIT_TEAM_LEADER')
+              : t('TEAM_LEADERS.NEW_TEAM_LEADER')
           }
         >
           <AddEditUser
@@ -362,7 +375,7 @@ const TeamLeader = () => {
             height="20vh"
           >
             <Typography marginTop="10px" textAlign={'center'}>
-              {t('COMMON.NO_MENTOR_LEAD_FOUND')}
+              {t('TEAM_LEADERS.NO_TEAM_LEADER_FOUND')}
             </Typography>
           </Box>
         )}

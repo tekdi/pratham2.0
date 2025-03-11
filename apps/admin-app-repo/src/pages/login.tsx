@@ -205,20 +205,26 @@ const LoginPage = () => {
             localStorage.setItem('adminInfo', JSON.stringify(userInfo));
             const roleId = userInfo.tenantData?.[0]?.roleId || '';
             const roleName = userInfo.tenantData?.[0]?.roleName || '';
+            const program = userInfo.tenantData?.[0]?.tenantName || '';
 
             localStorage.setItem('roleId', roleId);
             localStorage.setItem('roleName', roleName);
+            localStorage.setItem('program', program);
           }
           const selectedStateName = transformLabel(
             userInfo?.customFields.find(
               (field: { label: string }) => field?.label === 'STATE'
             )?.selectedValues[0]?.value
           );
-          localStorage.setItem('stateName', selectedStateName);
+          if (selectedStateName) {
+            localStorage.setItem('stateName', selectedStateName);
+          }
           const selectedStateId = userInfo?.customFields.find(
             (field: { label: string }) => field?.label === 'STATE'
           )?.selectedValues[0]?.id;
-          localStorage.setItem('stateId', selectedStateId);
+          if (selectedStateId) {
+            localStorage.setItem('stateId', selectedStateId);
+          }
         }
         if (
           userInfo?.role !== Role.ADMIN &&

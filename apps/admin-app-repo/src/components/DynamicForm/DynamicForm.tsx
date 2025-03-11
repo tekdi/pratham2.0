@@ -28,6 +28,7 @@ const DynamicForm = ({
   const [dependentSchema, setDependentSchema] = useState([]);
   const [isInitialCompleted, setIsInitialCompleted] = useState(false);
   const [hideAndSkipFields, setHideAndSkipFields] = useState({});
+  const [isRenderCompleted, setIsRenderCompleted] = useState(false);
 
   useEffect(() => {
     if (isInitialCompleted === true) {
@@ -41,6 +42,12 @@ const DynamicForm = ({
       SubmitaFunction(formData);
     }
   }, [formData]);
+
+  useEffect(() => {
+    if (isRenderCompleted === true) {
+      handleChange({ formData: prefilledFormData });
+    }
+  }, [isRenderCompleted]);
 
   useEffect(() => {
     function extractSkipAndHide(schema: any): Record<string, any> {
@@ -167,10 +174,13 @@ const DynamicForm = ({
     console.log('temp', temp_prefilled_form);
 
     const dependentApis = extractApiProperties(schema, 'dependent');
+    const initialApis = extractApiProperties(schema, 'initial');
+    // console.log('initialApis', initialApis);
     console.log('dependentFields', dependentApis);
-
-    if (dependentApis.length > 0) {
+    if (dependentApis.length > 0 && initialApis.length > 0) {
+      let initialKeys = initialApis.map((item) => item.key);
       let dependentKeys = dependentApis.map((item) => item.key);
+      dependentKeys = [...initialKeys, ...dependentKeys];
       console.log('dependentKeys', dependentKeys);
       console.log('prefilledFormData', temp_prefilled_form);
 
@@ -297,6 +307,8 @@ const DynamicForm = ({
       console.log('No dependent APIs found, setting form data directly');
       setFormData(temp_prefilled_form);
     }
+    //Code patch: bug solved for prefilled dependent field options render
+    setIsRenderCompleted(true);
   };
 
   const getDependentKeys = (schema, startKey) => {
@@ -514,7 +526,9 @@ const DynamicForm = ({
     // console.log('formSchema', transformedFormData);
     console.log('Form Data Submitted:', filteredData);
     console.log('formattedFormData', transformedFormData);
-    FormSubmitFunction(filteredData, transformedFormData);
+    if (!isCallSubmitInHandle) {
+      FormSubmitFunction(filteredData, transformedFormData);
+    }
   };
   console.log(formSchema);
 

@@ -7,7 +7,7 @@ export const TeamLeaderSearchSchema = {
       enum: ['Select'],
       enumNames: ['Select'],
       api: {
-        url: 'https://dev-interface.prathamdigital.org/interface/v1/fields/options/read',
+        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
         method: 'POST',
         payload: { fieldName: 'state', sort: ['state_name', 'asc'] },
         options: {
@@ -24,7 +24,7 @@ export const TeamLeaderSearchSchema = {
       enum: ['Select'],
       enumNames: ['Select'],
       api: {
-        url: 'https://dev-interface.prathamdigital.org/interface/v1/fields/options/read',
+        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
         method: 'POST',
         payload: {
           fieldName: 'district',
@@ -46,7 +46,7 @@ export const TeamLeaderSearchSchema = {
       enum: ['Select'],
       enumNames: ['Select'],
       api: {
-        url: 'https://dev-interface.prathamdigital.org/interface/v1/fields/options/read',
+        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
         method: 'POST',
         payload: {
           fieldName: 'block',
@@ -68,7 +68,7 @@ export const TeamLeaderSearchSchema = {
       enum: ['Select'],
       enumNames: ['Select'],
       api: {
-        url: 'https://dev-interface.prathamdigital.org/interface/v1/fields/options/read',
+        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
         method: 'POST',
         payload: {
           fieldName: 'village',
@@ -86,7 +86,7 @@ export const TeamLeaderSearchSchema = {
     },
     firstName: {
       type: 'string',
-      title: 'Search Key',
+      title: 'Search Team Leader',
       // description: 'Search for a specific user or entity',
     },
     sortBy: {
@@ -110,7 +110,7 @@ export const TeamLeaderSearchUISchema = {
     'district',
     'block',
     'village',
-    'searchKey',
+    'firstName',
     'sortBy',
     'status',
   ],
@@ -123,7 +123,7 @@ export const TeamLeaderSearchUISchema = {
     'ui:widget': 'select',
   },
 
-  searchKey: {
+  firstName: {
     'ui:widget': 'text',
   },
 

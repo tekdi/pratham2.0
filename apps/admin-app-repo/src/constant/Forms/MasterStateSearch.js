@@ -16,9 +16,9 @@ export const MasterStateSearchSchema = {
 };
 
 export const MasterStateUISchema = {
-  'ui:order': ['searchKey', 'sortBy'],
+  'ui:order': ['firstName', 'sortBy'],
 
-  searchKey: {
+  firstName: {
     'ui:widget': 'text',
   },
 

@@ -1,5 +1,3 @@
-import ContentCreator from "@/pages/content-creator-old";
-
 export const FormContext = {
   mentor: {
     context: 'USERS',
@@ -12,6 +10,18 @@ export const FormContext = {
   cohort: {
     context: 'COHORTS',
     contextType: 'COHORT',
+  },
+    teamLead: {
+    context: 'USERS',
+    contextType: 'LEAD',
+  },
+  facilitator:{
+    context: 'USERS',
+    contextType: 'INSTRUCTOR',
+  },
+    learner:{
+    context: 'USERS',
+    contextType: 'LEARNER',
   },
   contentCreator: {
     context: 'USERS',
