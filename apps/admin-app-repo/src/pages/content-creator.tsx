@@ -8,7 +8,7 @@ import {
   ContentCreatorUISchema,
 } from '../constant/Forms/ContentCreatorSearch';
 
-import { Status } from '@/utils/app.constant';
+import { RoleId, Status } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
 import { Box, Typography } from '@mui/material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
@@ -26,6 +26,7 @@ import {
 } from '@/components/DynamicForm/DynamicFormCallback';
 import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
+import TenantService from '@/services/TenantService';
 
 const ContentCreator = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -130,16 +131,46 @@ const ContentCreator = () => {
         return `${state}`;
       },
     },
-    // {
-    //   key: 'BOARD',
-    //   label: 'Board',
-    //   render: (row) => {
-    //     const board =
-    //       row.customFields.find((field) => field.label === 'BOARD')
-    //         ?.selectedValues[0]?.value || '-';
-    //     return `${board}`;
-    //   },
-    // },
+    {
+      key: 'BOARD',
+      label: 'Board',
+      render: (row) => {
+        const board =
+          row.customFields.find((field) => field.label === 'BOARD')
+            ?.selectedValues[0]?.value || '-';
+        return `${board}`;
+      },
+    },
+    {
+      key: 'MEDIUM',
+      label: 'Medium',
+      render: (row) => {
+        const medium =
+          row.customFields.find((field) => field.label === 'MEDIUM')
+            ?.selectedValues[0]?.value || '-';
+        return `${medium}`;
+      },
+    },
+    {
+      key: 'GRADE',
+      label: 'Grade',
+      render: (row) => {
+        const grade =
+          row.customFields.find((field) => field.label === 'GRADE')
+            ?.selectedValues[0]?.value || '-';
+        return `${grade}`;
+      },
+    },
+    {
+      key: 'SUBJECT',
+      label: 'subject',
+      render: (row) => {
+        const subject =
+          row.customFields.find((field) => field.label === 'SUBJECT')
+            ?.selectedValues[0]?.value || '-';
+        return `${subject}`;
+      },
+    },
   ];
 
   // Define actions
@@ -228,11 +259,10 @@ const ContentCreator = () => {
   const extraFields = {
     tenantCohortRoleMapping: [
       {
-        tenantId: 'ef99949b-7f3a-4a5f-806a-e67e683e38f3',
-        roleId: '45b8b0d7-e5c6-4f3f-a7bf-70f86e9357ce',
+        tenantId: TenantService.getTenantId(),
+        roleId: RoleId.CONTENT_CREATOR,
       },
     ],
-    username: 'scpcontentcreator',
     password: Math.floor(10000 + Math.random() * 90000),
   };
   const successUpdateMessage =

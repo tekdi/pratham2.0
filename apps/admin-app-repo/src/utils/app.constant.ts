@@ -112,7 +112,9 @@ export enum RoleId {
   TEACHER = "3bde0028-6900-4900-9d05-eeb608843718",
   TEAM_LEADER = "9dd9328f-1bc7-444f-96e3-c5e1daa3514a",
   ADMIN = "ee482faf-8a41-45fe-9656-5533dd6a787c",
-  SCTA = "f972a14e-afdb-4502-8ede-cf1fcf171e46"
+  SCTA = "f972a14e-afdb-4502-8ede-cf1fcf171e46",
+  CONTENT_CREATOR = '45b8b0d7-e5c6-4f3f-a7bf-70f86e9357ce',
+
 }
 
 export enum DataKey {
