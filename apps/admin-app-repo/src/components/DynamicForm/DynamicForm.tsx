@@ -17,7 +17,7 @@ const DynamicForm = ({
   prefilledFormData,
   FormSubmitFunction,
   extraFields,
-}) => {
+}: any) => {
   const { t } = useTranslation();
 
   const [submitted, setSubmitted] = useState(false);

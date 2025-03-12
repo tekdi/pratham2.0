@@ -312,7 +312,9 @@
     "ENTER_CHARACTER": "Please enter at least one character",
     "CONTACT_NUMBER": "Contact Number",
     "ENROLLMENT_NUMBER": "Enrollment Number",
-    "SELECT_OPTION": "Select Option"
+    "SELECT_OPTION": "Select Option",
+    "PROFILE_UPDATE_SUCCESSFULLY":"Profile updated successfully",
+     "UNABLE_TO_PROFILE_UPDATE_":"Unable to update profile"
   },
   "FIELDS": {
     "DESIGNATION": "Designation",
