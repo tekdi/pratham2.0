@@ -1,4 +1,4 @@
-export const learnerSearchSchema = {
+export const BatchSearchSchema = {
   type: 'object',
   properties: {
     state: {
@@ -112,9 +112,40 @@ export const learnerSearchSchema = {
       isMultiSelect: true,
       maxSelections: 1000,
     },
-    firstName: {
+    center: {
       type: 'string',
-      title: 'Search Learner',
+      title: 'CENTER',
+      coreField: 0,
+      fieldId: 'a7cf7617-79cd-455a-a9f6-6b00fe0a8eca',
+      field_type: 'drop_down',
+      enum: ['select'],
+      enumNames: ['Select'],
+      api: {
+        url: 'https://dev-interface.prathamdigital.org/interface/v1/cohort/search',
+        header: {
+          tenantId: '**',
+          Authorization: '**',
+          academicyearid: '**',
+        },
+        method: 'POST',
+        options: {
+          label: 'label',
+          value: 'value',
+          optionObj: 'result.values',
+        },
+        payload: {
+          limit: '**',
+          offset: '**',
+          filters: {
+            status: ['active'],
+          },
+        },
+        callType: 'initial',
+      },
+    },
+    name: {
+      type: 'string',
+      title: 'Search Key',
       // description: 'Search for a specific user or entity',
     },
     sortBy: {
@@ -123,25 +154,11 @@ export const learnerSearchSchema = {
       enum: ['asc', 'desc'],
       enumNames: ['A-Z', 'Z-A'],
     },
-    status: {
-      type: 'string',
-      title: 'Status',
-      enum: ['active', 'archived'],
-      enumNames: ['Active', 'Archived'],
-    },
   },
 };
 
-export const learnerSearchUISchema = {
-  'ui:order': [
-    'state',
-    'district',
-    'block',
-    'village',
-    'firstName',
-    'sortBy',
-    'status',
-  ],
+export const BatchSearchUISchema = {
+  'ui:order': ['state', 'district', 'block', 'village', 'searchKey', 'sortBy'],
 
   state: {
     'ui:widget': 'select',
@@ -159,15 +176,11 @@ export const learnerSearchUISchema = {
     'ui:widget': 'select',
   },
 
-  firstName: {
+  searchKey: {
     'ui:widget': 'text',
   },
 
   sortBy: {
-    'ui:widget': 'select',
-  },
-
-  status: {
     'ui:widget': 'select',
   },
 };
