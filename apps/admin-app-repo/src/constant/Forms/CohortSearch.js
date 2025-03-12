@@ -1,11 +1,16 @@
+import { isMultiSelect } from '@rjsf/utils';
+
 export const CohortSearchSchema = {
   type: 'object',
   properties: {
     state: {
-      type: 'string',
+      type: 'array',
       title: 'State',
-      enum: ['Select'],
-      enumNames: ['Select'],
+      items: {
+        type: 'string',
+        enum: ['Select'],
+        enumNames: ['Select'],
+      },
       api: {
         url: 'https://dev-interface.prathamdigital.org/interface/v1/fields/options/read',
         method: 'POST',
@@ -17,6 +22,10 @@ export const CohortSearchSchema = {
         },
         callType: 'initial',
       },
+      //for multiselect
+      uniqueItems: true,
+      isMultiSelect: true,
+      maxSelections: 50,
     },
     district: {
       type: 'string',
@@ -102,7 +111,11 @@ export const CohortSearchUISchema = {
   'ui:order': ['state', 'district', 'block', 'village', 'searchKey', 'sortBy'],
 
   state: {
-    'ui:widget': 'select',
+    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:options': {
+      multiple: true,
+      uniqueItems: true,
+    },
   },
 
   district: {
