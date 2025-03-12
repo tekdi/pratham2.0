@@ -52,7 +52,9 @@ import ExamplePage from '../../components/youthNet/BlockItem';
 import VillageSelector from '../../components/youthNet/VillageSelector';
 import { filterData, getAge, getLoggedInUserRole, getVillageUserCounts } from '../../utils/Helper';
 import { fetchUserList } from '../../services/youthNet/Dashboard/UserServices';
-import { cohortHierarchy, Role, SortOrder, Status } from '../../utils/app.constant';
+import { cohortHierarchy, Role, SortOrder, Status, VolunteerField } from '../../utils/app.constant';
+import { editEditUser } from '../../services/ProfileService';
+import { showToastMessage } from "@/components/Toastify";
 
 const Index = () => {
   const { isRTL } = useDirection();
@@ -64,6 +66,8 @@ const Index = () => {
   );
   const [searchInput, setSearchInput] = useState('');
   const [toggledUser, setToggledUser] = useState('');
+  const [selectedToggledUserId, setselectedToggledUserId] = useState('');
+
   const [openMentorDrawer, setOpenMentorDrawer] = useState(false);
   const [toggledMentor, setToggledMentor] = useState('');
   const [openDrawer, setOpenDrawer] = useState(false);
@@ -87,6 +91,8 @@ const Index = () => {
   const [selectedBlockValue, setSelectedBlockValue] = useState<any>('');
   const [selectedVillageValue, setSelectedVillageValue] = useState<any>('');
   const [selectedDistrictValue, setSelectedDistrictValue] = useState<any>('');
+  const [isVolunteerFieldId, setIsVolunteerFieldId] = useState<any>('');
+
   const [loading, setLoading] = useState<boolean>(false);
 
  const [appliedFilters, setAppliedFilters] = useState({
@@ -111,7 +117,7 @@ const Index = () => {
       );
       setDistrictData(transformedData);
       setSelectedDistrictValue(transformedData[0]?.id);
-      const controllingfieldfk = transformedData[0]?.id?.toString();
+      const controllingfieldfk = [transformedData[0]?.id?.toString()];
       const fieldName = 'block';
       const blockResponce = await getStateBlockDistrictList({
         controllingfieldfk,
@@ -193,7 +199,10 @@ const Index = () => {
             const blockField = user.customFields.find(
               (field: any) => field.label === cohortHierarchy.BLOCK
             );
-            console.log(blockField?.selectedValues);
+            const isVolunteer = user.customFields.find(
+              (field: any) => field.label === VolunteerField.IS_VOLUNTEER
+            );
+            setIsVolunteerFieldId(isVolunteer?.fieldId)
             const blockValues = blockField?.selectedValues.map(
               (block: any) => block.value
             );
@@ -227,7 +236,9 @@ const Index = () => {
               lastName: user?.lastName,
               joinOn:formattedDate,
               isNew:isToday,
-              age:getAge(user?.dob)
+              age:getAge(user?.dob),
+              showMore: true,
+              isVolunteer: isVolunteer?.selectedValues || VolunteerField?.NO,
             };
           }
         );
@@ -325,7 +336,6 @@ const Index = () => {
           const blockResult = userData.customFields.find(
             (item: any) => item.label === 'BLOCK'
           );
-          console.log(villageList);
           blockIds =
             blockResult?.selectedValues?.map((item: any) => item.id) || [];
         } else if (selectedBlockValue !== '') {
@@ -338,7 +348,6 @@ const Index = () => {
         };
 
         const result = await fetchUserList({ filters });
-        console.log(result);
         let villagewithUser;
         villagewithUser = getVillageUserCounts(result, villageList);
         const ascending = [...villagewithUser].sort((a, b) => a.name.localeCompare(b.name));
@@ -355,7 +364,6 @@ const Index = () => {
         setLoading(false)
       }
     };
-    //const userId=localStorage.getItem('userId')
     if (villageList?.length !== 0) getVillageYouthData();
   }, [villageList, selectedBlockValue]);
 
@@ -372,7 +380,7 @@ const Index = () => {
 
           setVillageCount(villageData.length);
         } else if (selectedBlockValue !== '') {
-          const controllingfieldfk = selectedBlockValue?.toString();
+          const controllingfieldfk = [selectedBlockValue?.toString()];
           const fieldName = 'village';
           const villageResponce = await getStateBlockDistrictList({
             controllingfieldfk,
@@ -410,16 +418,53 @@ const Index = () => {
   };
 
   const handleUserClick = (userId: any) => {
-    // console.log('Clicked user:', name);
     router.push(`/user-profile/${userId}`);
   };
 
-  const handleToggledUserClick = (name: any) => {
-    console.log('Toggled user:', name);
+  const handleToggledUserClick = (name: any, Id?:any) => {
+
     setToggledUser(name);
+    setselectedToggledUserId(Id)
     setOpenDrawer((prev) => !prev);
   };
+  const handlemarkAsVolunteer = async () => {
+    try {
+      if (selectedToggledUserId !== "") {
+        const userId = selectedToggledUserId;
+        const userDetails = {
+          userData: {},
+          customFields: [
+            {
+              fieldId: isVolunteerFieldId || "59716ca7-37af-4527-a1ad-ce0f1dabeb00",
+              value: "yes",
+            },
+          ],
+        };
+  
+        const response = await editEditUser(userId, userDetails);
+        console.log(filteredyouthList);
+  
+        const updateIsVolunteer = (array: any[], targetId: any, newValue: any) => {
+          return array.map((item) =>
+            item.Id === targetId ? { ...item, isVolunteer: newValue } : item
+          );
+        };
+  
+        const updatedYouthList = updateIsVolunteer(youthList, selectedToggledUserId, VolunteerField.YES);
+        const updatedFilteredList = updateIsVolunteer(filteredyouthList, selectedToggledUserId, VolunteerField.YES);
+  
+        setYouthList(updatedYouthList); 
+        setFilteredYouthList(updatedFilteredList); 
+        showToastMessage(t("YOUTHNET_DASHBOARD.MARK_AS_VOLUNTEER_SUCCESSFULLY"), "success");
 
+      }
+    } catch (e) {
+      showToastMessage(t("YOUTHNET_DASHBOARD.MARK_AS_VOLUNTEER_FAILED"), "error");
+
+      console.log(e);
+    }
+  };
+  
   const handleToggledMentorClick = (name: any) => {
     console.log('Toggled user:', name);
     setToggledMentor(name);
@@ -428,6 +473,7 @@ const Index = () => {
   const handleToggleClose = () => {
     setOpenDrawer(false);
     setOpenMentorDrawer(false);
+    setselectedToggledUserId("")  
   };
 
   const onClose = () => {
@@ -438,13 +484,17 @@ const Index = () => {
     setCount(0);
   };
 
-  const handleButtonClick = (actionType: string) => {
+  const handleButtonClick = async(actionType: string) => {
     console.log(actionType);
 
     switch (actionType) {
       case BOTTOM_DRAWER_CONSTANTS.MARK_VOLUNTEER:
-        setOpenDrawer(false);
-        break;
+        {
+          setOpenDrawer(false);
+          await handlemarkAsVolunteer()
+          break;
+        }
+       
 
       case BOTTOM_DRAWER_CONSTANTS.ADD_REASSIGN:
         setOpenMentorDrawer(false);
@@ -1156,6 +1206,7 @@ const Index = () => {
                 users={filteredyouthList}
                 onUserClick={handleUserClick}
                 onToggleUserClick={handleToggledUserClick}
+                // showMore={true}
               />):
               (filteredyouthList.length===0?
                ( <>

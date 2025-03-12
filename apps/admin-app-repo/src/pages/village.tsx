@@ -6,7 +6,7 @@ import axios from 'axios';
 import DynamicForm from '@/components/DynamicForm/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
-import { MasterStateSearchSchema, MasterStateUISchema } from '../constant/Forms/MasterStateSearch'
+
 import { Status } from '@/utils/app.constant';
 import { Box, Grid, Typography } from '@mui/material';
 import { debounce } from 'lodash';
@@ -25,15 +25,17 @@ import deleteIcon from '../../public/images/deleteIcon.svg';
 import Image from 'next/image';
 import UserNameCell from '@/components/UserNameCell';
 import { fetchStateOptions } from '@/services/MasterDataService';
+import {
+  MasterVillageSchema,
+  MasterVillageUISchema,
+} from '../constant/Forms/MasterVillageSearch';
 
 //import { DynamicForm } from '@shared-lib';
 
-const State = () => {
+const Village = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [schema, setSchema] = useState(MasterStateSearchSchema);
-  console.log(schema);
-  
-  const [uiSchema, setUiSchema] = useState(MasterStateUISchema);
+  const [schema, setSchema] = useState(MasterVillageSchema);
+  const [uiSchema, setUiSchema] = useState(MasterVillageUISchema);
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
   const [prefilledAddFormData, setPrefilledAddFormData] = useState({});
@@ -51,6 +53,9 @@ const State = () => {
   const [editableUserId, setEditableUserId] = useState('');
 
   const { t, i18n } = useTranslation();
+  const initialFormData = localStorage.getItem('stateId')
+    ? { state: localStorage.getItem('stateId') }
+    : {};
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -58,6 +63,9 @@ const State = () => {
     }
   }, [pageLimit]);
 
+  useEffect(() => {
+    setPrefilledFormData(initialFormData);
+  }, []);
 
   const updatedUiSchema = {
     ...uiSchema,
@@ -66,11 +74,14 @@ const State = () => {
     },
   };
 
-  const debouncedGetList = useCallback(debounce(async (data) => {
-    console.log('Debounced API Call:', data);
-    const resp = await fetchStateOptions(data);
-    setResponse({ result: resp?.result });  
-  }, 1000), []);
+  const debouncedGetList = useCallback(
+    debounce(async (data) => {
+      console.log('Debounced API Call:', data);
+      const resp = await fetchStateOptions(data);
+      setResponse({ result: resp?.result });
+    }, 1000),
+    []
+  );
 
   const SubmitaFunction = async (formData: any) => {
     setPrefilledFormData(formData);
@@ -80,7 +91,6 @@ const State = () => {
   const searchData = async (formData = [], newPage) => {
     const { sortBy, ...restFormData } = formData;
 
-   
     const filters = {
       // role: 'Instructor',
       status: [Status.ACTIVE],
@@ -92,10 +102,7 @@ const State = () => {
       }, {} as Record<string, any>),
     };
 
-    const sort = [
-      "state_name",
-      sortBy ? sortBy:"asc"
-    ];
+    const sort = ['village_name', sortBy ? sortBy : 'asc'];
     let limit = pageLimit;
     let offset = newPage * limit;
     let pageNumber = newPage;
@@ -109,7 +116,14 @@ const State = () => {
       limit,
       offset,
       sort,
-      fieldName: "state",
+      fieldName: 'village',
+      controllingfieldfk: formData.state
+        ? formData.district
+          ? formData.block
+            ? formData.block
+            : formData.district
+          : formData.state
+        : '',
       optionName: formData.firstName,
     };
 
@@ -117,30 +131,27 @@ const State = () => {
       debouncedGetList(data);
     } else {
       const resp = await fetchStateOptions(data);
+      // console.log('totalCount', result?.totalCount);
+      // console.log('userDetails', result?.getUserDetails);
       setResponse({ result: resp?.result });
+      console.log('Immediate API Call:', resp);
     }
   };
 
   // Define table columns
   const columns = [
     {
-      keys: ['state_name'],
-      label: 'State',
-      render: (row) => row.state_name,
-    },
-    {
-      keys: ['state_code'],
-      label: 'Code',
-      render: (row) => row.state_code
+      keys: ['village_name'],
+      label: 'Village',
+      render: (row) => row.village_name,
     },
     {
       keys: ['is_active'],
       label: 'Status',
-      render: (row) => row.is_active === 1 ? "Active" : "Inactive",
-      getStyle: (row) => ({ color: row.is_active === 1 ? "green" : "red" })
-    }
+      render: (row) => (row.is_active === 1 ? 'Active' : 'Inactive'),
+      getStyle: (row) => ({ color: row.is_active === 1 ? 'green' : 'red' }),
+    },
   ];
-
 
   // Pagination handlers
   const handlePageChange = (newPage) => {
@@ -182,8 +193,8 @@ const State = () => {
     }
 
     return result;
-  } 
-  
+  }
+
   return (
     <>
       <Box display={'flex'} flexDirection={'column'} gap={2}>
@@ -197,7 +208,7 @@ const State = () => {
               uiSchema={updatedUiSchema}
               SubmitaFunction={SubmitaFunction}
               isCallSubmitInHandle={true}
-              prefilledFormData={prefilledFormData || {}}
+              prefilledFormData={prefilledFormData}
             />
           )
         )}
@@ -224,7 +235,7 @@ const State = () => {
             height="20vh"
           >
             <Typography marginTop="10px" textAlign={'center'}>
-                {t('COMMON.NO_STATE_FOUND')}
+              {t('COMMON.NO_VILLAGE_FOUND')}
             </Typography>
           </Box>
         )}
@@ -240,4 +251,4 @@ export async function getStaticProps({ locale }: any) {
   };
 }
 
-export default State;
+export default Village;

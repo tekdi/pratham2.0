@@ -1,4 +1,4 @@
-export const MentorLeadSearchSchema = {
+export const MasterBlockSchema = {
   type: 'object',
   properties: {
     state: {
@@ -42,7 +42,7 @@ export const MentorLeadSearchSchema = {
     },
     firstName: {
       type: 'string',
-      title: 'Search Key',
+      title: 'Search Block',
       // description: 'Search for a specific user or entity',
     },
     sortBy: {
@@ -51,17 +51,11 @@ export const MentorLeadSearchSchema = {
       enum: ['asc', 'desc'],
       enumNames: ['A-Z', 'Z-A'],
     },
-    status: {
-      type: 'string',
-      title: 'Status',
-      enum: ['active', 'archived'],
-      enumNames: ['Active', 'Archived'],
-    },
   },
 };
 
-export const MentorLeadSearchUISchema = {
-  'ui:order': ['state', 'district', 'firstName', 'sortBy', 'status'],
+export const MasterBlocksUISchema = {
+  'ui:order': ['firstName', 'sortBy'],
 
   state: {
     'ui:widget': 'select',
@@ -76,10 +70,6 @@ export const MentorLeadSearchUISchema = {
   },
 
   sortBy: {
-    'ui:widget': 'select',
-  },
-
-  status: {
     'ui:widget': 'select',
   },
 };

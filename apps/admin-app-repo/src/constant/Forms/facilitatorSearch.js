@@ -1,4 +1,4 @@
-export const MentorSearchSchema = {
+export const facilitatorSearchSchema = {
   type: 'object',
   properties: {
     state: {
@@ -86,7 +86,7 @@ export const MentorSearchSchema = {
     },
     firstName: {
       type: 'string',
-      title: 'Search Key',
+      title: 'Search Facilitator',
       // description: 'Search for a specific user or entity',
     },
     sortBy: {
@@ -104,7 +104,7 @@ export const MentorSearchSchema = {
   },
 };
 
-export const MentorSearchUISchema = {
+export const facilitatorSearchUISchema = {
   'ui:order': [
     'state',
     'district',

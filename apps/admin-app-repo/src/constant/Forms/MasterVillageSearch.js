@@ -1,4 +1,4 @@
-export const MentorSearchSchema = {
+export const MasterVillageSchema = {
   type: 'object',
   properties: {
     state: {
@@ -62,31 +62,9 @@ export const MentorSearchSchema = {
         dependent: 'district',
       },
     },
-    village: {
-      type: 'string',
-      title: 'Village',
-      enum: ['Select'],
-      enumNames: ['Select'],
-      api: {
-        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
-        method: 'POST',
-        payload: {
-          fieldName: 'village',
-          controllingfieldfk: '**',
-          sort: ['village_name', 'asc'],
-        },
-        options: {
-          optionObj: 'result.values',
-          label: 'label',
-          value: 'value',
-        },
-        callType: 'dependent',
-        dependent: 'block',
-      },
-    },
     firstName: {
       type: 'string',
-      title: 'Search Key',
+      title: 'Search Village',
       // description: 'Search for a specific user or entity',
     },
     sortBy: {
@@ -95,25 +73,11 @@ export const MentorSearchSchema = {
       enum: ['asc', 'desc'],
       enumNames: ['A-Z', 'Z-A'],
     },
-    status: {
-      type: 'string',
-      title: 'Status',
-      enum: ['active', 'archived'],
-      enumNames: ['Active', 'Archived'],
-    },
   },
 };
 
-export const MentorSearchUISchema = {
-  'ui:order': [
-    'state',
-    'district',
-    'block',
-    'village',
-    'firstName',
-    'sortBy',
-    'status',
-  ],
+export const MasterVillageUISchema = {
+  'ui:order': ['firstName', 'sortBy'],
 
   state: {
     'ui:widget': 'select',
@@ -126,20 +90,11 @@ export const MentorSearchUISchema = {
   block: {
     'ui:widget': 'select',
   },
-
-  village: {
-    'ui:widget': 'select',
-  },
-
   firstName: {
     'ui:widget': 'text',
   },
 
   sortBy: {
-    'ui:widget': 'select',
-  },
-
-  status: {
     'ui:widget': 'select',
   },
 };

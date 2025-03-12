@@ -154,7 +154,7 @@ const PaginatedTable = ({
         <Table>
           <TableHead>
             <TableRow>
-              {columns.map((col) => (
+              {columns?.map((col) => (
                 <TableCell key={col.key || col.keys?.join('-')}>
                   {col.label}
                 </TableCell>
@@ -163,9 +163,9 @@ const PaginatedTable = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.map((row, index) => (
+            {data && data?.map((row, index) => (
               <TableRow key={index}>
-                {columns.map((col) => (
+                {columns?.map((col) => (
                   <TableCell key={col.key || col.keys?.join('-')}>
                     {/* ✅ Keep custom render logic if provided */}
                     {col.render
