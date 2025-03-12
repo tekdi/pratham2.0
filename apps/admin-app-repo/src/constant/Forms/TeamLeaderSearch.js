@@ -144,11 +144,19 @@ export const TeamLeaderSearchUISchema = {
   ],
 
   state: {
-    'ui:widget': 'select',
+    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:options': {
+      multiple: true,
+      uniqueItems: true,
+    },
   },
 
   district: {
-    'ui:widget': 'select',
+    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:options': {
+      multiple: true,
+      uniqueItems: true,
+    },
   },
 
   firstName: {
