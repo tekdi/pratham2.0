@@ -9,6 +9,10 @@ import CustomObjectFieldTemplate from './CustomObjectFieldTemplate';
 import CustomFieldTemplate from './CustomFieldTemplate';
 import { TextField, Container, Typography } from '@mui/material';
 import { useTranslation } from 'next-i18next';
+import _ from 'lodash'; // Lodash for deep comparison
+import CustomMultiSelectWidget from './RJSFWidget/CustomMultiSelectWidget';
+import CustomCheckboxWidget from './RJSFWidget/CustomCheckboxWidget';
+
 const DynamicForm = ({
   schema,
   uiSchema,
@@ -29,6 +33,11 @@ const DynamicForm = ({
   const [isInitialCompleted, setIsInitialCompleted] = useState(false);
   const [hideAndSkipFields, setHideAndSkipFields] = useState({});
   const [isRenderCompleted, setIsRenderCompleted] = useState(false);
+
+  const widgets = {
+    CustomMultiSelectWidget,
+    CustomCheckboxWidget,
+  };
 
   useEffect(() => {
     if (isInitialCompleted === true) {
@@ -65,8 +74,8 @@ const DynamicForm = ({
     }
     const extractedSkipAndHide = extractSkipAndHide(schema);
     setHideAndSkipFields(extractedSkipAndHide);
-    console.log('extractedSkipAndHide', extractedSkipAndHide);
-    console.log('formUiSchema', uiSchema);
+    // console.log('extractedSkipAndHide', extractedSkipAndHide);
+    // console.log('formUiSchema', uiSchema);
   }, [schema]);
 
   const prevFormData = useRef({});
@@ -76,7 +85,7 @@ const DynamicForm = ({
       const initialApis = extractApiProperties(schema, 'initial');
       const dependentApis = extractApiProperties(schema, 'dependent');
       setDependentSchema(dependentApis);
-      // console.log('!!!', initialApis);
+      // // console.log('!!!', initialApis);
       try {
         const apiRequests = initialApis.map((field) => {
           const { api } = field;
@@ -93,24 +102,39 @@ const DynamicForm = ({
         });
 
         const responses = await Promise.all(apiRequests);
-        console.log('API Responses:', responses);
+        // console.log('API Responses:', responses);
         // Update schema dynamically
         setFormSchema((prevSchema) => {
           const updatedProperties = { ...prevSchema.properties };
           responses.forEach(({ fieldKey, data }) => {
-            // console.log('Data:', data);
-            // console.log('fieldKey:', fieldKey);
+            // // console.log('Data:', data);
+            // // console.log('fieldKey:', fieldKey);
             let label = prevSchema.properties[fieldKey].api.options.label;
             let value = prevSchema.properties[fieldKey].api.options.value;
-            updatedProperties[fieldKey] = {
-              ...updatedProperties[fieldKey],
-              enum: data
-                ? data.map((item) => item?.[value].toString())
-                : ['Select'],
-              enumNames: data
-                ? data.map((item) => item?.[label].toString())
-                : ['Select'],
-            };
+            if (updatedProperties[fieldKey]?.isMultiSelect === true) {
+              updatedProperties[fieldKey] = {
+                ...updatedProperties[fieldKey],
+                items: {
+                  type: 'string',
+                  enum: data
+                    ? data.map((item) => item?.[value].toString())
+                    : [],
+                  enumNames: data
+                    ? data.map((item) => item?.[label].toString())
+                    : [],
+                },
+              };
+            } else {
+              updatedProperties[fieldKey] = {
+                ...updatedProperties[fieldKey],
+                enum: data
+                  ? data.map((item) => item?.[value].toString())
+                  : ['Select'],
+                enumNames: data
+                  ? data.map((item) => item?.[label].toString())
+                  : ['Select'],
+              };
+            }
           });
           return { ...prevSchema, properties: updatedProperties };
         });
@@ -122,8 +146,8 @@ const DynamicForm = ({
     };
 
     const getNestedValue = (obj, path) => {
-      // console.log("@@@@", obj)
-      // console.log("path", path)
+      // // console.log("@@@@", obj)
+      // // console.log("path", path)
       if (path === '') {
         return obj;
       } else {
@@ -134,7 +158,7 @@ const DynamicForm = ({
     // Call the function
     fetchApiData(schema);
 
-    console.log('formSchema !!!!!', formSchema);
+    // console.log('formSchema !!!!!', formSchema);
     //replace title with language constant
     const updateSchemaTitles = (schema, t) => {
       if (!schema || typeof schema !== 'object') return schema;
@@ -162,7 +186,7 @@ const DynamicForm = ({
     setFormSchema(translatedSchema);
   }, []);
 
-  // console.log('schema', schema)
+  // // console.log('schema', schema)
   const extractApiProperties = (schema, callType) => {
     return Object.entries(schema.properties)
       .filter(([_, value]) => value.api && value.api.callType === callType)
@@ -171,17 +195,17 @@ const DynamicForm = ({
 
   const renderPrefilledForm = () => {
     const temp_prefilled_form = { ...prefilledFormData };
-    console.log('temp', temp_prefilled_form);
+    // console.log('temp', temp_prefilled_form);
     const dependentApis = extractApiProperties(schema, 'dependent');
     const initialApis = extractApiProperties(schema, 'initial');
-    // console.log('initialApis', initialApis);
-    console.log('dependentFields', dependentApis);
+    // // console.log('initialApis', initialApis);
+    // console.log('dependentFields', dependentApis);
     if (dependentApis.length > 0 && initialApis.length > 0) {
       let initialKeys = initialApis.map((item) => item.key);
       let dependentKeys = dependentApis.map((item) => item.key);
       dependentKeys = [...initialKeys, ...dependentKeys];
-      console.log('dependentKeys', dependentKeys);
-      console.log('prefilledFormData', temp_prefilled_form);
+      // console.log('dependentKeys', dependentKeys);
+      // console.log('prefilledFormData', temp_prefilled_form);
       const removeDependentKeys = (formData, keysToRemove) => {
         const updatedData = { ...formData };
         keysToRemove.forEach((key) => delete updatedData[key]);
@@ -191,7 +215,7 @@ const DynamicForm = ({
         temp_prefilled_form,
         dependentKeys
       );
-      // console.log('updatedFormData', updatedFormData);
+      // // console.log('updatedFormData', updatedFormData);
       setFormData(updatedFormData);
 
       //prefill other dependent keys
@@ -207,9 +231,9 @@ const DynamicForm = ({
         temp_prefilled_form,
         dependentKeys
       );
-      console.log('filteredFormData', filteredFormData);
+      // console.log('filteredFormData', filteredFormData);
       const filteredFormDataKey = Object.keys(filteredFormData);
-      console.log('filteredFormDataKey', filteredFormDataKey);
+      // console.log('filteredFormDataKey', filteredFormDataKey);
       let filterDependentApis = [];
       for (let i = 0; i < filteredFormDataKey.length; i++) {
         filterDependentApis.push({
@@ -217,7 +241,7 @@ const DynamicForm = ({
           data: schema.properties[filteredFormDataKey[i]],
         });
       }
-      console.log('filterDependentApis', filterDependentApis);
+      // console.log('filterDependentApis', filterDependentApis);
       //dependent calls
       const workingSchema = filterDependentApis;
 
@@ -233,21 +257,26 @@ const DynamicForm = ({
         // Filter only the dependent APIs based on the changed field
         const dependentApis = workingSchema;
         try {
-          console.log('dependentApis dependentApis', dependentApis);
+          // console.log('dependentApis dependentApis', dependentApis);
           const apiRequests = dependentApis.map((realField) => {
             const field = realField?.data;
             const { api } = realField?.data;
             const key = realField?.key;
 
-            console.log('API field:', field);
+            // console.log('API field:', field);
 
             const changedField = field?.api?.dependent;
             const changedFieldValue = temp_prefilled_form[changedField];
-
-            // Replace "**" in the payload with changedFieldValue
-            const updatedPayload = JSON.parse(
-              JSON.stringify(api.payload).replace(/\*\*/g, changedFieldValue)
+            let isMultiSelect = field?.isMultiSelect;
+            let updatedPayload = replaceControllingField(
+              api.payload,
+              changedFieldValue,
+              isMultiSelect
             );
+            // Replace "**" in the payload with changedFieldValue
+            // const updatedPayload = JSON.parse(
+            //   JSON.stringify(api.payload).replace(/\*\*/g, changedFieldValue)
+            // );
 
             const config = {
               method: api.method,
@@ -259,12 +288,12 @@ const DynamicForm = ({
             if (key) {
               const changedField = key;
 
-              // console.log(`Field changed: ${changedField}, New Value: ${formData[changedField]}`);
-              // console.log('dependentSchema', dependentSchema);
+              // // console.log(`Field changed: ${changedField}, New Value: ${formData[changedField]}`);
+              // // console.log('dependentSchema', dependentSchema);
               const workingSchema1 = dependentSchema?.filter(
                 (item) => item.api && item.api.dependent === changedField
               );
-              // console.log('workingSchema1', workingSchema1);
+              // // console.log('workingSchema1', workingSchema1);
               if (workingSchema1.length > 0) {
                 const changedFieldValue = temp_prefilled_form[changedField];
 
@@ -285,13 +314,19 @@ const DynamicForm = ({
                     const apiRequests = dependentApis.map((field) => {
                       const { api, key } = field;
 
-                      // Replace "**" in the payload with changedFieldValue
-                      const updatedPayload = JSON.parse(
-                        JSON.stringify(api.payload).replace(
-                          /\*\*/g,
-                          changedFieldValue
-                        )
+                      let isMultiSelect = field?.isMultiSelect;
+                      let updatedPayload = replaceControllingField(
+                        api.payload,
+                        changedFieldValue,
+                        isMultiSelect
                       );
+                      // Replace "**" in the payload with changedFieldValue
+                      // const updatedPayload = JSON.parse(
+                      //   JSON.stringify(api.payload).replace(
+                      //     /\*\*/g,
+                      //     changedFieldValue
+                      //   )
+                      // );
 
                       const config = {
                         method: api.method,
@@ -300,37 +335,87 @@ const DynamicForm = ({
                         ...(api.method === 'POST' && { data: updatedPayload }),
                       };
 
-                      return axios(config).then((response) => ({
-                        fieldKey: field.key,
-                        data: getNestedValue(
-                          response.data,
-                          api.options.optionObj
-                        ),
-                      }));
+                      return axios(config)
+                        .then((response) => ({
+                          fieldKey: field.key,
+                          data: getNestedValue(
+                            response.data,
+                            api.options.optionObj
+                          ),
+                        }))
+                        .catch((error) => ({
+                          error: error,
+                          fieldKey: field.key,
+                        }));
                     });
 
                     const responses = await Promise.all(apiRequests);
-                    // console.log('API Responses:', responses);
-                    setFormSchema((prevSchema) => {
-                      const updatedProperties = { ...prevSchema.properties };
-                      responses.forEach(({ fieldKey, data }) => {
-                        // console.log('Data:', data);
-                        // console.log('fieldKey:', fieldKey);
-                        let label =
-                          prevSchema.properties[fieldKey].api.options.label;
-                        let value =
-                          prevSchema.properties[fieldKey].api.options.value;
-                        updatedProperties[fieldKey] = {
-                          ...updatedProperties[fieldKey],
-                          enum: data.map((item) => item?.[value].toString()),
-                          enumNames: data.map((item) =>
-                            item?.[label].toString()
-                          ),
-                        };
-                      });
+                    // // console.log('API Responses:', responses);
+                    if (!responses[0]?.error) {
+                      setFormSchema((prevSchema) => {
+                        const updatedProperties = { ...prevSchema.properties };
+                        responses.forEach(({ fieldKey, data }) => {
+                          // // console.log('Data:', data);
+                          // // console.log('fieldKey:', fieldKey);
+                          let label =
+                            prevSchema.properties[fieldKey].api.options.label;
+                          let value =
+                            prevSchema.properties[fieldKey].api.options.value;
+                          if (
+                            updatedProperties[fieldKey]?.isMultiSelect === true
+                          ) {
+                            updatedProperties[fieldKey] = {
+                              ...updatedProperties[fieldKey],
+                              items: {
+                                type: 'string',
+                                enum: data.map((item) =>
+                                  item?.[value].toString()
+                                ),
+                                enumNames: data.map((item) =>
+                                  item?.[label].toString()
+                                ),
+                              },
+                            };
+                          } else {
+                            updatedProperties[fieldKey] = {
+                              ...updatedProperties[fieldKey],
+                              enum: data.map((item) =>
+                                item?.[value].toString()
+                              ),
+                              enumNames: data.map((item) =>
+                                item?.[label].toString()
+                              ),
+                            };
+                          }
+                        });
 
-                      return { ...prevSchema, properties: updatedProperties };
-                    });
+                        return { ...prevSchema, properties: updatedProperties };
+                      });
+                    } else {
+                      setFormSchema((prevSchema) => {
+                        const updatedProperties = { ...prevSchema.properties };
+                        let fieldKey = responses[0]?.fieldKey;
+                        if (
+                          updatedProperties[fieldKey]?.isMultiSelect === true
+                        ) {
+                          updatedProperties[fieldKey] = {
+                            ...updatedProperties[fieldKey],
+                            items: {
+                              type: 'string',
+                              enum: [],
+                              enumNames: [],
+                            },
+                          };
+                        } else {
+                          updatedProperties[fieldKey] = {
+                            ...updatedProperties[fieldKey],
+                            enum: ['Select'],
+                            enumNames: ['Select'],
+                          };
+                        }
+                        return { ...prevSchema, properties: updatedProperties };
+                      });
+                    }
                   } catch (error) {
                     console.error('Error fetching dependent APIs:', error);
                   }
@@ -348,19 +433,30 @@ const DynamicForm = ({
           });
 
           const responses = await Promise.all(apiRequests);
-          console.log('API Responses:', responses);
+          // console.log('API Responses:', responses);
           setFormSchema((prevSchema) => {
             const updatedProperties = { ...prevSchema.properties };
             responses.forEach(({ fieldKey, data }) => {
-              console.log('Data:', data);
-              console.log('fieldKey:', fieldKey);
+              // console.log('Data:', data);
+              // console.log('fieldKey:', fieldKey);
               let label = prevSchema.properties[fieldKey].api.options.label;
               let value = prevSchema.properties[fieldKey].api.options.value;
-              updatedProperties[fieldKey] = {
-                ...updatedProperties[fieldKey],
-                enum: data.map((item) => item?.[value].toString()),
-                enumNames: data.map((item) => item?.[label].toString()),
-              };
+              if (updatedProperties[fieldKey]?.isMultiSelect === true) {
+                updatedProperties[fieldKey] = {
+                  ...updatedProperties[fieldKey],
+                  items: {
+                    type: 'string',
+                    enum: data.map((item) => item?.[value].toString()),
+                    enumNames: data.map((item) => item?.[label].toString()),
+                  },
+                };
+              } else {
+                updatedProperties[fieldKey] = {
+                  ...updatedProperties[fieldKey],
+                  enum: data.map((item) => item?.[value].toString()),
+                  enumNames: data.map((item) => item?.[label].toString()),
+                };
+              }
             });
 
             return { ...prevSchema, properties: updatedProperties };
@@ -389,7 +485,7 @@ const DynamicForm = ({
       }
 
       const skipKeys = getSkipKeys(hideAndSkipFields, temp_prefilled_form);
-      console.log('skipKeys', skipKeys);
+      // console.log('skipKeys', skipKeys);
       let updatedUISchema = formUiSchemaOriginal;
       function hideFieldsInUISchema(uiSchema, fieldsToHide) {
         const updatedUISchema = { ...uiSchema };
@@ -431,140 +527,286 @@ const DynamicForm = ({
     return dependentKeys;
   };
 
+  const hasObjectChanged = (oldObj, newObj) => {
+    const keys = new Set([...Object.keys(oldObj), ...Object.keys(newObj)]);
+
+    for (let key of keys) {
+      const oldValue = oldObj[key] || [];
+      const newValue = newObj[key] || [];
+
+      // Handle array comparison
+      if (Array.isArray(oldValue) && Array.isArray(newValue)) {
+        if (oldValue.length !== newValue.length) return true;
+        const isDifferent = oldValue.some(
+          (val, index) => val !== newValue[index]
+        );
+        if (isDifferent) return true;
+      }
+      // Handle normal value comparison
+      else if (oldValue !== newValue) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+  const replaceControllingField = (
+    payload,
+    changedFieldValue,
+    isMultiSelect
+  ) => {
+    // Clone the payload to avoid mutating original object
+    let updatedPayload = { ...payload };
+
+    // Replace ** with value based on isMultiSelect
+    updatedPayload.controllingfieldfk = isMultiSelect
+      ? changedFieldValue
+      : String(changedFieldValue);
+
+    return updatedPayload;
+  };
+
+  const getChangedField = (
+    formData: Record<string, any>,
+    prevFormData: Record<string, any>
+  ) => {
+    return Object.keys(formData).find((key) => {
+      const newValue = formData[key];
+      const oldValue = prevFormData[key];
+
+      if (Array.isArray(newValue) && Array.isArray(oldValue)) {
+        // Check if arrays have different elements (added/removed values)
+        return (
+          newValue.length !== oldValue.length ||
+          !newValue.every((val) => oldValue.includes(val))
+        );
+      } else {
+        // Check for primitive value changes
+        return newValue !== oldValue;
+      }
+    });
+  };
+
   const handleChange = ({ formData }: { formData: any }) => {
-    const changedField = Object.keys(formData).find(
-      (key) => formData[key] !== prevFormData.current[key]
-    );
+    // const changedField = Object.keys(formData).find(
+    //   (key) => formData[key] !== prevFormData.current[key]
+    // );
+    const changedField = getChangedField(formData, prevFormData.current);
+    // console.log('hasObjectChanged prevFormData.current', prevFormData.current);
+    console.log('hasObjectChanged formData', formData);
+    // console.log(
+    //   'hasObjectChanged hasObjectChanged(prevFormData.current, formData)',
+    //   hasObjectChanged(prevFormData.current, formData)
+    // );
+    // console.log('hasObjectChanged changedField', changedField);
 
-    if (changedField) {
-      //find out all dependent keys
-      const dependentKeyArray = getDependentKeys(schema, changedField);
-      console.log('dependent keys:', dependentKeyArray);
-      dependentKeyArray.forEach((key) => {
-        delete formData[key]; // Remove the key from formData
-      });
-      setFormSchema((prevSchema) => {
-        const updatedProperties = { ...prevSchema.properties };
-
+    if (hasObjectChanged(prevFormData.current, formData)) {
+      if (changedField) {
+        //find out all dependent keys
+        const dependentKeyArray = getDependentKeys(schema, changedField);
+        // console.log('hasObjectChanged formData', formData);
+        // console.log('hasObjectChanged dependent keys:', dependentKeyArray);
         dependentKeyArray.forEach((key) => {
-          if (updatedProperties[key]) {
-            updatedProperties[key] = {
-              ...updatedProperties[key],
-              enum: ['Select'], // Clear the enum
-              enumNames: ['Select'], // Clear the enumNames
+          delete formData[key]; // Remove the key from formData
+        });
+        // console.log('hasObjectChanged formData', formData);
+
+        setFormSchema((prevSchema) => {
+          const updatedProperties = { ...prevSchema.properties };
+
+          dependentKeyArray.forEach((key) => {
+            if (updatedProperties[key]) {
+              if (updatedProperties[key]?.isMultiSelect === true) {
+                updatedProperties[key] = {
+                  ...updatedProperties[key],
+                  items: {
+                    type: 'string',
+                    enum: [], // Clear the enum
+                    enumNames: [], // Clear the enumNames
+                  },
+                };
+              } else {
+                updatedProperties[key] = {
+                  ...updatedProperties[key],
+                  enum: ['Select'], // Clear the enum
+                  enumNames: ['Select'], // Clear the enumNames
+                };
+              }
+            }
+          });
+
+          return { ...prevSchema, properties: updatedProperties };
+        });
+
+        // // console.log(`Field changed: ${changedField}, New Value: ${formData[changedField]}`);
+        // // console.log('dependentSchema', dependentSchema);
+        const workingSchema = dependentSchema?.filter(
+          (item) => item.api && item.api.dependent === changedField
+        );
+        // // console.log('workingSchema', workingSchema);
+        if (workingSchema.length > 0) {
+          const changedFieldValue = formData[changedField];
+
+          const getNestedValue = (obj, path) => {
+            if (path === '') {
+              return obj;
+            } else {
+              return path.split('.').reduce((acc, key) => acc && acc[key], obj);
+            }
+          };
+
+          const fetchDependentApis = async () => {
+            // Filter only the dependent APIs based on the changed field
+            const dependentApis = workingSchema;
+            try {
+              const apiRequests = dependentApis.map((field) => {
+                const { api, key } = field;
+                let isMultiSelect = field?.isMultiSelect;
+                let updatedPayload = replaceControllingField(
+                  api.payload,
+                  changedFieldValue,
+                  isMultiSelect
+                );
+                // console.log('updatedPayload', updatedPayload);
+
+                // let changedFieldValuePayload = changedFieldValue;
+                // if (field?.isMultiSelect == true) {
+                //   // changedFieldValuePayload
+                // }
+                // // console.log(
+                //   'field multiselect changedFieldValuePayload',
+                //   changedFieldValuePayload
+                // );
+                // // console.log('field multiselect api.payload', api.payload);
+
+                // // Replace "**" in the payload with changedFieldValue
+                // const updatedPayload = JSON.parse(
+                //   JSON.stringify(api.payload).replace(
+                //     /\*\*/g,
+                //     changedFieldValuePayload
+                //   )
+                // );
+
+                const config = {
+                  method: api.method,
+                  url: api.url,
+                  headers: { 'Content-Type': 'application/json' },
+                  ...(api.method === 'POST' && { data: updatedPayload }),
+                };
+
+                return axios(config)
+                  .then((response) => ({
+                    fieldKey: field.key,
+                    data: getNestedValue(response.data, api.options.optionObj),
+                  }))
+                  .catch((error) => ({ error: error, fieldKey: field.key }));
+              });
+
+              const responses = await Promise.all(apiRequests);
+              // console.log('State API Responses:', responses);
+              if (!responses[0]?.error) {
+                setFormSchema((prevSchema) => {
+                  const updatedProperties = { ...prevSchema.properties };
+                  responses.forEach(({ fieldKey, data }) => {
+                    // // console.log('Data:', data);
+                    // // console.log('fieldKey:', fieldKey);
+                    let label =
+                      prevSchema.properties[fieldKey].api.options.label;
+                    let value =
+                      prevSchema.properties[fieldKey].api.options.value;
+                    if (updatedProperties[fieldKey]?.isMultiSelect === true) {
+                      updatedProperties[fieldKey] = {
+                        ...updatedProperties[fieldKey],
+                        items: {
+                          type: 'string',
+                          enum: data.map((item) => item?.[value].toString()),
+                          enumNames: data.map((item) =>
+                            item?.[label].toString()
+                          ),
+                        },
+                      };
+                    } else {
+                      updatedProperties[fieldKey] = {
+                        ...updatedProperties[fieldKey],
+                        enum: data.map((item) => item?.[value].toString()),
+                        enumNames: data.map((item) => item?.[label].toString()),
+                      };
+                    }
+                  });
+
+                  return { ...prevSchema, properties: updatedProperties };
+                });
+              } else {
+                setFormSchema((prevSchema) => {
+                  const updatedProperties = { ...prevSchema.properties };
+                  let fieldKey = responses[0]?.fieldKey;
+                  if (updatedProperties[fieldKey]?.isMultiSelect === true) {
+                    updatedProperties[fieldKey] = {
+                      ...updatedProperties[fieldKey],
+                      items: {
+                        type: 'string',
+                        enum: [],
+                        enumNames: [],
+                      },
+                    };
+                  } else {
+                    updatedProperties[fieldKey] = {
+                      ...updatedProperties[fieldKey],
+                      enum: ['Select'],
+                      enumNames: ['Select'],
+                    };
+                  }
+                  return { ...prevSchema, properties: updatedProperties };
+                });
+              }
+            } catch (error) {
+              console.error('Error fetching dependent APIs:', error);
+            }
+          };
+
+          // Call the function
+          fetchDependentApis();
+        }
+      }
+
+      prevFormData.current = formData;
+      // console.log('Form data changed:', formData);
+      setFormData(formData);
+
+      function getSkipKeys(skipHideObject, formData) {
+        let skipKeys = [];
+
+        Object.keys(skipHideObject).forEach((key) => {
+          if (formData[key] && skipHideObject[key][formData[key]]) {
+            skipKeys = skipKeys.concat(skipHideObject[key][formData[key]]);
+          }
+        });
+
+        return skipKeys;
+      }
+
+      const skipKeys = getSkipKeys(hideAndSkipFields, formData);
+      // console.log('skipKeys', skipKeys);
+      let updatedUISchema = formUiSchemaOriginal;
+      function hideFieldsInUISchema(uiSchema, fieldsToHide) {
+        const updatedUISchema = { ...uiSchema };
+
+        fieldsToHide.forEach((field) => {
+          if (updatedUISchema[field]) {
+            updatedUISchema[field] = {
+              ...updatedUISchema[field],
+              originalWidget: updatedUISchema[field]['ui:widget'], // Store original widget type
+              'ui:widget': 'hidden',
             };
           }
         });
 
-        return { ...prevSchema, properties: updatedProperties };
-      });
-
-      // console.log(`Field changed: ${changedField}, New Value: ${formData[changedField]}`);
-      // console.log('dependentSchema', dependentSchema);
-      const workingSchema = dependentSchema?.filter(
-        (item) => item.api && item.api.dependent === changedField
-      );
-      // console.log('workingSchema', workingSchema);
-      if (workingSchema.length > 0) {
-        const changedFieldValue = formData[changedField];
-
-        const getNestedValue = (obj, path) => {
-          if (path === '') {
-            return obj;
-          } else {
-            return path.split('.').reduce((acc, key) => acc && acc[key], obj);
-          }
-        };
-
-        const fetchDependentApis = async () => {
-          // Filter only the dependent APIs based on the changed field
-          const dependentApis = workingSchema;
-          try {
-            const apiRequests = dependentApis.map((field) => {
-              const { api, key } = field;
-
-              // Replace "**" in the payload with changedFieldValue
-              const updatedPayload = JSON.parse(
-                JSON.stringify(api.payload).replace(/\*\*/g, changedFieldValue)
-              );
-
-              const config = {
-                method: api.method,
-                url: api.url,
-                headers: { 'Content-Type': 'application/json' },
-                ...(api.method === 'POST' && { data: updatedPayload }),
-              };
-
-              return axios(config).then((response) => ({
-                fieldKey: field.key,
-                data: getNestedValue(response.data, api.options.optionObj),
-              }));
-            });
-
-            const responses = await Promise.all(apiRequests);
-            // console.log('API Responses:', responses);
-            setFormSchema((prevSchema) => {
-              const updatedProperties = { ...prevSchema.properties };
-              responses.forEach(({ fieldKey, data }) => {
-                // console.log('Data:', data);
-                // console.log('fieldKey:', fieldKey);
-                let label = prevSchema.properties[fieldKey].api.options.label;
-                let value = prevSchema.properties[fieldKey].api.options.value;
-                updatedProperties[fieldKey] = {
-                  ...updatedProperties[fieldKey],
-                  enum: data.map((item) => item?.[value].toString()),
-                  enumNames: data.map((item) => item?.[label].toString()),
-                };
-              });
-
-              return { ...prevSchema, properties: updatedProperties };
-            });
-          } catch (error) {
-            console.error('Error fetching dependent APIs:', error);
-          }
-        };
-
-        // Call the function
-        fetchDependentApis();
+        return updatedUISchema;
       }
+      const hiddenUISchema = hideFieldsInUISchema(updatedUISchema, skipKeys);
+      setFormUiSchema(hiddenUISchema);
     }
-
-    prevFormData.current = formData;
-    console.log('Form data changed:', formData);
-    setFormData(formData);
-
-    function getSkipKeys(skipHideObject, formData) {
-      let skipKeys = [];
-
-      Object.keys(skipHideObject).forEach((key) => {
-        if (formData[key] && skipHideObject[key][formData[key]]) {
-          skipKeys = skipKeys.concat(skipHideObject[key][formData[key]]);
-        }
-      });
-
-      return skipKeys;
-    }
-
-    const skipKeys = getSkipKeys(hideAndSkipFields, formData);
-    console.log('skipKeys', skipKeys);
-    let updatedUISchema = formUiSchemaOriginal;
-    function hideFieldsInUISchema(uiSchema, fieldsToHide) {
-      const updatedUISchema = { ...uiSchema };
-
-      fieldsToHide.forEach((field) => {
-        if (updatedUISchema[field]) {
-          updatedUISchema[field] = {
-            ...updatedUISchema[field],
-            originalWidget: updatedUISchema[field]['ui:widget'], // Store original widget type
-            'ui:widget': 'hidden',
-          };
-        }
-      });
-
-      return updatedUISchema;
-    }
-    const hiddenUISchema = hideFieldsInUISchema(updatedUISchema, skipKeys);
-    setFormUiSchema(hiddenUISchema);
   };
 
   const handleSubmit = ({ formData }: { formData: any }) => {
@@ -583,7 +825,7 @@ const DynamicForm = ({
       return updatedFormData;
     }
     const filteredData = filterFormData(hideAndSkipFields, formData);
-    console.log('formData', formData);
+    // console.log('formData', formData);
     //step-2 : Validate the form data
     function transformFormData(
       formData: Record<string, any>,
@@ -625,14 +867,14 @@ const DynamicForm = ({
       extraFields
     );
 
-    // console.log('formSchema', transformedFormData);
-    console.log('Form Data Submitted:', filteredData);
-    console.log('formattedFormData', transformedFormData);
+    // // console.log('formSchema', transformedFormData);
+    // console.log('Form Data Submitted:', filteredData);
+    // console.log('formattedFormData', transformedFormData);
     if (!isCallSubmitInHandle) {
       FormSubmitFunction(filteredData, transformedFormData);
     }
   };
-  console.log(formSchema);
+  // console.log(formSchema);
 
   return (
     <>
@@ -648,6 +890,7 @@ const DynamicForm = ({
           showErrorList={false} // Hides the error list card at the top
           // liveValidate={submitted} // Only validate on submit or typing
           // onChange={() => setSubmitted(true)} // Show validation when user starts typing
+          widgets={widgets}
         />
       ) : (
         <Grid container spacing={2}>
@@ -673,6 +916,7 @@ const DynamicForm = ({
                 // {...(isCallSubmitInHandle
                 //   ? { submitButtonProps: { style: { display: 'none' } } }
                 //   : {})}
+                widgets={widgets}
               >
                 {!isCallSubmitInHandle ? null : (
                   <button type="submit" style={{ display: 'none' }}>

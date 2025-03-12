@@ -147,3 +147,13 @@ return response;
     }
   };
   
+  export const createUser = async (userData: any): Promise<any> => {
+    const apiUrl: string = API_ENDPOINTS.accountCreate
+    try {
+      const response = await post(apiUrl, userData);
+      return response?.data?.result;
+    } catch (error) {
+      console.error("error in getting cohort list", error);
+      throw error;
+    }
+  };

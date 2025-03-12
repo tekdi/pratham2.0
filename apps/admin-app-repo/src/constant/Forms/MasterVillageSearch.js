@@ -2,10 +2,13 @@ export const MasterVillageSchema = {
   type: 'object',
   properties: {
     state: {
-      type: 'string',
+      type: 'array',
       title: 'State',
-      enum: ['Select'],
-      enumNames: ['Select'],
+      items: {
+        type: 'string',
+        enum: ['Select'],
+        enumNames: ['Select'],
+      },
       api: {
         url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
         method: 'POST',
@@ -17,12 +20,19 @@ export const MasterVillageSchema = {
         },
         callType: 'initial',
       },
+      //for multiselect
+      uniqueItems: true,
+      isMultiSelect: true,
+      maxSelections: 1000,
     },
     district: {
-      type: 'string',
+      type: 'array',
       title: 'District',
-      enum: ['Select'],
-      enumNames: ['Select'],
+      items: {
+        type: 'string',
+        enum: ['Select'],
+        enumNames: ['Select'],
+      },
       api: {
         url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
         method: 'POST',
@@ -39,12 +49,19 @@ export const MasterVillageSchema = {
         callType: 'dependent',
         dependent: 'state',
       },
+      //for multiselect
+      uniqueItems: true,
+      isMultiSelect: true,
+      maxSelections: 1000,
     },
     block: {
-      type: 'string',
+      type: 'array',
       title: 'Block',
-      enum: ['Select'],
-      enumNames: ['Select'],
+      items: {
+        type: 'string',
+        enum: ['Select'],
+        enumNames: ['Select'],
+      },
       api: {
         url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
         method: 'POST',
@@ -61,6 +78,10 @@ export const MasterVillageSchema = {
         callType: 'dependent',
         dependent: 'district',
       },
+      //for multiselect
+      uniqueItems: true,
+      isMultiSelect: true,
+      maxSelections: 1000,
     },
     firstName: {
       type: 'string',
@@ -80,15 +101,27 @@ export const MasterVillageUISchema = {
   'ui:order': ['firstName', 'sortBy'],
 
   state: {
-    'ui:widget': 'select',
+    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:options': {
+      multiple: true,
+      uniqueItems: true,
+    },
   },
 
   district: {
-    'ui:widget': 'select',
+    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:options': {
+      multiple: true,
+      uniqueItems: true,
+    },
   },
 
   block: {
-    'ui:widget': 'select',
+    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:options': {
+      multiple: true,
+      uniqueItems: true,
+    },
   },
   firstName: {
     'ui:widget': 'text',

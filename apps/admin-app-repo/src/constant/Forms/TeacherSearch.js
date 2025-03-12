@@ -2,12 +2,15 @@ export const TeacherSearchSchema = {
   type: 'object',
   properties: {
     state: {
-      type: 'string',
+      type: 'array',
       title: 'State',
-      enum: ['Select'],
-      enumNames: ['Select'],
+      items: {
+        type: 'string',
+        enum: ['Select'],
+        enumNames: ['Select'],
+      },
       api: {
-        url: 'https://dev-interface.prathamdigital.org/interface/v1/fields/options/read',
+        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
         method: 'POST',
         payload: { fieldName: 'state', sort: ['state_name', 'asc'] },
         options: {
@@ -17,14 +20,21 @@ export const TeacherSearchSchema = {
         },
         callType: 'initial',
       },
+      //for multiselect
+      uniqueItems: true,
+      isMultiSelect: true,
+      maxSelections: 1000,
     },
     district: {
-      type: 'string',
+      type: 'array',
       title: 'District',
-      enum: ['Select'],
-      enumNames: ['Select'],
+      items: {
+        type: 'string',
+        enum: ['Select'],
+        enumNames: ['Select'],
+      },
       api: {
-        url: 'https://dev-interface.prathamdigital.org/interface/v1/fields/options/read',
+        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
         method: 'POST',
         payload: {
           fieldName: 'district',
@@ -39,14 +49,21 @@ export const TeacherSearchSchema = {
         callType: 'dependent',
         dependent: 'state',
       },
+      //for multiselect
+      uniqueItems: true,
+      isMultiSelect: true,
+      maxSelections: 1000,
     },
     block: {
-      type: 'string',
+      type: 'array',
       title: 'Block',
-      enum: ['Select'],
-      enumNames: ['Select'],
+      items: {
+        type: 'string',
+        enum: ['Select'],
+        enumNames: ['Select'],
+      },
       api: {
-        url: 'https://dev-interface.prathamdigital.org/interface/v1/fields/options/read',
+        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
         method: 'POST',
         payload: {
           fieldName: 'block',
@@ -61,14 +78,21 @@ export const TeacherSearchSchema = {
         callType: 'dependent',
         dependent: 'district',
       },
+      //for multiselect
+      uniqueItems: true,
+      isMultiSelect: true,
+      maxSelections: 1000,
     },
     village: {
-      type: 'string',
+      type: 'array',
       title: 'Village',
-      enum: ['Select'],
-      enumNames: ['Select'],
+      items: {
+        type: 'string',
+        enum: ['Select'],
+        enumNames: ['Select'],
+      },
       api: {
-        url: 'https://dev-interface.prathamdigital.org/interface/v1/fields/options/read',
+        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
         method: 'POST',
         payload: {
           fieldName: 'village',
@@ -83,6 +107,10 @@ export const TeacherSearchSchema = {
         callType: 'dependent',
         dependent: 'block',
       },
+      //for multiselect
+      uniqueItems: true,
+      isMultiSelect: true,
+      maxSelections: 1000,
     },
     name: {
       type: 'string',
@@ -102,11 +130,19 @@ export const TeacherSearchUISchema = {
   'ui:order': ['state', 'district', 'block', 'village', 'searchKey', 'sortBy'],
 
   state: {
-    'ui:widget': 'select',
+    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:options': {
+      multiple: true,
+      uniqueItems: true,
+    },
   },
 
   district: {
-    'ui:widget': 'select',
+    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:options': {
+      multiple: true,
+      uniqueItems: true,
+    },
   },
 
   block: {
@@ -114,7 +150,11 @@ export const TeacherSearchUISchema = {
   },
 
   village: {
-    'ui:widget': 'select',
+    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:options': {
+      multiple: true,
+      uniqueItems: true,
+    },
   },
 
   searchKey: {
