@@ -21,17 +21,17 @@ import {
 import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import {
-  CohortSearchSchema,
-  CohortSearchUISchema,
-} from '@/constant/Forms/CohortSearch';
+  BatchSearchSchema,
+  BatchSearchUISchema,
+} from '@/constant/Forms/BatchSearch';
 import { getCohortList } from '@/services/CohortService/cohortService';
 
 //import { DynamicForm } from '@shared-lib';
 
-const Centers = () => {
+const Batch = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [schema, setSchema] = useState(CohortSearchSchema);
-  const [uiSchema, setUiSchema] = useState(CohortSearchUISchema);
+  const [schema, setSchema] = useState(BatchSearchSchema);
+  const [uiSchema, setUiSchema] = useState(BatchSearchUISchema);
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
   const [prefilledAddFormData, setPrefilledAddFormData] = useState({});
@@ -64,11 +64,11 @@ const Centers = () => {
 
       const responseForm = await fetchForm([
         {
-          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.cohort.context}&contextType=${FormContext.cohort.contextType}`,
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.batch.context}&contextType=${FormContext.batch.contextType}`,
           header: {},
         },
         {
-          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.cohort.context}&contextType=${FormContext.cohort.contextType}`,
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.batch.context}&contextType=${FormContext.batch.contextType}`,
           header: {
             tenantid: savedTenantId,
           },
@@ -97,7 +97,7 @@ const Centers = () => {
   };
 
   const searchData = async (formData: any, newPage: any) => {
-    const staticFilter = { type: CohortTypes.COHORT, status: [Status.ACTIVE] };
+    const staticFilter = { type: CohortTypes.BATCH, status: [Status.ACTIVE] };
     const { sortBy } = formData;
     const staticSort = ['name', sortBy || 'asc'];
     await searchListData(
@@ -116,21 +116,7 @@ const Centers = () => {
   // Define table columns
 
   const columns = [
-    { key: 'name', label: 'Center Name' },
-    {
-      key: 'address',
-      label: 'Address',
-      render: (row) =>
-        row.customFields.find((field) => field.label === 'ADDRESS')
-          ?.selectedValues || '-',
-    },
-    {
-      key: 'state',
-      label: 'State',
-      render: (row) =>
-        row.customFields.find((field) => field.label === 'STATE')
-          ?.selectedValues[0]?.value || '-',
-    },
+    { key: 'name', label: 'Batch' },
     {
       key: 'district',
       label: 'District',
@@ -150,6 +136,13 @@ const Centers = () => {
       label: 'Village',
       render: (row) =>
         row.customFields.find((field) => field.label === 'VILLAGE')
+          ?.selectedValues[0]?.value || '-',
+    },
+    {
+      key: 'center',
+      label: 'Center',
+      render: (row) =>
+        row.customFields.find((field) => field.label === 'CENTER')
           ?.selectedValues[0]?.value || '-',
     },
     {
@@ -257,12 +250,12 @@ const Centers = () => {
   const extraFields = {
     type: CohortTypes.COHORT,
   };
-  const successUpdateMessage = 'CENTERS.CENTER_UPDATE_SUCCESSFULLY';
-  const telemetryUpdateKey = 'center-updated-successfully';
-  const failureUpdateMessage = 'CENTERS.CENTER_UPDATE_FAILED';
-  const successCreateMessage = 'CENTERS.CENTER_CREATED';
-  const telemetryCreateKey = 'center-created-successfully';
-  const failureCreateMessage = 'CENTERS.CENTER_UPDATE_FAILED';
+  const successUpdateMessage = 'BATCH.BATCH_UPDATE_SUCCESSFULLY';
+  const telemetryUpdateKey = 'batch-updated-successfully';
+  const failureUpdateMessage = 'BATCH.BATCH_UPDATE_FAILED';
+  const successCreateMessage = 'BATCH.BATCH_CREATED_SUCCESSFULLY';
+  const telemetryCreateKey = 'batch-created-successfully';
+  const failureCreateMessage = 'BATCH.BATCH_UPDATE_FAILED';
 
   return (
     <>
@@ -300,9 +293,7 @@ const Centers = () => {
           open={openModal}
           onClose={handleCloseModal}
           showFooter={false}
-          modalTitle={
-            isEdit ? t('COMMON.UPDATE_CENTER') : t('CENTERS.NEW_CENTER')
-          }
+          modalTitle={isEdit ? t('BATCH.UPDATE_BATCH') : t('BATCH.NEW_BATCH')}
         >
           <AddEditUser
             SuccessCallback={() => {
@@ -353,7 +344,7 @@ const Centers = () => {
             height="20vh"
           >
             <Typography marginTop="10px" textAlign={'center'}>
-              {t('COMMON.NO_CENTER_FOUND')}
+              {t('BATCH.NO_BATCH_FOUND')}
             </Typography>
           </Box>
         )}
@@ -369,4 +360,4 @@ export async function getStaticProps({ locale }: any) {
   };
 }
 
-export default Centers;
+export default Batch;

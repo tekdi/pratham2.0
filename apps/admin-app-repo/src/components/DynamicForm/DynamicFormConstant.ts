@@ -11,16 +11,20 @@ export const FormContext = {
     context: 'COHORTS',
     contextType: 'COHORT',
   },
-    teamLead: {
+  batch: {
+    context: 'COHORTS',
+    contextType: 'BATCH',
+  },
+  teamLead: {
     context: 'USERS',
     contextType: 'LEAD',
   },
-  facilitator:{
+  facilitator: {
     context: 'USERS',
     contextType: 'INSTRUCTOR',
   },
-    learner:{
+  learner: {
     context: 'USERS',
     contextType: 'LEARNER',
-  }
+  },
 };
