@@ -2,10 +2,13 @@ export const MasterDistrictsSearchSchema = {
   type: 'object',
   properties: {
     state: {
-      type: 'string',
+      type: 'array',
       title: 'State',
-      enum: ['Select'],
-      enumNames: ['Select'],
+      items: {
+        type: 'string',
+        enum: ['Select'],
+        enumNames: ['Select'],
+      },
       api: {
         url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
         method: 'POST',
@@ -17,6 +20,10 @@ export const MasterDistrictsSearchSchema = {
         },
         callType: 'initial',
       },
+      //for multiselect
+      uniqueItems: true,
+      isMultiSelect: true,
+      maxSelections: 1000,
     },
     firstName: {
       type: 'string',

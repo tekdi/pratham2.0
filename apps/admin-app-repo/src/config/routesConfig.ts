@@ -14,15 +14,15 @@ export const ROLE_BASED_ROUTES = {
     [Role.CENTRAL_ADMIN]: [
       '/notification-templates/create',
       '/notification-templates/update/[identifier]',
-      '/edit-password'
+      '/edit-password',
     ],
     [Role.CCTA]: ['/subjectDetails', '/importCsv', '/edit-password'],
-    [Role.SCTA]: ['/subjectDetails', '/importCsv ' , '/edit-password'],
+    [Role.SCTA]: ['/subjectDetails', '/importCsv ', '/edit-password'],
   },
   [TenantName.YOUTHNET]: {
     [Role.ADMIN]: ['/edit-password'],
     [Role.CENTRAL_ADMIN]: ['/edit-password'],
-    [Role.CCTA]: ['/edit-password', '/subjectDetails', '/importCsv ' ,],
-    [Role.SCTA]: ['/edit-password' , '/subjectDetails', '/importCsv ' ,],
+    [Role.CCTA]: ['/edit-password', '/subjectDetails', '/importCsv '],
+    [Role.SCTA]: ['/edit-password', '/subjectDetails', '/importCsv '],
   },
 };
