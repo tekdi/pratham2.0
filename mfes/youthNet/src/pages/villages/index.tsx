@@ -55,6 +55,7 @@ import { fetchUserList } from '../../services/youthNet/Dashboard/UserServices';
 import { cohortHierarchy, Role, SortOrder, Status, VolunteerField } from '../../utils/app.constant';
 import { editEditUser } from '../../services/ProfileService';
 import { showToastMessage } from "@/components/Toastify";
+import MentorAssignment from '../../components/youthNet/MentorForm/MentorAssignment';
 
 const Index = () => {
   const { isRTL } = useDirection();
@@ -67,6 +68,8 @@ const Index = () => {
   const [searchInput, setSearchInput] = useState('');
   const [toggledUser, setToggledUser] = useState('');
   const [selectedToggledUserId, setselectedToggledUserId] = useState('');
+  const [formData, setFormData] = useState<any>();
+  const [showAssignmentScreen, setShowAssignmentScreen] = useState<boolean>(false);
 
   const [openMentorDrawer, setOpenMentorDrawer] = useState(false);
   const [toggledMentor, setToggledMentor] = useState('');
@@ -408,7 +411,10 @@ const Index = () => {
   useEffect(() => {
     setValue(YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() ? 1 : 2);
   }, []);
-
+  const FormSubmitFunction = async (formData: any, payload: any) => {
+    setFormData(formData);
+    setShowAssignmentScreen(true); 
+  };
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
     setSearchInput('')
@@ -572,6 +578,8 @@ const Index = () => {
 
   const handleOpenNew = () => {
     setAddNew(true);
+    //router.push(`/add-mentor`);
+
   };
 
   const handleNext = () => {
@@ -677,7 +685,7 @@ const Index = () => {
               />
             </Box>
 
-            {/* <Box mt={'18px'} px={'18px'} ml={'10px'}>
+             <Box mt={'18px'} px={'18px'} ml={'10px'}>
               <Button
                 sx={{
                   border: `1px solid ${theme.palette.error.contrastText}`,
@@ -697,7 +705,7 @@ const Index = () => {
               >
                 {t('COMMON.ADD_NEW')}
               </Button>
-            </Box> */}
+            </Box> 
 
             <Box>
               <Box display={'flex'} justifyContent={'space-between'}>
@@ -911,11 +919,11 @@ const Index = () => {
               onClose={onClose}
               showFooter={true}
               modalTitle={'New Mentor'}
-              handleNext={handleNext}
+              handleNext={FormSubmitFunction}
               primaryText={count === 0 ? 'Next' : 'Finish & Assign'}
               secondaryText={count === 1 ? 'Save Progress' : ''}
             >
-              {count === 0 && (
+              {/* {count === 0 && (
                 <Box>
                   <Box mt={2}>
                     <GenericForm fields={formFields} />
@@ -935,7 +943,13 @@ const Index = () => {
                     <VillageSelector />
                   </Box>
                 </Box>
-              )}
+              )} */}
+              <MentorAssignment FormSubmitFunction={FormSubmitFunction} 
+              setShowAssignmentScreen={setShowAssignmentScreen}
+              showAssignmentScreen={showAssignmentScreen}
+              formData={formData}
+              setFormData={setFormData}
+              />
             </SimpleModal>
           </>
         )}

@@ -26,6 +26,7 @@ import customTheme from '../styles/customTheme';
 import rtlPlugin from 'stylis-plugin-rtl';
 import { Box, IconButton } from '@mui/material';
 import { ToastContainer } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
 
 const ColorModeContext = React.createContext({ toggleColorMode: () => {} });
 const poppins = Poppins({
@@ -142,12 +143,13 @@ function CustomApp({ Component, pageProps }: AppProps) {
           >
             <QueryClientProvider client={client}>
               <Component {...pageProps} />
-            </QueryClientProvider>
-            <ToastContainer
+              <ToastContainer
               position="bottom-left"
               autoClose={3000}
               stacked={false}
             />
+            </QueryClientProvider>
+          
           </Box>
         </CssVarsProvider>
       </CacheProvider>
