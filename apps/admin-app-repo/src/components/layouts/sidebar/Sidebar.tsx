@@ -69,6 +69,8 @@ const Sidebar = ({
       bgcolor="#F8EFDA"
       sx={{
         background: 'linear-gradient(to bottom, white, #F8EFDA)',
+        height:"100vh",
+        overflowY:'auto'
       }}
     >
       <Box sx={{ display: 'flex', justifyContent: 'center' }}>
