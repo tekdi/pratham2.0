@@ -59,7 +59,8 @@ const SimpleModal: React.FC<SimpleModalProps> = ({
   const contentStyle = {
     flexGrow: 1,
     overflowY: 'auto',
-    padding: '0 16px 16px',
+    padding: '16px',
+    maxHeight: '60vh',
   };
 
   const buttonStyle = {
