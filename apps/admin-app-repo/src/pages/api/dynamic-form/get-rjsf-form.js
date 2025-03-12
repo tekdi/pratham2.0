@@ -116,6 +116,8 @@ function generateSchemaAndUISchema(fields) {
     }
     if (validation?.isMultiSelect) {
       schemaField.isMultiSelect = validation.isMultiSelect;
+      schemaField.uniqueItems = validation.isMultiSelect;
+      schemaField.type = 'array';
     }
     if (validation?.isRequired) {
       schemaField.isRequired = validation.isRequired;
@@ -143,16 +145,36 @@ function generateSchemaAndUISchema(fields) {
       uiSchema[name]['ui:help'] = hint;
     }
 
-    if (type === 'drop_down' || type === 'radio') {
+    if (type === 'radio') {
       schemaField.enum = options.map((opt) => opt.value);
       schemaField.enumNames = options.map((opt) => opt.label);
-      uiSchema[name] = { 'ui:widget': type === 'radio' ? 'radio' : 'select' };
-    } else if (type === 'checkbox') {
-      schemaField.type = 'array';
-      schemaField.items = { type: 'string' };
-      schemaField.enum = options?.map((opt) => opt.value) || [];
-      schemaField.enumNames = options?.map((opt) => opt.label) || [];
-      uiSchema[name] = { 'ui:widget': 'checkboxes' };
+      uiSchema[name] = {
+        'ui:widget': 'radio',
+      };
+    } else if (type === 'drop_down' || type === 'checkbox') {
+      if (schemaField?.isMultiSelect === true) {
+        schemaField.items = {
+          type: 'string',
+          enum: options.map((opt) => opt.value) || [],
+          enumNames: options.map((opt) => opt.label) || [],
+        };
+      } else {
+        schemaField.enum = options.map((opt) => opt.value) || [];
+        schemaField.enumNames = options.map((opt) => opt.label) || [];
+      }
+      uiSchema[name] = {
+        'ui:widget':
+          type === 'checkbox'
+            ? //? 'checkboxes'
+              'CustomCheckboxWidget'
+            : schemaField?.isMultiSelect === true
+            ? 'CustomMultiSelectWidget'
+            : 'select',
+        'ui:options': {
+          multiple: schemaField?.isMultiSelect === true ? true : false,
+          uniqueItems: schemaField?.isMultiSelect === true ? true : false,
+        },
+      };
     } else if (type === 'date') {
       schemaField.format = 'date';
       uiSchema[name] = { 'ui:widget': 'date' };
@@ -166,8 +188,16 @@ function generateSchemaAndUISchema(fields) {
     //Our custom RJSF field attributes
     if (api) {
       schemaField.api = api;
-      schemaField.enum = ['select'];
-      schemaField.enumNames = ['Select'];
+      if (schemaField?.isMultiSelect === true) {
+        schemaField.items = {
+          type: 'string',
+          enum: [],
+          enumNames: [],
+        };
+      } else {
+        schemaField.enum = ['select'];
+        schemaField.enumNames = ['Select'];
+      }
     }
 
     if (extra) {
