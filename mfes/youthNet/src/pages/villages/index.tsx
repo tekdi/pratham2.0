@@ -117,7 +117,7 @@ const Index = () => {
       );
       setDistrictData(transformedData);
       setSelectedDistrictValue(transformedData[0]?.id);
-      const controllingfieldfk = transformedData[0]?.id?.toString();
+      const controllingfieldfk = [transformedData[0]?.id?.toString()];
       const fieldName = 'block';
       const blockResponce = await getStateBlockDistrictList({
         controllingfieldfk,
@@ -380,7 +380,7 @@ const Index = () => {
 
           setVillageCount(villageData.length);
         } else if (selectedBlockValue !== '') {
-          const controllingfieldfk = selectedBlockValue?.toString();
+          const controllingfieldfk = [selectedBlockValue?.toString()];
           const fieldName = 'village';
           const villageResponce = await getStateBlockDistrictList({
             controllingfieldfk,
