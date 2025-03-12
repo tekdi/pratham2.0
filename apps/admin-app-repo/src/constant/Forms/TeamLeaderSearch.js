@@ -1,4 +1,4 @@
-export const MentorSearchSchema = {
+export const TeamLeaderSearchSchema = {
   type: 'object',
   properties: {
     state: {
@@ -86,7 +86,7 @@ export const MentorSearchSchema = {
     },
     firstName: {
       type: 'string',
-      title: 'Search Key',
+      title: 'Search Team Leader',
       // description: 'Search for a specific user or entity',
     },
     sortBy: {
@@ -104,7 +104,7 @@ export const MentorSearchSchema = {
   },
 };
 
-export const MentorSearchUISchema = {
+export const TeamLeaderSearchUISchema = {
   'ui:order': [
     'state',
     'district',
@@ -120,14 +120,6 @@ export const MentorSearchUISchema = {
   },
 
   district: {
-    'ui:widget': 'select',
-  },
-
-  block: {
-    'ui:widget': 'select',
-  },
-
-  village: {
     'ui:widget': 'select',
   },
 

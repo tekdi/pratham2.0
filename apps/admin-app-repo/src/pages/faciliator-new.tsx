@@ -1,17 +1,25 @@
 // @ts-nocheck
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import Form from '@rjsf/mui';
+import validator from '@rjsf/validator-ajv8';
+import axios from 'axios';
 import DynamicForm from '@/components/DynamicForm/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
 import {
-  MentorSearchSchema,
-  MentorSearchUISchema,
-} from '../constant/Forms/MentorSearch';
+  facilitatorSearchSchema,
+  facilitatorSearchUISchema,
+} from '../constant/Forms/facilitatorSearch';
 import { Status } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
-import { Box, Typography } from '@mui/material';
+import { Box, Grid, Typography } from '@mui/material';
+import { debounce } from 'lodash';
+import { Numbers } from '@mui/icons-material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { Button } from '@mui/material';
+import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import SimpleModal from '@/components/SimpleModal';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { updateCohortMemberStatus } from '@/services/CohortService/cohortService';
@@ -24,14 +32,11 @@ import {
   searchListData,
 } from '@/components/DynamicForm/DynamicFormCallback';
 import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
-import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 
-//import { DynamicForm } from '@shared-lib';
-
-const Mentor = () => {
+const Facilitator = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [schema, setSchema] = useState(MentorSearchSchema);
-  const [uiSchema, setUiSchema] = useState(MentorSearchUISchema);
+  const [schema, setSchema] = useState(facilitatorSearchSchema);
+  const [uiSchema, setUiSchema] = useState(facilitatorSearchUISchema);
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
   const [prefilledAddFormData, setPrefilledAddFormData] = useState({});
@@ -62,26 +67,22 @@ const Mentor = () => {
     const fetchData = async () => {
       const responseForm = await fetchForm([
         {
-          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.mentor.context}&contextType=${FormContext.mentor.contextType}`,
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.facilitator.context}&contextType=${FormContext.facilitator.contextType}`,
           header: {},
         },
         {
-          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.mentor.context}&contextType=${FormContext.mentor.contextType}`,
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.facilitator.context}&contextType=${FormContext.facilitator.contextType}`,
           header: {
             tenantid: localStorage.getItem('tenantId'),
           },
         },
       ]);
-      console.log('responseForm', responseForm);
       setAddSchema(responseForm?.schema);
       setAddUiSchema(responseForm?.uiSchema);
     };
-
-    setPrefilledAddFormData(initialFormData);
-    setPrefilledFormData(initialFormData);
+    fetchData();
     setRoleID(localStorage.getItem('roleId'));
     setTenantId(localStorage.getItem('tenantId'));
-    fetchData();
   }, []);
 
   const updatedUiSchema = {
@@ -96,7 +97,7 @@ const Mentor = () => {
     await searchData(formData, 0);
   };
 
-  const searchData = async (formData: any, newPage: any) => {
+  const searchData = async (formData, newPage) => {
     const staticFilter = { role: 'Instructor' };
     const { sortBy } = formData;
     const staticSort = ['firstName', sortBy || 'asc'];
@@ -117,8 +118,8 @@ const Mentor = () => {
   const columns = [
     {
       keys: ['firstName', 'middleName', 'lastName'],
-      label: 'Mentor Name',
-      render: (row: any) =>
+      label: 'Facilitator Name',
+      render: (row) =>
         `${row.firstName || ''} ${row.middleName || ''} ${
           row.lastName || ''
         }`.trim(),
@@ -126,9 +127,7 @@ const Mentor = () => {
     {
       key: 'status',
       label: 'Status',
-      getStyle: (row: any) => ({
-        color: row.status === 'active' ? 'green' : 'red',
-      }),
+      getStyle: (row) => ({ color: row.status === 'active' ? 'green' : 'red' }),
     },
     // {
     //   key: 'STATE',
@@ -186,10 +185,10 @@ const Mentor = () => {
           <Image src={editIcon} alt="" />
         </Box>
       ),
-      callback: (row: any) => {
-        console.log('row:', row);
-        console.log('AddSchema', addSchema);
-        console.log('AddUISchema', addUiSchema);
+      callback: (row) => {
+        // console.log('row:', row);
+        // console.log('AddSchema', addSchema);
+        // console.log('AddUISchema', addUiSchema);
 
         let tempFormData = extractMatchingKeys(row, addSchema);
         // console.log('tempFormData', tempFormData);
@@ -212,10 +211,10 @@ const Mentor = () => {
           }}
         >
           {' '}
-          <Image src={deleteIcon} alt="" />
+          <Image src={deleteIcon} alt="" />{' '}
         </Box>
       ),
-      callback: async (row: any) => {
+      callback: async (row) => {
         console.log('row:', row);
         // setEditableUserId(row?.userId);
         const memberStatus = Status.ARCHIVED;
@@ -235,13 +234,13 @@ const Mentor = () => {
   ];
 
   // Pagination handlers
-  const handlePageChange = (newPage: any) => {
-    console.log('Page changed to:', newPage);
+  const handlePageChange = (newPage) => {
+    // console.log('Page changed to:', newPage);
     searchData(prefilledFormData, newPage);
   };
 
-  const handleRowsPerPageChange = (newRowsPerPage: any) => {
-    console.log('Rows per page changed to:', newRowsPerPage);
+  const handleRowsPerPageChange = (newRowsPerPage) => {
+    // console.log('Rows per page changed to:', newRowsPerPage);
     setPageLimit(newRowsPerPage);
   };
 
@@ -260,18 +259,22 @@ const Mentor = () => {
         roleId: roleId,
       },
     ],
-    username: 'youthnetmentor',
+    username: 'scpFacilitator',
     password: Math.floor(10000 + Math.random() * 90000),
   };
-  const successUpdateMessage = 'MENTORS.MENTOR_UPDATED_SUCCESSFULLY';
-  const telemetryUpdateKey = 'youthnet-mentor-updated-successfully';
-  const failureUpdateMessage = 'MENTORS.NOT_ABLE_UPDATE_MENTOR';
-  const successCreateMessage = 'MENTORS.MENTOR_CREATED_SUCCESSFULLY';
-  const telemetryCreateKey = 'youthnet-mentor-created-successfully';
-  const failureCreateMessage = 'MENTORS.NOT_ABLE_CREATE_MENTOR';
-  const notificationKey = 'onMentorCreate';
-  const notificationMessage = 'MENTORS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
+  const successUpdateMessage = 'FACILITATORS.FACILITATOR_UPDATED_SUCCESSFULLY';
+  const telemetryUpdateKey = 'scp-facilitator-updated-successfully';
+  const failureUpdateMessage = 'COMMON.NOT_ABLE_UPDATE_FACILITATOR';
+  const successCreateMessage = 'FACILITATORS.FACILITATOR_CREATED_SUCCESSFULLY';
+  const telemetryCreateKey = 'SCP-Facilitator-created-successfully';
+  const failureCreateMessage = 'COMMON.NOT_ABLE_CREATE_FACILITATOR';
+  const notificationKey = 'onFacilitatorCreated';
+  const notificationMessage = 'FACILITATORS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
+
+  useEffect(() => {
+    setPrefilledFormData(initialFormData);
+  }, []);
 
   return (
     <>
@@ -290,12 +293,12 @@ const Mentor = () => {
             />
           )
         )}
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }} mt={4}>
+        <Box mt={4} sx={{ display: 'flex', justifyContent: 'end' }}>
           <Button
             variant="outlined"
             color="primary"
             onClick={() => {
-              setPrefilledAddFormData(initialFormData);
+              setPrefilledAddFormData({});
               setIsEdit(false);
               setEditableUserId('');
               handleOpenModal();
@@ -310,7 +313,9 @@ const Mentor = () => {
           onClose={handleCloseModal}
           showFooter={false}
           modalTitle={
-            isEdit ? t('MENTORS.UPDATE_MENTOR') : t('MENTORS.NEW_MENTOR')
+            isEdit
+              ? t('FACILITATORS.EDIT_FACILITATOR')
+              : t('FACILITATORS.NEW_FACILITATOR')
           }
         >
           <AddEditUser
@@ -364,7 +369,7 @@ const Mentor = () => {
             height="20vh"
           >
             <Typography marginTop="10px" textAlign={'center'}>
-              {t('COMMON.NO_MENTOR_FOUND')}
+              {t('COMMON.NO_FACILITATOR_FOUND')}
             </Typography>
           </Box>
         )}
@@ -380,4 +385,4 @@ export async function getStaticProps({ locale }: any) {
   };
 }
 
-export default Mentor;
+export default Facilitator;

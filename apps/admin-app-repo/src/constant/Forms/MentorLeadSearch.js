@@ -7,7 +7,7 @@ export const MentorLeadSearchSchema = {
       enum: ['Select'],
       enumNames: ['Select'],
       api: {
-        url: 'https://dev-interface.prathamdigital.org/interface/v1/fields/options/read',
+        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
         method: 'POST',
         payload: { fieldName: 'state', sort: ['state_name', 'asc'] },
         options: {
@@ -24,7 +24,7 @@ export const MentorLeadSearchSchema = {
       enum: ['Select'],
       enumNames: ['Select'],
       api: {
-        url: 'https://dev-interface.prathamdigital.org/interface/v1/fields/options/read',
+        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
         method: 'POST',
         payload: {
           fieldName: 'district',
@@ -55,13 +55,13 @@ export const MentorLeadSearchSchema = {
       type: 'string',
       title: 'Status',
       enum: ['active', 'archived'],
-      enumNames: ['Active', 'Archived'], 
+      enumNames: ['Active', 'Archived'],
     },
   },
 };
 
 export const MentorLeadSearchUISchema = {
-  'ui:order': ['state', 'district', 'searchKey', 'sortBy'],
+  'ui:order': ['state', 'district', 'firstName', 'sortBy', 'status'],
 
   state: {
     'ui:widget': 'select',
@@ -71,11 +71,15 @@ export const MentorLeadSearchUISchema = {
     'ui:widget': 'select',
   },
 
-  searchKey: {
+  firstName: {
     'ui:widget': 'text',
   },
 
   sortBy: {
+    'ui:widget': 'select',
+  },
+
+  status: {
     'ui:widget': 'select',
   },
 };
