@@ -140,15 +140,27 @@ export const CohortSearchUISchema = {
   },
 
   district: {
-    'ui:widget': 'select',
+    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:options': {
+      multiple: true,
+      uniqueItems: true,
+    },
   },
 
   block: {
-    'ui:widget': 'select',
+    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:options': {
+      multiple: true,
+      uniqueItems: true,
+    },
   },
 
   village: {
-    'ui:widget': 'select',
+    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:options': {
+      multiple: true,
+      uniqueItems: true,
+    },
   },
 
   searchKey: {

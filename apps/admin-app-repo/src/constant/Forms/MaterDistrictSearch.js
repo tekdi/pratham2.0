@@ -43,7 +43,11 @@ export const MasterDistrictsUISchema = {
   'ui:order': ['firstName', 'sortBy'],
 
   state: {
-    'ui:widget': 'select',
+    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:options': {
+      multiple: true,
+      uniqueItems: true,
+    },
   },
 
   firstName: {
