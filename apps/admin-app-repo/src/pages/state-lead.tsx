@@ -15,7 +15,7 @@ import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
 import { Button } from '@mui/material';
 import SimpleModal from '@/components/SimpleModal';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { updateCohortMemberStatus } from '@/services/CohortService/cohortService';
+import { deleteUser } from '@/services/UserService';
 import editIcon from '../../public/images/editIcon.svg';
 import deleteIcon from '../../public/images/deleteIcon.svg';
 import Image from 'next/image';
@@ -182,14 +182,14 @@ const StateLead = () => {
       callback: async (row: any) => {
         console.log('row:', row);
         setEditableUserId(row?.userId);
-        const memberStatus = Status.ARCHIVED;
-        const statusReason = '';
-        const membershipId = row?.userId;
-        const response = await updateCohortMemberStatus({
-          memberStatus,
-          statusReason,
-          membershipId,
-        });
+        const userId = row?.userId;
+        const response = await deleteUser(
+          userId, {
+            userData: {
+              status: Status.ARCHIVED
+            }
+          }
+        );
         setPrefilledFormData({});
         searchData(prefilledFormData, currentPage);
         setOpenModal(false);
