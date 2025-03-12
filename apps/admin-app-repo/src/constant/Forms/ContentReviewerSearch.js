@@ -7,7 +7,7 @@ export const ContentReviewerSearchSchema = {
         enum: ['Select'],
         enumNames: ['Select'],
         api: {
-          url: 'https://dev-interface.prathamdigital.org/interface/v1/fields/options/read',
+          url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
           method: 'POST',
           payload: { fieldName: 'state', sort: ['state_name', 'asc'] },
           options: {

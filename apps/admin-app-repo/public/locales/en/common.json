@@ -158,7 +158,8 @@
     "NOT_ABLE_UPDATE_LEARNER": "Not Able To Update Learner",
     "NOT_ABLE_CREATE_LEARNER": "Not Able To Create Learner",
     "NO_CONTENT_CREATOR_FOUND": "No Content Creator (SCTA) Found",
-    "NO_CONTENT_REVIEWER_FOUND": "No Content Reviewer (CCTA) Found"
+    "NO_CONTENT_REVIEWER_FOUND": "No Content Reviewer (CCTA) Found",
+    "NO_STATE_LEAD_FOUND": "No State Lead Found"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -678,5 +679,17 @@
     "NOT_ABLE_UPDATE_CONTENT_REVIEWER": "Not able to update Content Reviewer",
     "NOT_ABLE_CREATE_CONTENT_REVIEWER": "Not able to create Content Reviewer",
     "UPDATE_CONTENT_REVIEWER": "Update Content Reviewer"
+  },
+  "STATE_LEADS": {
+    "SEARCHBAR_PLACEHOLDER": "Search State Lead..",
+    "NEW_STATE_LEAD": "New State Lead",
+    "FIRST_SELECT_REQUIRED_FIELDS": "First select required fields",
+    "STATE_LEAD_CREATED_SUCCESSFULLY": "State Lead has been successfully created!",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "State Lead is created, credentials will be sent soon",
+    "STATE_LEAD_UPDATED_SUCCESSFULLY": "State Lead has been successfully updated!",
+    "EDIT_STATE_LEAD": "Edit State Lead",
+    "NOT_ABLE_UPDATE_STATE_LEAD": "Not able to update State Lead",
+    "NOT_ABLE_CREATE_STATE_LEAD": "Not able to create State Lead",
+    "UPDATE_STATE_LEAD": "Update State Lead"
   }
 }

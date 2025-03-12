@@ -1,4 +1,4 @@
-export const ContentCreatorSearchSchema = {
+export const StateLeadSearchSchema = {
     type: 'object',
     properties: {
       state: {
@@ -31,7 +31,7 @@ export const ContentCreatorSearchSchema = {
     },
   };
   
-  export const ContentCreatorUISchema = {
+  export const StateLeadUISchema = {
     'ui:order': ['state', 'searchKey', 'sortBy'],
   
     state: {

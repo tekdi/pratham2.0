@@ -30,5 +30,9 @@ export const FormContext = {
   contentReviewer: {
     context: 'USERS',
     contextType: 'Content Reviewer'
+  },
+  stateLead: {
+    context: 'USERS',
+    contextType: 'State Lead'
   }
 };

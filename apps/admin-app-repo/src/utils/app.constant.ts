@@ -115,6 +115,7 @@ export enum RoleId {
   SCTA = "f972a14e-afdb-4502-8ede-cf1fcf171e46",
   CONTENT_CREATOR = '45b8b0d7-e5c6-4f3f-a7bf-70f86e9357ce',
   CONTENT_REVIEWER = '2dc13fcc-29c4-42c1-b125-82d3dcaa4b42',
+  STATE_LEAD = '4a3493aa-a4f7-4e2b-b141-f213084b5599'
 }
 
 export enum DataKey {
