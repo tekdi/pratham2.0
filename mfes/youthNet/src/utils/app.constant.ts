@@ -85,7 +85,8 @@ export enum cohortHierarchy {
   BLOCK = 'BLOCK',
   COHORT = 'COHORT',
   DISTRICT='DISTRICT',
-  VILLAGE='VILLAGE'
+  VILLAGE='VILLAGE',
+  STATE='STATE'
 }
 export enum VolunteerField{
   IS_VOLUNTEER="IS_VOLUNTEER",
