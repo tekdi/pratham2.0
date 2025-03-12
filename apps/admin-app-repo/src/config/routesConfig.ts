@@ -10,15 +10,19 @@ export const PUBLIC_ROUTES = [
 ];
 export const ROLE_BASED_ROUTES = {
   [TenantName.SECOND_CHANCE_PROGRAM]: {
-    [Role.ADMIN]: ['/test-route/[identifier]'],
-    [Role.CENTRAL_ADMIN]: ['/test-route/[identifier]'],
-    [Role.CCTA]: ['/test-route/[identifier]'],
-    [Role.SCTA]: ['/test-route/[identifier]'],
+    [Role.ADMIN]: [],
+    [Role.CENTRAL_ADMIN]: [
+      '/notification-templates/create',
+      '/notification-templates/update/[identifier]',
+      '/edit-password'
+    ],
+    [Role.CCTA]: ['/subjectDetails', '/importCsv', '/edit-password'],
+    [Role.SCTA]: ['/subjectDetails', '/importCsv ' , '/edit-password'],
   },
   [TenantName.YOUTHNET]: {
-    [Role.ADMIN]: ['/test-route/[identifier]'],
-    [Role.CENTRAL_ADMIN]: ['/test-route/[identifier]'],
-    [Role.CCTA]: ['/test-route/[identifier]'],
-    [Role.SCTA]: ['/test-route/[identifier]'],
+    [Role.ADMIN]: ['/edit-password'],
+    [Role.CENTRAL_ADMIN]: ['/edit-password'],
+    [Role.CCTA]: ['/edit-password', '/subjectDetails', '/importCsv ' ,],
+    [Role.SCTA]: ['/edit-password' , '/subjectDetails', '/importCsv ' ,],
   },
 };

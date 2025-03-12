@@ -300,7 +300,7 @@ const LoginPage = () => {
                     window.location.href = '/centers';
                     router.push('/centers', undefined, { locale: locale });
                   } else if (
-                    userInfo?.role === Role.ADMIN &&
+                    userInfo?.role === Role.ADMIN || Role.CENTRAL_ADMIN &&
                     userInfo?.tenantData[0]?.tenantName == TenantName.YOUTHNET
                   ) {
                     window.location.href = '/mentor';
