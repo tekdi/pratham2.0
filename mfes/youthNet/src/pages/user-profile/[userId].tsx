@@ -75,10 +75,23 @@ const UserId = () => {
   const handleOpenEditModal = () => {
     setEditModal(true);
   };
-  function formatDate(dob: any) {
-    const date = new Date(dob.split(' ').reverse().join('-'));
-    return date.toISOString().split('T')[0];
-  }
+  function formatDate(dob: string): string | null {
+    if (!dob) return null; 
+
+    const parsedDate = new Date(dob);
+    
+    if (isNaN(parsedDate.getTime())) {
+        const parts = dob.split(' ');
+        if (parts.length === 3) {
+            const formatted = parts.reverse().join('-'); 
+            const retryDate = new Date(formatted);
+            if (!isNaN(retryDate.getTime())) return retryDate.toISOString().split('T')[0];
+        }
+        return null; 
+    }
+
+    return parsedDate.toISOString().split('T')[0];
+}
   useEffect(() => {
     const fetchData = async () => {
       try {
