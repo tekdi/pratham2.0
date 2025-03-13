@@ -8,7 +8,7 @@ import {
   ContentReviewerUISchema,
 } from '../constant/Forms/ContentReviewerSearch';
 
-import { RoleId, Status } from '@/utils/app.constant';
+import { RoleId, RoleName, Status, TenantName } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
 import { Box, Typography } from '@mui/material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
@@ -46,6 +46,9 @@ const ContentReviewer = () => {
   const [editableUserId, setEditableUserId] = useState('');
 
   const { t, i18n } = useTranslation();
+  const storedUserData = JSON.parse(
+    localStorage.getItem('adminInfo') || '{}'
+  );
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -63,7 +66,7 @@ const ContentReviewer = () => {
         {
           fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.contentReviewer.context}&contextType=${FormContext.contentReviewer.contextType}`,
           header: {
-            tenantid: localStorage.getItem('tenantId'),
+            tenantid: TenantService.getTenantId(),
           },
         },
       ]);
@@ -88,7 +91,7 @@ const ContentReviewer = () => {
   };
 
   const searchData = async (formData: any, newPage: any) => {
-    const staticFilter = { role: 'Content reviewer' }; // keep this in constant file
+    const staticFilter = { role: RoleName.CONTENT_REVIEWER, tenantId: TenantService.getTenantId() };
     const { sortBy } = formData;
     const staticSort = ['firstName', sortBy || 'asc'];
     await searchListData(
@@ -105,7 +108,7 @@ const ContentReviewer = () => {
   };
 
   // Define table columns
-  const columns = [
+  let columns = [
     {
       keys: ['firstName', 'middleName', 'lastName'],
       label: 'Content Reviewer Name',
@@ -130,48 +133,89 @@ const ContentReviewer = () => {
             ?.selectedValues[0]?.value || '-';
         return `${state}`;
       },
-    },
-    {
-      key: 'BOARD',
-      label: 'Board',
-      render: (row) => {
-        const board =
-          row.customFields.find((field) => field.label === 'BOARD')
-            ?.selectedValues[0]?.value || '-';
-        return `${board}`;
-      },
-    },
-    {
-      key: 'MEDIUM',
-      label: 'Medium',
-      render: (row) => {
-        const medium =
-          row.customFields.find((field) => field.label === 'MEDIUM')
-            ?.selectedValues[0]?.value || '-';
-        return `${medium}`;
-      },
-    },
-    {
-      key: 'GRADE',
-      label: 'Grade',
-      render: (row) => {
-        const grade =
-          row.customFields.find((field) => field.label === 'GRADE')
-            ?.selectedValues[0]?.value || '-';
-        return `${grade}`;
-      },
-    },
-    {
-      key: 'SUBJECT',
-      label: 'subject',
-      render: (row) => {
-        const subject =
-          row.customFields.find((field) => field.label === 'SUBJECT')
-            ?.selectedValues[0]?.value || '-';
-        return `${subject}`;
-      },
-    },
+    }
   ];
+
+  const scpCustomColumns = [
+      {
+        key: 'BOARD',
+        label: 'Board',
+        render: (row) => {
+          const board =
+            row.customFields.find((field) => field.label === 'BOARD')
+              ?.selectedValues[0]?.value || '-';
+          return `${board}`;
+        },
+      },
+      {
+        key: 'MEDIUM',
+        label: 'Medium',
+        render: (row) => {
+          const medium =
+            row.customFields.find((field) => field.label === 'MEDIUM')
+              ?.selectedValues[0]?.value || '-';
+          return `${medium}`;
+        },
+      },
+      {
+        key: 'GRADE',
+        label: 'Grade',
+        render: (row) => {
+          const grade =
+            row.customFields.find((field) => field.label === 'GRADE')
+              ?.selectedValues[0]?.value || '-';
+          return `${grade}`;
+        },
+      },
+      {
+        key: 'SUBJECT',
+        label: 'subject',
+        render: (row) => {
+          const subject =
+            row.customFields.find((field) => field.label === 'SUBJECT')
+              ?.selectedValues[0]?.value || '-';
+          return `${subject}`;
+        },
+      }
+    ]
+
+    const youthnetCustomColumns = [
+      {
+        key: 'DOMAIN',
+        label: 'Domain',
+        render: (row) => {
+          const domain =
+            row.customFields.find((field) => field.label === 'DOMAIN')
+              ?.selectedValues[0]?.value || '-';
+          return `${domain}`;
+        },
+      },
+      {
+        key: 'SUB-DOMAIN',
+        label: 'Sub Domain',
+        render: (row) => {
+          const subDomain =
+            row.customFields.find((field) => field.label === 'SUB-DOMAIN')
+              ?.selectedValues[0]?.value || '-';
+          return `${subDomain}`;
+        },
+      },
+      {
+        key: 'STREAM',
+        label: 'Stream',
+        render: (row) => {
+          const stream =
+            row.customFields.find((field) => field.label === 'STREAM')
+              ?.selectedValues[0]?.value || '-';
+          return `${stream}`;
+        }
+      }
+    ]
+    if (storedUserData.tenantData[0].tenantName === TenantName.SECOND_CHANCE_PROGRAM) {
+      columns = [...columns, ...scpCustomColumns]
+    } else if (storedUserData.tenantData[0].tenantName === TenantName.YOUTHNET) {
+      columns = [...columns, ...youthnetCustomColumns]
+    }
 
   // Define actions
   const actions = [

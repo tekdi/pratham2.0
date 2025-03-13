@@ -118,6 +118,12 @@ export enum RoleId {
   STATE_LEAD = '4a3493aa-a4f7-4e2b-b141-f213084b5599'
 }
 
+export enum RoleName {
+  CONTENT_CREATOR = 'Content creator',
+  CONTENT_REVIEWER = 'Content reviewer',
+  STATE_LEAD = 'State Lead'
+}
+
 export enum DataKey {
   UPDATED_AT = "updatedAt",
   CREATED_AT = "createdAt",

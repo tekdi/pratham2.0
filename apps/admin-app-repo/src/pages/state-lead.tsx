@@ -8,7 +8,7 @@ import {
   StateLeadUISchema,
 } from '../constant/Forms/StateLeadSearch';
 
-import { RoleId, Status } from '@/utils/app.constant';
+import { RoleId, RoleName, Status } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
 import { Box, Typography } from '@mui/material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
@@ -63,7 +63,7 @@ const StateLead = () => {
         {
           fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.stateLead.context}&contextType=${FormContext.stateLead.contextType}`,
           header: {
-            tenantid: localStorage.getItem('tenantId'),
+            tenantid: TenantService.getTenantId(),
           },
         },
       ]);
@@ -88,7 +88,7 @@ const StateLead = () => {
   };
 
   const searchData = async (formData: any, newPage: any) => {
-    const staticFilter = { role: 'State Lead' }; // keep this in constant file
+    const staticFilter = { role: RoleName.STATE_LEAD, tenantId: TenantService.getTenantId() };
     const { sortBy } = formData;
     const staticSort = ['firstName', sortBy || 'asc'];
     await searchListData(

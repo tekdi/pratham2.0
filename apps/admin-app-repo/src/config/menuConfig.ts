@@ -146,6 +146,21 @@ export const MENU_CONFIG = {
           link: '/youth',
           roles: [Role.ADMIN, Role.CENTRAL_ADMIN], // yet to come
         },
+        {
+          title: 'Content Creator',
+          link: '/content-creator',
+          roles: [Role.CENTRAL_ADMIN],
+        },
+        {
+          title: 'Content Reviewer',
+          link: '/content-reviewer',
+          roles: [Role.CENTRAL_ADMIN],
+        },
+        {
+          title: 'State Lead',
+          link: '/state-lead',
+          roles: [Role.CENTRAL_ADMIN],
+        },
       ],
     },
     master: {

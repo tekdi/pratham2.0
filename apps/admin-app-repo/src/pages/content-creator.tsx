@@ -8,7 +8,7 @@ import {
   ContentCreatorUISchema,
 } from '../constant/Forms/ContentCreatorSearch';
 
-import { RoleId, Status } from '@/utils/app.constant';
+import { RoleId, RoleName, Status, TenantName } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
 import { Box, Typography } from '@mui/material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
@@ -46,6 +46,8 @@ const ContentCreator = () => {
   const [editableUserId, setEditableUserId] = useState('');
 
   const { t, i18n } = useTranslation();
+
+  const storedUserData = JSON.parse(localStorage.getItem('adminInfo') || '{}');
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -88,7 +90,7 @@ const ContentCreator = () => {
   };
 
   const searchData = async (formData: any, newPage: any) => {
-    const staticFilter = { role: 'Content creator' }; // keep this in constant file
+    const staticFilter = { role: RoleName.CONTENT_CREATOR, tenantId: storedUserData.tenantData[0].tenantId };
     const { sortBy } = formData;
     const staticSort = ['firstName', sortBy || 'asc'];
     await searchListData(
@@ -105,7 +107,7 @@ const ContentCreator = () => {
   };
 
   // Define table columns
-  const columns = [
+  let columns = [
     {
       keys: ['firstName', 'middleName', 'lastName'],
       label: 'Content Creator Name',
@@ -130,7 +132,10 @@ const ContentCreator = () => {
             ?.selectedValues[0]?.value || '-';
         return `${state}`;
       },
-    },
+    }
+  ];
+
+  const scpCustomColumns = [
     {
       key: 'BOARD',
       label: 'Board',
@@ -170,8 +175,46 @@ const ContentCreator = () => {
             ?.selectedValues[0]?.value || '-';
         return `${subject}`;
       },
+    }
+  ]
+
+  const youthnetCustomColumns = [
+    {
+      key: 'DOMAIN',
+      label: 'Domain',
+      render: (row) => {
+        const domain =
+          row.customFields.find((field) => field.label === 'DOMAIN')
+            ?.selectedValues[0]?.value || '-';
+        return `${domain}`;
+      },
     },
-  ];
+    {
+      key: 'SUB-DOMAIN',
+      label: 'Sub Domain',
+      render: (row) => {
+        const subDomain =
+          row.customFields.find((field) => field.label === 'SUB-DOMAIN')
+            ?.selectedValues[0]?.value || '-';
+        return `${subDomain}`;
+      },
+    },
+    {
+      key: 'STREAM',
+      label: 'Stream',
+      render: (row) => {
+        const stream =
+          row.customFields.find((field) => field.label === 'STREAM')
+            ?.selectedValues[0]?.value || '-';
+        return `${stream}`;
+      }
+    }
+  ]
+  if (storedUserData.tenantData[0].tenantName === TenantName.SECOND_CHANCE_PROGRAM) {
+    columns = [...columns, ...scpCustomColumns]
+  } else if (storedUserData.tenantData[0].tenantName === TenantName.YOUTHNET) {
+    columns = [...columns, ...youthnetCustomColumns]
+  }
 
   // Define actions
   const actions = [
