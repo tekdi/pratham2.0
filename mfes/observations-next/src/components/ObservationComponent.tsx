@@ -57,7 +57,6 @@ const ObservationComponent: React.FC<QuestionnaireAppProps> = ({
   const [currentEvent, setCurrentEvent] = useState<CustomEvent | null>(null);
   const theme = useTheme<any>();
   // const router = useRouter();
-  const navigate = useNavigate();
 
   const uploadFileToPresignedUrl = async (event: FileUploadEvent) => {
     const payload: any = {

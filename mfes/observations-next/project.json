@@ -1,0 +1,9 @@
+{
+  "name": "observations-next",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "mfes/observations-next",
+  "projectType": "application",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project observations-next --web",
+  "targets": {}
+}
