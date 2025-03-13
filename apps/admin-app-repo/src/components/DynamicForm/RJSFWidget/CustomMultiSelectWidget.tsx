@@ -18,22 +18,27 @@ const CustomMultiSelectWidget = ({
   schema 
 }: WidgetProps) => {
   const { enumOptions = [] } = options;
-  const maxSelections = schema.maxSelection || enumOptions.length; // Use schema-defined maxSelection
+  const maxSelections = schema.maxSelection || enumOptions.length; // Default to max options if not set
+
+  // Ensure value is always an array
+  const selectedValues = Array.isArray(value) ? value : [];
 
   const handleChange = (event: any) => {
-    const selectedValues = event.target.value;
-    if (selectedValues.length <= maxSelections) {
-      onChange(selectedValues.length > 0 ? selectedValues : undefined);
+    const selected = event.target.value;
+    if (Array.isArray(selected)) {
+      if (selected.length <= maxSelections) {
+        onChange(selected.length > 0 ? selected : []); // Ensures array format
+      }
     }
   };
 
   return (
-    <FormControl fullWidth error={value.length > maxSelections}>
+    <FormControl fullWidth error={selectedValues.length > maxSelections}>
       <InputLabel>{label}</InputLabel>
       <Select
         id={id}
         multiple
-        value={value}
+        value={selectedValues} // Ensures it's always an array
         onChange={handleChange}
         renderValue={(selected) =>
           enumOptions
@@ -46,14 +51,14 @@ const CustomMultiSelectWidget = ({
           <MenuItem 
             key={option.value} 
             value={option.value} 
-            disabled={value.length >= maxSelections && !value.includes(option.value)}
+            disabled={selectedValues.length >= maxSelections && !selectedValues.includes(option.value)}
           >
-            <Checkbox checked={value.includes(option.value)} />
+            <Checkbox checked={selectedValues.includes(option.value)} />
             <ListItemText primary={option.label} />
           </MenuItem>
         ))}
       </Select>
-      {value.length > maxSelections && (
+      {selectedValues.length > maxSelections && (
         <FormHelperText>You can select up to {maxSelections} options</FormHelperText>
       )}
     </FormControl>
