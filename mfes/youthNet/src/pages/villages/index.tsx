@@ -108,7 +108,7 @@ const Index = () => {
     const getData = async () => {
       let userDataString = localStorage.getItem('userData');
       let userData: any = userDataString ? JSON.parse(userDataString) : null;
-      const districtResult = userData.customFields.find(
+      const districtResult = userData?.customFields?.find(
         (item: any) => item.label === cohortHierarchy.DISTRICT
       );
       console.log(districtResult?.selectedValues);
@@ -196,13 +196,13 @@ const Index = () => {
         const transformedYouthData = result?.getUserDetails.map(
           (user: any) => {
             let name = user.firstName || '';
-            const villageField = user.customFields.find(
-              (field: any) => field.label === cohortHierarchy.BLOCK
+            const villageField = user?.customFields?.find(
+              (field: any) => field?.label === cohortHierarchy.BLOCK
             );
-            const blockField = user.customFields.find(
-              (field: any) => field.label === cohortHierarchy.BLOCK
+            const blockField = user?.customFields?.find(
+              (field: any) => field?.label === cohortHierarchy.BLOCK
             );
-            const isVolunteer = user.customFields.find(
+            const isVolunteer = user?.customFields?.find(
               (field: any) => field.label === VolunteerField.IS_VOLUNTEER
             );
             setIsVolunteerFieldId(isVolunteer?.fieldId)
@@ -280,10 +280,10 @@ const Index = () => {
           const transformedMentorData = result?.getUserDetails.map(
             (user: any) => {
               let name = user.firstName || '';
-              const villageField = user.customFields.find(
+              const villageField = user?.customFields?.find(
                 (field: any) => field.label === cohortHierarchy.BLOCK
               );
-              const blockField = user.customFields.find(
+              const blockField = user?.customFields?.find(
                 (field: any) => field.label === cohortHierarchy.BLOCK
               );
               const blockValues = blockField?.selectedValues.map(
@@ -336,7 +336,7 @@ const Index = () => {
         let userData: any = userDataString ? JSON.parse(userDataString) : null;
         let blockIds: any;
         if (YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole()) {
-          const blockResult = userData.customFields.find(
+          const blockResult = userData?.customFields?.find(
             (item: any) => item.label === 'BLOCK'
           );
           blockIds =
