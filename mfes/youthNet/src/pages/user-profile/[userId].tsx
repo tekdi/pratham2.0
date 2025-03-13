@@ -1,9 +1,9 @@
 'use-client';
 
 import withRole from '../../components/withRole';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TENANT_DATA } from '../../utils/app.config';
-import { Box, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@mui/material/styles';
 import Header from '../../components/Header';
@@ -14,16 +14,28 @@ import { VILLAGE_DATA } from '../../components/youthNet/tempConfigs';
 import VillageDetailCard from '../../components/youthNet/VillageDetailCard';
 import Frame2 from '../../assets/images/SurveyFrame2.png';
 import Profile from '../../components/youthNet/Profile';
-import { getAge, toPascalCase } from '../../utils/Helper';
+import { filterSchema, getAge, toPascalCase } from '../../utils/Helper';
 import { useRouter } from 'next/router';
-import { getUserDetails } from '../../services/youthNet/Dashboard/UserServices';
+import { getUserDetails, updateUser } from '../../services/youthNet/Dashboard/UserServices';
+import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
+import { FormContext } from 'apps/admin-app-repo/src/components/DynamicForm/DynamicFormConstant';
+import { fetchForm } from 'apps/admin-app-repo/src/components/DynamicForm/DynamicFormCallback';
+import SimpleModal from '../../components/SimpleModal';
+import DynamicForm from 'apps/admin-app-repo/src/components/DynamicForm/DynamicForm';
+import { showToastMessage } from '@/components/Toastify';
 
 const UserId = () => {
   const { t } = useTranslation();
   const theme = useTheme<any>();
   const router = useRouter();
   const { userId } = router.query; 
+ const [schema, setSchema] = useState(null);
+ const [formData, setFormData] = useState<any>();
+ const [editModal, setEditModal] = useState<boolean>(false);
+ const [updatedUser, setUpdatedUser] = useState<boolean>(false);
 
+
+ const [uiSchema, setUiSchema] = useState(null);
   const [user, setUser] = React.useState<{
     userRole: string | null;
     userID: string | null;
@@ -60,7 +72,101 @@ const UserId = () => {
     joinedOn: null,
 
   });
+  const handleOpenEditModal = () => {
+    setEditModal(true);
+  };
+  function formatDate(dob: any) {
+    const date = new Date(dob.split(' ').reverse().join('-'));
+    return date.toISOString().split('T')[0];
+  }
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const responseForm: any = await fetchForm([
+          {
+            fetchUrl: `${
+              process.env.NEXT_PUBLIC_MIDDLEWARE_URL
+            }/form/read?context=${
+              FormContext.mentor.context
+            }&contextType=${user?.userRole?.toUpperCase()}`,
+            header: {},
+          },
+          {
+            fetchUrl: `${
+              process.env.NEXT_PUBLIC_MIDDLEWARE_URL
+            }/form/read?context=${
+              FormContext.mentor.context
+            }&contextType=${user?.userRole?.toUpperCase()}`,
+            header: { tenantid: localStorage.getItem('tenantId') },
+          },
+        ]);
+        console.log('responseForm', responseForm);
+        const { newSchema, extractedFields } = filterSchema(responseForm);
+        console.log(newSchema?.schema);
+        console.log(newSchema?.uiSchema);
 
+        const extractUserInfo = (({
+          firstName,
+          lastName,
+          middleName,
+          gender,
+          phone: mobile,
+          dob,
+          email,
+        }: any) => ({
+          firstName,
+          lastName,
+          middleName,
+          gender,
+          mobile,
+          dob,
+          email,
+        }))(user);
+        extractUserInfo.dob = formatDate(extractUserInfo?.dob);
+        extractUserInfo.mobile = extractUserInfo?.mobile?.toString();
+
+        console.log(extractUserInfo);
+        setFormData(extractUserInfo);
+        setSchema(newSchema?.schema);
+        setUiSchema(newSchema?.uiSchema);
+      } catch (e) {
+        console.log(e);
+      }
+      // setSdbvFieldData(extractedFields);
+    };
+    if (userId === localStorage.getItem('userId') && user?.userRole)
+      fetchData();
+  }, [user]);
+  const onClose = () => {
+    setEditModal(false);
+  };
+  const FormSubmitFunction = async (formData: any, payload: any) => {
+    try {
+      const object = {
+        userData: formData,
+      };
+      if (user?.email == formData?.email) {
+        delete formData?.email;
+      }
+      if (userId) {
+        const updateUserResponse = await updateUser(userId.toString(), object);
+        let userlocalData = localStorage.getItem('userData');
+        let userData = userlocalData ? JSON.parse(userlocalData) : {};
+        // let userlocalData = JSON.parse(localStorage.getItem("userData")) || {};
+
+        // Merge existing data with updated values
+        Object.assign(userData, formData);
+        console.log(userData);
+        localStorage.setItem('userData', JSON.stringify(userData));
+
+        showToastMessage(t('PROFILE.PROFILE_UPDATE_SUCCESSFULLY'), 'success');
+        setEditModal(false);
+        setUpdatedUser(!updatedUser);
+      }
+    } catch (e) {
+      showToastMessage(t('PROFILE.UNABLE_TO_PROFILE_UPDATE_'), 'error');
+    }
+  };
   useEffect(() => {
     const fetchData = async () => {
       if (typeof window === 'undefined' || !window.localStorage) return;
@@ -115,9 +221,10 @@ const UserId = () => {
     };
   
     fetchData();
-  }, [userId]);
+  }, [userId, updatedUser]);
   
   return (
+    <>
     <Box minHeight="100vh">
       {' '}
       <Box>
@@ -133,6 +240,47 @@ const UserId = () => {
 
          />
       </Box>
+      {userId===localStorage.getItem("userId") && (
+        <Box
+        sx={{
+          marginLeft:"30%",
+        }}
+      >
+            <Button
+              sx={{
+                fontSize: '14px',
+                lineHeight: '20px',
+                minWidth: '40%',
+                padding: '10px 24px 10px 16px',
+                gap: '8px',
+                borderRadius: '100px',
+                marginTop: '10px',
+               // flex: '1',
+                textAlign: 'center',
+                color: theme.palette.warning.A200,
+                border: `1px solid #4D4639`,
+              }}
+            onClick={handleOpenEditModal}
+            >
+              <Typography
+                variant="h3"
+                style={{
+                  letterSpacing: '0.1px',
+                  textAlign: 'left',
+                  marginBottom: '2px',
+                }}
+                fontSize={'14px'}
+                fontWeight={'500'}
+                lineHeight={'20px'}
+              >
+                {t('PROFILE.EDIT_PROFILE')}
+              </Typography>
+              <Box>
+                <CreateOutlinedIcon sx={{ fontSize: '14px' }} />
+              </Box>
+            </Button>
+            </Box>
+          )}
       {/* <Box ml={2}>
         {' '}
         <Typography
@@ -192,6 +340,25 @@ const UserId = () => {
         />
       </Box>
     </Box>
+    <SimpleModal
+              open={editModal}
+              onClose={onClose}
+              showFooter={true}
+              modalTitle={'New Mentor'}
+            //  handleNext={FormSubmitFunction}
+              // primaryText={count === 0 ? 'Next' : 'Finish & Assign'}
+              // secondaryText={count === 1 ? 'Save Progress' : ''}
+            >
+           {schema &&  uiSchema &&(<DynamicForm
+            schema={schema}
+            uiSchema={uiSchema}
+            FormSubmitFunction={FormSubmitFunction}
+            prefilledFormData={formData || {}}
+          />)
+           }
+            </SimpleModal>
+    </> 
+    
   );
 };
 
