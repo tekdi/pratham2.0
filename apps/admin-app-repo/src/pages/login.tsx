@@ -185,10 +185,13 @@ const LoginPage = () => {
         if (typeof window !== 'undefined' && window.localStorage) {
           if (userInfo) {
             if (userInfo?.customFields) {
-              const boardValues = userInfo.customFields
-                .filter((field: any) => field.label === 'BOARD')
-                .flatMap((field: any) => field.value.split(','))
-                .map((board: string) => board.trim());
+              const boardFields = userInfo.customFields.filter(
+                (field: any) => field.label === 'BOARD'
+              );
+
+              const boardValues = boardFields.length > 0
+                ? boardFields.flatMap((field: any) => field.value.split(',')).map((board: string) => board.trim())
+                : [];
 
               // Check if boardValues is not empty
               if (boardValues.length > 0) {
