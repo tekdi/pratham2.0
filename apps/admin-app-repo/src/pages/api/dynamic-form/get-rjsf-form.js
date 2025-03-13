@@ -1,5 +1,4 @@
 import { validate } from 'uuid';
-import mockedFields from './mock-fields.js'
 export default function handler(req, res) {
   if (req.method === 'POST') {
     try {
@@ -10,7 +9,6 @@ export default function handler(req, res) {
           // console.log('fieldFromFunction!!!', fields);
 
           if (fields && fields.length > 0) {
-            // fields = mockedFields; // todo: mocked the fields - need backend to support
             const { schema, uiSchema } = generateSchemaAndUISchema(fields);
             res.status(200).json({
               schema,
