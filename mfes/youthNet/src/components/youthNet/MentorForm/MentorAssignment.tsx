@@ -19,6 +19,7 @@ import { createUser } from 'mfes/youthNet/src/services/youthNet/Dashboard/UserSe
 import { getUserFullName, toPascalCase } from '@/utils/Helper';
 import { sendCredentialService } from '@/services/NotificationService';
 import { showToastMessage } from '@/components/Toastify';
+import { filterSchema } from 'mfes/youthNet/src/utils/Helper';
 type FormSubmitFunctionType = (formData: any, payload: any) => Promise<void>;
 
 interface MentorAssignmentProps {
@@ -121,7 +122,6 @@ const MentorAssignment: React.FC<MentorAssignmentProps> = ({
             email: sendTo,
           });
           if (response?.email?.data[0]?.result === "Email notification sent successfully") {
-            console.log("checked")
            
                     showToastMessage(t("MENTOR.MENTOR_CREATED_SUCCESSFULLY"), "success");
             
@@ -144,33 +144,7 @@ const MentorAssignment: React.FC<MentorAssignmentProps> = ({
     }
   };
 
-  function filterSchema(schemaObj: any) {
-    const locationFields = ['state', 'district', 'block', 'village'];
-
-    // Extract location fields separately
-    const extractedFields: any = {};
-    locationFields.forEach((field) => {
-      if (schemaObj.schema.properties[field]) {
-        extractedFields[field] = {
-          title: schemaObj.schema.properties[field].title,
-          fieldId: schemaObj.schema.properties[field].fieldId,
-          field_type: schemaObj.schema.properties[field].field_type,
-          maxSelection: schemaObj.schema.properties[field].maxSelection,
-          isMultiSelect: schemaObj.schema.properties[field].isMultiSelect,
-          'ui:widget': schemaObj.uiSchema[field]?.['ui:widget'] || 'select',
-        };
-      }
-    });
-
-    // Create a new schema object without location fields
-    const newSchema = JSON.parse(JSON.stringify(schemaObj)); // Deep copy
-    locationFields.forEach((field) => {
-      delete newSchema.schema.properties[field];
-      delete newSchema.uiSchema[field];
-    });
-
-    return { newSchema, extractedFields };
-  }
+  
 
   // Example usage:
   // const schemaObj = {
@@ -338,9 +312,14 @@ const MentorAssignment: React.FC<MentorAssignmentProps> = ({
           </Box>
 
           <Box display="flex" justifyContent="space-between" mt={4}>
-            <Button variant="contained" color="primary" onClick={handleFinish}>
-            {t('MENTOR.FINISH_ASSIGN')}
-            </Button>
+          <Button
+        variant="contained"
+        color="primary"
+        onClick={handleFinish}
+       disabled={Object.values(selectedVillages).every(villages => villages.length === 0)}
+        >
+       {t('MENTOR.FINISH_ASSIGN')}
+      </Button>
           </Box>
         </Box>
       )}
