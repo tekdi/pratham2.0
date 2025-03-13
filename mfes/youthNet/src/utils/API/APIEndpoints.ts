@@ -9,6 +9,8 @@ const API_ENDPOINTS = {
   academicYearsList: `${baseurl}/user/v1/academicyears/list`,
   userList: `${baseurl}/user/list`,
   fieldOptionsRead: `${baseurl}/fields/options/read`,
+  accountCreate: `${baseurl}/account/create`, 
+
 
 
 
