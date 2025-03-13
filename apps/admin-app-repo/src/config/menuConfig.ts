@@ -210,5 +210,11 @@ export const MENU_CONFIG = {
         Role.SCTA,
       ],
     },
+    workspace: {
+      title: 'Workspace',
+      icon: '/images/dashboard.svg',
+      link: '/workspace',
+      roles: [Role.CCTA, Role.SCTA],
+    }
   },
 };
