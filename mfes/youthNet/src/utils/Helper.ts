@@ -299,6 +299,30 @@ export const categorizeUsers=(users: any) =>{
   return { volunteerUsers, youthUsers };
 }
 
+export const filterSchema=(schemaObj: any)=> {
+    const locationFields = ['state', 'district', 'block', 'village'];
 
+    const extractedFields: any = {};
+    locationFields.forEach((field) => {
+      if (schemaObj.schema.properties[field]) {
+        extractedFields[field] = {
+          title: schemaObj.schema.properties[field].title,
+          fieldId: schemaObj.schema.properties[field].fieldId,
+          field_type: schemaObj.schema.properties[field].field_type,
+          maxSelection: schemaObj.schema.properties[field].maxSelection,
+          isMultiSelect: schemaObj.schema.properties[field].isMultiSelect,
+          'ui:widget': schemaObj.uiSchema[field]?.['ui:widget'] || 'select',
+        };
+      }
+    });
+
+    const newSchema = JSON.parse(JSON.stringify(schemaObj)); // Deep copy
+    locationFields.forEach((field) => {
+      delete newSchema.schema.properties[field];
+      delete newSchema.uiSchema[field];
+    });
+
+    return { newSchema, extractedFields };
+  }
 
 
