@@ -82,7 +82,7 @@ const Index = () => {
         district:[districtId],
       }
        const responce=await fetchUserList({filters})
-       const transformedData = responce?.getUserDetails.map((user: any) => ({
+       const transformedData = responce?.getUserDetails?.map((user: any) => ({
         id: user.userId,
         name: user.lastName ? `${user.firstName} ${user.lastName}` : user.firstName
       }));
@@ -91,7 +91,7 @@ const Index = () => {
        let userData: any = userDataString ? JSON.parse(userDataString) : null;
        userData.customFields = data.userData.customFields;
        localStorage.setItem('userData', JSON.stringify(userData));
-       setSelectedMentorId(responce?.getUserDetails[0]?.userId)
+       setSelectedMentorId(responce?.getUserDetails?.[0]?.userId)
 
     }
    
