@@ -1,5 +1,3 @@
-import { isMultiSelect } from '@rjsf/utils';
-
 export const CohortSearchSchema = {
   type: 'object',
   properties: {
