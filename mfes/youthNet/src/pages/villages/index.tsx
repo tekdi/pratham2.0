@@ -489,6 +489,8 @@ const Index = () => {
     setOpenReassignVillage(false);
     setAddNew(false);
     setCount(0);
+    setShowAssignmentScreen(false)
+    setFormData({})
   };
 
   const handleButtonClick = async(actionType: string) => {
@@ -659,6 +661,7 @@ const Index = () => {
                     values={districtData}
                     defaultValue={districtData[0]?.id}
                     onSelect={(value) => console.log('Selected:', value)}
+                    label={t('YOUTHNET_USERS_AND_VILLAGES.DISTRICT')}
                   />
                 ) : (
                   <Loader showBackdrop={true} />
@@ -980,6 +983,7 @@ const Index = () => {
                       values={districtData}
                       defaultValue={districtData?.[0]?.id}
                       onSelect={(value) => console.log('Selected:', value)}
+                      label={t('YOUTHNET_USERS_AND_VILLAGES.DISTRICT')}
                     />
                   ) : (
                     <Loader showBackdrop={true} />
@@ -998,6 +1002,7 @@ const Index = () => {
                       onSelect={(value) =>
                         console.log('Selected:', setSelectedBlockValue(value))
                       }
+                      label={t('YOUTHNET_USERS_AND_VILLAGES.BLOCK')}
                     />
                   ) : (
                     <Loader showBackdrop={true} />
@@ -1148,6 +1153,7 @@ const Index = () => {
                       values={districtData}
                       defaultValue={districtData?.[0]?.id}
                       onSelect={(value) => console.log('Selected:', value)}
+                      label={t('YOUTHNET_USERS_AND_VILLAGES.DISTRICT')}
                     />
                   ) : (
                     <Loader showBackdrop={true} />
@@ -1166,6 +1172,7 @@ const Index = () => {
                       onSelect={(value) =>
                         console.log('Selected:', setSelectedBlockValue(value))
                       }
+                      label={t('YOUTHNET_USERS_AND_VILLAGES.BLOCK')}
                     />
                   ) : (
                     <Loader showBackdrop={true} />
@@ -1191,6 +1198,7 @@ const Index = () => {
                   setSelectedVillageValue(value)
                 }
                 }
+                label={t('YOUTHNET_USERS_AND_VILLAGES.VILLAGE')}
               />
             </Box>
             <Box
