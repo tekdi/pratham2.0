@@ -1,3 +1,4 @@
+
 // @ts-nocheck
 import React, { useState, useEffect, useRef } from 'react';
 import Form from '@rjsf/mui';
@@ -1016,6 +1017,7 @@ const DynamicForm = ({
           // liveValidate={submitted} // Only validate on submit or typing
           // onChange={() => setSubmitted(true)} // Show validation when user starts typing
           widgets={widgets}
+          id="dynamic-form-id"
         />
       ) : (
         <Grid container spacing={2}>

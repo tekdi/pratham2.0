@@ -4,6 +4,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 interface DropdownProps {
   name?: string;
+  label?: string;
   values?: any[];
   onSelect: (value: string) => void;
   defaultValue?: string;
@@ -11,6 +12,7 @@ interface DropdownProps {
 
 const Dropdown: React.FC<DropdownProps> = ({
   name,
+  label,
   values = [],
   onSelect,
   defaultValue = '',
@@ -22,15 +24,17 @@ const Dropdown: React.FC<DropdownProps> = ({
     setSelectedValue(value);
     onSelect(value);
   };
+
   useEffect(() => {
-      setSelectedValue(defaultValue);
-  }, [defaultValue,]);
+    setSelectedValue(defaultValue);
+  }, [defaultValue]);
+
   return (
     <FormControl fullWidth>
-      <InputLabel>{name}</InputLabel>
+      <InputLabel>{label || name}</InputLabel>
       <Select
         value={selectedValue}
-        label={name}
+        label={label || name}
         onChange={handleChange}
         IconComponent={KeyboardArrowDownIcon}
         MenuProps={{

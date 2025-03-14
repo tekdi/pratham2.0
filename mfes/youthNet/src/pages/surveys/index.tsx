@@ -8,7 +8,8 @@ import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { targetSolution } from '../../services/youthNet/Survey/suveyService';
 
 const Survey = () => {
   const { t } = useTranslation();
@@ -16,6 +17,8 @@ const Survey = () => {
   const router = useRouter();
 
   const [value, setValue] = useState<number>(1);
+  const [surveysData, setSurveysData] = useState<any>();
+
   // const [searchInput, setSearchInput] = useState('');
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -28,7 +31,44 @@ const Survey = () => {
   const handleAddVolunteers = () => {
     router.push('/volunteerList');
   };
+  useEffect(() => {
+    const fetchObservationData = async () => {
+      try {
+        const response = await targetSolution();
+        console.log(response?.result?.data)
+        console.log(surveysData)
+        const surveysData2 = response?.result?.data.map((survey: any) => ({
+          id: survey._id,
+          solutionId: survey.solutionId,
+          title: survey.name,
+          date: new Date(survey.endDate).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          }),
+          details: {},
+        }));
+        setSurveysData(surveysData2)
+       console.log(surveysData2)
 
+        // setObservationData(response?.result?.data || []);
+        // const sortedData = [...response?.result?.data].sort((a, b) => {
+        //   const dateA = new Date(a.endDate);
+        //   const dateB = new Date(b.endDate);
+        //   return dateA.getTime() - dateB.getTime();
+        // });
+
+        // setFilteredObservationData(sortedData || []);
+        // const data=response?.result?.data;
+        // data[1].endDate = "2027-11-15T14:26:18.803Z";
+        // setObservationData(data || []);
+        // setFilteredObservationData(data || []);
+      } catch (error) {
+        console.error('Error fetching cohort list:', error);
+      }
+    };
+    fetchObservationData()
+  }, []);
   return (
     <>
       <Box>
@@ -84,7 +124,7 @@ const Survey = () => {
           >
             <Grid container spacing={2}>
               {surveysData && surveysData.length > 0 ? (
-                surveysData?.map((survey, index) => (
+                surveysData?.map((survey:any, index: any) => (
                   <Grid item xs={12} sm={12} md={6} lg={4} key={index}>
                     <Surveys
                       title={survey.title}

@@ -802,9 +802,11 @@
     "ASSIGN_VILLAGES_FROM_BLOCK_INFO": "You can complete this later at your own pace. However, the villages will only be assigned once you click on ‘Finish.’",
     "NO_DATA_FOUND":"No data found",
     "VILLAGE":"Village",
-    "BLOCK":"blocks",
+    "BLOCK":"Block",
     "VILLAGES":"Villages",
-    "BLOCKS":"Blocks"
+    "BLOCKS":"Blocks",
+    "DISTRICT":"District"
+    
   },
 
   "YOUTHNET_CAMP_DETAILS": {

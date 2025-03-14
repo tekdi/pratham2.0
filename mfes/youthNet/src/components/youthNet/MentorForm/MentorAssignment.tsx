@@ -229,7 +229,13 @@ const MentorAssignment: React.FC<MentorAssignmentProps> = ({
       const { newSchema, extractedFields } = filterSchema(responseForm);
 
            setAddSchema(newSchema?.schema);
-      setAddUiSchema(newSchema?.uiSchema);
+           const updatedUiSchema = {
+            ...newSchema?.uiSchema,
+            "ui:submitButtonOptions": {
+              norender: true, 
+            },
+          };
+      setAddUiSchema(updatedUiSchema);
       setSdbvFieldData(extractedFields);
     };
 

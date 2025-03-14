@@ -58,12 +58,13 @@ import { showToastMessage } from "@/components/Toastify";
 import MentorAssignment from '../../components/youthNet/MentorForm/MentorAssignment';
 
 const Index = () => {
-  const { isRTL } = useDirection();
+ const { isRTL } = useDirection();
   const { t } = useTranslation();
   const theme = useTheme<any>();
   const router = useRouter();
+  const { villageId, tab } = router.query;
   const [value, setValue] = useState<number>(
-    YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() ? 1 : 2
+    tab? Number(tab)  :  YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() ? 1 : 2
   );
   const [searchInput, setSearchInput] = useState('');
   const [toggledUser, setToggledUser] = useState('');
@@ -92,7 +93,7 @@ const Index = () => {
   const [districtData, setDistrictData] = useState<any>(null);
   const [selectedValue, setSelectedValue] = useState<any>();
   const [selectedBlockValue, setSelectedBlockValue] = useState<any>('');
-  const [selectedVillageValue, setSelectedVillageValue] = useState<any>('');
+  const [selectedVillageValue, setSelectedVillageValue] = useState<any>(villageId ? villageId: '');
   const [selectedDistrictValue, setSelectedDistrictValue] = useState<any>('');
   const [isVolunteerFieldId, setIsVolunteerFieldId] = useState<any>('');
 
@@ -379,7 +380,7 @@ const Index = () => {
             ? JSON.parse(villageDataString)
             : null;
           setVillageList(villageData);
-          setSelectedVillageValue(villageData[0]?.Id);
+          setSelectedVillageValue(villageId? villageId: villageData[0]?.Id);
 
           setVillageCount(villageData.length);
         } else if (selectedBlockValue !== '') {
@@ -399,7 +400,7 @@ const Index = () => {
           setVillageCount(transformedVillageData.length);
 
           setVillageList(transformedVillageData);
-          setSelectedVillageValue(transformedVillageData[0]?.Id);
+          setSelectedVillageValue(villageId? villageId:transformedVillageData[0]?.Id);
         }
       } catch (error) {
         console.log(error);
@@ -409,7 +410,7 @@ const Index = () => {
     getVillageList();
   }, [selectedBlockValue]);
   useEffect(() => {
-    setValue(YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() ? 1 : 2);
+    setValue(  tab? Number(tab)  : YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() ? 1 : 2);
   }, []);
   const FormSubmitFunction = async (formData: any, payload: any) => {
     setFormData(formData);
@@ -488,6 +489,8 @@ const Index = () => {
     setOpenReassignVillage(false);
     setAddNew(false);
     setCount(0);
+    setShowAssignmentScreen(false)
+    setFormData({})
   };
 
   const handleButtonClick = async(actionType: string) => {
@@ -658,6 +661,7 @@ const Index = () => {
                     values={districtData}
                     defaultValue={districtData[0]?.id}
                     onSelect={(value) => console.log('Selected:', value)}
+                    label={t('YOUTHNET_USERS_AND_VILLAGES.DISTRICT')}
                   />
                 ) : (
                   <Loader showBackdrop={true} />
@@ -919,9 +923,10 @@ const Index = () => {
               onClose={onClose}
               showFooter={true}
               modalTitle={'New Mentor'}
-              handleNext={FormSubmitFunction}
+            //  handleNext={FormSubmitFunction}
               primaryText={count === 0 ? 'Next' : 'Finish & Assign'}
               secondaryText={count === 1 ? 'Save Progress' : ''}
+              id="dynamic-form-id"
             >
               {/* {count === 0 && (
                 <Box>
@@ -978,6 +983,7 @@ const Index = () => {
                       values={districtData}
                       defaultValue={districtData?.[0]?.id}
                       onSelect={(value) => console.log('Selected:', value)}
+                      label={t('YOUTHNET_USERS_AND_VILLAGES.DISTRICT')}
                     />
                   ) : (
                     <Loader showBackdrop={true} />
@@ -996,6 +1002,7 @@ const Index = () => {
                       onSelect={(value) =>
                         console.log('Selected:', setSelectedBlockValue(value))
                       }
+                      label={t('YOUTHNET_USERS_AND_VILLAGES.BLOCK')}
                     />
                   ) : (
                     <Loader showBackdrop={true} />
@@ -1146,6 +1153,7 @@ const Index = () => {
                       values={districtData}
                       defaultValue={districtData?.[0]?.id}
                       onSelect={(value) => console.log('Selected:', value)}
+                      label={t('YOUTHNET_USERS_AND_VILLAGES.DISTRICT')}
                     />
                   ) : (
                     <Loader showBackdrop={true} />
@@ -1164,6 +1172,7 @@ const Index = () => {
                       onSelect={(value) =>
                         console.log('Selected:', setSelectedBlockValue(value))
                       }
+                      label={t('YOUTHNET_USERS_AND_VILLAGES.BLOCK')}
                     />
                   ) : (
                     <Loader showBackdrop={true} />
@@ -1189,6 +1198,7 @@ const Index = () => {
                   setSelectedVillageValue(value)
                 }
                 }
+                label={t('YOUTHNET_USERS_AND_VILLAGES.VILLAGE')}
               />
             </Box>
             <Box

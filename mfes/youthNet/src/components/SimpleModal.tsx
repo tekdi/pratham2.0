@@ -23,6 +23,7 @@ interface SimpleModalProps {
   onClose: () => void;
   modalTitle: string;
   handleNext?: any;
+  id?: string
 }
 const SimpleModal: React.FC<SimpleModalProps> = ({
   open,
@@ -35,6 +36,7 @@ const SimpleModal: React.FC<SimpleModalProps> = ({
   children,
   modalTitle,
   handleNext,
+  id=""
 }) => {
   const theme = useTheme<any>();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -123,6 +125,8 @@ const SimpleModal: React.FC<SimpleModalProps> = ({
                 sx={buttonStyle}
                 onClick={primaryActionHandler || handleNext}
                 className="one-line-text"
+                form={id} 
+                 type="submit"
               >
                 {primaryText}
               </Button>
