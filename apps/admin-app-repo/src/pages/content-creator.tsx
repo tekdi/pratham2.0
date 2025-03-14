@@ -1,28 +1,21 @@
 // @ts-nocheck
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import Form from '@rjsf/mui';
-import validator from '@rjsf/validator-ajv8';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 import DynamicForm from '@/components/DynamicForm/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
 import {
-  learnerSearchSchema,
-  learnerSearchUISchema,
-} from '../constant/Forms/LearnerSearch';
-import { Status } from '@/utils/app.constant';
+  ContentCreatorSearchSchema,
+  ContentCreatorUISchema,
+} from '../constant/Forms/ContentCreatorSearch';
+
+import { RoleId, RoleName, Status, TenantName } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
-import { Box, Grid, Typography } from '@mui/material';
-import { debounce } from 'lodash';
-import { Numbers } from '@mui/icons-material';
+import { Box, Typography } from '@mui/material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { Button } from '@mui/material';
-import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import SimpleModal from '@/components/SimpleModal';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { updateCohortMemberStatus } from '@/services/CohortService/cohortService';
+import { deleteUser } from '@/services/UserService';
 import editIcon from '../../public/images/editIcon.svg';
 import deleteIcon from '../../public/images/deleteIcon.svg';
 import Image from 'next/image';
@@ -32,11 +25,13 @@ import {
   searchListData,
 } from '@/components/DynamicForm/DynamicFormCallback';
 import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
+import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
+import TenantService from '@/services/TenantService';
 
-const Learner = () => {
+const ContentCreator = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [schema, setSchema] = useState(learnerSearchSchema);
-  const [uiSchema, setUiSchema] = useState(learnerSearchUISchema);
+  const [schema, setSchema] = useState(ContentCreatorSearchSchema);
+  const [uiSchema, setUiSchema] = useState(ContentCreatorUISchema);
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
   const [prefilledAddFormData, setPrefilledAddFormData] = useState({});
@@ -49,13 +44,10 @@ const Learner = () => {
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [isEdit, setIsEdit] = useState(false);
   const [editableUserId, setEditableUserId] = useState('');
-  const [roleId, setRoleID] = useState('');
-  const [tenantId, setTenantId] = useState('');
 
   const { t, i18n } = useTranslation();
-  const initialFormData = localStorage.getItem('stateId')
-    ? { state: localStorage.getItem('stateId') }
-    : {};
+
+  const storedUserData = JSON.parse(localStorage.getItem('adminInfo') || '{}');
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -67,11 +59,11 @@ const Learner = () => {
     const fetchData = async () => {
       const responseForm = await fetchForm([
         {
-          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.learner.context}&contextType=${FormContext.learner.contextType}`,
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.contentCreator.context}&contextType=${FormContext.contentCreator.contextType}`,
           header: {},
         },
         {
-          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.learner.context}&contextType=${FormContext.learner.contextType}`,
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.contentCreator.context}&contextType=${FormContext.contentCreator.contextType}`,
           header: {
             tenantid: localStorage.getItem('tenantId'),
           },
@@ -81,9 +73,8 @@ const Learner = () => {
       setAddSchema(responseForm?.schema);
       setAddUiSchema(responseForm?.uiSchema);
     };
+
     fetchData();
-    setRoleID(localStorage.getItem('roleId'));
-    setTenantId(localStorage.getItem('tenantId'));
   }, []);
 
   const updatedUiSchema = {
@@ -98,8 +89,8 @@ const Learner = () => {
     await searchData(formData, 0);
   };
 
-  const searchData = async (formData, newPage) => {
-    const staticFilter = { role: 'Learner' };
+  const searchData = async (formData: any, newPage: any) => {
+    const staticFilter = { role: RoleName.CONTENT_CREATOR, tenantId: storedUserData.tenantData[0].tenantId };
     const { sortBy } = formData;
     const staticSort = ['firstName', sortBy || 'asc'];
     await searchListData(
@@ -116,11 +107,11 @@ const Learner = () => {
   };
 
   // Define table columns
-  const columns = [
+  let columns = [
     {
       keys: ['firstName', 'middleName', 'lastName'],
-      label: 'Leaner Name',
-      render: (row) =>
+      label: 'Content Creator Name',
+      render: (row: any) =>
         `${row.firstName || ''} ${row.middleName || ''} ${
           row.lastName || ''
         }`.trim(),
@@ -128,46 +119,102 @@ const Learner = () => {
     {
       key: 'status',
       label: 'Status',
-      getStyle: (row) => ({ color: row.status === 'active' ? 'green' : 'red' }),
+      getStyle: (row: any) => ({
+        color: row.status === 'active' ? 'green' : 'red',
+      }),
     },
-    // {
-    //   key: 'STATE',
-    //   label: 'State',
-    //   render: (row) => {
-    //     const state =
-    //       row.customFields.find((field) => field.label === 'STATE')
-    //         ?.selectedValues[0]?.value || '-';
-    //     return `${state}`;
-    //   },
-    // },
     {
-      keys: ['STATE', 'DISTRICT', 'BLOCK', 'VILLAGE'],
-      label: 'Location (State / District / Block/ Village)',
-      render: (row: any) => {
+      key: 'STATE',
+      label: 'State',
+      render: (row) => {
         const state =
-          row.customFields.find(
-            (field: { label: string }) => field.label === 'STATE'
-          )?.selectedValues[0]?.value || '';
-        const district =
-          row.customFields.find(
-            (field: { label: string }) => field.label === 'DISTRICT'
-          )?.selectedValues[0]?.value || '';
-        const block =
-          row.customFields.find(
-            (field: { label: string }) => field.label === 'BLOCK'
-          )?.selectedValues[0]?.value || '';
-        const village =
-          row.customFields.find(
-            (field: { label: string }) => field.label === 'VILLAGE'
-          )?.selectedValues[0]?.value || '';
-        return `${state == '' ? '' : `${state}`}${
-          district == '' ? '' : `, ${district}`
-        }${block == '' ? '' : `, ${block}`}${
-          village == '' ? '' : `, ${village}`
-        }`;
+          row.customFields.find((field) => field.label === 'STATE')
+            ?.selectedValues[0]?.value || '-';
+        return `${state}`;
+      },
+    }
+  ];
+
+  const scpCustomColumns = [
+    {
+      key: 'BOARD',
+      label: 'Board',
+      render: (row) => {
+        const board =
+          row.customFields.find((field) => field.label === 'BOARD')
+            ?.selectedValues[0]?.value || '-';
+        return `${board}`;
       },
     },
-  ];
+    {
+      key: 'MEDIUM',
+      label: 'Medium',
+      render: (row) => {
+        const medium =
+          row.customFields.find((field) => field.label === 'MEDIUM')
+            ?.selectedValues[0]?.value || '-';
+        return `${medium}`;
+      },
+    },
+    {
+      key: 'GRADE',
+      label: 'Grade',
+      render: (row) => {
+        const grade =
+          row.customFields.find((field) => field.label === 'GRADE')
+            ?.selectedValues[0]?.value || '-';
+        return `${grade}`;
+      },
+    },
+    {
+      key: 'SUBJECT',
+      label: 'subject',
+      render: (row) => {
+        const subject =
+          row.customFields.find((field) => field.label === 'SUBJECT')
+            ?.selectedValues[0]?.value || '-';
+        return `${subject}`;
+      },
+    }
+  ]
+
+  const youthnetCustomColumns = [
+    {
+      key: 'DOMAIN',
+      label: 'Domain',
+      render: (row) => {
+        const domain =
+          row.customFields.find((field) => field.label === 'DOMAIN')
+            ?.selectedValues[0]?.value || '-';
+        return `${domain}`;
+      },
+    },
+    {
+      key: 'SUB-DOMAIN',
+      label: 'Sub Domain',
+      render: (row) => {
+        const subDomain =
+          row.customFields.find((field) => field.label === 'SUB-DOMAIN')
+            ?.selectedValues[0]?.value || '-';
+        return `${subDomain}`;
+      },
+    },
+    {
+      key: 'STREAM',
+      label: 'Stream',
+      render: (row) => {
+        const stream =
+          row.customFields.find((field) => field.label === 'STREAM')
+            ?.selectedValues[0]?.value || '-';
+        return `${stream}`;
+      }
+    }
+  ]
+  if (storedUserData.tenantData[0].tenantName === TenantName.SECOND_CHANCE_PROGRAM) {
+    columns = [...columns, ...scpCustomColumns]
+  } else if (storedUserData.tenantData[0].tenantName === TenantName.YOUTHNET) {
+    columns = [...columns, ...youthnetCustomColumns]
+  }
 
   // Define actions
   const actions = [
@@ -186,13 +233,13 @@ const Learner = () => {
           <Image src={editIcon} alt="" />
         </Box>
       ),
-      callback: (row) => {
-        // console.log('row:', row);
-        // console.log('AddSchema', addSchema);
-        // console.log('AddUISchema', addUiSchema);
+      callback: (row: any) => {
+        console.log('row:', row);
+        console.log('AddSchema', addSchema);
+        console.log('AddUISchema', addUiSchema);
 
         let tempFormData = extractMatchingKeys(row, addSchema);
-        // console.log('tempFormData', tempFormData);
+        console.log('tempFormData', tempFormData);
         setPrefilledAddFormData(tempFormData);
         setIsEdit(true);
         setEditableUserId(row?.userId);
@@ -212,21 +259,20 @@ const Learner = () => {
           }}
         >
           {' '}
-          <Image src={deleteIcon} alt="" />{' '}
+          <Image src={deleteIcon} alt="" />
         </Box>
       ),
-      callback: async (row) => {
+      callback: async (row: any) => {
         console.log('row:', row);
-        // setEditableUserId(row?.userId);
-        const memberStatus = Status.ARCHIVED;
-        const statusReason = '';
-        const membershipId = row?.userId;
-
-        const response = await updateCohortMemberStatus({
-          memberStatus,
-          statusReason,
-          membershipId,
-        });
+        setEditableUserId(row?.userId);
+        const userId = row?.userId;
+        const response = await deleteUser(
+          userId, {
+            userData: {
+              status: Status.ARCHIVED
+            }
+          }
+        );
         setPrefilledFormData({});
         searchData(prefilledFormData, currentPage);
         setOpenModal(false);
@@ -235,13 +281,13 @@ const Learner = () => {
   ];
 
   // Pagination handlers
-  const handlePageChange = (newPage) => {
-    // console.log('Page changed to:', newPage);
+  const handlePageChange = (newPage: any) => {
+    console.log('Page changed to:', newPage);
     searchData(prefilledFormData, newPage);
   };
 
-  const handleRowsPerPageChange = (newRowsPerPage) => {
-    // console.log('Rows per page changed to:', newRowsPerPage);
+  const handleRowsPerPageChange = (newRowsPerPage: any) => {
+    console.log('Rows per page changed to:', newRowsPerPage);
     setPageLimit(newRowsPerPage);
   };
 
@@ -256,26 +302,26 @@ const Learner = () => {
   const extraFields = {
     tenantCohortRoleMapping: [
       {
-        tenantId: tenantId,
-        roleId: roleId,
+        tenantId: TenantService.getTenantId(),
+        roleId: RoleId.CONTENT_CREATOR,
       },
     ],
-    username: 'Leaner',
     password: Math.floor(10000 + Math.random() * 90000),
   };
-  const successUpdateMessage = 'LEARNERS.LEARNER_UPDATED_SUCCESSFULLY';
-  const telemetryUpdateKey = 'scp-learner-updated-successfully';
-  const failureUpdateMessage = 'COMMON.NOT_ABLE_UPDATE_LEARNER';
-  const successCreateMessage = 'LEARNERS.LEARNER_CREATED_SUCCESSFULLY';
-  const telemetryCreateKey = 'scp-learner-created-successfully';
-  const failureCreateMessage = 'COMMON.NOT_ABLE_CREATE_LEARNER';
-  const notificationKey = 'onLearnerCreated';
-  const notificationMessage = 'LEARNERS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
+  const successUpdateMessage =
+    'CONTENT_CREATORS.CONTENT_CREATOR_UPDATED_SUCCESSFULLY';
+  const telemetryUpdateKey = 'content-creator-updated-successfully';
+  const failureUpdateMessage =
+    'CONTENT_CREATORS.NOT_ABLE_UPDATE_CONTENT_CREATOR';
+  const successCreateMessage =
+    'CONTENT_CREATORS.CONTENT_CREATOR_CREATED_SUCCESSFULLY';
+  const telemetryCreateKey = 'content-creator-created-successfully';
+  const failureCreateMessage =
+    'CONTENT_CREATORS.NOT_ABLE_CREATE_CONTENT_CREATOR';
+  const notificationKey = 'onContentCreatorCreate';
+  const notificationMessage =
+    'CONTENT_CREATORS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
-
-  useEffect(() => {
-    setPrefilledFormData(initialFormData);
-  }, []);
 
   return (
     <>
@@ -290,11 +336,11 @@ const Learner = () => {
               uiSchema={updatedUiSchema}
               SubmitaFunction={SubmitaFunction}
               isCallSubmitInHandle={true}
-              prefilledFormData={prefilledFormData}
+              prefilledFormData={prefilledFormData || {}}
             />
           )
         )}
-        <Box mt={4} sx={{ display: 'flex', justifyContent: 'end' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }} mt={4}>
           <Button
             variant="outlined"
             color="primary"
@@ -314,7 +360,9 @@ const Learner = () => {
           onClose={handleCloseModal}
           showFooter={false}
           modalTitle={
-            isEdit ? t('LEARNERS.EDIT_LEARNER') : t('LEARNERS.NEW_LEARNER')
+            isEdit
+              ? t('CONTENT_CREATORS.UPDATE_CONTENT_CREATOR')
+              : t('CONTENT_CREATORS.NEW_CONTENT_CREATOR')
           }
         >
           <AddEditUser
@@ -368,7 +416,7 @@ const Learner = () => {
             height="20vh"
           >
             <Typography marginTop="10px" textAlign={'center'}>
-              {t('LEARNERS.NO_LEARNERS_FOUND')}
+              {t('COMMON.NO_CONTENT_CREATOR_FOUND')}
             </Typography>
           </Box>
         )}
@@ -384,4 +432,4 @@ export async function getStaticProps({ locale }: any) {
   };
 }
 
-export default Learner;
+export default ContentCreator;

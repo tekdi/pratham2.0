@@ -1,28 +1,21 @@
 // @ts-nocheck
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import Form from '@rjsf/mui';
-import validator from '@rjsf/validator-ajv8';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 import DynamicForm from '@/components/DynamicForm/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
 import {
-  TeamLeaderSearchSchema,
-  TeamLeaderSearchUISchema,
-} from '../constant/Forms/TeamLeaderSearch';
-import { Status } from '@/utils/app.constant';
+  StateLeadSearchSchema,
+  StateLeadUISchema,
+} from '../constant/Forms/StateLeadSearch';
+
+import { RoleId, RoleName, Status } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
-import { Box, Grid, Typography } from '@mui/material';
-import { debounce } from 'lodash';
-import { Numbers } from '@mui/icons-material';
+import { Box, Typography } from '@mui/material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { Button } from '@mui/material';
-import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import SimpleModal from '@/components/SimpleModal';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { updateCohortMemberStatus } from '@/services/CohortService/cohortService';
+import { deleteUser } from '@/services/UserService';
 import editIcon from '../../public/images/editIcon.svg';
 import deleteIcon from '../../public/images/deleteIcon.svg';
 import Image from 'next/image';
@@ -32,11 +25,13 @@ import {
   searchListData,
 } from '@/components/DynamicForm/DynamicFormCallback';
 import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
+import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
+import TenantService from '@/services/TenantService';
 
-const TeamLeader = () => {
+const StateLead = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [schema, setSchema] = useState(TeamLeaderSearchSchema);
-  const [uiSchema, setUiSchema] = useState(TeamLeaderSearchUISchema);
+  const [schema, setSchema] = useState(StateLeadSearchSchema);
+  const [uiSchema, setUiSchema] = useState(StateLeadUISchema);
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
   const [prefilledAddFormData, setPrefilledAddFormData] = useState({});
@@ -49,13 +44,8 @@ const TeamLeader = () => {
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [isEdit, setIsEdit] = useState(false);
   const [editableUserId, setEditableUserId] = useState('');
-  const [roleId, setRoleID] = useState('');
-  const [tenantId, setTenantId] = useState('');
 
   const { t, i18n } = useTranslation();
-  const initialFormData = localStorage.getItem('stateId')
-    ? { state: localStorage.getItem('stateId') }
-    : {};
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -67,13 +57,13 @@ const TeamLeader = () => {
     const fetchData = async () => {
       const responseForm = await fetchForm([
         {
-          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.teamLead.context}&contextType=${FormContext.teamLead.contextType}`,
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.stateLead.context}&contextType=${FormContext.stateLead.contextType}`,
           header: {},
         },
         {
-          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.teamLead.context}&contextType=${FormContext.teamLead.contextType}`,
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.stateLead.context}&contextType=${FormContext.stateLead.contextType}`,
           header: {
-            tenantid: localStorage.getItem('tenantId'),
+            tenantid: TenantService.getTenantId(),
           },
         },
       ]);
@@ -81,9 +71,8 @@ const TeamLeader = () => {
       setAddSchema(responseForm?.schema);
       setAddUiSchema(responseForm?.uiSchema);
     };
+
     fetchData();
-    setRoleID(localStorage.getItem('roleId'));
-    setTenantId(localStorage.getItem('tenantId'));
   }, []);
 
   const updatedUiSchema = {
@@ -98,8 +87,8 @@ const TeamLeader = () => {
     await searchData(formData, 0);
   };
 
-  const searchData = async (formData, newPage) => {
-    const staticFilter = { role: 'Lead' };
+  const searchData = async (formData: any, newPage: any) => {
+    const staticFilter = { role: RoleName.STATE_LEAD, tenantId: TenantService.getTenantId() };
     const { sortBy } = formData;
     const staticSort = ['firstName', sortBy || 'asc'];
     await searchListData(
@@ -119,8 +108,8 @@ const TeamLeader = () => {
   const columns = [
     {
       keys: ['firstName', 'middleName', 'lastName'],
-      label: 'Team Lead Name',
-      render: (row) =>
+      label: 'State Lead Name',
+      render: (row: any) =>
         `${row.firstName || ''} ${row.middleName || ''} ${
           row.lastName || ''
         }`.trim(),
@@ -128,50 +117,20 @@ const TeamLeader = () => {
     {
       key: 'status',
       label: 'Status',
-      getStyle: (row) => ({ color: row.status === 'active' ? 'green' : 'red' }),
+      getStyle: (row: any) => ({
+        color: row.status === 'active' ? 'green' : 'red',
+      }),
     },
-    // {
-    //   key: 'STATE',
-    //   label: 'State',
-    //   render: (row) => {
-    //     const state =
-    //       row.customFields.find((field) => field.label === 'STATE')
-    //         ?.selectedValues[0]?.value || '-';
-    //     return `${state}`;
-    //   },
-    // },
     {
-      keys: ['STATE', 'DISTRICT', 'BLOCK', 'VILLAGE'],
-      label: 'Location (State / District / Block / Village)',
-      render: (row: any) => {
+      key: 'STATE',
+      label: 'State',
+      render: (row) => {
         const state =
-          row.customFields.find(
-            (field: { label: string }) => field.label === 'STATE'
-          )?.selectedValues[0]?.value || '';
-        const district =
-          row.customFields.find(
-            (field: { label: string }) => field.label === 'DISTRICT'
-          )?.selectedValues[0]?.value || '';
-        const block =
-          row.customFields.find(
-            (field: { label: string }) => field.label === 'BLOCK'
-          )?.selectedValues[0]?.value || '';
-        const village =
-          row.customFields.find(
-            (field: { label: string }) => field.label === 'VILLAGE'
-          )?.selectedValues[0]?.value || '';
-        return `${state == '' ? '' : `${state}`}${
-          district == '' ? '' : `, ${district}`
-        }${block == '' ? '' : `, ${block}`}${
-          village == '' ? '' : `, ${village}`
-        }`;
+          row.customFields.find((field) => field.label === 'STATE')
+            ?.selectedValues[0]?.value || '-';
+        return `${state}`;
       },
-    },
-    // {
-    //   keys: ['updatedBy'],
-    //   label: 'Updated By',
-    //   render: (row) => row.updatedBy
-    // },
+    }
   ];
 
   // Define actions
@@ -191,13 +150,13 @@ const TeamLeader = () => {
           <Image src={editIcon} alt="" />
         </Box>
       ),
-      callback: (row) => {
-        // console.log('row:', row);
-        // console.log('AddSchema', addSchema);
-        // console.log('AddUISchema', addUiSchema);
+      callback: (row: any) => {
+        console.log('row:', row);
+        console.log('AddSchema', addSchema);
+        console.log('AddUISchema', addUiSchema);
 
         let tempFormData = extractMatchingKeys(row, addSchema);
-        // console.log('tempFormData', tempFormData);
+        console.log('tempFormData', tempFormData);
         setPrefilledAddFormData(tempFormData);
         setIsEdit(true);
         setEditableUserId(row?.userId);
@@ -217,21 +176,20 @@ const TeamLeader = () => {
           }}
         >
           {' '}
-          <Image src={deleteIcon} alt="" />{' '}
+          <Image src={deleteIcon} alt="" />
         </Box>
       ),
-      callback: async (row) => {
+      callback: async (row: any) => {
         console.log('row:', row);
-        // setEditableUserId(row?.userId);
-        const memberStatus = Status.ARCHIVED;
-        const statusReason = '';
-        const membershipId = row?.userId;
-
-        const response = await updateCohortMemberStatus({
-          memberStatus,
-          statusReason,
-          membershipId,
-        });
+        setEditableUserId(row?.userId);
+        const userId = row?.userId;
+        const response = await deleteUser(
+          userId, {
+            userData: {
+              status: Status.ARCHIVED
+            }
+          }
+        );
         setPrefilledFormData({});
         searchData(prefilledFormData, currentPage);
         setOpenModal(false);
@@ -240,13 +198,13 @@ const TeamLeader = () => {
   ];
 
   // Pagination handlers
-  const handlePageChange = (newPage) => {
-    // console.log('Page changed to:', newPage);
+  const handlePageChange = (newPage: any) => {
+    console.log('Page changed to:', newPage);
     searchData(prefilledFormData, newPage);
   };
 
-  const handleRowsPerPageChange = (newRowsPerPage) => {
-    // console.log('Rows per page changed to:', newRowsPerPage);
+  const handleRowsPerPageChange = (newRowsPerPage: any) => {
+    console.log('Rows per page changed to:', newRowsPerPage);
     setPageLimit(newRowsPerPage);
   };
 
@@ -261,26 +219,26 @@ const TeamLeader = () => {
   const extraFields = {
     tenantCohortRoleMapping: [
       {
-        tenantId: tenantId,
-        roleId: roleId,
+        tenantId: TenantService.getTenantId(),
+        roleId: RoleId.STATE_LEAD,
       },
     ],
-    username: 'scpTeamLead',
     password: Math.floor(10000 + Math.random() * 90000),
   };
-  const successUpdateMessage = 'TEAM_LEADERS.TEAM_LEADER_UPDATED_SUCCESSFULLY';
-  const telemetryUpdateKey = 'scp-team-lead-updated-successfully';
-  const failureUpdateMessage = 'TEAM_LEADERS.NOT_ABLE_UPDATE_TEAM_LEADER';
-  const successCreateMessage = 'TEAM_LEADERS.TEAM_LEADER_CREATED_SUCCESSFULLY';
-  const telemetryCreateKey = 'scp-team-lead-created-successfully';
-  const failureCreateMessage = 'TEAM_LEADERS.NOT_ABLE_CREATE_TEAM_LEADER';
-  const notificationKey = 'onTeamLeaderCreated';
-  const notificationMessage = 'TEAM_LEADERS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
+  const successUpdateMessage =
+    'STATE_LEADS.STATE_LEAD_UPDATED_SUCCESSFULLY';
+  const telemetryUpdateKey = 'content-creator-updated-successfully';
+  const failureUpdateMessage =
+    'STATE_LEADS.NOT_ABLE_UPDATE_STATE_LEAD';
+  const successCreateMessage =
+    'STATE_LEADS.STATE_LEAD_CREATED_SUCCESSFULLY';
+  const telemetryCreateKey = 'content-creator-created-successfully';
+  const failureCreateMessage =
+    'STATE_LEADS.NOT_ABLE_CREATE_STATE_LEAD';
+  const notificationKey = 'onStateLeadCreate';
+  const notificationMessage =
+    'STATE_LEADS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
-
-  useEffect(() => {
-    setPrefilledFormData(initialFormData);
-  }, []);
 
   return (
     <>
@@ -295,11 +253,11 @@ const TeamLeader = () => {
               uiSchema={updatedUiSchema}
               SubmitaFunction={SubmitaFunction}
               isCallSubmitInHandle={true}
-              prefilledFormData={prefilledFormData}
+              prefilledFormData={prefilledFormData || {}}
             />
           )
         )}
-        <Box mt={4} sx={{ display: 'flex', justifyContent: 'end' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }} mt={4}>
           <Button
             variant="outlined"
             color="primary"
@@ -320,8 +278,8 @@ const TeamLeader = () => {
           showFooter={false}
           modalTitle={
             isEdit
-              ? t('TEAM_LEADERS.EDIT_TEAM_LEADER')
-              : t('TEAM_LEADERS.NEW_TEAM_LEADER')
+              ? t('STATE_LEADS.UPDATE_STATE_LEAD')
+              : t('STATE_LEADS.NEW_STATE_LEAD')
           }
         >
           <AddEditUser
@@ -375,7 +333,7 @@ const TeamLeader = () => {
             height="20vh"
           >
             <Typography marginTop="10px" textAlign={'center'}>
-              {t('TEAM_LEADERS.NO_TEAM_LEADER_FOUND')}
+              {t('COMMON.NO_STATE_LEAD_FOUND')}
             </Typography>
           </Box>
         )}
@@ -391,4 +349,4 @@ export async function getStaticProps({ locale }: any) {
   };
 }
 
-export default TeamLeader;
+export default StateLead;

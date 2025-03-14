@@ -129,13 +129,13 @@ export const BatchSearchSchema = {
         },
         method: 'POST',
         options: {
-          label: 'label',
-          value: 'value',
-          optionObj: 'result.values',
+          label: 'name',
+          value: 'cohortId',
+          optionObj: 'result.results.cohortDetails',
         },
         payload: {
-          limit: '**',
-          offset: '**',
+          limit: '200',
+          offset: '0',
           filters: {
             status: ['active'],
           },
@@ -161,19 +161,35 @@ export const BatchSearchUISchema = {
   'ui:order': ['state', 'district', 'block', 'village', 'searchKey', 'sortBy'],
 
   state: {
-    'ui:widget': 'select',
+    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:options': {
+      multiple: true,
+      uniqueItems: true,
+    },
   },
 
   district: {
-    'ui:widget': 'select',
+    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:options': {
+      multiple: true,
+      uniqueItems: true,
+    },
   },
 
   block: {
-    'ui:widget': 'select',
+    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:options': {
+      multiple: true,
+      uniqueItems: true,
+    },
   },
 
   village: {
-    'ui:widget': 'select',
+    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:options': {
+      multiple: true,
+      uniqueItems: true,
+    },
   },
 
   searchKey: {

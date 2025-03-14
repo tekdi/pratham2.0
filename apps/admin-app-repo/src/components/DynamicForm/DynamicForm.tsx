@@ -1,3 +1,4 @@
+
 // @ts-nocheck
 import React, { useState, useEffect, useRef } from 'react';
 import Form from '@rjsf/mui';
@@ -25,6 +26,7 @@ const DynamicForm = ({
   const { t } = useTranslation();
 
   const [submitted, setSubmitted] = useState(false);
+  const formRef = useRef(null);
   const [formSchema, setFormSchema] = useState(schema);
   const [formUiSchemaOriginal, setFormUiSchemaOriginal] = useState(uiSchema);
   const [formUiSchema, setFormUiSchema] = useState(uiSchema);
@@ -89,55 +91,102 @@ const DynamicForm = ({
       try {
         const apiRequests = initialApis.map((field) => {
           const { api } = field;
+          // If header exists, replace values with localStorage values
+          let customHeader = api?.header
+            ? {
+                tenantId:
+                  api.header.tenantId === '**'
+                    ? localStorage.getItem('tenantId') || ''
+                    : api.header.tenantId,
+                Authorization:
+                  api.header.Authorization === '**'
+                    ? `Bearer ${localStorage.getItem('token') || ''}`
+                    : api.header.Authorization,
+                academicyearid:
+                  api.header.academicyearid === '**'
+                    ? localStorage.getItem('academicYearId') || ''
+                    : api.header.academicyearid,
+              }
+            : {};
           const config = {
             method: api.method,
             url: api.url,
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', ...customHeader },
             ...(api.method === 'POST' && { data: api.payload }),
           };
-          return axios(config).then((response) => ({
-            fieldKey: field.key,
-            data: getNestedValue(response.data, api.options.optionObj),
-          }));
+          return axios(config)
+            .then((response) => ({
+              fieldKey: field.key,
+              data: getNestedValue(response.data, api.options.optionObj),
+            }))
+            .catch((error) => ({
+              error: error,
+              fieldKey: field.key,
+            }));
         });
 
         const responses = await Promise.all(apiRequests);
         // console.log('API Responses:', responses);
         // Update schema dynamically
-        setFormSchema((prevSchema) => {
-          const updatedProperties = { ...prevSchema.properties };
-          responses.forEach(({ fieldKey, data }) => {
-            // // console.log('Data:', data);
-            // // console.log('fieldKey:', fieldKey);
-            let label = prevSchema.properties[fieldKey].api.options.label;
-            let value = prevSchema.properties[fieldKey].api.options.value;
+        if (!responses[0]?.error) {
+          setFormSchema((prevSchema) => {
+            const updatedProperties = { ...prevSchema.properties };
+            responses.forEach(({ fieldKey, data }) => {
+              // // console.log('Data:', data);
+              // // console.log('fieldKey:', fieldKey);
+              let label = prevSchema.properties[fieldKey].api.options.label;
+              let value = prevSchema.properties[fieldKey].api.options.value;
+              if (updatedProperties[fieldKey]?.isMultiSelect === true) {
+                updatedProperties[fieldKey] = {
+                  ...updatedProperties[fieldKey],
+                  items: {
+                    type: 'string',
+                    enum: data
+                      ? data.map((item) => item?.[value].toString())
+                      : ['Select'],
+                    enumNames: data
+                      ? data.map((item) => item?.[label].toString())
+                      : ['Select'],
+                  },
+                };
+              } else {
+                updatedProperties[fieldKey] = {
+                  ...updatedProperties[fieldKey],
+                  enum: data
+                    ? data.map((item) => item?.[value].toString())
+                    : ['Select'],
+                  enumNames: data
+                    ? data.map((item) => item?.[label].toString())
+                    : ['Select'],
+                };
+              }
+            });
+            return { ...prevSchema, properties: updatedProperties };
+          });
+        } else {
+          setFormSchema((prevSchema) => {
+            const updatedProperties = { ...prevSchema.properties };
+            let fieldKey = responses[0]?.fieldKey;
             if (updatedProperties[fieldKey]?.isMultiSelect === true) {
               updatedProperties[fieldKey] = {
                 ...updatedProperties[fieldKey],
                 items: {
                   type: 'string',
-                  enum: data
-                    ? data.map((item) => item?.[value].toString())
-                    : [],
-                  enumNames: data
-                    ? data.map((item) => item?.[label].toString())
-                    : [],
+                  enum: ['Select'],
+                  enumNames: ['Select'],
                 },
               };
             } else {
               updatedProperties[fieldKey] = {
                 ...updatedProperties[fieldKey],
-                enum: data
-                  ? data.map((item) => item?.[value].toString())
-                  : ['Select'],
-                enumNames: data
-                  ? data.map((item) => item?.[label].toString())
-                  : ['Select'],
+                enum: ['Select'],
+                enumNames: ['Select'],
               };
             }
+            return { ...prevSchema, properties: updatedProperties };
           });
-          return { ...prevSchema, properties: updatedProperties };
-        });
+        }
+
         //setIsInitialCompleted
         setIsInitialCompleted(true);
       } catch (error) {
@@ -277,14 +326,29 @@ const DynamicForm = ({
             // const updatedPayload = JSON.parse(
             //   JSON.stringify(api.payload).replace(/\*\*/g, changedFieldValue)
             // );
-
+            // If header exists, replace values with localStorage values
+            let customHeader = api?.header
+              ? {
+                  tenantId:
+                    api.header.tenantId === '**'
+                      ? localStorage.getItem('tenantId') || ''
+                      : api.header.tenantId,
+                  Authorization:
+                    api.header.Authorization === '**'
+                      ? `Bearer ${localStorage.getItem('token') || ''}`
+                      : api.header.Authorization,
+                  academicyearid:
+                    api.header.academicyearid === '**'
+                      ? localStorage.getItem('academicYearId') || ''
+                      : api.header.academicyearid,
+                }
+              : {};
             const config = {
               method: api.method,
               url: api.url,
-              headers: { 'Content-Type': 'application/json' },
+              headers: { 'Content-Type': 'application/json', ...customHeader },
               ...(api.method === 'POST' && { data: updatedPayload }),
             };
-
             if (key) {
               const changedField = key;
 
@@ -328,13 +392,34 @@ const DynamicForm = ({
                       //   )
                       // );
 
+                      // If header exists, replace values with localStorage values
+                      let customHeader = api?.header
+                        ? {
+                            tenantId:
+                              api.header.tenantId === '**'
+                                ? localStorage.getItem('tenantId') || ''
+                                : api.header.tenantId,
+                            Authorization:
+                              api.header.Authorization === '**'
+                                ? `Bearer ${
+                                    localStorage.getItem('token') || ''
+                                  }`
+                                : api.header.Authorization,
+                            academicyearid:
+                              api.header.academicyearid === '**'
+                                ? localStorage.getItem('academicYearId') || ''
+                                : api.header.academicyearid,
+                          }
+                        : {};
                       const config = {
                         method: api.method,
                         url: api.url,
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                          'Content-Type': 'application/json',
+                          ...customHeader,
+                        },
                         ...(api.method === 'POST' && { data: updatedPayload }),
                       };
-
                       return axios(config)
                         .then((response) => ({
                           fieldKey: field.key,
@@ -402,8 +487,8 @@ const DynamicForm = ({
                             ...updatedProperties[fieldKey],
                             items: {
                               type: 'string',
-                              enum: [],
-                              enumNames: [],
+                              enum: ['Select'],
+                              enumNames: ['Select'],
                             },
                           };
                         } else {
@@ -588,7 +673,13 @@ const DynamicForm = ({
     });
   };
 
-  const handleChange = ({ formData }: { formData: any }) => {
+  const handleChange = ({
+    formData,
+    errors,
+  }: {
+    formData: any;
+    errors: any;
+  }) => {
     // const changedField = Object.keys(formData).find(
     //   (key) => formData[key] !== prevFormData.current[key]
     // );
@@ -622,8 +713,8 @@ const DynamicForm = ({
                   ...updatedProperties[key],
                   items: {
                     type: 'string',
-                    enum: [], // Clear the enum
-                    enumNames: [], // Clear the enumNames
+                    enum: ['Select'], // Clear the enum
+                    enumNames: ['Select'], // Clear the enumNames
                   },
                 };
               } else {
@@ -688,13 +779,32 @@ const DynamicForm = ({
                 //   )
                 // );
 
+                // If header exists, replace values with localStorage values
+                let customHeader = api?.header
+                  ? {
+                      tenantId:
+                        api.header.tenantId === '**'
+                          ? localStorage.getItem('tenantId') || ''
+                          : api.header.tenantId,
+                      Authorization:
+                        api.header.Authorization === '**'
+                          ? `Bearer ${localStorage.getItem('token') || ''}`
+                          : api.header.Authorization,
+                      academicyearid:
+                        api.header.academicyearid === '**'
+                          ? localStorage.getItem('academicYearId') || ''
+                          : api.header.academicyearid,
+                    }
+                  : {};
                 const config = {
                   method: api.method,
                   url: api.url,
-                  headers: { 'Content-Type': 'application/json' },
+                  headers: {
+                    'Content-Type': 'application/json',
+                    ...customHeader,
+                  },
                   ...(api.method === 'POST' && { data: updatedPayload }),
                 };
-
                 return axios(config)
                   .then((response) => ({
                     fieldKey: field.key,
@@ -746,8 +856,8 @@ const DynamicForm = ({
                       ...updatedProperties[fieldKey],
                       items: {
                         type: 'string',
-                        enum: [],
-                        enumNames: [],
+                        enum: ['Select'],
+                        enumNames: ['Select'],
                       },
                     };
                   } else {
@@ -772,7 +882,11 @@ const DynamicForm = ({
 
       prevFormData.current = formData;
       // console.log('Form data changed:', formData);
+      // live error
       setFormData(formData);
+      if (errors.length > 0) {
+        setSubmitted(true);
+      }
 
       function getSkipKeys(skipHideObject, formData) {
         let skipKeys = [];
@@ -873,6 +987,16 @@ const DynamicForm = ({
     if (!isCallSubmitInHandle) {
       FormSubmitFunction(filteredData, transformedFormData);
     }
+
+    //live validate error fix
+    setSubmitted(true);
+    // Get first error field and scroll into view
+    setTimeout(() => {
+      const errorField = document.querySelector('.field-error');
+      if (errorField) {
+        errorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
   };
   // console.log(formSchema);
 
@@ -880,24 +1004,27 @@ const DynamicForm = ({
     <>
       {!isCallSubmitInHandle ? (
         <Form
+          ref={formRef}
           schema={formSchema}
           uiSchema={formUiSchema}
           formData={formData}
           onChange={handleChange}
           onSubmit={handleSubmit}
           validator={validator}
-           id="dynamic-form-id"
-          noHtml5Validate
+          // noHtml5Validate //disable auto error pop up to field location
           showErrorList={false} // Hides the error list card at the top
+          liveValidate //all validate live
           // liveValidate={submitted} // Only validate on submit or typing
           // onChange={() => setSubmitted(true)} // Show validation when user starts typing
           widgets={widgets}
+          id="dynamic-form-id"
         />
       ) : (
         <Grid container spacing={2}>
           {Object.keys(formSchema.properties).map((key) => (
             <Grid item xs={12} md={4} lg={4} key={key} sx={{ mb: '-40px' }}>
               <Form
+                ref={formRef}
                 schema={{
                   type: 'object',
                   properties: { [key]: formSchema.properties[key] },
@@ -910,9 +1037,10 @@ const DynamicForm = ({
                 // submitButtonProps={{
                 //   style: { display: !isCallSubmitInHandle ? 'none' : 'block' },
                 // }}
-                noHtml5Validate
+                // noHtml5Validate //disable auto error pop up to field location
                 showErrorList={false} // Hides the error list card at the top
-                // liveValidate={submitted} // Only validate on submit or typing
+                // liveValidate //all validate live
+                liveValidate={submitted} // Only validate on submit or typing
                 // onChange={() => setSubmitted(true)} // Show validation when user starts typing
                 // {...(isCallSubmitInHandle
                 //   ? { submitButtonProps: { style: { display: 'none' } } }
