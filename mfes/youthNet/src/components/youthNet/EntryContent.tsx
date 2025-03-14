@@ -3,26 +3,17 @@ import { Box, Divider, Typography } from '@mui/material';
 import { UserList } from './UserCard';
 import UploadedFile from './UploadedFile';
 
-type EntryContentProps = {
-  date: string;
-  users: { name: string; age: string; village: string; image: string }[];
-  theme: string;
-  files: string[]; // Array of filenames for uploaded files
-  youthListUsers: {
-    name: string;
-    age: string;
-    village: string;
-    image: string;
-  }[];
+type QuestionAnswer = {
+  question: string;
+  answer: React.ReactNode;
 };
 
-const EntryContent: React.FC<EntryContentProps> = ({
-  date,
-  users,
-  theme,
-  files,
-  youthListUsers,
-}) => {
+type EntryContentProps = {
+  date: string;
+  qaPairs: QuestionAnswer[];
+};
+
+const EntryContent: React.FC<EntryContentProps> = ({ date, qaPairs }: any) => {
   return (
     <Box>
       <Typography
@@ -30,34 +21,18 @@ const EntryContent: React.FC<EntryContentProps> = ({
       >
         {date}
       </Typography>
-      <UserList users={users} />
       <Divider />
-      <Typography
-        sx={{
-          marginTop: '30px',
-          fontSize: '16px',
-          fontWeight: '500',
-          color: 'black',
-        }}
-      >
-        Theme: {theme}
-      </Typography>
-      <Typography
-        sx={{ marginTop: '12px', fontSize: '14px', fontWeight: '500' }}
-      >
-        Uploaded files(s)
-      </Typography>
-      {files.map((file, index) => (
-        <UploadedFile key={index} title={file} />
+      {qaPairs.map((pair: any, index: any) => (
+        <Box key={index} sx={{ marginTop: '20px' }}>
+          <Typography
+            sx={{ fontSize: '14px', fontWeight: '500', color: 'black' }}
+          >
+            {pair.question}
+          </Typography>
+          <Box sx={{ marginTop: '8px' }}>{pair.answer}</Box>
+        </Box>
       ))}
-      <Typography
-        sx={{ marginTop: '20px', fontSize: '14px', fontWeight: '500' }}
-      >
-        Youth List
-      </Typography>
-      <UserList users={youthListUsers} />
     </Box>
   );
 };
-
 export default EntryContent;
