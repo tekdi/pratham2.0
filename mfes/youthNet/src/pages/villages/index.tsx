@@ -920,9 +920,10 @@ const Index = () => {
               onClose={onClose}
               showFooter={true}
               modalTitle={'New Mentor'}
-              handleNext={FormSubmitFunction}
+            //  handleNext={FormSubmitFunction}
               primaryText={count === 0 ? 'Next' : 'Finish & Assign'}
               secondaryText={count === 1 ? 'Save Progress' : ''}
+              id="dynamic-form-id"
             >
               {/* {count === 0 && (
                 <Box>

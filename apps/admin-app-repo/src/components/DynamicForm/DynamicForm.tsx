@@ -886,6 +886,7 @@ const DynamicForm = ({
           onChange={handleChange}
           onSubmit={handleSubmit}
           validator={validator}
+           id="dynamic-form-id"
           noHtml5Validate
           showErrorList={false} // Hides the error list card at the top
           // liveValidate={submitted} // Only validate on submit or typing
