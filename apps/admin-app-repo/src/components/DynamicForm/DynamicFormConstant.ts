@@ -27,4 +27,16 @@ export const FormContext = {
     context: 'USERS',
     contextType: 'LEARNER',
   },
+  contentCreator: {
+    context: 'USERS',
+    contextType: 'Content Creator'
+  },
+  contentReviewer: {
+    context: 'USERS',
+    contextType: 'Content Reviewer'
+  },
+  stateLead: {
+    context: 'USERS',
+    contextType: 'State Lead'
+  }
 };
