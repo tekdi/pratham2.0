@@ -724,7 +724,8 @@
     "ASSIGN_VOLUNTEERS_NOW": "Assign Volunteers Now",
     "REMIND_ME_LATER": "Remind Me Later",
     "NEW_SURVEY_HAS_BEEN_ADDED": "A new survey '{{surveyName}}' has been added and has been assigned to {{villageCount}} villages",
-    "ASSIGN_VOLUNTEERS_TO_ENSURE": "Assign Volunteers to ensure they can access the survey"
+    "ASSIGN_VOLUNTEERS_TO_ENSURE": "Assign Volunteers to ensure they can access the survey",
+    "SURVEY_ASSIGNED_VILLAGE_COUNT":"Assigned to {{villageCount}} Villages"
   },
   "YOUTHNET_DASHBOARD": {
     "VILLAGES_MANAGED_BY_YOU": "Villages Managed by you : {{totalVillageCount}}",

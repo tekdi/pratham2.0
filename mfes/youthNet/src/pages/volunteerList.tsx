@@ -11,12 +11,19 @@ import VolunteerListCard from '../components/youthNet/VolunteerListCard';
 import NoDataFound from '../components/common/NoDataFound';
 import { Role, Status } from '../utils/app.constant';
 import { fetchUserList } from '../services/youthNet/Dashboard/UserServices';
+import { getStateBlockDistrictList } from '../services/youthNet/Dashboard/VillageServices';
+import { useTranslation } from 'next-i18next';
+import { fetchEntities } from '@/services/ObservationServices';
 
 const volunteerList = () => {
   const router = useRouter();
  const [villageList, setVillageList] = useState<any>();
+ const [villageCount, setVillageCount] = useState<any>();
+  const { t } = useTranslation();
 
+ 
   const { surveyName } = router.query;
+  const { blockId , observationId, solutionId} = router.query;
   const villageNameStringNew = Array.isArray(surveyName)
     ? surveyName[0]
     : surveyName || '';
@@ -26,65 +33,147 @@ const volunteerList = () => {
   const handleBack = () => {
     router.back();
   };
- useEffect(() => {
-  const getVillageVolunteerData = async () => {
-    const villagedatalist=localStorage.getItem('villageData')
-    if(villagedatalist)
-    {
-      const ids = JSON.parse(villagedatalist)?.map((item: any) => item.Id);
-
-      let transformedData = JSON.parse(villagedatalist).map(({ Id, name }: any) => ({
-        Id,
-        name,
-        entries: 0,
-        volunteerCount: 0,
-        actionLabel: "Add or Update Volunteers"
-      }));
-      const filters = {
-              village: ids,
-              role: Role.LEARNER,
-              status: [Status.ACTIVE],
-               is_volunteer:"yes"
-            };
-      
-            const result = await fetchUserList({ filters });
-            if(result?.getUserDetails)
-            {
-              const villageVolunteerCount: any = {};
-result.getUserDetails.forEach((user : any)=> {
-  const villageField = user?.customFields?.find((field: any) => field?.label === "VILLAGE");
-  if (villageField) {
-    const villageId = villageField?.selectedValues[0]?.id;
-    if (!villageVolunteerCount?.[villageId]) {
-      villageVolunteerCount[villageId] = 0;
-    }
-    villageVolunteerCount[villageId] += 1;
-  }
-});
-
-transformedData = transformedData.map((village: any) => {
-  const volunteerCount = villageVolunteerCount[village.Id] || 0;
-  return { ...village, volunteerCount };
-});
-
+  useEffect(() => {
+    const getVillageVolunteerData = async () => {
+      let villagedatalist;
+      if (blockId) {
+        const controllingfieldfk = [blockId.toString()];
+        const fieldName = "village";
+        const villageResponce = await getStateBlockDistrictList({
+          controllingfieldfk,
+          fieldName,
+        });
+  
+        const transformedVillageData = villageResponce?.result?.values?.map(
+          (item: any) => ({
+            Id: item?.value,
+            name: item?.label,
+          })
+        );
+        villagedatalist = transformedVillageData;
+        setVillageCount(transformedVillageData.length);
+      } else {
+        villagedatalist = localStorage.getItem("villageData");
+        if (villagedatalist) {
+          villagedatalist = JSON.parse(villagedatalist);
+          setVillageCount(villagedatalist.length);
+        }
+      }
+  
+      if (villagedatalist) {
+        const ids = villagedatalist?.map((item: any) => item.Id);
+  
+        let transformedData = villagedatalist.map(({ Id, name }: any) => ({
+          Id,
+          name,
+          entries: 0, // Default entries count
+          volunteerCount: 0, // Default volunteer count
+          actionLabel: "Add or Update Volunteers",
+          completedEntries: [], // New array for completed user IDs
+        }));
+  
+        const filters = {
+          village: ids,
+          role: Role.LEARNER,
+          status: [Status.ACTIVE],
+          is_volunteer: "yes",
+        };
+  
+        const result = await fetchUserList({ filters });
+  
+        if (result?.getUserDetails) {
+          const villageVolunteerCount: any = {};
+          const userVillageMap: any = {}; // Map userId to villageId
+  
+          result.getUserDetails.forEach((user: any) => {
+            const villageField = user?.customFields?.find(
+              (field: any) => field?.label === "VILLAGE"
+            );
+            if (villageField) {
+              const villageId = villageField?.selectedValues[0]?.id;
+              if (!villageVolunteerCount?.[villageId]) {
+                villageVolunteerCount[villageId] = 0;
+              }
+              villageVolunteerCount[villageId] += 1;
+  
+              // Map userId to villageId
+              userVillageMap[user.userId] = villageId;
             }
-    console.log(transformedData)
-    setVillageList(transformedData)
-  }
-  }
-  getVillageVolunteerData()
-}, []);
+          });
+  
+          transformedData = transformedData.map((village: any) => ({
+            ...village,
+            volunteerCount: villageVolunteerCount[village.Id] || 0,
+          }));
+  
+       //   const solutionId = observationId;
+          if (solutionId) {
+            const response = await fetchEntities({ solutionId });
+            console.log(response);
+  
+            const completedIds = response?.result?.entities
+              ?.filter((entity: any) => entity.status === "completed" && entity._id)
+              ?.map((entity: any) => entity._id);
+            console.log(completedIds);
+  
+            // Count completed entries per village & store completed entries
+            const villageEntriesData: any = {}; // To store count & IDs
+  
+            completedIds?.forEach((userId: string) => {
+              const villageId = userVillageMap[userId];
+              if (villageId) {
+                if (!villageEntriesData[villageId]) {
+                  villageEntriesData[villageId] = { count: 0, ids: [] };
+                }
+                villageEntriesData[villageId].count += 1;
+                villageEntriesData[villageId].ids.push(userId);
+              }
+            });
+  
+            // Update transformedData with entries count & completedEntries
+            transformedData = transformedData.map((village: any) => {
+              const entriesData = villageEntriesData[village.Id] || { count: 0, ids: [] };
+              return {
+                ...village,
+                entries: entriesData.count,
+                completedEntries: entriesData.ids, // Store completed IDs
+              };
+            });
+          }
+        }
+  
+        console.log(transformedData);
+        setVillageList(transformedData);
+      }
+    };
+  
+    getVillageVolunteerData();
+  }, [solutionId]);
+  
+  
 console.log(villageList)
   const handleCardAction = (villageNameStringNew: string, title: string, volunteerCount?: any) => {
     router.push({
       pathname: `/village-camp-survyey/${title}`,
       query: {
-        volunteerCount: volunteerCount
+        volunteerCount: volunteerCount,
+        observationId: observationId,
+        solutionId: solutionId
        
       },
     });  };
-const handleAddVolunteer=(id: any) => {
-  console.log("yes")
+const handleAddVolunteer=(id: any, blockId?: any) => {
+  if(blockId)
+  {
+    router.push({
+      pathname: `/villages`,
+      query: {
+        villageId: id,
+        tab: 3,
+        blockId: blockId
+      },
+    });
+  }
   router.push({
     pathname: `/villages`,
     query: {
@@ -99,8 +188,8 @@ const handleAddVolunteer=(id: any) => {
         <Header />
       </Box>
       <BackHeader
-        headingOne={SURVEY_DATA.CREATIVITY_MAHOTSAV}
-        headingTwo={SURVEY_DATA.TWELVE}
+       headingOne={localStorage.getItem("selectedSurvey") || ""}
+       headingTwo={t('YOUTHNET_SURVEY.SURVEY_ASSIGNED_VILLAGE_COUNT', {villageCount: villageCount})}
         showBackButton={true}
         onBackClick={handleBack}
       />
@@ -116,11 +205,16 @@ const handleAddVolunteer=(id: any) => {
                   volunteerCount={data?.volunteerCount}
                   actionLabel={data?.actionLabel}
                   onActionClick={() =>
+                  {
+                    localStorage.setItem('selectedSurveyEntries', JSON.stringify(data?.completedEntries));
                     handleCardAction(villageNameStringNew,data?.name, data?.volunteerCount)
+
+                  }
                   }
                   onAssignVolunteerClick={() =>
-                    handleAddVolunteer(data?.Id)
+                    handleAddVolunteer(data?.Id, blockId)
                   }
+                  entriesList={data?.completedEntries}
                 />
               </Grid>
             ))

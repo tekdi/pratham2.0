@@ -62,7 +62,7 @@ const Index = () => {
   const { t } = useTranslation();
   const theme = useTheme<any>();
   const router = useRouter();
-  const { villageId, tab } = router.query;
+  const { villageId, tab, blockId } = router.query;
   const [value, setValue] = useState<number>(
     tab? Number(tab)  :  YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() ? 1 : 2
   );
@@ -91,8 +91,10 @@ const Index = () => {
    const [openDelete, setOpenDelete] = useState(false);
   const [selectedMentorId, setSelectedMentorId] = useState('');
   const [districtData, setDistrictData] = useState<any>(null);
+  const [blockData, setBlockData] = useState<any>(null);
+
   const [selectedValue, setSelectedValue] = useState<any>();
-  const [selectedBlockValue, setSelectedBlockValue] = useState<any>('');
+  const [selectedBlockValue, setSelectedBlockValue] = useState<any>(blockId? blockId:'');
   const [selectedVillageValue, setSelectedVillageValue] = useState<any>(villageId ? villageId: '');
   const [selectedDistrictValue, setSelectedDistrictValue] = useState<any>('');
   const [isVolunteerFieldId, setIsVolunteerFieldId] = useState<any>('');
@@ -103,7 +105,6 @@ const Index = () => {
     centerType: '',
     sortOrder: '',
   });
-  const [blockData, setBlockData] = useState<any>(null);
   
   useEffect(() => {
     const getData = async () => {
@@ -136,10 +137,10 @@ const Index = () => {
         })
       );
       setBlockData(transformedBlockData);
-      setSelectedBlockValue(transformedBlockData[0]?.id);
+      setSelectedBlockValue(blockId? blockId:transformedBlockData[0]?.id);
     };
     getData();
-  }, []);
+  }, [blockId, villageId]);
   useEffect(() => {
     const getSortedData = (data: any, sortOrderType: any) => {
       switch (sortOrderType) {

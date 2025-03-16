@@ -25,24 +25,15 @@ const villageSurveyName = () => {
   const router = useRouter();
   const theme = useTheme<any>();
   const { villageSurveyName } = router.query;
-  const { volunteerCount } = router.query;
+  const { volunteerCount , observationId} = router.query;
+  const storedEntries = JSON.parse(localStorage.getItem('selectedSurveyEntries') || '[]');
 
   const [value, setValue] = React.useState(1);
   const [village, setVillage] = useState<string>('');
   const [camp, setCamp] = useState<string>('');
-
-  // const entry1 = [{ name: 'Anita Kulkarni', age: '', village: '', image: '' }];
-  // const entry2 = [{ name: 'Ananya Sen', age: '', village: '', image: '' }];
-  // const youthListUser1 = [
-  //   { name: 'Ananya Gupta', age: '16', village: 'Female', image: '' },
-  //   { name: 'Ankita Sharma', age: '15', village: 'Female', image: '' },
-  // ];
-  // const youthListUser2 = [
-  //   { name: 'Ankita Sharma', age: '15', village: 'Female', image: '' },
-  //   { name: 'Ananya Gupta', age: '16', village: 'Female', image: '' },
-  // ];
-  // const files = ['Uploaded_file1.mp4', 'Uploaded_file2.mp4'];
-
+  const [questionResponse, setQuestionResponseResponse] =
+  useState<any>(null);
+ 
   useEffect(() => {
     if (villageSurveyName) {
       const [villageName, ...rest] = (villageSurveyName as string).split(
@@ -63,129 +54,7 @@ const villageSurveyName = () => {
     setValue(newValue);
   };
 
-  const mapBackendDataToQAPairs = (data: any) => {
-    const answers = data?.OB?.answers || {};
-    return Object.values(answers)
-      .map((answer: any) => {
-        const question = answer.payload?.question?.[0];
-        const label = answer.payload?.labels?.[0];
-        
-        if (question && label) {
-          return { question, answer: label };
-        }
-        return null;
-      })
-      .filter(Boolean);
-  };
-  const backendData ={
-    "OB": {
-        "status": "submit",
-        "externalId": "OB",
-        "answers": {
-            "6748632e5c5385c232988159": {
-                "qid": "6748632e5c5385c232988159",
-                "value": "R2",
-                "remarks": "",
-                "fileName": [],
-                "gpsLocation": "",
-                "payload": {
-                    "question": [
-                        "Reason of Visit",
-                        ""
-                    ],
-                    "labels": [
-                        "Incomplete assignment / homework"
-                    ],
-                    "responseType": "radio",
-                    "filesNotUploaded": []
-                },
-                "startTime": 1741868082785,
-                "endTime": 1741868084917,
-                "criteriaId": "6748632e5c5385c232988163",
-                "responseType": "radio",
-                "evidenceMethod": "OB",
-                "rubricLevel": ""
-            },
-            "6748632e5c5385c23298815a": {
-                "qid": "6748632e5c5385c23298815a",
-                "value": "",
-                "remarks": "",
-                "fileName": [],
-                "gpsLocation": "",
-                "payload": {
-                    "question": [
-                        "Reason for Low Attendance",
-                        ""
-                    ],
-                    "responseType": "radio",
-                    "filesNotUploaded": []
-                },
-                "startTime": "",
-                "endTime": "",
-                "criteriaId": "6748632e5c5385c232988163",
-                "responseType": "radio",
-                "evidenceMethod": "OB",
-                "rubricLevel": ""
-            },
-            "6748632e5c5385c23298815b": {
-                "qid": "6748632e5c5385c23298815b",
-                "value": "R3",
-                "remarks": "",
-                "fileName": [],
-                "gpsLocation": "",
-                "payload": {
-                    "question": [
-                        "When can student start coming to classes?",
-                        ""
-                    ],
-                    "labels": [
-                        "Does not want to come / Dropout"
-                    ],
-                    "responseType": "radio",
-                    "filesNotUploaded": []
-                },
-                "startTime": 1741868082788,
-                "endTime": 1741868086165,
-                "criteriaId": "6748632e5c5385c232988163",
-                "responseType": "radio",
-                "evidenceMethod": "OB",
-                "rubricLevel": ""
-            },
-            "6748632e5c5385c23298815c": {
-                "qid": "6748632e5c5385c23298815c",
-                "value": "nice",
-                "remarks": "",
-                "fileName": [],
-                "gpsLocation": "",
-                "payload": {
-                    "question": [
-                        "Comments",
-                        ""
-                    ],
-                    "labels": [
-                        "nice"
-                    ],
-                    "responseType": "text",
-                    "filesNotUploaded": []
-                },
-                "startTime": 1741868082789,
-                "endTime": 1741868094699,
-                "criteriaId": "6748632e5c5385c232988163",
-                "responseType": "text",
-                "evidenceMethod": "OB",
-                "rubricLevel": ""
-            }
-        },
-        "startTime": 1741868082770,
-        "endTime": 1741868094879,
-        "gpsLocation": null,
-        "submittedBy": "f35d5f03-b052-4ee2-b949-ac897623f08f",
-        "submittedByName": "sample TL shetake",
-        "submittedByEmail": null,
-        "submissionDate": "2025-03-13T12:14:56.290Z",
-        "isValid": true
-    }
-}
+
 const data: Record<string, UserData> = {
   "123": { gender: "male", age: 17, name: "John Doe" },
   "1283": { gender: "female", age: 18, name: "Jane Smith" },
@@ -195,12 +64,29 @@ const data: Record<string, UserData> = {
 const ageColors = ["#EE6002", "#26A69A", "#6200EE", "#FFC107"];
 const genderColors = ["#008080", "#FF4500"];
 
-const processData = (key: keyof UserData) => {
+const processData = (key: keyof UserData, data: any) => {
+  if (!Array.isArray(data)) {
+    console.error("Invalid data format:", data);
+    return [];
+  }
+
+  const participantEntry = data.find((item: any) => item.question === "Participant Name");
+  
+  if (!participantEntry || !Array.isArray(participantEntry.answer)) {
+    console.warn("No valid Participant Name data found.");
+    return [];
+  }
+
+  const participantData = participantEntry.answer;
   const counts: Record<string, number> = {};
-  Object.values(data).forEach((item) => {
-    const value = item[key] as string;
-    counts[value] = (counts[value] || 0) + 1;
+
+  participantData.forEach((item: any) => {
+    if (item && typeof item === "object" && key in item) {
+      const value = String(item[key]); 
+      counts[value] = (counts[value] || 0) + 1;
+    }
   });
+
   return Object.keys(counts).map((value, index) => ({
     name: value,
     value: counts[value],
@@ -208,7 +94,7 @@ const processData = (key: keyof UserData) => {
   }));
 };
 
-  const qaPairs : any= mapBackendDataToQAPairs(backendData);
+console.log(questionResponse)
   return (
     <Box minHeight="100vh">
       <Box>
@@ -261,22 +147,32 @@ const processData = (key: keyof UserData) => {
       </Box>
       {value === 1 && (
         <Box>
-          <Box width="100%">
+          {(<Box width="100%">
             <EntrySlider>
-            <EntryContent date="March 13, 2025" qaPairs={qaPairs} />
-
-            <EntryContent date="March 13, 2025" qaPairs={qaPairs} />
-
+            {storedEntries.map((entryId: any, index: any) => (
+  <EntryContent    entityId={entryId} questionResponse={questionResponse} setQuestionResponseResponse={setQuestionResponseResponse} />
+))}
             </EntrySlider>
-          </Box>
+          </Box>)
+      }
         </Box>
       )}
-      {value === 2 && <Box> <div style={{ display: "flex", flexWrap: "wrap" }}>
-      <PieChartComponent title="Age" data={processData("age")} />
-      <PieChartComponent title="Gender" data={processData("gender")} />
-      <ParticipantsList users={Object.values(data)} />
+      {value === 2 &&
+       <Box>
+        {questionResponse? (<div style={{ display: "flex", flexWrap: "wrap" }}>
+      <PieChartComponent title="Age" data={processData("age", questionResponse)} />
+      <PieChartComponent title="Gender" data={processData("gender", questionResponse)} />
+      <ParticipantsList 
+  users={
+    Array.isArray(questionResponse) 
+      ? Object.values(questionResponse.find((item: any) => item.question === "Participant Name")?.answer || []) 
+      : []
+  } 
+/>
 
-    </div></Box>}
+    </div>): (<Typography ml="35%" mt="10%"> Looks like there are no entries yet</Typography>)
+}
+    </Box>}
     </Box>
   );
 };

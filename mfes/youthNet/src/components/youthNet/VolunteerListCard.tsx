@@ -11,7 +11,8 @@ interface CardProps {
   volunteerCount: number;
   actionLabel: string;
   onActionClick?: () => void;
-  onAssignVolunteerClick?: () => void
+  onAssignVolunteerClick?: () => void;
+  entriesList?: any
 }
 
 const VolunteerListCard: React.FC<CardProps> = ({
@@ -20,8 +21,10 @@ const VolunteerListCard: React.FC<CardProps> = ({
   volunteerCount,
   actionLabel,
   onActionClick,
-  onAssignVolunteerClick
+  onAssignVolunteerClick,
+  entriesList
 }) => {
+  console.log(entriesList)
   const { t } = useTranslation();
   return (
     <Card

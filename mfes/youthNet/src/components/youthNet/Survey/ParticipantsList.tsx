@@ -8,7 +8,7 @@ interface UserData {
   interface ParticipantsListProps {
     users: UserData[];
   }
-  
+
   const ParticipantsList: React.FC<ParticipantsListProps> = ({ users }) => (
     <Card sx={{ width: 300, margin: 2, padding: 2, backgroundColor: "#f8efe6", borderRadius: 3 }}>
       <CardContent>
@@ -18,7 +18,7 @@ interface UserData {
         <List>
           {users.map((user, index) => (
             <ListItem key={index} divider>
-              <ListItemText primary={user.name} />
+              <ListItemText primary={ user.name?user.name?.charAt(0).toUpperCase() + user?.name?.slice(1) :"" } />
             </ListItem>
           ))}
         </List>
