@@ -1011,9 +1011,9 @@ const DynamicForm = ({
           onChange={handleChange}
           onSubmit={handleSubmit}
           validator={validator}
-          // noHtml5Validate //disable auto error pop up to field location
+          noHtml5Validate //disable auto error pop up to field location
           showErrorList={false} // Hides the error list card at the top
-          liveValidate //all validate live
+         // liveValidate //all validate live
           // liveValidate={submitted} // Only validate on submit or typing
           // onChange={() => setSubmitted(true)} // Show validation when user starts typing
           widgets={widgets}
