@@ -395,9 +395,9 @@ const Learner = () => {
         checked={checked}
         open={open}
         onClose={() => setOpen(false)}
-        title="Delete User Permanently"
-        primary={'Delete User'}
-        secondary={'Cancel'}
+        title={t("COMMON.DELETE_USER")}
+        primary={t("COMMON.DELETE_USER_WITH_REASON")}
+        secondary={t("COMMON.CANCEL")}
         reason={reason}
       >
         <DeleteDetails

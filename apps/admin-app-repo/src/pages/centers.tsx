@@ -391,8 +391,8 @@ const Centers = () => {
         open={open}
         onClose={() => setOpen(false)}
         title={`Are you sure you want to delete ${firstName} center?`}
-        centerPrimary={'Yes'}
-        secondary={'Cancel'}
+        centerPrimary={t("COMMON.YES")}
+        secondary={t("COMMON.CANCEL")}
         onClickPrimary={deleteUser}
       ></GenericDeleteModal>
 

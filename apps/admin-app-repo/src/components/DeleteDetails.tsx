@@ -10,6 +10,7 @@ import {
   Typography,
 } from '@mui/material';
 import React from 'react';
+import { useTranslation } from 'next-i18next';
 
 interface DeleteDetailsProps {
   firstName: string;
@@ -30,6 +31,7 @@ const DeleteDetails: React.FC<DeleteDetailsProps> = ({
   reason,
   setReason,
 }) => {
+  const { t } = useTranslation();
   return (
     <>
       <Box
@@ -41,7 +43,7 @@ const DeleteDetails: React.FC<DeleteDetailsProps> = ({
         }}
       >
         <Typography fontWeight="bold">
-          {firstName} {lastName} test belongs to below center
+          { firstName } { lastName } {t("FORM.TEST_BELONG_TO")}
         </Typography>
         <TextField fullWidth value={village} disabled sx={{ mt: 1 }} />
       </Box>
@@ -53,14 +55,14 @@ const DeleteDetails: React.FC<DeleteDetailsProps> = ({
             onChange={(e) => setChecked(e.target.checked)}
           />
         }
-        label="Do you want to delete user from center?"
+        label={t('FORM.DO_YOU_WANT_TO_DELETE')}
         sx={{ mb: checked ? 2 : 0 }}
       />
 
       {checked && (
         <FormControl component="fieldset" sx={{ width: '100%' }}>
           <FormLabel sx={{ fontWeight: 'bold', mb: 1 }}>
-            Reason for Deletion
+            {t("COMMON.REASON_FOR_DELETION")}
           </FormLabel>
           <RadioGroup
             value={reason}
@@ -69,12 +71,12 @@ const DeleteDetails: React.FC<DeleteDetailsProps> = ({
             <FormControlLabel
               value="Incorrect Data Entry"
               control={<Radio />}
-              label="Incorrect Data Entry"
+              label={t("COMMON.INCORRECT_DATA_ENTRY")}
             />
             <FormControlLabel
               value="Duplicate User"
               control={<Radio />}
-              label="Duplicate User"
+              label={t("COMMON.DUPLICATED_USER")}
             />
           </RadioGroup>
         </FormControl>
