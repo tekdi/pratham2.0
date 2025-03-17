@@ -39,7 +39,7 @@ import { useRouter } from "next/router";
 import React, { useEffect, useMemo, useState } from "react";
 import KaTableComponent from "../components/KaTableComponent";
 import Loader from "../components/Loader";
-import { deleteUser } from "../services/DeleteUser";
+import { deleteUser } from "../services/UserService";
 import { getCohortList } from "../services/GetCohortList";
 import {
   cohortMemberList,
