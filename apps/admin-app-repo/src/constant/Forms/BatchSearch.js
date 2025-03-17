@@ -112,37 +112,37 @@ export const BatchSearchSchema = {
       isMultiSelect: true,
       maxSelections: 1000,
     },
-    // center: {
-    //   type: 'string',
-    //   title: 'CENTER',
-    //   coreField: 0,
-    //   fieldId: 'a7cf7617-79cd-455a-a9f6-6b00fe0a8eca',
-    //   field_type: 'drop_down',
-    //   enum: ['select'],
-    //   enumNames: ['Select'],
-    //   api: {
-    //     url: 'https://dev-interface.prathamdigital.org/interface/v1/cohort/search',
-    //     header: {
-    //       tenantId: '**',
-    //       Authorization: '**',
-    //       academicyearid: '**',
-    //     },
-    //     method: 'POST',
-    //     options: {
-    //       label: 'label',
-    //       value: 'value',
-    //       optionObj: 'result.values',
-    //     },
-    //     payload: {
-    //       limit: '**',
-    //       offset: '**',
-    //       filters: {
-    //         status: ['active'],
-    //       },
-    //     },
-    //     callType: 'initial',
-    //   },
-    // },
+    center: {
+      type: 'string',
+      title: 'CENTER',
+      coreField: 0,
+      fieldId: 'a7cf7617-79cd-455a-a9f6-6b00fe0a8eca',
+      field_type: 'drop_down',
+      enum: ['select'],
+      enumNames: ['Select'],
+      api: {
+        url: 'https://dev-interface.prathamdigital.org/interface/v1/cohort/search',
+        header: {
+          tenantId: '**',
+          Authorization: '**',
+          academicyearid: '**',
+        },
+        method: 'POST',
+        options: {
+          label: 'name',
+          value: 'cohortId',
+          optionObj: 'result.results.cohortDetails',
+        },
+        payload: {
+          limit: '200',
+          offset: '0',
+          filters: {
+            status: ['active'],
+          },
+        },
+        callType: 'initial',
+      },
+    },
     name: {
       type: 'string',
       title: 'Search Key',
