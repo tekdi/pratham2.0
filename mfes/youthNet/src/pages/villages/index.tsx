@@ -925,7 +925,7 @@ const Index = () => {
               showFooter={true}
               modalTitle={'New Mentor'}
             //  handleNext={FormSubmitFunction}
-              primaryText={count === 0 ? 'Next' : 'Finish & Assign'}
+             primaryText={!showAssignmentScreen? 'Next' : undefined}
               secondaryText={count === 1 ? 'Save Progress' : ''}
               id="dynamic-form-id"
             >

@@ -884,7 +884,7 @@ const DynamicForm = ({
       // console.log('Form data changed:', formData);
       // live error
       setFormData(formData);
-      if (errors.length > 0) {
+      if (errors?.length > 0) {
         setSubmitted(true);
       }
 
