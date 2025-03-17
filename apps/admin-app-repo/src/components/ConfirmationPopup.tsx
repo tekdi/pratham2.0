@@ -19,11 +19,11 @@ interface GenericModalProps {
   checked?: boolean;
   primary?: string;
   secondary: string;
-  reason? : any;
-  centerPrimary? : any
+  reason?: any;
+  centerPrimary?: any;
 }
 
-const GenericDeleteModal: React.FC<GenericModalProps> = ({
+const ConfirmationPopup: React.FC<GenericModalProps> = ({
   open,
   onClose,
   title,
@@ -33,7 +33,7 @@ const GenericDeleteModal: React.FC<GenericModalProps> = ({
   secondary,
   reason,
   centerPrimary,
-  onClickPrimary
+  onClickPrimary,
 }) => {
   const theme = useTheme<any>();
   return (
@@ -60,17 +60,14 @@ const GenericDeleteModal: React.FC<GenericModalProps> = ({
           alignItems="start"
         >
           <Typography id="modal-title">{title}</Typography>
-        
-            <CloseIcon sx={{cursor:'pointer'}} onClick={onClose} />
-     
+          <CloseIcon sx={{ cursor: 'pointer' }} onClick={onClose} />
         </Box>
         <Divider />
         {children && (
-          <Box sx={{ p: 2 }}>{children}</Box>
-        )}
-        {checked && (
-          <Divider />
-
+          <>
+            <Box sx={{ p: 2 }}>{children}</Box>
+            <Divider />
+          </>
         )}
         <Box
           sx={{
@@ -85,7 +82,7 @@ const GenericDeleteModal: React.FC<GenericModalProps> = ({
               fullWidth
               onClick={onClose}
               sx={{
-                  color: theme.palette.warning[300],
+                color: theme.palette.warning[300],
                 fontSize: '14px',
                 fontWeight: '500',
                 '&:hover': {
@@ -138,4 +135,4 @@ const GenericDeleteModal: React.FC<GenericModalProps> = ({
   );
 };
 
-export default GenericDeleteModal;
+export default ConfirmationPopup;

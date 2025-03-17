@@ -31,7 +31,7 @@ import {
 } from '@/components/DynamicForm/DynamicFormCallback';
 import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
-import GenericDeleteModal from '@/components/GenericDeleteModal';
+import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
 
 //import { DynamicForm } from '@shared-lib';
@@ -394,7 +394,7 @@ const Mentor = () => {
           </Box>
         )}
       </Box>
-      <GenericDeleteModal
+      <ConfirmationPopup
         checked={checked}
         open={open}
         onClose={() => setOpen(false)}
@@ -412,7 +412,7 @@ const Mentor = () => {
           reason={reason}
           setReason={setReason}
         />
-      </GenericDeleteModal>
+      </ConfirmationPopup>
     </>
   );
 };

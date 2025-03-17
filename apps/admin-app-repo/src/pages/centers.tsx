@@ -25,7 +25,7 @@ import {
   CohortSearchUISchema,
 } from '@/constant/Forms/CohortSearch';
 import { getCohortList } from '@/services/CohortService/cohortService';
-import GenericDeleteModal from '@/components/GenericDeleteModal';
+import ConfirmationPopup from '@/components/ConfirmationPopup';
 import { updateCohort } from '@/services/MasterDataService';
 
 //import { DynamicForm } from '@shared-lib';
@@ -387,21 +387,21 @@ const Centers = () => {
           </Box>
         )}
       </Box>
-      <GenericDeleteModal
+      <ConfirmationPopup
         open={open}
         onClose={() => setOpen(false)}
         title={`Are you sure you want to delete ${firstName} center?`}
         centerPrimary={t("COMMON.YES")}
         secondary={t("COMMON.CANCEL")}
         onClickPrimary={deleteUser}
-      ></GenericDeleteModal>
+      ></ConfirmationPopup>
 
-      {/* <GenericDeleteModal
+      {/* <ConfirmationPopup
         open={open}
         onClose={() => setOpen(false)}
         title={`You can't delete the center because it has 2 Active Learners`}
         secondary={'Cancel'}
-      ></GenericDeleteModal> */}
+      ></ConfirmationPopup> */}
     </>
   );
 };

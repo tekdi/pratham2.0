@@ -43,7 +43,7 @@ import {
   searchListData,
 } from '@/components/DynamicForm/DynamicFormCallback';
 import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
-import GenericDeleteModal from '@/components/GenericDeleteModal';
+import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
 
 const Facilitator = () => {
@@ -407,7 +407,7 @@ const Facilitator = () => {
         )}
       </Box>
 
-      <GenericDeleteModal
+      <ConfirmationPopup
         checked={checked}
         open={open}
         onClose={() => setOpen(false)}
@@ -425,7 +425,7 @@ const Facilitator = () => {
           reason={reason}
           setReason={setReason}
         />
-      </GenericDeleteModal>
+      </ConfirmationPopup>
     </>
   );
 };
