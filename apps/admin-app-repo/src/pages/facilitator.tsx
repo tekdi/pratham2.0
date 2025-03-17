@@ -45,6 +45,7 @@ import {
 import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
+import { deleteUser } from '@/services/UserService';
 
 const Facilitator = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -64,9 +65,13 @@ const Facilitator = () => {
   const [editableUserId, setEditableUserId] = useState('');
   const [roleId, setRoleID] = useState('');
   const [tenantId, setTenantId] = useState('');
-  const [village, setVillage] = useState('');
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
+
+  const [userID, setUserId] = useState("")
+  const [userData, setUserData] = useState({
+    firstName: "",
+    lastName: "",
+    village: "",
+  });
 
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
@@ -136,9 +141,8 @@ const Facilitator = () => {
       keys: ['firstName', 'middleName', 'lastName'],
       label: 'Facilitator Name',
       render: (row) =>
-        `${row.firstName || ''} ${row.middleName || ''} ${
-          row.lastName || ''
-        }`.trim(),
+        `${row.firstName || ''} ${row.middleName || ''} ${row.lastName || ''
+          }`.trim(),
     },
     {
       key: 'status',
@@ -175,14 +179,34 @@ const Facilitator = () => {
           row.customFields.find(
             (field: { label: string }) => field.label === 'VILLAGE'
           )?.selectedValues[0]?.value || '';
-        return `${state == '' ? '' : `${state}`}${
-          district == '' ? '' : `, ${district}`
-        }${block == '' ? '' : `, ${block}`}${
-          village == '' ? '' : `, ${village}`
-        }`;
+        return `${state == '' ? '' : `${state}`}${district == '' ? '' : `, ${district}`
+          }${block == '' ? '' : `, ${block}`}${village == '' ? '' : `, ${village}`
+          }`;
       },
     },
   ];
+
+  const userDelete = async () => {
+    try {
+      const resp = await deleteUser(userID, { userData: { reason: reason, status: "archived" } });
+      if (resp?.responseCode === 200) {
+        setResponse((prev) => ({
+          ...prev, // Preserve other properties in `prev`
+          result: {
+            ...prev?.result, // Preserve other properties in `result`
+            getUserDetails: prev?.result?.getUserDetails?.filter(item => item?.userId !== userID)
+          }
+        }));
+        console.log("Team leader successfully archived.");
+      } else {
+        console.error("Failed to archive team leader:", resp);
+      }
+
+      return resp;
+    } catch (error) {
+      console.error("Error updating team leader:", error);
+    }
+  };
 
   // Define actions
   const actions = [
@@ -232,14 +256,14 @@ const Facilitator = () => {
       ),
       callback: async (row) => {
         const findVillage = row?.customFields.find((item) => {
-          if (item.label === 'VILLAGE') {
+          if (item.label === 'BATCH') {
             return item;
           }
         });
 
-        setVillage(findVillage?.selectedValues[0]?.value);
+        // setVillage(findVillage?.selectedValues[0]?.value);
         // console.log('row:', row?.customFields[2].selectedValues[0].value);
-        setEditableUserId(row?.userId);
+        // setEditableUserId(row?.userId);
         // const memberStatus = Status.ARCHIVED;
         // const statusReason = '';
         // const membershipId = row?.userId;
@@ -252,8 +276,16 @@ const Facilitator = () => {
         // setPrefilledFormData({});
         // searchData(prefilledFormData, currentPage);
         setOpen(true);
-        setFirstName(row?.firstName)
-        setLastName(row?.lastName)
+        setUserId(row?.userId)
+
+        setUserData({
+          firstName: row?.firstName || "",
+          lastName: row?.lastName || "",
+          village: findVillage?.selectedValues?.[0]?.value || "",
+        });
+
+
+
       },
     },
   ];
@@ -415,11 +447,12 @@ const Facilitator = () => {
         primary={t("COMMON.DELETE_USER_WITH_REASON")}
         secondary={t("COMMON.CANCEL")}
         reason={reason}
+        onClickPrimary={userDelete}
       >
         <DeleteDetails
-          firstName={firstName}
-          lastName={lastName}
-          village={village}
+          firstName={userData.firstName}
+          lastName={userData.lastName}
+          village={userData.village}
           checked={checked}
           setChecked={setChecked}
           reason={reason}

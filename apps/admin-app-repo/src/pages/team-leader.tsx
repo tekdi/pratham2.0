@@ -34,6 +34,7 @@ import {
 import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
+import { deleteUser } from '@/services/UserService';
 
 const TeamLeader = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -59,6 +60,7 @@ const TeamLeader = () => {
   const [lastName, setLastName] = useState('')
   const [village, setVillage] = useState('');
   const [reason, setReason] = useState("");
+  const [userID, setUserId] = useState("")
 
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
@@ -106,6 +108,28 @@ const TeamLeader = () => {
     await searchData(formData, 0);
   };
 
+  const userDelete = async () => {
+    try {
+      const resp = await deleteUser(userID, { userData: { reason: reason, status: "archived" } });
+      if (resp?.responseCode === 200) {
+        setResponse((prev) => ({
+          ...prev, // Preserve other properties in `prev`
+          result: {
+            ...prev?.result, // Preserve other properties in `result`
+            getUserDetails: prev?.result?.getUserDetails?.filter(item => item?.userId !== userID)
+          }
+        }));
+        console.log("Team leader successfully archived.");
+      } else {
+        console.error("Failed to archive team leader:", resp);
+      }
+
+      return resp;
+    } catch (error) {
+      console.error("Error updating team leader:", error);
+    }
+  };
+
   const searchData = async (formData, newPage) => {
     const staticFilter = { role: 'Lead', status: "active" };
 
@@ -130,9 +154,8 @@ const TeamLeader = () => {
       keys: ['firstName', 'middleName', 'lastName'],
       label: 'Team Lead Name',
       render: (row) =>
-        `${row.firstName || ''} ${row.middleName || ''} ${
-          row.lastName || ''
-        }`.trim(),
+        `${row.firstName || ''} ${row.middleName || ''} ${row.lastName || ''
+          }`.trim(),
     },
     {
       key: 'status',
@@ -169,11 +192,9 @@ const TeamLeader = () => {
           row.customFields.find(
             (field: { label: string }) => field.label === 'VILLAGE'
           )?.selectedValues[0]?.value || '';
-        return `${state == '' ? '' : `${state}`}${
-          district == '' ? '' : `, ${district}`
-        }${block == '' ? '' : `, ${block}`}${
-          village == '' ? '' : `, ${village}`
-        }`;
+        return `${state == '' ? '' : `${state}`}${district == '' ? '' : `, ${district}`
+          }${block == '' ? '' : `, ${block}`}${village == '' ? '' : `, ${village}`
+          }`;
       },
     },
     // {
@@ -231,14 +252,13 @@ const TeamLeader = () => {
       ),
       callback: async (row) => {
         const findVillage = row?.customFields.find((item) => {
-          if (item.label === 'VILLAGE') {
+          if (item.label === 'BLOCK') {
             return item;
           }
         });
 
         setVillage(findVillage?.selectedValues[0]?.value);
-        // console.log('row:', row?.customFields[2].selectedValues[0].value);
-        setEditableUserId(row?.userId);
+        setUserId(row?.userId);
         // const memberStatus = Status.ARCHIVED;
         // const statusReason = '';
         // const membershipId = row?.userId;
@@ -300,8 +320,7 @@ const TeamLeader = () => {
     setPrefilledFormData(initialFormData);
   }, []);
 
-  console.log(reason , "shreyas");
-  
+
 
   return (
     <>
@@ -410,6 +429,7 @@ const TeamLeader = () => {
         primary={t("COMMON.DELETE_USER_WITH_REASON")}
         secondary={t("COMMON.CANCEL")}
         reason={reason}
+        onClickPrimary={userDelete}
       >
         <DeleteDetails
           firstName={firstName}

@@ -120,9 +120,7 @@ const Centers = () => {
 
   // delete center logic 
 
-  const deleteUser = async () => {
-    if (!cohortId) return; 
-
+  const deleteCohort = async () => {
     try {
       const resp = await updateCohort(cohortId, { status: Status.ARCHIVED });
       if (resp?.success) {
@@ -135,7 +133,6 @@ const Centers = () => {
     } catch (error) {
       console.error("Error updating cohort:", error);
     }
-    getCohortList()
   };
 
 
@@ -393,7 +390,7 @@ const Centers = () => {
         title={`Are you sure you want to delete ${firstName} center?`}
         centerPrimary={t("COMMON.YES")}
         secondary={t("COMMON.CANCEL")}
-        onClickPrimary={deleteUser}
+        onClickPrimary={deleteCohort}
       ></ConfirmationPopup>
 
       {/* <ConfirmationPopup
