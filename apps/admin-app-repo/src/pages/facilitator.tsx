@@ -12,8 +12,19 @@ import {
 } from '../constant/Forms/facilitatorSearch';
 import { Status } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
-import { Box, Grid, Typography } from '@mui/material';
-import { debounce } from 'lodash';
+import {
+  Box,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  Grid,
+  Radio,
+  RadioGroup,
+  TextField,
+  Typography,
+} from '@mui/material';
+import { debounce, forEach } from 'lodash';
 import { Numbers } from '@mui/icons-material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
 import EditIcon from '@mui/icons-material/Edit';
@@ -32,6 +43,8 @@ import {
   searchListData,
 } from '@/components/DynamicForm/DynamicFormCallback';
 import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
+import ConfirmationPopup from '@/components/ConfirmationPopup';
+import DeleteDetails from '@/components/DeleteDetails';
 
 const Facilitator = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -51,6 +64,9 @@ const Facilitator = () => {
   const [editableUserId, setEditableUserId] = useState('');
   const [roleId, setRoleID] = useState('');
   const [tenantId, setTenantId] = useState('');
+  const [village, setVillage] = useState('');
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
 
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
@@ -98,7 +114,7 @@ const Facilitator = () => {
   };
 
   const searchData = async (formData, newPage) => {
-    const staticFilter = { role: 'Instructor' };
+    const staticFilter = { role: 'Instructor', status: 'active' };
     const { sortBy } = formData;
     const staticSort = ['firstName', sortBy || 'asc'];
     await searchListData(
@@ -215,20 +231,29 @@ const Facilitator = () => {
         </Box>
       ),
       callback: async (row) => {
-        console.log('row:', row);
-        // setEditableUserId(row?.userId);
-        const memberStatus = Status.ARCHIVED;
-        const statusReason = '';
-        const membershipId = row?.userId;
-
-        const response = await updateCohortMemberStatus({
-          memberStatus,
-          statusReason,
-          membershipId,
+        const findVillage = row?.customFields.find((item) => {
+          if (item.label === 'VILLAGE') {
+            return item;
+          }
         });
-        setPrefilledFormData({});
-        searchData(prefilledFormData, currentPage);
-        setOpenModal(false);
+
+        setVillage(findVillage?.selectedValues[0]?.value);
+        // console.log('row:', row?.customFields[2].selectedValues[0].value);
+        setEditableUserId(row?.userId);
+        // const memberStatus = Status.ARCHIVED;
+        // const statusReason = '';
+        // const membershipId = row?.userId;
+
+        // const response = await updateCohortMemberStatus({
+        //   memberStatus,
+        //   statusReason,
+        //   membershipId,
+        // });
+        // setPrefilledFormData({});
+        // searchData(prefilledFormData, currentPage);
+        setOpen(true);
+        setFirstName(row?.firstName)
+        setLastName(row?.lastName)
       },
     },
   ];
@@ -275,6 +300,13 @@ const Facilitator = () => {
   useEffect(() => {
     setPrefilledFormData(initialFormData);
   }, []);
+
+  const [open, setOpen] = useState(false);
+  const [checked, setChecked] = useState(false);
+  const [reason, setReason] = useState("");
+
+  // console.log(response?.result?.getUserDetails , "shreyas");
+  response;
 
   return (
     <>
@@ -374,6 +406,26 @@ const Facilitator = () => {
           </Box>
         )}
       </Box>
+
+      <ConfirmationPopup
+        checked={checked}
+        open={open}
+        onClose={() => setOpen(false)}
+        title={t("COMMON.DELETE_USER")}
+        primary={t("COMMON.DELETE_USER_WITH_REASON")}
+        secondary={t("COMMON.CANCEL")}
+        reason={reason}
+      >
+        <DeleteDetails
+          firstName={firstName}
+          lastName={lastName}
+          village={village}
+          checked={checked}
+          setChecked={setChecked}
+          reason={reason}
+          setReason={setReason}
+        />
+      </ConfirmationPopup>
     </>
   );
 };

@@ -40,6 +40,21 @@ export const MENU_CONFIG = {
           link: '/learners',
           roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
+        {
+          title: 'Content Creator',
+          link: '/content-creator',
+          roles: [Role.CENTRAL_ADMIN],
+        },
+        {
+          title: 'Content Reviewer',
+          link: '/content-reviewer',
+          roles: [Role.CENTRAL_ADMIN],
+        },
+        {
+          title: 'State Lead',
+          link: '/state-lead',
+          roles: [Role.CENTRAL_ADMIN],
+        }
       ],
     },
 
@@ -131,6 +146,21 @@ export const MENU_CONFIG = {
           link: '/youth',
           roles: [Role.ADMIN, Role.CENTRAL_ADMIN], // yet to come
         },
+        {
+          title: 'Content Creator',
+          link: '/content-creator',
+          roles: [Role.CENTRAL_ADMIN],
+        },
+        {
+          title: 'Content Reviewer',
+          link: '/content-reviewer',
+          roles: [Role.CENTRAL_ADMIN],
+        },
+        {
+          title: 'State Lead',
+          link: '/state-lead',
+          roles: [Role.CENTRAL_ADMIN],
+        },
       ],
     },
     master: {
@@ -180,5 +210,11 @@ export const MENU_CONFIG = {
         Role.SCTA,
       ],
     },
+    workspace: {
+      title: 'Workspace',
+      icon: '/images/dashboard.svg',
+      link: '/workspace',
+      roles: [Role.CCTA, Role.SCTA],
+    }
   },
 };
