@@ -1,3 +1,4 @@
+
 // @ts-nocheck
 import React, { useState, useEffect, useRef } from 'react';
 import Form from '@rjsf/mui';
@@ -883,7 +884,7 @@ const DynamicForm = ({
       // console.log('Form data changed:', formData);
       // live error
       setFormData(formData);
-      if (errors.length > 0) {
+      if (errors?.length > 0) {
         setSubmitted(true);
       }
 
@@ -1010,12 +1011,13 @@ const DynamicForm = ({
           onChange={handleChange}
           onSubmit={handleSubmit}
           validator={validator}
-          // noHtml5Validate //disable auto error pop up to field location
+          //noHtml5Validate //disable auto error pop up to field location
           showErrorList={false} // Hides the error list card at the top
           liveValidate //all validate live
           // liveValidate={submitted} // Only validate on submit or typing
           // onChange={() => setSubmitted(true)} // Show validation when user starts typing
           widgets={widgets}
+          id="dynamic-form-id"
         />
       ) : (
         <Grid container spacing={2}>

@@ -141,7 +141,13 @@ const UserId = () => {
         console.log(extractUserInfo);
         setFormData(extractUserInfo);
         setSchema(newSchema?.schema);
-        setUiSchema(newSchema?.uiSchema);
+        const updatedUiSchema = {
+          ...newSchema?.uiSchema,
+          "ui:submitButtonOptions": {
+            norender: true, 
+          },
+        };
+        setUiSchema(updatedUiSchema);
       } catch (e) {
         console.log(e);
       }
@@ -359,7 +365,8 @@ const UserId = () => {
               showFooter={true}
               modalTitle={'New Mentor'}
             //  handleNext={FormSubmitFunction}
-              // primaryText={count === 0 ? 'Next' : 'Finish & Assign'}
+              primaryText={'submit'}
+              id="dynamic-form-id"
               // secondaryText={count === 1 ? 'Save Progress' : ''}
             >
            {schema &&  uiSchema &&(<DynamicForm
