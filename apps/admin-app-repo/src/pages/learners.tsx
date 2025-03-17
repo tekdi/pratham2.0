@@ -12,7 +12,7 @@ import {
 } from '../constant/Forms/LearnerSearch';
 import { Status } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
-import { Box, Grid, Typography } from '@mui/material';
+import { Box, Checkbox, FormControlLabel, Grid, TextField, Typography } from '@mui/material';
 import { debounce } from 'lodash';
 import { Numbers } from '@mui/icons-material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
@@ -32,6 +32,8 @@ import {
   searchListData,
 } from '@/components/DynamicForm/DynamicFormCallback';
 import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
+import ConfirmationPopup from '@/components/ConfirmationPopup';
+import DeleteDetails from '@/components/DeleteDetails';
 
 const Learner = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -51,6 +53,12 @@ const Learner = () => {
   const [editableUserId, setEditableUserId] = useState('');
   const [roleId, setRoleID] = useState('');
   const [tenantId, setTenantId] = useState('');
+  const [open, setOpen] = useState(false);
+  const [checked, setChecked] = useState(false);
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [village, setVillage] = useState('');
+  const [reason, setReason] = useState("");
 
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
@@ -99,7 +107,7 @@ const Learner = () => {
   };
 
   const searchData = async (formData, newPage) => {
-    const staticFilter = { role: 'Learner' };
+    const staticFilter = { role: 'Learner', status: "active" };
     const { sortBy } = formData;
     const staticSort = ['firstName', sortBy || 'asc'];
     await searchListData(
@@ -216,20 +224,29 @@ const Learner = () => {
         </Box>
       ),
       callback: async (row) => {
-        console.log('row:', row);
-        // setEditableUserId(row?.userId);
-        const memberStatus = Status.ARCHIVED;
-        const statusReason = '';
-        const membershipId = row?.userId;
-
-        const response = await updateCohortMemberStatus({
-          memberStatus,
-          statusReason,
-          membershipId,
+        const findVillage = row?.customFields.find((item) => {
+          if (item.label === 'VILLAGE') {
+            return item;
+          }
         });
-        setPrefilledFormData({});
-        searchData(prefilledFormData, currentPage);
-        setOpenModal(false);
+
+        setVillage(findVillage?.selectedValues[0]?.value);
+        // console.log('row:', row?.customFields[2].selectedValues[0].value);
+        setEditableUserId(row?.userId);
+        // const memberStatus = Status.ARCHIVED;
+        // const statusReason = '';
+        // const membershipId = row?.userId;
+
+        // const response = await updateCohortMemberStatus({
+        //   memberStatus,
+        //   statusReason,
+        //   membershipId,
+        // });
+        // setPrefilledFormData({});
+        // searchData(prefilledFormData, currentPage);
+        setOpen(true);
+        setFirstName(row?.firstName)
+        setLastName(row?.lastName)
       },
     },
   ];
@@ -373,6 +390,26 @@ const Learner = () => {
           </Box>
         )}
       </Box>
+
+      <ConfirmationPopup
+        checked={checked}
+        open={open}
+        onClose={() => setOpen(false)}
+        title={t("COMMON.DELETE_USER")}
+        primary={t("COMMON.DELETE_USER_WITH_REASON")}
+        secondary={t("COMMON.CANCEL")}
+        reason={reason}
+      >
+        <DeleteDetails
+          firstName={firstName}
+          lastName={lastName}
+          village={village}
+          checked={checked}
+          setChecked={setChecked}
+          reason={reason}
+          setReason={setReason}
+        />
+      </ConfirmationPopup>
     </>
   );
 };

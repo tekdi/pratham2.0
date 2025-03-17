@@ -23,7 +23,7 @@ export const fetchEntities = async ({ solutionId }: any): Promise<any> => {
       'X-auth-token': localStorage.getItem('token'),
     };
 
-    const response = await get(apiUrl, headers);
+    const response = await post(apiUrl,{}, headers);
     return response?.data;
   } catch (error) {
     console.error('Error in fetching attendance list', error);
