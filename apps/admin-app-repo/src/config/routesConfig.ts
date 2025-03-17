@@ -16,7 +16,7 @@ export const ROLE_BASED_ROUTES = {
       '/notification-templates/update/[identifier]',
       '/edit-password',
     ],
-    [Role.CCTA]: ['/subjectDetails', '/importCsv', '/edit-password'],
+    [Role.CCTA]: ['/subjectDetails', '/importCsv', '/edit-password',],
     [Role.SCTA]: ['/subjectDetails', '/importCsv ', '/edit-password'],
   },
   [TenantName.YOUTHNET]: {
