@@ -145,8 +145,8 @@ function generateSchemaAndUISchema(fields) {
     }
 
     if (type === 'radio') {
-      schemaField.enum = options.map((opt) => opt.value);
-      schemaField.enumNames = options.map((opt) => opt.label);
+      schemaField.enum = options?.map((opt) => opt.value);
+      schemaField.enumNames = options?.map((opt) => opt.label);
       uiSchema[name] = {
         'ui:widget': 'radio',
       };
@@ -154,12 +154,12 @@ function generateSchemaAndUISchema(fields) {
       if (schemaField?.isMultiSelect === true) {
         schemaField.items = {
           type: 'string',
-          enum: options.map((opt) => opt.value) || [],
-          enumNames: options.map((opt) => opt.label) || [],
+          enum: options?.map((opt) => opt.value) || ['Select'],
+          enumNames: options?.map((opt) => opt.label) || ['Select'],
         };
       } else {
-        schemaField.enum = options.map((opt) => opt.value) || [];
-        schemaField.enumNames = options.map((opt) => opt.label) || [];
+        schemaField.enum = options?.map((opt) => opt.value) || ['Select'];
+        schemaField.enumNames = options?.map((opt) => opt.label) || ['Select'];
       }
       uiSchema[name] = {
         'ui:widget':
@@ -181,7 +181,10 @@ function generateSchemaAndUISchema(fields) {
       schemaField.format = 'date-time';
       uiSchema[name] = { 'ui:widget': 'dateTime' };
     } else {
-      uiSchema[name] = { 'ui:widget': 'text' };
+      uiSchema[name] = {
+        'ui:widget': 'text',
+        // 'ui:options': { validateOnBlur: true },
+      };
     }
 
     //Our custom RJSF field attributes
@@ -190,11 +193,11 @@ function generateSchemaAndUISchema(fields) {
       if (schemaField?.isMultiSelect === true) {
         schemaField.items = {
           type: 'string',
-          enum: [],
-          enumNames: [],
+          enum: ['Select'],
+          enumNames: ['Select'],
         };
       } else {
-        schemaField.enum = ['select'];
+        schemaField.enum = ['Select'];
         schemaField.enumNames = ['Select'];
       }
     }

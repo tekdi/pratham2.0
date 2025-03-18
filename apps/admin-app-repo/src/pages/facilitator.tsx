@@ -12,8 +12,19 @@ import {
 } from '../constant/Forms/facilitatorSearch';
 import { Status } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
-import { Box, Grid, Typography } from '@mui/material';
-import { debounce } from 'lodash';
+import {
+  Box,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  Grid,
+  Radio,
+  RadioGroup,
+  TextField,
+  Typography,
+} from '@mui/material';
+import { debounce, forEach } from 'lodash';
 import { Numbers } from '@mui/icons-material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
 import EditIcon from '@mui/icons-material/Edit';
@@ -32,6 +43,9 @@ import {
   searchListData,
 } from '@/components/DynamicForm/DynamicFormCallback';
 import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
+import ConfirmationPopup from '@/components/ConfirmationPopup';
+import DeleteDetails from '@/components/DeleteDetails';
+import { deleteUser } from '@/services/UserService';
 
 const Facilitator = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -51,6 +65,13 @@ const Facilitator = () => {
   const [editableUserId, setEditableUserId] = useState('');
   const [roleId, setRoleID] = useState('');
   const [tenantId, setTenantId] = useState('');
+
+  const [userID, setUserId] = useState("")
+  const [userData, setUserData] = useState({
+    firstName: "",
+    lastName: "",
+    village: "",
+  });
 
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
@@ -98,7 +119,7 @@ const Facilitator = () => {
   };
 
   const searchData = async (formData, newPage) => {
-    const staticFilter = { role: 'Instructor' };
+    const staticFilter = { role: 'Instructor', status: 'active' };
     const { sortBy } = formData;
     const staticSort = ['firstName', sortBy || 'asc'];
     await searchListData(
@@ -120,9 +141,8 @@ const Facilitator = () => {
       keys: ['firstName', 'middleName', 'lastName'],
       label: 'Facilitator Name',
       render: (row) =>
-        `${row.firstName || ''} ${row.middleName || ''} ${
-          row.lastName || ''
-        }`.trim(),
+        `${row.firstName || ''} ${row.middleName || ''} ${row.lastName || ''
+          }`.trim(),
     },
     {
       key: 'status',
@@ -159,14 +179,34 @@ const Facilitator = () => {
           row.customFields.find(
             (field: { label: string }) => field.label === 'VILLAGE'
           )?.selectedValues[0]?.value || '';
-        return `${state == '' ? '' : `${state}`}${
-          district == '' ? '' : `, ${district}`
-        }${block == '' ? '' : `, ${block}`}${
-          village == '' ? '' : `, ${village}`
-        }`;
+        return `${state == '' ? '' : `${state}`}${district == '' ? '' : `, ${district}`
+          }${block == '' ? '' : `, ${block}`}${village == '' ? '' : `, ${village}`
+          }`;
       },
     },
   ];
+
+  const userDelete = async () => {
+    try {
+      const resp = await deleteUser(userID, { userData: { reason: reason, status: "archived" } });
+      if (resp?.responseCode === 200) {
+        setResponse((prev) => ({
+          ...prev, // Preserve other properties in `prev`
+          result: {
+            ...prev?.result, // Preserve other properties in `result`
+            getUserDetails: prev?.result?.getUserDetails?.filter(item => item?.userId !== userID)
+          }
+        }));
+        console.log("Team leader successfully archived.");
+      } else {
+        console.error("Failed to archive team leader:", resp);
+      }
+
+      return resp;
+    } catch (error) {
+      console.error("Error updating team leader:", error);
+    }
+  };
 
   // Define actions
   const actions = [
@@ -215,20 +255,37 @@ const Facilitator = () => {
         </Box>
       ),
       callback: async (row) => {
-        console.log('row:', row);
-        // setEditableUserId(row?.userId);
-        const memberStatus = Status.ARCHIVED;
-        const statusReason = '';
-        const membershipId = row?.userId;
-
-        const response = await updateCohortMemberStatus({
-          memberStatus,
-          statusReason,
-          membershipId,
+        const findVillage = row?.customFields.find((item) => {
+          if (item.label === 'BATCH') {
+            return item;
+          }
         });
-        setPrefilledFormData({});
-        searchData(prefilledFormData, currentPage);
-        setOpenModal(false);
+
+        // setVillage(findVillage?.selectedValues[0]?.value);
+        // console.log('row:', row?.customFields[2].selectedValues[0].value);
+        // setEditableUserId(row?.userId);
+        // const memberStatus = Status.ARCHIVED;
+        // const statusReason = '';
+        // const membershipId = row?.userId;
+
+        // const response = await updateCohortMemberStatus({
+        //   memberStatus,
+        //   statusReason,
+        //   membershipId,
+        // });
+        // setPrefilledFormData({});
+        // searchData(prefilledFormData, currentPage);
+        setOpen(true);
+        setUserId(row?.userId)
+
+        setUserData({
+          firstName: row?.firstName || "",
+          lastName: row?.lastName || "",
+          village: findVillage?.selectedValues?.[0]?.value || "",
+        });
+
+
+
       },
     },
   ];
@@ -275,6 +332,13 @@ const Facilitator = () => {
   useEffect(() => {
     setPrefilledFormData(initialFormData);
   }, []);
+
+  const [open, setOpen] = useState(false);
+  const [checked, setChecked] = useState(false);
+  const [reason, setReason] = useState("");
+
+  // console.log(response?.result?.getUserDetails , "shreyas");
+  response;
 
   return (
     <>
@@ -374,6 +438,27 @@ const Facilitator = () => {
           </Box>
         )}
       </Box>
+
+      <ConfirmationPopup
+        checked={checked}
+        open={open}
+        onClose={() => setOpen(false)}
+        title={t("COMMON.DELETE_USER")}
+        primary={t("COMMON.DELETE_USER_WITH_REASON")}
+        secondary={t("COMMON.CANCEL")}
+        reason={reason}
+        onClickPrimary={userDelete}
+      >
+        <DeleteDetails
+          firstName={userData.firstName}
+          lastName={userData.lastName}
+          village={userData.village}
+          checked={checked}
+          setChecked={setChecked}
+          reason={reason}
+          setReason={setReason}
+        />
+      </ConfirmationPopup>
     </>
   );
 };

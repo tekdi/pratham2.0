@@ -12,7 +12,14 @@ import {
 } from '../constant/Forms/MentorLeadSearch';
 import { Status } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
-import { Box, Grid, Typography } from '@mui/material';
+import {
+  Box,
+  Checkbox,
+  FormControlLabel,
+  Grid,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { debounce } from 'lodash';
 import { Numbers } from '@mui/icons-material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
@@ -32,6 +39,9 @@ import {
   searchListData,
 } from '@/components/DynamicForm/DynamicFormCallback';
 import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
+import ConfirmationPopup from '@/components/ConfirmationPopup';
+import DeleteDetails from '@/components/DeleteDetails';
+import { deleteUser } from '@/services/UserService';
 
 const MentorLead = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -49,6 +59,18 @@ const MentorLead = () => {
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [isEdit, setIsEdit] = useState(false);
   const [editableUserId, setEditableUserId] = useState('');
+  const [open, setOpen] = useState(false);
+  const [checked, setChecked] = useState(false);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [village, setVillage] = useState('');
+  const [userID, setUserId] = useState("")
+  const [userData, setUserData] = useState({
+    firstName: "",
+    lastName: "",
+    village: "",
+  });
+  const [reason, setReason] = useState("");
 
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
@@ -97,7 +119,8 @@ const MentorLead = () => {
   };
 
   const searchData = async (formData, newPage) => {
-    const staticFilter = { role: 'Lead' };
+    const staticFilter = { role: 'Lead', status: 'active' };
+
     const { sortBy } = formData;
     const staticSort = ['firstName', sortBy || 'asc'];
     await searchListData(
@@ -155,6 +178,27 @@ const MentorLead = () => {
       },
     },
   ];
+  const userDelete = async () => {
+    try {
+      const resp = await deleteUser(userID, { userData: { reason: reason, status: "archived" } });
+      if (resp?.responseCode === 200) {
+        setResponse((prev) => ({
+          ...prev, // Preserve other properties in `prev`
+          result: {
+            ...prev?.result, // Preserve other properties in `result`
+            getUserDetails: prev?.result?.getUserDetails?.filter(item => item?.userId !== userID)
+          }
+        }));
+        console.log("Team leader successfully archived.");
+      } else {
+        console.error("Failed to archive team leader:", resp);
+      }
+
+      return resp;
+    } catch (error) {
+      console.error("Error updating team leader:", error);
+    }
+  };
 
   // Define actions
   const actions = [
@@ -203,20 +247,34 @@ const MentorLead = () => {
         </Box>
       ),
       callback: async (row) => {
-        console.log('row:', row);
-        // setEditableUserId(row?.userId);
-        const memberStatus = Status.ARCHIVED;
-        const statusReason = '';
-        const membershipId = row?.userId;
-
-        const response = await updateCohortMemberStatus({
-          memberStatus,
-          statusReason,
-          membershipId,
+        const findVillage = row?.customFields.find((item) => {
+          if (item.label === 'VILLAGE') {
+            return item;
+          }
         });
-        setPrefilledFormData({});
-        searchData(prefilledFormData, currentPage);
-        setOpenModal(false);
+
+        // setVillage(findVillage?.selectedValues[0]?.value);
+        // console.log('row:', row?.customFields[2].selectedValues[0].value);
+        // setEditableUserId(row?.userId);
+        // const memberStatus = Status.ARCHIVED;
+        // const statusReason = '';
+        // const membershipId = row?.userId;
+
+        // const response = await updateCohortMemberStatus({
+        //   memberStatus,
+        //   statusReason,
+        //   membershipId,
+        // });
+        // setPrefilledFormData({});
+        // searchData(prefilledFormData, currentPage);
+        setOpen(true);
+        setUserId(row?.userId)
+
+        setUserData({
+          firstName: row?.firstName || "",
+          lastName: row?.lastName || "",
+          village: findVillage?.selectedValues?.[0]?.value || "",
+        });
       },
     },
   ];
@@ -361,6 +419,26 @@ const MentorLead = () => {
           </Box>
         )}
       </Box>
+      <ConfirmationPopup
+        checked={checked}
+        open={open}
+        onClose={() => setOpen(false)}
+        title={t("COMMON.DELETE_USER")}
+        primary={t("COMMON.DELETE_USER_WITH_REASON")}
+        secondary={t("COMMON.CANCEL")}
+        reason={reason}
+        onClickPrimary={userDelete}
+      >
+        <DeleteDetails
+          firstName={userData.firstName}
+          lastName={userData.lastName}
+          village={userData.village}
+          checked={checked}
+          setChecked={setChecked}
+          reason={reason}
+          setReason={setReason}
+        />
+      </ConfirmationPopup>
     </>
   );
 };

@@ -724,14 +724,18 @@
     "ASSIGN_VOLUNTEERS_NOW": "Assign Volunteers Now",
     "REMIND_ME_LATER": "Remind Me Later",
     "NEW_SURVEY_HAS_BEEN_ADDED": "A new survey '{{surveyName}}' has been added and has been assigned to {{villageCount}} villages",
-    "ASSIGN_VOLUNTEERS_TO_ENSURE": "Assign Volunteers to ensure they can access the survey"
+    "ASSIGN_VOLUNTEERS_TO_ENSURE": "Assign Volunteers to ensure they can access the survey",
+    "SURVEY_ASSIGNED_VILLAGE_COUNT":"Assigned to {{villageCount}} Villages"
   },
   "YOUTHNET_DASHBOARD": {
     "VILLAGES_MANAGED_BY_YOU": "Villages Managed by you : {{totalVillageCount}}",
+    "VILLAGE_MANAGED_BY_YOU": "Village Managed by you : {{totalVillageCount}}",
+    "VILLAGE": "Village",
+
     "MANAGES": "Manages",
     "VILLAGES": "Villages",
     "MONTHLY_REGISTRATIONS_OVERVIEW": "Registrations Overview",
-    "CLOSED_ON": "Closed on",
+    "CLOSED_ON": "Closes on",
     "ABOVE_18": "Over 18 Registrations",
     "BELOW_18": "Under 18 Registrations",
     "VLLAGE_18": "Today's New Registrations ",
@@ -802,9 +806,13 @@
     "ASSIGN_VILLAGES_FROM_BLOCK_INFO": "You can complete this later at your own pace. However, the villages will only be assigned once you click on ‘Finish.’",
     "NO_DATA_FOUND":"No data found",
     "VILLAGE":"Village",
-    "BLOCK":"blocks",
+    "BLOCK":"Block",
     "VILLAGES":"Villages",
-    "BLOCKS":"Blocks"
+    "BLOCKS":"Blocks",
+    "DISTRICT":"District",
+    "DISTRICTS":"Districts"
+
+    
   },
 
   "YOUTHNET_CAMP_DETAILS": {
