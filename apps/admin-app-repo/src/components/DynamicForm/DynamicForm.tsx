@@ -1,4 +1,3 @@
-
 // @ts-nocheck
 import React, { useState, useEffect, useRef } from 'react';
 import Form from '@rjsf/mui';
@@ -645,9 +644,16 @@ const DynamicForm = ({
     let updatedPayload = { ...payload };
 
     // Replace ** with value based on isMultiSelect
-    updatedPayload.controllingfieldfk = isMultiSelect
+    const newValue = isMultiSelect
       ? changedFieldValue
       : String(changedFieldValue);
+
+    // Iterate through the object keys and replace "**" wherever found
+    Object.keys(updatedPayload).forEach((key) => {
+      if (updatedPayload[key] === '**') {
+        updatedPayload[key] = newValue;
+      }
+    });
 
     return updatedPayload;
   };
@@ -959,8 +965,7 @@ const DynamicForm = ({
             // Use fieldId for custom fields
             transformedData.customFields.push({
               fieldId: fieldSchema.fieldId,
-              value:
-                fieldSchema?.maxSelection > 0 ? [formData[key]] : formData[key],
+              value: formData[key],
             });
           } else {
             // Use the field name for core fields

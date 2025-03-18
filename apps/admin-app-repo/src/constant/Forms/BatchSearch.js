@@ -1,4 +1,5 @@
-export const BatchSearchSchema = {
+export const BatchSearchSchema = 
+{
   type: 'object',
   properties: {
     state: {
