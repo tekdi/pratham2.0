@@ -1,4 +1,4 @@
-name: Deploy to QA 
+name: Deploy to QA Admin
 
 on:
   push:
@@ -46,7 +46,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY_QA }}
           script: |
             cd ${{ secrets.TARGET_QA_LAP }}
-            docker stop qa-LAP || true
+            docker stop qa-lap || true
             docker system prune -af || true
             aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
             aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
@@ -54,4 +54,5 @@ jobs:
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_URI }}
             docker-compose up -d --force-recreate --no-deps
             docker system prune -af || true
+            docker ps -a
             sudo systemctl restart nginx
