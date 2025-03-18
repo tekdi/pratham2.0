@@ -101,6 +101,10 @@ const ConfirmationPopup: React.FC<GenericModalProps> = ({
               variant="contained"
               fullWidth
               disabled={!checked || !reason}
+              onClick={() => {
+                if (onClickPrimary) onClickPrimary();
+                if (onClose) onClose();
+              }}
               color="primary"
               sx={{
                 padding: theme.spacing(1),
