@@ -141,7 +141,13 @@ const UserId = () => {
         console.log(extractUserInfo);
         setFormData(extractUserInfo);
         setSchema(newSchema?.schema);
-        setUiSchema(newSchema?.uiSchema);
+        const updatedUiSchema = {
+          ...newSchema?.uiSchema,
+          "ui:submitButtonOptions": {
+            norender: true, 
+          },
+        };
+        setUiSchema(updatedUiSchema);
       } catch (e) {
         console.log(e);
       }
@@ -214,16 +220,16 @@ const UserId = () => {
         }
        
        setUser({
-          firstName: userData?.firstName || '',
-          lastName: userData?.lastName || '',
-          middleName:userData?.middleName || '',
+          firstName: toPascalCase(userData?.firstName) || '',
+          lastName: toPascalCase(userData?.lastName) || '',
+          middleName:toPascalCase(userData?.middleName) || '',
           userName:  userData?.username || '',
           joinedOn: userData?.createdOn || '',
           email: userData?.email || '',
           userID: userData?.userId || '',
           phone: userData?.mobile || '',
-          gender: userData?.gender || '',
-          userRole: userData?.tenantData?.[0]?.roleName || role,
+          gender: (userData?.gender) || '',
+          userRole: toPascalCase(userData?.tenantData?.[0]?.roleName) || toPascalCase(role),
           dob: formattedDOBDate || '',
           district: getFieldValue('DISTRICT'),
           block: getFieldValue('BLOCK'),
@@ -359,7 +365,8 @@ const UserId = () => {
               showFooter={true}
               modalTitle={'New Mentor'}
             //  handleNext={FormSubmitFunction}
-              // primaryText={count === 0 ? 'Next' : 'Finish & Assign'}
+              primaryText={'submit'}
+              id="dynamic-form-id"
               // secondaryText={count === 1 ? 'Save Progress' : ''}
             >
            {schema &&  uiSchema &&(<DynamicForm

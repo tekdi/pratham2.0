@@ -32,8 +32,12 @@ export const getDeviceId = () => {
 };
 
 export const getLoggedInUserRole = () => {
-  return (localStorage.getItem('role') || "")
+  if (typeof window !== "undefined") {
+    return localStorage.getItem("role") || "";
+  }
+  return "";
 };
+
 export const filterUsersByAge = (users: any[]) => {
   const today = new Date();
 

@@ -4,12 +4,13 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 interface EntrySliderProps {
-  children: React.ReactNode[];
+  children: React.ReactNode | React.ReactNode[]; // Accept single or multiple children
 }
 
 const EntrySlider: React.FC<EntrySliderProps> = ({ children }) => {
+  const entries = Array.isArray(children) ? children : [children]; // Ensure always an array
   const [currentEntry, setCurrentEntry] = useState(1);
-  const totalEntries = children.length;
+  const totalEntries = entries.length;
 
   const handlePrev = () => {
     if (currentEntry > 1) {
@@ -27,25 +28,17 @@ const EntrySlider: React.FC<EntrySliderProps> = ({ children }) => {
     <Box
       sx={{
         border: '1px solid #EBE1D4',
-
         padding: '10px 20px',
         backgroundColor: '#FCF7F0',
         width: '100%',
       }}
     >
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="space-between"
-        sx={{
-          width: '100%',
-        }}
-      >
-        <IconButton onClick={handlePrev} disabled={currentEntry === 1}>
-          <ArrowBackIosIcon
-            sx={{ color: currentEntry === 1 ? '#E0E0E0' : '#000' }}
-          />
-        </IconButton>
+      <Box display="flex" alignItems="center" justifyContent="center" sx={{ width: '100%' }}>
+        {totalEntries > 1 && (
+          <IconButton onClick={handlePrev} disabled={currentEntry === 1}>
+            <ArrowBackIosIcon sx={{ color: currentEntry === 1 ? '#E0E0E0' : '#000' }} />
+          </IconButton>
+        )}
 
         <Typography
           sx={{
@@ -58,22 +51,15 @@ const EntrySlider: React.FC<EntrySliderProps> = ({ children }) => {
           Entry {currentEntry} of {totalEntries}
         </Typography>
 
-        <IconButton
-          onClick={handleNext}
-          disabled={currentEntry === totalEntries}
-        >
-          <ArrowForwardIosIcon
-            sx={{ color: currentEntry === totalEntries ? '#E0E0E0' : '#000' }}
-          />
-        </IconButton>
+        {totalEntries > 1 && (
+          <IconButton onClick={handleNext} disabled={currentEntry === totalEntries}>
+            <ArrowForwardIosIcon sx={{ color: currentEntry === totalEntries ? '#E0E0E0' : '#000' }} />
+          </IconButton>
+        )}
       </Box>
 
-      <Box
-        display="flex"
-        flexDirection="column"
-        sx={{ marginTop: '20px', width: '100%' }}
-      >
-        {children[currentEntry - 1]}
+      <Box display="flex" flexDirection="column" sx={{ marginTop: '20px', width: '100%' }}>
+        {entries[currentEntry - 1]}
       </Box>
     </Box>
   );

@@ -257,15 +257,19 @@ setVillageCount(villageIds?.length)
           <Box mt={2}>
             <Typography>
               {t(`YOUTHNET_DASHBOARD.MANAGES`)} {villageCount}{' '}
-              {t(`YOUTHNET_DASHBOARD.VILLAGES`)}
+              { villageCount>=1 ?t(`YOUTHNET_DASHBOARD.VILLAGE`): t(`YOUTHNET_DASHBOARD.VILLAGES`)}
             </Typography>
           </Box>
         ) : (
           <Typography>
-            {t('YOUTHNET_DASHBOARD.VILLAGES_MANAGED_BY_YOU', {
-              totalVillageCount: villageCount,
-            })}
-          </Typography>
+  {t(
+    villageCount <= 1
+      ? 'YOUTHNET_DASHBOARD.VILLAGE_MANAGED_BY_YOU'
+      : 'YOUTHNET_DASHBOARD.VILLAGES_MANAGED_BY_YOU',
+    { totalVillageCount: villageCount }
+  )}
+</Typography>
+
            
 
         )}
@@ -295,7 +299,9 @@ setVillageCount(villageIds?.length)
             <RegistrationStatistics
               onPrimaryClick={() => handleClick('village')}
               cardTitle={'From'}
-              statistic={registeredVillages.length +" villages"} 
+              statistic= {registeredVillages.length <=1 ? `${registeredVillages.length} ${t('YOUTHNET_USERS_AND_VILLAGES.VILLAGE')}` : `${registeredVillages.length} ${t('YOUTHNET_USERS_AND_VILLAGES.VILLAGES')}`} 
+ 
+            
             />
           </Grid>
         </Grid>
@@ -311,7 +317,7 @@ setVillageCount(villageIds?.length)
             { label: t('YOUTHNET_DASHBOARD.AS_OF_LAST_YEAR'), value: 'year' },
 
           ]}
-          data="577 Youth & Volunteers"
+          data=""
           userId={YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole()?selectedMentorId:localStorage.getItem('userId')|| ""}
           managedVillageCount={villageCount}
         />

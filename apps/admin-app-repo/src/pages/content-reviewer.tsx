@@ -4,23 +4,18 @@ import DynamicForm from '@/components/DynamicForm/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
 import {
-  MentorSearchSchema,
-  MentorSearchUISchema,
-} from '../constant/Forms/MentorSearch';
-import { Status } from '@/utils/app.constant';
+  ContentReviewerSearchSchema,
+  ContentReviewerUISchema,
+} from '../constant/Forms/ContentReviewerSearch';
+
+import { RoleId, RoleName, Status, TenantName } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
-import {
-  Box,
-  Checkbox,
-  FormControlLabel,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
 import { Button } from '@mui/material';
 import SimpleModal from '@/components/SimpleModal';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { updateCohortMemberStatus } from '@/services/CohortService/cohortService';
+import { deleteUser } from '@/services/UserService';
 import editIcon from '../../public/images/editIcon.svg';
 import deleteIcon from '../../public/images/deleteIcon.svg';
 import Image from 'next/image';
@@ -31,16 +26,12 @@ import {
 } from '@/components/DynamicForm/DynamicFormCallback';
 import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
-import ConfirmationPopup from '@/components/ConfirmationPopup';
-import DeleteDetails from '@/components/DeleteDetails';
-import { deleteUser } from '@/services/UserService';
+import TenantService from '@/services/TenantService';
 
-//import { DynamicForm } from '@shared-lib';
-
-const Mentor = () => {
+const ContentReviewer = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [schema, setSchema] = useState(MentorSearchSchema);
-  const [uiSchema, setUiSchema] = useState(MentorSearchUISchema);
+  const [schema, setSchema] = useState(ContentReviewerSearchSchema);
+  const [uiSchema, setUiSchema] = useState(ContentReviewerUISchema);
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
   const [prefilledAddFormData, setPrefilledAddFormData] = useState({});
@@ -53,23 +44,11 @@ const Mentor = () => {
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [isEdit, setIsEdit] = useState(false);
   const [editableUserId, setEditableUserId] = useState('');
-  const [roleId, setRoleID] = useState('');
-  const [tenantId, setTenantId] = useState('');
-  const [open, setOpen] = useState(false);
-  const [checked, setChecked] = useState(false);
-  const [userID, setUserId] = useState("")
-  const [userData, setUserData] = useState({
-    firstName: "",
-    lastName: "",
-    village: "",
-  });
-  const [reason, setReason] = useState("");
-
 
   const { t, i18n } = useTranslation();
-  const initialFormData = localStorage.getItem('stateId')
-    ? { state: localStorage.getItem('stateId') }
-    : {};
+  const storedUserData = JSON.parse(
+    localStorage.getItem('adminInfo') || '{}'
+  );
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -81,13 +60,13 @@ const Mentor = () => {
     const fetchData = async () => {
       const responseForm = await fetchForm([
         {
-          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.mentor.context}&contextType=${FormContext.mentor.contextType}`,
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.contentReviewer.context}&contextType=${FormContext.contentReviewer.contextType}`,
           header: {},
         },
         {
-          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.mentor.context}&contextType=${FormContext.mentor.contextType}`,
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.contentReviewer.context}&contextType=${FormContext.contentReviewer.contextType}`,
           header: {
-            tenantid: localStorage.getItem('tenantId'),
+            tenantid: TenantService.getTenantId(),
           },
         },
       ]);
@@ -96,10 +75,6 @@ const Mentor = () => {
       setAddUiSchema(responseForm?.uiSchema);
     };
 
-    setPrefilledAddFormData(initialFormData);
-    setPrefilledFormData(initialFormData);
-    setRoleID(localStorage.getItem('roleId'));
-    setTenantId(localStorage.getItem('tenantId'));
     fetchData();
   }, []);
 
@@ -116,8 +91,7 @@ const Mentor = () => {
   };
 
   const searchData = async (formData: any, newPage: any) => {
-    const staticFilter = { role: 'Instructor', status: 'active' };
-
+    const staticFilter = { role: RoleName.CONTENT_REVIEWER, tenantId: TenantService.getTenantId() };
     const { sortBy } = formData;
     const staticSort = ['firstName', sortBy || 'asc'];
     await searchListData(
@@ -134,10 +108,10 @@ const Mentor = () => {
   };
 
   // Define table columns
-  const columns = [
+  let columns = [
     {
       keys: ['firstName', 'middleName', 'lastName'],
-      label: 'Mentor Name',
+      label: 'Content Reviewer Name',
       render: (row: any) =>
         `${row.firstName || ''} ${row.middleName || ''} ${
           row.lastName || ''
@@ -150,66 +124,98 @@ const Mentor = () => {
         color: row.status === 'active' ? 'green' : 'red',
       }),
     },
-    // {
-    //   key: 'STATE',
-    //   label: 'State',
-    //   render: (row) => {
-    //     const state =
-    //       row.customFields.find((field) => field.label === 'STATE')
-    //         ?.selectedValues[0]?.value || '-';
-    //     return `${state}`;
-    //   },
-    // },
     {
-      keys: ['STATE', 'DISTRICT', 'BLOCK', 'VILLAGE'],
-      label: 'Location (State / District / Block/ Village)',
-      render: (row: any) => {
+      key: 'STATE',
+      label: 'State',
+      render: (row) => {
         const state =
-          row.customFields.find(
-            (field: { label: string }) => field.label === 'STATE'
-          )?.selectedValues[0]?.value || '';
-        const district =
-          row.customFields.find(
-            (field: { label: string }) => field.label === 'DISTRICT'
-          )?.selectedValues[0]?.value || '';
-        const block =
-          row.customFields.find(
-            (field: { label: string }) => field.label === 'BLOCK'
-          )?.selectedValues[0]?.value || '';
-        const village =
-          row.customFields.find(
-            (field: { label: string }) => field.label === 'VILLAGE'
-          )?.selectedValues[0]?.value || '';
-        return `${state == '' ? '' : `${state}`}${
-          district == '' ? '' : `, ${district}`
-        }${block == '' ? '' : `, ${block}`}${
-          village == '' ? '' : `, ${village}`
-        }`;
+          row.customFields.find((field) => field.label === 'STATE')
+            ?.selectedValues[0]?.value || '-';
+        return `${state}`;
       },
-    },
+    }
   ];
 
-  const userDelete = async () => {
-    try {
-      const resp = await deleteUser(userID, { userData: { reason: reason, status: "archived" } });
-      if (resp?.responseCode === 200) {
-        setResponse((prev) => ({
-          ...prev, // Preserve other properties in `prev`
-          result: {
-            ...prev?.result, // Preserve other properties in `result`
-            getUserDetails: prev?.result?.getUserDetails?.filter(item => item?.userId !== userID)
-          }
-        }));
-        console.log("Team leader successfully archived.");
-      } else {
-        console.error("Failed to archive team leader:", resp);
+  const scpCustomColumns = [
+      {
+        key: 'BOARD',
+        label: 'Board',
+        render: (row) => {
+          const board =
+            row.customFields.find((field) => field.label === 'BOARD')
+              ?.selectedValues[0]?.value || '-';
+          return `${board}`;
+        },
+      },
+      {
+        key: 'MEDIUM',
+        label: 'Medium',
+        render: (row) => {
+          const medium =
+            row.customFields.find((field) => field.label === 'MEDIUM')
+              ?.selectedValues[0]?.value || '-';
+          return `${medium}`;
+        },
+      },
+      {
+        key: 'GRADE',
+        label: 'Grade',
+        render: (row) => {
+          const grade =
+            row.customFields.find((field) => field.label === 'GRADE')
+              ?.selectedValues[0]?.value || '-';
+          return `${grade}`;
+        },
+      },
+      {
+        key: 'SUBJECT',
+        label: 'subject',
+        render: (row) => {
+          const subject =
+            row.customFields.find((field) => field.label === 'SUBJECT')
+              ?.selectedValues[0]?.value || '-';
+          return `${subject}`;
+        },
       }
+    ]
 
-      return resp;
-    } catch (error) {
-      console.error("Error updating team leader:", error);
+    const youthnetCustomColumns = [
+      {
+        key: 'DOMAIN',
+        label: 'Domain',
+        render: (row) => {
+          const domain =
+            row.customFields.find((field) => field.label === 'DOMAIN')
+              ?.selectedValues[0]?.value || '-';
+          return `${domain}`;
+        },
+      },
+      {
+        key: 'SUB-DOMAIN',
+        label: 'Sub Domain',
+        render: (row) => {
+          const subDomain =
+            row.customFields.find((field) => field.label === 'SUB-DOMAIN')
+              ?.selectedValues[0]?.value || '-';
+          return `${subDomain}`;
+        },
+      },
+      {
+        key: 'STREAM',
+        label: 'Stream',
+        render: (row) => {
+          const stream =
+            row.customFields.find((field) => field.label === 'STREAM')
+              ?.selectedValues[0]?.value || '-';
+          return `${stream}`;
+        }
+      }
+    ]
+    if (storedUserData.tenantData[0].tenantName === TenantName.SECOND_CHANCE_PROGRAM) {
+      columns = [...columns, ...scpCustomColumns]
+    } else if (storedUserData.tenantData[0].tenantName === TenantName.YOUTHNET) {
+      columns = [...columns, ...youthnetCustomColumns]
     }
-  };
 
   // Define actions
   const actions = [
@@ -234,7 +240,7 @@ const Mentor = () => {
         console.log('AddUISchema', addUiSchema);
 
         let tempFormData = extractMatchingKeys(row, addSchema);
-        // console.log('tempFormData', tempFormData);
+        console.log('tempFormData', tempFormData);
         setPrefilledAddFormData(tempFormData);
         setIsEdit(true);
         setEditableUserId(row?.userId);
@@ -257,39 +263,22 @@ const Mentor = () => {
           <Image src={deleteIcon} alt="" />
         </Box>
       ),
-      callback: async (row) => {
-        const findVillage = row?.customFields.find((item) => {
-          if (item.label === 'VILLAGE') {
-            return item;
+      callback: async (row: any) => {
+        console.log('row:', row);
+        setEditableUserId(row?.userId);
+        const userId = row?.userId;
+        const response = await deleteUser(
+          userId, {
+            userData: {
+              status: Status.ARCHIVED
+            }
           }
-        });
-
-        
-        // console.log('row:', row?.customFields[2].selectedValues[0].value);
-        // setEditableUserId(row?.userId);
-        // const memberStatus = Status.ARCHIVED;
-        // const statusReason = '';
-        // const membershipId = row?.userId;
-
-        // const response = await updateCohortMemberStatus({
-        //   memberStatus,
-        //   statusReason,
-        //   membershipId,
-        // });
-        // setPrefilledFormData({});
-        // searchData(prefilledFormData, currentPage);
-        setOpen(true);
-        setUserId(row?.userId)
-
-        setUserData({
-          firstName: row?.firstName || "",
-          lastName: row?.lastName || "",
-          village: findVillage?.selectedValues?.[0]?.value || "",
-        });
-
+        );
+        setPrefilledFormData({});
+        searchData(prefilledFormData, currentPage);
+        setOpenModal(false);
       },
-      },
-    
+    },
   ];
 
   // Pagination handlers
@@ -314,21 +303,25 @@ const Mentor = () => {
   const extraFields = {
     tenantCohortRoleMapping: [
       {
-        tenantId: tenantId,
-        roleId: roleId,
+        tenantId: TenantService.getTenantId(),
+        roleId: RoleId.CONTENT_REVIEWER,
       },
     ],
-    username: 'youthnetmentor',
     password: Math.floor(10000 + Math.random() * 90000),
   };
-  const successUpdateMessage = 'MENTORS.MENTOR_UPDATED_SUCCESSFULLY';
-  const telemetryUpdateKey = 'youthnet-mentor-updated-successfully';
-  const failureUpdateMessage = 'MENTORS.NOT_ABLE_UPDATE_MENTOR';
-  const successCreateMessage = 'MENTORS.MENTOR_CREATED_SUCCESSFULLY';
-  const telemetryCreateKey = 'youthnet-mentor-created-successfully';
-  const failureCreateMessage = 'MENTORS.NOT_ABLE_CREATE_MENTOR';
-  const notificationKey = 'onMentorCreate';
-  const notificationMessage = 'MENTORS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
+  const successUpdateMessage =
+    'CONTENT_REVIEWERS.CONTENT_REVIEWER_UPDATED_SUCCESSFULLY';
+  const telemetryUpdateKey = 'content-reviewer-updated-successfully';
+  const failureUpdateMessage =
+    'CONTENT_REVIEWERS.NOT_ABLE_UPDATE_CONTENT_REVIEWER';
+  const successCreateMessage =
+    'CONTENT_REVIEWERS.CONTENT_REVIEWER_CREATED_SUCCESSFULLY';
+  const telemetryCreateKey = 'content-reviewer-created-successfully';
+  const failureCreateMessage =
+    'CONTENT_REVIEWERS.NOT_ABLE_CREATE_CONTENT_REVIEWER';
+  const notificationKey = 'onContentReviewerCreate';
+  const notificationMessage =
+    'CONTENT_REVIEWERS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
 
   return (
@@ -344,7 +337,7 @@ const Mentor = () => {
               uiSchema={updatedUiSchema}
               SubmitaFunction={SubmitaFunction}
               isCallSubmitInHandle={true}
-              prefilledFormData={prefilledFormData}
+              prefilledFormData={prefilledFormData || {}}
             />
           )
         )}
@@ -353,7 +346,7 @@ const Mentor = () => {
             variant="outlined"
             color="primary"
             onClick={() => {
-              setPrefilledAddFormData(initialFormData);
+              setPrefilledAddFormData({});
               setIsEdit(false);
               setEditableUserId('');
               handleOpenModal();
@@ -368,7 +361,9 @@ const Mentor = () => {
           onClose={handleCloseModal}
           showFooter={false}
           modalTitle={
-            isEdit ? t('MENTORS.UPDATE_MENTOR') : t('MENTORS.NEW_MENTOR')
+            isEdit
+              ? t('CONTENT_REVIEWERS.UPDATE_CONTENT_REVIEWER')
+              : t('CONTENT_REVIEWERS.NEW_CONTENT_REVIEWER')
           }
         >
           <AddEditUser
@@ -422,31 +417,11 @@ const Mentor = () => {
             height="20vh"
           >
             <Typography marginTop="10px" textAlign={'center'}>
-              {t('COMMON.NO_MENTOR_FOUND')}
+              {t('COMMON.NO_CONTENT_REVIEWER_FOUND')}
             </Typography>
           </Box>
         )}
       </Box>
-      <ConfirmationPopup
-        checked={checked}
-        open={open}
-        onClose={() => setOpen(false)}
-        title={t("COMMON.DELETE_USER")}
-        primary={t("COMMON.DELETE_USER_WITH_REASON")}
-        secondary={t("COMMON.CANCEL")}
-        reason={reason}
-        onClickPrimary={userDelete}
-      >
-        <DeleteDetails
-          firstName={userData.firstName}
-          lastName={userData.lastName}
-          village={userData.village}
-          checked={checked}
-          setChecked={setChecked}
-          reason={reason}
-          setReason={setReason}
-        />
-      </ConfirmationPopup>
     </>
   );
 };
@@ -458,4 +433,4 @@ export async function getStaticProps({ locale }: any) {
   };
 }
 
-export default Mentor;
+export default ContentReviewer;
