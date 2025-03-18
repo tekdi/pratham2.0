@@ -114,7 +114,15 @@ export const extractMatchingKeys = (row: any, schema: any) => {
           (field) => field.fieldId === value.fieldId
         );
         if (customField) {
-          result[key] = customField.selectedValues.map((v) => v.id).join(', ');
+          // Handle STATE separately to extract ID instead of value
+          if (key === "state") {
+            result[key] = customField.selectedValues.map((v) => String(v.id));
+          } else {
+            // Keep other fields as arrays of values (strings)
+            result[key] = customField.selectedValues.map((v) =>
+              typeof v === "object" ? v.value : v
+            );
+          }
         }
       } else if (row[key] !== undefined) {
         result[key] = row[key];
