@@ -217,4 +217,60 @@ export const MENU_CONFIG = {
       roles: [Role.CCTA, Role.SCTA],
     }
   },
+  [TenantName.POS]: {
+    manageUsers: {
+      title: 'Manage Users',
+      icon: '/images/group.svg',
+      roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
+      subMenu: [
+        {
+          title: 'Mentor',
+          link: '/mentor',
+          roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
+        },
+        {
+          title: 'Mentor Leader',
+          link: '/mentor-leader',
+          roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
+        },
+        {
+          title: 'Youth',
+          link: '/youth',
+          roles: [Role.ADMIN, Role.CENTRAL_ADMIN], // yet to come
+        },
+        {
+          title: 'Content Creator',
+          link: '/content-creator',
+          roles: [Role.CENTRAL_ADMIN],
+        },
+        {
+          title: 'Content Reviewer',
+          link: '/content-reviewer',
+          roles: [Role.CENTRAL_ADMIN],
+        },
+        {
+          title: 'State Lead',
+          link: '/state-lead',
+          roles: [Role.CENTRAL_ADMIN],
+        },
+      ],
+    },
+    workspace: {
+      title: 'Workspace',
+      icon: '/images/dashboard.svg',
+      link: '/workspace',
+      roles: [Role.CCTA, Role.SCTA],
+    },
+    supportRequest: {
+      title: 'Support Request',
+      icon: '/images/Support.svg',
+      link: '/support-request',
+      roles: [
+        Role.ADMIN,
+        Role.CENTRAL_ADMIN,
+        Role.CCTA,
+        Role.SCTA,
+      ],
+    }
+  },
 };
