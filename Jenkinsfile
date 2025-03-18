@@ -17,18 +17,17 @@ pipeline {
                             sh '''
                             ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST << 'EOF'
                             echo "Connected to remote server"
-                            cd /home/ubuntu/pratham-qa/shiksha/admin
+                            cd /home/ubuntu/pratham-qa/shiksha/teacher
                             rm -rf pratham2.0
-                            git clone https://github.com/tekdi/pratham2.0 -b main-admin
-                            cd /home/ubuntu/pratham-qa/shiksha/admin/pratham2.0
-                            git fetch --all
+                            git clone https://github.com/tekdi/pratham2.0 -b main-teacher
+                            cd /home/ubuntu/pratham-qa/shiksha/teacher/pratham2.0
                             git pull
-                            git log -n 3 
+                            git log -n 3
                             rm -rf .env
                             cp -r ../.env .
-                            docker-compose -f docker-compose.admin-app-repo.yml down
+                            docker-compose -f docker-compose.teachers.yml down
                             docker system prune -af
-                            docker-compose -f docker-compose.admin-app-repo.yml up -d --timeout 9900
+                            docker-compose -f docker-compose.teachers.yml up -d --timeout 1200
                             echo '__________________Deployment done______________'
                             exit
 EOF
