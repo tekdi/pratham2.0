@@ -3,7 +3,7 @@ name: Deploy to DEV Teacher
 on:
   push:
     branches:
-      - main-teacher
+      - main-admin
 
 jobs:
   deploy:
