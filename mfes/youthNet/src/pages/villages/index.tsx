@@ -324,9 +324,11 @@ const Index = () => {
     getMentorData();
   }, [selectedDistrictValue,  value]);
   const handleLocationClick = (Id: any, name: any) => {
+    
     router.push({
       pathname: `/villageDetails/${name}`,
-      query: { id: Id },
+      query: { id: Id ,  blockId:selectedBlockValue
+      },
     });
   };
 
@@ -662,7 +664,7 @@ const Index = () => {
                     values={districtData}
                     defaultValue={districtData[0]?.id}
                     onSelect={(value) => console.log('Selected:', value)}
-                    label={t('YOUTHNET_USERS_AND_VILLAGES.DISTRICT')}
+                    label={t('YOUTHNET_USERS_AND_VILLAGES.DISTRICTS')}
                   />
                 ) : (
                   <Loader showBackdrop={true} />
@@ -984,7 +986,7 @@ const Index = () => {
                       values={districtData}
                       defaultValue={districtData?.[0]?.id}
                       onSelect={(value) => console.log('Selected:', value)}
-                      label={t('YOUTHNET_USERS_AND_VILLAGES.DISTRICT')}
+                      label={t('YOUTHNET_USERS_AND_VILLAGES.DISTRICTS')}
                     />
                   ) : (
                     <Loader showBackdrop={true} />
@@ -1003,7 +1005,7 @@ const Index = () => {
                       onSelect={(value) =>
                         console.log('Selected:', setSelectedBlockValue(value))
                       }
-                      label={t('YOUTHNET_USERS_AND_VILLAGES.BLOCK')}
+                      label={t('YOUTHNET_USERS_AND_VILLAGES.BLOCKS')}
                     />
                   ) : (
                     <Loader showBackdrop={true} />
@@ -1043,6 +1045,7 @@ const Index = () => {
                   fontSize: '16px',
                   color: 'black',
                   marginLeft: '2rem',
+                  mt:"10px"
                 }}
               >
                 {villageCount} {t(`YOUTHNET_DASHBOARD.VILLAGES`)}
@@ -1154,7 +1157,7 @@ const Index = () => {
                       values={districtData}
                       defaultValue={districtData?.[0]?.id}
                       onSelect={(value) => console.log('Selected:', value)}
-                      label={t('YOUTHNET_USERS_AND_VILLAGES.DISTRICT')}
+                      label={t('YOUTHNET_USERS_AND_VILLAGES.DISTRICTS')}
                     />
                   ) : (
                     <Loader showBackdrop={true} />
@@ -1173,7 +1176,7 @@ const Index = () => {
                       onSelect={(value) =>
                         console.log('Selected:', setSelectedBlockValue(value))
                       }
-                      label={t('YOUTHNET_USERS_AND_VILLAGES.BLOCK')}
+                      label={t('YOUTHNET_USERS_AND_VILLAGES.BLOCKS')}
                     />
                   ) : (
                     <Loader showBackdrop={true} />
@@ -1199,7 +1202,7 @@ const Index = () => {
                   setSelectedVillageValue(value)
                 }
                 }
-                label={t('YOUTHNET_USERS_AND_VILLAGES.VILLAGE')}
+                label={t('YOUTHNET_USERS_AND_VILLAGES.VILLAGES')}
               />
             </Box>
             <Box

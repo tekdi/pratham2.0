@@ -15,6 +15,7 @@ import {  useRouter } from 'next/navigation';
 import { useTranslation } from 'next-i18next';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import { VolunteerField } from '../../utils/app.constant';
+import { toPascalCase } from '@/utils/Helper';
 type UserCardProps = {
   name: string;
   firstName?: string;
@@ -123,7 +124,7 @@ const villageName=customFields?.find((item: any) => item.label === 'VILLAGE')?.s
             }}
             onClick={() => { onClick?.(Id, name)}}
           >
-            {name}
+            {toPascalCase(name)}
           </Typography>
           {villageCount && blockNames &&
           (<Typography>
@@ -135,7 +136,7 @@ const villageName=customFields?.find((item: any) => item.label === 'VILLAGE')?.s
             <Box sx={{ display: 'flex', gap: '8px' }}>
               {dob ? (
                 <Typography variant="body2" color="textSecondary">
-                  {getAge(dob)<0? getAgeInMonths(dob)+" m/o" :getAge(dob)+" y/o"}   • {t('YOUTHNET_PROFILE.JOINED_ON')} {" "+joinOn}
+                  {getAge(dob)<0? getAgeInMonths(dob)+" m/o" :getAge(dob)+" y/o"}   • { joinOn ?t('YOUTHNET_PROFILE.JOINED_ON')+" "+joinOn : ""}
                 </Typography>
               ) : (
                 joinOn && (
@@ -206,6 +207,7 @@ export const UserList: React.FC<UserListProps> = ({
   onToggleUserClick,
   onUserClick
 }) => {
+  console.log(users)
     const router = useRouter();
   // const onUserClick=(userId: any)=>
   //   {

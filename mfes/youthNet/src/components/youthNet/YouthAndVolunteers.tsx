@@ -35,18 +35,24 @@ const YouthAndVolunteers: React.FC<Props> = ({ selectOptions,managedVillageCount
   useEffect(() => {
     const getYouthData = async () => {
       try {
-        let fromDate;
+        let fromDate = new Date(2024, 3, 1);
             const villages=await getVillages(userId)
             const villageIds=villages?.map((item: any) => item.id) || []
-       const toDate = new Date();
+       let toDate ;
         if (selectedValue === 'today') {
-         fromDate = new Date(2024, 3, 1)
+          toDate = new Date();
         }
         if(selectedValue === 'month') {
-         fromDate = new Date(toDate.getFullYear(), toDate.getMonth() - 1, toDate.getDate())
+        const date = new Date();
+
+       //  fromDate = new Date(toDate.getFullYear(), toDate.getMonth() - 1, toDate.getDate())
+          toDate = new Date(date.getFullYear(), date.getMonth(), 0);
+
         }
         if(selectedValue==='year') {
-           fromDate = new Date(toDate.getFullYear() - 1, toDate.getMonth(), toDate.getDate())
+          // fromDate = new Date(toDate.getFullYear() - 1, toDate.getMonth(), toDate.getDate())
+          toDate = new Date(new Date().getFullYear(), 0, 0);
+
 
         }
         if(fromDate && toDate)
@@ -63,6 +69,8 @@ const YouthAndVolunteers: React.FC<Props> = ({ selectOptions,managedVillageCount
       }
 
       } catch (error) {
+        setYouthCount(0)
+        setVolunteerCount(0)
         console.log(error);
       }
       // setUserData(data);
@@ -101,7 +109,7 @@ if(userId && userId!=="")
       </FormControl>
       <Box display={'flex'} flexDirection="row" gap="10px">
       <Typography variant="body1" style={{ fontWeight: 300, color: 'black' }}>
-         {managedVillageCount} { t('YOUTHNET_DASHBOARD.VILLAGES')}
+         {managedVillageCount} { managedVillageCount>=1 ? t('YOUTHNET_DASHBOARD.VILLAGE'): t('YOUTHNET_DASHBOARD.VILLAGES')}
       </Typography>
       <FiberManualRecordIcon 
       sx={{ color: '#B1AAA2', width: 12, height: 12  , marginTop:"8px"}} 
@@ -112,7 +120,7 @@ if(userId && userId!=="")
       </Typography>
       </Box>
     
-      {data && (
+      { (
         <Box p={2}>
           <Grid container spacing={2}>
             <Grid item xs={6}>
