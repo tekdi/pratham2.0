@@ -24,7 +24,10 @@ import {
   CohortSearchSchema,
   CohortSearchUISchema,
 } from '@/constant/Forms/CohortSearch';
-import { getCohortList } from '@/services/CohortService/cohortService';
+import {
+  fetchCohortMemberList,
+  getCohortList,
+} from '@/services/CohortService/cohortService';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import { updateCohort } from '@/services/MasterDataService';
 
@@ -46,10 +49,11 @@ const Centers = () => {
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [isEdit, setIsEdit] = useState(false);
   const [editableUserId, setEditableUserId] = useState('');
-  const [cohortId, setCohortId] = useState('')
+  const [cohortId, setCohortId] = useState('');
   const [tenantId, setTenantId] = useState('');
   const [open, setOpen] = useState(false);
-  const [firstName, setFirstName] = useState('')
+  const [firstName, setFirstName] = useState('');
+  const [totalCount, setTotalCount] = useState();
 
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
@@ -118,23 +122,41 @@ const Centers = () => {
     );
   };
 
-  // delete center logic 
+  // delete center logic
 
   const deleteCohort = async () => {
+    const data = {
+      filters: {
+        cohortId: cohortId,
+      },
+      status: ['active'],
+    };
+    const response = await fetchCohortMemberList(data);
+
+    setTotalCount(response?.result);
+
     try {
-      const resp = await updateCohort(cohortId, { status: Status.ARCHIVED });
-      if (resp?.success) {
-        console.log("Cohort successfully archived.");
+      // const resp = await updateCohort(cohortId, { status: Status.ARCHIVED });
+      if (resp?.responseCode === 200) {
+        setResponse((prev) => ({
+          ...prev,
+          result: {
+            ...prev?.results,
+            cohortDetails: prev?.results?.cohortDetails?.filter(
+              (item) => item?.cohortId !== cohortId
+            ),
+          },
+        }));
+        console.log('Cohort successfully archived.');
       } else {
-        console.error("Failed to archive cohort:", resp);
+        console.error('Failed to archive cohort:', resp);
       }
 
       return resp;
     } catch (error) {
-      console.error("Error updating cohort:", error);
+      console.error('Error updating cohort:', error);
     }
   };
-
 
   // Define table columns
 
@@ -240,7 +262,7 @@ const Centers = () => {
       callback: async (row: any) => {
         console.log('row:', row);
         setEditableUserId(row?.userId);
-        setCohortId(row?.cohortId)
+        setCohortId(row?.cohortId);
         // const memberStatus = Status.ARCHIVED;
         // const statusReason = '';
         // const membershipId = row?.userId;
@@ -256,7 +278,7 @@ const Centers = () => {
         // searchData(prefilledFormData, currentPage);
         // setOpenModal(false);
         setOpen(true);
-        setFirstName(row?.name)
+        setFirstName(row?.name);
       },
     },
   ];
@@ -384,21 +406,24 @@ const Centers = () => {
           </Box>
         )}
       </Box>
+      {totalCount > 0 ? (
+        <ConfirmationPopup
+          open={open}
+          onClose={() => setOpen(false)}
+          title={`You can't delete the center because it has ${totalCount} Active Learners`}
+          secondary={'Cancel'}
+        />
+      ) : (
+       
       <ConfirmationPopup
         open={open}
         onClose={() => setOpen(false)}
         title={`Are you sure you want to delete ${firstName} center?`}
-        centerPrimary={t("COMMON.YES")}
-        secondary={t("COMMON.CANCEL")}
+        centerPrimary={t('COMMON.YES')}
+        secondary={t('COMMON.CANCEL')}
         onClickPrimary={deleteCohort}
-      ></ConfirmationPopup>
-
-      {/* <ConfirmationPopup
-        open={open}
-        onClose={() => setOpen(false)}
-        title={`You can't delete the center because it has 2 Active Learners`}
-        secondary={'Cancel'}
-      ></ConfirmationPopup> */}
+      />
+      )}
     </>
   );
 };

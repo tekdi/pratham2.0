@@ -234,47 +234,36 @@ const TeamLeader = () => {
         handleOpenModal();
       },
     },
-    {
-      icon: (
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
-            padding: '10px',
-          }}
-        >
-          {' '}
-          <Image src={deleteIcon} alt="" />{' '}
-        </Box>
-      ),
-      callback: async (row) => {
-        const findVillage = row?.customFields.find((item) => {
-          if (item.label === 'BLOCK') {
-            return item;
-          }
-        });
+    // {
+    //   icon: (
+    //     <Box
+    //       sx={{
+    //         display: 'flex',
+    //         flexDirection: 'column',
+    //         alignItems: 'center',
+    //         cursor: 'pointer',
+    //         backgroundColor: 'rgb(227, 234, 240)',
+    //         padding: '10px',
+    //       }}
+    //     >
+    //       {' '}
+    //       <Image src={deleteIcon} alt="" />{' '}
+    //     </Box>
+    //   ),
+    //   callback: async (row) => {
+    //     const findVillage = row?.customFields.find((item) => {
+    //       if (item.label === 'BLOCK') {
+    //         return item;
+    //       }
+    //     });
 
-        setVillage(findVillage?.selectedValues[0]?.value);
-        setUserId(row?.userId);
-        // const memberStatus = Status.ARCHIVED;
-        // const statusReason = '';
-        // const membershipId = row?.userId;
-
-        // const response = await updateCohortMemberStatus({
-        //   memberStatus,
-        //   statusReason,
-        //   membershipId,
-        // });
-        // setPrefilledFormData({});
-        // searchData(prefilledFormData, currentPage);
-        setOpen(true);
-        setFirstName(row?.firstName)
-        setLastName(row?.lastName)
-      },
-    },
+    //     setVillage(findVillage?.selectedValues[0]?.value);
+    //     setUserId(row?.userId);
+    //     setOpen(true);
+    //     setFirstName(row?.firstName)
+    //     setLastName(row?.lastName)
+    //   },
+    // },
   ];
 
   // Pagination handlers

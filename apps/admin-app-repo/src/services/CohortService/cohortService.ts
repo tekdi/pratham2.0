@@ -109,6 +109,7 @@ export const fetchCohortMemberList = async ({
   limit,
   offset,
   filters,
+  status
 }: CohortMemberList): Promise<any> => {
   const apiUrl: string = API_ENDPOINTS.cohortMemberList
   try {
@@ -117,6 +118,7 @@ export const fetchCohortMemberList = async ({
       offset,
       filters,
       // sort: ["username", "asc"],
+      status
     });
     return response?.data;
   } catch (error) {
