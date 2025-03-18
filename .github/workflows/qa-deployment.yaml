@@ -21,7 +21,7 @@ jobs:
       # Step 4: Build and tag the Docker image
       - name: Build Docker image
         run: |
-          docker build -f Dockerfile.admin-app-repo -t ${{ secrets.ECR_REPO_NAME_LAP }}:${{ secrets.IMAGE_TAG_LAP }} .
+          docker build -f Dockerfile.admin-app-repo -t ${{ secrets.ECR_REPO_NAME_LAP_QA }}:${{ secrets.IMAGE_TAG_LAP }} .
       # Step 5: Push the Docker image to Amazon ECR
       - name: Push Docker image to ECR
         env:
@@ -32,11 +32,11 @@ jobs:
           aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
           aws configure set default.region ${{ secrets.AWS_REGION }}
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_URI }}
-          docker push ${{ secrets.ECR_REPO_NAME_LAP }}:${{ secrets.IMAGE_TAG_LAP }}
+          docker push ${{ secrets.ECR_REPO_NAME_LAP_QA }}:${{ secrets.IMAGE_TAG_LAP }}
       # Step 6: Remove Docker image from GitHub Actions runner
       - name: Remove Docker image from runner
         run: |
-          docker rmi ${{ secrets.ECR_REPO_NAME_LAP }}:${{ secrets.IMAGE_TAG_LAP }}
+          docker rmi ${{ secrets.ECR_REPO_NAME_LAP_QA }}:${{ secrets.IMAGE_TAG_LAP }}
       # Step 7: SSH to the EC2 server and deploy
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v0.1.10
