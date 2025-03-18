@@ -130,11 +130,11 @@ function CustomApp({ Component, pageProps }: AppProps) {
             sx={{
               padding: '0',
               '@media (min-width: 900px)': {
-                width: '100%',
+                // width: '100%',
                 marginLeft: !isFullWidthPage ? '351px' : '0',
               },
               '@media (min-width: 2000px)': {
-                width: '100%',
+                // width: '100%',
                 marginLeft: !isFullWidthPage ? '351px' : '0',
               },
               background: theme.palette.warning['A400'],
