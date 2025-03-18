@@ -248,7 +248,7 @@ const Batch = () => {
   //Add Edit Props
   const extraFieldsUpdate = {};
   const extraFields = {
-    type: CohortTypes.COHORT,
+    type: CohortTypes.BATCH,
   };
   const successUpdateMessage = 'BATCH.BATCH_UPDATE_SUCCESSFULLY';
   const telemetryUpdateKey = 'batch-updated-successfully';
