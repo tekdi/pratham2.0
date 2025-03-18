@@ -10,9 +10,16 @@ import {
   TeamLeaderSearchSchema,
   TeamLeaderSearchUISchema,
 } from '../constant/Forms/TeamLeaderSearch';
-import { Status } from '@/utils/app.constant';
+import { RoleId, Status } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
-import { Box, Checkbox, FormControlLabel, Grid, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Checkbox,
+  FormControlLabel,
+  Grid,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { debounce } from 'lodash';
 import { Numbers } from '@mui/icons-material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
@@ -56,11 +63,11 @@ const TeamLeader = () => {
   const [tenantId, setTenantId] = useState('');
   const [open, setOpen] = useState(false);
   const [checked, setChecked] = useState(false);
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [village, setVillage] = useState('');
-  const [reason, setReason] = useState("");
-  const [userID, setUserId] = useState("")
+  const [reason, setReason] = useState('');
+  const [userID, setUserId] = useState('');
 
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
@@ -92,7 +99,7 @@ const TeamLeader = () => {
       setAddUiSchema(responseForm?.uiSchema);
     };
     fetchData();
-    setRoleID(localStorage.getItem('roleId'));
+    setRoleID(RoleId.TEAM_LEADER);
     setTenantId(localStorage.getItem('tenantId'));
   }, []);
 
@@ -110,28 +117,32 @@ const TeamLeader = () => {
 
   const userDelete = async () => {
     try {
-      const resp = await deleteUser(userID, { userData: { reason: reason, status: "archived" } });
+      const resp = await deleteUser(userID, {
+        userData: { reason: reason, status: 'archived' },
+      });
       if (resp?.responseCode === 200) {
         setResponse((prev) => ({
           ...prev, // Preserve other properties in `prev`
           result: {
             ...prev?.result, // Preserve other properties in `result`
-            getUserDetails: prev?.result?.getUserDetails?.filter(item => item?.userId !== userID)
-          }
+            getUserDetails: prev?.result?.getUserDetails?.filter(
+              (item) => item?.userId !== userID
+            ),
+          },
         }));
-        console.log("Team leader successfully archived.");
+        console.log('Team leader successfully archived.');
       } else {
-        console.error("Failed to archive team leader:", resp);
+        console.error('Failed to archive team leader:', resp);
       }
 
       return resp;
     } catch (error) {
-      console.error("Error updating team leader:", error);
+      console.error('Error updating team leader:', error);
     }
   };
 
   const searchData = async (formData, newPage) => {
-    const staticFilter = { role: 'Lead', status: "active" };
+    const staticFilter = { role: 'Lead', status: 'active' };
 
     const { sortBy } = formData;
     const staticSort = ['firstName', sortBy || 'asc'];
@@ -154,8 +165,9 @@ const TeamLeader = () => {
       keys: ['firstName', 'middleName', 'lastName'],
       label: 'Team Lead Name',
       render: (row) =>
-        `${row.firstName || ''} ${row.middleName || ''} ${row.lastName || ''
-          }`.trim(),
+        `${row.firstName || ''} ${row.middleName || ''} ${
+          row.lastName || ''
+        }`.trim(),
     },
     {
       key: 'status',
@@ -192,9 +204,11 @@ const TeamLeader = () => {
           row.customFields.find(
             (field: { label: string }) => field.label === 'VILLAGE'
           )?.selectedValues[0]?.value || '';
-        return `${state == '' ? '' : `${state}`}${district == '' ? '' : `, ${district}`
-          }${block == '' ? '' : `, ${block}`}${village == '' ? '' : `, ${village}`
-          }`;
+        return `${state == '' ? '' : `${state}`}${
+          district == '' ? '' : `, ${district}`
+        }${block == '' ? '' : `, ${block}`}${
+          village == '' ? '' : `, ${village}`
+        }`;
       },
     },
     // {
@@ -271,8 +285,8 @@ const TeamLeader = () => {
         // setPrefilledFormData({});
         // searchData(prefilledFormData, currentPage);
         setOpen(true);
-        setFirstName(row?.firstName)
-        setLastName(row?.lastName)
+        setFirstName(row?.firstName);
+        setLastName(row?.lastName);
       },
     },
   ];
@@ -319,8 +333,6 @@ const TeamLeader = () => {
   useEffect(() => {
     setPrefilledFormData(initialFormData);
   }, []);
-
-
 
   return (
     <>
@@ -425,9 +437,9 @@ const TeamLeader = () => {
         checked={checked}
         open={open}
         onClose={() => setOpen(false)}
-        title={t("COMMON.DELETE_USER")}
-        primary={t("COMMON.DELETE_USER_WITH_REASON")}
-        secondary={t("COMMON.CANCEL")}
+        title={t('COMMON.DELETE_USER')}
+        primary={t('COMMON.DELETE_USER_WITH_REASON')}
+        secondary={t('COMMON.CANCEL')}
         reason={reason}
         onClickPrimary={userDelete}
       >
@@ -441,7 +453,6 @@ const TeamLeader = () => {
           setReason={setReason}
         />
       </ConfirmationPopup>
-
     </>
   );
 };

@@ -7,7 +7,7 @@ import {
   MentorSearchSchema,
   MentorSearchUISchema,
 } from '../constant/Forms/MentorSearch';
-import { Status } from '@/utils/app.constant';
+import { RoleId, Status } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
 import {
   Box,
@@ -57,14 +57,13 @@ const Mentor = () => {
   const [tenantId, setTenantId] = useState('');
   const [open, setOpen] = useState(false);
   const [checked, setChecked] = useState(false);
-  const [userID, setUserId] = useState("")
+  const [userID, setUserId] = useState('');
   const [userData, setUserData] = useState({
-    firstName: "",
-    lastName: "",
-    village: "",
+    firstName: '',
+    lastName: '',
+    village: '',
   });
-  const [reason, setReason] = useState("");
-
+  const [reason, setReason] = useState('');
 
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
@@ -98,7 +97,7 @@ const Mentor = () => {
 
     setPrefilledAddFormData(initialFormData);
     setPrefilledFormData(initialFormData);
-    setRoleID(localStorage.getItem('roleId'));
+    setRoleID(RoleId.TEACHER);
     setTenantId(localStorage.getItem('tenantId'));
     fetchData();
   }, []);
@@ -191,23 +190,27 @@ const Mentor = () => {
 
   const userDelete = async () => {
     try {
-      const resp = await deleteUser(userID, { userData: { reason: reason, status: "archived" } });
+      const resp = await deleteUser(userID, {
+        userData: { reason: reason, status: 'archived' },
+      });
       if (resp?.responseCode === 200) {
         setResponse((prev) => ({
           ...prev, // Preserve other properties in `prev`
           result: {
             ...prev?.result, // Preserve other properties in `result`
-            getUserDetails: prev?.result?.getUserDetails?.filter(item => item?.userId !== userID)
-          }
+            getUserDetails: prev?.result?.getUserDetails?.filter(
+              (item) => item?.userId !== userID
+            ),
+          },
         }));
-        console.log("Team leader successfully archived.");
+        console.log('Team leader successfully archived.');
       } else {
-        console.error("Failed to archive team leader:", resp);
+        console.error('Failed to archive team leader:', resp);
       }
 
       return resp;
     } catch (error) {
-      console.error("Error updating team leader:", error);
+      console.error('Error updating team leader:', error);
     }
   };
 
@@ -264,7 +267,6 @@ const Mentor = () => {
           }
         });
 
-        
         // console.log('row:', row?.customFields[2].selectedValues[0].value);
         // setEditableUserId(row?.userId);
         // const memberStatus = Status.ARCHIVED;
@@ -279,17 +281,15 @@ const Mentor = () => {
         // setPrefilledFormData({});
         // searchData(prefilledFormData, currentPage);
         setOpen(true);
-        setUserId(row?.userId)
+        setUserId(row?.userId);
 
         setUserData({
-          firstName: row?.firstName || "",
-          lastName: row?.lastName || "",
-          village: findVillage?.selectedValues?.[0]?.value || "",
+          firstName: row?.firstName || '',
+          lastName: row?.lastName || '',
+          village: findVillage?.selectedValues?.[0]?.value || '',
         });
-
       },
-      },
-    
+    },
   ];
 
   // Pagination handlers
@@ -431,9 +431,9 @@ const Mentor = () => {
         checked={checked}
         open={open}
         onClose={() => setOpen(false)}
-        title={t("COMMON.DELETE_USER")}
-        primary={t("COMMON.DELETE_USER_WITH_REASON")}
-        secondary={t("COMMON.CANCEL")}
+        title={t('COMMON.DELETE_USER')}
+        primary={t('COMMON.DELETE_USER_WITH_REASON')}
+        secondary={t('COMMON.CANCEL')}
         reason={reason}
         onClickPrimary={userDelete}
       >
