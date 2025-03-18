@@ -1,6 +1,7 @@
 import { MenuItem, FormControl, Select, InputLabel } from '@mui/material';
 import { useEffect, useState } from 'react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { toPascalCase } from '@/utils/Helper';
 
 interface DropdownProps {
   name?: string;
@@ -47,7 +48,7 @@ const Dropdown: React.FC<DropdownProps> = ({
       >
         {values.map((item: any) => (
           <MenuItem key={item.id} value={item.id}>
-            {item.name}
+            {toPascalCase(item.name)}
           </MenuItem>
         ))}
       </Select>

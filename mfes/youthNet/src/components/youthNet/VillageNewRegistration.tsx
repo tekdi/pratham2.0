@@ -3,6 +3,9 @@ import React from 'react';
 import { useTheme } from '@mui/material/styles';
 import { VillageNewRegistrationProps } from '../../utils/Interfaces';
 import { useRouter } from 'next/router';
+import { cohortHierarchy } from '@/utils/app.constant';
+import { YOUTHNET_USER_ROLE } from './tempConfigs';
+import { getLoggedInUserRole } from '../../utils/Helper';
 
 const VillageNewRegistration: React.FC<VillageNewRegistrationProps> = ({
   locations,
@@ -11,10 +14,24 @@ const VillageNewRegistration: React.FC<VillageNewRegistrationProps> = ({
   const router = useRouter();
 
   const handleLocationClick = (location: any) => {
-router.push({
-    pathname: `/villageDetails/${location?.value}`,
-    query: {  id:location?.id }
-});  };
+    let userDataString = localStorage.getItem('userData');
+          let userData: any = userDataString ? JSON.parse(userDataString) : null;
+          const blockResult = userData?.customFields?.find(
+            (item: any) => item.label === cohortHierarchy.BLOCK
+          );
+          if(YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() )
+          {
+            router.push({
+              pathname: `/villageDetails/${location?.value}`,
+              query: {  id:location?.id , blockId: blockResult?.selectedValues[0]?.id?.toString()}
+          });  };
+          router.push({
+            pathname: `/villageDetails/${location?.value}`,
+            query: {  id:location?.id }
+        });
+        }
+          
+
 
   return (
     <Box>

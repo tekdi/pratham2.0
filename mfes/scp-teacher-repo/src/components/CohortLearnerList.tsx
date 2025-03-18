@@ -91,7 +91,7 @@ const CohortLearnerList: React.FC<CohortLearnerListProp> = ({
         setFilteredData([]);
 
         console.error('Error fetching cohort list:', error);
-        showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
+        //showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
         setLoading(false);
       } finally {
         setLoading(false);

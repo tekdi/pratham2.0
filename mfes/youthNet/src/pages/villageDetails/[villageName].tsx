@@ -27,7 +27,7 @@ const VillageDetails = () => {
   const villageNameString = Array.isArray(villageName)
     ? villageName[0]
     : villageName || '';
-  const { id } = router.query; // Extract the slug from the URL
+  const { id, blockId } = router.query; // Extract the slug from the URL
   const [yuthCount, setYuthCount] = useState<number>(0);
    const [volunteerCount, setVolunteerCount] = useState<number>(0);
   
@@ -74,8 +74,35 @@ const VillageDetails = () => {
   }, []);
   const handleYouthVolunteers = () => {
     console.log('handleYouthVolunteers');
+    
+    router.push({
+      pathname: `/villages`,
+      query: {
+        villageId: id,
+        tab: 3,
+        blockId:blockId
+      },
+    });  
   };
-
+  const handleAddVolunteer=(id: any, blockId?: any) => {
+    if(blockId)
+    {
+      router.push({
+        pathname: `/villages`,
+        query: {
+          villageId: id,
+          tab: 3,
+          blockId: blockId
+        },
+      });
+    }
+    router.push({
+      pathname: `/villages`,
+      query: {
+        villageId: id,
+        tab: 3
+      },
+    });  };
   const handleSurveys = () => {
     router.push(`/survey/${villageNameString}`);
   };
