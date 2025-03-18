@@ -94,7 +94,6 @@ const processData = (key: keyof UserData, data: any) => {
   }));
 };
 
-console.log(questionResponse)
   return (
     <Box minHeight="100vh">
       <Box>
@@ -147,19 +146,19 @@ console.log(questionResponse)
       </Box>
       {value === 1 && (
         <Box>
-          {(<Box width="100%">
+          { storedEntries.length!==0  ?(<Box width="100%">
             <EntrySlider>
             {storedEntries.map((entryId: any, index: any) => (
   <EntryContent    entityId={entryId} questionResponse={questionResponse} setQuestionResponseResponse={setQuestionResponseResponse} />
 ))}
             </EntrySlider>
-          </Box>)
+          </Box>):(<Typography ml="25%" mt="10%"> Looks like there are no entries yet</Typography>)
       }
         </Box>
       )}
       {value === 2 &&
        <Box>
-        {questionResponse? (<div style={{ display: "flex", flexWrap: "wrap" }}>
+        {storedEntries.length!==0? (<div style={{ display: "flex", flexWrap: "wrap" }}>
       <PieChartComponent title="Age" data={processData("age", questionResponse)} />
       <PieChartComponent title="Gender" data={processData("gender", questionResponse)} />
       <ParticipantsList 
@@ -170,7 +169,7 @@ console.log(questionResponse)
   } 
 />
 
-    </div>): (<Typography ml="35%" mt="10%"> Looks like there are no entries yet</Typography>)
+    </div>): (<Typography ml="25%" mt="10%"> Looks like there are no entries yet</Typography>)
 }
     </Box>}
     </Box>

@@ -220,16 +220,16 @@ const UserId = () => {
         }
        
        setUser({
-          firstName: userData?.firstName || '',
-          lastName: userData?.lastName || '',
-          middleName:userData?.middleName || '',
+          firstName: toPascalCase(userData?.firstName) || '',
+          lastName: toPascalCase(userData?.lastName) || '',
+          middleName:toPascalCase(userData?.middleName) || '',
           userName:  userData?.username || '',
           joinedOn: userData?.createdOn || '',
           email: userData?.email || '',
           userID: userData?.userId || '',
           phone: userData?.mobile || '',
-          gender: userData?.gender || '',
-          userRole: userData?.tenantData?.[0]?.roleName || role,
+          gender: (userData?.gender) || '',
+          userRole: toPascalCase(userData?.tenantData?.[0]?.roleName) || toPascalCase(role),
           dob: formattedDOBDate || '',
           district: getFieldValue('DISTRICT'),
           block: getFieldValue('BLOCK'),

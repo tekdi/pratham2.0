@@ -23,6 +23,8 @@ const Survey = () => {
 
   const [value, setValue] = useState<number>(1);
   const [surveysData, setSurveysData] = useState<any>();
+  const [expiredSurveysData, setExpiredSurveysData] = useState<any>();
+
 const [districtData, setDistrictData] = useState<any>(null);
   const [blockData, setBlockData] = useState<any>(null);
   // const [searchInput, setSearchInput] = useState('');
@@ -110,8 +112,15 @@ const [districtData, setDistrictData] = useState<any>(null);
             year: "numeric",
           }),
           details: {},
+          endDate: new Date(survey.endDate), 
+
         }));
-        setSurveysData(surveysData2)
+        const currentDate = new Date();
+        const activeSurveys = surveysData2.filter((survey: any) => survey.endDate >= currentDate);
+const expiredSurveys = surveysData2.filter((survey: any) => survey.endDate < currentDate);
+
+        setSurveysData(activeSurveys)
+        setExpiredSurveysData(expiredSurveys)
        console.log(surveysData2)
 
         // setObservationData(response?.result?.data || []);
@@ -258,11 +267,37 @@ const [districtData, setDistrictData] = useState<any>(null);
           </Box>
         )}
         {value === 2 && (
-          <Box sx={{ mt: 4, p: 2, background: '#FBF4E4' }}>
-            {/* <GenericForm fields={formFields} /> */}
-            {/* <ExamplePage/> */}
-            {/* <VillageSelector/> */}
-          </Box>
+          <Box
+          padding={'15px'}
+          sx={{
+            background: '#FBF4E4',
+          }}
+        >
+            
+          <Grid container spacing={2}>
+            {expiredSurveysData && expiredSurveysData.length > 0 ? (
+              expiredSurveysData?.map((survey:any, index: any) => (
+                <Grid item xs={12} sm={12} md={6} lg={4} key={index}>
+                  <Surveys
+                    title={survey.title}
+                    date={survey.date}
+                    villages={survey.details.villages}
+                    status={survey.details.status}
+                    actionRequired={survey.details.actionRequired}
+                    minHeight="98px"
+                   // onClick={handleAddVolunteers}
+                  //  onClick={() => {
+                  //   handleAddVolunteers(survey.id, survey.solutionId);
+                  //   localStorage.setItem("selectedSurvey", survey.title);
+                  // }}
+                  />
+                </Grid>
+              ))
+            ) : (
+              <NoDataFound />
+            )}
+          </Grid>
+        </Box>
         )}
       </Box>
     </>
