@@ -106,15 +106,61 @@ export const searchListData = async (
 };
 export const extractMatchingKeys = (row: any, schema: any) => {
   let result = {};
-
+  const getValue = (type, selectedValues) => {
+    if (
+      type === 'array' &&
+      Array.isArray(selectedValues) &&
+      selectedValues.length > 0
+    ) {
+      if (typeof selectedValues[0] === 'object') {
+        // Array of JSON objects -> return array of IDs
+        return selectedValues.map((item) => item.id);
+      } else {
+        // Simple array of strings -> return as is
+        return selectedValues;
+      }
+    } else if (
+      type === 'string' &&
+      Array.isArray(selectedValues) &&
+      selectedValues.length > 0
+    ) {
+      if (typeof selectedValues[0] === 'object') {
+        // Array of JSON objects -> return first object's ID
+        return selectedValues[0].id;
+      }
+    }
+    return null; // Default if conditions not met
+  };
+  const convertArrayToStrings = (arr) => {
+    if (!Array.isArray(arr)) {
+      // throw new Error('Input is not an array');
+      return arr;
+    }
+    return arr.map((item) => String(item));
+  };
   for (const [key, value] of Object.entries(schema.properties)) {
+    // console.log('######### prefilled key', JSON.stringify(key));
+    // console.log('######### prefilled value', JSON.stringify(value));
+    // console.log('######### prefilled row', JSON.stringify(row));
     if (value.coreField === 0) {
       if (value.fieldId) {
+        //check type = array or string
         const customField = row.customFields?.find(
           (field) => field.fieldId === value.fieldId
         );
         if (customField) {
-          result[key] = customField.selectedValues.map((v) => v.id).join(', ');
+          // console.log(
+          //   '######### prefilled customField',
+          //   JSON.stringify(customField)
+          // );
+          let resultValue = getValue(value.type, customField.selectedValues);
+          if (resultValue) {
+            // console.log(
+            //   '######### prefilled resultValue',
+            //   JSON.stringify(resultValue)
+            // );
+            result[key] = convertArrayToStrings(resultValue);
+          }
         }
       } else if (row[key] !== undefined) {
         result[key] = row[key];
