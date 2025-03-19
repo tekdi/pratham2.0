@@ -47,6 +47,7 @@ import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
 import { deleteUser } from '@/services/UserService';
 import { transformLabel } from '@/utils/Helper';
+import { getCohortList } from '@/services/GetCohortList';
 
 const Facilitator = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -66,6 +67,7 @@ const Facilitator = () => {
   const [editableUserId, setEditableUserId] = useState('');
   const [roleId, setRoleID] = useState('');
   const [tenantId, setTenantId] = useState('');
+  const [memberShipID, setMemberShipID]= useState('')
 
   const [userID, setUserId] = useState('');
   const [userData, setUserData] = useState({
@@ -193,14 +195,50 @@ const Facilitator = () => {
 
   const userDelete = async () => {
     try {
+      let membershipId = null;
+
+      // Attempt to get the cohort list
+      try {
+        const userCohortResp = await getCohortList(userID);
+        if (userCohortResp?.result?.cohortData?.length) {
+          membershipId = userCohortResp.result.cohortData[0].cohortMembershipId;
+        } else {
+          console.warn("No cohort data found for the user.");
+        }
+      } catch (error) {
+        console.error("Failed to fetch cohort list:", error);
+      }
+
+      // Attempt to update cohort member status only if we got a valid membershipId
+      if (membershipId) {
+        try {
+          const updateResponse = await updateCohortMemberStatus({
+            memberStatus: "archived",
+            statusReason: reason,
+            membershipId: membershipId,
+          });
+
+          if (updateResponse?.responseCode !== 200) {
+            console.error("Failed to archive user from center:", updateResponse);
+          } else {
+            console.log("User successfully archived from center.");
+          }
+        } catch (error) {
+          console.error("Error archiving user from center:", error);
+        }
+      }
+
+      // Always attempt to delete the user
+      console.log("Proceeding to self-delete...");
       const resp = await deleteUser(userID, {
-        userData: { reason: reason, status: 'archived' },
+        userData: { reason: reason, status: "archived" },
       });
+
       if (resp?.responseCode === 200) {
         setResponse((prev) => ({
-          ...prev, // Preserve other properties in `prev`
+          ...prev,
           result: {
-            ...prev?.result, // Preserve other properties in `result`
+            ...prev?.result,
             getUserDetails: prev?.result?.getUserDetails?.filter(
               (item) => item?.userId !== userID
             ),
@@ -216,6 +254,8 @@ const Facilitator = () => {
       console.error('Error updating team leader:', error);
     }
   };
+
+
 
   // Define actions
   const actions = [
@@ -265,7 +305,7 @@ const Facilitator = () => {
       ),
       callback: async (row) => {
         const findVillage = row?.customFields.find((item) => {
-          if (item.label === 'BATCH') {
+          if (item.label === 'BATCH' || item.label === 'CENTER') {
             return item;
           }
         });
