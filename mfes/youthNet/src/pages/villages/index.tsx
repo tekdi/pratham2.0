@@ -65,7 +65,6 @@ const Index = () => {
   const { villageId, tab, blockId } = router.query;
 
 // const blockId: blockResult?.selectedValues[0]?.id
-  console.log(villageId)
   const [value, setValue] = useState<number>(
     tab? Number(tab)  :  YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() ? 1 : 2
   );
@@ -145,7 +144,10 @@ const Index = () => {
     getData();
   }, [blockId, villageId]);
   useEffect(() => {
+    try{
     const getSortedData = (data: any, sortOrderType: any) => {
+      setLoading(true)
+
       switch (sortOrderType) {
         case SortOrder.ASC:
           return [...data].sort((a, b) => a.name.localeCompare(b.name));
@@ -187,6 +189,12 @@ const Index = () => {
       filteredData = filterData(youthList, searchInput);
       setFilteredYouthList(getSortedData(filteredData, appliedFilters?.sortOrder));
     }
+    setLoading(false)
+  }
+  catch(e)
+  {
+    setLoading(false)
+  }
   }, [searchInput, appliedFilters, value]);
   
   useEffect(() => {
@@ -381,7 +389,13 @@ const Index = () => {
     };
     if (villageList?.length !== 0) getVillageYouthData();
   }, [villageList, selectedBlockValue]);
+//   useEffect(() => {
+//     setSelectedVillageValue(villageId);
+//     setSelectedBlockValue(blockId)
 
+//   }
+      
+// , [blockId, villageId]);
   useEffect(() => {
     const getVillageList = async () => {
       try {
@@ -784,13 +798,13 @@ const Index = () => {
                 px: '20px',
               }}
             >
-              {!loading && filteredmentorList.length!==0 ?(<UserList
+              {filteredmentorList.length!==0 ?(<UserList
                 layout="list"
                 users={filteredmentorList}
                 onUserClick={handleUserClick}
                 onToggleUserClick={handleToggledMentorClick}
               />):
-              (filteredmentorList.length===0?
+              (filteredmentorList.length===0 && !loading?
                ( <>
              
                <Typography
@@ -1136,12 +1150,12 @@ const Index = () => {
               }}
             >
               
-{!loading && filteredvillageListWithUsers.length!==0 ?(  <UserList
+{filteredvillageListWithUsers.length!==0 ?(  <UserList
                   layout="list"
                   users={filteredvillageListWithUsers}
                   onUserClick={handleLocationClick}
                 />):
-              (filteredvillageListWithUsers.length===0?
+              (filteredvillageListWithUsers.length===0 && !loading ?
                ( <>
              
                <Typography
@@ -1260,14 +1274,14 @@ const Index = () => {
                 mt: '15px',
               }}
             >
-            {!loading && filteredyouthList.length!==0 ?( <UserList
+            {  filteredyouthList.length!==0 ?( <UserList
                 layout="list"
                 users={filteredyouthList}
                 onUserClick={handleUserClick}
                 onToggleUserClick={handleToggledUserClick}
                 // showMore={true}
               />):
-              (filteredyouthList.length===0?
+              (filteredyouthList.length===0 && !loading?
                ( <>
              
                <Typography
