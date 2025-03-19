@@ -112,9 +112,7 @@ const ContentCreator = () => {
       keys: ['firstName', 'middleName', 'lastName'],
       label: 'Content Creator Name',
       render: (row: any) =>
-        `${row.firstName || ''} ${row.middleName || ''} ${
-          row.lastName || ''
-        }`.trim(),
+        `${row.firstName || ''} ${row.middleName || ''} ${ row.lastName || ''}`.trim(),
     },
     {
       key: 'status',
@@ -127,9 +125,8 @@ const ContentCreator = () => {
       key: 'STATE',
       label: 'State',
       render: (row) => {
-        const state =
-          row.customFields.find((field) => field.label === 'STATE')
-            ?.selectedValues[0]?.value || '-';
+        const state = row.customFields.find((field) => field.label ===
+        'STATE')?.selectedValues[0]?.value || '-';
         return `${state}`;
       },
     }
@@ -140,9 +137,8 @@ const ContentCreator = () => {
       key: 'BOARD',
       label: 'Board',
       render: (row) => {
-        const board =
-          row.customFields.find((field) => field.label === 'BOARD')
-            ?.selectedValues[0]?.value || '-';
+        const board = row.customFields.find((field) => field.label ===
+        'BOARD')?.selectedValues.join(', ') || '-';
         return `${board}`;
       },
     },
@@ -150,9 +146,8 @@ const ContentCreator = () => {
       key: 'MEDIUM',
       label: 'Medium',
       render: (row) => {
-        const medium =
-          row.customFields.find((field) => field.label === 'MEDIUM')
-            ?.selectedValues[0]?.value || '-';
+        const medium = row.customFields.find((field) => field.label ===
+        'MEDIUM')?.selectedValues.join(', ') || '-';
         return `${medium}`;
       },
     },
@@ -160,9 +155,8 @@ const ContentCreator = () => {
       key: 'GRADE',
       label: 'Grade',
       render: (row) => {
-        const grade =
-          row.customFields.find((field) => field.label === 'GRADE')
-            ?.selectedValues[0]?.value || '-';
+        const grade = row.customFields.find((field) => field.label ===
+        'GRADE')?.selectedValues.join(', ') || '-';
         return `${grade}`;
       },
     },
@@ -170,9 +164,8 @@ const ContentCreator = () => {
       key: 'SUBJECT',
       label: 'subject',
       render: (row) => {
-        const subject =
-          row.customFields.find((field) => field.label === 'SUBJECT')
-            ?.selectedValues[0]?.value || '-';
+        const subject = row.customFields.find((field) => field.label ===
+        'SUBJECT')?.selectedValues.join(', ') || '-';
         return `${subject}`;
       },
     }
@@ -183,9 +176,8 @@ const ContentCreator = () => {
       key: 'DOMAIN',
       label: 'Domain',
       render: (row) => {
-        const domain =
-          row.customFields.find((field) => field.label === 'DOMAIN')
-            ?.selectedValues[0]?.value || '-';
+        const domain = row.customFields.find((field) => field.label ===
+        'DOMAIN')?.selectedValues.join(', ') || '-';
         return `${domain}`;
       },
     },
@@ -193,9 +185,8 @@ const ContentCreator = () => {
       key: 'SUB-DOMAIN',
       label: 'Sub Domain',
       render: (row) => {
-        const subDomain =
-          row.customFields.find((field) => field.label === 'SUB-DOMAIN')
-            ?.selectedValues[0]?.value || '-';
+        const subDomain = row.customFields.find((field) => field.label ===
+        'SUB-DOMAIN')?.selectedValues.join(', ') || '-';
         return `${subDomain}`;
       },
     },
@@ -203,9 +194,8 @@ const ContentCreator = () => {
       key: 'STREAM',
       label: 'Stream',
       render: (row) => {
-        const stream =
-          row.customFields.find((field) => field.label === 'STREAM')
-            ?.selectedValues[0]?.value || '-';
+        const stream = row.customFields.find((field) => field.label ===
+        'STREAM')?.selectedValues.join(', ') || '-';
         return `${stream}`;
       }
     }
