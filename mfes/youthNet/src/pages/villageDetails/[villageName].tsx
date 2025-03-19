@@ -27,15 +27,13 @@ const VillageDetails = () => {
   const villageNameString = Array.isArray(villageName)
     ? villageName[0]
     : villageName || '';
-  const { id, blockId } = router.query; // Extract the slug from the URL
+  const { id, blockId , tab } = router.query;
   const [yuthCount, setYuthCount] = useState<number>(0);
    const [volunteerCount, setVolunteerCount] = useState<number>(0);
   
   const [todaysRegistrationCount, setTodaysRegistrationCount] = useState<number>(0);
 
-  const handleBack = () => {
-    router.back();
-  };
+  
   const getTodayDate = () => {
     const today = new Date();
     return today.toLocaleDateString("en-CA"); 
@@ -115,12 +113,26 @@ const VillageDetails = () => {
       <Box>
         <BackHeader
           headingOne={villageNameString}
-          headingTwo={yuthCount?.toString()}
+          headingTwo={(yuthCount+volunteerCount).toString()}
           headingThree={<><ArrowUpwardIcon sx={{ height: 16, width: 16 }} />
  {todaysRegistrationCount.toString()}</>}
           showBackButton={true}
-          onBackClick={handleBack}
-        />
+          onBackClick={() => {
+            if(tab)
+            {
+  
+              router.push({
+                pathname: `/villages`,
+                query: {
+               //   villageId: id,
+                  tab: tab,
+                  blockId: blockId
+                },
+              });
+            }
+            else
+            router.back();
+          }}        />
       </Box>
       <Box
         ml={2}

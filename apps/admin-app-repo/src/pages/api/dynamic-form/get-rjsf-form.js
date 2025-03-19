@@ -183,7 +183,7 @@ function generateSchemaAndUISchema(fields) {
     } else {
       uiSchema[name] = {
         'ui:widget': 'text',
-        // 'ui:options': { validateOnBlur: true },
+        'ui:options': { validateOnBlur: true },
       };
     }
 

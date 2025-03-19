@@ -42,6 +42,8 @@ import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
 import { deleteUser } from '@/services/UserService';
+import { transformLabel } from '@/utils/Helper';
+import { getCohortList } from '@/services/GetCohortList';
 
 const MentorLead = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -64,13 +66,14 @@ const MentorLead = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [village, setVillage] = useState('');
-  const [userID, setUserId] = useState("")
+  const [userID, setUserId] = useState('');
   const [userData, setUserData] = useState({
-    firstName: "",
-    lastName: "",
-    village: "",
+    firstName: '',
+    lastName: '',
+    village: '',
   });
-  const [reason, setReason] = useState("");
+  const [reason, setReason] = useState('');
+  const [memberShipID, setMemberShipID] = useState('');
 
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
@@ -119,7 +122,11 @@ const MentorLead = () => {
   };
 
   const searchData = async (formData, newPage) => {
-    const staticFilter = { role: 'Lead', status: 'active' };
+    const staticFilter = {
+      role: 'Lead',
+      status: 'active',
+      tenantId: localStorage.getItem('tenantId'),
+    };
 
     const { sortBy } = formData;
     const staticSort = ['firstName', sortBy || 'asc'];
@@ -142,13 +149,14 @@ const MentorLead = () => {
       keys: ['firstName', 'middleName', 'lastName'],
       label: 'Mentor Lead Name',
       render: (row) =>
-        `${row.firstName || ''} ${row.middleName || ''} ${
-          row.lastName || ''
-        }`.trim(),
+        `${transformLabel(row.firstName) || ''} ${
+          transformLabel(row.middleName) || ''
+        } ${transformLabel(row.lastName) || ''}`.trim(),
     },
     {
       key: 'status',
       label: 'Status',
+      render: (row: any) => transformLabel(row.status),
       getStyle: (row) => ({ color: row.status === 'active' ? 'green' : 'red' }),
     },
     // {
@@ -166,11 +174,15 @@ const MentorLead = () => {
       label: 'Location (State / District )',
       render: (row) => {
         const state =
-          row.customFields.find((field) => field.label === 'STATE')
-            ?.selectedValues[0]?.value || '';
+          transformLabel(
+            row.customFields.find((field) => field.label === 'STATE')
+              ?.selectedValues[0]?.value
+          ) || '';
         const district =
-          row.customFields.find((field) => field.label === 'DISTRICT')
-            ?.selectedValues[0]?.value || '';
+          transformLabel(
+            row.customFields.find((field) => field.label === 'DISTRICT')
+              ?.selectedValues[0]?.value
+          ) || '';
 
         return `${state == '' ? '' : `${state}`}${
           district == '' ? '' : `, ${district}`
@@ -180,23 +192,66 @@ const MentorLead = () => {
   ];
   const userDelete = async () => {
     try {
-      const resp = await deleteUser(userID, { userData: { reason: reason, status: "archived" } });
+      let membershipId = null;
+
+      // Attempt to get the cohort list
+      try {
+        const userCohortResp = await getCohortList(userID);
+        if (userCohortResp?.result?.cohortData?.length) {
+          membershipId = userCohortResp.result.cohortData[0].cohortMembershipId;
+        } else {
+          console.warn('No cohort data found for the user.');
+        }
+      } catch (error) {
+        console.error('Failed to fetch cohort list:', error);
+      }
+
+      // Attempt to update cohort member status only if we got a valid membershipId
+      if (membershipId) {
+        try {
+          const updateResponse = await updateCohortMemberStatus({
+            memberStatus: 'archived',
+            statusReason: reason,
+            membershipId: membershipId,
+          });
+
+          if (updateResponse?.responseCode !== 200) {
+            console.error(
+              'Failed to archive user from center:',
+              updateResponse
+            );
+          } else {
+            console.log('User successfully archived from center.');
+          }
+        } catch (error) {
+          console.error('Error archiving user from center:', error);
+        }
+      }
+
+      // Always attempt to delete the user
+      console.log('Proceeding to self-delete...');
+      const resp = await deleteUser(userID, {
+        userData: { reason: reason, status: 'archived' },
+      });
+
       if (resp?.responseCode === 200) {
         setResponse((prev) => ({
-          ...prev, // Preserve other properties in `prev`
+          ...prev,
           result: {
-            ...prev?.result, // Preserve other properties in `result`
-            getUserDetails: prev?.result?.getUserDetails?.filter(item => item?.userId !== userID)
-          }
+            ...prev?.result,
+            getUserDetails: prev?.result?.getUserDetails?.filter(
+              (item) => item?.userId !== userID
+            ),
+          },
         }));
-        console.log("Team leader successfully archived.");
+        console.log('Team leader successfully archived.');
       } else {
-        console.error("Failed to archive team leader:", resp);
+        console.error('Failed to archive team leader:', resp);
       }
 
       return resp;
     } catch (error) {
-      console.error("Error updating team leader:", error);
+      console.error('Error updating team leader:', error);
     }
   };
 
@@ -248,7 +303,7 @@ const MentorLead = () => {
       ),
       callback: async (row) => {
         const findVillage = row?.customFields.find((item) => {
-          if (item.label === 'VILLAGE') {
+          if (item.label === 'DISTRICT') {
             return item;
           }
         });
@@ -268,12 +323,12 @@ const MentorLead = () => {
         // setPrefilledFormData({});
         // searchData(prefilledFormData, currentPage);
         setOpen(true);
-        setUserId(row?.userId)
+        setUserId(row?.userId);
 
         setUserData({
-          firstName: row?.firstName || "",
-          lastName: row?.lastName || "",
-          village: findVillage?.selectedValues?.[0]?.value || "",
+          firstName: row?.firstName || '',
+          lastName: row?.lastName || '',
+          village: findVillage?.selectedValues?.[0]?.value || '',
         });
       },
     },
@@ -423,9 +478,9 @@ const MentorLead = () => {
         checked={checked}
         open={open}
         onClose={() => setOpen(false)}
-        title={t("COMMON.DELETE_USER")}
-        primary={t("COMMON.DELETE_USER_WITH_REASON")}
-        secondary={t("COMMON.CANCEL")}
+        title={t('COMMON.DELETE_USER')}
+        primary={t('COMMON.DELETE_USER_WITH_REASON')}
+        secondary={t('COMMON.CANCEL')}
         reason={reason}
         onClickPrimary={userDelete}
       >
