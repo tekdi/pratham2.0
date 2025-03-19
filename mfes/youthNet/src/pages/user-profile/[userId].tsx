@@ -33,6 +33,7 @@ const UserId = () => {
  const [formData, setFormData] = useState<any>();
  const [editModal, setEditModal] = useState<boolean>(false);
  const [updatedUser, setUpdatedUser] = useState<boolean>(false);
+ const { tab, blockId , villageId} = router.query;
 
 
  const [uiSchema, setUiSchema] = useState(null);
@@ -254,6 +255,19 @@ const UserId = () => {
         <BackHeader headingOne={ userId===localStorage.getItem("userId")?t('YOUTHNET_PROFILE.MY_PROFILE'): user.firstName? user.lastName ?`${user.firstName} ${user.lastName}`:user.firstName : ''} 
          showBackButton={userId===localStorage.getItem("userId")?false:true}
          onBackClick={() => {
+          if(tab)
+          {
+
+            router.push({
+              pathname: `/villages`,
+              query: {
+              villageId: villageId,
+                tab: tab,
+                blockId: blockId
+              },
+            });
+          }
+          else
           router.back();
         }}
 
