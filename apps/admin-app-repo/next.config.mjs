@@ -58,7 +58,7 @@ const nextConfig = {
       },
       {
         source: "/mfe_workspace/workspace/content/assets/:path*",
-        destination: `${process.env.NEXT_PUBLIC_WORKSPACE_BASE_URL}/assets/:path*`,
+        destination: `/assets/:path*`,
       },
       {
         source: "/workspace/content/assets/:path*",
