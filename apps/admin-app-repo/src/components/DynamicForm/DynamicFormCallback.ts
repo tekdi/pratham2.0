@@ -162,10 +162,10 @@ export const extractMatchingKeys = (row: any, schema: any) => {
             result[key] = convertArrayToStrings(resultValue);
           }
         }
-      } else if (row[key] !== undefined) {
+      } else if (row[key] !== undefined && row[key] !== null) {
         result[key] = row[key];
       }
-    } else if (row[key] !== undefined) {
+    } else if (row[key] !== undefined && row[key] !== null) {
       result[key] = row[key];
     }
   }

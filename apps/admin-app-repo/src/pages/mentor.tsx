@@ -70,7 +70,7 @@ const Mentor = () => {
 
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
-    ? { state: localStorage.getItem('stateId') }
+    ? { state: [localStorage.getItem('stateId')] }
     : {};
 
   useEffect(() => {
@@ -156,6 +156,16 @@ const Mentor = () => {
       getStyle: (row: any) => ({
         color: row.status === 'active' ? 'green' : 'red',
       }),
+    },
+    {
+      keys: ['gender'],
+      label: 'Gender',
+      render: (row) => transformLabel(row.gender) || '',
+    },
+    {
+      keys: ['mobile'],
+      label: 'Mobile',
+      render: (row) => transformLabel(row.mobile) || '',
     },
     // {
     //   key: 'STATE',
