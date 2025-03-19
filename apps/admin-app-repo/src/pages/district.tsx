@@ -28,6 +28,7 @@ import deleteIcon from '../../public/images/deleteIcon.svg';
 import Image from 'next/image';
 import UserNameCell from '@/components/UserNameCell';
 import { fetchStateOptions } from '@/services/MasterDataService';
+import { transformLabel } from '@/utils/Helper';
 
 //import { DynamicForm } from '@shared-lib';
 
@@ -66,11 +67,14 @@ const District = () => {
     },
   };
 
-  const debouncedGetList = useCallback(debounce(async (data) => {
-    console.log('Debounced API Call:', data);
-    const resp = await fetchStateOptions(data);
-    setResponse({ result: resp?.result });
-  }, 1000), []);
+  const debouncedGetList = useCallback(
+    debounce(async (data) => {
+      console.log('Debounced API Call:', data);
+      const resp = await fetchStateOptions(data);
+      setResponse({ result: resp?.result });
+    }, 1000),
+    []
+  );
 
   const SubmitaFunction = async (formData: any) => {
     setPrefilledFormData(formData);
@@ -125,14 +129,14 @@ const District = () => {
     {
       keys: ['district_name'],
       label: 'District',
-      render: (row) => row.district_name,
+      render: (row) => transformLabel(row.district_name),
     },
     {
       keys: ['is_active'],
       label: 'Status',
-      render: (row) => row.is_active === 1 ? "Active" : "Inactive",
-      getStyle: (row) => ({ color: row.is_active === 1 ? "green" : "red" })
-    }
+      render: (row) => (row.is_active === 1 ? 'Active' : 'Inactive'),
+      getStyle: (row) => ({ color: row.is_active === 1 ? 'green' : 'red' }),
+    },
   ];
 
   // Pagination handlers
@@ -217,7 +221,7 @@ const District = () => {
             height="20vh"
           >
             <Typography marginTop="10px" textAlign={'center'}>
-                {t('COMMON.NO_DISTRICTS_FOUND')}
+              {t('COMMON.NO_DISTRICTS_FOUND')}
             </Typography>
           </Box>
         )}

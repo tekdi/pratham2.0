@@ -34,6 +34,7 @@ import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
 import { deleteUser } from '@/services/UserService';
+import { transformLabel } from '@/utils/Helper';
 
 //import { DynamicForm } from '@shared-lib';
 
@@ -138,13 +139,14 @@ const Mentor = () => {
       keys: ['firstName', 'middleName', 'lastName'],
       label: 'Mentor Name',
       render: (row: any) =>
-        `${row.firstName || ''} ${row.middleName || ''} ${
-          row.lastName || ''
-        }`.trim(),
+        `${transformLabel(row.firstName) || ''} ${
+          transformLabel(row.middleName) || ''
+        } ${transformLabel(row.lastName) || ''}`.trim(),
     },
     {
       key: 'status',
       label: 'Status',
+      render: (row: any) => transformLabel(row.status),
       getStyle: (row: any) => ({
         color: row.status === 'active' ? 'green' : 'red',
       }),

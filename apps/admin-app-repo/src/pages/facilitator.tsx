@@ -46,6 +46,7 @@ import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
 import { deleteUser } from '@/services/UserService';
+import { transformLabel } from '@/utils/Helper';
 
 const Facilitator = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -141,13 +142,14 @@ const Facilitator = () => {
       keys: ['firstName', 'middleName', 'lastName'],
       label: 'Facilitator Name',
       render: (row) =>
-        `${row.firstName || ''} ${row.middleName || ''} ${
-          row.lastName || ''
+        `${transformLabel(row.firstName) || ''} ${transformLabel(row.middleName) || ''} ${
+          transformLabel(row.lastName) || ''
         }`.trim(),
     },
     {
       key: 'status',
       label: 'Status',
+      render: (row: any) => transformLabel(row.status),
       getStyle: (row) => ({ color: row.status === 'active' ? 'green' : 'red' }),
     },
     // {
