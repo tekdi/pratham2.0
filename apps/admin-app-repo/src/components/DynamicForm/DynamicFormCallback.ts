@@ -139,9 +139,9 @@ export const extractMatchingKeys = (row: any, schema: any) => {
     return arr.map((item) => String(item));
   };
   for (const [key, value] of Object.entries(schema.properties)) {
-    console.log('######### prefilled key', JSON.stringify(key));
-    console.log('######### prefilled value', JSON.stringify(value));
-    console.log('######### prefilled row', JSON.stringify(row));
+    // console.log('######### prefilled key', JSON.stringify(key));
+    // console.log('######### prefilled value', JSON.stringify(value));
+    // console.log('######### prefilled row', JSON.stringify(row));
     if (value.coreField === 0) {
       if (value.fieldId) {
         //check type = array or string
@@ -149,16 +149,16 @@ export const extractMatchingKeys = (row: any, schema: any) => {
           (field) => field.fieldId === value.fieldId
         );
         if (customField) {
-          console.log(
-            '######### prefilled customField',
-            JSON.stringify(customField)
-          );
+          // console.log(
+          //   '######### prefilled customField',
+          //   JSON.stringify(customField)
+          // );
           let resultValue = getValue(value.type, customField.selectedValues);
           if (resultValue) {
-            console.log(
-              '######### prefilled resultValue',
-              JSON.stringify(resultValue)
-            );
+            // console.log(
+            //   '######### prefilled resultValue',
+            //   JSON.stringify(resultValue)
+            // );
             result[key] = convertArrayToStrings(resultValue);
           }
         }
