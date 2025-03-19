@@ -65,9 +65,8 @@ const Mentor = () => {
     lastName: '',
     village: '',
   });
-  const [reason, setReason] = useState("");
-  const [memberShipID, setMemberShipID] = useState('')
-
+  const [reason, setReason] = useState('');
+  const [memberShipID, setMemberShipID] = useState('');
 
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
@@ -119,7 +118,11 @@ const Mentor = () => {
   };
 
   const searchData = async (formData: any, newPage: any) => {
-    const staticFilter = { role: 'Instructor', status: 'active' };
+    const staticFilter = {
+      role: 'Instructor',
+      status: 'active',
+      tenantId: localStorage.getItem('tenantId'),
+    };
 
     const { sortBy } = formData;
     const staticSort = ['firstName', sortBy || 'asc'];
@@ -203,35 +206,38 @@ const Mentor = () => {
         if (userCohortResp?.result?.cohortData?.length) {
           membershipId = userCohortResp.result.cohortData[0].cohortMembershipId;
         } else {
-          console.warn("No cohort data found for the user.");
+          console.warn('No cohort data found for the user.');
         }
       } catch (error) {
-        console.error("Failed to fetch cohort list:", error);
+        console.error('Failed to fetch cohort list:', error);
       }
 
       // Attempt to update cohort member status only if we got a valid membershipId
       if (membershipId) {
         try {
           const updateResponse = await updateCohortMemberStatus({
-            memberStatus: "archived",
+            memberStatus: 'archived',
             statusReason: reason,
             membershipId: membershipId,
           });
 
           if (updateResponse?.responseCode !== 200) {
-            console.error("Failed to archive user from center:", updateResponse);
+            console.error(
+              'Failed to archive user from center:',
+              updateResponse
+            );
           } else {
-            console.log("User successfully archived from center.");
+            console.log('User successfully archived from center.');
           }
         } catch (error) {
-          console.error("Error archiving user from center:", error);
+          console.error('Error archiving user from center:', error);
         }
       }
 
       // Always attempt to delete the user
-      console.log("Proceeding to self-delete...");
+      console.log('Proceeding to self-delete...');
       const resp = await deleteUser(userID, {
-        userData: { reason: reason, status: "archived" },
+        userData: { reason: reason, status: 'archived' },
       });
 
       if (resp?.responseCode === 200) {

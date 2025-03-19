@@ -67,7 +67,7 @@ const Facilitator = () => {
   const [editableUserId, setEditableUserId] = useState('');
   const [roleId, setRoleID] = useState('');
   const [tenantId, setTenantId] = useState('');
-  const [memberShipID, setMemberShipID]= useState('')
+  const [memberShipID, setMemberShipID] = useState('');
 
   const [userID, setUserId] = useState('');
   const [userData, setUserData] = useState({
@@ -122,7 +122,11 @@ const Facilitator = () => {
   };
 
   const searchData = async (formData, newPage) => {
-    const staticFilter = { role: 'Instructor', status: 'active' };
+    const staticFilter = {
+      role: 'Instructor',
+      status: 'active',
+      tenantId: localStorage.getItem('tenantId'),
+    };
     const { sortBy } = formData;
     const staticSort = ['firstName', sortBy || 'asc'];
     await searchListData(
@@ -144,9 +148,9 @@ const Facilitator = () => {
       keys: ['firstName', 'middleName', 'lastName'],
       label: 'Facilitator Name',
       render: (row) =>
-        `${transformLabel(row.firstName) || ''} ${transformLabel(row.middleName) || ''} ${
-          transformLabel(row.lastName) || ''
-        }`.trim(),
+        `${transformLabel(row.firstName) || ''} ${
+          transformLabel(row.middleName) || ''
+        } ${transformLabel(row.lastName) || ''}`.trim(),
     },
     {
       key: 'status',
@@ -203,35 +207,38 @@ const Facilitator = () => {
         if (userCohortResp?.result?.cohortData?.length) {
           membershipId = userCohortResp.result.cohortData[0].cohortMembershipId;
         } else {
-          console.warn("No cohort data found for the user.");
+          console.warn('No cohort data found for the user.');
         }
       } catch (error) {
-        console.error("Failed to fetch cohort list:", error);
+        console.error('Failed to fetch cohort list:', error);
       }
 
       // Attempt to update cohort member status only if we got a valid membershipId
       if (membershipId) {
         try {
           const updateResponse = await updateCohortMemberStatus({
-            memberStatus: "archived",
+            memberStatus: 'archived',
             statusReason: reason,
             membershipId: membershipId,
           });
 
           if (updateResponse?.responseCode !== 200) {
-            console.error("Failed to archive user from center:", updateResponse);
+            console.error(
+              'Failed to archive user from center:',
+              updateResponse
+            );
           } else {
-            console.log("User successfully archived from center.");
+            console.log('User successfully archived from center.');
           }
         } catch (error) {
-          console.error("Error archiving user from center:", error);
+          console.error('Error archiving user from center:', error);
         }
       }
 
       // Always attempt to delete the user
-      console.log("Proceeding to self-delete...");
+      console.log('Proceeding to self-delete...');
       const resp = await deleteUser(userID, {
-        userData: { reason: reason, status: "archived" },
+        userData: { reason: reason, status: 'archived' },
       });
 
       if (resp?.responseCode === 200) {
@@ -254,8 +261,6 @@ const Facilitator = () => {
       console.error('Error updating team leader:', error);
     }
   };
-
-
 
   // Define actions
   const actions = [

@@ -143,7 +143,11 @@ const TeamLeader = () => {
   };
 
   const searchData = async (formData, newPage) => {
-    const staticFilter = { role: 'Lead', status: 'active' };
+    const staticFilter = {
+      role: 'Lead',
+      status: 'active',
+      tenantId: localStorage.getItem('tenantId'),
+    };
 
     const { sortBy } = formData;
     const staticSort = ['firstName', sortBy || 'asc'];
