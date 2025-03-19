@@ -965,6 +965,8 @@ const Index = () => {
               showAssignmentScreen={showAssignmentScreen}
               formData={formData}
               setFormData={setFormData}
+              onClose={onClose}
+
               />
             </SimpleModal>
           </>
