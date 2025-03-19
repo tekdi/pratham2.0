@@ -82,6 +82,7 @@ export interface CohortMemberList {
     status?: string[];
   };
   sort?: string[];
+  status? : any
 }
 
 export interface CoursePlannerMetaData {

@@ -83,35 +83,6 @@ export const TeamLeaderSearchSchema = {
       isMultiSelect: true,
       maxSelections: 1000,
     },
-    village: {
-      type: 'array',
-      title: 'Village',
-      items: {
-        type: 'string',
-        enum: ['Select'],
-        enumNames: ['Select'],
-      },
-      api: {
-        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
-        method: 'POST',
-        payload: {
-          fieldName: 'village',
-          controllingfieldfk: '**',
-          sort: ['village_name', 'asc'],
-        },
-        options: {
-          optionObj: 'result.values',
-          label: 'label',
-          value: 'value',
-        },
-        callType: 'dependent',
-        dependent: 'block',
-      },
-      //for multiselect
-      uniqueItems: true,
-      isMultiSelect: true,
-      maxSelections: 1000,
-    },
     firstName: {
       type: 'string',
       title: 'Search Team Leader',
@@ -133,15 +104,7 @@ export const TeamLeaderSearchSchema = {
 };
 
 export const TeamLeaderSearchUISchema = {
-  'ui:order': [
-    'state',
-    'district',
-    'block',
-    'village',
-    'firstName',
-    'sortBy',
-    'status',
-  ],
+  'ui:order': ['state', 'district', 'block', 'firstName', 'sortBy', 'status'],
 
   state: {
     'ui:widget': 'CustomMultiSelectWidget',
@@ -152,6 +115,14 @@ export const TeamLeaderSearchUISchema = {
   },
 
   district: {
+    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:options': {
+      multiple: true,
+      uniqueItems: true,
+    },
+  },
+
+  block: {
     'ui:widget': 'CustomMultiSelectWidget',
     'ui:options': {
       multiple: true,
