@@ -1,4 +1,4 @@
-name: Deploy to DEV Teacher
+name: Deploy to DEV Admin
 
 on:
   push:
