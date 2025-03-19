@@ -10,6 +10,7 @@ import { GetStaticPaths } from 'next';
 import {
   SURVEY_DATA,
   VILLAGE_DATA,
+  YOUTHNET_USER_ROLE,
 } from '../../components/youthNet/tempConfigs';
 import VillageDetailCard from '../../components/youthNet/VillageDetailCard';
 import Frame1 from '../../assets/images/SurveyFrame1.png';
@@ -18,7 +19,8 @@ import { useEffect, useState } from 'react';
 import { fetchUserList } from '../../services/youthNet/Dashboard/UserServices';
 import { Role, Status } from '../../utils/app.constant';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import { categorizeUsers } from '../../utils/Helper';
+import { categorizeUsers, getLoggedInUserRole } from '../../utils/Helper';
+import { cohortHierarchy } from '@/utils/app.constant';
 
 const VillageDetails = () => {
   const router = useRouter();
@@ -72,13 +74,25 @@ const VillageDetails = () => {
   }, []);
   const handleYouthVolunteers = () => {
     console.log('handleYouthVolunteers');
-    
+    let userDataString;
+    if(YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole())
+      userDataString = localStorage.getItem('selectedmentorData');
+    else
+    userDataString = localStorage.getItem('userData');
+
+
+              let userData: any = userDataString ? JSON.parse(userDataString) : null;
+              console.log(userData)
+              const blockResult = userData?.customFields?.find(
+                (item: any) => item.label === cohortHierarchy.BLOCK
+              );
+              blockResult?.selectedValues[0]?.id
     router.push({
       pathname: `/villages`,
       query: {
         villageId: id,
         tab: 3,
-        blockId:blockId
+        blockId:blockId?blockId:blockResult?.selectedValues[0]?.id
       },
     });  
   };
