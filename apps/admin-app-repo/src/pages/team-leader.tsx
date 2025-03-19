@@ -195,21 +195,29 @@ const TeamLeader = () => {
       label: 'Location (State / District / Block / Village)',
       render: (row: any) => {
         const state =
-          row.customFields.find(
-            (field: { label: string }) => field.label === 'STATE'
-          )?.selectedValues[0]?.value || '';
+          transformLabel(
+            row.customFields.find(
+              (field: { label: string }) => field.label === 'STATE'
+            )?.selectedValues[0]?.value
+          ) || '';
         const district =
-          row.customFields.find(
-            (field: { label: string }) => field.label === 'DISTRICT'
-          )?.selectedValues[0]?.value || '';
+          transformLabel(
+            row.customFields.find(
+              (field: { label: string }) => field.label === 'DISTRICT'
+            )?.selectedValues[0]?.value
+          ) || '';
         const block =
-          row.customFields.find(
-            (field: { label: string }) => field.label === 'BLOCK'
-          )?.selectedValues[0]?.value || '';
+          transformLabel(
+            row.customFields.find(
+              (field: { label: string }) => field.label === 'BLOCK'
+            )?.selectedValues[0]?.value
+          ) || '';
         const village =
-          row.customFields.find(
-            (field: { label: string }) => field.label === 'VILLAGE'
-          )?.selectedValues[0]?.value || '';
+          transformLabel(
+            row.customFields.find(
+              (field: { label: string }) => field.label === 'VILLAGE'
+            )?.selectedValues[0]?.value
+          ) || '';
         return `${state == '' ? '' : `${state}`}${
           district == '' ? '' : `, ${district}`
         }${block == '' ? '' : `, ${block}`}${

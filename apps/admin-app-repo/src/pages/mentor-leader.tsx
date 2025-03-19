@@ -174,11 +174,15 @@ const MentorLead = () => {
       label: 'Location (State / District )',
       render: (row) => {
         const state =
-          row.customFields.find((field) => field.label === 'STATE')
-            ?.selectedValues[0]?.value || '';
+          transformLabel(
+            row.customFields.find((field) => field.label === 'STATE')
+              ?.selectedValues[0]?.value
+          ) || '';
         const district =
-          row.customFields.find((field) => field.label === 'DISTRICT')
-            ?.selectedValues[0]?.value || '';
+          transformLabel(
+            row.customFields.find((field) => field.label === 'DISTRICT')
+              ?.selectedValues[0]?.value
+          ) || '';
 
         return `${state == '' ? '' : `${state}`}${
           district == '' ? '' : `, ${district}`
