@@ -25,6 +25,7 @@ import {
   BatchSearchUISchema,
 } from '@/constant/Forms/BatchSearch';
 import { getCohortList } from '@/services/CohortService/cohortService';
+import { transformLabel } from '@/utils/Helper';
 
 //import { DynamicForm } from '@shared-lib';
 
@@ -116,48 +117,64 @@ const Batch = () => {
   // Define table columns
 
   const columns = [
-    { key: 'name', label: 'Batch' },
+    {
+      key: 'name',
+      label: 'Batch',
+      render: (row: any) => transformLabel(row.name),
+    },
     {
       key: 'district',
       label: 'District',
       render: (row) =>
-        row.customFields.find((field) => field.label === 'DISTRICT')
-          ?.selectedValues[0]?.value || '-',
+        transformLabel(
+          row.customFields.find((field) => field.label === 'DISTRICT')
+            ?.selectedValues[0]?.value
+        ) || '-',
     },
     {
       key: 'block',
       label: 'Block',
       render: (row) =>
-        row.customFields.find((field) => field.label === 'BLOCK')
-          ?.selectedValues[0]?.value || '-',
+        transformLabel(
+          row.customFields.find((field) => field.label === 'BLOCK')
+            ?.selectedValues[0]?.value
+        ) || '-',
     },
     {
       key: 'village',
       label: 'Village',
       render: (row) =>
-        row.customFields.find((field) => field.label === 'VILLAGE')
-          ?.selectedValues[0]?.value || '-',
+        transformLabel(
+          row.customFields.find((field) => field.label === 'VILLAGE')
+            ?.selectedValues[0]?.value
+        ) || '-',
     },
     {
       key: 'center',
       label: 'Center',
       render: (row) =>
-        row.customFields.find((field) => field.label === 'CENTER')
-          ?.selectedValues[0]?.value || '-',
+        transformLabel(
+          row.customFields.find((field) => field.label === 'CENTER')
+            ?.selectedValues[0]?.value
+        ) || '-',
     },
     {
       key: 'board',
       label: 'Boards',
       render: (row) =>
-        row.customFields.find((field) => field.label === 'BOARD')
-          ?.selectedValues[0] || '-',
+        transformLabel(
+          row.customFields.find((field) => field.label === 'BOARD')
+            ?.selectedValues[0]
+        ) || '-',
     },
     {
       key: 'medium',
       label: 'Medium',
       render: (row) =>
-        row.customFields.find((field) => field.label === 'MEDIUM')
-          ?.selectedValues[0] || '-',
+        transformLabel(
+          row.customFields.find((field) => field.label === 'MEDIUM')
+            ?.selectedValues[0]
+        ) || '-',
     },
   ];
 
