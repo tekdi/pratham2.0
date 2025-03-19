@@ -34,6 +34,7 @@ import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
 import { deleteUser } from '@/services/UserService';
+import { getCohortList } from '@/services/GetCohortList';
 
 //import { DynamicForm } from '@shared-lib';
 
@@ -64,6 +65,7 @@ const Mentor = () => {
     village: "",
   });
   const [reason, setReason] = useState("");
+  const [memberShipID, setMemberShipID] = useState('')
 
 
   const { t, i18n } = useTranslation();
@@ -191,14 +193,54 @@ const Mentor = () => {
 
   const userDelete = async () => {
     try {
-      const resp = await deleteUser(userID, { userData: { reason: reason, status: "archived" } });
+      let membershipId = null;
+
+      // Attempt to get the cohort list
+      try {
+        const userCohortResp = await getCohortList(userID);
+        if (userCohortResp?.result?.cohortData?.length) {
+          membershipId = userCohortResp.result.cohortData[0].cohortMembershipId;
+        } else {
+          console.warn("No cohort data found for the user.");
+        }
+      } catch (error) {
+        console.error("Failed to fetch cohort list:", error);
+      }
+
+      // Attempt to update cohort member status only if we got a valid membershipId
+      if (membershipId) {
+        try {
+          const updateResponse = await updateCohortMemberStatus({
+            memberStatus: "archived",
+            statusReason: reason,
+            membershipId: membershipId,
+          });
+
+          if (updateResponse?.responseCode !== 200) {
+            console.error("Failed to archive user from center:", updateResponse);
+          } else {
+            console.log("User successfully archived from center.");
+          }
+        } catch (error) {
+          console.error("Error archiving user from center:", error);
+        }
+      }
+
+      // Always attempt to delete the user
+      console.log("Proceeding to self-delete...");
+      const resp = await deleteUser(userID, {
+        userData: { reason: reason, status: "archived" },
+      });
+
       if (resp?.responseCode === 200) {
         setResponse((prev) => ({
-          ...prev, // Preserve other properties in `prev`
+          ...prev,
           result: {
-            ...prev?.result, // Preserve other properties in `result`
-            getUserDetails: prev?.result?.getUserDetails?.filter(item => item?.userId !== userID)
-          }
+            ...prev?.result,
+            getUserDetails: prev?.result?.getUserDetails?.filter(
+              (item) => item?.userId !== userID
+            ),
+          },
         }));
         console.log("Team leader successfully archived.");
       } else {
