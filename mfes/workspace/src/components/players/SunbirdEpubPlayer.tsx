@@ -79,12 +79,12 @@ const SunbirdEpubPlayer = ({ playerConfig }: PlayerConfigProps) => {
   }, [isScriptLoaded]);
 
   return (
-    <div className="player-grid">
+    <div className="player-grid" style={{ height: '100vh' }}>
       {isScriptLoaded ? (
         <sunbird-epub-player
           player-config={JSON.stringify(playerConfig)}
           ref={sunbirdEpubPlayerRef}
-        ></sunbird-epub-player>
+        />
       ) : (
         <div>Loading EPUB Player...</div>
       )}
