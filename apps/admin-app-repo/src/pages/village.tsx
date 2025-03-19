@@ -29,6 +29,7 @@ import {
   MasterVillageSchema,
   MasterVillageUISchema,
 } from '../constant/Forms/MasterVillageSearch';
+import { transformLabel } from '@/utils/Helper';
 
 //import { DynamicForm } from '@shared-lib';
 
@@ -143,7 +144,7 @@ const Village = () => {
     {
       keys: ['village_name'],
       label: 'Village',
-      render: (row) => row.village_name,
+      render: (row) => transformLabel(row.village_name),
     },
     {
       keys: ['is_active'],

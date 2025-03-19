@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { WidgetProps } from '@rjsf/utils';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
@@ -18,17 +18,39 @@ const CustomMultiSelectWidget = ({
   schema,
 }: WidgetProps) => {
   const { enumOptions = [] } = options;
-  // console.log('enumOptions', enumOptions);
   const maxSelections = schema.maxSelection || enumOptions.length; // Default to max options if not set
 
   // Ensure value is always an array
   const selectedValues = Array.isArray(value) ? value : [];
 
+  // State to track if all options are selected
+  const [isAllSelected, setIsAllSelected] = useState(
+    selectedValues.length === enumOptions.length
+  );
+
+  // Update `isAllSelected` when `selectedValues` changes
+  useEffect(() => {
+    setIsAllSelected(selectedValues.length === enumOptions.length);
+  }, [selectedValues, enumOptions]);
+
+  // Handle change event for select
   const handleChange = (event: any) => {
     const selected = event.target.value;
-    if (Array.isArray(selected)) {
-      if (selected.length <= maxSelections) {
-        onChange(selected.length > 0 ? selected : []); // Ensures array format
+
+    if (selected.includes('selectAll')) {
+      // If "Select All" is clicked, select or deselect all
+      if (isAllSelected) {
+        onChange([]); // Deselect all if already selected
+      } else {
+        const allValues = enumOptions.map((option) => option.value);
+        onChange(allValues.slice(0, maxSelections)); // Select all up to maxSelections
+      }
+    } else {
+      // Handle individual selections
+      if (Array.isArray(selected)) {
+        if (selected.length <= maxSelections) {
+          onChange(selected.length > 0 ? selected : []); // Ensures array format
+        }
       }
     }
   };
@@ -46,7 +68,7 @@ const CustomMultiSelectWidget = ({
       <Select
         id={id}
         multiple
-        value={selectedValues} // Ensures it's always an array
+        value={selectedValues}
         onChange={handleChange}
         renderValue={(selected) =>
           enumOptions
@@ -55,6 +77,23 @@ const CustomMultiSelectWidget = ({
             .join(', ')
         }
       >
+        {/* Show "Select All" only if maxSelections >= enumOptions.length */}
+        {enumOptions.length > 0 && maxSelections >= enumOptions.length && (
+          <MenuItem
+            key="selectAll"
+            value="selectAll"
+            disabled={enumOptions.length === 1}
+          >
+            <Checkbox checked={isAllSelected} />
+            <ListItemText
+              primary={
+                isAllSelected ? 'Deselect All' : 'Select All'
+              }
+            />
+          </MenuItem>
+        )}
+
+        {/* Map through actual options */}
         {enumOptions.map((option) => (
           <MenuItem
             key={option.value}

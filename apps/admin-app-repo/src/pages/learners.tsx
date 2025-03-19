@@ -10,9 +10,16 @@ import {
   learnerSearchSchema,
   learnerSearchUISchema,
 } from '../constant/Forms/LearnerSearch';
-import { Status } from '@/utils/app.constant';
+import { RoleId, Status } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
-import { Box, Checkbox, FormControlLabel, Grid, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Checkbox,
+  FormControlLabel,
+  Grid,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { debounce } from 'lodash';
 import { Numbers } from '@mui/icons-material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
@@ -35,6 +42,7 @@ import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
 import { deleteUser } from '@/services/UserService';
+import { transformLabel } from '@/utils/Helper';
 import { getCohortList } from '@/services/GetCohortList';
 
 const Learner = () => {
@@ -57,15 +65,14 @@ const Learner = () => {
   const [tenantId, setTenantId] = useState('');
   const [open, setOpen] = useState(false);
   const [checked, setChecked] = useState(false);
-  const [userID, setUserId] = useState("")
+  const [userID, setUserId] = useState('');
   const [userData, setUserData] = useState({
-    firstName: "",
-    lastName: "",
-    village: "",
+    firstName: '',
+    lastName: '',
+    village: '',
   });
-  const [reason, setReason] = useState("");
-  const [memberShipID, setMemberShipID] = useState('')
-
+  const [reason, setReason] = useState('');
+  const [memberShipID, setMemberShipID] = useState('');
 
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
@@ -97,7 +104,7 @@ const Learner = () => {
       setAddUiSchema(responseForm?.uiSchema);
     };
     fetchData();
-    setRoleID(localStorage.getItem('roleId'));
+    setRoleID(RoleId.STUDENT);
     setTenantId(localStorage.getItem('tenantId'));
   }, []);
 
@@ -114,7 +121,11 @@ const Learner = () => {
   };
 
   const searchData = async (formData, newPage) => {
-    const staticFilter = { role: 'Learner', status: "active" };
+    const staticFilter = {
+      role: 'Learner',
+      status: 'active',
+      tenantId: localStorage.getItem('tenantId'),
+    };
     const { sortBy } = formData;
     const staticSort = ['firstName', sortBy || 'asc'];
     await searchListData(
@@ -136,13 +147,14 @@ const Learner = () => {
       keys: ['firstName', 'middleName', 'lastName'],
       label: 'Leaner Name',
       render: (row) =>
-        `${row.firstName || ''} ${row.middleName || ''} ${
-          row.lastName || ''
-        }`.trim(),
+        `${transformLabel(row.firstName) || ''} ${
+          transformLabel(row.middleName) || ''
+        } ${transformLabel(row.lastName) || ''}`.trim(),
     },
     {
       key: 'status',
       label: 'Status',
+      render: (row: any) => transformLabel(row.status),
       getStyle: (row) => ({ color: row.status === 'active' ? 'green' : 'red' }),
     },
     // {
@@ -160,21 +172,21 @@ const Learner = () => {
       label: 'Location (State / District / Block/ Village)',
       render: (row: any) => {
         const state =
-          row.customFields.find(
+        transformLabel(row.customFields.find(
             (field: { label: string }) => field.label === 'STATE'
-          )?.selectedValues[0]?.value || '';
+          )?.selectedValues[0]?.value) || '';
         const district =
-          row.customFields.find(
+        transformLabel(row.customFields.find(
             (field: { label: string }) => field.label === 'DISTRICT'
-          )?.selectedValues[0]?.value || '';
+          )?.selectedValues[0]?.value) || '';
         const block =
-          row.customFields.find(
+        transformLabel(row.customFields.find(
             (field: { label: string }) => field.label === 'BLOCK'
-          )?.selectedValues[0]?.value || '';
+          )?.selectedValues[0]?.value) || '';
         const village =
-          row.customFields.find(
+        transformLabel(row.customFields.find(
             (field: { label: string }) => field.label === 'VILLAGE'
-          )?.selectedValues[0]?.value || '';
+          )?.selectedValues[0]?.value) || '';
         return `${state == '' ? '' : `${state}`}${
           district == '' ? '' : `, ${district}`
         }${block == '' ? '' : `, ${block}`}${
@@ -183,7 +195,6 @@ const Learner = () => {
       },
     },
   ];
-
 
   const userDelete = async () => {
     try {
@@ -195,35 +206,38 @@ const Learner = () => {
         if (userCohortResp?.result?.cohortData?.length) {
           membershipId = userCohortResp.result.cohortData[0].cohortMembershipId;
         } else {
-          console.warn("No cohort data found for the user.");
+          console.warn('No cohort data found for the user.');
         }
       } catch (error) {
-        console.error("Failed to fetch cohort list:", error);
+        console.error('Failed to fetch cohort list:', error);
       }
 
       // Attempt to update cohort member status only if we got a valid membershipId
       if (membershipId) {
         try {
           const updateResponse = await updateCohortMemberStatus({
-            memberStatus: "archived",
+            memberStatus: 'archived',
             statusReason: reason,
             membershipId: membershipId,
           });
 
           if (updateResponse?.responseCode !== 200) {
-            console.error("Failed to archive user from center:", updateResponse);
+            console.error(
+              'Failed to archive user from center:',
+              updateResponse
+            );
           } else {
-            console.log("User successfully archived from center.");
+            console.log('User successfully archived from center.');
           }
         } catch (error) {
-          console.error("Error archiving user from center:", error);
+          console.error('Error archiving user from center:', error);
         }
       }
 
       // Always attempt to delete the user
-      console.log("Proceeding to self-delete...");
+      console.log('Proceeding to self-delete...');
       const resp = await deleteUser(userID, {
-        userData: { reason: reason, status: "archived" },
+        userData: { reason: reason, status: 'archived' },
       });
 
       if (resp?.responseCode === 200) {
@@ -236,14 +250,14 @@ const Learner = () => {
             ),
           },
         }));
-        console.log("Team leader successfully archived.");
+        console.log('Team leader successfully archived.');
       } else {
-        console.error("Failed to archive team leader:", resp);
+        console.error('Failed to archive team leader:', resp);
       }
 
       return resp;
     } catch (error) {
-      console.error("Error updating team leader:", error);
+      console.error('Error updating team leader:', error);
     }
   };
 
@@ -300,7 +314,6 @@ const Learner = () => {
           }
         });
 
-       
         // console.log('row:', row?.customFields[2].selectedValues[0].value);
         setEditableUserId(row?.userId);
         // const memberStatus = Status.ARCHIVED;
@@ -316,14 +329,13 @@ const Learner = () => {
         // searchData(prefilledFormData, currentPage);
         setOpen(true);
 
-        setUserId(row?.userId)
+        setUserId(row?.userId);
 
         setUserData({
-          firstName: row?.firstName || "",
-          lastName: row?.lastName || "",
-          village: findVillage?.selectedValues?.[0]?.value || "",
+          firstName: row?.firstName || '',
+          lastName: row?.lastName || '',
+          village: findVillage?.selectedValues?.[0]?.value || '',
         });
-      
       },
     },
   ];
@@ -472,9 +484,9 @@ const Learner = () => {
         checked={checked}
         open={open}
         onClose={() => setOpen(false)}
-        title={t("COMMON.DELETE_USER")}
-        primary={t("COMMON.DELETE_USER_WITH_REASON")}
-        secondary={t("COMMON.CANCEL")}
+        title={t('COMMON.DELETE_USER')}
+        primary={t('COMMON.DELETE_USER_WITH_REASON')}
+        secondary={t('COMMON.CANCEL')}
         reason={reason}
         onClickPrimary={userDelete}
       >
