@@ -38,7 +38,7 @@ export const ContentCreatorSearchSchema = {
   };
   
   export const ContentCreatorUISchema = {
-    'ui:order': ['state', 'searchKey', 'sortBy'],
+    'ui:order': ['state', 'searchKey', 'sortBy', 'status'],
   
     state: {
       'ui:widget': 'select',
@@ -49,6 +49,10 @@ export const ContentCreatorSearchSchema = {
     },
   
     sortBy: {
+      'ui:widget': 'select',
+    },
+
+    status: {
       'ui:widget': 'select',
     },
   };
