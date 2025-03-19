@@ -185,27 +185,20 @@ const LoginPage = () => {
         if (typeof window !== 'undefined' && window.localStorage) {
           if (userInfo) {
             if (userInfo?.customFields) {
-              const boardFields = userInfo.customFields.filter(
+              const boardField = userInfo.customFields.find(
                 (field: any) => field.label === 'BOARD'
               );
 
-              const boardValues = boardFields.length > 0
-                ? boardFields.flatMap((field: any) => field.value.split(',')).map((board: string) => board.trim())
-                : [];
+              const boardValues = boardField?.selectedValues || [];
 
-              // Check if boardValues is not empty
               if (boardValues.length > 0) {
                 console.log(boardValues);
-                localStorage.setItem(
-                  'userSpecificBoard',
-                  JSON.stringify(boardValues)
-                );
+                localStorage.setItem('userSpecificBoard', JSON.stringify(boardValues));
               } else {
-                console.log(
-                  'No BOARD field found in customFields. Skipping localStorage update.'
-                );
+                console.log('No BOARD field found in customFields. Skipping localStorage update.');
               }
             }
+
             localStorage.setItem('adminInfo', JSON.stringify(userInfo));
             const roleId = userInfo.tenantData?.[0]?.roleId || '';
             const roleName = userInfo.tenantData?.[0]?.roleName || '';

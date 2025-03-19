@@ -1,5 +1,4 @@
-export const BatchSearchSchema = 
-{
+export const BatchSearchSchema = {
   type: 'object',
   properties: {
     state: {
@@ -113,13 +112,11 @@ export const BatchSearchSchema =
       isMultiSelect: true,
       maxSelections: 1000,
     },
-    center: {
+    parentId: {
       type: 'string',
       title: 'CENTER',
-      coreField: 0,
-      fieldId: 'a7cf7617-79cd-455a-a9f6-6b00fe0a8eca',
       field_type: 'drop_down',
-      enum: ['select'],
+      enum: ['Select'],
       enumNames: ['Select'],
       api: {
         url: 'https://dev-interface.prathamdigital.org/interface/v1/cohort/search',
@@ -135,8 +132,8 @@ export const BatchSearchSchema =
           optionObj: 'result.results.cohortDetails',
         },
         payload: {
-          limit: '200',
-          offset: '0',
+          limit: 200,
+          offset: 0,
           filters: {
             status: ['active'],
           },
