@@ -38,7 +38,7 @@ export const StateLeadSearchSchema = {
   };
   
   export const StateLeadUISchema = {
-    'ui:order': ['state', 'searchKey', 'sortBy'],
+    'ui:order': ['state', 'searchKey', 'sortBy', 'status'],
   
     state: {
       'ui:widget': 'select',
@@ -49,6 +49,9 @@ export const StateLeadSearchSchema = {
     },
   
     sortBy: {
+      'ui:widget': 'select',
+    },
+    search: {
       'ui:widget': 'select',
     },
   };

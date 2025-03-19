@@ -700,6 +700,9 @@ const DynamicForm = ({
 
     if (hasObjectChanged(prevFormData.current, formData)) {
       if (changedField) {
+        //error set
+        console.log('errors', errors);
+        setSubmitted(false);
         //find out all dependent keys
         const dependentKeyArray = getDependentKeys(schema, changedField);
         // console.log('hasObjectChanged formData', formData);
@@ -890,9 +893,6 @@ const DynamicForm = ({
       // console.log('Form data changed:', formData);
       // live error
       setFormData(formData);
-      if (errors?.length > 0) {
-        setSubmitted(true);
-      }
 
       function getSkipKeys(skipHideObject, formData) {
         let skipKeys = [];
@@ -946,6 +946,12 @@ const DynamicForm = ({
     }
     const filteredData = filterFormData(hideAndSkipFields, formData);
     // console.log('formData', formData);
+    // console.log('######### filteredData', JSON.stringify(filteredData));
+    const cleanedData = Object.fromEntries(
+      Object.entries(filteredData).filter(
+        ([_, value]) => !Array.isArray(value) || value.length > 0
+      )
+    );
     //step-2 : Validate the form data
     function transformFormData(
       formData: Record<string, any>,
@@ -981,7 +987,7 @@ const DynamicForm = ({
     // Extra Field for cohort creation
 
     const transformedFormData = transformFormData(
-      filteredData,
+      cleanedData,
       schema,
       extraFields
     );
@@ -990,7 +996,7 @@ const DynamicForm = ({
     // console.log('Form Data Submitted:', filteredData);
     // console.log('formattedFormData', transformedFormData);
     if (!isCallSubmitInHandle) {
-      FormSubmitFunction(filteredData, transformedFormData);
+      FormSubmitFunction(cleanedData, transformedFormData);
     }
 
     //live validate error fix
@@ -1004,6 +1010,77 @@ const DynamicForm = ({
     }, 100);
   };
   // console.log(formSchema);
+
+  // Regex to Error Mapping
+  const patternErrorMessages = {
+    '^(?=.*[a-zA-Z])[a-zA-Z ]+$':
+      'FORM_ERROR_MESSAGES.NUMBER_AND_SPECIAL_CHARACTERS_NOT_ALLOWED',
+    '^[a-zA-Z][a-zA-Z ]*[a-zA-Z]$':
+      'FORM_ERROR_MESSAGES.NUMBER_AND_SPECIAL_CHARACTERS_NOT_ALLOWED',
+    '^[a-zA-Z0-9.@]+$':
+      'FORM_ERROR_MESSAGES.SPACE_AND_SPECIAL_CHARACTERS_NOT_ALLOWED',
+    '^[0-9]{10}$': 'FORM_ERROR_MESSAGES.ENTER_VALID_NUMBER',
+    '^d{10}$':
+      'FORM_ERROR_MESSAGES.CHARACTERS_AND_SPECIAL_CHARACTERS_NOT_ALLOWED',
+  };
+
+  // Dynamic custom validation
+  const customValidate = (formData, errors) => {
+    Object.keys(formSchema.properties).forEach((key) => {
+      const field = formSchema.properties[key];
+      const value = formData[key];
+
+      // Ensure errors[key] is defined
+      if (!errors[key]) {
+        errors[key] = {};
+      }
+      // ✅ Clear error if field is empty or invalid
+      if (!value || value === '' || value === null || value === undefined) {
+        if (errors[key]?.__errors) {
+          console.log('####### field', field);
+          console.log('####### value', value);
+          console.log('####### key', key);
+          errors[key].__errors = []; // ✅ Clear existing errors
+        }
+        delete errors[key]; // ✅ Completely remove errors if empty
+      } else if (field.pattern) {
+        // ✅ Validate pattern only if the field has a value
+        const patternRegex = new RegExp(field.pattern);
+        if (!patternRegex.test(value)) {
+          const errorMessage =
+            t(patternErrorMessages?.[field.pattern]) ||
+            `Invalid format for ${field.title || key}.`;
+
+          // ✅ Add only if pattern does not match
+          if (!errors[key].__errors) {
+            errors[key].__errors = [];
+          }
+          errors[key].__errors = [errorMessage];
+        } else {
+          // ✅ Clear errors if pattern matches
+          if (errors[key]?.__errors) {
+            errors[key].__errors = [];
+          }
+          delete errors[key]; // ✅ Remove errors if valid
+        }
+      }
+    });
+
+    return errors;
+  };
+
+  // Custom transformErrors to suppress required errors before submit
+  const transformErrors = (errors) => {
+    console.log('######### errors', JSON.stringify(errors));
+    let updatedError = errors;
+    if (!submitted) {
+      updatedError = errors.filter((error) => error.name !== 'required');
+    }
+    if (!submitted) {
+      updatedError = updatedError.filter((error) => error.name !== 'pattern');
+    }
+    return updatedError;
+  };
 
   return (
     <>
@@ -1021,6 +1098,8 @@ const DynamicForm = ({
           liveValidate //all validate live
           // liveValidate={submitted} // Only validate on submit or typing
           // onChange={() => setSubmitted(true)} // Show validation when user starts typing
+          customValidate={customValidate} // Dynamic Validation
+          transformErrors={transformErrors} // ✅ Suppress default pattern errors
           widgets={widgets}
           id="dynamic-form-id"
         />
@@ -1044,12 +1123,14 @@ const DynamicForm = ({
                 // }}
                 // noHtml5Validate //disable auto error pop up to field location
                 showErrorList={false} // Hides the error list card at the top
-                // liveValidate //all validate live
-                liveValidate={submitted} // Only validate on submit or typing
+                liveValidate //all validate live
+                // liveValidate={submitted} // Only validate on submit or typing
                 // onChange={() => setSubmitted(true)} // Show validation when user starts typing
                 // {...(isCallSubmitInHandle
                 //   ? { submitButtonProps: { style: { display: 'none' } } }
                 //   : {})}
+                customValidate={customValidate} // Dynamic Validation
+                transformErrors={transformErrors} // ✅ Suppress default pattern errors
                 widgets={widgets}
               >
                 {!isCallSubmitInHandle ? null : (

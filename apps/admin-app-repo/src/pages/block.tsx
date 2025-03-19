@@ -28,6 +28,7 @@ import deleteIcon from '../../public/images/deleteIcon.svg';
 import Image from 'next/image';
 import UserNameCell from '@/components/UserNameCell';
 import { fetchStateOptions } from '@/services/MasterDataService';
+import { transformLabel } from '@/utils/Helper';
 
 //import { DynamicForm } from '@shared-lib';
 
@@ -135,7 +136,7 @@ const Block = () => {
     {
       keys: ['block_name'],
       label: 'Block',
-      render: (row) => row.block_name,
+      render: (row) => transformLabel(row.block_name),
     },
     {
       keys: ['is_active'],

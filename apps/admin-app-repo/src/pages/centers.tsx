@@ -24,9 +24,13 @@ import {
   CohortSearchSchema,
   CohortSearchUISchema,
 } from '@/constant/Forms/CohortSearch';
-import { getCohortList } from '@/services/CohortService/cohortService';
+import {
+  fetchCohortMemberList,
+  getCohortList,
+} from '@/services/CohortService/cohortService';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import { updateCohort } from '@/services/MasterDataService';
+import { transformLabel } from '@/utils/Helper';
 
 //import { DynamicForm } from '@shared-lib';
 
@@ -46,10 +50,11 @@ const Centers = () => {
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [isEdit, setIsEdit] = useState(false);
   const [editableUserId, setEditableUserId] = useState('');
-  const [cohortId, setCohortId] = useState('')
+  const [cohortId, setCohortId] = useState('');
   const [tenantId, setTenantId] = useState('');
   const [open, setOpen] = useState(false);
-  const [firstName, setFirstName] = useState('')
+  const [firstName, setFirstName] = useState('');
+  const [totalCount, setTotalCount] = useState(0);
 
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
@@ -118,76 +123,102 @@ const Centers = () => {
     );
   };
 
-  // delete center logic 
+  // delete center logic
 
   const deleteCohort = async () => {
     try {
       const resp = await updateCohort(cohortId, { status: Status.ARCHIVED });
-      if (resp?.success) {
-        console.log("Cohort successfully archived.");
+      if (resp?.responseCode === 200) {
+        setResponse((prev) => ({
+          ...prev,
+          result: {
+            ...prev?.results,
+            cohortDetails: prev?.results?.cohortDetails?.filter(
+              (item) => item?.cohortId !== cohortId
+            ),
+          },
+        }));
+        console.log('Cohort successfully archived.');
       } else {
-        console.error("Failed to archive cohort:", resp);
+        console.error('Failed to archive cohort:', resp);
       }
 
       return resp;
     } catch (error) {
-      console.error("Error updating cohort:", error);
+      console.error('Error updating cohort:', error);
     }
   };
-
 
   // Define table columns
 
   const columns = [
-    { key: 'name', label: 'Center Name' },
+    {
+      key: 'name',
+      label: 'Center Name',
+      render: (row: any) => transformLabel(row.name),
+    },
     {
       key: 'address',
       label: 'Address',
       render: (row) =>
-        row.customFields.find((field) => field.label === 'ADDRESS')
-          ?.selectedValues || '-',
+        transformLabel(
+          row.customFields.find((field) => field.label === 'ADDRESS')
+            ?.selectedValues
+        ) || '-',
     },
     {
       key: 'state',
       label: 'State',
       render: (row) =>
-        row.customFields.find((field) => field.label === 'STATE')
-          ?.selectedValues[0]?.value || '-',
+        transformLabel(
+          row.customFields.find((field) => field.label === 'STATE')
+            ?.selectedValues[0]?.value
+        ) || '-',
     },
     {
       key: 'district',
       label: 'District',
       render: (row) =>
-        row.customFields.find((field) => field.label === 'DISTRICT')
-          ?.selectedValues[0]?.value || '-',
+        transformLabel(
+          row.customFields.find((field) => field.label === 'DISTRICT')
+            ?.selectedValues[0]?.value
+        ) || '-',
     },
     {
       key: 'block',
       label: 'Block',
       render: (row) =>
-        row.customFields.find((field) => field.label === 'BLOCK')
-          ?.selectedValues[0]?.value || '-',
+        transformLabel(
+          row.customFields.find((field) => field.label === 'BLOCK')
+            ?.selectedValues[0]?.value
+        ) || '-',
     },
     {
       key: 'village',
       label: 'Village',
       render: (row) =>
-        row.customFields.find((field) => field.label === 'VILLAGE')
-          ?.selectedValues[0]?.value || '-',
+        transformLabel(
+          row.customFields.find((field) => field.label === 'VILLAGE')
+            ?.selectedValues[0]?.value
+        ) || '-',
     },
     {
       key: 'board',
       label: 'Boards',
       render: (row) =>
-        row.customFields.find((field) => field.label === 'BOARD')
-          ?.selectedValues[0] || '-',
+        transformLabel(
+          row.customFields.find((field) => field.label === 'BOARD')
+            ?.selectedValues[0]
+        ) || '-',
     },
     {
       key: 'medium',
       label: 'Medium',
       render: (row) =>
-        row.customFields.find((field) => field.label === 'MEDIUM')
-          ?.selectedValues[0] || '-',
+        transformLabel(
+          row.customFields.find((field) => field.label === 'MEDIUM')
+            ?.selectedValues[0]
+        ) || '-',
     },
   ];
 
@@ -240,23 +271,20 @@ const Centers = () => {
       callback: async (row: any) => {
         console.log('row:', row);
         setEditableUserId(row?.userId);
-        setCohortId(row?.cohortId)
-        // const memberStatus = Status.ARCHIVED;
-        // const statusReason = '';
-        // const membershipId = row?.userId;
+        setCohortId(row?.cohortId);
 
-        //Call delete cohort api
+        const data = {
+          filters: {
+            cohortId: row?.cohortId,
+          },
+          status: ['active'],
+        };
+        const response = await fetchCohortMemberList(data);
 
-        // const response = await updateCohortMemberStatus({
-        //   memberStatus,
-        //   statusReason,
-        //   membershipId,
-        // });
-        // setPrefilledFormData({});
-        // searchData(prefilledFormData, currentPage);
-        // setOpenModal(false);
+        let totalCount = response?.result?.totalCount;
+        setTotalCount(totalCount);
         setOpen(true);
-        setFirstName(row?.name)
+        setFirstName(row?.name);
       },
     },
   ];
@@ -384,21 +412,23 @@ const Centers = () => {
           </Box>
         )}
       </Box>
-      <ConfirmationPopup
-        open={open}
-        onClose={() => setOpen(false)}
-        title={`Are you sure you want to delete ${firstName} center?`}
-        centerPrimary={t("COMMON.YES")}
-        secondary={t("COMMON.CANCEL")}
-        onClickPrimary={deleteCohort}
-      ></ConfirmationPopup>
-
-      {/* <ConfirmationPopup
-        open={open}
-        onClose={() => setOpen(false)}
-        title={`You can't delete the center because it has 2 Active Learners`}
-        secondary={'Cancel'}
-      ></ConfirmationPopup> */}
+      {totalCount > 0 ? (
+        <ConfirmationPopup
+          open={open}
+          onClose={() => setOpen(false)}
+          title={`You can't delete the center because it has ${totalCount} Active Learners`}
+          secondary={'Cancel'}
+        />
+      ) : (
+        <ConfirmationPopup
+          open={open}
+          onClose={() => setOpen(false)}
+          title={`Are you sure you want to delete ${firstName} center?`}
+          centerPrimary={t('COMMON.YES')}
+          secondary={t('COMMON.CANCEL')}
+          onClickPrimary={deleteCohort}
+        />
+      )}
     </>
   );
 };

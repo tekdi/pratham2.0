@@ -55,6 +55,7 @@ export enum Role {
 export enum TenantName {
   SECOND_CHANCE_PROGRAM = 'Second Chance Program',
   YOUTHNET = 'YouthNet',
+  POS = 'Open School'
 }
 
 export enum Status {
@@ -101,20 +102,20 @@ export enum FormContextType {
 }
 
 export enum RoleId {
-  STUDENT = "493c04e2-a9db-47f2-b304-503da358d5f4",
-  TEACHER = "3bde0028-6900-4900-9d05-eeb608843718",
-  TEAM_LEADER = "9dd9328f-1bc7-444f-96e3-c5e1daa3514a",
-  ADMIN = "ee482faf-8a41-45fe-9656-5533dd6a787c",
-  SCTA = "f972a14e-afdb-4502-8ede-cf1fcf171e46",
+  STUDENT = 'eea7ddab-bdf9-4db1-a1bb-43ef503d65ef',
+  TEACHER = 'a5f1dbc9-2ad4-442c-b762-0e3fc1f6c6da',
+  TEAM_LEADER = 'c4454929-954e-4c51-bb7d-cca834ab9375',
+  ADMIN = 'ee482faf-8a41-45fe-9656-5533dd6a787c',
+  SCTA = 'f972a14e-afdb-4502-8ede-cf1fcf171e46',
   CONTENT_CREATOR = '45b8b0d7-e5c6-4f3f-a7bf-70f86e9357ce',
   CONTENT_REVIEWER = '2dc13fcc-29c4-42c1-b125-82d3dcaa4b42',
-  STATE_LEAD = '4a3493aa-a4f7-4e2b-b141-f213084b5599'
+  STATE_LEAD = '4a3493aa-a4f7-4e2b-b141-f213084b5599',
 }
 
 export enum RoleName {
   CONTENT_CREATOR = 'Content creator',
   CONTENT_REVIEWER = 'Content reviewer',
-  STATE_LEAD = 'State Lead'
+  STATE_LEAD = 'State Lead',
 }
 
 export enum DataKey {
