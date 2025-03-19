@@ -121,8 +121,8 @@ const Index = () => {
         })
       );
       setDistrictData(transformedData);
-      setSelectedDistrictValue(transformedData[0]?.id);
-      const controllingfieldfk = [transformedData[0]?.id?.toString()];
+      setSelectedDistrictValue(transformedData?.[0]?.id);
+      const controllingfieldfk = [transformedData?.[0]?.id?.toString()];
       const fieldName = 'block';
       const blockResponce = await getStateBlockDistrictList({
         controllingfieldfk,
@@ -327,7 +327,7 @@ const Index = () => {
     
     router.push({
       pathname: `/villageDetails/${name}`,
-      query: { id: Id ,  blockId:selectedBlockValue
+      query: { id: Id ,  blockId:selectedBlockValue, tab: value
       },
     });
   };
@@ -428,7 +428,15 @@ const Index = () => {
   };
 
   const handleUserClick = (userId: any) => {
-    router.push(`/user-profile/${userId}`);
+   
+    router.push({
+      pathname: `/user-profile/${userId}`,
+      query: {
+        tab: value,
+        blockId: selectedBlockValue,
+        villageId: selectedVillageValue
+      },
+    }); 
   };
 
   const handleToggledUserClick = (name: any, Id?:any) => {
