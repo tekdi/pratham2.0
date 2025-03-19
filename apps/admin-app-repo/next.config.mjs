@@ -57,8 +57,8 @@ const nextConfig = {
         destination: "/api/fileUpload",
       },
       {
-        source: "/mfe_workspace/workspace/content/assets/:path*",
-        destination: `/assets/:path*`,
+        source: "/mfe_workspace/workspace/content/assets/pdfjs/:path*",
+        destination: "/assets/pdfjs/:path*",
       },
       {
         source: "/workspace/content/assets/:path*",
