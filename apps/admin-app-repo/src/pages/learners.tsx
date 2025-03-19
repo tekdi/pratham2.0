@@ -76,7 +76,7 @@ const Learner = () => {
 
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
-    ? { state: localStorage.getItem('stateId') }
+    ? { state: [localStorage.getItem('stateId')] }
     : {};
 
   useEffect(() => {
@@ -157,6 +157,16 @@ const Learner = () => {
       render: (row: any) => transformLabel(row.status),
       getStyle: (row) => ({ color: row.status === 'active' ? 'green' : 'red' }),
     },
+    {
+      keys: ['gender'],
+      label: 'Gender',
+      render: (row) => transformLabel(row.gender) || '',
+    },
+    {
+      keys: ['mobile'],
+      label: 'Mobile',
+      render: (row) => transformLabel(row.mobile) || '',
+    },
     // {
     //   key: 'STATE',
     //   label: 'State',
@@ -172,21 +182,29 @@ const Learner = () => {
       label: 'Location (State / District / Block/ Village)',
       render: (row: any) => {
         const state =
-        transformLabel(row.customFields.find(
-            (field: { label: string }) => field.label === 'STATE'
-          )?.selectedValues[0]?.value) || '';
+          transformLabel(
+            row.customFields.find(
+              (field: { label: string }) => field.label === 'STATE'
+            )?.selectedValues[0]?.value
+          ) || '';
         const district =
-        transformLabel(row.customFields.find(
-            (field: { label: string }) => field.label === 'DISTRICT'
-          )?.selectedValues[0]?.value) || '';
+          transformLabel(
+            row.customFields.find(
+              (field: { label: string }) => field.label === 'DISTRICT'
+            )?.selectedValues[0]?.value
+          ) || '';
         const block =
-        transformLabel(row.customFields.find(
-            (field: { label: string }) => field.label === 'BLOCK'
-          )?.selectedValues[0]?.value) || '';
+          transformLabel(
+            row.customFields.find(
+              (field: { label: string }) => field.label === 'BLOCK'
+            )?.selectedValues[0]?.value
+          ) || '';
         const village =
-        transformLabel(row.customFields.find(
-            (field: { label: string }) => field.label === 'VILLAGE'
-          )?.selectedValues[0]?.value) || '';
+          transformLabel(
+            row.customFields.find(
+              (field: { label: string }) => field.label === 'VILLAGE'
+            )?.selectedValues[0]?.value
+          ) || '';
         return `${state == '' ? '' : `${state}`}${
           district == '' ? '' : `, ${district}`
         }${block == '' ? '' : `, ${block}`}${
