@@ -53,7 +53,7 @@ const Centers = () => {
   const [tenantId, setTenantId] = useState('');
   const [open, setOpen] = useState(false);
   const [firstName, setFirstName] = useState('');
-  const [totalCount, setTotalCount] = useState();
+  const [totalCount, setTotalCount] = useState(0);
 
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
@@ -125,18 +125,8 @@ const Centers = () => {
   // delete center logic
 
   const deleteCohort = async () => {
-    const data = {
-      filters: {
-        cohortId: cohortId,
-      },
-      status: ['active'],
-    };
-    const response = await fetchCohortMemberList(data);
-
-    setTotalCount(response?.result);
-
     try {
-      // const resp = await updateCohort(cohortId, { status: Status.ARCHIVED });
+      const resp = await updateCohort(cohortId, { status: Status.ARCHIVED });
       if (resp?.responseCode === 200) {
         setResponse((prev) => ({
           ...prev,
@@ -263,20 +253,17 @@ const Centers = () => {
         console.log('row:', row);
         setEditableUserId(row?.userId);
         setCohortId(row?.cohortId);
-        // const memberStatus = Status.ARCHIVED;
-        // const statusReason = '';
-        // const membershipId = row?.userId;
 
-        //Call delete cohort api
+        const data = {
+          filters: {
+            cohortId: row?.cohortId,
+          },
+          status: ['active'],
+        };
+        const response = await fetchCohortMemberList(data);
 
-        // const response = await updateCohortMemberStatus({
-        //   memberStatus,
-        //   statusReason,
-        //   membershipId,
-        // });
-        // setPrefilledFormData({});
-        // searchData(prefilledFormData, currentPage);
-        // setOpenModal(false);
+        let totalCount = response?.result?.totalCount
+        setTotalCount(totalCount);
         setOpen(true);
         setFirstName(row?.name);
       },
