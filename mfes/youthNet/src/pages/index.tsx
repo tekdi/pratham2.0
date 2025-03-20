@@ -125,22 +125,33 @@ const villageIds=villages?.map((item: any) => item.id) || []
 setVillageCount(villageIds?.length)
         const response = await getYouthDataByDate(new Date(), new Date(), villageIds);
         if(response?.totalCount)
-        setTodaysRegistrationCount(response?.totalCount);
+        {
+          setTodaysRegistrationCount(response?.totalCount);
         //  const youthData=response.getUserDetails.find((item:any)=>{
         //    return item.role==="Content creator"
         //  })
         const youthData = filterUsersByAge(response.getUserDetails);
+        //console.log()
+
         const transformedAbove18 = youthData?.above18.map((user: any) => {
           let name = user.firstName || "";
           if (user.lastName) {
               name += ` ${user.lastName}`;
           }
+          const villageResult = user.customFields?.find(
+            (item: any) => item.label === 'VILLAGE'
+          );
+          const villageValues = villageResult?.selectedValues.map(
+            (village: any) => village.value
+          );
+
           return {
               Id: user.userId,
               name: name.trim() ,
               dob:user?.dob ,
             firstName:user?.firstName,
-            lastName:user?.lastName// Ensures there are no extra spaces if lastName is missing
+            lastName:user?.lastName,
+            villageNames:villageValues
           };
       });
       const transformedBelow18 = youthData?.below18.map((user: any) => {
@@ -148,12 +159,19 @@ setVillageCount(villageIds?.length)
         if (user.lastName) {
             name += ` ${user.lastName}`;
         }
+        const villageResult = user.customFields?.find(
+          (item: any) => item.label === 'VILLAGE'
+        );
+        const villageValues = villageResult?.selectedValues.map(
+          (village: any) => village.value
+        );
         return {
             Id: user.userId,
             name: name.trim(),
             dob:user.dob ,
             firstName:user?.firstName,
-            lastName:user?.lastName// Ensures there are no extra spaces if lastName is missing
+            lastName:user?.lastName,
+            villageNames:villageValues
         };
     });
         setAboveEighteenUsers(transformedAbove18);
@@ -170,19 +188,28 @@ setVillageCount(villageIds?.length)
             user.customFields.forEach((field: any) => {
               if (field.label === 'VILLAGE') {
                 field.selectedValues.forEach((value: any) => {
-                  villageMap.set(value.id, value.value); // Ensures unique villages by ID
+                  villageMap.set(value.id, value.value);
+                //  userVillageMap[user.userId] = value.value; // Ensures unique villages by ID
                 });
               }
             });
           }
         });
-
         const uniqueVillages = Array.from(villageMap, ([id, value]) => ({
           id,
           value,
         }));
         setRegisteredVillages(uniqueVillages);
-      } catch (error) {
+ 
+        }
+        else{
+          setTodaysRegistrationCount(0)
+          setRegisteredVillages([])
+          setAboveEighteenUsers([])
+          setBelowEighteenUsers([])
+        }
+            } catch (error) {
+              
         console.log(error);
       }
       // setUserData(data);
