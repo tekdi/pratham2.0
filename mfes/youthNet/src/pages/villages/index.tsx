@@ -63,6 +63,8 @@ const Index = () => {
   const theme = useTheme<any>();
   const router = useRouter();
   const { villageId, tab, blockId } = router.query;
+
+// const blockId: blockResult?.selectedValues[0]?.id
   const [value, setValue] = useState<number>(
     tab? Number(tab)  :  YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() ? 1 : 2
   );
@@ -121,8 +123,8 @@ const Index = () => {
         })
       );
       setDistrictData(transformedData);
-      setSelectedDistrictValue(transformedData[0]?.id);
-      const controllingfieldfk = [transformedData[0]?.id?.toString()];
+      setSelectedDistrictValue(transformedData?.[0]?.id);
+      const controllingfieldfk = [transformedData?.[0]?.id?.toString()];
       const fieldName = 'block';
       const blockResponce = await getStateBlockDistrictList({
         controllingfieldfk,
@@ -137,12 +139,15 @@ const Index = () => {
         })
       );
       setBlockData(transformedBlockData);
-      setSelectedBlockValue(blockId? blockId:transformedBlockData[0]?.id);
+      setSelectedBlockValue(blockId?  blockId:transformedBlockData[0]?.id);
     };
     getData();
   }, [blockId, villageId]);
   useEffect(() => {
+    try{
     const getSortedData = (data: any, sortOrderType: any) => {
+      setLoading(true)
+
       switch (sortOrderType) {
         case SortOrder.ASC:
           return [...data].sort((a, b) => a.name.localeCompare(b.name));
@@ -172,14 +177,24 @@ const Index = () => {
     let filteredData = [];
     if (value === 1) {
       filteredData = filterData(mentorList, searchInput);
+      const data=getSortedData(filteredData, appliedFilters?.sortOrder)
       setFilteredmentorList(getSortedData(filteredData, appliedFilters?.sortOrder));
+       setMentorCount(data.length)
     } else if (value === 2) {
       filteredData = filterData(villageListWithUsers, searchInput);
+      const data=getSortedData(filteredData, appliedFilters?.sortOrder)
       setFilteredVillageListWithUsers(getSortedData(filteredData, appliedFilters?.sortOrder));
+      setVillageCount(data.length)
     } else if (value === 3) {
       filteredData = filterData(youthList, searchInput);
       setFilteredYouthList(getSortedData(filteredData, appliedFilters?.sortOrder));
     }
+    setLoading(false)
+  }
+  catch(e)
+  {
+    setLoading(false)
+  }
   }, [searchInput, appliedFilters, value]);
   
   useEffect(() => {
@@ -283,13 +298,13 @@ const Index = () => {
             (user: any) => {
               let name = user.firstName || '';
               const villageField = user?.customFields?.find(
-                (field: any) => field.label === cohortHierarchy.BLOCK
+                (field: any) => field.label === cohortHierarchy.VILLAGE
               );
               const blockField = user?.customFields?.find(
                 (field: any) => field.label === cohortHierarchy.BLOCK
               );
               const blockValues = blockField?.selectedValues.map(
-                (block: any) => block.value
+                (block: any) => {block.value}
               );
 
               if (user.lastName) {
@@ -324,10 +339,11 @@ const Index = () => {
     getMentorData();
   }, [selectedDistrictValue,  value]);
   const handleLocationClick = (Id: any, name: any) => {
-    
+    console.log(selectedBlockValue)
+   
     router.push({
       pathname: `/villageDetails/${name}`,
-      query: { id: Id ,  blockId:selectedBlockValue
+      query: { id: Id ,  blockId:selectedBlockValue, tab: value
       },
     });
   };
@@ -373,7 +389,13 @@ const Index = () => {
     };
     if (villageList?.length !== 0) getVillageYouthData();
   }, [villageList, selectedBlockValue]);
+//   useEffect(() => {
+//     setSelectedVillageValue(villageId);
+//     setSelectedBlockValue(blockId)
 
+//   }
+      
+// , [blockId, villageId]);
   useEffect(() => {
     const getVillageList = async () => {
       try {
@@ -383,7 +405,14 @@ const Index = () => {
             ? JSON.parse(villageDataString)
             : null;
           setVillageList(villageData);
-          setSelectedVillageValue(villageId? villageId: villageData[0]?.Id);
+          if(selectedBlockValue===blockId)
+          {
+            setSelectedVillageValue(villageId);
+
+          }
+        else          
+        setSelectedVillageValue(villageData[0]?.Id);
+
 
           setVillageCount(villageData.length);
         } else if (selectedBlockValue !== '') {
@@ -403,7 +432,13 @@ const Index = () => {
           setVillageCount(transformedVillageData.length);
 
           setVillageList(transformedVillageData);
-          setSelectedVillageValue(villageId? villageId:transformedVillageData[0]?.Id);
+          if(selectedBlockValue===blockId)
+            {
+              setSelectedVillageValue(villageId);
+  
+            }
+          else          
+          setSelectedVillageValue(transformedVillageData[0]?.Id);
         }
       } catch (error) {
         console.log(error);
@@ -411,7 +446,7 @@ const Index = () => {
     };
 
     getVillageList();
-  }, [selectedBlockValue]);
+  }, [selectedBlockValue, blockId, villageId]);
   useEffect(() => {
     setValue(  tab? Number(tab)  : YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() ? 1 : 2);
   }, []);
@@ -428,7 +463,15 @@ const Index = () => {
   };
 
   const handleUserClick = (userId: any) => {
-    router.push(`/user-profile/${userId}`);
+   
+    router.push({
+      pathname: `/user-profile/${userId}`,
+      query: {
+        tab: value,
+        blockId: selectedBlockValue,
+        villageId: selectedVillageValue
+      },
+    }); 
   };
 
   const handleToggledUserClick = (name: any, Id?:any) => {
@@ -755,13 +798,13 @@ const Index = () => {
                 px: '20px',
               }}
             >
-              {!loading && filteredmentorList.length!==0 ?(<UserList
+              {filteredmentorList.length!==0 ?(<UserList
                 layout="list"
                 users={filteredmentorList}
                 onUserClick={handleUserClick}
                 onToggleUserClick={handleToggledMentorClick}
               />):
-              (filteredmentorList.length===0?
+              (filteredmentorList.length===0 && !loading?
                ( <>
              
                <Typography
@@ -957,6 +1000,8 @@ const Index = () => {
               showAssignmentScreen={showAssignmentScreen}
               formData={formData}
               setFormData={setFormData}
+              onClose={onClose}
+
               />
             </SimpleModal>
           </>
@@ -1105,12 +1150,12 @@ const Index = () => {
               }}
             >
               
-{!loading && filteredvillageListWithUsers.length!==0 ?(  <UserList
+{filteredvillageListWithUsers.length!==0 ?(  <UserList
                   layout="list"
                   users={filteredvillageListWithUsers}
                   onUserClick={handleLocationClick}
                 />):
-              (filteredvillageListWithUsers.length===0?
+              (filteredvillageListWithUsers.length===0 && !loading ?
                ( <>
              
                <Typography
@@ -1229,14 +1274,14 @@ const Index = () => {
                 mt: '15px',
               }}
             >
-            {!loading && filteredyouthList.length!==0 ?( <UserList
+            {  filteredyouthList.length!==0 ?( <UserList
                 layout="list"
                 users={filteredyouthList}
                 onUserClick={handleUserClick}
                 onToggleUserClick={handleToggledUserClick}
                 // showMore={true}
               />):
-              (filteredyouthList.length===0?
+              (filteredyouthList.length===0 && !loading?
                ( <>
              
                <Typography

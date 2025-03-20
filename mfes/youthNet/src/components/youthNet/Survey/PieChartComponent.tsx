@@ -8,11 +8,8 @@ interface PieChartComponentProps {
 }
 
 const ageGroups = [
-  { name: "10-15", color: "#26A69A" },
-  { name: "15-20", color: "#6200EE" },
-  { name: "20-25", color: "#FFC107" },
-  { name: "25-30", color: "#EE6002" },
-  { name: "30+", color: "#FF33A8" },
+  { name: "Below 18", color: "#FFC107" },
+  { name: "18 & Above", color: "#6200EE" },
 ];
 
 const genderColors = {
@@ -24,11 +21,10 @@ const processAgeData = (data: { name: string; value: number }[]) => {
   return data.map((entry) => {
     const age = parseInt(entry.name);
     let group = ageGroups.find(({ name }) => {
-      if (name.includes("+")) return age >= 30;
-      const [min, max] = name.split("-").map(Number);
-      return age >= min && age < max;
+      if (name === "Below 18") return age < 18;
+      return age >= 18;
     });
-    return { ...entry, color: group?.color || "#000" };
+    return { ...entry, color: group?.color || "#000", name: group?.name || entry.name };
   });
 };
 
@@ -56,7 +52,7 @@ const PieChartComponent: React.FC<PieChartComponentProps> = ({ title, data }) =>
           </Pie>
         </PieChart>
         {title === "Age" && (
-          <Box >
+          <Box>
             <Typography variant="subtitle1">Age Group Colors:</Typography>
             {ageGroups.map(({ name, color }) => (
               <Box key={name} display="flex" alignItems="center">
@@ -67,7 +63,7 @@ const PieChartComponent: React.FC<PieChartComponentProps> = ({ title, data }) =>
           </Box>
         )}
         {title === "Gender" && (
-          <Box >
+          <Box>
             <Typography variant="subtitle1">Gender Colors:</Typography>
             {Object.entries(genderColors).map(([name, color]) => (
               <Box key={name} display="flex" alignItems="center">

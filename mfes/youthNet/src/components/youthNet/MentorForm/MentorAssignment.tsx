@@ -28,13 +28,16 @@ interface MentorAssignmentProps {
   formData: any,
   setFormData: any
   FormSubmitFunction: FormSubmitFunctionType;
+  onClose:any
 }
 const MentorAssignment: React.FC<MentorAssignmentProps> = ({
   showAssignmentScreen,
   setShowAssignmentScreen,
   FormSubmitFunction,
   formData,
-  setFormData
+  setFormData,
+  onClose
+
 }) => {
   const [selectedBlock, setSelectedBlock] = useState<{
     id: string;
@@ -122,6 +125,8 @@ const MentorAssignment: React.FC<MentorAssignmentProps> = ({
             email: sendTo,
           });
           if (response?.email?.data[0]?.result === "Email notification sent successfully") {
+            onClose()
+
            
                     showToastMessage(t("MENTOR.MENTOR_CREATED_SUCCESSFULLY"), "success");
             
@@ -129,18 +134,22 @@ const MentorAssignment: React.FC<MentorAssignmentProps> = ({
           else
           {
             console.log(" not checked")
+            onClose()
+            showToastMessage(t('MENTOR.FAILED_TO_SEND_EMAIL'), 'error');
 
-            showToastMessage(
-              t("MENTOR.EMAIL.ALREADY_EXIST"),
-              'error'
-            );
           }
         }
       }
-    } catch (e) {
-      showToastMessage(t('MENTOR.MENTOR_CREATED_FAILED'), 'error');
+    } catch (error: any) {
+      if (error?.response?.data?.params?.err === "User already exist.") {
+        showToastMessage(error?.response?.data?.params?.err, "error");
+      } 
+      else
+      {
+        onClose()
 
-      console.log(e);
+      }
+     
     }
   };
 

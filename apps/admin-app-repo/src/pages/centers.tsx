@@ -30,6 +30,7 @@ import {
 } from '@/services/CohortService/cohortService';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import { updateCohort } from '@/services/MasterDataService';
+import { transformLabel } from '@/utils/Helper';
 import { useTheme } from "@mui/material/styles";
 import AddIcon from "@mui/icons-material/Add";
 
@@ -60,7 +61,7 @@ const Centers = () => {
 
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
-    ? { state: localStorage.getItem('stateId') }
+    ? { state: [localStorage.getItem('stateId')] }
     : {};
 
   useEffect(() => {
@@ -154,55 +155,73 @@ const Centers = () => {
   // Define table columns
 
   const columns = [
-    { key: 'name', label: 'Center Name' },
+    {
+      key: 'name',
+      label: 'Center Name',
+      render: (row: any) => transformLabel(row.name),
+    },
     {
       key: 'address',
       label: 'Address',
       render: (row) =>
-        row.customFields.find((field) => field.label === 'ADDRESS')
-          ?.selectedValues || '-',
+        transformLabel(
+          row.customFields.find((field) => field.label === 'ADDRESS')
+            ?.selectedValues
+        ) || '-',
     },
     {
       key: 'state',
       label: 'State',
       render: (row) =>
-        row.customFields.find((field) => field.label === 'STATE')
-          ?.selectedValues[0]?.value || '-',
+        transformLabel(
+          row.customFields.find((field) => field.label === 'STATE')
+            ?.selectedValues[0]?.value
+        ) || '-',
     },
     {
       key: 'district',
       label: 'District',
       render: (row) =>
-        row.customFields.find((field) => field.label === 'DISTRICT')
-          ?.selectedValues[0]?.value || '-',
+        transformLabel(
+          row.customFields.find((field) => field.label === 'DISTRICT')
+            ?.selectedValues[0]?.value
+        ) || '-',
     },
     {
       key: 'block',
       label: 'Block',
       render: (row) =>
-        row.customFields.find((field) => field.label === 'BLOCK')
-          ?.selectedValues[0]?.value || '-',
+        transformLabel(
+          row.customFields.find((field) => field.label === 'BLOCK')
+            ?.selectedValues[0]?.value
+        ) || '-',
     },
     {
       key: 'village',
       label: 'Village',
       render: (row) =>
-        row.customFields.find((field) => field.label === 'VILLAGE')
-          ?.selectedValues[0]?.value || '-',
+        transformLabel(
+          row.customFields.find((field) => field.label === 'VILLAGE')
+            ?.selectedValues[0]?.value
+        ) || '-',
     },
     {
       key: 'board',
       label: 'Boards',
       render: (row) =>
-        row.customFields.find((field) => field.label === 'BOARD')
-          ?.selectedValues[0] || '-',
+        transformLabel(
+          row.customFields.find((field) => field.label === 'BOARD')
+            ?.selectedValues[0]
+        ) || '-',
     },
     {
       key: 'medium',
       label: 'Medium',
       render: (row) =>
-        row.customFields.find((field) => field.label === 'MEDIUM')
-          ?.selectedValues[0] || '-',
+        transformLabel(
+          row.customFields.find((field) => field.label === 'MEDIUM')
+            ?.selectedValues[0]
+        ) || '-',
     },
   ];
 
@@ -265,7 +284,7 @@ const Centers = () => {
         };
         const response = await fetchCohortMemberList(data);
 
-        let totalCount = response?.result?.totalCount
+        let totalCount = response?.result?.totalCount;
         setTotalCount(totalCount);
         setOpen(true);
         setFirstName(row?.name);
@@ -412,15 +431,14 @@ const Centers = () => {
           secondary={'Cancel'}
         />
       ) : (
-       
-      <ConfirmationPopup
-        open={open}
-        onClose={() => setOpen(false)}
-        title={`Are you sure you want to delete ${firstName} center?`}
-        centerPrimary={t('COMMON.YES')}
-        secondary={t('COMMON.CANCEL')}
-        onClickPrimary={deleteCohort}
-      />
+        <ConfirmationPopup
+          open={open}
+          onClose={() => setOpen(false)}
+          title={`Are you sure you want to delete ${firstName} center?`}
+          centerPrimary={t('COMMON.YES')}
+          secondary={t('COMMON.CANCEL')}
+          onClickPrimary={deleteCohort}
+        />
       )}
     </>
   );

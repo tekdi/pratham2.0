@@ -754,8 +754,8 @@
     "TOTAL_COUNT_NEW_REGISTRATION":"Total Count (+ New Registrations today)",
     "NEW_REGISTRATION":"New Registrations Today",
     "YOUTH_JOINERS":"Youth joiners",
-    "OLD_JOINER_FIRST":"New joiners first",
-    "NEW_JOINER_FIRST":"Old joiners first",
+    "OLD_JOINER_FIRST":"Old joiners first",
+    "NEW_JOINER_FIRST":"New joiners first",
     "TOTAL_COUNT_YOUTH":"Total Count of Youth",
     "MARK_AS_VOLUNTEER_SUCCESSFULLY":"Successfully mark youth as a volunteer",
     "MARK_AS_VOLUNTEER_FAILED":"Failed to mark youth as a volunteer"

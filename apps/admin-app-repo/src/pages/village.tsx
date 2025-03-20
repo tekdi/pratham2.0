@@ -29,6 +29,7 @@ import {
   MasterVillageSchema,
   MasterVillageUISchema,
 } from '../constant/Forms/MasterVillageSearch';
+import { transformLabel } from '@/utils/Helper';
 
 //import { DynamicForm } from '@shared-lib';
 
@@ -54,7 +55,7 @@ const Village = () => {
 
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
-    ? { state: localStorage.getItem('stateId') }
+    ? { state: [localStorage.getItem('stateId')] }
     : {};
 
   useEffect(() => {
@@ -143,7 +144,7 @@ const Village = () => {
     {
       keys: ['village_name'],
       label: 'Village',
-      render: (row) => row.village_name,
+      render: (row) => transformLabel(row.village_name),
     },
     {
       keys: ['is_active'],

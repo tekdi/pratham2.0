@@ -7,7 +7,7 @@ import {
   MentorSearchSchema,
   MentorSearchUISchema,
 } from '../constant/Forms/MentorSearch';
-import { Status } from '@/utils/app.constant';
+import { RoleId, Status } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
 import {
   Box,
@@ -34,6 +34,7 @@ import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
 import { deleteUser } from '@/services/UserService';
+import { transformLabel } from '@/utils/Helper';
 import { getCohortList } from '@/services/GetCohortList';
 import { useTheme } from "@mui/material/styles";
 import AddIcon from "@mui/icons-material/Add";
@@ -61,19 +62,18 @@ const Mentor = () => {
   const [tenantId, setTenantId] = useState('');
   const [open, setOpen] = useState(false);
   const [checked, setChecked] = useState(false);
-  const [userID, setUserId] = useState("")
+  const [userID, setUserId] = useState('');
   const [userData, setUserData] = useState({
-    firstName: "",
-    lastName: "",
-    village: "",
+    firstName: '',
+    lastName: '',
+    village: '',
   });
-  const [reason, setReason] = useState("");
-  const [memberShipID, setMemberShipID] = useState('')
-
+  const [reason, setReason] = useState('');
+  const [memberShipID, setMemberShipID] = useState('');
 
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
-    ? { state: localStorage.getItem('stateId') }
+    ? { state: [localStorage.getItem('stateId')] }
     : {};
 
   useEffect(() => {
@@ -103,7 +103,7 @@ const Mentor = () => {
 
     setPrefilledAddFormData(initialFormData);
     setPrefilledFormData(initialFormData);
-    setRoleID(localStorage.getItem('roleId'));
+    setRoleID(RoleId.TEACHER);
     setTenantId(localStorage.getItem('tenantId'));
     fetchData();
   }, []);
@@ -121,7 +121,11 @@ const Mentor = () => {
   };
 
   const searchData = async (formData: any, newPage: any) => {
-    const staticFilter = { role: 'Instructor', status: 'active' };
+    const staticFilter = {
+      role: 'Instructor',
+      status: 'active',
+      tenantId: localStorage.getItem('tenantId'),
+    };
 
     const { sortBy } = formData;
     const staticSort = ['firstName', sortBy || 'asc'];
@@ -144,16 +148,27 @@ const Mentor = () => {
       keys: ['firstName', 'middleName', 'lastName'],
       label: 'Mentor Name',
       render: (row: any) =>
-        `${row.firstName || ''} ${row.middleName || ''} ${
-          row.lastName || ''
-        }`.trim(),
+        `${transformLabel(row.firstName) || ''} ${
+          transformLabel(row.middleName) || ''
+        } ${transformLabel(row.lastName) || ''}`.trim(),
     },
     {
       key: 'status',
       label: 'Status',
+      render: (row: any) => transformLabel(row.status),
       getStyle: (row: any) => ({
         color: row.status === 'active' ? 'green' : 'red',
       }),
+    },
+    {
+      keys: ['gender'],
+      label: 'Gender',
+      render: (row) => transformLabel(row.gender) || '',
+    },
+    {
+      keys: ['mobile'],
+      label: 'Mobile',
+      render: (row) => transformLabel(row.mobile) || '',
     },
     // {
     //   key: 'STATE',
@@ -170,21 +185,29 @@ const Mentor = () => {
       label: 'Location (State / District / Block/ Village)',
       render: (row: any) => {
         const state =
-          row.customFields.find(
-            (field: { label: string }) => field.label === 'STATE'
-          )?.selectedValues[0]?.value || '';
+          transformLabel(
+            row.customFields.find(
+              (field: { label: string }) => field.label === 'STATE'
+            )?.selectedValues[0]?.value
+          ) || '';
         const district =
-          row.customFields.find(
-            (field: { label: string }) => field.label === 'DISTRICT'
-          )?.selectedValues[0]?.value || '';
+          transformLabel(
+            row.customFields.find(
+              (field: { label: string }) => field.label === 'DISTRICT'
+            )?.selectedValues[0]?.value
+          ) || '';
         const block =
-          row.customFields.find(
-            (field: { label: string }) => field.label === 'BLOCK'
-          )?.selectedValues[0]?.value || '';
+          transformLabel(
+            row.customFields.find(
+              (field: { label: string }) => field.label === 'BLOCK'
+            )?.selectedValues[0]?.value
+          ) || '';
         const village =
-          row.customFields.find(
-            (field: { label: string }) => field.label === 'VILLAGE'
-          )?.selectedValues[0]?.value || '';
+          transformLabel(
+            row.customFields.find(
+              (field: { label: string }) => field.label === 'VILLAGE'
+            )?.selectedValues[0]?.value
+          ) || '';
         return `${state == '' ? '' : `${state}`}${
           district == '' ? '' : `, ${district}`
         }${block == '' ? '' : `, ${block}`}${
@@ -204,35 +227,38 @@ const Mentor = () => {
         if (userCohortResp?.result?.cohortData?.length) {
           membershipId = userCohortResp.result.cohortData[0].cohortMembershipId;
         } else {
-          console.warn("No cohort data found for the user.");
+          console.warn('No cohort data found for the user.');
         }
       } catch (error) {
-        console.error("Failed to fetch cohort list:", error);
+        console.error('Failed to fetch cohort list:', error);
       }
 
       // Attempt to update cohort member status only if we got a valid membershipId
       if (membershipId) {
         try {
           const updateResponse = await updateCohortMemberStatus({
-            memberStatus: "archived",
+            memberStatus: 'archived',
             statusReason: reason,
             membershipId: membershipId,
           });
 
           if (updateResponse?.responseCode !== 200) {
-            console.error("Failed to archive user from center:", updateResponse);
+            console.error(
+              'Failed to archive user from center:',
+              updateResponse
+            );
           } else {
-            console.log("User successfully archived from center.");
+            console.log('User successfully archived from center.');
           }
         } catch (error) {
-          console.error("Error archiving user from center:", error);
+          console.error('Error archiving user from center:', error);
         }
       }
 
       // Always attempt to delete the user
-      console.log("Proceeding to self-delete...");
+      console.log('Proceeding to self-delete...');
       const resp = await deleteUser(userID, {
-        userData: { reason: reason, status: "archived" },
+        userData: { reason: reason, status: 'archived' },
       });
 
       if (resp?.responseCode === 200) {
@@ -245,14 +271,14 @@ const Mentor = () => {
             ),
           },
         }));
-        console.log("Team leader successfully archived.");
+        console.log('Team leader successfully archived.');
       } else {
-        console.error("Failed to archive team leader:", resp);
+        console.error('Failed to archive team leader:', resp);
       }
 
       return resp;
     } catch (error) {
-      console.error("Error updating team leader:", error);
+      console.error('Error updating team leader:', error);
     }
   };
 
@@ -309,7 +335,6 @@ const Mentor = () => {
           }
         });
 
-        
         // console.log('row:', row?.customFields[2].selectedValues[0].value);
         // setEditableUserId(row?.userId);
         // const memberStatus = Status.ARCHIVED;
@@ -324,17 +349,15 @@ const Mentor = () => {
         // setPrefilledFormData({});
         // searchData(prefilledFormData, currentPage);
         setOpen(true);
-        setUserId(row?.userId)
+        setUserId(row?.userId);
 
         setUserData({
-          firstName: row?.firstName || "",
-          lastName: row?.lastName || "",
-          village: findVillage?.selectedValues?.[0]?.value || "",
+          firstName: row?.firstName || '',
+          lastName: row?.lastName || '',
+          village: findVillage?.selectedValues?.[0]?.value || '',
         });
-
       },
-      },
-    
+    },
   ];
 
   // Pagination handlers
@@ -483,9 +506,9 @@ const Mentor = () => {
         checked={checked}
         open={open}
         onClose={() => setOpen(false)}
-        title={t("COMMON.DELETE_USER")}
-        primary={t("COMMON.DELETE_USER_WITH_REASON")}
-        secondary={t("COMMON.CANCEL")}
+        title={t('COMMON.DELETE_USER')}
+        primary={t('COMMON.DELETE_USER_WITH_REASON')}
+        secondary={t('COMMON.CANCEL')}
         reason={reason}
         onClickPrimary={userDelete}
       >
