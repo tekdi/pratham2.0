@@ -23,7 +23,7 @@ const VillageNewRegistration: React.FC<VillageNewRegistrationProps> = ({
           {
             router.push({
               pathname: `/villageDetails/${location?.value}`,
-              query: {  id:location?.id , blockId: blockResult?.selectedValues[0]?.id?.toString()}
+              query: {  id:location?.id.toString() , blockId: blockResult?.selectedValues[0]?.id}
           });  };
           router.push({
             pathname: `/villageDetails/${location?.value}`,
