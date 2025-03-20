@@ -46,6 +46,24 @@ const AddEditUser = ({
 
   const { t } = useTranslation();
 
+  if (isEdit) {
+    const keysToRemove = [
+      'state',
+      'district',
+      'block',
+      'village',
+      'password',
+      'confirm_password',
+    ];
+    keysToRemove.forEach((key) => delete schema.properties[key]);
+    keysToRemove.forEach((key) => delete uiSchema[key]);
+    // console.log('schema', schema);
+  } else {
+    const keysToRemove = ['password', 'confirm_password']; //TODO: check 'program'
+    keysToRemove.forEach((key) => delete schema.properties[key]);
+    keysToRemove.forEach((key) => delete uiSchema[key]);
+  }
+
   const FormSubmitFunction = async (formData: any, payload: any) => {
     setPrefilledFormData(formData);
     if (isEdit) {
