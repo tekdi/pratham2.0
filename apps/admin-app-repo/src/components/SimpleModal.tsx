@@ -43,18 +43,19 @@ const SimpleModal: React.FC<SimpleModalProps> = ({
 
   const modalStyle = {
     display: "flex",
-    flexDirection: "column" as const,
-    position: "absolute" as const,
+    flexDirection: "column",
+    position: "absolute",
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    maxWidth:'450px',
-    width:'100%',
-    maxHeight: isFullwidth ? "60vh":"60vh",
-    backgroundColor: "#fff",
+    width: "40%",
+    maxHeight: "80vh",
+    backgroundColor: "rgb(255, 255, 255)",
     borderRadius: "8px",
-    boxShadow: theme.shadows[5]
+    boxShadow:
+      "rgba(0, 0, 0, 0.2) 0px 3px 5px -1px, rgba(0, 0, 0, 0.14) 0px 5px 8px 0px, rgba(0, 0, 0, 0.12) 0px 1px 14px 0px",
   };
+
 
   const titleStyle = {
     position: "sticky" as const,
@@ -116,6 +117,7 @@ const SimpleModal: React.FC<SimpleModalProps> = ({
               justifyContent="center"
               alignItems="center"
               sx={footerStyle}
+              gap={'10px'}
             >
               {primaryText && (
                 <Button
@@ -127,6 +129,7 @@ const SimpleModal: React.FC<SimpleModalProps> = ({
                     },
                     padding: theme.spacing(1),
                     fontWeight: "500",
+                    width:'100%'
                   }}
                   onClick={primaryActionHandler}
                 >

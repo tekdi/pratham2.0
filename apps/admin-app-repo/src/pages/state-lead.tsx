@@ -27,8 +27,13 @@ import {
 import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import TenantService from '@/services/TenantService';
+import { useTheme } from "@mui/material/styles";
+import AddIcon from "@mui/icons-material/Add";
+
+
 
 const StateLead = () => {
+  const theme = useTheme<any>();
   const [isLoading, setIsLoading] = useState(false);
   const [schema, setSchema] = useState(StateLeadSearchSchema);
   const [uiSchema, setUiSchema] = useState(StateLeadUISchema);
@@ -260,7 +265,14 @@ const StateLead = () => {
         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }} mt={4}>
           <Button
             variant="outlined"
+            startIcon={<AddIcon />}
             color="primary"
+            sx={{
+              textTransform: "none",
+              fontSize: "14px",
+              color: theme.palette.primary["100"],
+              width: "200px"
+            }}
             onClick={() => {
               setPrefilledAddFormData({});
               setIsEdit(false);
