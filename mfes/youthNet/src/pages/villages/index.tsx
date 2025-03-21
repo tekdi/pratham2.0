@@ -738,7 +738,7 @@ const Index = () => {
               />
             </Box>
 
-             <Box mt={'18px'} px={'18px'} ml={'10px'}>
+             <Box mt={'18px'} px={'18px'} ml={'10px'} display={'flex'} justifyContent={'flex-end'}>
               <Button
                 sx={{
                   border: `1px solid ${theme.palette.error.contrastText}`,
