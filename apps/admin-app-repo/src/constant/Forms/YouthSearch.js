@@ -1,13 +1,4 @@
-import { Role } from '@/utils/app.constant';
-
-const stateId =
-  typeof window !== 'undefined' ? localStorage.getItem('stateId') : null;
-const stateName =
-  typeof window !== 'undefined' ? localStorage.getItem('stateName') : null;
-const userRole =
-  typeof window !== 'undefined' ? localStorage.getItem('roleName') : null;
-
-export const MentorSearchSchema = {
+export const YouthSearchSchema = {
   type: 'object',
   properties: {
     state: {
@@ -15,23 +6,20 @@ export const MentorSearchSchema = {
       title: 'State',
       items: {
         type: 'string',
-        enum: userRole !== Role.CENTRAL_ADMIN ? [stateId] : ['Select'],
-        enumNames: userRole !== Role.CENTRAL_ADMIN ? [stateName] : ['Select'],
+        enum: ['Select'],
+        enumNames: ['Select'],
       },
-      api:
-        userRole !== Role.CENTRAL_ADMIN
-          ? undefined // Avoid API call if userRole is Central admin
-          : {
-              url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
-              method: 'POST',
-              payload: { fieldName: 'state', sort: ['state_name', 'asc'] },
-              options: {
-                optionObj: 'result.values',
-                label: 'label',
-                value: 'value',
-              },
-              callType: 'initial',
-            },
+      api: {
+        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
+        method: 'POST',
+        payload: { fieldName: 'state', sort: ['state_name', 'asc'] },
+        options: {
+          optionObj: 'result.values',
+          label: 'label',
+          value: 'value',
+        },
+        callType: 'initial',
+      },
       //for multiselect
       uniqueItems: true,
       isMultiSelect: true,
@@ -50,8 +38,7 @@ export const MentorSearchSchema = {
         method: 'POST',
         payload: {
           fieldName: 'district',
-          controllingfieldfk:
-            userRole !== Role.CENTRAL_ADMIN ? [stateId] : '**',
+          controllingfieldfk: '**',
           sort: ['district_name', 'asc'],
         },
         options: {
@@ -59,7 +46,7 @@ export const MentorSearchSchema = {
           label: 'label',
           value: 'value',
         },
-        callType: userRole !== Role.CENTRAL_ADMIN ? 'initial' : 'dependent',
+        callType: 'dependent',
         dependent: 'state',
       },
       //for multiselect
@@ -145,7 +132,7 @@ export const MentorSearchSchema = {
   },
 };
 
-export const MentorSearchUISchema = {
+export const YouthSearchUISchema = {
   'ui:order': [
     'state',
     'district',
