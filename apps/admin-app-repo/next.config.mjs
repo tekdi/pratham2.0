@@ -65,6 +65,10 @@ const nextConfig = {
         destination: `${process.env.NEXT_PUBLIC_WORKSPACE_BASE_URL}/api/proxy?path=/action/asset/:path*`,
       },
       {
+        source: "/mfe_workspace/assets/:path*",  // Match all requests under /mfe_workspace/assets
+        destination: "/mfe_workspace/assets/:path*",  // Serve from public/
+      },
+      {
         source: "/action/v1/telemetry",
         destination: `${process.env.NEXT_PUBLIC_TELEMETRY_URL}/v1/telemetry`,
       },

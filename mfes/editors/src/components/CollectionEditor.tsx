@@ -195,6 +195,24 @@ const CollectionEditor: React.FC = () => {
         document.head.appendChild(pdfLink);
       }
 
+      if (!document.getElementById("sunbird-epub-player-js")) {
+        const epubScript = document.createElement("script");
+        epubScript.id = "sunbird-epub-player-js";
+        epubScript.src =
+          "https://cdn.jsdelivr.net/npm/@project-sunbird/sunbird-epub-player-web-component@1.4.0/sunbird-epub-player.js";
+        epubScript.async = true;
+        document.body.appendChild(epubScript);
+      }
+
+      if (!document.getElementById("sunbird-epub-player-css")) {
+        const epubLink = document.createElement("link");
+        epubLink.id = "sunbird-epub-player-css";
+        epubLink.rel = "stylesheet";
+        epubLink.href =
+          "https://cdn.jsdelivr.net/npm/@project-sunbird/sunbird-epub-player-web-component@1.4.0/styles.css";
+        document.head.appendChild(epubLink);
+      }
+
       const videoScript = document.createElement("script");
       console.log("Video Player loaded");
       videoScript.id = "sunbird-video-player.js";
