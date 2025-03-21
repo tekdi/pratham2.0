@@ -48,11 +48,11 @@ jobs:
           username: ${{ secrets.EC2_USER_DEV }}
           key: ${{ secrets.EC2_SSH_KEY_DEV }}
           script: |
-            cd ${{ secrets.DEV_LMP_ENV }} && ls -ltra
+            cd ${{ secrets.TARGET_DEV_LMP }} && ls -ltra
                if [ -f .env ]; then
                rm .env
                fi
-               echo "${{ secrets.DEV_LAP_ENV }}" > .env && ls -ltra
+               echo "${{ secrets.DEV_LMP_ENV }}" > .env && ls -ltra
             docker ps -a --filter "status=exited" --format "{{.ID}}" | xargs -r docker start
             docker stop dev-lmp || true
             docker system prune -af || true
