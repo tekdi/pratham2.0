@@ -20,7 +20,7 @@ export const MasterDistrictsSearchSchema = {
       },
       api:
         userRole !== Role.CENTRAL_ADMIN
-          ? undefined // Avoid API call if stateId is present
+          ? undefined // Avoid API call if userRole is Central admin
           : {
               url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
               method: 'POST',
