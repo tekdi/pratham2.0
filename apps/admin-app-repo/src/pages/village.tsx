@@ -90,6 +90,11 @@ const Village = () => {
   };
 
   const searchData = async (formData = [], newPage) => {
+    formData = Object.fromEntries(
+      Object.entries(formData).filter(
+        ([_, value]) => !Array.isArray(value) || value.length > 0
+      )
+    );
     const { sortBy, ...restFormData } = formData;
 
     const filters = {

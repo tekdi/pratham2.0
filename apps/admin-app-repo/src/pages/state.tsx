@@ -6,7 +6,10 @@ import axios from 'axios';
 import DynamicForm from '@/components/DynamicForm/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
-import { MasterStateSearchSchema, MasterStateUISchema } from '../constant/Forms/MasterStateSearch'
+import {
+  MasterStateSearchSchema,
+  MasterStateUISchema,
+} from '../constant/Forms/MasterStateSearch';
 import { Status } from '@/utils/app.constant';
 import { Box, Grid, Typography } from '@mui/material';
 import { debounce } from 'lodash';
@@ -32,7 +35,7 @@ const State = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [schema, setSchema] = useState(MasterStateSearchSchema);
   console.log(schema);
-  
+
   const [uiSchema, setUiSchema] = useState(MasterStateUISchema);
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
@@ -58,7 +61,6 @@ const State = () => {
     }
   }, [pageLimit]);
 
-
   const updatedUiSchema = {
     ...uiSchema,
     'ui:submitButtonOptions': {
@@ -66,11 +68,14 @@ const State = () => {
     },
   };
 
-  const debouncedGetList = useCallback(debounce(async (data) => {
-    console.log('Debounced API Call:', data);
-    const resp = await fetchStateOptions(data);
-    setResponse({ result: resp?.result });  
-  }, 1000), []);
+  const debouncedGetList = useCallback(
+    debounce(async (data) => {
+      console.log('Debounced API Call:', data);
+      const resp = await fetchStateOptions(data);
+      setResponse({ result: resp?.result });
+    }, 1000),
+    []
+  );
 
   const SubmitaFunction = async (formData: any) => {
     setPrefilledFormData(formData);
@@ -78,9 +83,13 @@ const State = () => {
   };
 
   const searchData = async (formData = [], newPage) => {
+    formData = Object.fromEntries(
+      Object.entries(formData).filter(
+        ([_, value]) => !Array.isArray(value) || value.length > 0
+      )
+    );
     const { sortBy, ...restFormData } = formData;
 
-   
     const filters = {
       // role: 'Instructor',
       status: [Status.ACTIVE],
@@ -92,10 +101,7 @@ const State = () => {
       }, {} as Record<string, any>),
     };
 
-    const sort = [
-      "state_name",
-      sortBy ? sortBy:"asc"
-    ];
+    const sort = ['state_name', sortBy ? sortBy : 'asc'];
     let limit = pageLimit;
     let offset = newPage * limit;
     let pageNumber = newPage;
@@ -109,7 +115,7 @@ const State = () => {
       limit,
       offset,
       sort,
-      fieldName: "state",
+      fieldName: 'state',
       optionName: formData.firstName,
     };
 
@@ -131,16 +137,15 @@ const State = () => {
     {
       keys: ['state_code'],
       label: 'Code',
-      render: (row) => row.state_code
+      render: (row) => row.state_code,
     },
     {
       keys: ['is_active'],
       label: 'Status',
-      render: (row) => row.is_active === 1 ? "Active" : "Inactive",
-      getStyle: (row) => ({ color: row.is_active === 1 ? "green" : "red" })
-    }
+      render: (row) => (row.is_active === 1 ? 'Active' : 'Inactive'),
+      getStyle: (row) => ({ color: row.is_active === 1 ? 'green' : 'red' }),
+    },
   ];
-
 
   // Pagination handlers
   const handlePageChange = (newPage) => {
@@ -182,8 +187,8 @@ const State = () => {
     }
 
     return result;
-  } 
-  
+  }
+
   return (
     <>
       <Box display={'flex'} flexDirection={'column'} gap={2}>
@@ -224,7 +229,7 @@ const State = () => {
             height="20vh"
           >
             <Typography marginTop="10px" textAlign={'center'}>
-                {t('COMMON.NO_STATE_FOUND')}
+              {t('COMMON.NO_STATE_FOUND')}
             </Typography>
           </Box>
         )}
