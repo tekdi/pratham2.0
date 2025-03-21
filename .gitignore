@@ -49,6 +49,7 @@ build/
 # ignore env
 .env
 .env.local
+.env.test
 
 #ignore workflow
 .github/workflows/*
