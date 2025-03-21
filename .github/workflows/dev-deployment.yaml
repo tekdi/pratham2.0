@@ -58,6 +58,5 @@ jobs:
             docker system prune -af || true
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_URI }}
             docker-compose up -d --force-recreate --no-deps
-            docker system prune -af || true
             docker ps -a | grep dev-lmp
             sudo systemctl restart nginx
