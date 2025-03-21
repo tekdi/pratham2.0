@@ -26,9 +26,8 @@ import {
 } from '@/constant/Forms/BatchSearch';
 import { getCohortList } from '@/services/CohortService/cohortService';
 import { transformLabel } from '@/utils/Helper';
-import { useTheme } from "@mui/material/styles";
-import AddIcon from "@mui/icons-material/Add";
-
+import { useTheme } from '@mui/material/styles';
+import AddIcon from '@mui/icons-material/Add';
 
 //import { DynamicForm } from '@shared-lib';
 
@@ -102,6 +101,11 @@ const Batch = () => {
   };
 
   const searchData = async (formData: any, newPage: any) => {
+    formData = Object.fromEntries(
+      Object.entries(formData).filter(
+        ([_, value]) => !Array.isArray(value) || value.length > 0
+      )
+    );
     const staticFilter = { type: CohortTypes.BATCH, status: [Status.ACTIVE] };
     const { sortBy } = formData;
     const staticSort = ['name', sortBy || 'asc'];
@@ -301,10 +305,10 @@ const Batch = () => {
             startIcon={<AddIcon />}
             color="primary"
             sx={{
-              textTransform: "none",
-              fontSize: "14px",
-              color: theme.palette.primary["100"],
-              width: "200px"
+              textTransform: 'none',
+              fontSize: '14px',
+              color: theme.palette.primary['100'],
+              width: '200px',
             }}
             onClick={() => {
               setPrefilledAddFormData(initialFormData);
