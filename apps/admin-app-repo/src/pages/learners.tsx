@@ -44,8 +44,11 @@ import DeleteDetails from '@/components/DeleteDetails';
 import { deleteUser } from '@/services/UserService';
 import { transformLabel } from '@/utils/Helper';
 import { getCohortList } from '@/services/GetCohortList';
+import { useTheme } from "@mui/material/styles";
+import AddIcon from "@mui/icons-material/Add";
 
 const Learner = () => {
+  const theme = useTheme<any>();
   const [isLoading, setIsLoading] = useState(false);
   const [schema, setSchema] = useState(learnerSearchSchema);
   const [uiSchema, setUiSchema] = useState(learnerSearchUISchema);
@@ -421,7 +424,14 @@ const Learner = () => {
         <Box mt={4} sx={{ display: 'flex', justifyContent: 'end' }}>
           <Button
             variant="outlined"
+            startIcon={<AddIcon />}
             color="primary"
+            sx={{
+              textTransform: "none",
+              fontSize: "14px",
+              color: theme.palette.primary["100"],
+              width: "200px"
+            }}
             onClick={() => {
               setPrefilledAddFormData({});
               setIsEdit(false);

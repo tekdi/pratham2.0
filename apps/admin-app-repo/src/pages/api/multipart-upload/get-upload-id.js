@@ -9,7 +9,7 @@ const s3Client = new S3Client({
   },
 });
 
-const bucketName = process.env.SHIKSHA_AWS_BUCKET_NAME;
+const bucketName = process.env.AWS_BUCKET_NAME;
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
