@@ -269,70 +269,78 @@ export const genericEditorReviewFormResponse = {
                         "label": "Content Language",
                         "name": "Content Language",
                         "range": [
-                            {
-                                "key": "Hindi",
-                                "name": "Hindi"
-                            },
-                            {
-                                "key": "English",
-                                "name": "English"
-                            },
-                            {
-                                "key": "Urdu",
-                                "name": "Urdu"
-                            },
-                            {
-                                "key": "Sanskrit",
-                                "name": "Sanskrit"
-                            },
-                            {
-                                "key": "Punjabi",
-                                "name": "Punjabi"
-                            },
-                            {
-                                "key": "Gujarati",
-                                "name": "Gujarati"
-                            },
-                            {
-                                "key": "Marathi",
-                                "name": "Marathi"
-                            },
-                            {
-                                "key": "Tamil",
-                                "name": "Tamil"
-                            },
-                            {
-                                "key": "Telugu",
-                                "name": "Telugu"
-                            },
-                            {
-                                "key": "Kannada",
-                                "name": "Kannada"
-                            },
-                            {
-                                "key": "Malayalam",
-                                "name": "Malayalam"
-                            },
-                            {
-                                "key": "Odia",
-                                "name": "Odia"
-                            },
-                            {
-                                "key": "Assamese",
-                                "name": "Assamese"
-                            },
-                            {
-                                "key": "Bengali",
-                                "name": "Bengali"
-                            },
-                            {
-                                "key": "Manipuri",
-                                "name": "Manipuri"
-                            },
-                            {
-                                "key": "Kashmiri",
-                                "name": "Kashmiri"
-                            }
+                          {
+                              "key": "English",
+                              "name": "English"
+                          },
+                          {
+                              "key": "Marathi",
+                              "name": "Marathi"
+                          },
+                          {
+                              "key": "Hindi",
+                              "name": "Hindi"
+                          },
+                          {
+                              "key": "Assamese",
+                              "name": "Assamese"
+                          },
+                          {
+                              "key": "Bengali",
+                              "name": "Bengali"
+                          },
+                          {
+                              "key": "Gujarati",
+                              "name": "Gujarati"
+                          },
+                          {
+                              "key": "Kannada",
+                              "name": "Kannada"
+                          },
+                          {
+                              "key": "Kashmiri",
+                              "name": "Kashmiri"
+                          },
+                          {
+                              "key": "Khasi",
+                              "name": "Khasi"
+                          },
+                          {
+                              "key": "Malayalam",
+                              "name": "Malayalam"
+                          },
+                          {
+                              "key": "Manipuri",
+                              "name": "Manipuri"
+                          },
+                          {
+                              "key": "Odia",
+                              "name": "Odia"
+                          },
+                          {
+                              "key": "Punjabi",
+                              "name": "Punjabi"
+                          },
+                          {
+                              "key": "Rabha (Rongdani)",
+                              "name": "Rabha (Rongdani)"
+                          },
+                          {
+                              "key": "Sanskrit",
+                              "name": "Sanskrit"
+                          },
+                          {
+                              "key": "Tamil",
+                              "name": "Tamil"
+                          },
+                          {
+                              "key": "Telugu",
+                              "name": "Telugu"
+                          },
+                          {
+                              "key": "Urdu",
+                              "name": "Urdu"
+                          }
                         ],
                         "placeholder": "Content Language",
                         "renderingHints": {},

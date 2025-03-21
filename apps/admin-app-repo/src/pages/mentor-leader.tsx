@@ -44,8 +44,8 @@ import DeleteDetails from '@/components/DeleteDetails';
 import { deleteUser } from '@/services/UserService';
 import { transformLabel } from '@/utils/Helper';
 import { getCohortList } from '@/services/GetCohortList';
-import { useTheme } from "@mui/material/styles";
-import AddIcon from "@mui/icons-material/Add";
+import { useTheme } from '@mui/material/styles';
+import AddIcon from '@mui/icons-material/Add';
 
 const MentorLead = () => {
   const theme = useTheme<any>();
@@ -125,6 +125,11 @@ const MentorLead = () => {
   };
 
   const searchData = async (formData, newPage) => {
+    formData = Object.fromEntries(
+      Object.entries(formData).filter(
+        ([_, value]) => !Array.isArray(value) || value.length > 0
+      )
+    );
     const staticFilter = {
       role: 'Lead',
       status: 'active',
@@ -412,10 +417,10 @@ const MentorLead = () => {
             startIcon={<AddIcon />}
             color="primary"
             sx={{
-              textTransform: "none",
-              fontSize: "14px",
-              color: theme.palette.primary["100"],
-              width: "200px"
+              textTransform: 'none',
+              fontSize: '14px',
+              color: theme.palette.primary['100'],
+              width: '200px',
             }}
             onClick={() => {
               setPrefilledAddFormData(initialFormData);
