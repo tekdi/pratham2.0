@@ -140,7 +140,18 @@ const CollectionEditor: React.FC = () => {
   const [assetsLoaded, setAssetsLoaded] = useState(false);
 
   useEffect(() => {
+    const loadJQuery = () => {
+      if (!document.getElementById("jquery-script")) {
+        const script = document.createElement("script");
+        script.id = "jquery-script";
+        script.src = "https://code.jquery.com/jquery-3.6.0.min.js";
+        script.async = true;
+        script.onload = () => console.log("jQuery loaded successfully.");
+        document.body.appendChild(script);
+      }
+    };
     const loadAssets = () => {
+      loadJQuery();
       if (!document.getElementById("collection-editor-js")) {
         const script = document.createElement("script");
         console.log("Hello");
