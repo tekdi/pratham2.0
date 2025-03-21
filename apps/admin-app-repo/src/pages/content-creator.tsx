@@ -182,11 +182,11 @@ const ContentCreator = () => {
       },
     },
     {
-      key: 'SUB-DOMAIN',
+      key: 'SUB DOMAIN',
       label: 'Sub Domain',
       render: (row) => {
         const subDomain = row.customFields.find((field) => field.label ===
-        'SUB-DOMAIN')?.selectedValues.join(', ') || '-';
+        'SUB DOMAIN')?.selectedValues.join(', ') || '-';
         return `${subDomain}`;
       },
     },
