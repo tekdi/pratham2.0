@@ -37,16 +37,27 @@ const [districtData, setDistrictData] = useState<any>(null);
     router.push(`/campDetails/${villageNameStringNew}${title}`);
   };
 
-  const handleAddVolunteers = (observationId: any, solutionId: any) => {
-    console.log(observationId)
+  const handleAddVolunteers = (observationId: any, solutionId: any, observationName?: any) => {
+    // console.log(observationId)
+    // router.push({
+    //   pathname: `/volunteerList`,
+    //   query: {
+    //     blockId: selectedBlockValue,
+    //     observationId:observationId,
+    //     solutionId: solutionId
+    //   },
+    // });
+    const newFullPath = `/questionary`;
+    // const { observationName } = router.query;
+    const { Id } = router.query;
+
+
+    const queryParams = { entityId: "eab706df-a610-4b38-92a7-032f2938a120", Id: observationId , observationId:observationId, observationName: observationName , solutionId:solutionId};
     router.push({
-      pathname: `/volunteerList`,
-      query: {
-        blockId: selectedBlockValue,
-        observationId:observationId,
-        solutionId: solutionId
-      },
+      pathname: newFullPath,
+      query: queryParams,
     });
+    //here temporary hardcoded entity id later it replace with localstorage entity id for lear
   };
   useEffect(() => {
       const getData = async () => {
@@ -204,7 +215,7 @@ const expiredSurveys = surveysData2.filter((survey: any) => survey.endDate < cur
                       minHeight="98px"
                      // onClick={handleAddVolunteers}
                      onClick={() => {
-                      handleAddVolunteers(survey.id, survey.solutionId);
+                      handleAddVolunteers(survey.id, survey.solutionId,  survey.title);
                       localStorage.setItem("selectedSurvey", survey.title);
                     }}
                     />

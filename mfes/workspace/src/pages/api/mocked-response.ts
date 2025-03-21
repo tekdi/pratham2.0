@@ -357,34 +357,54 @@ export const genericEditorReviewFormResponse = {
                         "label": "Program",
                         "name": "Program",
                         "range": [
-                            {
-                                "name": "Early Years",
-                                "Value": "Early Years"
-                            },
-                            {
-                                "name": "TaRL(Elementary Education)",
-                                "Value": "TaRL(Elementary Education)"
-                            },
-                            {
-                                "name": "SCP",
-                                "Value": "SCP"
-                            },
-                            {
-                                "name": "YouthNet",
-                                "value": "YouthNet"
-                            },
-                            {
-                                "name": "Skilling Other",
-                                "value": "Skilling Other"
-                            },
-                            {
-                                "name": "Open School",
-                                "value": "Open School"
-                            },
-                            {
+                          {
+                              "name": "Hamara Gaon",
+                              "value": "Hamara Gaon"
+                          },
+                          {
+                              "name": "Early Childhood Education",
+                              "value": "Early Childhood Education"
+                          },
+                          {
+                              "name": "Inclusive Education (ENABLE)",
+                              "value": "Inclusive Education (ENABLE)"
+                          },
+                          {
+                              "name": "Elementary",
+                              "value": "Elementary"
+                          },
+                          {
+                              "name": "Second Chance",
+                              "value": "Second Chance"
+                          },
+                          {
+                              "name": "Digital Initiatives",
+                              "value": "Digital Initiatives"
+                          },
+                          {
+                              "name": "Vocational Training",
+                              "value": "Vocational Training"
+                          },
+                          {
+                              "name": "Pratham Council For Vulnerable Children",
+                              "value": "Pratham Council For Vulnerable Children"
+                          },
+                          {
+                              "name": "Annual Status of Education Report",
+                              "value": "Annual Status of Education Report"
+                          },
+                          {
+                              "name": "Pragyanpath",
+                              "value": "Pragyanpath"
+                          },
+                          {
+                              "name": "Open School",
+                              "value": "Open School"
+                          },
+                          {
                               "name": "Other",
                               "value": "Other"
-                            }
+                          }
                         ],
                         "placeholder": "Please select an option",
                         "renderingHints": {},
