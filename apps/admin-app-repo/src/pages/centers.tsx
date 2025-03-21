@@ -31,10 +31,13 @@ import {
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import { updateCohort } from '@/services/MasterDataService';
 import { transformLabel } from '@/utils/Helper';
+import { useTheme } from "@mui/material/styles";
+import AddIcon from "@mui/icons-material/Add";
 
 //import { DynamicForm } from '@shared-lib';
 
 const Centers = () => {
+  const theme = useTheme<any>();
   const [isLoading, setIsLoading] = useState(false);
   const [schema, setSchema] = useState(CohortSearchSchema);
   const [uiSchema, setUiSchema] = useState(CohortSearchUISchema);
@@ -276,8 +279,8 @@ const Centers = () => {
         const data = {
           filters: {
             cohortId: row?.cohortId,
+            status: ['active'],
           },
-          status: ['active'],
         };
         const response = await fetchCohortMemberList(data);
 
@@ -338,7 +341,15 @@ const Centers = () => {
         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }} mt={4}>
           <Button
             variant="outlined"
+            startIcon={<AddIcon />}
             color="primary"
+            sx={{
+              textTransform: "none",
+              fontSize: "14px",
+              color: theme.palette.primary["100"],
+              width: "200px"
+            }}
+
             onClick={() => {
               setPrefilledAddFormData(initialFormData);
               setIsEdit(false);

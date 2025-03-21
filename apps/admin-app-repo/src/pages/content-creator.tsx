@@ -27,8 +27,12 @@ import {
 import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import TenantService from '@/services/TenantService';
+import { useTheme } from "@mui/material/styles";
+import AddIcon from "@mui/icons-material/Add";
+
 
 const ContentCreator = () => {
+  const theme = useTheme<any>();
   const [isLoading, setIsLoading] = useState(false);
   const [schema, setSchema] = useState(ContentCreatorSearchSchema);
   const [uiSchema, setUiSchema] = useState(ContentCreatorUISchema);
@@ -182,11 +186,11 @@ const ContentCreator = () => {
       },
     },
     {
-      key: 'SUB-DOMAIN',
+      key: 'SUB DOMAIN',
       label: 'Sub Domain',
       render: (row) => {
         const subDomain = row.customFields.find((field) => field.label ===
-        'SUB-DOMAIN')?.selectedValues.join(', ') || '-';
+        'SUB DOMAIN')?.selectedValues.join(', ') || '-';
         return `${subDomain}`;
       },
     },
@@ -333,7 +337,15 @@ const ContentCreator = () => {
         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }} mt={4}>
           <Button
             variant="outlined"
+            startIcon={<AddIcon />}
             color="primary"
+            sx={{
+              textTransform: "none",
+              fontSize: "14px",
+              color: theme.palette.primary["100"],
+              width: "200px"
+            }}
+
             onClick={() => {
               setPrefilledAddFormData({});
               setIsEdit(false);
@@ -341,7 +353,7 @@ const ContentCreator = () => {
               handleOpenModal();
             }}
           >
-            {t('COMMON.ADD_NEW')}{' '}
+            {t('COMMON.ADD_NEW')}
           </Button>
         </Box>
 
