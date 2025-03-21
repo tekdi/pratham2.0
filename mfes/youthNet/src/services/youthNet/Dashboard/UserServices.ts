@@ -126,7 +126,6 @@ return response;
       let selectedMentorData = selectedMentorDataString ? JSON.parse(selectedMentorDataString) : null;
   
       if (selectedMentorData && selectedMentorData.userId == userId) {
-        console.log("true")
         // If selected mentor data matches, use it
         userData = selectedMentorData;
       } else {

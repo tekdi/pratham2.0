@@ -26,10 +26,14 @@ import {
 } from '@/constant/Forms/BatchSearch';
 import { getCohortList } from '@/services/CohortService/cohortService';
 import { transformLabel } from '@/utils/Helper';
+import { useTheme } from "@mui/material/styles";
+import AddIcon from "@mui/icons-material/Add";
+
 
 //import { DynamicForm } from '@shared-lib';
 
 const Batch = () => {
+  const theme = useTheme<any>();
   const [isLoading, setIsLoading] = useState(false);
   const [schema, setSchema] = useState(BatchSearchSchema);
   const [uiSchema, setUiSchema] = useState(BatchSearchUISchema);
@@ -49,7 +53,7 @@ const Batch = () => {
 
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
-    ? { state: localStorage.getItem('stateId') }
+    ? { state: [localStorage.getItem('stateId')] }
     : {};
 
   useEffect(() => {
@@ -294,7 +298,14 @@ const Batch = () => {
         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }} mt={4}>
           <Button
             variant="outlined"
+            startIcon={<AddIcon />}
             color="primary"
+            sx={{
+              textTransform: "none",
+              fontSize: "14px",
+              color: theme.palette.primary["100"],
+              width: "200px"
+            }}
             onClick={() => {
               setPrefilledAddFormData(initialFormData);
               setIsEdit(false);

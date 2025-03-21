@@ -99,7 +99,7 @@ const Sidebar = ({
                   }}
                   style={getActiveStyle(item.link)}
                 >
-                  <ListItemIcon>
+                  <ListItemIcon sx={{ minWidth: "40px" }}>
                     <Image
                       src={item.icon}
                       alt={t(item.title)}
@@ -125,7 +125,7 @@ const Sidebar = ({
                         .map((sub) => (
                           <ListItemButton
                             key={sub.link}
-                            sx={{ pl: 4 }}
+                            sx={{ pl: 7 }}
                             onClick={() => router.push(sub.link)}
                             style={getActiveStyle(sub.link)}
                           >

@@ -44,8 +44,11 @@ import DeleteDetails from '@/components/DeleteDetails';
 import { deleteUser } from '@/services/UserService';
 import { transformLabel } from '@/utils/Helper';
 import { getCohortList } from '@/services/GetCohortList';
+import { useTheme } from "@mui/material/styles";
+import AddIcon from "@mui/icons-material/Add";
 
 const Learner = () => {
+  const theme = useTheme<any>();
   const [isLoading, setIsLoading] = useState(false);
   const [schema, setSchema] = useState(learnerSearchSchema);
   const [uiSchema, setUiSchema] = useState(learnerSearchUISchema);
@@ -76,7 +79,7 @@ const Learner = () => {
 
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
-    ? { state: localStorage.getItem('stateId') }
+    ? { state: [localStorage.getItem('stateId')] }
     : {};
 
   useEffect(() => {
@@ -157,6 +160,16 @@ const Learner = () => {
       render: (row: any) => transformLabel(row.status),
       getStyle: (row) => ({ color: row.status === 'active' ? 'green' : 'red' }),
     },
+    {
+      keys: ['gender'],
+      label: 'Gender',
+      render: (row) => transformLabel(row.gender) || '',
+    },
+    {
+      keys: ['mobile'],
+      label: 'Mobile',
+      render: (row) => transformLabel(row.mobile) || '',
+    },
     // {
     //   key: 'STATE',
     //   label: 'State',
@@ -172,21 +185,29 @@ const Learner = () => {
       label: 'Location (State / District / Block/ Village)',
       render: (row: any) => {
         const state =
-        transformLabel(row.customFields.find(
-            (field: { label: string }) => field.label === 'STATE'
-          )?.selectedValues[0]?.value) || '';
+          transformLabel(
+            row.customFields.find(
+              (field: { label: string }) => field.label === 'STATE'
+            )?.selectedValues[0]?.value
+          ) || '';
         const district =
-        transformLabel(row.customFields.find(
-            (field: { label: string }) => field.label === 'DISTRICT'
-          )?.selectedValues[0]?.value) || '';
+          transformLabel(
+            row.customFields.find(
+              (field: { label: string }) => field.label === 'DISTRICT'
+            )?.selectedValues[0]?.value
+          ) || '';
         const block =
-        transformLabel(row.customFields.find(
-            (field: { label: string }) => field.label === 'BLOCK'
-          )?.selectedValues[0]?.value) || '';
+          transformLabel(
+            row.customFields.find(
+              (field: { label: string }) => field.label === 'BLOCK'
+            )?.selectedValues[0]?.value
+          ) || '';
         const village =
-        transformLabel(row.customFields.find(
-            (field: { label: string }) => field.label === 'VILLAGE'
-          )?.selectedValues[0]?.value) || '';
+          transformLabel(
+            row.customFields.find(
+              (field: { label: string }) => field.label === 'VILLAGE'
+            )?.selectedValues[0]?.value
+          ) || '';
         return `${state == '' ? '' : `${state}`}${
           district == '' ? '' : `, ${district}`
         }${block == '' ? '' : `, ${block}`}${
@@ -403,7 +424,14 @@ const Learner = () => {
         <Box mt={4} sx={{ display: 'flex', justifyContent: 'end' }}>
           <Button
             variant="outlined"
+            startIcon={<AddIcon />}
             color="primary"
+            sx={{
+              textTransform: "none",
+              fontSize: "14px",
+              color: theme.palette.primary["100"],
+              width: "200px"
+            }}
             onClick={() => {
               setPrefilledAddFormData({});
               setIsEdit(false);

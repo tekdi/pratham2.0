@@ -39,6 +39,7 @@ type UserCardProps = {
   Id?: any;
   villageCount?:any;
   blockNames?:string[]
+  villageNames?: string[]
   isVolunteer?: string
 };
 
@@ -64,12 +65,11 @@ const UserCard: React.FC<UserCardProps> = ({
   Id,
   blockNames,
   villageCount,
-  isVolunteer
+  isVolunteer,
+  villageNames
 }) => {
   const theme = useTheme<any>();
   const { t } = useTranslation();
-
-const villageName=customFields?.find((item: any) => item.label === 'VILLAGE')?.selectedValues[0]?.value
 
   return (
     <Box
@@ -129,14 +129,14 @@ const villageName=customFields?.find((item: any) => item.label === 'VILLAGE')?.s
           {villageCount && blockNames &&
           (<Typography>
 {villageCount === 1 ? `${villageCount} ${t('YOUTHNET_USERS_AND_VILLAGES.VILLAGE')}` : `${villageCount} ${t('YOUTHNET_USERS_AND_VILLAGES.VILLAGES')}`} 
-{blockNames.length > 1 ? ` (${blockNames} ${t('YOUTHNET_USERS_AND_VILLAGES.BLOCKS')}` : blockNames.length === 1 ? ` (${blockNames} ${t('YOUTHNET_USERS_AND_VILLAGES.BLOCK')})` : ""}
+{blockNames.length > 1 ? ` (${blockNames} ${t('YOUTHNET_USERS_AND_VILLAGES.BLOCKS')})` : blockNames.length === 1 ? ` (${blockNames} ${t('YOUTHNET_USERS_AND_VILLAGES.BLOCK')})` : ""}
             </Typography>)
           }
           <Box display={'flex'} justifyContent={'space-between'} width={'100%'}>
             <Box sx={{ display: 'flex', gap: '8px' }}>
               {dob ? (
                 <Typography variant="body2" color="textSecondary">
-                  {getAge(dob)<0? getAgeInMonths(dob)+" m/o" :getAge(dob)+" y/o"}   • { joinOn ?t('YOUTHNET_PROFILE.JOINED_ON')+" "+joinOn : ""}
+                  {getAge(dob)<0? getAgeInMonths(dob)+" m/o" :getAge(dob)+" y/o"}   • { joinOn ?t('YOUTHNET_PROFILE.JOINED_ON')+" "+joinOn : villageNames? villageNames: ""}
                 </Typography>
               ) : (
                 joinOn && (
