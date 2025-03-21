@@ -135,6 +135,7 @@ if(userId && userId!=="")
                 avatar={true}
                 statistic={volunteerCount}
                 subtile={'Volunteer'}
+                isVolunteer={true}
               />
             </Grid>
           </Grid>

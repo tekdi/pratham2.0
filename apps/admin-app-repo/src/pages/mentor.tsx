@@ -121,6 +121,11 @@ const Mentor = () => {
   };
 
   const searchData = async (formData: any, newPage: any) => {
+    formData = Object.fromEntries(
+      Object.entries(formData).filter(
+        ([_, value]) => !Array.isArray(value) || value.length > 0
+      )
+    );
     const staticFilter = {
       role: 'Instructor',
       status: 'active',

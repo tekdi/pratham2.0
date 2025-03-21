@@ -20,6 +20,7 @@ import { getUserFullName, toPascalCase } from '@/utils/Helper';
 import { sendCredentialService } from '@/services/NotificationService';
 import { showToastMessage } from '@/components/Toastify';
 import { filterSchema } from 'mfes/youthNet/src/utils/Helper';
+import useSubmittedButtonStore from 'mfes/youthNet/src/store/useSubmittedButtonStore';
 type FormSubmitFunctionType = (formData: any, payload: any) => Promise<void>;
 
 interface MentorAssignmentProps {
@@ -50,7 +51,12 @@ const MentorAssignment: React.FC<MentorAssignmentProps> = ({
   const [districtName, setDistrictName] = useState<any>('');
   //const [formData, setFormData] = useState<any>();
   const [sdbvFieldData, setSdbvFieldData] = useState<any>();
-
+  const setSubmittedButtonStatus = useSubmittedButtonStore(
+    (state: any) => state.setSubmittedButtonStatus
+  );
+  const submittedButtonStatus = useSubmittedButtonStore(
+    (state: any) => state.submittedButtonStatus
+  );
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
  // const [showAssignmentScreen, setShowAssignmentScreen] = useState(false); // New state to toggle views
@@ -129,15 +135,17 @@ const MentorAssignment: React.FC<MentorAssignmentProps> = ({
 
            
                     showToastMessage(t("MENTOR.MENTOR_CREATED_SUCCESSFULLY"), "success");
+                    setSubmittedButtonStatus(true)
             
           }
           else
           {
             console.log(" not checked")
             onClose()
-            showToastMessage(t('MENTOR.FAILED_TO_SEND_EMAIL'), 'error');
+            showToastMessage(t('MENTOR.MENTOR_CREATED'), 'success');
 
           }
+          setSubmittedButtonStatus(!submittedButtonStatus)
         }
       }
     } catch (error: any) {
