@@ -46,6 +46,24 @@ const AddEditUser = ({
 
   const { t } = useTranslation();
 
+  if (isEdit) {
+    const keysToRemove = [
+      'state',
+      'district',
+      'block',
+      'village',
+      'password',
+      'confirm_password',
+    ];
+    keysToRemove.forEach((key) => delete schema.properties[key]);
+    keysToRemove.forEach((key) => delete uiSchema[key]);
+    // console.log('schema', schema);
+  } else {
+    const keysToRemove = ['password', 'confirm_password']; //TODO: check 'program'
+    keysToRemove.forEach((key) => delete schema.properties[key]);
+    keysToRemove.forEach((key) => delete uiSchema[key]);
+  }
+
   const FormSubmitFunction = async (formData: any, payload: any) => {
     setPrefilledFormData(formData);
     if (isEdit) {
@@ -107,22 +125,26 @@ const AddEditUser = ({
         if (isNotificationRequired) {
           const responseUserData = await createUser(payload, t);
 
-          if (responseUserData && responseUserData?.userData?.userId) {
+          if (responseUserData?.userData?.userId) {
             showToastMessage(t(successCreateMessage), 'success');
 
             telemetryCallbacks(telemetryCreateKey);
             SuccessCallback();
 
-            //Send Notification with credentials to user
-
-            await notificationCallback(
-              successCreateMessage,
-              notificationContext,
-              notificationKey,
-              payload,
-              t,
-              notificationMessage
-            );
+            // Send Notification with credentials to user
+            try {
+              await notificationCallback(
+                successCreateMessage,
+                notificationContext,
+                notificationKey,
+                payload,
+                t,
+                notificationMessage
+              );
+            } catch (notificationError) {
+              console.error('Notification failed:', notificationError);
+              // No failure toast here to prevent duplicate messages
+            }
           } else {
             showToastMessage(t(failureCreateMessage), 'error');
           }
