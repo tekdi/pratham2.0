@@ -1,3 +1,12 @@
+import { Role } from '@/utils/app.constant';
+
+const stateId =
+  typeof window !== 'undefined' ? localStorage.getItem('stateId') : null;
+const stateName =
+  typeof window !== 'undefined' ? localStorage.getItem('stateName') : null;
+const userRole =
+  typeof window !== 'undefined' ? localStorage.getItem('roleName') : null;
+
 export const MentorLeadSearchSchema = {
   type: 'object',
   properties: {
@@ -6,20 +15,23 @@ export const MentorLeadSearchSchema = {
       title: 'State',
       items: {
         type: 'string',
-        enum: ['Select'],
-        enumNames: ['Select'],
+        enum: userRole !== Role.CENTRAL_ADMIN ? [stateId] : ['Select'],
+        enumNames: userRole !== Role.CENTRAL_ADMIN ? [stateName] : ['Select'],
       },
-      api: {
-        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
-        method: 'POST',
-        payload: { fieldName: 'state', sort: ['state_name', 'asc'] },
-        options: {
-          optionObj: 'result.values',
-          label: 'label',
-          value: 'value',
-        },
-        callType: 'initial',
-      },
+      api:
+        userRole !== Role.CENTRAL_ADMIN
+          ? undefined // Avoid API call if stateId is present
+          : {
+              url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
+              method: 'POST',
+              payload: { fieldName: 'state', sort: ['state_name', 'asc'] },
+              options: {
+                optionObj: 'result.values',
+                label: 'label',
+                value: 'value',
+              },
+              callType: 'initial',
+            },
       //for multiselect
       uniqueItems: true,
       isMultiSelect: true,
@@ -38,7 +50,8 @@ export const MentorLeadSearchSchema = {
         method: 'POST',
         payload: {
           fieldName: 'district',
-          controllingfieldfk: '**',
+          controllingfieldfk:
+            userRole !== Role.CENTRAL_ADMIN ? [stateId] : '**',
           sort: ['district_name', 'asc'],
         },
         options: {
@@ -46,7 +59,7 @@ export const MentorLeadSearchSchema = {
           label: 'label',
           value: 'value',
         },
-        callType: 'dependent',
+        callType: userRole !== Role.CENTRAL_ADMIN ? 'initial' : 'dependent',
         dependent: 'state',
       },
       //for multiselect
