@@ -56,6 +56,7 @@ import { cohortHierarchy, Role, SortOrder, Status, VolunteerField } from '../../
 import { editEditUser } from '../../services/ProfileService';
 import { showToastMessage } from "@/components/Toastify";
 import MentorAssignment from '../../components/youthNet/MentorForm/MentorAssignment';
+import useSubmittedButtonStore from '../../store/useSubmittedButtonStore';
 
 const Index = () => {
  const { isRTL } = useDirection();
@@ -73,7 +74,9 @@ const Index = () => {
   const [selectedToggledUserId, setselectedToggledUserId] = useState('');
   const [formData, setFormData] = useState<any>();
   const [showAssignmentScreen, setShowAssignmentScreen] = useState<boolean>(false);
-
+  const submittedButtonStatus = useSubmittedButtonStore(
+    (state: any) => state.submittedButtonStatus
+  );
   const [openMentorDrawer, setOpenMentorDrawer] = useState(false);
   const [toggledMentor, setToggledMentor] = useState('');
   const [openDrawer, setOpenDrawer] = useState(false);
@@ -337,7 +340,7 @@ const Index = () => {
     };
     if(value === 1)
     getMentorData();
-  }, [selectedDistrictValue,  value]);
+  }, [selectedDistrictValue,  value, submittedButtonStatus]);
   const handleLocationClick = (Id: any, name: any) => {
     console.log(selectedBlockValue)
    
