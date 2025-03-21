@@ -140,7 +140,18 @@ const CollectionEditor: React.FC = () => {
   const [assetsLoaded, setAssetsLoaded] = useState(false);
 
   useEffect(() => {
+    const loadJQuery = () => {
+      if (!document.getElementById("jquery-script")) {
+        const script = document.createElement("script");
+        script.id = "jquery-script";
+        script.src = "https://code.jquery.com/jquery-3.6.0.min.js";
+        script.async = true;
+        script.onload = () => console.log("jQuery loaded successfully.");
+        document.body.appendChild(script);
+      }
+    };
     const loadAssets = () => {
+      loadJQuery();
       if (!document.getElementById("collection-editor-js")) {
         const script = document.createElement("script");
         console.log("Hello");
@@ -182,6 +193,24 @@ const CollectionEditor: React.FC = () => {
         pdfLink.href =
           "https://cdn.jsdelivr.net/npm/@project-sunbird/sunbird-pdf-player-web-component@1.4.0/styles.css";
         document.head.appendChild(pdfLink);
+      }
+
+      if (!document.getElementById("sunbird-epub-player-js")) {
+        const epubScript = document.createElement("script");
+        epubScript.id = "sunbird-epub-player-js";
+        epubScript.src =
+          "https://cdn.jsdelivr.net/npm/@project-sunbird/sunbird-epub-player-web-component@1.4.0/sunbird-epub-player.js";
+        epubScript.async = true;
+        document.body.appendChild(epubScript);
+      }
+
+      if (!document.getElementById("sunbird-epub-player-css")) {
+        const epubLink = document.createElement("link");
+        epubLink.id = "sunbird-epub-player-css";
+        epubLink.rel = "stylesheet";
+        epubLink.href =
+          "https://cdn.jsdelivr.net/npm/@project-sunbird/sunbird-epub-player-web-component@1.4.0/styles.css";
+        document.head.appendChild(epubLink);
       }
 
       const videoScript = document.createElement("script");

@@ -21,7 +21,8 @@ interface FileUploadEvent {
 }
 interface QuestionnaireAppProps {
   observationQuestions: any; // Define the correct type here based on your data structure
-  observationName: any
+  observationName: any;
+  backButtonShow?: boolean
 }
 interface PresignedUrlResponse {
   url: string;
@@ -42,7 +43,7 @@ interface FileUploadData {
   [key: string]: any;
 }
 
-const ObservationComponent: React.FC<QuestionnaireAppProps> = ({ observationQuestions, observationName }) => {
+const ObservationComponent: React.FC<QuestionnaireAppProps> = ({ observationQuestions, observationName , backButtonShow=true}) => {
   const questionairePlayerMainRef = useRef<HTMLElement | null>(null);
   const [isBackConfirmationOpen, setIsBackConfirmationOpen] = useState(false);
 
@@ -207,7 +208,8 @@ const ObservationComponent: React.FC<QuestionnaireAppProps> = ({ observationQues
 
   return (
     <>
-      <Box
+     {backButtonShow && (
+      <><Box
         sx={{
           display: 'flex',
           direction: 'row',
@@ -232,10 +234,14 @@ const ObservationComponent: React.FC<QuestionnaireAppProps> = ({ observationQues
           </Typography>
         )}
       </Box>
+     
 
       <Typography variant="h3" ml="60px" color={'black'}>
         {observationName}
       </Typography>
+      </>
+      )
+}
 
       {observationQuestions && (
         <questionnaire-player-main
