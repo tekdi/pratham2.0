@@ -4,9 +4,8 @@ import DynamicForm from '@/components/DynamicForm/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
 import {
-    MentorSearchSchema,
-    MentorSearchUISchema,
-} from '../constant/Forms/MentorSearch';
+   YouthSearchSchema,YouthSearchUISchema
+} from '../constant/Forms/YouthSearch';
 import { RoleId, Status } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
 import {
@@ -44,8 +43,8 @@ import AddIcon from "@mui/icons-material/Add";
 const Youth = () => {
     const theme = useTheme<any>();
     const [isLoading, setIsLoading] = useState(false);
-    const [schema, setSchema] = useState(MentorSearchSchema);
-    const [uiSchema, setUiSchema] = useState(MentorSearchUISchema);
+    const [schema, setSchema] = useState(YouthSearchSchema);
+    const [uiSchema, setUiSchema] = useState(YouthSearchUISchema);
     const [addSchema, setAddSchema] = useState(null);
     const [addUiSchema, setAddUiSchema] = useState(null);
     const [prefilledAddFormData, setPrefilledAddFormData] = useState({});
@@ -86,17 +85,16 @@ const Youth = () => {
         const fetchData = async () => {
             const responseForm = await fetchForm([
                 {
-                    fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.mentor.context}&contextType=${FormContext.mentor.contextType}`,
+                    fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.youth.context}&contextType=${FormContext.youth.contextType}`,
                     header: {},
                 },
                 {
-                    fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.mentor.context}&contextType=${FormContext.mentor.contextType}`,
+                    fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.youth.context}&contextType=${FormContext.youth.contextType}`,
                     header: {
                         tenantid: localStorage.getItem('tenantId'),
                     },
                 },
             ]);
-            console.log('responseForm', responseForm);
             setAddSchema(responseForm?.schema);
             setAddUiSchema(responseForm?.uiSchema);
         };
@@ -383,18 +381,18 @@ const Youth = () => {
                 roleId: roleId,
             },
         ],
-        username: 'youthnetmentor',
+        username: 'youthnetyouth',
         password: Math.floor(10000 + Math.random() * 90000),
     };
-    const successUpdateMessage = 'MENTORS.MENTOR_UPDATED_SUCCESSFULLY';
-    const telemetryUpdateKey = 'youthnet-mentor-updated-successfully';
-    const failureUpdateMessage = 'MENTORS.NOT_ABLE_UPDATE_MENTOR';
-    const successCreateMessage = 'MENTORS.MENTOR_CREATED_SUCCESSFULLY';
-    const telemetryCreateKey = 'youthnet-mentor-created-successfully';
-    const failureCreateMessage = 'MENTORS.NOT_ABLE_CREATE_MENTOR';
-    const notificationKey = 'onMentorCreate';
-    const notificationMessage = 'MENTORS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
-    const notificationContext = 'USER';
+    const successUpdateMessage = 'YOUTH.YOUTH_UPDATED_SUCCESSFULLY';
+    const telemetryUpdateKey = 'youthnet-youth-updated-successfully';
+    const failureUpdateMessage = 'YOUTH.NOT_ABLE_UPDATE_YOUTH';
+    const successCreateMessage = 'YOUTH.YOUTH_CREATED_SUCCESSFULLY';
+    const telemetryCreateKey = 'youthnet-youth-created-successfully';
+    const failureCreateMessage = 'YOUTH.NOT_ABLE_CREATE_YOUTH';
+    // const notificationKey = 'onMentorCreate';
+    // const notificationMessage = 'YOUTH.USER_CREDENTIALS_WILL_BE_SEND_SOON';
+    // const notificationContext = 'USER';
 
     return (
         <>
@@ -420,7 +418,7 @@ const Youth = () => {
                     onClose={handleCloseModal}
                     showFooter={false}
                     modalTitle={
-                        isEdit ? t('MENTORS.UPDATE_MENTOR') : t('MENTORS.NEW_MENTOR')
+                        isEdit ? t('YOUTH.UPDATE_YOUTH') : t('YOUTH.NEW_YOUTH')
                     }
                 >
                     <AddEditUser
@@ -447,14 +445,14 @@ const Youth = () => {
                         successCreateMessage={successCreateMessage}
                         telemetryCreateKey={telemetryCreateKey}
                         failureCreateMessage={failureCreateMessage}
-                        notificationKey={notificationKey}
-                        notificationMessage={notificationMessage}
-                        notificationContext={notificationContext}
+                        // notificationKey={notificationKey}
+                        // notificationMessage={notificationMessage}
+                        // notificationContext={notificationContext}
                     />
                 </SimpleModal>
 
                 {response && response?.result?.getUserDetails ? (
-                    <Box sx={{ mt: 1 }}>
+                    <Box sx={{ mt: 5 }}>
                         <PaginatedTable
                             count={response?.result?.totalCount}
                             data={response?.result?.getUserDetails}
@@ -474,7 +472,7 @@ const Youth = () => {
                         height="20vh"
                     >
                         <Typography marginTop="10px" textAlign={'center'}>
-                            {t('COMMON.NO_MENTOR_FOUND')}
+                                {t('COMMON.NO_YOUTH_FOUND')}
                         </Typography>
                     </Box>
                 )}
