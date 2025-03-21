@@ -125,22 +125,26 @@ const AddEditUser = ({
         if (isNotificationRequired) {
           const responseUserData = await createUser(payload, t);
 
-          if (responseUserData && responseUserData?.userData?.userId) {
+          if (responseUserData?.userData?.userId) {
             showToastMessage(t(successCreateMessage), 'success');
 
             telemetryCallbacks(telemetryCreateKey);
             SuccessCallback();
 
-            //Send Notification with credentials to user
-
-            await notificationCallback(
-              successCreateMessage,
-              notificationContext,
-              notificationKey,
-              payload,
-              t,
-              notificationMessage
-            );
+            // Send Notification with credentials to user
+            try {
+              await notificationCallback(
+                successCreateMessage,
+                notificationContext,
+                notificationKey,
+                payload,
+                t,
+                notificationMessage
+              );
+            } catch (notificationError) {
+              console.error('Notification failed:', notificationError);
+              // No failure toast here to prevent duplicate messages
+            }
           } else {
             showToastMessage(t(failureCreateMessage), 'error');
           }
