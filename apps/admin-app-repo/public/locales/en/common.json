@@ -755,6 +755,15 @@
     "NOT_ABLE_CREATE_YOUTH":"Not able to create youth",
     "YOUTH_CREATED_SUCCESSFULLY":"Youth has been successfully created!",
     "NOT_ABLE_UPDATE_YOUTH":"Not able to update youth",
-    "YOUTH_UPDATED_SUCCESSFULLY":"Youth has been successfully updated!"
+    "YOUTH_UPDATED_SUCCESSFULLY":"Youth has been successfully updated!",
+    "SELF_PLACED":"Self Placed",
+    "REGULAR":"Regular",
+    "ENROLLED_IN_EDUCATIONAL_INSTITUTE":"Enrolled in educational institute",
+    "OWN_FARMING":"Own farming",
+    "AGRICULTURAL_FARM_LABORER":"Agricultural farm laborer",
+    "NON_AGRICULTURAL_LABORER":"Non-agricultural laborer",
+    "SALARIED_WORK":"Salaried work",
+    "SELF_EMPLOYMENT":"Self-employment",
+    "UNEMPLOYED_OR_DOMESTIC_WORK":"Unemployed or Domestic Work"
   }
 }
