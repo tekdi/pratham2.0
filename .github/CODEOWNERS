@@ -1,0 +1,14 @@
+# These owners will be the default owners for everything in the repo
+* @pratham-project-admin
+
+# Owners of specific micro frontends
+/apps/teachers/ @teacher-app-owners
+/apps/admin-app-repo/ @admin-app-owners
+/apps/authentication/ @auth-team
+/apps/scp-teacher-repo/ @teacher-app-owners
+/apps/youthNet/ @youth-team
+/apps/workspace/ @workspace-team
+/apps/notification/ @notification-team
+
+# Owners of shared libraries
+/libs/ @core-team
