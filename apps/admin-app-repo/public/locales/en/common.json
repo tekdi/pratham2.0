@@ -649,7 +649,9 @@
     "COURSE_NAME": "Course Name:",
     "REISSUE_CERTIFICATE_CONFIRMATION": "Reissue certificate confirmation",
     "ISSUE_CERTIFICATE_CONFIRMATION": "Issue certificate confirmation",
-    "COURSE_CERTIFICATE": "Course certificate"
+    "COURSE_CERTIFICATE": "Course certificate",
+    "DOWNLOAD":"Ceritificate Download",
+    "DOWNLOAD_CERTIFICATE_SUCCESSFULLY":"Download Certificate Successfully"
   },
   "MENTOR": {
     "NEW_MENTOR": "New Mentor",

@@ -89,3 +89,19 @@ export const renderCertificate = async (
     throw error;
   }
 };
+
+
+export const downloadCertificate = async (
+  {
+    credentialId,
+    templateId
+  }: renderCertificateParam): Promise<any> => {
+  const apiUrl: string = API_ENDPOINTS.downloadCertificate;
+  try {
+    const response = await post(apiUrl, {credentialId, templateId});
+    return response;
+  } catch (error) {
+    console.error('error in getting render certificate', error);
+    throw error;
+  }
+};

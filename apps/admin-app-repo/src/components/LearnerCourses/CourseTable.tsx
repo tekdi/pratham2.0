@@ -10,6 +10,7 @@ import HeaderComponent from '../HeaderComponent';
 import { SelectChangeEvent } from '@mui/material/Select';
 import {
   courseWiseLernerList,
+  downloadCertificate,
   getCourseName,
   issueCertificate,
   renderCertificate,
@@ -132,6 +133,42 @@ const CourseTable: React.FC = () => {
       }
     }
   };
+  const onDownloadCertificate = async (rowData: any) => {
+    try {
+      const response = await downloadCertificate({
+        credentialId: rowData.certificateId,
+        templateId: TEMPLATE_ID,
+      });
+
+      if (!response) {
+        throw new Error('No response from server');
+      }
+
+      const blob = new Blob([response], { type: 'application/pdf' });
+
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `certificate_${rowData.certificateId}.pdf`; // Set filename
+      document.body.appendChild(a);
+      a.click();
+
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      showToastMessage(
+        t('CERTIFICATES.DOWNLOAD_CERTIFICATE_SUCCESSFULLY'),
+        'success'
+      );
+      
+    } catch (e) {
+      if (rowData.courseStatus === Status.ISSUED) {
+        showToastMessage(t('CERTIFICATES.RENDER_CERTIFICATE_FAILED'), 'error');
+      }
+      console.error('Error downloading certificate:', e);
+    }
+};
+
 
   const CertificatePage: React.FC<{ htmlContent: string }> = ({ htmlContent }) => {
     const encodedHtml = encodeURIComponent(htmlContent);
@@ -320,6 +357,7 @@ const CourseTable: React.FC = () => {
           PagesSelector={PagesSelector}
           PageSizeSelector={PageSizeSelectorFunction}
           pageSizes={pageSizeArray}
+          onDownloadCertificate={onDownloadCertificate}
         />
         {showCertificate && (
           <SimpleModal
