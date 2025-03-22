@@ -1,22 +1,23 @@
-import dynamic from 'next/dynamic';
-
-import Header from '@/components/Header';
-import { useRouter } from 'next/router';
 import { useEffect } from 'react';
+import { useRouter } from 'next/router';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 const ReloadPage: React.FC = () => {
   const router = useRouter();
 
-  router.back();
+  useEffect(() => {
+    router.back();
+  }, [router]);
 
   return <h1>Reload</h1>;
 };
 
-// export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
-//   return {
-//     paths: [], //indicates that no page needs be created at build time
-//     fallback: 'blocking', //indicates the type of fallback
-//   };
-// };
+export async function getStaticProps({ locale }: any) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common'])),
+    },
+  };
+}
 
 export default ReloadPage;
