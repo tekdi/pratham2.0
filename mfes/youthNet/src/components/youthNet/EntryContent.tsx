@@ -21,15 +21,15 @@ interface EntryContentProps {
   entityId: any;
   questionResponse?: any;
   setQuestionResponseResponse?: any;
-  observationId?: any
+  observationId?: any;
+  submissionNumber?: any
 }
-const EntryContent: React.FC<EntryContentProps> = ({   entityId , questionResponse,  setQuestionResponseResponse, observationId }: any) => {
+const EntryContent: React.FC<EntryContentProps> = ({   entityId , questionResponse,  setQuestionResponseResponse, observationId , submissionNumber}: any) => {
     const router = useRouter();
      const [submittedBy, setSubmittedBy] = useState<any>("");
      const [submittedByName, setSubmittedByName] = useState<any>("");
      const [submissionDate, setSubmissionDate] = useState<any>("");
 
-   
  
 
   useEffect(() => {
@@ -40,7 +40,16 @@ const EntryContent: React.FC<EntryContentProps> = ({   entityId , questionRespon
         {
           entityId=entityId.toString()
           //observationId=observationId.toString()
-          const response=await fetchQuestion({observationId:observationId.toString(),entityId})
+          let response;
+          if(submissionNumber)
+          {
+            const tempSubmissionNumber=submissionNumber;
+             response=await fetchQuestion({observationId:observationId.toString(),entityId, tempSubmissionNumber})
+
+          }
+          else
+          response=await fetchQuestion({observationId:observationId.toString(),entityId})
+
           const combinedData = {
             solution: response.solution,
             assessment: {
@@ -63,7 +72,7 @@ const EntryContent: React.FC<EntryContentProps> = ({   entityId , questionRespon
       }
     };
     fetchQuestionsList();
-  }, [entityId, observationId]);
+  }, [entityId, observationId, submissionNumber]);
   const mapBackendDataToQAPairs = (data: any) => {
     const answers = data?.OB?.answers || {};
     const result: { question: string; answer: any }[] = [];

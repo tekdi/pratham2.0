@@ -66,7 +66,7 @@ const ObservationQuestions: React.FC = () => {
           ?.map((entity: any) => entity._id);
         console.log('########### observations', completedIds);
         console.log('########### Ids', Ids);
-        setStoredEntries(completedIds);
+       // setStoredEntries(completedIds);
         const observationId = response?.result?._id;
         setObservationId(observationId);
         const entityId = localStorage.getItem('userId') || '';
@@ -76,8 +76,18 @@ const ObservationQuestions: React.FC = () => {
           observationId,
           entityId,
         });
-        console.log('########### responseObserSubList', responseObserSubList);
-
+        // const allIds = responseObserSubList
+        //   ?.filter((entity: any) => entity.status === 'completed' && entity._id)
+        //   ?.map((entity: any) => entity._id);
+        const completedEntries = responseObserSubList
+        ?.filter((entity: any) => entity.status === "completed" && entity._id)
+        ?.map((entity: any) => ({
+          id: entity.entityId,
+          submissionCount: entity["submissionNumber"] || 0, 
+        }))
+        ?.sort((a: any, b: any) =>a.submissionCount - b.submissionCount)
+  setStoredEntries(completedEntries)
+       
         //get list of submissions
         if (responseObserSubList && responseObserSubList.length == 0) {
           
@@ -358,14 +368,15 @@ const ObservationQuestions: React.FC = () => {
               {storedEntries.length !== 0 ? (
                 <Box width="100%">
                   <EntrySlider>
-                    {storedEntries.map((entryId: any, index: any) => (
+                  {storedEntries?.map((entry: { id: string; submissionCount: number }) => (
                       <EntryContent
-                        entityId={entryId}
+                        entityId={entry.id}
                         questionResponse={questionResponse}
                         setQuestionResponseResponse={
                           setQuestionResponseResponse
                         }
                         observationId={observationId}
+                        submissionNumber={entry?.submissionCount}
                       />
                     ))}
                   </EntrySlider>
