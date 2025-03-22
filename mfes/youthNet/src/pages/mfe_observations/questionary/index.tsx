@@ -90,7 +90,6 @@ const ObservationQuestions: React.FC = () => {
        
         //get list of submissions
         if (responseObserSubList && responseObserSubList.length == 0) {
-          
         }
 
         let tempSubmissionNumber = null;
@@ -131,6 +130,7 @@ const ObservationQuestions: React.FC = () => {
             entityId,
             tempSubmissionNumber,
           });
+
           const combinedData = {
             solution: response.solution,
             assessment: {
