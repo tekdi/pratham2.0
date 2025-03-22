@@ -20,21 +20,22 @@ type QuestionAnswer = {
 interface EntryContentProps {
   entityId: any;
   questionResponse?: any;
-  setQuestionResponseResponse?: any
+  setQuestionResponseResponse?: any;
+  observationId?: any
 }
-const EntryContent: React.FC<EntryContentProps> = ({   entityId , questionResponse,  setQuestionResponseResponse }: any) => {
+const EntryContent: React.FC<EntryContentProps> = ({   entityId , questionResponse,  setQuestionResponseResponse, observationId }: any) => {
     const router = useRouter();
      const [submittedBy, setSubmittedBy] = useState<any>("");
      const [submittedByName, setSubmittedByName] = useState<any>("");
      const [submissionDate, setSubmissionDate] = useState<any>("");
 
    
-  const {  observationId} = router.query;
+ 
 
   useEffect(() => {
     const fetchQuestionsList = async () => {
       try {
-    
+
         if(observationId && entityId)
         {
           entityId=entityId.toString()
@@ -58,7 +59,7 @@ const EntryContent: React.FC<EntryContentProps> = ({   entityId , questionRespon
 
         }
       } catch (error) {
-        console.error('Error fetching cohort list', error);
+        console.error('Error list', error);
       }
     };
     fetchQuestionsList();

@@ -64,7 +64,11 @@ export enum Role {
   TEAM_LEADER = 'Team Leader',
   ADMIN = 'Admin',
 }
-
+export enum RoleNames {
+  STUDENT = 'Learner',
+  TEACHER = 'Instructor',
+  TEAM_LEADER = 'Lead',
+}
 export enum Status {
   DROPOUT = 'dropout',
   ACTIVE = 'active',
