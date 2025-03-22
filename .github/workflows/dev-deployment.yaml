@@ -48,12 +48,15 @@ jobs:
           username: ${{ secrets.EC2_USER_DEV }}
           key: ${{ secrets.EC2_SSH_KEY_DEV }}
           script: |
-            cd ${{ secrets.TARGET_DEV_LMP }}
+            cd ${{ secrets.TARGET_DEV_LMP }} && ls -ltra
+               if [ -f .env ]; then
+               rm .env
+               fi
+               echo "${{ secrets.DEV_LMP_ENV }}" > .env && ls -ltra
             docker ps -a --filter "status=exited" --format "{{.ID}}" | xargs -r docker start
             docker stop dev-lmp || true
             docker system prune -af || true
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_URI }}
             docker-compose up -d --force-recreate --no-deps
-            docker system prune -af || true
             docker ps -a | grep dev-lmp
             sudo systemctl restart nginx

@@ -1,5 +1,7 @@
 import {API_ENDPOINTS }from '@/utils/API/APIEndpoints';
 import { post } from '../RestClient';
+import axios, { AxiosResponse } from 'axios';
+
 export interface courseWiseLernerListParam {
   limit?: number;
   offset?: number;
@@ -89,3 +91,26 @@ export const renderCertificate = async (
     throw error;
   }
 };
+
+
+export const downloadCertificate = async (
+  { credentialId, templateId }: renderCertificateParam
+): Promise<Blob> => {
+  const apiUrl: string = API_ENDPOINTS.downloadCertificate;
+  try {
+    const response: AxiosResponse<Blob> = await axios.post(apiUrl, { credentialId, templateId }, { 
+      responseType: 'blob'  // Ensures we get a binary file
+    });
+
+    if (!response.data) {
+      throw new Error('Empty response from API');
+    }
+
+    return response.data; // Return only the Blob data
+  } catch (error) {
+    console.error('Error in getting render certificate:', error);
+    throw error;
+  }
+};
+
+
