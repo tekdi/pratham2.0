@@ -149,7 +149,7 @@ const processData = (key: keyof UserData, data: any) => {
           { storedEntries.length!==0  ?(<Box width="100%">
             <EntrySlider>
             {storedEntries.map((entryId: any, index: any) => (
-  <EntryContent    entityId={entryId} questionResponse={questionResponse} setQuestionResponseResponse={setQuestionResponseResponse} />
+  <EntryContent    entityId={entryId} questionResponse={questionResponse} setQuestionResponseResponse={setQuestionResponseResponse} observationId={observationId}/>
 ))}
             </EntrySlider>
           </Box>):(<Typography ml="25%" mt="10%"> Looks like there are no entries yet</Typography>)

@@ -825,6 +825,8 @@
   },
   "MENTOR": {
     "MENTOR_CREATED_SUCCESSFULLY": "The mentor account has been created successfully, and the credentials have been sent",
+    "MENTOR_CREATED": "The mentor account has been created successfully",
+
     "MENTOR_CREATED_FAILED": "Failed to create mentor account",
     "FINISH_ASSIGN": "Finish & Assign",
     "VILLAGES_SELECTED": "villages selected",
