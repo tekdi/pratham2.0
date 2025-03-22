@@ -15,7 +15,7 @@ const RegistrationStatistics: React.FC<RegistrationStatisticsProps> = ({
   return (
     <Box
       sx={{
-        background: '#CDC5BD',
+        background: '#EDE1CF',
         boxShadow: '0px 1px 2px 0px #0000004D, 0px 2px 6px 2px #00000026',
         padding: '12px',
         borderRadius: '16px',
