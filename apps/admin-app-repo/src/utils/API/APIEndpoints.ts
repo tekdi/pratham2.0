@@ -38,6 +38,8 @@ export const API_ENDPOINTS = {
   getCourseName: `${baseurl}/action/composite/v3/search`,
   issueCertificate: `${baseurl}/tracking/certificate/issue`,
   renderCertificate: `${baseurl}/tracking/certificate/render`,
+  downloadCertificate: `${baseurl}/tracking/certificate/render-PDF`,
+
 };
 
 export const COURSE_PLANNER_UPLOAD_ENDPOINTS = `${process.env.NEXT_PUBLIC_BASE_URL}/prathamservice/v1/course-planner/upload`;

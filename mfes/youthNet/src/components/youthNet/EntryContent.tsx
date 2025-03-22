@@ -20,26 +20,36 @@ type QuestionAnswer = {
 interface EntryContentProps {
   entityId: any;
   questionResponse?: any;
-  setQuestionResponseResponse?: any
+  setQuestionResponseResponse?: any;
+  observationId?: any;
+  submissionNumber?: any
 }
-const EntryContent: React.FC<EntryContentProps> = ({   entityId , questionResponse,  setQuestionResponseResponse }: any) => {
+const EntryContent: React.FC<EntryContentProps> = ({   entityId , questionResponse,  setQuestionResponseResponse, observationId , submissionNumber}: any) => {
     const router = useRouter();
      const [submittedBy, setSubmittedBy] = useState<any>("");
      const [submittedByName, setSubmittedByName] = useState<any>("");
      const [submissionDate, setSubmissionDate] = useState<any>("");
 
-   
-  const {  observationId} = router.query;
+ 
 
   useEffect(() => {
     const fetchQuestionsList = async () => {
       try {
-    
+
         if(observationId && entityId)
         {
           entityId=entityId.toString()
           //observationId=observationId.toString()
-          const response=await fetchQuestion({observationId:observationId.toString(),entityId})
+          let response;
+          if(submissionNumber)
+          {
+            const tempSubmissionNumber=submissionNumber;
+             response=await fetchQuestion({observationId:observationId.toString(),entityId, tempSubmissionNumber})
+
+          }
+          else
+          response=await fetchQuestion({observationId:observationId.toString(),entityId})
+
           const combinedData = {
             solution: response.solution,
             assessment: {
@@ -47,7 +57,7 @@ const EntryContent: React.FC<EntryContentProps> = ({   entityId , questionRespon
 
             }
           };
-       
+       console.log("########### combinedData?.assessment?.submissions",combinedData?.assessment?.submissions)
           setQuestionResponseResponse(
             mapBackendDataToQAPairs(combinedData?.assessment?.submissions)
           )
@@ -58,11 +68,11 @@ const EntryContent: React.FC<EntryContentProps> = ({   entityId , questionRespon
 
         }
       } catch (error) {
-        console.error('Error fetching cohort list', error);
+        console.error('Error list', error);
       }
     };
     fetchQuestionsList();
-  }, [entityId, observationId]);
+  }, [entityId, observationId, submissionNumber]);
   const mapBackendDataToQAPairs = (data: any) => {
     const answers = data?.OB?.answers || {};
     const result: { question: string; answer: any }[] = [];
@@ -114,7 +124,9 @@ const EntryContent: React.FC<EntryContentProps> = ({   entityId , questionRespon
         result.push({ question: "Participant Name", answer: participants });
     }
 
-    console.log(result);
+    // console.log(result);
+
+    console.log("########### result",result)
     return result;
 };
 const onUserClick=(userId: any)=>
