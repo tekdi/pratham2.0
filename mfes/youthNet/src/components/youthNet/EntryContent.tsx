@@ -48,7 +48,7 @@ const EntryContent: React.FC<EntryContentProps> = ({   entityId , questionRespon
 
             }
           };
-       
+       console.log("########### combinedData?.assessment?.submissions",combinedData?.assessment?.submissions)
           setQuestionResponseResponse(
             mapBackendDataToQAPairs(combinedData?.assessment?.submissions)
           )
@@ -115,7 +115,9 @@ const EntryContent: React.FC<EntryContentProps> = ({   entityId , questionRespon
         result.push({ question: "Participant Name", answer: participants });
     }
 
-    console.log(result);
+    // console.log(result);
+
+    console.log("########### result",result)
     return result;
 };
 const onUserClick=(userId: any)=>
