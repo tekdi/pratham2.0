@@ -49,7 +49,7 @@ const RegistrationStatistics: React.FC<RegistrationStatisticsProps> = ({
             }}
             className="one-line-text"
           >
-            {/* {cardTitle}  */} 400
+            {cardTitle}  
           </Box>
         )}
 
