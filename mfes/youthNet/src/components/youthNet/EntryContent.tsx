@@ -63,22 +63,29 @@ const EntryContent: React.FC<EntryContentProps> = ({
 
   const mapBackendDataToQAPairs = (data: any) => {
     const answers = data?.OB?.answers || {};
-    const result: { question: string; answer: any }[] = [];
+    const result: { question: string; answer: any, answerValue?:any }[] = [];
     let participants: any = [];
 
     Object.values(answers).forEach((answer: any) => {
+      console.log("######## answer",answer)
         const question = answer.payload?.question?.[0];
         const responseType = answer.responseType;
         let value = Array.isArray(answer.value) ? answer.value[0] : answer.value;
 
         if (answer.payload?.labels?.length > 0) {
-            value = answer.payload.labels[0];
+          if(typeof answer.payload.labels[0] == "string")
+          {
+            console.log("answer.payload?.labels" ,answer.payload.labels)
+            value = answer.payload.labels?.join(', ')
+          }
+           
+           
         }
 
         // Handle file uploads separately
         if (Array.isArray(answer.fileName) && answer.fileName.length > 0) {
             const fileUrls = answer.fileName.map((file: any) => file.previewUrl);
-            result.push({ question, answer: fileUrls });
+            result.push({ question, answer: fileUrls , answerValue: value});
             return; // Prevents further processing of file-type responses
         }
 
@@ -135,7 +142,12 @@ const EntryContent: React.FC<EntryContentProps> = ({
   const handleFileDownload = (fileUrl: string) => {
     window.open(fileUrl, "_blank");
   };
-
+  const getFileNameFromUrl = (url: any) => {
+    const urlObj = new URL(url);
+    const pathname = urlObj.pathname; // Get the path after domain
+    return pathname.substring(pathname.lastIndexOf('/') + 1); // Extract file name
+  };
+  console.log("############ questionResponse", questionResponse)
   return (
     <Box>
       <Typography sx={{ fontSize: "12px", fontWeight: "300", fontStyle: "italic" }}>
@@ -160,9 +172,10 @@ const EntryContent: React.FC<EntryContentProps> = ({
                 <Box sx={{ background: "#FAF3E0", padding: "10px", borderRadius: "8px" }}>
                   {pair.answer.map((participant: Participant, idx: number) => (
                     <Box key={idx} sx={{ padding: "8px 0", borderBottom: idx !== pair.answer.length - 1 ? "1px solid #ddd" : "none" }}>
-                      <Typography sx={{ fontSize: "16px", fontWeight: "600" }}>
-                        {participant.name.charAt(0).toUpperCase() + participant.name.slice(1)}
-                      </Typography>
+                     { participant?.name &&(<Typography sx={{ fontSize: "16px", fontWeight: "600" }}>
+                        {participant?.name?.toString().charAt(0)?.toUpperCase() + participant?.name?.toString().slice(1)}
+                      </Typography>)
+                  }
                       <Typography sx={{ fontSize: "14px", fontWeight: "400", color: "#555" }}>
                         {participant.age} y/o • {participant.gender}
                       </Typography>
@@ -170,19 +183,27 @@ const EntryContent: React.FC<EntryContentProps> = ({
                   ))}
                 </Box>
               ) : Array.isArray(pair.answer) ? (
-                pair.answer.map((fileUrl: string, idx: number) => (
-                  <Box key={idx} sx={{ display: "flex", alignItems: "center", background: "#fff", padding: "10px", borderRadius: "12px", boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.1)", maxWidth: "350px", justifyContent: "space-between" }}>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <InsertDriveFileIcon sx={{ color: "#555" }} />
-                      <Typography sx={{ fontSize: "14px", fontWeight: "500", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "200px" }} title={`File ${idx + 1}`}>
-                        File {idx + 1}
-                      </Typography>
+                <>
+                                <Typography sx={{ fontSize: "14px", color: "#333" }}>{pair.answerValue}</Typography>
+
+                {
+                  pair.answer.map((fileUrl: string, idx: number) => (
+                    <Box key={idx} sx={{ display: "flex", alignItems: "center", background: "#fff", padding: "10px", borderRadius: "12px", boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.1)", maxWidth: "350px", justifyContent: "space-between" }}>
+                      
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <InsertDriveFileIcon sx={{ color: "#555" }} />
+                        <Typography sx={{ fontSize: "14px", fontWeight: "500", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "200px" }} title={`File ${idx + 1}`}>
+                          
+                          {getFileNameFromUrl(fileUrl)}
+                        </Typography>
+                      </Box>
+                      <IconButton onClick={() => handleFileDownload(fileUrl)} sx={{ color: "black" }}>
+                        <Download />
+                      </IconButton>
                     </Box>
-                    <IconButton onClick={() => handleFileDownload(fileUrl)} sx={{ color: "black" }}>
-                      <Download />
-                    </IconButton>
-                  </Box>
-                ))
+                  ))
+                }</>
+                
               ) : (
                 <Typography sx={{ fontSize: "14px", color: "#333" }}>{pair.answer}</Typography>
               )}

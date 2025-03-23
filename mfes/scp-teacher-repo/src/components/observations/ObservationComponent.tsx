@@ -70,6 +70,7 @@ const ObservationComponent: React.FC<QuestionnaireAppProps> = ({
     payload.request[submissionId] = {
       files: [event.data.name],
     };
+    let fileType="";
 
     try {
       //generate presigned url
@@ -116,9 +117,9 @@ const ObservationComponent: React.FC<QuestionnaireAppProps> = ({
         //   console.error('Submission ID not found in response.');
         // }
          let fileName= event.data.name;
-         let fileType= event.data.file?.type;
+         fileType= event.data.file?.type
          console.log(fileName, fileType)
-
+       //  const nameWithoutExtension = fileName.split('.').slice(0, -1).join('.');
         const result=  await axios.get(`https://dev-interface.prathamdigital.org/interface/v1/user/presigned-url?key=${fileName}&fileType=${fileType}`)
         presignedurl=result.data.result;
         presigneDownloadUrl=result.data.result;
@@ -136,10 +137,10 @@ const ObservationComponent: React.FC<QuestionnaireAppProps> = ({
 
       await axios.put(
         presignedurl,
-        formData,
+        event.data.file,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            'Content-Type': fileType,
           },
         }
       );
