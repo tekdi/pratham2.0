@@ -64,7 +64,7 @@ const Index = () => {
   const theme = useTheme<any>();
   const router = useRouter();
   const { villageId, tab, blockId } = router.query;
-
+console.log(villageId)
 // const blockId: blockResult?.selectedValues[0]?.id
   const [value, setValue] = useState<number>(
     tab? Number(tab)  :  YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() ? 1 : 2
@@ -413,8 +413,13 @@ const Index = () => {
             setSelectedVillageValue(villageId);
 
           }
-        else          
-        setSelectedVillageValue(villageData[0]?.Id);
+        else   
+        {
+          if(YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole())
+            setSelectedVillageValue(villageId);
+          else
+          setSelectedVillageValue(villageData[0]?.Id);
+        }       
 
 
           setVillageCount(villageData.length);
@@ -440,8 +445,14 @@ const Index = () => {
               setSelectedVillageValue(villageId);
   
             }
-          else          
-          setSelectedVillageValue(transformedVillageData[0]?.Id);
+          else  
+          {
+            if(YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole())
+              setSelectedVillageValue(villageId);
+            else
+            setSelectedVillageValue(transformedVillageData[0]?.Id);
+
+          }        
         }
       } catch (error) {
         console.log(error);

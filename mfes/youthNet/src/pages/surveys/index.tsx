@@ -101,7 +101,7 @@ const [districtData, setDistrictData] = useState<any>(null);
         const state= stateResult?.selectedValues[0]?.id?.toString()
         const district=districtResult?.selectedValues[0]?.id?.toString()
         const block=YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole()?selectedBlockValue.toString():blockResult?.selectedValues[0]?.id?.toString()
-        const response = await targetSolution({state, district, block}) 
+        const response = await targetSolution({state, district}) 
         const surveysData2 = response?.result?.data.map((survey: any) => ({
           id: survey._id,
           solutionId: survey.solutionId,
