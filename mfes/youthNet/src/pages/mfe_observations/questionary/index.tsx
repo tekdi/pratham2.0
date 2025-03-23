@@ -42,7 +42,6 @@ const ObservationQuestions: React.FC = () => {
   const [questionResponse, setQuestionResponseResponse] = useState<any>(null);
   const [questions, setQuestions] = useState<any>(null);
   const theme = useTheme<any>();
-
   const [isAddNew, setIsAddNew] = useState(false);
 
   //another submission
@@ -115,7 +114,7 @@ const ObservationQuestions: React.FC = () => {
               responseObserSubList[i]?.status === 'draft'
             ) {
               tempSubmissionNumber = responseObserSubList[i].submissionNumber;
-              setIsAddNew(true);
+              //setIsAddNew(true);
               break; // Exit the loop once found
             }
           }
@@ -149,27 +148,54 @@ const ObservationQuestions: React.FC = () => {
     if (solutionId) fetchQuestionsList();
   }, [Id, solutionId]);
   const handleBack = () => {
-    router.back();
+    if(submissionNumber && isAddNew===true)
+    {
+      //add popup for back alert
+      const userResponse = confirm("Are you sure you want to go back?");
+
+if (userResponse) {
+  // User clicked "OK"
+  console.log("User confirmed the action.");
+  setIsAddNew(false)
+
+  // Perform the desired action here
+} else {
+  // User clicked "Cancel"
+  console.log("User canceled the action.");
+  // Handle the cancellation
+}
+    }
+    else{
+      router.back();
+    }
   };
   const addAnotherSubmission = async () => {
     try {
+      if(submissionNumber && isAddNew===false)
+      {
+        setIsAddNew(true)
+        
+      }
+      else{
+        console.log(' ####### ###addnew observationId', observationId);
+        console.log(' ####### ###addnew entityId', entityId);
+        const responseCreateObserSub = await createAnotherSubmission({
+          observationId,
+          entityId,
+        });
+        console.log('########### responseCreateObserSub', responseCreateObserSub);
+        //call list api
+        const responseObserSubList = await fetchObservSublist({
+          observationId,
+          entityId,
+        });
+  
+        console.log('########### responseObserSubList', responseObserSubList);
+        router.push('/mfe_observations/questionary/reload');
+  
+      }
       //createAnotherSubmission
-      console.log(' ####### ###addnew observationId', observationId);
-      console.log(' ####### ###addnew entityId', entityId);
-      const responseCreateObserSub = await createAnotherSubmission({
-        observationId,
-        entityId,
-      });
-      console.log('########### responseCreateObserSub', responseCreateObserSub);
-      //call list api
-      const responseObserSubList = await fetchObservSublist({
-        observationId,
-        entityId,
-      });
-
-      console.log('########### responseObserSubList', responseObserSubList);
-      router.push('/mfe_observations/questionary/reload');
-
+     
       //not started any submission
       /*if (
         !Ids.includes(entityId) ||
