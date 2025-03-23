@@ -140,34 +140,43 @@ const EntryContent: React.FC<EntryContentProps> = ({
   };
 
   const handleFileDownload = async(fileUrl: string , fileName:string) => {
-    try {
-      // Fetch the file as a blob
-      const response = await fetch(fileUrl);
-      if (!response.ok) {
-        throw new Error(`Error fetching file: ${response.statusText}`);
-      }
-  
-      // Convert response to blob
-      const blob = await response.blob();
-  
-      // Create a URL for the blob object
-      const url = window.URL.createObjectURL(blob);
-  
-      // Create a temporary link and trigger download
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', fileName || 'downloaded-file'); // Set file name
-      document.body.appendChild(link);
-      link.click();
-  
-      // Clean up
-      link.parentNode?.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      window.open(fileUrl, "_blank");
+    if(localStorage.getItem('mef_state'))
+      {
+        window.open(fileUrl, "_blank");
 
-      console.error('❌ Error downloading file:', error);
-    }
+      }
+      else{
+        try {
+          // Fetch the file as a blob
+          
+          const response = await fetch(fileUrl);
+          if (!response.ok) {
+            throw new Error(`Error fetching file: ${response.statusText}`);
+          }
+      
+          // Convert response to blob
+          const blob = await response.blob();
+      
+          // Create a URL for the blob object
+          const url = window.URL.createObjectURL(blob);
+      
+          // Create a temporary link and trigger download
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', fileName || 'downloaded-file'); // Set file name
+          document.body.appendChild(link);
+          link.click();
+      
+          // Clean up
+          link.parentNode?.removeChild(link);
+          window.URL.revokeObjectURL(url);
+        } catch (error) {
+          window.open(fileUrl, "_blank");
+    
+          console.error('❌ Error downloading file:', error);
+        }
+      }
+   
     // window.open(fileUrl, "_blank");
   };
   const getFileNameFromUrl = (url: any) => {
