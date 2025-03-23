@@ -132,7 +132,7 @@ const Survey = () => {
         const state = localStorage.getItem('mfe_state');
         const district = localStorage.getItem('mfe_district');
         const block = localStorage.getItem('mfe_block');
-        const response = await targetSolution({ state, district, block });
+        const response = await targetSolution({ state, district });
         const surveysData2 = response?.result?.data.map((survey: any) => ({
           id: survey._id,
           solutionId: survey.solutionId,

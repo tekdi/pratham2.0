@@ -75,7 +75,8 @@ const ObservationComponent: React.FC<QuestionnaireAppProps> = ({
       //generate presigned url
       const submissionId = event.data.submissionId; // Extract submissionId from event data
       const files = [event.data.name];
-      const requestObject = {
+      
+      const requestObject: any = {
         request: {
           [submissionId]: {
             files: files,
@@ -85,32 +86,42 @@ const ObservationComponent: React.FC<QuestionnaireAppProps> = ({
       };
       let presignedUrlLatest = '';
       let presignedUrlData = null;
+      let presignedurl="";
+      let presigneDownloadUrl=""
       // Get Pre-Signed URL
       try {
-        const response_url: any = await axios.post(
-          'https://dev-survey.prathamdigital.org/survey/v1/files/preSignedUrls',
-          requestObject,
-          {
-            headers: {
-              'x-auth-token': localStorage.getItem('token') || '', // Ensure token exists
-            },
-          }
-        );
-        const result_url = response_url.data.result;
-        console.log('########### response_url', result_url);
-        const dynamicSubmissionId = Object.keys(result_url).find(
-          (key) => key !== 'cloudStorage'
-        ); // Get dynamic key
-        if (dynamicSubmissionId) {
-          presignedUrlData = result_url[dynamicSubmissionId]?.files?.[0];
-          presignedUrlLatest = result_url[dynamicSubmissionId]?.files?.[0]?.url; // Upload URL
-          const downloadUrl =
-            result_url[dynamicSubmissionId]?.files?.[0]
-              ?.getDownloadableUrl?.[0]; // Download URL
-          console.log('########### presignedUrlData:', presignedUrlData);
-        } else {
-          console.error('Submission ID not found in response.');
-        }
+        // const response_url: any = await axios.post(
+        //   'https://dev-survey.prathamdigital.org/survey/v1/files/preSignedUrls',
+        //   requestObject,
+        //   {
+        //     headers: {
+        //       'x-auth-token': localStorage.getItem('token') || '', // Ensure token exists
+        //     },
+        //   }
+        // );
+        
+        // const result_url = response_url.data.result;
+        // console.log('########### response_url', result_url);
+        // const dynamicSubmissionId = Object.keys(result_url).find(
+        //   (key) => key !== 'cloudStorage'
+        // ); // Get dynamic key
+        // if (dynamicSubmissionId) {
+        //   presignedUrlData = result_url[dynamicSubmissionId]?.files?.[0];
+        //   presignedUrlLatest = result_url[dynamicSubmissionId]?.files?.[0]?.url; // Upload URL
+        //   const downloadUrl =
+        //     result_url[dynamicSubmissionId]?.files?.[0]
+        //       ?.getDownloadableUrl?.[0]; // Download URL
+        //   console.log('########### presignedUrlData:', presignedUrlData);
+        // } else {
+        //   console.error('Submission ID not found in response.');
+        // }
+         let fileName= event.data.name;
+         let fileType= event.data.file?.type;
+         console.log(fileName, fileType)
+
+        const result=  await axios.get(`https://dev-interface.prathamdigital.org/interface/v1/user/presigned-url?key=${fileName}&fileType=${fileType}`)
+        presignedurl=result.data.result;
+        presigneDownloadUrl=result.data.result;
       } catch (error) {
         console.error('Error fetching pre-signed URL:', error);
       }
@@ -124,7 +135,7 @@ const ObservationComponent: React.FC<QuestionnaireAppProps> = ({
       formData.append('file', event.data.file);
 
       await axios.put(
-        presignedUrlData.url,
+        presignedurl,
         formData,
         {
           headers: {
@@ -135,12 +146,12 @@ const ObservationComponent: React.FC<QuestionnaireAppProps> = ({
 
       const obj: FileUploadData = {
         name: event.data.name,
-        url: presignedUrlData.url.split('?')[0],
-        previewUrl: presignedUrlData.getDownloadableUrl[0],
+        url: presignedurl.split('?')[0],
+        previewUrl: presigneDownloadUrl.split('?')[0],
       };
 
-      for (const key of Object.keys(presignedUrlData.payload)) {
-        obj[key] = presignedUrlData.payload[key];
+      for (const key of Object.keys(requestObject)) {
+        obj[key] = requestObject[key];
       }
       setFileUploadResponse({
         status: 200,
