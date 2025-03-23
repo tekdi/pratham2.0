@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Divider, Typography } from '@mui/material';
+import { Box, Divider, Typography , IconButton } from '@mui/material';
 import { useRouter } from 'next/router';
 import { fetchQuestion } from '@/services/ObservationServices';
 import { UserList } from './UserCard';
 import { VolunteerField } from '../../utils/app.constant';
-
+import { Download } from '@mui/icons-material';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'
 type Participant = {
   name: string;
   age: number;
@@ -61,9 +62,9 @@ const EntryContent: React.FC<EntryContentProps> = ({   entityId , questionRespon
           setQuestionResponseResponse(
             mapBackendDataToQAPairs(combinedData?.assessment?.submissions)
           )
-          setSubmittedByName(combinedData?.assessment?.submissions?.OB?.submittedByName)
-          setSubmittedBy(combinedData?.assessment?.submissions?.OB?.submittedBy)
-          setSubmissionDate(combinedData?.assessment?.submissions?.OB?.submissionDate)
+          setSubmittedByName(combinedData?.assessment?.submissions?.SF?.submittedByName)
+          setSubmittedBy(combinedData?.assessment?.submissions?.SF?.submittedBy)
+          setSubmissionDate(combinedData?.assessment?.submissions?.SF?.submissionDate)
 
 
         }
@@ -89,7 +90,16 @@ const EntryContent: React.FC<EntryContentProps> = ({   entityId , questionRespon
             value = answer.payload.labels[0]; 
         }
 
-        if (responseType === "multiselect" || responseType === "radio" || responseType === "text" || responseType === "number") {
+        // **Dynamically handle any question that has uploaded files**
+        if (Array.isArray(answer.fileName) && answer.fileName.length > 0) {
+            const fileUrls = answer.fileName.map((file: any) => file.previewUrl);
+            const formattedAnswer = [
+                `Answer: ${value}`,
+                ...fileUrls.map((url: string, index: number) => `File ${index + 1}: ${url}`)
+            ];
+            result.push({ question, answer: formattedAnswer });
+        } 
+        else if (responseType === "multiselect" || responseType === "radio" || responseType === "text" || responseType === "number") {
             result.push({ question, answer: value });
         } 
         
@@ -121,14 +131,12 @@ const EntryContent: React.FC<EntryContentProps> = ({   entityId , questionRespon
 
     // Add participant list as a single question-answer entry
     if (participants.length > 0) {
-        result.push({ question: "Participant Name", answer: participants });
+        result.push({ question: "Participant Name", answer: participants.map((p: any) => `${p.name} (Age: ${p.age}, Gender: ${p.gender})`) });
     }
 
-    // console.log(result);
-
-    console.log("########### result",result)
     return result;
 };
+
 const onUserClick=(userId: any)=>
   {
     router.push(`/user-profile/${userId}`);
@@ -153,6 +161,11 @@ const onUserClick=(userId: any)=>
   
     return `Submitted on ${formattedDate} @ ${formattedTime}`;
   };
+  const handleFileDownload = (fileUrl: string) => {
+    console.log("Downloading file from:", fileUrl);
+    // You can add more logic here if needed
+    window.open(fileUrl, "_blank"); // Opens file in a new tab
+  };
   return (
     <Box>
       <Typography
@@ -172,34 +185,78 @@ const onUserClick=(userId: any)=>
     onUserClick={onUserClick}
       />
       <Divider />
-      {questionResponse?.map((pair: any, index: any) => (
-        <Box key={index} sx={{ marginTop: '20px' }}>
-          <Typography
-            sx={{ fontSize: '14px', fontWeight: '500', color: 'black' }}
-          >
-            {pair?.question}
-          </Typography>
-          <Box sx={{ marginTop: '8px' }}>
-            {/* Custom UI for "Participant Name" */}
-            {pair?.question === 'Participant Name' && Array.isArray(pair.answer) ? (
-              <Box sx={{ background: '#FAF3E0', padding: '10px', borderRadius: '8px' }}>
-                {pair.answer.map((participant: Participant, idx: number) => (
-                  <Box key={idx} sx={{ padding: '8px 0', borderBottom: idx !== pair.answer.length - 1 ? '1px solid #ddd' : 'none' }}>
-                    <Typography sx={{ fontSize: '16px', fontWeight: '600' }}>
-                      {participant?.name?.charAt(0).toUpperCase() + participant?.name.slice(1)}
-                    </Typography>
-                    <Typography sx={{ fontSize: '14px', fontWeight: '400', color: '#555' }}>
-                      {participant.age} y/o • {participant.gender}
+      <Box>
+  {questionResponse?.map((pair: any, index: number) => (
+    <Box key={index} sx={{ marginTop: '20px' }}>
+      <Typography sx={{ fontSize: '14px', fontWeight: '500', color: 'black' }}>
+        {pair?.question}
+      </Typography>
+
+      <Box sx={{ marginTop: '8px' }}>
+        {Array.isArray(pair.answer) ? (
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            {pair.answer.map((item: string, idx: number) => {
+              console.log(item)
+              // Extract the actual file name from S3 URL
+              const urlMatch = item.match(/https?:\/\/\S+/); // Extract URL
+              const fileUrl = urlMatch ? urlMatch[0] : null;
+              const fileNameMatch = fileUrl?.match(/([^/]+)\?/); // Extract file name before query params
+              const fileName = fileNameMatch ? decodeURIComponent(fileNameMatch[1]) : `File ${idx + 1}`;
+
+              return fileUrl ? (
+                <Box
+                  key={idx}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    background: '#fff',
+                    padding: '10px',
+                    borderRadius: '12px',
+                    boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.1)',
+                    width: '100%',
+                    maxWidth: '350px',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  {/* File Icon and Name */}
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <InsertDriveFileIcon sx={{ color: '#555' }} />
+                    <Typography
+                      sx={{ fontSize: '14px', fontWeight: '500', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '200px' }}
+                      title={fileName}
+                    >
+                      {fileName}
                     </Typography>
                   </Box>
-                ))}
-              </Box>
-            ) : (
-              pair.answer
-            )}
+
+                  {/* Download Button (calls function instead of direct link) */}
+                  <IconButton
+                    onClick={() => handleFileDownload(fileUrl)}
+                    sx={{ color: 'black' }}
+                  >
+                    <Download />
+                  </IconButton>
+                </Box>
+              ) : (
+                <Typography key={idx} sx={{ fontSize: '14px', color: '#333' }}>
+                  {item}
+                </Typography>
+              );
+            })}
           </Box>
-        </Box>
-      ))}
+        ) : (
+          <Typography sx={{ fontSize: '14px', color: '#333' }}>
+            {typeof pair.answer === 'object' ? JSON.stringify(pair.answer) : pair.answer}
+          </Typography>
+        )}
+      </Box>
+    </Box>
+  ))}
+</Box>
+
+
+
+
     </Box>
   );
 };
