@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import { Box, Typography, IconButton } from '@mui/material';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
@@ -8,10 +9,10 @@ interface EntrySliderProps {
 }
 
 const EntrySlider: React.FC<EntrySliderProps> = ({ children }) => {
-  const entries = Array.isArray(children) ? children : [children]; // Ensure always an array
+  const router = useRouter();
+  const entries = Array.isArray(children) ? children : [children];
   const totalEntries = entries.length;
 
-  // Retrieve last viewed entry from sessionStorage, default to 1
   const [currentEntry, setCurrentEntry] = useState(() => {
     return Number(sessionStorage.getItem('currentEntry')) || 1;
   });
@@ -19,6 +20,18 @@ const EntrySlider: React.FC<EntrySliderProps> = ({ children }) => {
   useEffect(() => {
     sessionStorage.setItem('currentEntry', String(currentEntry));
   }, [currentEntry]);
+
+  useEffect(() => {
+    const handleRouteChange = () => {
+      sessionStorage.removeItem('currentEntry');
+      setCurrentEntry(1);
+    };
+
+    router.events.on('routeChangeStart', handleRouteChange);
+    return () => {
+      router.events.off('routeChangeStart', handleRouteChange);
+    };
+  }, [router]);
 
   const handlePrev = () => {
     if (currentEntry > 1) {
