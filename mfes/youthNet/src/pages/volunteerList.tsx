@@ -14,6 +14,7 @@ import { fetchUserList } from '../services/youthNet/Dashboard/UserServices';
 import { getStateBlockDistrictList } from '../services/youthNet/Dashboard/VillageServices';
 import { useTranslation } from 'next-i18next';
 import { fetchEntities } from '@/services/ObservationServices';
+import { fetchObservSublist } from '../services/youthNet/Survey/suveyService';
 
 const volunteerList = () => {
   const router = useRouter();
@@ -107,38 +108,58 @@ const volunteerList = () => {
             volunteerCount: villageVolunteerCount[village.Id] || 0,
           }));
   
-       //   const solutionId = observationId;
+          const completedEntriesList: any = [];
+  
           if (solutionId) {
             const response = await fetchEntities({ solutionId });
-            console.log(response);
-            setObservationId(response?.result?._id)
-
+            setObservationId(response?.result?._id);
+  
             const completedIds = response?.result?.entities
-              ?.filter((entity: any) => entity.status === "completed" && entity._id)
+              ?.filter((entity: any) => entity.submissionsCount > 0 && entity._id)
               ?.map((entity: any) => entity._id);
+  
             console.log(completedIds);
   
-            // Count completed entries per village & store completed entries
-            const villageEntriesData: any = {}; // To store count & IDs
+            const completedEntriesResults = await Promise.all(
+              completedIds?.map(async (userId: string) => {
+                const responseObserSubList = await fetchObservSublist({
+                  observationId: response?.result?._id,
+                  entityId: userId,
+                });
   
-            completedIds?.forEach((userId: string) => {
-              const villageId = userVillageMap[userId];
+                return responseObserSubList
+                  ?.filter((entity: any) => entity.status === "completed" && entity._id)
+                  ?.map((entity: any) => ({
+                    id: entity.entityId,
+                    submissionCount: entity["submissionNumber"] || 0,
+                  }))
+                  ?.sort((a: any, b: any) => a.submissionCount - b.submissionCount);
+              })
+            );
+  
+            completedEntriesList.push(...completedEntriesResults.flat());
+  
+           
+            const villageEntriesData: any = {};
+            completedEntriesList.forEach((item: any) => {
+              const villageId = userVillageMap[item.id];
               if (villageId) {
                 if (!villageEntriesData[villageId]) {
                   villageEntriesData[villageId] = { count: 0, ids: [] };
                 }
-                villageEntriesData[villageId].count += 1;
-                villageEntriesData[villageId].ids.push(userId);
+                villageEntriesData[villageId].count = villageEntriesData[villageId]?.ids?.length;
+                villageEntriesData[villageId].ids.push(item);
               }
             });
   
-            // Update transformedData with entries count & completedEntries
+            console.log(villageEntriesData);
+  
             transformedData = transformedData.map((village: any) => {
               const entriesData = villageEntriesData[village.Id] || { count: 0, ids: [] };
               return {
                 ...village,
-                entries: entriesData.count,
-                completedEntries: entriesData.ids, // Store completed IDs
+                entries:entriesData.ids.length,
+                completedEntries: entriesData.ids, 
               };
             });
           }
@@ -151,6 +172,7 @@ const volunteerList = () => {
   
     getVillageVolunteerData();
   }, [solutionId]);
+  
   
   
 console.log(villageList)

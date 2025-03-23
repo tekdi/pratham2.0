@@ -42,8 +42,9 @@ const ObservationQuestions: React.FC = () => {
   const [questionResponse, setQuestionResponseResponse] = useState<any>(null);
   const [questions, setQuestions] = useState<any>(null);
   const theme = useTheme<any>();
-
   const [isAddNew, setIsAddNew] = useState(false);
+  const [isBackTab, setIsBackTab] = useState(false);
+
 
   //another submission
   const [entityId, setEntityId] = useState('');
@@ -90,6 +91,7 @@ const ObservationQuestions: React.FC = () => {
        
         //get list of submissions
         if (responseObserSubList && responseObserSubList.length == 0) {
+
         }
 
         let tempSubmissionNumber = null;
@@ -115,7 +117,7 @@ const ObservationQuestions: React.FC = () => {
               responseObserSubList[i]?.status === 'draft'
             ) {
               tempSubmissionNumber = responseObserSubList[i].submissionNumber;
-              setIsAddNew(true);
+              //setIsAddNew(true);
               break; // Exit the loop once found
             }
           }
@@ -149,27 +151,236 @@ const ObservationQuestions: React.FC = () => {
     if (solutionId) fetchQuestionsList();
   }, [Id, solutionId]);
   const handleBack = () => {
-    router.back();
+    if(submissionNumber && isAddNew===true)
+    {
+      //add popup for back alert
+      const userResponse = confirm("Are you sure you want to go back?");
+
+if (userResponse) {
+  // User clicked "OK"
+  console.log("User confirmed the action.");
+        setIsAddNew(false)
+        setIsBackTab(true)
+
+  // Perform the desired action here
+} else {
+  // User clicked "Cancel"
+  console.log("User canceled the action.");
+  // Handle the cancellation
+}
+    }
+    else{
+      router.back();
+    }
   };
   const addAnotherSubmission = async () => {
     try {
+      if(submissionNumber !=null && isAddNew===false)
+      {
+        if (observationId && isBackTab===true) 
+        {
+          try {
+            const response = await fetchEntities({ solutionId });
+            console.log('########### response', response);
+            const completedIds = response?.result?.entities
+              ?.filter((entity: any) => entity.status === 'completed' && entity._id)
+              ?.map((entity: any) => entity._id);
+            const Ids = response?.result?.entities
+              ?.filter((entity: any) => entity._id)
+              ?.map((entity: any) => entity._id);
+            console.log('########### observations', completedIds);
+            console.log('########### Ids', Ids);
+           // setStoredEntries(completedIds);
+            const observationId = response?.result?._id;
+            setObservationId(observationId);
+            const entityId = localStorage.getItem('userId') || '';
+            setEntityId(entityId);
+            console.log('########### entityId', entityId);
+            const responseObserSubList = await fetchObservSublist({
+              observationId,
+              entityId,
+            });
+            // const allIds = responseObserSubList
+            //   ?.filter((entity: any) => entity.status === 'completed' && entity._id)
+            //   ?.map((entity: any) => entity._id);
+            const completedEntries = responseObserSubList
+            ?.filter((entity: any) => entity.status === "completed" && entity._id)
+            ?.map((entity: any) => ({
+              id: entity.entityId,
+              submissionCount: entity["submissionNumber"] || 0, 
+            }))
+            ?.sort((a: any, b: any) =>a.submissionCount - b.submissionCount)
+      setStoredEntries(completedEntries)
+           
+            //get list of submissions
+            if (responseObserSubList && responseObserSubList.length == 0) {
+    
+            }
+    
+            let tempSubmissionNumber = null;
+            //not started any submission
+            if (
+              !Ids.includes(entityId) ||
+              (responseObserSubList && responseObserSubList.length == 0)
+            ) {
+              console.log('########### add new');
+              const data = {
+                data: [entityId],
+              };
+              await addEntities({ data, observationId });
+              setIsAddNew(true);
+            }
+            //started but not completed multiple time
+            else {
+              // Check if any status is "started" and get submission number
+    
+              for (let i = 0; i < responseObserSubList.length; i++) {
+                if (
+                  responseObserSubList[i]?.status === 'started' ||
+                  responseObserSubList[i]?.status === 'draft'
+                ) {
+                  tempSubmissionNumber = responseObserSubList[i].submissionNumber;
+                  //setIsAddNew(true);
+                  break; // Exit the loop once found
+                }
+              }
+              setSubmissionNumber(tempSubmissionNumber);
+            }
+            console.log('########### observationId', observationId);
+            //check already submitted
+    
+            if (observationId) {
+              const response = await fetchQuestion({
+                observationId,
+                entityId,
+                tempSubmissionNumber,
+              });
+    
+              const combinedData = {
+                solution: response.solution,
+                assessment: {
+                  ...response.assessment, // Spread all properties from assessment
+                },
+              };
+              setQuestions(combinedData);
+              // setQuestionResponseResponse(
+              //   combinedData
+              // )
+            }
+          } catch (error) {
+            console.error('Error fetching cohort list', error);
+          }
+        }
+        
+        setIsAddNew(true)
+        
+      }
+      else{
+        console.log(' ####### ###addnew observationId', observationId);
+        console.log(' ####### ###addnew entityId', entityId);
+        const responseCreateObserSub = await createAnotherSubmission({
+          observationId,
+          entityId,
+        });
+        console.log('########### responseCreateObserSub', responseCreateObserSub);
+        //call list api
+        const responseObserSubList = await fetchObservSublist({
+          observationId,
+          entityId,
+        });
+  
+        console.log('########### responseObserSubList', responseObserSubList);
+       // router.push('/mfe_observations/questionary/reload');
+      //  setIsAddNew(true)
+      try {
+        const response = await fetchEntities({ solutionId });
+        const completedIds = response?.result?.entities
+          ?.filter((entity: any) => entity.status === 'completed' && entity._id)
+          ?.map((entity: any) => entity._id);
+        const Ids = response?.result?.entities
+          ?.filter((entity: any) => entity._id)
+          ?.map((entity: any) => entity._id);
+           // setStoredEntries(completedIds);
+        const observationId = response?.result?._id;
+        setObservationId(observationId);
+        const entityId = localStorage.getItem('userId') || '';
+        setEntityId(entityId);
+        const responseObserSubList = await fetchObservSublist({
+          observationId,
+          entityId,
+        });
+        // const allIds = responseObserSubList
+        //   ?.filter((entity: any) => entity.status === 'completed' && entity._id)
+        //   ?.map((entity: any) => entity._id);
+        const completedEntries = responseObserSubList
+        ?.filter((entity: any) => entity.status === "completed" && entity._id)
+        ?.map((entity: any) => ({
+          id: entity.entityId,
+          submissionCount: entity["submissionNumber"] || 0, 
+        }))
+        ?.sort((a: any, b: any) =>a.submissionCount - b.submissionCount)
+  setStoredEntries(completedEntries)
+       
+        //get list of submissions
+        if (responseObserSubList && responseObserSubList.length == 0) {
+
+        }
+
+        let tempSubmissionNumber = null;
+        //not started any submission
+        if (
+          !Ids.includes(entityId) ||
+          (responseObserSubList && responseObserSubList.length == 0)
+        ) {
+          const data = {
+            data: [entityId],
+          };
+          await addEntities({ data, observationId });
+          setIsAddNew(true);
+        }
+        //started but not completed multiple time
+        else {
+          // Check if any status is "started" and get submission number
+
+          for (let i = 0; i < responseObserSubList.length; i++) {
+            if (
+              responseObserSubList[i]?.status === 'started' ||
+              responseObserSubList[i]?.status === 'draft'
+            ) {
+              tempSubmissionNumber = responseObserSubList[i].submissionNumber;
+              //setIsAddNew(true);
+              break; // Exit the loop once found
+            }
+          }
+          setSubmissionNumber(tempSubmissionNumber);
+        }
+        //check already submitted
+
+        if (observationId) {
+          const response = await fetchQuestion({
+            observationId,
+            entityId,
+            tempSubmissionNumber,
+          });
+
+          const combinedData = {
+            solution: response.solution,
+            assessment: {
+              ...response.assessment, // Spread all properties from assessment
+            },
+          };
+          setQuestions(combinedData);
+          // setQuestionResponseResponse(
+          //   combinedData
+          // )
+        }
+      } catch (error) {
+        console.error('Error fetching cohort list', error);
+      }
+      setIsAddNew(true)
+      }
       //createAnotherSubmission
-      console.log(' ####### ###addnew observationId', observationId);
-      console.log(' ####### ###addnew entityId', entityId);
-      const responseCreateObserSub = await createAnotherSubmission({
-        observationId,
-        entityId,
-      });
-      console.log('########### responseCreateObserSub', responseCreateObserSub);
-      //call list api
-      const responseObserSubList = await fetchObservSublist({
-        observationId,
-        entityId,
-      });
-
-      console.log('########### responseObserSubList', responseObserSubList);
-      router.push('/mfe_observations/questionary/reload');
-
+     
       //not started any submission
       /*if (
         !Ids.includes(entityId) ||
@@ -348,8 +559,8 @@ const ObservationQuestions: React.FC = () => {
               sx={{
                 border: `1px solid ${theme.palette.error.contrastText}`,
                 borderRadius: '100px',
-                height: '40px',
-                width: '8rem',
+                height: 'auto',
+                width: 'auto',
                 mt: '10px',
                 color: theme.palette.error.contrastText,
                 '& .MuiButton-endIcon': {
@@ -362,7 +573,7 @@ const ObservationQuestions: React.FC = () => {
               endIcon={<AddIcon />}
               onClick={addAnotherSubmission}
             >
-              {t('COMMON.ADD_NEW')}
+                   {submissionNumber !=null && isAddNew===false? t('COMMON.INPROGRESS'): t('COMMON.ADD_NEW')}
             </Button>
             <Box>
               {storedEntries.length !== 0 ? (

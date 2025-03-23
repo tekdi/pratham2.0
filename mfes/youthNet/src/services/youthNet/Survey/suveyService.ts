@@ -3,13 +3,13 @@ import { post, get } from '@shared-lib';
 export const targetSolution = async ({
   state,
   district,
-  block,
+ // block,
 }: any): Promise<any> => {
   try {
     const data = {
       state,
       district,
-      block,
+    //  block,
     };
     const apiUrl: string = `${process.env.NEXT_PUBLIC_SURVEY_URL}/solutions/targetedSolutions?type=observation&currentScopeOnly=true`;
 
