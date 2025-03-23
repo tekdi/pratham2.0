@@ -139,8 +139,36 @@ const EntryContent: React.FC<EntryContentProps> = ({
     return `Submitted on ${date.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })} @ ${date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true })}`;
   };
 
-  const handleFileDownload = (fileUrl: string) => {
-    window.open(fileUrl, "_blank");
+  const handleFileDownload = async(fileUrl: string , fileName:string) => {
+    try {
+      // Fetch the file as a blob
+      const response = await fetch(fileUrl);
+      if (!response.ok) {
+        throw new Error(`Error fetching file: ${response.statusText}`);
+      }
+  
+      // Convert response to blob
+      const blob = await response.blob();
+  
+      // Create a URL for the blob object
+      const url = window.URL.createObjectURL(blob);
+  
+      // Create a temporary link and trigger download
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName || 'downloaded-file'); // Set file name
+      document.body.appendChild(link);
+      link.click();
+  
+      // Clean up
+      link.parentNode?.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      window.open(fileUrl, "_blank");
+
+      console.error('❌ Error downloading file:', error);
+    }
+    // window.open(fileUrl, "_blank");
   };
   const getFileNameFromUrl = (url: any) => {
     const urlObj = new URL(url);
@@ -197,7 +225,7 @@ const EntryContent: React.FC<EntryContentProps> = ({
                           {getFileNameFromUrl(fileUrl)}
                         </Typography>
                       </Box>
-                      <IconButton onClick={() => handleFileDownload(fileUrl)} sx={{ color: "black" }}>
+                      <IconButton onClick={() => handleFileDownload(fileUrl, getFileNameFromUrl(fileUrl))} sx={{ color: "black" }}>
                         <Download />
                       </IconButton>
                     </Box>
