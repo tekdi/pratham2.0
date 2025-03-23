@@ -158,7 +158,7 @@ const volunteerList = () => {
               const entriesData = villageEntriesData[village.Id] || { count: 0, ids: [] };
               return {
                 ...village,
-                entries: entriesData.count,
+                entries:entriesData.ids.length,
                 completedEntries: entriesData.ids, 
               };
             });

@@ -1,16 +1,24 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Typography, IconButton } from '@mui/material';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 interface EntrySliderProps {
-  children: React.ReactNode | React.ReactNode[]; // Accept single or multiple children
+  children: React.ReactNode | React.ReactNode[];
 }
 
 const EntrySlider: React.FC<EntrySliderProps> = ({ children }) => {
   const entries = Array.isArray(children) ? children : [children]; // Ensure always an array
-  const [currentEntry, setCurrentEntry] = useState(1);
   const totalEntries = entries.length;
+
+  // Retrieve last viewed entry from sessionStorage, default to 1
+  const [currentEntry, setCurrentEntry] = useState(() => {
+    return Number(sessionStorage.getItem('currentEntry')) || 1;
+  });
+
+  useEffect(() => {
+    sessionStorage.setItem('currentEntry', String(currentEntry));
+  }, [currentEntry]);
 
   const handlePrev = () => {
     if (currentEntry > 1) {
