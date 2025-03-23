@@ -162,7 +162,8 @@
     "UPDATE_AVAILABLE": "New Update Available!",
     "RELOAD_TO_UPDATE": "Get the latest features and improvements—update now to enjoy a smoother experience and stay up-to-date!",
     "NO_ASSIGNED_BOARDS": "No assigned Board for selected Center",
-    "HIGHT-TO_LOW": "High to low"
+    "HIGHT-TO_LOW": "High to low",
+    "INPROGRESS":"Continue Previous Submission"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",

@@ -290,8 +290,94 @@ if (userResponse) {
         });
   
         console.log('########### responseObserSubList', responseObserSubList);
-        router.push('/mfe_observations/questionary/reload');
-  
+       // router.push('/mfe_observations/questionary/reload');
+      //  setIsAddNew(true)
+      try {
+        const response = await fetchEntities({ solutionId });
+        const completedIds = response?.result?.entities
+          ?.filter((entity: any) => entity.status === 'completed' && entity._id)
+          ?.map((entity: any) => entity._id);
+        const Ids = response?.result?.entities
+          ?.filter((entity: any) => entity._id)
+          ?.map((entity: any) => entity._id);
+           // setStoredEntries(completedIds);
+        const observationId = response?.result?._id;
+        setObservationId(observationId);
+        const entityId = localStorage.getItem('userId') || '';
+        setEntityId(entityId);
+        const responseObserSubList = await fetchObservSublist({
+          observationId,
+          entityId,
+        });
+        // const allIds = responseObserSubList
+        //   ?.filter((entity: any) => entity.status === 'completed' && entity._id)
+        //   ?.map((entity: any) => entity._id);
+        const completedEntries = responseObserSubList
+        ?.filter((entity: any) => entity.status === "completed" && entity._id)
+        ?.map((entity: any) => ({
+          id: entity.entityId,
+          submissionCount: entity["submissionNumber"] || 0, 
+        }))
+        ?.sort((a: any, b: any) =>a.submissionCount - b.submissionCount)
+  setStoredEntries(completedEntries)
+       
+        //get list of submissions
+        if (responseObserSubList && responseObserSubList.length == 0) {
+
+        }
+
+        let tempSubmissionNumber = null;
+        //not started any submission
+        if (
+          !Ids.includes(entityId) ||
+          (responseObserSubList && responseObserSubList.length == 0)
+        ) {
+          const data = {
+            data: [entityId],
+          };
+          await addEntities({ data, observationId });
+          setIsAddNew(true);
+        }
+        //started but not completed multiple time
+        else {
+          // Check if any status is "started" and get submission number
+
+          for (let i = 0; i < responseObserSubList.length; i++) {
+            if (
+              responseObserSubList[i]?.status === 'started' ||
+              responseObserSubList[i]?.status === 'draft'
+            ) {
+              tempSubmissionNumber = responseObserSubList[i].submissionNumber;
+              //setIsAddNew(true);
+              break; // Exit the loop once found
+            }
+          }
+          setSubmissionNumber(tempSubmissionNumber);
+        }
+        //check already submitted
+
+        if (observationId) {
+          const response = await fetchQuestion({
+            observationId,
+            entityId,
+            tempSubmissionNumber,
+          });
+
+          const combinedData = {
+            solution: response.solution,
+            assessment: {
+              ...response.assessment, // Spread all properties from assessment
+            },
+          };
+          setQuestions(combinedData);
+          // setQuestionResponseResponse(
+          //   combinedData
+          // )
+        }
+      } catch (error) {
+        console.error('Error fetching cohort list', error);
+      }
+      setIsAddNew(true)
       }
       //createAnotherSubmission
      
@@ -473,8 +559,8 @@ if (userResponse) {
               sx={{
                 border: `1px solid ${theme.palette.error.contrastText}`,
                 borderRadius: '100px',
-                height: '40px',
-                width: '8rem',
+                height: 'auto',
+                width: 'auto',
                 mt: '10px',
                 color: theme.palette.error.contrastText,
                 '& .MuiButton-endIcon': {
@@ -487,7 +573,7 @@ if (userResponse) {
               endIcon={<AddIcon />}
               onClick={addAnotherSubmission}
             >
-              {t('COMMON.ADD_NEW')}
+                   {submissionNumber !=null && isAddNew===false? t('COMMON.INPROGRESS'): t('COMMON.ADD_NEW')}
             </Button>
             <Box>
               {storedEntries.length !== 0 ? (
