@@ -62,9 +62,9 @@ const EntryContent: React.FC<EntryContentProps> = ({   entityId , questionRespon
           setQuestionResponseResponse(
             mapBackendDataToQAPairs(combinedData?.assessment?.submissions)
           )
-          setSubmittedByName(combinedData?.assessment?.submissions?.SF?.submittedByName)
-          setSubmittedBy(combinedData?.assessment?.submissions?.SF?.submittedBy)
-          setSubmissionDate(combinedData?.assessment?.submissions?.SF?.submissionDate)
+          setSubmittedByName(combinedData?.assessment?.submissions?.OB?.submittedByName)
+          setSubmittedBy(combinedData?.assessment?.submissions?.OB?.submittedBy)
+          setSubmissionDate(combinedData?.assessment?.submissions?.OB?.submissionDate)
 
 
         }
