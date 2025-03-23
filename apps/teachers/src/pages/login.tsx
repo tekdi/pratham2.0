@@ -9,6 +9,7 @@ import { AcademicYear } from '../utils/Interfaces';
 import { getAcademicYear } from '../services/AcademicYearService';
 import router from 'next/router';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { RoleNames } from '../utils/app.constant';
 
 const Login = dynamic(() => import('@login'), {
   ssr: false,
@@ -191,7 +192,11 @@ const LoginComponent = () => {
         token &&
         tenant?.toLowerCase() === TENANT_DATA.YOUTHNET?.toLowerCase()
       ) {
+        if(localStorage.getItem('role')=== RoleNames.TEACHER || localStorage.getItem('role')=== RoleNames.TEAM_LEADER )
         router.push('/youth');
+        else
+        router.push("/unauthorized");    
+
       }
     }
   };

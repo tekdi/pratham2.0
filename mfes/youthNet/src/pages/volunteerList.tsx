@@ -19,11 +19,13 @@ const volunteerList = () => {
   const router = useRouter();
  const [villageList, setVillageList] = useState<any>();
  const [villageCount, setVillageCount] = useState<any>();
+ const [observationId, setObservationId] = useState<any>();
+
   const { t } = useTranslation();
 
  
   const { surveyName } = router.query;
-  const { blockId , observationId, solutionId} = router.query;
+  const { blockId , solutionId} = router.query;
   const villageNameStringNew = Array.isArray(surveyName)
     ? surveyName[0]
     : surveyName || '';
@@ -80,7 +82,6 @@ const volunteerList = () => {
         };
   
         const result = await fetchUserList({ filters });
-  
         if (result?.getUserDetails) {
           const villageVolunteerCount: any = {};
           const userVillageMap: any = {}; // Map userId to villageId
@@ -110,7 +111,8 @@ const volunteerList = () => {
           if (solutionId) {
             const response = await fetchEntities({ solutionId });
             console.log(response);
-  
+            setObservationId(response?.result?._id)
+
             const completedIds = response?.result?.entities
               ?.filter((entity: any) => entity.status === "completed" && entity._id)
               ?.map((entity: any) => entity._id);
