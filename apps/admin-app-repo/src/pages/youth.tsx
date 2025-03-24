@@ -144,7 +144,7 @@ const Youth = () => {
     const columns = [
         {
             keys: ['firstName', 'middleName', 'lastName'],
-            label: 'Mentor Name',
+            label: 'Youth Name',
             render: (row: any) =>
                 `${transformLabel(row.firstName) || ''} ${transformLabel(row.middleName) || ''
                     } ${transformLabel(row.lastName) || ''}`.trim(),
