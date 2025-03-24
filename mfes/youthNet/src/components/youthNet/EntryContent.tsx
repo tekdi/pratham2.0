@@ -140,7 +140,7 @@ const EntryContent: React.FC<EntryContentProps> = ({
   };
 
   const handleFileDownload = async(fileUrl: string , fileName:string) => {
-    if(localStorage.getItem('mef_state'))
+    if(localStorage.getItem('mfe_state'))
       {
         window.open(fileUrl, "_blank");
 
