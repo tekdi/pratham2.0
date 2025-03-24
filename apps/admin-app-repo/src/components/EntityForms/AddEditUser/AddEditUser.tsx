@@ -16,13 +16,14 @@ import {
   createCohort,
   updateCohortUpdate,
 } from '@/services/CohortService/cohortService';
+import _ from 'lodash';
 
 const AddEditUser = ({
   SuccessCallback,
   schema,
   uiSchema,
   editPrefilledFormData,
-  isEdit,
+  isEdit = false,
   editableUserId,
   UpdateSuccessCallback,
   extraFields,
@@ -45,6 +46,8 @@ const AddEditUser = ({
   );
 
   const { t } = useTranslation();
+  let isEditSchema = _.cloneDeep(schema);
+  let isEditUiSchema = _.cloneDeep(uiSchema);
 
   if (isEdit) {
     const keysToRemove = [
@@ -55,8 +58,8 @@ const AddEditUser = ({
       'password',
       'confirm_password',
     ];
-    keysToRemove.forEach((key) => delete schema.properties[key]);
-    keysToRemove.forEach((key) => delete uiSchema[key]);
+    keysToRemove.forEach((key) => delete isEditSchema.properties[key]);
+    keysToRemove.forEach((key) => delete isEditUiSchema[key]);
     // console.log('schema', schema);
   } else {
     const keysToRemove = ['password', 'confirm_password']; //TODO: check 'program'
@@ -176,8 +179,8 @@ const AddEditUser = ({
         schema &&
         uiSchema && (
           <DynamicForm
-            schema={schema}
-            uiSchema={uiSchema}
+            schema={isEdit ? isEditSchema : schema}
+            uiSchema={isEdit ? isEditUiSchema : uiSchema}
             t={t}
             FormSubmitFunction={FormSubmitFunction}
             prefilledFormData={prefilledFormData || {}}
