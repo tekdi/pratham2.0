@@ -16,7 +16,7 @@ const RegistrationStatistics: React.FC<RegistrationStatisticsProps> = ({
   return (
     <Box
       sx={{
-        background: '#EDE1CF',
+        background: '#CDC5BD',
         boxShadow: '0px 1px 2px 0px #0000004D, 0px 2px 6px 2px #00000026',
         padding: '12px',
         borderRadius: '16px',
@@ -78,7 +78,7 @@ const RegistrationStatistics: React.FC<RegistrationStatisticsProps> = ({
           )}
 
           <Box>
-            {statistic && (
+            
               <Box
                 sx={{
                   fontSize: '16px',
@@ -87,9 +87,9 @@ const RegistrationStatistics: React.FC<RegistrationStatisticsProps> = ({
                 }}
                 className="one-line-text"
               >
-                {statistic }
+                {statistic}
               </Box>
-            )}
+            
             {subtile && (
               <Box
                 className="one-line-text"
