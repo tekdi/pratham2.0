@@ -61,6 +61,12 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
           MIME_TYPE.COLLECTION_MIME_TYPE.includes(content?.mimeType)
         ) {
           router.push({ pathname: `/collection`, query: { identifier } });
+        } else if (
+          content?.mimeType &&
+          MIME_TYPE.ECML_MIME_TYPE.includes(content?.mimeType) &&
+          mode !== "review"
+        ) {
+          router.push({ pathname: `/resource-editor`, query: { identifier } });
         }
         return; // Exit early since draft has specific routing logic
 

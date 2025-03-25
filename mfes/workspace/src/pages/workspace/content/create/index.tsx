@@ -6,7 +6,7 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import UploadIcon from "@mui/icons-material/Upload";
 import { useRouter } from "next/router";
-import { createCourse, createQuestionSet } from "@workspace/services/ContentService";
+import { createCourse, createQuestionSet, createResourceContent } from "@workspace/services/ContentService";
 import QuizOutlinedIcon from "@mui/icons-material/QuizOutlined";
 import SchoolOutlinedIcon from "@mui/icons-material/SchoolOutlined";
 import VideoLibraryOutlinedIcon from "@mui/icons-material/VideoLibraryOutlined";
@@ -76,6 +76,26 @@ const CreatePage = () => {
     fetchCollectionData();
   };
 
+  const fetchResourceContentData = async () => {
+    try {
+      const userId = getLocalStoredUserId();
+      const response = await createResourceContent(userId, tenantConfig?.CHANNEL_ID, tenantConfig?.CONTENT_FRAMEWORK);
+      console.log("Resource created successfully:", response);
+
+      const identifier = response?.result?.identifier;
+      router.push({
+        pathname: `/resource-editor`,
+        query: { identifier },
+      });
+    } catch (error) {
+      console.error("Error creating Resource:", error);
+    }
+  }
+
+  const openResourceEditor = () => {
+    fetchResourceContentData();
+  }
+
   const cardData = [
     {
       title: "New Question Set",
@@ -92,7 +112,7 @@ const CreatePage = () => {
     },
     {
       title: "New Content",
-      description: "Create new documents, PDF, video, QML, HTML, etc.",
+      description: "Create new documents, PDF, video, HTML, H5P, etc.",
       icon: <VideoLibraryOutlinedIcon fontSize="large" />,
       onClick: () => {
         sessionStorage.setItem("previousPage", window.location.href);
@@ -110,6 +130,13 @@ const CreatePage = () => {
           query: { editorforlargecontent: "true" }, // No change needed
         }); // Removed an extra comma
       },
+    },
+    {
+      title: 'New Resource',
+      description:
+        ' Create different resource like story, game, activity, audio, video using the inbuild authoring tools.',
+      icon: <SchoolOutlinedIcon fontSize="large" />,
+      onClick: openResourceEditor
     },
   ];
 
