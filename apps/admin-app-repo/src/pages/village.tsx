@@ -72,7 +72,6 @@ const Village = () => {
   }, [pageLimit]);
 
   useEffect(() => {
-    setPrefilledFormData(initialFormData);
     setPrefilledFormData(initialFormDataSearch);
   }, []);
 

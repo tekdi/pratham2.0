@@ -357,7 +357,6 @@ const TeamLeader = () => {
   const notificationContext = 'USER';
 
   useEffect(() => {
-    setPrefilledFormData(initialFormData);
     setPrefilledFormData(initialFormDataSearch);
   }, []);
 

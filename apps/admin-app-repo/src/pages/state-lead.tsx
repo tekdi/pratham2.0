@@ -256,7 +256,7 @@ const StateLead = () => {
    
 
   useEffect(() => {
-    setPrefilledAddFormData(initialFormDataSearch)
+    setPrefilledFormData(initialFormDataSearch);
   })
   return (
     <>

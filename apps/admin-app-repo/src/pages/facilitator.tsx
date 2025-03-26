@@ -416,7 +416,6 @@ const Facilitator = () => {
   const notificationContext = 'USER';
 
   useEffect(() => {
-    setPrefilledFormData(initialFormData);
     setPrefilledFormData(initialFormDataSearch);
   }, []);
 

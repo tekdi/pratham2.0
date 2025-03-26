@@ -416,7 +416,6 @@ const Learner = () => {
   const notificationContext = 'USER';
 
   useEffect(() => {
-    setPrefilledFormData(initialFormData);
     setPrefilledFormData(initialFormDataSearch);
   }, []);
 
