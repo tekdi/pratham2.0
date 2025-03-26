@@ -136,7 +136,7 @@ const MentorLead = () => {
       tenantId: localStorage.getItem('tenantId'),
     };
 
-    const { sortBy } = formData;
+    const { sortBy } = formData; 
     const staticSort = ['firstName', sortBy || 'asc'];
     await searchListData(
       formData,
