@@ -80,7 +80,7 @@ const Youth = () => {
     const initialFormDataSearch = localStorage.getItem(searchStoreKey) && localStorage.getItem(searchStoreKey) != "{}"
         ? JSON.parse(localStorage.getItem(searchStoreKey))
         : localStorage.getItem('stateId')
-            ? { state: [localStorage.getItem('stateId')] }
+            ? { state: [localStorage.getItem('stateId')]}
             : {};
 
     useEffect(() => {
