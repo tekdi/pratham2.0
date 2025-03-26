@@ -155,7 +155,7 @@ const DynamicForm = ({
                     ? data.map((item) => item?.[value].toString())
                     : ['Select'],
                   enumNames: data
-                    ? data.map((item) => toPascalCase(item?.[label].toString()))
+                    ? data.map((item) => (item?.[label].toString()))
                     : ['Select'],
                 };
               }
