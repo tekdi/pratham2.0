@@ -16,6 +16,7 @@ const CustomMultiSelectWidget = ({
   label,
   onChange,
   schema,
+  uiSchema, // Pass uiSchema to read ui:disabled
 }: WidgetProps) => {
   const { enumOptions = [] } = options;
   const maxSelections = schema.maxSelection || enumOptions.length; // Default to max options if not set
@@ -27,6 +28,9 @@ const CustomMultiSelectWidget = ({
   const [isAllSelected, setIsAllSelected] = useState(
     selectedValues.length === enumOptions.length
   );
+
+  // Check if the widget is disabled from uiSchema
+  const isDisabled = uiSchema?.['ui:disabled'] === true;
 
   // Update `isAllSelected` when `selectedValues` changes
   useEffect(() => {
@@ -60,6 +64,7 @@ const CustomMultiSelectWidget = ({
       fullWidth
       error={selectedValues.length > maxSelections}
       disabled={
+        isDisabled ||
         enumOptions.length === 0 ||
         (enumOptions.length === 1 && enumOptions[0]?.value === 'Select')
       }
@@ -77,7 +82,6 @@ const CustomMultiSelectWidget = ({
             .map((option) => option.label)
             .join(', ')
         }
-      
       >
         {/* Show "Select All" only if maxSelections >= enumOptions.length */}
         {enumOptions.length > 0 && maxSelections >= enumOptions.length && (
@@ -89,9 +93,7 @@ const CustomMultiSelectWidget = ({
           >
             <Checkbox checked={isAllSelected} />
             <ListItemText
-              primary={
-                isAllSelected ? 'Deselect All' : 'Select All'
-              }
+              primary={isAllSelected ? 'Deselect All' : 'Select All'}
             />
           </MenuItem>
         )}
