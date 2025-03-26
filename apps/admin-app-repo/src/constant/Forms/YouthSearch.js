@@ -1,3 +1,8 @@
+import { Role } from '@/utils/app.constant';
+
+const stateId =
+  typeof window !== 'undefined' ? localStorage.getItem('stateId') : null;
+  
 export const YouthSearchSchema = {
   type: 'object',
   properties: {
@@ -149,6 +154,7 @@ export const YouthSearchUISchema = {
       multiple: true,
       uniqueItems: true,
     },
+    ...(stateId ? { 'ui:disabled': true } : {}),
   },
 
   district: {
