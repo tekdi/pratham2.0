@@ -312,14 +312,14 @@ setVillageCount(villageIds?.length)
             <RegistrationStatistics
               onPrimaryClick={() => handleClick('above')}
               cardTitle={'Above 18 y/o'}
-              statistic={aboveEighteenUsers.length}
+              statistic={aboveEighteenUsers?.length}
             />
           </Grid>
           <Grid item xs={4}>
             <RegistrationStatistics
               onPrimaryClick={() => handleClick('below')}
               cardTitle={'Below 18 y/o'}
-              statistic={belowEighteenUsers.length}
+              statistic={belowEighteenUsers?.length}
             />
           </Grid>
           <Grid item xs={4}>

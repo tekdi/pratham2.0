@@ -121,6 +121,12 @@ function generateSchemaAndUISchema(fields) {
     if (validation?.isRequired) {
       schemaField.isRequired = validation.isRequired;
     }
+    if (validation?.minValue || validation?.minValue == 0) {
+      schemaField.minValue = validation.minValue;
+    }
+    if (validation?.maxValue) {
+      schemaField.maxValue = validation.maxValue;
+    }
     if (maxLength) {
       schemaField.maxLength = parseInt(maxLength, 10);
     }
@@ -175,8 +181,45 @@ function generateSchemaAndUISchema(fields) {
         },
       };
     } else if (type === 'date') {
+      let minDateCount = 0;
+      let maxDateCount = 100;
+      if (schemaField?.minValue) {
+        minDateCount = schemaField?.minValue;
+      }
+      if (schemaField?.minValue) {
+        maxDateCount = schemaField?.maxValue;
+      }
+
+      //set dates
+      // Get current date
+      const currentDate = new Date();
+
+      // Calculate min and max date range based on age limit
+      const maxDate = new Date(
+        currentDate.getFullYear() - minDateCount,
+        currentDate.getMonth(),
+        currentDate.getDate()
+      )
+        .toISOString()
+        .split('T')[0]; // 18 years ago
+
+      const minDate = new Date(
+        currentDate.getFullYear() - maxDateCount,
+        currentDate.getMonth(),
+        currentDate.getDate()
+      )
+        .toISOString()
+        .split('T')[0]; // 50 years ago
+
       schemaField.format = 'date';
-      uiSchema[name] = { 'ui:widget': 'date' };
+
+      uiSchema[name] = {
+        'ui:widget': 'CustomDateWidget',
+        'ui:options': {
+          minValue: minDate, // Default minValue (optional)
+          maxValue: maxDate, // Default maxValue (optional)
+        },
+      };
     } else if (type === 'dateTime') {
       schemaField.format = 'date-time';
       uiSchema[name] = { 'ui:widget': 'dateTime' };

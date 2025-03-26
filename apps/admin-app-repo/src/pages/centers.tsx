@@ -63,6 +63,13 @@ const Centers = () => {
   const initialFormData = localStorage.getItem('stateId')
     ? { state: [localStorage.getItem('stateId')] }
     : {};
+  const searchStoreKey = 'centers'
+  const initialFormDataSearch = localStorage.getItem(searchStoreKey) && localStorage.getItem(searchStoreKey) != "{}"
+    ? JSON.parse(localStorage.getItem(searchStoreKey))
+    : localStorage.getItem('stateId')
+      ? { state: [localStorage.getItem('stateId')] }
+      : {};
+
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -93,7 +100,7 @@ const Centers = () => {
     };
 
     setPrefilledAddFormData(initialFormData);
-    setPrefilledFormData(initialFormData);
+    setPrefilledFormData(initialFormDataSearch);
     fetchData();
   }, []);
 
@@ -106,6 +113,8 @@ const Centers = () => {
 
   const SubmitaFunction = async (formData: any) => {
     setPrefilledFormData(formData);
+    //set prefilled search data on refresh
+    localStorage.setItem(searchStoreKey, JSON.stringify(formData))
     await searchData(formData, 0);
   };
 
