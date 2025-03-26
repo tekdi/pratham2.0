@@ -16,6 +16,7 @@ import {
   createCohort,
   updateCohortUpdate,
 } from '@/services/CohortService/cohortService';
+import { CohortTypes } from '@/utils/app.constant';
 
 const AddEditUser = ({
   SuccessCallback,
@@ -154,6 +155,9 @@ const AddEditUser = ({
             showToastMessage(t(failureCreateMessage), 'error');
           }
         } else {
+          if(payload.type===CohortTypes.BATCH)
+            delete  payload.customFields;
+         // payload.delete(customFields)
           const centerCreation = await createCohort(payload);
           console.log('centerCreatedResponse: ', centerCreation);
           if (centerCreation) {
