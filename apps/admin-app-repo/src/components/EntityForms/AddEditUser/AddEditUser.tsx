@@ -17,7 +17,7 @@ import {
   updateCohortUpdate,
 } from '@/services/CohortService/cohortService';
 import { CohortTypes } from '@/utils/app.constant';
-
+import _ from 'lodash';
 const AddEditUser = ({
   SuccessCallback,
   schema,
@@ -48,6 +48,8 @@ const AddEditUser = ({
   const { t } = useTranslation();
   let isEditSchema = _.cloneDeep(schema);
   let isEditUiSchema = _.cloneDeep(uiSchema);
+  //  let isEditSchema = (schema);
+  // let isEditUiSchema = (uiSchema);
 
   if (isEdit) {
     const keysToRemove = [
