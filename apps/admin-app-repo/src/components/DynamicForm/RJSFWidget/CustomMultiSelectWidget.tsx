@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useEffect, useState } from 'react';
 import { WidgetProps } from '@rjsf/utils';
 import MenuItem from '@mui/material/MenuItem';

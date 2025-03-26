@@ -33,8 +33,8 @@ jobs:
           aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
           aws configure set default.region ${{ secrets.AWS_REGION }}
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_URI }}
-          docker push ${{ secrets.ECR_REPO_NAME_LMP_DEV }}:${{ secrets.IMAGE_TAG_LMP }}
-
+          docker push ${{ secrets.ECR_REPO_NAME_LAP_DEV }}:${{ secrets.IMAGE_TAG_LAP }}
+      
       # Step 6: Remove Docker image from GitHub Actions runner
       - name: Remove Docker image from runner
         run: |
@@ -48,15 +48,16 @@ jobs:
           username: ${{ secrets.EC2_USER_DEV }}
           key: ${{ secrets.EC2_SSH_KEY_DEV }}
           script: |
-            cd ${{ secrets.TARGET_DEV_LMP }} && ls -ltra
+            cd ${{ secrets.TARGET_DEV_LAP }} && ls -ltra
                if [ -f .env ]; then
                rm .env
                fi
-               echo "${{ secrets.DEV_LMP_ENV }}" > .env && ls -ltra
+               echo "${{ secrets.DEV_LAP_ENV }}" > .env && ls -ltra
             docker ps -a --filter "status=exited" --format "{{.ID}}" | xargs -r docker start
             docker stop dev-lmp || true
             docker system prune -af || true
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_URI }}
             docker-compose up -d --force-recreate --no-deps
-            docker ps -a | grep dev-lmp
+            docker system prune -af || true
+            docker ps -a | grep dev-lap
             sudo systemctl restart nginx

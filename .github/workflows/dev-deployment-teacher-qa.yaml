@@ -56,5 +56,3 @@ jobs:
             docker system prune -af || true
             docker ps -a
             sudo systemctl restart nginx
-#Testing
-
