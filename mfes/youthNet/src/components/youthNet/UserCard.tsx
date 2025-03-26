@@ -40,7 +40,8 @@ type UserCardProps = {
   villageCount?:any;
   blockNames?:string[]
   villageNames?: string[]
-  isVolunteer?: string
+  isVolunteer?: string;
+  nameRedirection?: boolean
 };
 
 const UserCard: React.FC<UserCardProps> = ({
@@ -66,7 +67,8 @@ const UserCard: React.FC<UserCardProps> = ({
   blockNames,
   villageCount,
   isVolunteer,
-  villageNames
+  villageNames,
+  nameRedirection=true
 }) => {
   const theme = useTheme<any>();
   const { t } = useTranslation();
@@ -117,8 +119,8 @@ const UserCard: React.FC<UserCardProps> = ({
             sx={{
               cursor: 'pointer',
               fontSize: '16px',
-              color: theme.palette.secondary.main,
-              textDecoration: 'underline',
+              color: nameRedirection? theme.palette.secondary.main: 'black',
+              textDecoration: nameRedirection ? 'underline' : 'none',
 
               padding: '5px 5px',
             }}
@@ -198,14 +200,16 @@ type UserListProps = {
   users: UserCardProps[];
   layout?: 'list' | 'grid';
   onToggleUserClick?: (name: string) => void;
-  onUserClick?: (Id: string,name?: string) => void
+  onUserClick?: (Id: string,name?: string) => void;
+  nameRedirection?: boolean
 };
 
 export const UserList: React.FC<UserListProps> = ({
   users,
   layout = 'grid',
   onToggleUserClick,
-  onUserClick
+  onUserClick,
+  nameRedirection=true
 }) => {
   console.log(users)
     const router = useRouter();
@@ -231,6 +235,7 @@ export const UserList: React.FC<UserListProps> = ({
                 {...user}
                 onClick={onUserClick}
                 onToggleClick={onToggleUserClick}
+                nameRedirection={nameRedirection}
               />{' '}
             </Grid>
             {index < users.length - 1 && <Divider />}
@@ -246,6 +251,7 @@ export const UserList: React.FC<UserListProps> = ({
             {...user}
             onClick={onUserClick}
             onToggleClick={onToggleUserClick}
+            nameRedirection={nameRedirection}
           />
           {index < users.length - 1 && <Divider />}
         </React.Fragment>
