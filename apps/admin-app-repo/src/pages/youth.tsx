@@ -71,9 +71,17 @@ const Youth = () => {
     const [memberShipID, setMemberShipID] = useState('');
 
     const { t, i18n } = useTranslation();
+
     const initialFormData = localStorage.getItem('stateId')
         ? { state: [localStorage.getItem('stateId')] }
         : {};
+
+    const searchStoreKey = 'youth'
+    const initialFormDataSearch = localStorage.getItem(searchStoreKey) && localStorage.getItem(searchStoreKey) != "{}"
+        ? JSON.parse(localStorage.getItem(searchStoreKey))
+        : localStorage.getItem('stateId')
+            ? { state: [localStorage.getItem('stateId')]}
+            : {};
 
     useEffect(() => {
         if (response?.result?.totalCount !== 0) {
@@ -100,7 +108,7 @@ const Youth = () => {
         };
 
         setPrefilledAddFormData(initialFormData);
-        setPrefilledFormData(initialFormData);
+        setPrefilledFormData(initialFormDataSearch);
         setRoleID(RoleId.TEACHER);
         setTenantId(localStorage.getItem('tenantId'));
         fetchData();
@@ -115,6 +123,8 @@ const Youth = () => {
 
     const SubmitaFunction = async (formData: any) => {
         setPrefilledFormData(formData);
+        //set prefilled search data on refresh
+        localStorage.setItem(searchStoreKey, JSON.stringify(formData))
         await searchData(formData, 0);
     };
 
@@ -144,7 +154,7 @@ const Youth = () => {
     const columns = [
         {
             keys: ['firstName', 'middleName', 'lastName'],
-            label: 'Mentor Name',
+            label: 'Youth Name',
             render: (row: any) =>
                 `${transformLabel(row.firstName) || ''} ${transformLabel(row.middleName) || ''
                     } ${transformLabel(row.lastName) || ''}`.trim(),

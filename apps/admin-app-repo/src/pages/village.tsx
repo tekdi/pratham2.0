@@ -58,6 +58,13 @@ const Village = () => {
     ? { state: [localStorage.getItem('stateId')] }
     : {};
 
+  const searchStoreKey = 'village'
+  const initialFormDataSearch = localStorage.getItem(searchStoreKey) && localStorage.getItem(searchStoreKey) != "{}"
+    ? JSON.parse(localStorage.getItem(searchStoreKey))
+    : localStorage.getItem('stateId')
+      ? { state: [localStorage.getItem('stateId')] }
+      : {};
+
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
       searchData(prefilledFormData, 0);
@@ -65,7 +72,7 @@ const Village = () => {
   }, [pageLimit]);
 
   useEffect(() => {
-    setPrefilledFormData(initialFormData);
+    setPrefilledFormData(initialFormDataSearch);
   }, []);
 
   const updatedUiSchema = {
@@ -86,6 +93,8 @@ const Village = () => {
 
   const SubmitaFunction = async (formData: any) => {
     setPrefilledFormData(formData);
+    //set prefilled search data on refresh
+    localStorage.setItem(searchStoreKey, JSON.stringify(formData))
     await searchData(formData, 0);
   };
 

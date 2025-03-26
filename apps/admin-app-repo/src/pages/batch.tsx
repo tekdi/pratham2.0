@@ -25,9 +25,10 @@ import {
   BatchSearchUISchema,
 } from '@/constant/Forms/BatchSearch';
 import { getCohortList } from '@/services/CohortService/cohortService';
-import { transformLabel } from '@/utils/Helper';
+import { toPascalCase, transformLabel } from '@/utils/Helper';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
+import CenterLabel from '@/components/Centerlabel';
 
 //import { DynamicForm } from '@shared-lib';
 
@@ -54,6 +55,12 @@ const Batch = () => {
   const initialFormData = localStorage.getItem('stateId')
     ? { state: [localStorage.getItem('stateId')] }
     : {};
+  const searchStoreKey = 'batch'
+  const initialFormDataSearch = localStorage.getItem(searchStoreKey) && localStorage.getItem(searchStoreKey) != "{}"
+    ? JSON.parse(localStorage.getItem(searchStoreKey))
+    : localStorage.getItem('stateId')
+      ? { state: [localStorage.getItem('stateId')] }
+      : {};
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -84,7 +91,7 @@ const Batch = () => {
     };
 
     setPrefilledAddFormData(initialFormData);
-    setPrefilledFormData(initialFormData);
+    setPrefilledFormData(initialFormDataSearch);
     fetchData();
   }, []);
 
@@ -97,9 +104,11 @@ const Batch = () => {
 
   const SubmitaFunction = async (formData: any) => {
     setPrefilledFormData(formData);
+    //set prefilled search data on refresh
+    localStorage.setItem(searchStoreKey, JSON.stringify(formData))
     await searchData(formData, 0);
   };
-
+ 
   const searchData = async (formData: any, newPage: any) => {
     formData = Object.fromEntries(
       Object.entries(formData).filter(
@@ -160,12 +169,11 @@ const Batch = () => {
     {
       key: 'center',
       label: 'Center',
-      render: (row) =>
-        transformLabel(
-          row.customFields.find((field) => field.label === 'CENTER')
-            ?.selectedValues[0]?.value
-        ) || '-',
-    },
+      render: (row) => <CenterLabel parentId={row?.parentId} />
+    }
+    
+    
+    ,
     {
       key: 'board',
       label: 'Boards',

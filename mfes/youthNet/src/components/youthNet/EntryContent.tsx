@@ -130,6 +130,7 @@ const EntryContent: React.FC<EntryContentProps> = ({
 
 
   const onUserClick = (userId: string) => {
+    if(localStorage.getItem('mfe_state'))
     router.push(`/user-profile/${userId}`);
   };
 
@@ -194,7 +195,8 @@ const EntryContent: React.FC<EntryContentProps> = ({
         users={[
           { Id: submittedBy, name: submittedByName, firstName: submittedByName, isVolunteer: VolunteerField.YES },
         ]}
-        onUserClick={onUserClick}
+        nameRedirection={localStorage.getItem('mfe_state')?false:true}
+        onUserClick={ onUserClick}
       />
       <Divider />
       <Box>

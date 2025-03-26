@@ -37,6 +37,7 @@ import { deleteUser } from '@/services/UserService';
 import { transformLabel } from '@/utils/Helper';
 import { getCohortList } from '@/services/GetCohortList';
 import { useTheme } from "@mui/material/styles";
+import { useRouter } from "next/router";
 import AddIcon from "@mui/icons-material/Add";
 
 //import { DynamicForm } from '@shared-lib';
@@ -72,9 +73,17 @@ const Mentor = () => {
   const [memberShipID, setMemberShipID] = useState('');
 
   const { t, i18n } = useTranslation();
+
   const initialFormData = localStorage.getItem('stateId')
     ? { state: [localStorage.getItem('stateId')] }
     : {};
+
+  const searchStoreKey = 'mentor'
+  const initialFormDataSearch = localStorage.getItem(searchStoreKey)  && localStorage.getItem(searchStoreKey) != "{}" 
+    ? JSON.parse(localStorage.getItem(searchStoreKey))
+    : localStorage.getItem('stateId')
+      ? { state: [localStorage.getItem('stateId')] }
+      : {};
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -102,7 +111,7 @@ const Mentor = () => {
     };
 
     setPrefilledAddFormData(initialFormData);
-    setPrefilledFormData(initialFormData);
+    setPrefilledFormData(initialFormDataSearch);
     setRoleID(RoleId.TEACHER);
     setTenantId(localStorage.getItem('tenantId'));
     fetchData();
@@ -115,8 +124,12 @@ const Mentor = () => {
     },
   };
 
+  const router = useRouter();
+
   const SubmitaFunction = async (formData: any) => {
     setPrefilledFormData(formData);
+    //set prefilled search data on refresh
+    localStorage.setItem(searchStoreKey, JSON.stringify(formData))
     await searchData(formData, 0);
   };
 
