@@ -23,7 +23,7 @@ const AddEditUser = ({
   schema,
   uiSchema,
   editPrefilledFormData,
-  isEdit,
+  isEdit = false,
   editableUserId,
   UpdateSuccessCallback,
   extraFields,
@@ -46,6 +46,8 @@ const AddEditUser = ({
   );
 
   const { t } = useTranslation();
+  let isEditSchema = _.cloneDeep(schema);
+  let isEditUiSchema = _.cloneDeep(uiSchema);
 
   if (isEdit) {
     const keysToRemove = [
@@ -185,8 +187,8 @@ const AddEditUser = ({
         schema &&
         uiSchema && (
           <DynamicForm
-            schema={schema}
-            uiSchema={uiSchema}
+            schema={isEdit ? isEditSchema : schema}
+            uiSchema={isEdit ? isEditUiSchema : uiSchema}
             t={t}
             FormSubmitFunction={FormSubmitFunction}
             prefilledFormData={prefilledFormData || {}}
