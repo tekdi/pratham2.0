@@ -16,8 +16,8 @@ import {
   createCohort,
   updateCohortUpdate,
 } from '@/services/CohortService/cohortService';
+import { CohortTypes } from '@/utils/app.constant';
 import _ from 'lodash';
-
 const AddEditUser = ({
   SuccessCallback,
   schema,
@@ -48,6 +48,16 @@ const AddEditUser = ({
   const { t } = useTranslation();
   let isEditSchema = _.cloneDeep(schema);
   let isEditUiSchema = _.cloneDeep(uiSchema);
+  //  let isEditSchema = (schema);
+  // let isEditUiSchema = (uiSchema);
+
+  if (localStorage.getItem('stateId')) {
+    // console.log('##########uiSchema', uiSchema);
+    // ✅ Add `ui:disabled` to the `state` field
+    if (uiSchema?.state) {
+      uiSchema.state['ui:disabled'] = true;
+    }
+  }
 
   if (isEdit) {
     const keysToRemove = [
@@ -57,12 +67,17 @@ const AddEditUser = ({
       'village',
       'password',
       'confirm_password',
+      'board',
+      'medium',
+      'parentId',
+      'batch',
+      'grade',
     ];
     keysToRemove.forEach((key) => delete isEditSchema.properties[key]);
     keysToRemove.forEach((key) => delete isEditUiSchema[key]);
     // console.log('schema', schema);
   } else {
-    const keysToRemove = ['password', 'confirm_password']; //TODO: check 'program'
+    const keysToRemove = ['password', 'confirm_password', 'program']; //TODO: check 'program'
     keysToRemove.forEach((key) => delete schema.properties[key]);
     keysToRemove.forEach((key) => delete uiSchema[key]);
   }
@@ -152,6 +167,8 @@ const AddEditUser = ({
             showToastMessage(t(failureCreateMessage), 'error');
           }
         } else {
+          if (payload.type === CohortTypes.BATCH) delete payload.customFields;
+          // payload.delete(customFields)
           const centerCreation = await createCohort(payload);
           console.log('centerCreatedResponse: ', centerCreation);
           if (centerCreation) {
