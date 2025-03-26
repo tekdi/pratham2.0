@@ -54,6 +54,12 @@ const Batch = () => {
   const initialFormData = localStorage.getItem('stateId')
     ? { state: [localStorage.getItem('stateId')] }
     : {};
+  const searchStoreKey = 'batch'
+  const initialFormDataSearch = localStorage.getItem(searchStoreKey) && localStorage.getItem(searchStoreKey) != "{}"
+    ? JSON.parse(localStorage.getItem(searchStoreKey))
+    : localStorage.getItem('stateId')
+      ? { state: [localStorage.getItem('stateId')] }
+      : {};
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -84,7 +90,7 @@ const Batch = () => {
     };
 
     setPrefilledAddFormData(initialFormData);
-    setPrefilledFormData(initialFormData);
+    setPrefilledFormData(initialFormDataSearch);
     fetchData();
   }, []);
 
@@ -97,6 +103,8 @@ const Batch = () => {
 
   const SubmitaFunction = async (formData: any) => {
     setPrefilledFormData(formData);
+    //set prefilled search data on refresh
+    localStorage.setItem(searchStoreKey, JSON.stringify(formData))
     await searchData(formData, 0);
   };
 

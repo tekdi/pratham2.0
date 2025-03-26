@@ -52,6 +52,13 @@ const StateLead = () => {
 
   const { t, i18n } = useTranslation();
 
+  const searchStoreKey = 'stateLead'
+  const initialFormDataSearch = localStorage.getItem(searchStoreKey) && localStorage.getItem(searchStoreKey) != "{}"
+    ? JSON.parse(localStorage.getItem(searchStoreKey))
+    : localStorage.getItem('stateId')
+      ? { state: [localStorage.getItem('stateId')] }
+      : {};
+
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
       searchData(prefilledFormData, 0);
@@ -89,6 +96,8 @@ const StateLead = () => {
 
   const SubmitaFunction = async (formData: any) => {
     setPrefilledFormData(formData);
+    //set prefilled search data on refresh
+    localStorage.setItem(searchStoreKey, JSON.stringify(formData))
     await searchData(formData, 0);
   };
 
@@ -244,7 +253,11 @@ const StateLead = () => {
   const notificationMessage =
     'STATE_LEADS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
+   
 
+  useEffect(() => {
+    setPrefilledFormData(initialFormDataSearch);
+  })
   return (
     <>
       <Box display={'flex'} flexDirection={'column'} gap={2}>
