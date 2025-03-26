@@ -64,11 +64,12 @@ const CustomMultiSelectWidget = ({
         (enumOptions.length === 1 && enumOptions[0]?.value === 'Select')
       }
     >
-      <InputLabel id="demo-simple-select-label">{label}</InputLabel>
+      <InputLabel id="demo-multiple-checkbox-label">{label}</InputLabel>
       <Select
         id={id}
         multiple
-        labelId="demo-simple-select-label"
+        label={label}
+        labelId="demo-multiple-checkbox-label"
         value={selectedValues}
         onChange={handleChange}
         renderValue={(selected) =>
@@ -85,7 +86,7 @@ const CustomMultiSelectWidget = ({
             key="selectAll"
             value="selectAll"
             disabled={enumOptions.length === 1}
-            sx={{ maxHeightheight: '40px' }}
+            sx={{ maxHeight: '40px' }}
           >
             <Checkbox checked={isAllSelected} />
             <ListItemText
