@@ -12,6 +12,7 @@ import { useTranslation } from 'next-i18next';
 import _ from 'lodash'; // Lodash for deep comparison
 import CustomMultiSelectWidget from './RJSFWidget/CustomMultiSelectWidget';
 import CustomCheckboxWidget from './RJSFWidget/CustomCheckboxWidget';
+import { toPascalCase } from '@/utils/Helper';
 
 const DynamicForm = ({
   schema,
@@ -144,7 +145,7 @@ const DynamicForm = ({
                       ? data.map((item) => item?.[value].toString())
                       : ['Select'],
                     enumNames: data
-                      ? data.map((item) => item?.[label].toString())
+                      ? data.map((item) =>  toPascalCase(item?.[label].toString()))
                       : ['Select'],
                   },
                 };
@@ -155,7 +156,7 @@ const DynamicForm = ({
                     ? data.map((item) => item?.[value].toString())
                     : ['Select'],
                   enumNames: data
-                    ? data.map((item) => item?.[label].toString())
+                    ? data.map((item) => toPascalCase(item?.[label].toString()))
                     : ['Select'],
                 };
               }
@@ -456,7 +457,7 @@ const DynamicForm = ({
                                   item?.[value].toString()
                                 ),
                                 enumNames: data.map((item) =>
-                                  item?.[label].toString()
+                                  toPascalCase(item?.[label].toString())
                                 ),
                               },
                             };
@@ -467,7 +468,7 @@ const DynamicForm = ({
                                 item?.[value].toString()
                               ),
                               enumNames: data.map((item) =>
-                                item?.[label].toString()
+                                toPascalCase(item?.[label].toString())
                               ),
                             };
                           }
@@ -531,14 +532,14 @@ const DynamicForm = ({
                   items: {
                     type: 'string',
                     enum: data.map((item) => item?.[value].toString()),
-                    enumNames: data.map((item) => item?.[label].toString()),
+                    enumNames: data.map((item) =>  toPascalCase(item?.[label].toString())),
                   },
                 };
               } else {
                 updatedProperties[fieldKey] = {
                   ...updatedProperties[fieldKey],
                   enum: data.map((item) => item?.[value].toString()),
-                  enumNames: data.map((item) => item?.[label].toString()),
+                  enumNames: data.map((item) =>  toPascalCase(item?.[label].toString())),
                 };
               }
             });
@@ -880,7 +881,7 @@ const DynamicForm = ({
                           type: 'string',
                           enum: data.map((item) => item?.[value].toString()),
                           enumNames: data.map((item) =>
-                            item?.[label].toString()
+                            toPascalCase(item?.[label].toString())
                           ),
                         },
                       };
@@ -888,7 +889,7 @@ const DynamicForm = ({
                       updatedProperties[fieldKey] = {
                         ...updatedProperties[fieldKey],
                         enum: data.map((item) => item?.[value].toString()),
-                        enumNames: data.map((item) => item?.[label].toString()),
+                        enumNames: data.map((item) =>  toPascalCase(item?.[label].toString())),
                       };
                     }
                   });
