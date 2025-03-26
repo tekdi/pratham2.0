@@ -128,9 +128,9 @@ const Mentor = () => {
 
   const SubmitaFunction = async (formData: any) => {
     setPrefilledFormData(formData);
-    await searchData(formData, 0);
     //set prefilled search data on refresh
     localStorage.setItem(searchStoreKey, JSON.stringify(formData))
+    await searchData(formData, 0);
   };
 
   const searchData = async (formData: any, newPage: any) => {

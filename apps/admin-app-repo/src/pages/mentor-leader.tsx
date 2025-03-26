@@ -79,9 +79,17 @@ const MentorLead = () => {
   const [memberShipID, setMemberShipID] = useState('');
 
   const { t, i18n } = useTranslation();
+
   const initialFormData = localStorage.getItem('stateId')
     ? { state: [localStorage.getItem('stateId')] }
     : {};
+
+  const searchStoreKey = 'mentorLeader'
+  const initialFormDataSearch = localStorage.getItem(searchStoreKey) && localStorage.getItem(searchStoreKey) != "{}"
+    ? JSON.parse(localStorage.getItem(searchStoreKey))
+    : localStorage.getItem('stateId')
+      ? { state: [localStorage.getItem('stateId')] }
+      : {};
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -107,9 +115,9 @@ const MentorLead = () => {
       setAddSchema(responseForm?.schema);
       setAddUiSchema(responseForm?.uiSchema);
     };
-    fetchData();
     setPrefilledAddFormData(initialFormData);
-    setPrefilledFormData(initialFormData);
+    setPrefilledFormData(initialFormDataSearch);
+    fetchData();
   }, []);
 
   const updatedUiSchema = {
@@ -121,6 +129,8 @@ const MentorLead = () => {
 
   const SubmitaFunction = async (formData: any) => {
     setPrefilledFormData(formData);
+    //set prefilled search data on refresh
+    localStorage.setItem(searchStoreKey, JSON.stringify(formData))
     await searchData(formData, 0);
   };
 
@@ -136,7 +146,7 @@ const MentorLead = () => {
       tenantId: localStorage.getItem('tenantId'),
     };
 
-    const { sortBy } = formData; 
+    const { sortBy } = formData;
     const staticSort = ['firstName', sortBy || 'asc'];
     await searchListData(
       formData,
