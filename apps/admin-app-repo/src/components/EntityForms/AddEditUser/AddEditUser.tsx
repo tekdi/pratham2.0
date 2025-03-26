@@ -63,13 +63,13 @@ const AddEditUser = ({
       'medium',
       'parentId',
       'batch',
-      'grade'
-    ];;
+      'grade',
+    ];
     keysToRemove.forEach((key) => delete schema.properties[key]);
     keysToRemove.forEach((key) => delete uiSchema[key]);
     // console.log('schema', schema);
   } else {
-    const keysToRemove = ['password', 'confirm_password']; //TODO: check 'program'
+    const keysToRemove = ['password', 'confirm_password', 'program']; //TODO: check 'program'
     keysToRemove.forEach((key) => delete schema.properties[key]);
     keysToRemove.forEach((key) => delete uiSchema[key]);
   }
@@ -159,9 +159,8 @@ const AddEditUser = ({
             showToastMessage(t(failureCreateMessage), 'error');
           }
         } else {
-          if(payload.type===CohortTypes.BATCH)
-            delete  payload.customFields;
-         // payload.delete(customFields)
+          if (payload.type === CohortTypes.BATCH) delete payload.customFields;
+          // payload.delete(customFields)
           const centerCreation = await createCohort(payload);
           console.log('centerCreatedResponse: ', centerCreation);
           if (centerCreation) {

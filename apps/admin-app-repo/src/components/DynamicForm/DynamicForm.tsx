@@ -12,6 +12,8 @@ import { useTranslation } from 'next-i18next';
 import _ from 'lodash'; // Lodash for deep comparison
 import CustomMultiSelectWidget from './RJSFWidget/CustomMultiSelectWidget';
 import CustomCheckboxWidget from './RJSFWidget/CustomCheckboxWidget';
+import CustomDateWidget from './RJSFWidget/CustomDateWidget';
+import { toPascalCase, transformLabel } from '@/utils/Helper';
 
 const DynamicForm = ({
   schema,
@@ -38,6 +40,7 @@ const DynamicForm = ({
   const widgets = {
     CustomMultiSelectWidget,
     CustomCheckboxWidget,
+    CustomDateWidget,
   };
 
   useEffect(() => {
@@ -144,7 +147,9 @@ const DynamicForm = ({
                       ? data.map((item) => item?.[value].toString())
                       : ['Select'],
                     enumNames: data
-                      ? data.map((item) => item?.[label].toString())
+                      ? data.map((item) =>
+                          transformLabel(item?.[label].toString())
+                        )
                       : ['Select'],
                   },
                 };
@@ -155,7 +160,7 @@ const DynamicForm = ({
                     ? data.map((item) => item?.[value].toString())
                     : ['Select'],
                   enumNames: data
-                    ? data.map((item) => (item?.[label].toString()))
+                    ? data.map((item) => item?.[label].toString())
                     : ['Select'],
                 };
               }
@@ -658,17 +663,20 @@ const DynamicForm = ({
 
   //   return updatedPayload;
   // };
-  const replaceControllingField = (payload, changedFieldValue, isMultiSelect) => {
+  const replaceControllingField = (
+    payload,
+    changedFieldValue,
+    isMultiSelect
+  ) => {
     // Deep clone to avoid modifying the original object
     const updatedPayload = JSON.parse(JSON.stringify(payload));
-  
     // Determine new value based on type
     const newValue = isMultiSelect
       ? Array.isArray(changedFieldValue)
         ? [...changedFieldValue]
         : [changedFieldValue]
       : changedFieldValue;
-  
+
     // Recursive function to replace ** in nested objects/arrays
     const replaceNested = (obj) => {
       if (Array.isArray(obj)) {
@@ -691,10 +699,10 @@ const DynamicForm = ({
         });
       }
     };
-  
+
     // Start recursion from the root
     replaceNested(updatedPayload);
-  
+
     return updatedPayload;
   };
   const getChangedField = (
