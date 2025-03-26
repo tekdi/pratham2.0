@@ -54,7 +54,12 @@ const AddEditUser = ({
       'village',
       'password',
       'confirm_password',
-    ];
+      'board',
+      'medium',
+      'parentId',
+      'batch',
+      'grade'
+    ];;
     keysToRemove.forEach((key) => delete schema.properties[key]);
     keysToRemove.forEach((key) => delete uiSchema[key]);
     // console.log('schema', schema);

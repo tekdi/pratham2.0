@@ -635,29 +635,68 @@ const DynamicForm = ({
     return false;
   };
 
-  const replaceControllingField = (
-    payload,
-    changedFieldValue,
-    isMultiSelect
-  ) => {
-    // Clone the payload to avoid mutating original object
-    let updatedPayload = { ...payload };
+  // const replaceControllingField = (
+  //   payload,
+  //   changedFieldValue,
+  //   isMultiSelect
+  // ) => {
+  //   // Clone the payload to avoid mutating original object
+  //   let updatedPayload = { ...payload };
+  //   console.log(updatedPayload)
 
-    // Replace ** with value based on isMultiSelect
+  //   // Replace ** with value based on isMultiSelect
+  //   const newValue = isMultiSelect
+  //     ? changedFieldValue
+  //     : String(changedFieldValue);
+
+  //   // Iterate through the object keys and replace "**" wherever found
+  //   Object.keys(updatedPayload).forEach((key) => {
+  //     if (updatedPayload[key] === '**') {
+  //       updatedPayload[key] = newValue;
+  //     }
+  //   });
+
+  //   return updatedPayload;
+  // };
+  const replaceControllingField = (payload, changedFieldValue, isMultiSelect) => {
+    // Deep clone to avoid modifying the original object
+    const updatedPayload = JSON.parse(JSON.stringify(payload));
+  
+    // Determine new value based on type
     const newValue = isMultiSelect
-      ? changedFieldValue
-      : String(changedFieldValue);
-
-    // Iterate through the object keys and replace "**" wherever found
-    Object.keys(updatedPayload).forEach((key) => {
-      if (updatedPayload[key] === '**') {
-        updatedPayload[key] = newValue;
+      ? Array.isArray(changedFieldValue)
+        ? [...changedFieldValue]
+        : [changedFieldValue]
+      : changedFieldValue;
+  
+    // Recursive function to replace ** in nested objects/arrays
+    const replaceNested = (obj) => {
+      if (Array.isArray(obj)) {
+        // If array, iterate through each element
+        obj.forEach((item, index) => {
+          if (typeof item === 'object' && item !== null) {
+            replaceNested(item); // Recursive call for nested objects/arrays
+          } else if (item === '**') {
+            obj[index] = newValue;
+          }
+        });
+      } else if (typeof obj === 'object' && obj !== null) {
+        // If object, iterate through keys
+        Object.keys(obj).forEach((key) => {
+          if (obj[key] === '**') {
+            obj[key] = newValue;
+          } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+            replaceNested(obj[key]); // Recursive call for nested objects/arrays
+          }
+        });
       }
-    });
-
+    };
+  
+    // Start recursion from the root
+    replaceNested(updatedPayload);
+  
     return updatedPayload;
   };
-
   const getChangedField = (
     formData: Record<string, any>,
     prevFormData: Record<string, any>
