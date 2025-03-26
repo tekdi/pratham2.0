@@ -1,3 +1,4 @@
+// @ts-nocheck
 // MUIDateWidget.jsx
 import React, { useState, useEffect } from 'react';
 import { TextField } from '@mui/material';
