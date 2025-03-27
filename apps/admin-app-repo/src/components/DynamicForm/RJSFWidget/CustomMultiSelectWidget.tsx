@@ -20,7 +20,7 @@ const CustomMultiSelectWidget = ({
 }: WidgetProps) => {
   const { enumOptions = [] } = options;
   const maxSelections = schema.maxSelection || enumOptions.length; // Default to max options if not set
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   // Ensure value is always an array
   const selectedValues = Array.isArray(value) ? value : [];
