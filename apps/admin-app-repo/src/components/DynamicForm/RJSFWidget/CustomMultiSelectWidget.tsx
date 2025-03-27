@@ -84,6 +84,13 @@ const CustomMultiSelectWidget = ({
             .map((option) => option.label)
             .join(', ')
         }
+        MenuProps={{
+          PaperProps: {
+            sx: {
+              maxHeight: '300px',
+            },
+          },
+        }}
       >
         {/* Show "Select All" only if maxSelections >= enumOptions.length */}
         {enumOptions.length > 0 && maxSelections >= enumOptions.length && (
