@@ -7,6 +7,7 @@ import ListItemText from '@mui/material/ListItemText';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
+import { useTranslation } from 'react-i18next';
 
 const CustomMultiSelectWidget = ({
   id,
@@ -19,6 +20,7 @@ const CustomMultiSelectWidget = ({
 }: WidgetProps) => {
   const { enumOptions = [] } = options;
   const maxSelections = schema.maxSelection || enumOptions.length; // Default to max options if not set
+  const { t, i18n } = useTranslation();
 
   // Ensure value is always an array
   const selectedValues = Array.isArray(value) ? value : [];
@@ -54,7 +56,6 @@ const CustomMultiSelectWidget = ({
       }
     }
   };
-
   return (
     <FormControl
       fullWidth
@@ -86,9 +87,7 @@ const CustomMultiSelectWidget = ({
           >
             <Checkbox checked={isAllSelected} />
             <ListItemText
-              primary={
-                isAllSelected ? 'Deselect All' : 'Select All'
-              }
+              primary={isAllSelected ? 'Deselect All' : 'Select All'}
             />
           </MenuItem>
         )}
@@ -104,7 +103,11 @@ const CustomMultiSelectWidget = ({
             }
           >
             <Checkbox checked={selectedValues.includes(option.value)} />
-            <ListItemText primary={option.label} />
+            <ListItemText
+              primary={t(`FORM.${option.label}`, {
+                defaultValue: option.label,
+              })}
+            />
           </MenuItem>
         ))}
       </Select>
