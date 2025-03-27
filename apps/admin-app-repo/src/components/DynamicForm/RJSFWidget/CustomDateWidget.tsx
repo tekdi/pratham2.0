@@ -1,5 +1,4 @@
 // @ts-nocheck
-// MUIDateWidget.jsx
 import React, { useState, useEffect } from 'react';
 import { TextField } from '@mui/material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -9,20 +8,36 @@ import dayjs from 'dayjs';
 const CustomDateWidget = ({ value, onChange, options }: any) => {
   const { minValue, maxValue } = options;
 
-  // Convert min and max values to Date objects using dayjs
-  const minDate = dayjs(minValue); // e.g., 1975-03-25
-  const maxDate = dayjs(maxValue); // e.g., 2007-03-25
+  console.log('###### DOB Received in Widget:', value);
 
-  // State to hold the selected date
-  const [selectedDate, setSelectedDate] = useState(value ? dayjs(value) : null);
+  // Ensure valid initial value
+  const initialValue =
+    typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}$/)
+      ? value
+      : null;
+
+  // State for selected date
+  const [selectedDate, setSelectedDate] = useState(
+    initialValue ? dayjs(initialValue, 'YYYY-MM-DD') : null
+  );
+
+  // Update state if value changes dynamically
+  useEffect(() => {
+    if (value && dayjs(value, 'YYYY-MM-DD').isValid()) {
+      setSelectedDate(dayjs(value, 'YYYY-MM-DD'));
+    } else {
+      setSelectedDate(null);
+    }
+  }, [value]);
 
   // Handle date change and update parent form
   const handleDateChange = (date: any) => {
     if (date && date.isValid()) {
-      const formattedDate = date.format('YYYY-MM-DD');
+      const formattedDate = date.format('YYYY-MM-DD'); // Send as MySQL format
       setSelectedDate(date);
       onChange(formattedDate);
     } else {
+      setSelectedDate(null);
       onChange(undefined);
     }
   };
@@ -31,11 +46,12 @@ const CustomDateWidget = ({ value, onChange, options }: any) => {
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <DatePicker
         label="Select Date of Birth"
-        value={selectedDate}
+        value={selectedDate || null}
         onChange={handleDateChange}
-        minDate={minDate}
-        maxDate={maxDate}
-        format="YYYY-MM-DD"
+        minDate={minValue ? dayjs(minValue, 'YYYY-MM-DD') : undefined}
+        maxDate={maxValue ? dayjs(maxValue, 'YYYY-MM-DD') : undefined}
+        // 👇 Set display format to DD-MM-YYYY
+        format="DD-MM-YYYY"
         renderInput={(params: any) => (
           <TextField
             {...params}
@@ -43,15 +59,17 @@ const CustomDateWidget = ({ value, onChange, options }: any) => {
             variant="outlined"
             helperText={
               selectedDate &&
-              (selectedDate.isBefore(minDate) || selectedDate.isAfter(maxDate))
-                ? `Date must be between ${minDate.format(
-                    'YYYY-MM-DD'
-                  )} and ${maxDate.format('YYYY-MM-DD')}`
+              (selectedDate.isBefore(dayjs(minValue)) ||
+                selectedDate.isAfter(dayjs(maxValue)))
+                ? `Date must be between ${dayjs(minValue).format(
+                    'DD-MM-YYYY'
+                  )} and ${dayjs(maxValue).format('DD-MM-YYYY')}`
                 : ''
             }
             error={
               selectedDate &&
-              (selectedDate.isBefore(minDate) || selectedDate.isAfter(maxDate))
+              (selectedDate.isBefore(dayjs(minValue)) ||
+                selectedDate.isAfter(dayjs(maxValue)))
             }
           />
         )}
