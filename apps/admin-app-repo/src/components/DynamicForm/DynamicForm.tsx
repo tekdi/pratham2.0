@@ -160,7 +160,9 @@ const DynamicForm = ({
                     ? data.map((item) => item?.[value].toString())
                     : ['Select'],
                   enumNames: data
-                    ? data.map((item) => item?.[label].toString())
+                    ? data.map((item) =>
+                        transformLabel(item?.[label].toString())
+                      )
                     : ['Select'],
                 };
               }
@@ -461,7 +463,7 @@ const DynamicForm = ({
                                   item?.[value].toString()
                                 ),
                                 enumNames: data.map((item) =>
-                                  item?.[label].toString()
+                                  transformLabel(item?.[label].toString())
                                 ),
                               },
                             };
@@ -472,7 +474,7 @@ const DynamicForm = ({
                                 item?.[value].toString()
                               ),
                               enumNames: data.map((item) =>
-                                item?.[label].toString()
+                                transformLabel(item?.[label].toString())
                               ),
                             };
                           }
@@ -536,14 +538,18 @@ const DynamicForm = ({
                   items: {
                     type: 'string',
                     enum: data.map((item) => item?.[value].toString()),
-                    enumNames: data.map((item) => item?.[label].toString()),
+                    enumNames: data.map((item) =>
+                      transformLabel(item?.[label].toString())
+                    ),
                   },
                 };
               } else {
                 updatedProperties[fieldKey] = {
                   ...updatedProperties[fieldKey],
                   enum: data.map((item) => item?.[value].toString()),
-                  enumNames: data.map((item) => item?.[label].toString()),
+                  enumNames: data.map((item) =>
+                    transformLabel(item?.[label].toString())
+                  ),
                 };
               }
             });
@@ -888,7 +894,7 @@ const DynamicForm = ({
                           type: 'string',
                           enum: data.map((item) => item?.[value].toString()),
                           enumNames: data.map((item) =>
-                            item?.[label].toString()
+                            transformLabel(item?.[label].toString())
                           ),
                         },
                       };
@@ -896,7 +902,9 @@ const DynamicForm = ({
                       updatedProperties[fieldKey] = {
                         ...updatedProperties[fieldKey],
                         enum: data.map((item) => item?.[value].toString()),
-                        enumNames: data.map((item) => item?.[label].toString()),
+                        enumNames: data.map((item) =>
+                          transformLabel(item?.[label].toString())
+                        ),
                       };
                     }
                   });
