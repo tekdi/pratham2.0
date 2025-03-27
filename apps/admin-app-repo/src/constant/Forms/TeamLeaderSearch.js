@@ -60,7 +60,7 @@ export const TeamLeaderSearchSchema = {
           value: 'value',
         },
         callType: userRole !== Role.CENTRAL_ADMIN ? 'initial' : 'dependent',
-        dependent: 'state',
+        ...(!stateId ? { dependent: 'state' } : {}),
       },
       //for multiselect
       uniqueItems: true,
