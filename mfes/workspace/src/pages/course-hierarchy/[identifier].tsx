@@ -95,22 +95,28 @@ const RecursiveAccordion = ({ data }: { data: any[] }) => {
 
 export default function CourseHierarchy() {
   const router = useRouter();
-  const [selectedKey, setSelectedKey] = useState("discover-contents");
+  const [selectedKey, setSelectedKey] = useState("");
   const [doId, setDoId] = useState<string | null>(null);
   const [courseHierarchyData, setCourseHierarchyData] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-
+  const [contentMode, setContentMode] = useState<string>("");
   useEffect(() => {
     if (router.query.identifier) {
       setDoId(router.query.identifier as string);
     }
-  }, [router.query.identifier]);
+    if (router.query.isReadOnly) {
+      setContentMode("edit")
+    }
+    if (router.query.previousPage) {
+      setSelectedKey(router.query.previousPage as string)
+    }
+  }, [router.query.identifier, router.query.previousPage]);
 
   useEffect(() => {
     const fetchCohortHierarchy = async (doId: string): Promise<any> => {
       try {
         const hierarchyResponse = await getContentHierarchy({
-          doId,
+          doId, contentMode
         });
         setLoading(true);
         const hierarchyData = hierarchyResponse?.data?.result?.content;
