@@ -91,7 +91,6 @@ const CustomMultiSelectWidget = ({
             key="selectAll"
             value="selectAll"
             disabled={enumOptions.length === 1}
-            sx={{ maxHeight: '40px' }}
           >
             <Checkbox checked={isAllSelected} />
             <ListItemText
@@ -115,6 +114,7 @@ const CustomMultiSelectWidget = ({
           </MenuItem>
         ))}
       </Select>
+
       {selectedValues.length > maxSelections && (
         <FormHelperText>
           You can select up to {maxSelections} options
