@@ -20,8 +20,8 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 const RecursiveAccordion = ({ data }: { data: any[] }) => {
   const router = useRouter();
   const renderAccordion = (nodes: any[], level = 0) => {
-    const resourceNodes = nodes.filter(node => node.contentType === 'Resource');
-    const nonResourceNodes = nodes.filter(node => node.contentType !== 'Resource');
+    const resourceNodes = nodes.filter(node => node.mimeType !== 'application/vnd.ekstep.content-collection');
+    const nonResourceNodes = nodes.filter(node => node.mimeType === 'application/vnd.ekstep.content-collection');
 
     return (
       <>

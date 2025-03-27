@@ -16,6 +16,7 @@ import {
 } from '../../../components/players/PlayerConfig';
 import Loader from '@/components/Loader';
 import Players from '@workspace/components/players/Players';
+import V1Player from "@workspace/components/V1-Player/V1Player";
 import Layout from "@workspace/components/Layout";
 import $ from "jquery";
 let playerConfig: any;
@@ -29,6 +30,8 @@ const SunbirdPlayers: React.FC<SunbirdPlayerProps> = () => {
   const [selectedKey, setSelectedKey] = useState("discover-contents");
   const { identifier } = router.query;
   const [loading, setLoading] = useState(true);
+  const [isContentInteractiveType, setIsContentInteractiveType] =
+    useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -39,6 +42,7 @@ const SunbirdPlayers: React.FC<SunbirdPlayerProps> = () => {
         if (identifier) {
           const data = await fetchContent(identifier);
           if (data.mimeType === MIME_TYPE.QUESTIONSET_MIME_TYPE) {
+            setIsContentInteractiveType(false);
             playerConfig = V2PlayerConfig;
             const Q1 = await getHierarchy(identifier);
             const Q2 = await getQumlData(identifier);
@@ -48,7 +52,9 @@ const SunbirdPlayers: React.FC<SunbirdPlayerProps> = () => {
             playerConfig = V1PlayerConfig;
             playerConfig.metadata = data;
             playerConfig.context['contentId'] = identifier;
+            setIsContentInteractiveType(true);
           } else {
+            setIsContentInteractiveType(false);
             playerConfig = V2PlayerConfig;
             playerConfig.metadata = data;
             playerConfig.context['contentId'] = identifier;
@@ -94,7 +100,15 @@ const SunbirdPlayers: React.FC<SunbirdPlayerProps> = () => {
         >
           {playerConfig?.metadata?.name}
         </Typography>
-        {!loading ? <Players playerConfig={playerConfig} /> : null}
+        {!loading && (
+        <div style={{ height: "100vh", width: "100%" }}>
+          {isContentInteractiveType ? (
+            <V1Player playerConfig={playerConfig} />
+          ) : (
+            <Players playerConfig={playerConfig} />
+          )}
+        </div>
+      )}
       </Box>
     </Box>
     </Layout>
