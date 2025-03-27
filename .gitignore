@@ -54,4 +54,4 @@ apps/admin-app-repo/build/
 .env.test
 
 #ignore workflow
-.github/workflows/*
+# .github/workflows/*

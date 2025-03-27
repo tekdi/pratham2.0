@@ -60,7 +60,7 @@ export const MentorSearchSchema = {
           value: 'value',
         },
         callType: userRole !== Role.CENTRAL_ADMIN ? 'initial' : 'dependent',
-        dependent: 'state',
+        ...(!stateId ? { dependent: 'state' } : {}),
       },
       //for multiselect
       uniqueItems: true,
@@ -162,6 +162,7 @@ export const MentorSearchUISchema = {
       multiple: true,
       uniqueItems: true,
     },
+    ...(stateId ? { 'ui:disabled': true } : {}),
   },
 
   district: {
@@ -198,5 +199,6 @@ export const MentorSearchUISchema = {
 
   status: {
     'ui:widget': 'select',
+    // 'ui:disabled': true,
   },
 };

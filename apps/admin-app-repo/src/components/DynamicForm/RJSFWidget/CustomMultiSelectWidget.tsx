@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useEffect, useState } from 'react';
 import { WidgetProps } from '@rjsf/utils';
 import MenuItem from '@mui/material/MenuItem';
@@ -17,6 +18,7 @@ const CustomMultiSelectWidget = ({
   label,
   onChange,
   schema,
+  uiSchema, // Pass uiSchema to read ui:disabled
 }: WidgetProps) => {
   const { enumOptions = [] } = options;
   const maxSelections = schema.maxSelection || enumOptions.length; // Default to max options if not set
@@ -29,6 +31,9 @@ const CustomMultiSelectWidget = ({
   const [isAllSelected, setIsAllSelected] = useState(
     selectedValues.length === enumOptions.length
   );
+
+  // Check if the widget is disabled from uiSchema
+  const isDisabled = uiSchema?.['ui:disabled'] === true;
 
   // Update `isAllSelected` when `selectedValues` changes
   useEffect(() => {
@@ -61,14 +66,17 @@ const CustomMultiSelectWidget = ({
       fullWidth
       error={selectedValues.length > maxSelections}
       disabled={
+        isDisabled ||
         enumOptions.length === 0 ||
         (enumOptions.length === 1 && enumOptions[0]?.value === 'Select')
       }
     >
-      <InputLabel>{label}</InputLabel>
+      <InputLabel id="demo-multiple-checkbox-label">{label}</InputLabel>
       <Select
         id={id}
         multiple
+        label={label}
+        labelId="demo-multiple-checkbox-label"
         value={selectedValues}
         onChange={handleChange}
         renderValue={(selected) =>
@@ -77,6 +85,13 @@ const CustomMultiSelectWidget = ({
             .map((option) => option.label)
             .join(', ')
         }
+        MenuProps={{
+          PaperProps: {
+            sx: {
+              maxHeight: '300px',
+            },
+          },
+        }}
       >
         {/* Show "Select All" only if maxSelections >= enumOptions.length */}
         {enumOptions.length > 0 && maxSelections >= enumOptions.length && (
@@ -111,6 +126,7 @@ const CustomMultiSelectWidget = ({
           </MenuItem>
         ))}
       </Select>
+
       {selectedValues.length > maxSelections && (
         <FormHelperText>
           You can select up to {maxSelections} options

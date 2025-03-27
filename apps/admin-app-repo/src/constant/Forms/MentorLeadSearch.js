@@ -60,7 +60,7 @@ export const MentorLeadSearchSchema = {
           value: 'value',
         },
         callType: userRole !== Role.CENTRAL_ADMIN ? 'initial' : 'dependent',
-        dependent: 'state',
+        ...(!stateId ? { dependent: 'state' } : {}),
       },
       //for multiselect
       uniqueItems: true,
@@ -97,6 +97,7 @@ export const MentorLeadSearchUISchema = {
       multiple: true,
       uniqueItems: true,
     },
+    ...(stateId ? { 'ui:disabled': true } : {}),
   },
 
   district: {
