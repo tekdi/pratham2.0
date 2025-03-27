@@ -162,6 +162,7 @@ export const MentorSearchUISchema = {
       multiple: true,
       uniqueItems: true,
     },
+    ...(stateId ? { 'ui:disabled': true } : {}),
   },
 
   district: {
@@ -198,5 +199,6 @@ export const MentorSearchUISchema = {
 
   status: {
     'ui:widget': 'select',
+    // 'ui:disabled': true,
   },
 };

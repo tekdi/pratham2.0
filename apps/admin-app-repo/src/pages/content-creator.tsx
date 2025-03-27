@@ -51,6 +51,14 @@ const ContentCreator = () => {
 
   const { t, i18n } = useTranslation();
 
+  const searchStoreKey = 'contentCreator'
+
+  const initialFormDataSearch = localStorage.getItem(searchStoreKey) && localStorage.getItem(searchStoreKey) != "{}"
+    ? JSON.parse(localStorage.getItem(searchStoreKey))
+    : localStorage.getItem('stateId')
+      ? { state: [localStorage.getItem('stateId')] }
+      : {};
+
   const storedUserData = JSON.parse(localStorage.getItem('adminInfo') || '{}');
 
   useEffect(() => {
@@ -90,6 +98,8 @@ const ContentCreator = () => {
 
   const SubmitaFunction = async (formData: any) => {
     setPrefilledFormData(formData);
+    //set prefilled search data on refresh
+    localStorage.setItem(searchStoreKey, JSON.stringify(formData))
     await searchData(formData, 0);
   };
 
@@ -316,6 +326,9 @@ const ContentCreator = () => {
   const notificationMessage =
     'CONTENT_CREATORS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
+  useEffect(() => {
+    setPrefilledFormData(initialFormDataSearch)
+  })
 
   return (
     <>

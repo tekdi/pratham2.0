@@ -55,4 +55,4 @@ mfes/workspace/public/content-editor/
 .env.test
 
 #ignore workflow
-.github/workflows/*
+# .github/workflows/*

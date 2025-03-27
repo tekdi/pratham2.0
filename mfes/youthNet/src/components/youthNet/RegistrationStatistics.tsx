@@ -10,13 +10,13 @@ const RegistrationStatistics: React.FC<RegistrationStatisticsProps> = ({
   avatar,
   subtile,
   onPrimaryClick,
-  isVolunteer
+  isVolunteer,
 }) => {
   const theme = useTheme<any>();
   return (
     <Box
       sx={{
-        background: '#EDE1CF',
+        background: '#CDC5BD',
         boxShadow: '0px 1px 2px 0px #0000004D, 0px 2px 6px 2px #00000026',
         padding: '12px',
         borderRadius: '16px',
@@ -49,7 +49,7 @@ const RegistrationStatistics: React.FC<RegistrationStatisticsProps> = ({
             }}
             className="one-line-text"
           >
-            {cardTitle}  
+            {cardTitle}
           </Box>
         )}
 
@@ -64,7 +64,9 @@ const RegistrationStatistics: React.FC<RegistrationStatisticsProps> = ({
             <Box>
               <Avatar
                 sx={{
-                  bgcolor: isVolunteer ? '#EDE1CF': theme?.palette?.warning['A400'],
+                  bgcolor: isVolunteer
+                    ? '#EDE1CF'
+                    : theme?.palette?.warning['A400'],
                   color: theme?.palette?.warning['300'],
                   boxShadow: '0px 1px 2px 0px #0000004D',
                   border: `2px solid ${theme?.palette?.warning['A100']}`,
@@ -78,18 +80,17 @@ const RegistrationStatistics: React.FC<RegistrationStatisticsProps> = ({
           )}
 
           <Box>
-            {statistic && (
-              <Box
-                sx={{
-                  fontSize: '16px',
-                  fontWeight: '500',
-                  color:  theme?.palette?.warning['300'],
-                }}
-                className="one-line-text"
-              >
-                {statistic }
-              </Box>
-            )}
+            <Box
+              sx={{
+                fontSize: '16px',
+                fontWeight: '500',
+                color: theme?.palette?.warning['300'],
+              }}
+              className="one-line-text"
+            >
+              {statistic}
+            </Box>
+
             {subtile && (
               <Box
                 className="one-line-text"
