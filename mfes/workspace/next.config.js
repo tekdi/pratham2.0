@@ -32,6 +32,10 @@ const nextConfig = {
         destination: '/api/fileUpload', // Forward asset uploads to fileUpload.js
       },
       {
+        source: "/play/content/assets/:path*", // Match any URL starting with /workspace/content/assets/
+        destination: '/assets/:path*', // Serve the assets from the public folder
+      },
+      {
         source: '/assets/pdfjs/:path*', // Match any URL starting with /workspace/content/assets/
         destination: '/assets/:path*', // Serve the assets from the public folder
       },
