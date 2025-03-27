@@ -96,7 +96,6 @@ export const TeamLeaderSearchSchema = {
       isMultiSelect: true,
       maxSelections: 1000,
     },
-
     firstName: {
       type: 'string',
       title: 'Search Team Leader',
