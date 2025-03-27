@@ -97,6 +97,7 @@ export const MentorLeadSearchUISchema = {
       multiple: true,
       uniqueItems: true,
     },
+    ...(stateId ? { 'ui:disabled': true } : {}),
   },
 
   district: {

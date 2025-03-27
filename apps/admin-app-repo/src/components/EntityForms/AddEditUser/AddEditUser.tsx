@@ -51,6 +51,14 @@ const AddEditUser = ({
   //  let isEditSchema = (schema);
   // let isEditUiSchema = (uiSchema);
 
+  if (localStorage.getItem('stateId')) {
+    // console.log('##########uiSchema', uiSchema);
+    // ✅ Add `ui:disabled` to the `state` field
+    if (uiSchema?.state) {
+      uiSchema.state['ui:disabled'] = true;
+    }
+  }
+
   if (isEdit) {
     const keysToRemove = [
       'state',
@@ -65,8 +73,8 @@ const AddEditUser = ({
       'batch',
       'grade',
     ];
-    keysToRemove.forEach((key) => delete schema.properties[key]);
-    keysToRemove.forEach((key) => delete uiSchema[key]);
+    keysToRemove.forEach((key) => delete isEditSchema.properties[key]);
+    keysToRemove.forEach((key) => delete isEditUiSchema[key]);
     // console.log('schema', schema);
   } else {
     const keysToRemove = ['password', 'confirm_password', 'program']; //TODO: check 'program'

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useEffect, useState } from 'react';
 import { WidgetProps } from '@rjsf/utils';
 import MenuItem from '@mui/material/MenuItem';
@@ -16,6 +17,7 @@ const CustomMultiSelectWidget = ({
   label,
   onChange,
   schema,
+  uiSchema, // Pass uiSchema to read ui:disabled
 }: WidgetProps) => {
   const { enumOptions = [] } = options;
   const maxSelections = schema.maxSelection || enumOptions.length; // Default to max options if not set
@@ -27,6 +29,9 @@ const CustomMultiSelectWidget = ({
   const [isAllSelected, setIsAllSelected] = useState(
     selectedValues.length === enumOptions.length
   );
+
+  // Check if the widget is disabled from uiSchema
+  const isDisabled = uiSchema?.['ui:disabled'] === true;
 
   // Update `isAllSelected` when `selectedValues` changes
   useEffect(() => {
@@ -60,6 +65,7 @@ const CustomMultiSelectWidget = ({
       fullWidth
       error={selectedValues.length > maxSelections}
       disabled={
+        isDisabled ||
         enumOptions.length === 0 ||
         (enumOptions.length === 1 && enumOptions[0]?.value === 'Select')
       }
@@ -94,7 +100,9 @@ const CustomMultiSelectWidget = ({
             disabled={enumOptions.length === 1}
           >
             <Checkbox checked={isAllSelected} />
-            <ListItemText primary={isAllSelected ? 'Deselect All' : 'Select All'} />
+            <ListItemText
+              primary={isAllSelected ? 'Deselect All' : 'Select All'}
+            />
           </MenuItem>
         )}
 
