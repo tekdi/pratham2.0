@@ -252,7 +252,7 @@ export const createCourse = async (userId: any, channelId: any, contentFW: any, 
   }
 };
 
-export const createResourceContent = async(userId: any, channelId: any, contentFW: any) => {
+export const createResourceContent = async(userId: any, contentType: string, channelId: any, contentFW: any) => {
   const apiURL = `/action/content/v3/create`;
 
   const reqBody = {
@@ -264,12 +264,13 @@ export const createResourceContent = async(userId: any, channelId: any, contentF
         createdFor: [channelId],
         mimeType: MIME_TYPE.ECML_MIME_TYPE,
         resourceType: "Learn",
-        primaryCategory: "Learning Resource",
-        contentType: "Resource",
-        framework: contentFW
+        contentType: contentType,
+        framework: contentFW,
+        ...(contentType !== "SelfAssess" && { primaryCategory: "Learning Resource" })
       },
     },
   };
+
 
   try {
     const response = await post(apiURL, reqBody);

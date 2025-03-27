@@ -76,10 +76,10 @@ const CreatePage = () => {
     fetchCollectionData();
   };
 
-  const fetchResourceContentData = async () => {
+  const fetchResourceContentData = async (contentType: string) => {
     try {
       const userId = getLocalStoredUserId();
-      const response = await createResourceContent(userId, tenantConfig?.CHANNEL_ID, tenantConfig?.CONTENT_FRAMEWORK);
+      const response = await createResourceContent(userId, contentType, tenantConfig?.CHANNEL_ID, tenantConfig?.CONTENT_FRAMEWORK);
       console.log("Resource created successfully:", response);
 
       const identifier = response?.result?.identifier;
@@ -93,7 +93,11 @@ const CreatePage = () => {
   }
 
   const openResourceEditor = () => {
-    fetchResourceContentData();
+    fetchResourceContentData("Resource");
+  }
+
+  const openCourseAssessmentEditor = () => {
+    fetchResourceContentData("SelfAssess");
   }
 
   const cardData = [
@@ -137,6 +141,13 @@ const CreatePage = () => {
         ' Create different resource like story, game, activity, audio, video using the inbuild authoring tools.',
       icon: <SchoolOutlinedIcon fontSize="large" />,
       onClick: openResourceEditor
+    },
+    {
+      title: 'Course Assessment',
+      description:
+        'Create assessments for courses using the in-built authoring tools',
+      icon: <SchoolOutlinedIcon fontSize="large" />,
+      onClick: openCourseAssessmentEditor
     },
   ];
 
