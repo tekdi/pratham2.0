@@ -305,10 +305,15 @@ export const submitComment = async (
 
 export const getContentHierarchy = async ({
   doId,
+  contentMode
 }: {
   doId: string;
+  contentMode: string;
 }): Promise<any> => {
-  const apiUrl: string = `/action/content/v3/hierarchy/${doId}`;
+  let apiUrl: string = `/action/content/v3/hierarchy/${doId}`;
+  if (contentMode == "edit") {
+    apiUrl = `/action/content/v3/hierarchy/${doId}?mode=edit`;
+  }
 
   try {
     console.log("Request data", apiUrl);
