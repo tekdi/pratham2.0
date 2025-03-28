@@ -97,7 +97,7 @@ const Index = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [openReassignDistrict, setOpenReassignDistrict] = useState(false);
   const [openReassignVillage, setOpenReassignVillage] = useState(false);
-  const [addNew, setAddNew] = useState(true);
+  const [addNew, setAddNew] = useState(false);
   const [count, setCount] = useState(0);
   const [villageCount, setVillageCount] = useState(0);
   const [mentorCount, setMentorCount] = useState(0);
