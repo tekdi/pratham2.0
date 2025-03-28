@@ -18,6 +18,7 @@ import {
 } from '@/services/CohortService/cohortService';
 import { CohortTypes, RoleId } from '@/utils/app.constant';
 import _ from 'lodash';
+import StepperForm from '@/components/DynamicForm/StepperForm';
 const AddEditUser = ({
   SuccessCallback,
   schema,
@@ -39,10 +40,14 @@ const AddEditUser = ({
   notificationContext,
   isNotificationRequired = true,
   blockFieldId,
-  districtFieldId
+  districtFieldId,
+  type,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
-
+  const [showAssignmentScreen, setShowAssignmentScreen] =
+    useState<boolean>(false);
+  const [formData, setFormData] = useState<any>();
+  const [districtId, setDistrictId] = useState<any>();
   const [prefilledFormData, setPrefilledFormData] = useState(
     editPrefilledFormData
   );
@@ -85,6 +90,7 @@ const AddEditUser = ({
   }
 
   const FormSubmitFunction = async (formData: any, payload: any) => {
+    console.log(payload);
     setPrefilledFormData(formData);
     if (isEdit) {
       if (isNotificationRequired) {
@@ -135,14 +141,19 @@ const AddEditUser = ({
           showToastMessage(t(failureUpdateMessage), 'error');
         }
       }
-    } 
-    else {
+    } else {
       if (isNotificationRequired) {
-        if (payload.tenantCohortRoleMapping[0]['roleId'] !== RoleId.STUDENT) {
+        if (
+          Array.isArray(payload.tenantCohortRoleMapping) &&
+          payload.tenantCohortRoleMapping[0] &&
+          payload.tenantCohortRoleMapping[0]['roleId'] !== RoleId.STUDENT
+        ) {
           payload.username = formData.email;
         }
       }
       if (
+        Array.isArray(payload.tenantCohortRoleMapping) &&
+        payload.tenantCohortRoleMapping.length > 0 &&
         payload.tenantCohortRoleMapping[0]['roleId'] === RoleId.TEAM_LEADER &&
         localStorage.getItem('program') === 'Second Chance Program'
       ) {
@@ -207,25 +218,91 @@ const AddEditUser = ({
       }
     }
   };
-
+  const onClose = () => {
+    // setOpenDelete(false);
+    //   setOpenReassignDistrict(false);
+    //   setOpenReassignVillage(false);
+    //   setAddNew(false);
+    //   setCount(0);
+    setShowAssignmentScreen(false);
+    setFormData({});
+    SuccessCallback();
+  };
+  const StepperFormSubmitFunction = async (formData: any, payload: any) => {
+    setDistrictId(formData?.district);
+    console.log(formData);
+    console.log(uiSchema);
+    console.log(payload);
+    console.log(schema);
+    //schema?.properties?.district
+    setFormData(formData);
+    setShowAssignmentScreen(true);
+  };
   return (
     <>
       {isLoading ? (
-        <>
-          <Loader showBackdrop={false} loadingText={t('COMMON.LOADING')} />
-        </>
+        <Loader showBackdrop={false} loadingText={t('COMMON.LOADING')} />
+      ) : isEdit ? (
+        // When editing, show DynamicForm regardless of role
+        <DynamicForm
+          schema={isEdit ? isEditSchema : schema}
+          uiSchema={isEdit ? isEditUiSchema : uiSchema}
+          t={t}
+          FormSubmitFunction={FormSubmitFunction}
+          prefilledFormData={prefilledFormData || {}}
+          extraFields={extraFieldsUpdate}
+        />
+      ) : type === 'facilitator' ? (
+        // When role is facilitator and not editing, show StepperForm with facilitator-specific props
+        <StepperForm
+          FormSubmitFunction={StepperFormSubmitFunction}
+          setShowAssignmentScreen={setShowAssignmentScreen}
+          showAssignmentScreen={showAssignmentScreen}
+          formData={formData}
+          setFormData={setFormData}
+          onClose={onClose}
+          parenResult={{}}
+          parentId={formData?.district}
+          stateId={formData?.state[0]}
+          districtId={formData?.district[0]}
+          blockId={formData?.block[0]}
+          villageId={formData?.village[0]}
+          parentLabel={t('FACILITATORS.CENTERS')}
+          assignmentChildmessage={t('FACILITATORS.ASSIGN_BATCHES_FINISH')}
+          assignmentMessage={t('FACILITATORS.ASSIGN_BATCHES_FROM_VILLAGES')}
+          selectedChildLabel={t('FACILITATORS.BATCHES_SELECTED')}
+          // facilitatorProp="yourFacilitatorValue"
+          role={type}
+          // add any additional prop(s) for facilitator
+        />
+      ) : type === 'mentor' ? (
+        <StepperForm
+          FormSubmitFunction={StepperFormSubmitFunction}
+          setShowAssignmentScreen={setShowAssignmentScreen}
+          showAssignmentScreen={showAssignmentScreen}
+          formData={formData}
+          setFormData={setFormData}
+          onClose={onClose}
+          parenResult={{}}
+          parentId={formData?.district}
+          stateId={formData?.state[0]}
+          districtId={formData?.district[0]}
+          parentLabel={t('MENTOR.DISTRICTS')}
+          assignmentChildmessage={t('MENTOR.ASSIGN_VILLAGES_FINISH')}
+          assignmentMessage={t('MENTOR.ASSIGN_VILLAGES_FROM_BLOCKS')}
+          selectedChildLabel={t('MENTOR.VILLAGES_SELECTED')}
+          //mentorProp="yourMentorValue" // add any additional prop(s) for mentor
+          role={type}
+        />
       ) : (
-        schema &&
-        uiSchema && (
-          <DynamicForm
-            schema={isEdit ? isEditSchema : schema}
-            uiSchema={isEdit ? isEditUiSchema : uiSchema}
-            t={t}
-            FormSubmitFunction={FormSubmitFunction}
-            prefilledFormData={prefilledFormData || {}}
-            extraFields={isEdit ? extraFieldsUpdate : extraFields}
-          />
-        )
+        <DynamicForm
+          schema={isEdit ? isEditSchema : schema}
+          uiSchema={isEdit ? isEditUiSchema : uiSchema}
+          t={t}
+          FormSubmitFunction={FormSubmitFunction}
+          prefilledFormData={prefilledFormData || {}}
+          extraFields={extraFields}
+        />
       )}
     </>
   );
