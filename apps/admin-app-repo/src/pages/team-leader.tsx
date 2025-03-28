@@ -31,6 +31,7 @@ import SimpleModal from '@/components/SimpleModal';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { updateCohortMemberStatus } from '@/services/CohortService/cohortService';
 import editIcon from '../../public/images/editIcon.svg';
+import apartment from '../../public/images/apartment.svg';
 import deleteIcon from '../../public/images/deleteIcon.svg';
 import Image from 'next/image';
 import {
@@ -61,6 +62,8 @@ const TeamLeader = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [isEdit, setIsEdit] = useState(false);
+  const [isReassign, setIsReassign] = useState(false);
+
   const [editableUserId, setEditableUserId] = useState('');
   const [roleId, setRoleID] = useState('');
   const [blockFieldId, setBlockFieldId] = useState('');
@@ -324,6 +327,34 @@ const TeamLeader = () => {
     //     setLastName(row?.lastName)
     //   },
     // },
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            backgroundColor: 'rgb(227, 234, 240)',
+            padding: '10px',
+          }}
+        >
+          <Image src={apartment} alt="" />
+        </Box>
+      ),
+      callback: (row) => {
+        // console.log('row:', row);
+        // console.log('AddSchema', addSchema);
+        // console.log('AddUISchema', addUiSchema);
+
+        // let tempFormData = extractMatchingKeys(row, addSchema);
+        // setPrefilledAddFormData(tempFormData);
+        // setIsEdit(true);
+        // setEditableUserId(row?.userId);
+        handleOpenModal();
+        setIsReassign(true);
+      },
+    },
   ];
 
   // Pagination handlers
@@ -413,9 +444,12 @@ const TeamLeader = () => {
           onClose={handleCloseModal}
           showFooter={false}
           modalTitle={
-            isEdit
+             isEdit
               ? t('TEAM_LEADERS.EDIT_TEAM_LEADER')
-              : t('TEAM_LEADERS.NEW_TEAM_LEADER')
+              : isReassign
+                ? t('TEAM_LEADERS.RE_ASSIGN_TEAM_LEAD')
+                : t('TEAM_LEADERS.NEW_TEAM_LEADER')
+
           }
         >
           <AddEditUser
@@ -428,6 +462,7 @@ const TeamLeader = () => {
             uiSchema={addUiSchema}
             editPrefilledFormData={prefilledAddFormData}
             isEdit={isEdit}
+            isReassign={isReassign}
             editableUserId={editableUserId}
             UpdateSuccessCallback={() => {
               setPrefilledFormData({});

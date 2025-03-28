@@ -286,7 +286,8 @@
     "EDIT_TEAM_LEADER": "Edit Team Leader",
     "NO_TEAM_LEADER_FOUND": "No Team Leader Found",
     "NOT_ABLE_CREATE_TEAM_LEADER": "Not Able To Create Team leader",
-    "NOT_ABLE_UPDATE_TEAM_LEADER": "Not Able to update Team leader"
+    "NOT_ABLE_UPDATE_TEAM_LEADER": "Not Able to update Team leader",
+    "RE_ASSIGN_TEAM_LEAD": "Re-assign Team lead"
   },
   "ADMIN": {
     "ADMIN_UPDATED_SUCCESSFULLY": "Admin has been successfully updated!"

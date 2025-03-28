@@ -24,6 +24,7 @@ const AddEditUser = ({
   uiSchema,
   editPrefilledFormData,
   isEdit = false,
+  isReassign = false,
   editableUserId,
   UpdateSuccessCallback,
   extraFields,
@@ -77,7 +78,27 @@ const AddEditUser = ({
     ];
     keysToRemove.forEach((key) => delete isEditSchema.properties[key]);
     keysToRemove.forEach((key) => delete isEditUiSchema[key]);
-    // console.log('schema', schema);
+    console.log('schema', schema);
+  } else if (isReassign){
+    const keysToRemove = [
+      'firstName',
+      'middleName',
+      'lastName',
+      'dob',
+      'gender',
+      'email',
+      'mobile',
+      'village',
+      'password',
+      'confirm_password',
+      'board',
+      'medium',
+      'parentId',
+      'batch',
+      'grade',
+    ];
+    keysToRemove.forEach((key) => delete isEditSchema.properties[key]);
+    keysToRemove.forEach((key) => delete isEditUiSchema[key]);
   } else {
     const keysToRemove = ['password', 'confirm_password', 'program']; //TODO: check 'program'
     keysToRemove.forEach((key) => delete schema.properties[key]);
@@ -86,6 +107,8 @@ const AddEditUser = ({
 
   const FormSubmitFunction = async (formData: any, payload: any) => {
     setPrefilledFormData(formData);
+    console.log(formData,'formdata');
+    
     if (isEdit) {
       if (isNotificationRequired) {
         try {
@@ -135,6 +158,9 @@ const AddEditUser = ({
           showToastMessage(t(failureUpdateMessage), 'error');
         }
       }
+    }else if (isReassign){
+      console.log('payload', payload);
+      
     } else {
       if (isNotificationRequired) {
         if (
@@ -222,14 +248,15 @@ const AddEditUser = ({
       ) : (
         schema &&
         uiSchema && (
-          <DynamicForm
-            schema={isEdit ? isEditSchema : schema}
-            uiSchema={isEdit ? isEditUiSchema : uiSchema}
-            t={t}
-            FormSubmitFunction={FormSubmitFunction}
-            prefilledFormData={prefilledFormData || {}}
-            extraFields={isEdit ? extraFieldsUpdate : extraFields}
-          />
+            <DynamicForm
+              schema={isEdit || isReassign ? isEditSchema : schema}
+              uiSchema={isEdit || isReassign ? isEditUiSchema : uiSchema}
+              t={t}
+              FormSubmitFunction={FormSubmitFunction}
+              prefilledFormData={prefilledFormData || {}}
+              extraFields={isEdit || isReassign ? extraFieldsUpdate : extraFields}
+            />
+
         )
       )}
     </>
