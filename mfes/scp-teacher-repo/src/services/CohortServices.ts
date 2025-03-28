@@ -1,7 +1,16 @@
 import { CohortListParam, GetCohortSearchParams } from '@/utils/Interfaces';
-import { Status } from '@/utils/app.constant';
+import { Role, Status } from '@/utils/app.constant';
 import { get, post } from './RestClient';
 import API_ENDPOINTS from '@/utils/API/APIEndpoints';
+
+const getUserRole = () => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('role');
+  }
+  return null; // Return a default value for SSR environments
+};
+
+const role = getUserRole();
 
 export const cohortList = async ({
   limit,
@@ -34,32 +43,35 @@ export const getCohortList = async (
   filters: { [key: string]: string } = {},
   isCustomFields: boolean = false
 ): Promise<any> => {
-  let apiUrl: string = API_ENDPOINTS.myCohorts(userId)
+  let apiUrl: string = API_ENDPOINTS.myCohorts(userId);
+  filters = { ...filters, children: 'true' };
   const filterParams = new URLSearchParams(filters).toString();
   if (filterParams) {
-    apiUrl += `&${filterParams}`;
+    apiUrl += `?${filterParams}`;
   }
   try {
     const response = await get(apiUrl);
+
     if (isCustomFields) {
       return response?.data?.result;
     }
-    if (response?.data?.result?.length) {
+    if (response?.data?.result.length>0) {
       let res = response?.data?.result;
+
       res = res.filter((block: any) => {
         if (
-          block?.cohortMemberStatus === Status.ACTIVE &&
-          block?.cohortStatus === Status.ACTIVE
+            block?.cohortStatus === Status.ACTIVE &&  block?.childData.length>0
         ) {
           return block;
         }
       });
+
       return res;
     }
+
     return response?.data?.result;
   } catch (error) {
     console.error('Error in getting cohort details', error);
-    // throw error;
   }
 };
 

@@ -63,6 +63,9 @@ const TeamLeader = () => {
   const [isEdit, setIsEdit] = useState(false);
   const [editableUserId, setEditableUserId] = useState('');
   const [roleId, setRoleID] = useState('');
+  const [blockFieldId, setBlockFieldId] = useState('');
+  const [districtFieldId, setDistrictFieldId] = useState('');
+
   const [tenantId, setTenantId] = useState('');
   const [open, setOpen] = useState(false);
   const [checked, setChecked] = useState(false);
@@ -109,6 +112,11 @@ const TeamLeader = () => {
         },
       ]);
       console.log('responseForm', responseForm);
+      const blockFieldId = responseForm.schema.properties.block.fieldId;
+      const districtFieldId = responseForm.schema.properties.district.fieldId;
+
+      setBlockFieldId(blockFieldId);
+      setDistrictFieldId(districtFieldId);
       setAddSchema(responseForm?.schema);
       setAddUiSchema(responseForm?.uiSchema);
     };
@@ -437,6 +445,8 @@ const TeamLeader = () => {
             notificationKey={notificationKey}
             notificationMessage={notificationMessage}
             notificationContext={notificationContext}
+            blockFieldId={blockFieldId}
+            districtFieldId={districtFieldId}
           />
         </SimpleModal>
 

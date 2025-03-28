@@ -16,7 +16,7 @@ import {
   createCohort,
   updateCohortUpdate,
 } from '@/services/CohortService/cohortService';
-import { CohortTypes } from '@/utils/app.constant';
+import { CohortTypes, RoleId } from '@/utils/app.constant';
 import _ from 'lodash';
 const AddEditUser = ({
   SuccessCallback,
@@ -38,6 +38,8 @@ const AddEditUser = ({
   notificationMessage,
   notificationContext,
   isNotificationRequired = true,
+  blockFieldId,
+  districtFieldId
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -133,12 +135,32 @@ const AddEditUser = ({
           showToastMessage(t(failureUpdateMessage), 'error');
         }
       }
-    } else {
-      //Manually setting userName as a email
+    } 
+    else {
       if (isNotificationRequired) {
-        payload.username = formData.email;
+        if (payload.tenantCohortRoleMapping[0]['roleId'] !== RoleId.STUDENT) {
+          payload.username = formData.email;
+        }
+      }
+      if (
+        payload.tenantCohortRoleMapping[0]['roleId'] === RoleId.TEAM_LEADER &&
+        localStorage.getItem('program') === 'Second Chance Program'
+      ) {
+        payload.automaticMember = {
+          value: true,
+          fieldName: 'Block',
+          fieldId: blockFieldId,
+        };
       }
 
+      if (payload.batch) {
+        const cohortIds = payload.batch;
+        // payload.tenantCohortRoleMapping.push(cohortIds);
+        payload.tenantCohortRoleMapping[0]['cohortIds'] = cohortIds;
+
+        delete payload.batch;
+        delete payload.center;
+      }
       try {
         if (isNotificationRequired) {
           const responseUserData = await createUser(payload, t);
