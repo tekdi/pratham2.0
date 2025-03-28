@@ -82,11 +82,12 @@ const Learner = () => {
     ? { state: [localStorage.getItem('stateId')] }
     : {};
 
-
-  const searchStoreKey = 'learner'
-  const initialFormDataSearch = localStorage.getItem(searchStoreKey) && localStorage.getItem(searchStoreKey) != "{}"
-    ? JSON.parse(localStorage.getItem(searchStoreKey))
-    : localStorage.getItem('stateId')
+  const searchStoreKey = 'learner';
+  const initialFormDataSearch =
+    localStorage.getItem(searchStoreKey) &&
+    localStorage.getItem(searchStoreKey) != '{}'
+      ? JSON.parse(localStorage.getItem(searchStoreKey))
+      : localStorage.getItem('stateId')
       ? { state: [localStorage.getItem('stateId')] }
       : {};
 
@@ -129,7 +130,7 @@ const Learner = () => {
   const SubmitaFunction = async (formData: any) => {
     setPrefilledFormData(formData);
     //set prefilled search data on refresh
-    localStorage.setItem(searchStoreKey, JSON.stringify(formData))
+    localStorage.setItem(searchStoreKey, JSON.stringify(formData));
     await searchData(formData, 0);
   };
 
@@ -448,7 +449,7 @@ const Learner = () => {
               width: '200px',
             }}
             onClick={() => {
-              setPrefilledAddFormData({});
+              setPrefilledAddFormData(initialFormData);
               setIsEdit(false);
               setEditableUserId('');
               handleOpenModal();

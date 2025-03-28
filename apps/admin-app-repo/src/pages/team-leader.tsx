@@ -63,6 +63,9 @@ const TeamLeader = () => {
   const [isEdit, setIsEdit] = useState(false);
   const [editableUserId, setEditableUserId] = useState('');
   const [roleId, setRoleID] = useState('');
+  const [blockFieldId, setBlockFieldId] = useState('');
+  const [districtFieldId, setDistrictFieldId] = useState('');
+
   const [tenantId, setTenantId] = useState('');
   const [open, setOpen] = useState(false);
   const [checked, setChecked] = useState(false);
@@ -79,10 +82,12 @@ const TeamLeader = () => {
     ? { state: [localStorage.getItem('stateId')] }
     : {};
 
-  const searchStoreKey = 'teamLeader'
-  const initialFormDataSearch = localStorage.getItem(searchStoreKey) && localStorage.getItem(searchStoreKey) != "{}"
-    ? JSON.parse(localStorage.getItem(searchStoreKey))
-    : localStorage.getItem('stateId')
+  const searchStoreKey = 'teamLeader';
+  const initialFormDataSearch =
+    localStorage.getItem(searchStoreKey) &&
+    localStorage.getItem(searchStoreKey) != '{}'
+      ? JSON.parse(localStorage.getItem(searchStoreKey))
+      : localStorage.getItem('stateId')
       ? { state: [localStorage.getItem('stateId')] }
       : {};
 
@@ -107,6 +112,11 @@ const TeamLeader = () => {
         },
       ]);
       console.log('responseForm', responseForm);
+      const blockFieldId = responseForm.schema.properties.block.fieldId;
+      const districtFieldId = responseForm.schema.properties.district.fieldId;
+
+      setBlockFieldId(blockFieldId);
+      setDistrictFieldId(districtFieldId);
       setAddSchema(responseForm?.schema);
       setAddUiSchema(responseForm?.uiSchema);
     };
@@ -125,7 +135,7 @@ const TeamLeader = () => {
   const SubmitaFunction = async (formData: any) => {
     setPrefilledFormData(formData);
     //set prefilled search data on refresh
-    localStorage.setItem(searchStoreKey, JSON.stringify(formData))
+    localStorage.setItem(searchStoreKey, JSON.stringify(formData));
     await searchData(formData, 0);
   };
 
@@ -278,7 +288,6 @@ const TeamLeader = () => {
         // console.log('AddUISchema', addUiSchema);
 
         let tempFormData = extractMatchingKeys(row, addSchema);
-        // console.log('tempFormData', tempFormData);
         setPrefilledAddFormData(tempFormData);
         setIsEdit(true);
         setEditableUserId(row?.userId);
@@ -389,7 +398,7 @@ const TeamLeader = () => {
               width: '200px',
             }}
             onClick={() => {
-              setPrefilledAddFormData({});
+              setPrefilledAddFormData(initialFormData);
               setIsEdit(false);
               setEditableUserId('');
               handleOpenModal();
@@ -436,6 +445,8 @@ const TeamLeader = () => {
             notificationKey={notificationKey}
             notificationMessage={notificationMessage}
             notificationContext={notificationContext}
+            blockFieldId={blockFieldId}
+            districtFieldId={districtFieldId}
           />
         </SimpleModal>
 
