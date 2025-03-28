@@ -75,7 +75,6 @@ const Index = () => {
   const theme = useTheme<any>();
   const router = useRouter();
   const { villageId, tab, blockId } = router.query;
-  console.log(villageId);
   // const blockId: blockResult?.selectedValues[0]?.id
   const [value, setValue] = useState<number>(
     tab
@@ -98,7 +97,7 @@ const Index = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [openReassignDistrict, setOpenReassignDistrict] = useState(false);
   const [openReassignVillage, setOpenReassignVillage] = useState(false);
-  const [addNew, setAddNew] = useState(false);
+  const [addNew, setAddNew] = useState(true);
   const [count, setCount] = useState(0);
   const [villageCount, setVillageCount] = useState(0);
   const [mentorCount, setMentorCount] = useState(0);
@@ -181,12 +180,12 @@ const Index = () => {
             return [...data].sort(
               (a, b) => b.newRegistrations - a.newRegistrations
             );
-          case SortOrder.NEW_REGISTRATION_HIGH_TO_LOW:
+          case SortOrder.NEW_REGISTRATION_HIGH_TO_LOW: 
             return [...data].sort(
               (a, b) => a.newRegistrations - b.newRegistrations
             );
           case SortOrder.TOTAL_COUNT_LOW_TO_HIGH:
-            return [...data].sort((a, b) => a.totalCount - b.totalCount);
+            return [...data].sort((a, b) => a.totalCount - b.totalCount);  
           case SortOrder.TOTAL_COUNT_HIGH_TO_LOW:
             return [...data].sort((a, b) => b.totalCount - a.totalCount);
           case SortOrder.AGE_LOW_TO_HIGH:
@@ -1032,6 +1031,7 @@ const Index = () => {
               primaryText={!showAssignmentScreen ? 'Next' : undefined}
               secondaryText={count === 1 ? 'Save Progress' : ''}
               id="dynamic-form-id"
+              
             >
               {/* {count === 0 && (
                 <Box>
