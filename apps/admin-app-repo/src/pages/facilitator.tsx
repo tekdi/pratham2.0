@@ -455,7 +455,7 @@ const Facilitator = () => {
               width: '200px',
             }}
             onClick={() => {
-              setPrefilledAddFormData({});
+              setPrefilledAddFormData(initialFormData);
               setIsEdit(false);
               setEditableUserId('');
               handleOpenModal();
@@ -468,7 +468,9 @@ const Facilitator = () => {
         <SimpleModal
           open={openModal}
           onClose={handleCloseModal}
-          showFooter={false}
+          showFooter={!isEdit ? true : false}
+          primaryText={'Next'}
+          id="dynamic-form-id"
           modalTitle={
             isEdit
               ? t('FACILITATORS.EDIT_FACILITATOR')
@@ -502,6 +504,7 @@ const Facilitator = () => {
             notificationKey={notificationKey}
             notificationMessage={notificationMessage}
             notificationContext={notificationContext}
+            type="facilitator"
           />
         </SimpleModal>
 
