@@ -1,22 +1,24 @@
-import React from "react";
-import { WidgetProps } from "@rjsf/utils";
-import Checkbox from "@mui/material/Checkbox";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormGroup from "@mui/material/FormGroup";
-import FormControl from "@mui/material/FormControl";
-import FormLabel from "@mui/material/FormLabel";
+import React from 'react';
+import { WidgetProps } from '@rjsf/utils';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormGroup from '@mui/material/FormGroup';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
+import { useTranslation } from 'react-i18next';
 
-const CustomCheckboxWidget = ({ 
-  id, 
-  schema, 
-  options, 
-  value = [], 
-  onChange, 
-  label 
+const CustomCheckboxWidget = ({
+  id,
+  schema,
+  options,
+  value = [],
+  onChange,
+  label,
 }: WidgetProps) => {
   const { enumOptions = [] } = options;
   const maxSelection = schema.maxSelection || Infinity; // Default to unlimited if not set
   const isMaxSelected = value.length >= maxSelection;
+  const { t } = useTranslation();
 
   const handleChange = (selectedValue: string) => {
     let newValue;
@@ -46,7 +48,9 @@ const CustomCheckboxWidget = ({
                 disabled={isMaxSelected && !value.includes(option.value)} // Disable if max reached
               />
             }
-            label={option.label}
+            label={t(`FORM.${option.label}`, {
+              defaultValue: option.label,
+            })}
           />
         ))}
       </FormGroup>
