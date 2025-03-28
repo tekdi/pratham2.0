@@ -139,7 +139,7 @@ export const BatchSearchSchema = {
       // enum: ['Select'],
       // enumNames: ['Select'],
       api: {
-        url: 'https://dev-interface.prathamdigital.org/interface/v1/cohort/search',
+        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/cohort/search`,
         header: {
           tenantId: '**',
           Authorization: '**',
