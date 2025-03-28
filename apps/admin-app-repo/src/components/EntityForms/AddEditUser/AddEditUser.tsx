@@ -39,7 +39,7 @@ const AddEditUser = ({
   notificationContext,
   isNotificationRequired = true,
   blockFieldId,
-  districtFieldId
+  districtFieldId,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -135,14 +135,19 @@ const AddEditUser = ({
           showToastMessage(t(failureUpdateMessage), 'error');
         }
       }
-    } 
-    else {
+    } else {
       if (isNotificationRequired) {
-        if (payload.tenantCohortRoleMapping[0]['roleId'] !== RoleId.STUDENT) {
+        if (
+          Array.isArray(payload.tenantCohortRoleMapping) &&
+          payload.tenantCohortRoleMapping[0] &&
+          payload.tenantCohortRoleMapping[0]['roleId'] !== RoleId.STUDENT
+        ) {
           payload.username = formData.email;
         }
       }
       if (
+        Array.isArray(payload.tenantCohortRoleMapping) &&
+        payload.tenantCohortRoleMapping[0] &&
         payload.tenantCohortRoleMapping[0]['roleId'] === RoleId.TEAM_LEADER &&
         localStorage.getItem('program') === 'Second Chance Program'
       ) {
