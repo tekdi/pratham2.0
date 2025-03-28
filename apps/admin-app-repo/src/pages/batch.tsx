@@ -55,10 +55,12 @@ const Batch = () => {
   const initialFormData = localStorage.getItem('stateId')
     ? { state: [localStorage.getItem('stateId')] }
     : {};
-  const searchStoreKey = 'batch'
-  const initialFormDataSearch = localStorage.getItem(searchStoreKey) && localStorage.getItem(searchStoreKey) != "{}"
-    ? JSON.parse(localStorage.getItem(searchStoreKey))
-    : localStorage.getItem('stateId')
+  const searchStoreKey = 'batch';
+  const initialFormDataSearch =
+    localStorage.getItem(searchStoreKey) &&
+    localStorage.getItem(searchStoreKey) != '{}'
+      ? JSON.parse(localStorage.getItem(searchStoreKey))
+      : localStorage.getItem('stateId')
       ? { state: [localStorage.getItem('stateId')] }
       : {};
 
@@ -105,19 +107,27 @@ const Batch = () => {
   const SubmitaFunction = async (formData: any) => {
     setPrefilledFormData(formData);
     //set prefilled search data on refresh
-    localStorage.setItem(searchStoreKey, JSON.stringify(formData))
+    localStorage.setItem(searchStoreKey, JSON.stringify(formData));
     await searchData(formData, 0);
   };
- 
+
   const searchData = async (formData: any, newPage: any) => {
     formData = Object.fromEntries(
       Object.entries(formData).filter(
         ([_, value]) => !Array.isArray(value) || value.length > 0
       )
     );
+
     const staticFilter = { type: CohortTypes.BATCH, status: [Status.ACTIVE] };
     const { sortBy } = formData;
     const staticSort = ['name', sortBy || 'asc'];
+    delete formData.state;
+    delete formData.district;
+    delete formData.block;
+    delete formData.village;
+    if (!formData.parentId) {
+      formData.parentId = [];
+    }
     await searchListData(
       formData,
       newPage,
@@ -169,11 +179,9 @@ const Batch = () => {
     {
       key: 'center',
       label: 'Center',
-      render: (row) => <CenterLabel parentId={row?.parentId} />
-    }
-    
-    
-    ,
+      render: (row) => <CenterLabel parentId={row?.parentId} />,
+    },
+
     {
       key: 'board',
       label: 'Boards',
