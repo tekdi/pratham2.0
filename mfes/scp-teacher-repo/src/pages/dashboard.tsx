@@ -216,11 +216,17 @@ const Dashboard: React.FC<DashboardProps> = () => {
   }, []);
 
   useEffect(() => {
-    if (cohortsData[0]?.cohortId) {
-      localStorage.setItem('classId', cohortsData[0]?.cohortId);
-      localStorage.removeItem('overallCommonSubjects');
-    } else {
-      localStorage.setItem('classId', '');
+    let local_classId=localStorage.getItem('classId');
+    if(!local_classId){
+      if (cohortsData[0]?.cohortId) {
+        // console.log("###### batch add cohortsData[0]?.cohortId",cohortsData[0]?.cohortId);
+          localStorage.setItem('classId', cohortsData[0]?.cohortId);
+          localStorage.setItem('cohortId', cohortsData[0]?.cohortId);
+          localStorage.removeItem('overallCommonSubjects');
+        } else {
+          localStorage.setItem('classId', '');
+          localStorage.setItem('cohortId','');
+        }
     }
     if (typeof window !== 'undefined' && window.localStorage) {
       const token = localStorage.getItem('token');
@@ -255,7 +261,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
         (item: any) => item?.label === 'BLOCKS'
       );
       const cohortData = response?.result?.userData?.customFields;
-      
+
 
       const state = cohortData?.find(
         (item: CustomField) => item.label === 'STATES'
@@ -274,7 +280,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
         isCustomFields
       );
       const activeCohorts = result?.filter(
-        (cohort: any) => cohort.cohortMemberStatus === Status.ACTIVE
+        (cohort: any) => cohort?.cohortStatus === Status.ACTIVE
       );
       updateStoreFromCohorts(activeCohorts, blockObject);
 
