@@ -50,6 +50,8 @@ import { transformLabel } from '@/utils/Helper';
 import { getCohortList } from '@/services/GetCohortList';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
+import apartment from '../../public/images/apartment.svg';
+
 
 const Facilitator = () => {
   const theme = useTheme<any>();
@@ -67,10 +69,14 @@ const Facilitator = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [isEdit, setIsEdit] = useState(false);
+  const [isReassign, setIsReassign] = useState(false);
   const [editableUserId, setEditableUserId] = useState('');
   const [roleId, setRoleID] = useState('');
   const [tenantId, setTenantId] = useState('');
   const [memberShipID, setMemberShipID] = useState('');
+  const [blockFieldId, setBlockFieldId] = useState('');
+  const [districtFieldId, setDistrictFieldId] = useState('');
+  const [villageFieldId, setVillageFieldId] = useState('');
 
   const [userID, setUserId] = useState('');
   const [userData, setUserData] = useState({
@@ -111,6 +117,16 @@ const Facilitator = () => {
           },
         },
       ]);
+      console.log('responseForm', responseForm);
+      const districtFieldId = responseForm.schema.properties.district.fieldId;
+      const blockFieldId = responseForm.schema.properties.block.fieldId;
+      const villageFieldId = responseForm.schema.properties.village.fieldId;
+      
+      // const centerFieldId = responseForm.schema.properties.center.fieldId;
+
+      setBlockFieldId(blockFieldId);
+      setDistrictFieldId(districtFieldId);
+      setVillageFieldId(villageFieldId)
       setAddSchema(responseForm?.schema);
       setAddUiSchema(responseForm?.uiSchema);
     };
@@ -374,6 +390,34 @@ const Facilitator = () => {
         });
       },
     },
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            backgroundColor: 'rgb(227, 234, 240)',
+            padding: '10px',
+          }}
+        >
+          <Image src={apartment} alt="" />
+        </Box>
+      ),
+      callback: (row) => {
+        // console.log('row:', row);
+        // console.log('AddSchema', addSchema);
+        // console.log('AddUISchema', addUiSchema);
+
+        let tempFormData = extractMatchingKeys(row, addSchema);
+        setPrefilledAddFormData(tempFormData);
+        // setIsEdit(true);
+        setIsReassign(true);
+        setEditableUserId(row?.userId);
+        handleOpenModal();
+      },
+    },
   ];
 
   // Pagination handlers
@@ -391,6 +435,8 @@ const Facilitator = () => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
+    setIsReassign(false);
+    setIsEdit(false);
   };
 
   //Add Edit Props
@@ -457,6 +503,7 @@ const Facilitator = () => {
             onClick={() => {
               setPrefilledAddFormData(initialFormData);
               setIsEdit(false);
+              setIsReassign(false);
               setEditableUserId('');
               handleOpenModal();
             }}
@@ -469,11 +516,12 @@ const Facilitator = () => {
           open={openModal}
           onClose={handleCloseModal}
           showFooter={!isEdit ? true : false}
-          primaryText={'Next'}
+          primaryText={isReassign ? '' :'Next'}
           id="dynamic-form-id"
           modalTitle={
             isEdit
-              ? t('FACILITATORS.EDIT_FACILITATOR')
+              ? t('FACILITATORS.EDIT_FACILITATOR') : isReassign
+                ? t('FACILITATORS.RE_ASSIGN_facilitator')
               : t('FACILITATORS.NEW_FACILITATOR')
           }
         >
@@ -487,6 +535,8 @@ const Facilitator = () => {
             uiSchema={addUiSchema}
             editPrefilledFormData={prefilledAddFormData}
             isEdit={isEdit}
+            isReassign={isReassign}
+            isExtraFields={true}
             editableUserId={editableUserId}
             UpdateSuccessCallback={() => {
               setPrefilledFormData({});
@@ -504,6 +554,9 @@ const Facilitator = () => {
             notificationKey={notificationKey}
             notificationMessage={notificationMessage}
             notificationContext={notificationContext}
+            blockFieldId={blockFieldId}
+            districtFieldId={districtFieldId}
+            villageFieldId={villageFieldId}
             type="facilitator"
           />
         </SimpleModal>

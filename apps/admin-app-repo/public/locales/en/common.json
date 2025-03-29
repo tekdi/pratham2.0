@@ -234,7 +234,8 @@
     "FACILITATOR_CREATED_SUCCESSFULLY": "Teacher is created, and credentials sent successfully!",
     "USER_CREDENTIALS_WILL_BE_SEND_SOON": "Teacher is created ,credentials will be sent soon",
     "FACILITATOR_UPDATED_SUCCESSFULLY": "Teacher has been successfully updated!",
-    "EDIT_FACILITATOR": "Edit Facilitator"
+    "EDIT_FACILITATOR": "Edit Facilitator",
+    "RE_ASSIGN_facilitator": "Re-assign Facilitator"
   },
   "NAVBAR": {
     "SEARCHBAR_PLACEHOLDER": "Search course, topic, student, pdf etc.."
@@ -662,7 +663,7 @@
   },
   "WHATS_YOUR_GENDER": "Gender",
   "first_name": " First Name",
-  "middle_name": "Middle Name",
+  "+": "Middle Name",
   "last_name": "Last Name",
   "phone_number": "Phone Number",
   "STATE": "State",

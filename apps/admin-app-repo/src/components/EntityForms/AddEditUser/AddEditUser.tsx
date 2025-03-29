@@ -40,8 +40,10 @@ const AddEditUser = ({
   notificationMessage,
   notificationContext,
   isNotificationRequired = true,
-  blockFieldId, //get from here
-  districtFieldId, //get from here
+  blockFieldId,
+  districtFieldId, 
+  isExtraFields = true,
+  villageFieldId
 }) => {
   console.log(editPrefilledFormData , 'schema');
 
@@ -84,7 +86,7 @@ const AddEditUser = ({
     keysToRemove.forEach((key) => delete isEditUiSchema[key]);
     console.log('schema', schema);
   } else if (isReassign) {
-    const keysToAdd = ['state', 'district', 'block'];
+    const keysToAdd = ['state', 'district', 'block', ...(isExtraFields ? ['village'] : [])];
     isEditSchema = {
       type: 'object',
       properties: keysToAdd.reduce((obj, key) => {
@@ -102,7 +104,7 @@ const AddEditUser = ({
     }, {});
   } else {
     const keysToRemove = ['password', 'confirm_password', 'program']; //TODO: check 'program'
-    keysToRemove.forEach((key) => delete schema.properties[key]);
+    keysToRemove.forEach((key) => delete schema?.properties[key]);
     keysToRemove.forEach((key) => delete uiSchema[key]);
   }
 
@@ -165,7 +167,7 @@ const AddEditUser = ({
       try {
         const reassignmentPayload = {
           userData: {
-            email: formData.email,
+            firstName: formData.firstName,
           },
           automaticMember: {
             value: true,
@@ -180,6 +182,10 @@ const AddEditUser = ({
             {
               fieldId: blockFieldId,
               value: [payload.customFields[2].value[0]],
+            },
+            {
+              fieldId: villageFieldId,
+              value: [payload.customFields[3].value[0]],
             },
           ],
         };

@@ -46,6 +46,7 @@ import { transformLabel } from '@/utils/Helper';
 import { getCohortList } from '@/services/GetCohortList';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
+import apartment from '../../public/images/apartment.svg';
 
 const Learner = () => {
   const theme = useTheme<any>();
@@ -66,6 +67,7 @@ const Learner = () => {
   const [editableUserId, setEditableUserId] = useState('');
   const [roleId, setRoleID] = useState('');
   const [tenantId, setTenantId] = useState('');
+  const [isReassign, setIsReassign] = useState(false);
   const [open, setOpen] = useState(false);
   const [checked, setChecked] = useState(false);
   const [userID, setUserId] = useState('');
@@ -76,7 +78,9 @@ const Learner = () => {
   });
   const [reason, setReason] = useState('');
   const [memberShipID, setMemberShipID] = useState('');
-
+  const [blockFieldId, setBlockFieldId] = useState('');
+  const [districtFieldId, setDistrictFieldId] = useState('');
+  const [villageFieldId, setVillageFieldId] = useState('');
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
     ? { state: [localStorage.getItem('stateId')] }
@@ -112,6 +116,15 @@ const Learner = () => {
         },
       ]);
       console.log('responseForm', responseForm);
+      const districtFieldId = responseForm.schema.properties.district.fieldId;
+      const blockFieldId = responseForm.schema.properties.block.fieldId;
+      const villageFieldId = responseForm.schema.properties.village.fieldId;
+
+      // const centerFieldId = responseForm.schema.properties.center.fieldId;
+
+      setBlockFieldId(blockFieldId);
+      setDistrictFieldId(districtFieldId);
+      setVillageFieldId(villageFieldId)
       setAddSchema(responseForm?.schema);
       setAddUiSchema(responseForm?.uiSchema);
     };
@@ -375,6 +388,34 @@ const Learner = () => {
         });
       },
     },
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            backgroundColor: 'rgb(227, 234, 240)',
+            padding: '10px',
+          }}
+        >
+          <Image src={apartment} alt="" />
+        </Box>
+      ),
+      callback: (row) => {
+        // console.log('row:', row);
+        // console.log('AddSchema', addSchema);
+        // console.log('AddUISchema', addUiSchema);
+
+        let tempFormData = extractMatchingKeys(row, addSchema);
+        setPrefilledAddFormData(tempFormData);
+        // setIsEdit(true);
+        setIsReassign(true);
+        setEditableUserId(row?.userId);
+        handleOpenModal();
+      },
+    },
   ];
 
   // Pagination handlers
@@ -392,6 +433,8 @@ const Learner = () => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
+    setIsReassign(false);
+    setIsEdit(false);
   };
 
   //Add Edit Props
@@ -451,6 +494,7 @@ const Learner = () => {
             onClick={() => {
               setPrefilledAddFormData(initialFormData);
               setIsEdit(false);
+              setIsReassign(false);
               setEditableUserId('');
               handleOpenModal();
             }}
@@ -464,7 +508,9 @@ const Learner = () => {
           onClose={handleCloseModal}
           showFooter={false}
           modalTitle={
-            isEdit ? t('LEARNERS.EDIT_LEARNER') : t('LEARNERS.NEW_LEARNER')
+
+            isEdit ? t('LEARNERS.EDIT_LEARNER') : isReassign
+              ? t('LEARNERS.RE_ASSIGN_facilitator'): t('LEARNERS.NEW_LEARNER') 
           }
         >
           <AddEditUser
@@ -477,6 +523,8 @@ const Learner = () => {
             uiSchema={addUiSchema}
             editPrefilledFormData={prefilledAddFormData}
             isEdit={isEdit}
+            isReassign={isReassign}
+            isExtraFields={true}
             editableUserId={editableUserId}
             UpdateSuccessCallback={() => {
               setPrefilledFormData({});
@@ -494,6 +542,9 @@ const Learner = () => {
             notificationKey={notificationKey}
             notificationMessage={notificationMessage}
             notificationContext={notificationContext}
+            blockFieldId={blockFieldId}
+            districtFieldId={districtFieldId}
+            villageFieldId={villageFieldId}
           />
         </SimpleModal>
 
