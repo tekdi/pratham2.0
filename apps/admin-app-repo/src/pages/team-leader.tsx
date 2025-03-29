@@ -347,10 +347,10 @@ const TeamLeader = () => {
         // console.log('AddSchema', addSchema);
         // console.log('AddUISchema', addUiSchema);
 
-        // let tempFormData = extractMatchingKeys(row, addSchema);
-        // setPrefilledAddFormData(tempFormData);
+        let tempFormData = extractMatchingKeys(row, addSchema);
+        setPrefilledAddFormData(tempFormData);
         // setIsEdit(true);
-        // setEditableUserId(row?.userId);
+        setEditableUserId(row?.userId);
         handleOpenModal();
         setIsReassign(true);
       },
