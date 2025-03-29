@@ -18,6 +18,7 @@ import {
 } from '@/services/CohortService/cohortService';
 import { CohortTypes, RoleId } from '@/utils/app.constant';
 import _ from 'lodash';
+import StepperForm from '@/components/DynamicForm/StepperForm';
 const AddEditUser = ({
   SuccessCallback,
   schema,
@@ -40,9 +41,13 @@ const AddEditUser = ({
   isNotificationRequired = true,
   blockFieldId,
   districtFieldId,
+  type,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
-
+  const [showAssignmentScreen, setShowAssignmentScreen] =
+    useState<boolean>(false);
+  const [formData, setFormData] = useState<any>();
+  const [districtId, setDistrictId] = useState<any>();
   const [prefilledFormData, setPrefilledFormData] = useState(
     editPrefilledFormData
   );
@@ -213,24 +218,102 @@ const AddEditUser = ({
     }
   };
 
+  const StepperFormSubmitFunction = async (formData: any, payload: any) => {
+    setDistrictId(formData?.district);
+    console.log(formData);
+    console.log(uiSchema);
+    console.log(payload);
+    console.log(schema);
+    //schema?.properties?.district
+    setFormData(formData);
+    setShowAssignmentScreen(true);
+  };
+  const onClose = () => {
+    // setOpenDelete(false);
+    //   setOpenReassignDistrict(false);
+    //   setOpenReassignVillage(false);
+    //   setAddNew(false);
+    //   setCount(0);
+    setShowAssignmentScreen(false);
+    setFormData({});
+    SuccessCallback();
+  };
   return (
+    // <>
+    //   {isLoading ? (
+    //     <>
+    //       <Loader showBackdrop={false} loadingText={t('COMMON.LOADING')} />
+    //     </>
+    //   ) : (
+    //     schema &&
+    //     uiSchema && (
+    //       <DynamicForm
+    //         schema={isEdit ? isEditSchema : schema}
+    //         uiSchema={isEdit ? isEditUiSchema : uiSchema}
+    //         t={t}
+    //         FormSubmitFunction={FormSubmitFunction}
+    //         prefilledFormData={prefilledFormData || {}}
+    //         extraFields={isEdit ? extraFieldsUpdate : extraFields}
+    //       />
+    //     )
+    //   )}
+    // </>
     <>
       {isLoading ? (
-        <>
-          <Loader showBackdrop={false} loadingText={t('COMMON.LOADING')} />
-        </>
+        <Loader showBackdrop={false} loadingText={t('COMMON.LOADING')} />
+      ) : isEdit ? (
+        // When editing, show DynamicForm regardless of role
+        <DynamicForm
+          schema={isEdit ? isEditSchema : schema}
+          uiSchema={isEdit ? isEditUiSchema : uiSchema}
+          t={t}
+          FormSubmitFunction={FormSubmitFunction}
+          prefilledFormData={prefilledFormData || {}}
+          extraFields={extraFieldsUpdate}
+        />
+      ) : type === 'facilitator' ? (
+        // When role is facilitator and not editing, show StepperForm with facilitator-specific props
+        <StepperForm
+          FormSubmitFunction={StepperFormSubmitFunction}
+          setShowAssignmentScreen={setShowAssignmentScreen}
+          showAssignmentScreen={showAssignmentScreen}
+          formData={formData}
+          setFormData={setFormData}
+          onClose={onClose}
+          parenResult={{}}
+          parentId={formData?.district}
+          stateId={formData?.state[0]}
+          districtId={formData?.district[0]}
+          blockId={formData?.block[0]}
+          villageId={formData?.village[0]}
+          // facilitatorProp="yourFacilitatorValue"
+          role={type}
+          // add any additional prop(s) for facilitator
+        />
+      ) : type === 'mentor' ? (
+        <StepperForm
+          FormSubmitFunction={StepperFormSubmitFunction}
+          setShowAssignmentScreen={setShowAssignmentScreen}
+          showAssignmentScreen={showAssignmentScreen}
+          formData={formData}
+          setFormData={setFormData}
+          onClose={onClose}
+          parenResult={{}}
+          parentId={formData?.district}
+          stateId={formData?.state[0]}
+          districtId={formData?.district[0]}
+          //mentorProp="yourMentorValue" // add any additional prop(s) for mentor
+          role={type}
+        />
       ) : (
-        schema &&
-        uiSchema && (
-          <DynamicForm
-            schema={isEdit ? isEditSchema : schema}
-            uiSchema={isEdit ? isEditUiSchema : uiSchema}
-            t={t}
-            FormSubmitFunction={FormSubmitFunction}
-            prefilledFormData={prefilledFormData || {}}
-            extraFields={isEdit ? extraFieldsUpdate : extraFields}
-          />
-        )
+        <DynamicForm
+          schema={isEdit ? isEditSchema : schema}
+          uiSchema={isEdit ? isEditUiSchema : uiSchema}
+          t={t}
+          FormSubmitFunction={FormSubmitFunction}
+          prefilledFormData={prefilledFormData || {}}
+          extraFields={extraFields}
+        />
       )}
     </>
   );
