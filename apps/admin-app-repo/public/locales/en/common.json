@@ -234,7 +234,8 @@
     "FACILITATOR_CREATED_SUCCESSFULLY": "Teacher is created, and credentials sent successfully!",
     "USER_CREDENTIALS_WILL_BE_SEND_SOON": "Teacher is created ,credentials will be sent soon",
     "FACILITATOR_UPDATED_SUCCESSFULLY": "Teacher has been successfully updated!",
-    "EDIT_FACILITATOR": "Edit Facilitator"
+    "EDIT_FACILITATOR": "Edit Facilitator",
+    "RE_ASSIGN_facilitator": "Re-assign Facilitator"
   },
   "NAVBAR": {
     "SEARCHBAR_PLACEHOLDER": "Search course, topic, student, pdf etc.."
@@ -286,7 +287,8 @@
     "EDIT_TEAM_LEADER": "Edit Team Leader",
     "NO_TEAM_LEADER_FOUND": "No Team Leader Found",
     "NOT_ABLE_CREATE_TEAM_LEADER": "Not Able To Create Team leader",
-    "NOT_ABLE_UPDATE_TEAM_LEADER": "Not Able to update Team leader"
+    "NOT_ABLE_UPDATE_TEAM_LEADER": "Not Able to update Team leader",
+    "RE_ASSIGN_TEAM_LEAD": "Re-assign Team lead"
   },
   "ADMIN": {
     "ADMIN_UPDATED_SUCCESSFULLY": "Admin has been successfully updated!"
@@ -661,7 +663,7 @@
   },
   "WHATS_YOUR_GENDER": "Gender",
   "first_name": " First Name",
-  "middle_name": "Middle Name",
+  "+": "Middle Name",
   "last_name": "Last Name",
   "phone_number": "Phone Number",
   "STATE": "State",

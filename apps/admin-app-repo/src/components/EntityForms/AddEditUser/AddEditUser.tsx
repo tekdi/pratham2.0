@@ -15,6 +15,7 @@ import {
 import {
   createCohort,
   updateCohortUpdate,
+  updateReassignUser,
 } from '@/services/CohortService/cohortService';
 import { CohortTypes, RoleId } from '@/utils/app.constant';
 import _ from 'lodash';
@@ -24,7 +25,8 @@ const AddEditUser = ({
   uiSchema,
   editPrefilledFormData,
   isEdit = false,
-  editableUserId,
+  isReassign = false,
+  editableUserId, //  user id from here
   UpdateSuccessCallback,
   extraFields,
   extraFieldsUpdate,
@@ -39,8 +41,13 @@ const AddEditUser = ({
   notificationContext,
   isNotificationRequired = true,
   blockFieldId,
-  districtFieldId,
+  districtFieldId, 
+  isExtraFields = true,
+  villageFieldId
 }) => {
+  console.log(editPrefilledFormData , 'schema');
+
+  
   const [isLoading, setIsLoading] = useState(false);
 
   const [prefilledFormData, setPrefilledFormData] = useState(
@@ -77,15 +84,36 @@ const AddEditUser = ({
     ];
     keysToRemove.forEach((key) => delete isEditSchema.properties[key]);
     keysToRemove.forEach((key) => delete isEditUiSchema[key]);
-    // console.log('schema', schema);
+    console.log('schema', schema);
+  } else if (isReassign) {
+    const keysToAdd = ['state', 'district', 'block', ...(isExtraFields ? ['village'] : [])];
+    isEditSchema = {
+      type: 'object',
+      properties: keysToAdd.reduce((obj, key) => {
+        if (schema.properties[key]) {
+          obj[key] = schema.properties[key];
+        }
+        return obj;
+      }, {}),
+    };
+    isEditUiSchema = keysToAdd.reduce((obj, key) => {
+      if (uiSchema[key]) {
+        obj[key] = uiSchema[key];
+      }
+      return obj;
+    }, {});
   } else {
     const keysToRemove = ['password', 'confirm_password', 'program']; //TODO: check 'program'
-    keysToRemove.forEach((key) => delete schema.properties[key]);
+    keysToRemove.forEach((key) => delete schema?.properties[key]);
     keysToRemove.forEach((key) => delete uiSchema[key]);
   }
 
   const FormSubmitFunction = async (formData: any, payload: any) => {
     setPrefilledFormData(formData);
+    console.log(formData,'formdata');
+    console.log(payload , "payload");
+    
+    
     if (isEdit) {
       if (isNotificationRequired) {
         try {
@@ -134,6 +162,45 @@ const AddEditUser = ({
           console.error('Error update user:', error);
           showToastMessage(t(failureUpdateMessage), 'error');
         }
+      }
+    } else if (isReassign) {
+      try {
+        const reassignmentPayload = {
+          userData: {
+            firstName: formData.firstName,
+          },
+          automaticMember: {
+            value: true,
+            fieldId: blockFieldId,
+            fieldName: "BLOCK",
+          },
+          customFields: [
+            {
+              fieldId: districtFieldId,
+              value: [payload.customFields[1].value[0]],
+            },
+            {
+              fieldId: blockFieldId,
+              value: [payload.customFields[2].value[0]],
+            },
+            {
+              fieldId: villageFieldId,
+              value: [payload.customFields[3].value[0]],
+            },
+          ],
+        };
+        const resp = await updateReassignUser(editableUserId, reassignmentPayload);
+        if (resp) {
+          showToastMessage(t(successUpdateMessage), 'success');
+          telemetryCallbacks(telemetryUpdateKey);
+          UpdateSuccessCallback();
+        } else {
+          console.error('Error reassigning user:', error);
+          showToastMessage(t(failureUpdateMessage), 'error');
+        }
+      } catch (error) {
+        console.error('Error reassigning user:', error);
+        showToastMessage(t(failureUpdateMessage), 'error');
       }
     } else {
       if (isNotificationRequired) {
@@ -222,14 +289,15 @@ const AddEditUser = ({
       ) : (
         schema &&
         uiSchema && (
-          <DynamicForm
-            schema={isEdit ? isEditSchema : schema}
-            uiSchema={isEdit ? isEditUiSchema : uiSchema}
-            t={t}
-            FormSubmitFunction={FormSubmitFunction}
-            prefilledFormData={prefilledFormData || {}}
-            extraFields={isEdit ? extraFieldsUpdate : extraFields}
-          />
+            <DynamicForm
+              schema={isEdit || isReassign ? isEditSchema : schema}
+              uiSchema={isEdit || isReassign ? isEditUiSchema : uiSchema}
+              t={t}
+              FormSubmitFunction={FormSubmitFunction}
+              prefilledFormData={prefilledFormData || {}}
+              extraFields={isEdit || isReassign ? extraFieldsUpdate : extraFields}
+            />
+
         )
       )}
     </>
