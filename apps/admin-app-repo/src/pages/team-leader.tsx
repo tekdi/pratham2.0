@@ -20,7 +20,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { debounce } from 'lodash';
+import { debounce, set } from 'lodash';
 import { Numbers } from '@mui/icons-material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
 import EditIcon from '@mui/icons-material/Edit';
@@ -350,9 +350,9 @@ const TeamLeader = () => {
         let tempFormData = extractMatchingKeys(row, addSchema);
         setPrefilledAddFormData(tempFormData);
         // setIsEdit(true);
+        setIsReassign(true);
         setEditableUserId(row?.userId);
         handleOpenModal();
-        setIsReassign(true);
       },
     },
   ];
@@ -372,6 +372,8 @@ const TeamLeader = () => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
+    setIsReassign(false);
+    setIsEdit(false);
   };
 
   //Add Edit Props
@@ -431,6 +433,7 @@ const TeamLeader = () => {
             onClick={() => {
               setPrefilledAddFormData(initialFormData);
               setIsEdit(false);
+              setIsReassign(false);
               setEditableUserId('');
               handleOpenModal();
             }}
