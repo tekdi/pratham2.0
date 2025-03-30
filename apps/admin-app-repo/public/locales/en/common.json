@@ -248,7 +248,8 @@
     "USER_CREDENTIALS_WILL_BE_SEND_SOON": "Learner is created, credentials will be sent soon",
     "LEARNER_UPDATED_SUCCESSFULLY": "Learner has been successfully updated!",
     "EDIT_LEARNER": "Edit Learner",
-    "NO_LEARNERS_FOUND": "No Learners Found"
+    "NO_LEARNERS_FOUND": "No Learners Found",
+    "RE_ASSIGN_facilitator":"Re-assign Facilitator"
   },
   "MENTORS": {
     "SEARCHBAR_PLACEHOLDER": "Search mentors..",

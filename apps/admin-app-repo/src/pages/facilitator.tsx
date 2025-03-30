@@ -77,6 +77,7 @@ const Facilitator = () => {
   const [blockFieldId, setBlockFieldId] = useState('');
   const [districtFieldId, setDistrictFieldId] = useState('');
   const [villageFieldId, setVillageFieldId] = useState('');
+  // const [centerFieldId, setCenterFieldId] = useState('');
 
   const [userID, setUserId] = useState('');
   const [userData, setUserData] = useState({
@@ -119,14 +120,15 @@ const Facilitator = () => {
       ]);
       console.log('responseForm', responseForm);
       const districtFieldId = responseForm.schema.properties.district.fieldId;
-      const blockFieldId = responseForm.schema.properties.block.fieldId;
-      const villageFieldId = responseForm.schema.properties.village.fieldId;
+      const blockFieldId = responseForm?.schema?.properties?.block.fieldId;
+      const villageFieldId = responseForm?.schema?.properties?.village?.fieldId;
+      // const centerFieldId = responseForm?.schema?.properties?.center?.fieldId;
       
-      // const centerFieldId = responseForm.schema.properties.center.fieldId;
 
       setBlockFieldId(blockFieldId);
       setDistrictFieldId(districtFieldId);
       setVillageFieldId(villageFieldId)
+      // setCenterFieldId(centerFieldId)
       setAddSchema(responseForm?.schema);
       setAddUiSchema(responseForm?.uiSchema);
     };
@@ -406,11 +408,14 @@ const Facilitator = () => {
         </Box>
       ),
       callback: (row) => {
-        // console.log('row:', row);
+        console.log('row:', row);
         // console.log('AddSchema', addSchema);
         // console.log('AddUISchema', addUiSchema);
 
+        
+        
         let tempFormData = extractMatchingKeys(row, addSchema);
+        console.log(tempFormData ,' tempFormData');
         setPrefilledAddFormData(tempFormData);
         // setIsEdit(true);
         setIsReassign(true);
@@ -515,8 +520,8 @@ const Facilitator = () => {
         <SimpleModal
           open={openModal}
           onClose={handleCloseModal}
-          showFooter={!isEdit ? true : false}
-          primaryText={isReassign ? '' :'Next'}
+          // showFooter={!isEdit ? true : false}
+          // primaryText={isReassign ? '' :'Next'}
           id="dynamic-form-id"
           modalTitle={
             isEdit
@@ -557,6 +562,7 @@ const Facilitator = () => {
             blockFieldId={blockFieldId}
             districtFieldId={districtFieldId}
             villageFieldId={villageFieldId}
+            // centerFieldId={centerFieldId}
             type="facilitator"
           />
         </SimpleModal>

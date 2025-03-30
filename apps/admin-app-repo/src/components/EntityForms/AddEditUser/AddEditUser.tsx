@@ -43,9 +43,10 @@ const AddEditUser = ({
   blockFieldId,
   districtFieldId, 
   isExtraFields = true,
-  villageFieldId
+  villageFieldId,
+  centerFieldId
 }) => {
-  console.log(editPrefilledFormData , 'schema');
+  console.log(editPrefilledFormData, 'editPrefilledFormData');
 
   
   const [isLoading, setIsLoading] = useState(false);
@@ -81,6 +82,7 @@ const AddEditUser = ({
       'parentId',
       'batch',
       'grade',
+      'center',
     ];
     keysToRemove.forEach((key) => delete isEditSchema.properties[key]);
     keysToRemove.forEach((key) => delete isEditUiSchema[key]);
@@ -183,10 +185,14 @@ const AddEditUser = ({
               fieldId: blockFieldId,
               value: [payload.customFields[2].value[0]],
             },
-            {
-              fieldId: villageFieldId,
-              value: [payload.customFields[3].value[0]],
-            },
+            ...(villageFieldId
+              ? [
+                {
+                  fieldId: villageFieldId,
+                  value: [payload.customFields[3].value[0]],
+                },
+              ]
+              : []),
           ],
         };
         const resp = await updateReassignUser(editableUserId, reassignmentPayload);
