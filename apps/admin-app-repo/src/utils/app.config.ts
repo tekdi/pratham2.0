@@ -21,15 +21,7 @@ export const MIME_TYPE = {
     "video/youtube"]
 };
 
-export const TENANT_ID = process.env.NEXT_PUBLIC_TENANT_ID || "";
-if (!TENANT_ID) {
-  console.warn('NEXT_PUBLIC_TENANT_ID is not set in the environment variables.');
-}
-export const TEMPLATE_ID: string = 'cm7nbogii000moc3gth63l863';
-
-export const jotFormId = process.env.NEXT_PUBLIC_JOTFORM_ID || '';
-if (!jotFormId) {
-  console.warn(
-    'NEXT_PUBLIC_JOTFORM_ID is not set in the environment variables.'
-  );
+export const CLOUD_STORAGE_URL = process.env.NEXT_PUBLIC_CLOUD_STORAGE_URL || "";
+if (!CLOUD_STORAGE_URL) {
+  console.warn('NEXT_PUBLIC_CLOUD_STORAGE_URL is not set in the environment variables.');
 }

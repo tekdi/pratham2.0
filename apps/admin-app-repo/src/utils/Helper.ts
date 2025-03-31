@@ -579,3 +579,39 @@ export const toPascalCase = (name: string | any) => {
     return name;
   }
 }
+
+export const handleExitEvent = () => {
+  const previousPage = sessionStorage.getItem("previousPage");
+  if (previousPage) {
+    window.location.href = previousPage;
+  } else {
+    window.history.go(-1);
+  }
+};
+
+export const getTelemetryEvents = (eventData: any, contentType: string) => {
+  console.log("getTelemetryEvents hit");
+
+  if (!eventData || !eventData.object || !eventData.object.id) {
+    console.error("Invalid event data");
+    return;
+  }
+
+  const {
+    eid,
+    edata,
+    object: { id: identifier },
+  } = eventData;
+  const telemetryKey = `${contentType}_${identifier}_${eid}`;
+
+  const telemetryData = {
+    eid,
+    edata,
+    identifier,
+    contentType,
+  };
+
+  console.log(`${eid}Telemetry`, telemetryData);
+
+  localStorage.setItem(telemetryKey, JSON.stringify(telemetryData));
+};
