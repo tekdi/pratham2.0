@@ -59,10 +59,10 @@ export const names = [
 ];
 
 export enum Role {
-  STUDENT = 'Student',
-  TEACHER = 'Teacher',
-  TEAM_LEADER = 'Team Leader',
-  ADMIN = 'Admin',
+  STUDENT = 'Learner',
+  TEACHER = 'Instructor',
+  TEAM_LEADER = 'Lead',
+  ADMIN = 'State Lead',
 }
 
 export enum Status {
@@ -92,9 +92,9 @@ export enum FormContext {
 }
 
 export enum FormContextType {
-  STUDENT = 'STUDENT',
-  TEACHER = 'TEACHER',
-  TEAM_LEADER = 'TEAM LEADER',
+  STUDENT = 'LEARNER',
+  TEACHER = 'INSTRUCTOR',
+  TEAM_LEADER = 'LEAD',
   COHORT = 'COHORT',
   COHORT_MEMBER = 'COHORTMEMBER',
 }
@@ -118,10 +118,10 @@ export enum CenterType {
 }
 
 export enum RoleId {
-  STUDENT = '493c04e2-a9db-47f2-b304-503da358d5f4',
-  TEACHER = '3bde0028-6900-4900-9d05-eeb608843718',
-  TEAM_LEADER = '9dd9328f-1bc7-444f-96e3-c5e1daa3514a',
-  ADMIN = 'ee482faf-8a41-45fe-9656-5533dd6a787c',
+  STUDENT = 'eea7ddab-bdf9-4db1-a1bb-43ef503d65ef',
+  TEACHER = 'a5f1dbc9-2ad4-442c-b762-0e3fc1f6c6da',
+  TEAM_LEADER = 'c4454929-954e-4c51-bb7d-cca834ab9375',
+  ADMIN = '4a3493aa-a4f7-4e2b-b141-f213084b5599',
 }
 
 export enum Pagination {
