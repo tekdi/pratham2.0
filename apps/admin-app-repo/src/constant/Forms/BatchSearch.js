@@ -126,13 +126,20 @@ export const BatchSearchSchema = {
       maxSelections: 1000,
     },
     parentId: {
-      type: 'string',
+      type: 'array',
       title: 'CENTER',
+      items: {
+        type: 'string',
+        enum: ['Select'],
+        enumNames: ['Select'],
+      },
+      // coreField: 1,
+      //fieldId: null,
       field_type: 'drop_down',
-      enum: ['Select'],
-      enumNames: ['Select'],
+      // enum: ['Select'],
+      // enumNames: ['Select'],
       api: {
-        url: 'https://dev-interface.prathamdigital.org/interface/v1/cohort/search',
+        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/cohort/search`,
         header: {
           tenantId: '**',
           Authorization: '**',
@@ -148,12 +155,19 @@ export const BatchSearchSchema = {
           limit: 200,
           offset: 0,
           filters: {
+            type: 'COHORT',
             status: ['active'],
+            village: '**',
           },
         },
-        callType: 'initial',
+        callType: 'dependent',
+        dependent: 'village',
       },
+      uniqueItems: true,
+      isMultiSelect: true,
+      maxSelections: 1000,
     },
+
     name: {
       type: 'string',
       title: 'Search Key',
@@ -196,6 +210,13 @@ export const BatchSearchUISchema = {
   },
 
   village: {
+    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:options': {
+      multiple: true,
+      uniqueItems: true,
+    },
+  },
+  parentId: {
     'ui:widget': 'CustomMultiSelectWidget',
     'ui:options': {
       multiple: true,

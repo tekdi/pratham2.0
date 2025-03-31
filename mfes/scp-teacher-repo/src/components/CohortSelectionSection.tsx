@@ -8,7 +8,7 @@ import {
   Typography,
 } from '@mui/material';
 import { usePathname, useRouter } from 'next/navigation';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { getCohortList } from '@/services/CohortServices';
 import { getUserDetails } from '@/services/ProfileService';
@@ -128,10 +128,17 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
     (state: { setBlockId: any }) => state.setBlockId
   );
 
+  //center add fix
+  const [centerId, setCenterId] = useState('');
+  const [filteredBatchData, setFilteredBatchData] = React.useState<any>();
+  const [filteredManipulatedBatchData, setFilteredManipulatedBatchData] =
+    React.useState<any>();
+
   useEffect(() => {
     if (typeof window !== 'undefined' && window.localStorage) {
       const token = localStorage.getItem('token');
       const storedUserId = localStorage.getItem('userId');
+      setCenterId(localStorage.getItem('centerId') || '');
       setClassId(localStorage.getItem('classId') || '');
       if (token) {
         setIsAuthenticated?.(true);
@@ -150,12 +157,45 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
       ?.filter((cohort: any) => cohort?.status?.toLowerCase() === Status.ACTIVE)
       ?.sort((a: any, b: any) => a.name.localeCompare(b.name));
 
-    setFilteredCohortData(filteredData);
+    setFilteredCohortData(filteredManipulatedData);
 
     setFilteredManipulatedCohortData(filteredManipulatedData);
-
   }, [manipulatedCohortData, cohortsData]);
 
+  useEffect(() => {
+    if (centerId != '') {
+      fetchBatch(centerId);
+    }
+  }, [centerId]);
+  const fetchBatch = async (centerId: any) => {
+    if (userId) {
+      let filteredChildData = await getBatchFilteredData(centerId);
+      setFilteredBatchData(filteredChildData);
+      setFilteredManipulatedBatchData(filteredChildData);
+    }
+  };
+  const getBatchFilteredData = async (centerId: any) => {
+    if (userId) {
+      const response = await queryClient.fetchQuery({
+        queryKey: [QueryKeys.MY_COHORTS, userId],
+        queryFn: () => getCohortList(userId, { customField: 'true' }),
+      });
+      // Find the cohort where cohortId matches centerId
+      const targetCohort = response.find(
+        (item: any) => item.cohortId === centerId
+      );
+      let filteredChildData = [];
+      // Check if the cohort is found
+      if (targetCohort) {
+        // Filter childData to only keep active children
+        filteredChildData = targetCohort.childData.filter(
+          (child: any) => child.status === 'active'
+        );
+      }
+      // console.log('batch add filteredChildData', filteredChildData);
+      return filteredChildData;
+    }
+  };
   useEffect(() => {
     if (userId) {
       if (!loading) {
@@ -251,19 +291,36 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                   customField: item?.customField,
                 }))
                 ?.filter(Boolean);
-              setCohortsData([...filteredData]);
+
               setCohorts(filteredData);
               if (filteredData.length > 0) {
                 if (typeof window !== 'undefined' && window.localStorage) {
+                  let filteredChildData = await getBatchFilteredData(
+                    filteredData?.[0]?.cohortId
+                  );
+                  setCohortsData([...filteredChildData]);
                   const cohort = localStorage.getItem('classId') || '';
                   if (cohort !== '') {
+                    // console.log('batch add cohort test', cohort);
                     setClassId(localStorage.getItem('classId') || '');
                   } else {
+                    //add batch child data
+                    // console.log("###### batch add filteredChildData",filteredChildData);
+                    // console.log("###### batch add filteredChildData?.[0]?.cohortId",filteredChildData?.[0]?.cohortId);
                     localStorage.setItem(
-                      'classId',
+                      'centerId',
                       filteredData?.[0]?.cohortId
                     );
-                    setClassId(filteredData?.[0]?.cohortId);
+                    setCenterId(filteredData?.[0]?.cohortId);
+                    localStorage.setItem(
+                      'classId',
+                      filteredChildData?.[0]?.cohortId
+                    );
+                    localStorage.setItem(
+                      'cohortId',
+                      filteredChildData?.[0]?.cohortId
+                    );
+                    setClassId(filteredChildData?.[0]?.cohortId);
                   }
                 }
                 if (isManipulationRequired) {
@@ -302,12 +359,13 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                 })
                 ?.filter(Boolean);
 
-
-              setCohortsData(filteredData);
-               if(response[0].childData.length===0)
-               {
-                    setLoading(false);
-               }
+              let filteredChildData = await getBatchFilteredData(
+                filteredData?.[0]?.cohortId
+              );
+              setCohortsData(filteredChildData);
+              if (response[0].childData.length === 0) {
+                setLoading(false);
+              }
               if (filteredData.length > 0) {
                 if (typeof window !== 'undefined' && window.localStorage) {
                   const cohort = localStorage.getItem('classId') || '';
@@ -315,10 +373,21 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                     setClassId(localStorage.getItem('classId') || '');
                   } else {
                     localStorage.setItem(
-                      'classId',
+                      'centerId',
                       filteredData?.[0]?.cohortId
                     );
-                    setClassId(filteredData?.[0]?.cohortId);
+
+                    setCenterId(filteredData?.[0]?.cohortId);
+                    localStorage.setItem(
+                      'classId',
+                      filteredChildData?.[0]?.cohortId
+                    );
+
+                    localStorage.setItem(
+                      'cohortId',
+                      filteredChildData?.[0]?.cohortId
+                    );
+                    setClassId(filteredChildData?.[0]?.cohortId);
                   }
                 }
               }
@@ -345,7 +414,16 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
     isCustomFieldRequired,
   ]);
 
-  const handleCohortSelection = (event: SelectChangeEvent<string>) => {
+  const handleCohortSelection = async (event: SelectChangeEvent<string>) => {
+    let filteredChildData = await getBatchFilteredData(event.target.value);
+    localStorage.setItem('classId', filteredChildData?.[0]?.cohortId);
+    localStorage.setItem('cohortId', filteredChildData?.[0]?.cohortId);
+    setClassId(filteredChildData?.[0]?.cohortId);
+    setCenterId(event.target.value);
+    localStorage.setItem('centerId', event.target.value);
+  };
+
+  const handleBatchSelection = (event: SelectChangeEvent<string>) => {
     setClassId(event.target.value);
     ReactGA.event('cohort-selection-dashboard', {
       selectedCohortID: event.target.value,
@@ -392,12 +470,12 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
       {/* {loading && (
         <Loader showBackdrop={true} loadingText={t('COMMON.LOADING')} />
       )} */}
-      {filteredCohortData && (
+      {filteredCohortData && filteredBatchData && (
         <Box
           sx={{
             '@media (min-width: 900px)': {
               marginTop: dashboard
-                ? teacher === 'Teacher'
+                ? teacher === 'Instructor'
                   ? '0px'
                   : '-25px'
                 : 'unset',
@@ -405,7 +483,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
             },
           }}
         >
-          {classId && filteredCohortData && (
+          {classId && filteredCohortData && filteredBatchData && (
             <Box>
               {blockName ? (
                 <Box>
@@ -435,7 +513,9 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                             </InputLabel>
                           )}
                           <Select
-                            value={classId || filteredCohortData?.[0]?.cohortId}
+                            value={
+                              centerId || filteredCohortData?.[0]?.cohortId
+                            }
                             labelId="center-select-label"
                             onChange={handleCohortSelection}
                             displayEmpty
@@ -508,6 +588,92 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                           {toPascalCase(filteredCohortData[0]?.name)}
                         </Typography>
                       )}
+                      {filteredBatchData?.length > 1 ? (
+                        <FormControl
+                          className="drawer-select"
+                          sx={{
+                            m: 0,
+                            width: '100%',
+                            // '@media (max-width: 700px)': {
+                            //   width: '50%',
+                            // },
+                          }}
+                        >
+                          {showFloatingLabel && (
+                            <InputLabel id="batch-select-label">
+                              {t('COMMON.BATCH')}
+                            </InputLabel>
+                          )}
+                          <Select
+                            value={classId || filteredBatchData?.[0]?.cohortId}
+                            labelId="batch-select-label"
+                            onChange={handleBatchSelection}
+                            displayEmpty
+                            inputProps={{ 'aria-label': 'Without label' }}
+                            className="select-languages capitalize fs-14 fw-500 bg-white"
+                            sx={{
+                              borderRadius: '0.5rem',
+                              color: theme.palette.warning['200'],
+                              width: '100%',
+                              marginBottom: '0rem',
+                              '@media (max-width: 900px)': {
+                                width: isAttendanceOverview ? '100%' : '62%',
+                              },
+                              // '& .MuiSelect-icon': {
+                              //   right: isRTL ? 'unset' : '7px',
+                              //   left: isRTL ? '7px' : 'unset',
+                              // },
+                            }}
+                            MenuProps={{
+                              PaperProps: {
+                                style: {
+                                  maxHeight: 250,
+                                },
+                              },
+                            }}
+                            IconComponent={(props) => (
+                              <ArrowDropDownIcon
+                                {...props}
+                                style={{ color: 'black' }}
+                              />
+                            )}
+                          >
+                            {filteredBatchData?.length !== 0 ? (
+                              filteredManipulatedBatchData?.map(
+                                (cohort: any) => (
+                                  <MenuItem
+                                    key={cohort.cohortId}
+                                    value={cohort.cohortId}
+                                    style={{
+                                      fontWeight: '500',
+                                      fontSize: '14px',
+                                      color: theme.palette.warning['A200'],
+                                      textTransform: 'capitalize',
+                                    }}
+                                  >
+                                    {toPascalCase(cohort.name)}
+                                  </MenuItem>
+                                )
+                              )
+                            ) : (
+                              <Typography
+                                style={{
+                                  fontWeight: '500',
+                                  fontSize: '14px',
+                                  color: theme.palette.warning['A200'],
+                                  padding: '0 15px',
+                                }}
+                              >
+                                {t('COMMON.NO_DATA_FOUND')}
+                              </Typography>
+                            )}
+                          </Select>
+                        </FormControl>
+                      ) : (
+                        <Typography color={theme.palette.warning['300']}>
+                          {toPascalCase(filteredBatchData[0]?.name)}
+                        </Typography>
+                      )}
                     </Box>
                   </Box>
                 </Box>
@@ -529,8 +695,8 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                             labelId="center-select-label"
                             label={showFloatingLabel ? t('COMMON.CENTER') : ''}
                             value={
-                              classId
-                                ? classId
+                              centerId
+                                ? centerId
                                 : filteredCohortData[0]?.cohortId
                             }
                             onChange={handleCohortSelection}
@@ -554,22 +720,22 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                               showFloatingLabel
                                 ? { borderRadius: '4px' }
                                 : {
-                                  borderRadius: '0.5rem',
-                                  color: theme.palette.warning['200'],
-                                  width: '100%',
-                                  marginBottom: '0rem',
-                                  marginRight: '10px',
-                                  '@media (max-width: 902px)': {
-                                    width: isAttendanceOverview
-                                      ? '100%'
-                                      : '62%',
-                                  },
-                                  '@media (max-width: 702px)': {
-                                    width: isAttendanceOverview
-                                      ? '100%'
-                                      : '65%',
+                                    borderRadius: '0.5rem',
+                                    color: theme.palette.warning['200'],
+                                    width: '100%',
+                                    marginBottom: '0rem',
+                                    marginRight: '10px',
+                                    '@media (max-width: 902px)': {
+                                      width: isAttendanceOverview
+                                        ? '100%'
+                                        : '62%',
+                                    },
+                                    '@media (max-width: 702px)': {
+                                      width: isAttendanceOverview
+                                        ? '100%'
+                                        : '65%',
+                                    },
                                   }
-                                }
                             }
                           >
                             {filteredCohortData?.length !== 0 ? (
@@ -606,7 +772,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                       ) : (
                         <>
                           {showDisabledDropDown &&
-                            filteredCohortData?.length === 1 ? (
+                          filteredCohortData?.length === 1 ? (
                             <FormControl
                               disabled={true}
                               className={
@@ -643,6 +809,136 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                           ) : (
                             <Typography color={theme.palette.warning['300']}>
                               {toPascalCase(filteredCohortData[0]?.name)}
+                            </Typography>
+                          )}
+                        </>
+                      )}
+                      {filteredBatchData?.length > 1 ? (
+                        <FormControl
+                          className={showFloatingLabel ? '' : 'drawer-select'}
+                          sx={{ m: 0, width: '100%' }}
+                        >
+                          {showFloatingLabel && (
+                            <InputLabel id="batch-select-label">
+                              {t('COMMON.BATCH')}
+                            </InputLabel>
+                          )}
+                          <Select
+                            labelId="batch-select-label"
+                            label={showFloatingLabel ? t('COMMON.BATCH') : ''}
+                            value={
+                              classId ? classId : filteredBatchData[0]?.cohortId
+                            }
+                            onChange={handleBatchSelection}
+                            // displayEmpty
+                            // style={{ borderRadius: '4px' }}
+
+                            inputProps={{ 'aria-label': 'Without label' }}
+                            MenuProps={{
+                              PaperProps: {
+                                style: {
+                                  maxHeight: 250,
+                                },
+                              },
+                            }}
+                            className={
+                              showFloatingLabel
+                                ? ''
+                                : 'select-languages fs-14 fw-500 bg-white'
+                            }
+                            sx={
+                              showFloatingLabel
+                                ? { borderRadius: '4px' }
+                                : {
+                                    borderRadius: '0.5rem',
+                                    color: theme.palette.warning['200'],
+                                    width: '100%',
+                                    marginBottom: '0rem',
+                                    marginRight: '10px',
+                                    '@media (max-width: 902px)': {
+                                      width: isAttendanceOverview
+                                        ? '100%'
+                                        : '62%',
+                                    },
+                                    '@media (max-width: 702px)': {
+                                      width: isAttendanceOverview
+                                        ? '100%'
+                                        : '65%',
+                                    },
+                                  }
+                            }
+                          >
+                            {filteredBatchData?.length !== 0 ? (
+                              filteredManipulatedBatchData?.map(
+                                (cohort: any) => (
+                                  <MenuItem
+                                    key={cohort.cohortId}
+                                    value={cohort.cohortId}
+                                    style={{
+                                      fontWeight: '500',
+                                      fontSize: '14px',
+                                      color: theme.palette.warning['A200'],
+                                      textTransform: 'capitalize',
+                                    }}
+                                  >
+                                    {toPascalCase(cohort?.name)}
+                                  </MenuItem>
+                                )
+                              )
+                            ) : (
+                              <Typography
+                                style={{
+                                  fontWeight: '500',
+                                  fontSize: '14px',
+                                  color: theme.palette.warning['A200'],
+                                  padding: '0 15px',
+                                }}
+                              >
+                                {t('COMMON.NO_DATA_FOUND')}
+                              </Typography>
+                            )}
+                          </Select>
+                        </FormControl>
+                      ) : (
+                        <>
+                          {showDisabledDropDown &&
+                          filteredBatchData?.length === 1 ? (
+                            <FormControl
+                              disabled={true}
+                              className={
+                                showFloatingLabel ? '' : 'drawer-select'
+                              }
+                              sx={{ m: 0, width: '100%' }}
+                            >
+                              {showFloatingLabel && (
+                                <InputLabel id="batch-select-label">
+                                  {t('COMMON.BATCH')}
+                                </InputLabel>
+                              )}
+                              <Select
+                                labelId="batch-select-label"
+                                label={
+                                  showFloatingLabel ? t('COMMON.BATCH') : ''
+                                }
+                                value={filteredBatchData[0]?.cohortId}
+                              >
+                                <MenuItem
+                                  key={filteredBatchData[0]?.cohortId}
+                                  value={filteredBatchData[0]?.cohortId}
+                                  style={{
+                                    fontWeight: '500',
+                                    fontSize: '14px',
+                                    color: theme.palette.warning['A200'],
+                                    textTransform: 'capitalize',
+                                  }}
+                                >
+                                  {filteredBatchData[0]?.name}
+                                </MenuItem>
+                              </Select>
+                            </FormControl>
+                          ) : (
+                            <Typography color={theme.palette.warning['300']}>
+                              {toPascalCase(filteredBatchData[0]?.name)}
                             </Typography>
                           )}
                         </>

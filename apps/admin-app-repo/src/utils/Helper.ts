@@ -1,8 +1,14 @@
-import FingerprintJS from "fingerprintjs2";
-import { getUserDetailsInfo } from "../services/UserList";
-import { Role, FormContextType, FormValues, InputTypes, Storage } from "./app.constant";
-import { State } from "./Interfaces";
-import { useQueryClient } from "@tanstack/react-query";
+import FingerprintJS from 'fingerprintjs2';
+import { getUserDetailsInfo } from '../services/UserList';
+import {
+  Role,
+  FormContextType,
+  FormValues,
+  InputTypes,
+  Storage,
+} from './app.constant';
+import { State } from './Interfaces';
+import { useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
 interface Value {
@@ -26,11 +32,11 @@ interface CohortDetail {
 export const generateUUID = () => {
   let d = new Date().getTime();
   let d2 =
-    (typeof performance !== "undefined" &&
+    (typeof performance !== 'undefined' &&
       performance.now &&
       performance.now() * 1000) ||
     0;
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
     let r = Math.random() * 16;
     if (d > 0) {
       r = (d + r) % 16 | 0;
@@ -39,7 +45,7 @@ export const generateUUID = () => {
       r = (d2 + r) % 16 | 0;
       d2 = Math.floor(d2 / 16);
     }
-    return (c === "x" ? r : (r & 0x3) | 0x8).toString(16);
+    return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
   });
 };
 
@@ -51,42 +57,46 @@ export const getUserName = async (
     const userDetails = await getUserDetailsInfo(userId, fieldValue);
     return userDetails?.userData?.name; // Accessing the name property from userData
   } catch (error) {
-    console.error("Error in fetching user name:", error);
+    console.error('Error in fetching user name:', error);
     return null;
   }
 };
 export const getInitials = (name: any) => {
-  if (!name) return ""; // Handle empty input
-  const words = name?.trim().split(" ");
+  if (!name) return ''; // Handle empty input
+  const words = name?.trim().split(' ');
   return words?.length > 1
     ? words[0][0].toUpperCase() + words[1][0].toUpperCase()
     : words[0][0].toUpperCase();
-}
+};
 
-  export const getUserFullName = (user?: { firstName?: string, lastName: string, name?: string }): string => {
-    let userData;
-    if (user) {
-      userData = user;
-    } else {
-      userData = localStorage.getItem(Storage.USER_DATA);
-      userData = JSON.parse(userData || "{}");
-    }
-
-    if (userData?.firstName) {
-      const lastName = userData?.lastName || "";
-      return `${userData.firstName} ${lastName}`;
-    } else if (userData?.firstName) {
-      return userData.firstName;
-    }
-
-    return '';
+export const getUserFullName = (user?: {
+  firstName?: string;
+  lastName: string;
+  name?: string;
+}): string => {
+  let userData;
+  if (user) {
+    userData = user;
+  } else {
+    userData = localStorage.getItem(Storage.USER_DATA);
+    userData = JSON.parse(userData || '{}');
   }
+
+  if (userData?.firstName) {
+    const lastName = userData?.lastName || '';
+    return `${userData.firstName} ${lastName}`;
+  } else if (userData?.firstName) {
+    return userData.firstName;
+  }
+
+  return '';
+};
 
 export const getDeviceId = () => {
   return new Promise((resolve) => {
     FingerprintJS.get((components: any[]) => {
       const values = components?.map((component) => component.value);
-      const deviceId = FingerprintJS.x64hash128(values.join(""), 31);
+      const deviceId = FingerprintJS.x64hash128(values.join(''), 31);
       resolve(deviceId);
     });
   });
@@ -101,10 +111,10 @@ export const generateUsernameAndPassword = (
   const randomNum = Math.floor(10000 + Math.random() * 90000).toString(); //NOSONAR
 
   const rolePrefixes: Record<string, string> = {
-    [FormContextType.TEACHER]: "FSC",
-    [FormContextType.STUDENT]: "SC",
-    [FormContextType.TEAM_LEADER]: "TLSC",
-    [FormContextType.CONTENT_CREATOR]: "SCTA", //prefix is not fix till now assume this SCTA(State Content Team Associate)
+    [FormContextType.TEACHER]: 'FSC',
+    [FormContextType.STUDENT]: 'SC',
+    [FormContextType.TEAM_LEADER]: 'TLSC',
+    [FormContextType.CONTENT_CREATOR]: 'SCTA', //prefix is not fix till now assume this SCTA(State Content Team Associate)
   };
 
   if (!(role in rolePrefixes)) {
@@ -119,12 +129,12 @@ export const generateUsernameAndPassword = (
 };
 
 export const transformLabel = (label: string): string => {
-  if (!label) {
+  if (typeof label !== "string") {
     return label;
   }
   return label
-    .toLowerCase() // Convert to lowercase to standardize
-    .replace(/[_-]/g, " ") // Replace underscores and hyphens with spaces
+    ?.toLowerCase() // Convert to lowercase to standardize
+    .replace(/[_-]/g, ' ') // Replace underscores and hyphens with spaces
     .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize the first letter of each word
 };
 
@@ -140,13 +150,13 @@ export const transformArray = (arr: State[]): State[] => {
 
 export const firstLetterInUpperCase = (label: string): string => {
   if (!label) {
-    return "";
+    return '';
   }
 
   return label
-    ?.split(" ")
+    ?.split(' ')
     ?.map((word) => word?.charAt(0).toUpperCase() + word?.slice(1))
-    ?.join(" ");
+    ?.join(' ');
 };
 export const capitalizeFirstLetterOfEachWordInArray = (
   arr: string[]
@@ -170,12 +180,14 @@ export const getCurrentYearPattern = () => {
   const currentYear = new Date().getFullYear();
 
   // Build the dynamic part for the current century
-  let regexPart = "";
+  let regexPart = '';
   if (currentYear >= 2000 && currentYear < 2100) {
     const lastDigit = currentYear % 10;
     const middleDigit = Math.floor((currentYear % 100) / 10);
 
-    regexPart = `20[0-${middleDigit - 1}][0-9]|20${middleDigit}[0-${lastDigit}]`;
+    regexPart = `20[0-${
+      middleDigit - 1
+    }][0-9]|20${middleDigit}[0-${lastDigit}]`;
   }
 
   // Full regex covering 1900–1999, 2000 to current year
@@ -198,7 +210,7 @@ export const mapFields = (formFields: any, Details: any) => {
         if (data[item.name] && item?.maxSelections > 1) {
           return [field?.value];
         } else if (item?.type === InputTypes.CHECKBOX) {
-          return String(field?.value).split(",");
+          return String(field?.value).split(',');
         } else {
           return field?.value?.toLowerCase();
         }
@@ -217,7 +229,7 @@ export const mapFields = (formFields: any, Details: any) => {
       } else {
         if (
           field?.value === FormValues.FEMALE ||
-          field?.value === FormValues.MALE||
+          field?.value === FormValues.MALE ||
           field?.value === FormValues.TRANSGENDER
         ) {
           return field?.value?.toLowerCase();
@@ -230,16 +242,16 @@ export const mapFields = (formFields: any, Details: any) => {
       if (item?.isMultiSelect) {
         if (Details[item.name] && item?.maxSelections > 1) {
           initialFormData[item.name] = [Details[item.name]];
-        } else if (item?.type === "checkbox") {
-          initialFormData[item.name] = String(Details[item.name]).split(",");
+        } else if (item?.type === 'checkbox') {
+          initialFormData[item.name] = String(Details[item.name]).split(',');
         } else {
           initialFormData[item.name] = Details[item.name];
         }
-      } else if (item?.type === "radio") {
+      } else if (item?.type === 'radio') {
         initialFormData[item.name] = Details[item.name] || null;
-      } else if (item?.type === "numeric") {
+      } else if (item?.type === 'numeric') {
         initialFormData[item.name] = Number(Details[item.name]);
-      } else if (item?.type === "text" && Details[item.name]) {
+      } else if (item?.type === 'text' && Details[item.name]) {
         initialFormData[item.name] = String(Details[item.name]);
       } else {
         if (Details[item.name]) {
@@ -265,11 +277,13 @@ export const getOptionsByCategory = (frameworks: any, categoryCode: string) => {
     (category: any) => category.code === categoryCode
   );
 
-  return category?.terms?.map((term: any) => ({
-    name: term.name,
-    code: term.code,
-    associations: term.associations,
-  })) || [];
+  return (
+    category?.terms?.map((term: any) => ({
+      name: term.name,
+      code: term.code,
+      associations: term.associations,
+    })) || []
+  );
 };
 
 interface Association {
@@ -357,7 +371,7 @@ interface DataItem {
 
 export const normalizeData = (data: any[]): DataItem[] => {
   if (!Array.isArray(data)) {
-    console.warn("Invalid data format:", data);
+    console.warn('Invalid data format:', data);
     return [];
   }
 
@@ -365,15 +379,15 @@ export const normalizeData = (data: any[]): DataItem[] => {
     // Handle first data structure
     if (item.boards && Array.isArray(item.boards)) {
       return item.boards.map((board: any) => ({
-        name: board.name || "",
-        code: board.code || "",
+        name: board.name || '',
+        code: board.code || '',
         associations: item.associations || [],
       }));
     }
 
     return {
-      name: item.name || "",
-      code: item.code || "",
+      name: item.name || '',
+      code: item.code || '',
       associations: item.associations || [],
     };
   });
@@ -398,7 +412,7 @@ export const getYouTubeThumbnail = (url: string): string => {
     const videoId = match[1];
     return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
   } else {
-    return "";
+    return '';
   }
 };
 
@@ -406,10 +420,10 @@ export const filterAndMapAssociations = (
   category: string,
   options: any[],
   associationsList?: any[],
-  codeKey: string = "code"
+  codeKey: string = 'code'
 ) => {
   if (!Array.isArray(options)) {
-    console.error("Options is not an array:", options);
+    console.error('Options is not an array:', options);
     return [];
   }
 
@@ -432,13 +446,12 @@ export const filterAndMapAssociations = (
     }));
 };
 
-
 export const dataURLToBlob = (dataURLs: string[]): Blob[] => {
   return dataURLs.map((dataURL) => {
-    const [header, base64Data] = dataURL.split(",");
+    const [header, base64Data] = dataURL.split(',');
     const mimeTypeMatch = header.match(/:(.*?);/);
     if (!mimeTypeMatch) {
-      throw new Error("Invalid data URL format");
+      throw new Error('Invalid data URL format');
     }
     const mimeType = mimeTypeMatch[1];
     const binary = atob(base64Data);
@@ -450,9 +463,9 @@ export const dataURLToBlob = (dataURLs: string[]): Blob[] => {
   });
 };
 
-
-
-export const getFilenameFromDataURL = (dataURLs: string[]): (string | null)[] => {
+export const getFilenameFromDataURL = (
+  dataURLs: string[]
+): (string | null)[] => {
   return dataURLs?.map((dataURL) => {
     // Check if the dataURL has a custom filename parameter
     const matches = dataURL.match(/filename=([^;&]+)/); // Look for `filename` in the query
@@ -500,33 +513,32 @@ export const convertAllImagesToDataUrls = async (imageUrls: string[]) => {
   return dataUrls;
 };
 
-
 export function convertImageToDataURL(imagePath: string, callback: any) {
   // Fetch the image as a blob
   fetch(imagePath)
-    .then(response => response.blob())
-    .then(blob => {
+    .then((response) => response.blob())
+    .then((blob) => {
       // Create a FileReader to convert the blob into a Data URL
       const reader = new FileReader();
 
       reader.onloadend = function () {
         // This is the Data URL of the image
         const dataUrl = reader.result;
-        callback(dataUrl);  // Call the callback with the Data URL
+        callback(dataUrl); // Call the callback with the Data URL
       };
 
       // Read the blob as a Data URL
       reader.readAsDataURL(blob);
     })
-    .catch(error => console.error("Error converting image:", error));
+    .catch((error) => console.error('Error converting image:', error));
 }
 
-export const getLastDayDate= (): string => {
+export const getLastDayDate = (): string => {
   const currentDate = new Date();
   currentDate.setDate(currentDate.getDate() - 1); // Subtract 1 day
   const year = currentDate.getFullYear();
-  const month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Month is zero-indexed
-  const day = String(currentDate.getDate()).padStart(2, "0");
+  const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Month is zero-indexed
+  const day = String(currentDate.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 };
 export const calculateAge = (dob: any) => {
@@ -565,7 +577,7 @@ export const preserveLocalStorage = () => {
   });
 };
 
- export const formatDate = (dateString: string) => {
+export const formatDate = (dateString: string) => {
   const date = new Date(dateString);
   return date.toLocaleDateString('en-US', {
     day: 'numeric',
@@ -578,40 +590,31 @@ export const toPascalCase = (name: string | any) => {
   if (typeof name !== 'string') {
     return name;
   }
-}
-
-export const handleExitEvent = () => {
-  const previousPage = sessionStorage.getItem("previousPage");
-  if (previousPage) {
-    window.location.href = previousPage;
-  } else {
-    window.history.go(-1);
-  }
 };
 
-export const getTelemetryEvents = (eventData: any, contentType: string) => {
-  console.log("getTelemetryEvents hit");
+export const filterSchema = (schemaObj: any, role: any) => {
+  const locationFields =
+    role === 'mentor' ? ['block', 'village'] : ['batch', 'center'];
 
-  if (!eventData || !eventData.object || !eventData.object.id) {
-    console.error("Invalid event data");
-    return;
-  }
+  const extractedFields: any = {};
+  locationFields.forEach((field) => {
+    if (schemaObj.schema.properties[field]) {
+      extractedFields[field] = {
+        title: schemaObj.schema.properties[field].title,
+        fieldId: schemaObj.schema.properties[field].fieldId,
+        field_type: schemaObj.schema.properties[field].field_type,
+        maxSelection: schemaObj.schema.properties[field].maxSelection,
+        isMultiSelect: schemaObj.schema.properties[field].isMultiSelect,
+        'ui:widget': schemaObj.uiSchema[field]?.['ui:widget'] || 'select',
+      };
+    }
+  });
 
-  const {
-    eid,
-    edata,
-    object: { id: identifier },
-  } = eventData;
-  const telemetryKey = `${contentType}_${identifier}_${eid}`;
+  const newSchema = JSON.parse(JSON.stringify(schemaObj)); // Deep copy
+  locationFields.forEach((field) => {
+    delete newSchema.schema.properties[field];
+    delete newSchema.uiSchema[field];
+  });
 
-  const telemetryData = {
-    eid,
-    edata,
-    identifier,
-    contentType,
-  };
-
-  console.log(`${eid}Telemetry`, telemetryData);
-
-  localStorage.setItem(telemetryKey, JSON.stringify(telemetryData));
+  return { newSchema, extractedFields };
 };

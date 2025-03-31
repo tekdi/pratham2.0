@@ -84,10 +84,12 @@ const Facilitator = () => {
     ? { state: [localStorage.getItem('stateId')] }
     : {};
 
-  const searchStoreKey = 'facilitator'
-  const initialFormDataSearch = localStorage.getItem(searchStoreKey) && localStorage.getItem(searchStoreKey) != "{}"
-    ? JSON.parse(localStorage.getItem(searchStoreKey))
-    : localStorage.getItem('stateId')
+  const searchStoreKey = 'facilitator';
+  const initialFormDataSearch =
+    localStorage.getItem(searchStoreKey) &&
+    localStorage.getItem(searchStoreKey) != '{}'
+      ? JSON.parse(localStorage.getItem(searchStoreKey))
+      : localStorage.getItem('stateId')
       ? { state: [localStorage.getItem('stateId')] }
       : {};
 
@@ -129,7 +131,7 @@ const Facilitator = () => {
   const SubmitaFunction = async (formData: any) => {
     setPrefilledFormData(formData);
     //set prefilled search data on refresh
-    localStorage.setItem(searchStoreKey, JSON.stringify(formData))
+    localStorage.setItem(searchStoreKey, JSON.stringify(formData));
     await searchData(formData, 0);
   };
 
@@ -455,7 +457,7 @@ const Facilitator = () => {
               width: '200px',
             }}
             onClick={() => {
-              setPrefilledAddFormData({});
+              setPrefilledAddFormData(initialFormData);
               setIsEdit(false);
               setEditableUserId('');
               handleOpenModal();
@@ -468,7 +470,9 @@ const Facilitator = () => {
         <SimpleModal
           open={openModal}
           onClose={handleCloseModal}
-          showFooter={false}
+          showFooter={!isEdit ? true : false}
+          primaryText={'Next'}
+          id="dynamic-form-id"
           modalTitle={
             isEdit
               ? t('FACILITATORS.EDIT_FACILITATOR')
@@ -502,6 +506,7 @@ const Facilitator = () => {
             notificationKey={notificationKey}
             notificationMessage={notificationMessage}
             notificationContext={notificationContext}
+            type="facilitator"
           />
         </SimpleModal>
 
