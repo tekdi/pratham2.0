@@ -88,17 +88,17 @@ const AddEditUser = ({
     keysToRemove.forEach((key) => delete isEditUiSchema[key]);
     console.log('schema', schema);
   } else if (isReassign) {
-    const keysToAdd = ['state', 'district', 'block', ...(isExtraFields ? ['village'] : [])];
+    const keysToHave = ['state', 'district', 'block', ...(isExtraFields ? ['village' , 'center' ] : [])];
     isEditSchema = {
       type: 'object',
-      properties: keysToAdd.reduce((obj, key) => {
+      properties: keysToHave.reduce((obj, key) => {
         if (schema.properties[key]) {
           obj[key] = schema.properties[key];
         }
         return obj;
       }, {}),
     };
-    isEditUiSchema = keysToAdd.reduce((obj, key) => {
+    isEditUiSchema = keysToHave.reduce((obj, key) => {
       if (uiSchema[key]) {
         obj[key] = uiSchema[key];
       }
