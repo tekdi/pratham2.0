@@ -215,12 +215,12 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
           }
           const blockObject =
             userDetailsResponse?.result?.userData?.customFields.find(
-              (item: any) => item?.label === 'BLOCKS'
+              (item: any) => item?.label === 'BLOCK'
             );
 
           if (cohortData?.customField?.length) {
             const district = cohortData?.customField?.find(
-              (item: CustomField) => item?.label === 'DISTRICTS'
+              (item: CustomField) => item?.label === 'DISTRICT'
             );
 
             if (district) {
@@ -229,7 +229,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
             }
 
             const state = cohortData?.customField?.find(
-              (item: CustomField) => item?.label === 'STATES'
+              (item: CustomField) => item?.label === 'STATE'
             );
 
             if (state) {
@@ -238,7 +238,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
             }
 
             const blockField = cohortData?.customField?.find(
-              (field: any) => field?.label === 'BLOCKS'
+              (field: any) => field?.label === 'BLOCK'
             );
 
             if (blockObject) {
