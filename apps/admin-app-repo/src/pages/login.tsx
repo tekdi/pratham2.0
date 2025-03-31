@@ -193,9 +193,14 @@ const LoginPage = () => {
 
               if (boardValues.length > 0) {
                 console.log(boardValues);
-                localStorage.setItem('userSpecificBoard', JSON.stringify(boardValues));
+                localStorage.setItem(
+                  'userSpecificBoard',
+                  JSON.stringify(boardValues)
+                );
               } else {
-                console.log('No BOARD field found in customFields. Skipping localStorage update.');
+                console.log(
+                  'No BOARD field found in customFields. Skipping localStorage update.'
+                );
               }
             }
 
@@ -296,8 +301,10 @@ const LoginPage = () => {
                     window.location.href = '/centers';
                     router.push('/centers', undefined, { locale: locale });
                   } else if (
-                    userInfo?.role === Role.ADMIN || Role.CENTRAL_ADMIN &&
-                    userInfo?.tenantData[0]?.tenantName == TenantName.YOUTHNET
+                    userInfo?.role === Role.ADMIN ||
+                    (Role.CENTRAL_ADMIN &&
+                      userInfo?.tenantData[0]?.tenantName ==
+                        TenantName.YOUTHNET)
                   ) {
                     window.location.href = '/mentor';
                     router.push('/mentor', undefined, { locale: locale });
@@ -379,9 +386,7 @@ const LoginPage = () => {
                 Storage.USER_DATA,
                 JSON.stringify(userResponse)
               );
-              const tenantId =
-                userResponse?.tenantData?.[0]?.tenantId ||
-                process.env.NEXT_PUBLIC_TENANT_ID;
+              const tenantId = userResponse?.tenantData?.[0]?.tenantId;
               TenantService.setTenantId(tenantId);
               localStorage.setItem('tenantId', tenantId);
             }
