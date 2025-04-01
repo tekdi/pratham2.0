@@ -86,7 +86,7 @@ export enum sessionType {
 }
 
 export enum cohortPrivileges {
-  STUDENT = 'student',
+  STUDENT = 'Learner',
 }
 
 export enum FormContext {
