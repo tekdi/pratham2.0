@@ -163,7 +163,8 @@ const CentersPage = () => {
             });
 
             if (
-              accessGranted('showBlockLevelCohort', accessControl, userRole) && response
+              accessGranted('showBlockLevelCohort', accessControl, userRole) &&
+              response
             ) {
               const blockData = response.map((block: any) => {
                 const blockName = block.cohortName;
@@ -171,12 +172,12 @@ const CentersPage = () => {
                 localStorage.setItem('blockParentId', blockId);
 
                 const stateField = block?.customField.find(
-                  (field: any) => field.label === 'STATES'
+                  (field: any) => field.label === 'STATE'
                 );
                 const state = stateField ? stateField.value : '';
 
                 const districtField = block?.customField.find(
-                  (field: any) => field.label === 'DISTRICTS'
+                  (field: any) => field.label === 'DISTRICT'
                 );
                 const district = districtField ? districtField.value : '';
                 return { blockName, blockId, state, district };
@@ -185,7 +186,8 @@ const CentersPage = () => {
             }
 
             if (
-              accessGranted('showBlockLevelCohort', accessControl, userRole) && response
+              accessGranted('showBlockLevelCohort', accessControl, userRole) &&
+              response
             ) {
               response.map((res: any) => {
                 const centerData = res?.childData.map((child: any) => {
@@ -205,7 +207,10 @@ const CentersPage = () => {
               });
             }
 
-            if (accessGranted('showTeacherCohorts', accessControl, userRole) && response) {
+            if (
+              accessGranted('showTeacherCohorts', accessControl, userRole) &&
+              response
+            ) {
               const cohortData = response.map((center: any) => {
                 const cohortName = center.cohortName;
                 const cohortId = center.cohortId;
@@ -228,7 +233,7 @@ const CentersPage = () => {
           }
         }
       } catch (error) {
-        console.log("error", error);
+        console.log('error', error);
         showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
       }
     };
@@ -537,32 +542,35 @@ const CentersPage = () => {
                       center.centerType?.toUpperCase() === CenterType.REGULAR ||
                       center.centerType === ''
                   ) && (
-                      <CenterList
-                        title="CENTERS.REGULAR_CENTERS"
-                        
-                        centers={filteredCenters
-                          .filter((center) => center.centerType?.toUpperCase() === CenterType.REGULAR || center.centerType === '')
-                          }
-                        router={router}
-                        theme={theme}
-                        t={t}
-                      />
-                    )}
+                    <CenterList
+                      title="CENTERS.REGULAR_CENTERS"
+                      centers={filteredCenters.filter(
+                        (center) =>
+                          center.centerType?.toUpperCase() ===
+                            CenterType.REGULAR || center.centerType === ''
+                      )}
+                      router={router}
+                      theme={theme}
+                      t={t}
+                    />
+                  )}
 
                   {/* Remote Centers */}
                   {filteredCenters.some(
                     (center) =>
                       center.centerType?.toUpperCase() === CenterType.REMOTE
                   ) && (
-                      <CenterList
-                        title="CENTERS.REMOTE_CENTERS"
-                        centers={filteredCenters
-                          .filter((center) => center.centerType?.toUpperCase() === CenterType.REMOTE)}
-                        router={router}
-                        theme={theme}
-                        t={t}
-                      />
-                    )}
+                    <CenterList
+                      title="CENTERS.REMOTE_CENTERS"
+                      centers={filteredCenters.filter(
+                        (center) =>
+                          center.centerType?.toUpperCase() === CenterType.REMOTE
+                      )}
+                      router={router}
+                      theme={theme}
+                      t={t}
+                    />
+                  )}
                 </>
               ) : (
                 <NoDataFound />
