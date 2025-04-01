@@ -157,7 +157,7 @@ const CoursePlannerDetail = () => {
     try {
       const solutionResponse = await getSolutionDetails({
         id: solutionId,
-        role: 'Teacher',
+        role: 'Instructor',
       });
 
       const externalId = solutionResponse?.result?.externalId;
@@ -217,13 +217,10 @@ const CoursePlannerDetail = () => {
 
   const handleToggleAll = () => {
     const allOpen = Object.values(expandedPanels).every(Boolean);
-    const newState = Object.keys(expandedPanels).reduce(
-      (acc, key) => {
-        acc[key] = !allOpen;
-        return acc;
-      },
-      {} as { [key: string]: boolean }
-    );
+    const newState = Object.keys(expandedPanels).reduce((acc, key) => {
+      acc[key] = !allOpen;
+      return acc;
+    }, {} as { [key: string]: boolean });
     setExpandedPanels(newState);
     const windowUrl = window.location.pathname;
 
@@ -724,8 +721,8 @@ const CoursePlannerDetail = () => {
                                         )
                                           ? '#FF9800'
                                           : isStatusCompleted(subTopic._id)
-                                            ? '#4CAF50'
-                                            : '#7C766e',
+                                          ? '#4CAF50'
+                                          : '#7C766e',
                                         cursor: isStatusCompleted(subTopic._id)
                                           ? 'default'
                                           : 'pointer',
@@ -762,9 +759,9 @@ const CoursePlannerDetail = () => {
                                   <Box
                                     sx={{ fontSize: '12px', fontWeight: '500' }}
                                   >
-                                    {`${subTopic?.learningResources?.length} ${t(
-                                      'COURSE_PLANNER.RESOURCES'
-                                    )}`}
+                                    {`${
+                                      subTopic?.learningResources?.length
+                                    } ${t('COURSE_PLANNER.RESOURCES')}`}
                                   </Box>
                                   <ArrowForwardIcon sx={{ fontSize: '16px' }} />
                                 </Box>
@@ -788,7 +785,9 @@ const CoursePlannerDetail = () => {
         </div>
         <FacilitatorDrawer
           secondary={t('COMMON.CANCEL')}
-          primary={`${t('COURSE_PLANNER.MARK_AS_COMPLETED')} (${selectedCount})`}
+          primary={`${t(
+            'COURSE_PLANNER.MARK_AS_COMPLETED'
+          )} (${selectedCount})`}
           toggleDrawer={toggleDrawer}
           drawerState={drawerState}
           onPrimaryClick={() => {
