@@ -522,8 +522,8 @@ const Facilitator = () => {
         <SimpleModal
           open={openModal}
           onClose={handleCloseModal}
-          // showFooter={!isEdit ? true : false}
-          // primaryText={isReassign ? '' :'Next'}
+          showFooter={!isEdit ? true : false}
+          primaryText={isReassign ? '' :'Next'}
           id="dynamic-form-id"
           modalTitle={
             isEdit

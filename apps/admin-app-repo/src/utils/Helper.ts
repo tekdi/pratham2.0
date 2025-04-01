@@ -618,3 +618,10 @@ export const filterSchema = (schemaObj: any, role: any) => {
 
   return { newSchema, extractedFields };
 };
+
+export function getReassignPayload(removedId: Array<string>, newCohortId: Array<string>) {
+    const cohortId = newCohortId;
+    const removedIds = removedId.filter((id: string) => !cohortId.includes(id));
+
+    return { cohortId, removedIds };
+}

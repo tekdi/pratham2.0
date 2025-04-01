@@ -258,7 +258,7 @@
     "LEARNER_UPDATED_SUCCESSFULLY": "Learner has been successfully updated!",
     "EDIT_LEARNER": "Edit Learner",
     "NO_LEARNERS_FOUND": "No Learners Found",
-    "RE_ASSIGN_facilitator":"Re-assign Facilitator"
+    "RE_ASSIGN_LEARNER":"Re-assign Learner"
   },
   "MENTORS": {
     "SEARCHBAR_PLACEHOLDER": "Search mentors..",

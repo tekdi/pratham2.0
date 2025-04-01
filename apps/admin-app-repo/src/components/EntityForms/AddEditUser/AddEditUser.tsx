@@ -5,7 +5,7 @@ import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
 import { showToastMessage } from '../../Toastify';
 import { createUser, updateUser } from '@/services/CreateUserService';
-import { firstLetterInUpperCase, getUserFullName } from '@/utils/Helper';
+import { firstLetterInUpperCase, getReassignPayload, getUserFullName } from '@/utils/Helper';
 import { sendCredentialService } from '@/services/NotificationService';
 import {
   notificationCallback,
@@ -13,6 +13,7 @@ import {
   telemetryCallbacks,
 } from '@/components/DynamicForm/DynamicFormCallback';
 import {
+  bulkCreateCohortMembers,
   createCohort,
   updateCohortUpdate,
   updateReassignUser,
@@ -20,6 +21,7 @@ import {
 import { CohortTypes, RoleId } from '@/utils/app.constant';
 import _ from 'lodash';
 import StepperForm from '@/components/DynamicForm/StepperForm';
+import CohortManager from '@/utils/CohortManager';
 const AddEditUser = ({
   SuccessCallback,
   schema,
@@ -27,7 +29,7 @@ const AddEditUser = ({
   editPrefilledFormData,
   isEdit = false,
   isReassign = false,
-  editableUserId, //  user id from here
+  editableUserId,
   UpdateSuccessCallback,
   extraFields,
   extraFieldsUpdate,
@@ -92,8 +94,8 @@ const AddEditUser = ({
     keysToRemove.forEach((key) => delete isEditSchema.properties[key]);
     keysToRemove.forEach((key) => delete isEditUiSchema[key]);
     console.log('schema', schema);
-  } else if (isReassign) {
-    const keysToHave = ['state', 'district', 'block', ...(isExtraFields ? ['village' , 'center' ] : [])];
+  } else if (isReassign) { 
+    const keysToHave = ['state', 'district', 'block', ...(isExtraFields ? ['village', 'center', 'batch'] : [])];
     isEditSchema = {
       type: 'object',
       properties: keysToHave.reduce((obj, key) => {
@@ -110,7 +112,7 @@ const AddEditUser = ({
       return obj;
     }, {});
   } else {
-    const keysToRemove = ['password', 'confirm_password', 'program']; //TODO: check 'program'
+    const keysToRemove = ['password', 'confirm_password', 'program'];
     keysToRemove.forEach((key) => delete schema?.properties[key]);
     keysToRemove.forEach((key) => delete uiSchema[key]);
   }
@@ -172,34 +174,21 @@ const AddEditUser = ({
       }
     } else if (isReassign) {
       try {
+        // console.log('new', formData?.batch);
+        // console.log(editPrefilledFormData?.batch, 'old');
+
+        console.log('payload', payload);
         const reassignmentPayload = {
-          userData: {
-            firstName: formData.firstName,
-          },
+          ...payload,
           automaticMember: {
             value: true,
             fieldId: blockFieldId,
             fieldName: "BLOCK",
           },
-          customFields: [
-            {
-              fieldId: districtFieldId,
-              value: [payload.customFields[1].value[0]],
-            },
-            {
-              fieldId: blockFieldId,
-              value: [payload.customFields[2].value[0]],
-            },
-            ...(villageFieldId
-              ? [
-                {
-                  fieldId: villageFieldId,
-                  value: [payload.customFields[3].value[0]],
-                },
-              ]
-              : []),
-          ],
-        };
+          userData: {
+            firstName: formData.firstName,
+          },
+        }; 
         const resp = await updateReassignUser(editableUserId, reassignmentPayload);
         if (resp) {
           showToastMessage(t(successUpdateMessage), 'success');
@@ -209,6 +198,16 @@ const AddEditUser = ({
           console.error('Error reassigning user:', error);
           showToastMessage(t(failureUpdateMessage), 'error');
         }
+        if (payload.batch) {
+          const cohortIdPayload = getReassignPayload(editPrefilledFormData.batch, formData.batch);
+          const res = await bulkCreateCohortMembers({
+            userId: [editableUserId],
+            cohortId: cohortIdPayload.cohortId,
+            removeCohortId: cohortIdPayload.removedIds,
+          });
+        }
+
+
       } catch (error) {
         console.error('Error reassigning user:', error);
         showToastMessage(t(failureUpdateMessage), 'error');
@@ -242,7 +241,7 @@ const AddEditUser = ({
         payload.tenantCohortRoleMapping[0]['cohortIds'] = cohortIds;
 
         delete payload.batch;
-        delete payload.center;
+        // delete payload.center;
       }
       try {
         if (isNotificationRequired) {
@@ -379,18 +378,14 @@ const AddEditUser = ({
           role={type}
         />
       ) : (
-        schema &&
-        uiSchema && (
-            <DynamicForm
-              schema={isEdit || isReassign ? isEditSchema : schema}
-              uiSchema={isEdit || isReassign ? isEditUiSchema : uiSchema}
-              t={t}
-              FormSubmitFunction={FormSubmitFunction}
-              prefilledFormData={prefilledFormData || {}}
-              extraFields={isEdit || isReassign ? extraFieldsUpdate : extraFields}
-            />
-
-        )
+        <DynamicForm
+          schema={isEdit || isReassign ? isEditSchema : schema}
+          uiSchema={isEdit || isReassign ? isEditUiSchema : uiSchema}
+          t={t}
+          FormSubmitFunction={FormSubmitFunction}
+          prefilledFormData={prefilledFormData || {}}
+            extraFields={isEdit || isReassign ? extraFieldsUpdate : extraFields}
+        />
       )}
     </>
   );

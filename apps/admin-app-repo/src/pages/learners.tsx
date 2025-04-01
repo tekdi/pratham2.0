@@ -47,6 +47,7 @@ import { getCohortList } from '@/services/GetCohortList';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import apartment from '../../public/images/apartment.svg';
+import { getCenterList } from '@/services/MasterDataService';
 
 const Learner = () => {
   const theme = useTheme<any>();
@@ -71,6 +72,8 @@ const Learner = () => {
   const [open, setOpen] = useState(false);
   const [checked, setChecked] = useState(false);
   const [userID, setUserId] = useState('');
+  const [centerSelectiveValue, setCenterSelectiveValue] = useState('');
+  const [cohorts, setCohorts] = useState([]);
   const [userData, setUserData] = useState({
     firstName: '',
     lastName: '',
@@ -81,6 +84,7 @@ const Learner = () => {
   const [blockFieldId, setBlockFieldId] = useState('');
   const [districtFieldId, setDistrictFieldId] = useState('');
   const [villageFieldId, setVillageFieldId] = useState('');
+  const [parentId, setParentId] = useState('');
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
     ? { state: [localStorage.getItem('stateId')] }
@@ -116,9 +120,9 @@ const Learner = () => {
         },
       ]);
       console.log('responseForm', responseForm);
-      const districtFieldId = responseForm.schema.properties.district.fieldId;
-      const blockFieldId = responseForm.schema.properties.block.fieldId;
-      const villageFieldId = responseForm.schema.properties.village.fieldId;
+      const districtFieldId = responseForm?.schema?.properties?.district?.fieldId;
+      const blockFieldId = responseForm?.schema?.properties?.block?.fieldId;
+      const villageFieldId = responseForm?.schema?.properties?.village?.fieldId;
 
       // const centerFieldId = responseForm.schema.properties.center.fieldId;
 
@@ -171,7 +175,7 @@ const Learner = () => {
       userList,
       staticSort
     );
-  };
+  };  
 
   // Define table columns
   const columns = [
@@ -311,6 +315,23 @@ const Learner = () => {
     }
   };
 
+  const fetchUserData = async (userId) => {
+    try {
+      let activeCohortIds = [];
+      const resp = await getCohortList(userId);
+      if (resp?.result) {
+         activeCohortIds = resp.result
+          .filter((cohort) => cohort.type === 'BATCH' && cohort.cohortStatus === 'active')
+          .map((cohort) => cohort.cohortId);
+        console.log(activeCohortIds , 'activeBatches');
+      }
+      return activeCohortIds;
+    } catch (error) {
+      console.error('Error getting user details:', error);
+      return null;
+    }
+  };
+
   // Define actions
   const actions = [
     {
@@ -338,7 +359,7 @@ const Learner = () => {
         setPrefilledAddFormData(tempFormData);
         setIsEdit(true);
         setEditableUserId(row?.userId);
-        handleOpenModal();
+        handleOpenModal();      
       },
     },
     {
@@ -366,17 +387,7 @@ const Learner = () => {
 
         // console.log('row:', row?.customFields[2].selectedValues[0].value);
         setEditableUserId(row?.userId);
-        // const memberStatus = Status.ARCHIVED;
-        // const statusReason = '';
-        // const membershipId = row?.userId;
 
-        // const response = await updateCohortMemberStatus({
-        //   memberStatus,
-        //   statusReason,
-        //   membershipId,
-        // });
-        // setPrefilledFormData({});
-        // searchData(prefilledFormData, currentPage);
         setOpen(true);
 
         setUserId(row?.userId);
@@ -403,12 +414,23 @@ const Learner = () => {
           <Image src={apartment} alt="" />
         </Box>
       ),
-      callback: (row) => {
-        // console.log('row:', row);
+      callback: async (row) => {
+        console.log('row:', row);
+        const centerField = row.customFields.find(field => field.label === "CENTER");
+        if (centerField) {
+          setCenterSelectiveValue(centerField.selectedValues);
+        } else {
+          console.log('CENTER field not found');
+        }
         // console.log('AddSchema', addSchema);
         // console.log('AddUISchema', addUiSchema);
 
+        let batchList = await fetchUserData(row?.userId);
         let tempFormData = extractMatchingKeys(row, addSchema);
+        tempFormData={
+          ...tempFormData,
+          batch: batchList
+        }
         setPrefilledAddFormData(tempFormData);
         // setIsEdit(true);
         setIsReassign(true);
@@ -499,7 +521,7 @@ const Learner = () => {
               handleOpenModal();
             }}
           >
-            {t('COMMON.ADD_NEW')}{' '}
+            {t('COMMON.ADD_NEW')}
           </Button>
         </Box>
 
@@ -508,9 +530,8 @@ const Learner = () => {
           onClose={handleCloseModal}
           showFooter={false}
           modalTitle={
-
             isEdit ? t('LEARNERS.EDIT_LEARNER') : isReassign
-              ? t('LEARNERS.RE_ASSIGN_facilitator'): t('LEARNERS.NEW_LEARNER') 
+              ? t('LEARNERS.RE_ASSIGN_LEARNER'): t('LEARNERS.NEW_LEARNER') 
           }
         >
           <AddEditUser

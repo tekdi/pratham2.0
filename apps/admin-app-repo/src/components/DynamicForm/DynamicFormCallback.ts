@@ -129,6 +129,10 @@ export const extractMatchingKeys = (row: any, schema: any) => {
         return selectedValues[0].id;
       }
     }
+    //patch for type = array and selected value = string
+    else if(type==='array'){
+      return [selectedValues];
+    }
     return null; // Default if conditions not met
   };
   const convertArrayToStrings = (arr) => {
