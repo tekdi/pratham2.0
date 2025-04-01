@@ -43,7 +43,7 @@ export enum Role {
   TEAM_LEADER = 'Lead',
   ADMIN = 'State Lead',
   CENTRAL_ADMIN = 'Central Lead',
-  LEARNERS = 'Learners',
+  LEARNERS = 'Learner',
   FACILITATORS = 'Facilitators',
   TEAM_LEADERS = 'Team Leaders',
   CONTENT_CREATOR = 'Content Creator',

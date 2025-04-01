@@ -36,7 +36,7 @@ import { showToastMessage } from '@/components/Toastify';
 import UpDownButton from '@/components/UpDownButton';
 import { getMyCohortMemberList } from '@/services/MyClassDetailsService';
 import useStore from '@/store/store';
-import { Status, Telemetry } from '@/utils/app.constant';
+import { Role, Status, Telemetry } from '@/utils/app.constant';
 import { calculatePercentage } from '@/utils/attendanceStats';
 import { logEvent } from '@/utils/googleAnalytics';
 import withAccessControl from '@/utils/hoc/withAccessControl';
@@ -209,7 +209,7 @@ const UserAttendanceHistory = () => {
             contextId: classId,
             fromDate: fromDateFormatted,
             toDate: toDateFormatted,
-            scope: 'student',
+            scope: Role.STUDENT,
           },
           facets: ['attendanceDate'],
         };
@@ -288,7 +288,7 @@ const UserAttendanceHistory = () => {
                   fromDate: shortDateFormat(selectedDate || currentDate),
                   toDate: shortDateFormat(selectedDate || currentDate),
                   contextId: classId,
-                  scope: 'student',
+                  scope: Role.STUDENT,
                 },
               };
               const res = await attendanceStatusList(attendanceStatusData);

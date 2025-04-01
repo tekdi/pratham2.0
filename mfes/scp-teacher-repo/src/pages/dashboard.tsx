@@ -352,7 +352,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
                 contextId: classId,
                 fromDate,
                 toDate,
-                scope: 'student',
+                scope: Role.STUDENT,
               };
               const response = await classesMissedAttendancePercentList({
                 filters,
@@ -425,7 +425,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
                 limit: AttendanceAPILimit,
                 page: 0,
                 filters: {
-                  scope: 'student',
+                  scope: Role.STUDENT,
                   fromDate: startDateRange,
                   toDate: endDateRange,
                   contextId: classId,
