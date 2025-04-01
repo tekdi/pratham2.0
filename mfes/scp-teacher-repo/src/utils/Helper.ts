@@ -427,7 +427,9 @@ export const getCurrentYearPattern = () => {
     const lastDigit = currentYear % 10;
     const middleDigit = Math.floor((currentYear % 100) / 10);
 
-    regexPart = `20[0-${middleDigit - 1}][0-9]|20${middleDigit}[0-${lastDigit}]`;
+    regexPart = `20[0-${
+      middleDigit - 1
+    }][0-9]|20${middleDigit}[0-${lastDigit}]`;
   }
 
   // Full regex covering 1900–1999, 2000 to current year
@@ -436,9 +438,9 @@ export const getCurrentYearPattern = () => {
 
 export const extractAddress = (
   fields: any[],
-  stateLabel: string = 'STATES',
-  districtLabel: string = 'DISTRICTS',
-  blockLabel: string = 'BLOCKS',
+  stateLabel: string = 'STATE',
+  districtLabel: string = 'DISTRICT',
+  blockLabel: string = 'BLOCK',
   searchKey: string = 'label',
   returnKey: string = 'value',
   toPascalCase: (str: string) => string = (str) => str // Default to identity function if not provided
@@ -715,7 +717,7 @@ export const updateStoreFromCohorts = (
   const setStateName = manageUserStore.getState().setStateName;
 
   const district = activeCohorts?.[0]?.customField?.find(
-    (item: any) => item?.label === 'DISTRICTS'
+    (item: any) => item?.label === 'DISTRICT'
   );
   if (district) {
     setDistrictCode(district?.code);
@@ -724,7 +726,7 @@ export const updateStoreFromCohorts = (
   }
 
   const state = activeCohorts?.[0]?.customField?.find(
-    (item: any) => item?.label === 'STATES'
+    (item: any) => item?.label === 'STATE'
   );
 
   if (state) {
@@ -751,12 +753,16 @@ export function formatEndDate({ diffDays }: any) {
       const months = Math.floor(remainingDays / 30.44);
       const days = Math.round(remainingDays % 30.44);
 
-      remainingTime = `${years} year(s)${months > 0 ? `, ${months} month(s)` : ''}${days > 0 ? `,  ${days} day(s)` : ''}`;
+      remainingTime = `${years} year(s)${
+        months > 0 ? `, ${months} month(s)` : ''
+      }${days > 0 ? `,  ${days} day(s)` : ''}`;
     } else if (diffDays > 31) {
       const months = Math.floor(diffDays / 30.44);
       const days = Math.round(diffDays % 30.44);
 
-      remainingTime = `${months} month(s) ${days > 0 ? ` , ${days} day(s)` : ''}`;
+      remainingTime = `${months} month(s) ${
+        days > 0 ? ` , ${days} day(s)` : ''
+      }`;
     } else {
       remainingTime = `${diffDays} day(s)`;
     }
@@ -831,7 +837,7 @@ export interface UserEntry {
   memberStatus: string;
   createdAt: string;
   updatedAt: string;
-  firstName?: string
+  firstName?: string;
 }
 
 export function getLatestEntries(
@@ -920,13 +926,12 @@ export const getBMG = (cohortData: any) => {
   return null;
 };
 
-
 export const getLastDayDate = (): string => {
   const currentDate = new Date();
   currentDate.setDate(currentDate.getDate() - 1); // Subtract 1 day
   const year = currentDate.getFullYear();
-  const month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Month is zero-indexed
-  const day = String(currentDate.getDate()).padStart(2, "0");
+  const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Month is zero-indexed
+  const day = String(currentDate.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 };
 
@@ -938,7 +943,7 @@ export const getAssessmentType = (type: string) => {
   } else {
     return AssessmentType.OTHER;
   }
-}
+};
 export const preserveLocalStorage = () => {
   const keysToKeep = [
     'preferredLanguage',

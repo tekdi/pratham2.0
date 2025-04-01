@@ -105,9 +105,9 @@ export interface UserList {
   limit: number;
   page: number;
   filters: {
-    states: string;
-    districts: string;
-    blocks: string;
+    state: string;
+    district: string;
+    block: string;
     role?: string;
   };
   fields: string[];
@@ -932,28 +932,27 @@ export interface VillageDetailProps {
   onClick?: () => void;
 }
 
-
 export interface Block {
-    id: number;
-    name: string;
-    selectedCount: number;
-    handleNext?: any;
+  id: number;
+  name: string;
+  selectedCount: number;
+  handleNext?: any;
 }
 
 export interface BlockItemProps {
-    name: string;
-    selectedCount: number;
-    onClick: () => void;
-    handleNext ? : any;
+  name: string;
+  selectedCount: number;
+  onClick: () => void;
+  handleNext?: any;
 }
 
 export interface AssignVillagesProps {
-    district: string;
-    blocks: Block[];
-    onBlockClick: (block: Block) => void;
-    handleNext?: any;
+  district: string;
+  blocks: Block[];
+  onBlockClick: (block: Block) => void;
+  handleNext?: any;
 }
 
 export interface ExamplePageProps {
-    handleNext: () => void;
+  handleNext: () => void;
 }
