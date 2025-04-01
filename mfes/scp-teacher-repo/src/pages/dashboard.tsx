@@ -260,12 +260,12 @@ const Dashboard: React.FC<DashboardProps> = () => {
         response = await getUserDetails(userId, true);
       }
       const blockObject = response?.result?.userData?.customFields?.find(
-        (item: any) => item?.label === 'BLOCKS'
+        (item: any) => item?.label === 'BLOCK'
       );
       const cohortData = response?.result?.userData?.customFields;
 
       const state = cohortData?.find(
-        (item: CustomField) => item.label === 'STATES'
+        (item: CustomField) => item.label === 'STATE'
       );
       setState(state?.value);
 
@@ -458,7 +458,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
               const filters = {
                 fromDate: startDateRange,
                 toDate: endDateRange,
-                scope: 'student',
+                scope: 'Learner',
                 contextId: cohortId,
               };
 
@@ -624,7 +624,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
             contextId: classId,
             fromDate: fromDateFormatted,
             toDate: toDateFormatted,
-            scope: 'student',
+            scope: 'Learner',
           },
           facets: ['attendanceDate'],
         };
@@ -722,10 +722,10 @@ const Dashboard: React.FC<DashboardProps> = () => {
 
         if (cohortData?.customField?.length) {
           const district = cohortData.customField.find(
-            (item: CustomField) => item.label === 'DISTRICTS'
+            (item: CustomField) => item.label === 'DISTRICT'
           );
           const state = cohortData.customField.find(
-            (item: CustomField) => item.label === 'STATES'
+            (item: CustomField) => item.label === 'STATE'
           );
           setState(state?.value);
 
