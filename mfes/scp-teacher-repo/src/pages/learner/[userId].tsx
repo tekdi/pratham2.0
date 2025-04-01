@@ -327,9 +327,9 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
                 setAddress(
                   extractAddress(
                     fields,
-                    'STATES',
-                    'DISTRICTS',
-                    'BLOCKS',
+                    'STATE',
+                    'DISTRICT',
+                    'BLOCK',
                     'label',
                     'value',
                     toPascalCase

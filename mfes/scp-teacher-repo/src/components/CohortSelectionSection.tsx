@@ -129,7 +129,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
   );
 
   //center add fix
-  const [centerId, setCenterId] = useState("");
+  const [centerId, setCenterId] = useState('');
   const [filteredBatchData, setFilteredBatchData] = React.useState<any>();
   const [filteredManipulatedBatchData, setFilteredManipulatedBatchData] =
     React.useState<any>();
@@ -157,14 +157,13 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
       ?.filter((cohort: any) => cohort?.status?.toLowerCase() === Status.ACTIVE)
       ?.sort((a: any, b: any) => a.name.localeCompare(b.name));
 
-    setFilteredCohortData(filteredData);
+    setFilteredCohortData(filteredManipulatedData);
 
     setFilteredManipulatedCohortData(filteredManipulatedData);
-
   }, [manipulatedCohortData, cohortsData]);
 
   useEffect(() => {
-    if (centerId != "") {
+    if (centerId != '') {
       fetchBatch(centerId);
     }
   }, [centerId]);
@@ -174,7 +173,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
       setFilteredBatchData(filteredChildData);
       setFilteredManipulatedBatchData(filteredChildData);
     }
-  }
+  };
   const getBatchFilteredData = async (centerId: any) => {
     if (userId) {
       const response = await queryClient.fetchQuery({
@@ -182,17 +181,21 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
         queryFn: () => getCohortList(userId, { customField: 'true' }),
       });
       // Find the cohort where cohortId matches centerId
-      const targetCohort = response.find((item: any) => item.cohortId === centerId);
+      const targetCohort = response.find(
+        (item: any) => item.cohortId === centerId
+      );
       let filteredChildData = [];
       // Check if the cohort is found
       if (targetCohort) {
         // Filter childData to only keep active children
-        filteredChildData = targetCohort.childData.filter((child: any) => child.status === "active");
+        filteredChildData = targetCohort.childData.filter(
+          (child: any) => child.status === 'active'
+        );
       }
-      console.log("###### batch add filteredChildData", filteredChildData);
+      // console.log('batch add filteredChildData', filteredChildData);
       return filteredChildData;
     }
-  }
+  };
   useEffect(() => {
     if (userId) {
       if (!loading) {
@@ -212,12 +215,12 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
           }
           const blockObject =
             userDetailsResponse?.result?.userData?.customFields.find(
-              (item: any) => item?.label === 'BLOCKS'
+              (item: any) => item?.label === 'BLOCK'
             );
 
           if (cohortData?.customField?.length) {
             const district = cohortData?.customField?.find(
-              (item: CustomField) => item?.label === 'DISTRICTS'
+              (item: CustomField) => item?.label === 'DISTRICT'
             );
 
             if (district) {
@@ -226,7 +229,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
             }
 
             const state = cohortData?.customField?.find(
-              (item: CustomField) => item?.label === 'STATES'
+              (item: CustomField) => item?.label === 'STATE'
             );
 
             if (state) {
@@ -235,7 +238,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
             }
 
             const blockField = cohortData?.customField?.find(
-              (field: any) => field?.label === 'BLOCKS'
+              (field: any) => field?.label === 'BLOCK'
             );
 
             if (blockObject) {
@@ -288,16 +291,17 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                   customField: item?.customField,
                 }))
                 ?.filter(Boolean);
-                
 
               setCohorts(filteredData);
               if (filteredData.length > 0) {
                 if (typeof window !== 'undefined' && window.localStorage) {
-                  let filteredChildData = await getBatchFilteredData(filteredData?.[0]?.cohortId);
+                  let filteredChildData = await getBatchFilteredData(
+                    filteredData?.[0]?.cohortId
+                  );
                   setCohortsData([...filteredChildData]);
                   const cohort = localStorage.getItem('classId') || '';
                   if (cohort !== '') {
-                    console.log("###### batch add cohort test", cohort);
+                    // console.log('batch add cohort test', cohort);
                     setClassId(localStorage.getItem('classId') || '');
                   } else {
                     //add batch child data
@@ -312,7 +316,10 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                       'classId',
                       filteredChildData?.[0]?.cohortId
                     );
-                    localStorage.setItem('cohortId', filteredChildData?.[0]?.cohortId);
+                    localStorage.setItem(
+                      'cohortId',
+                      filteredChildData?.[0]?.cohortId
+                    );
                     setClassId(filteredChildData?.[0]?.cohortId);
                   }
                 }
@@ -352,8 +359,9 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                 })
                 ?.filter(Boolean);
 
-
-              let filteredChildData = await getBatchFilteredData(filteredData?.[0]?.cohortId);
+              let filteredChildData = await getBatchFilteredData(
+                filteredData?.[0]?.cohortId
+              );
               setCohortsData(filteredChildData);
               if (response[0].childData.length === 0) {
                 setLoading(false);
@@ -375,7 +383,10 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                       filteredChildData?.[0]?.cohortId
                     );
 
-                    localStorage.setItem('cohortId', filteredChildData?.[0]?.cohortId);
+                    localStorage.setItem(
+                      'cohortId',
+                      filteredChildData?.[0]?.cohortId
+                    );
                     setClassId(filteredChildData?.[0]?.cohortId);
                   }
                 }
@@ -405,10 +416,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
 
   const handleCohortSelection = async (event: SelectChangeEvent<string>) => {
     let filteredChildData = await getBatchFilteredData(event.target.value);
-    localStorage.setItem(
-      'classId',
-      filteredChildData?.[0]?.cohortId
-    );
+    localStorage.setItem('classId', filteredChildData?.[0]?.cohortId);
     localStorage.setItem('cohortId', filteredChildData?.[0]?.cohortId);
     setClassId(filteredChildData?.[0]?.cohortId);
     setCenterId(event.target.value);
@@ -467,7 +475,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
           sx={{
             '@media (min-width: 900px)': {
               marginTop: dashboard
-                ? teacher === 'Teacher'
+                ? teacher === 'Instructor'
                   ? '0px'
                   : '-25px'
                 : 'unset',
@@ -505,7 +513,9 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                             </InputLabel>
                           )}
                           <Select
-                            value={centerId || filteredCohortData?.[0]?.cohortId}
+                            value={
+                              centerId || filteredCohortData?.[0]?.cohortId
+                            }
                             labelId="center-select-label"
                             onChange={handleCohortSelection}
                             displayEmpty
@@ -710,22 +720,22 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                               showFloatingLabel
                                 ? { borderRadius: '4px' }
                                 : {
-                                  borderRadius: '0.5rem',
-                                  color: theme.palette.warning['200'],
-                                  width: '100%',
-                                  marginBottom: '0rem',
-                                  marginRight: '10px',
-                                  '@media (max-width: 902px)': {
-                                    width: isAttendanceOverview
-                                      ? '100%'
-                                      : '62%',
-                                  },
-                                  '@media (max-width: 702px)': {
-                                    width: isAttendanceOverview
-                                      ? '100%'
-                                      : '65%',
+                                    borderRadius: '0.5rem',
+                                    color: theme.palette.warning['200'],
+                                    width: '100%',
+                                    marginBottom: '0rem',
+                                    marginRight: '10px',
+                                    '@media (max-width: 902px)': {
+                                      width: isAttendanceOverview
+                                        ? '100%'
+                                        : '62%',
+                                    },
+                                    '@media (max-width: 702px)': {
+                                      width: isAttendanceOverview
+                                        ? '100%'
+                                        : '65%',
+                                    },
                                   }
-                                }
                             }
                           >
                             {filteredCohortData?.length !== 0 ? (
@@ -762,7 +772,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                       ) : (
                         <>
                           {showDisabledDropDown &&
-                            filteredCohortData?.length === 1 ? (
+                          filteredCohortData?.length === 1 ? (
                             <FormControl
                               disabled={true}
                               className={
@@ -817,9 +827,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                             labelId="batch-select-label"
                             label={showFloatingLabel ? t('COMMON.BATCH') : ''}
                             value={
-                              classId
-                                ? classId
-                                : filteredBatchData[0]?.cohortId
+                              classId ? classId : filteredBatchData[0]?.cohortId
                             }
                             onChange={handleBatchSelection}
                             // displayEmpty
@@ -842,22 +850,22 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                               showFloatingLabel
                                 ? { borderRadius: '4px' }
                                 : {
-                                  borderRadius: '0.5rem',
-                                  color: theme.palette.warning['200'],
-                                  width: '100%',
-                                  marginBottom: '0rem',
-                                  marginRight: '10px',
-                                  '@media (max-width: 902px)': {
-                                    width: isAttendanceOverview
-                                      ? '100%'
-                                      : '62%',
-                                  },
-                                  '@media (max-width: 702px)': {
-                                    width: isAttendanceOverview
-                                      ? '100%'
-                                      : '65%',
+                                    borderRadius: '0.5rem',
+                                    color: theme.palette.warning['200'],
+                                    width: '100%',
+                                    marginBottom: '0rem',
+                                    marginRight: '10px',
+                                    '@media (max-width: 902px)': {
+                                      width: isAttendanceOverview
+                                        ? '100%'
+                                        : '62%',
+                                    },
+                                    '@media (max-width: 702px)': {
+                                      width: isAttendanceOverview
+                                        ? '100%'
+                                        : '65%',
+                                    },
                                   }
-                                }
                             }
                           >
                             {filteredBatchData?.length !== 0 ? (
@@ -894,7 +902,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                       ) : (
                         <>
                           {showDisabledDropDown &&
-                            filteredBatchData?.length === 1 ? (
+                          filteredBatchData?.length === 1 ? (
                             <FormControl
                               disabled={true}
                               className={
@@ -904,13 +912,13 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                             >
                               {showFloatingLabel && (
                                 <InputLabel id="batch-select-label">
-                                  {t('COMMON.CENTER')}
+                                  {t('COMMON.BATCH')}
                                 </InputLabel>
                               )}
                               <Select
                                 labelId="batch-select-label"
                                 label={
-                                  showFloatingLabel ? t('COMMON.CENTER') : ''
+                                  showFloatingLabel ? t('COMMON.BATCH') : ''
                                 }
                                 value={filteredBatchData[0]?.cohortId}
                               >

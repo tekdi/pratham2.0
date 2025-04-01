@@ -220,9 +220,9 @@ const TeacherProfile: React.FC<TeacherProfileProp> = ({
         setAddress(
           extractAddress(
             fields,
-            'STATES',
-            'DISTRICTS',
-            'BLOCKS',
+            'STATE',
+            'DISTRICT',
+            'BLOCK',
             'label',
             'value',
             toPascalCase

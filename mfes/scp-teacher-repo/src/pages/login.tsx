@@ -303,13 +303,13 @@ const LoginPage = () => {
                   userDetails?.result?.userData?.customFields;
                 if (customFields?.length) {
                   const state = customFields.find(
-                    (field: any) => field?.label === 'STATES'
+                    (field: any) => field?.label === 'STATE'
                   );
                   const district = customFields.find(
-                    (field: any) => field?.label === 'DISTRICTS'
+                    (field: any) => field?.label === 'DISTRICT'
                   );
                   const block = customFields.find(
-                    (field: any) => field?.label === 'BLOCKS'
+                    (field: any) => field?.label === 'BLOCK'
                   );
 
                   if (state) {
