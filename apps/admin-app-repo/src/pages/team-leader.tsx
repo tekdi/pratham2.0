@@ -447,12 +447,11 @@ const TeamLeader = () => {
           onClose={handleCloseModal}
           showFooter={false}
           modalTitle={
-             isEdit
+            isEdit
               ? t('TEAM_LEADERS.EDIT_TEAM_LEADER')
               : isReassign
-                ? t('TEAM_LEADERS.RE_ASSIGN_TEAM_LEAD')
-                : t('TEAM_LEADERS.NEW_TEAM_LEADER')
-
+              ? t('TEAM_LEADERS.RE_ASSIGN_TEAM_LEAD')
+              : t('TEAM_LEADERS.NEW_TEAM_LEADER')
           }
         >
           <AddEditUser

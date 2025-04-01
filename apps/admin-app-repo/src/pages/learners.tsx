@@ -120,7 +120,8 @@ const Learner = () => {
         },
       ]);
       console.log('responseForm', responseForm);
-      const districtFieldId = responseForm?.schema?.properties?.district?.fieldId;
+      const districtFieldId =
+        responseForm?.schema?.properties?.district?.fieldId;
       const blockFieldId = responseForm?.schema?.properties?.block?.fieldId;
       const villageFieldId = responseForm?.schema?.properties?.village?.fieldId;
 
@@ -128,7 +129,7 @@ const Learner = () => {
 
       setBlockFieldId(blockFieldId);
       setDistrictFieldId(districtFieldId);
-      setVillageFieldId(villageFieldId)
+      setVillageFieldId(villageFieldId);
       setAddSchema(responseForm?.schema);
       setAddUiSchema(responseForm?.uiSchema);
     };
@@ -175,7 +176,7 @@ const Learner = () => {
       userList,
       staticSort
     );
-  };  
+  };
 
   // Define table columns
   const columns = [
@@ -320,10 +321,13 @@ const Learner = () => {
       let activeCohortIds = [];
       const resp = await getCohortList(userId);
       if (resp?.result) {
-         activeCohortIds = resp.result
-          .filter((cohort) => cohort.type === 'BATCH' && cohort.cohortStatus === 'active')
+        activeCohortIds = resp.result
+          .filter(
+            (cohort) =>
+              cohort.type === 'BATCH' && cohort.cohortStatus === 'active'
+          )
           .map((cohort) => cohort.cohortId);
-        console.log(activeCohortIds , 'activeBatches');
+        console.log(activeCohortIds, 'activeBatches');
       }
       return activeCohortIds;
     } catch (error) {
@@ -359,7 +363,7 @@ const Learner = () => {
         setPrefilledAddFormData(tempFormData);
         setIsEdit(true);
         setEditableUserId(row?.userId);
-        handleOpenModal();      
+        handleOpenModal();
       },
     },
     {
@@ -416,7 +420,9 @@ const Learner = () => {
       ),
       callback: async (row) => {
         console.log('row:', row);
-        const centerField = row.customFields.find(field => field.label === "CENTER");
+        const centerField = row.customFields.find(
+          (field) => field.label === 'CENTER'
+        );
         if (centerField) {
           setCenterSelectiveValue(centerField.selectedValues);
         } else {
@@ -427,10 +433,10 @@ const Learner = () => {
 
         let batchList = await fetchUserData(row?.userId);
         let tempFormData = extractMatchingKeys(row, addSchema);
-        tempFormData={
+        tempFormData = {
           ...tempFormData,
-          batch: batchList
-        }
+          batch: batchList,
+        };
         setPrefilledAddFormData(tempFormData);
         // setIsEdit(true);
         setIsReassign(true);
@@ -530,8 +536,11 @@ const Learner = () => {
           onClose={handleCloseModal}
           showFooter={false}
           modalTitle={
-            isEdit ? t('LEARNERS.EDIT_LEARNER') : isReassign
-              ? t('LEARNERS.RE_ASSIGN_LEARNER'): t('LEARNERS.NEW_LEARNER') 
+            isEdit
+              ? t('LEARNERS.EDIT_LEARNER')
+              : isReassign
+              ? t('LEARNERS.RE_ASSIGN_LEARNER')
+              : t('LEARNERS.NEW_LEARNER')
           }
         >
           <AddEditUser

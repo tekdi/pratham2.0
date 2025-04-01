@@ -677,7 +677,7 @@
   },
   "WHATS_YOUR_GENDER": "Gender",
   "first_name": " First Name",
-  "+": "Middle Name",
+  "middle_name  ": "Middle Name",
   "last_name": "Last Name",
   "phone_number": "Phone Number",
   "STATE": "State",

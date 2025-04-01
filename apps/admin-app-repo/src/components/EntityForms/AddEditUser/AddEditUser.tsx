@@ -5,7 +5,11 @@ import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
 import { showToastMessage } from '../../Toastify';
 import { createUser, updateUser } from '@/services/CreateUserService';
-import { firstLetterInUpperCase, getReassignPayload, getUserFullName } from '@/utils/Helper';
+import {
+  firstLetterInUpperCase,
+  getReassignPayload,
+  getUserFullName,
+} from '@/utils/Helper';
 import { sendCredentialService } from '@/services/NotificationService';
 import {
   notificationCallback,
@@ -44,7 +48,7 @@ const AddEditUser = ({
   notificationContext,
   isNotificationRequired = true,
   blockFieldId,
-  districtFieldId, 
+  districtFieldId,
   isExtraFields = true,
   villageFieldId,
   centerFieldId,
@@ -52,7 +56,6 @@ const AddEditUser = ({
 }) => {
   console.log(editPrefilledFormData, 'editPrefilledFormData');
 
-  
   const [isLoading, setIsLoading] = useState(false);
   const [showAssignmentScreen, setShowAssignmentScreen] =
     useState<boolean>(false);
@@ -94,8 +97,13 @@ const AddEditUser = ({
     keysToRemove.forEach((key) => delete isEditSchema.properties[key]);
     keysToRemove.forEach((key) => delete isEditUiSchema[key]);
     console.log('schema', schema);
-  } else if (isReassign) { 
-    const keysToHave = ['state', 'district', 'block', ...(isExtraFields ? ['village', 'center', 'batch'] : [])];
+  } else if (isReassign) {
+    const keysToHave = [
+      'state',
+      'district',
+      'block',
+      ...(isExtraFields ? ['village', 'center', 'batch'] : []),
+    ];
     isEditSchema = {
       type: 'object',
       properties: keysToHave.reduce((obj, key) => {
@@ -119,10 +127,9 @@ const AddEditUser = ({
 
   const FormSubmitFunction = async (formData: any, payload: any) => {
     setPrefilledFormData(formData);
-    console.log(formData,'formdata');
-    console.log(payload , "payload");
-    
-    
+    console.log(formData, 'formdata');
+    console.log(payload, 'payload');
+
     if (isEdit) {
       if (isNotificationRequired) {
         try {
@@ -183,13 +190,16 @@ const AddEditUser = ({
           automaticMember: {
             value: true,
             fieldId: blockFieldId,
-            fieldName: "BLOCK",
+            fieldName: 'BLOCK',
           },
           userData: {
             firstName: formData.firstName,
           },
-        }; 
-        const resp = await updateReassignUser(editableUserId, reassignmentPayload);
+        };
+        const resp = await updateReassignUser(
+          editableUserId,
+          reassignmentPayload
+        );
         if (resp) {
           showToastMessage(t(successUpdateMessage), 'success');
           telemetryCallbacks(telemetryUpdateKey);
@@ -199,15 +209,16 @@ const AddEditUser = ({
           showToastMessage(t(failureUpdateMessage), 'error');
         }
         if (payload.batch) {
-          const cohortIdPayload = getReassignPayload(editPrefilledFormData.batch, formData.batch);
+          const cohortIdPayload = getReassignPayload(
+            editPrefilledFormData.batch,
+            formData.batch
+          );
           const res = await bulkCreateCohortMembers({
             userId: [editableUserId],
             cohortId: cohortIdPayload.cohortId,
             removeCohortId: cohortIdPayload.removedIds,
           });
         }
-
-
       } catch (error) {
         console.error('Error reassigning user:', error);
         showToastMessage(t(failureUpdateMessage), 'error');
@@ -384,7 +395,7 @@ const AddEditUser = ({
           t={t}
           FormSubmitFunction={FormSubmitFunction}
           prefilledFormData={prefilledFormData || {}}
-            extraFields={isEdit || isReassign ? extraFieldsUpdate : extraFields}
+          extraFields={isEdit || isReassign ? extraFieldsUpdate : extraFields}
         />
       )}
     </>

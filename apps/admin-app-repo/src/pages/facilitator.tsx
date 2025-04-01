@@ -52,7 +52,6 @@ import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import apartment from '../../public/images/apartment.svg';
 
-
 const Facilitator = () => {
   const theme = useTheme<any>();
   const [isLoading, setIsLoading] = useState(false);
@@ -125,11 +124,10 @@ const Facilitator = () => {
       const blockFieldId = responseForm?.schema?.properties?.block.fieldId;
       const villageFieldId = responseForm?.schema?.properties?.village?.fieldId;
       // const centerFieldId = responseForm?.schema?.properties?.center?.fieldId;
-      
 
       setBlockFieldId(blockFieldId);
       setDistrictFieldId(districtFieldId);
-      setVillageFieldId(villageFieldId)
+      setVillageFieldId(villageFieldId);
       // setCenterFieldId(centerFieldId)
       setAddSchema(responseForm?.schema);
       setAddUiSchema(responseForm?.uiSchema);
@@ -414,10 +412,8 @@ const Facilitator = () => {
         // console.log('AddSchema', addSchema);
         // console.log('AddUISchema', addUiSchema);
 
-        
-        
         let tempFormData = extractMatchingKeys(row, addSchema);
-        console.log(tempFormData ,' tempFormData');
+        console.log(tempFormData, ' tempFormData');
         setPrefilledAddFormData(tempFormData);
         // setIsEdit(true);
         setIsReassign(true);
@@ -523,12 +519,13 @@ const Facilitator = () => {
           open={openModal}
           onClose={handleCloseModal}
           showFooter={!isEdit ? true : false}
-          primaryText={isReassign ? '' :'Next'}
+          primaryText={isReassign ? '' : 'Next'}
           id="dynamic-form-id"
           modalTitle={
             isEdit
-              ? t('FACILITATORS.EDIT_FACILITATOR') : isReassign
-                ? t('FACILITATORS.RE_ASSIGN_facilitator')
+              ? t('FACILITATORS.EDIT_FACILITATOR')
+              : isReassign
+              ? t('FACILITATORS.RE_ASSIGN_facilitator')
               : t('FACILITATORS.NEW_FACILITATOR')
           }
         >
