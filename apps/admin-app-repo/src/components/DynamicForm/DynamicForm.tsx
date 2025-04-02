@@ -23,6 +23,7 @@ const DynamicForm = ({
   prefilledFormData,
   FormSubmitFunction,
   extraFields,
+  hideSubmit
 }: any) => {
   const { t } = useTranslation();
 
@@ -96,19 +97,19 @@ const DynamicForm = ({
           // If header exists, replace values with localStorage values
           let customHeader = api?.header
             ? {
-                tenantId:
-                  api.header.tenantId === '**'
-                    ? localStorage.getItem('tenantId') || ''
-                    : api.header.tenantId,
-                Authorization:
-                  api.header.Authorization === '**'
-                    ? `Bearer ${localStorage.getItem('token') || ''}`
-                    : api.header.Authorization,
-                academicyearid:
-                  api.header.academicyearid === '**'
-                    ? localStorage.getItem('academicYearId') || ''
-                    : api.header.academicyearid,
-              }
+              tenantId:
+                api.header.tenantId === '**'
+                  ? localStorage.getItem('tenantId') || ''
+                  : api.header.tenantId,
+              Authorization:
+                api.header.Authorization === '**'
+                  ? `Bearer ${localStorage.getItem('token') || ''}`
+                  : api.header.Authorization,
+              academicyearid:
+                api.header.academicyearid === '**'
+                  ? localStorage.getItem('academicYearId') || ''
+                  : api.header.academicyearid,
+            }
             : {};
           const config = {
             method: api.method,
@@ -148,8 +149,8 @@ const DynamicForm = ({
                       : ['Select'],
                     enumNames: data
                       ? data.map((item) =>
-                          transformLabel(item?.[label].toString())
-                        )
+                        transformLabel(item?.[label].toString())
+                      )
                       : ['Select'],
                   },
                 };
@@ -161,8 +162,8 @@ const DynamicForm = ({
                     : ['Select'],
                   enumNames: data
                     ? data.map((item) =>
-                        transformLabel(item?.[label].toString())
-                      )
+                      transformLabel(item?.[label].toString())
+                    )
                     : ['Select'],
                 };
               }
@@ -335,19 +336,19 @@ const DynamicForm = ({
             // If header exists, replace values with localStorage values
             let customHeader = api?.header
               ? {
-                  tenantId:
-                    api.header.tenantId === '**'
-                      ? localStorage.getItem('tenantId') || ''
-                      : api.header.tenantId,
-                  Authorization:
-                    api.header.Authorization === '**'
-                      ? `Bearer ${localStorage.getItem('token') || ''}`
-                      : api.header.Authorization,
-                  academicyearid:
-                    api.header.academicyearid === '**'
-                      ? localStorage.getItem('academicYearId') || ''
-                      : api.header.academicyearid,
-                }
+                tenantId:
+                  api.header.tenantId === '**'
+                    ? localStorage.getItem('tenantId') || ''
+                    : api.header.tenantId,
+                Authorization:
+                  api.header.Authorization === '**'
+                    ? `Bearer ${localStorage.getItem('token') || ''}`
+                    : api.header.Authorization,
+                academicyearid:
+                  api.header.academicyearid === '**'
+                    ? localStorage.getItem('academicYearId') || ''
+                    : api.header.academicyearid,
+              }
               : {};
             const config = {
               method: api.method,
@@ -401,21 +402,20 @@ const DynamicForm = ({
                       // If header exists, replace values with localStorage values
                       let customHeader = api?.header
                         ? {
-                            tenantId:
-                              api.header.tenantId === '**'
-                                ? localStorage.getItem('tenantId') || ''
-                                : api.header.tenantId,
-                            Authorization:
-                              api.header.Authorization === '**'
-                                ? `Bearer ${
-                                    localStorage.getItem('token') || ''
-                                  }`
-                                : api.header.Authorization,
-                            academicyearid:
-                              api.header.academicyearid === '**'
-                                ? localStorage.getItem('academicYearId') || ''
-                                : api.header.academicyearid,
-                          }
+                          tenantId:
+                            api.header.tenantId === '**'
+                              ? localStorage.getItem('tenantId') || ''
+                              : api.header.tenantId,
+                          Authorization:
+                            api.header.Authorization === '**'
+                              ? `Bearer ${localStorage.getItem('token') || ''
+                              }`
+                              : api.header.Authorization,
+                          academicyearid:
+                            api.header.academicyearid === '**'
+                              ? localStorage.getItem('academicYearId') || ''
+                              : api.header.academicyearid,
+                        }
                         : {};
                       const config = {
                         method: api.method,
@@ -844,19 +844,19 @@ const DynamicForm = ({
                 // If header exists, replace values with localStorage values
                 let customHeader = api?.header
                   ? {
-                      tenantId:
-                        api.header.tenantId === '**'
-                          ? localStorage.getItem('tenantId') || ''
-                          : api.header.tenantId,
-                      Authorization:
-                        api.header.Authorization === '**'
-                          ? `Bearer ${localStorage.getItem('token') || ''}`
-                          : api.header.Authorization,
-                      academicyearid:
-                        api.header.academicyearid === '**'
-                          ? localStorage.getItem('academicYearId') || ''
-                          : api.header.academicyearid,
-                    }
+                    tenantId:
+                      api.header.tenantId === '**'
+                        ? localStorage.getItem('tenantId') || ''
+                        : api.header.tenantId,
+                    Authorization:
+                      api.header.Authorization === '**'
+                        ? `Bearer ${localStorage.getItem('token') || ''}`
+                        : api.header.Authorization,
+                    academicyearid:
+                      api.header.academicyearid === '**'
+                        ? localStorage.getItem('academicYearId') || ''
+                        : api.header.academicyearid,
+                  }
                   : {};
                 const config = {
                   method: api.method,
@@ -1157,7 +1157,11 @@ const DynamicForm = ({
           transformErrors={transformErrors} // ✅ Suppress default pattern errors
           widgets={widgets}
           id="dynamic-form-id"
-        />
+        >
+          <button type="submit" style={{ display: hideSubmit ? 'none' : 'block' }}>
+            Submit
+          </button>
+        </Form>
       ) : (
         <Grid container spacing={2}>
           {Object.keys(formSchema.properties).map((key) => (

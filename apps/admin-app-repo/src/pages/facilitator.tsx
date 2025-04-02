@@ -87,11 +87,11 @@ const Facilitator = () => {
   const searchStoreKey = 'facilitator';
   const initialFormDataSearch =
     localStorage.getItem(searchStoreKey) &&
-    localStorage.getItem(searchStoreKey) != '{}'
+      localStorage.getItem(searchStoreKey) != '{}'
       ? JSON.parse(localStorage.getItem(searchStoreKey))
       : localStorage.getItem('stateId')
-      ? { state: [localStorage.getItem('stateId')] }
-      : {};
+        ? { state: [localStorage.getItem('stateId')] }
+        : {};
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -167,9 +167,8 @@ const Facilitator = () => {
       keys: ['firstName', 'middleName', 'lastName'],
       label: 'Facilitator Name',
       render: (row) =>
-        `${transformLabel(row.firstName) || ''} ${
-          transformLabel(row.middleName) || ''
-        } ${transformLabel(row.lastName) || ''}`.trim(),
+        `${transformLabel(row.firstName) || ''} ${transformLabel(row.middleName) || ''
+          } ${transformLabel(row.lastName) || ''}`.trim(),
     },
     {
       key: 'status',
@@ -225,11 +224,9 @@ const Facilitator = () => {
               (field: { label: string }) => field.label === 'VILLAGE'
             )?.selectedValues[0]?.value
           ) || '';
-        return `${state == '' ? '' : `${state}`}${
-          district == '' ? '' : `, ${district}`
-        }${block == '' ? '' : `, ${block}`}${
-          village == '' ? '' : `, ${village}`
-        }`;
+        return `${state == '' ? '' : `${state}`}${district == '' ? '' : `, ${district}`
+          }${block == '' ? '' : `, ${block}`}${village == '' ? '' : `, ${village}`
+          }`;
       },
     },
   ];
@@ -470,8 +467,8 @@ const Facilitator = () => {
         <SimpleModal
           open={openModal}
           onClose={handleCloseModal}
-          showFooter={!isEdit ? true : false}
-          primaryText={'Next'}
+          showFooter={true}
+          primaryText={t('Next')}
           id="dynamic-form-id"
           modalTitle={
             isEdit
@@ -507,6 +504,7 @@ const Facilitator = () => {
             notificationMessage={notificationMessage}
             notificationContext={notificationContext}
             type="facilitator"
+            hideSubmit={true}
           />
         </SimpleModal>
 

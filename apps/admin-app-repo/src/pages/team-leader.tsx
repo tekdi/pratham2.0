@@ -85,11 +85,11 @@ const TeamLeader = () => {
   const searchStoreKey = 'teamLeader';
   const initialFormDataSearch =
     localStorage.getItem(searchStoreKey) &&
-    localStorage.getItem(searchStoreKey) != '{}'
+      localStorage.getItem(searchStoreKey) != '{}'
       ? JSON.parse(localStorage.getItem(searchStoreKey))
       : localStorage.getItem('stateId')
-      ? { state: [localStorage.getItem('stateId')] }
-      : {};
+        ? { state: [localStorage.getItem('stateId')] }
+        : {};
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -198,9 +198,8 @@ const TeamLeader = () => {
       keys: ['firstName', 'middleName', 'lastName'],
       label: 'Team Lead Name',
       render: (row) =>
-        `${transformLabel(row.firstName) || ''} ${
-          transformLabel(row.middleName) || ''
-        } ${transformLabel(row.lastName) || ''}`.trim(),
+        `${transformLabel(row.firstName) || ''} ${transformLabel(row.middleName) || ''
+          } ${transformLabel(row.lastName) || ''}`.trim(),
     },
     {
       key: 'status',
@@ -251,11 +250,9 @@ const TeamLeader = () => {
               (field: { label: string }) => field.label === 'VILLAGE'
             )?.selectedValues[0]?.value
           ) || '';
-        return `${state == '' ? '' : `${state}`}${
-          district == '' ? '' : `, ${district}`
-        }${block == '' ? '' : `, ${block}`}${
-          village == '' ? '' : `, ${village}`
-        }`;
+        return `${state == '' ? '' : `${state}`}${district == '' ? '' : `, ${district}`
+          }${block == '' ? '' : `, ${block}`}${village == '' ? '' : `, ${village}`
+          }`;
       },
     },
     // {
@@ -411,7 +408,9 @@ const TeamLeader = () => {
         <SimpleModal
           open={openModal}
           onClose={handleCloseModal}
-          showFooter={false}
+          showFooter={true}
+          primaryText={isEdit ? t('Update') : t('Create')}
+          id="dynamic-form-id"
           modalTitle={
             isEdit
               ? t('TEAM_LEADERS.EDIT_TEAM_LEADER')
@@ -447,6 +446,8 @@ const TeamLeader = () => {
             notificationContext={notificationContext}
             blockFieldId={blockFieldId}
             districtFieldId={districtFieldId}
+            type="team-leader"
+            hideSubmit={true}
           />
         </SimpleModal>
 

@@ -42,6 +42,7 @@ const AddEditUser = ({
   blockFieldId,
   districtFieldId,
   type,
+  hideSubmit
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showAssignmentScreen, setShowAssignmentScreen] =
@@ -77,6 +78,7 @@ const AddEditUser = ({
       'board',
       'medium',
       'parentId',
+      'center',
       'batch',
       'grade',
     ];
@@ -270,6 +272,7 @@ const AddEditUser = ({
           FormSubmitFunction={FormSubmitFunction}
           prefilledFormData={prefilledFormData || {}}
           extraFields={extraFieldsUpdate}
+          hideSubmit={hideSubmit}
         />
       ) : type === 'facilitator' ? (
         // When role is facilitator and not editing, show StepperForm with facilitator-specific props
@@ -282,13 +285,14 @@ const AddEditUser = ({
           onClose={onClose}
           parenResult={{}}
           parentId={formData?.district}
-          stateId={formData?.state[0]}
-          districtId={formData?.district[0]}
-          blockId={formData?.block[0]}
-          villageId={formData?.village[0]}
+          stateId={formData?.state?.[0]}
+          districtId={formData?.district?.[0]}
+          blockId={formData?.block?.[0]}
+          villageId={formData?.village?.[0]}
           // facilitatorProp="yourFacilitatorValue"
           role={type}
-          // add any additional prop(s) for facilitator
+        // add any additional prop(s) for facilitator
+          hideSubmit={hideSubmit}
         />
       ) : type === 'mentor' ? (
         <StepperForm
@@ -300,10 +304,11 @@ const AddEditUser = ({
           onClose={onClose}
           parenResult={{}}
           parentId={formData?.district}
-          stateId={formData?.state[0]}
-          districtId={formData?.district[0]}
+          stateId={formData?.state?.[0]}
+          districtId={formData?.district?.[0]}
           //mentorProp="yourMentorValue" // add any additional prop(s) for mentor
           role={type}
+          hideSubmit={hideSubmit}
         />
       ) : (
         <DynamicForm
@@ -313,6 +318,7 @@ const AddEditUser = ({
           FormSubmitFunction={FormSubmitFunction}
           prefilledFormData={prefilledFormData || {}}
           extraFields={extraFields}
+          hideSubmit={hideSubmit}
         />
       )}
     </>

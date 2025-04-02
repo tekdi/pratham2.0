@@ -52,6 +52,7 @@ interface StepperFormProps {
   parentLabel?: string;
   assignmentMessage?: string;
   assignmentChildmessage?: string;
+  hideSubmit?: boolean
 }
 const StepperForm: React.FC<StepperFormProps> = ({
   showAssignmentScreen,
@@ -71,6 +72,7 @@ const StepperForm: React.FC<StepperFormProps> = ({
   assignmentChildmessage,
   assignmentMessage,
   role,
+  hideSubmit
 }) => {
   const [selectedChild, setSelectedChild] = useState<{
     id: string;
@@ -448,6 +450,7 @@ const StepperForm: React.FC<StepperFormProps> = ({
             uiSchema={addUiSchema}
             FormSubmitFunction={FormSubmitFunction}
             prefilledFormData={formData || {}}
+            hideSubmit={hideSubmit}
           />
         )
       ) : (
