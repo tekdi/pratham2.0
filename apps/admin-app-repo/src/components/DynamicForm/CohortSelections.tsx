@@ -231,7 +231,7 @@ const CohortSelections: React.FC<VillageSelectionProps> = ({
       )}
 
       <Paper
-        sx={{ maxHeight: '60vh', overflowY: 'auto', p: 2, borderRadius: '8px' }}
+        sx={{  overflowY: 'auto', p: 2, borderRadius: '8px' }}
       >
         {filteredVillages && Object.keys(filteredVillages)?.length > 0 ? (
           Object.keys(filteredVillages).map((letter) => (

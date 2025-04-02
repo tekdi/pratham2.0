@@ -292,7 +292,7 @@ const CohortPage = () => {
           const state = cohortData.customField.find(
             (item: CustomField) => item.label === 'STATE'
           );
-          setState(state?.value);
+          setState(state?.selectedValues?.[0]?.value || '');
           const stateCode = state?.code || '';
           const stateId = state?.fieldId || '';
 
@@ -300,9 +300,9 @@ const CohortPage = () => {
             (field: any) => field.label === 'BLOCK'
           );
 
-          const address = `${toPascalCase(district?.value)}, ${toPascalCase(
-            state?.value
-          )}`;
+          const address = `${toPascalCase(
+            district?.selectedValues?.[0]?.value || ''
+          )}, ${toPascalCase(state?.value)}`;
           cohortData.address = address || '';
 
           const typeOfCohort = cohortData.customField.find(

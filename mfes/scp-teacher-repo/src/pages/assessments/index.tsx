@@ -212,13 +212,13 @@ const Assessments = () => {
 
       if (!cohort?.customField) return;
 
-      const selectedState = cohort.customField.find(
-        (item: any) => item.label === 'STATE'
-      )?.value;
+      const selectedState =
+        cohort.customField.find((item: any) => item.label === 'STATE')
+          ?.selectedValues?.[0]?.value || '';
 
-      const selectedBoard = cohort.customField.find(
-        (item: any) => item.label === 'BOARD'
-      )?.value;
+      const selectedBoard =
+        cohort.customField.find((item: any) => item.label === 'BOARD')
+          ?.selectedValues?.[0] || '';
 
       setCenterData({ state: selectedState, board: selectedBoard });
 
