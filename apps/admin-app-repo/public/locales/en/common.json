@@ -235,6 +235,7 @@
     "USER_CREDENTIALS_WILL_BE_SEND_SOON": "Teacher is created ,credentials will be sent soon",
     "FACILITATOR_UPDATED_SUCCESSFULLY": "Teacher has been successfully updated!",
     "EDIT_FACILITATOR": "Edit Facilitator",
+    "RE_ASSIGN_facilitator": "Re-assign Facilitator",
     "FACILITATOR_CREATED": "The facilitator account has been created successfully",
     "FACILITATOR_CREATED_FAILED": "Failed to create facilitator account",
     "FINISH_ASSIGN": "Finish & Assign",
@@ -256,7 +257,8 @@
     "USER_CREDENTIALS_WILL_BE_SEND_SOON": "Learner is created, credentials will be sent soon",
     "LEARNER_UPDATED_SUCCESSFULLY": "Learner has been successfully updated!",
     "EDIT_LEARNER": "Edit Learner",
-    "NO_LEARNERS_FOUND": "No Learners Found"
+    "NO_LEARNERS_FOUND": "No Learners Found",
+    "RE_ASSIGN_LEARNER":"Re-assign Learner"
   },
   "MENTORS": {
     "SEARCHBAR_PLACEHOLDER": "Search mentors..",
@@ -295,7 +297,8 @@
     "EDIT_TEAM_LEADER": "Edit Team Leader",
     "NO_TEAM_LEADER_FOUND": "No Team Leader Found",
     "NOT_ABLE_CREATE_TEAM_LEADER": "Not Able To Create Team leader",
-    "NOT_ABLE_UPDATE_TEAM_LEADER": "Not Able to update Team leader"
+    "NOT_ABLE_UPDATE_TEAM_LEADER": "Not Able to update Team leader",
+    "RE_ASSIGN_TEAM_LEAD": "Re-assign Team lead"
   },
   "ADMIN": {
     "ADMIN_UPDATED_SUCCESSFULLY": "Admin has been successfully updated!"
@@ -674,7 +677,7 @@
   },
   "WHATS_YOUR_GENDER": "Gender",
   "first_name": " First Name",
-  "middle_name": "Middle Name",
+  "middle_name  ": "Middle Name",
   "last_name": "Last Name",
   "phone_number": "Phone Number",
   "STATE": "State",
@@ -780,5 +783,6 @@
     "SALARIED_WORK": "Salaried work",
     "SELF_EMPLOYMENT": "Self-employment",
     "UNEMPLOYED_OR_DOMESTIC_WORK": "Unemployed or Domestic Work"
-  }
+  },
+  "middle_name": "Middle Name"
 }
