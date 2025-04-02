@@ -176,7 +176,7 @@ const PaginatedTable = ({
                   </TableCell>
                 ))}
                 {actions.length > 0 && (
-                  <TableCell sx={{width:'100px'}}>
+                  <TableCell sx={{width:'100px', display:'flex' , marginBottom:'0px !important'}}>
                     {actions.map((action, idx) => (
                     
                         <IconButton key={idx} onClick={() => action.callback(row)}>
