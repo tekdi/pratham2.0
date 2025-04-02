@@ -125,7 +125,7 @@ const TeamLeader = () => {
     };
     fetchData();
     setRoleID(RoleId.TEAM_LEADER);
-    setTenantId(localStorage.getItem('tenantId'));
+    setTenantId(localStorage.getItem('tenantId')); 
   }, []);
 
   const updatedUiSchema = {

@@ -42,7 +42,7 @@ import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
 import { deleteUser } from '@/services/UserService';
-import { transformLabel } from '@/utils/Helper';
+import { fetchUserData, transformLabel } from '@/utils/Helper';
 import { getCohortList } from '@/services/GetCohortList';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
@@ -316,25 +316,25 @@ const Learner = () => {
     }
   };
 
-  const fetchUserData = async (userId) => {
-    try {
-      let activeCohortIds = [];
-      const resp = await getCohortList(userId);
-      if (resp?.result) {
-        activeCohortIds = resp.result
-          .filter(
-            (cohort) =>
-              cohort.type === 'BATCH' && cohort.cohortStatus === 'active'
-          )
-          .map((cohort) => cohort.cohortId);
-        console.log(activeCohortIds, 'activeBatches');
-      }
-      return activeCohortIds;
-    } catch (error) {
-      console.error('Error getting user details:', error);
-      return null;
-    }
-  };
+  // const fetchUserData = async (userId) => {
+  //   try {
+  //     let activeCohortIds = [];
+  //     const resp = await getCohortList(userId);
+  //     if (resp?.result) { 
+  //       activeCohortIds = resp.result
+  //         .filter(
+  //           (cohort) =>
+  //             cohort.type === 'BATCH' && cohort.cohortStatus === 'active'
+  //         )
+  //         .map((cohort) => cohort.cohortId);
+  //       console.log(activeCohortIds, 'activeBatches');
+  //     }
+  //     return activeCohortIds;
+  //   } catch (error) {
+  //     console.error('Error getting user details:', error);
+  //     return null;
+  //   }
+  // };
 
   // Define actions
   const actions = [
