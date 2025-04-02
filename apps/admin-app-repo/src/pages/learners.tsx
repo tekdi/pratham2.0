@@ -534,7 +534,9 @@ const Learner = () => {
         <SimpleModal
           open={openModal}
           onClose={handleCloseModal}
-          showFooter={false}
+          showFooter={true}
+          primaryText={isEdit ? t('Update') : t('Create')}
+          id="dynamic-form-id"
           modalTitle={
             isEdit
               ? t('LEARNERS.EDIT_LEARNER')
@@ -575,6 +577,7 @@ const Learner = () => {
             blockFieldId={blockFieldId}
             districtFieldId={districtFieldId}
             villageFieldId={villageFieldId}
+            hideSubmit={true}
           />
         </SimpleModal>
 

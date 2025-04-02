@@ -752,13 +752,14 @@ const DynamicForm = ({
     // console.log('hasObjectChanged changedField', changedField);
 
     if (hasObjectChanged(prevFormData.current, formData)) {
+      console.log('hasObjectChanged in 1 formData', formData);
       if (changedField) {
         //error set
         console.log('errors', errors);
         setSubmitted(false);
         //find out all dependent keys
         const dependentKeyArray = getDependentKeys(schema, changedField);
-        // console.log('hasObjectChanged formData', formData);
+        console.log('hasObjectChanged in 2 formData', formData);
         // console.log('hasObjectChanged dependent keys:', dependentKeyArray);
         dependentKeyArray.forEach((key) => {
           delete formData[key]; // Remove the key from formData

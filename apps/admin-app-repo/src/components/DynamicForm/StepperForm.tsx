@@ -53,7 +53,8 @@ interface StepperFormProps {
   parentLabel?: string;
   assignmentMessage?: string;
   assignmentChildmessage?: string;
-  hideSubmit?: boolean
+  hideSubmit?: boolean;
+  setButtonShow?: any;
 }
 const StepperForm: React.FC<StepperFormProps> = ({
   showAssignmentScreen,
@@ -73,7 +74,8 @@ const StepperForm: React.FC<StepperFormProps> = ({
   assignmentChildmessage,
   assignmentMessage,
   role,
-  hideSubmit
+  hideSubmit,
+  setButtonShow
 }) => {
   const [selectedChild, setSelectedChild] = useState<{
     id: string;
@@ -109,6 +111,11 @@ const StepperForm: React.FC<StepperFormProps> = ({
   };
 
   const handleBackToForm = () => setShowAssignmentScreen(false); // Back to form screen
+
+
+  useEffect(() => {
+    setButtonShow(!showAssignmentScreen)
+  }, [showAssignmentScreen]);
 
   const handleBack = () => setSelectedChild(null);
 
@@ -166,7 +173,7 @@ const StepperForm: React.FC<StepperFormProps> = ({
       };
       if (role === 'facilitator' && assignedObject[0]) {
         const cohortId = assignedObject[0].childId; // Accessing the first object in the array
-        tenantCohortRoleMapping[0].cohortId = cohortId;
+        tenantCohortRoleMapping[0].cohortIds = cohortId;
       }
       console.log(assignedObject);
       const payload = formData;

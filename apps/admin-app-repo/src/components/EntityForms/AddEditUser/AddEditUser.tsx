@@ -53,12 +53,13 @@ const AddEditUser = ({
   villageFieldId,
   centerFieldId,
   type,
-  hideSubmit
+  hideSubmit,
+  setButtonShow
 }) => {
-  
+
   const [isLoading, setIsLoading] = useState(false);
   const [showAssignmentScreen, setShowAssignmentScreen] =
-  useState<boolean>(false);
+    useState<boolean>(false);
   const [formData, setFormData] = useState<any>();
   const [districtId, setDistrictId] = useState<any>();
   const [prefilledFormData, setPrefilledFormData] = useState(
@@ -314,6 +315,7 @@ const AddEditUser = ({
     //schema?.properties?.district
     setFormData(formData);
     setShowAssignmentScreen(true);
+    // setButtonShow(false);
   };
   const onClose = () => {
     // setOpenDelete(false);
@@ -322,6 +324,7 @@ const AddEditUser = ({
     //   setAddNew(false);
     //   setCount(0);
     setShowAssignmentScreen(false);
+    // setButtonShow(true)
     setFormData({});
     SuccessCallback();
   };
@@ -376,8 +379,9 @@ const AddEditUser = ({
           villageId={formData?.village?.[0]}
           // facilitatorProp="yourFacilitatorValue"
           role={type}
-        // add any additional prop(s) for facilitator
+          // add any additional prop(s) for facilitator
           hideSubmit={hideSubmit}
+          setButtonShow={setButtonShow}
         />
       ) : type === 'mentor' ? (
         <StepperForm

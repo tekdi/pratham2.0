@@ -346,7 +346,7 @@ const TeamLeader = () => {
 
         let tempFormData = extractMatchingKeys(row, addSchema);
         setPrefilledAddFormData(tempFormData);
-        // setIsEdit(true);
+        setIsEdit(false);
         setIsReassign(true);
         setEditableUserId(row?.userId);
         handleOpenModal();
