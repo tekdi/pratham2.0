@@ -64,7 +64,7 @@ export const updateReassignUser = async (
     return response?.data;
   } catch (error) {
     console.error("Error in updating user details", error);
-    throw error;
+    return null;
   }
 };
 
