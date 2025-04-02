@@ -1,5 +1,5 @@
 import { CohortMemberList } from "@/utils/Interfaces";
-import { get, post, put } from "../RestClient";
+import { get, patch, post, put } from "../RestClient";
 import axios from 'axios';
 import { showToastMessage } from "@/components/Toastify";
 import { API_ENDPOINTS } from "@/utils/API/APIEndpoints";
@@ -48,6 +48,23 @@ export const updateCohortUpdate = async (
   } catch (error) {
     console.error("Error in updating cohort details", error);
     throw error;
+  }
+};
+
+
+
+export const updateReassignUser = async (
+  userId: string,
+  cohortDetails: any,
+): Promise<any> => {
+  const apiUrl = API_ENDPOINTS.userUpdate(userId);
+
+  try {
+    const response = await patch(apiUrl, cohortDetails)
+    return response?.data;
+  } catch (error) {
+    console.error("Error in updating user details", error);
+    return null;
   }
 };
 

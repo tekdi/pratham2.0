@@ -155,7 +155,7 @@ const Batch = () => {
       render: (row) =>
         transformLabel(
           row.customFields.find((field) => field.label === 'DISTRICT')
-            ?.selectedValues[0]?.value
+            ?.selectedValues?.[0]?.value
         ) || '-',
     },
     {
@@ -164,7 +164,7 @@ const Batch = () => {
       render: (row) =>
         transformLabel(
           row.customFields.find((field) => field.label === 'BLOCK')
-            ?.selectedValues[0]?.value
+            ?.selectedValues?.[0]?.value
         ) || '-',
     },
     {
@@ -173,7 +173,7 @@ const Batch = () => {
       render: (row) =>
         transformLabel(
           row.customFields.find((field) => field.label === 'VILLAGE')
-            ?.selectedValues[0]?.value
+            ?.selectedValues?.[0]?.value
         ) || '-',
     },
     {
@@ -188,7 +188,7 @@ const Batch = () => {
       render: (row) =>
         transformLabel(
           row.customFields.find((field) => field.label === 'BOARD')
-            ?.selectedValues[0]
+            ?.selectedValues?.[0]
         ) || '-',
     },
     {
@@ -197,7 +197,7 @@ const Batch = () => {
       render: (row) =>
         transformLabel(
           row.customFields.find((field) => field.label === 'MEDIUM')
-            ?.selectedValues[0]
+            ?.selectedValues?.[0]
         ) || '-',
     },
   ];
@@ -340,7 +340,9 @@ const Batch = () => {
         <SimpleModal
           open={openModal}
           onClose={handleCloseModal}
-          showFooter={false}
+          showFooter={true}
+          primaryText={isEdit ? t('Update') : t('Create')}
+          id="dynamic-form-id"
           modalTitle={isEdit ? t('BATCH.UPDATE_BATCH') : t('BATCH.NEW_BATCH')}
         >
           <AddEditUser
@@ -368,6 +370,7 @@ const Batch = () => {
             telemetryCreateKey={telemetryCreateKey}
             failureCreateMessage={failureCreateMessage}
             isNotificationRequired={false}
+            hideSubmit={true}
           />
         </SimpleModal>
 

@@ -50,6 +50,7 @@ import { transformLabel } from '@/utils/Helper';
 import { getCohortList } from '@/services/GetCohortList';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
+import apartment from '../../public/images/apartment.svg';
 
 const Facilitator = () => {
   const theme = useTheme<any>();
@@ -67,10 +68,15 @@ const Facilitator = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [isEdit, setIsEdit] = useState(false);
+  const [isReassign, setIsReassign] = useState(false);
   const [editableUserId, setEditableUserId] = useState('');
   const [roleId, setRoleID] = useState('');
   const [tenantId, setTenantId] = useState('');
   const [memberShipID, setMemberShipID] = useState('');
+  const [blockFieldId, setBlockFieldId] = useState('');
+  const [districtFieldId, setDistrictFieldId] = useState('');
+  const [villageFieldId, setVillageFieldId] = useState('');
+  // const [centerFieldId, setCenterFieldId] = useState('');
 
   const [userID, setUserId] = useState('');
   const [userData, setUserData] = useState({
@@ -87,11 +93,11 @@ const Facilitator = () => {
   const searchStoreKey = 'facilitator';
   const initialFormDataSearch =
     localStorage.getItem(searchStoreKey) &&
-    localStorage.getItem(searchStoreKey) != '{}'
+      localStorage.getItem(searchStoreKey) != '{}'
       ? JSON.parse(localStorage.getItem(searchStoreKey))
       : localStorage.getItem('stateId')
-      ? { state: [localStorage.getItem('stateId')] }
-      : {};
+        ? { state: [localStorage.getItem('stateId')] }
+        : {};
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -113,6 +119,16 @@ const Facilitator = () => {
           },
         },
       ]);
+      console.log('responseForm', responseForm);
+      const districtFieldId = responseForm.schema.properties.district.fieldId;
+      const blockFieldId = responseForm?.schema?.properties?.block.fieldId;
+      const villageFieldId = responseForm?.schema?.properties?.village?.fieldId;
+      // const centerFieldId = responseForm?.schema?.properties?.center?.fieldId;
+
+      setBlockFieldId(blockFieldId);
+      setDistrictFieldId(districtFieldId);
+      setVillageFieldId(villageFieldId);
+      // setCenterFieldId(centerFieldId)
       setAddSchema(responseForm?.schema);
       setAddUiSchema(responseForm?.uiSchema);
     };
@@ -167,9 +183,8 @@ const Facilitator = () => {
       keys: ['firstName', 'middleName', 'lastName'],
       label: 'Facilitator Name',
       render: (row) =>
-        `${transformLabel(row.firstName) || ''} ${
-          transformLabel(row.middleName) || ''
-        } ${transformLabel(row.lastName) || ''}`.trim(),
+        `${transformLabel(row.firstName) || ''} ${transformLabel(row.middleName) || ''
+          } ${transformLabel(row.lastName) || ''}`.trim(),
     },
     {
       key: 'status',
@@ -205,31 +220,29 @@ const Facilitator = () => {
           transformLabel(
             row.customFields.find(
               (field: { label: string }) => field.label === 'STATE'
-            )?.selectedValues[0]?.value
+            )?.selectedValues?.[0]?.value
           ) || '';
         const district =
           transformLabel(
             row.customFields.find(
               (field: { label: string }) => field.label === 'DISTRICT'
-            )?.selectedValues[0]?.value
+            )?.selectedValues?.[0]?.value
           ) || '';
         const block =
           transformLabel(
             row.customFields.find(
               (field: { label: string }) => field.label === 'BLOCK'
-            )?.selectedValues[0]?.value
+            )?.selectedValues?.[0]?.value
           ) || '';
         const village =
           transformLabel(
             row.customFields.find(
               (field: { label: string }) => field.label === 'VILLAGE'
-            )?.selectedValues[0]?.value
+            )?.selectedValues?.[0]?.value
           ) || '';
-        return `${state == '' ? '' : `${state}`}${
-          district == '' ? '' : `, ${district}`
-        }${block == '' ? '' : `, ${block}`}${
-          village == '' ? '' : `, ${village}`
-        }`;
+        return `${state == '' ? '' : `${state}`}${district == '' ? '' : `, ${district}`
+          }${block == '' ? '' : `, ${block}`}${village == '' ? '' : `, ${village}`
+          }`;
       },
     },
   ];
@@ -325,6 +338,7 @@ const Facilitator = () => {
         // console.log('tempFormData', tempFormData);
         setPrefilledAddFormData(tempFormData);
         setIsEdit(true);
+        setIsReassign(false);
         setEditableUserId(row?.userId);
         handleOpenModal();
       },
@@ -376,6 +390,35 @@ const Facilitator = () => {
         });
       },
     },
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            backgroundColor: 'rgb(227, 234, 240)',
+            padding: '10px',
+          }}
+        >
+          <Image src={apartment} alt="" />
+        </Box>
+      ),
+      callback: (row) => {
+        console.log('row:', row);
+        // console.log('AddSchema', addSchema);
+        // console.log('AddUISchema', addUiSchema);
+
+        let tempFormData = extractMatchingKeys(row, addSchema);
+        console.log(tempFormData, ' tempFormData');
+        setPrefilledAddFormData(tempFormData);
+        setIsEdit(false);
+        setIsReassign(true);
+        setEditableUserId(row?.userId);
+        handleOpenModal();
+      },
+    },
   ];
 
   // Pagination handlers
@@ -393,6 +436,8 @@ const Facilitator = () => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
+    setIsReassign(false);
+    setIsEdit(false);
   };
 
   //Add Edit Props
@@ -417,17 +462,24 @@ const Facilitator = () => {
   const notificationMessage = 'FACILITATORS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
 
-  useEffect(() => {
-    setPrefilledFormData(initialFormDataSearch);
-  }, []);
-
   const [open, setOpen] = useState(false);
   const [checked, setChecked] = useState(false);
   const [reason, setReason] = useState('');
 
   // console.log(response?.result?.getUserDetails , "shreyas");
-  response;
+  // response;
 
+  useEffect(() => {
+    setPrefilledFormData(initialFormDataSearch);
+  }, []);
+
+  const [buttonShow, setButtonShowState] = useState(true);
+
+  const setButtonShow = (status) => {
+
+    console.log("########## changed", status);
+    setButtonShowState(status)
+  }
   return (
     <>
       <Box display={'flex'} flexDirection={'column'} gap={2}>
@@ -459,6 +511,7 @@ const Facilitator = () => {
             onClick={() => {
               setPrefilledAddFormData(initialFormData);
               setIsEdit(false);
+              setIsReassign(false);
               setEditableUserId('');
               handleOpenModal();
             }}
@@ -470,13 +523,15 @@ const Facilitator = () => {
         <SimpleModal
           open={openModal}
           onClose={handleCloseModal}
-          showFooter={!isEdit ? true : false}
-          primaryText={'Next'}
+          showFooter={buttonShow}
+          primaryText={isEdit ? t('Update') : t('Next')}
           id="dynamic-form-id"
           modalTitle={
             isEdit
               ? t('FACILITATORS.EDIT_FACILITATOR')
-              : t('FACILITATORS.NEW_FACILITATOR')
+              : isReassign
+                ? t('FACILITATORS.RE_ASSIGN_facilitator')
+                : t('FACILITATORS.NEW_FACILITATOR')
           }
         >
           <AddEditUser
@@ -489,6 +544,8 @@ const Facilitator = () => {
             uiSchema={addUiSchema}
             editPrefilledFormData={prefilledAddFormData}
             isEdit={isEdit}
+            isReassign={isReassign}
+            isExtraFields={true}
             editableUserId={editableUserId}
             UpdateSuccessCallback={() => {
               setPrefilledFormData({});
@@ -506,7 +563,13 @@ const Facilitator = () => {
             notificationKey={notificationKey}
             notificationMessage={notificationMessage}
             notificationContext={notificationContext}
+            blockFieldId={blockFieldId}
+            districtFieldId={districtFieldId}
+            villageFieldId={villageFieldId}
+            // centerFieldId={centerFieldId}
             type="facilitator"
+            hideSubmit={true}
+            setButtonShow={setButtonShow}
           />
         </SimpleModal>
 

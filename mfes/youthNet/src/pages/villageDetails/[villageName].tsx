@@ -29,43 +29,43 @@ const VillageDetails = () => {
   const villageNameString = Array.isArray(villageName)
     ? villageName[0]
     : villageName || '';
-  const { id, blockId , tab } = router.query;
+  const { id, blockId, tab } = router.query;
   const [yuthCount, setYuthCount] = useState<number>(0);
-   const [volunteerCount, setVolunteerCount] = useState<number>(0);
-  
-  const [todaysRegistrationCount, setTodaysRegistrationCount] = useState<number>(0);
+  const [volunteerCount, setVolunteerCount] = useState<number>(0);
 
-  
+  const [todaysRegistrationCount, setTodaysRegistrationCount] =
+    useState<number>(0);
+
   const getTodayDate = () => {
     const today = new Date();
-    return today.toLocaleDateString("en-CA"); 
-};
+    return today.toLocaleDateString('en-CA');
+  };
   useEffect(() => {
     const getYouthData = async () => {
       try {
-        const limit=100;
-        const offset=0;
+        const limit = 100;
+        const offset = 0;
         let filters;
-        if(id)
-        {
-          filters={
-            role:Role.LEARNER,
-                  status:[Status.ACTIVE],
-                  village:[id.toString()]
-            }
+        if (id) {
+          filters = {
+            role: Role.LEARNER,
+            status: [Status.ACTIVE],
+            village: [id.toString()],
+          };
         }
-       if(filters)
-       {
-        const response=await fetchUserList({limit, offset,filters})
-       const { volunteerUsers, youthUsers } = categorizeUsers(response?.getUserDetails)
-        
-        setYuthCount(youthUsers?.length)
-        setVolunteerCount(volunteerUsers?.length)
-        const todayUsers = response?.getUserDetails.filter((user: any )=> {
-          return user.createdAt.startsWith(getTodayDate());
-      });
-      setTodaysRegistrationCount(todayUsers.length)
-       }
+        if (filters) {
+          const response = await fetchUserList({ limit, offset, filters });
+          const { volunteerUsers, youthUsers } = categorizeUsers(
+            response?.getUserDetails
+          );
+
+          setYuthCount(youthUsers?.length);
+          setVolunteerCount(volunteerUsers?.length);
+          const todayUsers = response?.getUserDetails.filter((user: any) => {
+            return user.createdAt.startsWith(getTodayDate());
+          });
+          setTodaysRegistrationCount(todayUsers.length);
+        }
       } catch (error) {
         console.log(error);
       }
@@ -75,36 +75,33 @@ const VillageDetails = () => {
   const handleYouthVolunteers = () => {
     console.log('handleYouthVolunteers');
     let userDataString;
-    if(YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole())
+    if (YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole())
       userDataString = localStorage.getItem('selectedmentorData');
-    else
-    userDataString = localStorage.getItem('userData');
+    else userDataString = localStorage.getItem('userData');
 
-
-              let userData: any = userDataString ? JSON.parse(userDataString) : null;
-              console.log(userData)
-              const blockResult = userData?.customFields?.find(
-                (item: any) => item.label === cohortHierarchy.BLOCK
-              );
-              blockResult?.selectedValues[0]?.id
+    let userData: any = userDataString ? JSON.parse(userDataString) : null;
+    console.log(userData);
+    const blockResult = userData?.customFields?.find(
+      (item: any) => item.label === cohortHierarchy.BLOCK
+    );
+    blockResult?.selectedValues?.[0]?.id;
     router.push({
       pathname: `/villages`,
       query: {
         villageId: id,
         tab: 3,
-        blockId:blockId?blockId:blockResult?.selectedValues[0]?.id
+        blockId: blockId ? blockId : blockResult?.selectedValues?.[0]?.id,
       },
-    });  
+    });
   };
-  const handleAddVolunteer=(id: any, blockId?: any) => {
-    if(blockId)
-    {
+  const handleAddVolunteer = (id: any, blockId?: any) => {
+    if (blockId) {
       router.push({
         pathname: `/villages`,
         query: {
           villageId: id,
           tab: 3,
-          blockId: blockId
+          blockId: blockId,
         },
       });
     }
@@ -112,9 +109,10 @@ const VillageDetails = () => {
       pathname: `/villages`,
       query: {
         villageId: id,
-        tab: 3
+        tab: 3,
       },
-    });  };
+    });
+  };
   const handleSurveys = () => {
     router.push(`/survey/${villageNameString}`);
   };
@@ -127,26 +125,27 @@ const VillageDetails = () => {
       <Box>
         <BackHeader
           headingOne={villageNameString}
-          headingTwo={(yuthCount+volunteerCount).toString()}
-          headingThree={<><ArrowUpwardIcon sx={{ height: 16, width: 16 }} />
- {todaysRegistrationCount.toString()}</>}
+          headingTwo={(yuthCount + volunteerCount).toString()}
+          headingThree={
+            <>
+              <ArrowUpwardIcon sx={{ height: 16, width: 16 }} />
+              {todaysRegistrationCount.toString()}
+            </>
+          }
           showBackButton={true}
           onBackClick={() => {
-            if(tab)
-            {
-  
+            if (tab) {
               router.push({
                 pathname: `/villages`,
                 query: {
-               //   villageId: id,
+                  //   villageId: id,
                   tab: tab,
-                  blockId: blockId
+                  blockId: blockId,
                 },
               });
-            }
-            else
-            router.back();
-          }}        />
+            } else router.back();
+          }}
+        />
       </Box>
       <Box
         ml={2}
@@ -165,8 +164,11 @@ const VillageDetails = () => {
       <Box>
         <VillageDetailCard
           imageSrc={Frame1}
-          title={t('YOUTHNET_DASHBOARD.YOUTH_AND_VOLUNTEER', {youthCount:yuthCount , volunteerCount:volunteerCount })}
-        onClick={handleYouthVolunteers}
+          title={t('YOUTHNET_DASHBOARD.YOUTH_AND_VOLUNTEER', {
+            youthCount: yuthCount,
+            volunteerCount: volunteerCount,
+          })}
+          onClick={handleYouthVolunteers}
         />
       </Box>
       {/* <Box>
