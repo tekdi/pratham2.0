@@ -287,7 +287,17 @@ const AddEditUser = ({
             showToastMessage(t(failureCreateMessage), 'error');
           }
         } else {
-          if (payload.type === CohortTypes.BATCH) delete payload.customFields;
+          if (payload.type === CohortTypes.BATCH) {
+            let customFields = payload.customFields
+            // delete payload.customFields;
+            let newCustomFields = removeFields(customFields, [
+              "6469c3ac-8c46-49d7-852a-00f9589737c5",
+              "b61edfc6-3787-4079-86d3-37262bf23a9e",
+              "4aab68ae-8382-43aa-a45a-e9b239319857",
+              "8e9bb321-ff99-4e2e-9269-61e863dd0c54"
+            ])
+            payload.customFields = newCustomFields
+          }
           // payload.delete(customFields)
           const centerCreation = await createCohort(payload);
           console.log('centerCreatedResponse: ', centerCreation);
@@ -305,6 +315,10 @@ const AddEditUser = ({
       }
     }
   };
+
+  const removeFields = (data, fieldIdsToRemove) => {
+    return data.filter(item => !fieldIdsToRemove.includes(item.fieldId));
+  }
 
   const StepperFormSubmitFunction = async (formData: any, payload: any) => {
     setDistrictId(formData?.district);
