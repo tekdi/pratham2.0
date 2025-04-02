@@ -27,10 +27,8 @@ import {
 import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import TenantService from '@/services/TenantService';
-import { useTheme } from "@mui/material/styles";
-import AddIcon from "@mui/icons-material/Add";
-
-
+import { useTheme } from '@mui/material/styles';
+import AddIcon from '@mui/icons-material/Add';
 
 const ContentReviewer = () => {
   const theme = useTheme<any>();
@@ -51,14 +49,14 @@ const ContentReviewer = () => {
   const [editableUserId, setEditableUserId] = useState('');
 
   const { t, i18n } = useTranslation();
-  const storedUserData = JSON.parse(
-    localStorage.getItem('adminInfo') || '{}'
-  );
+  const storedUserData = JSON.parse(localStorage.getItem('adminInfo') || '{}');
 
-  const searchStoreKey = 'contentReviewer'
-  const initialFormDataSearch = localStorage.getItem(searchStoreKey) && localStorage.getItem(searchStoreKey) != "{}"
-    ? JSON.parse(localStorage.getItem(searchStoreKey))
-    : localStorage.getItem('stateId')
+  const searchStoreKey = 'contentReviewer';
+  const initialFormDataSearch =
+    localStorage.getItem(searchStoreKey) &&
+    localStorage.getItem(searchStoreKey) != '{}'
+      ? JSON.parse(localStorage.getItem(searchStoreKey))
+      : localStorage.getItem('stateId')
       ? { state: [localStorage.getItem('stateId')] }
       : {};
 
@@ -86,7 +84,7 @@ const ContentReviewer = () => {
       setAddSchema(responseForm?.schema);
       setAddUiSchema(responseForm?.uiSchema);
     };
-    
+
     setPrefilledAddFormData(initialFormDataSearch);
     fetchData();
   }, []);
@@ -101,12 +99,15 @@ const ContentReviewer = () => {
   const SubmitaFunction = async (formData: any) => {
     setPrefilledFormData(formData);
     //set prefilled search data on refresh
-    localStorage.setItem(searchStoreKey, JSON.stringify(formData))
+    localStorage.setItem(searchStoreKey, JSON.stringify(formData));
     await searchData(formData, 0);
   };
 
   const searchData = async (formData: any, newPage: any) => {
-    const staticFilter = { role: RoleName.CONTENT_REVIEWER, tenantId: TenantService.getTenantId() };
+    const staticFilter = {
+      role: RoleName.CONTENT_REVIEWER,
+      tenantId: TenantService.getTenantId(),
+    };
     const { sortBy } = formData;
     const staticSort = ['firstName', sortBy || 'asc'];
     await searchListData(
@@ -128,7 +129,9 @@ const ContentReviewer = () => {
       keys: ['firstName', 'middleName', 'lastName'],
       label: 'Content Reviewer Name',
       render: (row: any) =>
-        `${row.firstName || ''} ${row.middleName || ''} ${row.lastName || ''}`.trim(),
+        `${row.firstName || ''} ${row.middleName || ''} ${
+          row.lastName || ''
+        }`.trim(),
     },
     {
       key: 'status',
@@ -141,11 +144,12 @@ const ContentReviewer = () => {
       key: 'STATE',
       label: 'State',
       render: (row) => {
-        const state = row.customFields.find((field) => field.label ===
-        'STATE')?.selectedValues[0]?.value || '-';
+        const state =
+          row.customFields.find((field) => field.label === 'STATE')
+            ?.selectedValues?.[0]?.value || '-';
         return `${state}`;
       },
-    }
+    },
   ];
 
   const scpCustomColumns = [
@@ -153,8 +157,10 @@ const ContentReviewer = () => {
       key: 'BOARD',
       label: 'Board',
       render: (row) => {
-        const board = row.customFields.find((field) => field.label ===
-        'BOARD')?.selectedValues.join(', ') || '-';
+        const board =
+          row.customFields
+            .find((field) => field.label === 'BOARD')
+            ?.selectedValues.join(', ') || '-';
         return `${board}`;
       },
     },
@@ -162,8 +168,10 @@ const ContentReviewer = () => {
       key: 'MEDIUM',
       label: 'Medium',
       render: (row) => {
-        const medium = row.customFields.find((field) => field.label ===
-        'MEDIUM')?.selectedValues.join(', ') || '-';
+        const medium =
+          row.customFields
+            .find((field) => field.label === 'MEDIUM')
+            ?.selectedValues.join(', ') || '-';
         return `${medium}`;
       },
     },
@@ -171,8 +179,10 @@ const ContentReviewer = () => {
       key: 'GRADE',
       label: 'Grade',
       render: (row) => {
-        const grade = row.customFields.find((field) => field.label ===
-        'GRADE')?.selectedValues.join(', ') || '-';
+        const grade =
+          row.customFields
+            .find((field) => field.label === 'GRADE')
+            ?.selectedValues.join(', ') || '-';
         return `${grade}`;
       },
     },
@@ -180,20 +190,24 @@ const ContentReviewer = () => {
       key: 'SUBJECT',
       label: 'subject',
       render: (row) => {
-        const subject = row.customFields.find((field) => field.label ===
-        'SUBJECT')?.selectedValues.join(', ') || '-';
+        const subject =
+          row.customFields
+            .find((field) => field.label === 'SUBJECT')
+            ?.selectedValues.join(', ') || '-';
         return `${subject}`;
       },
-    }
-  ]
+    },
+  ];
 
   const youthnetCustomColumns = [
     {
       key: 'DOMAIN',
       label: 'Domain',
       render: (row) => {
-        const domain = row.customFields.find((field) => field.label ===
-        'DOMAIN')?.selectedValues.join(', ') || '-';
+        const domain =
+          row.customFields
+            .find((field) => field.label === 'DOMAIN')
+            ?.selectedValues.join(', ') || '-';
         return `${domain}`;
       },
     },
@@ -201,8 +215,10 @@ const ContentReviewer = () => {
       key: 'SUB DOMAIN',
       label: 'Sub Domain',
       render: (row) => {
-        const subDomain = row.customFields.find((field) => field.label ===
-        'SUB DOMAIN')?.selectedValues.join(', ') || '-';
+        const subDomain =
+          row.customFields
+            .find((field) => field.label === 'SUB DOMAIN')
+            ?.selectedValues.join(', ') || '-';
         return `${subDomain}`;
       },
     },
@@ -210,17 +226,21 @@ const ContentReviewer = () => {
       key: 'STREAM',
       label: 'Stream',
       render: (row) => {
-        const stream = row.customFields.find((field) => field.label ===
-        'STREAM')?.selectedValues.join(', ') || '-';
+        const stream =
+          row.customFields
+            .find((field) => field.label === 'STREAM')
+            ?.selectedValues.join(', ') || '-';
         return `${stream}`;
-      }
-    }
-  ]
+      },
+    },
+  ];
 
-  if (storedUserData.tenantData[0].tenantName === TenantName.SECOND_CHANCE_PROGRAM) {
-    columns = [...columns, ...scpCustomColumns]
+  if (
+    storedUserData.tenantData[0].tenantName === TenantName.SECOND_CHANCE_PROGRAM
+  ) {
+    columns = [...columns, ...scpCustomColumns];
   } else if (storedUserData.tenantData[0].tenantName === TenantName.YOUTHNET) {
-    columns = [...columns, ...youthnetCustomColumns]
+    columns = [...columns, ...youthnetCustomColumns];
   }
 
   // Define actions
@@ -273,13 +293,11 @@ const ContentReviewer = () => {
         console.log('row:', row);
         setEditableUserId(row?.userId);
         const userId = row?.userId;
-        const response = await deleteUser(
-          userId, {
-            userData: {
-              status: Status.ARCHIVED
-            }
-          }
-        );
+        const response = await deleteUser(userId, {
+          userData: {
+            status: Status.ARCHIVED,
+          },
+        });
         setPrefilledFormData({});
         searchData(prefilledFormData, currentPage);
         setOpenModal(false);
@@ -353,10 +371,10 @@ const ContentReviewer = () => {
             startIcon={<AddIcon />}
             color="primary"
             sx={{
-              textTransform: "none",
-              fontSize: "14px",
-              color: theme.palette.primary["100"],
-              width: "200px"
+              textTransform: 'none',
+              fontSize: '14px',
+              color: theme.palette.primary['100'],
+              width: '200px',
             }}
             onClick={() => {
               setPrefilledAddFormData({});
