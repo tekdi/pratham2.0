@@ -183,15 +183,17 @@ const AddEditUser = ({
       try {
         // console.log('new', formData?.batch);
         // console.log(editPrefilledFormData?.batch, 'old');
-
+        delete payload?.batch;
         console.log('payload', payload);
         const reassignmentPayload = {
           ...payload,
-          automaticMember: {
-            value: true,
-            fieldId: blockFieldId,
-            fieldName: 'BLOCK',
-          },
+          ...(type === 'team-leader' && {
+            automaticMember: {
+              value: true,
+              fieldId: blockFieldId,
+              fieldName: 'BLOCK',
+            },
+          }),
           userData: {
             firstName: formData.firstName,
           },
@@ -208,7 +210,7 @@ const AddEditUser = ({
           console.error('Error reassigning user:', error);
           showToastMessage(t(failureUpdateMessage), 'error');
         }
-        if (payload.batch) {
+        if (type !== 'team-leader') {
           const cohortIdPayload = getReassignPayload(
             editPrefilledFormData.batch,
             formData.batch

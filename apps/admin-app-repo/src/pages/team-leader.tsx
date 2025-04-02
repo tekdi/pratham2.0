@@ -484,6 +484,7 @@ const TeamLeader = () => {
             notificationContext={notificationContext}
             blockFieldId={blockFieldId}
             districtFieldId={districtFieldId}
+            type={"team-leader"}
           />
         </SimpleModal>
 
