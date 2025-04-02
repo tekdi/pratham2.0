@@ -483,12 +483,8 @@ const TeamLeader = () => {
             notificationContext={notificationContext}
             blockFieldId={blockFieldId}
             districtFieldId={districtFieldId}
-<<<<<<< HEAD
-            type="team-leader"
             hideSubmit={true}
-=======
             type={"team-leader"}
->>>>>>> upstream/main
           />
         </SimpleModal>
 
