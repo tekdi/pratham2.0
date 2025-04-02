@@ -53,11 +53,13 @@ const AddEditUser = ({
   villageFieldId,
   centerFieldId,
   type,
+  hideSubmit,
+  setButtonShow
 }) => {
-  
+
   const [isLoading, setIsLoading] = useState(false);
   const [showAssignmentScreen, setShowAssignmentScreen] =
-  useState<boolean>(false);
+    useState<boolean>(false);
   const [formData, setFormData] = useState<any>();
   const [districtId, setDistrictId] = useState<any>();
   const [prefilledFormData, setPrefilledFormData] = useState(
@@ -90,6 +92,7 @@ const AddEditUser = ({
       'board',
       'medium',
       'parentId',
+      'center',
       'batch',
       'grade',
       'center',
@@ -312,6 +315,7 @@ const AddEditUser = ({
     //schema?.properties?.district
     setFormData(formData);
     setShowAssignmentScreen(true);
+    // setButtonShow(false);
   };
   const onClose = () => {
     // setOpenDelete(false);
@@ -320,6 +324,7 @@ const AddEditUser = ({
     //   setAddNew(false);
     //   setCount(0);
     setShowAssignmentScreen(false);
+    // setButtonShow(true)
     setFormData({});
     SuccessCallback();
   };
@@ -355,6 +360,7 @@ const AddEditUser = ({
           FormSubmitFunction={FormSubmitFunction}
           prefilledFormData={prefilledFormData || {}}
           extraFields={extraFieldsUpdate}
+          hideSubmit={hideSubmit}
         />
       ) : type === 'facilitator' ? (
         // When role is facilitator and not editing, show StepperForm with facilitator-specific props
@@ -367,13 +373,15 @@ const AddEditUser = ({
           onClose={onClose}
           parenResult={{}}
           parentId={formData?.district}
-          stateId={formData?.state[0]}
-          districtId={formData?.district[0]}
-          blockId={formData?.block[0]}
-          villageId={formData?.village[0]}
+          stateId={formData?.state?.[0]}
+          districtId={formData?.district?.[0]}
+          blockId={formData?.block?.[0]}
+          villageId={formData?.village?.[0]}
           // facilitatorProp="yourFacilitatorValue"
           role={type}
           // add any additional prop(s) for facilitator
+          hideSubmit={hideSubmit}
+          setButtonShow={setButtonShow}
         />
       ) : type === 'mentor' ? (
         <StepperForm
@@ -385,10 +393,11 @@ const AddEditUser = ({
           onClose={onClose}
           parenResult={{}}
           parentId={formData?.district}
-          stateId={formData?.state[0]}
-          districtId={formData?.district[0]}
+          stateId={formData?.state?.[0]}
+          districtId={formData?.district?.[0]}
           //mentorProp="yourMentorValue" // add any additional prop(s) for mentor
           role={type}
+          hideSubmit={hideSubmit}
         />
       ) : (
         <DynamicForm
@@ -397,6 +406,7 @@ const AddEditUser = ({
           t={t}
           FormSubmitFunction={FormSubmitFunction}
           prefilledFormData={prefilledFormData || {}}
+          hideSubmit={hideSubmit}
           extraFields={isEdit || isReassign ? extraFieldsUpdate : extraFields}
         />
       )}

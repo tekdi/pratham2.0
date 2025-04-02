@@ -378,7 +378,9 @@ const Centers = () => {
         <SimpleModal
           open={openModal}
           onClose={handleCloseModal}
-          showFooter={false}
+          showFooter={true}
+          primaryText={isEdit ? t('Update') : t('Create')}
+          id="dynamic-form-id"
           modalTitle={
             isEdit ? t('COMMON.UPDATE_CENTER') : t('CENTERS.NEW_CENTER')
           }
@@ -408,6 +410,7 @@ const Centers = () => {
             telemetryCreateKey={telemetryCreateKey}
             failureCreateMessage={failureCreateMessage}
             isNotificationRequired={false}
+            hideSubmit={true}
           />
         </SimpleModal>
 

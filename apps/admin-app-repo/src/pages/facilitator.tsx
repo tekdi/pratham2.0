@@ -93,11 +93,11 @@ const Facilitator = () => {
   const searchStoreKey = 'facilitator';
   const initialFormDataSearch =
     localStorage.getItem(searchStoreKey) &&
-    localStorage.getItem(searchStoreKey) != '{}'
+      localStorage.getItem(searchStoreKey) != '{}'
       ? JSON.parse(localStorage.getItem(searchStoreKey))
       : localStorage.getItem('stateId')
-      ? { state: [localStorage.getItem('stateId')] }
-      : {};
+        ? { state: [localStorage.getItem('stateId')] }
+        : {};
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -183,9 +183,8 @@ const Facilitator = () => {
       keys: ['firstName', 'middleName', 'lastName'],
       label: 'Facilitator Name',
       render: (row) =>
-        `${transformLabel(row.firstName) || ''} ${
-          transformLabel(row.middleName) || ''
-        } ${transformLabel(row.lastName) || ''}`.trim(),
+        `${transformLabel(row.firstName) || ''} ${transformLabel(row.middleName) || ''
+          } ${transformLabel(row.lastName) || ''}`.trim(),
     },
     {
       key: 'status',
@@ -241,11 +240,9 @@ const Facilitator = () => {
               (field: { label: string }) => field.label === 'VILLAGE'
             )?.selectedValues?.[0]?.value
           ) || '';
-        return `${state == '' ? '' : `${state}`}${
-          district == '' ? '' : `, ${district}`
-        }${block == '' ? '' : `, ${block}`}${
-          village == '' ? '' : `, ${village}`
-        }`;
+        return `${state == '' ? '' : `${state}`}${district == '' ? '' : `, ${district}`
+          }${block == '' ? '' : `, ${block}`}${village == '' ? '' : `, ${village}`
+          }`;
       },
     },
   ];
@@ -341,6 +338,7 @@ const Facilitator = () => {
         // console.log('tempFormData', tempFormData);
         setPrefilledAddFormData(tempFormData);
         setIsEdit(true);
+        setIsReassign(false);
         setEditableUserId(row?.userId);
         handleOpenModal();
       },
@@ -415,7 +413,7 @@ const Facilitator = () => {
         let tempFormData = extractMatchingKeys(row, addSchema);
         console.log(tempFormData, ' tempFormData');
         setPrefilledAddFormData(tempFormData);
-        // setIsEdit(true);
+        setIsEdit(false);
         setIsReassign(true);
         setEditableUserId(row?.userId);
         handleOpenModal();
@@ -464,17 +462,24 @@ const Facilitator = () => {
   const notificationMessage = 'FACILITATORS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
 
-  useEffect(() => {
-    setPrefilledFormData(initialFormDataSearch);
-  }, []);
-
   const [open, setOpen] = useState(false);
   const [checked, setChecked] = useState(false);
   const [reason, setReason] = useState('');
 
   // console.log(response?.result?.getUserDetails , "shreyas");
-  response;
+  // response;
 
+  useEffect(() => {
+    setPrefilledFormData(initialFormDataSearch);
+  }, []);
+
+  const [buttonShow, setButtonShowState] = useState(true);
+
+  const setButtonShow = (status) => {
+
+    console.log("########## changed", status);
+    setButtonShowState(status)
+  }
   return (
     <>
       <Box display={'flex'} flexDirection={'column'} gap={2}>
@@ -518,15 +523,15 @@ const Facilitator = () => {
         <SimpleModal
           open={openModal}
           onClose={handleCloseModal}
-          showFooter={!isEdit ? true : false}
-          primaryText={isReassign ? '' : 'Next'}
+          showFooter={buttonShow}
+          primaryText={isEdit ? t('Update') : t('Next')}
           id="dynamic-form-id"
           modalTitle={
             isEdit
               ? t('FACILITATORS.EDIT_FACILITATOR')
               : isReassign
-              ? t('FACILITATORS.RE_ASSIGN_facilitator')
-              : t('FACILITATORS.NEW_FACILITATOR')
+                ? t('FACILITATORS.RE_ASSIGN_facilitator')
+                : t('FACILITATORS.NEW_FACILITATOR')
           }
         >
           <AddEditUser
@@ -563,6 +568,8 @@ const Facilitator = () => {
             villageFieldId={villageFieldId}
             // centerFieldId={centerFieldId}
             type="facilitator"
+            hideSubmit={true}
+            setButtonShow={setButtonShow}
           />
         </SimpleModal>
 

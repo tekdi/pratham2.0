@@ -340,7 +340,9 @@ const Batch = () => {
         <SimpleModal
           open={openModal}
           onClose={handleCloseModal}
-          showFooter={false}
+          showFooter={true}
+          primaryText={isEdit ? t('Update') : t('Create')}
+          id="dynamic-form-id"
           modalTitle={isEdit ? t('BATCH.UPDATE_BATCH') : t('BATCH.NEW_BATCH')}
         >
           <AddEditUser
@@ -368,6 +370,7 @@ const Batch = () => {
             telemetryCreateKey={telemetryCreateKey}
             failureCreateMessage={failureCreateMessage}
             isNotificationRequired={false}
+            hideSubmit={true}
           />
         </SimpleModal>
 
