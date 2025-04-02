@@ -399,7 +399,9 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
               setManipulatedCohortData?.(filteredData);
             }
           }
-          // setLoading(false);
+          if (response.length === 0) {
+            setLoading(false);
+          }
         } catch (error) {
           console.error('Error fetching cohort list', error);
           // setLoading(false);
