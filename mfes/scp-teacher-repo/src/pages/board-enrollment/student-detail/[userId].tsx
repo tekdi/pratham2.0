@@ -1,3 +1,4 @@
+// @ts-nocheck
 import BoardEnrollmentProfile from '@/components/BoardEnrollmentProfile';
 import ConfirmationModal from '@/components/ConfirmationModal';
 import Header from '@/components/Header';
@@ -13,7 +14,7 @@ import {
   getAssociationsByName,
   getCohortNameById,
   getOptionsByCategory,
-  toPascalCase
+  toPascalCase,
 } from '@/utils/Helper';
 import { BoardEnrollmentData } from '@/utils/Interfaces';
 import { telemetryFactory } from '@/utils/telemetry';
@@ -141,7 +142,7 @@ const BoardEnrollmentDetail = () => {
   }, [memoizedFieldIdLabel]);
 
   useEffect(() => {
-    if (!(formData.BOARD?.toUpperCase().includes("NIOS"))) {
+    if (!formData.BOARD?.toUpperCase().includes('NIOS')) {
       setFormData((prev) => ({ ...prev, FEES: 'na' }));
     }
   }, [formData.BOARD, formData.FEES, activeStep === 3]);
@@ -221,7 +222,7 @@ const BoardEnrollmentDetail = () => {
       const externalsource = extractExternalSource(boardData);
       try {
         if (externalsource) {
-          const url = externalsource;
+          const url = process.env.NEXT_PUBLIC_MIDDLEWARE_URL + externalsource;
           const boards = await fetch(url).then((res) => res.json());
           const frameworks = boards?.result?.framework;
 
@@ -289,29 +290,29 @@ const BoardEnrollmentDetail = () => {
 
   const handleNext = async () => {
     setFormDataUpdated(false);
-  
+
     let nextStep = activeStep < 4 ? activeStep + 1 : activeStep;
     if (nextStep > stageCount) {
       setStageCount(stageCount + 1);
     }
-  
+
     const currentLabel = labelMapping[nextStep - 1];
     const field = userData?.customField?.find(
       (item) => item.label === currentLabel
     );
-  
+
     if (!field) {
       console.error(`Field with label "${currentLabel}" not found.`);
       return;
     }
-  
+
     const fieldId = field.fieldId;
     const value = formData?.[currentLabel];
-  
+
     if (!userData?.cohortMembershipId) {
       throw new Error('Membership ID is required.');
     }
-  
+
     const requestBody = {
       membershipId: userData?.cohortMembershipId,
       dynamicBody: {
@@ -327,14 +328,18 @@ const BoardEnrollmentDetail = () => {
         ],
       },
     };
-  
+
     try {
       const response = await updateCohortMemberStatus(requestBody);
-  
-      if (response && response?.params?.status === 'successful' && response?.responseCode === 201) {
+
+      if (
+        response &&
+        response?.params?.status === 'successful' &&
+        response?.responseCode === 201
+      ) {
         const windowUrl = window.location.pathname;
         const cleanedUrl = windowUrl.replace(/^\//, '');
-        const env = cleanedUrl.split("/")[0];
+        const env = cleanedUrl.split('/')[0];
         const telemetryInteract = {
           context: {
             env: env,
@@ -342,7 +347,7 @@ const BoardEnrollmentDetail = () => {
           },
           edata: {
             id: `endrolled-student(${userId})-to step ` + nextStep,
-  
+
             type: Telemetry.CLICK,
             subtype: '',
             pageid: cleanedUrl,
@@ -351,38 +356,49 @@ const BoardEnrollmentDetail = () => {
         telemetryFactory.interact(telemetryInteract);
         // API successful, update step state to nextStep
         setActiveStep(nextStep);
-        
-        // Call delete field values api to reset subjects, registration no and fees       
-        const generateApiBody = (fieldIds: { fieldId: string; label: string }[], membershipId: string) => {
-            return {
-              fieldValues: fieldIds
-                .filter(field => field.label !== "BOARD")
-                .map(field => ({
-                  fieldId: field.fieldId,
-                  itemId: membershipId
-                }))
-            };
+
+        // Call delete field values api to reset subjects, registration no and fees
+        const generateApiBody = (
+          fieldIds: { fieldId: string; label: string }[],
+          membershipId: string
+        ) => {
+          return {
+            fieldValues: fieldIds
+              .filter((field) => field.label !== 'BOARD')
+              .map((field) => ({
+                fieldId: field.fieldId,
+                itemId: membershipId,
+              })),
           };
-          
-          const handleDeleteFields = async () => {
-            if (!userData?.cohortMembershipId || !fieldIdLabel.length) {
-              console.error('Missing required data for deleting fields');
-              return;
-            }
-          
-            const apiBody = generateApiBody(fieldIdLabel, userData.cohortMembershipId);
-            try {
-              const result = await deleteFormFields(apiBody.fieldValues);
-              // console.log('Fields deleted successfully:', result);
-              setStageCount(nextStep);
-              setFormData({ BOARD: formData.BOARD, SUBJECTS: "", REGISTRATION: "", FEES: "" });
-            } catch (err) {
-              // console.error('Failed to delete fields:', err);
-              showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
-              throw err;
-            }
-          };
-        (activeStep === 0 && formDataUpdated) && handleDeleteFields();
+        };
+
+        const handleDeleteFields = async () => {
+          if (!userData?.cohortMembershipId || !fieldIdLabel.length) {
+            console.error('Missing required data for deleting fields');
+            return;
+          }
+
+          const apiBody = generateApiBody(
+            fieldIdLabel,
+            userData.cohortMembershipId
+          );
+          try {
+            const result = await deleteFormFields(apiBody.fieldValues);
+            // console.log('Fields deleted successfully:', result);
+            setStageCount(nextStep);
+            setFormData({
+              BOARD: formData.BOARD,
+              SUBJECTS: '',
+              REGISTRATION: '',
+              FEES: '',
+            });
+          } catch (err) {
+            // console.error('Failed to delete fields:', err);
+            showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
+            throw err;
+          }
+        };
+        activeStep === 0 && formDataUpdated && handleDeleteFields();
       } else {
         console.error('API response is invalid or failed.');
         showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
@@ -392,7 +408,6 @@ const BoardEnrollmentDetail = () => {
       showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
     }
   };
-  
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => {
@@ -528,54 +543,54 @@ const BoardEnrollmentDetail = () => {
                         sx={{
                           fontSize: '12px',
                           fontWeight: 600,
-                          color: theme.palette.warning['500']
+                          color: theme.palette.warning['500'],
                         }}
                       >
                         {t('BOARD_ENROLMENT.CHOOSE_BOARD')}
                       </Box>
-                      <Box sx={{maxHeight: '550px', overflowY: 'auto'}}>
-                      {boardOptions?.map((boardItem) => (
-                        <Box sx={{ mt: 2 }} key={boardItem.code}>
-                          <Box
-                            sx={{
-                              display: 'flex',
-                              pb: '15px',
-                              justifyContent: 'space-between',
-                              alignItems: 'center',
-                              borderBottom: `1px solid ${theme.palette.warning['A100']}`,
-                            }}
-                          >
+                      <Box sx={{ maxHeight: '550px', overflowY: 'auto' }}>
+                        {boardOptions?.map((boardItem) => (
+                          <Box sx={{ mt: 2 }} key={boardItem.code}>
                             <Box
                               sx={{
-                                fontSize: '16px',
-                                fontWeight: 400,
-                                color: theme.palette.warning['300'],
+                                display: 'flex',
+                                pb: '15px',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                borderBottom: `1px solid ${theme.palette.warning['A100']}`,
                               }}
                             >
-                              {boardItem?.name}
-                            </Box>
-                            <Radio
-                              checked={formData?.BOARD === boardItem?.name}
-                              onChange={(e) => {
-                                const selectedBoard = e.target.value;
-                                setFormData((prevFormData) => {
-                                  const updatedFormData = {
-                                    ...prevFormData,
-                                    BOARD: selectedBoard,
-                                  };
+                              <Box
+                                sx={{
+                                  fontSize: '16px',
+                                  fontWeight: 400,
+                                  color: theme.palette.warning['300'],
+                                }}
+                              >
+                                {boardItem?.name}
+                              </Box>
+                              <Radio
+                                checked={formData?.BOARD === boardItem?.name}
+                                onChange={(e) => {
+                                  const selectedBoard = e.target.value;
+                                  setFormData((prevFormData) => {
+                                    const updatedFormData = {
+                                      ...prevFormData,
+                                      BOARD: selectedBoard,
+                                    };
 
-                                  setFormDataUpdated(true);
-                                  setActiveStep(0);
-                                  return updatedFormData;
-                                });
-                              }}
-                              value={boardItem?.name}
-                              name="radio-buttons"
-                              inputProps={{ 'aria-label': boardItem?.name }}
-                            />
+                                    setFormDataUpdated(true);
+                                    setActiveStep(0);
+                                    return updatedFormData;
+                                  });
+                                }}
+                                value={boardItem?.name}
+                                name="radio-buttons"
+                                inputProps={{ 'aria-label': boardItem?.name }}
+                              />
+                            </Box>
                           </Box>
-                        </Box>
-                      ))}
+                        ))}
                       </Box>
                     </>
                   )}
@@ -619,14 +634,14 @@ const BoardEnrollmentDetail = () => {
                                   subjectOptions.length
                               }
                               onChange={(e) => {
-                                  const isChecked = e.target.checked;
-                                  setFormData({
-                                    ...formData,
-                                    SUBJECTS: isChecked
-                                      ? [...subjectOptions]
-                                      : [],
-                                  });
-                                  setFormDataUpdated(true);
+                                const isChecked = e.target.checked;
+                                setFormData({
+                                  ...formData,
+                                  SUBJECTS: isChecked
+                                    ? [...subjectOptions]
+                                    : [],
+                                });
+                                setFormDataUpdated(true);
                               }}
                               sx={{
                                 color: theme.palette.warning['300'],
@@ -759,7 +774,7 @@ const BoardEnrollmentDetail = () => {
                           setFormDataUpdated(true);
                         }}
                       >
-                        {formData.BOARD.toUpperCase().includes("NIOS") ? (
+                        {formData.BOARD.toUpperCase().includes('NIOS') ? (
                           <>
                             <FormControlLabel
                               value="yes"

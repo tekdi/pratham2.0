@@ -42,10 +42,12 @@ import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
 import { deleteUser } from '@/services/UserService';
-import { transformLabel } from '@/utils/Helper';
+import { fetchUserData, transformLabel } from '@/utils/Helper';
 import { getCohortList } from '@/services/GetCohortList';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
+import apartment from '../../public/images/apartment.svg';
+import { getCenterList } from '@/services/MasterDataService';
 
 const Learner = () => {
   const theme = useTheme<any>();
@@ -66,9 +68,12 @@ const Learner = () => {
   const [editableUserId, setEditableUserId] = useState('');
   const [roleId, setRoleID] = useState('');
   const [tenantId, setTenantId] = useState('');
+  const [isReassign, setIsReassign] = useState(false);
   const [open, setOpen] = useState(false);
   const [checked, setChecked] = useState(false);
   const [userID, setUserId] = useState('');
+  const [centerSelectiveValue, setCenterSelectiveValue] = useState('');
+  const [cohorts, setCohorts] = useState([]);
   const [userData, setUserData] = useState({
     firstName: '',
     lastName: '',
@@ -76,7 +81,10 @@ const Learner = () => {
   });
   const [reason, setReason] = useState('');
   const [memberShipID, setMemberShipID] = useState('');
-
+  const [blockFieldId, setBlockFieldId] = useState('');
+  const [districtFieldId, setDistrictFieldId] = useState('');
+  const [villageFieldId, setVillageFieldId] = useState('');
+  const [parentId, setParentId] = useState('');
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
     ? { state: [localStorage.getItem('stateId')] }
@@ -112,6 +120,16 @@ const Learner = () => {
         },
       ]);
       console.log('responseForm', responseForm);
+      const districtFieldId =
+        responseForm?.schema?.properties?.district?.fieldId;
+      const blockFieldId = responseForm?.schema?.properties?.block?.fieldId;
+      const villageFieldId = responseForm?.schema?.properties?.village?.fieldId;
+
+      // const centerFieldId = responseForm.schema.properties.center.fieldId;
+
+      setBlockFieldId(blockFieldId);
+      setDistrictFieldId(districtFieldId);
+      setVillageFieldId(villageFieldId);
       setAddSchema(responseForm?.schema);
       setAddUiSchema(responseForm?.uiSchema);
     };
@@ -204,25 +222,25 @@ const Learner = () => {
           transformLabel(
             row.customFields.find(
               (field: { label: string }) => field.label === 'STATE'
-            )?.selectedValues[0]?.value
+            )?.selectedValues?.[0]?.value
           ) || '';
         const district =
           transformLabel(
             row.customFields.find(
               (field: { label: string }) => field.label === 'DISTRICT'
-            )?.selectedValues[0]?.value
+            )?.selectedValues?.[0]?.value
           ) || '';
         const block =
           transformLabel(
             row.customFields.find(
               (field: { label: string }) => field.label === 'BLOCK'
-            )?.selectedValues[0]?.value
+            )?.selectedValues?.[0]?.value
           ) || '';
         const village =
           transformLabel(
             row.customFields.find(
               (field: { label: string }) => field.label === 'VILLAGE'
-            )?.selectedValues[0]?.value
+            )?.selectedValues?.[0]?.value
           ) || '';
         return `${state == '' ? '' : `${state}`}${
           district == '' ? '' : `, ${district}`
@@ -298,6 +316,26 @@ const Learner = () => {
     }
   };
 
+  // const fetchUserData = async (userId) => {
+  //   try {
+  //     let activeCohortIds = [];
+  //     const resp = await getCohortList(userId);
+  //     if (resp?.result) { 
+  //       activeCohortIds = resp.result
+  //         .filter(
+  //           (cohort) =>
+  //             cohort.type === 'BATCH' && cohort.cohortStatus === 'active'
+  //         )
+  //         .map((cohort) => cohort.cohortId);
+  //       console.log(activeCohortIds, 'activeBatches');
+  //     }
+  //     return activeCohortIds;
+  //   } catch (error) {
+  //     console.error('Error getting user details:', error);
+  //     return null;
+  //   }
+  // };
+
   // Define actions
   const actions = [
     {
@@ -353,17 +391,7 @@ const Learner = () => {
 
         // console.log('row:', row?.customFields[2].selectedValues[0].value);
         setEditableUserId(row?.userId);
-        // const memberStatus = Status.ARCHIVED;
-        // const statusReason = '';
-        // const membershipId = row?.userId;
 
-        // const response = await updateCohortMemberStatus({
-        //   memberStatus,
-        //   statusReason,
-        //   membershipId,
-        // });
-        // setPrefilledFormData({});
-        // searchData(prefilledFormData, currentPage);
         setOpen(true);
 
         setUserId(row?.userId);
@@ -373,6 +401,47 @@ const Learner = () => {
           lastName: row?.lastName || '',
           village: findVillage?.selectedValues?.[0]?.value || '',
         });
+      },
+    },
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            backgroundColor: 'rgb(227, 234, 240)',
+            padding: '10px',
+          }}
+        >
+          <Image src={apartment} alt="" />
+        </Box>
+      ),
+      callback: async (row) => {
+        console.log('row:', row);
+        const centerField = row.customFields.find(
+          (field) => field.label === 'CENTER'
+        );
+        if (centerField) {
+          setCenterSelectiveValue(centerField.selectedValues);
+        } else {
+          console.log('CENTER field not found');
+        }
+        // console.log('AddSchema', addSchema);
+        // console.log('AddUISchema', addUiSchema);
+
+        let batchList = await fetchUserData(row?.userId);
+        let tempFormData = extractMatchingKeys(row, addSchema);
+        tempFormData = {
+          ...tempFormData,
+          batch: batchList,
+        };
+        setPrefilledAddFormData(tempFormData);
+        // setIsEdit(true);
+        setIsReassign(true);
+        setEditableUserId(row?.userId);
+        handleOpenModal();
       },
     },
   ];
@@ -392,6 +461,8 @@ const Learner = () => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
+    setIsReassign(false);
+    setIsEdit(false);
   };
 
   //Add Edit Props
@@ -451,20 +522,27 @@ const Learner = () => {
             onClick={() => {
               setPrefilledAddFormData(initialFormData);
               setIsEdit(false);
+              setIsReassign(false);
               setEditableUserId('');
               handleOpenModal();
             }}
           >
-            {t('COMMON.ADD_NEW')}{' '}
+            {t('COMMON.ADD_NEW')}
           </Button>
         </Box>
 
         <SimpleModal
           open={openModal}
           onClose={handleCloseModal}
-          showFooter={false}
+          showFooter={true}
+          primaryText={isEdit ? t('Update') : t('Create')}
+          id="dynamic-form-id"
           modalTitle={
-            isEdit ? t('LEARNERS.EDIT_LEARNER') : t('LEARNERS.NEW_LEARNER')
+            isEdit
+              ? t('LEARNERS.EDIT_LEARNER')
+              : isReassign
+              ? t('LEARNERS.RE_ASSIGN_LEARNER')
+              : t('LEARNERS.NEW_LEARNER')
           }
         >
           <AddEditUser
@@ -477,6 +555,8 @@ const Learner = () => {
             uiSchema={addUiSchema}
             editPrefilledFormData={prefilledAddFormData}
             isEdit={isEdit}
+            isReassign={isReassign}
+            isExtraFields={true}
             editableUserId={editableUserId}
             UpdateSuccessCallback={() => {
               setPrefilledFormData({});
@@ -494,6 +574,10 @@ const Learner = () => {
             notificationKey={notificationKey}
             notificationMessage={notificationMessage}
             notificationContext={notificationContext}
+            blockFieldId={blockFieldId}
+            districtFieldId={districtFieldId}
+            villageFieldId={villageFieldId}
+            hideSubmit={true}
           />
         </SimpleModal>
 
