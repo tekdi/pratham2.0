@@ -112,7 +112,7 @@ export const extractMatchingKeys = (row: any, schema: any) => {
       Array.isArray(selectedValues) &&
       selectedValues.length > 0
     ) {
-      if (typeof selectedValues[0] === 'object') {
+      if (typeof selectedValues?.[0] === 'object') {
         // Array of JSON objects -> return array of IDs
         return selectedValues.map((item) => item.id);
       } else {
@@ -124,9 +124,9 @@ export const extractMatchingKeys = (row: any, schema: any) => {
       Array.isArray(selectedValues) &&
       selectedValues.length > 0
     ) {
-      if (typeof selectedValues[0] === 'object') {
+      if (typeof selectedValues?.[0] === 'object') {
         // Array of JSON objects -> return first object's ID
-        return selectedValues[0].id;
+        return selectedValues?.[0].id;
       }
     }
     //patch for type = array and selected value = string

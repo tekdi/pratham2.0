@@ -267,7 +267,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
       const state = cohortData?.find(
         (item: CustomField) => item.label === 'STATE'
       );
-      setState(state?.value);
+      setState(state?.selectedValues?.[0]?.value || '');
 
       const typeOfCohort = cohortData?.find(
         (item: CustomField) => item.label === 'TYPE_OF_COHORT'
@@ -727,11 +727,11 @@ const Dashboard: React.FC<DashboardProps> = () => {
           const state = cohortData.customField.find(
             (item: CustomField) => item.label === 'STATE'
           );
-          setState(state?.value);
+          setState(toPascalCase(state?.selectedValues?.[0]?.value) || '');
 
-          const address = `${toPascalCase(district?.value)}, ${toPascalCase(
-            state?.value
-          )}`;
+          const address = `${toPascalCase(
+            district?.selectedValues?.[0]?.value || ''
+          )}, ${toPascalCase(state?.selectedValues?.[0]?.value || '')}`;
           cohortData.address = address || '';
 
           const typeOfCohort = cohortData.customField.find(

@@ -222,25 +222,25 @@ const Learner = () => {
           transformLabel(
             row.customFields.find(
               (field: { label: string }) => field.label === 'STATE'
-            )?.selectedValues[0]?.value
+            )?.selectedValues?.[0]?.value
           ) || '';
         const district =
           transformLabel(
             row.customFields.find(
               (field: { label: string }) => field.label === 'DISTRICT'
-            )?.selectedValues[0]?.value
+            )?.selectedValues?.[0]?.value
           ) || '';
         const block =
           transformLabel(
             row.customFields.find(
               (field: { label: string }) => field.label === 'BLOCK'
-            )?.selectedValues[0]?.value
+            )?.selectedValues?.[0]?.value
           ) || '';
         const village =
           transformLabel(
             row.customFields.find(
               (field: { label: string }) => field.label === 'VILLAGE'
-            )?.selectedValues[0]?.value
+            )?.selectedValues?.[0]?.value
           ) || '';
         return `${state == '' ? '' : `${state}`}${
           district == '' ? '' : `, ${district}`

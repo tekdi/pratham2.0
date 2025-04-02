@@ -289,14 +289,19 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                   name: item?.cohortName || item?.name,
                   status: item?.cohortStatus,
                   customField: item?.customField,
+                  childData: item?.childData,
                 }))
                 ?.filter(Boolean);
 
               setCohorts(filteredData);
               if (filteredData.length > 0) {
                 if (typeof window !== 'undefined' && window.localStorage) {
+                  let centerLocalId = filteredData?.[0]?.cohortId;
+                  if (localStorage.getItem('centerId')) {
+                    centerLocalId = localStorage.getItem('centerId');
+                  }
                   let filteredChildData = await getBatchFilteredData(
-                    filteredData?.[0]?.cohortId
+                    centerLocalId
                   );
                   setCohortsData([...filteredChildData]);
                   const cohort = localStorage.getItem('classId') || '';
@@ -421,6 +426,9 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
     setClassId(filteredChildData?.[0]?.cohortId);
     setCenterId(event.target.value);
     localStorage.setItem('centerId', event.target.value);
+
+    //patch for reload
+    setHandleSaveHasRun?.(!handleSaveHasRun);
   };
 
   const handleBatchSelection = (event: SelectChangeEvent<string>) => {

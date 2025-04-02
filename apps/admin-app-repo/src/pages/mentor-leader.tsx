@@ -210,12 +210,12 @@ const MentorLead = () => {
         const state =
           transformLabel(
             row.customFields.find((field) => field.label === 'STATE')
-              ?.selectedValues[0]?.value
+              ?.selectedValues?.[0]?.value
           ) || '';
         const district =
           transformLabel(
             row.customFields.find((field) => field.label === 'DISTRICT')
-              ?.selectedValues[0]?.value
+              ?.selectedValues?.[0]?.value
           ) || '';
 
         return `${state == '' ? '' : `${state}`}${
