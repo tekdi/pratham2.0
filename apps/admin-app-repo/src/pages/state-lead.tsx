@@ -27,10 +27,8 @@ import {
 import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import TenantService from '@/services/TenantService';
-import { useTheme } from "@mui/material/styles";
-import AddIcon from "@mui/icons-material/Add";
-
-
+import { useTheme } from '@mui/material/styles';
+import AddIcon from '@mui/icons-material/Add';
 
 const StateLead = () => {
   const theme = useTheme<any>();
@@ -52,10 +50,12 @@ const StateLead = () => {
 
   const { t, i18n } = useTranslation();
 
-  const searchStoreKey = 'stateLead'
-  const initialFormDataSearch = localStorage.getItem(searchStoreKey) && localStorage.getItem(searchStoreKey) != "{}"
-    ? JSON.parse(localStorage.getItem(searchStoreKey))
-    : localStorage.getItem('stateId')
+  const searchStoreKey = 'stateLead';
+  const initialFormDataSearch =
+    localStorage.getItem(searchStoreKey) &&
+    localStorage.getItem(searchStoreKey) != '{}'
+      ? JSON.parse(localStorage.getItem(searchStoreKey))
+      : localStorage.getItem('stateId')
       ? { state: [localStorage.getItem('stateId')] }
       : {};
 
@@ -97,12 +97,15 @@ const StateLead = () => {
   const SubmitaFunction = async (formData: any) => {
     setPrefilledFormData(formData);
     //set prefilled search data on refresh
-    localStorage.setItem(searchStoreKey, JSON.stringify(formData))
+    localStorage.setItem(searchStoreKey, JSON.stringify(formData));
     await searchData(formData, 0);
   };
 
   const searchData = async (formData: any, newPage: any) => {
-    const staticFilter = { role: RoleName.STATE_LEAD, tenantId: TenantService.getTenantId() };
+    const staticFilter = {
+      role: RoleName.STATE_LEAD,
+      tenantId: TenantService.getTenantId(),
+    };
     const { sortBy } = formData;
     const staticSort = ['firstName', sortBy || 'asc'];
     await searchListData(
@@ -141,10 +144,10 @@ const StateLead = () => {
       render: (row) => {
         const state =
           row.customFields.find((field) => field.label === 'STATE')
-            ?.selectedValues[0]?.value || '-';
+            ?.selectedValues?.[0]?.value || '-';
         return `${state}`;
       },
-    }
+    },
   ];
 
   // Define actions
@@ -197,13 +200,11 @@ const StateLead = () => {
         console.log('row:', row);
         setEditableUserId(row?.userId);
         const userId = row?.userId;
-        const response = await deleteUser(
-          userId, {
-            userData: {
-              status: Status.ARCHIVED
-            }
-          }
-        );
+        const response = await deleteUser(userId, {
+          userData: {
+            status: Status.ARCHIVED,
+          },
+        });
         setPrefilledFormData({});
         searchData(prefilledFormData, currentPage);
         setOpenModal(false);
@@ -239,25 +240,19 @@ const StateLead = () => {
     ],
     password: Math.floor(10000 + Math.random() * 90000),
   };
-  const successUpdateMessage =
-    'STATE_LEADS.STATE_LEAD_UPDATED_SUCCESSFULLY';
+  const successUpdateMessage = 'STATE_LEADS.STATE_LEAD_UPDATED_SUCCESSFULLY';
   const telemetryUpdateKey = 'content-creator-updated-successfully';
-  const failureUpdateMessage =
-    'STATE_LEADS.NOT_ABLE_UPDATE_STATE_LEAD';
-  const successCreateMessage =
-    'STATE_LEADS.STATE_LEAD_CREATED_SUCCESSFULLY';
+  const failureUpdateMessage = 'STATE_LEADS.NOT_ABLE_UPDATE_STATE_LEAD';
+  const successCreateMessage = 'STATE_LEADS.STATE_LEAD_CREATED_SUCCESSFULLY';
   const telemetryCreateKey = 'content-creator-created-successfully';
-  const failureCreateMessage =
-    'STATE_LEADS.NOT_ABLE_CREATE_STATE_LEAD';
+  const failureCreateMessage = 'STATE_LEADS.NOT_ABLE_CREATE_STATE_LEAD';
   const notificationKey = 'onStateLeadCreate';
-  const notificationMessage =
-    'STATE_LEADS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
+  const notificationMessage = 'STATE_LEADS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
-   
 
   useEffect(() => {
     setPrefilledFormData(initialFormDataSearch);
-  })
+  });
   return (
     <>
       <Box display={'flex'} flexDirection={'column'} gap={2}>
@@ -281,10 +276,10 @@ const StateLead = () => {
             startIcon={<AddIcon />}
             color="primary"
             sx={{
-              textTransform: "none",
-              fontSize: "14px",
-              color: theme.palette.primary["100"],
-              width: "200px"
+              textTransform: 'none',
+              fontSize: '14px',
+              color: theme.palette.primary['100'],
+              width: '200px',
             }}
             onClick={() => {
               setPrefilledAddFormData({});

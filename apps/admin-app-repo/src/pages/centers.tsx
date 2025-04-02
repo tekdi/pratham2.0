@@ -63,13 +63,14 @@ const Centers = () => {
   const initialFormData = localStorage.getItem('stateId')
     ? { state: [localStorage.getItem('stateId')] }
     : {};
-  const searchStoreKey = 'centers'
-  const initialFormDataSearch = localStorage.getItem(searchStoreKey) && localStorage.getItem(searchStoreKey) != "{}"
-    ? JSON.parse(localStorage.getItem(searchStoreKey))
-    : localStorage.getItem('stateId')
+  const searchStoreKey = 'centers';
+  const initialFormDataSearch =
+    localStorage.getItem(searchStoreKey) &&
+    localStorage.getItem(searchStoreKey) != '{}'
+      ? JSON.parse(localStorage.getItem(searchStoreKey))
+      : localStorage.getItem('stateId')
       ? { state: [localStorage.getItem('stateId')] }
       : {};
-
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -114,7 +115,7 @@ const Centers = () => {
   const SubmitaFunction = async (formData: any) => {
     setPrefilledFormData(formData);
     //set prefilled search data on refresh
-    localStorage.setItem(searchStoreKey, JSON.stringify(formData))
+    localStorage.setItem(searchStoreKey, JSON.stringify(formData));
     await searchData(formData, 0);
   };
 
@@ -189,7 +190,7 @@ const Centers = () => {
       render: (row) =>
         transformLabel(
           row.customFields.find((field) => field.label === 'STATE')
-            ?.selectedValues[0]?.value
+            ?.selectedValues?.[0]?.value
         ) || '-',
     },
     {
@@ -198,7 +199,7 @@ const Centers = () => {
       render: (row) =>
         transformLabel(
           row.customFields.find((field) => field.label === 'DISTRICT')
-            ?.selectedValues[0]?.value
+            ?.selectedValues?.[0]?.value
         ) || '-',
     },
     {
@@ -207,7 +208,7 @@ const Centers = () => {
       render: (row) =>
         transformLabel(
           row.customFields.find((field) => field.label === 'BLOCK')
-            ?.selectedValues[0]?.value
+            ?.selectedValues?.[0]?.value
         ) || '-',
     },
     {
@@ -216,7 +217,7 @@ const Centers = () => {
       render: (row) =>
         transformLabel(
           row.customFields.find((field) => field.label === 'VILLAGE')
-            ?.selectedValues[0]?.value
+            ?.selectedValues?.[0]?.value
         ) || '-',
     },
     {
@@ -225,7 +226,7 @@ const Centers = () => {
       render: (row) =>
         transformLabel(
           row.customFields.find((field) => field.label === 'BOARD')
-            ?.selectedValues[0]
+            ?.selectedValues?.[0]
         ) || '-',
     },
     {
@@ -234,7 +235,7 @@ const Centers = () => {
       render: (row) =>
         transformLabel(
           row.customFields.find((field) => field.label === 'MEDIUM')
-            ?.selectedValues[0]
+            ?.selectedValues?.[0]
         ) || '-',
     },
   ];

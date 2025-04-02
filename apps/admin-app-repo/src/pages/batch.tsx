@@ -155,7 +155,7 @@ const Batch = () => {
       render: (row) =>
         transformLabel(
           row.customFields.find((field) => field.label === 'DISTRICT')
-            ?.selectedValues[0]?.value
+            ?.selectedValues?.[0]?.value
         ) || '-',
     },
     {
@@ -164,7 +164,7 @@ const Batch = () => {
       render: (row) =>
         transformLabel(
           row.customFields.find((field) => field.label === 'BLOCK')
-            ?.selectedValues[0]?.value
+            ?.selectedValues?.[0]?.value
         ) || '-',
     },
     {
@@ -173,7 +173,7 @@ const Batch = () => {
       render: (row) =>
         transformLabel(
           row.customFields.find((field) => field.label === 'VILLAGE')
-            ?.selectedValues[0]?.value
+            ?.selectedValues?.[0]?.value
         ) || '-',
     },
     {
@@ -188,7 +188,7 @@ const Batch = () => {
       render: (row) =>
         transformLabel(
           row.customFields.find((field) => field.label === 'BOARD')
-            ?.selectedValues[0]
+            ?.selectedValues?.[0]
         ) || '-',
     },
     {
@@ -197,7 +197,7 @@ const Batch = () => {
       render: (row) =>
         transformLabel(
           row.customFields.find((field) => field.label === 'MEDIUM')
-            ?.selectedValues[0]
+            ?.selectedValues?.[0]
         ) || '-',
     },
   ];

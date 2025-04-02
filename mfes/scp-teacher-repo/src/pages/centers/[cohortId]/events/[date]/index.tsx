@@ -150,7 +150,6 @@ const EventMonthView: React.FC<any> = () => {
       eventDeleted
     );
   }
- 
 
   const handleActiveStartDateChange = (date: Date) => {
     setSelectedDate(date);
@@ -184,22 +183,24 @@ const EventMonthView: React.FC<any> = () => {
 
           if (cohortData?.customField?.length) {
             const district = cohortData.customField.find(
-              (item: CustomField) => item.label === 'DISTRICTS'
+              (item: CustomField) => item.label === 'DISTRICT'
             );
             const districtCode = district?.code || '';
             const districtId = district?.fieldId || '';
             const state = cohortData.customField.find(
-              (item: CustomField) => item.label === 'STATES'
+              (item: CustomField) => item.label === 'STATE'
             );
-            setState(state.value);
+            setState(state.selectedValues?.[0]?.value || '');
             const stateCode = state?.code || '';
             const stateId = state?.fieldId || '';
 
             const blockField = cohortData?.customField.find(
-              (field: any) => field.label === 'BLOCKS'
+              (field: any) => field.label === 'BLOCK'
             );
 
-            const address = `${toPascalCase(district?.value)}, ${toPascalCase(state?.value)}`;
+            const address = `${toPascalCase(
+              district?.selectedValues?.[0]?.value || ''
+            )}, ${toPascalCase(state?.value)}`;
             cohortData.address = address || '';
 
             const typeOfCohort = cohortData.customField.find(

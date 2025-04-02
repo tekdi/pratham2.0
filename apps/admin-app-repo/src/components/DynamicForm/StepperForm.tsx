@@ -32,6 +32,7 @@ import {
   getCenterList,
   getStateBlockDistrictList,
 } from '@/services/MasterDataService';
+import { RoleId } from '@/utils/app.constant';
 type FormSubmitFunctionType = (formData: any, payload: any) => Promise<void>;
 
 interface StepperFormProps {
@@ -161,7 +162,7 @@ const StepperForm: React.FC<StepperFormProps> = ({
       let tenantCohortRoleMapping: any = [];
       tenantCohortRoleMapping[0] = {
         tenantId: localStorage.getItem('tenantId'),
-        roleId: 'a5f1dbc9-2ad4-442c-b762-0e3fc1f6c6da',
+        roleId: RoleId.TEACHER,
       };
       if (role === 'facilitator' && assignedObject[0]) {
         const cohortId = assignedObject[0].childId; // Accessing the first object in the array
