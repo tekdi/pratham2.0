@@ -635,7 +635,7 @@ export function getReassignPayload(removedId: Array<string>, newCohortId: Array<
         activeCohortIds = resp.result
           .filter(
             (cohort : any) =>
-              cohort.type === 'BATCH' && cohort.cohortStatus === 'active'
+              cohort.type === 'BATCH' && cohort.cohortMemberStatus === 'active'
           )
           .map((cohort : any) => cohort.cohortId);
         console.log(activeCohortIds, 'activeBatches');

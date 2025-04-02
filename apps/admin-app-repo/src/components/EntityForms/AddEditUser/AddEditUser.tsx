@@ -54,16 +54,16 @@ const AddEditUser = ({
   centerFieldId,
   type,
 }) => {
-  console.log(editPrefilledFormData, 'editPrefilledFormData');
-
+  
   const [isLoading, setIsLoading] = useState(false);
   const [showAssignmentScreen, setShowAssignmentScreen] =
-    useState<boolean>(false);
+  useState<boolean>(false);
   const [formData, setFormData] = useState<any>();
   const [districtId, setDistrictId] = useState<any>();
   const [prefilledFormData, setPrefilledFormData] = useState(
     editPrefilledFormData
   );
+  console.log(editPrefilledFormData, 'editPrefilledFormData');
 
   const { t } = useTranslation();
   let isEditSchema = _.cloneDeep(schema);
