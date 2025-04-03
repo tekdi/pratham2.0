@@ -56,6 +56,8 @@ interface StepperFormProps {
   assignmentChildmessage?: string;
   hideSubmit?: boolean;
   setButtonShow?: any;
+  schema?: any;
+  uiSchema?: any;
 }
 const StepperForm: React.FC<StepperFormProps> = ({
   showAssignmentScreen,
@@ -77,6 +79,8 @@ const StepperForm: React.FC<StepperFormProps> = ({
   role,
   hideSubmit,
   setButtonShow,
+  schema,
+  uiSchema,
 }) => {
   const [selectedChild, setSelectedChild] = useState<{
     id: string;
@@ -99,6 +103,8 @@ const StepperForm: React.FC<StepperFormProps> = ({
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
   const [fieldIds, setFieldIds] = useState({});
+  const [formUiSchemaOriginal, setFormUiSchemaOriginal] = useState(uiSchema);
+  const [formUiSchema, setFormUiSchema] = useState(uiSchema);
 
   // const [showAssignmentScreen, setShowAssignmentScreen] = useState(false); // New state to toggle views
 
@@ -523,7 +529,6 @@ const StepperForm: React.FC<StepperFormProps> = ({
             ))}
           </Box>
           <Box sx={{ my: 2 }}>
-
             <Divider/>
           </Box>
           <Box display="flex" justifyContent="space-between">
