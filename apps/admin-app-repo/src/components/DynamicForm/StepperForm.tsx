@@ -75,7 +75,7 @@ const StepperForm: React.FC<StepperFormProps> = ({
   assignmentMessage,
   role,
   hideSubmit,
-  setButtonShow
+  setButtonShow,
 }) => {
   const [selectedChild, setSelectedChild] = useState<{
     id: string;
@@ -112,9 +112,8 @@ const StepperForm: React.FC<StepperFormProps> = ({
 
   const handleBackToForm = () => setShowAssignmentScreen(false); // Back to form screen
 
-
   useEffect(() => {
-    setButtonShow(!showAssignmentScreen)
+    setButtonShow(!showAssignmentScreen);
   }, [showAssignmentScreen]);
 
   const handleBack = () => setSelectedChild(null);
@@ -462,7 +461,7 @@ const StepperForm: React.FC<StepperFormProps> = ({
           />
         )
       ) : (
-        <Box display="flex" flexDirection="column" p={3}>
+        <Box>
           <Button variant="text" color="primary" onClick={handleBackToForm}>
             {t('MENTOR.BACK_TO_FORM')}
           </Button>
@@ -477,34 +476,49 @@ const StepperForm: React.FC<StepperFormProps> = ({
             {parentName} {parentLabel}
           </Typography>
 
-          <Box
-            display="grid"
-            gridTemplateColumns="repeat(2, 1fr)"
-            gap={2}
-            mt={2}
-          >
+          <Box>
             {childData?.map(({ id, name }: any) => (
-              <Card
+              <Box
                 key={id}
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                padding={'10px'}
+                borderRadius={2}
+                border="1px solid #D0C5B4"
                 sx={{
+                  backgroundColor: '#fff',
                   cursor: 'pointer',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  p: 2,
+                  marginBottom: 2,
+                  transition: 'background-color 0.2s ease',
+                  '&:hover': { backgroundColor: '#f5f5f5' },
                 }}
                 onClick={() => setSelectedChild({ id, name })}
               >
-                <CardContent>
-                  <Typography variant="h6">{name}</Typography>
-                  <Typography variant="body2" color="textSecondary">
+                <Box>
+                  <Box
+                    sx={{
+                      color: 'rgb(31, 27, 19)',
+                      fontWeight: 400,
+                      fontSize: '16px',
+                    }}
+                  >
+                    {name}
+                  </Box>
+                  <Box
+                    sx={{
+                      color: 'rgb(99, 94, 87)',
+                      fontWeight: 400,
+                      fontSize: '16px',
+                    }}
+                  >
                     {selectedVillages[id]?.length || 0} {selectedChildLabel}
-                  </Typography>
-                </CardContent>
+                  </Box>
+                </Box>
                 <IconButton>
                   <ArrowForwardIosIcon fontSize="small" />
                 </IconButton>
-              </Card>
+              </Box>
             ))}
           </Box>
 
