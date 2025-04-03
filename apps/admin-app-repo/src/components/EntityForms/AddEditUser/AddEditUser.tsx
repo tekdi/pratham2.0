@@ -396,8 +396,6 @@ const AddEditUser = ({
           // add any additional prop(s) for facilitator
           hideSubmit={hideSubmit}
           setButtonShow={setButtonShow}
-          schema={isEdit || isReassign ? isEditSchema : schema}
-          uiSchema={isEdit || isReassign ? isEditUiSchema : uiSchema}
         />
       ) : type === 'mentor' ? (
         <StepperForm
