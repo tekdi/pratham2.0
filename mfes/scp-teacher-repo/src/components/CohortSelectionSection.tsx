@@ -227,7 +227,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
             );
 
             if (district) {
-              setDistrictCode(district?.code);
+              setDistrictCode(district?.selectedValues?.[0]?.id);
               setDistrictId(district?.fieldId);
             }
 
@@ -236,7 +236,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
             );
 
             if (state) {
-              setStateCode(state?.code);
+              setStateCode(state?.selectedValues?.[0]?.id);
               setStateId(state?.fieldId);
             }
 
@@ -245,7 +245,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
             );
 
             if (blockObject) {
-              setBlockCode(blockObject?.code);
+              setBlockCode(blockObject?.selectedValues?.[0]?.id);
               setBlockId(blockObject?.fieldId);
             }
           }
