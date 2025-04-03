@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 const index = () => {
   const router = useRouter();
   const { identifier } = router.query;
-  const sb_player = process.env.NEXT_PUBLIC_SBPLAYER + `?identifier=${identifier}`;
+  const sb_player = process.env.NEXT_PUBLIC_ADMIN_SBPLAYER + `?identifier=${identifier}`;
   if (typeof window !== "undefined" && window.localStorage) {
   localStorage.setItem("showHeader"  , "true")
   }
