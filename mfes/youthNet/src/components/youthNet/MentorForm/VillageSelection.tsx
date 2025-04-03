@@ -100,7 +100,7 @@ const VillageSelection = ({  blockId, blockName, onBack, selectedVillages: initi
         </IconButton>
       </Box>
 
-      <Box display="flex" alignItems="center" gap={1} mt={2} sx={{ border: "1px solid #ccc", borderRadius: "8px", p: 1 }}>
+      <Box display="flex" alignItems="center" gap={2} mt={2} sx={{ border: "1px solid #ccc", borderRadius: "8px", p: 1 }}>
         <SearchIcon color="disabled" />
         <TextField
           variant="standard"
@@ -131,7 +131,7 @@ const VillageSelection = ({  blockId, blockName, onBack, selectedVillages: initi
         {Object.keys(filteredVillages).map((letter) => (
           <Box key={letter} sx={{ mb: 2 }}>
             <Typography variant="subtitle1" fontWeight="bold">{letter}</Typography>
-            <Box sx={{display:"flex" , flexWrap:"wrap" , gap:"8px"}}>
+            <Box sx={{display:"flex" , flexWrap:"wrap" , gap:"15px"}}>
               {filteredVillages[letter].map((village) => {
                 const isSelected = selectedVillages.includes(village.id);
 
