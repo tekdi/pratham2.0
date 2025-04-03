@@ -38,6 +38,10 @@ const nextConfig = {
         destination: '/assets/:path*', // Serve the assets from the public folder
       },
       {
+        source: '/assets/:path*',
+        destination: '/assets/:path*',
+      },
+      {
         source: '/action/content/v3/upload/url/:identifier*', // Match content upload with 'url' in the path
         destination:
           '/api/proxy?path=/action/content/v3/upload/url/:identifier*', // Forward to proxy route with path as query param
