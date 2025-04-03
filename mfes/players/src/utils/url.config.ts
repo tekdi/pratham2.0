@@ -6,11 +6,11 @@ export const URL_CONFIG = {
     HIERARCHY_FEILDS: 'instructions,outcomeDeclaration',
   },
   API: {
-    CONTENT_READ: `/api/content/v1/read/`,
-    HIERARCHY_API: `/action/questionset/v2/hierarchy/`,
-    QUESTIONSET_READ: `/action/questionset/v2/read/`,
-    COMPOSITE_SEARCH: `/action/composite/v3/search`,
-    CONTENT_HIERARCHY: `/action/content/v3/hierarchy`,
+    CONTENT_READ: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/api/content/v1/read/`,
+    HIERARCHY_API: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/action/questionset/v2/hierarchy/`,
+    QUESTIONSET_READ: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/action/questionset/v2/read/`,
+    COMPOSITE_SEARCH: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/action/composite/v3/search`,
+    CONTENT_HIERARCHY: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/action/content/v3/hierarchy`,
   },
 };
 

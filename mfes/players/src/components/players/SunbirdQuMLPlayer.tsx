@@ -14,7 +14,7 @@ const SunbirdQuMLPlayer = ({ playerConfig }: PlayerConfigProps) => {
       //@ts-ignore
       window.$ = window.jQuery = $;
       //@ts-ignore
-      window.questionListUrl = '/api/question/v2/list';
+      window.questionListUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/api/question/v2/list`;
     }
 
     const jqueryScript = document.createElement('script');
