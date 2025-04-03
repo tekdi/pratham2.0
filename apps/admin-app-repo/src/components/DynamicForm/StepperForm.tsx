@@ -6,6 +6,7 @@ import {
   Card,
   CardContent,
   IconButton,
+  Divider,
 } from '@mui/material';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 // import VillageSelection from './VillageSelection';
@@ -521,8 +522,11 @@ const StepperForm: React.FC<StepperFormProps> = ({
               </Box>
             ))}
           </Box>
+          <Box sx={{ my: 2 }}>
 
-          <Box display="flex" justifyContent="space-between" mt={4}>
+            <Divider/>
+          </Box>
+          <Box display="flex" justifyContent="space-between">
             <Button
               variant="contained"
               color="primary"
@@ -530,6 +534,7 @@ const StepperForm: React.FC<StepperFormProps> = ({
               disabled={Object.values(selectedVillages).every(
                 (villages) => villages.length === 0
               )}
+              sx={{width: '100%'}}
             >
               {t('MENTOR.FINISH_ASSIGN')}
             </Button>
