@@ -126,9 +126,9 @@ const CoursePlanner = () => {
           const gradeField = cohortDetails?.customFields?.find(
             (field: any) => field?.label === 'GRADE'
           );
-          setBoardNew(boardField?.value);
-          setMediumNew(mediumField?.value);
-          setGradeNew(gradeField?.value);
+          setBoardNew(boardField?.selectedValues[0]);
+          setMediumNew(mediumField?.selectedValues[0]);
+          setGradeNew(gradeField?.selectedValues[0]);
 
           const stringFields = [
             // { label: CoursePlannerConstants.STATES, setter: setState },
@@ -142,8 +142,8 @@ const CoursePlanner = () => {
               (field: any) => field.label === label
             );
 
-            if (field && field.value) {
-              setter(field.value.trim());
+            if (field && field.selectedValues[0]) {
+              setter(field.selectedValues[0].trim());
             }
           });
         }
