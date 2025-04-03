@@ -7,10 +7,10 @@ export const URL_CONFIG = {
   },
   API: {
     CONTENT_READ: `/api/content/v1/read/`,
-    HIERARCHY_API: `${process.env.NEXT_PUBLIC_SSUNBIRD_BASE_URL}/action/questionset/v2/hierarchy/`,
-    QUESTIONSET_READ: `${process.env.NEXT_PUBLIC_SSUNBIRD_BASE_URL}/action/questionset/v2/read/`,
-    COMPOSITE_SEARCH: `${process.env.NEXT_PUBLIC_SSUNBIRD_BASE_URL}/action/composite/v3/search`,
-    CONTENT_HIERARCHY: `${process.env.NEXT_PUBLIC_SSUNBIRD_BASE_URL}/action/content/v3/hierarchy`,
+    HIERARCHY_API: `/action/questionset/v2/hierarchy/`,
+    QUESTIONSET_READ: `/action/questionset/v2/read/`,
+    COMPOSITE_SEARCH: `/action/composite/v3/search`,
+    CONTENT_HIERARCHY: `/action/content/v3/hierarchy`,
   },
 };
 
