@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import React, { useEffect, useRef } from 'react';
 import { getTelemetryEvents, handleExitEvent } from '../utils/Helper';
+import { useRouter } from 'next/router';
 
 interface PlayerConfigProps {
   playerConfig: any;
@@ -8,6 +9,7 @@ interface PlayerConfigProps {
 
 const SunbirdPdfPlayer = ({ playerConfig }: PlayerConfigProps) => {
   const sunbirdPdfPlayerRef = useRef<HTMLDivElement | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     // Dynamically load the Sunbird PDF Player script from CDN
@@ -30,7 +32,9 @@ const SunbirdPdfPlayer = ({ playerConfig }: PlayerConfigProps) => {
     const handlePlayerEvent = (event: any) => {
       console.log('Player Event', event.detail);
       if (event?.detail?.edata?.type === 'EXIT') {
-        handleExitEvent();
+        // handleExitEvent();
+        event.preventDefault();
+        router.back()
       }
     };
     const handleTelemetryEvent = (event: any) => {

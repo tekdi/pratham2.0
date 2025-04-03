@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router';
 import { getTelemetryEvents, handleExitEvent } from '../utils/Helper';
 import React, { useEffect, useRef } from 'react';
 
@@ -7,6 +8,7 @@ interface PlayerConfigProps {
 
 const SunbirdVideoPlayer = ({ playerConfig }: PlayerConfigProps) => {
   const sunbirdVideoPlayerRef = useRef<HTMLDivElement | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     // Load jQuery
@@ -35,7 +37,9 @@ const SunbirdVideoPlayer = ({ playerConfig }: PlayerConfigProps) => {
     const handlePlayerEvent = (event: any) => {
       console.log('Player Event', event.detail);
       if (event?.detail?.type === 'EXIT') {
-        handleExitEvent();
+        // handleExitEvent();
+        event.preventDefault();
+        router.back()
       }
     };
 
