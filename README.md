@@ -77,6 +77,27 @@ nx dev notification --port=4105 --verbose
 basePath : `http://localhost:4105`
 Port : `4105`
 
+### sbplayer admin
+
+Next JS, run:
+
+```sh
+nx dev players --port=4106 --verbose
+```
+
+basePath : `http://localhost:4106`
+Port : `4106`
+
+### sbplayer teacher
+
+Next JS, run:
+
+```sh
+nx dev players --port=4107 --verbose
+```
+
+basePath : `http://localhost:4107`
+Port : `4107`
 
 ##
 
