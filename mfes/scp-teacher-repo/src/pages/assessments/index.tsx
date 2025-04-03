@@ -13,11 +13,7 @@ import {
 import { getMyCohortMemberList } from '@/services/MyClassDetailsService';
 import { getAssessmentType, toPascalCase } from '@/utils/Helper';
 import { ICohort } from '@/utils/Interfaces';
-import {
-  AssessmentStatus,
-  Role,
-  Status
-} from '@/utils/app.constant';
+import { AssessmentStatus, Role, Status } from '@/utils/app.constant';
 import withAccessControl from '@/utils/hoc/withAccessControl';
 import ArrowDropDownSharpIcon from '@mui/icons-material/ArrowDropDownSharp';
 import {
@@ -116,7 +112,11 @@ const Assessments = () => {
         if (resp) {
           const userDetails = resp.map((user: any) => ({
             ...user,
-            name: toPascalCase(user?.firstName || '') + ' ' + (user?.lastName ? toPascalCase(user.lastName) : ""), userId: user.userId,
+            name:
+              toPascalCase(user?.firstName || '') +
+              ' ' +
+              (user?.lastName ? toPascalCase(user.lastName) : ''),
+            userId: user.userId,
           }));
           setCohortMembers(userDetails);
         }
@@ -139,7 +139,6 @@ const Assessments = () => {
       }, 0);
     }
   }, [classId]);
-
 
   useEffect(() => {
     const getDoIdForAssessmentReport = async (
@@ -185,9 +184,7 @@ const Assessments = () => {
                 setAssessmentList([]);
               }
             } else {
-              console.log(
-                'NO Result found from getDoIdForAssessmentDetails '
-              );
+              console.log('NO Result found from getDoIdForAssessmentDetails ');
             }
           }
         } else {
@@ -215,13 +212,13 @@ const Assessments = () => {
 
       if (!cohort?.customField) return;
 
-      const selectedState = cohort.customField.find(
-        (item: any) => item.label === 'STATES'
-      )?.value;
+      const selectedState =
+        cohort.customField.find((item: any) => item.label === 'STATE')
+          ?.selectedValues?.[0]?.value || '';
 
-      const selectedBoard = cohort.customField.find(
-        (item: any) => item.label === 'BOARD'
-      )?.value;
+      const selectedBoard =
+        cohort.customField.find((item: any) => item.label === 'BOARD')
+          ?.selectedValues?.[0] || '';
 
       setCenterData({ state: selectedState, board: selectedBoard });
 
@@ -233,8 +230,6 @@ const Assessments = () => {
         getDoIdForAssessmentReport(selectedState, selectedBoard);
       }
     }
-
-
   }, [assessmentType, classId, cohortsData]);
 
   useEffect(() => {
@@ -384,11 +379,15 @@ const Assessments = () => {
     if (newType === 'other') queryParams.type = 'other';
     else delete queryParams.type;
 
-    router.push({ pathname: router.pathname, query: queryParams }, undefined, { shallow: true });
+    router.push({ pathname: router.pathname, query: queryParams }, undefined, {
+      shallow: true,
+    });
   };
 
   useEffect(() => {
-    setAssessmentType(query.type === 'post' ? 'post' : (query.type === 'other' ? 'other' : 'pre'));
+    setAssessmentType(
+      query.type === 'post' ? 'post' : query.type === 'other' ? 'other' : 'pre'
+    );
   }, [query.type]);
 
   return (
@@ -397,9 +396,9 @@ const Assessments = () => {
         <Header />
       </Box>
 
-      {loading &&
-        <Loader showBackdrop={true} loadingText={t("COMMON.LOADING")} />
-      }
+      {loading && (
+        <Loader showBackdrop={true} loadingText={t('COMMON.LOADING')} />
+      )}
 
       <Box
         sx={{
@@ -490,24 +489,27 @@ const Assessments = () => {
         </Box>
       )}
 
-      {!isLoading && (!assessmentList?.length || !filteredLearnerList?.length) && centerData?.board && <NoDataFound />}
+      {!isLoading &&
+        (!assessmentList?.length || !filteredLearnerList?.length) &&
+        centerData?.board && <NoDataFound />}
 
-
-      { !isLoading && (!assessmentList?.length || !filteredLearnerList?.length) && !centerData?.board &&
-        (<Box
-        sx={{
-          background: theme.palette.action.selected,
-          py: 0.5,
-          borderRadius: 2,
-          m: 2.5,
-          p: 2,
-        }}
-      >
-        <Typography variant="h2" sx={{ ml: 2 }}>
-          {t('COMMON.NO_ASSIGNED_BOARDS')}
-        </Typography>
-        </Box>)
-      }
+      {!isLoading &&
+        (!assessmentList?.length || !filteredLearnerList?.length) &&
+        !centerData?.board && (
+          <Box
+            sx={{
+              background: theme.palette.action.selected,
+              py: 0.5,
+              borderRadius: 2,
+              m: 2.5,
+              p: 2,
+            }}
+          >
+            <Typography variant="h2" sx={{ ml: 2 }}>
+              {t('COMMON.NO_ASSIGNED_BOARDS')}
+            </Typography>
+          </Box>
+        )}
 
       {!isLoading &&
         // !!assessmentList?.length &&
@@ -534,7 +536,9 @@ const Assessments = () => {
             >
               {testCompletionCount?.totalCount > 0 && (
                 <span>
-                  {`${testCompletionCount.completionCount} ${t('ASSESSMENTS.OUT_OF')} ${testCompletionCount.totalCount}`}{' '}
+                  {`${testCompletionCount.completionCount} ${t(
+                    'ASSESSMENTS.OUT_OF'
+                  )} ${testCompletionCount.totalCount}`}{' '}
                   {t('ASSESSMENTS.COMPLETED_THE_ASSESSMENT')}
                 </span>
               )}
@@ -580,7 +584,7 @@ const Assessments = () => {
         </Box>
       )}
 
-      {modalOpen &&
+      {modalOpen && (
         <AssessmentSortModal
           open={modalOpen}
           onClose={handleCloseModal}
@@ -588,8 +592,7 @@ const Assessments = () => {
           btnText={t('COMMON.APPLY')}
           onFilterApply={handleSorting}
         />
-      }
-
+      )}
     </>
   );
 };

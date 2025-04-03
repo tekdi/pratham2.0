@@ -181,11 +181,11 @@ const MentorAssignment: React.FC<MentorAssignmentProps> = ({
       },
       {
         fieldId: fieldMapping.state.fieldId,
-        value: [stateResult?.selectedValues[0]?.id],
+        value: [stateResult?.selectedValues?.[0]?.id],
       },
       {
         fieldId: fieldMapping.district.fieldId,
-        value: [districtResult?.selectedValues[0]?.id],
+        value: [districtResult?.selectedValues?.[0]?.id],
       },
     ];
   };
@@ -197,7 +197,7 @@ const MentorAssignment: React.FC<MentorAssignmentProps> = ({
       const districtResult = userData.customFields.find(
         (item: any) => item.label === cohortHierarchy.DISTRICT
       );
-      setDistrictName(districtResult?.selectedValues[0]?.value);
+      setDistrictName(districtResult?.selectedValues?.[0]?.value);
       const transformedData = districtResult?.selectedValues?.map(
         (item: any) => ({
           id: item?.id,
@@ -327,8 +327,24 @@ const MentorAssignment: React.FC<MentorAssignmentProps> = ({
                 onClick={() => setSelectedBlock({ id, name })}
               >
                 <Box>
-                  <Typography sx={{color: '#1F1B13', fontWeight:'400', fontSize:'16px'}} variant="h6">{name}</Typography>
-                  <Typography sx={{ color: '#635E57', fontWeight: '400', fontSize: '14px' }} color="text.secondary">
+                  <Typography
+                    sx={{
+                      color: '#1F1B13',
+                      fontWeight: '400',
+                      fontSize: '16px',
+                    }}
+                    variant="h6"
+                  >
+                    {name}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      color: '#635E57',
+                      fontWeight: '400',
+                      fontSize: '14px',
+                    }}
+                    color="text.secondary"
+                  >
                     {selectedVillages[id]?.length || 0}{' '}
                     {t('MENTOR.VILLAGES_SELECTED')}
                   </Typography>

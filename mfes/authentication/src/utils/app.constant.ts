@@ -86,7 +86,7 @@ export enum sessionType {
 }
 
 export enum cohortPrivileges {
-  STUDENT = 'student',
+  STUDENT = 'Learner',
 }
 
 export enum FormContext {
@@ -125,7 +125,7 @@ export enum RoleId {
   STUDENT = 'eea7ddab-bdf9-4db1-a1bb-43ef503d65ef',
   TEACHER = 'a5f1dbc9-2ad4-442c-b762-0e3fc1f6c6da',
   TEAM_LEADER = 'c4454929-954e-4c51-bb7d-cca834ab9375',
-  ADMIN = 'ee482faf-8a41-45fe-9656-5533dd6a787c',
+  ADMIN = '4a3493aa-a4f7-4e2b-b141-f213084b5599',
 }
 
 export enum Pagination {

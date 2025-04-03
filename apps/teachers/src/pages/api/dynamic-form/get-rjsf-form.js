@@ -90,7 +90,6 @@ function generateSchemaAndUISchema(fields) {
       type,
       options,
       pattern,
-      isRequired,
       validation,
       maxLength,
       minLength,
@@ -98,7 +97,7 @@ function generateSchemaAndUISchema(fields) {
       api,
       extra,
     } = field;
-
+    let isRequired = false;
     const schemaField = {
       type: 'string',
       title: label,
@@ -120,6 +119,7 @@ function generateSchemaAndUISchema(fields) {
     }
     if (validation?.isRequired) {
       schemaField.isRequired = validation.isRequired;
+      isRequired = validation.isRequired;
     }
     if (validation?.minValue || validation?.minValue == 0) {
       schemaField.minValue = validation.minValue;

@@ -260,14 +260,14 @@ const Dashboard: React.FC<DashboardProps> = () => {
         response = await getUserDetails(userId, true);
       }
       const blockObject = response?.result?.userData?.customFields?.find(
-        (item: any) => item?.label === 'BLOCKS'
+        (item: any) => item?.label === 'BLOCK'
       );
       const cohortData = response?.result?.userData?.customFields;
 
       const state = cohortData?.find(
-        (item: CustomField) => item.label === 'STATES'
+        (item: CustomField) => item.label === 'STATE'
       );
-      setState(state?.value);
+      setState(state?.selectedValues?.[0]?.value || '');
 
       const typeOfCohort = cohortData?.find(
         (item: CustomField) => item.label === 'TYPE_OF_COHORT'
@@ -352,7 +352,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
                 contextId: classId,
                 fromDate,
                 toDate,
-                scope: 'student',
+                scope: Role.STUDENT,
               };
               const response = await classesMissedAttendancePercentList({
                 filters,
@@ -425,7 +425,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
                 limit: AttendanceAPILimit,
                 page: 0,
                 filters: {
-                  scope: 'student',
+                  scope: Role.STUDENT,
                   fromDate: startDateRange,
                   toDate: endDateRange,
                   contextId: classId,
@@ -458,7 +458,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
               const filters = {
                 fromDate: startDateRange,
                 toDate: endDateRange,
-                scope: 'student',
+                scope: 'Learner',
                 contextId: cohortId,
               };
 
@@ -624,7 +624,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
             contextId: classId,
             fromDate: fromDateFormatted,
             toDate: toDateFormatted,
-            scope: 'student',
+            scope: 'Learner',
           },
           facets: ['attendanceDate'],
         };
@@ -722,16 +722,16 @@ const Dashboard: React.FC<DashboardProps> = () => {
 
         if (cohortData?.customField?.length) {
           const district = cohortData.customField.find(
-            (item: CustomField) => item.label === 'DISTRICTS'
+            (item: CustomField) => item.label === 'DISTRICT'
           );
           const state = cohortData.customField.find(
-            (item: CustomField) => item.label === 'STATES'
+            (item: CustomField) => item.label === 'STATE'
           );
-          setState(state?.value);
+          setState(toPascalCase(state?.selectedValues?.[0]?.value) || '');
 
-          const address = `${toPascalCase(district?.value)}, ${toPascalCase(
-            state?.value
-          )}`;
+          const address = `${toPascalCase(
+            district?.selectedValues?.[0]?.value || ''
+          )}, ${toPascalCase(state?.selectedValues?.[0]?.value || '')}`;
           cohortData.address = address || '';
 
           const typeOfCohort = cohortData.customField.find(

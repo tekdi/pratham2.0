@@ -327,9 +327,9 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
                 setAddress(
                   extractAddress(
                     fields,
-                    'STATES',
-                    'DISTRICTS',
-                    'BLOCKS',
+                    'STATE',
+                    'DISTRICT',
+                    'BLOCK',
                     'label',
                     'value',
                     toPascalCase
@@ -652,7 +652,7 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
         limit: AttendanceAPILimit,
         page: 0,
         filters: {
-          scope: 'student',
+          scope: Role.STUDENT,
           fromDate: lastSeventhDayFormattedDate,
           toDate: todayFormattedDate,
           contextId: classId,

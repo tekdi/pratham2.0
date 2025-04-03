@@ -10,6 +10,7 @@ import {
 import { State } from './Interfaces';
 import { useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
+import { getCohortList } from '@/services/GetCohortList';
 
 interface Value {
   value: string;
@@ -617,4 +618,31 @@ export const filterSchema = (schemaObj: any, role: any) => {
   });
 
   return { newSchema, extractedFields };
-};
+}; 
+
+export function getReassignPayload(removedId: Array<string>, newCohortId: Array<string>) {
+    const cohortId = newCohortId;
+    const removedIds = removedId.filter((id: string) => !cohortId.includes(id));
+
+    return { cohortId, removedIds };
+}
+
+ export const fetchUserData = async (userId : any) => {
+    try {
+      let activeCohortIds = [];
+      const resp = await getCohortList(userId);
+      if (resp?.result) { 
+        activeCohortIds = resp.result
+          .filter(
+            (cohort : any) =>
+              cohort.type === 'BATCH' && cohort.cohortMemberStatus === 'active'
+          )
+          .map((cohort : any) => cohort.cohortId);
+        console.log(activeCohortIds, 'activeBatches');
+      }
+      return activeCohortIds;
+    } catch (error) {
+      console.error('Error getting user details:', error);
+      return null;
+    }
+  };
