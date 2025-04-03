@@ -16,7 +16,7 @@ export function middleware(request: { nextUrl: { clone: () => any } }) {
   }
   if (url.pathname.startsWith('/sbplayer')) {
     url.hostname = 'localhost';
-    url.port = '4106';
+    url.port = '4107';
     return NextResponse.rewrite(url);
   }
 
