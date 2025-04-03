@@ -174,12 +174,16 @@ const CentersPage = () => {
                 const stateField = block?.customField.find(
                   (field: any) => field.label === 'STATE'
                 );
-                const state = stateField ? stateField.value : '';
+                const state = stateField
+                  ? stateField?.selectedValues?.[0]?.value
+                  : '';
 
                 const districtField = block?.customField.find(
                   (field: any) => field.label === 'DISTRICT'
                 );
-                const district = districtField ? districtField.value : '';
+                const district = districtField
+                  ? districtField?.selectedValues?.[0]?.value
+                  : '';
                 return { blockName, blockId, state, district };
               });
               setBlockData(blockData);
