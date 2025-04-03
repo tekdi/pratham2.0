@@ -7,6 +7,9 @@ export const PUBLIC_ROUTES = [
   '/demo',
   '/logout',
   '/unauthorized',
+  '/importCsv',
+  '/resourceList',
+  '/play'
 ];
 export const ROLE_BASED_ROUTES = {
   [TenantName.SECOND_CHANCE_PROGRAM]: {
@@ -16,8 +19,8 @@ export const ROLE_BASED_ROUTES = {
       '/notification-templates/update/[identifier]',
       '/edit-password',
     ],
-    [Role.CCTA]: ['/subjectDetails', '/importCsv', '/edit-password',],
-    [Role.SCTA]: ['/subjectDetails', '/importCsv ', '/edit-password'],
+    [Role.CCTA]: ['/subjectDetails', '/importCsv', '/edit-password', '/resourceList', '/csvDetails', '/csvList', '/play'],
+    [Role.SCTA]: ['/subjectDetails', '/importCsv ', '/edit-password', '/resourceList', '/csvDetails', '/csvList', '/play'],
   },
   [TenantName.YOUTHNET]: {
     [Role.ADMIN]: ['/edit-password'],

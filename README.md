@@ -77,6 +77,17 @@ nx dev notification --port=4105 --verbose
 basePath : `http://localhost:4105`
 Port : `4105`
 
+### sbplayer
+
+Next JS, run:
+
+```sh
+nx dev players --port=4106 --verbose
+```
+
+basePath : `http://localhost:4106`
+Port : `4106`
+
 
 ##
 
