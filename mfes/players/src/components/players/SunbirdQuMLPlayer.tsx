@@ -60,8 +60,6 @@ const SunbirdQuMLPlayer = ({ playerConfig }: PlayerConfigProps) => {
       );
       document.body.removeChild(script);
     };
-    playerConfig.config.host = ''
-    console.log('playerConfig ===>', playerConfig)
   }, []);
 
   return (
