@@ -206,9 +206,9 @@ const CohortSelections: React.FC<VillageSelectionProps> = ({
             ? ParentName + 'Block'
             : ParentName + 'Village'}{' '}
         </Typography>
-        <IconButton>
+        {/* <IconButton>
           <SortIcon />
-        </IconButton>
+        </IconButton> */}
       </Box>
 
       {villages?.length && (
@@ -218,53 +218,66 @@ const CohortSelections: React.FC<VillageSelectionProps> = ({
               onChange={handleSelectAll}
               checked={selectedVillages?.length === villages?.length}
             />
+            
           }
           label={`Select All (${villages?.length} Villages)`}
           sx={{
-            mt: 1,
-            mb: 2,
-            backgroundColor: '#F5F5F5',
-            p: 1,
-            borderRadius: '8px',
+            mt: 1, mb: 2, backgroundColor: "#F5F5F5", p: 1, borderRadius: "8px", width
+              : "97%", background: "#F8EFE7", marginRight: "0px !important",
+            marginLeft: "0px !important"
           }}
         />
       )}
 
-      <Paper
-        sx={{  overflowY: 'auto', p: 2, borderRadius: '8px' }}
-      >
-        {filteredVillages && Object.keys(filteredVillages)?.length > 0 ? (
-          Object.keys(filteredVillages).map((letter) => (
-            <Box key={letter} sx={{ mb: 2 }}>
-              <Typography variant="subtitle1" fontWeight="bold">
-                {letter}
-              </Typography>
-              <Grid container spacing={1}>
-                {(filteredVillages[letter] || []).map(
-                  (
-                    village // Ensure it's always an array
-                  ) => (
-                    <Grid item xs={6} key={village.id}>
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            checked={selectedVillages.includes(village.id)}
-                            onChange={() => handleToggle(village.id)}
-                          />
-                        }
-                        label={village.name}
+      <Paper sx={{ maxHeight: "31vh", overflowY: "auto", p: 2, borderRadius: "8px" }}>
+        {Object.keys(filteredVillages).map((letter) => (
+          <Box key={letter} sx={{ mb: 2 }}>
+            <Typography variant="subtitle1" fontWeight="bold">{letter}</Typography>
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: "15px" }}>
+              {filteredVillages[letter]?.map((village) => {
+                const isSelected = selectedVillages.includes(village.id);
+
+                return (
+                  <Box key={village.id}>
+                    <Box
+                      onClick={() => handleToggle(village.id)}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        borderRadius: "16px",
+                        backgroundColor: isSelected ? "#FFC107" : "#FFF",
+                        color: isSelected ? "#1E1B16" : "#4D4639",
+                        border: "1px solid #DADADA",
+                        fontWeight: '500',
+                        cursor: "pointer",
+                        transition: "all 0.2s ease-in-out",
+                        padding: "5px 15px",
+                        gap: "8px",
+                        fontSize: '14px'
+                      }}
+                    >
+                      <Box >{village.name}</Box>
+                      <Checkbox
+                        checked={isSelected}
+                        sx={{
+                          color: isSelected ? "#000" : "#999",
+                          "&.Mui-checked": {
+                            color: "#000",
+                          },
+                          p: 0,
+                          pointerEvents: "none", // Prevents Checkbox from triggering separate events
+                        }}
                       />
-                    </Grid>
-                  )
-                )}
-              </Grid>
+                    </Box>
+                  </Box>
+                );
+              })}
             </Box>
-          ))
-        ) : (
-          <Typography variant="body2" color="textSecondary">
-            No data found.
-          </Typography>
-        )}
+
+
+          </Box>
+        ))}
       </Paper>
     </Box>
   );
