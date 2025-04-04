@@ -45,7 +45,7 @@ export const StateLeadSearchSchema = {
 };
 
 export const StateLeadUISchema = {
-  'ui:order': ['state', 'searchKey', 'sortBy', 'status'],
+  'ui:order': ['state', 'firstName', 'sortBy', 'status'],
 
   state: {
     'ui:widget': 'CustomMultiSelectWidget',
@@ -54,8 +54,8 @@ export const StateLeadUISchema = {
       uniqueItems: true,
     },
   },
-  searchKey: {
-    'ui:widget': 'text',
+  firstName: {
+    'ui:widget': 'SearchTextFieldWidget',
   },
 
   sortBy: {

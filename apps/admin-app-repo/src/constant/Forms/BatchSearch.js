@@ -170,7 +170,7 @@ export const BatchSearchSchema = {
 
     name: {
       type: 'string',
-      title: 'Search Key',
+      title: 'Search Batch..',
       // description: 'Search for a specific user or entity',
     },
     sortBy: {
@@ -183,7 +183,7 @@ export const BatchSearchSchema = {
 };
 
 export const BatchSearchUISchema = {
-  'ui:order': ['state', 'district', 'block', 'village', 'searchKey', 'sortBy'],
+  'ui:order': ['state', 'district', 'block', 'village', 'name', 'sortBy'],
 
   state: {
     'ui:widget': 'CustomMultiSelectWidget',
@@ -191,6 +191,7 @@ export const BatchSearchUISchema = {
       multiple: true,
       uniqueItems: true,
     },
+    ...(stateId ? { 'ui:disabled': true } : {}),
   },
 
   district: {
@@ -224,8 +225,8 @@ export const BatchSearchUISchema = {
     },
   },
 
-  searchKey: {
-    'ui:widget': 'text',
+  name: {
+    'ui:widget': 'SearchTextFieldWidget',
   },
 
   sortBy: {

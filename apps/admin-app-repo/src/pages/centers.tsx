@@ -33,6 +33,7 @@ import { updateCohort } from '@/services/MasterDataService';
 import { transformLabel } from '@/utils/Helper';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
+import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 
 //import { DynamicForm } from '@shared-lib';
 
@@ -66,11 +67,11 @@ const Centers = () => {
   const searchStoreKey = 'centers';
   const initialFormDataSearch =
     localStorage.getItem(searchStoreKey) &&
-    localStorage.getItem(searchStoreKey) != '{}'
+      localStorage.getItem(searchStoreKey) != '{}'
       ? JSON.parse(localStorage.getItem(searchStoreKey))
       : localStorage.getItem('stateId')
-      ? { state: [localStorage.getItem('stateId')] }
-      : {};
+        ? { state: [localStorage.getItem('stateId')] }
+        : {};
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -414,31 +415,32 @@ const Centers = () => {
           />
         </SimpleModal>
 
-        {response && response?.result?.results?.cohortDetails?.length > 0 ? (
-          <Box sx={{ mt: 1 }}>
-            <PaginatedTable
-              count={response?.result?.count}
-              data={response?.result?.results?.cohortDetails}
-              columns={columns}
-              actions={actions}
-              onPageChange={handlePageChange}
-              onRowsPerPageChange={handleRowsPerPageChange}
-              defaultPage={currentPage}
-              defaultRowsPerPage={pageLimit}
-            />
-          </Box>
-        ) : (
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            height="20vh"
-          >
-            <Typography marginTop="10px" textAlign={'center'}>
-              {t('COMMON.NO_CENTER_FOUND')}
-            </Typography>
-          </Box>
-        )}
+        {response != null ? <>
+          {response && response?.result?.results?.cohortDetails?.length > 0 ? (
+            <Box sx={{ mt: 1 }}>
+              <PaginatedTable
+                count={response?.result?.count}
+                data={response?.result?.results?.cohortDetails}
+                columns={columns}
+                actions={actions}
+                onPageChange={handlePageChange}
+                onRowsPerPageChange={handleRowsPerPageChange}
+                defaultPage={currentPage}
+                defaultRowsPerPage={pageLimit}
+              />
+            </Box>
+          ) : (
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              height="20vh"
+            >
+              <Typography marginTop="10px" textAlign={'center'}>
+                {t('COMMON.NO_CENTER_FOUND')}
+              </Typography>
+            </Box>
+          )}</> : <CenteredLoader />}
       </Box>
       {totalCount > 0 ? (
         <ConfirmationPopup

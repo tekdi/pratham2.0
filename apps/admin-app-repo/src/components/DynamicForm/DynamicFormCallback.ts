@@ -85,7 +85,7 @@ export const searchListData = async (
 
   setPageOffset(offset);
   setCurrentPage(pageNumber);
-  setResponse({});
+  setResponse(null);
 
   const data = {
     limit,

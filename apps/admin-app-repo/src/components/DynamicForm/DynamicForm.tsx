@@ -13,6 +13,8 @@ import _ from 'lodash'; // Lodash for deep comparison
 import CustomMultiSelectWidget from './RJSFWidget/CustomMultiSelectWidget';
 import CustomCheckboxWidget from './RJSFWidget/CustomCheckboxWidget';
 import CustomDateWidget from './RJSFWidget/CustomDateWidget';
+import SearchTextFieldWidget from './RJSFWidget/SearchTextFieldWidget';
+import CustomSingleSelectWidget from './RJSFWidget/CustomSingleSelectWidget';
 import { toPascalCase, transformLabel } from '@/utils/Helper';
 
 const DynamicForm = ({
@@ -42,6 +44,8 @@ const DynamicForm = ({
     CustomMultiSelectWidget,
     CustomCheckboxWidget,
     CustomDateWidget,
+    SearchTextFieldWidget,
+    CustomSingleSelectWidget
   };
 
   useEffect(() => {

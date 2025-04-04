@@ -35,7 +35,9 @@ const CustomMultiSelectWidget = ({
   // Check if the widget is disabled from uiSchema
   const isDisabled = uiSchema?.['ui:disabled'] === true;
 
-  // Update `isAllSelected` when `selectedValues` changes
+  // ✅ State to manually control dropdown open/close
+  const [open, setOpen] = useState(false);
+
   useEffect(() => {
     setIsAllSelected(selectedValues.length === enumOptions.length);
   }, [selectedValues, enumOptions]);
@@ -53,14 +55,18 @@ const CustomMultiSelectWidget = ({
         onChange(allValues.slice(0, maxSelections)); // Select all up to maxSelections
       }
     } else {
-      // Handle individual selections
       if (Array.isArray(selected)) {
         if (selected.length <= maxSelections) {
-          onChange(selected.length > 0 ? selected : []); // Ensures array format
+          onChange(selected.length > 0 ? selected : []);
+          // ✅ Close dropdown if only 1 selection is allowed and reached
+          if (maxSelections === 1 && selected.length === 1) {
+            setOpen(false);
+          }
         }
       }
     }
   };
+
   return (
     <FormControl
       fullWidth
@@ -78,6 +84,9 @@ const CustomMultiSelectWidget = ({
         label={label}
         labelId="demo-multiple-checkbox-label"
         value={selectedValues}
+        open={open}
+        onOpen={() => setOpen(true)}
+        onClose={() => setOpen(false)}
         onChange={handleChange}
         renderValue={(selected) =>
           enumOptions

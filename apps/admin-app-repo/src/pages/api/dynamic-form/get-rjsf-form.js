@@ -252,5 +252,33 @@ function generateSchemaAndUISchema(fields) {
     schema.properties[name] = schemaField;
   });
 
+  //form order schema
+  let originalOrder = Object.keys(schema.properties);
+  const finalUiOrder = reorderUiOrder(originalOrder, preferredOrder);
+  uiSchema['ui:order'] = finalUiOrder;
+
   return { schema, uiSchema };
 }
+
+const reorderUiOrder = (originalOrder, preferredOrder) => {
+  const preferredSet = new Set(preferredOrder);
+
+  const ordered = [
+    ...preferredOrder.filter((field) => originalOrder.includes(field)),
+    ...originalOrder.filter((field) => !preferredSet.has(field)),
+  ];
+
+  return ordered;
+};
+const preferredOrder = [
+  'state',
+  'district',
+  'block',
+  'village',
+  'center',
+  'parentId',
+  'batch',
+  'board',
+  'medium',
+  'grade',
+];

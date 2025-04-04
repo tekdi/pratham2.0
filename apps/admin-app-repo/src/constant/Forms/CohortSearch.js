@@ -127,7 +127,7 @@ export const CohortSearchSchema = {
     },
     name: {
       type: 'string',
-      title: 'Search Key',
+      title: 'Search Center..',
       // description: 'Search for a specific user or entity',
     },
     sortBy: {
@@ -140,7 +140,7 @@ export const CohortSearchSchema = {
 };
 
 export const CohortSearchUISchema = {
-  'ui:order': ['state', 'district', 'block', 'village', 'searchKey', 'sortBy'],
+  'ui:order': ['state', 'district', 'block', 'village', 'name', 'sortBy'],
 
   state: {
     'ui:widget': 'CustomMultiSelectWidget',
@@ -148,6 +148,7 @@ export const CohortSearchUISchema = {
       multiple: true,
       uniqueItems: true,
     },
+    ...(stateId ? { 'ui:disabled': true } : {}),
   },
 
   district: {
@@ -174,8 +175,8 @@ export const CohortSearchUISchema = {
     },
   },
 
-  searchKey: {
-    'ui:widget': 'text',
+  name: {
+    'ui:widget': 'SearchTextFieldWidget',
   },
 
   sortBy: {
