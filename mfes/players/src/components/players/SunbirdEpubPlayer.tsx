@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import React, { useEffect, useRef } from 'react';
 import { getTelemetryEvents, handleExitEvent } from '../utils/Helper';
+import { useRouter } from 'next/router';
 
 interface PlayerConfigProps {
   playerConfig: any;
@@ -8,6 +9,7 @@ interface PlayerConfigProps {
 
 const SunbirdEpubPlayer = ({ playerConfig }: PlayerConfigProps) => {
   const sunbirdEpubPlayerRef = useRef<HTMLDivElement | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const jqueryScript = document.createElement('script');
@@ -34,7 +36,9 @@ const SunbirdEpubPlayer = ({ playerConfig }: PlayerConfigProps) => {
     const handlePlayerEvent = (event: any) => {
       console.log('Player Event', event.detail);
       if (event?.detail?.edata?.type === 'EXIT') {
-        handleExitEvent();
+        // handleExitEvent();
+        event.preventDefault();
+        router.back()
       }
     };
     const handleTelemetryEvent = (event: any) => {
