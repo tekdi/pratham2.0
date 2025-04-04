@@ -46,7 +46,7 @@ import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
 import { deleteUser } from '@/services/UserService';
-import { transformLabel } from '@/utils/Helper';
+import { transformLabel, fetchUserData } from '@/utils/Helper';
 import { getCohortList } from '@/services/GetCohortList';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
@@ -405,12 +405,16 @@ const Facilitator = () => {
           <Image src={apartment} alt="" />
         </Box>
       ),
-      callback: (row) => {
+      callback: async (row) => {
         console.log('row:', row);
         // console.log('AddSchema', addSchema);
         // console.log('AddUISchema', addUiSchema);
-
+         let batchList = await fetchUserData(row?.userId);
         let tempFormData = extractMatchingKeys(row, addSchema);
+        tempFormData = {
+          ...tempFormData,
+          batch: batchList,
+        };
         console.log(tempFormData, ' tempFormData');
         setPrefilledAddFormData(tempFormData);
         setIsEdit(false);
@@ -570,6 +574,7 @@ const Facilitator = () => {
             type="facilitator"
             hideSubmit={true}
             setButtonShow={setButtonShow}
+            isSteeper={true}
           />
         </SimpleModal>
 

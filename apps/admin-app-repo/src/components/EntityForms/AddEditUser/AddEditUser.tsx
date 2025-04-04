@@ -54,7 +54,8 @@ const AddEditUser = ({
   centerFieldId,
   type,
   hideSubmit,
-  setButtonShow
+  setButtonShow,
+  isSteeper
 }) => {
 
   const [isLoading, setIsLoading] = useState(false);
@@ -105,7 +106,7 @@ const AddEditUser = ({
       'state',
       'district',
       'block',
-      ...(isExtraFields ? ['village', 'center', 'batch'] : []),
+      ...(isExtraFields ? ['village', ...(!isSteeper ? ['center', 'batch'] : [])] : []),
     ];
     isEditSchema = {
       type: 'object',
@@ -363,6 +364,8 @@ const AddEditUser = ({
     //   )}
     // </>
     <>
+     { console.log(formData, 'formData')}
+    
       {isLoading ? (
         <Loader showBackdrop={false} loadingText={t('COMMON.LOADING')} />
       ) : isEdit ? (
@@ -396,6 +399,19 @@ const AddEditUser = ({
           // add any additional prop(s) for facilitator
           hideSubmit={hideSubmit}
           setButtonShow={setButtonShow}
+          isReassign={isReassign}
+          isEditSchema={isEditSchema}
+          isEditUiSchema={isEditUiSchema}
+          extraFieldsUpdate={extraFieldsUpdate}
+          extraFields={extraFields}
+          prefilledFormData={prefilledFormData || {}}
+          schema={schema}
+          uiSchema={uiSchema}
+              selectedCohortId={editPrefilledFormData?.batch?.length ? editPrefilledFormData?.batch : ''}
+              successUpdateMessage={successUpdateMessage}
+              UpdateSuccessCallback={UpdateSuccessCallback}
+              editPrefilledFormData={editPrefilledFormData}
+              editableUserId={editableUserId}
         />
       ) : type === 'mentor' ? (
         <StepperForm
