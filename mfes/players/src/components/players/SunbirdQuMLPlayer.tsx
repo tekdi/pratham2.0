@@ -2,13 +2,15 @@ import 'reflect-metadata';
 import React, { useEffect, useRef } from 'react';
 import $ from 'jquery';
 import { getTelemetryEvents, handleExitEvent } from '../utils/Helper';
+import { useRouter } from 'next/router';
 interface PlayerConfigProps {
   playerConfig: any;
 }
 
 const SunbirdQuMLPlayer = ({ playerConfig }: PlayerConfigProps) => {
   const SunbirdQuMLPlayerRef = useRef<HTMLDivElement | null>(null);
-
+  const router = useRouter();
+  
   useEffect(() => {
     if (typeof window !== 'undefined') {
       //@ts-ignore
@@ -39,7 +41,9 @@ const SunbirdQuMLPlayer = ({ playerConfig }: PlayerConfigProps) => {
     const handlePlayerEvent = (event: any) => {
       console.log('Player Event', event.detail);
       if (event?.detail?.edata?.type === 'EXIT') {
-        handleExitEvent();
+        // handleExitEvent();
+        event.preventDefault();
+        router.back();
       }
     };
     const handleTelemetryEvent = (event: any) => {
