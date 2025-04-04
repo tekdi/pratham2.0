@@ -76,7 +76,7 @@ const StepperForm: React.FC<StepperFormProps> = ({
   assignmentMessage,
   role,
   hideSubmit,
-  setButtonShow,
+  setButtonShow
 }) => {
   const [selectedChild, setSelectedChild] = useState<{
     id: string;
@@ -523,7 +523,6 @@ const StepperForm: React.FC<StepperFormProps> = ({
             ))}
           </Box>
           <Box sx={{ my: 2 }}>
-
             <Divider/>
           </Box>
           <Box display="flex" justifyContent="space-between">
