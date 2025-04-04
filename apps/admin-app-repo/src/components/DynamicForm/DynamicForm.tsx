@@ -15,6 +15,7 @@ import CustomCheckboxWidget from './RJSFWidget/CustomCheckboxWidget';
 import CustomDateWidget from './RJSFWidget/CustomDateWidget';
 import SearchTextFieldWidget from './RJSFWidget/SearchTextFieldWidget';
 import CustomSingleSelectWidget from './RJSFWidget/CustomSingleSelectWidget';
+import CustomRadioWidget from './RJSFWidget/CustomRadioWidget';
 import { toPascalCase, transformLabel } from '@/utils/Helper';
 
 const DynamicForm = ({
@@ -45,7 +46,8 @@ const DynamicForm = ({
     CustomCheckboxWidget,
     CustomDateWidget,
     SearchTextFieldWidget,
-    CustomSingleSelectWidget
+    CustomSingleSelectWidget,
+    CustomRadioWidget
   };
 
   useEffect(() => {
@@ -1031,11 +1033,11 @@ const DynamicForm = ({
             // Use fieldId for custom fields
             transformedData.customFields.push({
               fieldId: fieldSchema.fieldId,
-              value: formData[key],
+              value: formData[key] || "",
             });
           } else {
             // Use the field name for core fields
-            transformedData[key] = formData[key];
+            transformedData[key] = formData[key] || "";
           }
         }
       }
@@ -1170,7 +1172,7 @@ const DynamicForm = ({
       ) : (
         <Grid container spacing={2}>
           {Object.keys(formSchema.properties).map((key) => (
-            <Grid item xs={12} md={4} lg={4} key={key} sx={{ mb: '-40px' }}>
+            <Grid item xs={12} md={4} lg={3} key={key} sx={{ mb: '-40px' }}>
               <Form
                 ref={formRef}
                 schema={{

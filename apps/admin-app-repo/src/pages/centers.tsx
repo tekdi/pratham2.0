@@ -12,6 +12,7 @@ import SimpleModal from '@/components/SimpleModal';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import editIcon from '../../public/images/editIcon.svg';
 import deleteIcon from '../../public/images/deleteIcon.svg';
+import MapIcon from '@mui/icons-material/Map';
 import Image from 'next/image';
 import {
   extractMatchingKeys,
@@ -47,9 +48,9 @@ const Centers = () => {
   const [prefilledAddFormData, setPrefilledAddFormData] = useState({});
   const [pageLimit, setPageLimit] = useState<number>(10);
   const [pageOffset, setPageOffset] = useState<number>(0);
-  const [prefilledFormData, setPrefilledFormData] = useState({});
+  const [prefilledFormData, setPrefilledFormData] = useState(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [response, setResponse] = useState({});
+  const [response, setResponse] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -97,7 +98,38 @@ const Centers = () => {
         },
       ]);
       console.log('responseForm', responseForm);
-      setAddSchema(responseForm?.schema);
+
+      //unit name is missing from required so handled from frotnend
+      let alterSchema = responseForm?.schema
+      let requiredArray = alterSchema?.required
+      if (!requiredArray.includes("name")) {
+        requiredArray.push("name")
+      }
+      alterSchema.required = requiredArray
+      //add max selection custom
+      if (alterSchema?.properties?.state) {
+        alterSchema.properties.state.maxSelection = 1
+      }
+      if (alterSchema?.properties?.district) {
+        alterSchema.properties.district.maxSelection = 1
+      }
+      if (alterSchema?.properties?.board) {
+        alterSchema.properties.board.maxSelection = 1
+      }
+      if (alterSchema?.properties?.village) {
+        alterSchema.properties.village.maxSelection = 1
+      }
+      if (alterSchema?.properties?.board) {
+        alterSchema.properties.board.maxSelection = 1000
+      }
+      if (alterSchema?.properties?.medium) {
+        alterSchema.properties.medium.maxSelection = 1000
+      }
+      if (alterSchema?.properties?.grade) {
+        alterSchema.properties.grade.maxSelection = 1000
+      }
+
+      setAddSchema(alterSchema);
       setAddUiSchema(responseForm?.uiSchema);
     };
 
@@ -114,32 +146,37 @@ const Centers = () => {
   };
 
   const SubmitaFunction = async (formData: any) => {
-    setPrefilledFormData(formData);
-    //set prefilled search data on refresh
-    localStorage.setItem(searchStoreKey, JSON.stringify(formData));
-    await searchData(formData, 0);
+    console.log("###### debug issue formData", formData)
+    if (Object.keys(formData).length > 0) {
+      setPrefilledFormData(formData);
+      //set prefilled search data on refresh
+      localStorage.setItem(searchStoreKey, JSON.stringify(formData));
+      await searchData(formData, 0);
+    }
   };
 
   const searchData = async (formData: any, newPage: any) => {
-    formData = Object.fromEntries(
-      Object.entries(formData).filter(
-        ([_, value]) => !Array.isArray(value) || value.length > 0
-      )
-    );
-    const staticFilter = { type: CohortTypes.COHORT, status: [Status.ACTIVE] };
-    const { sortBy } = formData;
-    const staticSort = ['name', sortBy || 'asc'];
-    await searchListData(
-      formData,
-      newPage,
-      staticFilter,
-      pageLimit,
-      setPageOffset,
-      setCurrentPage,
-      setResponse,
-      getCohortList,
-      staticSort
-    );
+    if (formData) {
+      formData = Object.fromEntries(
+        Object.entries(formData).filter(
+          ([_, value]) => !Array.isArray(value) || value.length > 0
+        )
+      );
+      const staticFilter = { type: CohortTypes.COHORT };
+      const { sortBy } = formData;
+      const staticSort = ['name', sortBy || 'asc'];
+      await searchListData(
+        formData,
+        newPage,
+        staticFilter,
+        pageLimit,
+        setPageOffset,
+        setCurrentPage,
+        setResponse,
+        getCohortList,
+        staticSort
+      );
+    }
   };
 
   // delete center logic
@@ -148,15 +185,16 @@ const Centers = () => {
     try {
       const resp = await updateCohort(cohortId, { status: Status.ARCHIVED });
       if (resp?.responseCode === 200) {
-        setResponse((prev) => ({
-          ...prev,
-          result: {
-            ...prev?.results,
-            cohortDetails: prev?.results?.cohortDetails?.filter(
-              (item) => item?.cohortId !== cohortId
-            ),
-          },
-        }));
+        // setResponse((prev) => ({
+        //   ...prev,
+        //   result: {
+        //     ...prev?.results,
+        //     cohortDetails: prev?.results?.cohortDetails?.filter(
+        //       (item) => item?.cohortId !== cohortId
+        //     ),
+        //   },
+        // }));
+        searchData(prefilledFormData, currentPage);
         console.log('Cohort successfully archived.');
       } else {
         console.error('Failed to archive cohort:', resp);
@@ -174,7 +212,16 @@ const Centers = () => {
     {
       key: 'name',
       label: 'Center Name',
-      render: (row: any) => transformLabel(row.name),
+      render: (row: any) => transformLabel(row?.name),
+    },
+    {
+      key: 'type',
+      label: 'Type',
+      render: (row) =>
+        transformLabel(
+          row.customFields.find((field) => field.label === 'TYPE_OF_CENTER')
+            ?.selectedValues.map((item) => item.value).join(', ')
+        ) || '-',
     },
     {
       key: 'address',
@@ -191,7 +238,7 @@ const Centers = () => {
       render: (row) =>
         transformLabel(
           row.customFields.find((field) => field.label === 'STATE')
-            ?.selectedValues?.[0]?.value
+            ?.selectedValues.map((item) => item.value).join(', ')
         ) || '-',
     },
     {
@@ -200,7 +247,7 @@ const Centers = () => {
       render: (row) =>
         transformLabel(
           row.customFields.find((field) => field.label === 'DISTRICT')
-            ?.selectedValues?.[0]?.value
+            ?.selectedValues.map((item) => item.value).join(', ')
         ) || '-',
     },
     {
@@ -209,7 +256,7 @@ const Centers = () => {
       render: (row) =>
         transformLabel(
           row.customFields.find((field) => field.label === 'BLOCK')
-            ?.selectedValues?.[0]?.value
+            ?.selectedValues.map((item) => item.value).join(', ')
         ) || '-',
     },
     {
@@ -218,7 +265,7 @@ const Centers = () => {
       render: (row) =>
         transformLabel(
           row.customFields.find((field) => field.label === 'VILLAGE')
-            ?.selectedValues?.[0]?.value
+            ?.selectedValues.map((item) => item.value).join(', ')
         ) || '-',
     },
     {
@@ -227,7 +274,7 @@ const Centers = () => {
       render: (row) =>
         transformLabel(
           row.customFields.find((field) => field.label === 'BOARD')
-            ?.selectedValues?.[0]
+            ?.selectedValues?.join(', ')
         ) || '-',
     },
     {
@@ -236,8 +283,22 @@ const Centers = () => {
       render: (row) =>
         transformLabel(
           row.customFields.find((field) => field.label === 'MEDIUM')
-            ?.selectedValues?.[0]
+            ?.selectedValues?.join(', ')
         ) || '-',
+    },
+    {
+      key: 'grade',
+      label: 'Grade',
+      render: (row) =>
+        transformLabel(
+          row.customFields.find((field) => field.label === 'GRADE')
+            ?.selectedValues?.join(', ')
+        ) || '-',
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      render: (row: any) => transformLabel(row?.status),
     },
   ];
 
@@ -255,21 +316,39 @@ const Centers = () => {
             padding: '10px',
           }}
         >
+          <MapIcon />
+        </Box>
+      ),
+      callback: async (row: any) => {
+        window.open(row.customFields.find((field) => field.label === 'GOOGLE MAP_LINK')
+          ?.selectedValues, '_blank', 'noopener,noreferrer');
+      },
+      show: (row) => row.customFields.find((field) => field.label === 'GOOGLE MAP_LINK')
+        ?.selectedValues !== '',
+    },
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            backgroundColor: 'rgb(227, 234, 240)',
+            padding: '10px',
+          }}
+        >
           <Image src={editIcon} alt="" />
         </Box>
       ),
       callback: (row: any) => {
-        console.log('row:', row);
-        console.log('AddSchema', addSchema);
-        console.log('AddUISchema', addUiSchema);
-
         let tempFormData = extractMatchingKeys(row, addSchema);
-        // console.log('tempFormData', tempFormData);
         setPrefilledAddFormData(tempFormData);
         setIsEdit(true);
         setEditableUserId(row?.cohortId);
         handleOpenModal();
       },
+      show: (row) => row.status !== 'archived',
     },
     {
       icon: (
@@ -305,6 +384,7 @@ const Centers = () => {
         setOpen(true);
         setFirstName(row?.name);
       },
+      show: (row) => row.status !== 'archived',
     },
   ];
 
@@ -388,8 +468,8 @@ const Centers = () => {
         >
           <AddEditUser
             SuccessCallback={() => {
-              setPrefilledFormData({});
-              searchData({}, 0);
+              setPrefilledFormData(initialFormDataSearch);
+              searchData(initialFormDataSearch, 0);
               setOpenModal(false);
             }}
             schema={addSchema}
@@ -398,7 +478,7 @@ const Centers = () => {
             isEdit={isEdit}
             editableUserId={editableUserId}
             UpdateSuccessCallback={() => {
-              setPrefilledFormData({});
+              setPrefilledFormData(prefilledFormData);
               searchData(prefilledFormData, currentPage);
               setOpenModal(false);
             }}
@@ -412,6 +492,7 @@ const Centers = () => {
             failureCreateMessage={failureCreateMessage}
             isNotificationRequired={false}
             hideSubmit={true}
+            type="centers"
           />
         </SimpleModal>
 

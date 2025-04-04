@@ -154,7 +154,7 @@ function generateSchemaAndUISchema(fields) {
       schemaField.enum = options?.map((opt) => opt.value);
       schemaField.enumNames = options?.map((opt) => opt.label);
       uiSchema[name] = {
-        'ui:widget': 'radio',
+        'ui:widget': 'CustomRadioWidget',
       };
     } else if (type === 'drop_down' || type === 'checkbox') {
       if (schemaField?.isMultiSelect === true) {

@@ -82,21 +82,32 @@ const AddEditUser = ({
   }
 
   if (isEdit) {
-    const keysToRemove = [
-      'state',
-      'district',
-      'block',
-      'village',
-      'password',
-      'confirm_password',
-      'board',
-      'medium',
-      'parentId',
-      'center',
-      'batch',
-      'grade',
-      'center',
-    ];
+    let keysToRemove = [];
+    if (type == "centers") {
+      keysToRemove = [
+        'state',
+        'district',
+        'block',
+        'village',
+      ];
+    }
+    else {
+      keysToRemove = [
+        'state',
+        'district',
+        'block',
+        'village',
+        'password',
+        'confirm_password',
+        'board',
+        'medium',
+        'parentId',
+        'center',
+        'batch',
+        'grade',
+        'center',
+      ];
+    }
     keysToRemove.forEach((key) => delete isEditSchema.properties[key]);
     keysToRemove.forEach((key) => delete isEditUiSchema[key]);
     console.log('schema', schema);

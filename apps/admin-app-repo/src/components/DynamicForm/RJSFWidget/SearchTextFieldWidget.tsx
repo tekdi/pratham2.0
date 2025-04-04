@@ -31,6 +31,7 @@ const SearchTextFieldWidget = ({
 
     return (
         <TextField
+        sx={{backgroundColor:"#eeeeee"}}
             id={id}
             label={t(label)}
             placeholder={placeholder}
