@@ -68,6 +68,9 @@ import { editEditUser } from '../../services/ProfileService';
 import { showToastMessage } from '@/components/Toastify';
 import MentorAssignment from '../../components/youthNet/MentorForm/MentorAssignment';
 import useSubmittedButtonStore from '../../store/useSubmittedButtonStore';
+import HolidayVillageIcon from '@mui/icons-material/HolidayVillage';
+import PersonPinIcon from '@mui/icons-material/PersonPin';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const Index = () => {
   const { isRTL } = useDirection();
@@ -636,20 +639,23 @@ const Index = () => {
     {
       label: t('YOUTHNET_USERS_AND_VILLAGES.ADD_OR_REASSIGN_VILLAGES'),
       action: BOTTOM_DRAWER_CONSTANTS.ADD_REASSIGN,
+      icon: <HolidayVillageIcon />,
     },
     {
       label: t('YOUTHNET_USERS_AND_VILLAGES.REQUEST_TO_REASSIGN_DISTRICT'),
       action: BOTTOM_DRAWER_CONSTANTS.REQUEST_REASSIGN,
+      icon: <PersonPinIcon />,
     },
     {
       label: t('YOUTHNET_USERS_AND_VILLAGES.DELETE_USER_PERMANENTLY'),
       action: BOTTOM_DRAWER_CONSTANTS.DELETE,
+      icon: <DeleteIcon />
     },
   ];
 
-  const Mentorbuttons = mentorActions.map(({ label, action }) => ({
+  const Mentorbuttons = mentorActions.map(({ label, action, icon }) => ({
     label,
-    icon: <SwapHorizIcon />,
+    icon,
     onClick: () => handleButtonClick(action),
   }));
 
