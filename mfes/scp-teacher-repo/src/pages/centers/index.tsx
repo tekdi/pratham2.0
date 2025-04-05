@@ -4,7 +4,7 @@ import NoDataFound from '@/components/common/NoDataFound';
 import Header from '@/components/Header';
 import ManageUser from '@/components/ManageUser';
 import { showToastMessage } from '@/components/Toastify';
-import { getCohortList } from '@/services/CohortServices';
+import { getBlocksByCenterId, getCohortList } from '@/services/CohortServices';
 import useStore from '@/store/store';
 import {
   CenterType,
@@ -27,6 +27,7 @@ import {
   Tab,
   Tabs,
   TextField,
+  Typography,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
@@ -38,6 +39,10 @@ import { accessControl } from '../../../app.config';
 import FilterModalCenter from '../blocks/components/FilterModalCenter';
 import taxonomyStore from '@/store/taxonomyStore';
 import { telemetryFactory } from '@/utils/telemetry';
+import CenterDropdown from '@/components/CenterSelection';
+import BatchList from '@/components/BatchList';
+import manageUserStore from '@/store/manageUserStore';
+
 
 const CentersPage = () => {
   const { t } = useTranslation();
@@ -71,6 +76,11 @@ const CentersPage = () => {
   const store = useStore();
   const userRole = store.userRole;
   const isActiveYear = store.isActiveYearSelected;
+  const [selectedCenter, setSelectedCenter] = useState('');
+  const [filteredBatches, setFilteredBatches] = useState<any[]>([]);
+  const [batchSearchInput, setBatchSearchInput] = useState(''); // Search for batches
+  const [batchLoading, setBatchLoading] = useState(false);
+  const userStore = manageUserStore();
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -94,7 +104,7 @@ const CentersPage = () => {
     if (router.isReady) {
       const queryParamValue = router.query.tab ? Number(router.query.tab) : 1;
 
-      if ([1, 2].includes(queryParamValue)) setValue(queryParamValue);
+      if ([1, 2, 3].includes(queryParamValue)) setValue(queryParamValue);
       else setValue(1);
     }
   }, [router.isReady, router.query.tab]);
@@ -133,6 +143,29 @@ const CentersPage = () => {
     setFilteredCenters(centerData);
   }, [centerData]);
 
+  useEffect(() => {
+    const storedCenterId = localStorage.getItem('centerId');
+    if (storedCenterId) {
+      setSelectedCenter(storedCenterId);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (selectedCenter) {
+      setBatchLoading(true);
+      getBlocksByCenterId(selectedCenter)
+        .then((res) => {
+          setFilteredBatches(res);
+          setBatchLoading(false);
+        })
+        .catch(() => {
+          setBatchLoading(false);
+        });
+    } else {
+      setFilteredBatches([]);
+    }
+  }, [selectedCenter]);
+
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchInput(event.target.value);
     const telemetryInteract = {
@@ -148,6 +181,10 @@ const CentersPage = () => {
       },
     };
     telemetryFactory.interact(telemetryInteract);
+  };
+
+  const handleBatchSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setBatchSearchInput(event.target.value);
   };
 
   const { isRTL } = useDirection();
@@ -305,54 +342,56 @@ const CentersPage = () => {
     setOpenCreateCenterModal(false);
   };
 
+  const handleCenterChange = (cohortId: any) => {
+    setSelectedCenter(cohortId);
+    localStorage.setItem('centerId', cohortId);
+  
+    if (cohortId) {
+      getBlocksByCenterId(cohortId).then((res) => {
+        console.log('Fetched batches:', res); // Log the fetched data
+        setFilteredBatches(res);
+        console.log('Filtered batches state:', res); // Log the state after update
+      });
+    } else {
+      setFilteredBatches([]);
+      console.log('Filtered batches state: []');
+    }
+  };
+
+  console.log("filtered batches before render:", filteredBatches);
+
+  const handleOpenAddBatchModal = () => {};
+
+  const filteredBatchList = useMemo(() => {
+    if (!filteredBatches) return [];
+  
+    if (!batchSearchInput) {
+      return filteredBatches; // Return all batches if search input is empty
+    }
+  
+    return filteredBatches.filter((batch) => {
+      if (batch.name) {
+        return batch.name.toLowerCase().includes(batchSearchInput.toLowerCase());
+      }
+      return false; // Or handle undefined values differently
+    });
+  }, [filteredBatches, batchSearchInput]);
+
   return (
     <>
       <Header />
-      {/* {loading && <Loader showBackdrop={false} loadingText={t('LOADING')} />} */}
       <Box sx={{ padding: '0' }}>
-        {accessGranted('showBlockLevelData', accessControl, userRole) ? (
-          <>
-            {blockData?.length !== 0 &&
-              blockData?.map((block: any) => (
-                <Box
-                  key={block.blockId}
-                  textAlign={'left'}
-                  fontSize={'22px'}
-                  p={'18px 18px 0 18px'}
-                  color={theme?.palette?.warning['300']}
-                >
-                  {toPascalCase(block?.blockName)}
-                  {block?.district && (
-                    <Box textAlign={'left'} fontSize={'16px'} p={'0  '}>
-                      {toPascalCase(block?.district)},{' '}
-                      {toPascalCase(block?.state)}
-                    </Box>
-                  )}
-                </Box>
-              ))}
-          </>
-        ) : (
-          <Box
-            textAlign={'left'}
-            fontSize={'22px'}
-            p={'18px 0 0px 18px'}
-            color={theme?.palette?.warning['300']}
-          >
-            {t('DASHBOARD.MY_TEACHING_CENTERS')}
-          </Box>
-        )}
         {accessGranted('showBlockLevelData', accessControl, userRole) && (
           <Box sx={{ width: '100%' }}>
             {value && (
               <Tabs
                 value={value}
                 onChange={handleChange}
-                textColor="inherit" // Use "inherit" to apply custom color
+                textColor="inherit"
                 aria-label="secondary tabs example"
                 sx={{
                   fontSize: '14px',
                   borderBottom: (theme) => `1px solid #EBE1D4`,
-
                   '& .MuiTab-root': {
                     color: theme.palette.warning['A200'],
                     padding: '0 20px',
@@ -373,214 +412,127 @@ const CentersPage = () => {
                   },
                 }}
               >
-                <Tab value={1} label={t('CENTERS.CENTERS')} />
+                <Tab value={1} label={t('COMMON.BATCHES')} />
                 <Tab value={2} label={t('COMMON.FACILITATORS')} />
+                
               </Tabs>
             )}
           </Box>
         )}
 
         <Box>
-          {value === 1 && (
-            <>
-              <Grid
-                px={'18px'}
-                spacing={2}
-                mt={1}
-                sx={{ display: 'flex', alignItems: 'center' }}
-                container
-              >
-                <Grid sx={{ paddingLeft: '18px !important' }} item xs={8}>
-                  <Box>
-                    <TextField
-                      value={searchInput}
-                      onChange={handleSearchChange}
-                      placeholder={t('COMMON.SEARCH')}
-                      variant="outlined"
-                      size="medium"
-                      sx={{
-                        p: 2,
-                        justifyContent: 'center',
-                        height: '48px',
-                        flexGrow: 1,
-                        mr: 1,
-                        backgroundColor: theme?.palette?.warning?.A700,
-                        color: theme.palette.warning['A200'],
-                        borderRadius: '40px',
-                        '& .MuiOutlinedInput-notchedOutline': {
-                          border: 'none',
-                        },
-                        '& .MuiOutlinedInput-root': {
-                          boxShadow: 'none',
-                        },
-                        '@media (min-width: 900px)': {
-                          width: '90%',
-                        },
-                      }}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            {searchInput ? (
-                              <IconButton
-                                onClick={() => setSearchInput('')}
-                                edge="end"
-                                sx={{ color: theme.palette.warning['A200'] }}
-                              >
-                                <Clear
-                                  sx={{ color: theme?.palette?.warning['300'] }}
-                                />
-                              </IconButton>
-                            ) : (
-                              <Search
-                                sx={{ color: theme?.palette?.warning['300'] }}
-                              />
-                            )}
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Box>
-                </Grid>
-                <Grid item xs={4}>
-                  <Box
-                    sx={{
-                      '@media (min-width: 900px)': {
-                        display: 'flex',
-                        justifyContent: 'end',
-                      },
-                    }}
-                  >
-                    <FormControl
-                      className="drawer-select"
-                      sx={{
-                        width: '100%',
-                        '@media (min-width: 900px)': {
-                          width: '40%',
-                        },
-                      }}
-                    >
-                      <Button
-                        variant="outlined"
-                        onClick={() => {
-                          // setSearchInput('');
-                          handleFilterModalOpen();
-                        }}
-                        size="medium"
-                        endIcon={<ArrowDropDown />}
-                        sx={{
-                          borderRadius: '7px',
-                          border: `1px solid ${theme?.palette?.warning?.A700}`,
-                          color: theme?.palette?.warning['300'],
-                          pl: 3,
-                          fontSize: '13px',
-                          fontWeight: '500',
-                        }}
-                        className="one-line-text"
-                      >
-                        {t('COMMON.FILTERS')}
-                      </Button>
-                    </FormControl>
-                  </Box>
-                </Grid>
-                {accessGranted(
-                  'showCreateCenterButton',
-                  accessControl,
-                  userRole
-                ) &&
-                  isActiveYear && (
-                    <Box mt={'18px'} px={'18px'}>
-                      {/* <Button
-                        sx={{
-                          border: '1px solid #1E1B16',
-                          borderRadius: '100px',
-                          height: '40px',
-                          px: '20px',
-                          color: theme.palette.error.contrastText,
-                          '& .MuiButton-endIcon': {
-                            marginLeft: isRTL
-                              ? '0px !important'
-                              : '8px !important',
-                            marginRight: isRTL
-                              ? '8px !important'
-                              : '-2px !important',
-                          },
-                        }}
-                        className="text-1E"
-                        endIcon={<AddIcon />}
-                        onClick={() => {
-                          setOpenCreateCenterModal(true);
-                          const telemetryInteract = {
-                            context: {
-                              env: 'teaching-center',
-                              cdata: [],
-                            },
-                            edata: {
-                              id: 'click-on-create-center',
-                              type: Telemetry.CLICK,
-                              subtype: '',
-                              pageid: 'centers',
-                            },
-                          };
-                          telemetryFactory.interact(telemetryInteract);
-                        }}
-                      >
-                        {t('BLOCKS.CREATE_NEW')}
-                      </Button> */}
-                    </Box>
-                  )}
-              </Grid>
-
-              {openCreateCenterModal && (
-                <CreateCenterModal
-                  open={openCreateCenterModal}
-                  handleClose={handleCreateCenterClose}
-                  onCenterAdded={handleCenterAdded}
+        {value === 1 && (
+          <>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
+                gap: 2,
+                px: 2,
+                mb: 2,
+                mt: 2,
+                flexWrap: 'wrap',
+              }}
+            >
+              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                <TextField
+                  value={batchSearchInput}
+                  onChange={handleBatchSearchChange}
+                  placeholder={t('COMMON.SEARCH')}
+                  variant="outlined"
+                  size="medium"
+                  sx={{
+                    width: {
+                      xs: '100%',
+                      sm: '400px',
+                      md: '450px',
+                    },
+                    height: '48px',
+                    backgroundColor: theme?.palette?.warning?.A700,
+                    color: theme?.palette?.warning?.A200,
+                    borderRadius: '40px',
+                    pl: 2,
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      border: 'none',
+                    },
+                    '& .MuiOutlinedInput-root': {
+                      paddingRight: '8px',
+                      borderRadius: '40px',
+                      boxShadow: 'none',
+                    },
+                    '& .MuiInputBase-input': {
+                      color: theme?.palette?.warning?.A200,
+                    },
+                  }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        {batchSearchInput ? (
+                          <IconButton
+                            onClick={() => setBatchSearchInput('')}
+                            edge="end"
+                            sx={{ color: theme.palette.warning['A200'] }}
+                          >
+                            <Clear
+                              sx={{ color: theme?.palette?.warning?.['300'] }}
+                            />
+                          </IconButton>
+                        ) : (
+                          <Search
+                            sx={{ color: theme?.palette?.warning?.['300'] }}
+                          />
+                        )}
+                      </InputAdornment>
+                    ),
+                  }}
                 />
-              )}
-
-              {filteredCenters && filteredCenters.length > 0 ? (
-                <>
-                  {/* Regular Centers */}
-                  {filteredCenters.some(
-                    (center) =>
-                      center.centerType?.toUpperCase() === CenterType.REGULAR ||
-                      center.centerType === ''
-                  ) && (
-                    <CenterList
-                      title="CENTERS.REGULAR_CENTERS"
-                      centers={filteredCenters.filter(
-                        (center) =>
-                          center.centerType?.toUpperCase() ===
-                            CenterType.REGULAR || center.centerType === ''
-                      )}
-                      router={router}
-                      theme={theme}
-                      t={t}
-                    />
-                  )}
-
-                  {/* Remote Centers */}
-                  {filteredCenters.some(
-                    (center) =>
-                      center.centerType?.toUpperCase() === CenterType.REMOTE
-                  ) && (
-                    <CenterList
-                      title="CENTERS.REMOTE_CENTERS"
-                      centers={filteredCenters.filter(
-                        (center) =>
-                          center.centerType?.toUpperCase() === CenterType.REMOTE
-                      )}
-                      router={router}
-                      theme={theme}
-                      t={t}
-                    />
-                  )}
-                </>
-              ) : (
-                <NoDataFound />
-              )}
-            </>
-          )}
+                <Button
+                  sx={{
+                    mt: 1.2,
+                    border: '1px solid #1E1B16',
+                    borderRadius: '100px',
+                    height: '40px',
+                    px: '16px',
+                    color: theme.palette.error.contrastText,
+                    alignSelf: 'flex-start',
+                    '& .MuiButton-endIcon': {
+                      marginLeft: isRTL ? '0px !important' : '8px !important',
+                      marginRight: isRTL ? '8px !important' : '-2px !important',
+                    },
+                  }}
+                  className="text-1E"
+                  endIcon={<AddIcon />}
+                  onClick={handleOpenAddBatchModal}
+                >
+                  {t('COMMON.ADD_NEW')}
+                </Button>
+              </Box>
+              <Box sx={{ minWidth: '300px' }}>
+                <CenterDropdown
+                  blockId={userStore.blockId}
+                  cohortId={selectedCenter}
+                  roleName="teacher"
+                  onChange={handleCenterChange}
+                />
+              </Box>
+            </Box>
+            {batchLoading ? (
+              <Typography>Loading Batches...</Typography>
+            ) : filteredBatchList && filteredBatchList.length > 0 ? (
+              <BatchList
+                title={''}
+                cohortId={selectedCenter}
+                batches={filteredBatchList}
+                router={router}
+                theme={theme}
+                t={t}
+              />
+            ) : (
+              <NoDataFound />
+            )}
+          </>
+        )}
         </Box>
         {value === 2 ? (
           <Box>
