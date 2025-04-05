@@ -109,3 +109,65 @@ export const getCohortSearch = async ({
     return error;
   }
 };
+
+export const getCentersByBlockId = async (blockId: string): Promise<any[]> => {
+  if (!blockId) {
+    throw new Error("blockId is required");
+  }
+
+  const apiUrl: string = API_ENDPOINTS.cohortSearch;
+
+  const data = {
+    limit: 20,
+    offset: 0,
+    filters: {
+      block: [blockId],
+      type: "COHORT",
+      status: ["active"]
+    },
+  };
+
+  try {
+    const response = await post(apiUrl, data);
+    const result = response?.data?.result?.results;
+
+    if (!result || !result.cohortDetails) {
+      return [];
+    }
+    return result.cohortDetails;
+  } catch (error) {
+    console.error("Error in searching Cohorts:", error);
+    return [];
+  }
+};
+
+export const getBlocksByCenterId = async (centerId: string): Promise<any[]> => {
+  if (!centerId) {
+    throw new Error("centerId is required");
+  }
+
+  const apiUrl: string = API_ENDPOINTS.cohortSearch;
+
+  const data = {
+    limit: 20,
+    offset: 0,
+    filters: {
+      parentId: [centerId]
+    }
+  };
+
+  try {
+    const response = await post(apiUrl, data);
+
+    const result = response?.data?.result?.results;
+
+    console.log('result ===>', result)
+
+    return result.cohortDetails;
+  } catch (error) {
+    console.error("Error in searching Cohorts:", error);
+    return [];
+  }
+};
+
+

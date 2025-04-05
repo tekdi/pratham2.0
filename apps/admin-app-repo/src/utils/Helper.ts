@@ -130,7 +130,7 @@ export const generateUsernameAndPassword = (
 };
 
 export const transformLabel = (label: string): string => {
-  if (typeof label !== "string") {
+  if (typeof label !== 'string') {
     return label;
   }
   return label
@@ -551,6 +551,22 @@ export const calculateAge = (dob: any) => {
   }
   return age;
 };
+export const calculateAgeFromDate = (dobString: any) => {
+  const dob = new Date(dobString);
+  const today = new Date();
+
+  let age = today.getFullYear() - dob.getFullYear();
+
+  const hasBirthdayPassedThisYear =
+    today.getMonth() > dob.getMonth() ||
+    (today.getMonth() === dob.getMonth() && today.getDate() >= dob.getDate());
+
+  if (!hasBirthdayPassedThisYear) {
+    age--;
+  }
+
+  return age;
+};
 export const preserveLocalStorage = () => {
   const keysToKeep = [
     'preferredLanguage',
@@ -618,31 +634,34 @@ export const filterSchema = (schemaObj: any, role: any) => {
   });
 
   return { newSchema, extractedFields };
-}; 
+};
 
-export function getReassignPayload(removedId: Array<string>, newCohortId: Array<string>) {
-    const cohortId = newCohortId;
-    const removedIds = removedId.filter((id: string) => !cohortId.includes(id));
+export function getReassignPayload(
+  removedId: Array<string>,
+  newCohortId: Array<string>
+) {
+  const cohortId = newCohortId;
+  const removedIds = removedId.filter((id: string) => !cohortId.includes(id));
 
-    return { cohortId, removedIds };
+  return { cohortId, removedIds };
 }
 
- export const fetchUserData = async (userId : any) => {
-    try {
-      let activeCohortIds = [];
-      const resp = await getCohortList(userId);
-      if (resp?.result) { 
-        activeCohortIds = resp.result
-          .filter(
-            (cohort : any) =>
-              cohort.type === 'BATCH' && cohort.cohortMemberStatus === 'active'
-          )
-          .map((cohort : any) => cohort.cohortId);
-        console.log(activeCohortIds, 'activeBatches');
-      }
-      return activeCohortIds;
-    } catch (error) {
-      console.error('Error getting user details:', error);
-      return null;
+export const fetchUserData = async (userId: any) => {
+  try {
+    let activeCohortIds = [];
+    const resp = await getCohortList(userId);
+    if (resp?.result) {
+      activeCohortIds = resp.result
+        .filter(
+          (cohort: any) =>
+            cohort.type === 'BATCH' && cohort.cohortMemberStatus === 'active'
+        )
+        .map((cohort: any) => cohort.cohortId);
+      console.log(activeCohortIds, 'activeBatches');
     }
-  };
+    return activeCohortIds;
+  } catch (error) {
+    console.error('Error getting user details:', error);
+    return null;
+  }
+};

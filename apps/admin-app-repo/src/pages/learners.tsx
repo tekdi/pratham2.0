@@ -315,27 +315,6 @@ const Learner = () => {
       console.error('Error updating team leader:', error);
     }
   };
-
-  // const fetchUserData = async (userId) => {
-  //   try {
-  //     let activeCohortIds = [];
-  //     const resp = await getCohortList(userId);
-  //     if (resp?.result) { 
-  //       activeCohortIds = resp.result
-  //         .filter(
-  //           (cohort) =>
-  //             cohort.type === 'BATCH' && cohort.cohortStatus === 'active'
-  //         )
-  //         .map((cohort) => cohort.cohortId);
-  //       console.log(activeCohortIds, 'activeBatches');
-  //     }
-  //     return activeCohortIds;
-  //   } catch (error) {
-  //     console.error('Error getting user details:', error);
-  //     return null;
-  //   }
-  // };
-
   // Define actions
   const actions = [
     {
