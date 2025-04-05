@@ -43,6 +43,7 @@ const CourseCard: React.FC<ContentCardProps> = ({
   const theme = useTheme<any>();
 
   const onContentClick = () => {
+    console.log("onContentClick ")
     if (mimeType === MIME_TYPE.QUESTIONSET_MIME_TYPE) {
       router.push({ pathname: `/editor`, query: { identifier, mode } });
     } else if (
@@ -68,6 +69,12 @@ const CourseCard: React.FC<ContentCardProps> = ({
       mode !== "review"
     ) {
       router.push({ pathname: `/collection`, query: { identifier } });
+    } else if (
+      mimeType &&
+      MIME_TYPE.ECML_MIME_TYPE.includes(mimeType) &&
+      mode !== "review"
+    ) {
+      router.push({ pathname: `/resource-editor`, query: { identifier } });
     }
   };
 
