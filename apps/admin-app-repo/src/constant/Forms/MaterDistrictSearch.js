@@ -11,13 +11,10 @@ export const MasterDistrictsSearchSchema = {
   type: 'object',
   properties: {
     state: {
-      type: 'array',
+      type: 'string',
       title: 'State',
-      items: {
-        type: 'string',
-        enum: userRole !== Role.CENTRAL_ADMIN ? [stateId] : ['Select'],
-        enumNames: userRole !== Role.CENTRAL_ADMIN ? [stateName] : ['Select'],
-      },
+      enum: userRole !== Role.CENTRAL_ADMIN ? [stateId] : ['Select'],
+      enumNames: userRole !== Role.CENTRAL_ADMIN ? [stateName] : ['Select'],
       api:
         userRole !== Role.CENTRAL_ADMIN
           ? undefined // Avoid API call if userRole is Central admin
@@ -32,12 +29,8 @@ export const MasterDistrictsSearchSchema = {
               },
               callType: 'initial',
             },
-      //for multiselect
-      uniqueItems: true,
-      isMultiSelect: true,
-      maxSelections: 1000,
     },
-    firstName: {
+    fieldName: {
       type: 'string',
       title: 'Search District',
       // description: 'Search for a specific user or entity',
@@ -52,18 +45,15 @@ export const MasterDistrictsSearchSchema = {
 };
 
 export const MasterDistrictsUISchema = {
-  'ui:order': ['state', 'firstName', 'sortBy'],
+  'ui:order': ['state', 'fieldName', 'sortBy'],
 
   state: {
-    'ui:widget': 'CustomMultiSelectWidget',
-    'ui:options': {
-      multiple: true,
-      uniqueItems: true,
-    },
+    'ui:widget': 'CustomSingleSelectWidget',
+    ...(stateId ? { 'ui:disabled': true } : {}),
   },
 
-  firstName: {
-    'ui:widget': 'text',
+  fieldName: {
+    'ui:widget': 'SearchTextFieldWidget',
   },
 
   sortBy: {
