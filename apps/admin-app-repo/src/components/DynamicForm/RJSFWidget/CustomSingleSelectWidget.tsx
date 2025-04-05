@@ -33,7 +33,8 @@ const CustomSingleSelectWidget = ({
   return (
     <FormControl
       fullWidth
-      error={!!rawErrors.length}
+      required={required}
+      error={rawErrors.length > 0}
       disabled={
         isDisabled ||
         enumOptions.length === 0 ||
@@ -51,7 +52,7 @@ const CustomSingleSelectWidget = ({
       >
         {isEmptyOptionIncluded && (
           <MenuItem value="">
-            <em>{t('FORM.Select')}</em>
+            <em>{t('FORM.Select')}{required && '*'}</em>
           </MenuItem>
         )}
 
@@ -62,9 +63,10 @@ const CustomSingleSelectWidget = ({
         ))}
       </Select>
 
-      {!!rawErrors.length && (
+      {/* Form submission error */}
+      {/* {rawErrors.length > 0 && (
         <FormHelperText>{rawErrors[0]}</FormHelperText>
-      )}
+      )} */}
     </FormControl>
   );
 };

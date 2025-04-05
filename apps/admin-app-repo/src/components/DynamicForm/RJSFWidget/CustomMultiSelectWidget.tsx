@@ -96,7 +96,7 @@ const CustomMultiSelectWidget = ({
           },
         }}
       >
-        {enumOptions.length > 0 && maxSelections >= enumOptions.length && (
+        {enumOptions.length > 1 && maxSelections >= enumOptions.length && (
           <MenuItem
             key="selectAll"
             value="selectAll"

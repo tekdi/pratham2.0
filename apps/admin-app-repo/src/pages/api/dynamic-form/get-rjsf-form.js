@@ -155,6 +155,9 @@ function generateSchemaAndUISchema(fields) {
       schemaField.enumNames = options?.map((opt) => opt.label);
       uiSchema[name] = {
         'ui:widget': 'CustomRadioWidget',
+        'ui:options': {
+          hideError: true, // ✅ hides automatic error rendering
+        },
       };
     } else if (type === 'drop_down' || type === 'checkbox') {
       if (schemaField?.isMultiSelect === true) {
@@ -174,10 +177,11 @@ function generateSchemaAndUISchema(fields) {
               'CustomCheckboxWidget'
             : schemaField?.isMultiSelect === true
             ? 'CustomMultiSelectWidget'
-            : 'select',
+            : 'CustomSingleSelectWidget',
         'ui:options': {
           multiple: schemaField?.isMultiSelect === true ? true : false,
           uniqueItems: schemaField?.isMultiSelect === true ? true : false,
+          hideError: schemaField?.isMultiSelect === true ? false : true,
         },
       };
     } else if (type === 'date') {
@@ -218,6 +222,7 @@ function generateSchemaAndUISchema(fields) {
         'ui:options': {
           minValue: minDate, // Default minValue (optional)
           maxValue: maxDate, // Default maxValue (optional)
+          hideError: true,
         },
       };
     } else if (type === 'dateTime') {
@@ -225,8 +230,8 @@ function generateSchemaAndUISchema(fields) {
       uiSchema[name] = { 'ui:widget': 'dateTime' };
     } else {
       uiSchema[name] = {
-        'ui:widget': 'text',
-        'ui:options': { validateOnBlur: true },
+        'ui:widget': 'CustomTextFieldWidget',
+        'ui:options': { validateOnBlur: true, hideError: true },
       };
     }
 

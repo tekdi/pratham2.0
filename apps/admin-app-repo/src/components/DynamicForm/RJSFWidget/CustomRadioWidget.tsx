@@ -1,59 +1,67 @@
 // @ts-nocheck
 import React from 'react';
-import {
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  FormControl,
-  FormLabel,
-  FormHelperText,
-} from '@mui/material';
 import { WidgetProps } from '@rjsf/utils';
+import {
+    FormControl,
+    FormControlLabel,
+    FormLabel,
+    Radio,
+    RadioGroup,
+    FormHelperText,
+} from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 const CustomRadioWidget = ({
-  id,
-  options,
-  value,
-  required,
-  disabled,
-  readonly,
-  label,
-  onChange,
-  rawErrors = [],
+    id,
+    options,
+    value,
+    required,
+    disabled,
+    readonly,
+    label,
+    onChange,
+    rawErrors = [],
 }: WidgetProps) => {
-  const { enumOptions = [] } = options;
+    const { enumOptions = [] } = options;
+    const { t } = useTranslation();
 
-  return (
-    <FormControl
-      component="fieldset"
-      required={required}
-      error={rawErrors.length > 0}
-      fullWidth
-    >
-      {label && <FormLabel component="legend">{label}</FormLabel>}
-      <RadioGroup
-        row
-        id={id}
-        name={id}
-        value={value ?? ''}
-        onChange={(e) => onChange(e.target.value)}
-        required={required}
-      >
-        {enumOptions.map((option) => (
-          <FormControlLabel
-            key={option.value}
-            value={option.value}
-            control={<Radio />}
-            label={option.label}
-            disabled={disabled || readonly}
-          />
-        ))}
-      </RadioGroup>
-      {rawErrors.length > 0 && (
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        onChange(event.target.value);
+    };
+
+    return (
+        <FormControl
+            component="fieldset"
+            error={rawErrors.length > 0}
+            required={required}
+            fullWidth
+        >
+            <FormLabel component="legend">{label}</FormLabel>
+            <RadioGroup
+                row // makes all options in one line, wraps automatically
+                id={id}
+                name={id}
+                value={value ?? ''}
+                onChange={handleChange}
+                style={{ flexWrap: 'wrap' }}
+            >
+                {enumOptions.map((option) => (
+                    <FormControlLabel
+                        key={option.value}
+                        value={option.value}
+                        control={<Radio />}
+                        label={t(`FORM.${option.label}`, {
+                            defaultValue: option.label,
+                        })}
+                        disabled={disabled || readonly}
+                    />
+                ))}
+            </RadioGroup>
+            {/* {rawErrors.length > 0 && (
         <FormHelperText>{rawErrors[0]}</FormHelperText>
-      )}
-    </FormControl>
-  );
+      )} */}
+        </FormControl>
+    );
 };
 
 export default CustomRadioWidget;

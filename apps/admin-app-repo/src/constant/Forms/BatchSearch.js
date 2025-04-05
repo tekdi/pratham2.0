@@ -179,11 +179,26 @@ export const BatchSearchSchema = {
       enum: ['asc', 'desc'],
       enumNames: ['A-Z', 'Z-A'],
     },
+    status: {
+      type: 'string',
+      title: 'Status',
+      enum: ['active', 'archived'],
+      enumNames: ['Active', 'Archived'],
+    },
   },
 };
 
 export const BatchSearchUISchema = {
-  'ui:order': ['state', 'district', 'block', 'village', 'name', 'sortBy'],
+  'ui:order': [
+    'state',
+    'district',
+    'block',
+    'village',
+    'parentId',
+    'name',
+    'sortBy',
+    'status',
+  ],
 
   state: {
     'ui:widget': 'CustomMultiSelectWidget',
@@ -230,6 +245,9 @@ export const BatchSearchUISchema = {
   },
 
   sortBy: {
+    'ui:widget': 'select',
+  },
+  status: {
     'ui:widget': 'select',
   },
 };

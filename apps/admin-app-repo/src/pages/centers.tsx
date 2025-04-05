@@ -35,6 +35,7 @@ import { transformLabel } from '@/utils/Helper';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
+import ActiveArchivedLearner from '@/components/ActiveArchivedLearner';
 
 //import { DynamicForm } from '@shared-lib';
 
@@ -102,9 +103,13 @@ const Centers = () => {
       //unit name is missing from required so handled from frotnend
       let alterSchema = responseForm?.schema
       let requiredArray = alterSchema?.required
-      if (!requiredArray.includes("name")) {
-        requiredArray.push("name")
-      }
+      const mustRequired = ['name', 'center_type', 'state', 'district', 'block', 'village', 'board', 'medium', 'grade'];
+      // Merge only missing items from required2 into required1
+      mustRequired.forEach((item) => {
+        if (!requiredArray.includes(item)) {
+          requiredArray.push(item);
+        }
+      });
       alterSchema.required = requiredArray
       //add max selection custom
       if (alterSchema?.properties?.state) {
@@ -113,8 +118,8 @@ const Centers = () => {
       if (alterSchema?.properties?.district) {
         alterSchema.properties.district.maxSelection = 1
       }
-      if (alterSchema?.properties?.board) {
-        alterSchema.properties.board.maxSelection = 1
+      if (alterSchema?.properties?.block) {
+        alterSchema.properties.block.maxSelection = 1
       }
       if (alterSchema?.properties?.village) {
         alterSchema.properties.village.maxSelection = 1
@@ -146,7 +151,7 @@ const Centers = () => {
   };
 
   const SubmitaFunction = async (formData: any) => {
-    console.log("###### debug issue formData", formData)
+    // console.log("###### debug issue formData", formData)
     if (Object.keys(formData).length > 0) {
       setPrefilledFormData(formData);
       //set prefilled search data on refresh
@@ -222,6 +227,16 @@ const Centers = () => {
           row.customFields.find((field) => field.label === 'TYPE_OF_CENTER')
             ?.selectedValues.map((item) => item.value).join(', ')
         ) || '-',
+    },
+    {
+      key: 'active_learners',
+      label: 'Active Learners',
+      render: (row) => <ActiveArchivedLearner cohortId={row?.cohortId} type={Status.ACTIVE} />,
+    },
+    {
+      key: 'archived_learners',
+      label: 'Archived Learners',
+      render: (row) => <ActiveArchivedLearner cohortId={row?.cohortId} type={Status.ARCHIVED} />,
     },
     {
       key: 'address',
@@ -324,7 +339,7 @@ const Centers = () => {
           ?.selectedValues, '_blank', 'noopener,noreferrer');
       },
       show: (row) => row.customFields.find((field) => field.label === 'GOOGLE MAP_LINK')
-        ?.selectedValues !== '',
+        ?.selectedValues,
     },
     {
       icon: (
