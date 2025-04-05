@@ -169,7 +169,9 @@
    "NOTE_MANUALLY":"Note: Manually marked attendance will override auto-attendance if it is later recorded.",
    "YES_MANUALLY":"Yes, Mark Manually",
    "NO_CENTER_AND_BATCH_FOUND": "No Center & Batch Found",
-   "NO_BATCH_FOUND": "No Batch Found"
+   "NO_BATCH_FOUND": "No Batch Found",
+   "BATCH": "Batch",
+   "BATCHES": "Batches"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
