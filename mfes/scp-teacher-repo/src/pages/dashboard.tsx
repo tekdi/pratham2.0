@@ -1383,11 +1383,12 @@ const Dashboard: React.FC<DashboardProps> = () => {
                     </Box>
                   </Box>
                 </Box>
-                {role === Role.TEAM_LEADER && (
+                {/* Hiding graph section until we get clearity on remote batches */}
+                {/* {role === Role.TEAM_LEADER && (
                   <Box p={2}>
                     <AttendanceComparison blockName={blockName} />
                   </Box>
-                )}
+                )} */}
                 {!isEliminatedFromBuild('SessionCardFooter', 'component') &&
                   SessionCardFooter &&
                   SessionCard && (
