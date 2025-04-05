@@ -17,7 +17,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 // import { FormContext } from '../../../../../../apps/admin-app-repo/src/components/DynamicForm/DynamicFormConstant';
 import { useTranslation } from 'react-i18next';
 // import { createUser } from 'mfes/youthNet/src/services/youthNet/Dashboard/UserServices';
-import { filterSchema, getUserFullName, toPascalCase } from '@/utils/Helper';
+import { filterSchema, getReassignPayload, getUserFullName, toPascalCase } from '@/utils/Helper';
 import { sendCredentialService } from '@/services/NotificationService';
 import { showToastMessage } from '@/components/Toastify';
 // import { filterSchema } from 'mfes/youthNet/src/utils/Helper';
@@ -34,6 +34,7 @@ import {
   getStateBlockDistrictList,
 } from '@/services/MasterDataService';
 import { RoleId } from '@/utils/app.constant';
+import { bulkCreateCohortMembers, updateReassignUser } from '@/services/CohortService/cohortService';
 type FormSubmitFunctionType = (formData: any, payload: any) => Promise<void>;
 
 interface StepperFormProps {
@@ -56,6 +57,21 @@ interface StepperFormProps {
   assignmentChildmessage?: string;
   hideSubmit?: boolean;
   setButtonShow?: any;
+  isEditSchema?: boolean;
+  isReassign?: boolean;
+  isEditUiSchema?: boolean;
+  extraFieldsUpdate?: any;
+  extraFields?: any;
+  prefilledFormData?: any;
+  uiSchema?: any;
+  schema?: any;
+  selectedCohortId?: any;
+  type?: string;
+  editableUserId?: any;
+  successUpdateMessage?: string;
+  UpdateSuccessCallback?: any;
+  editPrefilledFormData?: any;
+
 }
 const StepperForm: React.FC<StepperFormProps> = ({
   showAssignmentScreen,
@@ -76,8 +92,24 @@ const StepperForm: React.FC<StepperFormProps> = ({
   assignmentMessage,
   role,
   hideSubmit,
-  setButtonShow
+  setButtonShow,
+  isEditSchema,
+  isReassign,
+  isEditUiSchema,
+  extraFieldsUpdate,
+  extraFields,
+  prefilledFormData,
+  uiSchema,
+  schema,
+  selectedCohortId,
+  type,
+  editableUserId,
+  successUpdateMessage,
+  UpdateSuccessCallback,
+  editPrefilledFormData,
 }) => {
+  console.log('selectedCohortId', selectedCohortId);
+  
   const [selectedChild, setSelectedChild] = useState<{
     id: string;
     name: string;
@@ -99,6 +131,7 @@ const StepperForm: React.FC<StepperFormProps> = ({
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
   const [fieldIds, setFieldIds] = useState({});
+  const [villages, setVillages] = useState<{ id: number; name: string }[]>([]);
 
   // const [showAssignmentScreen, setShowAssignmentScreen] = useState(false); // New state to toggle views
 
@@ -123,23 +156,21 @@ const StepperForm: React.FC<StepperFormProps> = ({
     try {
       console.log(formData);
       console.log(sdbvFieldData);
-      // console.log()
-      // let assignedObject;
-      // if(role=== 'mentor')
-      // {
-
-      // }
+      console.log(selectedChild, 'selectedChild');
+      console.log(villages, 'villages');
       console.log(selectedVillages);
+
       const assignedObject = Object.entries(selectedVillages).map(
         ([parentId, childId]) => ({
           parentId,
           childId,
         })
       );
-      let customFields: any = []; // Initialize as an empty array
+
+      let customFields: any = [];
 
       if (role === 'mentor') {
-        customFields = mapToCustomFields(assignedObject, sdbvFieldData) || []; // Ensure it’s always an array
+        customFields = mapToCustomFields(assignedObject, sdbvFieldData) || [];
       }
 
       console.log('customFields', customFields);
@@ -149,116 +180,146 @@ const StepperForm: React.FC<StepperFormProps> = ({
         customFields.map((item: any) => [item.fieldId, item])
       );
 
-      // Add missing field IDs with values from payload or empty array if not found
-      {
-        Object.entries(fieldIds).forEach(([key, fieldId]) => {
-          const existingField: any = existFieldIds.get(fieldId);
+      Object.entries(fieldIds).forEach(([key, fieldId]) => {
+        const existingField: any = existFieldIds.get(fieldId);
 
-          if (existingField) {
-            if (formData[key]) {
-              existingField.value = formData[key];
-            }
-          } else {
-            // If missing, add with value from payload or empty array
-            customFields.push({ fieldId, value: formData[key] || [] });
-            delete formData[key];
+        if (existingField) {
+          if (formData[key]) {
+            existingField.value = formData[key];
           }
-        });
-      }
+        } else {
+          customFields.push({ fieldId, value: formData[key] || [] });
+          delete formData[key];
+        }
+      });
+
       console.log(customFields);
+
       let tenantCohortRoleMapping: any = [];
       tenantCohortRoleMapping[0] = {
         tenantId: localStorage.getItem('tenantId'),
         roleId: RoleId.TEACHER,
       };
+
       if (role === 'facilitator' && assignedObject[0]) {
-        const cohortId = assignedObject[0].childId; // Accessing the first object in the array
+        const cohortId = assignedObject[0].childId;
         tenantCohortRoleMapping[0].cohortIds = cohortId;
       }
-      console.log(assignedObject);
-      const payload = formData;
+
+      const payload = { ...formData };
+      console.log({ payload });
+
       payload.tenantCohortRoleMapping = tenantCohortRoleMapping;
       payload.customFields = customFields;
+
       if (payload.batch) {
         const cohortIds = payload.batch;
-        // payload.tenantCohortRoleMapping.push(cohortIds);
         payload.tenantCohortRoleMapping[0]['cohortIds'] = cohortIds;
-
         delete payload.batch;
         delete payload.center;
       }
+
       payload.username = formData.email;
       const randomNum = Math.floor(10000 + Math.random() * 90000).toString();
       payload.password = randomNum;
+
       console.log(payload);
-      const responseUserData = await createUser(payload);
-      if (responseUserData?.userData) {
-        let creatorName;
 
-        if (typeof window !== 'undefined' && window.localStorage) {
-          creatorName = getUserFullName();
-        }
-        let replacements: { [key: string]: string };
-        const key =
-          role === 'mentor' ? 'onMentorCreate' : 'onFacilitatorCreated';
-        const context = 'USER';
-        const isQueue = false;
+     
 
-        replacements = {};
-        if (creatorName) {
-          replacements = {
-            '{FirstName}': toPascalCase(payload?.firstName),
-            '{UserName}': payload?.email,
-            '{Password}': payload?.password,
-            '{appUrl}':
-              (process.env.NEXT_PUBLIC_TEACHER_APP_URL as string) || '', //TODO: check url
-          };
-        }
+      if (isReassign) { 
+        delete payload.batch;
+        console.log('payload', payload);
 
-        const sendTo = {
-          receipients: [payload?.email],
+        const reassignmentPayload = {
+          ...payload,
+          userData: {
+            firstName: formData.firstName,
+          },
         };
-        if (Object.keys(replacements).length !== 0 && sendTo) {
-          const response = await sendCredentialService({
-            isQueue,
-            context,
-            key,
-            replacements,
-            email: sendTo,
-          });
-          if (
-            response?.email?.data[0]?.result ===
-            'Email notification sent successfully'
-          ) {
-            //  onClose();
+        const resp = await updateReassignUser(editableUserId, reassignmentPayload);
+        if (resp) {
+          UpdateSuccessCallback();
+        } else {
+          console.error('Error reassigning user:');
+        }
 
-            showToastMessage(
-              t('MENTOR.MENTOR_CREATED_SUCCESSFULLY'),
-              'success'
-            );
-            setSubmittedButtonStatus(true);
-          } else {
-            console.log(' not checked');
-            //   onClose();
-            showToastMessage(t('MENTOR.MENTOR_CREATED'), 'success');
+        
+        if (role === 'facilitator' && assignedObject[0]) {
+          const newCohortIds = assignedObject?.[0].childId;
+        }
+        const cohortIdPayload = getReassignPayload(
+          editPrefilledFormData?.batch,
+          formData?.batch
+        );
+        
+        const removedIds = editPrefilledFormData?.batch?.filter((item: any) => !assignedObject?.[0]?.childId?.includes(item));
+        const bulkCreatePayload: any = {
+          userId: [editableUserId],
+          cohortId: assignedObject?.[0]?.childId,
+        }
+        if (removedIds?.length > 0) {
+          bulkCreatePayload.removeCohortId = removedIds;
+        }
+        const res = await bulkCreateCohortMembers(bulkCreatePayload);
+
+      } else {
+        const responseUserData = await createUser(payload);
+        if (responseUserData?.userData) {
+          let creatorName;
+
+          if (typeof window !== 'undefined' && window.localStorage) {
+            creatorName = getUserFullName();
           }
-          setSubmittedButtonStatus(!submittedButtonStatus);
+
+          let replacements: { [key: string]: string };
+          const key = role === 'mentor' ? 'onMentorCreate' : 'onFacilitatorCreated';
+          const context = 'USER';
+          const isQueue = false;
+
+          replacements = {};
+          if (creatorName) {
+            replacements = {
+              '{FirstName}': toPascalCase(payload?.firstName),
+              '{UserName}': payload?.email,
+              '{Password}': payload?.password,
+              '{appUrl}': (process.env.NEXT_PUBLIC_TEACHER_APP_URL as string) || '',
+            };
+          }
+
+          const sendTo = {
+            receipients: [payload?.email],
+          };
+
+          if (Object.keys(replacements).length !== 0 && sendTo) {
+            const response = await sendCredentialService({
+              isQueue,
+              context,
+              key,
+              replacements,
+              email: sendTo,
+            });
+            if (response?.email?.data[0]?.result === 'Email notification sent successfully') {
+              showToastMessage(
+                t('MENTOR.MENTOR_CREATED_SUCCESSFULLY'),
+                'success'
+              );
+              setSubmittedButtonStatus(true);
+            } else {
+              showToastMessage(t('MENTOR.MENTOR_CREATED'), 'success');
+            }
+            setSubmittedButtonStatus(!submittedButtonStatus);
+          }
         }
       }
     } catch (error: any) {
-      if (error?.response?.data?.params?.err === 'User already exist.') {
-        showToastMessage(error?.response?.data?.params?.err, 'error');
-      } else {
-        //  onClose();
-        console.log(error);
-      }
-    }
+          if (error?.response?.data?.params?.err === 'User already exist.') {
+            showToastMessage(error?.response?.data?.params?.err, 'error');
+          } else {
+            console.error('Error reassigning user:', error);
+          }
+        }
   };
-
-  // Example usage:
-  // const schemaObj = {
-  //   /* Your given schema and uiSchema here */
-  // };
 
   const mapToCustomFields = (Data: any, fieldMapping: any) => {
     // let userDataString = localStorage.getItem('userData');
@@ -358,8 +419,8 @@ const StepperForm: React.FC<StepperFormProps> = ({
               status: ['active'],
               // state: [stateId],
               // district: [districtId],
-              // block: [blockId],
-              village: [villageId],
+              block: [blockId],
+              // village: [villageId],
               // "name": selected[0]
             },
           };
@@ -435,15 +496,19 @@ const StepperForm: React.FC<StepperFormProps> = ({
         parentId={selectedChild.id}
         ParentName={selectedChild.name}
         onBack={handleBack}
-        selectedVillages={selectedVillages[selectedChild.id] || []}
+        selectedVillages={ selectedVillages[selectedChild.id] || []}
         onSelectionChange={(villages: any) =>
           handleVillageSelection(selectedChild.id, villages)
         }
-        role={role}
+        role={role} 
         districtId={districtId}
         stateId={stateId}
         blockId={blockId}
         villageId={villageId}
+        setVillages={setVillages}
+        villages={villages}
+        selectedCohortId={selectedCohortId}
+        isReassign={isReassign}
       />
     );
   }
@@ -454,11 +519,13 @@ const StepperForm: React.FC<StepperFormProps> = ({
         addSchema &&
         addUiSchema && (
           <DynamicForm
-            schema={addSchema}
-            uiSchema={addUiSchema}
+            schema={isReassign ? isEditSchema : addSchema}
+            uiSchema={isReassign ? isEditUiSchema : addUiSchema}
             FormSubmitFunction={FormSubmitFunction}
-            prefilledFormData={formData || {}}
+            // prefilledFormData={formData || {}}
             hideSubmit={hideSubmit}
+            extraFields={isReassign ? extraFieldsUpdate : extraFields}
+            prefilledFormData={prefilledFormData ||  {}}
           />
         )
       ) : (
@@ -513,7 +580,7 @@ const StepperForm: React.FC<StepperFormProps> = ({
                       fontSize: '16px',
                     }}
                   >
-                    {selectedVillages[id]?.length || 0} {selectedChildLabel}
+                    {selectedVillages[id]?.length ? selectedVillages[id].length : selectedCohortId?.length || 0} 
                   </Box>
                 </Box>
                 <IconButton>

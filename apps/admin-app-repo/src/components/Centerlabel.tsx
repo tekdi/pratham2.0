@@ -1,5 +1,5 @@
-import { getCohortList } from "@/services/CohortService/cohortService";
 import React from "react";
+import { getCohortList } from "@/services/CohortService/cohortService";
 
 const CenterLabel = ({ parentId }: any) => {
   const [centerLabel, setCenterLabel] = React.useState('-');

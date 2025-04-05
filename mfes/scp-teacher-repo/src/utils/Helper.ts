@@ -9,7 +9,7 @@ import {
 } from './Interfaces';
 dayjs.extend(utc);
 import { format, parseISO } from 'date-fns';
-import manageUserStore from '@/store/manageUserStore';
+import manageUserStore from '../store/manageUserStore';
 import {
   AssessmentType,
   avgLearnerAttendanceLimit,
@@ -359,7 +359,11 @@ export const mapFieldIdToValue = (
 ): { [key: string]: string } => {
   return fields?.reduce(
     (acc: { [key: string]: string }, field: CustomField) => {
-      acc[field.fieldId] = field.value;
+      if (field.selectedValues && field.selectedValues.length > 0) {
+        acc[field.fieldId] = field.selectedValues[0].value;
+      } else {
+        acc[field.fieldId] = '';
+      }
       return acc;
     },
     {}
@@ -721,8 +725,8 @@ export const updateStoreFromCohorts = (
   );
   if (district) {
     setDistrictCode(district?.code);
-    setDistrictId(district?.fieldId);
-    setDistrictName(district?.value);
+    setDistrictId(district?.selectedValues[0].id);
+    setDistrictName(district?.selectedValues[0].value);
   }
 
   const state = activeCohorts?.[0]?.customField?.find(
@@ -731,14 +735,14 @@ export const updateStoreFromCohorts = (
 
   if (state) {
     setStateCode(state?.code);
-    setStateId(state?.fieldId);
-    setStateName(state?.value);
+    setStateId(state?.selectedValues[0].id);
+    setStateName(state?.selectedValues[0].value);
   }
 
   if (blockObject) {
     setBlockCode(blockObject?.code);
-    setBlockId(blockObject?.fieldId);
-    setBlockName(blockObject?.value);
+    setBlockId(blockObject?.selectedValues[0].id);
+    setBlockName(blockObject?.selectedValues[0].value);
   }
 };
 

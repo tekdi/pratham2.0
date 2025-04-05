@@ -85,7 +85,7 @@ export const searchListData = async (
 
   setPageOffset(offset);
   setCurrentPage(pageNumber);
-  setResponse({});
+  setResponse(null);
 
   const data = {
     limit,
@@ -105,18 +105,17 @@ export const searchListData = async (
   }
 };
 export const extractMatchingKeys = (row: any, schema: any) => {
-  let result = {};
-  const getValue = (type, selectedValues) => {
+  let result: Record<string, any> = {};
+
+  const getValue = (type: string, selectedValues: any) => {
     if (
       type === 'array' &&
       Array.isArray(selectedValues) &&
       selectedValues.length > 0
     ) {
-      if (typeof selectedValues?.[0] === 'object') {
-        // Array of JSON objects -> return array of IDs
-        return selectedValues.map((item) => item.id);
+      if (typeof selectedValues[0] === 'object') {
+        return selectedValues.map((item) => item.id ?? item); // handles missing `id`
       } else {
-        // Simple array of strings -> return as is
         return selectedValues;
       }
     } else if (
@@ -124,58 +123,38 @@ export const extractMatchingKeys = (row: any, schema: any) => {
       Array.isArray(selectedValues) &&
       selectedValues.length > 0
     ) {
-      if (typeof selectedValues?.[0] === 'object') {
-        // Array of JSON objects -> return first object's ID
-        return selectedValues?.[0].id;
+      if (typeof selectedValues[0] === 'object') {
+        return selectedValues[0].id ?? selectedValues[0];
       }
-    }
-    //patch for type = array and selected value = string
-    else if(type==='array'){
+    } else if (type === 'array' && typeof selectedValues === 'string') {
       return [selectedValues];
+    } else if (type === 'string' && typeof selectedValues === 'string') {
+      return selectedValues;
     }
-    return null; // Default if conditions not met
+    return null;
   };
-  const convertArrayToStrings = (arr) => {
-    if (!Array.isArray(arr)) {
-      // throw new Error('Input is not an array');
-      return arr;
-    }
-    return arr.map((item) => String(item));
-  };
-  for (const [key, value] of Object.entries(schema.properties)) {
-    // console.log('######### prefilled key', JSON.stringify(key));
-    // console.log('######### prefilled value', JSON.stringify(value));
-    // console.log('######### prefilled row', JSON.stringify(row));
-    if (value.coreField === 0) {
-      if (value.fieldId) {
-        //check type = array or string
-        const customField = row.customFields?.find(
-          (field) => field.fieldId === value.fieldId
-        );
-        if (customField) {
-          // console.log(
-          //   '######### prefilled customField',
-          //   JSON.stringify(customField)
-          // );
-          let resultValue = getValue(value.type, customField.selectedValues);
-          if (resultValue) {
-            // console.log(
-            //   '######### prefilled resultValue',
-            //   JSON.stringify(resultValue)
-            // );
-            result[key] = convertArrayToStrings(resultValue);
-          }
-        }
-      } else if (row[key] !== undefined && row[key] !== null) {
-        result[key] = row[key];
-      }
-    } else if (row[key] !== undefined && row[key] !== null) {
+
+  for (const [key, schemaField] of Object.entries(schema.properties)) {
+    if (schemaField.coreField === 1) {
+      // Core fields (like name) directly from row
       result[key] = row[key];
+    } else if (schemaField.fieldId) {
+      const matchedField = row.customFields?.find(
+        (field) => field.fieldId === schemaField.fieldId
+      );
+
+      if (matchedField) {
+        const value = getValue(schemaField.type, matchedField.selectedValues);
+        if (value !== null) {
+          result[key] = value;
+        }
+      }
     }
   }
 
   return result;
 };
+
 
 // Add Edit Functions
 
