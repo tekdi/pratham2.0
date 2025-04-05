@@ -45,7 +45,7 @@ export const ContentReviewerSearchSchema = {
 };
 
 export const ContentReviewerUISchema = {
-  'ui:order': ['state', 'searchKey', 'sortBy', 'status'],
+  'ui:order': ['state', 'firstName', 'sortBy', 'status'],
 
   state: {
     'ui:widget': 'CustomMultiSelectWidget',
@@ -55,8 +55,8 @@ export const ContentReviewerUISchema = {
     },
   },
 
-  searchKey: {
-    'ui:widget': 'text',
+  firstName: {
+    'ui:widget': 'SearchTextFieldWidget',
   },
 
   sortBy: {

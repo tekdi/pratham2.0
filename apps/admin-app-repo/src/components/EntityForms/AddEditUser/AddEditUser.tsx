@@ -54,9 +54,9 @@ const AddEditUser = ({
   centerFieldId,
   type,
   hideSubmit,
-  setButtonShow
+  setButtonShow,
+  isSteeper
 }) => {
-
   const [isLoading, setIsLoading] = useState(false);
   const [showAssignmentScreen, setShowAssignmentScreen] =
     useState<boolean>(false);
@@ -82,30 +82,50 @@ const AddEditUser = ({
   }
 
   if (isEdit) {
-    const keysToRemove = [
-      'state',
-      'district',
-      'block',
-      'village',
-      'password',
-      'confirm_password',
-      'board',
-      'medium',
-      'parentId',
-      'center',
-      'batch',
-      'grade',
-      'center',
-    ];
+    console.log('########### debug issue ', isEditUiSchema);
+    let keysToRemove = [];
+    if (type == 'centers') {
+      keysToRemove = ['state', 'district', 'block', 'village'];
+      //disable center type if value present
+      if (editPrefilledFormData?.center_type) {
+        isEditUiSchema = {
+          ...isEditUiSchema,
+          center_type: {
+            ...isEditUiSchema.center_type,
+            'ui:disabled': true,
+          },
+        };
+      }
+    } else if (type == 'batch') {
+      keysToRemove = ['state', 'district', 'block', 'village', 'parentId'];
+    } else {
+      keysToRemove = [
+        'state',
+        'district',
+        'block',
+        'village',
+        'password',
+        'confirm_password',
+        'board',
+        'medium',
+        'parentId',
+        'center',
+        'batch',
+        'grade',
+        'center',
+      ];
+    }
     keysToRemove.forEach((key) => delete isEditSchema.properties[key]);
     keysToRemove.forEach((key) => delete isEditUiSchema[key]);
-    console.log('schema', schema);
+    //also remove from required if present
+    isEditSchema.required = isEditSchema.required.filter(key => !keysToRemove.includes(key));
+    console.log('schema', JSON.stringify(schema));
   } else if (isReassign) {
     const keysToHave = [
       'state',
       'district',
       'block',
-      ...(isExtraFields ? ['village', 'center', 'batch'] : []),
+      ...(isExtraFields ? ['village', ...(!isSteeper ? ['center', 'batch'] : [])] : []),
     ];
     isEditSchema = {
       type: 'object',
@@ -178,7 +198,7 @@ const AddEditUser = ({
 
           UpdateSuccessCallback();
         } else {
-          console.error('Error update user:', error);
+          // console.error('Error update user:', error);
           showToastMessage(t(failureUpdateMessage), 'error');
         }
       }
@@ -287,16 +307,16 @@ const AddEditUser = ({
             showToastMessage(t(failureCreateMessage), 'error');
           }
         } else {
-          if (payload.type === CohortTypes.BATCH) {
-            let customFields = payload.customFields
+          if (type == "batch") {
+            let customFields = payload.customFields;
             // delete payload.customFields;
             let newCustomFields = removeFields(customFields, [
-              "6469c3ac-8c46-49d7-852a-00f9589737c5",
-              "b61edfc6-3787-4079-86d3-37262bf23a9e",
-              "4aab68ae-8382-43aa-a45a-e9b239319857",
-              "8e9bb321-ff99-4e2e-9269-61e863dd0c54"
-            ])
-            payload.customFields = newCustomFields
+              '6469c3ac-8c46-49d7-852a-00f9589737c5',
+              'b61edfc6-3787-4079-86d3-37262bf23a9e',
+              '4aab68ae-8382-43aa-a45a-e9b239319857',
+              '8e9bb321-ff99-4e2e-9269-61e863dd0c54',
+            ]);
+            payload.customFields = newCustomFields;
           }
           // payload.delete(customFields)
           const centerCreation = await createCohort(payload);
@@ -317,8 +337,8 @@ const AddEditUser = ({
   };
 
   const removeFields = (data, fieldIdsToRemove) => {
-    return data.filter(item => !fieldIdsToRemove.includes(item.fieldId));
-  }
+    return data.filter((item) => !fieldIdsToRemove.includes(item.fieldId));
+  };
 
   const StepperFormSubmitFunction = async (formData: any, payload: any) => {
     setDistrictId(formData?.district);
@@ -363,6 +383,8 @@ const AddEditUser = ({
     //   )}
     // </>
     <>
+     { console.log(formData, 'formData')}
+    
       {isLoading ? (
         <Loader showBackdrop={false} loadingText={t('COMMON.LOADING')} />
       ) : isEdit ? (
@@ -396,6 +418,19 @@ const AddEditUser = ({
           // add any additional prop(s) for facilitator
           hideSubmit={hideSubmit}
           setButtonShow={setButtonShow}
+          isReassign={isReassign}
+          isEditSchema={isEditSchema}
+          isEditUiSchema={isEditUiSchema}
+          extraFieldsUpdate={extraFieldsUpdate}
+          extraFields={extraFields}
+          prefilledFormData={prefilledFormData || {}}
+          schema={schema}
+          uiSchema={uiSchema}
+              selectedCohortId={editPrefilledFormData?.batch?.length ? editPrefilledFormData?.batch : ''}
+              successUpdateMessage={successUpdateMessage}
+              UpdateSuccessCallback={UpdateSuccessCallback}
+              editPrefilledFormData={editPrefilledFormData}
+              editableUserId={editableUserId}
         />
       ) : type === 'mentor' ? (
         <StepperForm

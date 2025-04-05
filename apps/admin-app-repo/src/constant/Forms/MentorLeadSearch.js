@@ -109,7 +109,7 @@ export const MentorLeadSearchUISchema = {
   },
 
   firstName: {
-    'ui:widget': 'text',
+    'ui:widget': 'SearchTextFieldWidget',
   },
 
   sortBy: {

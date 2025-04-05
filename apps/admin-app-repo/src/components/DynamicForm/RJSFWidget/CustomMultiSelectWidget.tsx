@@ -18,53 +18,53 @@ const CustomMultiSelectWidget = ({
   label,
   onChange,
   schema,
-  uiSchema, // Pass uiSchema to read ui:disabled
+  uiSchema,
+  rawErrors = [],
 }: WidgetProps) => {
   const { enumOptions = [] } = options;
-  const maxSelections = schema.maxSelection || enumOptions.length; // Default to max options if not set
+  const maxSelections = schema.maxSelection || enumOptions.length;
   const { t } = useTranslation();
 
-  // Ensure value is always an array
   const selectedValues = Array.isArray(value) ? value : [];
 
-  // State to track if all options are selected
   const [isAllSelected, setIsAllSelected] = useState(
     selectedValues.length === enumOptions.length
   );
 
-  // Check if the widget is disabled from uiSchema
   const isDisabled = uiSchema?.['ui:disabled'] === true;
+  const [open, setOpen] = useState(false);
 
-  // Update `isAllSelected` when `selectedValues` changes
   useEffect(() => {
     setIsAllSelected(selectedValues.length === enumOptions.length);
   }, [selectedValues, enumOptions]);
 
-  // Handle change event for select
   const handleChange = (event: any) => {
     const selected = event.target.value;
 
     if (selected.includes('selectAll')) {
-      // If "Select All" is clicked, select or deselect all
       if (isAllSelected) {
-        onChange([]); // Deselect all if already selected
+        onChange([]);
       } else {
         const allValues = enumOptions.map((option) => option.value);
-        onChange(allValues.slice(0, maxSelections)); // Select all up to maxSelections
+        onChange(allValues.slice(0, maxSelections));
       }
     } else {
-      // Handle individual selections
       if (Array.isArray(selected)) {
         if (selected.length <= maxSelections) {
-          onChange(selected.length > 0 ? selected : []); // Ensures array format
+          onChange(selected.length > 0 ? selected : []);
+          if (maxSelections === 1 && selected.length === 1) {
+            setOpen(false);
+          }
         }
       }
     }
   };
+
   return (
     <FormControl
       fullWidth
-      error={selectedValues.length > maxSelections}
+      error={rawErrors.length > 0}
+      required={required}
       disabled={
         isDisabled ||
         enumOptions.length === 0 ||
@@ -78,6 +78,9 @@ const CustomMultiSelectWidget = ({
         label={label}
         labelId="demo-multiple-checkbox-label"
         value={selectedValues}
+        open={open}
+        onOpen={() => setOpen(true)}
+        onClose={() => setOpen(false)}
         onChange={handleChange}
         renderValue={(selected) =>
           enumOptions
@@ -93,8 +96,7 @@ const CustomMultiSelectWidget = ({
           },
         }}
       >
-        {/* Show "Select All" only if maxSelections >= enumOptions.length */}
-        {enumOptions.length > 0 && maxSelections >= enumOptions.length && (
+        {enumOptions.length > 1 && maxSelections >= enumOptions.length && (
           <MenuItem
             key="selectAll"
             value="selectAll"
@@ -107,7 +109,6 @@ const CustomMultiSelectWidget = ({
           </MenuItem>
         )}
 
-        {/* Map through actual options */}
         {enumOptions.map((option) => (
           <MenuItem
             key={option.value}
@@ -127,10 +128,9 @@ const CustomMultiSelectWidget = ({
         ))}
       </Select>
 
-      {selectedValues.length > maxSelections && (
-        <FormHelperText>
-          You can select up to {maxSelections} options
-        </FormHelperText>
+      {/* Form submission error */}
+      {rawErrors.length > 0 && (
+        <FormHelperText>{rawErrors[0]}</FormHelperText>
       )}
     </FormControl>
   );

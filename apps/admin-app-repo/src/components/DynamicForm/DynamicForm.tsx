@@ -13,6 +13,10 @@ import _ from 'lodash'; // Lodash for deep comparison
 import CustomMultiSelectWidget from './RJSFWidget/CustomMultiSelectWidget';
 import CustomCheckboxWidget from './RJSFWidget/CustomCheckboxWidget';
 import CustomDateWidget from './RJSFWidget/CustomDateWidget';
+import SearchTextFieldWidget from './RJSFWidget/SearchTextFieldWidget';
+import CustomSingleSelectWidget from './RJSFWidget/CustomSingleSelectWidget';
+import CustomRadioWidget from './RJSFWidget/CustomRadioWidget';
+import CustomTextFieldWidget from './RJSFWidget/CustomTextFieldWidget';
 import { toPascalCase, transformLabel } from '@/utils/Helper';
 
 const DynamicForm = ({
@@ -42,6 +46,10 @@ const DynamicForm = ({
     CustomMultiSelectWidget,
     CustomCheckboxWidget,
     CustomDateWidget,
+    SearchTextFieldWidget,
+    CustomSingleSelectWidget,
+    CustomRadioWidget,
+    CustomTextFieldWidget
   };
 
   useEffect(() => {
@@ -986,6 +994,9 @@ const DynamicForm = ({
   };
 
   const handleSubmit = ({ formData }: { formData: any }) => {
+
+    console.log('########### issue debug formData', formData);
+
     //step-1 : Check and remove skipped Data
     function filterFormData(skipHideObject, formData) {
       const updatedFormData = { ...formData };
@@ -1001,7 +1012,6 @@ const DynamicForm = ({
       return updatedFormData;
     }
     const filteredData = filterFormData(hideAndSkipFields, formData);
-    // console.log('formData', formData);
     // console.log('######### filteredData', JSON.stringify(filteredData));
     const cleanedData = Object.fromEntries(
       Object.entries(filteredData).filter(
@@ -1027,11 +1037,11 @@ const DynamicForm = ({
             // Use fieldId for custom fields
             transformedData.customFields.push({
               fieldId: fieldSchema.fieldId,
-              value: formData[key],
+              value: formData[key] || "",
             });
           } else {
             // Use the field name for core fields
-            transformedData[key] = formData[key];
+            transformedData[key] = formData[key] || "";
           }
         }
       }
@@ -1047,6 +1057,11 @@ const DynamicForm = ({
       schema,
       extraFields
     );
+
+    //add name in always lower case
+    if (transformedFormData?.name) {
+      transformedFormData.name = transformedFormData.name.toLowerCase();
+    }
 
     // // console.log('formSchema', transformedFormData);
     // console.log('Form Data Submitted:', filteredData);
@@ -1124,17 +1139,42 @@ const DynamicForm = ({
 
     return errors;
   };
+  // const customValidate = (formData, errors) => {
+  //   console.log('########### issue debug errors customvalidator ', JSON.stringify(errors));
+
+  //   Object.keys(formSchema.properties).forEach((key) => {
+  //     const field = formSchema.properties[key];
+  //     const value = formData[key];
+
+  //     if (field.pattern && value) {
+  //       const patternRegex = new RegExp(field.pattern);
+  //       if (!patternRegex.test(value)) {
+  //         const errorMessage =
+  //           t(patternErrorMessages?.[field.pattern]) ||
+  //           `Invalid format for ${field.title || key}.`;
+
+  //         if (!errors[key].__errors) {
+  //           errors[key].__errors = [];
+  //         }
+  //         errors[key].__errors.push(errorMessage);
+  //       }
+  //     }
+  //   });
+
+  //   return errors;
+  // };
 
   // Custom transformErrors to suppress required errors before submit
   const transformErrors = (errors) => {
-    console.log('######### errors', JSON.stringify(errors));
+    // console.log('########### issue debug errors 123 ', JSON.stringify(errors));
     let updatedError = errors;
     if (!submitted) {
-      updatedError = errors.filter((error) => error.name !== 'required');
+      // updatedError = errors.filter((error) => error.name !== 'required');
     }
     if (!submitted) {
       updatedError = updatedError.filter((error) => error.name !== 'pattern');
     }
+    // console.log('########### issue debug updatedError 123 ', JSON.stringify(updatedError));
     return updatedError;
   };
 
@@ -1147,7 +1187,16 @@ const DynamicForm = ({
           uiSchema={formUiSchema}
           formData={formData}
           onChange={handleChange}
-          onSubmit={handleSubmit}
+          // onSubmit={handleSubmit}
+          onSubmit={({ formData, errors }) => {
+            // console.log("########### issue debug SUBMIT", formData);
+            // console.log("########### issue debug ERRORS", errors); // 👈 this will be empty if validation passed
+            if (errors.length > 0) {
+              // Block submission if needed
+              return;
+            }
+            handleSubmit({ formData });
+          }}
           validator={validator}
           //noHtml5Validate //disable auto error pop up to field location
           showErrorList={false} // Hides the error list card at the top
@@ -1166,7 +1215,7 @@ const DynamicForm = ({
       ) : (
         <Grid container spacing={2}>
           {Object.keys(formSchema.properties).map((key) => (
-            <Grid item xs={12} md={4} lg={4} key={key} sx={{ mb: '-40px' }}>
+            <Grid item xs={12} md={4} lg={3} key={key} sx={{ mb: '-40px' }}>
               <Form
                 ref={formRef}
                 schema={{
