@@ -250,7 +250,7 @@ const DynamicForm = ({
     setFormSchema(translatedSchema);
   }, []);
 
-  // // console.log('schema', schema)
+   // console.log('schema', schema)
   const extractApiProperties = (schema, callType) => {
     return Object.entries(schema.properties)
       .filter(([_, value]) => value.api && value.api.callType === callType)

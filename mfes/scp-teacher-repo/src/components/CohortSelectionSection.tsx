@@ -130,9 +130,9 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
 
   //center add fix
   const [centerId, setCenterId] = useState('');
-  const [filteredBatchData, setFilteredBatchData] = React.useState<any>();
+  const [filteredBatchData, setFilteredBatchData] = React.useState<any>([]);
   const [filteredManipulatedBatchData, setFilteredManipulatedBatchData] =
-    React.useState<any>();
+    React.useState<any>([]);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.localStorage) {
@@ -157,9 +157,12 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
       ?.filter((cohort: any) => cohort?.status?.toLowerCase() === Status.ACTIVE)
       ?.sort((a: any, b: any) => a.name.localeCompare(b.name));
 
-    setFilteredCohortData(filteredManipulatedData);
-
-    setFilteredManipulatedCohortData(filteredManipulatedData);
+    if (filteredManipulatedData) {
+      setFilteredCohortData(filteredManipulatedData);
+    }
+    if (filteredManipulatedData) {
+      setFilteredManipulatedCohortData(filteredManipulatedData);
+    }
   }, [manipulatedCohortData, cohortsData]);
 
   useEffect(() => {
@@ -208,7 +211,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
             queryFn: () => getCohortList(userId, { customField: 'true' }),
           });
 
-          const cohortData = response[0];
+          const cohortData = response?.[0];
           let userDetailsResponse;
           if (userId) {
             userDetailsResponse = await getUserDetails(userId, true);
@@ -399,12 +402,12 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
               setManipulatedCohortData?.(filteredData);
             }
           }
-          if (response.length === 0) {
+          if (!response?.length) {
             setLoading(false);
           }
         } catch (error) {
           console.error('Error fetching cohort list', error);
-          // setLoading(false);
+          setLoading(false);
           showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
         }
       };
@@ -480,6 +483,21 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
       {/* {loading && (
         <Loader showBackdrop={true} loadingText={t('COMMON.LOADING')} />
       )} */}
+      {filteredCohortData?.length === 0 && filteredBatchData?.length === 0 && (
+      <Typography color={theme.palette.warning['300']}>
+        {t('COMMON.NO_CENTER_AND_BATCH_FOUND')}
+      </Typography>
+      )}
+      {filteredCohortData?.length === 0 && filteredBatchData?.length !== 0 && (
+      <Typography color={theme.palette.warning['300']}>
+        {t('COMMON.NO_CENTER_FOUND')}
+      </Typography>
+      )}
+      {filteredCohortData?.length !== 0 && filteredBatchData?.length === 0 && (
+          <Typography color={theme.palette.warning['300']}>
+              {t('COMMON.NO_BATCH_FOUND')}
+          </Typography>
+      )}
       {filteredCohortData && filteredBatchData && (
         <Box
           sx={{
@@ -595,7 +613,9 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                         </FormControl>
                       ) : (
                         <Typography color={theme.palette.warning['300']}>
-                          {toPascalCase(filteredCohortData[0]?.name)}
+                          {filteredCohortData?.length === 0
+                            ? t('COMMON.NO_CENTER_FOUND')
+                            : toPascalCase(filteredCohortData[0]?.name)}
                         </Typography>
                       )}
                       {filteredBatchData?.length > 1 ? (
@@ -681,7 +701,9 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                         </FormControl>
                       ) : (
                         <Typography color={theme.palette.warning['300']}>
-                          {toPascalCase(filteredBatchData[0]?.name)}
+                          {filteredBatchData?.length === 0
+                            ? t('COMMON.NO_BATCH_FOUND')
+                            : toPascalCase(filteredBatchData[0]?.name)}
                         </Typography>
                       )}
                     </Box>
@@ -818,7 +840,9 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                             </FormControl>
                           ) : (
                             <Typography color={theme.palette.warning['300']}>
-                              {toPascalCase(filteredCohortData[0]?.name)}
+                              {filteredCohortData?.length === 0
+                            ? t('COMMON.NO_CENTER_FOUND')
+                            : toPascalCase(filteredCohortData[0]?.name)}
                             </Typography>
                           )}
                         </>
@@ -948,7 +972,9 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                             </FormControl>
                           ) : (
                             <Typography color={theme.palette.warning['300']}>
-                              {toPascalCase(filteredBatchData[0]?.name)}
+                              {filteredBatchData?.length === 0
+                            ? t('COMMON.NO_BATCH_FOUND')
+                            : toPascalCase(filteredBatchData[0]?.name)}
                             </Typography>
                           )}
                         </>
