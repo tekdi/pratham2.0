@@ -125,6 +125,7 @@ export const TeamLeaderSearchUISchema = {
       multiple: true,
       uniqueItems: true,
     },
+    ...(stateId ? { 'ui:disabled': true } : {}),
   },
 
   district: {
@@ -144,7 +145,7 @@ export const TeamLeaderSearchUISchema = {
   },
 
   firstName: {
-    'ui:widget': 'text',
+    'ui:widget': 'SearchTextFieldWidget',
   },
 
   sortBy: {

@@ -162,6 +162,7 @@ export const facilitatorSearchUISchema = {
       multiple: true,
       uniqueItems: true,
     },
+    ...(stateId ? { 'ui:disabled': true } : {}),
   },
 
   district: {
@@ -189,7 +190,7 @@ export const facilitatorSearchUISchema = {
   },
 
   firstName: {
-    'ui:widget': 'text',
+    'ui:widget': 'SearchTextFieldWidget',
   },
 
   sortBy: {
