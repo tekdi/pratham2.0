@@ -171,7 +171,8 @@
    "NO_CENTER_AND_BATCH_FOUND": "No Center & Batch Found",
    "NO_BATCH_FOUND": "No Batch Found",
    "BATCH": "Batch",
-   "BATCHES": "Batches"
+   "BATCHES": "Batches",
+   "BATCH_SESSIONS": "Batch Sessions"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -401,7 +402,7 @@
     "NEW_CENTER": "New Center",
     "CENTER_TYPE": "Center Type",
     "UNIT_NAME": "Unit Name",
-    "NOTE": "Note: This will be the center name",
+    "NOTE": "Note: This will be the batch name",
     "CENTER_CREATED": "Center created successfully!",
     "DUPLICATE_CENTER": "Center already exists",
     "RENAME_CENTER": "Rename Center",
@@ -414,7 +415,8 @@
     "THE_USER_BELONGS_TO_THE_FOLLOWING_COHORT": "The user belongs to the following center: ",
     "PLEASE_REMOVE_THE_USER_FROM_COHORT": "Please remove the user from these centers before proceeding with deletion.",
     "ERROR_EMPTY": "Center name cannot be empty",
-    "ERROR_NUMBER": "Center name cannot be number"
+    "ERROR_NUMBER": "Center name cannot be number",
+    "RENAME_BATCH": "Rename Batch"
   },
   "CENTER_SESSION": {
     "THIS_SESSION": "This session",
@@ -749,7 +751,7 @@
     "ENTRIES": "Entries",
     "VOLUNTEERS_ASSIGNED": "Volunteers assigned"
   },
-  "YOUTHNET_PROFILE": {
+  "SCP_PROFILE": {
     "MY_PROFILE": "My Profile",
     "ACTIVITIES_CONDUCTED": "Activities conducted",
     "PROFILE_DETAILS": "Profile Details",
@@ -763,7 +765,10 @@
     "GENDER": "Gender",
     "AGE": "Age",
     "VOLUNTEERING_DETAILS": "Volunteering details",
-    "MARK_AS_VOLUNTEER": "Mark as Volunteer"
+    "MARK_AS_VOLUNTEER": "Mark as Volunteer",
+    "DOB": "Date of Birth",
+    "STATE_DISTRICT_BLOCK_VILLAGE": "Village Block District State",
+    "USERNAME": "Username"
   },
 
   "YOUTHNET_USERS_AND_VILLAGES": {

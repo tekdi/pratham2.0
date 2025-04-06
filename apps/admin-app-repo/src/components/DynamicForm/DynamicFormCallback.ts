@@ -114,7 +114,7 @@ export const extractMatchingKeys = (row: any, schema: any) => {
       selectedValues.length > 0
     ) {
       if (typeof selectedValues[0] === 'object') {
-        return selectedValues.map((item) => item.id ?? item); // handles missing `id`
+        return selectedValues.map((item) => item.id.toString() ?? item); // handles missing `id`
       } else {
         return selectedValues;
       }
@@ -124,7 +124,7 @@ export const extractMatchingKeys = (row: any, schema: any) => {
       selectedValues.length > 0
     ) {
       if (typeof selectedValues[0] === 'object') {
-        return selectedValues[0].id ?? selectedValues[0];
+        return selectedValues[0].id.toString() ?? selectedValues[0];
       }
     } else if (type === 'array' && typeof selectedValues === 'string') {
       return [selectedValues];

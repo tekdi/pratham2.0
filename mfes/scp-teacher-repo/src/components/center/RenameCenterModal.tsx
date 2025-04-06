@@ -125,7 +125,7 @@ const RenameCenterModal: React.FC<CreateBlockModalProps> = ({
               gutterBottom
               color={theme?.palette?.text?.primary}
             >
-              {t('CENTERS.RENAME_CENTER')}
+              {t('CENTERS.RENAME_BATCH')}
             </Typography>
             <IconButton
               onClick={() => handleClose('')}
