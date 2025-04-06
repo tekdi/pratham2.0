@@ -302,6 +302,13 @@ const LoginPage = () => {
                 const customFields =
                   userDetails?.result?.userData?.customFields;
                 if (customFields?.length) {
+
+                  // set customFields in userData
+                  let userDataString = localStorage.getItem('userData');
+                  let userData: any = userDataString ? JSON.parse(userDataString) : null;
+                  userData.customFields = customFields;
+                  localStorage.setItem('userData', JSON.stringify(userData));
+
                   const state = customFields.find(
                     (field: any) => field?.label === 'STATE'
                   );
