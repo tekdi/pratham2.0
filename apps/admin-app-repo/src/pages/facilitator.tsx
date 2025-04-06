@@ -46,13 +46,18 @@ import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
 import { deleteUser } from '@/services/UserService';
-import { transformLabel, fetchUserData } from '@/utils/Helper';
+import {
+  transformLabel,
+  fetchUserData,
+  calculateAgeFromDate,
+} from '@/utils/Helper';
 import { getCohortList } from '@/services/GetCohortList';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import apartment from '../../public/images/apartment.svg';
 import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 import FacilitatorForm from '@/components/DynamicForm/FacilitatorForm/FacilitatorForm';
+import CenterLabel from '@/components/Centerlabel';
 
 const Facilitator = () => {
   const theme = useTheme<any>();
@@ -224,10 +229,9 @@ const Facilitator = () => {
         } ${transformLabel(row.lastName) || ''}`.trim(),
     },
     {
-      key: 'status',
-      label: 'Status',
-      render: (row: any) => transformLabel(row.status),
-      getStyle: (row) => ({ color: row.status === 'active' ? 'green' : 'red' }),
+      keys: ['age'],
+      label: 'Age',
+      render: (row) => calculateAgeFromDate(row.dob) || '',
     },
     {
       keys: ['gender'],
@@ -239,19 +243,9 @@ const Facilitator = () => {
       label: 'Mobile',
       render: (row) => transformLabel(row.mobile) || '',
     },
-    // {
-    //   key: 'STATE',
-    //   label: 'State',
-    //   render: (row) => {
-    //     const state =
-    //       row.customFields.find((field) => field.label === 'STATE')
-    //         ?.selectedValues[0]?.value || '-';
-    //     return `${state}`;
-    //   },
-    // },
     {
-      keys: ['STATE', 'DISTRICT', 'BLOCK', 'VILLAGE'],
-      label: 'Location (State / District / Block/ Village)',
+      keys: ['STATE', 'DISTRICT', 'BLOCK'],
+      label: 'State, District, Block',
       render: (row: any) => {
         const state =
           transformLabel(
@@ -271,18 +265,71 @@ const Facilitator = () => {
               (field: { label: string }) => field.label === 'BLOCK'
             )?.selectedValues?.[0]?.value
           ) || '';
-        const village =
-          transformLabel(
-            row.customFields.find(
-              (field: { label: string }) => field.label === 'VILLAGE'
-            )?.selectedValues?.[0]?.value
-          ) || '';
         return `${state == '' ? '' : `${state}`}${
           district == '' ? '' : `, ${district}`
-        }${block == '' ? '' : `, ${block}`}${
-          village == '' ? '' : `, ${village}`
-        }`;
+        }${block == '' ? '' : `, ${block}`}`;
       },
+    },
+    {
+      key: 'village',
+      label: 'Village',
+      render: (row) =>
+        transformLabel(
+          row.customFields
+            .find((field) => field.label === 'VILLAGE')
+            ?.selectedValues.map((item) => item.value)
+            .join(', ')
+        ) || '-',
+    },
+    {
+      key: 'center',
+      label: 'Center',
+      render: (row) => {
+        let centerArray = row.customFields.find(
+          (field) => field.label === 'CENTER'
+        )?.selectedValues;
+        return (
+          <>
+            {centerArray && (
+              <>
+                {centerArray.map((centerId) => (
+                  <>
+                    <CenterLabel parentId={centerId} />,{' '}
+                  </>
+                ))}
+              </>
+            )}
+          </>
+        );
+      },
+    },
+    {
+      key: 'mysubject',
+      label: 'Main Subjects',
+      render: (row) =>
+        transformLabel(
+          row.customFields
+            .find((field) => field.label === 'MY_MAIN_SUBJECTS')
+            ?.selectedValues.map((item) => item.value)
+            .join(', ')
+        ) || '-',
+    },
+    {
+      key: 'subjectteach',
+      label: 'Subjects Teach',
+      render: (row) =>
+        transformLabel(
+          row.customFields
+            .find((field) => field.label === 'SUBJECTS_I_TEACH')
+            ?.selectedValues.map((item) => item.value)
+            .join(', ')
+        ) || '-',
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      render: (row: any) => transformLabel(row.status),
+      getStyle: (row) => ({ color: row.status === 'active' ? 'green' : 'red' }),
     },
   ];
 
@@ -331,15 +378,16 @@ const Facilitator = () => {
       });
 
       if (resp?.responseCode === 200) {
-        setResponse((prev) => ({
-          ...prev,
-          result: {
-            ...prev?.result,
-            getUserDetails: prev?.result?.getUserDetails?.filter(
-              (item) => item?.userId !== userID
-            ),
-          },
-        }));
+        // setResponse((prev) => ({
+        //   ...prev,
+        //   result: {
+        //     ...prev?.result,
+        //     getUserDetails: prev?.result?.getUserDetails?.filter(
+        //       (item) => item?.userId !== userID
+        //     ),
+        //   },
+        // }));
+        searchData(prefilledFormData, currentPage);
         console.log('Team leader successfully archived.');
       } else {
         console.error('Failed to archive team leader:', resp);
@@ -382,6 +430,7 @@ const Facilitator = () => {
         setEditableUserId(row?.userId);
         handleOpenModal();
       },
+      show: (row) => row.status !== 'archived',
     },
     {
       icon: (
@@ -401,7 +450,7 @@ const Facilitator = () => {
       ),
       callback: async (row) => {
         const findVillage = row?.customFields.find((item) => {
-          if (item.label === 'BATCH' || item.label === 'CENTER') {
+          if (item.label === 'VILLAGE' || item.label === 'BLOCK') {
             return item;
           }
         });
@@ -422,6 +471,8 @@ const Facilitator = () => {
         // searchData(prefilledFormData, currentPage);
         setOpen(true);
         setUserId(row?.userId);
+        setReason('');
+        setChecked(false);
 
         setUserData({
           firstName: row?.firstName || '',
@@ -429,6 +480,7 @@ const Facilitator = () => {
           village: findVillage?.selectedValues?.[0]?.value || '',
         });
       },
+      show: (row) => row.status !== 'archived',
     },
     {
       icon: (
@@ -463,6 +515,7 @@ const Facilitator = () => {
         setEditableUserId(row?.userId);
         handleOpenModal();
       },
+      show: (row) => row.status !== 'archived',
     },
   ];
 
@@ -592,7 +645,7 @@ const Facilitator = () => {
             isEdit={isEdit}
             isReassign={isReassign}
             // isExtraFields={true}
-            // editableUserId={editableUserId}
+            editableUserId={editableUserId}
             UpdateSuccessCallback={() => {
               setPrefilledFormData(prefilledFormData);
               searchData(prefilledFormData, currentPage);
@@ -600,9 +653,9 @@ const Facilitator = () => {
             }}
             extraFields={extraFields}
             extraFieldsUpdate={extraFieldsUpdate}
-            // successUpdateMessage={successUpdateMessage}
-            // telemetryUpdateKey={telemetryUpdateKey}
-            // failureUpdateMessage={failureUpdateMessage}
+            successUpdateMessage={successUpdateMessage}
+            telemetryUpdateKey={telemetryUpdateKey}
+            failureUpdateMessage={failureUpdateMessage}
             successCreateMessage={successCreateMessage}
             // telemetryCreateKey={telemetryCreateKey}
             failureCreateMessage={failureCreateMessage}

@@ -65,7 +65,10 @@ const AddEditUser = ({
   const [prefilledFormData, setPrefilledFormData] = useState(
     editPrefilledFormData
   );
-  // console.log('editPrefilledFormData',editPrefilledFormData);
+  // console.log(
+  //   '#### reassign issue debug editPrefilledFormData',
+  //   editPrefilledFormData
+  // );
 
   const { t } = useTranslation();
 
@@ -127,13 +130,15 @@ const AddEditUser = ({
       );
       // console.log('isEditSchema', JSON.stringify(isEditSchema));
     } else if (isReassign) {
+      let originalRequired = isEditSchema.required;
       const keysToHave = [
         'state',
         'district',
         'block',
-        ...(isExtraFields
-          ? ['village', ...(!isSteeper ? ['center', 'batch'] : [])]
-          : []),
+        'village',
+        'parentId',
+        'center',
+        'batch',
       ];
       isEditSchema = {
         type: 'object',
@@ -150,12 +155,12 @@ const AddEditUser = ({
         }
         return obj;
       }, {});
+      isEditSchema.required = originalRequired;
 
       //also remove from required if present
       isEditSchema.required = isEditSchema.required.filter((key) =>
         keysToHave.includes(key)
       );
-      // console.log('isEditSchema', JSON.stringify(isEditSchema));
     } else {
       const keysToRemove = ['password', 'confirm_password', 'program'];
       keysToRemove.forEach((key) => delete isEditSchema?.properties[key]);
@@ -179,7 +184,14 @@ const AddEditUser = ({
       if (isNotificationRequired) {
         try {
           const { userData, customFields } = splitUserData(payload);
-          delete userData?.email;
+          //update email and username if email changed
+          if (userData?.email) {
+            if (editPrefilledFormData?.email == userData?.email) {
+              delete userData?.email;
+            } else {
+              userData.username = userData?.email;
+            }
+          }
           // console.log('userData', userData);
           // console.log('customFields', customFields);
           const object = {
@@ -199,7 +211,7 @@ const AddEditUser = ({
             UpdateSuccessCallback();
             // localStorage.removeItem('BMGSData');
           } else {
-            console.error('Error update user:', error);
+            // console.error('Error update user:', error);
             showToastMessage(t(failureUpdateMessage), 'error');
           }
         } catch (error) {
@@ -248,23 +260,23 @@ const AddEditUser = ({
           reassignmentPayload
         );
         if (resp) {
+          if (type !== 'team-leader') {
+            const cohortIdPayload = getReassignPayload(
+              editPrefilledFormData.batch,
+              formData.batch
+            );
+            const res = await bulkCreateCohortMembers({
+              userId: [editableUserId],
+              cohortId: cohortIdPayload.cohortId,
+              removeCohortId: cohortIdPayload.removedIds,
+            });
+          }
           showToastMessage(t(successUpdateMessage), 'success');
           telemetryCallbacks(telemetryUpdateKey);
           UpdateSuccessCallback();
         } else {
           console.error('Error reassigning user:', error);
           showToastMessage(t(failureUpdateMessage), 'error');
-        }
-        if (type !== 'team-leader') {
-          const cohortIdPayload = getReassignPayload(
-            editPrefilledFormData.batch,
-            formData.batch
-          );
-          const res = await bulkCreateCohortMembers({
-            userId: [editableUserId],
-            cohortId: cohortIdPayload.cohortId,
-            removeCohortId: cohortIdPayload.removedIds,
-          });
         }
       } catch (error) {
         console.error('Error reassigning user:', error);
@@ -408,7 +420,7 @@ const AddEditUser = ({
         alteredSchema &&
         alteredUiSchema && (
           <>
-            {isEdit ? (
+            {/* {isEdit ? (
               // When editing, show DynamicForm regardless of role
               <DynamicForm
                 schema={alteredSchema}
@@ -473,6 +485,19 @@ const AddEditUser = ({
                 role={type}
                 hideSubmit={hideSubmit}
               />
+            ) : isReassign ? (
+              // When editing, show DynamicForm regardless of role
+              prefilledFormDataReas && (
+                <DynamicForm
+                  schema={alteredSchema}
+                  uiSchema={alteredUiSchema}
+                  t={t}
+                  FormSubmitFunction={FormSubmitFunction}
+                  prefilledFormData={prefilledFormDataReas}
+                  extraFields={extraFieldsUpdate}
+                  hideSubmit={hideSubmit}
+                />
+              )
             ) : (
               <DynamicForm
                 schema={alteredSchema}
@@ -485,7 +510,18 @@ const AddEditUser = ({
                   isEdit || isReassign ? extraFieldsUpdate : extraFields
                 }
               />
-            )}
+            )} */}
+            <DynamicForm
+              schema={alteredSchema}
+              uiSchema={alteredUiSchema}
+              t={t}
+              FormSubmitFunction={FormSubmitFunction}
+              prefilledFormData={prefilledFormData || {}}
+              hideSubmit={hideSubmit}
+              extraFields={
+                isEdit || isReassign ? extraFieldsUpdate : extraFields
+              }
+            />
           </>
         )
       )}

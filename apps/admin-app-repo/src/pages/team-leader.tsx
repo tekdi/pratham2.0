@@ -43,7 +43,11 @@ import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
 import { deleteUser } from '@/services/UserService';
-import { calculateAge, calculateAgeFromDate, transformLabel } from '@/utils/Helper';
+import {
+  calculateAge,
+  calculateAgeFromDate,
+  transformLabel,
+} from '@/utils/Helper';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
@@ -89,11 +93,11 @@ const TeamLeader = () => {
   const searchStoreKey = 'teamLeader';
   const initialFormDataSearch =
     localStorage.getItem(searchStoreKey) &&
-      localStorage.getItem(searchStoreKey) != '{}'
+    localStorage.getItem(searchStoreKey) != '{}'
       ? JSON.parse(localStorage.getItem(searchStoreKey))
       : localStorage.getItem('stateId')
-        ? { state: [localStorage.getItem('stateId')] }
-        : {};
+      ? { state: [localStorage.getItem('stateId')] }
+      : {};
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -118,8 +122,8 @@ const TeamLeader = () => {
       console.log('responseForm', responseForm);
 
       //unit name is missing from required so handled from frotnend
-      let alterSchema = responseForm?.schema
-      let requiredArray = alterSchema?.required
+      let alterSchema = responseForm?.schema;
+      let requiredArray = alterSchema?.required;
       const mustRequired = ['email'];
       // Merge only missing items from required2 into required1
       mustRequired.forEach((item) => {
@@ -220,8 +224,9 @@ const TeamLeader = () => {
       keys: ['firstName', 'middleName', 'lastName'],
       label: 'Team Lead Name',
       render: (row) =>
-        `${transformLabel(row.firstName) || ''} ${transformLabel(row.middleName) || ''
-          } ${transformLabel(row.lastName) || ''}`.trim(),
+        `${transformLabel(row.firstName) || ''} ${
+          transformLabel(row.middleName) || ''
+        } ${transformLabel(row.lastName) || ''}`.trim(),
     },
     {
       keys: ['age'],
@@ -255,8 +260,9 @@ const TeamLeader = () => {
               (field: { label: string }) => field.label === 'BLOCK'
             )?.selectedValues?.[0]?.value
           ) || '';
-        return `${state == '' ? '' : `${state}`}${district == '' ? '' : `, ${district}`
-          }${block == '' ? '' : `, ${block}`}`;
+        return `${state == '' ? '' : `${state}`}${
+          district == '' ? '' : `, ${district}`
+        }${block == '' ? '' : `, ${block}`}`;
       },
     },
     {
@@ -324,10 +330,10 @@ const TeamLeader = () => {
         setVillage(findVillage?.selectedValues[0]?.value);
         setUserId(row?.userId);
         setOpen(true);
-        setFirstName(row?.firstName)
-        setLastName(row?.lastName)
-        setReason('')
-        setChecked(false)
+        setFirstName(row?.firstName);
+        setLastName(row?.lastName);
+        setReason('');
+        setChecked(false);
       },
       show: (row) => row.status !== 'archived',
     },
@@ -451,14 +457,16 @@ const TeamLeader = () => {
           open={openModal}
           onClose={handleCloseModal}
           showFooter={true}
-          primaryText={isEdit ? t('Update') : t('Create')}
+          primaryText={
+            isEdit ? t('Update') : isReassign ? t('Reassign') : t('Create')
+          }
           id="dynamic-form-id"
           modalTitle={
             isEdit
               ? t('TEAM_LEADERS.EDIT_TEAM_LEADER')
               : isReassign
-                ? t('TEAM_LEADERS.RE_ASSIGN_TEAM_LEAD')
-                : t('TEAM_LEADERS.NEW_TEAM_LEADER')
+              ? t('TEAM_LEADERS.RE_ASSIGN_TEAM_LEAD')
+              : t('TEAM_LEADERS.NEW_TEAM_LEADER')
           }
         >
           <AddEditUser
@@ -492,7 +500,7 @@ const TeamLeader = () => {
             blockFieldId={blockFieldId}
             districtFieldId={districtFieldId}
             hideSubmit={true}
-            type={"team-leader"}
+            type={'team-leader'}
           />
         </SimpleModal>
 

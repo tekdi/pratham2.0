@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useEffect, useState } from 'react';
 import {
   Box,
@@ -16,10 +17,11 @@ import { API_ENDPOINTS } from '@/utils/API/APIEndpoints';
 import CohortBatchSelector from './CohortBatchSelector';
 import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { createUser } from '@/services/CreateUserService';
+import { createUser, updateUser } from '@/services/CreateUserService';
 import { getUserFullName, toPascalCase } from '@/utils/Helper';
 import { sendCredentialService } from '@/services/NotificationService';
 import { showToastMessage } from '@/components/Toastify';
+import { splitUserData, telemetryCallbacks } from '../DynamicFormCallback';
 const FacilitatorForm = ({
   t,
   SuccessCallback,
@@ -36,6 +38,10 @@ const FacilitatorForm = ({
   setButtonShow,
   successCreateMessage,
   failureCreateMessage,
+  editableUserId,
+  successUpdateMessage,
+  telemetryUpdateKey,
+  failureUpdateMessage,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [alteredSchema, setAlteredSchema] = useState<any>(null);
@@ -80,6 +86,17 @@ const FacilitatorForm = ({
         'batch',
         'grade',
       ];
+      //disable center type if value present
+      //if first time not designation is sent then update it but backend fix required as it gives eneditable field issue
+      // if (!editPrefilledFormData?.designation) {
+      //   isEditUiSchema = {
+      //     ...isEditUiSchema,
+      //     designation: {
+      //       ...isEditUiSchema.designation,
+      //       'ui:disabled': false,
+      //     },
+      //   };
+      // }
       keysToRemove.forEach((key) => delete isEditSchema.properties[key]);
       keysToRemove.forEach((key) => delete isEditUiSchema[key]);
       //also remove from required if present
@@ -88,13 +105,14 @@ const FacilitatorForm = ({
       );
       // console.log('isEditSchema', JSON.stringify(isEditSchema));
     } else if (isReassign) {
+      let originalRequired = isEditSchema.required;
       const keysToHave = [
         'state',
         'district',
         'block',
-        ...(isExtraFields
-          ? ['village', ...(!isSteeper ? ['center', 'batch'] : [])]
-          : []),
+        'village',
+        'center',
+        'batch',
       ];
       isEditSchema = {
         type: 'object',
@@ -111,6 +129,7 @@ const FacilitatorForm = ({
         }
         return obj;
       }, {});
+      isEditSchema.required = originalRequired;
 
       //also remove from required if present
       isEditSchema.required = isEditSchema.required.filter((key) =>
@@ -143,16 +162,55 @@ const FacilitatorForm = ({
   }, []);
 
   const StepperFormSubmitFunction = async (formData: any, payload: any) => {
-    const isEqual =
-      blockId.length === formData?.block.length &&
-      blockId.every((val, i) => val === formData?.block[i]);
-    if (!isEqual) {
-      setSelectedCenterBatches(null);
+    if (isEdit) {
+      try {
+        const { userData, customFields } = splitUserData(payload);
+        //update email and username if email changed
+        if (userData?.email) {
+          if (editPrefilledFormData?.email == userData?.email) {
+            delete userData?.email;
+          } else {
+            userData.username = userData?.email;
+          }
+        }
+        // console.log('userData', userData);
+        // console.log('customFields', customFields);
+        const object = {
+          userData: userData,
+          customFields: customFields,
+        };
+        const updateUserResponse = await updateUser(editableUserId, object);
+        // console.log('updatedResponse', updateUserResponse);
+
+        if (
+          updateUserResponse &&
+          updateUserResponse?.data?.params?.err === null
+        ) {
+          showToastMessage(t(successUpdateMessage), 'success');
+          telemetryCallbacks(telemetryUpdateKey);
+
+          UpdateSuccessCallback();
+          // localStorage.removeItem('BMGSData');
+        } else {
+          // console.error('Error update user:', error);
+          showToastMessage(t(failureUpdateMessage), 'error');
+        }
+      } catch (error) {
+        console.error('Error update user:', error);
+        showToastMessage(t(failureUpdateMessage), 'error');
+      }
+    } else {
+      const isEqual =
+        blockId.length === formData?.block.length &&
+        blockId.every((val, i) => val === formData?.block[i]);
+      if (!isEqual) {
+        setSelectedCenterBatches(null);
+      }
+      setBlockId(formData?.block);
+      setPrefilledFormData(formData);
+      setShowNextForm(true);
+      setButtonShow(false);
     }
-    setBlockId(formData?.block);
-    setPrefilledFormData(formData);
-    setShowNextForm(true);
-    setButtonShow(false);
   };
   const onCloseNextForm = (cohortdata) => {
     setSelectedCenterBatches(cohortdata);
