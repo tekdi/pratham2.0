@@ -1,9 +1,9 @@
 export const MasterStateSearchSchema = {
   type: 'object',
   properties: {
-    firstName: {
+    fieldName: {
       type: 'string',
-      title: 'Search State',
+      title: 'Search States',
       // description: 'Search for a specific user or entity',
     },
     sortBy: {
@@ -16,10 +16,10 @@ export const MasterStateSearchSchema = {
 };
 
 export const MasterStateUISchema = {
-  'ui:order': ['firstName', 'sortBy'],
+  'ui:order': ['fieldName', 'sortBy'],
 
-  firstName: {
-    'ui:widget': 'text',
+  fieldName: {
+    'ui:widget': 'SearchTextFieldWidget',
   },
 
   sortBy: {

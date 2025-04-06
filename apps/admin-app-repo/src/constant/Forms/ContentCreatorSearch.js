@@ -45,7 +45,7 @@ export const ContentCreatorSearchSchema = {
 };
 
 export const ContentCreatorUISchema = {
-  'ui:order': ['state', 'searchKey', 'sortBy', 'status'],
+  'ui:order': ['state', 'firstName', 'sortBy', 'status'],
 
   state: {
     'ui:widget': 'CustomMultiSelectWidget',
@@ -55,8 +55,8 @@ export const ContentCreatorUISchema = {
     },
   },
 
-  searchKey: {
-    'ui:widget': 'text',
+  firstName: {
+    'ui:widget': 'SearchTextFieldWidget',
   },
 
   sortBy: {

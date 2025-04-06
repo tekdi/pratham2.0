@@ -69,8 +69,8 @@ const Sidebar = ({
       bgcolor="#F8EFDA"
       sx={{
         background: 'linear-gradient(to bottom, white, #F8EFDA)',
-        height:"100vh",
-        overflowY:'auto'
+        height: "100vh",
+        overflowY: 'auto'
       }}
     >
       <Box sx={{ display: 'flex', justifyContent: 'center' }}>
@@ -94,6 +94,7 @@ const Sidebar = ({
                     if (hasSubMenu) {
                       handleToggle(key);
                     } else {
+                      onSidebarClose();
                       router.push(item.link);
                     }
                   }}
@@ -126,7 +127,9 @@ const Sidebar = ({
                           <ListItemButton
                             key={sub.link}
                             sx={{ pl: 7 }}
-                            onClick={() => router.push(sub.link)}
+                            onClick={() => {
+                              onSidebarClose(); router.push(sub.link);
+                            }}
                             style={getActiveStyle(sub.link)}
                           >
                             <ListItemText primary={t(sub.title)} />
