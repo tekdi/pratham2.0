@@ -289,21 +289,26 @@ const CohortPage = () => {
           );
           const districtCode = district?.code || '';
           const districtId = district?.fieldId || '';
+          
           const state = cohortData.customField.find(
             (item: CustomField) => item.label === 'STATE'
           );
           setState(state?.selectedValues?.[0]?.value || '');
           const stateCode = state?.code || '';
           const stateId = state?.fieldId || '';
-
+          
           const blockField = cohortData?.customField.find(
             (field: any) => field.label === 'BLOCK'
           );
+          
+          // Get values safely
+          const districtValue = toPascalCase(district?.selectedValues?.[0]?.value || '');
+          const stateValue = toPascalCase(state?.value || '');
 
-          const address = `${toPascalCase(
-            district?.selectedValues?.[0]?.value || ''
-          )}, ${toPascalCase(state?.value)}`;
-          cohortData.address = address || '';
+          const addressParts = [districtValue, stateValue].filter(Boolean);
+          const address = addressParts.join(', ');
+
+          cohortData.address = address;
 
           const typeOfCohort = cohortData.customField.find(
             (item: CustomField) => item.label === 'TYPE_OF_COHORT'
@@ -313,17 +318,17 @@ const CohortPage = () => {
           const medium = cohortData.customField.find(
             (item: CustomField) => item.label === 'MEDIUM'
           );
-          setMedium(medium?.value);
+          setMedium(medium?.selectedValues[0]);
 
           const grade = cohortData.customField.find(
             (item: CustomField) => item.label === 'GRADE'
           );
-          setGrade(grade?.value);
+          setGrade(grade?.selectedValues[0]);
 
           const board = cohortData.customField.find(
             (item: CustomField) => item.label === 'BOARD'
           );
-          setBoard(board?.value);
+          setBoard(board?.selectedValues[0]);
         }
         setCohortDetails(cohortData);
         setCohortName(cohortData?.name);
@@ -681,11 +686,11 @@ const CohortPage = () => {
                 const cleanedUrl = windowUrl.replace(/^\//, '');
                 const telemetryInteract = {
                   context: {
-                    env: 'teaching-center',
+                    env: 'teaching-batch',
                     cdata: [],
                   },
                   edata: {
-                    id: 'click-on-rename-center',
+                    id: 'click-on-rename-batch',
                     type: Telemetry.CLICK,
                     subtype: '',
                     pageid: cleanedUrl,
@@ -697,7 +702,7 @@ const CohortPage = () => {
               <ListItemIcon sx={{ color: theme.palette.warning['A200'] }}>
                 <ModeEditOutlineOutlinedIcon fontSize="small" />
               </ListItemIcon>
-              {t('CENTERS.RENAME_CENTER')}
+              {t('CENTERS.RENAME_BATCH')}
             </MenuItem>
             {/* <MenuItem
               onClick={() => {
@@ -773,7 +778,7 @@ const CohortPage = () => {
           }}
         >
           {!isEliminatedFromBuild('Events', 'feature') && isActiveYear && (
-            <Tab value={1} label={t('COMMON.CENTER_SESSIONS')} />
+            <Tab value={1} label={t('COMMON.BATCH_SESSIONS')} />
           )}
 
           <Tab
