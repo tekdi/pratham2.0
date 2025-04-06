@@ -359,11 +359,7 @@ export const mapFieldIdToValue = (
 ): { [key: string]: string } => {
   return fields?.reduce(
     (acc: { [key: string]: string }, field: CustomField) => {
-      if (field.selectedValues && field.selectedValues.length > 0) {
-        acc[field.fieldId] = field.selectedValues[0].value;
-      } else {
-        acc[field.fieldId] = '';
-      }
+      acc[field.fieldId] = field.value;
       return acc;
     },
     {}
