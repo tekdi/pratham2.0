@@ -51,6 +51,8 @@ import { getCohortList } from '@/services/GetCohortList';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import apartment from '../../public/images/apartment.svg';
+import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
+import FacilitatorForm from '@/components/DynamicForm/FacilitatorForm/FacilitatorForm';
 
 const Facilitator = () => {
   const theme = useTheme<any>();
@@ -64,7 +66,7 @@ const Facilitator = () => {
   const [pageOffset, setPageOffset] = useState<number>(0);
   const [prefilledFormData, setPrefilledFormData] = useState({});
   const [loading, setLoading] = useState<boolean>(false);
-  const [response, setResponse] = useState({});
+  const [response, setResponse] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -87,17 +89,17 @@ const Facilitator = () => {
 
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
-    ? { state: [localStorage.getItem('stateId')] }
-    : {};
+    ? { state: [localStorage.getItem('stateId')], designation: 'facilitator' }
+    : { designation: 'facilitator' };
 
   const searchStoreKey = 'facilitator';
   const initialFormDataSearch =
     localStorage.getItem(searchStoreKey) &&
-      localStorage.getItem(searchStoreKey) != '{}'
+    localStorage.getItem(searchStoreKey) != '{}'
       ? JSON.parse(localStorage.getItem(searchStoreKey))
       : localStorage.getItem('stateId')
-        ? { state: [localStorage.getItem('stateId')] }
-        : {};
+      ? { state: [localStorage.getItem('stateId')] }
+      : {};
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -120,6 +122,35 @@ const Facilitator = () => {
         },
       ]);
       console.log('responseForm', responseForm);
+
+      //unit name is missing from required so handled from frotnend
+      let alterSchema = responseForm?.schema;
+      let alterUISchema = responseForm?.uiSchema;
+      let requiredArray = alterSchema?.required;
+      const mustRequired = ['email'];
+      // Merge only missing items from required2 into required1
+      mustRequired.forEach((item) => {
+        if (!requiredArray.includes(item)) {
+          requiredArray.push(item);
+        }
+      });
+      alterSchema.required = requiredArray;
+      //add max selection custom
+      if (alterSchema?.properties?.village) {
+        alterSchema.properties.village.maxSelection = 1000;
+      }
+      if (alterUISchema?.designation) {
+        alterUISchema = {
+          ...alterUISchema,
+          designation: {
+            ...alterUISchema.designation,
+            'ui:disabled': true,
+          },
+        };
+      }
+
+      console.log('########### alterUISchema', alterUISchema);
+
       const districtFieldId = responseForm.schema.properties.district.fieldId;
       const blockFieldId = responseForm?.schema?.properties?.block.fieldId;
       const villageFieldId = responseForm?.schema?.properties?.village?.fieldId;
@@ -129,8 +160,8 @@ const Facilitator = () => {
       setDistrictFieldId(districtFieldId);
       setVillageFieldId(villageFieldId);
       // setCenterFieldId(centerFieldId)
-      setAddSchema(responseForm?.schema);
-      setAddUiSchema(responseForm?.uiSchema);
+      setAddSchema(alterSchema);
+      setAddUiSchema(alterUISchema);
     };
     fetchData();
     setRoleID(RoleId.TEACHER);
@@ -145,36 +176,41 @@ const Facilitator = () => {
   };
 
   const SubmitaFunction = async (formData: any) => {
-    setPrefilledFormData(formData);
-    //set prefilled search data on refresh
-    localStorage.setItem(searchStoreKey, JSON.stringify(formData));
-    await searchData(formData, 0);
+    // console.log("###### debug issue formData", formData)
+    if (Object.keys(formData).length > 0) {
+      setPrefilledFormData(formData);
+      //set prefilled search data on refresh
+      localStorage.setItem(searchStoreKey, JSON.stringify(formData));
+      await searchData(formData, 0);
+    }
   };
 
   const searchData = async (formData, newPage) => {
-    formData = Object.fromEntries(
-      Object.entries(formData).filter(
-        ([_, value]) => !Array.isArray(value) || value.length > 0
-      )
-    );
-    const staticFilter = {
-      role: 'Instructor',
-      status: 'active',
-      tenantId: localStorage.getItem('tenantId'),
-    };
-    const { sortBy } = formData;
-    const staticSort = ['firstName', sortBy || 'asc'];
-    await searchListData(
-      formData,
-      newPage,
-      staticFilter,
-      pageLimit,
-      setPageOffset,
-      setCurrentPage,
-      setResponse,
-      userList,
-      staticSort
-    );
+    if (formData) {
+      formData = Object.fromEntries(
+        Object.entries(formData).filter(
+          ([_, value]) => !Array.isArray(value) || value.length > 0
+        )
+      );
+      const staticFilter = {
+        role: 'Instructor',
+        status: 'active',
+        tenantId: localStorage.getItem('tenantId'),
+      };
+      const { sortBy } = formData;
+      const staticSort = ['firstName', sortBy || 'asc'];
+      await searchListData(
+        formData,
+        newPage,
+        staticFilter,
+        pageLimit,
+        setPageOffset,
+        setCurrentPage,
+        setResponse,
+        userList,
+        staticSort
+      );
+    }
   };
 
   // Define table columns
@@ -183,8 +219,9 @@ const Facilitator = () => {
       keys: ['firstName', 'middleName', 'lastName'],
       label: 'Facilitator Name',
       render: (row) =>
-        `${transformLabel(row.firstName) || ''} ${transformLabel(row.middleName) || ''
-          } ${transformLabel(row.lastName) || ''}`.trim(),
+        `${transformLabel(row.firstName) || ''} ${
+          transformLabel(row.middleName) || ''
+        } ${transformLabel(row.lastName) || ''}`.trim(),
     },
     {
       key: 'status',
@@ -240,9 +277,11 @@ const Facilitator = () => {
               (field: { label: string }) => field.label === 'VILLAGE'
             )?.selectedValues?.[0]?.value
           ) || '';
-        return `${state == '' ? '' : `${state}`}${district == '' ? '' : `, ${district}`
-          }${block == '' ? '' : `, ${block}`}${village == '' ? '' : `, ${village}`
-          }`;
+        return `${state == '' ? '' : `${state}`}${
+          district == '' ? '' : `, ${district}`
+        }${block == '' ? '' : `, ${block}`}${
+          village == '' ? '' : `, ${village}`
+        }`;
       },
     },
   ];
@@ -339,6 +378,7 @@ const Facilitator = () => {
         setPrefilledAddFormData(tempFormData);
         setIsEdit(true);
         setIsReassign(false);
+        setButtonShow(true);
         setEditableUserId(row?.userId);
         handleOpenModal();
       },
@@ -409,7 +449,7 @@ const Facilitator = () => {
         console.log('row:', row);
         // console.log('AddSchema', addSchema);
         // console.log('AddUISchema', addUiSchema);
-         let batchList = await fetchUserData(row?.userId);
+        let batchList = await fetchUserData(row?.userId);
         let tempFormData = extractMatchingKeys(row, addSchema);
         tempFormData = {
           ...tempFormData,
@@ -419,6 +459,7 @@ const Facilitator = () => {
         setPrefilledAddFormData(tempFormData);
         setIsEdit(false);
         setIsReassign(true);
+        setButtonShow(true);
         setEditableUserId(row?.userId);
         handleOpenModal();
       },
@@ -480,10 +521,9 @@ const Facilitator = () => {
   const [buttonShow, setButtonShowState] = useState(true);
 
   const setButtonShow = (status) => {
-
-    console.log("########## changed", status);
-    setButtonShowState(status)
-  }
+    console.log('########## changed', status);
+    setButtonShowState(status);
+  };
   return (
     <>
       <Box display={'flex'} flexDirection={'column'} gap={2}>
@@ -518,6 +558,7 @@ const Facilitator = () => {
               setIsReassign(false);
               setEditableUserId('');
               handleOpenModal();
+              setButtonShow(true);
             }}
           >
             {t('COMMON.ADD_NEW')}{' '}
@@ -534,14 +575,15 @@ const Facilitator = () => {
             isEdit
               ? t('FACILITATORS.EDIT_FACILITATOR')
               : isReassign
-                ? t('FACILITATORS.RE_ASSIGN_facilitator')
-                : t('FACILITATORS.NEW_FACILITATOR')
+              ? t('FACILITATORS.RE_ASSIGN_facilitator')
+              : t('FACILITATORS.NEW_FACILITATOR')
           }
         >
-          <AddEditUser
+          <FacilitatorForm
+            t={t}
             SuccessCallback={() => {
-              setPrefilledFormData({});
-              searchData({}, 0);
+              setPrefilledFormData(initialFormDataSearch);
+              searchData(initialFormDataSearch, 0);
               setOpenModal(false);
             }}
             schema={addSchema}
@@ -549,59 +591,65 @@ const Facilitator = () => {
             editPrefilledFormData={prefilledAddFormData}
             isEdit={isEdit}
             isReassign={isReassign}
-            isExtraFields={true}
-            editableUserId={editableUserId}
+            // isExtraFields={true}
+            // editableUserId={editableUserId}
             UpdateSuccessCallback={() => {
-              setPrefilledFormData({});
+              setPrefilledFormData(prefilledFormData);
               searchData(prefilledFormData, currentPage);
               setOpenModal(false);
             }}
             extraFields={extraFields}
             extraFieldsUpdate={extraFieldsUpdate}
-            successUpdateMessage={successUpdateMessage}
-            telemetryUpdateKey={telemetryUpdateKey}
-            failureUpdateMessage={failureUpdateMessage}
+            // successUpdateMessage={successUpdateMessage}
+            // telemetryUpdateKey={telemetryUpdateKey}
+            // failureUpdateMessage={failureUpdateMessage}
             successCreateMessage={successCreateMessage}
-            telemetryCreateKey={telemetryCreateKey}
+            // telemetryCreateKey={telemetryCreateKey}
             failureCreateMessage={failureCreateMessage}
-            notificationKey={notificationKey}
-            notificationMessage={notificationMessage}
-            notificationContext={notificationContext}
-            blockFieldId={blockFieldId}
-            districtFieldId={districtFieldId}
-            villageFieldId={villageFieldId}
-            // centerFieldId={centerFieldId}
+            // notificationKey={notificationKey}
+            // notificationMessage={notificationMessage}
+            // notificationContext={notificationContext}
+            // blockFieldId={blockFieldId}
+            // districtFieldId={districtFieldId}
+            // villageFieldId={villageFieldId}
+            // // centerFieldId={centerFieldId}
             type="facilitator"
             hideSubmit={true}
             setButtonShow={setButtonShow}
-            isSteeper={true}
+            // isSteeper={true}
           />
         </SimpleModal>
 
-        {response && response?.result?.getUserDetails ? (
-          <Box sx={{ mt: 1 }}>
-            <PaginatedTable
-              count={response?.result?.totalCount}
-              data={response?.result?.getUserDetails}
-              columns={columns}
-              actions={actions}
-              onPageChange={handlePageChange}
-              onRowsPerPageChange={handleRowsPerPageChange}
-              defaultPage={currentPage}
-              defaultRowsPerPage={pageLimit}
-            />
-          </Box>
+        {response != null ? (
+          <>
+            {response && response?.result?.getUserDetails ? (
+              <Box sx={{ mt: 1 }}>
+                <PaginatedTable
+                  count={response?.result?.totalCount}
+                  data={response?.result?.getUserDetails}
+                  columns={columns}
+                  actions={actions}
+                  onPageChange={handlePageChange}
+                  onRowsPerPageChange={handleRowsPerPageChange}
+                  defaultPage={currentPage}
+                  defaultRowsPerPage={pageLimit}
+                />
+              </Box>
+            ) : (
+              <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                height="20vh"
+              >
+                <Typography marginTop="10px" textAlign={'center'}>
+                  {t('COMMON.NO_FACILITATOR_FOUND')}
+                </Typography>
+              </Box>
+            )}
+          </>
         ) : (
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            height="20vh"
-          >
-            <Typography marginTop="10px" textAlign={'center'}>
-              {t('COMMON.NO_FACILITATOR_FOUND')}
-            </Typography>
-          </Box>
+          <CenteredLoader />
         )}
       </Box>
 

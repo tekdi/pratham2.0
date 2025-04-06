@@ -385,6 +385,7 @@ const Centers = () => {
         console.log('row:', row);
         setEditableUserId(row?.userId);
         setCohortId(row?.cohortId);
+        setIsEdit(false);
 
         const data = {
           filters: {
