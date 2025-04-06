@@ -487,7 +487,7 @@ const CentersPage = () => {
                     ),
                   }}
                 />
-                <Button
+                {/* <Button
                   sx={{
                     mt: 1.2,
                     border: '1px solid #1E1B16',
@@ -506,7 +506,7 @@ const CentersPage = () => {
                   onClick={handleOpenAddBatchModal}
                 >
                   {t('COMMON.ADD_NEW')}
-                </Button>
+                </Button> */}
               </Box>
               <Box sx={{ minWidth: '300px' }}>
                 <CenterDropdown
