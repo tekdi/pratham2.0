@@ -36,6 +36,8 @@ import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 import ActiveArchivedLearner from '@/components/ActiveArchivedLearner';
+import { API_ENDPOINTS } from '@/utils/API/APIEndpoints';
+import ActiveArchivedBatch from '@/components/ActiveArchivedBatch';
 
 //import { DynamicForm } from '@shared-lib';
 
@@ -61,6 +63,7 @@ const Centers = () => {
   const [open, setOpen] = useState(false);
   const [firstName, setFirstName] = useState('');
   const [totalCount, setTotalCount] = useState(0);
+  const [totalCountBatch, setTotalCountBatch] = useState(0);
 
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
@@ -69,11 +72,11 @@ const Centers = () => {
   const searchStoreKey = 'centers';
   const initialFormDataSearch =
     localStorage.getItem(searchStoreKey) &&
-      localStorage.getItem(searchStoreKey) != '{}'
+    localStorage.getItem(searchStoreKey) != '{}'
       ? JSON.parse(localStorage.getItem(searchStoreKey))
       : localStorage.getItem('stateId')
-        ? { state: [localStorage.getItem('stateId')] }
-        : {};
+      ? { state: [localStorage.getItem('stateId')] }
+      : {};
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -101,37 +104,47 @@ const Centers = () => {
       console.log('responseForm', responseForm);
 
       //unit name is missing from required so handled from frotnend
-      let alterSchema = responseForm?.schema
-      let requiredArray = alterSchema?.required
-      const mustRequired = ['name', 'center_type', 'state', 'district', 'block', 'village', 'board', 'medium', 'grade'];
+      let alterSchema = responseForm?.schema;
+      let requiredArray = alterSchema?.required;
+      const mustRequired = [
+        'name',
+        'center_type',
+        'state',
+        'district',
+        'block',
+        'village',
+        'board',
+        'medium',
+        'grade',
+      ];
       // Merge only missing items from required2 into required1
       mustRequired.forEach((item) => {
         if (!requiredArray.includes(item)) {
           requiredArray.push(item);
         }
       });
-      alterSchema.required = requiredArray
+      alterSchema.required = requiredArray;
       //add max selection custom
       if (alterSchema?.properties?.state) {
-        alterSchema.properties.state.maxSelection = 1
+        alterSchema.properties.state.maxSelection = 1;
       }
       if (alterSchema?.properties?.district) {
-        alterSchema.properties.district.maxSelection = 1
+        alterSchema.properties.district.maxSelection = 1;
       }
       if (alterSchema?.properties?.block) {
-        alterSchema.properties.block.maxSelection = 1
+        alterSchema.properties.block.maxSelection = 1;
       }
       if (alterSchema?.properties?.village) {
-        alterSchema.properties.village.maxSelection = 1
+        alterSchema.properties.village.maxSelection = 1;
       }
       if (alterSchema?.properties?.board) {
-        alterSchema.properties.board.maxSelection = 1000
+        alterSchema.properties.board.maxSelection = 1000;
       }
       if (alterSchema?.properties?.medium) {
-        alterSchema.properties.medium.maxSelection = 1000
+        alterSchema.properties.medium.maxSelection = 1000;
       }
       if (alterSchema?.properties?.grade) {
-        alterSchema.properties.grade.maxSelection = 1000
+        alterSchema.properties.grade.maxSelection = 1000;
       }
 
       setAddSchema(alterSchema);
@@ -224,19 +237,25 @@ const Centers = () => {
       label: 'Type',
       render: (row) =>
         transformLabel(
-          row.customFields.find((field) => field.label === 'TYPE_OF_CENTER')
-            ?.selectedValues.map((item) => item.value).join(', ')
+          row.customFields
+            .find((field) => field.label === 'TYPE_OF_CENTER')
+            ?.selectedValues.map((item) => item.value)
+            .join(', ')
         ) || '-',
     },
     {
-      key: 'active_learners',
-      label: 'Active Learners',
-      render: (row) => <ActiveArchivedLearner cohortId={row?.cohortId} type={Status.ACTIVE} />,
+      key: 'active_batches',
+      label: 'Active Batches',
+      render: (row) => (
+        <ActiveArchivedBatch cohortId={row?.cohortId} type={Status.ACTIVE} />
+      ),
     },
     {
-      key: 'archived_learners',
-      label: 'Archived Learners',
-      render: (row) => <ActiveArchivedLearner cohortId={row?.cohortId} type={Status.ARCHIVED} />,
+      key: 'archived_batches',
+      label: 'Archived Batches',
+      render: (row) => (
+        <ActiveArchivedBatch cohortId={row?.cohortId} type={Status.ARCHIVED} />
+      ),
     },
     {
       key: 'address',
@@ -252,8 +271,10 @@ const Centers = () => {
       label: 'State',
       render: (row) =>
         transformLabel(
-          row.customFields.find((field) => field.label === 'STATE')
-            ?.selectedValues.map((item) => item.value).join(', ')
+          row.customFields
+            .find((field) => field.label === 'STATE')
+            ?.selectedValues.map((item) => item.value)
+            .join(', ')
         ) || '-',
     },
     {
@@ -261,8 +282,10 @@ const Centers = () => {
       label: 'District',
       render: (row) =>
         transformLabel(
-          row.customFields.find((field) => field.label === 'DISTRICT')
-            ?.selectedValues.map((item) => item.value).join(', ')
+          row.customFields
+            .find((field) => field.label === 'DISTRICT')
+            ?.selectedValues.map((item) => item.value)
+            .join(', ')
         ) || '-',
     },
     {
@@ -270,8 +293,10 @@ const Centers = () => {
       label: 'Block',
       render: (row) =>
         transformLabel(
-          row.customFields.find((field) => field.label === 'BLOCK')
-            ?.selectedValues.map((item) => item.value).join(', ')
+          row.customFields
+            .find((field) => field.label === 'BLOCK')
+            ?.selectedValues.map((item) => item.value)
+            .join(', ')
         ) || '-',
     },
     {
@@ -279,8 +304,10 @@ const Centers = () => {
       label: 'Village',
       render: (row) =>
         transformLabel(
-          row.customFields.find((field) => field.label === 'VILLAGE')
-            ?.selectedValues.map((item) => item.value).join(', ')
+          row.customFields
+            .find((field) => field.label === 'VILLAGE')
+            ?.selectedValues.map((item) => item.value)
+            .join(', ')
         ) || '-',
     },
     {
@@ -288,7 +315,8 @@ const Centers = () => {
       label: 'Boards',
       render: (row) =>
         transformLabel(
-          row.customFields.find((field) => field.label === 'BOARD')
+          row.customFields
+            .find((field) => field.label === 'BOARD')
             ?.selectedValues?.join(', ')
         ) || '-',
     },
@@ -297,7 +325,8 @@ const Centers = () => {
       label: 'Medium',
       render: (row) =>
         transformLabel(
-          row.customFields.find((field) => field.label === 'MEDIUM')
+          row.customFields
+            .find((field) => field.label === 'MEDIUM')
             ?.selectedValues?.join(', ')
         ) || '-',
     },
@@ -306,7 +335,8 @@ const Centers = () => {
       label: 'Grade',
       render: (row) =>
         transformLabel(
-          row.customFields.find((field) => field.label === 'GRADE')
+          row.customFields
+            .find((field) => field.label === 'GRADE')
             ?.selectedValues?.join(', ')
         ) || '-',
     },
@@ -335,11 +365,16 @@ const Centers = () => {
         </Box>
       ),
       callback: async (row: any) => {
-        window.open(row.customFields.find((field) => field.label === 'GOOGLE MAP_LINK')
-          ?.selectedValues, '_blank', 'noopener,noreferrer');
+        window.open(
+          row.customFields.find((field) => field.label === 'GOOGLE MAP_LINK')
+            ?.selectedValues,
+          '_blank',
+          'noopener,noreferrer'
+        );
       },
-      show: (row) => row.customFields.find((field) => field.label === 'GOOGLE MAP_LINK')
-        ?.selectedValues,
+      show: (row) =>
+        row.customFields.find((field) => field.label === 'GOOGLE MAP_LINK')
+          ?.selectedValues,
     },
     {
       icon: (
@@ -385,17 +420,38 @@ const Centers = () => {
         console.log('row:', row);
         setEditableUserId(row?.userId);
         setCohortId(row?.cohortId);
+        setIsEdit(false);
 
-        const data = {
-          filters: {
-            cohortId: row?.cohortId,
-            status: ['active'],
-          },
+        //get batch from center id
+        const url = API_ENDPOINTS.cohortSearch;
+        const header = {
+          tenantId: localStorage.getItem('tenantId') || '',
+          Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+          academicyearid: localStorage.getItem('academicYearId') || '',
         };
-        const response = await fetchCohortMemberList(data);
+        const responseBatch = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...header,
+          },
+          body: JSON.stringify({
+            limit: 200,
+            offset: 0,
+            filters: {
+              type: 'BATCH',
+              status: ['active'],
+              parentId: [row?.cohortId],
+            },
+          }),
+        });
+        const dataBatch = await responseBatch.json();
+        if (dataBatch?.result?.results?.cohortDetails) {
+          setTotalCountBatch(dataBatch.result.results.cohortDetails.length);
+        } else {
+          setTotalCountBatch(0);
+        }
 
-        let totalCount = response?.result?.totalCount;
-        setTotalCount(totalCount);
         setOpen(true);
         setFirstName(row?.name);
       },
@@ -511,38 +567,44 @@ const Centers = () => {
           />
         </SimpleModal>
 
-        {response != null ? <>
-          {response && response?.result?.results?.cohortDetails?.length > 0 ? (
-            <Box sx={{ mt: 1 }}>
-              <PaginatedTable
-                count={response?.result?.count}
-                data={response?.result?.results?.cohortDetails}
-                columns={columns}
-                actions={actions}
-                onPageChange={handlePageChange}
-                onRowsPerPageChange={handleRowsPerPageChange}
-                defaultPage={currentPage}
-                defaultRowsPerPage={pageLimit}
-              />
-            </Box>
-          ) : (
-            <Box
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
-              height="20vh"
-            >
-              <Typography marginTop="10px" textAlign={'center'}>
-                {t('COMMON.NO_CENTER_FOUND')}
-              </Typography>
-            </Box>
-          )}</> : <CenteredLoader />}
+        {response != null ? (
+          <>
+            {response &&
+            response?.result?.results?.cohortDetails?.length > 0 ? (
+              <Box sx={{ mt: 1 }}>
+                <PaginatedTable
+                  count={response?.result?.count}
+                  data={response?.result?.results?.cohortDetails}
+                  columns={columns}
+                  actions={actions}
+                  onPageChange={handlePageChange}
+                  onRowsPerPageChange={handleRowsPerPageChange}
+                  defaultPage={currentPage}
+                  defaultRowsPerPage={pageLimit}
+                />
+              </Box>
+            ) : (
+              <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                height="20vh"
+              >
+                <Typography marginTop="10px" textAlign={'center'}>
+                  {t('COMMON.NO_CENTER_FOUND')}
+                </Typography>
+              </Box>
+            )}
+          </>
+        ) : (
+          <CenteredLoader />
+        )}
       </Box>
-      {totalCount > 0 ? (
+      {totalCount > 0 || totalCountBatch > 0 ? (
         <ConfirmationPopup
           open={open}
           onClose={() => setOpen(false)}
-          title={`You can't delete the center because it has ${totalCount} Active Learners`}
+          title={`You can't delete the center because it has ${totalCountBatch} Active Batch`}
           secondary={'Cancel'}
         />
       ) : (
