@@ -567,6 +567,20 @@ export const calculateAgeFromDate = (dobString: any) => {
 
   return age;
 };
+export const formatDateToDDMMYYYY = (dateStr: any) => {
+  const date = new Date(dateStr);
+
+  // Check for invalid date
+  if (isNaN(date.getTime())) {
+    return '-';
+  }
+
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // JS months are 0-indexed
+  const year = date.getFullYear();
+
+  return `${day}-${month}-${year}`;
+};
 export const preserveLocalStorage = () => {
   const keysToKeep = [
     'preferredLanguage',

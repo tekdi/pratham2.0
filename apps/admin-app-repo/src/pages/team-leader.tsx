@@ -198,7 +198,6 @@ const TeamLeader = () => {
       );
       const staticFilter = {
         role: 'Lead',
-        status: 'active',
         tenantId: localStorage.getItem('tenantId'),
       };
 
