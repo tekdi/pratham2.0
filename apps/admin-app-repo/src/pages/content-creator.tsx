@@ -29,6 +29,7 @@ import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import TenantService from '@/services/TenantService';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
+import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 
 const ContentCreator = () => {
   const theme = useTheme<any>();
@@ -42,7 +43,7 @@ const ContentCreator = () => {
   const [pageOffset, setPageOffset] = useState<number>(0);
   const [prefilledFormData, setPrefilledFormData] = useState({});
   const [loading, setLoading] = useState<boolean>(false);
-  const [response, setResponse] = useState({});
+  const [response, setResponse] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -78,7 +79,7 @@ const ContentCreator = () => {
         {
           fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.contentCreator.context}&contextType=${FormContext.contentCreator.contextType}`,
           header: {
-            tenantid: localStorage.getItem('tenantId'),
+            tenantid: TenantService.getTenantId(),
           },
         },
       ]);
@@ -349,7 +350,7 @@ const ContentCreator = () => {
   const notificationContext = 'USER';
   useEffect(() => {
     setPrefilledFormData(initialFormDataSearch);
-  });
+  }, []);
 
   return (
     <>
@@ -430,6 +431,8 @@ const ContentCreator = () => {
           />
         </SimpleModal>
 
+        {response != null ? (
+        <>
         {response && response?.result?.getUserDetails ? (
           <Box sx={{ mt: 1 }}>
             <PaginatedTable
@@ -454,6 +457,9 @@ const ContentCreator = () => {
               {t('COMMON.NO_CONTENT_CREATOR_FOUND')}
             </Typography>
           </Box>
+        )}
+        </> ) : (
+          <CenteredLoader />
         )}
       </Box>
     </>

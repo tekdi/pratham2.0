@@ -29,6 +29,7 @@ import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import TenantService from '@/services/TenantService';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
+import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 
 const ContentReviewer = () => {
   const theme = useTheme<any>();
@@ -42,7 +43,7 @@ const ContentReviewer = () => {
   const [pageOffset, setPageOffset] = useState<number>(0);
   const [prefilledFormData, setPrefilledFormData] = useState({});
   const [loading, setLoading] = useState<boolean>(false);
-  const [response, setResponse] = useState({});
+  const [response, setResponse] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -427,6 +428,8 @@ const ContentReviewer = () => {
           />
         </SimpleModal>
 
+        {response != null ? (
+        <>
         {response && response?.result?.getUserDetails ? (
           <Box sx={{ mt: 1 }}>
             <PaginatedTable
@@ -451,6 +454,8 @@ const ContentReviewer = () => {
               {t('COMMON.NO_CONTENT_REVIEWER_FOUND')}
             </Typography>
           </Box>
+        )} </> ) : (
+          <CenteredLoader />
         )}
       </Box>
     </>
