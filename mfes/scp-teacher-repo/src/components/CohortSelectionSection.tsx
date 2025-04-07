@@ -711,13 +711,13 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                 </Box>
               ) : (
                 <Box>
-                  <Box className="mt-md-16">
+                  <Box className="mt-24">
                     <Box sx={{ minWidth: 120, gap: '15px' }} display={'flex'}>
                       {filteredCohortData?.length > 1 ? (
                         <FormControl
                           className={showFloatingLabel ? '' : 'drawer-select'}
-                          sx={{ m: 0, width: '100%' }}
-                        >
+                          sx={{ m: 0, width: '100% !important' }}
+                        > 
                           {showFloatingLabel && (
                             <InputLabel id="center-select-label">
                               {t('COMMON.CENTER')}

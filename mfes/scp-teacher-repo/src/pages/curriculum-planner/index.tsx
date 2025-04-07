@@ -417,8 +417,8 @@ const CoursePlanner = () => {
           </Box>
         </Grid>
         <Grid item xs={12} md={6}>
-          <Box sx={{ mt: 2, px: '20px', width: '100%' }}>
-            <FormControl sx={{ width: '100%' }}>
+          <Box sx={{  px: '20px', width: '100%' }} className="mt-24">
+            <FormControl sx={{ width: '100%', marginTop: '18px', }}>
               <InputLabel id="course-type-select-label">
                 {' '}
                 {t('COURSE_PLANNER.COURSE_TYPE')}
