@@ -88,6 +88,7 @@ const ContentCreator = () => {
       setAddUiSchema(responseForm?.uiSchema);
     };
 
+    setPrefilledAddFormData(initialFormDataSearch);
     fetchData();
   }, []);
 
@@ -99,13 +100,21 @@ const ContentCreator = () => {
   };
 
   const SubmitaFunction = async (formData: any) => {
-    setPrefilledFormData(formData);
-    //set prefilled search data on refresh
-    localStorage.setItem(searchStoreKey, JSON.stringify(formData));
-    await searchData(formData, 0);
+    if (Object.keys(formData).length > 0) {
+      setPrefilledFormData(formData);
+      //set prefilled search data on refresh
+      localStorage.setItem(searchStoreKey, JSON.stringify(formData));
+      await searchData(formData, 0);
+    }
   };
 
   const searchData = async (formData: any, newPage: any) => {
+    if (formData) {
+      formData = Object.fromEntries(
+        Object.entries(formData).filter(
+          ([_, value]) => !Array.isArray(value) || value.length > 0
+        )
+      );
     const staticFilter = {
       role: RoleName.CONTENT_CREATOR,
       tenantId: storedUserData.tenantData[0].tenantId,
@@ -123,6 +132,7 @@ const ContentCreator = () => {
       userList,
       staticSort
     );
+   }
   };
 
   // Define table columns
@@ -394,7 +404,11 @@ const ContentCreator = () => {
         <SimpleModal
           open={openModal}
           onClose={handleCloseModal}
-          showFooter={false}
+          showFooter={true}
+          primaryText={
+            isEdit ? t('Update') : t('Create')
+          }
+          id="dynamic-form-id"
           modalTitle={
             isEdit
               ? t('CONTENT_CREATORS.UPDATE_CONTENT_CREATOR')
@@ -403,8 +417,8 @@ const ContentCreator = () => {
         >
           <AddEditUser
             SuccessCallback={() => {
-              setPrefilledFormData({});
-              searchData({}, 0);
+              setPrefilledFormData(initialFormDataSearch);
+              searchData(initialFormDataSearch, 0);
               setOpenModal(false);
             }}
             schema={addSchema}
@@ -413,7 +427,7 @@ const ContentCreator = () => {
             isEdit={isEdit}
             editableUserId={editableUserId}
             UpdateSuccessCallback={() => {
-              setPrefilledFormData({});
+              setPrefilledFormData(prefilledFormData);
               searchData(prefilledFormData, currentPage);
               setOpenModal(false);
             }}
@@ -428,6 +442,8 @@ const ContentCreator = () => {
             notificationKey={notificationKey}
             notificationMessage={notificationMessage}
             notificationContext={notificationContext}
+            hideSubmit={true}
+            type={'content-creator'}
           />
         </SimpleModal>
 
