@@ -37,6 +37,7 @@ import AddIcon from '@mui/icons-material/Add';
 import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 import ActiveArchivedLearner from '@/components/ActiveArchivedLearner';
 import { API_ENDPOINTS } from '@/utils/API/APIEndpoints';
+import ActiveArchivedBatch from '@/components/ActiveArchivedBatch';
 
 //import { DynamicForm } from '@shared-lib';
 
@@ -243,20 +244,17 @@ const Centers = () => {
         ) || '-',
     },
     {
-      key: 'active_learners',
-      label: 'Active Learners',
+      key: 'active_batches',
+      label: 'Active Batches',
       render: (row) => (
-        <ActiveArchivedLearner cohortId={row?.cohortId} type={Status.ACTIVE} />
+        <ActiveArchivedBatch cohortId={row?.cohortId} type={Status.ACTIVE} />
       ),
     },
     {
-      key: 'archived_learners',
-      label: 'Archived Learners',
+      key: 'archived_batches',
+      label: 'Archived Batches',
       render: (row) => (
-        <ActiveArchivedLearner
-          cohortId={row?.cohortId}
-          type={Status.ARCHIVED}
-        />
+        <ActiveArchivedBatch cohortId={row?.cohortId} type={Status.ARCHIVED} />
       ),
     },
     {
@@ -423,21 +421,6 @@ const Centers = () => {
         setEditableUserId(row?.userId);
         setCohortId(row?.cohortId);
         setIsEdit(false);
-
-        const data = {
-          filters: {
-            cohortId: row?.cohortId,
-            status: ['active'],
-          },
-        };
-        const response = await fetchCohortMemberList(data);
-
-        let totalCount = response?.result?.totalCount;
-        if (totalCount) {
-          setTotalCount(totalCount);
-        } else {
-          setTotalCount(0);
-        }
 
         //get batch from center id
         const url = API_ENDPOINTS.cohortSearch;
@@ -621,7 +604,7 @@ const Centers = () => {
         <ConfirmationPopup
           open={open}
           onClose={() => setOpen(false)}
-          title={`You can't delete the center because it has ${totalCount} Active Learners or ${totalCountBatch} Active Batch`}
+          title={`You can't delete the center because it has ${totalCountBatch} Active Batch`}
           secondary={'Cancel'}
         />
       ) : (

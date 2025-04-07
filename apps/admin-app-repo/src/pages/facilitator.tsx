@@ -199,7 +199,6 @@ const Facilitator = () => {
       );
       const staticFilter = {
         role: 'Instructor',
-        status: 'active',
         tenantId: localStorage.getItem('tenantId'),
       };
       const { sortBy } = formData;
@@ -482,41 +481,41 @@ const Facilitator = () => {
       },
       show: (row) => row.status !== 'archived',
     },
-    {
-      icon: (
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
-            padding: '10px',
-          }}
-        >
-          <Image src={apartment} alt="" />
-        </Box>
-      ),
-      callback: async (row) => {
-        console.log('row:', row);
-        // console.log('AddSchema', addSchema);
-        // console.log('AddUISchema', addUiSchema);
-        let batchList = await fetchUserData(row?.userId);
-        let tempFormData = extractMatchingKeys(row, addSchema);
-        tempFormData = {
-          ...tempFormData,
-          batch: batchList,
-        };
-        console.log(tempFormData, ' tempFormData');
-        setPrefilledAddFormData(tempFormData);
-        setIsEdit(false);
-        setIsReassign(true);
-        setButtonShow(true);
-        setEditableUserId(row?.userId);
-        handleOpenModal();
-      },
-      show: (row) => row.status !== 'archived',
-    },
+    // {
+    //   icon: (
+    //     <Box
+    //       sx={{
+    //         display: 'flex',
+    //         flexDirection: 'column',
+    //         alignItems: 'center',
+    //         cursor: 'pointer',
+    //         backgroundColor: 'rgb(227, 234, 240)',
+    //         padding: '10px',
+    //       }}
+    //     >
+    //       <Image src={apartment} alt="" />
+    //     </Box>
+    //   ),
+    //   callback: async (row) => {
+    //     console.log('row:', row);
+    //     // console.log('AddSchema', addSchema);
+    //     // console.log('AddUISchema', addUiSchema);
+    //     let batchList = await fetchUserData(row?.userId);
+    //     let tempFormData = extractMatchingKeys(row, addSchema);
+    //     tempFormData = {
+    //       ...tempFormData,
+    //       batch: batchList,
+    //     };
+    //     console.log(tempFormData, ' tempFormData');
+    //     setPrefilledAddFormData(tempFormData);
+    //     setIsEdit(false);
+    //     setIsReassign(true);
+    //     setButtonShow(true);
+    //     setEditableUserId(row?.userId);
+    //     handleOpenModal();
+    //   },
+    //   show: (row) => row.status !== 'archived',
+    // },
   ];
 
   // Pagination handlers
@@ -657,11 +656,11 @@ const Facilitator = () => {
             telemetryUpdateKey={telemetryUpdateKey}
             failureUpdateMessage={failureUpdateMessage}
             successCreateMessage={successCreateMessage}
-            // telemetryCreateKey={telemetryCreateKey}
+            telemetryCreateKey={telemetryCreateKey}
             failureCreateMessage={failureCreateMessage}
-            // notificationKey={notificationKey}
-            // notificationMessage={notificationMessage}
-            // notificationContext={notificationContext}
+            notificationKey={notificationKey}
+            notificationMessage={notificationMessage}
+            notificationContext={notificationContext}
             // blockFieldId={blockFieldId}
             // districtFieldId={districtFieldId}
             // villageFieldId={villageFieldId}
