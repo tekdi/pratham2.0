@@ -342,7 +342,7 @@ const UserId = () => {
             color: theme.palette.info.black,
           }}
         >
-          {t('YOUTHNET_PROFILE.PROFILE_DETAILS')}
+          {t('SCP_PROFILE.PROFILE_DETAILS')}
         </Typography>
         <Profile
           fullName={`${user.firstName} ${user.lastName}` || ''}

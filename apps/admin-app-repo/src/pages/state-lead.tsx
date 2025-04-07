@@ -30,6 +30,7 @@ import TenantService from '@/services/TenantService';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
+import { transformLabel } from '@/utils/Helper';
 
 const StateLead = () => {
   const theme = useTheme<any>();
@@ -147,6 +148,7 @@ const StateLead = () => {
     {
       key: 'status',
       label: 'Status',
+      render: (row: any) => transformLabel(row.status),
       getStyle: (row: any) => ({
         color: row.status === 'active' ? 'green' : 'red',
       }),
@@ -192,6 +194,7 @@ const StateLead = () => {
         setEditableUserId(row?.userId);
         handleOpenModal();
       },
+      show: (row) => row.status !== 'archived'
     },
     {
       icon: (
@@ -222,6 +225,7 @@ const StateLead = () => {
         searchData(prefilledFormData, currentPage);
         setOpenModal(false);
       },
+      show: (row) => row.status !== 'archived'
     },
   ];
 
