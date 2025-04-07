@@ -757,7 +757,7 @@ const Index = () => {
               <Box
                 sx={{
                   width: '100%',
-                  mr: '20px',
+                  // mr: '20px',
                 }}
               >
                 {districtData ? (
@@ -829,7 +829,7 @@ const Index = () => {
                   sx={{
                     fontSize: '16px',
                     color: 'black',
-                    margin: '20px',
+                    margin: '0 20px',
                   }}
                 >
                   {mentorCount} {''}
