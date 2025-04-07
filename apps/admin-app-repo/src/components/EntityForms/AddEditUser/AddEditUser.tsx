@@ -105,6 +105,36 @@ const AddEditUser = ({
         }
       } else if (type == 'batch') {
         keysToRemove = ['state', 'district', 'block', 'village', 'parentId'];
+      } else if (type == 'learner') {
+        keysToRemove = [
+          'state',
+          'district',
+          'block',
+          'village',
+          'password',
+          'confirm_password',
+          'board',
+          'medium',
+          'parentId',
+          'center',
+          'batch',
+          'grade',
+          'center',
+          'program',
+          'class',
+          'marital_status',
+          'phone_type_available',
+          'own_phone_check',
+          'parent_phone',
+          'preferred_mode_of_learning',
+          'drop_out_reason',
+          'work_domain',
+          'what_do_you_want_to_become',
+          'mother_name',
+          'guardian_name',
+          'guardian_relation',
+          'dob',
+        ];
       } else {
         keysToRemove = [
           'state',
@@ -120,6 +150,7 @@ const AddEditUser = ({
           'batch',
           'grade',
           'center',
+          'program',
         ];
       }
       keysToRemove.forEach((key) => delete isEditSchema.properties[key]);
@@ -178,7 +209,7 @@ const AddEditUser = ({
   const FormSubmitFunction = async (formData: any, payload: any) => {
     setPrefilledFormData(formData);
     console.log(formData, 'formdata');
-    console.log(payload, 'payload');
+    console.log('########## debug username', payload);
 
     if (isEdit) {
       if (isNotificationRequired) {
@@ -190,6 +221,12 @@ const AddEditUser = ({
               delete userData?.email;
             } else {
               userData.username = userData?.email;
+            }
+          }
+          //fix for learner edit username is not sent if not changed
+          if (userData?.username) {
+            if (editPrefilledFormData?.username == userData?.username) {
+              delete userData?.username;
             }
           }
           // console.log('userData', userData);
@@ -275,7 +312,7 @@ const AddEditUser = ({
           telemetryCallbacks(telemetryUpdateKey);
           UpdateSuccessCallback();
         } else {
-          console.error('Error reassigning user:', error);
+          // console.error('Error reassigning user:', error);
           showToastMessage(t(failureUpdateMessage), 'error');
         }
       } catch (error) {

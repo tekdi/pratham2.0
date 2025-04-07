@@ -17,7 +17,11 @@ import SearchTextFieldWidget from './RJSFWidget/SearchTextFieldWidget';
 import CustomSingleSelectWidget from './RJSFWidget/CustomSingleSelectWidget';
 import CustomRadioWidget from './RJSFWidget/CustomRadioWidget';
 import CustomTextFieldWidget from './RJSFWidget/CustomTextFieldWidget';
-import { toPascalCase, transformLabel } from '@/utils/Helper';
+import {
+  calculateAgeFromDate,
+  toPascalCase,
+  transformLabel,
+} from '@/utils/Helper';
 
 const DynamicForm = ({
   schema,
@@ -27,7 +31,7 @@ const DynamicForm = ({
   prefilledFormData,
   FormSubmitFunction,
   extraFields,
-  hideSubmit
+  hideSubmit,
 }: any) => {
   const { t } = useTranslation();
 
@@ -42,6 +46,61 @@ const DynamicForm = ({
   const [hideAndSkipFields, setHideAndSkipFields] = useState({});
   const [isRenderCompleted, setIsRenderCompleted] = useState(false);
 
+  //custom validation on formData for learner fields hide on dob
+  useEffect(() => {
+    if (formData?.dob) {
+      let age = calculateAgeFromDate(formData?.dob);
+      let oldFormSchema = formSchema;
+      let oldFormUiSchema = formUiSchema;
+      let requiredArray = oldFormSchema?.required;
+      let requiredKeys = ['parent_phone', 'guardian_relation', 'guardian_name'];
+
+      //if learner form then only apply
+      if (oldFormSchema?.properties?.guardian_relation) {
+        if (age < 18) {
+          // Merge only missing items from required2 into required1
+          requiredKeys.forEach((item) => {
+            if (!requiredArray.includes(item)) {
+              requiredArray.push(item);
+            }
+          });
+          //set ui schema show
+          const updatedUiSchema = { ...oldFormUiSchema };
+          // Clone each key's config and set widget to 'hidden'
+          requiredKeys.forEach((key) => {
+            if (updatedUiSchema.hasOwnProperty(key)) {
+              updatedUiSchema[key] = {
+                ...updatedUiSchema[key],
+                'ui:widget': 'CustomTextFieldWidget',
+              };
+            }
+          });
+          oldFormUiSchema = updatedUiSchema;
+        } else {
+          // remove from required
+          requiredArray = requiredArray.filter(
+            (key) => !requiredKeys.includes(key)
+          );
+          //set ui schema hide
+          const updatedUiSchema = { ...oldFormUiSchema };
+          // Clone each key's config and set widget to 'hidden'
+          requiredKeys.forEach((key) => {
+            if (updatedUiSchema.hasOwnProperty(key)) {
+              updatedUiSchema[key] = {
+                ...updatedUiSchema[key],
+                'ui:widget': 'hidden',
+              };
+            }
+          });
+          oldFormUiSchema = updatedUiSchema;
+        }
+        oldFormSchema.required = requiredArray;
+        setFormSchema(oldFormSchema);
+        setFormUiSchema(oldFormUiSchema);
+      }
+    }
+  }, [formData]);
+
   const widgets = {
     CustomMultiSelectWidget,
     CustomCheckboxWidget,
@@ -49,7 +108,7 @@ const DynamicForm = ({
     SearchTextFieldWidget,
     CustomSingleSelectWidget,
     CustomRadioWidget,
-    CustomTextFieldWidget
+    CustomTextFieldWidget,
   };
 
   useEffect(() => {
@@ -105,19 +164,19 @@ const DynamicForm = ({
           // If header exists, replace values with localStorage values
           let customHeader = api?.header
             ? {
-              tenantId:
-                api.header.tenantId === '**'
-                  ? localStorage.getItem('tenantId') || ''
-                  : api.header.tenantId,
-              Authorization:
-                api.header.Authorization === '**'
-                  ? `Bearer ${localStorage.getItem('token') || ''}`
-                  : api.header.Authorization,
-              academicyearid:
-                api.header.academicyearid === '**'
-                  ? localStorage.getItem('academicYearId') || ''
-                  : api.header.academicyearid,
-            }
+                tenantId:
+                  api.header.tenantId === '**'
+                    ? localStorage.getItem('tenantId') || ''
+                    : api.header.tenantId,
+                Authorization:
+                  api.header.Authorization === '**'
+                    ? `Bearer ${localStorage.getItem('token') || ''}`
+                    : api.header.Authorization,
+                academicyearid:
+                  api.header.academicyearid === '**'
+                    ? localStorage.getItem('academicYearId') || ''
+                    : api.header.academicyearid,
+              }
             : {};
           const config = {
             method: api.method,
@@ -153,12 +212,12 @@ const DynamicForm = ({
                   items: {
                     type: 'string',
                     enum: data
-                      ? data.map((item) => item?.[value].toString())
+                      ? data?.map((item) => item?.[value].toString())
                       : ['Select'],
                     enumNames: data
-                      ? data.map((item) =>
-                        transformLabel(item?.[label].toString())
-                      )
+                      ? data?.map((item) =>
+                          transformLabel(item?.[label].toString())
+                        )
                       : ['Select'],
                   },
                 };
@@ -166,12 +225,12 @@ const DynamicForm = ({
                 updatedProperties[fieldKey] = {
                   ...updatedProperties[fieldKey],
                   enum: data
-                    ? data.map((item) => item?.[value].toString())
+                    ? data?.map((item) => item?.[value].toString())
                     : ['Select'],
                   enumNames: data
-                    ? data.map((item) =>
-                      transformLabel(item?.[label].toString())
-                    )
+                    ? data?.map((item) =>
+                        transformLabel(item?.[label].toString())
+                      )
                     : ['Select'],
                 };
               }
@@ -250,7 +309,7 @@ const DynamicForm = ({
     setFormSchema(translatedSchema);
   }, []);
 
-   // console.log('schema', schema)
+  // console.log('schema', schema)
   const extractApiProperties = (schema, callType) => {
     return Object.entries(schema.properties)
       .filter(([_, value]) => value.api && value.api.callType === callType)
@@ -344,19 +403,19 @@ const DynamicForm = ({
             // If header exists, replace values with localStorage values
             let customHeader = api?.header
               ? {
-                tenantId:
-                  api.header.tenantId === '**'
-                    ? localStorage.getItem('tenantId') || ''
-                    : api.header.tenantId,
-                Authorization:
-                  api.header.Authorization === '**'
-                    ? `Bearer ${localStorage.getItem('token') || ''}`
-                    : api.header.Authorization,
-                academicyearid:
-                  api.header.academicyearid === '**'
-                    ? localStorage.getItem('academicYearId') || ''
-                    : api.header.academicyearid,
-              }
+                  tenantId:
+                    api.header.tenantId === '**'
+                      ? localStorage.getItem('tenantId') || ''
+                      : api.header.tenantId,
+                  Authorization:
+                    api.header.Authorization === '**'
+                      ? `Bearer ${localStorage.getItem('token') || ''}`
+                      : api.header.Authorization,
+                  academicyearid:
+                    api.header.academicyearid === '**'
+                      ? localStorage.getItem('academicYearId') || ''
+                      : api.header.academicyearid,
+                }
               : {};
             const config = {
               method: api.method,
@@ -410,20 +469,21 @@ const DynamicForm = ({
                       // If header exists, replace values with localStorage values
                       let customHeader = api?.header
                         ? {
-                          tenantId:
-                            api.header.tenantId === '**'
-                              ? localStorage.getItem('tenantId') || ''
-                              : api.header.tenantId,
-                          Authorization:
-                            api.header.Authorization === '**'
-                              ? `Bearer ${localStorage.getItem('token') || ''
-                              }`
-                              : api.header.Authorization,
-                          academicyearid:
-                            api.header.academicyearid === '**'
-                              ? localStorage.getItem('academicYearId') || ''
-                              : api.header.academicyearid,
-                        }
+                            tenantId:
+                              api.header.tenantId === '**'
+                                ? localStorage.getItem('tenantId') || ''
+                                : api.header.tenantId,
+                            Authorization:
+                              api.header.Authorization === '**'
+                                ? `Bearer ${
+                                    localStorage.getItem('token') || ''
+                                  }`
+                                : api.header.Authorization,
+                            academicyearid:
+                              api.header.academicyearid === '**'
+                                ? localStorage.getItem('academicYearId') || ''
+                                : api.header.academicyearid,
+                          }
                         : {};
                       const config = {
                         method: api.method,
@@ -467,10 +527,10 @@ const DynamicForm = ({
                               ...updatedProperties[fieldKey],
                               items: {
                                 type: 'string',
-                                enum: data.map((item) =>
+                                enum: data?.map((item) =>
                                   item?.[value].toString()
                                 ),
-                                enumNames: data.map((item) =>
+                                enumNames: data?.map((item) =>
                                   transformLabel(item?.[label].toString())
                                 ),
                               },
@@ -478,10 +538,10 @@ const DynamicForm = ({
                           } else {
                             updatedProperties[fieldKey] = {
                               ...updatedProperties[fieldKey],
-                              enum: data.map((item) =>
+                              enum: data?.map((item) =>
                                 item?.[value].toString()
                               ),
-                              enumNames: data.map((item) =>
+                              enumNames: data?.map((item) =>
                                 transformLabel(item?.[label].toString())
                               ),
                             };
@@ -545,8 +605,8 @@ const DynamicForm = ({
                   ...updatedProperties[fieldKey],
                   items: {
                     type: 'string',
-                    enum: data.map((item) => item?.[value].toString()),
-                    enumNames: data.map((item) =>
+                    enum: data?.map((item) => item?.[value].toString()),
+                    enumNames: data?.map((item) =>
                       transformLabel(item?.[label].toString())
                     ),
                   },
@@ -554,8 +614,8 @@ const DynamicForm = ({
               } else {
                 updatedProperties[fieldKey] = {
                   ...updatedProperties[fieldKey],
-                  enum: data.map((item) => item?.[value].toString()),
-                  enumNames: data.map((item) =>
+                  enum: data?.map((item) => item?.[value].toString()),
+                  enumNames: data?.map((item) =>
                     transformLabel(item?.[label].toString())
                   ),
                 };
@@ -853,19 +913,19 @@ const DynamicForm = ({
                 // If header exists, replace values with localStorage values
                 let customHeader = api?.header
                   ? {
-                    tenantId:
-                      api.header.tenantId === '**'
-                        ? localStorage.getItem('tenantId') || ''
-                        : api.header.tenantId,
-                    Authorization:
-                      api.header.Authorization === '**'
-                        ? `Bearer ${localStorage.getItem('token') || ''}`
-                        : api.header.Authorization,
-                    academicyearid:
-                      api.header.academicyearid === '**'
-                        ? localStorage.getItem('academicYearId') || ''
-                        : api.header.academicyearid,
-                  }
+                      tenantId:
+                        api.header.tenantId === '**'
+                          ? localStorage.getItem('tenantId') || ''
+                          : api.header.tenantId,
+                      Authorization:
+                        api.header.Authorization === '**'
+                          ? `Bearer ${localStorage.getItem('token') || ''}`
+                          : api.header.Authorization,
+                      academicyearid:
+                        api.header.academicyearid === '**'
+                          ? localStorage.getItem('academicYearId') || ''
+                          : api.header.academicyearid,
+                    }
                   : {};
                 const config = {
                   method: api.method,
@@ -901,8 +961,8 @@ const DynamicForm = ({
                         ...updatedProperties[fieldKey],
                         items: {
                           type: 'string',
-                          enum: data.map((item) => item?.[value].toString()),
-                          enumNames: data.map((item) =>
+                          enum: data?.map((item) => item?.[value].toString()),
+                          enumNames: data?.map((item) =>
                             transformLabel(item?.[label].toString())
                           ),
                         },
@@ -910,8 +970,8 @@ const DynamicForm = ({
                     } else {
                       updatedProperties[fieldKey] = {
                         ...updatedProperties[fieldKey],
-                        enum: data.map((item) => item?.[value].toString()),
-                        enumNames: data.map((item) =>
+                        enum: data?.map((item) => item?.[value].toString()),
+                        enumNames: data?.map((item) =>
                           transformLabel(item?.[label].toString())
                         ),
                       };
@@ -994,7 +1054,6 @@ const DynamicForm = ({
   };
 
   const handleSubmit = ({ formData }: { formData: any }) => {
-
     console.log('########### issue debug formData', formData);
 
     //step-1 : Check and remove skipped Data
@@ -1037,11 +1096,11 @@ const DynamicForm = ({
             // Use fieldId for custom fields
             transformedData.customFields.push({
               fieldId: fieldSchema.fieldId,
-              value: formData[key] || "",
+              value: formData[key] || '',
             });
           } else {
             // Use the field name for core fields
-            transformedData[key] = formData[key] || "";
+            transformedData[key] = formData[key] || '';
           }
         }
       }
@@ -1208,7 +1267,10 @@ const DynamicForm = ({
           widgets={widgets}
           id="dynamic-form-id"
         >
-          <button type="submit" style={{ display: hideSubmit ? 'none' : 'block' }}>
+          <button
+            type="submit"
+            style={{ display: hideSubmit ? 'none' : 'block' }}
+          >
             Submit
           </button>
         </Form>

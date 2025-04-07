@@ -42,12 +42,19 @@ import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
 import { deleteUser } from '@/services/UserService';
-import { fetchUserData, transformLabel } from '@/utils/Helper';
+import {
+  calculateAgeFromDate,
+  fetchUserData,
+  formatDateToDDMMYYYY,
+  transformLabel,
+} from '@/utils/Helper';
 import { getCohortList } from '@/services/GetCohortList';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import apartment from '../../public/images/apartment.svg';
 import { getCenterList } from '@/services/MasterDataService';
+import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
+import CenterLabel from '@/components/Centerlabel';
 
 const Learner = () => {
   const theme = useTheme<any>();
@@ -61,7 +68,7 @@ const Learner = () => {
   const [pageOffset, setPageOffset] = useState<number>(0);
   const [prefilledFormData, setPrefilledFormData] = useState({});
   const [loading, setLoading] = useState<boolean>(false);
-  const [response, setResponse] = useState({});
+  const [response, setResponse] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -120,6 +127,54 @@ const Learner = () => {
         },
       ]);
       console.log('responseForm', responseForm);
+
+      //unit name is missing from required so handled from frotnend
+      let alterSchema = responseForm?.schema;
+      let requiredArray = alterSchema?.required;
+      const mustRequired = [
+        'firstName',
+        'lastName',
+        'email',
+        'mobile',
+        'dob',
+        'gender',
+        'state',
+        'district',
+        'block',
+        'village',
+        'center',
+        'batch',
+        'username',
+      ];
+      // Merge only missing items from required2 into required1
+      mustRequired.forEach((item) => {
+        if (!requiredArray.includes(item)) {
+          requiredArray.push(item);
+        }
+      });
+      //no required
+
+      alterSchema.required = requiredArray;
+      //add max selection custom
+      if (alterSchema?.properties?.state) {
+        alterSchema.properties.state.maxSelection = 1;
+      }
+      if (alterSchema?.properties?.district) {
+        alterSchema.properties.district.maxSelection = 1;
+      }
+      if (alterSchema?.properties?.block) {
+        alterSchema.properties.block.maxSelection = 1;
+      }
+      if (alterSchema?.properties?.village) {
+        alterSchema.properties.village.maxSelection = 1;
+      }
+      if (alterSchema?.properties?.center) {
+        alterSchema.properties.center.maxSelection = 1;
+      }
+      if (alterSchema?.properties?.batch) {
+        alterSchema.properties.batch.maxSelection = 1;
+      }
+
       const districtFieldId =
         responseForm?.schema?.properties?.district?.fieldId;
       const blockFieldId = responseForm?.schema?.properties?.block?.fieldId;
@@ -130,7 +185,7 @@ const Learner = () => {
       setBlockFieldId(blockFieldId);
       setDistrictFieldId(districtFieldId);
       setVillageFieldId(villageFieldId);
-      setAddSchema(responseForm?.schema);
+      setAddSchema(alterSchema);
       setAddUiSchema(responseForm?.uiSchema);
     };
     fetchData();
@@ -146,36 +201,40 @@ const Learner = () => {
   };
 
   const SubmitaFunction = async (formData: any) => {
-    setPrefilledFormData(formData);
-    //set prefilled search data on refresh
-    localStorage.setItem(searchStoreKey, JSON.stringify(formData));
-    await searchData(formData, 0);
+    // console.log("###### debug issue formData", formData)
+    if (Object.keys(formData).length > 0) {
+      setPrefilledFormData(formData);
+      //set prefilled search data on refresh
+      localStorage.setItem(searchStoreKey, JSON.stringify(formData));
+      await searchData(formData, 0);
+    }
   };
 
   const searchData = async (formData, newPage) => {
-    formData = Object.fromEntries(
-      Object.entries(formData).filter(
-        ([_, value]) => !Array.isArray(value) || value.length > 0
-      )
-    );
-    const staticFilter = {
-      role: 'Learner',
-      status: 'active',
-      tenantId: localStorage.getItem('tenantId'),
-    };
-    const { sortBy } = formData;
-    const staticSort = ['firstName', sortBy || 'asc'];
-    await searchListData(
-      formData,
-      newPage,
-      staticFilter,
-      pageLimit,
-      setPageOffset,
-      setCurrentPage,
-      setResponse,
-      userList,
-      staticSort
-    );
+    if (formData) {
+      formData = Object.fromEntries(
+        Object.entries(formData).filter(
+          ([_, value]) => !Array.isArray(value) || value.length > 0
+        )
+      );
+      const staticFilter = {
+        role: 'Learner',
+        tenantId: localStorage.getItem('tenantId'),
+      };
+      const { sortBy } = formData;
+      const staticSort = ['firstName', sortBy || 'asc'];
+      await searchListData(
+        formData,
+        newPage,
+        staticFilter,
+        pageLimit,
+        setPageOffset,
+        setCurrentPage,
+        setResponse,
+        userList,
+        staticSort
+      );
+    }
   };
 
   // Define table columns
@@ -189,10 +248,47 @@ const Learner = () => {
         } ${transformLabel(row.lastName) || ''}`.trim(),
     },
     {
-      key: 'status',
-      label: 'Status',
-      render: (row: any) => transformLabel(row.status),
-      getStyle: (row) => ({ color: row.status === 'active' ? 'green' : 'red' }),
+      keys: ['age'],
+      label: 'Age',
+      render: (row) => calculateAgeFromDate(row.dob) || '',
+    },
+    {
+      keys: ['dob'],
+      label: 'DOB',
+      render: (row) => formatDateToDDMMYYYY(row.dob) || '',
+    },
+    {
+      keys: ['guardian'],
+      label: 'Guardian Details',
+      render: (row: any) => {
+        const NAME_OF_GUARDIAN =
+          transformLabel(
+            row.customFields.find(
+              (field: { label: string }) => field.label === 'NAME_OF_GUARDIAN'
+            )?.selectedValues?.[0]
+          ) || '';
+        const RELATION_WITH_GUARDIAN =
+          transformLabel(
+            row.customFields.find(
+              (field: { label: string }) =>
+                field.label === 'RELATION_WITH_GUARDIAN'
+            )?.selectedValues?.[0]
+          ) || '';
+        const PARENT_GUARDIAN_PHONE_NO =
+          transformLabel(
+            row.customFields.find(
+              (field: { label: string }) =>
+                field.label === 'PARENT_GUARDIAN_PHONE_NO'
+            )?.selectedValues?.[0]
+          ) || '';
+        const values = [
+          NAME_OF_GUARDIAN,
+          RELATION_WITH_GUARDIAN,
+          PARENT_GUARDIAN_PHONE_NO,
+        ];
+        const result = values.filter(Boolean).join(', ');
+        return result;
+      },
     },
     {
       keys: ['gender'],
@@ -204,19 +300,9 @@ const Learner = () => {
       label: 'Mobile',
       render: (row) => transformLabel(row.mobile) || '',
     },
-    // {
-    //   key: 'STATE',
-    //   label: 'State',
-    //   render: (row) => {
-    //     const state =
-    //       row.customFields.find((field) => field.label === 'STATE')
-    //         ?.selectedValues[0]?.value || '-';
-    //     return `${state}`;
-    //   },
-    // },
     {
       keys: ['STATE', 'DISTRICT', 'BLOCK', 'VILLAGE'],
-      label: 'Location (State / District / Block/ Village)',
+      label: 'State, District, Block, Village',
       render: (row: any) => {
         const state =
           transformLabel(
@@ -248,6 +334,26 @@ const Learner = () => {
           village == '' ? '' : `, ${village}`
         }`;
       },
+    },
+    {
+      key: 'center',
+      label: 'Center',
+      render: (row) => {
+        return (
+          <CenterLabel
+            parentId={
+              row.customFields.find((field) => field.label === 'CENTER')
+                ?.selectedValues?.[0]
+            }
+          />
+        );
+      },
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      render: (row: any) => transformLabel(row.status),
+      getStyle: (row) => ({ color: row.status === 'active' ? 'green' : 'red' }),
     },
   ];
 
@@ -296,15 +402,16 @@ const Learner = () => {
       });
 
       if (resp?.responseCode === 200) {
-        setResponse((prev) => ({
-          ...prev,
-          result: {
-            ...prev?.result,
-            getUserDetails: prev?.result?.getUserDetails?.filter(
-              (item) => item?.userId !== userID
-            ),
-          },
-        }));
+        // setResponse((prev) => ({
+        //   ...prev,
+        //   result: {
+        //     ...prev?.result,
+        //     getUserDetails: prev?.result?.getUserDetails?.filter(
+        //       (item) => item?.userId !== userID
+        //     ),
+        //   },
+        // }));
+        searchData(prefilledFormData, currentPage);
         console.log('Team leader successfully archived.');
       } else {
         console.error('Failed to archive team leader:', resp);
@@ -363,7 +470,7 @@ const Learner = () => {
       ),
       callback: async (row) => {
         const findVillage = row?.customFields.find((item) => {
-          if (item.label === 'BATCH') {
+          if (item.label === 'VILLAGE') {
             return item;
           }
         });
@@ -380,6 +487,8 @@ const Learner = () => {
           lastName: row?.lastName || '',
           village: findVillage?.selectedValues?.[0]?.value || '',
         });
+        setReason('');
+        setChecked(false);
       },
     },
     {
@@ -453,7 +562,8 @@ const Learner = () => {
         roleId: roleId,
       },
     ],
-    username: 'Leaner',
+    program: tenantId,
+    // username: 'Leaner',
     password: Math.floor(10000 + Math.random() * 90000),
   };
   const successUpdateMessage = 'LEARNERS.LEARNER_UPDATED_SUCCESSFULLY';
@@ -514,7 +624,9 @@ const Learner = () => {
           open={openModal}
           onClose={handleCloseModal}
           showFooter={true}
-          primaryText={isEdit ? t('Update') : t('Create')}
+          primaryText={
+            isEdit ? t('Update') : isReassign ? t('Reassign') : t('Create')
+          }
           id="dynamic-form-id"
           modalTitle={
             isEdit
@@ -526,8 +638,8 @@ const Learner = () => {
         >
           <AddEditUser
             SuccessCallback={() => {
-              setPrefilledFormData({});
-              searchData({}, 0);
+              setPrefilledFormData(initialFormDataSearch);
+              searchData(initialFormDataSearch, 0);
               setOpenModal(false);
             }}
             schema={addSchema}
@@ -538,7 +650,7 @@ const Learner = () => {
             isExtraFields={true}
             editableUserId={editableUserId}
             UpdateSuccessCallback={() => {
-              setPrefilledFormData({});
+              setPrefilledFormData(prefilledFormData);
               searchData(prefilledFormData, currentPage);
               setOpenModal(false);
             }}
@@ -557,33 +669,40 @@ const Learner = () => {
             districtFieldId={districtFieldId}
             villageFieldId={villageFieldId}
             hideSubmit={true}
+            type={'learner'}
           />
         </SimpleModal>
 
-        {response && response?.result?.getUserDetails ? (
-          <Box sx={{ mt: 1 }}>
-            <PaginatedTable
-              count={response?.result?.totalCount}
-              data={response?.result?.getUserDetails}
-              columns={columns}
-              actions={actions}
-              onPageChange={handlePageChange}
-              onRowsPerPageChange={handleRowsPerPageChange}
-              defaultPage={currentPage}
-              defaultRowsPerPage={pageLimit}
-            />
-          </Box>
+        {response != null ? (
+          <>
+            {response && response?.result?.getUserDetails ? (
+              <Box sx={{ mt: 1 }}>
+                <PaginatedTable
+                  count={response?.result?.totalCount}
+                  data={response?.result?.getUserDetails}
+                  columns={columns}
+                  actions={actions}
+                  onPageChange={handlePageChange}
+                  onRowsPerPageChange={handleRowsPerPageChange}
+                  defaultPage={currentPage}
+                  defaultRowsPerPage={pageLimit}
+                />
+              </Box>
+            ) : (
+              <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                height="20vh"
+              >
+                <Typography marginTop="10px" textAlign={'center'}>
+                  {t('LEARNERS.NO_LEARNERS_FOUND')}
+                </Typography>
+              </Box>
+            )}
+          </>
         ) : (
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            height="20vh"
-          >
-            <Typography marginTop="10px" textAlign={'center'}>
-              {t('LEARNERS.NO_LEARNERS_FOUND')}
-            </Typography>
-          </Box>
+          <CenteredLoader />
         )}
       </Box>
 

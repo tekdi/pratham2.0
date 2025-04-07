@@ -36,9 +36,11 @@ const CustomSingleSelectWidget = ({
       required={required}
       error={rawErrors.length > 0}
       disabled={
-        isDisabled ||
-        enumOptions.length === 0 ||
-        (enumOptions.length === 1 && enumOptions[0]?.value === 'Select')
+        isDisabled 
+        //bug fix for if zero value then no disable it not reflect in required if disable
+        // ||
+        // enumOptions.length === 0 ||
+        // (enumOptions.length === 1 && enumOptions[0]?.value === 'Select')
       }
     >
       <InputLabel id={`${id}-label`}>{label}</InputLabel>
@@ -48,19 +50,24 @@ const CustomSingleSelectWidget = ({
         value={value}
         onChange={handleChange}
         displayEmpty
-        label={value ? label : ""}
+        label={value ? label : ''}
       >
         {isEmptyOptionIncluded && (
           <MenuItem value="">
-            <em>{t('FORM.Select')}{required && '*'}</em>
+            <em>
+              {t('FORM.Select')}
+              {required && '*'}
+            </em>
           </MenuItem>
         )}
 
-        {enumOptions.map((option) => (
-          <MenuItem key={option.value} value={option.value}>
-            {t(`FORM.${option.label}`, { defaultValue: option.label })}
-          </MenuItem>
-        ))}
+        {enumOptions
+          .filter((option) => option.value !== 'Select')
+          .map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {t(`FORM.${option.label}`, { defaultValue: option.label })}
+            </MenuItem>
+          ))}
       </Select>
 
       {/* Form submission error */}

@@ -125,6 +125,8 @@ export const extractMatchingKeys = (row: any, schema: any) => {
     ) {
       if (typeof selectedValues[0] === 'object') {
         return selectedValues[0].id.toString() ?? selectedValues[0];
+      } else {
+        return selectedValues[0];
       }
     } else if (type === 'array' && typeof selectedValues === 'string') {
       return [selectedValues];
@@ -137,7 +139,10 @@ export const extractMatchingKeys = (row: any, schema: any) => {
   for (const [key, schemaField] of Object.entries(schema.properties)) {
     if (schemaField.coreField === 1) {
       // Core fields (like name) directly from row
-      result[key] = row[key];
+      //core field bug fix for null value must be string in middlename
+      if (row[key]) {
+        result[key] = row[key];
+      }
     } else if (schemaField.fieldId) {
       const matchedField = row.customFields?.find(
         (field) => field.fieldId === schemaField.fieldId
@@ -154,7 +159,6 @@ export const extractMatchingKeys = (row: any, schema: any) => {
 
   return result;
 };
-
 
 // Add Edit Functions
 
@@ -201,12 +205,19 @@ export const notificationCallback = async (
   }
   let replacements: { [key: string]: string };
   replacements = {};
+  let cleanedUrl = '';
+  if (process.env.NEXT_PUBLIC_TEACHER_SBPLAYER) {
+    cleanedUrl = process.env.NEXT_PUBLIC_TEACHER_SBPLAYER.replace(
+      /\/sbplayer$/,
+      ''
+    );
+  }
   if (creatorName) {
     replacements = {
       '{FirstName}': firstLetterInUpperCase(payload?.firstName),
       '{UserName}': payload?.email,
       '{Password}': payload?.password,
-      '{appUrl}': (process.env.NEXT_PUBLIC_TEACHER_APP_URL as string) || '', //TODO: check url
+      '{appUrl}': cleanedUrl || '', //TODO: check url
     };
   }
 
