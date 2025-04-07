@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect, useRef } from 'react';
 import Form from '@rjsf/mui';
 import validator from '@rjsf/validator-ajv8';

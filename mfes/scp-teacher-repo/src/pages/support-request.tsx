@@ -55,8 +55,8 @@ const SupportRequest = () => {
       const deviceType = /Mobile|Android|iPhone|iPad/i.test(userAgent)
         ? 'Mobile'
         : /Tablet/i.test(userAgent)
-          ? 'Tablet'
-          : 'Desktop';
+        ? 'Tablet'
+        : 'Desktop';
 
       // Extract browser name and version
       const browserMatch =
@@ -99,7 +99,7 @@ const SupportRequest = () => {
   return (
     <>
       <Header />
-      <Box display={'flex'}>
+      <Box display={'flex'} sx={{ marginBottom: '1.2rem' }}>
         <Box
           onClick={() => {
             setQueryParams((prev) => ({
@@ -128,7 +128,9 @@ const SupportRequest = () => {
           </Typography>
         </Box>
       </Box>
-      <JotFormEmbed formId={jotFormId} queryParams={queryParams} />
+      <Box>
+        <JotFormEmbed formId={jotFormId} queryParams={queryParams} />
+      </Box>
     </>
   );
 };

@@ -29,6 +29,9 @@ import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import TenantService from '@/services/TenantService';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
+import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
+import { transformLabel } from '@/utils/Helper';
+
 
 const ContentReviewer = () => {
   const theme = useTheme<any>();
@@ -42,7 +45,7 @@ const ContentReviewer = () => {
   const [pageOffset, setPageOffset] = useState<number>(0);
   const [prefilledFormData, setPrefilledFormData] = useState({});
   const [loading, setLoading] = useState<boolean>(false);
-  const [response, setResponse] = useState({});
+  const [response, setResponse] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -97,13 +100,21 @@ const ContentReviewer = () => {
   };
 
   const SubmitaFunction = async (formData: any) => {
-    setPrefilledFormData(formData);
-    //set prefilled search data on refresh
-    localStorage.setItem(searchStoreKey, JSON.stringify(formData));
-    await searchData(formData, 0);
+    if (Object.keys(formData).length > 0) {
+      setPrefilledFormData(formData);
+      //set prefilled search data on refresh
+      localStorage.setItem(searchStoreKey, JSON.stringify(formData));
+      await searchData(formData, 0);
+    }
   };
 
   const searchData = async (formData: any, newPage: any) => {
+    if (formData) {
+      formData = Object.fromEntries(
+        Object.entries(formData).filter(
+          ([_, value]) => !Array.isArray(value) || value.length > 0
+        )
+      );
     const staticFilter = {
       role: RoleName.CONTENT_REVIEWER,
       tenantId: TenantService.getTenantId(),
@@ -121,6 +132,7 @@ const ContentReviewer = () => {
       userList,
       staticSort
     );
+   }
   };
 
   // Define table columns
@@ -136,6 +148,7 @@ const ContentReviewer = () => {
     {
       key: 'status',
       label: 'Status',
+      render: (row: any) => transformLabel(row.status),
       getStyle: (row: any) => ({
         color: row.status === 'active' ? 'green' : 'red',
       }),
@@ -188,7 +201,7 @@ const ContentReviewer = () => {
     },
     {
       key: 'SUBJECT',
-      label: 'subject',
+      label: 'Subject',
       render: (row) => {
         const subject =
           row.customFields
@@ -272,6 +285,7 @@ const ContentReviewer = () => {
         setEditableUserId(row?.userId);
         handleOpenModal();
       },
+      show: (row) => row.status !== 'archived'
     },
     {
       icon: (
@@ -302,6 +316,7 @@ const ContentReviewer = () => {
         searchData(prefilledFormData, currentPage);
         setOpenModal(false);
       },
+      show: (row) => row.status !== 'archived'
     },
   ];
 
@@ -347,6 +362,9 @@ const ContentReviewer = () => {
   const notificationMessage =
     'CONTENT_REVIEWERS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
+  useEffect(() => {
+    setPrefilledFormData(initialFormDataSearch);
+  }, []);
 
   return (
     <>
@@ -390,7 +408,11 @@ const ContentReviewer = () => {
         <SimpleModal
           open={openModal}
           onClose={handleCloseModal}
-          showFooter={false}
+          showFooter={true}
+          primaryText={
+            isEdit ? t('Update') : t('Create')
+          }
+          id="dynamic-form-id"
           modalTitle={
             isEdit
               ? t('CONTENT_REVIEWERS.UPDATE_CONTENT_REVIEWER')
@@ -399,8 +421,8 @@ const ContentReviewer = () => {
         >
           <AddEditUser
             SuccessCallback={() => {
-              setPrefilledFormData({});
-              searchData({}, 0);
+              setPrefilledFormData(initialFormDataSearch);
+              searchData(initialFormDataSearch, 0);
               setOpenModal(false);
             }}
             schema={addSchema}
@@ -409,7 +431,7 @@ const ContentReviewer = () => {
             isEdit={isEdit}
             editableUserId={editableUserId}
             UpdateSuccessCallback={() => {
-              setPrefilledFormData({});
+              setPrefilledFormData(prefilledFormData);
               searchData(prefilledFormData, currentPage);
               setOpenModal(false);
             }}
@@ -424,9 +446,13 @@ const ContentReviewer = () => {
             notificationKey={notificationKey}
             notificationMessage={notificationMessage}
             notificationContext={notificationContext}
+            hideSubmit={true}
+            type={'content-reviewer'}
           />
         </SimpleModal>
 
+        {response != null ? (
+        <>
         {response && response?.result?.getUserDetails ? (
           <Box sx={{ mt: 1 }}>
             <PaginatedTable
@@ -451,6 +477,8 @@ const ContentReviewer = () => {
               {t('COMMON.NO_CONTENT_REVIEWER_FOUND')}
             </Typography>
           </Box>
+        )} </> ) : (
+          <CenteredLoader />
         )}
       </Box>
     </>

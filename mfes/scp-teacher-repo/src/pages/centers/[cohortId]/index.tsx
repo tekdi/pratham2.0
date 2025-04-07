@@ -76,6 +76,7 @@ import { telemetryFactory } from '@/utils/telemetry';
 import dynamic from 'next/dynamic';
 import { setTimeout } from 'timers';
 import { isEliminatedFromBuild } from '../../../../featureEliminationUtil';
+import LearnerManage from '@/shared/LearnerManage/LearnerManage';
 
 let SessionCardFooter: ComponentType<any> | null = null;
 if (!isEliminatedFromBuild('SessionCardFooter', 'component')) {
@@ -289,20 +290,22 @@ const CohortPage = () => {
           );
           const districtCode = district?.code || '';
           const districtId = district?.fieldId || '';
-          
+
           const state = cohortData.customField.find(
             (item: CustomField) => item.label === 'STATE'
           );
           setState(state?.selectedValues?.[0]?.value || '');
           const stateCode = state?.code || '';
           const stateId = state?.fieldId || '';
-          
+
           const blockField = cohortData?.customField.find(
             (field: any) => field.label === 'BLOCK'
           );
-          
+
           // Get values safely
-          const districtValue = toPascalCase(district?.selectedValues?.[0]?.value || '');
+          const districtValue = toPascalCase(
+            district?.selectedValues?.[0]?.value || ''
+          );
           const stateValue = toPascalCase(state?.value || '');
 
           const addressParts = [districtValue, stateValue].filter(Boolean);
@@ -1143,10 +1146,11 @@ const CohortPage = () => {
               />
             </Box>
             {openAddLearnerModal && (
-              <AddLearnerModal
+              <LearnerManage
                 open={openAddLearnerModal}
                 onClose={handleCloseAddLearnerModal}
                 onLearnerAdded={handleLearnerAdded}
+                cohortId={cohortId}
               />
             )}
           </>
