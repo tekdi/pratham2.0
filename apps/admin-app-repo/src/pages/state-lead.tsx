@@ -60,6 +60,8 @@ const StateLead = () => {
       ? { state: [localStorage.getItem('stateId')] }
       : {};
 
+  const storedUserData = JSON.parse(localStorage.getItem('adminInfo') || '{}');
+
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
       searchData(prefilledFormData, 0);
@@ -85,6 +87,7 @@ const StateLead = () => {
       setAddUiSchema(responseForm?.uiSchema);
     };
 
+    setPrefilledAddFormData(initialFormDataSearch);
     fetchData();
   }, []);
 
@@ -96,16 +99,24 @@ const StateLead = () => {
   };
 
   const SubmitaFunction = async (formData: any) => {
-    setPrefilledFormData(formData);
-    //set prefilled search data on refresh
-    localStorage.setItem(searchStoreKey, JSON.stringify(formData));
-    await searchData(formData, 0);
+    if (Object.keys(formData).length > 0) {
+      setPrefilledFormData(formData);
+      //set prefilled search data on refresh
+      localStorage.setItem(searchStoreKey, JSON.stringify(formData));
+      await searchData(formData, 0);
+    }
   };
 
   const searchData = async (formData: any, newPage: any) => {
+    if (formData) {
+      formData = Object.fromEntries(
+        Object.entries(formData).filter(
+          ([_, value]) => !Array.isArray(value) || value.length > 0
+        )
+      );
     const staticFilter = {
       role: RoleName.STATE_LEAD,
-      tenantId: TenantService.getTenantId(),
+      tenantId: storedUserData.tenantData[0].tenantId,
     };
     const { sortBy } = formData;
     const staticSort = ['firstName', sortBy || 'asc'];
@@ -120,10 +131,11 @@ const StateLead = () => {
       userList,
       staticSort
     );
+   }
   };
 
   // Define table columns
-  const columns = [
+  let columns = [
     {
       keys: ['firstName', 'middleName', 'lastName'],
       label: 'State Lead Name',
@@ -250,7 +262,6 @@ const StateLead = () => {
   const notificationKey = 'onStateLeadCreate';
   const notificationMessage = 'STATE_LEADS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
-
   useEffect(() => {
     setPrefilledFormData(initialFormDataSearch);
   }, []);
@@ -289,14 +300,18 @@ const StateLead = () => {
               handleOpenModal();
             }}
           >
-            {t('COMMON.ADD_NEW')}{' '}
+            {t('COMMON.ADD_NEW')}
           </Button>
         </Box>
 
         <SimpleModal
           open={openModal}
           onClose={handleCloseModal}
-          showFooter={false}
+          showFooter={true}
+          primaryText={
+            isEdit ? t('Update') : t('Create')
+          }
+          id="dynamic-form-id"
           modalTitle={
             isEdit
               ? t('STATE_LEADS.UPDATE_STATE_LEAD')
@@ -305,8 +320,8 @@ const StateLead = () => {
         >
           <AddEditUser
             SuccessCallback={() => {
-              setPrefilledFormData({});
-              searchData({}, 0);
+              setPrefilledFormData(initialFormDataSearch);
+              searchData(initialFormDataSearch, 0);
               setOpenModal(false);
             }}
             schema={addSchema}
@@ -315,7 +330,7 @@ const StateLead = () => {
             isEdit={isEdit}
             editableUserId={editableUserId}
             UpdateSuccessCallback={() => {
-              setPrefilledFormData({});
+              setPrefilledFormData(prefilledFormData);
               searchData(prefilledFormData, currentPage);
               setOpenModal(false);
             }}
@@ -330,6 +345,8 @@ const StateLead = () => {
             notificationKey={notificationKey}
             notificationMessage={notificationMessage}
             notificationContext={notificationContext}
+            hideSubmit={true}
+            type={'state-lead'}
           />
         </SimpleModal>
 
@@ -360,7 +377,7 @@ const StateLead = () => {
             </Typography>
           </Box>
         )}
-        </>) : (
+        </> ) : (
           <CenteredLoader />
         )}
       </Box>
