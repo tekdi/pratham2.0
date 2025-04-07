@@ -43,7 +43,6 @@ import CenterDropdown from '@/components/CenterSelection';
 import BatchList from '@/components/BatchList';
 import manageUserStore from '@/store/manageUserStore';
 
-
 const CentersPage = () => {
   const { t } = useTranslation();
   const theme = useTheme<any>();
@@ -183,7 +182,9 @@ const CentersPage = () => {
     telemetryFactory.interact(telemetryInteract);
   };
 
-  const handleBatchSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBatchSearchChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setBatchSearchInput(event.target.value);
   };
 
@@ -345,7 +346,7 @@ const CentersPage = () => {
   const handleCenterChange = (cohortId: any) => {
     setSelectedCenter(cohortId);
     localStorage.setItem('centerId', cohortId);
-  
+
     if (cohortId) {
       getBlocksByCenterId(cohortId).then((res) => {
         console.log('Fetched batches:', res); // Log the fetched data
@@ -358,20 +359,22 @@ const CentersPage = () => {
     }
   };
 
-  console.log("filtered batches before render:", filteredBatches);
+  console.log('filtered batches before render:', filteredBatches);
 
   const handleOpenAddBatchModal = () => {};
 
   const filteredBatchList = useMemo(() => {
     if (!filteredBatches) return [];
-  
+
     if (!batchSearchInput) {
       return filteredBatches; // Return all batches if search input is empty
     }
-  
+
     return filteredBatches.filter((batch) => {
       if (batch.name) {
-        return batch.name.toLowerCase().includes(batchSearchInput.toLowerCase());
+        return batch.name
+          .toLowerCase()
+          .includes(batchSearchInput.toLowerCase());
       }
       return false; // Or handle undefined values differently
     });
@@ -414,125 +417,129 @@ const CentersPage = () => {
               >
                 <Tab value={1} label={t('COMMON.BATCHES')} />
                 <Tab value={2} label={t('COMMON.FACILITATORS')} />
-                
               </Tabs>
             )}
           </Box>
         )}
 
         <Box>
-        {value === 1 && (
-          <>
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'flex-start',
-                gap: 2,
-                px: 2,
-                mb: 2,
-                mt: 2,
-                flexWrap: 'wrap',
-              }}
-            >
-              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                <TextField
-                  value={batchSearchInput}
-                  onChange={handleBatchSearchChange}
-                  placeholder={t('COMMON.SEARCH')}
-                  variant="outlined"
-                  size="medium"
-                  sx={{
-                    width: {
-                      xs: '100%',
-                      sm: '400px',
-                      md: '450px',
-                    },
-                    height: '48px',
-                    backgroundColor: theme?.palette?.warning?.A700,
-                    color: theme?.palette?.warning?.A200,
-                    borderRadius: '40px',
-                    pl: 2,
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      border: 'none',
-                    },
-                    '& .MuiOutlinedInput-root': {
-                      paddingRight: '8px',
-                      borderRadius: '40px',
-                      boxShadow: 'none',
-                    },
-                    '& .MuiInputBase-input': {
+          {value === 1 && (
+            <>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  gap: 2,
+                  px: 2,
+                  mb: 2,
+                  mt: 2,
+                  flexWrap: 'wrap',
+                  alignItems: 'center',
+                }}
+              >
+                <Box>
+                  <TextField
+                    value={batchSearchInput}
+                    onChange={handleBatchSearchChange}
+                    placeholder={t('COMMON.SEARCH')}
+                    variant="outlined"
+                    size="medium"
+                    sx={{
+                      width: {
+                        xs: '100%',
+                        sm: '400px',
+                        md: '450px',
+                      },
+                      height: '48px',
+                      backgroundColor: theme?.palette?.warning?.A700,
                       color: theme?.palette?.warning?.A200,
-                    },
-                  }}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        {batchSearchInput ? (
-                          <IconButton
-                            onClick={() => setBatchSearchInput('')}
-                            edge="end"
-                            sx={{ color: theme.palette.warning['A200'] }}
-                          >
-                            <Clear
+                      borderRadius: '40px',
+                      pl: 2,
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        border: 'none',
+                      },
+                      '& .MuiOutlinedInput-root': {
+                        paddingRight: '8px',
+                        borderRadius: '40px',
+                        boxShadow: 'none',
+                      },
+                      '& .MuiInputBase-input': {
+                        color: theme?.palette?.warning?.A200,
+                      },
+                    }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          {batchSearchInput ? (
+                            <IconButton
+                              onClick={() => setBatchSearchInput('')}
+                              edge="end"
+                              sx={{ color: theme.palette.warning['A200'] }}
+                            >
+                              <Clear
+                                sx={{ color: theme?.palette?.warning?.['300'] }}
+                              />
+                            </IconButton>
+                          ) : (
+                            <Search
                               sx={{ color: theme?.palette?.warning?.['300'] }}
                             />
-                          </IconButton>
-                        ) : (
-                          <Search
-                            sx={{ color: theme?.palette?.warning?.['300'] }}
-                          />
-                        )}
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-                <Button
-                  sx={{
-                    mt: 1.2,
-                    border: '1px solid #1E1B16',
-                    borderRadius: '100px',
-                    height: '40px',
-                    px: '16px',
-                    color: theme.palette.error.contrastText,
-                    alignSelf: 'flex-start',
-                    '& .MuiButton-endIcon': {
-                      marginLeft: isRTL ? '0px !important' : '8px !important',
-                      marginRight: isRTL ? '8px !important' : '-2px !important',
-                    },
-                  }}
-                  className="text-1E"
-                  endIcon={<AddIcon />}
-                  onClick={handleOpenAddBatchModal}
-                >
-                  {t('COMMON.ADD_NEW')}
-                </Button>
+                          )}
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Box>
+                
+                <Box sx={{ minWidth: '300px' }}>
+                  <CenterDropdown
+                    blockId={userStore.blockId}
+                    cohortId={selectedCenter}
+                    roleName="teacher"
+                    onChange={handleCenterChange}
+                  />
+                </Box>
               </Box>
-              <Box sx={{ minWidth: '300px' }}>
-                <CenterDropdown
-                  blockId={userStore.blockId}
+              <Box sx={{px:'16px'}}>
+
+              <Button
+                sx={{
+                  border: '1px solid #1E1B16',
+                  borderRadius: '100px',
+                  height: '40px',
+                  px: '16px',
+                  color: theme.palette.error.contrastText,
+                  alignSelf: 'flex-start',
+                  '& .MuiButton-endIcon': {
+                    marginLeft: isRTL ? '0px !important' : '8px !important',
+                    marginRight: isRTL
+                      ? '8px !important'
+                      : '-2px !important',
+                  },
+                }}
+                className="text-1E"
+                endIcon={<AddIcon />}
+                onClick={handleOpenAddBatchModal}
+              >
+                {t('COMMON.ADD_NEW')}
+              </Button>
+              </Box>
+              {batchLoading ? (
+                <Typography>Loading Batches...</Typography>
+              ) : filteredBatchList && filteredBatchList.length > 0 ? (
+                <BatchList
+                  title={''}
                   cohortId={selectedCenter}
-                  roleName="teacher"
-                  onChange={handleCenterChange}
+                  batches={filteredBatchList}
+                  router={router}
+                  theme={theme}
+                  t={t}
                 />
-              </Box>
-            </Box>
-            {batchLoading ? (
-              <Typography>Loading Batches...</Typography>
-            ) : filteredBatchList && filteredBatchList.length > 0 ? (
-              <BatchList
-                title={''}
-                cohortId={selectedCenter}
-                batches={filteredBatchList}
-                router={router}
-                theme={theme}
-                t={t}
-              />
-            ) : (
-              <NoDataFound />
-            )}
-          </>
-        )}
+              ) : (
+                <NoDataFound />
+              )}
+            </>
+          )}
         </Box>
         {value === 2 ? (
           <Box>
