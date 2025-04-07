@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useEffect, useState } from 'react';
 import DynamicForm from '@/components/DynamicForm/DynamicForm';
 import Loader from '@/components/Loader';
@@ -22,10 +21,8 @@ import {
   updateCohortUpdate,
   updateReassignUser,
 } from '@/services/CohortService/cohortService';
-import { CohortTypes, RoleId } from '@/utils/app.constant';
+import {  RoleId } from '@/utils/app.constant';
 import _ from 'lodash';
-import StepperForm from '@/components/DynamicForm/StepperForm';
-import CohortManager from '@/utils/CohortManager';
 const AddEditUser = ({
   SuccessCallback,
   schema,
@@ -135,11 +132,6 @@ const AddEditUser = ({
           'guardian_relation',
           'dob',
         ];
-      } else if (type == 'content-creator' || type == 'content-reviewer' || type == 'state-lead' ) {
-        keysToRemove = [
-          'password',
-          'confirm_password'
-        ];
       } else {
         keysToRemove = [
           'state',
@@ -161,9 +153,9 @@ const AddEditUser = ({
       keysToRemove.forEach((key) => delete isEditSchema.properties[key]);
       keysToRemove.forEach((key) => delete isEditUiSchema[key]);
       //also remove from required if present
-      isEditSchema.required = isEditSchema.required?.filter(
+      isEditSchema.required = isEditSchema.required.filter(
         (key) => !keysToRemove.includes(key)
-      ) || [];
+      );
       // console.log('isEditSchema', JSON.stringify(isEditSchema));
     } else if (isReassign) {
       let originalRequired = isEditSchema.required;
@@ -194,17 +186,17 @@ const AddEditUser = ({
       isEditSchema.required = originalRequired;
 
       //also remove from required if present
-      isEditSchema.required = isEditSchema.required?.filter((key) =>
+      isEditSchema.required = isEditSchema.required.filter((key) =>
         keysToHave.includes(key)
-      ) || [];
+      );
     } else {
       const keysToRemove = ['password', 'confirm_password', 'program'];
       keysToRemove.forEach((key) => delete isEditSchema?.properties[key]);
       keysToRemove.forEach((key) => delete isEditUiSchema[key]);
       //also remove from required if present
-      isEditSchema.required = isEditSchema.required?.filter(
+      isEditSchema.required = isEditSchema.required.filter(
         (key) => !keysToRemove.includes(key)
-      ) || [];
+      );
       // console.log('isEditSchema', JSON.stringify(isEditSchema));
     }
     setAlteredSchema(isEditSchema);
