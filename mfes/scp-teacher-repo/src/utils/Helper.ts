@@ -106,6 +106,81 @@ export const getDayMonthYearFormat = (dateString: string) => {
   });
 };
 
+export const calculateAgeFromDate = (dobString: any) => {
+  const dob = new Date(dobString);
+  const today = new Date();
+
+  let age = today.getFullYear() - dob.getFullYear();
+
+  const hasBirthdayPassedThisYear =
+    today.getMonth() > dob.getMonth() ||
+    (today.getMonth() === dob.getMonth() && today.getDate() >= dob.getDate());
+
+  if (!hasBirthdayPassedThisYear) {
+    age--;
+  }
+
+  return age;
+};
+
+export const transformLabel = (label: string): string => {
+  if (typeof label !== 'string') {
+    return label;
+  }
+  return label
+    ?.toLowerCase() // Convert to lowercase to standardize
+    .replace(/[_-]/g, ' ') // Replace underscores and hyphens with spaces
+    .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize the first letter of each word
+};
+
+export const firstLetterInUpperCase = (label: string): string => {
+  if (!label) {
+    return '';
+  }
+
+  return label
+    ?.split(' ')
+    ?.map((word) => word?.charAt(0).toUpperCase() + word?.slice(1))
+    ?.join(' ');
+};
+
+export function getReassignPayload(
+  removedId: Array<string>,
+  newCohortId: Array<string>
+) {
+  const cohortId = newCohortId;
+  const removedIds = removedId.filter((id: string) => !cohortId.includes(id));
+
+  return { cohortId, removedIds };
+}
+
+export const filterSchema = (schemaObj: any, role: any) => {
+  const locationFields =
+    role === 'mentor' ? ['block', 'village'] : ['batch', 'center'];
+
+  const extractedFields: any = {};
+  locationFields.forEach((field) => {
+    if (schemaObj.schema.properties[field]) {
+      extractedFields[field] = {
+        title: schemaObj.schema.properties[field].title,
+        fieldId: schemaObj.schema.properties[field].fieldId,
+        field_type: schemaObj.schema.properties[field].field_type,
+        maxSelection: schemaObj.schema.properties[field].maxSelection,
+        isMultiSelect: schemaObj.schema.properties[field].isMultiSelect,
+        'ui:widget': schemaObj.uiSchema[field]?.['ui:widget'] || 'select',
+      };
+    }
+  });
+
+  const newSchema = JSON.parse(JSON.stringify(schemaObj)); // Deep copy
+  locationFields.forEach((field) => {
+    delete newSchema.schema.properties[field];
+    delete newSchema.uiSchema[field];
+  });
+
+  return { newSchema, extractedFields };
+};
+
 // Function to truncate URL if it's too long
 export const truncateURL = (
   url: string,

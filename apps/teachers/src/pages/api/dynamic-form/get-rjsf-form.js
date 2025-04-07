@@ -154,7 +154,10 @@ function generateSchemaAndUISchema(fields) {
       schemaField.enum = options?.map((opt) => opt.value);
       schemaField.enumNames = options?.map((opt) => opt.label);
       uiSchema[name] = {
-        'ui:widget': 'radio',
+        'ui:widget': 'CustomRadioWidget',
+        'ui:options': {
+          hideError: true, // ✅ hides automatic error rendering
+        },
       };
     } else if (type === 'drop_down' || type === 'checkbox') {
       if (schemaField?.isMultiSelect === true) {
@@ -174,10 +177,11 @@ function generateSchemaAndUISchema(fields) {
               'CustomCheckboxWidget'
             : schemaField?.isMultiSelect === true
             ? 'CustomMultiSelectWidget'
-            : 'select',
+            : 'CustomSingleSelectWidget',
         'ui:options': {
           multiple: schemaField?.isMultiSelect === true ? true : false,
           uniqueItems: schemaField?.isMultiSelect === true ? true : false,
+          hideError: schemaField?.isMultiSelect === true ? false : true,
         },
       };
     } else if (type === 'date') {
@@ -218,6 +222,7 @@ function generateSchemaAndUISchema(fields) {
         'ui:options': {
           minValue: minDate, // Default minValue (optional)
           maxValue: maxDate, // Default maxValue (optional)
+          hideError: true,
         },
       };
     } else if (type === 'dateTime') {
@@ -225,8 +230,8 @@ function generateSchemaAndUISchema(fields) {
       uiSchema[name] = { 'ui:widget': 'dateTime' };
     } else {
       uiSchema[name] = {
-        'ui:widget': 'text',
-        'ui:options': { validateOnBlur: true },
+        'ui:widget': 'CustomTextFieldWidget',
+        'ui:options': { validateOnBlur: true, hideError: true },
       };
     }
 
@@ -252,5 +257,33 @@ function generateSchemaAndUISchema(fields) {
     schema.properties[name] = schemaField;
   });
 
+  //form order schema
+  let originalOrder = Object.keys(schema.properties);
+  const finalUiOrder = reorderUiOrder(originalOrder, preferredOrder);
+  uiSchema['ui:order'] = finalUiOrder;
+
   return { schema, uiSchema };
 }
+
+const reorderUiOrder = (originalOrder, preferredOrder) => {
+  const preferredSet = new Set(preferredOrder);
+
+  const ordered = [
+    ...preferredOrder.filter((field) => originalOrder.includes(field)),
+    ...originalOrder.filter((field) => !preferredSet.has(field)),
+  ];
+
+  return ordered;
+};
+const preferredOrder = [
+  'state',
+  'district',
+  'block',
+  'village',
+  'center',
+  'parentId',
+  'batch',
+  'board',
+  'medium',
+  'grade',
+];
