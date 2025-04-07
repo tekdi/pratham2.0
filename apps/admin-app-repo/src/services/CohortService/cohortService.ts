@@ -148,7 +148,8 @@ export const bulkCreateCohortMembers = async (payload: any): Promise<any> => {
     return response.data;
   } catch (error) {
     console.error('Error in bulk creating cohort members', error);
-    throw error;
+    // throw error;
+    return null;
   }
 };
 
