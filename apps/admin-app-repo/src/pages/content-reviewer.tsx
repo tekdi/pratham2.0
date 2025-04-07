@@ -30,6 +30,8 @@ import TenantService from '@/services/TenantService';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
+import { transformLabel } from '@/utils/Helper';
+
 
 const ContentReviewer = () => {
   const theme = useTheme<any>();
@@ -146,6 +148,7 @@ const ContentReviewer = () => {
     {
       key: 'status',
       label: 'Status',
+      render: (row: any) => transformLabel(row.status),
       getStyle: (row: any) => ({
         color: row.status === 'active' ? 'green' : 'red',
       }),
@@ -198,7 +201,7 @@ const ContentReviewer = () => {
     },
     {
       key: 'SUBJECT',
-      label: 'subject',
+      label: 'Subject',
       render: (row) => {
         const subject =
           row.customFields
@@ -282,6 +285,7 @@ const ContentReviewer = () => {
         setEditableUserId(row?.userId);
         handleOpenModal();
       },
+      show: (row) => row.status !== 'archived'
     },
     {
       icon: (
@@ -312,6 +316,7 @@ const ContentReviewer = () => {
         searchData(prefilledFormData, currentPage);
         setOpenModal(false);
       },
+      show: (row) => row.status !== 'archived'
     },
   ];
 
@@ -357,6 +362,9 @@ const ContentReviewer = () => {
   const notificationMessage =
     'CONTENT_REVIEWERS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
+  useEffect(() => {
+    setPrefilledFormData(initialFormDataSearch);
+  }, []);
 
   return (
     <>
