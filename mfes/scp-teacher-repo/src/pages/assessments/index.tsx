@@ -439,7 +439,7 @@ const Assessments = () => {
         </Grid>
         <Grid item xs={12} md={6}>
           <Box sx={{ mt: 2, px: '20px', width: '100%' }}>
-            <FormControl fullWidth>
+            <FormControl sx={{ marginTop: '20px' }} fullWidth>
               <InputLabel
                 style={{
                   color: theme?.palette?.warning['A200'],

@@ -43,7 +43,6 @@ import CenterDropdown from '@/components/CenterSelection';
 import BatchList from '@/components/BatchList';
 import manageUserStore from '@/store/manageUserStore';
 
-
 const CentersPage = () => {
   const { t } = useTranslation();
   const theme = useTheme<any>();
@@ -183,7 +182,9 @@ const CentersPage = () => {
     telemetryFactory.interact(telemetryInteract);
   };
 
-  const handleBatchSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBatchSearchChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setBatchSearchInput(event.target.value);
   };
 
@@ -345,7 +346,7 @@ const CentersPage = () => {
   const handleCenterChange = (cohortId: any) => {
     setSelectedCenter(cohortId);
     localStorage.setItem('centerId', cohortId);
-  
+
     if (cohortId) {
       getBlocksByCenterId(cohortId).then((res) => {
         console.log('Fetched batches:', res); // Log the fetched data
@@ -358,20 +359,22 @@ const CentersPage = () => {
     }
   };
 
-  console.log("filtered batches before render:", filteredBatches);
+  console.log('filtered batches before render:', filteredBatches);
 
   const handleOpenAddBatchModal = () => {};
 
   const filteredBatchList = useMemo(() => {
     if (!filteredBatches) return [];
-  
+
     if (!batchSearchInput) {
       return filteredBatches; // Return all batches if search input is empty
     }
-  
+
     return filteredBatches.filter((batch) => {
       if (batch.name) {
-        return batch.name.toLowerCase().includes(batchSearchInput.toLowerCase());
+        return batch.name
+          .toLowerCase()
+          .includes(batchSearchInput.toLowerCase());
       }
       return false; // Or handle undefined values differently
     });
@@ -414,7 +417,6 @@ const CentersPage = () => {
               >
                 <Tab value={1} label={t('COMMON.BATCHES')} />
                 <Tab value={2} label={t('COMMON.FACILITATORS')} />
-                
               </Tabs>
             )}
           </Box>
