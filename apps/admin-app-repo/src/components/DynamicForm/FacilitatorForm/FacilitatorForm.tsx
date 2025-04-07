@@ -21,7 +21,11 @@ import { createUser, updateUser } from '@/services/CreateUserService';
 import { getUserFullName, toPascalCase } from '@/utils/Helper';
 import { sendCredentialService } from '@/services/NotificationService';
 import { showToastMessage } from '@/components/Toastify';
-import { splitUserData, telemetryCallbacks } from '../DynamicFormCallback';
+import {
+  notificationCallback,
+  splitUserData,
+  telemetryCallbacks,
+} from '../DynamicFormCallback';
 const FacilitatorForm = ({
   t,
   SuccessCallback,
@@ -42,6 +46,10 @@ const FacilitatorForm = ({
   successUpdateMessage,
   telemetryUpdateKey,
   failureUpdateMessage,
+  notificationContext,
+  notificationKey,
+  notificationMessage,
+  telemetryCreateKey,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [alteredSchema, setAlteredSchema] = useState<any>(null);
@@ -392,48 +400,22 @@ const FacilitatorForm = ({
     if (responseUserData?.userData?.userId) {
       showToastMessage(t(successCreateMessage), 'success');
 
+      telemetryCallbacks(telemetryCreateKey);
       SuccessCallback();
-      let creatorName;
 
-      if (typeof window !== 'undefined' && window.localStorage) {
-        creatorName = getUserFullName();
-      }
-
-      let replacements: { [key: string]: string };
-      const key = 'onFacilitatorCreated';
-      const context = 'USER';
-      const isQueue = false;
-
-      replacements = {};
-      if (creatorName) {
-        replacements = {
-          '{FirstName}': toPascalCase(transformedFormData?.firstName),
-          '{UserName}': transformedFormData?.email,
-          '{Password}': transformedFormData?.password,
-          '{appUrl}': (process.env.NEXT_PUBLIC_TEACHER_APP_URL as string) || '',
-        };
-      }
-
-      const sendTo = {
-        receipients: [transformedFormData?.email],
-      };
-
-      if (Object.keys(replacements).length !== 0 && sendTo) {
-        const response = await sendCredentialService({
-          isQueue,
-          context,
-          key,
-          replacements,
-          email: sendTo,
-        });
-        if (
-          response?.email?.data[0]?.result ===
-          'Email notification sent successfully'
-        ) {
-          showToastMessage(t('MENTOR.MENTOR_CREATED_SUCCESSFULLY'), 'success');
-        } else {
-          showToastMessage(t('MENTOR.MENTOR_CREATED'), 'success');
-        }
+      // Send Notification with credentials to user
+      try {
+        await notificationCallback(
+          successCreateMessage,
+          notificationContext,
+          notificationKey,
+          transformedFormData,
+          t,
+          notificationMessage
+        );
+      } catch (notificationError) {
+        console.error('Notification failed:', notificationError);
+        // No failure toast here to prevent duplicate messages
       }
     } else {
       showToastMessage(t(failureCreateMessage), 'error');

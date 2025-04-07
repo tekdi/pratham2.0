@@ -1,5 +1,6 @@
 import React from 'react';
 import { getCohortList } from '@/services/CohortService/cohortService';
+import { transformLabel } from '@/utils/Helper';
 
 const CenterLabel = ({ parentId }: any) => {
   const [centerLabel, setCenterLabel] = React.useState('');
@@ -19,7 +20,7 @@ const CenterLabel = ({ parentId }: any) => {
     };
   }, [parentId]);
 
-  return <>{centerLabel}</>;
+  return <>{transformLabel(centerLabel)}</>;
 };
 
 const getCenterLabel = async (parentId: any) => {
