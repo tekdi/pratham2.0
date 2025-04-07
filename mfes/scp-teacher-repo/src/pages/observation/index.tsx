@@ -289,7 +289,7 @@ const ObservationForms: React.FC = () => {
       </Box>
 
       <Box>
-        <Grid container spacing={2}>
+        <Grid container spacing={2} alignItems="center">
           <Grid item xs={12} sm={12} md={6} lg={4}>
             <SearchBar
               onSearch={handleSearch}
@@ -299,8 +299,8 @@ const ObservationForms: React.FC = () => {
             />
           </Grid>
 
-          <Grid item xs={12} sm={12} md={6} lg={4}>
             {value === 0 && (
+          <Grid item xs={12} sm={12} md={6} lg={4}>
               <FormControl
                 sx={{
                   width: { xs: '100%', sm: '100%', md: '100%' },
@@ -328,8 +328,8 @@ const ObservationForms: React.FC = () => {
                   </MenuItem>
                 </Select>
               </FormControl>
-            )}
           </Grid>
+            )}
 
           <Grid item xs={12} sm={12} md={6} lg={4}>
             {typeof window !== 'undefined' &&

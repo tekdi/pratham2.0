@@ -29,6 +29,7 @@ import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import TenantService from '@/services/TenantService';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
+import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 
 const StateLead = () => {
   const theme = useTheme<any>();
@@ -42,7 +43,7 @@ const StateLead = () => {
   const [pageOffset, setPageOffset] = useState<number>(0);
   const [prefilledFormData, setPrefilledFormData] = useState({});
   const [loading, setLoading] = useState<boolean>(false);
-  const [response, setResponse] = useState({});
+  const [response, setResponse] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -252,7 +253,7 @@ const StateLead = () => {
 
   useEffect(() => {
     setPrefilledFormData(initialFormDataSearch);
-  });
+  }, []);
   return (
     <>
       <Box display={'flex'} flexDirection={'column'} gap={2}>
@@ -332,7 +333,9 @@ const StateLead = () => {
           />
         </SimpleModal>
 
-        {response && response?.result?.getUserDetails ? (
+        {response != null ? (
+        <>
+          {response && response?.result?.getUserDetails ? (
           <Box sx={{ mt: 1 }}>
             <PaginatedTable
               count={response?.result?.totalCount}
@@ -356,6 +359,9 @@ const StateLead = () => {
               {t('COMMON.NO_STATE_LEAD_FOUND')}
             </Typography>
           </Box>
+        )}
+        </>) : (
+          <CenteredLoader />
         )}
       </Box>
     </>
