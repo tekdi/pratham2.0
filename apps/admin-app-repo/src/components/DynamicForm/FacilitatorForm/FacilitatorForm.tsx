@@ -411,7 +411,8 @@ const FacilitatorForm = ({
           notificationKey,
           transformedFormData,
           t,
-          notificationMessage
+          notificationMessage,
+          type
         );
       } catch (notificationError) {
         console.error('Notification failed:', notificationError);
