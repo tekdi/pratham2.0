@@ -134,7 +134,7 @@ const Learner = () => {
       const mustRequired = [
         'firstName',
         'lastName',
-        'email',
+        // 'email',
         'mobile',
         'dob',
         'gender',
@@ -254,7 +254,7 @@ const Learner = () => {
     },
     {
       keys: ['dob'],
-      label: 'DOB',
+      label: 'Date Of Birth',
       render: (row) => formatDateToDDMMYYYY(row.dob) || '',
     },
     {
