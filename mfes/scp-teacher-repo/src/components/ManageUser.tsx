@@ -35,6 +35,7 @@ import Loader from './Loader';
 import ReassignModal from './ReassignModal';
 import SearchBar from './Searchbar';
 import SimpleModal from './SimpleModal';
+import FacilitatorManage from '@/shared/FacilitatorManage/FacilitatorManage';
 
 interface Cohort {
   cohortId: string;
@@ -154,10 +155,34 @@ const ManageUser: React.FC<ManageUsersProps> = ({
         if (cohortId) {
           const limit = 10;
           const page = offset;
+          let stateIds = [];
+          let districtIds = [];
+          let blockIds = [];
+          if (localStorage.getItem('userData')) {
+            try {
+              const customFields = JSON.parse(
+                localStorage.getItem('userData')
+              ).customFields;
+
+              const getSelectedValueIds = (label) => {
+                const field = customFields.find(
+                  (f) => f.label.toLowerCase() === label.toLowerCase()
+                );
+                return (
+                  field?.selectedValues?.map((val) => val.id.toString()) || []
+                );
+              };
+
+              stateIds = getSelectedValueIds('STATE');
+              districtIds = getSelectedValueIds('DISTRICT');
+              blockIds = getSelectedValueIds('BLOCK');
+            } catch (e) {}
+          }
+
           const filters = {
-            state: store.stateCode,
-            district: store.districtCode,
-            block: store.blockCode,
+            state: stateIds,
+            district: districtIds,
+            block: blockIds,
             role: Role.TEACHER,
             status: [Status.ACTIVE],
           };
@@ -279,8 +304,8 @@ const ManageUser: React.FC<ManageUsersProps> = ({
         const centerNames = cohortNamesArray?.map((cohortName: string) =>
           cohortName.trim()
         ) || [t('ATTENDANCE.NO_CENTERS_ASSIGNED')];
-        setCenters(centerNames);fieldName:
-        setSelectedUser(user);
+        setCenters(centerNames);
+        fieldName: setSelectedUser(user);
       }
 
       if (
@@ -1013,7 +1038,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
               </SimpleModal>
             )}
             {openAddFacilitatorModal && (
-              <AddFacilitatorModal
+              <FacilitatorManage
                 open={openAddFacilitatorModal}
                 onClose={handleCloseAddFaciModal}
                 onFacilitatorAdded={handleFacilitatorAdded}
