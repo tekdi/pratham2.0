@@ -146,8 +146,14 @@ const CohortBatchSelector: React.FC<> = ({
     <Box display="flex" flexDirection="column" height="100%">
       {step === 'cohort' ? (
         <>
+          <Box sx={{display:"flex" , justifyContent:"flex-start" , mb:2}} onClick={handleBackPress}>
+            <ArrowBackIcon />
+            <Typography variant="h2">
+              {t('MENTOR.BACK_TO_FORM')}
+            </Typography>
+          </Box>
           <Box flex={1} overflow="auto">
-            <Typography variant="h2" mb={1} ml={1}>
+            <Typography variant="h2" mb={1}>
               Select Center
             </Typography>
             <Box>
@@ -217,16 +223,11 @@ const CohortBatchSelector: React.FC<> = ({
             position="sticky"
             bottom={0}
             bgcolor="#fff"
-            p={2}
             borderTop="1px solid #eee"
             display="flex"
+            padding = "16px  0 0 0"
+            width={"100%"}
           >
-            <IconButton onClick={handleBackPress}>
-              <ArrowBackIcon />
-              <Typography variant="h2" ml={1}>
-                {t('MENTOR.BACK_TO_FORM')}
-              </Typography>
-            </IconButton>
             <Button
               fullWidth
               variant="contained"
@@ -234,6 +235,8 @@ const CohortBatchSelector: React.FC<> = ({
               disabled={Object.values(selectedMap).every(
                 (set) => set.size === 0
               )}
+              sx={{
+                width: '100%'}}
             >
               {t('MENTOR.FINISH_ASSIGN')}
             </Button>
@@ -247,7 +250,7 @@ const CohortBatchSelector: React.FC<> = ({
             zIndex={10}
             bgcolor="#fff"
             px={2}
-            py={1}
+            pt={1}
             borderBottom="1px solid #eee"
             display="flex"
             alignItems="center"
