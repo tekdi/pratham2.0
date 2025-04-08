@@ -429,6 +429,7 @@ export const generateUsernameAndPassword = (
   return { username, password };
 };
 
+
 export const mapFieldIdToValue = (
   fields: CustomField[]
 ): { [key: string]: string } => {

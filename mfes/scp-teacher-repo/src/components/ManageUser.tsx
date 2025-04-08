@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Button, Grid, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 
@@ -59,6 +60,7 @@ interface ManageUsersProps {
   cohortData?: any;
   isFromFLProfile?: boolean;
   teacherUserId?: string;
+  hideSearch?: boolean;
 }
 
 const ManageUser: React.FC<ManageUsersProps> = ({
@@ -67,6 +69,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
   cohortData,
   isFromFLProfile = false,
   teacherUserId,
+  hideSearch = false,
 }) => {
   const { t } = useTranslation();
   const theme = useTheme<any>();
@@ -615,11 +618,14 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                 sx={{ display: 'flex', alignItems: 'center', direction: 'row' }}
                 container
               >
-                <SearchBar
-                  onSearch={handleSearch}
-                  value={searchTerm}
-                  placeholder={t('COMMON.SEARCH_FACILITATORS')}
-                />
+                {!hideSearch && (
+                  <SearchBar
+                    onSearch={handleSearch}
+                    value={searchTerm}
+                    placeholder={t('COMMON.SEARCH_FACILITATORS')}
+                  />
+                )}
+
                 <Box mt={'18px'} px={'18px'} ml={'10px'}>
                   <Button
                     sx={{

@@ -193,7 +193,8 @@ export const notificationCallback = async (
   key: any,
   payload: any,
   t: any,
-  successMessageKey: any
+  successMessageKey: any,
+  type: any
 ) => {
   const isQueue = false;
 
@@ -214,14 +215,22 @@ export const notificationCallback = async (
   if (creatorName) {
     replacements = {
       '{FirstName}': firstLetterInUpperCase(payload?.firstName),
-      '{UserName}': payload?.email,
+      '{UserName}': payload?.username,
       '{Password}': payload?.password,
       '{appUrl}': cleanedUrl || '', //TODO: check url
     };
   }
 
+  let sentEmail = payload?.email;
+  //learner tst
+  if (type == 'learner') {
+    try {
+      sentEmail = JSON.parse(localStorage.getItem('userData'))?.email;
+    } catch (e) {}
+  }
+
   const sendTo = {
-    receipients: [payload?.email],
+    receipients: [sentEmail],
   };
   if (Object.keys(replacements).length !== 0 && sendTo) {
     const response = await sendCredentialService({

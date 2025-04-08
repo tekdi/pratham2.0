@@ -82,7 +82,7 @@ const LearnerManage = ({ open, onClose, onLearnerAdded, cohortId }: any) => {
       const mustRequired = [
         'firstName',
         'lastName',
-        'email',
+        // 'email',
         'mobile',
         'dob',
         'gender',
