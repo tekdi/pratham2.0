@@ -346,6 +346,7 @@ const Batch = () => {
           filters: {
             cohortId: row?.cohortId,
             status: ['active'],
+            role:'Learner',
           },
         };
         const response = await fetchCohortMemberList(data);
