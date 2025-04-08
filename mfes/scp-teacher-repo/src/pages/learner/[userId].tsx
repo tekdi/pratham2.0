@@ -49,7 +49,7 @@ import {
   Card,
   CardContent,
   Grid,
-  Typography
+  Typography,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { GetStaticPaths } from 'next';
@@ -58,10 +58,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import React, { ComponentType, useEffect, useState } from 'react';
-import {
-  accessControl,
-  AttendanceAPILimit
-} from '../../../app.config';
+import { accessControl, AttendanceAPILimit } from '../../../app.config';
 import { isEliminatedFromBuild } from '../../../featureEliminationUtil';
 import { useDirection } from '../../hooks/useDirection';
 let AssessmentReport: ComponentType<AssessmentReportProp> | null = null;
@@ -92,8 +89,8 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
   const { userId }: any = router.query;
   const store = useStore();
   const isActiveYear = store.isActiveYearSelected;
-  const [selectedUserEmail, setSelectedUserEmail] = useState("");
-  const [selectedUserUserName, setSelectedUserUserName] = useState("");
+  const [selectedUserEmail, setSelectedUserEmail] = useState('');
+  const [selectedUserUserName, setSelectedUserUserName] = useState('');
   const [assesmentData, setAssesmentData] = useState<any>(null);
   const [test, setTest] = React.useState('Pre Test');
   const [subject, setSubject] = React.useState('English');
@@ -159,7 +156,7 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
   };
 
   const mapFields = (formFields: any, response: any) => {
-    response.userData.phone_number=response.userData.mobile
+    response.userData.phone_number = response.userData.mobile;
     const initialFormData: any = {};
     formFields.fields.forEach((item: any) => {
       const userData = response?.userData;
@@ -210,9 +207,8 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
           }
         }
       } else {
-
         if (customFieldValue) {
-          const fieldValue = getValue(userData, customFieldValue); 
+          const fieldValue = getValue(userData, customFieldValue);
           if (fieldValue) {
             initialFormData[item.name] = fieldValue;
           }
@@ -227,9 +223,6 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
       const response = await getUserDetails(userId, true);
       setSelectedUserUserName(response?.result?.userData?.username);
       setSelectedUserEmail(response?.result?.userData?.email);
-   
-
-
 
       const formFields = await getFormRead(
         FormContext.USERS,
@@ -306,20 +299,23 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
             const data = response;
             if (data) {
               const coreFieldData = data?.result?.userData;
-              let fullName = "";
+              let fullName = '';
 
               if (coreFieldData?.firstName) {
                 fullName += toPascalCase(coreFieldData.firstName);
               }
-              
+
               if (coreFieldData?.middleName) {
-                fullName += (fullName ? " " : "") + toPascalCase(coreFieldData.middleName);
+                fullName +=
+                  (fullName ? ' ' : '') +
+                  toPascalCase(coreFieldData.middleName);
               }
-              
+
               if (coreFieldData?.lastName) {
-                fullName += (fullName ? " " : "") + toPascalCase(coreFieldData.lastName);
+                fullName +=
+                  (fullName ? ' ' : '') + toPascalCase(coreFieldData.lastName);
               }
-              
+
               setUserName(fullName);
               const fields: CustomField[] =
                 data?.result?.userData?.customFields;
@@ -345,9 +341,7 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
                     FormContext.USERS,
                     FormContextType.STUDENT
                   );
-                  if (response) {    
-
-
+                  if (response) {
                     const mergeData = (
                       fieldIdToValueMap: { [key: string]: string },
                       response: any
@@ -445,8 +439,8 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
             selectedOption !== '-'
               ? selectedOption.label
               : field?.value
-                ? translateString(t, field?.value)
-                : '-',
+              ? translateString(t, field?.value)
+              : '-',
         };
       }
       return {
@@ -683,7 +677,6 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
     setIsLearnerDeleted(true);
   };
 
-
   return (
     <>
       <Header />
@@ -853,7 +846,9 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
                     <Grid item xs={6}>
                       <StudentStatsCard
                         label1={t('COMMON.ATTENDANCE') + ' (%)'}
-                        value1={`${Math.round(overallAttendance?.present_percentage || 0)}%`}
+                        value1={`${Math.round(
+                          overallAttendance?.present_percentage || 0
+                        )}%`}
                         label2={false}
                         value2=""
                       />
@@ -1021,7 +1016,8 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
         </Box>
       </Box>
       {!isEliminatedFromBuild('AssessmentReport', 'component') &&
-        AssessmentReport && isActiveYear && (
+        AssessmentReport &&
+        isActiveYear && (
           <Box padding={2}>
             <Card
               sx={{
