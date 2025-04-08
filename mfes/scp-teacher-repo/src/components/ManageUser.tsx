@@ -85,6 +85,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
       lastName?: string;
       userId: string;
       cohortNames?: string;
+      batchNames?: any []
     }[]
   >([]);
   const [loading, setLoading] = React.useState(false);
@@ -231,6 +232,17 @@ const ManageUser: React.FC<ManageUsersProps> = ({
             (user: any, index: number) => {
               const cohorts = cohortDetails[index] || [];
 
+              const batches = cohorts.flatMap((cohort: any) =>
+                (cohort.childData || []).filter((child: any) => child.type === 'BATCH')
+              )
+
+              const batchNames = cohorts.flatMap((cohort: any) =>
+                (cohort.childData || [])
+                  .filter((child: any) => child.type === 'BATCH')
+                  .map((child: any) => child.name)
+              );
+              console.log('### batchNames ===>', batchNames);
+
               const cohortNames = cohorts
                 .filter(
                   ({ cohortStatus }: any) => cohortStatus === Status.ACTIVE
@@ -248,6 +260,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                   })
                 ),
                 cohortNames: cohortNames || null,
+                batchNames: batchNames || null
               };
             }
           );
@@ -562,6 +575,12 @@ const ManageUser: React.FC<ManageUsersProps> = ({
     }
     return cohortNames;
   };
+
+  const getBatchNames = (cohortNames: any) => {
+    if (!Array.isArray(cohortNames)) return null;
+  return cohortNames.join(', ');
+  };
+
   const handleSearch = (searchTerm: string) => {
     const term = searchTerm;
     setSearchTerm(term);
@@ -778,11 +797,11 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                               }}
                                             >
                                               {user?.cohortNames
-                                                ? getCohortNames(
-                                                    user.cohortNames
+                                                ? getBatchNames(
+                                                    user.batchNames
                                                   )
                                                 : t(
-                                                    'ATTENDANCE.NO_CENTERS_ASSIGNED'
+                                                    'ATTENDANCE.NO_BATCHES_ASSIGNED'
                                                   )}
                                             </Box>
                                           </Box>

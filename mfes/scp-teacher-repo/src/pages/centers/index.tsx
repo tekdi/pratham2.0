@@ -512,9 +512,7 @@ const CentersPage = () => {
               </Box>
               <Box sx={{ minWidth: '300px' }}>
                 <CenterDropdown
-                  blockId={userStore.blockId}
                   cohortId={selectedCenter}
-                  roleName="teacher"
                   onChange={handleCenterChange}
                 />
               </Box>

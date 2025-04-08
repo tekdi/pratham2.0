@@ -149,10 +149,11 @@ export const getBlocksByCenterId = async (centerId: string): Promise<any[]> => {
   const apiUrl: string = API_ENDPOINTS.cohortSearch;
 
   const data = {
-    limit: 20,
+    limit: 50,
     offset: 0,
     filters: {
-      parentId: [centerId]
+      parentId: [centerId],
+      status: ["active"]
     }
   };
 
