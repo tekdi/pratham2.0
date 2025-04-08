@@ -241,6 +241,20 @@ export const updateCohort = async (
   }
 };
 
+export const updateBatch = async (
+  cohortId: string,
+  name: string
+): Promise<any> => {
+  const apiUrl = API_ENDPOINTS.cohortUpdate(cohortId);
+  try {
+    const response = await put(apiUrl, { name });
+    return response.data.result;
+  } catch (error) {
+    console.error('Error in updating Batch', error);
+    throw error;
+  }
+};
+
 export const fetchStateOptions = async (data: any) => {
   try {
     const response = await axios.post(API_ENDPOINTS.fieldOptionsRead, data);
