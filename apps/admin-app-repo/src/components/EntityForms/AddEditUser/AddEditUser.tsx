@@ -373,7 +373,8 @@ const AddEditUser = ({
                 notificationKey,
                 payload,
                 t,
-                notificationMessage
+                notificationMessage,
+                type
               );
             } catch (notificationError) {
               console.error('Notification failed:', notificationError);
