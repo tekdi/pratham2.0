@@ -329,6 +329,7 @@ export interface CustomField {
   order: number;
   type: any;
   value: string;
+  selectedValues: Array<{id: string, value: string}>;
 }
 export interface CohortAttendanceListViewProps {
   cohortName: string;

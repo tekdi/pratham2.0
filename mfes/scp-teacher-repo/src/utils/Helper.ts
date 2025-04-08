@@ -433,8 +433,10 @@ export const mapFieldIdToValue = (
   fields: CustomField[]
 ): { [key: string]: string } => {
   return fields?.reduce(
-    (acc: { [key: string]: string }, field: CustomField) => {
-      acc[field.fieldId] = field.value;
+    (acc: { [key: string]: any }, field: CustomField) => {
+      acc[field.fieldId] = typeof field?.selectedValues?.[0] === 'object' 
+        ? field?.selectedValues?.[0]?.value 
+        : field?.selectedValues?.[0] || field?.value || '';
       return acc;
     },
     {}
