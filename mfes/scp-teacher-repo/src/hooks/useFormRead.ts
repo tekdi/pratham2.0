@@ -5,7 +5,8 @@ import API_ENDPOINTS from '@/utils/API/APIEndpoints';
 
 export const getFormRead = async (
   context: string,
-  contextType: string
+  contextType: string,
+  isTenantRequired?:  true
 ): Promise<any> => {
   try {
     if (typeof window !== 'undefined' && window.localStorage) {
@@ -22,7 +23,10 @@ export const getFormRead = async (
               .map(([key, value]) => `${key}=${value}`)
               .join('&');
           },
-          headers: { tenantId: tenantId, Authorization : `Bearer ${token}`},
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            ...(isTenantRequired && { tenantId }), // Add tenantId only if isTenantRequired is true
+          },
         }
       );
       const sortedFields = response?.data?.result.fields?.sort(
