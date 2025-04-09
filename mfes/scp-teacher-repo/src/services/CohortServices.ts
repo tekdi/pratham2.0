@@ -149,7 +149,7 @@ export const getBlocksByCenterId = async (centerId: string): Promise<any[]> => {
   const apiUrl: string = API_ENDPOINTS.cohortSearch;
 
   const data = {
-    limit: 50,
+    limit: 100,
     offset: 0,
     filters: {
       parentId: [centerId],
