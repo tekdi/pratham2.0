@@ -1,8 +1,13 @@
 import React from 'react';
-import { Card, CardContent, Typography, Grid } from '@mui/material';
+import { Card, CardContent, Typography, Grid, Box, Button } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
-import { Role } from '@/utils/app.constant';
+
+interface Subject {
+  id: string;
+  value: string;
+  label: string;
+}
 
 interface ProfileDetailsProps {
   fullName: string;
@@ -16,14 +21,14 @@ interface ProfileDetailsProps {
   mentorId?: string;
   gender?: string;
   age?: number;
-  dob?:string;
-  village?:string|null,
-  middleName?:string|null;
-  userName?:string|null;
-  firstName?:string|null;
-  lastName?:string|null;
-
-
+  dob?: string;
+  village?: string | null;
+  middleName?: string | null;
+  userName?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  subjectsITeach?: Subject[];
+  myMainSubjects?: Subject[];
 }
 
 const Profile: React.FC<ProfileDetailsProps> = ({
@@ -43,10 +48,16 @@ const Profile: React.FC<ProfileDetailsProps> = ({
   userName,
   middleName,
   firstName,
-  lastName
+  lastName,
+  subjectsITeach = [],
+  myMainSubjects = [],
 }) => {
   const { t } = useTranslation();
   const theme = useTheme<any>();
+
+  // Extract IDs of "MY_MAIN_SUBJECTS" for matching
+  const mainSubjectIds = new Set(myMainSubjects.map((subject) => subject.id));
+
   return (
     <Card
       sx={{
@@ -57,100 +68,57 @@ const Profile: React.FC<ProfileDetailsProps> = ({
       }}
     >
       <CardContent>
-        {true ?(
-          <>
-          <Typography
-          color={theme.palette.warning['500']}
-          sx={{ fontSize: '12px', fontWeight: 600 }}
-        >
-          {t('SCP_PROFILE.FULL_NAME')}
-        </Typography>
-        <Typography
-          color={theme.palette.warning['A200']}
-          sx={{ fontSize: '16px', fontWeight: 400 }}
-          gutterBottom
-        >
-          {fullName}
-        </Typography>
-        </>):
-         <>
-         <Typography
-         color={theme.palette.warning['500']}
-         sx={{ fontSize: '12px', fontWeight: 600 }}
-       >
-         {t('SCP_PROFILE.FIRST_NAME')}
-       </Typography>
-       <Typography
-         color={theme.palette.warning['A200']}
-         sx={{ fontSize: '16px', fontWeight: 400 }}
-         gutterBottom
-       >
-         {firstName}
-       </Typography>
-       <Typography
-         color={theme.palette.warning['500']}
-         sx={{ fontSize: '12px', fontWeight: 600 }}
-       >
-         {t('SCP_PROFILE.MIDDLE_NAME')}
-       </Typography>
-       <Typography
-         color={theme.palette.warning['A200']}
-         sx={{ fontSize: '16px', fontWeight: 400 }}
-         gutterBottom
-       >
-         {middleName}
-       </Typography>
-       <Typography
-         color={theme.palette.warning['500']}
-         sx={{ fontSize: '12px', fontWeight: 600 }}
-       >
-         {t('SCP_PROFILE.LAST_NAME')}
-       </Typography>
-       <Typography
-         color={theme.palette.warning['A200']}
-         sx={{ fontSize: '16px', fontWeight: 400 }}
-         gutterBottom
-       >
-         {lastName}
-       </Typography>
-       </>
-        }
-        {(
-          <>
-          <Typography
-          color={theme.palette.warning['500']}
-          sx={{ fontSize: '12px', fontWeight: 600 }}
-        >
-          {t('SCP_PROFILE.USERNAME')}
-        </Typography>
-        <Typography
-          color={theme.palette.warning['A200']}
-          sx={{ fontSize: '16px', fontWeight: 400 }}
-          gutterBottom
-        >
-          {userName}
-        </Typography>
-        </>)}
-
-        <Typography
-          color={theme.palette.warning['500']}
-          sx={{ fontSize: '12px', fontWeight: 600, mt: 2 }}
-        >
-          {t('SCP_PROFILE.EMAIL_ID')}
-        </Typography>
-        <Typography
-          color={theme.palette.warning['A200']}
-          sx={{ fontSize: '16px', fontWeight: 400 }}
-          gutterBottom
-        >
-          {emailId}
-        </Typography>
-
-        
-
         <Grid container spacing={2}>
-         
-          {/* <Grid item xs={6}>
+          <Grid item xs={6}>
+            <Typography
+              color={theme.palette.warning['500']}
+              sx={{ fontSize: '12px', fontWeight: 600 }}
+            >
+              {t('SCP_PROFILE.DESIGNATION')}
+            </Typography>
+            <Typography
+              color={theme.palette.warning['A200']}
+              sx={{ fontSize: '16px', fontWeight: 400 }}
+            >
+              {designation}
+            </Typography>
+          </Grid>
+
+          <Grid item xs={6}>
+            <>
+              <Typography
+                color={theme.palette.warning['500']}
+                sx={{ fontSize: '12px', fontWeight: 600 }}
+              >
+                {t('SCP_PROFILE.USERNAME')}
+              </Typography>
+              <Typography
+                color={theme.palette.warning['A200']}
+                sx={{ fontSize: '16px', fontWeight: 400 }}
+                gutterBottom
+              >
+                {userName}
+              </Typography>
+            </>
+          </Grid>
+
+          <Grid item xs={6}>
+            <Typography
+              color={theme.palette.warning['500']}
+              sx={{ fontSize: '12px', fontWeight: 600 }}
+            >
+              {t('SCP_PROFILE.EMAIL_ID')}
+            </Typography>
+            <Typography
+              color={theme.palette.warning['A200']}
+              sx={{ fontSize: '16px', fontWeight: 400 }}
+              gutterBottom
+            >
+              {emailId}
+            </Typography>
+          </Grid>
+
+          <Grid item xs={6}>
             <Typography
               color={theme.palette.warning['500']}
               sx={{ fontSize: '12px', fontWeight: 600, mt: 2 }}
@@ -163,10 +131,8 @@ const Profile: React.FC<ProfileDetailsProps> = ({
             >
               {joinedOn}
             </Typography>
-          </Grid> */}
-        </Grid>
+          </Grid>
 
-        <Grid container spacing={2}>
           <Grid item xs={6}>
             <Typography
               color={theme.palette.warning['500']}
@@ -181,37 +147,6 @@ const Profile: React.FC<ProfileDetailsProps> = ({
               {phoneNumber}
             </Typography>
           </Grid>
-          <Grid item xs={6}>
-            <Typography
-              color={theme.palette.warning['500']}
-              sx={{ fontSize: '12px', fontWeight: 600, mt: 2 }}
-            >
-              {t('SCP_PROFILE.DESIGNATION')}
-            </Typography>
-            <Typography
-              color={theme.palette.warning['A200']}
-              sx={{ fontSize: '16px', fontWeight: 400 }}
-            >
-              {designation}
-            </Typography>
-          </Grid>
-          {/* <Grid item xs={6}>
-            <Typography
-              color={theme.palette.warning['500']}
-              sx={{ fontSize: '12px', fontWeight: 600, mt: 2 }}
-            >
-              {t('SCP_PROFILE.MENTOR_ID')}
-            </Typography>
-            <Typography
-              color={theme.palette.warning['A200']}
-              sx={{ fontSize: '16px', fontWeight: 400 }}
-            >
-              {mentorId}
-            </Typography>
-          </Grid> */}
-        </Grid>
-
-        <Grid container spacing={2}>
           <Grid item xs={6}>
             <Typography
               color={theme.palette.warning['500']}
@@ -234,24 +169,37 @@ const Profile: React.FC<ProfileDetailsProps> = ({
               {dob}
             </Typography>
           </Grid>
-          <Grid item xs={6}>
-          <Typography
-          color={theme.palette.warning['500']}
-          sx={{ fontSize: '12px', fontWeight: 600, mt: 2 }}
-        >
-          {village?t('SCP_PROFILE.STATE_DISTRICT_BLOCK_VILLAGE') : t('SCP_PROFILE.STATE_DISTRICT_BLOCK')}
-        </Typography>
-        <Typography
-          color={theme.palette.warning['A200']}
-          sx={{ fontSize: '16px', fontWeight: 400 }}
-          gutterBottom
-        >
-           {village? village+" , ":""}{block}, {district},  {state}
-        </Typography>
-          </Grid>
-        
         </Grid>
-        
+
+        {/* Subjects I Teach Section */}
+        <Box mt={4}>
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: 'bold', mb: 2, color: theme.palette.warning['500'] }}
+          >
+            {t('SCP_PROFILE.SUBJECTS_I_TEACH')}
+          </Typography>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+            {subjectsITeach.map((subject) => {
+              const isHighlighted = mainSubjectIds.has(subject.id);
+              return (
+                <Button
+                  key={subject.id}
+                  variant="contained"
+                  sx={{
+                    backgroundColor: isHighlighted ? 'yellow' : 'primary.main',
+                    color: isHighlighted ? 'black' : 'white',
+                    '&:hover': {
+                      backgroundColor: isHighlighted ? 'gold' : 'primary.dark',
+                    },
+                  }}
+                >
+                  {subject.label}
+                </Button>
+              );
+            })}
+          </Box>
+        </Box>
       </CardContent>
     </Card>
   );
