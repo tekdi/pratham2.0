@@ -785,5 +785,12 @@
     "SELF_EMPLOYMENT": "Self-employment",
     "UNEMPLOYED_OR_DOMESTIC_WORK": "Unemployed or Domestic Work"
   },
-  "middle_name": "Middle Name"
+  "middle_name": "Middle Name",
+  "ADDRESS":" Address",
+  "DOB": "Date of Birth",
+  "SUBJECT": "Subject",
+   "UNMARRIED": "Unmarried",
+  "MARRIED": "Married",
+  "DIVORCED": "Divorced",
+  "SELF_PLACED": "Self Placed"
 }

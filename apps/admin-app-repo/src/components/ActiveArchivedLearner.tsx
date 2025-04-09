@@ -30,6 +30,7 @@ const getCountLabel = async (cohortId: any, type: any) => {
       filters: {
         cohortId: cohortId,
         status: [type],
+        role:'Learner'
       },
     };
     const response = await fetchCohortMemberList(data);

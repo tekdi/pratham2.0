@@ -134,7 +134,7 @@ const Learner = () => {
       const mustRequired = [
         'firstName',
         'lastName',
-        'email',
+        // 'email',
         'mobile',
         'dob',
         'gender',
@@ -254,7 +254,7 @@ const Learner = () => {
     },
     {
       keys: ['dob'],
-      label: 'DOB',
+      label: 'Date Of Birth',
       render: (row) => formatDateToDDMMYYYY(row.dob) || '',
     },
     {
@@ -451,6 +451,7 @@ const Learner = () => {
         setEditableUserId(row?.userId);
         handleOpenModal();
       },
+      show: (row) => row.status !== 'archived',
     },
     {
       icon: (
@@ -490,6 +491,7 @@ const Learner = () => {
         setReason('');
         setChecked(false);
       },
+      show: (row) => row.status !== 'archived',
     },
     {
       icon: (
@@ -531,6 +533,7 @@ const Learner = () => {
         setEditableUserId(row?.userId);
         handleOpenModal();
       },
+      show: (row) => row.status !== 'archived',
     },
   ];
 
