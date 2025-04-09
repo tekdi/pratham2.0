@@ -115,13 +115,21 @@ const LoginPage = () => {
       setLang(lang);
       const token = localStorage.getItem('token');
       const tenant = localStorage.getItem('tenantName');
-      if (token && (tenant?.toLocaleLowerCase() === TENANT_DATA?.SECOND_CHANCE_PROGRAM?.toLowerCase() || tenant?.toLocaleLowerCase() === TENANT_DATA?.PRATHAM_SCP?.toLowerCase())) {
-        localStorage.setItem("previousPage", "login");
+      if (
+        token &&
+        (tenant?.toLocaleLowerCase() ===
+          TENANT_DATA?.SECOND_CHANCE_PROGRAM?.toLowerCase() ||
+          tenant?.toLocaleLowerCase() ===
+            TENANT_DATA?.PRATHAM_SCP?.toLowerCase())
+      ) {
+        localStorage.setItem('previousPage', 'login');
         router.push('/dashboard');
-      } else if (token && tenant?.toLowerCase() == TENANT_DATA?.YOUTHNET?.toLowerCase()) {
+      } else if (
+        token &&
+        tenant?.toLowerCase() == TENANT_DATA?.YOUTHNET?.toLowerCase()
+      ) {
         router.push('/youthboard');
-        localStorage.setItem("previousPage", "login");
-
+        localStorage.setItem('previousPage', 'login');
       }
     }
   }, []);
@@ -264,7 +272,6 @@ const LoginPage = () => {
                     userId,
                     headers
                   );
-
                 } catch (updateError) {
                   console.error(
                     'Error updating device notification:',
@@ -295,17 +302,23 @@ const LoginPage = () => {
             setAccessToken(token);
 
             const tenant = localStorage.getItem('tenantName');
-            if (tenant?.toLocaleLowerCase() === TENANT_DATA?.SECOND_CHANCE_PROGRAM?.toLowerCase() || tenant?.toLocaleLowerCase() === TENANT_DATA?.PRATHAM_SCP?.toLowerCase()) {
+            if (
+              tenant?.toLocaleLowerCase() ===
+                TENANT_DATA?.SECOND_CHANCE_PROGRAM?.toLowerCase() ||
+              tenant?.toLocaleLowerCase() ===
+                TENANT_DATA?.PRATHAM_SCP?.toLowerCase()
+            ) {
               const userDetails = await getUserDetails(userId, true);
               if (userDetails?.result?.userData) {
                 const activeSessionId = await getAcademicYearList();
                 const customFields =
                   userDetails?.result?.userData?.customFields;
                 if (customFields?.length) {
-
                   // set customFields in userData
                   let userDataString = localStorage.getItem('userData');
-                  let userData: any = userDataString ? JSON.parse(userDataString) : null;
+                  let userData: any = userDataString
+                    ? JSON.parse(userDataString)
+                    : null;
                   userData.customFields = customFields;
                   localStorage.setItem('userData', JSON.stringify(userData));
 
@@ -320,21 +333,24 @@ const LoginPage = () => {
                   );
 
                   if (state) {
-                    localStorage.setItem('stateName', state?.value);
-                    setStateName(state?.value);
-                    setStateCode(state?.code);
+                    localStorage.setItem(
+                      'stateName',
+                      state?.selectedValues?.[0]?.value
+                    );
+                    setStateName(state?.selectedValues?.[0]?.value);
+                    setStateCode(state?.selectedValues?.[0]?.id);
                     setStateId(state?.fieldId);
                   }
 
                   if (district) {
-                    setDistrictName(district?.value);
-                    setDistrictCode(district?.code);
+                    setDistrictName(district?.selectedValues?.[0]?.value);
+                    setDistrictCode(district?.selectedValues?.[0]?.id);
                     setDistrictId(district?.fieldId);
                   }
 
                   if (block) {
-                    setBlockName(block?.value);
-                    setBlockCode(block?.code);
+                    setBlockName(block?.selectedValues?.[0]?.value);
+                    setBlockCode(block?.selectedValues?.[0]?.id);
                     setBlockId(block?.fieldId);
                   }
                 }
@@ -343,7 +359,10 @@ const LoginPage = () => {
                   router.push('/dashboard');
                 }
               }
-            } else if (token && tenant?.toLowerCase() === TENANT_DATA.YOUTHNET?.toLowerCase()) {
+            } else if (
+              token &&
+              tenant?.toLowerCase() === TENANT_DATA.YOUTHNET?.toLowerCase()
+            ) {
               router.push('/youthboard');
             }
           }
@@ -366,22 +385,22 @@ const LoginPage = () => {
         }
 
         const windowUrl = window.location.pathname;
-    const cleanedUrl = windowUrl.replace(/^\//, '');
-    const env = cleanedUrl.split("/")[0];
-    const telemetryInteract = {
-      context: {
-        env: env,
-        cdata: [],
-      },
-      edata: {
-        id: 'failed-login',
+        const cleanedUrl = windowUrl.replace(/^\//, '');
+        const env = cleanedUrl.split('/')[0];
+        const telemetryInteract = {
+          context: {
+            env: env,
+            cdata: [],
+          },
+          edata: {
+            id: 'failed-login',
 
-        type: Telemetry.CLICK,
-        subtype: '',
-        pageid: cleanedUrl,
-      },
-    };
-    telemetryFactory.interact(telemetryInteract);
+            type: Telemetry.CLICK,
+            subtype: '',
+            pageid: cleanedUrl,
+          },
+        };
+        telemetryFactory.interact(telemetryInteract);
       }
     }
   };
@@ -548,7 +567,7 @@ const LoginPage = () => {
                     alignItems={'center'}
                     justifyContent={'center'}
                     zIndex={99}
-                  // sx={{ margin: '5px 10px 25px', }}
+                    // sx={{ margin: '5px 10px 25px', }}
                   >
                     <Box
                       sx={{
@@ -720,7 +739,9 @@ const LoginPage = () => {
                         logEvent({
                           action: 'remember-me-button-clicked',
                           category: 'Login Page',
-                          label: `Remember Me ${rememberMe ? 'Checked' : 'Unchecked'}`,
+                          label: `Remember Me ${
+                            rememberMe ? 'Checked' : 'Unchecked'
+                          }`,
                         });
                       }}
                     >

@@ -130,7 +130,7 @@ const LoginComponent = () => {
 
       localStorage.setItem('role', receivedToken?.tenantData[0]?.roleName);
       localStorage.setItem('userEmail', receivedToken?.email);
-      localStorage.setItem('userName', receivedToken?.name);
+      localStorage.setItem('userName', receivedToken?.firstName);
       localStorage.setItem('userIdName', receivedToken?.username);
       localStorage.setItem(
         'temporaryPassword',
@@ -155,7 +155,9 @@ const LoginComponent = () => {
           if (customFields?.length) {
             // set customFields in userData
             let userDataString = localStorage.getItem('userData');
-            let userData: any = userDataString ? JSON.parse(userDataString) : null;
+            let userData: any = userDataString
+              ? JSON.parse(userDataString)
+              : null;
             userData.customFields = customFields;
             localStorage.setItem('userData', JSON.stringify(userData));
             const state = customFields.find(
@@ -169,21 +171,24 @@ const LoginComponent = () => {
             );
 
             if (state) {
-              localStorage.setItem('stateName', state?.value);
-              setStateName(state?.value);
-              setStateCode(state?.code);
+              localStorage.setItem(
+                'stateName',
+                state?.selectedValues?.[0]?.value
+              );
+              setStateName(state?.selectedValues?.[0]?.value);
+              setStateCode(state?.selectedValues?.[0]?.id);
               setStateId(state?.fieldId);
             }
 
             if (district) {
-              setDistrictName(district?.value);
-              setDistrictCode(district?.code);
+              setDistrictName(district?.selectedValues?.[0]?.value);
+              setDistrictCode(district?.selectedValues?.[0]?.id);
               setDistrictId(district?.fieldId);
             }
 
             if (block) {
-              setBlockName(block?.value);
-              setBlockCode(block?.code);
+              setBlockName(block?.selectedValues?.[0]?.value);
+              setBlockCode(block?.selectedValues?.[0]?.id);
               setBlockId(block?.fieldId);
             }
           }
@@ -197,11 +202,12 @@ const LoginComponent = () => {
         token &&
         tenant?.toLowerCase() === TENANT_DATA.YOUTHNET?.toLowerCase()
       ) {
-        if(localStorage.getItem('role')=== RoleNames.TEACHER || localStorage.getItem('role')=== RoleNames.TEAM_LEADER )
-        router.push('/youth');
-        else
-        router.push("/unauthorized");    
-
+        if (
+          localStorage.getItem('role') === RoleNames.TEACHER ||
+          localStorage.getItem('role') === RoleNames.TEAM_LEADER
+        )
+          router.push('/youth');
+        else router.push('/unauthorized');
       }
     }
   };
