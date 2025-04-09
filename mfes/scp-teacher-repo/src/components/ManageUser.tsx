@@ -659,6 +659,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                           ? '8px !important'
                           : '-2px !important',
                       },
+                      width:'100%',
                     }}
                     className="text-1E"
                     onClick={handleOpenAddFaciModal}

@@ -343,11 +343,9 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
                     FormContextType.STUDENT
                   );
 
-                  genericFormResponse.fields =
-                    genericFormResponse.fields.filter(
-                      (item: { name: string }) =>
-                        !['password', 'confirm_password'].includes(item.name)
-                    );
+                  genericFormResponse.fields = genericFormResponse.fields.filter(
+                    (item: { name: string }) => !["password", "confirm_password", "program"].includes(item.name)
+                  );
 
                   const tenantSpecificResponse = await getFormRead(
                     FormContext.USERS,

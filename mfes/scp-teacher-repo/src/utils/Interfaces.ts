@@ -371,6 +371,12 @@ export interface LearnerListProps {
   showMiniProfile?: boolean;
   onLearnerDelete: () => void;
   isFromProfile?: boolean;
+  gender?: string;
+}
+export interface UserData {
+  email: string;
+  gender: string;
+  // Add other properties of UserData here if they exist
 }
 export interface FacilitatorListParam {
   limit: number;
