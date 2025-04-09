@@ -6,29 +6,26 @@ import API_ENDPOINTS from '@/utils/API/APIEndpoints';
 export const getFormRead = async (
   context: string,
   contextType: string,
-  isTenantRequired?:  true
+  isTenantRequired?: true
 ): Promise<any> => {
   try {
     if (typeof window !== 'undefined' && window.localStorage) {
       const token = localStorage.getItem('token');
-      const response = await axios.get(
-        API_ENDPOINTS.formRead,
-        {
-          params: {
-            context,
-            contextType,
-          },
-          paramsSerializer: (params) => {
-            return Object.entries(params)
-              .map(([key, value]) => `${key}=${value}`)
-              .join('&');
-          },
-          headers: { 
-            Authorization: `Bearer ${token}`,
-            ...(isTenantRequired && { tenantId }), // Add tenantId only if isTenantRequired is true
-          },
-        }
-      );
+      const response = await axios.get(API_ENDPOINTS.formRead, {
+        params: {
+          context,
+          contextType,
+        },
+        paramsSerializer: (params) => {
+          return Object.entries(params)
+            .map(([key, value]) => `${key}=${value}`)
+            .join('&');
+        },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          ...{ tenantId },
+        },
+      });
       const sortedFields = response?.data?.result.fields?.sort(
         (a: { order: string }, b: { order: string }) =>
           parseInt(a.order) - parseInt(b.order)

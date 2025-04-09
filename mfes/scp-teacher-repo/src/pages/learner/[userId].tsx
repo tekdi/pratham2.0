@@ -295,7 +295,6 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
           const response = await getUserDetails(user, true);
 
           console.log('response', response);
-          
 
           if (response?.responseCode === 200) {
             const data = response;
@@ -345,7 +344,7 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
                   );
 
                   genericFormResponse.fields = genericFormResponse.fields.filter(
-                    (item: { name: string }) => !["password", "confirm_password"].includes(item.name)
+                    (item: { name: string }) => !["password", "confirm_password", "program"].includes(item.name)
                   );
 
                   const tenantSpecificResponse = await getFormRead(
@@ -361,8 +360,8 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
                     ...genericFormResponse,
                     fields: [
                       ...(genericFormResponse.fields || []),
-                      ...(tenantSpecificResponse.fields || [])
-                    ]
+                      ...(tenantSpecificResponse.fields || []),
+                    ],
                   };
 
                   if (combinedFormResponse) {
@@ -377,9 +376,13 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
                           value: string;
                           coreField: number;
                         }) => {
-                          if (field.fieldId && fieldIdToValueMap[field.fieldId]) {
+                          if (
+                            field.fieldId &&
+                            fieldIdToValueMap[field.fieldId]
+                          ) {
                             // Update field value from fieldIdToValueMap if fieldId is available
-                            field.value = fieldIdToValueMap[field.fieldId] || '-';
+                            field.value =
+                              fieldIdToValueMap[field.fieldId] || '-';
                           } else if (field.coreField === 1) {
                             // Set field value from fieldIdToValueMap if coreField is 1 and fieldId is not in the map
                             field.value = coreFieldData[field.name] || '-';
@@ -439,7 +442,11 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
       const getSelectedOption = (field: any) => {
         return (
           field?.options?.find(
-            (option: any) => option?.value === (typeof field?.value === 'string' ? field.value : field?.value?.[0])
+            (option: any) =>
+              option?.value ===
+              (typeof field?.value === 'string'
+                ? field.value
+                : field?.value?.[0])
           ) || '-'
         );
       };
@@ -914,7 +921,8 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
         //   },
         // }}
         >
-          {isActiveYear && (
+          {/* Hiding button for edit learner until edit functionality is developed */}
+          {/* {isActiveYear && (
             <Button
               sx={{
                 fontSize: '14px',
@@ -948,7 +956,7 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
                 <CreateOutlinedIcon sx={{ fontSize: '14px' }} />
               </Box>
             </Button>
-          )}
+          )} */}
 
           {openAddLearnerModal && (
             <div>
@@ -1033,7 +1041,9 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
           </Box>
         </Box>
       </Box>
-      {!isEliminatedFromBuild('AssessmentReport', 'component') &&
+
+      {/* Hiding Assessment Report on profile until fixed */}
+      {/* {!isEliminatedFromBuild('AssessmentReport', 'component') &&
         AssessmentReport &&
         isActiveYear && (
           <Box padding={2}>
@@ -1049,7 +1059,7 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
               </CardContent>
             </Card>
           </Box>
-        )}
+        )} */}
     </>
   );
 };

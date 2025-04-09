@@ -173,7 +173,8 @@
     "BATCH": "Batch",
     "BATCHES": "Batches",
     "BATCH_SESSIONS": "Batch Sessions",
-    "NOT_ABLE_CREATE_LEARNER": "Not able to create learner"
+    "NOT_ABLE_CREATE_LEARNER": "Not able to create learner",
+    "NOT_ABLE_CREATE_FACILITATOR": "Not Able To Create Teacher"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -855,7 +856,7 @@
   "MARRIED": "Married",
   "DIVORCED": "Divorced",
   "SELF_PLACED": "Self Placed",
-  "REMOTE": "Remote", 
+  "REMOTE": "Remote",
   "REGULAR": "Regular",
   "SCHOOL_INACCESSIBLE": "School inaccessible",
   "FINANCIAL_CONSTRAINTS": "Financial Constraints",
