@@ -223,7 +223,6 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
       const response = await getUserDetails(userId, true);
       setSelectedUserUserName(response?.result?.userData?.username);
       setSelectedUserEmail(response?.result?.userData?.email);
-
       const formFields = await getFormRead(
         FormContext.USERS,
         FormContextType.STUDENT
@@ -295,6 +294,9 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
         if (user) {
           const response = await getUserDetails(user, true);
 
+          console.log('response', response);
+          
+
           if (response?.responseCode === 200) {
             const data = response;
             if (data) {
@@ -337,11 +339,33 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
 
               const fetchFormData = async () => {
                 try {
-                  const response = await getFormRead(
+                  const genericFormResponse = await getFormRead(
                     FormContext.USERS,
                     FormContextType.STUDENT
                   );
-                  if (response) {
+
+                  genericFormResponse.fields = genericFormResponse.fields.filter(
+                    (item: { name: string }) => !["password", "confirm_password"].includes(item.name)
+                  );
+
+                  const tenantSpecificResponse = await getFormRead(
+                    FormContext.USERS,
+                    FormContextType.STUDENT,
+                    true
+                  );
+                  console.log(genericFormResponse, 'genericFormResponse');
+                  console.log(tenantSpecificResponse, 'tenantSpecificResponse');
+
+                  // Combine both responses
+                  const combinedFormResponse = {
+                    ...genericFormResponse,
+                    fields: [
+                      ...(genericFormResponse.fields || []),
+                      ...(tenantSpecificResponse.fields || [])
+                    ]
+                  };
+
+                  if (combinedFormResponse) {
                     const mergeData = (
                       fieldIdToValueMap: { [key: string]: string },
                       response: any
@@ -353,13 +377,9 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
                           value: string;
                           coreField: number;
                         }) => {
-                          if (
-                            field.fieldId &&
-                            fieldIdToValueMap[field.fieldId]
-                          ) {
+                          if (field.fieldId && fieldIdToValueMap[field.fieldId]) {
                             // Update field value from fieldIdToValueMap if fieldId is available
-                            field.value =
-                              fieldIdToValueMap[field.fieldId] || '-';
+                            field.value = fieldIdToValueMap[field.fieldId] || '-';
                           } else if (field.coreField === 1) {
                             // Set field value from fieldIdToValueMap if coreField is 1 and fieldId is not in the map
                             field.value = coreFieldData[field.name] || '-';
@@ -371,12 +391,10 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
 
                     const mergedProfileData = mergeData(
                       fieldIdToValueMap,
-                      response
+                      combinedFormResponse
                     );
+
                     if (mergedProfileData) {
-                      // const nameField = mergedProfileData.fields.find(
-                      //   (field: { name: string }) => field.name === 'name'
-                      // );
                       const customDataFields = mergedProfileData?.fields;
                       if (customDataFields?.length > 0) {
                         setCustomFieldsData(customDataFields);
@@ -421,7 +439,7 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
       const getSelectedOption = (field: any) => {
         return (
           field?.options?.find(
-            (option: any) => option?.value === field?.value?.[0]
+            (option: any) => option?.value === (typeof field?.value === 'string' ? field.value : field?.value?.[0])
           ) || '-'
         );
       };
