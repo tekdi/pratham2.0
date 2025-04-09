@@ -214,12 +214,24 @@ export const notificationCallback = async (
     );
   }
   if (creatorName) {
-    replacements = {
-      '{FirstName}': firstLetterInUpperCase(payload?.firstName),
-      '{UserName}': payload?.username,
-      '{Password}': payload?.password,
-      '{appUrl}': cleanedUrl || '', //TODO: check url
-    };
+    if (type == 'learner') {
+      let sentName = JSON.parse(localStorage.getItem('userData'))?.firstName;
+      replacements = {
+        '{FirstName}': sentName,
+        '{UserName}': payload?.username,
+        '{Password}': payload?.password,
+        '{LearnerName}': `${firstLetterInUpperCase(
+          payload?.firstName
+        )} ${firstLetterInUpperCase(payload?.lastName)}`,
+      };
+    } else {
+      replacements = {
+        '{FirstName}': firstLetterInUpperCase(payload?.firstName),
+        '{UserName}': payload?.username,
+        '{Password}': payload?.password,
+        '{appUrl}': cleanedUrl || '', //TODO: check url
+      };
+    }
   }
 
   let sentEmail = payload?.email;
