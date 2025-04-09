@@ -3,12 +3,15 @@ import { getCohortList } from '@/services/CohortService/cohortService';
 import { transformLabel } from '@/utils/Helper';
 
 const CenterLabel = ({ parentId }: any) => {
-  const [centerLabel, setCenterLabel] = React.useState('');
+  const [centerLabel, setCenterLabel] = React.useState('-');
 
   React.useEffect(() => {
     let isMounted = true;
     const fetchLabel = async () => {
-      const label = await getCenterLabel(parentId);
+      let label = '-';
+      if (parentId) {
+        label = await getCenterLabel(parentId);
+      }
       if (isMounted) {
         setCenterLabel(label);
       }
@@ -20,7 +23,7 @@ const CenterLabel = ({ parentId }: any) => {
     };
   }, [parentId]);
 
-  return <>{transformLabel(centerLabel)}</>;
+  return <>{centerLabel != '-' ? transformLabel(centerLabel) : CenterLabel}</>;
 };
 
 const getCenterLabel = async (parentId: any) => {
