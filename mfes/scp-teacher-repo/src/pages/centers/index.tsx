@@ -278,7 +278,7 @@ const CentersPage = () => {
         }
       } catch (error) {
         console.log('error', error);
-        showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
+        // showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
       }
     };
     getCohortListForTL();

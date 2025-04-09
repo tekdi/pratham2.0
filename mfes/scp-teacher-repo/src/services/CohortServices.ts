@@ -90,6 +90,7 @@ export const getCohortList = async (
     return response?.data?.result;
   } catch (error) {
     console.error('Error in getting cohort details', error);
+    return [];
   }
 };
 
