@@ -79,6 +79,7 @@ const CentersPage = () => {
   const [filteredBatches, setFilteredBatches] = useState<any[]>([]);
   const [batchSearchInput, setBatchSearchInput] = useState(''); // Search for batches
   const [batchLoading, setBatchLoading] = useState(false);
+  const [centerList, setCenterList] = useState<any[]>([]);
   const userStore = manageUserStore();
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -152,7 +153,7 @@ const CentersPage = () => {
   useEffect(() => {
     if (selectedCenter) {
       setBatchLoading(true);
-      getBlocksByCenterId(selectedCenter)
+      getBlocksByCenterId(selectedCenter, centerList)
         .then((res) => {
           setFilteredBatches(res);
           setBatchLoading(false);
@@ -163,7 +164,7 @@ const CentersPage = () => {
     } else {
       setFilteredBatches([]);
     }
-  }, [selectedCenter]);
+  }, [selectedCenter, centerList]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchInput(event.target.value);
@@ -199,6 +200,7 @@ const CentersPage = () => {
             const response = await getCohortList(userId, {
               customField: 'true',
             });
+            setCenterList(response);
 
             if (
               accessGranted('showBlockLevelCohort', accessControl, userRole) &&
@@ -276,7 +278,7 @@ const CentersPage = () => {
         }
       } catch (error) {
         console.log('error', error);
-        showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
+        // showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
       }
     };
     getCohortListForTL();
@@ -348,7 +350,7 @@ const CentersPage = () => {
     localStorage.setItem('centerId', cohortId);
 
     if (cohortId) {
-      getBlocksByCenterId(cohortId).then((res) => {
+      getBlocksByCenterId(cohortId, centerList).then((res) => {
         console.log('Fetched batches:', res); // Log the fetched data
         setFilteredBatches(res);
         console.log('Filtered batches state:', res); // Log the state after update
@@ -511,10 +513,10 @@ const CentersPage = () => {
                 </Button> */}
                 </Box>
                 <Box sx={{ minWidth: '300px' }}>
-                <CenterDropdown
-                  cohortId={selectedCenter}
-                  onChange={handleCenterChange}
-                />
+                  <CenterDropdown
+                    cohortId={selectedCenter}
+                    onChange={handleCenterChange}
+                  />
                 </Box>
               </Box>
               {batchLoading ? (
