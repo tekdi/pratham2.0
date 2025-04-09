@@ -943,7 +943,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
                           </Box>
 
                           <Box
-                            className="calenderTitle flex-center joyride-step-3 ps-md-ab"
+                            className="calenderTitle flex-center joyride-step-3 mt-md-54"
                             display={'flex'}
                             sx={{
                               cursor: 'pointer',
