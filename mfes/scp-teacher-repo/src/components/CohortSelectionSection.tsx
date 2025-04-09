@@ -179,7 +179,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
   };
   const getBatchFilteredData = async (centerId: any) => {
     if (userId) {
-      const response = await queryClient.fetchQuery({
+      let response = await queryClient.fetchQuery({
         queryKey: [QueryKeys.MY_COHORTS, userId],
         queryFn: () => getCohortList(userId, { customField: 'true' }),
       });
@@ -199,6 +199,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
       return filteredChildData;
     }
   };
+
   useEffect(() => {
     if (userId) {
       if (!loading) {
@@ -206,7 +207,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
       }
       const fetchCohorts = async () => {
         try {
-          const response = await queryClient.fetchQuery({
+          let response = await queryClient.fetchQuery({
             queryKey: [QueryKeys.MY_COHORTS, userId],
             queryFn: () => getCohortList(userId, { customField: 'true' }),
           });
@@ -484,19 +485,19 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
         <Loader showBackdrop={true} loadingText={t('COMMON.LOADING')} />
       )} */}
       {filteredCohortData?.length === 0 && filteredBatchData?.length === 0 && (
-      <Typography color={theme.palette.warning['300']}>
-        {t('COMMON.NO_CENTER_AND_BATCH_FOUND')}
-      </Typography>
+        <Typography color={theme.palette.warning['300']}>
+          {t('COMMON.NO_CENTER_AND_BATCH_FOUND')}
+        </Typography>
       )}
       {filteredCohortData?.length === 0 && filteredBatchData?.length !== 0 && (
-      <Typography color={theme.palette.warning['300']}>
-        {t('COMMON.NO_CENTER_FOUND')}
-      </Typography>
+        <Typography color={theme.palette.warning['300']}>
+          {t('COMMON.NO_CENTER_FOUND')}
+        </Typography>
       )}
       {filteredCohortData?.length !== 0 && filteredBatchData?.length === 0 && (
-          <Typography color={theme.palette.warning['300']}>
-              {t('COMMON.NO_BATCH_FOUND')}
-          </Typography>
+        <Typography color={theme.palette.warning['300']}>
+          {t('COMMON.NO_BATCH_FOUND')}
+        </Typography>
       )}
       {filteredCohortData && filteredBatchData && (
         <Box
@@ -715,27 +716,46 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                     <Box sx={{ minWidth: 120, gap: '15px' }} display={'flex'}>
                       {filteredCohortData?.length > 1 ? (
                         <FormControl
-                          className={showFloatingLabel ? '' : 'drawer-select'}
-                          sx={{ m: 0, width: '100% !important' }}
-                        > 
-                          {showFloatingLabel && (
-                            <InputLabel id="center-select-label">
-                              {t('COMMON.CENTER')}
-                            </InputLabel>
-                          )}
+                          variant="outlined"
+                          fullWidth
+                          sx={{
+                            m: 0,
+                            width: '100%',
+                            ...(showFloatingLabel
+                              ? {}
+                              : {
+                                  borderRadius: '0.5rem',
+                                  color: theme.palette.warning['200'],
+                                  marginBottom: '0rem',
+                                  marginRight: '10px',
+                                  '@media (max-width: 902px)': {
+                                    width: isAttendanceOverview
+                                      ? '100%'
+                                      : '62%',
+                                  },
+                                  '@media (max-width: 702px)': {
+                                    width: isAttendanceOverview
+                                      ? '100%'
+                                      : '65%',
+                                  },
+                                }),
+                          }}
+                        >
+                          <InputLabel id="center-select-label">
+                            {t('COMMON.CENTER')}
+                          </InputLabel>
+
                           <Select
                             labelId="center-select-label"
-                            label={showFloatingLabel ? t('COMMON.CENTER') : ''}
-                            value={
-                              centerId
-                                ? centerId
-                                : filteredCohortData[0]?.cohortId
-                            }
+                            value={centerId || filteredCohortData[0]?.cohortId}
                             onChange={handleCohortSelection}
-                            // displayEmpty
-                            // style={{ borderRadius: '4px' }}
-
-                            inputProps={{ 'aria-label': 'Without label' }}
+                            label={t('COMMON.CENTER')}
+                            inputProps={{ 'aria-label': 'Center select' }}
+                            className={
+                              showFloatingLabel
+                                ? ''
+                                : 'select-languages fs-14 fw-500 bg-white'
+                            }
                             MenuProps={{
                               PaperProps: {
                                 style: {
@@ -743,32 +763,6 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                                 },
                               },
                             }}
-                            className={
-                              showFloatingLabel
-                                ? ''
-                                : 'select-languages fs-14 fw-500 bg-white'
-                            }
-                            sx={
-                              showFloatingLabel
-                                ? { borderRadius: '4px' }
-                                : {
-                                    borderRadius: '0.5rem',
-                                    color: theme.palette.warning['200'],
-                                    width: '100%',
-                                    marginBottom: '0rem',
-                                    marginRight: '10px',
-                                    '@media (max-width: 902px)': {
-                                      width: isAttendanceOverview
-                                        ? '100%'
-                                        : '62%',
-                                    },
-                                    '@media (max-width: 702px)': {
-                                      width: isAttendanceOverview
-                                        ? '100%'
-                                        : '65%',
-                                    },
-                                  }
-                            }
                           >
                             {filteredCohortData?.length !== 0 ? (
                               filteredManipulatedCohortData?.map(
@@ -788,16 +782,18 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                                 )
                               )
                             ) : (
-                              <Typography
-                                style={{
-                                  fontWeight: '500',
-                                  fontSize: '14px',
-                                  color: theme.palette.warning['A200'],
-                                  padding: '0 15px',
-                                }}
-                              >
-                                {t('COMMON.NO_DATA_FOUND')}
-                              </Typography>
+                              <MenuItem disabled>
+                                <Typography
+                                  style={{
+                                    fontWeight: '500',
+                                    fontSize: '14px',
+                                    color: theme.palette.warning['A200'],
+                                    padding: '0 15px',
+                                  }}
+                                >
+                                  {t('COMMON.NO_DATA_FOUND')}
+                                </Typography>
+                              </MenuItem>
                             )}
                           </Select>
                         </FormControl>
@@ -841,33 +837,55 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                           ) : (
                             <Typography color={theme.palette.warning['300']}>
                               {filteredCohortData?.length === 0
-                            ? t('COMMON.NO_CENTER_FOUND')
-                            : toPascalCase(filteredCohortData[0]?.name)}
+                                ? t('COMMON.NO_CENTER_FOUND')
+                                : toPascalCase(filteredCohortData[0]?.name)}
                             </Typography>
                           )}
                         </>
                       )}
                       {filteredBatchData?.length > 1 ? (
                         <FormControl
+                          variant="outlined"
+                          fullWidth
                           className={showFloatingLabel ? '' : 'drawer-select'}
-                          sx={{ m: 0, width: '100%' }}
+                          sx={{
+                            m: 0,
+                            width: '100%',
+                            ...(showFloatingLabel
+                              ? {}
+                              : {
+                                  borderRadius: '0.5rem',
+                                  color: theme.palette.warning['200'],
+                                  marginBottom: '0rem',
+                                  marginRight: '10px',
+                                  '@media (max-width: 902px)': {
+                                    width: isAttendanceOverview
+                                      ? '100%'
+                                      : '62%',
+                                  },
+                                  '@media (max-width: 702px)': {
+                                    width: isAttendanceOverview
+                                      ? '100%'
+                                      : '65%',
+                                  },
+                                }),
+                          }}
                         >
-                          {showFloatingLabel && (
-                            <InputLabel id="batch-select-label">
-                              {t('COMMON.BATCH')}
-                            </InputLabel>
-                          )}
+                          <InputLabel id="batch-select-label">
+                            {t('COMMON.BATCH')}
+                          </InputLabel>
+
                           <Select
                             labelId="batch-select-label"
-                            label={showFloatingLabel ? t('COMMON.BATCH') : ''}
-                            value={
-                              classId ? classId : filteredBatchData[0]?.cohortId
-                            }
+                            label={t('COMMON.BATCH')}
+                            value={classId || filteredBatchData[0]?.cohortId}
                             onChange={handleBatchSelection}
-                            // displayEmpty
-                            // style={{ borderRadius: '4px' }}
-
-                            inputProps={{ 'aria-label': 'Without label' }}
+                            inputProps={{ 'aria-label': 'Batch select' }}
+                            className={
+                              showFloatingLabel
+                                ? ''
+                                : 'select-languages fs-14 fw-500 bg-white'
+                            }
                             MenuProps={{
                               PaperProps: {
                                 style: {
@@ -875,32 +893,6 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                                 },
                               },
                             }}
-                            className={
-                              showFloatingLabel
-                                ? ''
-                                : 'select-languages fs-14 fw-500 bg-white'
-                            }
-                            sx={
-                              showFloatingLabel
-                                ? { borderRadius: '4px' }
-                                : {
-                                    borderRadius: '0.5rem',
-                                    color: theme.palette.warning['200'],
-                                    width: '100%',
-                                    marginBottom: '0rem',
-                                    marginRight: '10px',
-                                    '@media (max-width: 902px)': {
-                                      width: isAttendanceOverview
-                                        ? '100%'
-                                        : '62%',
-                                    },
-                                    '@media (max-width: 702px)': {
-                                      width: isAttendanceOverview
-                                        ? '100%'
-                                        : '65%',
-                                    },
-                                  }
-                            }
                           >
                             {filteredBatchData?.length !== 0 ? (
                               filteredManipulatedBatchData?.map(
@@ -920,16 +912,18 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                                 )
                               )
                             ) : (
-                              <Typography
-                                style={{
-                                  fontWeight: '500',
-                                  fontSize: '14px',
-                                  color: theme.palette.warning['A200'],
-                                  padding: '0 15px',
-                                }}
-                              >
-                                {t('COMMON.NO_DATA_FOUND')}
-                              </Typography>
+                              <MenuItem disabled>
+                                <Typography
+                                  style={{
+                                    fontWeight: '500',
+                                    fontSize: '14px',
+                                    color: theme.palette.warning['A200'],
+                                    padding: '0 15px',
+                                  }}
+                                >
+                                  {t('COMMON.NO_DATA_FOUND')}
+                                </Typography>
+                              </MenuItem>
                             )}
                           </Select>
                         </FormControl>
@@ -973,8 +967,8 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                           ) : (
                             <Typography color={theme.palette.warning['300']}>
                               {filteredBatchData?.length === 0
-                            ? t('COMMON.NO_BATCH_FOUND')
-                            : toPascalCase(filteredBatchData[0]?.name)}
+                                ? t('COMMON.NO_BATCH_FOUND')
+                                : toPascalCase(filteredBatchData[0]?.name)}
                             </Typography>
                           )}
                         </>

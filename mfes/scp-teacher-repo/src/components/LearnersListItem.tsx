@@ -75,6 +75,8 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
     contactNumber: '',
     enrollmentNumber: '',
     customFieldsData: [] as UpdateCustomField[],
+    gender: '',
+    
   });
   const userStore = useStore();
   const theme = useTheme<any>();
@@ -322,6 +324,9 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
 
   const filteredFields = filterMiniProfileFields(learnerState.customFieldsData);
 
+  console.log('filteredFields', learnerState);
+  
+
   const getTeamLeadersCenters = async () => { };
 
   const handleCloseCentersModal = () => {
@@ -450,6 +455,8 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
               userName={learnerState.userName}
               contactNumber={learnerState.contactNumber}
               enrollmentNumber={learnerState.enrollmentNumber}
+              gender={learnerState?.userData?.gender}
+              email={learnerState?.userData?.email}   
             />
           )}
           <Box

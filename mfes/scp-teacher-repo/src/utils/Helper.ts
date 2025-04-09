@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Role, Status, labelsToExtractForMiniProfile } from './app.constant';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -15,6 +16,7 @@ import {
   avgLearnerAttendanceLimit,
   lowLearnerAttendanceLimit,
 } from '../../app.config';
+import API_ENDPOINTS from './API/APIEndpoints';
 
 export const ATTENDANCE_ENUM = {
   PRESENT: 'present',
@@ -429,19 +431,16 @@ export const generateUsernameAndPassword = (
   return { username, password };
 };
 
-
 export const mapFieldIdToValue = (
   fields: CustomField[]
 ): { [key: string]: string } => {
-  return fields?.reduce(
-    (acc: { [key: string]: any }, field: CustomField) => {
-      acc[field.fieldId] = typeof field?.selectedValues?.[0] === 'object' 
-        ? field?.selectedValues?.[0]?.value 
+  return fields?.reduce((acc: { [key: string]: any }, field: CustomField) => {
+    acc[field.fieldId] =
+      typeof field?.selectedValues?.[0] === 'object'
+        ? field?.selectedValues?.[0]?.value
         : field?.selectedValues?.[0] || field?.value || '';
-      return acc;
-    },
-    {}
-  );
+    return acc;
+  }, {});
 };
 
 export const convertUTCToIST = (utcDateTime: string) => {
@@ -1064,4 +1063,99 @@ export const getAge = (dobString: any) => {
   }
   console.log(age);
   return age;
+};
+
+//convert fl response to tl format
+export const flresponsetotl = async (response: any[]) => {
+  const uniqueParentIds = Array.from(
+    new Set(response.map((item) => item.parentID))
+  );
+
+  const fetchParentData = async (parentId: string) => {
+    try {
+      const url = API_ENDPOINTS.cohortSearch;
+      const header = {
+        tenantId: localStorage.getItem('tenantId') || '',
+        Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+        academicyearid: localStorage.getItem('academicYearId') || '',
+      };
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...header,
+        },
+        body: JSON.stringify({
+          limit: 200,
+          offset: 0,
+          filters: {
+            status: ['active'],
+            cohortId: parentId,
+          },
+        }),
+      });
+
+      const data = await response.json();
+      const cohortDetails = data?.result?.results?.cohortDetails || [];
+
+      // Remove customFields if needed
+      const filteredBatch = cohortDetails
+        .filter((item: { status: string }) => item.status === 'active')
+        .map(({ customFields, ...rest }) => rest);
+
+      return filteredBatch;
+    } catch (error) {
+      console.error(`Error fetching data for parentId ${parentId}:`, error);
+      return [];
+    }
+  };
+
+  const getAllParentData = async (parentIds: string[]) => {
+    const results = await Promise.all(
+      parentIds.map((id) => fetchParentData(id))
+    );
+    return results.flat(); // flatten nested arrays
+  };
+
+  // Now fetch and attach children
+  const parentData = await getAllParentData(uniqueParentIds);
+
+  const updatedCohorts = parentData.map((cohort) => {
+    const children = response.filter(
+      (child) => child.parentID === cohort.cohortId
+    );
+
+    return {
+      ...cohort,
+      childData: children,
+    };
+  });
+
+  // console.log('########## testflresponse updatedCohorts', updatedCohorts);
+  const transformCohortData = (cohorts) => {
+    const transform = (item) => {
+      const { name, cohortName, status, cohortStatus, childData, ...rest } =
+        item;
+
+      const updated = {
+        ...rest,
+        name: cohortName ?? name,
+        cohortName: name ?? cohortName,
+        status: cohortStatus ?? status,
+        cohortStatus: status ?? cohortStatus,
+        childData: childData?.map(transform) || [],
+      };
+
+      return updated;
+    };
+
+    return cohorts.map(transform);
+  };
+
+  // Usage
+  const transformedData = transformCohortData(updatedCohorts);
+  // console.log('########## testflresponse transformedData', transformedData);
+
+  return transformedData;
 };
