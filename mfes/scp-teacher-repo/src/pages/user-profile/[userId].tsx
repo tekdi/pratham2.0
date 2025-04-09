@@ -14,20 +14,20 @@ import { getUserDetails } from '../../services/ProfileService';
 import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import Profile from '@/components/Profile';
 import { log } from 'console';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const UserId = () => {
   const { t } = useTranslation();
   const theme = useTheme<any>();
   const router = useRouter();
-  const { userId } = router.query; 
- const [schema, setSchema] = useState(null);
- const [formData, setFormData] = useState<any>();
- const [editModal, setEditModal] = useState<boolean>(false);
- const [updatedUser, setUpdatedUser] = useState<boolean>(false);
- const { tab, blockId , villageId} = router.query;
+  const { userId } = router.query;
+  const [schema, setSchema] = useState(null);
+  const [formData, setFormData] = useState<any>();
+  const [editModal, setEditModal] = useState<boolean>(false);
+  const [updatedUser, setUpdatedUser] = useState<boolean>(false);
+  const { tab, blockId, villageId } = router.query;
 
-
- const [uiSchema, setUiSchema] = useState(null);
+  const [uiSchema, setUiSchema] = useState(null);
   const [user, setUser] = React.useState<{
     userRole: string | null;
     userID: string | null;
@@ -36,16 +36,14 @@ const UserId = () => {
     email: string | null;
     phone: string | null;
     gender: string | null;
-    dob?:string|null;
-    state?:string|null;
-    district?:string| null;
-    block?:string|null;
-    middleName?:string|null;
-    village?:string|null;
-    userName?:string|null;
-    joinedOn?:string|null;
-
-
+    dob?: string | null;
+    state?: string | null;
+    district?: string | null;
+    block?: string | null;
+    middleName?: string | null;
+    village?: string | null;
+    userName?: string | null;
+    joinedOn?: string | null;
   }>({
     userRole: null,
     userID: null,
@@ -57,33 +55,32 @@ const UserId = () => {
     dob: null,
     state: null,
     district: null,
-    block:null,
+    block: null,
     village: null,
     middleName: null,
     userName: null,
     joinedOn: null,
-
   });
   const handleOpenEditModal = () => {
     setEditModal(true);
   };
-//   function formatDate(dob: string): string | null {
-//     if (!dob) return null; 
+  //   function formatDate(dob: string): string | null {
+  //     if (!dob) return null;
 
-//     const parsedDate = new Date(dob);
-    
-//     if (isNaN(parsedDate.getTime())) {
-//         const parts = dob.split(' ');
-//         if (parts.length === 3) {
-//             const formatted = parts.reverse().join('-'); 
-//             const retryDate = new Date(formatted);
-//             if (!isNaN(retryDate.getTime())) return retryDate.toISOString().split('T')[0];
-//         }
-//         return null; 
-//     }
+  //     const parsedDate = new Date(dob);
 
-//     return parsedDate.toISOString().split('T')[0];
-// }
+  //     if (isNaN(parsedDate.getTime())) {
+  //         const parts = dob.split(' ');
+  //         if (parts.length === 3) {
+  //             const formatted = parts.reverse().join('-');
+  //             const retryDate = new Date(formatted);
+  //             if (!isNaN(retryDate.getTime())) return retryDate.toISOString().split('T')[0];
+  //         }
+  //         return null;
+  //     }
+
+  //     return parsedDate.toISOString().split('T')[0];
+  // }
   // useEffect(() => {
   //   const fetchData = async () => {
   //     try {
@@ -136,7 +133,7 @@ const UserId = () => {
   //       const updatedUiSchema = {
   //         ...newSchema?.uiSchema,
   //         "ui:submitButtonOptions": {
-  //           norender: true, 
+  //           norender: true,
   //         },
   //       };
   //       setUiSchema(updatedUiSchema);
@@ -181,47 +178,51 @@ const UserId = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (typeof window === 'undefined' || !window.localStorage) return;
-  
-      const storedUserId = localStorage.getItem("userId");
+
+      const storedUserId = localStorage.getItem('userId');
       const role = localStorage.getItem('role') || '';
       let userData: any = {};
-  
+
       if (userId === storedUserId) {
         userData = JSON.parse(localStorage.getItem('userData') || '{}');
       } else if (userId) {
         const data = await getUserDetails(userId, true);
         userData = data?.result.userData || {};
       }
-  
+
       if (userData) {
         const getFieldValue = (label: string) =>
-          toPascalCase(userData?.customFields?.find((item: any) => item.label === label)?.selectedValues?.[0]?.value || '');
+          toPascalCase(
+            userData?.customFields?.find((item: any) => item.label === label)
+              ?.selectedValues?.[0]?.value || ''
+          );
         let date;
         let formattedDOBDate;
-        if(userData.dob)
-        {
-           date = new Date(userData.dob);
+        if (userData.dob) {
+          date = new Date(userData.dob);
           //const joinedDate = new Date(userData.createdAt);
-  
-          const options: Intl.DateTimeFormatOptions = { 
-            day: "2-digit", 
-            month: "short", 
-            year: "numeric" 
-        };
-   formattedDOBDate = date.toLocaleDateString("en-GB", options);       
+
+          const options: Intl.DateTimeFormatOptions = {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+          };
+          formattedDOBDate = date.toLocaleDateString('en-GB', options);
         }
-       
-       setUser({
+
+        setUser({
           firstName: toPascalCase(userData?.firstName) || '',
           lastName: toPascalCase(userData?.lastName) || '',
-          middleName:toPascalCase(userData?.middleName) || '',
-          userName:  userData?.username || '',
+          middleName: toPascalCase(userData?.middleName) || '',
+          userName: userData?.username || '',
           joinedOn: userData?.createdOn || '',
           email: userData?.email || '',
           userID: userData?.userId || '',
           phone: userData?.mobile || '',
-          gender: (userData?.gender) || '',
-          userRole: toPascalCase(userData?.tenantData?.[0]?.roleName) || toPascalCase(role),
+          gender: userData?.gender || '',
+          userRole:
+            toPascalCase(userData?.tenantData?.[0]?.roleName) ||
+            toPascalCase(role),
           dob: formattedDOBDate || '',
           district: getFieldValue('DISTRICT'),
           block: getFieldValue('BLOCK'),
@@ -230,49 +231,50 @@ const UserId = () => {
         });
       }
     };
-  
+
     fetchData();
   }, [userId, updatedUser]);
 
   console.log('user ===>', user);
-  
+
   return (
     <>
-    <Box minHeight="100vh">
-      {' '}
-      <Box>
-        <Header />
-      </Box>
-     
-      <Box ml={2}>
-        
-        {/* <BackHeader headingOne={ userId===localStorage.getItem("userId")?t('YOUTHNET_PROFILE.MY_PROFILE'): user.firstName? user.lastName ?`${user.firstName} ${user.lastName}`:user.firstName : ''} 
-         showBackButton={userId===localStorage.getItem("userId")?false:true}
-         onBackClick={() => {
-          if(tab)
-          {
-
-            router.push({
-              pathname: `/villages`,
-              query: {
-              villageId: villageId,
-                tab: tab,
-                blockId: blockId
-              },
-            });
-          }
-          else
-          router.back();
-        }}
-
-         /> */}
-      </Box>
-      { (
-        <Box
-        sx={{
-          marginLeft:"30%",
-        }}
-      >
+      <Box minHeight="100vh">
+        {' '}
+        <Box>
+          <Header />
+        </Box>
+        <Box ml={2}>
+          <Box
+            onClick={() => router.back()}
+            sx={{
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              my: '25px',
+              gap: '5px',
+            }}
+          >
+            <ArrowBackIcon sx={{ fontSize: '25px', color: '#4D4639' }} />
+            <Box
+              sx={{
+                fontWeight: 400,
+                fontSize: '22px',
+                lineHeight: '28px',
+                letterSpacing: '0px',
+                color: '#4D4639',
+              }}
+            >
+              {`${user.firstName} ${user.lastName}` || ''}
+            </Box>
+          </Box>
+        </Box>
+        {
+          <Box
+            sx={{
+              marginLeft: '30%',
+            }}
+          >
             {/* <Button
               sx={{
                 fontSize: '14px',
@@ -306,9 +308,9 @@ const UserId = () => {
                 <CreateOutlinedIcon sx={{ fontSize: '14px' }} />
               </Box>
             </Button> */}
-            </Box>
-          )}
-      {/* <Box ml={2}>
+          </Box>
+        }
+        {/* <Box ml={2}>
         {' '}
         <Typography
           sx={{
@@ -320,54 +322,52 @@ const UserId = () => {
           {t('YOUTHNET_PROFILE.ACTIVITIES_CONDUCTED')}
         </Typography>
       </Box> */}
-      {/* <Box>
+        {/* <Box>
         <VillageDetailCard
           imageSrc={Frame2}
           title={VILLAGE_DATA.THREE}
           subtitle={VILLAGE_DATA.SURVEYS_CONDUCTED}
         />
       </Box> */}
-      <Box
-        sx={{
-          background: theme.palette.info.gradient,
-          padding: '24px 16px 24px 16px',
-        }}
-      >
-        <Typography
-          variant="h6"
-          fontWeight="bold"
+        <Box
           sx={{
-            fontSize: '14px',
-            fontWeight: 500,
-            color: theme.palette.info.black,
+            background: theme.palette.info.gradient,
+            padding: '24px 16px 24px 16px',
           }}
         >
-          {t('SCP_PROFILE.PROFILE_DETAILS')}
-        </Typography>
-        <Profile
-          fullName={`${user.firstName} ${user.lastName}` || ''}
-          emailId={user.email || '-'}
-          designation={user.userRole || '-'}
-          mentorId={user.userID || ''}
-          phoneNumber={user.phone || '-'}
-          gender={toPascalCase(user.gender) || '-'}
-          state={user.state ||"-"}
-          district={user.district ||"-"}
-          block={user.block ||"-"}
-          dob={user.dob || '-'}
-          age={getAge(user?.dob)}
-          village={user.village || null}
-          middleName={user.middleName || '-'}
-          userName={user.userName || null}
-          joinedOn={user.joinedOn || ''}
-          firstName={user.firstName || ''}
-          lastName={user.lastName || ''}
-
-
-        />
+          <Typography
+            variant="h6"
+            fontWeight="bold"
+            sx={{
+              fontSize: '14px',
+              fontWeight: 500,
+              color: theme.palette.info.black,
+            }}
+          >
+            {t('SCP_PROFILE.PROFILE_DETAILS')}
+          </Typography>
+          <Profile
+            fullName={`${user.firstName} ${user.lastName}` || ''}
+            emailId={user.email || '-'}
+            designation={user.userRole || '-'}
+            mentorId={user.userID || ''}
+            phoneNumber={user.phone || '-'}
+            gender={toPascalCase(user.gender) || '-'}
+            state={user.state || '-'}
+            district={user.district || '-'}
+            block={user.block || '-'}
+            dob={user.dob || '-'}
+            age={getAge(user?.dob)}
+            village={user.village || null}
+            middleName={user.middleName || '-'}
+            userName={user.userName || null}
+            joinedOn={user.joinedOn || ''}
+            firstName={user.firstName || ''}
+            lastName={user.lastName || ''}
+          />
+        </Box>
       </Box>
-    </Box>
-    {/* <SimpleModal
+      {/* <SimpleModal
               open={editModal}
               onClose={onClose}
               showFooter={true}
@@ -385,8 +385,7 @@ const UserId = () => {
           />)
            }
             </SimpleModal> */}
-    </> 
-    
+    </>
   );
 };
 
@@ -407,4 +406,3 @@ export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
 };
 
 export default UserId;
-
