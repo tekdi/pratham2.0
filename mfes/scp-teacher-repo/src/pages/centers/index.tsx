@@ -511,12 +511,10 @@ const CentersPage = () => {
                 </Button> */}
                 </Box>
                 <Box sx={{ minWidth: '300px' }}>
-                  <CenterDropdown
-                    blockId={userStore.blockId}
-                    cohortId={selectedCenter}
-                    roleName="teacher"
-                    onChange={handleCenterChange}
-                  />
+                <CenterDropdown
+                  cohortId={selectedCenter}
+                  onChange={handleCenterChange}
+                />
                 </Box>
               </Box>
               {batchLoading ? (
