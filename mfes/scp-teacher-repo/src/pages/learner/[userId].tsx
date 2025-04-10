@@ -441,9 +441,9 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
   );
 
   const learnerDetailsByOrder = [...uniqueFields]
-    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-    .filter((field) => (field.order ?? 0) <= 12)
-    .map((field) => {
+    ?.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+    ?.filter((field) => (field.order ?? 0) <= 12)
+    ?.map((field) => {
       const getSelectedOption = (field: any) => {
         return (
           field?.options?.find(

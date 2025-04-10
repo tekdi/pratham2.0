@@ -203,7 +203,9 @@ const Profile: React.FC<ProfileDetailsProps> = ({
 
                   }}
                 >
-                  {subject.label}
+                  {t(`FORM.${subject.label}`, {
+                    defaultValue: subject.label,
+                  })}
                 </Box>
               );
             })}
