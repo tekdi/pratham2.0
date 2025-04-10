@@ -207,16 +207,17 @@ const CoursePlanner = () => {
   }, [classId]);
 
   useEffect(() => {
-    console.log('## store', store)
-    if (store.cohorts.length > 0) {
-      const cohortId = router.query.center
-        ? router.query.center
-        : store.cohorts[0]?.childData[0]?.cohortId || store.cohorts[0].cohortId;
+    // console.log('## store', store)
+    // if (store?.cohorts?.length > 0) {
+    //   console.log('Rajnish cohortId', router.query.center);
+    //   const cohortId = router.query.center
+    //     ? router.query.center
+    //     : store.cohorts[0]?.childData[0]?.cohortId || store.cohorts[0].cohortId;
 
-      addQueryParams({ center: cohortId });
-      setSelectedValue(cohortId);
-      setType(tStore.type || COURSE_TYPE.FOUNDATION_COURSE);
-    }
+    //   addQueryParams({ center: cohortId });
+    //   setSelectedValue(cohortId);
+    // }
+    setType(tStore.type || COURSE_TYPE.FOUNDATION_COURSE);
   }, [store.cohorts]);
 
   useEffect(() => {
