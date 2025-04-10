@@ -129,7 +129,8 @@ const RouteGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
     if (
       user.role === Role.ADMIN &&
-      user?.tenantData[0]?.tenantName === TenantName.YOUTHNET &&
+      (user?.tenantData[0]?.tenantName === TenantName.YOUTHNET ||
+        user?.tenantData[0]?.tenantName === TenantName.PRAGYANPATH) &&
       youthNetNotAllowed.some(route => router.pathname.startsWith(route))
     ) {
       router.push("/unauthorized");
