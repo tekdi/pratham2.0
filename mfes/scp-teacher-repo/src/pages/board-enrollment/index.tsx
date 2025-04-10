@@ -26,7 +26,12 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 import useStore from '@/store/store';
-import { FormContext, FormContextType, limit, Status } from '@/utils/app.constant';
+import {
+  FormContext,
+  FormContextType,
+  limit,
+  Status,
+} from '@/utils/app.constant';
 import { useQueryClient } from '@tanstack/react-query';
 import { getFormRead } from '@/hooks/useFormRead';
 import boardEnrollmentStore from '@/store/boardEnrollmentStore';
@@ -184,6 +189,7 @@ const BoardEnrollment = () => {
         };
 
         const resultData = extractFieldData(formData);
+        // console.log('FormData!!!!!!!!', formattedMembers);
         const updatedMemberData = updateFormattedMember(
           formattedMembers,
           resultData
@@ -209,6 +215,7 @@ const BoardEnrollment = () => {
           });
         };
         const processedData = checkStageCompletion(updatedMemberData);
+        // console.log('!!!!!!!!!!!!!!!!!', updatedMemberData);
         setBoardEnrollmentList(processedData);
         setDisplayStudentList(processedData);
         setBoardEnrollmentData(processedData);
@@ -216,7 +223,7 @@ const BoardEnrollment = () => {
         setStagesCount(stageCounts);
       }
     } catch (error) {
-      console.log("error", error);
+      console.log('error', error);
       // handleFetchError(error);
     } finally {
       setLoading(false);
@@ -247,8 +254,10 @@ const BoardEnrollment = () => {
     return members.map((entry: any) => ({
       userId: entry.userId,
       cohortMembershipId: entry.cohortMembershipId,
-      name: toPascalCase(entry?.firstName || '') + ' ' + (entry?.lastName ? toPascalCase(entry.lastName) : ""),
-
+      name:
+        toPascalCase(entry?.firstName || '') +
+        ' ' +
+        (entry?.lastName ? toPascalCase(entry.lastName) : ''),
 
       memberStatus: entry.status,
       statusReason: entry.statusReason,
@@ -541,7 +550,7 @@ const BoardEnrollment = () => {
             </Box>
           </Grid>
           <Grid
-            sx={{ display: 'flex', justifyContent: 'flex-end', }}
+            sx={{ display: 'flex', justifyContent: 'flex-end' }}
             xs={4}
             item
           >
@@ -584,9 +593,10 @@ const BoardEnrollment = () => {
                       if (item?.memberStatus === Status.DROPOUT) {
                         handleOpen(item?.statusReason);
                       } else {
-                        router.push(
-                          `/board-enrollment/student-detail/${item?.userId}`
-                        );
+                        // TODO: Uncomment once issue fixed
+                        // router.push(
+                        //   `/board-enrollment/student-detail/${item?.userId}`
+                        // );
                       }
                     }}
                   >
@@ -611,7 +621,9 @@ const BoardEnrollment = () => {
                       >
                         {item?.name}
                       </Box>
-                      <EastIcon
+
+                      {/* TODO: Uncomment once issue fixed */}
+                      {/* <EastIcon
                         sx={{
                           color:
                             item.memberStatus === Status.DROPOUT
@@ -619,7 +631,7 @@ const BoardEnrollment = () => {
                               : theme.palette.warning['300'],
                           transform: isRTL ? ' rotate(180deg)' : 'unset',
                         }}
-                      />
+                      /> */}
                     </Box>
                     {/* <Box
                   sx={{
