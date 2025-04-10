@@ -245,16 +245,6 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                 (cohort.childData || []).filter((child: any) => child.type === 'BATCH')
               )
 
-              console.log ('Test### batches', batches)
-
-              // const batchNames = cohorts.flatMap((cohort: any) =>
-              //   (cohort.childData || [])
-              //     .filter((child: any) => child.type === 'BATCH')
-              //     .map((child: any) => child.name)
-              // );
-              // console.log('### batchNames ===>', batchNames);
-
-
               const batchNames = cohorts
               .filter((item: any) => item.type === 'BATCH' && item.cohortStatus === 'active')
               .map((item: any) => item.cohortName);
@@ -278,7 +268,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                   })
                 ),
                 cohortNames: cohortNames || null,
-                batchNames: batchName || null
+                batchNames: batchNames || null
               };
             }
           );
@@ -594,9 +584,9 @@ const ManageUser: React.FC<ManageUsersProps> = ({
     return cohortNames;
   };
 
-  const getBatchNames = (cohortNames: any) => {
-    if (!Array.isArray(cohortNames)) return null;
-  return cohortNames.join(', ');
+  const getBatchNames = (batchNames: any) => {
+    if (!Array.isArray(batchNames)) return null;
+  return batchNames.join(', ');
   };
 
   const handleSearch = (searchTerm: string) => {
@@ -818,7 +808,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                                 marginBottom: '10px',
                                               }}
                                             >
-                                              {user?.cohortNames
+                                              {user?.batchNames?.length > 0
                                                 ? getBatchNames(
                                                     user.batchNames
                                                   )

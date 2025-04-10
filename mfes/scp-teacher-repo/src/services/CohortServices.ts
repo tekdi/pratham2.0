@@ -170,8 +170,10 @@ export const getBlocksByCenterId = async (
   if (!centerList) {
     throw new Error('centerList is required');
   }
-  // console.log('!!!!!', centerList);
+  console.log('!!!!!', centerId);
+  console.log('!!!!!', centerList);
   const matchingChildren = getChildDataByParentId(centerList, centerId);
+  console.log('!!!!!', matchingChildren);
   return matchingChildren;
 };
 
@@ -182,7 +184,7 @@ const getChildDataByParentId = (data, parentId) => {
     for (const item of items) {
       if (item.childData && item.childData.length > 0) {
         for (const child of item.childData) {
-          if (child.parentID === parentId) {
+          if (child.parentId === parentId) {
             result.push(child);
           }
           // continue searching in case of deeper nesting
