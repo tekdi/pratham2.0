@@ -47,9 +47,9 @@ const CenterDropdown: React.FC<CenterDropdownProps> = ({
         {centerList && centerList.length === 0 ? (
           <MenuItem disabled>No centers found</MenuItem>
         ) : (
-          centerList.map((center) => (
-            <MenuItem key={center.cohortId} value={center.cohortId}>
-              {center.cohortName}
+          centerList?.map((center) => (
+            <MenuItem key={center?.cohortId} value={center?.cohortId}>
+              {center?.cohortName}
             </MenuItem>
           ))
         )}
