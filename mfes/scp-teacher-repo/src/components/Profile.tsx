@@ -185,12 +185,12 @@ const Profile: React.FC<ProfileDetailsProps> = ({
               return (
                 <Button
                   key={subject.id}
-                  variant="contained"
+                  variant={isHighlighted ? "contained" : "outlined"}
                   sx={{
-                    backgroundColor: isHighlighted ? 'yellow' : 'primary.main',
+                    backgroundColor: isHighlighted ? '#EFC570' : 'primary.main',
                     color: isHighlighted ? 'black' : 'white',
                     '&:hover': {
-                      backgroundColor: isHighlighted ? 'gold' : 'primary.dark',
+                      backgroundColor: isHighlighted ? '#EFC570' : 'primary.dark',
                     },
                   }}
                 >
