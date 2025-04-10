@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useEffect, useState } from 'react';
 import {
   Box,
@@ -18,7 +17,11 @@ import CohortBatchSelector from './CohortBatchSelector';
 import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { createUser, updateUser } from '@/services/CreateUserService';
-import { getUserFullName, toPascalCase } from '@/utils/Helper';
+import {
+  getReassignPayload,
+  getUserFullName,
+  toPascalCase,
+} from '@/utils/Helper';
 import { sendCredentialService } from '@/services/NotificationService';
 import { showToastMessage } from '@/components/Toastify';
 import {
@@ -26,14 +29,19 @@ import {
   splitUserData,
   telemetryCallbacks,
 } from '../DynamicFormCallback';
+import { getCohortList } from '@/services/GetCohortList';
+import {
+  bulkCreateCohortMembers,
+  updateReassignUser,
+} from '@/services/CohortService/cohortService';
 const FacilitatorForm = ({
   t,
   SuccessCallback,
   schema,
   uiSchema,
   editPrefilledFormData,
-  isEdit = false,
-  isReassign = false,
+  isEdit,
+  isReassign,
   UpdateSuccessCallback,
   extraFields,
   extraFieldsUpdate,
@@ -65,109 +73,230 @@ const FacilitatorForm = ({
   const [centerList, setCenterList] = useState(null);
   const [selectedCenterBatches, setSelectedCenterBatches] = useState(null);
 
+  const [isChangeForm, setIsChangeForm] = useState(false);
+  // const [testIs, setShowNextForm] = useState<boolean>(true);
+
   useEffect(() => {
-    let isEditSchema = _.cloneDeep(schema);
-    let isEditSchemaCB = _.cloneDeep(schema);
-    let isEditUiSchema = _.cloneDeep(uiSchema);
+    const fetchData = async () => {
+      let isEditSchema = _.cloneDeep(schema);
+      let isEditSchemaCB = _.cloneDeep(schema);
+      let isEditUiSchema = _.cloneDeep(uiSchema);
 
-    if (localStorage.getItem('stateId')) {
-      // console.log('##########isEditUiSchema', isEditUiSchema);
-      // ✅ Add `ui:disabled` to the `state` field
-      if (isEditUiSchema?.state) {
-        isEditUiSchema.state['ui:disabled'] = true;
-      }
-    }
-
-    if (isEdit) {
-      console.log('########### debug issue ', isEditUiSchema);
-      let keysToRemove = [
-        'state',
-        'district',
-        'block',
-        'village',
-        'password',
-        'confirm_password',
-        'board',
-        'medium',
-        'parentId',
-        'center',
-        'batch',
-        'grade',
-      ];
-      //disable center type if value present
-      //if first time not designation is sent then update it but backend fix required as it gives eneditable field issue
-      // if (!editPrefilledFormData?.designation) {
-      //   isEditUiSchema = {
-      //     ...isEditUiSchema,
-      //     designation: {
-      //       ...isEditUiSchema.designation,
-      //       'ui:disabled': false,
-      //     },
-      //   };
-      // }
-      keysToRemove.forEach((key) => delete isEditSchema.properties[key]);
-      keysToRemove.forEach((key) => delete isEditUiSchema[key]);
-      //also remove from required if present
-      isEditSchema.required = isEditSchema.required.filter(
-        (key) => !keysToRemove.includes(key)
-      );
-      // console.log('isEditSchema', JSON.stringify(isEditSchema));
-    } else if (isReassign) {
-      let originalRequired = isEditSchema.required;
-      const keysToHave = [
-        'state',
-        'district',
-        'block',
-        'village',
-        'center',
-        'batch',
-      ];
-      isEditSchema = {
-        type: 'object',
-        properties: keysToHave.reduce((obj, key) => {
-          if (isEditSchema.properties[key]) {
-            obj[key] = isEditSchema.properties[key];
-          }
-          return obj;
-        }, {}),
-      };
-      isEditUiSchema = keysToHave.reduce((obj, key) => {
-        if (isEditUiSchema[key]) {
-          obj[key] = isEditUiSchema[key];
+      if (localStorage.getItem('stateId')) {
+        // console.log('##########isEditUiSchema', isEditUiSchema);
+        // ✅ Add `ui:disabled` to the `state` field
+        if (isEditUiSchema?.state) {
+          isEditUiSchema.state['ui:disabled'] = true;
         }
-        return obj;
-      }, {});
-      isEditSchema.required = originalRequired;
+      }
 
-      //also remove from required if present
-      isEditSchema.required = isEditSchema.required.filter((key) =>
-        keysToHave.includes(key)
-      );
-      // console.log('isEditSchema', JSON.stringify(isEditSchema));
-    } else {
-      const keysToRemove = [
-        'password',
-        'confirm_password',
-        'program',
-        'center',
-        'batch',
-      ];
-      keysToRemove.forEach((key) => delete isEditSchema?.properties[key]);
-      keysToRemove.forEach((key) => delete isEditUiSchema[key]);
-      //also remove from required if present
-      isEditSchema.required = isEditSchema.required.filter(
-        (key) => !keysToRemove.includes(key)
-      );
-      // console.log('isEditSchema', JSON.stringify(isEditSchema));
+      console.log('######## filteredKeys start', isReassign);
+      if (isEdit) {
+        console.log('########### debug issue ', isEditUiSchema);
+        let keysToRemove = [
+          'state',
+          'district',
+          'block',
+          'village',
+          'password',
+          'confirm_password',
+          'board',
+          'medium',
+          'parentId',
+          'center',
+          'batch',
+          'grade',
+        ];
+        //disable center type if value present
+        //if first time not designation is sent then update it but backend fix required as it gives eneditable field issue
+        // if (!editPrefilledFormData?.designation) {
+        //   isEditUiSchema = {
+        //     ...isEditUiSchema,
+        //     designation: {
+        //       ...isEditUiSchema.designation,
+        //       'ui:disabled': false,
+        //     },
+        //   };
+        // }
+        keysToRemove.forEach((key) => delete isEditSchema.properties[key]);
+        keysToRemove.forEach((key) => delete isEditUiSchema[key]);
+        //also remove from required if present
+        isEditSchema.required = isEditSchema.required.filter(
+          (key) => !keysToRemove.includes(key)
+        );
+        // console.log('isEditSchema', JSON.stringify(isEditSchema));
+      } else if (isReassign) {
+        console.log('######## filteredKeys isReassign');
+        let originalRequired = isEditSchema.required;
+        const keysToHave = [
+          'state',
+          'district',
+          'block',
+          'village',
+          // 'center',
+          // 'batch',
+          'designation',
+        ];
 
-      //create another for sending center and batch
-      const keysToRemoveCB = ['password', 'confirm_password', 'program'];
-      keysToRemoveCB.forEach((key) => delete isEditSchemaCB?.properties[key]);
-    }
-    setAlteredSchema(isEditSchema);
-    setAlteredSchemaCB(isEditSchemaCB);
-    setAlteredUiSchema(isEditUiSchema);
+        console.log('######## filteredKeys keysToHave', keysToHave);
+        const properties = isEditSchema.properties;
+        const filteredKeys = Object.keys(properties).filter(
+          (key) => !keysToHave.includes(key)
+        );
+        console.log('######## filteredKeys', filteredKeys);
+        let keysToRemove = filteredKeys;
+        keysToRemove.forEach((key) => delete isEditSchema.properties[key]);
+        keysToRemove.forEach((key) => delete isEditUiSchema[key]);
+        //also remove from required if present
+        isEditSchema.required = isEditSchema.required.filter(
+          (key) => !keysToRemove.includes(key)
+        );
+
+        //remove ui:order
+        isEditUiSchema['ui:order'] = isEditUiSchema['ui:order'].filter(
+          (key) => !keysToRemove.includes(key)
+        );
+
+        console.log('######## filteredKeys isEditSchema', isEditSchema);
+        console.log('######## filteredKeys isEditUiSchema', isEditUiSchema);
+        let alterPrefilledFormData = prefilledFormData;
+
+        const filteredData = Object.fromEntries(
+          Object.entries(alterPrefilledFormData).filter(
+            ([key]) => !keysToRemove.includes(key)
+          )
+        );
+        console.log('######## filteredKeys filteredData', filteredData);
+        setPrefilledFormData(filteredData);
+        setIsChangeForm((preVal) => !preVal);
+      } else {
+        const keysToRemove = [
+          'password',
+          'confirm_password',
+          'program',
+          'center',
+          'batch',
+        ];
+        keysToRemove.forEach((key) => delete isEditSchema?.properties[key]);
+        keysToRemove.forEach((key) => delete isEditUiSchema[key]);
+        //also remove from required if present
+        isEditSchema.required = isEditSchema.required.filter(
+          (key) => !keysToRemove.includes(key)
+        );
+        // console.log('isEditSchema', JSON.stringify(isEditSchema));
+
+        //create another for sending center and batch
+        const keysToRemoveCB = ['password', 'confirm_password', 'program'];
+        keysToRemoveCB.forEach((key) => delete isEditSchemaCB?.properties[key]);
+      }
+      setAlteredSchema(isEditSchema);
+      setAlteredSchemaCB(isEditSchemaCB);
+      setAlteredUiSchema(isEditUiSchema);
+    };
+    fetchData();
   }, []);
+
+  const flresponsetotl = async (response: any[]) => {
+    console.log('###### responsedebug flresponsetotl', response);
+    const uniqueParentIds = Array.from(
+      new Set(
+        response
+          .filter((item) => item.cohortMemberStatus === 'active')
+          .map((item) => item.parentId)
+      )
+    );
+    console.log('###### responsedebug uniqueParentIds', uniqueParentIds);
+
+    const fetchParentData = async (parentId: string) => {
+      try {
+        const url = API_ENDPOINTS.cohortSearch;
+        const header = {
+          tenantId: localStorage.getItem('tenantId') || '',
+          Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+          academicyearid: localStorage.getItem('academicYearId') || '',
+        };
+
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...header,
+          },
+          body: JSON.stringify({
+            limit: 200,
+            offset: 0,
+            filters: {
+              status: ['active'],
+              cohortId: parentId,
+            },
+          }),
+        });
+
+        const data = await response.json();
+        const cohortDetails = data?.result?.results?.cohortDetails || [];
+
+        // Remove customFields if needed
+        const filteredBatch = cohortDetails
+          .filter((item) => item.status === 'active')
+          .map(({ customFields, ...rest }) => rest);
+
+        return filteredBatch;
+      } catch (error) {
+        console.error(`Error fetching data for parentId ${parentId}:`, error);
+        return [];
+      }
+    };
+
+    const getAllParentData = async (parentIds: string[]) => {
+      const results = await Promise.all(
+        parentIds.map((id) => fetchParentData(id))
+      );
+      return results.flat(); // flatten nested arrays
+    };
+
+    // Now fetch and attach children
+    const parentData = await getAllParentData(uniqueParentIds);
+
+    const updatedCohorts = parentData.map((cohort) => {
+      const children = response.filter(
+        (child) =>
+          child.parentId === cohort.cohortId &&
+          child.cohortMemberStatus == 'active'
+      );
+
+      return {
+        ...cohort,
+        childData: children,
+      };
+    });
+
+    console.log('###### responsedebug updatedCohorts', updatedCohorts);
+    const transformCohortData = (cohorts) => {
+      const transform = (item) => {
+        const { name, cohortName, status, cohortStatus, childData, ...rest } =
+          item;
+
+        const updated = {
+          ...rest,
+          name: cohortName ?? name,
+          cohortName: name ?? cohortName,
+          status: cohortStatus ?? status,
+          cohortStatus: status ?? cohortStatus,
+          childData: childData?.map(transform) || [],
+        };
+
+        return updated;
+      };
+
+      return cohorts.map(transform);
+    };
+
+    // Usage
+    const transformedData = transformCohortData(updatedCohorts);
+    console.log('###### responsedebug transformedData', transformedData);
+
+    return transformedData;
+  };
 
   const StepperFormSubmitFunction = async (formData: any, payload: any) => {
     if (isEdit) {
@@ -215,12 +344,14 @@ const FacilitatorForm = ({
         setSelectedCenterBatches(null);
       }
       setBlockId(formData?.block);
+      console.log('############ new formdata', formData);
       setPrefilledFormData(formData);
       setShowNextForm(true);
       setButtonShow(false);
     }
   };
   const onCloseNextForm = (cohortdata) => {
+    console.log('########## cohortdata', cohortdata);
     setSelectedCenterBatches(cohortdata);
     setShowNextForm(false);
     setButtonShow(true);
@@ -350,6 +481,19 @@ const FacilitatorForm = ({
             (item) => item.childData && item.childData.length > 0
           );
 
+          //prefilled value for user
+          if (selectedCenterBatches == null && isReassign === true) {
+            //set setSelectedCenterBatches
+            let response = await getCohortList(editableUserId);
+            console.log('###### responsedebug editableUserId', editableUserId);
+            console.log('###### responsedebug mycohor', response);
+            if (response?.result) {
+              let centerId = await flresponsetotl(response.result);
+              setSelectedCenterBatches(centerId);
+              console.log('###### responsedebug centerId', centerId);
+            }
+          }
+
           setCenterList(centerBatchList);
         }
       })
@@ -374,52 +518,99 @@ const FacilitatorForm = ({
     formDataCreate['center'] = parentCohortIds;
     formDataCreate['batch'] = childCohortIds;
     // Optional extra root-level fields
-    // Extra Field for cohort creation
-    const transformedFormData = transformFormData(
-      formDataCreate,
-      alteredSchemaCB,
-      extraFields
-    );
-
-    transformedFormData.username = formDataCreate.email;
-    const randomNum = Math.floor(10000 + Math.random() * 90000).toString();
-    transformedFormData.password = randomNum;
-    if (transformedFormData?.batch) {
-      const cohortIds = transformedFormData.batch;
-      transformedFormData.tenantCohortRoleMapping[0]['cohortIds'] = cohortIds;
-      delete transformedFormData.batch;
-    }
-
-    console.log(
-      '######## debug issue facilitator transformedFormData',
-      transformedFormData
-    );
-
-    //create user
-    const responseUserData = await createUser(transformedFormData);
-    if (responseUserData?.userData?.userId) {
-      showToastMessage(t(successCreateMessage), 'success');
-
-      telemetryCallbacks(telemetryCreateKey);
-      SuccessCallback();
-
-      // Send Notification with credentials to user
+    if (isReassign === true) {
+      // Extra Field for cohort creation
+      const transformedFormData = transformFormData(
+        formDataCreate,
+        alteredSchemaCB,
+        extraFieldsUpdate
+      );
+      let payload = transformedFormData;
       try {
-        await notificationCallback(
-          successCreateMessage,
-          notificationContext,
-          notificationKey,
-          transformedFormData,
-          t,
-          notificationMessage,
-          type
+        // console.log('new', formData?.batch);
+        // console.log(editPrefilledFormData?.batch, 'old');
+        delete payload?.batch;
+        console.log('payload', payload);
+        const reassignmentPayload = {
+          ...payload,
+          userData: {
+            firstName: editPrefilledFormData.firstName,
+          },
+        };
+        const resp = await updateReassignUser(
+          editableUserId,
+          reassignmentPayload
         );
-      } catch (notificationError) {
-        console.error('Notification failed:', notificationError);
-        // No failure toast here to prevent duplicate messages
+        if (resp) {
+          const cohortIdPayload = getReassignPayload(
+            editPrefilledFormData.batch,
+            formDataCreate.batch
+          );
+          const res = await bulkCreateCohortMembers({
+            userId: [editableUserId],
+            cohortId: cohortIdPayload.cohortId,
+            ...(cohortIdPayload.removedIds.length > 0 && {
+              removeCohortId: cohortIdPayload.removedIds,
+            }),
+          });
+          showToastMessage(t(successUpdateMessage), 'success');
+          telemetryCallbacks(telemetryUpdateKey);
+          UpdateSuccessCallback();
+        } else {
+          // console.error('Error reassigning user:', error);
+          showToastMessage(t(failureUpdateMessage), 'error');
+        }
+      } catch (error) {
+        console.error('Error reassigning user:', error);
+        showToastMessage(t(failureUpdateMessage + 'ssdsds'), 'error');
       }
     } else {
-      showToastMessage(t(failureCreateMessage), 'error');
+      // Extra Field for cohort creation
+      const transformedFormData = transformFormData(
+        formDataCreate,
+        alteredSchemaCB,
+        extraFields
+      );
+      transformedFormData.username = formDataCreate.email;
+      const randomNum = Math.floor(10000 + Math.random() * 90000).toString();
+      transformedFormData.password = randomNum;
+      if (transformedFormData?.batch) {
+        const cohortIds = transformedFormData.batch;
+        transformedFormData.tenantCohortRoleMapping[0]['cohortIds'] = cohortIds;
+        delete transformedFormData.batch;
+      }
+
+      console.log(
+        '######## debug issue facilitator transformedFormData',
+        transformedFormData
+      );
+
+      //create user
+      const responseUserData = await createUser(transformedFormData);
+      if (responseUserData?.userData?.userId) {
+        showToastMessage(t(successCreateMessage), 'success');
+
+        telemetryCallbacks(telemetryCreateKey);
+        SuccessCallback();
+
+        // Send Notification with credentials to user
+        try {
+          await notificationCallback(
+            successCreateMessage,
+            notificationContext,
+            notificationKey,
+            transformedFormData,
+            t,
+            notificationMessage,
+            type
+          );
+        } catch (notificationError) {
+          console.error('Notification failed:', notificationError);
+          // No failure toast here to prevent duplicate messages
+        }
+      } else {
+        showToastMessage(t(failureCreateMessage), 'error');
+      }
     }
   };
 
@@ -483,6 +674,7 @@ const FacilitatorForm = ({
               )
             ) : (
               <DynamicForm
+                // key={isChangeForm ? 'dynamicform' : 'defaultform'}
                 schema={alteredSchema}
                 uiSchema={alteredUiSchema}
                 t={t}

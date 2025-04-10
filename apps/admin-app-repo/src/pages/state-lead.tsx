@@ -8,7 +8,7 @@ import {
   StateLeadUISchema,
 } from '../constant/Forms/StateLeadSearch';
 
-import { RoleId, RoleName, Status } from '@/utils/app.constant';
+import { RoleId, RoleName, Status, TenantName } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
 import { Box, Typography } from '@mui/material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
@@ -115,24 +115,24 @@ const StateLead = () => {
           ([_, value]) => !Array.isArray(value) || value.length > 0
         )
       );
-    const staticFilter = {
-      role: RoleName.STATE_LEAD,
-      tenantId: storedUserData.tenantData[0].tenantId,
-    };
-    const { sortBy } = formData;
-    const staticSort = ['firstName', sortBy || 'asc'];
-    await searchListData(
-      formData,
-      newPage,
-      staticFilter,
-      pageLimit,
-      setPageOffset,
-      setCurrentPage,
-      setResponse,
-      userList,
-      staticSort
-    );
-   }
+      const staticFilter = {
+        role: RoleName.STATE_LEAD,
+        tenantId: storedUserData.tenantData[0].tenantId,
+      };
+      const { sortBy } = formData;
+      const staticSort = ['firstName', sortBy || 'asc'];
+      await searchListData(
+        formData,
+        newPage,
+        staticFilter,
+        pageLimit,
+        setPageOffset,
+        setCurrentPage,
+        setResponse,
+        userList,
+        staticSort
+      );
+    }
   };
 
   // Define table columns
@@ -194,7 +194,7 @@ const StateLead = () => {
         setEditableUserId(row?.userId);
         handleOpenModal();
       },
-      show: (row) => row.status !== 'archived'
+      show: (row) => row.status !== 'archived',
     },
     {
       icon: (
@@ -225,7 +225,7 @@ const StateLead = () => {
         searchData(prefilledFormData, currentPage);
         setOpenModal(false);
       },
-      show: (row) => row.status !== 'archived'
+      show: (row) => row.status !== 'archived',
     },
   ];
 
@@ -263,7 +263,11 @@ const StateLead = () => {
   const successCreateMessage = 'STATE_LEADS.STATE_LEAD_CREATED_SUCCESSFULLY';
   const telemetryCreateKey = 'content-creator-created-successfully';
   const failureCreateMessage = 'STATE_LEADS.NOT_ABLE_CREATE_STATE_LEAD';
-  const notificationKey = 'onStateLeadCreate';
+  // const notificationKey = 'onStateLeadCreate';
+  const notificationKey =
+    storedUserData.tenantData[0].tenantName === TenantName.SECOND_CHANCE_PROGRAM
+      ? 'onScpStateLeadCreate'
+      : 'onYouthnetStateLeadCreate';
   const notificationMessage = 'STATE_LEADS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
   useEffect(() => {
@@ -312,9 +316,7 @@ const StateLead = () => {
           open={openModal}
           onClose={handleCloseModal}
           showFooter={true}
-          primaryText={
-            isEdit ? t('Update') : t('Create')
-          }
+          primaryText={isEdit ? t('Update') : t('Create')}
           id="dynamic-form-id"
           modalTitle={
             isEdit
@@ -355,33 +357,34 @@ const StateLead = () => {
         </SimpleModal>
 
         {response != null ? (
-        <>
-          {response && response?.result?.getUserDetails ? (
-          <Box sx={{ mt: 1 }}>
-            <PaginatedTable
-              count={response?.result?.totalCount}
-              data={response?.result?.getUserDetails}
-              columns={columns}
-              actions={actions}
-              onPageChange={handlePageChange}
-              onRowsPerPageChange={handleRowsPerPageChange}
-              defaultPage={currentPage}
-              defaultRowsPerPage={pageLimit}
-            />
-          </Box>
+          <>
+            {response && response?.result?.getUserDetails ? (
+              <Box sx={{ mt: 1 }}>
+                <PaginatedTable
+                  count={response?.result?.totalCount}
+                  data={response?.result?.getUserDetails}
+                  columns={columns}
+                  actions={actions}
+                  onPageChange={handlePageChange}
+                  onRowsPerPageChange={handleRowsPerPageChange}
+                  defaultPage={currentPage}
+                  defaultRowsPerPage={pageLimit}
+                />
+              </Box>
+            ) : (
+              <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                height="20vh"
+              >
+                <Typography marginTop="10px" textAlign={'center'}>
+                  {t('COMMON.NO_STATE_LEAD_FOUND')}
+                </Typography>
+              </Box>
+            )}
+          </>
         ) : (
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            height="20vh"
-          >
-            <Typography marginTop="10px" textAlign={'center'}>
-              {t('COMMON.NO_STATE_LEAD_FOUND')}
-            </Typography>
-          </Box>
-        )}
-        </> ) : (
           <CenteredLoader />
         )}
       </Box>
