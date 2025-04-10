@@ -1068,7 +1068,7 @@ export const getAge = (dobString: any) => {
 //convert fl response to tl format
 export const flresponsetotl = async (response: any[]) => {
   const uniqueParentIds = Array.from(
-    new Set(response.map((item) => item.parentID))
+    new Set(response.map((item) => item.parentId))
   );
 
   const fetchParentData = async (parentId: string) => {
@@ -1123,7 +1123,7 @@ export const flresponsetotl = async (response: any[]) => {
 
   const updatedCohorts = parentData.map((cohort) => {
     const children = response.filter(
-      (child) => child.parentID === cohort.cohortId
+      (child) => child.parentId === cohort.cohortId
     );
 
     return {
