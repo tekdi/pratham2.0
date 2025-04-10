@@ -792,5 +792,6 @@
    "UNMARRIED": "Unmarried",
   "MARRIED": "Married",
   "DIVORCED": "Divorced",
-  "SELF_PLACED": "Self Placed"
+  "SELF_PLACED": "Self Placed",
+   "DESIGNATION": "Designation"
 }

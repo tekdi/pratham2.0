@@ -1,4 +1,3 @@
-import CenterList from '@/components/center/centerList';
 import CreateCenterModal from '@/components/center/CreateCenterModal';
 import NoDataFound from '@/components/common/NoDataFound';
 import Header from '@/components/Header';
@@ -152,6 +151,7 @@ const CentersPage = () => {
 
   useEffect(() => {
     if (selectedCenter) {
+      setFilteredBatches([]);
       setBatchLoading(true);
       getBlocksByCenterId(selectedCenter, centerList)
         .then((res) => {
@@ -281,6 +281,7 @@ const CentersPage = () => {
         // showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
       }
     };
+    setCenterList([]);
     getCohortListForTL();
   }, [isTeamLeader, isCenterAdded, reloadState]);
 
@@ -350,6 +351,7 @@ const CentersPage = () => {
     localStorage.setItem('centerId', cohortId);
 
     if (cohortId) {
+      setFilteredBatches([]);
       getBlocksByCenterId(cohortId, centerList).then((res) => {
         console.log('Fetched batches:', res); // Log the fetched data
         setFilteredBatches(res);
@@ -516,6 +518,7 @@ const CentersPage = () => {
                   <CenterDropdown
                     cohortId={selectedCenter}
                     onChange={handleCenterChange}
+                    centerList={centerList}
                   />
                 </Box>
               </Box>
