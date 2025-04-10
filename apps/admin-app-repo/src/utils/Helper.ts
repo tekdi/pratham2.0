@@ -654,10 +654,16 @@ export function getReassignPayload(
   removedId: Array<string>,
   newCohortId: Array<string>
 ) {
-  const cohortId = newCohortId;
-  const removedIds = removedId.filter((id: string) => !cohortId.includes(id));
-
-  return { cohortId, removedIds };
+  console.log('######### testss removedId', removedId);
+  console.log('######### testss newCohortId', newCohortId);
+  try {
+    const cohortId = newCohortId;
+    const removedIds = removedId.filter((id: string) => !cohortId.includes(id));
+    return { cohortId, removedIds };
+  } catch (e) {
+    const removedIds: any = [];
+    return { cohortId: newCohortId, removedIds };
+  }
 }
 
 export const fetchUserData = async (userId: any) => {
