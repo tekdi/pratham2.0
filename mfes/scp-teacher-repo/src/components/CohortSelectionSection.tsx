@@ -835,11 +835,52 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                               </Select>
                             </FormControl>
                           ) : (
-                            <Typography color={theme.palette.warning['300']}>
-                              {filteredCohortData?.length === 0
-                                ? t('COMMON.NO_CENTER_FOUND')
-                                : toPascalCase(filteredCohortData[0]?.name)}
-                            </Typography>
+                            <>
+                              <FormControl
+                                fullWidth
+                                disabled
+                                variant="outlined"
+                                sx={{
+                                  '& .MuiInputLabel-root': {
+                                    color: theme.palette.primary.light, // Label color
+                                  },
+                                }}
+                              >
+                                <InputLabel id="chip-label">center</InputLabel>
+                                <Select
+                                  labelId="chip-label"
+                                  value={
+                                    filteredCohortData?.length === 0
+                                      ? ''
+                                      : toPascalCase(
+                                          filteredCohortData[0]?.name
+                                        )
+                                  }
+                                  label="Chip"
+                                >
+                                  <MenuItem value="">
+                                    <Typography
+                                      color={theme.palette.warning['300']}
+                                    >
+                                      {t('COMMON.NO_CENTER_FOUND')}
+                                    </Typography>
+                                  </MenuItem>
+                                  {filteredCohortData?.length > 0 && (
+                                    <MenuItem
+                                      value={toPascalCase(
+                                        filteredCohortData[0]?.name
+                                      )}
+                                    >
+                                      <Typography>
+                                        {toPascalCase(
+                                          filteredCohortData[0]?.name
+                                        )}
+                                      </Typography>
+                                    </MenuItem>
+                                  )}
+                                </Select>
+                              </FormControl>
+                            </>
                           )}
                         </>
                       )}
@@ -965,11 +1006,40 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                               </Select>
                             </FormControl>
                           ) : (
-                            <Typography color={theme.palette.warning['300']}>
-                              {filteredBatchData?.length === 0
-                                ? t('COMMON.NO_BATCH_FOUND')
-                                : toPascalCase(filteredBatchData[0]?.name)}
-                            </Typography>
+                                  <FormControl
+                                    fullWidth
+                                    disabled
+                                    variant="outlined"
+                                    sx={{
+                                      '& .MuiInputLabel-root': {
+                                        color: theme.palette.primary.light,
+                                      }
+                                    }}
+                                  >
+                                    <InputLabel id="batch-label">Batch</InputLabel>
+                                    <Select
+                                      labelId="batch-label"
+                                      value={
+                                        filteredBatchData?.length === 0
+                                          ? ""
+                                          : toPascalCase(filteredBatchData[0]?.name)
+                                      }
+                                      label="Batch"
+                                    >
+                                      <MenuItem value="">
+                                        <Typography color={theme.palette.warning["300"]}>
+                                          {t("COMMON.NO_BATCH_FOUND")}
+                                        </Typography>
+                                      </MenuItem>
+                                      {filteredBatchData?.length > 0 && (
+                                        <MenuItem value={toPascalCase(filteredBatchData[0]?.name)}>
+                                          <Typography>
+                                            {toPascalCase(filteredBatchData[0]?.name)}
+                                          </Typography>
+                                        </MenuItem>
+                                      )}
+                                    </Select>
+                                  </FormControl>
                           )}
                         </>
                       )}

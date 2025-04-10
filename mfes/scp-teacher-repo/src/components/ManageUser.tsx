@@ -231,6 +231,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
             }
           });
 
+
           const extractedData = facilitatorList?.map(
             (user: any, index: number) => {
               const cohorts = cohortDetails[index] || [];
@@ -239,12 +240,9 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                 (cohort.childData || []).filter((child: any) => child.type === 'BATCH')
               )
 
-              const batchNames = cohorts.flatMap((cohort: any) =>
-                (cohort.childData || [])
-                  .filter((child: any) => child.type === 'BATCH')
-                  .map((child: any) => child.name)
-              );
-              console.log('### batchNames ===>', batchNames);
+              const batchNames = cohorts
+              .filter((item: any) => item.type === 'BATCH' && item.cohortStatus === 'active')
+              .map((item: any) => item.cohortName);
 
               const cohortNames = cohorts
                 .filter(
@@ -579,9 +577,9 @@ const ManageUser: React.FC<ManageUsersProps> = ({
     return cohortNames;
   };
 
-  const getBatchNames = (cohortNames: any) => {
-    if (!Array.isArray(cohortNames)) return null;
-  return cohortNames.join(', ');
+  const getBatchNames = (batchNames: any) => {
+    if (!Array.isArray(batchNames)) return null;
+  return batchNames.join(', ');
   };
 
   const handleSearch = (searchTerm: string) => {
@@ -803,7 +801,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                                 marginBottom: '10px',
                                               }}
                                             >
-                                              {user?.cohortNames
+                                              {user?.batchNames?.length > 0
                                                 ? getBatchNames(
                                                     user.batchNames
                                                   )
@@ -902,15 +900,18 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                 anchorEl={anchorEl}
                 isMobile={isMobile}
                 optionList={[
-                  {
-                    label: t('COMMON.ADD_OR_REASSIGN_CENTERS'),
-                    icon: (
-                      <ApartmentIcon
-                        sx={{ color: theme.palette.warning['300'] }}
-                      />
-                    ),
-                    name: 'reassign-block',
-                  },
+
+                  // TODO
+
+                  // {
+                  //   label: t('COMMON.ADD_OR_REASSIGN_CENTERS'),
+                  //   icon: (
+                  //     <ApartmentIcon
+                  //       sx={{ color: theme.palette.warning['300'] }}
+                  //     />
+                  //   ),
+                  //   name: 'reassign-block',
+                  // },
                   // TODO: Integrate todo service
                   // {
                   //   label: t('COMMON.REASSIGN_BLOCKS_REQUEST'),
