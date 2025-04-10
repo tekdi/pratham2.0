@@ -902,15 +902,18 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                 anchorEl={anchorEl}
                 isMobile={isMobile}
                 optionList={[
-                  {
-                    label: t('COMMON.ADD_OR_REASSIGN_CENTERS'),
-                    icon: (
-                      <ApartmentIcon
-                        sx={{ color: theme.palette.warning['300'] }}
-                      />
-                    ),
-                    name: 'reassign-block',
-                  },
+
+                  // TODO
+
+                  // {
+                  //   label: t('COMMON.ADD_OR_REASSIGN_CENTERS'),
+                  //   icon: (
+                  //     <ApartmentIcon
+                  //       sx={{ color: theme.palette.warning['300'] }}
+                  //     />
+                  //   ),
+                  //   name: 'reassign-block',
+                  // },
                   // TODO: Integrate todo service
                   // {
                   //   label: t('COMMON.REASSIGN_BLOCKS_REQUEST'),

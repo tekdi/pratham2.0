@@ -709,15 +709,18 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
                   option.name !== 'reassign-centers')
             )
             : [
-              {
-                label: t('COMMON.REASSIGN_CENTERS'),
-                icon: (
-                  <ApartmentIcon
-                    sx={{ color: theme.palette.warning['300'] }}
-                  />
-                ),
-                name: 'reassign-centers',
-              },
+              
+              // TODO
+
+              // { 
+              //   label: t('COMMON.REASSIGN_CENTERS'),
+              //   icon: (
+              //     <ApartmentIcon
+              //       sx={{ color: theme.palette.warning['300'] }}
+              //     />
+              //   ),
+              //   name: 'reassign-centers',
+              // },
               {
                 label: isDropout
                   ? t('COMMON.UNMARK_DROP_OUT')
