@@ -175,7 +175,7 @@ const Profile: React.FC<ProfileDetailsProps> = ({
         <Box mt={4}>
           <Typography
             variant="h6"
-            sx={{ fontWeight: 'bold', mb: 2, color: theme.palette.warning['500'] }}
+            sx={{ fontWeight: 'bold', mb: 1, color: theme.palette.warning['500'] }}
           >
             {t('SCP_PROFILE.SUBJECTS_I_TEACH')}
           </Typography>
@@ -183,19 +183,28 @@ const Profile: React.FC<ProfileDetailsProps> = ({
             {subjectsITeach.map((subject) => {
               const isHighlighted = mainSubjectIds.has(subject.id);
               return (
-                <Button
+                <Box
                   key={subject.id}
-                  variant={isHighlighted ? "contained" : "outlined"}
+
                   sx={{
-                    backgroundColor: isHighlighted ? '#EFC570' : 'primary.main',
-                    color: isHighlighted ? 'black' : 'white',
-                    '&:hover': {
-                      backgroundColor: isHighlighted ? '#EFC570' : 'primary.dark',
-                    },
+                    backgroundColor: isHighlighted ? '#EFC570' : 'transparent',
+                    color: isHighlighted ? 'black' : 'black',
+                    cursor: 'default !important',
+                    borderRadius: "8px",
+                    padding: '5px 10px',
+                    fontFamily: 'Poppins',
+                    fontWeight: 500,
+                    fontSize: '14px',
+                    lineHeight: '20px',
+                    letterSpacing: '0.1px',
+                    textAlign: 'center',
+                    verticalAlign: 'middle',
+                    border: isHighlighted?'unset': "1px solid #DADADA"
+
                   }}
                 >
                   {subject.label}
-                </Button>
+                </Box>
               );
             })}
           </Box>
