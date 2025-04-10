@@ -179,7 +179,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
   };
   const getBatchFilteredData = async (centerId: any) => {
     if (userId) {
-      const response = await queryClient.fetchQuery({
+      let response = await queryClient.fetchQuery({
         queryKey: [QueryKeys.MY_COHORTS, userId],
         queryFn: () => getCohortList(userId, { customField: 'true' }),
       });
@@ -199,6 +199,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
       return filteredChildData;
     }
   };
+
   useEffect(() => {
     if (userId) {
       if (!loading) {
@@ -206,7 +207,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
       }
       const fetchCohorts = async () => {
         try {
-          const response = await queryClient.fetchQuery({
+          let response = await queryClient.fetchQuery({
             queryKey: [QueryKeys.MY_COHORTS, userId],
             queryFn: () => getCohortList(userId, { customField: 'true' }),
           });

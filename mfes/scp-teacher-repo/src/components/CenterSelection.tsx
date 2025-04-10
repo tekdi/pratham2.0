@@ -22,7 +22,9 @@ const CenterDropdown: React.FC<CenterDropdownProps> = ({
   onChange,
 }) => {
   const [centers, setCenters] = useState<any[]>([]);
-  const [selectedCenterId, setSelectedCenterId] = useState<string>(cohortId || '');
+  const [selectedCenterId, setSelectedCenterId] = useState<string>(
+    cohortId || ''
+  );
   const queryClient = useQueryClient();
 
   useEffect(() => {
