@@ -372,6 +372,12 @@ const LoginPage = () => {
 
             if (userResponse) {
               localStorage.setItem('userId', userResponse?.userId);
+              console.log(userResponse?.tenantData);
+              localStorage.setItem(
+                'templtateId',
+                userResponse?.tenantData?.[0]?.templateId
+              );
+
               localStorage.setItem('userIdName', userResponse?.username);
               // Update Zustand store
               setUserId(userResponse?.userId || '');
