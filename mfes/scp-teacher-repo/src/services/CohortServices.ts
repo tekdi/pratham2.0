@@ -170,7 +170,8 @@ export const getBlocksByCenterId = async (
   if (!centerList) {
     throw new Error('centerList is required');
   }
-  // console.log('!!!!!', centerList);
+
+  console.log('!!!!!', centerList);
   const matchingChildren = getChildDataByParentId(centerList, centerId);
   return matchingChildren;
 };
