@@ -208,8 +208,6 @@ const ManageUser: React.FC<ManageUsersProps> = ({
           }
           const userIds = facilitatorList?.map((user: any) => user.userId);
 
-          console.log('Test### userIds', userIds)
-
           const cohortDetailsPromises = userIds.map((userId: string) =>
             queryClient.fetchQuery({
               queryKey: [QueryKeys.MY_COHORTS, userId],
@@ -233,13 +231,10 @@ const ManageUser: React.FC<ManageUsersProps> = ({
             }
           });
 
-          console.log ('Test### cohortDetails', cohortDetails)
 
           const extractedData = facilitatorList?.map(
             (user: any, index: number) => {
               const cohorts = cohortDetails[index] || [];
-
-              console.log ('Test### cohorts', cohorts)
 
               const batches = cohorts.flatMap((cohort: any) =>
                 (cohort.childData || []).filter((child: any) => child.type === 'BATCH')
@@ -248,8 +243,6 @@ const ManageUser: React.FC<ManageUsersProps> = ({
               const batchNames = cohorts
               .filter((item: any) => item.type === 'BATCH' && item.cohortStatus === 'active')
               .map((item: any) => item.cohortName);
-
-            console.log('Test### batchNames', batchNames);
 
               const cohortNames = cohorts
                 .filter(

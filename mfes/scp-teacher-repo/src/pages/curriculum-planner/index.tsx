@@ -209,7 +209,6 @@ const CoursePlanner = () => {
   useEffect(() => {
     // console.log('## store', store)
     // if (store?.cohorts?.length > 0) {
-    //   console.log('Rajnish cohortId', router.query.center);
     //   const cohortId = router.query.center
     //     ? router.query.center
     //     : store.cohorts[0]?.childData[0]?.cohortId || store.cohorts[0].cohortId;
