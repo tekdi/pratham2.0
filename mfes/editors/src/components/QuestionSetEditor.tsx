@@ -116,7 +116,7 @@ const QuestionSetEditor: React.FC = () => {
     const isQueue = false;
     const context = "CMS";
     const key = "onContentReview";
-    const url = `${window.location.origin}/mfe_workspace/editor?identifier=${notificationData?.contentId}&contentMode=review`
+    const url = `${process.env.NEXT_PUBLIC_WORKSPACE_BASE_URL}/editor?identifier=${notificationData?.contentId}&contentMode=review`
     try {
       const response = await fetchCCTAList();
       const cctaList = response;

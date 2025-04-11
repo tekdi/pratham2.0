@@ -36,7 +36,7 @@ const CollectionEditor: React.FC = () => {
     const isQueue = false;
     const context = "CMS";
     const key = "onContentReview";
-    const url = `${window.location.origin}/mfe_workspace/collection?identifier=${notificationData?.contentId}&contentMode=review`;
+    const url = `${process.env.NEXT_PUBLIC_WORKSPACE_BASE_URL}/collection?identifier=${notificationData?.contentId}&contentMode=review`;
     try {
       const response = await fetchCCTAList();
       const cctaList = response;
