@@ -117,19 +117,28 @@ const UserId = () => {
             }}
           >
             <ArrowBackIcon sx={{ fontSize: '25px', color: '#4D4639' }} />
-            <Box
-              sx={{
-                fontWeight: 400,
-                fontSize: '22px',
-                lineHeight: '28px',
-                letterSpacing: '0px',
-                color: '#4D4639',
-              }}
-            >
-              {`${user.firstName} ${user.lastName}` || ''}
-            </Box>
             <Box>
-              {user.village} {user.block} {user.district} {user.state}
+              <Box
+                sx={{
+                  fontWeight: 400,
+                  fontSize: '22px',
+                  lineHeight: '28px',
+                  letterSpacing: '0px',
+                  color: '#4D4639',
+                }}
+              >
+                {`${user.firstName} ${user.lastName}` || ''}
+              </Box>
+<Box
+  sx={{
+    fontWeight: 500,
+    fontSize: '12px',
+    lineHeight: '16px',
+    letterSpacing: '0.5px',
+  }}
+>
+  {user.village}, {user.block}, {user.district}, {user.state}
+</Box>
             </Box>
           </Box>
         </Box>

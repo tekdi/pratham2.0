@@ -435,18 +435,21 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
     fetchUserDetails();
   }, [reload]);
 
-  const learnerDetailsByOrder = [...customFieldsData]
-    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-    .filter((field) => (field.order ?? 0) <= 12)
+  const uniqueFields = customFieldsData.filter(
+    (field, index, self) =>
+      index === self.findIndex((f) => f.label === field.label)
+  );
+
+  const learnerDetailsByOrder = [...uniqueFields]
+    ?.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+    ?.filter((field) => (field.order ?? 0) <= 12)
     ?.map((field) => {
       const getSelectedOption = (field: any) => {
         return (
           field?.options?.find(
             (option: any) =>
               option?.value ===
-              (typeof field?.value === 'string'
-                ? field.value
-                : field?.value?.[0])
+              (typeof field?.value === 'string' ? field.value : field?.value?.[0])
           ) || '-'
         );
       };
@@ -455,7 +458,7 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
         field.type === 'drop_down' ||
         field.type === 'radio' ||
         field.type === 'dropdown' ||
-        (field.type === 'Radio' && field.options && field.value.length)
+        (field.type === 'Radio' && field.options && field.value?.length)
       ) {
         const selectedOption = getSelectedOption(field);
         return {
@@ -464,10 +467,11 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
             selectedOption !== '-'
               ? selectedOption.label
               : field?.value
-              ? translateString(t, field?.value)
-              : '-',
+                ? translateString(t, field?.value)
+                : '-',
         };
       }
+
       return {
         ...field,
         displayValue: field?.value ? toPascalCase(field?.value) : '-',
@@ -758,20 +762,25 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
         </Grid>
         <Grid item>
           <Box>
+
+            
             {userDetails && isActiveYear && (
-              <LearnersListItem
-                type={Role.STUDENT}
-                key={userId}
-                userId={userId}
-                learnerName={userName}
-                cohortMembershipId={userDetails.cohortMembershipId}
-                isDropout={userDetails.status === Status.DROPOUT}
-                statusReason={userDetails.statusReason}
-                reloadState={reloadState ?? false}
-                setReloadState={setReloadState ?? (() => {})}
-                onLearnerDelete={handleLearnerDelete}
-                isFromProfile={true}
-              />
+           <>
+                {console.log(userDetails, 'userDetails')}
+                <LearnersListItem
+                  type={Role.STUDENT}
+                  key={userId}
+                  userId={userId}
+                  learnerName={userName}
+                  cohortMembershipId={userDetails.cohortMembershipId}
+                  isDropout={userDetails.status === Status.DROPOUT}
+                  statusReason={userDetails.statusReason}
+                  reloadState={reloadState ?? false}
+                  setReloadState={setReloadState ?? (() => { })}
+                  onLearnerDelete={handleLearnerDelete}
+                  isFromProfile={true}
+                />
+           </>
             )}
           </Box>
         </Grid>
