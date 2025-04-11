@@ -14,13 +14,20 @@ import { ContentStatus, Editor } from "../utils/app.constant";
 import useTenantConfig from "../hooks/useTenantConfig";
 const CollectionEditor: React.FC = () => {
   const router = useRouter();
-  const { identifier } = router.query;
+  const { identifier, contentMode } = router.query;
   const [mode, setMode] = useState<any>();
   const [fullName, setFullName] = useState("Anonymous User");
   const [deviceId, setDeviceId] = useState("");
 
   const [firstName, lastName] = fullName.split(" ");
   const tenantConfig = useTenantConfig();
+  useEffect(() => {
+    if (contentMode?.length) {
+      setMode(contentMode);
+    }
+  }, [router.query]);
+
+
 
   const sendReviewNotification = async (notificationData: any) => {
     console.log("notificationData", notificationData);
@@ -29,8 +36,7 @@ const CollectionEditor: React.FC = () => {
     const isQueue = false;
     const context = "CMS";
     const key = "onContentReview";
-    const url = `${window.location.origin}/collection?identifier=${notificationData?.contentId}`;
-  
+    const url = `${process.env.NEXT_PUBLIC_WORKSPACE_BASE_URL}/collection?identifier=${notificationData?.contentId}&contentMode=review`;
     try {
       const response = await fetchCCTAList();
       const cctaList = response;
@@ -121,7 +127,7 @@ const CollectionEditor: React.FC = () => {
       cloudStorageUrls: [CLOUD_STORAGE_URL],
     },
     config: {
-      mode: mode || "edit", // edit / review / read / sourcingReview
+      mode: contentMode || mode || "edit", // edit / review / read / sourcingReview
       userSpecificFrameworkField: getLocalStoredUserSpecificBoard(),
       objectType: "Collection",
       primaryCategory: "Course", // Professional Development Course, Curriculum Course
