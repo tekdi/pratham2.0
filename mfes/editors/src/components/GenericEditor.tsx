@@ -54,7 +54,7 @@ const GenericEditor: React.FC = () => {
     const isQueue = false;
     const context = "CMS";
     const key = "onContentReview";
-    const url = `${window.location.origin}/workspace/content/review?identifier=${notificationData?.contentId}`;
+    const url = `${window.location.origin}/mfe_workspace/workspace/content/review?identifier=${notificationData?.contentId}`;
  const ContentDetail = await fetch(
         `/action/content/v3/read/${notificationData?.contentId}`
       );

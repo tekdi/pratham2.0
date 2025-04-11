@@ -18,7 +18,7 @@ export const sendContentNotification = async (
       const isQueue = false;
       const context = "CMS";
       const key = status ===  ContentStatus.PUBLISHED? "onContentPublish" : "onContentReject";
-      let url = `${window.location.origin}/${editorType === Editor.CONTENT ? "upload-editor" : editorType === Editor.QUESTION_SET ? "editor" : "collection"}?identifier=${identifier}`;
+      let url = `${window.location.origin}/mfe_workspace/${editorType === Editor.CONTENT ? "upload-editor" : editorType === Editor.QUESTION_SET ? "editor" : "collection"}?identifier=${identifier}`;
   
       let contentDetails: any = {};
       if (editorType !== Editor.CONTENT) {
