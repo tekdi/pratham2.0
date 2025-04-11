@@ -10,7 +10,7 @@ import {
   facilitatorSearchSchema,
   facilitatorSearchUISchema,
 } from '../constant/Forms/facilitatorSearch';
-import { RoleId, Status } from '@/utils/app.constant';
+import { Role, RoleId, Status } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
 import {
   Box,
@@ -197,10 +197,14 @@ const Facilitator = () => {
           ([_, value]) => !Array.isArray(value) || value.length > 0
         )
       );
+
       const staticFilter = {
         role: 'Instructor',
         tenantId: localStorage.getItem('tenantId'),
       };
+      if (localStorage.getItem('roleName') === Role.ADMIN) {
+        staticFilter.state = [localStorage.getItem('stateId')];
+      }
       const { sortBy } = formData;
       const staticSort = ['firstName', sortBy || 'asc'];
       await searchListData(
