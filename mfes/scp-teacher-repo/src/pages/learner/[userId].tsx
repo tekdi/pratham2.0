@@ -1027,7 +1027,9 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
                         }}
                         margin={0}
                       >
-                        {labelText}
+                        {t(`FORM.${labelText}`,{
+                          defaultValue: labelText,
+                        })}
                       </Typography>
 
                       {/* value */}
@@ -1040,7 +1042,9 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
                           color: theme.palette.warning['A200'],
                         }}
                       >
-                        {item?.displayValue}
+                        {t(`FORM.${item?.displayValue}`, {
+                          defaultValue: item?.displayValue,
+                        })}
                       </Typography>
                     </Grid>
                   );
