@@ -8,8 +8,23 @@ import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import { red } from '@mui/material/colors';
 import { Box } from '@mui/material';
-import { Progress } from '../Progress/Progress';
-
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
+import { CircularProgressWithLabel } from '../Progress/CircularProgressWithLabel';
+export interface ContentItem {
+  name: string;
+  gradeLevel: string[];
+  language: string[];
+  artifactUrl: string;
+  identifier: string;
+  appIcon: string;
+  contentType: string;
+  mimeType: string;
+  description: string;
+  posterImage: string;
+  leafNodes?: [{}];
+  children: [{}];
+}
 interface CommonCardProps {
   title: string;
   avatarLetter?: string;
@@ -22,10 +37,28 @@ interface CommonCardProps {
   children?: React.ReactNode;
   orientation?: 'vertical' | 'horizontal';
   minheight?: string;
-  status?: 'Not started' | 'Completed' | 'In progress' | string;
-  progress?: number;
+  TrackData?: any[];
+  item: ContentItem;
+  type: string;
   onClick?: () => void;
 }
+export const getLeafNodes = (node: any) => {
+  const result = [];
+
+  // If the node has leafNodes, add them to the result array
+  if (node?.leafNodes) {
+    result.push(...node.leafNodes);
+  }
+
+  // If the node has children, iterate through them and recursively collect leaf nodes
+  if (node?.children) {
+    node.children.forEach((child: any) => {
+      result.push(...getLeafNodes(child));
+    });
+  }
+
+  return result;
+};
 
 export const CommonCard: React.FC<CommonCardProps> = ({
   avatarLetter,
@@ -39,10 +72,40 @@ export const CommonCard: React.FC<CommonCardProps> = ({
   children,
   orientation,
   minheight,
-  status,
-  progress,
+  TrackData,
+  item,
+  type,
   onClick,
 }) => {
+  const [trackCompleted, setTrackCompleted] = React.useState(0);
+  const [trackProgress, setTrackProgress] = React.useState(100);
+
+  React.useEffect(() => {
+    const init = () => {
+      try {
+        //@ts-ignore
+        if (TrackData) {
+          const result = TrackData?.find((e) => e.courseId === item.identifier);
+          if (type === 'Course') {
+            const leafNodes = getLeafNodes(item ?? []);
+            const completedCount = result?.completed_list?.length || 0;
+            const percentage =
+              leafNodes.length > 0
+                ? Math.round((completedCount / leafNodes.length) * 100)
+                : 0;
+            setTrackProgress(percentage);
+            setTrackCompleted(percentage);
+          } else {
+            setTrackCompleted(result?.completed ? 100 : 0);
+          }
+        }
+      } catch (e) {
+        console.log('error', e);
+      }
+    };
+    init();
+  }, [TrackData, item, type]);
+
   return (
     <Card
       sx={{
@@ -82,7 +145,7 @@ export const CommonCard: React.FC<CommonCardProps> = ({
         )}
 
         {/* Progress Bar Overlay */}
-        {progress !== undefined && (
+        {trackProgress >= 0 && (
           <Box
             sx={{
               position: 'absolute',
@@ -90,52 +153,60 @@ export const CommonCard: React.FC<CommonCardProps> = ({
               top: 0,
               width: '100%',
               display: 'flex',
-              // justifyContent: 'center',
               alignItems: 'center',
               background: 'rgba(0, 0, 0, 0.5)',
             }}
           >
-            <Progress
-              variant="determinate"
-              value={100}
-              size={30}
-              thickness={5}
+            <Box
               sx={{
-                color: '#fff8fb',
-                position: 'absolute',
-                left: '10px',
-              }}
-            />
-            <Progress
-              variant="determinate"
-              value={progress}
-              size={30}
-              thickness={5}
-              sx={{
-                color: progress === 100 ? '#21A400' : '#FFB74D',
-                position: 'absolute',
-                left: '10px',
-              }}
-            />
-            <Typography
-              sx={{
+                p: '0px 5px',
                 fontSize: '12px',
                 fontWeight: 'bold',
-                marginLeft: '12px',
-                color: progress === 100 ? '#21A400' : '#FFB74D',
-                position: 'absolute',
-                left: '50px',
+                color: trackCompleted === 100 ? '#21A400' : '#FFB74D',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
               }}
             >
-              {status &&
-                actions &&
-                actions?.toString().toLowerCase() === 'resource' &&
-                status}
-              {status &&
-                actions &&
-                actions?.toString().toLowerCase() === 'course' &&
-                `${progress}%`}
-            </Typography>
+              {type === 'Course' ? (
+                <>
+                  <CircularProgressWithLabel
+                    value={trackProgress ?? 0}
+                    _text={{
+                      sx: {
+                        color: trackCompleted === 100 ? '#21A400' : '#FFB74D',
+                        fontSize: '10px',
+                      },
+                    }}
+                    sx={{
+                      color: trackCompleted === 100 ? '#21A400' : '#FFB74D',
+                    }}
+                    size={35}
+                    thickness={2}
+                  />
+                  {trackCompleted >= 100 ? (
+                    <>
+                      <CheckCircleIcon sx={{ color: '#21A400' }} />
+                      {`Completed`}
+                    </>
+                  ) : trackProgress > 0 && trackProgress < 100 ? (
+                    `In progress`
+                  ) : (
+                    `Enrolled`
+                  )}
+                </>
+              ) : trackCompleted >= 100 ? (
+                <>
+                  <CheckCircleIcon sx={{ color: '#21A400' }} />
+                  {`Completed`}
+                </>
+              ) : (
+                <>
+                  <ErrorIcon sx={{ color: '#FFB74D' }} />
+                  {`Enrolled`}
+                </>
+              )}
+            </Box>
           </Box>
         )}
       </Box>
@@ -177,7 +248,7 @@ export const CommonCard: React.FC<CommonCardProps> = ({
             paddingBottom: 0,
             overflow: 'hidden',
             maxWidth: '100%',
-            height: '50px',
+            // height: '50px',
           }}
         >
           <Box sx={{ display: 'flex', gap: 1 }}>
@@ -216,6 +287,7 @@ export const CommonCard: React.FC<CommonCardProps> = ({
               fontSize: '14px',
               fontWeight: 500,
               color: '#6750A4',
+              wordBreak: 'break-word',
             }}
           >
             {actions}

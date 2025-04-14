@@ -164,6 +164,17 @@ Port : `4112`
 
 ##
 
+### content
+
+Next JS, run:
+
+```sh
+nx dev content --port=4105 --verbose
+```
+
+basePath : `http://localhost:4105/mfe_content/`
+Port : `4113`
+
 ## NX Command
 
 ### View Nx Graph
