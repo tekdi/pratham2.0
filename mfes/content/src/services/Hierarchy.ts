@@ -112,7 +112,7 @@ export const hierarchyAPI = async (
 ): Promise<ContentSearchResponse> => {
   try {
     // Ensure the environment variable is defined
-    const searchApiUrl = process.env.NEXT_PUBLIC_SSUNBIRD_BASE_URL;
+    const searchApiUrl = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;
     if (!searchApiUrl) {
       throw new Error('Search API URL environment variable is not configured');
     }
@@ -120,7 +120,7 @@ export const hierarchyAPI = async (
     const config: AxiosRequestConfig = {
       method: 'get',
       maxBodyLength: Infinity,
-      url: `${searchApiUrl}/interface/v1/api/course/v1/hierarchy/${doId}`,
+      url: `${searchApiUrl}/api/course/v1/hierarchy/${doId}`,
     };
 
     // Execute the request

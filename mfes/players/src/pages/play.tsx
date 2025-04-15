@@ -52,7 +52,7 @@ const Players: React.FC<SunbirdPlayerProps> = ({
           const metadata = { ...Q1?.questionset, ...Q2?.questionset };
           config.metadata = metadata;
         } else if (MIME_TYPE.INTERACTIVE_MIME_TYPE.includes(data?.mimeType)) {
-          config = { ...V1PlayerConfig, metadata: data };
+          config = { ...V1PlayerConfig, metadata: data, data: data.body || {} };
           //@ts-ignore
           config.context['contentId'] = identifier;
         } else {
@@ -60,7 +60,6 @@ const Players: React.FC<SunbirdPlayerProps> = ({
           //@ts-ignore
           config.context['contentId'] = identifier;
         }
-
         setPlayerConfig(config);
       } catch (error) {
         console.error('Error loading content:', error);
@@ -97,7 +96,7 @@ const Players: React.FC<SunbirdPlayerProps> = ({
           <Loader showBackdrop={false} />
         </Box>
       ) : (
-        <Box marginTop="1rem" px="14px">
+        <Box height="100vh" width="100vw" p="14px">
           {/* <Typography
             color="#024f9d"
             sx={{ padding: '0 0 4px 4px', fontWeight: 'bold' }}

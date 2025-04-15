@@ -125,7 +125,7 @@ export const ContentSearch = async ({
 }): Promise<ContentSearchResponse[]> => {
   try {
     // Ensure the environment variable is defined
-    const searchApiUrl = process.env.NEXT_PUBLIC_SSUNBIRD_BASE_URL;
+    const searchApiUrl = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;
     if (!searchApiUrl) {
       throw new Error('Search API URL environment variable is not configured');
     }
@@ -168,7 +168,7 @@ export const ContentSearch = async ({
 
     // Execute the request
     const response = await post(
-      `${searchApiUrl}/interface/v1/action/composite/v3/search`,
+      `${searchApiUrl}/action/composite/v3/search`,
       data
     );
     const res = response?.data;

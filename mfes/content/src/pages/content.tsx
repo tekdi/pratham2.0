@@ -264,9 +264,10 @@ export default function Content(props: Readonly<ContentProps>) {
     const fetchFramework = async () => {
       try {
         const url = `${
-          process.env.NEXT_PUBLIC_SSUNBIRD_BASE_URL
-        }/interface/v1/api/framework/v1/read/${
-          localStorage.getItem('framework') || process.env.NEXT_PUBLIC_FRAMEWORK
+          process.env.NEXT_PUBLIC_MIDDLEWARE_URL
+        }/api/framework/v1/read/${
+          localStorage.getItem('framework') ||
+          process.env.NEXT_PUBLIC_FRAMEWORK_ID
         }`;
         const frameworkData = await fetch(url).then((res) => res.json());
         const frameworks = frameworkData?.result?.framework;

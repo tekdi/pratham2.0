@@ -169,10 +169,10 @@ Port : `4112`
 Next JS, run:
 
 ```sh
-nx dev content --port=4105 --verbose
+nx dev content --port=4113 --verbose
 ```
 
-basePath : `http://localhost:4105/mfe_content/`
+basePath : `http://localhost:4113/mfe_content/`
 Port : `4113`
 
 ## NX Command
