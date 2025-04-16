@@ -1,4 +1,6 @@
+// app/layout.tsx
 import './global.css';
+import MuiThemeProvider from './app/theme/MuiThemeProvider';
 
 export const metadata = {
   title: 'Welcome to learner-web-app',
@@ -12,7 +14,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <MuiThemeProvider>{children}</MuiThemeProvider>
+      </body>
     </html>
   );
 }

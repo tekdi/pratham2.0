@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import { Box } from '@mui/material';
-import { CommonSearch, getData, Layout } from '@shared-lib';
+import { CommonSearch, getData, Layout, Loader } from '@shared-lib';
 import { useRouter } from 'next/navigation';
 import BackToTop from '../components/BackToTop';
 import RenderTabContent from '../components/ContentTabs';
@@ -25,6 +25,7 @@ export interface ContentProps {
   showSearch?: boolean;
   showBackToTop?: boolean;
   showHelpDesk?: boolean;
+  isShowLayout?: boolean;
 }
 export default function Content(props: Readonly<ContentProps>) {
   const router = useRouter();
@@ -48,11 +49,14 @@ export default function Content(props: Readonly<ContentProps>) {
   useEffect(() => {
     const init = async () => {
       const newData = await getData('mfes_content_pages_content');
-      setPropData({
+      const newPorp = {
         showSearch: true,
         showFilter: true,
         ...(props || newData),
-      });
+      };
+      setPropData(newPorp);
+      console.log(newPorp, props, 'propData');
+
       setTabValue(0);
       setIsPageLoading(false);
     };
@@ -280,19 +284,7 @@ export default function Content(props: Readonly<ContentProps>) {
   }, [router]);
 
   return (
-    <Layout
-      isLoadingChildren={isPageLoading}
-      showTopAppBar={{
-        title: 'Shiksha: Home',
-        showMenuIcon: true,
-        actionButtonLabel: 'Action',
-        ...ProfileMenu(),
-      }}
-      showFilter={true}
-      isFooter={false}
-      showLogo={true}
-      showBack={true}
-    >
+    <LayoutPage isPageLoading={isPageLoading} isShow={propData?.isShowLayout}>
       <Box sx={{ p: 1 }}>
         {(propData?.showSearch || propData?.showFilter) && (
           <Box
@@ -380,6 +372,37 @@ export default function Content(props: Readonly<ContentProps>) {
         {propData?.showHelpDesk && <HelpDesk />}
         {propData?.showBackToTop && showBackToTop && <BackToTop />}
       </Box>
-    </Layout>
+    </LayoutPage>
   );
 }
+
+const LayoutPage = ({
+  isPageLoading,
+  isShow,
+  children,
+}: {
+  isPageLoading: boolean;
+  isShow?: boolean;
+  children: React.ReactNode;
+}) => {
+  if (isShow === undefined || isShow) {
+    return (
+      <Layout
+        isLoadingChildren={isPageLoading}
+        showTopAppBar={{
+          title: 'Shiksha: Home',
+          showMenuIcon: true,
+          actionButtonLabel: 'Action',
+        }}
+        showFilter={true}
+        isFooter={false}
+        showLogo={true}
+        showBack={true}
+      >
+        {children}
+      </Layout>
+    );
+  } else {
+    return <Loader isLoading={isPageLoading}>{children}</Loader>;
+  }
+};

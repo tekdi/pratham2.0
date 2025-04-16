@@ -1,12 +1,10 @@
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
 import CardMembershipIcon from '@mui/icons-material/CardMembership';
-import { useRouter } from 'next/router';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useEffect, useState } from 'react';
 
-export const ProfileMenu = () => {
-  const router = useRouter();
+export const ProfileMenu = ({ router }: { router: any }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -14,7 +12,7 @@ export const ProfileMenu = () => {
     if (hardRedirect && item != '') {
       window.location.href = item;
     } else if (item != '') {
-      router.push(item);
+      router?.push(item);
     }
     setAnchorEl(null);
   };

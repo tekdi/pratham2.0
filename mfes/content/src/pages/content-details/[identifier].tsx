@@ -13,7 +13,6 @@ import {
   createUserCertificateStatus,
   getUserCertificateStatus,
 } from '../../services/Certificate';
-import { ProfileMenu } from '../../utils/menus';
 
 interface ContentDetailsObject {
   name: string;
@@ -79,7 +78,6 @@ const ContentDetails = () => {
         title: 'Shiksha: Learning Made Easy',
         showMenuIcon: true,
         actionButtonLabel: 'Action',
-        ...ProfileMenu(),
       }}
       showBack={true}
       backTitle="Course Details"

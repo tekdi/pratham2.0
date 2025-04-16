@@ -33,7 +33,8 @@
       "@test-next-route": ["mfes/test-next-route/src/pages/index.tsx"],
       "@test-react-vite": ["mfes/mfes/test-react-vite"],
       "@workspace/*": ["mfes/workspace/src/*"],
-      "@youthNet": ["mfes/youthNet/src/pages/index.tsx"]
+      "@youthNet": ["mfes/youthNet/src/pages/index.tsx"],
+      "@Content": ["mfes/content/src/pages/content.tsx"]
     }
   },
   "exclude": ["node_modules", "tmp"]

@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Typography } from '@mui/material';
-import Grid from '@mui/material/Grid2';
+import { Box, Button, Grid } from '@mui/material';
 import { getUserCertificates } from '../services/Certificate';
 import { CommonCard, ContentItem, Layout } from '@shared-lib';
 import AppConst from '../utils/AppConst/AppConst';
-import { ProfileMenu } from '../utils/menus';
 
 interface Certificate extends ContentItem {
   courseId: string;
@@ -45,7 +43,6 @@ const CertificatesPage = () => {
         title: 'Shiksha: My Certificates',
         showMenuIcon: true,
         actionButtonLabel: 'Action',
-        ...ProfileMenu(),
       }}
       showFilter={true}
       isFooter={false}
@@ -55,7 +52,7 @@ const CertificatesPage = () => {
       <Box sx={{ p: 2 }}>
         <Grid container spacing={2}>
           {certificates?.map((item: any) => (
-            <Grid key={item?.identifier} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
+            <Grid key={item?.identifier} item xs={12} sm={6} md={4} lg={3}>
               <CommonCard
                 minheight="100%"
                 title={(item?.name || '').trim()}

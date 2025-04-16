@@ -7,7 +7,7 @@ import CardActions from '@mui/material/CardActions';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import { red } from '@mui/material/colors';
-import { Box } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import { CircularProgressWithLabel } from '../Progress/CircularProgressWithLabel';
@@ -271,27 +271,8 @@ export const CommonCard: React.FC<CommonCardProps> = ({
       )}
       {children && <CardContent>{children}</CardContent>}
       {actions && (
-        <CardActions
-          disableSpacing
-          sx={{
-            border: '1px solid #79747E',
-            borderRadius: '8px',
-            width: '80px',
-            display: 'flex',
-            justifyContent: 'center',
-            margin: '12px',
-          }}
-        >
-          <Typography
-            sx={{
-              fontSize: '14px',
-              fontWeight: 500,
-              color: '#6750A4',
-              wordBreak: 'break-word',
-            }}
-          >
-            {actions}
-          </Typography>
+        <CardActions>
+          <Button variant="contained">{actions}</Button>
         </CardActions>
       )}
     </Card>

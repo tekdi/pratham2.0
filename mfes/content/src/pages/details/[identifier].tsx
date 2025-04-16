@@ -5,7 +5,6 @@ import { getLeafNodes, Layout } from '@shared-lib';
 import CommonCollapse from '../../components/CommonCollapse'; // Adjust the import based on your folder structure
 import { hierarchyAPI } from '../../services/Hierarchy';
 import { trackingData } from '../../services/TrackingService';
-import { ProfileMenu } from '../../utils/menus';
 
 interface DetailsProps {
   details: any;
@@ -64,7 +63,6 @@ export default function Details({ details }: DetailsProps) {
       showTopAppBar={{
         title: 'Shiksha: Course Details',
         actionButtonLabel: 'Action',
-        ...ProfileMenu(),
       }}
       isFooter={false}
       showLogo={true}
