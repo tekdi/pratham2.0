@@ -7,93 +7,92 @@ import OtpVerificationComponent from '../../Components/OtpVerificationComponent'
 import ResetPasswordForm from '../../Components/ResetPasswordForm';
 import AccountSelectionForm from '../../Components/AccountSelectionForm';
 import PasswordResetSuccess from '../../Components/PasswordResetSuccess';
-import ChangeUsernameComponent from '../../Components/ChangeUsernameComponent';
+type UserAccount = {
+  name: string;
+  username: string;
+};
 
 type ForgotPasswordPageProps = {
-  onLoginSuccess: (response: any) => void;
-  handleAddAccount?: () => void;
-  handleForgotPassword?: () => void;
+  fetchMobileByUsername: (username: string) => Promise<string>;
+  fetchUsernamesByMobile: (mobile: string) => Promise<UserAccount[]>;
+  verifyOtp: (otp: string[]) => Promise<boolean>;
+  resetPassword: (newPassword: string) => Promise<void>;
+  suggestedUsernames?: string[];
 };
 
 const ForgotPasswordPage: React.FC<ForgotPasswordPageProps> = ({
-  onLoginSuccess,
-  handleAddAccount,
-  handleForgotPassword,
+  fetchMobileByUsername,
+  fetchUsernamesByMobile,
+  verifyOtp,
+  resetPassword,
+  suggestedUsernames = [],
 }) => {
-  const [mobileNumber, setmobileNumber] = useState<any>('');
-  const [usernames, setUsernames] = useState<any>([]);
-
-  const [otpmodal, setOtpModal] = useState<any>(false);
-  const [resetPasswordScreen, setResetPasswordScreeen] = useState<any>(false);
-  const [resetPasswordSuccessModal, setResetPasswordSucccessModal] =
-    useState<any>(false);
-
-  const [accountSelectionScreen, setAccountSelectionScreen] =
-    useState<any>(false);
-
+  const [mobileNumber, setMobileNumber] = useState<string>('');
+  const [usernames, setUsernames] = useState<UserAccount[]>([]);
+  const [otpmodal, setOtpModal] = useState(false);
+  const [resetPasswordScreen, setResetPasswordScreen] = useState(false);
+  const [resetPasswordSuccessModal, setResetPasswordSuccessModal] =
+    useState(false);
+  const [accountSelectionScreen, setAccountSelectionScreen] = useState(false);
   const [otp, setOtp] = useState<string[]>(['', '', '', '']);
 
-  const users = [
-    { name: 'Anagha Dhinesh', username: 'anagha_28' },
-    { name: 'Kanchan Srivastava', username: 'kanchan1998' },
-    { name: 'Shivam Karnajan', username: 'shivam.karnajan765' },
-    { name: 'Somnath Gharware', username: 'som@gharware' },
-  ];
-  const handleNextStep = (value: string) => {
-    //api call get phone number by using username
-    // if(getmobnumber)
+  const handleNextStep = async (value: string) => {
     const isValidMobileNumber = /^[0-9]{10}$/.test(value);
+
     if (isValidMobileNumber) {
-      // fetch all usernames by this  mobile number
-      //  setUsernames()
+      //const userList = await fetchUsernamesByMobile(value);
+      let userList = [
+        { name: 'Anagha Dhinesh', username: 'anagha_28' },
+        { name: 'Kanchan Srivastava', username: 'kanchan1998' },
+        { name: 'Shivam Karnajan', username: 'shivam.karnajan765' },
+        { name: 'Somnath Gharware', username: 'som@gharware' },
+      ]; // currently assume here dummy data
+      setUsernames(userList);
       setAccountSelectionScreen(true);
     } else {
+      // const mobile = await fetchMobileByUsername(value);
+      let mobile = '9087'; // currently assume here dummy mob number
+      setMobileNumber(mobile);
       setOtpModal(true);
     }
+
     console.log('User input:', value);
   };
-  const onVerify = () => {
-    console.log(otp);
-    //if(otp is verified)
-    setResetPasswordScreeen(true);
-    setOtpModal(false);
+
+  const onVerify = async () => {
+    // const isValid = await verifyOtp(otp);
+    const isValid = true; // temporary assume true
+    if (isValid) {
+      setResetPasswordScreen(true);
+      setOtpModal(false);
+    }
   };
-  const onCloseSuccessModal = () => {
-    setResetPasswordSucccessModal(false);
+
+  const onResetPassword = async (newPassword: string) => {
+    // await resetPassword(newPassword);
+    setResetPasswordSuccessModal(true);
   };
-  const onResend = () => {
-    console.log('resend otp');
-  };
-  const onResetpassword = () => {
-    console.log('reset pass');
-    setResetPasswordSucccessModal(true);
-  };
-  const handleCloseModal = () => {
-    setOtpModal(false);
-  };
+
+  const onCloseSuccessModal = () => setResetPasswordSuccessModal(false);
+  const onResend = () => console.log('resend otp');
+  const handleCloseModal = () => setOtpModal(false);
+
   return (
     <>
-      <ChangeUsernameComponent
-        suggestedUsernames={[
-          'anaghdadinesh789',
-          'anaghdadinesh267',
-          'anaghdadinesh342',
-        ]}
-        handleContinue={(selectedUsername) => {
-          console.log('User selected:', selectedUsername);
-        }}
-      />{' '}
       {resetPasswordScreen ? (
-        <ResetPasswordForm onSubmit={onResetpassword} />
+        <ResetPasswordForm onSubmit={onResetPassword} />
       ) : accountSelectionScreen ? (
-        <AccountSelectionForm userAccounts={users} onNext={handleNextStep} />
+        <AccountSelectionForm
+          userAccounts={usernames}
+          onNext={handleNextStep}
+        />
       ) : (
         <ForgotPasswordComponent onNext={handleNextStep} />
       )}
       <SimpleModal
         open={otpmodal}
         onClose={handleCloseModal}
-        showFooter={true}
+        showFooter
         primaryText={'Verify OTP'}
         modalTitle={'Verify Your Phone Number'}
         primaryActionHandler={onVerify}
@@ -108,7 +107,7 @@ const ForgotPasswordPage: React.FC<ForgotPasswordPageProps> = ({
       <SimpleModal
         open={resetPasswordSuccessModal}
         onClose={onCloseSuccessModal}
-        showFooter={true}
+        showFooter
         primaryText={'Okay'}
         primaryActionHandler={onCloseSuccessModal}
       >
