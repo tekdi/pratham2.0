@@ -181,14 +181,22 @@
             class="tablinks"
             id="usersButton"
             ng-click="initializeUser($event, 'users')"
+            ng-keypress="initializeUser($event, 'users')"
+            ng-keydown="initializeUser($event, 'users')"
+            ng-keyup="initializeUser($event, 'users')"
           >
             Users
           </h1>
         </div>
         <div class="close-block">
-          <span ng-click="closeUserSwitchingModal()"
-            ><img class="close" ng-src="{{closeIcon}}"
-          /></span>
+          <span
+            ng-click="closeUserSwitchingModal()"
+            ng-keypress="closeUserSwitchingModal()"
+            ng-keydown="closeUserSwitchingModal()"
+            ng-keyup="closeUserSwitchingModal()"
+          >
+            <img class="close" ng-src="{{closeIcon}}" />
+          </span>
         </div>
         <!-- <button class="tablinks" id="groupsButton" ng-click="initializeUser($event, 'groups')">Groups</button> -->
       </div>
@@ -198,6 +206,9 @@
           ng-click="selectUser(user)"
           class="userswitcher-card grid-container"
           ng-class="user.selected ? 'active' : ''"
+          ng-keypress="selectUser(user)"
+          ng-keydown="selectUser(user)"
+          ng-keyup="selectUser(user)"
         >
           <div class="userswitcher-container grid-item">
             <div class="userswitcher-data">

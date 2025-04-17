@@ -7,7 +7,7 @@
         <p class="ps-author" ng-if="content.owner">Author: <span>{{content.owner}}</span></p>
       </div>
       <div class="ps-body">
-        <div class="ps-nav left contentButton" ng-class="previousContent[content.identifier] ? 'buttonVisible' : 'buttonHide'" ng-click="contentLaunch('previous',content.identifier)">
+        <div class="ps-nav left contentButton" ng-class="previousContent[content.identifier] ? 'buttonVisible' : 'buttonHide'" ng-click="contentLaunch('previous',content.identifier)" onKeyPress="handleKeyPress($event)">
           <a class="ps-nav-header textdeco-none">
             <img ng-src="{{leftArrowIcon}}" alt="prev" class="ps-arrow">
             <div class="ps-nav-wrappe ps-text-right">
@@ -48,7 +48,7 @@
             </ul>
           </div>
         </div>
-        <div class="ps-nav right contentButton" ng-class="nextContent[content.identifier] ? 'buttonVisible' : 'buttonHide'" ng-click="contentLaunch('next',content.identifier)">
+        <div class="ps-nav right contentButton" ng-class="nextContent[content.identifier] ? 'buttonVisible' : 'buttonHide'" ng-click="contentLaunch('next',content.identifier)" onKeyPress="handleKeyPress($event)" onKeyDown="handleKeyDown($event)" onKeyUp="handleKeyUp($event)">
           <a class="ps-nav-header textdeco-none">
             <div class="ps-nav-wrapper">
               <p class="ps-nav-subtitle">Go to</p>
@@ -74,7 +74,7 @@
               <p class="ps-action-text">{{currentUser.name || currentUser.handle}}</p>
             </div>
           </li>
-          <li class="ps-action-list__item" ng-click="openGenie()"><a href="javascript:void(0);" class="ps-btn ps-btn--black"><img ng-src="{{genieIcon}}" class="ps-exit-icon"></a>
+          <li class="ps-action-list__item" ng-click="openGenie()" onKeyPress="handleKeyPress($event)" onKeyDown="handleKeyDown($event)" onKeyUp="handleKeyUp($event)"><a href="javascript:void(0);" class="ps-btn ps-btn--black"><img ng-src="{{genieIcon}}" class="ps-exit-icon"></a>
             <p class="ps-action-text">Exit</p>
           </li>
         </ul>
