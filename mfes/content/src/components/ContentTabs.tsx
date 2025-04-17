@@ -47,30 +47,7 @@ const RenderTabContent = memo(
       <Box sx={{ width: '100%' }}>
         {tabs?.length !== undefined && tabs?.length > 1 && (
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs
-              value={value ?? 0}
-              onChange={onChange}
-              aria-label={ariaLabel}
-              TabIndicatorProps={{
-                style: {
-                  backgroundColor: '#6750A4',
-                  height: '3px',
-                  maxWidth: 49,
-                  width: '100%',
-                  marginLeft: '1.2rem',
-                },
-              }}
-              sx={{
-                '.MuiTab-root': {
-                  color: '#49454F', // Default tab text color
-                  fontWeight: 500,
-                  textTransform: 'none', // Ensures text remains camel case
-                },
-                '.Mui-selected': {
-                  color: '#6750A4 !important', // Selected tab text color
-                },
-              }}
-            >
+            <Tabs value={value ?? 0} onChange={onChange} aria-label={ariaLabel}>
               {tabs.map((tab: any, index: number) => (
                 <Tab
                   key={tab.label}

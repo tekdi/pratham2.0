@@ -1,5 +1,9 @@
+'use client';
 import dynamic from 'next/dynamic';
 import React from 'react';
+import Layout from '../../components/Layout';
+import { Box, Stack } from '@mui/material';
+import { FilterForm } from '@shared-lib';
 
 interface MyComponentProps {
   title: string;
@@ -13,9 +17,22 @@ const Content = dynamic(() => import('@Content'), {
 
 const MyComponent: React.FC<MyComponentProps> = () => {
   return (
-    <div>
-      <Content isShowLayout={false} />
-    </div>
+    <Layout>
+      <Stack direction="row" sx={{ p: 4, gap: 4 }}>
+        <Box sx={{ flex: 3 }}>
+          <Box sx={{ position: 'sticky', top: 0 }}>
+            <FilterForm />
+          </Box>
+        </Box>
+        <Box sx={{ flex: 9 }}>
+          <Content
+            isShowLayout={false}
+            contentTabs={['courses']}
+            showFilter={false}
+          />
+        </Box>
+      </Stack>
+    </Layout>
   );
 };
 

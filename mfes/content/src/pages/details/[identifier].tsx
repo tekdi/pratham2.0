@@ -60,28 +60,22 @@ export default function Details({ details }: DetailsProps) {
   return (
     <Layout
       isLoadingChildren={loading}
-      showTopAppBar={{
+      _topAppBar={{
         title: 'Shiksha: Course Details',
         actionButtonLabel: 'Action',
       }}
-      isFooter={false}
-      showLogo={true}
-      showBack={true}
-      backTitle="Course Details "
+      backTitle="Course Details"
       backIconClick={onBackClick}
-      sx={{ height: '0vh' }}
+      onlyHideElements={['footer']}
     >
       <Box sx={{ p: '8px' }}>
         <Grid container spacing={2}>
-          <Grid size={{ xs: 12 }}>
-            <Typography
-              variant="h6"
-              sx={{ marginTop: '60px', fontWeight: 'bold' }}
-            >
+          <Grid item xs={12}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
               {selectedContent?.name}
             </Typography>
           </Grid>
-          <Grid size={{ xs: 12 }}>
+          <Grid item xs={12}>
             {selectedContent?.children?.length > 0 && (
               <RenderNestedChildren
                 data={selectedContent.children}

@@ -74,16 +74,13 @@ const ContentDetails = () => {
   return (
     <Layout
       isLoadingChildren={isLoading}
-      showTopAppBar={{
+      _topAppBar={{
         title: 'Shiksha: Learning Made Easy',
-        showMenuIcon: true,
         actionButtonLabel: 'Action',
       }}
-      showBack={true}
+      onlyHideElements={['footer']}
       backTitle="Course Details"
       backIconClick={handleBackClick}
-      isFooter={false}
-      showLogo={true}
       sx={{ height: '0vh' }}
     >
       <Grid container spacing={2}>

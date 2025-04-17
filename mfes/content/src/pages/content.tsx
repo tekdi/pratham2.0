@@ -13,7 +13,6 @@ import { hierarchyAPI } from '../services/Hierarchy';
 import { ContentSearch, ContentSearchResponse } from '../services/Search';
 import FilterDialog from '../components/FilterDialog';
 import { trackingData } from '../services/TrackingService';
-import { ProfileMenu } from '../utils/menus';
 
 export interface ContentProps {
   _grid?: object;
@@ -366,15 +365,11 @@ const LayoutPage = ({
     return (
       <Layout
         isLoadingChildren={isPageLoading}
-        showTopAppBar={{
+        _topAppBar={{
           title: 'Shiksha: Home',
-          showMenuIcon: true,
           actionButtonLabel: 'Action',
         }}
-        showFilter={true}
-        isFooter={false}
-        showLogo={true}
-        showBack={true}
+        onlyHideElements={['footer']}
       >
         {children}
       </Layout>
