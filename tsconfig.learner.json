@@ -18,7 +18,8 @@
       "@learner/*": ["apps/learner-web-app/src/*"],
 
       "@login/*": ["mfes/login/src/*"],
-      "@forget-password/*": ["mfes/forget-password/src/*"]
+      "@forget-password/*": ["mfes/forget-password/src/*"],
+      "@shared-lib": ["libs/shared-lib/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
