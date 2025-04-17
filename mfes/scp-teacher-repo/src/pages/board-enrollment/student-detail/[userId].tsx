@@ -78,7 +78,7 @@ const BoardEnrollmentDetail = () => {
   const cohortDetails = `${names?.cohortName} (${names?.blockName}, ${names?.districtName})`;
   const labelMapping: { [key: number]: string } = {
     0: 'BOARD',
-    1: 'SUBJECTS',
+    1: 'SUBJECT',
     2: 'REGISTRATION',
     3: 'FEES',
   };
@@ -107,11 +107,11 @@ const BoardEnrollmentDetail = () => {
         }
         // Parse if it's a stringified primitive
         else if (
-          typeof field.value === 'string' &&
-          field.value.startsWith('"') &&
-          field.value.endsWith('"')
+          typeof field.value === 'object' &&
+          field.value.length == 1 &&
+          !field.value[0]?.code
         ) {
-          acc[field.label] = JSON.parse(field.value);
+          acc[field.label] = field.value[0];
         } else {
           acc[field.label] = field.value; // Use as-is for other cases
         }
@@ -307,8 +307,9 @@ const BoardEnrollmentDetail = () => {
     }
 
     const fieldId = field.fieldId;
-    const value = formData?.[currentLabel];
-
+    const value = Array.isArray(formData?.[currentLabel])
+      ? formData?.[currentLabel]
+      : [formData?.[currentLabel]];
     if (!userData?.cohortMembershipId) {
       throw new Error('Membership ID is required.');
     }
@@ -388,7 +389,7 @@ const BoardEnrollmentDetail = () => {
             setStageCount(nextStep);
             setFormData({
               BOARD: formData.BOARD,
-              SUBJECTS: '',
+              SUBJECT: '',
               REGISTRATION: '',
               FEES: '',
             });
@@ -424,7 +425,7 @@ const BoardEnrollmentDetail = () => {
       case 0:
         return !formData?.BOARD;
       case 1:
-        return formData.SUBJECTS.length === 0;
+        return formData.SUBJECT.length === 0;
       case 2:
         return !formData.REGISTRATION;
       case 3:
@@ -459,7 +460,7 @@ const BoardEnrollmentDetail = () => {
           learnerName={userData?.name}
           centerName={cohortDetails}
           board={formData.BOARD}
-          subjects={formData.SUBJECTS}
+          subjects={formData.SUBJECT}
           registrationNum={formData.REGISTRATION}
           feesPaidStatus={formData.FEES}
           setActiveStep={setActiveStep}
@@ -625,21 +626,18 @@ const BoardEnrollmentDetail = () => {
                           control={
                             <Checkbox
                               checked={
-                                formData?.SUBJECTS.length ===
+                                formData?.SUBJECT.length ===
                                 subjectOptions?.length
                               }
                               indeterminate={
-                                formData?.SUBJECTS.length > 0 &&
-                                formData?.SUBJECTS.length <
-                                  subjectOptions.length
+                                formData?.SUBJECT.length > 0 &&
+                                formData?.SUBJECT.length < subjectOptions.length
                               }
                               onChange={(e) => {
                                 const isChecked = e.target.checked;
                                 setFormData({
                                   ...formData,
-                                  SUBJECTS: isChecked
-                                    ? [...subjectOptions]
-                                    : [],
+                                  SUBJECT: isChecked ? [...subjectOptions] : [],
                                 });
                                 setFormDataUpdated(true);
                               }}
@@ -674,8 +672,8 @@ const BoardEnrollmentDetail = () => {
                             control={
                               <Checkbox
                                 checked={
-                                  Array.isArray(formData?.SUBJECTS) &&
-                                  formData?.SUBJECTS.some(
+                                  Array.isArray(formData?.SUBJECT) &&
+                                  formData?.SUBJECT.some(
                                     (sub: { name: any }) =>
                                       sub.name === subject.name
                                   )
@@ -684,8 +682,8 @@ const BoardEnrollmentDetail = () => {
                                   const isChecked = e.target.checked;
 
                                   const updatedSubjects = isChecked
-                                    ? [...formData?.SUBJECTS, subject]
-                                    : formData?.SUBJECTS?.filter(
+                                    ? [...formData?.SUBJECT, subject]
+                                    : formData?.SUBJECT?.filter(
                                         (sub: { name: any }) =>
                                           sub.name !== subject.name
                                       );
@@ -693,7 +691,7 @@ const BoardEnrollmentDetail = () => {
 
                                   setFormData({
                                     ...formData,
-                                    SUBJECTS: updatedSubjects,
+                                    SUBJECT: updatedSubjects,
                                   });
                                 }}
                                 sx={{
