@@ -12,6 +12,8 @@ import {
 } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import CheckIcon from '@mui/icons-material/Check';
+import { showToastMessage } from '../ToastComponent/Toastify';
 
 interface ResetPasswordFormProps {
   onSubmit: (password: string, confirmPassword: string) => void;
@@ -21,13 +23,39 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSubmit }) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showValidation, setShowValidation] = useState(false);
 
   const handleTogglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
   };
 
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+    setShowValidation(!!e.target.value);
+  };
+
   const handleFormSubmit = () => {
+    if (password !== confirmPassword) {
+      showToastMessage('Passwords do not match', 'error');
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      showToastMessage('Password does not meet requirements', 'error');
+      return;
+    }
+
     onSubmit(password, confirmPassword);
+  };
+
+  const validatePassword = (value: string) => {
+    return (
+      /[A-Z]/.test(value) &&
+      /[a-z]/.test(value) &&
+      /\d/.test(value) &&
+      /[!@#$%^&*(),.?":{}|<>]/.test(value) &&
+      value.length >= 8
+    );
   };
 
   return (
@@ -37,17 +65,13 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSubmit }) => {
       alignItems="center"
       justifyContent="center"
       minHeight="100vh"
-      //   bgcolor="#fefbe9"
     >
       <Typography
         sx={{
           fontWeight: 600,
           fontSize: '24px',
-          lineHeight: '32px',
-          letterSpacing: '0px',
-          textAlign: 'center',
-          verticalAlign: 'middle',
           mb: 2,
+          textAlign: 'center',
         }}
       >
         Create a strong password
@@ -57,12 +81,9 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSubmit }) => {
         sx={{
           fontWeight: 400,
           fontSize: '16px',
-          lineHeight: '24px',
-          letterSpacing: '0.5px',
-          textAlign: 'center',
-          verticalAlign: 'middle',
           color: 'text.secondary',
           mb: 3,
+          textAlign: 'center',
         }}
       >
         Create a new, strong password that you don't use for other websites
@@ -75,7 +96,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSubmit }) => {
             type={showPassword ? 'text' : 'password'}
             variant="outlined"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={handlePasswordChange}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
@@ -86,6 +107,27 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSubmit }) => {
               ),
             }}
           />
+
+          {showValidation && (
+            <Box pl={1} pt={1}>
+              <ValidationItem
+                valid={/[A-Z]/.test(password) && /[a-z]/.test(password)}
+                label="Include both uppercase and lowercase letters"
+              />
+              <ValidationItem
+                valid={/\d/.test(password)}
+                label="Include at least one number"
+              />
+              <ValidationItem
+                valid={/[!@#$%^&*(),.?":{}|<>]/.test(password)}
+                label="Include at least one special character"
+              />
+              <ValidationItem
+                valid={password.length >= 8}
+                label="At least 8 characters"
+              />
+            </Box>
+          )}
 
           <TextField
             label="Confirm Password"
@@ -117,11 +159,35 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSubmit }) => {
               },
             }}
             onClick={handleFormSubmit}
+            disabled={!validatePassword(password)}
           >
             Reset Password
           </Button>
         </Box>
       </Paper>
+    </Box>
+  );
+};
+
+const ValidationItem = ({
+  valid,
+  label,
+}: {
+  valid: boolean;
+  label: string;
+}) => {
+  return (
+    <Box
+      display="flex"
+      alignItems="center"
+      gap={1}
+      color={valid ? 'green' : 'error.main'}
+      fontSize="14px"
+      fontWeight={400}
+      mb={0.5}
+    >
+      <CheckIcon sx={{ fontSize: 16 }} />
+      {label}
     </Box>
   );
 };

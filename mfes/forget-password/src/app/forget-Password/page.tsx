@@ -19,6 +19,7 @@ const ForgotPasswordPage = ({}) => {
 
   const [otpmodal, setOtpModal] = useState(false);
   const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
+  const [enterdUserName, setEnterdUserName] = useState('');
 
   const handleNextStep = async (value: string) => {
     const isValidMobileNumber = /^[0-9]{10}$/.test(value);
@@ -26,17 +27,20 @@ const ForgotPasswordPage = ({}) => {
     if (isValidMobileNumber) {
       router.push(`/account-selection?mobile=${value}`);
     } else {
+      setEnterdUserName(value);
       const mobile = await fetchMobileByUsername(value);
 
       if (mobile) {
         try {
-          let reason = 'signup'; // temporary taken signup cause api support only sinup reason
+          let reason = 'forgot';
           const response = await sendOTP({ mobile, reason });
           console.log('sendOTP', response);
           setHash(response?.result?.data?.hash);
           setOtpModal(true);
           setMobileNumber(mobile);
-        } catch (error) {}
+        } catch (error: any) {
+          showToastMessage('Failed to send otp', 'error');
+        }
       }
     }
 
@@ -46,16 +50,19 @@ const ForgotPasswordPage = ({}) => {
   const onVerify = async () => {
     try {
       let mobile = mobileNumber;
-      let reason = 'signup';
-
+      let reason = 'forgot';
+      let username = enterdUserName;
       const response = await verifyOTP({
         mobile,
         reason,
         otp: otp.join(''),
         hash,
+        username,
       });
       console.log('verifyOtp', response);
       const isValid = response.result.success;
+      localStorage.setItem('tokenForResetPassword', response.result.token); // temporary assume true
+
       if (isValid) {
         router.push('/reset-Password');
       } else {
@@ -69,9 +76,9 @@ const ForgotPasswordPage = ({}) => {
     try {
       const response = await userCheck({ username });
       console.log('response', response?.result[0]?.mobile);
-      response.result[0].mobile = '8793607919'; // temporary hardcoded
+      // response.result[0].mobile = '8793607919'; // temporary hardcoded
       if (response?.result[0]?.mobile) {
-        return response?.result[0]?.mobile;
+        return response?.result[0]?.mobile.toString();
       } else {
         showToastMessage(
           'Unable to find mobile number on given username',
@@ -85,8 +92,7 @@ const ForgotPasswordPage = ({}) => {
 
   const onResend = async () => {
     try {
-      let reason = 'signup';
-      // temporary taken signup cause api support only sinup reason
+      let reason = 'forgot';
       const response = await sendOTP({ mobile: mobileNumber, reason });
       console.log('sendOTP', response);
       setHash(response?.result?.data?.hash);

@@ -9,6 +9,7 @@ interface VerifyOTPParams {
   reason: string;
   otp: string;
   hash: string;
+  username: string;
 }
 export const sendOTP = async ({
   mobile,
@@ -30,11 +31,18 @@ export const verifyOTP = async ({
   reason,
   otp,
   hash,
+  username,
 }: VerifyOTPParams): Promise<any> => {
   const apiUrl: string = API_ENDPOINTS.verifyOTP;
 
   try {
-    const response = await post(apiUrl, { mobile, reason, otp, hash });
+    const response = await post(apiUrl, {
+      mobile,
+      reason,
+      otp,
+      hash,
+      username,
+    });
     return response?.data;
   } catch (error) {
     console.error('error in login', error);

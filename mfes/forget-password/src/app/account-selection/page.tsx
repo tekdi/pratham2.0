@@ -26,6 +26,8 @@ const AccountSelectionPage = () => {
   const mobile = searchParams.get('mobile');
 
   const [usernames, setUsernames] = useState<UserAccount[]>([]);
+  const [selectedUserName, setSelectedUserName] = useState('');
+
   const [otpmodal, setOtpModal] = useState(false);
   const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
   useEffect(() => {
@@ -54,18 +56,21 @@ const AccountSelectionPage = () => {
     if (isValidMobileNumber) {
       //const userList = await fetchUsernamesByMobile(value);
     } else {
+      setSelectedUserName(value);
       const mobile = await fetchMobileByUsername(value);
 
       //  let mobile = '9087'; // currently assume here dummy mob number
       if (mobile) {
         try {
-          let reason = 'signup'; // temporary taken signup cause api support only sinup reason
+          let reason = 'forgot';
           const response = await sendOTP({ mobile, reason });
           console.log('sendOTP', response);
           setHash(response?.result?.data?.hash);
           setOtpModal(true);
           setMobileNumber(mobile);
-        } catch (error) {}
+        } catch (error) {
+          
+        }
       }
     }
 
@@ -76,16 +81,18 @@ const AccountSelectionPage = () => {
     // const isValid = await verifyOtp(otp);
     try {
       let mobile = mobileNumber;
-      let reason = 'signup';
-
+      let reason = 'forgot';
+      let username = selectedUserName;
       const response = await verifyOTP({
         mobile,
         reason,
         otp: otp.join(''),
         hash,
+        username,
       });
       console.log('verifyOtp', response);
-      const isValid = response.result.success; // temporary assume true
+      const isValid = response.result.success;
+      localStorage.setItem('tokenForResetPassword', response.result.token); // temporary assume true
       if (isValid) {
         router.push('/reset-Password');
         setOtpModal(false);
@@ -100,9 +107,9 @@ const AccountSelectionPage = () => {
     try {
       const response = await userCheck({ username });
       console.log('response', response?.result[0]?.mobile);
-      response.result[0].mobile = '8793607919'; // temporary hardcoded
+     // response.result[0].mobile = '8793607919'; // temporary hardcoded
       if (response?.result[0]?.mobile) {
-        return response?.result[0]?.mobile;
+        return response?.result[0]?.mobile.toString();
       } else {
         showToastMessage(
           'Unable to find mobile number on given username',
@@ -116,8 +123,7 @@ const AccountSelectionPage = () => {
 
   const onResend = async () => {
     try {
-      let reason = 'signup';
-      // temporary taken signup cause api support only sinup reason
+      let reason = 'forgot';
       const response = await sendOTP({ mobile: mobileNumber, reason });
       console.log('sendOTP', response);
       setHash(response?.result?.data?.hash);

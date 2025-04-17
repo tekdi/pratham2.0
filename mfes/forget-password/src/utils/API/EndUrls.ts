@@ -7,4 +7,5 @@ export const API_ENDPOINTS = {
   sendOTP: `${baseurl}/user/send-otp`,
   verifyOTP: `${baseurl}/user/verify-otp`,
   resetPassword: `${baseurl}/user/reset-password`,
+  forgetPassword: `${baseurl}/user/forgot-password`,
 };

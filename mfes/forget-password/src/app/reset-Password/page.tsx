@@ -7,6 +7,7 @@ import PasswordResetSuccess from '@forget-password/Components/PasswordResetSucce
 import { useRouter } from 'next/navigation';
 import { Box } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { forgetPassword } from '@forget-password/utils/API/resetPasswordService';
 const ResetPasswordPage = ({}) => {
   const router = useRouter();
 
@@ -15,9 +16,12 @@ const ResetPasswordPage = ({}) => {
 
   const onResetPassword = async (newPassword: string) => {
     try {
-      // await resetPassword(newPassword);
-
-      setResetPasswordSuccessModal(true);
+      let token = localStorage.getItem('tokenForResetPassword');
+      if (token) {
+        const response = await forgetPassword(newPassword, token);
+        console.log(response);
+        setResetPasswordSuccessModal(true);
+      }
     } catch {}
   };
 

@@ -14,13 +14,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <MuiThemeProvider>
-      <html lang="en">
-        <body>
-          {children}
-          <ToastContainer />
-        </body>
-      </html>
-    </MuiThemeProvider>
+    <html lang="en">
+      <body>
+        <MuiThemeProvider>{children}</MuiThemeProvider>
+        <ToastContainer />
+      </body>
+    </html>
   );
 }
