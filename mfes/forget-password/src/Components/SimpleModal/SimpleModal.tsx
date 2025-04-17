@@ -10,7 +10,9 @@ import React, { ReactNode } from 'react';
 
 import CloseSharpIcon from '@mui/icons-material/CloseSharp';
 import { useTheme } from '@mui/material/styles';
-import { modalStyles } from '../styles/modalStyles';
+import { modalStyles } from '@forget-password/styles/modalStyles';
+// import { modalStyles } from '@forget-password/styles/modalStyles';
+// import { modalStyles } from '../styles/modalStyles';
 
 interface SimpleModalProps {
   secondaryActionHandler?: () => void;
@@ -87,7 +89,7 @@ const SimpleModal: React.FC<SimpleModalProps> = ({
               sx={titleStyle}
             >
               <Typography
-                variant="h3"
+                variant="h5"
                 sx={{ color: theme.palette.warning['A200'] }}
                 component="h2"
               >

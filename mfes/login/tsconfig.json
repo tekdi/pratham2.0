@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../tsconfig.learner.json",
   "compilerOptions": {
     "jsx": "preserve",
     "strict": true,
@@ -28,7 +28,8 @@
     "**/*.jsx",
     "../../mfes/login/.next/types/**/*.ts",
     "../../dist/mfes/login/.next/types/**/*.ts",
-    "next-env.d.ts"
+    "next-env.d.ts",
+    ".next/types/**/*.ts"
   ],
   "exclude": ["node_modules", "jest.config.ts", "**/*.spec.ts", "**/*.test.ts"]
 }

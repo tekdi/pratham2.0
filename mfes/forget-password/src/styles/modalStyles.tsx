@@ -4,7 +4,7 @@ export const modalStyles = (theme: any, width?: string) => ({
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  backgroundColor: theme.palette.warning.A400,
+  backgroundColor: 'white',
   borderRadius: '8px',
   zIndex: '9999',
   outline: 'none',

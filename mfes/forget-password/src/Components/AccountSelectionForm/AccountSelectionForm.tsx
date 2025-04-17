@@ -32,7 +32,6 @@ const AccountSelectionForm: React.FC<AccountSelectionFormProps> = ({
   };
 
   const handleSubmit = () => {
-    const selected = userAccounts.find((u) => u.username === selectedUsername);
     if (selectedUsername) {
       onNext(selectedUsername);
     }
@@ -46,12 +45,21 @@ const AccountSelectionForm: React.FC<AccountSelectionFormProps> = ({
       justifyContent="center"
       minHeight="100vh"
       bgcolor="#fefbe9"
+      px={2} // Symmetric horizontal padding
     >
-      <Typography variant="h6" mb={3}>
+      <Typography variant="h6" mb={3} textAlign="center">
         Which account are you having trouble logging into?
       </Typography>
 
-      <Paper elevation={3} sx={{ p: 3, borderRadius: 3, width: 350 }}>
+      <Paper
+        elevation={3}
+        sx={{
+          p: 3,
+          borderRadius: 3,
+          width: '100%',
+          maxWidth: 700,
+        }}
+      >
         <RadioGroup value={selectedUsername} onChange={handleChange}>
           {userAccounts.map((account) => (
             <FormControlLabel
@@ -59,9 +67,21 @@ const AccountSelectionForm: React.FC<AccountSelectionFormProps> = ({
               value={account.username}
               control={<Radio />}
               label={
-                <Box>
-                  <Typography fontWeight="bold">{account.name}</Typography>
-                  <Typography variant="body2" color="textSecondary">
+                <Box maxWidth="100%">
+                  <Typography fontWeight="bold" noWrap>
+                    {account.name}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color="textSecondary"
+                    sx={{
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      display: 'block',
+                      maxWidth: '100%',
+                    }}
+                  >
                     {account.username}
                   </Typography>
                 </Box>

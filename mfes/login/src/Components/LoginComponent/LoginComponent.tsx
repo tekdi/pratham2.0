@@ -71,11 +71,13 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
           mb: 3,
         }}
       >
-        {t('LOGIN_PAGE.LOGIN')}
+        {/* {t('LOGIN_PAGE.LOGIN')} */}
+        Login
       </Typography>
 
       <TextField
-        label={t('LOGIN_PAGE.USERNAME')}
+        label="UserName"
+        //{t('LOGIN_PAGE.USERNAME')}
         name="username"
         value={formData.username}
         onChange={handleChange}
@@ -85,7 +87,8 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
       />
 
       <TextField
-        label={t('LOGIN_PAGE.PASSWORD')}
+        label="Password"
+        //{t('LOGIN_PAGE.PASSWORD')}
         name="password"
         type={showPassword ? 'text' : 'password'}
         value={formData.password}
@@ -121,7 +124,8 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
               name="remember"
             />
           }
-          label={t('LOGIN_PAGE.REMEMBER_ME')}
+          label="Remember Me"
+          // {t('LOGIN_PAGE.REMEMBER_ME')}
         />
         <Typography
           variant="body2"
@@ -129,7 +133,8 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
           sx={{ cursor: 'pointer' }}
           onClick={handleForgotPassword}
         >
-          {t('LOGIN_PAGE.FORGOT_PASSWORD')}
+          ForGot Password
+          {/* {t('LOGIN_PAGE.FORGOT_PASSWORD')} */}
         </Typography>
       </Box>
 
@@ -147,7 +152,8 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
         }}
         onClick={handleLogin}
       >
-        {t('LOGIN_PAGE.LOGIN')}
+        {/* {t('LOGIN_PAGE.LOGIN')} */}
+        Login
       </Button>
 
       <Typography
@@ -158,7 +164,7 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
         sx={{ cursor: 'pointer' }}
         onClick={handleAddAccount}
       >
-        {t('LOGIN_PAGE.I_DONT_HAVE_ACCOUNT')}
+        {/* {t('LOGIN_PAGE.I_DONT_HAVE_ACCOUNT')} */}I dont have an Account
       </Typography>
     </Paper>
   );

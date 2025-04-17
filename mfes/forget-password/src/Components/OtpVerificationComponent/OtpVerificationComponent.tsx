@@ -5,13 +5,12 @@ import { Box, Typography, TextField, Button, Stack } from '@mui/material';
 
 const OtpVerificationComponent = ({
   maskedNumber = '9*********7',
-  onVerify,
+
   onResend,
   otp,
   setOtp,
 }: {
   maskedNumber?: string;
-  onVerify?: (otp: string) => void;
   onResend?: () => void;
   otp: string[];
   setOtp: any;
@@ -30,7 +29,7 @@ const OtpVerificationComponent = ({
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
-    if (value && index < 3) {
+    if (value && index < otp.length - 1) {
       const nextInput = document.getElementById(`otp-${index + 1}`);
       if (nextInput) (nextInput as HTMLInputElement).focus();
     }
@@ -38,13 +37,8 @@ const OtpVerificationComponent = ({
 
   const handleResend = () => {
     setTimer(59);
-    setOtp(['', '', '', '']);
+    setOtp(['', '', '', '', '', '']);
     onResend?.();
-  };
-
-  const handleVerify = () => {
-    const finalOtp = otp.join('');
-    if (finalOtp.length === 4) onVerify?.(finalOtp);
   };
 
   return (
@@ -60,6 +54,12 @@ const OtpVerificationComponent = ({
             id={`otp-${idx}`}
             value={digit}
             onChange={(e) => handleChange(idx, e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Backspace' && otp[idx] === '' && idx > 0) {
+                const prevInput = document.getElementById(`otp-${idx - 1}`);
+                if (prevInput) (prevInput as HTMLInputElement).focus();
+              }
+            }}
             inputProps={{
               maxLength: 1,
               style: { textAlign: 'center', fontSize: '20px' },

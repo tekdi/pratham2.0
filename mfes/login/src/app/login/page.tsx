@@ -1,13 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 // import { GetStaticPropsContext } from 'next';
-import LoginComponent from '../../Components/loginComponent';
-// import TestComp from '@learner/components/TestComp/TestComp';
-// import {TestComp } from '@learner/components/TestComp/TestComp';
-//  import TestComp from '@learner/';
-
-// import ForgotPasswordComponent from '../Components/ForgotPasswordComponent';
-// import AccountSelectionForm from '../Components/AccountSelectionForm';
-// import ResetPasswordForm from '../Components/ResetPasswordForm';
+// import WelcomeScreen from '../../Components/WelcomeScreen';
+import { Box } from '@mui/material';
+import LoginComponent from '@login/Components/LoginComponent/LoginComponent';
 type LoginPageProps = {
   onLoginSuccess: (response: any) => void;
   handleAddAccount?: () => void;
@@ -26,34 +21,31 @@ const LoginPage: React.FC<LoginPageProps> = ({
     { name: 'Somnath Gharware', username: 'som@gharware' },
   ];
   return (
-    <>
-      {/* <ForgotPasswordComponent
-        onNext={(value) => console.log('Next with:', value)}
-      /> */}
-      {/* <AccountSelectionForm
-        userAccounts={users}
-        onNext={(selected) => console.log(selected)}
-      /> */}
-      {/* <ResetPasswordForm onSubmit={onLoginSuccess} /> */}
-      {/* <TestComp /> */}
-      <main
-        style={{
-          width: '100vw',
-          height: '100vh',
-          display: 'flex',
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-          paddingRight: '4rem',
-          boxSizing: 'border-box',
-        }}
+    <Box display="flex" height="100vh" width="100vw">
+      <Box
+        flex={1}
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+      >
+      </Box>
+
+      <Box
+        flex={1}
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        pr={6} // Padding right = 4rem
+        boxSizing="border-box"
+        bgcolor="#ffffff" // Optional
       >
         <LoginComponent
           onLogin={onLoginSuccess}
           handleForgotPassword={handleForgotPassword}
           handleAddAccount={handleAddAccount}
         />
-      </main>
-    </>
+      </Box>
+    </Box>
   );
 };
 
