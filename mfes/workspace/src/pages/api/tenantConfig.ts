@@ -17,6 +17,11 @@ export const mockData: Record<string, any> = {
     CONTENT_FRAMEWORK: "level1-framework",
     COLLECTION_FRAMEWORK: "youthnet-framework",
   },
+  "914ca990-9b45-4385-a06b-05054f35d0b9": {
+    CHANNEL_ID: "pragyanpath-channel",
+    CONTENT_FRAMEWORK: "level1-framework",
+    COLLECTION_FRAMEWORK: "pragyanpath-framework",
+  },
 };
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {

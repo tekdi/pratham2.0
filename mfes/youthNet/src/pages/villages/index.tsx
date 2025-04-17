@@ -183,12 +183,12 @@ const Index = () => {
             return [...data].sort(
               (a, b) => b.newRegistrations - a.newRegistrations
             );
-          case SortOrder.NEW_REGISTRATION_HIGH_TO_LOW: 
+          case SortOrder.NEW_REGISTRATION_HIGH_TO_LOW:
             return [...data].sort(
               (a, b) => a.newRegistrations - b.newRegistrations
             );
           case SortOrder.TOTAL_COUNT_LOW_TO_HIGH:
-            return [...data].sort((a, b) => a.totalCount - b.totalCount);  
+            return [...data].sort((a, b) => a.totalCount - b.totalCount);
           case SortOrder.TOTAL_COUNT_HIGH_TO_LOW:
             return [...data].sort((a, b) => b.totalCount - a.totalCount);
           case SortOrder.AGE_LOW_TO_HIGH:
@@ -296,7 +296,8 @@ const Index = () => {
                 isNew: isToday,
                 age: getAge(user?.dob),
                 showMore: true,
-                isVolunteer: isVolunteer?.selectedValues || VolunteerField?.NO,
+                isVolunteer:
+                  isVolunteer?.selectedValues[0] || VolunteerField?.NO,
               };
             }
           );
@@ -649,7 +650,7 @@ const Index = () => {
     {
       label: t('YOUTHNET_USERS_AND_VILLAGES.DELETE_USER_PERMANENTLY'),
       action: BOTTOM_DRAWER_CONSTANTS.DELETE,
-      icon: <DeleteIcon />
+      icon: <DeleteIcon />,
     },
   ];
 
@@ -1037,7 +1038,6 @@ const Index = () => {
               primaryText={!showAssignmentScreen ? 'Next' : undefined}
               secondaryText={count === 1 ? 'Save Progress' : ''}
               id="dynamic-form-id"
-              
             >
               {/* {count === 0 && (
                 <Box>
