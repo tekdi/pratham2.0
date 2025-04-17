@@ -2,7 +2,6 @@ import './global.css';
 import { ReactNode } from 'react';
 import { Metadata } from 'next';
 import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
-import customTheme from '../styles/customTheme';
 
 export const metadata: Metadata = {
   title: 'Welcome to login',
@@ -17,10 +16,8 @@ export default function RootLayout({
   params: { locale: string };
 }) {
   return (
-    <CssVarsProvider theme={customTheme}>
-      <html lang={params.locale}>
-        <body>{children}</body>
-      </html>
-    </CssVarsProvider>
+    <html lang={params.locale}>
+      <body>{children}</body>
+    </html>
   );
 }
