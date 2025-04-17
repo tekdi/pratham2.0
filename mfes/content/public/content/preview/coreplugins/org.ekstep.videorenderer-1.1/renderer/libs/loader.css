@@ -29,7 +29,7 @@
   /* :not(:required) hides these rules from IE9 and below */
   .loading:not(:required) {
     /* hide "loading..." text */
-    font: 0/0 a;
+    font: 0/0 a, sans-serif;
     color: white;
     text-shadow: none;
     background-color: white;

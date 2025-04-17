@@ -1,4 +1,4 @@
-<div class="menu-overlay" ng-click="hideMenu()" ng-cloak></div>
+<div class="menu-overlay" ng-click="hideMenu()" ng-cloak ng-keydown="hideMenu()" ng-keyup="hideMenu()" ng-keypress="hideMenu()"></div>
 <!-- Menu container -->
 <div class="gc-menu">
     <a ng-if="!showUser" class="gc-menu-btn old_menu" href="javascript:void(0)" ng-click="openMenu()">
@@ -15,12 +15,12 @@
             <p class="icon-font">{{ content.name }}</p>
         </div>
         <div class = "gc-menu-options">
-            <div ng-click="replayContent()">
+            <div ng-click="replayContent()" ng-keypress="hideMenu()" ng-keydown="hideMenu()" ng-keyup="hideMenu()">
                 <img ng-src="{{imageBasePath}}icn_replay.png"/>
                 <span> {{AppLables.replay}} </span>
             </div>
         </div>
-        <div ng-if="showUser" ng-click="openUserSwitchingModal()" class = "gc-menu-options profile">
+        <div ng-if="showUser" ng-click="openUserSwitchingModal()" onkeypress="openUserSwitchingModal()" onkeydown="openUserSwitchingModal()" onkeyup="openUserSwitchingModal()" class="gc-menu-options profile">
             <img alt="prof img" ng-src="{{imageBasePath}}avatar_anonymous.png"/>
             <span class="menu-text"> {{currentUser.handle}} <br/> <small> {{AppLables.change}} </small></span>
         </div>
@@ -34,9 +34,9 @@
             <genie></genie>
         </div>
         <div class="inst-message-cont " ng-show="showInst">
-            <img class="inst-icon" ng-src="{{imageBasePath}}icn_teacherinfo.png" ng-click="expeandInstruction()" />
+            <img class="inst-icon" ng-src="{{imageBasePath}}icn_teacherinfo.png" ng-click="expeandInstruction()" ng-keypress="expeandInstruction()" ng-keydown="expeandInstruction()" ng-keyup="expeandInstruction()" />
             <p class="stage-Teacherinst">{{ stageInstMessage }}</p>
-            <img class="inst-done" ng-src="{{imageBasePath}}icn_done.png" ng-click="closeInstructions()" />
+            <img class="inst-done" ng-src="{{imageBasePath}}icn_done.png" ng-click="closeInstructions()" ng-keypress="closeInstructions()" ng-keydown="closeInstructions()" ng-keyup="closeInstructions()" />
         </div>
     </div>
 </div>

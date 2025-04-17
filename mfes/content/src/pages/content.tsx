@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import SearchIcon from '@mui/icons-material/Search';
-import { Box } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import { CommonSearch, getData, Layout, Loader } from '@shared-lib';
 import { useRouter } from 'next/navigation';
 import BackToTop from '../components/BackToTop';
@@ -317,32 +317,9 @@ export default function Content(props: Readonly<ContentProps>) {
             )}
             {propData?.showFilter && (
               <Box>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    backgroundColor: '#ECE6F0',
-                    borderRadius: '12px',
-                    // padding: '8px',
-                    width: '56px',
-                    height: '46px',
-                    '&:hover': {
-                      backgroundColor: '#E0E0E0',
-                      boxShadow: '0px 4px 8px 3px #00000026',
-                    },
-                    marginLeft: '4px',
-                    marginRight: '7px',
-
-                    boxShadow: '0px 1px 3px 0px #0000004D',
-                  }}
-                  onClick={() => setFilterShow(true)}
-                >
-                  <FilterAltOutlinedIcon
-                    sx={{ color: '#6750A4', fontSize: '25px' }}
-                  />
-                </Box>
+                <Button variant="outlined" onClick={() => setFilterShow(true)}>
+                  <FilterAltOutlinedIcon />
+                </Button>
                 <FilterDialog
                   open={filterShow}
                   onClose={() => setFilterShow(false)}

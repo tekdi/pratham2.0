@@ -26,9 +26,6 @@ const V1Player = ({ playerConfig }: PlayerProps) => {
           ) {
             preview.contentWindow.initializePreview(playerConfig);
           }
-          preview.contentWindow.addEventListener('message', (event: any) => {
-            console.log('V1 player event', event);
-          });
 
           preview.addEventListener('renderer:telemetry:event', (event: any) => {
             console.log('V1 player telemetry event ===>', event);

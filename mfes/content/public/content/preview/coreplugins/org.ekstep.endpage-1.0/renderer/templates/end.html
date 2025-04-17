@@ -7,9 +7,9 @@
         <p class="icon-font gc-ep-title gc-text-elipsis" ng-if="content.name">{{content.name}}</p>
         <p class="gc-content-owner gc-text-elipsis" ng-if="content.owner">{{ AppLables.author }}: {{content.owner}}</p>
     </div>
-    <center class="gc-ep-credits" ng-hide="content.imageCredits == null && content.voiceCredits == null && content.soundCredits == null ">
+    <div class="gc-ep-credits" style="text-align: center;" ng-hide="content.imageCredits == null && content.voiceCredits == null && content.soundCredits == null ">
         <input class="gc-btn-credits btn-normal" type="button" ng-click="showCredits()" />
-    </center>
+    </div>
     <div class="gc-ep-content-holder">
         <div class="gc-ep-assessment-cont">
             <div class="gc-ep-rating-cont">
@@ -29,11 +29,11 @@
                 </div>
             </div>
             <div class="gc-ep-footer">
-                <div ng-click="replayContent()" class="gc-ep-footer-icons gc-ep-replay">
+                <div ng-click="replayContent()" onKeyPress="event.preventDefault()" onKeyDown="event.preventDefault()" onKeyUp="event.preventDefault()" class="gc-ep-footer-icons gc-ep-replay">
                     <img class="replay" ng-src="{{imageBasePath}}icn_replay.png" />
                     <p>{{AppLables.replay}}</p>
                 </div>
-                <div ng-if="showUser" ng-click="ep_openUserSwitchingModal()" class="gc-ep-footer-icons gc-ep-userSwitch">
+                <div ng-if="showUser" ng-click="ep_openUserSwitchingModal()" onkeypress="handleKeyPress()" class="gc-ep-footer-icons gc-ep-userSwitch">
                     <img class="user" ng-src="{{currentUser.profileImage}}" />
                     <p><b>{{currentUser.handle}}</b>
                         <br/> <small> {{AppLables.change}} </small></p>
@@ -50,7 +50,7 @@
                 </div>
             </div>
             <div class="gc-related-cont" ng-show="showRelatedContent">
-                <div class="gc-related-list" ng-repeat="story in relatedContents" ng-click="playRelatedContent(story, $index);">
+                <div class="gc-related-list" ng-repeat="story in relatedContents" ng-click="playRelatedContent(story, $index);" onKeyPress="event.preventDefault()" onKeyDown="event.preventDefault()" onKeyUp="event.preventDefault()">
                     <div class="gc-related-item">
                         <p class="gc-text-elipsis gc-related-cont-title">{{story.name}}</p>
                         <div class="gc-rel-content-img">
@@ -66,7 +66,7 @@
     </div>
     <popup id="creditsPopup" ng-show = 'CreditPopup' popup-body="creditsBody"></popup>
     <div id="gcFbPopup" class="popup" ng-if="showFeedbackPopup">
-        <div class="popup-overlay" ng-click="hideFeedback()"></div>
+        <div class="popup-overlay" ng-click="hideFeedback()" onKeyPress="event.preventDefault()" onKeyDown="event.preventDefault()" onKeyUp="event.preventDefault()"></div>
         <div class="gc-popup-new gc-fc-popup">
             <div class="gc-popup-title-new">{{AppLables.feedback}}</div>
             <div class="gc-popup-body-new">
