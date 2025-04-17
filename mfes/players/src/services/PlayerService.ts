@@ -81,3 +81,14 @@ export const getQumlData = async (identifier: any) => {
     throw error;
   }
 };
+
+export const createContentTracking = async (reqBody: ContentCreate) => {
+  const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/content/create`;
+  try {
+    const response = await axios.post(apiUrl, reqBody);
+    return response?.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};

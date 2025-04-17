@@ -25,6 +25,9 @@ export * from './lib/theme';
 export * from './lib/ThemeProvider';
 export * from './lib/Progress/Circular';
 export * from './lib/Progress/Progress';
+export * from './lib/Progress/CircularProgressWithLabel';
+export * from './lib/Loader/Loader';
+export * from './lib/context/LanguageContext';
 import Image from '../images/default.png';
 export const IMAGES = {
   DEFAULT_PLACEHOLDER: Image,
