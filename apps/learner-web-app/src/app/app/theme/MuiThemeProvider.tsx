@@ -2,49 +2,52 @@
 'use client';
 
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { red } from '@mui/material/colors';
 import React from 'react';
-import { LanguageProvider } from '@shared-lib';
+// import { LanguageProvider } from '@shared-lib';
 
 const theme = createTheme({
   palette: {
     primary: {
-      main: red[500],
-      contrastText: '#fff',
+      main: '#FDBE16',
+      // contrastText: '#fff',
+      light: '#FFDEA1',
     },
+
     secondary: {
-      main: '#f50057',
-      contrastText: '#fff',
+      main: '#0D599E',
+      light: '#E7F3F8',
+      // contrastText: '#fff',
     },
   },
   components: {
     MuiOutlinedInput: {
       styleOverrides: {
         root: {
-          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-            borderColor: red[500],
-          },
+          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {},
+          // background: '#BA1A1A'
         },
       },
     },
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: '50px', // Makes the primary button rounded
+          borderRadius: '50px',
+          textTransform: 'none',
         },
       },
     },
   },
 });
 
-export default function ThemeRegistry({
+export default function MuiThemeProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
     <ThemeProvider theme={theme}>
-      <LanguageProvider>{children}</LanguageProvider>
+      {/* <LanguageProvider>{children}</LanguageProvider> */}
+      <>{children}</>
     </ThemeProvider>
   );
 }

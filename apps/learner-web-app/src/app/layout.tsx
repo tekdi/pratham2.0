@@ -1,5 +1,7 @@
 // app/layout.tsx
 import './global.css';
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 import MuiThemeProvider from './app/theme/MuiThemeProvider';
 
 export const metadata = {
@@ -16,6 +18,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <MuiThemeProvider>{children}</MuiThemeProvider>
+        <ToastContainer />
       </body>
     </html>
   );
