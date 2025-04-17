@@ -3,7 +3,7 @@
 
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import React from 'react';
-import { LanguageProvider } from '@shared-lib';
+// import { LanguageProvider } from '@shared-lib';
 
 const theme = createTheme({
   palette: {
@@ -46,7 +46,8 @@ export default function MuiThemeProvider({
 }) {
   return (
     <ThemeProvider theme={theme}>
-      <LanguageProvider>{children}</LanguageProvider>
+      {/* <LanguageProvider>{children}</LanguageProvider> */}
+      <>{children}</>
     </ThemeProvider>
   );
 }
