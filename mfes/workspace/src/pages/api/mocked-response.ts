@@ -557,3 +557,207 @@ export const publishResourceFormResponse = {
   ts: "2024-12-24T05:46:18.384Z",
   ver: "1.0",
 };
+
+export const contentEditorQuestionFormResponse = {
+  id: 'api.form.read',
+  params: {
+    resmsgid: '8437ee1d-b708-4f3f-9ec9-31d9a203a3c6',
+    msgid: 'dd4e9440-9257-4c49-a668-7b79a6e6f83c',
+    status: 'successful',
+  },
+  responseCode: 'OK',
+  result: {
+    form: {
+      type: 'content',
+      subtype: 'questions',
+      action: 'question-filter-view',
+      component: '*',
+      framework: '*',
+      data: {
+        action: 'question-filter-view',
+        templateName: 'filterMetaDataTemplate',
+        fields: [
+          {
+            code: 'searchText',
+            dataType: 'text',
+            description: ' by question title',
+            editable: true,
+            inputType: 'text',
+            label: 'Search',
+            name: 'Search',
+            index: 0,
+            placeholder: 'Search by question title',
+            renderingHints: {},
+            required: false,
+            visible: true,
+          },
+          {
+            code: 'level',
+            dataType: 'text',
+            description: 'Add Notes',
+            editable: true,
+            index: 2,
+            inputType: 'select',
+            label: 'Difficulty',
+            name: 'level',
+            placeholder: 'Select Level',
+            range: ['EASY', 'MEDIUM', 'DIFFICULT'],
+            renderingHints: {},
+            required: false,
+            visible: true,
+          },
+          {
+            code: 'questionType',
+            dataType: 'list',
+            description: 'Class',
+            editable: true,
+            index: 3,
+            inputType: 'multiselect',
+            label: 'Question Type',
+            name: 'Question Type',
+            placeholder: 'Question Type',
+            range: [
+              'Multiple Choice Questions',
+              'Fill in the Blanks',
+              'Match the Following',
+            ],
+            renderingHints: {},
+            required: false,
+            visible: true,
+          },
+          {
+            code: 'myQuestions',
+            dataType: 'toggle',
+            description: 'My Questions',
+            editable: true,
+            inputType: 'checkbox',
+            label: 'My Questions',
+            name: 'My Questions',
+            placeholder: 'My Questions',
+            renderingHints: {},
+            required: false,
+            visible: true,
+            index: 9,
+          },
+        ],
+      },
+      created_on: '2019-09-08T15:10:47.019Z',
+      last_modified_on: '2020-08-16T11:48:08.835Z',
+      rootOrgId: '*',
+    },
+  },
+  ts: '2025-03-20T04:27:33.588Z',
+  ver: '1.0',
+};
+
+export const contentEditorQuestionMetaFormResponse = {
+  "id": "api.form.read",
+  "params": {
+    "resmsgid": "1d4dc61c-e66b-41ba-aed2-00509bd4c9b7",
+      "msgid": "7f7f8182-5461-488d-93cc-3f6fdf11feaf",
+      "status": "successful"
+  },
+  "responseCode": "OK",
+  "result": {
+      "form": {
+          "type": "content",
+          "subtype": "questions",
+          "action": "question-meta-save",
+          "component": "*",
+          "framework": "*",
+          "data": {
+              "action": "question-meta-save",
+              "templateName": "questionMetaDataTemplate",
+              "fields": [
+                  {
+                      "code": "name",
+                      "dataType": "text",
+                      "description": "Title of the question",
+                      "editable": true,
+                      "inputType": "text",
+                      "label": "Title",
+                      "name": "Title",
+                      "index": 0,
+                      "placeholder": "Enter the Title",
+                      "renderingHints": {},
+                      "required": true,
+                      "visible": true
+                  },
+                  {
+                      "code": "description",
+                      "dataType": "text",
+                      "description": "Brief description",
+                      "editable": true,
+                      "inputType": "textarea",
+                      "label": "Description",
+                      "name": "Description",
+                      "placeholder": "Enter the Description",
+                      "renderingHints": {},
+                      "required": false,
+                      "visible": true,
+                      "index": 1
+                  },
+                  {
+                      "code": "medium",
+                      "dataType": "text",
+                      "description": "Language",
+                      "editable": true,
+                      "index": 8,
+                      "inputType": "select",
+                      "label": "Language",
+                      "name": "Language",
+                      "placeholder": "Select Language",
+                      "renderingHints": {},
+                      "required": false,
+                      "visible": true
+                  },
+                  {
+                      "code": "qlevel",
+                      "dataType": "text",
+                      "description": "Add Notes",
+                      "editable": true,
+                      "index": 3,
+                      "inputType": "select",
+                      "label": "Level",
+                      "name": "qlevel",
+                      "placeholder": "Select Level",
+                      "range": [
+                          "EASY",
+                          "MEDIUM",
+                          "DIFFICULT"
+                      ],
+                      "renderingHints": {},
+                      "required": true,
+                      "visible": true
+                  },
+                  {
+                      "code": "max_score",
+                      "dataType": "number",
+                      "description": "",
+                      "editable": true,
+                      "index": 4,
+                      "inputType": "number",
+                      "label": "Max Score",
+                      "name": "max_score",
+                      "placeholder": "Enter the Max Score",
+                      "renderingHints": {},
+                      "required": true,
+                      "visible": true,
+                      "validation": [
+                          {
+                              "type": "min",
+                              "value": "1",
+                              "message": ""
+                          }
+                      ]
+                  }
+              ]
+          },
+          "created_on": "2020-08-19T11:42:18.732Z",
+          "last_modified_on": "2020-08-16T11:48:17.934Z",
+          "rootOrgId": "*"
+      }
+  },
+  "ts": "2025-03-20T05:54:42.223Z",
+  "ver": "1.0"
+};

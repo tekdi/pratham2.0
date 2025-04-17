@@ -252,6 +252,35 @@ export const createCourse = async (userId: any, channelId: any, contentFW: any, 
   }
 };
 
+export const createResourceContent = async(userId: any, contentType: string, channelId: any, contentFW: any) => {
+  const apiURL = `/action/content/v3/create`;
+
+  const reqBody = {
+    request: {
+      content: {
+        code: uuidv4(), // Generate a unique ID for 'code'
+        name: "Untitled Resource",
+        createdBy: userId,
+        createdFor: [channelId],
+        mimeType: MIME_TYPE.ECML_MIME_TYPE,
+        resourceType: "Learn",
+        contentType: contentType,
+        framework: contentFW,
+        ...(contentType !== "SelfAssess" && { primaryCategory: "Learning Resource" })
+      },
+    },
+  };
+
+
+  try {
+    const response = await post(apiURL, reqBody);
+    return response?.data;
+  } catch (error) {
+    console.error("Error creating Resource:", error);
+    throw error;
+  }
+}
+
 export const publishContent = async (
   identifier: any,
   publishChecklist?: any
