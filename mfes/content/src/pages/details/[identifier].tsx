@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { useParams, useRouter } from 'next/navigation';
 import { Box, Typography, Grid } from '@mui/material';
 import { getLeafNodes, Layout } from '@shared-lib';
 import CommonCollapse from '../../components/CommonCollapse'; // Adjust the import based on your folder structure
 import { hierarchyAPI } from '../../services/Hierarchy';
 import { trackingData } from '../../services/TrackingService';
+import LayoutPage from '../../components/LayoutPage';
 
 interface DetailsProps {
-  details: any;
+  isShowLayout?: any;
 }
 
-export default function Details({ details }: DetailsProps) {
+export default function Details(props: DetailsProps) {
   const router = useRouter();
-  const { identifier } = router.query; // Fetch the 'id' from the URL
+  const params = useParams();
+  const identifier = params?.identifier; // string | string[] | undefined
   const [trackData, setTrackData] = useState([]);
   const [selectedContent, setSelectedContent] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -58,7 +60,8 @@ export default function Details({ details }: DetailsProps) {
     router.back();
   };
   return (
-    <Layout
+    <LayoutPage
+      isShow={props?.isShowLayout}
       isLoadingChildren={loading}
       _topAppBar={{
         title: 'Shiksha: Course Details',
@@ -85,7 +88,7 @@ export default function Details({ details }: DetailsProps) {
           </Grid>
         </Grid>
       </Box>
-    </Layout>
+    </LayoutPage>
   );
 }
 

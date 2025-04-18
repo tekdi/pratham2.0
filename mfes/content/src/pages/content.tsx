@@ -13,6 +13,7 @@ import { hierarchyAPI } from '../services/Hierarchy';
 import { ContentSearch, ContentSearchResponse } from '../services/Search';
 import FilterDialog from '../components/FilterDialog';
 import { trackingData } from '../services/TrackingService';
+import LayoutPage from '../components/LayoutPage';
 
 export interface ContentProps {
   _grid?: object;
@@ -283,7 +284,10 @@ export default function Content(props: Readonly<ContentProps>) {
   }, [router]);
 
   return (
-    <LayoutPage isPageLoading={isPageLoading} isShow={propData?.isShowLayout}>
+    <LayoutPage
+      isLoadingChildren={isPageLoading}
+      isShow={propData?.isShowLayout}
+    >
       <Box sx={{ p: 1 }}>
         {(propData?.showSearch || propData?.showFilter) && (
           <Box
@@ -351,30 +355,3 @@ export default function Content(props: Readonly<ContentProps>) {
     </LayoutPage>
   );
 }
-
-const LayoutPage = ({
-  isPageLoading,
-  isShow,
-  children,
-}: {
-  isPageLoading: boolean;
-  isShow?: boolean;
-  children: React.ReactNode;
-}) => {
-  if (isShow === undefined || isShow) {
-    return (
-      <Layout
-        isLoadingChildren={isPageLoading}
-        _topAppBar={{
-          title: 'Pratham: Home',
-          actionButtonLabel: 'Action',
-        }}
-        onlyHideElements={['footer']}
-      >
-        {children}
-      </Layout>
-    );
-  } else {
-    return <Loader isLoading={isPageLoading}>{children}</Loader>;
-  }
-};

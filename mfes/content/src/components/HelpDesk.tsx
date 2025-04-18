@@ -12,7 +12,7 @@ import {
   Grid,
 } from '@mui/material';
 import { CommonDialog, CommonTextField } from '@shared-lib';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { useTheme } from '@mui/material/styles';
 
 interface HelpDeskIssueData {
