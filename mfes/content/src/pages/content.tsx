@@ -54,22 +54,21 @@ export default function Content(props: Readonly<ContentProps>) {
         ...(props || newData),
       };
       setPropData(newPorp);
-      console.log(newPorp, props, 'propData');
-
+      console.log(props, 'propData');
       setTabValue(0);
       setIsPageLoading(false);
     };
     init();
   }, [props]);
 
-  const fetchContent = useCallback(async (filters: any) => {
+  const fetchContent = useCallback(async (filter: any) => {
     try {
       let data: any;
-      if (filters.identifier) {
-        const result = await hierarchyAPI(filters.identifier);
+      if (filter.identifier) {
+        const result = await hierarchyAPI(filter.identifier);
         data = [result];
       } else {
-        data = await ContentSearch(filters);
+        data = await ContentSearch(filter);
       }
       return data;
     } catch (error) {
@@ -242,6 +241,7 @@ export default function Content(props: Readonly<ContentProps>) {
   }, [localFilters, fetchContent, fetchDataTrack]);
 
   const handleApplyFilters = async (selectedValues: any) => {
+    setFilterShow(false);
     if (Object.keys(selectedValues).length === 0) {
       setLocalFilters((prevFilters: any) => ({
         ...prevFilters,
@@ -366,7 +366,7 @@ const LayoutPage = ({
       <Layout
         isLoadingChildren={isPageLoading}
         _topAppBar={{
-          title: 'Shiksha: Home',
+          title: 'Pratham: Home',
           actionButtonLabel: 'Action',
         }}
         onlyHideElements={['footer']}

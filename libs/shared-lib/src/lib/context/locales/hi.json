@@ -3,5 +3,16 @@
   "ENGLISH": "English",
   "HINDI": "Hindi",
   "MARATHI": "Marathi",
-  "URDU": "Urdu"
+  "URDU": "Urdu",
+  "LEARNER_APP": {
+    "COMMON": {
+      "L1_COURSES": "एल1 पाठ्यक्रम",
+      "EXPLORE": "अन्वेषण करें",
+      "SURVEYS": "सर्वेक्षण",
+      "PROFILE": "प्रोफाइल"
+    },
+    "COURSE": {
+      "EXPLORE_ADDITIONAL_COURSES": "अतिरिक्त पाठ्यक्रमों का अन्वेषण करें"
+    }
+  }
 }

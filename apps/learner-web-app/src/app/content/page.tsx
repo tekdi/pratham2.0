@@ -1,37 +1,17 @@
 'use client';
-import dynamic from 'next/dynamic';
 import React from 'react';
 import Layout from '../../components/Layout';
-import { Box, Stack } from '@mui/material';
-import { FilterForm } from '@shared-lib';
+import { LayoutProps } from '@shared-lib';
+import LearnerCourse from './LearnerCourse';
 
-interface MyComponentProps {
-  title: string;
-  description?: string;
-  onClick: () => void;
+interface AppProps {
+  _layout?: LayoutProps;
 }
 
-const Content = dynamic(() => import('@Content'), {
-  ssr: false,
-});
-
-const MyComponent: React.FC<MyComponentProps> = () => {
+const MyComponent: React.FC<AppProps> = () => {
   return (
     <Layout>
-      <Stack direction="row" sx={{ p: 4, gap: 4 }}>
-        <Box sx={{ flex: 3 }}>
-          <Box sx={{ position: 'sticky', top: 0 }}>
-            <FilterForm />
-          </Box>
-        </Box>
-        <Box sx={{ flex: 9 }}>
-          <Content
-            isShowLayout={false}
-            contentTabs={['courses']}
-            showFilter={false}
-          />
-        </Box>
-      </Stack>
+      <LearnerCourse />
     </Layout>
   );
 };

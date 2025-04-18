@@ -1,37 +1,71 @@
 'use client';
 
-import React from 'react';
-import { LayoutProps, Layout } from '@shared-lib';
+import React, { useState } from 'react';
+import {
+  LayoutProps,
+  Layout,
+  useTranslation,
+  DrawerItemProp,
+} from '@shared-lib';
 import { AccountBox, Explore, Home, Summarize } from '@mui/icons-material';
+import { useRouter } from 'next/navigation';
 
-const defaultNavLinks = [
-  {
-    title: 'L1 Courses',
-    icon: Home,
-    to: console.log,
-    isActive: true,
-  },
-  {
-    title: 'Explore',
-    icon: Explore,
-    to: console.log,
-  },
-  {
-    title: 'Surveys',
-    icon: Summarize,
-    to: console.log,
-  },
-  {
-    title: 'Profile',
-    icon: AccountBox,
-    to: console.log,
-  },
-];
+interface NewDrawerItemProp extends DrawerItemProp {
+  variant?: 'contained' | 'text';
+  isActive?: boolean;
+  customStyle?: React.CSSProperties;
+}
 const App: React.FC<LayoutProps> = ({ children, ...props }) => {
+  const router = useRouter();
+  const { t, setLanguage } = useTranslation();
+  const [defaultNavLinks, setDefaultNavLinks] = useState<NewDrawerItemProp[]>(
+    []
+  );
+
+  React.useEffect(() => {
+    const currentPage =
+      typeof window !== 'undefined' && window.location.pathname
+        ? window.location.pathname
+        : '';
+
+    setDefaultNavLinks([
+      {
+        title: t('LEARNER_APP.COMMON.L1_COURSES'),
+        icon: <Home />,
+        to: () => router.push('/content'),
+        isActive: currentPage === '/content',
+      },
+      {
+        title: t('LEARNER_APP.COMMON.EXPLORE'),
+        icon: <Explore />,
+        to: () => router.push('/explore'),
+        isActive: currentPage === '/explore',
+      },
+      {
+        title: t('LEARNER_APP.COMMON.SURVEYS'),
+        icon: <Summarize />,
+        to: () => router.push('/content'),
+        isActive: currentPage === '/content',
+      },
+      {
+        title: t('LEARNER_APP.COMMON.PROFILE'),
+        icon: <AccountBox />,
+        to: () => router.push('/content'),
+        isActive: currentPage === '/content',
+      },
+    ]);
+  }, [t, router.pathname]);
+  const onLanguageChange = (val: string) => {
+    setLanguage(val);
+  };
   return (
     <Layout
       onlyHideElements={['footer']}
-      _topAppBar={{ navLinks: defaultNavLinks, _navLinkBox: { gap: 5 } }}
+      _topAppBar={{
+        navLinks: defaultNavLinks,
+        _navLinkBox: { gap: 5 },
+        onLanguageChange,
+      }}
       {...props}
     >
       {children}

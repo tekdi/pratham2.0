@@ -5,6 +5,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 // import { yellow, red } from '@mui/material/colors';
 import React from 'react';
 import { LanguageProvider } from '@shared-lib';
+import { CssBaseline } from '@mui/material';
 
 const theme = createTheme({
   typography: {
@@ -85,6 +86,7 @@ export default function ThemeRegistry({
 }) {
   return (
     <ThemeProvider theme={theme}>
+      <CssBaseline />
       <LanguageProvider>{children}</LanguageProvider>
     </ThemeProvider>
   );

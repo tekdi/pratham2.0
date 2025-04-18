@@ -95,12 +95,10 @@ export const Layout: React.FC<LayoutProps> = ({
         {showElements?.includes('topBar') && (
           <Box
             sx={{
-              // width: '100%',
               display: 'center',
               justifyContent: 'center',
               alignItems: 'center',
               flexDirection: 'column',
-              // padding: 2,
             }}
           >
             <Box

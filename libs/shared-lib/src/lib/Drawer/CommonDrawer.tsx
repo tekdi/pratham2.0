@@ -7,10 +7,11 @@ import {
   ListItemIcon,
   ListItemText,
 } from '@mui/material';
+import { useTranslation } from '../context/LanguageContext';
 
 export interface DrawerItemProp {
-  title: string;
-  icon?: JSX.Element;
+  title: string | JSX.Element | ReturnType<typeof useTranslation>['t'];
+  icon?: JSX.Element | React.ReactNode;
   to: string | ((event: React.MouseEvent<HTMLAnchorElement>) => void);
 }
 

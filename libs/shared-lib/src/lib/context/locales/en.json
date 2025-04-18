@@ -3,5 +3,20 @@
   "ENGLISH": "English",
   "HINDI": "Hindi",
   "MARATHI": "Marathi",
-  "URDU": "Urdu"
+  "URDU": "Urdu",
+  "LEARNER_APP": {
+    "COMMON": {
+      "L1_COURSES": "L1 Courses",
+      "EXPLORE": "Explore",
+      "SURVEYS": "Surveys",
+      "PROFILE": "Profile"
+    },
+    "COURSE": {
+      "GET_STARTED": "Get Started with L1 Courses",
+      "FILTER_BY": "Filter by"
+    },
+    "EXPLORE": {
+      "EXPLORE_ADDITIONAL_COURSES": "Explore Additional Courses"
+    }
+  }
 }

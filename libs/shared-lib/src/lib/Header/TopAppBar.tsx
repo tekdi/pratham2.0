@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   AppBar,
   Box,
@@ -15,7 +15,6 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { CommonDrawer, DrawerItemProp } from '../Drawer/CommonDrawer';
 
 interface NewDrawerItemProp extends DrawerItemProp {
-  text: string;
   variant?: 'contained' | 'text';
   isActive?: boolean;
   customStyle?: React.CSSProperties;
@@ -35,6 +34,7 @@ export interface AppBarProps {
   isShowLang?: boolean;
   onLanguageChange?: (lang: string) => void;
   _navLinkBox?: React.CSSProperties;
+  _brand?: object;
 }
 
 export const TopAppBar: React.FC<AppBarProps> = ({
@@ -80,19 +80,38 @@ const LanguageSelect = ({
   onLanguageChange?: (value: string) => void;
 }) => {
   const theme = useTheme();
+  const [selectedLanguage, setSelectedLanguage] = useState('en');
+
+  useEffect(() => {
+    const storedLanguage = localStorage.getItem('lang');
+    if (storedLanguage) {
+      setSelectedLanguage(storedLanguage);
+    }
+  }, []);
+
+  const handleChange = (event: any) => {
+    const newLanguage = event.target.value;
+    setSelectedLanguage(newLanguage);
+    if (onLanguageChange) {
+      onLanguageChange(newLanguage);
+    } else {
+      localStorage.setItem('lang', newLanguage);
+    }
+  };
+
   return (
     <Select
-      defaultValue="EN"
+      value={selectedLanguage}
       size="small"
-      onChange={(e) => onLanguageChange?.(e.target.value)}
+      onChange={handleChange}
       sx={{
         minWidth: 80,
         height: 40,
         color: theme.palette.text.primary,
       }}
     >
-      <MuiMenuItem value="EN">EN</MuiMenuItem>
-      <MuiMenuItem value="HI">HI</MuiMenuItem>
+      <MuiMenuItem value="en">EN</MuiMenuItem>
+      <MuiMenuItem value="hi">HI</MuiMenuItem>
     </Select>
   );
 };
@@ -103,6 +122,7 @@ const DesktopBar = ({
   isShowLang = true,
   onLanguageChange,
   _navLinkBox,
+  _brand,
 }: AppBarProps) => {
   return (
     <Box
@@ -113,7 +133,7 @@ const DesktopBar = ({
         width: '100%',
       }}
     >
-      <Brand />
+      <Brand {..._brand} />
       <Box
         sx={{
           display: 'flex',
@@ -131,7 +151,7 @@ const DesktopBar = ({
                 link.variant ||
                 (link.isActive ? 'top-bar-link-button' : 'top-bar-link-text')
               }
-              startIcon={link?.icon && <link.icon />}
+              startIcon={link?.icon && link.icon}
               onClick={
                 typeof link.to === 'string'
                   ? undefined
@@ -160,6 +180,7 @@ const MobileTopBar = ({
   title,
   isShowLang,
   onLanguageChange,
+  _brand,
 }: AppBarProps) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   return (
@@ -223,16 +244,16 @@ const MobileTopBar = ({
         onItemClick={(to) => {
           setIsDrawerOpen(false);
         }}
-        topElement={<Brand />}
+        topElement={<Brand {..._brand} />}
       />
     </Box>
   );
 };
 
-const Brand = () => {
+const Brand = ({ _box, name = 'Pratham' }: { _box?: any; name?: string }) => {
   const theme = useTheme();
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }} {..._box}>
       <img src="/logo.png" alt="YouthNet" style={{ height: '32px' }} />
       <Typography
         variant="h6"
@@ -241,7 +262,7 @@ const Brand = () => {
           fontWeight: 600,
         }}
       >
-        YouthNet
+        {name}
       </Typography>
     </Box>
   );

@@ -27,7 +27,10 @@ export const FilterForm = ({
   onSortChange,
   onApply,
   filterValues,
+  _formControl,
 }: {
+  frameworkFilter?: any;
+  filterValues?: any;
   filter?: {
     sort?: boolean;
     language?: string[];
@@ -43,8 +46,7 @@ export const FilterForm = ({
   onContentTypeChange?: (contentType: string[]) => void;
   onSortChange?: (sort: any) => void;
   onApply?: (data: any) => void;
-  frameworkFilter: any;
-  filterValues: any;
+  _formControl?: any;
 }) => {
   // Manage the selected values for each category
   const [selectedValues, setSelectedValues] = useState(filterValues ?? {}); // Initialize as an empty object
@@ -85,6 +87,7 @@ export const FilterForm = ({
         frameworkFilter={frameworkFilter}
         selectedValues={selectedValues}
         handleChange={handleChange}
+        _formControl={_formControl}
       />
       {/* Sort By */}
       {filter?.sort && (
@@ -206,7 +209,7 @@ export const FilterForm = ({
 };
 
 const RenderCategories = React.memo(
-  ({ categories, selectedValues, handleChange }: any) => {
+  ({ categories, selectedValues, handleChange, _formControl }: any) => {
     const componentKey = `multi-checkbox-label_${categories?.identifier}`;
     const options = categories?.terms.map((term: any) => ({
       label: term.name,
@@ -218,29 +221,9 @@ const RenderCategories = React.memo(
 
     return (
       <FormControl
-        fullWidth
         key={componentKey}
-        sx={{
-          '& .MuiInputLabel-root.Mui-focused': {
-            color: '#1D1B20',
-          },
-          '&.Mui-focused': {
-            color: '#1D1B20',
-          },
-          '& .MuiInputLabel-root': { color: '#1D1B20' },
-          '& .MuiOutlinedInput-root': {
-            color: '#1D1B20',
-            '& .MuiOutlinedInput-notchedOutline': {
-              borderColor: '#1D1B20',
-            },
-            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-              borderColor: '#1D1B20',
-            },
-            '&:hover .MuiOutlinedInput-notchedOutline': {
-              borderColor: '#1D1B20',
-            },
-          },
-        }}
+        sx={{ maxWidth: '350px' }}
+        {..._formControl}
       >
         <InputLabel id={componentKey}>{categories?.name}</InputLabel>
         <Select
@@ -259,16 +242,11 @@ const RenderCategories = React.memo(
               .join(', ')
           }
           onChange={(event) => handleChange(event, `se_${categories?.code}s`)}
+          sx={{ maxWidth: '100%' }}
         >
           {options.map((option: any) => (
             <MenuItem value={option.value} key={option.value}>
               <Checkbox
-                sx={{
-                  color: '#6750A4',
-                  '&.Mui-checked': {
-                    color: '#6750A4',
-                  },
-                }}
                 checked={currentSelectedValues.includes(option.value)}
               />
               <ListItemText primary={option.label} />
@@ -286,6 +264,7 @@ const FrameworkFilterComponent = ({
   frameworkFilter,
   selectedValues,
   handleChange,
+  _formControl,
 }: any) => {
   return frameworkFilter?.categories?.map((categories: any) => {
     return (
@@ -294,6 +273,7 @@ const FrameworkFilterComponent = ({
         categories={categories}
         selectedValues={selectedValues}
         handleChange={handleChange}
+        _formControl={_formControl}
       />
     );
   });
