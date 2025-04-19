@@ -29,7 +29,6 @@ export const FilterForm = ({
   filterValues,
   _formControl,
 }: {
-  frameworkFilter?: any;
   filterValues?: any;
   filter?: {
     sort?: boolean;
@@ -101,7 +100,7 @@ export const FilterForm = ({
                 const value = e.target.value;
                 onSortChange?.(value);
               }}
-              value={sort?.sortBy || 'asc'}
+              value={sort?.sortBy ?? 'asc'}
             >
               <FormControlLabel
                 value="asc"
@@ -141,7 +140,7 @@ export const FilterForm = ({
           <Select
             multiple
             label="Subject"
-            value={selectedSubjects || []}
+            value={selectedSubjects ?? []}
             renderValue={(selected) => (selected as string[]).join(', ')} // Join array values for display
             onChange={(e) => {
               const value = e.target.value as string[];
@@ -151,7 +150,7 @@ export const FilterForm = ({
             {filter.subject.map((subject) => (
               <MenuItem value={subject} key={subject}>
                 <Checkbox
-                  checked={(selectedSubjects || []).indexOf(subject) > -1}
+                  checked={(selectedSubjects ?? []).indexOf(subject) > -1}
                 />
                 <ListItemText primary={subject} />
               </MenuItem>
@@ -167,7 +166,7 @@ export const FilterForm = ({
             renderValue={(selected) => (selected as string[]).join(', ')}
             label="Content Type"
             multiple
-            value={selectedContentTypes || []}
+            value={selectedContentTypes ?? []}
             onChange={(e) => {
               const value = e.target.value as string[];
               onContentTypeChange?.(value);
@@ -176,7 +175,7 @@ export const FilterForm = ({
             {filter.contentType.map((type) => (
               <MenuItem key={type} value={type}>
                 <Checkbox
-                  checked={(selectedContentTypes || []).indexOf(type) > -1}
+                  checked={(selectedContentTypes ?? []).indexOf(type) > -1}
                 />
                 <ListItemText primary={type} />
               </MenuItem>
@@ -217,7 +216,7 @@ const RenderCategories = React.memo(
     }));
 
     const currentSelectedValues =
-      selectedValues[`se_${categories?.code}s`] || [];
+      selectedValues[`se_${categories?.code}s`] ?? [];
 
     return (
       <FormControl

@@ -2,10 +2,9 @@
 'use client';
 
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-// import { yellow, red } from '@mui/material/colors';
+import { CssBaseline } from '@mui/material';
 import React from 'react';
 import { LanguageProvider } from '@shared-lib';
-import { CssBaseline } from '@mui/material';
 
 const theme = createTheme({
   typography: {
@@ -56,14 +55,13 @@ const theme = createTheme({
           },
         },
         {
-          props: { variant: 'top-bar-link-button' }, // custom variant name
+          props: { variant: 'top-bar-link-button' },
           style: {
             fontWeight: 600,
             padding: 14,
             gap: 8,
             borderRadius: 8,
             borderBottomWidth: 3,
-            // border: '2px dashed #1976d2',
             color: '#987100',
             backgroundColor: '#F7ECDF',
             '&:hover': {

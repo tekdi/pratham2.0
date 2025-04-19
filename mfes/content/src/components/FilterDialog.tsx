@@ -16,7 +16,6 @@ const FilterDialog = ({
   onContentTypeChange,
   onSortChange,
   onApply,
-  frameworkFilter,
   filterValues,
 }: {
   open: boolean;
@@ -36,7 +35,6 @@ const FilterDialog = ({
   onContentTypeChange?: (contentType: string[]) => void;
   onSortChange?: (sort: any) => void;
   onApply?: (data: any) => void;
-  frameworkFilter: any;
   filterValues: any;
 }) => {
   const handleFilterChange = (data: any) => {
@@ -69,7 +67,7 @@ const FilterDialog = ({
       <DialogContent dividers>
         <FilterForm
           _formControl={{ sx: { width: '100%' } }}
-          filterValues={filterValues?.filters || {}}
+          filterValues={filterValues?.filters ?? {}}
           onApply={handleFilterChange}
           filter={filter}
           language={language}
@@ -80,7 +78,6 @@ const FilterDialog = ({
           onSubjectsChange={onSubjectsChange}
           onContentTypeChange={onContentTypeChange}
           onSortChange={onSortChange}
-          frameworkFilter={frameworkFilter}
         />
       </DialogContent>
     </Dialog>

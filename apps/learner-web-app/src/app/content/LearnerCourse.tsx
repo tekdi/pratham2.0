@@ -60,7 +60,7 @@ export default memo(function LearnerCourse({
           handleFilterChange={handleFilterChange}
         />
       </Box>
-      <Box flex={127} sx={{ height: '100vh' }}>
+      <Box flex={127}>
         <Box
           display="flex"
           flexDirection={{ xs: 'column', md: 'row' }}

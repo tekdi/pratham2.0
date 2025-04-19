@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import { Box, Button } from '@mui/material';
-import { CommonSearch, getData, Layout, Loader } from '@shared-lib';
+import { CommonSearch, getData } from '@shared-lib';
 import { useRouter } from 'next/navigation';
 import BackToTop from '../components/BackToTop';
 import RenderTabContent from '../components/ContentTabs';
@@ -26,6 +26,7 @@ export interface ContentProps {
   showBackToTop?: boolean;
   showHelpDesk?: boolean;
   isShowLayout?: boolean;
+  hasMoreData?: boolean;
 }
 export default function Content(props: Readonly<ContentProps>) {
   const router = useRouter();
@@ -41,7 +42,6 @@ export default function Content(props: Readonly<ContentProps>) {
     offset: 0,
   });
   const [showBackToTop, setShowBackToTop] = useState(false);
-  const [frameworkFilter, setFrameworkFilter] = useState(false);
   const [trackData, setTrackData] = useState<[]>([]);
   const [filterShow, setFilterShow] = useState(false);
   const [propData, setPropData] = useState<ContentProps>();
@@ -52,7 +52,7 @@ export default function Content(props: Readonly<ContentProps>) {
       const newPorp = {
         showSearch: true,
         showFilter: true,
-        ...(props || newData),
+        ...(props ?? newData),
       };
       setPropData(newPorp);
       console.log(props, 'propData');
@@ -85,7 +85,7 @@ export default function Content(props: Readonly<ContentProps>) {
       const userId =
         localStorage.getItem('subId') ?? localStorage.getItem('userId');
       const userIdArray = userId?.split(',');
-      if (!userId || !courseList.length) return; // Ensure required values exist
+      if (!userId ?? !courseList.length) return; // Ensure required values exist
       //@ts-ignore
       const course_track_data = await trackingData(userIdArray, courseList);
       if (course_track_data?.data) {
@@ -93,7 +93,7 @@ export default function Content(props: Readonly<ContentProps>) {
 
         return (
           course_track_data.data.find((course: any) => course.userId === userId)
-            ?.course || []
+            ?.course ?? []
         );
       }
     } catch (error) {
@@ -196,7 +196,7 @@ export default function Content(props: Readonly<ContentProps>) {
       setTabs(filteredTabs);
       setLocalFilters((prevFilters: any) => ({
         ...prevFilters,
-        ...(propData?.filters || {}),
+        ...(propData?.filters ?? {}),
       }));
     };
     init();
@@ -215,22 +215,27 @@ export default function Content(props: Readonly<ContentProps>) {
           const newContentData = Object.values(result)
             .filter((e): e is ContentSearchResponse[] => Array.isArray(e))
             .flat();
-          const userTrackData = await fetchDataTrack(newContentData || []);
+          const userTrackData = await fetchDataTrack(newContentData ?? []);
           if (localFilters.offset === 0) {
-            setContentData((newContentData as ContentSearchResponse[]) || []);
+            setContentData((newContentData as ContentSearchResponse[]) ?? []);
             setTrackData(userTrackData);
           } else {
             setContentData((prevState: any) => [
               ...prevState,
-              ...(newContentData || []),
+              ...(newContentData ?? []),
             ]);
             setTrackData(
-              (prevState: []) => [...prevState, ...(userTrackData || [])] as []
+              (prevState: []) =>
+                [...(prevState ?? []), ...(userTrackData ?? [])] as []
             );
           }
-          setHasMoreData(
-            result?.count > localFilters.offset + newContentData?.length
-          );
+          if (propData?.hasMoreData === false) {
+            setHasMoreData(false);
+          } else {
+            setHasMoreData(
+              result?.count > localFilters.offset + newContentData?.length
+            );
+          }
         }
       } catch (error) {
         console.error(error);
@@ -239,7 +244,7 @@ export default function Content(props: Readonly<ContentProps>) {
       }
     };
     init();
-  }, [localFilters, fetchContent, fetchDataTrack]);
+  }, [localFilters, fetchContent, fetchDataTrack, propData?.hasMoreData]);
 
   const handleApplyFilters = async (selectedValues: any) => {
     setFilterShow(false);
@@ -263,33 +268,13 @@ export default function Content(props: Readonly<ContentProps>) {
     }
   };
 
-  //get filter framework
-  useEffect(() => {
-    const fetchFramework = async () => {
-      try {
-        const url = `${
-          process.env.NEXT_PUBLIC_MIDDLEWARE_URL
-        }/api/framework/v1/read/${
-          localStorage.getItem('framework') ||
-          process.env.NEXT_PUBLIC_FRAMEWORK_ID
-        }`;
-        const frameworkData = await fetch(url).then((res) => res.json());
-        const frameworks = frameworkData?.result?.framework;
-        setFrameworkFilter(frameworks);
-      } catch (error) {
-        console.error('Error fetching board data:', error);
-      }
-    };
-    fetchFramework();
-  }, [router]);
-
   return (
     <LayoutPage
       isLoadingChildren={isPageLoading}
       isShow={propData?.isShowLayout}
     >
       <Box sx={{ p: 1 }}>
-        {(propData?.showSearch || propData?.showFilter) && (
+        {(propData?.showSearch ?? propData?.showFilter) && (
           <Box
             sx={{
               width: '100%',
@@ -302,7 +287,7 @@ export default function Content(props: Readonly<ContentProps>) {
                 placeholder={'Search content..'}
                 rightIcon={<SearchIcon />}
                 onRightIconClick={handleSearchClick}
-                inputValue={searchValue || ''}
+                inputValue={searchValue ?? ''}
                 onInputChange={handleSearchChange}
                 onKeyPress={(ev: any) => {
                   if (ev.key === 'Enter') {
@@ -326,7 +311,6 @@ export default function Content(props: Readonly<ContentProps>) {
                 <FilterDialog
                   open={filterShow}
                   onClose={() => setFilterShow(false)}
-                  frameworkFilter={frameworkFilter}
                   filterValues={localFilters}
                   onApply={handleApplyFilters}
                 />
@@ -339,15 +323,16 @@ export default function Content(props: Readonly<ContentProps>) {
           value={tabValue}
           onChange={handleTabChange}
           contentData={contentData}
-          _grid={propData?._grid || {}}
-          trackData={trackData || []}
-          type={localFilters?.type || ''}
+          _grid={propData?._grid ?? {}}
+          trackData={trackData ?? []}
+          type={localFilters?.type ?? ''}
           handleCardClick={handleCardClickLocal}
           hasMoreData={hasMoreData}
           handleLoadMore={handleLoadMore}
           isLoadingMoreData={isLoading}
           isPageLoading={isLoading && localFilters?.offset === 0}
           tabs={tabs}
+          isHideEmptyDataMessage={propData?.hasMoreData !== false}
         />
         {propData?.showHelpDesk && <HelpDesk />}
         {propData?.showBackToTop && showBackToTop && <BackToTop />}

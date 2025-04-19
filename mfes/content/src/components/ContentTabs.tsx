@@ -27,6 +27,7 @@ const RenderTabContent = memo(
     ariaLabel,
     isLoadingMoreData,
     isPageLoading,
+    isHideEmptyDataMessage,
   }: {
     contentData: ContentSearchResponse[];
     _grid: any;
@@ -41,6 +42,7 @@ const RenderTabContent = memo(
     ariaLabel?: string;
     isLoadingMoreData: boolean;
     isPageLoading: boolean;
+    isHideEmptyDataMessage?: boolean;
     _card?: any;
   }) => {
     return (
@@ -114,9 +116,11 @@ const RenderTabContent = memo(
                     )}
                   </Button>
                 ) : (
-                  <Typography variant="body1">
-                    No more data available
-                  </Typography>
+                  isHideEmptyDataMessage && (
+                    <Typography variant="body1">
+                      No more data available
+                    </Typography>
+                  )
                 )}
               </Box>
             </Box>

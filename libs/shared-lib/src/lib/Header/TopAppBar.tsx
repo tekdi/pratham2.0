@@ -148,7 +148,7 @@ const DesktopBar = ({
             <Button
               key={index}
               variant={
-                link.variant ||
+                link.variant ??
                 (link.isActive ? 'top-bar-link-button' : 'top-bar-link-text')
               }
               startIcon={link?.icon && link.icon}
