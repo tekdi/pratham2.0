@@ -8,7 +8,7 @@ import {
   AccordionDetails,
   Stack,
 } from '@mui/material';
-import { useRouter } from 'next/router'; // Use Next.js router for navigation
+import { useRouter } from 'next/navigation'; // Use Next.js router for navigation
 import PictureAsPdfOutlinedIcon from '@mui/icons-material/PictureAsPdfOutlined';
 import PlayCircleOutlineOutlinedIcon from '@mui/icons-material/PlayCircleOutlineOutlined';
 import TextSnippetOutlinedIcon from '@mui/icons-material/TextSnippetOutlined';

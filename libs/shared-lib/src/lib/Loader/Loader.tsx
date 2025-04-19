@@ -37,7 +37,9 @@ export const Loader: React.FC<LoaderProps> = memo(
             width: '100%',
             // overflowY: 'auto',
             display: isLoading ? 'none' : 'block',
-            maxHeight: `calc(100vh - ${layoutHeight}px)`,
+            ...(isLoading
+              ? { maxHeight: `calc(100vh - ${layoutHeight}px)` }
+              : {}),
           }}
         >
           {children}

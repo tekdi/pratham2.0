@@ -7,7 +7,24 @@ import { LanguageProvider } from '@shared-lib';
 
 const theme = createTheme({
   palette: {},
-  components: {},
+  components: {
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          backgroundColor: '#fff',
+          color: '#000',
+        },
+      },
+    },
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          margin: 0,
+          padding: 0,
+        },
+      },
+    },
+  },
 });
 
 export default function MuiThemeProvider({

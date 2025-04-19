@@ -2,15 +2,17 @@
 'use client';
 
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { red } from '@mui/material/colors';
+import { CssBaseline } from '@mui/material';
 import React from 'react';
 import { LanguageProvider } from '@shared-lib';
 
 const theme = createTheme({
+  typography: {
+    fontFamily: 'Poppins, sans-serif',
+  },
   palette: {
     primary: {
-      main: red[500],
-      contrastText: '#fff',
+      main: '#FDBE16',
     },
     secondary: {
       main: '#f50057',
@@ -18,21 +20,59 @@ const theme = createTheme({
     },
   },
   components: {
-    MuiOutlinedInput: {
+    MuiAppBar: {
       styleOverrides: {
         root: {
-          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-            borderColor: red[500],
-          },
+          backgroundColor: '#fff',
+          paddingTop: '18px',
+          paddingBottom: '18px',
         },
       },
     },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {},
+      },
+    },
+
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: '50px', // Makes the primary button rounded
+          borderRadius: '50px',
+          color: '#1E1B16',
         },
       },
+      variants: [
+        {
+          props: { variant: 'top-bar-link-text' },
+          style: {
+            color: '#1F1B13',
+            padding: 14,
+            borderRadius: 8,
+            '& .MuiButton-startIcon': {
+              color: '#635E57',
+            },
+          },
+        },
+        {
+          props: { variant: 'top-bar-link-button' },
+          style: {
+            fontWeight: 600,
+            padding: 14,
+            gap: 8,
+            borderRadius: 8,
+            borderBottomWidth: 3,
+            color: '#987100',
+            backgroundColor: '#F7ECDF',
+            '&:hover': {
+              backgroundColor: '#fbf7f1',
+            },
+            '& .MuiButton-startIcon': {
+              marginRight: 0,
+            },
+          },
+        },
+      ],
     },
   },
 });
@@ -44,6 +84,7 @@ export default function ThemeRegistry({
 }) {
   return (
     <ThemeProvider theme={theme}>
+      <CssBaseline />
       <LanguageProvider>{children}</LanguageProvider>
     </ThemeProvider>
   );

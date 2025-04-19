@@ -1,6 +1,7 @@
 // app/layout.tsx
 import './global.css';
 import MuiThemeProvider from './app/theme/MuiThemeProvider';
+import Head from 'next/head';
 
 export const metadata = {
   title: 'Welcome to learner-web-app',
@@ -14,6 +15,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <Head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap"
+          rel="stylesheet"
+        />
+      </Head>
       <body>
         <MuiThemeProvider>{children}</MuiThemeProvider>
       </body>

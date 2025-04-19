@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { useParams, useRouter } from 'next/navigation';
 import { Box, Typography, Grid } from '@mui/material';
 import { getLeafNodes, Layout } from '@shared-lib';
 import CommonCollapse from '../../components/CommonCollapse'; // Adjust the import based on your folder structure
 import { hierarchyAPI } from '../../services/Hierarchy';
 import { trackingData } from '../../services/TrackingService';
+import LayoutPage from '../../components/LayoutPage';
 
 interface DetailsProps {
-  details: any;
+  isShowLayout?: any;
 }
 
-export default function Details({ details }: DetailsProps) {
+export default function Details(props: DetailsProps) {
   const router = useRouter();
-  const { identifier } = router.query; // Fetch the 'id' from the URL
+  const params = useParams();
+  const identifier = params?.identifier; // string | string[] | undefined
   const [trackData, setTrackData] = useState([]);
   const [selectedContent, setSelectedContent] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -58,30 +60,25 @@ export default function Details({ details }: DetailsProps) {
     router.back();
   };
   return (
-    <Layout
+    <LayoutPage
+      isShow={props?.isShowLayout}
       isLoadingChildren={loading}
-      showTopAppBar={{
+      _topAppBar={{
         title: 'Shiksha: Course Details',
         actionButtonLabel: 'Action',
       }}
-      isFooter={false}
-      showLogo={true}
-      showBack={true}
-      backTitle="Course Details "
+      backTitle="Course Details"
       backIconClick={onBackClick}
-      sx={{ height: '0vh' }}
+      onlyHideElements={['footer']}
     >
       <Box sx={{ p: '8px' }}>
         <Grid container spacing={2}>
-          <Grid size={{ xs: 12 }}>
-            <Typography
-              variant="h6"
-              sx={{ marginTop: '60px', fontWeight: 'bold' }}
-            >
+          <Grid item xs={12}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
               {selectedContent?.name}
             </Typography>
           </Grid>
-          <Grid size={{ xs: 12 }}>
+          <Grid item xs={12}>
             {selectedContent?.children?.length > 0 && (
               <RenderNestedChildren
                 data={selectedContent.children}
@@ -91,7 +88,7 @@ export default function Details({ details }: DetailsProps) {
           </Grid>
         </Grid>
       </Box>
-    </Layout>
+    </LayoutPage>
   );
 }
 

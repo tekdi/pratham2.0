@@ -1,13 +1,12 @@
-import { useRouter } from 'next/router';
+import { useParams } from 'next/navigation';
 import React from 'react';
 import { SunbirdPlayer } from '@shared-lib';
 interface PlayerPageProps {
-  id: string; // Define the type for the 'id' prop
+  id?: string; // Define the type for the 'id' prop
 }
 const PlayerPage: React.FC<PlayerPageProps> = ({ id }) => {
-  const router = useRouter();
-  const { identifier } = router.query; // Access the identifier from the URL
-  console.log('id', identifier);
+  const params = useParams();
+  const identifier = params?.identifier; // string | string[] | undefined
   if (!identifier) {
     return <div>Loading...</div>;
   }

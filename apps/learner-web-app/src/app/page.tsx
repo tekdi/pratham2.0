@@ -1,4 +1,7 @@
+'use client';
 import styles from './page.module.css';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function Index() {
   /*
@@ -6,6 +9,13 @@ export default function Index() {
    *
    * Note: The corresponding styles are in the ./index.css file.
    */
+
+  const router = useRouter();
+
+  useEffect(() => {
+    router.push('/content');
+  }, [router]);
+
   return (
     <div className={styles.page}>
       <div className="wrapper">

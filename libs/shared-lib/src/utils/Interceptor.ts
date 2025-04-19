@@ -57,13 +57,13 @@ instance.interceptors.response.use(
       !originalRequest._retry
     ) {
       if (error?.response?.request?.responseURL.includes('/auth/refresh')) {
-        window.location.href = '/logout';
+        // window.location.href = '/logout';
       } else {
         originalRequest._retry = true;
         try {
           const accessToken = await refreshToken();
           if (!accessToken) {
-            window.location.href = '/logout';
+            // window.location.href = '/logout';
           } else {
             originalRequest.headers.Authorization = `Bearer ${accessToken}`;
             return instance(originalRequest);
