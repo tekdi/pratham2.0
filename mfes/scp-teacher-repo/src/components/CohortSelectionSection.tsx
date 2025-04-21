@@ -842,11 +842,11 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                                 variant="outlined"
                                 sx={{
                                   '& .MuiInputLabel-root': {
-                                    color: theme.palette.primary.light, // Label color
+                                    color: theme.palette.primary.light,
                                   },
                                 }}
                               >
-                                <InputLabel id="chip-label">center</InputLabel>
+                                <InputLabel sx={{textAlign:"left"}} id="chip-label">center</InputLabel>
                                 <Select
                                   labelId="chip-label"
                                   value={
@@ -856,6 +856,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                                           filteredCohortData[0]?.name
                                         )
                                   }
+                                  sx={{ height: '53px' }}
                                   label="Chip"
                                 >
                                   <MenuItem value="">
@@ -871,7 +872,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                                         filteredCohortData[0]?.name
                                       )}
                                     >
-                                      <Typography>
+                                      <Typography sx={{textAlign:"left"}}>
                                         {toPascalCase(
                                           filteredCohortData[0]?.name
                                         )}
@@ -1025,6 +1026,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                                           : toPascalCase(filteredBatchData[0]?.name)
                                       }
                                       label="Batch"
+                                      sx={{height:"53px"}}  
                                     >
                                       <MenuItem value="">
                                         <Typography color={theme.palette.warning["300"]}>
@@ -1033,7 +1035,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                                       </MenuItem>
                                       {filteredBatchData?.length > 0 && (
                                         <MenuItem value={toPascalCase(filteredBatchData[0]?.name)}>
-                                          <Typography>
+                                          <Typography sx={{textAlign:"left"}}>
                                             {toPascalCase(filteredBatchData[0]?.name)}
                                           </Typography>
                                         </MenuItem>
