@@ -282,7 +282,7 @@ const AccordionWrapper = ({
     >
       <AccordionSummary
         sx={{
-          backgroundColor: theme.palette.custom?.secondaryBackground,
+          backgroundColor: theme.palette.secondary.main,
         }}
         expandIcon={
           expandedItems.has(item?.identifier) ? (

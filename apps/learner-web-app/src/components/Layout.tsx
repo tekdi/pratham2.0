@@ -54,7 +54,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         isActive: currentPage === '/content',
       },
     ]);
-  }, [t, router.pathname]);
+  }, [t, router]);
   const onLanguageChange = (val: string) => {
     setLanguage(val);
   };
