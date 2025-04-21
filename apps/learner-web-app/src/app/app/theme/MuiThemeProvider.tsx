@@ -1,11 +1,15 @@
 // app/theme/ThemeRegistry.tsx or MuiThemeProvider.tsx
 'use client';
 
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
 import React from 'react';
+import { LanguageProvider } from '@shared-lib';
 // import { LanguageProvider } from '@shared-lib';
 
 const theme = createTheme({
+  typography: {
+    fontFamily: 'Poppins, sans-serif',
+  },
   palette: {
     primary: {
       main: '#FDBE16',
@@ -20,21 +24,62 @@ const theme = createTheme({
     },
   },
   components: {
-    MuiOutlinedInput: {
+    MuiAppBar: {
       styleOverrides: {
         root: {
+          backgroundColor: '#fff',
+          paddingTop: '18px',
+          paddingBottom: '18px',
           '&.Mui-focused .MuiOutlinedInput-notchedOutline': {},
           // background: '#BA1A1A'
         },
       },
     },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {},
+      },
+    },
+
     MuiButton: {
       styleOverrides: {
         root: {
           borderRadius: '50px',
+          color: '#1E1B16',
           textTransform: 'none',
         },
       },
+      variants: [
+        {
+          props: { variant: 'top-bar-link-text' },
+          style: {
+            color: '#1F1B13',
+            padding: 14,
+            borderRadius: 8,
+            '& .MuiButton-startIcon': {
+              color: '#635E57',
+            },
+          },
+        },
+        {
+          props: { variant: 'top-bar-link-button' },
+          style: {
+            fontWeight: 600,
+            padding: 14,
+            gap: 8,
+            borderRadius: 8,
+            borderBottomWidth: 3,
+            color: '#987100',
+            backgroundColor: '#F7ECDF',
+            '&:hover': {
+              backgroundColor: '#fbf7f1',
+            },
+            '& .MuiButton-startIcon': {
+              marginRight: 0,
+            },
+          },
+        },
+      ],
     },
   },
 });
@@ -46,8 +91,8 @@ export default function MuiThemeProvider({
 }) {
   return (
     <ThemeProvider theme={theme}>
-      {/* <LanguageProvider>{children}</LanguageProvider> */}
-      <>{children}</>
+      <CssBaseline />
+      <LanguageProvider>{children}</LanguageProvider>
     </ThemeProvider>
   );
 }

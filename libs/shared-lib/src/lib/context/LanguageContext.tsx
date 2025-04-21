@@ -63,19 +63,27 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
   }, []);
 
   // Translate function
-  const t = useMemo(
-    () =>
-      (key: string): string =>
-        translations[language]?.[key] || key,
-    [language]
-  );
+  const t = useMemo(() => {
+    return (key: string): string => {
+      const keys = key.split('.');
+      let result: any = translations[language];
+
+      for (const k of keys) {
+        if (result?.[k] === undefined) {
+          return key; // fallback if any level is missing
+        }
+        result = result[k];
+      }
+
+      return typeof result === 'string' ? result : key;
+    };
+  }, [language]);
 
   // Handle language switch (simple version — no confirmation)
   const handleLanguageChange = useCallback((newLanguage: string) => {
     if (!translations[newLanguage]) return;
-    localStorage.setItem('appLanguage', newLanguage);
+    localStorage.setItem('lang', newLanguage);
     setLanguageState(newLanguage);
-    window?.location?.reload();
   }, []);
 
   // Memoized context value
