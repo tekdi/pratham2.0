@@ -41,11 +41,7 @@ export const CommonDrawer: React.FC<CommonDrawerProps> = ({
             key={item.title + index}
             onClick={() => onItemClick(item.to)}
           >
-            {item.icon && (
-              <ListItemIcon>
-                <item.icon />
-              </ListItemIcon>
-            )}
+            {item.icon && <ListItemIcon>{item.icon}</ListItemIcon>}
             <ListItemText primary={item.title} />
           </ListItemButton>
         ))}
