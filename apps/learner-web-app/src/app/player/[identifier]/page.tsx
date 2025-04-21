@@ -22,7 +22,9 @@ const App = () => {
       <Grid container spacing={4} sx={{ p: { xs: 1, md: 4 } }}>
         <Grid item xs={12} md={8}>
           <iframe
-            src={`/sbplayer?identifier=${identifier as string}`}
+            src={`${process.env.NEXT_PUBLIC_LEARNER_SBPLAYER}?identifier=${
+              identifier as string
+            }`}
             style={{
               // display: 'block',
               // padding: 0,

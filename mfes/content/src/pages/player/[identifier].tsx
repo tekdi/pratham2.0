@@ -12,7 +12,9 @@ const PlayerPage: React.FC<PlayerPageProps> = ({ id }) => {
 
   return (
     <iframe
-      src={`/sbplayer?identifier=${id ? id : (identifier as string)}`}
+      src={`${process.env.NEXT_PUBLIC_LEARNER_SBPLAYER}?identifier=${
+        identifier as string
+      }`}
       style={{
         // display: 'block',
         // padding: 0,
