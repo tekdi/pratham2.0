@@ -1,5 +1,7 @@
 // app/layout.tsx
 import './global.css';
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 import MuiThemeProvider from './app/theme/MuiThemeProvider';
 import Head from 'next/head';
 
@@ -23,6 +25,7 @@ export default function RootLayout({
       </Head>
       <body>
         <MuiThemeProvider>{children}</MuiThemeProvider>
+        <ToastContainer />
       </body>
     </html>
   );

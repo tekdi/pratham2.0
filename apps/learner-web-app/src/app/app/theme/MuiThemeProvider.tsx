@@ -1,10 +1,10 @@
 // app/theme/ThemeRegistry.tsx or MuiThemeProvider.tsx
 'use client';
 
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { CssBaseline } from '@mui/material';
+import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
 import React from 'react';
 import { LanguageProvider } from '@shared-lib';
+// import { LanguageProvider } from '@shared-lib';
 
 const theme = createTheme({
   typography: {
@@ -13,10 +13,14 @@ const theme = createTheme({
   palette: {
     primary: {
       main: '#FDBE16',
+      // contrastText: '#fff',
+      light: '#FFDEA1',
     },
+
     secondary: {
-      main: '#f50057',
-      contrastText: '#fff',
+      main: '#0D599E',
+      light: '#E7F3F8',
+      // contrastText: '#fff',
     },
   },
   components: {
@@ -26,6 +30,8 @@ const theme = createTheme({
           backgroundColor: '#fff',
           paddingTop: '18px',
           paddingBottom: '18px',
+          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {},
+          // background: '#BA1A1A'
         },
       },
     },
@@ -40,6 +46,7 @@ const theme = createTheme({
         root: {
           borderRadius: '50px',
           color: '#1E1B16',
+          textTransform: 'none',
         },
       },
       variants: [
@@ -77,7 +84,7 @@ const theme = createTheme({
   },
 });
 
-export default function ThemeRegistry({
+export default function MuiThemeProvider({
   children,
 }: {
   children: React.ReactNode;
