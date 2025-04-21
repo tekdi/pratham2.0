@@ -21,7 +21,7 @@ jobs:
       # Step 4: Build and tag the Docker image
       - name: Build Docker image
         run: |
-          docker build -f Dockerfile.teachers -t ${{ secrets.ECR_REPO_NAME_PLP_DEV }}:${{ secrets.IMAGE_TAG_PLP_DEV }} .
+          docker build -f Dockerfile.learner -t ${{ secrets.ECR_REPO_NAME_PLP_DEV }}:${{ secrets.IMAGE_TAG_PLP_DEV }} .
 
       # Step 5: Push the Docker image to Amazon ECR
       - name: Push Docker image to ECR
