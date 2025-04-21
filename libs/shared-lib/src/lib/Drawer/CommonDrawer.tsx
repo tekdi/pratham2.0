@@ -7,10 +7,9 @@ import {
   ListItemIcon,
   ListItemText,
 } from '@mui/material';
-import { useTranslation } from '../../../../shared-lib-v2/src/lib/context/LanguageContext';
 
 export interface DrawerItemProp {
-  title: string | JSX.Element | ReturnType<typeof useTranslation>['t'];
+  title: string | JSX.Element;
   icon?: JSX.Element | React.ReactNode;
   to: string | ((event: React.MouseEvent<HTMLAnchorElement>) => void);
 }
@@ -38,14 +37,16 @@ export const CommonDrawer: React.FC<CommonDrawerProps> = ({
       <List>
         {items.map((item, index) => (
           <ListItemButton
-            key={item.title + index}
-            onClick={() => onItemClick(item.to)}
+            key={`${item.title}${index}`}
+            onClick={
+              typeof item.to === 'string'
+                ? undefined
+                : (item.to as (
+                    event: React.MouseEvent<HTMLAnchorElement>
+                  ) => void)
+            }
           >
-            {item.icon && (
-              <ListItemIcon>
-                <item.icon />
-              </ListItemIcon>
-            )}
+            {item.icon && <ListItemIcon>{item.icon}</ListItemIcon>}
             <ListItemText primary={item.title} />
           </ListItemButton>
         ))}

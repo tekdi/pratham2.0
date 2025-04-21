@@ -39,7 +39,13 @@ export const CommonDrawer: React.FC<CommonDrawerProps> = ({
         {items.map((item, index) => (
           <ListItemButton
             key={item.title + index}
-            onClick={() => onItemClick(item.to)}
+            onClick={
+              typeof item.to === 'string'
+                ? undefined
+                : (item.to as (
+                    event: React.MouseEvent<HTMLAnchorElement>
+                  ) => void)
+            }
           >
             {item.icon && <ListItemIcon>{item.icon}</ListItemIcon>}
             <ListItemText primary={item.title} />
