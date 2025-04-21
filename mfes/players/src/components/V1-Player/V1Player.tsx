@@ -5,7 +5,7 @@ interface PlayerProps {
   playerConfig: any;
 }
 
-const basePath = process.env.NEXT_PUBLIC_ASSETS_CONTENT || '/mfe_content';
+const basePath = process.env.NEXT_PUBLIC_ASSETS_CONTENT || '/sbplayer';
 
 const V1Player = ({ playerConfig }: PlayerProps) => {
   const previewRef = useRef<HTMLIFrameElement | null>(null);
