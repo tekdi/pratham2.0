@@ -85,7 +85,7 @@ export default function Content(props: Readonly<ContentProps>) {
       const userId =
         localStorage.getItem('subId') ?? localStorage.getItem('userId');
       const userIdArray = userId?.split(',');
-      if (!userId ?? !courseList.length) return; // Ensure required values exist
+      if (!userId || !courseList.length) return; // Ensure required values exist
       //@ts-ignore
       const course_track_data = await trackingData(userIdArray, courseList);
       if (course_track_data?.data) {

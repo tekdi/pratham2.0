@@ -147,17 +147,23 @@ const DesktopBar = ({
           return (
             <Button
               key={index}
+              component={typeof link.to === 'string' ? 'a' : 'button'}
+              href={typeof link.to === 'string' ? link.to : undefined}
+              // @ts-ignore
               variant={
-                link.variant ??
-                (link.isActive ? 'top-bar-link-button' : 'top-bar-link-text')
+                link.isActive
+                  ? 'top-bar-link-button'
+                  : link.variant ?? 'top-bar-link-text'
               }
               startIcon={link?.icon && link.icon}
               onClick={
-                typeof link.to === 'string'
-                  ? undefined
-                  : (link.to as (
-                      event: React.MouseEvent<HTMLAnchorElement>
+                typeof link.to !== 'string'
+                  ? (link.to as (
+                      event: React.MouseEvent<
+                        HTMLButtonElement | HTMLAnchorElement
+                      >
                     ) => void)
+                  : undefined
               }
             >
               {link.title}

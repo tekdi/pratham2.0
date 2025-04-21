@@ -1,9 +1,9 @@
 {
-  "LANGUAGE": "Language hi",
-  "ENGLISH": "English",
-  "HINDI": "Hindi",
-  "MARATHI": "Marathi",
-  "URDU": "Urdu",
+  "LANGUAGE": "भाषा",
+  "ENGLISH": "अंग्रेज़ी",
+  "HINDI": "हिंदी",
+  "MARATHI": "मराठी",
+  "URDU": "उर्दू",
   "LEARNER_APP": {
     "COMMON": {
       "L1_COURSES": "एल1 पाठ्यक्रम",
@@ -12,6 +12,10 @@
       "PROFILE": "प्रोफाइल"
     },
     "COURSE": {
+      "GET_STARTED": "एल1 पाठ्यक्रम के साथ आरंभ करें",
+      "FILTER_BY": "इसके द्वारा फ़िल्टर करें"
+    },
+    "EXPLORE": {
       "EXPLORE_ADDITIONAL_COURSES": "अतिरिक्त पाठ्यक्रमों का अन्वेषण करें"
     }
   }

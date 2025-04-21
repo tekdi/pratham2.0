@@ -1,3 +1,4 @@
+import { ContentCreate } from '../utils/Interface';
 import { URL_CONFIG } from '../utils/url.config';
 import axios from 'axios';
 
