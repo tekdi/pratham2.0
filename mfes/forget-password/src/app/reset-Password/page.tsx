@@ -26,16 +26,24 @@ const ResetPasswordPage = ({}) => {
   };
 
   const onCloseSuccessModal = () => {
-    const route = localStorage.getItem('loginRoute');
+    const route = localStorage.getItem('redirectionRoute');
     if (route) router.push(route);
 
     setResetPasswordSuccessModal(false);
   };
 
   return (
-    <>
+    <Box
+      sx={{
+        background: 'linear-gradient(to bottom, #fff7e6, #fef9ef)',
+      }}
+    >
       <Box
-        sx={{ p: 2, cursor: 'pointer', width: 'fit-content' }}
+        sx={{
+          p: 2,
+          cursor: 'pointer',
+          width: 'fit-content',
+        }}
         onClick={() => router.back()}
       >
         <ArrowBackIcon
@@ -53,7 +61,7 @@ const ResetPasswordPage = ({}) => {
       >
         <PasswordResetSuccess />
       </SimpleModal>
-    </>
+    </Box>
   );
 };
 
