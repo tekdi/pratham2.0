@@ -31,7 +31,7 @@ const ResponseRecorded: React.FC<ResponseRecordedProps> = () => {
 
       <Typography
         variant="body1"
-        mb={1}
+        mb={2}
         sx={{
           color: '#1F1B13',
           textAlign: 'center',
