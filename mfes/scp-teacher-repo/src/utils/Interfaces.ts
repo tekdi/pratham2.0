@@ -91,6 +91,7 @@ export interface CohortListParam {
 export interface CohortMemberList {
   limit?: number;
   page?: number;
+  offset?: number;
   filters: {
     cohortId: string;
     role?: string;
@@ -329,7 +330,7 @@ export interface CustomField {
   order: number;
   type: any;
   value: string;
-  selectedValues: Array<{id: string, value: string}>;
+  selectedValues: Array<{ id: string; value: string }>;
 }
 export interface CohortAttendanceListViewProps {
   cohortName: string;
