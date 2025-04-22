@@ -95,6 +95,7 @@ export const Layout: React.FC<LayoutProps> = ({
         }}
         sx={{
           zIndex: 1,
+          bgcolor: 'transparent',
         }}
       >
         {showElements?.includes('topBar') && (
