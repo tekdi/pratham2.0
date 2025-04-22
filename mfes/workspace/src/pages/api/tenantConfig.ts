@@ -13,7 +13,7 @@ export const mockData: Record<string, any> = {
     COLLECTION_FRAMEWORK: "pos-framework",
   },
   "6c8b810a-66c2-4f0d-8c0c-c025415a4414": {
-    CHANNEL_ID: "pos-channel",
+    CHANNEL_ID: "youthnet-channel",
     CONTENT_FRAMEWORK: "level1-framework",
     COLLECTION_FRAMEWORK: "pos-framework",
   },
