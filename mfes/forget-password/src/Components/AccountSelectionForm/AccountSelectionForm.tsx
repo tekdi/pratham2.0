@@ -61,49 +61,50 @@ const AccountSelectionForm: React.FC<AccountSelectionFormProps> = ({
         }}
       >
         <RadioGroup value={selectedUsername} onChange={handleChange}>
-          {userAccounts.map((account) => (
-            <Box
-              key={account.username}
-              sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                border: '1px solid #ccc',
-                borderRadius: 2,
-                px: 2,
-                py: 1,
-                mb: 1,
-                backgroundColor:
-                  selectedUsername === account.username ? '#f3f3f3' : '#fff',
-                cursor: 'pointer',
-              }}
-              onClick={() => setSelectedUsername(account.username)} // make entire box clickable
-            >
-              <Box>
-                <Typography fontWeight="bold" noWrap>
-                  {account.name}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  color="textSecondary"
-                  sx={{
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    display: 'block',
-                  }}
-                >
-                  {account.username}
-                </Typography>
-              </Box>
+          {userAccounts &&
+            userAccounts?.map((account) => (
+              <Box
+                key={account.username}
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  border: '1px solid #ccc',
+                  borderRadius: 2,
+                  px: 2,
+                  py: 1,
+                  mb: 1,
+                  backgroundColor:
+                    selectedUsername === account.username ? '#f3f3f3' : '#fff',
+                  cursor: 'pointer',
+                }}
+                onClick={() => setSelectedUsername(account.username)} // make entire box clickable
+              >
+                <Box>
+                  <Typography fontWeight="bold" noWrap>
+                    {account.name}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color="textSecondary"
+                    sx={{
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      display: 'block',
+                    }}
+                  >
+                    {account.username}
+                  </Typography>
+                </Box>
 
-              <Radio
-                checked={selectedUsername === account.username}
-                value={account.username}
-                onChange={handleChange}
-              />
-            </Box>
-          ))}
+                <Radio
+                  checked={selectedUsername === account.username}
+                  value={account.username}
+                  onChange={handleChange}
+                />
+              </Box>
+            ))}
         </RadioGroup>
 
         <Button

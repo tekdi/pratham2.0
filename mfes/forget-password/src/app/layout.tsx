@@ -6,7 +6,7 @@ import customTheme from '../styles/customTheme';
 
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
-import MuiThemeProvider from './theme/MuiThemeProvider';
+import MuiThemeProvider from '../theme/MuiThemeProvider';
 
 export const metadata: Metadata = {
   title: 'Welcome to forget password',
