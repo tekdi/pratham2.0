@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { getTelemetryEvents, handleExitEvent } from '../utils/Helper';
 import React, { useEffect, useRef } from 'react';
 
@@ -39,7 +39,7 @@ const SunbirdVideoPlayer = ({ playerConfig }: PlayerConfigProps) => {
       if (event?.detail?.type === 'EXIT') {
         // handleExitEvent();
         event.preventDefault();
-        router.back()
+        router.back();
       }
     };
 

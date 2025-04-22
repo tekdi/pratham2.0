@@ -1,5 +1,3 @@
-// import { ThemeProvider, CssBaseline } from '@mui/material';
-// import customTheme from '../theme/theme';
 import type { AppProps } from 'next/app';
 import { useEffect } from 'react';
 import MuiThemeProvider from '../app/theme/MuiThemeProvider';
