@@ -7,9 +7,7 @@ import CardActions from '@mui/material/CardActions';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import { red } from '@mui/material/colors';
-import { Box, Button } from '@mui/material';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import ErrorIcon from '@mui/icons-material/Error';
+import { Box, Button, useTheme } from '@mui/material';
 import { CircularProgressWithLabel } from '../Progress/CircularProgressWithLabel';
 export interface ContentItem {
   name: string;
@@ -41,6 +39,12 @@ interface CommonCardProps {
   item: ContentItem;
   type: string;
   onClick?: () => void;
+  _card?: any;
+}
+
+interface StatuPorps {
+  trackProgress?: number;
+  status?: string;
 }
 export const getLeafNodes = (node: any) => {
   const result = [];
@@ -76,9 +80,9 @@ export const CommonCard: React.FC<CommonCardProps> = ({
   item,
   type,
   onClick,
+  _card,
 }) => {
-  const [trackCompleted, setTrackCompleted] = React.useState(0);
-  const [trackProgress, setTrackProgress] = React.useState(100);
+  const [statusBar, setStatusBar] = React.useState<StatuPorps>();
 
   React.useEffect(() => {
     const init = () => {
@@ -86,17 +90,30 @@ export const CommonCard: React.FC<CommonCardProps> = ({
         //@ts-ignore
         if (TrackData) {
           const result = TrackData?.find((e) => e.courseId === item.identifier);
+          const newObj = {
+            status:
+              result?.completed === 1
+                ? 'Completed'
+                : result?.started_on === null
+                ? 'Not Started'
+                : result?.in_progress === 1
+                ? 'In Progress'
+                : 'Enrolled',
+          };
           if (type === 'Course') {
-            const leafNodes = getLeafNodes(item ?? []);
-            const completedCount = result?.completed_list?.length || 0;
-            const percentage =
-              leafNodes.length > 0
-                ? Math.round((completedCount / leafNodes.length) * 100)
-                : 0;
-            setTrackProgress(percentage);
-            setTrackCompleted(percentage);
+            if (!_card?.isHideProgress) {
+              const leafNodes = getLeafNodes(item ?? []);
+              const completedCount = result?.completed_list?.length || 0;
+              const percentage =
+                leafNodes.length > 0
+                  ? Math.round((completedCount / leafNodes.length) * 100)
+                  : 0;
+              setStatusBar({ ...newObj, trackProgress: percentage });
+            } else {
+              setStatusBar(newObj);
+            }
           } else {
-            setTrackCompleted(result?.completed ? 100 : 0);
+            setStatusBar(newObj);
           }
         }
       } catch (e) {
@@ -104,7 +121,7 @@ export const CommonCard: React.FC<CommonCardProps> = ({
       }
     };
     init();
-  }, [TrackData, item, type]);
+  }, [TrackData, item, type, _card?.isHideProgress]);
 
   return (
     <Card
@@ -135,7 +152,7 @@ export const CommonCard: React.FC<CommonCardProps> = ({
             alt={imageAlt || 'Image'}
             sx={{
               width: '100%',
-              height: orientation === 'horizontal' ? '297px' : 'auto',
+              height: orientation === 'horizontal' ? '158px' : 'auto',
               objectFit: 'cover', //set contain
               '@media (max-width: 600px)': {
                 height: '200px',
@@ -145,70 +162,7 @@ export const CommonCard: React.FC<CommonCardProps> = ({
         )}
 
         {/* Progress Bar Overlay */}
-        {trackProgress >= 0 && (
-          <Box
-            sx={{
-              position: 'absolute',
-              height: '40px',
-              top: 0,
-              width: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              background: 'rgba(0, 0, 0, 0.5)',
-            }}
-          >
-            <Box
-              sx={{
-                p: '0px 5px',
-                fontSize: '12px',
-                fontWeight: 'bold',
-                color: trackCompleted === 100 ? '#21A400' : '#FFB74D',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-              }}
-            >
-              {type === 'Course' ? (
-                <>
-                  <CircularProgressWithLabel
-                    value={trackProgress ?? 0}
-                    _text={{
-                      sx: {
-                        color: trackCompleted === 100 ? '#21A400' : '#FFB74D',
-                        fontSize: '10px',
-                      },
-                    }}
-                    sx={{
-                      color: trackCompleted === 100 ? '#21A400' : '#FFB74D',
-                    }}
-                    size={35}
-                    thickness={2}
-                  />
-                  {trackCompleted >= 100 ? (
-                    <>
-                      <CheckCircleIcon sx={{ color: '#21A400' }} />
-                      {`Completed`}
-                    </>
-                  ) : trackProgress > 0 && trackProgress < 100 ? (
-                    `In progress`
-                  ) : (
-                    `Enrolled`
-                  )}
-                </>
-              ) : trackCompleted >= 100 ? (
-                <>
-                  <CheckCircleIcon sx={{ color: '#21A400' }} />
-                  {`Completed`}
-                </>
-              ) : (
-                <>
-                  <ErrorIcon sx={{ color: '#FFB74D' }} />
-                  {`Enrolled`}
-                </>
-              )}
-            </Box>
-          </Box>
-        )}
+        <StatusBar {...statusBar} />
       </Box>
 
       <CardHeader
@@ -222,6 +176,7 @@ export const CommonCard: React.FC<CommonCardProps> = ({
         title={
           <Typography
             sx={{
+              fontWeight: 500,
               fontSize: '16px',
               whiteSpace: 'wrap',
               overflow: 'hidden',
@@ -229,7 +184,6 @@ export const CommonCard: React.FC<CommonCardProps> = ({
               display: '-webkit-box',
               WebkitBoxOrient: 'vertical',
               WebkitLineClamp: 1,
-              paddingLeft: '5px',
             }}
           >
             {title}
@@ -244,37 +198,77 @@ export const CommonCard: React.FC<CommonCardProps> = ({
       {content && (
         <CardContent
           sx={{
-            display: 'flex',
-            paddingBottom: 0,
-            overflow: 'hidden',
-            maxWidth: '100%',
-            // height: '50px',
+            pt: 0,
           }}
         >
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <Typography
-              sx={{
-                display: '-webkit-box',
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-            >
-              <span style={{ fontSize: '14px', fontWeight: 700 }}>
-                Description:
-              </span>{' '}
-              {content}
-            </Typography>
-          </Box>
+          <Typography
+            sx={{
+              fontWeight: 400,
+              display: '-webkit-box',
+              WebkitLineClamp: 4,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {content}
+          </Typography>
         </CardContent>
       )}
       {children && <CardContent>{children}</CardContent>}
-      {actions && (
-        <CardActions>
-          <Button variant="contained">{actions}</Button>
-        </CardActions>
-      )}
+      {actions && <CardActions>{actions}</CardActions>}
     </Card>
+  );
+};
+
+export const StatusBar: React.FC<StatuPorps> = ({ trackProgress, status }) => {
+  const theme = useTheme();
+  return (
+    <Box
+      sx={{
+        position: 'absolute',
+        top: 0,
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        background: 'rgba(0, 0, 0, 0.5)',
+      }}
+    >
+      <Box
+        sx={{
+          p: '6px 6px',
+          fontSize: '14px',
+          lineHeight: '20px',
+          fontWeight: '500',
+          color: ['completed', 'In Progress'].includes(status ?? '')
+            ? '#50EE42'
+            : 'white',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+        }}
+      >
+        <CircularProgressWithLabel
+          value={trackProgress !== undefined ? trackProgress : 100}
+          _text={{
+            sx: {
+              color: ['completed', 'In Progress'].includes(status ?? '')
+                ? theme.palette.success.main
+                : 'white',
+              fontSize: '10px',
+              ...(trackProgress === undefined ? { display: 'none' } : {}),
+            },
+          }}
+          color={
+            ['completed', 'In Progress'].includes(status ?? '')
+              ? theme.palette.success.main
+              : 'white'
+          }
+          size={trackProgress !== undefined ? 35 : 16}
+          thickness={trackProgress !== undefined ? 2 : 4}
+        />
+        {status}
+      </Box>
+    </Box>
   );
 };

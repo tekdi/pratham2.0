@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Box, Typography, Grid } from '@mui/material';
-import { getLeafNodes, Layout } from '@shared-lib';
+import { getLeafNodes } from '@shared-lib';
 import CommonCollapse from '../../components/CommonCollapse'; // Adjust the import based on your folder structure
 import { hierarchyAPI } from '../../services/Hierarchy';
 import { trackingData } from '../../services/TrackingService';
@@ -31,7 +31,7 @@ export default function Details(props: DetailsProps) {
             courseList = getLeafNodes(result);
           }
 
-          const userId = localStorage.getItem('subId');
+          const userId = localStorage.getItem('userId');
           const userIdArray = userId?.split(',');
           if (!userId) return; // Ensure required values exist
           //@ts-ignore

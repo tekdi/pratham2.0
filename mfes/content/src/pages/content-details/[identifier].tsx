@@ -2,18 +2,16 @@
 
 'use client';
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Divider, Typography, Grid } from '@mui/material';
+import { Box, Button, Divider, Typography, Grid, Avatar } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useRouter, useParams } from 'next/navigation';
 import { fetchContent } from '../../services/Read';
 import AppConst from '../../utils/AppConst/AppConst';
-import Image from 'next/image';
+import LayoutPage from '../../components/LayoutPage';
 import {
   createUserCertificateStatus,
   getUserCertificateStatus,
 } from '../../services/Certificate';
-import LayoutPage from '../../components/LayoutPage';
-
 interface ContentDetailsObject {
   name: string;
   [key: string]: any;
@@ -89,7 +87,7 @@ const ContentDetails = (props: isShowLayout) => {
                 // height: { xs: 'auto', md: 'auto', lg: '100vh' },
               }}
             >
-              <Image
+              <Avatar
                 src={
                   contentDetails?.posterImage &&
                   contentDetails?.posterImage !== 'undefined'
@@ -97,15 +95,12 @@ const ContentDetails = (props: isShowLayout) => {
                     : `${AppConst.BASEPATH}/assests/images/default_hori.png`
                 }
                 alt="Course Thumbnail"
-                style={{
-                  width: '80%',
+                sx={{
+                  width: '100%',
+                  height: '100%',
                   borderRadius: '8px',
                   marginBottom: '16px',
                 }}
-                width={'100'}
-                height={'100'}
-                layout="responsive"
-                objectFit="contain"
               />
             </Box>
           </Grid>

@@ -59,6 +59,10 @@ const MyComponent: React.FC = () => {
             showHelpDesk={false}
             filters={{ limit: 4 }}
             hasMoreData={false}
+            _config={{
+              default_img: '/images/image_ver.png',
+              _card: { isHideProgress: true },
+            }}
           />
         </Grid>
       </Grid>

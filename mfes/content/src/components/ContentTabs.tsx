@@ -11,11 +11,12 @@ import { CommonCard, Loader } from '@shared-lib';
 import React, { memo } from 'react';
 import { ContentSearchResponse } from '../services/Search';
 import AppConst from '../utils/AppConst/AppConst';
+import { StatusIcon } from './CommonCollapse';
 
 const RenderTabContent = memo(
   ({
     contentData,
-    _grid,
+    _config,
     trackData,
     type,
     handleCardClick,
@@ -30,7 +31,7 @@ const RenderTabContent = memo(
     isHideEmptyDataMessage,
   }: {
     contentData: ContentSearchResponse[];
-    _grid: any;
+    _config: any;
     trackData?: [];
     type: string;
     handleCardClick: (content: ContentSearchResponse) => void;
@@ -43,8 +44,8 @@ const RenderTabContent = memo(
     isLoadingMoreData: boolean;
     isPageLoading: boolean;
     isHideEmptyDataMessage?: boolean;
-    _card?: any;
   }) => {
+    const { default_img, _card, ..._grid } = _config ?? {};
     return (
       <Box sx={{ width: '100%' }}>
         {tabs?.length !== undefined && tabs?.length > 1 && (
@@ -88,16 +89,38 @@ const RenderTabContent = memo(
                       image={
                         item?.posterImage && item?.posterImage !== 'undefined'
                           ? item?.posterImage
-                          : `${AppConst.BASEPATH}/assests/images/image_ver.png`
+                          : default_img ??
+                            `${AppConst.BASEPATH}/assests/images/image_ver.png`
                       }
-                      content={item?.description || '-'}
-                      actions={item?.contentType}
+                      content={item?.description || ''}
+                      actions={
+                        type !== 'Course' && (
+                          <Box>
+                            <StatusIcon
+                              showMimeTypeIcon
+                              mimeType={item?.mimeType}
+                              _icon={{
+                                isShowText: true,
+                                _box: {
+                                  py: '7px',
+                                  px: '10px',
+                                  borderRadius: '10px',
+                                  borderWidth: '1px',
+                                  borderStyle: 'solid',
+                                  borderColor: '#79747E',
+                                },
+                              }}
+                            />
+                          </Box>
+                        )
+                      }
                       // subheader={item?.contentType}
                       orientation="horizontal"
                       item={item}
                       TrackData={trackData}
                       type={type}
                       onClick={() => handleCardClick(item)}
+                      _card={_card}
                     />
                   </Grid>
                 ))}
