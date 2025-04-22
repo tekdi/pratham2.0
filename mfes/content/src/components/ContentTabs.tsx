@@ -7,11 +7,10 @@ import {
   Typography,
   Grid,
 } from '@mui/material';
-import { CommonCard, Loader } from '@shared-lib';
+import { ContentItem, Loader } from '@shared-lib';
 import React, { memo } from 'react';
 import { ContentSearchResponse } from '../services/Search';
-import AppConst from '../utils/AppConst/AppConst';
-import { StatusIcon } from './CommonCollapse';
+import ContentCard from './Card/ContentCard';
 
 const RenderTabContent = memo(
   ({
@@ -34,7 +33,7 @@ const RenderTabContent = memo(
     _config: any;
     trackData?: [];
     type: string;
-    handleCardClick: (content: ContentSearchResponse) => void;
+    handleCardClick: (content: ContentItem) => void;
     hasMoreData: boolean;
     handleLoadMore: (e: any) => void;
     tabs?: any[];
@@ -45,7 +44,7 @@ const RenderTabContent = memo(
     isPageLoading: boolean;
     isHideEmptyDataMessage?: boolean;
   }) => {
-    const { default_img, _card, ..._grid } = _config ?? {};
+    const { default_img, _card, _grid } = _config ?? {};
     return (
       <Box sx={{ width: '100%' }}>
         {tabs?.length !== undefined && tabs?.length > 1 && (
@@ -69,6 +68,7 @@ const RenderTabContent = memo(
           <Loader
             isLoading={isPageLoading}
             layoutHeight={197}
+            isHideMaxHeight
             _loader={{ backgroundColor: 'transparent' }}
           >
             <Box>
@@ -83,44 +83,13 @@ const RenderTabContent = memo(
                     lg={3}
                     {..._grid}
                   >
-                    <CommonCard
-                      minheight="100%"
-                      title={(item?.name || '').trim()}
-                      image={
-                        item?.posterImage && item?.posterImage !== 'undefined'
-                          ? item?.posterImage
-                          : default_img ??
-                            `${AppConst.BASEPATH}/assests/images/image_ver.png`
-                      }
-                      content={item?.description || ''}
-                      actions={
-                        type !== 'Course' && (
-                          <Box>
-                            <StatusIcon
-                              showMimeTypeIcon
-                              mimeType={item?.mimeType}
-                              _icon={{
-                                isShowText: true,
-                                _box: {
-                                  py: '7px',
-                                  px: '10px',
-                                  borderRadius: '10px',
-                                  borderWidth: '1px',
-                                  borderStyle: 'solid',
-                                  borderColor: '#79747E',
-                                },
-                              }}
-                            />
-                          </Box>
-                        )
-                      }
-                      // subheader={item?.contentType}
-                      orientation="horizontal"
+                    <ContentCard
                       item={item}
-                      TrackData={trackData}
                       type={type}
-                      onClick={() => handleCardClick(item)}
+                      default_img={default_img}
                       _card={_card}
+                      handleCardClick={handleCardClick}
+                      trackData={trackData}
                     />
                   </Grid>
                 ))}

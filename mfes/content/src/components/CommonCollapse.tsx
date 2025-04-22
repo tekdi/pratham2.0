@@ -373,7 +373,22 @@ export const CommonCollapse: React.FC<CommonAccordionProps> = ({
   );
 };
 
-export default CommonCollapse;
+const CollapsebleGrid = React.memo(function CollapsebleGrid({
+  data,
+  trackData,
+}: {
+  data: any[];
+  trackData: any[];
+}) {
+  if (!Array.isArray(data)) {
+    return null;
+  }
+  return data?.map((item: any) => (
+    <CommonCollapse key={item.identifier} item={item} TrackData={trackData} />
+  ));
+});
+
+export default CollapsebleGrid;
 
 const AccordionWrapper = ({
   item,

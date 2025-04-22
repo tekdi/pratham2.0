@@ -4,16 +4,11 @@ import Layout from '../../components/Layout';
 import LearnerCourse from './LearnerCourse';
 import dynamic from 'next/dynamic';
 import { Box, Button, Grid, Typography } from '@mui/material';
+import { gredientStyle } from '@learner/utils/style';
 
 const Content = dynamic(() => import('@Content'), {
   ssr: false,
 });
-const gredientStyle = {
-  backgroundImage: 'linear-gradient(#FFFDF7, #F8EFDA)',
-  backgroundRepeat: 'no-repeat',
-  backgroundAttachment: 'fixed',
-  backgroundSize: 'cover',
-};
 
 const MyComponent: React.FC = () => {
   return (

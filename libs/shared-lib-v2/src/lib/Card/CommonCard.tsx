@@ -7,7 +7,7 @@ import CardActions from '@mui/material/CardActions';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import { red } from '@mui/material/colors';
-import { Box, Button, useTheme } from '@mui/material';
+import { Box, useTheme } from '@mui/material';
 import { CircularProgressWithLabel } from '../Progress/CircularProgressWithLabel';
 export interface ContentItem {
   name: string;
@@ -140,6 +140,7 @@ export const CommonCard: React.FC<CommonCardProps> = ({
         '@media (max-width: 600px)': {
           flexDirection: 'column',
         },
+        ..._card?.sx,
       }}
       onClick={onClick}
     >

@@ -17,6 +17,7 @@ export interface LayoutProps {
   backIconClick?: () => void;
   _topAppBar?: AppBarProps;
   sx?: object;
+  _children?: object;
 }
 
 export const Layout: React.FC<LayoutProps> = ({
@@ -27,6 +28,7 @@ export const Layout: React.FC<LayoutProps> = ({
   backTitle,
   backIconClick,
   _topAppBar,
+  _children,
   sx = {},
 }) => {
   const [layoutHeight, setLayoutHeight] = useState(0);
@@ -43,9 +45,9 @@ export const Layout: React.FC<LayoutProps> = ({
         }
         return acc;
       }, 0);
+
       setLayoutHeight(totalHeight);
     }, 500);
-
     const init = () => {
       const arr = ['footer', 'back', 'logo', 'topBar'];
       if (onlyShowElements) {
@@ -68,7 +70,7 @@ export const Layout: React.FC<LayoutProps> = ({
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, [Object.keys(refs.current).length]);
+  }, [Object.keys(refs.current).length, onlyHideElements, onlyShowElements]);
 
   const handleButtonClick = () => {
     console.log('Footer button clicked!');
@@ -90,6 +92,9 @@ export const Layout: React.FC<LayoutProps> = ({
           ) {
             refs.current = { ...refs.current, topAppBar: refAppBar };
           }
+        }}
+        sx={{
+          zIndex: 1,
         }}
       >
         {showElements?.includes('topBar') && (
@@ -131,7 +136,11 @@ export const Layout: React.FC<LayoutProps> = ({
         )}
       </Box>
 
-      <Loader isLoading={isLoadingChildren} layoutHeight={layoutHeight}>
+      <Loader
+        isLoading={isLoadingChildren}
+        layoutHeight={layoutHeight}
+        {..._children}
+      >
         {children}
       </Loader>
 
