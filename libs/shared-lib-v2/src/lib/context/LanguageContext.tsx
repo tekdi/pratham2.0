@@ -16,7 +16,9 @@ import hi from './locales/hi.json';
 
 // Define translations object
 const translations: Record<string, Record<string, string>> = {
+  // @ts-ignore
   en,
+  // @ts-ignore
   hi,
 };
 

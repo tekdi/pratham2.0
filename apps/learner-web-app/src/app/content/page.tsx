@@ -1,15 +1,10 @@
 'use client';
 import React from 'react';
 import Layout from '../../components/Layout';
-import { LayoutProps } from '@shared-lib';
 import LearnerCourse from './LearnerCourse';
 import dynamic from 'next/dynamic';
 import { Box, Button, Grid, Typography } from '@mui/material';
 import LTwoCourse from './LTwoCourse';
-
-interface AppProps {
-  _layout?: LayoutProps;
-}
 
 const Content = dynamic(() => import('@Content'), {
   ssr: false,
@@ -21,7 +16,7 @@ const gredientStyle = {
   backgroundSize: 'cover',
 };
 
-const MyComponent: React.FC<AppProps> = () => {
+const MyComponent: React.FC = () => {
   return (
     <Layout>
       <Grid container style={gredientStyle}>
