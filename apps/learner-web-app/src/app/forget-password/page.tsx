@@ -6,7 +6,7 @@ import Header from '@learner/components/Header/Header';
 import dynamic from 'next/dynamic';
 
 const ForgetPassword = dynamic(
-  () => import('@forget-password/app/forget-Password/page'),
+  () => import('@forget-password/app/forget-password/page'),
   {
     ssr: false,
   }
