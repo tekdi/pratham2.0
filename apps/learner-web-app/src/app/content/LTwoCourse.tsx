@@ -8,8 +8,8 @@ import {
   SelectChangeEvent,
 } from '@mui/material';
 import CommonModal from '../../components/Modal/CommonModal';
-import LevelUp from './LevelUp';
-import ResponseRecorded from './ResponseRecorded';
+import LevelUp from '../../components/LTwoContent/LevelUp';
+import ResponseRecorded from '../../components/LTwoContent/ResponseRecorded';
 
 interface LTwoCourseProps {
   onSubmit?: () => void;
@@ -100,7 +100,7 @@ const LTwoCourse: React.FC<LTwoCourseProps> = ({ onSubmit }) => {
             onClose={() => setIsModalOpen(false)}
             submitText="Okay"
           >
-            <ResponseRecorded  />
+            <ResponseRecorded />
           </CommonModal>
         )}
       </Box>
