@@ -2,7 +2,7 @@ import { CohortMemberList } from '@/utils/Interfaces';
 import { get, patch, post, put } from '../RestClient';
 import axios from 'axios';
 import { showToastMessage } from '@/components/Toastify';
-import { API_ENDPOINTS } from '@/utils/API/APIEndpoints';
+import API_ENDPOINTS from '@/utils/API/APIEndpoints';
 
 export interface cohortListFilter {
   type: string;
@@ -104,7 +104,7 @@ export const createUser = async (userData: any): Promise<any> => {
 };
 
 export const createCohort = async (userData: any, t?: any): Promise<any> => {
-  const apiUrl: string = API_ENDPOINTS.cohortCreate;
+  const apiUrl: string = API_ENDPOINTS?.cohortCreate;
 
   try {
     const response = await post(apiUrl, userData);

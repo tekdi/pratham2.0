@@ -174,7 +174,8 @@
     "BATCHES": "Batches",
     "BATCH_SESSIONS": "Batch Sessions",
     "NOT_ABLE_CREATE_LEARNER": "Not able to create learner",
-    "NOT_ABLE_CREATE_FACILITATOR": "Not Able To Create Teacher"
+    "NOT_ABLE_CREATE_FACILITATOR": "Not Able To Create Teacher",
+    "NEW_BATCH": "New Batch"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -623,8 +624,8 @@
     "EMAIL_ALREADY_EXIST": "Email is already exists",
     "GRADUATE": "Graduate",
     "POST_GRADUATE": "Post Graduate",
-    "CENTER":"Center",
-    "BATCH":"Batch"
+    "CENTER": "Center",
+    "BATCH": "Batch"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "Invalid Input.",
