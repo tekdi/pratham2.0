@@ -246,7 +246,7 @@ export default function Index() {
                   {/* Search Bar (placeholder) */}
                   <Box>
                     <Typography>
-                      Search "Pratham myLearning" on Playstore
+                      Search &quot;Pratham myLearning&quot; on Playstore
                     </Typography>
                   </Box>
                 </Box>
@@ -290,15 +290,23 @@ export default function Index() {
                 collectively reach millions of children and young people each
                 year. The direct work follows two tracks: Pratham works with
                 children either in the school or in the community, whereas the
-                "partnership" model involves Pratham teams working closely with
-                government teams at the state, district, or block level. Our
-                unwavering commitment to developing, testing, and improving
-                learning outcomes continues to serve as a model, both within
-                India and beyond.
+                &ldquo;partnership&rdquo; model involves Pratham teams working
+                closely with government teams at the state, district, or block
+                level. Our unwavering commitment to developing, testing, and
+                improving learning outcomes continues to serve as a model, both
+                within India and beyond.
               </Typography>
             </Grid>
             <Grid item xs={12} md={5}>
-              <Box sx={{ position: 'relative', width: '100%', height: 278, borderRadius: '24px', overflow: 'hidden' }}>
+              <Box
+                sx={{
+                  position: 'relative',
+                  width: '100%',
+                  height: 278,
+                  borderRadius: '24px',
+                  overflow: 'hidden',
+                }}
+              >
                 <iframe
                   width="100%"
                   height="100%"
@@ -311,14 +319,18 @@ export default function Index() {
                   style={{ borderRadius: '24px' }}
                 ></iframe>
               </Box>
-
             </Grid>
           </Grid>
         </Box>
       </Container>
 
       {/* Our Programs Section */}
-      <Box sx={{ background: 'linear-gradient(180deg, #FFFDF7 0%, #F8EFDA 100%)', padding: '20px' }}>
+      <Box
+        sx={{
+          background: 'linear-gradient(180deg, #FFFDF7 0%, #F8EFDA 100%)',
+          padding: '20px',
+        }}
+      >
         <Container maxWidth="xl">
           <Box sx={{ my: 6 }}>
             <Typography
@@ -330,7 +342,7 @@ export default function Index() {
                 fontWeight: 600,
                 fontSize: '32px',
                 color: '#1F1B13',
-                textAlign: "center"
+                textAlign: 'center',
               }}
             >
               Our Programs
@@ -384,7 +396,11 @@ export default function Index() {
                         textAlign: 'center',
                       }}
                     >
-                      <Typography variant="h6" component="div" fontWeight="bold">
+                      <Typography
+                        variant="h6"
+                        component="div"
+                        fontWeight="bold"
+                      >
                         {program?.name}
                       </Typography>
                     </Box>
@@ -406,52 +422,54 @@ export default function Index() {
                         }}
                         loop={true}
                       >
-
-                        {   // @ts-ignore
-                        }
-                        {program?.programImages?.map((slide, slideIndex) => (
-                          <SwiperSlide key={`slide-${program.ordering}-${slideIndex}`}>
-                            <Box sx={{ position: 'relative', height: '200px' }}>
-                              <Image
-                                src={slide}
-                                alt={'img'}
-                                fill
-                                style={{ objectFit: 'cover' }}
-                                onError={handleImageError}
-                              />
+                        {program?.programImages?.map(
+                          (slide: any, slideIndex) => (
+                            <SwiperSlide
+                              key={`slide-${program.ordering}-${slideIndex}`}
+                            >
                               <Box
-                                sx={{
-                                  position: 'absolute',
-                                  bottom: 0,
-                                  left: 0,
-                                  right: 0,
-                                  backgroundColor: 'rgba(73, 108, 184, 0.9)',
-                                  p: 2,
-                                  color: 'white',
-                                }}
+                                sx={{ position: 'relative', height: '200px' }}
                               >
-                                <Typography
-                                  variant="caption"
-                                  component="div"
+                                <Image
+                                  src={slide}
+                                  alt={'img'}
+                                  fill
+                                  style={{ objectFit: 'cover' }}
+                                  onError={handleImageError}
+                                />
+                                <Box
                                   sx={{
-                                    backgroundColor: 'rgba(0,0,0,0.2)',
-                                    display: 'inline-block',
-                                    px: 1,
-                                    py: 0.5,
-                                    borderRadius: 1,
-                                    mb: 1,
+                                    position: 'absolute',
+                                    bottom: 0,
+                                    left: 0,
+                                    right: 0,
+                                    backgroundColor: 'rgba(73, 108, 184, 0.9)',
+                                    p: 2,
+                                    color: 'white',
                                   }}
                                 >
-                                  {slide.label}
-                                </Typography>
-                                <Typography variant="body2">
-                                  {slide.description}
-                                </Typography>
+                                  <Typography
+                                    variant="caption"
+                                    component="div"
+                                    sx={{
+                                      backgroundColor: 'rgba(0,0,0,0.2)',
+                                      display: 'inline-block',
+                                      px: 1,
+                                      py: 0.5,
+                                      borderRadius: 1,
+                                      mb: 1,
+                                    }}
+                                  >
+                                    {slide.label}
+                                  </Typography>
+                                  <Typography variant="body2">
+                                    {slide.description}
+                                  </Typography>
+                                </Box>
                               </Box>
-                            </Box>
-                          </SwiperSlide>
-                        ))}
-
+                            </SwiperSlide>
+                          )
+                        )}
                       </Swiper>
 
                       <Box
@@ -559,7 +577,6 @@ export default function Index() {
             </Swiper>
           </Box>
         </Container>
-
       </Box>
     </>
   );
