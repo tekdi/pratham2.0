@@ -60,7 +60,7 @@ const V1Player = ({ playerConfig }: PlayerProps) => {
       ref={previewRef}
       id="contentPlayer"
       title="Content Player"
-      src={`${basePath}/content/preview/preview.html?webview=true`}
+      src={`${basePath}/libs/sunbird-content-player/preview/preview.html?webview=true`}
       aria-label="Content Player"
       style={{ border: 'none' }}
       width={'100%'}
