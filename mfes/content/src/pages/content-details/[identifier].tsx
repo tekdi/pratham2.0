@@ -47,7 +47,7 @@ const ContentDetails = (props: isShowLayout) => {
         ) {
           router.replace(`/details/${identifier}`);
         } else {
-          setContentDetails(result);
+          setContentDetails(result as ContentSearchResponse);
         }
       } catch (error) {
         console.error('Failed to fetch content:', error);
@@ -124,7 +124,7 @@ const ContentDetails = (props: isShowLayout) => {
                       gap: 2,
                     }}
                   >
-                    {contentDetails?.children?.map((item) => (
+                    {contentDetails?.children?.map((item: any) => (
                       <Accordion
                         key={item.identifier}
                         sx={{ backgroundColor: 'transparent' }}

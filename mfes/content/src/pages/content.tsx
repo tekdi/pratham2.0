@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import { Box, Button } from '@mui/material';
-import { CommonSearch, getData } from '@shared-lib';
+import { CommonSearch, ContentItem, getData } from '@shared-lib';
 import { useRouter } from 'next/navigation';
 import BackToTop from '../components/BackToTop';
 import RenderTabContent from '../components/ContentTabs';
@@ -20,7 +20,7 @@ export interface ContentProps {
   filters?: object;
   contentTabs?: string[];
   cardName?: string;
-  handleCardClick?: (content: ContentSearchResponse) => void | undefined;
+  handleCardClick?: (content: ContentItem) => void | undefined;
   showFilter?: boolean;
   showSearch?: boolean;
   showBackToTop?: boolean;
@@ -133,7 +133,7 @@ export default function Content(props: Readonly<ContentProps>) {
     setTabValue(newValue);
   };
 
-  const handleCardClickLocal = async (content: ContentSearchResponse) => {
+  const handleCardClickLocal = async (content: ContentItem) => {
     try {
       if (
         [
