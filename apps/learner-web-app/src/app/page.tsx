@@ -22,7 +22,7 @@ import 'swiper/css/pagination';
 import { Autoplay, Navigation, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Swiper as SwiperClass } from 'swiper/types';
-import { Layout } from '@shared-lib'
+import { Layout } from '@shared-lib';
 interface Program {
   ordering: number;
   name: string;
@@ -63,7 +63,7 @@ export default function Index() {
   }, []);
 
   return (
-    <Layout onlyHideElements={['footer']} >
+    <Layout onlyHideElements={['footer']}>
       <Box
         sx={{
           background: 'linear-gradient(180deg, #FFFDF7 0%, #F8EFDA 100%)',
@@ -348,7 +348,6 @@ export default function Index() {
               Our Programs
             </Typography>
 
-
             <Grid container spacing={2} sx={{ my: 4 }}>
               {programs?.map((program) => (
                 <Grid item xs={12} md={4}>
@@ -367,11 +366,20 @@ export default function Index() {
                       <Box
                         sx={{
                           p: 2,
-                          backgroundColor: '#FFE4B5',
+                          backgroundColor: '#FFDEA1',
                           textAlign: 'center',
                         }}
                       >
-                        <Typography variant="h6" component="div" fontWeight="bold">
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: 500,
+                            fontSize: '18px',
+                            color: '#1F1B13',
+                          }}
+                          component="div"
+                          fontWeight="bold"
+                        >
                           {program?.name}
                         </Typography>
                       </Box>
@@ -388,18 +396,29 @@ export default function Index() {
                           pagination={{
                             clickable: true,
                             el: `.pagination-${program?.ordering}`,
-                            bulletActiveClass: 'swiper-pagination-bullet-active',
+                            bulletActiveClass:
+                              'swiper-pagination-bullet-active',
                             bulletClass: 'swiper-pagination-bullet',
                           }}
                           loop={true}
                         >
-
-                          {   // @ts-ignore
+                          {
+                            // @ts-ignore
                           }
-                          {program?.programImages?.map((slide: any, slideIndex) => (
-                            <SwiperSlide key={`slide-${program.ordering}-${slideIndex}`}>
-                              <Box sx={{ margin: '10px', height: '200px', display: 'flex', justifyContent: 'center', }}>
-                                {/* <Image
+                          {program?.programImages?.map(
+                            (slide: any, slideIndex) => (
+                              <SwiperSlide
+                                key={`slide-${program.ordering}-${slideIndex}`}
+                              >
+                                <Box
+                                  sx={{
+                                    margin: '10px',
+                                    height: '200px',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                  }}
+                                >
+                                  {/* <Image
                                   src={slide}
                                   alt={'img'}
                                   sx={{
@@ -410,13 +429,20 @@ export default function Index() {
                                   onError={handleImageError}
                                 /> */}
 
-                                <img src={slide}
-                                  alt={'img'} style={{ borderRadius: '24px', width: 'unset', height: '100%', objectFit: 'cover' }} />
-
-                              </Box>
-                            </SwiperSlide>
-                          ))}
-
+                                  <img
+                                    src={slide}
+                                    alt={'img'}
+                                    style={{
+                                      borderRadius: '24px',
+                                      width: 'unset',
+                                      height: '100%',
+                                      objectFit: 'cover',
+                                    }}
+                                  />
+                                </Box>
+                              </SwiperSlide>
+                            )
+                          )}
                         </Swiper>
 
                         {/* <Box
@@ -433,7 +459,12 @@ export default function Index() {
                         </Box> */}
 
                         <Box sx={{ my: 2 }}>
-                          <Box display="flex" justifyContent="center" alignItems="center" gap={2}>
+                          <Box
+                            display="flex"
+                            justifyContent="center"
+                            alignItems="center"
+                            gap={2}
+                          >
                             {/* Left Arrow Button */}
                             <Button
                               className={`prev-${program.ordering}`}
@@ -450,10 +481,10 @@ export default function Index() {
                                   backgroundColor: '#e0e0e0',
                                 },
                               }}
-
-
                             >
-                              <ChevronLeftIcon sx={{ color: '#1F1B13', fontSize: '30px' }} />
+                              <ChevronLeftIcon
+                                sx={{ color: '#1F1B13', fontSize: '30px' }}
+                              />
                             </Button>
 
                             {/* Pagination Dots */}
@@ -465,7 +496,7 @@ export default function Index() {
                                   width: '30px',
                                   height: '4px',
                                   borderRadius: '2px',
-                                  backgroundColor: '#D0D0D0',
+                                  backgroundColor: '#CDC5BD',
                                   opacity: 1,
                                   mx: 0.5,
                                 },
@@ -492,13 +523,13 @@ export default function Index() {
                                 },
                               }}
                             >
-                              <ChevronRightIcon sx={{ color: '#1F1B13', fontSize: '30px' }} fontSize="small" />
+                              <ChevronRightIcon
+                                sx={{ color: '#1F1B13', fontSize: '30px' }}
+                                fontSize="small"
+                              />
                             </Button>
                           </Box>
                         </Box>
-
-
-
                       </Box>
 
                       <CardActions sx={{ justifyContent: 'center', p: 2 }}>
@@ -508,9 +539,9 @@ export default function Index() {
                           color="primary"
                           sx={{
                             borderRadius: 50,
-                            backgroundColor: '#F99F1B',
+                            backgroundColor: '#FDBE16',
                             '&:hover': {
-                              backgroundColor: '#e08c0f',
+                              backgroundColor: '#FDBE16',
                             },
                           }}
                           onClick={() => router.push('/signup')}
@@ -525,8 +556,7 @@ export default function Index() {
             </Grid>
           </Box>
         </Container>
-      </Box >
-    </Layout >
-
+      </Box>
+    </Layout>
   );
 }
