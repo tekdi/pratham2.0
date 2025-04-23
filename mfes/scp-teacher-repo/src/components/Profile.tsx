@@ -185,12 +185,14 @@ const Profile: React.FC<ProfileDetailsProps> = ({
               return (
                 <Box
                   key={subject.id}
+
                   sx={{
                     backgroundColor: isHighlighted ? '#EFC570' : 'transparent',
                     color: isHighlighted ? 'black' : 'black',
                     cursor: 'default !important',
                     borderRadius: "8px",
                     padding: '5px 10px',
+                    fontFamily: 'Poppins',
                     fontWeight: 500,
                     fontSize: '14px',
                     lineHeight: '20px',
