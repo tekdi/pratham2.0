@@ -7,24 +7,25 @@ interface LoaderProps {
   layoutHeight?: number;
   children: ReactNode;
   _loader?: React.CSSProperties;
+  isHideMaxHeight?: Boolean;
 }
 
 export const Loader: React.FC<LoaderProps> = memo(
-  ({ isLoading, layoutHeight, _loader, children }) => {
+  ({ isLoading, layoutHeight, _loader, children, isHideMaxHeight }) => {
     return (
       <>
         {isLoading && (
           <Box
             sx={{
-              width: 'auto',
+              width: '100%',
               minHeight: `calc(100vh - ${layoutHeight || 0}px)`,
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
-              position: 'absolute',
-              zIndex: 9999,
-              left: 0,
-              right: 0,
+              // position: 'absolute',
+              // zIndex: 9999,
+              // left: 0,
+              // right: 0,
               backgroundColor: 'white',
               ..._loader,
             }}
@@ -37,8 +38,8 @@ export const Loader: React.FC<LoaderProps> = memo(
             width: '100%',
             // overflowY: 'auto',
             display: isLoading ? 'none' : 'block',
-            ...(isLoading
-              ? { maxHeight: `calc(100vh - ${layoutHeight}px)` }
+            ...(isLoading || !isHideMaxHeight
+              ? { height: `calc(100vh - ${layoutHeight}px)` }
               : {}),
           }}
         >

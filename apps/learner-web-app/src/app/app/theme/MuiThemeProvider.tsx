@@ -4,81 +4,93 @@
 import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
 import React from 'react';
 import { LanguageProvider } from '@shared-lib';
-// import { LanguageProvider } from '@shared-lib';
 
 const theme = createTheme({
   typography: {
-    fontFamily: "Poppins, Arial, sans-serif",
+    fontFamily: 'Poppins, Arial, sans-serif',
+    allVariants: {
+      fontFamily: 'Poppins, Arial, sans-serif',
+    },
     h1: {
-      fontSize: "22px",
+      fontSize: '22px',
       fontWeight: 400,
-      lineHeight: "28px",
-      marginBottom: "1rem",
+      lineHeight: '28px',
+      marginBottom: '1rem',
     },
     h2: {
-      fontSize: "16px",
+      fontSize: '16px',
       fontWeight: 500,
-      lineHeight: "24px",
+      lineHeight: '24px',
     },
     h3: {
-      fontSize: "14px",
+      fontSize: '14px',
       fontWeight: 500,
-      lineHeight: "20px",
-      marginBottom: "0.5rem",
+      lineHeight: '20px',
+      marginBottom: '0.5rem',
     },
     h4: {
-      //h4 is a large label style 
-      fontSize: "14px",
+      //h4 is a large label style
+      fontSize: '14px',
       fontWeight: 400,
-      lineHeight: "20px",
-      letterSpacing: "0.1px",
+      lineHeight: '20px',
+      letterSpacing: '0.1px',
     },
     h5: {
       //h5 is a medium label style
-      fontSize: "12px",
+      fontSize: '12px',
       fontWeight: 500,
-      lineHeight: "16px",
-      letterSpacing: "0.5px",
+      lineHeight: '16px',
+      letterSpacing: '0.5px',
     },
     h6: {
       //h6 is a small label style
-      fontSize: "11px",
+      fontSize: '11px',
       fontWeight: 500,
-      lineHeight: "16px",
-      letterSpacing: "0.5px",
+      lineHeight: '16px',
+      letterSpacing: '0.5px',
     },
     body1: {
-      fontSize: "16px",
+      fontSize: '16px',
       fontWeight: 400,
-      lineHeight: "24px",
-      letterSpacing: "0.5px",
+      lineHeight: '24px',
+      letterSpacing: '0.5px',
     },
     body2: {
-      fontSize: "14px",
+      fontSize: '14px',
       fontWeight: 400,
-      lineHeight: "20px",
-      letterSpacing: "0.25px",
-      marginBottom: "1rem",
+      lineHeight: '20px',
+      letterSpacing: '0.25px',
+      marginBottom: '1rem',
     },
     button: {
-      textTransform: "none",
-      fontSize: "14px",
+      textTransform: 'none',
+      fontSize: '14px',
       fontWeight: 600,
     },
   },
   palette: {
     primary: {
       main: '#FDBE16',
-      // contrastText: '#fff',
       light: '#FFDEA1',
     },
     secondary: {
       main: '#0D599E',
       light: '#E7F3F8',
-      // contrastText: '#fff',
+    },
+    success: {
+      main: '#50EE42',
     },
   },
   components: {
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          '& > :last-child': {
+            paddingBottom: 16,
+          },
+        },
+      },
+    },
     MuiAppBar: {
       styleOverrides: {
         root: {
@@ -86,7 +98,6 @@ const theme = createTheme({
           paddingTop: '18px',
           paddingBottom: '18px',
           '&.Mui-focused .MuiOutlinedInput-notchedOutline': {},
-          // background: '#BA1A1A'
         },
       },
     },
@@ -95,7 +106,6 @@ const theme = createTheme({
         root: {},
       },
     },
-
     MuiButton: {
       styleOverrides: {
         root: {

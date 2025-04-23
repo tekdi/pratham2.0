@@ -109,6 +109,10 @@ export default memo(function LearnerCourse({
           showFilter={false}
           showSearch={false}
           showHelpDesk={false}
+          _config={{
+            default_img: '/images/image_ver.png',
+            _card: { isHideProgress: true },
+          }}
           {..._content}
           filters={filterState}
         />

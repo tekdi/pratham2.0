@@ -26,6 +26,10 @@ export default function LayoutPage({
       </Layout>
     );
   } else {
-    return <Loader isLoading={isLoadingChildren || false}>{children}</Loader>;
+    return (
+      <Loader isLoading={isLoadingChildren || false} isHideMaxHeight>
+        {children}
+      </Loader>
+    );
   }
 }

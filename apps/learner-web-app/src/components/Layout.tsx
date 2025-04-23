@@ -61,12 +61,13 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
   return (
     <Layout
       onlyHideElements={['footer']}
+      {...props}
       _topAppBar={{
         navLinks: defaultNavLinks,
         _navLinkBox: { gap: 5 },
         onLanguageChange,
+        ...props?._topAppBar,
       }}
-      {...props}
     >
       {children}
     </Layout>

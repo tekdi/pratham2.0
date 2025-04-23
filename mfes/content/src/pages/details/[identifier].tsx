@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Box, Typography, Grid } from '@mui/material';
-import { getLeafNodes, Layout } from '@shared-lib';
-import CommonCollapse from '../../components/CommonCollapse'; // Adjust the import based on your folder structure
+import { Box } from '@mui/material';
+import { getLeafNodes } from '@shared-lib';
 import { hierarchyAPI } from '../../services/Hierarchy';
 import { trackingData } from '../../services/TrackingService';
 import LayoutPage from '../../components/LayoutPage';
+import UnitGrid from '../../components/UnitGrid';
+import CollapsebleGrid from '../../components/CommonCollapse';
+import InfoCard from '../../components/Card/InfoCard';
 
 interface DetailsProps {
   isShowLayout?: any;
+  type?: 'collapse' | 'card';
+  _config?: any;
 }
 
 export default function Details(props: DetailsProps) {
@@ -31,7 +35,7 @@ export default function Details(props: DetailsProps) {
             courseList = getLeafNodes(result);
           }
 
-          const userId = localStorage.getItem('subId');
+          const userId = localStorage.getItem('userId');
           const userIdArray = userId?.split(',');
           if (!userId) return; // Ensure required values exist
           //@ts-ignore
@@ -71,38 +75,35 @@ export default function Details(props: DetailsProps) {
       backIconClick={onBackClick}
       onlyHideElements={['footer']}
     >
-      <Box sx={{ p: '8px' }}>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-              {selectedContent?.name}
-            </Typography>
-          </Grid>
-          <Grid item xs={12}>
-            {selectedContent?.children?.length > 0 && (
-              <RenderNestedChildren
-                data={selectedContent.children}
-                trackData={trackData}
-              />
-            )}
-          </Grid>
-        </Grid>
+      <InfoCard
+        item={selectedContent}
+        onBackClick={onBackClick}
+        _config={{
+          ...props?._config,
+          _infoCard: {
+            isShowStatus: trackData,
+            isHideStatus: true,
+            ...props?._config?._infoCard,
+          },
+        }}
+      />
+
+      <Box sx={{ pt: 5, pb: 10, px: 10 }}>
+        {props?.type === 'collapse' ? (
+          selectedContent?.children?.length > 0 && (
+            <CollapsebleGrid
+              data={selectedContent.children}
+              trackData={trackData}
+            />
+          )
+        ) : (
+          <UnitGrid
+            item={selectedContent}
+            trackData={trackData}
+            _config={props?._config}
+          />
+        )}
       </Box>
     </LayoutPage>
   );
 }
-
-const RenderNestedChildren = React.memo(function RenderNestedChildren({
-  data,
-  trackData,
-}: {
-  data: any[];
-  trackData: any[];
-}) {
-  if (!Array.isArray(data)) {
-    return null;
-  }
-  return data?.map((item: any) => (
-    <CommonCollapse key={item.identifier} item={item} TrackData={trackData} />
-  ));
-});

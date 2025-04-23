@@ -61,7 +61,15 @@ const LoginPage = () => {
 
               const tenantId = userResponse?.tenantData?.[0]?.tenantId;
               localStorage.setItem('tenantId', tenantId);
-              router.push('/home');
+              document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
+              if (
+                typeof window !== 'undefined' &&
+                window.location.href.includes('redirect')
+              ) {
+                router.push(window.location.href.split('redirect=')[1]);
+              } else {
+                router.push('/home');
+              }
             } else {
               showToastMessage(
                 'LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT',

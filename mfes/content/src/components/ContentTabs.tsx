@@ -7,15 +7,15 @@ import {
   Typography,
   Grid,
 } from '@mui/material';
-import { CommonCard, Loader } from '@shared-lib';
+import { ContentItem, Loader } from '@shared-lib';
 import React, { memo } from 'react';
 import { ContentSearchResponse } from '../services/Search';
-import AppConst from '../utils/AppConst/AppConst';
+import ContentCard from './Card/ContentCard';
 
 const RenderTabContent = memo(
   ({
     contentData,
-    _grid,
+    _config,
     trackData,
     type,
     handleCardClick,
@@ -30,10 +30,10 @@ const RenderTabContent = memo(
     isHideEmptyDataMessage,
   }: {
     contentData: ContentSearchResponse[];
-    _grid: any;
+    _config: any;
     trackData?: [];
     type: string;
-    handleCardClick: (content: ContentSearchResponse) => void;
+    handleCardClick: (content: ContentItem) => void;
     hasMoreData: boolean;
     handleLoadMore: (e: any) => void;
     tabs?: any[];
@@ -43,8 +43,8 @@ const RenderTabContent = memo(
     isLoadingMoreData: boolean;
     isPageLoading: boolean;
     isHideEmptyDataMessage?: boolean;
-    _card?: any;
   }) => {
+    const { default_img, _card, _grid } = _config ?? {};
     return (
       <Box sx={{ width: '100%' }}>
         {tabs?.length !== undefined && tabs?.length > 1 && (
@@ -68,6 +68,7 @@ const RenderTabContent = memo(
           <Loader
             isLoading={isPageLoading}
             layoutHeight={197}
+            isHideMaxHeight
             _loader={{ backgroundColor: 'transparent' }}
           >
             <Box>
@@ -82,22 +83,13 @@ const RenderTabContent = memo(
                     lg={3}
                     {..._grid}
                   >
-                    <CommonCard
-                      minheight="100%"
-                      title={(item?.name || '').trim()}
-                      image={
-                        item?.posterImage && item?.posterImage !== 'undefined'
-                          ? item?.posterImage
-                          : `${AppConst.BASEPATH}/assests/images/image_ver.png`
-                      }
-                      content={item?.description || '-'}
-                      actions={item?.contentType}
-                      // subheader={item?.contentType}
-                      orientation="horizontal"
+                    <ContentCard
                       item={item}
-                      TrackData={trackData}
                       type={type}
-                      onClick={() => handleCardClick(item)}
+                      default_img={default_img}
+                      _card={_card}
+                      handleCardClick={handleCardClick}
+                      trackData={trackData}
                     />
                   </Grid>
                 ))}
