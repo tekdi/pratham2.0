@@ -5,6 +5,7 @@ import LearnerCourse from './LearnerCourse';
 import dynamic from 'next/dynamic';
 import { Box, Button, Grid, Typography } from '@mui/material';
 import { gredientStyle } from '@learner/utils/style';
+import LTwoCourse from './LTwoCourse';
 
 const Content = dynamic(() => import('@Content'), {
   ssr: false,
@@ -73,34 +74,14 @@ const MyComponent: React.FC = () => {
         <Grid
           item
           xs={12}
-          md={3}
+          md={12}
           sx={{
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
           }}
         >
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              mb: 2,
-            }}
-          >
-            <Typography variant="h4" gutterBottom sx={{ color: '#06A816' }}>
-              Level 2 Course
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-              You can boost your skills and unlock new job opportunities with
-              our L2 course.
-            </Typography>
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <Button variant="contained" color="primary" href="/courses">
-                I’m interested
-              </Button>
-            </Box>
-          </Box>
+          <LTwoCourse />
         </Grid>
       </Grid>
 

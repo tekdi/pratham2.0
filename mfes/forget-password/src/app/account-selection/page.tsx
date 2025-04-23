@@ -68,9 +68,7 @@ const AccountSelectionPage = () => {
           setHash(response?.result?.data?.hash);
           setOtpModal(true);
           setMobileNumber(mobile);
-        } catch (error) {
-          
-        }
+        } catch (error) {}
       }
     }
 
@@ -107,7 +105,7 @@ const AccountSelectionPage = () => {
     try {
       const response = await userCheck({ username });
       console.log('response', response?.result[0]?.mobile);
-     // response.result[0].mobile = '8793607919'; // temporary hardcoded
+      // response.result[0].mobile = '8793607919'; // temporary hardcoded
       if (response?.result[0]?.mobile) {
         return response?.result[0]?.mobile.toString();
       } else {
@@ -132,9 +130,18 @@ const AccountSelectionPage = () => {
   const handleCloseModal = () => setOtpModal(false);
 
   return (
-    <>
+    <Box
+      sx={{
+        background: 'linear-gradient(to bottom, #fff7e6, #fef9ef)',
+      }}
+    >
       <Box
-        sx={{ p: 2, cursor: 'pointer', width: 'fit-content' }}
+        sx={{
+          p: 2,
+          cursor: 'pointer',
+          width: 'fit-content',
+          background: 'linear-gradient(to bottom, #fff7e6, #fef9ef)',
+        }}
         onClick={() => router.back()}
       >
         <ArrowBackIcon
@@ -157,7 +164,7 @@ const AccountSelectionPage = () => {
           maskedNumber={maskMobileNumber(mobileNumber)}
         />
       </SimpleModal>
-    </>
+    </Box>
   );
 };
 

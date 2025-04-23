@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import SimpleModal from '@forget-password/Components/SimpleModal/SimpleModal';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import OtpVerificationComponent from '@forget-password/Components/OtpVerificationComponent/OtpVerificationComponent';
 import ForgotPasswordComponent from '@forget-password/Components/ForgotPasswordComponent/ForgotPasswordComponent';
 import { sendOTP, verifyOTP } from '@forget-password/utils/API/OtPService';
@@ -16,7 +16,11 @@ const ForgotPasswordPage = ({}) => {
 
   const [mobileNumber, setMobileNumber] = useState<string>('');
   const [hash, setHash] = useState<string>('');
-
+  const searchParams = useSearchParams();
+  const redirectionRoute = searchParams.get('redirectionRoute');
+  if (redirectionRoute) {
+    localStorage.setItem('redirectionRoute', redirectionRoute);
+  }
   const [otpmodal, setOtpModal] = useState(false);
   const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
   const [enterdUserName, setEnterdUserName] = useState('');
@@ -104,9 +108,17 @@ const ForgotPasswordPage = ({}) => {
   };
 
   return (
-    <>
+    <Box
+      sx={{
+        background: 'linear-gradient(to bottom, #fff7e6, #fef9ef)',
+      }}
+    >
       <Box
-        sx={{ p: 2, cursor: 'pointer', width: 'fit-content' }}
+        sx={{
+          p: 2,
+          cursor: 'pointer',
+          width: 'fit-content',
+        }}
         onClick={() => router.back()}
       >
         <ArrowBackIcon
@@ -130,7 +142,7 @@ const ForgotPasswordPage = ({}) => {
           maskedNumber={maskMobileNumber(mobileNumber)}
         />
       </SimpleModal>
-    </>
+    </Box>
   );
 };
 
