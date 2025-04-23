@@ -12,6 +12,9 @@ const nextConfig = {
     // See: https://github.com/gregberge/svgr
     svgr: false,
   },
+  images: {
+    domains: ['program-image-dev.s3.ap-south-1.amazonaws.com'],
+  },
 };
 
 const plugins = [
