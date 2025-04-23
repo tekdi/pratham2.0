@@ -246,7 +246,7 @@ export default function Index() {
                   {/* Search Bar (placeholder) */}
                   <Box>
                     <Typography>
-                      Search "Pratham myLearning" on Playstore
+                      Search &quot;Pratham myLearning&quot; on Playstore
                     </Typography>
                   </Box>
                 </Box>
@@ -290,15 +290,23 @@ export default function Index() {
                 collectively reach millions of children and young people each
                 year. The direct work follows two tracks: Pratham works with
                 children either in the school or in the community, whereas the
-                "partnership" model involves Pratham teams working closely with
-                government teams at the state, district, or block level. Our
-                unwavering commitment to developing, testing, and improving
-                learning outcomes continues to serve as a model, both within
-                India and beyond.
+                &ldquo;partnership&rdquo; model involves Pratham teams working
+                closely with government teams at the state, district, or block
+                level. Our unwavering commitment to developing, testing, and
+                improving learning outcomes continues to serve as a model, both
+                within India and beyond.
               </Typography>
             </Grid>
             <Grid item xs={12} md={5}>
-              <Box sx={{ position: 'relative', width: '100%', height: 278, borderRadius: '24px', overflow: 'hidden' }}>
+              <Box
+                sx={{
+                  position: 'relative',
+                  width: '100%',
+                  height: 278,
+                  borderRadius: '24px',
+                  overflow: 'hidden',
+                }}
+              >
                 <iframe
                   width="100%"
                   height="100%"
@@ -311,14 +319,18 @@ export default function Index() {
                   style={{ borderRadius: '24px' }}
                 ></iframe>
               </Box>
-
             </Grid>
           </Grid>
         </Box>
       </Container>
 
       {/* Our Programs Section */}
-      <Box sx={{ background: 'linear-gradient(180deg, #FFFDF7 0%, #F8EFDA 100%)', padding: '20px' }}>
+      <Box
+        sx={{
+          background: 'linear-gradient(180deg, #FFFDF7 0%, #F8EFDA 100%)',
+          padding: '20px',
+        }}
+      >
         <Container maxWidth="xl">
           <Box sx={{ my: 6 }}>
             <Typography
@@ -330,7 +342,7 @@ export default function Index() {
                 fontWeight: 600,
                 fontSize: '32px',
                 color: '#1F1B13',
-                textAlign: "center"
+                textAlign: 'center',
               }}
             >
               Our Programs
@@ -384,7 +396,7 @@ export default function Index() {
 
                           {   // @ts-ignore
                           }
-                          {program?.programImages?.map((slide, slideIndex) => (
+                          {program?.programImages?.map((slide: any, slideIndex) => (
                             <SwiperSlide key={`slide-${program.ordering}-${slideIndex}`}>
                               <Box sx={{ margin: '10px', height: '200px', display: 'flex', justifyContent: 'center', }}>
                                 {/* <Image
@@ -407,99 +419,86 @@ export default function Index() {
 
                         </Swiper>
 
-                        <Box
-                          sx={{
-                            // position: 'absolute',
-                            // bottom: 0,
-                            // left: 0,
-                            // right: 0,
-                            // backgroundColor: 'rgba(73, 108, 184, 0.9)',
-                            // p: 2,
-                            // color: 'white',
-                          }}
-                        >
-                        </Box>
-
-                        <Box
+                        {/* <Box
                           sx={{
                             position: 'absolute',
-                            left: '10px',
-                            top: '50%',
-                            zIndex: 1,
-                            transform: 'translateY(-50%)',
-                          }}
-                        >
-                          <Button
-                            className={`prev-${program.ordering}`}
-                            sx={{
-                              minWidth: '30px',
-                              width: '30px',
-                              height: '30px',
-                              p: 0,
-                              borderRadius: '50%',
-                              backgroundColor: 'white',
-                              color: 'gray',
-                              '&:hover': { backgroundColor: '#e0e0e0' },
-                            }}
-                          >
-                            <ChevronLeftIcon fontSize="small" />
-                          </Button>
-                        </Box>
-
-                        <Box
-                          sx={{
-                            position: 'absolute',
-                            right: '10px',
-                            top: '50%',
-                            zIndex: 1,
-                            transform: 'translateY(-50%)',
-                          }}
-                        >
-                          <Button
-                            className={`next-${program?.ordering}`}
-                            sx={{
-                              minWidth: '30px',
-                              width: '30px',
-                              height: '30px',
-                              p: 0,
-                              borderRadius: '50%',
-                              backgroundColor: 'white',
-                              color: 'gray',
-                              '&:hover': { backgroundColor: '#e0e0e0' },
-                            }}
-                          >
-                            <ChevronRightIcon fontSize="small" />
-                          </Button>
-                        </Box>
-
-                        <Box
-                          sx={{
-                            position: 'absolute',
-                            bottom: '10px',
+                            bottom: 0,
                             left: 0,
                             right: 0,
-                            display: 'flex',
-                            justifyContent: 'center',
-                            zIndex: 1,
+                            backgroundColor: 'rgba(73, 108, 184, 0.9)',
+                            p: 2,
+                            color: 'white',
                           }}
                         >
-                          <Box
-                            className={`pagination-${program?.ordering}`}
-                            sx={{
-                              '& .swiper-pagination-bullet': {
+                        </Box> */}
+
+                        <Box sx={{ my: 2 }}>
+                          <Box display="flex" justifyContent="center" alignItems="center" gap={2}>
+                            {/* Left Arrow Button */}
+                            <Button
+                              className={`prev-${program.ordering}`}
+                              sx={{
+                                minWidth: '30px',
                                 width: '30px',
-                                height: '4px',
-                                borderRadius: '2px',
-                                backgroundColor: '#D0D0D0',
-                                opacity: 1,
-                                mx: 0.5,
-                              },
-                              '& .swiper-pagination-bullet-active': {
-                                backgroundColor: '#FDB813',
-                              },
-                            }}
-                          ></Box>
+                                height: '30px',
+                                p: 0,
+                                borderRadius: '50%',
+                                backgroundColor: '#FFFFFF',
+                                boxShadow: '0px 1px 2px 0px #0000004D',
+                                color: 'gray',
+                                '&:hover': {
+                                  backgroundColor: '#e0e0e0',
+                                },
+                              }}
+
+
+                            >
+                              <ChevronLeftIcon sx={{ color: '#1F1B13', fontSize: '30px' }} />
+                            </Button>
+
+                            {/* Pagination Dots */}
+                            <Box
+                              className={`pagination-${program?.ordering}`}
+                              sx={{
+                                display: 'flex',
+                                '& .swiper-pagination-bullet': {
+                                  width: '30px',
+                                  height: '4px',
+                                  borderRadius: '2px',
+                                  backgroundColor: '#D0D0D0',
+                                  opacity: 1,
+                                  mx: 0.5,
+                                },
+                                '& .swiper-pagination-bullet-active': {
+                                  backgroundColor: '#FDB813',
+                                },
+                              }}
+                            ></Box>
+
+                            {/* Right Arrow Button */}
+                            <Button
+                              className={`next-${program?.ordering}`}
+                              sx={{
+                                minWidth: '30px',
+                                width: '30px',
+                                height: '30px',
+                                p: 0,
+                                borderRadius: '50%',
+                                backgroundColor: '#FFFFFF',
+                                boxShadow: '0px 1px 2px 0px #0000004D',
+                                color: 'gray',
+                                '&:hover': {
+                                  backgroundColor: '#e0e0e0',
+                                },
+                              }}
+                            >
+                              <ChevronRightIcon sx={{ color: '#1F1B13', fontSize: '30px' }} fontSize="small" />
+                            </Button>
+                          </Box>
                         </Box>
+
+
+
                       </Box>
 
                       <CardActions sx={{ justifyContent: 'center', p: 2 }}>
@@ -526,8 +525,7 @@ export default function Index() {
             </Grid>
           </Box>
         </Container>
-
-      </Box>
+      </Box >
     </Layout >
 
   );

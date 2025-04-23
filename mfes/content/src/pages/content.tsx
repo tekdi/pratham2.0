@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import { Box, Button } from '@mui/material';
-import { CommonSearch, getData } from '@shared-lib';
+import { CommonSearch, ContentItem, getData } from '@shared-lib';
 import { useRouter } from 'next/navigation';
 import BackToTop from '../components/BackToTop';
 import RenderTabContent from '../components/ContentTabs';
@@ -16,11 +16,11 @@ import { trackingData } from '../services/TrackingService';
 import LayoutPage from '../components/LayoutPage';
 
 export interface ContentProps {
-  _grid?: object;
+  _config?: object;
   filters?: object;
   contentTabs?: string[];
   cardName?: string;
-  handleCardClick?: (content: ContentSearchResponse) => void | undefined;
+  handleCardClick?: (content: ContentItem) => void | undefined;
   showFilter?: boolean;
   showSearch?: boolean;
   showBackToTop?: boolean;
@@ -55,7 +55,6 @@ export default function Content(props: Readonly<ContentProps>) {
         ...(props ?? newData),
       };
       setPropData(newPorp);
-      console.log(props, 'propData');
       setTabValue(0);
       setIsPageLoading(false);
     };
@@ -82,8 +81,7 @@ export default function Content(props: Readonly<ContentProps>) {
     if (!resultData.length) return; // Ensure contentData is available
     try {
       const courseList = resultData.map((item: any) => item.identifier); // Extract all identifiers
-      const userId =
-        localStorage.getItem('subId') ?? localStorage.getItem('userId');
+      const userId = localStorage.getItem('userId');
       const userIdArray = userId?.split(',');
       if (!userId || !courseList.length) return; // Ensure required values exist
       //@ts-ignore
@@ -135,7 +133,7 @@ export default function Content(props: Readonly<ContentProps>) {
     setTabValue(newValue);
   };
 
-  const handleCardClickLocal = async (content: ContentSearchResponse) => {
+  const handleCardClickLocal = async (content: ContentItem) => {
     try {
       if (
         [
@@ -164,21 +162,7 @@ export default function Content(props: Readonly<ContentProps>) {
   };
 
   useEffect(() => {
-    const handleScroll = () => {
-      setShowBackToTop(window.scrollY > 300);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => {
     const init = () => {
-      const cookies = document.cookie.split('; ');
-      const subid = cookies
-        .find((row) => row.startsWith('subid='))
-        ?.split('=')[1];
-
-      localStorage.setItem('subId', `${subid}`);
       const filteredTabs = [
         {
           label: 'Courses',
@@ -323,7 +307,7 @@ export default function Content(props: Readonly<ContentProps>) {
           value={tabValue}
           onChange={handleTabChange}
           contentData={contentData}
-          _grid={propData?._grid ?? {}}
+          _config={propData?._config ?? {}}
           trackData={trackData ?? []}
           type={localFilters?.type ?? ''}
           handleCardClick={handleCardClickLocal}

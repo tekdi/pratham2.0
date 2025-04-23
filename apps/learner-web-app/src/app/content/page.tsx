@@ -4,17 +4,12 @@ import Layout from '../../components/Layout';
 import LearnerCourse from './LearnerCourse';
 import dynamic from 'next/dynamic';
 import { Box, Button, Grid, Typography } from '@mui/material';
+import { gredientStyle } from '@learner/utils/style';
 import LTwoCourse from './LTwoCourse';
 
 const Content = dynamic(() => import('@Content'), {
   ssr: false,
 });
-const gredientStyle = {
-  backgroundImage: 'linear-gradient(#FFFDF7, #F8EFDA)',
-  backgroundRepeat: 'no-repeat',
-  backgroundAttachment: 'fixed',
-  backgroundSize: 'cover',
-};
 
 const MyComponent: React.FC = () => {
   return (
@@ -45,7 +40,7 @@ const MyComponent: React.FC = () => {
               You have 4 Ongoing Courses
             </Typography>
             <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <Button variant="contained" color="primary" href="/courses">
+              <Button variant="contained" color="primary" href="/in-progress">
                 View All
               </Button>
             </Box>
@@ -58,8 +53,20 @@ const MyComponent: React.FC = () => {
             showFilter={false}
             showSearch={false}
             showHelpDesk={false}
-            filters={{ limit: 4 }}
+            filters={{
+              limit: 4,
+              filters: {
+                identifier: [
+                  'do_2142616245440921601283',
+                  'do_2142600316330557441211',
+                ],
+              },
+            }}
             hasMoreData={false}
+            _config={{
+              default_img: '/images/image_ver.png',
+              _card: { isHideProgress: true },
+            }}
           />
         </Grid>
       </Grid>

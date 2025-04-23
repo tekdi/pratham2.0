@@ -43,7 +43,15 @@ const App = () => {
             showSearch={false}
             showHelpDesk={false}
             filters={{ limit: 4 }}
-            _grid={{ xs: 6, sm: 6, md: 6, lg: 6 }}
+            _config={{
+              _grid: {
+                xs: 6,
+                sm: 6,
+                md: 6,
+                lg: 6,
+              },
+              default_img: '/images/image_ver.png',
+            }}
             hasMoreData={false}
           />
         </Grid>
