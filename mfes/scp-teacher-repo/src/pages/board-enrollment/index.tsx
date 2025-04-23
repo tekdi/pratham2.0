@@ -60,11 +60,10 @@ interface FormResponse {
 interface CustomField {
   fieldId: string;
   label: string;
-  value: string | object | any;
+  value: string | object;
   type?: string;
   sourceDetails?: object | null;
   order?: string | null | undefined;
-  selectedValues?: any;
 }
 
 interface FormattedMember {
@@ -201,11 +200,7 @@ const BoardEnrollment = () => {
             // Count fields with non-empty values
             const completedStep = item.customField.reduce(
               (count: number, field: any) => {
-                if (
-                  field.value &&
-                  field.value !== '' &&
-                  !(Array.isArray(field.value) && field.value.length === 0)
-                ) {
+                if (field.value && field.value !== '') {
                   return count + 1;
                 }
                 return count;
@@ -284,7 +279,7 @@ const BoardEnrollment = () => {
       formData
         .filter(
           (formField) =>
-            formField.label === 'BOARD' || formField.label === 'SUBJECT'
+            formField.label === 'BOARD' || formField.label === 'SUBJECTS'
         )
         .map((formField) => formField.fieldId)
     );
@@ -292,25 +287,6 @@ const BoardEnrollment = () => {
     const formDataFieldMap = new Map<string, Field>(
       formData.map((field) => [field.fieldId, field])
     );
-
-    const parseJSON = (val: string) => {
-      try {
-        return JSON.parse(val);
-      } catch (err) {
-        console.warn(`Error parsing JSON:`, err);
-        return val;
-      }
-    };
-
-    const getFieldValue = (
-      label: string,
-      selectedValues: string[] = []
-    ): any => {
-      if (label === 'SUBJECT') {
-        return selectedValues.map(parseJSON);
-      }
-      return selectedValues[0] ? parseJSON(selectedValues[0]) : '';
-    };
 
     // Update each member's customField array
     formattedMember.forEach((member) => {
@@ -327,10 +303,7 @@ const BoardEnrollment = () => {
           const field: CustomField = {
             fieldId: formField.fieldId,
             label: formField.label,
-            value: getFieldValue(
-              formField.label,
-              existingField?.selectedValues
-            ),
+            value: existingField?.value || '',
             type: existingField?.type || 'text', // Default type to 'text'
             sourceDetails: formField.sourceDetails || null,
             order: formField.order || null,
@@ -339,8 +312,7 @@ const BoardEnrollment = () => {
           // Parse JSON if the fieldId is in parseFields
           if (parseFields.has(field.fieldId)) {
             try {
-              const parsed = JSON.parse(field.value as string);
-              field.value = parsed;
+              field.value = JSON.parse(field.value as string);
             } catch (error) {
               console.warn(
                 `Unable to parse value for fieldId ${field.fieldId}:`,
@@ -621,9 +593,10 @@ const BoardEnrollment = () => {
                       if (item?.memberStatus === Status.DROPOUT) {
                         handleOpen(item?.statusReason);
                       } else {
-                        router.push(
-                          `/board-enrollment/student-detail/${item?.userId}`
-                        );
+                        // TODO: Uncomment once issue fixed
+                        // router.push(
+                        //   `/board-enrollment/student-detail/${item?.userId}`
+                        // );
                       }
                     }}
                   >
@@ -648,7 +621,9 @@ const BoardEnrollment = () => {
                       >
                         {item?.name}
                       </Box>
-                      <EastIcon
+
+                      {/* TODO: Uncomment once issue fixed */}
+                      {/* <EastIcon
                         sx={{
                           color:
                             item.memberStatus === Status.DROPOUT
@@ -656,7 +631,7 @@ const BoardEnrollment = () => {
                               : theme.palette.warning['300'],
                           transform: isRTL ? ' rotate(180deg)' : 'unset',
                         }}
-                      />
+                      /> */}
                     </Box>
                     {/* <Box
                   sx={{
