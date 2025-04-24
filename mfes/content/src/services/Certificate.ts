@@ -49,7 +49,7 @@ export const getUserCertificates = async ({
   offset = 0,
 }: {
   userId: string;
-  courseId: any[];
+  courseId?: any[];
   limit?: number;
   offset?: number;
 }): Promise<any> => {
