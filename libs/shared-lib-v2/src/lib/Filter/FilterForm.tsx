@@ -269,6 +269,7 @@ export default function FilterList({
     setIsDrawerOpen(false);
     const formattedPayload = formatPayload(formData);
     onApply(formattedPayload);
+    console.log(formData, 'formattedPayload');
   };
   const [showMore, setShowMore] = useState(false);
   const [showMoreStatic, setShowMoreStatic] = useState(false);
@@ -479,7 +480,7 @@ const formatPayload = (payload: any) => {
   const formattedPayload: any = {};
   Object.keys(payload).forEach((key) => {
     if (Array.isArray(payload[key])) {
-      formattedPayload[key] = payload[key].map((item: any) => item.code);
+      formattedPayload[key] = payload[key].map((item: any) => item.name);
     } else {
       formattedPayload[key] = payload[key];
     }
