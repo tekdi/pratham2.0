@@ -13,6 +13,9 @@ import { showToastMessage } from '@learner/components/ToastComponent/Toastify';
 import axios from 'axios';
 import MobileVerificationSuccess from '@learner/components/MobileVerificationSuccess/MobileVerificationSuccess';
 import CreateAccountForm from '@learner/components/CreateAccountForm/CreateAccountForm';
+import DynamicForm from '@learner/components/DynamicForm/components/DynamicForm';
+import { fetchForm } from '@learner/components/DynamicForm/components/DynamicFormCallback';
+import { FormContext } from '@learner/components/DynamicForm/components/DynamicFormConstant';
 
 type UserAccount = {
   name: string;
@@ -34,6 +37,36 @@ const registrationPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [addSchema, setAddSchema] = useState(null);
+  const [addUiSchema, setAddUiSchema] = useState(null);
+
+  // const [schema, setSchema] = useState(facilitatorSearchSchema);
+  // const [uiSchema, setUiSchema] = useState(facilitatorSearchUISchema);
+  useEffect(() => {
+    // Fetch form schema from API and set it in state.
+    const fetchData = async () => {
+      const responseForm: any = await fetchForm([
+        {
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.learner.context}&contextType=${FormContext.learner.contextType}`,
+          header: {},
+        },
+        // {
+        //   fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.learner.context}&contextType=${FormContext.learner.contextType}`,
+        //   header: {
+        //     tenantid: localStorage.getItem('tenantId'),
+        //   },
+        // },
+      ]);
+
+      //unit name is missing from required so handled from frotnend
+      let alterSchema = responseForm?.schema;
+      let alterUISchema = responseForm?.uiSchema;
+
+      setAddSchema(alterSchema);
+      setAddUiSchema(alterUISchema);
+    };
+    fetchData();
+  }, []);
   useEffect(() => {
     let timer: any;
     if (verificationSuccessModal) {
@@ -185,6 +218,9 @@ const registrationPage = () => {
   //       setUsernames(usernameList);
   //     }
   //   };
+  const FormSubmitFunction = async (formData: any, payload: any) => {
+    console.log(formData);
+  };
   return (
     <Box
       height="100vh"
@@ -213,8 +249,9 @@ const registrationPage = () => {
           // height="100vh"
           //   m="80px"
           ml="25%"
-          mt="500px"
+          mt="10px"
           width="50vw"
+          height="100vh"
           display="flex"
           flexDirection="column"
           // overflow="hidden"
@@ -222,6 +259,17 @@ const registrationPage = () => {
             background: 'linear-gradient(to bottom, #fff7e6, #fef9ef)',
           }}
         >
+          {addSchema && addUiSchema && (
+            <DynamicForm
+              schema={addSchema}
+              uiSchema={addUiSchema}
+              // t={t}
+              FormSubmitFunction={FormSubmitFunction}
+              prefilledFormData={{}}
+              hideSubmit={false}
+              // extraFields={isEdit || isReassign ? extraFieldsUpdate : extraFields}
+            />
+          )}
           <Button
             // variant="contained"
             //fullWidth
