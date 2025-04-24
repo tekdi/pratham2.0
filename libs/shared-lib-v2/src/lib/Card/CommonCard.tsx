@@ -7,7 +7,7 @@ import CardActions from '@mui/material/CardActions';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import { red } from '@mui/material/colors';
-import { Box, useTheme } from '@mui/material';
+import { Box, LinearProgress, useTheme } from '@mui/material';
 import { CircularProgressWithLabel } from '../Progress/CircularProgressWithLabel';
 export interface ContentItem {
   name: string;
@@ -45,6 +45,7 @@ interface CommonCardProps {
 interface StatuPorps {
   trackProgress?: number;
   status?: string;
+  type?: string;
 }
 export const getLeafNodes = (node: any) => {
   const result = [];
@@ -83,7 +84,6 @@ export const CommonCard: React.FC<CommonCardProps> = ({
   _card,
 }) => {
   const [statusBar, setStatusBar] = React.useState<StatuPorps>();
-
   React.useEffect(() => {
     const init = () => {
       try {
@@ -91,6 +91,7 @@ export const CommonCard: React.FC<CommonCardProps> = ({
         if (TrackData) {
           const result = TrackData?.find((e) => e.courseId === item.identifier);
           const newObj = {
+            type,
             status:
               result?.completed === 1
                 ? 'Completed'
@@ -153,10 +154,10 @@ export const CommonCard: React.FC<CommonCardProps> = ({
             alt={imageAlt || 'Image'}
             sx={{
               width: '100%',
-              height: orientation === 'horizontal' ? '158px' : 'auto',
+              height: orientation === 'horizontal' ? '140px' : 'auto',
               objectFit: 'cover', //set contain
               '@media (max-width: 600px)': {
-                height: '200px',
+                height: '140px',
               },
             }}
           />
@@ -222,13 +223,17 @@ export const CommonCard: React.FC<CommonCardProps> = ({
   );
 };
 
-export const StatusBar: React.FC<StatuPorps> = ({ trackProgress, status }) => {
+export const StatusBar: React.FC<StatuPorps> = ({
+  trackProgress,
+  status,
+  type,
+}) => {
   const theme = useTheme();
   return (
     <Box
       sx={{
         position: 'absolute',
-        top: 0,
+        ...(type === 'Course' ? { top: 0 } : { bottom: 0 }),
         width: '100%',
         display: 'flex',
         alignItems: 'center',
@@ -237,6 +242,7 @@ export const StatusBar: React.FC<StatuPorps> = ({ trackProgress, status }) => {
     >
       <Box
         sx={{
+          width: '100%',
           p: '6px 6px',
           fontSize: '14px',
           lineHeight: '20px',
@@ -251,32 +257,45 @@ export const StatusBar: React.FC<StatuPorps> = ({ trackProgress, status }) => {
           gap: '8px',
         }}
       >
-        <CircularProgressWithLabel
-          value={trackProgress !== undefined ? trackProgress : 100}
-          _text={{
-            sx: {
-              color: [
-                'completed',
-                'In Progress',
-                'Enrolled, not started',
-              ].includes(status ?? '')
+        {type === 'Course' ? (
+          <CircularProgressWithLabel
+            value={trackProgress !== undefined ? trackProgress : 100}
+            _text={{
+              sx: {
+                color: [
+                  'completed',
+                  'In Progress',
+                  'Enrolled, not started',
+                ].includes(status ?? '')
+                  ? theme.palette.success.main
+                  : 'white',
+                fontSize: '10px',
+                ...(trackProgress === undefined ? { display: 'none' } : {}),
+              },
+            }}
+            color={
+              ['completed', 'In Progress', 'Enrolled, not started'].includes(
+                status ?? ''
+              )
                 ? theme.palette.success.main
-                : 'white',
-              fontSize: '10px',
-              ...(trackProgress === undefined ? { display: 'none' } : {}),
-            },
-          }}
-          color={
-            ['completed', 'In Progress', 'Enrolled, not started'].includes(
-              status ?? ''
-            )
-              ? theme.palette.success.main
-              : 'white'
-          }
-          size={trackProgress !== undefined ? 35 : 16}
-          thickness={trackProgress !== undefined ? 2 : 4}
-        />
-        {status}
+                : 'white'
+            }
+            size={trackProgress !== undefined ? 35 : 16}
+            thickness={trackProgress !== undefined ? 2 : 4}
+          />
+        ) : (
+          <LinearProgress
+            sx={{
+              width: '100%',
+            }}
+            variant="determinate"
+            color="error"
+            value={
+              status === 'completed' ? 100 : status === 'In Progress' ? 50 : 0
+            }
+          />
+        )}
+        <Typography width={'100%'}>{status}</Typography>
       </Box>
     </Box>
   );

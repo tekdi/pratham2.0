@@ -4,11 +4,15 @@ import { handleExitEvent } from '../utils/Helper';
 
 interface PlayerConfigProps {
   playerConfig: any;
+  relatedData?: any;
 }
 
 const basePath = process.env.NEXT_PUBLIC_ASSETS_CONTENT || '/sbplayer';
 
-const SunbirdPdfPlayer = ({ playerConfig }: PlayerConfigProps) => {
+const SunbirdPdfPlayer = ({
+  playerConfig,
+  relatedData: { courseId, unitId },
+}: PlayerConfigProps) => {
   const sunbirdPdfPlayerRef = useRef<HTMLIFrameElement | null>(null);
 
   useEffect(() => {
@@ -39,7 +43,7 @@ const SunbirdPdfPlayer = ({ playerConfig }: PlayerConfigProps) => {
             pdfElement.addEventListener('telemetryEvent', (event: any) => {
               console.log('On telemetryEvent', event);
               try {
-                getTelemetryEvents(event.detail, 'pdf');
+                getTelemetryEvents(event.detail, 'pdf', { courseId, unitId });
               } catch (error) {
                 console.error('Error submitting assessment:', error);
               }

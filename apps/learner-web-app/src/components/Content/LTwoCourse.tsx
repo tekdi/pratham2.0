@@ -7,9 +7,9 @@ import {
   Select,
   SelectChangeEvent,
 } from '@mui/material';
-import CommonModal from '../../components/Modal/CommonModal';
-import LevelUp from '../../components/LTwoContent/LevelUp';
-import ResponseRecorded from '../../components/LTwoContent/ResponseRecorded';
+import CommonModal from '../Modal/CommonModal';
+import LevelUp from '../LTwoContent/LevelUp';
+import ResponseRecorded from '../LTwoContent/ResponseRecorded';
 
 interface LTwoCourseProps {
   onSubmit?: () => void;

@@ -27,12 +27,17 @@ export const handleTelemetryEventQuml = (event: any) => {
   getTelemetryEvents(event.detail, 'quml');
 };
 
-export const getTelemetryEvents = (eventData: any, contentType: string) => {
+export const getTelemetryEvents = (
+  eventData: any,
+  contentType: string,
+  { courseId, unitId }: any = {}
+) => {
   console.log(
     'getTelemetryEvents hit',
     'Telemetry Event',
     contentType,
-    eventData
+    eventData,
+    { courseId, unitId }
   );
 
   if (!eventData || !eventData.object || !eventData.object.id) {
@@ -153,7 +158,12 @@ export const getTelemetryEvents = (eventData: any, contentType: string) => {
       }
 
       try {
-        contentWithTelemetryData({ identifier, detailsObject });
+        contentWithTelemetryData({
+          identifier,
+          detailsObject,
+          courseId,
+          unitId,
+        });
       } catch (error) {
         console.log(error);
       }
@@ -167,6 +177,8 @@ export const getTelemetryEvents = (eventData: any, contentType: string) => {
 export const contentWithTelemetryData = async ({
   identifier,
   detailsObject,
+  courseId,
+  unitId,
 }: any) => {
   try {
     let resolvedMimeType = localStorage.getItem('mimeType');
@@ -189,8 +201,8 @@ export const contentWithTelemetryData = async ({
       const reqBody: ContentCreate = {
         userId: userId,
         contentId: identifier,
-        courseId: identifier,
-        unitId: identifier,
+        courseId: courseId && unitId ? courseId : identifier,
+        unitId: courseId && unitId ? unitId : identifier,
         contentType: ContentTypeReverseMap[resolvedMimeType] || '',
         contentMime: resolvedMimeType,
         lastAccessOn: lastAccessOn,

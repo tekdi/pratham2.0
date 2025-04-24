@@ -1,3 +1,4 @@
+/*************  ✨ Windsurf Command 🌟  *************/
 // app/theme/ThemeRegistry.tsx or MuiThemeProvider.tsx
 'use client';
 
@@ -80,6 +81,9 @@ const theme = createTheme({
     success: {
       main: '#50EE42',
     },
+    error: {
+      main: '#ff0000',
+    },
   },
   components: {
     MuiCard: {
@@ -147,6 +151,15 @@ const theme = createTheme({
         },
       ],
     },
+    MuiLinearProgress: {
+      styleOverrides: {
+        root: {
+          '&.Mui-error': {
+            backgroundColor: '#ff0000',
+          },
+        },
+      },
+    },
   },
 });
 
@@ -162,3 +175,5 @@ export default function MuiThemeProvider({
     </ThemeProvider>
   );
 }
+
+/*******  b29d3c4f-16b2-49ee-b103-ac893eb1b4d5  *******/

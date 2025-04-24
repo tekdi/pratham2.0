@@ -1,9 +1,11 @@
 import { useParams } from 'next/navigation';
 import React from 'react';
 interface PlayerPageProps {
+  contentId?: string;
+  unitId?: string;
   id?: string; // Define the type for the 'id' prop
 }
-const PlayerPage: React.FC<PlayerPageProps> = ({ id }) => {
+const PlayerPage: React.FC<PlayerPageProps> = ({ unitId, contentId, id }) => {
   const params = useParams();
   const identifier = params?.identifier; // string | string[] | undefined
   if (!identifier) {
@@ -13,7 +15,7 @@ const PlayerPage: React.FC<PlayerPageProps> = ({ id }) => {
   return (
     <iframe
       src={`${process.env.NEXT_PUBLIC_LEARNER_SBPLAYER}?identifier=${
-        identifier as string
+        id ?? (identifier as string)
       }`}
       style={{
         // display: 'block',

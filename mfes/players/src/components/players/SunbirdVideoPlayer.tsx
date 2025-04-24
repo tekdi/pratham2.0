@@ -4,11 +4,15 @@ import { handleExitEvent } from '../utils/Helper';
 
 interface PlayerConfigProps {
   playerConfig: any;
+  relatedData?: any;
 }
 
 const basePath = process.env.NEXT_PUBLIC_ASSETS_CONTENT || '/sbplayer';
 
-const SunbirdVideoPlayer = ({ playerConfig }: PlayerConfigProps) => {
+const SunbirdVideoPlayer = ({
+  playerConfig,
+  relatedData: { courseId, unitId },
+}: PlayerConfigProps) => {
   const sunbirdVideoPlayerRef = useRef<HTMLIFrameElement | null>(null);
 
   useEffect(() => {
@@ -39,7 +43,10 @@ const SunbirdVideoPlayer = ({ playerConfig }: PlayerConfigProps) => {
             videoElement.addEventListener('telemetryEvent', (event: any) => {
               console.log('On telemetryEvent', event);
               try {
-                getTelemetryEvents(event.detail, 'video');
+                getTelemetryEvents(event.detail, 'video', {
+                  courseId,
+                  unitId,
+                });
               } catch (error) {
                 console.error('Error submitting assessment:', error);
               }

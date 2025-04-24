@@ -1,11 +1,11 @@
 'use client';
 import React from 'react';
-import Layout from '../../components/Layout';
-import LearnerCourse from './LearnerCourse';
+import Layout from '@learner/components/Layout';
+import LearnerCourse from '@learner/components/Content/LearnerCourse';
 import dynamic from 'next/dynamic';
 import { Box, Button, Grid, Typography } from '@mui/material';
 import { gredientStyle } from '@learner/utils/style';
-import LTwoCourse from './LTwoCourse';
+import LTwoCourse from '@learner/components/Content/LTwoCourse';
 
 const Content = dynamic(() => import('@Content'), {
   ssr: false,

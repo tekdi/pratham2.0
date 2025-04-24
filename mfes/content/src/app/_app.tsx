@@ -1,6 +1,6 @@
 import type { AppProps } from 'next/app';
 import { useEffect } from 'react';
-import MuiThemeProvider from '../app/theme/MuiThemeProvider';
+import MuiThemeProvider from '@content-mfes/assets/theme/MuiThemeProvider';
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const URL_LOGIN = process.env.NEXT_PUBLIC_LOGIN;

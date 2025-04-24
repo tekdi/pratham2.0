@@ -2,7 +2,7 @@
 
 'use client';
 import React from 'react';
-import Layout from '../../../components/Layout';
+import Layout from '@learner/components/Layout';
 import dynamic from 'next/dynamic';
 import { Box } from '@mui/material';
 import { gredientStyle } from '@learner/utils/style';

@@ -3,11 +3,15 @@ import { getTelemetryEvents } from '../../services/TelemetryService';
 
 interface PlayerProps {
   playerConfig: any;
+  relatedData?: any;
 }
 
 const basePath = process.env.NEXT_PUBLIC_ASSETS_CONTENT || '/sbplayer';
 
-const V1Player = ({ playerConfig }: PlayerProps) => {
+const V1Player = ({
+  playerConfig,
+  relatedData: { courseId, unitId },
+}: PlayerProps) => {
   const previewRef = useRef<HTMLIFrameElement | null>(null);
 
   useEffect(() => {
@@ -36,7 +40,10 @@ const V1Player = ({ playerConfig }: PlayerProps) => {
               console.log('V1 player telemetry END event ===>', event);
             }
 
-            getTelemetryEvents(event.detail.telemetryData, 'v1');
+            getTelemetryEvents(event.detail.telemetryData, 'v1', {
+              courseId,
+              unitId,
+            });
           });
         }, 100);
       };

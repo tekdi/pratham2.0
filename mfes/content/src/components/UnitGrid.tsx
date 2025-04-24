@@ -10,6 +10,7 @@ interface CommonAccordionProps {
   actions?: { label: string; onClick: () => void }[];
   trackData?: any[];
   _config: any;
+  handleItemClick?: (content: ContentItem) => void;
 }
 
 export const UnitGrid: React.FC<CommonAccordionProps> = ({
@@ -17,6 +18,7 @@ export const UnitGrid: React.FC<CommonAccordionProps> = ({
   actions = [],
   trackData,
   _config,
+  handleItemClick,
 }) => {
   const router = useRouter();
   const { default_img, _card, _grid } = _config || {};
@@ -55,15 +57,6 @@ export const UnitGrid: React.FC<CommonAccordionProps> = ({
     };
     init();
   }, [trackData, item]);
-
-  const handleItemClick = (subItem: any) => {
-    localStorage.setItem('unitId', subItem?.identifier);
-    const path =
-      subItem.mimeType === 'application/vnd.ekstep.content-collection'
-        ? `/details/${subItem?.identifier}`
-        : `/player/${subItem?.identifier}`;
-    router.push(path);
-  };
 
   return (
     <Grid container spacing={2}>

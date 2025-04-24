@@ -26,6 +26,7 @@ const InfoCard: React.FC<InfoCardProps> = ({ item, onBackClick, _config }) => {
         component="img"
         sx={{
           flex: { xs: 6, md: 4, lg: 3, xl: 3 },
+          maxHeight: '280px',
           ..._infoCard?._cardMedia,
         }}
         image={item?.appIcon || default_img}
@@ -98,7 +99,7 @@ const InfoCard: React.FC<InfoCardProps> = ({ item, onBackClick, _config }) => {
                   bgcolor: '#FFDEA1',
                 }}
               >
-                Started on:{' - '}
+                Started on: {item?.startedOn ?? ' - '}
                 {/* {JSON.stringify(_infoCard?.isShowStatus || {})} */}
               </Box>
             )}
