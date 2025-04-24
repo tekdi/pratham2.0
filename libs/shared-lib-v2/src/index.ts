@@ -15,3 +15,5 @@ export * from './lib/context/LanguageContext';
 export * from './utils/Interceptor';
 export * from './utils/RestClient';
 export * from './utils/DataClient';
+export * from './lib/Filter/FilterForm'
+

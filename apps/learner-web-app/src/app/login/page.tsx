@@ -19,7 +19,7 @@ const Login = dynamic(
 const LoginPage = () => {
   const router = useRouter();
 
-  const handleAddAccount = () => {};
+  const handleAddAccount = () => { };
   const handleForgotPassword = () => {
     localStorage.setItem('loginRoute', '/login');
     router.push('/forget-password');
@@ -61,6 +61,13 @@ const LoginPage = () => {
 
               const tenantId = userResponse?.tenantData?.[0]?.tenantId;
               localStorage.setItem('tenantId', tenantId);
+
+              const channelId = userResponse?.tenantData?.[0]?.channelId;
+              localStorage.setItem('channelId', channelId);
+
+              const collectionFramework = userResponse?.tenantData?.[0]?.collectionFramework;
+              localStorage.setItem('collectionFramework', collectionFramework);
+
               document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
               if (
                 typeof window !== 'undefined' &&
