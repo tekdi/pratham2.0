@@ -101,12 +101,11 @@ export enum FormContextType {
   TEAM_LEADER = 'LEAD',
   COHORT = 'COHORT',
   COHORT_MEMBER = 'COHORTMEMBER',
-  BATCH = 'BATCH',
 }
 export enum ObservationEntityType {
   LEARNER = 'learner',
   FACILITATOR = 'facilitator',
-  CENTER = 'center',
+  CENTER = 'batch',
 }
 export enum ObservationStatus {
   DRAFT = 'draft',
@@ -120,7 +119,6 @@ export enum CenterType {
   REGULAR = 'REGULAR',
   REMOTE = 'REMOTE',
   UNKNOWN = 'UNKNOWN',
-  BATCH = 'BATCH',
 }
 
 export enum RoleId {
