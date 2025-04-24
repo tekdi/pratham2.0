@@ -1,17 +1,40 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Layout from '../../components/Layout';
 import LearnerCourse from './LearnerCourse';
 import dynamic from 'next/dynamic';
 import { Box, Button, Grid, Typography } from '@mui/material';
 import { gredientStyle } from '@learner/utils/style';
 import LTwoCourse from './LTwoCourse';
+import { getTenantInfo } from '@learner/utils/API/ProgramService';
+import ContentComponent from '@learner/components/Content/Content';
 
 const Content = dynamic(() => import('@Content'), {
   ssr: false,
 });
 
 const MyComponent: React.FC = () => {
+  const [filter, setFilter] = useState({});
+
+  useEffect(() => {
+    const fetchTenantInfo = async () => {
+      try {
+        const res = await getTenantInfo();
+        console.log('Tenant Info:', res);
+        const youthnetContentFilter = res?.result.find(
+          (program: any) => program.name === 'YouthNet'
+        )?.contentFilter;
+
+        console.log(youthnetContentFilter);
+        setFilter(youthnetContentFilter);
+        localStorage.setItem('filter', JSON.stringify(youthnetContentFilter));
+      } catch (error) {
+        console.error('Failed to fetch tenant info:', error);
+      }
+    };
+
+    fetchTenantInfo();
+  }, []);
   return (
     <Layout>
       <Grid container style={gredientStyle}>
@@ -47,27 +70,7 @@ const MyComponent: React.FC = () => {
           </Box>
         </Grid>
         <Grid item xs={12} md={9}>
-          <Content
-            isShowLayout={false}
-            contentTabs={['Course']}
-            showFilter={false}
-            showSearch={false}
-            showHelpDesk={false}
-            filters={{
-              limit: 4,
-              filters: {
-                identifier: [
-                  'do_2142616245440921601283',
-                  'do_2142600316330557441211',
-                ],
-              },
-            }}
-            hasMoreData={false}
-            _config={{
-              default_img: '/images/image_ver.png',
-              _card: { isHideProgress: true },
-            }}
-          />
+          <ContentComponent limit={4} />
         </Grid>
       </Grid>
       <Grid container sx={{ p: 4 }}>
@@ -87,7 +90,7 @@ const MyComponent: React.FC = () => {
 
       <Grid container style={gredientStyle}>
         <Grid item xs={12}>
-          <LearnerCourse />
+          <LearnerCourse _content={{ filter: filter }} />
         </Grid>
       </Grid>
     </Layout>
