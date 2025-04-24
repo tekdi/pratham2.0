@@ -363,11 +363,28 @@ export const filterSchema = (schemaObj: any) => {
     }
   });
 
-  const newSchema = JSON.parse(JSON.stringify(schemaObj)); // Deep copy
+  // Deep copy the schema object
+  const newSchema = JSON.parse(JSON.stringify(schemaObj));
+
   locationFields.forEach((field) => {
+    // Remove from schema properties
     delete newSchema.schema.properties[field];
+    // Remove from uiSchema
     delete newSchema.uiSchema[field];
+
+    // Remove from required array if exists
+    const requiredIndex = newSchema.schema.required?.indexOf(field);
+    if (requiredIndex > -1) {
+      newSchema.schema.required.splice(requiredIndex, 1);
+    }
+
+    // Remove from ui:order array if exists
+    const orderIndex = newSchema.uiSchema['ui:order']?.indexOf(field);
+    if (orderIndex > -1) {
+      newSchema.uiSchema['ui:order'].splice(orderIndex, 1);
+    }
   });
 
+  console.log(newSchema);
   return { newSchema, extractedFields };
 };
