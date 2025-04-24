@@ -786,7 +786,7 @@ const ObservationDetails = () => {
               </Box>
 
               {/* Pagination */}
-              {(entity === ObservationEntityType.CENTER
+              {/* {(entity === ObservationEntityType.CENTER
                 ? totalCountForCenter
                 : totalCount) > 6 && (
                 <Box
@@ -811,7 +811,7 @@ const ObservationDetails = () => {
                     boundaryCount={1}
                   />
                 </Box>
-              )}
+              )} */}
             </Box>
           </Grid>
         </Grid>
