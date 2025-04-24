@@ -14,6 +14,7 @@ import { ContentSearch, ContentSearchResponse } from '../services/Search';
 import FilterDialog from '../components/FilterDialog';
 import { trackingData } from '../services/TrackingService';
 import LayoutPage from '../components/LayoutPage';
+import { getUserCertificates } from '../services/Certificate';
 
 export interface ContentProps {
   _config?: object;
@@ -83,17 +84,36 @@ export default function Content(props: Readonly<ContentProps>) {
       const courseList = resultData.map((item: any) => item.identifier); // Extract all identifiers
       const userId = localStorage.getItem('userId');
       const userIdArray = userId?.split(',');
-      if (!userId || !courseList.length) return; // Ensure required values exist
+      if (!userId || !courseList.length) return []; // Ensure required values exist
       //@ts-ignore
       const course_track_data = await trackingData(userIdArray, courseList);
+      const {
+        result: { data: dataCertificates },
+      } = await getUserCertificates({
+        userId: localStorage.getItem('userId') || '',
+        courseId: courseList ?? [],
+        limit: localFilters.limit,
+        offset: localFilters.offset,
+      });
       if (course_track_data?.data) {
         //@ts-ignore
-
-        return (
+        const userTrackData =
           course_track_data.data.find((course: any) => course.userId === userId)
-            ?.course ?? []
+            ?.course ?? [];
+        const newData: any = [];
+        userTrackData.forEach((item: any) =>
+          newData.push({
+            ...item,
+            enrolled: Boolean(
+              dataCertificates.find(
+                (cert: any) => cert.courseId === item.courseId
+              )?.status === 'enrolled'
+            ),
+          })
         );
+        return newData;
       }
+      return [];
     } catch (error) {
       console.error('Error fetching track data:', error);
     }
@@ -200,6 +220,7 @@ export default function Content(props: Readonly<ContentProps>) {
             .filter((e): e is ContentSearchResponse[] => Array.isArray(e))
             .flat();
           const userTrackData = await fetchDataTrack(newContentData ?? []);
+          console.log(userTrackData, 'sagar userTrackData');
           if (localFilters.offset === 0) {
             setContentData((newContentData as ContentSearchResponse[]) ?? []);
             setTrackData(userTrackData);
