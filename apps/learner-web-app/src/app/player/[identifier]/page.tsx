@@ -4,7 +4,7 @@
 import React from 'react';
 import Layout from '../../../components/Layout';
 import dynamic from 'next/dynamic';
-import { Grid } from '@mui/material';
+import { Box, Grid } from '@mui/material';
 import { useParams } from 'next/navigation';
 
 const Content = dynamic(() => import('@Content'), {
@@ -19,8 +19,12 @@ const App = () => {
 
   return (
     <Layout>
-      <Grid container spacing={4} sx={{ p: { xs: 1, md: 4 } }}>
-        <Grid item xs={12} md={8}>
+      <Box sx={{ display: 'flex', gap: 4, p: { xs: 1, md: 4 } }}>
+        <Box
+          sx={{
+            flex: { xs: 12, md: 8 },
+          }}
+        >
           <iframe
             src={`${process.env.NEXT_PUBLIC_LEARNER_SBPLAYER}?identifier=${
               identifier as string
@@ -34,8 +38,14 @@ const App = () => {
             height="100%"
             title="Embedded Localhost"
           />
-        </Grid>
-        <Grid item xs={12} md={4}>
+        </Box>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            flex: { xs: 12, md: 4 },
+          }}
+        >
           <Content
             isShowLayout={false}
             contentTabs={['content']}
@@ -54,8 +64,8 @@ const App = () => {
             }}
             hasMoreData={false}
           />
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
     </Layout>
   );
 };

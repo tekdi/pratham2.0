@@ -44,10 +44,12 @@ export const createUserCertificateStatus = async ({
 
 export const getUserCertificates = async ({
   userId,
+  courseId,
   limit = 2,
   offset = 0,
 }: {
   userId: string;
+  courseId?: any[];
   limit?: number;
   offset?: number;
 }): Promise<any> => {
@@ -61,6 +63,7 @@ export const getUserCertificates = async ({
     const data = {
       filters: {
         userId: [userId],
+        courseId,
       },
       limit,
       offset,

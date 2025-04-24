@@ -3,7 +3,7 @@ name: Deploy to DEV Learner
 on:
   push:
     branches:
-      - release-1.4.0
+      - main-learner
 
 jobs:
   deploy:
@@ -21,7 +21,7 @@ jobs:
       # Step 4: Build and tag the Docker image
       - name: Build Docker image
         run: |
-          docker build -f Dockerfile.learner-web-app -t ${{ secrets.ECR_REPO_NAME_PLP_DEV }}:${{ secrets.IMAGE_TAG_PLP_DEV }} .
+          docker build -f Dockerfile.learner-web-app -t ${{ secrets.ECR_REPO_NAME_PLP }}:${{ secrets.IMAGE_TAG_PLP_DEV }} .
 
       # Step 5: Push the Docker image to Amazon ECR
       - name: Push Docker image to ECR
@@ -33,12 +33,12 @@ jobs:
           aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
           aws configure set default.region ${{ secrets.AWS_REGION }}
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT }}.dkr.ecr.ap-south-1.amazonaws.com
-          docker push ${{ secrets.ECR_REPO_NAME_PLP_DEV }}:${{ secrets.IMAGE_TAG_PLP_DEV }}
+          docker push ${{ secrets.ECR_REPO_NAME_PLP }}:${{ secrets.IMAGE_TAG_PLP_DEV }}
 
       # Step 6: Remove Docker image from GitHub Actions runner
       - name: Remove Docker image from runner
         run: |
-          docker rmi ${{ secrets.ECR_REPO_NAME_PLP_DEV }}:${{ secrets.IMAGE_TAG_PLP_DEV }}
+          docker rmi ${{ secrets.ECR_REPO_NAME_PLP }}:${{ secrets.IMAGE_TAG_PLP_DEV }}
 
       # Step 7: SSH to the EC2 server and deploy
       - name: Deploy to EC2
@@ -50,10 +50,10 @@ jobs:
           script: |
             cd ${{ secrets.TARGET_DEV_PLP }}
             if [ -f .env ]; then
-               rm .env
-               fi
-               echo '${{ secrets.DEV_PLP_ENV }}"' > .env
-               ls -ltra
+            rm .env
+            fi
+            echo "${{ secrets.DEV_PLP_ENV }}" > .env
+            ls -ltra
             docker stop dev-plp-learner || true
             docker system prune -af || true
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT }}.dkr.ecr.ap-south-1.amazonaws.com

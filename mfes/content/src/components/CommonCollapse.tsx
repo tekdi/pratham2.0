@@ -108,7 +108,6 @@ const GetIconByMimeType = React.memo(function GetIconByMimeTypeComponent({
   isShowText?: boolean;
   _box?: any;
 }): React.ReactNode {
-  console.log(mimeType);
   const icons = {
     'application/pdf': {
       icon: <PictureAsPdfIcon sx={{ color: 'red' }} />,

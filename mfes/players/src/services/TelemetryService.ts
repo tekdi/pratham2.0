@@ -153,49 +153,7 @@ export const getTelemetryEvents = (eventData: any, contentType: string) => {
       }
 
       try {
-        const contentWithTelemetryData = async () => {
-          try {
-            let resolvedMimeType = localStorage.getItem('mimeType');
-
-            if (!resolvedMimeType) {
-              const response = await fetchBulkContents([identifier]);
-              resolvedMimeType = response[0]?.mimeType || '';
-              if (!resolvedMimeType) {
-                console.error('Failed to fetch mimeType.');
-                return;
-              }
-            }
-            let userId = '';
-            if (typeof window !== 'undefined' && window.localStorage) {
-              userId = localStorage.getItem('userId') ?? '';
-            }
-            if (userId !== undefined || userId !== '') {
-              const ContentTypeReverseMap = Object.fromEntries(
-                Object.entries(ContentType).map(([key, value]) => [value, key])
-              );
-
-              const reqBody: ContentCreate = {
-                userId: userId,
-                contentId: identifier,
-                courseId: identifier,
-                unitId: identifier,
-                contentType: ContentTypeReverseMap[resolvedMimeType] || '',
-                contentMime: resolvedMimeType,
-                lastAccessOn: lastAccessOn,
-                detailsObject: detailsObject,
-              };
-              // if (detailsObject.length > 0) {
-              const response = await createContentTracking(reqBody);
-              if (response) {
-                console.log(response);
-              }
-            }
-          } catch (error) {
-            console.error('Error in contentWithTelemetryData:', error);
-          }
-          // }
-        };
-        contentWithTelemetryData();
+        contentWithTelemetryData({ identifier, detailsObject });
       } catch (error) {
         console.log(error);
       }
@@ -204,4 +162,48 @@ export const getTelemetryEvents = (eventData: any, contentType: string) => {
       console.error('Error logging telemetry END event:', error);
     }
   }
+};
+
+export const contentWithTelemetryData = async ({
+  identifier,
+  detailsObject,
+}: any) => {
+  try {
+    let resolvedMimeType = localStorage.getItem('mimeType');
+    if (!resolvedMimeType) {
+      const response = await fetchBulkContents([identifier]);
+      resolvedMimeType = response[0]?.mimeType || '';
+      if (!resolvedMimeType) {
+        console.error('Failed to fetch mimeType.');
+        return;
+      }
+    }
+    let userId = '';
+    if (typeof window !== 'undefined' && window.localStorage) {
+      userId = localStorage.getItem('userId') ?? '';
+    }
+    if (userId !== undefined || userId !== '') {
+      const ContentTypeReverseMap = Object.fromEntries(
+        Object.entries(ContentType).map(([key, value]) => [value, key])
+      );
+      const reqBody: ContentCreate = {
+        userId: userId,
+        contentId: identifier,
+        courseId: identifier,
+        unitId: identifier,
+        contentType: ContentTypeReverseMap[resolvedMimeType] || '',
+        contentMime: resolvedMimeType,
+        lastAccessOn: lastAccessOn,
+        detailsObject: detailsObject,
+      };
+      // if (detailsObject.length > 0) {
+      const response = await createContentTracking(reqBody);
+      if (response) {
+        console.log(response);
+      }
+    }
+  } catch (error) {
+    console.error('Error in contentWithTelemetryData:', error);
+  }
+  // }
 };

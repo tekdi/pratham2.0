@@ -8,6 +8,8 @@ import Header from '@learner/components/Header/Header';
 import { getUserId, login } from '@learner/utils/API/LoginService';
 import { showToastMessage } from '@learner/components/ToastComponent/Toastify';
 import { useRouter } from 'next/navigation';
+import { useMediaQuery, useTheme } from '@mui/material';
+import { CourseCompletionBanner } from 'libs/shared-lib-v2/src/lib/CourseCompletionBanner/CourseCompletionBanner';
 
 const Login = dynamic(
   () => import('@login/Components/LoginComponent/LoginComponent'),
@@ -18,8 +20,9 @@ const Login = dynamic(
 
 const LoginPage = () => {
   const router = useRouter();
-
-  const handleAddAccount = () => { };
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const handleAddAccount = () => {};
   const handleForgotPassword = () => {
     localStorage.setItem('loginRoute', '/login');
     router.push('/forget-password');
@@ -65,7 +68,8 @@ const LoginPage = () => {
               const channelId = userResponse?.tenantData?.[0]?.channelId;
               localStorage.setItem('channelId', channelId);
 
-              const collectionFramework = userResponse?.tenantData?.[0]?.collectionFramework;
+              const collectionFramework =
+                userResponse?.tenantData?.[0]?.collectionFramework;
               localStorage.setItem('collectionFramework', collectionFramework);
 
               document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
@@ -109,14 +113,16 @@ const LoginPage = () => {
       {/* Main Content: Split screen */}
       <Box flex={1} display="flex" overflow="hidden">
         {/* Left: Welcome Screen */}
-        <Box
-          flex={1}
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-        >
-          <WelcomeScreen />
-        </Box>
+        {!isMobile && (
+          <Box
+            flex={1}
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <WelcomeScreen />
+          </Box>
+        )}
 
         {/* Right: Login Component */}
         <Box

@@ -94,11 +94,11 @@ export const CommonCard: React.FC<CommonCardProps> = ({
             status:
               result?.completed === 1
                 ? 'Completed'
-                : result?.started_on === null
-                ? 'Not Started'
                 : result?.in_progress === 1
                 ? 'In Progress'
-                : 'Enrolled',
+                : result?.enrolled === true
+                ? 'Enrolled, not started'
+                : 'Not Started',
           };
           if (type === 'Course') {
             if (!_card?.isHideProgress) {
@@ -241,7 +241,9 @@ export const StatusBar: React.FC<StatuPorps> = ({ trackProgress, status }) => {
           fontSize: '14px',
           lineHeight: '20px',
           fontWeight: '500',
-          color: ['completed', 'In Progress'].includes(status ?? '')
+          color: ['completed', 'In Progress', 'Enrolled, not started'].includes(
+            status ?? ''
+          )
             ? '#50EE42'
             : 'white',
           display: 'flex',
@@ -253,7 +255,11 @@ export const StatusBar: React.FC<StatuPorps> = ({ trackProgress, status }) => {
           value={trackProgress !== undefined ? trackProgress : 100}
           _text={{
             sx: {
-              color: ['completed', 'In Progress'].includes(status ?? '')
+              color: [
+                'completed',
+                'In Progress',
+                'Enrolled, not started',
+              ].includes(status ?? '')
                 ? theme.palette.success.main
                 : 'white',
               fontSize: '10px',
@@ -261,7 +267,9 @@ export const StatusBar: React.FC<StatuPorps> = ({ trackProgress, status }) => {
             },
           }}
           color={
-            ['completed', 'In Progress'].includes(status ?? '')
+            ['completed', 'In Progress', 'Enrolled, not started'].includes(
+              status ?? ''
+            )
               ? theme.palette.success.main
               : 'white'
           }
