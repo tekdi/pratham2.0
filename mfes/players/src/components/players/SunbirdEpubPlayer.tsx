@@ -40,17 +40,20 @@ const SunbirdEpubPlayer = ({
                 handleExitEvent();
               }
             });
-            epubElement.addEventListener('telemetryEvent', (event: any) => {
-              console.log('On telemetryEvent', event);
-              try {
-                getTelemetryEvents(event.detail, 'epub', {
-                  courseId,
-                  unitId,
-                });
-              } catch (error) {
-                console.error('Error submitting assessment:', error);
+            epubElement.addEventListener(
+              'telemetryEvent',
+              async (event: any) => {
+                console.log('On telemetryEvent', event);
+                try {
+                  await getTelemetryEvents(event.detail, 'epub', {
+                    courseId,
+                    unitId,
+                  });
+                } catch (error) {
+                  console.error('Error submitting assessment:', error);
+                }
               }
-            });
+            );
 
             const myPlayer =
               playerElement.contentDocument.getElementById('my-player');

@@ -27,7 +27,7 @@ export const handleTelemetryEventQuml = (event: any) => {
   getTelemetryEvents(event.detail, 'quml');
 };
 
-export const getTelemetryEvents = (
+export const getTelemetryEvents = async (
   eventData: any,
   contentType: string,
   { courseId, unitId }: any = {}
@@ -158,7 +158,7 @@ export const getTelemetryEvents = (
       }
 
       try {
-        contentWithTelemetryData({
+        await contentWithTelemetryData({
           identifier,
           detailsObject,
           courseId,

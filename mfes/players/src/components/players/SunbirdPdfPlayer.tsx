@@ -40,14 +40,20 @@ const SunbirdPdfPlayer = ({
                 handleExitEvent();
               }
             });
-            pdfElement.addEventListener('telemetryEvent', (event: any) => {
-              console.log('On telemetryEvent', event);
-              try {
-                getTelemetryEvents(event.detail, 'pdf', { courseId, unitId });
-              } catch (error) {
-                console.error('Error submitting assessment:', error);
+            pdfElement.addEventListener(
+              'telemetryEvent',
+              async (event: any) => {
+                console.log('On telemetryEvent', event);
+                try {
+                  await getTelemetryEvents(event.detail, 'pdf', {
+                    courseId,
+                    unitId,
+                  });
+                } catch (error) {
+                  console.error('Error submitting assessment:', error);
+                }
               }
-            });
+            );
 
             const myPlayer =
               playerElement.contentDocument.getElementById('my-player');

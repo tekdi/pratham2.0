@@ -40,17 +40,20 @@ const SunbirdVideoPlayer = ({
                 handleExitEvent();
               }
             });
-            videoElement.addEventListener('telemetryEvent', (event: any) => {
-              console.log('On telemetryEvent', event);
-              try {
-                getTelemetryEvents(event.detail, 'video', {
-                  courseId,
-                  unitId,
-                });
-              } catch (error) {
-                console.error('Error submitting assessment:', error);
+            videoElement.addEventListener(
+              'telemetryEvent',
+              async (event: any) => {
+                console.log('On telemetryEvent', event);
+                try {
+                  await getTelemetryEvents(event.detail, 'video', {
+                    courseId,
+                    unitId,
+                  });
+                } catch (error) {
+                  console.error('Error submitting assessment:', error);
+                }
               }
-            });
+            );
 
             const myPlayer =
               playerElement.contentDocument.getElementById('my-player');

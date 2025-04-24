@@ -115,10 +115,8 @@ export const ContentSearch = async ({
   filters,
   limit = 5,
   offset = 0,
-  channel,
 }: {
   type: string;
-  channel: string;
   query?: string;
   filters?: object;
   limit?: number;
@@ -145,7 +143,7 @@ export const ContentSearch = async ({
             type?.toLowerCase() === 'course'
               ? ['Course']
               : ['Learning Resource', 'Practice Question Set'],
-          channel: localStorage.getItem('tenant-code'),
+          channel: localStorage.getItem('channelId'),
         },
         fields: [
           'name',
