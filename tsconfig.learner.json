@@ -24,7 +24,10 @@
         "mfes/content/src/pages/content-details/[identifier].tsx"
       ],
       "@ContentDetails": ["mfes/content/src/pages/details/[identifier].tsx"],
-      "@ContentPlayer": ["mfes/content/src/pages/player/[identifier].tsx"]
+      "@ContentPlayer": ["mfes/content/src/pages/player/[identifier].tsx"],
+
+      //dynamic form
+      "@dynamic-form/*":["apps/learner-web-app/src/components/DynamicForm/*"]
     }
   },
   "exclude": ["node_modules", "tmp"]
