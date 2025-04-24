@@ -39,15 +39,11 @@ const CertificatesPage = () => {
   return (
     <Layout
       isLoadingChildren={isPageLoading}
-      showTopAppBar={{
+      _topAppBar={{
         title: 'Shiksha: My Certificates',
-        showMenuIcon: true,
         actionButtonLabel: 'Action',
       }}
-      showFilter={true}
-      isFooter={false}
-      showLogo={true}
-      showBack={true}
+      onlyHideElements={['footer']}
     >
       <Box sx={{ p: 2 }}>
         <Grid container spacing={2}>

@@ -7,14 +7,15 @@ import {
   AccordionSummary,
   AccordionDetails,
   Stack,
+  SvgIcon,
 } from '@mui/material';
-import { useRouter } from 'next/router'; // Use Next.js router for navigation
-import PictureAsPdfOutlinedIcon from '@mui/icons-material/PictureAsPdfOutlined';
-import PlayCircleOutlineOutlinedIcon from '@mui/icons-material/PlayCircleOutlineOutlined';
+import { useRouter } from 'next/navigation'; // Use Next.js router for navigation
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import SmartDisplayIcon from '@mui/icons-material/SmartDisplay';
+import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import TextSnippetOutlinedIcon from '@mui/icons-material/TextSnippetOutlined';
 import LensOutlinedIcon from '@mui/icons-material/LensOutlined';
-import AutoStoriesIcon from '@mui/icons-material/AutoStories';
-import SlideshowIcon from '@mui/icons-material/Slideshow';
+import HtmlIcon from '@mui/icons-material/IntegrationInstructions';
 import LensIcon from '@mui/icons-material/Lens';
 import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
 import { useTheme } from '@mui/material/styles';
@@ -23,6 +24,67 @@ import ErrorIcon from '@mui/icons-material/Error';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { CircularProgressWithLabel, getLeafNodes } from '@shared-lib';
+
+function EAlphabetIcon(props: any) {
+  return (
+    <SvgIcon
+      style={{
+        border: `1px solid ${props?.color || props?.sx?.color || '#999'}`,
+        borderRadius: '8px',
+      }}
+      {...props}
+    >
+      <text
+        style={{
+          transform: 'rotate(-30deg)',
+          transformOrigin: 'center',
+        }}
+        x="50%"
+        y="50%"
+        dominantBaseline="middle"
+        textAnchor="middle"
+        fontSize="20"
+        fill="currentColor"
+        stroke="currentColor"
+        strokeWidth="1"
+      >
+        e
+      </text>
+    </SvgIcon>
+  );
+}
+function H5P(props: any) {
+  return (
+    <SvgIcon
+      style={{
+        border: `1px solid ${props?.color || props?.sx?.color || '#999'}`,
+        borderRadius: '8px',
+        background: `${props?.color || props?.sx?.color || '#999'}`,
+      }}
+      {...props}
+    >
+      <text
+        style={{
+          transform: 'rotate(-30deg)',
+          transformOrigin: 'center center',
+          letterSpacing: -1,
+          fontSize: '14px',
+          color: 'white',
+        }}
+        x="50%"
+        y="53%"
+        dominantBaseline="middle"
+        textAnchor="middle"
+        fontSize="20"
+        fill="currentColor"
+        stroke="currentColor"
+        strokeWidth="1"
+      >
+        H5P
+      </text>
+    </SvgIcon>
+  );
+}
 // Types for nested data structure and actions
 interface NestedItem {
   identifier: string;
@@ -37,19 +99,73 @@ interface CommonAccordionProps {
   TrackData?: any[];
 }
 
-const getIconByMimeType = (mimeType?: string): React.ReactNode => {
+const GetIconByMimeType = React.memo(function GetIconByMimeTypeComponent({
+  mimeType,
+  isShowText = false,
+  _box,
+}: {
+  mimeType?: string;
+  isShowText?: boolean;
+  _box?: any;
+}): React.ReactNode {
   const icons = {
-    'application/pdf': <PictureAsPdfOutlinedIcon />,
-    'video/mp4': <PlayCircleOutlineOutlinedIcon />,
-    'video/webm': <PlayCircleOutlineOutlinedIcon />,
-    'video/x-youtube': <PlayCircleOutlineOutlinedIcon />,
-    'application/vnd.sunbird.questionset': <TextSnippetOutlinedIcon />,
-    'application/vnd.ekstep.h5p-archive': <SlideshowIcon />,
-    'application/epub': <AutoStoriesIcon />,
+    'application/pdf': {
+      icon: <PictureAsPdfIcon sx={{ color: 'red' }} />,
+      text: 'PDF',
+    },
+    'video/mp4': {
+      icon: <PlayCircleIcon sx={{ color: 'blue' }} />,
+      text: 'Video',
+    },
+    'video/webm': {
+      icon: <PlayCircleIcon sx={{ color: 'blue' }} />,
+      text: 'Video',
+    },
+    'video/x-youtube': {
+      icon: <SmartDisplayIcon sx={{ color: 'red' }} />,
+      text: 'Youtube',
+    },
+    'application/vnd.sunbird.questionset': {
+      icon: <TextSnippetOutlinedIcon />,
+      text: 'QUML',
+    },
+    'application/vnd.ekstep.h5p-archive': {
+      icon: <H5P sx={{ color: '#2575be' }} />,
+      text: 'H5P',
+    },
+    'application/vnd.ekstep.html-archive': {
+      icon: <HtmlIcon sx={{ color: 'green' }} />,
+      text: 'HTML',
+    },
+    'application/epub': {
+      icon: <EAlphabetIcon sx={{ color: 'green' }} />,
+      text: 'Epub',
+    },
   };
+  if (isShowText) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          gap: 1,
+          ..._box,
+        }}
+      >
+        {icons?.[mimeType as keyof typeof icons]?.icon || (
+          <TextSnippetOutlinedIcon />
+        )}
+        <Typography>
+          {icons?.[mimeType as keyof typeof icons]?.text || 'unknown'}
+        </Typography>
+      </Box>
+    );
+  }
   //@ts-ignore
-  return icons[mimeType] || <TextSnippetOutlinedIcon />;
-};
+  return (
+    icons?.[mimeType as keyof typeof icons]?.icon || <TextSnippetOutlinedIcon />
+  );
+});
 
 const RenderNestedData: React.FC<{
   data: NestedItem[];
@@ -256,7 +372,22 @@ export const CommonCollapse: React.FC<CommonAccordionProps> = ({
   );
 };
 
-export default CommonCollapse;
+const CollapsebleGrid = React.memo(function CollapsebleGrid({
+  data,
+  trackData,
+}: {
+  data: any[];
+  trackData: any[];
+}) {
+  if (!Array.isArray(data)) {
+    return null;
+  }
+  return data?.map((item: any) => (
+    <CommonCollapse key={item.identifier} item={item} TrackData={trackData} />
+  ));
+});
+
+export default CollapsebleGrid;
 
 const AccordionWrapper = ({
   item,
@@ -282,7 +413,7 @@ const AccordionWrapper = ({
     >
       <AccordionSummary
         sx={{
-          backgroundColor: theme.palette.custom?.secondaryBackground,
+          backgroundColor: theme.palette.secondary.main,
         }}
         expandIcon={
           expandedItems.has(item?.identifier) ? (
@@ -389,18 +520,20 @@ export const RowContent = ({
   );
 };
 
-const StatusIcon = React.memo(
+export const StatusIcon = React.memo(
   ({
     showMimeTypeIcon,
     showLenseIcon,
     mimeType,
+    _icon,
   }: {
-    showMimeTypeIcon: boolean;
-    showLenseIcon: boolean;
+    showMimeTypeIcon?: boolean;
+    showLenseIcon?: boolean;
     mimeType?: string;
+    _icon?: any;
   }) => {
     if (showMimeTypeIcon) {
-      return getIconByMimeType(mimeType);
+      return <GetIconByMimeType mimeType={mimeType} {..._icon} />;
     } else if (showLenseIcon) {
       return <LensIcon sx={{ fontSize: '1.5rem' }} />;
     }

@@ -1,5 +1,3 @@
-import { sendOTP } from './OtPService';
-
 const baseurl = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;
 
 export const API_ENDPOINTS = {
@@ -21,6 +19,7 @@ export const API_ENDPOINTS = {
   userCheck: `${baseurl}/user/check`,
   sendOTP: `${baseurl}/user/send-otp`,
   verifyOTP: `${baseurl}/user/verify-otp`,
+  program: `${baseurl}/tenant/read`,
 };
 
 export const COURSE_PLANNER_UPLOAD_ENDPOINTS = `${process.env.NEXT_PUBLIC_BASE_URL}/prathamservice/v1/course-planner/upload`;

@@ -7,15 +7,15 @@ import {
   Typography,
   Grid,
 } from '@mui/material';
-import { CommonCard, Loader } from '@shared-lib';
+import { ContentItem, Loader } from '@shared-lib';
 import React, { memo } from 'react';
 import { ContentSearchResponse } from '../services/Search';
-import AppConst from '../utils/AppConst/AppConst';
+import ContentCard from './Card/ContentCard';
 
 const RenderTabContent = memo(
   ({
     contentData,
-    _grid,
+    _config,
     trackData,
     type,
     handleCardClick,
@@ -27,12 +27,13 @@ const RenderTabContent = memo(
     ariaLabel,
     isLoadingMoreData,
     isPageLoading,
+    isHideEmptyDataMessage,
   }: {
     contentData: ContentSearchResponse[];
-    _grid: any;
+    _config: any;
     trackData?: [];
     type: string;
-    handleCardClick: (content: ContentSearchResponse) => void;
+    handleCardClick: (content: ContentItem) => void;
     hasMoreData: boolean;
     handleLoadMore: (e: any) => void;
     tabs?: any[];
@@ -41,36 +42,14 @@ const RenderTabContent = memo(
     ariaLabel?: string;
     isLoadingMoreData: boolean;
     isPageLoading: boolean;
-    _card?: any;
+    isHideEmptyDataMessage?: boolean;
   }) => {
+    const { default_img, _card, _grid } = _config ?? {};
     return (
       <Box sx={{ width: '100%' }}>
         {tabs?.length !== undefined && tabs?.length > 1 && (
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs
-              value={value ?? 0}
-              onChange={onChange}
-              aria-label={ariaLabel}
-              TabIndicatorProps={{
-                style: {
-                  backgroundColor: '#6750A4',
-                  height: '3px',
-                  maxWidth: 49,
-                  width: '100%',
-                  marginLeft: '1.2rem',
-                },
-              }}
-              sx={{
-                '.MuiTab-root': {
-                  color: '#49454F', // Default tab text color
-                  fontWeight: 500,
-                  textTransform: 'none', // Ensures text remains camel case
-                },
-                '.Mui-selected': {
-                  color: '#6750A4 !important', // Selected tab text color
-                },
-              }}
-            >
+            <Tabs value={value ?? 0} onChange={onChange} aria-label={ariaLabel}>
               {tabs.map((tab: any, index: number) => (
                 <Tab
                   key={tab.label}
@@ -89,6 +68,7 @@ const RenderTabContent = memo(
           <Loader
             isLoading={isPageLoading}
             layoutHeight={197}
+            isHideMaxHeight
             _loader={{ backgroundColor: 'transparent' }}
           >
             <Box>
@@ -103,22 +83,13 @@ const RenderTabContent = memo(
                     lg={3}
                     {..._grid}
                   >
-                    <CommonCard
-                      minheight="100%"
-                      title={(item?.name || '').trim()}
-                      image={
-                        item?.posterImage && item?.posterImage !== 'undefined'
-                          ? item?.posterImage
-                          : `${AppConst.BASEPATH}/assests/images/image_ver.png`
-                      }
-                      content={item?.description || '-'}
-                      actions={item?.contentType}
-                      // subheader={item?.contentType}
-                      orientation="horizontal"
+                    <ContentCard
                       item={item}
-                      TrackData={trackData}
                       type={type}
-                      onClick={() => handleCardClick(item)}
+                      default_img={default_img}
+                      _card={_card}
+                      handleCardClick={handleCardClick}
+                      trackData={trackData}
                     />
                   </Grid>
                 ))}
@@ -137,9 +108,11 @@ const RenderTabContent = memo(
                     )}
                   </Button>
                 ) : (
-                  <Typography variant="body1">
-                    No more data available
-                  </Typography>
+                  isHideEmptyDataMessage && (
+                    <Typography variant="body1">
+                      No more data available
+                    </Typography>
+                  )
                 )}
               </Box>
             </Box>

@@ -5,7 +5,7 @@ interface PlayerProps {
   playerConfig: any;
 }
 
-const basePath = process.env.NEXT_PUBLIC_ASSETS_CONTENT || '/mfe_content';
+const basePath = process.env.NEXT_PUBLIC_ASSETS_CONTENT || '/sbplayer';
 
 const V1Player = ({ playerConfig }: PlayerProps) => {
   const previewRef = useRef<HTMLIFrameElement | null>(null);
@@ -60,7 +60,7 @@ const V1Player = ({ playerConfig }: PlayerProps) => {
       ref={previewRef}
       id="contentPlayer"
       title="Content Player"
-      src={`${basePath}/content/preview/preview.html?webview=true`}
+      src={`${basePath}/libs/sunbird-content-player/preview/preview.html?webview=true`}
       aria-label="Content Player"
       style={{ border: 'none' }}
       width={'100%'}

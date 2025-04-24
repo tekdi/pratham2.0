@@ -12,6 +12,29 @@ const nextConfig = {
     // See: https://github.com/gregberge/svgr
     svgr: false,
   },
+  images: {
+    domains: ['program-image-dev.s3.ap-south-1.amazonaws.com'],
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/action/data/v3/telemetry',
+        destination: `${process.env.NEXT_PUBLIC_TELEMETRY_URL}/v1/telemetry`,
+      },
+      {
+        source: '/action/v1/telemetry',
+        destination: `${process.env.NEXT_PUBLIC_TELEMETRY_URL}/v1/telemetry`,
+      },
+      {
+        source: '/data/v3/telemetry',
+        destination: `${process.env.NEXT_PUBLIC_TELEMETRY_URL}/v1/telemetry`,
+      },
+      {
+        source: '/assets/public/:path*', // Match any URL starting with /assets/public/
+        destination: `${process.env.NEXT_PUBLIC_CLOUD_STORAGE_URL}/:path*`, // Forward to S3, stripping "/assets/public"
+      },
+    ];
+  },
 };
 
 const plugins = [

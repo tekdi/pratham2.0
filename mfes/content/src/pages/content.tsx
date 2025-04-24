@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import { Box, Button } from '@mui/material';
-import { CommonSearch, getData, Layout, Loader } from '@shared-lib';
+import { CommonSearch, ContentItem, getData } from '@shared-lib';
 import { useRouter } from 'next/navigation';
 import BackToTop from '../components/BackToTop';
 import RenderTabContent from '../components/ContentTabs';
@@ -13,19 +13,21 @@ import { hierarchyAPI } from '../services/Hierarchy';
 import { ContentSearch, ContentSearchResponse } from '../services/Search';
 import FilterDialog from '../components/FilterDialog';
 import { trackingData } from '../services/TrackingService';
-import { ProfileMenu } from '../utils/menus';
+import LayoutPage from '../components/LayoutPage';
+import { getUserCertificates } from '../services/Certificate';
 
 export interface ContentProps {
-  _grid?: object;
+  _config?: object;
   filters?: object;
   contentTabs?: string[];
   cardName?: string;
-  handleCardClick?: (content: ContentSearchResponse) => void | undefined;
+  handleCardClick?: (content: ContentItem) => void | undefined;
   showFilter?: boolean;
   showSearch?: boolean;
   showBackToTop?: boolean;
   showHelpDesk?: boolean;
   isShowLayout?: boolean;
+  hasMoreData?: boolean;
 }
 export default function Content(props: Readonly<ContentProps>) {
   const router = useRouter();
@@ -41,7 +43,6 @@ export default function Content(props: Readonly<ContentProps>) {
     offset: 0,
   });
   const [showBackToTop, setShowBackToTop] = useState(false);
-  const [frameworkFilter, setFrameworkFilter] = useState(false);
   const [trackData, setTrackData] = useState<[]>([]);
   const [filterShow, setFilterShow] = useState(false);
   const [propData, setPropData] = useState<ContentProps>();
@@ -52,25 +53,23 @@ export default function Content(props: Readonly<ContentProps>) {
       const newPorp = {
         showSearch: true,
         showFilter: true,
-        ...(props || newData),
+        ...(props ?? newData),
       };
       setPropData(newPorp);
-      console.log(newPorp, props, 'propData');
-
       setTabValue(0);
       setIsPageLoading(false);
     };
     init();
   }, [props]);
 
-  const fetchContent = useCallback(async (filters: any) => {
+  const fetchContent = useCallback(async (filter: any) => {
     try {
       let data: any;
-      if (filters.identifier) {
-        const result = await hierarchyAPI(filters.identifier);
+      if (filter.identifier) {
+        const result = await hierarchyAPI(filter.identifier);
         data = [result];
       } else {
-        data = await ContentSearch(filters);
+        data = await ContentSearch(filter);
       }
       return data;
     } catch (error) {
@@ -83,20 +82,38 @@ export default function Content(props: Readonly<ContentProps>) {
     if (!resultData.length) return; // Ensure contentData is available
     try {
       const courseList = resultData.map((item: any) => item.identifier); // Extract all identifiers
-      const userId =
-        localStorage.getItem('subId') ?? localStorage.getItem('userId');
+      const userId = localStorage.getItem('userId');
       const userIdArray = userId?.split(',');
-      if (!userId || !courseList.length) return; // Ensure required values exist
+      if (!userId || !courseList.length) return []; // Ensure required values exist
       //@ts-ignore
       const course_track_data = await trackingData(userIdArray, courseList);
+      const {
+        result: { data: dataCertificates },
+      } = await getUserCertificates({
+        userId: localStorage.getItem('userId') || '',
+        courseId: courseList ?? [],
+        limit: localFilters.limit,
+        offset: localFilters.offset,
+      });
       if (course_track_data?.data) {
         //@ts-ignore
-
-        return (
+        const userTrackData =
           course_track_data.data.find((course: any) => course.userId === userId)
-            ?.course || []
+            ?.course ?? [];
+        const newData: any = [];
+        userTrackData.forEach((item: any) =>
+          newData.push({
+            ...item,
+            enrolled: Boolean(
+              dataCertificates.find(
+                (cert: any) => cert.courseId === item.courseId
+              )?.status === 'enrolled'
+            ),
+          })
         );
+        return newData;
       }
+      return [];
     } catch (error) {
       console.error('Error fetching track data:', error);
     }
@@ -136,7 +153,7 @@ export default function Content(props: Readonly<ContentProps>) {
     setTabValue(newValue);
   };
 
-  const handleCardClickLocal = async (content: ContentSearchResponse) => {
+  const handleCardClickLocal = async (content: ContentItem) => {
     try {
       if (
         [
@@ -165,21 +182,7 @@ export default function Content(props: Readonly<ContentProps>) {
   };
 
   useEffect(() => {
-    const handleScroll = () => {
-      setShowBackToTop(window.scrollY > 300);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => {
     const init = () => {
-      const cookies = document.cookie.split('; ');
-      const subid = cookies
-        .find((row) => row.startsWith('subid='))
-        ?.split('=')[1];
-
-      localStorage.setItem('subId', `${subid}`);
       const filteredTabs = [
         {
           label: 'Courses',
@@ -197,7 +200,7 @@ export default function Content(props: Readonly<ContentProps>) {
       setTabs(filteredTabs);
       setLocalFilters((prevFilters: any) => ({
         ...prevFilters,
-        ...(propData?.filters || {}),
+        ...(propData?.filters ?? {}),
       }));
     };
     init();
@@ -216,22 +219,28 @@ export default function Content(props: Readonly<ContentProps>) {
           const newContentData = Object.values(result)
             .filter((e): e is ContentSearchResponse[] => Array.isArray(e))
             .flat();
-          const userTrackData = await fetchDataTrack(newContentData || []);
+          const userTrackData = await fetchDataTrack(newContentData ?? []);
+          console.log(userTrackData, 'sagar userTrackData');
           if (localFilters.offset === 0) {
-            setContentData((newContentData as ContentSearchResponse[]) || []);
+            setContentData((newContentData as ContentSearchResponse[]) ?? []);
             setTrackData(userTrackData);
           } else {
             setContentData((prevState: any) => [
               ...prevState,
-              ...(newContentData || []),
+              ...(newContentData ?? []),
             ]);
             setTrackData(
-              (prevState: []) => [...prevState, ...(userTrackData || [])] as []
+              (prevState: []) =>
+                [...(prevState ?? []), ...(userTrackData ?? [])] as []
             );
           }
-          setHasMoreData(
-            result?.count > localFilters.offset + newContentData?.length
-          );
+          if (propData?.hasMoreData === false) {
+            setHasMoreData(false);
+          } else {
+            setHasMoreData(
+              result?.count > localFilters.offset + newContentData?.length
+            );
+          }
         }
       } catch (error) {
         console.error(error);
@@ -240,9 +249,10 @@ export default function Content(props: Readonly<ContentProps>) {
       }
     };
     init();
-  }, [localFilters, fetchContent, fetchDataTrack]);
+  }, [localFilters, fetchContent, fetchDataTrack, propData?.hasMoreData]);
 
   const handleApplyFilters = async (selectedValues: any) => {
+    setFilterShow(false);
     if (Object.keys(selectedValues).length === 0) {
       setLocalFilters((prevFilters: any) => ({
         ...prevFilters,
@@ -263,30 +273,13 @@ export default function Content(props: Readonly<ContentProps>) {
     }
   };
 
-  //get filter framework
-  useEffect(() => {
-    const fetchFramework = async () => {
-      try {
-        const url = `${
-          process.env.NEXT_PUBLIC_MIDDLEWARE_URL
-        }/api/framework/v1/read/${
-          localStorage.getItem('framework') ||
-          process.env.NEXT_PUBLIC_FRAMEWORK_ID
-        }`;
-        const frameworkData = await fetch(url).then((res) => res.json());
-        const frameworks = frameworkData?.result?.framework;
-        setFrameworkFilter(frameworks);
-      } catch (error) {
-        console.error('Error fetching board data:', error);
-      }
-    };
-    fetchFramework();
-  }, [router]);
-
   return (
-    <LayoutPage isPageLoading={isPageLoading} isShow={propData?.isShowLayout}>
+    <LayoutPage
+      isLoadingChildren={isPageLoading}
+      isShow={propData?.isShowLayout}
+    >
       <Box sx={{ p: 1 }}>
-        {(propData?.showSearch || propData?.showFilter) && (
+        {(propData?.showSearch ?? propData?.showFilter) && (
           <Box
             sx={{
               width: '100%',
@@ -299,7 +292,7 @@ export default function Content(props: Readonly<ContentProps>) {
                 placeholder={'Search content..'}
                 rightIcon={<SearchIcon />}
                 onRightIconClick={handleSearchClick}
-                inputValue={searchValue || ''}
+                inputValue={searchValue ?? ''}
                 onInputChange={handleSearchChange}
                 onKeyPress={(ev: any) => {
                   if (ev.key === 'Enter') {
@@ -323,7 +316,6 @@ export default function Content(props: Readonly<ContentProps>) {
                 <FilterDialog
                   open={filterShow}
                   onClose={() => setFilterShow(false)}
-                  frameworkFilter={frameworkFilter}
                   filterValues={localFilters}
                   onApply={handleApplyFilters}
                 />
@@ -336,15 +328,16 @@ export default function Content(props: Readonly<ContentProps>) {
           value={tabValue}
           onChange={handleTabChange}
           contentData={contentData}
-          _grid={propData?._grid || {}}
-          trackData={trackData || []}
-          type={localFilters?.type || ''}
+          _config={propData?._config ?? {}}
+          trackData={trackData ?? []}
+          type={localFilters?.type ?? ''}
           handleCardClick={handleCardClickLocal}
           hasMoreData={hasMoreData}
           handleLoadMore={handleLoadMore}
           isLoadingMoreData={isLoading}
           isPageLoading={isLoading && localFilters?.offset === 0}
           tabs={tabs}
+          isHideEmptyDataMessage={propData?.hasMoreData !== false}
         />
         {propData?.showHelpDesk && <HelpDesk />}
         {propData?.showBackToTop && showBackToTop && <BackToTop />}
@@ -352,34 +345,3 @@ export default function Content(props: Readonly<ContentProps>) {
     </LayoutPage>
   );
 }
-
-const LayoutPage = ({
-  isPageLoading,
-  isShow,
-  children,
-}: {
-  isPageLoading: boolean;
-  isShow?: boolean;
-  children: React.ReactNode;
-}) => {
-  if (isShow === undefined || isShow) {
-    return (
-      <Layout
-        isLoadingChildren={isPageLoading}
-        showTopAppBar={{
-          title: 'Shiksha: Home',
-          showMenuIcon: true,
-          actionButtonLabel: 'Action',
-        }}
-        showFilter={true}
-        isFooter={false}
-        showLogo={true}
-        showBack={true}
-      >
-        {children}
-      </Layout>
-    );
-  } else {
-    return <Loader isLoading={isPageLoading}>{children}</Loader>;
-  }
-};

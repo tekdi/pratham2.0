@@ -8,6 +8,8 @@ import Header from '@learner/components/Header/Header';
 import { getUserId, login } from '@learner/utils/API/LoginService';
 import { showToastMessage } from '@learner/components/ToastComponent/Toastify';
 import { useRouter } from 'next/navigation';
+import { useMediaQuery, useTheme } from '@mui/material';
+import { CourseCompletionBanner } from 'libs/shared-lib-v2/src/lib/CourseCompletionBanner/CourseCompletionBanner';
 
 const Login = dynamic(
   () => import('@login/Components/LoginComponent/LoginComponent'),
@@ -18,7 +20,8 @@ const Login = dynamic(
 
 const LoginPage = () => {
   const router = useRouter();
-
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const handleAddAccount = () => {};
   const handleForgotPassword = () => {
     localStorage.setItem('loginRoute', '/login');
@@ -61,7 +64,15 @@ const LoginPage = () => {
 
               const tenantId = userResponse?.tenantData?.[0]?.tenantId;
               localStorage.setItem('tenantId', tenantId);
-              router.push('/home');
+              document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
+              if (
+                typeof window !== 'undefined' &&
+                window.location.href.includes('redirect')
+              ) {
+                router.push(window.location.href.split('redirect=')[1]);
+              } else {
+                router.push('/home');
+              }
             } else {
               showToastMessage(
                 'LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT',
@@ -94,14 +105,16 @@ const LoginPage = () => {
       {/* Main Content: Split screen */}
       <Box flex={1} display="flex" overflow="hidden">
         {/* Left: Welcome Screen */}
-        <Box
-          flex={1}
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-        >
-          <WelcomeScreen />
-        </Box>
+        {!isMobile && (
+          <Box
+            flex={1}
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <WelcomeScreen />
+          </Box>
+        )}
 
         {/* Right: Login Component */}
         <Box
