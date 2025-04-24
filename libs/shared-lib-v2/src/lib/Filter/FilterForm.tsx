@@ -9,9 +9,17 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
+  Button,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  RadioGroup,
+  Radio,
+  Divider,
 } from '@mui/material';
 import { useTranslation } from '../context/LanguageContext';
 import { filterContent, staticFilterContent } from '../../utils/AuthService';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 export interface TermOption {
   code: string;
@@ -262,6 +270,8 @@ export default function FilterList({
     const formattedPayload = formatPayload(formData);
     onApply(formattedPayload);
   };
+  const [showMore, setShowMore] = useState(false);
+  const [showMoreStatic, setShowMoreStatic] = useState(false);
 
   if (loading) {
     return (
@@ -272,93 +282,196 @@ export default function FilterList({
   }
 
   return (
-    <Paper sx={{ maxHeight: '80vh', overflow: 'auto', p: 2 }}>
-      <Typography variant="h6" fontWeight="bold" gutterBottom>
-        {t('select_filters')}
-      </Typography>
+    <>
+      <Box sx={{ maxHeight: '62vh', overflow: 'auto' }}>
+        {/* <Typography variant="h6" fontWeight="bold" gutterBottom>
+          {t('select_filters')}
+        </Typography> */}
 
-      <Stack spacing={3}>
-        {renderForm.map((cat) => (
-          <Box key={cat.code}>
-            <Typography variant="subtitle1" fontWeight={600} mb={1}>
-              {cat.name}
-            </Typography>
-            <FormGroup>
-              {cat.options.map((opt) => (
-                <FormControlLabel
-                  key={opt.code}
-                  control={
-                    <Checkbox
-                      checked={
-                        !!formData[cat.code]?.some((o) => o.code === opt.code)
-                      }
-                      onChange={(e) => {
-                        const prev = formData[cat.code] || [];
-                        const next = e.target.checked
-                          ? [...prev, opt]
-                          : prev.filter((o) => o.code !== opt.code);
+        <Box sx={{ mb: 2 }}>
+          {renderForm.map((cat) => {
+            const optionsToShow = showMore
+              ? cat.options
+              : cat.options.slice(0, 3);
 
-                        // update associations
-                        replaceOptionsWithAssoc({
-                          category: cat.code,
-                          index: cat.index,
-                          newCategoryData: next,
-                        });
-
-                        // merge back into full formData
-                        setFormData((all) => ({ ...all, [cat.code]: next }));
+            return (
+              <>
+                <Accordion
+                  key={cat.code}
+                  sx={{ background: 'unset', boxShadow: 'unset' }}
+                >
+                  <AccordionSummary
+                    sx={{
+                      minHeight: 20,
+                      '&.Mui-expanded': {
+                        minHeight: 20,
+                        '& .MuiAccordionSummary-content': {
+                          margin: '5px 0',
+                        },
+                      },
+                    }}
+                    expandIcon={<ExpandMoreIcon sx={{ color: '#1C1B1F' }} />}
+                  >
+                    <Typography
+                      sx={{
+                        fontSize: '18px',
+                        fontWeight: '500',
+                        color: '#181D27',
                       }}
-                    />
-                  }
-                  label={opt.name}
-                />
-              ))}
-            </FormGroup>
-          </Box>
-        ))}
+                    >
+                      {cat.name}
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails sx={{ padding: '0px 22px' }}>
+                    <FormGroup>
+                      {optionsToShow.map((opt) => (
+                        <FormControlLabel
+                          sx={{
+                            color: '#414651',
+                            fontSize: '14px',
+                            fontWeight: '500',
+                          }}
+                          key={opt.code}
+                          control={
+                            <Checkbox
+                              checked={
+                                !!formData[cat.code]?.some(
+                                  (o) => o.code === opt.code
+                                )
+                              }
+                              onChange={(e) => {
+                                const prev = formData[cat.code] || [];
+                                const next = e.target.checked
+                                  ? [...prev, opt]
+                                  : prev.filter((o) => o.code !== opt.code);
 
-        <Typography variant="h6" fontWeight="bold">
-          {t('other_filters')}
-        </Typography>
+                                replaceOptionsWithAssoc({
+                                  category: cat.code,
+                                  index: cat.index,
+                                  newCategoryData: next,
+                                });
 
-        {renderStaticForm.map((field) => (
-          <Box key={field.code}>
-            <Typography variant="subtitle1" fontWeight={600} mb={1}>
-              {field.name}
-            </Typography>
-            <FormGroup row>
-              {field.range.map((r: any) => (
-                <FormControlLabel
-                  key={r.value}
-                  control={
-                    <Checkbox
-                      checked={staticFormData[field.code]?.includes(r.value)}
-                      onChange={(e) => {
-                        const prev = staticFormData[field.code] || [];
-                        const next = e.target.checked
-                          ? [...prev, r.value]
-                          : prev.filter((v) => v !== r.value);
-                        setStaticFormData((all) => ({
-                          ...all,
-                          [field.code]: next,
-                        }));
-                      }}
-                    />
-                  }
-                  label={r}
-                />
-              ))}
-            </FormGroup>
-          </Box>
-        ))}
-      </Stack>
+                                setFormData((all) => ({
+                                  ...all,
+                                  [cat.code]: next,
+                                }));
+                              }}
+                            />
+                          }
+                          label={opt.name}
+                        />
+                      ))}
+                    </FormGroup>
+                    {cat.options.length > 3 && (
+                      <Button
+                        variant="text"
+                        size="small"
+                        onClick={() => setShowMore(!showMore)}
+                        sx={{ mt: 1 }}
+                      >
+                        {showMore ? 'Show less ▲' : 'Show more ▼'}
+                      </Button>
+                    )}
+                  </AccordionDetails>
+                </Accordion>
+                {/* <Divider sx={{ my: 2 }} /> */}
+              </>
+            );
+          })}
 
-      <Box mt={4} textAlign="right">
-        <MuiButton variant="contained" onClick={handleFilter}>
+          <Typography variant="h6" sx={{ my: 2 }} fontWeight="bold">
+            {t('LEARNER_APP.other_filters')}
+          </Typography>
+
+          {renderStaticForm.map((field) => {
+            const rangeToShow = showMoreStatic
+              ? field.range
+              : field.range.slice(0, 3);
+
+            return (
+              <Accordion
+                sx={{ background: 'unset', boxShadow: 'unset' }}
+                key={field.code}
+              >
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  sx={{
+                    minHeight: 20,
+                    '&.Mui-expanded': {
+                      minHeight: 20,
+                      '& .MuiAccordionSummary-content': {
+                        margin: '5px 0',
+                      },
+                    },
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      fontSize: '18px',
+                      fontWeight: '500',
+                      color: '#181D27',
+                    }}
+                  >
+                    {field.name}
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ padding: '0px 22px' }}>
+                  <FormGroup>
+                    {rangeToShow.map((r: any) => (
+                      <FormControlLabel
+                        sx={{
+                          color: '#414651',
+                          fontSize: '14px',
+                          fontWeight: '500',
+                        }}
+                        key={r.value}
+                        control={
+                          <Checkbox
+                            checked={staticFormData[field.code]?.includes(
+                              r.value
+                            )}
+                            onChange={(e) => {
+                              const prev = staticFormData[field.code] || [];
+                              const next = e.target.checked
+                                ? [...prev, r.value]
+                                : prev.filter((v) => v !== r.value);
+                              setStaticFormData((all) => ({
+                                ...all,
+                                [field.code]: next,
+                              }));
+                            }}
+                          />
+                        }
+                        label={r}
+                      />
+                    ))}
+                  </FormGroup>
+                  {field.range.length > 3 && (
+                    <Button
+                      variant="text"
+                      size="small"
+                      onClick={() => setShowMoreStatic(!showMoreStatic)}
+                      sx={{ mt: 1 }}
+                    >
+                      {showMoreStatic ? 'Show less ▲' : 'Show more ▼'}
+                    </Button>
+                  )}
+                </AccordionDetails>
+              </Accordion>
+            );
+          })}
+        </Box>
+      </Box>
+      <Box display={'flex'} justifyContent="center" gap={2} mt={2}>
+        <MuiButton
+          variant="contained"
+          sx={{ width: '50%' }}
+          onClick={handleFilter}
+        >
           {t('filter')}
         </MuiButton>
       </Box>
-    </Paper>
+    </>
   );
 }
 
