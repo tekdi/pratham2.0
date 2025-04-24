@@ -103,13 +103,10 @@ export const CommonCard: React.FC<CommonCardProps> = ({
           };
           if (type === 'Course') {
             if (!_card?.isHideProgress) {
-              const leafNodes = getLeafNodes(item ?? []);
-              const completedCount = result?.completed_list?.length || 0;
-              const percentage =
-                leafNodes.length > 0
-                  ? Math.round((completedCount / leafNodes.length) * 100)
-                  : 0;
-              setStatusBar({ ...newObj, trackProgress: percentage });
+              setStatusBar({
+                ...newObj,
+                trackProgress: result?.percentage ?? 0,
+              });
             } else {
               setStatusBar(newObj);
             }
@@ -229,6 +226,7 @@ export const StatusBar: React.FC<StatuPorps> = ({
   type,
 }) => {
   const theme = useTheme();
+  // console.log({ trackProgress, status, type }, 'sagar');
   return (
     <Box
       sx={{
@@ -291,7 +289,13 @@ export const StatusBar: React.FC<StatuPorps> = ({
             variant="determinate"
             color="error"
             value={
-              status === 'completed' ? 100 : status === 'In Progress' ? 50 : 0
+              typeof trackProgress === 'number'
+                ? trackProgress
+                : status?.toLowerCase() === 'completed'
+                ? 100
+                : status?.toLowerCase() === 'in progress'
+                ? 50
+                : 0
             }
           />
         )}

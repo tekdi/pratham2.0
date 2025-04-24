@@ -99,7 +99,17 @@ const InfoCard: React.FC<InfoCardProps> = ({ item, onBackClick, _config }) => {
                   bgcolor: '#FFDEA1',
                 }}
               >
-                Started on: {item?.startedOn ?? ' - '}
+                Started on:{' '}
+                {item?.startedOn
+                  ? new Intl.DateTimeFormat('en-GB', {
+                      day: '2-digit',
+                      month: 'short',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: true,
+                    }).format(new Date(item.startedOn))
+                  : ' - '}
                 {/* {JSON.stringify(_infoCard?.isShowStatus || {})} */}
               </Box>
             )}

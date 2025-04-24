@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Box } from '@mui/material';
-import { getLeafNodes } from '@shared-lib';
+import { calculateCourseStatus, trackDataPorps } from '@shared-lib';
 import { hierarchyAPI } from '@content-mfes/services/Hierarchy';
 import { trackingData } from '@content-mfes/services/TrackingService';
 import LayoutPage from '@content-mfes/components/LayoutPage';
@@ -23,7 +23,7 @@ export default function Details(props: DetailsProps) {
   const router = useRouter();
   const { courseId, unitId } = useParams();
   const identifier = unitId ?? courseId;
-  const [trackData, setTrackData] = useState([]);
+  const [trackData, setTrackData] = useState<trackDataPorps[]>([]);
   const [selectedContent, setSelectedContent] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -53,10 +53,6 @@ export default function Details(props: DetailsProps) {
         if (!userId) return; // Ensure required values exist
 
         try {
-          let courseList = result?.childNodes; // Extract all courseIds
-          if (!courseList) {
-            courseList = getLeafNodes(result);
-          }
           const userIdArray = userId?.split(',');
           //@ts-ignore
           const course_track_data = await trackingData(userIdArray, [courseId]);
@@ -68,19 +64,25 @@ export default function Details(props: DetailsProps) {
               )?.course || [];
             const newTrack = userTrackData?.[0] ?? {};
             const newTrackData = result?.children?.map((item: any) => {
-              return {
-                courseId: item?.courseId,
-                in_progress: 0,
-                completed: 0,
-                started_on: null,
-                in_progress_list: [],
-                completed_list: [],
-              };
+              if (
+                item?.mimeType === 'application/vnd.ekstep.content-collection'
+              ) {
+                const result = calculateCourseStatus({
+                  statusData: newTrack,
+                  allCourseIds: item.leafNodes,
+                  courseId: item.identifier,
+                });
+                return result;
+              } else {
+                const result = calculateCourseStatus({
+                  statusData: newTrack,
+                  allCourseIds: [item.identifier],
+                  courseId: item.identifier,
+                });
+                return result;
+              }
             });
-
-            console.log('course_track_data', newTrack, newTrackData);
-
-            setTrackData(userTrackData);
+            setTrackData(newTrackData ?? []);
           }
         } catch (error) {
           console.error('Error fetching track data:', error);
@@ -106,7 +108,7 @@ export default function Details(props: DetailsProps) {
   };
 
   const onBackClick = () => {
-    router.back();
+    router.push('/content');
   };
 
   return (

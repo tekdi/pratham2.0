@@ -52,13 +52,13 @@ const ContentDetails = (props: isShowLayout) => {
             data?.result?.status === 'completed'
           ) {
             if (props?.getIfEnrolled) {
-              props?.getIfEnrolled(result as ContentSearchResponse);
+              props?.getIfEnrolled(result as unknown as ContentSearchResponse);
             } else {
               router.replace(`/content/${identifier}`);
             }
           }
         }
-        setContentDetails(result as ContentSearchResponse);
+        setContentDetails(result as unknown as ContentSearchResponse);
       } catch (error) {
         console.error('Failed to fetch content:', error);
       } finally {
@@ -80,9 +80,9 @@ const ContentDetails = (props: isShowLayout) => {
           userId,
           courseId: identifier as string,
         });
-        router.replace(`/details/${identifier}`);
+        router.replace(`/content/${identifier}`);
       } else {
-        router.replace(`/login?redirectUrl=/details/${identifier}`);
+        router.replace(`/login?redirectUrl=/content/${identifier}`);
       }
     } catch (error) {
       console.error('Failed to create user certificate:', error);
