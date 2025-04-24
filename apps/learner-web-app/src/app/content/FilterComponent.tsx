@@ -9,29 +9,23 @@ const FilterComponent: React.FC<{
 }> = ({ filterState, handleFilterChange }) => {
   const { t } = useTranslation();
 
-
   const [isModal, setIsModal] = useState(true);
   const [parentFormData, setParentFormData] = useState([]);
   const [parentStaticFormData, setParentStaticFormData] = useState([]);
   const [orginalFormData, setOrginalFormData] = useState([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
-  const [instant, setInstant] = useState("");
+  const [instant, setInstant] = useState('');
 
   const memoizedFilterForm = useMemo(
     () => (
       <FilterForm
-        filterValues={filterState}
         onApply={handleFilterChange}
-        // isModal={isModal}
-        // setIsModal={setIsModal}
         setParentFormData={setParentFormData}
         setParentStaticFormData={setParentStaticFormData}
-        parentFormData={parentFormData}
         parentStaticFormData={parentStaticFormData}
         setOrginalFormData={setOrginalFormData}
         orginalFormData={orginalFormData}
         setIsDrawerOpen={setIsDrawerOpen}
-        instant={instant}
       />
     ),
     [filterState, handleFilterChange]

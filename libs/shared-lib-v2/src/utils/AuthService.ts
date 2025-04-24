@@ -1,12 +1,14 @@
-import axios from 'axios'; // Ensure axios is imported
+import axios from 'axios';
 import { API_ENDPOINTS } from './APIEndpoints';
 
-// Define the type for the input parameter
 interface InstantIdParam {
   instantId: string;
 }
 
-// Define the type for the result of the API call
+interface StaticFilterContentParam {
+  instantFramework: string;
+}
+
 interface FilterContentResult {
   framework?: {
     categories?: any[];
@@ -15,17 +17,20 @@ interface FilterContentResult {
 
 interface StaticFilterContentResult {
   objectCategoryDefinition?: {
-    forms?: { 
+    forms?: {
       create?: {
         properties?: any;
+        instantFramework?: string;
       };
     };
   };
 }
 
 // Function to fetch filter content
-export const filterContent = async ({ instantId }: InstantIdParam): Promise<FilterContentResult | undefined> => {
-  const url = API_ENDPOINTS.framework(instantId); // Construct the URL using the instantId
+export const filterContent = async ({
+  instantId,
+}: InstantIdParam): Promise<FilterContentResult | undefined> => {
+  const url = API_ENDPOINTS.framework(instantId);
 
   try {
     const result = await axios.get(url);
@@ -39,16 +44,19 @@ export const filterContent = async ({ instantId }: InstantIdParam): Promise<Filt
   return undefined;
 };
 
-// Function to fetch static filter content
-export const staticFilterContent = async ({ instantId }: InstantIdParam): Promise<StaticFilterContentResult | undefined> => {
-  const url = API_ENDPOINTS.actionObject // Hardcoded URL
+export const staticFilterContent = async ({
+  instantFramework,
+}: StaticFilterContentParam): Promise<
+  StaticFilterContentResult | undefined
+> => {
+  const url = API_ENDPOINTS.actionObject;
 
   const payload = {
     request: {
       objectCategoryDefinition: {
         objectType: 'Collection',
         name: 'Course',
-        channel: instantId,
+        channel: instantFramework,
       },
     },
   };
