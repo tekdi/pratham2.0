@@ -622,6 +622,8 @@ const CentersPage = () => {
                     cohortId={selectedCenter}
                     onChange={handleCenterChange}
                     centerList={centerList}
+                    selectedCenterId={selectedCenter}
+                    setSelectedCenterId={setSelectedCenter}
                   />
                 </Box>
               </Box>
