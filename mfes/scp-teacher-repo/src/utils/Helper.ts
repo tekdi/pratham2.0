@@ -18,6 +18,7 @@ import {
 } from '../../app.config';
 import API_ENDPOINTS from './API/APIEndpoints';
 import { getCohortData } from '@/services/CohortServices';
+import { customFields } from '@/components/GeneratedSchemas';
 
 export const ATTENDANCE_ENUM = {
   PRESENT: 'present',
@@ -558,6 +559,7 @@ export const getUserDetailsById = (data: any[], userId: any) => {
       status: user?.status,
       statusReason: user?.statusReason,
       cohortMembershipId: user?.cohortMembershipId,
+      customFields: user?.customField,
     };
   }
 
