@@ -23,6 +23,7 @@ import { Swiper as SwiperClass } from 'swiper/types';
 interface Program {
   ordering: number;
   name: string;
+  tenantId: string;
   programImages: {
     label: string;
     description: string;
@@ -34,6 +35,7 @@ const OurProgramCarousel = () => {
   const router = useRouter();
   const [activeSlide, setActiveSlide] = useState<number>(0);
   const [programs, setPrograms] = useState<Program[]>([]);
+  const [tenantId, setTenantId] = useState('');
 
   const handleSlideChange = (swiper: SwiperClass) => {
     setActiveSlide(swiper.realIndex);
@@ -45,6 +47,8 @@ const OurProgramCarousel = () => {
         const res = await getTenantInfo();
         console.log('Tenant Info:', res);
         setPrograms(res?.result || []);
+        const tenantIds = res?.result?.map((item: any) => item.tenantId);
+        setTenantId(tenantIds);
       } catch (error) {
         console.error('Failed to fetch tenant info:', error);
       }
@@ -248,7 +252,11 @@ const OurProgramCarousel = () => {
                           backgroundColor: '#FDBE16',
                         },
                       }}
-                      onClick={() => router.push('/signup')}
+                      onClick={() =>
+                        router.push(
+                          '/registration?tenantId=' + program?.tenantId
+                        )
+                      }
                     >
                       Sign Up
                     </Button>

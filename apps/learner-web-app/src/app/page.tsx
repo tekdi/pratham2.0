@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 import { Layout } from '@shared-lib';
 import OurProgramCarousel from '@learner/components/OurProgramCarousel';
@@ -19,10 +19,25 @@ export default function Index() {
   const router = useRouter();
   const theme = useTheme();
   const [imgError, setImgError] = useState<boolean>(false);
+  const programCarouselRef = useRef<HTMLDivElement>(null); // Reference for the carousel section
 
   const handleImageError = () => {
     setImgError(true);
   };
+
+  /*************  ✨ Windsurf Command ⭐  *************/
+  /**
+   * Handles smooth scrolling to the program carousel section when
+   * the user clicks the "Explore Programs" button.
+   */
+  /*******  f66c0108-7e2c-474f-beaa-522c3fd68dae  *******/
+
+  const handleScrollToPrograms = () => {
+    if (programCarouselRef.current) {
+      programCarouselRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <Layout onlyHideElements={['footer']}>
       <Box
@@ -88,7 +103,7 @@ export default function Index() {
                   backgroundColor: '#FDBE16',
                 },
               }}
-              onClick={() => router.push('/login')}
+              onClick={handleScrollToPrograms} // Scroll to carousel section on click
             >
               Sign Up for Program Now!
             </Button>
@@ -287,6 +302,7 @@ export default function Index() {
 
       {/* Our Programs Section */}
       <Box
+        ref={programCarouselRef} // Reference for scrolling
         sx={{
           background: 'linear-gradient(180deg, #FFFDF7 0%, #F8EFDA 100%)',
           padding: '20px',
