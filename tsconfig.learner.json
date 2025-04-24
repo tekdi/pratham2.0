@@ -25,7 +25,10 @@
         "mfes/content/src/app/content-details/[identifier]/page.tsx"
       ],
       "@ContentDetails": ["mfes/content/src/app/content/[courseId]/page.tsx"],
-      "@ContentPlayer": ["mfes/content/src/app/player/[identifier]/page.tsx"]
+      "@ContentPlayer": ["mfes/content/src/app/player/[identifier]/page.tsx"],
+
+      //dynamic form
+      "@dynamic-form/*": ["apps/learner-web-app/src/components/DynamicForm/*"]
     }
   },
   "exclude": ["node_modules", "tmp"]

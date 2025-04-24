@@ -1,279 +1,489 @@
+import React, { useEffect, useState } from 'react';
 import {
   Box,
-  Button,
-  Checkbox,
-  FormControl,
-  FormControlLabel,
-  InputLabel,
-  ListItemText,
-  MenuItem,
-  OutlinedInput,
-  Radio,
-  RadioGroup,
-  Select,
+  Paper,
+  Stack,
   Typography,
+  Button as MuiButton,
+  CircularProgress,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
+  Button,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  RadioGroup,
+  Radio,
+  Divider,
 } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { useTranslation } from '../context/LanguageContext';
+import { filterContent, staticFilterContent } from '../../utils/AuthService';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-export const FilterForm = ({
-  filter,
-  language,
-  selectedSubjects,
-  selectedContentTypes,
-  sort,
-  onLanguageChange,
-  onSubjectsChange,
-  onContentTypeChange,
-  onSortChange,
+export interface TermOption {
+  code: string;
+  name: string;
+  identifier?: string;
+  associations?: Record<string, any[]>;
+}
+export interface Category {
+  name: string;
+  code: string;
+  index: number;
+  options: TermOption[];
+}
+export interface StaticField {
+  name: string;
+  code: string;
+  range: { value: string; label: string }[];
+  sourceCategory?: string;
+  fields?: { sourceCategory?: string }[]; // Added fields property
+}
+
+interface FilterListProps {
+  // instant: { frameworkId?: string; channelId?: string };
+  setParentFormData: (d: any) => void;
+  setParentStaticFormData: (d: any) => void;
+  parentStaticFormData: any;
+  setOrginalFormData: (d: any) => void;
+  orginalFormData: any;
+  setIsDrawerOpen: (b: boolean) => void;
+  onApply?: any;
+}
+
+export default function FilterList({
+  setParentFormData,
+  setParentStaticFormData,
+  parentStaticFormData,
+  setOrginalFormData,
+  orginalFormData,
+  setIsDrawerOpen,
   onApply,
-  filterValues,
-  _formControl,
-}: {
-  filterValues?: any;
-  filter?: {
-    sort?: boolean;
-    language?: string[];
-    subject?: string[];
-    contentType?: string[];
-  };
-  language?: string;
-  selectedSubjects?: string[];
-  selectedContentTypes?: string[];
-  sort?: any;
-  onLanguageChange?: (language: string) => void;
-  onSubjectsChange?: (subjects: string[]) => void;
-  onContentTypeChange?: (contentType: string[]) => void;
-  onSortChange?: (sort: any) => void;
-  onApply?: (data: any) => void;
-  _formControl?: any;
-}) => {
-  // Manage the selected values for each category
-  const [selectedValues, setSelectedValues] = useState(filterValues ?? {}); // Initialize as an empty object
+}: FilterListProps) {
+  const { t } = useTranslation();
 
-  const handleChange = (event: any, filterCode: any) => {
-    const { value } = event.target;
-    setSelectedValues((prev: any) => ({
-      ...prev,
-      [filterCode]: typeof value === 'string' ? value.split(',') : value,
+  const [filterData, setFilterData] = useState<Record<string, any>[]>([]);
+  const [renderForm, setRenderForm] = useState<Category[]>([]);
+  const [renderStaticForm, setRenderStaticForm] = useState<StaticField[]>([]);
+  const [staticFilter, setStaticFilter] = useState<StaticField[]>([]);
+  const [formData, setFormData] = useState<Record<string, TermOption[]>>(
+    orginalFormData || {}
+  );
+  const [staticFormData, setStaticFormData] = useState<
+    Record<string, string[]>
+  >(parentStaticFormData || {});
+  const [loading, setLoading] = useState(true);
+
+  // Helper functions
+  function convertToStructuredArray(obj: Record<string, any>) {
+    return Object.keys(obj).map((key) => ({
+      [key]: {
+        name: obj[key].name,
+        code: obj[key].code,
+        options: obj[key].options,
+      },
     }));
-  };
+  }
 
-  const [frameworkFilter, setFrameworkFilter] = useState<any>(null);
+  function transformCategories(categories: any[]) {
+    return categories
+      .sort((a, b) => a.index - b.index)
+      .reduce((acc: any, category: any) => {
+        acc[category.code] = {
+          name: category.name,
+          code: category.code,
+          index: category.index,
+          options: category.terms
+            .sort((a: any, b: any) => a.index - b.index)
+            .map((term: any) => {
+              const grouped =
+                term.associations?.reduce((g: any, assoc: any) => {
+                  g[assoc.category] = g[assoc.category] || [];
+                  g[assoc.category].push(assoc);
+                  return g;
+                }, {}) || {};
+              Object.keys(grouped).forEach((k) =>
+                grouped[k].sort((a: any, b: any) => a.index - b.index)
+              );
+              return {
+                code: term.code,
+                name: term.name,
+                identifier: term.identifier,
+                associations: grouped,
+              };
+            }),
+        };
+        return acc;
+      }, {});
+  }
+
+  function transformRenderForm(categories: any[]) {
+    return categories
+      .sort((a, b) => a.index - b.index)
+      .map((category) => ({
+        name: category.name,
+        code: category.code,
+        options: category.terms
+          .sort((a: any, b: any) => a.index - b.index)
+          .map((term: any) => ({
+            code: term.code,
+            name: term.name,
+            identifier: term.identifier,
+            associations:
+              term.associations?.reduce((g: any, assoc: any) => {
+                g[assoc.category] = g[assoc.category] || [];
+                g[assoc.category].push(assoc);
+                return g;
+              }, {}) || {},
+          })),
+        index: category.index,
+      }));
+  }
+
+  function filterObjectsWithSourceCategory(
+    data: any[],
+    filteredNames: string[]
+  ) {
+    const filtered = data.filter((section) =>
+      section.fields?.some((f: any) => f.hasOwnProperty('sourceCategory'))
+    );
+    setStaticFilter(filtered);
+    return filtered.map((cat) => ({
+      ...cat,
+      fields: cat.fields?.filter((f: any) => !filteredNames.includes(f.name)),
+    }));
+  }
+
+  function findAndRemoveIndexes(index: number, form: Category[]) {
+    return form.map((item) => ({
+      ...item,
+      options: item.index > index ? [] : item.options,
+    }));
+  }
+
+  function updateRenderFormWithAssociations(
+    category: string,
+    newData: TermOption[],
+    baseFilter: any[],
+    currentForm: Category[]
+  ) {
+    const obj = baseFilter.find((f: any) => f[category]);
+    if (!obj) return currentForm;
+
+    const toPush: Record<string, any[]> = {};
+    newData.forEach((opt) =>
+      Object.entries(opt.associations || {}).forEach(([k, arr]) => {
+        toPush[k] = toPush[k] || [];
+        arr.forEach((item) => {
+          if (!toPush[k].some((o) => o.code === item.code))
+            toPush[k].push(item);
+        });
+      })
+    );
+
+    return currentForm.map((item) => ({
+      ...item,
+      options: toPush[item.code]?.length ? toPush[item.code] : item.options,
+    }));
+  }
+
+  function replaceOptionsWithAssoc({
+    category,
+    index,
+    newCategoryData,
+  }: {
+    category: string;
+    index: number;
+    newCategoryData: TermOption[];
+  }) {
+    if (newCategoryData.length === 0 && index === 1) {
+      fetchData();
+      return;
+    }
+    const pruned = findAndRemoveIndexes(index, renderForm);
+    const updated = updateRenderFormWithAssociations(
+      category,
+      newCategoryData,
+      filterData,
+      pruned
+    );
+    setRenderForm(updated);
+  }
+
+  function transformFormData(
+    fd: Record<string, TermOption[]>,
+    sf: StaticField[]
+  ) {
+    const map: Record<string, string> = {};
+    sf.forEach((f) =>
+      f.fields?.forEach((fld: any) => {
+        if (fld.sourceCategory) map[fld.sourceCategory] = fld.code;
+      })
+    );
+    const out: Record<string, string[]> = {};
+    Object.keys(fd).forEach((k) => {
+      if (map[k]) out[map[k]] = fd[k].map((o) => o.identifier || o.code);
+    });
+    return out;
+  }
+
+  // Data fetch
+  const fetchData = async () => {
+    setLoading(true);
+    const instantId = localStorage.getItem('collectionFramework') ?? '';
+    const data = await filterContent({ instantId });
+    const cats = data?.framework?.categories || [];
+    setFilterData(convertToStructuredArray(transformCategories(cats)));
+
+    const rf = transformRenderForm(cats);
+    const defaults: Record<string, TermOption[]> = {};
+    rf.forEach((c) => {
+      if (c.options.length === 1) defaults[c.code] = [c.options[0]];
+    });
+    setRenderForm(rf);
+    setFormData({ ...defaults, ...orginalFormData });
+
+    const instantFramework = localStorage.getItem('channelId') ?? '';
+    const staticResp = await staticFilterContent({ instantFramework });
+    const props =
+      staticResp?.objectCategoryDefinition?.forms?.create?.properties || [];
+    const filtered = filterObjectsWithSourceCategory(
+      props,
+      rf.map((r) => r.name)
+    );
+    setRenderStaticForm(filtered[0]?.fields || []);
+    setStaticFormData(parentStaticFormData);
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const fetchFramework = async () => {
-      try {
-        const url = `${
-          process.env.NEXT_PUBLIC_MIDDLEWARE_URL
-        }/api/framework/v1/read/${
-          localStorage.getItem('framework') ||
-          process.env.NEXT_PUBLIC_FRAMEWORK_ID
-        }`;
-        const frameworkData = await fetch(url).then((res) => res.json());
-        const frameworks = frameworkData?.result?.framework;
-        setFrameworkFilter(frameworks);
-      } catch (error) {
-        console.error('Error fetching board data:', error);
-      }
-    };
-    fetchFramework();
+    fetchData();
   }, []);
 
-  return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-      {/* new filter frameworkFilter */}
-      <FrameworkFilterComponent
-        frameworkFilter={frameworkFilter}
-        selectedValues={selectedValues}
-        handleChange={handleChange}
-        _formControl={_formControl}
-      />
-      {/* Sort By */}
-      {filter?.sort && (
-        <>
-          <Typography sx={{ fontWeight: 700 }} variant="subtitle1">
-            Sort By
-          </Typography>
-          <FormControl>
-            <RadioGroup
-              onChange={(e) => {
-                const value = e.target.value;
-                onSortChange?.(value);
-              }}
-              value={sort?.sortBy ?? 'asc'}
-            >
-              <FormControlLabel
-                value="asc"
-                label="A to Z"
-                control={<Radio />}
-              />
-              <FormControlLabel
-                value="desc"
-                label="Z to A"
-                control={<Radio />}
-              />
-            </RadioGroup>
-          </FormControl>
-        </>
-      )}
-      {/* Language */}
-      {filter?.language && filter.language.length > 0 && (
-        <FormControl fullWidth margin="normal">
-          <InputLabel>Language</InputLabel>
-          <Select
-            label="Language"
-            onChange={(e) => onLanguageChange?.(e.target.value)}
-            value={language}
-          >
-            {filter.language.map((lang) => (
-              <MenuItem value={lang} key={lang}>
-                {lang}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      )}
-      {/* Subject */}
-      {filter?.subject && filter.subject.length > 0 && (
-        <FormControl margin="normal" fullWidth>
-          <InputLabel>Subject</InputLabel>
-          <Select
-            multiple
-            label="Subject"
-            value={selectedSubjects ?? []}
-            renderValue={(selected) => (selected as string[]).join(', ')} // Join array values for display
-            onChange={(e) => {
-              const value = e.target.value as string[];
-              onSubjectsChange?.(value);
-            }}
-          >
-            {filter.subject.map((subject) => (
-              <MenuItem value={subject} key={subject}>
-                <Checkbox
-                  checked={(selectedSubjects ?? []).indexOf(subject) > -1}
-                />
-                <ListItemText primary={subject} />
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      )}
-      {/* Content Type */}
-      {filter?.contentType && filter.contentType.length > 0 && (
-        <FormControl fullWidth margin="normal">
-          <InputLabel>Content Type</InputLabel>
-          <Select
-            renderValue={(selected) => (selected as string[]).join(', ')}
-            label="Content Type"
-            multiple
-            value={selectedContentTypes ?? []}
-            onChange={(e) => {
-              const value = e.target.value as string[];
-              onContentTypeChange?.(value);
-            }}
-          >
-            {filter.contentType.map((type) => (
-              <MenuItem key={type} value={type}>
-                <Checkbox
-                  checked={(selectedContentTypes ?? []).indexOf(type) > -1}
-                />
-                <ListItemText primary={type} />
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      )}
-      {/* Buttons */}
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, gap: 2 }}>
-        <Button
-          onClick={() => {
-            onApply?.({});
-            setSelectedValues({});
-          }}
-          variant="outlined"
-        >
-          Clear All
-        </Button>
-        <Button
-          variant="contained"
-          onClick={() => {
-            onApply?.(selectedValues);
-          }}
-        >
-          Apply
-        </Button>
-      </Box>
-    </Box>
-  );
-};
+  const handleFilter = () => {
+    const transformed = transformFormData(formData, staticFilter);
+    setParentFormData(transformed);
+    setOrginalFormData(formData);
+    setParentStaticFormData(staticFormData);
+    setIsDrawerOpen(false);
+    const formattedPayload = formatPayload(formData);
+    onApply(formattedPayload);
+    console.log(formData, 'formattedPayload');
+  };
+  const [showMore, setShowMore] = useState(false);
+  const [showMoreStatic, setShowMoreStatic] = useState(false);
 
-const RenderCategories = React.memo(
-  ({ categories, selectedValues, handleChange, _formControl }: any) => {
-    const componentKey = `multi-checkbox-label_${categories?.identifier}`;
-    const options = categories?.terms.map((term: any) => ({
-      label: term.name,
-      value: term.code,
-    }));
-
-    const currentSelectedValues =
-      selectedValues[`se_${categories?.code}s`] ?? [];
-
+  if (loading) {
     return (
-      <FormControl
-        key={componentKey}
-        sx={{ maxWidth: '350px' }}
-        {..._formControl}
-      >
-        <InputLabel id={componentKey}>{categories?.name}</InputLabel>
-        <Select
-          multiple
-          labelId={componentKey}
-          input={<OutlinedInput label={categories?.name} />}
-          value={currentSelectedValues}
-          renderValue={(selected) =>
-            (selected as string[])
-              .map((selectedValue: any) => {
-                const selectedOption = options.find(
-                  (option: any) => option.value === selectedValue
-                );
-                return selectedOption ? selectedOption.label : '';
-              })
-              .join(', ')
-          }
-          onChange={(event) => handleChange(event, `se_${categories?.code}s`)}
-          sx={{ maxWidth: '100%' }}
-        >
-          {options.map((option: any) => (
-            <MenuItem value={option.value} key={option.value}>
-              <Checkbox
-                checked={currentSelectedValues.includes(option.value)}
-              />
-              <ListItemText primary={option.label} />
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+      <Box p={4} textAlign="center">
+        <CircularProgress />
+      </Box>
     );
   }
-);
 
-RenderCategories.displayName = 'RenderCategories';
+  return (
+    <>
+      <Box sx={{ maxHeight: '62vh', overflow: 'auto' }}>
+        {/* <Typography variant="h6" fontWeight="bold" gutterBottom>
+          {t('select_filters')}
+        </Typography> */}
 
-const FrameworkFilterComponent = ({
-  frameworkFilter,
-  selectedValues,
-  handleChange,
-  _formControl,
-}: any) => {
-  return frameworkFilter?.categories?.map((categories: any) => {
-    return (
-      <RenderCategories
-        key={categories?.identifier}
-        categories={categories}
-        selectedValues={selectedValues}
-        handleChange={handleChange}
-        _formControl={_formControl}
-      />
-    );
+        <Box sx={{ mb: 2 }}>
+          {renderForm.map((cat) => {
+            const optionsToShow = showMore
+              ? cat.options
+              : cat.options.slice(0, 3);
+
+            return (
+              <>
+                <Accordion
+                  key={cat.code}
+                  sx={{ background: 'unset', boxShadow: 'unset' }}
+                >
+                  <AccordionSummary
+                    sx={{
+                      minHeight: 20,
+                      '&.Mui-expanded': {
+                        minHeight: 20,
+                        '& .MuiAccordionSummary-content': {
+                          margin: '5px 0',
+                        },
+                      },
+                    }}
+                    expandIcon={<ExpandMoreIcon sx={{ color: '#1C1B1F' }} />}
+                  >
+                    <Typography
+                      sx={{
+                        fontSize: '18px',
+                        fontWeight: '500',
+                        color: '#181D27',
+                      }}
+                    >
+                      {cat.name}
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails sx={{ padding: '0px 22px' }}>
+                    <FormGroup>
+                      {optionsToShow.map((opt) => (
+                        <FormControlLabel
+                          sx={{
+                            color: '#414651',
+                            fontSize: '14px',
+                            fontWeight: '500',
+                          }}
+                          key={opt.code}
+                          control={
+                            <Checkbox
+                              checked={
+                                !!formData[cat.code]?.some(
+                                  (o) => o.code === opt.code
+                                )
+                              }
+                              onChange={(e) => {
+                                const prev = formData[cat.code] || [];
+                                const next = e.target.checked
+                                  ? [...prev, opt]
+                                  : prev.filter((o) => o.code !== opt.code);
+
+                                replaceOptionsWithAssoc({
+                                  category: cat.code,
+                                  index: cat.index,
+                                  newCategoryData: next,
+                                });
+
+                                setFormData((all) => ({
+                                  ...all,
+                                  [cat.code]: next,
+                                }));
+                              }}
+                            />
+                          }
+                          label={opt.name}
+                        />
+                      ))}
+                    </FormGroup>
+                    {cat.options.length > 3 && (
+                      <Button
+                        variant="text"
+                        size="small"
+                        onClick={() => setShowMore(!showMore)}
+                        sx={{ mt: 1 }}
+                      >
+                        {showMore ? 'Show less ▲' : 'Show more ▼'}
+                      </Button>
+                    )}
+                  </AccordionDetails>
+                </Accordion>
+                {/* <Divider sx={{ my: 2 }} /> */}
+              </>
+            );
+          })}
+
+          <Typography variant="h6" sx={{ my: 2 }} fontWeight="bold">
+            {t('LEARNER_APP.other_filters')}
+          </Typography>
+
+          {renderStaticForm.map((field) => {
+            const rangeToShow = showMoreStatic
+              ? field.range
+              : field.range.slice(0, 3);
+
+            return (
+              <Accordion
+                sx={{ background: 'unset', boxShadow: 'unset' }}
+                key={field.code}
+              >
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  sx={{
+                    minHeight: 20,
+                    '&.Mui-expanded': {
+                      minHeight: 20,
+                      '& .MuiAccordionSummary-content': {
+                        margin: '5px 0',
+                      },
+                    },
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      fontSize: '18px',
+                      fontWeight: '500',
+                      color: '#181D27',
+                    }}
+                  >
+                    {field.name}
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ padding: '0px 22px' }}>
+                  <FormGroup>
+                    {rangeToShow.map((r: any) => (
+                      <FormControlLabel
+                        sx={{
+                          color: '#414651',
+                          fontSize: '14px',
+                          fontWeight: '500',
+                        }}
+                        key={r.value}
+                        control={
+                          <Checkbox
+                            checked={staticFormData[field.code]?.includes(
+                              r.value
+                            )}
+                            onChange={(e) => {
+                              const prev = staticFormData[field.code] || [];
+                              const next = e.target.checked
+                                ? [...prev, r.value]
+                                : prev.filter((v) => v !== r.value);
+                              setStaticFormData((all) => ({
+                                ...all,
+                                [field.code]: next,
+                              }));
+                            }}
+                          />
+                        }
+                        label={r}
+                      />
+                    ))}
+                  </FormGroup>
+                  {field.range.length > 3 && (
+                    <Button
+                      variant="text"
+                      size="small"
+                      onClick={() => setShowMoreStatic(!showMoreStatic)}
+                      sx={{ mt: 1 }}
+                    >
+                      {showMoreStatic ? 'Show less ▲' : 'Show more ▼'}
+                    </Button>
+                  )}
+                </AccordionDetails>
+              </Accordion>
+            );
+          })}
+        </Box>
+      </Box>
+      <Box display={'flex'} justifyContent="center" gap={2} mt={2}>
+        <MuiButton
+          variant="contained"
+          sx={{ width: '50%' }}
+          onClick={handleFilter}
+        >
+          {t('filter')}
+        </MuiButton>
+      </Box>
+    </>
+  );
+}
+
+const formatPayload = (payload: any) => {
+  const formattedPayload: any = {};
+  Object.keys(payload).forEach((key) => {
+    if (Array.isArray(payload[key])) {
+      formattedPayload[key] = payload[key].map((item: any) => item.name);
+    } else {
+      formattedPayload[key] = payload[key];
+    }
   });
+  return formattedPayload;
 };
