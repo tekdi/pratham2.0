@@ -130,7 +130,7 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
           });
     } else if (
       content?.mimeType &&
-      MIME_TYPE.GENERIC_MIME_TYPE.includes(content?.mimeType)
+      (MIME_TYPE.GENERIC_MIME_TYPE.includes(content?.mimeType) || content?.mimeType == MIME_TYPE.ECML_MIME_TYPE)
     ) {
       localStorage.setItem("contentCreatedBy", content?.createdBy);
       console.log(content);

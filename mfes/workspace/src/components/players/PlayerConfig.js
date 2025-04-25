@@ -85,11 +85,8 @@ export const V1PlayerConfig = {
     apislug: "",
     repos: ["/sunbird-plugins/renderer"],
     plugins: [
-      {
-        id: "org.sunbird.iframeEvent",
-        ver: 1,
-        type: "plugin",
-      }
+      { id: "org.sunbird.iframeEvent", ver: 1, type: "plugin" },
+      { id: "org.sunbird.player.endpage", ver: 1.1, type: "plugin" },
     ],
     sideMenu: {
       showShare: true,

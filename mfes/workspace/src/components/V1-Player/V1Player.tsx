@@ -22,6 +22,10 @@ const V1Player = ({ playerConfig }: PlayerProps) => {
             preview.contentWindow &&
             preview.contentWindow.initializePreview
           ) {
+            if (playerConfig.metadata.mimeType === 'application/vnd.ekstep.ecml-archive'){
+              playerConfig.data = playerConfig.metadata?.body;
+              playerConfig.config.overlay = {}
+            }
             preview.contentWindow.initializePreview(playerConfig);
           }
           preview.contentWindow.addEventListener("message", (event: any) => {
