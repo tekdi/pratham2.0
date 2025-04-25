@@ -7,14 +7,14 @@ import dynamic from 'next/dynamic';
 import { Box } from '@mui/material';
 import { gredientStyle } from '@learner/utils/style';
 
-const ContentDetails = dynamic(() => import('@ContentDetails'), {
+const CourseUnitDetails = dynamic(() => import('@CourseUnitDetails'), {
   ssr: false,
 });
 const App = () => {
   return (
     <Layout>
       <Box sx={gredientStyle}>
-        <ContentDetails
+        <CourseUnitDetails
           isShowLayout={false}
           _config={{
             default_img: '/images/image_ver.png',

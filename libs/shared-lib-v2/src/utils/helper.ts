@@ -55,3 +55,28 @@ export function calculateCourseStatus({
     percentage: percentage,
   };
 }
+
+export const calculateTrackData = (newTrack: any, children: any) => {
+  const newTrackData = children?.map((item: any) => {
+    return calculateTrackDataItem(newTrack, item);
+  });
+  return newTrackData;
+};
+
+export const calculateTrackDataItem = (newTrack: any, item: any) => {
+  if (item?.mimeType === 'application/vnd.ekstep.content-collection') {
+    const result = calculateCourseStatus({
+      statusData: newTrack,
+      allCourseIds: item.leafNodes,
+      courseId: item.identifier,
+    });
+    return result;
+  } else {
+    const result = calculateCourseStatus({
+      statusData: newTrack,
+      allCourseIds: [item.identifier],
+      courseId: item.identifier,
+    });
+    return result;
+  }
+};

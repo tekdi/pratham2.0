@@ -90,12 +90,13 @@ export const CommonCard: React.FC<CommonCardProps> = ({
         //@ts-ignore
         if (TrackData) {
           const result = TrackData?.find((e) => e.courseId === item.identifier);
+          // console.log(result, 'sagar result 12');
           const newObj = {
             type,
             status:
-              result?.completed === 1
+              result?.status?.toLowerCase() === 'completed'
                 ? 'Completed'
-                : result?.in_progress === 1
+                : result?.status?.toLowerCase() === 'in completed'
                 ? 'In Progress'
                 : result?.enrolled === true
                 ? 'Enrolled, not started'
@@ -141,6 +142,7 @@ export const CommonCard: React.FC<CommonCardProps> = ({
         ..._card?.sx,
       }}
       onClick={onClick}
+      title={item.identifier}
     >
       {/* Image and Progress Overlay */}
       <Box sx={{ position: 'relative', width: '100%' }}>
@@ -245,7 +247,7 @@ export const StatusBar: React.FC<StatuPorps> = ({
           fontSize: '14px',
           lineHeight: '20px',
           fontWeight: '500',
-          color: ['completed', 'In Progress', 'Enrolled, not started'].includes(
+          color: ['Completed', 'In Progress', 'Enrolled, not started'].includes(
             status ?? ''
           )
             ? '#50EE42'
@@ -272,7 +274,7 @@ export const StatusBar: React.FC<StatuPorps> = ({
               },
             }}
             color={
-              ['completed', 'In Progress', 'Enrolled, not started'].includes(
+              ['Completed', 'In Progress', 'Enrolled, not started'].includes(
                 status ?? ''
               )
                 ? theme.palette.success.main

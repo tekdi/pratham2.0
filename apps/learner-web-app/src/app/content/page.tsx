@@ -16,21 +16,18 @@ const MyComponent: React.FC = () => {
     const fetchTenantInfo = async () => {
       try {
         const res = await getTenantInfo();
-        console.log('Tenant Info:', res);
         const youthnetContentFilter = res?.result.find(
           (program: any) => program.name === 'YouthNet'
         )?.contentFilter;
-
-        console.log(youthnetContentFilter);
-        setFilter(youthnetContentFilter);
+        setFilter({ filters: youthnetContentFilter });
         localStorage.setItem('filter', JSON.stringify(youthnetContentFilter));
       } catch (error) {
         console.error('Failed to fetch tenant info:', error);
       }
     };
-
     fetchTenantInfo();
   }, []);
+
   return (
     <Layout>
       <Grid container style={gredientStyle}>
@@ -86,7 +83,7 @@ const MyComponent: React.FC = () => {
 
       <Grid container style={gredientStyle}>
         <Grid item xs={12}>
-          <LearnerCourse _content={{ filter: filter }} />
+          <LearnerCourse _content={{ filters: filter }} />
         </Grid>
       </Grid>
     </Layout>

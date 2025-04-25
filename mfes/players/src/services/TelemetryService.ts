@@ -97,13 +97,13 @@ export const getTelemetryEvents = async (
             }
 
             // Skip event if `eid === 'END'` and progress is not 100 in either `summary` or `extra`
-            if (
-              parsedTelemetryEvent?.eid === 'END' &&
-              ((progressFromSummary !== 100 && progressFromSummary !== null) ||
-                (progressFromExtra !== 100 && progressFromExtra !== null))
-            ) {
-              return;
-            }
+            // if (
+            //   parsedTelemetryEvent?.eid === 'END' &&
+            //   ((progressFromSummary !== 100 && progressFromSummary !== null) ||
+            //     (progressFromExtra !== 100 && progressFromExtra !== null))
+            // ) {
+            //   return;
+            // }
 
             // Push parsed telemetry event
             detailsObject.push(parsedTelemetryEvent);

@@ -4,7 +4,7 @@ import React from 'react';
 import dynamic from 'next/dynamic';
 
 const ContentDetails = dynamic(
-  () => import('@learner/app/player/[identifier]/page'),
+  () => import('@learner/components/Content/Player'),
   {
     ssr: false,
   }

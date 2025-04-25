@@ -1,32 +1,17 @@
-import { useParams } from 'next/navigation';
-import React from 'react';
-interface PlayerPageProps {
-  contentId?: string;
-  unitId?: string;
-  id?: string; // Define the type for the 'id' prop
-}
-const PlayerPage: React.FC<PlayerPageProps> = ({ unitId, contentId, id }) => {
-  const params = useParams();
-  const identifier = params?.identifier; // string | string[] | undefined
-  if (!identifier) {
-    return <div>Loading...</div>;
-  }
+'use client';
 
-  return (
-    <iframe
-      src={`${process.env.NEXT_PUBLIC_LEARNER_SBPLAYER}?identifier=${
-        id ?? (identifier as string)
-      }`}
-      style={{
-        // display: 'block',
-        // padding: 0,
-        border: 'none',
-      }}
-      width="100%"
-      height="100%"
-      title="Embedded Localhost"
-    />
-  );
+import React from 'react';
+import dynamic from 'next/dynamic';
+
+const Player = dynamic(
+  () => import('@content-mfes/components/Content/Player'),
+  {
+    ssr: false,
+  }
+);
+
+const App: React.FC = () => {
+  return <Player />;
 };
 
-export default PlayerPage;
+export default App;
