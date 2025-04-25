@@ -171,20 +171,21 @@ const PaginatedTable = ({
                     {col.render
                       ? col.render(row)
                       : Array.isArray(col.keys)
-                      ? col.keys.map((key) => row[key] ?? '').join(' ')
-                      : row[col.key] ?? ''}
+                        ? col.keys.map((key) => row[key] ?? '').join(' ')
+                        : row[col.key] ?? ''}
                   </TableCell>
                 ))}
                 {actions.length > 0 && (
-                  <TableCell sx={{width:'100px'}}>
-                    {actions.map((action, idx) => (
-                    
-                        <IconButton key={idx} onClick={() => action.callback(row)}>
-                          {action.icon}
-                        </IconButton>
-            
-
-                    ))}
+                  <TableCell>
+                    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                      {actions
+                        .filter((action) => (typeof action.show === 'function' ? action.show(row) : true))
+                        .map((action, idx) => (
+                          <IconButton key={idx} onClick={() => action.callback(row)}>
+                            {action.icon}
+                          </IconButton>
+                        ))}
+                    </Box>
                   </TableCell>
                 )}
               </TableRow>

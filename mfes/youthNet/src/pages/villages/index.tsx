@@ -68,6 +68,9 @@ import { editEditUser } from '../../services/ProfileService';
 import { showToastMessage } from '@/components/Toastify';
 import MentorAssignment from '../../components/youthNet/MentorForm/MentorAssignment';
 import useSubmittedButtonStore from '../../store/useSubmittedButtonStore';
+import HolidayVillageIcon from '@mui/icons-material/HolidayVillage';
+import PersonPinIcon from '@mui/icons-material/PersonPin';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const Index = () => {
   const { isRTL } = useDirection();
@@ -75,7 +78,6 @@ const Index = () => {
   const theme = useTheme<any>();
   const router = useRouter();
   const { villageId, tab, blockId } = router.query;
-  console.log(villageId);
   // const blockId: blockResult?.selectedValues[0]?.id
   const [value, setValue] = useState<number>(
     tab
@@ -294,7 +296,8 @@ const Index = () => {
                 isNew: isToday,
                 age: getAge(user?.dob),
                 showMore: true,
-                isVolunteer: isVolunteer?.selectedValues || VolunteerField?.NO,
+                isVolunteer:
+                  isVolunteer?.selectedValues[0] || VolunteerField?.NO,
               };
             }
           );
@@ -637,20 +640,23 @@ const Index = () => {
     {
       label: t('YOUTHNET_USERS_AND_VILLAGES.ADD_OR_REASSIGN_VILLAGES'),
       action: BOTTOM_DRAWER_CONSTANTS.ADD_REASSIGN,
+      icon: <HolidayVillageIcon />,
     },
     {
       label: t('YOUTHNET_USERS_AND_VILLAGES.REQUEST_TO_REASSIGN_DISTRICT'),
       action: BOTTOM_DRAWER_CONSTANTS.REQUEST_REASSIGN,
+      icon: <PersonPinIcon />,
     },
     {
       label: t('YOUTHNET_USERS_AND_VILLAGES.DELETE_USER_PERMANENTLY'),
       action: BOTTOM_DRAWER_CONSTANTS.DELETE,
+      icon: <DeleteIcon />,
     },
   ];
 
-  const Mentorbuttons = mentorActions.map(({ label, action }) => ({
+  const Mentorbuttons = mentorActions.map(({ label, action, icon }) => ({
     label,
-    icon: <SwapHorizIcon />,
+    icon,
     onClick: () => handleButtonClick(action),
   }));
 
@@ -752,7 +758,7 @@ const Index = () => {
               <Box
                 sx={{
                   width: '100%',
-                  mr: '20px',
+                  // mr: '20px',
                 }}
               >
                 {districtData ? (
@@ -824,7 +830,7 @@ const Index = () => {
                   sx={{
                     fontSize: '16px',
                     color: 'black',
-                    margin: '20px',
+                    margin: '0 20px',
                   }}
                 >
                   {mentorCount} {''}

@@ -60,7 +60,7 @@ export const BatchSearchSchema = {
           value: 'value',
         },
         callType: userRole !== Role.CENTRAL_ADMIN ? 'initial' : 'dependent',
-        dependent: 'state',
+        ...(!stateId ? { dependent: 'state' } : {}),
       },
       //for multiselect
       uniqueItems: true,
@@ -126,13 +126,20 @@ export const BatchSearchSchema = {
       maxSelections: 1000,
     },
     parentId: {
-      type: 'string',
+      type: 'array',
       title: 'CENTER',
+      items: {
+        type: 'string',
+        enum: ['Select'],
+        enumNames: ['Select'],
+      },
+      // coreField: 1,
+      //fieldId: null,
       field_type: 'drop_down',
-      enum: ['Select'],
-      enumNames: ['Select'],
+      // enum: ['Select'],
+      // enumNames: ['Select'],
       api: {
-        url: 'https://dev-interface.prathamdigital.org/interface/v1/cohort/search',
+        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/cohort/search`,
         header: {
           tenantId: '**',
           Authorization: '**',
@@ -148,15 +155,22 @@ export const BatchSearchSchema = {
           limit: 200,
           offset: 0,
           filters: {
+            type: 'COHORT',
             status: ['active'],
+            village: '**',
           },
         },
-        callType: 'initial',
+        callType: 'dependent',
+        dependent: 'village',
       },
+      uniqueItems: true,
+      isMultiSelect: true,
+      maxSelections: 1000,
     },
+
     name: {
       type: 'string',
-      title: 'Search Key',
+      title: 'Search Batch..',
       // description: 'Search for a specific user or entity',
     },
     sortBy: {
@@ -165,11 +179,26 @@ export const BatchSearchSchema = {
       enum: ['asc', 'desc'],
       enumNames: ['A-Z', 'Z-A'],
     },
+    status: {
+      type: 'string',
+      title: 'Status',
+      enum: ['active', 'archived'],
+      enumNames: ['Active', 'Archived'],
+    },
   },
 };
 
 export const BatchSearchUISchema = {
-  'ui:order': ['state', 'district', 'block', 'village', 'searchKey', 'sortBy'],
+  'ui:order': [
+    'state',
+    'district',
+    'block',
+    'village',
+    'parentId',
+    'name',
+    'sortBy',
+    'status',
+  ],
 
   state: {
     'ui:widget': 'CustomMultiSelectWidget',
@@ -177,6 +206,7 @@ export const BatchSearchUISchema = {
       multiple: true,
       uniqueItems: true,
     },
+    ...(stateId ? { 'ui:disabled': true } : {}),
   },
 
   district: {
@@ -202,12 +232,22 @@ export const BatchSearchUISchema = {
       uniqueItems: true,
     },
   },
+  parentId: {
+    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:options': {
+      multiple: true,
+      uniqueItems: true,
+    },
+  },
 
-  searchKey: {
-    'ui:widget': 'text',
+  name: {
+    'ui:widget': 'SearchTextFieldWidget',
   },
 
   sortBy: {
+    'ui:widget': 'select',
+  },
+  status: {
     'ui:widget': 'select',
   },
 };

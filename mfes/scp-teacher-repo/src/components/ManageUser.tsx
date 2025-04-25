@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Button, Grid, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 
@@ -35,6 +36,7 @@ import Loader from './Loader';
 import ReassignModal from './ReassignModal';
 import SearchBar from './Searchbar';
 import SimpleModal from './SimpleModal';
+import FacilitatorManage from '@/shared/FacilitatorManage/FacilitatorManage';
 
 interface Cohort {
   cohortId: string;
@@ -58,6 +60,7 @@ interface ManageUsersProps {
   cohortData?: any;
   isFromFLProfile?: boolean;
   teacherUserId?: string;
+  hideSearch?: boolean;
 }
 
 const ManageUser: React.FC<ManageUsersProps> = ({
@@ -66,6 +69,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
   cohortData,
   isFromFLProfile = false,
   teacherUserId,
+  hideSearch = false,
 }) => {
   const { t } = useTranslation();
   const theme = useTheme<any>();
@@ -84,6 +88,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
       lastName?: string;
       userId: string;
       cohortNames?: string;
+      batchNames?: any []
     }[]
   >([]);
   const [loading, setLoading] = React.useState(false);
@@ -153,11 +158,35 @@ const ManageUser: React.FC<ManageUsersProps> = ({
 
         if (cohortId) {
           const limit = 10;
-           const page = offset;
+          const page = offset;
+          let stateIds = [];
+          let districtIds = [];
+          let blockIds = [];
+          if (localStorage.getItem('userData')) {
+            try {
+              const customFields = JSON.parse(
+                localStorage.getItem('userData')
+              ).customFields;
+
+              const getSelectedValueIds = (label) => {
+                const field = customFields.find(
+                  (f) => f.label.toLowerCase() === label.toLowerCase()
+                );
+                return (
+                  field?.selectedValues?.map((val) => val.id.toString()) || []
+                );
+              };
+
+              stateIds = getSelectedValueIds('STATE');
+              districtIds = getSelectedValueIds('DISTRICT');
+              blockIds = getSelectedValueIds('BLOCK');
+            } catch (e) {}
+          }
+
           const filters = {
-            states: store.stateCode,
-            districts: store.districtCode,
-            blocks: store.blockCode,
+            state: stateIds,
+            district: districtIds,
+            block: blockIds,
             role: Role.TEACHER,
             status: [Status.ACTIVE],
           };
@@ -202,9 +231,18 @@ const ManageUser: React.FC<ManageUsersProps> = ({
             }
           });
 
+
           const extractedData = facilitatorList?.map(
             (user: any, index: number) => {
               const cohorts = cohortDetails[index] || [];
+
+              const batches = cohorts.flatMap((cohort: any) =>
+                (cohort.childData || []).filter((child: any) => child.type === 'BATCH')
+              )
+
+              const batchNames = cohorts
+              .filter((item: any) => item.type === 'BATCH' && item.cohortStatus === 'active')
+              .map((item: any) => item.cohortName);
 
               const cohortNames = cohorts
                 .filter(
@@ -215,8 +253,15 @@ const ManageUser: React.FC<ManageUsersProps> = ({
 
               return {
                 userId: user?.userId,
-                name: toPascalCase(getUserFullName({ firstName: user?.firstName, lastName: user?.lastName, name: user?.name })),
+                name: toPascalCase(
+                  getUserFullName({
+                    firstName: user?.firstName,
+                    lastName: user?.lastName,
+                    name: user?.name,
+                  })
+                ),
                 cohortNames: cohortNames || null,
+                batchNames: batchNames || null
               };
             }
           );
@@ -224,7 +269,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
           setUsers(extractedData);
           // setLoading(false);
           if (isMobile) {
-           setInfiniteData([...infiniteData, ...extractedData]);
+            setInfiniteData([...infiniteData, ...extractedData]);
           } else {
             setFilteredUsers(extractedData);
             setInfiniteData(extractedData);
@@ -266,27 +311,27 @@ const ManageUser: React.FC<ManageUsersProps> = ({
 
   const toggleDrawer =
     (anchor: Anchor, open: boolean, user?: any, teacherUserId?: string) =>
-      (event: React.KeyboardEvent | React.MouseEvent) => {
-        setCohortDeleteId(isFromFLProfile ? teacherUserId : user.userId);
-        if (!isFromFLProfile) {
-          const cohortNamesArray = user?.cohortNames?.split(', ');
-          const centerNames = cohortNamesArray?.map((cohortName: string) =>
-            cohortName.trim()
-          ) || [t('ATTENDANCE.NO_CENTERS_ASSIGNED')];
-          setCenters(centerNames);
-          setSelectedUser(user);
-        }
+    (event: React.KeyboardEvent | React.MouseEvent) => {
+      setCohortDeleteId(isFromFLProfile ? teacherUserId : user.userId);
+      if (!isFromFLProfile) {
+        const cohortNamesArray = user?.cohortNames?.split(', ');
+        const centerNames = cohortNamesArray?.map((cohortName: string) =>
+          cohortName.trim()
+        ) || [t('ATTENDANCE.NO_CENTERS_ASSIGNED')];
+        setCenters(centerNames);
+        fieldName: setSelectedUser(user);
+      }
 
-        if (
-          event.type === 'keydown' &&
-          ((event as React.KeyboardEvent).key === 'Tab' ||
-            (event as React.KeyboardEvent).key === 'Shift')
-        ) {
-          return;
-        }
+      if (
+        event.type === 'keydown' &&
+        ((event as React.KeyboardEvent).key === 'Tab' ||
+          (event as React.KeyboardEvent).key === 'Shift')
+      ) {
+        return;
+      }
 
-        setState({ ...state, bottom: open });
-      };
+      setState({ ...state, bottom: open });
+    };
 
   const listItemClick = async (event: React.MouseEvent, name: string) => {
     if (name === 'delete-User') {
@@ -498,7 +543,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
     setOpenFacilitatorModal(false);
   };
 
-  const handleDeleteUser = () => { };
+  const handleDeleteUser = () => {};
 
   const handleFacilitatorAdded = () => {
     setIsFacilitatorAdded((prev) => !prev);
@@ -531,6 +576,12 @@ const ManageUser: React.FC<ManageUsersProps> = ({
     }
     return cohortNames;
   };
+
+  const getBatchNames = (batchNames: any) => {
+    if (!Array.isArray(batchNames)) return null;
+  return batchNames.join(', ');
+  };
+
   const handleSearch = (searchTerm: string) => {
     const term = searchTerm;
     setSearchTerm(term);
@@ -540,30 +591,35 @@ const ManageUser: React.FC<ManageUsersProps> = ({
   };
   const PAGINATION_CONFIG = {
     ITEMS_PER_PAGE: 10,
-    INFINITE_SCROLL_INCREMENT: 10
+    INFINITE_SCROLL_INCREMENT: 10,
   };
 
   const fetchData = async () => {
-    if (infiniteData && (infiniteData.length>=TotalCount)){
+    if (infiniteData && infiniteData.length >= TotalCount) {
       return;
-    }    
+    }
     try {
       setOffSet((prev) => {
-        if (TotalCount && prev + PAGINATION_CONFIG.ITEMS_PER_PAGE <= TotalCount) {
+        if (
+          TotalCount &&
+          prev + PAGINATION_CONFIG.ITEMS_PER_PAGE <= TotalCount
+        ) {
           return prev + PAGINATION_CONFIG.ITEMS_PER_PAGE;
         }
         return prev;
       });
 
-     setInfinitePage((prev) => prev + PAGINATION_CONFIG.INFINITE_SCROLL_INCREMENT);
+      setInfinitePage(
+        (prev) => prev + PAGINATION_CONFIG.INFINITE_SCROLL_INCREMENT
+      );
     } catch (error) {
       console.error('Error fetching more data:', error);
       showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
     }
-  }
+  };
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
-    setOffSet((newPage - 1) * PAGINATION_CONFIG.ITEMS_PER_PAGE)
+    setOffSet((newPage - 1) * PAGINATION_CONFIG.ITEMS_PER_PAGE);
   };
 
   return (
@@ -579,11 +635,14 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                 sx={{ display: 'flex', alignItems: 'center', direction: 'row' }}
                 container
               >
-                <SearchBar
-                  onSearch={handleSearch}
-                  value={searchTerm}
-                  placeholder={t('COMMON.SEARCH_FACILITATORS')}
-                />
+                {!hideSearch && (
+                  <SearchBar
+                    onSearch={handleSearch}
+                    value={searchTerm}
+                    placeholder={t('COMMON.SEARCH_FACILITATORS')}
+                  />
+                )}
+
                 <Box mt={'18px'} px={'18px'} ml={'10px'}>
                   <Button
                     sx={{
@@ -598,6 +657,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                           ? '8px !important'
                           : '-2px !important',
                       },
+                      width:'100%',
                     }}
                     className="text-1E"
                     onClick={handleOpenAddFaciModal}
@@ -741,13 +801,13 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                                 marginBottom: '10px',
                                               }}
                                             >
-                                              {user?.cohortNames
-                                                ? getCohortNames(
-                                                  user.cohortNames
-                                                )
+                                              {user?.batchNames?.length > 0
+                                                ? getBatchNames(
+                                                    user.batchNames
+                                                  )
                                                 : t(
-                                                  'ATTENDANCE.NO_CENTERS_ASSIGNED'
-                                                )}
+                                                    'ATTENDANCE.NO_BATCHES_ASSIGNED'
+                                                  )}
                                             </Box>
                                           </Box>
                                         </Box>
@@ -756,10 +816,10 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                             onClick={(event) => {
                                               isMobile
                                                 ? toggleDrawer(
-                                                  'bottom',
-                                                  true,
-                                                  user
-                                                )(event)
+                                                    'bottom',
+                                                    true,
+                                                    user
+                                                  )(event)
                                                 : handleMenuOpen(event, user);
                                             }}
                                             sx={{
@@ -805,7 +865,9 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                             }}
                           >
                             <CustomPagination
-                              count={Math.ceil(TotalCount / PAGINATION_CONFIG.ITEMS_PER_PAGE)}
+                              count={Math.ceil(
+                                TotalCount / PAGINATION_CONFIG.ITEMS_PER_PAGE
+                              )}
                               page={page}
                               onPageChange={handlePageChange}
                               fetchMoreData={() => fetchData()}
@@ -838,15 +900,18 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                 anchorEl={anchorEl}
                 isMobile={isMobile}
                 optionList={[
-                  {
-                    label: t('COMMON.ADD_OR_REASSIGN_CENTERS'),
-                    icon: (
-                      <ApartmentIcon
-                        sx={{ color: theme.palette.warning['300'] }}
-                      />
-                    ),
-                    name: 'reassign-block',
-                  },
+
+                  // TODO
+
+                  // {
+                  //   label: t('COMMON.ADD_OR_REASSIGN_CENTERS'),
+                  //   icon: (
+                  //     <ApartmentIcon
+                  //       sx={{ color: theme.palette.warning['300'] }}
+                  //     />
+                  //   ),
+                  //   name: 'reassign-block',
+                  // },
                   // TODO: Integrate todo service
                   // {
                   //   label: t('COMMON.REASSIGN_BLOCKS_REQUEST'),
@@ -884,7 +949,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                 >
                   {selectedUser?.name
                     ? selectedUser.name.charAt(0).toUpperCase() +
-                    selectedUser.name.slice(1)
+                      selectedUser.name.slice(1)
                     : ''}
                 </Box>
                 <Box
@@ -930,9 +995,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                 </Box>
               </BottomDrawer>
 
-              {
-                openCentersModal &&
-
+              {openCentersModal && (
                 <ManageCentersModal
                   open={openCentersModal}
                   onClose={handleCloseCentersModal}
@@ -940,11 +1003,10 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                   centers={centers}
                   onAssign={handleAssignCenters}
                 />
-              }
+              )}
             </Box>
 
-            {
-              confirmationModalOpen &&
+            {confirmationModalOpen && (
               <ConfirmationModal
                 message={t('CENTERS.BLOCK_REQUEST')}
                 handleAction={handleRequestBlockAction}
@@ -955,10 +1017,10 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                 handleCloseModal={handleCloseModal}
                 modalOpen={confirmationModalOpen}
               />
-            }
+            )}
 
-            {
-              reassignModalOpen && <ReassignModal
+            {reassignModalOpen && (
+              <ReassignModal
                 cohortNames={reassignCohortNames}
                 message={t('COMMON.ADD_OR_REASSIGN_CENTERS')}
                 handleAction={handleRequestBlockAction}
@@ -969,39 +1031,41 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                 buttonNames={{ primary: t('COMMON.SAVE') }}
                 selectedUser={selectedUser}
               />
-            }
+            )}
 
-            {openDeleteUserModal && <DeleteUserModal
-              type={Role.TEACHER}
-              userId={userId}
-              open={openDeleteUserModal}
-              onClose={handleCloseModal}
-              onUserDelete={handleDeleteUser}
-              reloadState={reloadState}
-              setReloadState={setReloadState}
-            />
-            }
+            {openDeleteUserModal && (
+              <DeleteUserModal
+                type={Role.TEACHER}
+                userId={userId}
+                open={openDeleteUserModal}
+                onClose={handleCloseModal}
+                onUserDelete={handleDeleteUser}
+                reloadState={reloadState}
+                setReloadState={setReloadState}
+              />
+            )}
 
-            {openRemoveUserModal && <SimpleModal
-              primaryText={t('COMMON.OK')}
-              primaryActionHandler={handleCloseRemoveModal}
-              open={openRemoveUserModal}
-              onClose={handleCloseRemoveModal}
-              modalTitle={t('COMMON.DELETE_USER')}
-            >
-              {' '}
-              <Box mt={1.5} mb={1.5}>
-                <Typography>
-                  {t('CENTERS.THE_USER_BELONGS_TO_THE_FOLLOWING_COHORT')}{' '}
-                  <strong>{toPascalCase(removeCohortNames)}</strong>
-                  <br />
-                  {t('CENTERS.PLEASE_REMOVE_THE_USER_FROM_COHORT')}
-                </Typography>
-              </Box>
-            </SimpleModal>
-            }
+            {openRemoveUserModal && (
+              <SimpleModal
+                primaryText={t('COMMON.OK')}
+                primaryActionHandler={handleCloseRemoveModal}
+                open={openRemoveUserModal}
+                onClose={handleCloseRemoveModal}
+                modalTitle={t('COMMON.DELETE_USER')}
+              >
+                {' '}
+                <Box mt={1.5} mb={1.5}>
+                  <Typography>
+                    {t('CENTERS.THE_USER_BELONGS_TO_THE_FOLLOWING_COHORT')}{' '}
+                    <strong>{toPascalCase(removeCohortNames)}</strong>
+                    <br />
+                    {t('CENTERS.PLEASE_REMOVE_THE_USER_FROM_COHORT')}
+                  </Typography>
+                </Box>
+              </SimpleModal>
+            )}
             {openAddFacilitatorModal && (
-              <AddFacilitatorModal
+              <FacilitatorManage
                 open={openAddFacilitatorModal}
                 onClose={handleCloseAddFaciModal}
                 onFacilitatorAdded={handleFacilitatorAdded}

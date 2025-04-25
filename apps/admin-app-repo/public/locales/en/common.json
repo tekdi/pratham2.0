@@ -234,7 +234,17 @@
     "FACILITATOR_CREATED_SUCCESSFULLY": "Teacher is created, and credentials sent successfully!",
     "USER_CREDENTIALS_WILL_BE_SEND_SOON": "Teacher is created ,credentials will be sent soon",
     "FACILITATOR_UPDATED_SUCCESSFULLY": "Teacher has been successfully updated!",
-    "EDIT_FACILITATOR": "Edit Facilitator"
+    "EDIT_FACILITATOR": "Edit Facilitator",
+    "RE_ASSIGN_facilitator": "Re-assign Facilitator",
+    "FACILITATOR_CREATED": "The facilitator account has been created successfully",
+    "FACILITATOR_CREATED_FAILED": "Failed to create facilitator account",
+    "FINISH_ASSIGN": "Finish & Assign",
+    "BATCHES_SELECTED": "batches selected",
+    "CENTERS": "Centers",
+    "ASSIGN_BATCHES_FINISH": "You can complete this later at your own pace. However, the batches will only be assigned once you click on ‘Finish & Assign’",
+    "ASSIGN_BATCHES_FROM_VILLAGES": "Assign Batches from Center",
+    "BACK_TO_FORM": "Back to form",
+    "SEARCH_BATCHES": "Search Batches.."
   },
   "NAVBAR": {
     "SEARCHBAR_PLACEHOLDER": "Search course, topic, student, pdf etc.."
@@ -247,7 +257,8 @@
     "USER_CREDENTIALS_WILL_BE_SEND_SOON": "Learner is created, credentials will be sent soon",
     "LEARNER_UPDATED_SUCCESSFULLY": "Learner has been successfully updated!",
     "EDIT_LEARNER": "Edit Learner",
-    "NO_LEARNERS_FOUND": "No Learners Found"
+    "NO_LEARNERS_FOUND": "No Learners Found",
+    "RE_ASSIGN_LEARNER":"Re-assign Learner"
   },
   "MENTORS": {
     "SEARCHBAR_PLACEHOLDER": "Search mentors..",
@@ -286,7 +297,8 @@
     "EDIT_TEAM_LEADER": "Edit Team Leader",
     "NO_TEAM_LEADER_FOUND": "No Team Leader Found",
     "NOT_ABLE_CREATE_TEAM_LEADER": "Not Able To Create Team leader",
-    "NOT_ABLE_UPDATE_TEAM_LEADER": "Not Able to update Team leader"
+    "NOT_ABLE_UPDATE_TEAM_LEADER": "Not Able to update Team leader",
+    "RE_ASSIGN_TEAM_LEAD": "Re-assign Team lead"
   },
   "ADMIN": {
     "ADMIN_UPDATED_SUCCESSFULLY": "Admin has been successfully updated!"
@@ -393,7 +405,6 @@
     "YOU_CANT_DELETE_BATCH_HAS_ACTIVE_LEARNERS": "You can't delete the batch because it has {{activeMembers}} Active Learners",
     "NO_BATCH_FOUND": "No Batch Found"
   },
-
   "FORM": {
     "FULL_NAME": "Full Name",
     "ENTER_FULL_NAME": "Enter FUll Name",
@@ -465,6 +476,7 @@
     "NAME": "Name",
     "MOBILE_NUMBER": "Mobile Number",
     "CENTER": "Center",
+    "BATCH":"Batch",
     "ENGLISH": "English",
     "HOME_SCIENCE": "Home Science",
     "MATH": "Math",
@@ -571,7 +583,6 @@
     "EDITOR_WORKSPACE": "Editor Workspace",
     "COURSE": "Course"
   },
-
   "CONTENT_CREATOR_REVIEWER": {
     "CONTENT_CREATOR": "Content Creator",
     "CONTENT_REVIEWER": "Content Reviewer",
@@ -581,13 +592,11 @@
     "CREATE_CONTENT_CREATOR": "Create content creator",
     "EDIT_CONTENT_REVIEWER": "Edit content reviewer"
   },
-
   "PROGRAM_MANAGEMENT": {
     "PROGRAMS": "Programs",
     "CREATE_PROGRAM": "Create Program",
     "EDIT_PROGRAM": "Edit Program",
     "EDIT": "Edit",
-
     "DELETE_PROGRAM": "Delete",
     "SEARCH_PROGRAM": "Search Program...",
     "NO_PROGRAMS_FOUND": "No Program Found",
@@ -599,7 +608,6 @@
     "ARCHIVED": "Archived",
     "PUBLISHED": "Published",
     "PUBLISH": "Publish",
-
     "UNPUBLISHED": "Unpublish",
     "PROGRAM_PUBLISHED_SUCCESS": "Program Published Successfully!",
     "PROGRAM_DRAFT": "Program marked as a Draft",
@@ -641,7 +649,6 @@
     "REISSUED_CERTIFICATE_FAILED": "Failed to Reissued Certificate",
     "RENDER_CERTIFICATE_FAILED": "Failed to Render Certificate",
     "ISSUED_CERTIFICATE_FAILED": " Failed to Issued Certificate",
-
     "ISSUE_CERTIFICATE_ALERT": "Are you sure you want to issue a certificate for the following details?",
     "REISSUE_CERTIFICATE_ALERT": "Are you sure you want to reissue a certificate for the following details?",
     "FIRST_NAME": "First Name:",
@@ -651,17 +658,27 @@
     "REISSUE_CERTIFICATE_CONFIRMATION": "Reissue certificate confirmation",
     "ISSUE_CERTIFICATE_CONFIRMATION": "Issue certificate confirmation",
     "COURSE_CERTIFICATE": "Course certificate",
-    "DOWNLOAD":"Ceritificate Download",
-    "DOWNLOAD_CERTIFICATE_SUCCESSFULLY":"Download Certificate Successfully"
+    "DOWNLOAD": "Ceritificate Download",
+    "DOWNLOAD_CERTIFICATE_SUCCESSFULLY": "Download Certificate Successfully"
   },
   "MENTOR": {
     "NEW_MENTOR": "New Mentor",
     "NEW_MENTOR_LEAD": "New Mentor Lead",
-    "NO_MENTOR_FOUND": "No Mentor Found"
+    "NO_MENTOR_FOUND": "No Mentor Found",
+    "MENTOR_CREATED_SUCCESSFULLY": "The mentor account has been created successfully, and the credentials have been sent",
+    "MENTOR_CREATED": "The mentor account has been created successfully",
+    "MENTOR_CREATED_FAILED": "Failed to create mentor account",
+    "FINISH_ASSIGN": "Finish & Assign",
+    "VILLAGES_SELECTED": "villages selected",
+    "DISTRICTS": "Districts",
+    "ASSIGN_VILLAGES_FINISH": "You can complete this later at your own pace. However, the villages will only be assigned once you click on ‘Finish.’",
+    "ASSIGN_VILLAGES_FROM_BLOCKS": "Assign Villages from Blocks",
+    "BACK_TO_FORM": "Back to form",
+    "SEARCH_VILLAGES": "Search villages.."
   },
   "WHATS_YOUR_GENDER": "Gender",
   "first_name": " First Name",
-  "middle_name": "Middle Name",
+  "middle_name  ": "Middle Name",
   "last_name": "Last Name",
   "phone_number": "Phone Number",
   "STATE": "State",
@@ -750,22 +767,31 @@
   "REGULAR": "Regular",
   "REMOTE": "Remote",
   "IS_VOLUNTEER": "Is Volunteer",
-  "YOUTH":{
+  "YOUTH": {
     "UPDATE_YOUTH": "Update Youth",
     "NEW_YOUTH": "New Youth",
-    "USER_CREDENTIALS_WILL_BE_SEND_SOON":"User credentials will be sent soon",
-    "NOT_ABLE_CREATE_YOUTH":"Not able to create youth",
-    "YOUTH_CREATED_SUCCESSFULLY":"Youth has been successfully created!",
-    "NOT_ABLE_UPDATE_YOUTH":"Not able to update youth",
-    "YOUTH_UPDATED_SUCCESSFULLY":"Youth has been successfully updated!",
-    "SELF_PLACED":"Self Placed",
-    "REGULAR":"Regular",
-    "ENROLLED_IN_EDUCATIONAL_INSTITUTE":"Enrolled in educational institute",
-    "OWN_FARMING":"Own farming",
-    "AGRICULTURAL_FARM_LABORER":"Agricultural farm laborer",
-    "NON_AGRICULTURAL_LABORER":"Non-agricultural laborer",
-    "SALARIED_WORK":"Salaried work",
-    "SELF_EMPLOYMENT":"Self-employment",
-    "UNEMPLOYED_OR_DOMESTIC_WORK":"Unemployed or Domestic Work"
-  }
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "User credentials will be sent soon",
+    "NOT_ABLE_CREATE_YOUTH": "Not able to create youth",
+    "YOUTH_CREATED_SUCCESSFULLY": "Youth has been successfully created!",
+    "NOT_ABLE_UPDATE_YOUTH": "Not able to update youth",
+    "YOUTH_UPDATED_SUCCESSFULLY": "Youth has been successfully updated!",
+    "SELF_PLACED": "Self Placed",
+    "REGULAR": "Regular",
+    "ENROLLED_IN_EDUCATIONAL_INSTITUTE": "Enrolled in educational institute",
+    "OWN_FARMING": "Own farming",
+    "AGRICULTURAL_FARM_LABORER": "Agricultural farm laborer",
+    "NON_AGRICULTURAL_LABORER": "Non-agricultural laborer",
+    "SALARIED_WORK": "Salaried work",
+    "SELF_EMPLOYMENT": "Self-employment",
+    "UNEMPLOYED_OR_DOMESTIC_WORK": "Unemployed or Domestic Work"
+  },
+  "middle_name": "Middle Name",
+  "ADDRESS":" Address",
+  "DOB": "Date of Birth",
+  "SUBJECT": "Subject",
+   "UNMARRIED": "Unmarried",
+  "MARRIED": "Married",
+  "DIVORCED": "Divorced",
+  "SELF_PLACED": "Self Placed",
+   "DESIGNATION": "Designation"
 }

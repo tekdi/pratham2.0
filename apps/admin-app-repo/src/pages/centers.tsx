@@ -12,6 +12,7 @@ import SimpleModal from '@/components/SimpleModal';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import editIcon from '../../public/images/editIcon.svg';
 import deleteIcon from '../../public/images/deleteIcon.svg';
+import MapIcon from '@mui/icons-material/Map';
 import Image from 'next/image';
 import {
   extractMatchingKeys,
@@ -33,6 +34,10 @@ import { updateCohort } from '@/services/MasterDataService';
 import { transformLabel } from '@/utils/Helper';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
+import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
+import ActiveArchivedLearner from '@/components/ActiveArchivedLearner';
+import { API_ENDPOINTS } from '@/utils/API/APIEndpoints';
+import ActiveArchivedBatch from '@/components/ActiveArchivedBatch';
 
 //import { DynamicForm } from '@shared-lib';
 
@@ -46,9 +51,9 @@ const Centers = () => {
   const [prefilledAddFormData, setPrefilledAddFormData] = useState({});
   const [pageLimit, setPageLimit] = useState<number>(10);
   const [pageOffset, setPageOffset] = useState<number>(0);
-  const [prefilledFormData, setPrefilledFormData] = useState({});
+  const [prefilledFormData, setPrefilledFormData] = useState(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [response, setResponse] = useState({});
+  const [response, setResponse] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -58,18 +63,20 @@ const Centers = () => {
   const [open, setOpen] = useState(false);
   const [firstName, setFirstName] = useState('');
   const [totalCount, setTotalCount] = useState(0);
+  const [totalCountBatch, setTotalCountBatch] = useState(0);
 
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
     ? { state: [localStorage.getItem('stateId')] }
     : {};
-  const searchStoreKey = 'centers'
-  const initialFormDataSearch = localStorage.getItem(searchStoreKey) && localStorage.getItem(searchStoreKey) != "{}"
-    ? JSON.parse(localStorage.getItem(searchStoreKey))
-    : localStorage.getItem('stateId')
+  const searchStoreKey = 'centers';
+  const initialFormDataSearch =
+    localStorage.getItem(searchStoreKey) &&
+    localStorage.getItem(searchStoreKey) != '{}'
+      ? JSON.parse(localStorage.getItem(searchStoreKey))
+      : localStorage.getItem('stateId')
       ? { state: [localStorage.getItem('stateId')] }
       : {};
-
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -95,7 +102,52 @@ const Centers = () => {
         },
       ]);
       console.log('responseForm', responseForm);
-      setAddSchema(responseForm?.schema);
+
+      //unit name is missing from required so handled from frotnend
+      let alterSchema = responseForm?.schema;
+      let requiredArray = alterSchema?.required;
+      const mustRequired = [
+        'name',
+        'center_type',
+        'state',
+        'district',
+        'block',
+        'village',
+        'board',
+        'medium',
+        'grade',
+      ];
+      // Merge only missing items from required2 into required1
+      mustRequired.forEach((item) => {
+        if (!requiredArray.includes(item)) {
+          requiredArray.push(item);
+        }
+      });
+      alterSchema.required = requiredArray;
+      //add max selection custom
+      if (alterSchema?.properties?.state) {
+        alterSchema.properties.state.maxSelection = 1;
+      }
+      if (alterSchema?.properties?.district) {
+        alterSchema.properties.district.maxSelection = 1;
+      }
+      if (alterSchema?.properties?.block) {
+        alterSchema.properties.block.maxSelection = 1;
+      }
+      if (alterSchema?.properties?.village) {
+        alterSchema.properties.village.maxSelection = 1;
+      }
+      if (alterSchema?.properties?.board) {
+        alterSchema.properties.board.maxSelection = 1000;
+      }
+      if (alterSchema?.properties?.medium) {
+        alterSchema.properties.medium.maxSelection = 1000;
+      }
+      if (alterSchema?.properties?.grade) {
+        alterSchema.properties.grade.maxSelection = 1000;
+      }
+
+      setAddSchema(alterSchema);
       setAddUiSchema(responseForm?.uiSchema);
     };
 
@@ -112,32 +164,37 @@ const Centers = () => {
   };
 
   const SubmitaFunction = async (formData: any) => {
-    setPrefilledFormData(formData);
-    //set prefilled search data on refresh
-    localStorage.setItem(searchStoreKey, JSON.stringify(formData))
-    await searchData(formData, 0);
+    // console.log("###### debug issue formData", formData)
+    if (Object.keys(formData).length > 0) {
+      setPrefilledFormData(formData);
+      //set prefilled search data on refresh
+      localStorage.setItem(searchStoreKey, JSON.stringify(formData));
+      await searchData(formData, 0);
+    }
   };
 
   const searchData = async (formData: any, newPage: any) => {
-    formData = Object.fromEntries(
-      Object.entries(formData).filter(
-        ([_, value]) => !Array.isArray(value) || value.length > 0
-      )
-    );
-    const staticFilter = { type: CohortTypes.COHORT, status: [Status.ACTIVE] };
-    const { sortBy } = formData;
-    const staticSort = ['name', sortBy || 'asc'];
-    await searchListData(
-      formData,
-      newPage,
-      staticFilter,
-      pageLimit,
-      setPageOffset,
-      setCurrentPage,
-      setResponse,
-      getCohortList,
-      staticSort
-    );
+    if (formData) {
+      formData = Object.fromEntries(
+        Object.entries(formData).filter(
+          ([_, value]) => !Array.isArray(value) || value.length > 0
+        )
+      );
+      const staticFilter = { type: CohortTypes.COHORT };
+      const { sortBy } = formData;
+      const staticSort = ['name', sortBy || 'asc'];
+      await searchListData(
+        formData,
+        newPage,
+        staticFilter,
+        pageLimit,
+        setPageOffset,
+        setCurrentPage,
+        setResponse,
+        getCohortList,
+        staticSort
+      );
+    }
   };
 
   // delete center logic
@@ -146,15 +203,16 @@ const Centers = () => {
     try {
       const resp = await updateCohort(cohortId, { status: Status.ARCHIVED });
       if (resp?.responseCode === 200) {
-        setResponse((prev) => ({
-          ...prev,
-          result: {
-            ...prev?.results,
-            cohortDetails: prev?.results?.cohortDetails?.filter(
-              (item) => item?.cohortId !== cohortId
-            ),
-          },
-        }));
+        // setResponse((prev) => ({
+        //   ...prev,
+        //   result: {
+        //     ...prev?.results,
+        //     cohortDetails: prev?.results?.cohortDetails?.filter(
+        //       (item) => item?.cohortId !== cohortId
+        //     ),
+        //   },
+        // }));
+        searchData(prefilledFormData, currentPage);
         console.log('Cohort successfully archived.');
       } else {
         console.error('Failed to archive cohort:', resp);
@@ -172,7 +230,32 @@ const Centers = () => {
     {
       key: 'name',
       label: 'Center Name',
-      render: (row: any) => transformLabel(row.name),
+      render: (row: any) => transformLabel(row?.name),
+    },
+    {
+      key: 'type',
+      label: 'Type',
+      render: (row) =>
+        transformLabel(
+          row.customFields
+            .find((field) => field.label === 'TYPE_OF_CENTER')
+            ?.selectedValues.map((item) => item.value)
+            .join(', ')
+        ) || '-',
+    },
+    {
+      key: 'active_batches',
+      label: 'Active Batches',
+      render: (row) => (
+        <ActiveArchivedBatch cohortId={row?.cohortId} type={Status.ACTIVE} />
+      ),
+    },
+    {
+      key: 'archived_batches',
+      label: 'Archived Batches',
+      render: (row) => (
+        <ActiveArchivedBatch cohortId={row?.cohortId} type={Status.ARCHIVED} />
+      ),
     },
     {
       key: 'address',
@@ -188,8 +271,10 @@ const Centers = () => {
       label: 'State',
       render: (row) =>
         transformLabel(
-          row.customFields.find((field) => field.label === 'STATE')
-            ?.selectedValues[0]?.value
+          row.customFields
+            .find((field) => field.label === 'STATE')
+            ?.selectedValues.map((item) => item.value)
+            .join(', ')
         ) || '-',
     },
     {
@@ -197,8 +282,10 @@ const Centers = () => {
       label: 'District',
       render: (row) =>
         transformLabel(
-          row.customFields.find((field) => field.label === 'DISTRICT')
-            ?.selectedValues[0]?.value
+          row.customFields
+            .find((field) => field.label === 'DISTRICT')
+            ?.selectedValues.map((item) => item.value)
+            .join(', ')
         ) || '-',
     },
     {
@@ -206,8 +293,10 @@ const Centers = () => {
       label: 'Block',
       render: (row) =>
         transformLabel(
-          row.customFields.find((field) => field.label === 'BLOCK')
-            ?.selectedValues[0]?.value
+          row.customFields
+            .find((field) => field.label === 'BLOCK')
+            ?.selectedValues.map((item) => item.value)
+            .join(', ')
         ) || '-',
     },
     {
@@ -215,8 +304,10 @@ const Centers = () => {
       label: 'Village',
       render: (row) =>
         transformLabel(
-          row.customFields.find((field) => field.label === 'VILLAGE')
-            ?.selectedValues[0]?.value
+          row.customFields
+            .find((field) => field.label === 'VILLAGE')
+            ?.selectedValues.map((item) => item.value)
+            .join(', ')
         ) || '-',
     },
     {
@@ -224,8 +315,9 @@ const Centers = () => {
       label: 'Boards',
       render: (row) =>
         transformLabel(
-          row.customFields.find((field) => field.label === 'BOARD')
-            ?.selectedValues[0]
+          row.customFields
+            .find((field) => field.label === 'BOARD')
+            ?.selectedValues?.join(', ')
         ) || '-',
     },
     {
@@ -233,9 +325,25 @@ const Centers = () => {
       label: 'Medium',
       render: (row) =>
         transformLabel(
-          row.customFields.find((field) => field.label === 'MEDIUM')
-            ?.selectedValues[0]
+          row.customFields
+            .find((field) => field.label === 'MEDIUM')
+            ?.selectedValues?.join(', ')
         ) || '-',
+    },
+    {
+      key: 'grade',
+      label: 'Grade',
+      render: (row) =>
+        transformLabel(
+          row.customFields
+            .find((field) => field.label === 'GRADE')
+            ?.selectedValues?.join(', ')
+        ) || '-',
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      render: (row: any) => transformLabel(row?.status),
     },
   ];
 
@@ -253,21 +361,44 @@ const Centers = () => {
             padding: '10px',
           }}
         >
+          <MapIcon />
+        </Box>
+      ),
+      callback: async (row: any) => {
+        window.open(
+          row.customFields.find((field) => field.label === 'GOOGLE MAP_LINK')
+            ?.selectedValues,
+          '_blank',
+          'noopener,noreferrer'
+        );
+      },
+      show: (row) =>
+        row.customFields.find((field) => field.label === 'GOOGLE MAP_LINK')
+          ?.selectedValues,
+    },
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            backgroundColor: 'rgb(227, 234, 240)',
+            padding: '10px',
+          }}
+        >
           <Image src={editIcon} alt="" />
         </Box>
       ),
       callback: (row: any) => {
-        console.log('row:', row);
-        console.log('AddSchema', addSchema);
-        console.log('AddUISchema', addUiSchema);
-
         let tempFormData = extractMatchingKeys(row, addSchema);
-        // console.log('tempFormData', tempFormData);
         setPrefilledAddFormData(tempFormData);
         setIsEdit(true);
         setEditableUserId(row?.cohortId);
         handleOpenModal();
       },
+      show: (row) => row.status !== 'archived',
     },
     {
       icon: (
@@ -289,20 +420,42 @@ const Centers = () => {
         console.log('row:', row);
         setEditableUserId(row?.userId);
         setCohortId(row?.cohortId);
+        setIsEdit(false);
 
-        const data = {
-          filters: {
-            cohortId: row?.cohortId,
-            status: ['active'],
-          },
+        //get batch from center id
+        const url = API_ENDPOINTS.cohortSearch;
+        const header = {
+          tenantId: localStorage.getItem('tenantId') || '',
+          Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+          academicyearid: localStorage.getItem('academicYearId') || '',
         };
-        const response = await fetchCohortMemberList(data);
+        const responseBatch = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...header,
+          },
+          body: JSON.stringify({
+            limit: 200,
+            offset: 0,
+            filters: {
+              type: 'BATCH',
+              status: ['active'],
+              parentId: [row?.cohortId],
+            },
+          }),
+        });
+        const dataBatch = await responseBatch.json();
+        if (dataBatch?.result?.results?.cohortDetails) {
+          setTotalCountBatch(dataBatch.result.results.cohortDetails.length);
+        } else {
+          setTotalCountBatch(0);
+        }
 
-        let totalCount = response?.result?.totalCount;
-        setTotalCount(totalCount);
         setOpen(true);
         setFirstName(row?.name);
       },
+      show: (row) => row.status !== 'archived',
     },
   ];
 
@@ -377,15 +530,17 @@ const Centers = () => {
         <SimpleModal
           open={openModal}
           onClose={handleCloseModal}
-          showFooter={false}
+          showFooter={true}
+          primaryText={isEdit ? t('Update') : t('Create')}
+          id="dynamic-form-id"
           modalTitle={
             isEdit ? t('COMMON.UPDATE_CENTER') : t('CENTERS.NEW_CENTER')
           }
         >
           <AddEditUser
             SuccessCallback={() => {
-              setPrefilledFormData({});
-              searchData({}, 0);
+              setPrefilledFormData(initialFormDataSearch);
+              searchData(initialFormDataSearch, 0);
               setOpenModal(false);
             }}
             schema={addSchema}
@@ -394,7 +549,7 @@ const Centers = () => {
             isEdit={isEdit}
             editableUserId={editableUserId}
             UpdateSuccessCallback={() => {
-              setPrefilledFormData({});
+              setPrefilledFormData(prefilledFormData);
               searchData(prefilledFormData, currentPage);
               setOpenModal(false);
             }}
@@ -407,40 +562,49 @@ const Centers = () => {
             telemetryCreateKey={telemetryCreateKey}
             failureCreateMessage={failureCreateMessage}
             isNotificationRequired={false}
+            hideSubmit={true}
+            type="centers"
           />
         </SimpleModal>
 
-        {response && response?.result?.results?.cohortDetails?.length > 0 ? (
-          <Box sx={{ mt: 1 }}>
-            <PaginatedTable
-              count={response?.result?.count}
-              data={response?.result?.results?.cohortDetails}
-              columns={columns}
-              actions={actions}
-              onPageChange={handlePageChange}
-              onRowsPerPageChange={handleRowsPerPageChange}
-              defaultPage={currentPage}
-              defaultRowsPerPage={pageLimit}
-            />
-          </Box>
+        {response != null ? (
+          <>
+            {response &&
+            response?.result?.results?.cohortDetails?.length > 0 ? (
+              <Box sx={{ mt: 1 }}>
+                <PaginatedTable
+                  count={response?.result?.count}
+                  data={response?.result?.results?.cohortDetails}
+                  columns={columns}
+                  actions={actions}
+                  onPageChange={handlePageChange}
+                  onRowsPerPageChange={handleRowsPerPageChange}
+                  defaultPage={currentPage}
+                  defaultRowsPerPage={pageLimit}
+                />
+              </Box>
+            ) : (
+              <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                height="20vh"
+              >
+                <Typography marginTop="10px" textAlign={'center'}>
+                  {t('COMMON.NO_CENTER_FOUND')}
+                </Typography>
+              </Box>
+            )}
+          </>
         ) : (
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            height="20vh"
-          >
-            <Typography marginTop="10px" textAlign={'center'}>
-              {t('COMMON.NO_CENTER_FOUND')}
-            </Typography>
-          </Box>
+          <CenteredLoader />
         )}
       </Box>
-      {totalCount > 0 ? (
+      {totalCount > 0 || totalCountBatch > 0 ? (
         <ConfirmationPopup
           open={open}
           onClose={() => setOpen(false)}
-          title={`You can't delete the center because it has ${totalCount} Active Learners`}
+          title={`You can't delete the center because it has ${totalCountBatch} Active Batch`}
           secondary={'Cancel'}
         />
       ) : (

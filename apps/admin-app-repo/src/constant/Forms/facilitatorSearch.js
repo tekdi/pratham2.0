@@ -60,7 +60,7 @@ export const facilitatorSearchSchema = {
           value: 'value',
         },
         callType: userRole !== Role.CENTRAL_ADMIN ? 'initial' : 'dependent',
-        dependent: 'state',
+        ...(!stateId ? { dependent: 'state' } : {}),
       },
       //for multiselect
       uniqueItems: true,
@@ -162,6 +162,7 @@ export const facilitatorSearchUISchema = {
       multiple: true,
       uniqueItems: true,
     },
+    ...(stateId ? { 'ui:disabled': true } : {}),
   },
 
   district: {
@@ -189,7 +190,7 @@ export const facilitatorSearchUISchema = {
   },
 
   firstName: {
-    'ui:widget': 'text',
+    'ui:widget': 'SearchTextFieldWidget',
   },
 
   sortBy: {

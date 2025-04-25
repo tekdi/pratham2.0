@@ -1,5 +1,6 @@
-import { getCohortList } from "@/services/CohortService/cohortService";
-import React from "react";
+import React from 'react';
+import { getCohortList } from '@/services/CohortService/cohortService';
+import { transformLabel } from '@/utils/Helper';
 
 const CenterLabel = ({ parentId }: any) => {
   const [centerLabel, setCenterLabel] = React.useState('-');
@@ -7,7 +8,10 @@ const CenterLabel = ({ parentId }: any) => {
   React.useEffect(() => {
     let isMounted = true;
     const fetchLabel = async () => {
-      const label = await getCenterLabel(parentId);
+      let label = '-';
+      if (parentId) {
+        label = await getCenterLabel(parentId);
+      }
       if (isMounted) {
         setCenterLabel(label);
       }
@@ -19,30 +23,30 @@ const CenterLabel = ({ parentId }: any) => {
     };
   }, [parentId]);
 
-  return <>{centerLabel}</>;
+  return <>{centerLabel != '-' ? transformLabel(centerLabel) : CenterLabel}</>;
 };
 
 const getCenterLabel = async (parentId: any) => {
-  try{const data = {
-     limit: 100,
-     offset: 0,
-   // sort: sort,
-    filters: {
-      "cohortId": parentId
-  },
-  };
-  const resp = await getCohortList(data)
-  console.log((resp?.results?.cohortDetails[0]?.name))
+  try {
+    const data = {
+      limit: 100,
+      offset: 0,
+      // sort: sort,
+      filters: {
+        cohortId: parentId,
+      },
+    };
+    const resp = await getCohortList(data);
+    console.log(resp?.results?.cohortDetails[0]?.name);
 
-  return  resp?.results?.cohortDetails[0]?.name? (resp?.results?.cohortDetails[0]?.name): "-"
-//  console.log(resp?.results?.cohortDetails[0]?.name)
-
-}
-  catch(e)
-  {
-    console.log(e)
+    return resp?.results?.cohortDetails[0]?.name
+      ? resp?.results?.cohortDetails[0]?.name
+      : '-';
+    //  console.log(resp?.results?.cohortDetails[0]?.name)
+  } catch (e) {
+    console.log(e);
   }
-  
-//  console.log(resp)
+
+  //  console.log(resp)
 };
 export default CenterLabel;

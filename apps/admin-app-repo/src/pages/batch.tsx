@@ -24,11 +24,18 @@ import {
   BatchSearchSchema,
   BatchSearchUISchema,
 } from '@/constant/Forms/BatchSearch';
-import { getCohortList } from '@/services/CohortService/cohortService';
+import {
+  fetchCohortMemberList,
+  getCohortList,
+} from '@/services/CohortService/cohortService';
 import { toPascalCase, transformLabel } from '@/utils/Helper';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import CenterLabel from '@/components/Centerlabel';
+import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
+import ActiveArchivedLearner from '@/components/ActiveArchivedLearner';
+import ConfirmationPopup from '@/components/ConfirmationPopup';
+import { updateCohort } from '@/services/MasterDataService';
 
 //import { DynamicForm } from '@shared-lib';
 
@@ -44,23 +51,29 @@ const Batch = () => {
   const [pageOffset, setPageOffset] = useState<number>(0);
   const [prefilledFormData, setPrefilledFormData] = useState({});
   const [loading, setLoading] = useState<boolean>(false);
-  const [response, setResponse] = useState({});
+  const [response, setResponse] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [isEdit, setIsEdit] = useState(false);
   const [editableUserId, setEditableUserId] = useState('');
+  const [cohortId, setCohortId] = useState('');
   const [tenantId, setTenantId] = useState('');
+  const [open, setOpen] = useState(false);
+  const [firstName, setFirstName] = useState('');
+  const [totalCount, setTotalCount] = useState(0);
 
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
     ? { state: [localStorage.getItem('stateId')] }
     : {};
-  const searchStoreKey = 'batch'
-  const initialFormDataSearch = localStorage.getItem(searchStoreKey) && localStorage.getItem(searchStoreKey) != "{}"
-    ? JSON.parse(localStorage.getItem(searchStoreKey))
-    : localStorage.getItem('stateId')
-      ? { state: [localStorage.getItem('stateId')] }
-      : {};
+  const searchStoreKey = 'batch';
+  const initialFormDataSearch =
+    localStorage.getItem(searchStoreKey) &&
+      localStorage.getItem(searchStoreKey) != '{}'
+      ? JSON.parse(localStorage.getItem(searchStoreKey))
+      : localStorage.getItem('stateId')
+        ? { state: [localStorage.getItem('stateId')] }
+        : {};
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -86,7 +99,52 @@ const Batch = () => {
         },
       ]);
       console.log('responseForm', responseForm);
-      setAddSchema(responseForm?.schema);
+
+      //unit name is missing from required so handled from frotnend
+      let alterSchema = responseForm?.schema;
+      let requiredArray = alterSchema?.required;
+      const mustRequired = [
+        'name',
+        'state',
+        'district',
+        'block',
+        'village',
+        'parentId',
+        'board',
+        'medium',
+        'grade',
+      ];
+      // Merge only missing items from required2 into required1
+      mustRequired.forEach((item) => {
+        if (!requiredArray.includes(item)) {
+          requiredArray.push(item);
+        }
+      });
+      alterSchema.required = requiredArray;
+      //add max selection custom
+      if (alterSchema?.properties?.state) {
+        alterSchema.properties.state.maxSelection = 1;
+      }
+      if (alterSchema?.properties?.district) {
+        alterSchema.properties.district.maxSelection = 1;
+      }
+      if (alterSchema?.properties?.block) {
+        alterSchema.properties.block.maxSelection = 1;
+      }
+      if (alterSchema?.properties?.village) {
+        alterSchema.properties.village.maxSelection = 1;
+      }
+      if (alterSchema?.properties?.board) {
+        alterSchema.properties.board.maxSelection = 1;
+      }
+      if (alterSchema?.properties?.medium) {
+        alterSchema.properties.medium.maxSelection = 1;
+      }
+      if (alterSchema?.properties?.grade) {
+        alterSchema.properties.grade.maxSelection = 1;
+      }
+
+      setAddSchema(alterSchema);
       setAddUiSchema(responseForm?.uiSchema);
     };
 
@@ -103,32 +161,71 @@ const Batch = () => {
   };
 
   const SubmitaFunction = async (formData: any) => {
-    setPrefilledFormData(formData);
-    //set prefilled search data on refresh
-    localStorage.setItem(searchStoreKey, JSON.stringify(formData))
-    await searchData(formData, 0);
+    // console.log("###### debug issue formData", formData)
+    if (Object.keys(formData).length > 0) {
+      setPrefilledFormData(formData);
+      //set prefilled search data on refresh
+      localStorage.setItem(searchStoreKey, JSON.stringify(formData));
+      await searchData(formData, 0);
+    }
   };
- 
+
   const searchData = async (formData: any, newPage: any) => {
-    formData = Object.fromEntries(
-      Object.entries(formData).filter(
-        ([_, value]) => !Array.isArray(value) || value.length > 0
-      )
-    );
-    const staticFilter = { type: CohortTypes.BATCH, status: [Status.ACTIVE] };
-    const { sortBy } = formData;
-    const staticSort = ['name', sortBy || 'asc'];
-    await searchListData(
-      formData,
-      newPage,
-      staticFilter,
-      pageLimit,
-      setPageOffset,
-      setCurrentPage,
-      setResponse,
-      getCohortList,
-      staticSort
-    );
+    if (formData) {
+      formData = Object.fromEntries(
+        Object.entries(formData).filter(
+          ([_, value]) => !Array.isArray(value) || value.length > 0
+        )
+      );
+      const staticFilter = { type: CohortTypes.BATCH };
+      const { sortBy } = formData;
+      const staticSort = ['name', sortBy || 'asc'];
+      delete formData.state;
+      delete formData.district;
+      delete formData.block;
+      delete formData.village;
+      if (!formData.parentId) {
+        formData.parentId = [];
+      }
+      await searchListData(
+        formData,
+        newPage,
+        staticFilter,
+        pageLimit,
+        setPageOffset,
+        setCurrentPage,
+        setResponse,
+        getCohortList,
+        staticSort
+      );
+    }
+  };
+
+  // delete center logic
+
+  const deleteCohort = async () => {
+    try {
+      const resp = await updateCohort(cohortId, { status: Status.ARCHIVED });
+      if (resp?.responseCode === 200) {
+        // setResponse((prev) => ({
+        //   ...prev,
+        //   result: {
+        //     ...prev?.results,
+        //     cohortDetails: prev?.results?.cohortDetails?.filter(
+        //       (item) => item?.cohortId !== cohortId
+        //     ),
+        //   },
+        // }));
+        searchData(prefilledFormData, currentPage);
+        console.log('Batch successfully archived.');
+      } else {
+        console.error('Failed to archive cohort:', resp);
+      }
+
+      return resp;
+    } catch (error) {
+      console.error('Error updating cohort:', error);
+    }
   };
 
   // Define table columns
@@ -136,51 +233,39 @@ const Batch = () => {
   const columns = [
     {
       key: 'name',
-      label: 'Batch',
+      label: 'Batch Name',
       render: (row: any) => transformLabel(row.name),
     },
     {
-      key: 'district',
-      label: 'District',
-      render: (row) =>
-        transformLabel(
-          row.customFields.find((field) => field.label === 'DISTRICT')
-            ?.selectedValues[0]?.value
-        ) || '-',
+      key: 'active_learners',
+      label: 'Active Learners',
+      render: (row) => (
+        <ActiveArchivedLearner cohortId={row?.cohortId} type={Status.ACTIVE} />
+      ),
     },
     {
-      key: 'block',
-      label: 'Block',
-      render: (row) =>
-        transformLabel(
-          row.customFields.find((field) => field.label === 'BLOCK')
-            ?.selectedValues[0]?.value
-        ) || '-',
-    },
-    {
-      key: 'village',
-      label: 'Village',
-      render: (row) =>
-        transformLabel(
-          row.customFields.find((field) => field.label === 'VILLAGE')
-            ?.selectedValues[0]?.value
-        ) || '-',
+      key: 'archived_learners',
+      label: 'Archived Learners',
+      render: (row) => (
+        <ActiveArchivedLearner
+          cohortId={row?.cohortId}
+          type={Status.ARCHIVED}
+        />
+      ),
     },
     {
       key: 'center',
       label: 'Center',
-      render: (row) => <CenterLabel parentId={row?.parentId} />
-    }
-    
-    
-    ,
+      render: (row) => <CenterLabel parentId={row?.parentId} />,
+    },
     {
       key: 'board',
       label: 'Boards',
       render: (row) =>
         transformLabel(
-          row.customFields.find((field) => field.label === 'BOARD')
-            ?.selectedValues[0]
+          row.customFields
+            .find((field) => field.label === 'BOARD')
+            ?.selectedValues?.join(', ')
         ) || '-',
     },
     {
@@ -188,9 +273,25 @@ const Batch = () => {
       label: 'Medium',
       render: (row) =>
         transformLabel(
-          row.customFields.find((field) => field.label === 'MEDIUM')
-            ?.selectedValues[0]
+          row.customFields
+            .find((field) => field.label === 'MEDIUM')
+            ?.selectedValues?.join(', ')
         ) || '-',
+    },
+    {
+      key: 'grade',
+      label: 'Grade',
+      render: (row) =>
+        transformLabel(
+          row.customFields
+            .find((field) => field.label === 'GRADE')
+            ?.selectedValues?.join(', ')
+        ) || '-',
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      render: (row: any) => transformLabel(row?.status),
     },
   ];
 
@@ -212,17 +313,13 @@ const Batch = () => {
         </Box>
       ),
       callback: (row: any) => {
-        console.log('row:', row);
-        console.log('AddSchema', addSchema);
-        console.log('AddUISchema', addUiSchema);
-
         let tempFormData = extractMatchingKeys(row, addSchema);
-        // console.log('tempFormData', tempFormData);
         setPrefilledAddFormData(tempFormData);
         setIsEdit(true);
         setEditableUserId(row?.cohortId);
         handleOpenModal();
       },
+      show: (row) => row.status !== 'archived',
     },
     {
       icon: (
@@ -242,22 +339,24 @@ const Batch = () => {
       ),
       callback: async (row: any) => {
         console.log('row:', row);
-        // setEditableUserId(row?.userId);
-        // const memberStatus = Status.ARCHIVED;
-        // const statusReason = '';
-        // const membershipId = row?.userId;
+        setEditableUserId(row?.userId);
+        setCohortId(row?.cohortId);
 
-        //Call delete cohort api
+        const data = {
+          filters: {
+            cohortId: row?.cohortId,
+            status: ['active'],
+            role:'Learner',
+          },
+        };
+        const response = await fetchCohortMemberList(data);
 
-        // const response = await updateCohortMemberStatus({
-        //   memberStatus,
-        //   statusReason,
-        //   membershipId,
-        // });
-        setPrefilledFormData({});
-        searchData(prefilledFormData, currentPage);
-        setOpenModal(false);
+        let totalCount = response?.result?.totalCount;
+        setTotalCount(totalCount);
+        setOpen(true);
+        setFirstName(row?.name);
       },
+      show: (row) => row.status !== 'archived',
     },
   ];
 
@@ -332,13 +431,15 @@ const Batch = () => {
         <SimpleModal
           open={openModal}
           onClose={handleCloseModal}
-          showFooter={false}
+          showFooter={true}
+          primaryText={isEdit ? t('Update') : t('Create')}
+          id="dynamic-form-id"
           modalTitle={isEdit ? t('BATCH.UPDATE_BATCH') : t('BATCH.NEW_BATCH')}
         >
           <AddEditUser
             SuccessCallback={() => {
-              setPrefilledFormData({});
-              searchData({}, 0);
+              setPrefilledFormData(initialFormDataSearch);
+              searchData(initialFormDataSearch, 0);
               setOpenModal(false);
             }}
             schema={addSchema}
@@ -347,7 +448,7 @@ const Batch = () => {
             isEdit={isEdit}
             editableUserId={editableUserId}
             UpdateSuccessCallback={() => {
-              setPrefilledFormData({});
+              setPrefilledFormData(prefilledFormData);
               searchData(prefilledFormData, currentPage);
               setOpenModal(false);
             }}
@@ -360,35 +461,61 @@ const Batch = () => {
             telemetryCreateKey={telemetryCreateKey}
             failureCreateMessage={failureCreateMessage}
             isNotificationRequired={false}
+            hideSubmit={true}
+            type="batch"
           />
         </SimpleModal>
 
-        {response && response?.result?.results?.cohortDetails?.length > 0 ? (
-          <Box sx={{ mt: 1 }}>
-            <PaginatedTable
-              count={response?.result?.count}
-              data={response?.result?.results?.cohortDetails}
-              columns={columns}
-              actions={actions}
-              onPageChange={handlePageChange}
-              onRowsPerPageChange={handleRowsPerPageChange}
-              defaultPage={currentPage}
-              defaultRowsPerPage={pageLimit}
-            />
-          </Box>
+        {response != null ? (
+          <>
+            {response &&
+              response?.result?.results?.cohortDetails?.length > 0 ? (
+              <Box sx={{ mt: 1 }}>
+                <PaginatedTable
+                  count={response?.result?.count}
+                  data={response?.result?.results?.cohortDetails}
+                  columns={columns}
+                  actions={actions}
+                  onPageChange={handlePageChange}
+                  onRowsPerPageChange={handleRowsPerPageChange}
+                  defaultPage={currentPage}
+                  defaultRowsPerPage={pageLimit}
+                />
+              </Box>
+            ) : (
+              <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                height="20vh"
+              >
+                <Typography marginTop="10px" textAlign={'center'}>
+                  {t('BATCH.NO_BATCH_FOUND')}
+                </Typography>
+              </Box>
+            )}
+          </>
         ) : (
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            height="20vh"
-          >
-            <Typography marginTop="10px" textAlign={'center'}>
-              {t('BATCH.NO_BATCH_FOUND')}
-            </Typography>
-          </Box>
+          <CenteredLoader />
         )}
       </Box>
+      {totalCount > 0 ? (
+        <ConfirmationPopup
+          open={open}
+          onClose={() => setOpen(false)}
+          title={`You can't delete the batch because it has ${totalCount} Active Learners`}
+          secondary={'Cancel'}
+        />
+      ) : (
+        <ConfirmationPopup
+          open={open}
+          onClose={() => setOpen(false)}
+          title={`Are you sure you want to delete ${firstName} batch?`}
+          centerPrimary={t('COMMON.YES')}
+          secondary={t('COMMON.CANCEL')}
+          onClickPrimary={deleteCohort}
+        />
+      )}
     </>
   );
 };

@@ -29,6 +29,7 @@ import Image from 'next/image';
 import UserNameCell from '@/components/UserNameCell';
 import { fetchStateOptions } from '@/services/MasterDataService';
 import { transformLabel } from '@/utils/Helper';
+import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 
 //import { DynamicForm } from '@shared-lib';
 
@@ -44,7 +45,7 @@ const Block = () => {
   const [pageOffset, setPageOffset] = useState<number>(0);
   const [prefilledFormData, setPrefilledFormData] = useState();
   const [loading, setLoading] = useState<boolean>(false);
-  const [response, setResponse] = useState({});
+  const [response, setResponse] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [renderKey, setRenderKey] = useState(true);
   // const [open, setOpen] = useState(false);
@@ -61,7 +62,7 @@ const Block = () => {
   const initialFormDataSearch = localStorage.getItem(searchStoreKey) && localStorage.getItem(searchStoreKey) != "{}"
     ? JSON.parse(localStorage.getItem(searchStoreKey))
     : localStorage.getItem('stateId')
-      ? { state: [localStorage.getItem('stateId')] }
+      ? { state: localStorage.getItem('stateId') }
       : {};
 
   useEffect(() => {
@@ -124,7 +125,7 @@ const Block = () => {
 
     setPageOffset(offset);
     setCurrentPage(pageNumber);
-    setResponse({});
+    setResponse(null);
     setRenderKey((renderKey) => !renderKey);
 
     const data = {
@@ -132,13 +133,13 @@ const Block = () => {
       offset,
       sort,
       fieldName: 'block',
-      controllingfieldfk: formData.district
-        ? formData.district
-        : formData.state,
-      optionName: formData.firstName,
+      controllingfieldfk: filters.district
+        ? filters.district
+        : [filters.state],
+      optionName: filters.fieldName,
     };
 
-    if (filters.firstName) {
+    if (filters?.fieldName) {
       debouncedGetList(data);
     } else {
       const resp = await fetchStateOptions(data);
@@ -178,31 +179,6 @@ const Block = () => {
     setOpenModal(false);
   };
 
-  function extractMatchingKeys(row, schema) {
-    let result = {};
-
-    for (const [key, value] of Object.entries(schema.properties)) {
-      if (value.coreField === 0) {
-        if (value.fieldId) {
-          const customField = row.results?.values?.find(
-            (field) => field.fieldId === value.fieldId
-          );
-          if (customField) {
-            result[key] = customField.selectedValues
-              .map((v) => v.id)
-              .join(', ');
-          }
-        } else if (row[key] !== undefined) {
-          result[key] = row[key];
-        }
-      } else if (row[key] !== undefined) {
-        result[key] = row[key];
-      }
-    }
-
-    return result;
-  }
-
   return (
     <>
       <Box display={'flex'} flexDirection={'column'} gap={2}>
@@ -221,32 +197,33 @@ const Block = () => {
           )
         )}
 
-        {response && response?.result ? (
-          <Box sx={{ mt: 5 }}>
-            <PaginatedTable
-              key={renderKey ? 'defaultRender' : 'customRender'}
-              count={response?.result?.totalCount}
-              data={response?.result?.values}
-              columns={columns}
-              // actions={actions}
-              onPageChange={handlePageChange}
-              onRowsPerPageChange={handleRowsPerPageChange}
-              defaultPage={currentPage}
-              defaultRowsPerPage={pageLimit}
-            />
-          </Box>
-        ) : (
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            height="20vh"
-          >
-            <Typography marginTop="10px" textAlign={'center'}>
-              {t('COMMON.NO_BLOCK_FOUND')}
-            </Typography>
-          </Box>
-        )}
+        {response != null ? <>
+          {response && response?.result ? (
+            <Box sx={{ mt: 5 }}>
+              <PaginatedTable
+                key={renderKey ? 'defaultRender' : 'customRender'}
+                count={response?.result?.totalCount}
+                data={response?.result?.values}
+                columns={columns}
+                // actions={actions}
+                onPageChange={handlePageChange}
+                onRowsPerPageChange={handleRowsPerPageChange}
+                defaultPage={currentPage}
+                defaultRowsPerPage={pageLimit}
+              />
+            </Box>
+          ) : (
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              height="20vh"
+            >
+              <Typography marginTop="10px" textAlign={'center'}>
+                {t('COMMON.NO_BLOCK_FOUND')}
+              </Typography>
+            </Box>
+          )}</> : <CenteredLoader />}
       </Box>
     </>
   );

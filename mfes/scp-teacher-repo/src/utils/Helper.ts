@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Role, Status, labelsToExtractForMiniProfile } from './app.constant';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -9,12 +10,13 @@ import {
 } from './Interfaces';
 dayjs.extend(utc);
 import { format, parseISO } from 'date-fns';
-import manageUserStore from '@/store/manageUserStore';
+import manageUserStore from '../store/manageUserStore';
 import {
   AssessmentType,
   avgLearnerAttendanceLimit,
   lowLearnerAttendanceLimit,
 } from '../../app.config';
+import API_ENDPOINTS from './API/APIEndpoints';
 
 export const ATTENDANCE_ENUM = {
   PRESENT: 'present',
@@ -104,6 +106,81 @@ export const getDayMonthYearFormat = (dateString: string) => {
     month: 'long',
     year: 'numeric',
   });
+};
+
+export const calculateAgeFromDate = (dobString: any) => {
+  const dob = new Date(dobString);
+  const today = new Date();
+
+  let age = today.getFullYear() - dob.getFullYear();
+
+  const hasBirthdayPassedThisYear =
+    today.getMonth() > dob.getMonth() ||
+    (today.getMonth() === dob.getMonth() && today.getDate() >= dob.getDate());
+
+  if (!hasBirthdayPassedThisYear) {
+    age--;
+  }
+
+  return age;
+};
+
+export const transformLabel = (label: string): string => {
+  if (typeof label !== 'string') {
+    return label;
+  }
+  return label
+    ?.toLowerCase() // Convert to lowercase to standardize
+    .replace(/[_-]/g, ' ') // Replace underscores and hyphens with spaces
+    .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize the first letter of each word
+};
+
+export const firstLetterInUpperCase = (label: string): string => {
+  if (!label) {
+    return '';
+  }
+
+  return label
+    ?.split(' ')
+    ?.map((word) => word?.charAt(0).toUpperCase() + word?.slice(1))
+    ?.join(' ');
+};
+
+export function getReassignPayload(
+  removedId: Array<string>,
+  newCohortId: Array<string>
+) {
+  const cohortId = newCohortId;
+  const removedIds = removedId.filter((id: string) => !cohortId.includes(id));
+
+  return { cohortId, removedIds };
+}
+
+export const filterSchema = (schemaObj: any, role: any) => {
+  const locationFields =
+    role === 'mentor' ? ['block', 'village'] : ['batch', 'center'];
+
+  const extractedFields: any = {};
+  locationFields.forEach((field) => {
+    if (schemaObj.schema.properties[field]) {
+      extractedFields[field] = {
+        title: schemaObj.schema.properties[field].title,
+        fieldId: schemaObj.schema.properties[field].fieldId,
+        field_type: schemaObj.schema.properties[field].field_type,
+        maxSelection: schemaObj.schema.properties[field].maxSelection,
+        isMultiSelect: schemaObj.schema.properties[field].isMultiSelect,
+        'ui:widget': schemaObj.uiSchema[field]?.['ui:widget'] || 'select',
+      };
+    }
+  });
+
+  const newSchema = JSON.parse(JSON.stringify(schemaObj)); // Deep copy
+  locationFields.forEach((field) => {
+    delete newSchema.schema.properties[field];
+    delete newSchema.uiSchema[field];
+  });
+
+  return { newSchema, extractedFields };
 };
 
 // Function to truncate URL if it's too long
@@ -357,13 +434,13 @@ export const generateUsernameAndPassword = (
 export const mapFieldIdToValue = (
   fields: CustomField[]
 ): { [key: string]: string } => {
-  return fields?.reduce(
-    (acc: { [key: string]: string }, field: CustomField) => {
-      acc[field.fieldId] = field.value;
-      return acc;
-    },
-    {}
-  );
+  return fields?.reduce((acc: { [key: string]: any }, field: CustomField) => {
+    acc[field.fieldId] =
+      typeof field?.selectedValues?.[0] === 'object'
+        ? field?.selectedValues?.[0]?.value
+        : field?.selectedValues?.[0] || field?.value || '';
+    return acc;
+  }, {});
 };
 
 export const convertUTCToIST = (utcDateTime: string) => {
@@ -427,7 +504,9 @@ export const getCurrentYearPattern = () => {
     const lastDigit = currentYear % 10;
     const middleDigit = Math.floor((currentYear % 100) / 10);
 
-    regexPart = `20[0-${middleDigit - 1}][0-9]|20${middleDigit}[0-${lastDigit}]`;
+    regexPart = `20[0-${
+      middleDigit - 1
+    }][0-9]|20${middleDigit}[0-${lastDigit}]`;
   }
 
   // Full regex covering 1900–1999, 2000 to current year
@@ -436,9 +515,9 @@ export const getCurrentYearPattern = () => {
 
 export const extractAddress = (
   fields: any[],
-  stateLabel: string = 'STATES',
-  districtLabel: string = 'DISTRICTS',
-  blockLabel: string = 'BLOCKS',
+  stateLabel: string = 'STATE',
+  districtLabel: string = 'DISTRICT',
+  blockLabel: string = 'BLOCK',
   searchKey: string = 'label',
   returnKey: string = 'value',
   toPascalCase: (str: string) => string = (str) => str // Default to identity function if not provided
@@ -715,28 +794,28 @@ export const updateStoreFromCohorts = (
   const setStateName = manageUserStore.getState().setStateName;
 
   const district = activeCohorts?.[0]?.customField?.find(
-    (item: any) => item?.label === 'DISTRICTS'
+    (item: any) => item?.label === 'DISTRICT'
   );
   if (district) {
     setDistrictCode(district?.code);
-    setDistrictId(district?.fieldId);
-    setDistrictName(district?.value);
+    setDistrictId(district?.selectedValues[0].id);
+    setDistrictName(district?.selectedValues[0].value);
   }
 
   const state = activeCohorts?.[0]?.customField?.find(
-    (item: any) => item?.label === 'STATES'
+    (item: any) => item?.label === 'STATE'
   );
 
   if (state) {
     setStateCode(state?.code);
-    setStateId(state?.fieldId);
-    setStateName(state?.value);
+    setStateId(state?.selectedValues[0].id);
+    setStateName(state?.selectedValues[0].value);
   }
 
   if (blockObject) {
     setBlockCode(blockObject?.code);
-    setBlockId(blockObject?.fieldId);
-    setBlockName(blockObject?.value);
+    setBlockId(blockObject?.selectedValues[0].id);
+    setBlockName(blockObject?.selectedValues[0].value);
   }
 };
 
@@ -751,12 +830,16 @@ export function formatEndDate({ diffDays }: any) {
       const months = Math.floor(remainingDays / 30.44);
       const days = Math.round(remainingDays % 30.44);
 
-      remainingTime = `${years} year(s)${months > 0 ? `, ${months} month(s)` : ''}${days > 0 ? `,  ${days} day(s)` : ''}`;
+      remainingTime = `${years} year(s)${
+        months > 0 ? `, ${months} month(s)` : ''
+      }${days > 0 ? `,  ${days} day(s)` : ''}`;
     } else if (diffDays > 31) {
       const months = Math.floor(diffDays / 30.44);
       const days = Math.round(diffDays % 30.44);
 
-      remainingTime = `${months} month(s) ${days > 0 ? ` , ${days} day(s)` : ''}`;
+      remainingTime = `${months} month(s) ${
+        days > 0 ? ` , ${days} day(s)` : ''
+      }`;
     } else {
       remainingTime = `${diffDays} day(s)`;
     }
@@ -831,7 +914,7 @@ export interface UserEntry {
   memberStatus: string;
   createdAt: string;
   updatedAt: string;
-  firstName?: string
+  firstName?: string;
 }
 
 export function getLatestEntries(
@@ -920,13 +1003,12 @@ export const getBMG = (cohortData: any) => {
   return null;
 };
 
-
 export const getLastDayDate = (): string => {
   const currentDate = new Date();
   currentDate.setDate(currentDate.getDate() - 1); // Subtract 1 day
   const year = currentDate.getFullYear();
-  const month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Month is zero-indexed
-  const day = String(currentDate.getDate()).padStart(2, "0");
+  const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Month is zero-indexed
+  const day = String(currentDate.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 };
 
@@ -938,7 +1020,7 @@ export const getAssessmentType = (type: string) => {
   } else {
     return AssessmentType.OTHER;
   }
-}
+};
 export const preserveLocalStorage = () => {
   const keysToKeep = [
     'preferredLanguage',
@@ -964,4 +1046,122 @@ export const preserveLocalStorage = () => {
       localStorage.setItem(key, valuesToKeep[key]);
     }
   });
+};
+
+export const getAge = (dobString: any) => {
+  console.log(dobString);
+  const dob = new Date(dobString);
+  const today = new Date();
+
+  let age = today.getFullYear() - dob.getFullYear();
+  const monthDiff = today.getMonth() - dob.getMonth();
+  const dayDiff = today.getDate() - dob.getDate();
+
+  // Adjust age if birthday hasn't occurred yet this year
+  if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+    age--;
+  }
+  console.log(age);
+  return age;
+};
+
+//convert fl response to tl format
+export const flresponsetotl = async (response: any[]) => {
+  const uniqueParentIds = Array.from(
+    new Set(
+      response
+        .filter((item) => item.cohortMemberStatus === 'active')
+        .map((item) => item.parentId)
+    )
+  );
+
+  const fetchParentData = async (parentId: string) => {
+    try {
+      const url = API_ENDPOINTS.cohortSearch;
+      const header = {
+        tenantId: localStorage.getItem('tenantId') || '',
+        Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+        academicyearid: localStorage.getItem('academicYearId') || '',
+      };
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...header,
+        },
+        body: JSON.stringify({
+          limit: 200,
+          offset: 0,
+          filters: {
+            status: ['active'],
+            cohortId: parentId,
+          },
+        }),
+      });
+
+      const data = await response.json();
+      const cohortDetails = data?.result?.results?.cohortDetails || [];
+
+      // Remove customFields if needed
+      const filteredBatch = cohortDetails
+        .filter((item: { status: string }) => item.status === 'active')
+        .map(({ customFields, ...rest }) => rest);
+
+      return filteredBatch;
+    } catch (error) {
+      console.error(`Error fetching data for parentId ${parentId}:`, error);
+      return [];
+    }
+  };
+
+  const getAllParentData = async (parentIds: string[]) => {
+    const results = await Promise.all(
+      parentIds.map((id) => fetchParentData(id))
+    );
+    return results.flat(); // flatten nested arrays
+  };
+
+  // Now fetch and attach children
+  const parentData = await getAllParentData(uniqueParentIds);
+
+  const updatedCohorts = parentData.map((cohort) => {
+    const children = response.filter(
+      (child) =>
+        child.parentId === cohort.cohortId &&
+        child.cohortMemberStatus == 'active'
+    );
+
+    return {
+      ...cohort,
+      childData: children,
+    };
+  });
+
+  // console.log('########## testflresponse updatedCohorts', updatedCohorts);
+  const transformCohortData = (cohorts) => {
+    const transform = (item) => {
+      const { name, cohortName, status, cohortStatus, childData, ...rest } =
+        item;
+
+      const updated = {
+        ...rest,
+        name: cohortName ?? name,
+        cohortName: name ?? cohortName,
+        status: cohortStatus ?? status,
+        cohortStatus: status ?? cohortStatus,
+        childData: childData?.map(transform) || [],
+      };
+
+      return updated;
+    };
+
+    return cohorts.map(transform);
+  };
+
+  // Usage
+  const transformedData = transformCohortData(updatedCohorts);
+  // console.log('########## testflresponse transformedData', transformedData);
+
+  return transformedData;
 };

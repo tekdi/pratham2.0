@@ -85,7 +85,7 @@ export const searchListData = async (
 
   setPageOffset(offset);
   setCurrentPage(pageNumber);
-  setResponse({});
+  setResponse(null);
 
   const data = {
     limit,
@@ -105,18 +105,17 @@ export const searchListData = async (
   }
 };
 export const extractMatchingKeys = (row: any, schema: any) => {
-  let result = {};
-  const getValue = (type, selectedValues) => {
+  let result: Record<string, any> = {};
+
+  const getValue = (type: string, selectedValues: any) => {
     if (
       type === 'array' &&
       Array.isArray(selectedValues) &&
       selectedValues.length > 0
     ) {
       if (typeof selectedValues[0] === 'object') {
-        // Array of JSON objects -> return array of IDs
-        return selectedValues.map((item) => item.id);
+        return selectedValues.map((item) => item.id.toString() ?? item); // handles missing `id`
       } else {
-        // Simple array of strings -> return as is
         return selectedValues;
       }
     } else if (
@@ -125,48 +124,36 @@ export const extractMatchingKeys = (row: any, schema: any) => {
       selectedValues.length > 0
     ) {
       if (typeof selectedValues[0] === 'object') {
-        // Array of JSON objects -> return first object's ID
-        return selectedValues[0].id;
+        return selectedValues[0].id.toString() ?? selectedValues[0];
+      } else {
+        return selectedValues[0];
       }
+    } else if (type === 'array' && typeof selectedValues === 'string') {
+      return [selectedValues];
+    } else if (type === 'string' && typeof selectedValues === 'string') {
+      return selectedValues;
     }
-    return null; // Default if conditions not met
+    return null;
   };
-  const convertArrayToStrings = (arr) => {
-    if (!Array.isArray(arr)) {
-      // throw new Error('Input is not an array');
-      return arr;
-    }
-    return arr.map((item) => String(item));
-  };
-  for (const [key, value] of Object.entries(schema.properties)) {
-    // console.log('######### prefilled key', JSON.stringify(key));
-    // console.log('######### prefilled value', JSON.stringify(value));
-    // console.log('######### prefilled row', JSON.stringify(row));
-    if (value.coreField === 0) {
-      if (value.fieldId) {
-        //check type = array or string
-        const customField = row.customFields?.find(
-          (field) => field.fieldId === value.fieldId
-        );
-        if (customField) {
-          // console.log(
-          //   '######### prefilled customField',
-          //   JSON.stringify(customField)
-          // );
-          let resultValue = getValue(value.type, customField.selectedValues);
-          if (resultValue) {
-            // console.log(
-            //   '######### prefilled resultValue',
-            //   JSON.stringify(resultValue)
-            // );
-            result[key] = convertArrayToStrings(resultValue);
-          }
-        }
-      } else if (row[key] !== undefined && row[key] !== null) {
+
+  for (const [key, schemaField] of Object.entries(schema.properties)) {
+    if (schemaField.coreField === 1) {
+      // Core fields (like name) directly from row
+      //core field bug fix for null value must be string in middlename
+      if (row[key]) {
         result[key] = row[key];
       }
-    } else if (row[key] !== undefined && row[key] !== null) {
-      result[key] = row[key];
+    } else if (schemaField.fieldId) {
+      const matchedField = row.customFields?.find(
+        (field) => field.fieldId === schemaField.fieldId
+      );
+
+      if (matchedField) {
+        const value = getValue(schemaField.type, matchedField.selectedValues);
+        if (value !== null) {
+          result[key] = value;
+        }
+      }
     }
   }
 
@@ -207,7 +194,8 @@ export const notificationCallback = async (
   key: any,
   payload: any,
   t: any,
-  successMessageKey: any
+  successMessageKey: any,
+  type: any
 ) => {
   const isQueue = false;
 
@@ -218,17 +206,44 @@ export const notificationCallback = async (
   }
   let replacements: { [key: string]: string };
   replacements = {};
+  let cleanedUrl = '';
+  if (process.env.NEXT_PUBLIC_TEACHER_SBPLAYER) {
+    cleanedUrl = process.env.NEXT_PUBLIC_TEACHER_SBPLAYER.replace(
+      /\/sbplayer$/,
+      ''
+    );
+  }
   if (creatorName) {
-    replacements = {
-      '{FirstName}': firstLetterInUpperCase(payload?.firstName),
-      '{UserName}': payload?.email,
-      '{Password}': payload?.password,
-      '{appUrl}': (process.env.NEXT_PUBLIC_TEACHER_APP_URL as string) || '', //TODO: check url
-    };
+    if (type == 'learner') {
+      let sentName = JSON.parse(localStorage.getItem('userData'))?.firstName;
+      replacements = {
+        '{FirstName}': sentName,
+        '{UserName}': payload?.username,
+        '{Password}': payload?.password,
+        '{LearnerName}': `${firstLetterInUpperCase(
+          payload?.firstName
+        )} ${firstLetterInUpperCase(payload?.lastName)}`,
+      };
+    } else {
+      replacements = {
+        '{FirstName}': firstLetterInUpperCase(payload?.firstName),
+        '{UserName}': payload?.username,
+        '{Password}': payload?.password,
+        '{appUrl}': cleanedUrl || '', //TODO: check url
+      };
+    }
+  }
+
+  let sentEmail = payload?.email;
+  //learner tst
+  if (type == 'learner') {
+    try {
+      sentEmail = JSON.parse(localStorage.getItem('userData'))?.email;
+    } catch (e) {}
   }
 
   const sendTo = {
-    receipients: [payload?.email],
+    receipients: [sentEmail],
   };
   if (Object.keys(replacements).length !== 0 && sendTo) {
     const response = await sendCredentialService({

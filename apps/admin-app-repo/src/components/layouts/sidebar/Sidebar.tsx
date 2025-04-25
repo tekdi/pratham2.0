@@ -16,10 +16,10 @@ import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import LogoIcon from '../logo/LogoIcon';
 import Buynow from './Buynow';
-import Menuitems from './MenuItems';
+// import Menuitems from './MenuItems';
 import { getFilteredMenuItems } from './MenuItems';
 
 //menu config dynamic
@@ -56,9 +56,14 @@ const Sidebar = ({
       ? { backgroundColor: '#FDBF34', color: 'black', borderRadius: '100px' }
       : {};
 
-  const menuItems = Object.entries(MENU_CONFIG[storedProgram] || {}).filter(
-    ([_, item]) => item.roles.includes(storedRole)
-  );
+  // const menuItems = Object.entries(MENU_CONFIG[storedProgram] || {}).filter(
+  //   ([_, item]) => item.roles.includes(storedRole)
+  // );
+  const menuItems = useMemo(() => {
+    return Object.entries(MENU_CONFIG[storedProgram] || {}).filter(
+      ([_, item]) => item.roles.includes(storedRole)
+    );
+  }, [storedProgram, storedRole]);
 
   // console.log('menuItems', JSON.stringify(menuItems));
 
@@ -69,8 +74,8 @@ const Sidebar = ({
       bgcolor="#F8EFDA"
       sx={{
         background: 'linear-gradient(to bottom, white, #F8EFDA)',
-        height:"100vh",
-        overflowY:'auto'
+        height: '100vh',
+        overflowY: 'auto',
       }}
     >
       <Box sx={{ display: 'flex', justifyContent: 'center' }}>
@@ -78,9 +83,7 @@ const Sidebar = ({
       </Box>
 
       <Box mt={2}>
-        <List
-          component="nav"
-        >
+        <List component="nav">
           {menuItems.map(([key, item]) => {
             const hasSubMenu = item.subMenu && item.subMenu.length > 0;
             const isAllowed = item.roles.includes(storedRole);
@@ -95,11 +98,12 @@ const Sidebar = ({
                       handleToggle(key);
                     } else {
                       router.push(item.link);
+                      onSidebarClose();
                     }
                   }}
                   style={getActiveStyle(item.link)}
                 >
-                  <ListItemIcon sx={{ minWidth: "40px" }}>
+                  <ListItemIcon sx={{ minWidth: '40px' }}>
                     <Image
                       src={item.icon}
                       alt={t(item.title)}
@@ -126,7 +130,10 @@ const Sidebar = ({
                           <ListItemButton
                             key={sub.link}
                             sx={{ pl: 7 }}
-                            onClick={() => router.push(sub.link)}
+                            onClick={() => {
+                              router.push(sub.link);
+                              onSidebarClose();
+                            }}
                             style={getActiveStyle(sub.link)}
                           >
                             <ListItemText primary={t(sub.title)} />

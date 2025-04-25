@@ -26,10 +26,10 @@ type FormSubmitFunctionType = (formData: any, payload: any) => Promise<void>;
 interface MentorAssignmentProps {
   showAssignmentScreen: boolean;
   setShowAssignmentScreen: React.Dispatch<React.SetStateAction<boolean>>;
-  formData: any,
-  setFormData: any
+  formData: any;
+  setFormData: any;
   FormSubmitFunction: FormSubmitFunctionType;
-  onClose:any
+  onClose: any;
 }
 const MentorAssignment: React.FC<MentorAssignmentProps> = ({
   showAssignmentScreen,
@@ -37,8 +37,7 @@ const MentorAssignment: React.FC<MentorAssignmentProps> = ({
   FormSubmitFunction,
   formData,
   setFormData,
-  onClose
-
+  onClose,
 }) => {
   const [selectedBlock, setSelectedBlock] = useState<{
     id: string;
@@ -59,7 +58,7 @@ const MentorAssignment: React.FC<MentorAssignmentProps> = ({
   );
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
- // const [showAssignmentScreen, setShowAssignmentScreen] = useState(false); // New state to toggle views
+  // const [showAssignmentScreen, setShowAssignmentScreen] = useState(false); // New state to toggle views
 
   const { t } = useTranslation();
 
@@ -69,7 +68,6 @@ const MentorAssignment: React.FC<MentorAssignmentProps> = ({
       [blockId]: villages,
     }));
   };
-
 
   const handleBackToForm = () => setShowAssignmentScreen(false); // Back to form screen
 
@@ -85,8 +83,8 @@ const MentorAssignment: React.FC<MentorAssignmentProps> = ({
       );
       const customFields = mapToCustomFields(assignedVillages, sdbvFieldData);
       console.log('customFields', customFields);
-      let tenantCohortRoleMapping =[] 
-      tenantCohortRoleMapping[0]= {
+      let tenantCohortRoleMapping = [];
+      tenantCohortRoleMapping[0] = {
         tenantId: localStorage.getItem('tenantId'),
         roleId: 'a5f1dbc9-2ad4-442c-b762-0e3fc1f6c6da',
       };
@@ -130,38 +128,33 @@ const MentorAssignment: React.FC<MentorAssignmentProps> = ({
             replacements,
             email: sendTo,
           });
-          if (response?.email?.data[0]?.result === "Email notification sent successfully") {
-            onClose()
+          if (
+            response?.email?.data[0]?.result ===
+            'Email notification sent successfully'
+          ) {
+            onClose();
 
-           
-                    showToastMessage(t("MENTOR.MENTOR_CREATED_SUCCESSFULLY"), "success");
-                    setSubmittedButtonStatus(true)
-            
-          }
-          else
-          {
-            console.log(" not checked")
-            onClose()
+            showToastMessage(
+              t('MENTOR.MENTOR_CREATED_SUCCESSFULLY'),
+              'success'
+            );
+            setSubmittedButtonStatus(true);
+          } else {
+            console.log(' not checked');
+            onClose();
             showToastMessage(t('MENTOR.MENTOR_CREATED'), 'success');
-
           }
-          setSubmittedButtonStatus(!submittedButtonStatus)
+          setSubmittedButtonStatus(!submittedButtonStatus);
         }
       }
     } catch (error: any) {
-      if (error?.response?.data?.params?.err === "User already exist.") {
-        showToastMessage(error?.response?.data?.params?.err, "error");
-      } 
-      else
-      {
-        onClose()
-
+      if (error?.response?.data?.params?.err === 'User already exist.') {
+        showToastMessage(error?.response?.data?.params?.err, 'error');
+      } else {
+        onClose();
       }
-     
     }
   };
-
-  
 
   // Example usage:
   // const schemaObj = {
@@ -188,11 +181,11 @@ const MentorAssignment: React.FC<MentorAssignmentProps> = ({
       },
       {
         fieldId: fieldMapping.state.fieldId,
-        value: [stateResult?.selectedValues[0]?.id],
+        value: [stateResult?.selectedValues?.[0]?.id],
       },
       {
         fieldId: fieldMapping.district.fieldId,
-        value: [districtResult?.selectedValues[0]?.id],
+        value: [districtResult?.selectedValues?.[0]?.id],
       },
     ];
   };
@@ -204,7 +197,7 @@ const MentorAssignment: React.FC<MentorAssignmentProps> = ({
       const districtResult = userData.customFields.find(
         (item: any) => item.label === cohortHierarchy.DISTRICT
       );
-      setDistrictName(districtResult?.selectedValues[0]?.value);
+      setDistrictName(districtResult?.selectedValues?.[0]?.value);
       const transformedData = districtResult?.selectedValues?.map(
         (item: any) => ({
           id: item?.id,
@@ -245,13 +238,13 @@ const MentorAssignment: React.FC<MentorAssignmentProps> = ({
       console.log('responseForm', responseForm);
       const { newSchema, extractedFields } = filterSchema(responseForm);
 
-           setAddSchema(newSchema?.schema);
-           const updatedUiSchema = {
-            ...newSchema?.uiSchema,
-            "ui:submitButtonOptions": {
-              norender: true, 
-            },
-          };
+      setAddSchema(newSchema?.schema);
+      const updatedUiSchema = {
+        ...newSchema?.uiSchema,
+        'ui:submitButtonOptions': {
+          norender: true,
+        },
+      };
       setAddUiSchema(updatedUiSchema);
       setSdbvFieldData(extractedFields);
     };
@@ -288,61 +281,93 @@ const MentorAssignment: React.FC<MentorAssignmentProps> = ({
           />
         )
       ) : (
-        <Box display="flex" flexDirection="column" p={3}>
+        <Box display="flex" flexDirection="column">
           <Button variant="text" color="primary" onClick={handleBackToForm}>
-          {t('MENTOR.BACK_TO_FORM')}
+            {t('MENTOR.BACK_TO_FORM')}
           </Button>
-          <Typography variant="h5" fontWeight="bold">
-          {t('MENTOR.ASSIGN_VILLAGES_FROM_BLOCKS')}
+          <Typography
+            sx={{ fontSize: '14px', color: '#1F1B13', fontWeight: '400' }}
+          >
+            {t('MENTOR.ASSIGN_VILLAGES_FROM_BLOCKS')}
           </Typography>
-          <Typography variant="body2" color="textSecondary" gutterBottom>
+          <Typography
+            sx={{ fontSize: '14px', color: '#1F1B13', fontWeight: '400' }}
+            color="textSecondary"
+            gutterBottom
+          >
             {t('MENTOR.ASSIGN_VILLAGES_FINISH')}
           </Typography>
 
-          <Typography variant="subtitle1" fontWeight="bold" mt={2}>
+          <Typography
+            variant="subtitle1"
+            sx={{ fontSize: '14px', color: '#7C766F', fontWeight: '400' }}
+            mt={2}
+          >
             {districtName} {t('MENTOR.DISTRICTS')}
           </Typography>
 
           <Box
-            display="grid"
-            gridTemplateColumns="repeat(2, 1fr)"
-            gap={2}
-            mt={2}
+          // display="grid"
+          // gridTemplateColumns="repeat(2, 1fr)"
+          // gap={2}
           >
             {blocks.map(({ id, name }: any) => (
-              <Card
+              <Box
                 key={id}
                 sx={{
                   cursor: 'pointer',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  p: 2,
+                  mt: 2,
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  padding: '10px',
                 }}
                 onClick={() => setSelectedBlock({ id, name })}
               >
-                <CardContent>
-                  <Typography variant="h6">{name}</Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    {selectedVillages[id]?.length || 0} {t('MENTOR.VILLAGES_SELECTED')}
+                <Box>
+                  <Typography
+                    sx={{
+                      color: '#1F1B13',
+                      fontWeight: '400',
+                      fontSize: '16px',
+                    }}
+                    variant="h6"
+                  >
+                    {name}
                   </Typography>
-                </CardContent>
+                  <Typography
+                    sx={{
+                      color: '#635E57',
+                      fontWeight: '400',
+                      fontSize: '14px',
+                    }}
+                    color="text.secondary"
+                  >
+                    {selectedVillages[id]?.length || 0}{' '}
+                    {t('MENTOR.VILLAGES_SELECTED')}
+                  </Typography>
+                </Box>
                 <IconButton>
                   <ArrowForwardIosIcon fontSize="small" />
                 </IconButton>
-              </Card>
+              </Box>
             ))}
           </Box>
 
-          <Box display="flex" justifyContent="space-between" mt={4}>
-          <Button
-        variant="contained"
-        color="primary"
-        onClick={handleFinish}
-       disabled={Object.values(selectedVillages).every(villages => villages.length === 0)}
-        >
-       {t('MENTOR.FINISH_ASSIGN')}
-      </Button>
+          <Box display="flex" justifyContent="space-between" mt={2}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleFinish}
+              disabled={Object.values(selectedVillages).every(
+                (villages) => villages.length === 0
+              )}
+              sx={{ width: '100%' }}
+            >
+              {t('MENTOR.FINISH_ASSIGN')}
+            </Button>
           </Box>
         </Box>
       )}

@@ -11,13 +11,10 @@ export const MasterBlockSchema = {
   type: 'object',
   properties: {
     state: {
-      type: 'array',
+      type: 'string',
       title: 'State',
-      items: {
-        type: 'string',
-        enum: userRole !== Role.CENTRAL_ADMIN ? [stateId] : ['Select'],
-        enumNames: userRole !== Role.CENTRAL_ADMIN ? [stateName] : ['Select'],
-      },
+      enum: userRole !== Role.CENTRAL_ADMIN ? [stateId] : ['Select'],
+      enumNames: userRole !== Role.CENTRAL_ADMIN ? [stateName] : ['Select'],
       api:
         userRole !== Role.CENTRAL_ADMIN
           ? undefined // Avoid API call if userRole is Central admin
@@ -32,10 +29,6 @@ export const MasterBlockSchema = {
               },
               callType: 'initial',
             },
-      //for multiselect
-      uniqueItems: true,
-      isMultiSelect: true,
-      maxSelections: 1000,
     },
     district: {
       type: 'array',
@@ -60,14 +53,14 @@ export const MasterBlockSchema = {
           value: 'value',
         },
         callType: userRole !== Role.CENTRAL_ADMIN ? 'initial' : 'dependent',
-        dependent: 'state',
+        ...(!stateId ? { dependent: 'state' } : {}),
       },
       //for multiselect
       uniqueItems: true,
       isMultiSelect: true,
       maxSelections: 1000,
     },
-    firstName: {
+    fieldName: {
       type: 'string',
       title: 'Search Block',
       // description: 'Search for a specific user or entity',
@@ -82,9 +75,14 @@ export const MasterBlockSchema = {
 };
 
 export const MasterBlocksUISchema = {
-  'ui:order': ['firstName', 'sortBy'],
+  'ui:order': ['state', 'district', 'fieldName', 'sortBy'],
 
   state: {
+    'ui:widget': 'CustomSingleSelectWidget',
+    ...(stateId ? { 'ui:disabled': true } : {}),
+  },
+
+  district: {
     'ui:widget': 'CustomMultiSelectWidget',
     'ui:options': {
       multiple: true,
@@ -92,12 +90,8 @@ export const MasterBlocksUISchema = {
     },
   },
 
-  district: {
-    'ui:widget': 'select',
-  },
-
-  firstName: {
-    'ui:widget': 'text',
+  fieldName: {
+    'ui:widget': 'SearchTextFieldWidget',
   },
 
   sortBy: {

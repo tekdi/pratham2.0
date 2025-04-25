@@ -27,10 +27,10 @@ import {
 import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import TenantService from '@/services/TenantService';
-import { useTheme } from "@mui/material/styles";
-import AddIcon from "@mui/icons-material/Add";
-
-
+import { useTheme } from '@mui/material/styles';
+import AddIcon from '@mui/icons-material/Add';
+import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
+import { transformLabel } from '@/utils/Helper';
 
 const ContentReviewer = () => {
   const theme = useTheme<any>();
@@ -44,21 +44,21 @@ const ContentReviewer = () => {
   const [pageOffset, setPageOffset] = useState<number>(0);
   const [prefilledFormData, setPrefilledFormData] = useState({});
   const [loading, setLoading] = useState<boolean>(false);
-  const [response, setResponse] = useState({});
+  const [response, setResponse] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [isEdit, setIsEdit] = useState(false);
   const [editableUserId, setEditableUserId] = useState('');
 
   const { t, i18n } = useTranslation();
-  const storedUserData = JSON.parse(
-    localStorage.getItem('adminInfo') || '{}'
-  );
+  const storedUserData = JSON.parse(localStorage.getItem('adminInfo') || '{}');
 
-  const searchStoreKey = 'contentReviewer'
-  const initialFormDataSearch = localStorage.getItem(searchStoreKey) && localStorage.getItem(searchStoreKey) != "{}"
-    ? JSON.parse(localStorage.getItem(searchStoreKey))
-    : localStorage.getItem('stateId')
+  const searchStoreKey = 'contentReviewer';
+  const initialFormDataSearch =
+    localStorage.getItem(searchStoreKey) &&
+    localStorage.getItem(searchStoreKey) != '{}'
+      ? JSON.parse(localStorage.getItem(searchStoreKey))
+      : localStorage.getItem('stateId')
       ? { state: [localStorage.getItem('stateId')] }
       : {};
 
@@ -86,7 +86,7 @@ const ContentReviewer = () => {
       setAddSchema(responseForm?.schema);
       setAddUiSchema(responseForm?.uiSchema);
     };
-    
+
     setPrefilledAddFormData(initialFormDataSearch);
     fetchData();
   }, []);
@@ -99,27 +99,39 @@ const ContentReviewer = () => {
   };
 
   const SubmitaFunction = async (formData: any) => {
-    setPrefilledFormData(formData);
-    //set prefilled search data on refresh
-    localStorage.setItem(searchStoreKey, JSON.stringify(formData))
-    await searchData(formData, 0);
+    if (Object.keys(formData).length > 0) {
+      setPrefilledFormData(formData);
+      //set prefilled search data on refresh
+      localStorage.setItem(searchStoreKey, JSON.stringify(formData));
+      await searchData(formData, 0);
+    }
   };
 
   const searchData = async (formData: any, newPage: any) => {
-    const staticFilter = { role: RoleName.CONTENT_REVIEWER, tenantId: TenantService.getTenantId() };
-    const { sortBy } = formData;
-    const staticSort = ['firstName', sortBy || 'asc'];
-    await searchListData(
-      formData,
-      newPage,
-      staticFilter,
-      pageLimit,
-      setPageOffset,
-      setCurrentPage,
-      setResponse,
-      userList,
-      staticSort
-    );
+    if (formData) {
+      formData = Object.fromEntries(
+        Object.entries(formData).filter(
+          ([_, value]) => !Array.isArray(value) || value.length > 0
+        )
+      );
+      const staticFilter = {
+        role: RoleName.CONTENT_REVIEWER,
+        tenantId: TenantService.getTenantId(),
+      };
+      const { sortBy } = formData;
+      const staticSort = ['firstName', sortBy || 'asc'];
+      await searchListData(
+        formData,
+        newPage,
+        staticFilter,
+        pageLimit,
+        setPageOffset,
+        setCurrentPage,
+        setResponse,
+        userList,
+        staticSort
+      );
+    }
   };
 
   // Define table columns
@@ -128,11 +140,14 @@ const ContentReviewer = () => {
       keys: ['firstName', 'middleName', 'lastName'],
       label: 'Content Reviewer Name',
       render: (row: any) =>
-        `${row.firstName || ''} ${row.middleName || ''} ${row.lastName || ''}`.trim(),
+        `${row.firstName || ''} ${row.middleName || ''} ${
+          row.lastName || ''
+        }`.trim(),
     },
     {
       key: 'status',
       label: 'Status',
+      render: (row: any) => transformLabel(row.status),
       getStyle: (row: any) => ({
         color: row.status === 'active' ? 'green' : 'red',
       }),
@@ -141,11 +156,12 @@ const ContentReviewer = () => {
       key: 'STATE',
       label: 'State',
       render: (row) => {
-        const state = row.customFields.find((field) => field.label ===
-        'STATE')?.selectedValues[0]?.value || '-';
+        const state =
+          row.customFields.find((field) => field.label === 'STATE')
+            ?.selectedValues?.[0]?.value || '-';
         return `${state}`;
       },
-    }
+    },
   ];
 
   const scpCustomColumns = [
@@ -153,8 +169,10 @@ const ContentReviewer = () => {
       key: 'BOARD',
       label: 'Board',
       render: (row) => {
-        const board = row.customFields.find((field) => field.label ===
-        'BOARD')?.selectedValues.join(', ') || '-';
+        const board =
+          row.customFields
+            .find((field) => field.label === 'BOARD')
+            ?.selectedValues.join(', ') || '-';
         return `${board}`;
       },
     },
@@ -162,8 +180,10 @@ const ContentReviewer = () => {
       key: 'MEDIUM',
       label: 'Medium',
       render: (row) => {
-        const medium = row.customFields.find((field) => field.label ===
-        'MEDIUM')?.selectedValues.join(', ') || '-';
+        const medium =
+          row.customFields
+            .find((field) => field.label === 'MEDIUM')
+            ?.selectedValues.join(', ') || '-';
         return `${medium}`;
       },
     },
@@ -171,29 +191,35 @@ const ContentReviewer = () => {
       key: 'GRADE',
       label: 'Grade',
       render: (row) => {
-        const grade = row.customFields.find((field) => field.label ===
-        'GRADE')?.selectedValues.join(', ') || '-';
+        const grade =
+          row.customFields
+            .find((field) => field.label === 'GRADE')
+            ?.selectedValues.join(', ') || '-';
         return `${grade}`;
       },
     },
     {
       key: 'SUBJECT',
-      label: 'subject',
+      label: 'Subject',
       render: (row) => {
-        const subject = row.customFields.find((field) => field.label ===
-        'SUBJECT')?.selectedValues.join(', ') || '-';
+        const subject =
+          row.customFields
+            .find((field) => field.label === 'SUBJECT')
+            ?.selectedValues.join(', ') || '-';
         return `${subject}`;
       },
-    }
-  ]
+    },
+  ];
 
   const youthnetCustomColumns = [
     {
       key: 'DOMAIN',
       label: 'Domain',
       render: (row) => {
-        const domain = row.customFields.find((field) => field.label ===
-        'DOMAIN')?.selectedValues.join(', ') || '-';
+        const domain =
+          row.customFields
+            .find((field) => field.label === 'DOMAIN')
+            ?.selectedValues.join(', ') || '-';
         return `${domain}`;
       },
     },
@@ -201,8 +227,10 @@ const ContentReviewer = () => {
       key: 'SUB DOMAIN',
       label: 'Sub Domain',
       render: (row) => {
-        const subDomain = row.customFields.find((field) => field.label ===
-        'SUB DOMAIN')?.selectedValues.join(', ') || '-';
+        const subDomain =
+          row.customFields
+            .find((field) => field.label === 'SUB DOMAIN')
+            ?.selectedValues.join(', ') || '-';
         return `${subDomain}`;
       },
     },
@@ -210,17 +238,21 @@ const ContentReviewer = () => {
       key: 'STREAM',
       label: 'Stream',
       render: (row) => {
-        const stream = row.customFields.find((field) => field.label ===
-        'STREAM')?.selectedValues.join(', ') || '-';
+        const stream =
+          row.customFields
+            .find((field) => field.label === 'STREAM')
+            ?.selectedValues.join(', ') || '-';
         return `${stream}`;
-      }
-    }
-  ]
+      },
+    },
+  ];
 
-  if (storedUserData.tenantData[0].tenantName === TenantName.SECOND_CHANCE_PROGRAM) {
-    columns = [...columns, ...scpCustomColumns]
+  if (
+    storedUserData.tenantData[0].tenantName === TenantName.SECOND_CHANCE_PROGRAM
+  ) {
+    columns = [...columns, ...scpCustomColumns];
   } else if (storedUserData.tenantData[0].tenantName === TenantName.YOUTHNET) {
-    columns = [...columns, ...youthnetCustomColumns]
+    columns = [...columns, ...youthnetCustomColumns];
   }
 
   // Define actions
@@ -252,6 +284,7 @@ const ContentReviewer = () => {
         setEditableUserId(row?.userId);
         handleOpenModal();
       },
+      show: (row) => row.status !== 'archived',
     },
     {
       icon: (
@@ -273,17 +306,16 @@ const ContentReviewer = () => {
         console.log('row:', row);
         setEditableUserId(row?.userId);
         const userId = row?.userId;
-        const response = await deleteUser(
-          userId, {
-            userData: {
-              status: Status.ARCHIVED
-            }
-          }
-        );
+        const response = await deleteUser(userId, {
+          userData: {
+            status: Status.ARCHIVED,
+          },
+        });
         setPrefilledFormData({});
         searchData(prefilledFormData, currentPage);
         setOpenModal(false);
       },
+      show: (row) => row.status !== 'archived',
     },
   ];
 
@@ -325,10 +357,16 @@ const ContentReviewer = () => {
   const telemetryCreateKey = 'content-reviewer-created-successfully';
   const failureCreateMessage =
     'CONTENT_REVIEWERS.NOT_ABLE_CREATE_CONTENT_REVIEWER';
-  const notificationKey = 'onContentReviewerCreate';
+  const notificationKey =
+    storedUserData.tenantData[0].tenantName === TenantName.SECOND_CHANCE_PROGRAM
+      ? 'onScpContentReviewerCreate'
+      : 'onYouthnetContentReviewerCreate';
   const notificationMessage =
     'CONTENT_REVIEWERS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
+  useEffect(() => {
+    setPrefilledFormData(initialFormDataSearch);
+  }, []);
 
   return (
     <>
@@ -353,10 +391,10 @@ const ContentReviewer = () => {
             startIcon={<AddIcon />}
             color="primary"
             sx={{
-              textTransform: "none",
-              fontSize: "14px",
-              color: theme.palette.primary["100"],
-              width: "200px"
+              textTransform: 'none',
+              fontSize: '14px',
+              color: theme.palette.primary['100'],
+              width: '200px',
             }}
             onClick={() => {
               setPrefilledAddFormData({});
@@ -372,7 +410,9 @@ const ContentReviewer = () => {
         <SimpleModal
           open={openModal}
           onClose={handleCloseModal}
-          showFooter={false}
+          showFooter={true}
+          primaryText={isEdit ? t('Update') : t('Create')}
+          id="dynamic-form-id"
           modalTitle={
             isEdit
               ? t('CONTENT_REVIEWERS.UPDATE_CONTENT_REVIEWER')
@@ -381,8 +421,8 @@ const ContentReviewer = () => {
         >
           <AddEditUser
             SuccessCallback={() => {
-              setPrefilledFormData({});
-              searchData({}, 0);
+              setPrefilledFormData(initialFormDataSearch);
+              searchData(initialFormDataSearch, 0);
               setOpenModal(false);
             }}
             schema={addSchema}
@@ -391,7 +431,7 @@ const ContentReviewer = () => {
             isEdit={isEdit}
             editableUserId={editableUserId}
             UpdateSuccessCallback={() => {
-              setPrefilledFormData({});
+              setPrefilledFormData(prefilledFormData);
               searchData(prefilledFormData, currentPage);
               setOpenModal(false);
             }}
@@ -406,33 +446,41 @@ const ContentReviewer = () => {
             notificationKey={notificationKey}
             notificationMessage={notificationMessage}
             notificationContext={notificationContext}
+            hideSubmit={true}
+            type={'content-reviewer'}
           />
         </SimpleModal>
 
-        {response && response?.result?.getUserDetails ? (
-          <Box sx={{ mt: 1 }}>
-            <PaginatedTable
-              count={response?.result?.totalCount}
-              data={response?.result?.getUserDetails}
-              columns={columns}
-              actions={actions}
-              onPageChange={handlePageChange}
-              onRowsPerPageChange={handleRowsPerPageChange}
-              defaultPage={currentPage}
-              defaultRowsPerPage={pageLimit}
-            />
-          </Box>
+        {response != null ? (
+          <>
+            {response && response?.result?.getUserDetails ? (
+              <Box sx={{ mt: 1 }}>
+                <PaginatedTable
+                  count={response?.result?.totalCount}
+                  data={response?.result?.getUserDetails}
+                  columns={columns}
+                  actions={actions}
+                  onPageChange={handlePageChange}
+                  onRowsPerPageChange={handleRowsPerPageChange}
+                  defaultPage={currentPage}
+                  defaultRowsPerPage={pageLimit}
+                />
+              </Box>
+            ) : (
+              <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                height="20vh"
+              >
+                <Typography marginTop="10px" textAlign={'center'}>
+                  {t('COMMON.NO_CONTENT_REVIEWER_FOUND')}
+                </Typography>
+              </Box>
+            )}{' '}
+          </>
         ) : (
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            height="20vh"
-          >
-            <Typography marginTop="10px" textAlign={'center'}>
-              {t('COMMON.NO_CONTENT_REVIEWER_FOUND')}
-            </Typography>
-          </Box>
+          <CenteredLoader />
         )}
       </Box>
     </>

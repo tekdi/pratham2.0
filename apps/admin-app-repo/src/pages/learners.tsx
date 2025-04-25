@@ -10,7 +10,7 @@ import {
   learnerSearchSchema,
   learnerSearchUISchema,
 } from '../constant/Forms/LearnerSearch';
-import { RoleId, Status } from '@/utils/app.constant';
+import { Role, RoleId, Status } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
 import {
   Box,
@@ -42,10 +42,19 @@ import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
 import { deleteUser } from '@/services/UserService';
-import { transformLabel } from '@/utils/Helper';
+import {
+  calculateAgeFromDate,
+  fetchUserData,
+  formatDateToDDMMYYYY,
+  transformLabel,
+} from '@/utils/Helper';
 import { getCohortList } from '@/services/GetCohortList';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
+import apartment from '../../public/images/apartment.svg';
+import { getCenterList } from '@/services/MasterDataService';
+import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
+import CenterLabel from '@/components/Centerlabel';
 
 const Learner = () => {
   const theme = useTheme<any>();
@@ -59,16 +68,19 @@ const Learner = () => {
   const [pageOffset, setPageOffset] = useState<number>(0);
   const [prefilledFormData, setPrefilledFormData] = useState({});
   const [loading, setLoading] = useState<boolean>(false);
-  const [response, setResponse] = useState({});
+  const [response, setResponse] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [isEdit, setIsEdit] = useState(false);
   const [editableUserId, setEditableUserId] = useState('');
   const [roleId, setRoleID] = useState('');
   const [tenantId, setTenantId] = useState('');
+  const [isReassign, setIsReassign] = useState(false);
   const [open, setOpen] = useState(false);
   const [checked, setChecked] = useState(false);
   const [userID, setUserId] = useState('');
+  const [centerSelectiveValue, setCenterSelectiveValue] = useState('');
+  const [cohorts, setCohorts] = useState([]);
   const [userData, setUserData] = useState({
     firstName: '',
     lastName: '',
@@ -76,17 +88,21 @@ const Learner = () => {
   });
   const [reason, setReason] = useState('');
   const [memberShipID, setMemberShipID] = useState('');
-
+  const [blockFieldId, setBlockFieldId] = useState('');
+  const [districtFieldId, setDistrictFieldId] = useState('');
+  const [villageFieldId, setVillageFieldId] = useState('');
+  const [parentId, setParentId] = useState('');
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
     ? { state: [localStorage.getItem('stateId')] }
     : {};
 
-
-  const searchStoreKey = 'learner'
-  const initialFormDataSearch = localStorage.getItem(searchStoreKey) && localStorage.getItem(searchStoreKey) != "{}"
-    ? JSON.parse(localStorage.getItem(searchStoreKey))
-    : localStorage.getItem('stateId')
+  const searchStoreKey = 'learner';
+  const initialFormDataSearch =
+    localStorage.getItem(searchStoreKey) &&
+    localStorage.getItem(searchStoreKey) != '{}'
+      ? JSON.parse(localStorage.getItem(searchStoreKey))
+      : localStorage.getItem('stateId')
       ? { state: [localStorage.getItem('stateId')] }
       : {};
 
@@ -111,7 +127,65 @@ const Learner = () => {
         },
       ]);
       console.log('responseForm', responseForm);
-      setAddSchema(responseForm?.schema);
+
+      //unit name is missing from required so handled from frotnend
+      let alterSchema = responseForm?.schema;
+      let requiredArray = alterSchema?.required;
+      const mustRequired = [
+        'firstName',
+        'lastName',
+        // 'email',
+        'mobile',
+        'dob',
+        'gender',
+        'state',
+        'district',
+        'block',
+        'village',
+        'center',
+        'batch',
+        'username',
+      ];
+      // Merge only missing items from required2 into required1
+      mustRequired.forEach((item) => {
+        if (!requiredArray.includes(item)) {
+          requiredArray.push(item);
+        }
+      });
+      //no required
+
+      alterSchema.required = requiredArray;
+      //add max selection custom
+      if (alterSchema?.properties?.state) {
+        alterSchema.properties.state.maxSelection = 1;
+      }
+      if (alterSchema?.properties?.district) {
+        alterSchema.properties.district.maxSelection = 1;
+      }
+      if (alterSchema?.properties?.block) {
+        alterSchema.properties.block.maxSelection = 1;
+      }
+      if (alterSchema?.properties?.village) {
+        alterSchema.properties.village.maxSelection = 1;
+      }
+      if (alterSchema?.properties?.center) {
+        alterSchema.properties.center.maxSelection = 1;
+      }
+      if (alterSchema?.properties?.batch) {
+        alterSchema.properties.batch.maxSelection = 1;
+      }
+
+      const districtFieldId =
+        responseForm?.schema?.properties?.district?.fieldId;
+      const blockFieldId = responseForm?.schema?.properties?.block?.fieldId;
+      const villageFieldId = responseForm?.schema?.properties?.village?.fieldId;
+
+      // const centerFieldId = responseForm.schema.properties.center.fieldId;
+
+      setBlockFieldId(blockFieldId);
+      setDistrictFieldId(districtFieldId);
+      setVillageFieldId(villageFieldId);
+      setAddSchema(alterSchema);
       setAddUiSchema(responseForm?.uiSchema);
     };
     fetchData();
@@ -127,36 +201,43 @@ const Learner = () => {
   };
 
   const SubmitaFunction = async (formData: any) => {
-    setPrefilledFormData(formData);
-    //set prefilled search data on refresh
-    localStorage.setItem(searchStoreKey, JSON.stringify(formData))
-    await searchData(formData, 0);
+    // console.log("###### debug issue formData", formData)
+    if (Object.keys(formData).length > 0) {
+      setPrefilledFormData(formData);
+      //set prefilled search data on refresh
+      localStorage.setItem(searchStoreKey, JSON.stringify(formData));
+      await searchData(formData, 0);
+    }
   };
 
   const searchData = async (formData, newPage) => {
-    formData = Object.fromEntries(
-      Object.entries(formData).filter(
-        ([_, value]) => !Array.isArray(value) || value.length > 0
-      )
-    );
-    const staticFilter = {
-      role: 'Learner',
-      status: 'active',
-      tenantId: localStorage.getItem('tenantId'),
-    };
-    const { sortBy } = formData;
-    const staticSort = ['firstName', sortBy || 'asc'];
-    await searchListData(
-      formData,
-      newPage,
-      staticFilter,
-      pageLimit,
-      setPageOffset,
-      setCurrentPage,
-      setResponse,
-      userList,
-      staticSort
-    );
+    if (formData) {
+      formData = Object.fromEntries(
+        Object.entries(formData).filter(
+          ([_, value]) => !Array.isArray(value) || value.length > 0
+        )
+      );
+      const staticFilter = {
+        role: 'Learner',
+        tenantId: localStorage.getItem('tenantId'),
+      };
+      if (localStorage.getItem('roleName') === Role.ADMIN) {
+        staticFilter.state = [localStorage.getItem('stateId')];
+      }
+      const { sortBy } = formData;
+      const staticSort = ['firstName', sortBy || 'asc'];
+      await searchListData(
+        formData,
+        newPage,
+        staticFilter,
+        pageLimit,
+        setPageOffset,
+        setCurrentPage,
+        setResponse,
+        userList,
+        staticSort
+      );
+    }
   };
 
   // Define table columns
@@ -170,10 +251,47 @@ const Learner = () => {
         } ${transformLabel(row.lastName) || ''}`.trim(),
     },
     {
-      key: 'status',
-      label: 'Status',
-      render: (row: any) => transformLabel(row.status),
-      getStyle: (row) => ({ color: row.status === 'active' ? 'green' : 'red' }),
+      keys: ['age'],
+      label: 'Age',
+      render: (row) => calculateAgeFromDate(row.dob) || '',
+    },
+    {
+      keys: ['dob'],
+      label: 'Date Of Birth',
+      render: (row) => formatDateToDDMMYYYY(row.dob) || '',
+    },
+    {
+      keys: ['guardian'],
+      label: 'Guardian Details',
+      render: (row: any) => {
+        const NAME_OF_GUARDIAN =
+          transformLabel(
+            row.customFields.find(
+              (field: { label: string }) => field.label === 'NAME_OF_GUARDIAN'
+            )?.selectedValues?.[0]
+          ) || '';
+        const RELATION_WITH_GUARDIAN =
+          transformLabel(
+            row.customFields.find(
+              (field: { label: string }) =>
+                field.label === 'RELATION_WITH_GUARDIAN'
+            )?.selectedValues?.[0]
+          ) || '';
+        const PARENT_GUARDIAN_PHONE_NO =
+          transformLabel(
+            row.customFields.find(
+              (field: { label: string }) =>
+                field.label === 'PARENT_GUARDIAN_PHONE_NO'
+            )?.selectedValues?.[0]
+          ) || '';
+        const values = [
+          NAME_OF_GUARDIAN,
+          RELATION_WITH_GUARDIAN,
+          PARENT_GUARDIAN_PHONE_NO,
+        ];
+        const result = values.filter(Boolean).join(', ');
+        return result;
+      },
     },
     {
       keys: ['gender'],
@@ -185,43 +303,33 @@ const Learner = () => {
       label: 'Mobile',
       render: (row) => transformLabel(row.mobile) || '',
     },
-    // {
-    //   key: 'STATE',
-    //   label: 'State',
-    //   render: (row) => {
-    //     const state =
-    //       row.customFields.find((field) => field.label === 'STATE')
-    //         ?.selectedValues[0]?.value || '-';
-    //     return `${state}`;
-    //   },
-    // },
     {
       keys: ['STATE', 'DISTRICT', 'BLOCK', 'VILLAGE'],
-      label: 'Location (State / District / Block/ Village)',
+      label: 'State, District, Block, Village',
       render: (row: any) => {
         const state =
           transformLabel(
             row.customFields.find(
               (field: { label: string }) => field.label === 'STATE'
-            )?.selectedValues[0]?.value
+            )?.selectedValues?.[0]?.value
           ) || '';
         const district =
           transformLabel(
             row.customFields.find(
               (field: { label: string }) => field.label === 'DISTRICT'
-            )?.selectedValues[0]?.value
+            )?.selectedValues?.[0]?.value
           ) || '';
         const block =
           transformLabel(
             row.customFields.find(
               (field: { label: string }) => field.label === 'BLOCK'
-            )?.selectedValues[0]?.value
+            )?.selectedValues?.[0]?.value
           ) || '';
         const village =
           transformLabel(
             row.customFields.find(
               (field: { label: string }) => field.label === 'VILLAGE'
-            )?.selectedValues[0]?.value
+            )?.selectedValues?.[0]?.value
           ) || '';
         return `${state == '' ? '' : `${state}`}${
           district == '' ? '' : `, ${district}`
@@ -229,6 +337,26 @@ const Learner = () => {
           village == '' ? '' : `, ${village}`
         }`;
       },
+    },
+    {
+      key: 'center',
+      label: 'Center',
+      render: (row) => {
+        return (
+          <CenterLabel
+            parentId={
+              row.customFields.find((field) => field.label === 'CENTER')
+                ?.selectedValues?.[0]
+            }
+          />
+        );
+      },
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      render: (row: any) => transformLabel(row.status),
+      getStyle: (row) => ({ color: row.status === 'active' ? 'green' : 'red' }),
     },
   ];
 
@@ -277,15 +405,16 @@ const Learner = () => {
       });
 
       if (resp?.responseCode === 200) {
-        setResponse((prev) => ({
-          ...prev,
-          result: {
-            ...prev?.result,
-            getUserDetails: prev?.result?.getUserDetails?.filter(
-              (item) => item?.userId !== userID
-            ),
-          },
-        }));
+        // setResponse((prev) => ({
+        //   ...prev,
+        //   result: {
+        //     ...prev?.result,
+        //     getUserDetails: prev?.result?.getUserDetails?.filter(
+        //       (item) => item?.userId !== userID
+        //     ),
+        //   },
+        // }));
+        searchData(prefilledFormData, currentPage);
         console.log('Team leader successfully archived.');
       } else {
         console.error('Failed to archive team leader:', resp);
@@ -296,7 +425,6 @@ const Learner = () => {
       console.error('Error updating team leader:', error);
     }
   };
-
   // Define actions
   const actions = [
     {
@@ -326,6 +454,7 @@ const Learner = () => {
         setEditableUserId(row?.userId);
         handleOpenModal();
       },
+      show: (row) => row.status !== 'archived',
     },
     {
       icon: (
@@ -345,24 +474,14 @@ const Learner = () => {
       ),
       callback: async (row) => {
         const findVillage = row?.customFields.find((item) => {
-          if (item.label === 'BATCH') {
+          if (item.label === 'VILLAGE') {
             return item;
           }
         });
 
         // console.log('row:', row?.customFields[2].selectedValues[0].value);
         setEditableUserId(row?.userId);
-        // const memberStatus = Status.ARCHIVED;
-        // const statusReason = '';
-        // const membershipId = row?.userId;
 
-        // const response = await updateCohortMemberStatus({
-        //   memberStatus,
-        //   statusReason,
-        //   membershipId,
-        // });
-        // setPrefilledFormData({});
-        // searchData(prefilledFormData, currentPage);
         setOpen(true);
 
         setUserId(row?.userId);
@@ -372,7 +491,52 @@ const Learner = () => {
           lastName: row?.lastName || '',
           village: findVillage?.selectedValues?.[0]?.value || '',
         });
+        setReason('');
+        setChecked(false);
       },
+      show: (row) => row.status !== 'archived',
+    },
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            backgroundColor: 'rgb(227, 234, 240)',
+            padding: '10px',
+          }}
+        >
+          <Image src={apartment} alt="" />
+        </Box>
+      ),
+      callback: async (row) => {
+        console.log('row:', row);
+        const centerField = row.customFields.find(
+          (field) => field.label === 'CENTER'
+        );
+        if (centerField) {
+          setCenterSelectiveValue(centerField.selectedValues);
+        } else {
+          console.log('CENTER field not found');
+        }
+        // console.log('AddSchema', addSchema);
+        // console.log('AddUISchema', addUiSchema);
+
+        let batchList = await fetchUserData(row?.userId);
+        let tempFormData = extractMatchingKeys(row, addSchema);
+        tempFormData = {
+          ...tempFormData,
+          batch: batchList,
+        };
+        setPrefilledAddFormData(tempFormData);
+        // setIsEdit(true);
+        setIsReassign(true);
+        setEditableUserId(row?.userId);
+        handleOpenModal();
+      },
+      show: (row) => row.status !== 'archived',
     },
   ];
 
@@ -391,6 +555,8 @@ const Learner = () => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
+    setIsReassign(false);
+    setIsEdit(false);
   };
 
   //Add Edit Props
@@ -402,7 +568,8 @@ const Learner = () => {
         roleId: roleId,
       },
     ],
-    username: 'Leaner',
+    program: tenantId,
+    // username: 'Leaner',
     password: Math.floor(10000 + Math.random() * 90000),
   };
   const successUpdateMessage = 'LEARNERS.LEARNER_UPDATED_SUCCESSFULLY';
@@ -448,37 +615,48 @@ const Learner = () => {
               width: '200px',
             }}
             onClick={() => {
-              setPrefilledAddFormData({});
+              setPrefilledAddFormData(initialFormData);
               setIsEdit(false);
+              setIsReassign(false);
               setEditableUserId('');
               handleOpenModal();
             }}
           >
-            {t('COMMON.ADD_NEW')}{' '}
+            {t('COMMON.ADD_NEW')}
           </Button>
         </Box>
 
         <SimpleModal
           open={openModal}
           onClose={handleCloseModal}
-          showFooter={false}
+          showFooter={true}
+          primaryText={
+            isEdit ? t('Update') : isReassign ? t('Reassign') : t('Create')
+          }
+          id="dynamic-form-id"
           modalTitle={
-            isEdit ? t('LEARNERS.EDIT_LEARNER') : t('LEARNERS.NEW_LEARNER')
+            isEdit
+              ? t('LEARNERS.EDIT_LEARNER')
+              : isReassign
+              ? t('LEARNERS.RE_ASSIGN_LEARNER')
+              : t('LEARNERS.NEW_LEARNER')
           }
         >
           <AddEditUser
             SuccessCallback={() => {
-              setPrefilledFormData({});
-              searchData({}, 0);
+              setPrefilledFormData(initialFormDataSearch);
+              searchData(initialFormDataSearch, 0);
               setOpenModal(false);
             }}
             schema={addSchema}
             uiSchema={addUiSchema}
             editPrefilledFormData={prefilledAddFormData}
             isEdit={isEdit}
+            isReassign={isReassign}
+            isExtraFields={true}
             editableUserId={editableUserId}
             UpdateSuccessCallback={() => {
-              setPrefilledFormData({});
+              setPrefilledFormData(prefilledFormData);
               searchData(prefilledFormData, currentPage);
               setOpenModal(false);
             }}
@@ -493,33 +671,44 @@ const Learner = () => {
             notificationKey={notificationKey}
             notificationMessage={notificationMessage}
             notificationContext={notificationContext}
+            blockFieldId={blockFieldId}
+            districtFieldId={districtFieldId}
+            villageFieldId={villageFieldId}
+            hideSubmit={true}
+            type={'learner'}
           />
         </SimpleModal>
 
-        {response && response?.result?.getUserDetails ? (
-          <Box sx={{ mt: 1 }}>
-            <PaginatedTable
-              count={response?.result?.totalCount}
-              data={response?.result?.getUserDetails}
-              columns={columns}
-              actions={actions}
-              onPageChange={handlePageChange}
-              onRowsPerPageChange={handleRowsPerPageChange}
-              defaultPage={currentPage}
-              defaultRowsPerPage={pageLimit}
-            />
-          </Box>
+        {response != null ? (
+          <>
+            {response && response?.result?.getUserDetails ? (
+              <Box sx={{ mt: 1 }}>
+                <PaginatedTable
+                  count={response?.result?.totalCount}
+                  data={response?.result?.getUserDetails}
+                  columns={columns}
+                  actions={actions}
+                  onPageChange={handlePageChange}
+                  onRowsPerPageChange={handleRowsPerPageChange}
+                  defaultPage={currentPage}
+                  defaultRowsPerPage={pageLimit}
+                />
+              </Box>
+            ) : (
+              <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                height="20vh"
+              >
+                <Typography marginTop="10px" textAlign={'center'}>
+                  {t('LEARNERS.NO_LEARNERS_FOUND')}
+                </Typography>
+              </Box>
+            )}
+          </>
         ) : (
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            height="20vh"
-          >
-            <Typography marginTop="10px" textAlign={'center'}>
-              {t('LEARNERS.NO_LEARNERS_FOUND')}
-            </Typography>
-          </Box>
+          <CenteredLoader />
         )}
       </Box>
 

@@ -1,16 +1,7 @@
-import { Role, TenantName } from "@/utils/app.constant";
+import { Role, TenantName } from '@/utils/app.constant';
 
 export const MENU_CONFIG = {
   [TenantName.SECOND_CHANCE_PROGRAM]: {
-    batch: {
-      title: 'Batch',
-      icon: '/images/centers.svg',
-      link: '/batch',
-      roles: [
-        Role.ADMIN,
-        // Role.CENTRAL_ADMIN, //check
-      ],
-    },
     centers: {
       title: 'Centers',
       icon: '/images/centers.svg',
@@ -18,6 +9,15 @@ export const MENU_CONFIG = {
       roles: [
         Role.ADMIN,
         // Role.CENTRAL_ADMIN, // check
+      ],
+    },
+    batch: {
+      title: 'Batch',
+      icon: '/images/centers.svg',
+      link: '/batch',
+      roles: [
+        Role.ADMIN,
+        // Role.CENTRAL_ADMIN, //check
       ],
     },
     manageUsers: {
@@ -54,7 +54,7 @@ export const MENU_CONFIG = {
           title: 'State Lead',
           link: '/state-lead',
           roles: [Role.CENTRAL_ADMIN],
-        }
+        },
       ],
     },
 
@@ -117,12 +117,7 @@ export const MENU_CONFIG = {
       title: 'Support Request',
       icon: '/images/Support.svg',
       link: '/support-request',
-      roles: [
-        Role.ADMIN,
-        Role.CENTRAL_ADMIN,
-        Role.CCTA,
-        Role.SCTA,
-      ],
+      roles: [Role.ADMIN, Role.CENTRAL_ADMIN, Role.CCTA, Role.SCTA],
     },
   },
   [TenantName.YOUTHNET]: {
@@ -203,19 +198,14 @@ export const MENU_CONFIG = {
       title: 'Support Request',
       icon: '/images/Support.svg',
       link: '/support-request',
-      roles: [
-        Role.ADMIN,
-        Role.CENTRAL_ADMIN,
-        Role.CCTA,
-        Role.SCTA,
-      ],
+      roles: [Role.ADMIN, Role.CENTRAL_ADMIN, Role.CCTA, Role.SCTA],
     },
     workspace: {
       title: 'Workspace',
       icon: '/images/dashboard.svg',
       link: '/workspace',
       roles: [Role.CCTA, Role.SCTA],
-    }
+    },
   },
   [TenantName.POS]: {
     manageUsers: {
@@ -265,12 +255,15 @@ export const MENU_CONFIG = {
       title: 'Support Request',
       icon: '/images/Support.svg',
       link: '/support-request',
-      roles: [
-        Role.ADMIN,
-        Role.CENTRAL_ADMIN,
-        Role.CCTA,
-        Role.SCTA,
-      ],
-    }
+      roles: [Role.ADMIN, Role.CENTRAL_ADMIN, Role.CCTA, Role.SCTA],
+    },
   },
+  [TenantName.PRAGYANPATH]: {
+    workspace: {
+      title: 'Workspace',
+      icon: '/images/dashboard.svg',
+      link: '/workspace',
+      roles: [Role.CCTA, Role.SCTA],
+    }
+  }
 };

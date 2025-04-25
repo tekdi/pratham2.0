@@ -60,7 +60,7 @@ export const MentorSearchSchema = {
           value: 'value',
         },
         callType: userRole !== Role.CENTRAL_ADMIN ? 'initial' : 'dependent',
-        dependent: 'state',
+        ...(!stateId ? { dependent: 'state' } : {}),
       },
       //for multiselect
       uniqueItems: true,
@@ -81,7 +81,7 @@ export const MentorSearchSchema = {
         payload: {
           fieldName: 'block',
           controllingfieldfk: '**',
-          sort: ['block_name', 'asc'],
+          sort: ['block_nCustomRadioWidgetame', 'asc'],
         },
         options: {
           optionObj: 'result.values',
@@ -190,7 +190,7 @@ export const MentorSearchUISchema = {
   },
 
   firstName: {
-    'ui:widget': 'text',
+    'ui:widget': 'SearchTextFieldWidget',
   },
 
   sortBy: {

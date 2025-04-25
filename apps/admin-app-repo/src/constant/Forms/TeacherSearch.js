@@ -60,7 +60,7 @@ export const TeacherSearchSchema = {
           value: 'value',
         },
         callType: userRole !== Role.CENTRAL_ADMIN ? 'initial' : 'dependent',
-        dependent: 'state',
+        ...(!stateId ? { dependent: 'state' } : {}),
       },
       //for multiselect
       uniqueItems: true,
@@ -140,7 +140,7 @@ export const TeacherSearchSchema = {
 };
 
 export const TeacherSearchUISchema = {
-  'ui:order': ['state', 'district', 'block', 'village', 'searchKey', 'sortBy'],
+  'ui:order': ['state', 'district', 'block', 'village', 'name', 'sortBy'],
 
   state: {
     'ui:widget': 'CustomMultiSelectWidget',
@@ -148,6 +148,7 @@ export const TeacherSearchUISchema = {
       multiple: true,
       uniqueItems: true,
     },
+    ...(stateId ? { 'ui:disabled': true } : {}),
   },
 
   district: {
@@ -170,8 +171,8 @@ export const TeacherSearchUISchema = {
     },
   },
 
-  searchKey: {
-    'ui:widget': 'text',
+  name: {
+    'ui:widget': 'SearchTextFieldWidget',
   },
 
   sortBy: {

@@ -91,6 +91,7 @@ export interface CohortListParam {
 export interface CohortMemberList {
   limit?: number;
   page?: number;
+  offset?: number;
   filters: {
     cohortId: string;
     role?: string;
@@ -105,9 +106,9 @@ export interface UserList {
   limit: number;
   page: number;
   filters: {
-    states: string;
-    districts: string;
-    blocks: string;
+    state: string;
+    district: string;
+    block: string;
     role?: string;
   };
   fields: string[];
@@ -329,6 +330,7 @@ export interface CustomField {
   order: number;
   type: any;
   value: string;
+  selectedValues: Array<{ id: string; value: string }>;
 }
 export interface CohortAttendanceListViewProps {
   cohortName: string;
@@ -370,6 +372,12 @@ export interface LearnerListProps {
   showMiniProfile?: boolean;
   onLearnerDelete: () => void;
   isFromProfile?: boolean;
+  gender?: string;
+}
+export interface UserData {
+  email: string;
+  gender: string;
+  // Add other properties of UserData here if they exist
 }
 export interface FacilitatorListParam {
   limit: number;
@@ -932,28 +940,27 @@ export interface VillageDetailProps {
   onClick?: () => void;
 }
 
-
 export interface Block {
-    id: number;
-    name: string;
-    selectedCount: number;
-    handleNext?: any;
+  id: number;
+  name: string;
+  selectedCount: number;
+  handleNext?: any;
 }
 
 export interface BlockItemProps {
-    name: string;
-    selectedCount: number;
-    onClick: () => void;
-    handleNext ? : any;
+  name: string;
+  selectedCount: number;
+  onClick: () => void;
+  handleNext?: any;
 }
 
 export interface AssignVillagesProps {
-    district: string;
-    blocks: Block[];
-    onBlockClick: (block: Block) => void;
-    handleNext?: any;
+  district: string;
+  blocks: Block[];
+  onBlockClick: (block: Block) => void;
+  handleNext?: any;
 }
 
 export interface ExamplePageProps {
-    handleNext: () => void;
+  handleNext: () => void;
 }

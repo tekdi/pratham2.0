@@ -102,7 +102,7 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
       content.contentType === "Course"
         ? router.push({
             pathname: `/course-hierarchy/${identifier}`,
-            query: { identifier },
+            query: { identifier, isReadOnly: true, previousPage: 'submitted' },
           })
         : router.push({
             pathname: `/workspace/content/review`,
@@ -112,7 +112,7 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
       content.contentType === "Course"
         ? router.push({
             pathname: `/course-hierarchy/${identifier}`,
-            query: { identifier, isReadOnly: true },
+            query: { identifier, isReadOnly: true, previousPage: 'allContents' },
           })
         : router.push({
             pathname: `/workspace/content/review`,
@@ -122,7 +122,7 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
       content.contentType === "Course"
         ? router.push({
             pathname: `/course-hierarchy/${identifier}`,
-            query: { identifier, isDiscoverContent: true },
+            query: { identifier, previousPage: 'discover-contents' },
           })
         : router.push({
             pathname: `/workspace/content/review`,

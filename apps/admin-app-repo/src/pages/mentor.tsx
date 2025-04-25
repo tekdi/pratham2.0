@@ -7,7 +7,7 @@ import {
   MentorSearchSchema,
   MentorSearchUISchema,
 } from '../constant/Forms/MentorSearch';
-import { RoleId, Status } from '@/utils/app.constant';
+import { Role, RoleId, Status } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
 import {
   Box,
@@ -36,9 +36,9 @@ import DeleteDetails from '@/components/DeleteDetails';
 import { deleteUser } from '@/services/UserService';
 import { transformLabel } from '@/utils/Helper';
 import { getCohortList } from '@/services/GetCohortList';
-import { useTheme } from "@mui/material/styles";
-import { useRouter } from "next/router";
-import AddIcon from "@mui/icons-material/Add";
+import { useTheme } from '@mui/material/styles';
+import { useRouter } from 'next/router';
+import AddIcon from '@mui/icons-material/Add';
 
 //import { DynamicForm } from '@shared-lib';
 
@@ -78,10 +78,12 @@ const Mentor = () => {
     ? { state: [localStorage.getItem('stateId')] }
     : {};
 
-  const searchStoreKey = 'mentor'
-  const initialFormDataSearch = localStorage.getItem(searchStoreKey)  && localStorage.getItem(searchStoreKey) != "{}" 
-    ? JSON.parse(localStorage.getItem(searchStoreKey))
-    : localStorage.getItem('stateId')
+  const searchStoreKey = 'mentor';
+  const initialFormDataSearch =
+    localStorage.getItem(searchStoreKey) &&
+    localStorage.getItem(searchStoreKey) != '{}'
+      ? JSON.parse(localStorage.getItem(searchStoreKey))
+      : localStorage.getItem('stateId')
       ? { state: [localStorage.getItem('stateId')] }
       : {};
 
@@ -129,7 +131,7 @@ const Mentor = () => {
   const SubmitaFunction = async (formData: any) => {
     setPrefilledFormData(formData);
     //set prefilled search data on refresh
-    localStorage.setItem(searchStoreKey, JSON.stringify(formData))
+    localStorage.setItem(searchStoreKey, JSON.stringify(formData));
     await searchData(formData, 0);
   };
 
@@ -144,7 +146,9 @@ const Mentor = () => {
       status: 'active',
       tenantId: localStorage.getItem('tenantId'),
     };
-
+    if (localStorage.getItem('roleName') === Role.ADMIN) {
+      staticFilter.state = [localStorage.getItem('stateId')];
+    }
     const { sortBy } = formData;
     const staticSort = ['firstName', sortBy || 'asc'];
     await searchListData(
@@ -206,25 +210,25 @@ const Mentor = () => {
           transformLabel(
             row.customFields.find(
               (field: { label: string }) => field.label === 'STATE'
-            )?.selectedValues[0]?.value
+            )?.selectedValues?.[0]?.value
           ) || '';
         const district =
           transformLabel(
             row.customFields.find(
               (field: { label: string }) => field.label === 'DISTRICT'
-            )?.selectedValues[0]?.value
+            )?.selectedValues?.[0]?.value
           ) || '';
         const block =
           transformLabel(
             row.customFields.find(
               (field: { label: string }) => field.label === 'BLOCK'
-            )?.selectedValues[0]?.value
+            )?.selectedValues?.[0]?.value
           ) || '';
         const village =
           transformLabel(
             row.customFields.find(
               (field: { label: string }) => field.label === 'VILLAGE'
-            )?.selectedValues[0]?.value
+            )?.selectedValues?.[0]?.value
           ) || '';
         return `${state == '' ? '' : `${state}`}${
           district == '' ? '' : `, ${district}`
@@ -440,10 +444,10 @@ const Mentor = () => {
             startIcon={<AddIcon />}
             color="primary"
             sx={{
-              textTransform: "none",
-              fontSize: "14px",
-              color: theme.palette.primary["100"],
-              width: "200px"
+              textTransform: 'none',
+              fontSize: '14px',
+              color: theme.palette.primary['100'],
+              width: '200px',
             }}
             onClick={() => {
               setPrefilledAddFormData(initialFormData);
@@ -459,10 +463,12 @@ const Mentor = () => {
         <SimpleModal
           open={openModal}
           onClose={handleCloseModal}
-          showFooter={false}
+          showFooter={!isEdit ? true : false}
           modalTitle={
             isEdit ? t('MENTORS.UPDATE_MENTOR') : t('MENTORS.NEW_MENTOR')
           }
+          primaryText={'Next'}
+          id="dynamic-form-id"
         >
           <AddEditUser
             SuccessCallback={() => {
@@ -491,6 +497,7 @@ const Mentor = () => {
             notificationKey={notificationKey}
             notificationMessage={notificationMessage}
             notificationContext={notificationContext}
+            type="mentor"
           />
         </SimpleModal>
 

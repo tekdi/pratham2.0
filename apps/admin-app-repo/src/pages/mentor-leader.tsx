@@ -10,7 +10,7 @@ import {
   MentorLeadSearchSchema,
   MentorLeadSearchUISchema,
 } from '../constant/Forms/MentorLeadSearch';
-import { Status } from '@/utils/app.constant';
+import { Role, RoleId, Status } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
 import {
   Box,
@@ -48,6 +48,10 @@ import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 
 const MentorLead = () => {
+  console.log(
+    '################ MentorLeadSearchSchema',
+    MentorLeadSearchSchema
+  );
   const theme = useTheme<any>();
   const [isLoading, setIsLoading] = useState(false);
   const [schema, setSchema] = useState(MentorLeadSearchSchema);
@@ -84,10 +88,12 @@ const MentorLead = () => {
     ? { state: [localStorage.getItem('stateId')] }
     : {};
 
-  const searchStoreKey = 'mentorLeader'
-  const initialFormDataSearch = localStorage.getItem(searchStoreKey) && localStorage.getItem(searchStoreKey) != "{}"
-    ? JSON.parse(localStorage.getItem(searchStoreKey))
-    : localStorage.getItem('stateId')
+  const searchStoreKey = 'mentorLeader';
+  const initialFormDataSearch =
+    localStorage.getItem(searchStoreKey) &&
+    localStorage.getItem(searchStoreKey) != '{}'
+      ? JSON.parse(localStorage.getItem(searchStoreKey))
+      : localStorage.getItem('stateId')
       ? { state: [localStorage.getItem('stateId')] }
       : {};
 
@@ -130,7 +136,7 @@ const MentorLead = () => {
   const SubmitaFunction = async (formData: any) => {
     setPrefilledFormData(formData);
     //set prefilled search data on refresh
-    localStorage.setItem(searchStoreKey, JSON.stringify(formData))
+    localStorage.setItem(searchStoreKey, JSON.stringify(formData));
     await searchData(formData, 0);
   };
 
@@ -145,7 +151,9 @@ const MentorLead = () => {
       status: 'active',
       tenantId: localStorage.getItem('tenantId'),
     };
-
+    if (localStorage.getItem('roleName') === Role.ADMIN) {
+      staticFilter.state = [localStorage.getItem('stateId')];
+    }
     const { sortBy } = formData;
     const staticSort = ['firstName', sortBy || 'asc'];
     await searchListData(
@@ -204,12 +212,12 @@ const MentorLead = () => {
         const state =
           transformLabel(
             row.customFields.find((field) => field.label === 'STATE')
-              ?.selectedValues[0]?.value
+              ?.selectedValues?.[0]?.value
           ) || '';
         const district =
           transformLabel(
             row.customFields.find((field) => field.label === 'DISTRICT')
-              ?.selectedValues[0]?.value
+              ?.selectedValues?.[0]?.value
           ) || '';
 
         return `${state == '' ? '' : `${state}`}${
@@ -385,7 +393,7 @@ const MentorLead = () => {
     tenantCohortRoleMapping: [
       {
         tenantId: '6c8b810a-66c2-4f0d-8c0c-c025415a4414',
-        roleId: 'c4454929-954e-4c51-bb7d-cca834ab9375',
+        roleId: RoleId.TEAM_LEADER,
       },
     ],
     username: 'youthnetmentorlead',

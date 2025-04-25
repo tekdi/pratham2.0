@@ -11,13 +11,10 @@ export const MasterVillageSchema = {
   type: 'object',
   properties: {
     state: {
-      type: 'array',
+      type: 'string',
       title: 'State',
-      items: {
-        type: 'string',
-        enum: userRole !== Role.CENTRAL_ADMIN ? [stateId] : ['Select'],
-        enumNames: userRole !== Role.CENTRAL_ADMIN ? [stateName] : ['Select'],
-      },
+      enum: userRole !== Role.CENTRAL_ADMIN ? [stateId] : ['Select'],
+      enumNames: userRole !== Role.CENTRAL_ADMIN ? [stateName] : ['Select'],
       api:
         userRole !== Role.CENTRAL_ADMIN
           ? undefined // Avoid API call if userRole is Central admin
@@ -32,10 +29,6 @@ export const MasterVillageSchema = {
               },
               callType: 'initial',
             },
-      //for multiselect
-      uniqueItems: true,
-      isMultiSelect: true,
-      maxSelections: 1000,
     },
     district: {
       type: 'array',
@@ -60,7 +53,7 @@ export const MasterVillageSchema = {
           value: 'value',
         },
         callType: userRole !== Role.CENTRAL_ADMIN ? 'initial' : 'dependent',
-        dependent: 'state',
+        ...(!stateId ? { dependent: 'state' } : {}),
       },
       //for multiselect
       uniqueItems: true,
@@ -96,7 +89,7 @@ export const MasterVillageSchema = {
       isMultiSelect: true,
       maxSelections: 1000,
     },
-    firstName: {
+    fieldName: {
       type: 'string',
       title: 'Search Village',
       // description: 'Search for a specific user or entity',
@@ -111,14 +104,11 @@ export const MasterVillageSchema = {
 };
 
 export const MasterVillageUISchema = {
-  'ui:order': ['firstName', 'sortBy'],
+  'ui:order': ['state', 'district', 'block', 'fieldName', 'sortBy'],
 
   state: {
-    'ui:widget': 'CustomMultiSelectWidget',
-    'ui:options': {
-      multiple: true,
-      uniqueItems: true,
-    },
+    'ui:widget': 'CustomSingleSelectWidget',
+    ...(stateId ? { 'ui:disabled': true } : {}),
   },
 
   district: {
@@ -136,8 +126,8 @@ export const MasterVillageUISchema = {
       uniqueItems: true,
     },
   },
-  firstName: {
-    'ui:widget': 'text',
+  fieldName: {
+    'ui:widget': 'SearchTextFieldWidget',
   },
 
   sortBy: {

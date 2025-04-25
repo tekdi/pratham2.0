@@ -5,15 +5,21 @@ import validator from '@rjsf/validator-ajv8';
 import axios from 'axios';
 import Grid from '@mui/material/Grid';
 import { Box } from '@mui/material';
-import CustomObjectFieldTemplate from './CustomObjectFieldTemplate';
-import CustomFieldTemplate from './CustomFieldTemplate';
 import { TextField, Container, Typography } from '@mui/material';
 import { useTranslation } from 'next-i18next';
 import _ from 'lodash'; // Lodash for deep comparison
 import CustomMultiSelectWidget from './RJSFWidget/CustomMultiSelectWidget';
 import CustomCheckboxWidget from './RJSFWidget/CustomCheckboxWidget';
 import CustomDateWidget from './RJSFWidget/CustomDateWidget';
-import { toPascalCase, transformLabel } from '@/utils/Helper';
+import SearchTextFieldWidget from './RJSFWidget/SearchTextFieldWidget';
+import CustomSingleSelectWidget from './RJSFWidget/CustomSingleSelectWidget';
+import CustomRadioWidget from './RJSFWidget/CustomRadioWidget';
+import CustomTextFieldWidget from './RJSFWidget/CustomTextFieldWidget';
+import {
+  calculateAgeFromDate,
+  toPascalCase,
+  transformLabel,
+} from '@/utils/Helper';
 
 const DynamicForm = ({
   schema,
@@ -23,6 +29,7 @@ const DynamicForm = ({
   prefilledFormData,
   FormSubmitFunction,
   extraFields,
+  hideSubmit,
 }: any) => {
   const { t } = useTranslation();
 
@@ -37,10 +44,69 @@ const DynamicForm = ({
   const [hideAndSkipFields, setHideAndSkipFields] = useState({});
   const [isRenderCompleted, setIsRenderCompleted] = useState(false);
 
+  //custom validation on formData for learner fields hide on dob
+  useEffect(() => {
+    if (formData?.dob) {
+      let age = calculateAgeFromDate(formData?.dob);
+      let oldFormSchema = formSchema;
+      let oldFormUiSchema = formUiSchema;
+      let requiredArray = oldFormSchema?.required;
+      let requiredKeys = ['parent_phone', 'guardian_relation', 'guardian_name'];
+
+      //if learner form then only apply
+      if (oldFormSchema?.properties?.guardian_relation) {
+        if (age < 18) {
+          // Merge only missing items from required2 into required1
+          requiredKeys.forEach((item) => {
+            if (!requiredArray.includes(item)) {
+              requiredArray.push(item);
+            }
+          });
+          //set ui schema show
+          const updatedUiSchema = { ...oldFormUiSchema };
+          // Clone each key's config and set widget to 'hidden'
+          requiredKeys.forEach((key) => {
+            if (updatedUiSchema.hasOwnProperty(key)) {
+              updatedUiSchema[key] = {
+                ...updatedUiSchema[key],
+                'ui:widget': 'CustomTextFieldWidget',
+              };
+            }
+          });
+          oldFormUiSchema = updatedUiSchema;
+        } else {
+          // remove from required
+          requiredArray = requiredArray.filter(
+            (key) => !requiredKeys.includes(key)
+          );
+          //set ui schema hide
+          const updatedUiSchema = { ...oldFormUiSchema };
+          // Clone each key's config and set widget to 'hidden'
+          requiredKeys.forEach((key) => {
+            if (updatedUiSchema.hasOwnProperty(key)) {
+              updatedUiSchema[key] = {
+                ...updatedUiSchema[key],
+                'ui:widget': 'hidden',
+              };
+            }
+          });
+          oldFormUiSchema = updatedUiSchema;
+        }
+        oldFormSchema.required = requiredArray;
+        setFormSchema(oldFormSchema);
+        setFormUiSchema(oldFormUiSchema);
+      }
+    }
+  }, [formData]);
+
   const widgets = {
     CustomMultiSelectWidget,
     CustomCheckboxWidget,
     CustomDateWidget,
+    SearchTextFieldWidget,
+    CustomSingleSelectWidget,
+    CustomRadioWidget,
+    CustomTextFieldWidget,
   };
 
   useEffect(() => {
@@ -144,10 +210,10 @@ const DynamicForm = ({
                   items: {
                     type: 'string',
                     enum: data
-                      ? data.map((item) => item?.[value].toString())
+                      ? data?.map((item) => item?.[value].toString())
                       : ['Select'],
                     enumNames: data
-                      ? data.map((item) =>
+                      ? data?.map((item) =>
                           transformLabel(item?.[label].toString())
                         )
                       : ['Select'],
@@ -157,10 +223,12 @@ const DynamicForm = ({
                 updatedProperties[fieldKey] = {
                   ...updatedProperties[fieldKey],
                   enum: data
-                    ? data.map((item) => item?.[value].toString())
+                    ? data?.map((item) => item?.[value].toString())
                     : ['Select'],
                   enumNames: data
-                    ? data.map((item) => item?.[label].toString())
+                    ? data?.map((item) =>
+                        transformLabel(item?.[label].toString())
+                      )
                     : ['Select'],
                 };
               }
@@ -239,7 +307,7 @@ const DynamicForm = ({
     setFormSchema(translatedSchema);
   }, []);
 
-  // // console.log('schema', schema)
+  // console.log('schema', schema)
   const extractApiProperties = (schema, callType) => {
     return Object.entries(schema.properties)
       .filter(([_, value]) => value.api && value.api.callType === callType)
@@ -457,22 +525,22 @@ const DynamicForm = ({
                               ...updatedProperties[fieldKey],
                               items: {
                                 type: 'string',
-                                enum: data.map((item) =>
+                                enum: data?.map((item) =>
                                   item?.[value].toString()
                                 ),
-                                enumNames: data.map((item) =>
-                                  item?.[label].toString()
+                                enumNames: data?.map((item) =>
+                                  transformLabel(item?.[label].toString())
                                 ),
                               },
                             };
                           } else {
                             updatedProperties[fieldKey] = {
                               ...updatedProperties[fieldKey],
-                              enum: data.map((item) =>
+                              enum: data?.map((item) =>
                                 item?.[value].toString()
                               ),
-                              enumNames: data.map((item) =>
-                                item?.[label].toString()
+                              enumNames: data?.map((item) =>
+                                transformLabel(item?.[label].toString())
                               ),
                             };
                           }
@@ -535,15 +603,19 @@ const DynamicForm = ({
                   ...updatedProperties[fieldKey],
                   items: {
                     type: 'string',
-                    enum: data.map((item) => item?.[value].toString()),
-                    enumNames: data.map((item) => item?.[label].toString()),
+                    enum: data?.map((item) => item?.[value].toString()),
+                    enumNames: data?.map((item) =>
+                      transformLabel(item?.[label].toString())
+                    ),
                   },
                 };
               } else {
                 updatedProperties[fieldKey] = {
                   ...updatedProperties[fieldKey],
-                  enum: data.map((item) => item?.[value].toString()),
-                  enumNames: data.map((item) => item?.[label].toString()),
+                  enum: data?.map((item) => item?.[value].toString()),
+                  enumNames: data?.map((item) =>
+                    transformLabel(item?.[label].toString())
+                  ),
                 };
               }
             });
@@ -746,13 +818,14 @@ const DynamicForm = ({
     // console.log('hasObjectChanged changedField', changedField);
 
     if (hasObjectChanged(prevFormData.current, formData)) {
+      console.log('hasObjectChanged in 1 formData', formData);
       if (changedField) {
         //error set
         console.log('errors', errors);
         setSubmitted(false);
         //find out all dependent keys
         const dependentKeyArray = getDependentKeys(schema, changedField);
-        // console.log('hasObjectChanged formData', formData);
+        console.log('hasObjectChanged in 2 formData', formData);
         // console.log('hasObjectChanged dependent keys:', dependentKeyArray);
         dependentKeyArray.forEach((key) => {
           delete formData[key]; // Remove the key from formData
@@ -886,17 +959,19 @@ const DynamicForm = ({
                         ...updatedProperties[fieldKey],
                         items: {
                           type: 'string',
-                          enum: data.map((item) => item?.[value].toString()),
-                          enumNames: data.map((item) =>
-                            item?.[label].toString()
+                          enum: data?.map((item) => item?.[value].toString()),
+                          enumNames: data?.map((item) =>
+                            transformLabel(item?.[label].toString())
                           ),
                         },
                       };
                     } else {
                       updatedProperties[fieldKey] = {
                         ...updatedProperties[fieldKey],
-                        enum: data.map((item) => item?.[value].toString()),
-                        enumNames: data.map((item) => item?.[label].toString()),
+                        enum: data?.map((item) => item?.[value].toString()),
+                        enumNames: data?.map((item) =>
+                          transformLabel(item?.[label].toString())
+                        ),
                       };
                     }
                   });
@@ -977,6 +1052,8 @@ const DynamicForm = ({
   };
 
   const handleSubmit = ({ formData }: { formData: any }) => {
+    console.log('########### issue debug formData', formData);
+
     //step-1 : Check and remove skipped Data
     function filterFormData(skipHideObject, formData) {
       const updatedFormData = { ...formData };
@@ -992,7 +1069,6 @@ const DynamicForm = ({
       return updatedFormData;
     }
     const filteredData = filterFormData(hideAndSkipFields, formData);
-    // console.log('formData', formData);
     // console.log('######### filteredData', JSON.stringify(filteredData));
     const cleanedData = Object.fromEntries(
       Object.entries(filteredData).filter(
@@ -1018,11 +1094,11 @@ const DynamicForm = ({
             // Use fieldId for custom fields
             transformedData.customFields.push({
               fieldId: fieldSchema.fieldId,
-              value: formData[key],
+              value: formData[key] || '',
             });
           } else {
             // Use the field name for core fields
-            transformedData[key] = formData[key];
+            transformedData[key] = formData[key] || '';
           }
         }
       }
@@ -1038,6 +1114,11 @@ const DynamicForm = ({
       schema,
       extraFields
     );
+
+    //add name in always lower case
+    if (transformedFormData?.name) {
+      transformedFormData.name = transformedFormData.name.toLowerCase();
+    }
 
     // // console.log('formSchema', transformedFormData);
     // console.log('Form Data Submitted:', filteredData);
@@ -1115,17 +1196,42 @@ const DynamicForm = ({
 
     return errors;
   };
+  // const customValidate = (formData, errors) => {
+  //   console.log('########### issue debug errors customvalidator ', JSON.stringify(errors));
+
+  //   Object.keys(formSchema.properties).forEach((key) => {
+  //     const field = formSchema.properties[key];
+  //     const value = formData[key];
+
+  //     if (field.pattern && value) {
+  //       const patternRegex = new RegExp(field.pattern);
+  //       if (!patternRegex.test(value)) {
+  //         const errorMessage =
+  //           t(patternErrorMessages?.[field.pattern]) ||
+  //           `Invalid format for ${field.title || key}.`;
+
+  //         if (!errors[key].__errors) {
+  //           errors[key].__errors = [];
+  //         }
+  //         errors[key].__errors.push(errorMessage);
+  //       }
+  //     }
+  //   });
+
+  //   return errors;
+  // };
 
   // Custom transformErrors to suppress required errors before submit
   const transformErrors = (errors) => {
-    console.log('######### errors', JSON.stringify(errors));
+    // console.log('########### issue debug errors 123 ', JSON.stringify(errors));
     let updatedError = errors;
     if (!submitted) {
-      updatedError = errors.filter((error) => error.name !== 'required');
+      // updatedError = errors.filter((error) => error.name !== 'required');
     }
     if (!submitted) {
       updatedError = updatedError.filter((error) => error.name !== 'pattern');
     }
+    // console.log('########### issue debug updatedError 123 ', JSON.stringify(updatedError));
     return updatedError;
   };
 
@@ -1138,7 +1244,16 @@ const DynamicForm = ({
           uiSchema={formUiSchema}
           formData={formData}
           onChange={handleChange}
-          onSubmit={handleSubmit}
+          // onSubmit={handleSubmit}
+          onSubmit={({ formData, errors }) => {
+            // console.log("########### issue debug SUBMIT", formData);
+            // console.log("########### issue debug ERRORS", errors); // 👈 this will be empty if validation passed
+            if (errors.length > 0) {
+              // Block submission if needed
+              return;
+            }
+            handleSubmit({ formData });
+          }}
           validator={validator}
           //noHtml5Validate //disable auto error pop up to field location
           showErrorList={false} // Hides the error list card at the top
@@ -1149,11 +1264,18 @@ const DynamicForm = ({
           transformErrors={transformErrors} // ✅ Suppress default pattern errors
           widgets={widgets}
           id="dynamic-form-id"
-        />
+        >
+          <button
+            type="submit"
+            style={{ display: hideSubmit ? 'none' : 'block' }}
+          >
+            Submit
+          </button>
+        </Form>
       ) : (
         <Grid container spacing={2}>
           {Object.keys(formSchema.properties).map((key) => (
-            <Grid item xs={12} md={4} lg={4} key={key} sx={{ mb: '-40px' }}>
+            <Grid item xs={12} md={4} lg={3} key={key} sx={{ mb: '-40px' }}>
               <Form
                 ref={formRef}
                 schema={{
