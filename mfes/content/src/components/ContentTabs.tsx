@@ -7,7 +7,7 @@ import {
   Typography,
   Grid,
 } from '@mui/material';
-import { ContentItem, Loader } from '@shared-lib';
+import { ContentItem, Loader, useTranslation } from '@shared-lib'; // Updated import
 import React, { memo } from 'react';
 import { ContentSearchResponse } from '../services/Search';
 import ContentCard from './Card/ContentCard';
@@ -44,6 +44,7 @@ const RenderTabContent = memo(
     isPageLoading: boolean;
     isHideEmptyDataMessage?: boolean;
   }) => {
+    const { t } = useTranslation();
     const { default_img, _card, _grid } = _config ?? {};
     return (
       <Box sx={{ width: '100%' }}>
@@ -104,13 +105,13 @@ const RenderTabContent = memo(
                     {isLoadingMoreData ? (
                       <CircularProgress size={20} />
                     ) : (
-                      'Load More'
+                      t('LEARNER_APP.CONTENT_TABS.LOAD_MORE')
                     )}
                   </Button>
                 ) : (
                   isHideEmptyDataMessage && (
                     <Typography variant="body1">
-                      No more data available
+                      {t('LEARNER_APP.CONTENT_TABS.NO_MORE_DATA')}
                     </Typography>
                   )
                 )}
