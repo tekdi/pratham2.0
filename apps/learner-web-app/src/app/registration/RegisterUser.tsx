@@ -409,7 +409,6 @@ const RegisterUser = () => {
     setMobile(formData.mobile);
   };
   return (
-    <Suspense fallback={<div>Loading...</div>}>
       <Box
         height="100vh"
         width="100vw"
@@ -540,7 +539,6 @@ const RegisterUser = () => {
           </Box>
         </SimpleModal>
       </Box>
-    </Suspense>
   );
 };
 
