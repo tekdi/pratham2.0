@@ -1,12 +1,8 @@
 'use client';
-import { getTenantInfo } from '@learner/utils/API/ProgramService';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+
 import {
   Box,
   Button,
-  Card,
-  CardActions,
   Container,
   Grid,
   Typography,
@@ -14,53 +10,33 @@ import {
 } from '@mui/material';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import 'swiper/css';
-import 'swiper/css/autoplay';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-import { Autoplay, Navigation, Pagination } from 'swiper/modules';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Swiper as SwiperClass } from 'swiper/types';
+import { useState, useRef } from 'react';
+
 import { Layout } from '@shared-lib';
-interface Program {
-  ordering: number;
-  name: string;
-  programImages: {
-    label: string;
-    description: string;
-    [key: string]: any; // Additional properties for images
-  }[];
-}
+import OurProgramCarousel from '@learner/components/OurProgramCarousel';
 
 export default function Index() {
   const router = useRouter();
   const theme = useTheme();
   const [imgError, setImgError] = useState<boolean>(false);
-  const [activeSlide, setActiveSlide] = useState<number>(0);
-  const [programs, setPrograms] = useState<Program[]>([]);
+  const programCarouselRef = useRef<HTMLDivElement>(null); // Reference for the carousel section
 
   const handleImageError = () => {
     setImgError(true);
   };
 
-  const handleSlideChange = (swiper: SwiperClass) => {
-    setActiveSlide(swiper.realIndex);
+  /*************  ✨ Windsurf Command ⭐  *************/
+  /**
+   * Handles smooth scrolling to the program carousel section when
+   * the user clicks the "Explore Programs" button.
+   */
+  /*******  f66c0108-7e2c-474f-beaa-522c3fd68dae  *******/
+
+  const handleScrollToPrograms = () => {
+    if (programCarouselRef.current) {
+      programCarouselRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
   };
-
-  useEffect(() => {
-    const fetchTenantInfo = async () => {
-      try {
-        const res = await getTenantInfo();
-        console.log('Tenant Info:', res);
-        setPrograms(res?.result || []);
-      } catch (error) {
-        console.error('Failed to fetch tenant info:', error);
-      }
-    };
-
-    fetchTenantInfo();
-  }, []);
 
   return (
     <Layout onlyHideElements={['footer']}>
@@ -127,7 +103,7 @@ export default function Index() {
                   backgroundColor: '#FDBE16',
                 },
               }}
-              onClick={() => router.push('/login')}
+              onClick={handleScrollToPrograms} // Scroll to carousel section on click
             >
               Sign Up for Program Now!
             </Button>
@@ -326,236 +302,13 @@ export default function Index() {
 
       {/* Our Programs Section */}
       <Box
+        ref={programCarouselRef} // Reference for scrolling
         sx={{
           background: 'linear-gradient(180deg, #FFFDF7 0%, #F8EFDA 100%)',
           padding: '20px',
         }}
       >
-        <Container maxWidth="xl">
-          <Box sx={{ my: 6 }}>
-            <Typography
-              variant="h5"
-              component="h2"
-              fontWeight="bold"
-              sx={{
-                mb: 3,
-                fontWeight: 600,
-                fontSize: '32px',
-                color: '#1F1B13',
-                textAlign: 'center',
-              }}
-            >
-              Our Programs
-            </Typography>
-
-            <Grid container spacing={2} sx={{ my: 4 }}>
-              {programs?.map((program) => (
-                <Grid item xs={12} md={4}>
-                  <SwiperSlide key={program?.ordering}>
-                    <Card
-                      sx={{
-                        maxWidth: '100%',
-                        height: '100%',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        borderRadius: 2,
-                        overflow: 'hidden',
-                        boxShadow: 3,
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          p: 2,
-                          backgroundColor: '#FFDEA1',
-                          textAlign: 'center',
-                        }}
-                      >
-                        <Typography
-                          variant="h6"
-                          sx={{
-                            fontWeight: 500,
-                            fontSize: '18px',
-                            color: '#1F1B13',
-                          }}
-                          component="div"
-                          fontWeight="bold"
-                        >
-                          {program?.name}
-                        </Typography>
-                      </Box>
-
-                      <Box sx={{ position: 'relative' }}>
-                        <Swiper
-                          modules={[Navigation, Pagination]}
-                          spaceBetween={0}
-                          slidesPerView={1}
-                          navigation={{
-                            nextEl: `.next-${program?.ordering}`,
-                            prevEl: `.prev-${program?.ordering}`,
-                          }}
-                          pagination={{
-                            clickable: true,
-                            el: `.pagination-${program?.ordering}`,
-                            bulletActiveClass:
-                              'swiper-pagination-bullet-active',
-                            bulletClass: 'swiper-pagination-bullet',
-                          }}
-                          loop={true}
-                        >
-                          {
-                            // @ts-ignore
-                          }
-                          {program?.programImages?.map(
-                            (slide: any, slideIndex) => (
-                              <SwiperSlide
-                                key={`slide-${program.ordering}-${slideIndex}`}
-                              >
-                                <Box
-                                  sx={{
-                                    margin: '10px',
-                                    height: '200px',
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                  }}
-                                >
-                                  {/* <Image
-                                  src={slide}
-                                  alt={'img'}
-                                  sx={{
-                                    borderRadius: '24px',
-                                    width: 'unset',
-                                    height: '100%',
-                                  }}
-                                  onError={handleImageError}
-                                /> */}
-
-                                  <img
-                                    src={slide}
-                                    alt={'img'}
-                                    style={{
-                                      borderRadius: '24px',
-                                      width: 'unset',
-                                      height: '100%',
-                                      objectFit: 'cover',
-                                    }}
-                                  />
-                                </Box>
-                              </SwiperSlide>
-                            )
-                          )}
-                        </Swiper>
-
-                        {/* <Box
-                          sx={{
-                            position: 'absolute',
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            backgroundColor: 'rgba(73, 108, 184, 0.9)',
-                            p: 2,
-                            color: 'white',
-                          }}
-                        >
-                        </Box> */}
-
-                        <Box sx={{ my: 2 }}>
-                          <Box
-                            display="flex"
-                            justifyContent="center"
-                            alignItems="center"
-                            gap={2}
-                          >
-                            {/* Left Arrow Button */}
-                            <Button
-                              className={`prev-${program.ordering}`}
-                              sx={{
-                                minWidth: '30px',
-                                width: '30px',
-                                height: '30px',
-                                p: 0,
-                                borderRadius: '50%',
-                                backgroundColor: '#FFFFFF',
-                                boxShadow: '0px 1px 2px 0px #0000004D',
-                                color: 'gray',
-                                '&:hover': {
-                                  backgroundColor: '#e0e0e0',
-                                },
-                              }}
-                            >
-                              <ChevronLeftIcon
-                                sx={{ color: '#1F1B13', fontSize: '30px' }}
-                              />
-                            </Button>
-
-                            {/* Pagination Dots */}
-                            <Box
-                              className={`pagination-${program?.ordering}`}
-                              sx={{
-                                display: 'flex',
-                                '& .swiper-pagination-bullet': {
-                                  width: '30px',
-                                  height: '4px',
-                                  borderRadius: '2px',
-                                  backgroundColor: '#CDC5BD',
-                                  opacity: 1,
-                                  mx: 0.5,
-                                },
-                                '& .swiper-pagination-bullet-active': {
-                                  backgroundColor: '#FDB813',
-                                },
-                              }}
-                            ></Box>
-
-                            {/* Right Arrow Button */}
-                            <Button
-                              className={`next-${program?.ordering}`}
-                              sx={{
-                                minWidth: '30px',
-                                width: '30px',
-                                height: '30px',
-                                p: 0,
-                                borderRadius: '50%',
-                                backgroundColor: '#FFFFFF',
-                                boxShadow: '0px 1px 2px 0px #0000004D',
-                                color: 'gray',
-                                '&:hover': {
-                                  backgroundColor: '#e0e0e0',
-                                },
-                              }}
-                            >
-                              <ChevronRightIcon
-                                sx={{ color: '#1F1B13', fontSize: '30px' }}
-                                fontSize="small"
-                              />
-                            </Button>
-                          </Box>
-                        </Box>
-                      </Box>
-
-                      <CardActions sx={{ justifyContent: 'center', p: 2 }}>
-                        <Button
-                          fullWidth
-                          variant="contained"
-                          color="primary"
-                          sx={{
-                            borderRadius: 50,
-                            backgroundColor: '#FDBE16',
-                            '&:hover': {
-                              backgroundColor: '#FDBE16',
-                            },
-                          }}
-                          onClick={() => router.push('/signup')}
-                        >
-                          Sign Up
-                        </Button>
-                      </CardActions>
-                    </Card>
-                  </SwiperSlide>
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
-        </Container>
+        <OurProgramCarousel />
       </Box>
     </Layout>
   );

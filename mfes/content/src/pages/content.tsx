@@ -41,6 +41,7 @@ export default function Content(props: Readonly<ContentProps>) {
   const [localFilters, setLocalFilters] = useState<any>({
     limit: 5,
     offset: 0,
+    filters: props.filters,
   });
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [trackData, setTrackData] = useState<[]>([]);

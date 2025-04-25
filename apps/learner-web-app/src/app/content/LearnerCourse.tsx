@@ -1,5 +1,5 @@
 import dynamic from 'next/dynamic';
-import React, { useState, useCallback, memo } from 'react';
+import React, { useState, useCallback, memo, useEffect } from 'react';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import { CommonDialog, useTranslation } from '@shared-lib';
 import { FilterAltOutlined } from '@mui/icons-material';
@@ -23,6 +23,18 @@ export default memo(function LearnerCourse({
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useTranslation();
 
+  useEffect(() => {
+    console.log(_content.filter);
+
+    if (_content?.filter) {
+      console.log(_content?.filter);
+      setFilterState((prevState) => ({
+        ...prevState,
+        ..._content?.filter,
+      }));
+    }
+  }, [_content]);
+  console.log(filterState);
   const handleSearchClick = useCallback((searchValue: string) => {
     setFilterState((prevState) => ({
       ...prevState,
