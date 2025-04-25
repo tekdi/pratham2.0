@@ -58,7 +58,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
   open,
   setOpen,
 }) => {
-  certificateId = 'did:rcw:20f5fe82-4912-401a-a33a-09b46413b9cf'; // temporaory hardcoded
+  // certificateId = 'did:rcw:20f5fe82-4912-401a-a33a-09b46413b9cf'; // temporaory hardcoded
   const handleCloseCertificate = async () => {};
   const [certificateHtml, setCertificateHtml] = useState('');
   const [showShareOptions, setShowShareOptions] = useState(false);

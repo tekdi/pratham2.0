@@ -46,10 +46,10 @@ const ContentDetails = (props: ContentDetailsProps) => {
             userId,
             courseId: identifier as string,
           });
-
           if (
             data?.result?.status === 'enrolled' ||
-            data?.result?.status === 'completed'
+            data?.result?.status === 'completed' ||
+            data?.result?.status === 'viewCertificate'
           ) {
             if (props?.getIfEnrolled) {
               props?.getIfEnrolled(result as unknown as ContentSearchResponse);
