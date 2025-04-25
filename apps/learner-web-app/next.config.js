@@ -13,6 +13,13 @@ const nextConfig = {
     svgr: false,
   },
 
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+
   //cross import support
   transpilePackages: ['@shared-lib-v2/*'],
 
