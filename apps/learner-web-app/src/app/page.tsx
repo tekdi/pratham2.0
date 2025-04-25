@@ -10,19 +10,28 @@ import {
 } from '@mui/material';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
-import { Layout } from '@shared-lib';
+import { Layout, useTranslation } from '@shared-lib';
 import OurProgramCarousel from '@learner/components/OurProgramCarousel';
 
 export default function Index() {
   const router = useRouter();
   const theme = useTheme();
+  const { t } = useTranslation();
   const [imgError, setImgError] = useState<boolean>(false);
+  const programCarouselRef = useRef<HTMLDivElement>(null);
 
   const handleImageError = () => {
     setImgError(true);
   };
+
+  const handleScrollToPrograms = () => {
+    if (programCarouselRef.current) {
+      programCarouselRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <Layout onlyHideElements={['footer']}>
       <Box
@@ -60,7 +69,7 @@ export default function Index() {
                 textAlign: 'center',
               }}
             >
-              Welcome to Pratham myLearning!
+              {t('LEARNER_APP.HOME.WELCOME_TITLE')}
             </Typography>
             <Typography
               sx={{
@@ -69,7 +78,7 @@ export default function Index() {
                 textAlign: 'center',
               }}
             >
-              Your Learning Journey begins here
+              {t('LEARNER_APP.HOME.WELCOME_SUBTITLE')}
             </Typography>
 
             <Button
@@ -88,14 +97,14 @@ export default function Index() {
                   backgroundColor: '#FDBE16',
                 },
               }}
-              onClick={() => router.push('/login')}
+              onClick={handleScrollToPrograms}
             >
-              Sign Up for Program Now!
+              {t('LEARNER_APP.HOME.SIGN_UP_BUTTON')}
             </Button>
 
             <Box sx={{ display: 'flex', gap: '5px' }}>
               <Typography variant="body2" color="#1F1B13" display="inline">
-                Already signed up?
+                {t('LEARNER_APP.HOME.ALREADY_SIGNED_UP')}
               </Typography>
               <Typography
                 variant="body2"
@@ -108,7 +117,7 @@ export default function Index() {
                 display="inline"
                 onClick={() => router.push('/login')}
               >
-                Click here to login
+                {t('LEARNER_APP.HOME.LOGIN_LINK')}
               </Typography>
             </Box>
           </Box>
@@ -141,10 +150,10 @@ export default function Index() {
                         }}
                         fontWeight="bold"
                       >
-                        Get the App
+                        {t('LEARNER_APP.HOME.GET_THE_APP')}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        Point your phone camera here
+                        {t('LEARNER_APP.HOME.POINT_CAMERA')}
                       </Typography>
                     </Box>
                   </Box>
@@ -176,7 +185,7 @@ export default function Index() {
                       fontWeight: '400',
                     }}
                   >
-                    OR
+                    {t('LEARNER_APP.HOME.OR')}
                   </Typography>
                   <Box
                     sx={{
@@ -203,11 +212,9 @@ export default function Index() {
                       width="122"
                     />
                   </Box>
-
-                  {/* Search Bar (placeholder) */}
                   <Box>
                     <Typography>
-                      Search &quot;Pratham myLearning&quot; on Playstore
+                      {t('LEARNER_APP.HOME.SEARCH_PLAYSTORE')}
                     </Typography>
                   </Box>
                 </Box>
@@ -217,7 +224,6 @@ export default function Index() {
         </Box>
       </Box>
 
-      {/* About Pratham Section */}
       <Container maxWidth="xl">
         <Box sx={{ my: 6, px: '20px' }}>
           <Grid container spacing={4}>
@@ -233,7 +239,7 @@ export default function Index() {
                   color: '#1F1B13',
                 }}
               >
-                About Pratham
+                {t('LEARNER_APP.HOME.ABOUT_PRATHAM_TITLE')}
               </Typography>
               <Typography
                 sx={{
@@ -245,17 +251,7 @@ export default function Index() {
                 variant="body1"
                 paragraph
               >
-                Pratham creates innovative education solutions with thoughtful,
-                impactful interventions that span the age spectrum. Working both
-                directly and through government systems, these programs
-                collectively reach millions of children and young people each
-                year. The direct work follows two tracks: Pratham works with
-                children either in the school or in the community, whereas the
-                &ldquo;partnership&rdquo; model involves Pratham teams working
-                closely with government teams at the state, district, or block
-                level. Our unwavering commitment to developing, testing, and
-                improving learning outcomes continues to serve as a model, both
-                within India and beyond.
+                {t('LEARNER_APP.HOME.ABOUT_PRATHAM_DESC')}
               </Typography>
             </Grid>
             <Grid item xs={12} md={5}>
@@ -285,8 +281,8 @@ export default function Index() {
         </Box>
       </Container>
 
-      {/* Our Programs Section */}
       <Box
+        ref={programCarouselRef}
         sx={{
           background: 'linear-gradient(180deg, #FFFDF7 0%, #F8EFDA 100%)',
           padding: '20px',

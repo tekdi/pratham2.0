@@ -12,6 +12,10 @@ const nextConfig = {
     // See: https://github.com/gregberge/svgr
     svgr: false,
   },
+
+  //cross import support
+  transpilePackages: ['@shared-lib-v2/*'],
+
   images: {
     domains: ['program-image-dev.s3.ap-south-1.amazonaws.com'],
   },

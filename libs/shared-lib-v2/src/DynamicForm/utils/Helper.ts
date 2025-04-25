@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { Role, Status, labelsToExtractForMiniProfile } from '@dynamic-form/utils/app.constant';
+import { Role, Status, labelsToExtractForMiniProfile } from '../utils/app.constant';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import FingerprintJS from 'fingerprintjs2';
@@ -7,16 +7,16 @@ import {
   BoardEnrollmentStageCounts,
   CustomField,
   UpdateCustomField,
-} from '@dynamic-form/utils/Interfaces';
+} from '../utils/Interfaces';
 dayjs.extend(utc);
 import { format, parseISO } from 'date-fns';
-import manageUserStore from '@dynamic-form/store/manageUserStore';
+import manageUserStore from '../store/manageUserStore';
 import {
   AssessmentType,
   avgLearnerAttendanceLimit,
   lowLearnerAttendanceLimit,
-} from '@dynamic-form/utils/app.config';
-import API_ENDPOINTS from '@dynamic-form/utils/API/APIEndpoints';
+} from '../utils/app.config';
+import API_ENDPOINTS from '../utils/API/APIEndpoints';
 
 export const ATTENDANCE_ENUM = {
   PRESENT: 'present',

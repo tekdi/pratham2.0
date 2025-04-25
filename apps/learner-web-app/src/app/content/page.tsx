@@ -8,8 +8,10 @@ import LTwoCourse from '@learner/components/Content/LTwoCourse';
 import { useEffect, useState } from 'react';
 import { getTenantInfo } from '@learner/utils/API/ProgramService';
 import ContentComponent from '@learner/components/Content/Content';
+import { useTranslation } from '@shared-lib';
 
 const MyComponent: React.FC = () => {
+  const { t } = useTranslation();
   const [filter, setFilter] = useState({});
 
   useEffect(() => {
@@ -50,14 +52,14 @@ const MyComponent: React.FC = () => {
             }}
           >
             <Typography variant="h4" gutterBottom sx={{ color: '#06A816' }}>
-              In Progress
+              {t('LEARNER_APP.L_ONE_COURSE.IN_PROGRESS_TITLE')}
             </Typography>
             <Typography variant="body1" gutterBottom>
-              You have 4 Ongoing Courses
+              {t('LEARNER_APP.L_ONE_COURSE.ONGOING_COURSES')}
             </Typography>
             <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
               <Button variant="contained" color="primary" href="/in-progress">
-                View All
+                {t('LEARNER_APP.L_ONE_COURSE.VIEW_ALL_BUTTON')}
               </Button>
             </Box>
           </Box>

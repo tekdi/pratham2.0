@@ -1,4 +1,4 @@
-import axiosInstance from '@dynamic-form/services/Interceptor';
+import axiosInstance from '../services/Interceptor';
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
 
 export async function get(

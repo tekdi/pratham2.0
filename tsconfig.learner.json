@@ -30,7 +30,7 @@
       "@ContentPlayer": ["mfes/content/src/components/Content/Player.tsx"],
 
       //dynamic form
-      "@dynamic-form/*": ["apps/learner-web-app/src/components/DynamicForm/*"]
+      "@shared-lib-v2/*": ["libs/shared-lib-v2/src/*"]
     }
   },
   "exclude": ["node_modules", "tmp"]

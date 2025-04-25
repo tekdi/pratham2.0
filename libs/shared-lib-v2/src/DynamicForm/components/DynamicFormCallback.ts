@@ -1,11 +1,11 @@
 //@ts-nocheck
-import { sendCredentialService } from '@dynamic-form/services/NotificationService';
-import { TelemetryEventType } from '@dynamic-form/utils/app.constant';
-import { firstLetterInUpperCase, getUserFullName } from '@dynamic-form/utils/Helper';
-import { telemetryFactory } from '@dynamic-form/utils/telemetry';
+import { sendCredentialService } from '../services/NotificationService';
+import { TelemetryEventType } from '../utils/app.constant';
+import { firstLetterInUpperCase, getUserFullName } from '../utils/Helper';
+import { telemetryFactory } from '../utils/telemetry';
 import axios from 'axios';
 import { debounce } from 'lodash';
-import { showToastMessage } from '@dynamic-form/components/Toastify';
+import { showToastMessage } from '../components/Toastify';
 
 export const debouncedGetList = debounce(
   async (data, setResponse, getListApiCall) => {

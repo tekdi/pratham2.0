@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { post } from './RestClient';
-import API_ENDPOINTS from '@dynamic-form/utils/API/APIEndpoints';
+import API_ENDPOINTS from '../utils/API/APIEndpoints';
 
 interface LoginParams {
   username: string;

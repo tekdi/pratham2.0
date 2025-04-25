@@ -1,4 +1,4 @@
-import { Role } from '@dynamic-form/utils/app.constant';
+import { Role } from '../utils/app.constant';
 
 export const AttendanceAPILimit: number = 300;
 export const lowLearnerAttendanceLimit: number = 32;

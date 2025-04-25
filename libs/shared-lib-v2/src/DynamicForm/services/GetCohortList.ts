@@ -1,4 +1,4 @@
-import API_ENDPOINTS from '@dynamic-form/utils/API/APIEndpoints';
+import API_ENDPOINTS from '../utils/API/APIEndpoints';
 import { get } from './RestClient';
 export const getCohortList = async (
   userId: string | string[]

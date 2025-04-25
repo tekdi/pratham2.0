@@ -13,14 +13,30 @@ import { showToastMessage } from '@learner/components/ToastComponent/Toastify';
 import axios from 'axios';
 import MobileVerificationSuccess from '@learner/components/MobileVerificationSuccess/MobileVerificationSuccess';
 import CreateAccountForm from '@learner/components/CreateAccountForm/CreateAccountForm';
+import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
+import { fetchForm } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
+import { FormContext } from '@shared-lib-v2/DynamicForm/components/DynamicFormConstant';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { createUser } from '@shared-lib-v2/DynamicForm/services/CreateUserService';
+import { RoleId } from '@shared-lib-v2/DynamicForm/utils/app.constant';
+import { getUserId, login } from '@learner/utils/API/LoginService';
+import SignupSuccess from '@learner/components/SignupSuccess /SignupSuccess ';
+import { Loader } from '@shared-lib';
+import { firstLetterInUpperCase } from '@learner/utils/helper';
 
 type UserAccount = {
   name: string;
   username: string;
 };
 const registrationPage = () => {
-  let formData: any = {};
+  // let formData: any = {};
   const [usernames, setUsernames] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const searchParams = useSearchParams();
+  const newAccount = searchParams.get('newAccount');
+  const tenantId = searchParams.get('tenantId');
+
   const [accountExistModal, setAccountExistModal] = useState<boolean>(false);
   const [usernamePasswordForm, setUsernamePasswordForm] =
     useState<boolean>(false);
@@ -28,32 +44,118 @@ const registrationPage = () => {
   const [otpmodal, setOtpModal] = useState(false);
   const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
   const [hash, setHash] = useState<string>('');
+  const localFormData = JSON.parse(localStorage.getItem('formData') || '{}');
+  const [formData, setFormData] = useState<any>(localFormData);
+  const localPayload = JSON.parse(localStorage.getItem('localPayload') || '{}');
+
+  const [payload, setPayload] = useState<any>(localPayload);
+
   const [verificationSuccessModal, setVerificationSuccessModal] =
     useState(false);
+  const [signupSuccessModal, setSignupSuccessModal] = useState(false);
+
   //formData.email = 'a@tekditechnologies.com';
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [mobile, setMobile] = useState('');
+  const router = useRouter();
+
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [addSchema, setAddSchema] = useState(null);
+  const [addUiSchema, setAddUiSchema] = useState(null);
+
+  // const [schema, setSchema] = useState(facilitatorSearchSchema);
+  // const [uiSchema, setUiSchema] = useState(facilitatorSearchUISchema);
+  useEffect(() => {
+    // Fetch form schema from API and set it in state.
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const responseForm: any = await fetchForm([
+          {
+            fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.learner.context}&contextType=${FormContext.learner.contextType}`,
+            header: {},
+          },
+          // {
+          //   fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.learner.context}&contextType=${FormContext.learner.contextType}`,
+          //   header: {
+          //     tenantid: localStorage.getItem('tenantId'),
+          //   },
+          // },
+        ]);
+        console.log('responseForm', responseForm?.schema);
+        delete responseForm?.schema?.properties.password;
+        delete responseForm?.schema?.properties.confirm_password;
+        delete responseForm?.schema?.properties.username;
+        delete responseForm?.schema?.properties.program;
+
+        //unit name is missing from required so handled from frotnend
+        let alterSchema = responseForm?.schema;
+        let alterUISchema = responseForm?.uiSchema;
+
+        setAddSchema(alterSchema);
+        setAddUiSchema(alterUISchema);
+      } catch (error) {
+        console.log('error', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
   useEffect(() => {
     let timer: any;
     if (verificationSuccessModal) {
       timer = setTimeout(() => {
-        setUsernamePasswordForm(true);
+        //   router.push(`/account-selection?newAccount=${'true'}`);
+        // params.set('newAccount', 'true');
+
         onCloseSuccessModal();
       }, 3000);
     }
 
     return () => clearTimeout(timer);
   }, [verificationSuccessModal]);
-  const handleCreateAccount = () => {
-    console.log('Username:', username);
-    console.log('Password:', password);
-    console.log('Confirm Password:', confirmPassword);
-  };
-  formData.mobile = '8793607919';
-  formData.firstName = 'karan';
-  formData.lastName = 'patil';
+  const handleCreateAccount = async () => {
+    try {
+      console.log('Username:', username);
+      console.log('Username:', formData);
+      console.log('Username:', payload);
 
+      console.log('Password:', password);
+      console.log('Confirm Password:', confirmPassword);
+      console.log('Confirm Password:', confirmPassword);
+      const localPayload = localStorage.getItem('localPayload');
+      if (localPayload && tenantId) {
+        const payloadData = JSON.parse(
+          localStorage.getItem('localPayload') || '{}'
+        );
+        const tenantData = [{ roleId: RoleId.STUDENT, tenantId: tenantId }];
+
+        const createuserPayload = {
+          ...payload,
+          username: username,
+          password: password,
+          program: tenantId,
+          tenantCohortRoleMapping: tenantData,
+        };
+        localStorage.setItem('localPayload', JSON.stringify(createuserPayload));
+        const responseUserData = await createUser(createuserPayload);
+        console.log(responseUserData);
+        if (responseUserData) {
+          setSignupSuccessModal(true);
+        } else {
+          showToastMessage('Username Already Exist', 'error');
+        }
+
+        console.log(responseUserData);
+      }
+    } catch (error) {}
+  };
+  // formData.mobile = '8793607919';
+  // formData.firstName = 'karan';
+  // formData.lastName = 'patil';
+  console.log(payload);
   const maskMobileNumber = (mobile: string) => {
     if (mobile && mobile.length < 2) return mobile;
     else if (mobile) {
@@ -85,8 +187,9 @@ const registrationPage = () => {
 
       const response = await userCheck(payload);
       const users = response?.result || [];
-
-      if (users.length > 0) {
+      if (users.length > 0 && isEmailCheck) {
+        showToastMessage('Email already exists', 'error');
+      } else if (users.length > 0) {
         const usernameList = users.map((user: any) => user.username);
 
         setUsernames(usernameList);
@@ -110,7 +213,9 @@ const registrationPage = () => {
     }
   };
 
-  const handleLoginClick = () => {};
+  const handleLoginClick = () => {
+    router.push('/login');
+  };
   const handleCloseModal = () => {
     setAccountExistModal(false);
   };
@@ -120,15 +225,15 @@ const registrationPage = () => {
   };
   const onCreateAnotherAccount = async () => {
     setAccountExistModal(false);
-    await handleSendOtp(formData.mobile);
+    await handleSendOtp(mobile);
   };
   const onVerify = async () => {
     try {
-      let mobile = formData.mobile.toString();
+      // let mobile = mobile.toString();
       let reason = 'signup';
       // let username = enterdUserName;
       const response = await verifyOTP({
-        mobile,
+        mobile: mobile.toString(),
         reason,
         otp: otp.join(''),
         hash,
@@ -155,7 +260,7 @@ const registrationPage = () => {
   const onResend = async () => {
     try {
       let reason = 'forgot';
-      const response = await sendOTP({ mobile: formData.mobileNumber, reason });
+      const response = await sendOTP({ mobile: mobile, reason });
       console.log('sendOTP', response);
       setHash(response?.result?.data?.hash);
     } catch (error) {}
@@ -167,6 +272,89 @@ const registrationPage = () => {
 
     setVerificationSuccessModal(false);
     setUsernamePasswordForm(true);
+  };
+  const onCloseSignupSuccessModal = () => {
+    //  const route = localStorage.getItem('redirectionRoute');
+    //   if (route) router.push(route);
+
+    setSignupSuccessModal(false);
+    // setUsernamePasswordForm(true);
+  };
+  const onSigin = async () => {
+    let username;
+    let password;
+    const localPayload = localStorage.getItem('localPayload');
+    if (localPayload) {
+      const payloadData = JSON.parse(
+        localStorage.getItem('localPayload') || '{}'
+      );
+      username = payloadData?.username;
+      password = payloadData?.password;
+    }
+
+    try {
+      if (username && password) {
+        console.log('hello');
+
+        const response = await login({ username, password });
+        if (response?.result?.access_token) {
+          if (typeof window !== 'undefined' && window.localStorage) {
+            const token = response.result.access_token;
+            const refreshToken = response?.result?.refresh_token;
+            localStorage.setItem('token', token);
+
+            const userResponse = await getUserId();
+
+            if (userResponse) {
+              if (
+                userResponse?.tenantData?.[0]?.roleName === 'Learner' &&
+                userResponse?.tenantData?.[0]?.tenantName === 'YouthNet'
+              ) {
+                localStorage.setItem('userId', userResponse?.userId);
+                console.log(userResponse?.tenantData);
+                localStorage.setItem(
+                  'templtateId',
+                  userResponse?.tenantData?.[0]?.templateId
+                );
+
+                localStorage.setItem('userIdName', userResponse?.username);
+
+                const tenantId = userResponse?.tenantData?.[0]?.tenantId;
+                localStorage.setItem('tenantId', tenantId);
+
+                const channelId = userResponse?.tenantData?.[0]?.channelId;
+                localStorage.setItem('channelId', channelId);
+
+                const collectionFramework =
+                  userResponse?.tenantData?.[0]?.collectionFramework;
+                localStorage.setItem(
+                  'collectionFramework',
+                  collectionFramework
+                );
+
+                document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
+
+                console.log('hello');
+                router.push('/home');
+              } else {
+                // showToastMessage(
+                //   'LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT',
+                //   'error'
+                // );
+              }
+            }
+          }
+        } else {
+          // showToastMessage('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT', 'error');
+        }
+        setSignupSuccessModal(false);
+      }
+      // setLoading(false);
+    } catch (error: any) {
+      //   setLoading(false);
+      const errorMessage = 'LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT';
+      showToastMessage(errorMessage, 'error');
+    }
   };
   //   const handleLogin = async () => {
   //     if (formData.email) {
@@ -185,18 +373,41 @@ const registrationPage = () => {
   //       setUsernames(usernameList);
   //     }
   //   };
+  const FormSubmitFunction = async (formData: any, payload: any) => {
+    localStorage.setItem('formData', JSON.stringify(formData));
+    setPayload(payload);
+    localStorage.setItem('localPayload', JSON.stringify(payload));
+    setFormData(formData);
+    handleAccountValidation(formData);
+    console.log(formData);
+    console.log(payload);
+    setMobile(formData.mobile);
+  };
   return (
     <Box
       height="100vh"
       width="100vw"
       display="flex"
       flexDirection="column"
-      // overflow="hidden"
       sx={{
         background: 'linear-gradient(to bottom, #fff7e6, #fef9ef)',
+        overflow: 'auto',
       }}
     >
-      {usernamePasswordForm ? (
+      {loading ? (
+        <Box
+          width="100%"
+          id="check"
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+        >
+          <Loader isLoading={true} layoutHeight={0}>
+            {/* Your actual content goes here, even if it's an empty div */}
+            <div />
+          </Loader>{' '}
+        </Box>
+      ) : usernamePasswordForm ? (
         <Box mt="10%">
           <CreateAccountForm
             username={username}
@@ -206,25 +417,28 @@ const registrationPage = () => {
             confirmPassword={confirmPassword}
             onConfirmPasswordChange={setConfirmPassword}
             onSubmit={handleCreateAccount}
+            belowEighteen={formData.guardian_name ? true : false}
           />
         </Box>
       ) : (
         <Box
-          // height="100vh"
-          //   m="80px"
           ml="25%"
-          mt="500px"
+          mt="10px"
           width="50vw"
+          height="100vh"
           display="flex"
           flexDirection="column"
-          // overflow="hidden"
-          sx={{
-            background: 'linear-gradient(to bottom, #fff7e6, #fef9ef)',
-          }}
         >
+          {addSchema && addUiSchema && (
+            <DynamicForm
+              schema={addSchema}
+              uiSchema={addUiSchema}
+              FormSubmitFunction={FormSubmitFunction}
+              prefilledFormData={formData}
+              hideSubmit={true}
+            />
+          )}
           <Button
-            // variant="contained"
-            //fullWidth
             sx={{
               mt: 3,
               backgroundColor: '#FFC107',
@@ -234,9 +448,9 @@ const registrationPage = () => {
                 backgroundColor: '#ffb300',
               },
             }}
-            onClick={() => handleAccountValidation(formData)}
+            form="dynamic-form-id"
+            type="submit"
           >
-            {/* {t('LOGIN_PAGE.LOGIN')} */}
             Continue
           </Button>
         </Box>
@@ -252,11 +466,14 @@ const registrationPage = () => {
         footerText="Are you sure you want to create another account?"
       >
         <AccountExistsCard
-          fullName={formData.firstName + ' ' + formData?.lastName}
+          fullName={firstLetterInUpperCase(
+            formData.firstName + ' ' + formData?.lastName
+          )}
           usernames={usernames}
           onLoginClick={handleLoginClick}
         />
       </SimpleModal>
+
       <SimpleModal
         open={otpmodal}
         onClose={handleOTPModal}
@@ -269,9 +486,10 @@ const registrationPage = () => {
           onResend={onResend}
           otp={otp}
           setOtp={setOtp}
-          maskedNumber={maskMobileNumber(formData.mobileNumber)}
+          maskedNumber={maskMobileNumber(mobile || '')}
         />
       </SimpleModal>
+
       <SimpleModal
         open={verificationSuccessModal}
         onClose={onCloseSuccessModal}
@@ -281,6 +499,18 @@ const registrationPage = () => {
       >
         <Box p="10px">
           <MobileVerificationSuccess />
+        </Box>
+      </SimpleModal>
+
+      <SimpleModal
+        open={signupSuccessModal}
+        onClose={onCloseSignupSuccessModal}
+        showFooter={true}
+        primaryText={'Start learning'}
+        primaryActionHandler={onSigin}
+      >
+        <Box p="10px">
+          <SignupSuccess />
         </Box>
       </SimpleModal>
     </Box>

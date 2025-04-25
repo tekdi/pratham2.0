@@ -19,10 +19,12 @@ import 'swiper/css/pagination';
 import { Navigation, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Swiper as SwiperClass } from 'swiper/types';
+import { useTranslation } from '@shared-lib';
 
 interface Program {
   ordering: number;
   name: string;
+  tenantId: string;
   programImages: {
     label: string;
     description: string;
@@ -31,9 +33,11 @@ interface Program {
 }
 
 const OurProgramCarousel = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const [activeSlide, setActiveSlide] = useState<number>(0);
   const [programs, setPrograms] = useState<Program[]>([]);
+  const [tenantId, setTenantId] = useState('');
 
   const handleSlideChange = (swiper: SwiperClass) => {
     setActiveSlide(swiper.realIndex);
@@ -45,6 +49,8 @@ const OurProgramCarousel = () => {
         const res = await getTenantInfo();
         console.log('Tenant Info:', res);
         setPrograms(res?.result || []);
+        const tenantIds = res?.result?.map((item: any) => item.tenantId);
+        setTenantId(tenantIds);
       } catch (error) {
         console.error('Failed to fetch tenant info:', error);
       }
@@ -67,7 +73,7 @@ const OurProgramCarousel = () => {
             textAlign: 'center',
           }}
         >
-          Our Programs
+          {t('LEARNER_APP.HOME.OUR_PROGRAMS')}
         </Typography>
 
         <Grid container spacing={2} sx={{ my: 4 }}>
@@ -130,7 +136,6 @@ const OurProgramCarousel = () => {
                         ? program.programImages
                         : [null]
                       ).map((slide: any, slideIndex) => {
-                        console.log(`Slide ${slideIndex}:`, slide);
                         return (
                           <SwiperSlide
                             key={`slide-${program.ordering}-${slideIndex}`}
@@ -144,7 +149,7 @@ const OurProgramCarousel = () => {
                               }}
                             >
                               <img
-                                src={slide || '/images/welcome.gif'} // Use dummy image if slide is null
+                                src={slide || '/images/default.png'} // Use dummy image if slide is null
                                 alt="img"
                                 style={{
                                   borderRadius: '24px',
@@ -154,7 +159,7 @@ const OurProgramCarousel = () => {
                                 }}
                                 onError={(e) => {
                                   (e.target as HTMLImageElement).src =
-                                    '/images/welcome.gif';
+                                    '/images/default.png';
                                 }}
                               />
                             </Box>
@@ -248,9 +253,13 @@ const OurProgramCarousel = () => {
                           backgroundColor: '#FDBE16',
                         },
                       }}
-                      onClick={() => router.push('/signup')}
+                      onClick={() =>
+                        router.push(
+                          '/registration?tenantId=' + program?.tenantId
+                        )
+                      }
                     >
-                      Sign Up
+                      {t('LEARNER_APP.HOME.SIGN_UP')}
                     </Button>
                   </CardActions>
                 </Card>

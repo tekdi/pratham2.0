@@ -8,18 +8,18 @@ import { Box } from '@mui/material';
 import { TextField, Container, Typography } from '@mui/material';
 import { useTranslation } from 'next-i18next';
 import _ from 'lodash'; // Lodash for deep comparison
-import CustomMultiSelectWidget from '@dynamic-form/components/RJSFWidget/CustomMultiSelectWidget';
-import CustomCheckboxWidget from '@dynamic-form/components/RJSFWidget/CustomCheckboxWidget';
-import CustomDateWidget from '@dynamic-form/components/RJSFWidget/CustomDateWidget';
-import SearchTextFieldWidget from '@dynamic-form/components/RJSFWidget/SearchTextFieldWidget';
-import CustomSingleSelectWidget from '@dynamic-form/components/RJSFWidget/CustomSingleSelectWidget';
-import CustomRadioWidget from '@dynamic-form/components/RJSFWidget/CustomRadioWidget';
-import CustomTextFieldWidget from '@dynamic-form/components/RJSFWidget/CustomTextFieldWidget';
+import CustomMultiSelectWidget from './RJSFWidget/CustomMultiSelectWidget';
+import CustomCheckboxWidget from './RJSFWidget/CustomCheckboxWidget';
+import CustomDateWidget from './RJSFWidget/CustomDateWidget';
+import SearchTextFieldWidget from './RJSFWidget/SearchTextFieldWidget';
+import CustomSingleSelectWidget from './RJSFWidget/CustomSingleSelectWidget';
+import CustomRadioWidget from './RJSFWidget/CustomRadioWidget';
+import CustomTextFieldWidget from './RJSFWidget/CustomTextFieldWidget';
 import {
   calculateAgeFromDate,
   toPascalCase,
   transformLabel,
-} from '@dynamic-form/utils/Helper';
+} from '../utils/Helper';
 
 const DynamicForm = ({
   schema,
