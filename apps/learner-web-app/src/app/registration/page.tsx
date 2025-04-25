@@ -93,6 +93,9 @@ const registrationPage = () => {
         let alterSchema = responseForm?.schema;
         let alterUISchema = responseForm?.uiSchema;
 
+        //set 2 grid layout
+        alterUISchema = enhanceUiSchemaWithGrid(alterUISchema);
+
         setAddSchema(alterSchema);
         setAddUiSchema(alterUISchema);
       } catch (error) {
@@ -103,6 +106,25 @@ const registrationPage = () => {
     };
     fetchData();
   }, []);
+
+  const enhanceUiSchemaWithGrid = (uiSchema: any): any => {
+    const enhancedSchema = { ...uiSchema };
+
+    Object.keys(enhancedSchema).forEach((fieldKey) => {
+      if (typeof enhancedSchema[fieldKey] === 'object') {
+        // Ensure ui:options exists
+        if (!enhancedSchema[fieldKey]['ui:options']) {
+          enhancedSchema[fieldKey]['ui:options'] = {};
+        }
+
+        // Push grid option
+        enhancedSchema[fieldKey]['ui:options'].grid = { xs: 12, sm: 12, md: 6 };
+      }
+    });
+
+    return enhancedSchema;
+  };
+
   useEffect(() => {
     let timer: any;
     if (verificationSuccessModal) {

@@ -20,6 +20,7 @@ import {
   toPascalCase,
   transformLabel,
 } from '../utils/Helper';
+import { CustomObjectFieldTemplate } from './FormTemplate/ObjectFieldTemplate';
 
 const DynamicForm = ({
   schema,
@@ -1264,6 +1265,9 @@ const DynamicForm = ({
           transformErrors={transformErrors} // ✅ Suppress default pattern errors
           widgets={widgets}
           id="dynamic-form-id"
+
+          // template
+          templates={{ ObjectFieldTemplate: CustomObjectFieldTemplate }}
         >
           <button
             type="submit"
