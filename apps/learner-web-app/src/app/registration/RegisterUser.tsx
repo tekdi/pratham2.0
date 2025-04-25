@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Box, Button } from '@mui/material';
+import { Box, Button, Link, Typography } from '@mui/material';
 import Header from '@learner/components/Header/Header';
 import dynamic from 'next/dynamic';
 import { userCheck } from '@learner/utils/API/userService';
@@ -23,9 +23,12 @@ import { getUserId, login } from '@learner/utils/API/LoginService';
 import SignupSuccess from '@learner/components/SignupSuccess /SignupSuccess ';
 import { Loader } from '@shared-lib';
 import { firstLetterInUpperCase } from '@learner/utils/helper';
+import face from '../../../public/images/Group 3.png';
 
 //build issue fix for  ⨯ useSearchParams() should be wrapped in a suspense boundary at page
 import { useSearchParams } from 'next/navigation';
+import { getTenantInfo } from '@learner/utils/API/ProgramService';
+import Image from 'next/image';
 
 type UserAccount = {
   name: string;
@@ -39,6 +42,7 @@ const RegisterUser = () => {
   // let formData: any = {};
   const [usernames, setUsernames] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [invalidLinkModal, setInvalidLinkModal] = useState(false);
 
   const [accountExistModal, setAccountExistModal] = useState<boolean>(false);
   const [usernamePasswordForm, setUsernamePasswordForm] =
@@ -69,6 +73,24 @@ const RegisterUser = () => {
 
   // const [schema, setSchema] = useState(facilitatorSearchSchema);
   // const [uiSchema, setUiSchema] = useState(facilitatorSearchUISchema);
+  function checkTenantId(tenantIdToCheck: any, tenantData: any) {
+    return tenantData?.some((item: any) => item.tenantId === tenantIdToCheck);
+  }
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await getTenantInfo();
+        console.log('res', res?.result);
+
+        const isPresent = checkTenantId(tenantId, res?.result);
+        console.log('isPresent', isPresent);
+        if (!isPresent) {
+          setInvalidLinkModal(true);
+        }
+      } catch (error) {}
+    };
+    fetchData();
+  }, [tenantId]);
   useEffect(() => {
     // Fetch form schema from API and set it in state.
     const fetchData = async () => {
@@ -305,6 +327,10 @@ const RegisterUser = () => {
     setSignupSuccessModal(false);
     // setUsernamePasswordForm(true);
   };
+  const onCloseInvalidLinkModal = () => {};
+  const renderHomePage = () => {
+    router.push('/');
+  };
   const onSigin = async () => {
     let username;
     let password;
@@ -359,8 +385,7 @@ const RegisterUser = () => {
 
                 document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
 
-                console.log('hello');
-                router.push('/home');
+                router.push('/content');
               } else {
                 // showToastMessage(
                 //   'LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT',
@@ -409,51 +434,92 @@ const RegisterUser = () => {
     setMobile(formData.mobile);
   };
   return (
-      <Box
-        height="100vh"
-        width="100vw"
-        display="flex"
-        flexDirection="column"
-        sx={{
-          background: 'linear-gradient(to bottom, #fff7e6, #fef9ef)',
-          overflow: 'auto',
-        }}
-      >
-        {loading ? (
+    <Box
+      height="100vh"
+      width="100vw"
+      display="flex"
+      flexDirection="column"
+      sx={{
+        background: 'linear-gradient(to bottom, #fff7e6, #fef9ef)',
+        overflow: 'auto',
+      }}
+    >
+      {loading ? (
+        <Box
+          width="100%"
+          id="check"
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+        >
+          <Loader isLoading={true} layoutHeight={0}>
+            {/* Your actual content goes here, even if it's an empty div */}
+            <div />
+          </Loader>{' '}
+        </Box>
+      ) : usernamePasswordForm ? (
+        <Box mt="10%">
+          <CreateAccountForm
+            username={username}
+            onUsernameChange={setUsername}
+            password={password}
+            onPasswordChange={setPassword}
+            confirmPassword={confirmPassword}
+            onConfirmPasswordChange={setConfirmPassword}
+            onSubmit={handleCreateAccount}
+            belowEighteen={formData.guardian_name ? true : false}
+          />
+        </Box>
+      ) : (
+        <>
           <Box
-            width="100%"
-            id="check"
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
+            sx={{
+              textAlign: 'center',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              fontFamily: `'Inter', sans-serif`, // assuming Inter or similar
+              mt: '15px',
+            }}
           >
-            <Loader isLoading={true} layoutHeight={0}>
-              {/* Your actual content goes here, even if it's an empty div */}
-              <div />
-            </Loader>{' '}
+            <Typography variant="h2" fontWeight="bold" gutterBottom>
+              Sign Up for YouthNet
+            </Typography>
+
+            <Typography variant="body1" color="text.secondary" mb={2}>
+              Get vocational training to land an entry level job with 2 months
+              of training
+            </Typography>
+
+            <Typography variant="body2" color="text.secondary">
+              Already signed up?{' '}
+              <Link
+                href="/login"
+                underline="hover"
+                color="secondary"
+                fontWeight="bold"
+              >
+                Click here to login
+              </Link>
+            </Typography>
           </Box>
-        ) : usernamePasswordForm ? (
-          <Box mt="10%">
-            <CreateAccountForm
-              username={username}
-              onUsernameChange={setUsername}
-              password={password}
-              onPasswordChange={setPassword}
-              confirmPassword={confirmPassword}
-              onConfirmPasswordChange={setConfirmPassword}
-              onSubmit={handleCreateAccount}
-              belowEighteen={formData.guardian_name ? true : false}
-            />
-          </Box>
-        ) : (
           <Box
             ml="25%"
-            mt="10px"
+            // mt="70px"
             width="50vw"
-            height="100vh"
+            // height="100vh"
             display="flex"
             flexDirection="column"
+            bgcolor={'#fff'}
+            padding={'40px'}
           >
+            <Box display="flex" alignItems="center" gap={1} mb={2}>
+              <Image src={face} alt="Step Icon" />
+              <Typography fontWeight={600}>
+                1/2 Tell us about yourself
+              </Typography>
+            </Box>
+
             {addSchema && addUiSchema && (
               <DynamicForm
                 schema={addSchema}
@@ -479,66 +545,77 @@ const RegisterUser = () => {
               Continue
             </Button>
           </Box>
-        )}
+        </>
+      )}
 
-        <SimpleModal
-          open={accountExistModal}
-          onClose={handleCloseModal}
-          showFooter
-          primaryText={'Yes, Create Another Account'}
-          modalTitle={'Account Already Exists'}
-          primaryActionHandler={onCreateAnotherAccount}
-          footerText="Are you sure you want to create another account?"
-        >
-          <AccountExistsCard
-            fullName={firstLetterInUpperCase(
-              formData.firstName + ' ' + formData?.lastName
-            )}
-            usernames={usernames}
-            onLoginClick={handleLoginClick}
-          />
-        </SimpleModal>
+      <SimpleModal
+        open={accountExistModal}
+        onClose={handleCloseModal}
+        showFooter
+        primaryText={'Yes, Create Another Account'}
+        modalTitle={'Account Already Exists'}
+        primaryActionHandler={onCreateAnotherAccount}
+        footerText="Are you sure you want to create another account?"
+      >
+        <AccountExistsCard
+          fullName={firstLetterInUpperCase(
+            formData.firstName + ' ' + formData?.lastName
+          )}
+          usernames={usernames}
+          onLoginClick={handleLoginClick}
+        />
+      </SimpleModal>
 
-        <SimpleModal
-          open={otpmodal}
-          onClose={handleOTPModal}
-          showFooter
-          primaryText={'Verify OTP'}
-          modalTitle={'Verify Your Phone Number'}
-          primaryActionHandler={onVerify}
-        >
-          <OtpVerificationComponent
-            onResend={onResend}
-            otp={otp}
-            setOtp={setOtp}
-            maskedNumber={maskMobileNumber(mobile || '')}
-          />
-        </SimpleModal>
+      <SimpleModal
+        open={otpmodal}
+        onClose={handleOTPModal}
+        showFooter
+        primaryText={'Verify OTP'}
+        modalTitle={'Verify Your Phone Number'}
+        primaryActionHandler={onVerify}
+      >
+        <OtpVerificationComponent
+          onResend={onResend}
+          otp={otp}
+          setOtp={setOtp}
+          maskedNumber={maskMobileNumber(mobile || '')}
+        />
+      </SimpleModal>
 
-        <SimpleModal
-          open={verificationSuccessModal}
-          onClose={onCloseSuccessModal}
-          showFooter={false}
-          primaryText={'Okay'}
-          primaryActionHandler={onCloseSuccessModal}
-        >
-          <Box p="10px">
-            <MobileVerificationSuccess />
-          </Box>
-        </SimpleModal>
+      <SimpleModal
+        open={verificationSuccessModal}
+        onClose={onCloseSuccessModal}
+        showFooter={false}
+        primaryText={'Okay'}
+        primaryActionHandler={onCloseSuccessModal}
+      >
+        <Box p="10px">
+          <MobileVerificationSuccess />
+        </Box>
+      </SimpleModal>
 
-        <SimpleModal
-          open={signupSuccessModal}
-          onClose={onCloseSignupSuccessModal}
-          showFooter={true}
-          primaryText={'Start learning'}
-          primaryActionHandler={onSigin}
-        >
-          <Box p="10px">
-            <SignupSuccess />
-          </Box>
-        </SimpleModal>
-      </Box>
+      <SimpleModal
+        open={signupSuccessModal}
+        onClose={onCloseSignupSuccessModal}
+        showFooter={true}
+        primaryText={'Start learning'}
+        primaryActionHandler={onSigin}
+      >
+        <Box p="10px">
+          <SignupSuccess />
+        </Box>
+      </SimpleModal>
+
+      <SimpleModal
+        open={invalidLinkModal}
+        onClose={onCloseInvalidLinkModal}
+        showFooter={true}
+        primaryText={'Okay'}
+        primaryActionHandler={renderHomePage}
+      >
+        <Box p="10px">Invalid Link</Box>
+      </SimpleModal>
+    </Box>
   );
 };
 
