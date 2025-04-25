@@ -605,228 +605,170 @@ const ObservationDetails = () => {
   return (
     <>
       <Header />
-      <Box m="20px">
+      <Box m={{ xs: '10px', md: '20px' }}>
+        {/* Top bar with back icon and title */}
         <Box
           sx={{
             display: 'flex',
-            direction: 'row',
-            gap: '24px',
+            alignItems: 'center',
+            gap: '16px',
+            flexWrap: 'wrap',
+            mb: 2,
           }}
-          width={'100%'}
         >
           <KeyboardBackspaceOutlinedIcon
-            cursor={'pointer'}
-            sx={{
-              color: theme.palette.warning['A200'],
-            }}
+            cursor="pointer"
+            sx={{ color: theme.palette.warning['A200'] }}
             onClick={handleBackEvent}
           />
-          <Typography variant="h1" color={'black'}>
+          <Typography variant="h1" color="black">
             {observationName}
           </Typography>
         </Box>
 
-        <Grid>
-          {/* Left side - Observation details and buttons */}
-          <Grid>
-            {' '}
-            {/* Increased the left side size */}
-            <Box position="relative" bgcolor="#FBF4E5" width="100%" p="20px">
-              <Box sx={{ marginTop: '10px', marginLeft: '10px' }}>
-                <Typography
-                  variant="h2"
-                  color={'black'}
-                  sx={{ fontWeight: 'bold' }}
-                >
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <Box
+              position="relative"
+              bgcolor="#FBF4E5"
+              width="100%"
+              p={{ xs: 2, sm: 3 }}
+            >
+              <Box mt={1} ml={1}>
+                <Typography variant="h2" fontWeight="bold" color="black">
                   {t('OBSERVATION.OBSERVATION_DETAILS')}
                 </Typography>
-
-                <Typography variant="h2" color={'black'} mt="20px">
+                <Typography variant="h2" color="black" mt={2}>
                   {observationDescription}
                 </Typography>
-                {observationEndDate !== '' && (
-                  <Typography variant="body1" color={'black'}>
+                {observationEndDate && (
+                  <Typography variant="body1" color="black">
                     {t('OBSERVATION.DUE_DATE')}:{' '}
-                    {observationEndDate !== ''
-                      ? formatDate(observationEndDate?.toString())
-                      : 'N/A'}
+                    {formatDate(observationEndDate?.toString())}
                   </Typography>
                 )}
               </Box>
-
               <Box
                 sx={{
                   display: 'flex',
-                  direction: 'row',
+                  flexDirection: { xs: 'column', md: 'row' },
+                  marginLeft: '10px',
+                }}
+              >
+                {entity !== ObservationEntityType?.CENTER ? (
+                  <CohortSelectionSection
+                    classId={classId}
+                    setClassId={setClassId}
+                    userId={userId}
+                    setUserId={setUserId}
+                    isAuthenticated={isAuthenticated}
+                    setIsAuthenticated={setIsAuthenticated}
+                    loading={loading}
+                    setLoading={setLoading}
+                    cohortsData={cohortsData}
+                    setCohortsData={setCohortsData}
+                    manipulatedCohortData={manipulatedCohortData}
+                    setManipulatedCohortData={setManipulatedCohortData}
+                    blockName={blockName}
+                    setBlockName={setBlockName}
+                    handleSaveHasRun={handleSaveHasRun}
+                    setHandleSaveHasRun={setHandleSaveHasRun}
+                    isCustomFieldRequired={false}
+                  />
+                ) : (
+                  <CenterDropdown
+                    cohortId={selectedCenter}
+                    onChange={handleCenterChange}
+                    centerList={centerList}
+                    selectedCenterId={selectedCenter}
+                    setSelectedCenterId={setSelectedCenter}
+                  />
+                )}
+                <Box
+                  sx={{
+                    mt: '20px',
+                  }}
+                >
+                  <FormControl
+                    sx={{
+                      minWidth: {
+                        xs: '100%',
+                        sm: '100%',
+                        md: 300,
+                      },
+                      backgroundColor: 'white',
+                    }}
+                  >
+                    <InputLabel>
+                      <Typography variant="h2" color="black">
+                        {t('OBSERVATION.OBSERVATION_STATUS')}
+                      </Typography>
+                    </InputLabel>
+                    <Select
+                      value={status}
+                      onChange={handleStatusChange}
+                      label={t('OBSERVATION.OBSERVATION_STATUS')}
+                      defaultValue={ObservationStatus.ALL}
+                    >
+                      <MenuItem value={ObservationStatus.ALL}>
+                        {t('COMMON.ALL')}
+                      </MenuItem>
+                      <MenuItem value={ObservationStatus.NOT_STARTED}>
+                        {t('OBSERVATION.NOT_STARTED')}
+                      </MenuItem>
+                      <MenuItem value={ObservationStatus.DRAFT}>
+                        {t('OBSERVATION.INPROGRESS')}
+                      </MenuItem>
+                      <MenuItem value={ObservationStatus.COMPLETED}>
+                        {t('OBSERVATION.COMPLETED')}
+                      </MenuItem>
+                    </Select>
+                  </FormControl>
+                </Box>
+              </Box>
+              <Box width="100%" mt={{ xs: 2, md: 0 }}>
+                <SearchBar
+                  onSearch={setSearchInput}
+                  value={searchInput}
+                  placeholder="Search..."
+                  backgroundColor="white"
+                  fullWidth
+                />
+              </Box>
+              {/* Dropdowns and filters */}
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: { xs: 'column', md: 'row' },
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  '@media (max-width: 908px)': {
-                    flexDirection: 'column',
-                  },
+                  gap: 2,
+                  mt: 3,
                 }}
               >
                 <Box
                   sx={{
                     display: 'flex',
+                    flexDirection: { xs: 'column', md: 'row' },
                     alignItems: 'center',
-                    gap: '15px',
-                    width: '100%',
-                    '@media (max-width: 908px)': {
-                      flexDirection: 'column',
-                    },
-                    marginTop: '25px',
-                  }}
-                >
-                  {entity !== ObservationEntityType?.CENTER && (
-                    <>
-                      {/* <FormControl
-                        sx={{
-                          width: { xs: '100%', sm: '100%', md: 300 },
-                          backgroundColor: 'white',
-                        }}
-                      >
-                        <InputLabel id="center-name-label">
-                          <Typography variant="h2" color="black">
-                            {t('ATTENDANCE.CENTER_NAME')}
-                          </Typography>
-                        </InputLabel>
-                        <Select
-                          labelId="center-name-label"
-                          value={selectedCohort}
-                          onChange={handleCohortChange}
-                          input={<OutlinedInput label="Cohort Name" />}
-                          MenuProps={{
-                            PaperProps: {
-                              sx: {
-                                maxHeight: '200px',
-                                overflowY: 'auto',
-                              },
-                            },
-                          }}
-                        >
-                          {myCohortList?.map((cohort: any) => (
-                            <MenuItem
-                              key={cohort.cohortId}
-                              value={cohort.cohortId}
-                            >
-                              {localStorage.getItem('role') === Role.TEAM_LEADER
-                                ? toPascalCase(cohort.name)
-                                : toPascalCase(cohort.cohortName)}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl> */}
-                      <CohortSelectionSection
-                        classId={classId}
-                        setClassId={setClassId}
-                        userId={userId}
-                        setUserId={setUserId}
-                        isAuthenticated={isAuthenticated}
-                        setIsAuthenticated={setIsAuthenticated}
-                        loading={loading}
-                        setLoading={setLoading}
-                        cohortsData={cohortsData}
-                        setCohortsData={setCohortsData}
-                        manipulatedCohortData={manipulatedCohortData}
-                        setManipulatedCohortData={setManipulatedCohortData}
-                        blockName={blockName}
-                        setBlockName={setBlockName}
-                        handleSaveHasRun={handleSaveHasRun}
-                        setHandleSaveHasRun={setHandleSaveHasRun}
-                        isCustomFieldRequired={false}
-                      />
-                    </>
-                  )}
-                  {entity === ObservationEntityType?.CENTER && (
-                    <>
-                      <CenterDropdown
-                        cohortId={selectedCenter}
-                        onChange={handleCenterChange}
-                        centerList={centerList}
-                        selectedCenterId={selectedCenter}
-                        setSelectedCenterId={setSelectedCenter}
-                      />
-                    </>
-                  )}
-                  <Box
-                    sx={{
-                      mt: '20px',
-                    }}
-                  >
-                    <FormControl
-                      sx={{
-                        minWidth: {
-                          xs: '100%',
-                          sm: '100%',
-                          md: 300,
-                        },
-                        backgroundColor: 'white',
-                      }}
-                    >
-                      <InputLabel>
-                        <Typography variant="h2" color="black">
-                          {t('OBSERVATION.OBSERVATION_STATUS')}
-                        </Typography>
-                      </InputLabel>
-                      <Select
-                        value={status}
-                        onChange={handleStatusChange}
-                        label={t('OBSERVATION.OBSERVATION_STATUS')}
-                        defaultValue={ObservationStatus.ALL}
-                      >
-                        <MenuItem value={ObservationStatus.ALL}>
-                          {t('COMMON.ALL')}
-                        </MenuItem>
-                        <MenuItem value={ObservationStatus.NOT_STARTED}>
-                          {t('OBSERVATION.NOT_STARTED')}
-                        </MenuItem>
-                        <MenuItem value={ObservationStatus.DRAFT}>
-                          {t('OBSERVATION.INPROGRESS')}
-                        </MenuItem>
-                        <MenuItem value={ObservationStatus.COMPLETED}>
-                          {t('OBSERVATION.COMPLETED')}
-                        </MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-                </Box>
-
-                <Box
-                  mt="10px"
-                  sx={{
+                    gap: 2,
                     width: '100%',
                   }}
-                >
-                  <SearchBar
-                    onSearch={setSearchInput}
-                    value={searchInput}
-                    placeholder="Search..."
-                    backgroundColor={'white'}
-                    fullWidth={true}
-                  ></SearchBar>
-                </Box>
+                ></Box>
               </Box>
 
+              {/* Entity cards or loader */}
               <Box
                 sx={{
-                  marginTop: '20px',
+                  mt: 3,
                   display: 'flex',
                   flexWrap: 'wrap',
-                  flexDirection: 'row',
                   gap: '20px',
-                  mx: '10px',
+                  justifyContent: 'flex-start',
                 }}
               >
                 {loading ? (
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      marginLeft: '50%',
-                    }}
-                  >
+                  <Box mx="auto">
                     <Loader
                       showBackdrop={false}
                       loadingText={t('COMMON.LOADING')}
@@ -834,10 +776,8 @@ const ObservationDetails = () => {
                   </Box>
                 ) : filteredEntityData.length === 0 ? (
                   entity && (
-                    <Typography ml="40%">
-                      {t('OBSERVATION.NO_DATA_FOUND', {
-                        entity: entity,
-                      })}
+                    <Typography mx="auto">
+                      {t('OBSERVATION.NO_DATA_FOUND', { entity })}
                     </Typography>
                   )
                 ) : (
@@ -845,49 +785,30 @@ const ObservationDetails = () => {
                 )}
               </Box>
 
-              {/* {totalCountForCenter > 6 &&
-                entity === ObservationEntityType.CENTER && (
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      justifyContent: 'flex-end',
-                      margin: '20px',
-                      gap: '15px',
-                    }}
-                  >
-                    <Pagination
-                      // size="small"
-                      color="primary"
-                      count={Math.ceil(totalCountForCenter / pageLimit)}
-                      page={currentPage + 1}
-                      onChange={handlePaginationChange}
-                      siblingCount={0}
-                      boundaryCount={1}
-                      sx={{ marginTop: '10px' }}
-                    />
-                  </Box>
-                )}
-
-              {totalCount > 6 && entity !== ObservationEntityType.CENTER && (
+              {/* Pagination */}
+              {/* {(entity === ObservationEntityType.CENTER
+                ? totalCountForCenter
+                : totalCount) > 6 && (
                 <Box
                   sx={{
                     display: 'flex',
                     flexDirection: 'row',
                     justifyContent: 'flex-end',
-                    margin: '20px',
-                    gap: '15px',
+                    mt: 3,
+                    gap: 2,
                   }}
                 >
                   <Pagination
-                    // size="small"
                     color="primary"
-                    count={Math.ceil(totalCount / pageLimit)}
+                    count={Math.ceil(
+                      (entity === ObservationEntityType.CENTER
+                        ? totalCountForCenter
+                        : totalCount) / pageLimit
+                    )}
                     page={currentPage + 1}
                     onChange={handlePaginationChange}
                     siblingCount={0}
                     boundaryCount={1}
-                    sx={{ marginTop: '10px' }}
                   />
                 </Box>
               )} */}
