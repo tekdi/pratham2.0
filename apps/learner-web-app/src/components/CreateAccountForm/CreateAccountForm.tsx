@@ -12,10 +12,12 @@ import {
 import { useState } from 'react';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import CheckIcon from '@mui/icons-material/Check';
 import Image from 'next/image';
 import face from '../../../public/images/Group 3.png';
 import tip from '../../../public/images/Group.png';
+import { useSearchParams } from 'next/navigation';
+import { showToastMessage } from '../ToastComponent/Toastify';
 
 type Props = {
   username: string;
@@ -40,17 +42,44 @@ const CreateAccountForm = ({
   onConfirmPasswordChange,
   onSubmit,
   isSubmitDisabled = false,
-  isGuardianConfirmed,
-  setIsGuardianConfirmed,
   belowEighteen,
 }: Props) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [agree, setAgree] = useState(false);
-  //   const [isGuardianConfirmed, setIsGuardianConfirmed] = useState(false);
-
+  const searchParams = useSearchParams();
+  const newAccount = searchParams.get('newAccount');
+  //const belowEighteen = newAccount === 'below-18';
+  const [isGuardianConfirmed, setIsGuardianConfirmed] = useState(false);
   const togglePassword = () => setShowPassword((prev) => !prev);
   const toggleConfirmPassword = () => setShowConfirm((prev) => !prev);
+
+  const validatePassword = (value: string) => {
+    return (
+      /[A-Z]/.test(value) &&
+      /[a-z]/.test(value) &&
+      /\d/.test(value) &&
+      /[!@#$%^&*(),.?":{}|<>]/.test(value) &&
+      value.length >= 8
+    );
+  };
+
+  const isPasswordValid = validatePassword(password);
+  const doPasswordsMatch = password === confirmPassword;
+
+  const handleSubmit = () => {
+    if (!doPasswordsMatch) {
+      showToastMessage('Passwords do not match', 'error');
+      return;
+    }
+
+    if (!isPasswordValid) {
+      showToastMessage('Password does not meet requirements', 'error');
+      return;
+    }
+
+    onSubmit();
+  };
 
   return (
     <Box maxWidth={800} mx="auto" p={3} sx={{ backgroundColor: 'white' }}>
@@ -64,7 +93,7 @@ const CreateAccountForm = ({
 
       {/* Alert */}
       <Alert
-        icon={<Image src={tip} alt="Step Icon" />}
+        icon={<Image src={tip} alt="Tip Icon" />}
         severity="info"
         sx={{
           backgroundColor: '#F7EBD9',
@@ -104,6 +133,28 @@ const CreateAccountForm = ({
           ),
         }}
       />
+
+      {/* Validation checklist */}
+      {password && !isPasswordValid && (
+        <Box pl={1} pt={1}>
+          <ValidationItem
+            valid={/[A-Z]/.test(password) && /[a-z]/.test(password)}
+            label="Include both uppercase and lowercase letters"
+          />
+          <ValidationItem
+            valid={/\d/.test(password)}
+            label="Include at least one number"
+          />
+          <ValidationItem
+            valid={/[!@#$%^&*(),.?":{}|<>]/.test(password)}
+            label="Include at least one special character"
+          />
+          <ValidationItem
+            valid={password.length >= 8}
+            label="At least 8 characters"
+          />
+        </Box>
+      )}
 
       {/* Confirm Password */}
       <TextField
@@ -170,8 +221,16 @@ const CreateAccountForm = ({
       <Button
         fullWidth
         variant="contained"
-        onClick={onSubmit}
-        disabled={!agree || isSubmitDisabled}
+        onClick={handleSubmit}
+        disabled={
+          !agree ||
+          isSubmitDisabled ||
+          !isPasswordValid ||
+          (belowEighteen && !isGuardianConfirmed) ||
+          username === '' ||
+          password === '' ||
+          confirmPassword === ''
+        }
         sx={{
           backgroundColor: '#FFCB05',
           color: 'black',
@@ -186,6 +245,29 @@ const CreateAccountForm = ({
       >
         Create Account
       </Button>
+    </Box>
+  );
+};
+
+const ValidationItem = ({
+  valid,
+  label,
+}: {
+  valid: boolean;
+  label: string;
+}) => {
+  return (
+    <Box
+      display="flex"
+      alignItems="center"
+      gap={1}
+      color={valid ? 'green' : 'error.main'}
+      fontSize="14px"
+      fontWeight={400}
+      mb={0.5}
+    >
+      <CheckIcon sx={{ fontSize: 16 }} />
+      {label}
     </Box>
   );
 };
