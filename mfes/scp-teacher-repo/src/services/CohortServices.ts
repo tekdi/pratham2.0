@@ -198,3 +198,16 @@ const getChildDataByParentId = (data, parentId) => {
   search(data);
   return result;
 };
+
+export const getCohortData = async (
+  userId: string | string[],
+): Promise<any> => {
+  const apiUrl: string = API_ENDPOINTS.myCohorts(userId);
+  try {
+    const response = await get(apiUrl);
+    return response?.data;
+  } catch (error) {
+    console.error("error in fetching user details", error);
+    return error;
+  }
+};

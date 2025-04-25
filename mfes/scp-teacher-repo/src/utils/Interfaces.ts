@@ -373,6 +373,7 @@ export interface LearnerListProps {
   onLearnerDelete: () => void;
   isFromProfile?: boolean;
   gender?: string;
+  customFields?: any;
 }
 export interface UserData {
   email: string;
