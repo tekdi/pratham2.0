@@ -1,8 +1,8 @@
-import { SendCredentialsRequest } from '@dynamic-form/utils/Interfaces';
+import { SendCredentialsRequest } from '../utils/Interfaces';
 import { post, get } from './RestClient';
-import { toPascalCase } from '@dynamic-form/utils/Helper';
+import { toPascalCase } from '../utils/Helper';
 import axios from 'axios';
-import API_ENDPOINTS from '@dynamic-form/utils/API/APIEndpoints';
+import API_ENDPOINTS from '../utils/API/APIEndpoints';
 
 export const sendCredentialService = async ({
   isQueue,

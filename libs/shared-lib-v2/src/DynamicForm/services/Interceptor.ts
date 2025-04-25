@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { refresh } from '@dynamic-form/services/LoginService';
-import { tenantId } from '@dynamic-form/utils/app.config';
+import { refresh } from '../services/LoginService';
+import { tenantId } from '../utils/app.config';
 
 const instance = axios.create();
 

@@ -1,9 +1,9 @@
 //@ts-nocheck
-import { CohortMemberList } from '@dynamic-form/utils/Interfaces';
+import { CohortMemberList } from '../../utils/Interfaces';
 import { get, patch, post, put } from '../RestClient';
 import axios from 'axios';
-import { showToastMessage } from '@dynamic-form/components/Toastify';
-import  API_ENDPOINTS  from '@dynamic-form/utils/API/APIEndpoints';
+import { showToastMessage } from '../../components/Toastify';
+import  API_ENDPOINTS  from '../../utils/API/APIEndpoints';
 
 export interface cohortListFilter {
   type: string;

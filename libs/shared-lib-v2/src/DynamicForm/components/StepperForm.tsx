@@ -17,24 +17,24 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 // import { FormContext } from '../../../../../../apps/admin-app-repo/src/components/DynamicForm/DynamicFormConstant';
 import { useTranslation } from 'react-i18next';
 // import { createUser } from 'mfes/youthNet/src/services/youthNet/Dashboard/UserServices';
-import { filterSchema, getReassignPayload, getUserFullName, toPascalCase } from '@dynamic-form/utils/Helper';
-import { sendCredentialService } from '@dynamic-form/services/NotificationService';
-import { showToastMessage } from '@dynamic-form/components/Toastify';
+import { filterSchema, getReassignPayload, getUserFullName, toPascalCase } from '../utils/Helper';
+import { sendCredentialService } from '../services/NotificationService';
+import { showToastMessage } from '../components/Toastify';
 // import { filterSchema } from 'mfes/youthNet/src/utils/Helper';
 // import useSubmittedButtonStore from 'mfes/youthNet/src/store/useSubmittedButtonStore';
 // import VillageSelection from './CohortSelections';
-import { fetchForm } from '@dynamic-form/components/DynamicFormCallback';
-import { FormContext } from '@dynamic-form/components/DynamicFormConstant';
-import DynamicForm from '@dynamic-form/components/DynamicForm';
-import CohortSelections from '@dynamic-form/components/CohortSelections';
-import { createUser } from '@dynamic-form/services/CreateUserService';
-import useSubmittedButtonStore from '@dynamic-form/utils/useSharedState';
+import { fetchForm } from '../components/DynamicFormCallback';
+import { FormContext } from '../components/DynamicFormConstant';
+import DynamicForm from '../components/DynamicForm';
+import CohortSelections from '../components/CohortSelections';
+import { createUser } from '../services/CreateUserService';
+import useSubmittedButtonStore from '../utils/useSharedState';
 import {
   getCenterList,
   getStateBlockDistrictList,
-} from '@dynamic-form/services/MasterDataService';
-import { RoleId } from '@dynamic-form/utils/app.constant';
-import { bulkCreateCohortMembers, updateReassignUser } from '@dynamic-form/services/CohortService/cohortService';
+} from '../services/MasterDataService';
+import { RoleId } from '../utils/app.constant';
+import { bulkCreateCohortMembers, updateReassignUser } from '../services/CohortService/cohortService';
 type FormSubmitFunctionType = (formData: any, payload: any) => Promise<void>;
 
 interface StepperFormProps {

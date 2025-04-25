@@ -1,7 +1,7 @@
-import { showToastMessage } from '@dynamic-form/components/Toastify';
-import { deleteApi, patch, post, put } from '@dynamic-form/services/RestClient';
+import { showToastMessage } from '../components/Toastify';
+import { deleteApi, patch, post, put } from '../services/RestClient';
 import axios from 'axios';
-import  API_ENDPOINTS  from '@dynamic-form/utils/API/APIEndpoints';
+import  API_ENDPOINTS  from '../utils/API/APIEndpoints';
 export interface CenterListParam {
   limit?: number;
   filters?: any;

@@ -9,32 +9,32 @@ import {
   IconButton,
   Divider,
 } from '@mui/material';
-import Loader from '@dynamic-form/components/Loader';
-import DynamicForm from '@dynamic-form/components/DynamicForm';
+import Loader from '../Loader';
+import DynamicForm from '../DynamicForm';
 import _ from 'lodash';
 import axios from 'axios';
-import  API_ENDPOINTS  from '@dynamic-form/utils/API/APIEndpoints';
+import  API_ENDPOINTS  from '../../utils/API/APIEndpoints';
 import CohortBatchSelector from './CohortBatchSelector';
-import CenteredLoader from '@dynamic-form/components/CenteredLoader/CenteredLoader';
+import CenteredLoader from '../CenteredLoader/CenteredLoader';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { createUser, updateUser } from '@dynamic-form/services/CreateUserService';
+import { createUser, updateUser } from '../../services/CreateUserService';
 import {
   getReassignPayload,
   getUserFullName,
   toPascalCase,
-} from '@dynamic-form/utils/Helper';
-import { sendCredentialService } from '@dynamic-form/services/NotificationService';
-import { showToastMessage } from '@dynamic-form/components/Toastify';
+} from '../../utils/Helper';
+import { sendCredentialService } from '../../services/NotificationService';
+import { showToastMessage } from '../Toastify';
 import {
   notificationCallback,
   splitUserData,
   telemetryCallbacks,
-} from '@dynamic-form/components/DynamicFormCallback';
-import { getCohortList } from '@dynamic-form/services/GetCohortList';
+} from '../DynamicFormCallback';
+import { getCohortList } from '../../services/GetCohortList';
 import {
   bulkCreateCohortMembers,
   updateReassignUser,
-} from '@dynamic-form/services/CohortService/cohortService';
+} from '../../services/CohortService/cohortService';
 const FacilitatorForm = ({
   t,
   SuccessCallback,

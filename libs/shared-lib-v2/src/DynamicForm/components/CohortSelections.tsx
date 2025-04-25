@@ -14,8 +14,8 @@ import { useTranslation } from 'react-i18next';
 import {
   getCenterList,
   getStateBlockDistrictList,
-} from '@dynamic-form/services/MasterDataService';
-import { FormContextType } from '@dynamic-form/utils/app.constant';
+} from '../services/MasterDataService';
+import { FormContextType } from '../utils/app.constant';
 interface VillageSelectionProps {
   parentId: string;
   ParentName: string;

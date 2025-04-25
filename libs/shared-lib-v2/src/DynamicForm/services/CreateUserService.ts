@@ -1,5 +1,5 @@
-import API_ENDPOINTS from '@dynamic-form/utils/API/APIEndpoints';
-import { post, patch } from '@dynamic-form/services/RestClient';
+import API_ENDPOINTS from '../utils/API/APIEndpoints';
+import { post, patch } from '../services/RestClient';
 
 //     const sortedFields = response?.data?.result.fields?.sort(
 //       (a: { order: string }, b: { order: string }) =>
