@@ -327,8 +327,7 @@ const RegisterUser = () => {
     setSignupSuccessModal(false);
     // setUsernamePasswordForm(true);
   };
-  const onCloseInvalidLinkModal = () => {
-  };
+  const onCloseInvalidLinkModal = () => {};
   const renderHomePage = () => {
     router.push('/');
   };
