@@ -1,10 +1,13 @@
 import React from 'react';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 interface ResponseRecordedProps {}
 
 const ResponseRecorded: React.FC<ResponseRecordedProps> = () => {
+  const { t } = useTranslation();
+
   return (
     <Box
       sx={{
@@ -26,7 +29,7 @@ const ResponseRecorded: React.FC<ResponseRecordedProps> = () => {
         }}
         mb={2}
       >
-        Your response has been recorded
+        {t('LEARNER_APP.RESPONSE_RECORDED.TITLE')}
       </Typography>
 
       <Typography
@@ -37,7 +40,7 @@ const ResponseRecorded: React.FC<ResponseRecordedProps> = () => {
           textAlign: 'center',
         }}
       >
-        Our expert will reach out to you soon
+        {t('LEARNER_APP.RESPONSE_RECORDED.SUB_TITLE')}
       </Typography>
 
       <Typography
@@ -48,8 +51,7 @@ const ResponseRecorded: React.FC<ResponseRecordedProps> = () => {
         }}
         mb={4}
       >
-        In the meantime, feel free to explore more courses or continue building
-        your skills!
+        {t('LEARNER_APP.RESPONSE_RECORDED.FOOTER_TEXT')}
       </Typography>
     </Box>
   );

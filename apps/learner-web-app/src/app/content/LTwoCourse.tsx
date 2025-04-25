@@ -10,12 +10,14 @@ import {
 import CommonModal from '../../components/Modal/CommonModal';
 import LevelUp from '../../components/LTwoContent/LevelUp';
 import ResponseRecorded from '../../components/LTwoContent/ResponseRecorded';
+import { Layout, useTranslation } from '@shared-lib';
 
 interface LTwoCourseProps {
   onSubmit?: () => void;
 }
 
 const LTwoCourse: React.FC<LTwoCourseProps> = ({ onSubmit }) => {
+  const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [count, setCount] = useState(0);
 
@@ -48,7 +50,7 @@ const LTwoCourse: React.FC<LTwoCourseProps> = ({ onSubmit }) => {
   return (
     <>
       <Typography variant="h1" gutterBottom sx={{ color: '#78590C' }}>
-        L2 Course
+        {t('LEARNER_APP.L_TWO_COURSE.TITLE')}
       </Typography>
       <Box
         sx={{
@@ -64,11 +66,10 @@ const LTwoCourse: React.FC<LTwoCourseProps> = ({ onSubmit }) => {
       >
         <Box sx={{ width: '38%' }}>
           <Typography variant="h1" sx={{ color: '#1F1B13' }} gutterBottom>
-            You can boost your skills and unlock new job opportunities with our
-            L2 course.
+            {t('LEARNER_APP.L_TWO_COURSE.DESCRIPTION')}
           </Typography>
           <Typography variant="body1" color="#635E57" gutterBottom>
-            Show your interest to receive personalized guidance from our expert!
+            {t('LEARNER_APP.L_TWO_COURSE.SUB_DESCRIPTION')}
           </Typography>
         </Box>
         <Box>
@@ -78,7 +79,7 @@ const LTwoCourse: React.FC<LTwoCourseProps> = ({ onSubmit }) => {
             color="primary"
             onClick={handleInterestClick}
           >
-            I'm interested
+            {t('LEARNER_APP.L_TWO_COURSE.INTEREST_BUTTON')}
           </Button>
         </Box>
         {count == 0 ? (
@@ -86,7 +87,7 @@ const LTwoCourse: React.FC<LTwoCourseProps> = ({ onSubmit }) => {
             handleSubmit={handleSubmit}
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
-            submitText="Submit"
+            submitText={t('LEARNER_APP.L_TWO_COURSE.SUBMIT_BUTTON')}
           >
             <LevelUp
               handleTopicChange={handleTopicChange}
@@ -98,7 +99,7 @@ const LTwoCourse: React.FC<LTwoCourseProps> = ({ onSubmit }) => {
             handleSubmit={handleCloseResponse}
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
-            submitText="Okay"
+            submitText={t('LEARNER_APP.L_TWO_COURSE.OKAY_BUTTON')}
           >
             <ResponseRecorded />
           </CommonModal>
