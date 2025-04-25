@@ -214,25 +214,37 @@ const CentersPage = () => {
               accessGranted('showBlockLevelCohort', accessControl, userRole) &&
               response
             ) {
-              const blockData = response.map((block: any) => {
-                const blockName = block.cohortName;
-                const blockId = block.cohortId;
+              const blockData = response.map((item: any) => {
+                const blockName = item.cohortName;
+                const blockId = item.cohortId;
                 localStorage.setItem('blockParentId', blockId);
 
-                const stateField = block?.customField.find(
+                const stateField = item?.customField.find(
                   (field: any) => field.label === 'STATE'
                 );
                 const state = stateField
                   ? stateField?.selectedValues?.[0]?.value
                   : '';
 
-                const districtField = block?.customField.find(
+                const districtField = item?.customField.find(
                   (field: any) => field.label === 'DISTRICT'
                 );
                 const district = districtField
                   ? districtField?.selectedValues?.[0]?.value
                   : '';
-                return { blockName, blockId, state, district };
+                const blockField = item?.customField.find(
+                  (field: any) => field.label === 'BLOCK'
+                );
+                const block = blockField
+                  ? blockField?.selectedValues?.[0]?.value
+                  : '';
+                const villageField = item?.customField.find(
+                  (field: any) => field.label === 'VILLAGE'
+                );
+                const village = villageField
+                  ? villageField?.selectedValues?.[0]?.value
+                  : '';
+                return { blockName, blockId, state, district, block, village };
               });
               setBlockData(blockData);
             }

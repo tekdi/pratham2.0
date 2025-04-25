@@ -37,6 +37,7 @@ import ReassignModal from './ReassignModal';
 import SearchBar from './Searchbar';
 import SimpleModal from './SimpleModal';
 import FacilitatorManage from '@/shared/FacilitatorManage/FacilitatorManage';
+import { customFields } from './GeneratedSchemas';
 
 interface Cohort {
   cohortId: string;
@@ -88,7 +89,8 @@ const ManageUser: React.FC<ManageUsersProps> = ({
       lastName?: string;
       userId: string;
       cohortNames?: string;
-      batchNames?: any []
+      batchNames?: any[];
+      customFields?: any[];
     }[]
   >([]);
   const [loading, setLoading] = React.useState(false);
@@ -105,6 +107,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
   const [offset, setOffSet] = useState(0);
   const [infinitePage, setInfinitePage] = useState(1);
   const [infiniteData, setInfiniteData] = useState(users || []);
+  const [selectedUserData, setSelectedUserData] = useState(null);
 
   const [state, setState] = React.useState({
     bottom: false,
@@ -137,6 +140,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
   const [filteredUsers, setFilteredUsers] = useState(users || []);
   const [TotalCount, setTotalCount] = useState<number>(0);
   const [hasMore, setHasMore] = useState(true);
+  const [allFacilitatorsData, setAllFacilitatorsData] = useState<any>([]);
 
   useEffect(() => {
     if (reloadState) {
@@ -199,6 +203,13 @@ const ManageUser: React.FC<ManageUsersProps> = ({
           //   queryFn: () => getMyUserList({ limit, page, filters, fields }),
           // });
           const facilitatorList = resp.result?.getUserDetails;
+          const entireFLList = await getMyUserList({
+            limit,
+            page: 0,
+            filters,
+            fields,
+          });
+          setAllFacilitatorsData(entireFLList?.result?.getUserDetails);
 
           setTotalCount(resp.result?.totalCount);
 
@@ -231,18 +242,22 @@ const ManageUser: React.FC<ManageUsersProps> = ({
             }
           });
 
-
           const extractedData = facilitatorList?.map(
             (user: any, index: number) => {
               const cohorts = cohortDetails[index] || [];
 
               const batches = cohorts.flatMap((cohort: any) =>
-                (cohort.childData || []).filter((child: any) => child.type === 'BATCH')
-              )
+                (cohort.childData || []).filter(
+                  (child: any) => child.type === 'BATCH'
+                )
+              );
 
               const batchNames = cohorts
-              .filter((item: any) => item.type === 'BATCH' && item.cohortStatus === 'active')
-              .map((item: any) => item.cohortName);
+                .filter(
+                  (item: any) =>
+                    item.type === 'BATCH' && item.cohortStatus === 'active'
+                )
+                .map((item: any) => item.cohortName);
 
               const cohortNames = cohorts
                 .filter(
@@ -261,7 +276,8 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                   })
                 ),
                 cohortNames: cohortNames || null,
-                batchNames: batchNames || null
+                batchNames: batchNames || null,
+                customFields: user?.customFields,
               };
             }
           );
@@ -381,10 +397,19 @@ const ManageUser: React.FC<ManageUsersProps> = ({
       }
     }
     if (name === 'reassign-block') {
+      //TODO: Add reassign logic here
+      console.log('HIijbdjbnjbdn');
       const reassignuserId = isFromFLProfile
         ? teacherUserId
         : selectedUser?.userId;
 
+      const matchingUser = allFacilitatorsData?.find(
+        (user) => user.userId === reassignuserId
+      );
+      console.log('****userlist', users);
+      console.log('****reassignuserId', reassignuserId);
+      setSelectedUserData(matchingUser);
+      console.log('$$$$$$$', matchingUser);
       setReassignFacilitatorUserId(
         isFromFLProfile ? teacherUserId : selectedUser?.userId
       );
@@ -540,6 +565,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
   };
 
   const handleCloseAddFaciModal = () => {
+    console.log('clickedddddddddddddddddd');
     setOpenFacilitatorModal(false);
   };
 
@@ -579,7 +605,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
 
   const getBatchNames = (batchNames: any) => {
     if (!Array.isArray(batchNames)) return null;
-  return batchNames.join(', ');
+    return batchNames.join(', ');
   };
 
   const handleSearch = (searchTerm: string) => {
@@ -657,7 +683,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                           ? '8px !important'
                           : '-2px !important',
                       },
-                      width:'100%',
+                      width: '100%',
                     }}
                     className="text-1E"
                     onClick={handleOpenAddFaciModal}
@@ -802,9 +828,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                               }}
                                             >
                                               {user?.batchNames?.length > 0
-                                                ? getBatchNames(
-                                                    user.batchNames
-                                                  )
+                                                ? getBatchNames(user.batchNames)
                                                 : t(
                                                     'ATTENDANCE.NO_BATCHES_ASSIGNED'
                                                   )}
@@ -900,18 +924,17 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                 anchorEl={anchorEl}
                 isMobile={isMobile}
                 optionList={[
-
                   // TODO
 
-                  // {
-                  //   label: t('COMMON.ADD_OR_REASSIGN_CENTERS'),
-                  //   icon: (
-                  //     <ApartmentIcon
-                  //       sx={{ color: theme.palette.warning['300'] }}
-                  //     />
-                  //   ),
-                  //   name: 'reassign-block',
-                  // },
+                  {
+                    label: t('COMMON.REASSIGN_BATCH'),
+                    icon: (
+                      <ApartmentIcon
+                        sx={{ color: theme.palette.warning['300'] }}
+                      />
+                    ),
+                    name: 'reassign-block',
+                  },
                   // TODO: Integrate todo service
                   // {
                   //   label: t('COMMON.REASSIGN_BLOCKS_REQUEST'),
@@ -1020,17 +1043,30 @@ const ManageUser: React.FC<ManageUsersProps> = ({
             )}
 
             {reassignModalOpen && (
-              <ReassignModal
-                cohortNames={reassignCohortNames}
-                message={t('COMMON.ADD_OR_REASSIGN_CENTERS')}
-                handleAction={handleRequestBlockAction}
-                handleCloseReassignModal={handleCloseReassignModal}
-                modalOpen={reassignModalOpen}
-                reloadState={reloadState}
-                setReloadState={setReloadState}
-                buttonNames={{ primary: t('COMMON.SAVE') }}
-                selectedUser={selectedUser}
+              //TODO: Add new reassign popup here
+              <FacilitatorManage
+                open={reassignModalOpen}
+                onClose={handleCloseReassignModal}
+                isReassign={true}
+                reassignuserId={
+                  isFromFLProfile ? teacherUserId : selectedUser?.userId
+                }
+                selectedUserData={selectedUserData}
+                // onFacilitatorAdded={handleFacilitatorAdded}
               />
+
+              //Old Reassign flow
+              // <ReassignModal
+              //   cohortNames={reassignCohortNames}
+              //   message={t('COMMON.ADD_OR_REASSIGN_CENTERS')}
+              //   handleAction={handleRequestBlockAction}
+              //   handleCloseReassignModal={handleCloseReassignModal}
+              //   modalOpen={reassignModalOpen}
+              //   reloadState={reloadState}
+              //   setReloadState={setReloadState}
+              //   buttonNames={{ primary: t('COMMON.SAVE') }}
+              //   selectedUser={selectedUser}
+              // />
             )}
 
             {openDeleteUserModal && (
@@ -1066,6 +1102,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
             )}
             {openAddFacilitatorModal && (
               <FacilitatorManage
+                key={openAddFacilitatorModal === true ? 'render1' : 'render2'}
                 open={openAddFacilitatorModal}
                 onClose={handleCloseAddFaciModal}
                 onFacilitatorAdded={handleFacilitatorAdded}
