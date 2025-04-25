@@ -1,5 +1,5 @@
 import React, { memo, useState } from 'react';
-import { CommonSearch } from '@shared-lib';
+import { CommonSearch, useTranslation } from '@shared-lib'; // Updated import
 import { Search as SearchIcon } from '@mui/icons-material';
 
 export default memo(function SearchComponent({
@@ -7,6 +7,7 @@ export default memo(function SearchComponent({
 }: {
   onSearch: (value: string) => void;
 }) {
+  const { t } = useTranslation();
   const [searchValue, setSearchValue] = useState('');
 
   const handleSearchChange = (value: string) => {
@@ -19,7 +20,7 @@ export default memo(function SearchComponent({
 
   return (
     <CommonSearch
-      placeholder={'Search content..'}
+      placeholder={t('LEARNER_APP.SEARCH_COMPONENT.PLACEHOLDER')}
       rightIcon={<SearchIcon />}
       onRightIconClick={handleSearchClick}
       inputValue={searchValue}
