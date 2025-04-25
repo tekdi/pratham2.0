@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Box, Typography } from '@mui/material';
-import { useTranslation } from '@shared-lib';
-import FilterForm from 'libs/shared-lib-v2/src/lib/Filter/FilterForm';
+import { useTranslation, FilterForm } from '@shared-lib';
 
 const FilterComponent: React.FC<{
   filterState: any;

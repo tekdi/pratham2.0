@@ -1,18 +1,14 @@
 'use client';
-import React, { useEffect, useState } from 'react';
-import Layout from '../../components/Layout';
-import LearnerCourse from './LearnerCourse';
-import dynamic from 'next/dynamic';
+import React from 'react';
+import Layout from '@learner/components/Layout';
+import LearnerCourse from '@learner/components/Content/LearnerCourse';
 import { Box, Button, Grid, Typography } from '@mui/material';
 import { gredientStyle } from '@learner/utils/style';
-import LTwoCourse from './LTwoCourse';
+import LTwoCourse from '@learner/components/Content/LTwoCourse';
+import { useEffect, useState } from 'react';
 import { getTenantInfo } from '@learner/utils/API/ProgramService';
 import ContentComponent from '@learner/components/Content/Content';
 import { useTranslation } from '@shared-lib';
-
-const Content = dynamic(() => import('@Content'), {
-  ssr: false,
-});
 
 const MyComponent: React.FC = () => {
   const { t } = useTranslation();
@@ -22,21 +18,18 @@ const MyComponent: React.FC = () => {
     const fetchTenantInfo = async () => {
       try {
         const res = await getTenantInfo();
-        console.log('Tenant Info:', res);
         const youthnetContentFilter = res?.result.find(
           (program: any) => program.name === 'YouthNet'
         )?.contentFilter;
-
-        console.log(youthnetContentFilter);
-        setFilter(youthnetContentFilter);
+        setFilter({ filters: youthnetContentFilter });
         localStorage.setItem('filter', JSON.stringify(youthnetContentFilter));
       } catch (error) {
         console.error('Failed to fetch tenant info:', error);
       }
     };
-
     fetchTenantInfo();
   }, []);
+
   return (
     <Layout>
       <Grid container style={gredientStyle}>
@@ -92,7 +85,7 @@ const MyComponent: React.FC = () => {
 
       <Grid container style={gredientStyle}>
         <Grid item xs={12}>
-          <LearnerCourse _content={{ filter: filter }} />
+          <LearnerCourse _content={{ filters: filter }} />
         </Grid>
       </Grid>
     </Layout>

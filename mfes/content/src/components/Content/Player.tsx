@@ -1,3 +1,4 @@
+'use client';
 import { useParams } from 'next/navigation';
 import React from 'react';
 interface PlayerPageProps {
@@ -5,20 +6,23 @@ interface PlayerPageProps {
 }
 const PlayerPage: React.FC<PlayerPageProps> = ({ id }) => {
   const params = useParams();
-  const identifier = params?.identifier; // string | string[] | undefined
+  const { identifier, courseId, unitId } = params; // string | string[] | undefined
   if (!identifier) {
     return <div>Loading...</div>;
   }
 
   return (
     <iframe
-      src={`${process.env.NEXT_PUBLIC_LEARNER_SBPLAYER}?identifier=${
-        identifier as string
+      src={`${
+        process.env.NEXT_PUBLIC_LEARNER_SBPLAYER
+      }?identifier=${identifier}${
+        courseId && unitId ? `&courseId=${courseId}&unitId=${unitId}` : ''
       }`}
       style={{
         // display: 'block',
         // padding: 0,
         border: 'none',
+        height: 'calc(100vh - 20px)',
       }}
       width="100%"
       height="100%"

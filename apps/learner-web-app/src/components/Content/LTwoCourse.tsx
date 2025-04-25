@@ -1,16 +1,9 @@
 import React, { useState } from 'react';
-import {
-  Box,
-  Typography,
-  Button,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-} from '@mui/material';
-import CommonModal from '../../components/Modal/CommonModal';
-import LevelUp from '../../components/LTwoContent/LevelUp';
-import ResponseRecorded from '../../components/LTwoContent/ResponseRecorded';
-import { Layout, useTranslation } from '@shared-lib';
+import { Box, Typography, Button, SelectChangeEvent } from '@mui/material';
+import CommonModal from '@learner/components/Modal/CommonModal';
+import LevelUp from '@learner/components/LTwoContent/LevelUp';
+import ResponseRecorded from '@learner/components/LTwoContent/ResponseRecorded';
+import { useTranslation } from '@shared-lib';
 
 interface LTwoCourseProps {
   onSubmit?: () => void;

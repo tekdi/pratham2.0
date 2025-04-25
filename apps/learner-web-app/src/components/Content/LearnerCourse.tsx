@@ -24,17 +24,14 @@ export default memo(function LearnerCourse({
   const { t } = useTranslation();
 
   useEffect(() => {
-    console.log(_content.filter);
-
-    if (_content?.filter) {
-      console.log(_content?.filter);
+    if (_content?.filters) {
       setFilterState((prevState) => ({
         ...prevState,
-        ..._content?.filter,
+        ..._content?.filters,
       }));
     }
-  }, [_content]);
-  console.log(filterState);
+  }, [_content?.filters]);
+
   const handleSearchClick = useCallback((searchValue: string) => {
     setFilterState((prevState) => ({
       ...prevState,

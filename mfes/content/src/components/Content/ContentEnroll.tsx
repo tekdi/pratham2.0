@@ -10,25 +10,27 @@ import {
   AccordionDetails,
 } from '@mui/material';
 import { useRouter, useParams } from 'next/navigation';
-import LayoutPage from '../../components/LayoutPage';
+import LayoutPage from '@content-mfes/components/LayoutPage';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
   createUserCertificateStatus,
   getUserCertificateStatus,
-} from '../../services/Certificate';
-import InfoCard from '../../components/Card/InfoCard';
-import { hierarchyAPI } from '../../services/Hierarchy';
-import { ContentSearchResponse } from '../../services/Search';
+} from '@content-mfes/services/Certificate';
+import InfoCard from '@content-mfes/components/Card/InfoCard';
+import { hierarchyAPI } from '@content-mfes/services/Hierarchy';
+import { ContentSearchResponse } from '@content-mfes/services/Search';
 
-interface isShowLayout {
+interface ContentDetailsProps {
   isShowLayout: boolean;
+  id?: string;
+  getIfEnrolled?: (content: ContentSearchResponse) => void;
   _config?: any;
 }
 
-const ContentDetails = (props: isShowLayout) => {
+const ContentDetails = (props: ContentDetailsProps) => {
   const router = useRouter();
   const params = useParams();
-  const identifier = params?.identifier; // string | string[] | undefined
+  const identifier = props.id ?? params?.identifier; // string | string[] | undefined
   const [contentDetails, setContentDetails] =
     useState<ContentSearchResponse | null>(null);
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
@@ -37,18 +39,26 @@ const ContentDetails = (props: isShowLayout) => {
     const fetchContentDetails = async () => {
       try {
         const result = await hierarchyAPI(identifier as string);
-        const data = await getUserCertificateStatus({
-          userId: localStorage.getItem('userId') || '',
-          courseId: identifier as string,
-        });
-        if (
-          data?.result?.status === 'enrolled' ||
-          data?.result?.status === 'completed'
-        ) {
-          router.replace(`/details/${identifier}`);
-        } else {
-          setContentDetails(result as ContentSearchResponse);
+        const userId = localStorage.getItem('userId');
+        const tenantId = localStorage.getItem('tenantId');
+        if (userId && tenantId) {
+          const data = await getUserCertificateStatus({
+            userId,
+            courseId: identifier as string,
+          });
+
+          if (
+            data?.result?.status === 'enrolled' ||
+            data?.result?.status === 'completed'
+          ) {
+            if (props?.getIfEnrolled) {
+              props?.getIfEnrolled(result as unknown as ContentSearchResponse);
+            } else {
+              router.replace(`/content/${identifier}`);
+            }
+          }
         }
+        setContentDetails(result as unknown as ContentSearchResponse);
       } catch (error) {
         console.error('Failed to fetch content:', error);
       } finally {
@@ -60,15 +70,20 @@ const ContentDetails = (props: isShowLayout) => {
     } else {
       setIsLoading(false);
     }
-  }, [identifier]);
+  }, [identifier, props, router]);
 
   const handleClick = async () => {
     try {
-      await createUserCertificateStatus({
-        userId: localStorage.getItem('userId') || '',
-        courseId: identifier as string,
-      });
-      router.replace(`/details/${identifier}`);
+      const userId = localStorage.getItem('userId');
+      if (userId) {
+        await createUserCertificateStatus({
+          userId,
+          courseId: identifier as string,
+        });
+        router.replace(`/content/${identifier}`);
+      } else {
+        router.replace(`/login?redirectUrl=/content/${identifier}`);
+      }
     } catch (error) {
       console.error('Failed to create user certificate:', error);
     }

@@ -23,6 +23,7 @@ const UnitCard = ({
         position: 'relative',
         display: 'flex',
         alignItems: 'center',
+        mt: '18px',
       }}
     >
       <Box

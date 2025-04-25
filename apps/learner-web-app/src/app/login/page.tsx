@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Box } from '@mui/material';
 import dynamic from 'next/dynamic';
 import WelcomeScreen from '@learner/components/WelcomeComponent/WelcomeScreen';
@@ -9,7 +9,7 @@ import { getUserId, login } from '@learner/utils/API/LoginService';
 import { showToastMessage } from '@learner/components/ToastComponent/Toastify';
 import { useRouter } from 'next/navigation';
 import { useMediaQuery, useTheme } from '@mui/material';
-import { CourseCompletionBanner } from 'libs/shared-lib-v2/src/lib/CourseCompletionBanner/CourseCompletionBanner';
+import FingerprintJS from '@fingerprintjs/fingerprintjs';
 
 const Login = dynamic(
   () => import('@login/Components/LoginComponent/LoginComponent'),
@@ -23,6 +23,23 @@ const LoginPage = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const handleAddAccount = () => {};
+
+  useEffect(() => {
+    const init = async () => {
+      try {
+        if (!localStorage.getItem('did')) {
+          const fp = await FingerprintJS.load();
+          const { visitorId } = await fp.get();
+          localStorage.setItem('did', visitorId);
+          console.log('Device fingerprint generated successfully');
+        }
+      } catch (error) {
+        console.error('Error generating device fingerprint:', error);
+      }
+    };
+    init();
+  }, []);
+
   const handleForgotPassword = () => {
     localStorage.setItem('loginRoute', '/login');
     router.push('/forget-password');
@@ -79,7 +96,7 @@ const LoginPage = () => {
               ) {
                 router.push(window.location.href.split('redirect=')[1]);
               } else {
-                router.push('/home');
+                router.push('/content');
               }
             } else {
               showToastMessage(

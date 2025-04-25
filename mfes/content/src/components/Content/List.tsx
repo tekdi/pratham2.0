@@ -4,17 +4,25 @@ import React, { useCallback, useEffect, useState } from 'react';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import { Box, Button } from '@mui/material';
-import { CommonSearch, ContentItem, getData } from '@shared-lib';
+import {
+  calculateTrackDataItem,
+  CommonSearch,
+  ContentItem,
+  getData,
+} from '@shared-lib';
 import { useRouter } from 'next/navigation';
-import BackToTop from '../components/BackToTop';
-import RenderTabContent from '../components/ContentTabs';
-import HelpDesk from '../components/HelpDesk';
-import { hierarchyAPI } from '../services/Hierarchy';
-import { ContentSearch, ContentSearchResponse } from '../services/Search';
-import FilterDialog from '../components/FilterDialog';
-import { trackingData } from '../services/TrackingService';
-import LayoutPage from '../components/LayoutPage';
-import { getUserCertificates } from '../services/Certificate';
+import BackToTop from '@content-mfes/components/BackToTop';
+import RenderTabContent from '@content-mfes/components/ContentTabs';
+import HelpDesk from '@content-mfes/components/HelpDesk';
+import { hierarchyAPI } from '@content-mfes/services/Hierarchy';
+import {
+  ContentSearch,
+  ContentSearchResponse,
+} from '@content-mfes/services/Search';
+import FilterDialog from '@content-mfes/components/FilterDialog';
+import { trackingData } from '@content-mfes/services/TrackingService';
+import LayoutPage from '@content-mfes/components/LayoutPage';
+import { getUserCertificates } from '@content-mfes/services/Certificate';
 
 export interface ContentProps {
   _config?: object;
@@ -41,9 +49,8 @@ export default function Content(props: Readonly<ContentProps>) {
   const [localFilters, setLocalFilters] = useState<any>({
     limit: 5,
     offset: 0,
-    filters: props.filters,
   });
-  const [showBackToTop, setShowBackToTop] = useState(false);
+  const [showBackToTop] = useState(false);
   const [trackData, setTrackData] = useState<[]>([]);
   const [filterShow, setFilterShow] = useState(false);
   const [propData, setPropData] = useState<ContentProps>();
@@ -102,16 +109,21 @@ export default function Content(props: Readonly<ContentProps>) {
           course_track_data.data.find((course: any) => course.userId === userId)
             ?.course ?? [];
         const newData: any = [];
-        userTrackData.forEach((item: any) =>
+        userTrackData.forEach((item: any) => {
+          const childItem = resultData?.find(
+            (subItem: any) => item.courseId === subItem.identifier
+          );
+          const dataTrack = calculateTrackDataItem(item ?? {}, childItem ?? {});
           newData.push({
             ...item,
+            ...dataTrack,
             enrolled: Boolean(
               dataCertificates.find(
                 (cert: any) => cert.courseId === item.courseId
               )?.status === 'enrolled'
             ),
-          })
-        );
+          });
+        });
         return newData;
       }
       return [];
@@ -156,7 +168,9 @@ export default function Content(props: Readonly<ContentProps>) {
 
   const handleCardClickLocal = async (content: ContentItem) => {
     try {
-      if (
+      if (propData?.handleCardClick) {
+        propData.handleCardClick(content);
+      } else if (
         [
           'application/vnd.ekstep.ecml-archive',
           'application/vnd.ekstep.html-archive',
@@ -169,11 +183,7 @@ export default function Content(props: Readonly<ContentProps>) {
           'application/vnd.sunbird.questionset',
         ].includes(content?.mimeType as string)
       ) {
-        if (propData?.handleCardClick) {
-          propData.handleCardClick(content);
-        } else {
-          router.push(`/player/${content?.identifier}`);
-        }
+        router.push(`/player/${content?.identifier}`);
       } else {
         router.push(`/content-details/${content?.identifier}`);
       }
@@ -221,7 +231,6 @@ export default function Content(props: Readonly<ContentProps>) {
             .filter((e): e is ContentSearchResponse[] => Array.isArray(e))
             .flat();
           const userTrackData = await fetchDataTrack(newContentData ?? []);
-          console.log(userTrackData, 'sagar userTrackData');
           if (localFilters.offset === 0) {
             setContentData((newContentData as ContentSearchResponse[]) ?? []);
             setTrackData(userTrackData);

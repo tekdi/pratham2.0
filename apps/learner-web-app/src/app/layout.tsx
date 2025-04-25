@@ -2,7 +2,7 @@
 import './global.css';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
-import MuiThemeProvider from './app/theme/MuiThemeProvider';
+import MuiThemeProvider from '@learner/assets/theme/MuiThemeProvider';
 
 export const metadata = {
   title: 'Welcome to learner-web-app',
