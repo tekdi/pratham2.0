@@ -6,8 +6,11 @@ import Image from 'next/image';
 import welcomeGIF from '../../../public/images/welcome.gif';
 import playstoreIcon from '../../../public/images/playstore.png';
 import prathamQRCode from '../../../public/images/prathamQR.png';
+import { useTranslation } from '@shared-lib';
 
 const WelcomeScreen = () => {
+  const { t } = useTranslation();
+
   return (
     <Box
       minHeight="100vh"
@@ -17,12 +20,10 @@ const WelcomeScreen = () => {
       justifyContent="center"
       px={2}
       textAlign="center"
-      // bgcolor="#fffef5"
     >
-      {/* Smiley image */}
       <Image
         src={welcomeGIF}
-        alt="Smiley face"
+        alt={t('LEARNER_APP.LOGIN.welcome_image_alt')}
         width={60}
         height={60}
         style={{ marginBottom: '16px' }}
@@ -36,7 +37,7 @@ const WelcomeScreen = () => {
         textAlign="center"
         sx={{ verticalAlign: 'middle' }}
       >
-        Welcome to Pratham myLearning!
+        {t('LEARNER_APP.LOGIN.welcome_title')}
       </Typography>
 
       <Typography
@@ -48,7 +49,7 @@ const WelcomeScreen = () => {
         sx={{ verticalAlign: 'middle' }}
         mb={4}
       >
-        Your Learning Journey Begins here
+        {t('LEARNER_APP.LOGIN.welcome_subtitle')}
       </Typography>
 
       <Grid
@@ -58,11 +59,10 @@ const WelcomeScreen = () => {
         spacing={4}
         maxWidth="600px"
       >
-        {/* QR code section */}
         <Grid item xs={12} sm={4}>
           <Image
             src={prathamQRCode}
-            alt="QR Code"
+            alt={t('LEARNER_APP.LOGIN.qr_image_alt')}
             width={100}
             height={100}
             style={{ margin: '0 auto' }}
@@ -73,14 +73,13 @@ const WelcomeScreen = () => {
             fontWeight={500}
             mt={1}
           >
-            Get the App
+            {t('LEARNER_APP.LOGIN.qr_get_app')}
           </Typography>
           <Typography fontSize="12px" color="textSecondary">
-            Point your phone <br /> camera here
+            {t('LEARNER_APP.LOGIN.qr_instruction')}
           </Typography>
         </Grid>
 
-        {/* OR divider */}
         <Grid
           item
           xs={12}
@@ -89,19 +88,18 @@ const WelcomeScreen = () => {
           alignItems="center"
           justifyContent="center"
         >
-          <Typography fontWeight={500}>OR</Typography>
+          <Typography fontWeight={500}>{t('LEARNER_APP.LOGIN.or')}</Typography>
         </Grid>
 
-        {/* Playstore section */}
         <Grid item xs={12} sm={5}>
           <Image
             src={playstoreIcon}
-            alt="Get it on Google Play"
+            alt={t('LEARNER_APP.LOGIN.playstore_image_alt')}
             width={160}
             height={50}
           />
           <Typography fontSize="12px" color="textSecondary" mt={1}>
-            Search <strong>“Pratham myLearning”</strong> on Playstore
+            {t('LEARNER_APP.LOGIN.playstore_instruction')}
           </Typography>
         </Grid>
       </Grid>

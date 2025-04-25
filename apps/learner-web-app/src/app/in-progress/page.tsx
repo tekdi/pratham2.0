@@ -7,12 +7,14 @@ import dynamic from 'next/dynamic';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useRouter } from 'next/navigation';
 import ContentComponent from '@learner/components/Content/Content';
+import { Layout as SharedLayout, useTranslation } from '@shared-lib'; // Updated import
 
 const Content = dynamic(() => import('@Content'), {
   ssr: false,
 });
 
 const InProgress: React.FC = () => {
+  const { t } = useTranslation();
   const router = useRouter();
 
   const onBackClick = () => {
@@ -33,7 +35,7 @@ const InProgress: React.FC = () => {
             }}
           >
             <Typography fontSize={'22px'} fontWeight={400}>
-              {'All In Progress Courses'}
+              {t('LEARNER_APP.IN_PROGRESS.ALL_COURSES')}
             </Typography>
           </Button>
         </Grid>
