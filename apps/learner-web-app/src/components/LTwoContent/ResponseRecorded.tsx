@@ -1,11 +1,9 @@
 import React from 'react';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { Box, Typography } from '@mui/material';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@shared-lib';
 
-interface ResponseRecordedProps {}
-
-const ResponseRecorded: React.FC<ResponseRecordedProps> = () => {
+const ResponseRecorded: React.FC = () => {
   const { t } = useTranslation();
 
   return (

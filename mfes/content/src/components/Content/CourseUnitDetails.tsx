@@ -78,34 +78,32 @@ export default function Details(props: DetailsProps) {
                 );
 
                 setTrackData(newTrackData ?? []);
+                if (!unitId) {
+                  const course_track = calculateTrackDataItem(
+                    userTrackData?.[0] ?? {},
+                    resultHierarchy ?? {}
+                  );
 
-                const course_track = calculateTrackDataItem(
-                  userTrackData?.[0] ?? {},
-                  resultHierarchy ?? {}
-                );
-
-                if (
-                  (course_track?.status === 'completed' &&
-                    data?.result?.status === 'enrolled') ||
-                  true
-                ) {
-                  const userResponse = await getUserId();
-                  console.log(userResponse, 'userResponse');
-                  const result = await issueCertificate({
-                    userId: userId,
-                    courseId: courseId,
-                    unitId: unitId,
-                    issuanceDate: new Date().toISOString(),
-                    expirationDate: new Date(
-                      new Date().setFullYear(new Date().getFullYear() + 20)
-                    ).toISOString(),
-                    credentialId: data?.result?.usercertificateId,
-                    firstName: userResponse?.firstName || '',
-                    middleName: userResponse?.middleName || '',
-                    lastName: userResponse?.lastName || '',
-                    courseName: resultHierarchy?.name || '',
-                  });
-                  console.log(result, 'sagar');
+                  if (
+                    course_track?.status === 'completed' &&
+                    data?.result?.status === 'enrolled'
+                  ) {
+                    const userResponse = await getUserId();
+                    await issueCertificate({
+                      userId: userId,
+                      courseId: courseId,
+                      unitId: unitId,
+                      issuanceDate: new Date().toISOString(),
+                      expirationDate: new Date(
+                        new Date().setFullYear(new Date().getFullYear() + 20)
+                      ).toISOString(),
+                      credentialId: data?.result?.usercertificateId,
+                      firstName: userResponse?.firstName ?? '',
+                      middleName: userResponse?.middleName ?? '',
+                      lastName: userResponse?.lastName ?? '',
+                      courseName: resultHierarchy?.name ?? '',
+                    });
+                  }
                 }
               }
             }
@@ -120,7 +118,7 @@ export default function Details(props: DetailsProps) {
       }
     };
     if (identifier) getDetails(identifier as string);
-  }, [identifier, courseId, router]);
+  }, [identifier, courseId, router, unitId]);
 
   const handleItemClick = (subItem: any) => {
     localStorage.setItem('unitId', subItem?.courseId);

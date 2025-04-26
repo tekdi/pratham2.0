@@ -13,7 +13,7 @@ import {
   Paper,
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { Layout, useTranslation } from '@shared-lib';
+import { useTranslation } from '@shared-lib';
 
 interface LoginComponentProps {
   onLogin: (data: {

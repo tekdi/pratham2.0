@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox, { CheckboxProps } from '@mui/material/Checkbox';
+import { CheckboxProps } from '@mui/material/Checkbox';
 import {
   Modal,
   Box,
-  Button,
   Typography,
   IconButton,
   Stack,
@@ -19,14 +16,7 @@ import {
   downloadCertificate,
   renderCertificate,
 } from '../../utils/CertificateService/coursesCertificates';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  List,
-  ListItemButton,
-  ListItemText,
-} from '@mui/material';
+
 const style = {
   position: 'absolute' as const,
   top: '50%',
