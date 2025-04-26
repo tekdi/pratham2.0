@@ -13,11 +13,12 @@ import {
   Typography,
 } from '@mui/material';
 import { useParams, useRouter } from 'next/navigation';
-import { fetchContent } from '@learner/utils/API/contentService';
+// import { ContentSearch } from '@learner/utils/API/contentService';
 import { checkAuth } from '@shared-lib-v2/utils/AuthService';
 import { useTranslation } from '@shared-lib';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { gredientStyle } from '@learner/utils/style';
+import { ContentSearch, fetchContent } from '@learner/utils/API/contentService';
 
 const Content = dynamic(() => import('@Content'), {
   ssr: false,
@@ -34,11 +35,35 @@ const App = () => {
 
   useEffect(() => {
     const fetch = async () => {
-      const response = await fetchContent(identifier);
-      setItem(response);
+      if (unitId) {
+        const {
+          result: { content },
+        } = await ContentSearch({
+          filters: { identifier: [unitId, courseId, identifier] },
+        });
+        const contentMap = content.reduce(
+          (acc: any, item: any) => ({
+            ...acc,
+            [item.identifier === unitId
+              ? 'unit'
+              : item.identifier === courseId
+              ? 'course'
+              : 'content']: item,
+          }),
+          {}
+        );
+        setItem(contentMap);
+        const filteredContent = contentMap?.unit?.leafNodes.filter(
+          (contentItem: any) => contentItem !== identifier
+        );
+        setRelatedIdentity(filteredContent ?? []);
+      } else {
+        const response = await fetchContent(identifier);
+        setItem({ content: response });
+      }
     };
     fetch();
-  }, [identifier]);
+  }, [identifier, unitId, courseId]);
 
   if (!identifier) {
     return <div>Loading...</div>;
@@ -80,13 +105,13 @@ const App = () => {
               <ArrowBackIcon />
             </IconButton>
             <Breadcrumbs separator="›" aria-label="breadcrumb">
-              <Typography variant="body1">
-                {t('LEARNER_APP.COMMON.COURSES')}
-              </Typography>
-              <Typography variant="body1">
-                {t('LEARNER_APP.COMMON.UNITS')}
-              </Typography>
-              <Typography variant="body1">{item?.name}</Typography>
+              {item?.course?.name && (
+                <Typography variant="body1">{item?.course?.name}</Typography>
+              )}
+              {item?.unit?.name && (
+                <Typography variant="body1">{item?.unit?.name}</Typography>
+              )}
+              <Typography variant="body1">{item?.content?.name}</Typography>
             </Breadcrumbs>
           </Box>
           <Box
@@ -104,9 +129,9 @@ const App = () => {
                 lineHeight: '44px',
               }}
             >
-              {item?.name ?? '-'}
+              {item?.content?.name ?? '-'}
             </Typography>
-            {item?.description && (
+            {item?.content?.description && (
               <Typography
                 sx={{
                   fontWeight: 400,
@@ -118,7 +143,7 @@ const App = () => {
                   WebkitBoxOrient: 'vertical',
                 }}
               >
-                {item?.description ?? '-'}
+                {item?.content?.description ?? '-'}
               </Typography>
             )}
           </Box>
@@ -129,7 +154,7 @@ const App = () => {
             unitId={unitId}
           />
         </Box>
-        {courseId && unitId && relatedIdentity.length > 0 && (
+        {relatedIdentity.length > 0 && (
           <Box
             sx={{
               display: 'flex',

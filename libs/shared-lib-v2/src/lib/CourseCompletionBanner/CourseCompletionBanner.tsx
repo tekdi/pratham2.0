@@ -1,3 +1,4 @@
+'use client';
 import React, { useState } from 'react';
 import { Box, Button, Typography, Paper } from '@mui/material';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'; // You can replace this with an ice cream emoji if needed
@@ -74,7 +75,11 @@ export const CourseCompletionBanner: React.FC<CourseCompletionBannerProps> = ({
           Preview Certificate
         </Button>
       </Box>
-      <CertificateModal open={showCertificate} setOpen={setShowCertificate} certificateId={certificateId} />
+      <CertificateModal
+        open={showCertificate}
+        setOpen={setShowCertificate}
+        certificateId={certificateId}
+      />
     </>
   );
 };

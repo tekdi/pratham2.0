@@ -20,6 +20,7 @@ import {
 } from '@content-mfes/services/Certificate';
 import AppConst from '@content-mfes/utils/AppConst/AppConst';
 import { getUserId } from '@content-mfes/services/LoginService';
+import { checkAuth } from '@shared-lib-v2/utils/AuthService';
 
 interface DetailsProps {
   isShowLayout?: any;
@@ -42,11 +43,10 @@ export default function Details(props: DetailsProps) {
       try {
         const resultHierarchy = await hierarchyAPI(identifier);
         const userId = localStorage.getItem('userId');
-        const tenantId = localStorage.getItem('tenantId');
         let startedOn = '';
-        if (userId && tenantId) {
+        if (checkAuth()) {
           const data = await getUserCertificateStatus({
-            userId,
+            userId: userId as string,
             courseId: courseId as string,
           });
           if (
@@ -58,53 +58,50 @@ export default function Details(props: DetailsProps) {
           ) {
             router.replace(`/content-details/${courseId}`);
           } else {
+            const userIdArray: string[] = Array.isArray(userId)
+              ? (userId as string[]).filter(Boolean)
+              : [userId as string].filter(Boolean);
+            const course_track_data = await trackingData(userIdArray, [
+              courseId as string,
+            ]);
+            const userTrackData =
+              course_track_data.data.find(
+                (course: any) => course.userId === userId
+              )?.course || [];
+
+            const newTrackData = calculateTrackData(
+              userTrackData?.[0] ?? {},
+              resultHierarchy?.children ?? []
+            );
+
+            setTrackData(newTrackData ?? []);
             if (data?.result?.status === 'viewCertificate') {
               setCertificateId(data?.result?.certificateId);
-            } else {
-              const userIdArray = Array.isArray(userId) ? userId : [userId];
-              const course_track_data = await trackingData(userIdArray, [
-                courseId as string,
-              ]);
-              if (course_track_data?.data) {
-                //@ts-ignore
-                const userTrackData =
-                  course_track_data.data.find(
-                    (course: any) => course.userId === userId
-                  )?.course || [];
+            } else if (course_track_data?.data && !unitId) {
+              const course_track = calculateTrackDataItem(
+                userTrackData?.[0] ?? {},
+                resultHierarchy ?? {}
+              );
 
-                const newTrackData = calculateTrackData(
-                  userTrackData?.[0] ?? {},
-                  resultHierarchy?.children ?? []
-                );
-
-                setTrackData(newTrackData ?? []);
-                if (!unitId) {
-                  const course_track = calculateTrackDataItem(
-                    userTrackData?.[0] ?? {},
-                    resultHierarchy ?? {}
-                  );
-
-                  if (
-                    course_track?.status === 'completed' &&
-                    data?.result?.status === 'enrolled'
-                  ) {
-                    const userResponse = await getUserId();
-                    await issueCertificate({
-                      userId: userId,
-                      courseId: courseId,
-                      unitId: unitId,
-                      issuanceDate: new Date().toISOString(),
-                      expirationDate: new Date(
-                        new Date().setFullYear(new Date().getFullYear() + 20)
-                      ).toISOString(),
-                      credentialId: data?.result?.usercertificateId,
-                      firstName: userResponse?.firstName ?? '',
-                      middleName: userResponse?.middleName ?? '',
-                      lastName: userResponse?.lastName ?? '',
-                      courseName: resultHierarchy?.name ?? '',
-                    });
-                  }
-                }
+              if (
+                course_track?.status === 'completed' &&
+                data?.result?.status === 'enrolled'
+              ) {
+                const userResponse = await getUserId();
+                await issueCertificate({
+                  userId: userId,
+                  courseId: courseId,
+                  unitId: unitId,
+                  issuanceDate: new Date().toISOString(),
+                  expirationDate: new Date(
+                    new Date().setFullYear(new Date().getFullYear() + 20)
+                  ).toISOString(),
+                  credentialId: data?.result?.usercertificateId,
+                  firstName: userResponse?.firstName ?? '',
+                  middleName: userResponse?.middleName ?? '',
+                  lastName: userResponse?.lastName ?? '',
+                  courseName: resultHierarchy?.name ?? '',
+                });
               }
             }
           }

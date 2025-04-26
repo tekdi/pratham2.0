@@ -1,4 +1,3 @@
-/*************  ✨ Windsurf Command 🌟  *************/
 // app/theme/ThemeRegistry.tsx or MuiThemeProvider.tsx
 'use client';
 
@@ -175,5 +174,3 @@ export default function MuiThemeProvider({
     </ThemeProvider>
   );
 }
-
-/*******  b29d3c4f-16b2-49ee-b103-ac893eb1b4d5  *******/

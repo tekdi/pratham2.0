@@ -40,13 +40,13 @@ export const ContentSearch = async ({
       request: {
         filters: {
           ...filters,
-          status: ['live'],
-          primaryCategory: [
-            'Course',
-            'Learning Resource',
-            'Practice Question Set',
-          ],
-          channel: localStorage.getItem('channelId'),
+          //   status: ['live'],
+          //   primaryCategory: [
+          //     'Course',
+          //     'Learning Resource',
+          //     'Practice Question Set',
+          //   ],
+          //   channel: localStorage.getItem('channelId'),
         },
         fields: [
           'name',
@@ -55,11 +55,6 @@ export const ContentSearch = async ({
           'posterImage',
           'mimeType',
           'identifier',
-          'resourceType',
-          'primaryCategory',
-          'contentType',
-          'trackable',
-          'children',
           'leafNodes',
         ],
         query,
