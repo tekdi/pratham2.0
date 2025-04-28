@@ -81,7 +81,7 @@ const MyComponent: React.FC = () => {
               <ContentComponent />
             </Grid>
           </Grid>
-          <Grid container sx={{ p: 4 }}>
+          <Grid container>
             <Grid
               item
               xs={12}

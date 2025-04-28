@@ -66,7 +66,14 @@ export const getUserId = async (): Promise<any> => {
     });
 
     return response?.data?.result;
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.response?.status === 401) {
+      // Clear all localStorage data
+      localStorage.clear();
+      // Redirect to login page
+      window.location.href = '/login';
+      return;
+    }
     console.error('Error in fetching user details', error);
     throw error;
   }

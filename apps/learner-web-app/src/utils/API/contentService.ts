@@ -1,5 +1,4 @@
-import { post } from '@shared-lib';
-import { get } from './RestClient';
+import { post, get } from '@shared-lib';
 
 export const fetchContent = async (identifier: any) => {
   try {
@@ -73,6 +72,111 @@ export const ContentSearch = async ({
     return res;
   } catch (error) {
     console.error('Error in ContentSearch:', error);
+    throw error;
+  }
+};
+
+export const fetchUserCoursesWithContent = async (
+  userId: string,
+  tenantId: string
+) => {
+  try {
+    // First API call to get course IDs
+    const API_URL = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/user_certificate/status/search`;
+
+    const response = await post(API_URL, {
+      filters: {
+        status: ['completed', 'viewCertificate'],
+        tenantId,
+        userId,
+      },
+      offset: 0,
+    });
+
+    const courseIds = response?.data?.result?.data || [];
+    // Second API call to get content for each course
+    const allCourses = await Promise.all(
+      courseIds.map(
+        async (course: { identifier: string; courseId: string }) => {
+          const contentUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/action/content/v3/read/${course.courseId}`;
+          const contentResponse = await get(contentUrl);
+          return {
+            courseId: course.courseId,
+            name: contentResponse?.data?.result?.content?.name || '',
+            subjects: contentResponse?.data?.result?.content?.se_subjects || [],
+          };
+        }
+      )
+    );
+
+    // Group courses by topic
+    const topicGroups = allCourses.reduce(
+      (
+        acc: { topic: string; courses: { name: string; courseId: string }[] }[],
+        course
+      ) => {
+        course.subjects.forEach((topic: string) => {
+          const existingGroup = acc.find((group) => group.topic === topic);
+          if (existingGroup) {
+            if (
+              !existingGroup.courses.some((c) => c.courseId === course.courseId)
+            ) {
+              existingGroup.courses.push({
+                name: course.name,
+                courseId: course.courseId,
+              });
+            }
+          } else {
+            acc.push({
+              topic,
+              courses: [
+                {
+                  name: course.name,
+                  courseId: course.courseId,
+                },
+              ],
+            });
+          }
+        });
+        return acc;
+      },
+      []
+    );
+
+    return topicGroups;
+  } catch (error) {
+    console.error('Error fetching user courses with content:', error);
+    throw error;
+  }
+};
+
+export const createL2Course = async (userData: {
+  first_name: string;
+  middle_name: string;
+  last_name: string;
+  mother_name: string;
+  gender: string;
+  email_address: string;
+  dob: string;
+  qualification: string;
+  phone_number: string;
+  state: string;
+  district: string;
+  block: string;
+  village: string;
+  blood_group: string;
+  userId: string;
+  courseId: string;
+  courseName: string;
+  topicName: string;
+}) => {
+  try {
+    const API_URL = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/prathamservice/v1/save-user-salesforce`;
+
+    const response = await post(API_URL, userData);
+    return response?.data;
+  } catch (error) {
+    console.error('Error saving user to Salesforce:', error);
     throw error;
   }
 };
