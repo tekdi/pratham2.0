@@ -132,5 +132,8 @@
   "PARENT_GUARDIAN_PHONE_NO": "Parent/Guardian Phone No",
   "PROGRAM": "Program",
   "SUBMIT": "Submit",
-  "CONTINUE": "Continue"
+  "CONTINUE": "Continue",
+  "UNMARRIED": "UNMARRIED",
+  "MARRIED": "MARRIED",
+  "DIVORCED": "DIVORCED"
 }
