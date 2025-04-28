@@ -24,6 +24,7 @@ import { hierarchyAPI } from '@content-mfes/services/Hierarchy';
 import {
   ContentSearch,
   ContentSearchResponse as ImportedContentSearchResponse,
+  ResultProp,
 } from '@content-mfes/services/Search';
 import FilterDialog from '@content-mfes/components/FilterDialog';
 import { trackingData } from '@content-mfes/services/TrackingService';
@@ -52,11 +53,6 @@ const DEFAULT_FILTERS = {
   limit: 5,
   offset: 0,
 };
-
-interface ContentSearchResult {
-  result: ImportedContentSearchResponse[];
-  count: number;
-}
 
 interface TrackDataItem {
   courseId: string;
@@ -131,7 +127,7 @@ export default function Content(props: Readonly<ContentProps>) {
 
   // Memoized content fetching with cancellation
   const fetchContent = useCallback(
-    async (filter: typeof localFilters): Promise<ContentSearchResult> => {
+    async (filter: typeof localFilters): Promise<ResultProp> => {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
@@ -153,7 +149,7 @@ export default function Content(props: Readonly<ContentProps>) {
             children: hierarchyResult.children || [defaultChild],
           };
           return {
-            result: [result],
+            content: [result],
             count: 1,
           };
         }
@@ -162,23 +158,19 @@ export default function Content(props: Readonly<ContentProps>) {
           throw new Error('Type is required for content search');
         }
 
-        const response = await ContentSearch({
+        const resultResponse = await ContentSearch({
           ...filter,
           type: filter.type,
         });
-
-        const searchResults = Array.isArray(response) ? response : [];
-        return {
-          result: searchResults,
-          count: searchResults.length,
-        };
+        const response = resultResponse?.result;
+        return response;
       } catch (error) {
         if (error instanceof Error && error.name === 'AbortError') {
           console.log('Request was cancelled');
-          return { result: [], count: 0 };
+          return { content: [], count: 0 };
         }
         console.error('Failed to fetch content:', error);
-        return { result: [], count: 0 };
+        return { content: [], count: 0 };
       }
     },
     []
@@ -254,9 +246,10 @@ export default function Content(props: Readonly<ContentProps>) {
       setIsLoading(true);
       try {
         const response = await fetchContent(localFilters);
+
         if (!response || !isMounted) return;
 
-        const newContentData = response.result || [];
+        const newContentData = response.content || [];
 
         const userTrackData = await fetchDataTrack(newContentData);
         if (!isMounted) return;

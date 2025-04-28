@@ -55,6 +55,7 @@ export const ContentSearch = async ({
           'mimeType',
           'identifier',
           'leafNodes',
+          'se_subjects',
         ],
         query,
         limit,
@@ -94,36 +95,44 @@ export const fetchUserCoursesWithContent = async (
     });
 
     const courseIds = response?.data?.result?.data || [];
-    // Second API call to get content for each course
-    const allCourses = await Promise.all(
-      courseIds.map(
-        async (course: { identifier: string; courseId: string }) => {
-          const contentUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/action/content/v3/read/${course.courseId}`;
-          const contentResponse = await get(contentUrl);
-          return {
-            courseId: course.courseId,
-            name: contentResponse?.data?.result?.content?.name || '',
-            subjects: contentResponse?.data?.result?.content?.se_subjects || [],
-          };
-        }
-      )
-    );
+    const resultCourses = await ContentSearch({
+      filters: {
+        identifier: courseIds.map((c: any) => c.courseId),
+        status: ['live'],
+        primaryCategory: [
+          'Course',
+          'Learning Resource',
+          'Practice Question Set',
+        ],
+        channel: localStorage.getItem('channelId'),
+        ...(JSON.parse(localStorage.getItem('filter') || '{}') || {}),
+      },
+    });
+
+    const allCourses = resultCourses?.result?.content || [];
+    console.log(allCourses, 'resultCourses');
 
     // Group courses by topic
     const topicGroups = allCourses.reduce(
       (
         acc: { topic: string; courses: { name: string; courseId: string }[] }[],
-        course
+        course: {
+          name: string;
+          identifier: string;
+          se_subjects: string[];
+        }
       ) => {
-        course.subjects.forEach((topic: string) => {
+        course.se_subjects.forEach((topic: string) => {
           const existingGroup = acc.find((group) => group.topic === topic);
           if (existingGroup) {
             if (
-              !existingGroup.courses.some((c) => c.courseId === course.courseId)
+              !existingGroup.courses.some(
+                (c) => c.courseId === course.identifier
+              )
             ) {
               existingGroup.courses.push({
                 name: course.name,
-                courseId: course.courseId,
+                courseId: course.identifier,
               });
             }
           } else {
@@ -132,7 +141,7 @@ export const fetchUserCoursesWithContent = async (
               courses: [
                 {
                   name: course.name,
-                  courseId: course.courseId,
+                  courseId: course.identifier,
                 },
               ],
             });

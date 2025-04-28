@@ -109,6 +109,14 @@ export interface ContentSearchResponse {
 }
 // Define the payload
 
+export interface ResultProp {
+  content: ContentSearchResponse[];
+  count: number;
+}
+export interface ContentResponse {
+  result: ResultProp;
+}
+
 export const ContentSearch = async ({
   type,
   query,
@@ -121,7 +129,7 @@ export const ContentSearch = async ({
   filters?: object;
   limit?: number;
   offset?: number;
-}): Promise<ContentSearchResponse[]> => {
+}): Promise<ContentResponse> => {
   try {
     // Ensure the environment variable is defined
     const searchApiUrl = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;

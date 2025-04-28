@@ -10,10 +10,11 @@ import {
 } from '@learner/utils/API/contentService';
 import { checkAuth } from '@shared-lib-v2/utils/AuthService';
 import { getUserId } from '@learner/utils/API/LoginService';
+import { showToastMessage } from '@learner/components/ToastComponent/Toastify';
 
 export interface TopicProp {
   topic: string;
-  course?: any[];
+  courses?: any[];
 }
 
 const LTwoCourse: React.FC = () => {
@@ -36,6 +37,7 @@ const LTwoCourse: React.FC = () => {
             setTopics(courses);
           } catch (error) {
             console.error('Error fetching user courses:', error);
+            showToastMessage(`Error fetching user courses: ${error}`, 'error');
           }
         }
       }
@@ -72,8 +74,8 @@ const LTwoCourse: React.FC = () => {
         village: '',
         blood_group: '',
         userId: userResponse?.userId || '',
-        courseId: selectedTopic?.course?.[0]?.name || '',
-        courseName: selectedTopic?.course?.[0]?.courseId || '',
+        courseId: selectedTopic?.courses?.[0]?.name || '',
+        courseName: selectedTopic?.courses?.[0]?.courseId || '',
         topicName: selectedTopic?.topic || '',
       };
 
@@ -87,6 +89,7 @@ const LTwoCourse: React.FC = () => {
       }
     } catch (error) {
       console.error('Error in handleSubmit:', error);
+      showToastMessage(`Error in handleSubmit: ${error}`, 'error');
       // Handle error appropriately
     }
   };

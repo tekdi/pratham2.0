@@ -1,10 +1,4 @@
-import {
-  Box,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-  Typography,
-} from '@mui/material';
+import { Box, MenuItem, Select, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
 import { useTranslation } from '@shared-lib';
 import { TopicProp } from '@learner/components/Content/LTwoCourse';
@@ -15,7 +9,7 @@ interface StaticTopic {
 }
 
 interface LevelUpProps {
-  handleTopicChange: (event: SelectChangeEvent) => void;
+  handleTopicChange: (event: TopicProp) => void;
   selectedTopic: string;
   topics?: TopicProp[];
 }
