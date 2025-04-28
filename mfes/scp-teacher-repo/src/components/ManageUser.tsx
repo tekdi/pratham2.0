@@ -80,6 +80,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
   const queryClient = useQueryClient();
   const { isRTL } = useDirection();
   const isActiveYear = newStore.isActiveYearSelected;
+  const loggedInUserRole = localStorage.getItem('role');
 
   const [value, setValue] = React.useState(1);
   const [users, setUsers] = useState<
@@ -954,12 +955,18 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                     ),
                     name: 'delete-User',
                   },
-                ].filter(
-                  (option) =>
-                    !isFromFLProfile ||
-                    (option.name !== 'reassign-block' &&
-                      option.name !== 'reassign-block-request')
-                )}
+                ].filter((option) => {
+                  if (option.name === 'reassign-block') {
+                    return loggedInUserRole === Role.TEAM_LEADER; // Only show Reassign Batch if user is TL
+                  }
+                  if (isFromFLProfile) {
+                    return (
+                      option.name !== 'reassign-block' &&
+                      option.name !== 'reassign-block-request'
+                    );
+                  }
+                  return true;
+                })}
               >
                 <Box
                   sx={{
