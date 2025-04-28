@@ -9,7 +9,9 @@
       "L1_COURSES": "L1 Courses",
       "EXPLORE": "Explore",
       "SURVEYS": "Surveys",
-      "PROFILE": "Profile"
+      "PROFILE": "Profile",
+      "UNITS": "Units",
+      "COURSES": "Courses"
     },
     "COURSE": {
       "GET_STARTED": "Get Started with L1 Courses",
@@ -17,6 +19,85 @@
     },
     "EXPLORE": {
       "EXPLORE_ADDITIONAL_COURSES": "Explore Additional Courses"
+    },
+    "HOME": {
+      "WELCOME_TITLE": "Welcome to Pratham myLearning!",
+      "WELCOME_SUBTITLE": "Your Learning Journey begins here",
+      "SIGN_UP_BUTTON": "Sign Up for Program Now!",
+      "ALREADY_SIGNED_UP": "Already signed up?",
+      "LOGIN_LINK": "Click here to login",
+      "GET_THE_APP": "Get the App",
+      "POINT_CAMERA": "Point your phone camera here",
+      "OR": "OR",
+      "SEARCH_PLAYSTORE": "Search \"Pratham myLearning\" on Playstore",
+      "ABOUT_PRATHAM_TITLE": "About Pratham",
+      "ABOUT_PRATHAM_DESC": "Pratham creates innovative education solutions with thoughtful, impactful interventions that span the age spectrum. Working both directly and through government systems, these programs collectively reach millions of children and young people each year. The direct work follows two tracks: Pratham works with children either in the school or in the community, whereas the “partnership” model involves Pratham teams working closely with government teams at the state, district, or block level. Our unwavering commitment to developing, testing, and improving learning outcomes continues to serve as a model, both within India and beyond.",
+      "OUR_PROGRAMS": "Our Programs",
+      "SIGN_UP": "Sign Up"
+    },
+    "LOGIN": {
+      "welcome_title": "Welcome to Pratham myLearning!",
+      "welcome_subtitle": "Your Learning Journey Begins here",
+      "welcome_image_alt": "Smiley face",
+      "qr_get_app": "Get the App",
+      "qr_instruction": "Point your phone \n camera here",
+      "qr_image_alt": "QR Code",
+      "or": "OR",
+      "playstore_image_alt": "Get it on Google Play",
+      "playstore_instruction": "Search “Pratham myLearning” on Playstore",
+      "login_title": "Login",
+      "username_label": "UserName",
+      "password_label": "Password",
+      "remember_me": "Remember Me",
+      "forgot_password": "Forgot Password",
+      "login_button": "Login",
+      "no_account": "I don’t have an Account"
+    },
+    "L_ONE_COURSE": {
+      "IN_PROGRESS_TITLE": "In Progress",
+      "ONGOING_COURSES": "You have 4 Ongoing Courses",
+      "VIEW_ALL_BUTTON": "View All"
+    },
+    "L_TWO_COURSE": {
+      "TITLE": "L2 Course",
+      "DESCRIPTION": "You can boost your skills and unlock new job opportunities with our L2 course.",
+      "SUB_DESCRIPTION": "Show your interest to receive personalized guidance from our expert!",
+      "INTEREST_BUTTON": "I'm interested",
+      "SUBMIT_BUTTON": "Submit",
+      "OKAY_BUTTON": "Okay"
+    },
+    "LEVEL_UP": {
+      "TITLE": "Great! We're Excited to Help You Level Up!",
+      "SUB_TITLE": "Which topic are you most interested in?",
+      "TOPICS_PLACEHOLDER": "Topics",
+      "TOPIC_PLUMBING": "Plumbing",
+      "TOPIC_ELECTRICAL": "Electrical",
+      "TOPIC_CARPENTRY": "Carpentry",
+      "TOPIC_MASONRY": "Masonry",
+      "TOPIC_PAINTING": "Painting",
+      "FOOTER_TEXT": "Once you select a course, our expert will contact you with more information!"
+    },
+    "RESPONSE_RECORDED": {
+      "TITLE": "Your response has been recorded",
+      "SUB_TITLE": "Our expert will reach out to you soon",
+      "FOOTER_TEXT": "In the meantime, feel free to explore more courses or continue building your skills!"
+    },
+    "CONTENT": {
+      "DEFAULT_IMAGE_ALT": "Default course image"
+    },
+    "IN_PROGRESS": {
+      "ALL_COURSES": "All In Progress Courses"
+    },
+    "SEARCH_COMPONENT": {
+      "PLACEHOLDER": "Search content..",
+      "Course": "Course"
+    },
+    "CONTENT_TABS": {
+      "LOAD_MORE": "Load More",
+      "NO_MORE_DATA": "No more data available"
+    },
+    "PLAYER": {
+      "MORE_RELATED_RESOURCES": "More Related Resources"
     },
     "other_filters": "Other Filters"
   }

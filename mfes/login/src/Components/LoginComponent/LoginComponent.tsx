@@ -13,7 +13,8 @@ import {
   Paper,
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { useTranslation } from 'next-i18next';
+import { useTranslation } from '@shared-lib';
+
 interface LoginComponentProps {
   onLogin: (data: {
     username: string;
@@ -23,6 +24,7 @@ interface LoginComponentProps {
   handleAddAccount?: () => void;
   handleForgotPassword?: () => void;
 }
+
 const LoginComponent: React.FC<LoginComponentProps> = ({
   onLogin,
   handleAddAccount,
@@ -54,9 +56,7 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
       elevation={3}
       sx={{
         maxWidth: 400,
-        // mx: 'auto',
         p: 4,
-        // border: '2px solid #007bff',
         borderRadius: 2,
       }}
     >
@@ -71,13 +71,11 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
           mb: 3,
         }}
       >
-        {/* {t('LOGIN_PAGE.LOGIN')} */}
-        Login
+        {t('LEARNER_APP.LOGIN.login_title')}
       </Typography>
 
       <TextField
-        label="UserName"
-        //{t('LOGIN_PAGE.USERNAME')}
+        label={t('LEARNER_APP.LOGIN.username_label')}
         name="username"
         value={formData.username}
         onChange={handleChange}
@@ -87,8 +85,7 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
       />
 
       <TextField
-        label="Password"
-        //{t('LOGIN_PAGE.PASSWORD')}
+        label={t('LEARNER_APP.LOGIN.password_label')}
         name="password"
         type={showPassword ? 'text' : 'password'}
         value={formData.password}
@@ -124,8 +121,7 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
               name="remember"
             />
           }
-          label="Remember Me"
-          // {t('LOGIN_PAGE.REMEMBER_ME')}
+          label={t('LEARNER_APP.LOGIN.remember_me')}
         />
         <Typography
           variant="body2"
@@ -133,8 +129,7 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
           sx={{ cursor: 'pointer' }}
           onClick={handleForgotPassword}
         >
-          ForGot Password
-          {/* {t('LOGIN_PAGE.FORGOT_PASSWORD')} */}
+          {t('LEARNER_APP.LOGIN.forgot_password')}
         </Typography>
       </Box>
 
@@ -152,8 +147,7 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
         }}
         onClick={handleLogin}
       >
-        {/* {t('LOGIN_PAGE.LOGIN')} */}
-        Login
+        {t('LEARNER_APP.LOGIN.login_button')}
       </Button>
 
       <Typography
@@ -164,7 +158,7 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
         sx={{ cursor: 'pointer' }}
         onClick={handleAddAccount}
       >
-        {/* {t('LOGIN_PAGE.I_DONT_HAVE_ACCOUNT')} */}I dont have an Account
+        {t('LEARNER_APP.LOGIN.no_account')}
       </Typography>
     </Paper>
   );

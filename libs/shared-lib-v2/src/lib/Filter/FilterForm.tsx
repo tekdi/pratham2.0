@@ -1,3 +1,4 @@
+'use client';
 import React, { useEffect, useState } from 'react';
 import {
   Box,
@@ -52,7 +53,7 @@ interface FilterListProps {
   onApply?: any;
 }
 
-export default function FilterList({
+export function FilterForm({
   setParentFormData,
   setParentStaticFormData,
   parentStaticFormData,

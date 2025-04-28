@@ -49,6 +49,7 @@ interface ContentSearchResponse {
   author?: string;
   consumerId?: string;
   childNodes?: string[];
+  children?: string[];
   discussionForum?: {
     enabled?: string;
   };

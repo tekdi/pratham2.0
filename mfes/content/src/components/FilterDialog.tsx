@@ -1,7 +1,7 @@
 import CloseIcon from '@mui/icons-material/Close';
 import { Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
 import { FilterForm } from '@shared-lib';
-import React from 'react';
+import React, { useState } from 'react';
 
 const FilterDialog = ({
   open,
@@ -41,6 +41,13 @@ const FilterDialog = ({
     onApply?.(data);
   };
 
+  const [isModal, setIsModal] = useState(true);
+  const [parentFormData, setParentFormData] = useState([]);
+  const [parentStaticFormData, setParentStaticFormData] = useState([]);
+  const [orginalFormData, setOrginalFormData] = useState([]);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(true);
+  const [instant, setInstant] = useState('');
+
   return (
     <Dialog
       fullWidth
@@ -66,18 +73,13 @@ const FilterDialog = ({
       </IconButton>
       <DialogContent dividers>
         <FilterForm
-          _formControl={{ sx: { width: '100%' } }}
-          filterValues={filterValues?.filters ?? {}}
           onApply={handleFilterChange}
-          filter={filter}
-          language={language}
-          selectedSubjects={selectedSubjects}
-          selectedContentTypes={selectedContentTypes}
-          sort={sort}
-          onLanguageChange={onLanguageChange}
-          onSubjectsChange={onSubjectsChange}
-          onContentTypeChange={onContentTypeChange}
-          onSortChange={onSortChange}
+          setParentFormData={setParentFormData}
+          setParentStaticFormData={setParentStaticFormData}
+          parentStaticFormData={parentStaticFormData}
+          setOrginalFormData={setOrginalFormData}
+          orginalFormData={orginalFormData}
+          setIsDrawerOpen={setIsDrawerOpen}
         />
       </DialogContent>
     </Dialog>

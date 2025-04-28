@@ -2,12 +2,15 @@
 
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { FetchDoIds, getTenantInfo } from '@learner/utils/API/ProgramService';
+import { FetchDoIds } from '@learner/utils/API/ProgramService';
+import { useTranslation } from '@shared-lib';
 
 const Content = dynamic(() => import('@Content'), {
   ssr: false,
 });
-const ContentComponent = ({ limit }: any) => {
+
+const ContentComponent = ({ limit = 4, hasMoreData = false }: any) => {
+  const { t } = useTranslation();
   const [identifier, setIdentifier] = useState([]);
 
   useEffect(() => {
@@ -28,7 +31,7 @@ const ContentComponent = ({ limit }: any) => {
 
     fetchDOIds();
   }, []);
-  // console.log(courseIds);
+
   return (
     <Content
       isShowLayout={false}
@@ -42,10 +45,11 @@ const ContentComponent = ({ limit }: any) => {
           identifier: identifier,
         },
       }}
-      hasMoreData={false}
+      hasMoreData={hasMoreData}
       _config={{
         default_img: '/images/image_ver.png',
         _card: { isHideProgress: true },
+        default_img_alt: t('LEARNER_APP.CONTENT.DEFAULT_IMAGE_ALT'),
       }}
     />
   );

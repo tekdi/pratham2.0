@@ -6,6 +6,7 @@ import {
   Typography,
 } from '@mui/material';
 import React from 'react';
+import { Layout, useTranslation } from '@shared-lib';
 
 interface LevelUpProps {
   handleTopicChange: (event: SelectChangeEvent) => void;
@@ -16,6 +17,8 @@ const LevelUp: React.FC<LevelUpProps> = ({
   handleTopicChange,
   selectedTopic,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div>
       <Typography
@@ -27,7 +30,7 @@ const LevelUp: React.FC<LevelUpProps> = ({
         mb={3}
         id="modal-title"
       >
-        Great! We're Excited to Help You Level Up!
+        {t('LEARNER_APP.LEVEL_UP.TITLE')}
       </Typography>
 
       <Typography
@@ -38,7 +41,7 @@ const LevelUp: React.FC<LevelUpProps> = ({
         }}
         mb={2}
       >
-        Which topic are you most interested in?
+        {t('LEARNER_APP.LEVEL_UP.SUB_TITLE')}
       </Typography>
 
       <Box sx={{ mb: 2 }}>
@@ -50,19 +53,28 @@ const LevelUp: React.FC<LevelUpProps> = ({
           sx={{ textAlign: 'left' }}
         >
           <MenuItem disabled value="">
-            <em>Topics</em>
+            <em>{t('LEARNER_APP.LEVEL_UP.TOPICS_PLACEHOLDER')}</em>
           </MenuItem>
-          <MenuItem value="plumbing">Plumbing</MenuItem>
-          <MenuItem value="electrical">Electrical</MenuItem>
-          <MenuItem value="carpentry">Carpentry</MenuItem>
-          <MenuItem value="masonry">Masonry</MenuItem>
-          <MenuItem value="painting">Painting</MenuItem>
+          <MenuItem value="plumbing">
+            {t('LEARNER_APP.LEVEL_UP.TOPIC_PLUMBING')}
+          </MenuItem>
+          <MenuItem value="electrical">
+            {t('LEARNER_APP.LEVEL_UP.TOPIC_ELECTRICAL')}
+          </MenuItem>
+          <MenuItem value="carpentry">
+            {t('LEARNER_APP.LEVEL_UP.TOPIC_CARPENTRY')}
+          </MenuItem>
+          <MenuItem value="masonry">
+            {t('LEARNER_APP.LEVEL_UP.TOPIC_MASONRY')}
+          </MenuItem>
+          <MenuItem value="painting">
+            {t('LEARNER_APP.LEVEL_UP.TOPIC_PAINTING')}
+          </MenuItem>
         </Select>
       </Box>
 
-          <Typography variant="h4" color="#635E57" mb={3}>
-        Once you select a course, our expert will contact you with more
-        information!
+      <Typography variant="h4" color="#635E57" mb={3}>
+        {t('LEARNER_APP.LEVEL_UP.FOOTER_TEXT')}
       </Typography>
     </div>
   );

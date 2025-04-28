@@ -124,12 +124,12 @@ export const getTelemetryConfig = (): Context => {
   if (typeof window !== 'undefined' && window.localStorage) {
     const ls = window.localStorage;
     localStorageData = {
-      userName: ls.getItem('userName') ?? '',
-      accToken: ls.getItem('accToken') ?? '',
-      sid: ls.getItem('accToken') ?? '',
+      userName: ls.getItem('userIdName') ?? '',
+      accToken: ls.getItem('token') ?? '',
+      sid: ls.getItem('token') ?? '',
       uid: ls.getItem('userId') ?? '',
       tenantId: ls.getItem('tenantId') ?? '',
-      tenantCode: ls.getItem('tenant-code') ?? '',
+      tenantCode: ls.getItem('channelId') ?? '',
       did: ls.getItem('did') ?? '',
     };
   }

@@ -1,0 +1,357 @@
+'use client';
+
+import React, { useCallback, useEffect, useState } from 'react';
+import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
+import SearchIcon from '@mui/icons-material/Search';
+import { Box, Button } from '@mui/material';
+import {
+  calculateTrackDataItem,
+  CommonSearch,
+  ContentItem,
+  getData,
+} from '@shared-lib';
+import { useRouter } from 'next/navigation';
+import BackToTop from '@content-mfes/components/BackToTop';
+import RenderTabContent from '@content-mfes/components/ContentTabs';
+import HelpDesk from '@content-mfes/components/HelpDesk';
+import { hierarchyAPI } from '@content-mfes/services/Hierarchy';
+import {
+  ContentSearch,
+  ContentSearchResponse,
+} from '@content-mfes/services/Search';
+import FilterDialog from '@content-mfes/components/FilterDialog';
+import { trackingData } from '@content-mfes/services/TrackingService';
+import LayoutPage from '@content-mfes/components/LayoutPage';
+import { getUserCertificates } from '@content-mfes/services/Certificate';
+
+export interface ContentProps {
+  _config?: object;
+  filters?: object;
+  contentTabs?: string[];
+  cardName?: string;
+  handleCardClick?: (content: ContentItem) => void | undefined;
+  showFilter?: boolean;
+  showSearch?: boolean;
+  showBackToTop?: boolean;
+  showHelpDesk?: boolean;
+  isShowLayout?: boolean;
+  hasMoreData?: boolean;
+}
+export default function Content(props: Readonly<ContentProps>) {
+  const router = useRouter();
+  const [searchValue, setSearchValue] = useState('');
+  const [tabValue, setTabValue] = useState<number>();
+  const [tabs, setTabs] = useState<any>([]);
+  const [contentData, setContentData] = useState<ContentSearchResponse[]>([]);
+  const [isPageLoading, setIsPageLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasMoreData, setHasMoreData] = useState(true);
+  const [localFilters, setLocalFilters] = useState<any>({
+    limit: 5,
+    offset: 0,
+  });
+  const [showBackToTop] = useState(false);
+  const [trackData, setTrackData] = useState<[]>([]);
+  const [filterShow, setFilterShow] = useState(false);
+  const [propData, setPropData] = useState<ContentProps>();
+
+  useEffect(() => {
+    const init = async () => {
+      const newData = await getData('mfes_content_pages_content');
+      const newPorp = {
+        showSearch: true,
+        showFilter: true,
+        ...(props ?? newData),
+      };
+      setPropData(newPorp);
+      setTabValue(0);
+      setIsPageLoading(false);
+    };
+    init();
+  }, [props]);
+
+  const fetchContent = useCallback(async (filter: any) => {
+    try {
+      let data: any;
+      if (filter.identifier) {
+        const result = await hierarchyAPI(filter.identifier);
+        data = [result];
+      } else {
+        data = await ContentSearch(filter);
+      }
+      return data;
+    } catch (error) {
+      console.error('Failed to fetch content:', error);
+      return [];
+    }
+  }, []);
+
+  const fetchDataTrack = useCallback(async (resultData: any) => {
+    if (!resultData.length) return; // Ensure contentData is available
+    try {
+      const courseList = resultData.map((item: any) => item.identifier); // Extract all identifiers
+      const userId = localStorage.getItem('userId');
+      const userIdArray = userId?.split(',');
+      if (!userId || !courseList.length) return []; // Ensure required values exist
+      //@ts-ignore
+      const course_track_data = await trackingData(userIdArray, courseList);
+      const {
+        result: { data: dataCertificates },
+      } = await getUserCertificates({
+        userId: localStorage.getItem('userId') || '',
+        courseId: courseList ?? [],
+        limit: localFilters.limit,
+        offset: localFilters.offset,
+      });
+      if (course_track_data?.data) {
+        //@ts-ignore
+        const userTrackData =
+          course_track_data.data.find((course: any) => course.userId === userId)
+            ?.course ?? [];
+        const newData: any = [];
+        userTrackData.forEach((item: any) => {
+          const childItem = resultData?.find(
+            (subItem: any) => item.courseId === subItem.identifier
+          );
+          const dataTrack = calculateTrackDataItem(item ?? {}, childItem ?? {});
+          newData.push({
+            ...item,
+            ...dataTrack,
+            enrolled: Boolean(
+              dataCertificates.find(
+                (cert: any) => cert.courseId === item.courseId
+              )?.status === 'enrolled'
+            ),
+          });
+        });
+        return newData;
+      }
+      return [];
+    } catch (error) {
+      console.error('Error fetching track data:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (tabValue !== undefined && tabs?.[tabValue]?.type) {
+      setLocalFilters((prevFilters: any) => ({
+        ...prevFilters,
+        type: tabs?.[tabValue]?.type,
+        offset: 0,
+      }));
+    }
+  }, [tabValue, tabs]);
+
+  const handleLoadMore = (event: any) => {
+    event.preventDefault();
+    setLocalFilters((prevFilters: any) => ({
+      ...prevFilters,
+      offset: prevFilters.offset + prevFilters.limit,
+    }));
+  };
+
+  const handleSearchClick = async () => {
+    setLocalFilters((prevFilters: any) => ({
+      ...prevFilters,
+      query: searchValue.trim(),
+      offset: 0,
+    }));
+  };
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(event.target.value);
+  };
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
+  };
+
+  const handleCardClickLocal = async (content: ContentItem) => {
+    try {
+      if (propData?.handleCardClick) {
+        propData.handleCardClick(content);
+      } else if (
+        [
+          'application/vnd.ekstep.ecml-archive',
+          'application/vnd.ekstep.html-archive',
+          'application/vnd.ekstep.h5p-archive',
+          'application/pdf',
+          'video/mp4',
+          'video/webm',
+          'application/epub',
+          'video/x-youtube',
+          'application/vnd.sunbird.questionset',
+        ].includes(content?.mimeType as string)
+      ) {
+        router.push(`/player/${content?.identifier}`);
+      } else {
+        router.push(`/content-details/${content?.identifier}`);
+      }
+    } catch (error) {
+      console.error('Failed to fetch content:', error);
+    }
+  };
+
+  useEffect(() => {
+    const init = () => {
+      const filteredTabs = [
+        {
+          label: 'Courses',
+          type: 'Course',
+        },
+        {
+          label: 'Content',
+          type: 'Learning Resource',
+        },
+      ].filter((tab) =>
+        Array.isArray(propData?.contentTabs) && propData.contentTabs.length > 0
+          ? propData?.contentTabs?.includes(tab.label?.toLowerCase())
+          : true
+      );
+      setTabs(filteredTabs);
+      setLocalFilters((prevFilters: any) => ({
+        ...prevFilters,
+        ...(propData?.filters ?? {}),
+      }));
+    };
+    init();
+  }, [propData?.filters, propData?.contentTabs]);
+
+  useEffect(() => {
+    const init = async () => {
+      setIsLoading(true);
+      try {
+        if (
+          localFilters.type &&
+          localFilters.limit &&
+          localFilters.offset !== undefined
+        ) {
+          const { result } = await fetchContent(localFilters);
+          const newContentData = Object.values(result)
+            .filter((e): e is ContentSearchResponse[] => Array.isArray(e))
+            .flat();
+          const userTrackData = await fetchDataTrack(newContentData ?? []);
+          if (localFilters.offset === 0) {
+            setContentData((newContentData as ContentSearchResponse[]) ?? []);
+            setTrackData(userTrackData);
+          } else {
+            setContentData((prevState: any) => [
+              ...prevState,
+              ...(newContentData ?? []),
+            ]);
+            setTrackData(
+              (prevState: []) =>
+                [...(prevState ?? []), ...(userTrackData ?? [])] as []
+            );
+          }
+          if (propData?.hasMoreData === false) {
+            setHasMoreData(false);
+          } else {
+            setHasMoreData(
+              result?.count > localFilters.offset + newContentData?.length
+            );
+          }
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    init();
+  }, [localFilters, fetchContent, fetchDataTrack, propData?.hasMoreData]);
+
+  const handleApplyFilters = async (selectedValues: any) => {
+    setFilterShow(false);
+    if (Object.keys(selectedValues).length === 0) {
+      setLocalFilters((prevFilters: any) => ({
+        ...prevFilters,
+        filters: {},
+        offset: 0,
+      }));
+    } else {
+      const { limit, offset, ...selectedValuesWithoutLimitOffset } =
+        selectedValues;
+      setLocalFilters((prevFilters: any) => ({
+        ...prevFilters,
+        offset: 0,
+        filters: {
+          ...prevFilters.filters,
+          ...selectedValuesWithoutLimitOffset,
+        },
+      }));
+    }
+  };
+
+  return (
+    <LayoutPage
+      isLoadingChildren={isPageLoading}
+      isShow={propData?.isShowLayout}
+    >
+      <Box sx={{ p: 1 }}>
+        {(propData?.showSearch ?? propData?.showFilter) && (
+          <Box
+            sx={{
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'space-between',
+            }}
+          >
+            {propData?.showSearch && (
+              <CommonSearch
+                placeholder={'Search content..'}
+                rightIcon={<SearchIcon />}
+                onRightIconClick={handleSearchClick}
+                inputValue={searchValue ?? ''}
+                onInputChange={handleSearchChange}
+                onKeyPress={(ev: any) => {
+                  if (ev.key === 'Enter') {
+                    handleSearchClick();
+                  }
+                }}
+                sx={{
+                  backgroundColor: '#f0f0f0',
+                  padding: '4px',
+                  borderRadius: '50px',
+                  width: '100%',
+                  marginLeft: '10px',
+                }}
+              />
+            )}
+            {propData?.showFilter && (
+              <Box>
+                <Button variant="outlined" onClick={() => setFilterShow(true)}>
+                  <FilterAltOutlinedIcon />
+                </Button>
+                <FilterDialog
+                  open={filterShow}
+                  onClose={() => setFilterShow(false)}
+                  filterValues={localFilters}
+                  onApply={handleApplyFilters}
+                />
+              </Box>
+            )}
+          </Box>
+        )}
+        <RenderTabContent
+          {...propData}
+          value={tabValue}
+          onChange={handleTabChange}
+          contentData={contentData}
+          _config={propData?._config ?? {}}
+          trackData={trackData ?? []}
+          type={localFilters?.type ?? ''}
+          handleCardClick={handleCardClickLocal}
+          hasMoreData={hasMoreData}
+          handleLoadMore={handleLoadMore}
+          isLoadingMoreData={isLoading}
+          isPageLoading={isLoading && localFilters?.offset === 0}
+          tabs={tabs}
+          isHideEmptyDataMessage={propData?.hasMoreData !== false}
+        />
+        {propData?.showHelpDesk && <HelpDesk />}
+        {propData?.showBackToTop && showBackToTop && <BackToTop />}
+      </Box>
+    </LayoutPage>
+  );
+}

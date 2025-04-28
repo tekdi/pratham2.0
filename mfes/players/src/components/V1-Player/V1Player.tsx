@@ -3,11 +3,15 @@ import { getTelemetryEvents } from '../../services/TelemetryService';
 
 interface PlayerProps {
   playerConfig: any;
+  relatedData?: any;
 }
 
 const basePath = process.env.NEXT_PUBLIC_ASSETS_CONTENT || '/sbplayer';
 
-const V1Player = ({ playerConfig }: PlayerProps) => {
+const V1Player = ({
+  playerConfig,
+  relatedData: { courseId, unitId },
+}: PlayerProps) => {
   const previewRef = useRef<HTMLIFrameElement | null>(null);
 
   useEffect(() => {
@@ -27,17 +31,23 @@ const V1Player = ({ playerConfig }: PlayerProps) => {
             preview.contentWindow.initializePreview(playerConfig);
           }
 
-          preview.addEventListener('renderer:telemetry:event', (event: any) => {
-            console.log('V1 player telemetry event ===>', event);
-            if (event.detail.telemetryData.eid === 'START') {
-              console.log('V1 player telemetry START event ===>', event);
-            }
-            if (event.detail.telemetryData.eid === 'END') {
-              console.log('V1 player telemetry END event ===>', event);
-            }
+          preview.addEventListener(
+            'renderer:telemetry:event',
+            async (event: any) => {
+              console.log('V1 player telemetry event ===>', event);
+              if (event.detail.telemetryData.eid === 'START') {
+                console.log('V1 player telemetry START event ===>', event);
+              }
+              if (event.detail.telemetryData.eid === 'END') {
+                console.log('V1 player telemetry END event ===>', event);
+              }
 
-            getTelemetryEvents(event.detail.telemetryData, 'v1');
-          });
+              await getTelemetryEvents(event.detail.telemetryData, 'v1', {
+                courseId,
+                unitId,
+              });
+            }
+          );
         }, 100);
       };
 

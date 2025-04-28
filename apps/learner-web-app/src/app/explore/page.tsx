@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
-import Layout from '../../components/Layout';
-import LearnerCourse from '../content/LearnerCourse';
+import Layout from '@learner/components/Layout';
+import LearnerCourse from '@learner/components/Content/LearnerCourse';
 
 const App = () => {
   return (
