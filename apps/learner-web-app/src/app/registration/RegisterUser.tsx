@@ -49,7 +49,7 @@ const RegisterUser = () => {
     useState<boolean>(false);
 
   const [otpmodal, setOtpModal] = useState(false);
-  const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
+  const [otp, setOtp] = useState<string[]>(['', '', '', '']);
   const [hash, setHash] = useState<string>('');
   const localFormData = JSON.parse(localStorage.getItem('formData') || '{}');
   const [formData, setFormData] = useState<any>(localFormData);
@@ -113,7 +113,9 @@ const RegisterUser = () => {
         delete responseForm?.schema?.properties.confirm_password;
         delete responseForm?.schema?.properties.username;
         delete responseForm?.schema?.properties.program;
-
+        delete responseForm?.schema?.properties.batch;
+        delete responseForm?.schema?.properties.center;
+        responseForm?.schema?.required.pop('batch');
         //unit name is missing from required so handled from frotnend
         let alterSchema = responseForm?.schema;
         let alterUISchema = responseForm?.uiSchema;
@@ -268,7 +270,7 @@ const RegisterUser = () => {
   };
   const handleOTPModal = () => {
     setOtpModal(false);
-    setOtp(['', '', '', '', '', '']);
+    setOtp(['', '', '', '']);
   };
   const onCreateAnotherAccount = async () => {
     setAccountExistModal(false);
@@ -301,7 +303,7 @@ const RegisterUser = () => {
     } catch (error) {
       showToastMessage('Please enter valid otp', 'error');
     } finally {
-      setOtp(['', '', '', '', '', '']);
+      setOtp(['', '', '', '']);
     }
   };
   const onResend = async () => {

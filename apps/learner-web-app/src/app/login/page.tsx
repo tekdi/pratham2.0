@@ -53,7 +53,7 @@ const LoginPage = () => {
 
   const handleForgotPassword = () => {
     localStorage.setItem('loginRoute', '/login');
-    router.push('/forget-password');
+    router.push('/password-forget');
   };
   const handleLogin = async (data: {
     username: string;

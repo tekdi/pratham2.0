@@ -10,12 +10,22 @@ import { getTenantInfo } from '@learner/utils/API/ProgramService';
 import ContentComponent from '@learner/components/Content/Content';
 import { useTranslation } from '@shared-lib';
 import { checkAuth } from '@shared-lib-v2/utils/AuthService';
+import { CompleteProfileBanner } from '@learner/components/CompleteProfileBanner/CompleteProfileBanner';
+import { profileComplitionCheck } from '@learner/utils/API/userService';
 
 const MyComponent: React.FC = () => {
   const { t } = useTranslation();
   const [filter, setFilter] = useState({});
   const [isLogin, setIsLogin] = useState<boolean | null>(null);
+  const [isProfileCard, setIsProfileCard] = useState(false);
 
+  useEffect(() => {
+    const fetchProfileInfo = async () => {
+      const result = await profileComplitionCheck();
+      setIsProfileCard(!result);
+    };
+    fetchProfileInfo();
+  }, []);
   useEffect(() => {
     const fetchTenantInfo = async () => {
       if (checkAuth()) {
@@ -39,6 +49,8 @@ const MyComponent: React.FC = () => {
 
   return (
     <Layout isLoadingChildren={isLogin === null}>
+      {isProfileCard && <CompleteProfileBanner />}
+
       {isLogin && (
         <>
           <Grid container style={gredientStyle}>
