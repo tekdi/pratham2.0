@@ -1,7 +1,7 @@
 import React from 'react';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { Box, Typography } from '@mui/material';
-import { useTranslation } from '@shared-lib';
+import { Layout as SharedLayout, useTranslation } from '@shared-lib'; // Updated import
 
 const ResponseRecorded: React.FC = () => {
   const { t } = useTranslation();
