@@ -166,7 +166,7 @@ const UserProfileCard = () => {
         sx={{
           background: 'linear-gradient(to bottom, #FFFDF6, #F8EFDA)',
           maxWidth: '600px',
-          padding: '12px',
+          padding: '20px',
           position: 'relative',
         }}
       >

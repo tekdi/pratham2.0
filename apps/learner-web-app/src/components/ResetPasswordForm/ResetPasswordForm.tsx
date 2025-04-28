@@ -35,6 +35,17 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
   };
 
   const handleSubmit = async () => {
+    if (!oldPassword || !newPassword || !confirmPassword) {
+      showToastMessage('Please fill in all fields.', 'error');
+      return;
+    } else if (newPassword !== confirmPassword) {
+      showToastMessage(
+        'New Password and Confirm Password must be the same.',
+        'error'
+      );
+      return;
+    }
+
     onResetPassword(oldPassword, newPassword, confirmPassword);
   };
 
