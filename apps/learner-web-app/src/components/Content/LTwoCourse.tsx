@@ -40,6 +40,11 @@ const LTwoCourse: React.FC<LTwoCourseProps> = ({ onSubmit }) => {
     setSelectedTopic(event.target.value);
   };
 
+  const handleClose = () => {
+    setIsModalOpen(false);
+    setCount(0);
+  };
+
   return (
     <>
       <Typography variant="h1" gutterBottom sx={{ color: '#78590C' }}>
@@ -55,9 +60,15 @@ const LTwoCourse: React.FC<LTwoCourseProps> = ({ onSubmit }) => {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
+          '@media (max-width: 600px)': {
+            flexDirection: 'column',
+            alignItems: 'center',
+          },
         }}
       >
-        <Box sx={{ width: '38%' }}>
+        <Box
+          sx={{ width: '38%', '@media (max-width: 600px)': { width: '100%' } }}
+        >
           <Typography variant="h1" sx={{ color: '#1F1B13' }} gutterBottom>
             {t('LEARNER_APP.L_TWO_COURSE.DESCRIPTION')}
           </Typography>
@@ -79,7 +90,7 @@ const LTwoCourse: React.FC<LTwoCourseProps> = ({ onSubmit }) => {
           <CommonModal
             handleSubmit={handleSubmit}
             isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
+            onClose={handleClose}
             submitText={t('LEARNER_APP.L_TWO_COURSE.SUBMIT_BUTTON')}
           >
             <LevelUp
@@ -91,7 +102,7 @@ const LTwoCourse: React.FC<LTwoCourseProps> = ({ onSubmit }) => {
           <CommonModal
             handleSubmit={handleCloseResponse}
             isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
+            onClose={handleClose}
             submitText={t('LEARNER_APP.L_TWO_COURSE.OKAY_BUTTON')}
           >
             <ResponseRecorded />
