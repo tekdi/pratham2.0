@@ -1,7 +1,7 @@
 import React from 'react';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { Box, Typography } from '@mui/material';
-import { useTranslation } from 'react-i18next';
+import { Layout as SharedLayout, useTranslation } from '@shared-lib'; // Updated import
 
 interface ResponseRecordedProps {}
 
