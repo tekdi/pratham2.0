@@ -324,7 +324,14 @@ export function FilterForm({
                       {cat.name}
                     </Typography>
                   </AccordionSummary>
-                  <AccordionDetails sx={{ padding: '0px 22px' }}>
+                  <AccordionDetails
+                    sx={{
+                      padding: '0px 22px',
+                      minHeight: '100px',
+                      overflow: 'auto',
+                      maxHeight: '120px',
+                    }}
+                  >
                     <FormGroup>
                       {optionsToShow.map((opt) => (
                         <FormControlLabel
@@ -396,7 +403,7 @@ export function FilterForm({
                 key={field.code}
               >
                 <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
+                  expandIcon={<ExpandMoreIcon sx={{ color: '#1C1B1F' }} />}
                   sx={{
                     minHeight: 20,
                     '&.Mui-expanded': {
@@ -417,7 +424,14 @@ export function FilterForm({
                     {field.name}
                   </Typography>
                 </AccordionSummary>
-                <AccordionDetails sx={{ padding: '0px 22px' }}>
+                <AccordionDetails
+                  sx={{
+                    padding: '0px 22px',
+                    minHeight: '100px',
+                    overflow: 'auto',
+                    maxHeight: '120px',
+                  }}
+                >
                   <FormGroup>
                     {rangeToShow.map((r: any) => (
                       <FormControlLabel

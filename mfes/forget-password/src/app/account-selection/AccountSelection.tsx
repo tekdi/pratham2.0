@@ -29,7 +29,7 @@ const AccountSelection = () => {
   const [selectedUserName, setSelectedUserName] = useState('');
 
   const [otpmodal, setOtpModal] = useState(false);
-  const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
+  const [otp, setOtp] = useState<string[]>(['', '', '', '']);
   useEffect(() => {
     const fetchUsernameByMobile = async () => {
       try {

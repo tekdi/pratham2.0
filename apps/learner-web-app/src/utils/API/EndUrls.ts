@@ -21,6 +21,8 @@ export const API_ENDPOINTS = {
   verifyOTP: `${baseurl}/user/verify-otp`,
   program: `${baseurl}/tenant/read`,
   fetchCourseId: `${baseurl}/tracking/content/course/inprogress`,
+  userUpdate: (userId: string) => `${baseurl}/user/update/${userId}`,
+
 };
 
 export const COURSE_PLANNER_UPLOAD_ENDPOINTS = `${process.env.NEXT_PUBLIC_BASE_URL}/prathamservice/v1/course-planner/upload`;
