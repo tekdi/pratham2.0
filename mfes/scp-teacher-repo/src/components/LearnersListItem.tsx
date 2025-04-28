@@ -84,6 +84,8 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const router = useRouter();
   const { t } = useTranslation();
+  const loggedInUserRole = localStorage.getItem('role');
+
   const [openCentersModal, setOpenCentersModal] = React.useState(false);
   const [openDeleteUserModal, setOpenDeleteUserModal] = React.useState(false);
   const [centers, setCenters] = React.useState();
@@ -716,16 +718,20 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
                     option.name !== 'reassign-centers')
               )
             : [
-                // TODO
-                {
-                  label: t('COMMON.REASSIGN_BATCH'),
-                  icon: (
-                    <ApartmentIcon
-                      sx={{ color: theme.palette.warning['300'] }}
-                    />
-                  ),
-                  name: 'reassign-batch',
-                },
+                // Only TL will see this option
+                ...(loggedInUserRole === Role.TEAM_LEADER
+                  ? [
+                      {
+                        label: t('COMMON.REASSIGN_BATCH'),
+                        icon: (
+                          <ApartmentIcon
+                            sx={{ color: theme.palette.warning['300'] }}
+                          />
+                        ),
+                        name: 'reassign-batch',
+                      },
+                    ]
+                  : []),
                 {
                   label: isDropout
                     ? t('COMMON.UNMARK_DROP_OUT')
