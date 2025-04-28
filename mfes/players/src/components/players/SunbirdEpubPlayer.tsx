@@ -4,11 +4,15 @@ import { handleExitEvent } from '../utils/Helper';
 
 interface PlayerConfigProps {
   playerConfig: any;
+  relatedData?: any;
 }
 
 const basePath = process.env.NEXT_PUBLIC_ASSETS_CONTENT || '/sbplayer';
 
-const SunbirdEpubPlayer = ({ playerConfig }: PlayerConfigProps) => {
+const SunbirdEpubPlayer = ({
+  playerConfig,
+  relatedData: { courseId, unitId },
+}: PlayerConfigProps) => {
   const sunbirdEpubPlayerRef = useRef<HTMLIFrameElement | null>(null);
 
   useEffect(() => {
@@ -36,14 +40,20 @@ const SunbirdEpubPlayer = ({ playerConfig }: PlayerConfigProps) => {
                 handleExitEvent();
               }
             });
-            epubElement.addEventListener('telemetryEvent', (event: any) => {
-              console.log('On telemetryEvent', event);
-              try {
-                getTelemetryEvents(event.detail, 'epub');
-              } catch (error) {
-                console.error('Error submitting assessment:', error);
+            epubElement.addEventListener(
+              'telemetryEvent',
+              async (event: any) => {
+                console.log('On telemetryEvent', event);
+                try {
+                  await getTelemetryEvents(event.detail, 'epub', {
+                    courseId,
+                    unitId,
+                  });
+                } catch (error) {
+                  console.error('Error submitting assessment:', error);
+                }
               }
-            });
+            );
 
             const myPlayer =
               playerElement.contentDocument.getElementById('my-player');

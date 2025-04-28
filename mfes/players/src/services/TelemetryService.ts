@@ -27,12 +27,17 @@ export const handleTelemetryEventQuml = (event: any) => {
   getTelemetryEvents(event.detail, 'quml');
 };
 
-export const getTelemetryEvents = (eventData: any, contentType: string) => {
+export const getTelemetryEvents = async (
+  eventData: any,
+  contentType: string,
+  { courseId, unitId }: any = {}
+) => {
   console.log(
     'getTelemetryEvents hit',
     'Telemetry Event',
     contentType,
-    eventData
+    eventData,
+    { courseId, unitId }
   );
 
   if (!eventData || !eventData.object || !eventData.object.id) {
@@ -57,6 +62,15 @@ export const getTelemetryEvents = (eventData: any, contentType: string) => {
   console.log(`${eid}Telemetry`, telemetryData);
 
   localStorage.setItem(telemetryKey, JSON.stringify(telemetryData));
+
+  if (eid === 'START') {
+    await contentWithTelemetryData({
+      identifier,
+      detailsObject: [telemetryData],
+      courseId,
+      unitId,
+    });
+  }
 
   if (eid === 'END' || (contentType === 'quml' && eid === 'SUMMARY')) {
     try {
@@ -92,13 +106,13 @@ export const getTelemetryEvents = (eventData: any, contentType: string) => {
             }
 
             // Skip event if `eid === 'END'` and progress is not 100 in either `summary` or `extra`
-            if (
-              parsedTelemetryEvent?.eid === 'END' &&
-              ((progressFromSummary !== 100 && progressFromSummary !== null) ||
-                (progressFromExtra !== 100 && progressFromExtra !== null))
-            ) {
-              return;
-            }
+            // if (
+            //   parsedTelemetryEvent?.eid === 'END' &&
+            //   ((progressFromSummary !== 100 && progressFromSummary !== null) ||
+            //     (progressFromExtra !== 100 && progressFromExtra !== null))
+            // ) {
+            //   return;
+            // }
 
             // Push parsed telemetry event
             detailsObject.push(parsedTelemetryEvent);
@@ -153,7 +167,12 @@ export const getTelemetryEvents = (eventData: any, contentType: string) => {
       }
 
       try {
-        contentWithTelemetryData({ identifier, detailsObject });
+        await contentWithTelemetryData({
+          identifier,
+          detailsObject,
+          courseId,
+          unitId,
+        });
       } catch (error) {
         console.log(error);
       }
@@ -167,6 +186,8 @@ export const getTelemetryEvents = (eventData: any, contentType: string) => {
 export const contentWithTelemetryData = async ({
   identifier,
   detailsObject,
+  courseId,
+  unitId,
 }: any) => {
   try {
     let resolvedMimeType = localStorage.getItem('mimeType');
@@ -189,8 +210,8 @@ export const contentWithTelemetryData = async ({
       const reqBody: ContentCreate = {
         userId: userId,
         contentId: identifier,
-        courseId: identifier,
-        unitId: identifier,
+        courseId: courseId && unitId ? courseId : identifier,
+        unitId: courseId && unitId ? unitId : identifier,
         contentType: ContentTypeReverseMap[resolvedMimeType] || '',
         contentMime: resolvedMimeType,
         lastAccessOn: lastAccessOn,

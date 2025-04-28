@@ -9,7 +9,9 @@
       "L1_COURSES": "L1 Courses",
       "EXPLORE": "Explore",
       "SURVEYS": "Surveys",
-      "PROFILE": "Profile"
+      "PROFILE": "Profile",
+      "UNITS": "Units",
+      "COURSES": "Courses"
     },
     "COURSE": {
       "GET_STARTED": "Get Started with L1 Courses",
@@ -93,6 +95,9 @@
     "CONTENT_TABS": {
       "LOAD_MORE": "Load More",
       "NO_MORE_DATA": "No more data available"
+    },
+    "PLAYER": {
+      "MORE_RELATED_RESOURCES": "More Related Resources"
     },
     "other_filters": "Other Filters"
   },

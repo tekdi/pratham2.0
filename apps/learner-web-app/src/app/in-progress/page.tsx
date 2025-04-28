@@ -40,7 +40,7 @@ const InProgress: React.FC = () => {
           </Button>
         </Grid>
         <Grid item xs={12} sx={{ p: 5, pt: 0 }}>
-          <ContentComponent limit={8} />
+          <ContentComponent limit={8} hasMoreData />
         </Grid>
       </Grid>
     </Layout>

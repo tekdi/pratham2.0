@@ -8,11 +8,15 @@ import { handleExitEvent } from '../utils/Helper';
 
 interface PlayerConfigProps {
   playerConfig: any;
+  relatedData?: any;
 }
 
 const basePath = process.env.NEXT_PUBLIC_ASSETS_CONTENT || '/sbplayer';
 
-const SunbirdQuMLPlayer = ({ playerConfig }: PlayerConfigProps) => {
+const SunbirdQuMLPlayer = ({
+  playerConfig,
+  relatedData: { courseId, unitId },
+}: PlayerConfigProps) => {
   const SunbirdQuMLPlayerRef = useRef<HTMLIFrameElement | null>(null);
 
   useEffect(() => {
@@ -61,6 +65,8 @@ const SunbirdQuMLPlayer = ({ playerConfig }: PlayerConfigProps) => {
         contentWithTelemetryData({
           identifier: data.identifierWithoutImg,
           detailsObject: data,
+          courseId,
+          unitId,
         });
       } else if (data?.data?.edata?.type === 'EXIT') {
         handleExitEvent();

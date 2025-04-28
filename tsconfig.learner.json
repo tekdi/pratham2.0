@@ -16,18 +16,21 @@
     "baseUrl": ".",
     "paths": {
       "@learner/*": ["apps/learner-web-app/src/*"],
+      "@content-mfes/*": ["mfes/content/src/*"],
       "@login/*": ["mfes/login/src/*"],
       "@forget-password/*": ["mfes/forget-password/src/*"],
       "@shared-lib": ["libs/shared-lib-v2/src/index.ts"],
-      "@Content": ["mfes/content/src/pages/content.tsx"],
+      "@Content": ["mfes/content/src/components/Content/List.tsx"],
       "@ContentEnrollDetails": [
-        "mfes/content/src/pages/content-details/[identifier].tsx"
+        "mfes/content/src/components/Content/ContentEnroll.tsx"
       ],
-      "@ContentDetails": ["mfes/content/src/pages/details/[identifier].tsx"],
-      "@ContentPlayer": ["mfes/content/src/pages/player/[identifier].tsx"],
+      "@CourseUnitDetails": [
+        "mfes/content/src/components/Content/CourseUnitDetails.tsx"
+      ],
+      "@ContentPlayer": ["mfes/content/src/components/Content/Player.tsx"],
 
       //dynamic form
-      "@dynamic-form/*":["apps/learner-web-app/src/components/DynamicForm/*"]
+      "@shared-lib-v2/*": ["libs/shared-lib-v2/src/*"]
     }
   },
   "exclude": ["node_modules", "tmp"]
