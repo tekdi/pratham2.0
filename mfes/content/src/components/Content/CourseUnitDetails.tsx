@@ -2,15 +2,25 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Box } from '@mui/material';
-import { calculateTrackData, trackDataPorps } from '@shared-lib';
+import {
+  calculateTrackData,
+  calculateTrackDataItem,
+  CourseCompletionBanner,
+  trackDataPorps,
+} from '@shared-lib';
 import { hierarchyAPI } from '@content-mfes/services/Hierarchy';
 import { trackingData } from '@content-mfes/services/TrackingService';
 import LayoutPage from '@content-mfes/components/LayoutPage';
 import UnitGrid from '@content-mfes/components/UnitGrid';
 import CollapsebleGrid from '@content-mfes/components/CommonCollapse';
 import InfoCard from '@content-mfes/components/Card/InfoCard';
-import { getUserCertificateStatus } from '@content-mfes/services/Certificate';
+import {
+  getUserCertificateStatus,
+  issueCertificate,
+} from '@content-mfes/services/Certificate';
 import AppConst from '@content-mfes/utils/AppConst/AppConst';
+import { getUserId } from '@content-mfes/services/LoginService';
+import { checkAuth } from '@shared-lib-v2/utils/AuthService';
 
 interface DetailsProps {
   isShowLayout?: any;
@@ -26,52 +36,78 @@ export default function Details(props: DetailsProps) {
   const [trackData, setTrackData] = useState<trackDataPorps[]>([]);
   const [selectedContent, setSelectedContent] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [certificateId, setCertificateId] = useState();
 
   useEffect(() => {
     const getDetails = async (identifier: string) => {
       try {
-        const result = await hierarchyAPI(identifier);
+        const resultHierarchy = await hierarchyAPI(identifier);
         const userId = localStorage.getItem('userId');
-        const tenantId = localStorage.getItem('tenantId');
         let startedOn = '';
-        if (userId && tenantId) {
+        if (checkAuth()) {
           const data = await getUserCertificateStatus({
-            userId,
+            userId: userId as string,
             courseId: courseId as string,
           });
           if (
             !(
               data?.result?.status === 'enrolled' ||
-              data?.result?.status === 'completed'
+              data?.result?.status === 'completed' ||
+              data?.result?.status === 'viewCertificate'
             )
           ) {
             router.replace(`/content-details/${courseId}`);
-          }
-          startedOn = data?.result?.createdOn;
-        }
-        setSelectedContent({ ...result, startedOn });
-        if (!userId) return; // Ensure required values exist
-
-        try {
-          const userIdArray = userId?.split(',');
-          //@ts-ignore
-          const course_track_data = await trackingData(userIdArray, [courseId]);
-          if (course_track_data?.data) {
-            //@ts-ignore
+          } else {
+            const userIdArray: string[] = Array.isArray(userId)
+              ? (userId as string[]).filter(Boolean)
+              : [userId as string].filter(Boolean);
+            const course_track_data = await trackingData(userIdArray, [
+              courseId as string,
+            ]);
             const userTrackData =
               course_track_data.data.find(
                 (course: any) => course.userId === userId
               )?.course || [];
+
             const newTrackData = calculateTrackData(
               userTrackData?.[0] ?? {},
-              result?.children ?? []
+              resultHierarchy?.children ?? []
             );
 
             setTrackData(newTrackData ?? []);
+            if (data?.result?.status === 'viewCertificate') {
+              setCertificateId(data?.result?.certificateId);
+            } else if (course_track_data?.data && !unitId) {
+              const course_track = calculateTrackDataItem(
+                userTrackData?.[0] ?? {},
+                resultHierarchy ?? {}
+              );
+
+              if (
+                course_track?.status === 'completed' &&
+                data?.result?.status === 'enrolled'
+              ) {
+                const userResponse = await getUserId();
+                await issueCertificate({
+                  userId: userId,
+                  courseId: courseId,
+                  unitId: unitId,
+                  issuanceDate: new Date().toISOString(),
+                  expirationDate: new Date(
+                    new Date().setFullYear(new Date().getFullYear() + 20)
+                  ).toISOString(),
+                  credentialId: data?.result?.usercertificateId,
+                  firstName: userResponse?.firstName ?? '',
+                  middleName: userResponse?.middleName ?? '',
+                  lastName: userResponse?.lastName ?? '',
+                  courseName: resultHierarchy?.name ?? '',
+                });
+              }
+            }
           }
-        } catch (error) {
-          console.error('Error fetching track data:', error);
+          startedOn = data?.result?.createdOn;
         }
+        setSelectedContent({ ...resultHierarchy, startedOn });
       } catch (error) {
         console.error('Failed to fetch content:', error);
       } finally {
@@ -79,7 +115,7 @@ export default function Details(props: DetailsProps) {
       }
     };
     if (identifier) getDetails(identifier as string);
-  }, [identifier, courseId, router]);
+  }, [identifier, courseId, router, unitId]);
 
   const handleItemClick = (subItem: any) => {
     localStorage.setItem('unitId', subItem?.courseId);
@@ -125,6 +161,9 @@ export default function Details(props: DetailsProps) {
       />
 
       <Box sx={{ pt: 5, pb: 10, px: 10 }}>
+        {certificateId && (
+          <CourseCompletionBanner certificateId={certificateId} />
+        )}
         {props?.type === 'collapse' ? (
           selectedContent?.children?.length > 0 && (
             <CollapsebleGrid

@@ -63,6 +63,15 @@ export const getTelemetryEvents = async (
 
   localStorage.setItem(telemetryKey, JSON.stringify(telemetryData));
 
+  if (eid === 'START') {
+    await contentWithTelemetryData({
+      identifier,
+      detailsObject: [telemetryData],
+      courseId,
+      unitId,
+    });
+  }
+
   if (eid === 'END' || (contentType === 'quml' && eid === 'SUMMARY')) {
     try {
       const detailsObject: any[] = [];

@@ -1,11 +1,9 @@
+'use client';
 import React, { useEffect, useState } from 'react';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox, { CheckboxProps } from '@mui/material/Checkbox';
+import { CheckboxProps } from '@mui/material/Checkbox';
 import {
   Modal,
   Box,
-  Button,
   Typography,
   IconButton,
   Stack,
@@ -19,14 +17,7 @@ import {
   downloadCertificate,
   renderCertificate,
 } from '../../utils/CertificateService/coursesCertificates';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  List,
-  ListItemButton,
-  ListItemText,
-} from '@mui/material';
+
 const style = {
   position: 'absolute' as const,
   top: '50%',
@@ -58,7 +49,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
   open,
   setOpen,
 }) => {
-  certificateId = 'did:rcw:20f5fe82-4912-401a-a33a-09b46413b9cf'; // temporaory hardcoded
+  // certificateId = 'did:rcw:20f5fe82-4912-401a-a33a-09b46413b9cf'; // temporaory hardcoded
   const handleCloseCertificate = async () => {};
   const [certificateHtml, setCertificateHtml] = useState('');
   const [showShareOptions, setShowShareOptions] = useState(false);
