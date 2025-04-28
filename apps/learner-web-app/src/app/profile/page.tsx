@@ -9,6 +9,7 @@ import { courseWiseLernerList } from '@shared-lib-v2/utils/CertificateService/co
 import { CertificateModal, get } from '@shared-lib';
 
 import axios from 'axios';
+import { baseurl } from '@learner/utils/API/EndUrls';
 type FilterDetails = {
   status?: string[];
   tenantId?: string;
@@ -45,8 +46,9 @@ const ProfilePage = () => {
       console.log('response', response.data);
       for (const item of response.data) {
         try {
+          const url = baseurl;
           const Details: any = await get(
-            `https://dev-interface.prathamdigital.org/interface/v1//action/content/v3/read/${item.courseId}`,
+            `${baseurl}/action/content/v3/read/${item.courseId}`,
             {
               tenantId: localStorage.getItem('tenantId') || '',
               Authorization: `Bearer ${localStorage.getItem('accToken') || ''}`,

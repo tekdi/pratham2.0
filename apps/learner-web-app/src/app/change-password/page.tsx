@@ -13,6 +13,7 @@ import { useRouter } from 'next/navigation';
 import PasswordResetSuccess from '@forget-password/Components/PasswordResetSuccess/PasswordResetSuccess';
 import { login, resetPassword } from '@learner/utils/API/LoginService';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import Layout from '../../components/Layout';
 
 const ChangePassword = () => {
   const [otp, setOtp] = useState<string[]>(['', '', '', '']);
@@ -130,64 +131,66 @@ const ChangePassword = () => {
 
   return (
     <>
-      <Box
-        sx={{ display: 'flex', alignItems: 'center', mb: 2, mt: 2 }}
-        onClick={() => router.back()}
-      >
-        <IconButton>
-          <ArrowBackIcon />
-        </IconButton>
-      </Box>
-      <Box
-        height="100vh"
-        width="100vw"
-        display="flex"
-        flexDirection="column"
-        overflow="auto"
-        mt="70px"
-      >
-        <Typography
-          variant="body1"
-          mb="20px"
-          sx={{
-            fontWeight: 600,
-            fontSize: '24px',
-            lineHeight: '32px',
-            letterSpacing: '0px',
-            textAlign: 'center',
-          }}
+      <Layout>
+        <Box
+          sx={{ display: 'flex', alignItems: 'center', mb: 2, mt: 2 }}
+          onClick={() => router.back()}
         >
-          Change Password
-        </Typography>
-        <ResetPasswordForm
-          onResetPassword={handleResetPassword}
-          onForgotPassword={handleForgotPassword}
-        />
-      </Box>
-      <SimpleModal
-        open={otpmodal}
-        onClose={handleOTPModal}
-        showFooter
-        primaryText={'Verify OTP'}
-        modalTitle={'Verify Your Phone Number'}
-        primaryActionHandler={onVerify}
-      >
-        <OtpVerificationComponent
-          onResend={onResend}
-          otp={otp}
-          setOtp={setOtp}
-          maskedNumber={maskMobileNumber(mobile || '')}
-        />
-      </SimpleModal>
-      <SimpleModal
-        open={resetPasswordSuccessModal}
-        onClose={onCloseSuccessModal}
-        showFooter
-        primaryText={'Okay'}
-        primaryActionHandler={onCloseSuccessModal}
-      >
-        <PasswordResetSuccess />
-      </SimpleModal>
+          <IconButton>
+            <ArrowBackIcon />
+          </IconButton>
+        </Box>
+        <Box
+          height="100vh"
+          width="100vw"
+          display="flex"
+          flexDirection="column"
+          overflow="auto"
+          mt="70px"
+        >
+          <Typography
+            variant="body1"
+            mb="20px"
+            sx={{
+              fontWeight: 600,
+              fontSize: '24px',
+              lineHeight: '32px',
+              letterSpacing: '0px',
+              textAlign: 'center',
+            }}
+          >
+            Change Password
+          </Typography>
+          <ResetPasswordForm
+            onResetPassword={handleResetPassword}
+            onForgotPassword={handleForgotPassword}
+          />
+        </Box>
+        <SimpleModal
+          open={otpmodal}
+          onClose={handleOTPModal}
+          showFooter
+          primaryText={'Verify OTP'}
+          modalTitle={'Verify Your Phone Number'}
+          primaryActionHandler={onVerify}
+        >
+          <OtpVerificationComponent
+            onResend={onResend}
+            otp={otp}
+            setOtp={setOtp}
+            maskedNumber={maskMobileNumber(mobile || '')}
+          />
+        </SimpleModal>
+        <SimpleModal
+          open={resetPasswordSuccessModal}
+          onClose={onCloseSuccessModal}
+          showFooter
+          primaryText={'Okay'}
+          primaryActionHandler={onCloseSuccessModal}
+        >
+          <PasswordResetSuccess />
+        </SimpleModal>
+      </Layout>
     </>
   );
 };

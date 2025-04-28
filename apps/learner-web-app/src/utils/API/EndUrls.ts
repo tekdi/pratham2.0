@@ -1,4 +1,4 @@
-const baseurl = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;
+export const baseurl = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;
 
 export const API_ENDPOINTS = {
   accountCreate: `${baseurl}/account/create`,

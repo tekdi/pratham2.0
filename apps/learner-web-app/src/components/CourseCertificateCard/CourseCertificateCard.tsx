@@ -8,6 +8,7 @@ import {
   CardMedia,
 } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 interface CertificateCardProps {
   title: string;
@@ -105,7 +106,7 @@ const CourseCertificateCard: React.FC<CertificateCardProps> = ({
             color: '#1976D2',
             pl: 0,
           }}
-          endIcon={<span style={{ fontSize: '18px' }}>→</span>}
+          endIcon={<ArrowForwardIcon sx={{ fontSize: '18px' }} />}
         >
           Preview Certificate
         </Button>

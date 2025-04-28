@@ -76,6 +76,14 @@ const UserProfileCard = () => {
     if (option === 'Change Password') {
       router.push('/change-password');
     }
+    if (option === 'Change Username') {
+      router.push('/change-username');
+    }
+    if (option === 'Privacy Guidelines') {
+      window.open('https://www.pratham.org/privacy-guidelines/', '_blank');
+    }
+    if (option === 'Consent Form') {
+    }
     setSelectedOption(option);
     setOpen(true);
     setAnchorEl(null); // Close the menu
