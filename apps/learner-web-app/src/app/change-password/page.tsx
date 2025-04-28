@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, IconButton, Typography } from '@mui/material';
 import Header from '@learner/components/Header/Header';
 import ResetPasswordForm from '@learner/components/ResetPasswordForm/ResetPasswordForm';
 import SimpleModal from '@learner/components/SimpleModal/SimpleModal';
@@ -12,6 +12,8 @@ import { maskMobileNumber } from '@learner/utils/helper';
 import { useRouter } from 'next/navigation';
 import PasswordResetSuccess from '@forget-password/Components/PasswordResetSuccess/PasswordResetSuccess';
 import { login, resetPassword } from '@learner/utils/API/LoginService';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
 const ChangePassword = () => {
   const [otp, setOtp] = useState<string[]>(['', '', '', '']);
   const [otpmodal, setOtpModal] = useState(false);
@@ -128,6 +130,14 @@ const ChangePassword = () => {
 
   return (
     <>
+      <Box
+        sx={{ display: 'flex', alignItems: 'center', mb: 2, mt: 2 }}
+        onClick={() => router.back()}
+      >
+        <IconButton>
+          <ArrowBackIcon />
+        </IconButton>
+      </Box>
       <Box
         height="100vh"
         width="100vw"
