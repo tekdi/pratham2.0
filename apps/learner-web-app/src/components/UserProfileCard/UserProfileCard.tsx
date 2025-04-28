@@ -69,8 +69,12 @@ const UserProfileCard = () => {
   };
 
   const handleOpen = (option: string) => {
+    console.log(option);
     if (option === 'Edit Profile') {
       router.push('/profile-complition');
+    }
+    if (option === 'Change Password') {
+      router.push('/change-password');
     }
     setSelectedOption(option);
     setOpen(true);
