@@ -1,11 +1,15 @@
 import { Box, Button, Typography, Paper } from '@mui/material';
 import { useRouter } from 'next/navigation';
+import { Loader, useTranslation } from '@shared-lib'; // Updated import
 
 export const CompleteProfileBanner = () => {
   const router = useRouter();
+  const { t } = useTranslation(); // Initialize translation function
+
   const handleCompleteProfileClick = () => {
     router.push('/profile-complition?isComplition=true');
   };
+
   return (
     <Paper
       elevation={2}
@@ -19,8 +23,8 @@ export const CompleteProfileBanner = () => {
       }}
     >
       <Typography variant="body1" sx={{ fontWeight: 500 }}>
-        Complete your profile so we can guide you better on your learning
-        journey
+        {t('LEARNER_APP.COMPLETE_PROFILE_BANNER.MESSAGE')}{' '}
+        {/* Internationalized message */}
       </Typography>
       <Button
         onClick={handleCompleteProfileClick}
@@ -38,7 +42,8 @@ export const CompleteProfileBanner = () => {
           },
         }}
       >
-        Complete Profile
+        {t('LEARNER_APP.COMPLETE_PROFILE_BANNER.BUTTON')}{' '}
+        {/* Internationalized button text */}
       </Button>
     </Paper>
   );

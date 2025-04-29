@@ -13,9 +13,12 @@ const CustomDateWidget = ({
   required,
   label,
   rawErrors = [],
+  uiSchema = {}, // <-- include uiSchema
 }: any) => {
   const { minValue, maxValue } = options;
   const { t } = useTranslation();
+
+  const isDisabled = uiSchema?.['ui:disabled'] === true;
 
   const initialValue =
     typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}$/)
@@ -50,6 +53,7 @@ const CustomDateWidget = ({
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <DatePicker
+        disabled={isDisabled}
         label={`${t(`FORM.${label}`, {
           defaultValue: label,
         })} ${required ? '*' : ''}`}

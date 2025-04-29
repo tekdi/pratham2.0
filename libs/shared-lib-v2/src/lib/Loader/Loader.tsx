@@ -7,11 +7,19 @@ interface LoaderProps {
   layoutHeight?: number;
   children: ReactNode;
   _loader?: React.CSSProperties;
+  _children?: React.CSSProperties;
   isHideMaxHeight?: Boolean;
 }
 
 export const Loader: React.FC<LoaderProps> = memo(
-  ({ isLoading, layoutHeight, _loader, children, isHideMaxHeight }) => {
+  ({
+    isLoading,
+    layoutHeight,
+    _loader,
+    _children,
+    children,
+    isHideMaxHeight,
+  }) => {
     return (
       <>
         {isLoading && (
@@ -41,6 +49,7 @@ export const Loader: React.FC<LoaderProps> = memo(
             ...(isLoading || !isHideMaxHeight
               ? { height: `calc(100vh - ${layoutHeight}px)` }
               : {}),
+            ..._children,
           }}
         >
           {children}

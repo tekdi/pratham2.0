@@ -63,6 +63,24 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
       onlyHideElements={['footer']}
       {...props}
       _topAppBar={{
+        _brand: {
+          name: 'YouthNet',
+          _box: {
+            onClick: () => router.push('/content'),
+            sx: {
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+            },
+            _text: {
+              fontWeight: 400,
+              fontSize: '22px',
+              lineHeight: '28px',
+              textAlign: 'center',
+            },
+          },
+        },
         navLinks: defaultNavLinks,
         _navLinkBox: { gap: 5 },
         onLanguageChange,
