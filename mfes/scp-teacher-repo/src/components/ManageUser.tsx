@@ -8,11 +8,14 @@ import ManageCentersModal from '@/components/ManageCentersModal';
 import ManageUsersModal from '@/components/ManageUsersModal';
 import { showToastMessage } from '@/components/Toastify';
 import { cohortList, getCohortList } from '@/services/CohortServices';
-import { getMyUserList } from '@/services/MyClassDetailsService';
+import {
+  getMyCohortFacilitatorList,
+  getMyUserList,
+} from '@/services/MyClassDetailsService';
 import reassignLearnerStore from '@/store/reassignLearnerStore';
 import useStore from '@/store/store';
 import { QueryKeys, Role, Status, Telemetry } from '@/utils/app.constant';
-import { getUserFullName, toPascalCase } from '@/utils/Helper';
+import { fetchUserData, getUserFullName, toPascalCase } from '@/utils/Helper';
 import { telemetryFactory } from '@/utils/telemetry';
 import AddIcon from '@mui/icons-material/Add';
 import ApartmentIcon from '@mui/icons-material/Apartment';
@@ -38,6 +41,7 @@ import SearchBar from './Searchbar';
 import SimpleModal from './SimpleModal';
 import FacilitatorManage from '@/shared/FacilitatorManage/FacilitatorManage';
 import { customFields } from './GeneratedSchemas';
+import { fetchCohortMemberList } from '@/services/CohortService/cohortService';
 
 interface Cohort {
   cohortId: string;
@@ -62,6 +66,7 @@ interface ManageUsersProps {
   isFromFLProfile?: boolean;
   teacherUserId?: string;
   hideSearch?: boolean;
+  isFromCenterDetailPage?: boolean;
 }
 
 const ManageUser: React.FC<ManageUsersProps> = ({
@@ -71,6 +76,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
   isFromFLProfile = false,
   teacherUserId,
   hideSearch = false,
+  isFromCenterDetailPage = false,
 }) => {
   const { t } = useTranslation();
   const theme = useTheme<any>();
@@ -160,7 +166,6 @@ const ManageUser: React.FC<ManageUsersProps> = ({
             return block?.blockId;
           })
           .join('');
-
         if (cohortId) {
           const limit = 10;
           const page = offset;
@@ -304,8 +309,102 @@ const ManageUser: React.FC<ManageUsersProps> = ({
         setLoading(false);
       }
     };
-    getFacilitator();
-  }, [isFacilitatorAdded, reloadState, page, infinitePage]);
+
+    const fetchFacilitators = async () => {
+      const cohortId = cohortData;
+      const page = 0;
+      const filters = {
+        cohortId: cohortId,
+        role: Role.TEACHER,
+        status: [Status.ACTIVE],
+      };
+      const facilitatorResponse = await fetchCohortMemberList({
+        page,
+        filters,
+      });
+      if (facilitatorResponse?.result?.userDetails) {
+        let facilitatorList = facilitatorResponse.result.userDetails;
+        if (!facilitatorList || facilitatorList?.length === 0) {
+          console.log('No users found.');
+          return;
+        }
+        const userIds = facilitatorList?.map((user: any) => user.userId);
+
+        const cohortDetailsPromises = userIds.map((userId: string) =>
+          queryClient.fetchQuery({
+            queryKey: [QueryKeys.MY_COHORTS, userId],
+            queryFn: () => getCohortList(userId, { customField: 'true' }),
+          })
+        );
+
+        const cohortDetailsResults = await Promise.allSettled(
+          cohortDetailsPromises
+        );
+
+        const cohortDetails = cohortDetailsResults.map((result) => {
+          if (result.status === 'fulfilled') {
+            return result.value;
+          } else {
+            console.error(
+              'Error fetching cohort details for a user:',
+              result.reason
+            );
+            return null; // or handle the error as needed
+          }
+        });
+
+        const extractedData = facilitatorList?.map(
+          (user: any, index: number) => {
+            const cohorts = cohortDetails[index] || [];
+
+            const batches = cohorts.flatMap((cohort: any) =>
+              (cohort.childData || []).filter(
+                (child: any) => child.type === 'BATCH'
+              )
+            );
+
+            const batchNames = cohorts
+              .filter(
+                (item: any) =>
+                  item.type === 'BATCH' && item.cohortStatus === 'active'
+              )
+              .map((item: any) => item.cohortName);
+
+            const cohortNames = cohorts
+              .filter(({ cohortStatus }: any) => cohortStatus === Status.ACTIVE)
+              .map(({ cohortName }: any) => toPascalCase(cohortName))
+              .join(', ');
+
+            return {
+              userId: user?.userId,
+              name: toPascalCase(
+                getUserFullName({
+                  firstName: user?.firstName,
+                  lastName: user?.lastName,
+                  // name: user?.name,
+                })
+              ),
+              cohortNames: cohortNames || null,
+              batchNames: batchNames || null,
+              customFields: user?.customField,
+            };
+          }
+        );
+        setFilteredUsers(extractedData);
+      }
+    };
+    if (isFromCenterDetailPage) {
+      fetchFacilitators();
+    } else {
+      getFacilitator();
+    }
+  }, [
+    isFacilitatorAdded,
+    reloadState,
+    page,
+    infinitePage,
+    isFromCenterDetailPage,
+  ]);
 
   const handleClose = () => {
     setOpen(false);
@@ -669,30 +768,33 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                     placeholder={t('COMMON.SEARCH_FACILITATORS')}
                   />
                 )}
-
-                <Box mt={'18px'} px={'18px'} ml={'10px'}>
-                  <Button
-                    sx={{
-                      border: `1px solid ${theme.palette.error.contrastText}`,
-                      borderRadius: '100px',
-                      height: '40px',
-                      width: '8rem',
-                      color: theme.palette.error.contrastText,
-                      '& .MuiButton-endIcon': {
-                        marginLeft: isRTL ? '0px !important' : '8px !important',
-                        marginRight: isRTL
-                          ? '8px !important'
-                          : '-2px !important',
-                      },
-                      width: '100%',
-                    }}
-                    className="text-1E"
-                    onClick={handleOpenAddFaciModal}
-                    endIcon={<AddIcon />}
-                  >
-                    {t('COMMON.ADD_NEW')}
-                  </Button>
-                </Box>
+                {isFromCenterDetailPage ? null : (
+                  <Box mt={'18px'} px={'18px'} ml={'10px'}>
+                    <Button
+                      sx={{
+                        border: `1px solid ${theme.palette.error.contrastText}`,
+                        borderRadius: '100px',
+                        height: '40px',
+                        width: '8rem',
+                        color: theme.palette.error.contrastText,
+                        '& .MuiButton-endIcon': {
+                          marginLeft: isRTL
+                            ? '0px !important'
+                            : '8px !important',
+                          marginRight: isRTL
+                            ? '8px !important'
+                            : '-2px !important',
+                        },
+                        width: '100%',
+                      }}
+                      className="text-1E"
+                      onClick={handleOpenAddFaciModal}
+                      endIcon={<AddIcon />}
+                    >
+                      {t('COMMON.ADD_NEW')}
+                    </Button>
+                  </Box>
+                )}
               </Grid>
             )}
 
@@ -748,6 +850,132 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                             loadingText={t('COMMON.LOADING')}
                           />
                         </Box>
+                      ) : isFromCenterDetailPage ? (
+                        <>
+                          <Box>
+                            <Grid container spacing={2}>
+                              {filteredUsers.length > 0 ? (
+                                filteredUsers.map((user) => (
+                                  <Grid
+                                    item
+                                    xs={12}
+                                    sm={12}
+                                    md={6}
+                                    lg={4}
+                                    key={user.userId}
+                                  >
+                                    <Box
+                                      display={'flex'}
+                                      borderBottom={`1px solid ${theme.palette.warning['A100']}`}
+                                      width={'100%'}
+                                      justifyContent={'space-between'}
+                                      sx={{
+                                        cursor: 'pointer',
+                                        '@media (min-width: 600px)': {
+                                          border: `1px solid  ${theme.palette.action.selected}`,
+                                          padding: '4px 10px',
+                                          borderRadius: '8px',
+                                          background:
+                                            theme.palette.warning['A400'],
+                                        },
+                                      }}
+                                    >
+                                      <Box
+                                        display="flex"
+                                        alignItems="center"
+                                        gap="5px"
+                                      >
+                                        <Box>
+                                          <CustomLink
+                                            className="word-break"
+                                            href="#"
+                                            onClick={(e) => e.preventDefault()}
+                                          >
+                                            <Typography
+                                              onClick={() => {
+                                                handleTeacherFullProfile(
+                                                  user?.userId
+                                                );
+                                              }}
+                                              sx={{
+                                                textAlign: 'left',
+                                                fontSize: '16px',
+                                                fontWeight: '400',
+                                                marginTop: '5px',
+                                                color:
+                                                  theme.palette.secondary.main,
+                                              }}
+                                            >
+                                              {`${user?.name}`}
+                                            </Typography>
+                                          </CustomLink>
+                                          {/* Uncomment if batchnames to be displayed */}
+                                          <Box
+                                            sx={{
+                                              backgroundColor:
+                                                theme.palette.action.selected,
+                                              padding: '5px',
+                                              width: 'fit-content',
+                                              borderRadius: '5px',
+                                              fontSize: '12px',
+                                              fontWeight: '600',
+                                              color: 'black',
+                                              marginBottom: '10px',
+                                            }}
+                                          >
+                                            {user?.batchNames?.length > 0
+                                              ? getBatchNames(user.batchNames)
+                                              : t(
+                                                  'ATTENDANCE.NO_BATCHES_ASSIGNED'
+                                                )}
+                                          </Box>
+                                        </Box>
+                                      </Box>
+                                      <Box>
+                                        <MoreVertIcon
+                                          onClick={(event) => {
+                                            isMobile
+                                              ? toggleDrawer(
+                                                  'bottom',
+                                                  true,
+                                                  user
+                                                )(event)
+                                              : handleMenuOpen(event, user);
+                                          }}
+                                          sx={{
+                                            fontSize: '24px',
+                                            marginTop: '1rem',
+                                            color: theme.palette.warning['300'],
+                                            cursor: 'pointer',
+                                          }}
+                                        />
+                                      </Box>
+                                    </Box>
+                                  </Grid>
+                                ))
+                              ) : (
+                                <Box
+                                  sx={{
+                                    m: '1.125rem',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    width: '100%',
+                                  }}
+                                >
+                                  <Typography
+                                    style={{
+                                      width: '100%',
+                                      textAlign: 'center',
+                                    }}
+                                  >
+                                    {t('COMMON.NO_DATA_FOUND')}
+                                  </Typography>
+                                </Box>
+                              )}
+                            </Grid>
+                          </Box>
+                        </>
                       ) : (
                         <>
                           <Box>
@@ -1058,7 +1286,9 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                 reassignuserId={
                   isFromFLProfile ? teacherUserId : selectedUser?.userId
                 }
-                selectedUserData={selectedUserData}
+                selectedUserData={
+                  isFromCenterDetailPage ? selectedUser : selectedUserData
+                }
                 // onFacilitatorAdded={handleFacilitatorAdded}
               />
 
