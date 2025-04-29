@@ -68,7 +68,7 @@ interface HierarchyResponse {
 }
 
 export interface ContentProps {
-  _config?: object;
+  _config?: any;
   filters?: object;
   contentTabs?: string[];
   cardName?: string;
@@ -163,6 +163,9 @@ export default function Content(props: Readonly<ContentProps>) {
           type: filter.type,
         });
         const response = resultResponse?.result;
+        if (props?._config?.getContentData) {
+          props?._config?.getContentData(response);
+        }
         return response;
       } catch (error) {
         if (error instanceof Error && error.name === 'AbortError') {
