@@ -1,3 +1,4 @@
+import { ContentCreate } from '../utils/Interface';
 import { URL_CONFIG } from '../utils/url.config';
 import axios from 'axios';
 
@@ -78,6 +79,17 @@ export const getQumlData = async (identifier: any) => {
     return response?.data?.result?.content || response?.data?.result;
   } catch (error) {
     console.error('Error fetching content:', error);
+    throw error;
+  }
+};
+
+export const createContentTracking = async (reqBody: ContentCreate) => {
+  const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/content/create`;
+  try {
+    const response = await axios.post(apiUrl, reqBody);
+    return response?.data;
+  } catch (error) {
+    console.log(error);
     throw error;
   }
 };

@@ -258,7 +258,7 @@
     "LEARNER_UPDATED_SUCCESSFULLY": "Learner has been successfully updated!",
     "EDIT_LEARNER": "Edit Learner",
     "NO_LEARNERS_FOUND": "No Learners Found",
-    "RE_ASSIGN_LEARNER":"Re-assign Learner"
+    "RE_ASSIGN_LEARNER": "Re-assign Learner"
   },
   "MENTORS": {
     "SEARCHBAR_PLACEHOLDER": "Search mentors..",
@@ -476,7 +476,7 @@
     "NAME": "Name",
     "MOBILE_NUMBER": "Mobile Number",
     "CENTER": "Center",
-    "BATCH":"Batch",
+    "BATCH": "Batch",
     "ENGLISH": "English",
     "HOME_SCIENCE": "Home Science",
     "MATH": "Math",
@@ -767,6 +767,9 @@
   "REGULAR": "Regular",
   "REMOTE": "Remote",
   "IS_VOLUNTEER": "Is Volunteer",
+  "SKILLING_CENTER_IMAGE": "Sklling Center Image",
+  "INDUSTRY": "Industry",
+  "GOOGLE_MAP_LINK": "Google Map Link",
   "YOUTH": {
     "UPDATE_YOUTH": "Update Youth",
     "NEW_YOUTH": "New Youth",
@@ -786,12 +789,12 @@
     "UNEMPLOYED_OR_DOMESTIC_WORK": "Unemployed or Domestic Work"
   },
   "middle_name": "Middle Name",
-  "ADDRESS":" Address",
+  "ADDRESS": " Address",
   "DOB": "Date of Birth",
   "SUBJECT": "Subject",
-   "UNMARRIED": "Unmarried",
+  "UNMARRIED": "Unmarried",
   "MARRIED": "Married",
   "DIVORCED": "Divorced",
   "SELF_PLACED": "Self Placed",
-   "DESIGNATION": "Designation"
+  "DESIGNATION": "Designation"
 }
