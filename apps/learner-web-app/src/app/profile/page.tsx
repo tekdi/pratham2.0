@@ -7,8 +7,6 @@ import UserProfileCard from '@learner/components/UserProfileCard/UserProfileCard
 import CourseCertificateCard from '@learner/components/CourseCertificateCard/CourseCertificateCard';
 import { courseWiseLernerList } from '@shared-lib-v2/utils/CertificateService/coursesCertificates';
 import { CertificateModal, get } from '@shared-lib';
-
-import axios from 'axios';
 import { baseurl } from '@learner/utils/API/EndUrls';
 type FilterDetails = {
   status?: string[];
@@ -16,10 +14,12 @@ type FilterDetails = {
   userId?: string;
 };
 const ProfilePage = () => {
-  const [filters, setFilters] = useState<FilterDetails>({
+  const [filters] = useState<FilterDetails>({
     status: ['completed', 'viewCertificate'],
-    tenantId: localStorage.getItem('tenantId') || '',
-    userId: localStorage.getItem('userId') || '',
+    tenantId:
+      (typeof window !== 'undefined' && localStorage.getItem('tenantId')) || '',
+    userId:
+      (typeof window !== 'undefined' && localStorage.getItem('userId')) || '',
   });
   const [showCertificate, setShowCertificate] = useState(false);
   const [certificateId, setCertificateId] = useState('');
