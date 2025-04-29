@@ -9,7 +9,11 @@ const Content = dynamic(() => import('@Content'), {
   ssr: false,
 });
 
-const ContentComponent = ({ limit = 4, hasMoreData = false }: any) => {
+const ContentComponent = ({
+  limit = 4,
+  hasMoreData = false,
+  getContentData,
+}: any) => {
   const { t } = useTranslation();
   const [identifier, setIdentifier] = useState([]);
 
@@ -50,6 +54,7 @@ const ContentComponent = ({ limit = 4, hasMoreData = false }: any) => {
         default_img: '/images/image_ver.png',
         _card: { isHideProgress: true },
         default_img_alt: t('LEARNER_APP.CONTENT.DEFAULT_IMAGE_ALT'),
+        getContentData: getContentData,
       }}
     />
   );
