@@ -13,7 +13,7 @@ import {
   Paper,
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { useTranslation } from '@shared-lib';
+import { Loader, useTranslation } from '@shared-lib'; // Updated import
 
 interface LoginComponentProps {
   onLogin: (data: {
@@ -30,7 +30,7 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
   handleAddAccount,
   handleForgotPassword,
 }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(); // Initialize translation function
 
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -71,7 +71,7 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
           mb: 3,
         }}
       >
-        {t('LEARNER_APP.LOGIN.login_title')}
+        {t('LEARNER_APP.LOGIN.login_title')} {/* Internationalized title */}
       </Typography>
 
       <TextField
@@ -129,7 +129,8 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
           sx={{ cursor: 'pointer' }}
           onClick={handleForgotPassword}
         >
-          {t('LEARNER_APP.LOGIN.forgot_password')}
+          {t('LEARNER_APP.LOGIN.forgot_password')}{' '}
+          {/* Internationalized text */}
         </Typography>
       </Box>
 

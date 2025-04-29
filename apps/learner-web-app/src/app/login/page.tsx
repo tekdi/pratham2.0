@@ -10,6 +10,7 @@ import { showToastMessage } from '@learner/components/ToastComponent/Toastify';
 import { useRouter } from 'next/navigation';
 import { useMediaQuery, useTheme } from '@mui/material';
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
+import { Loader, useTranslation } from '@shared-lib';
 
 const Login = dynamic(
   () => import('@login/Components/LoginComponent/LoginComponent'),
@@ -22,6 +23,7 @@ const LoginPage = () => {
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const { t } = useTranslation(); // Initialize translation function
   const handleAddAccount = () => {};
 
   useEffect(() => {
@@ -42,10 +44,10 @@ const LoginPage = () => {
           const fp = await FingerprintJS.load();
           const { visitorId } = await fp.get();
           localStorage.setItem('did', visitorId);
-          console.log('Device fingerprint generated successfully');
+          console.log(t('LOGIN_PAGE.DEVICE_FINGERPRINT_SUCCESS')); // Internationalized log message
         }
       } catch (error) {
-        console.error('Error generating device fingerprint:', error);
+        console.error(t('LOGIN_PAGE.DEVICE_FINGERPRINT_ERROR')); // Internationalized error message
       }
     };
     init();
@@ -55,6 +57,7 @@ const LoginPage = () => {
     localStorage.setItem('loginRoute', '/login');
     router.push('/password-forget');
   };
+
   const handleLogin = async (data: {
     username: string;
     password: string;
@@ -67,17 +70,21 @@ const LoginPage = () => {
       if (response?.result?.access_token) {
         handleSuccessfulLogin(response?.result, data, router);
       } else {
-        showToastMessage('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT', 'error');
+        showToastMessage(
+          t('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT'),
+          'error'
+        ); // Internationalized toast message
       }
-      // setLoading(false);
     } catch (error: any) {
-      //   setLoading(false);
-      const errorMessage = 'LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT';
+      const errorMessage = t('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT'); // Internationalized error message
       showToastMessage(errorMessage, 'error');
     }
   };
+
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div>{t('LOGIN_PAGE.LOADING')}</div>}>
+      {' '}
+      {/* Internationalized fallback */}
       <Box
         height="100vh"
         width="100vw"
@@ -131,6 +138,7 @@ const handleSuccessfulLogin = async (
   data: { remember: boolean },
   router: any
 ) => {
+  const { t } = useTranslation(); // Initialize translation function
   if (typeof window !== 'undefined' && window.localStorage) {
     const token = response.access_token;
     const refreshToken = response?.refresh_token;
@@ -173,7 +181,10 @@ const handleSuccessfulLogin = async (
           router.push('/content');
         }
       } else {
-        showToastMessage('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT', 'error');
+        showToastMessage(
+          t('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT'),
+          'error'
+        ); // Internationalized toast message
       }
     }
   }
