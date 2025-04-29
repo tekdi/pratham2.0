@@ -19,8 +19,11 @@ const ChangePassword = () => {
   const [otp, setOtp] = useState<string[]>(['', '', '', '']);
   const [otpmodal, setOtpModal] = useState(false);
   const [hash, setHash] = useState<string>('');
-  const [mobile, setMobile] = useState(
-    localStorage.getItem('usermobile') || ''
+
+  const [mobile] = useState(
+    typeof window !== 'undefined'
+      ? localStorage.getItem('usermobile') || ''
+      : ''
   );
   const [resetPasswordSuccessModal, setResetPasswordSuccessModal] =
     useState(false);
