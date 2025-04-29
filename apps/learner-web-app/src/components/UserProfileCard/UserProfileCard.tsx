@@ -69,8 +69,20 @@ const UserProfileCard = () => {
   };
 
   const handleOpen = (option: string) => {
+    console.log(option);
     if (option === 'Edit Profile') {
       router.push('/profile-complition');
+    }
+    if (option === 'Change Password') {
+      router.push('/change-password');
+    }
+    if (option === 'Change Username') {
+      router.push('/change-username');
+    }
+    if (option === 'Privacy Guidelines') {
+      window.open('https://www.pratham.org/privacy-guidelines/', '_blank');
+    }
+    if (option === 'Consent Form') {
     }
     setSelectedOption(option);
     setOpen(true);
@@ -162,7 +174,7 @@ const UserProfileCard = () => {
         sx={{
           background: 'linear-gradient(to bottom, #FFFDF6, #F8EFDA)',
           maxWidth: '600px',
-          padding: '12px',
+          padding: '20px',
           position: 'relative',
         }}
       >

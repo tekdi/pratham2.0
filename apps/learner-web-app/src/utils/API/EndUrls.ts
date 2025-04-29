@@ -1,4 +1,4 @@
-const baseurl = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;
+export const baseurl = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;
 
 export const API_ENDPOINTS = {
   accountCreate: `${baseurl}/account/create`,
@@ -22,7 +22,7 @@ export const API_ENDPOINTS = {
   program: `${baseurl}/tenant/read`,
   fetchCourseId: `${baseurl}/tracking/content/course/inprogress`,
   userUpdate: (userId: string) => `${baseurl}/user/update/${userId}`,
-
+  courseWiseLernerList: `${baseurl}/tracking/user_certificate/status/search`,
 };
 
 export const COURSE_PLANNER_UPLOAD_ENDPOINTS = `${process.env.NEXT_PUBLIC_BASE_URL}/prathamservice/v1/course-planner/upload`;
