@@ -12,7 +12,8 @@ import {
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { CommonDrawer, DrawerItemProp } from '../Drawer/CommonDrawer';
+import { CommonDrawer } from '../Drawer/CommonDrawer';
+import type { DrawerItemProp } from '../Drawer/CommonDrawer';
 
 interface NewDrawerItemProp extends DrawerItemProp {
   variant?: 'contained' | 'text';
@@ -147,6 +148,8 @@ const DesktopBar = ({
           return (
             <Button
               key={index}
+              // @ts-ignore
+
               variant={
                 link.variant ??
                 (link.isActive ? 'top-bar-link-button' : 'top-bar-link-text')
@@ -240,12 +243,14 @@ const MobileTopBar = ({
       <CommonDrawer
         open={isDrawerOpen}
         onDrawerClose={() => setIsDrawerOpen(false)}
+        // @ts-ignore
+
         items={navLinks}
         onItemClick={(to) => {
           setIsDrawerOpen(false);
         }}
         topElement={<Brand {..._brand} />}
-      />
+    />
     </Box>
   );
 };
