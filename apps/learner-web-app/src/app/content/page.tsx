@@ -17,6 +17,7 @@ const MyComponent: React.FC = () => {
   const { t } = useTranslation();
   const [filter, setFilter] = useState({});
   const [isLogin, setIsLogin] = useState<boolean | null>(null);
+  const [isShow, setIsShow] = useState(false);
   const [isProfileCard, setIsProfileCard] = useState(false);
 
   useEffect(() => {
@@ -53,7 +54,11 @@ const MyComponent: React.FC = () => {
 
       {isLogin && (
         <>
-          <Grid container style={gredientStyle}>
+          <Grid
+            container
+            style={gredientStyle}
+            {...(isShow ? {} : { sx: { display: 'none' } })}
+          >
             <Grid
               item
               xs={12}
@@ -90,10 +95,13 @@ const MyComponent: React.FC = () => {
               </Box>
             </Grid>
             <Grid item xs={12} md={9}>
-              <ContentComponent />
+              <ContentComponent
+                getContentData={(e: any) => setIsShow(e.count)}
+              />
             </Grid>
           </Grid>
-          <Grid container sx={{ p: 4 }}>
+
+          <Grid container>
             <Grid
               item
               xs={12}

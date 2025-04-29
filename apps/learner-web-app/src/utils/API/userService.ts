@@ -103,3 +103,13 @@ export const getUserDetails = async (
     return error;
   }
 };
+export const userNameExist = async (userData: any): Promise<any> => {
+  const apiUrl: string = API_ENDPOINTS.suggestUsername;
+  try {
+    const response = await post(apiUrl, userData);
+    return response?.data?.result;
+  } catch (error) {
+    console.error('error in getting in userNme exist', error);
+    throw error;
+  }
+};

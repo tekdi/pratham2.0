@@ -22,7 +22,10 @@ import { RoleId } from '@shared-lib-v2/DynamicForm/utils/app.constant';
 import { getUserId, login } from '@learner/utils/API/LoginService';
 import SignupSuccess from '@learner/components/SignupSuccess /SignupSuccess ';
 import { Loader } from '@shared-lib';
-import { firstLetterInUpperCase } from '@learner/utils/helper';
+import {
+  firstLetterInUpperCase,
+  maskMobileNumber,
+} from '@learner/utils/helper';
 import face from '../../../public/images/Group 3.png';
 
 //build issue fix for  ⨯ useSearchParams() should be wrapped in a suspense boundary at page
@@ -205,15 +208,7 @@ const RegisterUser = () => {
   // formData.firstName = 'karan';
   // formData.lastName = 'patil';
   console.log(payload);
-  const maskMobileNumber = (mobile: string) => {
-    if (mobile && mobile.length < 2) return mobile;
-    else if (mobile) {
-      const first = mobile[0];
-      const last = mobile[mobile.length - 1];
-      const masked = '*'.repeat(mobile.length - 2);
-      return first + masked + last;
-    }
-  };
+
   const handleSendOtp = async (mob: string) => {
     try {
       const reason = 'signup';
