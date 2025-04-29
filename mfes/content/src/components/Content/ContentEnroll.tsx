@@ -19,6 +19,7 @@ import {
 import InfoCard from '@content-mfes/components/Card/InfoCard';
 import { hierarchyAPI } from '@content-mfes/services/Hierarchy';
 import { ContentSearchResponse } from '@content-mfes/services/Search';
+import { checkAuth } from '@shared-lib-v2/utils/AuthService';
 
 interface ContentDetailsProps {
   isShowLayout: boolean;
@@ -40,16 +41,15 @@ const ContentDetails = (props: ContentDetailsProps) => {
       try {
         const result = await hierarchyAPI(identifier as string);
         const userId = localStorage.getItem('userId');
-        const tenantId = localStorage.getItem('tenantId');
-        if (userId && tenantId) {
+        if (checkAuth()) {
           const data = await getUserCertificateStatus({
-            userId,
+            userId: userId as string,
             courseId: identifier as string,
           });
-
           if (
             data?.result?.status === 'enrolled' ||
-            data?.result?.status === 'completed'
+            data?.result?.status === 'completed' ||
+            data?.result?.status === 'viewCertificate'
           ) {
             if (props?.getIfEnrolled) {
               props?.getIfEnrolled(result as unknown as ContentSearchResponse);
@@ -82,7 +82,7 @@ const ContentDetails = (props: ContentDetailsProps) => {
         });
         router.replace(`/content/${identifier}`);
       } else {
-        router.replace(`/login?redirectUrl=/content/${identifier}`);
+        router.replace(`/login?redirectUrl=/content-details/${identifier}`);
       }
     } catch (error) {
       console.error('Failed to create user certificate:', error);

@@ -22,7 +22,7 @@ const ForgotPassword = ({}) => {
     localStorage.setItem('redirectionRoute', redirectionRoute);
   }
   const [otpmodal, setOtpModal] = useState(false);
-  const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
+  const [otp, setOtp] = useState<string[]>(['', '', '', '']);
   const [enterdUserName, setEnterdUserName] = useState('');
 
   const handleNextStep = async (value: string) => {
@@ -104,7 +104,7 @@ const ForgotPassword = ({}) => {
   };
   const handleCloseModal = () => {
     setOtpModal(false);
-    setOtp(['', '', '', '', '', '']);
+    setOtp(['', '', '', '']);
   };
 
   return (

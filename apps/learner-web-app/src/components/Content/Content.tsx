@@ -3,13 +3,17 @@
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { FetchDoIds } from '@learner/utils/API/ProgramService';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@shared-lib';
 
 const Content = dynamic(() => import('@Content'), {
   ssr: false,
 });
 
-const ContentComponent = ({ limit }: any) => {
+const ContentComponent = ({
+  limit = 4,
+  hasMoreData = false,
+  getContentData,
+}: any) => {
   const { t } = useTranslation();
   const [identifier, setIdentifier] = useState([]);
 
@@ -45,11 +49,12 @@ const ContentComponent = ({ limit }: any) => {
           identifier: identifier,
         },
       }}
-      hasMoreData={false}
+      hasMoreData={hasMoreData}
       _config={{
         default_img: '/images/image_ver.png',
         _card: { isHideProgress: true },
         default_img_alt: t('LEARNER_APP.CONTENT.DEFAULT_IMAGE_ALT'),
+        getContentData: getContentData,
       }}
     />
   );

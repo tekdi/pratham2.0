@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { Box } from '@mui/material';
 import dynamic from 'next/dynamic';
 import WelcomeScreen from '@learner/components/WelcomeComponent/WelcomeScreen';
@@ -22,11 +22,24 @@ const LoginPage = () => {
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const handleAddAccount = () => {};
+  const handleAddAccount = () => {
+    router.push('/');
+  };
 
   useEffect(() => {
     const init = async () => {
       try {
+        const access_token = localStorage.getItem('token');
+        const refresh_token = localStorage.getItem('refreshToken');
+        if (access_token) {
+          const response = {
+            result: {
+              access_token,
+              refresh_token,
+            },
+          };
+          handleSuccessfulLogin(response?.result, { remember: false }, router);
+        }
         if (!localStorage.getItem('did')) {
           const fp = await FingerprintJS.load();
           const { visitorId } = await fp.get();
@@ -42,70 +55,19 @@ const LoginPage = () => {
 
   const handleForgotPassword = () => {
     localStorage.setItem('loginRoute', '/login');
-    router.push('/forget-password');
+    router.push('/password-forget');
   };
   const handleLogin = async (data: {
     username: string;
     password: string;
     remember: boolean;
   }) => {
-    console.log('Login Data:', data?.username);
-    let username = data?.username;
-    let password = data?.password;
+    const username = data?.username;
+    const password = data?.password;
     try {
       const response = await login({ username, password });
       if (response?.result?.access_token) {
-        if (typeof window !== 'undefined' && window.localStorage) {
-          const token = response.result.access_token;
-          const refreshToken = response?.result?.refresh_token;
-          localStorage.setItem('token', token);
-          data?.remember
-            ? localStorage.setItem('refreshToken', refreshToken)
-            : localStorage.removeItem('refreshToken');
-
-          const userResponse = await getUserId();
-
-          if (userResponse) {
-            if (
-              userResponse?.tenantData?.[0]?.roleName === 'Learner' &&
-              userResponse?.tenantData?.[0]?.tenantName === 'YouthNet'
-            ) {
-              localStorage.setItem('userId', userResponse?.userId);
-              console.log(userResponse?.tenantData);
-              localStorage.setItem(
-                'templtateId',
-                userResponse?.tenantData?.[0]?.templateId
-              );
-
-              localStorage.setItem('userIdName', userResponse?.username);
-
-              const tenantId = userResponse?.tenantData?.[0]?.tenantId;
-              localStorage.setItem('tenantId', tenantId);
-
-              const channelId = userResponse?.tenantData?.[0]?.channelId;
-              localStorage.setItem('channelId', channelId);
-
-              const collectionFramework =
-                userResponse?.tenantData?.[0]?.collectionFramework;
-              localStorage.setItem('collectionFramework', collectionFramework);
-
-              document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
-              if (
-                typeof window !== 'undefined' &&
-                window.location.href.includes('redirect')
-              ) {
-                router.push(window.location.href.split('redirect=')[1]);
-              } else {
-                router.push('/content');
-              }
-            } else {
-              showToastMessage(
-                'LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT',
-                'error'
-              );
-            }
-          }
-        }
+        handleSuccessfulLogin(response?.result, data, router);
       } else {
         showToastMessage('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT', 'error');
       }
@@ -117,49 +79,104 @@ const LoginPage = () => {
     }
   };
   return (
-    <Box
-      height="100vh"
-      width="100vw"
-      display="flex"
-      flexDirection="column"
-      overflow="hidden"
-    >
-      {/* Fixed Header */}
-      <Header />
+    <Suspense fallback={<div>Loading...</div>}>
+      <Box
+        height="100vh"
+        width="100vw"
+        display="flex"
+        flexDirection="column"
+        overflow="hidden"
+      >
+        {/* Fixed Header */}
+        <Header />
 
-      {/* Main Content: Split screen */}
-      <Box flex={1} display="flex" overflow="hidden">
-        {/* Left: Welcome Screen */}
-        {!isMobile && (
+        {/* Main Content: Split screen */}
+        <Box flex={1} display="flex" overflow="hidden">
+          {/* Left: Welcome Screen */}
+          {!isMobile && (
+            <Box
+              flex={1}
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <WelcomeScreen />
+            </Box>
+          )}
+
+          {/* Right: Login Component */}
           <Box
             flex={1}
             display="flex"
             justifyContent="center"
             alignItems="center"
+            pr={6}
+            boxSizing="border-box"
+            bgcolor="#ffffff"
           >
-            <WelcomeScreen />
+            <Login
+              onLogin={handleLogin}
+              handleForgotPassword={handleForgotPassword}
+              handleAddAccount={handleAddAccount}
+            />
           </Box>
-        )}
-
-        {/* Right: Login Component */}
-        <Box
-          flex={1}
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          pr={6}
-          boxSizing="border-box"
-          bgcolor="#ffffff"
-        >
-          <Login
-            onLogin={handleLogin}
-            handleForgotPassword={handleForgotPassword}
-            handleAddAccount={handleAddAccount}
-          />
         </Box>
       </Box>
-    </Box>
+    </Suspense>
   );
 };
 
 export default LoginPage;
+
+const handleSuccessfulLogin = async (
+  response: any,
+  data: { remember: boolean },
+  router: any
+) => {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    const token = response.access_token;
+    const refreshToken = response?.refresh_token;
+    localStorage.setItem('token', token);
+    data?.remember
+      ? localStorage.setItem('refreshToken', refreshToken)
+      : localStorage.removeItem('refreshToken');
+
+    const userResponse = await getUserId();
+
+    if (userResponse) {
+      if (
+        userResponse?.tenantData?.[0]?.roleName === 'Learner' &&
+        userResponse?.tenantData?.[0]?.tenantName === 'YouthNet'
+      ) {
+        localStorage.setItem('userId', userResponse?.userId);
+        localStorage.setItem(
+          'templtateId',
+          userResponse?.tenantData?.[0]?.templateId
+        );
+        localStorage.setItem('userIdName', userResponse?.username);
+
+        const tenantId = userResponse?.tenantData?.[0]?.tenantId;
+        localStorage.setItem('tenantId', tenantId);
+
+        const channelId = userResponse?.tenantData?.[0]?.channelId;
+        localStorage.setItem('channelId', channelId);
+
+        const collectionFramework =
+          userResponse?.tenantData?.[0]?.collectionFramework;
+        localStorage.setItem('collectionFramework', collectionFramework);
+
+        document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
+        const redirectUrl = new URLSearchParams(window.location.search).get(
+          'redirectUrl'
+        );
+        if (redirectUrl && redirectUrl.startsWith('/')) {
+          router.push(redirectUrl);
+        } else {
+          router.push('/content');
+        }
+      } else {
+        showToastMessage('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT', 'error');
+      }
+    }
+  }
+};

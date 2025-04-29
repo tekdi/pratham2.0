@@ -9,13 +9,31 @@ import { useEffect, useState } from 'react';
 import { getTenantInfo } from '@learner/utils/API/ProgramService';
 import ContentComponent from '@learner/components/Content/Content';
 import { useTranslation } from '@shared-lib';
+import { checkAuth } from '@shared-lib-v2/utils/AuthService';
+import { CompleteProfileBanner } from '@learner/components/CompleteProfileBanner/CompleteProfileBanner';
+import { profileComplitionCheck } from '@learner/utils/API/userService';
 
 const MyComponent: React.FC = () => {
   const { t } = useTranslation();
   const [filter, setFilter] = useState({});
+  const [isLogin, setIsLogin] = useState<boolean | null>(null);
+  const [isShow, setIsShow] = useState(false);
+  const [isProfileCard, setIsProfileCard] = useState(false);
 
   useEffect(() => {
+    const fetchProfileInfo = async () => {
+      const result = await profileComplitionCheck();
+      setIsProfileCard(!result);
+    };
+    fetchProfileInfo();
+  }, []);
+  useEffect(() => {
     const fetchTenantInfo = async () => {
+      if (checkAuth()) {
+        setIsLogin(true);
+      } else {
+        setIsLogin(false);
+      }
       try {
         const res = await getTenantInfo();
         const youthnetContentFilter = res?.result.find(
@@ -31,57 +49,74 @@ const MyComponent: React.FC = () => {
   }, []);
 
   return (
-    <Layout>
-      <Grid container style={gredientStyle}>
-        <Grid
-          item
-          xs={12}
-          md={3}
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-          }}
-        >
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              mb: 2,
-            }}
+    <Layout isLoadingChildren={isLogin === null}>
+      {isProfileCard && <CompleteProfileBanner />}
+
+      {isLogin && (
+        <>
+          <Grid
+            container
+            style={gredientStyle}
+            {...(isShow ? {} : { sx: { display: 'none' } })}
           >
-            <Typography variant="h4" gutterBottom sx={{ color: '#06A816' }}>
-              {t('LEARNER_APP.L_ONE_COURSE.IN_PROGRESS_TITLE')}
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-              {t('LEARNER_APP.L_ONE_COURSE.ONGOING_COURSES')}
-            </Typography>
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <Button variant="contained" color="primary" href="/in-progress">
-                {t('LEARNER_APP.L_ONE_COURSE.VIEW_ALL_BUTTON')}
-              </Button>
-            </Box>
-          </Box>
-        </Grid>
-        <Grid item xs={12} md={9}>
-          <ContentComponent limit={4} />
-        </Grid>
-      </Grid>
-      <Grid container sx={{ p: 4 }}>
-        <Grid
-          item
-          xs={12}
-          md={12}
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-          }}
-        >
-          <LTwoCourse />
-        </Grid>
-      </Grid>
+            <Grid
+              item
+              xs={12}
+              md={3}
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+              }}
+            >
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  mb: 2,
+                }}
+              >
+                <Typography variant="h4" gutterBottom sx={{ color: '#06A816' }}>
+                  {t('LEARNER_APP.L_ONE_COURSE.IN_PROGRESS_TITLE')}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  {t('LEARNER_APP.L_ONE_COURSE.ONGOING_COURSES')}
+                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    href="/in-progress"
+                  >
+                    {t('LEARNER_APP.L_ONE_COURSE.VIEW_ALL_BUTTON')}
+                  </Button>
+                </Box>
+              </Box>
+            </Grid>
+            <Grid item xs={12} md={9}>
+              <ContentComponent
+                getContentData={(e: any) => setIsShow(e.count)}
+              />
+            </Grid>
+          </Grid>
+
+          <Grid container>
+            <Grid
+              item
+              xs={12}
+              md={12}
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+              }}
+            >
+              <LTwoCourse />
+            </Grid>
+          </Grid>
+        </>
+      )}
 
       <Grid container style={gredientStyle}>
         <Grid item xs={12}>

@@ -6,7 +6,7 @@ import axios from 'axios';
 import Grid from '@mui/material/Grid';
 import { Box } from '@mui/material';
 import { TextField, Container, Typography } from '@mui/material';
-import { useTranslation } from 'next-i18next';
+import { Layout as SharedLayout, useTranslation } from '@shared-lib';
 import _ from 'lodash'; // Lodash for deep comparison
 import CustomMultiSelectWidget from './RJSFWidget/CustomMultiSelectWidget';
 import CustomCheckboxWidget from './RJSFWidget/CustomCheckboxWidget';

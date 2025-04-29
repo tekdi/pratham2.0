@@ -96,7 +96,7 @@ export const CommonCard: React.FC<CommonCardProps> = ({
             status:
               result?.status?.toLowerCase() === 'completed'
                 ? 'Completed'
-                : result?.status?.toLowerCase() === 'in completed'
+                : result?.status?.toLowerCase() === 'in progress'
                 ? 'In Progress'
                 : result?.enrolled === true
                 ? 'Enrolled, not started'

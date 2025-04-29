@@ -37,7 +37,7 @@ const OtpVerificationComponent = ({
 
   const handleResend = () => {
     setTimer(59);
-    setOtp(['', '', '', '', '', '']);
+    setOtp(['', '', '', '']);
     onResend?.();
   };
 

@@ -40,7 +40,7 @@ export function calculateCourseStatus({
   if (completedCount === total && total > 0) {
     status = 'completed';
   } else if (completedCount > 0 || inProgressCount > 0) {
-    status = 'in completed';
+    status = 'in progress';
   }
 
   const percentage = total > 0 ? Math.round((completedCount / total) * 100) : 0;

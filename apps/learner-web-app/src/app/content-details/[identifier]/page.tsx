@@ -1,13 +1,16 @@
 // pages/content-details/[identifier].tsx
 
-'use client';
 import React from 'react';
 import Layout from '../../../components/Layout';
 // import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { gredientStyle } from '@learner/utils/style';
 import { Box } from '@mui/material';
+import { getMetadata } from '@learner/utils/API/metabaseService';
 
+export async function generateMetadata({ params }: any) {
+  return await getMetadata(params.identifier);
+}
 const ContentEnrollDetails = dynamic(() => import('@ContentEnrollDetails'), {
   ssr: false,
 });
@@ -21,7 +24,7 @@ const App = () => {
           isShowLayout={false}
           _config={{
             default_img: '/images/image_ver.png',
-            _infoCard: { _cardMedia: { maxHeight: '280px' } },
+            _infoCard: { _cardMedia: { maxHeight: '244px' } },
           }}
         />
       </Box>

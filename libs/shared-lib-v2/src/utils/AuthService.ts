@@ -72,3 +72,14 @@ export const staticFilterContent = async ({
   }
   return undefined;
 };
+
+export const checkAuth = () => {
+  const userId = localStorage.getItem('userId');
+  const tenantId = localStorage.getItem('tenantId');
+  const token = localStorage.getItem('token');
+  if (userId && tenantId && token) {
+    return true;
+  } else {
+    return false;
+  }
+};

@@ -82,3 +82,14 @@ export const getUserCertificates = async ({
     throw error;
   }
 };
+
+export const issueCertificate = async (reqBody: any) => {
+  const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/certificate/issue`;
+  try {
+    const response = await post(apiUrl, reqBody);
+    return response?.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
