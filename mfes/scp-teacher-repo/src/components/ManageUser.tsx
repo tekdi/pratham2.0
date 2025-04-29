@@ -498,7 +498,6 @@ const ManageUser: React.FC<ManageUsersProps> = ({
     }
     if (name === 'reassign-block') {
       //TODO: Add reassign logic here
-      console.log('HIijbdjbnjbdn');
       const reassignuserId = isFromFLProfile
         ? teacherUserId
         : selectedUser?.userId;
