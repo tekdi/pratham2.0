@@ -41,7 +41,7 @@ const CourseCertificateCard: React.FC<CertificateCardProps> = ({
         <CardMedia
           component="img"
           height="200"
-          image={imageUrl || '/images/default.png'}
+          image={imageUrl || '/images/image_ver.png'}
           alt={title}
           sx={{
             width: '100%',
@@ -71,7 +71,14 @@ const CourseCertificateCard: React.FC<CertificateCardProps> = ({
               fontSize: 12,
             }}
           >
-            Completed on {completionDate}
+            Issued certificate on{' '}
+            {new Date(completionDate)
+              .toLocaleDateString('en-US', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+              })
+              .replace(',', ',')}
           </Typography>
         </Box>
       </Box>

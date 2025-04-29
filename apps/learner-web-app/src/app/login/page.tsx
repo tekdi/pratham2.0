@@ -22,7 +22,9 @@ const LoginPage = () => {
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const handleAddAccount = () => {};
+  const handleAddAccount = () => {
+    router.push('/');
+  };
 
   useEffect(() => {
     const init = async () => {
