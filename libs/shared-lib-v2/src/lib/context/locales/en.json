@@ -1,0 +1,202 @@
+{
+  "LANGUAGE": "Language en",
+  "ENGLISH": "English",
+  "HINDI": "Hindi",
+  "MARATHI": "Marathi",
+  "URDU": "Urdu",
+  "LEARNER_APP": {
+    "COMPLETE_PROFILE_BANNER": {
+      "MESSAGE": "Complete your profile so we can guide you better on your learning journey",
+      "BUTTON": "Complete Profile"
+    },
+    "COMMON": {
+      "L1_COURSES": "L1 Courses",
+      "EXPLORE": "Explore",
+      "SURVEYS": "Surveys",
+      "PROFILE": "Profile",
+      "UNITS": "Units",
+      "COURSES": "Courses"
+    },
+    "COURSE": {
+      "GET_STARTED": "Get Started with L1 Courses",
+      "FILTER_BY": "Filter by"
+    },
+    "EXPLORE": {
+      "EXPLORE_ADDITIONAL_COURSES": "Explore Additional Courses"
+    },
+    "HOME": {
+      "WELCOME_TITLE": "Welcome to Pratham myLearning!",
+      "WELCOME_SUBTITLE": "Your Learning Journey begins here",
+      "SIGN_UP_BUTTON": "Sign Up for Program Now!",
+      "ALREADY_SIGNED_UP": "Already signed up?",
+      "LOGIN_LINK": "Click here to login",
+      "GET_THE_APP": "Get the App",
+      "POINT_CAMERA": "Point your phone camera here",
+      "OR": "OR",
+      "SEARCH_PLAYSTORE": "Search \"Pratham myLearning\" on Playstore",
+      "ABOUT_PRATHAM_TITLE": "About Pratham",
+      "ABOUT_PRATHAM_DESC": "Pratham creates innovative education solutions with thoughtful, impactful interventions that span the age spectrum. Working both directly and through government systems, these programs collectively reach millions of children and young people each year. The direct work follows two tracks: Pratham works with children either in the school or in the community, whereas the “partnership” model involves Pratham teams working closely with government teams at the state, district, or block level. Our unwavering commitment to developing, testing, and improving learning outcomes continues to serve as a model, both within India and beyond.",
+      "OUR_PROGRAMS": "Our Programs",
+      "SIGN_UP": "Sign Up"
+    },
+    "LOGIN": {
+      "welcome_title": "Welcome to Pratham myLearning!",
+      "welcome_subtitle": "Your Learning Journey Begins here",
+      "welcome_image_alt": "Smiley face",
+      "qr_get_app": "Get the App",
+      "qr_instruction": "Point your phone \n camera here",
+      "qr_image_alt": "QR Code",
+      "or": "OR",
+      "playstore_image_alt": "Get it on Google Play",
+      "playstore_instruction": "Search “Pratham myLearning” on Playstore",
+      "login_title": "Login",
+      "username_label": "Username",
+      "password_label": "Password",
+      "remember_me": "Remember Me",
+      "forgot_password": "Forgot Password?",
+      "login_button": "Login",
+      "no_account": "I don’t have an Account"
+    },
+    "L_ONE_COURSE": {
+      "IN_PROGRESS_TITLE": "In Progress",
+      "ONGOING_COURSES": "You have 4 Ongoing Courses",
+      "VIEW_ALL_BUTTON": "View All"
+    },
+    "L_TWO_COURSE": {
+      "TITLE": "L2 Course",
+      "DESCRIPTION": "You can boost your skills and unlock new job opportunities with our L2 course.",
+      "SUB_DESCRIPTION": "Show your interest to receive personalized guidance from our expert!",
+      "INTEREST_BUTTON": "I'm interested",
+      "SUBMIT_BUTTON": "Submit",
+      "OKAY_BUTTON": "Okay"
+    },
+    "LEVEL_UP": {
+      "TITLE": "Great! We're Excited to Help You Level Up!",
+      "SUB_TITLE": "Which topic are you most interested in?",
+      "TOPICS_PLACEHOLDER": "Topics",
+      "TOPIC_PLUMBING": "Plumbing",
+      "TOPIC_ELECTRICAL": "Electrical",
+      "TOPIC_CARPENTRY": "Carpentry",
+      "TOPIC_MASONRY": "Masonry",
+      "TOPIC_PAINTING": "Painting",
+      "FOOTER_TEXT": "Once you select a course, our expert will contact you with more information!"
+    },
+    "RESPONSE_RECORDED": {
+      "TITLE": "Your response has been recorded",
+      "SUB_TITLE": "Our expert will reach out to you soon",
+      "FOOTER_TEXT": "In the meantime, feel free to explore more courses or continue building your skills!"
+    },
+    "CONTENT": {
+      "DEFAULT_IMAGE_ALT": "Default course image"
+    },
+    "IN_PROGRESS": {
+      "ALL_COURSES": "All In Progress Courses"
+    },
+    "SEARCH_COMPONENT": {
+      "PLACEHOLDER": "Search content..",
+      "Course": "Course"
+    },
+    "CONTENT_TABS": {
+      "LOAD_MORE": "Load More",
+      "NO_MORE_DATA": "No more data available"
+    },
+    "PLAYER": {
+      "MORE_RELATED_RESOURCES": "More Related Resources"
+    },
+    "other_filters": "Other Filters",
+    "USER_PROFILE_CARD": {
+      "MY_PROFILE": "My Profile",
+      "JOINED_ON": "Joined on",
+      "CONTACT_INFORMATION": "Contact Information",
+      "EMAIL_ADDRESS": "Email Address",
+      "PHONE_NUMBER": "Phone Number",
+      "PHONE_BELONGS_TO_YOU": "Does this phone belong to you?",
+      "PERSONAL_INFORMATION": "Personal Information",
+      "GENDER": "Gender",
+      "DOB": "DOB",
+      "MARITAL_STATUS": "Marital Status",
+      "MOTHER_NAME": "Mother's Name",
+      "HIGHEST_QUALIFICATION": "Highest Qualification/Last Passed Grade",
+      "LOCATION": "Location",
+      "ASPIRATION_EXPERIENCE": "Aspiration & Experience",
+      "PRIOR_TRAINING": "Have you received any prior training?",
+      "CURRENT_WORK": "Have you ever worked or are you currently working?",
+      "FUTURE_WORK": "What do you want to become?",
+      "EDIT_PROFILE": "Edit Profile",
+      "CHANGE_USERNAME": "Change Username",
+      "CHANGE_PASSWORD": "Change Password",
+      "PRIVACY_GUIDELINES": "Privacy Guidelines",
+      "CONSENT_FORM": "Consent Form"
+    },
+    "USERNAME_SUGGESTION": {
+      "USERNAME": "Username",
+      "AVAILABLE_USERNAMES": "Available usernames",
+      "CONTINUE": "Continue"
+    },
+    "RESET_PASSWORD_FORM": {
+      "OLD_PASSWORD": "Old Password",
+      "NEW_PASSWORD": "New Password",
+      "CONFIRM_NEW_PASSWORD": "Confirm New Password",
+      "RESET_PASSWORD": "Reset Password",
+      "FORGOT_PASSWORD": "Forgot Password?",
+      "FILL_ALL_FIELDS": "Please fill in all fields.",
+      "PASSWORDS_MUST_MATCH": "New Password and Confirm Password must be the same."
+    }
+  },
+  "LOGIN_PAGE": {
+    "USERNAME_PASSWORD_NOT_CORRECT": "Username or Password is not correct",
+    "DEVICE_FINGERPRINT_SUCCESS": "Device fingerprint generated successfully",
+    "DEVICE_FINGERPRINT_ERROR": "Error generating device fingerprint",
+    "LOADING": "Loading..."
+  },
+  "STATE": "State",
+  "DISTRICT": "District",
+  "BLOCK": "Block",
+  "VILLAGE": "Village",
+  "first_name": "First Name",
+  "middle_name": "Middle Name",
+  "last_name": "Last Name",
+  "EMAIL": "Email",
+  "phone_number": "Phone Number",
+  "dob": "Date of Birth",
+  "WHATS_YOUR_GENDER": "What's Your Gender",
+  "MALE": "Male",
+  "FEMALE": "Female",
+  "TRANSGENDER": "Transgender",
+  "MOTHER_NAME": "Mother Name",
+  "HIGHEST_EDCATIONAL_QUALIFICATION_OR_LAST_PASSED_GRADE": "Highest Educational Qualification or Last Passed Grade",
+  "MARITAL_STATUS": "Marital Status",
+  "TYPE_OF_PHONE_AVAILABLE": "Type of Phone Available",
+  "SMARTPHONE": "Smartphone",
+  "KEYPAD": "Keypad",
+  "DOES_THIS_PHONE_BELONG_TO_YOU": "Does this phone belong to you",
+  "YES": "Yes",
+  "NO": "No",
+  "USERNAME": "Username",
+  "PASSWORD": "Password",
+  "confirm_password": "Confirm Password",
+  "NAME_OF_GUARDIAN": "Name of Guardian",
+  "RELATION_WITH_GUARDIAN": "Relation with Guardian",
+  "PARENT_GUARDIAN_PHONE_NO": "Parent/Guardian Phone No",
+  "PROGRAM": "Program",
+  "SUBMIT": "Submit",
+  "CONTINUE": "Continue",
+  "UNMARRIED": "UNMARRIED",
+  "MARRIED": "MARRIED",
+  "DIVORCED": "DIVORCED",
+  "WHAT_DO_YOU_WANT_TO_BECOME": "What do you want to become?",
+  "WHAT_IS_YOUR_PREFERRED_MODE_OF_LEARNING": "What is your preferred mode of learning?",
+  "REASON_FOR_DROP_OUT_FROM_SCHOOL": "Reason for drop out from school",
+  "ARE_YOU_CURRENTLY_WORKING_IF_YES_CHOOSE_THE_DOMAIN": "Are you currently working? If yes, choose the domain",
+  "FORGOT_PASSWORD": {
+    "TITLE": "Trouble with logging in?",
+    "SUBTITLE": "No worries, we’ll help you get back to your account",
+    "INPUT_LABEL": "Enter username or phone number",
+    "BUTTON": "Next"
+  },
+  "OTP_VERIFICATION": {
+    "MESSAGE": "We’ve sent an OTP to verify your number {{maskedNumber}}",
+    "RESEND_TIMER": "Resend OTP in {{timer}}s",
+    "RESEND": "Resend OTP"
+  }
+}
