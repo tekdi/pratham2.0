@@ -12,41 +12,39 @@ import { useTranslation } from '@shared-lib';
 import { checkAuth } from '@shared-lib-v2/utils/AuthService';
 import { CompleteProfileBanner } from '@learner/components/CompleteProfileBanner/CompleteProfileBanner';
 import { profileComplitionCheck } from '@learner/utils/API/userService';
+import { usePathname } from 'next/navigation';
 
 const MyComponent: React.FC = () => {
   const { t } = useTranslation();
-  const [filter, setFilter] = useState({});
+  const pathname = usePathname();
+  const [filter, setFilter] = useState<object | null>();
   const [isLogin, setIsLogin] = useState<boolean | null>(null);
   const [isShow, setIsShow] = useState(false);
   const [isProfileCard, setIsProfileCard] = useState(false);
 
   useEffect(() => {
-    const fetchProfileInfo = async () => {
-      const result = await profileComplitionCheck();
-      setIsProfileCard(!result);
-    };
-    fetchProfileInfo();
-  }, []);
-  useEffect(() => {
     const fetchTenantInfo = async () => {
       if (checkAuth()) {
         setIsLogin(true);
+        try {
+          const result = await profileComplitionCheck();
+          setIsProfileCard(!result);
+          const res = await getTenantInfo();
+          const youthnetContentFilter = res?.result.find(
+            (program: any) => program.name === 'YouthNet'
+          )?.contentFilter;
+          setFilter({ filters: youthnetContentFilter });
+          localStorage.setItem('filter', JSON.stringify(youthnetContentFilter));
+        } catch (error) {
+          console.error('Failed to fetch tenant info:', error);
+        }
       } else {
+        setFilter({});
         setIsLogin(false);
-      }
-      try {
-        const res = await getTenantInfo();
-        const youthnetContentFilter = res?.result.find(
-          (program: any) => program.name === 'YouthNet'
-        )?.contentFilter;
-        setFilter({ filters: youthnetContentFilter });
-        localStorage.setItem('filter', JSON.stringify(youthnetContentFilter));
-      } catch (error) {
-        console.error('Failed to fetch tenant info:', error);
       }
     };
     fetchTenantInfo();
-  }, []);
+  }, [pathname]);
 
   return (
     <Layout isLoadingChildren={isLogin === null}>
@@ -120,7 +118,7 @@ const MyComponent: React.FC = () => {
 
       <Grid container style={gredientStyle}>
         <Grid item xs={12}>
-          <LearnerCourse _content={{ filters: filter }} />
+          {filter && <LearnerCourse _content={{ filters: filter }} />}
         </Grid>
       </Grid>
     </Layout>

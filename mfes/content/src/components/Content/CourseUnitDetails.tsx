@@ -123,7 +123,6 @@ export default function Details(props: DetailsProps) {
       subItem.mimeType === 'application/vnd.ekstep.content-collection'
         ? `/content/${courseId}/${subItem?.identifier}`
         : `/content/${courseId}/${unitId}/${subItem?.identifier}`;
-    console.log(path, subItem);
     router.push(path);
   };
 
@@ -160,7 +159,16 @@ export default function Details(props: DetailsProps) {
         }}
       />
 
-      <Box sx={{ pt: 5, pb: 10, px: 10 }}>
+      <Box
+        sx={{
+          pt: 5,
+          pb: 10,
+          px: 10,
+          gap: 2,
+          display: 'flex',
+          flexWrap: 'wrap',
+        }}
+      >
         {certificateId && (
           <CourseCompletionBanner certificateId={certificateId} />
         )}
