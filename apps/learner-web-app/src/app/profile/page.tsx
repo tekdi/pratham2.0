@@ -7,6 +7,8 @@ import UserProfileCard from '@learner/components/UserProfileCard/UserProfileCard
 import CourseCertificateCard from '@learner/components/CourseCertificateCard/CourseCertificateCard';
 import { courseWiseLernerList } from '@shared-lib-v2/utils/CertificateService/coursesCertificates';
 import { CertificateModal, get } from '@shared-lib';
+
+import axios from 'axios';
 import { baseurl } from '@learner/utils/API/EndUrls';
 type FilterDetails = {
   status?: string[];
@@ -14,12 +16,10 @@ type FilterDetails = {
   userId?: string;
 };
 const ProfilePage = () => {
-  const [filters] = useState<FilterDetails>({
+  const [filters, setFilters] = useState<FilterDetails>({
     status: ['completed', 'viewCertificate'],
-    tenantId:
-      (typeof window !== 'undefined' && localStorage.getItem('tenantId')) || '',
-    userId:
-      (typeof window !== 'undefined' && localStorage.getItem('userId')) || '',
+    tenantId: localStorage.getItem('tenantId') || '',
+    userId: localStorage.getItem('userId') || '',
   });
   const [showCertificate, setShowCertificate] = useState(false);
   const [certificateId, setCertificateId] = useState('');
@@ -61,7 +61,7 @@ const ProfilePage = () => {
             userId: item.userId,
             courseId: item.courseId,
             certificateId: item.certificateId,
-            completedOn: item.completedOn,
+            completedOn: item.issuedOn,
             description: courseDetails.description || '',
             posterImage: courseDetails.posterImage || '',
             program: courseDetails.program || [],
