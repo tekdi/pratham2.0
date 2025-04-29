@@ -62,6 +62,7 @@ const ProfilePage = () => {
             courseId: item.courseId,
             certificateId: item.certificateId,
             completedOn: item.issuedOn,
+
             description: courseDetails.description || '',
             posterImage: courseDetails.posterImage || '',
             program: courseDetails.program || [],

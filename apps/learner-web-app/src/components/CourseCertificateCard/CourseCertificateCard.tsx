@@ -36,7 +36,6 @@ const CourseCertificateCard: React.FC<CertificateCardProps> = ({
         width: '231px',
       }}
     >
-      {/* Image with overlay bar */}
       <Box sx={{ position: 'relative' }}>
         <CardMedia
           component="img"
