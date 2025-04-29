@@ -1,5 +1,5 @@
 import { post, get } from '@shared-lib';
-import { API_ENDPOINTS } from './EndUrls';
+import { API_ENDPOINTS, COURSE_L2_ENDPOINTS } from './EndUrls';
 export interface courseWiseLernerListParam {
   limit?: number;
   offset?: number;
@@ -102,63 +102,67 @@ export const fetchUserCoursesWithContent = async (
     });
 
     const courseIds = response?.data?.result?.data ?? [];
-    const resultCourses = await ContentSearch({
-      filters: {
-        identifier: courseIds.map((c: any) => c.courseId),
-        status: ['live'],
-        primaryCategory: [
-          'Course',
-          'Learning Resource',
-          'Practice Question Set',
-        ],
-        channel: localStorage.getItem('channelId'),
-        ...(JSON.parse(localStorage.getItem('filter') ?? '{}') ?? {}),
-      },
-    });
+    let topicGroups = [];
+    if (courseIds.length > 0) {
+      const resultCourses = await ContentSearch({
+        filters: {
+          identifier: courseIds.map((c: any) => c.courseId),
+          status: ['live'],
+          primaryCategory: [
+            'Course',
+            'Learning Resource',
+            'Practice Question Set',
+          ],
+          channel: localStorage.getItem('channelId'),
+          ...(JSON.parse(localStorage.getItem('filter') ?? '{}') ?? {}),
+        },
+      });
 
-    const allCourses = resultCourses?.result?.content ?? [];
-    console.log(allCourses, 'resultCourses');
+      const allCourses = resultCourses?.result?.content ?? [];
 
-    // Group courses by topic
-    const topicGroups = allCourses.reduce(
-      (
-        acc: { topic: string; courses: { name: string; courseId: string }[] }[],
-        course: {
-          name: string;
-          identifier: string;
-          se_subjects: string[];
-        }
-      ) => {
-        course?.se_subjects?.forEach((topic: string) => {
-          const existingGroup = acc.find((group) => group.topic === topic);
-          if (existingGroup) {
-            if (
-              !existingGroup.courses.some(
-                (c) => c.courseId === course.identifier
-              )
-            ) {
-              existingGroup.courses.push({
-                name: course.name,
-                courseId: course.identifier,
-              });
-            }
-          } else {
-            acc.push({
-              topic,
-              courses: [
-                {
+      // Group courses by topic
+      topicGroups = allCourses?.reduce(
+        (
+          acc: {
+            topic: string;
+            courses: { name: string; courseId: string }[];
+          }[],
+          course: {
+            name: string;
+            identifier: string;
+            se_subjects: string[];
+          }
+        ) => {
+          course?.se_subjects?.forEach((topic: string) => {
+            const existingGroup = acc.find((group) => group.topic === topic);
+            if (existingGroup) {
+              if (
+                !existingGroup.courses.some(
+                  (c) => c.courseId === course.identifier
+                )
+              ) {
+                existingGroup.courses.push({
                   name: course.name,
                   courseId: course.identifier,
-                },
-              ],
-            });
-          }
-        });
-        return acc;
-      },
-      []
-    );
-
+                });
+              }
+            } else {
+              acc.push({
+                topic,
+                courses: [
+                  {
+                    name: course.name,
+                    courseId: course.identifier,
+                  },
+                ],
+              });
+            }
+          });
+          return acc;
+        },
+        []
+      );
+    }
     return topicGroups;
   } catch (error) {
     console.error('Error fetching user courses with content:', error);
@@ -187,9 +191,7 @@ export const createL2Course = async (userData: {
   topicName: string;
 }) => {
   try {
-    const API_URL = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/prathamservice/v1/save-user-salesforce`;
-
-    const response = await post(API_URL, userData);
+    const response = await post(COURSE_L2_ENDPOINTS, userData);
     return response?.data;
   } catch (error) {
     console.error('Error saving user to Salesforce:', error);

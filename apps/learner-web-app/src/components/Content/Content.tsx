@@ -24,10 +24,8 @@ const ContentComponent = ({
         let courseIds: never[] = [];
         if (userId && userId[0] !== null) {
           const res = await FetchDoIds(userId);
-
           const courseIdList = res?.data[0]?.courseIdList;
           courseIds = courseIdList.map((course: any) => course.courseId);
-
           setIdentifier(courseIds);
         }
         if (courseIds.length <= 0) {

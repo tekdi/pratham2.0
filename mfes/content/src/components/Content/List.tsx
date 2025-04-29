@@ -91,7 +91,7 @@ export default function Content(props: Readonly<ContentProps>) {
   >([]);
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [hasMoreData, setHasMoreData] = useState(true);
+  const [hasMoreData, setHasMoreData] = useState(false);
   const [localFilters, setLocalFilters] = useState<
     typeof DEFAULT_FILTERS & {
       type?: string;
@@ -116,6 +116,23 @@ export default function Content(props: Readonly<ContentProps>) {
           ...(props ?? newData),
         };
         setPropData(newProp);
+        // Set initial filters after propData is set
+        setLocalFilters((prev) => ({
+          ...prev,
+          ...(newProp?.filters ?? {}),
+          type:
+            props?.contentTabs?.length === 1
+              ? props.contentTabs[0]
+              : DEFAULT_TABS[0].type,
+        }));
+
+        // Set initial tabs after propData is set
+        const filteredTabs = DEFAULT_TABS.filter((tab) =>
+          Array.isArray(newProp?.contentTabs) && newProp.contentTabs.length > 0
+            ? newProp.contentTabs.includes(tab.label.toLowerCase())
+            : true
+        );
+        setTabs(filteredTabs);
         setIsPageLoading(false);
       } catch (error) {
         console.error('Failed to initialize component:', error);
@@ -292,7 +309,13 @@ export default function Content(props: Readonly<ContentProps>) {
         abortControllerRef.current.abort();
       }
     };
-  }, [localFilters, fetchContent, fetchDataTrack, propData?.hasMoreData]);
+  }, [
+    localFilters,
+    fetchContent,
+    fetchDataTrack,
+    propData?.hasMoreData,
+    propData?.filters,
+  ]);
 
   // Update filters when tab changes
   useEffect(() => {
@@ -304,23 +327,6 @@ export default function Content(props: Readonly<ContentProps>) {
       }));
     }
   }, [tabValue, tabs]);
-
-  // Initialize tabs and filters
-  useEffect(() => {
-    const init = () => {
-      const filteredTabs = DEFAULT_TABS.filter((tab) =>
-        Array.isArray(propData?.contentTabs) && propData.contentTabs.length > 0
-          ? propData.contentTabs.includes(tab.label.toLowerCase())
-          : true
-      );
-      setTabs(filteredTabs);
-      setLocalFilters((prev) => ({
-        ...prev,
-        ...(propData?.filters ?? {}),
-      }));
-    };
-    init();
-  }, [propData?.filters, propData?.contentTabs]);
 
   // Event handlers
   const handleLoadMore = useCallback((event: React.MouseEvent) => {

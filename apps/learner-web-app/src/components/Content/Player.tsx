@@ -86,8 +86,10 @@ const App = () => {
         <Box
           sx={{
             display: 'flex',
+            flex: { xs: 1, md: 8 },
             gap: 2,
             flexDirection: 'column',
+            width: relatedIdentity.length > 0 ? 'initial' : '100%',
           }}
         >
           <Box
@@ -242,7 +244,7 @@ const PlayerBox = ({ item, identifier, courseId, unitId }: any) => {
             src={item?.posterImage ?? `/images/image_ver.png`}
             alt={item?.identifier}
             style={{
-              height: 'calc(100vh - 150px)',
+              height: 'calc(100vh - 287px)',
               width: 'auto',
               borderRadius: 0,
             }}
@@ -272,7 +274,7 @@ const PlayerBox = ({ item, identifier, courseId, unitId }: any) => {
           style={{
             // display: 'block',
             // padding: 0,
-            height: 'calc(100vh - 150px)',
+            height: 'calc(100vh - 287px)',
             border: 'none',
           }}
           width="100%"

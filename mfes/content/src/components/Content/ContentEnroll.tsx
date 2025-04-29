@@ -73,6 +73,7 @@ const ContentDetails = (props: ContentDetailsProps) => {
   }, [identifier, props, router]);
 
   const handleClick = async () => {
+    setIsLoading(true);
     try {
       const userId = localStorage.getItem('userId');
       if (userId) {
@@ -87,6 +88,7 @@ const ContentDetails = (props: ContentDetailsProps) => {
     } catch (error) {
       console.error('Failed to create user certificate:', error);
     }
+    setIsLoading(false);
   };
   const onBackClick = () => {
     router.back();

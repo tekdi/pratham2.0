@@ -22,6 +22,7 @@ const LTwoCourse: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [count, setCount] = useState(0);
   const [topics, setTopics] = useState<TopicProp[]>([]);
+  const [userResponse, setUserResponse] = useState<any>(null);
   const [selectedTopic, setSelectedTopic] = React.useState<
     TopicProp | undefined
   >(undefined);
@@ -33,6 +34,8 @@ const LTwoCourse: React.FC = () => {
         const tenantId = localStorage.getItem('tenantId');
         if (userId && tenantId) {
           try {
+            const result = await getUserId();
+            setUserResponse(result);
             const courses = await fetchUserCoursesWithContent(userId, tenantId);
             setTopics(courses);
           } catch (error) {
@@ -51,13 +54,30 @@ const LTwoCourse: React.FC = () => {
   }
 
   const handleInterestClick = () => {
-    setIsModalOpen(true);
+    if (userResponse) {
+      const { email, dob } = userResponse;
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const dobPattern = /^\d{4}-\d{2}-\d{2}$/;
+
+      if (!emailPattern.test(email) || !dobPattern.test(dob)) {
+        showToastMessage(
+          'Complete your profile with a valid email and DOB in YYYY-MM-DD format',
+          'error'
+        );
+      } else {
+        setIsModalOpen(true);
+      }
+    } else {
+      showToastMessage(
+        'Complete your profile with a valid email and DOB in YYYY-MM-DD format',
+        'error'
+      );
+    }
   };
 
   const handleSubmit = async () => {
     try {
       // Get user data
-      const userResponse = await getUserId();
       const userData = {
         first_name: userResponse?.firstName ?? '',
         middle_name: userResponse?.middleName ?? '',
@@ -87,9 +107,16 @@ const LTwoCourse: React.FC = () => {
         setIsModalOpen(false);
         setCount(0);
       }
-    } catch (error) {
-      console.error('Error in handleSubmit:', error);
-      showToastMessage(`Error in handleSubmit: ${error}`, 'error');
+    } catch (error: any) {
+      const response = error?.response;
+      console.error(
+        'Error in handleSubmit:',
+        response?.data?.message?.join('') ?? error
+      );
+      showToastMessage(
+        `Error in handleSubmit: ${response?.data?.message?.join('') ?? error}`,
+        'error'
+      );
       // Handle error appropriately
     }
   };
