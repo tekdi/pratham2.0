@@ -143,7 +143,8 @@ export const extractMatchingKeys = (row: any, schema: any) => {
         result[key] = row[key];
       }
     } else if (schemaField.fieldId) {
-      const matchedField = row.customFields?.find(
+      const fields = row.customFields || row.customField || [];
+      const matchedField = fields?.find(
         (field) => field.fieldId === schemaField.fieldId
       );
 
