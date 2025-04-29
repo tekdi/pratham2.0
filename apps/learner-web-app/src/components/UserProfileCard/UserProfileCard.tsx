@@ -41,7 +41,21 @@ const UserProfileCard = () => {
     'Privacy Guidelines',
     'Consent Form',
   ];
+  const isBelow18 = (dob: string): boolean => {
+    const birthDate = new Date(dob);
+    const today = new Date();
 
+    const age =
+      today.getFullYear() -
+      birthDate.getFullYear() -
+      (today.getMonth() < birthDate.getMonth() ||
+      (today.getMonth() === birthDate.getMonth() &&
+        today.getDate() < birthDate.getDate())
+        ? 1
+        : 0);
+
+    return age < 18;
+  };
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -81,9 +95,12 @@ const UserProfileCard = () => {
     }
     if (option === 'Privacy Guidelines') {
       window.open('https://www.pratham.org/privacy-guidelines/', '_blank');
+    } else if (option === 'Consent Form' && isBelow18(userData.dob)) {
+      window.open('/files/consent_form_below_18_hindi.pdf', '_blank');
+    } else if (option === 'Consent Form' && !isBelow18(userData.dob)) {
+      window.open('/files/consent_form_above_18_hindi.pdf', '_blank');
     }
-    if (option === 'Consent Form') {
-    }
+
     setSelectedOption(option);
     setOpen(true);
     setAnchorEl(null); // Close the menu
@@ -329,6 +346,13 @@ const UserProfileCard = () => {
           </MenuItem>
         ))}
       </Menu>
+      {/* <a
+        href="/files/consent_form_above_18_hindi.pdf"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Open PDF
+      </a> */}
     </Box>
   );
 };

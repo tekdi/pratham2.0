@@ -9,6 +9,9 @@ import {
 } from '@shared-lib';
 import { AccountBox, Explore, Home, Summarize } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
+import ProfileMenu from './ProfileMenu/ProfileMenu';
+import { Box } from '@mui/material';
+import { usePathname } from 'next/navigation';
 
 interface NewDrawerItemProp extends DrawerItemProp {
   variant?: 'contained' | 'text';
@@ -17,10 +20,25 @@ interface NewDrawerItemProp extends DrawerItemProp {
 }
 const App: React.FC<LayoutProps> = ({ children, ...props }) => {
   const router = useRouter();
+  const pathname = usePathname();
+
   const { t, setLanguage } = useTranslation();
   const [defaultNavLinks, setDefaultNavLinks] = useState<NewDrawerItemProp[]>(
     []
   );
+  const [anchorEl, setAnchorEl] = useState<any>(null);
+
+  const handleOpen = (event: any) => setAnchorEl(event.currentTarget);
+  const handleClose = () => setAnchorEl(null);
+  const handleProfileClick = () => {
+    if (pathname !== '/profile') {
+      router.push('/profile');
+    }
+    handleClose();
+  };
+  const handleLogoutClick = () => {
+    router.push('/logout');
+  };
 
   React.useEffect(() => {
     const currentPage =
@@ -50,7 +68,9 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
       {
         title: t('LEARNER_APP.COMMON.PROFILE'),
         icon: <AccountBox />,
-        to: () => router.push('/profile'),
+        to: () => {
+          setAnchorEl(true);
+        },
         isActive: currentPage === '/profile',
       },
     ]);
@@ -59,18 +79,35 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
     setLanguage(val);
   };
   return (
-    <Layout
-      onlyHideElements={['footer']}
-      {...props}
-      _topAppBar={{
-        navLinks: defaultNavLinks,
-        _navLinkBox: { gap: 5 },
-        onLanguageChange,
-        ...props?._topAppBar,
-      }}
-    >
-      {children}
-    </Layout>
+    <>
+      <Layout
+        onlyHideElements={['footer']}
+        {...props}
+        _topAppBar={{
+          navLinks: defaultNavLinks,
+          _navLinkBox: { gap: 5 },
+          onLanguageChange,
+          ...props?._topAppBar,
+        }}
+      >
+        <Box>
+          {children}
+          <Box
+            sx={{
+              marginTop: '20px',
+            }}
+          >
+            <ProfileMenu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleClose}
+              onProfileClick={handleProfileClick}
+              onLogout={handleLogoutClick}
+            />
+          </Box>
+        </Box>
+      </Layout>
+    </>
   );
 };
 
