@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React, { useEffect, useState } from 'react';
-import DynamicForm from '@/components/DynamicForm/DynamicForm';
+import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
 import { showToastMessage } from '../../Toastify';
@@ -15,7 +15,7 @@ import {
   notificationCallback,
   splitUserData,
   telemetryCallbacks,
-} from '@/components/DynamicForm/DynamicFormCallback';
+} from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import {
   bulkCreateCohortMembers,
   createCohort,
@@ -24,7 +24,7 @@ import {
 } from '@/services/CohortService/cohortService';
 import { CohortTypes, RoleId } from '@/utils/app.constant';
 import _ from 'lodash';
-import StepperForm from '@/components/DynamicForm/StepperForm';
+import StepperForm from '@shared-lib-v2/DynamicForm/components/StepperForm';
 import CohortManager from '@/utils/CohortManager';
 const AddEditUser = ({
   SuccessCallback,
@@ -215,6 +215,7 @@ const AddEditUser = ({
     setPrefilledFormData(formData);
     console.log(formData, 'formdata');
     console.log('########## debug username', payload);
+    console.log('########## debug formdata', formData);
 
     if (isEdit) {
       if (isNotificationRequired) {

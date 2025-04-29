@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React, { useState, useEffect } from 'react';
-import DynamicForm from '@/components/DynamicForm/DynamicForm';
+import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
 import { CohortTypes, Status } from '@/utils/app.constant';
@@ -18,8 +18,8 @@ import {
   extractMatchingKeys,
   fetchForm,
   searchListData,
-} from '@/components/DynamicForm/DynamicFormCallback';
-import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
+} from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
+import { FormContext } from '@shared-lib-v2/DynamicForm/components/DynamicFormConstant';
 import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import {
   CohortSearchSchema,
@@ -434,6 +434,7 @@ const Centers = () => {
       ),
       callback: (row: any) => {
         let tempFormData = extractMatchingKeys(row, addSchema);
+        console.log('######## images value tempFormData', tempFormData);
         setPrefilledAddFormData(tempFormData);
         setIsEdit(true);
         setEditableUserId(row?.cohortId);

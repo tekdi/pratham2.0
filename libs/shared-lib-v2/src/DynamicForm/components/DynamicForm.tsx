@@ -15,6 +15,7 @@ import SearchTextFieldWidget from './RJSFWidget/SearchTextFieldWidget';
 import CustomSingleSelectWidget from './RJSFWidget/CustomSingleSelectWidget';
 import CustomRadioWidget from './RJSFWidget/CustomRadioWidget';
 import CustomTextFieldWidget from './RJSFWidget/CustomTextFieldWidget';
+import CustomFileUpload from './RJSFWidget/CustomFileUpload';
 import {
   calculateAgeFromDate,
   toPascalCase,
@@ -108,6 +109,7 @@ const DynamicForm = ({
     CustomSingleSelectWidget,
     CustomRadioWidget,
     CustomTextFieldWidget,
+    CustomFileUpload,
   };
 
   useEffect(() => {
@@ -1123,7 +1125,7 @@ const DynamicForm = ({
 
     // // console.log('formSchema', transformedFormData);
     // console.log('Form Data Submitted:', filteredData);
-    // console.log('formattedFormData', transformedFormData);
+    console.log('########## debug formattedFormData', transformedFormData);
     if (!isCallSubmitInHandle) {
       FormSubmitFunction(cleanedData, transformedFormData);
     }
@@ -1265,7 +1267,6 @@ const DynamicForm = ({
           transformErrors={transformErrors} // ✅ Suppress default pattern errors
           widgets={widgets}
           id="dynamic-form-id"
-
           // template
           templates={{ ObjectFieldTemplate: CustomObjectFieldTemplate }}
         >

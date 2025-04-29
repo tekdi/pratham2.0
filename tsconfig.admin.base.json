@@ -17,6 +17,9 @@
     "paths": {
       "@/*": ["apps/admin-app-repo/src/*"],
       "@shared-lib": ["libs/shared-lib/src/index.ts"],
+      
+      //dynamic form
+      "@shared-lib-v2/*": ["libs/shared-lib-v2/src/*"]
     }
   },
   "exclude": ["node_modules", "tmp"]
