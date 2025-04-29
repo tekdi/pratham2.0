@@ -54,6 +54,7 @@ const InfoCard: React.FC<InfoCardProps> = ({ item, onBackClick, _config }) => {
               display: 'flex',
               alignItems: 'center',
               gap: 1,
+              pt: 2,
             }}
           >
             <IconButton
@@ -68,16 +69,29 @@ const InfoCard: React.FC<InfoCardProps> = ({ item, onBackClick, _config }) => {
               <Typography variant="body1">Electrical</Typography>
             </Breadcrumbs>
           </Box>
-          <Typography component="div" variant="h5">
+          <Typography
+            component="div"
+            variant="h5"
+            sx={{
+              fontWeight: 700,
+              fontSize: '36px',
+              lineHeight: '44px',
+              display: '-webkit-box',
+              WebkitLineClamp: 1,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
             {item?.name}
           </Typography>
           <Typography
             variant="subtitle1"
             component="div"
             sx={{
-              color: 'text.secondary',
+              color: '#1F1B13',
               display: '-webkit-box',
-              WebkitLineClamp: 4,
+              WebkitLineClamp: 2,
               WebkitBoxOrient: 'vertical',
               overflow: 'hidden',
               textOverflow: 'ellipsis',

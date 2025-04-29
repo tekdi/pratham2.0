@@ -72,6 +72,10 @@ const App = () => {
     router.back();
   };
 
+  const handleCardClick = (content: any) => {
+    router.push(`/content/${courseId}/${unitId}/${content.identifier}`);
+  };
+
   return (
     <Layout>
       <Box
@@ -181,6 +185,7 @@ const App = () => {
               showFilter={false}
               showSearch={false}
               showHelpDesk={false}
+              handleCardClick={handleCardClick}
               filters={{
                 limit: 4,
                 filters: {
@@ -221,7 +226,11 @@ const PlayerBox = ({ item, identifier, courseId, unitId }: any) => {
     if (checkAuth()) {
       setPlay(true);
     } else {
-      router.push('/login?redirectUrl=/content-details/' + courseId);
+      router.push(
+        `/login?redirectUrl=${
+          courseId ? `/content-details/${courseId}` : `/player/${identifier}`
+        }`
+      );
     }
   };
   return (
@@ -245,7 +254,7 @@ const PlayerBox = ({ item, identifier, courseId, unitId }: any) => {
             alt={item?.identifier}
             style={{
               height: 'calc(100vh - 287px)',
-              width: 'auto',
+              width: '100%',
               borderRadius: 0,
             }}
           />

@@ -56,11 +56,9 @@ const LTwoCourse: React.FC = () => {
   const handleInterestClick = () => {
     if (userResponse) {
       const { email, dob } = userResponse;
-      // Using atomic groups to prevent backtracking
-      const emailPattern =
-        /^(?=(?:[^\s@]+@[^\s@]+\.[^\s@]+)$)[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      // Using atomic groups and strict boundaries for date
-      const dobPattern = /^(?=(?:\d{4}-\d{2}-\d{2})$)\d{4}-\d{2}-\d{2}$/;
+      // @ts-ignore
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const dobPattern = /^\d{4}-\d{2}-\d{2}$/;
 
       if (!emailPattern.test(email) || !dobPattern.test(dob)) {
         showToastMessage(

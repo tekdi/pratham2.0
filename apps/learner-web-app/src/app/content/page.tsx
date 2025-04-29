@@ -12,9 +12,11 @@ import { useTranslation } from '@shared-lib';
 import { checkAuth } from '@shared-lib-v2/utils/AuthService';
 import { CompleteProfileBanner } from '@learner/components/CompleteProfileBanner/CompleteProfileBanner';
 import { profileComplitionCheck } from '@learner/utils/API/userService';
+import { usePathname } from 'next/navigation';
 
 const MyComponent: React.FC = () => {
   const { t } = useTranslation();
+  const pathname = usePathname();
   const [filter, setFilter] = useState<object | null>();
   const [isLogin, setIsLogin] = useState<boolean | null>(null);
   const [isShow, setIsShow] = useState(false);
@@ -37,11 +39,12 @@ const MyComponent: React.FC = () => {
           console.error('Failed to fetch tenant info:', error);
         }
       } else {
+        setFilter({});
         setIsLogin(false);
       }
     };
     fetchTenantInfo();
-  }, []);
+  }, [pathname]);
 
   return (
     <Layout isLoadingChildren={isLogin === null}>
