@@ -129,7 +129,7 @@ export const fetchUserCoursesWithContent = async (
           se_subjects: string[];
         }
       ) => {
-        course.se_subjects.forEach((topic: string) => {
+        course?.se_subjects?.forEach((topic: string) => {
           const existingGroup = acc.find((group) => group.topic === topic);
           if (existingGroup) {
             if (
