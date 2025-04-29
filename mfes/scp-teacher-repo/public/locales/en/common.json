@@ -174,7 +174,9 @@
     "BATCHES": "Batches",
     "BATCH_SESSIONS": "Batch Sessions",
     "NOT_ABLE_CREATE_LEARNER": "Not able to create learner",
-    "NOT_ABLE_CREATE_FACILITATOR": "Not Able To Create Teacher"
+    "NOT_ABLE_CREATE_FACILITATOR": "Not Able To Create Teacher",
+    "NEW_BATCH": "New Batch",
+    "REASSIGN_BATCH": "Re-assign Batch"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -622,7 +624,9 @@
     "USERNAME_ALREADY_EXIST": "This username already exists",
     "EMAIL_ALREADY_EXIST": "Email is already exists",
     "GRADUATE": "Graduate",
-    "POST_GRADUATE": "Post Graduate"
+    "POST_GRADUATE": "Post Graduate",
+    "CENTER": "Center",
+    "BATCH": "Batch"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "Invalid Input.",
@@ -806,14 +810,22 @@
     "SUMMARY": "Summary"
   },
   "FACILITATORS": {
-    "NEW_FACILITATOR": "New Facilitators"
+    "NEW_FACILITATOR": "New Facilitators",
+    "RE_ASSIGN_FACILITATOR": "Re-assign Facilitator"
   },
   "MENTOR": {
     "BACK_TO_FORM": "Back to Form",
     "FINISH_ASSIGN": "Finish & Assign"
   },
   "LEARNERS": {
-    "NEW_LEARNER": "New Learners"
+    "NEW_LEARNER": "New Learners",
+    "EDIT_LEARNER": "Edit Learner",
+    "RE_ASSIGN_LEARNER": "Re-assign Learner",
+    "LEARNER_UPDATED_SUCCESSFULLY": "Learner updated successfully",
+    "NOT_ABLE_UPDATE_LEARNER": "Not able to update learner",
+    "LEARNER_CREATED_SUCCESSFULLY": "Learner created successfully",
+    "NOT_ABLE_CREATE_LEARNER": "Not able to create learner",
+    "LEARNERS.USER_CREDENTIALS_WILL_BE_SEND_SOON": "User credentials will be sent soon"
   },
   "VILLAGE": "Village",
   "first_name": "First Name",

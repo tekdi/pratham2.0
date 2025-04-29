@@ -17,6 +17,8 @@ import {
   lowLearnerAttendanceLimit,
 } from '../../app.config';
 import API_ENDPOINTS from './API/APIEndpoints';
+import { getCohortData } from '@/services/CohortServices';
+import { customFields } from '@/components/GeneratedSchemas';
 
 export const ATTENDANCE_ENUM = {
   PRESENT: 'present',
@@ -557,6 +559,7 @@ export const getUserDetailsById = (data: any[], userId: any) => {
       status: user?.status,
       statusReason: user?.statusReason,
       cohortMembershipId: user?.cohortMembershipId,
+      customFields: user?.customField,
     };
   }
 
@@ -1164,4 +1167,24 @@ export const flresponsetotl = async (response: any[]) => {
   // console.log('########## testflresponse transformedData', transformedData);
 
   return transformedData;
+};
+
+export const fetchUserData = async (userId: any) => {
+  try {
+    let activeCohortIds = [];
+    const resp = await getCohortData(userId);
+    if (resp?.result) {
+      activeCohortIds = resp.result
+        .filter(
+          (cohort: any) =>
+            cohort.type === 'BATCH' && cohort.cohortMemberStatus === 'active'
+        )
+        .map((cohort: any) => cohort.cohortId);
+      console.log(activeCohortIds, 'activeBatches');
+    }
+    return activeCohortIds;
+  } catch (error) {
+    console.error('Error getting user details:', error);
+    return null;
+  }
 };

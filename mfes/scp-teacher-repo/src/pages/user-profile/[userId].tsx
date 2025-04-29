@@ -10,6 +10,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Profile from '@/components/Profile';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { GetStaticPaths } from 'next';
+import { toPascalCase } from '@/utils/Helper';
 
 const UserId = () => {
   const { t } = useTranslation();
@@ -127,18 +128,24 @@ const UserId = () => {
                   color: '#4D4639',
                 }}
               >
-                {`${user.firstName} ${user.lastName}` || ''}
+                {toPascalCase(`${user.firstName} ${user.lastName}` || '')}
+                
               </Box>
-<Box
-  sx={{
-    fontWeight: 500,
-    fontSize: '12px',
-    lineHeight: '16px',
-    letterSpacing: '0.5px',
-  }}
->
-  {user.village}, {user.block}, {user.district}, {user.state}
-</Box>
+                {(user.village || user.block || user.district || user.state) && (
+                <Box
+                  sx={{
+                  fontWeight: 500,
+                  fontSize: '12px',
+                  lineHeight: '16px',
+                  letterSpacing: '0.5px',
+                  }}
+                >
+                  {user.state && `${user.state}, `}
+                  {user.district && `${user.district}, `}
+                  {user.block && `${user.block}, `}
+                  {user.village && `${user.village} `}
+                </Box>
+                )}
             </Box>
           </Box>
         </Box>
