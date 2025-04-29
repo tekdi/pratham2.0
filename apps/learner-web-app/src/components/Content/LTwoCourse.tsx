@@ -59,24 +59,24 @@ const LTwoCourse: React.FC = () => {
       // Get user data
       const userResponse = await getUserId();
       const userData = {
-        first_name: userResponse?.firstName || '',
-        middle_name: userResponse?.middleName || '',
-        last_name: userResponse?.lastName || '',
+        first_name: userResponse?.firstName ?? '',
+        middle_name: userResponse?.middleName ?? '',
+        last_name: userResponse?.lastName ?? '',
         mother_name: '',
-        gender: userResponse?.gender || '',
-        email_address: userResponse?.email || '',
-        dob: userResponse?.dob || '',
+        gender: userResponse?.gender ?? '',
+        email_address: userResponse?.email ?? '',
+        dob: userResponse?.dob ?? '',
         qualification: '',
-        phone_number: userResponse?.mobile?.toString() || '',
+        phone_number: userResponse?.mobile?.toString() ?? '',
         state: '',
         district: '',
         block: '',
         village: '',
         blood_group: '',
-        userId: userResponse?.userId || '',
-        courseId: selectedTopic?.courses?.[0]?.name || '',
-        courseName: selectedTopic?.courses?.[0]?.courseId || '',
-        topicName: selectedTopic?.topic || '',
+        userId: userResponse?.userId ?? '',
+        courseId: selectedTopic?.courses?.[0]?.name ?? '',
+        courseName: selectedTopic?.courses?.[0]?.courseId ?? '',
+        topicName: selectedTopic?.topic ?? '',
       };
 
       // Call createL2Course API

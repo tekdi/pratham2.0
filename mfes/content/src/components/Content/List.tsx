@@ -252,7 +252,7 @@ export default function Content(props: Readonly<ContentProps>) {
 
         if (!response || !isMounted) return;
 
-        const newContentData = response.content || [];
+        const newContentData = response.content ?? [];
 
         const userTrackData = await fetchDataTrack(newContentData);
         if (!isMounted) return;
@@ -261,7 +261,7 @@ export default function Content(props: Readonly<ContentProps>) {
           setContentData(newContentData);
           setTrackData(userTrackData);
         } else {
-          setContentData((prev) => [...(prev || []), ...newContentData]);
+          setContentData((prev) => [...(prev ?? []), ...newContentData]);
           setTrackData((prev) => [...prev, ...userTrackData]);
         }
 
@@ -358,7 +358,7 @@ export default function Content(props: Readonly<ContentProps>) {
       try {
         if (propData?.handleCardClick) {
           propData.handleCardClick(content);
-        } else if (SUPPORTED_MIME_TYPES.includes(content?.mimeType as string)) {
+        } else if (SUPPORTED_MIME_TYPES.includes(content?.mimeType)) {
           router.push(`/player/${content?.identifier}`);
         } else {
           router.push(`/content-details/${content?.identifier}`);

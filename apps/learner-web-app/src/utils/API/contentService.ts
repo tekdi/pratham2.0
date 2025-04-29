@@ -94,7 +94,7 @@ export const fetchUserCoursesWithContent = async (
       offset: 0,
     });
 
-    const courseIds = response?.data?.result?.data || [];
+    const courseIds = response?.data?.result?.data ?? [];
     const resultCourses = await ContentSearch({
       filters: {
         identifier: courseIds.map((c: any) => c.courseId),
@@ -105,11 +105,11 @@ export const fetchUserCoursesWithContent = async (
           'Practice Question Set',
         ],
         channel: localStorage.getItem('channelId'),
-        ...(JSON.parse(localStorage.getItem('filter') || '{}') || {}),
+        ...(JSON.parse(localStorage.getItem('filter') ?? '{}') ?? {}),
       },
     });
 
-    const allCourses = resultCourses?.result?.content || [];
+    const allCourses = resultCourses?.result?.content ?? [];
     console.log(allCourses, 'resultCourses');
 
     // Group courses by topic
