@@ -27,7 +27,7 @@ const UsernameSuggestion: React.FC<UsernameSuggestionProps> = ({
   setSuggestions,
   onContinue,
 }) => {
-  const { t } = useTranslation(); // Initialize translation function
+  const { t } = useTranslation();
 
   // Function to handle clicking a suggestion
   const handleSuggestionClick = (username: string) => {

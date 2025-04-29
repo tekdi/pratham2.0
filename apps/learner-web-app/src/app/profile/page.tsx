@@ -7,6 +7,7 @@ import UserProfileCard from '@learner/components/UserProfileCard/UserProfileCard
 import CourseCertificateCard from '@learner/components/CourseCertificateCard/CourseCertificateCard';
 import { courseWiseLernerList } from '@shared-lib-v2/utils/CertificateService/coursesCertificates';
 import { CertificateModal, get } from '@shared-lib';
+
 import { baseurl } from '@learner/utils/API/EndUrls';
 type FilterDetails = {
   status?: string[];
@@ -61,7 +62,7 @@ const ProfilePage = () => {
             userId: item.userId,
             courseId: item.courseId,
             certificateId: item.certificateId,
-            completedOn: item.completedOn,
+            completedOn: item.issuedOn,
             description: courseDetails.description || '',
             posterImage: courseDetails.posterImage || '',
             program: courseDetails.program || [],

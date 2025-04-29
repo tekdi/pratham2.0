@@ -22,9 +22,11 @@ const Login = dynamic(
 const LoginPage = () => {
   const router = useRouter();
   const theme = useTheme();
+  const { t } = useTranslation();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const { t } = useTranslation(); // Initialize translation function
-  const handleAddAccount = () => {};
+  const handleAddAccount = () => {
+    router.push('/');
+  };
 
   useEffect(() => {
     const init = async () => {
