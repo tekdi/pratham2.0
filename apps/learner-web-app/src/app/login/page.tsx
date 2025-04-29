@@ -22,11 +22,11 @@ const Login = dynamic(
 const LoginPage = () => {
   const router = useRouter();
   const theme = useTheme();
-  const { t } = useTranslation();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const handleAddAccount = () => {
     router.push('/');
   };
+  const { t } = useTranslation();
 
   useEffect(() => {
     const init = async () => {
@@ -46,10 +46,10 @@ const LoginPage = () => {
           const fp = await FingerprintJS.load();
           const { visitorId } = await fp.get();
           localStorage.setItem('did', visitorId);
-          console.log(t('LOGIN_PAGE.DEVICE_FINGERPRINT_SUCCESS')); // Internationalized log message
+          console.log('Device fingerprint generated successfully');
         }
       } catch (error) {
-        console.error(t('LOGIN_PAGE.DEVICE_FINGERPRINT_ERROR')); // Internationalized error message
+        console.error('Error generating device fingerprint:', error);
       }
     };
     init();
@@ -59,7 +59,6 @@ const LoginPage = () => {
     localStorage.setItem('loginRoute', '/login');
     router.push('/password-forget');
   };
-
   const handleLogin = async (data: {
     username: string;
     password: string;
@@ -75,18 +74,17 @@ const LoginPage = () => {
         showToastMessage(
           t('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT'),
           'error'
-        ); // Internationalized toast message
+        );
       }
+      // setLoading(false);
     } catch (error: any) {
-      const errorMessage = t('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT'); // Internationalized error message
+      //   setLoading(false);
+      const errorMessage = t('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT');
       showToastMessage(errorMessage, 'error');
     }
   };
-
   return (
-    <Suspense fallback={<div>{t('LOGIN_PAGE.LOADING')}</div>}>
-      {' '}
-      {/* Internationalized fallback */}
+    <Suspense fallback={<div>Loading...</div>}>
       <Box
         height="100vh"
         width="100vw"
@@ -140,7 +138,6 @@ const handleSuccessfulLogin = async (
   data: { remember: boolean },
   router: any
 ) => {
-  const { t } = useTranslation(); // Initialize translation function
   if (typeof window !== 'undefined' && window.localStorage) {
     const token = response.access_token;
     const refreshToken = response?.refresh_token;
@@ -183,10 +180,7 @@ const handleSuccessfulLogin = async (
           router.push('/content');
         }
       } else {
-        showToastMessage(
-          t('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT'),
-          'error'
-        ); // Internationalized toast message
+        showToastMessage('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT', 'error');
       }
     }
   }
