@@ -1,6 +1,13 @@
 import { post } from '@shared-lib';
 import { get } from './RestClient';
-
+import { API_ENDPOINTS } from './EndUrls';
+export interface courseWiseLernerListParam {
+  limit?: number;
+  offset?: number;
+  filters: {
+    status?: string[];
+  };
+}
 export const fetchContent = async (identifier: any) => {
   try {
     const API_URL = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/api/content/v1/read/${identifier}`;
@@ -73,6 +80,24 @@ export const ContentSearch = async ({
     return res;
   } catch (error) {
     console.error('Error in ContentSearch:', error);
+    throw error;
+  }
+};
+export const courseWiseLernerList = async ({
+  limit,
+  offset,
+  filters,
+}: courseWiseLernerListParam): Promise<any> => {
+  const apiUrl: string = API_ENDPOINTS.courseWiseLernerList;
+  try {
+    const response = await post(apiUrl, {
+      limit,
+      filters,
+      offset,
+    });
+    return response?.data?.result;
+  } catch (error) {
+    console.error('error in getting user list', error);
     throw error;
   }
 };

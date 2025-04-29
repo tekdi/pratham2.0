@@ -50,7 +50,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
       {
         title: t('LEARNER_APP.COMMON.PROFILE'),
         icon: <AccountBox />,
-        to: () => router.push('/content'),
+        to: () => router.push('/profile'),
         isActive: currentPage === '/content',
       },
     ]);
