@@ -17,8 +17,10 @@ type FilterDetails = {
 const ProfilePage = () => {
   const [filters] = useState<FilterDetails>({
     status: ['completed', 'viewCertificate'],
-    tenantId: localStorage.getItem('tenantId') || '',
-    userId: localStorage.getItem('userId') || '',
+    tenantId:
+      (typeof window !== 'undefined' && localStorage.getItem('tenantId')) || '',
+    userId:
+      (typeof window !== 'undefined' && localStorage.getItem('userId')) || '',
   });
   const [showCertificate, setShowCertificate] = useState(false);
   const [certificateId, setCertificateId] = useState('');
