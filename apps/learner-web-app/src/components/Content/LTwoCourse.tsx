@@ -158,7 +158,7 @@ const LTwoCourse: React.FC = () => {
           >
             <LevelUp
               handleTopicChange={handleTopicChange}
-              selectedTopic={selectedTopic?.topic || ''}
+              selectedTopic={selectedTopic?.topic ?? ''}
               topics={topics}
             />
           </CommonModal>
