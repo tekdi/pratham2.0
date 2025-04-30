@@ -68,14 +68,15 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
   // Translate function
   const t = useMemo(() => {
     return (key: string): string => {
-      const keys = key.split('.');
+      const keys = key?.split('.');
       let result: any = translations[language];
-
-      for (const k of keys) {
-        if (result?.[k] === undefined) {
-          return key; // fallback if any level is missing
+      if (keys) {
+        for (const k of keys) {
+          if (result?.[k] === undefined) {
+            return key; // fallback if any level is missing
+          }
+          result = result[k];
         }
-        result = result[k];
       }
 
       return typeof result === 'string' ? result : key;
