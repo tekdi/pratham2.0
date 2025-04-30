@@ -41,14 +41,12 @@ export const userCheck = async ({
 };
 
 export const profileComplitionCheck = async (): Promise<any> => {
-  let userId = localStorage.getItem('userId');
+  const userId = localStorage.getItem('userId');
   try {
     if (userId) {
-      let apiUrl: string = API_ENDPOINTS.userRead(userId, true);
-
+      const apiUrl = API_ENDPOINTS.userRead(userId, true);
       const response = await get(apiUrl);
-      console.log('response', response);
-      let userData = response?.data?.result?.userData;
+      const userData = response?.data?.result?.userData;
       const responseForm: any = await fetchForm([
         {
           fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.learner.context}&contextType=${FormContext.learner.contextType}`,

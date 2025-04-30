@@ -10,6 +10,7 @@ import { showToastMessage } from '@learner/components/ToastComponent/Toastify';
 import { useRouter } from 'next/navigation';
 import { useMediaQuery, useTheme } from '@mui/material';
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
+import { Loader, useTranslation } from '@shared-lib';
 
 const Login = dynamic(
   () => import('@login/Components/LoginComponent/LoginComponent'),
@@ -25,6 +26,7 @@ const LoginPage = () => {
   const handleAddAccount = () => {
     router.push('/');
   };
+  const { t } = useTranslation();
 
   useEffect(() => {
     const init = async () => {
@@ -69,12 +71,15 @@ const LoginPage = () => {
       if (response?.result?.access_token) {
         handleSuccessfulLogin(response?.result, data, router);
       } else {
-        showToastMessage('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT', 'error');
+        showToastMessage(
+          t('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT'),
+          'error'
+        );
       }
       // setLoading(false);
     } catch (error: any) {
       //   setLoading(false);
-      const errorMessage = 'LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT';
+      const errorMessage = t('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT');
       showToastMessage(errorMessage, 'error');
     }
   };

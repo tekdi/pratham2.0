@@ -21,12 +21,15 @@ const ContentComponent = ({
     const fetchDOIds = async () => {
       try {
         const userId = [localStorage.getItem('userId')];
+        let courseIds: never[] = [];
         if (userId && userId[0] !== null) {
           const res = await FetchDoIds(userId);
-
           const courseIdList = res?.data[0]?.courseIdList;
-          const courseIds = courseIdList.map((course: any) => course.courseId);
+          courseIds = courseIdList.map((course: any) => course.courseId);
           setIdentifier(courseIds);
+        }
+        if (courseIds.length <= 0) {
+          getContentData(courseIds.length);
         }
       } catch (error) {
         console.error('Failed to fetch tenant info:', error);
@@ -35,6 +38,10 @@ const ContentComponent = ({
 
     fetchDOIds();
   }, []);
+
+  if (identifier.length <= 0) {
+    return null;
+  }
 
   return (
     <Content

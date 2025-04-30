@@ -79,35 +79,51 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
     setLanguage(val);
   };
   return (
-    <>
-      <Layout
-        onlyHideElements={['footer']}
-        {...props}
-        _topAppBar={{
-          navLinks: defaultNavLinks,
-          _navLinkBox: { gap: 5 },
-          onLanguageChange,
-          ...props?._topAppBar,
-        }}
-      >
-        <Box>
-          {children}
-          <Box
-            sx={{
-              marginTop: '20px',
-            }}
-          >
-            <ProfileMenu
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl)}
-              onClose={handleClose}
-              onProfileClick={handleProfileClick}
-              onLogout={handleLogoutClick}
-            />
-          </Box>
+    <Layout
+      onlyHideElements={['footer']}
+      {...props}
+      _topAppBar={{
+        _brand: {
+          name: 'YouthNet',
+          _box: {
+            onClick: () => router.push('/content'),
+            sx: {
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+            },
+            _text: {
+              fontWeight: 400,
+              fontSize: '22px',
+              lineHeight: '28px',
+              textAlign: 'center',
+            },
+          },
+        },
+        navLinks: defaultNavLinks,
+        _navLinkBox: { gap: 5 },
+        onLanguageChange,
+        ...props?._topAppBar,
+      }}
+    >
+      <Box>
+        {children}
+        <Box
+          sx={{
+            marginTop: '20px',
+          }}
+        >
+          <ProfileMenu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+            onProfileClick={handleProfileClick}
+            onLogout={handleLogoutClick}
+          />
         </Box>
-      </Layout>
-    </>
+      </Box>
+    </Layout>
   );
 };
 

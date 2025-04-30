@@ -78,8 +78,8 @@ const OurProgramCarousel = () => {
 
         <Grid container spacing={2} sx={{ my: 4 }}>
           {programs?.map((program) => (
-            <Grid item xs={12} md={4}>
-              <SwiperSlide key={program?.ordering}>
+            <Grid item xs={12} md={4} key={program?.ordering}>
+              <SwiperSlide>
                 <Card
                   sx={{
                     maxWidth: '100%',
@@ -129,9 +129,6 @@ const OurProgramCarousel = () => {
                       }}
                       loop={true}
                     >
-                      {
-                        // @ts-ignore
-                      }
                       {(program?.programImages?.length > 0
                         ? program.programImages
                         : [null]
