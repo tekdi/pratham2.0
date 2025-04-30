@@ -7,6 +7,8 @@ import UserProfileCard from '@learner/components/UserProfileCard/UserProfileCard
 import CourseCertificateCard from '@learner/components/CourseCertificateCard/CourseCertificateCard';
 import { courseWiseLernerList } from '@shared-lib-v2/utils/CertificateService/coursesCertificates';
 import { CertificateModal, get } from '@shared-lib';
+import { useRouter } from 'next/navigation';
+import { checkAuth } from '@shared-lib-v2/utils/AuthService';
 
 import { baseurl } from '@learner/utils/API/EndUrls';
 type FilterDetails = {
@@ -15,6 +17,8 @@ type FilterDetails = {
   userId?: string;
 };
 const ProfilePage = () => {
+  const router = useRouter();
+
   const [filters] = useState<FilterDetails>({
     status: ['completed', 'viewCertificate'],
     tenantId:
@@ -81,7 +85,12 @@ const ProfilePage = () => {
     };
     prepareCertificateData();
   }, []);
-
+  useEffect(() => {
+    // const token = localStorage.getItem('token');
+    if (!checkAuth()) {
+      router.push('/login');
+    }
+  }, []);
   return (
     <Layout>
       <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={2}>

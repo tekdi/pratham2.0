@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import { useMediaQuery, useTheme } from '@mui/material';
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import { Loader, useTranslation } from '@shared-lib';
+import { preserveLocalStorage } from '@learner/utils/helper';
 
 const Login = dynamic(
   () => import('@login/Components/LoginComponent/LoginComponent'),
@@ -31,6 +32,9 @@ const LoginPage = () => {
   useEffect(() => {
     const init = async () => {
       try {
+        // localStorage.clear();()
+        preserveLocalStorage();
+
         const access_token = localStorage.getItem('token');
         const refresh_token = localStorage.getItem('refreshToken');
         if (access_token) {
@@ -91,6 +95,7 @@ const LoginPage = () => {
         display="flex"
         flexDirection="column"
         overflow="hidden"
+        sx={{ overflowWrap: 'break-word', wordBreak: 'break-word' }}
       >
         {/* Fixed Header */}
         <Header />
