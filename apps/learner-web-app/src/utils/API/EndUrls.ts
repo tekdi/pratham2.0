@@ -23,6 +23,7 @@ export const API_ENDPOINTS = {
   fetchCourseId: `${baseurl}/tracking/content/course/inprogress`,
   userUpdate: (userId: string) => `${baseurl}/user/update/${userId}`,
   courseWiseLernerList: `${baseurl}/tracking/user_certificate/status/search`,
+  academicYearsList: `${baseurl}/academicyears/list`,
 };
 
 export const COURSE_L2_ENDPOINTS = `${process.env.NEXT_PUBLIC_BASE_URL}/prathamservice/v1/save-user-salesforce`;
