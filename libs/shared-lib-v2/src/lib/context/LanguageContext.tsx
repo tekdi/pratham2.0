@@ -14,6 +14,7 @@ import { getTitleFromValue } from './Languages';
 // Translation files
 import en from './locales/en.json';
 import hi from './locales/hi.json';
+import mr from './locales/mr.json';
 
 // Define translations object
 const translations: Record<string, Record<string, string>> = {
@@ -21,6 +22,7 @@ const translations: Record<string, Record<string, string>> = {
   en,
   // @ts-ignore
   hi,
+  mr,
 };
 
 // Define RTL languages
@@ -68,14 +70,15 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
   // Translate function
   const t = useMemo(() => {
     return (key: string): string => {
-      const keys = key.split('.');
+      const keys = key?.split('.');
       let result: any = translations[language];
-
-      for (const k of keys) {
-        if (result?.[k] === undefined) {
-          return key; // fallback if any level is missing
+      if (keys) {
+        for (const k of keys) {
+          if (result?.[k] === undefined) {
+            return key; // fallback if any level is missing
+          }
+          result = result[k];
         }
-        result = result[k];
       }
 
       return typeof result === 'string' ? result : key;
