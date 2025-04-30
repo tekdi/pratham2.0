@@ -65,7 +65,12 @@ const EditProfile = ({ completeProfile }: EditProfileProps) => {
 
   // const [schema, setSchema] = useState(facilitatorSearchSchema);
   // const [uiSchema, setUiSchema] = useState(facilitatorSearchUISchema);
-
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/login');
+    }
+  }, []);
   useEffect(() => {
     // Fetch form schema from API and set it in state.
     const fetchData = async () => {

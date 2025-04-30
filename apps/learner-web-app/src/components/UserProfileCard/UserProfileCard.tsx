@@ -187,7 +187,7 @@ const UserProfileCard = () => {
   };
 
   return (
-    <Box>
+    <Box sx={{ overflowWrap: 'break-word', wordBreak: 'break-word' }}>
       <Box
         sx={{
           background: 'linear-gradient(to bottom, #FFFDF6, #F8EFDA)',

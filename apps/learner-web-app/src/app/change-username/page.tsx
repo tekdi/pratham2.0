@@ -12,6 +12,8 @@ import UsernameSuggestion from '@learner/components/UsernameSuggestion/UsernameS
 import { updateUser, userNameExist } from '@learner/utils/API/userService';
 import js from '@eslint/js';
 import SimpleModal from '@learner/components/SimpleModal/SimpleModal';
+import { checkAuth } from '@shared-lib-v2/utils/AuthService';
+
 const ChangeUserNamePage = () => {
   const router = useRouter();
   const [username, setUsername] = useState('');
@@ -86,6 +88,11 @@ const ChangeUserNamePage = () => {
     setUsernameChangedSuceesModal(false);
     router.push('/profile');
   };
+  useEffect(() => {
+    if (!checkAuth()) {
+      router.push('/login');
+    }
+  }, []);
   return (
     <Layout>
       <Box
