@@ -86,6 +86,12 @@ const ChangeUserNamePage = () => {
     setUsernameChangedSuceesModal(false);
     router.push('/profile');
   };
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/login');
+    }
+  }, []);
   return (
     <Layout>
       <Box

@@ -68,6 +68,8 @@ const RegisterUser = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [mobile, setMobile] = useState('');
+  const [tenantName, setTenantName] = useState('');
+
   const router = useRouter();
 
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -77,6 +79,10 @@ const RegisterUser = () => {
   // const [schema, setSchema] = useState(facilitatorSearchSchema);
   // const [uiSchema, setUiSchema] = useState(facilitatorSearchUISchema);
   function checkTenantId(tenantIdToCheck: any, tenantData: any) {
+    const name = tenantData?.find(
+      (item: any) => item.tenantId === tenantIdToCheck
+    ).name;
+    setTenantName(name);
     return tenantData?.some((item: any) => item.tenantId === tenantIdToCheck);
   }
   useEffect(() => {
@@ -480,7 +486,7 @@ const RegisterUser = () => {
             }}
           >
             <Typography variant="h2" fontWeight="bold" gutterBottom>
-              Sign Up for YouthNet
+              Sign Up for {tenantName}
             </Typography>
 
             <Typography variant="body1" color="text.secondary" mb={2}>
