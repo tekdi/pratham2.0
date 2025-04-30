@@ -27,6 +27,8 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 //build issue fix for  ⨯ useSearchParams() should be wrapped in a suspense boundary at page
 import { useSearchParams } from 'next/navigation';
 import { getTenantInfo } from '@learner/utils/API/ProgramService';
+import { checkAuth } from '@shared-lib-v2/utils/AuthService';
+
 import Image from 'next/image';
 import { set } from 'lodash';
 import {
@@ -66,8 +68,8 @@ const EditProfile = ({ completeProfile }: EditProfileProps) => {
   // const [schema, setSchema] = useState(facilitatorSearchSchema);
   // const [uiSchema, setUiSchema] = useState(facilitatorSearchUISchema);
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
+    // const token = localStorage.getItem('token');
+    if (!checkAuth()) {
       router.push('/login');
     }
   }, []);
