@@ -59,7 +59,7 @@
     },
     "L_ONE_COURSE": {
       "IN_PROGRESS_TITLE": "In Progress",
-      "ONGOING_COURSES": "You have 4 Ongoing Courses",
+      "ONGOING_COURSES": "You have {count} Ongoing Courses",
       "VIEW_ALL_BUTTON": "View All"
     },
     "L_TWO_COURSE": {
