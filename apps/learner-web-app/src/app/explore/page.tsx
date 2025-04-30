@@ -2,6 +2,7 @@
 import React from 'react';
 import Layout from '@learner/components/Layout';
 import LearnerCourse from '@learner/components/Content/LearnerCourse';
+import SkillCenter from '@learner/components/SkillCenter/SkillCenter';
 
 const App = () => {
   return (
@@ -12,6 +13,7 @@ const App = () => {
           title: 'LEARNER_APP.EXPLORE.EXPLORE_ADDITIONAL_COURSES',
         }}
       />
+      <SkillCenter/>
     </Layout>
   );
 };

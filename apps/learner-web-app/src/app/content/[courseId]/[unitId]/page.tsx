@@ -16,14 +16,14 @@ const CourseUnitDetails = dynamic(() => import('@CourseUnitDetails'), {
 });
 const App = () => {
   return (
-    <Layout>
-      <Box sx={gredientStyle}>
+    <Layout sx={gredientStyle}>
+      <Box>
         <CourseUnitDetails
           isShowLayout={false}
           _config={{
             default_img: '/images/image_ver.png',
             _card: { isHideProgress: true },
-            _infoCard: { _cardMedia: { maxHeight: '244px' } },
+            _infoCard: { _cardMedia: { maxHeight: '248px' } },
           }}
         />
       </Box>

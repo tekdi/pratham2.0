@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { login, resetPassword } from '@learner/utils/API/LoginService';
+import { Loader, useTranslation } from '@shared-lib'; // Updated import
 import { showToastMessage } from '../ToastComponent/Toastify';
 
 interface ResetPasswordFormProps {
@@ -25,6 +25,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
   onResetPassword,
   onForgotPassword,
 }) => {
+  const { t } = useTranslation(); // Initialize translation function
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -36,11 +37,14 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
 
   const handleSubmit = async () => {
     if (!oldPassword || !newPassword || !confirmPassword) {
-      showToastMessage('Please fill in all fields.', 'error');
+      showToastMessage(
+        t('LEARNER_APP.RESET_PASSWORD_FORM.FILL_ALL_FIELDS'),
+        'error'
+      );
       return;
     } else if (newPassword !== confirmPassword) {
       showToastMessage(
-        'New Password and Confirm Password must be the same.',
+        t('LEARNER_APP.RESET_PASSWORD_FORM.PASSWORDS_MUST_MATCH'),
         'error'
       );
       return;
@@ -62,7 +66,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
       }}
     >
       <TextField
-        label="Old Password"
+        label={t('LEARNER_APP.RESET_PASSWORD_FORM.OLD_PASSWORD')}
         type={showPassword ? 'text' : 'password'}
         value={oldPassword}
         onChange={(e) => setOldPassword(e.target.value)}
@@ -81,7 +85,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
       />
 
       <TextField
-        label="New Password"
+        label={t('LEARNER_APP.RESET_PASSWORD_FORM.NEW_PASSWORD')}
         type={showPassword ? 'text' : 'password'}
         value={newPassword}
         onChange={(e) => setNewPassword(e.target.value)}
@@ -100,7 +104,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
       />
 
       <TextField
-        label="Confirm New Password"
+        label={t('LEARNER_APP.RESET_PASSWORD_FORM.CONFIRM_NEW_PASSWORD')}
         type={showPassword ? 'text' : 'password'}
         value={confirmPassword}
         onChange={(e) => setConfirmPassword(e.target.value)}
@@ -132,7 +136,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
           mb: 2,
         }}
       >
-        Reset Password
+        {t('LEARNER_APP.RESET_PASSWORD_FORM.RESET_PASSWORD')}
       </Button>
 
       <Typography
@@ -141,7 +145,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
         sx={{ cursor: 'pointer', textDecoration: 'underline' }}
         onClick={onForgotPassword}
       >
-        Forgot Password?
+        {t('LEARNER_APP.RESET_PASSWORD_FORM.FORGOT_PASSWORD')}
       </Typography>
     </Box>
   );

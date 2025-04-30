@@ -5,6 +5,10 @@
   "MARATHI": "Marathi",
   "URDU": "Urdu",
   "LEARNER_APP": {
+    "COMPLETE_PROFILE_BANNER": {
+      "MESSAGE": "Complete your profile so we can guide you better on your learning journey",
+      "BUTTON": "Complete Profile"
+    },
     "COMMON": {
       "L1_COURSES": "L1 Courses",
       "EXPLORE": "Explore",
@@ -46,10 +50,10 @@
       "playstore_image_alt": "Get it on Google Play",
       "playstore_instruction": "Search “Pratham myLearning” on Playstore",
       "login_title": "Login",
-      "username_label": "UserName",
+      "username_label": "Username",
       "password_label": "Password",
       "remember_me": "Remember Me",
-      "forgot_password": "Forgot Password",
+      "forgot_password": "Forgot Password?",
       "login_button": "Login",
       "no_account": "I don’t have an Account"
     },
@@ -99,7 +103,51 @@
     "PLAYER": {
       "MORE_RELATED_RESOURCES": "More Related Resources"
     },
-    "other_filters": "Other Filters"
+    "other_filters": "Other Filters",
+    "USER_PROFILE_CARD": {
+      "MY_PROFILE": "My Profile",
+      "JOINED_ON": "Joined on",
+      "CONTACT_INFORMATION": "Contact Information",
+      "EMAIL_ADDRESS": "Email Address",
+      "PHONE_NUMBER": "Phone Number",
+      "PHONE_BELONGS_TO_YOU": "Does this phone belong to you?",
+      "PERSONAL_INFORMATION": "Personal Information",
+      "GENDER": "Gender",
+      "DOB": "DOB",
+      "MARITAL_STATUS": "Marital Status",
+      "MOTHER_NAME": "Mother's Name",
+      "HIGHEST_QUALIFICATION": "Highest Qualification/Last Passed Grade",
+      "LOCATION": "Location",
+      "ASPIRATION_EXPERIENCE": "Aspiration & Experience",
+      "PRIOR_TRAINING": "Have you received any prior training?",
+      "CURRENT_WORK": "Have you ever worked or are you currently working?",
+      "FUTURE_WORK": "What do you want to become?",
+      "EDIT_PROFILE": "Edit Profile",
+      "CHANGE_USERNAME": "Change Username",
+      "CHANGE_PASSWORD": "Change Password",
+      "PRIVACY_GUIDELINES": "Privacy Guidelines",
+      "CONSENT_FORM": "Consent Form"
+    },
+    "USERNAME_SUGGESTION": {
+      "USERNAME": "Username",
+      "AVAILABLE_USERNAMES": "Available usernames",
+      "CONTINUE": "Continue"
+    },
+    "RESET_PASSWORD_FORM": {
+      "OLD_PASSWORD": "Old Password",
+      "NEW_PASSWORD": "New Password",
+      "CONFIRM_NEW_PASSWORD": "Confirm New Password",
+      "RESET_PASSWORD": "Reset Password",
+      "FORGOT_PASSWORD": "Forgot Password?",
+      "FILL_ALL_FIELDS": "Please fill in all fields.",
+      "PASSWORDS_MUST_MATCH": "New Password and Confirm Password must be the same."
+    }
+  },
+  "LOGIN_PAGE": {
+    "USERNAME_PASSWORD_NOT_CORRECT": "Username or Password is not correct",
+    "DEVICE_FINGERPRINT_SUCCESS": "Device fingerprint generated successfully",
+    "DEVICE_FINGERPRINT_ERROR": "Error generating device fingerprint",
+    "LOADING": "Loading..."
   },
   "STATE": "State",
   "DISTRICT": "District",
@@ -136,5 +184,19 @@
   "UNMARRIED": "UNMARRIED",
   "MARRIED": "MARRIED",
   "DIVORCED": "DIVORCED",
-  "WHAT_DO_YOU_WANT_TO_BECOME": "What do you want to become?"
+  "WHAT_DO_YOU_WANT_TO_BECOME": "What do you want to become?",
+  "WHAT_IS_YOUR_PREFERRED_MODE_OF_LEARNING": "What is your preferred mode of learning?",
+  "REASON_FOR_DROP_OUT_FROM_SCHOOL": "Reason for drop out from school",
+  "ARE_YOU_CURRENTLY_WORKING_IF_YES_CHOOSE_THE_DOMAIN": "Are you currently working? If yes, choose the domain",
+  "FORGOT_PASSWORD": {
+    "TITLE": "Trouble with logging in?",
+    "SUBTITLE": "No worries, we’ll help you get back to your account",
+    "INPUT_LABEL": "Enter username or phone number",
+    "BUTTON": "Next"
+  },
+  "OTP_VERIFICATION": {
+    "MESSAGE": "We’ve sent an OTP to verify your number {{maskedNumber}}",
+    "RESEND_TIMER": "Resend OTP in {{timer}}s",
+    "RESEND": "Resend OTP"
+  }
 }

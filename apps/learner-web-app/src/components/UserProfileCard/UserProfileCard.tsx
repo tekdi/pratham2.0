@@ -16,7 +16,7 @@ import Image from 'next/image';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useRouter } from 'next/navigation';
 import { getUserDetails } from '@learner/utils/API/userService';
-import { Loader } from '@shared-lib';
+import { Loader, useTranslation } from '@shared-lib';
 
 // Assuming an API function fetchUserData is available
 // Example: const fetchUserData = async () => { ... };
@@ -31,17 +31,32 @@ const UserProfileCard = () => {
   const router = useRouter();
   const [userData, setUserData] = useState<any>(null); // User data state
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation();
   const [selectedOption, setSelectedOption] = useState('');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const options = [
-    'Edit Profile',
-    'Change Username',
-    'Change Password',
-    'Privacy Guidelines',
-    'Consent Form',
+    t('LEARNER_APP.USER_PROFILE_CARD.EDIT_PROFILE'),
+    t('LEARNER_APP.USER_PROFILE_CARD.CHANGE_USERNAME'),
+    t('LEARNER_APP.USER_PROFILE_CARD.CHANGE_PASSWORD'),
+    t('LEARNER_APP.USER_PROFILE_CARD.PRIVACY_GUIDELINES'),
+    t('LEARNER_APP.USER_PROFILE_CARD.CONSENT_FORM'),
   ];
+  const isBelow18 = (dob: string): boolean => {
+    const birthDate = new Date(dob);
+    const today = new Date();
 
+    const age =
+      today.getFullYear() -
+      birthDate.getFullYear() -
+      (today.getMonth() < birthDate.getMonth() ||
+      (today.getMonth() === birthDate.getMonth() &&
+        today.getDate() < birthDate.getDate())
+        ? 1
+        : 0);
+
+    return age < 18;
+  };
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -81,9 +96,12 @@ const UserProfileCard = () => {
     }
     if (option === 'Privacy Guidelines') {
       window.open('https://www.pratham.org/privacy-guidelines/', '_blank');
+    } else if (option === 'Consent Form' && isBelow18(userData.dob)) {
+      window.open('/files/consent_form_below_18_hindi.pdf', '_blank');
+    } else if (option === 'Consent Form' && !isBelow18(userData.dob)) {
+      window.open('/files/consent_form_above_18_hindi.pdf', '_blank');
     }
-    if (option === 'Consent Form') {
-    }
+
     setSelectedOption(option);
     setOpen(true);
     setAnchorEl(null); // Close the menu
@@ -191,7 +209,7 @@ const UserProfileCard = () => {
             fontSize="1rem"
             sx={{ mb: 1 }}
           >
-            My Profile
+            {t('LEARNER_APP.USER_PROFILE_CARD.MY_PROFILE')}
           </Typography>
           <IconButton onClick={handleSettingsClick}>
             <Image
@@ -215,36 +233,48 @@ const UserProfileCard = () => {
       <Box
         sx={{ padding: '16px', backgroundColor: '#FFF8F2', maxWidth: '600px' }}
       >
-        <Typography sx={sectionTitleStyle}>Contact Information</Typography>
+        <Typography sx={sectionTitleStyle}>
+          {t('LEARNER_APP.USER_PROFILE_CARD.CONTACT_INFORMATION')}
+        </Typography>
         <Box sx={sectionCardStyle}>
           <Box sx={{ mb: 1.5 }}>
-            <Typography sx={labelStyle}>Email Address</Typography>
+            <Typography sx={labelStyle}>
+              {t('LEARNER_APP.USER_PROFILE_CARD.EMAIL_ADDRESS')}
+            </Typography>
             <Typography sx={valueStyle}>{email || '-'}</Typography>
           </Box>
 
           <Grid container spacing={1.5}>
             <Grid item xs={6}>
-              <Typography sx={labelStyle}>Phone Number</Typography>
+              <Typography sx={labelStyle}>
+                {t('LEARNER_APP.USER_PROFILE_CARD.PHONE_NUMBER')}
+              </Typography>
               <Typography sx={valueStyle}>{mobile}</Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography sx={labelStyle}>
-                Does this phone belong to you?
+                {t('LEARNER_APP.USER_PROFILE_CARD.PHONE_BELONGS_TO_YOU')}
               </Typography>
               <Typography sx={valueStyle}>{phoneOwnership}</Typography>
             </Grid>
           </Grid>
         </Box>
 
-        <Typography sx={sectionTitleStyle}>Personal Information</Typography>
+        <Typography sx={sectionTitleStyle}>
+          {t('LEARNER_APP.USER_PROFILE_CARD.PERSONAL_INFORMATION')}
+        </Typography>
         <Box sx={sectionCardStyle}>
           <Grid container spacing={1.5}>
             <Grid item xs={6}>
-              <Typography sx={labelStyle}>Gender</Typography>
+              <Typography sx={labelStyle}>
+                {t('LEARNER_APP.USER_PROFILE_CARD.GENDER')}
+              </Typography>
               <Typography sx={valueStyle}>{gender}</Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography sx={labelStyle}>DOB</Typography>
+              <Typography sx={labelStyle}>
+                {t('LEARNER_APP.USER_PROFILE_CARD.DOB')}
+              </Typography>
               <Typography sx={valueStyle}>
                 {new Date(dob).toLocaleDateString('en-GB', {
                   day: '2-digit',
@@ -254,21 +284,27 @@ const UserProfileCard = () => {
               </Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography sx={labelStyle}>Marital Status</Typography>
+              <Typography sx={labelStyle}>
+                {t('LEARNER_APP.USER_PROFILE_CARD.MARITAL_STATUS')}
+              </Typography>
               <Typography sx={valueStyle}>{maritalStatus}</Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography sx={labelStyle}>Mother's Name</Typography>
+              <Typography sx={labelStyle}>
+                {t('LEARNER_APP.USER_PROFILE_CARD.MOTHER_NAME')}
+              </Typography>
               <Typography sx={valueStyle}>{motherName || '-'}</Typography>
             </Grid>
             <Grid item xs={12}>
               <Typography sx={labelStyle}>
-                Highest Qualification/Last Passed Grade
+                {t('LEARNER_APP.USER_PROFILE_CARD.HIGHEST_QUALIFICATION')}
               </Typography>
               <Typography sx={valueStyle}>{qualification}</Typography>
             </Grid>
             <Grid item xs={12}>
-              <Typography sx={labelStyle}>Location</Typography>
+              <Typography sx={labelStyle}>
+                {t('LEARNER_APP.USER_PROFILE_CARD.LOCATION')}
+              </Typography>
               <Typography sx={valueStyle}>
                 {[village, district, state].filter(Boolean).join(', ') || '-'}
               </Typography>
@@ -329,6 +365,13 @@ const UserProfileCard = () => {
           </MenuItem>
         ))}
       </Menu>
+      {/* <a
+        href="/files/consent_form_above_18_hindi.pdf"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Open PDF
+      </a> */}
     </Box>
   );
 };

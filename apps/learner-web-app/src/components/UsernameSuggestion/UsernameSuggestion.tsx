@@ -10,6 +10,7 @@ import {
   Box,
 } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
+import { Loader, useTranslation } from '@shared-lib'; // Updated import
 
 interface UsernameSuggestionProps {
   value: string;
@@ -26,6 +27,8 @@ const UsernameSuggestion: React.FC<UsernameSuggestionProps> = ({
   setSuggestions,
   onContinue,
 }) => {
+  const { t } = useTranslation();
+
   // Function to handle clicking a suggestion
   const handleSuggestionClick = (username: string) => {
     onChange(username);
@@ -46,7 +49,7 @@ const UsernameSuggestion: React.FC<UsernameSuggestionProps> = ({
       }}
     >
       <TextField
-        label="Username"
+        label={t('LEARNER_APP.USERNAME_SUGGESTION.USERNAME')} // Internationalized label
         value={value}
         onChange={(e: any) => onChange(e)}
         fullWidth
@@ -74,7 +77,7 @@ const UsernameSuggestion: React.FC<UsernameSuggestionProps> = ({
               color: '#4B4B4B',
             }}
           >
-            Available usernames
+            {t('LEARNER_APP.USERNAME_SUGGESTION.AVAILABLE_USERNAMES')}
           </Typography>
           <List dense disablePadding>
             {suggestions.map((username) => (
@@ -114,7 +117,7 @@ const UsernameSuggestion: React.FC<UsernameSuggestionProps> = ({
           },
         }}
       >
-        Continue
+        {t('LEARNER_APP.USERNAME_SUGGESTION.CONTINUE')}
       </Button>
     </Box>
   );
