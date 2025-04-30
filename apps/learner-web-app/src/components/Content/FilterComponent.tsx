@@ -39,7 +39,15 @@ const FilterComponent: React.FC<{
         width: '100%',
       }}
     >
-      <Typography variant="h6">{t('LEARNER_APP.COURSE.FILTER_BY')}</Typography>
+      <Typography
+        variant="h6"
+        sx={{
+          fontWeight: 500,
+          fontSize: '16px',
+        }}
+      >
+        {t('LEARNER_APP.COURSE.FILTER_BY')}
+      </Typography>
       {memoizedFilterForm}
     </Box>
   );

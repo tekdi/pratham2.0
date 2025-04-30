@@ -164,6 +164,7 @@ const handleSuccessfulLogin = async (
           userResponse?.tenantData?.[0]?.templateId
         );
         localStorage.setItem('userIdName', userResponse?.username);
+        localStorage.setItem('firstName', userResponse?.firstName || '');
 
         const tenantId = userResponse?.tenantData?.[0]?.tenantId;
         localStorage.setItem('tenantId', tenantId);

@@ -194,9 +194,9 @@ const App = () => {
               }}
               _config={{
                 _grid: {
-                  xs: 6,
+                  xs: 12,
                   sm: 6,
-                  md: 6,
+                  md: 12,
                   lg: 6,
                 },
                 default_img: '/images/image_ver.png',
