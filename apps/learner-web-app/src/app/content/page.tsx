@@ -19,6 +19,7 @@ const MyComponent: React.FC = () => {
   const pathname = usePathname();
   const [filter, setFilter] = useState<object | null>();
   const [isLogin, setIsLogin] = useState<boolean | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [isShow, setIsShow] = useState(false);
   const [isProfileCard, setIsProfileCard] = useState(false);
 
@@ -30,7 +31,6 @@ const MyComponent: React.FC = () => {
           const result = await profileComplitionCheck();
           setIsProfileCard(!result);
         } else {
-          setFilter({});
           setIsLogin(false);
         }
         const res = await getTenantInfo();
@@ -64,12 +64,14 @@ const MyComponent: React.FC = () => {
             localStorage.setItem('collectionFramework', collectionFramework);
           }
         }
-
-        setFilter({ filters: youthnetContentFilter?.contentFilter });
-        localStorage.setItem(
-          'filter',
-          JSON.stringify(youthnetContentFilter?.contentFilter)
-        );
+        setTimeout(() => {
+          setFilter({ filters: youthnetContentFilter?.contentFilter });
+          localStorage.setItem(
+            'filter',
+            JSON.stringify(youthnetContentFilter?.contentFilter)
+          );
+          setIsLoading(false);
+        }, 1000);
       } catch (error) {
         console.error('Failed to fetch tenant info:', error);
       }
@@ -78,11 +80,39 @@ const MyComponent: React.FC = () => {
   }, [pathname]);
 
   return (
-    <Layout isLoadingChildren={isLogin === null} sx={gredientStyle}>
+    <Layout isLoadingChildren={isLoading} sx={gredientStyle}>
       {isProfileCard && <CompleteProfileBanner />}
-
       {isLogin && (
         <>
+          <Box
+            sx={{
+              height: 24,
+              display: 'flex',
+              alignItems: 'center',
+              py: '36px',
+              px: '34px',
+              bgcolor: '#fff',
+            }}
+          >
+            <Typography
+              variant="h4"
+              gutterBottom
+              sx={{
+                fontFamily: 'Poppins',
+                fontWeight: 500,
+                fontSize: 16,
+                lineHeight: '24px',
+                letterSpacing: '0.15px',
+                verticalAlign: 'middle',
+                color: '#1F1B13',
+              }}
+            >
+              <span role="img" aria-label="wave">
+                👋
+              </span>
+              Welcome, {localStorage.getItem('firstName')}!
+            </Typography>
+          </Box>
           <Grid
             container
             style={gredientStyle}
@@ -95,32 +125,50 @@ const MyComponent: React.FC = () => {
               sx={{
                 display: 'flex',
                 flexDirection: 'column',
-                justifyContent: 'center',
+                px: '48px',
+                py: '32px',
+                gap: 3,
               }}
             >
               <Box
                 sx={{
                   display: 'flex',
                   flexDirection: 'column',
-                  alignItems: 'center',
-                  mb: 2,
                 }}
               >
-                <Typography variant="h4" gutterBottom sx={{ color: '#06A816' }}>
+                <Typography
+                  variant="h4"
+                  gutterBottom
+                  sx={{
+                    fontFamily: 'Poppins',
+                    fontWeight: 400,
+                    fontSize: '22px',
+                    lineHeight: '28px',
+                    letterSpacing: '0px',
+                    verticalAlign: 'middle',
+                    color: '#06A816',
+                  }}
+                >
                   {t('LEARNER_APP.L_ONE_COURSE.IN_PROGRESS_TITLE')}
                 </Typography>
-                <Typography variant="body1" gutterBottom>
-                  {t('LEARNER_APP.L_ONE_COURSE.ONGOING_COURSES')}
+                <Typography
+                  variant="body1"
+                  gutterBottom
+                  sx={{
+                    fontSize: 16,
+                  }}
+                >
+                  {t('LEARNER_APP.L_ONE_COURSE.ONGOING_COURSES').replace(
+                    '{count}',
+                    isShow.toString()
+                  )}
                 </Typography>
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    href="/in-progress"
-                  >
-                    {t('LEARNER_APP.L_ONE_COURSE.VIEW_ALL_BUTTON')}
-                  </Button>
-                </Box>
+              </Box>
+
+              <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+                <Button variant="contained" color="primary" href="/in-progress">
+                  {t('LEARNER_APP.L_ONE_COURSE.VIEW_ALL_BUTTON')}
+                </Button>
               </Box>
             </Grid>
             <Grid item xs={12} md={9}>
