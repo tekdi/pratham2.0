@@ -7,7 +7,12 @@ import {
   useTranslation,
   DrawerItemProp,
 } from '@shared-lib';
-import { AccountBox, Explore, Home, Summarize } from '@mui/icons-material';
+import {
+  AccountCircleOutlined,
+  ExploreOutlined,
+  Home,
+  AssignmentOutlined,
+} from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import ProfileMenu from './ProfileMenu/ProfileMenu';
 import { Box } from '@mui/material';
@@ -49,25 +54,25 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
     setDefaultNavLinks([
       {
         title: t('LEARNER_APP.COMMON.L1_COURSES'),
-        icon: <Home />,
+        icon: <Home sx={{ width: 28, height: 28 }} />,
         to: () => router.push('/content'),
         isActive: currentPage === '/content',
       },
       {
         title: t('LEARNER_APP.COMMON.EXPLORE'),
-        icon: <Explore />,
+        icon: <ExploreOutlined sx={{ width: 28, height: 28 }} />,
         to: () => router.push('/explore'),
         isActive: currentPage === '/explore',
       },
       {
         title: t('LEARNER_APP.COMMON.SURVEYS'),
-        icon: <Summarize />,
+        icon: <AssignmentOutlined sx={{ width: 28, height: 28 }} />,
         to: () => router.push('/content'),
         isActive: currentPage === '/content',
       },
       {
         title: t('LEARNER_APP.COMMON.PROFILE'),
-        icon: <AccountBox />,
+        icon: <AccountCircleOutlined sx={{ width: 28, height: 28 }} />,
         to: () => {
           setAnchorEl(true);
         },

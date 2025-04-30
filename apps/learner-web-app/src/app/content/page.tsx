@@ -24,30 +24,61 @@ const MyComponent: React.FC = () => {
 
   useEffect(() => {
     const fetchTenantInfo = async () => {
-      if (checkAuth()) {
-        setIsLogin(true);
-        try {
+      try {
+        if (checkAuth()) {
+          setIsLogin(true);
           const result = await profileComplitionCheck();
           setIsProfileCard(!result);
-          const res = await getTenantInfo();
-          const youthnetContentFilter = res?.result.find(
-            (program: any) => program.name === 'YouthNet'
-          )?.contentFilter;
-          setFilter({ filters: youthnetContentFilter });
-          localStorage.setItem('filter', JSON.stringify(youthnetContentFilter));
-        } catch (error) {
-          console.error('Failed to fetch tenant info:', error);
+        } else {
+          setFilter({});
+          setIsLogin(false);
         }
-      } else {
-        setFilter({});
-        setIsLogin(false);
+        const res = await getTenantInfo();
+        const youthnetContentFilter = res?.result.find(
+          (program: any) => program.name === 'YouthNet'
+        );
+
+        const storedChannelId = localStorage.getItem('channelId');
+        if (!storedChannelId) {
+          const channelId = youthnetContentFilter?.channelId;
+          if (channelId) {
+            localStorage.setItem('channelId', channelId);
+          }
+        }
+
+        const storedTenantId = localStorage.getItem('tenantId');
+        if (!storedTenantId) {
+          const tenantId = youthnetContentFilter?.tenantId;
+          if (tenantId) {
+            localStorage.setItem('tenantId', tenantId);
+          }
+        }
+
+        const storedCollectionFramework = localStorage.getItem(
+          'collectionFramework'
+        );
+        if (!storedCollectionFramework) {
+          const collectionFramework =
+            youthnetContentFilter?.collectionFramework;
+          if (collectionFramework) {
+            localStorage.setItem('collectionFramework', collectionFramework);
+          }
+        }
+
+        setFilter({ filters: youthnetContentFilter?.contentFilter });
+        localStorage.setItem(
+          'filter',
+          JSON.stringify(youthnetContentFilter?.contentFilter)
+        );
+      } catch (error) {
+        console.error('Failed to fetch tenant info:', error);
       }
     };
     fetchTenantInfo();
   }, [pathname]);
 
   return (
-    <Layout isLoadingChildren={isLogin === null}>
+    <Layout isLoadingChildren={isLogin === null} sx={gredientStyle}>
       {isProfileCard && <CompleteProfileBanner />}
 
       {isLogin && (
