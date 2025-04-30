@@ -151,10 +151,6 @@ const DesktopBar = ({
               key={index}
               component={typeof link.to === 'string' ? 'a' : 'button'}
               href={typeof link.to === 'string' ? link.to : undefined}
-              sx={{
-                fontSize: '16px',
-                lineHeight: '24px',
-              }}
               // @ts-ignore
               variant={
                 link.isActive

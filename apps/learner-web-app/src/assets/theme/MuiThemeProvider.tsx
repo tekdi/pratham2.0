@@ -122,6 +122,9 @@ const theme = createTheme({
         {
           props: { variant: 'top-bar-link-text' },
           style: {
+            fontSize: '16px',
+            lineHeight: '24px',
+            fontWeight: 400,
             color: '#1F1B13',
             padding: 14,
             borderRadius: 8,
@@ -133,6 +136,8 @@ const theme = createTheme({
         {
           props: { variant: 'top-bar-link-button' },
           style: {
+            fontSize: '16px',
+            lineHeight: '24px',
             fontWeight: 600,
             padding: 14,
             gap: 8,
