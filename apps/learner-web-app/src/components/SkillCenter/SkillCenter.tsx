@@ -126,7 +126,7 @@ const SkillCenter = () => {
         <Typography variant="h5" component="h3" sx={{ fontWeight: 600 }}>
           Skilling Center Near You
         </Typography>
-        {centers.length > 0 && (
+        {centers.length > 3 && (
           <Link
             href="#"
             onClick={() => {
