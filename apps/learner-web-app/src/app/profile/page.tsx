@@ -8,6 +8,7 @@ import CourseCertificateCard from '@learner/components/CourseCertificateCard/Cou
 import { courseWiseLernerList } from '@shared-lib-v2/utils/CertificateService/coursesCertificates';
 import { CertificateModal, get } from '@shared-lib';
 import { useRouter } from 'next/navigation';
+import { checkAuth } from '@shared-lib-v2/utils/AuthService';
 
 import { baseurl } from '@learner/utils/API/EndUrls';
 type FilterDetails = {
@@ -85,8 +86,8 @@ const ProfilePage = () => {
     prepareCertificateData();
   }, []);
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
+    // const token = localStorage.getItem('token');
+    if (!checkAuth()) {
       router.push('/login');
     }
   }, []);
