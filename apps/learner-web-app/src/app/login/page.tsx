@@ -9,7 +9,7 @@ import { getUserId, login } from '@learner/utils/API/LoginService';
 import { showToastMessage } from '@learner/components/ToastComponent/Toastify';
 import { useRouter } from 'next/navigation';
 import { useMediaQuery, useTheme } from '@mui/material';
-// import FingerprintJS from '@fingerprintjs/fingerprintjs';
+import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import { Loader, useTranslation } from '@shared-lib';
 import { preserveLocalStorage } from '@learner/utils/helper';
 
@@ -46,12 +46,12 @@ const LoginPage = () => {
           };
           handleSuccessfulLogin(response?.result, { remember: false }, router);
         }
-        // if (!localStorage.getItem('did')) {
-        //   const fp = await FingerprintJS.load();
-        //   const { visitorId } = await fp.get();
-        //   localStorage.setItem('did', visitorId);
-        //   console.log('Device fingerprint generated successfully');
-        // }
+        if (!localStorage.getItem('did')) {
+          const fp = await FingerprintJS.load();
+          const { visitorId } = await fp.get();
+          localStorage.setItem('did', visitorId);
+          console.log('Device fingerprint generated successfully');
+        }
       } catch (error) {
         console.error('Error generating device fingerprint:', error);
       }
