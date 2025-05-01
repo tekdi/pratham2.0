@@ -156,7 +156,6 @@ const SkillCenter = () => {
 
       <Grid container spacing={3}>
         {visibleCenters.map((center, idx) => (
-          
           <Grid item xs={12} sm={6} md={4} key={idx}>
             <Card sx={{ height: '100%', borderRadius: 3 }}>
               <CardContent>

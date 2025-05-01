@@ -1,10 +1,12 @@
 import React from 'react'
+import { gredientStyle } from '@learner/utils/style';
+import Layout from '@learner/components/Layout';
 
 const SkillCenter = () => {
   return (
-    <div>
-      <h1>shryeas shinde</h1>
-    </div>
+    <Layout sx={gredientStyle}>
+      <SkillCenter/>
+    </Layout >
   )
 }
 
