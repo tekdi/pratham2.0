@@ -14,7 +14,9 @@ import {
 } from '@mui/material'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
 import { searchCohort, CohortDetails } from '@learner/utils/API/CohortService';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useRouter } from 'next/navigation';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 interface Center {
   name: string;
@@ -53,11 +55,11 @@ const ImageContainer = styled(Box)(({ theme }) => ({
 
 const ImageOverlay = styled(Box)(({ theme }) => ({
   position: 'absolute',
-  top: 0,
-  left: 0,
-  width: '100%',
-  height: '100%',
-  background: 'rgba(0,0,0,0.4)',
+  bottom: 0,
+  right: 0,
+  width: '45px',
+  height: '45px',
+  background: 'rgba(39, 39, 39, 0.75)',
   color: '#fff',
   display: 'flex',
   alignItems: 'center',
@@ -117,7 +119,6 @@ const SkillCenter = ({ title,  isNavigateBack,  viewAll,  Limit  }: SkillCenterP
             moreImages: cohort.image?.length > 3 ? cohort.image.length - 3 : 0,
           }));
           setCenters(apiCenters);
-        
         }
       } catch (error) {
         console.error('Failed to fetch centers:', error);
@@ -142,43 +143,47 @@ const SkillCenter = ({ title,  isNavigateBack,  viewAll,  Limit  }: SkillCenterP
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h5" component="h3" sx={{ fontWeight: 400, color: '#1F1B13', fontSize: '22px' }}>
-          {title}
-        </Typography>
+        <Box sx={{display:'flex' , gap:'5px', alignItems:'center'}}>
+          {isNavigateBack && (
+            <Box
+              onClick={() => {
+                router.back()
+              }}
+              sx={{
+                color: "#4D4639",
+                fontWeight: 500,
+                fontSize: '16px',
+                cursor: 'pointer'
+              }}
+            >
+              <ArrowBackIcon/>
+            </Box>
+          )}
+          <Typography variant="h5" component="h3" sx={{ fontWeight: 400, color: '#1F1B13', fontSize: '22px' }}>
+            {title}
+          </Typography>
+        </Box>
         {!viewAll && centers.length > 3 && (
-          <Link
-            href="#"
+          <Box
             onClick={() => {
               router.push('/skill-center')
             }}
             sx={{ 
-              color: 'primary.main', 
-              textDecoration: 'none', 
+              color: "#0D599E",
               fontWeight: 500,
-              display: 'flex',
-              alignItems: 'center'
+              fontSize:'16px',
+              cursor:'pointer'
             }}
           >
-            View All →
-          </Link>
-        )}
-        {isNavigateBack && (
-          <Box
-            // href="#"
-            onClick={() => {
-              router.back()
-            }}
-            sx={{ 
-              color: 'primary.main', 
-              textDecoration: 'none', 
+            View All <ArrowForwardIcon sx={{
+              color: "#0D599E",
               fontWeight: 500,
-              display: 'flex',
-              alignItems: 'center'
-            }}
-          >
-            ← Back
+              fontSize: '16px',
+              cursor: 'pointer'
+            }} />
           </Box>
         )}
+       
       </Box>
 
       <Grid container spacing={3}>
@@ -187,9 +192,9 @@ const SkillCenter = ({ title,  isNavigateBack,  viewAll,  Limit  }: SkillCenterP
             <Card sx={{ 
               height: '100%', 
               borderRadius: 3,
-              boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
+              boxShadow: 'unset',
               '&:hover': {
-                boxShadow: '0px 8px 16px rgba(0, 0, 0, 0.15)',
+                boxShadow: 'unset',
                 transform: 'translateY(-2px)',
                 transition: 'all 0.3s ease'
               }

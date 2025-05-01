@@ -7,7 +7,7 @@ import SkillCenter from '@learner/components/SkillCenter/SkillCenter';
 const SkillCenterPage = () => {
   return (
     <Layout sx={gredientStyle}>
-      <Box>
+      <Box sx={{background:'#fff', py:2}}>
         <SkillCenter 
           title={"Skilling Centers"} 
           isNavigateBack={true}
