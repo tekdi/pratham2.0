@@ -14,7 +14,7 @@ const App = () => {
           title: 'LEARNER_APP.EXPLORE.EXPLORE_ADDITIONAL_COURSES',
         }}
       />
-      <SkillCenter />
+      <SkillCenter viewAll={true} Limit={3} title={"Skilling Center Near You"} />
     </Layout>
   );
 };

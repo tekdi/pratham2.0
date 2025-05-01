@@ -1,13 +1,20 @@
 import React from 'react'
 import { gredientStyle } from '@learner/utils/style';
 import Layout from '@learner/components/Layout';
+import { Box } from '@mui/material';
+import SkillCenter from '@learner/components/SkillCenter/SkillCenter';
 
-const SkillCenter = () => {
+const SkillCenterPage = () => {
   return (
     <Layout sx={gredientStyle}>
-      <SkillCenter/>
-    </Layout >
+      <Box>
+        <SkillCenter 
+          title={"Skilling Centers"} 
+          isNavigateBack={true}
+        />
+      </Box>
+    </Layout>
   )
 }
 
-export default SkillCenter
+export default SkillCenterPage

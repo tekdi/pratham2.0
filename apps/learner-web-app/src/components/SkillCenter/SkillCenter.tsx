@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useEffect, useState } from 'react'
 import { 
   Box, 
@@ -26,6 +28,13 @@ interface Center {
     label: string;
     selectedValues: string[];
   }[];
+}
+
+interface SkillCenterProps {
+  title?: string;
+  isNavigateBack?: boolean;
+  viewAll?: boolean;
+  Limit?: number;
 }
 
 const ImageContainer = styled(Box)(({ theme }) => ({
@@ -76,9 +85,8 @@ const getIndustryValues = (cohort: CohortDetails): string[] => {
   return [];
 };
 
-const SkillCenter = () => {
+const SkillCenter = ({ title,  isNavigateBack,  viewAll,  Limit  }: SkillCenterProps) => {
   const router = useRouter();
-  const [showAll, setShowAll] = useState(false);
   const [centers, setCenters] = useState<Center[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -86,7 +94,7 @@ const SkillCenter = () => {
     const fetchCenters = async () => {
       try {
         const response = await searchCohort({
-          limit: 10,
+          limit: 100, // Increased limit to show more data
           offset: 0,
           filters: {
             state: 27,
@@ -105,7 +113,6 @@ const SkillCenter = () => {
             mapsUrl: getCustomFieldValue(cohort, 'GOOGLE_MAP_LINK') || '#',
             images: cohort.image || ['/images/default.png'],
             moreImages: cohort.image?.length > 3 ? cohort.image.length - 3 : 0,
-            
           }));
           setCenters(apiCenters);
         }
@@ -119,7 +126,7 @@ const SkillCenter = () => {
     fetchCenters();
   }, []);
 
-  const visibleCenters = showAll ? centers : centers.slice(0, 3);
+  const visibleCenters = viewAll ? centers : centers.slice(0, Limit);
 
   if (loading) {
     return (
@@ -133,9 +140,9 @@ const SkillCenter = () => {
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h5" component="h3" sx={{ fontWeight: 600 }}>
-          Skilling Center Near You
+          {title}
         </Typography>
-        {centers.length > 3 && (
+        {viewAll && centers.length > 0 && (
           <Link
             href="#"
             onClick={() => {
@@ -150,6 +157,23 @@ const SkillCenter = () => {
             }}
           >
             View All →
+          </Link>
+        )}
+        {isNavigateBack && (
+          <Link
+            href="#"
+            onClick={() => {
+              router.back()
+            }}
+            sx={{ 
+              color: 'primary.main', 
+              textDecoration: 'none', 
+              fontWeight: 500,
+              display: 'flex',
+              alignItems: 'center'
+            }}
+          >
+            ← Back
           </Link>
         )}
       </Box>
