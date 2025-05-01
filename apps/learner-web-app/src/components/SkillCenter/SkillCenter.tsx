@@ -22,6 +22,10 @@ interface Center {
   mapsUrl: string;
   images: string[];
   moreImages: number;
+  customFields?: {
+    label: string;
+    selectedValues: string[];
+  }[];
 }
 
 const ImageContainer = styled(Box)(({ theme }) => ({
@@ -53,7 +57,12 @@ const ImageOverlay = styled(Box)(({ theme }) => ({
 }));
 
 const getCustomFieldValue = (cohort: CohortDetails, fieldLabel: string): string | null => {
+  console.log(fieldLabel , "fieldLabel");
+  console.log(cohort, 'cohort')
+  
   const field = cohort.customFields.find(f => f.label === fieldLabel);
+  console.log(field , 'field');
+  
   if (field && field.selectedValues.length > 0) {
     return field.selectedValues[0] as any;
   }
@@ -185,7 +194,7 @@ const SkillCenter = () => {
                 </Typography>
                     
                 <Link
-                  href={center.address}
+                  href={center.mapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   sx={{
