@@ -10,7 +10,8 @@ import {
   CardContent, 
   Chip,
   Container,
-  styled
+  styled,
+  CircularProgress
 } from '@mui/material'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
 import { searchCohort, CohortDetails } from '@learner/utils/API/CohortService';
@@ -89,50 +90,65 @@ const getIndustryValues = (cohort: CohortDetails): string[] => {
   return [];
 };
 
-const SkillCenter = ({ title,  isNavigateBack,  viewAll,  Limit  }: SkillCenterProps) => {
+const SkillCenter = ({ title, isNavigateBack, viewAll, Limit }: SkillCenterProps) => {
   const router = useRouter();
   const [centers, setCenters] = useState<Center[]>([]);
   const [loading, setLoading] = useState(true);
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const limit = 10;
+
+  const fetchCenters = async (currentOffset: number) => {
+    try {
+      const response = await searchCohort({
+        limit: limit,
+        offset: currentOffset,
+        filters: {
+          state: 27,
+          district: 498,
+          block: 3786,
+          village: 521992,
+        },
+      });
+      if (response?.result?.results?.cohortDetails) {
+        const apiCenters: Center[] = response.result.results.cohortDetails.map((cohort: CohortDetails) => ({
+          name: cohort.name,
+          category: getIndustryValues(cohort)[0] || 'General',
+          address: getCustomFieldValue(cohort, 'ADDRESS') || 'Address not available',
+          distance: '0 km',
+          mapsUrl: getCustomFieldValue(cohort, 'GOOGLE_MAP_LINK') || '#',
+          images: cohort.image || ['/images/default.png'],
+          moreImages: cohort.image?.length > 3 ? cohort.image.length - 3 : 0,
+        }));
+
+        if (currentOffset === 0) {
+          setCenters(apiCenters);
+        } else {
+          setCenters(prev => [...prev, ...apiCenters]);
+        }
+
+        setHasMore(apiCenters.length === limit);
+      }
+    } catch (error) {
+      console.error('Failed to fetch centers:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchCenters = async () => {
-      try {
-        const response = await searchCohort({
-          limit: 10, 
-          offset: 0,
-          filters: {
-            state: 27,
-            district: 498,
-            block: 3786,
-            village: 521992,
-          },
-        });
-        
-        if (response?.result?.results?.cohortDetails) {
-          const apiCenters: Center[] = response.result.results.cohortDetails.map((cohort: CohortDetails) => ({
-            name: cohort.name,
-            category: getIndustryValues(cohort)[0] || 'General',
-            address: getCustomFieldValue(cohort, 'ADDRESS') || 'Address not available',
-            distance: '0 km',
-            mapsUrl: getCustomFieldValue(cohort, 'GOOGLE_MAP_LINK') || '#',
-            images: cohort.image || ['/images/default.png'],
-            moreImages: cohort.image?.length > 3 ? cohort.image.length - 3 : 0,
-          }));
-          setCenters(apiCenters);
-        }
-      } catch (error) {
-        console.error('Failed to fetch centers:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCenters();
+    fetchCenters(0);
   }, []);
+
+  const handleLoadMore = () => {
+    const newOffset = offset + limit;
+    setOffset(newOffset);
+    fetchCenters(newOffset);
+  };
 
   const visibleCenters = viewAll ? centers : centers.slice(0, Limit);
 
-  if (loading) {
+  if (loading && centers.length === 0) {
     return (
       <Box sx={{ p: 3 }}>
         <Typography>Loading centers...</Typography>
@@ -183,7 +199,6 @@ const SkillCenter = ({ title,  isNavigateBack,  viewAll,  Limit  }: SkillCenterP
             }} />
           </Box>
         )}
-       
       </Box>
 
       <Grid container spacing={3}>
@@ -279,6 +294,30 @@ const SkillCenter = ({ title,  isNavigateBack,  viewAll,  Limit  }: SkillCenterP
           </Grid>
         ))}
       </Grid>
+
+      {viewAll && hasMore && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+          <Box
+            onClick={handleLoadMore}
+            sx={{
+              backgroundColor: '#FDBE16',
+              color: '#1E1B16',
+              padding: '10px 20px',
+              borderRadius: '50px',
+              cursor: 'pointer',
+              '&:hover': {
+                backgroundColor: '#FDBE16',
+              },
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1
+            }}
+          >
+            {loading ? 'Loading...' : 'Load More'}
+            {loading && <CircularProgress size={20} color="inherit" />}
+          </Box>
+        </Box>
+      )}
     </Box>
   );
 };
