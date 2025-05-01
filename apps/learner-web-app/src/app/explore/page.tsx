@@ -4,6 +4,7 @@ import Layout from '@learner/components/Layout';
 import LearnerCourse from '@learner/components/Content/LearnerCourse';
 import SkillCenter from '@learner/components/SkillCenter/SkillCenter';
 import { gredientStyle } from '@learner/utils/style';
+import { Box } from '@mui/material';
 
 const App = () => {
   return (
@@ -14,7 +15,16 @@ const App = () => {
           title: 'LEARNER_APP.EXPLORE.EXPLORE_ADDITIONAL_COURSES',
         }}
       />
-      <SkillCenter viewAll={true} Limit={3} title={"Skilling Center Near You"} />
+      <Box sx={{ 
+          background:'#fff',
+          py:2
+       }}>
+        <SkillCenter
+          viewAll={false}
+          Limit={3}
+          title={'Skilling Center Near You'}
+        />
+      </Box>
     </Layout>
   );
 };

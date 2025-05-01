@@ -39,12 +39,14 @@ interface SkillCenterProps {
 
 const ImageContainer = styled(Box)(({ theme }) => ({
   position: 'relative',
-  borderRadius: theme.shape.borderRadius,
+  borderRadius: '8px',
   overflow: 'hidden',
+  flex: 1,
+  height: '180px',
   '& img': {
-    width: 60,
-    height: 45,
-    borderRadius: theme.shape.borderRadius,
+    width: '100%',
+    height: '100%',
+    borderRadius: '8px',
     objectFit: 'cover'
   }
 }));
@@ -55,13 +57,13 @@ const ImageOverlay = styled(Box)(({ theme }) => ({
   left: 0,
   width: '100%',
   height: '100%',
-  background: 'rgba(0,0,0,0.5)',
+  background: 'rgba(0,0,0,0.4)',
   color: '#fff',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  borderRadius: theme.shape.borderRadius,
-  fontSize: 14,
+  borderRadius: '8px',
+  fontSize: '16px',
   fontWeight: 500,
 }));
 
@@ -94,7 +96,7 @@ const SkillCenter = ({ title,  isNavigateBack,  viewAll,  Limit  }: SkillCenterP
     const fetchCenters = async () => {
       try {
         const response = await searchCohort({
-          limit: 100, // Increased limit to show more data
+          limit: 10, 
           offset: 0,
           filters: {
             state: 27,
@@ -115,6 +117,7 @@ const SkillCenter = ({ title,  isNavigateBack,  viewAll,  Limit  }: SkillCenterP
             moreImages: cohort.image?.length > 3 ? cohort.image.length - 3 : 0,
           }));
           setCenters(apiCenters);
+        
         }
       } catch (error) {
         console.error('Failed to fetch centers:', error);
@@ -139,10 +142,10 @@ const SkillCenter = ({ title,  isNavigateBack,  viewAll,  Limit  }: SkillCenterP
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h5" component="h3" sx={{ fontWeight: 600 }}>
+        <Typography variant="h5" component="h3" sx={{ fontWeight: 400, color: '#1F1B13', fontSize: '22px' }}>
           {title}
         </Typography>
-        {viewAll && centers.length > 0 && (
+        {!viewAll && centers.length > 3 && (
           <Link
             href="#"
             onClick={() => {
@@ -160,8 +163,8 @@ const SkillCenter = ({ title,  isNavigateBack,  viewAll,  Limit  }: SkillCenterP
           </Link>
         )}
         {isNavigateBack && (
-          <Link
-            href="#"
+          <Box
+            // href="#"
             onClick={() => {
               router.back()
             }}
@@ -174,16 +177,25 @@ const SkillCenter = ({ title,  isNavigateBack,  viewAll,  Limit  }: SkillCenterP
             }}
           >
             ← Back
-          </Link>
+          </Box>
         )}
       </Box>
 
       <Grid container spacing={3}>
         {visibleCenters.map((center, idx) => (
           <Grid item xs={12} sm={6} md={4} key={idx}>
-            <Card sx={{ height: '100%', borderRadius: 3 }}>
-              <CardContent>
-                <Box sx={{ display: 'flex', gap: 0.5, mb: 1 }}>
+            <Card sx={{ 
+              height: '100%', 
+              borderRadius: 3,
+              boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
+              '&:hover': {
+                boxShadow: '0px 8px 16px rgba(0, 0, 0, 0.15)',
+                transform: 'translateY(-2px)',
+                transition: 'all 0.3s ease'
+              }
+            }}>
+              <CardContent sx={{ p: 0 }}>
+                <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
                   {center.images.slice(0, 3).map((img, i) => (
                     <ImageContainer key={i}>
                       <img src={img} alt={`${center.name} view ${i + 1}`} />
@@ -196,42 +208,67 @@ const SkillCenter = ({ title,  isNavigateBack,  viewAll,  Limit  }: SkillCenterP
                   ))}
                 </Box>
 
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                    {center.name}
-                  </Typography>
-                  <Chip 
-                    label={center.category} 
-                    size="small" 
-                    sx={{ 
-                      backgroundColor: 'grey.100',
-                      color: 'text.secondary',
-                      height: 24
-                    }} 
+                <Box sx={{ px: 2, pb: 2 }}>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: 1, 
+                    mb: 1,
+                    justifyContent: 'space-between'
+                  }}>
+                    <Typography variant="subtitle1" sx={{ 
+                      fontWeight: 600,
+                      color: '#1F1B13',
+                      fontSize: '18px'
+                    }}>
+                      {center.name}
+                    </Typography>
+                    <Chip 
+                      label={center.category} 
+                      size="small" 
+                      sx={{ 
+                        backgroundColor: '#F5F5F5',
+                        color: '#635E57',
+                        fontSize: '14px',
+                        fontWeight: 500,
+                        borderRadius: '16px',
+                        height: '24px'
+                      }} 
                     />
-                </Box>
-                    
+                  </Box>
 
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                  {center.address}
-                </Typography>
-                    
-                <Link
-                  href={center.mapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  sx={{
-                    color: 'primary.main',
-                    textDecoration: 'none',
-                    fontWeight: 500,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 0.5,
-                    fontSize: '0.875rem'
-                  }}
-                >
-                  Open on Maps <LocationOnIcon sx={{ fontSize: 16 }} />
-                </Link>
+                  <Typography 
+                    variant="body2" 
+                    sx={{ 
+                      mb: 1.5,
+                      color: '#635E57',
+                      fontSize: '14px',
+                      lineHeight: 1.5
+                    }}
+                  >
+                    {center.address}
+                  </Typography>
+
+                  <Link
+                    href={center.mapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    sx={{
+                      color: '#0066CC',
+                      textDecoration: 'none',
+                      fontWeight: 500,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 0.5,
+                      fontSize: '14px',
+                      '&:hover': {
+                        color: '#004C99'
+                      }
+                    }}
+                  >
+                    Open on Maps <LocationOnIcon sx={{ fontSize: 18 }} />
+                  </Link>
+                </Box>
               </CardContent>
             </Card>
           </Grid>

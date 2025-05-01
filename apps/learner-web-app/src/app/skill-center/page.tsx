@@ -11,6 +11,7 @@ const SkillCenterPage = () => {
         <SkillCenter 
           title={"Skilling Centers"} 
           isNavigateBack={true}
+          viewAll={true}
         />
       </Box>
     </Layout>
