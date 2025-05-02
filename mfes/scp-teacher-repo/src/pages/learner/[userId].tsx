@@ -127,6 +127,7 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
     status: any;
     statusReason: any;
     cohortMembershipId: any;
+    customFields: any;
   } | null>(null);
   const [center, setCenter] = useState<any>(null);
   const [batchName, setBatchName] = useState<string>('');
@@ -347,9 +348,13 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
                     FormContextType.STUDENT
                   );
 
-                  genericFormResponse.fields = genericFormResponse.fields.filter(
-                    (item: { name: string }) => !["password", "confirm_password", "program"].includes(item.name)
-                  );
+                  genericFormResponse.fields =
+                    genericFormResponse.fields.filter(
+                      (item: { name: string }) =>
+                        !['password', 'confirm_password', 'program'].includes(
+                          item.name
+                        )
+                    );
 
                   const tenantSpecificResponse = await getFormRead(
                     FormContext.USERS,
@@ -453,7 +458,9 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
           field?.options?.find(
             (option: any) =>
               option?.value ===
-              (typeof field?.value === 'string' ? field.value : field?.value?.[0])
+              (typeof field?.value === 'string'
+                ? field.value
+                : field?.value?.[0])
           ) || '-'
         );
       };
@@ -471,8 +478,8 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
             selectedOption !== '-'
               ? selectedOption.label
               : field?.value
-                ? translateString(t, field?.value)
-                : '-',
+              ? translateString(t, field?.value)
+              : '-',
         };
       }
 
@@ -820,8 +827,6 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
         </Grid>
         <Grid item>
           <Box>
-
-            
             {userDetails && isActiveYear && (
                 <LearnersListItem
                   type={Role.STUDENT}
@@ -832,9 +837,10 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
                   isDropout={userDetails.status === Status.DROPOUT}
                   statusReason={userDetails.statusReason}
                   reloadState={reloadState ?? false}
-                  setReloadState={setReloadState ?? (() => { })}
+                  setReloadState={setReloadState ?? (() => {})}
                   onLearnerDelete={handleLearnerDelete}
                   isFromProfile={true}
+                  customFields={userDetails.customFields}
                 />
     
             )}

@@ -106,8 +106,8 @@ export const COURSE_TYPE = {
 };
 
 export const entityList = {
-  TEAM_LEADER: ['center', 'facilitator', 'learner'],
-  TEACHER: ['center', 'learner'],
+  TEAM_LEADER: ['batch', 'facilitator', 'learner'],
+  TEACHER: ['batch', 'learner'],
 };
 
 export const MIME_TYPE = {
