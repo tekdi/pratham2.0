@@ -310,11 +310,9 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
             const userData = data?.userData;
             setUserData(userData);
             setUserName(
-              userData?.firstName +
-                ' ' +
-                userData?.middleName +
-                ' ' +
-                userData?.lastName
+              [userData?.firstName, userData?.middleName, userData?.lastName]
+                .filter(Boolean)
+                .join(' ')
             );
             setContactNumber(userData?.mobile);
             setEnrollmentNumber(userData?.username);
