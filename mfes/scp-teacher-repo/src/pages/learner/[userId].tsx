@@ -734,25 +734,24 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
 
           // Fetch detailed cohort information
           const cohortDetails = await getCohortDetails({
-            // userId: userId,
-            userId: "66dd6ec0-dca1-407e-be5b-7587084ffcda",
+            userId: userId,
             children: true,
             customField: true
           });
           console.log('Cohort details:', cohortDetails);
       
           // Find active batch and store its name (search all in result)
-          const allBatches = (cohortDetails.result || [])
-            .flatMap((cohort: any) => cohort.childData || []);
-          console.log(allBatches, "allBatches");
+          const allBatches = cohortDetails.result;
           
-          const activeBatches = allBatches.filter(
-            (batch: any) => batch.type === "BATCH" && batch.status === "active"
-          );
-          if (activeBatches.length > 0) {
-            setBatchNames(activeBatches.map((batch: any) => batch.name));
+          if (allBatches && Array.isArray(allBatches)) {
+            const activeBatchNames = allBatches
+              .filter((batch: any) => batch.cohortStatus === "active" && batch.type === "BATCH")
+              .map((batch: any) => batch.cohortName);
+            
+            if (activeBatchNames.length > 0) {
+              setBatchNames(activeBatchNames);
+            }
           }
-          
         }
         
       } catch (error) {
@@ -1086,7 +1085,9 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
                         color: theme.palette.warning['A200'],
                       }}
                     >
-                      {item.label?.toUpperCase() === 'BATCH' ? batchNames.join(', ') : displayValue}
+                      {item.label?.toUpperCase() === 'BATCH' 
+                       ? batchNames.join(', ') 
+                       : typeof displayValue === 'string' ? t(`FORM.${displayValue}`, displayValue) : displayValue}
                     </Typography>
                   </Grid>
                 );
