@@ -210,12 +210,12 @@ const LearnerManage = ({
           const stateIds = getSelectedValueIds('STATE');
           const districtIds = getSelectedValueIds('DISTRICT');
           const blockIds = getSelectedValueIds('BLOCK');
-          const villageIds = getSelectedValueIds('VILLAGE');
+          // const villageIds = getSelectedValueIds('VILLAGE');
           initialFormData = {
             state: stateIds,
             district: districtIds,
             block: blockIds,
-            village: villageIds,
+            // village: villageIds,
             center: [localStorage.getItem('centerId')],
             batch: [cohortId],
           };
