@@ -16,7 +16,7 @@ export const fetchContent = async (identifier: any) => {
     const response = await get(
       `${API_URL}?fields=${FIELDS}&mode=${MODE}&licenseDetails=${LICENSE_DETAILS}`
     );
-    console.log('response =====>', response);
+
     return response?.data?.result?.content;
   } catch (error) {
     console.error('Error fetching content:', error);
