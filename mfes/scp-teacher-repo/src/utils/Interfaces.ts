@@ -91,7 +91,6 @@ export interface CohortListParam {
 export interface CohortMemberList {
   limit?: number;
   page?: number;
-  offset?: number;
   filters: {
     cohortId: string;
     role?: string;
@@ -316,7 +315,7 @@ export interface GetDoIdServiceParam {
     board?: string[];
     subject?: string | string[];
     assessmentType?: string | string[];
-    state: string;
+    state?: string;
   };
 }
 
