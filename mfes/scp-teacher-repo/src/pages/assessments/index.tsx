@@ -107,6 +107,7 @@ const Assessments = () => {
           page: 0,
           filters,
         });
+        console.log('response', response);
         const resp = response?.result?.userDetails;
 
         if (resp) {
@@ -118,6 +119,7 @@ const Assessments = () => {
               (user?.lastName ? toPascalCase(user.lastName) : ''),
             userId: user.userId,
           }));
+
           setCohortMembers(userDetails);
         }
       } catch (error) {
@@ -139,6 +141,7 @@ const Assessments = () => {
       }, 0);
     }
   }, [classId]);
+  console.log('hii');
 
   useEffect(() => {
     const getDoIdForAssessmentReport = async (
@@ -150,7 +153,7 @@ const Assessments = () => {
       const filters = {
         program: Program,
         board: [selectedBoard],
-        state: selectedState,
+        //  state: selectedState,
         status: ['Live'],
         assessmentType: getAssessmentType(assessmentType),
         primaryCategory: ['Practice Question Set'],
@@ -163,11 +166,8 @@ const Assessments = () => {
           setFilteredLearnerList([]);
           setAssessmentList([]);
 
-          const searchResults = await queryClient.fetchQuery({
-            queryKey: ['contentSearch', { filters }],
-            queryFn: () => getDoIdForAssessmentDetails({ filters }),
-          });
-
+          const searchResults = await getDoIdForAssessmentDetails({ filters });
+          console.log('searchResults', searchResults);
           if (searchResults?.responseCode === 'OK') {
             const result = searchResults?.result;
             if (result) {
@@ -225,13 +225,12 @@ const Assessments = () => {
       setLearnerList([]);
       setFilteredLearnerList([]);
       setAssessmentList([]);
-
-      if (selectedState && selectedBoard) {
+      console.log('selectedState', selectedBoard);
+      if (selectedBoard) {
         getDoIdForAssessmentReport(selectedState, selectedBoard);
       }
     }
   }, [assessmentType, classId, cohortsData]);
-
   useEffect(() => {
     const getAssessmentsForLearners = async () => {
       try {
@@ -262,6 +261,7 @@ const Assessments = () => {
             }
             return user;
           });
+          console.log('userList', userList);
           setLearnerList(userList);
           setFilteredLearnerList(userList);
         }
