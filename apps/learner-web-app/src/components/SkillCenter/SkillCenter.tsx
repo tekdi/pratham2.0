@@ -179,7 +179,7 @@ const SkillCenter = ({ title, isNavigateBack, viewAll, Limit }: SkillCenterProps
             {title}
           </Typography>
         </Box>
-        {!viewAll && centers.length > 3 && (
+        {!viewAll && centers.length > 0 && (
           <Box
             onClick={() => {
               router.push('/skill-center')
