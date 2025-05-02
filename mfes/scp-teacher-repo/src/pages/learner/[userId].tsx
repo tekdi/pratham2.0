@@ -61,6 +61,7 @@ import React, { ComponentType, useEffect, useState } from 'react';
 import { accessControl, AttendanceAPILimit } from '../../../app.config';
 import { isEliminatedFromBuild } from '../../../featureEliminationUtil';
 import { useDirection } from '../../hooks/useDirection';
+import { cohortCenterList, getCohortDetails } from '@/services/CenterListServices';
 let AssessmentReport: ComponentType<AssessmentReportProp> | null = null;
 
 if (!isEliminatedFromBuild('AssessmentReport', 'component')) {
@@ -127,6 +128,9 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
     statusReason: any;
     cohortMembershipId: any;
   } | null>(null);
+  const [center, setCenter] = useState<any>(null);
+  const [batchName, setBatchName] = useState<string>('');
+  const [batchNames, setBatchNames] = useState<string[]>([]);
 
   useEffect(() => {
     setSelectedValue(currentDayMonth);
@@ -706,6 +710,61 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
     setIsLearnerDeleted(true);
   };
 
+  useEffect(() => {
+    const fetchCohortList = async () => {
+      try {
+        const userDetails = await getUserDetails(userId, true);
+        const centerId = userDetails.result.userData.customFields.find(
+          (field: any) => field.label === "CENTER"
+        )?.selectedValues[0];
+
+        const response = await cohortCenterList({
+          limit: 10,
+          offset: 0,
+          filters: {
+            cohortId: centerId
+          }
+        });
+        console.log('Cohort list:', response.results);
+        
+        const center = response.results.cohortDetails[0];
+        if (center.type === "COHORT" && center.status === "active") {
+          console.log('Center name:', center.name);
+          setCenter(center);
+
+          // Fetch detailed cohort information
+          const cohortDetails = await getCohortDetails({
+            // userId: userId,
+            userId: "66dd6ec0-dca1-407e-be5b-7587084ffcda",
+            children: true,
+            customField: true
+          });
+          console.log('Cohort details:', cohortDetails);
+      
+          // Find active batch and store its name (search all in result)
+          const allBatches = (cohortDetails.result || [])
+            .flatMap((cohort: any) => cohort.childData || []);
+          console.log(allBatches, "allBatches");
+          
+          const activeBatches = allBatches.filter(
+            (batch: any) => batch.type === "BATCH" && batch.status === "active"
+          );
+          if (activeBatches.length > 0) {
+            setBatchNames(activeBatches.map((batch: any) => batch.name));
+          }
+          
+        }
+        
+      } catch (error) {
+        console.error('Error fetching cohort list:', error);
+      }
+    };
+
+    fetchCohortList();
+  }, [userId]);
+
+  console.log(batchNames, "batchNames");
+
   return (
     <>
       <Header />
@@ -765,8 +824,6 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
 
             
             {userDetails && isActiveYear && (
-           <>
-                {console.log(userDetails, 'userDetails')}
                 <LearnersListItem
                   type={Role.STUDENT}
                   key={userId}
@@ -780,7 +837,7 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
                   onLearnerDelete={handleLearnerDelete}
                   isFromProfile={true}
                 />
-           </>
+    
             )}
           </Box>
         </Grid>
@@ -989,10 +1046,6 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
               border: '2px solid',
               borderColor: '#FFECB3',
               padding: '15px',
-              // '@media (min-width: 900px)': {
-              //   minWidth: '30%',
-              //   width: '30%',
-              // },
             }}
             minWidth={'100%'}
             borderRadius={'12px'}
@@ -1003,49 +1056,41 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
             padding="15px"
           >
             <Grid container spacing={4}>
-              {learnerDetailsByOrder?.map(
-                (
-                  item: {
-                    label?: string;
-                    displayValue?: string;
-                    order?: number;
-                  },
-                  i: number
-                ) => {
-                  const labelText = item.label
-                    ? t(`FORM.${item?.label?.toUpperCase()}`, item?.label)
-                    : item?.label;
-
-                  return (
-                    <Grid item xs={6} key={i}>
-                      {/* question */}
-                      <Typography
-                        variant="h4"
-                        sx={{
-                          fontSize: '12px',
-                          color: theme.palette.warning.main,
-                        }}
-                        margin={0}
-                      >
-                        {labelText}
-                      </Typography>
-
-                      {/* value */}
-                      <Typography
-                        variant="h4"
-                        margin={0}
-                        sx={{
-                          wordBreak: 'break-word',
-                          fontSize: '16px',
-                          color: theme.palette.warning['A200'],
-                        }}
-                      >
-                        {item?.displayValue}
-                      </Typography>
-                    </Grid>
-                  );
+              {learnerDetailsByOrder?.map((item, i) => {
+                let displayValue = item?.displayValue;
+                if (item.label?.toUpperCase() === 'CENTER' && center && center.type === 'COHORT' && center.status === 'active') {
+                  displayValue = center.name;
                 }
-              )}
+                const labelText = item.label
+                  ? t(`FORM.${item?.label?.toUpperCase()}`, item?.label)
+                  : item?.label;
+
+                return (
+                  <Grid item xs={6} key={i}>
+                    <Typography
+                      variant="h4"
+                      sx={{
+                        fontSize: '12px',
+                        color: theme.palette.warning.main,
+                      }}
+                      margin={0}
+                    >
+                      {labelText}
+                    </Typography>
+                    <Typography
+                      variant="h4"
+                      margin={0}
+                      sx={{
+                        wordBreak: 'break-word',
+                        fontSize: '16px',
+                        color: theme.palette.warning['A200'],
+                      }}
+                    >
+                      {item.label?.toUpperCase() === 'BATCH' ? batchNames.join(', ') : displayValue}
+                    </Typography>
+                  </Grid>
+                );
+              })}
             </Grid>
           </Box>
         </Box>

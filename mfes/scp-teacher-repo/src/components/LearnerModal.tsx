@@ -113,10 +113,26 @@ const LearnerModal = ({
     router.push(`/learner/${userId}`);
   };
 
+  const getDisplayFullName = (name: string) => {
+    if (!name || name.toLowerCase().includes('null')) {
+      const cleaned = name
+        ?.split(' ')
+        .filter(
+          (part) =>
+            part &&
+            part.toLowerCase() !== 'null' &&
+            part.toLowerCase() !== 'undefined'
+        )
+        .join(' ');
+      return cleaned && cleaned.trim() !== '' ? cleaned : '-';
+    }
+    return name;
+  };
+
   const learnerDetailsByOrder = [
     {
       label: t('PROFILE.FULL_NAME'),
-      value: userName ? toPascalCase(userName) : '-',
+      value: getDisplayFullName(userName ? toPascalCase(userName) : ''),
     },
     {
       label: t('PROFILE.CONTACT_NUMBER'),
