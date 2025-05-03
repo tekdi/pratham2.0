@@ -1,4 +1,4 @@
-import { post } from '@shared-lib';
+import { post, get } from '@shared-lib';
 import { API_ENDPOINTS } from './EndUrls';
 
 export interface CustomFieldValue {
@@ -64,6 +64,10 @@ export interface CohortSearchParams {
     village?: number;
   };
 }
+interface CohortDetailsParams {
+  userId: string;
+  fieldvalue?: boolean;
+}
 
 export const searchCohort = async ({
   limit = 10,
@@ -81,6 +85,24 @@ export const searchCohort = async ({
     return response?.data;
   } catch (error) {
     console.error('Error in cohort search:', error);
+    throw error;
+  }
+}; 
+
+
+
+
+export const getUserCohortsRead = async ({
+  userId,
+  fieldvalue=true
+}: CohortDetailsParams): Promise<any> => {
+  const apiUrl: string = `${API_ENDPOINTS.myCohortsRead(userId)}?fieldvalue=${fieldvalue}`;
+  
+  try {
+    const response = await get(apiUrl);
+    return response?.data;
+  } catch (error) {
+    console.error('Error getting cohort details:', error);
     throw error;
   }
 }; 

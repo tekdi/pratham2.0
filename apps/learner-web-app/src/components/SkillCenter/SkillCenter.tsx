@@ -14,7 +14,7 @@ import {
   CircularProgress
 } from '@mui/material'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
-import { searchCohort, CohortDetails } from '@learner/utils/API/CohortService';
+import { searchCohort, CohortDetails, getUserCohortsRead } from '@learner/utils/API/CohortService';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useRouter } from 'next/navigation';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -100,14 +100,49 @@ const SkillCenter = ({ title, isNavigateBack, viewAll, Limit }: SkillCenterProps
 
   const fetchCenters = async (currentOffset: number) => {
     try {
+      const userId = localStorage.getItem('userId');
+      if (!userId) {
+        console.error('User ID not found in localStorage');
+        return;
+      }
+      const userCohorts = await getUserCohortsRead({
+        userId: userId,
+        fieldvalue: true,
+      });
+      
+      console.log(userCohorts, 'userCohorts');
+      
+      // Extract state, district, block and village IDs from user data
+      const userData = userCohorts?.result?.userData;
+      const customFields = userData?.customFields || [];
+      
+      interface CustomField {
+        fieldId: string;
+        label: string;
+        type: string;
+        selectedValues: any[];
+      }
+      
+      const stateField = customFields.find((field: CustomField) => field.label === 'STATE');
+      const districtField = customFields.find((field: CustomField) => field.label === 'DISTRICT');
+      const blockField = customFields.find((field: CustomField) => field.label === 'BLOCK');
+      const villageField = customFields.find((field: CustomField) => field.label === 'VILLAGE');
+      
+      const stateId = stateField?.selectedValues[0]?.id;
+      const districtId = districtField?.selectedValues[0]?.id;
+      const blockId = blockField?.selectedValues[0]?.id;
+      const villageId = villageField?.selectedValues[0]?.id;
+
+      console.log(stateId, districtId, blockId, villageId, 'stateId, districtId, blockId, villageId');
+      
       const response = await searchCohort({
         limit: limit,
         offset: currentOffset,
         filters: {
-          state: 27,
-          district: 498,
-          block: 3786,
-          village: 521992,
+          state: stateId,
+          district: districtId,
+          block: blockId,
+          village: villageId,
         },
       });
       if (response?.result?.results?.cohortDetails) {
@@ -179,7 +214,7 @@ const SkillCenter = ({ title, isNavigateBack, viewAll, Limit }: SkillCenterProps
             {title}
           </Typography>
         </Box>
-        {!viewAll && centers.length > 0 && (
+        {!viewAll && centers.length > 3 && (
           <Box
             onClick={() => {
               router.push('/skill-center')
@@ -294,6 +329,20 @@ const SkillCenter = ({ title, isNavigateBack, viewAll, Limit }: SkillCenterProps
           </Grid>
         ))}
       </Grid>
+
+      {!loading && visibleCenters.length === 0 && (
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          height: '200px',
+          width: '100%'
+        }}>
+          <Typography variant="h6" sx={{ color: '#635E57' , fontSize:'16px' }}>
+            No data found
+          </Typography>
+        </Box>
+      )}
 
       {viewAll && hasMore && (
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
