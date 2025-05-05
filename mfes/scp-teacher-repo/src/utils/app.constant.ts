@@ -120,7 +120,7 @@ export enum CenterType {
   REGULAR = 'REGULAR',
   REMOTE = 'REMOTE',
   UNKNOWN = 'UNKNOWN',
-  BATCH = 'batch',
+  BATCH = 'BATCH',
 }
 
 export enum RoleId {
