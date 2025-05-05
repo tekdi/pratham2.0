@@ -889,5 +889,12 @@
   "NON_AGRICULTURAL_LABORER": "Non-agricultural laborer",
   "SALARIED_WORK": "Salaried work",
   "SELF_EMPLOYMENT": "Self-employment",
-  "UNEMPLOYED_OR_DOMESTIC_WORK": "Unemployed or Domestic Work"
+  "UNEMPLOYED_OR_DOMESTIC_WORK": "Unemployed or Domestic Work",
+  "STATE":"State",
+  "DISTRICT":"District",
+  "BLOCK":"Block",
+  "CENTER":"Center",
+  "BOARD":"Board",
+  "MEDIUM":"Medium",
+  "GRADE":"Grade"
 }
