@@ -61,8 +61,9 @@ export const getCohortList = async (
 
       res = res.filter((block: any) => {
         if (
-          block?.cohortStatus === Status.ACTIVE &&
-          block?.childData.length > 0
+          block?.cohortStatus === Status.ACTIVE 
+          //if no center then also show in list
+          // && block?.childData.length > 0
         ) {
           return block;
         }
