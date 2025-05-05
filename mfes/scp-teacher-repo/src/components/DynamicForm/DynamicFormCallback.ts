@@ -143,7 +143,8 @@ export const extractMatchingKeys = (row: any, schema: any) => {
         result[key] = row[key];
       }
     } else if (schemaField.fieldId) {
-      const matchedField = row.customFields?.find(
+      const fields = row.customFields || row.customField || [];
+      const matchedField = fields?.find(
         (field) => field.fieldId === schemaField.fieldId
       );
 
@@ -206,19 +207,45 @@ export const notificationCallback = async (
   let replacements: { [key: string]: string };
   replacements = {};
   let cleanedUrl = '';
-  if (process.env.NEXT_PUBLIC_TEACHER_SBPLAYER) {
-    cleanedUrl = process.env.NEXT_PUBLIC_TEACHER_SBPLAYER.replace(
-      /\/sbplayer$/,
-      ''
-    );
+  if (type == 'team-leader' || type == 'facilitator') {
+    if (process.env.NEXT_PUBLIC_TEACHER_SBPLAYER) {
+      cleanedUrl = process.env.NEXT_PUBLIC_TEACHER_SBPLAYER.replace(
+        /\/sbplayer$/,
+        ''
+      );
+    }
+  }
+  if (
+    type == 'state-lead' ||
+    type == 'content-reviewer' ||
+    type == 'content-creator'
+  ) {
+    if (process.env.NEXT_PUBLIC_ADMIN_SBPLAYER) {
+      cleanedUrl = process.env.NEXT_PUBLIC_ADMIN_SBPLAYER.replace(
+        /\/sbplayer$/,
+        ''
+      );
+    }
   }
   if (creatorName) {
-    replacements = {
-      '{FirstName}': firstLetterInUpperCase(payload?.firstName),
-      '{UserName}': payload?.username,
-      '{Password}': payload?.password,
-      '{appUrl}': cleanedUrl || '', //TODO: check url
-    };
+    if (type == 'learner') {
+      let sentName = JSON.parse(localStorage.getItem('userData'))?.firstName;
+      replacements = {
+        '{FirstName}': sentName,
+        '{UserName}': payload?.username,
+        '{Password}': payload?.password,
+        '{LearnerName}': `${firstLetterInUpperCase(
+          payload?.firstName
+        )} ${firstLetterInUpperCase(payload?.lastName)}`,
+      };
+    } else {
+      replacements = {
+        '{FirstName}': firstLetterInUpperCase(payload?.firstName),
+        '{UserName}': payload?.username,
+        '{Password}': payload?.password,
+        '{appUrl}': cleanedUrl || '', //TODO: check url
+      };
+    }
   }
 
   let sentEmail = payload?.email;

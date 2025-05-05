@@ -69,32 +69,32 @@ const Profile: React.FC<ProfileDetailsProps> = ({
     >
       <CardContent>
         <Grid container spacing={2}>
-          <Grid item xs={6}>
+          <Grid item xs={12} md={12} lg={6}>
             <Typography
               color={theme.palette.warning['500']}
-              sx={{ fontSize: '12px', fontWeight: 600 }}
+              sx={{ fontSize: '12px', fontWeight: 600, wordWrap: 'break-word' }}
             >
               {t('SCP_PROFILE.DESIGNATION')}
             </Typography>
             <Typography
               color={theme.palette.warning['A200']}
-              sx={{ fontSize: '16px', fontWeight: 400 }}
+              sx={{ fontSize: '16px', fontWeight: 400, wordWrap: 'break-word' }}
             >
               {designation}
             </Typography>
           </Grid>
 
-          <Grid item xs={6}>
+          <Grid item xs={12} md={12} lg={6}>
             <>
               <Typography
                 color={theme.palette.warning['500']}
-                sx={{ fontSize: '12px', fontWeight: 600 }}
+                sx={{ fontSize: '12px', fontWeight: 600, wordWrap: 'break-word' }}
               >
                 {t('SCP_PROFILE.USERNAME')}
               </Typography>
               <Typography
                 color={theme.palette.warning['A200']}
-                sx={{ fontSize: '16px', fontWeight: 400 }}
+                sx={{ fontSize: '16px', fontWeight: 400, wordWrap: 'break-word' }}
                 gutterBottom
               >
                 {userName}
@@ -102,55 +102,55 @@ const Profile: React.FC<ProfileDetailsProps> = ({
             </>
           </Grid>
 
-          <Grid item xs={6}>
+          <Grid item xs={12} md={12} lg={6}>
             <Typography
               color={theme.palette.warning['500']}
-              sx={{ fontSize: '12px', fontWeight: 600 }}
+              sx={{ fontSize: '12px', fontWeight: 600, wordWrap: 'break-word' }}
             >
               {t('SCP_PROFILE.EMAIL_ID')}
             </Typography>
             <Typography
               color={theme.palette.warning['A200']}
-              sx={{ fontSize: '16px', fontWeight: 400 }}
+              sx={{ fontSize: '16px', fontWeight: 400, wordWrap: 'break-word' }}
               gutterBottom
             >
               {emailId}
             </Typography>
           </Grid>
 
-          <Grid item xs={6}>
+          <Grid item xs={12} md={12} lg={6}>
             <Typography
               color={theme.palette.warning['500']}
-              sx={{ fontSize: '12px', fontWeight: 600, mt: 2 }}
+              sx={{ fontSize: '12px', fontWeight: 600, mt: 2, wordWrap: 'break-word' }}
             >
               {t('SCP_PROFILE.JOINED_ON')}
             </Typography>
             <Typography
               color={theme.palette.warning['A200']}
-              sx={{ fontSize: '16px', fontWeight: 400 }}
+              sx={{ fontSize: '16px', fontWeight: 400, wordWrap: 'break-word' }}
             >
               {joinedOn}
             </Typography>
           </Grid>
 
-          <Grid item xs={6}>
+          <Grid item xs={12} md={12} lg={6}>
             <Typography
               color={theme.palette.warning['500']}
-              sx={{ fontSize: '12px', fontWeight: 600, mt: 2 }}
+              sx={{ fontSize: '12px', fontWeight: 600, mt: 2, wordWrap: 'break-word' }}
             >
               {t('SCP_PROFILE.PHONE_NUMBER')}
             </Typography>
             <Typography
               color={theme.palette.warning['A200']}
-              sx={{ fontSize: '16px', fontWeight: 400 }}
+              sx={{ fontSize: '16px', fontWeight: 400, wordWrap: 'break-word' }}
             >
               {phoneNumber}
             </Typography>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={12} md={12} lg={6}>
             <Typography
               color={theme.palette.warning['500']}
-              sx={{ fontSize: '12px', fontWeight: 600, mt: 2 }}
+              sx={{ fontSize: '12px', fontWeight: 600, mt: 2, wordWrap: 'break-word' }}
             >
               {t('SCP_PROFILE.GENDER')}
             </Typography>
@@ -158,14 +158,14 @@ const Profile: React.FC<ProfileDetailsProps> = ({
               {gender}
             </Typography>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={12} md={12} lg={6}>
             <Typography
               color={theme.palette.warning['500']}
-              sx={{ fontSize: '12px', fontWeight: 600, mt: 2 }}
+              sx={{ fontSize: '12px', fontWeight: 600, mt: 2, wordWrap: 'break-word' }}
             >
               {t('SCP_PROFILE.DOB')}
             </Typography>
-            <Typography sx={{ fontSize: '16px', fontWeight: 400 }}>
+            <Typography sx={{ fontSize: '16px', fontWeight: 400, wordWrap: 'break-word' }}>
               {dob}
             </Typography>
           </Grid>
@@ -175,7 +175,7 @@ const Profile: React.FC<ProfileDetailsProps> = ({
         <Box mt={4}>
           <Typography
             variant="h6"
-            sx={{ fontWeight: 'bold', mb: 2, color: theme.palette.warning['500'] }}
+            sx={{ fontWeight: 'bold', mb: 1, color: theme.palette.warning['500'] }}
           >
             {t('SCP_PROFILE.SUBJECTS_I_TEACH')}
           </Typography>
@@ -183,19 +183,28 @@ const Profile: React.FC<ProfileDetailsProps> = ({
             {subjectsITeach.map((subject) => {
               const isHighlighted = mainSubjectIds.has(subject.id);
               return (
-                <Button
+                <Box
                   key={subject.id}
-                  variant={isHighlighted ? "contained" : "outlined"}
                   sx={{
-                    backgroundColor: isHighlighted ? '#EFC570' : 'primary.main',
-                    color: isHighlighted ? 'black' : 'white',
-                    '&:hover': {
-                      backgroundColor: isHighlighted ? '#EFC570' : 'primary.dark',
-                    },
+                    backgroundColor: isHighlighted ? '#EFC570' : 'transparent',
+                    color: isHighlighted ? 'black' : 'black',
+                    cursor: 'default !important',
+                    borderRadius: "8px",
+                    padding: '5px 10px',
+                    fontWeight: 500,
+                    fontSize: '14px',
+                    lineHeight: '20px',
+                    letterSpacing: '0.1px',
+                    textAlign: 'center',
+                    verticalAlign: 'middle',
+                    border: isHighlighted?'unset': "1px solid #DADADA"
+
                   }}
                 >
-                  {subject.label}
-                </Button>
+                  {t(`FORM.${subject.label}`, {
+                    defaultValue: subject.label,
+                  })}
+                </Box>
               );
             })}
           </Box>

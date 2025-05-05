@@ -258,4 +258,12 @@ export const MENU_CONFIG = {
       roles: [Role.ADMIN, Role.CENTRAL_ADMIN, Role.CCTA, Role.SCTA],
     },
   },
+  [TenantName.PRAGYANPATH]: {
+    workspace: {
+      title: 'Workspace',
+      icon: '/images/dashboard.svg',
+      link: '/workspace',
+      roles: [Role.CCTA, Role.SCTA],
+    }
+  }
 };

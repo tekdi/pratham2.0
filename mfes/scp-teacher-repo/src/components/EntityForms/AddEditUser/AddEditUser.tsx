@@ -21,8 +21,9 @@ import {
   updateCohortUpdate,
   updateReassignUser,
 } from '@/services/CohortService/cohortService';
-import {  RoleId } from '@/utils/app.constant';
+import { RoleId } from '@/utils/app.constant';
 import _ from 'lodash';
+import { fetchAttendanceStats } from '@/utils/helperAttendanceStatApi';
 const AddEditUser = ({
   SuccessCallback,
   schema,
@@ -220,6 +221,13 @@ const AddEditUser = ({
               userData.username = userData?.email;
             }
           }
+
+          //bug fix for if email is empty then don't sent
+          if (type == 'learner') {
+            if (userData?.email == '') {
+              delete userData.email;
+            }
+          }
           //fix for learner edit username is not sent if not changed
           if (userData?.username) {
             if (editPrefilledFormData?.username == userData?.username) {
@@ -271,50 +279,58 @@ const AddEditUser = ({
         }
       }
     } else if (isReassign) {
-      try {
-        // console.log('new', formData?.batch);
-        // console.log(editPrefilledFormData?.batch, 'old');
-        delete payload?.batch;
-        console.log('payload', payload);
-        const reassignmentPayload = {
-          ...payload,
-          ...(type === 'team-leader' && {
-            automaticMember: {
-              value: true,
-              fieldId: blockFieldId,
-              fieldName: 'BLOCK',
-            },
-          }),
-          userData: {
-            firstName: formData.firstName,
-          },
-        };
-        const resp = await updateReassignUser(
-          editableUserId,
-          reassignmentPayload
+      const attendanceStats = await fetchAttendanceStats(editableUserId);
+      if (attendanceStats && attendanceStats.length > 0) {
+        showToastMessage(
+          t('COMMON.CANNOT_REASSIGN_TODAY_ATTENDANCE_MARKED'),
+          'error'
         );
-        if (resp) {
-          if (type !== 'team-leader') {
-            const cohortIdPayload = getReassignPayload(
-              editPrefilledFormData.batch,
-              formData.batch
-            );
-            const res = await bulkCreateCohortMembers({
-              userId: [editableUserId],
-              cohortId: cohortIdPayload.cohortId,
-              removeCohortId: cohortIdPayload.removedIds,
-            });
+      } else {
+        try {
+          // console.log('new', formData?.batch);
+          // console.log(editPrefilledFormData?.batch, 'old');
+          delete payload?.batch;
+          console.log('payload', payload);
+          const reassignmentPayload = {
+            ...payload,
+            ...(type === 'team-leader' && {
+              automaticMember: {
+                value: true,
+                fieldId: blockFieldId,
+                fieldName: 'BLOCK',
+              },
+            }),
+            userData: {
+              firstName: formData.firstName,
+            },
+          };
+          const resp = await updateReassignUser(
+            editableUserId,
+            reassignmentPayload
+          );
+          if (resp) {
+            if (type !== 'team-leader') {
+              const cohortIdPayload = getReassignPayload(
+                editPrefilledFormData.batch,
+                formData.batch
+              );
+              const res = await bulkCreateCohortMembers({
+                userId: [editableUserId],
+                cohortId: cohortIdPayload.cohortId,
+                removeCohortId: cohortIdPayload.removedIds,
+              });
+            }
+            showToastMessage(t(successUpdateMessage), 'success');
+            telemetryCallbacks(telemetryUpdateKey);
+            UpdateSuccessCallback();
+          } else {
+            // console.error('Error reassigning user:', error);
+            showToastMessage(t(failureUpdateMessage), 'error');
           }
-          showToastMessage(t(successUpdateMessage), 'success');
-          telemetryCallbacks(telemetryUpdateKey);
-          UpdateSuccessCallback();
-        } else {
-          // console.error('Error reassigning user:', error);
+        } catch (error) {
+          console.error('Error reassigning user:', error);
           showToastMessage(t(failureUpdateMessage), 'error');
         }
-      } catch (error) {
-        console.error('Error reassigning user:', error);
-        showToastMessage(t(failureUpdateMessage), 'error');
       }
     } else {
       if (isNotificationRequired) {
@@ -349,6 +365,12 @@ const AddEditUser = ({
       }
       try {
         if (isNotificationRequired) {
+          //bug fix for if email is empty then don't sent
+          if (type == 'learner') {
+            if (payload?.email == '') {
+              delete payload.email;
+            }
+          }
           const responseUserData = await createUser(payload, t);
 
           if (responseUserData?.userData?.userId) {
