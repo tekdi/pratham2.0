@@ -208,7 +208,7 @@ const CentersPage = () => {
       const location: any = {};
 
       data?.customFields?.forEach((field: any) => {
-        const value = field.selectedValues?.[0]?.id.toString();
+        const value = field.selectedValues?.[0]?.id?.toString();
         if (!value) return;
 
         switch (field.label?.toUpperCase()) {

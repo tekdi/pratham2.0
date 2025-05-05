@@ -55,7 +55,7 @@ const ModalComponent: React.FC<ModalProps> = ({
             <Typography variant="h4" fontSize="16px" fontWeight="500" m={0}>
               {heading}
             </Typography>
-            {routeName !== '/board-enrollment' && (
+            {selectedDate && (
               <Typography
                 variant="h2"
                 sx={{

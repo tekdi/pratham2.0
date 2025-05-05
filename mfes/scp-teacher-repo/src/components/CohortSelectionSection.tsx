@@ -434,6 +434,13 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
     setCenterId(event.target.value);
     localStorage.setItem('centerId', event.target.value);
 
+    //check if empty batch
+    if (!filteredChildData?.[0]?.cohortId) {
+      //patch for no data reset after batch change
+      setClassId('1234');
+      localStorage.removeItem('cohortId');
+      localStorage.removeItem('classId');
+    }
     //patch for reload
     setHandleSaveHasRun?.(!handleSaveHasRun);
   };
@@ -495,47 +502,299 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
           {t('COMMON.NO_CENTER_FOUND')}
         </Typography>
       )}
-      {filteredCohortData?.length !== 0 && filteredBatchData?.length === 0 && (
-        <Typography color={theme.palette.warning['300']}>
-          {t('COMMON.NO_BATCH_FOUND')}
-        </Typography>
-      )}
-      {filteredCohortData && filteredBatchData && (
-        <Box
-          sx={{
-            '@media (min-width: 900px)': {
-              marginTop: dashboard
-                ? teacher === 'Instructor'
-                  ? '0px'
-                  : '-25px'
-                : 'unset',
-              marginRight: dashboard ? '15px' : 'unset',
-            },
-          }}
-        >
-          {classId && filteredCohortData && filteredBatchData && (
+      {/* {filteredCohortData && filteredBatchData && ( */}
+      <Box
+        sx={{
+          '@media (min-width: 900px)': {
+            marginTop: dashboard
+              ? teacher === 'Instructor'
+                ? '0px'
+                : '-25px'
+              : 'unset',
+            marginRight: dashboard ? '15px' : 'unset',
+          },
+        }}
+      >
+        {/* {classId && filteredCohortData && filteredBatchData && ( */}
+        <Box>
+          {blockName ? (
             <Box>
-              {blockName ? (
-                <Box>
-                  <Typography
-                    color={theme.palette.warning['300']}
-                    textAlign={'left'}
-                    sx={{ fontSize: '12px', color: '#777' }}
-                  >
-                    {toPascalCase(blockName)} {t('DASHBOARD.BLOCK')}
-                  </Typography>
-                  <Box className="mt-md-16">
-                    <Box sx={{ minWidth: 120, gap: '15px' }} display={'flex'}>
-                      {filteredCohortData?.length > 1 ? (
+              <Typography
+                color={theme.palette.warning['300']}
+                textAlign={'left'}
+                sx={{ fontSize: '12px', color: '#777' }}
+              >
+                {toPascalCase(blockName)} {t('DASHBOARD.BLOCK')}
+              </Typography>
+              <Box className="mt-md-16">
+                <Box sx={{ minWidth: 120, gap: '15px' }} display={'flex'}>
+                  {filteredCohortData?.length > 1 ? (
+                    <FormControl
+                      className="drawer-select"
+                      sx={{
+                        m: 0,
+                        width: '100%',
+                        // '@media (max-width: 700px)': {
+                        //   width: '50%',
+                        // },
+                      }}
+                    >
+                      {showFloatingLabel && (
+                        <InputLabel id="center-select-label">
+                          {t('COMMON.CENTER')}
+                        </InputLabel>
+                      )}
+                      <Select
+                        value={centerId || filteredCohortData?.[0]?.cohortId}
+                        labelId="center-select-label"
+                        onChange={handleCohortSelection}
+                        displayEmpty
+                        inputProps={{ 'aria-label': 'Without label' }}
+                        className="select-languages capitalize fs-14 fw-500 bg-white"
+                        sx={{
+                          borderRadius: '0.5rem',
+                          color: theme.palette.warning['200'],
+                          width: '100%',
+                          marginBottom: '0rem',
+                          '@media (max-width: 900px)': {
+                            width: isAttendanceOverview ? '100%' : '62%',
+                          },
+                          // '& .MuiSelect-icon': {
+                          //   right: isRTL ? 'unset' : '7px',
+                          //   left: isRTL ? '7px' : 'unset',
+                          // },
+                        }}
+                        MenuProps={{
+                          PaperProps: {
+                            style: {
+                              maxHeight: 250,
+                            },
+                          },
+                        }}
+                        IconComponent={(props) => (
+                          <ArrowDropDownIcon
+                            {...props}
+                            style={{ color: 'black' }}
+                          />
+                        )}
+                      >
+                        {filteredCohortData?.length !== 0 ? (
+                          filteredManipulatedCohortData?.map((cohort: any) => (
+                            <MenuItem
+                              key={cohort.cohortId}
+                              value={cohort.cohortId}
+                              style={{
+                                fontWeight: '500',
+                                fontSize: '14px',
+                                color: theme.palette.warning['A200'],
+                                textTransform: 'capitalize',
+                              }}
+                            >
+                              {toPascalCase(cohort.name)}{' '}
+                              {cohort?.typeOfCohort === CenterType.REGULAR ||
+                                (CenterType.UNKNOWN &&
+                                  `(${cohort?.typeOfCohort?.toLowerCase()})`)}
+                            </MenuItem>
+                          ))
+                        ) : (
+                          <Typography
+                            style={{
+                              fontWeight: '500',
+                              fontSize: '14px',
+                              color: theme.palette.warning['A200'],
+                              padding: '0 15px',
+                            }}
+                          >
+                            {t('COMMON.NO_DATA_FOUND')}
+                          </Typography>
+                        )}
+                      </Select>
+                    </FormControl>
+                  ) : (
+                    <Typography color={theme.palette.warning['300']}>
+                      {filteredCohortData?.length === 0
+                        ? t('COMMON.NO_CENTER_FOUND')
+                        : toPascalCase(filteredCohortData[0]?.name)}
+                    </Typography>
+                  )}
+                  {filteredBatchData?.length > 1 ? (
+                    <FormControl
+                      className="drawer-select"
+                      sx={{
+                        m: 0,
+                        width: '100%',
+                        // '@media (max-width: 700px)': {
+                        //   width: '50%',
+                        // },
+                      }}
+                    >
+                      {showFloatingLabel && (
+                        <InputLabel id="batch-select-label">
+                          {t('COMMON.BATCH')}
+                        </InputLabel>
+                      )}
+                      <Select
+                        value={classId || filteredBatchData?.[0]?.cohortId}
+                        labelId="batch-select-label"
+                        onChange={handleBatchSelection}
+                        displayEmpty
+                        inputProps={{ 'aria-label': 'Without label' }}
+                        className="select-languages capitalize fs-14 fw-500 bg-white"
+                        sx={{
+                          borderRadius: '0.5rem',
+                          color: theme.palette.warning['200'],
+                          width: '100%',
+                          marginBottom: '0rem',
+                          '@media (max-width: 900px)': {
+                            width: isAttendanceOverview ? '100%' : '62%',
+                          },
+                          // '& .MuiSelect-icon': {
+                          //   right: isRTL ? 'unset' : '7px',
+                          //   left: isRTL ? '7px' : 'unset',
+                          // },
+                        }}
+                        MenuProps={{
+                          PaperProps: {
+                            style: {
+                              maxHeight: 250,
+                            },
+                          },
+                        }}
+                        IconComponent={(props) => (
+                          <ArrowDropDownIcon
+                            {...props}
+                            style={{ color: 'black' }}
+                          />
+                        )}
+                      >
+                        {filteredBatchData?.length !== 0 ? (
+                          filteredManipulatedBatchData?.map((cohort: any) => (
+                            <MenuItem
+                              key={cohort.cohortId}
+                              value={cohort.cohortId}
+                              style={{
+                                fontWeight: '500',
+                                fontSize: '14px',
+                                color: theme.palette.warning['A200'],
+                                textTransform: 'capitalize',
+                              }}
+                            >
+                              {toPascalCase(cohort.name)}
+                            </MenuItem>
+                          ))
+                        ) : (
+                          <Typography
+                            style={{
+                              fontWeight: '500',
+                              fontSize: '14px',
+                              color: theme.palette.warning['A200'],
+                              padding: '0 15px',
+                            }}
+                          >
+                            {t('COMMON.NO_DATA_FOUND')}
+                          </Typography>
+                        )}
+                      </Select>
+                    </FormControl>
+                  ) : (
+                    <Typography color={theme.palette.warning['300']}>
+                      {filteredBatchData?.length === 0
+                        ? t('COMMON.NO_BATCH_FOUND')
+                        : toPascalCase(filteredBatchData[0]?.name)}
+                    </Typography>
+                  )}
+                </Box>
+              </Box>
+            </Box>
+          ) : (
+            <Box>
+              <Box className="mt-24">
+                <Box sx={{ minWidth: 120, gap: '15px' }} display={'flex'}>
+                  {filteredCohortData?.length > 1 ? (
+                    <FormControl
+                      variant="outlined"
+                      fullWidth
+                      sx={{
+                        m: 0,
+                        width: '100%',
+                        ...(showFloatingLabel
+                          ? {}
+                          : {
+                              borderRadius: '0.5rem',
+                              color: theme.palette.warning['200'],
+                              marginBottom: '0rem',
+                              marginRight: '10px',
+                              '@media (max-width: 902px)': {
+                                width: isAttendanceOverview ? '100%' : '62%',
+                              },
+                              '@media (max-width: 702px)': {
+                                width: isAttendanceOverview ? '100%' : '65%',
+                              },
+                            }),
+                      }}
+                    >
+                      <InputLabel id="center-select-label">
+                        {t('COMMON.CENTER')}
+                      </InputLabel>
+
+                      <Select
+                        labelId="center-select-label"
+                        value={centerId || filteredCohortData[0]?.cohortId}
+                        onChange={handleCohortSelection}
+                        label={t('COMMON.CENTER')}
+                        inputProps={{ 'aria-label': 'Center select' }}
+                        className={
+                          showFloatingLabel
+                            ? ''
+                            : 'select-languages fs-14 fw-500 bg-white'
+                        }
+                        MenuProps={{
+                          PaperProps: {
+                            style: {
+                              maxHeight: 250,
+                            },
+                          },
+                        }}
+                      >
+                        {filteredCohortData?.length !== 0 ? (
+                          filteredManipulatedCohortData?.map((cohort: any) => (
+                            <MenuItem
+                              key={cohort.cohortId}
+                              value={cohort.cohortId}
+                              style={{
+                                fontWeight: '500',
+                                fontSize: '14px',
+                                color: theme.palette.warning['A200'],
+                                textTransform: 'capitalize',
+                              }}
+                            >
+                              {toPascalCase(cohort?.name)}
+                            </MenuItem>
+                          ))
+                        ) : (
+                          <MenuItem disabled>
+                            <Typography
+                              style={{
+                                fontWeight: '500',
+                                fontSize: '14px',
+                                color: theme.palette.warning['A200'],
+                                padding: '0 15px',
+                              }}
+                            >
+                              {t('COMMON.NO_DATA_FOUND')}
+                            </Typography>
+                          </MenuItem>
+                        )}
+                      </Select>
+                    </FormControl>
+                  ) : filteredCohortData?.length == 1 ? (
+                    <>
+                      {showDisabledDropDown &&
+                      filteredCohortData?.length === 1 ? (
                         <FormControl
-                          className="drawer-select"
-                          sx={{
-                            m: 0,
-                            width: '100%',
-                            // '@media (max-width: 700px)': {
-                            //   width: '50%',
-                            // },
-                          }}
+                          disabled={true}
+                          className={showFloatingLabel ? '' : 'drawer-select'}
+                          sx={{ m: 0, width: '100%' }}
                         >
                           {showFloatingLabel && (
                             <InputLabel id="center-select-label">
@@ -543,93 +802,166 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                             </InputLabel>
                           )}
                           <Select
-                            value={
-                              centerId || filteredCohortData?.[0]?.cohortId
-                            }
                             labelId="center-select-label"
-                            onChange={handleCohortSelection}
-                            displayEmpty
-                            inputProps={{ 'aria-label': 'Without label' }}
-                            className="select-languages capitalize fs-14 fw-500 bg-white"
-                            sx={{
-                              borderRadius: '0.5rem',
-                              color: theme.palette.warning['200'],
-                              width: '100%',
-                              marginBottom: '0rem',
-                              '@media (max-width: 900px)': {
-                                width: isAttendanceOverview ? '100%' : '62%',
-                              },
-                              // '& .MuiSelect-icon': {
-                              //   right: isRTL ? 'unset' : '7px',
-                              //   left: isRTL ? '7px' : 'unset',
-                              // },
-                            }}
-                            MenuProps={{
-                              PaperProps: {
-                                style: {
-                                  maxHeight: 250,
-                                },
-                              },
-                            }}
-                            IconComponent={(props) => (
-                              <ArrowDropDownIcon
-                                {...props}
-                                style={{ color: 'black' }}
-                              />
-                            )}
+                            label={showFloatingLabel ? t('COMMON.CENTER') : ''}
+                            value={filteredCohortData[0]?.cohortId}
                           >
-                            {filteredCohortData?.length !== 0 ? (
-                              filteredManipulatedCohortData?.map(
-                                (cohort: any) => (
-                                  <MenuItem
-                                    key={cohort.cohortId}
-                                    value={cohort.cohortId}
-                                    style={{
-                                      fontWeight: '500',
-                                      fontSize: '14px',
-                                      color: theme.palette.warning['A200'],
-                                      textTransform: 'capitalize',
-                                    }}
-                                  >
-                                    {toPascalCase(cohort.name)}{' '}
-                                    {cohort?.typeOfCohort ===
-                                      CenterType.REGULAR ||
-                                      (CenterType.UNKNOWN &&
-                                        `(${cohort?.typeOfCohort?.toLowerCase()})`)}
-                                  </MenuItem>
-                                )
-                              )
-                            ) : (
-                              <Typography
-                                style={{
-                                  fontWeight: '500',
-                                  fontSize: '14px',
-                                  color: theme.palette.warning['A200'],
-                                  padding: '0 15px',
-                                }}
-                              >
-                                {t('COMMON.NO_DATA_FOUND')}
-                              </Typography>
-                            )}
+                            <MenuItem
+                              key={filteredCohortData[0]?.cohortId}
+                              value={filteredCohortData[0]?.cohortId}
+                              style={{
+                                fontWeight: '500',
+                                fontSize: '14px',
+                                color: theme.palette.warning['A200'],
+                                textTransform: 'capitalize',
+                              }}
+                            >
+                              {filteredCohortData[0]?.name}
+                            </MenuItem>
                           </Select>
                         </FormControl>
                       ) : (
-                        <Typography color={theme.palette.warning['300']}>
-                          {filteredCohortData?.length === 0
-                            ? t('COMMON.NO_CENTER_FOUND')
-                            : toPascalCase(filteredCohortData[0]?.name)}
-                        </Typography>
+                        <>
+                          <FormControl
+                            fullWidth
+                            disabled
+                            variant="outlined"
+                            sx={{
+                              '& .MuiInputLabel-root': {
+                                color: theme.palette.primary.light,
+                              },
+                            }}
+                          >
+                            <InputLabel
+                              sx={{ textAlign: 'left' }}
+                              id="chip-label"
+                            >
+                              t('COMMON.CENTER')
+                            </InputLabel>
+                            <Select
+                              labelId="chip-label"
+                              value={
+                                filteredCohortData?.length === 0
+                                  ? ''
+                                  : toPascalCase(filteredCohortData?.[0]?.name)
+                              }
+                              sx={{ height: '53px' }}
+                              label="Chip"
+                            >
+                              <MenuItem value="">
+                                <Typography
+                                  color={theme.palette.warning['300']}
+                                >
+                                  {t('COMMON.NO_CENTER_FOUND')}
+                                </Typography>
+                              </MenuItem>
+                              {filteredCohortData?.length > 0 && (
+                                <MenuItem
+                                  value={toPascalCase(
+                                    filteredCohortData[0]?.name
+                                  )}
+                                >
+                                  <Typography sx={{ textAlign: 'left' }}>
+                                    {toPascalCase(filteredCohortData[0]?.name)}
+                                  </Typography>
+                                </MenuItem>
+                              )}
+                            </Select>
+                          </FormControl>
+                        </>
                       )}
-                      {filteredBatchData?.length > 1 ? (
+                    </>
+                  ) : (
+                    <Typography color={theme.palette.warning['300']}>
+                      {t('COMMON.NO_CENTER_FOUND')}
+                    </Typography>
+                  )}
+                  {filteredBatchData?.length > 1 ? (
+                    <FormControl
+                      variant="outlined"
+                      fullWidth
+                      className={showFloatingLabel ? '' : 'drawer-select'}
+                      sx={{
+                        m: 0,
+                        width: '100%',
+                        ...(showFloatingLabel
+                          ? {}
+                          : {
+                              borderRadius: '0.5rem',
+                              color: theme.palette.warning['200'],
+                              marginBottom: '0rem',
+                              marginRight: '10px',
+                              '@media (max-width: 902px)': {
+                                width: isAttendanceOverview ? '100%' : '62%',
+                              },
+                              '@media (max-width: 702px)': {
+                                width: isAttendanceOverview ? '100%' : '65%',
+                              },
+                            }),
+                      }}
+                    >
+                      <InputLabel id="batch-select-label">
+                        {t('COMMON.BATCH')}
+                      </InputLabel>
+
+                      <Select
+                        labelId="batch-select-label"
+                        label={t('COMMON.BATCH')}
+                        value={classId || filteredBatchData[0]?.cohortId}
+                        onChange={handleBatchSelection}
+                        inputProps={{ 'aria-label': 'Batch select' }}
+                        className={
+                          showFloatingLabel
+                            ? ''
+                            : 'select-languages fs-14 fw-500 bg-white'
+                        }
+                        MenuProps={{
+                          PaperProps: {
+                            style: {
+                              maxHeight: 250,
+                            },
+                          },
+                        }}
+                      >
+                        {filteredBatchData?.length !== 0 ? (
+                          filteredManipulatedBatchData?.map((cohort: any) => (
+                            <MenuItem
+                              key={cohort.cohortId}
+                              value={cohort.cohortId}
+                              style={{
+                                fontWeight: '500',
+                                fontSize: '14px',
+                                color: theme.palette.warning['A200'],
+                                textTransform: 'capitalize',
+                              }}
+                            >
+                              {toPascalCase(cohort?.name)}
+                            </MenuItem>
+                          ))
+                        ) : (
+                          <MenuItem disabled>
+                            <Typography
+                              style={{
+                                fontWeight: '500',
+                                fontSize: '14px',
+                                color: theme.palette.warning['A200'],
+                                padding: '0 15px',
+                              }}
+                            >
+                              {t('COMMON.NO_DATA_FOUND')}
+                            </Typography>
+                          </MenuItem>
+                        )}
+                      </Select>
+                    </FormControl>
+                  ) : filteredBatchData?.length == 1 ? (
+                    <>
+                      {showDisabledDropDown &&
+                      filteredBatchData?.length === 1 ? (
                         <FormControl
-                          className="drawer-select"
-                          sx={{
-                            m: 0,
-                            width: '100%',
-                            // '@media (max-width: 700px)': {
-                            //   width: '50%',
-                            // },
-                          }}
+                          disabled={true}
+                          className={showFloatingLabel ? '' : 'drawer-select'}
+                          sx={{ m: 0, width: '100%' }}
                         >
                           {showFloatingLabel && (
                             <InputLabel id="batch-select-label">
@@ -637,434 +969,77 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                             </InputLabel>
                           )}
                           <Select
-                            value={classId || filteredBatchData?.[0]?.cohortId}
                             labelId="batch-select-label"
-                            onChange={handleBatchSelection}
-                            displayEmpty
-                            inputProps={{ 'aria-label': 'Without label' }}
-                            className="select-languages capitalize fs-14 fw-500 bg-white"
-                            sx={{
-                              borderRadius: '0.5rem',
-                              color: theme.palette.warning['200'],
-                              width: '100%',
-                              marginBottom: '0rem',
-                              '@media (max-width: 900px)': {
-                                width: isAttendanceOverview ? '100%' : '62%',
-                              },
-                              // '& .MuiSelect-icon': {
-                              //   right: isRTL ? 'unset' : '7px',
-                              //   left: isRTL ? '7px' : 'unset',
-                              // },
-                            }}
-                            MenuProps={{
-                              PaperProps: {
-                                style: {
-                                  maxHeight: 250,
-                                },
-                              },
-                            }}
-                            IconComponent={(props) => (
-                              <ArrowDropDownIcon
-                                {...props}
-                                style={{ color: 'black' }}
-                              />
-                            )}
+                            label={showFloatingLabel ? t('COMMON.BATCH') : ''}
+                            value={filteredBatchData[0]?.cohortId}
                           >
-                            {filteredBatchData?.length !== 0 ? (
-                              filteredManipulatedBatchData?.map(
-                                (cohort: any) => (
-                                  <MenuItem
-                                    key={cohort.cohortId}
-                                    value={cohort.cohortId}
-                                    style={{
-                                      fontWeight: '500',
-                                      fontSize: '14px',
-                                      color: theme.palette.warning['A200'],
-                                      textTransform: 'capitalize',
-                                    }}
-                                  >
-                                    {toPascalCase(cohort.name)}
-                                  </MenuItem>
-                                )
-                              )
-                            ) : (
-                              <Typography
-                                style={{
-                                  fontWeight: '500',
-                                  fontSize: '14px',
-                                  color: theme.palette.warning['A200'],
-                                  padding: '0 15px',
-                                }}
-                              >
-                                {t('COMMON.NO_DATA_FOUND')}
-                              </Typography>
-                            )}
-                          </Select>
-                        </FormControl>
-                      ) : (
-                        <Typography color={theme.palette.warning['300']}>
-                          {filteredBatchData?.length === 0
-                            ? t('COMMON.NO_BATCH_FOUND')
-                            : toPascalCase(filteredBatchData[0]?.name)}
-                        </Typography>
-                      )}
-                    </Box>
-                  </Box>
-                </Box>
-              ) : (
-                <Box>
-                  <Box className="mt-24">
-                    <Box sx={{ minWidth: 120, gap: '15px' }} display={'flex'}>
-                      {filteredCohortData?.length > 1 ? (
-                        <FormControl
-                          variant="outlined"
-                          fullWidth
-                          sx={{
-                            m: 0,
-                            width: '100%',
-                            ...(showFloatingLabel
-                              ? {}
-                              : {
-                                  borderRadius: '0.5rem',
-                                  color: theme.palette.warning['200'],
-                                  marginBottom: '0rem',
-                                  marginRight: '10px',
-                                  '@media (max-width: 902px)': {
-                                    width: isAttendanceOverview
-                                      ? '100%'
-                                      : '62%',
-                                  },
-                                  '@media (max-width: 702px)': {
-                                    width: isAttendanceOverview
-                                      ? '100%'
-                                      : '65%',
-                                  },
-                                }),
-                          }}
-                        >
-                          <InputLabel id="center-select-label">
-                            {t('COMMON.CENTER')}
-                          </InputLabel>
-
-                          <Select
-                            labelId="center-select-label"
-                            value={centerId || filteredCohortData[0]?.cohortId}
-                            onChange={handleCohortSelection}
-                            label={t('COMMON.CENTER')}
-                            inputProps={{ 'aria-label': 'Center select' }}
-                            className={
-                              showFloatingLabel
-                                ? ''
-                                : 'select-languages fs-14 fw-500 bg-white'
-                            }
-                            MenuProps={{
-                              PaperProps: {
-                                style: {
-                                  maxHeight: 250,
-                                },
-                              },
-                            }}
-                          >
-                            {filteredCohortData?.length !== 0 ? (
-                              filteredManipulatedCohortData?.map(
-                                (cohort: any) => (
-                                  <MenuItem
-                                    key={cohort.cohortId}
-                                    value={cohort.cohortId}
-                                    style={{
-                                      fontWeight: '500',
-                                      fontSize: '14px',
-                                      color: theme.palette.warning['A200'],
-                                      textTransform: 'capitalize',
-                                    }}
-                                  >
-                                    {toPascalCase(cohort?.name)}
-                                  </MenuItem>
-                                )
-                              )
-                            ) : (
-                              <MenuItem disabled>
-                                <Typography
-                                  style={{
-                                    fontWeight: '500',
-                                    fontSize: '14px',
-                                    color: theme.palette.warning['A200'],
-                                    padding: '0 15px',
-                                  }}
-                                >
-                                  {t('COMMON.NO_DATA_FOUND')}
-                                </Typography>
-                              </MenuItem>
-                            )}
-                          </Select>
-                        </FormControl>
-                      ) : (
-                        <>
-                          {showDisabledDropDown &&
-                          filteredCohortData?.length === 1 ? (
-                            <FormControl
-                              disabled={true}
-                              className={
-                                showFloatingLabel ? '' : 'drawer-select'
-                              }
-                              sx={{ m: 0, width: '100%' }}
-                            >
-                              {showFloatingLabel && (
-                                <InputLabel id="center-select-label">
-                                  {t('COMMON.CENTER')}
-                                </InputLabel>
-                              )}
-                              <Select
-                                labelId="center-select-label"
-                                label={
-                                  showFloatingLabel ? t('COMMON.CENTER') : ''
-                                }
-                                value={filteredCohortData[0]?.cohortId}
-                              >
-                                <MenuItem
-                                  key={filteredCohortData[0]?.cohortId}
-                                  value={filteredCohortData[0]?.cohortId}
-                                  style={{
-                                    fontWeight: '500',
-                                    fontSize: '14px',
-                                    color: theme.palette.warning['A200'],
-                                    textTransform: 'capitalize',
-                                  }}
-                                >
-                                  {filteredCohortData[0]?.name}
-                                </MenuItem>
-                              </Select>
-                            </FormControl>
-                          ) : (
-                            <>
-                              <FormControl
-                                fullWidth
-                                disabled
-                                variant="outlined"
-                                sx={{
-                                  '& .MuiInputLabel-root': {
-                                    color: theme.palette.primary.light,
-                                  },
-                                }}
-                              >
-                                <InputLabel
-                                  sx={{ textAlign: 'left' }}
-                                  id="chip-label"
-                                >
-                                  t('COMMON.CENTER')
-                                </InputLabel>
-                                <Select
-                                  labelId="chip-label"
-                                  value={
-                                    filteredCohortData?.length === 0
-                                      ? ''
-                                      : toPascalCase(
-                                          filteredCohortData[0]?.name
-                                        )
-                                  }
-                                  sx={{ height: '53px' }}
-                                  label="Chip"
-                                >
-                                  <MenuItem value="">
-                                    <Typography
-                                      color={theme.palette.warning['300']}
-                                    >
-                                      {t('COMMON.NO_CENTER_FOUND')}
-                                    </Typography>
-                                  </MenuItem>
-                                  {filteredCohortData?.length > 0 && (
-                                    <MenuItem
-                                      value={toPascalCase(
-                                        filteredCohortData[0]?.name
-                                      )}
-                                    >
-                                      <Typography sx={{ textAlign: 'left' }}>
-                                        {toPascalCase(
-                                          filteredCohortData[0]?.name
-                                        )}
-                                      </Typography>
-                                    </MenuItem>
-                                  )}
-                                </Select>
-                              </FormControl>
-                            </>
-                          )}
-                        </>
-                      )}
-                      {filteredBatchData?.length > 1 ? (
-                        <FormControl
-                          variant="outlined"
-                          fullWidth
-                          className={showFloatingLabel ? '' : 'drawer-select'}
-                          sx={{
-                            m: 0,
-                            width: '100%',
-                            ...(showFloatingLabel
-                              ? {}
-                              : {
-                                  borderRadius: '0.5rem',
-                                  color: theme.palette.warning['200'],
-                                  marginBottom: '0rem',
-                                  marginRight: '10px',
-                                  '@media (max-width: 902px)': {
-                                    width: isAttendanceOverview
-                                      ? '100%'
-                                      : '62%',
-                                  },
-                                  '@media (max-width: 702px)': {
-                                    width: isAttendanceOverview
-                                      ? '100%'
-                                      : '65%',
-                                  },
-                                }),
-                          }}
-                        >
-                          <InputLabel id="batch-select-label">
-                            {t('COMMON.BATCH')}
-                          </InputLabel>
-
-                          <Select
-                            labelId="batch-select-label"
-                            label={t('COMMON.BATCH')}
-                            value={classId || filteredBatchData[0]?.cohortId}
-                            onChange={handleBatchSelection}
-                            inputProps={{ 'aria-label': 'Batch select' }}
-                            className={
-                              showFloatingLabel
-                                ? ''
-                                : 'select-languages fs-14 fw-500 bg-white'
-                            }
-                            MenuProps={{
-                              PaperProps: {
-                                style: {
-                                  maxHeight: 250,
-                                },
-                              },
-                            }}
-                          >
-                            {filteredBatchData?.length !== 0 ? (
-                              filteredManipulatedBatchData?.map(
-                                (cohort: any) => (
-                                  <MenuItem
-                                    key={cohort.cohortId}
-                                    value={cohort.cohortId}
-                                    style={{
-                                      fontWeight: '500',
-                                      fontSize: '14px',
-                                      color: theme.palette.warning['A200'],
-                                      textTransform: 'capitalize',
-                                    }}
-                                  >
-                                    {toPascalCase(cohort?.name)}
-                                  </MenuItem>
-                                )
-                              )
-                            ) : (
-                              <MenuItem disabled>
-                                <Typography
-                                  style={{
-                                    fontWeight: '500',
-                                    fontSize: '14px',
-                                    color: theme.palette.warning['A200'],
-                                    padding: '0 15px',
-                                  }}
-                                >
-                                  {t('COMMON.NO_DATA_FOUND')}
-                                </Typography>
-                              </MenuItem>
-                            )}
-                          </Select>
-                        </FormControl>
-                      ) : (
-                        <>
-                          {showDisabledDropDown &&
-                          filteredBatchData?.length === 1 ? (
-                            <FormControl
-                              disabled={true}
-                              className={
-                                showFloatingLabel ? '' : 'drawer-select'
-                              }
-                              sx={{ m: 0, width: '100%' }}
-                            >
-                              {showFloatingLabel && (
-                                <InputLabel id="batch-select-label">
-                                  {t('COMMON.BATCH')}
-                                </InputLabel>
-                              )}
-                              <Select
-                                labelId="batch-select-label"
-                                label={
-                                  showFloatingLabel ? t('COMMON.BATCH') : ''
-                                }
-                                value={filteredBatchData[0]?.cohortId}
-                              >
-                                <MenuItem
-                                  key={filteredBatchData[0]?.cohortId}
-                                  value={filteredBatchData[0]?.cohortId}
-                                  style={{
-                                    fontWeight: '500',
-                                    fontSize: '14px',
-                                    color: theme.palette.warning['A200'],
-                                    textTransform: 'capitalize',
-                                  }}
-                                >
-                                  {filteredBatchData[0]?.name}
-                                </MenuItem>
-                              </Select>
-                            </FormControl>
-                          ) : (
-                            <FormControl
-                              fullWidth
-                              disabled
-                              variant="outlined"
-                              sx={{
-                                '& .MuiInputLabel-root': {
-                                  color: theme.palette.primary.light,
-                                },
+                            <MenuItem
+                              key={filteredBatchData[0]?.cohortId}
+                              value={filteredBatchData[0]?.cohortId}
+                              style={{
+                                fontWeight: '500',
+                                fontSize: '14px',
+                                color: theme.palette.warning['A200'],
+                                textTransform: 'capitalize',
                               }}
                             >
-                              <InputLabel id="batch-label">Batch</InputLabel>
-                              <Select
-                                labelId="batch-label"
-                                value={
-                                  filteredBatchData?.length === 0
-                                    ? ''
-                                    : toPascalCase(filteredBatchData[0]?.name)
-                                }
-                                label="Batch"
-                                sx={{ height: '53px' }}
+                              {filteredBatchData[0]?.name}
+                            </MenuItem>
+                          </Select>
+                        </FormControl>
+                      ) : (
+                        <FormControl
+                          fullWidth
+                          disabled
+                          variant="outlined"
+                          sx={{
+                            '& .MuiInputLabel-root': {
+                              color: theme.palette.primary.light,
+                            },
+                          }}
+                        >
+                          <InputLabel id="batch-label">Batch</InputLabel>
+                          <Select
+                            labelId="batch-label"
+                            value={
+                              filteredBatchData?.length === 0
+                                ? ''
+                                : toPascalCase(filteredBatchData[0]?.name)
+                            }
+                            label="Batch"
+                            sx={{ height: '53px' }}
+                          >
+                            <MenuItem value="">
+                              <Typography color={theme.palette.warning['300']}>
+                                {t('COMMON.NO_BATCH_FOUND')}
+                              </Typography>
+                            </MenuItem>
+                            {filteredBatchData?.length > 0 && (
+                              <MenuItem
+                                value={toPascalCase(filteredBatchData[0]?.name)}
                               >
-                                <MenuItem value="">
-                                  <Typography
-                                    color={theme.palette.warning['300']}
-                                  >
-                                    {t('COMMON.NO_BATCH_FOUND')}
-                                  </Typography>
-                                </MenuItem>
-                                {filteredBatchData?.length > 0 && (
-                                  <MenuItem
-                                    value={toPascalCase(
-                                      filteredBatchData[0]?.name
-                                    )}
-                                  >
-                                    <Typography sx={{ textAlign: 'left' }}>
-                                      {toPascalCase(filteredBatchData[0]?.name)}
-                                    </Typography>
-                                  </MenuItem>
-                                )}
-                              </Select>
-                            </FormControl>
-                          )}
-                        </>
+                                <Typography sx={{ textAlign: 'left' }}>
+                                  {toPascalCase(filteredBatchData[0]?.name)}
+                                </Typography>
+                              </MenuItem>
+                            )}
+                          </Select>
+                        </FormControl>
                       )}
-                    </Box>
-                  </Box>
+                    </>
+                  ) : (
+                    <Typography color={theme.palette.warning['300']}>
+                      {t('COMMON.NO_BATCH_FOUND')}
+                    </Typography>
+                  )}
                 </Box>
-              )}
+              </Box>
             </Box>
           )}
         </Box>
-      )}
+        {/* )} */}
+      </Box>
+      {/* )} */}
     </Box>
   );
 };
