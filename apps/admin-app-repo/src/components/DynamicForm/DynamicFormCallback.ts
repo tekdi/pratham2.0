@@ -207,11 +207,25 @@ export const notificationCallback = async (
   let replacements: { [key: string]: string };
   replacements = {};
   let cleanedUrl = '';
-  if (process.env.NEXT_PUBLIC_TEACHER_SBPLAYER) {
-    cleanedUrl = process.env.NEXT_PUBLIC_TEACHER_SBPLAYER.replace(
-      /\/sbplayer$/,
-      ''
-    );
+  if (type == 'team-leader' || type == 'facilitator') {
+    if (process.env.NEXT_PUBLIC_TEACHER_SBPLAYER) {
+      cleanedUrl = process.env.NEXT_PUBLIC_TEACHER_SBPLAYER.replace(
+        /\/sbplayer$/,
+        ''
+      );
+    }
+  }
+  if (
+    type == 'state-lead' ||
+    type == 'content-reviewer' ||
+    type == 'content-creator'
+  ) {
+    if (process.env.NEXT_PUBLIC_ADMIN_SBPLAYER) {
+      cleanedUrl = process.env.NEXT_PUBLIC_ADMIN_SBPLAYER.replace(
+        /\/sbplayer$/,
+        ''
+      );
+    }
   }
   if (creatorName) {
     if (type == 'learner') {
