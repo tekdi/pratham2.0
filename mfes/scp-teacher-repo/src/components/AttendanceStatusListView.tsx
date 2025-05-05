@@ -166,6 +166,7 @@ const AttendanceStatusListView: React.FC<AttendanceStatusListViewProps> = ({
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'flex-start',
+            width: '40%',
           }}
         >
           <Typography
@@ -179,6 +180,7 @@ const AttendanceStatusListView: React.FC<AttendanceStatusListViewProps> = ({
               color: isDisabled
                 ? theme.palette.warning['400']
                 : theme.palette.warning['300'],
+             
             }}
             onClick={() => handleOpenModalLearner(userData?.userId!)}
             className="two-line-text"
@@ -193,7 +195,7 @@ const AttendanceStatusListView: React.FC<AttendanceStatusListViewProps> = ({
               userData?.name
             )}
           </Typography>
-          <Typography variant='h6'>{(userData?.userName)?.toUpperCase()}</Typography>
+          <Typography variant='h6' sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%' }}>{(userData?.userName)?.toUpperCase()}</Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: '10px' }}>
           {userData?.memberStatus === Status.DROPOUT &&

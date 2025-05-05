@@ -1092,8 +1092,8 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
                       }}
                     >
                       {item.label?.toUpperCase() === 'BATCH'
-                        ? batchNames.join(', ')
-                        : typeof displayValue === 'string' ? t(`FORM.${displayValue}`, displayValue) : displayValue}
+                        ? batchNames.map(name => toPascalCase(name)).join(', ')
+                        : typeof displayValue === 'string' ? t(`FORM.${displayValue}`, toPascalCase(displayValue)) : toPascalCase(displayValue)}
                     </Typography>
                   </Grid>
                 );
