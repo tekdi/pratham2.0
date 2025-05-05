@@ -6,7 +6,7 @@ import axios from 'axios';
 import Grid from '@mui/material/Grid';
 import { Box } from '@mui/material';
 import { TextField, Container, Typography } from '@mui/material';
-import { Layout as SharedLayout } from '@shared-lib';
+import { Layout as SharedLayout, useTranslation } from '@shared-lib';
 import _ from 'lodash'; // Lodash for deep comparison
 import CustomMultiSelectWidget from './RJSFWidget/CustomMultiSelectWidget';
 import CustomCheckboxWidget from './RJSFWidget/CustomCheckboxWidget';
@@ -22,8 +22,6 @@ import {
   transformLabel,
 } from '../utils/Helper';
 import { CustomObjectFieldTemplate } from './FormTemplate/ObjectFieldTemplate';
-
-import { useTranslation } from 'react-i18next';
 
 const DynamicForm = ({
   schema,
