@@ -829,6 +829,17 @@
     "NOT_ABLE_CREATE_LEARNER": "Not able to create learner",
     "LEARNERS.USER_CREDENTIALS_WILL_BE_SEND_SOON": "User credentials will be sent soon"
   },
+  "BATCH": {
+    "NEW_BATCH": "New Batch",
+    "UPDATE_BATCH": "Update Batch",
+    "SURE_DELETE_BATCH": "Are you sure you want to delete ",
+    "BATCH_UPDATE_SUCCESSFULLY": "Batch has been successfully updated",
+    "BATCH_DELETE_SUCCESSFULLY": "Batch has been successfully deleted",
+    "BATCH_CREATED_SUCCESSFULLY": "Batch Created successfully",
+    "BATCH_UPDATE_FAILED": "Something went wrong while updating batch",
+    "YOU_CANT_DELETE_BATCH_HAS_ACTIVE_LEARNERS": "You can't delete the batch because it has {{activeMembers}} Active Learners",
+    "NO_BATCH_FOUND": "No Batch Found"
+  },
   "VILLAGE": "Village",
   "first_name": "First Name",
   "middle_name": "Middle Name",
@@ -890,11 +901,11 @@
   "SALARIED_WORK": "Salaried work",
   "SELF_EMPLOYMENT": "Self-employment",
   "UNEMPLOYED_OR_DOMESTIC_WORK": "Unemployed or Domestic Work",
-  "STATE":"State",
-  "DISTRICT":"District",
-  "BLOCK":"Block",
-  "CENTER":"Center",
-  "BOARD":"Board",
-  "MEDIUM":"Medium",
-  "GRADE":"Grade"
+  "STATE": "State",
+  "DISTRICT": "District",
+  "BLOCK": "Block",
+  "CENTER": "Center",
+  "BOARD": "Board",
+  "MEDIUM": "Medium",
+  "GRADE": "Grade"
 }
