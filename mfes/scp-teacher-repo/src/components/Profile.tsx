@@ -69,32 +69,32 @@ const Profile: React.FC<ProfileDetailsProps> = ({
     >
       <CardContent>
         <Grid container spacing={2}>
-          <Grid item xs={6}>
+          <Grid item xs={12} md={12} lg={6}>
             <Typography
               color={theme.palette.warning['500']}
-              sx={{ fontSize: '12px', fontWeight: 600 }}
+              sx={{ fontSize: '12px', fontWeight: 600, wordWrap: 'break-word' }}
             >
               {t('SCP_PROFILE.DESIGNATION')}
             </Typography>
             <Typography
               color={theme.palette.warning['A200']}
-              sx={{ fontSize: '16px', fontWeight: 400 }}
+              sx={{ fontSize: '16px', fontWeight: 400, wordWrap: 'break-word' }}
             >
               {designation}
             </Typography>
           </Grid>
 
-          <Grid item xs={6}>
+          <Grid item xs={12} md={12} lg={6}>
             <>
               <Typography
                 color={theme.palette.warning['500']}
-                sx={{ fontSize: '12px', fontWeight: 600 }}
+                sx={{ fontSize: '12px', fontWeight: 600, wordWrap: 'break-word' }}
               >
                 {t('SCP_PROFILE.USERNAME')}
               </Typography>
               <Typography
                 color={theme.palette.warning['A200']}
-                sx={{ fontSize: '16px', fontWeight: 400 }}
+                sx={{ fontSize: '16px', fontWeight: 400, wordWrap: 'break-word' }}
                 gutterBottom
               >
                 {userName}
@@ -102,55 +102,55 @@ const Profile: React.FC<ProfileDetailsProps> = ({
             </>
           </Grid>
 
-          <Grid item xs={6}>
+          <Grid item xs={12} md={12} lg={6}>
             <Typography
               color={theme.palette.warning['500']}
-              sx={{ fontSize: '12px', fontWeight: 600 }}
+              sx={{ fontSize: '12px', fontWeight: 600, wordWrap: 'break-word' }}
             >
               {t('SCP_PROFILE.EMAIL_ID')}
             </Typography>
             <Typography
               color={theme.palette.warning['A200']}
-              sx={{ fontSize: '16px', fontWeight: 400 }}
+              sx={{ fontSize: '16px', fontWeight: 400, wordWrap: 'break-word' }}
               gutterBottom
             >
               {emailId}
             </Typography>
           </Grid>
 
-          <Grid item xs={6}>
+          <Grid item xs={12} md={12} lg={6}>
             <Typography
               color={theme.palette.warning['500']}
-              sx={{ fontSize: '12px', fontWeight: 600, mt: 2 }}
+              sx={{ fontSize: '12px', fontWeight: 600, mt: 2, wordWrap: 'break-word' }}
             >
               {t('SCP_PROFILE.JOINED_ON')}
             </Typography>
             <Typography
               color={theme.palette.warning['A200']}
-              sx={{ fontSize: '16px', fontWeight: 400 }}
+              sx={{ fontSize: '16px', fontWeight: 400, wordWrap: 'break-word' }}
             >
               {joinedOn}
             </Typography>
           </Grid>
 
-          <Grid item xs={6}>
+          <Grid item xs={12} md={12} lg={6}>
             <Typography
               color={theme.palette.warning['500']}
-              sx={{ fontSize: '12px', fontWeight: 600, mt: 2 }}
+              sx={{ fontSize: '12px', fontWeight: 600, mt: 2, wordWrap: 'break-word' }}
             >
               {t('SCP_PROFILE.PHONE_NUMBER')}
             </Typography>
             <Typography
               color={theme.palette.warning['A200']}
-              sx={{ fontSize: '16px', fontWeight: 400 }}
+              sx={{ fontSize: '16px', fontWeight: 400, wordWrap: 'break-word' }}
             >
               {phoneNumber}
             </Typography>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={12} md={12} lg={6}>
             <Typography
               color={theme.palette.warning['500']}
-              sx={{ fontSize: '12px', fontWeight: 600, mt: 2 }}
+              sx={{ fontSize: '12px', fontWeight: 600, mt: 2, wordWrap: 'break-word' }}
             >
               {t('SCP_PROFILE.GENDER')}
             </Typography>
@@ -158,14 +158,14 @@ const Profile: React.FC<ProfileDetailsProps> = ({
               {gender}
             </Typography>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={12} md={12} lg={6}>
             <Typography
               color={theme.palette.warning['500']}
-              sx={{ fontSize: '12px', fontWeight: 600, mt: 2 }}
+              sx={{ fontSize: '12px', fontWeight: 600, mt: 2, wordWrap: 'break-word' }}
             >
               {t('SCP_PROFILE.DOB')}
             </Typography>
-            <Typography sx={{ fontSize: '16px', fontWeight: 400 }}>
+            <Typography sx={{ fontSize: '16px', fontWeight: 400, wordWrap: 'break-word' }}>
               {dob}
             </Typography>
           </Grid>

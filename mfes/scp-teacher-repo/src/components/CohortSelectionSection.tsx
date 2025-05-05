@@ -174,6 +174,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
     if (userId) {
       let filteredChildData = await getBatchFilteredData(centerId);
       setFilteredBatchData(filteredChildData);
+      setCohorts(filteredChildData);
       setFilteredManipulatedBatchData(filteredChildData);
     }
   };
@@ -281,7 +282,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
 
             if (response?.length > 0) {
               const nameTypePairs = extractNamesAndCohortTypes(response);
-              setCohorts(nameTypePairs);
+              // setCohorts(nameTypePairs);
             }
           }
           if (response && response.length > 0) {
@@ -297,7 +298,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                 }))
                 ?.filter(Boolean);
 
-              setCohorts(filteredData);
+              // setCohorts(filteredData);
               if (filteredData.length > 0) {
                 if (typeof window !== 'undefined' && window.localStorage) {
                   let centerLocalId = filteredData?.[0]?.cohortId;
@@ -846,7 +847,12 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                                   },
                                 }}
                               >
-                                <InputLabel sx={{textAlign:"left"}} id="chip-label">center</InputLabel>
+                                <InputLabel
+                                  sx={{ textAlign: 'left' }}
+                                  id="chip-label"
+                                >
+                                  t('COMMON.CENTER')
+                                </InputLabel>
                                 <Select
                                   labelId="chip-label"
                                   value={
@@ -872,7 +878,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                                         filteredCohortData[0]?.name
                                       )}
                                     >
-                                      <Typography sx={{textAlign:"left"}}>
+                                      <Typography sx={{ textAlign: 'left' }}>
                                         {toPascalCase(
                                           filteredCohortData[0]?.name
                                         )}
@@ -1007,41 +1013,47 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                               </Select>
                             </FormControl>
                           ) : (
-                                  <FormControl
-                                    fullWidth
-                                    disabled
-                                    variant="outlined"
-                                    sx={{
-                                      '& .MuiInputLabel-root': {
-                                        color: theme.palette.primary.light,
-                                      }
-                                    }}
+                            <FormControl
+                              fullWidth
+                              disabled
+                              variant="outlined"
+                              sx={{
+                                '& .MuiInputLabel-root': {
+                                  color: theme.palette.primary.light,
+                                },
+                              }}
+                            >
+                              <InputLabel id="batch-label">Batch</InputLabel>
+                              <Select
+                                labelId="batch-label"
+                                value={
+                                  filteredBatchData?.length === 0
+                                    ? ''
+                                    : toPascalCase(filteredBatchData[0]?.name)
+                                }
+                                label="Batch"
+                                sx={{ height: '53px' }}
+                              >
+                                <MenuItem value="">
+                                  <Typography
+                                    color={theme.palette.warning['300']}
                                   >
-                                    <InputLabel id="batch-label">Batch</InputLabel>
-                                    <Select
-                                      labelId="batch-label"
-                                      value={
-                                        filteredBatchData?.length === 0
-                                          ? ""
-                                          : toPascalCase(filteredBatchData[0]?.name)
-                                      }
-                                      label="Batch"
-                                      sx={{height:"53px"}}  
-                                    >
-                                      <MenuItem value="">
-                                        <Typography color={theme.palette.warning["300"]}>
-                                          {t("COMMON.NO_BATCH_FOUND")}
-                                        </Typography>
-                                      </MenuItem>
-                                      {filteredBatchData?.length > 0 && (
-                                        <MenuItem value={toPascalCase(filteredBatchData[0]?.name)}>
-                                          <Typography sx={{textAlign:"left"}}>
-                                            {toPascalCase(filteredBatchData[0]?.name)}
-                                          </Typography>
-                                        </MenuItem>
-                                      )}
-                                    </Select>
-                                  </FormControl>
+                                    {t('COMMON.NO_BATCH_FOUND')}
+                                  </Typography>
+                                </MenuItem>
+                                {filteredBatchData?.length > 0 && (
+                                  <MenuItem
+                                    value={toPascalCase(
+                                      filteredBatchData[0]?.name
+                                    )}
+                                  >
+                                    <Typography sx={{ textAlign: 'left' }}>
+                                      {toPascalCase(filteredBatchData[0]?.name)}
+                                    </Typography>
+                                  </MenuItem>
+                                )}
+                              </Select>
+                            </FormControl>
                           )}
                         </>
                       )}
