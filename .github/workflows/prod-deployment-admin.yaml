@@ -39,7 +39,7 @@ jobs:
       - name: Remove Docker image from runner
         run: |
           docker rmi ${{ secrets.ECR_REPO_NAME_LAP_PROD }}:${{ secrets.IMAGE_TAG_LAP }}
-          
+
       # Step 7: SSH to the EC2 server and deploy
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v0.1.10

@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React, { useState, useEffect } from 'react';
-import DynamicForm from '@/components/DynamicForm/DynamicForm';
+import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
 import { CohortTypes, Status } from '@/utils/app.constant';
@@ -18,8 +18,8 @@ import {
   extractMatchingKeys,
   fetchForm,
   searchListData,
-} from '@/components/DynamicForm/DynamicFormCallback';
-import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
+} from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
+import { FormContext } from '@shared-lib-v2/DynamicForm/components/DynamicFormConstant';
 import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import {
   CohortSearchSchema,
@@ -64,6 +64,7 @@ const Centers = () => {
   const [firstName, setFirstName] = useState('');
   const [totalCount, setTotalCount] = useState(0);
   const [totalCountBatch, setTotalCountBatch] = useState(0);
+  const storedProgram = localStorage.getItem('program');
 
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
@@ -106,17 +107,10 @@ const Centers = () => {
       //unit name is missing from required so handled from frotnend
       let alterSchema = responseForm?.schema;
       let requiredArray = alterSchema?.required;
-      const mustRequired = [
-        'name',
-        'center_type',
-        'state',
-        'district',
-        'block',
-        'village',
-        'board',
-        'medium',
-        'grade',
-      ];
+      const mustRequired = ['name', 'state', 'district', 'block', 'village'];
+      if (storedProgram === 'Second Chance Program') {
+        mustRequired.push('center_type', 'board', 'medium', 'grade');
+      }
       // Merge only missing items from required2 into required1
       mustRequired.forEach((item) => {
         if (!requiredArray.includes(item)) {
@@ -233,31 +227,6 @@ const Centers = () => {
       render: (row: any) => transformLabel(row?.name),
     },
     {
-      key: 'type',
-      label: 'Type',
-      render: (row) =>
-        transformLabel(
-          row.customFields
-            .find((field) => field.label === 'TYPE_OF_CENTER')
-            ?.selectedValues.map((item) => item.value)
-            .join(', ')
-        ) || '-',
-    },
-    {
-      key: 'active_batches',
-      label: 'Active Batches',
-      render: (row) => (
-        <ActiveArchivedBatch cohortId={row?.cohortId} type={Status.ACTIVE} />
-      ),
-    },
-    {
-      key: 'archived_batches',
-      label: 'Archived Batches',
-      render: (row) => (
-        <ActiveArchivedBatch cohortId={row?.cohortId} type={Status.ARCHIVED} />
-      ),
-    },
-    {
       key: 'address',
       label: 'Address',
       render: (row) =>
@@ -311,6 +280,76 @@ const Centers = () => {
         ) || '-',
     },
     {
+      key: 'status',
+      label: 'Status',
+      render: (row: any) => transformLabel(row?.status),
+    },
+  ];
+  // const extraColumnsForYouthnet = [
+  //   {
+  //     key: 'image',
+  //     label: 'Images',
+  //     render: (row: any) => {
+  //       console.log('Row in image column:', row);
+  //       return row?.image?.[0];
+  //     },
+  //   },
+  // ];
+  const extraColumnsForYouthnet = [
+    {
+      key: 'image',
+      label: 'Images',
+      render: (row: any) => {
+        console.log('Row in image column:', row);
+        return (
+          <div style={{ display: 'flex', gap: '8px' }}>
+            {row?.image?.map((imgUrl: string, index: number) => (
+              <img
+                key={index}
+                src={imgUrl}
+                alt={`Image ${index + 1}`}
+                style={{
+                  width: 80,
+                  height: 80,
+                  objectFit: 'cover',
+                  borderRadius: 8,
+                }}
+              />
+            ))}
+          </div>
+        );
+      },
+    },
+  ];
+
+  // Extra columns for 'Second Chance Program'
+  const extraColumnsForSCP = [
+    {
+      key: 'type',
+      label: 'Type',
+      render: (row) =>
+        transformLabel(
+          row.customFields
+            .find((field) => field.label === 'TYPE_OF_CENTER')
+            ?.selectedValues.map((item) => item.value)
+            .join(', ')
+        ) || '-',
+    },
+    {
+      key: 'active_batches',
+      label: 'Active Batches',
+      render: (row) => (
+        <ActiveArchivedBatch cohortId={row?.cohortId} type={Status.ACTIVE} />
+      ),
+    },
+    {
+      key: 'archived_batches',
+      label: 'Archived Batches',
+      render: (row) => (
+        <ActiveArchivedBatch cohortId={row?.cohortId} type={Status.ARCHIVED} />
+      ),
+    },
+    {
       key: 'board',
       label: 'Boards',
       render: (row) =>
@@ -340,12 +379,14 @@ const Centers = () => {
             ?.selectedValues?.join(', ')
         ) || '-',
     },
-    {
-      key: 'status',
-      label: 'Status',
-      render: (row: any) => transformLabel(row?.status),
-    },
   ];
+
+  if (storedProgram === 'Second Chance Program') {
+    columns.push(...extraColumnsForSCP);
+  }
+  if (storedProgram === 'YouthNet') {
+    columns.push(...extraColumnsForYouthnet);
+  }
 
   // Define actions
   const actions = [
@@ -393,6 +434,7 @@ const Centers = () => {
       ),
       callback: (row: any) => {
         let tempFormData = extractMatchingKeys(row, addSchema);
+        console.log('######## images value tempFormData', tempFormData);
         setPrefilledAddFormData(tempFormData);
         setIsEdit(true);
         setEditableUserId(row?.cohortId);

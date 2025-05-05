@@ -77,6 +77,7 @@ import dynamic from 'next/dynamic';
 import { setTimeout } from 'timers';
 import { isEliminatedFromBuild } from '../../../../featureEliminationUtil';
 import LearnerManage from '@/shared/LearnerManage/LearnerManage';
+import ManageUser from '@/components/ManageUser';
 
 let SessionCardFooter: ComponentType<any> | null = null;
 if (!isEliminatedFromBuild('SessionCardFooter', 'component')) {
@@ -1160,10 +1161,17 @@ const CohortPage = () => {
         {value === 3 && (
           <>
             <Box mt={3} px={'18px'}></Box>
-            <CohortFacilitatorList
+            {/* <CohortFacilitatorList
               cohortId={cohortId}
               reloadState={reloadState}
               setReloadState={setReloadState}
+            /> */}
+            <ManageUser
+              reloadState={reloadState}
+              setReloadState={setReloadState}
+              cohortData={cohortId}
+              hideSearch={true}
+              isFromCenterDetailPage={true}
             />
           </>
         )}

@@ -15,6 +15,8 @@ interface CenterDropdownProps {
   roleName?: string;
   onChange?: (value: string) => void;
   centerList?: any;
+  selectedCenterId?: any;
+  setSelectedCenterId?: any;
 }
 
 const CenterDropdown: React.FC<CenterDropdownProps> = ({
@@ -22,11 +24,11 @@ const CenterDropdown: React.FC<CenterDropdownProps> = ({
   roleName,
   onChange,
   centerList,
+  selectedCenterId,
+  setSelectedCenterId,
 }) => {
   const [centers, setCenters] = useState<any[]>([]);
-  const [selectedCenterId, setSelectedCenterId] = useState<string>(
-    cohortId || ''
-  );
+
   const queryClient = useQueryClient();
 
   const handleChange = (e: SelectChangeEvent<string>) => {
@@ -47,7 +49,7 @@ const CenterDropdown: React.FC<CenterDropdownProps> = ({
         {centerList && centerList.length === 0 ? (
           <MenuItem disabled>No centers found</MenuItem>
         ) : (
-          centerList?.map((center) => (
+          centerList?.map((center: any) => (
             <MenuItem key={center?.cohortId} value={center?.cohortId}>
               {center?.cohortName}
             </MenuItem>

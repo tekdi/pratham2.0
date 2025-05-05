@@ -26,20 +26,29 @@ import {
 import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
+import { fetchUserData } from '@/utils/Helper';
 
-const LearnerManage = ({ open, onClose, onLearnerAdded, cohortId }: any) => {
+const LearnerManage = ({
+  open,
+  onClose,
+  onLearnerAdded,
+  cohortId,
+  isReassign,
+  customFields,
+  userId,
+}: any) => {
   const theme = useTheme<any>();
   const [isLoading, setIsLoading] = useState(false);
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
-  const [prefilledAddFormData, setPrefilledAddFormData] = useState(null);
+  const [prefilledAddFormData, setPrefilledAddFormData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [openModal, setOpenModal] = React.useState<boolean>(open);
   const [isEdit, setIsEdit] = useState(false);
   const [editableUserId, setEditableUserId] = useState('');
   const [roleId, setRoleID] = useState('');
   const [tenantId, setTenantId] = useState('');
-  const [isReassign, setIsReassign] = useState(false);
+  // const [isReassign, setIsReassign] = useState(false);
   const [checked, setChecked] = useState(false);
   const [userID, setUserId] = useState('');
   const [centerSelectiveValue, setCenterSelectiveValue] = useState('');
@@ -123,19 +132,46 @@ const LearnerManage = ({ open, onClose, onLearnerAdded, cohortId }: any) => {
         alterSchema.properties.batch.maxSelection = 1;
       }
 
-      const requiredKeys = ['state', 'district', 'block', 'center', 'batch'];
+      const requiredKeys = isReassign
+        ? ['state', 'district', 'block']
+        : ['state', 'district', 'block', 'center', 'batch'];
       //set ui schema hide
       const updatedUiSchema = { ...alterUISchema };
       // Clone each key's config and set widget to 'hidden'
-      requiredKeys.forEach((key) => {
-        if (updatedUiSchema.hasOwnProperty(key)) {
-          updatedUiSchema[key] = {
-            ...updatedUiSchema[key],
-            'ui:widget': 'hidden',
-          };
-        }
-      });
-      alterUISchema = updatedUiSchema;
+      if (!isReassign) {
+        requiredKeys.forEach((key) => {
+          if (updatedUiSchema.hasOwnProperty(key)) {
+            updatedUiSchema[key] = {
+              ...updatedUiSchema[key],
+              'ui:widget': 'hidden',
+            };
+          }
+        });
+        alterUISchema = updatedUiSchema;
+      } else {
+        requiredKeys.forEach((key) => {
+          if (updatedUiSchema.hasOwnProperty(key)) {
+            updatedUiSchema[key] = {
+              ...updatedUiSchema[key],
+              'ui:disabled': true,
+            };
+          }
+        });
+        alterUISchema = updatedUiSchema;
+      }
+
+      //setprefilled formDat for re-assign functionality
+      if (isReassign) {
+        let batchList = await fetchUserData(userId);
+        let tempFormData =
+          extractMatchingKeys({ customFields }, alterSchema) ?? {};
+        tempFormData = {
+          ...tempFormData,
+          batch: batchList,
+        };
+        setPrefilledAddFormData(tempFormData);
+        console.log('@@@@@@@@@', tempFormData);
+      }
 
       const districtFieldId =
         responseForm?.schema?.properties?.district?.fieldId;
@@ -174,12 +210,12 @@ const LearnerManage = ({ open, onClose, onLearnerAdded, cohortId }: any) => {
           const stateIds = getSelectedValueIds('STATE');
           const districtIds = getSelectedValueIds('DISTRICT');
           const blockIds = getSelectedValueIds('BLOCK');
-          const villageIds = getSelectedValueIds('VILLAGE');
+          // const villageIds = getSelectedValueIds('VILLAGE');
           initialFormData = {
             state: stateIds,
             district: districtIds,
             block: blockIds,
-            village: villageIds,
+            // village: villageIds,
             center: [localStorage.getItem('centerId')],
             batch: [cohortId],
           };
@@ -188,7 +224,7 @@ const LearnerManage = ({ open, onClose, onLearnerAdded, cohortId }: any) => {
       console.log('######### setPrefilledAddFormData', initialFormData);
       setPrefilledAddFormData(initialFormData);
       setIsEdit(false);
-      setIsReassign(false);
+      // setIsReassign(false);
       setEditableUserId('');
     }
   }, [open]);
@@ -215,10 +251,10 @@ const LearnerManage = ({ open, onClose, onLearnerAdded, cohortId }: any) => {
   };
   const successUpdateMessage = 'LEARNERS.LEARNER_UPDATED_SUCCESSFULLY';
   const telemetryUpdateKey = 'scp-learner-updated-successfully';
-  const failureUpdateMessage = 'COMMON.NOT_ABLE_UPDATE_LEARNER';
+  const failureUpdateMessage = 'LEARNERS.NOT_ABLE_UPDATE_LEARNER';
   const successCreateMessage = 'LEARNERS.LEARNER_CREATED_SUCCESSFULLY';
   const telemetryCreateKey = 'scp-learner-created-successfully';
-  const failureCreateMessage = 'COMMON.NOT_ABLE_CREATE_LEARNER';
+  const failureCreateMessage = 'LEARNERS.NOT_ABLE_CREATE_LEARNER';
   const notificationKey = 'onLearnerCreated';
   const notificationMessage = 'LEARNERS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
@@ -254,7 +290,7 @@ const LearnerManage = ({ open, onClose, onLearnerAdded, cohortId }: any) => {
             isEdit={isEdit}
             isReassign={isReassign}
             isExtraFields={true}
-            editableUserId={editableUserId}
+            editableUserId={isReassign ? userId : editableUserId}
             UpdateSuccessCallback={() => {
               setOpenModal(false);
             }}

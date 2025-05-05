@@ -121,6 +121,12 @@ export const MENU_CONFIG = {
     },
   },
   [TenantName.YOUTHNET]: {
+    centers: {
+      title: 'Skilling Centers',
+      icon: '/images/centers.svg',
+      link: '/centers',
+      roles: [Role.ADMIN],
+    },
     manageUsers: {
       title: 'Manage Users',
       icon: '/images/group.svg',
@@ -264,6 +270,6 @@ export const MENU_CONFIG = {
       icon: '/images/dashboard.svg',
       link: '/workspace',
       roles: [Role.CCTA, Role.SCTA],
-    }
-  }
+    },
+  },
 };
