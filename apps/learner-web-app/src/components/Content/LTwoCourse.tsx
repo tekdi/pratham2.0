@@ -137,7 +137,7 @@ const LTwoCourse: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 4 }}>
+    <Box sx={{ py: '56px', px: '48px', bgcolor: 'white' }}>
       <Typography variant="h1" gutterBottom sx={{ color: '#78590C' }}>
         {t('LEARNER_APP.L_TWO_COURSE.TITLE')}
       </Typography>

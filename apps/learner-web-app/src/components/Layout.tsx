@@ -7,11 +7,17 @@ import {
   useTranslation,
   DrawerItemProp,
 } from '@shared-lib';
-import { AccountBox, Explore, Home, Summarize } from '@mui/icons-material';
+import {
+  AccountCircleOutlined,
+  ExploreOutlined,
+  Home,
+  AssignmentOutlined,
+} from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import ProfileMenu from './ProfileMenu/ProfileMenu';
 import { Box } from '@mui/material';
 import { usePathname } from 'next/navigation';
+import { checkAuth } from '@shared-lib-v2/utils/AuthService';
 
 interface NewDrawerItemProp extends DrawerItemProp {
   variant?: 'contained' | 'text';
@@ -27,8 +33,6 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
     []
   );
   const [anchorEl, setAnchorEl] = useState<any>(null);
-
-  const handleOpen = (event: any) => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
   const handleProfileClick = () => {
     if (pathname !== '/profile') {
@@ -46,34 +50,39 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         ? window.location.pathname
         : '';
 
-    setDefaultNavLinks([
+    const navLinks = [
       {
         title: t('LEARNER_APP.COMMON.L1_COURSES'),
-        icon: <Home />,
+        icon: <Home sx={{ width: 28, height: 28 }} />,
         to: () => router.push('/content'),
         isActive: currentPage === '/content',
       },
       {
         title: t('LEARNER_APP.COMMON.EXPLORE'),
-        icon: <Explore />,
+        icon: <ExploreOutlined sx={{ width: 28, height: 28 }} />,
         to: () => router.push('/explore'),
         isActive: currentPage === '/explore',
       },
       {
         title: t('LEARNER_APP.COMMON.SURVEYS'),
-        icon: <Summarize />,
+        icon: <AssignmentOutlined sx={{ width: 28, height: 28 }} />,
         to: () => router.push('/content'),
         isActive: currentPage === '/content',
       },
-      {
+    ];
+
+    if (checkAuth()) {
+      navLinks.push({
         title: t('LEARNER_APP.COMMON.PROFILE'),
-        icon: <AccountBox />,
+        icon: <AccountCircleOutlined sx={{ width: 28, height: 28 }} />,
         to: () => {
           setAnchorEl(true);
         },
         isActive: currentPage === '/profile',
-      },
-    ]);
+      });
+    }
+
+    setDefaultNavLinks(navLinks);
   }, [t, router]);
   const onLanguageChange = (val: string) => {
     setLanguage(val);

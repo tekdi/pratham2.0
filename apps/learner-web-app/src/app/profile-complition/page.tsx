@@ -7,7 +7,6 @@ import { useSearchParams } from 'next/navigation';
 const ProfileComplitionInner = () => {
   const searchParams = useSearchParams();
   const isComplition = searchParams.get('isComplition');
-
   return <EditProfile completeProfile={isComplition ? true : false} />;
 };
 
