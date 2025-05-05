@@ -1,3 +1,4 @@
+// @ts-ignore
 import { CohortListParam, GetCohortSearchParams } from '@/utils/Interfaces';
 import { Role, Status } from '@/utils/app.constant';
 import { get, post } from './RestClient';
@@ -176,10 +177,10 @@ export const getBlocksByCenterId = async (
   return matchingChildren;
 };
 
-const getChildDataByParentId = (data, parentId) => {
-  let result = [];
+const getChildDataByParentId = (data: any, parentId: string) => {
+  let result: any[] = [];
 
-  const search = (items) => {
+  const search = (items: any[]) => {
     for (const item of items) {
       if (item.childData && item.childData.length > 0) {
         for (const child of item.childData) {
@@ -197,4 +198,17 @@ const getChildDataByParentId = (data, parentId) => {
 
   search(data);
   return result;
+};
+
+export const getCohortData = async (
+  userId: string | string[]
+): Promise<any> => {
+  const apiUrl: string = API_ENDPOINTS.myCohorts(userId);
+  try {
+    const response = await get(apiUrl);
+    return response?.data;
+  } catch (error) {
+    console.error('error in fetching user details', error);
+    return error;
+  }
 };

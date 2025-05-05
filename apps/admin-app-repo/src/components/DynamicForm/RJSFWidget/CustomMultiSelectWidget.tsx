@@ -87,7 +87,9 @@ const CustomMultiSelectWidget = ({
         renderValue={(selected) =>
           enumOptions
             .filter((option) => selected.includes(option.value))
-            .map((option) => option.label)
+            .map((option) =>
+              t(`FORM.${option.label}`, { defaultValue: option.label })
+            )
             .join(', ')
         }
         MenuProps={{
