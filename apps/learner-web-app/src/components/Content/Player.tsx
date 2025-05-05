@@ -37,11 +37,12 @@ const App = () => {
     const fetch = async () => {
       if (unitId) {
         const {
-          result: { content },
+          result: { content, QuestionSet },
         } = await ContentSearch({
           filters: { identifier: [unitId, courseId, identifier] },
         });
-        const contentMap = content.reduce(
+        const newContent = [...content, ...QuestionSet];
+        const contentMap = newContent.reduce(
           (acc: any, item: any) => ({
             ...acc,
             [item.identifier === unitId
@@ -56,6 +57,7 @@ const App = () => {
         const filteredContent = contentMap?.unit?.leafNodes.filter(
           (contentItem: any) => contentItem !== identifier
         );
+        console.log('filteredContent', filteredContent);
         setRelatedIdentity(filteredContent ?? []);
       } else {
         const response = await fetchContent(identifier);

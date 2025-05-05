@@ -1,9 +1,7 @@
 import 'reflect-metadata';
 import React, { useEffect, useRef } from 'react';
 // import axios from 'axios';
-import // handleTelemetryEventQuml,
-// getTelemetryEvents,
-'../../services/TelemetryService';
+import { handleTelemetryEventQuml } from '../../services/TelemetryService';
 import { handleExitEvent } from '../utils/Helper';
 import { createAssessmentTracking } from '../../services/PlayerService';
 
@@ -94,8 +92,11 @@ const SunbirdQuMLPlayer = ({
         });
       } else if (data?.data?.edata?.type === 'EXIT') {
         handleExitEvent();
-        // } else {
-        // handleTelemetryEventQuml(event);
+      } else if (data?.data?.mid) {
+        handleTelemetryEventQuml(data, {
+          courseId,
+          unitId,
+        });
       }
     };
 

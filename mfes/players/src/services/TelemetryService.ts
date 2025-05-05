@@ -23,8 +23,11 @@ export const handleTelemetryEventPDF = (event: any) => {
   getTelemetryEvents(event.detail, 'pdf');
 };
 
-export const handleTelemetryEventQuml = (event: any) => {
-  getTelemetryEvents(JSON.parse(event.data), 'quml');
+export const handleTelemetryEventQuml = (
+  event: any,
+  { courseId, unitId }: any = {}
+) => {
+  getTelemetryEvents(event.data, 'quml', { courseId, unitId });
 };
 
 export const getTelemetryEvents = async (
