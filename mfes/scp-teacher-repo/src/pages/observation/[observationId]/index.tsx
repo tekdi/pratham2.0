@@ -687,6 +687,7 @@ const ObservationDetails = () => {
                 <Box
                   sx={{
                     mt: '20px',
+                    ml: '14px',
                   }}
                 >
                   <FormControl
