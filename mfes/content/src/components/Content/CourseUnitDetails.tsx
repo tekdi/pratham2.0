@@ -88,7 +88,7 @@ export default function Details(props: DetailsProps) {
                 data?.result?.status === 'enrolled'
               ) {
                 const userResponse = await getUserId();
-                await issueCertificate({
+                const resultCertificate = await issueCertificate({
                   userId: userId,
                   courseId: courseId,
                   unitId: unitId,
@@ -102,6 +102,7 @@ export default function Details(props: DetailsProps) {
                   lastName: userResponse?.lastName ?? '',
                   courseName: resultHierarchy?.name ?? '',
                 });
+                setCertificateId(resultCertificate?.result?.credentialSchemaId);
               }
             }
           }
