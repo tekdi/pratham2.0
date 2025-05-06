@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import { useMediaQuery, useTheme } from '@mui/material';
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import { Loader, useTranslation } from '@shared-lib';
+import { getAcademicYear } from '@learner/utils/API/AcademicYearService';
 import { preserveLocalStorage } from '@learner/utils/helper';
 
 const Login = dynamic(
@@ -74,6 +75,8 @@ const LoginPage = () => {
       const response = await login({ username, password });
       if (response?.result?.access_token) {
         handleSuccessfulLogin(response?.result, data, router);
+
+       
       } else {
         showToastMessage(
           t('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT'),
@@ -86,6 +89,8 @@ const LoginPage = () => {
       const errorMessage = t('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT');
       showToastMessage(errorMessage, 'error');
     }
+
+   
   };
   return (
     <Suspense fallback={<div>Loading...</div>}>
@@ -168,6 +173,14 @@ const handleSuccessfulLogin = async (
 
         const tenantId = userResponse?.tenantData?.[0]?.tenantId;
         localStorage.setItem('tenantId', tenantId);
+
+        const academicYearResponse = await getAcademicYear();
+
+        console.log(academicYearResponse[0]?.id , 'academicYearResponse');
+        
+        if (academicYearResponse[0]?.id) {
+          localStorage.setItem('academicYearId', academicYearResponse[0]?.id);
+        }
 
         const channelId = userResponse?.tenantData?.[0]?.channelId;
         localStorage.setItem('channelId', channelId);
