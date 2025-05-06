@@ -134,8 +134,8 @@ const SessionsCard: React.FC<SessionsCardProps> = ({
           subject && sessionTitle
             ? `${toPascalCase(subject)} - ${sessionTitle}`
             : subject
-              ? toPascalCase(subject)
-              : toPascalCase(sessionTitle),
+            ? toPascalCase(subject)
+            : toPascalCase(sessionTitle),
       };
       await handleCohortNotification(
         cohortId,
@@ -235,8 +235,8 @@ const SessionsCard: React.FC<SessionsCardProps> = ({
           subject && sessionTitle
             ? `${toPascalCase(subject)} - ${sessionTitle}`
             : subject
-              ? toPascalCase(subject)
-              : toPascalCase(sessionTitle),
+            ? toPascalCase(subject)
+            : toPascalCase(sessionTitle),
       };
       await handleCohortNotification(
         cohortId,
@@ -253,8 +253,8 @@ const SessionsCard: React.FC<SessionsCardProps> = ({
     return subject && sessionTitle
       ? `${toPascalCase(subject)} - ${sessionTitle}`
       : subject
-        ? toPascalCase(subject)
-        : toPascalCase(sessionTitle);
+      ? toPascalCase(subject)
+      : toPascalCase(sessionTitle);
   };
 
   return (
@@ -376,8 +376,8 @@ const SessionsCard: React.FC<SessionsCardProps> = ({
           subject && sessionTitle
             ? `${toPascalCase(subject)} - ${sessionTitle}`
             : subject
-              ? toPascalCase(subject)
-              : toPascalCase(sessionTitle)
+            ? toPascalCase(subject)
+            : toPascalCase(sessionTitle)
         }
         primary={eventEdited ? 'Update' : 'Schedule'}
         handleEditModal={handleEditModal}

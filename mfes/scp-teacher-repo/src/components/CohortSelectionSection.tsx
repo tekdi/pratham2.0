@@ -836,7 +836,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                               sx={{ textAlign: 'left' }}
                               id="chip-label"
                             >
-                              t('COMMON.CENTER')
+                              {t('COMMON.CENTER')}
                             </InputLabel>
                             <Select
                               labelId="chip-label"

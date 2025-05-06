@@ -982,26 +982,22 @@ export const calculateAge = (dob: any) => {
 };
 
 export const getBMG = (cohortData: any) => {
-  if (cohortData) {
-    if (cohortData?.customField?.length) {
-      const medium = cohortData.customField.find(
-        (item: CustomField) => item.label === 'MEDIUM'
+  if (cohortData?.customField?.length) {
+    const getValue = (label: string) => {
+      const field = cohortData.customField.find(
+        (item: any) => item.label === label
       );
+      const value = field?.selectedValues?.[0];
+      return typeof value === 'object' ? value.value : value;
+    };
 
-      const grade = cohortData.customField.find(
-        (item: CustomField) => item.label === 'GRADE'
-      );
+    const bmg = {
+      board: getValue('BOARD'),
+      medium: getValue('MEDIUM'),
+      grade: getValue('GRADE'),
+    };
 
-      const board = cohortData.customField.find(
-        (item: CustomField) => item.label === 'BOARD'
-      );
-      const bmg = {
-        board: board?.value,
-        medium: medium?.value,
-        grade: grade?.value,
-      };
-      return bmg;
-    }
+    return bmg;
   }
   return null;
 };

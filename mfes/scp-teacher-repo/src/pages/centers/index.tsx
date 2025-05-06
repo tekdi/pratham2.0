@@ -655,28 +655,32 @@ const CentersPage = () => {
                       ),
                     }}
                   />
-                  <Button
-                    sx={{
-                      mt: 1.2,
-                      border: '1px solid #1E1B16',
-                      borderRadius: '100px',
-                      height: '40px',
-                      px: '16px',
-                      color: theme.palette.error.contrastText,
-                      alignSelf: 'flex-start',
-                      '& .MuiButton-endIcon': {
-                        marginLeft: isRTL ? '0px !important' : '8px !important',
-                        marginRight: isRTL
-                          ? '8px !important'
-                          : '-2px !important',
-                      },
-                    }}
-                    className="text-1E"
-                    endIcon={<AddIcon />}
-                    onClick={handleOpenAddBatchModal}
-                  >
-                    {t('COMMON.ADD_NEW')}
-                  </Button>
+                  {isTeamLeader && (
+                    <Button
+                      sx={{
+                        mt: 1.2,
+                        border: '1px solid #1E1B16',
+                        borderRadius: '100px',
+                        height: '40px',
+                        px: '16px',
+                        color: theme.palette.error.contrastText,
+                        alignSelf: 'flex-start',
+                        '& .MuiButton-endIcon': {
+                          marginLeft: isRTL
+                            ? '0px !important'
+                            : '8px !important',
+                          marginRight: isRTL
+                            ? '8px !important'
+                            : '-2px !important',
+                        },
+                      }}
+                      className="text-1E"
+                      endIcon={<AddIcon />}
+                      onClick={handleOpenAddBatchModal}
+                    >
+                      {t('COMMON.ADD_NEW')}
+                    </Button>
+                  )}
                 </Box>
                 <Box sx={{ minWidth: '300px' }}>
                   <CenterDropdown
