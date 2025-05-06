@@ -49,6 +49,11 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY_PROD }}
           script: |
             cd ${{ secrets.TARGET_PROD_LMP }}
+            if [ -f .env ]; then
+            rm .env
+            fi
+            echo "${{ secrets.PROD_LMP_ENV }}" > .env
+            ls -ltra
             docker stop prod-lmp || true
             docker system prune -af || true
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_URI }}
