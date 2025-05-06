@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography, TextField, Button, Stack } from '@mui/material';
 
 const OtpVerificationComponent = ({
-  maskedNumber = '9*********7',
+  maskedNumber,
 
   onResend,
   otp,
