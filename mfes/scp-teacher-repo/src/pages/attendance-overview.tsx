@@ -598,7 +598,7 @@ const AttendanceOverview: React.FC<AttendanceOverviewProps> = () => {
                 : 'linear-gradient(180deg, #fffdf7 0%, #f8efda 100%)',
           }}
         >
-          <Box className="d-md-flex space-md-between gap-md-10 w-100">
+          <Box className="d-md-flex space-md-between gap-md-10 w-100" sx={{alignItems:'center'}}>
             <Box className="flex-basis-md-50">
               <CohortSelectionSection
                 classId={classId}
@@ -619,7 +619,7 @@ const AttendanceOverview: React.FC<AttendanceOverviewProps> = () => {
               />
             </Box>
             <Box
-              sx={{ marginTop: blockName ? '25px' : '0px' }}
+              sx={{ marginTop: blockName ? '25px' : '14px' }}
               className="flex-basis-md-50"
             >
               <DateRangePopup

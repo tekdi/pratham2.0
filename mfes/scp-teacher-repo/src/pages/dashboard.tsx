@@ -742,17 +742,17 @@ const Dashboard: React.FC<DashboardProps> = () => {
           const medium = cohortData.customField.find(
             (item: CustomField) => item.label === 'MEDIUM'
           );
-          setMedium(medium?.value);
+          setMedium(medium?.selectedValues?.[0] || '');
 
           const grade = cohortData.customField.find(
             (item: CustomField) => item.label === 'GRADE'
           );
-          setGrade(grade?.value);
+          setGrade(grade?.selectedValues?.[0] || '');
 
           const board = cohortData.customField.find(
             (item: CustomField) => item.label === 'BOARD'
           );
-          setBoard(board?.value);
+          setBoard(board?.selectedValues?.[0] || '');
         }
       }
     };
@@ -951,8 +951,9 @@ const Dashboard: React.FC<DashboardProps> = () => {
                               gap: '4px',
                               opacity: classId === 'all' ? 0.5 : 1,
                               '@media (max-width: 900px)': {
+                                position: 'absolute',
                                 top:
-                                  role === Role.TEAM_LEADER ? '210px' : '185px',
+                                  role === Role.TEAM_LEADER ? '55px' : '60px',
                                 right: '20px',
                               },
                             }}
