@@ -14,6 +14,7 @@ import { getTitleFromValue } from './Languages';
 // Translation files
 import en from './locales/en.json';
 import hi from './locales/hi.json';
+import mr from './locales/mr.json';
 
 // Define translations object
 const translations: Record<string, Record<string, string>> = {
@@ -21,6 +22,7 @@ const translations: Record<string, Record<string, string>> = {
   en,
   // @ts-ignore
   hi,
+  mr,
 };
 
 // Define RTL languages

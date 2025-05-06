@@ -23,8 +23,11 @@ export const handleTelemetryEventPDF = (event: any) => {
   getTelemetryEvents(event.detail, 'pdf');
 };
 
-export const handleTelemetryEventQuml = (event: any) => {
-  getTelemetryEvents(event.detail, 'quml');
+export const handleTelemetryEventQuml = (
+  event: any,
+  { courseId, unitId }: any = {}
+) => {
+  getTelemetryEvents(event.data, 'quml', { courseId, unitId });
 };
 
 export const getTelemetryEvents = async (
@@ -32,13 +35,10 @@ export const getTelemetryEvents = async (
   contentType: string,
   { courseId, unitId }: any = {}
 ) => {
-  console.log(
-    'getTelemetryEvents hit',
-    'Telemetry Event',
-    contentType,
-    eventData,
-    { courseId, unitId }
-  );
+  console.log('getTelemetryEvents hit', eventData, contentType, {
+    courseId,
+    unitId,
+  });
 
   if (!eventData || !eventData.object || !eventData.object.id) {
     console.error('Invalid event data');

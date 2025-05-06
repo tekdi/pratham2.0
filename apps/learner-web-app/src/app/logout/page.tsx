@@ -4,32 +4,8 @@ import { useTranslation } from 'next-i18next';
 import { logout } from '@learner/utils/API/LoginService';
 import Loader from '@learner/components/Loader/Loader';
 import { useRouter } from 'next/navigation';
-const preserveLocalStorage = () => {
-  const keysToKeep = [
-    'preferredLanguage',
-    'mui-mode',
-    'mui-color-scheme-dark',
-    'mui-color-scheme-light',
-    'hasSeenTutorial',
-  ];
+import { preserveLocalStorage } from '@learner/utils/helper';
 
-  const valuesToKeep: { [key: string]: any } = {};
-
-  keysToKeep.forEach((key: string) => {
-    const value = localStorage.getItem(key);
-    if (value !== null) {
-      valuesToKeep[key] = value;
-    }
-  });
-
-  localStorage.clear();
-
-  keysToKeep.forEach((key: string) => {
-    if (valuesToKeep[key] !== undefined) {
-      localStorage.setItem(key, valuesToKeep[key]);
-    }
-  });
-};
 function Logout() {
   const router = useRouter();
   const { t } = useTranslation();
