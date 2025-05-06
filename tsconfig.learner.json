@@ -27,6 +27,7 @@
       "@CourseUnitDetails": [
         "mfes/content/src/components/Content/CourseUnitDetails.tsx"
       ],
+      "@InfoCard": ["mfes/content/src/components/Card/InfoCard.tsx"],
       "@ContentPlayer": ["mfes/content/src/components/Content/Player.tsx"],
 
       //dynamic form

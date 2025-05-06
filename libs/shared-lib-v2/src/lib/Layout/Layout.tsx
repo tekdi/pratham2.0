@@ -16,6 +16,7 @@ export interface LayoutProps {
   backTitle?: string;
   backIconClick?: () => void;
   _topAppBar?: AppBarProps;
+  footerComponent?: React.ReactNode;
   sx?: object;
   _children?: object;
 }
@@ -29,6 +30,7 @@ export const Layout: React.FC<LayoutProps> = ({
   backIconClick,
   _topAppBar,
   _children,
+  footerComponent,
   sx = {},
 }) => {
   const [layoutHeight, setLayoutHeight] = useState(0);
@@ -158,19 +160,21 @@ export const Layout: React.FC<LayoutProps> = ({
             }
           }}
         >
-          <Footer
-            buttonLabel="Continue"
-            // buttonWidth="328px"
-            buttonHeight="40px"
-            buttonBorderRadius="50px"
-            buttonBackgroundColor="#FDBE16"
-            buttonColor="#1E1B16"
-            buttonFontSize="14px"
-            buttonFontWeight={500}
-            buttonSupportingText=""
-            bottompx={0}
-            onButtonClick={handleButtonClick}
-          />
+          {footerComponent && (
+            <Footer
+              buttonLabel="Continue"
+              // buttonWidth="328px"
+              buttonHeight="40px"
+              buttonBorderRadius="50px"
+              buttonBackgroundColor="#FDBE16"
+              buttonColor="#1E1B16"
+              buttonFontSize="14px"
+              buttonFontWeight={500}
+              buttonSupportingText=""
+              bottompx={0}
+              onButtonClick={handleButtonClick}
+            />
+          )}
         </Box>
       )}
     </Box>

@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { useTranslation, FilterForm } from '@shared-lib';
 
 const FilterComponent: React.FC<{
@@ -7,27 +7,27 @@ const FilterComponent: React.FC<{
   handleFilterChange: (newFilterState: any) => void;
 }> = ({ filterState, handleFilterChange }) => {
   const { t } = useTranslation();
-
-  const [isModal, setIsModal] = useState(true);
-  const [parentFormData, setParentFormData] = useState([]);
-  const [parentStaticFormData, setParentStaticFormData] = useState([]);
-  const [orginalFormData, setOrginalFormData] = useState([]);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(true);
-  const [instant, setInstant] = useState('');
+  const [filterCount, setFilterCount] = useState(
+    Object?.keys(filterState.filters || {}).filter(
+      (e) => e?.toString() != 'limit'
+    ).length
+  );
 
   const memoizedFilterForm = useMemo(
     () => (
       <FilterForm
-        onApply={handleFilterChange}
-        setParentFormData={setParentFormData}
-        setParentStaticFormData={setParentStaticFormData}
-        parentStaticFormData={parentStaticFormData}
-        setOrginalFormData={setOrginalFormData}
-        orginalFormData={orginalFormData}
-        setIsDrawerOpen={setIsDrawerOpen}
+        onApply={(newFilterState: any) => {
+          setFilterCount(
+            Object?.keys(newFilterState || {}).filter(
+              (e) => e?.toString() != 'limit'
+            ).length
+          );
+          handleFilterChange(newFilterState);
+        }}
+        orginalFormData={filterState?.filters || {}}
       />
     ),
-    [filterState, handleFilterChange]
+    [handleFilterChange, filterState]
   );
 
   return (
@@ -39,15 +39,37 @@ const FilterComponent: React.FC<{
         width: '100%',
       }}
     >
-      <Typography
-        variant="h6"
+      <Box
         sx={{
-          fontWeight: 500,
-          fontSize: '16px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
         }}
       >
-        {t('LEARNER_APP.COURSE.FILTER_BY')}
-      </Typography>
+        <Typography
+          variant="h6"
+          sx={{
+            fontWeight: 500,
+            fontSize: '16px',
+          }}
+        >
+          {t('LEARNER_APP.COURSE.FILTER_BY')}{' '}
+          {filterCount > 0 && `(${filterCount})`}
+        </Typography>
+        {filterCount > 0 && (
+          <Button
+            variant="text"
+            color="primary"
+            onClick={() => {
+              setFilterCount(0);
+              handleFilterChange({});
+            }}
+          >
+            {t('LEARNER_APP.COURSE.CLEAR_FILTER')}
+          </Button>
+        )}
+      </Box>
+
       {memoizedFilterForm}
     </Box>
   );
