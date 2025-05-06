@@ -301,7 +301,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
             setUsers(extractedData);
             setFilteredUsers(extractedData);
             setLoading(false);
-          });
+          },50);
         }
       } catch (error) {
         console.log(error);
