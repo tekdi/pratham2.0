@@ -951,8 +951,9 @@ const Dashboard: React.FC<DashboardProps> = () => {
                               gap: '4px',
                               opacity: classId === 'all' ? 0.5 : 1,
                               '@media (max-width: 900px)': {
+                                position: 'absolute',
                                 top:
-                                  role === Role.TEAM_LEADER ? '210px' : '185px',
+                                  role === Role.TEAM_LEADER ? '55px' : '60px',
                                 right: '20px',
                               },
                             }}

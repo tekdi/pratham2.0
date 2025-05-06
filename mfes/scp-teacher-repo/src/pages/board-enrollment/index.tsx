@@ -481,7 +481,7 @@ const BoardEnrollment = () => {
 
       <Box sx={{ px: '16px' }}>
         <Grid container sx={{ mt: '20px', alignItems: 'flex-end' }}>
-          <Grid item xs={8}>
+          <Grid item xs={12}>
             <Box>
               <CohortSelectionSection
                 classId={classId}
