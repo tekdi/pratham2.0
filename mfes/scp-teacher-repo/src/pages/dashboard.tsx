@@ -742,17 +742,17 @@ const Dashboard: React.FC<DashboardProps> = () => {
           const medium = cohortData.customField.find(
             (item: CustomField) => item.label === 'MEDIUM'
           );
-          setMedium(medium?.value);
+          setMedium(medium?.selectedValues?.[0] || '');
 
           const grade = cohortData.customField.find(
             (item: CustomField) => item.label === 'GRADE'
           );
-          setGrade(grade?.value);
+          setGrade(grade?.selectedValues?.[0] || '');
 
           const board = cohortData.customField.find(
             (item: CustomField) => item.label === 'BOARD'
           );
-          setBoard(board?.value);
+          setBoard(board?.selectedValues?.[0] || '');
         }
       }
     };
