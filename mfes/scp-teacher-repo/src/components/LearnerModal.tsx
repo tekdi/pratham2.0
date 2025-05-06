@@ -102,7 +102,7 @@ const LearnerModal = ({
   contactNumber?: any;
   enrollmentNumber?: any;
   gender?: any;
-    email?: any;
+  email?: any;
 }) => {
   const { t } = useTranslation();
 
@@ -126,19 +126,23 @@ const LearnerModal = ({
       label: t('PROFILE.ENROLLMENT_NUMBER'),
       value: enrollmentNumber || '-',
     },
-    
+
     {
       label: 'Gender',
-      value: gender || '-',
+      value: toPascalCase(gender) || '-',
     },
     {
       label: 'Email',
       value: email || '-',
     },
     ...data.map((field: any) => ({
-      label: field.label ? t(`FORM.${field.label.toUpperCase()}`, field.label) : field.label,
+      label: field.label
+        ? t(`FORM.${field.label.toUpperCase()}`, field.label)
+        : field.label,
       value: Array.isArray(field.selectedValues)
-        ? toPascalCase(field.selectedValues.map((item: any) => item.value).join(', '))
+        ? toPascalCase(
+            field.selectedValues.map((item: any) => item.value).join(', ')
+          )
         : field.selectedValues || '-',
     })),
   ];

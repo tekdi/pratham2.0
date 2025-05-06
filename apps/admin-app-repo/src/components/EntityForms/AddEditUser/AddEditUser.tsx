@@ -230,6 +230,13 @@ const AddEditUser = ({
               }
             }
           }
+
+          //bug fix for if email is empty then don't sent
+          if (type == 'learner') {
+            if (userData?.email == '') {
+              delete userData.email;
+            }
+          }
           //fix for learner edit username is not sent if not changed
           if (userData?.username) {
             if (editPrefilledFormData?.username == userData?.username) {
@@ -359,6 +366,12 @@ const AddEditUser = ({
       }
       try {
         if (isNotificationRequired) {
+          //bug fix for if email is empty then don't sent
+          if (type == 'learner') {
+            if (payload?.email == '') {
+              delete payload.email;
+            }
+          }
           const responseUserData = await createUser(payload, t);
 
           if (responseUserData?.userData?.userId) {

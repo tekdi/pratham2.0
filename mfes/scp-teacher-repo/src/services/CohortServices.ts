@@ -62,7 +62,11 @@ export const getCohortList = async (
       res = res.filter((block: any) => {
         if (
           block?.cohortStatus === Status.ACTIVE &&
-          block?.childData.length > 0
+          //if no center then also show in list only for facilitator
+          ((localStorage.getItem('role') === Role.TEACHER &&
+            block?.childData.length > 0) ||
+            localStorage.getItem('role') !== Role.TEACHER)
+          //
         ) {
           return block;
         }

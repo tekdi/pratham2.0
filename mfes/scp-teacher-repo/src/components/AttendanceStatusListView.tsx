@@ -60,7 +60,7 @@ const AttendanceStatusListView: React.FC<AttendanceStatusListViewProps> = ({
     backgroundColor: isBulkAction ? theme.palette.warning[800] : 'none',
     // position: isBulkAction ? 'fixed' : 'none',
     // width: isBulkAction ? '89%' : '100%',
-    borderBottom: isBulkAction ? 'none' : '1px solid #D0C5B4', 
+    borderBottom: isBulkAction ? 'none' : '1px solid #D0C5B4',
     justifyContent: 'space-between',
   };
 
@@ -81,6 +81,8 @@ const AttendanceStatusListView: React.FC<AttendanceStatusListViewProps> = ({
   const [contactNumber, setContactNumber] = useState<any>('');
   const [userName, setUserName] = React.useState('');
   const [enrollmentNumber, setEnrollmentNumber] = React.useState('');
+  const [gender, setGender] = React.useState('');
+  const [email, setEmail] = React.useState('');
   const [isModalOpenLearner, setIsModalOpenLearner] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -105,24 +107,28 @@ const AttendanceStatusListView: React.FC<AttendanceStatusListViewProps> = ({
           const data = response?.result;
           if (data) {
             const userData = data?.userData;
-            let fullName = "";
+            let fullName = '';
 
             if (userData?.firstName) {
               fullName += toPascalCase(userData.firstName);
             }
-            
+
             if (userData?.middleName) {
-              fullName += (fullName ? " " : "") + toPascalCase(userData.middleName);
+              fullName +=
+                (fullName ? ' ' : '') + toPascalCase(userData.middleName);
             }
-            
+
             if (userData?.lastName) {
-              fullName += (fullName ? " " : "") + toPascalCase(userData.lastName);
+              fullName +=
+                (fullName ? ' ' : '') + toPascalCase(userData.lastName);
             }
-            
+
             setUserName(fullName);
 
             setContactNumber(userData?.mobile);
             setEnrollmentNumber(userData?.username);
+            setGender(userData?.gender);
+            setEmail(userData?.email);
             const customDataFields = userData?.customFields;
             if (customDataFields?.length > 0) {
               setCustomFieldsData(customDataFields);
@@ -156,6 +162,8 @@ const AttendanceStatusListView: React.FC<AttendanceStatusListViewProps> = ({
             userName={userName}
             contactNumber={contactNumber}
             enrollmentNumber={enrollmentNumber}
+            gender={gender}
+            email={email}
           />
         )
       )}
@@ -279,7 +287,9 @@ const AttendanceStatusListView: React.FC<AttendanceStatusListViewProps> = ({
                   {updatedAtDate &&
                     attendanceDateFormatted &&
                     updatedAtDate <= attendanceDateFormatted &&
-                    userData.memberStatus === Status.DROPOUT && <DropoutLabel />}
+                    userData.memberStatus === Status.DROPOUT && (
+                      <DropoutLabel />
+                    )}
                 </>
               )}
             </Box>

@@ -88,6 +88,8 @@ const CentersPage = () => {
   const [openBatchModal, setOpenBatchModal] = useState(false);
   const [addBatchSchema, setAddBatchSchema] = useState<any>(null);
   const [addBatchUiSchema, setAddBatchUiSchema] = useState<any>(null);
+  const [emptyFormData, setEmptyFormData] = useState<any>({});
+  const [tempVariable, setTempVariable] = useState([]);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -198,6 +200,38 @@ const CentersPage = () => {
   };
 
   const { isRTL } = useDirection();
+
+  useEffect(() => {
+    //setEmptyFormData
+
+    function getLocationFromCustomFields(data: any): any {
+      const location: any = {};
+
+      data?.customFields?.forEach((field: any) => {
+        const value = field.selectedValues?.[0]?.id?.toString();
+        if (!value) return;
+
+        switch (field.label?.toUpperCase()) {
+          case 'STATE':
+            location.state = [value];
+            break;
+          case 'DISTRICT':
+            location.district = [value];
+            break;
+          case 'BLOCK':
+            location.block = [value];
+            break;
+        }
+      });
+
+      return location;
+    }
+
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+    const location = getLocationFromCustomFields(userData);
+    // console.log('location', location);
+    setEmptyFormData(location);
+  }, [tempVariable]);
 
   useEffect(() => {
     const getCohortListForTL = async () => {
@@ -445,8 +479,24 @@ const CentersPage = () => {
         if (alterSchema?.properties?.grade) {
           alterSchema.properties.grade.maxSelection = 1;
         }
+
+        const hideFields = (data: any, fieldsToHide: string[]): any => {
+          const updatedData = { ...data };
+
+          fieldsToHide.forEach((field) => {
+            if (updatedData[field]) {
+              updatedData[field] = {
+                'ui:widget': 'hidden',
+              };
+            }
+          });
+
+          return updatedData;
+        };
+        const fieldsToHide = ['state', 'district', 'block'];
+        const updatedData = hideFields(responseForm?.uiSchema, fieldsToHide);
         setAddBatchSchema(alterSchema);
-        setAddBatchUiSchema(responseForm?.uiSchema);
+        setAddBatchUiSchema(updatedData);
       }
     };
 
@@ -493,7 +543,6 @@ const CentersPage = () => {
   }, [filteredBatches, batchSearchInput]);
 
   // Add empty form data for required props
-  const emptyFormData = {};
   const emptyUserId = '';
   const emptyCallback = () => {};
 
@@ -606,28 +655,32 @@ const CentersPage = () => {
                       ),
                     }}
                   />
-                  <Button
-                    sx={{
-                      mt: 1.2,
-                      border: '1px solid #1E1B16',
-                      borderRadius: '100px',
-                      height: '40px',
-                      px: '16px',
-                      color: theme.palette.error.contrastText,
-                      alignSelf: 'flex-start',
-                      '& .MuiButton-endIcon': {
-                        marginLeft: isRTL ? '0px !important' : '8px !important',
-                        marginRight: isRTL
-                          ? '8px !important'
-                          : '-2px !important',
-                      },
-                    }}
-                    className="text-1E"
-                    endIcon={<AddIcon />}
-                    onClick={handleOpenAddBatchModal}
-                  >
-                    {t('COMMON.ADD_NEW')}
-                  </Button>
+                  {isTeamLeader && (
+                    <Button
+                      sx={{
+                        mt: 1.2,
+                        border: '1px solid #1E1B16',
+                        borderRadius: '100px',
+                        height: '40px',
+                        px: '16px',
+                        color: theme.palette.error.contrastText,
+                        alignSelf: 'flex-start',
+                        '& .MuiButton-endIcon': {
+                          marginLeft: isRTL
+                            ? '0px !important'
+                            : '8px !important',
+                          marginRight: isRTL
+                            ? '8px !important'
+                            : '-2px !important',
+                        },
+                      }}
+                      className="text-1E"
+                      endIcon={<AddIcon />}
+                      onClick={handleOpenAddBatchModal}
+                    >
+                      {t('COMMON.ADD_NEW')}
+                    </Button>
+                  )}
                 </Box>
                 <Box sx={{ minWidth: '300px' }}>
                   <CenterDropdown
