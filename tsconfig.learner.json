@@ -19,6 +19,9 @@
       "@content-mfes/*": ["mfes/content/src/*"],
       "@login/*": ["mfes/login/src/*"],
       "@forget-password/*": ["mfes/forget-password/src/*"],
+      "@survey/*": ["mfes/survey-observations/src/*"],
+      "@collection": ["mfes/editors/src/components/CollectionEditor.tsx"],
+
       "@shared-lib": ["libs/shared-lib-v2/src/index.ts"],
       "@Content": ["mfes/content/src/components/Content/List.tsx"],
       "@ContentEnrollDetails": [

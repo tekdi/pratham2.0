@@ -1,3 +1,4 @@
+import MuiThemeProvider from '../theme/MuiThemeProvider';
 import './global.css';
 
 export const metadata = {
@@ -12,7 +13,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <link
+        href="https://fonts.googleapis.com/icon?family=Material+Icons"
+        rel="stylesheet"
+      />
+      <head />
+      <body>
+        <MuiThemeProvider>{children}</MuiThemeProvider>
+        {/* <ToastContainer /> */}
+      </body>
     </html>
   );
 }
