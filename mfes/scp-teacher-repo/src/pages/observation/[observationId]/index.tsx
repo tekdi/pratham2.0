@@ -611,9 +611,9 @@ const ObservationDetails = () => {
           sx={{
             display: 'flex',
             alignItems: 'center',
-            gap: '16px',
-            flexWrap: 'wrap',
+            gap: '22px',
             mb: 2,
+            color: '#1F1B13',
           }}
         >
           <KeyboardBackspaceOutlinedIcon
@@ -621,12 +621,11 @@ const ObservationDetails = () => {
             sx={{ color: theme.palette.warning['A200'] }}
             onClick={handleBackEvent}
           />
-          <Box 
-          sx={{
-              fontWeight: 400,
-              fontSize: 16,
-          }}
-           color="#1F1B13">
+          <Box  sx={{
+            fontSize: '16px',
+            fontWeight: '400',
+            color: '#1F1B13',
+          }}>
             {observationName}
           </Box>
         </Box>
@@ -692,7 +691,9 @@ const ObservationDetails = () => {
                 <Box
                   sx={{
                     mt: '20px',
-                    ml: '14px',
+                    '@media (min-width: 902px)': {
+                      ml: '14px',
+                    },
                   }}
                 >
                   <FormControl
@@ -703,6 +704,7 @@ const ObservationDetails = () => {
                         md: 300,
                       },
                       backgroundColor: 'white',
+                      marginTop: '3px',
                     }}
                   >
                     <InputLabel>
@@ -715,6 +717,10 @@ const ObservationDetails = () => {
                       onChange={handleStatusChange}
                       label={t('OBSERVATION.OBSERVATION_STATUS')}
                       defaultValue={ObservationStatus.ALL}
+                      sx={{
+                        height: '52px',
+                       
+                      }}
                     >
                       <MenuItem value={ObservationStatus.ALL}>
                         {t('COMMON.ALL')}
@@ -750,7 +756,6 @@ const ObservationDetails = () => {
                   alignItems: 'center',
                   gap: 2,
                   mt: 3,
-                  mx: '10px',
                 }}
               >
                 <Box
@@ -772,7 +777,7 @@ const ObservationDetails = () => {
                   flexWrap: 'wrap',
                   gap: '20px',
                   justifyContent: 'flex-start',
-                  mx: '8px',
+                  mx:2
                 }}
               >
                 {loading ? (
