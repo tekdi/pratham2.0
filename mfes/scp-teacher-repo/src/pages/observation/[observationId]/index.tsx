@@ -621,9 +621,14 @@ const ObservationDetails = () => {
             sx={{ color: theme.palette.warning['A200'] }}
             onClick={handleBackEvent}
           />
-          <Typography variant="h1" color="black">
+          <Box 
+          sx={{
+              fontWeight: 400,
+              fontSize: 16,
+          }}
+           color="#1F1B13">
             {observationName}
-          </Typography>
+          </Box>
         </Box>
 
         <Grid container spacing={2}>
@@ -745,6 +750,7 @@ const ObservationDetails = () => {
                   alignItems: 'center',
                   gap: 2,
                   mt: 3,
+                  mx: '10px',
                 }}
               >
                 <Box
@@ -766,6 +772,7 @@ const ObservationDetails = () => {
                   flexWrap: 'wrap',
                   gap: '20px',
                   justifyContent: 'flex-start',
+                  mx: '8px',
                 }}
               >
                 {loading ? (
