@@ -961,7 +961,28 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                         <FormControl
                           disabled={true}
                           className={showFloatingLabel ? '' : 'drawer-select'}
-                          sx={{ m: 0, width: '100%' }}
+                          sx={{
+                            m: 0,
+                            width: '100%',
+                            ...(showFloatingLabel
+                              ? {}
+                              : {
+                                  borderRadius: '0.5rem',
+                                  color: theme.palette.warning['200'],
+                                  marginBottom: '0rem',
+                                  marginRight: '10px',
+                                  '@media (max-width: 902px)': {
+                                    width: isAttendanceOverview
+                                      ? '100%'
+                                      : '62%',
+                                  },
+                                  '@media (max-width: 702px)': {
+                                    width: isAttendanceOverview
+                                      ? '100%'
+                                      : '65%',
+                                  },
+                                }),
+                          }}
                         >
                           {showFloatingLabel && (
                             <InputLabel id="batch-select-label">
@@ -972,6 +993,26 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                             labelId="batch-select-label"
                             label={showFloatingLabel ? t('COMMON.BATCH') : ''}
                             value={filteredBatchData[0]?.cohortId}
+                            sx={{
+                              borderRadius: '0.5rem',
+                              color: theme.palette.warning['200'],
+                              width: '100%',
+                              marginBottom: '0rem',
+                              '@media (max-width: 900px)': {
+                                width: isAttendanceOverview ? '100%' : '62%',
+                              },
+                              // '& .MuiSelect-icon': {
+                              //   right: isRTL ? 'unset' : '7px',
+                              //   left: isRTL ? '7px' : 'unset',
+                              // },
+                            }}
+                            MenuProps={{
+                              PaperProps: {
+                                style: {
+                                  maxHeight: 250,
+                                },
+                              },
+                            }}
                           >
                             <MenuItem
                               key={filteredBatchData[0]?.cohortId}
@@ -993,9 +1034,27 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                           disabled
                           variant="outlined"
                           sx={{
-                            '& .MuiInputLabel-root': {
-                              color: theme.palette.primary.light,
-                            },
+                            m: 0,
+                            width: '100%',
+                            ...(showFloatingLabel
+                              ? {}
+                              : {
+                                  borderRadius: '0.5rem',
+                                  color: theme.palette.warning['200'],
+                                  backgroundColor: 'white',
+                                  marginBottom: '0rem',
+                                  marginRight: '10px',
+                                  '@media (max-width: 902px)': {
+                                    width: isAttendanceOverview
+                                      ? '100%'
+                                      : '62%',
+                                  },
+                                  '@media (max-width: 702px)': {
+                                    width: isAttendanceOverview
+                                      ? '100%'
+                                      : '100%',
+                                  },
+                                }),
                           }}
                         >
                           <InputLabel id="batch-label">Batch</InputLabel>
@@ -1007,7 +1066,26 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                                 : toPascalCase(filteredBatchData[0]?.name)
                             }
                             label="Batch"
-                            sx={{ height: '53px' }}
+                            sx={{
+                              borderRadius: '0.5rem',
+                              color: theme.palette.warning['200'],
+                              width: '100%',
+                              marginBottom: '0rem',
+                              '@media (max-width: 900px)': {
+                                width: isAttendanceOverview ? '100%' : '100%',
+                              },
+                              // '& .MuiSelect-icon': {
+                              //   right: isRTL ? 'unset' : '7px',
+                              //   left: isRTL ? '7px' : 'unset',
+                              // },
+                            }}
+                            MenuProps={{
+                              PaperProps: {
+                                style: {
+                                  maxHeight: 250,
+                                },
+                              },
+                            }}
                           >
                             <MenuItem value="">
                               <Typography color={theme.palette.warning['300']}>
