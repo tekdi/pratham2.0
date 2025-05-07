@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   LayoutProps,
   Layout,
@@ -11,6 +11,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { Box } from '@mui/material';
 import POSMuiThemeProvider from '@learner/assets/theme/POSMuiThemeProvider';
+import { getTenantInfo } from '@learner/utils/API/ProgramService';
 
 interface NewDrawerItemProp extends DrawerItemProp {
   variant?: 'contained' | 'text';
@@ -74,7 +75,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         _brand: {
           _box: {
             logoComponent: <Brand />,
-            onClick: () => router.push('/poc'),
+            onClick: () => router.push('/pos'),
           },
         },
         navLinks: defaultNavLinks,
@@ -88,6 +89,42 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
 };
 
 export default function AppWrapper(props: LayoutProps) {
+  const router = useRouter();
+
+  useEffect(() => {
+    const init = async () => {
+      const channelId = localStorage.getItem('channelId');
+      const tenantId = localStorage.getItem('tenantId');
+      const collectionFramework = localStorage.getItem('collectionFramework');
+
+      if (!channelId || !tenantId || !collectionFramework) {
+        const res = await getTenantInfo();
+        const youthnetContentFilter = res?.result.find(
+          (program: any) => program.name === 'Open School'
+        );
+
+        if (youthnetContentFilter) {
+          if (!channelId) {
+            localStorage.setItem('channelId', youthnetContentFilter.channelId);
+          }
+          if (!tenantId) {
+            localStorage.setItem('tenantId', youthnetContentFilter.tenantId);
+          }
+          if (!collectionFramework) {
+            localStorage.setItem(
+              'collectionFramework',
+              youthnetContentFilter.collectionFramework
+            );
+          }
+
+          // All values are set now, reload page
+          window.location.reload();
+        }
+      }
+    };
+    init();
+  }, []);
+
   return (
     <POSMuiThemeProvider>
       <App {...props} />
