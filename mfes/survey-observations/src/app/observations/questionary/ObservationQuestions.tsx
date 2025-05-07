@@ -482,12 +482,13 @@ const ObservationQuestions: React.FC = () => {
             }}
           >
             <Button
-              color="secondary"
+              color="primary"
               sx={{
                 borderRadius: '100px',
                 height: 'auto',
                 width: 'fit-content',
                 my: 2,
+                bgcolor: '#FDBE16',
               }}
               endIcon={<AddIcon />}
               onClick={addAnotherSubmission}
