@@ -200,7 +200,7 @@ export const notificationCallback = async (
   const isQueue = false;
 
   console.log('########### type', type);
-  
+
   let creatorName;
 
   if (typeof window !== 'undefined' && window.localStorage) {
@@ -225,8 +225,7 @@ export const notificationCallback = async (
         ''
       );
     }
-  }
-  else if (type == 'team-leader' || type == 'facilitator') {
+  } else if (type == 'team-leader' || type == 'facilitator') {
     if (process.env.NEXT_PUBLIC_TEACHER_SBPLAYER) {
       cleanedUrl = process.env.NEXT_PUBLIC_TEACHER_SBPLAYER.replace(
         /\/sbplayer$/,
@@ -234,6 +233,7 @@ export const notificationCallback = async (
       );
     }
   }
+  cleanedUrl = 'testlink';
   if (creatorName) {
     if (type == 'learner') {
       let sentName = JSON.parse(localStorage.getItem('userData'))?.firstName;
