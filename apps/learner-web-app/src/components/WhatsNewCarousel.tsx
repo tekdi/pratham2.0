@@ -17,8 +17,10 @@ const slides = [
   {
     image:
       'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80',
-    heading: 'Pratham - Shah PraDigi Innovation Centre is selected as one of the winners of the Learning Engineering Tools Competition 2021-22',
-    description: `Pratham undertook an exploratory study for children to understand the problem of plastic waste management in rural India. This study is a part of Pratham’s Learning for Life curriculum. In this study, we covered 8400 households, in 700 villages across 70 districts, in 15 states. Findings to be released in July 2022. Click here to sign up for the report.`
+    heading:
+      'Pratham - Shah PraDigi Innovation Centre is selected as one of the winners of the Learning Engineering Tools Competition 2021-22',
+    description:
+      "Pratham undertook an exploratory study for children to understand the problem of plastic waste management in rural India. This study is a part of Pratham's Learning for Life curriculum. In this study, we covered 8400 households, in 700 villages across 70 districts, in 15 states. Findings to be released in July 2022. Click here to sign up for the report.",
   },
   {
     image:
@@ -165,7 +167,6 @@ const WhatsNewCarousel = () => (
               >
                 {slide.description}
               </Typography>
-             
             </Box>
           </Box>
         </SwiperSlide>
