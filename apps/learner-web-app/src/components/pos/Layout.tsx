@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import React, { useState } from 'react';
 import {
   LayoutProps,
@@ -9,6 +10,7 @@ import {
 } from '@shared-lib';
 import { useRouter } from 'next/navigation';
 import { Box } from '@mui/material';
+import POSMuiThemeProvider from '@learner/assets/theme/POSMuiThemeProvider';
 
 interface NewDrawerItemProp extends DrawerItemProp {
   variant?: 'contained' | 'text';
@@ -17,7 +19,7 @@ interface NewDrawerItemProp extends DrawerItemProp {
 }
 const App: React.FC<LayoutProps> = ({ children, ...props }) => {
   const router = useRouter();
-  const { t, setLanguage } = useTranslation();
+  const { t } = useTranslation();
   const [defaultNavLinks, setDefaultNavLinks] = useState<NewDrawerItemProp[]>(
     []
   );
@@ -63,36 +65,20 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
 
     setDefaultNavLinks(navLinks);
   }, [t, router]);
-  const onLanguageChange = (val: string) => {
-    setLanguage(val);
-  };
+
   return (
     <Layout
-      // onlyHideElements={['footer']}
       {...props}
       _topAppBar={{
         isShowLang: false,
         _brand: {
-          name: 'YouthNet',
           _box: {
-            onClick: () => router.push('/content'),
-            sx: {
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-            },
-            _text: {
-              fontWeight: 400,
-              fontSize: '22px',
-              lineHeight: '28px',
-              textAlign: 'center',
-            },
+            logoComponent: <Brand />,
+            onClick: () => router.push('/poc'),
           },
         },
         navLinks: defaultNavLinks,
-        _navLinkBox: { gap: 5 },
-        onLanguageChange,
+        _navLinkBox: { gap: '12px' },
         ...props?._topAppBar,
       }}
     >
@@ -101,4 +87,31 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
   );
 };
 
-export default App;
+export default function AppWrapper(props: LayoutProps) {
+  return (
+    <POSMuiThemeProvider>
+      <App {...props} />
+    </POSMuiThemeProvider>
+  );
+}
+
+const Brand = () => {
+  return (
+    <Box display="flex" gap={1}>
+      <Image
+        src="/images/appLogo.svg"
+        alt="Pratham"
+        width={146}
+        height={32}
+        style={{ height: '32px' }}
+      />
+      <Image
+        src="/images/pradigi.png"
+        alt="Pradigi"
+        width={94}
+        height={32}
+        style={{ height: '32px' }}
+      />
+    </Box>
+  );
+};

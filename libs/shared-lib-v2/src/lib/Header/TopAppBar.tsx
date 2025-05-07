@@ -173,10 +173,15 @@ const DesktopBar = ({
             </Button>
           );
         })}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          {rightComponent}
-          {isShowLang && <LanguageSelect onLanguageChange={onLanguageChange} />}
-        </Box>
+
+        {(rightComponent || isShowLang) && (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            {rightComponent}
+            {isShowLang && (
+              <LanguageSelect onLanguageChange={onLanguageChange} />
+            )}
+          </Box>
+        )}
       </Box>
     </Box>
   );
@@ -263,17 +268,21 @@ const Brand = ({ _box, name = 'Pratham' }: { _box?: any; name?: string }) => {
   const theme = useTheme();
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }} {..._box}>
-      <img src="/logo.png" alt="YouthNet" style={{ height: '40px' }} />
-      <Typography
-        variant="h6"
-        sx={{
-          color: theme.palette.text.primary,
-          fontWeight: 600,
-          ...(_box?._text ?? {}),
-        }}
-      >
-        {name}
-      </Typography>
+      {_box?.logoComponent || (
+        <>
+          <img src="/logo.png" alt="YouthNet" style={{ height: '40px' }} />
+          <Typography
+            variant="h6"
+            sx={{
+              color: theme.palette.text.primary,
+              fontWeight: 600,
+              ...(_box?._text ?? {}),
+            }}
+          >
+            {name}
+          </Typography>
+        </>
+      )}
     </Box>
   );
 };

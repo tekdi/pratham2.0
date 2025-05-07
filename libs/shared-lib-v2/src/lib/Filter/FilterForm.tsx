@@ -342,7 +342,7 @@ export function FilterForm({
                           <Checkbox
                             checked={
                               !!formData[cat.code]?.some(
-                                (o) => o.code === opt.code
+                                (o) => o?.code === opt?.code
                               )
                             }
                             onChange={(e) => {
@@ -392,7 +392,7 @@ export function FilterForm({
         {renderStaticForm.map((field) => {
           const rangeToShow = showMoreStatic
             ? field.range
-            : field.range.slice(0, 3);
+            : field?.range?.slice(0, 3);
 
           return (
             <Accordion

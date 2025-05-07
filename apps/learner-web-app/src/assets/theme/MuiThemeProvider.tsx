@@ -172,10 +172,20 @@ export default function MuiThemeProvider({
 }: {
   children: React.ReactNode;
 }) {
+  console.log(theme, 'theme context');
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <LanguageProvider>{children}</LanguageProvider>
+      {children}
     </ThemeProvider>
   );
 }
+
+export const MuiThemeProviderWithLanguage = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
+  return <LanguageProvider>{children}</LanguageProvider>;
+};
