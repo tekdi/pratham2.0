@@ -1036,12 +1036,12 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                           sx={{
                             m: 0,
                             width: '100%',
+                            backgroundColor: 'white',
                             ...(showFloatingLabel
                               ? {}
                               : {
                                   borderRadius: '0.5rem',
                                   color: theme.palette.warning['200'],
-                                  backgroundColor: 'white',
                                   marginBottom: '0rem',
                                   marginRight: '10px',
                                   '@media (max-width: 902px)': {
@@ -1052,14 +1052,16 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                                   '@media (max-width: 702px)': {
                                     width: isAttendanceOverview
                                       ? '100%'
-                                      : '100%',
+                                      : '65%',
                                   },
                                 }),
                           }}
                         >
-                          <InputLabel id="batch-label">Batch</InputLabel>
+                          <InputLabel id="batch-label">
+                            {t('COMMON.BATCH')}
+                          </InputLabel>
                           <Select
-                            labelId="batch-label"
+                            labelId={t('COMMON.BATCH')}
                             value={
                               filteredBatchData?.length === 0
                                 ? ''
