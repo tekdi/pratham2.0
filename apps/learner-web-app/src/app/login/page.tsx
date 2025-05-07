@@ -75,8 +75,6 @@ const LoginPage = () => {
       const response = await login({ username, password });
       if (response?.result?.access_token) {
         handleSuccessfulLogin(response?.result, data, router);
-
-       
       } else {
         showToastMessage(
           t('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT'),
@@ -89,8 +87,6 @@ const LoginPage = () => {
       const errorMessage = t('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT');
       showToastMessage(errorMessage, 'error');
     }
-
-   
   };
   return (
     <Suspense fallback={<div>Loading...</div>}>
@@ -176,8 +172,8 @@ const handleSuccessfulLogin = async (
 
         const academicYearResponse = await getAcademicYear();
 
-        console.log(academicYearResponse[0]?.id , 'academicYearResponse');
-        
+        console.log(academicYearResponse[0]?.id, 'academicYearResponse');
+
         if (academicYearResponse[0]?.id) {
           localStorage.setItem('academicYearId', academicYearResponse[0]?.id);
         }
