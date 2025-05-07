@@ -175,7 +175,7 @@ const Observation = () => {
   return (
     <>
       <Box px={{ xs: 2, sm: 3, md: 4 }} py={{ xs: 2, sm: 3 }}>
-        <Typography variant="h6">{t('SURVEYS.SURVEYS')}</Typography>
+        <Typography variant="h2">{t('SURVEYS.SURVEYS')}</Typography>
       </Box>
 
       <Box sx={{ width: '100%', overflowX: 'auto' }}>

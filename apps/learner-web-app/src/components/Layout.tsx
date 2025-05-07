@@ -66,8 +66,8 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
       {
         title: t('LEARNER_APP.COMMON.SURVEYS'),
         icon: <AssignmentOutlined sx={{ width: 28, height: 28 }} />,
-        to: () => router.push('/content'),
-        isActive: currentPage === '/content',
+        to: () => router.push('/surveys'),
+        isActive: currentPage === '/surveys',
       },
     ];
 
