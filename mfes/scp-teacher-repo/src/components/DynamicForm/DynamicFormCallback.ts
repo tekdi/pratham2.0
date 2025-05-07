@@ -207,6 +207,9 @@ export const notificationCallback = async (
   let replacements: { [key: string]: string };
   replacements = {};
   let cleanedUrl = '';
+
+  console.log('########### type', type);
+  console.log('########### type replacements', replacements);
   if (type == 'team-leader' || type == 'facilitator') {
     if (process.env.NEXT_PUBLIC_TEACHER_SBPLAYER) {
       cleanedUrl = process.env.NEXT_PUBLIC_TEACHER_SBPLAYER.replace(
@@ -220,6 +223,10 @@ export const notificationCallback = async (
     type == 'content-reviewer' ||
     type == 'content-creator'
   ) {
+    console.log(
+      '########### type process.env.NEXT_PUBLIC_ADMIN_SBPLAYER',
+      process.env.NEXT_PUBLIC_ADMIN_SBPLAYER
+    );
     if (process.env.NEXT_PUBLIC_ADMIN_SBPLAYER) {
       cleanedUrl = process.env.NEXT_PUBLIC_ADMIN_SBPLAYER.replace(
         /\/sbplayer$/,
