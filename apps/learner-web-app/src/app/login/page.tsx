@@ -13,6 +13,7 @@ import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import { Loader, useTranslation } from '@shared-lib';
 import { getAcademicYear } from '@learner/utils/API/AcademicYearService';
 import { preserveLocalStorage } from '@learner/utils/helper';
+import { profileComplitionCheck } from '@learner/utils/API/userService';
 
 const Login = dynamic(
   () => import('@login/Components/LoginComponent/LoginComponent'),
@@ -169,7 +170,7 @@ const handleSuccessfulLogin = async (
 
         const tenantId = userResponse?.tenantData?.[0]?.tenantId;
         localStorage.setItem('tenantId', tenantId);
-
+        await profileComplitionCheck()
         const academicYearResponse = await getAcademicYear();
 
         console.log(academicYearResponse[0]?.id, 'academicYearResponse');

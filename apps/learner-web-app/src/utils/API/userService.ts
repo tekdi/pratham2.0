@@ -61,6 +61,13 @@ export const profileComplitionCheck = async (): Promise<any> => {
       const apiUrl = API_ENDPOINTS.userRead(userId, true);
       const response = await get(apiUrl);
       const userData = response?.data?.result?.userData;
+      const isVolunteerField = userData?.customFields.find(
+        (field: any) => field.label === 'IS_VOLUNTEER'
+      );
+      console.log(isVolunteerField);
+      const isVolunteer = isVolunteerField?.selectedValues?.[0] === 'yes';
+      localStorage.setItem('isVolunteer', JSON.stringify(isVolunteer));
+
       setLocalStorageFromCustomFields(userData?.customFields);
 
       const responseForm: any = await fetchForm([
