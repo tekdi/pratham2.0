@@ -199,6 +199,8 @@ export const notificationCallback = async (
 ) => {
   const isQueue = false;
 
+  console.log('########### type', type);
+  
   let creatorName;
 
   if (typeof window !== 'undefined' && window.localStorage) {
@@ -208,16 +210,6 @@ export const notificationCallback = async (
   replacements = {};
   let cleanedUrl = '';
 
-  console.log('########### type', type);
-  console.log('########### type replacements', replacements);
-  if (type == 'team-leader' || type == 'facilitator') {
-    if (process.env.NEXT_PUBLIC_TEACHER_SBPLAYER) {
-      cleanedUrl = process.env.NEXT_PUBLIC_TEACHER_SBPLAYER.replace(
-        /\/sbplayer$/,
-        ''
-      );
-    }
-  }
   if (
     type == 'state-lead' ||
     type == 'content-reviewer' ||
@@ -229,6 +221,14 @@ export const notificationCallback = async (
     );
     if (process.env.NEXT_PUBLIC_ADMIN_SBPLAYER) {
       cleanedUrl = process.env.NEXT_PUBLIC_ADMIN_SBPLAYER.replace(
+        /\/sbplayer$/,
+        ''
+      );
+    }
+  }
+  else if (type == 'team-leader' || type == 'facilitator') {
+    if (process.env.NEXT_PUBLIC_TEACHER_SBPLAYER) {
+      cleanedUrl = process.env.NEXT_PUBLIC_TEACHER_SBPLAYER.replace(
         /\/sbplayer$/,
         ''
       );
