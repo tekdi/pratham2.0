@@ -1,13 +1,8 @@
 'use client';
 
-import dynamic from 'next/dynamic';
-
 import { Button, Typography, useTheme } from '@mui/material';
-import { GetStaticPaths } from 'next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { Suspense, useEffect, useState } from 'react';
 import { Box, Grid, Tab, Tabs } from '@mui/material';
-import { useTranslation } from 'next-i18next';
 
 import {
   createAnotherSubmission,
@@ -20,8 +15,12 @@ import EntryContent from 'mfes/survey-observations/src/Components/EntryContent/E
 import { useRouter, useSearchParams } from 'next/navigation';
 import ObservationComponent from 'mfes/survey-observations/src/Components/ObservationComponent/ObservationComponent';
 import { set } from 'lodash';
-import { addEntities, fetchEntities, fetchQuestion } from 'mfes/survey-observations/src/utils/API/suveyService';
-
+import {
+  addEntities,
+  fetchEntities,
+  fetchQuestion,
+} from 'mfes/survey-observations/src/utils/API/suveyService';
+import { useTranslation } from '@shared-lib';
 
 const ObservationQuestions: React.FC = () => {
   const searchParams = useSearchParams();
@@ -127,6 +126,7 @@ const ObservationQuestions: React.FC = () => {
         //check already submitted
 
         if (observationId) {
+          console.log('hii');
           const response = await fetchQuestion({
             observationId,
             entityId,

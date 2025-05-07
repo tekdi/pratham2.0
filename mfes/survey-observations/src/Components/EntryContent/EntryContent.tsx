@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Divider, Typography, IconButton } from '@mui/material';
-import { fetchQuestion } from '@/services/ObservationServices';
 import { Download } from '@mui/icons-material';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import { UserList } from '../UserCard/UserCard';
 import { VolunteerField } from 'mfes/survey-observations/app.config';
 import { useRouter } from 'next/navigation';
+import { fetchQuestion } from '@survey/utils/API/suveyService';
 
 type Participant = {
   name: string;

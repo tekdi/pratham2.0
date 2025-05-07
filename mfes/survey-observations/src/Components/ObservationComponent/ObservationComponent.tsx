@@ -1,16 +1,15 @@
 import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
-
-import { updateSubmission } from '@/services/ObservationServices';
 import KeyboardBackspaceOutlinedIcon from '@mui/icons-material/KeyboardBackspaceOutlined';
 import { Box, Typography, useTheme } from '@mui/material';
 import 'questionnaire-webcomponent/questionnaire-player-webcomponent.js';
 import 'questionnaire-webcomponent/styles.css';
-import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
-import ConfirmationModal from '@/components/ConfirmationModal';
+import { updateSubmission } from '@survey/utils/API/suveyService';
+import ConfirmationModal from '../ConfirmationModal/ConfirmationModal';
 // import ConfirmationModal from '../ConfirmationModal';
-// import { showToastMessage } from '../Toastify';
+import { useTranslation } from '@shared-lib';
+import { showToastMessage } from '../ToastComponent/Toastify';
 
 interface FileUploadEvent {
   data: {
@@ -214,7 +213,7 @@ const ObservationComponent: React.FC<QuestionnaireAppProps> = ({
             submissionId,
             submissionData,
           });
-          // showToastMessage(t('OBSERVATION.FORM_SAVED_SUCCESSFULLY'), 'success');
+          showToastMessage(t('OBSERVATION.FORM_SAVED_SUCCESSFULLY'), 'success');
         };
 
         playerElement.addEventListener(
@@ -242,9 +241,9 @@ const ObservationComponent: React.FC<QuestionnaireAppProps> = ({
       const submissionId = observationQuestions?.assessment?.submissionId;
       const response = await updateSubmission({ submissionId, submissionData });
       if (currentEvent.detail.status === 'draft') {
-        // showToastMessage(t('OBSERVATION.FORM_SAVED_SUCCESSFULLY'), 'success');
+        showToastMessage(t('OBSERVATION.FORM_SAVED_SUCCESSFULLY'), 'success');
       } else if (currentEvent.detail.status === 'submit') {
-        // showToastMessage(t('OBSERVATION.FORM_SUBMIT_SUCCESSFULLY'), 'success');
+        showToastMessage(t('OBSERVATION.FORM_SUBMIT_SUCCESSFULLY'), 'success');
         router.push(`${localStorage.getItem('observationPath')}`);
       }
     }

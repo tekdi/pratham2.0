@@ -4,7 +4,7 @@
 import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
 import React from 'react';
 // import { LanguageProvider } from '@shared-lib';
-// import { LanguageProvider } from '@shared-lib';
+import { LanguageProvider } from '@shared-lib';
 
 const theme = createTheme({
   typography: {
@@ -61,7 +61,7 @@ export default function MuiThemeProvider({
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      {children}
+      <LanguageProvider>{children}</LanguageProvider>
     </ThemeProvider>
   );
 }
