@@ -62,6 +62,7 @@ const UserId = () => {
   });
   const [openProfileEditModal, setOpenProfileEditModal] = React.useState(false);
   const [userData, setUserData] = useState<any>({});
+  const [isSelfProfile, setIsSelfProfile] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -72,10 +73,12 @@ const UserId = () => {
 
       if (userId === storedUserId) {
         userData = JSON.parse(localStorage.getItem('userData') || '{}');
+        setIsSelfProfile(true);
       } else if (userId) {
         const data = await getUserDetails(userId, true);
         userData = data?.result.userData || {};
         setUserData(userData);
+        setIsSelfProfile(false);
       }
 
       if (userData) {
@@ -181,7 +184,7 @@ const UserId = () => {
           >
             {t('SCP_PROFILE.PROFILE_DETAILS')}
           </Typography>
-          {isActiveYear && (
+          {isActiveYear && !isSelfProfile && (
             <Button
               sx={{
                 fontSize: '14px',
