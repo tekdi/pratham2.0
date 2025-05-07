@@ -480,6 +480,8 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
   const isAssessment = pathname === '/assessments';
   const dashboard = pathname === '/dashboard';
   const isCoursePlanner = pathname === '/curriculum-planner';
+  const isAttendanceHistory = pathname === '/attendance-history';
+  const boardEnrollment = pathname === '/board-enrollment';
 
   return (
     <Box
@@ -527,16 +529,27 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                 {toPascalCase(blockName)} {t('DASHBOARD.BLOCK')}
               </Typography>
               <Box className="mt-md-16">
-                <Box sx={{ minWidth: 120, gap: '15px' }} display={'flex'}>
+                <Box sx={{ minWidth: 120, gap: '5px' }} display={'flex'}>
                   {filteredCohortData?.length > 1 ? (
                     <FormControl
                       className="drawer-select"
                       sx={{
                         m: 0,
                         width: '100%',
-                        // '@media (max-width: 700px)': {
-                        //   width: '50%',
-                        // },
+                        ...(showFloatingLabel
+                          ? {}
+                          : {
+                              borderRadius: '0.5rem',
+                              color: theme.palette.warning['200'],
+                              marginBottom: '0rem',
+                              marginRight: '10px',
+                              '@media (max-width: 902px)': {
+                                width: isAttendanceOverview ? '100%' : '62%',
+                              },
+                              '@media (max-width: 702px)': {
+                                width: isAttendanceOverview ? '100%' : '65%',
+                              },
+                            }),
                       }}
                     >
                       {showFloatingLabel && (
@@ -623,9 +636,26 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                       sx={{
                         m: 0,
                         width: '100%',
-                        // '@media (max-width: 700px)': {
-                        //   width: '50%',
-                        // },
+                        marginRight:
+                          dashboard ||
+                          isAttendanceOverview ||
+                          isAttendanceHistory ||
+                          boardEnrollment
+                            ? 0
+                            : '10px',
+                        marginLeft: boardEnrollment ? '10px' : 'unset',
+                        ...(showFloatingLabel
+                          ? {}
+                          : {
+                              color: theme.palette.warning['200'],
+                              marginBottom: '0rem',
+                              '@media (max-width: 902px)': {
+                                width: isAttendanceOverview ? '100%' : '62%',
+                              },
+                              '@media (max-width: 702px)': {
+                                width: isAttendanceOverview ? '100%' : '65%',
+                              },
+                            }),
                       }}
                     >
                       {showFloatingLabel && (
@@ -709,7 +739,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
           ) : (
             <Box>
               <Box className="mt-24">
-                <Box sx={{ minWidth: 120, gap: '15px' }} display={'flex'}>
+                <Box sx={{ minWidth: 120, gap: '5px' }} display={'flex'}>
                   {filteredCohortData?.length > 1 ? (
                     <FormControl
                       variant="outlined"
@@ -794,7 +824,28 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                         <FormControl
                           disabled={true}
                           className={showFloatingLabel ? '' : 'drawer-select'}
-                          sx={{ m: 0, width: '100%' }}
+                          sx={{
+                            m: 0,
+                            width: '100%',
+                            ...(showFloatingLabel
+                              ? {}
+                              : {
+                                  borderRadius: '0.5rem',
+                                  color: theme.palette.warning['200'],
+                                  marginBottom: '0rem',
+                                  marginRight: '10px',
+                                  '@media (max-width: 902px)': {
+                                    width: isAttendanceOverview
+                                      ? '100%'
+                                      : '62%',
+                                  },
+                                  '@media (max-width: 702px)': {
+                                    width: isAttendanceOverview
+                                      ? '100%'
+                                      : '65%',
+                                  },
+                                }),
+                          }}
                         >
                           {showFloatingLabel && (
                             <InputLabel id="center-select-label">
@@ -827,15 +878,29 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                             disabled
                             variant="outlined"
                             sx={{
-                              '& .MuiInputLabel-root': {
-                                color: theme.palette.primary.light,
-                              },
+                              m: 0,
+                              width: '100%',
+                              backgroundColor: 'white',
+                              ...(showFloatingLabel
+                                ? {}
+                                : {
+                                    color: theme.palette.warning['200'],
+                                    marginBottom: '0rem',
+                                    marginRight: '10px',
+                                    '@media (max-width: 902px)': {
+                                      width: isAttendanceOverview
+                                        ? '100%'
+                                        : '62%',
+                                    },
+                                    '@media (max-width: 702px)': {
+                                      width: isAttendanceOverview
+                                        ? '100%'
+                                        : '65%',
+                                    },
+                                  }),
                             }}
                           >
-                            <InputLabel
-                              sx={{ textAlign: 'left' }}
-                              id="chip-label"
-                            >
+                            <InputLabel id="chip-label">
                               {t('COMMON.CENTER')}
                             </InputLabel>
                             <Select
@@ -845,8 +910,33 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                                   ? ''
                                   : toPascalCase(filteredCohortData?.[0]?.name)
                               }
-                              sx={{ height: '53px' }}
-                              label="Chip"
+                              label={t('COMMON.CENTER')}
+                              sx={{
+                                color: theme.palette.warning['200'],
+                                width: '100%',
+                                marginBottom: '0rem',
+                                '@media (max-width: 900px)': {
+                                  width: isAttendanceOverview ? '100%' : '100%',
+                                },
+                                height: '52px',
+                                '& .MuiOutlinedInput-notchedOutline': {
+                                  borderColor: theme.palette.warning['200'],
+                                },
+                                '&:hover .MuiOutlinedInput-notchedOutline': {
+                                  borderColor: theme.palette.warning['200'],
+                                },
+                                '&.Mui-focused .MuiOutlinedInput-notchedOutline':
+                                  {
+                                    borderColor: theme.palette.warning['200'],
+                                  },
+                              }}
+                              MenuProps={{
+                                PaperProps: {
+                                  style: {
+                                    maxHeight: 250,
+                                  },
+                                },
+                              }}
                             >
                               <MenuItem value="">
                                 <Typography
@@ -861,7 +951,15 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                                     filteredCohortData[0]?.name
                                   )}
                                 >
-                                  <Typography sx={{ textAlign: 'left' }}>
+                                  <Typography
+                                    sx={{
+                                      textAlign: 'left',
+                                      overflow: 'hidden',
+                                      textOverflow: 'ellipsis',
+                                      whiteSpace: 'nowrap',
+                                      maxWidth: '100%',
+                                    }}
+                                  >
                                     {toPascalCase(filteredCohortData[0]?.name)}
                                   </Typography>
                                 </MenuItem>
@@ -884,13 +982,19 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                       sx={{
                         m: 0,
                         width: '100%',
+                        marginRight:
+                          dashboard ||
+                          isAttendanceOverview ||
+                          isAttendanceHistory ||
+                          boardEnrollment
+                            ? 0
+                            : '10px',
+                        marginLeft: boardEnrollment ? '10px' : 'unset',
                         ...(showFloatingLabel
                           ? {}
                           : {
-                              borderRadius: '0.5rem',
                               color: theme.palette.warning['200'],
                               marginBottom: '0rem',
-                              marginRight: '10px',
                               '@media (max-width: 902px)': {
                                 width: isAttendanceOverview ? '100%' : '62%',
                               },
@@ -935,7 +1039,16 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                                 textTransform: 'capitalize',
                               }}
                             >
-                              {toPascalCase(cohort?.name)}
+                              <Typography
+                                sx={{
+                                  textAlign: 'left',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  whiteSpace: 'nowrap',
+                                }}
+                              >
+                                {toPascalCase(cohort?.name)}
+                              </Typography>
                             </MenuItem>
                           ))
                         ) : (
@@ -964,13 +1077,20 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                           sx={{
                             m: 0,
                             width: '100%',
+                            marginRight:
+                              dashboard ||
+                              isAttendanceOverview ||
+                              isAttendanceHistory ||
+                              boardEnrollment
+                                ? 0
+                                : '10px',
+                            marginLeft: boardEnrollment ? '10px' : 'unset',
                             ...(showFloatingLabel
                               ? {}
                               : {
-                                  borderRadius: '0.5rem',
                                   color: theme.palette.warning['200'],
+                                  backgroundColor: 'white',
                                   marginBottom: '0rem',
-                                  marginRight: '10px',
                                   '@media (max-width: 902px)': {
                                     width: isAttendanceOverview
                                       ? '100%'
@@ -994,12 +1114,11 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                             label={showFloatingLabel ? t('COMMON.BATCH') : ''}
                             value={filteredBatchData[0]?.cohortId}
                             sx={{
-                              borderRadius: '0.5rem',
                               color: theme.palette.warning['200'],
                               width: '100%',
                               marginBottom: '0rem',
                               '@media (max-width: 900px)': {
-                                width: isAttendanceOverview ? '100%' : '62%',
+                                width: isAttendanceOverview ? '100%' : '100%',
                               },
                               // '& .MuiSelect-icon': {
                               //   right: isRTL ? 'unset' : '7px',
@@ -1024,7 +1143,17 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                                 textTransform: 'capitalize',
                               }}
                             >
-                              {filteredBatchData[0]?.name}
+                              <Typography
+                                sx={{
+                                  textAlign: 'left',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  whiteSpace: 'nowrap',
+                                  maxWidth: '100%',
+                                }}
+                              >
+                                {filteredBatchData[0]?.name}
+                              </Typography>
                             </MenuItem>
                           </Select>
                         </FormControl>
@@ -1036,14 +1165,20 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                           sx={{
                             m: 0,
                             width: '100%',
+                            marginRight:
+                              dashboard ||
+                              isAttendanceOverview ||
+                              isAttendanceHistory ||
+                              boardEnrollment
+                                ? 0
+                                : '10px',
+                            marginLeft: boardEnrollment ? '10px' : 'unset',
                             backgroundColor: 'white',
                             ...(showFloatingLabel
                               ? {}
                               : {
-                                  borderRadius: '0.5rem',
                                   color: theme.palette.warning['200'],
                                   marginBottom: '0rem',
-                                  marginRight: '10px',
                                   '@media (max-width: 902px)': {
                                     width: isAttendanceOverview
                                       ? '100%'
@@ -1069,17 +1204,13 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                             }
                             label="Batch"
                             sx={{
-                              borderRadius: '0.5rem',
                               color: theme.palette.warning['200'],
                               width: '100%',
                               marginBottom: '0rem',
                               '@media (max-width: 900px)': {
                                 width: isAttendanceOverview ? '100%' : '100%',
                               },
-                              // '& .MuiSelect-icon': {
-                              //   right: isRTL ? 'unset' : '7px',
-                              //   left: isRTL ? '7px' : 'unset',
-                              // },
+                              height: '52px',
                             }}
                             MenuProps={{
                               PaperProps: {
@@ -1097,8 +1228,23 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                             {filteredBatchData?.length > 0 && (
                               <MenuItem
                                 value={toPascalCase(filteredBatchData[0]?.name)}
+                                sx={{
+                                  width: '100%',
+                                  maxWidth: '100%',
+                                  padding: '8px 16px',
+                                }}
                               >
-                                <Typography sx={{ textAlign: 'left' }}>
+                                <Typography
+                                  sx={{
+                                    textAlign: 'left',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
+                                    maxWidth: '100%',
+                                    width: '100%',
+                                    display: 'block',
+                                  }}
+                                >
                                   {toPascalCase(filteredBatchData[0]?.name)}
                                 </Typography>
                               </MenuItem>

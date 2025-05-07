@@ -695,7 +695,7 @@ const ObservationDetails = () => {
                     mt: '24px',
                     '@media (min-width: 900px)': {
                       width: '20%',
-                      marginLeft: '10px',
+                      marginLeft: '5px',
                     },
                   }}
                 >
@@ -703,7 +703,7 @@ const ObservationDetails = () => {
                     <FormControl
                       sx={{
                         borderRadius: '0.5rem',
-                        color: theme.palette.warning['200'],
+                        color: 'rgba(0, 0, 0, 0.6)',
                         backgroundColor: 'white',
                         marginBottom: '0rem',
                         width: '100%',
@@ -717,7 +717,10 @@ const ObservationDetails = () => {
                       }}
                     >
                       <InputLabel>
-                        <Typography variant="h2" color="black">
+                        <Typography
+                          variant="h2"
+                          sx={{ color: 'rgba(0, 0, 0, 0.6)', fontWeight: 400 }}
+                        >
                           {t('OBSERVATION.OBSERVATION_STATUS')}
                         </Typography>
                       </InputLabel>
