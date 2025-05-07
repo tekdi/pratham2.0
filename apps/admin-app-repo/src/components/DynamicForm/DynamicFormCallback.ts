@@ -199,6 +199,8 @@ export const notificationCallback = async (
 ) => {
   const isQueue = false;
 
+  console.log('########### type', type);
+
   let creatorName;
 
   if (typeof window !== 'undefined' && window.localStorage) {
@@ -208,8 +210,22 @@ export const notificationCallback = async (
   replacements = {};
   let cleanedUrl = '';
 
-  console.log("########### type",type)
-  if (type == 'team-leader' || type == 'facilitator') {
+  if (
+    type == 'state-lead' ||
+    type == 'content-reviewer' ||
+    type == 'content-creator'
+  ) {
+    console.log(
+      '########### type process.env.NEXT_PUBLIC_ADMIN_SBPLAYER',
+      process.env.NEXT_PUBLIC_ADMIN_SBPLAYER
+    );
+    if (process.env.NEXT_PUBLIC_ADMIN_SBPLAYER) {
+      cleanedUrl = process.env.NEXT_PUBLIC_ADMIN_SBPLAYER.replace(
+        /\/sbplayer$/,
+        ''
+      );
+    }
+  } else if (type == 'team-leader' || type == 'facilitator') {
     if (process.env.NEXT_PUBLIC_TEACHER_SBPLAYER) {
       cleanedUrl = process.env.NEXT_PUBLIC_TEACHER_SBPLAYER.replace(
         /\/sbplayer$/,
@@ -217,20 +233,7 @@ export const notificationCallback = async (
       );
     }
   }
-  if (
-    type == 'state-lead' ||
-    type == 'content-reviewer' ||
-    type == 'content-creator'
-  ) {
-
-  console.log("########### type process.env.NEXT_PUBLIC_ADMIN_SBPLAYER",process.env.NEXT_PUBLIC_ADMIN_SBPLAYER)
-    if (process.env.NEXT_PUBLIC_ADMIN_SBPLAYER) {
-      cleanedUrl = process.env.NEXT_PUBLIC_ADMIN_SBPLAYER.replace(
-        /\/sbplayer$/,
-        ''
-      );
-    }
-  }
+  cleanedUrl = 'testlink';
   if (creatorName) {
     if (type == 'learner') {
       let sentName = JSON.parse(localStorage.getItem('userData'))?.firstName;
