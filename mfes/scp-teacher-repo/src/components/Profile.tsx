@@ -181,13 +181,13 @@ const Profile: React.FC<ProfileDetailsProps> = ({
           </Typography>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
             {subjectsITeach.map((subject) => {
-              const isHighlighted = mainSubjectIds.has(subject.id);
+             // const isHighlighted = mainSubjectIds.has(subject.id);
               return (
                 <Box
                   key={subject.id}
                   sx={{
-                    backgroundColor: isHighlighted ? '#EFC570' : 'transparent',
-                    color: isHighlighted ? 'black' : 'black',
+                    backgroundColor: 'transparent',
+                    color:  'black',
                     cursor: 'default !important',
                     borderRadius: "8px",
                     padding: '5px 10px',
@@ -197,8 +197,51 @@ const Profile: React.FC<ProfileDetailsProps> = ({
                     letterSpacing: '0.1px',
                     textAlign: 'center',
                     verticalAlign: 'middle',
-                    border: isHighlighted?'unset': "1px solid #DADADA"
+                    border: "1px solid #DADADA"
 
+                  }}
+                >
+                  {t(`FORM.${subject.label}`, {
+                    defaultValue: subject.label,
+                  })}
+                </Box>
+              );
+            })}
+
+
+          </Box>
+        </Box>
+        <Box mt={4}>
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 'bold',
+              mb: 1,
+              color: theme.palette.warning['500'],
+            }}
+          >
+            {t('SCP_PROFILE.MY_MAIN_SUBJECTS')}
+          </Typography>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+            {myMainSubjects.map((subject: any) => {
+              // const isHighlighted = mainSubjectIds.has(subject.id);
+              return (
+                <Box
+                  key={subject.id}
+                  sx={{
+                    backgroundColor: 'transparent',
+                    color: 'black',
+                    cursor: 'default !important',
+                    borderRadius: '8px',
+                    padding: '5px 10px',
+                    fontFamily: 'Poppins',
+                    fontWeight: 500,
+                    fontSize: '14px',
+                    lineHeight: '20px',
+                    letterSpacing: '0.1px',
+                    textAlign: 'center',
+                    verticalAlign: 'middle',
+                    border: '1px solid #DADADA',
                   }}
                 >
                   {t(`FORM.${subject.label}`, {

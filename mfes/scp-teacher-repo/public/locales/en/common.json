@@ -334,6 +334,7 @@
     "YEAR_OF_JOINING_SCP": "Year of joining SCP",
     "MAIN_SUBJECT": "My Main Subjects",
     "SUBJECTS_I_TEACH": "Subjects I Teach",
+    "MY_MAIN_SUBJECTS": "My Main Subjects",
     "GENDER": "Gender",
     "UNIT_NAME": "Unit Name",
     "UNIT_CODE": "Unit Code",
@@ -640,7 +641,6 @@
     "MIN_LENGTH_CHARACTERS_ERROR": "Minimum {{minLength}} characters required",
     "MAX_LENGTH_CHARACTERS_ERROR": "Maximum {{maxLength}} characters allowed",
     "NUMBER_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "Numbers and special characters are not allowed",
-
     "ENTER_VALID_MOBILE_NUMBER": "Enter Valid mobile number",
     "ENTER_VALID_EMAIL": "Enter valid Email",
     "ENTER_VALID_YEAR": "Enter valid Year",
@@ -779,7 +779,6 @@
     "USERNAME": "Username",
     "SUBJECTS_I_TEACH": "Subjects I Teach"
   },
-
   "YOUTHNET_USERS_AND_VILLAGES": {
     "MENTORS": "Mentors",
     "CSV": "CSV",
@@ -798,7 +797,6 @@
     "ASSIGN_VILLAGES_FROM_BLOCK": "Assign Villages from Block",
     "ASSIGN_VILLAGES_FROM_BLOCK_INFO": "You can complete this later at your own pace. However, the villages will only be assigned once you click on ‘Finish.’"
   },
-
   "YOUTHNET_CAMP_DETAILS": {
     "SUBMISSION": "Submission",
     "SUMMARY": "Summary"
