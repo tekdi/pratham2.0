@@ -1,4 +1,5 @@
-import React from 'react';
+'use client';
+import React, { useState } from 'react';
 import { Layout, useTranslation } from '@shared-lib';
 import {
   Container,
@@ -14,310 +15,640 @@ import SearchIcon from '@mui/icons-material/Search';
 import FeautureCarousel from '@learner/components/FeautureCarousel';
 import WhatsNewCarousel from '@learner/components/WhatsNewCarousel';
 import MoreWayCarousel from '@learner/components/MoreWayCarousel';
+import KnwoledgeCarousel from '@learner/components/KnwoledgeCarousel';
+import OtherWebsiteCarousel from '@learner/components/OtherWebsiteCarousel';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import useMediaQuery from '@mui/material/useMediaQuery';
+
+const keyThemesList = [
+  [
+    {
+      title: 'Academics',
+
+      desc: 'Math, Science, English...',
+    },
+    {
+      title: 'Growth & Learning',
+
+      desc: 'Activity Videos, Stories, Riddles...',
+    },
+    {
+      title: 'Media Moments',
+
+      desc: 'TV Episodes, Podcasts...',
+    },
+    {
+      title: 'Inclusive Education',
+
+      desc: 'Innovative Strategies, Subject-specific...',
+    },
+  ],
+  [
+    {
+      title: 'Career Skills',
+
+      desc: 'Resume, Interview, Communication...',
+    },
+    {
+      title: 'Entrepreneurship',
+
+      desc: 'Startups, Business Ideas, Finance...',
+    },
+    {
+      title: 'Digital Literacy',
+
+      desc: 'Computers, Internet, Safety...',
+    },
+    {
+      title: 'Professional Growth',
+
+      desc: 'Leadership, Teamwork, Projects...',
+    },
+  ],
+  [
+    {
+      title: 'Life Skills',
+
+      desc: 'Critical Thinking, Problem Solving...',
+    },
+    {
+      title: 'Health & Wellness',
+
+      desc: 'Nutrition, Exercise, Mindfulness...',
+    },
+    {
+      title: 'Civic Awareness',
+      desc: 'Rights, Responsibilities, Community...',
+    },
+    {
+      title: 'Creativity',
+
+      desc: 'Art, Music, Innovation...',
+    },
+  ],
+];
+
 const page = () => {
+  const partners = [
+    { src: '/images/knowledge-one.png', alt: 'UBS' },
+    { src: '/images/knowdlege-two.png', alt: 'Education Above All' },
+    { src: '/images/knowledge-three.png', alt: 'Sulzer' },
+    { src: '/images/knowledge-four.png', alt: 'Schmidt Futures' },
+    { src: '/images/knowledge-five.png', alt: 'Western Digital' },
+    { src: '/images/knowledge-one.png', alt: 'UBS' },
+    { src: '/images/knowdlege-two.png', alt: 'Education Above All' },
+    { src: '/images/knowledge-three.png', alt: 'Sulzer' },
+    { src: '/images/knowledge-four.png', alt: 'Schmidt Futures' },
+    { src: '/images/knowledge-five.png', alt: 'Western Digital' },
+  ];
+  const ourPartners = [
+    { src: '/images/knowdlege-two.png', alt: 'Education Above All' },
+    { src: '/images/knowledge-one.png', alt: 'UBS' },
+    { src: '/images/knowledge-four.png', alt: 'Schmidt Futures' },
+    { src: '/images/knowledge-three.png', alt: 'Sulzer' },
+    { src: '/images/knowledge-one.png', alt: 'UBS' },
+    { src: '/images/knowdlege-two.png', alt: 'Education Above All' },
+    { src: '/images/knowledge-five.png', alt: 'Western Digital' },
+    { src: '/images/knowledge-four.png', alt: 'Schmidt Futures' },
+    { src: '/images/knowledge-five.png', alt: 'Western Digital' },
+    { src: '/images/knowledge-three.png', alt: 'Sulzer' },
+  ];
+  const otherWebsites = [
+    { src: '/images/knowledge-one.png', alt: 'UBS' },
+    { src: '/images/knowdlege-two.png', alt: 'Education Above All' },
+    { src: '/images/knowledge-three.png', alt: 'Sulzer' },
+    { src: '/images/knowledge-four.png', alt: 'Schmidt Futures' },
+  ];
+
+  const [hovered, setHovered] = useState<number | null>(null);
+  const [openAccordion, setOpenAccordion] = useState<number | null>(null);
+  const isMobile = useMediaQuery('(max-width:900px)');
+
   return (
     <Layout onlyHideElements={['footer']}>
-      <Grid container spacing={4}>
-        <Grid item xs={12} md={6}>
-          <img
-            src="/images/home-page-banner.png"
-            alt="Happy children learning together"
-            style={{ width: '100%', height: 'auto' }}
-          />
-        </Grid>
-        <Grid
-          item
-          xs={12}
-          md={6}
-          sx={{
-            '@media (max-width: 900px)': {
-              marginTop: '-90px',
-            },
-          }}
-        >
-          <Box sx={{ p: 3, '@media (max-width: 900px)': { px: '16px' } }}>
-            <Typography
-              variant="h3"
-              component="h1"
-              sx={{
-                fontWeight: 800,
-                fontSize: '72px',
-                lineHeight: '110%',
-                letterSpacing: '0%',
-                color: '#1F1B13',
-                '@media (min-width: 900px)': {
-                  marginLeft: '-120px',
-                },
-                '@media (max-width: 900px)': {
-                  fontSize: '40px',
-                },
-              }}
-            >
-              Pratham
-            </Typography>
-            <Typography
-              variant="h3"
-              component="h1"
-              sx={{
-                fontWeight: 800,
-                fontSize: '72px',
-                lineHeight: '110%',
-                letterSpacing: '0%',
-                color: '#FDBE16',
-                '@media (max-width: 900px)': {
-                  fontSize: '40px',
-                  marginLeft: '60px',
-                },
-              }}
-            >
-              Open School
-            </Typography>
-
-            <Typography
-              variant="h5"
-              component="h2"
-              sx={{
-                my: 2,
-                fontFamily: 'Poppins',
-                fontWeight: 400,
-                fontSize: '28px',
-                lineHeight: '36px',
-                letterSpacing: '0px',
-                color: '#1F1B13',
-                mt: 2,
-                '@media (max-width: 900px)': {
-                  fontSize: '16px',
-                },
-              }}
-            >
-              Opening doors to knowledge and skills
-            </Typography>
-
-            <Box
-              sx={{
-                fontFamily: 'Poppins',
-                fontWeight: 400,
-                fontSize: '22px',
-                lineHeight: '28px',
-                letterSpacing: '0px',
-                color: '#1F1B13',
-                background:
-                  'linear-gradient(87.94deg, #E9A416 -32.81%, #FBCC4C 22.95%, #FDE6AA 77.57%)',
-                display: 'inline-block',
-                padding: '10px 20px',
-                borderRadius: '8px',
-                mt: 1,
-                '@media (max-width: 900px)': {
-                  fontSize: '16px',
-                },
-              }}
-            >
-              In 15 languages
-            </Box>
-
-            <Typography
-              variant="body1"
-              sx={{
-                mb: 3,
-                fontFamily: 'Poppins',
-                fontWeight: 400,
-                fontSize: '18px',
-                lineHeight: '24px',
-                letterSpacing: '0.5px',
-                color: '#1F1B13',
-                mt: 3,
-                '@media (max-width: 900px)': {
-                  fontSize: '16px',
-                },
-              }}
-            >
-              Description about Open School here. A place where learning has no
-              limits. Whether you're here to explore new subjects, revisit past
-              lessons.
-            </Typography>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                bgcolor: '#F5F5F5',
-                borderRadius: '8px',
-                boxShadow: '0px 1px 2px 0px #0000004D',
-                mx: 'auto',
-                mt: 4,
-              }}
-            >
-              <SearchIcon sx={{ color: '#757575', ml: 2, mr: 1 }} />
-              <TextField
-                variant="standard"
-                placeholder="Search.."
-                InputProps={{
-                  disableUnderline: true,
-                  sx: {
-                    fontFamily: 'Poppins',
-                    fontSize: '18px',
-                    pl: 1,
-                    bgcolor: 'transparent',
-                  },
-                }}
-                sx={{ flexGrow: 1, bgcolor: 'transparent' }}
-              />
-              <Button
-                variant="contained"
+      <Box sx={{ background: '#F3F3F3' }}>
+        <Grid container spacing={4}>
+          <Grid item xs={12} md={6}>
+            <img
+              src="/images/home-page-banner.png"
+              alt="Happy children learning together"
+              style={{ width: '100%', height: '568px' }}
+            />
+          </Grid>
+          <Grid
+            item
+            xs={12}
+            md={6}
+            sx={{
+              '@media (max-width: 900px)': {
+                marginTop: '-90px',
+              },
+            }}
+          >
+            <Box sx={{ p: 3, '@media (max-width: 900px)': { px: '16px' } }}>
+              <Typography
+                variant="h3"
+                component="h1"
                 sx={{
-                  bgcolor: '#FDBE16',
+                  fontWeight: 800,
+                  fontSize: '72px',
+                  lineHeight: '110%',
+                  letterSpacing: '0%',
                   color: '#1F1B13',
-                  borderTopLeftRadius: 0,
-                  borderBottomLeftRadius: 0,
-                  borderTopRightRadius: '8px',
-                  borderBottomRightRadius: '8px',
-                  boxShadow: 'none',
-                  px: 4,
-                  py: 1.5,
-                  fontWeight: 600,
-                  fontSize: '16px',
-                  textTransform: 'none',
-                  '&:hover': { bgcolor: '#e9a416' },
+                  '@media (min-width: 900px)': {
+                    marginLeft: '-120px',
+                  },
                   '@media (max-width: 900px)': {
-                    fontSize: '14px',
+                    fontSize: '40px',
                   },
                 }}
               >
-                Search
-              </Button>
-            </Box>
-          </Box>
-        </Grid>
-      </Grid>
+                Pratham
+              </Typography>
+              <Typography
+                variant="h3"
+                component="h1"
+                sx={{
+                  fontWeight: 800,
+                  fontSize: '72px',
+                  lineHeight: '110%',
+                  letterSpacing: '0%',
+                  color: '#FDBE16',
+                  '@media (max-width: 900px)': {
+                    fontSize: '40px',
+                    marginLeft: '60px',
+                  },
+                }}
+              >
+                Open School
+              </Typography>
 
-      <Box
-        sx={{
-          mx: 7,
-          boxShadow: '1px 0px 16px 0px #00000026',
-          backgroundColor: '#F1F2F2',
-          p: '32px',
-          marginTop: '-100px',
-          zIndex: 1000,
-          position: 'relative',
-          '@media (max-width: 900px)': {
-            mx: '16px',
-            marginTop: '20px',
-          },
-        }}
-      >
-        <Typography
-          variant="h4"
-          component="h3"
-          sx={{
-            fontFamily: 'Poppins',
-            fontWeight: 700,
-            fontSize: '36px',
-            lineHeight: '64px',
-            letterSpacing: '-0.25px',
-            color: '#1F1B13',
-            textAlign: 'center',
-            '@media (max-width: 900px)': {
-              fontSize: '22px',
-            },
-          }}
-        >
-          Our Learning Pillars
-        </Typography>
-        <Grid container spacing={4}>
-          {['School', 'Work', 'Life'].map((pillar, index) => (
-            <Grid item xs={12} md={4} key={pillar}>
+              <Typography
+                variant="h5"
+                component="h2"
+                sx={{
+                  my: 2,
+                  fontFamily: 'Poppins',
+                  fontWeight: 400,
+                  fontSize: '28px',
+                  lineHeight: '36px',
+                  letterSpacing: '0px',
+                  color: '#1F1B13',
+                  mt: 2,
+                  '@media (max-width: 900px)': {
+                    fontSize: '16px',
+                  },
+                }}
+              >
+                Opening doors to knowledge and skills
+              </Typography>
+
               <Box
                 sx={{
-                  height: '100%',
-                  marginTop: '20px',
+                  fontFamily: 'Poppins',
+                  fontWeight: 400,
+                  fontSize: '22px',
+                  lineHeight: '28px',
+                  letterSpacing: '0px',
+                  color: '#1F1B13',
+                  background:
+                    'linear-gradient(87.94deg, #E9A416 -32.81%, #FBCC4C 22.95%, #FDE6AA 77.57%)',
+                  display: 'inline-block',
+                  padding: '10px 20px',
+                  borderRadius: '8px',
+                  mt: 1,
+                  '@media (max-width: 900px)': {
+                    fontSize: '16px',
+                  },
                 }}
               >
-                <Box
-                  sx={{
-                    background: `url(/images/pillar-${
-                      index + 1
-                    }.png) no-repeat center center`,
-                    backgroundSize: 'cover',
-                    height: '273px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexDirection: 'column',
-                  }}
-                >
-                  <Box
-                    sx={{
-                      mt: 2,
-                      fontFamily: 'Poppins',
-                      fontWeight: 400,
-                      fontSize: '28px',
-                      lineHeight: '36px',
-                      letterSpacing: '0px',
-                      textAlign: 'center',
-                      color: '#fff',
-                      '@media (max-width: 900px)': {
-                        fontSize: '19px',
-                      },
-                    }}
-                  >
-                    Learning for
-                  </Box>
+                In 15 languages
+              </Box>
 
-                  <Box
-                    sx={{
-                      mt: 1,
-                      fontFamily: 'Poppins',
-                      fontWeight: 700,
-                      fontSize: '45px',
-                      lineHeight: '52px',
-                      letterSpacing: '0px',
-                      textAlign: 'center',
-                      color: '#FDBE16',
-                      '@media (max-width: 900px)': {
-                        fontSize: '31px',
-                      },
-                    }}
-                  >
-                    {pillar}
-                  </Box>
-                </Box>
-                <Box
-                  sx={{
-                    fontFamily: 'Poppins',
-                    fontWeight: 400,
+              <Typography
+                variant="body1"
+                sx={{
+                  mb: 3,
+                  fontFamily: 'Poppins',
+                  fontWeight: 400,
+                  fontSize: '18px',
+                  lineHeight: '24px',
+                  letterSpacing: '0.5px',
+                  color: '#1F1B13',
+                  mt: 3,
+                  '@media (max-width: 900px)': {
                     fontSize: '16px',
-                    lineHeight: '24px',
-                    letterSpacing: '0.5px',
-                    color: '#7C766F',
-                    marginTop: '20px',
+                  },
+                }}
+              >
+                Description about Open School here. A place where learning has
+                no limits. Whether you're here to explore new subjects, revisit
+                past lessons.
+              </Typography>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  bgcolor: '#F5F5F5',
+                  borderRadius: '8px',
+                  boxShadow: '0px 1px 2px 0px #0000004D',
+                  mx: 'auto',
+                  mt: 4,
+                }}
+              >
+                <SearchIcon sx={{ color: '#757575', ml: 2, mr: 1 }} />
+                <TextField
+                  variant="standard"
+                  placeholder="Search.."
+                  InputProps={{
+                    disableUnderline: true,
+                    sx: {
+                      fontFamily: 'Poppins',
+                      fontSize: '18px',
+                      pl: 1,
+                      bgcolor: 'transparent',
+                    },
+                  }}
+                  sx={{ flexGrow: 1, bgcolor: 'transparent' }}
+                />
+                <Button
+                  variant="contained"
+                  sx={{
+                    bgcolor: '#FDBE16',
+                    color: '#1F1B13',
+                    borderTopLeftRadius: 0,
+                    borderBottomLeftRadius: 0,
+                    borderTopRightRadius: '8px',
+                    borderBottomRightRadius: '8px',
+                    boxShadow: 'none',
+                    px: 4,
+                    py: 1.5,
+                    fontWeight: 600,
+                    fontSize: '16px',
+                    textTransform: 'none',
+                    '&:hover': { bgcolor: '#e9a416' },
                     '@media (max-width: 900px)': {
-                      fontSize: '11px',
+                      fontSize: '14px',
                     },
                   }}
                 >
-                  Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut
-                  elit tellus, luctus nec llamcorper mattis, pulvinar dapibus
-                  leo. ullamcorper mattis, pulvinar dapibus leo.
-                </Box>
+                  Search
+                </Button>
               </Box>
-            </Grid>
-          ))}
+            </Box>
+          </Grid>
         </Grid>
-      </Box>
 
-      {/* Total Resources section  */}
-
-      <Box sx={{ marginTop: '50px' }}>
         <Box
           sx={{
+            mx: 7,
+            boxShadow: '1px 0px 16px 0px #00000026',
+            backgroundColor: '#F1F2F2',
+            p: '32px',
+            marginTop: '-60px',
+            zIndex: 1000,
+            position: 'relative',
             '@media (max-width: 900px)': {
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              justifyContent: 'center',
+              mx: '16px',
+              marginTop: '20px',
             },
           }}
         >
+          <Typography
+            variant="h4"
+            component="h3"
+            sx={{
+              fontFamily: 'Poppins',
+              fontWeight: 700,
+              fontSize: '36px',
+              lineHeight: '64px',
+              letterSpacing: '-0.25px',
+              color: '#1F1B13',
+              textAlign: 'center',
+              '@media (max-width: 900px)': {
+                fontSize: '22px',
+              },
+            }}
+          >
+            Our Learning Pillars
+          </Typography>
+          <Grid container spacing={4}>
+            {['School', 'Work', 'Life'].map((pillar, index) => (
+              <Grid
+                item
+                xs={12}
+                md={4}
+                key={pillar}
+                sx={{ position: 'relative', minHeight: 350 }}
+              >
+                <Box
+                  onMouseEnter={() => setHovered(index)}
+                  onMouseLeave={() => setHovered(null)}
+                  sx={{
+                    height: '100%',
+                    marginTop: '20px',
+                    position: 'relative',
+                  }}
+                >
+                  {/* Default Card Content */}
+                  <Box
+                    sx={{
+                      background: `url(/images/pillar-${
+                        index + 1
+                      }.png) no-repeat center center`,
+                      backgroundSize: 'cover',
+                      height: '273px',
+                      '@media (min-width: 900px)': {
+                        display: hovered === index ? 'none' : 'flex',
+                      },
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexDirection: 'column',
+                      borderRadius: '12px',
+                      transition: 'all 0.3s',
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        mt: 2,
+                        fontFamily: 'Poppins',
+                        fontWeight: 400,
+                        fontSize: '28px',
+                        lineHeight: '36px',
+                        letterSpacing: '0px',
+                        textAlign: 'center',
+                        color: '#fff',
+                        '@media (max-width: 900px)': {
+                          fontSize: '19px',
+                        },
+                      }}
+                    >
+                      Learning for
+                    </Box>
+                    <Box
+                      sx={{
+                        mt: 1,
+                        fontFamily: 'Poppins',
+                        fontWeight: 700,
+                        fontSize: '45px',
+                        lineHeight: '52px',
+                        letterSpacing: '0px',
+                        textAlign: 'center',
+                        color: '#FDBE16',
+                        '@media (max-width: 900px)': {
+                          fontSize: '31px',
+                        },
+                      }}
+                    >
+                      {pillar}
+                    </Box>
+                  </Box>
+
+                  {/* Description below the card */}
+                  <Box
+                    sx={{
+                      fontFamily: 'Poppins',
+                      fontWeight: 400,
+                      fontSize: '16px',
+                      lineHeight: '24px',
+                      letterSpacing: '0.5px',
+                      color: '#7C766F',
+                      marginTop: '20px',
+                      '@media (max-width: 900px)': {
+                        fontSize: '11px',
+                      },
+                    }}
+                  >
+                    Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut
+                    elit tellus, luctus nec llamcorper mattis, pulvinar dapibus
+                    leo. ullamcorper mattis, pulvinar dapibus leo.
+                  </Box>
+
+                  {/* MUI Accordion for KEY THEMES on mobile only */}
+                  {isMobile && (
+                    <Accordion
+                      expanded={openAccordion === index}
+                      onChange={() =>
+                        setOpenAccordion(openAccordion === index ? null : index)
+                      }
+                      sx={{
+                        mt: 2,
+                        bgcolor: '#fff',
+                        boxShadow: '0 4px 24px rgba(0,0,0,0.12)',
+                        borderRadius: 2,
+                        width: '100%',
+                        '&:before': { display: 'none' },
+                      }}
+                    >
+                      <AccordionSummary
+                        expandIcon={
+                          <ExpandLessIcon sx={{ color: '#7C766F' }} />
+                        }
+                        aria-controls={`panel${index}-content`}
+                        id={`panel${index}-header`}
+                        sx={{
+                          minHeight: 0,
+                          px: 2,
+                          py: 1,
+                          borderBottom:
+                            openAccordion === index ? '1px solid #eee' : 'none',
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            fontFamily: 'Poppins',
+                            fontWeight: 600,
+                            fontSize: '14px',
+                            color: '#7C766F',
+                            letterSpacing: '1px',
+                          }}
+                        >
+                          KEY THEMES
+                        </Typography>
+                      </AccordionSummary>
+                      <AccordionDetails sx={{ px: 2, pt: 1, pb: 2 }}>
+                        {keyThemesList[index].map((theme) => (
+                          <Box key={theme.title} sx={{ mb: 1 }}>
+                            <Typography
+                              sx={{
+                                fontFamily: 'Poppins',
+                                fontWeight: 700,
+                                fontSize: '18px',
+                                lineHeight: '24px',
+                                color: '#F17B06',
+                              }}
+                            >
+                              {theme.title}
+                            </Typography>
+                            <Typography
+                              sx={{
+                                fontFamily: 'Poppins',
+                                fontWeight: 400,
+                                fontSize: '14px',
+                                lineHeight: '20px',
+                                color: '#635E57',
+                              }}
+                            >
+                              {theme.desc}
+                            </Typography>
+                          </Box>
+                        ))}
+                        <Box
+                          sx={{
+                            mt: 2,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                          }}
+                        >
+                          <Typography
+                            sx={{
+                              fontFamily: 'Poppins',
+                              fontWeight: 500,
+                              fontSize: '18px',
+                              lineHeight: '24px',
+                              color: '#0D599E',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            View All
+                          </Typography>
+                          <ArrowForwardIcon
+                            sx={{
+                              fontSize: '25px',
+                              color: '#0D599E',
+                              cursor: 'pointer',
+                            }}
+                          />
+                        </Box>
+                      </AccordionDetails>
+                    </Accordion>
+                  )}
+                </Box>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
+
+        {/* Total Resources section  */}
+
+        <Box sx={{ marginTop: '50px' }}>
           <Box
+            sx={{
+              '@media (max-width: 900px)': {
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                justifyContent: 'center',
+              },
+            }}
+          >
+            <Box
+              sx={{
+                fontFamily: 'Poppins',
+                fontWeight: 700,
+                fontSize: '46px',
+                lineHeight: '100%',
+                letterSpacing: '-0.25px',
+                textAlign: 'center',
+                color: '#1F1B13',
+                '@media (max-width: 900px)': {
+                  fontSize: '24px',
+                },
+              }}
+            >
+              3524
+            </Box>
+            <Box
+              sx={{
+                fontFamily: 'Poppins',
+                fontWeight: 400,
+                fontSize: '24px',
+                lineHeight: '32px',
+                letterSpacing: '0px',
+                textAlign: 'center',
+                color: '#1F1B13',
+                mt: 1.5,
+                '@media (max-width: 900px)': {
+                  mt: 0,
+                },
+              }}
+            >
+              Total Resources
+            </Box>
+          </Box>
+
+          {/* Resource Stats Section */}
+          <Container>
+            <Grid
+              container
+              spacing={2}
+              justifyContent="center"
+              alignItems="center"
+              sx={{ mt: 2, mb: 2 }}
+            >
+              {[
+                { value: 230, label: 'Videos' },
+                { value: 1700, label: 'Stories' },
+                { value: 512, label: 'Games' },
+                { value: 781, label: 'Audios' },
+                { value: 562, label: 'Other Formats' },
+                { value: 15, label: 'Languages' },
+              ].map((item, idx) => (
+                <Grid
+                  item
+                  xs={6}
+                  sm={6}
+                  md={4}
+                  lg={2}
+                  key={item.label}
+                  sx={{ textAlign: 'center' }}
+                >
+                  <Typography
+                    sx={{
+                      fontFamily: 'Poppins',
+                      fontWeight: 700,
+                      fontSize: '36px',
+                      lineHeight: '44px',
+                      letterSpacing: '0px',
+                      textAlign: 'center',
+                      color: '#F17B06',
+                      '@media (max-width: 900px)': {
+                        fontSize: '24px',
+                      },
+                    }}
+                  >
+                    {item.value}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontFamily: 'Poppins',
+                      fontWeight: 400,
+                      fontSize: '24px',
+                      lineHeight: '32px',
+                      letterSpacing: '0px',
+                      textAlign: 'center',
+                      color: '#1F1B13',
+                      '@media (max-width: 900px)': {
+                        fontSize: '16px',
+                      },
+                    }}
+                  >
+                    {item.label}
+                  </Typography>
+                </Grid>
+              ))}
+            </Grid>
+          </Container>
+        </Box>
+        {/* Featured Gallery section  */}
+
+        <Box>
+          <Typography
             sx={{
               fontFamily: 'Poppins',
               fontWeight: 700,
@@ -325,184 +656,176 @@ const page = () => {
               lineHeight: '100%',
               letterSpacing: '-0.25px',
               textAlign: 'center',
-              color: '#1F1B13',
-              '@media (max-width: 900px)': {
-                fontSize: '24px',
-              },
+              mt: 5,
             }}
           >
-            3524
-          </Box>
+            Featured Gallery
+          </Typography>
+
           <Box
             sx={{
-              fontFamily: 'Poppins',
-              fontWeight: 400,
-              fontSize: '24px',
-              lineHeight: '32px',
-              letterSpacing: '0px',
-              textAlign: 'center',
-              color: '#1F1B13',
-              mt: 1.5,
-              '@media (max-width: 900px)': {
-                mt: 0,
-              },
+              mt: 1,
             }}
           >
-            Total Resources
+            <FeautureCarousel />
           </Box>
         </Box>
 
-        {/* Resource Stats Section */}
-        <Container>
-          <Grid
-            container
-            spacing={2}
-            justifyContent="center"
-            alignItems="center"
-            sx={{ mt: 2, mb: 2 }}
+        {/* What's New */}
+        <Box>
+          <Typography
+            sx={{
+              fontFamily: 'Poppins',
+              fontWeight: 700,
+              fontSize: '36px',
+              lineHeight: '44px',
+              letterSpacing: '0px',
+              textAlign: 'center',
+              mt: 4,
+            }}
           >
-            {[
-              { value: 230, label: 'Videos' },
-              { value: 1700, label: 'Stories' },
-              { value: 512, label: 'Games' },
-              { value: 781, label: 'Audios' },
-              { value: 562, label: 'Other Formats' },
-              { value: 15, label: 'Languages' },
-            ].map((item, idx) => (
-              <Grid
-                item
-                xs={6}
-                sm={6}
-                md={4}
-                lg={2}
-                key={item.label}
-                sx={{ textAlign: 'center' }}
-              >
-                <Typography
-                  sx={{
-                    fontFamily: 'Poppins',
-                    fontWeight: 700,
-                    fontSize: '36px',
-                    lineHeight: '44px',
-                    letterSpacing: '0px',
-                    textAlign: 'center',
-                    color: '#F17B06',
-                    '@media (max-width: 900px)': {
-                      fontSize: '24px',
-                    },
-                  }}
-                >
-                  {item.value}
-                </Typography>
-                <Typography
-                  sx={{
-                    fontFamily: 'Poppins',
-                    fontWeight: 400,
-                    fontSize: '24px',
-                    lineHeight: '32px',
-                    letterSpacing: '0px',
-                    textAlign: 'center',
-                    color: '#1F1B13',
-                    '@media (max-width: 900px)': {
-                      fontSize: '16px',
-                    },
-                  }}
-                >
-                  {item.label}
-                </Typography>
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </Box>
-      {/* Featured Gallery section  */}
+            What's New
+          </Typography>
 
-      <Box>
-        <Typography
+          <Box>
+            <WhatsNewCarousel />
+          </Box>
+
+          {/* More way to Learn */}
+        </Box>
+        <Box
           sx={{
-            fontFamily: 'Poppins',
-            fontWeight: 700,
-            fontSize: '46px',
-            lineHeight: '100%',
-            letterSpacing: '-0.25px',
-            textAlign: 'center',
-            mt: 5,
+            mt: 8,
+            mx: 7,
+            '@media (max-width: 900px)': {
+              mx: '16px',
+            },
           }}
         >
-          Featured Gallery
-        </Typography>
+          <Grid container spacing={2} sx={{ alignItems: 'center' }}>
+            <Grid item xs={12} md={6}>
+              <Typography
+                sx={{
+                  fontFamily: 'Poppins',
+                  fontWeight: 700,
+                  fontSize: '36px',
+                  lineHeight: '44px',
+                  letterSpacing: '0px',
+                  color: '#1F1B13',
+                  '@media (max-width: 900px)': {
+                    fontSize: '22px',
+                    lineHeight: '30px',
+                    textAlign: 'center',
+                  },
+                }}
+              >
+                More Ways to Learn – Check Out Our Products!
+              </Typography>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <MoreWayCarousel />
+            </Grid>
+          </Grid>
+        </Box>
 
         <Box
           sx={{
-            mt: 1,
+            mt: 7,
+            mx: 7,
+            '@media (max-width: 900px)': {
+              mx: '16px',
+            },
           }}
         >
-          <FeautureCarousel />
-        </Box>
-      </Box>
+          <Typography
+            sx={{
+              fontFamily: 'Poppins',
+              fontWeight: 700,
+              fontSize: '36px',
+              lineHeight: '44px',
+              letterSpacing: '0px',
+              textAlign: 'center',
+              color: '#1F1B13',
+              '@media (max-width: 900px)': {
+                fontSize: '22px',
+              },
+            }}
+          >
+            Knowledge Partners
+          </Typography>
 
-      {/* What’s New */}
-      <Box>
-        <Typography
+          <Container maxWidth="xl">
+            <Box sx={{ mt: 3 }}>
+              <KnwoledgeCarousel images={partners} />
+            </Box>
+          </Container>
+        </Box>
+
+        <Box
           sx={{
-            fontFamily: 'Poppins',
-            fontWeight: 700,
-            fontSize: '36px',
-            lineHeight: '44px',
-            letterSpacing: '0px',
-            textAlign: 'center',
-            mt: 4,
+            mt: 7,
+            mx: 7,
+            '@media (max-width: 900px)': {
+              mx: '16px',
+            },
           }}
         >
-          What’s New
-        </Typography>
+          <Typography
+            sx={{
+              fontFamily: 'Poppins',
+              fontWeight: 700,
+              fontSize: '36px',
+              lineHeight: '44px',
+              letterSpacing: '0px',
+              textAlign: 'center',
+              color: '#1F1B13',
+              '@media (max-width: 900px)': {
+                fontSize: '22px',
+              },
+            }}
+          >
+            Our Partners
+          </Typography>
 
-        <Box>
-          <WhatsNewCarousel />
+          <Container maxWidth="xl">
+            <Box sx={{ mt: 3 }}>
+              <KnwoledgeCarousel images={ourPartners} />
+            </Box>
+          </Container>
         </Box>
 
-        {/* More way to Learn */}
-      </Box>
-      <Box
-        sx={{
-          mt: 8,
-          mx: 7,
-          '@media (max-width: 900px)': {
-            mx: '16px',
-          },
-        }}
-      >
-        <Grid container spacing={2} sx={{ alignItems: 'center' }}>
-          <Grid item xs={12} md={6}>
-            <Typography
-              sx={{
-                fontFamily: 'Poppins',
-                fontWeight: 700,
-                fontSize: '36px',
-                lineHeight: '44px',
-                letterSpacing: '0px',
-                color: '#1F1B13',
-              }}
-            >
-              More Ways to Learn – Check Out Our Products!
-            </Typography>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <MoreWayCarousel />
-          </Grid>
-        </Grid>
-      </Box>
+        <Box
+          sx={{
+            mt: 7,
+            mx: 7,
+            '@media (max-width: 900px)': {
+              mx: '16px',
+            },
+          }}
+        >
+          <Typography
+            sx={{
+              fontFamily: 'Poppins',
+              fontWeight: 700,
+              fontSize: '36px',
+              lineHeight: '44px',
+              letterSpacing: '0px',
+              textAlign: 'center',
+              color: '#1F1B13',
+              '@media (max-width: 900px)': {
+                fontSize: '22px',
+              },
+            }}
+          >
+            Other Websites
+          </Typography>
 
-      <Box
-        sx={{
-          mt: 8,
-          mx: 7,
-        }}
-      >
-        <Typography>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut tellus,
-          luctus nec ullamcorper mattis, pulvinar dapibus leo.
-        </Typography>
+          <Container maxWidth="xl">
+            <Box sx={{ mt: 3 }}>
+              <OtherWebsiteCarousel images={otherWebsites} />
+            </Box>
+          </Container>
+        </Box>
       </Box>
     </Layout>
   );

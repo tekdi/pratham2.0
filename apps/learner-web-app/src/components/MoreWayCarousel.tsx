@@ -89,12 +89,13 @@ const MoreWayCarousel = () => {
                     </Typography>
                   </Box>
 
+                  {/* Only show on desktop */}
                   <Box
                     sx={{
                       py: 2,
                       background: '#FFFFFF',
                       px: '36px',
-                      display: 'flex',
+                      display: { xs: 'none', md: 'flex' },
                       alignItems: 'center',
                       gap: 2,
                       height: 76,
@@ -133,6 +134,7 @@ const MoreWayCarousel = () => {
                     minHeight: 240,
                     height: '100%',
                     pt: 2,
+                    flexDirection: 'column',
                   }}
                 >
                   <Box
@@ -146,6 +148,41 @@ const MoreWayCarousel = () => {
                       objectFit: 'contain',
                     }}
                   />
+                  {/* Only show on mobile */}
+                  <Box
+                    sx={{
+                      py: 2,
+                      background: '#FFFFFF',
+                      px: '36px',
+                      display: { xs: 'flex', md: 'none' },
+                      alignItems: 'center',
+                      gap: 2,
+                      height: 76,
+                      justifyContent: 'center',
+                      mt: 2,
+                      width: '100%',
+                    }}
+                  >
+                    <img src="/images/playstoreIcon.png" alt="Play Store" />
+                    <Button
+                      href="https://play.google.com/store"
+                      target="_blank"
+                      endIcon={<ArrowForwardIcon />}
+                      sx={{
+                        color: '#0D599E',
+                        fontFamily: 'Poppins',
+                        fontWeight: 500,
+                        fontSize: 18,
+                        lineHeight: '24px',
+                        letterSpacing: 0.15,
+                        '@media (max-width: 900px)': {
+                          fontSize: '16px',
+                        },
+                      }}
+                    >
+                      Get it from Play Store Now!
+                    </Button>
+                  </Box>
                 </Box>
               </Grid>
             </Grid>
@@ -194,13 +231,14 @@ const MoreWayCarousel = () => {
           },
         }}
       />
+      {/* Desktop navigation (left side) */}
       <Box
         sx={{
           position: 'absolute',
-          left: -32,
+          left: -20,
           top: '50%',
           transform: 'translateY(-50%)',
-          display: 'flex',
+          display: { xs: 'none', md: 'flex' },
           flexDirection: 'column',
           zIndex: 2,
         }}
@@ -210,8 +248,8 @@ const MoreWayCarousel = () => {
           aria-label="Previous"
           sx={{
             background: '#fff',
-            width: 56,
-            height: 56,
+            width: 40,
+            height: 40,
             boxShadow: '0px 4px 16px 0px #0000001A',
             mb: 1,
             '&:hover': { background: '#f5f5f5' },
@@ -226,10 +264,58 @@ const MoreWayCarousel = () => {
           aria-label="Next"
           sx={{
             background: '#fff',
-            width: 56,
-            height: 56,
+            width: 40,
+            height: 40,
             boxShadow: '0px 4px 16px 0px #0000001A',
             mt: 1,
+            '&:hover': { background: '#f5f5f5' },
+          }}
+        >
+          <ChevronLeftIcon
+            sx={{
+              color: '#222',
+              fontSize: 32,
+              fontWeight: 900,
+              transform: 'rotate(180deg)',
+            }}
+          />
+        </IconButton>
+      </Box>
+      {/* Mobile navigation (bottom center) */}
+      <Box
+        sx={{
+          display: { xs: 'flex', md: 'none' },
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: 3,
+          mt: '-62px',
+          position: 'relative',
+          zIndex: 2,
+        }}
+      >
+        <IconButton
+          className="moreway-swiper-prev"
+          aria-label="Previous"
+          sx={{
+            background: '#fff',
+            width: 40,
+            height: 40,
+            boxShadow: '0px 4px 16px 0px #0000001A',
+            '&:hover': { background: '#f5f5f5' },
+          }}
+        >
+          <ChevronLeftIcon
+            sx={{ color: '#222', fontSize: 32, fontWeight: 900 }}
+          />
+        </IconButton>
+        <IconButton
+          className="moreway-swiper-next"
+          aria-label="Next"
+          sx={{
+            background: '#fff',
+            width: 40,
+            height: 40,
+            boxShadow: '0px 4px 16px 0px #0000001A',
             '&:hover': { background: '#f5f5f5' },
           }}
         >
