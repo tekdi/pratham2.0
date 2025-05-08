@@ -96,10 +96,14 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
       category: 'Dashboard',
       label: 'Logout Clicked',
     });
-    const token = localStorage.getItem('token');
 
-    const tenantid = localStorage.getItem('tenantId');
-    const deviceID = localStorage.getItem('deviceID');
+    const token =
+      typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const tenantid =
+      typeof window !== 'undefined' ? localStorage.getItem('tenantId') : null;
+    const deviceID =
+      typeof window !== 'undefined' ? localStorage.getItem('deviceID') : null;
+
     const windowUrl = window.location.pathname;
     const cleanedUrl = windowUrl.replace(/^\//, '');
     const env = cleanedUrl.split('/')[0];
