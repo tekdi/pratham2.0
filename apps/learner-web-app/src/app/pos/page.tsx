@@ -13,6 +13,7 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import FeautureCarousel from '@learner/components/FeautureCarousel';
 import WhatsNewCarousel from '@learner/components/WhatsNewCarousel';
+import MoreWayCarousel from '@learner/components/MoreWayCarousel';
 const page = () => {
   return (
     <Layout onlyHideElements={['footer']}>
@@ -450,7 +451,7 @@ const page = () => {
             lineHeight: '44px',
             letterSpacing: '0px',
             textAlign: 'center',
-            mt: 5,
+            mt: 4,
           }}
         >
           What’s New
@@ -459,6 +460,49 @@ const page = () => {
         <Box>
           <WhatsNewCarousel />
         </Box>
+
+        {/* More way to Learn */}
+      </Box>
+      <Box
+        sx={{
+          mt: 8,
+          mx: 7,
+          '@media (max-width: 900px)': {
+            mx: '16px',
+          },
+        }}
+      >
+        <Grid container spacing={2} sx={{ alignItems: 'center' }}>
+          <Grid item xs={12} md={6}>
+            <Typography
+              sx={{
+                fontFamily: 'Poppins',
+                fontWeight: 700,
+                fontSize: '36px',
+                lineHeight: '44px',
+                letterSpacing: '0px',
+                color: '#1F1B13',
+              }}
+            >
+              More Ways to Learn – Check Out Our Products!
+            </Typography>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <MoreWayCarousel />
+          </Grid>
+        </Grid>
+      </Box>
+
+      <Box
+        sx={{
+          mt: 8,
+          mx: 7,
+        }}
+      >
+        <Typography>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut tellus,
+          luctus nec ullamcorper mattis, pulvinar dapibus leo.
+        </Typography>
       </Box>
     </Layout>
   );
