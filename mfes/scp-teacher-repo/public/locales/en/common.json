@@ -174,9 +174,10 @@
     "BATCHES": "Batches",
     "BATCH_SESSIONS": "Batch Sessions",
     "NOT_ABLE_CREATE_LEARNER": "Not able to create learner",
-    "NOT_ABLE_CREATE_FACILITATOR": "Not Able To Create Teacher",
+    "NOT_ABLE_CREATE_FACILITATOR": "Not Able To Create Facilitator",
     "NEW_BATCH": "New Batch",
-    "REASSIGN_BATCH": "Re-assign Batch"
+    "REASSIGN_BATCH": "Re-assign Batch",
+    "NOT_ABLE_UPDATE_FACILITATOR": "Not Able To Update Facilitator"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -811,7 +812,10 @@
   },
   "FACILITATORS": {
     "NEW_FACILITATOR": "New Facilitators",
-    "RE_ASSIGN_FACILITATOR": "Re-assign Facilitator"
+    "RE_ASSIGN_FACILITATOR": "Re-assign Facilitator",
+    "FACILITATOR_UPDATED_SUCCESSFULLY": "Facilitator updated successfully",
+    "FACILITATOR_CREATED_SUCCESSFULLY": "Facilitator created successfully",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "User credentials will be sent soon"
   },
   "MENTOR": {
     "BACK_TO_FORM": "Back to Form",

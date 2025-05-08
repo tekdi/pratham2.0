@@ -1,6 +1,6 @@
 'use-client';
 import React, { useEffect, useState } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@mui/material/styles';
 import Header from '../../components/Header';
@@ -11,12 +11,17 @@ import Profile from '@/components/Profile';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { GetStaticPaths } from 'next';
 import { toPascalCase } from '@/utils/Helper';
+import useStore from '@/store/store';
+import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
+import FacilitatorManage from '@/shared/FacilitatorManage/FacilitatorManage';
 
 const UserId = () => {
   const { t } = useTranslation();
   const theme = useTheme<any>();
   const router = useRouter();
   const { userId } = router.query;
+  const store = useStore();
+  const isActiveYear = store.isActiveYearSelected;
 
   const [user, setUser] = React.useState<{
     userRole: string | null;
@@ -55,6 +60,9 @@ const UserId = () => {
     subjectsITeach: [],
     myMainSubjects: [],
   });
+  const [openProfileEditModal, setOpenProfileEditModal] = React.useState(false);
+  const [userData, setUserData] = useState<any>({});
+  const [isSelfProfile, setIsSelfProfile] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -65,9 +73,12 @@ const UserId = () => {
 
       if (userId === storedUserId) {
         userData = JSON.parse(localStorage.getItem('userData') || '{}');
+        setIsSelfProfile(true);
       } else if (userId) {
         const data = await getUserDetails(userId, true);
         userData = data?.result.userData || {};
+        setUserData(userData);
+        setIsSelfProfile(false);
       }
 
       if (userData) {
@@ -100,6 +111,14 @@ const UserId = () => {
     fetchData();
   }, [userId]);
 
+  const handleOpenProfileEditModal = () => {
+    setOpenProfileEditModal(true);
+  };
+
+  const handleCloseProfileEditModal = () => {
+    setOpenProfileEditModal(false);
+  };
+
   return (
     <>
       <Box minHeight="100vh">
@@ -129,15 +148,14 @@ const UserId = () => {
                 }}
               >
                 {toPascalCase(`${user.firstName} ${user.lastName}` || '')}
-                
               </Box>
-                {(user.village || user.block || user.district || user.state) && (
+              {(user.village || user.block || user.district || user.state) && (
                 <Box
                   sx={{
-                  fontWeight: 500,
-                  fontSize: '12px',
-                  lineHeight: '16px',
-                  letterSpacing: '0.5px',
+                    fontWeight: 500,
+                    fontSize: '12px',
+                    lineHeight: '16px',
+                    letterSpacing: '0.5px',
                   }}
                 >
                   {user.state && `${user.state}, `}
@@ -145,7 +163,7 @@ const UserId = () => {
                   {user.block && `${user.block}, `}
                   {user.village && `${user.village} `}
                 </Box>
-                )}
+              )}
             </Box>
           </Box>
         </Box>
@@ -166,6 +184,41 @@ const UserId = () => {
           >
             {t('SCP_PROFILE.PROFILE_DETAILS')}
           </Typography>
+          {isActiveYear && !isSelfProfile && (
+            <Button
+              sx={{
+                fontSize: '14px',
+                lineHeight: '20px',
+                minWidth: 'fit-content',
+                padding: '10px 24px 10px 16px',
+                gap: '8px',
+                borderRadius: '100px',
+                marginTop: '10px',
+                flex: '1',
+                textAlign: 'center',
+                color: theme.palette.warning.A200,
+                border: `1px solid #4D4639`,
+              }}
+              onClick={handleOpenProfileEditModal}
+            >
+              <Typography
+                variant="h3"
+                style={{
+                  letterSpacing: '0.1px',
+                  textAlign: 'left',
+                  marginBottom: '2px',
+                }}
+                fontSize={'14px'}
+                fontWeight={'500'}
+                lineHeight={'20px'}
+              >
+                {t('PROFILE.EDIT_PROFILE')}
+              </Typography>
+              <Box>
+                <CreateOutlinedIcon sx={{ fontSize: '14px' }} />
+              </Box>
+            </Button>
+          )}
           <Profile
             fullName={`${user.firstName} ${user.lastName}` || ''}
             emailId={user.email || '-'}
@@ -186,6 +239,18 @@ const UserId = () => {
             subjectsITeach={user.subjectsITeach}
             myMainSubjects={user.myMainSubjects}
           />
+          {openProfileEditModal && (
+            <div>
+              <FacilitatorManage
+                open={openProfileEditModal}
+                onClose={handleCloseProfileEditModal}
+                isReassign={false}
+                isEdit={true}
+                reassignuserId={userId}
+                selectedUserData={userData}
+              />
+            </div>
+          )}
         </Box>
       </Box>
     </>
