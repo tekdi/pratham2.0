@@ -20,6 +20,7 @@ import { useRouter } from 'next/router';
 import { Role } from '@/utils/app.constant';
 import { getCohortDetails } from '@/services/CohortServices';
 import { usePathname } from 'next/navigation';
+
 const SessionsCard: React.FC<SessionsCardProps> = ({
   data,
   showCenterName = false,
@@ -198,7 +199,14 @@ const SessionsCard: React.FC<SessionsCardProps> = ({
       case EventStatus.UPCOMING:
         return <CircleTwoToneIcon sx={{ color: 'grey' }} />;
       case EventStatus.LIVE:
-        return <SensorsTwoToneIcon sx={{ color: 'red' }} />;
+        return (
+          <img
+            src="/scp-teacher-repo/images/live-classes.gif"
+            alt="Live Icon"
+            style={{ width: 24, height: 24 }}
+          />
+        );
+
       case EventStatus.PASSED:
         return <CheckCircleTwoToneIcon sx={{ color: 'green' }} />;
       default:

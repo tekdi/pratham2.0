@@ -1184,3 +1184,10 @@ export const fetchUserData = async (userId: any) => {
     return null;
   }
 };
+export const getInitials = (name: any) => {
+  if (!name) return ''; // Handle empty input
+  const words = name?.trim().split(' ');
+  return words?.length > 1
+    ? words[0][0].toUpperCase() + words[1][0].toUpperCase()
+    : words[0][0].toUpperCase();
+};

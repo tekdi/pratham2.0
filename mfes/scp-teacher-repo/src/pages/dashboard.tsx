@@ -953,7 +953,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
                               '@media (max-width: 900px)': {
                                 position: 'absolute',
                                 top:
-                                  role === Role.TEAM_LEADER ? '55px' : '60px',
+                                  role === Role.TEAM_LEADER ? '115px' : '115px',
                                 right: '20px',
                               },
                             }}
