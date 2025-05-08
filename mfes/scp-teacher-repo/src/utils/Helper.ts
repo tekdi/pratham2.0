@@ -958,8 +958,10 @@ export const getUserFullName = (user?: {
   if (user) {
     userData = user;
   } else {
-    userData = localStorage.getItem('userData');
-    userData = JSON.parse(userData || '{}');
+    if (typeof window !== 'undefined' && window.localStorage) {
+      userData = localStorage.getItem('userData');
+      userData = JSON.parse(userData || '{}');
+    }
   }
 
   if (userData?.firstName) {
