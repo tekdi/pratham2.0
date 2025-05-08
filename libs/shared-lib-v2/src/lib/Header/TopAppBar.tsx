@@ -10,16 +10,20 @@ import {
   Select,
   MenuItem as MuiMenuItem,
   useTheme,
+  Menu,
+  MenuItem,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { CommonDrawer } from '../Drawer/CommonDrawer';
 import type { DrawerItemProp } from '../Drawer/CommonDrawer';
+import { ChevronRight } from '@mui/icons-material';
 
 interface NewDrawerItemProp extends DrawerItemProp {
   variant?: 'contained' | 'text';
   isActive?: boolean;
   customStyle?: React.CSSProperties;
+  child?: NewDrawerItemProp[];
 }
 export interface AppBarProps {
   title?: string;
@@ -127,6 +131,16 @@ const DesktopBar = ({
   _navLinkBox,
   _brand,
 }: AppBarProps) => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <Box
       sx={{
@@ -146,19 +160,28 @@ const DesktopBar = ({
           ..._navLinkBox,
         }}
       >
-        {navLinks.map((link, index) => {
-          return (
+        {navLinks.map((link, index) => (
+          <Box key={index}>
+            {link?.icon && (
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  mr: 1,
+                }}
+              >
+                {link.icon}
+              </Box>
+            )}
             <Button
-              key={index}
               component={typeof link.to === 'string' ? 'a' : 'button'}
               href={typeof link.to === 'string' ? link.to : undefined}
-              // @ts-ignore
               variant={
                 link.isActive
                   ? 'top-bar-link-button'
                   : link.variant ?? 'top-bar-link-text'
               }
-              startIcon={link?.icon && link.icon}
               onClick={
                 typeof link.to !== 'string'
                   ? (link.to as (
@@ -171,8 +194,71 @@ const DesktopBar = ({
             >
               {link.title}
             </Button>
-          );
-        })}
+            {link.child && (
+              <ChevronRight
+                component="span"
+                sx={{
+                  fontSize: 20,
+                  ml: 1,
+                  cursor: 'pointer',
+                }}
+                onClick={handleMenuOpen}
+              />
+            )}
+            {link.child && (
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+                MenuListProps={{
+                  onMouseLeave: handleMenuClose,
+                  sx: {
+                    display: 'flex',
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
+                    '& .MuiMenuItem-root': {
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      width: 'min-content',
+                      '&:not(:last-child)': {
+                        marginRight: 2,
+                      },
+                      '&[style*="max-width"]': {
+                        width: '100%',
+                        maxWidth: '100vw',
+                        marginRight: 0,
+                      },
+                    },
+                  },
+                }}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'right',
+                }}
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+              >
+                {link.child.map((childLink: any, childIndex) => (
+                  <MenuItem
+                    key={childIndex}
+                    onClick={() => {
+                      handleMenuClose();
+                      childLink?.to();
+                    }}
+                    style={{
+                      maxWidth: childLink.title.length > 100 ? '100wh' : '',
+                    }}
+                  >
+                    {childLink.title}
+                  </MenuItem>
+                ))}
+              </Menu>
+            )}
+          </Box>
+        ))}
 
         {(rightComponent || isShowLang) && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>

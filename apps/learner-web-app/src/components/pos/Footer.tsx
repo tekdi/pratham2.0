@@ -145,7 +145,7 @@ export const Footer: React.FC = () => {
             <IconButton
               aria-label="Facebook"
               component={Link}
-              href="https://www.facebook.com/PrathamDigital"
+              href="https://www.facebook.com/PrathamEducationFoundation"
               target="_blank"
               rel="noopener noreferrer"
               sx={{ color: '#3b5998' }} // Facebook color
@@ -155,7 +155,7 @@ export const Footer: React.FC = () => {
             <IconButton
               aria-label="Twitter"
               component={Link}
-              href="https://twitter.com/PrathamDigital"
+              href="https://x.com/Pratham_India"
               target="_blank"
               rel="noopener noreferrer"
               sx={{ color: '#1DA1F2' }} // Twitter color
@@ -165,7 +165,7 @@ export const Footer: React.FC = () => {
             <IconButton
               aria-label="Instagram"
               component={Link}
-              href="https://www.instagram.com/PrathamDigital"
+              href="https://www.instagram.com/prathameducation?igsh=MWM3aXJoeTZoYzNxNg%3D%3D&utm_source=qr"
               target="_blank"
               rel="noopener noreferrer"
               sx={{ color: '#E4405F' }} // Instagram color
@@ -175,7 +175,7 @@ export const Footer: React.FC = () => {
             <IconButton
               aria-label="LinkedIn"
               component={Link}
-              href="https://www.linkedin.com/company/pratham-digital/"
+              href="https://www.linkedin.com/company/pratham/"
               target="_blank"
               rel="noopener noreferrer"
               sx={{ color: '#0077B5' }} // LinkedIn color
@@ -185,7 +185,7 @@ export const Footer: React.FC = () => {
             <IconButton
               aria-label="YouTube"
               component={Link}
-              href="https://www.youtube.com/prathamdigital"
+              href="http://www.youtube.com/@PrathamEducationFoundation"
               target="_blank"
               rel="noopener noreferrer"
               sx={{ color: '#FF0000' }} // YouTube color
@@ -195,12 +195,13 @@ export const Footer: React.FC = () => {
           </Box>
         </Box>
       </Box>
-
-      <Typography variant="body1" gutterBottom>
-        {t(
-          'All resources on the website are licensed under a CC BY-NC-ND 4.0 International License © Pratham Open School | Terms and Conditions'
-        )}
-      </Typography>
+      <Box sx={{ backgroundColor: 'white' }}>
+        <Typography variant="body1" gutterBottom>
+          {t(
+            'All resources on the website are licensed under a CC BY-NC-ND 4.0 International License © Pratham Open School | Terms and Conditions'
+          )}
+        </Typography>
+      </Box>
     </Box>
   );
 };

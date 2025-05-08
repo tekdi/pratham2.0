@@ -4,18 +4,19 @@ import { useTranslation, FilterForm } from '@shared-lib';
 
 const FilterComponent: React.FC<{
   filterState: any;
+  staticFilter?: object;
   handleFilterChange: (newFilterState: any) => void;
-}> = ({ filterState, handleFilterChange }) => {
+}> = ({ filterState, staticFilter, handleFilterChange }) => {
   const { t } = useTranslation();
   const [filterCount, setFilterCount] = useState<any>();
 
   useEffect(() => {
     setFilterCount(
       Object?.keys(filterState.filters || {}).filter(
-        (e) => e?.toString() != 'limit'
+        (e) => !['limit', ...Object.keys(staticFilter ?? {})].includes(e)
       ).length
     );
-  }, [filterState]);
+  }, [filterState, staticFilter]);
 
   const memoizedFilterForm = useMemo(
     () => (
@@ -29,13 +30,11 @@ const FilterComponent: React.FC<{
           handleFilterChange(newFilterState);
         }}
         orginalFormData={filterState?.filters || {}}
-        parentStaticFormData={filterState?.filters || {}}
-        // staticFilter={[{ domain: ['Learning for school'] }]}
+        staticFilter={staticFilter}
       />
     ),
-    [handleFilterChange, filterState]
+    [handleFilterChange, staticFilter, filterState]
   );
-
   return (
     <Box
       sx={{

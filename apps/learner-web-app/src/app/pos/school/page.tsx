@@ -39,7 +39,9 @@ export default function PosSchoolsPage() {
       />
       <Grid container>
         <Grid item xs={12}>
-          <LearnerCourse />
+          <LearnerCourse
+            _content={{ staticFilter: { se_domains: ['Learning for School'] } }}
+          />
         </Grid>
       </Grid>
     </Layout>

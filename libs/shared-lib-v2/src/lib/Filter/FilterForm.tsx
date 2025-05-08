@@ -11,7 +11,7 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Divider,
+  Chip,
 } from '@mui/material';
 import { useTranslation } from '../context/LanguageContext';
 import { filterContent, staticFilterContent } from '../../utils/AuthService';
@@ -38,24 +38,24 @@ export interface StaticField {
   fields?: { sourceCategory?: string; name?: string }[];
 }
 
+interface FilterSectionProps {
+  fields: any[];
+  selectedValues: Record<string, any[]>;
+  onChange: (code: string, next: any[]) => void;
+  showMore: boolean;
+  setShowMore: (b: boolean) => void;
+  repleaseCode?: string;
+  staticFormData?: Record<string, object> | undefined;
+}
+
 interface FilterListProps {
-  setParentFormData?: (d: any) => void;
-  setParentStaticFormData?: (d: any) => void;
-  parentStaticFormData?: any;
-  setOrginalFormData?: (d: any) => void;
   orginalFormData: any;
-  setIsDrawerOpen?: (b: boolean) => void;
-  staticFilter?: any;
+  staticFilter?: Record<string, object> | undefined;
   onApply?: any;
 }
 
 export function FilterForm({
-  setParentFormData,
-  setParentStaticFormData,
-  parentStaticFormData,
-  setOrginalFormData,
   orginalFormData,
-  setIsDrawerOpen,
   staticFilter,
   onApply,
 }: FilterListProps) {
@@ -65,15 +65,11 @@ export function FilterForm({
   const [renderForm, setRenderForm] = useState<Category[]>([]);
   const [renderStaticForm, setRenderStaticForm] = useState<StaticField[]>([]);
   const [formData, setFormData] = useState<Record<string, TermOption[]>>({});
-  const [staticFormData, setStaticFormData] = useState<
-    Record<string, string[]>
-  >(parentStaticFormData || {});
   const [loading, setLoading] = useState(true);
   const [showMore, setShowMore] = useState(false);
   const [showMoreStatic, setShowMoreStatic] = useState(false);
 
   const fetchData = useCallback(async () => {
-    setLoading(true);
     const instantId = localStorage.getItem('collectionFramework') ?? '';
     const data = await filterContent({ instantId });
     const categories = data?.framework?.categories || [];
@@ -105,22 +101,16 @@ export function FilterForm({
       transformedRenderForm.map((r) => r.name)
     );
     setRenderStaticForm(filtered[0]?.fields || []);
-    setStaticFormData(parentStaticFormData || {});
     setLoading(false);
-  }, [orginalFormData, parentStaticFormData]);
+  }, [orginalFormData]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
   const handleFilter = () => {
-    const transformed = transformFormData(formData, staticFilter);
-    setParentFormData?.(transformed);
-    setOrginalFormData?.(formData);
-    setParentStaticFormData?.(staticFormData);
-    setIsDrawerOpen?.(false);
     const formattedPayload = formatPayload(formData);
-    onApply({ ...formattedPayload, ...staticFormData });
+    onApply?.({ ...formattedPayload, ...staticFilter });
   };
 
   const replaceOptionsWithAssoc = ({
@@ -150,10 +140,13 @@ export function FilterForm({
     <Loader isLoading={loading}>
       <Box display="flex" flexDirection="column" gap={2}>
         <FilterSection
+          staticFormData={staticFilter}
+          repleaseCode="se_{code}s"
           fields={renderForm}
           selectedValues={formData}
           onChange={(code, next) => {
             const cat = renderForm.find((f) => f.code === code);
+
             if (cat) {
               replaceOptionsWithAssoc({
                 category: code,
@@ -179,10 +172,11 @@ export function FilterForm({
           </Typography>
 
           <FilterSection
+            staticFormData={staticFilter}
             fields={renderStaticForm}
-            selectedValues={staticFormData}
+            selectedValues={formData}
             onChange={(code, next) => {
-              setStaticFormData((prev) => ({ ...prev, [code]: next }));
+              setFormData((prev) => ({ ...prev, [code]: next }));
             }}
             showMore={showMoreStatic}
             setShowMore={setShowMoreStatic}
@@ -207,7 +201,9 @@ const formatPayload = (payload: any) => {
   const formattedPayload: any = {};
   Object.keys(payload).forEach((key) => {
     if (Array.isArray(payload[key])) {
-      formattedPayload[key] = payload[key].map((item: any) => item.name);
+      formattedPayload[key] = payload[key].map(
+        (item: any) => item.name || item
+      );
     } else {
       formattedPayload[key] = payload[key];
     }
@@ -322,61 +318,34 @@ function updateRenderFormWithAssociations(
   }));
 }
 
-function transformFormData(
-  fd: Record<string, TermOption[]>,
-  sf: StaticField[]
-) {
-  const map: Record<string, string> = {};
-  sf?.forEach((f) =>
-    f.fields?.forEach((fld: any) => {
-      if (fld.sourceCategory) map[fld.sourceCategory] = fld.code;
-    })
-  );
-  const out: Record<string, string[]> = {};
-  Object.keys(fd).forEach((k) => {
-    if (map[k]) out[map[k]] = fd[k].map((o) => o.identifier || o.code);
-  });
-  return out;
-}
-
-interface FilterSectionProps {
-  fields: any[];
-  selectedValues: Record<string, any[]>;
-  onChange: (code: string, next: any[]) => void;
-  showMore: boolean;
-  setShowMore: (b: boolean) => void;
-}
-
 const FilterSection: React.FC<FilterSectionProps> = ({
+  staticFormData,
   fields,
   selectedValues,
   onChange,
   showMore,
   setShowMore,
+  repleaseCode,
 }) => {
   return (
     <Box>
       {fields.map((field) => {
         const values = field.options ?? field.range ?? [];
-        const code = field.code;
+        const code = repleaseCode
+          ? repleaseCode.replace('{code}', field.code)
+          : field.code;
         const selected = selectedValues[code] || [];
         const optionsToShow = showMore ? values : values.slice(0, 3);
-
-        return (
-          <Accordion
-            key={code}
-            sx={{ background: 'unset', boxShadow: 'unset' }}
-          >
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon sx={{ color: '#1C1B1F' }} />}
+        const staticValues = staticFormData?.[code] || [];
+        if (Array.isArray(staticValues) && staticValues.length > 0) {
+          return (
+            <Box
               sx={{
-                minHeight: 20,
-                '&.Mui-expanded': {
-                  minHeight: 20,
-                  '& .MuiAccordionSummary-content': {
-                    margin: '5px 0',
-                  },
-                },
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 1,
+                px: 1,
+                pb: 1,
               }}
             >
               <Typography
@@ -384,66 +353,96 @@ const FilterSection: React.FC<FilterSectionProps> = ({
               >
                 {field.name}
               </Typography>
-            </AccordionSummary>
-            <AccordionDetails
-              sx={{
-                padding: '0px 16px',
-                overflow: 'auto',
-                maxHeight: '150px',
-              }}
+              {staticValues.map((item: any, idx: number) => (
+                <Chip
+                  key={`${code}-chip-${idx}`}
+                  label={item.name || item}
+                  sx={{ fontSize: '12px' }}
+                />
+              ))}
+            </Box>
+          );
+        } else {
+          return (
+            <Accordion
+              key={code}
+              sx={{ background: 'unset', boxShadow: 'unset' }}
             >
-              <FormGroup>
-                {optionsToShow.map((item: any, idx: number) => {
-                  const isChecked =
-                    Array.isArray(selected) &&
-                    selected.some((s) =>
-                      typeof s === 'string'
-                        ? s === item.name || s === item
-                        : s.code === item.code || s.name === item.name
-                    );
-
-                  return (
-                    <FormControlLabel
-                      key={`${code}-${idx}`}
-                      control={
-                        <Checkbox
-                          checked={isChecked}
-                          onChange={(e) => {
-                            const next = e.target.checked
-                              ? [...selected, item]
-                              : selected.filter(
-                                  (s: any) =>
-                                    s !== item &&
-                                    s.code !== item.code &&
-                                    s.name !== item.name
-                                );
-                            onChange(code, next);
-                          }}
-                        />
-                      }
-                      label={item.name || item}
-                      sx={{
-                        color: '#414651',
-                        fontSize: '14px',
-                        fontWeight: '500',
-                      }}
-                    />
-                  );
-                })}
-              </FormGroup>
-              {values.length > 3 && (
-                <Button
-                  variant="text"
-                  size="small"
-                  onClick={() => setShowMore(!showMore)}
-                  sx={{ mt: 0 }}
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon sx={{ color: '#1C1B1F' }} />}
+                sx={{
+                  minHeight: 20,
+                  '&.Mui-expanded': {
+                    minHeight: 20,
+                    '& .MuiAccordionSummary-content': {
+                      margin: '5px 0',
+                    },
+                  },
+                }}
+              >
+                <Typography
+                  sx={{ fontSize: '18px', fontWeight: '500', color: '#181D27' }}
                 >
-                  {showMore ? 'Show less ▲' : 'Show more ▼'}
-                </Button>
-              )}
-            </AccordionDetails>
-          </Accordion>
-        );
+                  {field.name}
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails
+                sx={{
+                  padding: '0px 16px',
+                  overflow: 'auto',
+                  maxHeight: '150px',
+                }}
+              >
+                <FormGroup>
+                  {optionsToShow.map((item: any, idx: number) => {
+                    const isChecked =
+                      Array.isArray(selected) &&
+                      selected.some((s) =>
+                        typeof s === 'string'
+                          ? s === item.name || s === item
+                          : s.code === item.code || s.name === item.name
+                      );
+                    return (
+                      <FormControlLabel
+                        key={`${code}-${idx}`}
+                        control={
+                          <Checkbox
+                            checked={isChecked}
+                            onChange={(e) => {
+                              const next = e.target.checked
+                                ? [...selected, item]
+                                : selected.filter(
+                                    (s: any) =>
+                                      !(s === item.name || s.name === item.name)
+                                  );
+                              onChange(code, next);
+                            }}
+                          />
+                        }
+                        label={item.name || item}
+                        sx={{
+                          color: '#414651',
+                          fontSize: '14px',
+                          fontWeight: '500',
+                        }}
+                      />
+                    );
+                  })}
+                </FormGroup>
+                {values.length > 3 && !staticValues.length && (
+                  <Button
+                    variant="text"
+                    size="small"
+                    onClick={() => setShowMore(!showMore)}
+                    sx={{ mt: 0 }}
+                  >
+                    {showMore ? 'Show less ▲' : 'Show more ▼'}
+                  </Button>
+                )}
+              </AccordionDetails>
+            </Accordion>
+          );
+        }
       })}
     </Box>
   );

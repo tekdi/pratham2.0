@@ -22,6 +22,7 @@ export default memo(function LearnerCourse({
   const [filterState, setFilterState] = useState<any>({ limit: 8 });
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useTranslation();
+  const { staticFilter } = _content ?? {};
 
   useEffect(() => {
     if (_content?.filters) {
@@ -96,6 +97,7 @@ export default memo(function LearnerCourse({
       <Stack direction="row" sx={{ gap: 4 }}>
         <CommonDialog isOpen={isOpen} onClose={() => setIsOpen(false)}>
           <FilterComponent
+            staticFilter={staticFilter}
             filterState={filterState}
             handleFilterChange={handleFilterChange}
           />
@@ -111,6 +113,7 @@ export default memo(function LearnerCourse({
           }}
         >
           <FilterComponent
+            staticFilter={staticFilter}
             filterState={filterState}
             handleFilterChange={handleFilterChange}
           />
@@ -126,7 +129,13 @@ export default memo(function LearnerCourse({
               <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
                 {filterState?.filters
                   ? Object.keys(filterState.filters)
-                      .filter((e) => e !== 'limit')
+                      .filter(
+                        (e) =>
+                          ![
+                            'limit',
+                            ...Object.keys(staticFilter ?? {}),
+                          ].includes(e)
+                      )
                       .map((key, index) => (
                         <Chip
                           key={index}
@@ -181,7 +190,12 @@ export default memo(function LearnerCourse({
               _card: { isHideProgress: true },
             }}
             {..._content}
-            filters={filterState}
+            filters={{
+              filters: {
+                ...filterState.filters,
+                ...staticFilter,
+              },
+            }}
           />
         </Box>
       </Stack>
