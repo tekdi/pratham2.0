@@ -40,7 +40,7 @@ export default function PosSchoolsPage() {
       <Grid container>
         <Grid item xs={12}>
           <LearnerCourse
-            _content={{ staticFilter: { se_domains: ['Learning for Life'] } }}
+          // _content={{ staticFilter: { se_domains: ['Learning for Life'] } }}
           />
         </Grid>
       </Grid>

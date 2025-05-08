@@ -145,8 +145,11 @@ export function FilterForm({
           fields={renderForm}
           selectedValues={formData}
           onChange={(code, next) => {
-            const cat = renderForm.find((f) => f.code === code);
-
+            const cat = renderForm.find(
+              (f) => 'se_{code}s'.replace('{code}', f.code) === code
+            );
+            // const updateFormData = { ...formData, [code]: next };
+            setFormData((prev) => ({ ...prev, [code]: next }));
             if (cat) {
               replaceOptionsWithAssoc({
                 category: code,
@@ -154,7 +157,6 @@ export function FilterForm({
                 newCategoryData: next,
               });
             }
-            setFormData((prev) => ({ ...prev, [code]: next }));
           }}
           showMore={showMore}
           setShowMore={setShowMore}
@@ -299,18 +301,22 @@ function updateRenderFormWithAssociations(
   baseFilter: any[],
   currentForm: Category[]
 ) {
-  const obj = baseFilter.find((f: any) => f[category]);
+  const catName = category.replace(/^se_|s$/g, '');
+  const obj = baseFilter.find((f: any) => f[category] || f[catName]);
   if (!obj) return currentForm;
-
   const toPush: Record<string, any[]> = {};
-  newData.forEach((opt) =>
-    Object.entries(opt.associations || {}).forEach(([k, arr]) => {
+
+  newData.forEach((opt) => {
+    const associations =
+      opt.associations ??
+      obj[catName]?.options?.find((e: any) => e.code == opt.code)?.associations;
+    return Object.entries(associations || {}).forEach(([k, arr]: any) => {
       toPush[k] = toPush[k] || [];
-      arr.forEach((item) => {
+      arr?.forEach((item: any) => {
         if (!toPush[k].some((o) => o.code === item.code)) toPush[k].push(item);
       });
-    })
-  );
+    });
+  });
 
   return currentForm.map((item) => ({
     ...item,
@@ -384,6 +390,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                   sx={{ fontSize: '18px', fontWeight: '500', color: '#181D27' }}
                 >
                   {field.name}
+                  {/* {field?.options?.length} */}
                 </Typography>
               </AccordionSummary>
               <AccordionDetails
