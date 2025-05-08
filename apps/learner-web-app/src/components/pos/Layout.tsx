@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation';
 import { Box } from '@mui/material';
 import POSMuiThemeProvider from '@learner/assets/theme/POSMuiThemeProvider';
 import { getTenantInfo } from '@learner/utils/API/ProgramService';
+import { Footer } from './Footer';
 
 interface NewDrawerItemProp extends DrawerItemProp {
   variant?: 'contained' | 'text';
@@ -70,6 +71,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
   return (
     <Layout
       {...props}
+      onlyHideElements={['footer']}
       _topAppBar={{
         isShowLang: false,
         _brand: {
@@ -84,13 +86,12 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
       }}
     >
       <Box>{children}</Box>
+      <Footer />
     </Layout>
   );
 };
 
 export default function AppWrapper(props: LayoutProps) {
-  const router = useRouter();
-
   useEffect(() => {
     const init = async () => {
       const channelId = localStorage.getItem('channelId');
@@ -99,9 +100,15 @@ export default function AppWrapper(props: LayoutProps) {
 
       if (!channelId || !tenantId || !collectionFramework) {
         const res = await getTenantInfo();
-        const youthnetContentFilter = res?.result.find(
-          (program: any) => program.name === 'Open School'
-        );
+        const currentDomain = window.location.hostname;
+        const youthnetContentFilter =
+          res?.result.find(
+            (program: any) => program.domain === currentDomain
+          ) ||
+          res?.result.find(
+            (program: any) =>
+              program.domain === process.env.NEXT_PUBLIC_POS_DOMAIN
+          );
 
         if (youthnetContentFilter) {
           if (!channelId) {

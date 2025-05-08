@@ -44,7 +44,7 @@ export const Loader: React.FC<LoaderProps> = memo(
         <Box
           style={{
             width: '100%',
-            // overflowY: 'auto',
+            overflowY: 'auto',
             display: isLoading ? 'none' : 'block',
             ...(isLoading || !isHideMaxHeight
               ? { height: `calc(100vh - ${layoutHeight}px)` }

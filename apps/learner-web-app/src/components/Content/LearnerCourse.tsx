@@ -25,7 +25,7 @@ export default memo(function LearnerCourse({
 
   useEffect(() => {
     if (_content?.filters) {
-      setFilterState((prevState) => ({
+      setFilterState((prevState: any) => ({
         ...prevState,
         ..._content?.filters,
       }));
@@ -33,20 +33,20 @@ export default memo(function LearnerCourse({
   }, [_content?.filters]);
 
   const handleSearchClick = useCallback((searchValue: string) => {
-    setFilterState((prevState) => ({
+    setFilterState((prevState: any) => ({
       ...prevState,
       query: searchValue,
     }));
   }, []);
 
   const handleFilterChange = (newFilterState: typeof filterState) => {
-    setFilterState((prevState) => ({
+    setFilterState((prevState: any) => ({
       ...prevState,
       filters: newFilterState,
     }));
     setIsOpen(false);
   };
-  console.log('filterState', filterState);
+
   return (
     <Stack sx={{ p: { xs: 1, md: 4 }, gap: 4 }}>
       {title && (
