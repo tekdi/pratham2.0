@@ -66,6 +66,16 @@ const CreateAccountForm = ({
       value.length >= 8
     );
   };
+  const handleConsentform = () => {
+    if (belowEighteen) {
+      window.open('/files/consent_form_below_18_hindi.pdf', '_blank');
+    } else {
+      window.open('/files/consent_form_above_18_hindi.pdf', '_blank');
+    }
+  };
+  const handlePrivacyGuidelines = () => {
+    window.open('https://www.pratham.org/privacy-guidelines/', '_blank');
+  };
 
   const isPasswordValid = validatePassword(password);
   const doPasswordsMatch = password === confirmPassword;
@@ -221,12 +231,22 @@ const CreateAccountForm = ({
           label={
             <Typography fontSize="14px">
               I have read and agree to the{' '}
-              <Typography component="span" fontWeight="bold" color="#0071E3">
+              <Typography
+                component="span"
+                fontWeight="bold"
+                color="#0071E3"
+                onClick={handlePrivacyGuidelines}
+              >
                 Privacy Guidelines
               </Typography>{' '}
               and I consent to the collection and use of my personal data as
               described in the{' '}
-              <Typography component="span" fontWeight="bold" color="#0071E3">
+              <Typography
+                component="span"
+                fontWeight="bold"
+                color="#0071E3"
+                onClick={handleConsentform}
+              >
                 Consent Form
               </Typography>
               .
