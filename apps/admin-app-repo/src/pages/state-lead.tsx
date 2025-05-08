@@ -305,7 +305,6 @@ const StateLead = () => {
           )
         )}
         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }} mt={4}>
-        new changes 8 may
           <Button
             variant="outlined"
             startIcon={<AddIcon />}
