@@ -185,7 +185,7 @@ export const Footer: React.FC = () => {
             <IconButton
               aria-label="YouTube"
               component={Link}
-              href="http://www.youtube.com/@PrathamEducationFoundation"
+              href="https://www.youtube.com/@PrathamEducationFoundation"
               target="_blank"
               rel="noopener noreferrer"
               sx={{ color: '#FF0000' }} // YouTube color
