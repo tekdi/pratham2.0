@@ -162,18 +162,6 @@ const DesktopBar = ({
       >
         {navLinks.map((link, index) => (
           <Box key={index}>
-            {link?.icon && (
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  mr: 1,
-                }}
-              >
-                {link.icon}
-              </Box>
-            )}
             <Button
               component={typeof link.to === 'string' ? 'a' : 'button'}
               href={typeof link.to === 'string' ? link.to : undefined}
@@ -190,6 +178,20 @@ const DesktopBar = ({
                       >
                     ) => void)
                   : undefined
+              }
+              startIcon={
+                link?.icon && (
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      mr: 1,
+                    }}
+                  >
+                    {link.icon}
+                  </Box>
+                )
               }
             >
               {link.title}
