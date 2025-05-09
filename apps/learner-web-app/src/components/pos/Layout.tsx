@@ -50,69 +50,21 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         title: t('LEARNER_APP.POS.ABOUT_US'),
         to: () => router.push('/pos/about-us'),
         isActive: currentPage === '/pos/about-us',
-        child: [
-          {
-            title: t('LEARNER_APP.POS.THEMATIC_REPOSITORY'),
-            to: () => router.push('/pos/thematic-repository'),
-          },
-        ],
       },
       {
         title: t('LEARNER_APP.POS.SCHOOL'),
         to: () => router.push('/pos/school'),
         isActive: currentPage === '/pos/school',
-        child: [
-          {
-            title: t('LEARNER_APP.POS.THEMATIC_REPOSITORY'),
-            to: () => router.push('/pos/thematic-repository'),
-          },
-          {
-            title: t('LEARNER_APP.POS.THEMATIC_REPOSITORY'),
-            to: () => router.push('/pos/thematic-repository'),
-          },
-        ],
       },
       {
         title: t('LEARNER_APP.POS.WORK'),
         to: () => router.push('/pos/work'),
         isActive: currentPage === '/pos/work',
-        child: [
-          {
-            title: t('LEARNER_APP.POS.THEMATIC_REPOSITORY'),
-            to: () => router.push('/pos/thematic-repository'),
-          },
-          {
-            title: t('LEARNER_APP.POS.THEMATIC_REPOSITORY'),
-            to: () => router.push('/pos/thematic-repository'),
-          },
-          {
-            title: t('LEARNER_APP.POS.THEMATIC_REPOSITORY'),
-            to: () => router.push('/pos/thematic-repository'),
-          },
-        ],
       },
       {
         title: t('LEARNER_APP.POS.LIFE'),
         to: () => router.push('/pos/life'),
         isActive: currentPage === '/pos/life',
-        child: [
-          {
-            title: t('LEARNER_APP.POS.THEMATIC_REPOSITORY'),
-            to: () => router.push('/pos/thematic-repository'),
-          },
-          {
-            title: t('LEARNER_APP.POS.THEMATIC_REPOSITORY'),
-            to: () => router.push('/pos/thematic-repository'),
-          },
-          {
-            title: t('LEARNER_APP.POS.THEMATIC_REPOSITORY'),
-            to: () => router.push('/pos/thematic-repository'),
-          },
-          {
-            title: t('LEARNER_APP.POS.THEMATIC_REPOSITORY'),
-            to: () => router.push('/pos/thematic-repository'),
-          },
-        ],
       },
       {
         title: t('LEARNER_APP.POS.PROGRAM'),
