@@ -4,7 +4,7 @@ import { useTranslation, FilterForm } from '@shared-lib';
 
 const FilterComponent: React.FC<{
   filterState: any;
-  staticFilter?: object;
+  staticFilter?: Record<string, object> | undefined;
   handleFilterChange: (newFilterState: any) => void;
 }> = ({ filterState, staticFilter, handleFilterChange }) => {
   const { t } = useTranslation();
