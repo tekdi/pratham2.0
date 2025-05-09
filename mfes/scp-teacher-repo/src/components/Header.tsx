@@ -275,9 +275,9 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
                   display: 'flex',
                   alignItems: 'center',
                   // ml: 1,
-                  '@media (max-width: 600px)': {
-                    display: 'none',
-                  },
+                  // '@media (max-width: 600px)': {
+                  //   display: 'none',
+                  // },
                 }}
               >
                 <AccountCircleIcon />
