@@ -119,12 +119,20 @@ export default function Details(props: DetailsProps) {
   }, [identifier, courseId, router, unitId]);
 
   const handleItemClick = (subItem: any) => {
-    localStorage.setItem('unitId', subItem?.courseId);
-    const path =
-      subItem.mimeType === 'application/vnd.ekstep.content-collection'
-        ? `/content/${courseId}/${subItem?.identifier}`
-        : `/content/${courseId}/${unitId}/${subItem?.identifier}`;
-    router.push(path);
+    if (props?._config?.handleCardClick) {
+      props?._config.handleCardClick?.(subItem);
+    } else {
+      localStorage.setItem('unitId', subItem?.courseId);
+      const path =
+        subItem.mimeType === 'application/vnd.ekstep.content-collection'
+          ? `${props?._config?.contentBaseUrl ?? '/content'}/${courseId}/${
+              subItem?.identifier
+            }`
+          : `${
+              props?._config?.contentBaseUrl ?? '/content'
+            }/${courseId}/${unitId}/${subItem?.identifier}`;
+      router.push(path);
+    }
   };
 
   const onBackClick = () => {

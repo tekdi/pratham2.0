@@ -2,12 +2,41 @@
 import LearnerCourse from '@learner/components/Content/LearnerCourse';
 import Layout from '@learner/components/pos/Layout';
 import { Grid } from '@mui/material';
+import { ContentItem } from '@shared-lib';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
+import { useCallback } from 'react';
 
+const SUPPORTED_MIME_TYPES = [
+  'application/vnd.ekstep.ecml-archive',
+  'application/vnd.ekstep.html-archive',
+  'application/vnd.ekstep.h5p-archive',
+  'application/pdf',
+  'video/mp4',
+  'video/webm',
+  'application/epub',
+  'video/x-youtube',
+  'application/vnd.sunbird.questionset',
+];
 const InfoCard = dynamic(() => import('@InfoCard'), {
   ssr: false,
 });
 export default function PosSchoolsPage() {
+  const router = useRouter();
+  const handleCardClickLocal = useCallback(
+    async (content: ContentItem) => {
+      try {
+        if (SUPPORTED_MIME_TYPES.includes(content?.mimeType)) {
+          return null;
+        } else {
+          router.push(`/pos/content/${content?.identifier}`);
+        }
+      } catch (error) {
+        console.error('Failed to handle card click:', error);
+      }
+    },
+    [router]
+  );
   return (
     <Layout>
       <InfoCard
@@ -40,7 +69,10 @@ export default function PosSchoolsPage() {
       <Grid container>
         <Grid item xs={12}>
           <LearnerCourse
-            _content={{ staticFilter: { se_domains: ['Learning for School'] } }}
+            _content={{
+              handleCardClick: handleCardClickLocal,
+              staticFilter: { se_domains: ['Learning for School'] },
+            }}
           />
         </Grid>
       </Grid>

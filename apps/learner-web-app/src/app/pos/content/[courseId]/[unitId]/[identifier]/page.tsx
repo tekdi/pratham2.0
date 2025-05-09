@@ -3,8 +3,7 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 import { getMetadata } from '@learner/utils/API/metabaseService';
-import Layout from '@learner/components/Layout';
-import { gredientStyle } from '@learner/utils/style';
+import Layout from '@learner/components/pos/Layout';
 
 export async function generateMetadata({ params }: any) {
   return await getMetadata(params.identifier);
@@ -17,12 +16,12 @@ const ContentDetails = dynamic(
   }
 );
 
-const HomePage: React.FC = () => {
+const App: React.FC = () => {
   return (
-    <Layout sx={gredientStyle}>
-      <ContentDetails />
+    <Layout>
+      <ContentDetails userIdLocalstorageName={'did'} />
     </Layout>
   );
 };
 
-export default HomePage;
+export default App;

@@ -172,8 +172,6 @@ export default function MuiThemeProvider({
 }: {
   children: React.ReactNode;
 }) {
-  console.log(theme, 'theme context');
-
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
