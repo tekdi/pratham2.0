@@ -32,3 +32,14 @@ export const getAgeInMonths = (dobString: any) => {
   console.log(monthsOld);
   return monthsOld;
 };
+export const toPascalCase = (name: string | any) => {
+  if (typeof name !== 'string') {
+    return name;
+  }
+
+  return name
+    ?.toLowerCase()
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};

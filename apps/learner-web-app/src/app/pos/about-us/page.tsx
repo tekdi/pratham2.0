@@ -106,7 +106,7 @@ const AboutUsPage = () => {
         {/* Title Here About 3 Pillars */}
         <Box
           sx={{
-            background: '#fff',
+            background: '#ffff',
             padding: '30px 40px',
             mx: 7,
             mt: 8,

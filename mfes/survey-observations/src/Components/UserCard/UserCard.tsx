@@ -11,11 +11,14 @@ import {
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useTheme } from '@mui/material/styles';
 import { useRouter } from 'next/navigation';
-import { useTranslation } from 'next-i18next';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import { getAge, toPascalCase } from '@/utils/Helper';
-import { getAgeInMonths } from '../../utils/Helper/helper';
+import {
+  getAge,
+  getAgeInMonths,
+  toPascalCase,
+} from '../../utils/Helper/helper';
 import { VolunteerField } from 'mfes/survey-observations/app.config';
+import { useTranslation } from '@shared-lib';
 type UserCardProps = {
   name: string;
   firstName?: string;
