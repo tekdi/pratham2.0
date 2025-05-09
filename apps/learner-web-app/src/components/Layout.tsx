@@ -74,17 +74,6 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         isActive: currentPage === '/explore',
       },
     ];
-
-    if (checkAuth()) {
-      navLinks.push({
-        title: t('LEARNER_APP.COMMON.PROFILE'),
-        icon: <AccountCircleOutlined sx={{ width: 28, height: 28 }} />,
-        to: () => {
-          setAnchorEl(true);
-        },
-        isActive: currentPage === '/profile',
-      });
-    }
     const isVolunteer = JSON.parse(
       localStorage.getItem('isVolunteer') || 'false'
     );
@@ -95,6 +84,16 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         icon: <AssignmentOutlined sx={{ width: 28, height: 28 }} />,
         to: () => router.push('/surveys'),
         isActive: currentPage === '/surveys',
+      });
+    }
+    if (checkAuth()) {
+      navLinks.push({
+        title: t('LEARNER_APP.COMMON.PROFILE'),
+        icon: <AccountCircleOutlined sx={{ width: 28, height: 28 }} />,
+        to: () => {
+          setAnchorEl(true);
+        },
+        isActive: currentPage === '/profile',
       });
     }
 
