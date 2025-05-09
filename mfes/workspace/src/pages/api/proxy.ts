@@ -5,6 +5,8 @@ import {
   genericEditorReviewFormResponse,
   genericEditorRequestForChangesFormResponse,
   publishResourceFormResponse,
+  contentEditorQuestionFormResponse,
+  contentEditorQuestionMetaFormResponse
 } from "./mocked-response";
 import { getCookie } from '@workspace/utils/cookieHelper';
 import { mockData } from "./tenantConfig";
@@ -53,6 +55,14 @@ export default async function handler(
     }
     if (action === "publish" && subType === "resource" && type === 'content') {
       return res.status(200).json(publishResourceFormResponse); 
+    }
+    if (action === 'question-filter-view' && subType === 'questions' &&
+      type === 'content') {
+      return res.status(200).json(contentEditorQuestionFormResponse);
+    }
+    if (action === 'question-meta-save' && subType === 'questions' &&
+      type === 'content') {
+      return res.status(200).json(contentEditorQuestionMetaFormResponse);
     }
   }
 

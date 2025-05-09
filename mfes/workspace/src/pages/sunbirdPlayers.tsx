@@ -44,6 +44,7 @@ const SunbirdPlayers = ({ "player-config": playerConfig }: PlayerProps) => {
   console.log("workspace playerconfig", playerConfig);
 
   const mimeType = playerConfig?.metadata?.mimeType;
+  console.log('Player mimeType ==>', mimeType)
   switch (mimeType) {
     case "application/pdf":
       return <SunbirdPdfPlayer playerConfig={playerConfig} />;
@@ -57,6 +58,7 @@ const SunbirdPlayers = ({ "player-config": playerConfig }: PlayerProps) => {
     case "application/vnd.ekstep.html-archive":
     case "video/youtube":
     case "video/x-youtube":
+    case "application/vnd.ekstep.ecml-archive":
       // return <SunbirdV1Player playerConfig={playerConfig} />;
       return <SunbirdV1Player playerConfig={playerConfig} />;
     default:
