@@ -18,6 +18,7 @@ import ProfileMenu from './ProfileMenu/ProfileMenu';
 import { Box } from '@mui/material';
 import { usePathname } from 'next/navigation';
 import { checkAuth } from '@shared-lib-v2/utils/AuthService';
+import ConfirmationModal from './ConfirmationModal/ConfirmationModal';
 
 interface NewDrawerItemProp extends DrawerItemProp {
   variant?: 'contained' | 'text';
@@ -33,6 +34,12 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
     []
   );
   const [anchorEl, setAnchorEl] = useState<any>(null);
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+
+  const getMessage = () => {
+    if (modalOpen) return t('COMMON.SURE_LOGOUT');
+    return '';
+  };
   const handleClose = () => setAnchorEl(null);
   const handleProfileClick = () => {
     if (pathname !== '/profile') {
@@ -42,6 +49,9 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
   };
   const handleLogoutClick = () => {
     router.push('/logout');
+  };
+  const handleLogoutModal = () => {
+    setModalOpen(true);
   };
 
   React.useEffect(() => {
@@ -64,17 +74,6 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         isActive: currentPage === '/explore',
       },
     ];
-
-    if (checkAuth()) {
-      navLinks.push({
-        title: t('LEARNER_APP.COMMON.PROFILE'),
-        icon: <AccountCircleOutlined sx={{ width: 28, height: 28 }} />,
-        to: () => {
-          setAnchorEl(true);
-        },
-        isActive: currentPage === '/profile',
-      });
-    }
     const isVolunteer = JSON.parse(
       localStorage.getItem('isVolunteer') || 'false'
     );
@@ -87,11 +86,24 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         isActive: currentPage === '/surveys',
       });
     }
+    if (checkAuth()) {
+      navLinks.push({
+        title: t('LEARNER_APP.COMMON.PROFILE'),
+        icon: <AccountCircleOutlined sx={{ width: 28, height: 28 }} />,
+        to: () => {
+          setAnchorEl(true);
+        },
+        isActive: currentPage === '/profile',
+      });
+    }
 
     setDefaultNavLinks(navLinks);
   }, [t, router]);
   const onLanguageChange = (val: string) => {
     setLanguage(val);
+  };
+  const handleCloseModel = () => {
+    setModalOpen(false);
   };
   return (
     <Layout
@@ -134,10 +146,20 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
             open={Boolean(anchorEl)}
             onClose={handleClose}
             onProfileClick={handleProfileClick}
-            onLogout={handleLogoutClick}
+            onLogout={handleLogoutModal}
           />
         </Box>
       </Box>
+      <ConfirmationModal
+        message={getMessage()}
+        handleAction={handleLogoutClick}
+        buttonNames={{
+          primary: t('COMMON.LOGOUT'),
+          secondary: t('COMMON.CANCEL'),
+        }}
+        handleCloseModal={handleCloseModel}
+        modalOpen={modalOpen}
+      />
     </Layout>
   );
 };
