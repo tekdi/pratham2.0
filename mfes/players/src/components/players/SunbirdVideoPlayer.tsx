@@ -11,7 +11,7 @@ const basePath = process.env.NEXT_PUBLIC_ASSETS_CONTENT || '/sbplayer';
 
 const SunbirdVideoPlayer = ({
   playerConfig,
-  relatedData: { courseId, unitId },
+  relatedData: { courseId, unitId, userId },
 }: PlayerConfigProps) => {
   const sunbirdVideoPlayerRef = useRef<HTMLIFrameElement | null>(null);
 
@@ -48,6 +48,7 @@ const SunbirdVideoPlayer = ({
                   await getTelemetryEvents(event.detail, 'video', {
                     courseId,
                     unitId,
+                    userId,
                   });
                 } catch (error) {
                   console.error('Error submitting assessment:', error);

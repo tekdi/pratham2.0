@@ -2,7 +2,7 @@
 import './global.css';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
-import MuiThemeProvider from '@learner/assets/theme/MuiThemeProvider';
+import { MuiThemeProviderWithLanguage } from '@learner/assets/theme/MuiThemeProvider';
 
 export const metadata = {
   title: 'Welcome to learner-web-app',
@@ -32,7 +32,7 @@ export default function RootLayout({
     <html lang="en">
       <head />
       <body>
-        <MuiThemeProvider>{children}</MuiThemeProvider>
+        <MuiThemeProviderWithLanguage>{children}</MuiThemeProviderWithLanguage>
         <ToastContainer />
       </body>
     </html>

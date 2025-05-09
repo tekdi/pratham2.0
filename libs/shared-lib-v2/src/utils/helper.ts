@@ -67,14 +67,14 @@ export const calculateTrackDataItem = (newTrack: any, item: any) => {
   if (item?.mimeType === 'application/vnd.ekstep.content-collection') {
     const result = calculateCourseStatus({
       statusData: newTrack,
-      allCourseIds: item.leafNodes,
+      allCourseIds: item?.leafNodes || [],
       courseId: item.identifier,
     });
     return result;
   } else {
     const result = calculateCourseStatus({
       statusData: newTrack,
-      allCourseIds: [item.identifier],
+      allCourseIds: item.identifier ? [item.identifier] : [],
       courseId: item.identifier,
     });
     return result;

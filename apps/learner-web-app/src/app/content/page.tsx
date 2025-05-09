@@ -197,7 +197,12 @@ const MyComponent: React.FC = () => {
 
       <Grid container style={gredientStyle}>
         <Grid item xs={12}>
-          {filter && <LearnerCourse _content={{ filters: filter }} />}
+          {filter && (
+            <LearnerCourse
+              title={'LEARNER_APP.COURSE.GET_STARTED'}
+              _content={{ filters: filter }}
+            />
+          )}
         </Grid>
       </Grid>
     </Layout>

@@ -10,7 +10,7 @@ const basePath = process.env.NEXT_PUBLIC_ASSETS_CONTENT || '/sbplayer';
 
 const V1Player = ({
   playerConfig,
-  relatedData: { courseId, unitId },
+  relatedData: { courseId, unitId, userId },
 }: PlayerProps) => {
   const previewRef = useRef<HTMLIFrameElement | null>(null);
 
@@ -45,6 +45,7 @@ const V1Player = ({
               await getTelemetryEvents(event.detail.telemetryData, 'v1', {
                 courseId,
                 unitId,
+                userId,
               });
             }
           );

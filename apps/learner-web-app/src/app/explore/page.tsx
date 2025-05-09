@@ -10,15 +10,17 @@ const App = () => {
   return (
     <Layout sx={gredientStyle}>
       <LearnerCourse
+        title={'LEARNER_APP.EXPLORE.EXPLORE_ADDITIONAL_COURSES'}
         _content={{
           contentTabs: ['courses', 'content'],
-          title: 'LEARNER_APP.EXPLORE.EXPLORE_ADDITIONAL_COURSES',
         }}
       />
-      <Box sx={{ 
-          background:'#fff',
-          py:2
-       }}>
+      <Box
+        sx={{
+          background: '#fff',
+          py: 2,
+        }}
+      >
         <SkillCenter
           viewAll={false}
           Limit={3}

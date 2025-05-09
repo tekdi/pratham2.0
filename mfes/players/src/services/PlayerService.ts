@@ -99,12 +99,15 @@ export const createAssessmentTracking = async ({
   scoreDetails,
   courseId,
   unitId,
+  userId: propUserId,
   maxScore,
   seconds,
 }: any) => {
   try {
     let userId = '';
-    if (typeof window !== 'undefined' && window.localStorage) {
+    if (propUserId) {
+      userId = propUserId;
+    } else if (typeof window !== 'undefined' && window.localStorage) {
       userId = localStorage.getItem('userId') ?? '';
     }
     const attemptId = uuidv4();

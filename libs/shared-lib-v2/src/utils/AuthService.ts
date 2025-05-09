@@ -73,7 +73,10 @@ export const staticFilterContent = async ({
   return undefined;
 };
 
-export const checkAuth = () => {
+export const checkAuth = (isAuthenticated?: boolean) => {
+  if (isAuthenticated === true) {
+    return true;
+  }
   const userId = localStorage.getItem('userId');
   const tenantId = localStorage.getItem('tenantId');
   const token = localStorage.getItem('token');
@@ -82,4 +85,16 @@ export const checkAuth = () => {
   } else {
     return false;
   }
+};
+
+export const getUserId = (key?: string | null) => {
+  const userId = localStorage.getItem('userId');
+
+  if (userId) {
+    return userId;
+  }
+
+  if (key) return localStorage.getItem(key);
+
+  return userId;
 };

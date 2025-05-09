@@ -30,6 +30,7 @@ import FilterDialog from '@content-mfes/components/FilterDialog';
 import { trackingData } from '@content-mfes/services/TrackingService';
 import LayoutPage from '@content-mfes/components/LayoutPage';
 import { getUserCertificates } from '@content-mfes/services/Certificate';
+import { getUserId } from '@shared-lib-v2/utils/AuthService';
 
 // Constants
 const SUPPORTED_MIME_TYPES = [
@@ -207,12 +208,10 @@ export default function Content(props: Readonly<ContentProps>) {
         const courseList = resultData
           .map((item) => item.identifier)
           .filter((id): id is string => id !== undefined);
-        const userId = localStorage.getItem('userId');
+        const userId = getUserId(props?._config?.userIdLocalstorageName);
 
         if (!userId || !courseList.length) return [];
-
         const userIdArray = userId.split(',').filter(Boolean);
-
         const [courseTrackData, certificates] = await Promise.all([
           trackingData(userIdArray, courseList),
           getUserCertificates({
@@ -248,7 +247,11 @@ export default function Content(props: Readonly<ContentProps>) {
         return [];
       }
     },
-    [localFilters.limit, localFilters.offset]
+    [
+      localFilters.limit,
+      localFilters.offset,
+      props?._config?.userIdLocalstorageName,
+    ]
   );
 
   // Fetch content data with proper state management
@@ -266,11 +269,8 @@ export default function Content(props: Readonly<ContentProps>) {
       setIsLoading(true);
       try {
         const response = await fetchContent(localFilters);
-
         if (!response || !isMounted) return;
-
         const newContentData = response.content ?? [];
-
         const userTrackData = await fetchDataTrack(newContentData);
         if (!isMounted) return;
 

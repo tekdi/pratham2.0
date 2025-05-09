@@ -2,7 +2,6 @@
 
 'use client';
 import React, { useEffect, useState } from 'react';
-import Layout from '@learner/components/Layout';
 import dynamic from 'next/dynamic';
 import {
   Avatar,
@@ -17,13 +16,12 @@ import { useParams, useRouter } from 'next/navigation';
 import { checkAuth } from '@shared-lib-v2/utils/AuthService';
 import { useTranslation } from '@shared-lib';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { gredientStyle } from '@learner/utils/style';
 import { ContentSearch, fetchContent } from '@learner/utils/API/contentService';
 
 const Content = dynamic(() => import('@Content'), {
   ssr: false,
 });
-const App = () => {
+const App = (props: { userIdLocalstorageName?: string }) => {
   const { t } = useTranslation();
   const router = useRouter();
   const params = useParams();
@@ -32,7 +30,7 @@ const App = () => {
   const [relatedIdentity, setRelatedIdentity] = useState<Array<string | null>>(
     []
   );
-
+  console.log('item', props);
   useEffect(() => {
     const fetch = async () => {
       if (unitId) {
@@ -41,7 +39,7 @@ const App = () => {
         } = await ContentSearch({
           filters: { identifier: [unitId, courseId, identifier] },
         });
-        const newContent = [...content, ...QuestionSet];
+        const newContent = [...(content ?? []), ...(QuestionSet ?? [])];
         const contentMap = newContent.reduce(
           (acc: any, item: any) => ({
             ...acc,
@@ -57,7 +55,7 @@ const App = () => {
         const filteredContent = contentMap?.unit?.leafNodes.filter(
           (contentItem: any) => contentItem !== identifier
         );
-        console.log('filteredContent', filteredContent);
+
         setRelatedIdentity(filteredContent ?? []);
       } else {
         const response = await fetchContent(identifier);
@@ -79,153 +77,157 @@ const App = () => {
   };
 
   return (
-    <Layout>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: { xs: 'column', md: 'row' },
+        gap: 4,
+        p: { xs: 2, md: 4 },
+      }}
+    >
       <Box
         sx={{
           display: 'flex',
-          flexDirection: { xs: 'column', md: 'row' },
-          gap: 4,
-          p: { xs: 2, md: 4 },
+          flex: { xs: 1, md: 8 },
+          gap: 2,
+          flexDirection: 'column',
+          width: relatedIdentity.length > 0 ? 'initial' : '100%',
         }}
-        style={gredientStyle}
       >
         <Box
           sx={{
             display: 'flex',
-            flex: { xs: 1, md: 8 },
-            gap: 2,
-            flexDirection: 'column',
-            width: relatedIdentity.length > 0 ? 'initial' : '100%',
+            alignItems: 'center',
+            gap: 1,
           }}
         >
-          <Box
+          <IconButton
+            aria-label="back"
+            onClick={onBackClick}
+            sx={{ width: '24px', height: '24px' }}
+          >
+            <ArrowBackIcon />
+          </IconButton>
+          <Breadcrumbs separator="›" aria-label="breadcrumb">
+            {item?.course?.name && (
+              <Typography variant="body1">{item?.course?.name}</Typography>
+            )}
+            {item?.unit?.name && (
+              <Typography variant="body1">{item?.unit?.name}</Typography>
+            )}
+            <Typography variant="body1">{item?.content?.name}</Typography>
+          </Breadcrumbs>
+        </Box>
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 2,
+            flexDirection: 'column',
+            pb: 2,
+          }}
+        >
+          <Typography
             sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
+              fontWeight: 700,
+              fontSize: '36px',
+              lineHeight: '44px',
             }}
           >
-            <IconButton
-              aria-label="back"
-              onClick={onBackClick}
-              sx={{ width: '24px', height: '24px' }}
-            >
-              <ArrowBackIcon />
-            </IconButton>
-            <Breadcrumbs separator="›" aria-label="breadcrumb">
-              {item?.course?.name && (
-                <Typography variant="body1">{item?.course?.name}</Typography>
-              )}
-              {item?.unit?.name && (
-                <Typography variant="body1">{item?.unit?.name}</Typography>
-              )}
-              <Typography variant="body1">{item?.content?.name}</Typography>
-            </Breadcrumbs>
-          </Box>
-          <Box
-            sx={{
-              display: 'flex',
-              gap: 2,
-              flexDirection: 'column',
-              pb: 2,
-            }}
-          >
+            {item?.content?.name ?? '-'}
+          </Typography>
+          {item?.content?.description && (
             <Typography
               sx={{
-                fontWeight: 700,
-                fontSize: '36px',
-                lineHeight: '44px',
+                fontWeight: 400,
+                fontSize: '16px',
+                lineHeight: '24px',
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                overflow: 'hidden',
+                WebkitBoxOrient: 'vertical',
               }}
             >
-              {item?.content?.name ?? '-'}
+              {item?.content?.description ?? '-'}
             </Typography>
-            {item?.content?.description && (
-              <Typography
-                sx={{
-                  fontWeight: 400,
-                  fontSize: '16px',
-                  lineHeight: '24px',
-                  display: '-webkit-box',
-                  WebkitLineClamp: 2,
-                  overflow: 'hidden',
-                  WebkitBoxOrient: 'vertical',
-                }}
-              >
-                {item?.content?.description ?? '-'}
-              </Typography>
-            )}
-          </Box>
-          <PlayerBox
-            item={item}
-            identifier={identifier}
-            courseId={courseId}
-            unitId={unitId}
+          )}
+        </Box>
+        <PlayerBox
+          userIdLocalstorageName={props.userIdLocalstorageName}
+          item={item}
+          identifier={identifier}
+          courseId={courseId}
+          unitId={unitId}
+        />
+      </Box>
+      {relatedIdentity.length > 0 && (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            flex: { xs: 1, sm: 1, md: 4 },
+          }}
+        >
+          <Typography
+            sx={{
+              mb: 2,
+              fontWeight: 500,
+              fontSize: '18px',
+              lineHeight: '24px',
+            }}
+          >
+            {t('LEARNER_APP.PLAYER.MORE_RELATED_RESOURCES')}
+          </Typography>
+
+          <Content
+            isShowLayout={false}
+            contentTabs={['content']}
+            showFilter={false}
+            showSearch={false}
+            showHelpDesk={false}
+            handleCardClick={handleCardClick}
+            filters={{
+              limit: 4,
+              filters: {
+                identifier: relatedIdentity,
+              },
+            }}
+            _config={{
+              _grid: {
+                xs: 12,
+                sm: 6,
+                md: 12,
+                lg: 6,
+              },
+              default_img: '/images/image_ver.png',
+            }}
+            hasMoreData={false}
           />
         </Box>
-        {relatedIdentity.length > 0 && (
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              flex: { xs: 1, sm: 1, md: 4 },
-            }}
-          >
-            <Typography
-              sx={{
-                mb: 2,
-                fontWeight: 500,
-                fontSize: '18px',
-                lineHeight: '24px',
-              }}
-            >
-              {t('LEARNER_APP.PLAYER.MORE_RELATED_RESOURCES')}
-            </Typography>
-
-            <Content
-              isShowLayout={false}
-              contentTabs={['content']}
-              showFilter={false}
-              showSearch={false}
-              showHelpDesk={false}
-              handleCardClick={handleCardClick}
-              filters={{
-                limit: 4,
-                filters: {
-                  identifier: relatedIdentity,
-                },
-              }}
-              _config={{
-                _grid: {
-                  xs: 12,
-                  sm: 6,
-                  md: 12,
-                  lg: 6,
-                },
-                default_img: '/images/image_ver.png',
-              }}
-              hasMoreData={false}
-            />
-          </Box>
-        )}
-      </Box>
-    </Layout>
+      )}
+    </Box>
   );
 };
 
 export default App;
 
-const PlayerBox = ({ item, identifier, courseId, unitId }: any) => {
+const PlayerBox = ({
+  item,
+  identifier,
+  courseId,
+  unitId,
+  userIdLocalstorageName,
+}: any) => {
   const router = useRouter();
   const [play, setPlay] = useState(false);
 
   useEffect(() => {
-    if (checkAuth()) {
+    if (checkAuth() || userIdLocalstorageName) {
       setPlay(true);
     }
   }, []);
 
   const handlePlay = () => {
-    if (checkAuth()) {
+    if (checkAuth() || userIdLocalstorageName) {
       setPlay(true);
     } else {
       router.push(
@@ -281,11 +283,15 @@ const PlayerBox = ({ item, identifier, courseId, unitId }: any) => {
             process.env.NEXT_PUBLIC_LEARNER_SBPLAYER
           }?identifier=${identifier}${
             courseId && unitId ? `&courseId=${courseId}&unitId=${unitId}` : ''
+          }${
+            userIdLocalstorageName
+              ? `&userId=${localStorage.getItem(userIdLocalstorageName)}`
+              : ''
           }`}
           style={{
             // display: 'block',
             // padding: 0,
-            height: 'calc(100vh - 287px)',
+            height: 'calc(100vh)',
             border: 'none',
           }}
           width="100%"

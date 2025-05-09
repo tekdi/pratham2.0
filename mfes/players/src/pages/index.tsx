@@ -29,8 +29,12 @@ const Players: React.FC<SunbirdPlayerProps> = ({
   playerConfig: propPlayerConfig,
 }) => {
   const router = useRouter();
-  const { courseId, unitId, identifier: queryIdentifier } = router.query ?? {}; // Get identifier from the query
-
+  const {
+    courseId,
+    unitId,
+    userId,
+    identifier: queryIdentifier,
+  } = router.query ?? {}; // Get identifier from the query
   const identifier = propIdentifier || queryIdentifier; // Prefer prop over query
   const [playerConfig, setPlayerConfig] = useState<PlayerConfig | undefined>(
     propPlayerConfig
@@ -109,6 +113,7 @@ const Players: React.FC<SunbirdPlayerProps> = ({
             player-config={playerConfig}
             courseId={courseId as string}
             unitId={unitId as string}
+            userId={userId as string}
           />
         </Box>
       )}

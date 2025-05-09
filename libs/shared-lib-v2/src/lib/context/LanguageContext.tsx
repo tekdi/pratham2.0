@@ -114,8 +114,12 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
 // Custom hook
 export const useTranslation = (): LanguageContextType => {
   const context = useContext(LanguageContext);
+
   if (!context) {
-    throw new Error('useTranslation must be used within a LanguageProvider');
+    const stack = new Error().stack;
+    throw new Error(
+      `useTranslation must be used within a LanguageProvider.\nCall stack:\n${stack}`
+    );
   }
   return context;
 };

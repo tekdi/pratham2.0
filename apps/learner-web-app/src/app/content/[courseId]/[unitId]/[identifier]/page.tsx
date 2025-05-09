@@ -3,6 +3,8 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 import { getMetadata } from '@learner/utils/API/metabaseService';
+import Layout from '@learner/components/Layout';
+import { gredientStyle } from '@learner/utils/style';
 
 export async function generateMetadata({ params }: any) {
   return await getMetadata(params.identifier);
@@ -16,7 +18,11 @@ const ContentDetails = dynamic(
 );
 
 const HomePage: React.FC = () => {
-  return <ContentDetails />;
+  return (
+    <Layout sx={gredientStyle}>
+      <ContentDetails />
+    </Layout>
+  );
 };
 
 export default HomePage;
