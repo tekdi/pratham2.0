@@ -224,7 +224,7 @@ const UserId = () => {
             designation={user.userRole || '-'}
             mentorId={user.userID || ''}
             phoneNumber={user.phone || '-'}
-            gender={user.gender || '-'}
+            gender={toPascalCase(user.gender) || '-'}
             state={user.state || '-'}
             district={user.district || '-'}
             block={user.block || '-'}
