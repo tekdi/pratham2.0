@@ -177,7 +177,8 @@
     "NOT_ABLE_CREATE_FACILITATOR": "Not Able To Create Facilitator",
     "NEW_BATCH": "New Batch",
     "REASSIGN_BATCH": "Re-assign Batch",
-    "NOT_ABLE_UPDATE_FACILITATOR": "Not Able To Update Facilitator"
+    "NOT_ABLE_UPDATE_FACILITATOR": "Not Able To Update Facilitator",
+    "HI": "Hi, {{name}}"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -529,8 +530,6 @@
     "LEARNERS_PRIMARY_WORK": "Learner's Primary Work",
     "ENROLLED_IN_EDUCATIONAL_INSTITUTE": "Enrolled in educational institute",
     "OWN_FARMING": "Own farming",
-    "CENTER": "Center",
-    "BATCH": "Batch",
     "AGRICULTURAL_FARM_LABORER": "Agricultural farm laborer",
     "NON_AGRICULTURAL_LABORER": "Non-agricultural laborer",
     "SALARIED_WORK": "Salaried work",

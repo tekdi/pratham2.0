@@ -158,10 +158,9 @@ const UserId = () => {
                     letterSpacing: '0.5px',
                   }}
                 >
-                  {user.state && `${user.state}, `}
-                  {user.district && `${user.district}, `}
-                  {user.block && `${user.block}, `}
-                  {user.village && `${user.village} `}
+                  {[user.state, user.district, user.block, user.village]
+                    .filter(Boolean)
+                    .join(', ')}
                 </Box>
               )}
             </Box>
@@ -253,6 +252,45 @@ const UserId = () => {
           )}
         </Box>
       </Box>
+      {isSelfProfile ? (
+        <Box sx={{ px: '16px', my: 2 }}>
+          <Box
+            sx={{
+              fontSize: '14px',
+              fontWeight: '500',
+              color: theme.palette.warning['300'],
+            }}
+          >
+            {t('LOGIN_PAGE.OTHER_SETTING')}
+          </Box>
+          <Box sx={{ mt: 2.5 }}>
+            <Button
+              variant="outlined"
+              color="primary"
+              sx={{
+                '&.Mui-disabled': {
+                  backgroundColor: theme?.palette?.primary?.main,
+                },
+                minWidth: '84px',
+                padding: theme.spacing(1),
+                fontWeight: '500',
+                width: '188px',
+                height: '40px',
+                '@media (max-width: 430px)': {
+                  width: '100%',
+                },
+                whiteSpace: 'nowrap',
+              }}
+              onClick={() => {
+                router.push('/edit-password');
+              }}
+              className="one-line-text"
+            >
+              {t('LOGIN_PAGE.RESET_PASSWORD')}
+            </Button>
+          </Box>
+        </Box>
+      ) : null}
     </>
   );
 };
