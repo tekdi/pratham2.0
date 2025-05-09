@@ -63,12 +63,6 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         to: () => router.push('/explore'),
         isActive: currentPage === '/explore',
       },
-      {
-        title: t('LEARNER_APP.COMMON.SURVEYS'),
-        icon: <AssignmentOutlined sx={{ width: 28, height: 28 }} />,
-        to: () => router.push('/content'),
-        isActive: currentPage === '/content',
-      },
     ];
 
     if (checkAuth()) {
@@ -79,6 +73,18 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
           setAnchorEl(true);
         },
         isActive: currentPage === '/profile',
+      });
+    }
+    const isVolunteer = JSON.parse(
+      localStorage.getItem('isVolunteer') || 'false'
+    );
+    console.log(isVolunteer);
+    if (isVolunteer) {
+      navLinks.push({
+        title: t('LEARNER_APP.COMMON.SURVEYS'),
+        icon: <AssignmentOutlined sx={{ width: 28, height: 28 }} />,
+        to: () => router.push('/surveys'),
+        isActive: currentPage === '/surveys',
       });
     }
 

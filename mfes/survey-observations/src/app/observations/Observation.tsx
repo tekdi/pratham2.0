@@ -3,7 +3,7 @@
 'use client';
 import { Box, Grid, Tab, Tabs, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useTranslation } from 'next-i18next';
+import { useTranslation } from '@shared-lib'; // Updated import
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import React, { useEffect, useState } from 'react';
 // import { targetSolution } from '../../services/youthNet/Survey/suveyService';
@@ -175,7 +175,7 @@ const Observation = () => {
   return (
     <>
       <Box px={{ xs: 2, sm: 3, md: 4 }} py={{ xs: 2, sm: 3 }}>
-        <Typography variant="h6">{t('SURVEYS.SURVEYS')}</Typography>
+        <Typography variant="h2">{t('SURVEYS.SURVEYS')}</Typography>
       </Box>
 
       <Box sx={{ width: '100%', overflowX: 'auto' }}>

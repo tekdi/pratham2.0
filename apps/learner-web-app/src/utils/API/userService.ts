@@ -1,8 +1,9 @@
 import { fetchForm } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import { API_ENDPOINTS } from './EndUrls';
-import { post, get, patch } from './RestClient';
+import { post, patch } from './RestClient';
 import { FormContext } from '@shared-lib-v2/DynamicForm/components/DynamicFormConstant';
 import { getMissingFields } from '../helper';
+import { get } from '@shared-lib';
 export interface UserDetailParam {
   userData?: object;
 
@@ -59,8 +60,17 @@ export const profileComplitionCheck = async (): Promise<any> => {
   try {
     if (userId) {
       const apiUrl = API_ENDPOINTS.userRead(userId, true);
-      const response = await get(apiUrl);
+      const response = await get(apiUrl, {
+        tenantId: localStorage.getItem('tenantId'),
+      });
       const userData = response?.data?.result?.userData;
+      const isVolunteerField = userData?.customFields.find(
+        (field: any) => field.label === 'IS_VOLUNTEER'
+      );
+      console.log(isVolunteerField);
+      const isVolunteer = isVolunteerField?.selectedValues?.[0] === 'yes';
+      localStorage.setItem('isVolunteer', JSON.stringify(isVolunteer));
+
       setLocalStorageFromCustomFields(userData?.customFields);
 
       const responseForm: any = await fetchForm([

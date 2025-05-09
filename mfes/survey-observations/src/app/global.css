@@ -1280,3 +1280,29 @@ mat-radio-group.mat-mdc-radio-group {
 .mt-24 {
   margin-top: 24px;
 }
+
+.Toastify__toast-body {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Space between icon and text */
+  padding: 8px 12px;
+  font-size: 14px;
+  white-space: normal; /* Allows line wrapping if needed */
+  word-break: break-word;
+}
+
+.Toastify__toast-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.Toastify__toast {
+  max-width: 320px;
+  margin: auto;
+  word-break: break-word;
+  text-align: center;
+}

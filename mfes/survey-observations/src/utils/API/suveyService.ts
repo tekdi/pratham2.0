@@ -40,9 +40,14 @@ export const fetchEntities = async ({ solutionId }: any): Promise<any> => {
 export const fetchQuestion = async ({
   observationId,
   entityId,
+  tempSubmissionNumber,
 }: any): Promise<any> => {
   try {
-    const apiUrl: string = `${process.env.NEXT_PUBLIC_SURVEY_URL}/observations/assessment/${observationId}?entityId=${entityId}`;
+    let querySubNum = '';
+    if (tempSubmissionNumber) {
+      querySubNum = `&submissionNumber=${tempSubmissionNumber}`;
+    }
+    const apiUrl: string = `${process.env.NEXT_PUBLIC_SURVEY_URL}/observations/assessment/${observationId}?entityId=${entityId}${querySubNum}`;
 
     const headers = {
       'X-auth-token': localStorage.getItem('token'),

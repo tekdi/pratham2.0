@@ -2,8 +2,9 @@ import { Box, Typography } from '@mui/material';
 import React from 'react';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { useTheme } from '@mui/material/styles';
-import { useTranslation } from 'next-i18next';
+// import { useTranslation } from 'next-i18next';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
+import { useTranslation } from '@shared-lib';
 interface SurveysProps {
   title: string;
   date?: string;
@@ -91,7 +92,7 @@ function Surveys({
                 }}
                 className="one-line-text"
               >
-                {t('YOUTHNET_DASHBOARD.CLOSED_ON')} {date}
+                {t('SURVEYS.CLOSED_ON')} {date}
               </Typography>
             )}
           </Box>

@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material';
+import { useTranslation } from '@shared-lib';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 
 interface NoDataFoundProps {
   title?: string;
@@ -9,7 +9,7 @@ interface NoDataFoundProps {
 
 const NoDataFound: React.FC<NoDataFoundProps> = ({
   title = 'COMMON.NO_DATA_FOUND',
-  bgColor
+  bgColor,
 }) => {
   const { t } = useTranslation();
   return (
@@ -23,7 +23,7 @@ const NoDataFound: React.FC<NoDataFoundProps> = ({
       <Typography
         style={{ fontWeight: '500', textAlign: 'center', width: '100%' }}
       >
-        {t(title,'No Data Found')}
+        {t('No Data Found')}
       </Typography>
     </Box>
   );
