@@ -464,7 +464,7 @@ const Assessments = () => {
   // Add effect to handle route changes
   useEffect(() => {
     const handleRouteChange = (url: string) => {
-      if (!url.startsWith('/assessments')) {
+      if (!url.startsWith('/scp-teacher-repo/assessments')) {
         // Clear sort filter when navigating away from assessments
         localStorage.removeItem('assessmentSortOption');
         setSelectedSortOption(null);
