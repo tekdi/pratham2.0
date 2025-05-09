@@ -22,7 +22,12 @@ import useStore from '../store/store';
 import ConfirmationModal from './ConfirmationModal';
 import StyledMenu from './StyledMenu';
 import { TENANT_DATA } from '../../app.config';
-import { getInitials, getUserFullName } from '@/utils/Helper';
+import {
+  firstLetterInUpperCase,
+  getInitials,
+  getUserFullName,
+} from '@/utils/Helper';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 interface HeaderProps {
   toggleDrawer?: (newOpen: boolean) => () => void;
@@ -44,6 +49,7 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
 
   const [userId, setUserId] = useState<string>('');
   const [userRole, setuserRole] = useState<string>('');
+  const [userName, setuserName] = useState<string>('');
 
   const [openMenu, setOpenMenu] = useState<boolean>(false);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -62,11 +68,13 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
       const storedLanguage = localStorage.getItem('preferredLanguage');
       const storedDarkMode = localStorage.getItem('mui-mode');
       const storedRole = localStorage.getItem('role');
+      const storedUserName = localStorage.getItem('userName');
 
       if (storedUserId) setUserId(storedUserId);
       if (storedLanguage) setSelectedLanguage(storedLanguage);
       if (storedDarkMode) setDarkMode(storedDarkMode);
       if (storedRole) setuserRole(storedRole);
+      if (storedUserName) setuserName(storedUserName);
     }
   }, []);
 
@@ -262,9 +270,37 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
               flexDirection={'column'}
               mt={'0.5rem'}
             >
-              <AccountCircleOutlinedIcon
-                sx={{ color: theme.palette.warning['A200'] }}
-              />
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  // ml: 1,
+                  '@media (max-width: 600px)': {
+                    display: 'none',
+                  },
+                }}
+              >
+                <AccountCircleIcon />
+
+                <Typography
+                  variant="body1"
+                  fontWeight="400"
+                  sx={{
+                    ml: 1,
+                    maxWidth: '200px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    fontSize: '16px',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {t('COMMON.HI', {
+                    name: firstLetterInUpperCase(userName ?? ''),
+                  })}
+                </Typography>
+                {/* 
+            <FeatherIcon icon="chevron-down" size="20" /> */}
+              </Box>
             </Box>
 
             <StyledMenu

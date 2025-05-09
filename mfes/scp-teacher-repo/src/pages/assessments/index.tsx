@@ -376,9 +376,8 @@ const Assessments = () => {
 
     const queryParams = { ...query };
     if (newType === 'post') queryParams.type = 'post';
-    if (newType === 'other') queryParams.type = 'other';
+    else if (newType === 'other') queryParams.type = 'other';
     else delete queryParams.type;
-
     router.push({ pathname: router.pathname, query: queryParams }, undefined, {
       shallow: true,
     });
