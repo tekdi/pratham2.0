@@ -158,10 +158,9 @@ const UserId = () => {
                     letterSpacing: '0.5px',
                   }}
                 >
-                  {user.state && `${user.state}, `}
-                  {user.district && `${user.district}, `}
-                  {user.block && `${user.block}, `}
-                  {user.village && `${user.village} `}
+                  {[user.state, user.district, user.block, user.village]
+                    .filter(Boolean)
+                    .join(', ')}
                 </Box>
               )}
             </Box>
