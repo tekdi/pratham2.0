@@ -308,7 +308,7 @@ const EditProfile = ({ completeProfile }: EditProfileProps) => {
                 schema={addSchema}
                 uiSchema={addUiSchema}
                 FormSubmitFunction={FormSubmitFunction}
-                prefilledFormData={userFormData}
+                prefilledFormData={completeProfile ? {} : userFormData}
                 hideSubmit={true}
               />
             )}
