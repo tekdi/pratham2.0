@@ -8,6 +8,13 @@ export const firstLetterInUpperCase = (label: string): string => {
     ?.map((word) => word?.charAt(0).toUpperCase() + word?.slice(1))
     ?.join(' ');
 };
+const getSelectedValueName = (fields: any, label: any) => {
+  const field = fields.find((f: any) => f.label === label);
+  if (field && field.selectedValues && field.selectedValues.length > 0) {
+    return field.selectedValues[0]; // Return the first selected value
+  }
+  return null; 
+};
 export const mapUserData = (userData: any) => {
   console.log(userData, 'userData');
   try {
@@ -57,14 +64,23 @@ export const mapUserData = (userData: any) => {
       ),
     };
 
-    if (userData.guardian_name) {
-      result.guardian_name = userData.guardian_name || '';
+    if (getSelectedValueName(userData.customFields, 'NAME_OF_GUARDIAN')) {
+      result.guardian_name =
+        getSelectedValueName(userData.customFields, 'NAME_OF_GUARDIAN') || '';
     }
-    if (userData.guardian_relation) {
-      result.guardian_relation = userData.guardian_relation || '';
+    if (getSelectedValueName(userData.customFields, 'RELATION_WITH_GUARDIAN')) {
+      result.guardian_relation =
+        getSelectedValueName(userData.customFields, 'RELATION_WITH_GUARDIAN') ||
+        '';
     }
-    if (userData.parent_phone) {
-      result.parent_phone = userData.parent_phone || '';
+    if (
+      getSelectedValueName(userData.customFields, 'PARENT_GUARDIAN_PHONE_NO')
+    ) {
+      result.parent_phone =
+        getSelectedValueName(
+          userData.customFields,
+          'PARENT_GUARDIAN_PHONE_NO'
+        ) || '';
     }
 
     return result;
