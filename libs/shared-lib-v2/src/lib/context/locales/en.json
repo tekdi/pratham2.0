@@ -29,7 +29,8 @@
     "OK": "OK",
     "INPROGRESS": "In-Progress",
     "SURE_LOGOUT": "Are you sure you want to Logout?",
-    "LOGOUT": "Logout"
+    "LOGOUT": "Logout",
+    "LOADING": "Loading.."
   },
   "LEARNER_APP": {
     "COMPLETE_PROFILE_BANNER": {

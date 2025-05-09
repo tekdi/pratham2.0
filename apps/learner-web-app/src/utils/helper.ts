@@ -13,7 +13,7 @@ const getSelectedValueName = (fields: any, label: any) => {
   if (field && field.selectedValues && field.selectedValues.length > 0) {
     return field.selectedValues[0]; // Return the first selected value
   }
-  return null; 
+  return null;
 };
 export const mapUserData = (userData: any) => {
   console.log(userData, 'userData');
@@ -48,10 +48,12 @@ export const mapUserData = (userData: any) => {
       district: getSelectedValue('DISTRICT'),
       block: getSelectedValue('BLOCK'),
       village: getSelectedValue('VILLAGE'),
-      drop_out_reason: getSelectedValue('REASON_FOR_DROP_OUT_FROM_SCHOOL'), // array
-      work_domain: getSelectedValue(
-        'ARE_YOU_CURRENTLY_WORKING_IF_YES_CHOOSE_THE_DOMAIN'
-      ),
+      drop_out_reason:
+        getSelectedValue('REASON_FOR_DROP_OUT_FROM_SCHOOL') || [], // array
+      work_domain:
+        getSelectedValue(
+          'ARE_YOU_CURRENTLY_WORKING_IF_YES_CHOOSE_THE_DOMAIN'
+        ) || [],
       what_do_you_want_to_become: getSingleTextValue(
         'WHAT_DO_YOU_WANT_TO_BECOME'
       ),
@@ -59,9 +61,8 @@ export const mapUserData = (userData: any) => {
         'HIGHEST_EDCATIONAL_QUALIFICATION_OR_LAST_PASSED_GRADE'
       ), // string
 
-      preferred_mode_of_learning: getSelectedValue(
-        'WHAT_IS_YOUR_PREFERRED_MODE_OF_LEARNING'
-      ),
+      preferred_mode_of_learning:
+        getSelectedValue('WHAT_IS_YOUR_PREFERRED_MODE_OF_LEARNING') || [],
     };
 
     if (getSelectedValueName(userData.customFields, 'NAME_OF_GUARDIAN')) {
