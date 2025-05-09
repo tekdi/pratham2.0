@@ -23,6 +23,7 @@ import {
 } from '../utils/Helper';
 import { CustomObjectFieldTemplate } from './FormTemplate/ObjectFieldTemplate';
 
+// import { useTranslation } from '@shared-lib'; // Updated import
 const DynamicForm = ({
   schema,
   uiSchema,

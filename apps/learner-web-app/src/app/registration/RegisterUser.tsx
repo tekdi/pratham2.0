@@ -1,7 +1,14 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Link, Typography } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Button,
+  IconButton,
+  Link,
+  Typography,
+} from '@mui/material';
 import Header from '@learner/components/Header/Header';
 import dynamic from 'next/dynamic';
 import { userCheck } from '@learner/utils/API/userService';
@@ -22,6 +29,8 @@ import { RoleId } from '@shared-lib-v2/DynamicForm/utils/app.constant';
 import { getUserId, login } from '@learner/utils/API/LoginService';
 import SignupSuccess from '@learner/components/SignupSuccess /SignupSuccess ';
 import { Loader } from '@shared-lib';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import {
   firstLetterInUpperCase,
   maskMobileNumber,
@@ -54,9 +63,17 @@ const RegisterUser = () => {
   const [otpmodal, setOtpModal] = useState(false);
   const [otp, setOtp] = useState<string[]>(['', '', '', '']);
   const [hash, setHash] = useState<string>('');
-  const localFormData = JSON.parse(localStorage.getItem('formData') || '{}');
+  const localFormData =
+    typeof window !== 'undefined'
+      ? JSON.parse(localStorage.getItem('formData') || '{}')
+      : {};
+
   const [formData, setFormData] = useState<any>(localFormData);
-  const localPayload = JSON.parse(localStorage.getItem('localPayload') || '{}');
+
+  const localPayload =
+    typeof window !== 'undefined'
+      ? JSON.parse(localStorage.getItem('localPayload') || '{}')
+      : {};
 
   const [payload, setPayload] = useState<any>(localPayload);
 
@@ -447,6 +464,8 @@ const RegisterUser = () => {
         overflow: 'auto',
       }}
     >
+      <Header />
+
       {loading ? (
         <Box
           width="100%"
@@ -461,18 +480,30 @@ const RegisterUser = () => {
           </Loader>{' '}
         </Box>
       ) : usernamePasswordForm ? (
-        <Box mt="10%">
-          <CreateAccountForm
-            username={username}
-            onUsernameChange={setUsername}
-            password={password}
-            onPasswordChange={setPassword}
-            confirmPassword={confirmPassword}
-            onConfirmPasswordChange={setConfirmPassword}
-            onSubmit={handleCreateAccount}
-            belowEighteen={formData.guardian_name ? true : false}
-          />
-        </Box>
+        <>
+          {' '}
+          <Box
+            sx={{ display: 'flex', alignItems: 'center', mb: 2, mt: 2 }}
+            onClick={() => router.back()}
+          >
+            <IconButton>
+              <ArrowBackIcon />
+            </IconButton>
+          </Box>
+          <Box mb={'30px'}>
+            <CreateAccountForm
+              username={username}
+              onUsernameChange={setUsername}
+              password={password}
+              onPasswordChange={setPassword}
+              confirmPassword={confirmPassword}
+              onConfirmPasswordChange={setConfirmPassword}
+              onSubmit={handleCreateAccount}
+              belowEighteen={formData.guardian_name ? true : false}
+              tenantName={tenantName}
+            />
+          </Box>
+        </>
       ) : (
         <>
           <Box
@@ -532,12 +563,31 @@ const RegisterUser = () => {
                 hideSubmit={true}
               />
             )}
+            <Alert
+              icon={<PriorityHighIcon htmlColor="black" />}
+              severity="info"
+              sx={{
+                backgroundColor: '#F7EBD9',
+                color: '#000',
+                //  fontSize: '14px',
+                mt: 2,
+                mb: 3,
+              }}
+            >
+              Make sure to cross check the state, district, block, village
+            </Alert>
             <Button
               sx={{
                 mt: 3,
                 backgroundColor: '#FFC107',
                 color: '#000',
-                fontWeight: 'bold',
+                fontFamily: 'Poppins',
+                fontWeight: 500,
+                fontSize: '14px',
+                lineHeight: '20px',
+                letterSpacing: '0.1px',
+                textAlign: 'center',
+                verticalAlign: 'middle',
                 '&:hover': {
                   backgroundColor: '#ffb300',
                 },
@@ -570,7 +620,7 @@ const RegisterUser = () => {
       </SimpleModal>
 
       <SimpleModal
-        open={otpmodal}
+        open={otpmodal && mobile ? true : false}
         onClose={handleOTPModal}
         showFooter
         primaryText={'Verify OTP'}

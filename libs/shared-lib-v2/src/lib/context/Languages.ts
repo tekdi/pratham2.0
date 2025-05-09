@@ -6,7 +6,7 @@ export interface Language {
 export const languages: Language[] = [
   { title: 'english', value: 'en' },
   { title: 'hindi', value: 'hi' },
-  //   { title: 'marathi', value: 'ma' },
+    { title: 'marathi', value: 'ma' },
   // { title: 'bengali', value: 'ba' },
   // { title: 'telugu', value: 'te' },
   // { title: 'kannada', value: 'ka' },

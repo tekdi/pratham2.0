@@ -955,8 +955,12 @@ export const getUserFullName = (user?: {
   if (user) {
     userData = user;
   } else {
-    userData = localStorage.getItem('userData');
-    userData = JSON.parse(userData || '{}');
+    if (typeof window !== 'undefined') {
+      const storedData = localStorage.getItem('userData');
+      if (storedData) {
+        userData = JSON.parse(storedData);
+      }
+    }
   }
 
   if (userData?.firstName) {
@@ -1164,4 +1168,11 @@ export const flresponsetotl = async (response: any[]) => {
   // console.log('########## testflresponse transformedData', transformedData);
 
   return transformedData;
+};
+export const getInitials = (name: any) => {
+  if (!name) return ''; // Handle empty input
+  const words = name?.trim().split(' ');
+  return words?.length > 1
+    ? words[0][0].toUpperCase() + words[1][0].toUpperCase()
+    : words[0][0].toUpperCase();
 };

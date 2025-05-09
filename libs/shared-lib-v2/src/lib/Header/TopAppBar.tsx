@@ -114,6 +114,7 @@ const LanguageSelect = ({
     >
       <MuiMenuItem value="en">EN</MuiMenuItem>
       <MuiMenuItem value="hi">HI</MuiMenuItem>
+      <MuiMenuItem value="mr">MR</MuiMenuItem>
     </Select>
   );
 };

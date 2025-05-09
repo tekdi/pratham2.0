@@ -160,7 +160,7 @@ const MyComponent: React.FC = () => {
                 >
                   {t('LEARNER_APP.L_ONE_COURSE.ONGOING_COURSES').replace(
                     '{count}',
-                    isShow.toString()
+                    isShow?.toString()
                   )}
                 </Typography>
               </Box>

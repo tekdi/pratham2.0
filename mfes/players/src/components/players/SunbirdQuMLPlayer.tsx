@@ -1,10 +1,9 @@
 import 'reflect-metadata';
 import React, { useEffect, useRef } from 'react';
-import {
-  contentWithTelemetryData,
-  getTelemetryEvents,
-} from '../../services/TelemetryService';
+// import axios from 'axios';
+import { handleTelemetryEventQuml } from '../../services/TelemetryService';
 import { handleExitEvent } from '../utils/Helper';
+import { createAssessmentTracking } from '../../services/PlayerService';
 
 interface PlayerConfigProps {
   playerConfig: any;
@@ -26,7 +25,32 @@ const SunbirdQuMLPlayer = ({
       playerElement.src = '';
       playerElement.src = originalSrc;
 
-      const handleLoad = () => {
+      const handleLoad = async () => {
+        // console.log(
+        //   'playerConfig',
+        //   playerConfig?.metadata?.children,
+        //   playerConfig?.metadata?.children.map((child: any) => child.identifier)
+        // );
+
+        // if (playerConfig?.metadata?.children) {
+        // const { data } = await axios.post(
+        //   `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/api/question/v2/list`,
+        //   {
+        //     request: {
+        //       search: {
+        //         identifier: playerConfig?.metadata?.children.map(
+        //           (child: any) => child.identifier
+        //         ),
+        //       },
+        //     },
+        //   }
+        // );
+        // localStorage.setItem(
+        //   'questions_data',
+        //   JSON.stringify({ questions_data: data })
+        // );
+        // console.log(data, 'result');
+        // }
         setTimeout(() => {
           if (
             playerElement.contentWindow &&
@@ -60,16 +84,19 @@ const SunbirdQuMLPlayer = ({
   React.useEffect(() => {
     const handleMessage = (event: any) => {
       const data = JSON.parse(event?.data);
-
       if (data?.maxScore !== undefined) {
-        contentWithTelemetryData({
-          identifier: data.identifierWithoutImg,
-          detailsObject: data,
+        createAssessmentTracking({
+          ...data,
           courseId,
           unitId,
         });
       } else if (data?.data?.edata?.type === 'EXIT') {
         handleExitEvent();
+      } else if (data?.data?.mid) {
+        handleTelemetryEventQuml(data, {
+          courseId,
+          unitId,
+        });
       }
     };
 
