@@ -778,7 +778,8 @@
     "DOB": "Date of Birth",
     "STATE_DISTRICT_BLOCK_VILLAGE": "Village Block District State",
     "USERNAME": "Username",
-    "SUBJECTS_I_TEACH": "Subjects I Teach"
+    "SUBJECTS_I_TEACH": "Subjects I Teach",
+    "MY_MAIN_SUBJECTS": "My Main Subjects"
   },
   "YOUTHNET_USERS_AND_VILLAGES": {
     "MENTORS": "Mentors",
