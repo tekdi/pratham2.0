@@ -185,11 +185,12 @@ export default memo(function LearnerCourse({
             showFilter={false}
             showSearch={false}
             showHelpDesk={false}
+            {..._content}
             _config={{
               default_img: '/images/image_ver.png',
               _card: { isHideProgress: true },
+              ..._content?._config,
             }}
-            {..._content}
             filters={{
               filters: {
                 ...filterState.filters,

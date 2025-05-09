@@ -29,7 +29,7 @@ export default function PosSchoolsPage() {
         if (SUPPORTED_MIME_TYPES.includes(content?.mimeType)) {
           return null;
         } else {
-          router.push(`/pos/content/${content?.identifier}`);
+          router.push(`/pos/content-details/${content?.identifier}`);
         }
       } catch (error) {
         console.error('Failed to handle card click:', error);
@@ -70,6 +70,7 @@ export default function PosSchoolsPage() {
         <Grid item xs={12}>
           <LearnerCourse
             _content={{
+              _config: { userIdLocalstorageName: 'did' },
               handleCardClick: handleCardClickLocal,
               staticFilter: { se_domains: ['Learning for School'] },
             }}

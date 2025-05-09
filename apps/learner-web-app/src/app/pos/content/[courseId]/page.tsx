@@ -17,6 +17,7 @@ const App = () => {
       <CourseUnitDetails
         isShowLayout={false}
         _config={{
+          userIdLocalstorageName: 'did',
           contentBaseUrl: '/pos/content',
           default_img: '/images/unit.png',
           _card: { isHideProgress: true },

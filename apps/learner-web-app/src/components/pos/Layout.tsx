@@ -13,7 +13,8 @@ import { Box } from '@mui/material';
 import POSMuiThemeProvider from '@learner/assets/theme/POSMuiThemeProvider';
 import { getTenantInfo } from '@learner/utils/API/ProgramService';
 import { Footer } from './Footer';
-
+import { getDeviceIdUUID } from '@shared-lib-v2/DynamicForm/utils/Helper';
+import { validate as uuidValidate } from 'uuid';
 interface NewDrawerItemProp extends DrawerItemProp {
   variant?: 'contained' | 'text';
   isActive?: boolean;
@@ -27,6 +28,18 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
   );
 
   React.useEffect(() => {
+    const init = async () => {
+      const did = localStorage.getItem('did');
+      if (!did || !(did && uuidValidate(did))) {
+        const visitorId = await getDeviceIdUUID();
+        localStorage.setItem(
+          'did',
+          typeof visitorId === 'string' ? visitorId : ''
+        );
+        console.log('Device fingerprint generated successfully', visitorId);
+      }
+    };
+    init();
     const currentPage =
       typeof window !== 'undefined' && window.location.pathname
         ? window.location.pathname

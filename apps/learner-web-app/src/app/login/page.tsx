@@ -9,10 +9,10 @@ import { getUserId, login } from '@learner/utils/API/LoginService';
 import { showToastMessage } from '@learner/components/ToastComponent/Toastify';
 import { useRouter } from 'next/navigation';
 import { useMediaQuery, useTheme } from '@mui/material';
-import FingerprintJS from '@fingerprintjs/fingerprintjs';
-import { Loader, useTranslation } from '@shared-lib';
+import { useTranslation } from '@shared-lib';
 import { getAcademicYear } from '@learner/utils/API/AcademicYearService';
 import { preserveLocalStorage } from '@learner/utils/helper';
+import { getDeviceId } from '@shared-lib-v2/DynamicForm/utils/Helper';
 
 const Login = dynamic(
   () => import('@login/Components/LoginComponent/LoginComponent'),
@@ -48,9 +48,11 @@ const LoginPage = () => {
           handleSuccessfulLogin(response?.result, { remember: false }, router);
         }
         if (!localStorage.getItem('did')) {
-          const fp = await FingerprintJS.load();
-          const { visitorId } = await fp.get();
-          localStorage.setItem('did', visitorId);
+          const visitorId = await getDeviceId();
+          localStorage.setItem(
+            'did',
+            typeof visitorId === 'string' ? visitorId : ''
+          );
           console.log('Device fingerprint generated successfully');
         }
       } catch (error) {
@@ -75,8 +77,6 @@ const LoginPage = () => {
       const response = await login({ username, password });
       if (response?.result?.access_token) {
         handleSuccessfulLogin(response?.result, data, router);
-
-       
       } else {
         showToastMessage(
           t('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT'),
@@ -89,8 +89,6 @@ const LoginPage = () => {
       const errorMessage = t('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT');
       showToastMessage(errorMessage, 'error');
     }
-
-   
   };
   return (
     <Suspense fallback={<div>Loading...</div>}>
@@ -176,8 +174,8 @@ const handleSuccessfulLogin = async (
 
         const academicYearResponse = await getAcademicYear();
 
-        console.log(academicYearResponse[0]?.id , 'academicYearResponse');
-        
+        console.log(academicYearResponse[0]?.id, 'academicYearResponse');
+
         if (academicYearResponse[0]?.id) {
           localStorage.setItem('academicYearId', academicYearResponse[0]?.id);
         }
