@@ -1,3 +1,5 @@
+import { ToastContainer } from 'react-toastify';
+import MuiThemeProvider from '../theme/MuiThemeProvider';
 import './global.css';
 
 export const metadata = {
@@ -12,7 +14,21 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <link
+        href="https://fonts.googleapis.com/icon?family=Material+Icons"
+        rel="stylesheet"
+      />
+      <head />
+      <body>
+        <MuiThemeProvider>{children}</MuiThemeProvider>
+        <ToastContainer
+          position="bottom-center"
+          autoClose={2000} // ✅ must not be false here
+          hideProgressBar
+          closeButton={false}
+          newestOnTop
+        />
+      </body>
     </html>
   );
 }

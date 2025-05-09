@@ -22,6 +22,7 @@ const translations: Record<string, Record<string, string>> = {
   en,
   // @ts-ignore
   hi,
+  // @ts-ignore
   mr,
 };
 

@@ -150,7 +150,7 @@ const AccountSelection = () => {
       </Box>
       <AccountSelectionForm userAccounts={usernames} onNext={handleNextStep} />
       <SimpleModal
-        open={otpmodal}
+        open={otpmodal && mobileNumber ? true : false}
         onClose={handleCloseModal}
         showFooter
         primaryText={'Verify OTP'}

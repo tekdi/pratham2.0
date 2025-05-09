@@ -176,7 +176,7 @@ const ChangePassword = () => {
           />
         </Box>
         <SimpleModal
-          open={otpmodal}
+          open={otpmodal && mobile ? true : false}
           onClose={handleOTPModal}
           showFooter
           primaryText={'Verify OTP'}

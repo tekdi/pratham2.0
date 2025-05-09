@@ -79,5 +79,4 @@ const OtpVerificationComponent = ({
     </Box>
   );
 };
-
 export default OtpVerificationComponent;

@@ -5,7 +5,6 @@ import { Box, Typography, TextField, Button, Stack } from '@mui/material';
 
 const OtpVerificationComponent = ({
   maskedNumber,
-
   onResend,
   otp,
   setOtp,
@@ -80,5 +79,4 @@ const OtpVerificationComponent = ({
     </Box>
   );
 };
-
 export default OtpVerificationComponent;

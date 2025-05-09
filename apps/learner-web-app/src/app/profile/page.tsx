@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Box } from '@mui/material';
+import { Alert, Box, Typography } from '@mui/material';
 import Layout from '../../components/Layout';
 import UserProfileCard from '@learner/components/UserProfileCard/UserProfileCard';
 import CourseCertificateCard from '@learner/components/CourseCertificateCard/CourseCertificateCard';
@@ -9,8 +9,10 @@ import { courseWiseLernerList } from '@shared-lib-v2/utils/CertificateService/co
 import { CertificateModal, get } from '@shared-lib';
 import { useRouter } from 'next/navigation';
 import { checkAuth } from '@shared-lib-v2/utils/AuthService';
+import InfoIcon from '@mui/icons-material/Info';
 
 import { baseurl } from '@learner/utils/API/EndUrls';
+import { Info } from '@mui/icons-material';
 type FilterDetails = {
   status?: string[];
   tenantId?: string;
@@ -107,7 +109,19 @@ const ProfilePage = () => {
 
         {/* Certificates Section */}
         <Box flexGrow={1} p={2}>
+          <Typography color={'#78590C'}>YouthNet</Typography>
+
+          <Typography color={'#78590C'}>
+            Completed Courses & Certificates
+          </Typography>
+          {courseData.length === 0 && (
+            <Box display="flex" alignItems="center" p="20px">
+              <InfoIcon color="info" sx={{ color: '#FDBE16', mr: 1 }} />
+              <Typography>Certification has not been completed yet.</Typography>
+            </Box>
+          )}
           <Box
+            mt="20px"
             display="grid"
             gridTemplateColumns={{
               xs: '1fr', // 1 column for mobile
@@ -118,7 +132,7 @@ const ProfilePage = () => {
             }}
             gap={2}
           >
-            {courseData &&
+            {courseData.lenght !== 0 &&
               courseData?.map((cert: any, index: any) => (
                 <CourseCertificateCard
                   key={index}
