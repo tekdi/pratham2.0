@@ -620,7 +620,7 @@ const RegisterUser = () => {
       </SimpleModal>
 
       <SimpleModal
-        open={otpmodal}
+        open={otpmodal && mobile ? true : false}
         onClose={handleOTPModal}
         showFooter
         primaryText={'Verify OTP'}

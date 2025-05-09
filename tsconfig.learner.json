@@ -19,7 +19,6 @@
       "@content-mfes/*": ["mfes/content/src/*"],
       "@login/*": ["mfes/login/src/*"],
       "@forget-password/*": ["mfes/forget-password/src/*"],
-      "@survey/*": ["mfes/survey-observations/src/*"],
       "@collection": ["mfes/editors/src/components/CollectionEditor.tsx"],
 
       "@shared-lib": ["libs/shared-lib-v2/src/index.ts"],
@@ -33,7 +32,9 @@
       "@ContentPlayer": ["mfes/content/src/components/Content/Player.tsx"],
 
       //dynamic form
-      "@shared-lib-v2/*": ["libs/shared-lib-v2/src/*"]
+      "@shared-lib-v2/*": ["libs/shared-lib-v2/src/*"],
+      "@survey/*": ["mfes/survey-observations/src/*"],
+      "@players/*": ["mfes/players/src/pages/play.tsx"]
     }
   },
   "exclude": ["node_modules", "tmp"]

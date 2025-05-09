@@ -128,7 +128,7 @@ const ForgotPassword = ({}) => {
       <ForgotPasswordComponent onNext={handleNextStep} />
 
       <SimpleModal
-        open={otpmodal}
+        open={otpmodal && mobileNumber ? true : false}
         onClose={handleCloseModal}
         showFooter
         primaryText={'Verify OTP'}

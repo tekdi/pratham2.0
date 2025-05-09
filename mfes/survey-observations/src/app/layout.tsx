@@ -1,3 +1,4 @@
+import { ToastContainer } from 'react-toastify';
 import MuiThemeProvider from '../theme/MuiThemeProvider';
 import './global.css';
 
@@ -20,7 +21,13 @@ export default function RootLayout({
       <head />
       <body>
         <MuiThemeProvider>{children}</MuiThemeProvider>
-        {/* <ToastContainer /> */}
+        <ToastContainer
+          position="bottom-center"
+          autoClose={2000} // ✅ must not be false here
+          hideProgressBar
+          closeButton={false}
+          newestOnTop
+        />
       </body>
     </html>
   );
