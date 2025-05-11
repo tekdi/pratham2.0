@@ -45,12 +45,12 @@ interface FilterSectionProps {
   showMore: boolean;
   setShowMore: (b: boolean) => void;
   repleaseCode?: string;
-  staticFormData?: Record<string, object> | undefined;
+  staticFormData?: Record<string, object>;
 }
 
 interface FilterListProps {
   orginalFormData: any;
-  staticFilter?: Record<string, object> | undefined;
+  staticFilter?: Record<string, object>;
   onApply?: any;
   filterFramework?: any;
 }
@@ -60,7 +60,7 @@ export function FilterForm({
   staticFilter,
   onApply,
   filterFramework,
-}: FilterListProps) {
+}: Readonly<FilterListProps>) {
   const { t } = useTranslation();
 
   const [filterData, setFilterData] = useState<Record<string, any>[]>([]);
@@ -81,7 +81,7 @@ export function FilterForm({
       data = await filterContent({ instantId });
     }
 
-    const categories = data?.framework?.categories || [];
+    const categories = data?.framework?.categories ?? [];
     const transformedCategories = transformCategories(categories);
     const transformedRenderForm = transformRenderForm(categories);
     const defaults: Record<string, TermOption[]> = {};
@@ -102,13 +102,13 @@ export function FilterForm({
     const instantFramework = localStorage.getItem('channelId') ?? '';
     const staticResp = await staticFilterContent({ instantFramework });
     const props =
-      staticResp?.objectCategoryDefinition?.forms?.create?.properties || [];
+      staticResp?.objectCategoryDefinition?.forms?.create?.properties ?? [];
 
     const filtered = filterObjectsWithSourceCategory(
       props,
       transformedRenderForm.map((r) => r.name)
     );
-    setRenderStaticForm(filtered[0]?.fields || []);
+    setRenderStaticForm(filtered[0]?.fields ?? []);
     setLoading(false);
   }, [orginalFormData, filterFramework]);
 
@@ -156,7 +156,6 @@ export function FilterForm({
             const cat = renderForm.find(
               (f) => 'se_{code}s'.replace('{code}', f.code) === code
             );
-            // const updateFormData = { ...formData, [code]: next };
             setFormData((prev) => ({ ...prev, [code]: next }));
             if (cat) {
               replaceOptionsWithAssoc({
@@ -212,7 +211,7 @@ const formatPayload = (payload: any) => {
   Object.keys(payload).forEach((key) => {
     if (Array.isArray(payload[key])) {
       formattedPayload[key] = payload[key].map(
-        (item: any) => item.name || item
+        (item: any) => item.name ?? item
       );
     } else {
       formattedPayload[key] = payload[key];
@@ -310,7 +309,7 @@ function updateRenderFormWithAssociations(
   currentForm: Category[]
 ) {
   const catName = category.replace(/(^se_)|(s$)/g, '');
-  const obj = baseFilter.find((f: any) => f[category] || f[catName]);
+  const obj = baseFilter.find((f: any) => f[category] ?? f[catName]);
   if (!obj) return currentForm;
   const toPush: Record<string, any[]> = {};
 
@@ -318,8 +317,8 @@ function updateRenderFormWithAssociations(
     const associations =
       opt.associations ??
       obj[catName]?.options?.find((e: any) => e.code == opt.code)?.associations;
-    return Object.entries(associations || {}).forEach(([k, arr]: any) => {
-      toPush[k] = toPush[k] || [];
+    return Object.entries(associations ?? {}).forEach(([k, arr]: any) => {
+      toPush[k] = toPush[k] ?? [];
       arr?.forEach((item: any) => {
         if (!toPush[k].some((o) => o.code === item.code)) toPush[k].push(item);
       });
@@ -348,7 +347,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
         const code = repleaseCode
           ? repleaseCode.replace('{code}', field.code)
           : field.code;
-        const selected = selectedValues[code] || [];
+        const selected = selectedValues[code] ?? [];
         const optionsToShow = showMore ? values : values.slice(0, 3);
         const staticValues = Array.isArray(staticFormData?.[code])
           ? staticFormData[code]
@@ -373,7 +372,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
               {staticValues.map((item: any, idx: number) => (
                 <Chip
                   key={`${code}-chip-${idx}`}
-                  label={item.name || item}
+                  label={item.name ?? item}
                   sx={{ fontSize: '12px' }}
                 />
               ))}
@@ -401,7 +400,6 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                   sx={{ fontSize: '18px', fontWeight: '500', color: '#181D27' }}
                 >
                   {field.name}
-                  {/* {field?.options?.length} */}
                 </Typography>
               </AccordionSummary>
               <AccordionDetails
@@ -437,7 +435,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                             }}
                           />
                         }
-                        label={item.name || item}
+                        label={item.name ?? item}
                         sx={{
                           color: '#414651',
                           fontSize: '14px',

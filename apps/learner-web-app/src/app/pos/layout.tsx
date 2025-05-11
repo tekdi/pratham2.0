@@ -1,5 +1,3 @@
-// app/layout.tsx
-// import './global.css';
 import 'react-toastify/dist/ReactToastify.css';
 import POSMuiThemeProvider from '@learner/assets/theme/POSMuiThemeProvider';
 import { GlobalProvider } from '@learner/components/Provider/GlobalProvider';
@@ -25,9 +23,7 @@ export const metadata = {
 
 export default function RootLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <GlobalProvider>
       <POSMuiThemeProvider>{children}</POSMuiThemeProvider>

@@ -49,9 +49,7 @@ const theme = createTheme(learnerTheme, {
 
 export default function POSMuiThemeProvider({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />

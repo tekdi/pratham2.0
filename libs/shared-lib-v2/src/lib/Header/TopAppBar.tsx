@@ -185,7 +185,7 @@ export const DesktopBar = ({
         }}
       >
         {navLinks.map((link, index) => (
-          <Box key={index} onMouseLeave={handleLeave}>
+          <Box key={`${link.title}-${index}`} onMouseLeave={handleLeave}>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <Button
                 component={typeof link.to === 'string' ? 'a' : 'button'}
@@ -234,7 +234,7 @@ export const DesktopBar = ({
 
       {menus.map((menu, level) => (
         <Popper
-          key={level}
+          key={`menu-${level}`}
           open={Boolean(menu.anchorEl)}
           anchorEl={menu.anchorEl}
           placement="bottom"
@@ -269,7 +269,7 @@ export const DesktopBar = ({
 
                 return (
                   <Box
-                    key={idx}
+                    key={`${idx}-${item.label}`}
                     onMouseEnter={(e) => {
                       if (hasChild) {
                         openMenuAtLevel(level + 1, e.currentTarget, item.child);
@@ -381,7 +381,7 @@ const Brand = ({ _box, name = 'Pratham' }: { _box?: any; name?: string }) => {
   const theme = useTheme();
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }} {..._box}>
-      {_box?.brandlogo || (
+      {_box?.brandlogo ?? (
         <>
           <img src="/logo.png" alt="YouthNet" style={{ height: '40px' }} />
           <Typography

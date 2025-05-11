@@ -160,7 +160,7 @@ export const Layout: React.FC<LayoutProps> = ({
             }
           }}
         >
-          {footerComponent || (
+          {footerComponent ?? (
             <Footer
               buttonLabel="Continue"
               // buttonWidth="328px"

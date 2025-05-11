@@ -2,7 +2,6 @@
 
 import React from 'react';
 import Layout from '@learner/components/pos/Layout';
-// import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { gredientStyle } from '@learner/utils/style';
 import { Box } from '@mui/material';

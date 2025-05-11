@@ -140,7 +140,7 @@ export default memo(function LearnerCourse({
                       )
                       .map((key, index) => (
                         <Chip
-                          key={index}
+                          key={`${key}-${index}`}
                           label={
                             <Typography
                               noWrap

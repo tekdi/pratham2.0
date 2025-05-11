@@ -20,7 +20,7 @@ import {
 } from '@content-mfes/services/Certificate';
 import AppConst from '@content-mfes/utils/AppConst/AppConst';
 import { checkAuth, getUserId } from '@shared-lib-v2/utils/AuthService';
-
+import { getUserId as getUserIdLocal } from '@content-mfes/services/LoginService';
 interface DetailsProps {
   isShowLayout?: any;
   id?: string;
@@ -90,7 +90,7 @@ export default function Details(props: DetailsProps) {
                 course_track?.status === 'completed' &&
                 data?.result?.status === 'enrolled'
               ) {
-                const userResponse: any = await getUserId();
+                const userResponse: any = await getUserIdLocal();
                 const resultCertificate = await issueCertificate({
                   userId: userId,
                   courseId: courseId,

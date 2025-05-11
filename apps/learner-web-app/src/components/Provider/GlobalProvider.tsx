@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useMemo } from 'react';
 import { getTenantInfo } from '@learner/utils/API/ProgramService';
 import { filterContent } from '@shared-lib-v2/utils/AuthService';
 
@@ -26,7 +26,7 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
       const res = await getTenantInfo();
       const currentDomain = window.location.hostname;
       const tenantInfo =
-        res?.result.find((program: any) => program.domain === currentDomain) ||
+        res?.result.find((program: any) => program.domain === currentDomain) ??
         res?.result.find(
           (program: any) =>
             program.domain === process.env.NEXT_PUBLIC_POS_DOMAIN
@@ -55,7 +55,10 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
 
   return (
     <GlobalProviderContext.Provider
-      value={{ loading, globalData, setGlobalData }}
+      value={useMemo(
+        () => ({ loading, globalData, setGlobalData }),
+        [loading, globalData, setGlobalData]
+      )}
     >
       {children}
     </GlobalProviderContext.Provider>

@@ -5,7 +5,7 @@ import { useTranslation, FilterForm } from '@shared-lib';
 const FilterComponent: React.FC<{
   filterState: any;
   filterFramework?: any;
-  staticFilter?: Record<string, object> | undefined;
+  staticFilter?: Record<string, object>;
   handleFilterChange: (newFilterState: any) => void;
 }> = ({ filterState, staticFilter, filterFramework, handleFilterChange }) => {
   const { t } = useTranslation();
@@ -13,7 +13,7 @@ const FilterComponent: React.FC<{
 
   useEffect(() => {
     setFilterCount(
-      Object?.keys(filterState.filters || {}).filter(
+      Object?.keys(filterState.filters ?? {}).filter(
         (e) => !['limit', ...Object.keys(staticFilter ?? {})].includes(e)
       ).length
     );
@@ -24,14 +24,14 @@ const FilterComponent: React.FC<{
       <FilterForm
         onApply={(newFilterState: any) => {
           setFilterCount(
-            Object?.keys(newFilterState || {}).filter(
+            Object?.keys(newFilterState ?? {}).filter(
               (e) => e?.toString() != 'limit'
             ).length
           );
           handleFilterChange(newFilterState);
         }}
         filterFramework={filterFramework}
-        orginalFormData={filterState?.filters || {}}
+        orginalFormData={filterState?.filters ?? {}}
         staticFilter={staticFilter}
       />
     ),

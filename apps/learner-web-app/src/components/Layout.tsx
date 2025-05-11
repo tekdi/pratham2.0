@@ -165,7 +165,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
   );
 };
 
-export default function AppWrapper(props: LayoutProps) {
+export default function AppWrapper(props: Readonly<LayoutProps>) {
   return (
     <MuiThemeProvider>
       <App {...props} />

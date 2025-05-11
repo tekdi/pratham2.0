@@ -3,7 +3,6 @@ import LearnerCourse from '@learner/components/Content/LearnerCourse';
 import Layout from '@learner/components/pos/Layout';
 import { useGlobalData } from '@learner/components/Provider/GlobalProvider';
 import { SUPPORTED_MIME_TYPES } from '@learner/utils/helper';
-import { Height } from '@mui/icons-material';
 import { Grid } from '@mui/material';
 import { ContentItem, Loader } from '@shared-lib';
 import dynamic from 'next/dynamic';
@@ -14,7 +13,7 @@ const InfoCard = dynamic(() => import('@InfoCard'), {
   ssr: false,
 });
 
-export default function App({ pagename }: { pagename: string }) {
+export default function App({ pagename }: Readonly<{ pagename: string }>) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const {

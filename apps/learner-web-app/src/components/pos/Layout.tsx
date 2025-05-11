@@ -47,7 +47,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
       typeof window !== 'undefined' && window.location.pathname
         ? window.location.pathname
         : '';
-    const categories = filterFramework?.framework?.categories || [];
+    const categories = filterFramework?.framework?.categories ?? [];
     const transformedCategories = transformCategories(categories);
     const schoolSubCategory =
       transformedCategories?.domain?.options.find(
