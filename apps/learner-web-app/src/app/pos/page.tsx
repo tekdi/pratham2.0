@@ -90,9 +90,9 @@ const keyThemesList = [
   ],
 ];
 const descriptions = [
-  'School pillar description: Empowering students with foundational knowledge and skills for academic success and lifelong learning.',
-  'Work pillar description: Equipping learners with practical and professional skills for career readiness and growth in the workplace.',
-  'Life pillar description: Fostering holistic development, critical thinking, and well-being for a balanced and fulfilling life.',
+  'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
+  'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
+  'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
 ];
 
 const page = () => {
@@ -121,10 +121,10 @@ const page = () => {
     { src: '/images/knowledge-three.png', alt: 'Sulzer' },
   ];
   const otherWebsites = [
-    { src: '/images/knowledge-one.png', alt: 'UBS' },
-    { src: '/images/knowdlege-two.png', alt: 'Education Above All' },
-    { src: '/images/knowledge-three.png', alt: 'Sulzer' },
-    { src: '/images/knowledge-four.png', alt: 'Schmidt Futures' },
+    { src: '/images/website-1.png', alt: 'UBS' },
+    { src: '/images/Websites-2.png', alt: 'Education Above All' },
+    { src: '/images/website-3.png', alt: 'Sulzer' },
+    { src: '/images/website-4.png', alt: 'Schmidt Futures' },
   ];
 
   return (
