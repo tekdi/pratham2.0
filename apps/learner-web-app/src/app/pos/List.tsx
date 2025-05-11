@@ -76,7 +76,13 @@ export default function App({ pagename }: { pagename: string }) {
               handleCardClick: handleCardClickLocal,
               staticFilter: {
                 se_domains: [`Learning for ${pagename}`],
-                se_subDomains: searchParams?.get('se_subDomains')?.split(','),
+                ...(searchParams?.get('se_subDomains')?.split(',')
+                  ? {
+                      se_subDomains: searchParams
+                        ?.get('se_subDomains')
+                        ?.split(','),
+                    }
+                  : {}),
               },
             }}
           />

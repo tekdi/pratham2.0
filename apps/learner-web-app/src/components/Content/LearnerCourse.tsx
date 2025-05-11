@@ -23,7 +23,7 @@ export default memo(function LearnerCourse({
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useTranslation();
   const { staticFilter, filterFramework } = _content ?? {};
-
+  console.log(staticFilter, 'staticFilter sagar');
   useEffect(() => {
     if (_content?.filters) {
       setFilterState((prevState: any) => ({
@@ -31,8 +31,8 @@ export default memo(function LearnerCourse({
         ..._content?.filters,
       }));
     }
-  }, [_content?.filters, staticFilter]);
-  console.log('filterState', staticFilter);
+  }, [_content?.filters]);
+
   const handleSearchClick = useCallback((searchValue: string) => {
     setFilterState((prevState: any) => ({
       ...prevState,

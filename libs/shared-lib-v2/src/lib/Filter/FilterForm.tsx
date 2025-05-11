@@ -309,7 +309,7 @@ function updateRenderFormWithAssociations(
   baseFilter: any[],
   currentForm: Category[]
 ) {
-  const catName = category.replace(/^se_|s$/g, '');
+  const catName = category.replace(/(^se_)|(s$)/g, '');
   const obj = baseFilter.find((f: any) => f[category] || f[catName]);
   if (!obj) return currentForm;
   const toPush: Record<string, any[]> = {};

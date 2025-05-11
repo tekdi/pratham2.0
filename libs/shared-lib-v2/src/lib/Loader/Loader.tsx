@@ -34,7 +34,7 @@ export const Loader: React.FC<LoaderProps> = memo(
               // zIndex: 9999,
               // left: 0,
               // right: 0,
-              backgroundColor: 'white',
+              backgroundColor: 'transparent',
               ..._loader,
             }}
           >

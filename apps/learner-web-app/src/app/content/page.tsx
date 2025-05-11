@@ -17,7 +17,7 @@ import { usePathname } from 'next/navigation';
 const MyComponent: React.FC = () => {
   const { t } = useTranslation();
   const pathname = usePathname();
-  const [filter, setFilter] = useState<object | null>();
+  const [filter, setFilter] = useState<Record<string, any> | null>(null);
   const [isLogin, setIsLogin] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isShow, setIsShow] = useState(false);
@@ -78,7 +78,7 @@ const MyComponent: React.FC = () => {
     };
     fetchTenantInfo();
   }, [pathname]);
-
+  console.log(filter?.filters?.domain, 'sagar');
   return (
     <Layout isLoadingChildren={isLoading} sx={gredientStyle}>
       {isProfileCard && <CompleteProfileBanner />}
@@ -200,7 +200,18 @@ const MyComponent: React.FC = () => {
           {filter && (
             <LearnerCourse
               title={'LEARNER_APP.COURSE.GET_STARTED'}
-              _content={{ filters: filter }}
+              _content={{
+                staticFilter: {
+                  se_domains:
+                    typeof filter.filters?.domain === 'string'
+                      ? [filter.filters?.domain]
+                      : filter.filters?.domain,
+                  program:
+                    typeof filter.filters?.program === 'string'
+                      ? [filter.filters?.program]
+                      : filter.filters?.program,
+                },
+              }}
             />
           )}
         </Grid>

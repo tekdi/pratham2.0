@@ -237,7 +237,7 @@ export const DesktopBar = ({
           key={level}
           open={Boolean(menu.anchorEl)}
           anchorEl={menu.anchorEl}
-          placement={level === 0 ? 'bottom-start' : 'bottom-start'}
+          placement="bottom"
           disablePortal
           onMouseEnter={handleEnter}
           onMouseLeave={handleLeave}
