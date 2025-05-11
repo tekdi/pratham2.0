@@ -5,7 +5,7 @@ import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
 import React from 'react';
 import { LanguageProvider } from '@shared-lib';
 
-const theme = createTheme({
+export const theme = createTheme({
   typography: {
     fontFamily: 'Poppins, Arial, sans-serif',
     allVariants: {
