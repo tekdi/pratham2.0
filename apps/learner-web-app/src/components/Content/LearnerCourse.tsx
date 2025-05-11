@@ -22,7 +22,7 @@ export default memo(function LearnerCourse({
   const [filterState, setFilterState] = useState<any>({ limit: 8 });
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useTranslation();
-  const { staticFilter } = _content ?? {};
+  const { staticFilter, filterFramework } = _content ?? {};
 
   useEffect(() => {
     if (_content?.filters) {
@@ -31,8 +31,8 @@ export default memo(function LearnerCourse({
         ..._content?.filters,
       }));
     }
-  }, [_content?.filters]);
-
+  }, [_content?.filters, staticFilter]);
+  console.log('filterState', staticFilter);
   const handleSearchClick = useCallback((searchValue: string) => {
     setFilterState((prevState: any) => ({
       ...prevState,
@@ -97,6 +97,7 @@ export default memo(function LearnerCourse({
       <Stack direction="row" sx={{ gap: 4 }}>
         <CommonDialog isOpen={isOpen} onClose={() => setIsOpen(false)}>
           <FilterComponent
+            filterFramework={filterFramework}
             staticFilter={staticFilter}
             filterState={filterState}
             handleFilterChange={handleFilterChange}
@@ -113,6 +114,7 @@ export default memo(function LearnerCourse({
           }}
         >
           <FilterComponent
+            filterFramework={filterFramework}
             staticFilter={staticFilter}
             filterState={filterState}
             handleFilterChange={handleFilterChange}

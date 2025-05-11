@@ -52,12 +52,14 @@ interface FilterListProps {
   orginalFormData: any;
   staticFilter?: Record<string, object> | undefined;
   onApply?: any;
+  filterFramework?: any;
 }
 
 export function FilterForm({
   orginalFormData,
   staticFilter,
   onApply,
+  filterFramework,
 }: FilterListProps) {
   const { t } = useTranslation();
 
@@ -71,9 +73,15 @@ export function FilterForm({
 
   const fetchData = useCallback(async () => {
     const instantId = localStorage.getItem('collectionFramework') ?? '';
-    const data = await filterContent({ instantId });
-    const categories = data?.framework?.categories || [];
+    let data: any = {};
 
+    if (filterFramework) {
+      data = filterFramework;
+    } else if (orginalFormData) {
+      data = await filterContent({ instantId });
+    }
+
+    const categories = data?.framework?.categories || [];
     const transformedCategories = transformCategories(categories);
     const transformedRenderForm = transformRenderForm(categories);
     const defaults: Record<string, TermOption[]> = {};
@@ -102,7 +110,7 @@ export function FilterForm({
     );
     setRenderStaticForm(filtered[0]?.fields || []);
     setLoading(false);
-  }, [orginalFormData]);
+  }, [orginalFormData, filterFramework]);
 
   useEffect(() => {
     fetchData();
@@ -233,7 +241,7 @@ function filterObjectsWithSourceCategory(data: any[], filteredNames: string[]) {
   }));
 }
 
-function transformCategories(categories: any[]) {
+export function transformCategories(categories: any[]) {
   return categories
     .sort((a, b) => a.index - b.index)
     .reduce((acc: any, category: any) => {
@@ -265,7 +273,7 @@ function transformCategories(categories: any[]) {
     }, {});
 }
 
-function transformRenderForm(categories: any[]) {
+export function transformRenderForm(categories: any[]) {
   return categories
     .sort((a, b) => a.index - b.index)
     .map((category) => ({
@@ -335,17 +343,20 @@ const FilterSection: React.FC<FilterSectionProps> = ({
 }) => {
   return (
     <Box>
-      {fields.map((field) => {
+      {fields.map((field, idx) => {
         const values = field.options ?? field.range ?? [];
         const code = repleaseCode
           ? repleaseCode.replace('{code}', field.code)
           : field.code;
         const selected = selectedValues[code] || [];
         const optionsToShow = showMore ? values : values.slice(0, 3);
-        const staticValues = staticFormData?.[code] || [];
+        const staticValues = Array.isArray(staticFormData?.[code])
+          ? staticFormData[code]
+          : [];
         if (Array.isArray(staticValues) && staticValues.length > 0) {
           return (
             <Box
+              key={`${code}-${idx}`}
               sx={{
                 display: 'flex',
                 flexDirection: 'column',

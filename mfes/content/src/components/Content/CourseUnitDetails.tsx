@@ -90,7 +90,7 @@ export default function Details(props: DetailsProps) {
                 course_track?.status === 'completed' &&
                 data?.result?.status === 'enrolled'
               ) {
-                const userResponse = await getUserId();
+                const userResponse: any = await getUserId();
                 const resultCertificate = await issueCertificate({
                   userId: userId,
                   courseId: courseId,

@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   AppBar,
   Box,
@@ -10,14 +10,15 @@ import {
   Select,
   MenuItem as MuiMenuItem,
   useTheme,
-  Menu,
   MenuItem,
+  Paper,
+  Popper,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { CommonDrawer } from '../Drawer/CommonDrawer';
 import type { DrawerItemProp } from '../Drawer/CommonDrawer';
-import { ChevronRight } from '@mui/icons-material';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 interface NewDrawerItemProp extends DrawerItemProp {
   variant?: 'contained' | 'text';
@@ -123,7 +124,7 @@ const LanguageSelect = ({
   );
 };
 
-const DesktopBar = ({
+export const DesktopBar = ({
   navLinks = [],
   rightComponent,
   isShowLang = true,
@@ -131,14 +132,36 @@ const DesktopBar = ({
   _navLinkBox,
   _brand,
 }: AppBarProps) => {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [menus, setMenus] = useState<
+    { anchorEl: HTMLElement | null; items: any[] }[]
+  >([]);
+  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
+  const openMenuAtLevel = (
+    level: number,
+    anchor: HTMLElement,
+    items: any[]
+  ) => {
+    setMenus((prev) => {
+      const next = [...prev];
+      next[level] = { anchorEl: anchor, items };
+      return next.slice(0, level + 1);
+    });
   };
 
-  const handleMenuClose = () => {
-    setAnchorEl(null);
+  const handleEnter = () => {
+    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+  };
+
+  const handleLeave = () => {
+    closeTimeoutRef.current = setTimeout(() => {
+      setMenus([]);
+    }, 300);
+  };
+
+  const handleClickLeaf = (to: any) => {
+    setMenus([]);
+    if (typeof to === 'function') to();
   };
 
   return (
@@ -151,6 +174,7 @@ const DesktopBar = ({
       }}
     >
       <Brand {..._brand} />
+
       <Box
         sx={{
           display: 'flex',
@@ -161,104 +185,40 @@ const DesktopBar = ({
         }}
       >
         {navLinks.map((link, index) => (
-          <Box key={index}>
-            <Button
-              component={typeof link.to === 'string' ? 'a' : 'button'}
-              href={typeof link.to === 'string' ? link.to : undefined}
-              variant={
-                link.isActive
-                  ? 'top-bar-link-button'
-                  : link.variant ?? 'top-bar-link-text'
-              }
-              onClick={
-                typeof link.to !== 'string'
-                  ? (link.to as (
-                      event: React.MouseEvent<
-                        HTMLButtonElement | HTMLAnchorElement
-                      >
-                    ) => void)
-                  : undefined
-              }
-              startIcon={
-                link?.icon && (
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      mr: 1,
-                    }}
-                  >
-                    {link.icon}
-                  </Box>
-                )
-              }
-            >
-              {link.title}
-            </Button>
-            {link.child && (
-              <ChevronRight
-                component="span"
-                sx={{
-                  fontSize: 20,
-                  ml: 1,
-                  cursor: 'pointer',
-                }}
-                onClick={handleMenuOpen}
-              />
-            )}
-            {link.child && (
-              <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleMenuClose}
-                MenuListProps={{
-                  onMouseLeave: handleMenuClose,
-                  sx: {
-                    display: 'flex',
-                    flexDirection: 'row',
-                    flexWrap: 'wrap',
-                    '& .MuiMenuItem-root': {
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      width: 'min-content',
-                      '&:not(:last-child)': {
-                        marginRight: 2,
-                      },
-                      '&[style*="max-width"]': {
-                        width: '100%',
-                        maxWidth: '100vw',
-                        marginRight: 0,
-                      },
-                    },
-                  },
-                }}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'right',
-                }}
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
+          <Box key={index} onMouseLeave={handleLeave}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Button
+                component={typeof link.to === 'string' ? 'a' : 'button'}
+                href={typeof link.to === 'string' ? link.to : undefined}
+                // @ts-ignore
+                variant={
+                  link.isActive
+                    ? 'top-bar-link-button'
+                    : link.variant ?? 'top-bar-link-text'
+                }
+                onClick={
+                  typeof link.to !== 'string'
+                    ? (link.to as React.MouseEventHandler)
+                    : undefined
+                }
               >
-                {link.child.map((childLink: any, childIndex) => (
-                  <MenuItem
-                    key={childIndex}
-                    onClick={() => {
-                      handleMenuClose();
-                      childLink?.to();
-                    }}
-                    style={{
-                      maxWidth: childLink.title.length > 100 ? '100wh' : '',
-                    }}
-                  >
-                    {childLink.title}
-                  </MenuItem>
-                ))}
-              </Menu>
-            )}
+                {link.title}
+              </Button>
+              {link.child && (
+                <IconButton
+                  size="small"
+                  onMouseEnter={(e) =>
+                    openMenuAtLevel(0, e.currentTarget, link.child ?? [])
+                  }
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openMenuAtLevel(0, e.currentTarget, link?.child ?? []);
+                  }}
+                >
+                  <ArrowDropDownIcon />
+                </IconButton>
+              )}
+            </Box>
           </Box>
         ))}
 
@@ -271,6 +231,74 @@ const DesktopBar = ({
           </Box>
         )}
       </Box>
+
+      {menus.map((menu, level) => (
+        <Popper
+          key={level}
+          open={Boolean(menu.anchorEl)}
+          anchorEl={menu.anchorEl}
+          placement={level === 0 ? 'bottom-start' : 'bottom-start'}
+          disablePortal
+          onMouseEnter={handleEnter}
+          onMouseLeave={handleLeave}
+          modifiers={[
+            {
+              name: 'offset',
+              options: {
+                offset: [0, 0],
+              },
+            },
+          ]}
+          sx={{
+            zIndex: 1300 + level,
+            mt: level === 0 ? 0.5 : 0,
+          }}
+        >
+          <Paper elevation={3}>
+            <Box
+              display="flex"
+              flexDirection="row"
+              flexWrap="wrap"
+              sx={{
+                boxShadow: '0px -4px 4px rgba(0, 0, 0, 0.1)',
+              }}
+            >
+              {menu.items.map((item, idx) => {
+                const hasChild =
+                  Array.isArray(item.child) && item.child.length > 0;
+
+                return (
+                  <Box
+                    key={idx}
+                    onMouseEnter={(e) => {
+                      if (hasChild) {
+                        openMenuAtLevel(level + 1, e.currentTarget, item.child);
+                      } else {
+                        setMenus((prev) => prev.slice(0, level + 1));
+                      }
+                    }}
+                    sx={{ minWidth: 160 }}
+                  >
+                    <MenuItem
+                      onClick={() => {
+                        if (!hasChild) handleClickLeaf(item.to);
+                      }}
+                      sx={{
+                        justifyContent: 'space-between',
+                        whiteSpace: 'nowrap',
+                        py: 3,
+                      }}
+                    >
+                      {item.title}
+                      {hasChild && <ArrowDropDownIcon fontSize="small" />}
+                    </MenuItem>
+                  </Box>
+                );
+              })}
+            </Box>
+          </Paper>
+        </Popper>
+      ))}
     </Box>
   );
 };
@@ -285,6 +313,7 @@ const MobileTopBar = ({
   _brand,
 }: AppBarProps) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
   return (
     <Box
       sx={{
@@ -294,7 +323,7 @@ const MobileTopBar = ({
         width: '100%',
       }}
     >
-      {!showBackIcon && (
+      {!showBackIcon ? (
         <>
           <IconButton
             size="large"
@@ -317,8 +346,7 @@ const MobileTopBar = ({
             {title}
           </Typography>
         </>
-      )}
-      {showBackIcon && (
+      ) : (
         <>
           <IconButton
             size="large"
@@ -343,9 +371,6 @@ const MobileTopBar = ({
         open={isDrawerOpen}
         onDrawerClose={() => setIsDrawerOpen(false)}
         items={navLinks}
-        onItemClick={(to) => {
-          setIsDrawerOpen(false);
-        }}
         topElement={<Brand {..._brand} />}
       />
     </Box>
@@ -356,7 +381,7 @@ const Brand = ({ _box, name = 'Pratham' }: { _box?: any; name?: string }) => {
   const theme = useTheme();
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }} {..._box}>
-      {_box?.logoComponent || (
+      {_box?.brandlogo || (
         <>
           <img src="/logo.png" alt="YouthNet" style={{ height: '40px' }} />
           <Typography

@@ -4,9 +4,10 @@ import { useTranslation, FilterForm } from '@shared-lib';
 
 const FilterComponent: React.FC<{
   filterState: any;
+  filterFramework?: any;
   staticFilter?: Record<string, object> | undefined;
   handleFilterChange: (newFilterState: any) => void;
-}> = ({ filterState, staticFilter, handleFilterChange }) => {
+}> = ({ filterState, staticFilter, filterFramework, handleFilterChange }) => {
   const { t } = useTranslation();
   const [filterCount, setFilterCount] = useState<any>();
 
@@ -29,12 +30,14 @@ const FilterComponent: React.FC<{
           );
           handleFilterChange(newFilterState);
         }}
+        filterFramework={filterFramework}
         orginalFormData={filterState?.filters || {}}
         staticFilter={staticFilter}
       />
     ),
-    [handleFilterChange, staticFilter, filterState]
+    [handleFilterChange, filterFramework, staticFilter, filterState]
   );
+
   return (
     <Box
       sx={{

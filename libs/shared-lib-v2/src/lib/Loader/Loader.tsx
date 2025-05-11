@@ -5,7 +5,7 @@ import React, { memo, ReactNode } from 'react';
 interface LoaderProps {
   isLoading: boolean;
   layoutHeight?: number;
-  children: ReactNode;
+  children?: ReactNode;
   _loader?: React.CSSProperties;
   _children?: React.CSSProperties;
   isHideMaxHeight?: Boolean;
