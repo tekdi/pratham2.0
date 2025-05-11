@@ -88,6 +88,7 @@ export const theme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
+          borderRadius: '12px',
           '& > :last-child': {
             paddingBottom: 16,
           },

@@ -3,6 +3,7 @@ import LearnerCourse from '@learner/components/Content/LearnerCourse';
 import Layout from '@learner/components/pos/Layout';
 import { useGlobalData } from '@learner/components/Provider/GlobalProvider';
 import { SUPPORTED_MIME_TYPES } from '@learner/utils/helper';
+import { Height } from '@mui/icons-material';
 import { Grid } from '@mui/material';
 import { ContentItem, Loader } from '@shared-lib';
 import dynamic from 'next/dynamic';
@@ -72,7 +73,14 @@ export default function App({ pagename }: { pagename: string }) {
           <LearnerCourse
             _content={{
               filterFramework: filterFramework,
-              _config: { userIdLocalstorageName: 'did' },
+              _config: {
+                userIdLocalstorageName: 'did',
+                _card: {
+                  isHideProgress: true,
+                  isWrap: true,
+                  _cardMedia: { sx: { height: '153px' } },
+                },
+              },
               handleCardClick: handleCardClickLocal,
               staticFilter: {
                 se_domains: [`Learning for ${pagename}`],

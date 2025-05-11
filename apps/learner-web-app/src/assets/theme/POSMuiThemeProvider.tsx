@@ -6,6 +6,13 @@ import React from 'react';
 import { theme as learnerTheme } from './MuiThemeProvider';
 const theme = createTheme(learnerTheme, {
   components: {
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          borderRadius: 0,
+        },
+      },
+    },
     MuiButton: {
       variants: [
         {
