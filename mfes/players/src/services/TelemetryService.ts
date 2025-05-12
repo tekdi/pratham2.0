@@ -25,19 +25,20 @@ export const handleTelemetryEventPDF = (event: any) => {
 
 export const handleTelemetryEventQuml = (
   event: any,
-  { courseId, unitId }: any = {}
+  { courseId, unitId, userId }: any = {}
 ) => {
-  getTelemetryEvents(event.data, 'quml', { courseId, unitId });
+  getTelemetryEvents(event.data, 'quml', { courseId, unitId, userId });
 };
 
 export const getTelemetryEvents = async (
   eventData: any,
   contentType: string,
-  { courseId, unitId }: any = {}
+  { courseId, unitId, userId }: any = {}
 ) => {
   console.log('getTelemetryEvents hit', eventData, contentType, {
     courseId,
     unitId,
+    userId,
   });
 
   if (!eventData || !eventData.object || !eventData.object.id) {
@@ -69,6 +70,7 @@ export const getTelemetryEvents = async (
       detailsObject: [telemetryData],
       courseId,
       unitId,
+      userId,
     });
   }
 
@@ -172,6 +174,7 @@ export const getTelemetryEvents = async (
           detailsObject,
           courseId,
           unitId,
+          userId,
         });
       } catch (error) {
         console.log(error);
@@ -188,6 +191,7 @@ export const contentWithTelemetryData = async ({
   detailsObject,
   courseId,
   unitId,
+  userId: propUserId,
 }: any) => {
   try {
     let resolvedMimeType = localStorage.getItem('mimeType');
@@ -200,9 +204,12 @@ export const contentWithTelemetryData = async ({
       }
     }
     let userId = '';
-    if (typeof window !== 'undefined' && window.localStorage) {
+    if (propUserId) {
+      userId = propUserId;
+    } else if (typeof window !== 'undefined' && window.localStorage) {
       userId = localStorage.getItem('userId') ?? '';
     }
+    console.log(userId, propUserId, 'sagar');
     if (userId !== undefined || userId !== '') {
       const ContentTypeReverseMap = Object.fromEntries(
         Object.entries(ContentType).map(([key, value]) => [value, key])

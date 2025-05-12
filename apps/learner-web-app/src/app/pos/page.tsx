@@ -1,27 +1,143 @@
-import React from 'react';
-import { Layout, useTranslation } from '@shared-lib';
+'use client';
+import React, { useState } from 'react';
+import Layout from '@learner/components/pos/Layout';
+
 import {
   Container,
   Typography,
   TextField,
   Button,
   Grid,
-  Card,
-  CardContent,
   Box,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import FeautureCarousel from '@learner/components/FeautureCarousel';
 import WhatsNewCarousel from '@learner/components/WhatsNewCarousel';
+import MoreWayCarousel from '@learner/components/MoreWayCarousel';
+import KnwoledgeCarousel from '@learner/components/KnwoledgeCarousel';
+import OtherWebsiteCarousel from '@learner/components/OtherWebsiteCarousel';
+import Learning from '@learner/components/Learning';
+import Image from 'next/image';
+
+const keyThemesList = [
+  [
+    {
+      title: 'Academics',
+
+      desc: 'Math, Science, English...',
+    },
+    {
+      title: 'Growth & Learning',
+
+      desc: 'Activity Videos, Stories, Riddles...',
+    },
+    {
+      title: 'Media Moments',
+
+      desc: 'TV Episodes, Podcasts...',
+    },
+    {
+      title: 'Inclusive Education',
+
+      desc: 'Innovative Strategies, Subject-specific...',
+    },
+  ],
+  [
+    {
+      title: 'Career Skills',
+
+      desc: 'Resume, Interview, Communication...',
+    },
+    {
+      title: 'Entrepreneurship',
+
+      desc: 'Startups, Business Ideas, Finance...',
+    },
+    {
+      title: 'Digital Literacy',
+
+      desc: 'Computers, Internet, Safety...',
+    },
+    {
+      title: 'Professional Growth',
+
+      desc: 'Leadership, Teamwork, Projects...',
+    },
+  ],
+  [
+    {
+      title: 'Life Skills',
+
+      desc: 'Critical Thinking, Problem Solving...',
+    },
+    {
+      title: 'Health & Wellness',
+
+      desc: 'Nutrition, Exercise, Mindfulness...',
+    },
+    {
+      title: 'Civic Awareness',
+      desc: 'Rights, Responsibilities, Community...',
+    },
+    {
+      title: 'Creativity',
+
+      desc: 'Art, Music, Innovation...',
+    },
+  ],
+];
+const descriptions = [
+  'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
+  'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
+  'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
+];
+
 const page = () => {
+  const partners = [
+    { src: '/images/knowledge-one.png', alt: 'UBS' },
+    { src: '/images/knowdlege-two.png', alt: 'Education Above All' },
+    { src: '/images/knowledge-three.png', alt: 'Sulzer' },
+    { src: '/images/knowledge-four.png', alt: 'Schmidt Futures' },
+    { src: '/images/knowledge-five.png', alt: 'Western Digital' },
+    { src: '/images/knowledge-one.png', alt: 'UBS' },
+    { src: '/images/knowdlege-two.png', alt: 'Education Above All' },
+    { src: '/images/knowledge-three.png', alt: 'Sulzer' },
+    { src: '/images/knowledge-four.png', alt: 'Schmidt Futures' },
+    { src: '/images/knowledge-five.png', alt: 'Western Digital' },
+  ];
+  const ourPartners = [
+    { src: '/images/knowdlege-two.png', alt: 'Education Above All' },
+    { src: '/images/knowledge-one.png', alt: 'UBS' },
+    { src: '/images/knowledge-four.png', alt: 'Schmidt Futures' },
+    { src: '/images/knowledge-three.png', alt: 'Sulzer' },
+    { src: '/images/knowledge-one.png', alt: 'UBS' },
+    { src: '/images/knowdlege-two.png', alt: 'Education Above All' },
+    { src: '/images/knowledge-five.png', alt: 'Western Digital' },
+    { src: '/images/knowledge-four.png', alt: 'Schmidt Futures' },
+    { src: '/images/knowledge-five.png', alt: 'Western Digital' },
+    { src: '/images/knowledge-three.png', alt: 'Sulzer' },
+  ];
+  const otherWebsites = [
+    { src: '/images/website-1.png', alt: 'UBS' },
+    { src: '/images/Websites-2.png', alt: 'Education Above All' },
+    { src: '/images/website-3.png', alt: 'Sulzer' },
+    { src: '/images/website-4.png', alt: 'Schmidt Futures' },
+  ];
+
   return (
     <Layout onlyHideElements={['footer']}>
       <Grid container spacing={4}>
         <Grid item xs={12} md={6}>
-          <img
+          <Image
             src="/images/home-page-banner.png"
             alt="Happy children learning together"
-            style={{ width: '100%', height: 'auto' }}
+            layout="responsive"
+            width={1000}
+            height={568}
+            style={{ width: '100%', height: '568px' }}
           />
         </Grid>
         <Grid
@@ -194,7 +310,7 @@ const page = () => {
           boxShadow: '1px 0px 16px 0px #00000026',
           backgroundColor: '#F1F2F2',
           p: '32px',
-          marginTop: '-100px',
+          marginTop: '-60px',
           zIndex: 1000,
           position: 'relative',
           '@media (max-width: 900px)': {
@@ -221,86 +337,7 @@ const page = () => {
         >
           Our Learning Pillars
         </Typography>
-        <Grid container spacing={4}>
-          {['School', 'Work', 'Life'].map((pillar, index) => (
-            <Grid item xs={12} md={4} key={pillar}>
-              <Box
-                sx={{
-                  height: '100%',
-                  marginTop: '20px',
-                }}
-              >
-                <Box
-                  sx={{
-                    background: `url(/images/pillar-${
-                      index + 1
-                    }.png) no-repeat center center`,
-                    backgroundSize: 'cover',
-                    height: '273px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexDirection: 'column',
-                  }}
-                >
-                  <Box
-                    sx={{
-                      mt: 2,
-                      fontFamily: 'Poppins',
-                      fontWeight: 400,
-                      fontSize: '28px',
-                      lineHeight: '36px',
-                      letterSpacing: '0px',
-                      textAlign: 'center',
-                      color: '#fff',
-                      '@media (max-width: 900px)': {
-                        fontSize: '19px',
-                      },
-                    }}
-                  >
-                    Learning for
-                  </Box>
-
-                  <Box
-                    sx={{
-                      mt: 1,
-                      fontFamily: 'Poppins',
-                      fontWeight: 700,
-                      fontSize: '45px',
-                      lineHeight: '52px',
-                      letterSpacing: '0px',
-                      textAlign: 'center',
-                      color: '#FDBE16',
-                      '@media (max-width: 900px)': {
-                        fontSize: '31px',
-                      },
-                    }}
-                  >
-                    {pillar}
-                  </Box>
-                </Box>
-                <Box
-                  sx={{
-                    fontFamily: 'Poppins',
-                    fontWeight: 400,
-                    fontSize: '16px',
-                    lineHeight: '24px',
-                    letterSpacing: '0.5px',
-                    color: '#7C766F',
-                    marginTop: '20px',
-                    '@media (max-width: 900px)': {
-                      fontSize: '11px',
-                    },
-                  }}
-                >
-                  Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut
-                  elit tellus, luctus nec llamcorper mattis, pulvinar dapibus
-                  leo. ullamcorper mattis, pulvinar dapibus leo.
-                </Box>
-              </Box>
-            </Grid>
-          ))}
-        </Grid>
+        <Learning data={keyThemesList} descriptions={descriptions} />
       </Box>
 
       {/* Total Resources section  */}
@@ -381,7 +418,7 @@ const page = () => {
                   sx={{
                     fontFamily: 'Poppins',
                     fontWeight: 700,
-                    fontSize: '36px',
+                    fontSize: { xs: '24px', md: '36px' },
                     lineHeight: '44px',
                     letterSpacing: '0px',
                     textAlign: 'center',
@@ -440,7 +477,7 @@ const page = () => {
         </Box>
       </Box>
 
-      {/* What’s New */}
+      {/* What's New */}
       <Box>
         <Typography
           sx={{
@@ -450,15 +487,150 @@ const page = () => {
             lineHeight: '44px',
             letterSpacing: '0px',
             textAlign: 'center',
-            mt: 5,
+            mt: 4,
           }}
         >
-          What’s New
+          What's New
         </Typography>
 
         <Box>
           <WhatsNewCarousel />
         </Box>
+
+        {/* More way to Learn */}
+      </Box>
+      <Box
+        sx={{
+          mt: 8,
+          mx: 7,
+          '@media (max-width: 900px)': {
+            mx: '16px',
+          },
+        }}
+      >
+        <Grid container spacing={2} sx={{ alignItems: 'center' }}>
+          <Grid item xs={12} md={6}>
+            <Typography
+              sx={{
+                fontFamily: 'Poppins',
+                fontWeight: 700,
+                fontSize: '36px',
+                lineHeight: '44px',
+                letterSpacing: '0px',
+                color: '#1F1B13',
+                '@media (max-width: 900px)': {
+                  fontSize: '22px',
+                  lineHeight: '30px',
+                  textAlign: 'center',
+                },
+              }}
+            >
+              More Ways to Learn – Check Out Our Products!
+            </Typography>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <MoreWayCarousel />
+          </Grid>
+        </Grid>
+      </Box>
+
+      <Box
+        sx={{
+          mt: 7,
+          mx: 7,
+          '@media (max-width: 900px)': {
+            mx: '16px',
+          },
+        }}
+      >
+        <Typography
+          sx={{
+            fontFamily: 'Poppins',
+            fontWeight: 700,
+            fontSize: '36px',
+            lineHeight: '44px',
+            letterSpacing: '0px',
+            textAlign: 'center',
+            color: '#1F1B13',
+            '@media (max-width: 900px)': {
+              fontSize: '22px',
+            },
+          }}
+        >
+          Knowledge Partners
+        </Typography>
+
+        <Container maxWidth="xl">
+          <Box sx={{ mt: 3 }}>
+            <KnwoledgeCarousel images={partners} />
+          </Box>
+        </Container>
+      </Box>
+
+      <Box
+        sx={{
+          mt: 7,
+          mx: 7,
+          '@media (max-width: 900px)': {
+            mx: '16px',
+          },
+        }}
+      >
+        <Typography
+          sx={{
+            fontFamily: 'Poppins',
+            fontWeight: 700,
+            fontSize: '36px',
+            lineHeight: '44px',
+            letterSpacing: '0px',
+            textAlign: 'center',
+            color: '#1F1B13',
+            '@media (max-width: 900px)': {
+              fontSize: '22px',
+            },
+          }}
+        >
+          Our Partners
+        </Typography>
+
+        <Container maxWidth="xl">
+          <Box sx={{ mt: 3 }}>
+            <KnwoledgeCarousel images={ourPartners} />
+          </Box>
+        </Container>
+      </Box>
+
+      <Box
+        sx={{
+          mt: 7,
+          mx: 7,
+          '@media (max-width: 900px)': {
+            mx: '16px',
+          },
+        }}
+      >
+        <Typography
+          sx={{
+            fontFamily: 'Poppins',
+            fontWeight: 700,
+            fontSize: '36px',
+            lineHeight: '44px',
+            letterSpacing: '0px',
+            textAlign: 'center',
+            color: '#1F1B13',
+            '@media (max-width: 900px)': {
+              fontSize: '22px',
+            },
+          }}
+        >
+          Other Websites
+        </Typography>
+
+        <Container maxWidth="xl">
+          <Box sx={{ mt: 3 }}>
+            <OtherWebsiteCarousel images={otherWebsites} />
+          </Box>
+        </Container>
       </Box>
     </Layout>
   );

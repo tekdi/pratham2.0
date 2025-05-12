@@ -5,7 +5,7 @@ import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
 import React from 'react';
 import { LanguageProvider } from '@shared-lib';
 
-const theme = createTheme({
+export const theme = createTheme({
   typography: {
     fontFamily: 'Poppins, Arial, sans-serif',
     allVariants: {
@@ -88,6 +88,7 @@ const theme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
+          borderRadius: '12px',
           '& > :last-child': {
             paddingBottom: 16,
           },
@@ -175,7 +176,15 @@ export default function MuiThemeProvider({
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <LanguageProvider>{children}</LanguageProvider>
+      {children}
     </ThemeProvider>
   );
 }
+
+export const MuiThemeProviderWithLanguage = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
+  return <LanguageProvider>{children}</LanguageProvider>;
+};

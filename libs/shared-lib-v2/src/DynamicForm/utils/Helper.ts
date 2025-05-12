@@ -1,5 +1,9 @@
 //@ts-nocheck
-import { Role, Status, labelsToExtractForMiniProfile } from '../utils/app.constant';
+import {
+  Role,
+  Status,
+  labelsToExtractForMiniProfile,
+} from '../utils/app.constant';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import FingerprintJS from 'fingerprintjs2';
@@ -8,7 +12,6 @@ import {
   CustomField,
   UpdateCustomField,
 } from '../utils/Interfaces';
-dayjs.extend(utc);
 import { format, parseISO } from 'date-fns';
 import manageUserStore from '../store/manageUserStore';
 import {
@@ -17,6 +20,8 @@ import {
   lowLearnerAttendanceLimit,
 } from '../utils/app.config';
 import API_ENDPOINTS from '../utils/API/APIEndpoints';
+import { v5 as uuidv5 } from 'uuid';
+dayjs.extend(utc);
 
 export const ATTENDANCE_ENUM = {
   PRESENT: 'present',
@@ -294,6 +299,18 @@ export const getDeviceId = () => {
       const values = components.map((component) => component.value);
       const deviceId = FingerprintJS.x64hash128(values.join(''), 31);
       resolve(deviceId);
+    });
+  });
+};
+
+export const getDeviceIdUUID = () => {
+  return new Promise((resolve) => {
+    FingerprintJS.get((components: any[]) => {
+      const values = components.map((component) => component.value);
+      const deviceId = FingerprintJS.x64hash128(values.join(''), 31);
+      const ns = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
+      const uuid = uuidv5(deviceId, ns); // Generate deterministic UUID from fingerprint
+      resolve(uuid);
     });
   });
 };

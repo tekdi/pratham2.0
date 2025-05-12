@@ -14,7 +14,7 @@ const basePath = process.env.NEXT_PUBLIC_ASSETS_CONTENT || '/sbplayer';
 
 const SunbirdQuMLPlayer = ({
   playerConfig,
-  relatedData: { courseId, unitId },
+  relatedData: { courseId, unitId, userId },
 }: PlayerConfigProps) => {
   const SunbirdQuMLPlayerRef = useRef<HTMLIFrameElement | null>(null);
 
@@ -89,6 +89,7 @@ const SunbirdQuMLPlayer = ({
           ...data,
           courseId,
           unitId,
+          userId,
         });
       } else if (data?.data?.edata?.type === 'EXIT') {
         handleExitEvent();
@@ -96,6 +97,7 @@ const SunbirdQuMLPlayer = ({
         handleTelemetryEventQuml(data, {
           courseId,
           unitId,
+          userId,
         });
       }
     };

@@ -19,9 +19,8 @@ import {
   issueCertificate,
 } from '@content-mfes/services/Certificate';
 import AppConst from '@content-mfes/utils/AppConst/AppConst';
-import { getUserId } from '@content-mfes/services/LoginService';
-import { checkAuth } from '@shared-lib-v2/utils/AuthService';
-
+import { checkAuth, getUserId } from '@shared-lib-v2/utils/AuthService';
+import { getUserId as getUserIdLocal } from '@content-mfes/services/LoginService';
 interface DetailsProps {
   isShowLayout?: any;
   id?: string;
@@ -42,9 +41,9 @@ export default function Details(props: DetailsProps) {
     const getDetails = async (identifier: string) => {
       try {
         const resultHierarchy = await hierarchyAPI(identifier);
-        const userId = localStorage.getItem('userId');
+        const userId = getUserId(props?._config?.userIdLocalstorageName);
         let startedOn = '';
-        if (checkAuth()) {
+        if (checkAuth(Boolean(userId))) {
           const data = await getUserCertificateStatus({
             userId: userId as string,
             courseId: courseId as string,
@@ -56,7 +55,11 @@ export default function Details(props: DetailsProps) {
               data?.result?.status === 'viewCertificate'
             )
           ) {
-            router.replace(`/content-details/${courseId}`);
+            router.replace(
+              `${
+                props?._config?.contentBaseUrl ?? '/content'
+              }-details/${courseId}`
+            );
           } else {
             const userIdArray: string[] = Array.isArray(userId)
               ? (userId as string[]).filter(Boolean)
@@ -87,7 +90,7 @@ export default function Details(props: DetailsProps) {
                 course_track?.status === 'completed' &&
                 data?.result?.status === 'enrolled'
               ) {
-                const userResponse = await getUserId();
+                const userResponse: any = await getUserIdLocal();
                 const resultCertificate = await issueCertificate({
                   userId: userId,
                   courseId: courseId,
@@ -119,12 +122,20 @@ export default function Details(props: DetailsProps) {
   }, [identifier, courseId, router, unitId]);
 
   const handleItemClick = (subItem: any) => {
-    localStorage.setItem('unitId', subItem?.courseId);
-    const path =
-      subItem.mimeType === 'application/vnd.ekstep.content-collection'
-        ? `/content/${courseId}/${subItem?.identifier}`
-        : `/content/${courseId}/${unitId}/${subItem?.identifier}`;
-    router.push(path);
+    if (props?._config?.handleCardClick) {
+      props?._config.handleCardClick?.(subItem);
+    } else {
+      localStorage.setItem('unitId', subItem?.courseId);
+      const path =
+        subItem.mimeType === 'application/vnd.ekstep.content-collection'
+          ? `${props?._config?.contentBaseUrl ?? '/content'}/${courseId}/${
+              subItem?.identifier
+            }`
+          : `${
+              props?._config?.contentBaseUrl ?? '/content'
+            }/${courseId}/${unitId}/${subItem?.identifier}`;
+      router.push(path);
+    }
   };
 
   const onBackClick = () => {

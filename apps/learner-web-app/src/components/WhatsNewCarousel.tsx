@@ -12,11 +12,11 @@ import GlobalStyles from '@mui/material/GlobalStyles';
 import IconButton from '@mui/material/IconButton';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import { Grid } from '@mui/material';
 
 const slides = [
   {
-    image:
-      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80',
+    image: 'images/what-new.png',
     heading:
       'Pratham - Shah PraDigi Innovation Centre is selected as one of the winners of the Learning Engineering Tools Competition 2021-22',
     description:
@@ -47,17 +47,17 @@ const WhatsNewCarousel = () => (
     <GlobalStyles
       styles={{
         '.custom-swiper-bullet': {
-          width: 10,
-          height: 10,
+          width: 16,
+          height: 16,
           borderRadius: '50%',
-          background: '#ddd',
+          background: '#CDC5BD',
           display: 'inline-block',
           margin: '0 4px',
           transition: 'background 0.2s',
           cursor: 'pointer',
         },
         '.custom-swiper-bullet-active': {
-          background: '#ffe082',
+          background: '#FDBE16',
         },
         '.custom-swiper-pagination': {
           display: 'flex',
@@ -100,75 +100,89 @@ const WhatsNewCarousel = () => (
     >
       {slides.map((slide, idx) => (
         <SwiperSlide key={idx}>
-          <Box
+          <Grid
+            container
             sx={{
-              display: 'flex',
-              flexDirection: { xs: 'column', md: 'row' },
-              alignItems: 'stretch',
-              justifyContent: 'stretch',
+              alignItems: 'center',
+              background: '#F1F2F2',
             }}
           >
             {/* Image Section */}
-            <Box
-              sx={{
-                position: 'relative',
-                flex: 1.2,
-                minWidth: 0,
-                display: 'flex',
-                alignItems: 'stretch',
-              }}
-            >
+            <Grid item xs={12} md={6}>
               <Box
-                component="img"
-                src={slide.image}
-                alt="slide"
                 sx={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  borderTopLeftRadius: 2,
-                  borderBottomLeftRadius: 2,
-                  minHeight: 320,
-                  maxHeight: 340,
-                  '@media (max-width:900px)': {
-                    borderRadius: '12px 12px 0 0',
-                    maxHeight: 220,
-                    minHeight: 180,
-                  },
+                  position: 'relative',
+                  flex: 1.2,
+                  minWidth: 0,
+                  display: 'flex',
+                  alignItems: 'center',
                 }}
-              />
-            </Box>
+              >
+                <Box
+                  component="img"
+                  src={slide.image}
+                  alt="slide"
+                  sx={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    borderTopLeftRadius: 2,
+                    borderBottomLeftRadius: 2,
+                    minHeight: 320,
+                    maxHeight: 340,
+                    '@media (max-width:900px)': {
+                      borderRadius: '12px 12px 0 0',
+                      maxHeight: 220,
+                      minHeight: 180,
+                    },
+                  }}
+                />
+              </Box>
+            </Grid>
             {/* Content Section */}
-            <Box
-              sx={{
-                flex: 1.8,
-                background: '#f7f7f7',
-                borderTopRightRadius: 2,
-                borderBottomRightRadius: 2,
-                p: { xs: '24px 16px', md: '32px' },
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                '@media (max-width:900px)': { borderRadius: '0 0 12px 12px' },
-              }}
-            >
-              <Typography
+            <Grid item xs={12} md={6}>
+              <Box
                 sx={{
-                  fontSize: '1.25rem',
-                  fontWeight: 600,
-                  mb: 2,
-                  color: '#222',
+                  flex: 1.8,
+                  borderTopRightRadius: 2,
+                  borderBottomRightRadius: 2,
+                  p: { xs: '24px 16px', md: '32px' },
                 }}
               >
-                {slide.heading}
-              </Typography>
-              <Typography
-                sx={{ fontSize: '1rem', color: '#444', lineHeight: 1.6, mb: 3 }}
-              >
-                {slide.description}
-              </Typography>
-            </Box>
-          </Box>
+                <Typography
+                  sx={{
+                    fontFamily: 'Poppins',
+                    fontWeight: 400,
+                    fontSize: '22px',
+                    lineHeight: '28px',
+                    letterSpacing: '0px',
+                    color: '#1F1B13',
+                    '@media (max-width:900px)': {
+                      fontSize: '16px',
+                    },
+                  }}
+                >
+                  {slide.heading}
+                </Typography>
+                <Typography
+                  sx={{
+                    fontFamily: 'Poppins',
+                    fontWeight: 400,
+                    fontSize: '16px',
+                    lineHeight: '24px',
+                    letterSpacing: '0.5px',
+                    color: '#1F1B13',
+                    mt: 2,
+                    '@media (max-width:900px)': {
+                      fontSize: '14px',
+                    },
+                  }}
+                >
+                  {slide.description}
+                </Typography>
+              </Box>
+            </Grid>
+          </Grid>
         </SwiperSlide>
       ))}
     </Swiper>
@@ -190,7 +204,7 @@ const WhatsNewCarousel = () => (
           borderRadius: '50%',
         }}
       >
-        <ArrowBackIosNewIcon fontSize="small" sx={{ color: '#222' }} />
+        <ArrowBackIosNewIcon fontSize="small" sx={{ color: '#1F1B13' }} />
       </IconButton>
       <Box className="custom-swiper-pagination" />
       <IconButton
@@ -202,7 +216,7 @@ const WhatsNewCarousel = () => (
           borderRadius: '50%',
         }}
       >
-        <ArrowForwardIosIcon fontSize="small" sx={{ color: '#222' }} />
+        <ArrowForwardIosIcon fontSize="small" sx={{ color: '#1F1B13' }} />
       </IconButton>
     </Box>
   </Box>
