@@ -268,3 +268,14 @@ export const SUPPORTED_MIME_TYPES = [
   'video/x-youtube',
   'application/vnd.sunbird.questionset',
 ];
+export const toPascalCase = (name: string | any) => {
+  if (typeof name !== 'string') {
+    return name;
+  }
+
+  return name
+    ?.toLowerCase()
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};

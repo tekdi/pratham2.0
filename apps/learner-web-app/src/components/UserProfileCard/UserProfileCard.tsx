@@ -17,6 +17,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useRouter } from 'next/navigation';
 import { getUserDetails } from '@learner/utils/API/userService';
 import { Loader, useTranslation } from '@shared-lib';
+import { toPascalCase } from '@learner/utils/helper';
 
 // Assuming an API function fetchUserData is available
 // Example: const fetchUserData = async () => { ... };
@@ -134,7 +135,13 @@ const UserProfileCard = () => {
   if (typeof window !== 'undefined' && mobile) {
     localStorage.setItem('usermobile', mobile);
   }
-  const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ');
+  const fullName = [
+    toPascalCase(firstName),
+    toPascalCase(middleName),
+    toPascalCase(lastName),
+  ]
+    .filter(Boolean)
+    .join(' ');
   const maritalStatus = getCustomFieldValue(customFields, 'MARITAL_STATUS');
   const qualification = getCustomFieldValue(
     customFields,
@@ -240,12 +247,12 @@ const UserProfileCard = () => {
           {t('LEARNER_APP.USER_PROFILE_CARD.CONTACT_INFORMATION')}
         </Typography>
         <Box sx={sectionCardStyle}>
-          <Box sx={{ mb: 1.5 }}>
+          {/* <Box sx={{ mb: 1.5 }}>
             <Typography sx={labelStyle}>
               {t('LEARNER_APP.USER_PROFILE_CARD.EMAIL_ADDRESS')}
             </Typography>
             <Typography sx={valueStyle}>{email || '-'}</Typography>
-          </Box>
+          </Box> */}
 
           <Grid container spacing={1.5}>
             <Grid item xs={6}>
@@ -258,7 +265,9 @@ const UserProfileCard = () => {
               <Typography sx={labelStyle}>
                 {t('LEARNER_APP.USER_PROFILE_CARD.PHONE_BELONGS_TO_YOU')}
               </Typography>
-              <Typography sx={valueStyle}>{phoneOwnership}</Typography>
+              <Typography sx={valueStyle}>
+                {toPascalCase(phoneOwnership)}
+              </Typography>
             </Grid>
           </Grid>
         </Box>
@@ -272,7 +281,7 @@ const UserProfileCard = () => {
               <Typography sx={labelStyle}>
                 {t('LEARNER_APP.USER_PROFILE_CARD.GENDER')}
               </Typography>
-              <Typography sx={valueStyle}>{gender}</Typography>
+              <Typography sx={valueStyle}>{toPascalCase(gender)}</Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography sx={labelStyle}>
@@ -290,19 +299,25 @@ const UserProfileCard = () => {
               <Typography sx={labelStyle}>
                 {t('LEARNER_APP.USER_PROFILE_CARD.MARITAL_STATUS')}
               </Typography>
-              <Typography sx={valueStyle}>{maritalStatus}</Typography>
+              <Typography sx={valueStyle}>
+                {toPascalCase(maritalStatus)}
+              </Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography sx={labelStyle}>
                 {t('LEARNER_APP.USER_PROFILE_CARD.MOTHER_NAME')}
               </Typography>
-              <Typography sx={valueStyle}>{motherName || '-'}</Typography>
+              <Typography sx={valueStyle}>
+                {toPascalCase(motherName) || '-'}
+              </Typography>
             </Grid>
             <Grid item xs={12}>
               <Typography sx={labelStyle}>
                 {t('LEARNER_APP.USER_PROFILE_CARD.HIGHEST_QUALIFICATION')}
               </Typography>
-              <Typography sx={valueStyle}>{qualification}</Typography>
+              <Typography sx={valueStyle}>
+                {toPascalCase(qualification)}
+              </Typography>
             </Grid>
             <Grid item xs={12}>
               <Typography sx={labelStyle}>
@@ -328,7 +343,7 @@ const UserProfileCard = () => {
               Have you ever worked or are you currently working?
             </Typography>
             <Typography sx={valueStyle}>
-              {currentWork.replaceAll('_', ' ')}
+              {toPascalCase(currentWork).replaceAll('_', ' ')}
             </Typography>
           </Box>
           <Box>
