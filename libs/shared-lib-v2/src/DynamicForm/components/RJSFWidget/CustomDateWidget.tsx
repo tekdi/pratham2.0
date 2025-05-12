@@ -4,7 +4,7 @@ import { TextField } from '@mui/material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'libs/shared-lib-v2/src/lib/context/LanguageContext';
 
 const CustomDateWidget = ({
   value,

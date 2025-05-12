@@ -5,7 +5,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'libs/shared-lib-v2/src/lib/context/LanguageContext';
 
 const CustomCheckboxWidget = ({
   id,
@@ -48,9 +48,7 @@ const CustomCheckboxWidget = ({
                 disabled={isMaxSelected && !value.includes(option.value)} // Disable if max reached
               />
             }
-            label={t(`FORM.${option.label}`, {
-              defaultValue: option.label,
-            })}
+            label={t(`FORM.${option.label}`, { defaultValue: option.label })}
           />
         ))}
       </FormGroup>
