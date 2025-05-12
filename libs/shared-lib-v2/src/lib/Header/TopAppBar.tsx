@@ -112,9 +112,11 @@ const LanguageSelect = ({
       size="small"
       onChange={handleChange}
       sx={{
-        minWidth: 80,
-        height: 40,
         color: theme.palette.text.primary,
+        width: 70,
+        height: 28,
+        borderRadius: 8,
+        borderWidth: 1,
       }}
     >
       <MuiMenuItem value="en">EN</MuiMenuItem>
@@ -196,6 +198,7 @@ export const DesktopBar = ({
                     ? 'top-bar-link-button'
                     : link.variant ?? 'top-bar-link-text'
                 }
+                startIcon={link?.icon && link.icon}
                 onClick={
                   typeof link.to !== 'string'
                     ? (link.to as React.MouseEventHandler)
