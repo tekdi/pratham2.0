@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { Loader, useTranslation } from '@shared-lib'; // Updated import
+import { useTranslation } from '@shared-lib';
 import { showToastMessage } from '../ToastComponent/Toastify';
 
 interface ResetPasswordFormProps {
@@ -25,7 +25,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
   onResetPassword,
   onForgotPassword,
 }) => {
-  const { t } = useTranslation(); // Initialize translation function
+  const { t } = useTranslation();
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -35,14 +35,36 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
     setShowPassword((prev) => !prev);
   };
 
-  const handleSubmit = async () => {
+  const validatePasswordRules = (password: string) => ({
+    minLength: password.length >= 8,
+    uppercase: /[A-Z]/.test(password),
+    lowercase: /[a-z]/.test(password),
+    number: /[0-9]/.test(password),
+    specialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+  });
+
+  const rules = validatePasswordRules(newPassword);
+  const allValid = Object.values(rules).every(Boolean);
+  const passwordsMatch = newPassword === confirmPassword;
+
+  const handleSubmit = () => {
     if (!oldPassword || !newPassword || !confirmPassword) {
       showToastMessage(
         t('LEARNER_APP.RESET_PASSWORD_FORM.FILL_ALL_FIELDS'),
         'error'
       );
       return;
-    } else if (newPassword !== confirmPassword) {
+    }
+
+    if (!allValid) {
+      showToastMessage(
+        t('LEARNER_APP.RESET_PASSWORD_FORM.INVALID_PASSWORD'),
+        'error'
+      );
+      return;
+    }
+
+    if (!passwordsMatch) {
       showToastMessage(
         t('LEARNER_APP.RESET_PASSWORD_FORM.PASSWORDS_MUST_MATCH'),
         'error'
@@ -91,7 +113,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
         onChange={(e) => setNewPassword(e.target.value)}
         fullWidth
         variant="outlined"
-        sx={{ mb: 2 }}
+        sx={{ mb: 1 }}
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
@@ -102,6 +124,46 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
           ),
         }}
       />
+
+      {/* Show password checklist after user starts typing newPassword */}
+      {newPassword && (
+        <Box sx={{ textAlign: 'left', mb: 2 }}>
+          <Typography
+            variant="caption"
+            color={rules.minLength ? 'green' : 'error'}
+          >
+            • {t('LEARNER_APP.RESET_PASSWORD_FORM.PASSWORD_MIN_LENGTH')}
+          </Typography>
+          <br />
+          <Typography
+            variant="caption"
+            color={rules.uppercase ? 'green' : 'error'}
+          >
+            • {t('LEARNER_APP.RESET_PASSWORD_FORM.PASSWORD_UPPERCASE')}
+          </Typography>
+          <br />
+          <Typography
+            variant="caption"
+            color={rules.lowercase ? 'green' : 'error'}
+          >
+            • {t('LEARNER_APP.RESET_PASSWORD_FORM.PASSWORD_LOWERCASE')}
+          </Typography>
+          <br />
+          <Typography
+            variant="caption"
+            color={rules.number ? 'green' : 'error'}
+          >
+            • {t('LEARNER_APP.RESET_PASSWORD_FORM.PASSWORD_NUMBER')}
+          </Typography>
+          <br />
+          <Typography
+            variant="caption"
+            color={rules.specialChar ? 'green' : 'error'}
+          >
+            • {t('LEARNER_APP.RESET_PASSWORD_FORM.PASSWORD_SPECIAL')}
+          </Typography>
+        </Box>
+      )}
 
       <TextField
         label={t('LEARNER_APP.RESET_PASSWORD_FORM.CONFIRM_NEW_PASSWORD')}
@@ -126,6 +188,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
         variant="contained"
         fullWidth
         onClick={handleSubmit}
+        disabled={!(allValid && passwordsMatch && confirmPassword)}
         sx={{
           backgroundColor: '#FFC107',
           color: '#000',
