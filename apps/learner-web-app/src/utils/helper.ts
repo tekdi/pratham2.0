@@ -13,7 +13,7 @@ const getSelectedValueName = (fields: any, label: any) => {
   if (field && field.selectedValues && field.selectedValues.length > 0) {
     return field.selectedValues[0]; // Return the first selected value
   }
-  return null; 
+  return null;
 };
 export const mapUserData = (userData: any) => {
   console.log(userData, 'userData');
@@ -238,3 +238,15 @@ export const preserveLocalStorage = () => {
     }
   });
 };
+
+export const SUPPORTED_MIME_TYPES = [
+  'application/vnd.ekstep.ecml-archive',
+  'application/vnd.ekstep.html-archive',
+  'application/vnd.ekstep.h5p-archive',
+  'application/pdf',
+  'video/mp4',
+  'video/webm',
+  'application/epub',
+  'video/x-youtube',
+  'application/vnd.sunbird.questionset',
+];

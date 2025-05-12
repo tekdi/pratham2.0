@@ -1,23 +1,140 @@
+'use client';
 import React from 'react';
-import Layout from '@learner/components/Layout';
+import Layout from '@learner/components/pos/Layout';
 import { Grid, Typography } from '@mui/material';
 import { Box } from '@mui/material';
+import Learning from '@learner/components/Learning';
+import Image from 'next/image';
 
 const AboutUsPage = () => {
+  const keyThemesList = [
+    [
+      {
+        title: 'Academics',
+        desc: 'Math, Science, English...',
+      },
+      {
+        title: 'Growth & Learning',
+        desc: 'Activity Videos, Stories, Riddles...',
+      },
+      {
+        title: 'Media Moments',
+        desc: 'TV Episodes, Podcasts...',
+      },
+      {
+        title: 'Inclusive Education',
+        desc: 'Innovative Strategies, Subject-specific...',
+      },
+    ],
+    [
+      {
+        title: 'Career Skills',
+        desc: 'Resume, Interview, Communication...',
+      },
+      {
+        title: 'Entrepreneurship',
+        desc: 'Startups, Business Ideas, Finance...',
+      },
+      {
+        title: 'Digital Literacy',
+        desc: 'Computers, Internet, Safety...',
+      },
+      {
+        title: 'Professional Growth',
+        desc: 'Leadership, Teamwork, Projects...',
+      },
+    ],
+    [
+      {
+        title: 'Life Skills',
+        desc: 'Critical Thinking, Problem Solving...',
+      },
+      {
+        title: 'Health & Wellness',
+        desc: 'Nutrition, Exercise, Mindfulness...',
+      },
+      {
+        title: 'Civic Awareness',
+        desc: 'Rights, Responsibilities, Community...',
+      },
+      {
+        title: 'Creativity',
+        desc: 'Art, Music, Innovation...',
+      },
+    ],
+  ];
+  const descriptions = [
+    [
+      {
+        cardDesc:
+          'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
+      },
+      'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
+      'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
+    ],
+    [
+      {
+        cardDesc:
+          'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
+      },
+      'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
+      ' Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
+    ],
+    [
+      {
+        cardDesc:
+          'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
+      },
+      'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
+      'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
+    ],
+  ];
   return (
     <Layout>
       <Box sx={{ background: '#F3F3F3' }}>
-        <Box>
-          <img
-            style={{ width: '100%', height: '400px' }}
-            src="/images/about-banner.png"
-            alt="About Us"
-          />
+        <Box
+          sx={{
+            width: '100%',
+            height: '400px',
+            backgroundImage: 'url(/images/about-banner.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Box>
+            <Typography
+              sx={{
+                fontWeight: 700,
+                fontSize: { xs: '16px', md: '24px' },
+                lineHeight: { xs: '24px', md: '44px' },
+                letterSpacing: '0px',
+                textAlign: 'center',
+                color: '#FFF',
+              }}
+            >
+              About Us
+            </Typography>
+            <Typography
+              sx={{
+                fontWeight: 700,
+                fontSize: { xs: '22px', md: '36px' },
+                letterSpacing: '-0.25px',
+                textAlign: 'center',
+                color: '#FDBE16',
+              }}
+            >
+              One liner - Highlight POS as a Pradigi Product
+            </Typography>
+          </Box>
         </Box>
         <Box
           sx={{
             background: 'url(/images/bg-img.png) no-repeat center center',
-            padding: '60px 40px 10px',
+            padding: { xs: '60px 16px 10px', md: '60px 40px 10px' },
             backgroundSize: 'cover',
           }}
         >
@@ -27,8 +144,8 @@ const AboutUsPage = () => {
                 sx={{
                   fontFamily: 'Poppins',
                   fontWeight: 600,
-                  fontSize: '32px',
-                  lineHeight: '100%',
+                  fontSize: { xs: '22px', md: '32px' },
+                  lineHeight: { xs: '28px', md: '100%' },
                   letterSpacing: '0px',
                   color: '#1F1B13',
                 }}
@@ -39,8 +156,8 @@ const AboutUsPage = () => {
                 sx={{
                   fontFamily: 'Poppins',
                   fontWeight: 400,
-                  fontSize: '16px',
-                  lineHeight: '24px',
+                  fontSize: { xs: '14px', md: '16px' },
+                  lineHeight: { xs: '20px', md: '24px' },
                   letterSpacing: '0.5px',
                   color: '#1F1B13',
                   mt: 2,
@@ -57,8 +174,8 @@ const AboutUsPage = () => {
                 sx={{
                   fontFamily: 'Poppins',
                   fontWeight: 400,
-                  fontSize: '16px',
-                  lineHeight: '24px',
+                  fontSize: { xs: '14px', md: '16px' },
+                  lineHeight: { xs: '20px', md: '24px' },
                   letterSpacing: '0.5px',
                   color: '#1F1B13',
                   mt: 2,
@@ -73,8 +190,8 @@ const AboutUsPage = () => {
                 sx={{
                   fontFamily: 'Poppins',
                   fontWeight: 400,
-                  fontSize: '16px',
-                  lineHeight: '24px',
+                  fontSize: { xs: '14px', md: '16px' },
+                  lineHeight: { xs: '20px', md: '24px' },
                   letterSpacing: '0.5px',
                   color: '#1F1B13',
                   mt: 2,
@@ -107,8 +224,8 @@ const AboutUsPage = () => {
         <Box
           sx={{
             background: '#ffff',
-            padding: '30px 40px',
-            mx: 7,
+            padding: { xs: '30px 16px', md: '30px 40px' },
+            mx: { xs: '16px', md: 7 },
             mt: 8,
           }}
         >
@@ -125,8 +242,8 @@ const AboutUsPage = () => {
               sx={{
                 fontFamily: 'Poppins',
                 fontWeight: 600,
-                fontSize: '32px',
-                lineHeight: '40px',
+                fontSize: { xs: '22px', md: '32px' },
+                lineHeight: { xs: '28px', md: '40px' },
                 letterSpacing: '0px',
                 textAlign: 'center',
                 color: '#1F1B13',
@@ -139,8 +256,8 @@ const AboutUsPage = () => {
             sx={{
               fontFamily: 'Poppins',
               fontWeight: 400,
-              fontSize: '22px',
-              lineHeight: '28px',
+              fontSize: { xs: '14px', md: '22px' },
+              lineHeight: { xs: '20px', md: '28px' },
               letterSpacing: '0px',
               textAlign: 'center',
               color: '#635E57',
@@ -151,162 +268,11 @@ const AboutUsPage = () => {
           </Typography>
 
           <Box sx={{ mt: 6 }}>
-            <Grid container spacing={3}>
-              {[
-                {
-                  title: 'School',
-                  image: '/images/pillar-1.png',
-                  description:
-                    'Lorem ipsum dolor sit amet, consectetur dipisicing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.',
-                  headings: [
-                    {
-                      title: 'Heading',
-                      description:
-                        'Lorem ipsum dolor sit amet, consectetur dipisicing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.',
-                    },
-                    {
-                      title: 'Heading',
-                      description:
-                        'Lorem ipsum dolor sit amet, consectetur dipisicing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.',
-                    },
-                  ],
-                },
-                {
-                  title: 'Work',
-                  image: '/images/pillar-2.png',
-                  description:
-                    'Lorem ipsum dolor sit amet, consectetur dipisicing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.',
-                  headings: [
-                    {
-                      title: 'Heading',
-                      description:
-                        'Lorem ipsum dolor sit amet, consectetur dipisicing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.',
-                    },
-                    {
-                      title: 'Heading',
-                      description:
-                        'Lorem ipsum dolor sit amet, consectetur dipisicing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.',
-                    },
-                  ],
-                },
-                {
-                  title: 'Life',
-                  image: '/images/pillar-3.png',
-                  description:
-                    'Lorem ipsum dolor sit amet, consectetur dipisicing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.',
-                  headings: [
-                    {
-                      title: 'Heading',
-                      description:
-                        'Lorem ipsum dolor sit amet, consectetur dipisicing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.',
-                    },
-                    {
-                      title: 'Heading',
-                      description:
-                        'Lorem ipsum dolor sit amet, consectetur dipisicing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.',
-                    },
-                  ],
-                },
-              ].map((pillar, index) => (
-                <Grid item xs={12} md={4} key={index}>
-                  <Box
-                    sx={{
-                      position: 'relative',
-                      overflow: 'hidden',
-                      mb: 2,
-                    }}
-                  >
-                    <img
-                      src={pillar.image}
-                      alt={pillar.title}
-                      style={{
-                        width: '100%',
-                        height: 220,
-                        objectFit: 'cover',
-                        filter: 'brightness(0.7)',
-                      }}
-                    />
-                    <Box
-                      sx={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        width: '100%',
-                        height: '100%',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        color: '#fff',
-                        px: 2,
-                      }}
-                    >
-                      <Typography
-                        variant="h5"
-                        sx={{ fontWeight: 400, fontFamily: 'Poppins' }}
-                      >
-                        Learning for
-                      </Typography>
-                      <Typography
-                        variant="h3"
-                        sx={{
-                          fontWeight: 700,
-                          color: '#FDBE16',
-                          fontFamily: 'Poppins',
-                          lineHeight: 1,
-                        }}
-                      >
-                        {pillar.title}
-                      </Typography>
-                    </Box>
-                  </Box>
-                  <Typography
-                    sx={{
-                      fontFamily: 'Poppins',
-                      fontWeight: 400,
-                      fontSize: '16px',
-                      lineHeight: '24px',
-                      letterSpacing: '0.5px',
-                      mb: 2,
-                      color: '#7C766F',
-                    }}
-                  >
-                    {pillar.description}
-                  </Typography>
-                  {pillar.headings.map((heading, idx) => (
-                    <React.Fragment key={idx}>
-                      <Typography
-                        variant="h6"
-                        sx={{
-                          fontFamily: 'Poppins',
-                          fontWeight: 600,
-                          mb: 1,
-                          fontSize: '16px',
-                          lineHeight: '24px',
-                          letterSpacing: '0.15px',
-                          color: '#1F1B13',
-                        }}
-                      >
-                        {heading.title}
-                      </Typography>
-                      <Typography
-                        sx={{
-                          fontFamily: 'Poppins',
-                          fontWeight: 400,
-                          fontSize: '16px',
-                          lineHeight: '24px',
-                          letterSpacing: '0.5px',
-                          mb: 2,
-                          color: '#7C766F',
-                        }}
-                      >
-                        {heading.description}
-                      </Typography>
-                    </React.Fragment>
-                  ))}
-                </Grid>
-              ))}
-            </Grid>
+            <Learning
+              data={keyThemesList}
+              descriptions={descriptions}
+              aboutDescriptionStyle={true}
+            />
           </Box>
         </Box>
 
@@ -314,7 +280,7 @@ const AboutUsPage = () => {
           sx={{
             background: '#fff',
             padding: '30px 40px',
-            mx: 7,
+            mx: { xs: '16px', md: 7 },
             mt: 12,
           }}
         >
@@ -377,7 +343,7 @@ const AboutUsPage = () => {
                 icon: '/images/edu-icon-two.png',
                 title: 'A Focus on Innovation',
                 description:
-                  'Pratham’s strategies reconfigure teaching methodologies, break down traditional tactics, and challenge the current rote learning mechanisms in our schools. Our programs are innovative and outcome-driven. In its early years Pratham developed innovative teaching-learning approaches, materials, and measurement methods. In 2005, we pioneered a nationwide survey of schooling and learning that has had a major impact on national and international policy discussions.',
+                  "Pratham's strategies reconfigure teaching methodologies, break down traditional tactics, and challenge the current rote learning mechanisms in our schools. Our programs are innovative and outcome-driven. In its early years Pratham developed innovative teaching-learning approaches, materials, and measurement methods. In 2005, we pioneered a nationwide survey of schooling and learning that has had a major impact on national and international policy discussions.",
               },
               {
                 icon: '/images/edu-icon-three.png',
@@ -407,7 +373,7 @@ const AboutUsPage = () => {
                 >
                   <Grid
                     item
-                    xs={2}
+                    xs={12}
                     md={4}
                     sx={{
                       display: 'flex',
@@ -435,7 +401,7 @@ const AboutUsPage = () => {
                       {item.title}
                     </Typography>
                   </Grid>
-                  <Grid item xs={10} md={8}>
+                  <Grid item xs={12} md={8}>
                     <Typography
                       sx={{
                         fontFamily: 'Poppins',

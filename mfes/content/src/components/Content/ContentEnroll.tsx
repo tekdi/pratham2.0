@@ -19,7 +19,7 @@ import {
 import InfoCard from '@content-mfes/components/Card/InfoCard';
 import { hierarchyAPI } from '@content-mfes/services/Hierarchy';
 import { ContentSearchResponse } from '@content-mfes/services/Search';
-import { checkAuth } from '@shared-lib-v2/utils/AuthService';
+import { checkAuth, getUserId } from '@shared-lib-v2/utils/AuthService';
 
 interface ContentDetailsProps {
   isShowLayout: boolean;
@@ -40,8 +40,8 @@ const ContentDetails = (props: ContentDetailsProps) => {
     const fetchContentDetails = async () => {
       try {
         const result = await hierarchyAPI(identifier as string);
-        const userId = localStorage.getItem('userId');
-        if (checkAuth()) {
+        const userId = getUserId(props?._config?.userIdLocalstorageName);
+        if (checkAuth(Boolean(userId))) {
           const data = await getUserCertificateStatus({
             userId: userId as string,
             courseId: identifier as string,
@@ -54,7 +54,9 @@ const ContentDetails = (props: ContentDetailsProps) => {
             if (props?.getIfEnrolled) {
               props?.getIfEnrolled(result as unknown as ContentSearchResponse);
             } else {
-              router.replace(`/content/${identifier}`);
+              router.replace(
+                `${props?._config?.contentBaseUrl ?? '/content'}/${identifier}`
+              );
             }
           }
         }
@@ -75,15 +77,21 @@ const ContentDetails = (props: ContentDetailsProps) => {
   const handleClick = async () => {
     setIsLoading(true);
     try {
-      const userId = localStorage.getItem('userId');
+      const userId = getUserId(props?._config?.userIdLocalstorageName);
       if (userId) {
         await createUserCertificateStatus({
           userId,
           courseId: identifier as string,
         });
-        router.replace(`/content/${identifier}`);
+        router.replace(
+          `${props?._config?.contentBaseUrl ?? '/content'}/${identifier}`
+        );
       } else {
-        router.replace(`/login?redirectUrl=/content-details/${identifier}`);
+        router.replace(
+          `/login?redirectUrl=${
+            props?._config?.contentBaseUrl ?? '/content'
+          }-details/${identifier}`
+        );
       }
     } catch (error) {
       console.error('Failed to create user certificate:', error);
