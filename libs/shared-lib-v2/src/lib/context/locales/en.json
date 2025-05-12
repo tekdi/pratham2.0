@@ -185,7 +185,12 @@
       "RESET_PASSWORD": "Reset Password",
       "FORGOT_PASSWORD": "Forgot Password?",
       "FILL_ALL_FIELDS": "Please fill in all fields.",
-      "PASSWORDS_MUST_MATCH": "New Password and Confirm Password must be the same."
+      "PASSWORDS_MUST_MATCH": "New Password and Confirm Password must be the same.",
+      "PASSWORD_MIN_LENGTH": "Password must be at least 8 characters long",
+      "PASSWORD_UPPERCASE": "Password must contain at least one uppercase letter",
+      "PASSWORD_LOWERCASE": "Password must contain at least one lowercase letter",
+      "PASSWORD_NUMBER": "Password must contain at least one number",
+      "PASSWORD_SPECIAL": "Password must contain at least one special character"
     }
   },
   "LOGIN_PAGE": {
