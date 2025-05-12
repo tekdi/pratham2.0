@@ -33,7 +33,7 @@ const rtlLanguages = ['ur'];
 export type LanguageContextType = {
   language: string;
   setLanguage: (lang: string) => void;
-  t: (key: string) => string;
+  t: (key: string, options?: { defaultValue?: string }) => string;
   rtlLanguages: string[];
 };
 
@@ -70,19 +70,19 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
 
   // Translate function
   const t = useMemo(() => {
-    return (key: string): string => {
+    return (key: string, options?: { defaultValue?: string }): string => {
       const keys = key?.split('.');
       let result: any = translations[language];
       if (keys) {
         for (const k of keys) {
           if (result?.[k] === undefined) {
-            return key; // fallback if any level is missing
+            return options?.defaultValue || key; // fallback to defaultValue if provided, otherwise key
           }
           result = result[k];
         }
       }
 
-      return typeof result === 'string' ? result : key;
+      return typeof result === 'string' ? result : options?.defaultValue || key;
     };
   }, [language]);
 

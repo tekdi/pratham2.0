@@ -33,6 +33,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import {
   firstLetterInUpperCase,
+  isUnderEighteen,
   maskMobileNumber,
 } from '@learner/utils/helper';
 import face from '../../../public/images/Group 3.png';
@@ -144,6 +145,52 @@ const RegisterUser = () => {
         responseForm?.schema?.required.pop('batch');
         //unit name is missing from required so handled from frotnend
         let alterSchema = responseForm?.schema;
+        let requiredArray = alterSchema?.required;
+        const mustRequired = [
+          'firstName',
+          'lastName',
+          // 'email',
+          'mobile',
+          'dob',
+          'gender',
+          'state',
+          'district',
+          'block',
+          'village',
+          // 'center',
+          // 'batch',
+          // 'username',
+        ];
+        // Merge only missing items from required2 into required1
+        mustRequired.forEach((item) => {
+          if (!requiredArray.includes(item)) {
+            requiredArray.push(item);
+          }
+        });
+        //no required
+
+        alterSchema.required = requiredArray;
+        //add max selection custom
+        if (alterSchema?.properties?.state) {
+          alterSchema.properties.state.maxSelection = 1;
+        }
+        if (alterSchema?.properties?.district) {
+          alterSchema.properties.district.maxSelection = 1;
+        }
+        if (alterSchema?.properties?.block) {
+          alterSchema.properties.block.maxSelection = 1;
+        }
+        if (alterSchema?.properties?.village) {
+          alterSchema.properties.village.maxSelection = 1;
+        }
+        if (alterSchema?.properties?.center) {
+          alterSchema.properties.center.maxSelection = 1;
+        }
+        if (alterSchema?.properties?.batch) {
+          alterSchema.properties.batch.maxSelection = 1;
+        }
+
+        //alter UI schema
         let alterUISchema = responseForm?.uiSchema;
 
         //set 2 grid layout
@@ -250,7 +297,12 @@ const RegisterUser = () => {
       const isEmailCheck = Boolean(formData.email);
       const payload = isEmailCheck
         ? { email: formData.email }
-        : { firstName: formData.firstName, mobile: formData.mobile };
+        : {
+            firstName: formData.firstName,
+            mobile: isUnderEighteen(formData.dob)
+              ? formData.parent_phone
+              : formData.mobile,
+          };
 
       const response = await userCheck(payload);
       const users = response?.result || [];
@@ -444,14 +496,21 @@ const RegisterUser = () => {
   //     }
   //   };
   const FormSubmitFunction = async (formData: any, payload: any) => {
+    console.log('formData', formData);
     localStorage.setItem('formData', JSON.stringify(formData));
     setPayload(payload);
     localStorage.setItem('localPayload', JSON.stringify(payload));
     setFormData(formData);
     handleAccountValidation(formData);
-    console.log(formData);
+    console.log(formData.parent_phone);
     console.log(payload);
-    setMobile(formData.mobile);
+    console.log(formData.dob);
+    console.log(isUnderEighteen(formData.dob));
+    if (isUnderEighteen(formData.dob)) {
+      setMobile(formData.parent_phone);
+    } else {
+      setMobile(formData.mobile);
+    }
   };
   return (
     <Box

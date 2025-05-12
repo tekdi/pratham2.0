@@ -1,6 +1,6 @@
 import { Backdrop, CircularProgress, Typography } from "@mui/material";
 import React, { useMemo } from "react";
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "../../lib/context/LanguageContext";
 
 const Loader: React.FC<{ showBackdrop: boolean; loadingText?: string }> = ({
   showBackdrop,

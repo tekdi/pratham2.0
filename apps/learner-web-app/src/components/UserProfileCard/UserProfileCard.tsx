@@ -37,7 +37,7 @@ const UserProfileCard = () => {
 
   const options = [
     t('LEARNER_APP.USER_PROFILE_CARD.EDIT_PROFILE'),
-    t('LEARNER_APP.USER_PROFILE_CARD.CHANGE_USERNAME'),
+    // t('LEARNER_APP.USER_PROFILE_CARD.CHANGE_USERNAME'),
     t('LEARNER_APP.USER_PROFILE_CARD.CHANGE_PASSWORD'),
     t('LEARNER_APP.USER_PROFILE_CARD.PRIVACY_GUIDELINES'),
     t('LEARNER_APP.USER_PROFILE_CARD.CONSENT_FORM'),
@@ -131,7 +131,9 @@ const UserProfileCard = () => {
     username,
     customFields = [],
   } = userData;
-
+  if (typeof window !== 'undefined' && mobile) {
+    localStorage.setItem('usermobile', mobile);
+  }
   const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ');
   const maritalStatus = getCustomFieldValue(customFields, 'MARITAL_STATUS');
   const qualification = getCustomFieldValue(
@@ -226,7 +228,8 @@ const UserProfileCard = () => {
         </Typography>
 
         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-          {username} • Joined on June 16, 2024
+          {username}
+          {/* • Joined on June 16, 2024 */}
         </Typography>
       </Box>
 
@@ -306,7 +309,7 @@ const UserProfileCard = () => {
                 {t('LEARNER_APP.USER_PROFILE_CARD.LOCATION')}
               </Typography>
               <Typography sx={valueStyle}>
-                {[village, district, state].filter(Boolean).join(', ') || '-'}
+                {[state, district, village].filter(Boolean).join(', ') || '-'}
               </Typography>
             </Grid>
           </Grid>

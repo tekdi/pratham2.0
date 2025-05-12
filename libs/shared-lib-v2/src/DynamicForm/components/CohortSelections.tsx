@@ -10,12 +10,12 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useTranslation } from 'react-i18next';
 import {
   getCenterList,
   getStateBlockDistrictList,
 } from '../services/MasterDataService';
 import { FormContextType } from '../utils/app.constant';
+import { useTranslation } from '../../lib/context/LanguageContext';
 interface VillageSelectionProps {
   parentId: string;
   ParentName: string;
@@ -97,7 +97,10 @@ const CohortSelections: React.FC<VillageSelectionProps> = ({
           );
           setVillages(transformedcenterData);
           if (transformedcenterData?.length > 0 && isReassign) {
-            const cohortIds = typeof selectedCohortId === 'string' ? [selectedCohortId] : selectedCohortId;
+            const cohortIds =
+              typeof selectedCohortId === 'string'
+                ? [selectedCohortId]
+                : selectedCohortId;
             setSelectedVillages(cohortIds);
             onSelectionChange(cohortIds);
           }
@@ -151,7 +154,15 @@ const CohortSelections: React.FC<VillageSelectionProps> = ({
         />
       </Box>
       <Paper
-        sx={{ maxHeight: '31vh', overflowY: 'auto', p: 2, borderRadius: '8px', display : 'flex', gap: "15px", flexWrap: 'wrap' }}
+        sx={{
+          maxHeight: '31vh',
+          overflowY: 'auto',
+          p: 2,
+          borderRadius: '8px',
+          display: 'flex',
+          gap: '15px',
+          flexWrap: 'wrap',
+        }}
       >
         {villages?.map((village: any) => {
           const isSelected = selectedVillages.includes(village.id);

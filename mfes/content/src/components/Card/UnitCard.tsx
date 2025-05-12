@@ -1,5 +1,5 @@
 import { CommonCard, ContentItem } from '@shared-lib';
-import { Box, Card } from '@mui/material';
+import { Box } from '@mui/material';
 import AppConst from '../../utils/AppConst/AppConst';
 
 const UnitCard = ({
