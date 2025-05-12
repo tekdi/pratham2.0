@@ -161,11 +161,11 @@ export default function Details(props: DetailsProps) {
         item={selectedContent}
         onBackClick={onBackClick}
         _config={{
-          default_img: `${AppConst.BASEPATH}/assests/images/image_ver.png`,
           ...props?._config,
           _infoCard: {
             isShowStatus: trackData,
             isHideStatus: true,
+            default_img: `${AppConst.BASEPATH}/assests/images/image_ver.png`,
             ...props?._config?._infoCard,
           },
         }}
