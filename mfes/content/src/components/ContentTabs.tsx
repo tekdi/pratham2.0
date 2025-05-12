@@ -46,6 +46,7 @@ const RenderTabContent = memo(
   }) => {
     const { t } = useTranslation();
     const { default_img, _card, _grid } = _config ?? {};
+
     return (
       <Box sx={{ width: '100%' }}>
         {tabs?.length !== undefined && tabs?.length > 1 && (
@@ -65,7 +66,12 @@ const RenderTabContent = memo(
             </Tabs>
           </Box>
         )}
-        <Box sx={{ flexGrow: 1, mt: 2 }}>
+        <Box
+          sx={{
+            flexGrow: 1,
+            mt: tabs?.length !== undefined && tabs?.length > 1 ? 2 : 0,
+          }}
+        >
           <Loader
             isLoading={isPageLoading}
             layoutHeight={197}

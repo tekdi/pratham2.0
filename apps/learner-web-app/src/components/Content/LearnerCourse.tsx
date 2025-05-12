@@ -19,11 +19,11 @@ export default memo(function LearnerCourse({
   title,
   _content,
 }: LearnerCourseProps) {
-  const [filterState, setFilterState] = useState<any>({ limit: 8 });
+  const [filterState, setFilterState] = useState<any>({ limit: 10 });
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useTranslation();
   const { staticFilter, filterFramework } = _content ?? {};
-  console.log(staticFilter, 'staticFilter sagar');
+
   useEffect(() => {
     if (_content?.filters) {
       setFilterState((prevState: any) => ({
@@ -181,25 +181,34 @@ export default memo(function LearnerCourse({
               </Box>
             </Box>
           )}
-          <Content
-            isShowLayout={false}
-            contentTabs={['Course']}
-            showFilter={false}
-            showSearch={false}
-            showHelpDesk={false}
-            {..._content}
-            _config={{
-              default_img: '/images/image_ver.png',
-              _card: { isHideProgress: true },
-              ..._content?._config,
+          <Box
+            sx={{
+              overflowY: 'auto',
+              maxHeight: 'calc(100vh - 200px)', // Adjust height as needed
             }}
-            filters={{
-              filters: {
-                ...filterState.filters,
-                ...staticFilter,
-              },
-            }}
-          />
+          >
+            <Content
+              isShowLayout={false}
+              contentTabs={['Course']}
+              showFilter={false}
+              showSearch={false}
+              showHelpDesk={false}
+              {..._content}
+              _config={{
+                default_img: '/images/image_ver.png',
+                _card: { isHideProgress: true },
+                _grid: { xs: 6, sm: 4, md: 3, lg: 2.4 },
+                ..._content?._config,
+              }}
+              filters={{
+                ...filterState,
+                filters: {
+                  ...filterState.filters,
+                  ...staticFilter,
+                },
+              }}
+            />
+          </Box>
         </Box>
       </Stack>
     </Stack>
