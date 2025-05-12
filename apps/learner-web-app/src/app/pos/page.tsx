@@ -1,14 +1,13 @@
 'use client';
 import React, { useState } from 'react';
-import { Layout, useTranslation } from '@shared-lib';
+import Layout from '@learner/components/pos/Layout';
+
 import {
   Container,
   Typography,
   TextField,
   Button,
   Grid,
-  Card,
-  CardContent,
   Box,
   Accordion,
   AccordionSummary,
@@ -22,6 +21,7 @@ import KnwoledgeCarousel from '@learner/components/KnwoledgeCarousel';
 import OtherWebsiteCarousel from '@learner/components/OtherWebsiteCarousel';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import Image from 'next/image';
 
 const keyThemesList = [
   [
@@ -129,9 +129,12 @@ const page = () => {
     <Layout onlyHideElements={['footer']}>
       <Grid container spacing={4}>
         <Grid item xs={12} md={6}>
-          <img
+          <Image
             src="/images/home-page-banner.png"
             alt="Happy children learning together"
+            layout="responsive"
+            width={1000}
+            height={568}
             style={{ width: '100%', height: '568px' }}
           />
         </Grid>

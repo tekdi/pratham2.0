@@ -1,17 +1,22 @@
+'use client';
 import React from 'react';
-import Layout from '@learner/components/Layout';
+import Layout from '@learner/components/pos/Layout';
 import { Grid, Typography } from '@mui/material';
 import { Box } from '@mui/material';
+import Image from 'next/image';
 
 const AboutUsPage = () => {
   return (
     <Layout>
       <Box sx={{ background: '#F3F3F3' }}>
         <Box>
-          <img
-            style={{ width: '100%', height: '400px' }}
+          <Image
             src="/images/about-banner.png"
             alt="About Us"
+            layout="responsive"
+            width={1000}
+            height={400}
+            style={{ width: '100%', height: '400px' }}
           />
         </Box>
         <Box

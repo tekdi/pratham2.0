@@ -11,7 +11,7 @@ const basePath = process.env.NEXT_PUBLIC_ASSETS_CONTENT || '/sbplayer';
 
 const SunbirdPdfPlayer = ({
   playerConfig,
-  relatedData: { courseId, unitId },
+  relatedData: { courseId, unitId, userId },
 }: PlayerConfigProps) => {
   const sunbirdPdfPlayerRef = useRef<HTMLIFrameElement | null>(null);
 
@@ -48,6 +48,7 @@ const SunbirdPdfPlayer = ({
                   await getTelemetryEvents(event.detail, 'pdf', {
                     courseId,
                     unitId,
+                    userId,
                   });
                 } catch (error) {
                   console.error('Error submitting assessment:', error);
