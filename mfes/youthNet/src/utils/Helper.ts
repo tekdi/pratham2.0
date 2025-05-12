@@ -348,7 +348,6 @@ export const categorizeUsers = (users: any) => {
 
 export const filterSchema = (schemaObj: any) => {
   const locationFields = ['state', 'district', 'block', 'village'];
-
   const extractedFields: any = {};
   locationFields.forEach((field) => {
     if (schemaObj.schema.properties[field]) {
@@ -362,12 +361,44 @@ export const filterSchema = (schemaObj: any) => {
       };
     }
   });
-
-  const newSchema = JSON.parse(JSON.stringify(schemaObj)); // Deep copy
+  // Deep copy the schema object
+  const newSchema = JSON.parse(JSON.stringify(schemaObj));
   locationFields.forEach((field) => {
+    // Remove from schema properties
     delete newSchema.schema.properties[field];
+    // Remove from uiSchema
     delete newSchema.uiSchema[field];
+    // Remove from required array if exists
+    const requiredIndex = newSchema.schema.required?.indexOf(field);
+    if (requiredIndex > -1) {
+      newSchema.schema.required.splice(requiredIndex, 1);
+    }
+    // Remove from ui:order array if exists
+    const orderIndex = newSchema.uiSchema['ui:order']?.indexOf(field);
+    if (orderIndex > -1) {
+      newSchema.uiSchema['ui:order'].splice(orderIndex, 1);
+    }
   });
-
+  console.log(newSchema);
   return { newSchema, extractedFields };
+};
+
+export const extractVillageIds = (users: any[]): number[] => {
+  const villageIds = users.flatMap((user) =>
+    user.customFields
+      ?.filter((field: any) => field.label === 'VILLAGE')
+      .flatMap(
+        (field: any) => field.selectedValues?.map((val: any) => val.id) || []
+      )
+  );
+
+  return Array.from(new Set(villageIds)); // Remove duplicates
+};
+
+export const filterOutUserVillages = (
+  transformedVillageData: { id: number; name: string }[],
+  userVillageIds: number[]
+): { id: number; name: string }[] => {
+  const userVillageIdSet = new Set(userVillageIds);
+  return transformedVillageData.filter(village => !userVillageIdSet.has(village.id));
 };

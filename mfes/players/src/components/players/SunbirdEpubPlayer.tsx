@@ -11,7 +11,7 @@ const basePath = process.env.NEXT_PUBLIC_ASSETS_CONTENT || '/sbplayer';
 
 const SunbirdEpubPlayer = ({
   playerConfig,
-  relatedData: { courseId, unitId },
+  relatedData: { courseId, unitId, userId },
 }: PlayerConfigProps) => {
   const sunbirdEpubPlayerRef = useRef<HTMLIFrameElement | null>(null);
 
@@ -48,6 +48,7 @@ const SunbirdEpubPlayer = ({
                   await getTelemetryEvents(event.detail, 'epub', {
                     courseId,
                     unitId,
+                    userId,
                   });
                 } catch (error) {
                   console.error('Error submitting assessment:', error);

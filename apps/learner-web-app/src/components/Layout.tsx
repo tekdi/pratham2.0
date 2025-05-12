@@ -18,6 +18,7 @@ import ProfileMenu from './ProfileMenu/ProfileMenu';
 import { Box } from '@mui/material';
 import { usePathname } from 'next/navigation';
 import { checkAuth } from '@shared-lib-v2/utils/AuthService';
+import MuiThemeProvider from '@learner/assets/theme/MuiThemeProvider';
 import ConfirmationModal from './ConfirmationModal/ConfirmationModal';
 
 interface NewDrawerItemProp extends DrawerItemProp {
@@ -164,4 +165,10 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
   );
 };
 
-export default App;
+export default function AppWrapper(props: Readonly<LayoutProps>) {
+  return (
+    <MuiThemeProvider>
+      <App {...props} />
+    </MuiThemeProvider>
+  );
+}

@@ -1,8 +1,10 @@
+'use client';
 import React from 'react';
-import Layout from '@learner/components/Layout';
+import Layout from '@learner/components/pos/Layout';
 import { Grid, Typography } from '@mui/material';
 import { Box } from '@mui/material';
 import Learning from '@learner/components/Learning';
+import Image from 'next/image';
 
 const AboutUsPage = () => {
   const keyThemesList = [

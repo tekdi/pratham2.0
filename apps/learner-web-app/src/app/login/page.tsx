@@ -9,10 +9,10 @@ import { getUserId, login } from '@learner/utils/API/LoginService';
 import { showToastMessage } from '@learner/components/ToastComponent/Toastify';
 import { useRouter } from 'next/navigation';
 import { useMediaQuery, useTheme } from '@mui/material';
-import FingerprintJS from '@fingerprintjs/fingerprintjs';
-import { Loader, useTranslation } from '@shared-lib';
+import { useTranslation } from '@shared-lib';
 import { getAcademicYear } from '@learner/utils/API/AcademicYearService';
 import { preserveLocalStorage } from '@learner/utils/helper';
+import { getDeviceId } from '@shared-lib-v2/DynamicForm/utils/Helper';
 import { profileComplitionCheck } from '@learner/utils/API/userService';
 
 const Login = dynamic(
@@ -49,9 +49,11 @@ const LoginPage = () => {
           handleSuccessfulLogin(response?.result, { remember: false }, router);
         }
         if (!localStorage.getItem('did')) {
-          const fp = await FingerprintJS.load();
-          const { visitorId } = await fp.get();
-          localStorage.setItem('did', visitorId);
+          const visitorId = await getDeviceId();
+          localStorage.setItem(
+            'did',
+            typeof visitorId === 'string' ? visitorId : ''
+          );
           console.log('Device fingerprint generated successfully');
         }
       } catch (error) {
@@ -170,7 +172,7 @@ const handleSuccessfulLogin = async (
 
         const tenantId = userResponse?.tenantData?.[0]?.tenantId;
         localStorage.setItem('tenantId', tenantId);
-        await profileComplitionCheck()
+        await profileComplitionCheck();
         const academicYearResponse = await getAcademicYear();
 
         console.log(academicYearResponse[0]?.id, 'academicYearResponse');
