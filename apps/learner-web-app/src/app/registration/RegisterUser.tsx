@@ -145,6 +145,52 @@ const RegisterUser = () => {
         responseForm?.schema?.required.pop('batch');
         //unit name is missing from required so handled from frotnend
         let alterSchema = responseForm?.schema;
+        let requiredArray = alterSchema?.required;
+        const mustRequired = [
+          'firstName',
+          'lastName',
+          // 'email',
+          'mobile',
+          'dob',
+          'gender',
+          'state',
+          'district',
+          'block',
+          'village',
+          // 'center',
+          // 'batch',
+          // 'username',
+        ];
+        // Merge only missing items from required2 into required1
+        mustRequired.forEach((item) => {
+          if (!requiredArray.includes(item)) {
+            requiredArray.push(item);
+          }
+        });
+        //no required
+
+        alterSchema.required = requiredArray;
+        //add max selection custom
+        if (alterSchema?.properties?.state) {
+          alterSchema.properties.state.maxSelection = 1;
+        }
+        if (alterSchema?.properties?.district) {
+          alterSchema.properties.district.maxSelection = 1;
+        }
+        if (alterSchema?.properties?.block) {
+          alterSchema.properties.block.maxSelection = 1;
+        }
+        if (alterSchema?.properties?.village) {
+          alterSchema.properties.village.maxSelection = 1;
+        }
+        if (alterSchema?.properties?.center) {
+          alterSchema.properties.center.maxSelection = 1;
+        }
+        if (alterSchema?.properties?.batch) {
+          alterSchema.properties.batch.maxSelection = 1;
+        }
+
+        //alter UI schema
         let alterUISchema = responseForm?.uiSchema;
 
         //set 2 grid layout
