@@ -5,7 +5,7 @@ import React, { memo, ReactNode } from 'react';
 interface LoaderProps {
   isLoading: boolean;
   layoutHeight?: number;
-  children: ReactNode;
+  children?: ReactNode;
   _loader?: React.CSSProperties;
   _children?: React.CSSProperties;
   isHideMaxHeight?: Boolean;
@@ -34,7 +34,7 @@ export const Loader: React.FC<LoaderProps> = memo(
               // zIndex: 9999,
               // left: 0,
               // right: 0,
-              backgroundColor: 'white',
+              backgroundColor: 'transparent',
               ..._loader,
             }}
           >
@@ -44,7 +44,7 @@ export const Loader: React.FC<LoaderProps> = memo(
         <Box
           style={{
             width: '100%',
-            // overflowY: 'auto',
+            overflowY: 'auto',
             display: isLoading ? 'none' : 'block',
             ...(isLoading || !isHideMaxHeight
               ? { height: `calc(100vh - ${layoutHeight}px)` }

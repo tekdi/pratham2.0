@@ -24,12 +24,14 @@ interface PlayerProps {
   'player-config': any;
   courseId?: string;
   unitId?: string;
+  userId?: string;
 }
 
 const SunbirdPlayers = ({
   'player-config': playerConfig,
   courseId,
   unitId,
+  userId,
 }: PlayerProps) => {
   console.log('workspace playerconfig', playerConfig);
 
@@ -39,7 +41,7 @@ const SunbirdPlayers = ({
       return (
         <SunbirdPdfPlayer
           playerConfig={playerConfig}
-          relatedData={{ courseId, unitId }}
+          relatedData={{ courseId, unitId, userId }}
         />
       );
     case 'video/mp4':
@@ -47,21 +49,21 @@ const SunbirdPlayers = ({
       return (
         <SunbirdVideoPlayer
           playerConfig={playerConfig}
-          relatedData={{ courseId, unitId }}
+          relatedData={{ courseId, unitId, userId }}
         />
       );
     case 'application/vnd.sunbird.questionset':
       return (
         <SunbirdQuMLPlayer
           playerConfig={playerConfig}
-          relatedData={{ courseId, unitId }}
+          relatedData={{ courseId, unitId, userId }}
         />
       );
     case 'application/epub':
       return (
         <SunbirdEpubPlayer
           playerConfig={playerConfig}
-          relatedData={{ courseId, unitId }}
+          relatedData={{ courseId, unitId, userId }}
         />
       );
     case 'application/vnd.ekstep.h5p-archive':
@@ -72,7 +74,7 @@ const SunbirdPlayers = ({
       return (
         <SunbirdV1Player
           playerConfig={playerConfig}
-          relatedData={{ courseId, unitId }}
+          relatedData={{ courseId, unitId, userId }}
         />
       );
     default:

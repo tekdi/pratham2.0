@@ -55,7 +55,8 @@
     },
     "COURSE": {
       "GET_STARTED": "Get Started with L1 Courses",
-      "FILTER_BY": "Filter by"
+      "FILTER_BY": "Filter by",
+      "CLEAR_FILTER": "Clear Filter"
     },
     "EXPLORE": {
       "EXPLORE_ADDITIONAL_COURSES": "Explore Additional Courses"
@@ -116,6 +117,14 @@
       "TOPIC_MASONRY": "Masonry",
       "TOPIC_PAINTING": "Painting",
       "FOOTER_TEXT": "Once you select a course, our expert will contact you with more information!"
+    },
+    "POS": {
+      "SCHOOL": "School",
+      "WORK": "Work",
+      "LIFE": "Life",
+      "PROGRAM": "Program",
+      "ABOUT_US": "About Us",
+      "THEMATIC_REPOSITORY": "Thematic Repository"
     },
     "RESPONSE_RECORDED": {
       "TITLE": "Your response has been recorded",

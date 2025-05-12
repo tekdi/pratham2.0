@@ -239,3 +239,15 @@ export const preserveLocalStorage = () => {
     }
   });
 };
+
+export const SUPPORTED_MIME_TYPES = [
+  'application/vnd.ekstep.ecml-archive',
+  'application/vnd.ekstep.html-archive',
+  'application/vnd.ekstep.h5p-archive',
+  'application/pdf',
+  'video/mp4',
+  'video/webm',
+  'application/epub',
+  'video/x-youtube',
+  'application/vnd.sunbird.questionset',
+];

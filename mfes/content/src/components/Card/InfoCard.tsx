@@ -1,7 +1,6 @@
 import {
   Card,
   CardMedia,
-  CardContent,
   Typography,
   Box,
   IconButton,
@@ -13,7 +12,7 @@ import React from 'react';
 
 interface InfoCardProps {
   item: any;
-  onBackClick: () => void;
+  onBackClick?: () => void;
   _config?: any;
 }
 
@@ -21,7 +20,7 @@ const InfoCard: React.FC<InfoCardProps> = ({ item, onBackClick, _config }) => {
   const { default_img, _infoCard } = _config || {};
 
   return (
-    <Card sx={{ display: 'flex' }}>
+    <Card sx={{ display: 'flex', ..._infoCard?._card }}>
       <CardMedia
         component="img"
         sx={{
@@ -37,6 +36,7 @@ const InfoCard: React.FC<InfoCardProps> = ({ item, onBackClick, _config }) => {
           display: 'flex',
           flexDirection: 'column',
           flex: { xs: 6, md: 8, lg: 9, xl: 9 },
+          ..._infoCard?._textCard,
         }}
       >
         <Box
@@ -49,26 +49,28 @@ const InfoCard: React.FC<InfoCardProps> = ({ item, onBackClick, _config }) => {
             gap: 1.5,
           }}
         >
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-              pt: 2,
-            }}
-          >
-            <IconButton
-              aria-label="back"
-              onClick={onBackClick}
-              sx={{ width: '24px', height: '24px' }}
+          {onBackClick && (
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                pt: 2,
+              }}
             >
-              <ArrowBackIcon />
-            </IconButton>
-            <Breadcrumbs separator="›" aria-label="breadcrumb">
-              <Typography variant="body1">Course</Typography>
-              <Typography variant="body1">Electrical</Typography>
-            </Breadcrumbs>
-          </Box>
+              <IconButton
+                aria-label="back"
+                onClick={onBackClick}
+                sx={{ width: '24px', height: '24px' }}
+              >
+                <ArrowBackIcon />
+              </IconButton>
+              <Breadcrumbs separator="›" aria-label="breadcrumb">
+                <Typography variant="body1">Course</Typography>
+                <Typography variant="body1">Electrical</Typography>
+              </Breadcrumbs>
+            </Box>
+          )}
           <Typography
             component="div"
             variant="h5"

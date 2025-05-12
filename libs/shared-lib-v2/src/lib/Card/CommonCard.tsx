@@ -129,7 +129,6 @@ export const CommonCard: React.FC<CommonCardProps> = ({
         flexDirection: orientation === 'horizontal' ? 'column' : 'row',
         height: minheight || 'auto',
         cursor: onClick ? 'pointer' : 'default',
-        borderRadius: '12px',
         bgcolor: '#FEF7FF',
         boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.1)',
         overflow: 'hidden',
@@ -158,6 +157,7 @@ export const CommonCard: React.FC<CommonCardProps> = ({
               '@media (max-width: 600px)': {
                 height: '140px',
               },
+              ..._card?._cardMedia?.sx,
             }}
           />
         )}
