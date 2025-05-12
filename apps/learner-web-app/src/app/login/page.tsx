@@ -64,7 +64,9 @@ const LoginPage = () => {
   }, []);
 
   const handleForgotPassword = () => {
-    localStorage.setItem('loginRoute', '/login');
+    localStorage.setItem('redirectionRoute', '/login');
+    //   router.push('/password-forget?redirectRoute=/login');
+
     router.push('/password-forget');
   };
   const handleLogin = async (data: {
@@ -99,7 +101,11 @@ const LoginPage = () => {
         display="flex"
         flexDirection="column"
         overflow="hidden"
-        sx={{ overflowWrap: 'break-word', wordBreak: 'break-word' }}
+        sx={{
+          overflowWrap: 'break-word',
+          wordBreak: 'break-word',
+          background: 'linear-gradient(135deg, #FFFDF6, #F8EFDA)',
+        }}
       >
         {/* Fixed Header */}
         <Header />
@@ -126,7 +132,7 @@ const LoginPage = () => {
             alignItems="center"
             pr={6}
             boxSizing="border-box"
-            bgcolor="#ffffff"
+            // bgcolor="#ffffff"
           >
             <Login
               onLogin={handleLogin}

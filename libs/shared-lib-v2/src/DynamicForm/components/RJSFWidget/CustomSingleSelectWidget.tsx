@@ -6,7 +6,7 @@ import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'libs/shared-lib-v2/src/lib/context/LanguageContext';
 
 const CustomSingleSelectWidget = ({
   id,
@@ -36,7 +36,7 @@ const CustomSingleSelectWidget = ({
       required={required}
       error={rawErrors.length > 0}
       disabled={
-        isDisabled 
+        isDisabled
         //bug fix for if zero value then no disable it not reflect in required if disable
         // ||
         // enumOptions.length === 0 ||

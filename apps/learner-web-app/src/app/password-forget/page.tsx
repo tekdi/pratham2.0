@@ -24,6 +24,7 @@ const forgetPasswordPage = () => {
         background: 'linear-gradient(to bottom, #fff7e6, #fef9ef)',
       }}
     >
+      <Header />
       <ForgetPassword />
     </Box>
   );
