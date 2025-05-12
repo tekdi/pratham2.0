@@ -29,42 +29,50 @@ const KnwoledgeCarousel = ({
           display: 'flex',
           width: '100%',
           maxWidth: 1100,
-          animation: 'slide 8s linear infinite',
-          '@keyframes slide': {
-            '0%': {
-              transform: 'translateX(0)',
-            },
-            '100%': {
-              transform: 'translateX(-50%)',
-            },
-          },
-          //   '&:hover': {
-          //     animationPlayState: 'paused',
-          //   },
+          position: 'relative',
+          overflow: 'hidden',
         }}
       >
-        {duplicatedImages.map((image, idx) => (
-          <Box
-            key={idx}
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: 80,
-              px: 3,
-              borderRight: `1px solid #FDBE16`,
-              flexShrink: 0,
-              width: 220,
-            }}
-          >
-            <img
-              src={image.src}
-              alt={image.alt}
-              style={{ maxHeight: 60, maxWidth: 140, objectFit: 'contain' }}
-              loading="lazy"
-            />
-          </Box>
-        ))}
+        <Box
+          sx={{
+            display: 'flex',
+            animation: 'slide 20s linear infinite',
+            '@keyframes slide': {
+              '0%': {
+                transform: 'translateX(0)',
+              },
+              '100%': {
+                transform: 'translateX(-50%)',
+              },
+            },
+            '&:hover': {
+              animationPlayState: 'paused',
+            },
+          }}
+        >
+          {duplicatedImages.map((image, idx) => (
+            <Box
+              key={idx}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: 80,
+                px: 3,
+                borderRight: `1px solid #FDBE16`,
+                flexShrink: 0,
+                width: 220,
+              }}
+            >
+              <img
+                src={image.src}
+                alt={image.alt}
+                style={{ maxHeight: 60, maxWidth: 140, objectFit: 'contain' }}
+                loading="lazy"
+              />
+            </Box>
+          ))}
+        </Box>
       </Box>
     </Box>
   );
