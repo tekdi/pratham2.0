@@ -134,8 +134,8 @@ export default function Index() {
                       <Image
                         src="/images/prathamQR.png"
                         alt="QR Code"
-                        width={62}
-                        height={61}
+                        width={100}
+                        height={100}
                         onError={handleImageError}
                       />
                     </Box>
@@ -198,11 +198,17 @@ export default function Index() {
               </Grid>
               <Grid item xs={12} sm={5}>
                 <Box
+                  onClick={() => {
+                    router.push(
+                      'https://play.google.com/store/apps/details?id=com.pratham.learning'
+                    );
+                  }}
                   sx={{
                     display: 'flex',
                     justifyContent: 'flex-end',
                     gap: 1,
                     alignItems: 'center',
+                    cursor: 'pointer',
                   }}
                 >
                   <Box>

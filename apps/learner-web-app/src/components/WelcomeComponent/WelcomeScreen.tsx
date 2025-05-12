@@ -7,9 +7,11 @@ import welcomeGIF from '../../../public/images/welcome.gif';
 import playstoreIcon from '../../../public/images/playstore.png';
 import prathamQRCode from '../../../public/images/prathamQR.png';
 import { useTranslation } from '@shared-lib';
+import { useRouter } from 'next/navigation';
 
 const WelcomeScreen = () => {
   const { t } = useTranslation();
+  const router = useRouter();
 
   return (
     <Box
@@ -92,15 +94,24 @@ const WelcomeScreen = () => {
         </Grid>
 
         <Grid item xs={12} sm={5}>
-          <Image
-            src={playstoreIcon}
-            alt={t('LEARNER_APP.LOGIN.playstore_image_alt')}
-            width={160}
-            height={50}
-          />
-          <Typography fontSize="12px" color="textSecondary" mt={1}>
-            {t('LEARNER_APP.LOGIN.playstore_instruction')}
-          </Typography>
+          <Box
+            sx={{ cursor: 'pointer' }}
+            onClick={() => {
+              router.push(
+                'https://play.google.com/store/apps/details?id=com.pratham.learning'
+              );
+            }}
+          >
+            <Image
+              src={playstoreIcon}
+              alt={t('LEARNER_APP.LOGIN.playstore_image_alt')}
+              width={160}
+              height={50}
+            />
+            <Typography fontSize="12px" color="textSecondary" mt={1}>
+              {t('LEARNER_APP.LOGIN.playstore_instruction')}
+            </Typography>
+          </Box>
         </Grid>
       </Grid>
     </Box>
