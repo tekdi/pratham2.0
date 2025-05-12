@@ -12,8 +12,8 @@ import {
 import { Delete } from '@mui/icons-material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
-import { useTranslation } from 'react-i18next';
 import { CircularProgress } from '@mui/material';
+import { useTranslation } from 'libs/shared-lib-v2/src/lib/context/LanguageContext';
 
 const CustomFileUpload = ({
   value = [],
