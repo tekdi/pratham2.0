@@ -163,7 +163,7 @@
     "RELOAD_TO_UPDATE": "Get the latest features and improvements—update now to enjoy a smoother experience and stay up-to-date!",
     "NO_ASSIGNED_BOARDS": "No assigned Board for selected Center",
     "HIGHT-TO_LOW": "High to low",
-    "INPROGRESS":"Continue Previous Submission"
+    "INPROGRESS": "Continue Previous Submission"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -716,7 +716,7 @@
     "OBSERVATION_STATUS": "Survey Status",
     "OBSERVATION_NOT_STARTED_YET": "Survey not started yet",
     "EXPIRED": "Expired",
-    "ARE_YOU_SURE_YOU_TO_SUBMIT_FORM":"Are you sure to submit form?"
+    "ARE_YOU_SURE_YOU_TO_SUBMIT_FORM": "Are you sure to submit form?"
   },
   "YOUTHNET_SURVEY": {
     "SURVEY": "Surveys",
@@ -835,7 +835,8 @@
     "DISTRICTS": "Districts",
     "ASSIGN_VILLAGES_FINISH": "You can complete this later at your own pace. However, the villages will only be assigned once you click on ‘Finish.’",
     "ASSIGN_VILLAGES_FROM_BLOCKS": "Assign Villages from Blocks",
-    "BACK_TO_FORM": "Back to form"
+    "BACK_TO_FORM": "Back to form",
+    "SELECTED_VILLAGE_COUNT": "Selected village count : {{totalVillageCount}}"
   },
   "UNIT_NAME": "Unit Name",
   "TYPE_OF_CENTER": "Type Of Center",
