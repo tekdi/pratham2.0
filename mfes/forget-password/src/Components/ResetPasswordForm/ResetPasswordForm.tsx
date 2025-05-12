@@ -63,7 +63,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSubmit }) => {
       display="flex"
       flexDirection="column"
       alignItems="center"
-      justifyContent="center"
+      // justifyContent="center"
       minHeight="100vh"
     >
       <Typography

@@ -33,6 +33,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import {
   firstLetterInUpperCase,
+  isUnderEighteen,
   maskMobileNumber,
 } from '@learner/utils/helper';
 import face from '../../../public/images/Group 3.png';
@@ -250,7 +251,12 @@ const RegisterUser = () => {
       const isEmailCheck = Boolean(formData.email);
       const payload = isEmailCheck
         ? { email: formData.email }
-        : { firstName: formData.firstName, mobile: formData.mobile };
+        : {
+            firstName: formData.firstName,
+            mobile: isUnderEighteen(formData.dob)
+              ? formData.parent_phone
+              : formData.mobile,
+          };
 
       const response = await userCheck(payload);
       const users = response?.result || [];
@@ -444,14 +450,21 @@ const RegisterUser = () => {
   //     }
   //   };
   const FormSubmitFunction = async (formData: any, payload: any) => {
+    console.log('formData', formData);
     localStorage.setItem('formData', JSON.stringify(formData));
     setPayload(payload);
     localStorage.setItem('localPayload', JSON.stringify(payload));
     setFormData(formData);
     handleAccountValidation(formData);
-    console.log(formData);
+    console.log(formData.parent_phone);
     console.log(payload);
-    setMobile(formData.mobile);
+    console.log(formData.dob);
+    console.log(isUnderEighteen(formData.dob));
+    if (isUnderEighteen(formData.dob)) {
+      setMobile(formData.parent_phone);
+    } else {
+      setMobile(formData.mobile);
+    }
   };
   return (
     <Box

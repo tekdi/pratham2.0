@@ -24,6 +24,8 @@ const resetPasswordPage = () => {
         background: 'linear-gradient(to bottom, #fff7e6, #fef9ef)',
       }}
     >
+      <Header />
+
       <ResetPassword />
     </Box>
   );

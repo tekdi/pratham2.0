@@ -8,7 +8,7 @@ import ListItemText from '@mui/material/ListItemText';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'libs/shared-lib-v2/src/lib/context/LanguageContext';
 
 const CustomMultiSelectWidget = ({
   id,
