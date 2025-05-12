@@ -39,7 +39,6 @@ const WelcomeScreen = () => {
       >
         {t('LEARNER_APP.LOGIN.welcome_title')}
       </Typography>
-
       <Typography
         fontWeight={400}
         fontSize="22px"
@@ -52,55 +51,81 @@ const WelcomeScreen = () => {
         {t('LEARNER_APP.LOGIN.welcome_subtitle')}
       </Typography>
 
+      {/* App Download Section - Horizontal Arrangement */}
       <Grid
         container
         alignItems="center"
         justifyContent="center"
-        spacing={4}
-        maxWidth="600px"
+        spacing={2}
+        maxWidth="700px"
+        sx={{ mt: 2 }}
       >
-        <Grid item xs={12} sm={4}>
-          <Image
-            src={prathamQRCode}
-            alt={t('LEARNER_APP.LOGIN.qr_image_alt')}
-            width={100}
-            height={100}
-            style={{ margin: '0 auto' }}
-          />
-          <Typography
-            fontFamily="Poppins"
-            fontSize="14px"
-            fontWeight={500}
-            mt={1}
+        {/* QR Code Section */}
+        <Grid item xs={12} sm={5} md={4}>
+          <Box
+            display="flex"
+            flexDirection="row"
+            alignItems="center"
+            justifyContent="center"
           >
-            {t('LEARNER_APP.LOGIN.qr_get_app')}
-          </Typography>
-          <Typography fontSize="12px" color="textSecondary">
-            {t('LEARNER_APP.LOGIN.qr_instruction')}
-          </Typography>
+            <Image
+              src={prathamQRCode}
+              alt={t('LEARNER_APP.LOGIN.qr_image_alt')}
+              width={70}
+              height={70}
+              style={{ marginRight: 12 }}
+            />
+            <Box textAlign="left">
+              <Typography fontWeight={600} fontSize="16px">
+                Get the App
+              </Typography>
+              <Typography fontSize="14px" color="textSecondary">
+                Point your phone
+                <br />
+                camera here
+              </Typography>
+            </Box>
+          </Box>
         </Grid>
 
+        {/* OR Divider */}
         <Grid
           item
           xs={12}
-          sm={1}
+          sm={2}
+          md={1}
           display="flex"
           alignItems="center"
           justifyContent="center"
         >
-          <Typography fontWeight={500}>{t('LEARNER_APP.LOGIN.or')}</Typography>
+          <Typography fontWeight={500} fontSize="18px">
+            OR
+          </Typography>
         </Grid>
 
-        <Grid item xs={12} sm={5}>
-          <Image
-            src={playstoreIcon}
-            alt={t('LEARNER_APP.LOGIN.playstore_image_alt')}
-            width={160}
-            height={50}
-          />
-          <Typography fontSize="12px" color="textSecondary" mt={1}>
-            {t('LEARNER_APP.LOGIN.playstore_instruction')}
-          </Typography>
+        {/* Play Store Section */}
+        <Grid item xs={12} sm={5} md={5}>
+          <Box
+            display="flex"
+            flexDirection="row"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Image
+              src={playstoreIcon}
+              alt={t('LEARNER_APP.LOGIN.playstore_image_alt')}
+              width={140}
+              height={44}
+              style={{ marginRight: 12 }}
+            />
+            <Box textAlign="left">
+              <Typography fontSize="14px" color="textSecondary">
+                Search <b>"Pratham myLearning"</b>
+                <br />
+                on Playstore
+              </Typography>
+            </Box>
+          </Box>
         </Grid>
       </Grid>
     </Box>
