@@ -86,20 +86,26 @@ const UserProfileCard = () => {
 
   const handleOpen = (option: string) => {
     console.log(option);
-    if (option === 'Edit Profile') {
+    if (option === t('LEARNER_APP.USER_PROFILE_CARD.EDIT_PROFILE')) {
       router.push('/profile-complition');
     }
-    if (option === 'Change Password') {
+    if (option === t('LEARNER_APP.USER_PROFILE_CARD.CHANGE_PASSWORD')) {
       router.push('/change-password');
     }
     if (option === 'Change Username') {
       router.push('/change-username');
     }
-    if (option === 'Privacy Guidelines') {
+    if (option === t('LEARNER_APP.USER_PROFILE_CARD.PRIVACY_GUIDELINES')) {
       window.open('https://www.pratham.org/privacy-guidelines/', '_blank');
-    } else if (option === 'Consent Form' && isBelow18(userData.dob)) {
+    } else if (
+      option === t('LEARNER_APP.USER_PROFILE_CARD.CONSENT_FORM') &&
+      isBelow18(userData.dob)
+    ) {
       window.open('/files/consent_form_below_18_hindi.pdf', '_blank');
-    } else if (option === 'Consent Form' && !isBelow18(userData.dob)) {
+    } else if (
+      option === t('LEARNER_APP.USER_PROFILE_CARD.CONSENT_FORM') &&
+      !isBelow18(userData.dob)
+    ) {
       window.open('/files/consent_form_above_18_hindi.pdf', '_blank');
     }
 
