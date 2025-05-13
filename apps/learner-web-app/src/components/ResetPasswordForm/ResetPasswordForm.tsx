@@ -124,8 +124,8 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
         }}
       />
 
-      {/* Show password checklist after user starts typing newPassword */}
-      {newPassword && (
+      {/* Show password checklist only when there are unmet requirements */}
+      {newPassword && !allValid && (
         <Box sx={{ textAlign: 'left', mb: 2 }}>
           <Typography
             variant="caption"
