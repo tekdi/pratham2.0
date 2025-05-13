@@ -140,7 +140,13 @@ const GetIconByMimeType = React.memo(function GetIconByMimeTypeComponent({
       text: 'Video',
     },
     'video/x-youtube': {
-      icon: <SmartDisplayIcon sx={{ color: 'red' }} />,
+      icon: (
+        <img
+          src="/images/youtube.svg"
+          alt="youtube"
+          style={{ width: '18px', height: '18px' }}
+        />
+      ),
       text: 'Youtube',
     },
     'application/vnd.sunbird.questionset': {
