@@ -1,17 +1,12 @@
 'use client';
 import React from 'react';
 import Layout from '../../components/Layout';
-import { Box, Button, Grid, Typography } from '@mui/material';
+import { Button, Grid, Typography } from '@mui/material';
 import { gredientStyle } from '@learner/utils/style';
-import dynamic from 'next/dynamic';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useRouter } from 'next/navigation';
 import ContentComponent from '@learner/components/Content/Content';
-import { Layout as SharedLayout, useTranslation } from '@shared-lib'; // Updated import
-
-const Content = dynamic(() => import('@Content'), {
-  ssr: false,
-});
+import { useTranslation } from '@shared-lib'; // Updated import
 
 const InProgress: React.FC = () => {
   const { t } = useTranslation();
