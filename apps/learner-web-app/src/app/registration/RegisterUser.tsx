@@ -150,7 +150,7 @@ const RegisterUser = () => {
           'firstName',
           'lastName',
           // 'email',
-          'mobile',
+          // 'mobile',
           'dob',
           'gender',
           'state',
@@ -196,8 +196,11 @@ const RegisterUser = () => {
         //set 2 grid layout
         alterUISchema = enhanceUiSchemaWithGrid(alterUISchema);
 
+        // Usage:
+        const updatedUiSchema = reorderUiSchema(alterUISchema, 'mobile', 'dob');
+
         setAddSchema(alterSchema);
-        setAddUiSchema(alterUISchema);
+        setAddUiSchema(updatedUiSchema);
       } catch (error) {
         console.log('error', error);
       } finally {
@@ -224,6 +227,19 @@ const RegisterUser = () => {
 
     return enhancedSchema;
   };
+
+  function reorderUiSchema(uiSchema: any, moveField: any, afterField: any) {
+    const order = [...uiSchema['ui:order']];
+    const filteredOrder = order.filter((item) => item !== moveField);
+    const index = filteredOrder.indexOf(afterField);
+
+    filteredOrder.splice(index + 1, 0, moveField);
+
+    return {
+      ...uiSchema,
+      'ui:order': filteredOrder,
+    };
+  }
 
   useEffect(() => {
     let timer: any;
@@ -254,8 +270,29 @@ const RegisterUser = () => {
         );
         const tenantData = [{ roleId: RoleId.STUDENT, tenantId: tenantId }];
 
+        //delete mobile or guardian detail from dob
+        let updated_payload = payload;
+        if (isUnderEighteen(updated_payload?.dob)) {
+          delete updated_payload?.mobile;
+        } else {
+          const fieldIdsToRemove = [
+            'd7a56014-0b9a-4f16-b07e-88baea79576d',
+            '3a7bf305-6bac-4377-bf09-f38af866105c',
+            '7ecaa845-901a-4ac7-a136-eed087f3b85b',
+          ];
+          updated_payload = {
+            ...payload,
+            customFields: payload.customFields.filter(
+              (field: any) => !fieldIdsToRemove.includes(field.fieldId)
+            ),
+          };
+          delete formData?.parent_phone;
+          delete formData?.guardian_relation;
+          delete formData?.guardian_name;
+        }
+
         const createuserPayload = {
-          ...payload,
+          ...updated_payload,
           username: username,
           password: password,
           program: tenantId,
@@ -625,6 +662,7 @@ const RegisterUser = () => {
                 FormSubmitFunction={FormSubmitFunction}
                 prefilledFormData={formData}
                 hideSubmit={true}
+                type={'learner'}
               />
             )}
             <Alert
