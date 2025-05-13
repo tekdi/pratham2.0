@@ -22,14 +22,20 @@ const ContentCard = ({
   return (
     <CardWrap isWrap={isWrap}>
       <CommonCard
-        minheight="100%"
+        minheight={type?.toLowerCase() === 'course' ? '302px' : 'auto'}
         title={(item?.name || '').trim()}
         image={
           item?.posterImage && item?.posterImage !== 'undefined'
             ? item?.posterImage
             : default_img ?? `${AppConst.BASEPATH}/assests/images/image_ver.png`
         }
-        content={item?.description || ''}
+        content={
+          item?.description
+            ? item?.description
+            : type?.toLowerCase() === 'course'
+            ? 'No description available'
+            : ''
+        }
         actions={
           type !== 'Course' && (
             <Box>
@@ -56,7 +62,19 @@ const ContentCard = ({
         TrackData={trackData}
         type={type}
         onClick={() => handleCardClick(item)}
-        _card={_card}
+        _card={{
+          _contentText: {
+            sx: !item?.description
+              ? {
+                  color: '#79747E',
+                  fontStyle: 'italic',
+                }
+              : {
+                  textTransform: 'capitalize',
+                },
+          },
+          ..._card,
+        }}
       />
     </CardWrap>
   );

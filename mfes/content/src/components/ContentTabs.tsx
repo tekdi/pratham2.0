@@ -106,7 +106,7 @@ const RenderTabContent = memo(
                 ))}
               </Grid>
               <Box sx={{ textAlign: 'center', mt: 4 }}>
-                {hasMoreData ? (
+                {hasMoreData && (
                   <Button
                     variant="contained"
                     onClick={handleLoadMore}
@@ -118,14 +118,13 @@ const RenderTabContent = memo(
                       t('LEARNER_APP.CONTENT_TABS.LOAD_MORE')
                     )}
                   </Button>
-                ) : (
-                  isHideEmptyDataMessage && (
-                    <Typography variant="body1">
-                      {t('LEARNER_APP.CONTENT_TABS.NO_MORE_DATA')}
-                    </Typography>
-                  )
                 )}
               </Box>
+              {!contentData?.length && (
+                <Typography variant="body1" sx={{ mt: 4, textAlign: 'center' }}>
+                  {t('LEARNER_APP.CONTENT_TABS.NO_MORE_DATA')}
+                </Typography>
+              )}
             </Box>
           </Loader>
         </Box>

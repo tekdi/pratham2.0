@@ -93,7 +93,8 @@
       "remember_me": "Remember Me",
       "forgot_password": "Forgot Password?",
       "login_button": "Login",
-      "no_account": "I don’t have an Account"
+      "no_account": "I don’t have an Account",
+      "make_sure_to_cross_check_the_state_district_block_village": "Make sure to cross check the State, District, Block, Village"
     },
     "L_ONE_COURSE": {
       "IN_PROGRESS_TITLE": "In Progress",
@@ -191,7 +192,8 @@
       "PASSWORD_UPPERCASE": "Password must contain at least one uppercase letter",
       "PASSWORD_LOWERCASE": "Password must contain at least one lowercase letter",
       "PASSWORD_NUMBER": "Password must contain at least one number",
-      "PASSWORD_SPECIAL": "Password must contain at least one special character"
+      "PASSWORD_SPECIAL": "Password must contain at least one special character",
+      "PASSWORD_LETTER": "Password must contain at least one uppercase and lowercase letter"
     }
   },
   "LOGIN_PAGE": {

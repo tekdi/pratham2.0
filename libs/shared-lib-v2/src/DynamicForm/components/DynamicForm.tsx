@@ -62,6 +62,7 @@ const DynamicForm = ({
         //if learner form then only apply
         if (oldFormSchema?.properties?.guardian_relation) {
           if (age < 18) {
+            delete formData?.mobile;
             // Merge only missing items from required2 into required1 guardian details
             requiredKeys.forEach((item) => {
               if (!requiredArray.includes(item)) {
@@ -92,12 +93,16 @@ const DynamicForm = ({
               if (updatedUiSchema.hasOwnProperty(key)) {
                 updatedUiSchema[key] = {
                   ...updatedUiSchema[key],
-                  'ui:widget': 'hidden',
+                  // 'ui:widget': 'hidden',
+                  'ui:disabled': true,
                 };
               }
             });
             oldFormUiSchema = updatedUiSchema;
           } else {
+            delete formData?.parent_phone;
+            delete formData?.guardian_relation;
+            delete formData?.guardian_name;
             // remove from required
             requiredArray = requiredArray.filter(
               (key) => !requiredKeys.includes(key)
@@ -168,7 +173,8 @@ const DynamicForm = ({
           if (updatedUiSchema.hasOwnProperty(key)) {
             updatedUiSchema[key] = {
               ...updatedUiSchema[key],
-              'ui:widget': 'hidden',
+              // 'ui:widget': 'hidden',
+              'ui:disabled': true,
             };
           }
         });

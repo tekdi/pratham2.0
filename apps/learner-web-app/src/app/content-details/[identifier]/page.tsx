@@ -24,7 +24,10 @@ const App = () => {
           isShowLayout={false}
           _config={{
             default_img: '/images/image_ver.png',
-            _infoCard: { _cardMedia: { maxHeight: '279px' } },
+            _infoCard: {
+              _cardMedia: { maxHeight: '279px' },
+              default_img: '/images/image_ver.png',
+            },
           }}
         />
       </Box>
