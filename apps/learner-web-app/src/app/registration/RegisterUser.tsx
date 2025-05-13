@@ -323,7 +323,11 @@ const RegisterUser = () => {
       const errorMessage = error.response?.data?.params?.errmsg;
       if (errorMessage == 'User does not exist') {
         let reason = 'signup';
-        handleSendOtp(formData.mobile);
+        handleSendOtp(
+          isUnderEighteen(formData.dob)
+            ? formData.parent_phone
+            : formData.mobile
+        );
       }
       // errmsg: 'User does not exist'
 
@@ -441,6 +445,7 @@ const RegisterUser = () => {
                 );
 
                 localStorage.setItem('userIdName', userResponse?.username);
+                localStorage.setItem('name', userResponse?.firstName);
 
                 const tenantId = userResponse?.tenantData?.[0]?.tenantId;
                 localStorage.setItem('tenantId', tenantId);
