@@ -23,7 +23,7 @@ const App = () => {
             userIdLocalstorageName: 'did',
             contentBaseUrl: '/pos/content',
             default_img: '/images/image_ver.png',
-            _infoCard: { _cardMedia: { maxHeight: '248px' } },
+            _infoCard: { _cardMedia: { maxHeight: '279px' } },
           }}
         />
       </Box>
