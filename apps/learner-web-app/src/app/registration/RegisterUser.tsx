@@ -150,7 +150,7 @@ const RegisterUser = () => {
           'firstName',
           'lastName',
           // 'email',
-          'mobile',
+          // 'mobile',
           'dob',
           'gender',
           'state',
@@ -196,8 +196,11 @@ const RegisterUser = () => {
         //set 2 grid layout
         alterUISchema = enhanceUiSchemaWithGrid(alterUISchema);
 
+        // Usage:
+        const updatedUiSchema = reorderUiSchema(alterUISchema, 'mobile', 'dob');
+
         setAddSchema(alterSchema);
-        setAddUiSchema(alterUISchema);
+        setAddUiSchema(updatedUiSchema);
       } catch (error) {
         console.log('error', error);
       } finally {
@@ -224,6 +227,19 @@ const RegisterUser = () => {
 
     return enhancedSchema;
   };
+
+  function reorderUiSchema(uiSchema: any, moveField: any, afterField: any) {
+    const order = [...uiSchema['ui:order']];
+    const filteredOrder = order.filter((item) => item !== moveField);
+    const index = filteredOrder.indexOf(afterField);
+
+    filteredOrder.splice(index + 1, 0, moveField);
+
+    return {
+      ...uiSchema,
+      'ui:order': filteredOrder,
+    };
+  }
 
   useEffect(() => {
     let timer: any;
@@ -254,8 +270,29 @@ const RegisterUser = () => {
         );
         const tenantData = [{ roleId: RoleId.STUDENT, tenantId: tenantId }];
 
+        //delete mobile or guardian detail from dob
+        let updated_payload = payload;
+        if (isUnderEighteen(updated_payload?.dob)) {
+          delete updated_payload?.mobile;
+        } else {
+          const fieldIdsToRemove = [
+            'd7a56014-0b9a-4f16-b07e-88baea79576d',
+            '3a7bf305-6bac-4377-bf09-f38af866105c',
+            '7ecaa845-901a-4ac7-a136-eed087f3b85b',
+          ];
+          updated_payload = {
+            ...payload,
+            customFields: payload.customFields.filter(
+              (field: any) => !fieldIdsToRemove.includes(field.fieldId)
+            ),
+          };
+          delete formData?.parent_phone;
+          delete formData?.guardian_relation;
+          delete formData?.guardian_name;
+        }
+
         const createuserPayload = {
-          ...payload,
+          ...updated_payload,
           username: username,
           password: password,
           program: tenantId,
@@ -265,6 +302,9 @@ const RegisterUser = () => {
         const responseUserData = await createUser(createuserPayload);
         console.log(responseUserData);
         if (responseUserData) {
+          localStorage.removeItem('localPayload');
+          localStorage.removeItem('formData');
+
           setSignupSuccessModal(true);
         } else {
           showToastMessage('Username Already Exist', 'error');
@@ -446,6 +486,10 @@ const RegisterUser = () => {
 
                 localStorage.setItem('userIdName', userResponse?.username);
                 localStorage.setItem('name', userResponse?.firstName);
+                localStorage.setItem(
+                  'firstName',
+                  userResponse?.firstName || ''
+                );
 
                 const tenantId = userResponse?.tenantData?.[0]?.tenantId;
                 localStorage.setItem('tenantId', tenantId);
@@ -548,7 +592,11 @@ const RegisterUser = () => {
           {' '}
           <Box
             sx={{ display: 'flex', alignItems: 'center', mb: 2, mt: 2 }}
-            onClick={() => router.back()}
+            onClick={() => {
+              if (usernamePasswordForm) {
+                setUsernamePasswordForm(false);
+              } else router.back();
+            }}
           >
             <IconButton>
               <ArrowBackIcon />
@@ -618,15 +666,6 @@ const RegisterUser = () => {
               </Typography>
             </Box>
 
-            {addSchema && addUiSchema && (
-              <DynamicForm
-                schema={addSchema}
-                uiSchema={addUiSchema}
-                FormSubmitFunction={FormSubmitFunction}
-                prefilledFormData={formData}
-                hideSubmit={true}
-              />
-            )}
             <Alert
               icon={<PriorityHighIcon htmlColor="black" />}
               severity="info"
@@ -638,8 +677,18 @@ const RegisterUser = () => {
                 mb: 3,
               }}
             >
-              Make sure to cross check the state, district, block, village
+              Make sure to cross check the State, District, Block, Village
             </Alert>
+            {addSchema && addUiSchema && (
+              <DynamicForm
+                schema={addSchema}
+                uiSchema={addUiSchema}
+                FormSubmitFunction={FormSubmitFunction}
+                prefilledFormData={formData}
+                hideSubmit={true}
+                type={'learner'}
+              />
+            )}
             <Button
               sx={{
                 mt: 3,

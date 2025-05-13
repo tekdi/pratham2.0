@@ -192,7 +192,8 @@
       "PASSWORD_UPPERCASE": "Password must contain at least one uppercase letter",
       "PASSWORD_LOWERCASE": "Password must contain at least one lowercase letter",
       "PASSWORD_NUMBER": "Password must contain at least one number",
-      "PASSWORD_SPECIAL": "Password must contain at least one special character"
+      "PASSWORD_SPECIAL": "Password must contain at least one special character",
+      "PASSWORD_LETTER": "Password must contain at least one uppercase and lowercase letter"
     }
   },
   "LOGIN_PAGE": {

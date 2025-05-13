@@ -8,6 +8,7 @@ import {
   Radio,
   RadioGroup,
   FormHelperText,
+  TextField,
 } from '@mui/material';
 import { useTranslation } from 'libs/shared-lib-v2/src/lib/context/LanguageContext';
 
@@ -36,7 +37,34 @@ const CustomRadioWidget = ({
       required={required}
       fullWidth
     >
-      <FormLabel component="legend">{label}</FormLabel>
+      {/* Hidden text input to force native validation */}
+      <input
+        value={value ?? ''}
+        required={required}
+        onChange={() => {}}
+        tabIndex={-1}
+        style={{
+          height: 1,
+          padding: 0,
+          border: 0,
+          ...(value && { visibility: 'hidden' }),
+        }}
+        aria-hidden="true"
+      />
+      <FormLabel
+        component="legend"
+        sx={{
+          color: 'black',
+          '&.Mui-error': {
+            color: 'black', // override error red
+          },
+          '&.Mui-disabled': {
+            color: 'black', // override disabled grey
+          },
+        }}
+      >
+        {label}
+      </FormLabel>
       <RadioGroup
         row // makes all options in one line, wraps automatically
         id={id}
