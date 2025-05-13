@@ -37,8 +37,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
 
   const validatePasswordRules = (password: string) => ({
     minLength: password.length >= 8,
-    uppercase: /[A-Z]/.test(password),
-    lowercase: /[a-z]/.test(password),
+    hasLetter: /[a-zA-Z]/.test(password),
     number: /[0-9]/.test(password),
     specialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password),
   });
@@ -137,16 +136,9 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
           <br />
           <Typography
             variant="caption"
-            color={rules.uppercase ? 'green' : 'error'}
+            color={rules.hasLetter ? 'green' : 'error'}
           >
-            • {t('LEARNER_APP.RESET_PASSWORD_FORM.PASSWORD_UPPERCASE')}
-          </Typography>
-          <br />
-          <Typography
-            variant="caption"
-            color={rules.lowercase ? 'green' : 'error'}
-          >
-            • {t('LEARNER_APP.RESET_PASSWORD_FORM.PASSWORD_LOWERCASE')}
+            • {t('LEARNER_APP.RESET_PASSWORD_FORM.PASSWORD_LETTER')}
           </Typography>
           <br />
           <Typography
@@ -188,7 +180,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
         variant="contained"
         fullWidth
         onClick={handleSubmit}
-        disabled={!(allValid && passwordsMatch && confirmPassword)}
+        disabled={!(allValid && confirmPassword)}
         sx={{
           backgroundColor: '#FFC107',
           color: '#000',

@@ -302,6 +302,9 @@ const RegisterUser = () => {
         const responseUserData = await createUser(createuserPayload);
         console.log(responseUserData);
         if (responseUserData) {
+          localStorage.removeItem('localPayload');
+          localStorage.removeItem('formData');
+
           setSignupSuccessModal(true);
         } else {
           showToastMessage('Username Already Exist', 'error');
@@ -483,6 +486,10 @@ const RegisterUser = () => {
 
                 localStorage.setItem('userIdName', userResponse?.username);
                 localStorage.setItem('name', userResponse?.firstName);
+                localStorage.setItem(
+                  'firstName',
+                  userResponse?.firstName || ''
+                );
 
                 const tenantId = userResponse?.tenantData?.[0]?.tenantId;
                 localStorage.setItem('tenantId', tenantId);
