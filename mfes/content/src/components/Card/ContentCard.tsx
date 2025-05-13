@@ -19,6 +19,7 @@ const ContentCard = ({
   trackData?: [];
 }) => {
   const { isWrap } = _card ?? {};
+  console.log(type, 'sagar item');
   return (
     <CardWrap isWrap={isWrap}>
       <CommonCard
@@ -29,7 +30,13 @@ const ContentCard = ({
             ? item?.posterImage
             : default_img ?? `${AppConst.BASEPATH}/assests/images/image_ver.png`
         }
-        content={item?.description || ''}
+        content={
+          item?.description
+            ? item?.description
+            : type?.toLowerCase() === 'course'
+            ? 'No description available'
+            : ''
+        }
         actions={
           type !== 'Course' && (
             <Box>
@@ -56,7 +63,12 @@ const ContentCard = ({
         TrackData={trackData}
         type={type}
         onClick={() => handleCardClick(item)}
-        _card={_card}
+        _card={{
+          _contentText: {
+            sx: { color: item?.description ? 'inherit' : '#79747E' },
+          },
+          ..._card,
+        }}
       />
     </CardWrap>
   );
