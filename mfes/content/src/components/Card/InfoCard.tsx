@@ -8,7 +8,7 @@ import {
   Breadcrumbs,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import CommonModal from '../common-modal';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
@@ -22,6 +22,28 @@ const InfoCard: React.FC<InfoCardProps> = ({ item, onBackClick, _config }) => {
   const { _infoCard } = _config || {};
   const [openModal, setOpenModal] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showButton, setShowButton] = useState(false);
+  const descriptionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const checkTextHeight = () => {
+      if (descriptionRef.current) {
+        const lineHeight = parseInt(
+          window.getComputedStyle(descriptionRef.current).lineHeight
+        );
+        const height = descriptionRef.current.scrollHeight;
+        setShowButton(height > lineHeight * 2);
+      }
+    };
+
+    // Initial check
+    checkTextHeight();
+
+    // Add resize listener to handle window resizing
+    window.addEventListener('resize', checkTextHeight);
+    return () => window.removeEventListener('resize', checkTextHeight);
+  }, [item?.description]);
+
   return (
     <>
       <Card sx={{ display: 'flex', ..._infoCard?._card }}>
@@ -93,6 +115,7 @@ const InfoCard: React.FC<InfoCardProps> = ({ item, onBackClick, _config }) => {
               {item?.name}
             </Typography>
             <Typography
+              ref={descriptionRef}
               variant="subtitle1"
               component="div"
               sx={{
@@ -108,22 +131,24 @@ const InfoCard: React.FC<InfoCardProps> = ({ item, onBackClick, _config }) => {
             >
               {item?.description}
             </Typography>
-            <Button
-              onClick={() => setIsExpanded(!isExpanded)}
-              sx={{
-                textTransform: 'none',
-                color: '#1F1B13',
-                p: 0,
-                minWidth: 'auto',
-                transition: 'all 0.3s ease-in-out',
-                '&:hover': {
-                  backgroundColor: 'transparent',
-                  textDecoration: 'underline',
-                },
-              }}
-            >
-              {isExpanded ? 'See less' : 'See more'}
-            </Button>
+            {showButton && (
+              <Button
+                onClick={() => setIsExpanded(!isExpanded)}
+                sx={{
+                  textTransform: 'none',
+                  color: '#1F1B13',
+                  p: 0,
+                  minWidth: 'auto',
+                  transition: 'all 0.3s ease-in-out',
+                  '&:hover': {
+                    backgroundColor: 'transparent',
+                    textDecoration: 'underline',
+                  },
+                }}
+              >
+                {isExpanded ? 'See less' : 'See more'}
+              </Button>
+            )}
             <Box>
               {_infoCard?.isShowStatus && (
                 <Box

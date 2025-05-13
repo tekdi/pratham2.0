@@ -55,7 +55,8 @@
       "remember_me": "मला आठवा",
       "forgot_password": "पासवर्ड विसरलात?",
       "login_button": "लॉगिन",
-      "no_account": "माझे खाते नाही"
+      "no_account": "माझे खाते नाही",
+      "make_sure_to_cross_check_the_state_district_block_village": "कृपया राज्य, जिल्हा, ब्लॉक आणि गाव यांची दुहेरी तपासणी करा"
     },
     "L_ONE_COURSE": {
       "IN_PROGRESS_TITLE": "प्रगतीत",
