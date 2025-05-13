@@ -110,7 +110,7 @@ const GetIconByMimeType = React.memo(function GetIconByMimeTypeComponent({
 }): React.ReactNode {
   const icons = {
     'application/pdf': {
-      icon: <PictureAsPdfIcon sx={{ color: 'red' }} />,
+      icon: <PictureAsPdfIcon sx={{ color: 'red' }} />, // icons
       text: 'PDF',
     },
     'video/mp4': {

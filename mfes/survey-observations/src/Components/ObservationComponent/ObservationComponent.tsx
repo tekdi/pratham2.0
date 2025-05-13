@@ -150,7 +150,7 @@ const ObservationComponent: React.FC<QuestionnaireAppProps> = ({
       const obj: FileUploadData = {
         name: event.data.name,
         url: presignedurl.split('?')[0],
-        previewUrl: presigneDownloadUrl.split('?')[0],
+        previewUrl: presignedurl.split('?')[0],
       };
 
       for (const key of Object.keys(requestObject)) {
