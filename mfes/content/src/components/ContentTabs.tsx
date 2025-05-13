@@ -45,10 +45,10 @@ const RenderTabContent = memo(
     isHideEmptyDataMessage?: boolean;
   }) => {
     const { t } = useTranslation();
-    const { default_img, _card, _grid } = _config ?? {};
+    const { default_img, _card, _box } = _config ?? {};
 
     return (
-      <Box sx={{ width: '100%' }}>
+      <Box sx={{ width: '100%', ...(_box?.sx ?? {}) }}>
         {tabs?.length !== undefined && tabs?.length > 1 && (
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs value={value ?? 0} onChange={onChange} aria-label={ariaLabel}>
