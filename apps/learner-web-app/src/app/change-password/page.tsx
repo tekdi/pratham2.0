@@ -154,7 +154,7 @@ const ChangePassword = () => {
           // width="100vw"
           display="flex"
           flexDirection="column"
-          overflow="auto"
+          //  overflow="auto"
           mt="70px"
         >
           <Typography
