@@ -1,4 +1,62 @@
 import { post, get } from '@shared-lib';
+type FileItem = {
+  name: string;
+  url: string;
+  previewUrl?: string;
+  request?: any;
+  ref?: string;
+};
+
+type SubAnswer = {
+  fileName?: FileItem[];
+  [key: string]: any;
+};
+
+type Answer = {
+  fileName?: FileItem[];
+  value?: any;
+  [key: string]: any;
+};
+
+type Evidence = {
+  answers?: Record<string, Answer>;
+};
+
+type DataObject = {
+  evidence?: Evidence;
+};
+
+const updatePreviewUrls = (obj: DataObject): void => {
+  const answers = obj?.evidence?.answers;
+  if (!answers) return;
+
+  Object.values(answers).forEach((answer: Answer) => {
+    if (Array.isArray(answer.fileName)) {
+      answer.fileName.forEach((file: FileItem) => {
+        if (file.url) {
+          file.previewUrl = file.url;
+        }
+      });
+    }
+
+    // Handle nested participant matrix values
+    if (Array.isArray(answer.value)) {
+      answer.value.forEach((participant: any) => {
+        if (participant && typeof participant === 'object') {
+          Object.values(participant).forEach((subAnswer: any) => {
+            if (Array.isArray(subAnswer.fileName)) {
+              subAnswer.fileName.forEach((file: FileItem) => {
+                if (file.url) {
+                  file.previewUrl = file.url;
+                }
+              });
+            }
+          });
+        }
+      });
+    }
+  });
+};
 
 export const targetSolution = async ({
   state,
@@ -137,6 +195,10 @@ export const updateSubmission = async ({
   submissionData,
 }: any): Promise<any> => {
   try {
+    updatePreviewUrls(submissionData);
+    console.log(submissionData);
+
+    // if(submissionData.evidence.answers.fileName)
     const apiUrl: string = `${process.env.NEXT_PUBLIC_SURVEY_URL}/observationSubmissions/update/${submissionId}`;
 
     const headers = {
