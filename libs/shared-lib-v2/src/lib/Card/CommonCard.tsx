@@ -167,6 +167,9 @@ export const CommonCard: React.FC<CommonCardProps> = ({
       </Box>
 
       <CardHeader
+        sx={{
+          pb: 0.5,
+        }}
         avatar={
           avatarLetter && (
             <Avatar sx={{ bgcolor: avatarColor }} aria-label="avatar">

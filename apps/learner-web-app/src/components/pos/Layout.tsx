@@ -108,7 +108,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
     ];
 
     setDefaultNavLinks(navLinks);
-  }, [t, router]);
+  }, [t, filterFramework?.framework?.categories, router]);
 
   return (
     <Layout

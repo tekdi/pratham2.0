@@ -17,7 +17,7 @@ interface InfoCardProps {
 }
 
 const InfoCard: React.FC<InfoCardProps> = ({ item, onBackClick, _config }) => {
-  const { default_img, _infoCard } = _config || {};
+  const { _infoCard } = _config || {};
 
   return (
     <Card sx={{ display: 'flex', ..._infoCard?._card }}>
@@ -28,7 +28,7 @@ const InfoCard: React.FC<InfoCardProps> = ({ item, onBackClick, _config }) => {
           maxHeight: '280px',
           ..._infoCard?._cardMedia,
         }}
-        image={item?.appIcon || default_img}
+        image={item?.appIcon || _infoCard?.default_img}
         alt={item?.name}
       />
       <Box

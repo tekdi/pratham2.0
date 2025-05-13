@@ -41,7 +41,7 @@ const DynamicForm = ({
   const [formSchema, setFormSchema] = useState(schema);
   const [formUiSchemaOriginal, setFormUiSchemaOriginal] = useState(uiSchema);
   const [formUiSchema, setFormUiSchema] = useState(uiSchema);
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState(prefilledFormData);
   const [dependentSchema, setDependentSchema] = useState([]);
   const [isInitialCompleted, setIsInitialCompleted] = useState(false);
   const [hideAndSkipFields, setHideAndSkipFields] = useState({});
@@ -116,6 +116,10 @@ const DynamicForm = ({
   useEffect(() => {
     if (isInitialCompleted === true) {
       // setFormData;
+      //fix for auto submit and render
+      if (Object.keys(prefilledFormData).length === 0) {
+        prefilledFormData = { test: 'test' };
+      }
       renderPrefilledForm();
     }
   }, [isInitialCompleted]);
@@ -128,7 +132,8 @@ const DynamicForm = ({
 
   useEffect(() => {
     if (isRenderCompleted === true) {
-      handleChange({ formData: prefilledFormData });
+      //commented below to fix bug of no district load
+      // handleChange({ formData: prefilledFormData });
     }
   }, [isRenderCompleted]);
 

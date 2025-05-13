@@ -33,7 +33,7 @@ export const UnitGrid: React.FC<CommonAccordionProps> = ({
           lg={3}
           {..._grid}
         >
-          {subItem?.children && subItem.children.length > 0 ? (
+          {subItem?.mimeType === 'application/vnd.ekstep.content-collection' ? (
             <UnitCard
               item={subItem}
               trackData={trackData ?? []}
