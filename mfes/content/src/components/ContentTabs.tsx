@@ -79,22 +79,26 @@ const RenderTabContent = memo(
             _loader={{ backgroundColor: 'transparent' }}
           >
             <Box>
-              <Grid container spacing={2}>
+              <Grid container spacing={4}>
                 {contentData?.map((item: any) => (
                   <Grid
                     key={item?.identifier}
                     item
-                    xs={12}
-                    sm={6}
-                    md={4}
-                    lg={3}
-                    {..._grid}
+                    sx={{ flexWrap: 'wrap' }}
+                    // xs={12}
+                    // sm={6}
+                    // md={4}
+                    // lg={3}
+                    // {..._grid}
                   >
                     <ContentCard
                       item={item}
                       type={type}
                       default_img={default_img}
-                      _card={_card}
+                      _card={{
+                        ..._card,
+                        sx: { width: '230px', ...(_card?.sx ?? {}) },
+                      }}
                       handleCardClick={handleCardClick}
                       trackData={trackData}
                     />
