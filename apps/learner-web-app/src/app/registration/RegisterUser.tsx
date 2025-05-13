@@ -592,7 +592,11 @@ const RegisterUser = () => {
           {' '}
           <Box
             sx={{ display: 'flex', alignItems: 'center', mb: 2, mt: 2 }}
-            onClick={() => router.back()}
+            onClick={() => {
+              if (usernamePasswordForm) {
+                setUsernamePasswordForm(false);
+              } else router.back();
+            }}
           >
             <IconButton>
               <ArrowBackIcon />
