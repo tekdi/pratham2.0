@@ -213,6 +213,7 @@ export const CommonCard: React.FC<CommonCardProps> = ({
               WebkitBoxOrient: 'vertical',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
+              ..._card?._contentText?.sx,
             }}
           >
             {content}
