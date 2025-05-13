@@ -51,7 +51,8 @@
       "CLOSE": "Close",
       "CANCEL": "Cancel",
       "OK": "OK",
-      "INPROGRESS": "In-Progress"
+      "INPROGRESS": "In-Progress",
+      "LOADING": "Loading.."
     },
     "COURSE": {
       "GET_STARTED": "Get Started with L1 Courses",

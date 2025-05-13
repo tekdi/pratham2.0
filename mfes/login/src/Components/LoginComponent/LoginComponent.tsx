@@ -113,12 +113,16 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
           }}
         />
 
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          mt={1}
-        >
+        <Box mt={1}>
+          <Typography
+            variant="body2"
+            color="secondary"
+            sx={{ cursor: 'pointer', mb: 1 }}
+            onClick={handleForgotPassword}
+          >
+            {t('LEARNER_APP.LOGIN.forgot_password')}{' '}
+            {/* Internationalized text */}
+          </Typography>
           <FormControlLabel
             control={
               <Checkbox
@@ -129,15 +133,6 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
             }
             label={t('LEARNER_APP.LOGIN.remember_me')}
           />
-          <Typography
-            variant="body2"
-            color="secondary"
-            sx={{ cursor: 'pointer' }}
-            onClick={handleForgotPassword}
-          >
-            {t('LEARNER_APP.LOGIN.forgot_password')}{' '}
-            {/* Internationalized text */}
-          </Typography>
         </Box>
 
         <Button
