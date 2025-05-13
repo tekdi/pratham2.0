@@ -51,12 +51,12 @@ const CustomDateWidget = ({
   const errorText = rawErrors?.length > 0 ? rawErrors[0] : '';
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <LocalizationProvider dateAdapter={AdapterDayjs} required={required}>
       <DatePicker
         disabled={isDisabled}
         label={`${t(`FORM.${label}`, {
           defaultValue: label,
-        })} ${required ? '*' : ''}`}
+        })}`}
         value={selectedDate || null}
         onChange={handleDateChange}
         minDate={minValue ? dayjs(minValue, 'YYYY-MM-DD') : undefined}
@@ -66,10 +66,12 @@ const CustomDateWidget = ({
           textField: {
             fullWidth: true,
             variant: 'outlined',
-            error: rawErrors.length > 0,
+            // error: rawErrors.length > 0,
             // helperText: errorText,
+            required
           },
         }}
+        required={required}
       />
     </LocalizationProvider>
   );
