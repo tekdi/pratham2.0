@@ -92,7 +92,7 @@ const ChangePassword = () => {
         reason,
         otp: otp.join(''),
         hash,
-        //  username,
+        username: localStorage.getItem('userIdName') || '',
       });
       console.log('verifyOtp', response);
       let isValid = response.result.success;
