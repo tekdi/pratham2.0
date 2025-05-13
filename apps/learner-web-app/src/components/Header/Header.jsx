@@ -9,7 +9,9 @@ import { useTranslation } from '@shared-lib';
 
 const Header = () => {
   const { t, setLanguage } = useTranslation();
-  const [lang, setLang] = useState('en'); // state for selected language
+  const [lang, setLang] = useState(
+    typeof window !== 'undefined' ? localStorage.getItem('lang') || 'en' : 'en'
+  ); // state for selected language
 
   const handleLanguageChange = (event) => {
     const newLang = event.target.value;

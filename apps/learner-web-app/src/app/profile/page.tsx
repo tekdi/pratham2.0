@@ -132,7 +132,7 @@ const ProfilePage = () => {
             }}
             gap={2}
           >
-            {courseData.lenght !== 0 &&
+            {courseData.length !== 0 &&
               courseData?.map((cert: any, index: any) => (
                 <CourseCertificateCard
                   key={index}
