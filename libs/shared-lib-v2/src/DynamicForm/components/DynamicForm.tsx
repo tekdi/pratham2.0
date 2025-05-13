@@ -33,6 +33,7 @@ const DynamicForm = ({
   FormSubmitFunction,
   extraFields,
   hideSubmit,
+  type,
 }: any) => {
   const { t } = useTranslation();
 
@@ -49,52 +50,130 @@ const DynamicForm = ({
 
   //custom validation on formData for learner fields hide on dob
   useEffect(() => {
-    if (formData?.dob) {
-      let age = calculateAgeFromDate(formData?.dob);
-      let oldFormSchema = formSchema;
-      let oldFormUiSchema = formUiSchema;
-      let requiredArray = oldFormSchema?.required;
+    if (type == 'learner') {
       let requiredKeys = ['parent_phone', 'guardian_relation', 'guardian_name'];
+      let requiredKeys2 = ['mobile'];
+      if (formData?.dob) {
+        let age = calculateAgeFromDate(formData?.dob);
+        let oldFormSchema = formSchema;
+        let oldFormUiSchema = formUiSchema;
+        let requiredArray = oldFormSchema?.required;
 
-      //if learner form then only apply
-      if (oldFormSchema?.properties?.guardian_relation) {
-        if (age < 18) {
-          // Merge only missing items from required2 into required1
-          requiredKeys.forEach((item) => {
-            if (!requiredArray.includes(item)) {
-              requiredArray.push(item);
-            }
-          });
-          //set ui schema show
-          const updatedUiSchema = { ...oldFormUiSchema };
-          // Clone each key's config and set widget to 'hidden'
-          requiredKeys.forEach((key) => {
-            if (updatedUiSchema.hasOwnProperty(key)) {
-              updatedUiSchema[key] = {
-                ...updatedUiSchema[key],
-                'ui:widget': 'CustomTextFieldWidget',
-              };
-            }
-          });
-          oldFormUiSchema = updatedUiSchema;
-        } else {
-          // remove from required
-          requiredArray = requiredArray.filter(
-            (key) => !requiredKeys.includes(key)
-          );
-          //set ui schema hide
-          const updatedUiSchema = { ...oldFormUiSchema };
-          // Clone each key's config and set widget to 'hidden'
-          requiredKeys.forEach((key) => {
-            if (updatedUiSchema.hasOwnProperty(key)) {
-              updatedUiSchema[key] = {
-                ...updatedUiSchema[key],
-                'ui:widget': 'hidden',
-              };
-            }
-          });
-          oldFormUiSchema = updatedUiSchema;
+        //if learner form then only apply
+        if (oldFormSchema?.properties?.guardian_relation) {
+          if (age < 18) {
+            // Merge only missing items from required2 into required1 guardian details
+            requiredKeys.forEach((item) => {
+              if (!requiredArray.includes(item)) {
+                requiredArray.push(item);
+              }
+            });
+
+            // remove from required mobile
+            requiredArray = requiredArray.filter(
+              (key) => !requiredKeys2.includes(key)
+            );
+
+            //set ui schema show
+            const updatedUiSchema = { ...oldFormUiSchema };
+            // Clone each key's config and set widget to 'hidden'
+            requiredKeys.forEach((key) => {
+              if (updatedUiSchema.hasOwnProperty(key)) {
+                updatedUiSchema[key] = {
+                  ...updatedUiSchema[key],
+                  'ui:widget': 'CustomTextFieldWidget',
+                };
+              }
+            });
+
+            //hide mobile
+            // Clone each key's config and set widget to 'hidden'
+            requiredKeys2.forEach((key) => {
+              if (updatedUiSchema.hasOwnProperty(key)) {
+                updatedUiSchema[key] = {
+                  ...updatedUiSchema[key],
+                  'ui:widget': 'hidden',
+                };
+              }
+            });
+            oldFormUiSchema = updatedUiSchema;
+          } else {
+            // remove from required
+            requiredArray = requiredArray.filter(
+              (key) => !requiredKeys.includes(key)
+            );
+
+            // Merge only missing items from required2 into required1 guardian details
+            requiredKeys2.forEach((item) => {
+              if (!requiredArray.includes(item)) {
+                requiredArray.push(item);
+              }
+            });
+
+            //set ui schema hide
+            const updatedUiSchema = { ...oldFormUiSchema };
+            // Clone each key's config and set widget to 'hidden'
+            requiredKeys.forEach((key) => {
+              if (updatedUiSchema.hasOwnProperty(key)) {
+                updatedUiSchema[key] = {
+                  ...updatedUiSchema[key],
+                  'ui:widget': 'hidden',
+                };
+              }
+            });
+
+            //show mobile
+            // Clone each key's config and set widget to 'hidden'
+            requiredKeys2.forEach((key) => {
+              if (updatedUiSchema.hasOwnProperty(key)) {
+                updatedUiSchema[key] = {
+                  ...updatedUiSchema[key],
+                  'ui:widget': 'CustomTextFieldWidget',
+                };
+              }
+            });
+
+            oldFormUiSchema = updatedUiSchema;
+          }
+          oldFormSchema.required = requiredArray;
+          setFormSchema(oldFormSchema);
+          setFormUiSchema(oldFormUiSchema);
         }
+      } else {
+        //initially hide all
+        let oldFormSchema = formSchema;
+        let oldFormUiSchema = formUiSchema;
+        let requiredArray = oldFormSchema?.required;
+
+        // remove from required
+        requiredArray = requiredArray.filter(
+          (key) => !requiredKeys.includes(key)
+        );
+        requiredArray = requiredArray.filter(
+          (key) => !requiredKeys2.includes(key)
+        );
+
+        //set ui schema hide
+        const updatedUiSchema = { ...oldFormUiSchema };
+        // Clone each key's config and set widget to 'hidden'
+        requiredKeys.forEach((key) => {
+          if (updatedUiSchema.hasOwnProperty(key)) {
+            updatedUiSchema[key] = {
+              ...updatedUiSchema[key],
+              'ui:widget': 'hidden',
+            };
+          }
+        });
+        requiredKeys2.forEach((key) => {
+          if (updatedUiSchema.hasOwnProperty(key)) {
+            updatedUiSchema[key] = {
+              ...updatedUiSchema[key],
+              'ui:widget': 'hidden',
+            };
+          }
+        });
+
+        oldFormUiSchema = updatedUiSchema;
         oldFormSchema.required = requiredArray;
         setFormSchema(oldFormSchema);
         setFormUiSchema(oldFormUiSchema);
