@@ -6,6 +6,7 @@ import customTheme from '../styles/customTheme';
 
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
+import MuiThemeProvider from '../theme/MuiThemeProvider';
 
 export const metadata: Metadata = {
   title: 'Welcome to forget password',
@@ -20,7 +21,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {children}
+        <MuiThemeProvider>{children}</MuiThemeProvider>
         <ToastContainer />
       </body>
     </html>

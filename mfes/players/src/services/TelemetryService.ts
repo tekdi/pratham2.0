@@ -23,17 +23,23 @@ export const handleTelemetryEventPDF = (event: any) => {
   getTelemetryEvents(event.detail, 'pdf');
 };
 
-export const handleTelemetryEventQuml = (event: any) => {
-  getTelemetryEvents(event.detail, 'quml');
+export const handleTelemetryEventQuml = (
+  event: any,
+  { courseId, unitId, userId }: any = {}
+) => {
+  getTelemetryEvents(event.data, 'quml', { courseId, unitId, userId });
 };
 
-export const getTelemetryEvents = (eventData: any, contentType: string) => {
-  console.log(
-    'getTelemetryEvents hit',
-    'Telemetry Event',
-    contentType,
-    eventData
-  );
+export const getTelemetryEvents = async (
+  eventData: any,
+  contentType: string,
+  { courseId, unitId, userId }: any = {}
+) => {
+  console.log('getTelemetryEvents hit', eventData, contentType, {
+    courseId,
+    unitId,
+    userId,
+  });
 
   if (!eventData || !eventData.object || !eventData.object.id) {
     console.error('Invalid event data');
@@ -57,6 +63,16 @@ export const getTelemetryEvents = (eventData: any, contentType: string) => {
   console.log(`${eid}Telemetry`, telemetryData);
 
   localStorage.setItem(telemetryKey, JSON.stringify(telemetryData));
+
+  if (eid === 'START') {
+    await contentWithTelemetryData({
+      identifier,
+      detailsObject: [telemetryData],
+      courseId,
+      unitId,
+      userId,
+    });
+  }
 
   if (eid === 'END' || (contentType === 'quml' && eid === 'SUMMARY')) {
     try {
@@ -92,13 +108,13 @@ export const getTelemetryEvents = (eventData: any, contentType: string) => {
             }
 
             // Skip event if `eid === 'END'` and progress is not 100 in either `summary` or `extra`
-            if (
-              parsedTelemetryEvent?.eid === 'END' &&
-              ((progressFromSummary !== 100 && progressFromSummary !== null) ||
-                (progressFromExtra !== 100 && progressFromExtra !== null))
-            ) {
-              return;
-            }
+            // if (
+            //   parsedTelemetryEvent?.eid === 'END' &&
+            //   ((progressFromSummary !== 100 && progressFromSummary !== null) ||
+            //     (progressFromExtra !== 100 && progressFromExtra !== null))
+            // ) {
+            //   return;
+            // }
 
             // Push parsed telemetry event
             detailsObject.push(parsedTelemetryEvent);
@@ -153,49 +169,13 @@ export const getTelemetryEvents = (eventData: any, contentType: string) => {
       }
 
       try {
-        const contentWithTelemetryData = async () => {
-          try {
-            let resolvedMimeType = localStorage.getItem('mimeType');
-
-            if (!resolvedMimeType) {
-              const response = await fetchBulkContents([identifier]);
-              resolvedMimeType = response[0]?.mimeType || '';
-              if (!resolvedMimeType) {
-                console.error('Failed to fetch mimeType.');
-                return;
-              }
-            }
-            let userId = '';
-            if (typeof window !== 'undefined' && window.localStorage) {
-              userId = localStorage.getItem('userId') ?? '';
-            }
-            if (userId !== undefined || userId !== '') {
-              const ContentTypeReverseMap = Object.fromEntries(
-                Object.entries(ContentType).map(([key, value]) => [value, key])
-              );
-
-              const reqBody: ContentCreate = {
-                userId: userId,
-                contentId: identifier,
-                courseId: identifier,
-                unitId: identifier,
-                contentType: ContentTypeReverseMap[resolvedMimeType] || '',
-                contentMime: resolvedMimeType,
-                lastAccessOn: lastAccessOn,
-                detailsObject: detailsObject,
-              };
-              // if (detailsObject.length > 0) {
-              const response = await createContentTracking(reqBody);
-              if (response) {
-                console.log(response);
-              }
-            }
-          } catch (error) {
-            console.error('Error in contentWithTelemetryData:', error);
-          }
-          // }
-        };
-        contentWithTelemetryData();
+        await contentWithTelemetryData({
+          identifier,
+          detailsObject,
+          courseId,
+          unitId,
+          userId,
+        });
       } catch (error) {
         console.log(error);
       }
@@ -204,4 +184,54 @@ export const getTelemetryEvents = (eventData: any, contentType: string) => {
       console.error('Error logging telemetry END event:', error);
     }
   }
+};
+
+export const contentWithTelemetryData = async ({
+  identifier,
+  detailsObject,
+  courseId,
+  unitId,
+  userId: propUserId,
+}: any) => {
+  try {
+    let resolvedMimeType = localStorage.getItem('mimeType');
+    if (!resolvedMimeType) {
+      const response = await fetchBulkContents([identifier]);
+      resolvedMimeType = response[0]?.mimeType || '';
+      if (!resolvedMimeType) {
+        console.error('Failed to fetch mimeType.');
+        return;
+      }
+    }
+    let userId = '';
+    if (propUserId) {
+      userId = propUserId;
+    } else if (typeof window !== 'undefined' && window.localStorage) {
+      userId = localStorage.getItem('userId') ?? '';
+    }
+    console.log(userId, propUserId, 'sagar');
+    if (userId !== undefined || userId !== '') {
+      const ContentTypeReverseMap = Object.fromEntries(
+        Object.entries(ContentType).map(([key, value]) => [value, key])
+      );
+      const reqBody: ContentCreate = {
+        userId: userId,
+        contentId: identifier,
+        courseId: courseId && unitId ? courseId : identifier,
+        unitId: courseId && unitId ? unitId : identifier,
+        contentType: ContentTypeReverseMap[resolvedMimeType] || '',
+        contentMime: resolvedMimeType,
+        lastAccessOn: lastAccessOn,
+        detailsObject: detailsObject,
+      };
+      // if (detailsObject.length > 0) {
+      const response = await createContentTracking(reqBody);
+      if (response) {
+        console.log(response);
+      }
+    }
+  } catch (error) {
+    console.error('Error in contentWithTelemetryData:', error);
+  }
+  // }
 };

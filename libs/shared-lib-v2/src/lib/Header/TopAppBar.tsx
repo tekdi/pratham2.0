@@ -1,0 +1,404 @@
+'use client';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  AppBar,
+  Box,
+  Toolbar,
+  Typography,
+  IconButton,
+  Button,
+  Select,
+  MenuItem as MuiMenuItem,
+  useTheme,
+  MenuItem,
+  Paper,
+  Popper,
+} from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { CommonDrawer } from '../Drawer/CommonDrawer';
+import type { DrawerItemProp } from '../Drawer/CommonDrawer';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+
+interface NewDrawerItemProp extends DrawerItemProp {
+  variant?: 'contained' | 'text';
+  isActive?: boolean;
+  customStyle?: React.CSSProperties;
+  child?: NewDrawerItemProp[];
+}
+export interface AppBarProps {
+  title?: string;
+  showBackIcon?: boolean;
+  backIconClick?: () => void;
+  actionButtonLabel?: string;
+  actionButtonClick?: () => void;
+  actionButtonColor?: 'inherit' | 'primary' | 'secondary' | 'default';
+  position?: 'fixed' | 'absolute' | 'sticky' | 'static' | 'relative';
+  color?: 'primary' | 'secondary' | 'default' | 'transparent' | 'inherit';
+  bgcolor?: string;
+  navLinks?: NewDrawerItemProp[];
+  rightComponent?: React.ReactNode;
+  isShowLang?: boolean;
+  onLanguageChange?: (lang: string) => void;
+  _navLinkBox?: React.CSSProperties;
+  _brand?: object;
+}
+
+export const TopAppBar: React.FC<AppBarProps> = ({
+  title = 'Title',
+  showBackIcon = false,
+  backIconClick,
+  navLinks = [],
+  rightComponent,
+  isShowLang = true,
+  onLanguageChange,
+  ...props
+}) => {
+  return (
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar position="static">
+        <Toolbar sx={{ justifyContent: 'space-between' }}>
+          <MobileTopBar
+            {...props}
+            navLinks={navLinks}
+            showBackIcon={showBackIcon}
+            backIconClick={backIconClick}
+            title={title}
+            isShowLang={isShowLang}
+            onLanguageChange={onLanguageChange}
+          />
+          {/* xs is for mobile and md is for desktop */}
+          <DesktopBar
+            {...props}
+            navLinks={navLinks}
+            rightComponent={rightComponent}
+            isShowLang={isShowLang}
+            onLanguageChange={onLanguageChange}
+          />
+        </Toolbar>
+      </AppBar>
+    </Box>
+  );
+};
+
+const LanguageSelect = ({
+  onLanguageChange,
+}: {
+  onLanguageChange?: (value: string) => void;
+}) => {
+  const theme = useTheme();
+  const [selectedLanguage, setSelectedLanguage] = useState('en');
+
+  useEffect(() => {
+    const storedLanguage = localStorage.getItem('lang');
+    if (storedLanguage) {
+      setSelectedLanguage(storedLanguage);
+    }
+  }, []);
+
+  const handleChange = (event: any) => {
+    const newLanguage = event.target.value;
+    setSelectedLanguage(newLanguage);
+    if (onLanguageChange) {
+      onLanguageChange(newLanguage);
+    } else {
+      localStorage.setItem('lang', newLanguage);
+    }
+  };
+
+  return (
+    <Select
+      value={selectedLanguage}
+      size="small"
+      onChange={handleChange}
+      sx={{
+        color: theme.palette.text.primary,
+        width: 70,
+        height: 28,
+        borderRadius: 8,
+        borderWidth: 1,
+      }}
+    >
+      <MuiMenuItem value="en">EN</MuiMenuItem>
+      <MuiMenuItem value="hi">HI</MuiMenuItem>
+      <MuiMenuItem value="mr">MR</MuiMenuItem>
+    </Select>
+  );
+};
+
+export const DesktopBar = ({
+  navLinks = [],
+  rightComponent,
+  isShowLang = true,
+  onLanguageChange,
+  _navLinkBox,
+  _brand,
+}: AppBarProps) => {
+  const [menus, setMenus] = useState<
+    { anchorEl: HTMLElement | null; items: any[] }[]
+  >([]);
+  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const openMenuAtLevel = (
+    level: number,
+    anchor: HTMLElement,
+    items: any[]
+  ) => {
+    setMenus((prev) => {
+      const next = [...prev];
+      next[level] = { anchorEl: anchor, items };
+      return next.slice(0, level + 1);
+    });
+  };
+
+  const handleEnter = () => {
+    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+  };
+
+  const handleLeave = () => {
+    closeTimeoutRef.current = setTimeout(() => {
+      setMenus([]);
+    }, 300);
+  };
+
+  const handleClickLeaf = (to: any) => {
+    setMenus([]);
+    if (typeof to === 'function') to();
+  };
+
+  return (
+    <Box
+      sx={{
+        display: { xs: 'none', md: 'flex' },
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
+      }}
+    >
+      <Brand {..._brand} />
+
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2,
+          justifyContent: 'center',
+          ..._navLinkBox,
+        }}
+      >
+        {navLinks.map((link, index) => (
+          <Box key={`${link.title}-${index}`} onMouseLeave={handleLeave}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Button
+                component={typeof link.to === 'string' ? 'a' : 'button'}
+                href={typeof link.to === 'string' ? link.to : undefined}
+                // @ts-ignore
+                variant={
+                  link.isActive
+                    ? 'top-bar-link-button'
+                    : link.variant ?? 'top-bar-link-text'
+                }
+                startIcon={link?.icon && link.icon}
+                onClick={
+                  typeof link.to !== 'string'
+                    ? (link.to as React.MouseEventHandler)
+                    : undefined
+                }
+              >
+                {link.title}
+              </Button>
+              {link.child && (
+                <IconButton
+                  size="small"
+                  onMouseEnter={(e) =>
+                    openMenuAtLevel(0, e.currentTarget, link.child ?? [])
+                  }
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openMenuAtLevel(0, e.currentTarget, link?.child ?? []);
+                  }}
+                >
+                  <ArrowDropDownIcon />
+                </IconButton>
+              )}
+            </Box>
+          </Box>
+        ))}
+
+        {(rightComponent || isShowLang) && (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            {rightComponent}
+            {isShowLang && (
+              <LanguageSelect onLanguageChange={onLanguageChange} />
+            )}
+          </Box>
+        )}
+      </Box>
+
+      {menus.map((menu, level) => (
+        <Popper
+          key={`menu-${level}`}
+          open={Boolean(menu.anchorEl)}
+          anchorEl={menu.anchorEl}
+          placement="bottom"
+          disablePortal
+          onMouseEnter={handleEnter}
+          onMouseLeave={handleLeave}
+          modifiers={[
+            {
+              name: 'offset',
+              options: {
+                offset: [0, 0],
+              },
+            },
+          ]}
+          sx={{
+            zIndex: 1300 + level,
+            mt: level === 0 ? 0.5 : 0,
+          }}
+        >
+          <Paper elevation={3}>
+            <Box
+              display="flex"
+              flexDirection="row"
+              flexWrap="wrap"
+              sx={{
+                boxShadow: '0px -4px 4px rgba(0, 0, 0, 0.1)',
+              }}
+            >
+              {menu.items.map((item, idx) => {
+                const hasChild =
+                  Array.isArray(item.child) && item.child.length > 0;
+
+                return (
+                  <Box
+                    key={`${idx}-${item.label}`}
+                    onMouseEnter={(e) => {
+                      if (hasChild) {
+                        openMenuAtLevel(level + 1, e.currentTarget, item.child);
+                      } else {
+                        setMenus((prev) => prev.slice(0, level + 1));
+                      }
+                    }}
+                    sx={{ minWidth: 160 }}
+                  >
+                    <MenuItem
+                      onClick={() => {
+                        if (!hasChild) handleClickLeaf(item.to);
+                      }}
+                      sx={{
+                        justifyContent: 'space-between',
+                        whiteSpace: 'nowrap',
+                        py: 3,
+                      }}
+                    >
+                      {item.title}
+                      {hasChild && <ArrowDropDownIcon fontSize="small" />}
+                    </MenuItem>
+                  </Box>
+                );
+              })}
+            </Box>
+          </Paper>
+        </Popper>
+      ))}
+    </Box>
+  );
+};
+
+const MobileTopBar = ({
+  navLinks = [],
+  showBackIcon,
+  backIconClick,
+  title,
+  isShowLang,
+  onLanguageChange,
+  _brand,
+}: AppBarProps) => {
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  return (
+    <Box
+      sx={{
+        display: { xs: 'flex', md: 'none' },
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
+      }}
+    >
+      {!showBackIcon ? (
+        <>
+          <IconButton
+            size="large"
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            onClick={(e) => setIsDrawerOpen(true)}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography
+            component="div"
+            sx={{
+              flexGrow: 1,
+              textAlign: 'center',
+              fontSize: '22px',
+              fontWeight: 400,
+            }}
+          >
+            {title}
+          </Typography>
+        </>
+      ) : (
+        <>
+          <IconButton
+            size="large"
+            edge="start"
+            color="inherit"
+            aria-label="back"
+            onClick={backIconClick}
+          >
+            <ArrowBackIcon />
+          </IconButton>
+          <Typography
+            variant="h6"
+            component="div"
+            sx={{ flexGrow: 1, textAlign: 'left' }}
+          >
+            {title}
+          </Typography>
+        </>
+      )}
+      {isShowLang && <LanguageSelect onLanguageChange={onLanguageChange} />}
+      <CommonDrawer
+        open={isDrawerOpen}
+        onDrawerClose={() => setIsDrawerOpen(false)}
+        items={navLinks}
+        topElement={<Brand {..._brand} />}
+      />
+    </Box>
+  );
+};
+
+const Brand = ({ _box, name = 'Pratham' }: { _box?: any; name?: string }) => {
+  const theme = useTheme();
+  return (
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }} {..._box}>
+      {_box?.brandlogo ?? (
+        <>
+          <img src="/logo.png" alt="YouthNet" style={{ height: '40px' }} />
+          <Typography
+            variant="h6"
+            sx={{
+              color: theme.palette.text.primary,
+              fontWeight: 600,
+              ...(_box?._text ?? {}),
+            }}
+          >
+            {name}
+          </Typography>
+        </>
+      )}
+    </Box>
+  );
+};

@@ -12,7 +12,7 @@ import {
   Grid,
 } from '@mui/material';
 import { CommonDialog, CommonTextField } from '@shared-lib';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { useTheme } from '@mui/material/styles';
 
 interface HelpDeskIssueData {
@@ -88,68 +88,6 @@ const HelpDesk = () => {
         isOpen={isDialogOpen}
         onClose={handleDialogClose}
         header="Help desk"
-        content={
-          <Grid container spacing={2}>
-            <Typography>We’ve sent an your issue to help desk</Typography>
-            <Grid
-              item
-              xs={12}
-              sm={6}
-              md={12}
-              lg={12}
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 2,
-                borderRadius: '20px 20px 0 0',
-                padding: '15px',
-                backgroundColor: '#FFFFFF',
-              }}
-            >
-              <CommonTextField
-                label="Subject"
-                value={issueData.subject}
-                type="text"
-                variant="outlined"
-                onChange={handleChange('subject')}
-              />
-              <CommonTextField
-                label="Description"
-                type="text"
-                variant="outlined"
-                multiline
-                rows={4}
-                value={issueData.description}
-                onChange={handleChange('description')}
-              />
-              <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label">Status</InputLabel>
-                <Select
-                  fullWidth
-                  value={issueData.status}
-                  onChange={handleChange('status')}
-                >
-                  <MenuItem value="Open">Open</MenuItem>
-                  <MenuItem value="Closed">Closed</MenuItem>
-                  <MenuItem value="In Progress">In Progress</MenuItem>
-                </Select>
-              </FormControl>
-              <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label">Priority</InputLabel>
-                <Select
-                  fullWidth
-                  value={issueData.priority}
-                  onChange={handleChange('priority')}
-                  sx={{ mt: 2 }}
-                >
-                  <MenuItem value="High">High</MenuItem>
-                  <MenuItem value="Medium">Medium</MenuItem>
-                  <MenuItem value="Low">Low</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
-        }
         actions={
           <Button
             onClick={handleOtpSubmit}
@@ -166,7 +104,68 @@ const HelpDesk = () => {
             Submit
           </Button>
         }
-      />
+      >
+        <Grid container spacing={2}>
+          <Typography>We’ve sent an your issue to help desk</Typography>
+          <Grid
+            item
+            xs={12}
+            sm={6}
+            md={12}
+            lg={12}
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 2,
+              borderRadius: '20px 20px 0 0',
+              padding: '15px',
+              backgroundColor: '#FFFFFF',
+            }}
+          >
+            <CommonTextField
+              label="Subject"
+              value={issueData.subject}
+              type="text"
+              variant="outlined"
+              onChange={handleChange('subject')}
+            />
+            <CommonTextField
+              label="Description"
+              type="text"
+              variant="outlined"
+              multiline
+              rows={4}
+              value={issueData.description}
+              onChange={handleChange('description')}
+            />
+            <FormControl fullWidth>
+              <InputLabel id="demo-simple-select-label">Status</InputLabel>
+              <Select
+                fullWidth
+                value={issueData.status}
+                onChange={handleChange('status')}
+              >
+                <MenuItem value="Open">Open</MenuItem>
+                <MenuItem value="Closed">Closed</MenuItem>
+                <MenuItem value="In Progress">In Progress</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl fullWidth>
+              <InputLabel id="demo-simple-select-label">Priority</InputLabel>
+              <Select
+                fullWidth
+                value={issueData.priority}
+                onChange={handleChange('priority')}
+                sx={{ mt: 2 }}
+              >
+                <MenuItem value="High">High</MenuItem>
+                <MenuItem value="Medium">Medium</MenuItem>
+                <MenuItem value="Low">Low</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+        </Grid>
+      </CommonDialog>
     </Fab>
   );
 };

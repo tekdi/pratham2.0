@@ -44,10 +44,12 @@ export const createUserCertificateStatus = async ({
 
 export const getUserCertificates = async ({
   userId,
+  courseId,
   limit = 2,
   offset = 0,
 }: {
   userId: string;
+  courseId?: any[];
   limit?: number;
   offset?: number;
 }): Promise<any> => {
@@ -61,6 +63,7 @@ export const getUserCertificates = async ({
     const data = {
       filters: {
         userId: [userId],
+        courseId,
       },
       limit,
       offset,
@@ -76,6 +79,17 @@ export const getUserCertificates = async ({
     return res;
   } catch (error) {
     console.error('Error in getUserCertificates:', error);
+    throw error;
+  }
+};
+
+export const issueCertificate = async (reqBody: any) => {
+  const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/certificate/issue`;
+  try {
+    const response = await post(apiUrl, reqBody);
+    return response?.data;
+  } catch (error) {
+    console.log(error);
     throw error;
   }
 };

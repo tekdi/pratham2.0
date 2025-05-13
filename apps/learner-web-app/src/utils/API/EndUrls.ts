@@ -1,6 +1,4 @@
-import { sendOTP } from './OtPService';
-
-const baseurl = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;
+export const baseurl = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;
 
 export const API_ENDPOINTS = {
   accountCreate: `${baseurl}/account/create`,
@@ -21,8 +19,16 @@ export const API_ENDPOINTS = {
   userCheck: `${baseurl}/user/check`,
   sendOTP: `${baseurl}/user/send-otp`,
   verifyOTP: `${baseurl}/user/verify-otp`,
+  program: `${baseurl}/tenant/read`,
+  fetchCourseId: `${baseurl}/tracking/content/course/inprogress`,
+  userUpdate: (userId: string) => `${baseurl}/user/update/${userId}`,
+  courseWiseLernerList: `${baseurl}/tracking/user_certificate/status/search`,
+  academicYearsList: `${baseurl}/academicyears/list`,
+  cohortSearch: `${baseurl}/cohort/search`,
+  myCohortsRead: (userId: string) => `${baseurl}/user/read/${userId}`,
 };
 
+export const COURSE_L2_ENDPOINTS = `${process.env.NEXT_PUBLIC_BASE_URL}/prathamservice/v1/save-user-salesforce`;
 export const COURSE_PLANNER_UPLOAD_ENDPOINTS = `${process.env.NEXT_PUBLIC_BASE_URL}/prathamservice/v1/course-planner/upload`;
 
 export const TARGET_SOLUTION_ENDPOINTS = `${process.env.NEXT_PUBLIC_COURSE_PLANNER_API_URL}/solutions/targetedSolutions?type=improvementProject&currentScopeOnly=true`;

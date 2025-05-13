@@ -1,12 +1,22 @@
 'use client';
 
-import React from 'react';
-import { Box, Typography, Select, MenuItem } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, Select, MenuItem } from '@mui/material';
 import LanguageIcon from '@mui/icons-material/Language';
 import Image from 'next/image';
 import appLogo from '../../../public/images/appLogo.svg';
+import { useTranslation } from '@shared-lib';
 
 const Header = () => {
+  const { t, setLanguage } = useTranslation();
+  const [lang, setLang] = useState('en'); // state for selected language
+
+  const handleLanguageChange = (event) => {
+    const newLang = event.target.value;
+    setLang(newLang);
+    setLanguage(newLang);
+  };
+
   return (
     <Box
       display="flex"
@@ -17,7 +27,7 @@ const Header = () => {
       borderBottom="1px solid #ccc"
       bgcolor="#fff"
     >
-      {/* Logo and tagline */}
+      {/* Logo */}
       <Box display="flex" alignItems="center" gap={2}>
         <Image src={appLogo} alt="Pratham Logo" width={200} height={40} />
       </Box>
@@ -26,7 +36,8 @@ const Header = () => {
       <Box display="flex" alignItems="center" gap={1}>
         <LanguageIcon fontSize="small" />
         <Select
-          value="en"
+          value={lang}
+          onChange={handleLanguageChange}
           variant="standard"
           disableUnderline
           sx={{

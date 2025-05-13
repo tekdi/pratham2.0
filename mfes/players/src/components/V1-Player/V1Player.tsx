@@ -3,11 +3,15 @@ import { getTelemetryEvents } from '../../services/TelemetryService';
 
 interface PlayerProps {
   playerConfig: any;
+  relatedData?: any;
 }
 
-const basePath = process.env.NEXT_PUBLIC_ASSETS_CONTENT || '/mfe_content';
+const basePath = process.env.NEXT_PUBLIC_ASSETS_CONTENT || '/sbplayer';
 
-const V1Player = ({ playerConfig }: PlayerProps) => {
+const V1Player = ({
+  playerConfig,
+  relatedData: { courseId, unitId, userId },
+}: PlayerProps) => {
   const previewRef = useRef<HTMLIFrameElement | null>(null);
 
   useEffect(() => {
@@ -27,17 +31,24 @@ const V1Player = ({ playerConfig }: PlayerProps) => {
             preview.contentWindow.initializePreview(playerConfig);
           }
 
-          preview.addEventListener('renderer:telemetry:event', (event: any) => {
-            console.log('V1 player telemetry event ===>', event);
-            if (event.detail.telemetryData.eid === 'START') {
-              console.log('V1 player telemetry START event ===>', event);
-            }
-            if (event.detail.telemetryData.eid === 'END') {
-              console.log('V1 player telemetry END event ===>', event);
-            }
+          preview.addEventListener(
+            'renderer:telemetry:event',
+            async (event: any) => {
+              console.log('V1 player telemetry event ===>', event);
+              if (event.detail.telemetryData.eid === 'START') {
+                console.log('V1 player telemetry START event ===>', event);
+              }
+              if (event.detail.telemetryData.eid === 'END') {
+                console.log('V1 player telemetry END event ===>', event);
+              }
 
-            getTelemetryEvents(event.detail.telemetryData, 'v1');
-          });
+              await getTelemetryEvents(event.detail.telemetryData, 'v1', {
+                courseId,
+                unitId,
+                userId,
+              });
+            }
+          );
         }, 100);
       };
 
@@ -60,7 +71,7 @@ const V1Player = ({ playerConfig }: PlayerProps) => {
       ref={previewRef}
       id="contentPlayer"
       title="Content Player"
-      src={`${basePath}/content/preview/preview.html?webview=true`}
+      src={`${basePath}/libs/sunbird-content-player/preview/preview.html?webview=true`}
       aria-label="Content Player"
       style={{ border: 'none' }}
       width={'100%'}

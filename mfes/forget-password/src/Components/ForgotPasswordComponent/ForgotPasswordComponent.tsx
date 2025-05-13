@@ -3,12 +3,14 @@
 import React, { useState } from 'react';
 import { Box, Typography, TextField, Button, Paper } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
+import { Loader, useTranslation } from '@shared-lib'; // Updated import
 
 const ForgotPasswordComponent = ({
   onNext,
 }: {
   onNext: (value: string) => void;
 }) => {
+  const { t } = useTranslation();
   const [input, setInput] = useState('');
 
   const handleNext = () => {
@@ -22,10 +24,9 @@ const ForgotPasswordComponent = ({
       display="flex"
       flexDirection="column"
       alignItems="center"
-      justifyContent="center"
+      // justifyContent="center"
       minHeight="100vh"
-      //  bgcolor="#fffbe6"
-      px={2}
+      //px={2}
     >
       <LockIcon sx={{ fontSize: 40, color: '#000', mb: 2 }} />
 
@@ -39,7 +40,7 @@ const ForgotPasswordComponent = ({
         }}
         gutterBottom
       >
-        Trouble with logging in?
+        {t('FORGOT_PASSWORD.TITLE')} {/* Internationalized title */}
       </Typography>
 
       <Typography
@@ -53,7 +54,7 @@ const ForgotPasswordComponent = ({
           mb: 3,
         }}
       >
-        No worries, we’ll help you get back to your account
+        {t('FORGOT_PASSWORD.SUBTITLE')} {/* Internationalized subtitle */}
       </Typography>
 
       <Paper
@@ -67,7 +68,7 @@ const ForgotPasswordComponent = ({
         }}
       >
         <TextField
-          label="Enter username or phone number"
+          label={t('FORGOT_PASSWORD.INPUT_LABEL')}
           variant="outlined"
           fullWidth
           value={input}
@@ -92,7 +93,7 @@ const ForgotPasswordComponent = ({
           }}
           onClick={handleNext}
         >
-          Next
+          {t('FORGOT_PASSWORD.BUTTON')} {/* Internationalized button text */}
         </Button>
       </Paper>
     </Box>

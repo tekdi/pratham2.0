@@ -50,6 +50,7 @@ export interface ContentSearchResponse {
   author?: string;
   consumerId?: string;
   childNodes?: string[];
+  children: [{}];
   discussionForum?: {
     enabled?: string;
   };
@@ -108,21 +109,27 @@ export interface ContentSearchResponse {
 }
 // Define the payload
 
+export interface ResultProp {
+  content: ContentSearchResponse[];
+  count: number;
+}
+export interface ContentResponse {
+  result: ResultProp;
+}
+
 export const ContentSearch = async ({
   type,
   query,
   filters,
   limit = 5,
   offset = 0,
-  channel,
 }: {
   type: string;
-  channel: string;
   query?: string;
   filters?: object;
   limit?: number;
   offset?: number;
-}): Promise<ContentSearchResponse[]> => {
+}): Promise<ContentResponse> => {
   try {
     // Ensure the environment variable is defined
     const searchApiUrl = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;
@@ -144,7 +151,7 @@ export const ContentSearch = async ({
             type?.toLowerCase() === 'course'
               ? ['Course']
               : ['Learning Resource', 'Practice Question Set'],
-          channel: localStorage.getItem('tenant-code'),
+          channel: localStorage.getItem('channelId'),
         },
         fields: [
           'name',

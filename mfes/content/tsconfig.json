@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../tsconfig.learner.json",
   "compilerOptions": {
     "jsx": "preserve",
     "strict": true,
@@ -19,10 +19,17 @@
       {
         "name": "next"
       }
-    ],
+    ]
     //"types": ["jest", "node"]
     //"types": ["node"]
   },
-  "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "next-env.d.ts"],
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.js",
+    "**/*.jsx",
+    "next-env.d.ts",
+    ".next/types/**/*.ts"
+  ],
   "exclude": ["node_modules", "jest.config.ts", "**/*.spec.ts", "**/*.test.ts"]
 }
