@@ -80,6 +80,7 @@ const CustomFileUpload = ({
   };
 
   const uploadToServer = async (file: File) => {
+    console.log(file);
     try {
       setUploading(true);
 

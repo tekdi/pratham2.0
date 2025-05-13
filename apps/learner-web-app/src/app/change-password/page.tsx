@@ -150,8 +150,8 @@ const ChangePassword = () => {
           </IconButton>
         </Box>
         <Box
-          height="100vh"
-          width="100vw"
+          // height="100vh"
+          // width="100vw"
           display="flex"
           flexDirection="column"
           overflow="auto"

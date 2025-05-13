@@ -8,6 +8,7 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  Divider,
 } from '@mui/material';
 import { useRouter, useParams } from 'next/navigation';
 import LayoutPage from '@content-mfes/components/LayoutPage';
@@ -120,12 +121,30 @@ const ContentDetails = (props: ContentDetailsProps) => {
             display: 'flex',
             flexDirection: 'column',
             flex: { xs: 6, md: 8, lg: 9, xl: 9 },
+            px: '18px',
           }}
         >
           {/* Section Header */}
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, py: 4 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 4,
+              py: 4,
+              width: '85%',
+            }}
+          >
             <Box>
-              <Typography fontSize={'14px'} fontWeight={400}>
+              <Typography
+                sx={{
+                  fontWeight: 400,
+                  fontSize: '16px',
+                  lineHeight: '24px',
+                  letterSpacing: '0.5px',
+                  color: '#4D4639',
+                }}
+                fontWeight={400}
+              >
                 {contentDetails?.description ?? 'No description available'}
               </Typography>
             </Box>
@@ -136,8 +155,17 @@ const ContentDetails = (props: ContentDetailsProps) => {
                 gap: 3,
               }}
             >
-              <Typography fontSize={'14px'} fontWeight={400}>
-                What You’ll Learn
+              <Typography
+                sx={{
+                  fontWeight: 400,
+                  fontSize: '22px',
+                  lineHeight: '28px',
+                  letterSpacing: '0px',
+                  verticalAlign: 'middle',
+                  color: '#1F1B13',
+                }}
+              >
+                What You'll Learn
               </Typography>
 
               {contentDetails?.children &&
@@ -149,23 +177,62 @@ const ContentDetails = (props: ContentDetailsProps) => {
                       gap: 2,
                     }}
                   >
-                    {contentDetails?.children?.map((item: any) => (
-                      <Accordion
-                        key={item.identifier}
-                        sx={{ backgroundColor: 'transparent' }}
-                      >
-                        <AccordionSummary
-                          expandIcon={<ExpandMoreIcon />}
-                          aria-controls="panel1-content"
-                          id="panel1-header"
-                        >
-                          <Typography component="span">{item?.name}</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                          {item?.description ?? 'No description available'}
-                        </AccordionDetails>
-                      </Accordion>
-                    ))}
+                    {contentDetails?.children?.map(
+                      (item: any, index: number) => (
+                        <>
+                          <Accordion
+                            key={item.identifier}
+                            sx={{
+                              backgroundColor: 'transparent',
+                              boxShadow: 'none',
+                              '&:before': {
+                                display: 'none',
+                              },
+                              '&.MuiAccordion-root': {
+                                border: 'none',
+                              },
+                            }}
+                          >
+                            <AccordionSummary
+                              expandIcon={<ExpandMoreIcon />}
+                              aria-controls="panel1-content"
+                              id="panel1-header"
+                            >
+                              <Typography
+                                component="span"
+                                sx={{
+                                  fontWeight: 500,
+                                  fontSize: '16px',
+                                  letterSpacing: '0.15px',
+                                }}
+                              >
+                                {item?.name}
+                              </Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                              <Typography
+                                component="span"
+                                sx={{
+                                  fontWeight: 400,
+                                  fontSize: '16px',
+                                  lineHeight: '24px',
+                                  letterSpacing: '0.5px',
+                                  color: '#4D4639',
+                                }}
+                              >
+                                {item?.description ??
+                                  'No description available'}
+                              </Typography>
+                            </AccordionDetails>
+                          </Accordion>
+
+                          {index <
+                            (contentDetails?.children?.length ?? 0) - 1 && (
+                            <Divider />
+                          )}
+                        </>
+                      )
+                    )}
                   </Box>
                 )}
             </Box>

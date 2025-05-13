@@ -15,7 +15,7 @@ const OtpVerificationComponent = ({
   setOtp: any;
 }) => {
   // const [otp, setOtp] = useState<string[]>(['', '', '', '']);
-  const [timer, setTimer] = useState(59);
+  const [timer, setTimer] = useState(120);
 
   useEffect(() => {
     if (timer === 0) return;
@@ -35,7 +35,7 @@ const OtpVerificationComponent = ({
   };
 
   const handleResend = () => {
-    setTimer(59);
+    setTimer(120);
     setOtp(['', '', '', '']);
     onResend?.();
   };

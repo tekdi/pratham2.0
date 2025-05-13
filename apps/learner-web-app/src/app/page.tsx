@@ -22,11 +22,8 @@ export default function Index() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <Box
-        height="100vh"
-        width="100vw"
         display="flex"
         flexDirection="column"
-        overflow="hidden"
         sx={{ overflowWrap: 'break-word', wordBreak: 'break-word' }}
       >
         <Header />
@@ -134,8 +131,8 @@ export default function Index() {
                         <Image
                           src="/images/prathamQR.png"
                           alt="QR Code"
-                          width={62}
-                          height={61}
+                          width={100}
+                          height={100}
                         />
                       </Box>
                       <Box>
@@ -202,6 +199,12 @@ export default function Index() {
                       justifyContent: 'flex-end',
                       gap: 1,
                       alignItems: 'center',
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => {
+                      router.push(
+                        'https://play.google.com/store/apps/details?id=com.pratham.learning'
+                      );
                     }}
                   >
                     <Box>

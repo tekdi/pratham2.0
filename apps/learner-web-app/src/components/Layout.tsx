@@ -83,8 +83,8 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
       navLinks.push({
         title: t('LEARNER_APP.COMMON.SURVEYS'),
         icon: <AssignmentOutlined sx={{ width: 28, height: 28 }} />,
-        to: () => router.push('/surveys'),
-        isActive: currentPage === '/surveys',
+        to: () => router.push('/observations'),
+        isActive: currentPage === '/observations',
       });
     }
     if (checkAuth()) {

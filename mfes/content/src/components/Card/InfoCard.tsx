@@ -44,9 +44,10 @@ const InfoCard: React.FC<InfoCardProps> = ({ item, onBackClick, _config }) => {
             display: 'flex',
             flexDirection: 'column',
             flex: '1 0 auto',
-            p: 2,
+            p: '18px',
             pb: 0,
             gap: 1.5,
+            width: '85%',
           }}
         >
           {onBackClick && (

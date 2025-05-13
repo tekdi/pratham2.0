@@ -458,11 +458,10 @@ const ObservationQuestions: React.FC = () => {
         sx={{
           width: { xs: '90%', sm: '80%', md: '70%', lg: 900 },
           height: isAddNew ? 'auto' : { xs: 'auto', md: 600 },
-          mt: 4,
           mx: 'auto',
           gap: 3,
           borderRadius: '24px',
-          padding: { xs: 2, sm: 3, md: 4 },
+          padding: { xs: 1, sm: 3, md: 4 },
           background: '#FBF4E4',
         }}
       >

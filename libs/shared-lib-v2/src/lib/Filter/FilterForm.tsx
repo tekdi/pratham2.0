@@ -196,7 +196,7 @@ export function FilterForm({
               sx={{ width: '50%' }}
               onClick={handleFilter}
             >
-              {t('filter')}
+              {t('Filter')}
             </MuiButton>
           </Box>
         </Box>
