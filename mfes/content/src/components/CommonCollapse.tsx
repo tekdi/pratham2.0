@@ -110,35 +110,83 @@ const GetIconByMimeType = React.memo(function GetIconByMimeTypeComponent({
 }): React.ReactNode {
   const icons = {
     'application/pdf': {
-      icon: <PictureAsPdfIcon sx={{ color: 'red' }} />, // icons
+      icon: (
+        <img
+          src="/images/PDF.svg"
+          alt="PDF"
+          style={{ width: '18px', height: '18px' }}
+        />
+      ),
       text: 'PDF',
     },
     'video/mp4': {
-      icon: <PlayCircleIcon sx={{ color: 'blue' }} />,
+      icon: (
+        <img
+          src="/images/video.svg"
+          alt="video"
+          style={{ width: '18px', height: '18px' }}
+        />
+      ),
       text: 'Video',
     },
     'video/webm': {
-      icon: <PlayCircleIcon sx={{ color: 'blue' }} />,
+      icon: (
+        <img
+          src="/images/video.svg"
+          alt="video"
+          style={{ width: '18px', height: '18px' }}
+        />
+      ),
       text: 'Video',
     },
     'video/x-youtube': {
-      icon: <SmartDisplayIcon sx={{ color: 'red' }} />,
+      icon: (
+        <img
+          src="/images/youtube.svg"
+          alt="youtube"
+          style={{ width: '18px', height: '18px' }}
+        />
+      ),
       text: 'Youtube',
     },
     'application/vnd.sunbird.questionset': {
-      icon: <TextSnippetOutlinedIcon />,
+      icon: (
+        <img
+          src="/images/Qml.svg"
+          alt="quml"
+          style={{ width: '18px', height: '18px' }}
+        />
+      ),
       text: 'QUML',
     },
     'application/vnd.ekstep.h5p-archive': {
-      icon: <H5P sx={{ color: '#2575be' }} />,
+      icon: (
+        <img
+          src="/images/HTML.svg"
+          alt="h5p"
+          style={{ width: '18px', height: '18px' }}
+        />
+      ),
       text: 'H5P',
     },
     'application/vnd.ekstep.html-archive': {
-      icon: <HtmlIcon sx={{ color: 'green' }} />,
+      icon: (
+        <img
+          src="/images/HTML.svg"
+          alt="html"
+          style={{ width: '18px', height: '18px' }}
+        />
+      ),
       text: 'HTML',
     },
     'application/epub': {
-      icon: <EAlphabetIcon sx={{ color: 'green' }} />,
+      icon: (
+        <img
+          src="/images/Epub.svg"
+          alt="epub"
+          style={{ width: '18px', height: '18px' }}
+        />
+      ),
       text: 'Epub',
     },
   };

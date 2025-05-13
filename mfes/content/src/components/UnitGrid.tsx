@@ -22,23 +22,27 @@ export const UnitGrid: React.FC<CommonAccordionProps> = ({
   const { default_img, _card, _grid } = _config || {};
 
   return (
-    <Grid container spacing={2}>
+    <Grid container spacing={4}>
       {item?.children?.map((subItem: any) => (
         <Grid
           key={subItem?.identifier}
           item
-          xs={12}
-          sm={6}
-          md={4}
-          lg={3}
-          {..._grid}
+          // xs={12}
+          // sm={6}
+          // md={4}
+          // lg={3}
+          // {..._grid}
+          sx={{ flexWrap: 'wrap' }}
         >
           {subItem?.mimeType === 'application/vnd.ekstep.content-collection' ? (
             <UnitCard
               item={subItem}
               trackData={trackData ?? []}
               default_img={default_img}
-              _card={_card}
+              _card={{
+                ..._card,
+                sx: { width: '230px', ...(_card?.sx ?? {}) },
+              }}
               handleCardClick={(content: ContentItem) =>
                 handleItemClick?.(content)
               }
@@ -48,7 +52,10 @@ export const UnitGrid: React.FC<CommonAccordionProps> = ({
               item={subItem}
               type={item.mimeType}
               default_img={default_img}
-              _card={_card}
+              _card={{
+                ..._card,
+                sx: { width: '230px', ...(_card?.sx ?? {}) },
+              }}
               handleCardClick={(content: ContentItem) =>
                 handleItemClick?.(content)
               }
