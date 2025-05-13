@@ -1,10 +1,10 @@
 'use client';
 import { useEffect } from 'react';
-import { useTranslation } from 'next-i18next';
 import { logout } from '@learner/utils/API/LoginService';
 import Loader from '@learner/components/Loader/Loader';
 import { useRouter } from 'next/navigation';
 import { preserveLocalStorage } from '@learner/utils/helper';
+import { useTranslation } from '@shared-lib';
 
 function Logout() {
   const router = useRouter();

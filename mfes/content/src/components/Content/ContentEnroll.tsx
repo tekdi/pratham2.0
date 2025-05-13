@@ -142,6 +142,7 @@ const ContentDetails = (props: ContentDetailsProps) => {
                   lineHeight: '24px',
                   letterSpacing: '0.5px',
                   color: '#4D4639',
+                  textTransform: 'capitalize',
                 }}
                 fontWeight={400}
               >
