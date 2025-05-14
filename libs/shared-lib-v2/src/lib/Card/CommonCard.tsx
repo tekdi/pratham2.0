@@ -168,7 +168,8 @@ export const CommonCard: React.FC<CommonCardProps> = ({
 
       <CardHeader
         sx={{
-          pb: 0.5,
+          pb: 0,
+          pt: 1,
         }}
         avatar={
           avatarLetter && (
@@ -182,6 +183,7 @@ export const CommonCard: React.FC<CommonCardProps> = ({
             sx={{
               fontWeight: 500,
               fontSize: '16px',
+              lineHeight: '24px',
               whiteSpace: 'wrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -194,22 +196,28 @@ export const CommonCard: React.FC<CommonCardProps> = ({
           </Typography>
         }
         subheader={
-          <Typography variant="h6" sx={{ fontSize: '14px' }}>
-            {subheader}
-          </Typography>
+          subheader && (
+            <Typography variant="h6" sx={{ fontSize: '14px' }}>
+              {subheader}
+            </Typography>
+          )
         }
       />
       {content && (
         <CardContent
           sx={{
-            pt: 0,
+            pt: 0.5,
+            pb: 0,
           }}
         >
           <Typography
             sx={{
               fontWeight: 400,
+              fontSize: '15.4px',
+              lineHeight: '22px',
+              color: '#49454F',
               display: '-webkit-box',
-              WebkitLineClamp: 4,
+              WebkitLineClamp: 5,
               WebkitBoxOrient: 'vertical',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -221,7 +229,9 @@ export const CommonCard: React.FC<CommonCardProps> = ({
         </CardContent>
       )}
       {children && <CardContent>{children}</CardContent>}
-      {actions && <CardActions>{actions}</CardActions>}
+      {actions && (
+        <CardActions sx={{ p: 2, pt: '14px' }}>{actions}</CardActions>
+      )}
     </Card>
   );
 };
@@ -247,7 +257,9 @@ export const StatusBar: React.FC<StatuPorps> = ({
       <Box
         sx={{
           width: '100%',
-          p: '6px 6px',
+          pl: type === 'Course' ? '6px' : '0',
+          pr: type === 'Course' ? '6px' : '8px',
+          py: '6px',
           fontSize: '14px',
           lineHeight: '20px',
           fontWeight: '500',
@@ -305,7 +317,17 @@ export const StatusBar: React.FC<StatuPorps> = ({
             }
           />
         )}
-        <Typography width={'100%'}>{status}</Typography>
+        <Typography
+          width={type === 'Course' ? '100%' : '133px'}
+          sx={{
+            fontSize: '14px',
+            lineHeight: '20px',
+            letterSpacing: '0.1px',
+            verticalAlign: 'middle',
+          }}
+        >
+          {status}
+        </Typography>
       </Box>
     </Box>
   );
