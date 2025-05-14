@@ -126,7 +126,7 @@ const InfoCard: React.FC<InfoCardProps> = ({ item, onBackClick, _config }) => {
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 transition: 'all 0.3s ease-in-out',
-                maxHeight: isExpanded ? '1000px' : '48px',
+                maxHeight: isExpanded ? '100%' : '51px',
               }}
             >
               {item?.description}
