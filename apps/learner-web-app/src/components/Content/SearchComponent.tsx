@@ -1,6 +1,7 @@
-import React, { memo, useState } from 'react';
-import { CommonSearch, useTranslation } from '@shared-lib'; // Updated import
+import React, { memo, useState, useMemo, useEffect } from 'react';
+import { CommonSearch, useTranslation } from '@shared-lib';
 import { Search as SearchIcon } from '@mui/icons-material';
+import debounce from 'lodash/debounce';
 
 export default memo(function SearchComponent({
   onSearch,
@@ -10,12 +11,47 @@ export default memo(function SearchComponent({
   const { t } = useTranslation();
   const [searchValue, setSearchValue] = useState('');
 
+  // Debounced function (only called for non-empty values)
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((value: string) => {
+        if (value.trim() !== '') {
+          onSearch(value.trim());
+        }
+      }, 300),
+    [onSearch]
+  );
+
+  useEffect(() => {
+    const trimmed = searchValue.trim();
+
+    if (trimmed === '') {
+      // Immediately clear results (optional: depending on your app logic)
+      debouncedSearch.cancel(); // Cancel any pending debounced call
+      onSearch(''); // Notify parent to clear results
+      return;
+    }
+
+    debouncedSearch(trimmed);
+
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [searchValue, debouncedSearch, onSearch]);
+
   const handleSearchChange = (value: string) => {
     setSearchValue(value);
   };
 
   const handleSearchClick = () => {
-    onSearch(searchValue);
+    const trimmed = searchValue.trim();
+    debouncedSearch.cancel(); // Cancel debounce before immediate search
+
+    if (trimmed !== '') {
+      onSearch(trimmed);
+    } else {
+      onSearch(''); // Ensure reset on manual clear + click
+    }
   };
 
   return (

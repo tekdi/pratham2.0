@@ -520,10 +520,10 @@ mat-radio-group.mat-mdc-radio-group {
     0 1px 5px 0 rgb(0 0 0 / 12%) !important;
 }
 
-.MuiLinearProgress-root {
+/* .MuiLinearProgress-root {
   background-color: var(--mui-palette-warning-600) !important;
 }
 
 .MuiLinearProgress-bar {
   background-color: var(--mui-palette-error-main) !important;
-}
+} */

@@ -19,11 +19,10 @@ const ContentCard = ({
   trackData?: [];
 }) => {
   const { isWrap } = _card ?? {};
-  console.log(type, 'sagar item');
   return (
     <CardWrap isWrap={isWrap}>
       <CommonCard
-        minheight="100%"
+        minheight={type?.toLowerCase() === 'course' ? '302px' : 'auto'}
         title={(item?.name || '').trim()}
         image={
           item?.posterImage && item?.posterImage !== 'undefined'
@@ -65,7 +64,14 @@ const ContentCard = ({
         onClick={() => handleCardClick(item)}
         _card={{
           _contentText: {
-            sx: { color: item?.description ? 'inherit' : '#79747E' },
+            sx: !item?.description
+              ? {
+                  color: '#79747E',
+                  fontStyle: 'italic',
+                }
+              : {
+                  textTransform: 'capitalize',
+                },
           },
           ..._card,
         }}
