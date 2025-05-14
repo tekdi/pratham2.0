@@ -302,8 +302,8 @@ const RegisterUser = () => {
         const responseUserData = await createUser(createuserPayload);
         console.log(responseUserData);
         if (responseUserData) {
-          localStorage.removeItem('localPayload');
-          localStorage.removeItem('formData');
+          // localStorage.removeItem('localPayload');
+          // localStorage.removeItem('formData');
 
           setSignupSuccessModal(true);
         } else {
