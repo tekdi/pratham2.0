@@ -180,22 +180,22 @@ export const getMissingFields = (schema: any, userData: any) => {
     //   });
     // }
 
-    if (result.properties.dob) {
-      guardianFields.forEach((field) => {
-        if (!result.properties[field]) {
-          result.properties[field] = {
-            type: 'string',
-            title: field.toUpperCase(),
-          };
-        }
-      });
-    } else {
-      guardianFields.forEach((field) => {
-        if (result.properties[field]) {
-          delete result.properties[field];
-        }
-      });
-    }
+    // if (result.properties.dob) {
+    //   guardianFields.forEach((field) => {
+    //     if (!result.properties[field]) {
+    //       result.properties[field] = {
+    //         type: 'string',
+    //         title: field.toUpperCase(),
+    //       };
+    //     }
+    //   });
+    // } else {
+    //   guardianFields.forEach((field) => {
+    //     if (result.properties[field]) {
+    //       delete result.properties[field];
+    //     }
+    //   });
+    // }
 
     return result;
   } catch (error) {

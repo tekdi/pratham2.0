@@ -310,6 +310,7 @@ const EditProfile = ({ completeProfile }: EditProfileProps) => {
                 FormSubmitFunction={FormSubmitFunction}
                 prefilledFormData={completeProfile ? {} : userFormData}
                 hideSubmit={true}
+                type="learner"
               />
             )}
             <Button

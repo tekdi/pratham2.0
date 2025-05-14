@@ -45,7 +45,7 @@ const RenderTabContent = memo(
     isHideEmptyDataMessage?: boolean;
   }) => {
     const { t } = useTranslation();
-    const { default_img, _card, _box } = _config ?? {};
+    const { default_img, _card, _box, _subBox } = _config ?? {};
 
     return (
       <Box sx={{ width: '100%', ...(_box?.sx ?? {}) }}>
@@ -78,7 +78,7 @@ const RenderTabContent = memo(
             isHideMaxHeight
             _loader={{ backgroundColor: 'transparent' }}
           >
-            <Box>
+            <Box {..._subBox} sx={{ ...(_subBox?.sx ?? {}) }}>
               <Grid container spacing={4}>
                 {contentData?.map((item: any) => (
                   <Grid

@@ -322,7 +322,8 @@ const UserProfileCard = () => {
                 {t('LEARNER_APP.USER_PROFILE_CARD.HIGHEST_QUALIFICATION')}
               </Typography>
               <Typography sx={valueStyle}>
-                {toPascalCase(qualification)}
+                {/* {t(`form.${qualification}`)} */}
+                {t(`form.${qualification}`, { defaultValue: qualification })}
               </Typography>
             </Grid>
             <Grid item xs={12}>
