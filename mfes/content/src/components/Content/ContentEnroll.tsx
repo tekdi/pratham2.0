@@ -114,6 +114,8 @@ const ContentDetails = (props: ContentDetailsProps) => {
     <LayoutPage isLoadingChildren={isLoading} isShow={props?.isShowLayout}>
       <InfoCard
         item={contentDetails}
+        //build issue fix
+        topic={''}
         onBackClick={onBackClick}
         _config={{ onButtonClick: handleClick, ...props?._config }}
       />
