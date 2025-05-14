@@ -31,6 +31,7 @@ import SignupSuccess from '@learner/components/SignupSuccess /SignupSuccess ';
 import { Loader } from '@shared-lib';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
+import { useTranslation } from '@shared-lib';
 import {
   firstLetterInUpperCase,
   isUnderEighteen,
@@ -51,6 +52,7 @@ const RegisterUser = () => {
   const searchParams = useSearchParams();
   const newAccount = searchParams.get('newAccount');
   const tenantId = searchParams.get('tenantId');
+  const { t } = useTranslation();
 
   // let formData: any = {};
   const [usernames, setUsernames] = useState<any[]>([]);
@@ -677,7 +679,9 @@ const RegisterUser = () => {
                 mb: 3,
               }}
             >
-              Make sure to cross check the State, District, Block, Village
+              {t(
+                'LEARNER_APP.LOGIN.make_sure_to_cross_check_the_state_district_block_village'
+              )}
             </Alert>
             {addSchema && addUiSchema && (
               <DynamicForm
