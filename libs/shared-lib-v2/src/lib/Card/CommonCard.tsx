@@ -90,7 +90,6 @@ export const CommonCard: React.FC<CommonCardProps> = ({
         //@ts-ignore
         if (TrackData) {
           const result = TrackData?.find((e) => e.courseId === item.identifier);
-          // console.log(result, 'sagar result 12');
           const newObj = {
             type,
             status:
@@ -246,7 +245,6 @@ export const StatusBar: React.FC<StatuPorps> = ({
   type,
 }) => {
   const theme = useTheme();
-  // console.log({ trackProgress, status, type }, 'sagar');
   return (
     <Box
       sx={{

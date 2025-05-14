@@ -38,6 +38,11 @@ export default function Details(props: DetailsProps) {
   const [courseItem, setCourseItem] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [certificateId, setCertificateId] = useState();
+  let activeLink = null;
+  if (typeof window !== 'undefined') {
+    const searchParams = new URLSearchParams(window.location.search);
+    activeLink = searchParams.get('activeLink');
+  }
 
   useEffect(() => {
     const getDetails = async (identifier: string) => {
@@ -65,7 +70,9 @@ export default function Details(props: DetailsProps) {
             router.replace(
               `${
                 props?._config?.contentBaseUrl ?? '/content'
-              }-details/${courseId}`
+              }-details/${courseId}${
+                activeLink ? `?activeLink=${activeLink}` : ''
+              }`
             );
           } else {
             const userIdArray: string[] = Array.isArray(userId)
@@ -136,6 +143,7 @@ export default function Details(props: DetailsProps) {
     unitId,
     props?._config?.userIdLocalstorageName,
     props?._config?.contentBaseUrl,
+    activeLink,
   ]);
 
   const handleItemClick = (subItem: any) => {
@@ -151,7 +159,7 @@ export default function Details(props: DetailsProps) {
           : `${
               props?._config?.contentBaseUrl ?? '/content'
             }/${courseId}/${unitId}/${subItem?.identifier}`;
-      router.push(path);
+      router.push(`${path}${activeLink ? `?activeLink=${activeLink}` : ''}`);
     }
   };
 
