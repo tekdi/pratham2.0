@@ -232,8 +232,7 @@ const handleSuccessfulLogin = async (
           router.push('/content');
         }
       } else {
-        console.log('hii');
-        showToastMessage('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT', 'error');
+        showToastMessage('Username or password not correct', 'error');
         const telemetryInteract = {
           context: { env: 'sign-in', cdata: [] },
           edata: {
