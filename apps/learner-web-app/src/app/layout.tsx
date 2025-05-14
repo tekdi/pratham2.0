@@ -5,6 +5,7 @@ import { ToastContainer } from 'react-toastify';
 import MuiThemeProvider, {
   MuiThemeProviderWithLanguage,
 } from '@learner/assets/theme/MuiThemeProvider';
+import ClientLayout from './ClientLayout';
 
 export const metadata = {
   title: 'Welcome to learner-web-app',
@@ -38,10 +39,12 @@ export default function RootLayout({
       />
       <head />
       <body>
-        <MuiThemeProviderWithLanguage>
-          <MuiThemeProvider>{children}</MuiThemeProvider>
-        </MuiThemeProviderWithLanguage>
-        <ToastContainer />
+        <ClientLayout>
+          <MuiThemeProviderWithLanguage>
+            <MuiThemeProvider>{children}</MuiThemeProvider>
+          </MuiThemeProviderWithLanguage>
+          <ToastContainer />
+        </ClientLayout>
       </body>
     </html>
   );
