@@ -299,11 +299,15 @@ const RegisterUser = () => {
           tenantCohortRoleMapping: tenantData,
         };
         localStorage.setItem('localPayload', JSON.stringify(createuserPayload));
+        localStorage.setItem(
+          'loginLocalPayload',
+          JSON.stringify(createuserPayload)
+        );
         const responseUserData = await createUser(createuserPayload);
         console.log(responseUserData);
         if (responseUserData) {
-          // localStorage.removeItem('localPayload');
-          // localStorage.removeItem('formData');
+          localStorage.removeItem('localPayload');
+          localStorage.removeItem('formData');
 
           setSignupSuccessModal(true);
         } else {
@@ -450,17 +454,26 @@ const RegisterUser = () => {
   const onSigin = async () => {
     let username;
     let password;
-    const localPayload = localStorage.getItem('localPayload');
-    if (localPayload) {
+    console.log(username, password);
+
+    //   const loginLocalPayload = localStorage.getItem('loginLocalPayload');
+    if (true) {
+      console.log(username, password);
+
       const payloadData = JSON.parse(
-        localStorage.getItem('localPayload') || '{}'
+        localStorage.getItem('loginLocalPayload') || '{}'
       );
+
+      console.log(payloadData);
       username = payloadData?.username;
       password = payloadData?.password;
+      console.log(username, password);
     }
 
     try {
       if (username && password) {
+        console.log('hii');
+
         console.log('hello');
 
         const response = await login({ username, password });
@@ -549,6 +562,8 @@ const RegisterUser = () => {
     localStorage.setItem('formData', JSON.stringify(formData));
     setPayload(payload);
     localStorage.setItem('localPayload', JSON.stringify(payload));
+    localStorage.setItem('loginLocalPayload', JSON.stringify(payload));
+
     setFormData(formData);
     handleAccountValidation(formData);
     console.log(formData.parent_phone);
