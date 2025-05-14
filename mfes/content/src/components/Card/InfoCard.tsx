@@ -14,11 +14,17 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 interface InfoCardProps {
   item: any;
+  topic: string;
   onBackClick?: () => void;
   _config?: any;
 }
 
-const InfoCard: React.FC<InfoCardProps> = ({ item, onBackClick, _config }) => {
+const InfoCard: React.FC<InfoCardProps> = ({
+  item,
+  topic,
+  onBackClick,
+  _config,
+}) => {
   const { _infoCard } = _config || {};
   const [openModal, setOpenModal] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -43,7 +49,7 @@ const InfoCard: React.FC<InfoCardProps> = ({ item, onBackClick, _config }) => {
     window.addEventListener('resize', checkTextHeight);
     return () => window.removeEventListener('resize', checkTextHeight);
   }, [item?.description]);
-
+  console.log(topic, 'topic');
   return (
     <>
       <Card sx={{ display: 'flex', ..._infoCard?._card }}>
@@ -94,7 +100,7 @@ const InfoCard: React.FC<InfoCardProps> = ({ item, onBackClick, _config }) => {
                 </IconButton>
                 <Breadcrumbs separator="›" aria-label="breadcrumb">
                   <Typography variant="body1">Course</Typography>
-                  <Typography variant="body1">Electrical</Typography>
+                  {topic && <Typography variant="body1">{topic}</Typography>}
                 </Breadcrumbs>
               </Box>
             )}
@@ -119,6 +125,7 @@ const InfoCard: React.FC<InfoCardProps> = ({ item, onBackClick, _config }) => {
               variant="subtitle1"
               component="div"
               sx={{
+                textTransform: 'capitalize',
                 color: '#1F1B13',
                 display: '-webkit-box',
                 WebkitLineClamp: isExpanded ? 'unset' : 2,
@@ -150,32 +157,57 @@ const InfoCard: React.FC<InfoCardProps> = ({ item, onBackClick, _config }) => {
               </Button>
             )}
             <Box>
-              {_infoCard?.isShowStatus && (
-                <Box
-                  sx={{
-                    width: 'fit-content',
-                    borderRadius: '12px',
-                    pt: 1,
-                    pr: 2,
-                    pb: 1,
-                    pl: 2,
-                    bgcolor: '#FFDEA1',
-                  }}
-                >
-                  Started on:{' '}
-                  {item?.startedOn
-                    ? new Intl.DateTimeFormat('en-GB', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: true,
-                      }).format(new Date(item.startedOn))
-                    : ' - '}
-                  {/* {JSON.stringify(_infoCard?.isShowStatus || {})} */}
-                </Box>
-              )}
+              {_infoCard?.isShowStatus &&
+                (item?.issuedOn ? (
+                  <Typography
+                    sx={{
+                      fontFamily: 'Poppins',
+                      fontWeight: 500,
+                      fontSize: '16px',
+                      lineHeight: '24px',
+                      color: '#00730B',
+                      letterSpacing: '0.15px',
+                    }}
+                  >
+                    <CheckCircleIcon
+                      sx={{ color: '#00730B', fontSize: 20, mr: 1 }}
+                    />
+                    Completed on:{' '}
+                    {new Intl.DateTimeFormat('en-GB', {
+                      day: '2-digit',
+                      month: 'short',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: true,
+                    }).format(new Date(item?.issuedOn))}
+                  </Typography>
+                ) : (
+                  <Box
+                    sx={{
+                      width: 'fit-content',
+                      borderRadius: '12px',
+                      pt: 1,
+                      pr: 2,
+                      pb: 1,
+                      pl: 2,
+                      bgcolor: '#FFDEA1',
+                    }}
+                  >
+                    Started on:{' '}
+                    {item?.startedOn
+                      ? new Intl.DateTimeFormat('en-GB', {
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: true,
+                        }).format(new Date(item.startedOn))
+                      : ' - '}
+                    {/* {JSON.stringify(_infoCard?.isShowStatus || {})} */}
+                  </Box>
+                ))}
               {!_infoCard?.isHideStatus && (
                 <Button
                   variant="contained"

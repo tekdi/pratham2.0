@@ -33,6 +33,12 @@ export default memo(function LearnerCourse({
     }
   }, [_content?.filters]);
 
+  const handleTabChange = useCallback((tab: any) => {
+    setFilterState((prevState: any) => ({
+      ...prevState,
+      query: '',
+    }));
+  }, []);
   const handleSearchClick = useCallback((searchValue: string) => {
     setFilterState((prevState: any) => ({
       ...prevState,
@@ -78,7 +84,10 @@ export default memo(function LearnerCourse({
               gap: 2,
             }}
           >
-            <SearchComponent onSearch={handleSearchClick} />
+            <SearchComponent
+              onSearch={handleSearchClick}
+              value={filterState?.query}
+            />
             <Box sx={{ display: { xs: 'block', md: 'none' } }}>
               <Button
                 variant="outlined"
@@ -165,7 +174,10 @@ export default memo(function LearnerCourse({
                   gap: 2,
                 }}
               >
-                <SearchComponent onSearch={handleSearchClick} />
+                <SearchComponent
+                  onSearch={handleSearchClick}
+                  value={filterState?.query}
+                />
                 <Box sx={{ display: { xs: 'block', md: 'none' } }}>
                   <Button
                     variant="outlined"
@@ -186,6 +198,7 @@ export default memo(function LearnerCourse({
             showHelpDesk={false}
             {..._content}
             _config={{
+              tabChange: handleTabChange,
               default_img: '/images/image_ver.png',
               _card: { isHideProgress: true },
               _subBox: {
