@@ -71,46 +71,51 @@ export function FilterForm({
   const [showMore, setShowMore] = useState(false);
   const [showMoreStatic, setShowMoreStatic] = useState(false);
 
-  const fetchData = useCallback(async () => {
-    const instantId = localStorage.getItem('collectionFramework') ?? '';
-    let data: any = {};
+  const fetchData = useCallback(
+    async (noFilter = true) => {
+      const instantId = localStorage.getItem('collectionFramework') ?? '';
+      let data: any = {};
 
-    if (filterFramework) {
-      data = filterFramework;
-    } else if (orginalFormData) {
-      data = await filterContent({ instantId });
-    }
-
-    const categories = data?.framework?.categories ?? [];
-    const transformedCategories = transformCategories(categories);
-    const transformedRenderForm = transformRenderForm(categories);
-    const defaults: Record<string, TermOption[]> = {};
-
-    transformedRenderForm.forEach((c) => {
-      if (c.options.length === 1) {
-        defaults[c.code] = [c.options[0]];
+      if (filterFramework) {
+        data = filterFramework;
+      } else if (orginalFormData) {
+        data = await filterContent({ instantId });
       }
-    });
 
-    setFilterData(convertToStructuredArray(transformedCategories));
-    setRenderForm(transformedRenderForm);
+      const categories = data?.framework?.categories ?? [];
+      const transformedCategories = transformCategories(categories);
+      const transformedRenderForm = transformRenderForm(categories);
+      const defaults: Record<string, TermOption[]> = {};
 
-    // merge orginalFormData
-    const mergedData = { ...orginalFormData };
-    setFormData(mergedData);
+      transformedRenderForm.forEach((c) => {
+        if (c.options.length === 1) {
+          defaults[c.code] = [c.options[0]];
+        }
+      });
 
-    const instantFramework = localStorage.getItem('channelId') ?? '';
-    const staticResp = await staticFilterContent({ instantFramework });
-    const props =
-      staticResp?.objectCategoryDefinition?.forms?.create?.properties ?? [];
+      setFilterData(convertToStructuredArray(transformedCategories));
+      setRenderForm(transformedRenderForm);
 
-    const filtered = filterObjectsWithSourceCategory(
-      props,
-      transformedRenderForm.map((r) => r.name)
-    );
-    setRenderStaticForm(filtered[0]?.fields ?? []);
-    setLoading(false);
-  }, [orginalFormData, filterFramework]);
+      if (noFilter) {
+        // merge orginalFormData
+        const mergedData = { ...orginalFormData };
+        setFormData(mergedData);
+      }
+
+      const instantFramework = localStorage.getItem('channelId') ?? '';
+      const staticResp = await staticFilterContent({ instantFramework });
+      const props =
+        staticResp?.objectCategoryDefinition?.forms?.create?.properties ?? [];
+
+      const filtered = filterObjectsWithSourceCategory(
+        props,
+        transformedRenderForm.map((r) => r.name)
+      );
+      setRenderStaticForm(filtered[0]?.fields ?? []);
+      setLoading(false);
+    },
+    [orginalFormData, filterFramework]
+  );
 
   useEffect(() => {
     fetchData();
@@ -131,7 +136,7 @@ export function FilterForm({
     newCategoryData: TermOption[];
   }) => {
     if (newCategoryData.length === 0 && index === 1) {
-      fetchData();
+      fetchData(false);
       return;
     }
     const pruned = findAndRemoveIndexes(index, renderForm);

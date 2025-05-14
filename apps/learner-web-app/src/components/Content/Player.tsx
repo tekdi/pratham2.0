@@ -30,7 +30,11 @@ const App = (props: { userIdLocalstorageName?: string }) => {
   const [relatedIdentity, setRelatedIdentity] = useState<Array<string | null>>(
     []
   );
-  console.log('item', props);
+  let activeLink = null;
+  if (typeof window !== 'undefined') {
+    const searchParams = new URLSearchParams(window.location.search);
+    activeLink = searchParams.get('activeLink');
+  }
   useEffect(() => {
     const fetch = async () => {
       if (unitId) {
@@ -73,7 +77,11 @@ const App = (props: { userIdLocalstorageName?: string }) => {
   };
 
   const handleCardClick = (content: any) => {
-    router.push(`/content/${courseId}/${unitId}/${content.identifier}`);
+    router.push(
+      `/content/${courseId}/${unitId}/${content.identifier}${
+        activeLink ? `?activeLink=${activeLink}` : ''
+      }`
+    );
   };
 
   return (
@@ -192,15 +200,8 @@ const App = (props: { userIdLocalstorageName?: string }) => {
               },
             }}
             _config={{
-              _grid: {
-                xs: 12,
-                sm: 6,
-                md: 12,
-                lg: 6,
-              },
               default_img: '/images/image_ver.png',
             }}
-            hasMoreData={false}
           />
         </Box>
       )}
@@ -291,7 +292,7 @@ const PlayerBox = ({
           style={{
             // display: 'block',
             // padding: 0,
-            height: 'calc(100vh)',
+            height: 'calc(100vh - 287px)',
             border: 'none',
           }}
           width="100%"
