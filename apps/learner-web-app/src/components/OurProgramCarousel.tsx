@@ -16,7 +16,7 @@ import 'swiper/css';
 import 'swiper/css/autoplay';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import { Navigation, Pagination } from 'swiper/modules';
+import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Swiper as SwiperClass } from 'swiper/types';
 import { useTranslation } from '@shared-lib';
@@ -83,7 +83,7 @@ const OurProgramCarousel = () => {
                 <Card
                   sx={{
                     maxWidth: '100%',
-                    height: '100%',
+                    height: '400px',
                     display: 'flex',
                     flexDirection: 'column',
                     borderRadius: 2,
@@ -112,133 +112,148 @@ const OurProgramCarousel = () => {
                     </Typography>
                   </Box>
 
-                  <Box sx={{ position: 'relative' }}>
-                    <Swiper
-                      modules={[Navigation, Pagination]}
-                      spaceBetween={0}
-                      slidesPerView={1}
-                      navigation={{
-                        nextEl: `.next-${program?.ordering}`,
-                        prevEl: `.prev-${program?.ordering}`,
-                      }}
-                      pagination={{
-                        clickable: true,
-                        el: `.pagination-${program?.ordering}`,
-                        bulletActiveClass: 'swiper-pagination-bullet-active',
-                        bulletClass: 'swiper-pagination-bullet',
-                      }}
-                      loop={true}
-                    >
-                      {(program?.programImages?.length > 0
-                        ? program.programImages
-                        : [null]
-                      ).map((slide: any, slideIndex) => {
-                        return (
-                          <SwiperSlide
-                            key={`slide-${program.ordering}-${slideIndex}`}
-                          >
-                            <Box
-                              sx={{
-                                margin: '10px',
-                                height: '200px',
-                                display: 'flex',
-                                justifyContent: 'center',
-                              }}
-                            >
-                              <img
-                                src={slide || '/images/default.png'} // Use dummy image if slide is null
-                                alt="img"
-                                style={{
-                                  borderRadius: '24px',
-                                  width: 'unset',
-                                  height: '100%',
-                                  objectFit: 'cover',
-                                }}
-                                onError={(e) => {
-                                  (e.target as HTMLImageElement).src =
-                                    '/images/default.png';
-                                }}
-                              />
-                            </Box>
-                          </SwiperSlide>
-                        );
-                      })}
-                    </Swiper>
-                    <Box sx={{ my: 2 }}>
-                      <Box
-                        display="flex"
-                        justifyContent="center"
-                        alignItems="center"
-                        gap={2}
+                  <Box
+                    sx={{
+                      flexGrow: 1,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'flex-start',
+                    }}
+                  >
+                    <Box sx={{ position: 'relative' }}>
+                      <Swiper
+                        modules={[Navigation, Pagination, Autoplay]}
+                        spaceBetween={0}
+                        slidesPerView={1}
+                        navigation={{
+                          nextEl: `.next-${program?.ordering}`,
+                          prevEl: `.prev-${program?.ordering}`,
+                        }}
+                        pagination={{
+                          clickable: true,
+                          el: `.pagination-${program?.ordering}`,
+                          bulletActiveClass: 'swiper-pagination-bullet-active',
+                          bulletClass: 'swiper-pagination-bullet',
+                        }}
+                        loop={true}
+                        autoplay={{
+                          delay: 3000,
+                          disableOnInteraction: false,
+                        }}
                       >
-                        {/* Left Arrow Button */}
-                        <Button
-                          className={`prev-${program.ordering}`}
-                          sx={{
-                            minWidth: '30px',
-                            width: '30px',
-                            height: '30px',
-                            p: 0,
-                            borderRadius: '50%',
-                            backgroundColor: '#FFFFFF',
-                            boxShadow: '0px 1px 2px 0px #0000004D',
-                            color: 'gray',
-                            '&:hover': {
-                              backgroundColor: '#e0e0e0',
-                            },
-                          }}
-                        >
-                          <ChevronLeftIcon
-                            sx={{ color: '#1F1B13', fontSize: '30px' }}
-                          />
-                        </Button>
-
-                        {/* Pagination Dots */}
+                        {(program?.programImages?.length > 0
+                          ? program.programImages
+                          : [null]
+                        ).map((slide: any, slideIndex) => {
+                          return (
+                            <SwiperSlide
+                              key={`slide-${program.ordering}-${slideIndex}`}
+                            >
+                              <Box
+                                sx={{
+                                  margin: '10px',
+                                  height: '200px',
+                                  display: 'flex',
+                                  justifyContent: 'center',
+                                }}
+                              >
+                                <img
+                                  src={slide || '/images/default.png'} // Use dummy image if slide is null
+                                  alt="img"
+                                  style={{
+                                    borderRadius: '24px',
+                                    width: 'unset',
+                                    height: '100%',
+                                    objectFit: 'cover',
+                                  }}
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).src =
+                                      '/images/default.png';
+                                  }}
+                                />
+                              </Box>
+                            </SwiperSlide>
+                          );
+                        })}
+                      </Swiper>
+                      <Box sx={{ my: 2 }}>
                         <Box
-                          className={`pagination-${program?.ordering}`}
-                          sx={{
-                            display: 'flex',
-                            '& .swiper-pagination-bullet': {
-                              width: '30px',
-                              height: '4px',
-                              borderRadius: '2px',
-                              backgroundColor: '#CDC5BD',
-                              opacity: 1,
-                              mx: 0.5,
-                            },
-                            '& .swiper-pagination-bullet-active': {
-                              backgroundColor: '#FDB813',
-                            },
-                          }}
-                        ></Box>
-
-                        {/* Right Arrow Button */}
-                        <Button
-                          className={`next-${program?.ordering}`}
-                          sx={{
-                            minWidth: '30px',
-                            width: '30px',
-                            height: '30px',
-                            p: 0,
-                            borderRadius: '50%',
-                            backgroundColor: '#FFFFFF',
-                            boxShadow: '0px 1px 2px 0px #0000004D',
-                            color: 'gray',
-                            '&:hover': {
-                              backgroundColor: '#e0e0e0',
-                            },
-                          }}
+                          display="flex"
+                          justifyContent="center"
+                          alignItems="center"
+                          gap={2}
                         >
-                          <ChevronRightIcon
-                            sx={{ color: '#1F1B13', fontSize: '30px' }}
-                            fontSize="small"
-                          />
-                        </Button>
+                          {/* Left Arrow Button */}
+                          <Button
+                            className={`prev-${program.ordering}`}
+                            sx={{
+                              minWidth: '30px',
+                              width: '30px',
+                              height: '30px',
+                              p: 0,
+                              borderRadius: '50%',
+                              backgroundColor: '#FFFFFF',
+                              boxShadow: '0px 1px 2px 0px #0000004D',
+                              color: 'gray',
+                              '&:hover': {
+                                backgroundColor: '#e0e0e0',
+                              },
+                            }}
+                          >
+                            <ChevronLeftIcon
+                              sx={{ color: '#1F1B13', fontSize: '30px' }}
+                            />
+                          </Button>
+
+                          {/* Pagination Dots */}
+                          <Box
+                            className={`pagination-${program?.ordering}`}
+                            sx={{
+                              display: 'flex',
+                              '& .swiper-pagination-bullet': {
+                                width: '30px',
+                                height: '4px',
+                                borderRadius: '2px',
+                                backgroundColor: '#CDC5BD',
+                                opacity: 1,
+                                mx: 0.5,
+                              },
+                              '& .swiper-pagination-bullet-active': {
+                                backgroundColor: '#FDB813',
+                              },
+                            }}
+                          ></Box>
+
+                          {/* Right Arrow Button */}
+                          <Button
+                            className={`next-${program?.ordering}`}
+                            sx={{
+                              minWidth: '30px',
+                              width: '30px',
+                              height: '30px',
+                              p: 0,
+                              borderRadius: '50%',
+                              backgroundColor: '#FFFFFF',
+                              boxShadow: '0px 1px 2px 0px #0000004D',
+                              color: 'gray',
+                              '&:hover': {
+                                backgroundColor: '#e0e0e0',
+                              },
+                            }}
+                          >
+                            <ChevronRightIcon
+                              sx={{ color: '#1F1B13', fontSize: '30px' }}
+                              fontSize="small"
+                            />
+                          </Button>
+                        </Box>
                       </Box>
                     </Box>
                   </Box>
 
-                  <CardActions sx={{ justifyContent: 'center', p: 2 }}>
+                  <CardActions
+                    sx={{ justifyContent: 'center', p: 2, mt: 'auto' }}
+                  >
                     <Button
                       fullWidth
                       variant="contained"
