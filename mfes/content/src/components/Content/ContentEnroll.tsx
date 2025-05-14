@@ -84,8 +84,15 @@ const ContentDetails = (props: ContentDetailsProps) => {
           userId,
           courseId: identifier as string,
         });
+        let activeLink = null;
+        if (typeof window !== 'undefined') {
+          const searchParams = new URLSearchParams(window.location.search);
+          activeLink = searchParams.get('activeLink');
+        }
         router.replace(
-          `${props?._config?.contentBaseUrl ?? '/content'}/${identifier}`
+          `${props?._config?.contentBaseUrl ?? '/content'}/${identifier}${
+            activeLink ? `?activeLink=${activeLink}` : ''
+          }`
         );
       } else {
         router.replace(
@@ -107,6 +114,8 @@ const ContentDetails = (props: ContentDetailsProps) => {
     <LayoutPage isLoadingChildren={isLoading} isShow={props?.isShowLayout}>
       <InfoCard
         item={contentDetails}
+        //build issue fix
+        topic={''}
         onBackClick={onBackClick}
         _config={{ onButtonClick: handleClick, ...props?._config }}
       />

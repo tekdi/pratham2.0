@@ -33,6 +33,12 @@ export default memo(function LearnerCourse({
     }
   }, [_content?.filters]);
 
+  const handleTabChange = useCallback((tab: any) => {
+    setFilterState((prevState: any) => ({
+      ...prevState,
+      query: '',
+    }));
+  }, []);
   const handleSearchClick = useCallback((searchValue: string) => {
     setFilterState((prevState: any) => ({
       ...prevState,
@@ -63,12 +69,9 @@ export default memo(function LearnerCourse({
           <Typography
             variant="h6"
             sx={{
-              fontFamily: 'Poppins',
               fontWeight: 400,
               fontSize: '22px',
               lineHeight: '28px',
-              letterSpacing: '0px',
-              verticalAlign: 'middle',
             }}
           >
             {t(title ?? 'LEARNER_APP.COURSE.GET_STARTED')}
@@ -81,7 +84,10 @@ export default memo(function LearnerCourse({
               gap: 2,
             }}
           >
-            <SearchComponent onSearch={handleSearchClick} />
+            <SearchComponent
+              onSearch={handleSearchClick}
+              value={filterState?.query}
+            />
             <Box sx={{ display: { xs: 'block', md: 'none' } }}>
               <Button
                 variant="outlined"
@@ -168,7 +174,10 @@ export default memo(function LearnerCourse({
                   gap: 2,
                 }}
               >
-                <SearchComponent onSearch={handleSearchClick} />
+                <SearchComponent
+                  onSearch={handleSearchClick}
+                  value={filterState?.query}
+                />
                 <Box sx={{ display: { xs: 'block', md: 'none' } }}>
                   <Button
                     variant="outlined"
@@ -181,34 +190,31 @@ export default memo(function LearnerCourse({
               </Box>
             </Box>
           )}
-          <Box
-            sx={{
-              overflowY: 'auto',
-              maxHeight: 'calc(100vh - 200px)', // Adjust height as needed
+          <Content
+            isShowLayout={false}
+            contentTabs={['Course']}
+            showFilter={false}
+            showSearch={false}
+            showHelpDesk={false}
+            {..._content}
+            _config={{
+              tabChange: handleTabChange,
+              default_img: '/images/image_ver.png',
+              _card: { isHideProgress: true },
+              _subBox: {
+                overflowY: 'auto',
+                maxHeight: 'calc(100vh - 200px)', // Adjust height as needed
+              },
+              ..._content?._config,
             }}
-          >
-            <Content
-              isShowLayout={false}
-              contentTabs={['Course']}
-              showFilter={false}
-              showSearch={false}
-              showHelpDesk={false}
-              {..._content}
-              _config={{
-                default_img: '/images/image_ver.png',
-                _card: { isHideProgress: true },
-                _grid: { xs: 6, sm: 4, md: 3, lg: 2.4 },
-                ..._content?._config,
-              }}
-              filters={{
-                ...filterState,
-                filters: {
-                  ...filterState.filters,
-                  ...staticFilter,
-                },
-              }}
-            />
-          </Box>
+            filters={{
+              ...filterState,
+              filters: {
+                ...filterState.filters,
+                ...staticFilter,
+              },
+            }}
+          />
         </Box>
       </Stack>
     </Stack>

@@ -277,7 +277,10 @@ export default function Content(props: Readonly<ContentProps>) {
       try {
         const response = await fetchContent(localFilters);
         if (!response || !isMounted) return;
-        const newContentData = response.content ?? [];
+        const newContentData = [
+          ...(response.content ?? []),
+          ...(response?.QuestionSet ?? []),
+        ];
         const userTrackData = await fetchDataTrack(newContentData);
         if (!isMounted) return;
 
@@ -365,8 +368,9 @@ export default function Content(props: Readonly<ContentProps>) {
       url.searchParams.set('tab', newValue.toString());
       window.history.replaceState(null, '', url.toString());
       setTabValue(newValue);
+      props?._config?.tabChange?.(newValue);
     },
-    []
+    [props?._config?.tabChange]
   );
 
   const handleCardClickLocal = useCallback(
@@ -375,9 +379,13 @@ export default function Content(props: Readonly<ContentProps>) {
         if (propData?.handleCardClick) {
           propData.handleCardClick(content);
         } else if (SUPPORTED_MIME_TYPES.includes(content?.mimeType)) {
-          router.push(`/player/${content?.identifier}`);
+          router.push(
+            `/player/${content?.identifier}?activeLink=${window.location.pathname}`
+          );
         } else {
-          router.push(`/content-details/${content?.identifier}`);
+          router.push(
+            `/content-details/${content?.identifier}?activeLink=${window.location.pathname}`
+          );
         }
       } catch (error) {
         console.error('Failed to handle card click:', error);
