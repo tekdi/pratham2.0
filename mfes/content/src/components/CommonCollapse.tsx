@@ -7,15 +7,10 @@ import {
   AccordionSummary,
   AccordionDetails,
   Stack,
-  SvgIcon,
 } from '@mui/material';
 import { useRouter } from 'next/navigation'; // Use Next.js router for navigation
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import SmartDisplayIcon from '@mui/icons-material/SmartDisplay';
-import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import TextSnippetOutlinedIcon from '@mui/icons-material/TextSnippetOutlined';
 import LensOutlinedIcon from '@mui/icons-material/LensOutlined';
-import HtmlIcon from '@mui/icons-material/IntegrationInstructions';
 import LensIcon from '@mui/icons-material/Lens';
 import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
 import { useTheme } from '@mui/material/styles';
@@ -24,67 +19,8 @@ import ErrorIcon from '@mui/icons-material/Error';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { CircularProgressWithLabel, getLeafNodes } from '@shared-lib';
+import Image from 'next/image';
 
-function EAlphabetIcon(props: any) {
-  return (
-    <SvgIcon
-      style={{
-        border: `1px solid ${props?.color || props?.sx?.color || '#999'}`,
-        borderRadius: '8px',
-      }}
-      {...props}
-    >
-      <text
-        style={{
-          transform: 'rotate(-30deg)',
-          transformOrigin: 'center',
-        }}
-        x="50%"
-        y="50%"
-        dominantBaseline="middle"
-        textAnchor="middle"
-        fontSize="20"
-        fill="currentColor"
-        stroke="currentColor"
-        strokeWidth="1"
-      >
-        e
-      </text>
-    </SvgIcon>
-  );
-}
-function H5P(props: any) {
-  return (
-    <SvgIcon
-      style={{
-        border: `1px solid ${props?.color || props?.sx?.color || '#999'}`,
-        borderRadius: '8px',
-        background: `${props?.color || props?.sx?.color || '#999'}`,
-      }}
-      {...props}
-    >
-      <text
-        style={{
-          transform: 'rotate(-30deg)',
-          transformOrigin: 'center center',
-          letterSpacing: -1,
-          fontSize: '14px',
-          color: 'white',
-        }}
-        x="50%"
-        y="53%"
-        dominantBaseline="middle"
-        textAnchor="middle"
-        fontSize="20"
-        fill="currentColor"
-        stroke="currentColor"
-        strokeWidth="1"
-      >
-        H5P
-      </text>
-    </SvgIcon>
-  );
-}
 // Types for nested data structure and actions
 interface NestedItem {
   identifier: string;
@@ -110,83 +46,41 @@ const GetIconByMimeType = React.memo(function GetIconByMimeTypeComponent({
 }): React.ReactNode {
   const icons = {
     'application/pdf': {
-      icon: (
-        <img
-          src="/images/PDF.svg"
-          alt="PDF"
-          style={{ width: '18px', height: '18px' }}
-        />
-      ),
+      icon: <Image src="/images/PDF.svg" alt="PDF" width="18" height="18" />,
       text: 'PDF',
     },
     'video/mp4': {
       icon: (
-        <img
-          src="/images/video.svg"
-          alt="video"
-          style={{ width: '18px', height: '18px' }}
-        />
+        <Image src="/images/video.svg" alt="videoMp4" width="18" height="18" />
       ),
       text: 'Video',
     },
     'video/webm': {
       icon: (
-        <img
-          src="/images/video.svg"
-          alt="video"
-          style={{ width: '18px', height: '18px' }}
-        />
+        <Image src="/images/video.svg" alt="videoWebm" width="18" height="18" />
       ),
       text: 'Video',
     },
     'video/x-youtube': {
       icon: (
-        <img
-          src="/images/youtube.svg"
-          alt="youtube"
-          style={{ width: '18px', height: '18px' }}
-        />
+        <Image src="/images/youtube.svg" alt="youtube" width="18" height="18" />
       ),
       text: 'Youtube',
     },
     'application/vnd.sunbird.questionset': {
-      icon: (
-        <img
-          src="/images/Qml.svg"
-          alt="quml"
-          style={{ width: '18px', height: '18px' }}
-        />
-      ),
+      icon: <Image src="/images/Qml.svg" alt="quml" width="18" height="18" />,
       text: 'QUML',
     },
     'application/vnd.ekstep.h5p-archive': {
-      icon: (
-        <img
-          src="/images/HTML.svg"
-          alt="h5p"
-          style={{ width: '18px', height: '18px' }}
-        />
-      ),
+      icon: <Image src="/images/HTML.svg" alt="h5p" width="18" height="18" />,
       text: 'H5P',
     },
     'application/vnd.ekstep.html-archive': {
-      icon: (
-        <img
-          src="/images/HTML.svg"
-          alt="html"
-          style={{ width: '18px', height: '18px' }}
-        />
-      ),
+      icon: <Image src="/images/HTML.svg" alt="html" width="18" height="18" />,
       text: 'HTML',
     },
     'application/epub': {
-      icon: (
-        <img
-          src="/images/Epub.svg"
-          alt="epub"
-          style={{ width: '18px', height: '18px' }}
-        />
-      ),
+      icon: <Image src="/images/Epub.svg" alt="epub" width="18" height="18" />,
       text: 'Epub',
     },
   };
@@ -196,14 +90,25 @@ const GetIconByMimeType = React.memo(function GetIconByMimeTypeComponent({
         sx={{
           display: 'flex',
           flexDirection: 'row',
-          gap: 1,
+          gap: '4px',
+          alignItems: 'center',
           ..._box,
         }}
       >
         {icons?.[mimeType as keyof typeof icons]?.icon || (
           <TextSnippetOutlinedIcon />
         )}
-        <Typography>
+        <Typography
+          sx={{
+            fontFamily: 'Poppins',
+            fontWeight: 500,
+            fontSize: 14,
+            lineHeight: '20px',
+            letterSpacing: '0.1px',
+            textAlign: 'center',
+            verticalAlign: 'middle',
+          }}
+        >
           {icons?.[mimeType as keyof typeof icons]?.text || 'unknown'}
         </Typography>
       </Box>
