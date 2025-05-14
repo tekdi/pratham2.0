@@ -132,8 +132,8 @@ const EntryContent: React.FC<EntryContentProps> = ({
   };
 
   const onUserClick = (userId: string) => {
-    if (localStorage.getItem('mfe_state'))
-      router.push(`/user-profile/${userId}`);
+    // if (localStorage.getItem('mfe_state'))
+    //   router.push(`/user-profile/${userId}`);
   };
 
   const formatDate = (dateString: string) => {
