@@ -19,6 +19,7 @@ const ContentCard = ({
   trackData?: [];
 }) => {
   const { isWrap } = _card ?? {};
+
   return (
     <CardWrap isWrap={isWrap}>
       <CommonCard

@@ -19,21 +19,12 @@ export const UnitGrid: React.FC<CommonAccordionProps> = ({
   _config,
   handleItemClick,
 }) => {
-  const { default_img, _card, _grid } = _config || {};
+  const { default_img, _card } = _config || {};
 
   return (
     <Grid container spacing={4}>
       {item?.children?.map((subItem: any) => (
-        <Grid
-          key={subItem?.identifier}
-          item
-          // xs={12}
-          // sm={6}
-          // md={4}
-          // lg={3}
-          // {..._grid}
-          sx={{ flexWrap: 'wrap' }}
-        >
+        <Grid key={subItem?.identifier} item sx={{ flexWrap: 'wrap' }}>
           {subItem?.mimeType === 'application/vnd.ekstep.content-collection' ? (
             <UnitCard
               item={subItem}
