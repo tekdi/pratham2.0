@@ -5,6 +5,8 @@ import Loader from '@learner/components/Loader/Loader';
 import { useRouter } from 'next/navigation';
 import { preserveLocalStorage } from '@learner/utils/helper';
 import { useTranslation } from '@shared-lib';
+import { Telemetry } from '@shared-lib-v2/DynamicForm/utils/app.constant';
+import { telemetryFactory } from '@shared-lib-v2/DynamicForm/utils/telemetry';
 
 function Logout() {
   const router = useRouter();
@@ -17,6 +19,19 @@ function Logout() {
         if (refreshToken) {
           await logout(refreshToken);
         }
+        const telemetryInteract = {
+          context: {
+            env: 'sign-out',
+            cdata: [],
+          },
+          edata: {
+            id: 'logout-success',
+            type: Telemetry.CLICK,
+            subtype: '',
+            pageid: 'sign-out',
+          },
+        };
+        telemetryFactory.interact(telemetryInteract);
       } catch (error) {
         console.log(error);
       }
