@@ -1,11 +1,13 @@
-import React, { memo, useState, useMemo, useEffect } from 'react';
+import React, { memo, useState, useMemo, useEffect, use } from 'react';
 import { CommonSearch, useTranslation } from '@shared-lib';
 import { Search as SearchIcon } from '@mui/icons-material';
 import debounce from 'lodash/debounce';
 
 export default memo(function SearchComponent({
   onSearch,
+  value,
 }: {
+  value: string;
   onSearch: (value: string) => void;
 }) {
   const { t } = useTranslation();
@@ -23,7 +25,7 @@ export default memo(function SearchComponent({
   );
 
   useEffect(() => {
-    const trimmed = searchValue.trim();
+    const trimmed = searchValue?.trim();
 
     if (trimmed === '') {
       // Immediately clear results (optional: depending on your app logic)
@@ -38,6 +40,10 @@ export default memo(function SearchComponent({
       debouncedSearch.cancel();
     };
   }, [searchValue, debouncedSearch, onSearch]);
+
+  useEffect(() => {
+    setSearchValue(value);
+  }, [value]);
 
   const handleSearchChange = (value: string) => {
     setSearchValue(value);

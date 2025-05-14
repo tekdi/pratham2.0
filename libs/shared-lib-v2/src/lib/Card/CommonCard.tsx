@@ -90,7 +90,6 @@ export const CommonCard: React.FC<CommonCardProps> = ({
         //@ts-ignore
         if (TrackData) {
           const result = TrackData?.find((e) => e.courseId === item.identifier);
-          // console.log(result, 'sagar result 12');
           const newObj = {
             type,
             status:
@@ -141,12 +140,12 @@ export const CommonCard: React.FC<CommonCardProps> = ({
         ..._card?.sx,
       }}
       onClick={onClick}
-      title={item.identifier}
     >
       {/* Image and Progress Overlay */}
       <Box sx={{ position: 'relative', width: '100%' }}>
         {image && (
           <CardMedia
+            title={item.identifier}
             component="img"
             image={image || '/assets/images/default.png'}
             alt={imageAlt || 'Image'}
@@ -180,6 +179,7 @@ export const CommonCard: React.FC<CommonCardProps> = ({
         }
         title={
           <Typography
+            title={title}
             sx={{
               fontWeight: 500,
               fontSize: '16px',
@@ -211,6 +211,9 @@ export const CommonCard: React.FC<CommonCardProps> = ({
           }}
         >
           <Typography
+            component="h1"
+            // @ts-ignore
+            title={content}
             sx={{
               fontWeight: 400,
               fontSize: '15.4px',
@@ -242,7 +245,6 @@ export const StatusBar: React.FC<StatuPorps> = ({
   type,
 }) => {
   const theme = useTheme();
-  // console.log({ trackProgress, status, type }, 'sagar');
   return (
     <Box
       sx={{
