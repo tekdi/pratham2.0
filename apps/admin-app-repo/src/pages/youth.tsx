@@ -425,6 +425,15 @@ const Youth = () => {
         );
         setIsVolunteerFieldId(volunteerField?.fieldId);
       },
+      show: (row: any) => {
+        const isVolunteerField = row.customFields.find(
+          (field) => field.label === 'IS_VOLUNTEER'
+        );
+
+        const isVolunteer = isVolunteerField?.selectedValues?.[0] === 'yes';
+
+        return !isVolunteer;
+      },
     },
   ];
 
