@@ -1,9 +1,9 @@
 import React from 'react';
-import { Modal, Paper, Box, Typography, Divider, Button } from '@mui/material';
+import { Modal, Paper, Box, Divider, Button } from '@mui/material';
 
 interface CommonModalProps {
   open: boolean;
-  onClose: () => void;
+  onClose?: () => void;
   onStartLearning: () => void;
   children: React.ReactNode;
 }
