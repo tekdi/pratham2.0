@@ -223,11 +223,13 @@ const handleSuccessfulLogin = async (
         localStorage.setItem('collectionFramework', collectionFramework);
 
         document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
-        const redirectUrl = new URLSearchParams(window.location.search).get(
-          'redirectUrl'
-        );
+        const query = new URLSearchParams(window.location.search);
+        const redirectUrl = query.get('redirectUrl');
+        const activeLink = query.get('activeLink');
         if (redirectUrl && redirectUrl.startsWith('/')) {
-          router.push(redirectUrl);
+          router.push(
+            `${redirectUrl}${activeLink ? `?activeLink=${activeLink}` : ''}`
+          );
         } else {
           router.push('/content');
         }

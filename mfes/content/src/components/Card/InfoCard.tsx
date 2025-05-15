@@ -8,13 +8,14 @@ import {
   Breadcrumbs,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import CommonModal from '../common-modal';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { ExpandableText } from '@shared-lib';
 
 interface InfoCardProps {
   item: any;
-  topic: string;
+  topic?: string;
   onBackClick?: () => void;
   _config?: any;
 }
@@ -27,29 +28,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
 }) => {
   const { _infoCard } = _config || {};
   const [openModal, setOpenModal] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [showButton, setShowButton] = useState(false);
-  const descriptionRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const checkTextHeight = () => {
-      if (descriptionRef.current) {
-        const lineHeight = parseInt(
-          window.getComputedStyle(descriptionRef.current).lineHeight
-        );
-        const height = descriptionRef.current.scrollHeight;
-        setShowButton(height > lineHeight * 2);
-      }
-    };
-
-    // Initial check
-    checkTextHeight();
-
-    // Add resize listener to handle window resizing
-    window.addEventListener('resize', checkTextHeight);
-    return () => window.removeEventListener('resize', checkTextHeight);
-  }, [item?.description]);
-  console.log(topic, 'topic');
   return (
     <>
       <Card sx={{ display: 'flex', ..._infoCard?._card }}>
@@ -120,42 +99,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
             >
               {item?.name}
             </Typography>
-            <Typography
-              ref={descriptionRef}
-              variant="subtitle1"
-              component="div"
-              sx={{
-                textTransform: 'capitalize',
-                color: '#1F1B13',
-                display: '-webkit-box',
-                WebkitLineClamp: isExpanded ? 'unset' : 2,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                transition: 'all 0.3s ease-in-out',
-                maxHeight: isExpanded ? '100%' : '51px',
-              }}
-            >
-              {item?.description}
-            </Typography>
-            {showButton && (
-              <Button
-                onClick={() => setIsExpanded(!isExpanded)}
-                sx={{
-                  textTransform: 'none',
-                  color: '#1F1B13',
-                  p: 0,
-                  minWidth: 'auto',
-                  transition: 'all 0.3s ease-in-out',
-                  '&:hover': {
-                    backgroundColor: 'transparent',
-                    textDecoration: 'underline',
-                  },
-                }}
-              >
-                {isExpanded ? 'See less' : 'See more'}
-              </Button>
-            )}
+            <ExpandableText text={item?.description} number={2} />
             <Box>
               {_infoCard?.isShowStatus &&
                 (item?.issuedOn ? (
@@ -225,7 +169,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
 
       <CommonModal
         open={openModal}
-        onClose={() => setOpenModal(false)}
+        // onClose={() => setOpenModal(false)}
         onStartLearning={_config?.onButtonClick}
       >
         <Box

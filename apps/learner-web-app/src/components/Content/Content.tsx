@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { FetchDoIds } from '@learner/utils/API/ProgramService';
 import { useTranslation } from '@shared-lib';
+import { courseWiseLernerList } from '@learner/utils/API/contentService';
 
 const Content = dynamic(() => import('@Content'), {
   ssr: false,
@@ -20,11 +20,13 @@ const ContentComponent = ({
   useEffect(() => {
     const fetchDOIds = async () => {
       try {
-        const userId = [localStorage.getItem('userId')];
+        const userId = localStorage.getItem('userId');
         let courseIds: never[] = [];
-        if (userId && userId[0] !== null) {
-          const res = await FetchDoIds(userId);
-          const courseIdList = res?.data[0]?.courseIdList;
+        if (userId) {
+          const res = await courseWiseLernerList({
+            filters: { userId: [userId], status: ['inprogress'] },
+          });
+          const courseIdList = res?.data;
           courseIds = courseIdList.map((course: any) => course.courseId);
           setIdentifier(courseIds);
         }
