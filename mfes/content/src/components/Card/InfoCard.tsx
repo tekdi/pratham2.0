@@ -14,7 +14,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 interface InfoCardProps {
   item: any;
-  topic: string;
+  topic?: string;
   onBackClick?: () => void;
   _config?: any;
 }
@@ -49,7 +49,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
     window.addEventListener('resize', checkTextHeight);
     return () => window.removeEventListener('resize', checkTextHeight);
   }, [item?.description]);
-  console.log(topic, 'topic');
+
   return (
     <>
       <Card sx={{ display: 'flex', ..._infoCard?._card }}>
@@ -225,7 +225,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
 
       <CommonModal
         open={openModal}
-        onClose={() => setOpenModal(false)}
+        // onClose={() => setOpenModal(false)}
         onStartLearning={_config?.onButtonClick}
       >
         <Box

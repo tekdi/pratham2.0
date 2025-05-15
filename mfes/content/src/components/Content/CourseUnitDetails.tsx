@@ -61,11 +61,12 @@ export default function Details(props: DetailsProps) {
             courseId: courseId as string,
           });
           if (
-            !(
-              data?.result?.status === 'enrolled' ||
-              data?.result?.status === 'completed' ||
-              data?.result?.status === 'viewCertificate'
-            )
+            ![
+              'enrolled',
+              'inprogress',
+              'completed',
+              'viewCertificate',
+            ].includes(data?.result?.status)
           ) {
             router.replace(
               `${
