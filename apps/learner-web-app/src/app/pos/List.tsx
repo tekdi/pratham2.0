@@ -13,7 +13,17 @@ const InfoCard = dynamic(() => import('@InfoCard'), {
   ssr: false,
 });
 
-export default function App({ pagename }: Readonly<{ pagename: string }>) {
+export default function App({
+  pagename,
+  _infoCard,
+  hideStaticFilter,
+  _content,
+}: Readonly<{
+  _infoCard?: any;
+  pagename?: string;
+  hideStaticFilter?: boolean;
+  _content: any;
+}>) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const {
@@ -45,12 +55,14 @@ export default function App({ pagename }: Readonly<{ pagename: string }>) {
           name: `Learning for ${pagename}`,
           description:
             'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
+          ...(_infoCard?.item || {}),
         }}
         _config={{
-          default_img: `/images/pos_${pagename?.toLowerCase()}.jpg`,
+          ...(_infoCard?._config || {}),
           _infoCard: {
+            default_img: `/images/pos_${pagename?.toLowerCase()}.jpg`,
             isHideStatus: true,
-            _textCard: { p: '40px' },
+            _textCard: { p: '40px', zIndex: 1 },
             _cardMedia: { maxHeight: '250px' },
             _card: {
               position: 'relative',
@@ -64,6 +76,7 @@ export default function App({ pagename }: Readonly<{ pagename: string }>) {
                 background: 'linear-gradient(to top, white, transparent)',
               },
             },
+            ...(_infoCard?._config?._infoCard || {}),
           },
         }}
       />
@@ -71,6 +84,7 @@ export default function App({ pagename }: Readonly<{ pagename: string }>) {
         <Grid item xs={12}>
           <LearnerCourse
             _content={{
+              ..._content,
               filterFramework: filterFramework,
               _config: {
                 userIdLocalstorageName: 'did',
@@ -81,16 +95,20 @@ export default function App({ pagename }: Readonly<{ pagename: string }>) {
                 },
               },
               handleCardClick: handleCardClickLocal,
-              staticFilter: {
-                se_domains: [`Learning for ${pagename}`],
-                ...(searchParams?.get('se_subDomains')?.split(',')
-                  ? {
-                      se_subDomains: searchParams
-                        ?.get('se_subDomains')
-                        ?.split(','),
-                    }
-                  : {}),
-              },
+              ...(!hideStaticFilter
+                ? {
+                    staticFilter: {
+                      se_domains: [`Learning for ${pagename}`],
+                      ...(searchParams?.get('se_subDomains')?.split(',')
+                        ? {
+                            se_subDomains: searchParams
+                              ?.get('se_subDomains')
+                              ?.split(','),
+                          }
+                        : {}),
+                    },
+                  }
+                : {}),
             }}
           />
         </Grid>
