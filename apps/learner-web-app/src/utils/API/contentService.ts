@@ -5,6 +5,7 @@ export interface courseWiseLernerListParam {
   offset?: number;
   filters: {
     status?: string[];
+    userId?: string[];
   };
 }
 export const fetchContent = async (identifier: any) => {

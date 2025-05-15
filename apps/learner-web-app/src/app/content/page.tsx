@@ -169,7 +169,7 @@ const MyComponent: React.FC = () => {
                 </Button>
               </Box>
             </Grid>
-            <Grid item xs={12} md={9}>
+            <Grid item xs={12} md={9} sx={{ pl: { xs: '48px', md: '0px' } }}>
               <ContentComponent
                 getContentData={(e: any) => setIsShow(e.count)}
               />
