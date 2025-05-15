@@ -819,7 +819,9 @@
   },
   "MENTOR": {
     "BACK_TO_FORM": "Back to Form",
-    "FINISH_ASSIGN": "Finish & Assign"
+    "FINISH_ASSIGN": "Finish & Assign",
+    "BACK": "Back",
+    "SAVE_SELECTION": "Save Selection"
   },
   "LEARNERS": {
     "NEW_LEARNER": "New Learners",
