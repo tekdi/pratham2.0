@@ -320,7 +320,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
             alignItems="center"
             mb={2}
           >
-            <Typography variant="h6">Modal Title</Typography>
+            <Typography variant="h6">Certificate</Typography>
             <Stack direction="row" spacing={1}>
               <Tooltip title="Download">
                 <IconButton onClick={onDownloadCertificate}>
