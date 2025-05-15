@@ -34,13 +34,13 @@ export const mapUserData = (userData: any) => {
 
     const result: any = {
       firstName: userData.firstName || '',
-      middleName: userData.middleName || '',
+      //  middleName: userData.middleName || '',
       lastName: userData.lastName || '',
       email: userData.email || '',
       mobile: userData.mobile ? userData.mobile?.toString() : '',
       dob: userData.dob || '',
       gender: userData.gender || '',
-      mother_name: getSingleTextValue('MOTHER_NAME'),
+      // mother_name: getSingleTextValue('MOTHER_NAME'),
       marital_status: getSelectedValue('MARITAL_STATUS'),
       phone_type_available: getSingleSelectedValue('TYPE_OF_PHONE_AVAILABLE'),
       own_phone_check: getSingleSelectedValue('DOES_THIS_PHONE_BELONG_TO_YOU'),
@@ -48,12 +48,15 @@ export const mapUserData = (userData: any) => {
       district: getSelectedValue('DISTRICT'),
       block: getSelectedValue('BLOCK'),
       village: getSelectedValue('VILLAGE'),
+      // is_volunteer: getSingleTextValue('IS_VOLUNTEER'),
       drop_out_reason:
         getSelectedValue('REASON_FOR_DROP_OUT_FROM_SCHOOL') || [], // array
       work_domain:
         getSelectedValue(
           'ARE_YOU_CURRENTLY_WORKING_IF_YES_CHOOSE_THE_DOMAIN'
         ) || [],
+      training_check:
+        getSelectedValue('HAVE_YOU_RECEIVE_ANY_PRIOR_TRAINING') || [],
       what_do_you_want_to_become: getSingleTextValue(
         'WHAT_DO_YOU_WANT_TO_BECOME'
       ),
@@ -64,7 +67,15 @@ export const mapUserData = (userData: any) => {
       preferred_mode_of_learning:
         getSelectedValue('WHAT_IS_YOUR_PREFERRED_MODE_OF_LEARNING') || [],
     };
-
+    if (userData.middleName) {
+      result.middleName = userData.middleName;
+    }
+    if (getSingleTextValue('MOTHER_NAME')) {
+      result.mother_name = getSingleTextValue('MOTHER_NAME');
+    }
+    if (getSingleTextValue('IS_VOLUNTEER')) {
+      result.is_volunteer = getSingleTextValue('IS_VOLUNTEER');
+    }
     if (getSelectedValueName(userData.customFields, 'NAME_OF_GUARDIAN')) {
       result.guardian_name =
         getSelectedValueName(userData.customFields, 'NAME_OF_GUARDIAN') || '';
