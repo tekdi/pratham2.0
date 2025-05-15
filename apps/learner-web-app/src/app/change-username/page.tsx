@@ -96,11 +96,11 @@ const ChangeUserNamePage = () => {
   return (
     <Layout>
       <Box
-        height="100vh"
-        width="100vw"
+        // height="100vh"
+        // width="100vw"
         display="flex"
         flexDirection="column"
-        overflow="hidden"
+        //  overflow="hidden"
       >
         <Box
           sx={{ display: 'flex', alignItems: 'center', mb: 2, mt: 2 }}

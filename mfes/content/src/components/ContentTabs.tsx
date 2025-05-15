@@ -45,9 +45,10 @@ const RenderTabContent = memo(
     isHideEmptyDataMessage?: boolean;
   }) => {
     const { t } = useTranslation();
-    const { default_img, _card, _grid } = _config ?? {};
+    const { default_img, _card, _box, _subBox } = _config ?? {};
+
     return (
-      <Box sx={{ width: '100%' }}>
+      <Box sx={{ width: '100%', ...(_box?.sx ?? {}) }}>
         {tabs?.length !== undefined && tabs?.length > 1 && (
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs value={value ?? 0} onChange={onChange} aria-label={ariaLabel}>
@@ -65,30 +66,39 @@ const RenderTabContent = memo(
             </Tabs>
           </Box>
         )}
-        <Box sx={{ flexGrow: 1, mt: 2 }}>
+        <Box
+          sx={{
+            flexGrow: 1,
+            mt: tabs?.length !== undefined && tabs?.length > 1 ? 2 : 0,
+          }}
+        >
           <Loader
             isLoading={isPageLoading}
             layoutHeight={197}
             isHideMaxHeight
             _loader={{ backgroundColor: 'transparent' }}
           >
-            <Box>
-              <Grid container spacing={2}>
+            <Box {..._subBox} sx={{ ...(_subBox?.sx ?? {}) }}>
+              <Grid container spacing={4}>
                 {contentData?.map((item: any) => (
                   <Grid
                     key={item?.identifier}
                     item
-                    xs={12}
-                    sm={6}
-                    md={4}
-                    lg={3}
-                    {..._grid}
+                    sx={{ flexWrap: 'wrap' }}
+                    // xs={12}
+                    // sm={6}
+                    // md={4}
+                    // lg={3}
+                    // {..._grid}
                   >
                     <ContentCard
                       item={item}
                       type={type}
                       default_img={default_img}
-                      _card={_card}
+                      _card={{
+                        ..._card,
+                        sx: { width: '230px', ...(_card?.sx ?? {}) },
+                      }}
                       handleCardClick={handleCardClick}
                       trackData={trackData}
                     />
@@ -96,7 +106,7 @@ const RenderTabContent = memo(
                 ))}
               </Grid>
               <Box sx={{ textAlign: 'center', mt: 4 }}>
-                {hasMoreData ? (
+                {hasMoreData && (
                   <Button
                     variant="contained"
                     onClick={handleLoadMore}
@@ -108,14 +118,13 @@ const RenderTabContent = memo(
                       t('LEARNER_APP.CONTENT_TABS.LOAD_MORE')
                     )}
                   </Button>
-                ) : (
-                  isHideEmptyDataMessage && (
-                    <Typography variant="body1">
-                      {t('LEARNER_APP.CONTENT_TABS.NO_MORE_DATA')}
-                    </Typography>
-                  )
                 )}
               </Box>
+              {!contentData?.length && (
+                <Typography variant="body1" sx={{ mt: 4, textAlign: 'center' }}>
+                  {t('LEARNER_APP.CONTENT_TABS.NO_MORE_DATA')}
+                </Typography>
+              )}
             </Box>
           </Loader>
         </Box>

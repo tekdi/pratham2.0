@@ -19,11 +19,11 @@ export default memo(function LearnerCourse({
   title,
   _content,
 }: LearnerCourseProps) {
-  const [filterState, setFilterState] = useState<any>({ limit: 8 });
+  const [filterState, setFilterState] = useState<any>({ limit: 10 });
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useTranslation();
   const { staticFilter, filterFramework } = _content ?? {};
-  console.log(staticFilter, 'staticFilter sagar');
+
   useEffect(() => {
     if (_content?.filters) {
       setFilterState((prevState: any) => ({
@@ -33,6 +33,12 @@ export default memo(function LearnerCourse({
     }
   }, [_content?.filters]);
 
+  const handleTabChange = useCallback((tab: any) => {
+    setFilterState((prevState: any) => ({
+      ...prevState,
+      query: '',
+    }));
+  }, []);
   const handleSearchClick = useCallback((searchValue: string) => {
     setFilterState((prevState: any) => ({
       ...prevState,
@@ -63,12 +69,9 @@ export default memo(function LearnerCourse({
           <Typography
             variant="h6"
             sx={{
-              fontFamily: 'Poppins',
               fontWeight: 400,
               fontSize: '22px',
               lineHeight: '28px',
-              letterSpacing: '0px',
-              verticalAlign: 'middle',
             }}
           >
             {t(title ?? 'LEARNER_APP.COURSE.GET_STARTED')}
@@ -81,7 +84,10 @@ export default memo(function LearnerCourse({
               gap: 2,
             }}
           >
-            <SearchComponent onSearch={handleSearchClick} />
+            <SearchComponent
+              onSearch={handleSearchClick}
+              value={filterState?.query}
+            />
             <Box sx={{ display: { xs: 'block', md: 'none' } }}>
               <Button
                 variant="outlined"
@@ -168,7 +174,10 @@ export default memo(function LearnerCourse({
                   gap: 2,
                 }}
               >
-                <SearchComponent onSearch={handleSearchClick} />
+                <SearchComponent
+                  onSearch={handleSearchClick}
+                  value={filterState?.query}
+                />
                 <Box sx={{ display: { xs: 'block', md: 'none' } }}>
                   <Button
                     variant="outlined"
@@ -189,11 +198,17 @@ export default memo(function LearnerCourse({
             showHelpDesk={false}
             {..._content}
             _config={{
+              tabChange: handleTabChange,
               default_img: '/images/image_ver.png',
               _card: { isHideProgress: true },
+              _subBox: {
+                overflowY: 'auto',
+                maxHeight: 'calc(100vh - 200px)', // Adjust height as needed
+              },
               ..._content?._config,
             }}
             filters={{
+              ...filterState,
               filters: {
                 ...filterState.filters,
                 ...staticFilter,

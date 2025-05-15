@@ -418,3 +418,129 @@ summary svg {
 .swiper-pagination-bullets.swiper-pagination-horizontal {
   width: unset !important;
 }
+.css-1i1js26-MuiSvgIcon-root-MuiSelect-icon {
+  color: var(--mui-palette-warning-300) !important;
+}
+
+/* 
+*{
+  border: 1px solid red !important;
+} */
+
+/* questionnaire-player-main .custom-font{
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif !important;
+}
+:root{
+  --primary-color:#663399;
+  --btn-outline:#663399;
+  --error-color:rgb(150, 4, 4);
+  --question-tip:gray;
+  --general-btn-text-color:white;
+  --general-btn-hover-bg:white;
+  --secondary-btn-bg:white;
+  --secondary-btn-hover-bg:whitesmoke;
+  --card-bg:white;
+  --disabled-btn-bg:gainsboro;
+  --disabled-btn-text:gray;  
+} */
+:root {
+  --background: #fff;
+  --foreground: #f7be36;
+  --primary-color: black;
+  --btn-outline: #f7be36;
+  --error-color: rgb(150 4 4);
+  --question-tip: gray;
+  --general-btn-text-color: white;
+  --general-btn-hover-bg: #f7be36;
+  --secondary-btn-bg: #f7be36;
+  --secondary-btn-hover-bg: #f7be36;
+
+  /* --card-bg: #FBF4E5; */
+  --disabled-btn-bg: gainsboro;
+  --disabled-btn-text: #f7be36;
+}
+
+mat-radio-group.mat-mdc-radio-group {
+  display: flex;
+  gap: 50px;
+}
+
+.player-grid {
+  height: 100vh !important;
+  border: solid 1px #ccc;
+}
+
+.wrapper[_ngcontent-ng-c2640644362] {
+  min-height: 0 !important;
+}
+
+#overlay-button[aria-label='Player Menu Open'] {
+  margin-top: 4rem !important;
+}
+
+/* Observation Component Overrides */
+
+.custom-font {
+  font-family: Poppins, sans-serif !important;
+}
+
+.activeCard {
+  margin: 1rem !important;
+  padding: 1rem !important;
+}
+
+.wc-primary-color {
+  font-size: 1rem !important;
+}
+
+mat-radio-group.mat-mdc-radio-group {
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+/* End of Observation component overrides */
+
+.btn-outline-secondary {
+  color: #1e1b16 !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  background: transparent !important;
+  border-radius: 100px !important;
+  box-shadow: 0 3px 1px -2px rgb(0 0 0 / 20%), 0 2px 2px 0 rgb(0 0 0 / 14%),
+    0 1px 5px 0 rgb(0 0 0 / 12%) !important;
+}
+
+.btn-primary {
+  color: #1e1b16 !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  background: #fdbe16 !important;
+  border-radius: 100px !important;
+  box-shadow: 0 3px 1px -2px rgb(0 0 0 / 20%), 0 2px 2px 0 rgb(0 0 0 / 14%),
+    0 1px 5px 0 rgb(0 0 0 / 12%) !important;
+}
+
+/* .MuiLinearProgress-root {
+  background-color: var(--mui-palette-warning-600) !important;
+}
+
+.MuiLinearProgress-bar {
+  background-color: var(--mui-palette-error-main) !important;
+} */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

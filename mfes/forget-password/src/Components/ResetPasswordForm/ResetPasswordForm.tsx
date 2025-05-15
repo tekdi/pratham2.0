@@ -63,7 +63,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSubmit }) => {
       display="flex"
       flexDirection="column"
       alignItems="center"
-      justifyContent="center"
+      // justifyContent="center"
       minHeight="100vh"
     >
       <Typography
@@ -108,7 +108,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSubmit }) => {
             }}
           />
 
-          {showValidation && (
+          {showValidation && !validatePassword(password) && (
             <Box pl={1} pt={1}>
               <ValidationItem
                 valid={/[A-Z]/.test(password) && /[a-z]/.test(password)}

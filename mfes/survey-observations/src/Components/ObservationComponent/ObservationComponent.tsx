@@ -119,12 +119,15 @@ const ObservationComponent: React.FC<QuestionnaireAppProps> = ({
         let fileName = event.data.name;
         fileType = event.data.file?.type;
         console.log(fileName, fileType);
+        const extension = `.${fileType.split('/')[1]}`;
+
         //  const nameWithoutExtension = fileName.split('.').slice(0, -1).join('.');
-        const result = await axios.get(
-          `https://dev-interface.prathamdigital.org/interface/v1/user/presigned-url?key=${fileName}&fileType=${fileType}`
-        );
-        presignedurl = result.data.result;
-        presigneDownloadUrl = result.data.result;
+        // const result = await axios.get(
+        //   `https://dev-interface.prathamdigital.org/interface/v1/user/presigned-url?key=${fileName}&fileType=${extension}`
+        // );
+        // presignedurl = result.data.result.url;
+        // presigneDownloadUrl = result.data.result;
+        presignedurl = await uploadToServer(event.data.file);
       } catch (error) {
         console.error('Error fetching pre-signed URL:', error);
       }
@@ -134,6 +137,7 @@ const ObservationComponent: React.FC<QuestionnaireAppProps> = ({
         response.data.result[submissionId].files[0];*/
 
       // Use FormData for file uploads
+      console.log(presignedurl);
       const formData = new FormData();
       formData.append('file', event.data.file);
 
@@ -146,7 +150,7 @@ const ObservationComponent: React.FC<QuestionnaireAppProps> = ({
       const obj: FileUploadData = {
         name: event.data.name,
         url: presignedurl.split('?')[0],
-        previewUrl: presigneDownloadUrl.split('?')[0],
+        previewUrl: presignedurl.split('?')[0],
       };
 
       for (const key of Object.keys(requestObject)) {
@@ -172,7 +176,48 @@ const ObservationComponent: React.FC<QuestionnaireAppProps> = ({
       uploadFileToPresignedUrl(event as FileUploadEvent);
     }
   };
+  const uploadToServer = async (file: File) => {
+    console.log(file);
+    try {
+      // setUploading(true);
 
+      const extension = file.name.split('.').pop()?.toLowerCase();
+      const fileName = file.name.split('.')[0];
+
+      // Step 1: Get Presigned URL
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/presigned-url?filename=${fileName}&foldername=cohort&fileType=.${extension}`
+      );
+      const presignedData = await res.json();
+
+      const { url, fields } = presignedData.result;
+
+      // Step 2: Prepare form data
+      const formData = new FormData();
+      Object.entries(fields).forEach(([key, value]) => {
+        formData.append(key, value as string);
+      });
+      formData.append('file', file);
+
+      // Step 3: Upload to S3
+      const uploadRes = await fetch(url, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!uploadRes.ok) throw new Error('Upload failed');
+
+      // Step 4: Construct the uploaded file URL
+      const uploadedUrl = `${url}${fields.key}`;
+      return uploadedUrl;
+    } catch (err) {
+      console.error('Upload failed:', err);
+      alert('File upload failed. Please try again.');
+      return '';
+    } finally {
+      // setUploading(false);
+    }
+  };
   useEffect(() => {
     if (typeof window !== 'undefined') {
       window.addEventListener('message', receiveUploadData, false);

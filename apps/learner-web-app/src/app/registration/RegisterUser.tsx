@@ -31,8 +31,10 @@ import SignupSuccess from '@learner/components/SignupSuccess /SignupSuccess ';
 import { Loader } from '@shared-lib';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
+import { useTranslation } from '@shared-lib';
 import {
   firstLetterInUpperCase,
+  isUnderEighteen,
   maskMobileNumber,
 } from '@learner/utils/helper';
 import face from '../../../public/images/Group 3.png';
@@ -50,6 +52,7 @@ const RegisterUser = () => {
   const searchParams = useSearchParams();
   const newAccount = searchParams.get('newAccount');
   const tenantId = searchParams.get('tenantId');
+  const { t } = useTranslation();
 
   // let formData: any = {};
   const [usernames, setUsernames] = useState<any[]>([]);
@@ -144,13 +147,62 @@ const RegisterUser = () => {
         responseForm?.schema?.required.pop('batch');
         //unit name is missing from required so handled from frotnend
         let alterSchema = responseForm?.schema;
+        let requiredArray = alterSchema?.required;
+        const mustRequired = [
+          'firstName',
+          'lastName',
+          // 'email',
+          // 'mobile',
+          'dob',
+          'gender',
+          'state',
+          'district',
+          'block',
+          'village',
+          // 'center',
+          // 'batch',
+          // 'username',
+        ];
+        // Merge only missing items from required2 into required1
+        mustRequired.forEach((item) => {
+          if (!requiredArray.includes(item)) {
+            requiredArray.push(item);
+          }
+        });
+        //no required
+
+        alterSchema.required = requiredArray;
+        //add max selection custom
+        if (alterSchema?.properties?.state) {
+          alterSchema.properties.state.maxSelection = 1;
+        }
+        if (alterSchema?.properties?.district) {
+          alterSchema.properties.district.maxSelection = 1;
+        }
+        if (alterSchema?.properties?.block) {
+          alterSchema.properties.block.maxSelection = 1;
+        }
+        if (alterSchema?.properties?.village) {
+          alterSchema.properties.village.maxSelection = 1;
+        }
+        if (alterSchema?.properties?.center) {
+          alterSchema.properties.center.maxSelection = 1;
+        }
+        if (alterSchema?.properties?.batch) {
+          alterSchema.properties.batch.maxSelection = 1;
+        }
+
+        //alter UI schema
         let alterUISchema = responseForm?.uiSchema;
 
         //set 2 grid layout
         alterUISchema = enhanceUiSchemaWithGrid(alterUISchema);
 
+        // Usage:
+        const updatedUiSchema = reorderUiSchema(alterUISchema, 'mobile', 'dob');
+
         setAddSchema(alterSchema);
-        setAddUiSchema(alterUISchema);
+        setAddUiSchema(updatedUiSchema);
       } catch (error) {
         console.log('error', error);
       } finally {
@@ -177,6 +229,19 @@ const RegisterUser = () => {
 
     return enhancedSchema;
   };
+
+  function reorderUiSchema(uiSchema: any, moveField: any, afterField: any) {
+    const order = [...uiSchema['ui:order']];
+    const filteredOrder = order.filter((item) => item !== moveField);
+    const index = filteredOrder.indexOf(afterField);
+
+    filteredOrder.splice(index + 1, 0, moveField);
+
+    return {
+      ...uiSchema,
+      'ui:order': filteredOrder,
+    };
+  }
 
   useEffect(() => {
     let timer: any;
@@ -207,17 +272,45 @@ const RegisterUser = () => {
         );
         const tenantData = [{ roleId: RoleId.STUDENT, tenantId: tenantId }];
 
+        //delete mobile or guardian detail from dob
+        let updated_payload = payload;
+        if (isUnderEighteen(updated_payload?.dob)) {
+          delete updated_payload?.mobile;
+        } else {
+          const fieldIdsToRemove = [
+            'd7a56014-0b9a-4f16-b07e-88baea79576d',
+            '3a7bf305-6bac-4377-bf09-f38af866105c',
+            '7ecaa845-901a-4ac7-a136-eed087f3b85b',
+          ];
+          updated_payload = {
+            ...payload,
+            customFields: payload.customFields.filter(
+              (field: any) => !fieldIdsToRemove.includes(field.fieldId)
+            ),
+          };
+          delete formData?.parent_phone;
+          delete formData?.guardian_relation;
+          delete formData?.guardian_name;
+        }
+
         const createuserPayload = {
-          ...payload,
+          ...updated_payload,
           username: username,
           password: password,
           program: tenantId,
           tenantCohortRoleMapping: tenantData,
         };
         localStorage.setItem('localPayload', JSON.stringify(createuserPayload));
+        localStorage.setItem(
+          'loginLocalPayload',
+          JSON.stringify(createuserPayload)
+        );
         const responseUserData = await createUser(createuserPayload);
         console.log(responseUserData);
         if (responseUserData) {
+          localStorage.removeItem('localPayload');
+          localStorage.removeItem('formData');
+
           setSignupSuccessModal(true);
         } else {
           showToastMessage('Username Already Exist', 'error');
@@ -250,7 +343,12 @@ const RegisterUser = () => {
       const isEmailCheck = Boolean(formData.email);
       const payload = isEmailCheck
         ? { email: formData.email }
-        : { firstName: formData.firstName, mobile: formData.mobile };
+        : {
+            firstName: formData.firstName,
+            mobile: isUnderEighteen(formData.dob)
+              ? formData.parent_phone
+              : formData.mobile,
+          };
 
       const response = await userCheck(payload);
       const users = response?.result || [];
@@ -271,7 +369,11 @@ const RegisterUser = () => {
       const errorMessage = error.response?.data?.params?.errmsg;
       if (errorMessage == 'User does not exist') {
         let reason = 'signup';
-        handleSendOtp(formData.mobile);
+        handleSendOtp(
+          isUnderEighteen(formData.dob)
+            ? formData.parent_phone
+            : formData.mobile
+        );
       }
       // errmsg: 'User does not exist'
 
@@ -354,17 +456,26 @@ const RegisterUser = () => {
   const onSigin = async () => {
     let username;
     let password;
-    const localPayload = localStorage.getItem('localPayload');
-    if (localPayload) {
+    console.log(username, password);
+
+    //   const loginLocalPayload = localStorage.getItem('loginLocalPayload');
+    if (true) {
+      console.log(username, password);
+
       const payloadData = JSON.parse(
-        localStorage.getItem('localPayload') || '{}'
+        localStorage.getItem('loginLocalPayload') || '{}'
       );
+
+      console.log(payloadData);
       username = payloadData?.username;
       password = payloadData?.password;
+      console.log(username, password);
     }
 
     try {
       if (username && password) {
+        console.log('hii');
+
         console.log('hello');
 
         const response = await login({ username, password });
@@ -389,6 +500,11 @@ const RegisterUser = () => {
                 );
 
                 localStorage.setItem('userIdName', userResponse?.username);
+                localStorage.setItem('name', userResponse?.firstName);
+                localStorage.setItem(
+                  'firstName',
+                  userResponse?.firstName || ''
+                );
 
                 const tenantId = userResponse?.tenantData?.[0]?.tenantId;
                 localStorage.setItem('tenantId', tenantId);
@@ -444,14 +560,23 @@ const RegisterUser = () => {
   //     }
   //   };
   const FormSubmitFunction = async (formData: any, payload: any) => {
+    console.log('formData', formData);
     localStorage.setItem('formData', JSON.stringify(formData));
     setPayload(payload);
     localStorage.setItem('localPayload', JSON.stringify(payload));
+    localStorage.setItem('loginLocalPayload', JSON.stringify(payload));
+
     setFormData(formData);
     handleAccountValidation(formData);
-    console.log(formData);
+    console.log(formData.parent_phone);
     console.log(payload);
-    setMobile(formData.mobile);
+    console.log(formData.dob);
+    console.log(isUnderEighteen(formData.dob));
+    if (isUnderEighteen(formData.dob)) {
+      setMobile(formData.parent_phone);
+    } else {
+      setMobile(formData.mobile);
+    }
   };
   return (
     <Box
@@ -484,7 +609,11 @@ const RegisterUser = () => {
           {' '}
           <Box
             sx={{ display: 'flex', alignItems: 'center', mb: 2, mt: 2 }}
-            onClick={() => router.back()}
+            onClick={() => {
+              if (usernamePasswordForm) {
+                setUsernamePasswordForm(false);
+              } else router.back();
+            }}
           >
             <IconButton>
               <ArrowBackIcon />
@@ -554,15 +683,6 @@ const RegisterUser = () => {
               </Typography>
             </Box>
 
-            {addSchema && addUiSchema && (
-              <DynamicForm
-                schema={addSchema}
-                uiSchema={addUiSchema}
-                FormSubmitFunction={FormSubmitFunction}
-                prefilledFormData={formData}
-                hideSubmit={true}
-              />
-            )}
             <Alert
               icon={<PriorityHighIcon htmlColor="black" />}
               severity="info"
@@ -574,8 +694,20 @@ const RegisterUser = () => {
                 mb: 3,
               }}
             >
-              Make sure to cross check the state, district, block, village
+              {t(
+                'LEARNER_APP.LOGIN.make_sure_to_cross_check_the_state_district_block_village'
+              )}
             </Alert>
+            {addSchema && addUiSchema && (
+              <DynamicForm
+                schema={addSchema}
+                uiSchema={addUiSchema}
+                FormSubmitFunction={FormSubmitFunction}
+                prefilledFormData={formData}
+                hideSubmit={true}
+                type={'learner'}
+              />
+            )}
             <Button
               sx={{
                 mt: 3,

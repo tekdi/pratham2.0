@@ -110,6 +110,7 @@ export interface ContentSearchResponse {
 // Define the payload
 
 export interface ResultProp {
+  QuestionSet?: ContentSearchResponse[];
   content: ContentSearchResponse[];
   count: number;
 }

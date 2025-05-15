@@ -90,7 +90,6 @@ export const CommonCard: React.FC<CommonCardProps> = ({
         //@ts-ignore
         if (TrackData) {
           const result = TrackData?.find((e) => e.courseId === item.identifier);
-          // console.log(result, 'sagar result 12');
           const newObj = {
             type,
             status:
@@ -141,12 +140,12 @@ export const CommonCard: React.FC<CommonCardProps> = ({
         ..._card?.sx,
       }}
       onClick={onClick}
-      title={item.identifier}
     >
       {/* Image and Progress Overlay */}
       <Box sx={{ position: 'relative', width: '100%' }}>
         {image && (
           <CardMedia
+            title={item.identifier}
             component="img"
             image={image || '/assets/images/default.png'}
             alt={imageAlt || 'Image'}
@@ -167,6 +166,10 @@ export const CommonCard: React.FC<CommonCardProps> = ({
       </Box>
 
       <CardHeader
+        sx={{
+          pb: 0,
+          pt: 1,
+        }}
         avatar={
           avatarLetter && (
             <Avatar sx={{ bgcolor: avatarColor }} aria-label="avatar">
@@ -176,9 +179,11 @@ export const CommonCard: React.FC<CommonCardProps> = ({
         }
         title={
           <Typography
+            title={title}
             sx={{
               fontWeight: 500,
               fontSize: '16px',
+              lineHeight: '24px',
               whiteSpace: 'wrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -191,25 +196,35 @@ export const CommonCard: React.FC<CommonCardProps> = ({
           </Typography>
         }
         subheader={
-          <Typography variant="h6" sx={{ fontSize: '14px' }}>
-            {subheader}
-          </Typography>
+          subheader && (
+            <Typography variant="h6" sx={{ fontSize: '14px' }}>
+              {subheader}
+            </Typography>
+          )
         }
       />
       {content && (
         <CardContent
           sx={{
-            pt: 0,
+            pt: 0.5,
+            pb: 0,
           }}
         >
           <Typography
+            component="h1"
+            // @ts-ignore
+            title={content}
             sx={{
               fontWeight: 400,
+              fontSize: '15.4px',
+              lineHeight: '22px',
+              color: '#49454F',
               display: '-webkit-box',
-              WebkitLineClamp: 4,
+              WebkitLineClamp: 5,
               WebkitBoxOrient: 'vertical',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
+              ..._card?._contentText?.sx,
             }}
           >
             {content}
@@ -217,7 +232,9 @@ export const CommonCard: React.FC<CommonCardProps> = ({
         </CardContent>
       )}
       {children && <CardContent>{children}</CardContent>}
-      {actions && <CardActions>{actions}</CardActions>}
+      {actions && (
+        <CardActions sx={{ p: 2, pt: '14px' }}>{actions}</CardActions>
+      )}
     </Card>
   );
 };
@@ -228,7 +245,6 @@ export const StatusBar: React.FC<StatuPorps> = ({
   type,
 }) => {
   const theme = useTheme();
-  // console.log({ trackProgress, status, type }, 'sagar');
   return (
     <Box
       sx={{
@@ -243,7 +259,9 @@ export const StatusBar: React.FC<StatuPorps> = ({
       <Box
         sx={{
           width: '100%',
-          p: '6px 6px',
+          pl: type === 'Course' ? '6px' : '0',
+          pr: type === 'Course' ? '6px' : '8px',
+          py: '6px',
           fontSize: '14px',
           lineHeight: '20px',
           fontWeight: '500',
@@ -301,7 +319,17 @@ export const StatusBar: React.FC<StatuPorps> = ({
             }
           />
         )}
-        <Typography width={'100%'}>{status}</Typography>
+        <Typography
+          width={type === 'Course' ? '100%' : '133px'}
+          sx={{
+            fontSize: '14px',
+            lineHeight: '20px',
+            letterSpacing: '0.1px',
+            verticalAlign: 'middle',
+          }}
+        >
+          {status}
+        </Typography>
       </Box>
     </Box>
   );

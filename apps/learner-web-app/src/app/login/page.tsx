@@ -14,6 +14,7 @@ import { getAcademicYear } from '@learner/utils/API/AcademicYearService';
 import { preserveLocalStorage } from '@learner/utils/helper';
 import { getDeviceId } from '@shared-lib-v2/DynamicForm/utils/Helper';
 import { profileComplitionCheck } from '@learner/utils/API/userService';
+import { telemetryFactory } from '@shared-lib-v2/DynamicForm/utils/telemetry';
 
 const Login = dynamic(
   () => import('@login/Components/LoginComponent/LoginComponent'),
@@ -64,7 +65,9 @@ const LoginPage = () => {
   }, []);
 
   const handleForgotPassword = () => {
-    localStorage.setItem('loginRoute', '/login');
+    localStorage.setItem('redirectionRoute', '/login');
+    //   router.push('/password-forget?redirectRoute=/login');
+
     router.push('/password-forget');
   };
   const handleLogin = async (data: {
@@ -83,12 +86,30 @@ const LoginPage = () => {
           t('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT'),
           'error'
         );
+        const telemetryInteract = {
+          context: { env: 'sign-in', cdata: [] },
+          edata: {
+            id: 'login-failed',
+            type: 'CLICK',
+            pageid: 'sign-in',
+          },
+        };
+        telemetryFactory.interact(telemetryInteract);
       }
       // setLoading(false);
     } catch (error: any) {
       //   setLoading(false);
       const errorMessage = t('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT');
       showToastMessage(errorMessage, 'error');
+      const telemetryInteract = {
+        context: { env: 'sign-in', cdata: [] },
+        edata: {
+          id: 'login-failed',
+          type: 'CLICK',
+          pageid: 'sign-in',
+        },
+      };
+      telemetryFactory.interact(telemetryInteract);
     }
   };
   return (
@@ -99,7 +120,11 @@ const LoginPage = () => {
         display="flex"
         flexDirection="column"
         overflow="hidden"
-        sx={{ overflowWrap: 'break-word', wordBreak: 'break-word' }}
+        sx={{
+          overflowWrap: 'break-word',
+          wordBreak: 'break-word',
+          background: 'linear-gradient(135deg, #FFFDF6, #F8EFDA)',
+        }}
       >
         {/* Fixed Header */}
         <Header />
@@ -126,7 +151,7 @@ const LoginPage = () => {
             alignItems="center"
             pr={6}
             boxSizing="border-box"
-            bgcolor="#ffffff"
+            // bgcolor="#ffffff"
           >
             <Login
               onLogin={handleLogin}
@@ -176,7 +201,16 @@ const handleSuccessfulLogin = async (
         const academicYearResponse = await getAcademicYear();
 
         console.log(academicYearResponse[0]?.id, 'academicYearResponse');
-
+        const telemetryInteract = {
+          context: { env: 'sign-in', cdata: [] },
+          edata: {
+            id: 'login-success',
+            type: 'CLICK',
+            pageid: 'sign-in',
+            uid: userResponse?.userId || 'Anonymous',
+          },
+        };
+        telemetryFactory.interact(telemetryInteract);
         if (academicYearResponse[0]?.id) {
           localStorage.setItem('academicYearId', academicYearResponse[0]?.id);
         }
@@ -198,7 +232,16 @@ const handleSuccessfulLogin = async (
           router.push('/content');
         }
       } else {
-        showToastMessage('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT', 'error');
+        showToastMessage('Username or password not correct', 'error');
+        const telemetryInteract = {
+          context: { env: 'sign-in', cdata: [] },
+          edata: {
+            id: 'login-failed',
+            type: 'CLICK',
+            pageid: 'sign-in',
+          },
+        };
+        telemetryFactory.interact(telemetryInteract);
       }
     }
   }

@@ -9,13 +9,20 @@ import {
   createL2Course,
 } from '@learner/utils/API/contentService';
 import { checkAuth } from '@shared-lib-v2/utils/AuthService';
-import { getUserId } from '@learner/utils/API/LoginService';
 import { showToastMessage } from '@learner/components/ToastComponent/Toastify';
+import { getUserDetails } from '@learner/utils/API/userService';
 
 export interface TopicProp {
   topic: string;
   courses?: any[];
 }
+const getCustomFieldValueFromArray = (customFields: any, label: string[]) => {
+  const fieldValue = label.reduce((acc, curr) => {
+    const field = customFields.find((f: any) => f.label === curr);
+    return { ...acc, [curr]: field?.selectedValues?.[0]?.value || '' };
+  }, {});
+  return JSON.parse(JSON.stringify(fieldValue));
+};
 
 const LTwoCourse: React.FC = () => {
   const { t } = useTranslation();
@@ -34,8 +41,22 @@ const LTwoCourse: React.FC = () => {
         const tenantId = localStorage.getItem('tenantId');
         if (userId && tenantId) {
           try {
-            const result = await getUserId();
-            setUserResponse(result);
+            const { result } = await getUserDetails(userId, true);
+            const customFieldsJson = getCustomFieldValueFromArray(
+              result?.userData?.customFields,
+              [
+                'MOTHER_NAME',
+                'STATE',
+                'DISTRICT',
+                'BLOCK',
+                'VILLAGE',
+                'HIGHEST_EDCATIONAL_QUALIFICATION_OR_LAST_PASSED_GRADE',
+              ]
+            );
+            setUserResponse({
+              ...(result.userData || {}),
+              ...customFieldsJson,
+            });
             const courses = await fetchUserCoursesWithContent(userId, tenantId);
             setTopics(courses);
           } catch (error) {
@@ -54,26 +75,28 @@ const LTwoCourse: React.FC = () => {
   }
 
   const handleInterestClick = () => {
-    if (userResponse) {
-      const { email, dob } = userResponse;
-      // @ts-ignore
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      const dobPattern = /^\d{4}-\d{2}-\d{2}$/;
+    setIsModalOpen(true);
 
-      if (!emailPattern.test(email) || !dobPattern.test(dob)) {
-        showToastMessage(
-          'Complete your profile with a valid email and DOB in YYYY-MM-DD format',
-          'error'
-        );
-      } else {
-        setIsModalOpen(true);
-      }
-    } else {
-      showToastMessage(
-        'Complete your profile with a valid email and DOB in YYYY-MM-DD format',
-        'error'
-      );
-    }
+    // if (userResponse) {
+    //   const { email, dob } = userResponse;
+    //   // @ts-ignore
+    //   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    //   const dobPattern = /^\d{4}-\d{2}-\d{2}$/;
+
+    //   if (!emailPattern.test(email) || !dobPattern.test(dob)) {
+    //     showToastMessage(
+    //       'Complete your profile with a valid email and DOB in YYYY-MM-DD format',
+    //       'error'
+    //     );
+    //   } else {
+    //     setIsModalOpen(true);
+    //   }
+    // } else {
+    //   showToastMessage(
+    //     'Complete your profile with a valid email and DOB in YYYY-MM-DD format',
+    //     'error'
+    //   );
+    // }
   };
 
   const handleSubmit = async () => {
@@ -83,16 +106,18 @@ const LTwoCourse: React.FC = () => {
         first_name: userResponse?.firstName ?? '',
         middle_name: userResponse?.middleName ?? '',
         last_name: userResponse?.lastName ?? '',
-        mother_name: '',
+        mother_name: userResponse?.MOTHER_NAME ?? '',
         gender: userResponse?.gender ?? '',
         email_address: userResponse?.email ?? '',
         dob: userResponse?.dob ?? '',
-        qualification: '',
+        qualification:
+          userResponse?.HIGHEST_EDCATIONAL_QUALIFICATION_OR_LAST_PASSED_GRADE ??
+          '',
         phone_number: userResponse?.mobile?.toString() ?? '',
-        state: '',
-        district: '',
-        block: '',
-        village: '',
+        state: userResponse?.STATE ?? '',
+        district: userResponse?.DISTRICT ?? '',
+        block: userResponse?.BLOCK ?? '',
+        village: userResponse?.VILLAGE ?? '',
         blood_group: '',
         userId: userResponse?.userId ?? '',
         courseId: selectedTopic?.courses?.[0]?.name ?? '',
@@ -205,4 +230,4 @@ const LTwoCourse: React.FC = () => {
   );
 };
 
-export default LTwoCourse;
+export default React.memo(LTwoCourse);

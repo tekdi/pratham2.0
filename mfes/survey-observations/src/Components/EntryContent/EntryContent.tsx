@@ -71,6 +71,7 @@ const EntryContent: React.FC<EntryContentProps> = ({
 
   const mapBackendDataToQAPairs = (data: any) => {
     const answers = data?.OB?.answers || {};
+    console.log(answers);
     const result: { question: string; answer: any; answerValue?: any }[] = [];
     let participants: any = [];
 
@@ -131,8 +132,8 @@ const EntryContent: React.FC<EntryContentProps> = ({
   };
 
   const onUserClick = (userId: string) => {
-    if (localStorage.getItem('mfe_state'))
-      router.push(`/user-profile/${userId}`);
+    // if (localStorage.getItem('mfe_state'))
+    //   router.push(`/user-profile/${userId}`);
   };
 
   const formatDate = (dateString: string) => {
@@ -187,9 +188,12 @@ const EntryContent: React.FC<EntryContentProps> = ({
     // window.open(fileUrl, "_blank");
   };
   const getFileNameFromUrl = (url: any) => {
-    const urlObj = new URL(url);
-    const pathname = urlObj.pathname; // Get the path after domain
-    return pathname.substring(pathname.lastIndexOf('/') + 1); // Extract file name
+    if (url) {
+      console.log(url);
+      const urlObj = new URL(url);
+      const pathname = urlObj.pathname; // Get the path after domain
+      return pathname.substring(pathname.lastIndexOf('/') + 1); // Extract file name
+    }
   };
   console.log('############ questionResponse', questionResponse);
   return (
@@ -270,7 +274,7 @@ const EntryContent: React.FC<EntryContentProps> = ({
                   <Typography sx={{ fontSize: '14px', color: '#333' }}>
                     {pair.answerValue}
                   </Typography>
-
+                  {console.log(pair)}
                   {pair.answer.map((fileUrl: string, idx: number) => (
                     <Box
                       key={idx}

@@ -78,7 +78,7 @@ const MyComponent: React.FC = () => {
     };
     fetchTenantInfo();
   }, [pathname]);
-  console.log(filter?.filters?.domain, 'sagar');
+
   return (
     <Layout isLoadingChildren={isLoading} sx={gredientStyle}>
       {isProfileCard && <CompleteProfileBanner />}
@@ -98,13 +98,11 @@ const MyComponent: React.FC = () => {
               variant="h4"
               gutterBottom
               sx={{
-                fontFamily: 'Poppins',
                 fontWeight: 500,
                 fontSize: 16,
                 lineHeight: '24px',
-                letterSpacing: '0.15px',
-                verticalAlign: 'middle',
                 color: '#1F1B13',
+                textTransform: 'capitalize',
               }}
             >
               <span role="img" aria-label="wave">

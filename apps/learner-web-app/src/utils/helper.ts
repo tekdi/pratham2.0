@@ -34,13 +34,13 @@ export const mapUserData = (userData: any) => {
 
     const result: any = {
       firstName: userData.firstName || '',
-      middleName: userData.middleName || '',
+      //  middleName: userData.middleName || '',
       lastName: userData.lastName || '',
       email: userData.email || '',
       mobile: userData.mobile ? userData.mobile?.toString() : '',
       dob: userData.dob || '',
       gender: userData.gender || '',
-      mother_name: getSingleTextValue('MOTHER_NAME'),
+      // mother_name: getSingleTextValue('MOTHER_NAME'),
       marital_status: getSelectedValue('MARITAL_STATUS'),
       phone_type_available: getSingleSelectedValue('TYPE_OF_PHONE_AVAILABLE'),
       own_phone_check: getSingleSelectedValue('DOES_THIS_PHONE_BELONG_TO_YOU'),
@@ -48,10 +48,15 @@ export const mapUserData = (userData: any) => {
       district: getSelectedValue('DISTRICT'),
       block: getSelectedValue('BLOCK'),
       village: getSelectedValue('VILLAGE'),
-      drop_out_reason: getSelectedValue('REASON_FOR_DROP_OUT_FROM_SCHOOL'), // array
-      work_domain: getSelectedValue(
-        'ARE_YOU_CURRENTLY_WORKING_IF_YES_CHOOSE_THE_DOMAIN'
-      ),
+      // is_volunteer: getSingleTextValue('IS_VOLUNTEER'),
+      drop_out_reason:
+        getSelectedValue('REASON_FOR_DROP_OUT_FROM_SCHOOL') || [], // array
+      work_domain:
+        getSelectedValue(
+          'ARE_YOU_CURRENTLY_WORKING_IF_YES_CHOOSE_THE_DOMAIN'
+        ) || [],
+      training_check:
+        getSelectedValue('HAVE_YOU_RECEIVE_ANY_PRIOR_TRAINING') || [],
       what_do_you_want_to_become: getSingleTextValue(
         'WHAT_DO_YOU_WANT_TO_BECOME'
       ),
@@ -59,11 +64,18 @@ export const mapUserData = (userData: any) => {
         'HIGHEST_EDCATIONAL_QUALIFICATION_OR_LAST_PASSED_GRADE'
       ), // string
 
-      preferred_mode_of_learning: getSelectedValue(
-        'WHAT_IS_YOUR_PREFERRED_MODE_OF_LEARNING'
-      ),
+      preferred_mode_of_learning:
+        getSelectedValue('WHAT_IS_YOUR_PREFERRED_MODE_OF_LEARNING') || [],
     };
-
+    if (userData.middleName) {
+      result.middleName = userData.middleName;
+    }
+    if (getSingleTextValue('MOTHER_NAME')) {
+      result.mother_name = getSingleTextValue('MOTHER_NAME');
+    }
+    if (getSingleTextValue('IS_VOLUNTEER')) {
+      result.is_volunteer = getSingleTextValue('IS_VOLUNTEER');
+    }
     if (getSelectedValueName(userData.customFields, 'NAME_OF_GUARDIAN')) {
       result.guardian_name =
         getSelectedValueName(userData.customFields, 'NAME_OF_GUARDIAN') || '';
@@ -179,22 +191,22 @@ export const getMissingFields = (schema: any, userData: any) => {
     //   });
     // }
 
-    if (result.properties.dob) {
-      guardianFields.forEach((field) => {
-        if (!result.properties[field]) {
-          result.properties[field] = {
-            type: 'string',
-            title: field.toUpperCase(),
-          };
-        }
-      });
-    } else {
-      guardianFields.forEach((field) => {
-        if (result.properties[field]) {
-          delete result.properties[field];
-        }
-      });
-    }
+    // if (result.properties.dob) {
+    //   guardianFields.forEach((field) => {
+    //     if (!result.properties[field]) {
+    //       result.properties[field] = {
+    //         type: 'string',
+    //         title: field.toUpperCase(),
+    //       };
+    //     }
+    //   });
+    // } else {
+    //   guardianFields.forEach((field) => {
+    //     if (result.properties[field]) {
+    //       delete result.properties[field];
+    //     }
+    //   });
+    // }
 
     return result;
   } catch (error) {
@@ -238,6 +250,23 @@ export const preserveLocalStorage = () => {
     }
   });
 };
+export const isUnderEighteen = (dobString: any): boolean => {
+  if (!dobString) return false;
+
+  const dob = new Date(dobString);
+  if (isNaN(dob.getTime())) return false; // Invalid date check
+
+  const today = new Date();
+  let age = today.getFullYear() - dob.getFullYear();
+  const monthDiff = today.getMonth() - dob.getMonth();
+  const dayDiff = today.getDate() - dob.getDate();
+
+  if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+    age--;
+  }
+
+  return age < 18;
+};
 
 export const SUPPORTED_MIME_TYPES = [
   'application/vnd.ekstep.ecml-archive',
@@ -250,3 +279,14 @@ export const SUPPORTED_MIME_TYPES = [
   'video/x-youtube',
   'application/vnd.sunbird.questionset',
 ];
+export const toPascalCase = (name: string | any) => {
+  if (typeof name !== 'string') {
+    return name;
+  }
+
+  return name
+    ?.toLowerCase()
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};

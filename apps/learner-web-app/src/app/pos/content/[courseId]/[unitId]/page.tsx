@@ -22,7 +22,7 @@ const App = () => {
           contentBaseUrl: '/pos/content',
           default_img: '/images/image_ver.png',
           _card: { isHideProgress: true },
-          _infoCard: { _cardMedia: { maxHeight: '248px' } },
+          _infoCard: { _cardMedia: { maxHeight: '279px' } },
         }}
       />
     </Layout>

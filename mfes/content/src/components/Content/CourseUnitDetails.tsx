@@ -21,6 +21,7 @@ import {
 import AppConst from '@content-mfes/utils/AppConst/AppConst';
 import { checkAuth, getUserId } from '@shared-lib-v2/utils/AuthService';
 import { getUserId as getUserIdLocal } from '@content-mfes/services/LoginService';
+
 interface DetailsProps {
   isShowLayout?: any;
   id?: string;
@@ -34,15 +35,26 @@ export default function Details(props: DetailsProps) {
   const identifier = unitId ?? courseId;
   const [trackData, setTrackData] = useState<trackDataPorps[]>([]);
   const [selectedContent, setSelectedContent] = useState<any>(null);
+  const [courseItem, setCourseItem] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [certificateId, setCertificateId] = useState();
+  let activeLink = null;
+  if (typeof window !== 'undefined') {
+    const searchParams = new URLSearchParams(window.location.search);
+    activeLink = searchParams.get('activeLink');
+  }
 
   useEffect(() => {
     const getDetails = async (identifier: string) => {
       try {
         const resultHierarchy = await hierarchyAPI(identifier);
+        if (unitId) {
+          const course = await hierarchyAPI(courseId as string);
+          setCourseItem(course);
+        }
+
         const userId = getUserId(props?._config?.userIdLocalstorageName);
-        let startedOn = '';
+        let startedOn = {};
         if (checkAuth(Boolean(userId))) {
           const data = await getUserCertificateStatus({
             userId: userId as string,
@@ -58,7 +70,9 @@ export default function Details(props: DetailsProps) {
             router.replace(
               `${
                 props?._config?.contentBaseUrl ?? '/content'
-              }-details/${courseId}`
+              }-details/${courseId}${
+                activeLink ? `?activeLink=${activeLink}` : ''
+              }`
             );
           } else {
             const userIdArray: string[] = Array.isArray(userId)
@@ -109,9 +123,12 @@ export default function Details(props: DetailsProps) {
               }
             }
           }
-          startedOn = data?.result?.createdOn;
+          startedOn = {
+            startedOn: data?.result?.createdOn,
+            issuedOn: data?.result?.issuedOn,
+          };
         }
-        setSelectedContent({ ...resultHierarchy, startedOn });
+        setSelectedContent({ ...resultHierarchy, ...startedOn });
       } catch (error) {
         console.error('Failed to fetch content:', error);
       } finally {
@@ -119,7 +136,15 @@ export default function Details(props: DetailsProps) {
       }
     };
     if (identifier) getDetails(identifier as string);
-  }, [identifier, courseId, router, unitId]);
+  }, [
+    identifier,
+    courseId,
+    router,
+    unitId,
+    props?._config?.userIdLocalstorageName,
+    props?._config?.contentBaseUrl,
+    activeLink,
+  ]);
 
   const handleItemClick = (subItem: any) => {
     if (props?._config?.handleCardClick) {
@@ -134,7 +159,7 @@ export default function Details(props: DetailsProps) {
           : `${
               props?._config?.contentBaseUrl ?? '/content'
             }/${courseId}/${unitId}/${subItem?.identifier}`;
-      router.push(path);
+      router.push(`${path}${activeLink ? `?activeLink=${activeLink}` : ''}`);
     }
   };
 
@@ -159,13 +184,14 @@ export default function Details(props: DetailsProps) {
     >
       <InfoCard
         item={selectedContent}
+        topic={courseItem?.se_subjects ?? selectedContent?.se_subjects}
         onBackClick={onBackClick}
         _config={{
-          default_img: `${AppConst.BASEPATH}/assests/images/image_ver.png`,
           ...props?._config,
           _infoCard: {
             isShowStatus: trackData,
             isHideStatus: true,
+            default_img: `${AppConst.BASEPATH}/assests/images/image_ver.png`,
             ...props?._config?._infoCard,
           },
         }}
@@ -181,7 +207,7 @@ export default function Details(props: DetailsProps) {
           flexWrap: 'wrap',
         }}
       >
-        {certificateId && (
+        {certificateId && !unitId && (
           <CourseCompletionBanner certificateId={certificateId} />
         )}
         {props?.type === 'collapse' ? (

@@ -13,9 +13,13 @@ const FilterComponent: React.FC<{
 
   useEffect(() => {
     setFilterCount(
-      Object?.keys(filterState.filters ?? {}).filter(
-        (e) => !['limit', ...Object.keys(staticFilter ?? {})].includes(e)
-      ).length
+      Object?.keys(filterState.filters ?? {}).filter((e) => {
+        const filterValue = filterState.filters[e];
+        return (
+          !['limit', ...Object.keys(staticFilter ?? {})].includes(e) &&
+          !(Array.isArray(filterValue) && filterValue.length === 0)
+        );
+      }).length
     );
   }, [filterState, staticFilter]);
 

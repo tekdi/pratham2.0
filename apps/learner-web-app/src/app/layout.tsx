@@ -2,7 +2,10 @@
 import './global.css';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
-import { MuiThemeProviderWithLanguage } from '@learner/assets/theme/MuiThemeProvider';
+import MuiThemeProvider, {
+  MuiThemeProviderWithLanguage,
+} from '@learner/assets/theme/MuiThemeProvider';
+import ClientLayout from './ClientLayout';
 
 export const metadata = {
   title: 'Welcome to learner-web-app',
@@ -30,10 +33,18 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <link
+        href="https://fonts.googleapis.com/icon?family=Material+Icons"
+        rel="stylesheet"
+      />
       <head />
       <body>
-        <MuiThemeProviderWithLanguage>{children}</MuiThemeProviderWithLanguage>
-        <ToastContainer />
+        <ClientLayout>
+          <MuiThemeProviderWithLanguage>
+            <MuiThemeProvider>{children}</MuiThemeProvider>
+          </MuiThemeProviderWithLanguage>
+          <ToastContainer />
+        </ClientLayout>
       </body>
     </html>
   );

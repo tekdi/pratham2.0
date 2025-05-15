@@ -16,7 +16,7 @@ import {
   ContentItem,
   getData,
 } from '@shared-lib';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import BackToTop from '@content-mfes/components/BackToTop';
 import RenderTabContent from '@content-mfes/components/ContentTabs';
 import HelpDesk from '@content-mfes/components/HelpDesk';
@@ -84,6 +84,7 @@ export interface ContentProps {
 
 export default function Content(props: Readonly<ContentProps>) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [searchValue, setSearchValue] = useState('');
   const [tabValue, setTabValue] = useState<number>(0);
   const [tabs, setTabs] = useState<typeof DEFAULT_TABS>([]);
@@ -134,6 +135,12 @@ export default function Content(props: Readonly<ContentProps>) {
             : true
         );
         setTabs(filteredTabs);
+        const tabParam = searchParams?.get('tab');
+        if (tabParam && filteredTabs?.[Number(tabParam)]) {
+          setTabValue(Number(tabParam));
+        } else {
+          setTabValue(0);
+        }
         setIsPageLoading(false);
       } catch (error) {
         console.error('Failed to initialize component:', error);
@@ -141,7 +148,7 @@ export default function Content(props: Readonly<ContentProps>) {
       }
     };
     init();
-  }, [props]);
+  }, [props, searchParams]);
 
   // Memoized content fetching with cancellation
   const fetchContent = useCallback(
@@ -270,7 +277,10 @@ export default function Content(props: Readonly<ContentProps>) {
       try {
         const response = await fetchContent(localFilters);
         if (!response || !isMounted) return;
-        const newContentData = response.content ?? [];
+        const newContentData = [
+          ...(response.content ?? []),
+          ...(response?.QuestionSet ?? []),
+        ];
         const userTrackData = await fetchDataTrack(newContentData);
         if (!isMounted) return;
 
@@ -354,9 +364,13 @@ export default function Content(props: Readonly<ContentProps>) {
 
   const handleTabChange = useCallback(
     (event: React.SyntheticEvent, newValue: number) => {
+      const url = new URL(window.location.href);
+      url.searchParams.set('tab', newValue.toString());
+      window.history.replaceState(null, '', url.toString());
       setTabValue(newValue);
+      props?._config?.tabChange?.(newValue);
     },
-    []
+    [props?._config?.tabChange]
   );
 
   const handleCardClickLocal = useCallback(
@@ -365,9 +379,13 @@ export default function Content(props: Readonly<ContentProps>) {
         if (propData?.handleCardClick) {
           propData.handleCardClick(content);
         } else if (SUPPORTED_MIME_TYPES.includes(content?.mimeType)) {
-          router.push(`/player/${content?.identifier}`);
+          router.push(
+            `/player/${content?.identifier}?activeLink=${window.location.pathname}`
+          );
         } else {
-          router.push(`/content-details/${content?.identifier}`);
+          router.push(
+            `/content-details/${content?.identifier}?activeLink=${window.location.pathname}`
+          );
         }
       } catch (error) {
         console.error('Failed to handle card click:', error);
@@ -450,27 +468,25 @@ export default function Content(props: Readonly<ContentProps>) {
       isLoadingChildren={isPageLoading}
       isShow={propData?.isShowLayout}
     >
-      <Box sx={{ p: 1 }}>
-        {searchAndFilterSection}
-        <RenderTabContent
-          {...propData}
-          value={tabValue}
-          onChange={handleTabChange}
-          contentData={contentData}
-          _config={propData?._config ?? {}}
-          trackData={trackData as any}
-          type={localFilters?.type ?? ''}
-          handleCardClick={handleCardClickLocal}
-          hasMoreData={hasMoreData}
-          handleLoadMore={handleLoadMore}
-          isLoadingMoreData={isLoading}
-          isPageLoading={isLoading && localFilters?.offset === 0}
-          tabs={tabs}
-          isHideEmptyDataMessage={propData?.hasMoreData !== false}
-        />
-        {propData?.showHelpDesk && <HelpDesk />}
-        {propData?.showBackToTop && <BackToTop />}
-      </Box>
+      {searchAndFilterSection}
+      <RenderTabContent
+        {...propData}
+        value={tabValue}
+        onChange={handleTabChange}
+        contentData={contentData}
+        _config={propData?._config ?? {}}
+        trackData={trackData as any}
+        type={localFilters?.type ?? ''}
+        handleCardClick={handleCardClickLocal}
+        hasMoreData={hasMoreData}
+        handleLoadMore={handleLoadMore}
+        isLoadingMoreData={isLoading}
+        isPageLoading={isLoading && localFilters?.offset === 0}
+        tabs={tabs}
+        isHideEmptyDataMessage={propData?.hasMoreData !== false}
+      />
+      {propData?.showHelpDesk && <HelpDesk />}
+      {propData?.showBackToTop && <BackToTop />}
     </LayoutPage>
   );
 }

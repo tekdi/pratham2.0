@@ -90,7 +90,7 @@ export const theme = createTheme({
         root: {
           borderRadius: '12px',
           '& > :last-child': {
-            paddingBottom: 16,
+            paddingBottom: '16px !important',
           },
         },
       },

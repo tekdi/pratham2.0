@@ -209,7 +209,6 @@ export const contentWithTelemetryData = async ({
     } else if (typeof window !== 'undefined' && window.localStorage) {
       userId = localStorage.getItem('userId') ?? '';
     }
-    console.log(userId, propUserId, 'sagar');
     if (userId !== undefined || userId !== '') {
       const ContentTypeReverseMap = Object.fromEntries(
         Object.entries(ContentType).map(([key, value]) => [value, key])

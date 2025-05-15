@@ -24,9 +24,9 @@ const ForgotPasswordComponent = ({
       display="flex"
       flexDirection="column"
       alignItems="center"
-      justifyContent="center"
+      // justifyContent="center"
       minHeight="100vh"
-      px={2}
+      //px={2}
     >
       <LockIcon sx={{ fontSize: 40, color: '#000', mb: 2 }} />
 

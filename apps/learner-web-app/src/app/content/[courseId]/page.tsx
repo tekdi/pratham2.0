@@ -22,7 +22,10 @@ const App = () => {
         _config={{
           default_img: '/images/unit.png',
           _card: { isHideProgress: true },
-          _infoCard: { _cardMedia: { maxHeight: '248px' } },
+          _infoCard: {
+            _cardMedia: { maxHeight: '279px' },
+            default_img: '/images/image_ver.png',
+          },
           _grid: { xs: 6, sm: 4, md: 3, lg: 2.5 },
         }}
       />

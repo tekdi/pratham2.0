@@ -33,7 +33,7 @@ const rtlLanguages = ['ur'];
 export type LanguageContextType = {
   language: string;
   setLanguage: (lang: string) => void;
-  t: (key: string) => string;
+  t: (key: string, options?: { defaultValue?: string }) => string;
   rtlLanguages: string[];
 };
 
@@ -70,19 +70,33 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
 
   // Translate function
   const t = useMemo(() => {
-    return (key: string): string => {
-      const keys = key?.split('.');
-      let result: any = translations[language];
-      if (keys) {
-        for (const k of keys) {
-          if (result?.[k] === undefined) {
-            return key; // fallback if any level is missing
+    return (key: string, options?: { defaultValue?: string }): string => {
+      const getNestedValue = (lang: string) => {
+        const keys = key?.split('.');
+        let result: any = translations[lang];
+        if (keys) {
+          for (const k of keys) {
+            if (result?.[k] === undefined) {
+              return undefined;
+            }
+            result = result[k];
           }
-          result = result[k];
         }
+        return typeof result === 'string' ? result : undefined;
+      };
+
+      // Try the current language first
+      const currentLangValue = getNestedValue(language);
+
+      // Fallback to English if not found
+      if (currentLangValue !== undefined) {
+        return currentLangValue;
       }
 
-      return typeof result === 'string' ? result : key;
+      const fallbackValue = getNestedValue('en');
+
+      // Return fallback or options.defaultValue or key itself
+      return fallbackValue ?? options?.defaultValue ?? key;
     };
   }, [language]);
 

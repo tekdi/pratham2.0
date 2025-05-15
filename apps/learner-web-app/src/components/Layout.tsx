@@ -56,11 +56,16 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
   };
 
   React.useEffect(() => {
-    const currentPage =
-      typeof window !== 'undefined' && window.location.pathname
+    let currentPage = '';
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      const activeLink = searchParams.get('activeLink');
+      currentPage = activeLink
+        ? activeLink
+        : window.location.pathname
         ? window.location.pathname
         : '';
-
+    }
     const navLinks = [
       {
         title: t('LEARNER_APP.COMMON.L1_COURSES'),
@@ -78,13 +83,13 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
     const isVolunteer = JSON.parse(
       localStorage.getItem('isVolunteer') || 'false'
     );
-    console.log(isVolunteer);
+
     if (isVolunteer) {
       navLinks.push({
         title: t('LEARNER_APP.COMMON.SURVEYS'),
         icon: <AssignmentOutlined sx={{ width: 28, height: 28 }} />,
-        to: () => router.push('/surveys'),
-        isActive: currentPage === '/surveys',
+        to: () => router.push('/observations'),
+        isActive: currentPage === '/observations',
       });
     }
     if (checkAuth()) {
