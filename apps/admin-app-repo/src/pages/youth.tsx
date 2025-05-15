@@ -7,7 +7,7 @@ import {
   YouthSearchSchema,
   YouthSearchUISchema,
 } from '../constant/Forms/YouthSearch';
-import { RoleId, Status } from '@/utils/app.constant';
+import { Role, RoleId, Status } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
 import {
   Box,
@@ -16,6 +16,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
 import { Button } from '@mui/material';
 import SimpleModal from '@/components/SimpleModal';
@@ -33,11 +34,13 @@ import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
-import { deleteUser } from '@/services/UserService';
+import { deleteUser, editEditUser } from '@/services/UserService';
 import { transformLabel } from '@/utils/Helper';
 import { getCohortList } from '@/services/GetCohortList';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
+import MarkAsVolunteer from '@/components/MarkAsVolunteer';
+import { showToastMessage } from '@/components/Toastify';
 
 //import { DynamicForm } from '@shared-lib';
 
@@ -70,6 +73,8 @@ const Youth = () => {
   });
   const [reason, setReason] = useState('');
   const [memberShipID, setMemberShipID] = useState('');
+  const [openMarkVolunteerModal, setOpenMarkVolunteerModal] = useState(false);
+  const [isVolunteerFieldId, setIsVolunteerFieldId] = useState('');
 
   const { t, i18n } = useTranslation();
 
@@ -137,7 +142,9 @@ const Youth = () => {
       status: 'active',
       tenantId: localStorage.getItem('tenantId'),
     };
-
+    if (localStorage.getItem('roleName') === Role.ADMIN) {
+      staticFilter.state = [localStorage.getItem('stateId')];
+    }
     const { sortBy } = formData;
     const staticSort = ['firstName', sortBy || 'asc'];
     await searchListData(
@@ -293,6 +300,29 @@ const Youth = () => {
     }
   };
 
+  const handlemarkAsVolunteer = async () => {
+    console.log('selected!!!', editableUserId);
+    try {
+      const userId = editableUserId;
+      const userDetails = {
+        userData: {},
+        customFields: [
+          {
+            fieldId:
+              isVolunteerFieldId || '59716ca7-37af-4527-a1ad-ce0f1dabeb00',
+            value: 'yes',
+          },
+        ],
+      };
+      const response = await editEditUser(userId, userDetails);
+      showToastMessage(t('YOUTH.MARK_AS_VOLUNTEER_SUCCESSFULLY'), 'success');
+      searchData({}, 0);
+    } catch (e) {
+      showToastMessage(t('YOUTH.MARK_AS_VOLUNTEER_FAILED'), 'error');
+      console.log(e);
+    }
+  };
+
   // Define actions
   const actions = [
     {
@@ -367,6 +397,33 @@ const Youth = () => {
           lastName: row?.lastName || '',
           village: findVillage?.selectedValues?.[0]?.value || '',
         });
+      },
+    },
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            backgroundColor: 'rgb(227, 234, 240)',
+            height: '34px',
+            width: '34px',
+          }}
+        >
+          <SwapHorizIcon />
+        </Box>
+      ),
+      callback: (row: any) => {
+        console.log('row:', row);
+        setEditableUserId(row?.userId);
+        setOpenMarkVolunteerModal(true);
+        const volunteerField = row.customFields.find(
+          (field) => field.label === 'IS_VOLUNTEER'
+        );
+        setIsVolunteerFieldId(volunteerField?.fieldId);
       },
     },
   ];
@@ -509,6 +566,21 @@ const Youth = () => {
           reason={reason}
           setReason={setReason}
         />
+      </ConfirmationPopup>
+      <ConfirmationPopup
+        checked={checked}
+        open={openMarkVolunteerModal}
+        onClose={() => {
+          setOpenMarkVolunteerModal(false);
+          setChecked(false);
+        }}
+        title={t('YOUTH.MARK_AS_VOLUNTEER')}
+        primary={t('YOUTH.MARK_AS_VOLUNTEER')}
+        secondary={t('COMMON.CANCEL')}
+        onClickPrimary={handlemarkAsVolunteer}
+        isFromMarkAsVoluteer={true}
+      >
+        <MarkAsVolunteer checked={checked} setChecked={setChecked} />
       </ConfirmationPopup>
     </>
   );
