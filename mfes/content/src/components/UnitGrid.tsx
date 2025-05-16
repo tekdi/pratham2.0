@@ -23,7 +23,31 @@ export const UnitGrid: React.FC<CommonAccordionProps> = ({
   const { t } = useTranslation();
 
   return (
-    <Grid container spacing={4}>
+    <Grid
+      container
+      spacing={4}
+      display="grid"
+      gridTemplateColumns={{
+        xs: 'repeat(auto-fit, minmax(250px, 1fr))',
+        sm: 'repeat(auto-fit, minmax(250px, 1fr))',
+        md:
+          item?.children?.length > 2
+            ? 'repeat(auto-fit, minmax(250px, 1fr 1fr))'
+            : 'repeat(4, minmax(250px, 1fr))',
+        lg:
+          item?.children?.length > 3
+            ? 'repeat(auto-fit, minmax(250px, 1fr 1fr))'
+            : 'repeat(5, minmax(250px, 1fr))',
+        xl:
+          item?.children?.length > 4
+            ? 'repeat(auto-fit, minmax(250px, 1fr 1fr))'
+            : 'repeat(5, minmax(250px, 1fr))',
+      }}
+      gap="1rem"
+      alignItems={'center'}
+      justifyContent="center"
+      padding="1rem"
+    >
       {item?.children?.length <= 0 && (
         <Grid item xs={12} textAlign="center">
           <Typography variant="body1" sx={{ mt: 4, textAlign: 'center' }}>
@@ -32,7 +56,14 @@ export const UnitGrid: React.FC<CommonAccordionProps> = ({
         </Grid>
       )}
       {item?.children?.map((subItem: any) => (
-        <Grid key={subItem?.identifier} item sx={{ flexWrap: 'wrap' }}>
+        <Grid
+          key={subItem?.identifier}
+          item
+          sx={{
+            display: { xs: 'flex', sm: 'block' },
+            justifyContent: { xs: 'center', sm: 'initial' },
+          }}
+        >
           {subItem?.mimeType === 'application/vnd.ekstep.content-collection' ? (
             <UnitCard
               item={subItem}

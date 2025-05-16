@@ -79,17 +79,39 @@ const RenderTabContent = memo(
             _loader={{ backgroundColor: 'transparent' }}
           >
             <Box {..._subBox} sx={{ ...(_subBox?.sx ?? {}) }}>
-              <Grid container spacing={4}>
+              <Grid
+                container
+                spacing={4}
+                display="grid"
+                gridTemplateColumns={{
+                  xs: 'repeat(auto-fit, minmax(250px, 1fr))',
+                  sm: 'repeat(auto-fit, minmax(250px, 1fr))',
+                  md:
+                    contentData.length > 3
+                      ? 'repeat(auto-fit, minmax(250px, 1fr 1fr))'
+                      : 'repeat(4, minmax(250px, 1fr))',
+                  lg:
+                    contentData.length > 3
+                      ? 'repeat(auto-fit, minmax(250px, 1fr 1fr))'
+                      : 'repeat(5, minmax(250px, 1fr))',
+                  xl:
+                    contentData.length > 4
+                      ? 'repeat(auto-fit, minmax(250px, 1fr 1fr))'
+                      : 'repeat(5, minmax(250px, 1fr))',
+                }}
+                gap="1rem"
+                alignItems={'center'}
+                justifyContent="center"
+                padding="1rem"
+              >
                 {contentData?.map((item: any) => (
                   <Grid
-                    key={item?.identifier}
                     item
-                    sx={{ flexWrap: 'wrap' }}
-                    // xs={12}
-                    // sm={6}
-                    // md={4}
-                    // lg={3}
-                    // {..._grid}
+                    key={item?.identifier}
+                    sx={{
+                      display: { xs: 'flex', sm: 'block' },
+                      justifyContent: { xs: 'center', sm: 'initial' },
+                    }}
                   >
                     <ContentCard
                       item={item}

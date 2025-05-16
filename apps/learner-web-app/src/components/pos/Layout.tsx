@@ -97,8 +97,15 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
       },
       {
         title: t('LEARNER_APP.POS.PROGRAM'),
-        to: () => router.push('/pos/program'),
+        // to: () => router.push('/pos/program'),
         isActive: currentPage === '/pos/program',
+        child: [
+          { code: 'Vocational Training', name: 'YouthNet' },
+          { name: 'Second Chance Program', code: 'SCP' },
+        ].map((item: any) => ({
+          title: item?.name,
+          to: () => router.push(`/pos/program?program=${item?.code}`),
+        })),
       },
       {
         title: t('LEARNER_APP.POS.THEMATIC_REPOSITORY'),
