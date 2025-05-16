@@ -33,15 +33,15 @@ export const UnitGrid: React.FC<CommonAccordionProps> = ({
         md:
           item?.children?.length > 2
             ? 'repeat(auto-fit, minmax(250px, 1fr 1fr))'
-            : 'repeat(4, minmax(250px, 1fr))',
+            : 'repeat(2, minmax(250px, 1fr))',
         lg:
           item?.children?.length > 3
             ? 'repeat(auto-fit, minmax(250px, 1fr 1fr))'
-            : 'repeat(5, minmax(250px, 1fr))',
+            : 'repeat(2, minmax(250px, 1fr))',
         xl:
           item?.children?.length > 4
             ? 'repeat(auto-fit, minmax(250px, 1fr 1fr))'
-            : 'repeat(5, minmax(250px, 1fr))',
+            : 'repeat(2, minmax(250px, 1fr))',
       }}
       gap="1rem"
       alignItems={'center'}
