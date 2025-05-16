@@ -86,6 +86,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
             <Typography
               component="div"
               variant="h5"
+              title={item?.name}
               sx={{
                 fontWeight: 700,
                 fontSize: '36px',

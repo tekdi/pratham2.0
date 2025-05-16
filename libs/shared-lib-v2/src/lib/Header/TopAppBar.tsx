@@ -199,11 +199,11 @@ export const DesktopBar = ({
                     : link.variant ?? 'top-bar-link-text'
                 }
                 startIcon={link?.icon && link.icon}
-                onClick={
-                  typeof link.to !== 'string'
-                    ? (link.to as React.MouseEventHandler)
-                    : undefined
-                }
+                onClick={(e: any) => {
+                  typeof link.to !== 'string' && link.to !== undefined
+                    ? link.to(e)
+                    : openMenuAtLevel(0, e.currentTarget, link.child ?? []);
+                }}
               >
                 {link.title}
               </Button>
@@ -258,14 +258,7 @@ export const DesktopBar = ({
           }}
         >
           <Paper elevation={3}>
-            <Box
-              display="flex"
-              flexDirection="row"
-              flexWrap="wrap"
-              sx={{
-                boxShadow: '0px -4px 4px rgba(0, 0, 0, 0.1)',
-              }}
-            >
+            <Box display="flex" flexDirection="row" flexWrap="wrap">
               {menu.items.map((item, idx) => {
                 const hasChild =
                   Array.isArray(item.child) && item.child.length > 0;
@@ -280,7 +273,6 @@ export const DesktopBar = ({
                         setMenus((prev) => prev.slice(0, level + 1));
                       }
                     }}
-                    sx={{ minWidth: 160 }}
                   >
                     <MenuItem
                       onClick={() => {
