@@ -19,3 +19,4 @@ export * from './lib/CertificateModal/CertificateModal';
 export * from './lib/CourseCompletionBanner/CourseCompletionBanner';
 export * from './utils/helper';
 export * from './lib/Text/ExpandableText';
+export * from './lib/Grid/Grid';
