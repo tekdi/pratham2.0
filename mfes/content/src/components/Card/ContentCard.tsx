@@ -19,10 +19,11 @@ const ContentCard = ({
   trackData?: [];
 }) => {
   const { isWrap } = _card ?? {};
+
   return (
     <CardWrap isWrap={isWrap}>
       <CommonCard
-        minheight={type?.toLowerCase() === 'course' ? '302px' : 'auto'}
+        minheight={type?.toLowerCase() === 'course' ? '302px' : '356px'}
         title={(item?.name || '').trim()}
         image={
           item?.posterImage && item?.posterImage !== 'undefined'
@@ -30,31 +31,25 @@ const ContentCard = ({
             : default_img ?? `${AppConst.BASEPATH}/assests/images/image_ver.png`
         }
         content={
-          item?.description
-            ? item?.description
-            : type?.toLowerCase() === 'course'
-            ? 'No description available'
-            : ''
+          item?.description ? item?.description : 'No description available'
         }
         actions={
           type !== 'Course' && (
-            <Box>
-              <StatusIcon
-                showMimeTypeIcon
-                mimeType={item?.mimeType}
-                _icon={{
-                  isShowText: true,
-                  _box: {
-                    py: '7px',
-                    px: '10px',
-                    borderRadius: '10px',
-                    borderWidth: '1px',
-                    borderStyle: 'solid',
-                    borderColor: '#79747E',
-                  },
-                }}
-              />
-            </Box>
+            <StatusIcon
+              showMimeTypeIcon
+              mimeType={item?.mimeType}
+              _icon={{
+                isShowText: true,
+                _box: {
+                  py: '7px',
+                  px: '8px',
+                  borderRadius: '10px',
+                  borderWidth: '1px',
+                  borderStyle: 'solid',
+                  borderColor: '#79747E',
+                },
+              }}
+            />
           )
         }
         orientation="horizontal"
@@ -68,9 +63,11 @@ const ContentCard = ({
               ? {
                   color: '#79747E',
                   fontStyle: 'italic',
+                  minHeight: '114px',
                 }
               : {
                   textTransform: 'capitalize',
+                  minHeight: '114px',
                 },
           },
           ..._card,

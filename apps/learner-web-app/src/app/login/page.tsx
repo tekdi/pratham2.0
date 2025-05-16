@@ -14,6 +14,7 @@ import { getAcademicYear } from '@learner/utils/API/AcademicYearService';
 import { preserveLocalStorage } from '@learner/utils/helper';
 import { getDeviceId } from '@shared-lib-v2/DynamicForm/utils/Helper';
 import { profileComplitionCheck } from '@learner/utils/API/userService';
+import { telemetryFactory } from '@shared-lib-v2/DynamicForm/utils/telemetry';
 
 const Login = dynamic(
   () => import('@login/Components/LoginComponent/LoginComponent'),
@@ -85,12 +86,30 @@ const LoginPage = () => {
           t('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT'),
           'error'
         );
+        const telemetryInteract = {
+          context: { env: 'sign-in', cdata: [] },
+          edata: {
+            id: 'login-failed',
+            type: 'CLICK',
+            pageid: 'sign-in',
+          },
+        };
+        telemetryFactory.interact(telemetryInteract);
       }
       // setLoading(false);
     } catch (error: any) {
       //   setLoading(false);
       const errorMessage = t('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT');
       showToastMessage(errorMessage, 'error');
+      const telemetryInteract = {
+        context: { env: 'sign-in', cdata: [] },
+        edata: {
+          id: 'login-failed',
+          type: 'CLICK',
+          pageid: 'sign-in',
+        },
+      };
+      telemetryFactory.interact(telemetryInteract);
     }
   };
   return (
@@ -182,7 +201,16 @@ const handleSuccessfulLogin = async (
         const academicYearResponse = await getAcademicYear();
 
         console.log(academicYearResponse[0]?.id, 'academicYearResponse');
-
+        const telemetryInteract = {
+          context: { env: 'sign-in', cdata: [] },
+          edata: {
+            id: 'login-success',
+            type: 'CLICK',
+            pageid: 'sign-in',
+            uid: userResponse?.userId || 'Anonymous',
+          },
+        };
+        telemetryFactory.interact(telemetryInteract);
         if (academicYearResponse[0]?.id) {
           localStorage.setItem('academicYearId', academicYearResponse[0]?.id);
         }
@@ -195,16 +223,27 @@ const handleSuccessfulLogin = async (
         localStorage.setItem('collectionFramework', collectionFramework);
 
         document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
-        const redirectUrl = new URLSearchParams(window.location.search).get(
-          'redirectUrl'
-        );
+        const query = new URLSearchParams(window.location.search);
+        const redirectUrl = query.get('redirectUrl');
+        const activeLink = query.get('activeLink');
         if (redirectUrl && redirectUrl.startsWith('/')) {
-          router.push(redirectUrl);
+          router.push(
+            `${redirectUrl}${activeLink ? `?activeLink=${activeLink}` : ''}`
+          );
         } else {
           router.push('/content');
         }
       } else {
-        showToastMessage('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT', 'error');
+        showToastMessage('Username or password not correct', 'error');
+        const telemetryInteract = {
+          context: { env: 'sign-in', cdata: [] },
+          edata: {
+            id: 'login-failed',
+            type: 'CLICK',
+            pageid: 'sign-in',
+          },
+        };
+        telemetryFactory.interact(telemetryInteract);
       }
     }
   }

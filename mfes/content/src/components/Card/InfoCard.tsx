@@ -8,41 +8,26 @@ import {
   Breadcrumbs,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import CommonModal from '../common-modal';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { ExpandableText } from '@shared-lib';
 
 interface InfoCardProps {
   item: any;
+  topic?: string;
   onBackClick?: () => void;
   _config?: any;
 }
 
-const InfoCard: React.FC<InfoCardProps> = ({ item, onBackClick, _config }) => {
+const InfoCard: React.FC<InfoCardProps> = ({
+  item,
+  topic,
+  onBackClick,
+  _config,
+}) => {
   const { _infoCard } = _config || {};
   const [openModal, setOpenModal] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [showButton, setShowButton] = useState(false);
-  const descriptionRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const checkTextHeight = () => {
-      if (descriptionRef.current) {
-        const lineHeight = parseInt(
-          window.getComputedStyle(descriptionRef.current).lineHeight
-        );
-        const height = descriptionRef.current.scrollHeight;
-        setShowButton(height > lineHeight * 2);
-      }
-    };
-
-    // Initial check
-    checkTextHeight();
-
-    // Add resize listener to handle window resizing
-    window.addEventListener('resize', checkTextHeight);
-    return () => window.removeEventListener('resize', checkTextHeight);
-  }, [item?.description]);
 
   return (
     <>
@@ -94,7 +79,7 @@ const InfoCard: React.FC<InfoCardProps> = ({ item, onBackClick, _config }) => {
                 </IconButton>
                 <Breadcrumbs separator="›" aria-label="breadcrumb">
                   <Typography variant="body1">Course</Typography>
-                  <Typography variant="body1">Electrical</Typography>
+                  {topic && <Typography variant="body1">{topic}</Typography>}
                 </Breadcrumbs>
               </Box>
             )}
@@ -114,68 +99,59 @@ const InfoCard: React.FC<InfoCardProps> = ({ item, onBackClick, _config }) => {
             >
               {item?.name}
             </Typography>
-            <Typography
-              ref={descriptionRef}
-              variant="subtitle1"
-              component="div"
-              sx={{
-                color: '#1F1B13',
-                display: '-webkit-box',
-                WebkitLineClamp: isExpanded ? 'unset' : 2,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                transition: 'all 0.3s ease-in-out',
-                maxHeight: isExpanded ? '100%' : '51px',
-              }}
-            >
-              {item?.description}
-            </Typography>
-            {showButton && (
-              <Button
-                onClick={() => setIsExpanded(!isExpanded)}
-                sx={{
-                  textTransform: 'none',
-                  color: '#1F1B13',
-                  p: 0,
-                  minWidth: 'auto',
-                  transition: 'all 0.3s ease-in-out',
-                  '&:hover': {
-                    backgroundColor: 'transparent',
-                    textDecoration: 'underline',
-                  },
-                }}
-              >
-                {isExpanded ? 'See less' : 'See more'}
-              </Button>
-            )}
+            <ExpandableText text={item?.description} number={2} />
             <Box>
-              {_infoCard?.isShowStatus && (
-                <Box
-                  sx={{
-                    width: 'fit-content',
-                    borderRadius: '12px',
-                    pt: 1,
-                    pr: 2,
-                    pb: 1,
-                    pl: 2,
-                    bgcolor: '#FFDEA1',
-                  }}
-                >
-                  Started on:{' '}
-                  {item?.startedOn
-                    ? new Intl.DateTimeFormat('en-GB', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: true,
-                      }).format(new Date(item.startedOn))
-                    : ' - '}
-                  {/* {JSON.stringify(_infoCard?.isShowStatus || {})} */}
-                </Box>
-              )}
+              {_infoCard?.isShowStatus &&
+                (item?.issuedOn ? (
+                  <Typography
+                    sx={{
+                      fontFamily: 'Poppins',
+                      fontWeight: 500,
+                      fontSize: '16px',
+                      lineHeight: '24px',
+                      color: '#00730B',
+                      letterSpacing: '0.15px',
+                    }}
+                  >
+                    <CheckCircleIcon
+                      sx={{ color: '#00730B', fontSize: 20, mr: 1 }}
+                    />
+                    Completed on:{' '}
+                    {new Intl.DateTimeFormat('en-GB', {
+                      day: '2-digit',
+                      month: 'short',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: true,
+                    }).format(new Date(item?.issuedOn))}
+                  </Typography>
+                ) : (
+                  <Box
+                    sx={{
+                      width: 'fit-content',
+                      borderRadius: '12px',
+                      pt: 1,
+                      pr: 2,
+                      pb: 1,
+                      pl: 2,
+                      bgcolor: '#FFDEA1',
+                    }}
+                  >
+                    Started on:{' '}
+                    {item?.startedOn
+                      ? new Intl.DateTimeFormat('en-GB', {
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: true,
+                        }).format(new Date(item.startedOn))
+                      : ' - '}
+                    {/* {JSON.stringify(_infoCard?.isShowStatus || {})} */}
+                  </Box>
+                ))}
               {!_infoCard?.isHideStatus && (
                 <Button
                   variant="contained"
@@ -193,7 +169,7 @@ const InfoCard: React.FC<InfoCardProps> = ({ item, onBackClick, _config }) => {
 
       <CommonModal
         open={openModal}
-        onClose={() => setOpenModal(false)}
+        // onClose={() => setOpenModal(false)}
         onStartLearning={_config?.onButtonClick}
       >
         <Box

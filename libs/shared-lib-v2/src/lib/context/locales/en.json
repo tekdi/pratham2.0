@@ -253,6 +253,8 @@
   "first_name": "First Name",
   "middle_name": "Middle Name",
   "last_name": "Last Name",
+  "HAVE_YOU_RECEIVE_ANY_PRIOR_TRAINING": "Have you received any prior training?",
+  "IS_VOLUNTEER": "Is Volunteer",
   "EMAIL": "Email",
   "phone_number": "Phone Number",
   "dob": "Date of Birth",

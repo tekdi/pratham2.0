@@ -1,5 +1,9 @@
 import { ContentCreate, ContentType } from '../utils/Interface';
-import { createContentTracking, fetchBulkContents } from './PlayerService';
+import {
+  createContentTracking,
+  fetchBulkContents,
+  updateCOurseAndIssueCertificate,
+} from './PlayerService';
 
 const lastAccessOn = new Date().toISOString();
 
@@ -194,22 +198,23 @@ export const contentWithTelemetryData = async ({
   userId: propUserId,
 }: any) => {
   try {
-    let resolvedMimeType = localStorage.getItem('mimeType');
+    const response = await fetchBulkContents([identifier, courseId]);
+    const course = response?.find(
+      (content: any) => content.identifier === courseId
+    );
+    const resolvedMimeType = response[0]?.mimeType || '';
     if (!resolvedMimeType) {
-      const response = await fetchBulkContents([identifier]);
-      resolvedMimeType = response[0]?.mimeType || '';
-      if (!resolvedMimeType) {
-        console.error('Failed to fetch mimeType.');
-        return;
-      }
+      console.error('Failed to fetch mimeType.');
+      return;
     }
+
     let userId = '';
     if (propUserId) {
       userId = propUserId;
     } else if (typeof window !== 'undefined' && window.localStorage) {
       userId = localStorage.getItem('userId') ?? '';
     }
-    console.log(userId, propUserId, 'sagar');
+
     if (userId !== undefined || userId !== '') {
       const ContentTypeReverseMap = Object.fromEntries(
         Object.entries(ContentType).map(([key, value]) => [value, key])
@@ -227,7 +232,11 @@ export const contentWithTelemetryData = async ({
       // if (detailsObject.length > 0) {
       const response = await createContentTracking(reqBody);
       if (response) {
-        console.log(response);
+        await updateCOurseAndIssueCertificate({
+          userId,
+          course,
+          unitId,
+        });
       }
     }
   } catch (error) {
