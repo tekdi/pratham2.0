@@ -135,7 +135,6 @@
     "AND_COUNT_MORE": "और {{count}} अधिक",
     "RETURN_TO_LOGIN": "लॉगिन पर वापस जाएं",
     "NO_CENTER_FOUND": "कोई केंद्र नहीं मिला",
-
     "FILTER_BY": "फ़िल्टर करें",
     "ALL": "सभी",
     "ACTIVE": "सक्रिय",
@@ -146,7 +145,38 @@
     "SURE_MARK": "क्या आप सुनिश्चित हैं कि आप इस उपस्थिति को चिह्नित करना चाहते हैं?",
     "CANNOT_REASSIGN_TODAY_ATTENDANCE_MARKED": "आज की उपस्थिति पहले ही चिह्नित की जा चुकी है, इसलिए शिक्षार्थी को पुनः आवंटित नहीं किया जा सकता",
     "INCORRECT_DATA_ENTRY": "गलत डेटा प्रविष्टि",
-    "DUPLICATED_USER": "डुप्लिकेट उपयोगकर्ता"
+    "DUPLICATED_USER": "डुप्लिकेट उपयोगकर्ता",
+    "RESIGNATION": "Resignation",
+    "FACILITATOR_COUNT": "Facilitators Total count: {{count}}",
+    "LEARNER_COUNT": "Learners Total count: {{count}}",
+    "FILTER_BY_ATTENDANCE_PERCENTAGE": "Filters By Attendance Percentage",
+    "MORE_THAN": "More than {{range}} %",
+    "BETWEEN": "Between {{lowerLimit}} - {{upperLimit}} %",
+    "LESS_THAN": "Less than {{range}} %",
+    "MODIFY_CENTER_ATTENDANCE": "Modify Center Attendance",
+    "SUPPORT_REQUEST": "Support Request",
+    "WE_ARE_HERE_TO_HELP": "We're Here to Help",
+    "SUBMIT_YOUR_REQUEST_FOR_ISSUES": "Submit your request and let us assist you with any issues or concerns.",
+    "INSTALL": "Install Now",
+    "INSTALL_APP_MESSAGE": "For Easy Access, Install the App Now",
+    "INSTALL_APP_DESCRIPTION": "Get access to the Pratham Learning Management Portal (LMP) at your fingertips by installing on your device.",
+    "RELOAD": "Update Now",
+    "UPDATE_AVAILABLE": "New Update Available!",
+    "RELOAD_TO_UPDATE": "Get the latest features and improvements—update now to enjoy a smoother experience and stay up-to-date!",
+    "NO_ASSIGNED_BOARDS": "No assigned Board for selected Center",
+    "YOU_HAVE_UNSAVED_CHANGES": "You have unsaved changes. Are you sure you want to go back?",
+    "ATTENDANCE_IS_USUALLY": " Attendance is usually auto-marked after the first session of the day.",
+    "ARE_YOU_SURE_MANUALLY": "Are you sure you want to mark attendance manually?",
+    "USE_MANUAL": "Use manual marking only for technical issues, sessions on other platforms, or if not conducted online.",
+    "NOTE_MANUALLY": "Note: Manually marked attendance will override auto-attendance if it is later recorded.",
+    "YES_MANUALLY": "Yes, Mark Manually",
+    "NO_CENTER_AND_BATCH_FOUND": "No Center & Batch Found",
+    "NO_BATCH_FOUND": "No Batch Found",
+    "BATCH": "Batch",
+    "BATCHES": "Batches",
+    "BATCH_SESSIONS": "Batch Sessions",
+    "NOT_ABLE_CREATE_LEARNER": "Not able to create learner",
+    "NOT_ABLE_CREATE_FACILITATOR": "Not Able To Create Teacher"
   },
   "LOGIN_PAGE": {
     "USERNAME": "उपयोगकर्ता नाम",
@@ -220,7 +250,12 @@
     "REGULAR_AVERAGE_ATTENDANCE": "नियमित औसत उपस्थिति",
     "BLOCK": "ब्लॉक",
     "ATTENDANCE": "उपस्थिति (%)",
-    "WORKSPACE": "कार्यस्थान"
+    "WORKSPACE": "कार्यस्थान",
+    "VILLAGES_AND_YOUTH": "Villages and Youth",
+    "USERS_&_VILLAGES": "Users & Villages",
+    "VILLAGES": "Villages",
+    "YOUTH_VOLUNTEERS": "Youth/Volunteers",
+    "SEARCH_VILLAGES": "Search Villages"
   },
   "ATTENDANCE": {
     "TOTAL_STUDENTS": "कुल छात्रों की संख्या: {{count}}",
@@ -253,7 +288,11 @@
     "ATTENDANCE_MARKED_OUT_OF_DAYS": "उपस्थिति चिह्नित: पिछले 7 दिनों में से {{count}} दिन",
     "NO_CENTERS_ASSIGNED": "कोई केंद्र असाइन नहीं किया गया",
     "NO_ATTENDANCE": "0 %",
-    "UNKNOWN": "अज्ञात"
+    "UNKNOWN": "अज्ञात",
+    "MARK_MANUAL_ATTENDANCE_CONFIRMATION": "Are you sure you want to mark attendance manually?",
+    "MANUAL_ATTENDANCE_INFO": "Attendance is usually auto-marked after the first session of the day. Use manual marking only for technical issues, sessions on other platforms, or if not conducted online.",
+    "MANUAL_ATTENDANCE_NOTE": "Note: Manually marked attendance will override auto-attendance if it is later recorded.",
+    "NO_BATCHES_ASSIGNED": "No Batches Assigned"
   },
   "PROFILE": {
     "EDIT_PROFILE": "प्रोफ़ाइल संपादित करें",
@@ -276,7 +315,7 @@
     "SUBMITTED_ON": "प्रस्तुत किया गया",
     "MARK_OBTAINED": "प्राप्त अंक",
     "TOTAL_QUESTIONS": "कुल प्रश्न",
-    "VIEW_FULL_PROFILE": "पूरा प्रोफाइल देखें",
+    "VIEW_FULL_PROFILE": "View Full Profile",
     "SUBJECT": "विषय",
     "POST_TEST": "पोस्ट टेस्ट",
     "PRE_TEST": "प्री टेस्ट",
@@ -386,7 +425,8 @@
     "SEARCH_CENTERS": "केंद्र खोजें",
     "ERROR_EMPTY": "केंद्र का नाम खाली नहीं हो सकता",
     "ERROR_NUMBER": "केंद्र का नाम संख्या नहीं हो सकता",
-    "DUPLICATE_CENTER": "केंद्र पहले से ही मौजूद है"
+    "DUPLICATE_CENTER": "केंद्र पहले से ही मौजूद है",
+    "RENAME_BATCH": "Rename Batch"
   },
   "CENTER_SESSION": {
     "THIS_SESSION": "यह सत्र",
@@ -456,7 +496,6 @@
     "IDENTIFIER_NOT_FOUND": "पहचानकर्ता नहीं मिला! सामग्री नहीं खोल सकते!",
     "PREREQUISITES": "पूर्व-आवश्यकताएँ",
     "POST_REQUISITES": "पश्च-आवश्यकताएँ",
-
     "SELECT_SESSION": "कृपया सत्र का प्रकार चुनें",
     "MEETING_LINK_REQUIRED": "कृपया बैठक लिंक दर्ज करें!",
     "WEEKDAY_ERROR": "कृपया आवर्ती कार्यक्रम के लिए कम से कम एक सप्ताह का दिन चुनें।",
@@ -469,7 +508,12 @@
     "PLANNED_SESSION_END_DATE_TIME_REQUIRED_ERROR": "कृपया नियोजित सत्र के लिए एक मान्य समाप्ति समय प्रदान करें।",
     "INVALID_DATE": "अमान्य तिथि।",
     "INVALID_EVENT_CONFIGURATION": "अमान्य कार्यक्रम विन्यास। कृपया अपनी इनपुट जांचें।",
-    "MEETING_URL_ERROR": "कृपया एक मान्य बैठक URL प्रदान करें।"
+    "MEETING_URL_ERROR": "कृपया एक मान्य बैठक URL प्रदान करें।",
+    "COMPLETED": "Completed",
+    "INPROGRESS": "In Progress",
+    "NOTSTARTED": "Not Started",
+    "START_DATE_MUST_BE_TODAY_OR_FUTURE_DATE": "Start date must be today or future date",
+    "DATE_MUST_BE_TODAY_OR_FUTURE_DATE": "Date must be today or future date"
   },
   "MANAGE_USERS": {
     "CENTERS_REQUEST_FAILED": "केंद्र अनुरोध विफल रहा",
@@ -494,7 +538,7 @@
     "NON_AGRICULTURAL_LABORER": "गैर-कृषि श्रमिक",
     "SALARIED_WORK": "सैलरी वाली नौकरी",
     "SELF_EMPLOYMENT": "स्व-रोज़गार",
-    "UNEMPLOYED": "बेरोज़गार",
+    "UNEMPLOYED": "बेरोज़गार",
     "INVOLVED_IN_DOMESTIC_WORK": "घरेलू काम में संलग्न",
     "ENTER_YOUR_FATHER_NAME": "अपने पिता का नाम दर्ज करें",
     "CLASS_OR_LAST_PASSED_GRADE": "कक्षा (अंतिम पास की गई कक्षा)",
@@ -561,7 +605,36 @@
     "SCIENCE": "विज्ञान",
     "SOCIAL_SCIENCE": "सामाजिक विज्ञान",
     "LIFE_SKILLS": "जीवन कौशल",
-    "NUMBER_OF_CLUSTERS_I_TEACH": "क्लस्टर की संख्या जो मैं पढ़ाता हूँ"
+    "NUMBER_OF_CLUSTERS_I_TEACH": "क्लस्टर की संख्या जो मैं पढ़ाता हूँ",
+    "PREFERRED_LANGUAGE": "Preferred Language",
+    "FIRST_NAME": "First Name",
+    "MIDDLE_NAME_OR_FATHER_NAME": "Middle Name or Father Name",
+    "LAST_NAME": "Last Name",
+    "USERNAME": "Username",
+    "MOTHER_NAME": "Mother Name",
+    "DATE_OF_BIRTH": "Date of Birth",
+    "NAME_OF_GUARDIAN": "Name of Guardian",
+    "RELATION_WITH_GUARDIAN": "Relation with Guardian",
+    "PHONE_NUMBER": "Phone Number",
+    "DOES_THIS_PHONE_BELONG_TO_YOU": "Does This Phone Belong to You?",
+    "HIGHEST_EDCATIONAL_QUALIFICATION_OR_LAST_PASSED_GRADE": "Highest Educational Qualification or Last Passed Grade",
+    "WHAT_IS_YOUR_PREFERRED_MODE_OF_LEARNING": "What is Your Preferred Mode of Learning?",
+    "ARE_YOU_CURRENTLY_WORKING_IF_YES_CHOOSE_THE_DOMAIN": "Are You Currently Working? If Yes, Choose the Domain",
+    "HAVE_YOU_RECEIVE_ANY_PRIOR_TRAINING": "Have You Received Any Prior Training?",
+    "WHAT_DO_YOU_WANT_TO_BECOME": "What do you want to become?",
+    "EDUCATIONAL_INSTITUTE": "Educational Institute",
+    "UNEMPLOYED_OR_DOMESTIC_WORK": "Unemployed or Domestic Work",
+    "SELF_PLACED": "Self Placed",
+    "TRANSGENDER": "Transgender",
+    "HINDI": "Hindi",
+    "MARATHI": "Marathi",
+    "URDU": "Urdu",
+    "DIVORCED/WIDOW": "Divorced/Widow",
+    "AVAILABLE_SUGGESTIONS": "Available suggestions:",
+    "USERNAME_ALREADY_EXIST": "This username already exists",
+    "EMAIL_ALREADY_EXIST": "Email is already exists",
+    "GRADUATE": "Graduate",
+    "POST_GRADUATE": "Post Graduate"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "अवैध इनपुट।",
@@ -578,7 +651,10 @@
     "ENTER_VALID_YEAR": "वैध वर्ष दर्ज करें",
     "MUST_BE_LESS_THAN": "{{fieldname}} {{maxLength}} से कम होना चाहिए",
     "MUST_BE_GREATER_THAN": "{{fieldname}} {{minLength}} से अधिक होना चाहिए",
-    "ENTER_VALID_CENTER_NAME": "वैध केंद्र नाम दर्ज करें"
+    "ENTER_VALID_CENTER_NAME": "वैध केंद्र नाम दर्ज करें",
+    "SPACE_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "Space and special characters are not allowed",
+    "DATE_MUST_BE_ON_OR_BEFORE": "Date must be on or before {{date}}",
+    "DATE_MUST_BE_ON_OR_AFTER": "Date must be on or after {{date}}"
   },
   "COURSE_PLANNER": {
     "COURSE_PLANNER": "पाठ्यचर्या योजना",
@@ -613,7 +689,8 @@
     "NUMBER_OUT_OF_COMPLETED": "{{completedCount}} में से {{totalCount}} पूरा हुआ",
     "NO_SUBTOPIC_SELECTED": "कोई उपविषय चयनित नहीं किया गया",
     "NO_SUBJECT_FOUND": "कोई विषय नहीं मिला",
-    "NO_ASSIGNED": "कोई असाइन नहीं किया गया"
+    "NO_ASSIGNED": "कोई असाइन नहीं किया गया",
+    "OUT_OF": "Out of"
   },
   "BOARD_ENROLMENT": {
     "BOARD_ENROLLMENT": "बोर्ड नामांकन",
@@ -625,7 +702,7 @@
     "BOARD_ENROLLMENT_NUMBER": "बोर्ड पंजीकरण संख्या",
     "EXAM_FEES_PAID": "परीक्षा शुल्क का भुगतान किया? (वैकल्पिक)",
     "SAVE_AND_NEXT": "सहेजें और आगे बढ़ें",
-    "TO_SAVE_YOUR_PROGRESS": "“सहेजें और आगे बढ़ें” पर क्लिक करके अपनी प्रगति सहेजें। आप इसे कभी भी बदल सकते हैं।",
+    "TO_SAVE_YOUR_PROGRESS": "सहेजें और आगे बढ़ें पर क्लिक करके अपनी प्रगति सहेजें। आप इसे कभी भी बदल सकते हैं।",
     "MANDATORY": "{{FeesStepBoards}} के लिए अनिवार्य। अन्य बोर्डों के लिए, यह चरण स्वचालित रूप से पूर्ण हो जाता है। कृपया डेटा सबमिट करने के लिए सहेजें पर क्लिक करें।",
     "COMPLETED": "पूर्ण",
     "MARK_AS_COMPLETE": "समाप्त के रूप में चिह्नित करें",
@@ -663,7 +740,8 @@
     "SURVEY_FORMS": "सर्वेक्षण फॉर्म",
     "OBSERVATION_STATUS": "निरीक्षण की वर्तमान स्थिति",
     "OBSERVATION_NOT_STARTED_YET": "सर्वेक्षण अभी शुरू नहीं हुआ है।",
-    "EXPIRED": "समाप्त हो गया।"
+    "EXPIRED": "समाप्त हो गया।",
+    "ARE_YOU_SURE_YOU_TO_SUBMIT_FORM": "Are you sure to submit the form?"
   },
 
   "YOUTHNET_SURVEY": {
@@ -680,7 +758,9 @@
     "CLOSED_ON": "बंद किया गया",
     "ABOVE_18": "18 वर्ष से अधिक पंजीकरण",
     "BELOW_18": "18 वर्ष से कम पंजीकरण",
-    "VLLAGE_18": "आज के नए पंजीकरण"
+    "VLLAGE_18": "आज के नए पंजीकरण",
+    "MANAGES": "Manages",
+    "VILLAGES": "Villages"
   },
 
   "YOUTHNET_VOLUNTEERLIST": {
@@ -705,5 +785,124 @@
   "YOUTHNET_CAMP_DETAILS": {
     "SUBMISSION": "प्रस्तुत करना",
     "SUMMARY": "सारांश"
-  }
+  },
+
+  "SCP_PROFILE": {
+    "MY_PROFILE": "My Profile",
+    "ACTIVITIES_CONDUCTED": "Activities conducted",
+    "PROFILE_DETAILS": "Profile Details",
+    "FULL_NAME": "Full Name",
+    "EMAIL_ID": "Email ID",
+    "STATE_DISTRICT_BLOCK": "State District Block",
+    "DESIGNATION": "Designation",
+    "JOINED_ON": "Joined on",
+    "PHONE_NUMBER": "Phone Number",
+    "MENTOR_ID": "Mentor ID",
+    "GENDER": "Gender",
+    "AGE": "Age",
+    "VOLUNTEERING_DETAILS": "Volunteering details",
+    "MARK_AS_VOLUNTEER": "Mark as Volunteer",
+    "DOB": "Date of Birth",
+    "STATE_DISTRICT_BLOCK_VILLAGE": "Village Block District State",
+    "USERNAME": "Username",
+    "SUBJECTS_I_TEACH": "Subjects I Teach",
+    "MY_MAIN_SUBJECTS": "My Main Subjects"
+  },
+  "YOUTHNET_USERS_AND_VILLAGES": {
+    "MENTORS": "Mentors",
+    "CSV": "CSV",
+    "SEARCH_MENTORS": "Search Mentors...",
+    "MARK_AS_VOLUNTEER": "Mark as Volunteer",
+    "ADD_OR_REASSIGN_VILLAGES": "Add or Re-assign Villages",
+    "REQUEST_TO_REASSIGN_DISTRICT": "Request to Re-assign District",
+    "DELETE_USER_PERMANENTLY": "Delete User Permanently",
+    "REQUEST_USER_TO_DIFFERENT_MENTOR": "Re-assign user to a different Mentor Leader",
+    "SAVE_PROGRESS": "Save progress",
+    "FINISH_ASSIGN": "Finish & Assign",
+    "SEND_REQUEST_TO_ADMIN_TEXT": "You are sending a request to the State Admin to re-assign this user to another district",
+    "SELECT_STATE": "Select State",
+    "SELECT_DISTRICT": "Select District",
+    "SELECT": "Select",
+    "ASSIGN_VILLAGES_FROM_BLOCK": "Assign Villages from Block",
+    "ASSIGN_VILLAGES_FROM_BLOCK_INFO": "You can complete this later at your own pace. However, the villages will only be assigned once you click on 'Finish.'"
+  },
+  "SURVEYS": {
+    "SURVEYS": "Surveys",
+    "ACTIVE_SURVEYS": "Active Surveys",
+    "PREVIOUS_SURVEYS": "Previous Surveys",
+    "VILLAGES": "Villages",
+    "SUBMISSION": "Submissions",
+    "SUMMARY": "Summary"
+  },
+  "FACILITATORS": {
+    "NEW_FACILITATOR": "New Facilitators"
+  },
+  "MENTOR": {
+    "BACK_TO_FORM": "Back to Form",
+    "FINISH_ASSIGN": "Finish & Assign"
+  },
+  "LEARNERS": {
+    "NEW_LEARNER": "New Learners"
+  },
+  "VILLAGE": "Village",
+  "first_name": "First Name",
+  "middle_name": "Middle Name",
+  "last_name": "Last Name",
+  "dob": "Date of Birth",
+  "WHATS_YOUR_GENDER": "Gender",
+  "Male": "Male",
+  "Female": "Female",
+  "Transgender": "Transgender",
+  "email": "Email",
+  "phone_number": "Phone Number",
+  "DESIGNATION": "Designation",
+  "Facilitator": "Facilitator",
+  "MY_MAIN_SUBJECTS": "My Main Subjects",
+  "English": "English",
+  "Home Science": "Home Science",
+  "Math": "Math",
+  "Language": "Language",
+  "Science": "Science",
+  "Social Science": "Social Science",
+  "Life Skills": "Life Skills",
+  "SUBJECTS_I_TEACH": "Subjects I Teach",
+  "MOTHER_NAME": "Mother Name",
+  "HIGHEST_EDCATIONAL_QUALIFICATION_OR_LAST_PASSED_GRADE": "Highest Educational Qualification or Last Passed Grade",
+  "MARITAL_STATUS": "Marital Status",
+  "TYPE_OF_PHONE_AVAILABLE": "Type of Phone Available",
+  "Smartphone": "Smartphone",
+  "Keypad": "Keypad",
+  "DOES_THIS_PHONE_BELONG_TO_YOU": "Does This Phone Belong to You?",
+  "USERNAME": "Username",
+  "NAME_OF_GUARDIAN": "Name of Guardian",
+  "RELATION_WITH_GUARDIAN": "Relation with Guardian",
+  "PARENT_GUARDIAN_PHONE_NO": "Parent/Guardian Phone Number",
+  "WHAT_IS_YOUR_PREFERRED_MODE_OF_LEARNING": "What is Your Preferred Mode of Learning?",
+  "REASON_FOR_DROP_OUT_FROM_SCHOOL": "Reason for drop out from School",
+  "ARE_YOU_CURRENTLY_WORKING_IF_YES_CHOOSE_THE_DOMAIN": "Are You Currently Working? If Yes, Choose the Domain",
+  "WHAT_DO_YOU_WANT_TO_BECOME": "What do you want to become?",
+  "UNMARRIED": "Unmarried",
+  "MARRIED": "Married",
+  "DIVORCED": "Divorced",
+  "SELF_PLACED": "Self Placed",
+  "REMOTE": "Remote",
+  "REGULAR": "Regular",
+  "SCHOOL_INACCESSIBLE": "School inaccessible",
+  "FINANCIAL_CONSTRAINTS": "Financial Constraints",
+  "LACK_OF_INTEREST": "Lack of Interest",
+  "FAMILY_RESPONSIBILITIES": "Family responsibilities",
+  "FAILED": "Failed",
+  "ILLNESS": "Illness",
+  "MARRIAGE": "Marriage",
+  "MIGRATION": "Migration",
+  "STARTED_VOCATIONAL_COURSE": "Started vocational course",
+  "STARTED_JOB": "Started a job",
+  "SCHOOL_CLOSURE_DUE_TO_COVID": "School closure due to covid",
+  "ENROLLED_IN_EDUCATIONAL_INSTITUTE": "Enrolled in educational institute",
+  "OWN_FARMING": "Own farming",
+  "AGRICULTURAL_FARM_LABORER": "Agricultural farm laborer",
+  "NON_AGRICULTURAL_LABORER": "Non-agricultural laborer",
+  "SALARIED_WORK": "Salaried work",
+  "SELF_EMPLOYMENT": "Self-employment",
+  "UNEMPLOYED_OR_DOMESTIC_WORK": "Unemployed or Domestic Work"
 }
