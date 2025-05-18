@@ -319,13 +319,14 @@ const AboutUsPage = () => {
               mt: 2,
             }}
           >
-            Pratham is an innovative learning organization created to improve
-            the quality of education in India. As one of the largest
-            non-governmental organizations in the country, Pratham focuses on
-            high-quality, low-cost, and replicable interventions to address gaps
-            in the education system. Established in 1995 to provide education to
-            children in the slums of Mumbai, Pratham has grown both in scope and
-            geographical coverage.
+            Pratham Education Foundation (Pratham) is one of the largest NGOs in
+            India, with a record of innovative, rigorously evaluated programs.
+            With a history spanning 30 years, Pratham's journey began with
+            pre-school initiatives in the urban slums of Mumbai. Today, Pratham
+            offers tailored programs for preschool and elementary school age
+            groups, women and older women, and youth. Working directly with
+            communities as well as through large-scale collaborations with
+            government systems, Pratham reaches millions of lives every year.
           </Typography>
           <Box
             sx={{

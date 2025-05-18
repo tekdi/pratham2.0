@@ -90,9 +90,11 @@ const keyThemesList = [
   ],
 ];
 const descriptions = [
-  'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
-  'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
-  'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
+  `
+  Learning for School focuses on scholastic subjects, which include early years education and learning to read, write, and think. These skills are crucial for building children's confidence and dignity among their peers.
+  `,
+  'Learning for Work equips adolescents and youth with the skills and knowledge needed for employment and livelihoods.',
+  'Learning for Life encompasses skills and knowledge that are a part of lifelong learning like transferable skills, interests, hobbies, and creativity. These also include life skills but are not limited to them.  It emphasises environmental awareness, physical and mental well-being, and extends learning beyond scholastic subjects.',
 ];
 
 const page = () => {
@@ -246,9 +248,10 @@ const page = () => {
                 },
               }}
             >
-              Description about Open School here. A place where learning has no
-              limits. Whether you're here to explore new subjects, revisit past
-              lessons.
+              Pratham Open School offers free, downloadable videos, games,
+              reading material and stories in 15 languages for ages 1 to 18+,
+              designed to support self-led learning and group learning through
+              activities and projects.
             </Typography>
             <Box
               sx={{
