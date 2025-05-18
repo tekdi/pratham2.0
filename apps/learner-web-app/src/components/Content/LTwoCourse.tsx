@@ -110,6 +110,7 @@ const LTwoCourse: React.FC = () => {
         gender: userResponse?.gender ?? '',
         email_address: userResponse?.email ?? '',
         dob: userResponse?.dob ?? '',
+        enrollmentId: userResponse?.enrollmentId ?? '',
         qualification:
           userResponse?.HIGHEST_EDCATIONAL_QUALIFICATION_OR_LAST_PASSED_GRADE ??
           '',
@@ -120,8 +121,8 @@ const LTwoCourse: React.FC = () => {
         village: userResponse?.VILLAGE ?? '',
         blood_group: '',
         userId: userResponse?.userId ?? '',
-        courseId: selectedTopic?.courses?.[0]?.name ?? '',
-        courseName: selectedTopic?.courses?.[0]?.courseId ?? '',
+        courseId: selectedTopic?.courses?.[0]?.courseId ?? '',
+        courseName: selectedTopic?.courses?.[0]?.name ?? '',
         topicName: selectedTopic?.topic ?? '',
       };
 

@@ -10,7 +10,6 @@ export default function PosPage() {
     <List
       _infoCard={false}
       pagename="Program"
-      hideStaticFilter={true}
       _content={{ contentTabs: ['content'] }}
     />
   );
