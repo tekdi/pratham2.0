@@ -89,15 +89,17 @@ const App = (props: { userIdLocalstorageName?: string }) => {
       sx={{
         display: 'flex',
         flexDirection: { xs: 'column', md: 'row' },
-        gap: 4,
-        p: { xs: 2, md: 4 },
+        gap: 2,
+        px: { xs: 2 },
+        pb: { xs: 1 },
+        pt: 4,
       }}
     >
       <Box
         sx={{
           display: 'flex',
-          flex: { xs: 1, md: 8 },
-          gap: 2,
+          flex: { xs: 1, md: 15 },
+          gap: 1,
           flexDirection: 'column',
           width: relatedIdentity.length > 0 ? 'initial' : '100%',
         }}
@@ -129,15 +131,14 @@ const App = (props: { userIdLocalstorageName?: string }) => {
         <Box
           sx={{
             display: 'flex',
-            gap: 2,
             flexDirection: 'column',
-            pb: 2,
+            // pb: 2,
           }}
         >
           <Typography
             sx={{
               fontWeight: 700,
-              fontSize: '36px',
+              fontSize: '24px',
               lineHeight: '44px',
             }}
           >
@@ -147,7 +148,7 @@ const App = (props: { userIdLocalstorageName?: string }) => {
             <Typography
               sx={{
                 fontWeight: 400,
-                fontSize: '16px',
+                fontSize: '14px',
                 lineHeight: '24px',
                 display: '-webkit-box',
                 WebkitLineClamp: 2,
@@ -155,7 +156,7 @@ const App = (props: { userIdLocalstorageName?: string }) => {
                 WebkitBoxOrient: 'vertical',
               }}
             >
-              {item?.content?.description ?? '-'}
+              {item?.content?.description ?? 'no description'}
             </Typography>
           )}
         </Box>
@@ -172,7 +173,7 @@ const App = (props: { userIdLocalstorageName?: string }) => {
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            flex: { xs: 1, sm: 1, md: 4 },
+            flex: { xs: 1, sm: 1, md: 9 },
           }}
         >
           <Typography
@@ -200,6 +201,15 @@ const App = (props: { userIdLocalstorageName?: string }) => {
               },
             }}
             _config={{
+              _card: {
+                sx: {
+                  width: '203px',
+                },
+              },
+              _subBox: {
+                overflowY: 'scroll',
+                maxHeight: 'calc(100vh - 204px)', // Adjust height as needed
+              },
               default_img: '/images/image_ver.png',
             }}
           />
@@ -292,7 +302,7 @@ const PlayerBox = ({
           style={{
             // display: 'block',
             // padding: 0,
-            height: 'calc(100vh - 287px)',
+            height: 'calc(100vh - 100px)',
             border: 'none',
           }}
           width="100%"

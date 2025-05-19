@@ -202,7 +202,7 @@ export default memo(function LearnerCourse({
               default_img: '/images/image_ver.png',
               _card: { isHideProgress: true },
               _subBox: {
-                overflowY: 'auto',
+                overflowY: 'scroll',
                 maxHeight: 'calc(100vh - 200px)', // Adjust height as needed
               },
               ..._content?._config,
