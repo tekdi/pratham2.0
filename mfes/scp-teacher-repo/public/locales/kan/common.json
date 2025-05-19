@@ -154,7 +154,33 @@
     "LESS_THAN": "{{range}} ಕ್ಕಿಂತ ಕಡಿಮೆ %",
     "MODIFY_CENTER_ATTENDANCE": "ಕೇಂದ್ರ ಹಾಜರಾತಿಯನ್ನು ಮಾರ್ಪಡಿಸಿ",
     "NO_VILLAGES": "ಗ್ರಾಮಗಳಿಲ್ಲ",
-    "ALL_VILLAGES": "ಎಲ್ಲಾ ಗ್ರಾಮಗಳು"
+    "ALL_VILLAGES": "ಎಲ್ಲಾ ಗ್ರಾಮಗಳು",
+    "RESIGNATION": "ರಾಜೀನಾಮೆ",
+    "SUPPORT_REQUEST": "ಬೆಂಬಲ ಕೋರಿಕೆ",
+    "WE_ARE_HERE_TO_HELP": "ನಾವು ನಿಮ್ಮ ಸಹಾಯಕ್ಕಾಗಿ ಇಲ್ಲಿದ್ದೇವೆ",
+    "SUBMIT_YOUR_REQUEST_FOR_ISSUES": "ನಿಮ್ಮ ಕೋರಿಕೆಯನ್ನು ಸಲ್ಲಿಸಿ ಮತ್ತು ಯಾವುದೇ ಸಮಸ್ಯೆ ಅಥವಾ ಕಾಳಜಿಯಲ್ಲಿ ನಮಗೆ ನಿಮಗೆ ಸಹಾಯ ಮಾಡಲು ಅವಕಾಶ ನೀಡಿ。",
+    "INSTALL": "ಈಗ ಸ್ಥಾಪಿಸಿ",
+    "INSTALL_APP_MESSAGE": "ಸುಲಭ ಪ್ರವೇಶಕ್ಕಾಗಿ, ಈಗ ಆಪ್ ಸ್ಥಾಪಿಸಿ",
+    "INSTALL_APP_DESCRIPTION": "ನಿಮ್ಮ ಡಿವೈಸ್‌ನಲ್ಲಿ ಸ್ಥಾಪಿಸುವ ಮೂಲಕ ಪ್ರಥಮ ಲರ್ನಿಂಗ್ ಮ್ಯಾನೇಜ್‌ಮೆಂಟ್ ಪೋರ್ಟಲ್ (LMP) ಅನ್ನು ನಿಮ್ಮ ಬೆರಳತುದಿಯಲ್ಲಿ ಪಡೆಯಿರಿ।",
+    "RELOAD": "ಈಗ ನವೀಕರಿಸಿ",
+    "UPDATE_AVAILABLE": "ಹೊಸ ನವೀಕರಣ ಲಭ್ಯವಿದೆ!",
+    "RELOAD_TO_UPDATE": "ಇತ್ತೀಚಿನ ವೈಶಿಷ್ಟ್ಯಗಳು ಮತ್ತು ಸುಧಾರಣೆಗಳನ್ನು ಪಡೆಯಲು ಈಗ ನವೀಕರಿಸಿ ಮತ್ತು ಸುಗಮ ಅನುಭವವನ್ನು ಆನಂದಿಸಿ!",
+    "NO_ASSIGNED_BOARDS": "ಆಯ್ಕೆಮಾಡಿದ ಕೇಂದ್ರಕ್ಕೆ ಯಾವುದೇ ಬೋರ್ಡ್‌ಗಳನ್ನು ನಿಯೋಜಿಸಲಾಗಿಲ್ಲ",
+    "YOU_HAVE_UNSAVED_CHANGES": "ನೀವು ಉಳಿಸದಿರುವ ಬದಲಾವಣೆಗಳನ್ನು ಹೊಂದಿದ್ದೀರಿ. ನೀವು ನಿಜವಾಗಿಯೂ ಹಿಂದಿರುಗಲು ಬಯಸುವಿರಾ?",
+    "ATTENDANCE_IS_USUALLY": "ಹಾಜರಾತಿಯನ್ನು ಸಾಮಾನ್ಯವಾಗಿ ದಿನದ ಮೊದಲ ಸೆಷನ್‌ನ ನಂತರ ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಗುರುತಿಸಲಾಗುತ್ತದೆ।",
+    "ARE_YOU_SURE_MANUALLY": "ನೀವು ನಿಜವಾಗಿಯೂ ಹಾಜರಾತಿಯನ್ನು ಕೈಯಾರೆ ಗುರುತಿಸಲು ಬಯಸುವಿರಾ?",
+    "USE_MANUAL": "ತಾಂತ್ರಿಕ ಸಮಸ್ಯೆಗಳು, ಇತರ ಪ್ಲಾಟ್‌ಫಾರ್ಮ್‌ಗಳಲ್ಲಿ ಸೆಷನ್‌ಗಳು, ಅಥವಾ ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ನಡೆಯದಿದ್ದರೆ ಮಾತ್ರ ಕೈಯಾರೆ ಗುರುತಿಸುವಿಕೆಯನ್ನು ಬಳಸಿ।",
+    "NOTE_MANUALLY": "ಗಮನಿಸಿ: ಕೈಯಾರೆ ಗುರುತಿಸಿದ ಹಾಜರಾತಿಯು ಸ್ವಯಂಚಾಲಿತ ಹಾಜರಾತಿಯನ್ನು ಮೀರಿಸುತ್ತದೆ, ಒಂದು ವೇಳೆ ಇದನ್ನು ನಂತರ ದಾಖಲಿಸಿದರೆ।",
+    "YES_MANUALLY": "ಹೌದು, ಕೈಯಾರೆ ಗುರುತಿಸಿ",
+    "NO_CENTER_AND_BATCH_FOUND": "ಯಾವುದೇ ಕೇಂದ್ರ ಮತ್ತು ಬ್ಯಾಚ್ ಕಂಡುಬಂದಿಲ್ಲ",
+    "NO_BATCH_FOUND": "ಯಾವುದೇ ಬ್ಯಾಚ್ ಕಂಡುಬಂದಿಲ್ಲ",
+    "BATCH": "ಬ್ಯಾಚ್",
+    "BATCHES": "ಬ್ಯಾಚ್‌ಗಳು",
+    "BATCH_SESSIONS": "ಬ್ಯಾಚ್ ಸೆಷನ್‌ಗಳು",
+    "NOT_ABLE_CREATE_LEARNER": "ಕಲಿಯುವವರನ್ನು ರಚಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ",
+    "NOT_ABLE_CREATE_FACILITATOR": "ಸುಗಮಕಾರರನ್ನು ರಚಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ",
+    "PLEASE_SELECT_THE_CENTER": "ದಯವಿಟ್ಟು ಕೇಂದ್ರವನ್ನು ಆಯ್ಕೆಮಾಡಿ",
+    "USERS_&VILLAGES": "ಬಳಕೆದಾರರು ಮತ್ತು ಗ್ರಾಮಗಳು"
   },
   "LOGIN_PAGE": {
     "USERNAME": "ಬಳಕೆದಾರಹೆಸರು",
@@ -231,7 +257,9 @@
     "WORKSPACE": "ಕಾರ್ಯಸ್ಥಳ",
     "VILLAGES_AND_YOUTH": "ಗ್ರಾಮಗಳು ಮತ್ತು ಯುವಕರು",
     "VILLAGES": "ಗ್ರಾಮಗಳು",
-    "YOUTH_VOLUNTEERS": "ಯುವಕರು/ಸ್ವಯಂಸೇವಕರು"
+    "YOUTH_VOLUNTEERS": "ಯುವಕರು/ಸ್ವಯಂಸೇವಕರು",
+    "USERS_&VILLAGES": "ಬಳಕೆದಾರರು ಮತ್ತು ಗ್ರಾಮಗಳು",
+    "SEARCH_VILLAGES": "ಗ್ರಾಮಗಳನ್ನು ಹುಡುಕಿ"
   },
   "ATTENDANCE": {
     "TOTAL_STUDENTS": "ಒಟ್ಟು ಕಲಿಯುವವರ ಸಂಖ್ಯೆ: {{count}}",
@@ -264,7 +292,11 @@
     "ATTENDANCE_MARKED_OUT_OF_DAYS": "ಹಾಜರಾತಿ: ಕಳೆದ 7 ದಿನಗಳಲ್ಲಿ {{count}} ಎಂದು ಗುರುತಿಸಲಾಗಿದೆ",
     "NO_CENTERS_ASSIGNED": "ಯಾವುದೇ ಕೇಂದ್ರಗಳನ್ನು ನಿಯೋಜಿಸಲಾಗಿಲ್ಲ",
     "NO_ATTENDANCE": "0 %",
-    "UNKNOWN": "ಅನೋನ್ (Unknown)"
+    "UNKNOWN": "ಅನೋನ್ (Unknown)",
+    "MARK_MANUAL_ATTENDANCE_CONFIRMATION": "ನೀವು ನಿಜವಾಗಿಯೂ ಹಾಜರಾತಿಯನ್ನು ಕೈಯಾರೆ ಗುರುತಿಸಲು ಬಯಸುವಿರಾ?",
+    "MANUAL_ATTENDANCE_INFO": "ಹಾಜರಾತಿಯನ್ನು ಸಾಮಾನ್ಯವಾಗಿ ದಿನದ ಮೊದಲ ಸೆಷನ್‌ನ ನಂತರ ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಗುರುತಿಸಲಾಗುತ್ತದೆ। ತಾಂತ್ರಿಕ ಸಮಸ್ಯೆಗಳು, ಇತರ ಪ್ಲಾಟ್‌ಫಾರ್ಮ್‌ಗಳಲ್ಲಿ ಸೆಷನ್‌ಗಳು, ಅಥವಾ ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ನಡೆಯದಿದ್ದರೆ ಮಾತ್ರ ಕೈಯಾರೆ ಗುರುತಿಸುವಿಕೆಯನ್ನು ಬಳಸಿ।",
+    "MANUAL_ATTENDANCE_NOTE": "ಗಮನಿಸಿ: ಕೈಯಾರೆ ಗುರುತಿಸಿದ ಹಾಜರಾತಿಯು ಸ್ವಯಂಚಾಲಿತ ಹಾಜರಾತಿಯನ್ನು ಮೀರಿಸುತ್ತದೆ, ಒಂದು ವೇಳೆ ಇದನ್ನು ನಂತರ ದಾಖಲಿಸಿದರೆ।",
+    "NO_BATCHES_ASSIGNED": "ಯಾವುದೇ ಬ್ಯಾಚ್‌ಗಳನ್ನು ನಿಯೋಜಿಸಲಾಗಿಲ್ಲ"
   },
   "PROFILE": {
     "EDIT_PROFILE": "ಪ್ರೊಫೈಲ್ ಸಂಪಾದಿಸಿ",
@@ -391,7 +423,8 @@
     "SEARCH_CENTERS": "ಸರ್ಚ್ ಸೆಂಟರ್",
     "ERROR_EMPTY": "ಕೇಂದ್ರದ ಹೆಸರು ಖಾಲಿಯಾಗಿರಬಾರದು.",
     "ERROR_NUMBER": "ಕೇಂದ್ರದ ಹೆಸರು ಸಂಖ್ಯೆಯಾಗಿರಬಾರದು.",
-    "DUPLICATE_CENTER": "ಕೇಂದ್ರವು ಈಗಾಗಲೇ ಅಸ್ತಿತ್ವದಲ್ಲಿದೆ."
+    "DUPLICATE_CENTER": "ಕೇಂದ್ರವು ಈಗಾಗಲೇ ಅಸ್ತಿತ್ವದಲ್ಲಿದೆ.",
+    "RENAME_BATCH": "ಬ್ಯಾಚ್‌ನ ಹೆಸರನ್ನು ಬದಲಾಯಿಸಿ"
   },
   "CENTER_SESSION": {
     "THIS_SESSION": "ಈ ಅವಧಿ",
@@ -476,7 +509,9 @@
     "MEETING_URL_ERROR": "ದಯವಿಟ್ಟು ಮಾನ್ಯವಾದ ಸಭೆಯ URL ಅನ್ನು ಒದಗಿಸಿ.",
     "COMPLETED": "ಪೂರ್ಣಗೊಂಡಿದೆ",
     "INPROGRESS": "ಪ್ರಗತಿಯಲ್ಲಿದೆ",
-    "NOTSTARTED": "ಪ್ರಾರಂಭಿಸಲಾಗಿಲ್ಲ"
+    "NOTSTARTED": "ಪ್ರಾರಂಭಿಸಲಾಗಿಲ್ಲ",
+    "START_DATE_MUST_BE_TODAY_OR_FUTURE_DATE": "ಪ್ರಾರಂಭ ದಿನಾಂಕವು ಇಂದಿನ ಅಥವಾ ಭವಿಷ್ಯದ ದಿನಾಂಕವಾಗಿರಬೇಕು",
+    "DATE_MUST_BE_TODAY_OR_FUTURE_DATE": "ದಿನಾಂಕವು ಇಂದಿನ ಅಥವಾ ಭವಿಷ್ಯದ ದಿನಾಂಕವಾಗಿರಬೇಕು"
   },
   "MANAGE_USERS": {
     "CENTERS_REQUESTED_SUCCESSFULLY": "ಕೇಂದ್ರವು ಯಶಸ್ವಿಯಾಗಿ ವಿನಂತಿಸಿದೆ",
@@ -568,7 +603,35 @@
     "SOCIAL_SCIENCE": "ಸಮಾಜ ವಿಜ್ಞಾನ",
     "LIFE_SKILLS": "ಜೀವನ ಕೌಶಲ್ಯಗಳು",
     "USERNAME": "ಬಳಕೆದಾರಹೆಸರು",
-    "NUMBER_OF_CLUSTERS_I_TEACH": "ನಾನು ಕಲಿಸುವ ಕ್ಲಸ್ಟರ್‌ಗಳ ಸಂಖ್ಯೆ"
+    "NUMBER_OF_CLUSTERS_I_TEACH": "ನಾನು ಕಲಿಸುವ ಕ್ಲಸ್ಟರ್‌ಗಳ ಸಂಖ್ಯೆ",
+    "PREFERRED_LANGUAGE": "ಆದ್ಯತೆಯ ಭಾಷೆ",
+    "FIRST_NAME": "ಮೊದಲ ಹೆಸರು",
+    "MIDDLE_NAME_OR_FATHER_NAME": "ಮಧ್ಯದ ಹೆಸರು ಅಥವಾ ತಂದೆಯ ಹೆಸರು",
+    "LAST_NAME": "ಕೊನೆಯ ಹೆಸರು",
+    "MOTHER_NAME": "ತಾಯಿಯ ಹೆಸರು",
+    "DATE_OF_BIRTH": "ಜನ್ಮ ದಿನಾಂಕ",
+    "NAME_OF_GUARDIAN": "ಪಾಲಕರ ಹೆಸರು",
+    "RELATION_WITH_GUARDIAN": "ಪಾಲಕರೊಂದಿಗಿನ ಸಂಬಂಧ",
+    "PHONE_NUMBER": "ಫೋನ್ ಸಂಖ್ಯೆ",
+    "DOES_THIS_PHONE_BELONG_TO_YOU": "ಈ ಫೋನ್ ನಿಮ್ಮದೇ?",
+    "HIGHEST_EDCATIONAL_QUALIFICATION_OR_LAST_PASSED_GRADE": "ಉನ್ನತ ಶೈಕ್ಷಣಿಕ ಅರ್ಹತೆ ಅಥವಾ ಕೊನೆಯದಾಗಿ ಉತ್ತೀರ್ಣಗೊಂಡ ಗ್ರೇಡ್",
+    "WHAT_IS_YOUR_PREFERRED_MODE_OF_LEARNING": "ನಿಮ್ಮ ಆದ್ಯತೆಯ ಕಲಿಕೆಯ ವಿಧಾನ ಯಾವುದು?",
+    "ARE_YOU_CURRENTLY_WORKING_IF_YES_CHOOSE_THE_DOMAIN": "ನೀವು ಪ್ರಸ್ತುತ ಕೆಲಸ ಮಾಡುತ್ತಿದ್ದೀರಾ? ಹೌದಾದರೆ, ಡೊಮೇನ್ ಆಯ್ಕೆಮಾಡಿ",
+    "HAVE_YOU_RECEIVE_ANY_PRIOR_TRAINING": "ನೀವು ಯಾವುದೇ ಹಿಂದಿನ ತರಬೇತಿಯನ್ನು ಪಡೆದಿದ್ದೀರಾ?",
+    "WHAT_DO_YOU_WANT_TO_BECOME": "ನೀವು ಏನಾಗಲು ಬಯಸುತ್ತೀರಿ?",
+    "EDUCATIONAL_INSTITUTE": "ಶೈಕ್ಷಣಿಕ ಸಂಸ್ಥೆ",
+    "UNEMPLOYED_OR_DOMESTIC_WORK": "ನಿರುದ್ಯೋಗಿ ಅಥವಾ ಗೃಹ ಕೆಲಸ",
+    "SELF_PLACED": "ಸ್ವಯಂ-ನಿಯೋಜಿತ",
+    "TRANSGENDER": "ಟ್ರಾನ್ಸ್‌ಜೆಂಡರ್",
+    "HINDI": "ಹಿಂದಿ",
+    "MARATHI": "ಮರಾಠಿ",
+    "URDU": "ಉರ್ದು",
+    "DIVORCED/WIDOW": "ವಿಚ್ಛೇದಿತ/ವಿಧವೆ",
+    "AVAILABLE_SUGGESTIONS": "ಲಭ್ಯವಿರುವ ಸಲಹೆಗಳು:",
+    "USERNAME_ALREADY_EXIST": "ಈ ಬಳಕೆದಾರ ಹೆಸರು ಈಗಾಗಲೇ ಇದೆ",
+    "EMAIL_ALREADY_EXIST": "ಇಮೇಲ್ ಈಗಾಗಲೇ ಇದೆ",
+    "GRADUATE": "ಪದವೀಧರ",
+    "POST_GRADUATE": "ಸ್ನಾತಕೋತ್ತರ"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "ಇನ್ ವ್ಯಾಲಿಡ್ ಇನ್‌ಪುಟ್.",
@@ -585,7 +648,10 @@
     "ENTER_VALID_YEAR": "ಮಾನ್ಯ ವರ್ಷವನ್ನು ನಮೂದಿಸಿ",
     "MUST_BE_LESS_THAN": "{{fieldname}} {{maxLength}} ಕ್ಕಿಂತ ಕಡಿಮೆ ಇರಬೇಕು.",
     "MUST_BE_GREATER_THAN": "{{fieldname}} {{minLength}} ಕ್ಕಿಂತ ಹೆಚ್ಚಾಗಿರಬೇಕು.",
-    "ENTER_VALID_CENTER_NAME": "ವ್ಯಾಲಿಡ್ ಕೇಂದ್ರದ ಹೆಸರನ್ನು ನಮೂದಿಸಿ"
+    "ENTER_VALID_CENTER_NAME": "ವ್ಯಾಲಿಡ್ ಕೇಂದ್ರದ ಹೆಸರನ್ನು ನಮೂದಿಸಿ",
+    "SPACE_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "ಖಾಲಿ ಜಾಗ ಮತ್ತು ವಿಶೇಷ ಅಕ್ಷರಗಳಿಗೆ ಅನುಮತಿಯಿಲ್ಲ",
+    "DATE_MUST_BE_ON_OR_BEFORE": "ದಿನಾಂಕವು {{date}} ರಂದು ಅಥವಾ ಅದಕ್ಕಿಂತ ಮೊದಲು ಇರಬೇಕು",
+    "DATE_MUST_BE_ON_OR_AFTER": "ದಿನಾಂಕವು {{date}} ರಂದು ಅಥವಾ ಅದಕ್ಕಿಂತ ನಂತರ ಇರಬೇಕು"
   },
   "COURSE_PLANNER": {
     "COURSE_PLANNER": "ಕೋರ್ಸ್ ಯೋಜನೆ",
@@ -594,7 +660,11 @@
     "COLLAPSE_ALL": "ಎಲ್ಲವನ್ನೂ ಕುಗ್ಗಿಸಿ",
     "EXPAND_ALL": "ಎಲ್ಲವನ್ನೂ ವಿಸ್ತರಿಸಿ",
     "RESOURCES": "ಸಂಪನ್ಮೂಲಗಳು",
-    "MARK_AS_COMPLETED": "ಪೂರ್ಣಗೊಂಡಿದೆ ಎಂದು ಗುರುತಿಸಿ"
+    "MARK_AS_COMPLETED": "ಪೂರ್ಣಗೊಂಡಿದೆ ಎಂದು ಗುರುತಿಸಿ",
+     "COURSE_TYPE": "ಕೋರ್ಸ್ ಪ್ರಕಾರ",
+    "SUBTOPICS_SELECTED": "ಆಯ್ಕೆಮಾಡಿದ ಉಪವಿಷಯಗಳು",
+    "NO_RESOURCES_FOUND": "ಯಾವುದೇ ಸಂಪನ್ಮೂಲಗಳು ಕಂಡುಬಂದಿಲ್ಲ",
+    "INVALID_RESOURCE": "ಅಮಾನ್ಯ ಸಂಪನ್ಮೂಲ"
   },
   "ASSESSMENTS": {
     "ASSESSMENTS": "ಮೌಲ್ಯಮಾಪನಗಳು",
@@ -616,7 +686,8 @@
     "NUMBER_OUT_OF_COMPLETED": "{{completedCount}} ರಲ್ಲಿ {{totalCount}} ಪೂರ್ಣಗೊಂಡಿದೆ",
     "NO_SUBTOPIC_SELECTED": "ಯಾವುದೇ ಉಪವಿಷಯವನ್ನು ಆಯ್ಕೆ ಮಾಡಲಾಗಿಲ್ಲ.",
     "NO_SUBJECT_FOUND": "ಯಾವುದೇ ವಿಷಯ ಕಂಡುಬಂದಿಲ್ಲ",
-    "NO_ASSIGNED": "ನಿಯೋಜಿಸಲಾಗಿಲ್ಲ"
+    "NO_ASSIGNED": "ನಿಯೋಜಿಸಲಾಗಿಲ್ಲ",
+    "OUT_OF": "ರಿಂದ"
   },
   "BOARD_ENROLMENT": {
     "BOARD_ENROLLMENT": "ಮಂಡಳಿಯ ದಾಖಲಾತಿ",
@@ -666,7 +737,8 @@
     "SURVEY_FORMS": "ಸಮೀಕ್ಷೆಯ ನಮೂನೆಗಳು",
     "OBSERVATION_STATUS": "ವೀಕ್ಷಣಾ ಸ್ಥಿತಿ",
     "OBSERVATION_NOT_STARTED_YET": "ಸಮೀಕ್ಷೆ ಇನ್ನೂ ಪ್ರಾರಂಭವಾಗಿಲ್ಲ。",
-    "EXPIRED": "ಅವಧಿ ಮೀರಿದೆ"
+    "EXPIRED": "ಅವಧಿ ಮೀರಿದೆ",
+    "ARE_YOU_SURE_YOU_TO_SUBMIT_FORM": "ನೀವು ನಿಜವಾಗಿಯೂ ಫಾರ್ಮ್ ಸಲ್ಲಿಸಲು ಬಯಸುವಿರಾ?"
   },
   "YOUTHNET_SURVEY": {
     "NEW_SURVEY": "ಹೊಸ ಸಮೀಕ್ಷೆ",
@@ -685,6 +757,130 @@
     "CLOSED_ON": "ಮುಗಿದ ದಿನಾಂಕ",
     "VILLAGES_AND_YOUTH": "ಗ್ರಾಮಗಳು ಮತ್ತು ಯುವಕರು",
     "VILLAGES": "ಗ್ರಾಮಗಳು",
-    "YOUTH_VOLUNTEERS": "ಯುವಕರು/ಸ್ವಯಂಸೇವಕರು"
+    "YOUTH_VOLUNTEERS": "ಯುವಕರು/ಸ್ವಯಂಸೇವಕರು",
+    "MANAGES": "ನಿರ್ವಹಿಸುತ್ತದೆ",
+    "ABOVE_18": "18ಕ್ಕಿಂತ ಮೇಲೆ",
+    "BELOW_18": "18ಕ್ಕಿಂತ ಕೆಳಗೆ",
+    "VLLAGE_18": "ಗ್ರಾಮ 18"
+  },
+  "YOUTHNET_USERS_AND_VILLAGES": {
+    "MENTORS": "ಮಾರ್ಗದರ್ಶಕರು",
+    "CSV": "CSV",
+    "SEARCH_MENTORS": "ಮಾರ್ಗದರ್ಶಕರನ್ನು ಹುಡುಕಿ...",
+    "MARK_AS_VOLUNTEER": "ಸ್ವಯಂಸೇವಕನಾಗಿ ಗುರುತಿಸಿ",
+    "ADD_OR_REASSIGN_VILLAGES": "ಗ್ರಾಮಗಳನ್ನು ಸೇರಿಸಿ ಅಥವಾ ಮರುನಿಯೋಜಿಸಿ",
+    "REQUEST_TO_REASSIGN_DISTRICT": "ಜಿಲ್ಲೆಯನ್ನು ಮರುನಿಯೋಜಿಸಲು ಕೋರಿಕೆ",
+    "DELETE_USER_PERMANENTLY": "ಬಳಕೆದಾರರನ್ನು ಶಾಶ್ವತವಾಗಿ ಅಳಿಸಿ",
+    "REQUEST_USER_TO_DIFFERENT_MENTOR": "ಬಳಕೆದಾರರನ್ನು ಬೇರೆ ಮಾರ್ಗದರ್ಶಕ ನಾಯಕನಿಗೆ ಮರುನಿಯೋಜಿಸಲು ಕೋರಿಕೆ",
+    "SAVE_PROGRESS": "ಪ್ರಗತಿಯನ್ನು ಉಳಿಸಿ",
+    "FINISH_ASSIGN": "ಮುಗಿಸಿ ಮತ್ತು ನಿಯೋಜಿಸಿ",
+    "SEND_REQUEST_TO_ADMIN_TEXT": "ನೀವು ಈ ಬಳಕೆದಾರರನ್ನು ಬೇರೆ ಜಿಲ್ಲೆಗೆ ಮರುನಿಯೋಜಿಸಲು ರಾಜ್ಯ ಆಡಳಿತಗಾರರಿಗೆ ಕೋರಿಕೆ ಕಳುಹಿಸುತ್ತಿದ್ದೀರಿ",
+    "SELECT_STATE": "ರಾಜ್ಯವನ್ನು ಆಯ್ಕೆಮಾಡಿ",
+    "SELECT_DISTRICT": "ಜಿಲ್ಲೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ",
+    "SELECT": "ಆಯ್ಕೆಮಾಡಿ",
+    "ASSIGN_VILLAGES_FROM_BLOCK": "ಬ್ಲಾಕ್‌ನಿಂದ ಗ್ರಾಮಗಳನ್ನು ನಿಯೋಜಿಸಿ",
+    "ASSIGN_VILLAGES_FROM_BLOCK_INFO": "ನೀವು ಇದನ್ನು ನಂತರ ನಿಮ್ಮ ಅನುಕೂಲಕ್ಕೆ ತಕ್ಕಂತೆ ಪೂರ್ಣಗೊಳಿಸಬಹುದು. ಆದರೆ, ಗ್ರಾಮಗಳನ್ನು 'ಮುಗಿಸಿ' ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ ಮಾತ್ರ ನಿಯೋಜಿಸಲಾಗುತ್ತದೆ।"
+  },
+  "SURVEYS": {
+    "SURVEYS": "ಸಮೀಕ್ಷೆಗಳು",
+    "ACTIVE_SURVEYS": "ಸಕ್ರಿಯ ಸಮೀಕ್ಷೆಗಳು",
+    "PREVIOUS_SURVEYS": "ಹಿಂದಿನ ಸಮೀಕ್ಷೆಗಳು",
+    "VILLAGES": "ಗ್ರಾಮಗಳು",
+    "SUBMISSION": "ಸಲ್ಲಿಕೆ",
+    "SUMMARY": "ಸಾರಾಂಶ"
+  },
+  "FACILITATORS": {
+    "NEW_FACILITATOR": "ಹೊಸ ಸುಗಮಕಾರ"
+  },
+  "MENTOR": {
+    "BACK_TO_FORM": "ಫಾರ್ಮ್‌ಗೆ ಹಿಂತಿರುಗಿ",
+    "FINISH_ASSIGN": "ಮುಗಿಸಿ ಮತ್ತು ನಿಯೋಜಿಸಿ"
+  },
+  "LEARNERS": {
+    "NEW_LEARNER": "ಹೊಸ ಕಲಿಯುವವ"
+  },
+  "VILLAGE": "ಗ್ರಾಮ",
+  "first_name": "ಮೊದಲ ಹೆಸರು",
+  "middle_name": "ಮಧ್ಯದ ಹೆಸರು",
+  "last_name": "ಕೊನೆಯ ಹೆಸರು",
+  "dob": "ಜನ್ಮ ದಿನಾಂಕ",
+  "WHATS_YOUR_GENDER": "ನಿಮ್ಮ ಲಿಂಗ",
+  "Male": "ಪುರುಷ",
+  "Female": "ಸ್ತ್ರೀ",
+  "Transgender": "ಟ್ರಾನ್ಸ್‌ಜೆಂಡರ್",
+  "email": "ಇಮೇಲ್",
+  "phone_number": "ಫೋನ್ ಸಂಖ್ಯೆ",
+  "DESIGNATION": "ಪದವಿ",
+  "Facilitator": "ಸುಗಮಕಾರ",
+  "MY_MAIN_SUBJECTS": "ನನ್ನ ಮುಖ್ಯ ವಿಷಯಗಳು",
+  "English": "ಇಂಗ್ಲಿಷ್",
+  "Home Science": "ಗೃಹ ವಿಜ್ಞಾನ",
+  "Math": "ಗಣಿತ",
+  "Language": "ಭಾಷೆ",
+  "Science": "ವಿಜ್ಞಾನ",
+  "Social Science": "ಸಾಮಾಜಿಕ ವಿಜ್ಞಾನ",
+  "Life Skills": "ಜೀವನ ಕೌಶಲ್ಯಗಳು",
+  "SUBJECTS_I_TEACH": "ನಾನು ಕಲಿಸುವ ವಿಷಯಗಳು",
+  "MOTHER_NAME": "ತಾಯಿಯ ಹೆಸರು",
+  "HIGHEST_EDCATIONAL_QUALIFICATION_OR_LAST_PASSED_GRADE": "ಉನ್ನತ ಶೈಕ್ಷಣಿಕ ಅರ್ಹತೆ ಅಥವಾ ಕೊನೆಯದಾಗಿ ಉತ್ತೀರ್ಣಗೊಂಡ ಗ್ರೇಡ್",
+  "MARITAL_STATUS": "ವೈವಾಹಿಕ ಸ್ಥಿತಿ",
+  "TYPE_OF_PHONE_AVAILABLE": "ಲಭ್ಯವಿರುವ ಫೋನ್‌ನ ಪ್ರಕಾರ",
+  "Smartphone": "ಸ್ಮಾರ್ಟ್‌ಫೋನ್",
+  "Keypad": "ಕೀಪ್ಯಾಡ್",
+  "DOES_THIS_PHONE_BELONG_TO_YOU": "ಈ ಫೋನ್ ನಿಮ್ಮದೇ?",
+  "USERNAME": "ಬಳಕೆದಾರ ಹೆಸರು",
+  "NAME_OF_GUARDIAN": "ಪಾಲಕರ ಹೆಸರು",
+  "RELATION_WITH_GUARDIAN": "ಪಾಲಕರೊಂದಿಗಿನ ಸಂಬಂಧ",
+  "PARENT_GUARDIAN_PHONE_NO": "ಪೋಷಕ/ಪಾಲಕರ ಫೋನ್ ಸಂಖ್ಯೆ",
+  "WHAT_IS_YOUR_PREFERRED_MODE_OF_LEARNING": "ನಿಮ್ಮ ಆದ್ಯತೆಯ ಕಲಿಕೆಯ ವಿಧಾನ ಯಾವುದು?",
+  "REASON_FOR_DROP_OUT_FROM_SCHOOL": "ಶಾಲೆಯಿಂದ ಬಿಟ್ಟುಹೋಗುವ ಕಾರಣ",
+  "ARE_YOU_CURRENTLY_WORKING_IF_YES_CHOOSE_THE_DOMAIN": "ನೀವು ಪ್ರಸ್ತುತ ಕೆಲಸ ಮಾಡುತ್ತಿದ್ದೀರಾ? ಹೌದಾದರೆ, ಡೊಮೇನ್ ಆಯ್ಕೆಮಾಡಿ",
+  "WHAT_DO_YOU_WANT_TO_BECOME": "ನೀವು ಏನಾಗಲು ಬಯಸುತ್ತೀರಿ?",
+  "UNMARRIED": "ಅವಿವಾಹಿತ",
+  "MARRIED": "ವಿವಾಹಿತ",
+  "DIVORCED": "ವಿಚ್ಛೇದಿತ",
+  "SELF_PLACED": "ಸ್ವಯಂ-ನಿಯೋಜಿತ",
+  "REMOTE": "ರಿಮೋಟ್",
+  "REGULAR": "ನಿಯಮಿತ",
+  "SCHOOL_INACCESSIBLE": "ಶಾಲೆಗೆ ಪ್ರವೇಶವಿಲ್ಲ",
+  "FINANCIAL_CONSTRAINTS": "ಆರ್ಥಿಕ ಸೀಮಿತತೆಗಳು",
+  "LACK_OF_INTEREST": "ಆಸಕ್ತಿಯ ಕೊರತೆ",
+  "FAMILY_RESPONSIBILITIES": "ಕುಟುಂಬದ ಜವಾಬ್ದಾರಿಗಳು",
+  "FAILED": "ವಿಫಲಗೊಂಡ",
+  "ILLNESS": "ಅನಾರೋಗ್ಯ",
+  "MARRIAGE": "ವಿವಾಹ",
+  "MIGRATION": "ವಲಸೆ",
+  "STARTED_VOCATIONAL_COURSE": "ವೃತ್ತಿಪರ ಕೋರ್ಸ್ ಪ್ರಾರಂಭಿಸಿದ",
+  "STARTED_JOB": "ಕೆಲಸ ಪ್ರಾರಂಭಿಸಿದ",
+  "SCHOOL_CLOSURE_DUE_TO_COVID": "ಕೋವಿಡ್‌ನಿಂದಾಗಿ ಶಾಲೆ ಮುಚ್ಚಲಾಗಿದೆ",
+  "ENROLLED_IN_EDUCATIONAL_INSTITUTE": "ಶೈಕ್ಷಣಿಕ ಸಂಸ್ಥೆಯಲ್ಲಿ ಸೇರಿಕೊಂಡ",
+  "OWN_FARMING": "ಸ್ವಂತ ಕೃಷಿ",
+  "AGRICULTURAL_FARM_LABORER": "ಕೃಷಿ ಕಾರ್ಮಿಕ",
+  "NON_AGRICULTURAL_LABORER": "ಕೃಷಿಯೇತರ ಕಾರ್ಮಿಕ",
+  "SALARIED_WORK": "ವೇತನದ ಕೆಲಸ",
+  "SELF_EMPLOYMENT": "ಸ್ವಯಂ-ರೋಜಗಾರ",
+  "UNEMPLOYED_OR_DOMESTIC_WORK": "ನಿರುದ್ಯೋಗಿ ಅಥವಾ ಗೃಹ ಕೆಲಸ",
+
+
+  "SCP_PROFILE": {
+    "MY_PROFILE": "ನನ್ನ ಪ್ರೊಫೈಲ್",
+    "ACTIVITIES_CONDUCTED": "ನಡೆಸಲಾದ ಚಟುವಟಿಕೆಗಳು",
+    "PROFILE_DETAILS": "ಪ್ರೊಫೈಲ್ ವಿವರಗಳು",
+    "FULL_NAME": "ಪೂರ್ಣ ಹೆಸರು",
+    "EMAIL_ID": "ಇಮೇಲ್ ಐಡಿ",
+    "STATE_DISTRICT_BLOCK": "ರಾಜ್ಯ ಜಿಲ್ಲೆ ಬ್ಲಾಕ್",
+    "DESIGNATION": "ಪದವಿ",
+    "JOINED_ON": "ಸೇರಿದ ದಿನಾಂಕ",
+    "PHONE_NUMBER": "ಫೋನ್ ಸಂಖ್ಯೆ",
+    "MENTOR_ID": "ಮಾರ್ಗದರ್ಶಕ ಐಡಿ",
+    "GENDER": "ಲಿಂಗ",
+    "AGE": "ವಯಸ್ಸು",
+    "VOLUNTEERING_DETAILS": "ಸ್ವಯಂಸೇವಾ ವಿವರಗಳು",
+    "MARK_AS_VOLUNTEER": "ಸ್ವಯಂಸೇವಕನಾಗಿ ಗುರುತಿಸಿ",
+    "DOB": "ಜನ್ಮ ದಿನಾಂಕ",
+    "STATE_DISTRICT_BLOCK_VILLAGE": "ಗ್ರಾಮ ಬ್ಲಾಕ್ ಜಿಲ್ಲೆ ರಾಜ್ಯ",
+    "USERNAME": "ಬಳಕೆದಾರ ಹೆಸರು",
+    "SUBJECTS_I_TEACH": "ನಾನು ಕಲಿಸುವ ವಿಷಯಗಳು",
+    "MY_MAIN_SUBJECTS": "ನನ್ನ ಮುಖ್ಯ ವಿಷಯಗಳು"
   }
 }
