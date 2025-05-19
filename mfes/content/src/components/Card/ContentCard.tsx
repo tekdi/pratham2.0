@@ -23,7 +23,6 @@ const ContentCard = ({
   return (
     <CardWrap isWrap={isWrap} _card={_card}>
       <CommonCard
-        minheight={type?.toLowerCase() === 'course' ? '302px' : '356px'}
         title={(item?.name || '').trim()}
         image={
           item?.posterImage && item?.posterImage !== 'undefined'
