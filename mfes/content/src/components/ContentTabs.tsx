@@ -5,9 +5,8 @@ import {
   Tab,
   Tabs,
   Typography,
-  Grid,
 } from '@mui/material';
-import { ContentItem, Loader, useTranslation } from '@shared-lib'; // Updated import
+import { CardGrid, ContentItem, Loader, useTranslation } from '@shared-lib'; // Updated import
 import React, { memo } from 'react';
 import { ContentSearchResponse } from '../services/Search';
 import ContentCard from './Card/ContentCard';
@@ -79,40 +78,13 @@ const RenderTabContent = memo(
             _loader={{ backgroundColor: 'transparent' }}
           >
             <Box {..._subBox} sx={{ ...(_subBox?.sx ?? {}) }}>
-              <Grid
-                container
-                spacing={4}
-                display="grid"
-                gridTemplateColumns={{
-                  xs: 'repeat(auto-fit, minmax(250px, 1fr))',
-                  sm: 'repeat(auto-fit, minmax(250px, 1fr))',
-                  md:
-                    contentData.length > 3
-                      ? 'repeat(auto-fit, minmax(250px, 1fr 1fr))'
-                      : 'repeat(2, minmax(250px, 1fr))',
-                  lg:
-                    contentData.length > 3
-                      ? 'repeat(auto-fit, minmax(250px, 1fr 1fr))'
-                      : 'repeat(2, minmax(250px, 1fr))',
-                  xl:
-                    contentData.length > 4
-                      ? 'repeat(auto-fit, minmax(250px, 1fr 1fr))'
-                      : 'repeat(2, minmax(250px, 1fr))',
-                }}
-                gap="1rem"
-                alignItems={'center'}
-                justifyContent="center"
-                padding="1rem"
+              <CardGrid
+                childWidth={
+                  _card?.sx?.width ? _card?.sx?.width.replace('px', '') : 230
+                }
               >
                 {contentData?.map((item: any) => (
-                  <Grid
-                    item
-                    key={item?.identifier}
-                    sx={{
-                      display: { xs: 'flex', sm: 'block' },
-                      justifyContent: { xs: 'center', sm: 'initial' },
-                    }}
-                  >
+                  <Box key={item?.identifier}>
                     <ContentCard
                       item={item}
                       type={type}
@@ -124,9 +96,9 @@ const RenderTabContent = memo(
                       handleCardClick={handleCardClick}
                       trackData={trackData}
                     />
-                  </Grid>
+                  </Box>
                 ))}
-              </Grid>
+              </CardGrid>
               <Box sx={{ textAlign: 'center', mt: 4 }}>
                 {hasMoreData && (
                   <Button
