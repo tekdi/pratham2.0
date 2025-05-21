@@ -263,7 +263,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                   (item: any) =>
                     item.type === 'BATCH' && item.cohortStatus === 'active'
                 )
-                .map((item: any) => item.cohortName);
+                .map((item: any) => toPascalCase(item.cohortName));
 
               const cohortNames = cohorts
                 .filter(
@@ -301,7 +301,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
             setUsers(extractedData);
             setFilteredUsers(extractedData);
             setLoading(false);
-          },50);
+          }, 50);
         }
       } catch (error) {
         console.log(error);

@@ -143,7 +143,13 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
     if (typeof window !== 'undefined' && window.localStorage) {
       localStorage.setItem('learnerId', userId);
       setCohortId(localStorage.getItem('classId') || '');
+      setClassId(localStorage.getItem('classId') || '');
     }
+    const todayFormattedDate = formatSelectedDate(new Date());
+    const lastSeventhDayFormattedDate = formatSelectedDate(
+      new Date(today.getTime() - 6 * 24 * 60 * 60 * 1000)
+    );
+    getAttendanceData(lastSeventhDayFormattedDate, todayFormattedDate);
   }, []);
 
   const handleReload = () => {
@@ -287,6 +293,7 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
     const response = await classesMissedAttendancePercentList({
       filters,
       facets: ['userId'],
+      sort: ['absent_percentage', 'asc'],
     });
     if (response?.responseCode === 200) {
       const userData = response?.data?.result?.userId[userId];
