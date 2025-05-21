@@ -13,51 +13,51 @@ export const theme = createTheme({
       fontFamily: 'Poppins, Arial, sans-serif',
     },
     h1: {
-      fontSize: '22px',
+      fontSize: 'calc(22px * var(--font-size-scale))',
       fontWeight: 400,
       lineHeight: 1.27,
       marginBottom: '1rem',
     },
     h2: {
-      fontSize: '16px',
+      fontSize: 'calc(16px * var(--font-size-scale))',
       fontWeight: 500,
       lineHeight: 1.5,
     },
     h3: {
-      fontSize: '14px',
+      fontSize: 'calc(14px * var(--font-size-scale))',
       fontWeight: 500,
       lineHeight: 1.43,
       marginBottom: '0.5rem',
     },
     h4: {
       //h4 is a large label style
-      fontSize: '14px',
+      fontSize: 'calc(14px * var(--font-size-scale))',
       fontWeight: 400,
       lineHeight: 1.43,
       letterSpacing: '0.1px',
     },
     h5: {
       //h5 is a medium label style
-      fontSize: '12px',
+      fontSize: 'calc(12px * var(--font-size-scale))',
       fontWeight: 500,
       lineHeight: 1.33,
       letterSpacing: '0.5px',
     },
     h6: {
       //h6 is a small label style
-      fontSize: '11px',
+      fontSize: 'calc(11px * var(--font-size-scale))',
       fontWeight: 500,
       lineHeight: 1.45,
       letterSpacing: '0.5px',
     },
     body1: {
-      fontSize: '16px',
+      fontSize: 'calc(16px * var(--font-size-scale))',
       fontWeight: 400,
       lineHeight: 1.5,
       letterSpacing: '0.5px',
     },
     body2: {
-      fontSize: '14px',
+      fontSize: 'calc(14px * var(--font-size-scale))',
       fontWeight: 400,
       lineHeight: 1.43,
       letterSpacing: '0.25px',
@@ -65,7 +65,7 @@ export const theme = createTheme({
     },
     button: {
       textTransform: 'none',
-      fontSize: '14px',
+      fontSize: 'calc(14px * var(--font-size-scale))',
       fontWeight: 600,
     },
   },
@@ -124,7 +124,7 @@ export const theme = createTheme({
         {
           props: { variant: 'top-bar-link-text' },
           style: {
-            fontSize: '16px',
+            fontSize: 'calc(16px * var(--font-size-scale))',
             lineHeight: '24px',
             fontWeight: 400,
             color: '#1F1B13',
@@ -138,7 +138,7 @@ export const theme = createTheme({
         {
           props: { variant: 'top-bar-link-button' },
           style: {
-            fontSize: '16px',
+            fontSize: 'calc(16px * var(--font-size-scale))',
             lineHeight: '24px',
             fontWeight: 600,
             padding: 14,

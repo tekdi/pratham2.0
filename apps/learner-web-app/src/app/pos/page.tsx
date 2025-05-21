@@ -160,7 +160,7 @@ const page = () => {
               component="h1"
               sx={{
                 fontWeight: 800,
-                fontSize: '72px',
+                // fontSize: '72px',
                 lineHeight: '110%',
                 letterSpacing: '0%',
                 color: '#1F1B13',

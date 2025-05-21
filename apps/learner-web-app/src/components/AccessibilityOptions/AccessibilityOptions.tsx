@@ -15,7 +15,6 @@ import LinkIcon from '@mui/icons-material/Link';
 import { Stack, Divider, Paper } from '@mui/material';
 import AccessibleIcon from '@mui/icons-material/Accessible';
 import { useFontSize } from '../../context/FontSizeContext';
-import '../../context/FontSize.css'; // Import the CSS
 
 export default function AccessibilityOptions() {
   const [open, setOpen] = React.useState(false);

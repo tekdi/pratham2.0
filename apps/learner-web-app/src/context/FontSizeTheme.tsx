@@ -2,7 +2,6 @@ import React from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import { useFontSize } from './FontSizeContext';
 import { Theme } from '@mui/material/styles';
-import './FontSize.css';
 
 interface FontSizeThemeProps {
   children: React.ReactNode;
@@ -23,7 +22,16 @@ const FontSizeTheme: React.FC<FontSizeThemeProps> = ({
     );
   }, [fontSize]);
 
-  return <ThemeProvider theme={baseTheme}>{children}</ThemeProvider>;
+  return (
+    <>
+      <style jsx global>{`
+        :root {
+          --font-size-scale: ${fontSize};
+        }
+      `}</style>
+      <ThemeProvider theme={baseTheme}>{children}</ThemeProvider>
+    </>
+  );
 };
 
 export default FontSizeTheme;
