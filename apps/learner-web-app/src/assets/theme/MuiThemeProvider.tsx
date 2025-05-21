@@ -4,6 +4,7 @@
 import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
 import React from 'react';
 import { LanguageProvider } from '@shared-lib';
+import FontSizeTheme from '../../context/FontSizeTheme';
 
 export const theme = createTheme({
   typography: {
@@ -14,51 +15,51 @@ export const theme = createTheme({
     h1: {
       fontSize: '22px',
       fontWeight: 400,
-      lineHeight: '28px',
+      lineHeight: 1.27,
       marginBottom: '1rem',
     },
     h2: {
       fontSize: '16px',
       fontWeight: 500,
-      lineHeight: '24px',
+      lineHeight: 1.5,
     },
     h3: {
       fontSize: '14px',
       fontWeight: 500,
-      lineHeight: '20px',
+      lineHeight: 1.43,
       marginBottom: '0.5rem',
     },
     h4: {
       //h4 is a large label style
       fontSize: '14px',
       fontWeight: 400,
-      lineHeight: '20px',
+      lineHeight: 1.43,
       letterSpacing: '0.1px',
     },
     h5: {
       //h5 is a medium label style
       fontSize: '12px',
       fontWeight: 500,
-      lineHeight: '16px',
+      lineHeight: 1.33,
       letterSpacing: '0.5px',
     },
     h6: {
       //h6 is a small label style
       fontSize: '11px',
       fontWeight: 500,
-      lineHeight: '16px',
+      lineHeight: 1.45,
       letterSpacing: '0.5px',
     },
     body1: {
       fontSize: '16px',
       fontWeight: 400,
-      lineHeight: '24px',
+      lineHeight: 1.5,
       letterSpacing: '0.5px',
     },
     body2: {
       fontSize: '14px',
       fontWeight: 400,
-      lineHeight: '20px',
+      lineHeight: 1.43,
       letterSpacing: '0.25px',
       marginBottom: '1rem',
     },
@@ -174,10 +175,10 @@ export default function MuiThemeProvider({
   children: React.ReactNode;
 }) {
   return (
-    <ThemeProvider theme={theme}>
+    <FontSizeTheme baseTheme={theme}>
       <CssBaseline />
       {children}
-    </ThemeProvider>
+    </FontSizeTheme>
   );
 }
 

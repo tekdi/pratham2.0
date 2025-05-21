@@ -21,6 +21,8 @@ import KnwoledgeCarousel from '@learner/components/KnwoledgeCarousel';
 import OtherWebsiteCarousel from '@learner/components/OtherWebsiteCarousel';
 import Learning from '@learner/components/Learning';
 import Image from 'next/image';
+import AccessibilityOptions from '@learner/components/AccessibilityOptions/AccessibilityOptions';
+import FontSizeDemo from '../font-size-demo/page';
 
 const keyThemesList = [
   [
@@ -131,6 +133,9 @@ const page = () => {
 
   return (
     <Layout onlyHideElements={['footer']}>
+      {/* <Dummy /> */}
+      <AccessibilityOptions />
+      <FontSizeDemo />
       <Grid container spacing={4}>
         <Grid item xs={12} md={6}>
           <Image
