@@ -31,7 +31,14 @@ const InfoCard: React.FC<InfoCardProps> = ({
 
   return (
     <>
-      <Card sx={{ display: 'flex', ..._infoCard?._card }}>
+      <Card
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row', md: 'row' },
+          borderRadius: 0,
+          ..._infoCard?._card,
+        }}
+      >
         <CardMedia
           component="img"
           sx={{

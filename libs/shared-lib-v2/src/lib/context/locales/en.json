@@ -134,7 +134,8 @@
       "FOOTER_TEXT": "In the meantime, feel free to explore more courses or continue building your skills!"
     },
     "CONTENT": {
-      "DEFAULT_IMAGE_ALT": "Default course image"
+      "DEFAULT_IMAGE_ALT": "Default course image",
+      "FILTERS": "Filters"
     },
     "IN_PROGRESS": {
       "ALL_COURSES": "All In Progress Courses"
