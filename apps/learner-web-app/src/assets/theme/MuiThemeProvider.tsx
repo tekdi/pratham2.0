@@ -6,6 +6,33 @@ import React from 'react';
 import { LanguageProvider } from '@shared-lib';
 import FontSizeTheme from '../../context/FontSizeTheme';
 
+// Add module augmentation for custom typography variants
+declare module '@mui/material/styles' {
+  interface TypographyVariants {
+    body3: React.CSSProperties;
+    body4: React.CSSProperties;
+    body5: React.CSSProperties;
+    body6: React.CSSProperties;
+  }
+
+  interface TypographyVariantsOptions {
+    body3?: React.CSSProperties;
+    body4?: React.CSSProperties;
+    body5?: React.CSSProperties;
+    body6?: React.CSSProperties;
+  }
+}
+
+// Update the Typography's variant prop options
+declare module '@mui/material/Typography' {
+  interface TypographyPropsVariantOverrides {
+    body3: true;
+    body4: true;
+    body5: true;
+    body6: true;
+  }
+}
+
 export const theme = createTheme({
   typography: {
     fontFamily: 'Poppins, Arial, sans-serif',
@@ -62,6 +89,34 @@ export const theme = createTheme({
       lineHeight: 1.43,
       letterSpacing: '0.25px',
       marginBottom: '1rem',
+    },
+    body3: {
+      fontSize: 'calc(72px * var(--font-size-scale))',
+      fontWeight: 700,
+      lineHeight: 2.43,
+      letterSpacing: '0.25px',
+      marginBottom: '1.5rem',
+    },
+    body4: {
+      fontSize: 'calc(12px * var(--font-size-scale))',
+      fontWeight: 400,
+      lineHeight: 1.5,
+      letterSpacing: '0.25px',
+      marginBottom: '1rem',
+    },
+    body5: {
+      fontSize: 'calc(12px * var(--font-size-scale))',
+      fontWeight: 600,
+      lineHeight: 1.5,
+      letterSpacing: '0.15px',
+      marginBottom: '1rem',
+    },
+    body6: {
+      fontSize: 'calc(10px * var(--font-size-scale))',
+      fontWeight: 400,
+      lineHeight: 1.4,
+      letterSpacing: '0.4px',
+      marginBottom: '0.75rem',
     },
     button: {
       textTransform: 'none',

@@ -156,8 +156,7 @@ const page = () => {
         >
           <Box sx={{ p: 3, '@media (max-width: 900px)': { px: '16px' } }}>
             <Typography
-              variant="h3"
-              component="h1"
+              variant="body3"
               sx={{
                 fontWeight: 800,
                 // fontSize: '72px',
