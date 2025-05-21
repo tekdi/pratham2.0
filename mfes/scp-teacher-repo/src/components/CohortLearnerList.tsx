@@ -137,9 +137,10 @@ const CohortLearnerList: React.FC<CohortLearnerListProp> = ({
             sx={{
               '@media (min-width: 900px)': {
                 background: theme.palette.action.selected,
-                marginTop: '12px',
+                margin: '24px 18px 18px 18px',
                 paddingBottom: '20px',
                 paddingTop: '10px',
+                borderRadius: '12px',
               },
             }}
           >
