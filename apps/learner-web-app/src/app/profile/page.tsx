@@ -13,6 +13,7 @@ import InfoIcon from '@mui/icons-material/Info';
 
 import { baseurl } from '@learner/utils/API/EndUrls';
 import { Info } from '@mui/icons-material';
+import { showToastMessage } from '@learner/components/ToastComponent/Toastify';
 type FilterDetails = {
   status?: string[];
   tenantId?: string;
@@ -34,13 +35,20 @@ const ProfilePage = () => {
   const [courseData, setCourseData] = useState<any>([]);
 
   const handlePreview = async (id: string) => {
+    console.log(id);
+
     try {
+      if (id === null) {
+        showToastMessage('Certification Id not found', 'error');
+        return;
+      }
       setShowCertificate(false);
       setCertificateId(id);
       setTimeout(() => {
         setShowCertificate(true);
       }, 2); // open modal in next tick
     } catch (error) {
+      console.log(id);
       console.error('Error fetching certificate data:', error);
     }
   };
@@ -93,6 +101,7 @@ const ProfilePage = () => {
       router.push('/login');
     }
   }, []);
+  console.log('courseData', courseData);
   return (
     <Layout>
       <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={2}>
@@ -100,7 +109,7 @@ const ProfilePage = () => {
         <Box
           sx={{
             flexShrink: 0,
-            width: { xs: '100%', md: '500px' },
+            width: { xs: '100%', md: '530px' },
             mb: { xs: 2, md: 0 },
           }}
         >
@@ -147,7 +156,7 @@ const ProfilePage = () => {
         </Box>
       </Box>
       <CertificateModal
-        certificateId={certificateId.toString()}
+        certificateId={certificateId?.toString()}
         open={showCertificate}
         setOpen={setShowCertificate}
       />

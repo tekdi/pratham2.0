@@ -99,6 +99,7 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
           variant="outlined"
           fullWidth
           margin="normal"
+          autoComplete="new-password" // <-- Prevent browser from injecting its UI
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
