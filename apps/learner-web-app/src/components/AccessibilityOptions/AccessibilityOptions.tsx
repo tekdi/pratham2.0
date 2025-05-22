@@ -28,6 +28,10 @@ export default function AccessibilityOptions() {
     useFontSize();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [isIncreased, setIsIncreased] = React.useState(false);
+  const [isDecreased, setIsDecreased] = React.useState(false);
+
+  const defaultFontSize = 1; // Assuming 1 is the default fontSize value
 
   // Update CSS variable when fontSize changes
   React.useEffect(() => {
@@ -35,7 +39,29 @@ export default function AccessibilityOptions() {
       '--font-size-scale',
       fontSize.toString()
     );
+
+    // Update button highlight states
+    setIsIncreased(fontSize > defaultFontSize);
+    setIsDecreased(fontSize < defaultFontSize);
   }, [fontSize]);
+
+  const handleIncreaseFontSize = () => {
+    increaseFontSize();
+    setIsIncreased(true);
+    setIsDecreased(false);
+  };
+
+  const handleDecreaseFontSize = () => {
+    decreaseFontSize();
+    setIsDecreased(true);
+    setIsIncreased(false);
+  };
+
+  const handleResetFontSize = () => {
+    resetFontSize();
+    setIsIncreased(false);
+    setIsDecreased(false);
+  };
 
   const toggleDrawer =
     (openState: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
@@ -112,32 +138,38 @@ export default function AccessibilityOptions() {
           <Stack spacing={2}>
             <Stack direction={isMobile ? 'column' : 'row'} spacing={2}>
               <Button
-                variant="outlined"
+                variant={isIncreased ? 'contained' : 'outlined'}
                 color="primary"
                 startIcon={<AddIcon />}
-                onClick={increaseFontSize}
+                onClick={handleIncreaseFontSize}
                 sx={{
                   flex: 1,
                   justifyContent: 'flex-start',
                   py: 1.5,
                   borderRadius: 2,
-                  bgcolor: '#f5f5f5',
+                  bgcolor: isIncreased ? '#FFBF00' : '#f5f5f5',
+                  '&:hover': {
+                    bgcolor: isIncreased ? '#E6AC00' : '',
+                  },
                 }}
               >
                 <Typography variant="subtitle1">Increase Font Size</Typography>
               </Button>
 
               <Button
-                variant="outlined"
+                variant={isDecreased ? 'contained' : 'outlined'}
                 color="primary"
                 startIcon={<RemoveIcon />}
-                onClick={decreaseFontSize}
+                onClick={handleDecreaseFontSize}
                 sx={{
                   flex: 1,
                   justifyContent: 'flex-start',
                   py: 1.5,
                   borderRadius: 2,
-                  bgcolor: '#f5f5f5',
+                  bgcolor: isDecreased ? '#FFBF00' : '#f5f5f5',
+                  '&:hover': {
+                    bgcolor: isDecreased ? '#E6AC00' : '',
+                  },
                 }}
               >
                 <Typography variant="subtitle1">Decrease Font Size</Typography>
@@ -212,7 +244,11 @@ export default function AccessibilityOptions() {
           <Divider sx={{ my: 3 }} />
 
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-            <Button variant="text" color="primary" onClick={resetFontSize}>
+            <Button
+              variant="text"
+              color="primary"
+              onClick={handleResetFontSize}
+            >
               Clear Selection
             </Button>
           </Box>

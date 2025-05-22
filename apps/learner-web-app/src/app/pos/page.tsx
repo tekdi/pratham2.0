@@ -424,6 +424,7 @@ const page = () => {
               >
                 <Typography
                   variant="body6"
+                  component="h1"
                   sx={{
                     fontFamily: 'Poppins',
                     fontWeight: 700,
@@ -441,6 +442,7 @@ const page = () => {
                 </Typography>
                 <Typography
                   variant="body8"
+                  component="h1"
                   sx={{
                     fontFamily: 'Poppins',
                     fontWeight: 400,
@@ -466,6 +468,7 @@ const page = () => {
       <Box>
         <Typography
           variant="body7"
+          component="h1"
           sx={{
             fontFamily: 'Poppins',
             fontWeight: 700,
@@ -492,6 +495,7 @@ const page = () => {
       <Box>
         <Typography
           variant="body6"
+          component="h1"
           sx={{
             fontFamily: 'Poppins',
             fontWeight: 700,
@@ -520,10 +524,11 @@ const page = () => {
           },
         }}
       >
-        <Grid container spacing={2} sx={{ alignItems: 'center' }}>
-          <Grid item xs={12} md={6}>
+        <Grid container spacing={3} sx={{ alignItems: 'center' }}>
+          <Grid item xs={12} md={5}>
             <Typography
               variant="body6"
+              component="h1"
               sx={{
                 fontFamily: 'Poppins',
                 fontWeight: 700,
@@ -541,7 +546,7 @@ const page = () => {
               More Ways to Learn – Check Out Our Products!
             </Typography>
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={7}>
             <MoreWayCarousel />
           </Grid>
         </Grid>
@@ -558,6 +563,7 @@ const page = () => {
       >
         <Typography
           variant="body6"
+          component="h1"
           sx={{
             fontWeight: 700,
             fontSize: '36px',
@@ -591,6 +597,7 @@ const page = () => {
       >
         <Typography
           variant="body6"
+          component="h1"
           sx={{
             fontFamily: 'Poppins',
             fontWeight: 700,
