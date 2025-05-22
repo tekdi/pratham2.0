@@ -63,10 +63,10 @@ const InfoCard: React.FC<InfoCardProps> = ({
               display: 'flex',
               flexDirection: 'column',
               flex: '1 0 auto',
-              p: '18px',
-              pb: 0,
+              p: { xs: '16px', md: '18px' },
+              pb: { xs: '0px', md: '18px' },
               gap: 1.5,
-              width: '85%',
+              width: { xs: '90%', sm: '85%' },
             }}
           >
             {onBackClick && (
@@ -97,8 +97,8 @@ const InfoCard: React.FC<InfoCardProps> = ({
               title={item?.name}
               sx={{
                 fontWeight: 700,
-                fontSize: '36px',
-                lineHeight: '44px',
+                fontSize: { xs: '22px', sm: '24px', md: '36px' },
+                lineHeight: { xs: '28px', sm: '32px', md: '44px' },
                 display: '-webkit-box',
                 WebkitLineClamp: 1,
                 WebkitBoxOrient: 'vertical',
@@ -108,16 +108,22 @@ const InfoCard: React.FC<InfoCardProps> = ({
             >
               {item?.name}
             </Typography>
-            <ExpandableText text={item?.description} number={2} />
+            <ExpandableText
+              text={item?.description}
+              number={2}
+              _text={{
+                fontSize: { xs: '14px', sm: '16px', md: '18px' },
+                lineHeight: { xs: '20px', sm: '22px', md: '26px' },
+              }}
+            />
             <Box>
               {_infoCard?.isShowStatus &&
                 (item?.issuedOn ? (
                   <Typography
                     sx={{
-                      fontFamily: 'Poppins',
                       fontWeight: 500,
-                      fontSize: '16px',
-                      lineHeight: '24px',
+                      fontSize: { xs: '14px', sm: '16px', md: '16px' },
+                      lineHeight: { xs: '20px', sm: '22px', md: '26px' },
                       color: '#00730B',
                       letterSpacing: '0.15px',
                     }}
@@ -145,6 +151,8 @@ const InfoCard: React.FC<InfoCardProps> = ({
                       pb: 1,
                       pl: 2,
                       bgcolor: '#FFDEA1',
+                      fontSize: { xs: '14px', sm: '16px', md: '16px' },
+                      lineHeight: { xs: '20px', sm: '22px', md: '26px' },
                     }}
                   >
                     Started on:{' '}

@@ -282,12 +282,12 @@ const PlayerBox = ({
               : ''
           }`}
           style={{
-            // display: 'block',
-            // padding: 0,
+            width: '100%',
             height: 'calc(100vh - 235px)',
             border: 'none',
             objectFit: 'contain',
           }}
+          allowFullScreen
           width="100%"
           height="100%"
           title="Embedded Localhost"
