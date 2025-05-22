@@ -43,7 +43,8 @@ const InfoCard: React.FC<InfoCardProps> = ({
           component="img"
           sx={{
             flex: { xs: 6, md: 4, lg: 3, xl: 3 },
-            maxHeight: '280px',
+            maxHeight: { xs: '200px', sm: '280px' },
+            // objectFit: 'contain',
             ..._infoCard?._cardMedia,
           }}
           image={item?.appIcon || _infoCard?.default_img}
@@ -74,7 +75,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   gap: 1,
-                  pt: 2,
+                  pt: { xs: 0, md: 2 },
                 }}
               >
                 <IconButton

@@ -56,7 +56,7 @@ export default memo(function LearnerCourse({
   };
 
   return (
-    <Stack sx={{ gap: 2 }}>
+    <Stack sx={{ gap: { xs: 0, sm: 0, md: 2 }, pb: 4 }}>
       <Box
         sx={{
           position: 'sticky',

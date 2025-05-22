@@ -117,7 +117,15 @@ const RenderTabContent = memo(
                 )}
               </Box>
               {!contentData?.length && (
-                <Typography variant="body1" sx={{ mt: 4, textAlign: 'center' }}>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    minHeight: '100px',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
                   {t('LEARNER_APP.CONTENT_TABS.NO_MORE_DATA')}
                 </Typography>
               )}

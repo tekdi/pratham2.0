@@ -97,12 +97,16 @@ export const theme = createTheme({
     },
     MuiAppBar: {
       styleOverrides: {
-        root: {
+        root: ({ theme }) => ({
           backgroundColor: '#fff',
-          paddingTop: '18px',
-          paddingBottom: '18px',
+          paddingTop: '10px',
+          paddingBottom: '10px',
+          [theme.breakpoints.down('sm')]: {
+            paddingTop: '4px',
+            paddingBottom: '4px',
+          },
           '&.Mui-focused .MuiOutlinedInput-notchedOutline': {},
-        },
+        }),
       },
     },
     MuiOutlinedInput: {
@@ -127,7 +131,7 @@ export const theme = createTheme({
             lineHeight: '24px',
             fontWeight: 400,
             color: '#1F1B13',
-            padding: 14,
+            padding: '12px 10px',
             borderRadius: 8,
             '& .MuiButton-startIcon': {
               color: '#635E57',
@@ -140,10 +144,11 @@ export const theme = createTheme({
             fontSize: '16px',
             lineHeight: '24px',
             fontWeight: 600,
-            padding: 14,
+            padding: '12px 10px',
             gap: 8,
             borderRadius: 8,
             borderBottomWidth: 3,
+            letterSpacing: '0.22px',
             color: '#987100',
             backgroundColor: '#F7ECDF',
             '&:hover': {

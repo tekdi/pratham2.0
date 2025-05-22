@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Button, Grid, Typography } from '@mui/material';
-import { CardGrid, ContentItem, useTranslation } from '@shared-lib';
+import { ContentItem, useTranslation } from '@shared-lib';
 import UnitCard from './Card/UnitCard';
 import ContentCard from './Card/ContentCard';
 
@@ -19,11 +19,11 @@ export const UnitGrid: React.FC<CommonAccordionProps> = ({
   _config,
   handleItemClick,
 }) => {
-  const { default_img, _card } = _config || {};
+  const { default_img, _grid, _card } = _config || {};
   const { t } = useTranslation();
 
   return (
-    <CardGrid>
+    <Grid container spacing={{ xs: 1, sm: 1, md: 2 }}>
       {item?.children?.length <= 0 ? (
         <Grid item xs={12} textAlign="center">
           <Typography variant="body1" sx={{ mt: 4, textAlign: 'center' }}>
@@ -32,17 +32,23 @@ export const UnitGrid: React.FC<CommonAccordionProps> = ({
         </Grid>
       ) : (
         item?.children?.map((subItem: any) => (
-          <Box key={subItem?.identifier}>
+          <Grid
+            key={subItem?.identifier}
+            item
+            xs={6}
+            sm={6}
+            md={4}
+            lg={3}
+            xl={2.4}
+            {..._grid}
+          >
             {subItem?.mimeType ===
             'application/vnd.ekstep.content-collection' ? (
               <UnitCard
                 item={subItem}
                 trackData={trackData ?? []}
                 default_img={default_img}
-                _card={{
-                  ..._card,
-                  sx: { width: '230px', ...(_card?.sx ?? {}) },
-                }}
+                _card={_card}
                 handleCardClick={(content: ContentItem) =>
                   handleItemClick?.(content)
                 }
@@ -52,10 +58,7 @@ export const UnitGrid: React.FC<CommonAccordionProps> = ({
                 item={subItem}
                 type={item.mimeType}
                 default_img={default_img}
-                _card={{
-                  ..._card,
-                  sx: { width: '230px', ...(_card?.sx ?? {}) },
-                }}
+                _card={_card}
                 handleCardClick={(content: ContentItem) =>
                   handleItemClick?.(content)
                 }
@@ -76,10 +79,10 @@ export const UnitGrid: React.FC<CommonAccordionProps> = ({
                 ))}
               </Box>
             )}
-          </Box>
+          </Grid>
         ))
       )}
-    </CardGrid>
+    </Grid>
   );
 };
 

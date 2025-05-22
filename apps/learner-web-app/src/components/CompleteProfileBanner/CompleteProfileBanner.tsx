@@ -15,12 +15,12 @@ export const CompleteProfileBanner = () => {
       elevation={2}
       sx={{
         backgroundColor: '#FFE08A', // light yellow
-        padding: 2,
+        padding: 1.5,
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between',
+        justifyContent: 'center',
         borderRadius: 2,
-        gap: 1,
+        gap: { xs: 1, sm: 2, md: 4 },
       }}
     >
       <Typography
@@ -36,20 +36,16 @@ export const CompleteProfileBanner = () => {
       <Button
         onClick={handleCompleteProfileClick}
         variant="contained"
+        color="primary"
         sx={{
           minWidth: '144px',
-          backgroundColor: '#FFC400', // yellow button
-          color: '#000',
-          fontWeight: { xs: '400', sm: '400', md: '600' },
-          paddingX: 3,
-          paddingY: 1,
-          borderRadius: 5,
+          fontWeight: 400,
+          lineHeight: '24px',
           fontSize: 14,
-          lineHeight: 1.43,
           letterSpacing: '0.25px',
           textAlign: 'center',
           verticalAlign: 'middle',
-          padding: '10px 12px',
+          padding: { xs: '10px 12px', sm: '10px 12px', md: '8px 48px' },
           boxShadow: '0px 3px 5px rgba(0, 0, 0, 0.2)',
           '&:hover': {
             backgroundColor: '#FFB300', // darker on hover
