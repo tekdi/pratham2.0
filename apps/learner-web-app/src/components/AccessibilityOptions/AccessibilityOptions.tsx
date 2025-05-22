@@ -1,9 +1,16 @@
 import * as React from 'react';
-import Box from '@mui/material/Box';
-import SwipeableDrawer from '@mui/material/SwipeableDrawer';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
+import {
+  Box,
+  SwipeableDrawer,
+  Button,
+  Typography,
+  IconButton,
+  Stack,
+  Divider,
+  Paper,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
@@ -12,7 +19,6 @@ import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
 import MicIcon from '@mui/icons-material/Mic';
 import InvertColorsIcon from '@mui/icons-material/InvertColors';
 import LinkIcon from '@mui/icons-material/Link';
-import { Stack, Divider, Paper } from '@mui/material';
 import AccessibleIcon from '@mui/icons-material/Accessible';
 import { useFontSize } from '../../context/FontSizeContext';
 
@@ -20,6 +26,8 @@ export default function AccessibilityOptions() {
   const [open, setOpen] = React.useState(false);
   const { increaseFontSize, decreaseFontSize, resetFontSize, fontSize } =
     useFontSize();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   // Update CSS variable when fontSize changes
   React.useEffect(() => {
@@ -55,7 +63,7 @@ export default function AccessibilityOptions() {
           '&:hover': { bgcolor: '#ebe7d9' },
           position: 'absolute',
           right: 8,
-          top: 150,
+          top: isMobile ? 100 : 150,
           zIndex: 1001,
         }}
       >
@@ -70,9 +78,10 @@ export default function AccessibilityOptions() {
           sx: {
             height: 'auto',
             maxHeight: '95vh',
-            marginTop: '152px',
+            marginTop: isMobile ? '100px' : '152px',
             borderRadius: '16px 0 0 16px',
-            width: '552px',
+            width: isMobile ? '90%' : '552px',
+            maxWidth: '552px',
             zIndex: 99999,
           },
         }}
@@ -82,7 +91,7 @@ export default function AccessibilityOptions() {
       >
         <Paper
           elevation={0}
-          sx={{ width: 'auto', padding: 2, maxWidth: '600px' }}
+          sx={{ width: 'auto', padding: isMobile ? 1.5 : 2, maxWidth: '600px' }}
         >
           <Box
             sx={{
@@ -101,7 +110,7 @@ export default function AccessibilityOptions() {
           <Divider sx={{ mb: 3 }} />
 
           <Stack spacing={2}>
-            <Stack direction="row" spacing={2}>
+            <Stack direction={isMobile ? 'column' : 'row'} spacing={2}>
               <Button
                 variant="outlined"
                 color="primary"
@@ -135,7 +144,7 @@ export default function AccessibilityOptions() {
               </Button>
             </Stack>
 
-            <Stack direction="row" spacing={2}>
+            <Stack direction={isMobile ? 'column' : 'row'} spacing={2}>
               <Button
                 variant="outlined"
                 color="primary"
@@ -167,7 +176,7 @@ export default function AccessibilityOptions() {
               </Button>
             </Stack>
 
-            <Stack direction="row" spacing={2}>
+            <Stack direction={isMobile ? 'column' : 'row'} spacing={2}>
               <Button
                 variant="outlined"
                 color="primary"
