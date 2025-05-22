@@ -59,10 +59,9 @@ const FilterComponent: React.FC<{
         }}
       >
         <Typography
-          variant="h6"
+          variant="h2"
           sx={{
             fontWeight: 500,
-            fontSize: '16px',
           }}
         >
           {t('LEARNER_APP.COURSE.FILTER_BY')}{' '}

@@ -95,12 +95,11 @@ const MyComponent: React.FC = () => {
             }}
           >
             <Typography
-              variant="h4"
+              variant="body1"
+              component="h2"
               gutterBottom
               sx={{
                 fontWeight: 500,
-                fontSize: 16,
-                lineHeight: '24px',
                 color: '#1F1B13',
                 textTransform: 'capitalize',
               }}
@@ -135,13 +134,10 @@ const MyComponent: React.FC = () => {
                 }}
               >
                 <Typography
-                  variant="h4"
+                  variant="h1"
                   gutterBottom
                   sx={{
-                    fontFamily: 'Poppins',
                     fontWeight: 400,
-                    fontSize: '22px',
-                    lineHeight: '28px',
                     letterSpacing: '0px',
                     verticalAlign: 'middle',
                     color: '#06A816',
@@ -149,13 +145,7 @@ const MyComponent: React.FC = () => {
                 >
                   {t('LEARNER_APP.L_ONE_COURSE.IN_PROGRESS_TITLE')}
                 </Typography>
-                <Typography
-                  variant="body1"
-                  gutterBottom
-                  sx={{
-                    fontSize: 16,
-                  }}
-                >
+                <Typography variant="body1" gutterBottom>
                   {t('LEARNER_APP.L_ONE_COURSE.ONGOING_COURSES').replace(
                     '{count}',
                     isShow?.toString()

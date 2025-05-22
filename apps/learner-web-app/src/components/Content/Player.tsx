@@ -136,20 +136,23 @@ const App = (props: { userIdLocalstorageName?: string }) => {
           }}
         >
           <Typography
+            variant="body8"
+            component="h2"
             sx={{
               fontWeight: 700,
-              fontSize: '24px',
-              lineHeight: '44px',
+              // fontSize: '24px',
+              // lineHeight: '44px',
             }}
           >
             {item?.content?.name ?? '-'}
           </Typography>
           {item?.content?.description && (
             <Typography
+              variant="h3"
               sx={{
                 fontWeight: 400,
-                fontSize: '14px',
-                lineHeight: '24px',
+                // fontSize: '14px',
+                // lineHeight: '24px',
                 display: '-webkit-box',
                 WebkitLineClamp: 2,
                 overflow: 'hidden',
@@ -177,11 +180,13 @@ const App = (props: { userIdLocalstorageName?: string }) => {
           }}
         >
           <Typography
+            variant="body5"
+            component="h2"
             sx={{
               mb: 2,
               fontWeight: 500,
-              fontSize: '18px',
-              lineHeight: '24px',
+              // fontSize: '18px',
+              // lineHeight: '24px',
             }}
           >
             {t('LEARNER_APP.PLAYER.MORE_RELATED_RESOURCES')}

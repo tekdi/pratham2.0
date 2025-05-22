@@ -28,8 +28,10 @@ const AccountExistsCard: React.FC<AccountExistsCardProps> = ({
 
       <Typography
         mt={2}
+        variant="body1"
+        component="h2"
         // fontFamily="Poppins"
-        fontSize="16px"
+        // fontSize="16px"
         fontWeight={400}
         lineHeight="24px"
         letterSpacing="0.5px"
@@ -45,8 +47,10 @@ const AccountExistsCard: React.FC<AccountExistsCardProps> = ({
 
       <Typography
         mt={2}
-        fontFamily="Poppins"
-        fontSize="18px"
+        variant="body5"
+        component="h2"
+        // fontFamily="Poppins"
+        // fontSize="18px"
         fontWeight={600}
         lineHeight="28px"
       >
@@ -79,7 +83,8 @@ const AccountExistsCard: React.FC<AccountExistsCardProps> = ({
               }}
             >
               <Typography
-                fontSize="14px"
+                // fontSize="14px"
+                variant="h3"
                 color="text.primary"
                 lineHeight={1.4}
                 mb={0.2}
@@ -87,10 +92,9 @@ const AccountExistsCard: React.FC<AccountExistsCardProps> = ({
                 {username}
               </Typography>
               <Typography
-                variant="body2"
+                variant="h3"
                 sx={{
                   color: '#0071E3',
-                  fontSize: '13px',
                   lineHeight: 1.4,
                 }}
               >

@@ -56,7 +56,7 @@ export default function AccessibilityOptions() {
           position: 'absolute',
           right: 8,
           top: 150,
-          zIndex: 99999,
+          zIndex: 1001,
         }}
       >
         <AccessibleIcon sx={{ color: '#000' }} />
@@ -73,6 +73,7 @@ export default function AccessibilityOptions() {
             marginTop: '152px',
             borderRadius: '16px 0 0 16px',
             width: '552px',
+            zIndex: 99999,
           },
         }}
         BackdropProps={{

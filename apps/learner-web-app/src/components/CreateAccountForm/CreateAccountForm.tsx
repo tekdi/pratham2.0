@@ -229,7 +229,7 @@ const CreateAccountForm = ({
             />
           }
           label={
-            <Typography fontSize="14px">
+            <Typography variant="h3">
               I have read and agree to the{' '}
               <Typography
                 component="span"
@@ -264,7 +264,7 @@ const CreateAccountForm = ({
               />
             }
             label={
-              <Typography fontSize="14px">
+              <Typography variant="h3">
                 I confirm this checkbox is filled out by the parent/guardian of
                 the learner.
               </Typography>

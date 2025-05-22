@@ -67,10 +67,10 @@ export default memo(function LearnerCourse({
           }}
         >
           <Typography
-            variant="h6"
+            variant="h1"
             sx={{
               fontWeight: 400,
-              fontSize: '22px',
+              // fontSize: '22px',
               lineHeight: '28px',
             }}
           >

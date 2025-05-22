@@ -95,15 +95,14 @@ export const Footer: React.FC = () => {
           }}
         >
           <Typography
-            variant="h6"
+            variant="body1"
             component="h3"
             gutterBottom
             sx={{
-              fontFamily: 'Poppins',
               fontWeight: 600,
-              fontSize: 16,
-              lineHeight: '24px',
-              letterSpacing: '0.15px',
+              // fontSize: 16,
+              // lineHeight: '24px',
+              // letterSpacing: '0.15px',
             }}
           >
             {t('Useful Links')}
@@ -129,14 +128,14 @@ export const Footer: React.FC = () => {
           }}
         >
           <Typography
-            variant="h6"
+            variant="body1"
             component="h3"
             gutterBottom
             sx={{
               fontFamily: 'Poppins',
-              fontWeight: 600,
-              fontSize: 16,
-              lineHeight: '24px',
+              // fontWeight: 600,
+              // fontSize: 16,
+              // lineHeight: '24px',
               letterSpacing: '0.15px',
             }}
           >
