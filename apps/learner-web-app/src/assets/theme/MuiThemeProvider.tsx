@@ -101,11 +101,20 @@ export const theme = createTheme({
           backgroundColor: '#fff',
           paddingTop: '10px',
           paddingBottom: '10px',
-          [theme.breakpoints.down('sm')]: {
+          [theme.breakpoints.down('md')]: {
             paddingTop: '4px',
             paddingBottom: '4px',
           },
           '&.Mui-focused .MuiOutlinedInput-notchedOutline': {},
+        }),
+      },
+    },
+    MuiToolbar: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          [theme.breakpoints.down('md')]: {
+            minHeight: '56px',
+          },
         }),
       },
     },
