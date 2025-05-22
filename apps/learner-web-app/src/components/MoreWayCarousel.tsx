@@ -63,7 +63,8 @@ const MoreWayCarousel = () => {
                 >
                   <Box sx={{ padding: '56px 40px 20px 40px' }}>
                     <Typography
-                      variant="h6"
+                      variant="body8"
+                      component="h6"
                       sx={{
                         fontFamily: 'Poppins',
                         fontWeight: 600,
@@ -76,11 +77,12 @@ const MoreWayCarousel = () => {
                       {slide.title}
                     </Typography>
                     <Typography
+                      variant="h2"
                       sx={{
                         fontFamily: 'Poppins',
                         fontWeight: 400,
-                        fontSize: 16,
-                        lineHeight: '24px',
+                        // fontSize: 16,
+                        // lineHeight: '24px',
                         color: '#1F1B13',
                         mt: 2,
                       }}

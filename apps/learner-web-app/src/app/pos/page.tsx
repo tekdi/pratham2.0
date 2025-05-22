@@ -157,6 +157,7 @@ const page = () => {
           <Box sx={{ p: 3, '@media (max-width: 900px)': { px: '16px' } }}>
             <Typography
               variant="body3"
+              component="h1"
               sx={{
                 fontWeight: 800,
                 // fontSize: '72px',
@@ -174,11 +175,11 @@ const page = () => {
               Pratham
             </Typography>
             <Typography
-              variant="h3"
+              variant="body3"
               component="h1"
               sx={{
                 fontWeight: 800,
-                fontSize: '72px',
+                // fontSize: '72px',
                 lineHeight: '110%',
                 letterSpacing: '0%',
                 color: '#FDBE16',
@@ -192,13 +193,12 @@ const page = () => {
             </Typography>
 
             <Typography
-              variant="h5"
-              component="h2"
+              variant="body4"
+              component="h1"
               sx={{
                 my: 2,
                 fontFamily: 'Poppins',
                 fontWeight: 400,
-                fontSize: '28px',
                 lineHeight: '36px',
                 letterSpacing: '0px',
                 color: '#1F1B13',
@@ -211,11 +211,11 @@ const page = () => {
               Opening doors to knowledge and skills
             </Typography>
 
-            <Box
+            <Typography
+              variant="h1"
+              component="h1"
               sx={{
-                fontFamily: 'Poppins',
                 fontWeight: 400,
-                fontSize: '22px',
                 lineHeight: '28px',
                 letterSpacing: '0px',
                 color: '#1F1B13',
@@ -231,16 +231,17 @@ const page = () => {
               }}
             >
               In 15 languages
-            </Box>
+            </Typography>
 
             <Typography
-              variant="body1"
+              variant="body5"
+              component="h1"
               sx={{
                 mb: 3,
                 fontFamily: 'Poppins',
                 fontWeight: 400,
-                fontSize: '18px',
-                lineHeight: '24px',
+                // fontSize: '18px',
+                // lineHeight: '24px',
                 letterSpacing: '0.5px',
                 color: '#1F1B13',
                 mt: 3,
@@ -324,12 +325,12 @@ const page = () => {
         }}
       >
         <Typography
-          variant="h4"
+          variant="body6"
           component="h3"
           sx={{
             fontFamily: 'Poppins',
             fontWeight: 700,
-            fontSize: '36px',
+            // fontSize: '36px',
             lineHeight: '64px',
             letterSpacing: '-0.25px',
             color: '#1F1B13',
@@ -357,12 +358,14 @@ const page = () => {
             },
           }}
         >
-          <Box
+          <Typography
+            variant="body7"
+            component="h1"
             sx={{
-              fontFamily: 'Poppins',
+              // fontFamily: 'Poppins',
               fontWeight: 700,
-              fontSize: '46px',
-              lineHeight: '100%',
+              // fontSize: '46px',
+              // lineHeight: '100%',
               letterSpacing: '-0.25px',
               textAlign: 'center',
               color: '#1F1B13',
@@ -372,13 +375,14 @@ const page = () => {
             }}
           >
             3524
-          </Box>
-          <Box
+          </Typography>
+          <Typography
+            variant="body8"
+            component="h1"
             sx={{
-              fontFamily: 'Poppins',
               fontWeight: 400,
-              fontSize: '24px',
-              lineHeight: '32px',
+              // fontSize: '24px',
+              // lineHeight: '32px',
               letterSpacing: '0px',
               textAlign: 'center',
               color: '#1F1B13',
@@ -389,7 +393,7 @@ const page = () => {
             }}
           >
             Total Resources
-          </Box>
+          </Typography>
         </Box>
 
         {/* Resource Stats Section */}
@@ -419,10 +423,11 @@ const page = () => {
                 sx={{ textAlign: 'center' }}
               >
                 <Typography
+                  variant="body6"
                   sx={{
                     fontFamily: 'Poppins',
                     fontWeight: 700,
-                    fontSize: { xs: '24px', md: '36px' },
+                    fontSize: '36px',
                     lineHeight: '44px',
                     letterSpacing: '0px',
                     textAlign: 'center',
@@ -435,10 +440,11 @@ const page = () => {
                   {item.value}
                 </Typography>
                 <Typography
+                  variant="body8"
                   sx={{
                     fontFamily: 'Poppins',
                     fontWeight: 400,
-                    fontSize: '24px',
+                    // fontSize: '24px',
                     lineHeight: '32px',
                     letterSpacing: '0px',
                     textAlign: 'center',
@@ -459,10 +465,11 @@ const page = () => {
 
       <Box>
         <Typography
+          variant="body7"
           sx={{
             fontFamily: 'Poppins',
             fontWeight: 700,
-            fontSize: '46px',
+            // fontSize: '46px',
             lineHeight: '100%',
             letterSpacing: '-0.25px',
             textAlign: 'center',
@@ -484,11 +491,12 @@ const page = () => {
       {/* What's New */}
       <Box>
         <Typography
+          variant="body6"
           sx={{
             fontFamily: 'Poppins',
             fontWeight: 700,
-            fontSize: '36px',
-            lineHeight: '44px',
+            // fontSize: '36px',
+            // lineHeight: '44px',
             letterSpacing: '0px',
             textAlign: 'center',
             mt: 4,
@@ -515,11 +523,12 @@ const page = () => {
         <Grid container spacing={2} sx={{ alignItems: 'center' }}>
           <Grid item xs={12} md={6}>
             <Typography
+              variant="body6"
               sx={{
                 fontFamily: 'Poppins',
                 fontWeight: 700,
-                fontSize: '36px',
-                lineHeight: '44px',
+                // fontSize: '36px',
+                // lineHeight: '44px',
                 letterSpacing: '0px',
                 color: '#1F1B13',
                 '@media (max-width: 900px)': {
@@ -548,8 +557,8 @@ const page = () => {
         }}
       >
         <Typography
+          variant="body6"
           sx={{
-            fontFamily: 'Poppins',
             fontWeight: 700,
             fontSize: '36px',
             lineHeight: '44px',
@@ -581,10 +590,11 @@ const page = () => {
         }}
       >
         <Typography
+          variant="body6"
           sx={{
             fontFamily: 'Poppins',
             fontWeight: 700,
-            fontSize: '36px',
+            // fontSize: '36px',
             lineHeight: '44px',
             letterSpacing: '0px',
             textAlign: 'center',

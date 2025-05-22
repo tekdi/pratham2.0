@@ -56,6 +56,7 @@ export default function AccessibilityOptions() {
           position: 'absolute',
           right: 8,
           top: 150,
+          zIndex: 99999,
         }}
       >
         <AccessibleIcon sx={{ color: '#000' }} />

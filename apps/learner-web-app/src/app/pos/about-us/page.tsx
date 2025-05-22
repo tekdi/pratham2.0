@@ -107,10 +107,12 @@ const AboutUsPage = () => {
         >
           <Box>
             <Typography
+              variant="body8"
+              component="h1"
               sx={{
                 fontWeight: 700,
-                fontSize: { xs: '16px', md: '24px' },
-                lineHeight: { xs: '24px', md: '44px' },
+                // fontSize: { xs: '16px', md: '24px' },
+                // lineHeight: { xs: '24px', md: '44px' },
                 letterSpacing: '0px',
                 textAlign: 'center',
                 color: '#FFF',
@@ -119,9 +121,11 @@ const AboutUsPage = () => {
               About Us
             </Typography>
             <Typography
+              variant="body6"
+              component="h1"
               sx={{
                 fontWeight: 700,
-                fontSize: { xs: '22px', md: '36px' },
+                // fontSize: { xs: '22px' }, //md: '36px'
                 letterSpacing: '-0.25px',
                 textAlign: 'center',
                 color: '#FDBE16',
@@ -141,11 +145,13 @@ const AboutUsPage = () => {
           <Grid container spacing={3} sx={{ alignItems: 'center' }}>
             <Grid item xs={12} md={6}>
               <Typography
+                variant="body9"
+                component="h1"
                 sx={{
                   fontFamily: 'Poppins',
                   fontWeight: 600,
-                  fontSize: { xs: '22px', md: '32px' },
-                  lineHeight: { xs: '28px', md: '100%' },
+                  // fontSize: { xs: '22px', md: '32px' },
+                  // lineHeight: { xs: '28px', md: '100%' },
                   letterSpacing: '0px',
                   color: '#1F1B13',
                 }}
@@ -153,11 +159,13 @@ const AboutUsPage = () => {
                 Some more information about POS as a Pradigi Product
               </Typography>
               <Typography
+                variant="h2"
+                component="h2"
                 sx={{
                   fontFamily: 'Poppins',
                   fontWeight: 400,
-                  fontSize: { xs: '14px', md: '16px' },
-                  lineHeight: { xs: '20px', md: '24px' },
+                  // fontSize: { xs: '14px', md: '16px' },
+                  // lineHeight: { xs: '20px', md: '24px' },
                   letterSpacing: '0.5px',
                   color: '#1F1B13',
                   mt: 2,
@@ -171,11 +179,13 @@ const AboutUsPage = () => {
                 released in July 2022. 
               </Typography>
               <Typography
+                variant="h2"
+                component="h2"
                 sx={{
                   fontFamily: 'Poppins',
                   fontWeight: 400,
-                  fontSize: { xs: '14px', md: '16px' },
-                  lineHeight: { xs: '20px', md: '24px' },
+                  // fontSize: { xs: '14px', md: '16px' },
+                  // lineHeight: { xs: '20px', md: '24px' },
                   letterSpacing: '0.5px',
                   color: '#1F1B13',
                   mt: 2,
@@ -187,11 +197,13 @@ const AboutUsPage = () => {
                 curriculum.
               </Typography>
               <Typography
+                variant="h2"
+                component="h2"
                 sx={{
                   fontFamily: 'Poppins',
                   fontWeight: 400,
-                  fontSize: { xs: '14px', md: '16px' },
-                  lineHeight: { xs: '20px', md: '24px' },
+                  // fontSize: { xs: '14px', md: '16px' },
+                  // lineHeight: { xs: '20px', md: '24px' },
                   letterSpacing: '0.5px',
                   color: '#1F1B13',
                   mt: 2,
@@ -239,11 +251,13 @@ const AboutUsPage = () => {
             }}
           >
             <Typography
+              variant="body9"
+              component="h2"
               sx={{
                 fontFamily: 'Poppins',
                 fontWeight: 600,
-                fontSize: { xs: '22px', md: '32px' },
-                lineHeight: { xs: '28px', md: '40px' },
+                // fontSize: { xs: '22px', md: '32px' },
+                // lineHeight: { xs: '28px', md: '40px' },
                 letterSpacing: '0px',
                 textAlign: 'center',
                 color: '#1F1B13',
@@ -253,11 +267,13 @@ const AboutUsPage = () => {
             </Typography>
           </Box>
           <Typography
+            variant="h1"
+            component="h1"
             sx={{
               fontFamily: 'Poppins',
               fontWeight: 400,
-              fontSize: { xs: '14px', md: '22px' },
-              lineHeight: { xs: '20px', md: '28px' },
+              // fontSize: { xs: '14px', md: '22px' },
+              // lineHeight: { xs: '20px', md: '28px' },
               letterSpacing: '0px',
               textAlign: 'center',
               color: '#635E57',
@@ -294,11 +310,13 @@ const AboutUsPage = () => {
             }}
           >
             <Typography
+              variant="body9"
+              component="h2"
               sx={{
                 fontFamily: 'Poppins',
                 fontWeight: 600,
-                fontSize: '32px',
-                lineHeight: '40px',
+                // fontSize: '32px',
+                // lineHeight: '40px',
                 letterSpacing: '0px',
                 textAlign: 'center',
                 color: '#1F1B13',
@@ -308,11 +326,13 @@ const AboutUsPage = () => {
             </Typography>
           </Box>
           <Typography
+            variant="h1"
+            component="h1"
             sx={{
               fontFamily: 'Poppins',
               fontWeight: 400,
-              fontSize: '22px',
-              lineHeight: '32px',
+              // fontSize: '22px',
+              // lineHeight: '32px',
               letterSpacing: '0px',
               textAlign: 'center',
               color: '#635E57',
@@ -390,11 +410,13 @@ const AboutUsPage = () => {
                       sx={{ width: 48, height: 48, objectFit: 'contain' }}
                     />
                     <Typography
+                      variant="body4"
+                      component="h2"
                       sx={{
                         fontFamily: 'Poppins',
                         fontWeight: 400,
-                        fontSize: '28px',
-                        lineHeight: '36px',
+                        // fontSize: '28px',
+                        // lineHeight: '36px',
                         letterSpacing: '0px',
                         color: '#1F1B13',
                       }}
@@ -404,11 +426,13 @@ const AboutUsPage = () => {
                   </Grid>
                   <Grid item xs={12} md={8}>
                     <Typography
+                      variant="h2"
+                      component="h2"
                       sx={{
                         fontFamily: 'Poppins',
                         fontWeight: 400,
-                        fontSize: '16px',
-                        lineHeight: '24px',
+                        // fontSize: '16px',
+                        // lineHeight: '24px',
                         letterSpacing: '0.5px',
                         color: '#7C766F',
                       }}

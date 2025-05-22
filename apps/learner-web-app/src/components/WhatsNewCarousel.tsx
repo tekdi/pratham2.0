@@ -150,11 +150,12 @@ const WhatsNewCarousel = () => (
                 }}
               >
                 <Typography
+                  variant="h1"
                   sx={{
                     fontFamily: 'Poppins',
                     fontWeight: 400,
-                    fontSize: '22px',
-                    lineHeight: '28px',
+                    // fontSize: '22px',
+                    // lineHeight: '28px',
                     letterSpacing: '0px',
                     color: '#1F1B13',
                     '@media (max-width:900px)': {
@@ -165,11 +166,12 @@ const WhatsNewCarousel = () => (
                   {slide.heading}
                 </Typography>
                 <Typography
+                  variant="h2"
                   sx={{
                     fontFamily: 'Poppins',
                     fontWeight: 400,
-                    fontSize: '16px',
-                    lineHeight: '24px',
+                    // fontSize: '16px',
+                    // lineHeight: '24px',
                     letterSpacing: '0.5px',
                     color: '#1F1B13',
                     mt: 2,

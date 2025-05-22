@@ -110,11 +110,13 @@ const FeautureCarousel = () => {
                 />
               </Box>
               <Box sx={{ p: 2 }}>
-                <Box
+                <Typography
+                  variant="body1"
+                  component="h1"
                   sx={{
                     fontFamily: 'Poppins',
                     fontWeight: 500,
-                    fontSize: 16,
+                    // fontSize: 16,
                     letterSpacing: 0.15,
                     color: '#1F1B13',
                     '@media (max-width: 900px)': {
@@ -123,8 +125,10 @@ const FeautureCarousel = () => {
                   }}
                 >
                   {item.title}
-                </Box>
-                <Box
+                </Typography>
+                <Typography
+                  variant="body1"
+                  component="h1"
                   sx={{
                     fontFamily: 'Poppins',
                     fontWeight: 400,
@@ -139,7 +143,7 @@ const FeautureCarousel = () => {
                   }}
                 >
                   {item.description}
-                </Box>
+                </Typography>
               </Box>
               <Box sx={{ p: 2 }}>
                 {item.actions.map((action, i) => (
