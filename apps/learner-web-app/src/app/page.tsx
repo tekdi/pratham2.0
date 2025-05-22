@@ -56,6 +56,7 @@ export default function Index() {
               </Box>
               <Typography
                 variant="body9"
+                component="h1"
                 sx={{
                   fontWeight: '400',
                   color: '#1F1B13',
@@ -243,6 +244,7 @@ export default function Index() {
                 </Typography>
                 <Typography
                   variant="body1"
+                  component="h1"
                   paragraph
                   sx={{
                     mb: 3,

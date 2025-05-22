@@ -21,6 +21,8 @@ import InvertColorsIcon from '@mui/icons-material/InvertColors';
 import LinkIcon from '@mui/icons-material/Link';
 import AccessibleIcon from '@mui/icons-material/Accessible';
 import { useFontSize } from '../../context/FontSizeContext';
+import TextIncreaseIcon from '@mui/icons-material/TextIncrease';
+import TextDecreaseIcon from '@mui/icons-material/TextDecrease';
 
 export default function AccessibilityOptions() {
   const [open, setOpen] = React.useState(false);
@@ -91,6 +93,7 @@ export default function AccessibilityOptions() {
           right: 8,
           top: isMobile ? 100 : 150,
           zIndex: 1001,
+          border: '1px solid #CDC5BD',
         }}
       >
         <AccessibleIcon sx={{ color: '#000' }} />
@@ -127,10 +130,17 @@ export default function AccessibilityOptions() {
               mb: 2,
             }}
           >
-            <Typography variant="h6">Accessibility Options</Typography>
-            <IconButton onClick={toggleDrawer(false)}>
-              <CloseIcon />
-            </IconButton>
+            <Typography sx={{ color: '#1F1B13', fontWeight: 500 }} variant="h2">
+              Accessibility Options
+            </Typography>
+
+            <CloseIcon
+              sx={{
+                color: '#1C1B1F',
+                cursor: 'pointer',
+              }}
+              onClick={toggleDrawer(false)}
+            />
           </Box>
 
           <Divider sx={{ mb: 3 }} />
@@ -140,39 +150,57 @@ export default function AccessibilityOptions() {
               <Button
                 variant={isIncreased ? 'contained' : 'outlined'}
                 color="primary"
-                startIcon={<AddIcon />}
+                startIcon={<TextIncreaseIcon sx={{ color: '#635E57' }} />}
                 onClick={handleIncreaseFontSize}
                 sx={{
                   flex: 1,
                   justifyContent: 'flex-start',
                   py: 1.5,
                   borderRadius: 2,
-                  bgcolor: isIncreased ? '#FFBF00' : '#f5f5f5',
+                  bgcolor: isIncreased ? '#FDBE16' : '#f5f5f5',
                   '&:hover': {
                     bgcolor: isIncreased ? '#E6AC00' : '',
                   },
+                  border: '1px solid #CDC5BD',
                 }}
               >
-                <Typography variant="subtitle1">Increase Font Size</Typography>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    color: '#1F1B13',
+                    fontWeight: 500,
+                  }}
+                >
+                  Increase Font Size
+                </Typography>
               </Button>
 
               <Button
                 variant={isDecreased ? 'contained' : 'outlined'}
                 color="primary"
-                startIcon={<RemoveIcon />}
+                startIcon={<TextDecreaseIcon sx={{ color: '#635E57' }} />}
                 onClick={handleDecreaseFontSize}
                 sx={{
                   flex: 1,
                   justifyContent: 'flex-start',
                   py: 1.5,
                   borderRadius: 2,
-                  bgcolor: isDecreased ? '#FFBF00' : '#f5f5f5',
+                  bgcolor: isDecreased ? '#FDBE16' : '#f5f5f5',
                   '&:hover': {
                     bgcolor: isDecreased ? '#E6AC00' : '',
                   },
+                  border: '1px solid #CDC5BD',
                 }}
               >
-                <Typography variant="subtitle1">Decrease Font Size</Typography>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    color: '#1F1B13',
+                    fontWeight: 500,
+                  }}
+                >
+                  Decrease Font Size
+                </Typography>
               </Button>
             </Stack>
 
@@ -186,14 +214,15 @@ export default function AccessibilityOptions() {
                   justifyContent: 'flex-start',
                   py: 1.5,
                   borderRadius: 2,
-                  bgcolor: '#f5f5f5',
+                  // bgcolor: '#f5f5f5',
+                  border: '1px solid #CDC5BD',
                 }}
               >
                 <Typography variant="subtitle1">Text to Speech</Typography>
               </Button>
 
               <Button
-                variant="contained"
+                variant="outlined"
                 color="primary"
                 startIcon={<MicIcon />}
                 sx={{
@@ -201,7 +230,8 @@ export default function AccessibilityOptions() {
                   justifyContent: 'flex-start',
                   py: 1.5,
                   borderRadius: 2,
-                  bgcolor: '#FFBF00',
+                  // bgcolor: '#FFBF00',
+                  border: '1px solid #CDC5BD',
                 }}
               >
                 <Typography variant="subtitle1">Speech to Text</Typography>
@@ -219,13 +249,14 @@ export default function AccessibilityOptions() {
                   py: 1.5,
                   borderRadius: 2,
                   bgcolor: '#f5f5f5',
+                  border: '1px solid #CDC5BD',
                 }}
               >
                 <Typography variant="subtitle1">Invert Colours</Typography>
               </Button>
 
               <Button
-                variant="contained"
+                variant="outlined"
                 color="primary"
                 startIcon={<LinkIcon />}
                 sx={{
@@ -233,7 +264,8 @@ export default function AccessibilityOptions() {
                   justifyContent: 'flex-start',
                   py: 1.5,
                   borderRadius: 2,
-                  bgcolor: '#FFBF00',
+                  // bgcolor: '#FFBF00',
+                  border: '1px solid #CDC5BD',
                 }}
               >
                 <Typography variant="subtitle1">Underline links</Typography>
@@ -248,6 +280,13 @@ export default function AccessibilityOptions() {
               variant="text"
               color="primary"
               onClick={handleResetFontSize}
+              sx={{
+                color: '#0D599E',
+                fontWeight: 500,
+                fontSize: '14px',
+                borderRadius: 2,
+                padding: '6px 16px',
+              }}
             >
               Clear Selection
             </Button>
