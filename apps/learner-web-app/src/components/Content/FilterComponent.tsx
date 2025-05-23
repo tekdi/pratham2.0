@@ -34,6 +34,7 @@ const FilterComponent: React.FC<{
           );
           handleFilterChange(newFilterState);
         }}
+        isOpenColapsed
         filterFramework={filterFramework}
         orginalFormData={filterState?.filters ?? {}}
         staticFilter={staticFilter}

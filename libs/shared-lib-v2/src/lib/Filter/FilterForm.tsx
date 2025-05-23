@@ -46,6 +46,8 @@ interface FilterSectionProps {
   setShowMore: (b: boolean) => void;
   repleaseCode?: string;
   staticFormData?: Record<string, object>;
+  isShowStaticFilterValue?: boolean;
+  isOpenColapsed?: boolean;
 }
 
 interface FilterListProps {
@@ -53,6 +55,8 @@ interface FilterListProps {
   staticFilter?: Record<string, object>;
   onApply?: any;
   filterFramework?: any;
+  isShowStaticFilterValue?: boolean;
+  isOpenColapsed?: boolean;
 }
 
 export function FilterForm({
@@ -60,6 +64,8 @@ export function FilterForm({
   staticFilter,
   onApply,
   filterFramework,
+  isShowStaticFilterValue,
+  isOpenColapsed,
 }: Readonly<FilterListProps>) {
   const { t } = useTranslation();
 
@@ -111,7 +117,12 @@ export function FilterForm({
         props,
         transformedRenderForm.map((r) => r.name)
       );
-      setRenderStaticForm(filtered[0]?.fields ?? []);
+      const fields = filtered[0]?.fields
+        ? filtered[0]?.fields.filter(
+            (e: any) => !['Primary User', 'Target Age group'].includes(e.name)
+          )
+        : [];
+      setRenderStaticForm(fields);
       setLoading(false);
     },
     [orginalFormData, filterFramework]
@@ -152,7 +163,34 @@ export function FilterForm({
   return (
     <Loader isLoading={loading}>
       <Box display="flex" flexDirection="column" gap={2}>
+        <Box>
+          {/* <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 500,
+              fontSize: '16px',
+              my: 2,
+            }}
+          >
+            {t('LEARNER_APP.other_filters')}
+          </Typography> */}
+
+          <FilterSection
+            isShowStaticFilterValue={isShowStaticFilterValue}
+            isOpenColapsed={isOpenColapsed}
+            staticFormData={staticFilter}
+            fields={renderStaticForm}
+            selectedValues={formData}
+            onChange={(code, next) => {
+              setFormData((prev) => ({ ...prev, [code]: next }));
+            }}
+            showMore={showMoreStatic}
+            setShowMore={setShowMoreStatic}
+          />
+        </Box>
         <FilterSection
+          isShowStaticFilterValue={isShowStaticFilterValue}
+          isOpenColapsed={isOpenColapsed}
           staticFormData={staticFilter}
           repleaseCode="se_{code}s"
           fields={renderForm}
@@ -173,37 +211,14 @@ export function FilterForm({
           showMore={showMore}
           setShowMore={setShowMore}
         />
-        <Box>
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 500,
-              fontSize: '16px',
-              my: 2,
-            }}
+        <Box display={'flex'} justifyContent="center" gap={2} mt={2}>
+          <MuiButton
+            variant="contained"
+            sx={{ width: '50%' }}
+            onClick={handleFilter}
           >
-            {t('LEARNER_APP.other_filters')}
-          </Typography>
-
-          <FilterSection
-            staticFormData={staticFilter}
-            fields={renderStaticForm}
-            selectedValues={formData}
-            onChange={(code, next) => {
-              setFormData((prev) => ({ ...prev, [code]: next }));
-            }}
-            showMore={showMoreStatic}
-            setShowMore={setShowMoreStatic}
-          />
-          <Box display={'flex'} justifyContent="center" gap={2} mt={2}>
-            <MuiButton
-              variant="contained"
-              sx={{ width: '50%' }}
-              onClick={handleFilter}
-            >
-              {t('Filter')}
-            </MuiButton>
-          </Box>
+            {t('Filter')}
+          </MuiButton>
         </Box>
       </Box>
     </Loader>
@@ -344,6 +359,8 @@ const FilterSection: React.FC<FilterSectionProps> = ({
   showMore,
   setShowMore,
   repleaseCode,
+  isShowStaticFilterValue,
+  isOpenColapsed,
 }) => {
   return (
     <Box>
@@ -358,6 +375,9 @@ const FilterSection: React.FC<FilterSectionProps> = ({
           ? staticFormData[code]
           : [];
         if (Array.isArray(staticValues) && staticValues.length > 0) {
+          if (!isShowStaticFilterValue) {
+            return null;
+          }
           return (
             <Box
               key={`${code}-${idx}`}
@@ -386,6 +406,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
         } else {
           return (
             <Accordion
+              defaultExpanded={isOpenColapsed}
               key={code}
               sx={{ background: 'unset', boxShadow: 'unset' }}
             >
@@ -404,7 +425,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                 <Typography
                   sx={{ fontSize: '18px', fontWeight: '500', color: '#181D27' }}
                 >
-                  {field.name}
+                  {field.name === 'Sub Domain' ? '' : field.name}
                 </Typography>
               </AccordionSummary>
               <AccordionDetails
