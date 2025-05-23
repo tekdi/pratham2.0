@@ -9,7 +9,6 @@ import {
 } from '@shared-lib';
 import {
   AccountCircleOutlined,
-  ExploreOutlined,
   Home,
   AssignmentOutlined,
 } from '@mui/icons-material';
@@ -117,7 +116,10 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
       {...props}
       _topAppBar={{
         _brand: {
-          name: localStorage.getItem('userProgram') ?? '',
+          name:
+            typeof window !== 'undefined'
+              ? localStorage.getItem('userProgram') ?? ''
+              : '',
           _box: {
             onClick: () => router.push('/content'),
             sx: {
