@@ -2,9 +2,10 @@ import dynamic from 'next/dynamic';
 import React, { useState, useCallback, memo, useEffect } from 'react';
 import { Box, Button, Chip, Stack, Typography } from '@mui/material';
 import { CommonDialog, useTranslation } from '@shared-lib';
-import { FilterAltOutlined } from '@mui/icons-material';
+import { FilterAltOutlined, FilterList } from '@mui/icons-material';
 import SearchComponent from './SearchComponent';
 import FilterComponent from './FilterComponent';
+import { gredientStyle } from '@learner/utils/style';
 
 interface LearnerCourseProps {
   title?: string;
@@ -55,52 +56,145 @@ export default memo(function LearnerCourse({
   };
 
   return (
-    <Stack sx={{ p: { xs: 1, md: 4 }, gap: 4 }}>
-      {title && (
-        <Box
-          display="flex"
-          flexDirection={{ xs: 'column', md: 'row' }}
-          justifyContent="space-between"
-          alignItems="center"
-          sx={{
-            gap: { xs: 2, md: 0 },
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 400,
-              fontSize: '22px',
-              lineHeight: '28px',
-            }}
-          >
-            {t(title ?? 'LEARNER_APP.COURSE.GET_STARTED')}
-          </Typography>
+    <Stack sx={{ gap: { xs: 0, sm: 0, md: 2 }, pb: 4 }}>
+      <Box
+        sx={{
+          position: 'sticky',
+          top: 0,
+          bgcolor: '',
+          px: { xs: 1, md: 4 },
+          py: { xs: 1, md: 2 },
+          zIndex: 1,
+        }}
+        style={gredientStyle}
+      >
+        {title && (
           <Box
+            display="flex"
+            flexDirection={{ xs: 'column', md: 'row' }}
+            justifyContent="space-between"
+            alignItems="center"
             sx={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              gap: 2,
+              gap: { xs: 2, md: 0 },
+              px: { xs: 1, md: 0 },
             }}
           >
-            <SearchComponent
-              onSearch={handleSearchClick}
-              value={filterState?.query}
-            />
-            <Box sx={{ display: { xs: 'block', md: 'none' } }}>
-              <Button
-                variant="outlined"
-                onClick={() => setIsOpen(true)}
-                size="large"
-              >
-                <FilterAltOutlined />
-              </Button>
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 400,
+                fontSize: '22px',
+                lineHeight: '28px',
+              }}
+            >
+              {t(title ?? 'LEARNER_APP.COURSE.GET_STARTED')}
+            </Typography>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                gap: 1,
+              }}
+            >
+              <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+                <Button
+                  variant="outlined"
+                  onClick={() => setIsOpen(true)}
+                  size="large"
+                  sx={{
+                    borderRadius: '8px',
+                    borderWidth: '1px',
+                    borderColor: '#DADADA !important',
+                    padding: '8px 10px',
+                  }}
+                >
+                  <FilterList sx={{ width: 20, height: 20, mr: 0.5 }} />
+                  <Typography
+                    sx={{
+                      fontWeight: 500,
+                      fontSize: '14px',
+                      lineHeight: '20px',
+                      letterSpacing: '0.1px',
+                      mr: 0.5,
+                    }}
+                  >
+                    {t('LEARNER_APP.CONTENT.FILTERS')}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontWeight: 500,
+                      fontSize: '14px',
+                      lineHeight: '20px',
+                      letterSpacing: '0.1px',
+                    }}
+                  >
+                    {Object.keys(filterState?.filters || {}).filter(
+                      (e) =>
+                        !['limit', ...Object.keys(staticFilter ?? {})].includes(
+                          e
+                        )
+                    ).length
+                      ? `(${
+                          Object.keys(filterState.filters).filter(
+                            (e) =>
+                              ![
+                                'limit',
+                                ...Object.keys(staticFilter ?? {}),
+                              ].includes(e)
+                          ).length
+                        })`
+                      : null}
+                  </Typography>
+                </Button>
+              </Box>
+              <SearchComponent
+                onSearch={handleSearchClick}
+                value={filterState?.query}
+              />
+            </Box>
+            <Box
+              sx={{
+                display: { xs: 'flex', sm: 'flex', md: 'none' },
+                overflowY: 'auto',
+                width: '100%',
+              }}
+            >
+              {filterState?.filters
+                ? Object.keys(filterState.filters)
+                    .filter(
+                      (e) =>
+                        !['limit', ...Object.keys(staticFilter ?? {})].includes(
+                          e
+                        )
+                    )
+                    .map((key, index) => (
+                      <Chip
+                        key={`${key}-${index}`}
+                        label={
+                          <Typography
+                            noWrap
+                            variant="body2"
+                            sx={{ maxWidth: 300, mb: 0 }}
+                          >
+                            {`${key}: ${filterState.filters[key]}`}
+                          </Typography>
+                        }
+                        onDelete={() => {
+                          const { [key]: _, ...rest } =
+                            filterState.filters ?? {};
+                          handleFilterChange(rest);
+                        }}
+                        sx={{ mr: 1, mb: 1, borderRadius: '8px' }}
+                      />
+                    ))
+                : null}
             </Box>
           </Box>
-        </Box>
-      )}
-      <Stack direction="row" sx={{ gap: 4 }}>
+        )}
+      </Box>
+      <Stack direction="row" sx={{ gap: 4, px: { xs: 2, md: 4 } }}>
         <CommonDialog isOpen={isOpen} onClose={() => setIsOpen(false)}>
           <FilterComponent
             filterFramework={filterFramework}
@@ -115,7 +209,7 @@ export default memo(function LearnerCourse({
           sx={{
             display: { xs: 'none', md: 'flex' },
             position: 'sticky',
-            top: 0,
+            top: 100,
             alignSelf: 'flex-start',
           }}
         >
@@ -201,10 +295,6 @@ export default memo(function LearnerCourse({
               tabChange: handleTabChange,
               default_img: '/images/image_ver.png',
               _card: { isHideProgress: true },
-              _subBox: {
-                overflowY: 'auto',
-                maxHeight: 'calc(100vh - 200px)', // Adjust height as needed
-              },
               ..._content?._config,
             }}
             filters={{

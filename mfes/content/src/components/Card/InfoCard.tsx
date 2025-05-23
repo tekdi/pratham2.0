@@ -8,13 +8,14 @@ import {
   Breadcrumbs,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import CommonModal from '../common-modal';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { ExpandableText, useTranslation } from '@shared-lib';
 
 interface InfoCardProps {
   item: any;
-  topic: string;
+  topic?: string;
   onBackClick?: () => void;
   _config?: any;
 }
@@ -25,39 +26,26 @@ const InfoCard: React.FC<InfoCardProps> = ({
   onBackClick,
   _config,
 }) => {
+  const { t } = useTranslation();
   const { _infoCard } = _config || {};
   const [openModal, setOpenModal] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [showButton, setShowButton] = useState(false);
-  const descriptionRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const checkTextHeight = () => {
-      if (descriptionRef.current) {
-        const lineHeight = parseInt(
-          window.getComputedStyle(descriptionRef.current).lineHeight
-        );
-        const height = descriptionRef.current.scrollHeight;
-        setShowButton(height > lineHeight * 2);
-      }
-    };
-
-    // Initial check
-    checkTextHeight();
-
-    // Add resize listener to handle window resizing
-    window.addEventListener('resize', checkTextHeight);
-    return () => window.removeEventListener('resize', checkTextHeight);
-  }, [item?.description]);
-  console.log(topic, 'topic');
   return (
     <>
-      <Card sx={{ display: 'flex', ..._infoCard?._card }}>
+      <Card
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row', md: 'row' },
+          borderRadius: 0,
+          ..._infoCard?._card,
+        }}
+      >
         <CardMedia
           component="img"
           sx={{
             flex: { xs: 6, md: 4, lg: 3, xl: 3 },
-            maxHeight: '280px',
+            maxHeight: { xs: '200px', sm: '280px' },
+            // objectFit: 'contain',
             ..._infoCard?._cardMedia,
           }}
           image={item?.appIcon || _infoCard?.default_img}
@@ -76,10 +64,10 @@ const InfoCard: React.FC<InfoCardProps> = ({
               display: 'flex',
               flexDirection: 'column',
               flex: '1 0 auto',
-              p: '18px',
-              pb: 0,
+              p: { xs: '16px', md: '18px' },
+              pb: { xs: '0px', md: '18px' },
               gap: 1.5,
-              width: '85%',
+              width: { xs: '90%', sm: '85%' },
             }}
           >
             {onBackClick && (
@@ -88,7 +76,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   gap: 1,
-                  pt: 2,
+                  pt: { xs: 0, md: 2 },
                 }}
               >
                 <IconButton
@@ -99,18 +87,39 @@ const InfoCard: React.FC<InfoCardProps> = ({
                   <ArrowBackIcon />
                 </IconButton>
                 <Breadcrumbs separator="›" aria-label="breadcrumb">
-                  <Typography variant="body1">Course</Typography>
-                  {topic && <Typography variant="body1">{topic}</Typography>}
+                  {_infoCard?.breadCrumbs?.map(
+                    (breadcrumb: any, index: number) => (
+                      <Typography
+                        key={`${
+                          breadcrumb?.name ?? breadcrumb?.label ?? ''
+                        } ${index}`}
+                        variant="body1"
+                        color="text.secondary"
+                        sx={{ cursor: 'pointer' }}
+                        onClick={() => breadcrumb.handleBreadcrumbClick()}
+                      >
+                        {breadcrumb.name ?? breadcrumb.label ?? ''}
+                      </Typography>
+                    )
+                  )}
+                  {(!_infoCard?.breadCrumbs ||
+                    _infoCard?.breadCrumbs?.length > 1) &&
+                    ['Course', ...(topic ? [topic] : [])].map((key) => (
+                      <Typography key={key} variant="body1">
+                        {key}
+                      </Typography>
+                    ))}
                 </Breadcrumbs>
               </Box>
             )}
             <Typography
               component="div"
               variant="h5"
+              title={item?.name}
               sx={{
                 fontWeight: 700,
-                fontSize: '36px',
-                lineHeight: '44px',
+                fontSize: { xs: '22px', sm: '24px', md: '36px' },
+                lineHeight: { xs: '28px', sm: '32px', md: '44px' },
                 display: '-webkit-box',
                 WebkitLineClamp: 1,
                 WebkitBoxOrient: 'vertical',
@@ -120,51 +129,22 @@ const InfoCard: React.FC<InfoCardProps> = ({
             >
               {item?.name}
             </Typography>
-            <Typography
-              ref={descriptionRef}
-              variant="subtitle1"
-              component="div"
-              sx={{
-                textTransform: 'capitalize',
-                color: '#1F1B13',
-                display: '-webkit-box',
-                WebkitLineClamp: isExpanded ? 'unset' : 2,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                transition: 'all 0.3s ease-in-out',
-                maxHeight: isExpanded ? '100%' : '51px',
+            <ExpandableText
+              text={item?.description}
+              number={2}
+              _text={{
+                fontSize: { xs: '14px', sm: '16px', md: '18px' },
+                lineHeight: { xs: '20px', sm: '22px', md: '26px' },
               }}
-            >
-              {item?.description}
-            </Typography>
-            {showButton && (
-              <Button
-                onClick={() => setIsExpanded(!isExpanded)}
-                sx={{
-                  textTransform: 'none',
-                  color: '#1F1B13',
-                  p: 0,
-                  minWidth: 'auto',
-                  transition: 'all 0.3s ease-in-out',
-                  '&:hover': {
-                    backgroundColor: 'transparent',
-                    textDecoration: 'underline',
-                  },
-                }}
-              >
-                {isExpanded ? 'See less' : 'See more'}
-              </Button>
-            )}
+            />
             <Box>
               {_infoCard?.isShowStatus &&
                 (item?.issuedOn ? (
                   <Typography
                     sx={{
-                      fontFamily: 'Poppins',
                       fontWeight: 500,
-                      fontSize: '16px',
-                      lineHeight: '24px',
+                      fontSize: { xs: '14px', sm: '16px', md: '16px' },
+                      lineHeight: { xs: '20px', sm: '22px', md: '26px' },
                       color: '#00730B',
                       letterSpacing: '0.15px',
                     }}
@@ -172,7 +152,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
                     <CheckCircleIcon
                       sx={{ color: '#00730B', fontSize: 20, mr: 1 }}
                     />
-                    Completed on:{' '}
+                    {t('LEARNER_APP.COURSE.COMPLETED_ON')}:{' '}
                     {new Intl.DateTimeFormat('en-GB', {
                       day: '2-digit',
                       month: 'short',
@@ -192,9 +172,11 @@ const InfoCard: React.FC<InfoCardProps> = ({
                       pb: 1,
                       pl: 2,
                       bgcolor: '#FFDEA1',
+                      fontSize: { xs: '14px', sm: '16px', md: '16px' },
+                      lineHeight: { xs: '20px', sm: '22px', md: '26px' },
                     }}
                   >
-                    Started on:{' '}
+                    {t('LEARNER_APP.COURSE.STARTED_ON')}:{' '}
                     {item?.startedOn
                       ? new Intl.DateTimeFormat('en-GB', {
                           day: '2-digit',
@@ -225,7 +207,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
 
       <CommonModal
         open={openModal}
-        onClose={() => setOpenModal(false)}
+        // onClose={() => setOpenModal(false)}
         onStartLearning={_config?.onButtonClick}
       >
         <Box

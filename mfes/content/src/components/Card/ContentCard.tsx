@@ -21,18 +21,15 @@ const ContentCard = ({
   const { isWrap } = _card ?? {};
 
   return (
-    <CardWrap isWrap={isWrap}>
+    <CardWrap isWrap={isWrap} _card={_card}>
       <CommonCard
-        minheight={type?.toLowerCase() === 'course' ? '302px' : '356px'}
         title={(item?.name || '').trim()}
         image={
           item?.posterImage && item?.posterImage !== 'undefined'
             ? item?.posterImage
             : default_img ?? `${AppConst.BASEPATH}/assests/images/image_ver.png`
         }
-        content={
-          item?.description ? item?.description : 'No description available'
-        }
+        content={item?.description ? item?.description : ''}
         actions={
           type !== 'Course' && (
             <StatusIcon
@@ -57,21 +54,7 @@ const ContentCard = ({
         TrackData={trackData}
         type={type}
         onClick={() => handleCardClick(item)}
-        _card={{
-          _contentText: {
-            sx: !item?.description
-              ? {
-                  color: '#79747E',
-                  fontStyle: 'italic',
-                  minHeight: '114px',
-                }
-              : {
-                  textTransform: 'capitalize',
-                  minHeight: '114px',
-                },
-          },
-          ..._card,
-        }}
+        _card={_card}
       />
     </CardWrap>
   );
@@ -82,9 +65,11 @@ export default ContentCard;
 const CardWrap = ({
   children,
   isWrap,
+  _card,
 }: {
   children: React.ReactNode;
   isWrap?: boolean;
+  _card?: any;
 }) => {
   const theme = useTheme();
   const borderRadius = (
@@ -107,7 +92,7 @@ const CardWrap = ({
           position: 'absolute',
           top: -8,
           zIndex: 0,
-          width: '100%',
+          width: _card?.sx.width ?? '100%',
           px: 2,
         }}
       >
@@ -126,7 +111,7 @@ const CardWrap = ({
           position: 'absolute',
           top: -4,
           zIndex: 0,
-          width: '100%',
+          width: _card?.sx.width ?? '100%',
           px: 1,
         }}
       >
@@ -140,7 +125,7 @@ const CardWrap = ({
           }}
         />
       </Box>
-      <Box sx={{ zIndex: 1, width: '100%' }}>{children}</Box>
+      <Box sx={{ zIndex: 1, width: _card?.sx.width ?? '100%' }}>{children}</Box>
     </Box>
   );
 };

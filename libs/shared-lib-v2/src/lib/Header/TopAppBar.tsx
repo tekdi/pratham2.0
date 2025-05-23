@@ -112,11 +112,16 @@ const LanguageSelect = ({
       size="small"
       onChange={handleChange}
       sx={{
+        '& .MuiSelect-select': {
+          padding: '2px 12px 3px 12px',
+        },
         color: theme.palette.text.primary,
-        width: 70,
-        height: 28,
-        borderRadius: 8,
+        borderRadius: '8px',
         borderWidth: 1,
+        '& .Mui-selected': {
+          backgroundColor: 'transparent',
+          color: theme.palette.text.primary,
+        },
       }}
     >
       <MuiMenuItem value="en">EN</MuiMenuItem>
@@ -199,11 +204,11 @@ export const DesktopBar = ({
                     : link.variant ?? 'top-bar-link-text'
                 }
                 startIcon={link?.icon && link.icon}
-                onClick={
-                  typeof link.to !== 'string'
-                    ? (link.to as React.MouseEventHandler)
-                    : undefined
-                }
+                onClick={(e: any) => {
+                  typeof link.to !== 'string' && link.to !== undefined
+                    ? link.to(e)
+                    : openMenuAtLevel(0, e.currentTarget, link.child ?? []);
+                }}
               >
                 {link.title}
               </Button>
@@ -258,14 +263,7 @@ export const DesktopBar = ({
           }}
         >
           <Paper elevation={3}>
-            <Box
-              display="flex"
-              flexDirection="row"
-              flexWrap="wrap"
-              sx={{
-                boxShadow: '0px -4px 4px rgba(0, 0, 0, 0.1)',
-              }}
-            >
+            <Box display="flex" flexDirection="row" flexWrap="wrap">
               {menu.items.map((item, idx) => {
                 const hasChild =
                   Array.isArray(item.child) && item.child.length > 0;
@@ -280,7 +278,6 @@ export const DesktopBar = ({
                         setMenus((prev) => prev.slice(0, level + 1));
                       }
                     }}
-                    sx={{ minWidth: 160 }}
                   >
                     <MenuItem
                       onClick={() => {
@@ -337,17 +334,7 @@ const MobileTopBar = ({
           >
             <MenuIcon />
           </IconButton>
-          <Typography
-            component="div"
-            sx={{
-              flexGrow: 1,
-              textAlign: 'center',
-              fontSize: '22px',
-              fontWeight: 400,
-            }}
-          >
-            {title}
-          </Typography>
+          <Brand {..._brand} name={''} />
         </>
       ) : (
         <>
@@ -387,16 +374,18 @@ const Brand = ({ _box, name = 'Pratham' }: { _box?: any; name?: string }) => {
       {_box?.brandlogo ?? (
         <>
           <img src="/logo.png" alt="YouthNet" style={{ height: '40px' }} />
-          <Typography
-            variant="h6"
-            sx={{
-              color: theme.palette.text.primary,
-              fontWeight: 600,
-              ...(_box?._text ?? {}),
-            }}
-          >
-            {name}
-          </Typography>
+          {name && (
+            <Typography
+              variant="h6"
+              sx={{
+                color: theme.palette.text.primary,
+                fontWeight: 600,
+                ...(_box?._text ?? {}),
+              }}
+            >
+              {name}
+            </Typography>
+          )}
         </>
       )}
     </Box>

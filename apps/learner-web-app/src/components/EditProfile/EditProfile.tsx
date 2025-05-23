@@ -19,6 +19,7 @@ import { Loader } from '@shared-lib';
 import {
   firstLetterInUpperCase,
   getMissingFields,
+  isUnderEighteen,
   mapUserData,
 } from '@learner/utils/helper';
 import face from '../../../public/images/Group 3.png';
@@ -112,6 +113,9 @@ const EditProfile = ({ completeProfile }: EditProfileProps) => {
           setuserData(useInfo?.result?.userData);
           const mappedData = mapUserData(useInfo?.result?.userData);
           console.log(mappedData);
+          if (isUnderEighteen(useInfo?.result?.userData?.dob)) {
+            delete responseForm?.schema.properties.mobile;
+          }
 
           const updatedSchema = getMissingFields(
             responseForm?.schema,
@@ -120,7 +124,6 @@ const EditProfile = ({ completeProfile }: EditProfileProps) => {
           console.log(updatedSchema);
 
           setUserFormData(mappedData);
-
           //unit name is missing from required so handled from frotnend
           let alterSchema = completeProfile
             ? updatedSchema
@@ -285,15 +288,18 @@ const EditProfile = ({ completeProfile }: EditProfileProps) => {
             </Typography>
           </Box>
           <Box
-            ml="25%"
-            // mt="70px"
-            width="50vw"
-            // height="100vh"
-            display="flex"
-            flexDirection="column"
-            bgcolor={'#fff'}
-            padding={'40px'}
-            mb="20px"
+            sx={{
+              ml: 'auto',
+              mr: 'auto',
+              width: {
+                xs: '90vw',
+                md: '50vw',
+              },
+              display: 'flex',
+              flexDirection: 'column',
+              bgcolor: '#fff',
+              p: '40px',
+            }}
           >
             {completeProfile && (
               <Box display="flex" alignItems="center" gap={1} mb={2}>

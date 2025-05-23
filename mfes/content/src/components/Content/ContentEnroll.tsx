@@ -36,6 +36,14 @@ const ContentDetails = (props: ContentDetailsProps) => {
   const [contentDetails, setContentDetails] =
     useState<ContentSearchResponse | null>(null);
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
+  let activeLink = null;
+  if (typeof window !== 'undefined') {
+    const searchParams = new URLSearchParams(window.location.search);
+    activeLink = searchParams.get('activeLink');
+    if (!activeLink) {
+      activeLink = '';
+    }
+  }
 
   useEffect(() => {
     const fetchContentDetails = async () => {
@@ -48,15 +56,17 @@ const ContentDetails = (props: ContentDetailsProps) => {
             courseId: identifier as string,
           });
           if (
-            data?.result?.status === 'enrolled' ||
-            data?.result?.status === 'completed' ||
-            data?.result?.status === 'viewCertificate'
+            ['enrolled', 'inprogress', 'completed', 'viewCertificate'].includes(
+              data?.result?.status
+            )
           ) {
             if (props?.getIfEnrolled) {
               props?.getIfEnrolled(result as unknown as ContentSearchResponse);
             } else {
               router.replace(
-                `${props?._config?.contentBaseUrl ?? '/content'}/${identifier}`
+                `${props?._config?.contentBaseUrl ?? '/content'}/${identifier}${
+                  activeLink ? `?activeLink=${activeLink}` : ''
+                }`
               );
             }
           }
@@ -73,7 +83,7 @@ const ContentDetails = (props: ContentDetailsProps) => {
     } else {
       setIsLoading(false);
     }
-  }, [identifier, props, router]);
+  }, [identifier, activeLink, props, router]);
 
   const handleClick = async () => {
     setIsLoading(true);
@@ -84,11 +94,7 @@ const ContentDetails = (props: ContentDetailsProps) => {
           userId,
           courseId: identifier as string,
         });
-        let activeLink = null;
-        if (typeof window !== 'undefined') {
-          const searchParams = new URLSearchParams(window.location.search);
-          activeLink = searchParams.get('activeLink');
-        }
+
         router.replace(
           `${props?._config?.contentBaseUrl ?? '/content'}/${identifier}${
             activeLink ? `?activeLink=${activeLink}` : ''
@@ -98,7 +104,9 @@ const ContentDetails = (props: ContentDetailsProps) => {
         router.replace(
           `/login?redirectUrl=${
             props?._config?.contentBaseUrl ?? '/content'
-          }-details/${identifier}`
+          }-details/${identifier}${
+            activeLink ? `&activeLink=${activeLink}` : ''
+          }`
         );
       }
     } catch (error) {
@@ -111,17 +119,20 @@ const ContentDetails = (props: ContentDetailsProps) => {
   };
 
   return (
-    <LayoutPage isLoadingChildren={isLoading} isShow={props?.isShowLayout}>
+    <LayoutPage
+      isLoadingChildren={isLoading || activeLink === null}
+      isShow={props?.isShowLayout}
+    >
       <InfoCard
         item={contentDetails}
-        //build issue fix
-        topic={''}
+        topic={contentDetails?.se_subjects?.join(',')}
         onBackClick={onBackClick}
         _config={{ onButtonClick: handleClick, ...props?._config }}
       />
       <Box sx={{ display: 'flex' }}>
         <Box
           sx={{
+            display: { xs: 'none', sm: 'none', md: 'flex' },
             flex: { xs: 6, md: 4, lg: 3, xl: 3 },
           }}
         />
@@ -133,7 +144,6 @@ const ContentDetails = (props: ContentDetailsProps) => {
             px: '18px',
           }}
         >
-          {/* Section Header */}
           <Box
             sx={{
               display: 'flex',

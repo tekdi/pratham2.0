@@ -31,7 +31,7 @@ const UnitCard = ({
           position: 'absolute',
           top: -12,
           zIndex: 0,
-          width: '100%',
+          width: _card?.sx?.width ?? '100%',
           px: 3,
         }}
       >
@@ -48,7 +48,7 @@ const UnitCard = ({
           position: 'absolute',
           top: -6,
           zIndex: 0,
-          width: '100%',
+          width: _card?.sx?.width ?? '100%',
           px: 1.5,
         }}
       >
@@ -60,7 +60,7 @@ const UnitCard = ({
           }}
         />
       </Box>
-      <Box sx={{ zIndex: 1, width: '100%' }}>
+      <Box sx={{ zIndex: 1, width: _card?.sx?.width ?? '100%' }}>
         <CommonCard
           minheight="100%"
           title={(item?.name || '').trim()}
@@ -78,21 +78,7 @@ const UnitCard = ({
           TrackData={trackData}
           type={type}
           onClick={() => handleCardClick(item)}
-          _card={{
-            _contentText: {
-              sx: !item?.description
-                ? {
-                    color: '#79747E',
-                    fontStyle: 'italic',
-                    minHeight: '114px',
-                  }
-                : {
-                    textTransform: 'capitalize',
-                    minHeight: '114px',
-                  },
-            },
-            ..._card,
-          }}
+          _card={_card}
         />
       </Box>
     </Box>

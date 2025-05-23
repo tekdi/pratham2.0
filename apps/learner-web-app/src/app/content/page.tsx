@@ -2,7 +2,14 @@
 import React from 'react';
 import Layout from '@learner/components/Layout';
 import LearnerCourse from '@learner/components/Content/LearnerCourse';
-import { Box, Button, Grid, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Grid,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material';
 import { gredientStyle } from '@learner/utils/style';
 import LTwoCourse from '@learner/components/Content/LTwoCourse';
 import { useEffect, useState } from 'react';
@@ -13,14 +20,13 @@ import { checkAuth } from '@shared-lib-v2/utils/AuthService';
 import { CompleteProfileBanner } from '@learner/components/CompleteProfileBanner/CompleteProfileBanner';
 import { profileComplitionCheck } from '@learner/utils/API/userService';
 import { usePathname } from 'next/navigation';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 const MyComponent: React.FC = () => {
-  const { t } = useTranslation();
   const pathname = usePathname();
   const [filter, setFilter] = useState<Record<string, any> | null>(null);
   const [isLogin, setIsLogin] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isShow, setIsShow] = useState(false);
   const [isProfileCard, setIsProfileCard] = useState(false);
 
   useEffect(() => {
@@ -111,70 +117,7 @@ const MyComponent: React.FC = () => {
               Welcome, {localStorage.getItem('firstName')}!
             </Typography>
           </Box>
-          <Grid
-            container
-            style={gredientStyle}
-            {...(isShow ? {} : { sx: { display: 'none' } })}
-          >
-            <Grid
-              item
-              xs={12}
-              md={3}
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                px: '48px',
-                py: '32px',
-                gap: 3,
-              }}
-            >
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}
-              >
-                <Typography
-                  variant="h4"
-                  gutterBottom
-                  sx={{
-                    fontFamily: 'Poppins',
-                    fontWeight: 400,
-                    fontSize: '22px',
-                    lineHeight: '28px',
-                    letterSpacing: '0px',
-                    verticalAlign: 'middle',
-                    color: '#06A816',
-                  }}
-                >
-                  {t('LEARNER_APP.L_ONE_COURSE.IN_PROGRESS_TITLE')}
-                </Typography>
-                <Typography
-                  variant="body1"
-                  gutterBottom
-                  sx={{
-                    fontSize: 16,
-                  }}
-                >
-                  {t('LEARNER_APP.L_ONE_COURSE.ONGOING_COURSES').replace(
-                    '{count}',
-                    isShow?.toString()
-                  )}
-                </Typography>
-              </Box>
-
-              <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
-                <Button variant="contained" color="primary" href="/in-progress">
-                  {t('LEARNER_APP.L_ONE_COURSE.VIEW_ALL_BUTTON')}
-                </Button>
-              </Box>
-            </Grid>
-            <Grid item xs={12} md={9}>
-              <ContentComponent
-                getContentData={(e: any) => setIsShow(e.count)}
-              />
-            </Grid>
-          </Grid>
+          <InProgressContent />
 
           <Grid container>
             <Grid
@@ -219,3 +162,105 @@ const MyComponent: React.FC = () => {
 };
 
 export default MyComponent;
+
+const InProgressContent: React.FC = () => {
+  const { t } = useTranslation();
+  const [isShow, setIsShow] = useState(false);
+  const theme = useTheme();
+  // Detect if the screen size is medium or larger
+  const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
+
+  return (
+    <Grid
+      container
+      style={gredientStyle}
+      {...(isShow ? {} : { sx: { display: 'none' } })}
+    >
+      <Grid
+        item
+        xs={12}
+        md={3}
+        sx={{
+          display: 'flex',
+          flexDirection: { md: 'column' },
+          justifyContent: {
+            xs: 'space-between',
+            sm: 'space-between',
+            md: 'flex-start',
+          },
+          px: { xs: '16px', md: '48px' },
+          py: { xs: '24px', md: '32px' },
+          pb: { xs: 2, sm: 2 },
+          gap: 3,
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: { xs: 0, sm: 0, md: 1 },
+          }}
+        >
+          <Typography
+            variant="h4"
+            gutterBottom
+            sx={{
+              fontFamily: 'Poppins',
+              fontWeight: 400,
+              fontSize: { md: '22px', sm: '16px', xs: '16px' },
+              lineHeight: { md: '28px', sm: '24px', xs: '24px' },
+              letterSpacing: '0px',
+              verticalAlign: 'middle',
+              color: '#06A816',
+              mb: 0,
+            }}
+          >
+            {t('LEARNER_APP.L_ONE_COURSE.IN_PROGRESS_TITLE')}
+          </Typography>
+          <Typography
+            variant="body1"
+            gutterBottom
+            sx={{
+              color: '#7C766F',
+              fontSize: { xs: '12px', sm: '12px', md: '16px' },
+            }}
+          >
+            {t('LEARNER_APP.L_ONE_COURSE.ONGOING_COURSES').replace(
+              '{count}',
+              isShow?.toString()
+            )}
+          </Typography>
+        </Box>
+        <Box
+          sx={{ display: { md: 'flex' }, justifyContent: { md: 'flex-start' } }}
+        >
+          <Button
+            variant={isMdUp ? 'contained' : 'text'}
+            sx={
+              !isMdUp
+                ? {
+                    color: theme.palette.secondary.main,
+                    minWidth: '100px',
+                    fontWeight: 500,
+                    fontSize: '14px',
+                    lineHeight: '20px',
+                    letterSpacing: '0.1px',
+                    textAlign: 'center',
+                    verticalAlign: 'middle',
+                  }
+                : {}
+            }
+            endIcon={<ArrowForwardIcon />}
+            color="primary"
+            href="/in-progress"
+          >
+            {t('LEARNER_APP.L_ONE_COURSE.VIEW_ALL_BUTTON')}
+          </Button>
+        </Box>
+      </Grid>
+      <Grid item xs={12} md={9} sx={{ pl: { xs: '16px', md: '0px' } }}>
+        <ContentComponent getContentData={(e: any) => setIsShow(e.count)} />
+      </Grid>
+    </Grid>
+  );
+};

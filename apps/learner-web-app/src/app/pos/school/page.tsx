@@ -6,5 +6,15 @@ const List = dynamic(() => import('@learner/app/pos/List'), {
 });
 
 export default function PosPage() {
-  return <List pagename="School" />;
+  return (
+    <List
+      pagename="School"
+      _infoCard={{
+        item: {
+          description:
+            "Learning for School focuses on scholastic subjects, which include early years education and learning to read, write, and think. These skills are crucial for building children's confidence and dignity among their peers.",
+        },
+      }}
+    />
+  );
 }
