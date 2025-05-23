@@ -4,7 +4,6 @@ import {
   Button,
   Typography,
   CircularProgress,
-  useTheme,
   IconButton,
 } from '@mui/material';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -38,7 +37,6 @@ const ContentCardCarousel = ({
 }) => {
   const { t } = useTranslation();
   const { default_img, _subBox, _card, isHideNavigation } = _config ?? {};
-  const theme = useTheme();
   const prevRef = useRef(null);
   const nextRef = useRef(null);
 

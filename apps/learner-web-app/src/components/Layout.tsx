@@ -117,7 +117,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
       {...props}
       _topAppBar={{
         _brand: {
-          name: localStorage.getItem('userProgram') || '',
+          name: localStorage.getItem('userProgram') ?? '',
           _box: {
             onClick: () => router.push('/content'),
             sx: {
