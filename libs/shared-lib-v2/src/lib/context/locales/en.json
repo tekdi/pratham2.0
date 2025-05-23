@@ -55,6 +55,8 @@
       "LOADING": "Loading.."
     },
     "COURSE": {
+      "COMPLETED_ON": "Completed on",
+      "STARTED_ON": "Started on",
       "GET_STARTED": "Get Started with L1 Courses",
       "FILTER_BY": "Filter by",
       "CLEAR_FILTER": "Clear Filter"

@@ -321,8 +321,8 @@ export const StatusBar: React.FC<StatuPorps> = ({
           />
         )}
         <Typography
-          width={type === 'Course' ? '100%' : '133px'}
           sx={{
+            minWidth: '80px',
             fontSize: '14px',
             lineHeight: '20px',
             letterSpacing: '0.1px',

@@ -207,8 +207,6 @@ export default function Details(props: DetailsProps) {
           pb: { xs: 4, md: 10 },
           px: { xs: 2, sm: 3, md: 10 },
           gap: 2,
-          display: 'flex',
-          flexWrap: 'wrap',
           ...props?._box,
         }}
       >

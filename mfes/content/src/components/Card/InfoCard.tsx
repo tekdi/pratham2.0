@@ -11,7 +11,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import React, { useState } from 'react';
 import CommonModal from '../common-modal';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { ExpandableText } from '@shared-lib';
+import { ExpandableText, useTranslation } from '@shared-lib';
 
 interface InfoCardProps {
   item: any;
@@ -26,6 +26,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
   onBackClick,
   _config,
 }) => {
+  const { t } = useTranslation();
   const { _infoCard } = _config || {};
   const [openModal, setOpenModal] = useState(false);
 
@@ -86,8 +87,28 @@ const InfoCard: React.FC<InfoCardProps> = ({
                   <ArrowBackIcon />
                 </IconButton>
                 <Breadcrumbs separator="›" aria-label="breadcrumb">
-                  <Typography variant="body1">Course</Typography>
-                  {topic && <Typography variant="body1">{topic}</Typography>}
+                  {_infoCard?.breadCrumbs?.map(
+                    (breadcrumb: any, index: number) => (
+                      <Typography
+                        key={`${
+                          breadcrumb?.name ?? breadcrumb?.label ?? ''
+                        } ${index}`}
+                        variant="body1"
+                        color="text.secondary"
+                        sx={{ cursor: 'pointer' }}
+                        onClick={() => breadcrumb.handleBreadcrumbClick()}
+                      >
+                        {breadcrumb.name ?? breadcrumb.label ?? ''}
+                      </Typography>
+                    )
+                  )}
+                  {(!_infoCard?.breadCrumbs ||
+                    _infoCard?.breadCrumbs?.length > 1) &&
+                    ['Course', ...(topic ? [topic] : [])].map((key) => (
+                      <Typography key={key} variant="body1">
+                        {key}
+                      </Typography>
+                    ))}
                 </Breadcrumbs>
               </Box>
             )}
@@ -131,7 +152,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
                     <CheckCircleIcon
                       sx={{ color: '#00730B', fontSize: 20, mr: 1 }}
                     />
-                    Completed on:{' '}
+                    {t('LEARNER_APP.COURSE.COMPLETED_ON')}:{' '}
                     {new Intl.DateTimeFormat('en-GB', {
                       day: '2-digit',
                       month: 'short',
@@ -155,7 +176,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
                       lineHeight: { xs: '20px', sm: '22px', md: '26px' },
                     }}
                   >
-                    Started on:{' '}
+                    {t('LEARNER_APP.COURSE.STARTED_ON')}:{' '}
                     {item?.startedOn
                       ? new Intl.DateTimeFormat('en-GB', {
                           day: '2-digit',
