@@ -174,92 +174,102 @@ const InProgressContent: React.FC = () => {
     <Grid
       container
       style={gredientStyle}
+      sx={{ px: { xs: 0, sm: 0, md: 4 } }}
       {...(isShow ? {} : { sx: { display: 'none' } })}
     >
-      <Grid
-        item
-        xs={12}
-        md={3}
-        sx={{
-          display: 'flex',
-          flexDirection: { md: 'column' },
-          justifyContent: {
-            xs: 'space-between',
-            sm: 'space-between',
-            md: 'flex-start',
-          },
-          px: { xs: '16px', md: '48px' },
-          py: { xs: '24px', md: '32px' },
-          pb: { xs: 2, sm: 2 },
-          gap: 3,
-        }}
-      >
+      <Grid item xs={12} md={2.7}>
         <Box
           sx={{
             display: 'flex',
-            flexDirection: 'column',
-            gap: { xs: 0, sm: 0, md: 1 },
+            flexDirection: { md: 'column' },
+            justifyContent: {
+              xs: 'space-between',
+              sm: 'space-between',
+              md: 'flex-start',
+            },
+            px: { xs: '16px' },
+            py: { xs: '24px' },
+            pb: { xs: 0, sm: 0 },
+            gap: 3,
           }}
         >
-          <Typography
-            variant="h4"
-            gutterBottom
+          <Box
             sx={{
-              fontFamily: 'Poppins',
-              fontWeight: 400,
-              fontSize: { md: '22px', sm: '16px', xs: '16px' },
-              lineHeight: { md: '28px', sm: '24px', xs: '24px' },
-              letterSpacing: '0px',
-              verticalAlign: 'middle',
-              color: '#06A816',
-              mb: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: { xs: 0, sm: 0, md: 1 },
             }}
           >
-            {t('LEARNER_APP.L_ONE_COURSE.IN_PROGRESS_TITLE')}
-          </Typography>
-          <Typography
-            variant="body1"
-            gutterBottom
+            <Typography
+              variant="h4"
+              gutterBottom
+              sx={{
+                fontFamily: 'Poppins',
+                fontWeight: 400,
+                fontSize: { md: '22px', sm: '16px', xs: '16px' },
+                lineHeight: { md: '28px', sm: '24px', xs: '24px' },
+                letterSpacing: '0px',
+                verticalAlign: 'middle',
+                color: '#06A816',
+                mb: 0,
+              }}
+            >
+              {t('LEARNER_APP.L_ONE_COURSE.IN_PROGRESS_TITLE')}
+            </Typography>
+            <Typography
+              variant="body1"
+              gutterBottom
+              sx={{
+                color: '#7C766F',
+                fontSize: { xs: '12px', sm: '12px', md: '16px' },
+              }}
+            >
+              {t('LEARNER_APP.L_ONE_COURSE.ONGOING_COURSES').replace(
+                '{count}',
+                isShow?.toString()
+              )}
+            </Typography>
+          </Box>
+          <Box
             sx={{
-              color: '#7C766F',
-              fontSize: { xs: '12px', sm: '12px', md: '16px' },
+              display: { md: 'flex' },
+              justifyContent: { md: 'flex-start' },
             }}
           >
-            {t('LEARNER_APP.L_ONE_COURSE.ONGOING_COURSES').replace(
-              '{count}',
-              isShow?.toString()
-            )}
-          </Typography>
-        </Box>
-        <Box
-          sx={{ display: { md: 'flex' }, justifyContent: { md: 'flex-start' } }}
-        >
-          <Button
-            variant={isMdUp ? 'contained' : 'text'}
-            sx={
-              !isMdUp
-                ? {
-                    color: theme.palette.secondary.main,
-                    minWidth: '100px',
-                    fontWeight: 500,
-                    fontSize: '14px',
-                    lineHeight: '20px',
-                    letterSpacing: '0.1px',
-                    textAlign: 'center',
-                    verticalAlign: 'middle',
-                  }
-                : {}
-            }
-            endIcon={<ArrowForwardIcon />}
-            color="primary"
-            href="/in-progress"
-          >
-            {t('LEARNER_APP.L_ONE_COURSE.VIEW_ALL_BUTTON')}
-          </Button>
+            <Button
+              variant={isMdUp ? 'contained' : 'text'}
+              sx={
+                !isMdUp
+                  ? {
+                      color: theme.palette.secondary.main,
+                      minWidth: '100px',
+                      fontWeight: 500,
+                      fontSize: '14px',
+                      lineHeight: '20px',
+                      letterSpacing: '0.1px',
+                      textAlign: 'center',
+                      verticalAlign: 'middle',
+                    }
+                  : {}
+              }
+              endIcon={<ArrowForwardIcon />}
+              color="primary"
+              href="/in-progress"
+            >
+              {t('LEARNER_APP.L_ONE_COURSE.VIEW_ALL_BUTTON')}
+            </Button>
+          </Box>
         </Box>
       </Grid>
-      <Grid item xs={12} md={9} sx={{ pl: { xs: '16px', md: '0px' } }}>
-        <ContentComponent getContentData={(e: any) => setIsShow(e.count)} />
+      <Grid item xs={12} md={9.3}>
+        <ContentComponent
+          getContentData={(e: any) => setIsShow(e.count)}
+          _config={{
+            isShowInCarousel: true,
+            isHideNavigation: true,
+            _subBox: { px: { xs: 2, sm: 2, md: 0 } },
+          }}
+        />
       </Grid>
     </Grid>
   );

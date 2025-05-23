@@ -8,7 +8,7 @@ interface LoaderProps {
   children?: ReactNode;
   _loader?: React.CSSProperties;
   _children?: React.CSSProperties;
-  isHideMaxHeight?: Boolean;
+  isHideMaxHeight?: boolean;
 }
 
 export const Loader: React.FC<LoaderProps> = memo(

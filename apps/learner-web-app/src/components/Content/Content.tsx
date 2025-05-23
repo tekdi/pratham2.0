@@ -13,6 +13,7 @@ const ContentComponent = ({
   limit = 4,
   hasMoreData = false,
   getContentData,
+  _config,
 }: any) => {
   const { t } = useTranslation();
   const [identifier, setIdentifier] = useState([]);
@@ -65,6 +66,7 @@ const ContentComponent = ({
         _card: { isHideProgress: true },
         default_img_alt: t('LEARNER_APP.CONTENT.DEFAULT_IMAGE_ALT'),
         getContentData: getContentData,
+        ...(_config ?? {}),
       }}
     />
   );
