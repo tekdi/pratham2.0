@@ -5,10 +5,11 @@ import { Box, Typography, Button } from '@mui/material';
 type ExpandableTextProps = {
   text?: string;
   number?: number;
+  _text?: any;
 };
 
 export const ExpandableText: React.FC<ExpandableTextProps> = memo(
-  ({ text = '', number = 2 }) => {
+  ({ text = '', number = 2, _text }) => {
     const contentRef = useRef<HTMLDivElement>(null);
     const [isExpanded, setIsExpanded] = useState(false);
     const [showButton, setShowButton] = useState(false);
@@ -56,11 +57,13 @@ export const ExpandableText: React.FC<ExpandableTextProps> = memo(
           <Typography
             variant="subtitle1"
             component="div"
+            {..._text}
             sx={{
               textTransform: 'capitalize',
               color: '#1F1B13',
               whiteSpace: 'pre-wrap',
               lineHeight: `${lineHeight}px`,
+              ..._text.sx,
             }}
           >
             {text}

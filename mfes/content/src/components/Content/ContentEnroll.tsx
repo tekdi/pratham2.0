@@ -132,6 +132,7 @@ const ContentDetails = (props: ContentDetailsProps) => {
       <Box sx={{ display: 'flex' }}>
         <Box
           sx={{
+            display: { xs: 'none', sm: 'none', md: 'flex' },
             flex: { xs: 6, md: 4, lg: 3, xl: 3 },
           }}
         />
@@ -143,7 +144,6 @@ const ContentDetails = (props: ContentDetailsProps) => {
             px: '18px',
           }}
         >
-          {/* Section Header */}
           <Box
             sx={{
               display: 'flex',

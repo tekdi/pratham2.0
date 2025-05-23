@@ -24,14 +24,16 @@ import { getUserId as getUserIdLocal } from '@content-mfes/services/LoginService
 
 interface DetailsProps {
   isShowLayout?: any;
+  isHideInfoCard?: boolean;
   id?: string;
   type?: 'collapse' | 'card';
   _config?: any;
+  _box?: any;
 }
 
 export default function Details(props: DetailsProps) {
   const router = useRouter();
-  const { courseId, unitId } = useParams();
+  const { courseId, unitId, identifier: contentId } = useParams();
   const identifier = unitId ?? courseId;
   const [trackData, setTrackData] = useState<trackDataPorps[]>([]);
   const [selectedContent, setSelectedContent] = useState<any>(null);
@@ -183,29 +185,29 @@ export default function Details(props: DetailsProps) {
       }}
       onlyHideElements={['footer']}
     >
-      <InfoCard
-        item={selectedContent}
-        topic={courseItem?.se_subjects ?? selectedContent?.se_subjects}
-        onBackClick={onBackClick}
-        _config={{
-          ...props?._config,
-          _infoCard: {
-            isShowStatus: trackData,
-            isHideStatus: true,
-            default_img: `${AppConst.BASEPATH}/assests/images/image_ver.png`,
-            ...props?._config?._infoCard,
-          },
-        }}
-      />
-
+      {!props?.isHideInfoCard && (
+        <InfoCard
+          item={selectedContent}
+          topic={courseItem?.se_subjects ?? selectedContent?.se_subjects}
+          onBackClick={onBackClick}
+          _config={{
+            ...props?._config,
+            _infoCard: {
+              isShowStatus: trackData,
+              isHideStatus: true,
+              default_img: `${AppConst.BASEPATH}/assests/images/image_ver.png`,
+              ...props?._config?._infoCard,
+            },
+          }}
+        />
+      )}
       <Box
         sx={{
-          pt: 5,
-          pb: 10,
-          px: 10,
+          pt: { xs: 4, md: 5 },
+          pb: { xs: 4, md: 10 },
+          px: { xs: 2, sm: 3, md: 10 },
           gap: 2,
-          display: 'flex',
-          flexWrap: 'wrap',
+          ...props?._box,
         }}
       >
         {certificateId && !unitId && (
@@ -222,6 +224,9 @@ export default function Details(props: DetailsProps) {
           <UnitGrid
             handleItemClick={handleItemClick}
             item={selectedContent}
+            skipContentId={
+              typeof contentId === 'string' ? contentId : undefined
+            }
             trackData={trackData}
             _config={props?._config}
           />

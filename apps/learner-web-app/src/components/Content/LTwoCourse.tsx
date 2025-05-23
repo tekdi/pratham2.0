@@ -163,16 +163,30 @@ const LTwoCourse: React.FC = () => {
   };
 
   return (
-    <Box sx={{ py: '56px', px: '48px', bgcolor: 'white' }}>
-      <Typography variant="h1" gutterBottom sx={{ color: '#78590C' }}>
+    <Box
+      sx={{
+        padding: { md: '48px 56px', xs: '24px 16px' },
+        bgcolor: 'white',
+      }}
+    >
+      <Typography
+        variant="h1"
+        gutterBottom
+        sx={{
+          color: '#78590C',
+          fontSize: { md: '22px', xs: '16px' },
+          lineHeight: { md: '26px', xs: '20px' },
+        }}
+      >
         {t('LEARNER_APP.L_TWO_COURSE.TITLE')}
       </Typography>
       <Box
         sx={{
+          gap: { md: 2, xs: 0 },
           width: '100%',
-          mb: 2,
+          mb: { md: 2, xs: 0 },
           background: '#F3EDF7',
-          padding: '24px 56px 24px 56px',
+          padding: { md: '24px 56px', xs: '16px' },
           borderRadius: '24px',
           display: 'flex',
           justifyContent: 'space-between',
@@ -183,26 +197,35 @@ const LTwoCourse: React.FC = () => {
           },
         }}
       >
-        <Box
-          sx={{ width: '38%', '@media (max-width: 600px)': { width: '100%' } }}
-        >
-          <Typography variant="h1" sx={{ color: '#1F1B13' }} gutterBottom>
+        <Box>
+          <Typography
+            variant="h1"
+            sx={{
+              color: '#1F1B13',
+              fontSize: { md: '22px', xs: '16px' },
+              lineHeight: { md: '26px', xs: '20px' },
+            }}
+            gutterBottom
+          >
             {t('LEARNER_APP.L_TWO_COURSE.DESCRIPTION')}
           </Typography>
           <Typography variant="body1" color="#635E57" gutterBottom>
             {t('LEARNER_APP.L_TWO_COURSE.SUB_DESCRIPTION')}
           </Typography>
         </Box>
-        <Box>
-          <Button
-            sx={{ padding: '10px 55px', fontSize: '16px', fontWeight: '500' }}
-            variant="contained"
-            color="primary"
-            onClick={handleInterestClick}
-          >
-            {t('LEARNER_APP.L_TWO_COURSE.INTEREST_BUTTON')}
-          </Button>
-        </Box>
+        <Button
+          sx={{
+            minWidth: 'fit-content',
+            padding: '10px 55px',
+            fontSize: '16px',
+            fontWeight: '500',
+          }}
+          variant="contained"
+          color="primary"
+          onClick={handleInterestClick}
+        >
+          {t('LEARNER_APP.L_TWO_COURSE.INTEREST_BUTTON')}
+        </Button>
         {count == 0 ? (
           <CommonModal
             handleSubmit={handleSubmit}
