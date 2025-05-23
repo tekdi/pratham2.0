@@ -94,7 +94,10 @@ const ContentCardCarousel = ({
         }}
       >
         {contentData?.map((item: any) => (
-          <SwiperSlide key={item?.identifier} style={{ height: 'auto' }}>
+          <SwiperSlide
+            key={item?.identifier}
+            style={{ height: 'auto', paddingBottom: '8px' }}
+          >
             <ContentCard
               item={item}
               type={type}
