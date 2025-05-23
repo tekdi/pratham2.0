@@ -17,9 +17,9 @@ const InProgress: React.FC = () => {
   };
 
   return (
-    <Layout>
-      <Grid container style={gredientStyle}>
-        <Grid item xs={12} sx={{ p: 5, pb: 1 }}>
+    <Layout _children={{ _children: gredientStyle }}>
+      <Grid container>
+        <Grid item xs={12} sx={{ p: { xs: 2, md: 5 }, pb: { xs: 1, md: 0 } }}>
           <Button
             startIcon={<ArrowBackIcon />}
             onClick={onBackClick}
@@ -29,12 +29,15 @@ const InProgress: React.FC = () => {
               fontSize: '16px',
             }}
           >
-            <Typography fontSize={'22px'} fontWeight={400}>
+            <Typography
+              fontSize={{ xs: '16px', sm: '16px', md: '20px', lg: '24px' }}
+              fontWeight={400}
+            >
               {t('LEARNER_APP.IN_PROGRESS.ALL_COURSES')}
             </Typography>
           </Button>
         </Grid>
-        <Grid item xs={12} sx={{ p: 5, pt: 0 }}>
+        <Grid item xs={12} sx={{ px: { xs: 2, md: 5 }, pt: 0 }}>
           <ContentComponent limit={8} hasMoreData />
         </Grid>
       </Grid>
