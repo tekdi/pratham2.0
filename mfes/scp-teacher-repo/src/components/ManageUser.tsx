@@ -966,6 +966,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                     style={{
                                       width: '100%',
                                       textAlign: 'center',
+                                      fontWeight: '500',
                                     }}
                                   >
                                     {t('COMMON.NO_DATA_FOUND')}
@@ -1101,6 +1102,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                     style={{
                                       width: '100%',
                                       textAlign: 'center',
+                                      fontWeight: '500',
                                     }}
                                   >
                                     {t('COMMON.NO_DATA_FOUND')}
