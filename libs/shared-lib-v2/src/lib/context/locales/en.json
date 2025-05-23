@@ -163,7 +163,7 @@
       "PHONE_BELONGS_TO_YOU": "Does this phone belong to you?",
       "PERSONAL_INFORMATION": "Personal Information",
       "GENDER": "Gender",
-      "DOB": "DOB",
+      "DOB": "Date of Birth",
       "MARITAL_STATUS": "Marital Status",
       "MOTHER_NAME": "Mother's Name",
       "HIGHEST_QUALIFICATION": "Highest Qualification/Last Passed Grade",
@@ -176,7 +176,11 @@
       "CHANGE_USERNAME": "Change Username",
       "CHANGE_PASSWORD": "Change Password",
       "PRIVACY_GUIDELINES": "Privacy Guidelines",
-      "CONSENT_FORM": "Consent Form"
+      "CONSENT_FORM": "Consent Form",
+      "PARENT_PHONE_NUMBRER": "Parent's Phone Number",
+      "GUARDIAN_RELATION": "Relation with Guardian",
+      "GUARDIAN_NAME": "Guardian's Name",
+      "GUARDIAN_DETAILS": "Guardian Details"
     },
     "USERNAME_SUGGESTION": {
       "USERNAME": "Username",

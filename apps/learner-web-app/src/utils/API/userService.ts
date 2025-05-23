@@ -2,7 +2,7 @@ import { fetchForm } from '@shared-lib-v2/DynamicForm/components/DynamicFormCall
 import { API_ENDPOINTS } from './EndUrls';
 import { post, patch } from './RestClient';
 import { FormContext } from '@shared-lib-v2/DynamicForm/components/DynamicFormConstant';
-import { getMissingFields } from '../helper';
+import { getMissingFields, isUnderEighteen } from '../helper';
 import { get } from '@shared-lib';
 export interface UserDetailParam {
   userData?: object;
@@ -86,7 +86,14 @@ export const profileComplitionCheck = async (): Promise<any> => {
         },
       ]);
       console.log('responseForm', responseForm?.schema);
-
+      console.log('userData', userData);
+      if (!isUnderEighteen(userData?.dob)) {
+        delete responseForm?.schema.properties.guardian_relation;
+        delete responseForm?.schema.properties.guardian_name;
+        delete responseForm?.schema.properties.parent_phone;
+      } else {
+        delete responseForm?.schema.properties.mobile;
+      }
       const result = getMissingFields(responseForm?.schema, userData);
       console.log('result', result);
       const isPropertiesEmpty = Object.keys(result.properties).length === 0;

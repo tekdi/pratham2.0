@@ -22,6 +22,9 @@ const WelcomeScreen = () => {
       justifyContent="center"
       px={2}
       textAlign="center"
+      sx={{
+        minHeight: { xs: 'auto', sm: '100vh' },
+      }}
     >
       <Image
         src={welcomeGIF}
@@ -33,8 +36,8 @@ const WelcomeScreen = () => {
 
       <Typography
         fontWeight={400}
-        fontSize="32px"
-        lineHeight="40px"
+        fontSize={{ xs: '24px', sm: '32px' }}
+        lineHeight={{ xs: '32px', sm: '40px' }}
         letterSpacing="0px"
         textAlign="center"
         sx={{ verticalAlign: 'middle' }}
@@ -43,8 +46,8 @@ const WelcomeScreen = () => {
       </Typography>
       <Typography
         fontWeight={400}
-        fontSize="22px"
-        lineHeight="28px"
+        fontSize={{ xs: '18px', sm: '22px' }}
+        lineHeight={{ xs: '24px', sm: '28px' }}
         letterSpacing="0px"
         textAlign="center"
         sx={{ verticalAlign: 'middle' }}
@@ -53,31 +56,36 @@ const WelcomeScreen = () => {
         {t('LEARNER_APP.LOGIN.welcome_subtitle')}
       </Typography>
 
-      {/* App Download Section - Horizontal Arrangement */}
+      {/* App Download Section - Responsive Arrangement */}
       <Grid
         container
         alignItems="center"
         justifyContent="center"
-        spacing={2}
+        // spacing={2}
         maxWidth="700px"
-        sx={{ mt: 2 }}
+        //  sx={{ mt: 2 }}
       >
         {/* QR Code Section */}
         <Grid item xs={12} sm={5} md={4}>
           <Box
             display="flex"
-            flexDirection="row"
+            flexDirection={{
+              xs: 'column',
+              sm: 'column',
+              md: 'column',
+              lg: 'row',
+            }}
             alignItems="center"
             justifyContent="center"
+            gap={2}
           >
             <Image
               src={prathamQRCode}
               alt={t('LEARNER_APP.LOGIN.qr_image_alt')}
               width={70}
               height={70}
-              style={{ marginRight: 12 }}
             />
-            <Box textAlign="left">
+            <Box textAlign="center">
               <Typography fontWeight={600} fontSize="16px">
                 Get the App
               </Typography>
@@ -109,9 +117,15 @@ const WelcomeScreen = () => {
         <Grid item xs={12} sm={5} md={5}>
           <Box
             display="flex"
-            flexDirection="row"
+            flexDirection={{
+              xs: 'column',
+              sm: 'column',
+              md: 'column',
+              lg: 'row',
+            }}
             alignItems="center"
             justifyContent="center"
+            gap={2}
             sx={{ cursor: 'pointer' }}
             onClick={() => {
               router.push(
@@ -124,9 +138,8 @@ const WelcomeScreen = () => {
               alt={t('LEARNER_APP.LOGIN.playstore_image_alt')}
               width={140}
               height={44}
-              style={{ marginRight: 12 }}
             />
-            <Box textAlign="left">
+            <Box textAlign="center">
               <Typography fontSize="14px" color="textSecondary">
                 Search <b>"Pratham myLearning"</b>
                 <br />

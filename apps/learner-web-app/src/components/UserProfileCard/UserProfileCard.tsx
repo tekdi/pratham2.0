@@ -17,7 +17,8 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useRouter } from 'next/navigation';
 import { getUserDetails } from '@learner/utils/API/userService';
 import { Loader, useTranslation } from '@shared-lib';
-import { toPascalCase } from '@learner/utils/helper';
+import { isUnderEighteen, toPascalCase } from '@learner/utils/helper';
+import { isUndefined } from 'lodash';
 
 // Assuming an API function fetchUserData is available
 // Example: const fetchUserData = async () => { ... };
@@ -170,8 +171,20 @@ const UserProfileCard = () => {
     'WHAT_DO_YOU_WANT_TO_BECOME'
   );
   const motherName = getCustomFieldValue(customFields, 'MOTHER_NAME');
+  const parentPhone = getCustomFieldValue(
+    customFields,
+    'PARENT_GUARDIAN_PHONE_NO'
+  );
+  const guardianName = getCustomFieldValue(customFields, 'NAME_OF_GUARDIAN');
+  const guarduianRelation = getCustomFieldValue(
+    customFields,
+    'RELATION_WITH_GUARDIAN'
+  );
+
   const state = getCustomFieldValue(customFields, 'STATE');
   const district = getCustomFieldValue(customFields, 'DISTRICT');
+  const block = getCustomFieldValue(customFields, 'BLOCK');
+
   const village = getCustomFieldValue(customFields, 'VILLAGE');
 
   const sectionCardStyle = {
@@ -249,34 +262,77 @@ const UserProfileCard = () => {
       <Box
         sx={{ padding: '16px', backgroundColor: '#FFF8F2', maxWidth: '600px' }}
       >
-        <Typography sx={sectionTitleStyle}>
-          {t('LEARNER_APP.USER_PROFILE_CARD.CONTACT_INFORMATION')}
-        </Typography>
-        <Box sx={sectionCardStyle}>
-          {/* <Box sx={{ mb: 1.5 }}>
+        {!isUnderEighteen(dob) ? (
+          <>
+            <Typography sx={sectionTitleStyle}>
+              {t('LEARNER_APP.USER_PROFILE_CARD.CONTACT_INFORMATION')}
+            </Typography>
+            <Box sx={sectionCardStyle}>
+              {/* <Box sx={{ mb: 1.5 }}>
             <Typography sx={labelStyle}>
               {t('LEARNER_APP.USER_PROFILE_CARD.EMAIL_ADDRESS')}
             </Typography>
             <Typography sx={valueStyle}>{email || '-'}</Typography>
           </Box> */}
 
-          <Grid container spacing={1.5}>
-            <Grid item xs={6}>
-              <Typography sx={labelStyle}>
-                {t('LEARNER_APP.USER_PROFILE_CARD.PHONE_NUMBER')}
-              </Typography>
-              <Typography sx={valueStyle}>{mobile}</Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <Typography sx={labelStyle}>
-                {t('LEARNER_APP.USER_PROFILE_CARD.PHONE_BELONGS_TO_YOU')}
-              </Typography>
-              <Typography sx={valueStyle}>
-                {toPascalCase(phoneOwnership)}
-              </Typography>
-            </Grid>
-          </Grid>
-        </Box>
+              <Grid container spacing={1.5}>
+                <Grid item xs={6}>
+                  <Typography sx={labelStyle}>
+                    {t('LEARNER_APP.USER_PROFILE_CARD.PHONE_NUMBER')}
+                  </Typography>
+                  <Typography sx={valueStyle}>{mobile}</Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography sx={labelStyle}>
+                    {t('LEARNER_APP.USER_PROFILE_CARD.PHONE_BELONGS_TO_YOU')}
+                  </Typography>
+                  <Typography sx={valueStyle}>
+                    {toPascalCase(phoneOwnership)}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Box>
+          </>
+        ) : (
+          <>
+            <Typography sx={sectionTitleStyle}>
+              {t('LEARNER_APP.USER_PROFILE_CARD.GUARDIAN_DETAILS')}
+            </Typography>
+            <Box sx={sectionCardStyle}>
+              {/* <Box sx={{ mb: 1.5 }}>
+            <Typography sx={labelStyle}>
+              {t('LEARNER_APP.USER_PROFILE_CARD.EMAIL_ADDRESS')}
+            </Typography>
+            <Typography sx={valueStyle}>{email || '-'}</Typography>
+          </Box> */}
+
+              <Grid container spacing={1.5}>
+                <Grid item xs={6}>
+                  <Typography sx={labelStyle}>
+                    {t('LEARNER_APP.USER_PROFILE_CARD.PARENT_PHONE_NUMBRER')}
+                  </Typography>
+                  <Typography sx={valueStyle}>{parentPhone || '-'}</Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography sx={labelStyle}>
+                    {t('LEARNER_APP.USER_PROFILE_CARD.GUARDIAN_RELATION')}
+                  </Typography>
+                  <Typography sx={valueStyle}>
+                    {toPascalCase(guarduianRelation) || '-'}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography sx={labelStyle}>
+                    {t('LEARNER_APP.USER_PROFILE_CARD.GUARDIAN_NAME')}
+                  </Typography>
+                  <Typography sx={valueStyle}>
+                    {toPascalCase(guardianName) || '-'}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Box>
+          </>
+        )}
 
         <Typography sx={sectionTitleStyle}>
           {t('LEARNER_APP.USER_PROFILE_CARD.PERSONAL_INFORMATION')}
@@ -331,7 +387,8 @@ const UserProfileCard = () => {
                 {t('LEARNER_APP.USER_PROFILE_CARD.LOCATION')}
               </Typography>
               <Typography sx={valueStyle}>
-                {[state, district, village].filter(Boolean).join(', ') || '-'}
+                {[state, district, block, village].filter(Boolean).join(', ') ||
+                  '-'}
               </Typography>
             </Grid>
           </Grid>

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { Suspense, useEffect } from 'react';
-import { Box } from '@mui/material';
+import { Box, Grid, Typography } from '@mui/material';
 import dynamic from 'next/dynamic';
 import WelcomeScreen from '@learner/components/WelcomeComponent/WelcomeScreen';
 import Header from '@learner/components/Header/Header';
@@ -15,6 +15,10 @@ import { preserveLocalStorage } from '@learner/utils/helper';
 import { getDeviceId } from '@shared-lib-v2/DynamicForm/utils/Helper';
 import { profileComplitionCheck } from '@learner/utils/API/userService';
 import { telemetryFactory } from '@shared-lib-v2/DynamicForm/utils/telemetry';
+import Image from 'next/image';
+import playstoreIcon from '../../../public/images/playstore.png';
+import prathamQRCode from '../../../public/images/prathamQR.png';
+import welcomeGIF from '../../../public/images/welcome.gif';
 
 const Login = dynamic(
   () => import('@login/Components/LoginComponent/LoginComponent'),
@@ -22,6 +26,133 @@ const Login = dynamic(
     ssr: false,
   }
 );
+
+const AppDownloadSection = () => {
+  const { t } = useTranslation();
+  const router = useRouter();
+
+  return (
+    <Grid
+      container
+      alignItems="center"
+      justifyContent="center"
+      maxWidth="500px"
+    >
+      {/* QR Code Section */}
+      <Grid item xs={5} sm={5} md={4}>
+        <Box
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          justifyContent="center"
+          gap={1}
+        >
+          <Image
+            src={prathamQRCode}
+            alt={t('LEARNER_APP.LOGIN.qr_image_alt')}
+            width={120}
+            height={120}
+            style={{ objectFit: 'contain' }}
+          />
+          <Box textAlign="center">
+            <Typography fontWeight={600} fontSize="14px">
+              Get the App
+            </Typography>
+            <Typography fontSize="12px" color="textSecondary">
+              Point your phone
+              <br />
+              camera here
+            </Typography>
+          </Box>
+        </Box>
+      </Grid>
+
+      {/* OR Divider */}
+      <Grid
+        item
+        xs={2}
+        sm={2}
+        md={1}
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+      >
+        <Typography fontWeight={500} fontSize="14px">
+          OR
+        </Typography>
+      </Grid>
+
+      {/* Play Store Section */}
+      <Grid item xs={5} sm={5} md={5}>
+        <Box
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          justifyContent="center"
+          gap={1}
+          sx={{ cursor: 'pointer' }}
+          onClick={() => {
+            router.push(
+              'https://play.google.com/store/apps/details?id=com.pratham.learning'
+            );
+          }}
+        >
+          <Image
+            src={playstoreIcon}
+            alt={t('LEARNER_APP.LOGIN.playstore_image_alt')}
+            width={100}
+            height={32}
+          />
+          <Box textAlign="center">
+            <Typography fontSize="12px" color="textSecondary">
+              Search <b>"Pratham myLearning"</b>
+              <br />
+              on Playstore
+            </Typography>
+          </Box>
+        </Box>
+      </Grid>
+    </Grid>
+  );
+};
+
+const WelcomeMessage = () => {
+  const { t } = useTranslation();
+
+  return (
+    <Box display="flex" flexDirection="column" alignItems="center" mb={2}>
+      <Image
+        src={welcomeGIF}
+        alt={t('LEARNER_APP.LOGIN.welcome_image_alt')}
+        width={60}
+        height={60}
+        style={{ marginBottom: '8px' }}
+      />
+
+      <Typography
+        fontWeight={400}
+        fontSize={{ xs: '24px', sm: '32px' }}
+        lineHeight={{ xs: '32px', sm: '40px' }}
+        letterSpacing="0px"
+        textAlign="center"
+        sx={{ verticalAlign: 'middle' }}
+      >
+        {t('LEARNER_APP.LOGIN.welcome_title')}
+      </Typography>
+      <Typography
+        fontWeight={400}
+        fontSize={{ xs: '18px', sm: '22px' }}
+        lineHeight={{ xs: '24px', sm: '28px' }}
+        letterSpacing="0px"
+        textAlign="center"
+        sx={{ verticalAlign: 'middle' }}
+        mb={2}
+      >
+        {t('LEARNER_APP.LOGIN.welcome_subtitle')}
+      </Typography>
+    </Box>
+  );
+};
 
 const LoginPage = () => {
   const router = useRouter();
@@ -115,13 +246,13 @@ const LoginPage = () => {
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <Box
-        height="100vh"
-        width="100vw"
+        //height="100vh"
+        // width="100vw"
         display="flex"
         flexDirection="column"
-        overflow="hidden"
+        //  overflow="hidden"
         sx={{
-          overflowWrap: 'break-word',
+          //  overflowWrap: 'break-word',
           wordBreak: 'break-word',
           background: 'linear-gradient(135deg, #FFFDF6, #F8EFDA)',
         }}
@@ -130,34 +261,66 @@ const LoginPage = () => {
         <Header />
 
         {/* Main Content: Split screen */}
-        <Box flex={1} display="flex" overflow="hidden">
-          {/* Left: Welcome Screen */}
-          {!isMobile && (
-            <Box
-              flex={1}
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
-            >
-              <WelcomeScreen />
-            </Box>
-          )}
+        <Box
+          flex={1}
+          display="flex"
+          flexDirection={{ xs: 'column', sm: 'row' }}
+        >
+          {/* Left: Welcome Screen - Hidden on mobile */}
+          <Box
+            flex={1}
+            display={{ xs: 'none', sm: 'flex' }}
+            justifyContent="center"
+            alignItems="center"
+            sx={{
+              minHeight: { xs: 'auto', sm: '100%' },
+              py: { xs: 4, sm: 0 },
+            }}
+          >
+            <WelcomeScreen />
+          </Box>
 
           {/* Right: Login Component */}
           <Box
             flex={1}
             display="flex"
+            flexDirection="column"
             justifyContent="center"
             alignItems="center"
-            pr={6}
+            px={3}
             boxSizing="border-box"
-            // bgcolor="#ffffff"
+            sx={{
+              minHeight: { xs: 'auto', sm: '100%' },
+              py: { xs: 2, sm: 0 },
+            }}
           >
+            {/* Welcome Message - Only visible on mobile */}
+            <Box
+              display={{ xs: 'flex', sm: 'none' }}
+              justifyContent="center"
+              alignItems="center"
+              width="100%"
+              mb={1}
+            >
+              <WelcomeMessage />
+            </Box>
+
             <Login
               onLogin={handleLogin}
               handleForgotPassword={handleForgotPassword}
               handleAddAccount={handleAddAccount}
             />
+
+            {/* App Download Section - Only visible on mobile */}
+            <Box
+              display={{ xs: 'flex', sm: 'none' }}
+              justifyContent="center"
+              alignItems="center"
+              width="100%"
+              mt={4}
+            >
+              <AppDownloadSection />
+            </Box>
           </Box>
         </Box>
       </Box>
@@ -196,7 +359,9 @@ const handleSuccessfulLogin = async (
         localStorage.setItem('firstName', userResponse?.firstName || '');
 
         const tenantId = userResponse?.tenantData?.[0]?.tenantId;
+        const tenantName = userResponse?.tenantData?.[0]?.tenantName;
         localStorage.setItem('tenantId', tenantId);
+        localStorage.setItem('userProgram', tenantName);
         await profileComplitionCheck();
         const academicYearResponse = await getAcademicYear();
 
