@@ -60,7 +60,7 @@ const ContentComponent = ({
       }}
       hasMoreData={hasMoreData}
       _config={{
-        _box: { sx: { pt: 4 } },
+        _box: { sx: { pt: { md: 4 } } },
         default_img: '/images/image_ver.png',
         _card: { isHideProgress: true },
         default_img_alt: t('LEARNER_APP.CONTENT.DEFAULT_IMAGE_ALT'),

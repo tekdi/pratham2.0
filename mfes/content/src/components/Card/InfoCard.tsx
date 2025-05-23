@@ -11,7 +11,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import React, { useState } from 'react';
 import CommonModal from '../common-modal';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { ExpandableText } from '@shared-lib';
+import { ExpandableText, useTranslation } from '@shared-lib';
 
 interface InfoCardProps {
   item: any;
@@ -26,17 +26,26 @@ const InfoCard: React.FC<InfoCardProps> = ({
   onBackClick,
   _config,
 }) => {
+  const { t } = useTranslation();
   const { _infoCard } = _config || {};
   const [openModal, setOpenModal] = useState(false);
 
   return (
     <>
-      <Card sx={{ display: 'flex', ..._infoCard?._card }}>
+      <Card
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row', md: 'row' },
+          borderRadius: 0,
+          ..._infoCard?._card,
+        }}
+      >
         <CardMedia
           component="img"
           sx={{
             flex: { xs: 6, md: 4, lg: 3, xl: 3 },
-            maxHeight: '280px',
+            maxHeight: { xs: '200px', sm: '280px' },
+            // objectFit: 'contain',
             ..._infoCard?._cardMedia,
           }}
           image={item?.appIcon || _infoCard?.default_img}
@@ -55,10 +64,10 @@ const InfoCard: React.FC<InfoCardProps> = ({
               display: 'flex',
               flexDirection: 'column',
               flex: '1 0 auto',
-              p: '18px',
-              pb: 0,
+              p: { xs: '16px', md: '18px' },
+              pb: { xs: '0px', md: '18px' },
               gap: 1.5,
-              width: '85%',
+              width: { xs: '90%', sm: '85%' },
             }}
           >
             {onBackClick && (
@@ -67,7 +76,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   gap: 1,
-                  pt: 2,
+                  pt: { xs: 0, md: 2 },
                 }}
               >
                 <IconButton
@@ -78,8 +87,28 @@ const InfoCard: React.FC<InfoCardProps> = ({
                   <ArrowBackIcon />
                 </IconButton>
                 <Breadcrumbs separator="›" aria-label="breadcrumb">
-                  <Typography variant="body1">Course</Typography>
-                  {topic && <Typography variant="body1">{topic}</Typography>}
+                  {_infoCard?.breadCrumbs?.map(
+                    (breadcrumb: any, index: number) => (
+                      <Typography
+                        key={`${
+                          breadcrumb?.name ?? breadcrumb?.label ?? ''
+                        } ${index}`}
+                        variant="body1"
+                        color="text.secondary"
+                        sx={{ cursor: 'pointer' }}
+                        onClick={() => breadcrumb.handleBreadcrumbClick()}
+                      >
+                        {breadcrumb.name ?? breadcrumb.label ?? ''}
+                      </Typography>
+                    )
+                  )}
+                  {(!_infoCard?.breadCrumbs ||
+                    _infoCard?.breadCrumbs?.length > 1) &&
+                    ['Course', ...(topic ? [topic] : [])].map((key) => (
+                      <Typography key={key} variant="body1">
+                        {key}
+                      </Typography>
+                    ))}
                 </Breadcrumbs>
               </Box>
             )}
@@ -89,8 +118,8 @@ const InfoCard: React.FC<InfoCardProps> = ({
               title={item?.name}
               sx={{
                 fontWeight: 700,
-                fontSize: '36px',
-                lineHeight: '44px',
+                fontSize: { xs: '22px', sm: '24px', md: '36px' },
+                lineHeight: { xs: '28px', sm: '32px', md: '44px' },
                 display: '-webkit-box',
                 WebkitLineClamp: 1,
                 WebkitBoxOrient: 'vertical',
@@ -100,16 +129,22 @@ const InfoCard: React.FC<InfoCardProps> = ({
             >
               {item?.name}
             </Typography>
-            <ExpandableText text={item?.description} number={2} />
+            <ExpandableText
+              text={item?.description}
+              number={2}
+              _text={{
+                fontSize: { xs: '14px', sm: '16px', md: '18px' },
+                lineHeight: { xs: '20px', sm: '22px', md: '26px' },
+              }}
+            />
             <Box>
               {_infoCard?.isShowStatus &&
                 (item?.issuedOn ? (
                   <Typography
                     sx={{
-                      fontFamily: 'Poppins',
                       fontWeight: 500,
-                      fontSize: '16px',
-                      lineHeight: '24px',
+                      fontSize: { xs: '14px', sm: '16px', md: '16px' },
+                      lineHeight: { xs: '20px', sm: '22px', md: '26px' },
                       color: '#00730B',
                       letterSpacing: '0.15px',
                     }}
@@ -117,7 +152,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
                     <CheckCircleIcon
                       sx={{ color: '#00730B', fontSize: 20, mr: 1 }}
                     />
-                    Completed on:{' '}
+                    {t('LEARNER_APP.COURSE.COMPLETED_ON')}:{' '}
                     {new Intl.DateTimeFormat('en-GB', {
                       day: '2-digit',
                       month: 'short',
@@ -137,9 +172,11 @@ const InfoCard: React.FC<InfoCardProps> = ({
                       pb: 1,
                       pl: 2,
                       bgcolor: '#FFDEA1',
+                      fontSize: { xs: '14px', sm: '16px', md: '16px' },
+                      lineHeight: { xs: '20px', sm: '22px', md: '26px' },
                     }}
                   >
-                    Started on:{' '}
+                    {t('LEARNER_APP.COURSE.STARTED_ON')}:{' '}
                     {item?.startedOn
                       ? new Intl.DateTimeFormat('en-GB', {
                           day: '2-digit',

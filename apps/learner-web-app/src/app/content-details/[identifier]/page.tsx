@@ -25,7 +25,7 @@ const App = () => {
           _config={{
             default_img: '/images/image_ver.png',
             _infoCard: {
-              _cardMedia: { maxHeight: '279px' },
+              _cardMedia: { maxHeight: { xs: '200px', sm: '280px' } },
               default_img: '/images/image_ver.png',
             },
           }}

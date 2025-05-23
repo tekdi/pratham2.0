@@ -18,7 +18,7 @@ import { useTranslation } from '@shared-lib';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { ContentSearch, fetchContent } from '@learner/utils/API/contentService';
 
-const Content = dynamic(() => import('@Content'), {
+const CourseUnitDetails = dynamic(() => import('@CourseUnitDetails'), {
   ssr: false,
 });
 const App = (props: { userIdLocalstorageName?: string }) => {
@@ -74,14 +74,6 @@ const App = (props: { userIdLocalstorageName?: string }) => {
   }
   const onBackClick = () => {
     router.back();
-  };
-
-  const handleCardClick = (content: any) => {
-    router.push(
-      `/content/${courseId}/${unitId}/${content.identifier}${
-        activeLink ? `?activeLink=${activeLink}` : ''
-      }`
-    );
   };
 
   return (
@@ -187,30 +179,20 @@ const App = (props: { userIdLocalstorageName?: string }) => {
             {t('LEARNER_APP.PLAYER.MORE_RELATED_RESOURCES')}
           </Typography>
 
-          <Content
+          <CourseUnitDetails
             isShowLayout={false}
-            contentTabs={['content']}
-            showFilter={false}
-            showSearch={false}
-            showHelpDesk={false}
-            handleCardClick={handleCardClick}
-            filters={{
-              limit: 4,
-              filters: {
-                identifier: relatedIdentity,
-              },
+            isHideInfoCard={true}
+            _box={{
+              pt: 1,
+              pb: 1,
+              px: 1,
+              height: 'calc(100vh - 185px)',
             }}
             _config={{
-              _card: {
-                sx: {
-                  width: '203px',
-                },
-              },
-              _subBox: {
-                overflowY: 'scroll',
-                maxHeight: 'calc(100vh - 204px)', // Adjust height as needed
-              },
+              _parentGrid: { pb: 2 },
               default_img: '/images/image_ver.png',
+              _grid: { xs: 6, sm: 4, md: 6, lg: 4, xl: 3 },
+              _card: { isHideProgress: true },
             }}
           />
         </Box>
@@ -268,7 +250,7 @@ const PlayerBox = ({
             src={item?.posterImage ?? `/images/image_ver.png`}
             alt={item?.identifier}
             style={{
-              height: 'calc(100vh - 287px)',
+              height: 'calc(100vh - 235px)',
               width: '100%',
               borderRadius: 0,
             }}
@@ -300,11 +282,12 @@ const PlayerBox = ({
               : ''
           }`}
           style={{
-            // display: 'block',
-            // padding: 0,
-            height: 'calc(100vh - 100px)',
+            width: '100%',
+            height: 'calc(100vh - 235px)',
             border: 'none',
+            objectFit: 'contain',
           }}
+          allowFullScreen
           width="100%"
           height="100%"
           title="Embedded Localhost"
