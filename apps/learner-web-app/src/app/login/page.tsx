@@ -50,8 +50,9 @@ const AppDownloadSection = () => {
           <Image
             src={prathamQRCode}
             alt={t('LEARNER_APP.LOGIN.qr_image_alt')}
-            width={50}
-            height={50}
+            width={120}
+            height={120}
+            style={{ objectFit: 'contain' }}
           />
           <Box textAlign="center">
             <Typography fontWeight={600} fontSize="14px">
@@ -358,7 +359,9 @@ const handleSuccessfulLogin = async (
         localStorage.setItem('firstName', userResponse?.firstName || '');
 
         const tenantId = userResponse?.tenantData?.[0]?.tenantId;
+        const tenantName = userResponse?.tenantData?.[0]?.tenantName;
         localStorage.setItem('tenantId', tenantId);
+        localStorage.setItem('userProgram', tenantName);
         await profileComplitionCheck();
         const academicYearResponse = await getAcademicYear();
 

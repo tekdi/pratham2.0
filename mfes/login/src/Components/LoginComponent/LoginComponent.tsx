@@ -56,7 +56,7 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
       elevation={3}
       sx={{
         maxWidth: 400,
-        p: 4,
+        p: 3,
         borderRadius: 2,
       }}
     >

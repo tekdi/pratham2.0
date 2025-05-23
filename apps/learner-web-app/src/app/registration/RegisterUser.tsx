@@ -763,6 +763,7 @@ const RegisterUser = () => {
                 fontFamily: 'Poppins',
                 fontWeight: 500,
                 fontSize: '14px',
+                height: '40px',
                 lineHeight: '20px',
                 letterSpacing: '0.1px',
                 textAlign: 'center',
