@@ -5,8 +5,9 @@ import {
   Tab,
   Tabs,
   Typography,
+  Grid,
 } from '@mui/material';
-import { CardGrid, ContentItem, Loader, useTranslation } from '@shared-lib'; // Updated import
+import { ContentItem, Loader, useTranslation } from '@shared-lib'; // Updated import
 import React, { memo } from 'react';
 import { ContentSearchResponse } from '../services/Search';
 import ContentCard from './Card/ContentCard';
@@ -44,8 +45,7 @@ const RenderTabContent = memo(
     isHideEmptyDataMessage?: boolean;
   }) => {
     const { t } = useTranslation();
-    const { default_img, _card, _box, _subBox } = _config ?? {};
-
+    const { default_img, _card, _grid, _box, _subBox } = _config ?? {};
     return (
       <Box sx={{ width: '100%', ...(_box?.sx ?? {}) }}>
         {tabs?.length !== undefined && tabs?.length > 1 && (
@@ -78,27 +78,29 @@ const RenderTabContent = memo(
             _loader={{ backgroundColor: 'transparent' }}
           >
             <Box {..._subBox} sx={{ ...(_subBox?.sx ?? {}) }}>
-              <CardGrid
-                childWidth={
-                  _card?.sx?.width ? _card?.sx?.width.replace('px', '') : 230
-                }
-              >
+              <Grid container spacing={{ xs: 1, sm: 1, md: 2 }}>
                 {contentData?.map((item: any) => (
-                  <Box key={item?.identifier}>
+                  <Grid
+                    key={item?.identifier}
+                    item
+                    xs={6}
+                    sm={6}
+                    md={4}
+                    lg={3}
+                    xl={2.4}
+                    {..._grid}
+                  >
                     <ContentCard
                       item={item}
                       type={type}
                       default_img={default_img}
-                      _card={{
-                        ..._card,
-                        sx: { width: '230px', ...(_card?.sx ?? {}) },
-                      }}
+                      _card={_card}
                       handleCardClick={handleCardClick}
                       trackData={trackData}
                     />
-                  </Box>
+                  </Grid>
                 ))}
-              </CardGrid>
+              </Grid>
               <Box sx={{ textAlign: 'center', mt: 4 }}>
                 {hasMoreData && (
                   <Button
@@ -115,7 +117,15 @@ const RenderTabContent = memo(
                 )}
               </Box>
               {!contentData?.length && (
-                <Typography variant="body1" sx={{ mt: 4, textAlign: 'center' }}>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    minHeight: '100px',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
                   {t('LEARNER_APP.CONTENT_TABS.NO_MORE_DATA')}
                 </Typography>
               )}

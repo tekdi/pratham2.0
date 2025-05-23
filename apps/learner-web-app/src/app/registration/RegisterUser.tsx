@@ -608,7 +608,7 @@ const RegisterUser = () => {
         <>
           {' '}
           <Box
-            sx={{ display: 'flex', alignItems: 'center', mb: 2, mt: 2 }}
+            sx={{ display: 'flex', alignItems: 'center', mt: 2 }}
             onClick={() => {
               if (usernamePasswordForm) {
                 setUsernamePasswordForm(false);
@@ -645,36 +645,83 @@ const RegisterUser = () => {
               mt: '15px',
             }}
           >
-            <Typography variant="h2" fontWeight="bold" gutterBottom>
+            <Typography
+              variant="h1"
+              fontWeight="bold"
+              gutterBottom
+              sx={{
+                fontFamily: 'Poppins, sans-serif',
+                lineHeight: '24px',
+                letterSpacing: '0.5px',
+                textAlign: 'center',
+              }}
+            >
               Sign Up for {tenantName}
             </Typography>
 
-            <Typography variant="body1" color="text.secondary" mb={2}>
-              Get vocational training to land an entry level job with 2 months
-              of training
+            <Typography
+              sx={{
+                fontFamily: 'Poppins, sans-serif',
+                fontWeight: 400,
+                fontSize: '16px',
+                lineHeight: '24px',
+                letterSpacing: '0.5px',
+                textAlign: 'center',
+                p: '5px',
+              }}
+            >
+              Get vocational training to land
+              <Box
+                component="br"
+                sx={{ display: { xs: 'block', sm: 'none' } }}
+              />
+              an entry level job with 2 months of
+              <Box
+                component="br"
+                sx={{ display: { xs: 'block', sm: 'none' } }}
+              />
+              training
             </Typography>
 
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{
+                fontFamily: 'Poppins, sans-serif',
+                fontWeight: 400,
+                fontSize: '16px',
+                lineHeight: '24px',
+                letterSpacing: '0.5px',
+                textAlign: 'center',
+              }}
+            >
               Already signed up?{' '}
               <Link
                 href="/login"
                 underline="hover"
                 color="secondary"
-                fontWeight="bold"
+                sx={{ fontWeight: '500' }}
               >
                 Click here to login
               </Link>
             </Typography>
           </Box>
           <Box
-            ml="25%"
-            // mt="70px"
-            width="50vw"
-            // height="100vh"
-            display="flex"
-            flexDirection="column"
-            bgcolor={'#fff'}
-            padding={'40px'}
+            sx={{
+              ml: 'auto',
+              mr: 'auto',
+              width: {
+                xs: '90vw',
+                md: '50vw',
+              },
+              display: 'flex',
+              flexDirection: 'column',
+              bgcolor: '#fff',
+              p: {
+                xs: '20px',
+                md: '40px',
+              },
+            }}
           >
             <Box display="flex" alignItems="center" gap={1} mb={2}>
               <Image src={face} alt="Step Icon" />
@@ -716,6 +763,7 @@ const RegisterUser = () => {
                 fontFamily: 'Poppins',
                 fontWeight: 500,
                 fontSize: '14px',
+                height: '40px',
                 lineHeight: '20px',
                 letterSpacing: '0.1px',
                 textAlign: 'center',

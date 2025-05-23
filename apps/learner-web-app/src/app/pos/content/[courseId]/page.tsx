@@ -22,7 +22,7 @@ const App = () => {
           default_img: '/images/unit.png',
           _card: { isHideProgress: true },
           _infoCard: {
-            _cardMedia: { maxHeight: '279px' },
+            _cardMedia: { maxHeight: { xs: '200px', sm: '280px' } },
             default_img: '/images/image_ver.png',
           },
           _grid: { xs: 6, sm: 4, md: 3, lg: 2.5 },

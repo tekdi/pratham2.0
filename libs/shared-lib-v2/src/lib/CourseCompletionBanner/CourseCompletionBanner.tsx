@@ -22,10 +22,10 @@ export const CourseCompletionBanner: React.FC<CourseCompletionBannerProps> = ({
       <Box
         display="flex"
         alignItems="center"
-        // justifyContent="space-between"
-        p={2}
-        gap={5}
         sx={{
+          p: { xs: 1, sm: 2 },
+          gap: { xs: 1, sm: 5 },
+          flexDirection: { xs: 'column', sm: 'row' },
           background: 'linear-gradient(90deg, #fff9f0 0%, #fefcee 100%)',
           borderRadius: 2,
         }}
