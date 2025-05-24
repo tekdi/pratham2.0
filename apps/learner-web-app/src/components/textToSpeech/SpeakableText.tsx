@@ -1,7 +1,7 @@
-import { useSpeechContext } from "@learner/context/SpeechContext";
-import useSpeech from "@learner/hooks/useSpeech";
-import React, { useState, useEffect } from "react";
-import type { ReactNode, MouseEvent } from "react";
+import { useSpeechContext } from '@learner/context/SpeechContext';
+import useSpeech from '@learner/hooks/useSpeech';
+import React, { useState, useEffect } from 'react';
+import type { ReactNode, MouseEvent } from 'react';
 
 interface SpeakableTextProps {
   children: ReactNode;
@@ -33,19 +33,19 @@ const SpeakableText: React.FC<SpeakableTextProps> = ({
     const handleSpeakEnd = () => setIsSpeaking(false);
 
     try {
-      window.speechSynthesis.addEventListener("start", handleSpeakStart);
-      window.speechSynthesis.addEventListener("end", handleSpeakEnd);
-      window.speechSynthesis.addEventListener("pause", handleSpeakEnd);
-      window.speechSynthesis.addEventListener("cancel", handleSpeakEnd);
+      window.speechSynthesis.addEventListener('start', handleSpeakStart);
+      window.speechSynthesis.addEventListener('end', handleSpeakEnd);
+      window.speechSynthesis.addEventListener('pause', handleSpeakEnd);
+      window.speechSynthesis.addEventListener('cancel', handleSpeakEnd);
 
       return () => {
-        window.speechSynthesis.removeEventListener("start", handleSpeakStart);
-        window.speechSynthesis.removeEventListener("end", handleSpeakEnd);
-        window.speechSynthesis.removeEventListener("pause", handleSpeakEnd);
-        window.speechSynthesis.removeEventListener("cancel", handleSpeakEnd);
+        window.speechSynthesis.removeEventListener('start', handleSpeakStart);
+        window.speechSynthesis.removeEventListener('end', handleSpeakEnd);
+        window.speechSynthesis.removeEventListener('pause', handleSpeakEnd);
+        window.speechSynthesis.removeEventListener('cancel', handleSpeakEnd);
       };
     } catch (e) {
-      console.warn("Could not attach speech event listeners:", e);
+      console.warn('Could not attach speech event listeners:', e);
       return undefined;
     }
   }, [isSupported, usingFallback]);
@@ -67,7 +67,7 @@ const SpeakableText: React.FC<SpeakableTextProps> = ({
 
     // If explicit text is provided, use it
     // Otherwise, try to use children if it's a string
-    const textToSpeak = text || (typeof children === "string" ? children : "");
+    const textToSpeak = text || (typeof children === 'string' ? children : '');
 
     if (textToSpeak) {
       const succeeded = speak(textToSpeak);
@@ -96,17 +96,17 @@ const SpeakableText: React.FC<SpeakableTextProps> = ({
 
   // Apply speaking styles based on browser capability
   const speakableStyle: React.CSSProperties = {
-    cursor: isSupported && isSpeechEnabled ? "pointer" : "default",
-    transition: "all 0.2s ease",
+    cursor: isSupported && isSpeechEnabled ? 'pointer' : 'default',
+    transition: 'all 0.2s ease',
     ...(isSpeaking
       ? {
-          color: "#4CAF50",
-          textDecoration: "underline",
+          color: '#4CAF50',
+          textDecoration: 'underline',
         }
       : isHovering && isSpeechEnabled
       ? {
-          textDecoration: "underline",
-          borderBottom: "1px dashed #666",
+          textDecoration: 'underline',
+          borderBottom: '1px dashed #666',
         }
       : {}),
     ...style,
@@ -115,13 +115,13 @@ const SpeakableText: React.FC<SpeakableTextProps> = ({
   // Add a title based on browser compatibility
   const getTitle = () => {
     if (!isSupported) {
-      return "Speech not fully supported in your browser";
+      return '';
     } else if (usingFallback) {
-      return "Using limited speech capabilities in this browser";
+      return '';
     } else if (!isSpeechEnabled) {
-      return "Speech is currently disabled. Enable it from the toggle button.";
+      return '';
     } else {
-      return isSpeaking ? "Click to stop speaking" : "Click to hear this text";
+      return isSpeaking ? 'Click to stop speaking' : 'Click to hear this text';
     }
   };
 
@@ -137,7 +137,7 @@ const SpeakableText: React.FC<SpeakableTextProps> = ({
     >
       {children}
       {isSpeechEnabled && isSpeaking && (
-        <span style={{ marginLeft: "5px", display: "inline-block" }}>🔊</span>
+        <span style={{ marginLeft: '5px', display: 'inline-block' }}>🔊</span>
       )}
     </span>
   );

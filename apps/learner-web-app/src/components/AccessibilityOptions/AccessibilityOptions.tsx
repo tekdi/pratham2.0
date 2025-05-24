@@ -142,6 +142,7 @@ export default function AccessibilityOptions() {
                 cursor: 'pointer',
               }}
               onClick={toggleDrawer(false)}
+              data-speech-control="true"
             />
           </Box>
 

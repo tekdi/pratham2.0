@@ -56,36 +56,10 @@ const useSpeech = () => {
   const fallbackSpeak = useCallback((text: string) => {
     console.log('Using fallback speech mechanism');
     
-    // Approach 1: Alert the user (simplest fallback)
-    // alert('Text-to-speech is not supported in your browser. Text content: ' + text);
-    
-    // Approach 2: Create a dedicated text-to-speech service API endpoint
-    // This would require server-side implementation
+    // Silent fallback that doesn't show any visual notification
     try {
-      // For future server API implementation:
-      // const audio = new Audio('https://your-tts-service.com/api/speech?text=' + encodeURIComponent(text));
-      // audio.play();
-      
-      // For now, provide visual feedback
-      const element = document.createElement('div');
-      element.style.position = 'fixed';
-      element.style.bottom = '20px';
-      element.style.right = '20px';
-      element.style.background = 'rgba(0,0,0,0.7)';
-      element.style.color = 'white';
-      element.style.padding = '10px';
-      element.style.borderRadius = '5px';
-      element.style.zIndex = '9999';
-      element.style.maxWidth = '300px';
-      element.textContent = `Speech feature is limited in your browser. Text: "${text.substring(0, 50)}${text.length > 50 ? '...' : ''}"`;
-      
-      document.body.appendChild(element);
-      setTimeout(() => {
-        if (document.body.contains(element)) {
-          document.body.removeChild(element);
-        }
-      }, 5000);
-      
+      // Just return true to indicate we "handled" it
+      // but don't show any visual notification
       return true;
     } catch (e) {
       console.error('Fallback speech mechanism failed', e);

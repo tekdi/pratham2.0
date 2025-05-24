@@ -22,6 +22,8 @@ import OtherWebsiteCarousel from '@learner/components/OtherWebsiteCarousel';
 import Learning from '@learner/components/Learning';
 import Image from 'next/image';
 import AccessibilityOptions from '@learner/components/AccessibilityOptions/AccessibilityOptions';
+import SpeechAwareTooltip from '@learner/components/textToSpeech/SpeechAwareTooltip';
+import SpeakableText from '@learner/components/textToSpeech/SpeakableText';
 
 const keyThemesList = [
   [
@@ -172,7 +174,7 @@ const page = () => {
                 },
               }}
             >
-              Pratham
+              <SpeakableText>Pratham</SpeakableText>
             </Typography>
             <Typography
               variant="body3"
@@ -189,7 +191,7 @@ const page = () => {
                 },
               }}
             >
-              Open School
+              <SpeakableText>Open School</SpeakableText>
             </Typography>
 
             <Typography
@@ -208,7 +210,9 @@ const page = () => {
                 },
               }}
             >
-              Opening doors to knowledge and skills
+              <SpeakableText>
+                Opening doors to knowledge and skills
+              </SpeakableText>
             </Typography>
 
             <Typography
@@ -230,7 +234,7 @@ const page = () => {
                 },
               }}
             >
-              In 15 languages
+              <SpeakableText>In 15 languages</SpeakableText>
             </Typography>
 
             <Typography
@@ -250,10 +254,12 @@ const page = () => {
                 },
               }}
             >
-              Pratham Open School offers free, downloadable videos, games,
-              reading material and stories in 15 languages for ages 1 to 18+,
-              designed to support self-led learning and group learning through
-              activities and projects.
+              <SpeakableText>
+                Pratham Open School offers free, downloadable videos, games,
+                reading material and stories in 15 languages for ages 1 to 18+,
+                designed to support self-led learning and group learning through
+                activities and projects.
+              </SpeakableText>
             </Typography>
             <Box
               sx={{
@@ -302,7 +308,7 @@ const page = () => {
                   },
                 }}
               >
-                Search
+                <SpeakableText>Search</SpeakableText>
               </Button>
             </Box>
           </Box>
@@ -340,7 +346,7 @@ const page = () => {
             },
           }}
         >
-          Our Learning Pillars
+          <SpeakableText>Our Learning Pillars</SpeakableText>
         </Typography>
         <Learning data={keyThemesList} descriptions={descriptions} />
       </Box>
@@ -374,7 +380,7 @@ const page = () => {
               },
             }}
           >
-            3524
+            <SpeakableText>3524</SpeakableText>
           </Typography>
           <Typography
             variant="body8"
@@ -392,7 +398,7 @@ const page = () => {
               },
             }}
           >
-            Total Resources
+            <SpeakableText>Total Resources</SpeakableText>
           </Typography>
         </Box>
 
@@ -438,7 +444,7 @@ const page = () => {
                     },
                   }}
                 >
-                  {item.value}
+                  <SpeakableText>{item.value}</SpeakableText>
                 </Typography>
                 <Typography
                   variant="body8"
@@ -456,7 +462,7 @@ const page = () => {
                     },
                   }}
                 >
-                  {item.label}
+                  <SpeakableText>{item.label}</SpeakableText>
                 </Typography>
               </Grid>
             ))}
@@ -479,7 +485,7 @@ const page = () => {
             mt: 5,
           }}
         >
-          Featured Gallery
+          <SpeakableText>Featured Gallery</SpeakableText>
         </Typography>
 
         <Box
@@ -506,7 +512,7 @@ const page = () => {
             mt: 4,
           }}
         >
-          What's New
+          <SpeakableText>What's New</SpeakableText>
         </Typography>
 
         <Box>
@@ -543,7 +549,9 @@ const page = () => {
                 },
               }}
             >
-              More Ways to Learn – Check Out Our Products!
+              <SpeakableText>
+                More Ways to Learn – Check Out Our Products!
+              </SpeakableText>
             </Typography>
           </Grid>
           <Grid item xs={12} md={7}>
@@ -576,7 +584,7 @@ const page = () => {
             },
           }}
         >
-          Knowledge Partners
+          <SpeakableText>Knowledge Partners</SpeakableText>
         </Typography>
 
         <Container maxWidth="xl">
@@ -611,7 +619,7 @@ const page = () => {
             },
           }}
         >
-          Our Partners
+          <SpeakableText>Our Partners</SpeakableText>
         </Typography>
 
         <Container maxWidth="xl">
@@ -644,7 +652,7 @@ const page = () => {
             },
           }}
         >
-          Other Websites
+          <SpeakableText>Other Websites</SpeakableText>
         </Typography>
 
         <Container maxWidth="xl">
