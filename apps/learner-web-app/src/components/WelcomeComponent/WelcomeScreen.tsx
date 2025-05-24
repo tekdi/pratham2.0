@@ -35,20 +35,23 @@ const WelcomeScreen = () => {
       />
 
       <Typography
+        variant="body9"
+        component="h2"
         fontWeight={400}
-        fontSize={{ xs: '24px', sm: '32px' }}
-        lineHeight={{ xs: '32px', sm: '40px' }}
-        letterSpacing="0px"
+        // fontSize="32px"
+        // lineHeight="40px"
+        // letterSpacing="0px"
         textAlign="center"
         sx={{ verticalAlign: 'middle' }}
       >
         {t('LEARNER_APP.LOGIN.welcome_title')}
       </Typography>
       <Typography
+        variant="h1"
         fontWeight={400}
-        fontSize={{ xs: '18px', sm: '22px' }}
-        lineHeight={{ xs: '24px', sm: '28px' }}
-        letterSpacing="0px"
+        // fontSize="22px"
+        // lineHeight="28px"
+        // letterSpacing="0px"
         textAlign="center"
         sx={{ verticalAlign: 'middle' }}
         mb={4}

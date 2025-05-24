@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { FontSizeProvider } from '../context/FontSizeContext';
 import { telemetryFactory } from '@shared-lib-v2/DynamicForm/utils/telemetry';
 
 export default function ClientLayout({
@@ -12,5 +13,5 @@ export default function ClientLayout({
     telemetryFactory.init();
   }, []);
 
-  return <>{children}</>;
+  return <FontSizeProvider>{children}</FontSizeProvider>;
 }

@@ -5,6 +5,7 @@ import { Grid, Typography } from '@mui/material';
 import { Box } from '@mui/material';
 import Learning from '@learner/components/Learning';
 import Image from 'next/image';
+import SpeakableText from '@learner/components/textToSpeech/SpeakableText';
 
 const AboutUsPage = () => {
   const keyThemesList = [
@@ -107,27 +108,33 @@ const AboutUsPage = () => {
         >
           <Box>
             <Typography
+              variant="body8"
+              component="h1"
               sx={{
                 fontWeight: 700,
-                fontSize: { xs: '16px', md: '24px' },
-                lineHeight: { xs: '24px', md: '44px' },
+                // fontSize: { xs: '16px', md: '24px' },
+                // lineHeight: { xs: '24px', md: '44px' },
                 letterSpacing: '0px',
                 textAlign: 'center',
                 color: '#FFF',
               }}
             >
-              About Us
+              <SpeakableText>About Us</SpeakableText>
             </Typography>
             <Typography
+              variant="body6"
+              component="h1"
               sx={{
                 fontWeight: 700,
-                fontSize: { xs: '22px', md: '36px' },
+                // fontSize: { xs: '22px' }, //md: '36px'
                 letterSpacing: '-0.25px',
                 textAlign: 'center',
                 color: '#FDBE16',
               }}
             >
-              One liner - Highlight POS as a Pradigi Product
+              <SpeakableText>
+                One liner - Highlight POS as a Pradigi Product
+              </SpeakableText>
             </Typography>
           </Box>
         </Box>
@@ -141,66 +148,82 @@ const AboutUsPage = () => {
           <Grid container spacing={3} sx={{ alignItems: 'center' }}>
             <Grid item xs={12} md={6}>
               <Typography
+                variant="body9"
+                component="h1"
                 sx={{
                   fontFamily: 'Poppins',
                   fontWeight: 600,
-                  fontSize: { xs: '22px', md: '32px' },
-                  lineHeight: { xs: '28px', md: '100%' },
+                  // fontSize: { xs: '22px', md: '32px' },
+                  // lineHeight: { xs: '28px', md: '100%' },
                   letterSpacing: '0px',
                   color: '#1F1B13',
                 }}
               >
-                Some more information about POS as a Pradigi Product
+                <SpeakableText>
+                  Some more information about POS as a Pradigi Product
+                </SpeakableText>
               </Typography>
               <Typography
+                variant="h2"
+                component="h2"
                 sx={{
                   fontFamily: 'Poppins',
                   fontWeight: 400,
-                  fontSize: { xs: '14px', md: '16px' },
-                  lineHeight: { xs: '20px', md: '24px' },
+                  // fontSize: { xs: '14px', md: '16px' },
+                  // lineHeight: { xs: '20px', md: '24px' },
                   letterSpacing: '0.5px',
                   color: '#1F1B13',
                   mt: 2,
                 }}
               >
-                Pratham undertook an exploratory study for children to
-                understand the problem of plastic waste management in rural
-                India. This study is a part of Pratham's Learning for Life
-                curriculum. In this study, we covered 8400 households, in 700
-                villages across 70 districts, in 15 states. Findings to be
-                released in July 2022. 
+                <SpeakableText>
+                  Pratham undertook an exploratory study for children to
+                  understand the problem of plastic waste management in rural
+                  India. This study is a part of Pratham's Learning for Life
+                  curriculum. In this study, we covered 8400 households, in 700
+                  villages across 70 districts, in 15 states. Findings to be
+                  released in July 2022.
+                </SpeakableText>
               </Typography>
               <Typography
+                variant="h2"
+                component="h2"
                 sx={{
                   fontFamily: 'Poppins',
                   fontWeight: 400,
-                  fontSize: { xs: '14px', md: '16px' },
-                  lineHeight: { xs: '20px', md: '24px' },
+                  // fontSize: { xs: '14px', md: '16px' },
+                  // lineHeight: { xs: '20px', md: '24px' },
                   letterSpacing: '0.5px',
                   color: '#1F1B13',
                   mt: 2,
                 }}
               >
-                Pratham undertook an exploratory study for children to
-                understand the problem of plastic waste management in rural
-                India. This study is a part of Pratham's Learning for Life
-                curriculum.
+                <SpeakableText>
+                  Pratham undertook an exploratory study for children to
+                  understand the problem of plastic waste management in rural
+                  India. This study is a part of Pratham's Learning for Life
+                  curriculum.
+                </SpeakableText>
               </Typography>
               <Typography
+                variant="h2"
+                component="h2"
                 sx={{
                   fontFamily: 'Poppins',
                   fontWeight: 400,
-                  fontSize: { xs: '14px', md: '16px' },
-                  lineHeight: { xs: '20px', md: '24px' },
+                  // fontSize: { xs: '14px', md: '16px' },
+                  // lineHeight: { xs: '20px', md: '24px' },
                   letterSpacing: '0.5px',
                   color: '#1F1B13',
                   mt: 2,
                 }}
               >
-                Pratham undertook an exploratory study for children to
-                understand the problem of plastic waste management in rural
-                India. This study is a part of Pratham's Learning for Life
-                curriculum.
+                <SpeakableText>
+                  Pratham undertook an exploratory study for children to
+                  understand the problem of plastic waste management in rural
+                  India. This study is a part of Pratham's Learning for Life
+                  curriculum.
+                </SpeakableText>
               </Typography>
             </Grid>
             <Grid item xs={12} md={6}>
@@ -239,32 +262,38 @@ const AboutUsPage = () => {
             }}
           >
             <Typography
+              variant="body9"
+              component="h2"
               sx={{
                 fontFamily: 'Poppins',
                 fontWeight: 600,
-                fontSize: { xs: '22px', md: '32px' },
-                lineHeight: { xs: '28px', md: '40px' },
+                // fontSize: { xs: '22px', md: '32px' },
+                // lineHeight: { xs: '28px', md: '40px' },
                 letterSpacing: '0px',
                 textAlign: 'center',
                 color: '#1F1B13',
               }}
             >
-              Title Here About 3 Pillars
+              <SpeakableText>Title Here About 3 Pillars</SpeakableText>
             </Typography>
           </Box>
           <Typography
+            variant="h1"
+            component="h1"
             sx={{
               fontFamily: 'Poppins',
               fontWeight: 400,
-              fontSize: { xs: '14px', md: '22px' },
-              lineHeight: { xs: '20px', md: '28px' },
+              // fontSize: { xs: '14px', md: '22px' },
+              // lineHeight: { xs: '20px', md: '28px' },
               letterSpacing: '0px',
               textAlign: 'center',
               color: '#635E57',
               mt: 2,
             }}
           >
-            Any subtext, if required can be displayed to give more information
+            <SpeakableText>
+              Any subtext, if required can be displayed to give more information
+            </SpeakableText>
           </Typography>
 
           <Box sx={{ mt: 6 }}>
@@ -294,38 +323,46 @@ const AboutUsPage = () => {
             }}
           >
             <Typography
+              variant="body9"
+              component="h2"
               sx={{
                 fontFamily: 'Poppins',
                 fontWeight: 600,
-                fontSize: '32px',
-                lineHeight: '40px',
+                // fontSize: '32px',
+                // lineHeight: '40px',
                 letterSpacing: '0px',
                 textAlign: 'center',
                 color: '#1F1B13',
               }}
             >
-              Pratham Education Foundation
+              <SpeakableText>Pratham Education Foundation</SpeakableText>
             </Typography>
           </Box>
           <Typography
+            variant="h1"
+            component="h1"
             sx={{
               fontFamily: 'Poppins',
               fontWeight: 400,
-              fontSize: '22px',
-              lineHeight: '32px',
+              // fontSize: '22px',
+              // lineHeight: '32px',
               letterSpacing: '0px',
               textAlign: 'center',
               color: '#635E57',
               mt: 2,
             }}
           >
-            Pratham is an innovative learning organization created to improve
-            the quality of education in India. As one of the largest
-            non-governmental organizations in the country, Pratham focuses on
-            high-quality, low-cost, and replicable interventions to address gaps
-            in the education system. Established in 1995 to provide education to
-            children in the slums of Mumbai, Pratham has grown both in scope and
-            geographical coverage.
+            <SpeakableText>
+              Pratham Education Foundation (Pratham) is one of the largest NGOs
+              in India, with a record of innovative, rigorously evaluated
+              programs. With a history spanning 30 years, Pratham's journey
+              began with pre-school initiatives in the urban slums of Mumbai.
+              Today, Pratham offers tailored programs for preschool and
+              elementary school age groups, women and older women, and youth.
+              Working directly with communities as well as through large-scale
+              collaborations with government systems, Pratham reaches millions
+              of lives every year.
+            </SpeakableText>
           </Typography>
           <Box
             sx={{
@@ -389,30 +426,34 @@ const AboutUsPage = () => {
                       sx={{ width: 48, height: 48, objectFit: 'contain' }}
                     />
                     <Typography
+                      variant="body4"
+                      component="h2"
                       sx={{
                         fontFamily: 'Poppins',
                         fontWeight: 400,
-                        fontSize: '28px',
-                        lineHeight: '36px',
+                        // fontSize: '28px',
+                        // lineHeight: '36px',
                         letterSpacing: '0px',
                         color: '#1F1B13',
                       }}
                     >
-                      {item.title}
+                      <SpeakableText>{item.title}</SpeakableText>
                     </Typography>
                   </Grid>
                   <Grid item xs={12} md={8}>
                     <Typography
+                      variant="h2"
+                      component="h2"
                       sx={{
                         fontFamily: 'Poppins',
                         fontWeight: 400,
-                        fontSize: '16px',
-                        lineHeight: '24px',
+                        // fontSize: '16px',
+                        // lineHeight: '24px',
                         letterSpacing: '0.5px',
                         color: '#7C766F',
                       }}
                     >
-                      {item.description}
+                      <SpeakableText>{item.description}</SpeakableText>
                     </Typography>
                   </Grid>
                 </Grid>

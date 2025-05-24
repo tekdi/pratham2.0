@@ -15,6 +15,7 @@ import { Footer } from './Footer';
 import { getDeviceIdUUID } from '@shared-lib-v2/DynamicForm/utils/Helper';
 import { validate as uuidValidate } from 'uuid';
 import { useGlobalData } from '../Provider/GlobalProvider';
+import AccessibilityOptions from '../AccessibilityOptions/AccessibilityOptions';
 interface NewDrawerItemProp extends DrawerItemProp {
   variant?: 'contained' | 'text';
   isActive?: boolean;
@@ -134,7 +135,11 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         ...props?._topAppBar,
       }}
     >
-      <Box>{children}</Box>
+      <Box>
+        <AccessibilityOptions />
+
+        {children}
+      </Box>
       <Footer />
     </Layout>
   );

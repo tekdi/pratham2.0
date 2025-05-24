@@ -64,11 +64,11 @@ const CourseCertificateCard: React.FC<CertificateCardProps> = ({
         >
           <CheckCircleIcon sx={{ color: '#00C853', fontSize: 18, mr: 0.5 }} />
           <Typography
-            variant="caption"
+            variant="h5"
             sx={{
               color: '#00C853',
               fontWeight: 600,
-              fontSize: 12,
+              // fontSize: 12,
             }}
           >
             Issued certificate on{' '}

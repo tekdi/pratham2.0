@@ -125,8 +125,10 @@ const SimpleModal: React.FC<SimpleModalProps> = ({
             {footerText && (
               <Box>
                 <Typography
+                  variant="h2"
+                  component="h2"
                   fontWeight={600}
-                  fontSize="16px"
+                  // fontSize="16px"
                   textAlign="center"
                   mt="10px"
                 >
