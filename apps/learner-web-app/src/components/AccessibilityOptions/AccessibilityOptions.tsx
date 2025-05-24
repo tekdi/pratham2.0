@@ -23,7 +23,6 @@ import AccessibleIcon from '@mui/icons-material/Accessible';
 import { useFontSize } from '../../context/FontSizeContext';
 import TextIncreaseIcon from '@mui/icons-material/TextIncrease';
 import TextDecreaseIcon from '@mui/icons-material/TextDecrease';
-import SpeechToggle from '../textToSpeech/SpeechToggle';
 import { useSpeechContext } from '@learner/context/SpeechContext';
 
 export default function AccessibilityOptions() {
@@ -227,8 +226,6 @@ export default function AccessibilityOptions() {
               >
                 <Typography variant="subtitle1">Text to Speech</Typography>
               </Button>
-
-              {/* <SpeechToggle /> */}
 
               <Button
                 variant="outlined"
