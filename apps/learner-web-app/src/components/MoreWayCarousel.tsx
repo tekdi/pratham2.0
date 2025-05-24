@@ -12,6 +12,7 @@ import { Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+import SpeakableText from './textToSpeech/SpeakableText';
 
 const slides = [
   {
@@ -74,7 +75,7 @@ const MoreWayCarousel = () => {
                         lineHeight: '32px',
                       }}
                     >
-                      {slide.title}
+                      <SpeakableText>{slide.title}</SpeakableText>
                     </Typography>
                     <Typography
                       variant="h2"
@@ -87,7 +88,7 @@ const MoreWayCarousel = () => {
                         mt: 2,
                       }}
                     >
-                      {slide.description}
+                      <SpeakableText>{slide.description}</SpeakableText>
                     </Typography>
                   </Box>
 
@@ -119,7 +120,7 @@ const MoreWayCarousel = () => {
                         letterSpacing: 0.15,
                       }}
                     >
-                      Get it from Play Store Now!
+                      <SpeakableText>Get it from Play Store Now!</SpeakableText>
                     </Button>
                   </Box>
                 </Box>
@@ -182,7 +183,7 @@ const MoreWayCarousel = () => {
                         },
                       }}
                     >
-                      Get it from Play Store Now!
+                      <SpeakableText>Get it from Play Store Now!</SpeakableText>
                     </Button>
                   </Box>
                 </Box>

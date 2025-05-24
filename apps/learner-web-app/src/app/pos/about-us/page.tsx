@@ -119,7 +119,7 @@ const AboutUsPage = () => {
                 color: '#FFF',
               }}
             >
-              About Us
+              <SpeakableText>About Us</SpeakableText>
             </Typography>
             <Typography
               variant="body6"
@@ -133,10 +133,8 @@ const AboutUsPage = () => {
               }}
             >
               <SpeakableText>
-
-              One liner - Highlight POS as a Pradigi Product
+                One liner - Highlight POS as a Pradigi Product
               </SpeakableText>
-                
             </Typography>
           </Box>
         </Box>
@@ -161,7 +159,9 @@ const AboutUsPage = () => {
                   color: '#1F1B13',
                 }}
               >
-                Some more information about POS as a Pradigi Product
+                <SpeakableText>
+                  Some more information about POS as a Pradigi Product
+                </SpeakableText>
               </Typography>
               <Typography
                 variant="h2"
@@ -176,12 +176,14 @@ const AboutUsPage = () => {
                   mt: 2,
                 }}
               >
-                Pratham undertook an exploratory study for children to
-                understand the problem of plastic waste management in rural
-                India. This study is a part of Pratham's Learning for Life
-                curriculum. In this study, we covered 8400 households, in 700
-                villages across 70 districts, in 15 states. Findings to be
-                released in July 2022. 
+                <SpeakableText>
+                  Pratham undertook an exploratory study for children to
+                  understand the problem of plastic waste management in rural
+                  India. This study is a part of Pratham's Learning for Life
+                  curriculum. In this study, we covered 8400 households, in 700
+                  villages across 70 districts, in 15 states. Findings to be
+                  released in July 2022.
+                </SpeakableText>
               </Typography>
               <Typography
                 variant="h2"
@@ -196,10 +198,12 @@ const AboutUsPage = () => {
                   mt: 2,
                 }}
               >
-                Pratham undertook an exploratory study for children to
-                understand the problem of plastic waste management in rural
-                India. This study is a part of Pratham's Learning for Life
-                curriculum.
+                <SpeakableText>
+                  Pratham undertook an exploratory study for children to
+                  understand the problem of plastic waste management in rural
+                  India. This study is a part of Pratham's Learning for Life
+                  curriculum.
+                </SpeakableText>
               </Typography>
               <Typography
                 variant="h2"
@@ -214,10 +218,12 @@ const AboutUsPage = () => {
                   mt: 2,
                 }}
               >
-                Pratham undertook an exploratory study for children to
-                understand the problem of plastic waste management in rural
-                India. This study is a part of Pratham's Learning for Life
-                curriculum.
+                <SpeakableText>
+                  Pratham undertook an exploratory study for children to
+                  understand the problem of plastic waste management in rural
+                  India. This study is a part of Pratham's Learning for Life
+                  curriculum.
+                </SpeakableText>
               </Typography>
             </Grid>
             <Grid item xs={12} md={6}>
@@ -268,7 +274,7 @@ const AboutUsPage = () => {
                 color: '#1F1B13',
               }}
             >
-              Title Here About 3 Pillars
+              <SpeakableText>Title Here About 3 Pillars</SpeakableText>
             </Typography>
           </Box>
           <Typography
@@ -285,7 +291,9 @@ const AboutUsPage = () => {
               mt: 2,
             }}
           >
-            Any subtext, if required can be displayed to give more information
+            <SpeakableText>
+              Any subtext, if required can be displayed to give more information
+            </SpeakableText>
           </Typography>
 
           <Box sx={{ mt: 6 }}>
@@ -327,7 +335,7 @@ const AboutUsPage = () => {
                 color: '#1F1B13',
               }}
             >
-              Pratham Education Foundation
+              <SpeakableText>Pratham Education Foundation</SpeakableText>
             </Typography>
           </Box>
           <Typography
@@ -344,14 +352,17 @@ const AboutUsPage = () => {
               mt: 2,
             }}
           >
-            Pratham Education Foundation (Pratham) is one of the largest NGOs in
-            India, with a record of innovative, rigorously evaluated programs.
-            With a history spanning 30 years, Pratham's journey began with
-            pre-school initiatives in the urban slums of Mumbai. Today, Pratham
-            offers tailored programs for preschool and elementary school age
-            groups, women and older women, and youth. Working directly with
-            communities as well as through large-scale collaborations with
-            government systems, Pratham reaches millions of lives every year.
+            <SpeakableText>
+              Pratham Education Foundation (Pratham) is one of the largest NGOs
+              in India, with a record of innovative, rigorously evaluated
+              programs. With a history spanning 30 years, Pratham's journey
+              began with pre-school initiatives in the urban slums of Mumbai.
+              Today, Pratham offers tailored programs for preschool and
+              elementary school age groups, women and older women, and youth.
+              Working directly with communities as well as through large-scale
+              collaborations with government systems, Pratham reaches millions
+              of lives every year.
+            </SpeakableText>
           </Typography>
           <Box
             sx={{
@@ -426,7 +437,7 @@ const AboutUsPage = () => {
                         color: '#1F1B13',
                       }}
                     >
-                      {item.title}
+                      <SpeakableText>{item.title}</SpeakableText>
                     </Typography>
                   </Grid>
                   <Grid item xs={12} md={8}>
@@ -442,7 +453,7 @@ const AboutUsPage = () => {
                         color: '#7C766F',
                       }}
                     >
-                      {item.description}
+                      <SpeakableText>{item.description}</SpeakableText>
                     </Typography>
                   </Grid>
                 </Grid>

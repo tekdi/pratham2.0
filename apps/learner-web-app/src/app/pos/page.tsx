@@ -9,9 +9,6 @@ import {
   Button,
   Grid,
   Box,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import FeautureCarousel from '@learner/components/FeautureCarousel';
@@ -21,8 +18,6 @@ import KnwoledgeCarousel from '@learner/components/KnwoledgeCarousel';
 import OtherWebsiteCarousel from '@learner/components/OtherWebsiteCarousel';
 import Learning from '@learner/components/Learning';
 import Image from 'next/image';
-import AccessibilityOptions from '@learner/components/AccessibilityOptions/AccessibilityOptions';
-import SpeechAwareTooltip from '@learner/components/textToSpeech/SpeechAwareTooltip';
 import SpeakableText from '@learner/components/textToSpeech/SpeakableText';
 
 const keyThemesList = [
@@ -134,7 +129,6 @@ const page = () => {
 
   return (
     <Layout onlyHideElements={['footer']}>
-      <AccessibilityOptions />
       <Grid container spacing={4}>
         <Grid item xs={12} md={6}>
           <Image

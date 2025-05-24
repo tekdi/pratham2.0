@@ -13,6 +13,7 @@ import IconButton from '@mui/material/IconButton';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { Grid } from '@mui/material';
+import SpeakableText from './textToSpeech/SpeakableText';
 
 const slides = [
   {
@@ -163,7 +164,7 @@ const WhatsNewCarousel = () => (
                     },
                   }}
                 >
-                  {slide.heading}
+                  <SpeakableText>{slide.heading}</SpeakableText>
                 </Typography>
                 <Typography
                   variant="h2"
@@ -180,7 +181,7 @@ const WhatsNewCarousel = () => (
                     },
                   }}
                 >
-                  {slide.description}
+                  <SpeakableText>{slide.description}</SpeakableText>
                 </Typography>
               </Box>
             </Grid>

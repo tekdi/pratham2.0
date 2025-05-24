@@ -11,6 +11,7 @@ import { Grid } from '@mui/material';
 import React, { useState } from 'react';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import SpeakableText from './textToSpeech/SpeakableText';
 
 const Learning = ({
   data,
@@ -77,7 +78,7 @@ const Learning = ({
                   },
                 }}
               >
-                Learning for
+                <SpeakableText>Learning for</SpeakableText>
               </Typography>
               <Typography
                 variant="body7"
@@ -96,7 +97,7 @@ const Learning = ({
                   },
                 }}
               >
-                {pillar}
+                <SpeakableText>{pillar}</SpeakableText>
               </Typography>
             </Box>
 
@@ -132,7 +133,7 @@ const Learning = ({
                     letterSpacing: '1px',
                   }}
                 >
-                  KEY THEMES
+                  <SpeakableText>KEY THEMES</SpeakableText>
                 </Typography>
                 {data[index].map((theme: any) => (
                   <Box key={theme.title} sx={{ mb: 1 }}>
@@ -147,7 +148,7 @@ const Learning = ({
                         color: '#F17B06',
                       }}
                     >
-                      {theme.title}
+                      <SpeakableText>{theme.title}</SpeakableText>
                     </Typography>
                     <Typography
                       variant="body2"
@@ -160,7 +161,7 @@ const Learning = ({
                         color: '#635E57',
                       }}
                     >
-                      {theme.desc}
+                      <SpeakableText>{theme.desc}</SpeakableText>
                     </Typography>
                   </Box>
                 ))}
@@ -184,7 +185,7 @@ const Learning = ({
                       cursor: 'pointer',
                     }}
                   >
-                    View All
+                    <SpeakableText>View All</SpeakableText>
                   </Typography>
                   <ArrowForwardIcon
                     sx={{ fontSize: '25px', color: '#0D599E' }}
@@ -210,9 +211,11 @@ const Learning = ({
                         mb: '8px',
                       }}
                     >
-                      {typeof descriptions[index][0] === 'object'
-                        ? descriptions[index][0].cardDesc
-                        : descriptions[index][0]}
+                      <SpeakableText>
+                        {typeof descriptions[index][0] === 'object'
+                          ? descriptions[index][0].cardDesc
+                          : descriptions[index][0]}
+                      </SpeakableText>
                     </Typography>
                     {/* All three description lines with their headings */}
                     {descriptions[index]
@@ -232,7 +235,7 @@ const Learning = ({
                               mt: i > 0 ? '16px' : '0',
                             }}
                           >
-                            Heading
+                            <SpeakableText>Heading</SpeakableText>
                           </Typography>
                           {/* Description text */}
                           <Typography
@@ -245,7 +248,7 @@ const Learning = ({
                               fontFamily: 'Poppins',
                             }}
                           >
-                            {desc}
+                            <SpeakableText>{desc}</SpeakableText>
                           </Typography>
                         </Box>
                       ))}
@@ -261,7 +264,7 @@ const Learning = ({
                       fontFamily: 'Poppins',
                     }}
                   >
-                    {descriptions[index]}
+                    <SpeakableText>{descriptions[index]}</SpeakableText>
                   </Typography>
                 )}
               </Box>
@@ -282,7 +285,7 @@ const Learning = ({
                   },
                 }}
               >
-                {descriptions[index]}
+                <SpeakableText>{descriptions[index]}</SpeakableText>
               </Typography>
             )}
 
@@ -328,7 +331,7 @@ const Learning = ({
                       color: '#7C766F',
                     }}
                   >
-                    KEY THEMES
+                    <SpeakableText>KEY THEMES</SpeakableText>
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails sx={{ px: 2.5, pt: 0, pb: 2 }}>
@@ -345,7 +348,7 @@ const Learning = ({
                           mb: 0.2,
                         }}
                       >
-                        {theme.title}
+                        <SpeakableText>{theme.title}</SpeakableText>
                       </Typography>
                       <Typography
                         variant="h4"
@@ -356,7 +359,7 @@ const Learning = ({
                           color: '#7C766F',
                         }}
                       >
-                        {theme.desc}
+                        <SpeakableText>{theme.desc}</SpeakableText>
                       </Typography>
                     </Box>
                   ))}
@@ -379,7 +382,7 @@ const Learning = ({
                         mr: 1,
                       }}
                     >
-                      View All
+                      <SpeakableText>View All</SpeakableText>
                     </Typography>
                     <ArrowForwardIcon
                       sx={{ fontSize: '20px', color: '#0D599E' }}
