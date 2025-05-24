@@ -78,21 +78,7 @@ const UnitCard = ({
           TrackData={trackData}
           type={type}
           onClick={() => handleCardClick(item)}
-          _card={{
-            _contentText: {
-              sx: !item?.description
-                ? {
-                    color: '#79747E',
-                    fontStyle: 'italic',
-                    minHeight: '114px',
-                  }
-                : {
-                    textTransform: 'capitalize',
-                    minHeight: '114px',
-                  },
-            },
-            ..._card,
-          }}
+          _card={_card}
         />
       </Box>
     </Box>

@@ -5,6 +5,7 @@ import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
 import React from 'react';
 import { LanguageProvider } from '@shared-lib';
 import FontSizeTheme from '../../context/FontSizeTheme';
+import { SpeechProvider } from '@learner/context/SpeechContext';
 
 // Add module augmentation for custom typography variants
 declare module '@mui/material/styles' {
@@ -176,12 +177,25 @@ export const theme = createTheme({
     },
     MuiAppBar: {
       styleOverrides: {
-        root: {
+        root: ({ theme }) => ({
           backgroundColor: '#fff',
-          paddingTop: '18px',
-          paddingBottom: '18px',
+          paddingTop: '10px',
+          paddingBottom: '10px',
+          [theme.breakpoints.down('md')]: {
+            paddingTop: '4px',
+            paddingBottom: '4px',
+          },
           '&.Mui-focused .MuiOutlinedInput-notchedOutline': {},
-        },
+        }),
+      },
+    },
+    MuiToolbar: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          [theme.breakpoints.down('md')]: {
+            minHeight: '56px',
+          },
+        }),
       },
     },
     MuiOutlinedInput: {
@@ -206,7 +220,7 @@ export const theme = createTheme({
             lineHeight: '24px',
             fontWeight: 400,
             color: '#1F1B13',
-            padding: 14,
+            padding: '12px 10px',
             borderRadius: 8,
             '& .MuiButton-startIcon': {
               color: '#635E57',
@@ -219,10 +233,11 @@ export const theme = createTheme({
             fontSize: 'calc(16px * var(--font-size-scale))',
             lineHeight: '24px',
             fontWeight: 600,
-            padding: 14,
+            padding: '12px 10px',
             gap: 8,
             borderRadius: 8,
             borderBottomWidth: 3,
+            letterSpacing: '0.22px',
             color: '#987100',
             backgroundColor: '#F7ECDF',
             '&:hover': {
@@ -255,7 +270,7 @@ export default function MuiThemeProvider({
   return (
     <FontSizeTheme baseTheme={theme}>
       <CssBaseline />
-      {children}
+      <SpeechProvider>{children}</SpeechProvider>
     </FontSizeTheme>
   );
 }

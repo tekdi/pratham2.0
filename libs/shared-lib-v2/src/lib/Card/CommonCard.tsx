@@ -126,7 +126,7 @@ export const CommonCard: React.FC<CommonCardProps> = ({
       sx={{
         display: 'flex',
         flexDirection: orientation === 'horizontal' ? 'column' : 'row',
-        height: minheight || 'auto',
+        height: minheight || '100%',
         cursor: onClick ? 'pointer' : 'default',
         bgcolor: '#FEF7FF',
         boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.1)',
@@ -224,6 +224,7 @@ export const CommonCard: React.FC<CommonCardProps> = ({
               WebkitBoxOrient: 'vertical',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
+              textTransform: 'capitalize',
               ..._card?._contentText?.sx,
             }}
           >
@@ -320,8 +321,8 @@ export const StatusBar: React.FC<StatuPorps> = ({
           />
         )}
         <Typography
-          width={type === 'Course' ? '100%' : '133px'}
           sx={{
+            minWidth: '80px',
             fontSize: '14px',
             lineHeight: '20px',
             letterSpacing: '0.1px',

@@ -112,11 +112,16 @@ const LanguageSelect = ({
       size="small"
       onChange={handleChange}
       sx={{
+        '& .MuiSelect-select': {
+          padding: '2px 12px 3px 12px',
+        },
         color: theme.palette.text.primary,
-        width: 70,
-        height: 28,
-        borderRadius: 8,
+        borderRadius: '8px',
         borderWidth: 1,
+        '& .Mui-selected': {
+          backgroundColor: 'transparent',
+          color: theme.palette.text.primary,
+        },
       }}
     >
       <MuiMenuItem value="en">EN</MuiMenuItem>
@@ -334,17 +339,7 @@ const MobileTopBar = ({
           >
             <MenuIcon />
           </IconButton>
-          <Typography
-            component="div"
-            sx={{
-              flexGrow: 1,
-              textAlign: 'center',
-              fontSize: '22px',
-              fontWeight: 400,
-            }}
-          >
-            {title}
-          </Typography>
+          <Brand {..._brand} name={''} />
         </>
       ) : (
         <>
@@ -384,16 +379,18 @@ const Brand = ({ _box, name = 'Pratham' }: { _box?: any; name?: string }) => {
       {_box?.brandlogo ?? (
         <>
           <img src="/logo.png" alt="YouthNet" style={{ height: '40px' }} />
-          <Typography
-            variant="h6"
-            sx={{
-              color: theme.palette.text.primary,
-              fontWeight: 600,
-              ...(_box?._text ?? {}),
-            }}
-          >
-            {name}
-          </Typography>
+          {name && (
+            <Typography
+              variant="h6"
+              sx={{
+                color: theme.palette.text.primary,
+                fontWeight: 600,
+                ...(_box?._text ?? {}),
+              }}
+            >
+              {name}
+            </Typography>
+          )}
         </>
       )}
     </Box>

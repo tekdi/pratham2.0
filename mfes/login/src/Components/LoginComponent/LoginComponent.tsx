@@ -56,7 +56,7 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
       elevation={3}
       sx={{
         maxWidth: 400,
-        p: 4,
+        p: 3,
         borderRadius: 2,
       }}
     >
@@ -99,6 +99,7 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
           variant="outlined"
           fullWidth
           margin="normal"
+          autoComplete="new-password" // <-- Prevent browser from injecting its UI
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">

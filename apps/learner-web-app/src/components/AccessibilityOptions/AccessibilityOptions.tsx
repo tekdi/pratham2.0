@@ -23,11 +23,14 @@ import AccessibleIcon from '@mui/icons-material/Accessible';
 import { useFontSize } from '../../context/FontSizeContext';
 import TextIncreaseIcon from '@mui/icons-material/TextIncrease';
 import TextDecreaseIcon from '@mui/icons-material/TextDecrease';
+import SpeechToggle from '../textToSpeech/SpeechToggle';
+import { useSpeechContext } from '@learner/context/SpeechContext';
 
 export default function AccessibilityOptions() {
   const [open, setOpen] = React.useState(false);
   const { increaseFontSize, decreaseFontSize, resetFontSize, fontSize } =
     useFontSize();
+  const { isSpeechEnabled, toggleSpeechEnabled } = useSpeechContext();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [isIncreased, setIsIncreased] = React.useState(false);
@@ -206,20 +209,26 @@ export default function AccessibilityOptions() {
 
             <Stack direction={isMobile ? 'column' : 'row'} spacing={2}>
               <Button
-                variant="outlined"
+                variant={isSpeechEnabled ? 'contained' : 'outlined'}
                 color="primary"
                 startIcon={<RecordVoiceOverIcon />}
+                onClick={toggleSpeechEnabled}
                 sx={{
                   flex: 1,
                   justifyContent: 'flex-start',
                   py: 1.5,
                   borderRadius: 2,
-                  // bgcolor: '#f5f5f5',
+                  bgcolor: isSpeechEnabled ? '#FDBE16' : '#f5f5f5',
+                  '&:hover': {
+                    bgcolor: isSpeechEnabled ? '#E6AC00' : '',
+                  },
                   border: '1px solid #CDC5BD',
                 }}
               >
                 <Typography variant="subtitle1">Text to Speech</Typography>
               </Button>
+
+              {/* <SpeechToggle /> */}
 
               <Button
                 variant="outlined"

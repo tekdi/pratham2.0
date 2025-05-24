@@ -39,14 +39,23 @@ export default function Index() {
             <Box
               sx={{
                 textAlign: 'center',
-                my: 4,
+                my: { xs: 2, sm: 4 },
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: 2,
+                gap: { xs: 1, sm: 2 },
+                width: '100%',
+                px: { xs: 2, sm: 0 },
+                maxWidth: '100%',
               }}
             >
-              <Box sx={{ width: 60, height: 60, position: 'relative' }}>
+              <Box
+                sx={{
+                  width: { xs: 40, sm: 60 },
+                  height: { xs: 40, sm: 60 },
+                  position: 'relative',
+                }}
+              >
                 <Image
                   src="/images/welcome.gif"
                   alt="welcome gif"

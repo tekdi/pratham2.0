@@ -528,8 +528,8 @@ mat-radio-group.mat-mdc-radio-group {
   background-color: var(--mui-palette-error-main) !important;
 } */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 4px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {

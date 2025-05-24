@@ -5,6 +5,7 @@ import { Grid, Typography } from '@mui/material';
 import { Box } from '@mui/material';
 import Learning from '@learner/components/Learning';
 import Image from 'next/image';
+import SpeakableText from '@learner/components/textToSpeech/SpeakableText';
 
 const AboutUsPage = () => {
   const keyThemesList = [
@@ -131,7 +132,11 @@ const AboutUsPage = () => {
                 color: '#FDBE16',
               }}
             >
+              <SpeakableText>
+
               One liner - Highlight POS as a Pradigi Product
+              </SpeakableText>
+                
             </Typography>
           </Box>
         </Box>

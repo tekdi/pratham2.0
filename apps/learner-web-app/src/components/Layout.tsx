@@ -9,7 +9,6 @@ import {
 } from '@shared-lib';
 import {
   AccountCircleOutlined,
-  ExploreOutlined,
   Home,
   AssignmentOutlined,
 } from '@mui/icons-material';
@@ -73,12 +72,12 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         to: () => router.push('/content'),
         isActive: currentPage === '/content',
       },
-      {
-        title: t('LEARNER_APP.COMMON.EXPLORE'),
-        icon: <ExploreOutlined sx={{ width: 28, height: 28 }} />,
-        to: () => router.push('/explore'),
-        isActive: currentPage === '/explore',
-      },
+      // {
+      //   title: t('LEARNER_APP.COMMON.EXPLORE'),
+      //   icon: <ExploreOutlined sx={{ width: 28, height: 28 }} />,
+      //   to: () => router.push('/explore'),
+      //   isActive: currentPage === '/explore',
+      // },
     ];
     const isVolunteer = JSON.parse(
       localStorage.getItem('isVolunteer') || 'false'
@@ -117,7 +116,10 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
       {...props}
       _topAppBar={{
         _brand: {
-          name: 'YouthNet',
+          name:
+            typeof window !== 'undefined'
+              ? localStorage.getItem('userProgram') ?? ''
+              : '',
           _box: {
             onClick: () => router.push('/content'),
             sx: {

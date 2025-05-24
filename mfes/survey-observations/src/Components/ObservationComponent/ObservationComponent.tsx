@@ -141,11 +141,11 @@ const ObservationComponent: React.FC<QuestionnaireAppProps> = ({
       const formData = new FormData();
       formData.append('file', event.data.file);
 
-      await axios.put(presignedurl, event.data.file, {
-        headers: {
-          'Content-Type': fileType,
-        },
-      });
+      // await axios.put(presignedurl, event.data.file, {
+      //   headers: {
+      //     'Content-Type': fileType,
+      //   },
+      // });
 
       const obj: FileUploadData = {
         name: event.data.name,

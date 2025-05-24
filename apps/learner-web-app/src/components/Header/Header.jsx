@@ -24,7 +24,7 @@ const Header = () => {
       display="flex"
       justifyContent="space-between"
       alignItems="center"
-      px={4}
+      px={2}
       py={2}
       borderBottom="1px solid #ccc"
       bgcolor="#fff"

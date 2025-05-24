@@ -106,28 +106,62 @@ const CreateAccountForm = ({
           // mt: '15px',
         }}
       >
-        <Typography variant="h2" fontWeight="bold" gutterBottom>
+        <Typography variant="h1" fontWeight="bold" gutterBottom>
           Sign Up for {tenantName}
         </Typography>
 
-        <Typography variant="body1" color="text.secondary" mb={2}>
-          Get vocational training to land an entry level job with 2 months of
+        <Typography
+          sx={{
+            fontFamily: 'Poppins, sans-serif',
+            fontWeight: 400,
+            fontSize: '16px',
+            lineHeight: '24px',
+            letterSpacing: '0.5px',
+            textAlign: 'center',
+            p: '5px',
+          }}
+        >
+          Get vocational training to land
+          <Box component="br" sx={{ display: { xs: 'block', sm: 'none' } }} />
+          an entry level job with 2 months of
+          <Box component="br" sx={{ display: { xs: 'block', sm: 'none' } }} />
           training
         </Typography>
 
-        <Typography variant="body2" color="text.secondary">
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{
+            fontFamily: 'Poppins, sans-serif',
+            fontWeight: 400,
+            fontSize: '16px',
+            lineHeight: '24px',
+            letterSpacing: '0.5px',
+            textAlign: 'center',
+          }}
+        >
           Already signed up?{' '}
           <Link
             href="/login"
             underline="hover"
             color="secondary"
-            fontWeight="bold"
+            sx={{ fontWeight: '500' }}
           >
             Click here to login
           </Link>
         </Typography>
       </Box>
-      <Box maxWidth={800} mx="auto" p={3} sx={{ backgroundColor: 'white' }}>
+      <Box
+        mx="auto"
+        p={3}
+        sx={{
+          backgroundColor: 'white',
+          maxWidth: {
+            xs: 350,
+            md: 800,
+          },
+        }}
+      >
         {/* Header */}
         <Box display="flex" alignItems="center" gap={1} mb={2}>
           <Image src={face} alt="Step Icon" />

@@ -1,15 +1,9 @@
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Tab,
-  Tabs,
-  Typography,
-} from '@mui/material';
-import { CardGrid, ContentItem, Loader, useTranslation } from '@shared-lib'; // Updated import
+import { Box, Tab, Tabs } from '@mui/material';
+import { ContentItem, Loader, useTranslation } from '@shared-lib'; // Updated import
 import React, { memo } from 'react';
-import { ContentSearchResponse } from '../services/Search';
-import ContentCard from './Card/ContentCard';
+import { ContentSearchResponse } from '@content-mfes/services/Search';
+import ContentCardGrid from '@content-mfes/components/Card/ContentCardGrid';
+import ContentCardCarousel from '@content-mfes/components/Card/ContentCardCarousel';
 
 const RenderTabContent = memo(
   ({
@@ -44,8 +38,7 @@ const RenderTabContent = memo(
     isHideEmptyDataMessage?: boolean;
   }) => {
     const { t } = useTranslation();
-    const { default_img, _card, _box, _subBox } = _config ?? {};
-
+    const { _box } = _config ?? {};
     return (
       <Box sx={{ width: '100%', ...(_box?.sx ?? {}) }}>
         {tabs?.length !== undefined && tabs?.length > 1 && (
@@ -77,49 +70,30 @@ const RenderTabContent = memo(
             isHideMaxHeight
             _loader={{ backgroundColor: 'transparent' }}
           >
-            <Box {..._subBox} sx={{ ...(_subBox?.sx ?? {}) }}>
-              <CardGrid
-                childWidth={
-                  _card?.sx?.width ? _card?.sx?.width.replace('px', '') : 230
-                }
-              >
-                {contentData?.map((item: any) => (
-                  <Box key={item?.identifier}>
-                    <ContentCard
-                      item={item}
-                      type={type}
-                      default_img={default_img}
-                      _card={{
-                        ..._card,
-                        sx: { width: '230px', ...(_card?.sx ?? {}) },
-                      }}
-                      handleCardClick={handleCardClick}
-                      trackData={trackData}
-                    />
-                  </Box>
-                ))}
-              </CardGrid>
-              <Box sx={{ textAlign: 'center', mt: 4 }}>
-                {hasMoreData && (
-                  <Button
-                    variant="contained"
-                    onClick={handleLoadMore}
-                    disabled={isLoadingMoreData}
-                  >
-                    {isLoadingMoreData ? (
-                      <CircularProgress size={20} />
-                    ) : (
-                      t('LEARNER_APP.CONTENT_TABS.LOAD_MORE')
-                    )}
-                  </Button>
-                )}
-              </Box>
-              {!contentData?.length && (
-                <Typography variant="body1" sx={{ mt: 4, textAlign: 'center' }}>
-                  {t('LEARNER_APP.CONTENT_TABS.NO_MORE_DATA')}
-                </Typography>
-              )}
-            </Box>
+            {contentData?.length > 0 && _config?.isShowInCarousel && (
+              <ContentCardCarousel
+                contentData={contentData}
+                _config={_config}
+                type={type}
+                handleCardClick={handleCardClick}
+                trackData={trackData}
+                hasMoreData={hasMoreData}
+                handleLoadMore={handleLoadMore}
+                isLoadingMoreData={isLoadingMoreData}
+              />
+            )}
+            {!_config?.isShowInCarousel && (
+              <ContentCardGrid
+                contentData={contentData}
+                _config={_config}
+                type={type}
+                handleCardClick={handleCardClick}
+                trackData={trackData}
+                hasMoreData={hasMoreData}
+                handleLoadMore={handleLoadMore}
+                isLoadingMoreData={isLoadingMoreData}
+              />
+            )}
           </Loader>
         </Box>
       </Box>
