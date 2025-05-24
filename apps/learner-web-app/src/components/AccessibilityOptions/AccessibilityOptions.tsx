@@ -65,6 +65,18 @@ export default function AccessibilityOptions() {
     resetFontSize();
     setIsIncreased(false);
     setIsDecreased(false);
+
+    // Clear speech setting from localStorage and disable it
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('isSpeechEnabled');
+    }
+    disableSpeechEnabled();
+  };
+
+  const disableSpeechEnabled = () => {
+    if (isSpeechEnabled) {
+      toggleSpeechEnabled();
+    }
   };
 
   const toggleDrawer =

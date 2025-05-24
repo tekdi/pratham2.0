@@ -1,5 +1,5 @@
-import React, { createContext, useState, useContext } from "react";
-import type { ReactNode } from "react";
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import type { ReactNode } from 'react';
 
 interface SpeechContextType {
   isSpeechEnabled: boolean;
@@ -24,10 +24,24 @@ interface SpeechProviderProps {
 }
 
 export const SpeechProvider: React.FC<SpeechProviderProps> = ({ children }) => {
-  const [isSpeechEnabled, setIsSpeechEnabled] = useState(false);
+  // Load initial state from localStorage
+  const [isSpeechEnabled, setIsSpeechEnabled] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const savedState = localStorage.getItem('isSpeechEnabled');
+      return savedState ? JSON.parse(savedState) : false;
+    }
+    return false;
+  });
+
+  // Save to localStorage whenever state changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('isSpeechEnabled', JSON.stringify(isSpeechEnabled));
+    }
+  }, [isSpeechEnabled]);
 
   const toggleSpeechEnabled = () => {
-    setIsSpeechEnabled((prev) => !prev);
+    setIsSpeechEnabled((prev: boolean) => !prev);
   };
 
   const enableSpeech = () => {
@@ -36,7 +50,7 @@ export const SpeechProvider: React.FC<SpeechProviderProps> = ({ children }) => {
 
   const disableSpeech = () => {
     // Cancel any ongoing speech when disabling
-    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       window.speechSynthesis.cancel();
     }
     setIsSpeechEnabled(false);
