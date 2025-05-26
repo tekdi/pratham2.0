@@ -14,9 +14,11 @@ import {
 import { useParams, useRouter } from 'next/navigation';
 // import { ContentSearch } from '@learner/utils/API/contentService';
 import { checkAuth } from '@shared-lib-v2/utils/AuthService';
-import { useTranslation } from '@shared-lib';
+import { findCourseUnitPath, useTranslation } from '@shared-lib';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { ContentSearch, fetchContent } from '@learner/utils/API/contentService';
+import { fetchContent } from '@learner/utils/API/contentService';
+import BreadCrumb from '@content-mfes/components/BreadCrumb';
+import { hierarchyAPI } from '@content-mfes/services/Hierarchy';
 
 const CourseUnitDetails = dynamic(() => import('@CourseUnitDetails'), {
   ssr: false,
@@ -27,9 +29,9 @@ const App = (props: { userIdLocalstorageName?: string }) => {
   const params = useParams();
   const { identifier, courseId, unitId } = params; // string | string[] | undefined
   const [item, setItem] = useState<{ [key: string]: any }>(null);
-  const [relatedIdentity, setRelatedIdentity] = useState<Array<string | null>>(
-    []
-  );
+  const [breadCrumbs, setBreadCrumbs] = useState<any>();
+  const [isShowMoreContent, setIsShowMoreContent] = useState(false);
+
   let activeLink = null;
   if (typeof window !== 'undefined') {
     const searchParams = new URLSearchParams(window.location.search);
@@ -37,37 +39,24 @@ const App = (props: { userIdLocalstorageName?: string }) => {
   }
   useEffect(() => {
     const fetch = async () => {
+      const response = await fetchContent(identifier);
+      setItem({ content: response });
       if (unitId) {
-        const {
-          result: { content, QuestionSet },
-        } = await ContentSearch({
-          filters: { identifier: [unitId, courseId, identifier] },
-        });
-        const newContent = [...(content ?? []), ...(QuestionSet ?? [])];
-        const contentMap = newContent.reduce(
-          (acc: any, item: any) => ({
-            ...acc,
-            [item.identifier === unitId
-              ? 'unit'
-              : item.identifier === courseId
-              ? 'course'
-              : 'content']: item,
-          }),
-          {}
-        );
-        setItem(contentMap);
-        const filteredContent = contentMap?.unit?.leafNodes.filter(
-          (contentItem: any) => contentItem !== identifier
-        );
-
-        setRelatedIdentity(filteredContent ?? []);
-      } else {
-        const response = await fetchContent(identifier);
-        setItem({ content: response });
+        const course = await hierarchyAPI(courseId as string);
+        const breadcrum = findCourseUnitPath(course, identifier as string, [
+          'name',
+          'identifier',
+          'mimeType',
+          {
+            key: 'link',
+            suffix: activeLink ? `?activeLink=${activeLink}` : '',
+          },
+        ]);
+        setBreadCrumbs(breadcrum);
       }
     };
     fetch();
-  }, [identifier, unitId, courseId]);
+  }, [identifier, unitId, courseId, activeLink]);
 
   if (!identifier) {
     return <div>Loading...</div>;
@@ -93,7 +82,7 @@ const App = (props: { userIdLocalstorageName?: string }) => {
           flex: { xs: 1, md: 15 },
           gap: 1,
           flexDirection: 'column',
-          width: relatedIdentity.length > 0 ? 'initial' : '100%',
+          width: isShowMoreContent ? 'initial' : '100%',
         }}
       >
         <Box
@@ -110,15 +99,7 @@ const App = (props: { userIdLocalstorageName?: string }) => {
           >
             <ArrowBackIcon />
           </IconButton>
-          <Breadcrumbs separator="›" aria-label="breadcrumb">
-            {item?.course?.name && (
-              <Typography variant="body1">{item?.course?.name}</Typography>
-            )}
-            {item?.unit?.name && (
-              <Typography variant="body1">{item?.unit?.name}</Typography>
-            )}
-            <Typography variant="body1">{item?.content?.name}</Typography>
-          </Breadcrumbs>
+          <BreadCrumb breadCrumbs={breadCrumbs} />
         </Box>
         <Box
           sx={{
@@ -160,43 +141,49 @@ const App = (props: { userIdLocalstorageName?: string }) => {
           unitId={unitId}
         />
       </Box>
-      {relatedIdentity.length > 0 && (
-        <Box
+
+      <Box
+        sx={{
+          display: isShowMoreContent ? 'flex' : 'none',
+          flexDirection: 'column',
+          flex: { xs: 1, sm: 1, md: 9 },
+        }}
+      >
+        <Typography
           sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            flex: { xs: 1, sm: 1, md: 9 },
+            mb: 2,
+            fontWeight: 500,
+            fontSize: '18px',
+            lineHeight: '24px',
           }}
         >
-          <Typography
-            sx={{
-              mb: 2,
-              fontWeight: 500,
-              fontSize: '18px',
-              lineHeight: '24px',
-            }}
-          >
-            {t('LEARNER_APP.PLAYER.MORE_RELATED_RESOURCES')}
-          </Typography>
+          {t('LEARNER_APP.PLAYER.MORE_RELATED_RESOURCES')}
+        </Typography>
 
-          <CourseUnitDetails
-            isShowLayout={false}
-            isHideInfoCard={true}
-            _box={{
-              pt: 1,
-              pb: 1,
-              px: 1,
-              height: 'calc(100vh - 185px)',
-            }}
-            _config={{
-              _parentGrid: { pb: 2 },
-              default_img: '/images/image_ver.png',
-              _grid: { xs: 6, sm: 4, md: 6, lg: 4, xl: 3 },
-              _card: { isHideProgress: true },
-            }}
-          />
-        </Box>
-      )}
+        <CourseUnitDetails
+          isShowLayout={false}
+          isHideInfoCard={true}
+          _box={{
+            pt: 1,
+            pb: 1,
+            px: 1,
+            height: 'calc(100vh - 185px)',
+          }}
+          _config={{
+            getContentData: (item: any) => {
+              setIsShowMoreContent(
+                item.children.filter(
+                  (item: any) => item.identifier !== identifier
+                )?.length > 0
+              );
+            },
+            _parentGrid: { pb: 2 },
+            default_img: '/images/image_ver.png',
+            _grid: { xs: 6, sm: 4, md: 6, lg: 4, xl: 3 },
+            _card: { isHideProgress: true },
+          }}
+        />
+      </Box>
     </Box>
   );
 };
