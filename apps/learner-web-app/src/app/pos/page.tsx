@@ -18,7 +18,7 @@ import KnwoledgeCarousel from '@learner/components/KnwoledgeCarousel';
 import OtherWebsiteCarousel from '@learner/components/OtherWebsiteCarousel';
 import Learning from '@learner/components/Learning';
 import Image from 'next/image';
-import SpeakableText from '@learner/components/textToSpeech/SpeakableText';
+import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 
 const keyThemesList = [
   [

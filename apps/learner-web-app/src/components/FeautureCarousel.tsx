@@ -11,7 +11,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/autoplay';
-import SpeakableText from './textToSpeech/SpeakableText';
+import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 
 const mockData = [
   {

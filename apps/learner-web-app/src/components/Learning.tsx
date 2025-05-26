@@ -11,7 +11,7 @@ import { Grid } from '@mui/material';
 import React, { useState } from 'react';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import SpeakableText from './textToSpeech/SpeakableText';
+import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 
 const Learning = ({
   data,

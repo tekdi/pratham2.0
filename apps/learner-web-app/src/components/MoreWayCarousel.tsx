@@ -12,7 +12,7 @@ import { Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import SpeakableText from './textToSpeech/SpeakableText';
+import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 
 const slides = [
   {

@@ -23,7 +23,7 @@ import AccessibleIcon from '@mui/icons-material/Accessible';
 import { useFontSize } from '../../context/FontSizeContext';
 import TextIncreaseIcon from '@mui/icons-material/TextIncrease';
 import TextDecreaseIcon from '@mui/icons-material/TextDecrease';
-import { useSpeechContext } from '@learner/context/SpeechContext';
+import { useSpeechContext } from '@shared-lib-v2/lib/context/SpeechContext';
 
 export default function AccessibilityOptions() {
   const [open, setOpen] = React.useState(false);
@@ -240,7 +240,7 @@ export default function AccessibilityOptions() {
                 <Typography variant="subtitle1">Text to Speech</Typography>
               </Button>
 
-              <Button
+              {/* <Button
                 variant="outlined"
                 color="primary"
                 startIcon={<MicIcon />}
@@ -254,7 +254,7 @@ export default function AccessibilityOptions() {
                 }}
               >
                 <Typography variant="subtitle1">Speech to Text</Typography>
-              </Button>
+              </Button> */}
             </Stack>
 
             <Stack direction={isMobile ? 'column' : 'row'} spacing={2}>

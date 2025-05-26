@@ -19,6 +19,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { CommonDrawer } from '../Drawer/CommonDrawer';
 import type { DrawerItemProp } from '../Drawer/CommonDrawer';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import SpeakableText from '../textToSpeech/SpeakableText';
 
 interface NewDrawerItemProp extends DrawerItemProp {
   variant?: 'contained' | 'text';
@@ -216,7 +217,7 @@ export const DesktopBar = ({
                 }}
               >
                 <Typography variant="body1" data-speech-control="true">
-                  {link.title}
+                  <SpeakableText>{link.title}</SpeakableText>
                 </Typography>
               </Button>
               {link.child && (

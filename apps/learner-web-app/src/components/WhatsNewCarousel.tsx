@@ -13,7 +13,7 @@ import IconButton from '@mui/material/IconButton';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { Grid } from '@mui/material';
-import SpeakableText from './textToSpeech/SpeakableText';
+import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 
 const slides = [
   {

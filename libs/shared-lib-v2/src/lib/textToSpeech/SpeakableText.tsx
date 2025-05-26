@@ -1,7 +1,7 @@
-import { useSpeechContext } from '@learner/context/SpeechContext';
-import useSpeech from '@learner/hooks/useSpeech';
 import React, { useState, useEffect } from 'react';
 import type { ReactNode, MouseEvent } from 'react';
+import useSpeech from '../../hooks/useSpeech';
+import { useSpeechContext } from '../context/SpeechContext';
 
 interface SpeakableTextProps {
   children: ReactNode;

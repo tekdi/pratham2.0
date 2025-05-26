@@ -5,7 +5,7 @@ import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
 import React from 'react';
 import { LanguageProvider } from '@shared-lib';
 import FontSizeTheme from '../../context/FontSizeTheme';
-import { SpeechProvider } from '@learner/context/SpeechContext';
+import { SpeechProvider } from '@shared-lib-v2/lib/context/SpeechContext';
 
 // Add module augmentation for custom typography variants
 declare module '@mui/material/styles' {
