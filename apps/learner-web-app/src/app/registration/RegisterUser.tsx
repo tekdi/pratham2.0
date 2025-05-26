@@ -275,7 +275,8 @@ const RegisterUser = () => {
         //delete mobile or guardian detail from dob
         let updated_payload = payload;
         if (isUnderEighteen(updated_payload?.dob)) {
-          delete updated_payload?.mobile;
+          //  delete updated_payload?.mobile;
+          updated_payload.mobile = formData?.parent_phone;
         } else {
           const fieldIdsToRemove = [
             'd7a56014-0b9a-4f16-b07e-88baea79576d',
