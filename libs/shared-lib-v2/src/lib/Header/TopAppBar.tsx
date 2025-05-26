@@ -215,7 +215,9 @@ export const DesktopBar = ({
                     : openMenuAtLevel(0, e.currentTarget, link.child ?? []);
                 }}
               >
-                {link.title}
+                <Typography variant="body1" data-speech-control="true">
+                  {link.title}
+                </Typography>
               </Button>
               {link.child && (
                 <IconButton
@@ -294,7 +296,9 @@ export const DesktopBar = ({
                         py: 3,
                       }}
                     >
-                      {item.title}
+                      <Typography variant="body1" data-speech-control="true">
+                        {item.title}
+                      </Typography>
                       {hasChild && <ArrowDropDownIcon fontSize="small" />}
                     </MenuItem>
                   </Box>
@@ -357,6 +361,7 @@ const MobileTopBar = ({
             component="div"
             sx={{ flexGrow: 1, textAlign: 'left' }}
           >
+            // add SpeakableText
             {title}
           </Typography>
         </>
