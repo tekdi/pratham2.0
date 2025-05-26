@@ -266,7 +266,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                   if (item?.cohortId && item?.name) {
                     nameTypePairs.push({
                       cohortId: item?.cohortId,
-                      name: item?.name,
+                      name: toPascalCase(item?.name),
                       status: item?.status,
                       cohortType,
                     });
@@ -291,7 +291,8 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                 ?.map((item: any) => ({
                   cohortId: item?.cohortId,
                   parentId: item?.parentId,
-                  name: item?.cohortName || item?.name,
+                  name:
+                    toPascalCase(item?.cohortName) || toPascalCase(item?.name),
                   status: item?.cohortStatus,
                   customField: item?.customField,
                   childData: item?.childData,
@@ -347,10 +348,15 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
             } else if (response[0].type === cohortHierarchy.BLOCK) {
               if (setBlockName) {
                 setBlockName(
-                  response?.[0]?.name || response?.[0]?.cohortName || ''
+                  toPascalCase(response?.[0]?.name) ||
+                    toPascalCase(response?.[0]?.cohortName) ||
+                    ''
                 );
               }
-              setBlock(response[0].name || response[0].cohortName);
+              setBlock(
+                toPascalCase(response[0].name) ||
+                  toPascalCase(response[0].cohortName)
+              );
               const filteredData = response[0].childData
                 ?.filter((item: any) => item?.status !== Status.ARCHIVED)
                 .map((item: any) => {
@@ -361,7 +367,9 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                   return {
                     cohortId: item?.cohortId,
                     parentId: item?.parentId,
-                    name: item?.cohortName || item?.name,
+                    name:
+                      toPascalCase(item?.cohortName) ||
+                      toPascalCase(item?.name),
                     typeOfCohort: typeOfCohort || t('ATTENDANCE.UNKNOWN'),
                     status: item?.status,
                     customField: item?.customField,
@@ -867,7 +875,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                                 textTransform: 'capitalize',
                               }}
                             >
-                              {filteredCohortData[0]?.name}
+                              {toPascalCase(filteredCohortData[0]?.name)}
                             </MenuItem>
                           </Select>
                         </FormControl>
@@ -1152,7 +1160,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
                                   maxWidth: '100%',
                                 }}
                               >
-                                {filteredBatchData[0]?.name}
+                                {toPascalCase(filteredBatchData[0]?.name)}
                               </Typography>
                             </MenuItem>
                           </Select>
