@@ -275,11 +275,12 @@ const EditProfile = ({ completeProfile }: EditProfileProps) => {
             }}
           >
             <Typography
-              variant="body1"
+              variant="body8"
+              component="h2"
               sx={{
                 fontWeight: 600,
-                fontSize: '24px',
-                lineHeight: '32px',
+                // fontSize: '24px',
+                // lineHeight: '32px',
                 letterSpacing: '0px',
                 textAlign: 'center',
               }}
