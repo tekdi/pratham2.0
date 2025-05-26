@@ -158,12 +158,12 @@ const ChangePassword = () => {
           mt="70px"
         >
           <Typography
-            variant="body1"
+            variant="body8"
             mb="20px"
             sx={{
               fontWeight: 600,
-              fontSize: '24px',
-              lineHeight: '32px',
+              // fontSize: '24px',
+              // lineHeight: '32px',
               letterSpacing: '0px',
               textAlign: 'center',
             }}

@@ -80,9 +80,10 @@ export const Footer: React.FC = () => {
             />
           </Link>
           <Typography variant="body1" gutterBottom sx={{ pr: 6 }}>
-            {t(
-              'Pratham Digital aims to create an open learning mechanism to help children and youth prepare for school, work and life.We strive to create content that can encourage and support self-learning, project based learning and experiential learning for groups and individuals. We create videos, games and learning applications in 11 regional languages for learners across the age group of 3-18+.'
-            )}
+            {t(`
+  Over the past 30 years, Pratham Education Foundation has worked across India on diverse educational initiatives. 
+  The Pratham-Shah PraDigi Innovation Centre, also known as PraDigi Centre (India), was established to develop an open learning model designed to foster lifelong learning and equip children and youth with essential skills for school, life, and work. The centre aims to leverage technology to transform educational experiences and to create engaging, supportive, contextual, and relevant learning environments.
+`)}
           </Typography>
         </Box>
         <Box
@@ -94,15 +95,14 @@ export const Footer: React.FC = () => {
           }}
         >
           <Typography
-            variant="h6"
+            variant="body1"
             component="h3"
             gutterBottom
             sx={{
-              fontFamily: 'Poppins',
               fontWeight: 600,
-              fontSize: 16,
-              lineHeight: '24px',
-              letterSpacing: '0.15px',
+              // fontSize: 16,
+              // lineHeight: '24px',
+              // letterSpacing: '0.15px',
             }}
           >
             {t('Useful Links')}
@@ -128,14 +128,14 @@ export const Footer: React.FC = () => {
           }}
         >
           <Typography
-            variant="h6"
+            variant="body1"
             component="h3"
             gutterBottom
             sx={{
               fontFamily: 'Poppins',
-              fontWeight: 600,
-              fontSize: 16,
-              lineHeight: '24px',
+              // fontWeight: 600,
+              // fontSize: 16,
+              // lineHeight: '24px',
               letterSpacing: '0.15px',
             }}
           >

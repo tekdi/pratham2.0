@@ -11,6 +11,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/autoplay';
+import SpeakableText from './textToSpeech/SpeakableText';
 
 const mockData = [
   {
@@ -110,11 +111,13 @@ const FeautureCarousel = () => {
                 />
               </Box>
               <Box sx={{ p: 2 }}>
-                <Box
+                <Typography
+                  variant="body1"
+                  component="h1"
                   sx={{
                     fontFamily: 'Poppins',
                     fontWeight: 500,
-                    fontSize: 16,
+                    // fontSize: 16,
                     letterSpacing: 0.15,
                     color: '#1F1B13',
                     '@media (max-width: 900px)': {
@@ -122,9 +125,11 @@ const FeautureCarousel = () => {
                     },
                   }}
                 >
-                  {item.title}
-                </Box>
-                <Box
+                  <SpeakableText>{item.title}</SpeakableText>
+                </Typography>
+                <Typography
+                  variant="body1"
+                  component="h1"
                   sx={{
                     fontFamily: 'Poppins',
                     fontWeight: 400,
@@ -138,8 +143,8 @@ const FeautureCarousel = () => {
                     },
                   }}
                 >
-                  {item.description}
-                </Box>
+                  <SpeakableText>{item.description}</SpeakableText>
+                </Typography>
               </Box>
               <Box sx={{ p: 2 }}>
                 {item.actions.map((action, i) => (
@@ -166,7 +171,7 @@ const FeautureCarousel = () => {
                     }
                     size="small"
                   >
-                    {action.label}
+                    <SpeakableText>{action.label}</SpeakableText>
                   </Button>
                 ))}
               </Box>
