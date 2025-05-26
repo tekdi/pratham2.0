@@ -3,14 +3,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import {
-  Avatar,
-  Box,
-  Breadcrumbs,
-  Button,
-  IconButton,
-  Typography,
-} from '@mui/material';
+import { Avatar, Box, Button, IconButton, Typography } from '@mui/material';
 import { useParams, useRouter } from 'next/navigation';
 // import { ContentSearch } from '@learner/utils/API/contentService';
 import { checkAuth } from '@shared-lib-v2/utils/AuthService';
@@ -73,7 +66,7 @@ const App = (props: { userIdLocalstorageName?: string }) => {
         gap: 2,
         px: { xs: 2 },
         pb: { xs: 1 },
-        pt: 4,
+        pt: { xs: 2, sm: 2, md: 4 },
       }}
     >
       <Box
