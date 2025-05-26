@@ -264,6 +264,9 @@ const page = () => {
                 boxShadow: '0px 1px 2px 0px #0000004D',
                 mx: 'auto',
                 mt: 4,
+                '@media (min-width: 900px)': {
+                  mb: '100px',
+                },
               }}
             >
               <SearchIcon sx={{ color: '#757575', ml: 2, mr: 1 }} />
