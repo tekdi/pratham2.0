@@ -66,8 +66,9 @@ const mockData = [
   },
 ];
 
-const mediaMD = useMediaQuery('(max-width: 900px)');
 const FeautureCarousel = () => {
+  const mediaMD = useMediaQuery('(max-width: 900px)');
+
   return (
     <Box sx={{ width: '100%', py: 2 }}>
       <Swiper
