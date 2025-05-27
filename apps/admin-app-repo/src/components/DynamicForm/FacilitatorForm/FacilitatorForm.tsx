@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useEffect, useState } from 'react';
 import {
   Box,
@@ -20,6 +21,8 @@ import { createUser, updateUser } from '@/services/CreateUserService';
 import {
   getReassignPayload,
   getUserFullName,
+  isBlockDifferent,
+  isCenterDifferent,
   toPascalCase,
 } from '@/utils/Helper';
 import { sendCredentialService } from '@/services/NotificationService';
@@ -34,6 +37,7 @@ import {
   bulkCreateCohortMembers,
   updateReassignUser,
 } from '@/services/CohortService/cohortService';
+import useNotification from '@/hooks/useNotification';
 const FacilitatorForm = ({
   t,
   SuccessCallback,
@@ -58,6 +62,9 @@ const FacilitatorForm = ({
   notificationKey,
   notificationMessage,
   telemetryCreateKey,
+  blockReassignmentNotificationKey,
+  profileUpdateNotificationKey,
+  centerUpdateNotificationKey,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [alteredSchema, setAlteredSchema] = useState<any>(null);
@@ -65,6 +72,9 @@ const FacilitatorForm = ({
   const [alteredUiSchema, setAlteredUiSchema] = useState<any>(null);
 
   const [prefilledFormData, setPrefilledFormData] = useState(
+    editPrefilledFormData
+  );
+  const [originalPrefilledFormData, setOriginalPrefilledFormData] = useState(
     editPrefilledFormData
   );
   const [showNextForm, setShowNextForm] = useState<boolean>(false);
@@ -75,6 +85,7 @@ const FacilitatorForm = ({
 
   const [isChangeForm, setIsChangeForm] = useState(false);
   // const [testIs, setShowNextForm] = useState<boolean>(true);
+  const { getNotification } = useNotification();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -323,6 +334,7 @@ const FacilitatorForm = ({
           updateUserResponse &&
           updateUserResponse?.data?.params?.err === null
         ) {
+          getNotification(editableUserId, profileUpdateNotificationKey);
           showToastMessage(t(successUpdateMessage), 'success');
           telemetryCallbacks(telemetryUpdateKey);
 
@@ -526,6 +538,21 @@ const FacilitatorForm = ({
         extraFieldsUpdate
       );
       let payload = transformedFormData;
+      // console.log(
+      //   '######## debug issue facilitator transformedFormData',
+      //   originalPrefilledFormData
+      // );
+      // console.log('######## debug formDataCreate', transformedFormData);
+
+      const toSendBlockChangeNotification = isBlockDifferent(
+        originalPrefilledFormData,
+        transformedFormData
+      );
+      const toSendCenterChangeNotification = isCenterDifferent(
+        originalPrefilledFormData,
+        transformedFormData
+      );
+      
       try {
         // console.log('new', formData?.batch);
         // console.log(editPrefilledFormData?.batch, 'old');
@@ -554,6 +581,13 @@ const FacilitatorForm = ({
             }),
           });
           showToastMessage(t(successUpdateMessage), 'success');
+          // Send notification if block or center is changed
+          if (toSendBlockChangeNotification) {
+            getNotification(editableUserId, blockReassignmentNotificationKey);
+          }
+          if (toSendCenterChangeNotification) {
+            getNotification(editableUserId, centerUpdateNotificationKey);
+          }
           telemetryCallbacks(telemetryUpdateKey);
           UpdateSuccessCallback();
         } else {
