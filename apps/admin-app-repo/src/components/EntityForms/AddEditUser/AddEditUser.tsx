@@ -9,6 +9,7 @@ import {
   firstLetterInUpperCase,
   getReassignPayload,
   getUserFullName,
+  isUnderEighteen,
 } from '@/utils/Helper';
 import { sendCredentialService } from '@/services/NotificationService';
 import {
@@ -245,6 +246,14 @@ const AddEditUser = ({
           }
           // console.log('userData', userData);
           // console.log('customFields', customFields);
+          if (type == 'learner') {
+            const parentPhoneField = customFields.find(
+              (field: any) => field.value === formData.parent_phone
+            );
+            if (parentPhoneField) {
+              userData.mobile = parentPhoneField.value;
+            }
+          }
           const object = {
             userData: userData,
             customFields: customFields,
@@ -371,6 +380,9 @@ const AddEditUser = ({
             if (payload?.email == '') {
               delete payload.email;
             }
+          }
+          if (isUnderEighteen(payload?.dob) && type == 'learner') {
+            payload.mobile = formData?.parent_phone;
           }
           const responseUserData = await createUser(payload, t);
 
