@@ -447,10 +447,10 @@ export const filterAndMapAssociations = (
     }));
 };
 
-export const dataURLToBlob = (dataURLs: string[]): Blob[] => {
+export const dataURLToBlob = (dataURLs: any[]): Blob[] => {
   return dataURLs.map((dataURL) => {
     const [header, base64Data] = dataURL.split(',');
-    const mimeTypeMatch = header.match(/:(.*?);/);
+    const mimeTypeMatch = header?.match(/:(.*?);/);
     if (!mimeTypeMatch) {
       throw new Error('Invalid data URL format');
     }
@@ -685,6 +685,50 @@ export const fetchUserData = async (userId: any) => {
     return null;
   }
 };
+
+export const isBlockDifferent: any = (
+  originalPrefilledFormData: { block?: string[] },
+  formData: { block?: string[] }
+): boolean => {
+  const originalBlock = originalPrefilledFormData.block?.[0];
+  const currentBlock = formData.block?.[0];
+
+  return originalBlock !== currentBlock;
+};
+
+export const isDistrictDifferent: any = (
+  originalPrefilledFormData: { district?: string[] },
+  formData: { district?: string[] }
+): boolean => {
+  const originalDistrict = originalPrefilledFormData.district?.[0];
+  const currentDistrict = formData.district?.[0];
+
+  return originalDistrict !== currentDistrict;
+};
+
+export const isCenterDifferent = (
+  originalPrefilledFormData: any,
+  transformedFormData: any
+): boolean => {
+  const centerFromOriginal = originalPrefilledFormData.center ?? [];
+
+  const centerFieldFromTransformed = transformedFormData.customFields.find(
+    (field: { fieldId: string }) =>
+      field.fieldId === '753727ba-17e7-429b-99b9-ef6c3dc533e7'
+  );
+
+  const centerFromTransformed = Array.isArray(centerFieldFromTransformed?.value)
+    ? centerFieldFromTransformed?.value
+    : [];
+
+  const sortArr = (arr: string[]) => [...arr].sort();
+
+  return (
+    JSON.stringify(sortArr(centerFromOriginal)) !==
+    JSON.stringify(sortArr(centerFromTransformed))
+  );
+};
+
 export const isUnderEighteen = (dobString: any): boolean => {
   if (!dobString) return false;
 
