@@ -5,13 +5,14 @@ import {
   Box,
   IconButton,
   Button,
-  Breadcrumbs,
+  useTheme,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import React, { useState } from 'react';
 import CommonModal from '../common-modal';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { ExpandableText, useTranslation } from '@shared-lib';
+import BreadCrumb from '../BreadCrumb';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 
 interface InfoCardProps {
@@ -30,7 +31,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
   const { t } = useTranslation();
   const { _infoCard } = _config || {};
   const [openModal, setOpenModal] = useState(false);
-
+  const theme = useTheme();
   return (
     <>
       <Card
@@ -87,32 +88,10 @@ const InfoCard: React.FC<InfoCardProps> = ({
                 >
                   <ArrowBackIcon />
                 </IconButton>
-                <Breadcrumbs separator="›" aria-label="breadcrumb">
-                  {_infoCard?.breadCrumbs?.map(
-                    (breadcrumb: any, index: number) => (
-                      <Typography
-                        key={`${
-                          breadcrumb?.name ?? breadcrumb?.label ?? ''
-                        } ${index}`}
-                        variant="body1"
-                        color="text.secondary"
-                        sx={{ cursor: 'pointer' }}
-                        onClick={() => breadcrumb.handleBreadcrumbClick()}
-                      >
-                        <SpeakableText>
-                          {breadcrumb.name ?? breadcrumb.label ?? ''}
-                        </SpeakableText>
-                      </Typography>
-                    )
-                  )}
-                  {(!_infoCard?.breadCrumbs ||
-                    _infoCard?.breadCrumbs?.length > 1) &&
-                    ['Course', ...(topic ? [topic] : [])].map((key) => (
-                      <Typography key={key} variant="body1">
-                        <SpeakableText>{key}</SpeakableText>
-                      </Typography>
-                    ))}
-                </Breadcrumbs>
+                <BreadCrumb
+                  breadCrumbs={_infoCard?.breadCrumbs}
+                  topic={topic}
+                />
               </Box>
             )}
             <Typography

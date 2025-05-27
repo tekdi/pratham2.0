@@ -10,7 +10,7 @@ const Content = dynamic(() => import('@Content'), {
 });
 
 const ContentComponent = ({
-  limit = 4,
+  limit = 8,
   hasMoreData = false,
   getContentData,
   _config,

@@ -198,6 +198,14 @@ const EditProfile = ({ completeProfile }: EditProfileProps) => {
     }
     console.log('payload', payload);
     const { userData, customFields } = splitUserData(payload);
+
+    const parentPhoneField = customFields.find(
+      (field: any) => field.value === formData.parent_phone
+    );
+    console.log('Parent Phone Field:', parentPhoneField);
+    if (parentPhoneField) {
+      userData.mobile = parentPhoneField.value;
+    }
     let userId = localStorage.getItem('userId');
     const object = {
       userData: userData,
