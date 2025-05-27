@@ -84,6 +84,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSubmit }) => {
           color: 'text.secondary',
           mb: 3,
           textAlign: 'center',
+          m: '10px',
         }}
       >
         Create a new, strong password that you don't use for other websites
