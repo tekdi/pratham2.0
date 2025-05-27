@@ -315,7 +315,7 @@ export interface GetDoIdServiceParam {
     board?: string[];
     subject?: string | string[];
     assessmentType?: string | string[];
-    state: string;
+    state?: string;
   };
 }
 
@@ -329,7 +329,7 @@ export interface CustomField {
   order: number;
   type: any;
   value: string;
-  selectedValues: Array<{id: string, value: string}>;
+  selectedValues: Array<{ id: string; value: string }>;
 }
 export interface CohortAttendanceListViewProps {
   cohortName: string;
@@ -372,6 +372,7 @@ export interface LearnerListProps {
   onLearnerDelete: () => void;
   isFromProfile?: boolean;
   gender?: string;
+  customFields?: any;
 }
 export interface UserData {
   email: string;

@@ -174,7 +174,11 @@
     "BATCHES": "Batches",
     "BATCH_SESSIONS": "Batch Sessions",
     "NOT_ABLE_CREATE_LEARNER": "Not able to create learner",
-    "NOT_ABLE_CREATE_FACILITATOR": "Not Able To Create Teacher"
+    "NOT_ABLE_CREATE_FACILITATOR": "Not Able To Create Facilitator",
+    "NEW_BATCH": "New Batch",
+    "REASSIGN_BATCH": "Re-assign Batch",
+    "NOT_ABLE_UPDATE_FACILITATOR": "Not Able To Update Facilitator",
+    "HI": "Hi, {{name}}"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -332,6 +336,7 @@
     "YEAR_OF_JOINING_SCP": "Year of joining SCP",
     "MAIN_SUBJECT": "My Main Subjects",
     "SUBJECTS_I_TEACH": "Subjects I Teach",
+    "MY_MAIN_SUBJECTS": "My Main Subjects",
     "GENDER": "Gender",
     "UNIT_NAME": "Unit Name",
     "UNIT_CODE": "Unit Code",
@@ -376,6 +381,7 @@
     "STEP_9": "Access the full academic year’s course plan for each subject, along with resources like videos and documents for every topic. Track your teaching progress by updating topic completion status.",
     "STEP_10": "View detailed scores and summaries of Pre and Post tests for each learner. Track which students have completed, are in progress or yet to start the test.",
     "STEP_11": "Track and update each learner’s board exam enrollment status",
+    "STEP_12": "Whenever you run into a problem while using the app, raise a support request by describing the problem and adding screenshots or attachments. Our team will review and take action.",
     "PREVIOUS": "Previous",
     "NEXT": "Next",
     "SKIP": "Skip",
@@ -622,7 +628,9 @@
     "USERNAME_ALREADY_EXIST": "This username already exists",
     "EMAIL_ALREADY_EXIST": "Email is already exists",
     "GRADUATE": "Graduate",
-    "POST_GRADUATE": "Post Graduate"
+    "POST_GRADUATE": "Post Graduate",
+    "CENTER": "Center",
+    "BATCH": "Batch"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "Invalid Input.",
@@ -804,14 +812,38 @@
     "SUMMARY": "Summary"
   },
   "FACILITATORS": {
-    "NEW_FACILITATOR": "New Facilitators"
+    "NEW_FACILITATOR": "New Facilitators",
+    "RE_ASSIGN_FACILITATOR": "Re-assign Facilitator",
+    "FACILITATOR_UPDATED_SUCCESSFULLY": "Facilitator updated successfully",
+    "FACILITATOR_CREATED_SUCCESSFULLY": "Facilitator created successfully",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "User credentials will be sent soon"
   },
   "MENTOR": {
     "BACK_TO_FORM": "Back to Form",
-    "FINISH_ASSIGN": "Finish & Assign"
+    "FINISH_ASSIGN": "Finish & Assign",
+    "BACK": "Back",
+    "SAVE_SELECTION": "Save Selection"
   },
   "LEARNERS": {
-    "NEW_LEARNER": "New Learners"
+    "NEW_LEARNER": "New Learners",
+    "EDIT_LEARNER": "Edit Learner",
+    "RE_ASSIGN_LEARNER": "Re-assign Learner",
+    "LEARNER_UPDATED_SUCCESSFULLY": "Learner updated successfully",
+    "NOT_ABLE_UPDATE_LEARNER": "Not able to update learner",
+    "LEARNER_CREATED_SUCCESSFULLY": "Learner created successfully",
+    "NOT_ABLE_CREATE_LEARNER": "Not able to create learner",
+    "LEARNERS.USER_CREDENTIALS_WILL_BE_SEND_SOON": "User credentials will be sent soon"
+  },
+  "BATCH": {
+    "NEW_BATCH": "New Batch",
+    "UPDATE_BATCH": "Update Batch",
+    "SURE_DELETE_BATCH": "Are you sure you want to delete ",
+    "BATCH_UPDATE_SUCCESSFULLY": "Batch has been successfully updated",
+    "BATCH_DELETE_SUCCESSFULLY": "Batch has been successfully deleted",
+    "BATCH_CREATED_SUCCESSFULLY": "Batch Created successfully",
+    "BATCH_UPDATE_FAILED": "Something went wrong while updating batch",
+    "YOU_CANT_DELETE_BATCH_HAS_ACTIVE_LEARNERS": "You can't delete the batch because it has {{activeMembers}} Active Learners",
+    "NO_BATCH_FOUND": "No Batch Found"
   },
   "VILLAGE": "Village",
   "first_name": "First Name",
@@ -873,5 +905,12 @@
   "NON_AGRICULTURAL_LABORER": "Non-agricultural laborer",
   "SALARIED_WORK": "Salaried work",
   "SELF_EMPLOYMENT": "Self-employment",
-  "UNEMPLOYED_OR_DOMESTIC_WORK": "Unemployed or Domestic Work"
+  "UNEMPLOYED_OR_DOMESTIC_WORK": "Unemployed or Domestic Work",
+  "STATE": "State",
+  "DISTRICT": "District",
+  "BLOCK": "Block",
+  "CENTER": "Center",
+  "BOARD": "Board",
+  "MEDIUM": "Medium",
+  "GRADE": "Grade"
 }
