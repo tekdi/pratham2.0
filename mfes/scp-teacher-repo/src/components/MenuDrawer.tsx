@@ -211,8 +211,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
       sx={{
         '& .MuiPaper-root': {
           borderRight: `1px solid ${theme.palette.warning['A100']}`,
-          '@media (max-width: 900px)': { 
-          zIndex: '998 !important',
+          '@media (max-width: 900px)': {
+            zIndex: '998 !important',
           },
           left: isRTL ? '0px !important' : '0px !important',
 
@@ -449,19 +449,19 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                     : 'transparent',
                 },
               }}
-              startIcon={<Image
-                src={surveyForm}
-                alt="SurveyForm-Icon"
-                width={24}
-                height={24}
-              />}
+              startIcon={
+                <Image
+                  src={surveyForm}
+                  alt="SurveyForm-Icon"
+                  width={24}
+                  height={24}
+                />
+              }
               onClick={() => {
                 router.push(`/youthboard/surveys`);
               }}
             >
-              {
-                t('SURVEYS.SURVEYS')
-              }
+              {t('SURVEYS.SURVEYS')}
             </Button>
           </Box>
         )}
@@ -665,7 +665,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
           </Box>
         )}
         {isActiveYear && !tenantName && (
-          <Box sx={{ marginTop: '18px' }}>
+          <Box sx={{ marginTop: '18px' }} className="joyride-step-12">
             <Button
               className="fs-14"
               sx={{

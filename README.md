@@ -196,3 +196,5 @@ Port : `4113`
 ```sh
 import { SharedLib } from '@shared-lib';
 ```
+
+docker-compose -f docker-compose.admin-app-repo.yml up -d --force-recreate --no-deps

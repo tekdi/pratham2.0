@@ -284,6 +284,7 @@ const MentorAssignment: React.FC<MentorAssignmentProps> = ({
         addSchema &&
         addUiSchema && (
           <DynamicForm
+            hideSubmit={true}
             schema={addSchema}
             uiSchema={addUiSchema}
             FormSubmitFunction={FormSubmitFunction}

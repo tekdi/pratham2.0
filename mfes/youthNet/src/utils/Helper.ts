@@ -361,8 +361,10 @@ export const filterSchema = (schemaObj: any) => {
       };
     }
   });
+
   // Deep copy the schema object
   const newSchema = JSON.parse(JSON.stringify(schemaObj));
+
   locationFields.forEach((field) => {
     // Remove from schema properties
     delete newSchema.schema.properties[field];
