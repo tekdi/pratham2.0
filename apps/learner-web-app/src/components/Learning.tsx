@@ -5,6 +5,7 @@ import {
   AccordionDetails,
   AccordionSummary,
   Typography,
+  useMediaQuery,
 } from '@mui/material';
 import { Box } from '@mui/material';
 import { Grid } from '@mui/material';
@@ -23,6 +24,8 @@ const Learning = ({
   aboutDescriptionStyle?: boolean;
 }) => {
   const [hovered, setHovered] = useState<number | null>(null);
+
+  const mediaMD = useMediaQuery('(max-width: 900px)');
 
   return (
     <Grid container spacing={4}>
@@ -62,39 +65,33 @@ const Learning = ({
               }}
             >
               <Typography
-                variant="body4"
+                variant={mediaMD ? 'body5' : 'body4'}
                 component="h1"
                 sx={{
                   mt: 2,
                   fontFamily: 'Poppins',
                   fontWeight: 400,
                   // fontSize: '28px',
-                  lineHeight: '36px',
+                  // lineHeight: '36px',
                   letterSpacing: '0px',
                   textAlign: 'center',
                   color: '#fff',
-                  '@media (max-width: 900px)': {
-                    fontSize: '19px',
-                  },
                 }}
               >
                 <SpeakableText>Learning for</SpeakableText>
               </Typography>
               <Typography
-                variant="body7"
+                variant={mediaMD ? 'body9' : 'body7'}
                 component="h1"
                 sx={{
                   mt: 1,
                   fontFamily: 'Poppins',
                   fontWeight: 700,
                   // fontSize: '45px',
-                  lineHeight: '52px',
+                  // lineHeight: '52px',
                   letterSpacing: '0px',
                   textAlign: 'center',
                   color: '#FDBE16',
-                  '@media (max-width: 900px)': {
-                    fontSize: '31px',
-                  },
                 }}
               >
                 <SpeakableText>{pillar}</SpeakableText>
@@ -270,7 +267,7 @@ const Learning = ({
               </Box>
             ) : (
               <Typography
-                variant="body1"
+                variant={mediaMD ? 'h5' : 'body1'}
                 component="h1"
                 sx={{
                   fontFamily: 'Poppins',
@@ -280,9 +277,6 @@ const Learning = ({
                   letterSpacing: '0.5px',
                   color: '#7C766F',
                   marginTop: '20px',
-                  '@media (max-width: 900px)': {
-                    fontSize: '11px',
-                  },
                 }}
               >
                 <SpeakableText>{descriptions[index]}</SpeakableText>

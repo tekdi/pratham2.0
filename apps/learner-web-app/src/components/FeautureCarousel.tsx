@@ -6,6 +6,7 @@ import {
   Button,
   Typography,
   Box,
+  useMediaQuery,
 } from '@mui/material';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
@@ -65,6 +66,7 @@ const mockData = [
   },
 ];
 
+const mediaMD = useMediaQuery('(max-width: 900px)');
 const FeautureCarousel = () => {
   return (
     <Box sx={{ width: '100%', py: 2 }}>
@@ -112,7 +114,7 @@ const FeautureCarousel = () => {
               </Box>
               <Box sx={{ p: 2 }}>
                 <Typography
-                  variant="body1"
+                  variant={mediaMD ? 'body5' : 'body1'}
                   component="h1"
                   sx={{
                     fontFamily: 'Poppins',
@@ -120,15 +122,12 @@ const FeautureCarousel = () => {
                     // fontSize: 16,
                     letterSpacing: 0.15,
                     color: '#1F1B13',
-                    '@media (max-width: 900px)': {
-                      fontSize: '13px',
-                    },
                   }}
                 >
                   <SpeakableText>{item.title}</SpeakableText>
                 </Typography>
                 <Typography
-                  variant="body1"
+                  variant={mediaMD ? 'body5' : 'body1'}
                   component="h1"
                   sx={{
                     fontFamily: 'Poppins',
@@ -137,10 +136,6 @@ const FeautureCarousel = () => {
                     letterSpacing: 0.5,
                     color: '#1F1B13',
                     mt: 0.5,
-
-                    '@media (max-width: 900px)': {
-                      fontSize: '13px',
-                    },
                   }}
                 >
                   <SpeakableText>{item.description}</SpeakableText>

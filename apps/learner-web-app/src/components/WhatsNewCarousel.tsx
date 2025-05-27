@@ -12,7 +12,7 @@ import GlobalStyles from '@mui/material/GlobalStyles';
 import IconButton from '@mui/material/IconButton';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import { Grid } from '@mui/material';
+import { Grid, useMediaQuery } from '@mui/material';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 
 const slides = [
@@ -36,6 +36,8 @@ const slides = [
     ],
   },
 ];
+
+const mediaMD = useMediaQuery('(max-width: 900px)');
 
 const WhatsNewCarousel = () => (
   <Box
@@ -151,7 +153,8 @@ const WhatsNewCarousel = () => (
                 }}
               >
                 <Typography
-                  variant="h1"
+                  variant={mediaMD ? 'body1' : 'h1'}
+                  component="h1"
                   sx={{
                     fontFamily: 'Poppins',
                     fontWeight: 400,
@@ -167,7 +170,8 @@ const WhatsNewCarousel = () => (
                   <SpeakableText>{slide.heading}</SpeakableText>
                 </Typography>
                 <Typography
-                  variant="h2"
+                  variant={mediaMD ? 'h3' : 'h2'}
+                  component="h1"
                   sx={{
                     fontFamily: 'Poppins',
                     fontWeight: 400,
@@ -176,9 +180,6 @@ const WhatsNewCarousel = () => (
                     letterSpacing: '0.5px',
                     color: '#1F1B13',
                     mt: 2,
-                    '@media (max-width:900px)': {
-                      fontSize: '14px',
-                    },
                   }}
                 >
                   <SpeakableText>{slide.description}</SpeakableText>

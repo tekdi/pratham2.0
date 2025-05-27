@@ -9,6 +9,7 @@ import {
   Button,
   Grid,
   Box,
+  useMediaQuery,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import FeautureCarousel from '@learner/components/FeautureCarousel';
@@ -127,6 +128,8 @@ const page = () => {
     { src: '/images/website-4.png', alt: 'Schmidt Futures' },
   ];
 
+  const mediaMD = useMediaQuery('(max-width: 900px)');
+
   return (
     <Layout onlyHideElements={['footer']}>
       <Grid container spacing={4}>
@@ -152,7 +155,7 @@ const page = () => {
         >
           <Box sx={{ p: 3, '@media (max-width: 900px)': { px: '16px' } }}>
             <Typography
-              variant="body3"
+              variant={mediaMD ? 'body10' : 'body3'}
               component="h1"
               sx={{
                 fontWeight: 800,
@@ -163,15 +166,12 @@ const page = () => {
                 '@media (min-width: 900px)': {
                   marginLeft: '-120px',
                 },
-                '@media (max-width: 900px)': {
-                  fontSize: '40px',
-                },
               }}
             >
               <SpeakableText>Pratham</SpeakableText>
             </Typography>
             <Typography
-              variant="body3"
+              variant={mediaMD ? 'body10' : 'body3'}
               component="h1"
               sx={{
                 fontWeight: 800,
@@ -180,7 +180,6 @@ const page = () => {
                 letterSpacing: '0%',
                 color: '#FDBE16',
                 '@media (max-width: 900px)': {
-                  fontSize: '40px',
                   marginLeft: '60px',
                 },
               }}
@@ -189,7 +188,7 @@ const page = () => {
             </Typography>
 
             <Typography
-              variant="body4"
+              variant={mediaMD ? 'body1' : 'body4'}
               component="h1"
               sx={{
                 my: 2,
@@ -199,9 +198,6 @@ const page = () => {
                 letterSpacing: '0px',
                 color: '#1F1B13',
                 mt: 2,
-                '@media (max-width: 900px)': {
-                  fontSize: '16px',
-                },
               }}
             >
               <SpeakableText>
@@ -210,7 +206,7 @@ const page = () => {
             </Typography>
 
             <Typography
-              variant="h1"
+              variant={mediaMD ? 'body1' : 'h1'}
               component="h1"
               sx={{
                 fontWeight: 400,
@@ -223,16 +219,13 @@ const page = () => {
                 padding: '10px 20px',
                 borderRadius: '8px',
                 mt: 1,
-                '@media (max-width: 900px)': {
-                  fontSize: '16px',
-                },
               }}
             >
               <SpeakableText>In 15 languages</SpeakableText>
             </Typography>
 
             <Typography
-              variant="body5"
+              variant={mediaMD ? 'body1' : 'body5'}
               component="h1"
               sx={{
                 mb: 3,
@@ -243,9 +236,6 @@ const page = () => {
                 letterSpacing: '0.5px',
                 color: '#1F1B13',
                 mt: 3,
-                '@media (max-width: 900px)': {
-                  fontSize: '16px',
-                },
               }}
             >
               <SpeakableText>
@@ -300,9 +290,6 @@ const page = () => {
                   fontSize: '16px',
                   textTransform: 'none',
                   '&:hover': { bgcolor: '#e9a416' },
-                  '@media (max-width: 900px)': {
-                    fontSize: '14px',
-                  },
                 }}
               >
                 <SpeakableText>Search</SpeakableText>
@@ -328,7 +315,7 @@ const page = () => {
         }}
       >
         <Typography
-          variant="body6"
+          variant={mediaMD ? 'h1' : 'body6'}
           component="h3"
           sx={{
             fontFamily: 'Poppins',
@@ -338,9 +325,6 @@ const page = () => {
             letterSpacing: '-0.25px',
             color: '#1F1B13',
             textAlign: 'center',
-            '@media (max-width: 900px)': {
-              fontSize: '22px',
-            },
           }}
         >
           <SpeakableText>Our Learning Pillars</SpeakableText>
@@ -362,7 +346,7 @@ const page = () => {
           }}
         >
           <Typography
-            variant="body7"
+            variant={mediaMD ? 'body8' : 'body7'}
             component="h1"
             sx={{
               // fontFamily: 'Poppins',
@@ -372,9 +356,6 @@ const page = () => {
               letterSpacing: '-0.25px',
               textAlign: 'center',
               color: '#1F1B13',
-              '@media (max-width: 900px)': {
-                fontSize: '24px',
-              },
             }}
           >
             <SpeakableText>3524</SpeakableText>
@@ -426,7 +407,7 @@ const page = () => {
                 sx={{ textAlign: 'center' }}
               >
                 <Typography
-                  variant="body6"
+                  variant={mediaMD ? 'body8' : 'body6'}
                   component="h1"
                   sx={{
                     fontFamily: 'Poppins',
@@ -436,15 +417,12 @@ const page = () => {
                     letterSpacing: '0px',
                     textAlign: 'center',
                     color: '#F17B06',
-                    '@media (max-width: 900px)': {
-                      fontSize: '24px',
-                    },
                   }}
                 >
                   <SpeakableText>{item.value}</SpeakableText>
                 </Typography>
                 <Typography
-                  variant="body8"
+                  variant={mediaMD ? 'body1' : 'body6'}
                   component="h1"
                   sx={{
                     fontFamily: 'Poppins',
@@ -454,9 +432,6 @@ const page = () => {
                     letterSpacing: '0px',
                     textAlign: 'center',
                     color: '#1F1B13',
-                    '@media (max-width: 900px)': {
-                      fontSize: '16px',
-                    },
                   }}
                 >
                   <SpeakableText>{item.label}</SpeakableText>
@@ -530,7 +505,7 @@ const page = () => {
         <Grid container spacing={3} sx={{ alignItems: 'center' }}>
           <Grid item xs={12} md={5}>
             <Typography
-              variant="body6"
+              variant={mediaMD ? 'h1' : 'body6'}
               component="h1"
               sx={{
                 fontFamily: 'Poppins',
@@ -540,8 +515,6 @@ const page = () => {
                 letterSpacing: '0px',
                 color: '#1F1B13',
                 '@media (max-width: 900px)': {
-                  fontSize: '22px',
-                  lineHeight: '30px',
                   textAlign: 'center',
                 },
               }}
@@ -567,7 +540,7 @@ const page = () => {
         }}
       >
         <Typography
-          variant="body6"
+          variant={mediaMD ? 'h1' : 'body6'}
           component="h1"
           sx={{
             fontWeight: 700,
@@ -576,9 +549,6 @@ const page = () => {
             letterSpacing: '0px',
             textAlign: 'center',
             color: '#1F1B13',
-            '@media (max-width: 900px)': {
-              fontSize: '22px',
-            },
           }}
         >
           <SpeakableText>Knowledge Partners</SpeakableText>
@@ -601,19 +571,16 @@ const page = () => {
         }}
       >
         <Typography
-          variant="body6"
+          variant={mediaMD ? 'h1' : 'body6'}
           component="h1"
           sx={{
             fontFamily: 'Poppins',
             fontWeight: 700,
             // fontSize: '36px',
-            lineHeight: '44px',
+            // lineHeight: '44px',
             letterSpacing: '0px',
             textAlign: 'center',
             color: '#1F1B13',
-            '@media (max-width: 900px)': {
-              fontSize: '22px',
-            },
           }}
         >
           <SpeakableText>Our Partners</SpeakableText>
@@ -636,17 +603,16 @@ const page = () => {
         }}
       >
         <Typography
+          variant={mediaMD ? 'h1' : 'body6'}
+          component="h1"
           sx={{
             fontFamily: 'Poppins',
             fontWeight: 700,
-            fontSize: '36px',
-            lineHeight: '44px',
+            // fontSize: '36px',
+            // lineHeight: '44px',
             letterSpacing: '0px',
             textAlign: 'center',
             color: '#1F1B13',
-            '@media (max-width: 900px)': {
-              fontSize: '22px',
-            },
           }}
         >
           <SpeakableText>Other Websites</SpeakableText>

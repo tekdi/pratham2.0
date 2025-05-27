@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import Layout from '@learner/components/pos/Layout';
-import { Grid, Typography } from '@mui/material';
+import { Grid, Typography, useMediaQuery } from '@mui/material';
 import { Box } from '@mui/material';
 import Learning from '@learner/components/Learning';
 import Image from 'next/image';
@@ -90,6 +90,7 @@ const AboutUsPage = () => {
       'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
     ],
   ];
+  const mediaMD = useMediaQuery('(max-width: 900px)');
   return (
     <Layout>
       <Box sx={{ background: '#F3F3F3' }}>
@@ -108,13 +109,10 @@ const AboutUsPage = () => {
         >
           <Box>
             <Typography
-              variant="body8"
+              variant={mediaMD ? 'h2' : 'body8'}
               component="h1"
               sx={{
                 fontWeight: 700,
-                // fontSize: { xs: '16px', md: '24px' },
-                // lineHeight: { xs: '24px', md: '44px' },
-                letterSpacing: '0px',
                 textAlign: 'center',
                 color: '#FFF',
               }}
@@ -122,12 +120,10 @@ const AboutUsPage = () => {
               <SpeakableText>About Us</SpeakableText>
             </Typography>
             <Typography
-              variant="body6"
+              variant={mediaMD ? 'h1' : 'body6'}
               component="h1"
               sx={{
                 fontWeight: 700,
-                // fontSize: { xs: '22px' }, //md: '36px'
-                letterSpacing: '-0.25px',
                 textAlign: 'center',
                 color: '#FDBE16',
               }}
@@ -148,13 +144,11 @@ const AboutUsPage = () => {
           <Grid container spacing={3} sx={{ alignItems: 'center' }}>
             <Grid item xs={12} md={6}>
               <Typography
-                variant="body9"
+                variant={mediaMD ? 'h1' : 'body9'}
                 component="h1"
                 sx={{
                   fontFamily: 'Poppins',
                   fontWeight: 600,
-                  // fontSize: { xs: '22px', md: '32px' },
-                  // lineHeight: { xs: '28px', md: '100%' },
                   letterSpacing: '0px',
                   color: '#1F1B13',
                 }}
@@ -164,7 +158,7 @@ const AboutUsPage = () => {
                 </SpeakableText>
               </Typography>
               <Typography
-                variant="h2"
+                variant={mediaMD ? 'h3' : 'h2'}
                 component="h2"
                 sx={{
                   fontFamily: 'Poppins',
@@ -186,13 +180,12 @@ const AboutUsPage = () => {
                 </SpeakableText>
               </Typography>
               <Typography
-                variant="h2"
+                variant={mediaMD ? 'h3' : 'h2'}
                 component="h2"
                 sx={{
                   fontFamily: 'Poppins',
                   fontWeight: 400,
-                  // fontSize: { xs: '14px', md: '16px' },
-                  // lineHeight: { xs: '20px', md: '24px' },
+
                   letterSpacing: '0.5px',
                   color: '#1F1B13',
                   mt: 2,
@@ -206,13 +199,11 @@ const AboutUsPage = () => {
                 </SpeakableText>
               </Typography>
               <Typography
-                variant="h2"
+                variant={mediaMD ? 'h3' : 'h2'}
                 component="h2"
                 sx={{
                   fontFamily: 'Poppins',
                   fontWeight: 400,
-                  // fontSize: { xs: '14px', md: '16px' },
-                  // lineHeight: { xs: '20px', md: '24px' },
                   letterSpacing: '0.5px',
                   color: '#1F1B13',
                   mt: 2,
@@ -262,13 +253,11 @@ const AboutUsPage = () => {
             }}
           >
             <Typography
-              variant="body9"
+              variant={mediaMD ? 'h1' : 'body9'}
               component="h2"
               sx={{
                 fontFamily: 'Poppins',
                 fontWeight: 600,
-                // fontSize: { xs: '22px', md: '32px' },
-                // lineHeight: { xs: '28px', md: '40px' },
                 letterSpacing: '0px',
                 textAlign: 'center',
                 color: '#1F1B13',
@@ -278,13 +267,11 @@ const AboutUsPage = () => {
             </Typography>
           </Box>
           <Typography
-            variant="h1"
+            variant={mediaMD ? 'h3' : 'h1'}
             component="h1"
             sx={{
               fontFamily: 'Poppins',
               fontWeight: 400,
-              // fontSize: { xs: '14px', md: '22px' },
-              // lineHeight: { xs: '20px', md: '28px' },
               letterSpacing: '0px',
               textAlign: 'center',
               color: '#635E57',
@@ -328,8 +315,6 @@ const AboutUsPage = () => {
               sx={{
                 fontFamily: 'Poppins',
                 fontWeight: 600,
-                // fontSize: '32px',
-                // lineHeight: '40px',
                 letterSpacing: '0px',
                 textAlign: 'center',
                 color: '#1F1B13',

@@ -17,6 +17,7 @@ declare module '@mui/material/styles' {
     body7: React.CSSProperties;
     body8: React.CSSProperties;
     body9: React.CSSProperties;
+    body10: React.CSSProperties;
   }
 
   interface TypographyVariantsOptions {
@@ -27,6 +28,7 @@ declare module '@mui/material/styles' {
     body7?: React.CSSProperties;
     body8?: React.CSSProperties;
     body9?: React.CSSProperties;
+    body10?: React.CSSProperties;
   }
 }
 
@@ -40,6 +42,7 @@ declare module '@mui/material/Typography' {
     body7: true;
     body8: true;
     body9: true;
+    body10: true;
   }
 }
 
@@ -142,6 +145,13 @@ export const theme = createTheme({
       letterSpacing: '0.4px',
       //  marginBottom: '0.75rem',
     },
+    body10: {
+      fontSize: 'calc(40px * var(--font-size-scale))',
+      lineHeight: 1.4,
+      letterSpacing: '0.4px',
+      //  marginBottom: '0.75rem',
+    },
+
     button: {
       textTransform: 'none',
       fontSize: 'calc(14px * var(--font-size-scale))',
