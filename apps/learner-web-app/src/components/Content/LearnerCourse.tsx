@@ -201,6 +201,7 @@ export default memo(function LearnerCourse({
             staticFilter={staticFilter}
             filterState={filterState}
             handleFilterChange={handleFilterChange}
+            onlyFields={_content?.onlyFields ?? []}
           />
         </CommonDialog>
 
@@ -218,6 +219,7 @@ export default memo(function LearnerCourse({
             staticFilter={staticFilter}
             filterState={filterState}
             handleFilterChange={handleFilterChange}
+            onlyFields={_content?.onlyFields ?? []}
           />
         </Box>
         <Box flex={127}>

@@ -139,3 +139,52 @@ export function findCourseUnitPath(
 
   return null;
 }
+
+type NameMapEntry = string | { key: string; replaceCode: string };
+
+export function sortJsonByArray({
+  jsonArray,
+  nameArray,
+  key = 'code',
+  onlyMatched = true,
+}: {
+  jsonArray: any[];
+  nameArray?: NameMapEntry[];
+  key?: string;
+  onlyMatched?: boolean;
+}) {
+  if (nameArray === undefined || nameArray.length === 0) return jsonArray;
+  const orderMap = new Map<string, { index: number; replaceCode?: string }>();
+  nameArray.forEach((entry, index) => {
+    if (typeof entry === 'string') {
+      orderMap.set(entry, { index });
+    } else {
+      orderMap.set(entry.key, { index, replaceCode: entry.replaceCode });
+    }
+  });
+
+  return jsonArray
+    .filter((item) => {
+      const val = String(item[key]);
+      return !onlyMatched || orderMap.has(val);
+    })
+    .sort((a, b) => {
+      const aIndex = orderMap.get(String(a[key]))?.index ?? Infinity;
+      const bIndex = orderMap.get(String(b[key]))?.index ?? Infinity;
+      return aIndex - bIndex;
+    })
+    .map((item) => {
+      const val = String(item[key]);
+      const entry = orderMap.get(val);
+
+      if (entry?.replaceCode) {
+        return {
+          ...item,
+          [key]: entry.replaceCode.replace('{code}', val),
+          [`old_${key}`]: val,
+        };
+      }
+
+      return item;
+    });
+}
