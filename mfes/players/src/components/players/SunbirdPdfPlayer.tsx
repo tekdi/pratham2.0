@@ -134,9 +134,11 @@ const SunbirdPdfPlayer = ({
           justifyContent: 'center',
         }}
         onMouseOver={(e) =>
-          (e.currentTarget.style.background = 'rgba(255, 0, 0, 0.1)')
+          (e.currentTarget.style.background = 'rgba(0,0,0,0.1)')
         }
+        onFocus={(e) => (e.currentTarget.style.background = 'rgba(0,0,0,0.1)')}
         onMouseOut={(e) => (e.currentTarget.style.background = 'transparent')}
+        onBlur={(e) => (e.currentTarget.style.background = 'transparent')}
       >
         {isFullscreen ? (
           // Exit Fullscreen Icon (improved)
@@ -145,7 +147,7 @@ const SunbirdPdfPlayer = ({
             height="40"
             viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg"
-            style={{ fill: 'red' }}
+            style={{ fill: 'black' }}
           >
             <rect x="0" fill="none" width="20" height="20" />
 
@@ -160,7 +162,7 @@ const SunbirdPdfPlayer = ({
             height="40"
             viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg"
-            style={{ fill: 'red' }}
+            style={{ fill: 'black' }}
           >
             <rect x="0" fill="none" width="20" height="20" />
 
