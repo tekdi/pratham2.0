@@ -67,7 +67,7 @@ export default function App({
     async (content: ContentItem) => {
       try {
         if (SUPPORTED_MIME_TYPES.includes(content?.mimeType)) {
-          return null;
+          router.push(`/pos/player/${content?.identifier}`);
         } else {
           router.push(`/pos/content-details/${content?.identifier}`);
         }
