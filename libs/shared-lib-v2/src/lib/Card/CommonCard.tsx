@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
@@ -9,6 +11,7 @@ import Typography from '@mui/material/Typography';
 import { red } from '@mui/material/colors';
 import { Box, LinearProgress, useTheme } from '@mui/material';
 import { CircularProgressWithLabel } from '../Progress/CircularProgressWithLabel';
+import SpeakableText from '../textToSpeech/SpeakableText';
 export interface ContentItem {
   name: string;
   gradeLevel: string[];
@@ -179,11 +182,13 @@ export const CommonCard: React.FC<CommonCardProps> = ({
         }
         title={
           <Typography
+            variant="body1"
+            component="div"
             title={title}
             sx={{
               fontWeight: 500,
-              fontSize: '16px',
-              lineHeight: '24px',
+              // fontSize: '16px',
+              // lineHeight: '24px',
               whiteSpace: 'wrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -192,13 +197,13 @@ export const CommonCard: React.FC<CommonCardProps> = ({
               WebkitLineClamp: 1,
             }}
           >
-            {title}
+            <SpeakableText>{title}</SpeakableText>
           </Typography>
         }
         subheader={
           subheader && (
-            <Typography variant="h6" sx={{ fontSize: '14px' }}>
-              {subheader}
+            <Typography variant="h3" component="div">
+              <SpeakableText>{subheader}</SpeakableText>
             </Typography>
           )
         }
@@ -211,13 +216,14 @@ export const CommonCard: React.FC<CommonCardProps> = ({
           }}
         >
           <Typography
-            component="h1"
+            variant="body1"
+            component="div"
             // @ts-ignore
             title={content}
             sx={{
               fontWeight: 400,
-              fontSize: '15.4px',
-              lineHeight: '22px',
+              // fontSize: '15.4px',
+              // lineHeight: '22px',
               color: '#49454F',
               display: '-webkit-box',
               WebkitLineClamp: 5,
@@ -228,13 +234,15 @@ export const CommonCard: React.FC<CommonCardProps> = ({
               ..._card?._contentText?.sx,
             }}
           >
-            {content}
+            <SpeakableText>{content}</SpeakableText>
           </Typography>
         </CardContent>
       )}
       {children && <CardContent>{children}</CardContent>}
       {actions && (
-        <CardActions sx={{ p: 2, pt: '14px' }}>{actions}</CardActions>
+        <CardActions sx={{ p: 2, pt: '14px' }}>
+          <SpeakableText>{actions}</SpeakableText>
+        </CardActions>
       )}
     </Card>
   );
@@ -321,15 +329,17 @@ export const StatusBar: React.FC<StatuPorps> = ({
           />
         )}
         <Typography
+          variant="h3"
+          component="div"
           sx={{
             minWidth: '80px',
-            fontSize: '14px',
-            lineHeight: '20px',
+            // fontSize: '14px',
+            // lineHeight: '20px',
             letterSpacing: '0.1px',
             verticalAlign: 'middle',
           }}
         >
-          {status}
+          <SpeakableText>{status}</SpeakableText>
         </Typography>
       </Box>
     </Box>

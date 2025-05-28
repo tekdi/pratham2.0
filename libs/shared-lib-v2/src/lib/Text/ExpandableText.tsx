@@ -1,74 +1,120 @@
 'use client';
-import React, { useRef, useState, useEffect, useCallback, memo } from 'react';
+import React, { useState, useEffect, useCallback, memo, useRef } from 'react';
 import { Box, Typography, Button } from '@mui/material';
+import SpeakableText from '../textToSpeech/SpeakableText';
 
 type ExpandableTextProps = {
   text?: string;
-  number?: number;
   _text?: any;
+  maxWords?: number;
+  maxLines?: number;
 };
 
 export const ExpandableText: React.FC<ExpandableTextProps> = memo(
-  ({ text = '', number = 2, _text }) => {
-    const contentRef = useRef<HTMLDivElement>(null);
+  ({ text = '', _text, maxWords = 30, maxLines = 2 }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [showButton, setShowButton] = useState(false);
-    const [maxHeight, setMaxHeight] = useState<string>('0px');
+    const [truncatedText, setTruncatedText] = useState<string>('');
+    const [needsTruncation, setNeedsTruncation] = useState(false);
+    const textRef = useRef<HTMLDivElement>(null);
 
-    const lineHeight = 25.5; // Customize based on your actual line height
+    // Function to truncate text by words
+    const truncateByWords = useCallback(
+      (text: string, maxWords: number): string => {
+        const words = text.split(' ');
+        if (words.length <= maxWords) {
+          return text;
+        }
+        return words.slice(0, maxWords).join(' ');
+      },
+      []
+    );
+
+    // Check if text needs truncation
+    useEffect(() => {
+      if (text && textRef.current) {
+        const words = text.split(' ');
+        const needsWordTrunc = words.length > maxWords;
+
+        // Create a temporary element to check if text overflows 2 lines
+        const tempElement = document.createElement('div');
+        tempElement.style.position = 'absolute';
+        tempElement.style.visibility = 'hidden';
+        tempElement.style.height = 'auto';
+        tempElement.style.width = textRef.current.offsetWidth + 'px';
+        tempElement.style.fontSize = window.getComputedStyle(
+          textRef.current
+        ).fontSize;
+        tempElement.style.fontFamily = window.getComputedStyle(
+          textRef.current
+        ).fontFamily;
+        tempElement.style.lineHeight = window.getComputedStyle(
+          textRef.current
+        ).lineHeight;
+        tempElement.style.whiteSpace = 'pre-wrap';
+        tempElement.innerHTML = text;
+
+        document.body.appendChild(tempElement);
+        const fullHeight = tempElement.scrollHeight;
+
+        // Set line height to 2 lines to check overflow
+        tempElement.style.height = `calc(2 * ${
+          window.getComputedStyle(textRef.current).lineHeight
+        })`;
+        tempElement.style.overflow = 'hidden';
+        const twoLineHeight = tempElement.scrollHeight;
+
+        document.body.removeChild(tempElement);
+
+        const needsLineTrunc = fullHeight > twoLineHeight;
+        const needsTrunc = needsWordTrunc || needsLineTrunc;
+
+        setNeedsTruncation(needsTrunc);
+
+        if (needsTrunc) {
+          setTruncatedText(truncateByWords(text, maxWords));
+          setShowButton(true);
+        } else {
+          setTruncatedText(text);
+          setShowButton(false);
+        }
+      }
+    }, [text, maxWords, truncateByWords]);
 
     // Toggle expand/collapse
     const toggleExpand = useCallback(() => {
       setIsExpanded((prev) => !prev);
     }, []);
 
-    // Detect overflow and set initial max height
-    useEffect(() => {
-      const el = contentRef.current;
-      if (el) {
-        const lineHeightPx = number * lineHeight;
-        const fullHeight = el.scrollHeight;
-        setMaxHeight(isExpanded ? `${fullHeight}px` : `${lineHeightPx}px`);
-        setShowButton(fullHeight > lineHeightPx);
-      }
-    }, [text, number, isExpanded]);
-
-    // Adjust height on expand/collapse
-    useEffect(() => {
-      const el = contentRef.current;
-      if (el) {
-        const fullHeight = el.scrollHeight;
-        const lineHeightPx = number * lineHeight;
-        const newHeight = isExpanded ? `${fullHeight}px` : `${lineHeightPx}px`;
-        setMaxHeight(newHeight);
-      }
-    }, [isExpanded, number]);
+    // Determine which text to display
+    const displayText = needsTruncation && !isExpanded ? truncatedText : text;
 
     return (
-      <Box sx={{ position: 'relative' }}>
-        <Box
-          ref={contentRef}
+      <Box>
+        <Typography
+          ref={textRef}
+          variant="body1"
+          component="div"
+          // {..._text}
           sx={{
-            overflow: 'hidden',
-            transition: 'max-height 0.3s ease-in-out',
-            maxHeight,
+            textTransform: 'capitalize',
+            color: '#1F1B13',
+            whiteSpace: 'pre-wrap',
+            fontWeight: '400',
+            // Use line-clamp when not expanded and truncation is needed
+            ...(needsTruncation &&
+              !isExpanded && {
+                display: '-webkit-box',
+                WebkitLineClamp: maxLines,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }),
+            // ..._text?.sx,
           }}
         >
-          <Typography
-            variant="subtitle1"
-            component="div"
-            {..._text}
-            sx={{
-              textTransform: 'capitalize',
-              color: '#1F1B13',
-              whiteSpace: 'pre-wrap',
-              lineHeight: `${lineHeight}px`,
-              ..._text.sx,
-            }}
-          >
-            {text}
-          </Typography>
-        </Box>
+          <SpeakableText>{displayText}</SpeakableText>
+        </Typography>
 
         {showButton && (
           <Button
@@ -83,12 +129,12 @@ export const ExpandableText: React.FC<ExpandableTextProps> = memo(
                 backgroundColor: 'transparent',
                 textDecoration: 'underline',
               },
-              position: 'absolute',
-              right: '-45px',
-              bottom: '-2px',
+              mt: 0.5,
+              display: 'block',
+              fontSize: 'inherit',
             }}
           >
-            {isExpanded ? '..less' : '..more'}
+            {isExpanded ? 'see less' : 'see more'}
           </Button>
         )}
       </Box>

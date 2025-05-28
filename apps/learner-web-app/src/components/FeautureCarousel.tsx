@@ -6,12 +6,13 @@ import {
   Button,
   Typography,
   Box,
+  useMediaQuery,
 } from '@mui/material';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/autoplay';
-import SpeakableText from './textToSpeech/SpeakableText';
+import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 
 const mockData = [
   {
@@ -66,6 +67,8 @@ const mockData = [
 ];
 
 const FeautureCarousel = () => {
+  const mediaMD = useMediaQuery('(max-width: 900px)');
+
   return (
     <Box sx={{ width: '100%', py: 2 }}>
       <Swiper
@@ -112,7 +115,7 @@ const FeautureCarousel = () => {
               </Box>
               <Box sx={{ p: 2 }}>
                 <Typography
-                  variant="body1"
+                  variant={mediaMD ? 'body5' : 'body1'}
                   component="h1"
                   sx={{
                     fontFamily: 'Poppins',
@@ -120,15 +123,12 @@ const FeautureCarousel = () => {
                     // fontSize: 16,
                     letterSpacing: 0.15,
                     color: '#1F1B13',
-                    '@media (max-width: 900px)': {
-                      fontSize: '13px',
-                    },
                   }}
                 >
                   <SpeakableText>{item.title}</SpeakableText>
                 </Typography>
                 <Typography
-                  variant="body1"
+                  variant={mediaMD ? 'body5' : 'body1'}
                   component="h1"
                   sx={{
                     fontFamily: 'Poppins',
@@ -137,10 +137,6 @@ const FeautureCarousel = () => {
                     letterSpacing: 0.5,
                     color: '#1F1B13',
                     mt: 0.5,
-
-                    '@media (max-width: 900px)': {
-                      fontSize: '13px',
-                    },
                   }}
                 >
                   <SpeakableText>{item.description}</SpeakableText>

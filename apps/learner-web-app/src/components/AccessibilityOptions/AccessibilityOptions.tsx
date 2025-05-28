@@ -23,7 +23,7 @@ import AccessibleIcon from '@mui/icons-material/Accessible';
 import { useFontSize } from '../../context/FontSizeContext';
 import TextIncreaseIcon from '@mui/icons-material/TextIncrease';
 import TextDecreaseIcon from '@mui/icons-material/TextDecrease';
-import { useSpeechContext } from '@learner/context/SpeechContext';
+import { useSpeechContext } from '@shared-lib-v2/lib/context/SpeechContext';
 
 export default function AccessibilityOptions() {
   const [open, setOpen] = React.useState(false);
@@ -243,24 +243,6 @@ export default function AccessibilityOptions() {
               <Button
                 variant="outlined"
                 color="primary"
-                startIcon={<MicIcon />}
-                sx={{
-                  flex: 1,
-                  justifyContent: 'flex-start',
-                  py: 1.5,
-                  borderRadius: 2,
-                  // bgcolor: '#FFBF00',
-                  border: '1px solid #CDC5BD',
-                }}
-              >
-                <Typography variant="subtitle1">Speech to Text</Typography>
-              </Button>
-            </Stack>
-
-            <Stack direction={isMobile ? 'column' : 'row'} spacing={2}>
-              <Button
-                variant="outlined"
-                color="primary"
                 startIcon={<InvertColorsIcon />}
                 sx={{
                   flex: 1,
@@ -273,7 +255,9 @@ export default function AccessibilityOptions() {
               >
                 <Typography variant="subtitle1">Invert Colours</Typography>
               </Button>
+            </Stack>
 
+            <Stack direction={isMobile ? 'column' : 'row'} spacing={2}>
               <Button
                 variant="outlined"
                 color="primary"
@@ -283,12 +267,14 @@ export default function AccessibilityOptions() {
                   justifyContent: 'flex-start',
                   py: 1.5,
                   borderRadius: 2,
-                  // bgcolor: '#FFBF00',
+                  bgcolor: '#f5f5f5',
                   border: '1px solid #CDC5BD',
                 }}
               >
-                <Typography variant="subtitle1">Underline links</Typography>
+                <Typography variant="subtitle1">Underline Links</Typography>
               </Button>
+
+              <Box sx={{ flex: 1 }} />
             </Stack>
           </Stack>
 
