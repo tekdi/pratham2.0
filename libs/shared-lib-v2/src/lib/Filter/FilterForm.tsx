@@ -18,6 +18,7 @@ import { filterContent, staticFilterContent } from '../../utils/AuthService';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Loader } from '../Loader/Loader';
 import { sortJsonByArray } from '../../utils/helper';
+import SpeakableText from '../textToSpeech/SpeakableText';
 
 export interface TermOption {
   code: string;
@@ -168,7 +169,7 @@ export function FilterForm({
             sx={{ width: '50%' }}
             onClick={handleFilter}
           >
-            {t('Filter')}
+            <SpeakableText>{t('Filter')}</SpeakableText>
           </MuiButton>
         </Box>
       </Box>
@@ -319,9 +320,12 @@ const FilterSection: React.FC<FilterSectionProps> = ({
               }}
             >
               <Typography
-                sx={{ fontSize: '18px', fontWeight: '500', color: '#181D27' }}
+                /* @ts-ignore */
+                variant="body5"
+                component="div"
+                sx={{ fontWeight: '500', color: '#181D27' }}
               >
-                {field.name}
+                <SpeakableText>{field.name}</SpeakableText>
               </Typography>
               {staticValues.map((item: any, idx: number) => (
                 <Chip
@@ -352,10 +356,14 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                 }}
               >
                 <Typography
-                  sx={{ fontSize: '18px', fontWeight: '500', color: '#181D27' }}
+                  /* @ts-ignore */
+                  variant="body5"
+                  component="div"
+                  sx={{ fontWeight: '500', color: '#181D27' }}
                 >
-                  {field.name === 'Sub Domain' ? '' : field.name}
-                  {/* {field.options && ` (${field.options.length})`} */}
+                  <SpeakableText>
+                    {field.name === 'Sub Domain' ? '' : field.name}
+                  </SpeakableText>
                 </Typography>
               </AccordionSummary>
               <AccordionDetails
@@ -391,7 +399,9 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                             }}
                           />
                         }
-                        label={item.name ?? item}
+                        label={
+                          <SpeakableText>{item.name ?? item}</SpeakableText>
+                        }
                         sx={{
                           color: '#414651',
                           fontSize: '14px',

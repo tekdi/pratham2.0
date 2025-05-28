@@ -1,5 +1,5 @@
 import type { MouseEvent } from 'react';
-import { useSpeechContext } from '../context/SpeechContext';
+import { useSpeechContext } from '../lib/context/SpeechContext';
 import { useEffect } from 'react';
 
 /**

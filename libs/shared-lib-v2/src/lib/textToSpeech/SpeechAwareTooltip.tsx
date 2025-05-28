@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import type { ReactNode, ReactElement } from 'react';
 import { Tooltip, Button } from '@mui/material';
 import type { TooltipProps } from '@mui/material';
-import useDisableClicks from '@learner/hooks/useDisableClicks';
-import { useSpeechContext } from '@learner/context/SpeechContext';
+import useDisableClicks from '../../hooks/useDisableClicks';
+import { useSpeechContext } from '../context/SpeechContext';
 
 interface SpeechAwareTooltipProps {
   children: ReactElement;

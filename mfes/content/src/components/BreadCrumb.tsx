@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
 import { Breadcrumbs, Button, Typography, useTheme } from '@mui/material';
+import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 
 const BreadCrumb = ({
   breadCrumbs,
@@ -23,7 +24,9 @@ const BreadCrumb = ({
             href={breadcrumb?.link}
             rel="noopener noreferrer"
           >
-            {breadcrumb?.name ?? breadcrumb?.label ?? ''}
+            <SpeakableText>
+              {breadcrumb?.name ?? breadcrumb?.label ?? ''}
+            </SpeakableText>
           </Button>
         ) : (
           <Typography
@@ -31,14 +34,16 @@ const BreadCrumb = ({
             variant="body1"
             color="text.secondary"
           >
-            {breadcrumb?.name ?? breadcrumb?.label ?? ''}
+            <SpeakableText>
+              {breadcrumb?.name ?? breadcrumb?.label ?? ''}
+            </SpeakableText>
           </Typography>
         )
       )}
       {(!breadCrumbs || breadCrumbs?.length === 0) &&
         ['Course', ...(topic ? [topic] : [])].map((key) => (
           <Typography key={key} variant="body1">
-            {key}
+            <SpeakableText>{key}</SpeakableText>
           </Typography>
         ))}
     </Breadcrumbs>

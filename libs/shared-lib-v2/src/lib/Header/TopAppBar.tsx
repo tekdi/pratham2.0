@@ -19,6 +19,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { CommonDrawer } from '../Drawer/CommonDrawer';
 import type { DrawerItemProp } from '../Drawer/CommonDrawer';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import SpeakableText from '../textToSpeech/SpeakableText';
 
 interface NewDrawerItemProp extends DrawerItemProp {
   variant?: 'contained' | 'text';
@@ -215,7 +216,13 @@ export const DesktopBar = ({
                     : openMenuAtLevel(0, e.currentTarget, link.child ?? []);
                 }}
               >
-                {link.title}
+                <Typography
+                  variant="body1"
+                  sx={{ fontWeight: 500, color: '#1F1B13' }}
+                  data-speech-control="true"
+                >
+                  <SpeakableText>{link.title}</SpeakableText>
+                </Typography>
               </Button>
               {link.child && (
                 <IconButton
@@ -294,7 +301,13 @@ export const DesktopBar = ({
                         py: 3,
                       }}
                     >
-                      {item.title}
+                      <Typography
+                        variant="body1"
+                        sx={{ fontWeight: 500, color: '#1F1B13' }}
+                        data-speech-control="true"
+                      >
+                        <SpeakableText>{item.title}</SpeakableText>
+                      </Typography>
                       {hasChild && <ArrowDropDownIcon fontSize="small" />}
                     </MenuItem>
                   </Box>
@@ -353,11 +366,11 @@ const MobileTopBar = ({
             <ArrowBackIcon />
           </IconButton>
           <Typography
-            variant="h6"
+            variant="body1"
             component="div"
-            sx={{ flexGrow: 1, textAlign: 'left' }}
+            sx={{ flexGrow: 1, textAlign: 'left', fontWeight: 500 }}
           >
-            {title}
+            <SpeakableText>{title}</SpeakableText>
           </Typography>
         </>
       )}
@@ -381,14 +394,14 @@ const Brand = ({ _box, name = 'Pratham' }: { _box?: any; name?: string }) => {
           <img src="/logo.png" alt="YouthNet" style={{ height: '40px' }} />
           {name && (
             <Typography
-              variant="h6"
+              variant="body1"
               sx={{
                 color: theme.palette.text.primary,
                 fontWeight: 600,
                 ...(_box?._text ?? {}),
               }}
             >
-              {name}
+              <SpeakableText>{name}</SpeakableText>
             </Typography>
           )}
         </>
