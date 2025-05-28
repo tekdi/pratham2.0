@@ -141,6 +141,7 @@ const MyComponent: React.FC = () => {
             <LearnerCourse
               title={'LEARNER_APP.COURSE.GET_STARTED'}
               _content={{
+                onlyFields: ['contentLanguage', 'se_subDomains', 'se_subjects'],
                 staticFilter: {
                   se_domains:
                     typeof filter.filters?.domain === 'string'
