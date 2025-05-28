@@ -12,6 +12,7 @@ const App = () => {
       <LearnerCourse
         title={'LEARNER_APP.EXPLORE.EXPLORE_ADDITIONAL_COURSES'}
         _content={{
+          onlyFields: ['contentLanguage', 'se_subDomains', 'se_subjects'],
           contentTabs: ['courses', 'content'],
         }}
       />
