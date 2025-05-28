@@ -46,6 +46,14 @@ const App = (props: { userIdLocalstorageName?: string }) => {
           },
         ]);
         setBreadCrumbs(breadcrum);
+      } else {
+        const breadcrum = findCourseUnitPath(
+          response,
+          identifier as string,
+          ['name', 'identifier', 'mimeType'],
+          [{ name: 'Content' }]
+        );
+        setBreadCrumbs(breadcrum);
       }
     };
     fetch();
