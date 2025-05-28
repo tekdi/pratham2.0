@@ -149,6 +149,7 @@ export const DesktopBar = ({
     { anchorEl: HTMLElement | null; items: any[] }[]
   >([]);
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const theme = useTheme();
 
   const openMenuAtLevel = (
     level: number,
@@ -279,7 +280,7 @@ export const DesktopBar = ({
               {menu.items.map((item, idx) => {
                 const hasChild =
                   Array.isArray(item.child) && item.child.length > 0;
-
+                console.log(item.isActive, 'item');
                 return (
                   <Box
                     key={`${idx}-${item.label}`}
@@ -289,6 +290,11 @@ export const DesktopBar = ({
                       } else {
                         setMenus((prev) => prev.slice(0, level + 1));
                       }
+                    }}
+                    sx={{
+                      bgcolor: item.isActive
+                        ? theme.palette.primary.main
+                        : 'inherit',
                     }}
                   >
                     <MenuItem
