@@ -7,7 +7,7 @@ import {
   Layout,
   useTranslation,
   DrawerItemProp,
-  transformCategories,
+  transformRenderForm,
 } from '@shared-lib';
 import { useRouter } from 'next/navigation';
 import { Box } from '@mui/material';
@@ -49,7 +49,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         ? window.location.pathname
         : '';
     const categories = filterFramework?.framework?.categories ?? [];
-    const transformedCategories = transformCategories(categories);
+    const transformedCategories = transformRenderForm(categories);
     const schoolSubCategory =
       transformedCategories?.domain?.options.find(
         (category: any) => category.code === 'learningForSchool'

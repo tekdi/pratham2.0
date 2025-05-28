@@ -332,7 +332,7 @@ export const StatusBar: React.FC<StatuPorps> = ({
           variant="h3"
           component="div"
           sx={{
-            minWidth: '80px',
+            minWidth: '81px',
             // fontSize: '14px',
             // lineHeight: '20px',
             letterSpacing: '0.1px',

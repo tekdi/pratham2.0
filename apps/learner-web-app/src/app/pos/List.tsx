@@ -30,12 +30,16 @@ export default function App({
     globalData: { filterFramework },
     loading,
   } = useGlobalData();
-
+  const [item, setItem] = useState<any>({});
   const [staticFilter, setStaticFilter] = useState<any>({});
 
   useEffect(() => {
     if (!hideStaticFilter && pagename === 'Program') {
       const program = searchParams?.get('program')?.split(',');
+      setItem({
+        ..._infoCard?.item,
+        description: _infoCard?.item?.description?.[program?.[0] || 'SCP'],
+      });
       if (program?.includes('Vocational Training')) {
         setStaticFilter({
           program: program ?? [],
@@ -55,8 +59,9 @@ export default function App({
             }
           : {}),
       });
+      setItem(_infoCard?.item || {});
     }
-  }, [hideStaticFilter, pagename, searchParams]);
+  }, [hideStaticFilter, pagename, _infoCard?.item, searchParams]);
 
   const handleCardClickLocal = useCallback(
     async (content: ContentItem) => {
@@ -82,7 +87,7 @@ export default function App({
           name: `Learning for ${pagename}`,
           description:
             'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
-          ...(_infoCard?.item || {}),
+          ...(item || {}),
         }}
         _config={{
           ...(_infoCard?._config || {}),
