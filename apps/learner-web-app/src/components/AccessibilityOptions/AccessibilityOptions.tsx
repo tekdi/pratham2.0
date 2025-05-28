@@ -21,6 +21,7 @@ import InvertColorsIcon from '@mui/icons-material/InvertColors';
 import LinkIcon from '@mui/icons-material/Link';
 import AccessibleIcon from '@mui/icons-material/Accessible';
 import { useFontSize } from '../../context/FontSizeContext';
+import { useUnderlineLinks } from '../../context/UnderlineLinksContext';
 import TextIncreaseIcon from '@mui/icons-material/TextIncrease';
 import TextDecreaseIcon from '@mui/icons-material/TextDecrease';
 import { useSpeechContext } from '@shared-lib-v2/lib/context/SpeechContext';
@@ -30,6 +31,7 @@ export default function AccessibilityOptions() {
   const { increaseFontSize, decreaseFontSize, resetFontSize, fontSize } =
     useFontSize();
   const { isSpeechEnabled, toggleSpeechEnabled } = useSpeechContext();
+  const { isUnderlineLinksEnabled, toggleUnderlineLinks } = useUnderlineLinks();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [isIncreased, setIsIncreased] = React.useState(false);
@@ -69,8 +71,14 @@ export default function AccessibilityOptions() {
     // Clear speech setting from localStorage and disable it
     if (typeof window !== 'undefined') {
       localStorage.removeItem('isSpeechEnabled');
+      localStorage.removeItem('isUnderlineLinksEnabled');
     }
     disableSpeechEnabled();
+
+    // Disable underline links
+    if (isUnderlineLinksEnabled) {
+      toggleUnderlineLinks();
+    }
   };
 
   const disableSpeechEnabled = () => {
@@ -259,22 +267,40 @@ export default function AccessibilityOptions() {
 
             <Stack direction={isMobile ? 'column' : 'row'} spacing={2}>
               <Button
-                variant="outlined"
+                variant={isUnderlineLinksEnabled ? 'contained' : 'outlined'}
                 color="primary"
                 startIcon={<LinkIcon />}
+                onClick={toggleUnderlineLinks}
                 sx={{
                   flex: 1,
                   justifyContent: 'flex-start',
                   py: 1.5,
                   borderRadius: 2,
-                  bgcolor: '#f5f5f5',
+                  bgcolor: isUnderlineLinksEnabled ? '#FDBE16' : '#f5f5f5',
+                  '&:hover': {
+                    bgcolor: isUnderlineLinksEnabled ? '#E6AC00' : '',
+                  },
                   border: '1px solid #CDC5BD',
                 }}
               >
                 <Typography variant="subtitle1">Underline Links</Typography>
               </Button>
 
-              <Box sx={{ flex: 1 }} />
+              <Button
+                variant="outlined"
+                color="primary"
+                startIcon={<MicIcon />}
+                sx={{
+                  flex: 1,
+                  justifyContent: 'flex-start',
+                  py: 1.5,
+                  borderRadius: 2,
+                  // bgcolor: '#FFBF00',
+                  border: '1px solid #CDC5BD',
+                }}
+              >
+                <Typography variant="subtitle1">Speech to Text</Typography>
+              </Button>
             </Stack>
           </Stack>
 
