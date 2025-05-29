@@ -87,6 +87,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
   const { isRTL } = useDirection();
   const isActiveYear = newStore.isActiveYearSelected;
   const loggedInUserRole = localStorage.getItem('role');
+  const tenantId = localStorage.getItem('tenantId') || '';
 
   const [value, setValue] = React.useState(1);
   const [users, setUsers] = useState<
@@ -199,6 +200,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
             block: blockIds,
             role: Role.TEACHER,
             status: [Status.ACTIVE],
+            tenantId: tenantId,
           };
           const fields = ['age'];
           // const test = isMobile ? infinitePage : page
