@@ -127,12 +127,11 @@ export default function AccessibilityOptions() {
           top: isMobile ? 100 : 150,
           zIndex: 1001,
           border: isColorInverted ? '1px solid #CDC5BD' : '1px solid #CDC5BD',
-          filter: isColorInverted ? 'invert(1) hue-rotate(180deg)' : 'none',
         }}
       >
         <AccessibleIcon
           sx={{
-            color: isColorInverted ? '#f5f3e7' : '#000',
+            color: isColorInverted ? '#fff' : '#000',
           }}
         />
       </IconButton>
@@ -247,7 +246,7 @@ export default function AccessibilityOptions() {
               <Button
                 variant={isSpeechEnabled ? 'contained' : 'outlined'}
                 color="primary"
-                startIcon={<RecordVoiceOverIcon />}
+                startIcon={<RecordVoiceOverIcon sx={{ color: '#635E57' }} />}
                 onClick={toggleSpeechEnabled}
                 sx={{
                   flex: 1,
@@ -267,7 +266,7 @@ export default function AccessibilityOptions() {
               <Button
                 variant={isColorInverted ? 'contained' : 'outlined'}
                 color="primary"
-                startIcon={<InvertColorsIcon />}
+                startIcon={<InvertColorsIcon sx={{ color: '#635E57' }} />}
                 onClick={toggleColorInversion}
                 sx={{
                   flex: 1,
@@ -289,7 +288,7 @@ export default function AccessibilityOptions() {
               <Button
                 variant={isUnderlineLinksEnabled ? 'contained' : 'outlined'}
                 color="primary"
-                startIcon={<LinkIcon />}
+                startIcon={<LinkIcon sx={{ color: '#635E57' }} />}
                 onClick={toggleUnderlineLinks}
                 sx={{
                   flex: 1,
