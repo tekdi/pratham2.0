@@ -38,6 +38,38 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/icon?family=Material+Icons"
           rel="stylesheet"
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const savedState = localStorage.getItem('isColorInverted');
+                  if (savedState !== null) {
+                    const isInverted = JSON.parse(savedState);
+                    if (isInverted) {
+                      document.documentElement.style.filter = 'invert(1) hue-rotate(180deg)';
+                      
+                      // Add style for images/videos
+                      const style = document.createElement('style');
+                      style.id = 'color-inversion-style-initial';
+                      style.textContent = \`
+                        img, video, iframe, svg, canvas, embed, object {
+                          filter: invert(1) hue-rotate(180deg) !important;
+                        }
+                        [data-no-invert], [data-no-invert] * {
+                          filter: invert(1) hue-rotate(180deg) !important;
+                        }
+                      \`;
+                      document.head.appendChild(style);
+                    }
+                  }
+                } catch (e) {
+                  // Handle any localStorage errors silently
+                }
+              })();
+            `,
+          }}
+        />
       </head>
       <body>
         <ClientLayout>

@@ -7,8 +7,8 @@ import {
   Layout,
   useTranslation,
   DrawerItemProp,
-  transformCategories,
 } from '@shared-lib';
+import { transformRenderForm } from '@shared-lib-v2/lib/Filter/FilterForm';
 import { useRouter } from 'next/navigation';
 import { Box } from '@mui/material';
 import { Footer } from './Footer';
@@ -16,11 +16,35 @@ import { getDeviceIdUUID } from '@shared-lib-v2/DynamicForm/utils/Helper';
 import { validate as uuidValidate } from 'uuid';
 import { useGlobalData } from '../Provider/GlobalProvider';
 import AccessibilityOptions from '../AccessibilityOptions/AccessibilityOptions';
+
 interface NewDrawerItemProp extends DrawerItemProp {
   variant?: 'contained' | 'text';
   isActive?: boolean;
   customStyle?: React.CSSProperties;
 }
+
+// Custom function to transform categories to match expected structure
+const transformCategories = (categories: any[]) => {
+  const transformedCategories = transformRenderForm(categories);
+
+  // Create a structure that matches what the code expects
+  const result: any = {};
+
+  transformedCategories.forEach((category: any) => {
+    if (category.old_code === 'domain') {
+      result.domain = {
+        options: category.options.map((option: any) => ({
+          code: option.code,
+          name: option.name,
+          associations: option.associations,
+        })),
+      };
+    }
+  });
+
+  return result;
+};
+
 const App: React.FC<LayoutProps> = ({ children, ...props }) => {
   const router = useRouter();
   const { t } = useTranslation();
