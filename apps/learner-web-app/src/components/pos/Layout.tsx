@@ -186,6 +186,8 @@ export default App;
 
 const Brand = () => {
   const router = useRouter();
+  const { isColorInverted } = useColorInversion();
+
   return (
     <Box
       display="flex"
@@ -194,11 +196,14 @@ const Brand = () => {
       sx={{ cursor: 'pointer' }}
     >
       <Image
-        src="/images/appLogo.svg"
+        src={
+          isColorInverted
+            ? '/images/PrathamLogowhite.png'
+            : '/images/appLogo.svg'
+        }
         alt="Pratham"
         width={146}
         height={32}
-        style={{ height: '32px' }}
       />
       <Image
         src="/images/pradigi.png"
