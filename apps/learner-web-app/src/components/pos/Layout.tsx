@@ -16,6 +16,7 @@ import { getDeviceIdUUID } from '@shared-lib-v2/DynamicForm/utils/Helper';
 import { validate as uuidValidate } from 'uuid';
 import { useGlobalData } from '../Provider/GlobalProvider';
 import AccessibilityOptions from '../AccessibilityOptions/AccessibilityOptions';
+import { useColorInversion } from '../../context/ColorInversionContext';
 
 interface NewDrawerItemProp extends DrawerItemProp {
   variant?: 'contained' | 'text';
@@ -48,6 +49,7 @@ const transformCategories = (categories: any[]) => {
 const App: React.FC<LayoutProps> = ({ children, ...props }) => {
   const router = useRouter();
   const { t } = useTranslation();
+  const { isColorInverted } = useColorInversion();
   const [defaultNavLinks, setDefaultNavLinks] = useState<NewDrawerItemProp[]>(
     []
   );
@@ -159,6 +161,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
       onlyHideElements={['footer']}
       _topAppBar={{
         isShowLang: false,
+        isColorInverted: isColorInverted,
         _brand: {
           _box: {
             brandlogo: <Brand />,
