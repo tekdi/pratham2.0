@@ -13,6 +13,7 @@ import React, { useState } from 'react';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
+import { useColorInversion } from '../context/ColorInversionContext';
 
 const Learning = ({
   data,
@@ -24,6 +25,7 @@ const Learning = ({
   aboutDescriptionStyle?: boolean;
 }) => {
   const [hovered, setHovered] = useState<number | null>(null);
+  const { isColorInverted } = useColorInversion();
 
   const mediaMD = useMediaQuery('(max-width: 900px)');
 
@@ -48,6 +50,7 @@ const Learning = ({
           >
             {/* Default Card Content */}
             <Box
+              data-no-invert={isColorInverted}
               sx={{
                 background: `url(/images/pillar-${
                   index + 1

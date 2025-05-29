@@ -91,10 +91,12 @@ const AboutUsPage = () => {
     ],
   ];
   const mediaMD = useMediaQuery('(max-width: 900px)');
+  const isColorInverted = false; // This should be replaced with actual logic to determine if the color is inverted
   return (
     <Layout>
       <Box sx={{ background: '#F3F3F3' }}>
         <Box
+          data-no-invert={true}
           sx={{
             width: '100%',
             height: '400px',
@@ -114,7 +116,7 @@ const AboutUsPage = () => {
               sx={{
                 fontWeight: 700,
                 textAlign: 'center',
-                color: '#FFF',
+                color: isColorInverted ? '#FFF' : '#fff',
               }}
             >
               <SpeakableText>About Us</SpeakableText>
