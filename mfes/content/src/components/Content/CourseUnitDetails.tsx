@@ -7,6 +7,7 @@ import {
   calculateTrackDataItem,
   CourseCompletionBanner,
   trackDataPorps,
+  findCourseUnitPath,
 } from '@shared-lib';
 import { hierarchyAPI } from '@content-mfes/services/Hierarchy';
 import { trackingData } from '@content-mfes/services/TrackingService';
@@ -38,6 +39,7 @@ export default function Details(props: DetailsProps) {
   const [trackData, setTrackData] = useState<trackDataPorps[]>([]);
   const [selectedContent, setSelectedContent] = useState<any>(null);
   const [courseItem, setCourseItem] = useState<any>({});
+  const [breadCrumbs, setBreadCrumbs] = useState<any>();
   const [loading, setLoading] = useState(true);
   const [certificateId, setCertificateId] = useState();
   let activeLink = null;
@@ -50,9 +52,22 @@ export default function Details(props: DetailsProps) {
     const getDetails = async (identifier: string) => {
       try {
         const resultHierarchy = await hierarchyAPI(identifier);
-        if (unitId) {
+        if (props?._config?.getContentData) {
+          props?._config?.getContentData(resultHierarchy);
+        }
+        if (unitId && !props?.isHideInfoCard) {
           const course = await hierarchyAPI(courseId as string);
           setCourseItem(course);
+          const breadcrum = findCourseUnitPath(course, unitId as string, [
+            'name',
+            'identifier',
+            'mimeType',
+            {
+              key: 'link',
+              suffix: activeLink ? `?activeLink=${activeLink}` : '',
+            },
+          ]);
+          setBreadCrumbs(breadcrum);
         }
 
         const userId = getUserId(props?._config?.userIdLocalstorageName);
@@ -144,9 +159,9 @@ export default function Details(props: DetailsProps) {
     courseId,
     router,
     unitId,
-    props?._config?.userIdLocalstorageName,
-    props?._config?.contentBaseUrl,
+    props?._config,
     activeLink,
+    props?.isHideInfoCard,
   ]);
 
   const handleItemClick = (subItem: any) => {
@@ -193,6 +208,7 @@ export default function Details(props: DetailsProps) {
           _config={{
             ...props?._config,
             _infoCard: {
+              breadCrumbs: breadCrumbs,
               isShowStatus: trackData,
               isHideStatus: true,
               default_img: `${AppConst.BASEPATH}/assests/images/image_ver.png`,

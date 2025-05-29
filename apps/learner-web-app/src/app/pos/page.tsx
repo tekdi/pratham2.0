@@ -9,9 +9,7 @@ import {
   Button,
   Grid,
   Box,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
+  useMediaQuery,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import FeautureCarousel from '@learner/components/FeautureCarousel';
@@ -21,6 +19,7 @@ import KnwoledgeCarousel from '@learner/components/KnwoledgeCarousel';
 import OtherWebsiteCarousel from '@learner/components/OtherWebsiteCarousel';
 import Learning from '@learner/components/Learning';
 import Image from 'next/image';
+import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 
 const keyThemesList = [
   [
@@ -90,9 +89,11 @@ const keyThemesList = [
   ],
 ];
 const descriptions = [
-  'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
-  'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
-  'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
+  `
+  Learning for School focuses on scholastic subjects, which include early years education and learning to read, write, and think. These skills are crucial for building children's confidence and dignity among their peers.
+  `,
+  'Learning for Work equips adolescents and youth with the skills and knowledge needed for employment and livelihoods.',
+  'Learning for Life encompasses skills and knowledge that are a part of lifelong learning like transferable skills, interests, hobbies, and creativity. These also include life skills but are not limited to them.  It emphasises environmental awareness, physical and mental well-being, and extends learning beyond scholastic subjects.',
 ];
 
 const page = () => {
@@ -127,6 +128,8 @@ const page = () => {
     { src: '/images/website-4.png', alt: 'Schmidt Futures' },
   ];
 
+  const mediaMD = useMediaQuery('(max-width: 900px)');
+
   return (
     <Layout onlyHideElements={['footer']}>
       <Grid container spacing={4}>
@@ -152,67 +155,61 @@ const page = () => {
         >
           <Box sx={{ p: 3, '@media (max-width: 900px)': { px: '16px' } }}>
             <Typography
-              variant="h3"
+              variant={mediaMD ? 'body10' : 'body3'}
               component="h1"
               sx={{
                 fontWeight: 800,
-                fontSize: '72px',
+                // fontSize: '72px',
                 lineHeight: '110%',
                 letterSpacing: '0%',
                 color: '#1F1B13',
                 '@media (min-width: 900px)': {
                   marginLeft: '-120px',
                 },
-                '@media (max-width: 900px)': {
-                  fontSize: '40px',
-                },
               }}
             >
-              Pratham
+              <SpeakableText>Pratham</SpeakableText>
             </Typography>
             <Typography
-              variant="h3"
+              variant={mediaMD ? 'body10' : 'body3'}
               component="h1"
               sx={{
                 fontWeight: 800,
-                fontSize: '72px',
+                // fontSize: '72px',
                 lineHeight: '110%',
                 letterSpacing: '0%',
                 color: '#FDBE16',
                 '@media (max-width: 900px)': {
-                  fontSize: '40px',
                   marginLeft: '60px',
                 },
               }}
             >
-              Open School
+              <SpeakableText>Open School</SpeakableText>
             </Typography>
 
             <Typography
-              variant="h5"
-              component="h2"
+              variant={mediaMD ? 'body1' : 'body4'}
+              component="h1"
               sx={{
                 my: 2,
                 fontFamily: 'Poppins',
                 fontWeight: 400,
-                fontSize: '28px',
                 lineHeight: '36px',
                 letterSpacing: '0px',
                 color: '#1F1B13',
                 mt: 2,
-                '@media (max-width: 900px)': {
-                  fontSize: '16px',
-                },
               }}
             >
-              Opening doors to knowledge and skills
+              <SpeakableText>
+                Opening doors to knowledge and skills
+              </SpeakableText>
             </Typography>
 
-            <Box
+            <Typography
+              variant={mediaMD ? 'body1' : 'h1'}
+              component="h1"
               sx={{
-                fontFamily: 'Poppins',
                 fontWeight: 400,
-                fontSize: '22px',
                 lineHeight: '28px',
                 letterSpacing: '0px',
                 color: '#1F1B13',
@@ -222,33 +219,31 @@ const page = () => {
                 padding: '10px 20px',
                 borderRadius: '8px',
                 mt: 1,
-                '@media (max-width: 900px)': {
-                  fontSize: '16px',
-                },
               }}
             >
-              In 15 languages
-            </Box>
+              <SpeakableText>In 15 languages</SpeakableText>
+            </Typography>
 
             <Typography
-              variant="body1"
+              variant={mediaMD ? 'body1' : 'body5'}
+              component="h1"
               sx={{
                 mb: 3,
                 fontFamily: 'Poppins',
                 fontWeight: 400,
-                fontSize: '18px',
-                lineHeight: '24px',
+                // fontSize: '18px',
+                // lineHeight: '24px',
                 letterSpacing: '0.5px',
                 color: '#1F1B13',
                 mt: 3,
-                '@media (max-width: 900px)': {
-                  fontSize: '16px',
-                },
               }}
             >
-              Description about Open School here. A place where learning has no
-              limits. Whether you're here to explore new subjects, revisit past
-              lessons.
+              <SpeakableText>
+                Pratham Open School offers free, downloadable videos, games,
+                reading material and stories in 15 languages for ages 1 to 18+,
+                designed to support self-led learning and group learning through
+                activities and projects.
+              </SpeakableText>
             </Typography>
             <Box
               sx={{
@@ -259,6 +254,9 @@ const page = () => {
                 boxShadow: '0px 1px 2px 0px #0000004D',
                 mx: 'auto',
                 mt: 4,
+                '@media (min-width: 900px)': {
+                  mb: '100px',
+                },
               }}
             >
               <SearchIcon sx={{ color: '#757575', ml: 2, mr: 1 }} />
@@ -292,12 +290,9 @@ const page = () => {
                   fontSize: '16px',
                   textTransform: 'none',
                   '&:hover': { bgcolor: '#e9a416' },
-                  '@media (max-width: 900px)': {
-                    fontSize: '14px',
-                  },
                 }}
               >
-                Search
+                <SpeakableText>Search</SpeakableText>
               </Button>
             </Box>
           </Box>
@@ -320,22 +315,19 @@ const page = () => {
         }}
       >
         <Typography
-          variant="h4"
+          variant={mediaMD ? 'h1' : 'body6'}
           component="h3"
           sx={{
             fontFamily: 'Poppins',
             fontWeight: 700,
-            fontSize: '36px',
+            // fontSize: '36px',
             lineHeight: '64px',
             letterSpacing: '-0.25px',
             color: '#1F1B13',
             textAlign: 'center',
-            '@media (max-width: 900px)': {
-              fontSize: '22px',
-            },
           }}
         >
-          Our Learning Pillars
+          <SpeakableText>Our Learning Pillars</SpeakableText>
         </Typography>
         <Learning data={keyThemesList} descriptions={descriptions} />
       </Box>
@@ -353,28 +345,28 @@ const page = () => {
             },
           }}
         >
-          <Box
+          <Typography
+            variant={mediaMD ? 'body8' : 'body7'}
+            component="h1"
             sx={{
-              fontFamily: 'Poppins',
+              // fontFamily: 'Poppins',
               fontWeight: 700,
-              fontSize: '46px',
-              lineHeight: '100%',
+              // fontSize: '46px',
+              // lineHeight: '100%',
               letterSpacing: '-0.25px',
               textAlign: 'center',
               color: '#1F1B13',
-              '@media (max-width: 900px)': {
-                fontSize: '24px',
-              },
             }}
           >
-            3524
-          </Box>
-          <Box
+            <SpeakableText>3524</SpeakableText>
+          </Typography>
+          <Typography
+            variant="body8"
+            component="h1"
             sx={{
-              fontFamily: 'Poppins',
               fontWeight: 400,
-              fontSize: '24px',
-              lineHeight: '32px',
+              // fontSize: '24px',
+              // lineHeight: '32px',
               letterSpacing: '0px',
               textAlign: 'center',
               color: '#1F1B13',
@@ -384,8 +376,8 @@ const page = () => {
               },
             }}
           >
-            Total Resources
-          </Box>
+            <SpeakableText>Total Resources</SpeakableText>
+          </Typography>
         </Box>
 
         {/* Resource Stats Section */}
@@ -415,36 +407,34 @@ const page = () => {
                 sx={{ textAlign: 'center' }}
               >
                 <Typography
+                  variant={mediaMD ? 'body8' : 'body6'}
+                  component="h1"
                   sx={{
                     fontFamily: 'Poppins',
                     fontWeight: 700,
-                    fontSize: { xs: '24px', md: '36px' },
+                    fontSize: '36px',
                     lineHeight: '44px',
                     letterSpacing: '0px',
                     textAlign: 'center',
                     color: '#F17B06',
-                    '@media (max-width: 900px)': {
-                      fontSize: '24px',
-                    },
                   }}
                 >
-                  {item.value}
+                  <SpeakableText>{item.value}</SpeakableText>
                 </Typography>
                 <Typography
+                  variant={mediaMD ? 'body1' : 'body6'}
+                  component="h1"
                   sx={{
                     fontFamily: 'Poppins',
                     fontWeight: 400,
-                    fontSize: '24px',
+                    // fontSize: '24px',
                     lineHeight: '32px',
                     letterSpacing: '0px',
                     textAlign: 'center',
                     color: '#1F1B13',
-                    '@media (max-width: 900px)': {
-                      fontSize: '16px',
-                    },
                   }}
                 >
-                  {item.label}
+                  <SpeakableText>{item.label}</SpeakableText>
                 </Typography>
               </Grid>
             ))}
@@ -455,17 +445,19 @@ const page = () => {
 
       <Box>
         <Typography
+          variant="body7"
+          component="h1"
           sx={{
             fontFamily: 'Poppins',
             fontWeight: 700,
-            fontSize: '46px',
+            // fontSize: '46px',
             lineHeight: '100%',
             letterSpacing: '-0.25px',
             textAlign: 'center',
             mt: 5,
           }}
         >
-          Featured Gallery
+          <SpeakableText>Featured Gallery</SpeakableText>
         </Typography>
 
         <Box
@@ -480,17 +472,19 @@ const page = () => {
       {/* What's New */}
       <Box>
         <Typography
+          variant="body6"
+          component="h1"
           sx={{
             fontFamily: 'Poppins',
             fontWeight: 700,
-            fontSize: '36px',
-            lineHeight: '44px',
+            // fontSize: '36px',
+            // lineHeight: '44px',
             letterSpacing: '0px',
             textAlign: 'center',
             mt: 4,
           }}
         >
-          What's New
+          <SpeakableText>What's New</SpeakableText>
         </Typography>
 
         <Box>
@@ -508,27 +502,29 @@ const page = () => {
           },
         }}
       >
-        <Grid container spacing={2} sx={{ alignItems: 'center' }}>
-          <Grid item xs={12} md={6}>
+        <Grid container spacing={3} sx={{ alignItems: 'center' }}>
+          <Grid item xs={12} md={5}>
             <Typography
+              variant={mediaMD ? 'h1' : 'body6'}
+              component="h1"
               sx={{
                 fontFamily: 'Poppins',
                 fontWeight: 700,
-                fontSize: '36px',
-                lineHeight: '44px',
+                // fontSize: '36px',
+                // lineHeight: '44px',
                 letterSpacing: '0px',
                 color: '#1F1B13',
                 '@media (max-width: 900px)': {
-                  fontSize: '22px',
-                  lineHeight: '30px',
                   textAlign: 'center',
                 },
               }}
             >
-              More Ways to Learn – Check Out Our Products!
+              <SpeakableText>
+                More Ways to Learn – Check Out Our Products!
+              </SpeakableText>
             </Typography>
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={7}>
             <MoreWayCarousel />
           </Grid>
         </Grid>
@@ -544,20 +540,18 @@ const page = () => {
         }}
       >
         <Typography
+          variant={mediaMD ? 'h1' : 'body6'}
+          component="h1"
           sx={{
-            fontFamily: 'Poppins',
             fontWeight: 700,
             fontSize: '36px',
             lineHeight: '44px',
             letterSpacing: '0px',
             textAlign: 'center',
             color: '#1F1B13',
-            '@media (max-width: 900px)': {
-              fontSize: '22px',
-            },
           }}
         >
-          Knowledge Partners
+          <SpeakableText>Knowledge Partners</SpeakableText>
         </Typography>
 
         <Container maxWidth="xl">
@@ -577,20 +571,19 @@ const page = () => {
         }}
       >
         <Typography
+          variant={mediaMD ? 'h1' : 'body6'}
+          component="h1"
           sx={{
             fontFamily: 'Poppins',
             fontWeight: 700,
-            fontSize: '36px',
-            lineHeight: '44px',
+            // fontSize: '36px',
+            // lineHeight: '44px',
             letterSpacing: '0px',
             textAlign: 'center',
             color: '#1F1B13',
-            '@media (max-width: 900px)': {
-              fontSize: '22px',
-            },
           }}
         >
-          Our Partners
+          <SpeakableText>Our Partners</SpeakableText>
         </Typography>
 
         <Container maxWidth="xl">
@@ -610,20 +603,19 @@ const page = () => {
         }}
       >
         <Typography
+          variant={mediaMD ? 'h1' : 'body6'}
+          component="h1"
           sx={{
             fontFamily: 'Poppins',
             fontWeight: 700,
-            fontSize: '36px',
-            lineHeight: '44px',
+            // fontSize: '36px',
+            // lineHeight: '44px',
             letterSpacing: '0px',
             textAlign: 'center',
             color: '#1F1B13',
-            '@media (max-width: 900px)': {
-              fontSize: '22px',
-            },
           }}
         >
-          Other Websites
+          <SpeakableText>Other Websites</SpeakableText>
         </Typography>
 
         <Container maxWidth="xl">

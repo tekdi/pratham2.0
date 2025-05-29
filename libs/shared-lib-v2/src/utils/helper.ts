@@ -80,3 +80,111 @@ export const calculateTrackDataItem = (newTrack: any, item: any) => {
     return result;
   }
 };
+
+type KeyFormat = string | { key: string; format?: string; suffix: string };
+
+export function findCourseUnitPath(
+  node: any,
+  targetId: string,
+  keyArray: KeyFormat[],
+  path: any[] = []
+): any[] | null {
+  // Build current node's object by processing keyArray
+  const currentObj = keyArray.reduce((acc, keyItem) => {
+    if (typeof keyItem === 'string') {
+      // simple key, just pick the value if exists
+      if (node[keyItem] !== undefined) acc[keyItem] = node[keyItem];
+    } else if (typeof keyItem === 'object' && keyItem.key) {
+      let formattedValue = '';
+      if (keyItem.key === 'link') {
+        if (
+          path?.length > 0 &&
+          node.mimeType === 'application/vnd.ekstep.content-collection'
+        ) {
+          formattedValue = `/content/${path?.[0]?.identifier}/${
+            node.identifier
+          }${keyItem?.suffix ?? ''}`;
+        } else {
+          formattedValue = `/content/${node.identifier}${
+            keyItem?.suffix ?? ''
+          }`;
+        }
+      }
+      if (keyItem.format) {
+        // Replace ${id} or any ${key} in format with node[key]
+        formattedValue = keyItem.format.replace(
+          /\$\{(\w+)\}/g,
+          (_, k) => node[k] ?? ''
+        );
+      }
+      acc[keyItem.key] = formattedValue;
+    }
+    return acc;
+  }, {} as Record<string, any>);
+
+  const newPath = [...path, currentObj];
+
+  if (node.identifier === targetId) {
+    return newPath;
+  }
+
+  const children = node.children;
+
+  if (Array.isArray(children)) {
+    for (const child of children) {
+      const result = findCourseUnitPath(child, targetId, keyArray, newPath);
+      if (result) return result;
+    }
+  }
+
+  return null;
+}
+
+type NameMapEntry = string | { key: string; replaceCode: string };
+
+export function sortJsonByArray({
+  jsonArray,
+  nameArray,
+  key = 'code',
+  onlyMatched = true,
+}: {
+  jsonArray: any[];
+  nameArray?: NameMapEntry[];
+  key?: string;
+  onlyMatched?: boolean;
+}) {
+  if (nameArray === undefined || nameArray.length === 0) return jsonArray;
+  const orderMap = new Map<string, { index: number; replaceCode?: string }>();
+  nameArray.forEach((entry, index) => {
+    if (typeof entry === 'string') {
+      orderMap.set(entry, { index });
+    } else {
+      orderMap.set(entry.key, { index, replaceCode: entry.replaceCode });
+    }
+  });
+
+  return jsonArray
+    .filter((item) => {
+      const val = String(item[key]);
+      return !onlyMatched || orderMap.has(val);
+    })
+    .sort((a, b) => {
+      const aIndex = orderMap.get(String(a[key]))?.index ?? Infinity;
+      const bIndex = orderMap.get(String(b[key]))?.index ?? Infinity;
+      return aIndex - bIndex;
+    })
+    .map((item) => {
+      const val = String(item[key]);
+      const entry = orderMap.get(val);
+
+      if (entry?.replaceCode) {
+        return {
+          ...item,
+          [key]: entry.replaceCode.replace('{code}', val),
+          [`old_${key}`]: val,
+        };
+      }
+
+      return item;
+    });
+}

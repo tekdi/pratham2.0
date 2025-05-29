@@ -9,6 +9,7 @@ export default function PosPage() {
   return (
     <List
       pagename="School"
+      _content={{ isOpenColapsed: ['se_subDomains', 'se_subjects'] }}
       _infoCard={{
         item: {
           description:

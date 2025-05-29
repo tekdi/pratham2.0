@@ -544,3 +544,22 @@ mat-radio-group.mat-mdc-radio-group {
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+/* Accessibility: Underline Links */
+.underline-links-enabled a,
+.underline-links-enabled [href] {
+  text-decoration: underline !important;
+}
+
+/* Ensure underline is visible even for styled links */
+.underline-links-enabled a:hover,
+.underline-links-enabled [href]:hover {
+  text-decoration: underline !important;
+}
+
+/* Apply to MUI Link components and other styled links */
+.underline-links-enabled .MuiLink-root,
+.underline-links-enabled .MuiTypography-root a,
+.underline-links-enabled .MuiButton-root[href] {
+  text-decoration: underline !important;
+}

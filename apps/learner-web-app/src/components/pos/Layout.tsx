@@ -7,7 +7,7 @@ import {
   Layout,
   useTranslation,
   DrawerItemProp,
-  transformCategories,
+  transformRenderForm,
 } from '@shared-lib';
 import { useRouter } from 'next/navigation';
 import { Box } from '@mui/material';
@@ -15,6 +15,7 @@ import { Footer } from './Footer';
 import { getDeviceIdUUID } from '@shared-lib-v2/DynamicForm/utils/Helper';
 import { validate as uuidValidate } from 'uuid';
 import { useGlobalData } from '../Provider/GlobalProvider';
+import AccessibilityOptions from '../AccessibilityOptions/AccessibilityOptions';
 interface NewDrawerItemProp extends DrawerItemProp {
   variant?: 'contained' | 'text';
   isActive?: boolean;
@@ -47,21 +48,25 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
       typeof window !== 'undefined' && window.location.pathname
         ? window.location.pathname
         : '';
+    const withoutQueryString =
+      typeof window !== 'undefined'
+        ? window.location.pathname + window.location.search
+        : '';
     const categories = filterFramework?.framework?.categories ?? [];
-    const transformedCategories = transformCategories(categories);
-    const schoolSubCategory =
-      transformedCategories?.domain?.options.find(
-        (category: any) => category.code === 'learningForSchool'
-      )?.associations?.subDomain ?? [];
-    const workSubCategory =
-      transformedCategories?.domain?.options.find(
-        (category: any) => category.code === 'learningForWork'
-      )?.associations?.subDomain ?? [];
-    const lifeSubCategory =
-      transformedCategories?.domain?.options.find(
-        (category: any) => category.code === 'learningForLife'
-      )?.associations?.subDomain ?? [];
+    const transformedCategories = transformRenderForm(categories);
+    const option = transformedCategories?.find(
+      (item) => item.code === 'se_domains'
+    )?.options;
 
+    const schoolSubCategory =
+      option?.find((category: any) => category.code === 'learningForSchool')
+        ?.associations?.subDomain ?? [];
+    const workSubCategory =
+      option?.find((category: any) => category.code === 'learningForWork')
+        ?.associations?.subDomain ?? [];
+    const lifeSubCategory =
+      option?.find((category: any) => category.code === 'learningForLife')
+        ?.associations?.subDomain ?? [];
     const navLinks = [
       {
         title: t('LEARNER_APP.POS.ABOUT_US'),
@@ -75,6 +80,8 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         child: schoolSubCategory.map((item: any) => ({
           title: item?.name,
           to: () => router.push(`/pos/school?se_subDomains=${item?.code}`),
+          isActive:
+            withoutQueryString === `/pos/school?se_subDomains=${item?.code}`,
         })),
       },
       {
@@ -84,6 +91,8 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         child: workSubCategory.map((item: any) => ({
           title: item?.name,
           to: () => router.push(`/pos/work?se_subDomains=${item?.code}`),
+          isActive:
+            withoutQueryString === `/pos/work?se_subDomains=${item?.code}`,
         })),
       },
       {
@@ -93,6 +102,8 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         child: lifeSubCategory.map((item: any) => ({
           title: item?.name,
           to: () => router.push(`/pos/life?se_subDomains=${item?.code}`),
+          isActive:
+            withoutQueryString === `/pos/life?se_subDomains=${item?.code}`,
         })),
       },
       {
@@ -105,6 +116,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         ].map((item: any) => ({
           title: item?.name,
           to: () => router.push(`/pos/program?program=${item?.code}`),
+          isActive: withoutQueryString === `/pos/program?program=${item?.code}`,
         })),
       },
       {
@@ -134,7 +146,11 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         ...props?._topAppBar,
       }}
     >
-      <Box>{children}</Box>
+      <Box>
+        <AccessibilityOptions />
+
+        {children}
+      </Box>
       <Footer />
     </Layout>
   );

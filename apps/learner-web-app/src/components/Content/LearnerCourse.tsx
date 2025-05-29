@@ -57,18 +57,18 @@ export default memo(function LearnerCourse({
 
   return (
     <Stack sx={{ gap: { xs: 0, sm: 0, md: 2 }, pb: 4 }}>
-      <Box
-        sx={{
-          position: 'sticky',
-          top: 0,
-          bgcolor: '',
-          px: { xs: 1, md: 4 },
-          py: { xs: 1, md: 2 },
-          zIndex: 1,
-        }}
-        style={gredientStyle}
-      >
-        {title && (
+      {title && (
+        <Box
+          sx={{
+            position: 'sticky',
+            top: 0,
+            bgcolor: '',
+            px: { xs: 1, md: 4 },
+            py: { xs: 1, md: 2 },
+            zIndex: 1,
+          }}
+          style={gredientStyle}
+        >
           <Box
             display="flex"
             flexDirection={{ xs: 'column', md: 'row' }}
@@ -192,15 +192,20 @@ export default memo(function LearnerCourse({
                 : null}
             </Box>
           </Box>
-        )}
-      </Box>
-      <Stack direction="row" sx={{ gap: 4, px: { xs: 2, md: 4 } }}>
+        </Box>
+      )}
+      <Stack
+        direction="row"
+        sx={{ gap: 4, px: { xs: 1, md: 4 }, py: { xs: 1, md: 2 } }}
+      >
         <CommonDialog isOpen={isOpen} onClose={() => setIsOpen(false)}>
           <FilterComponent
             filterFramework={filterFramework}
             staticFilter={staticFilter}
             filterState={filterState}
             handleFilterChange={handleFilterChange}
+            onlyFields={_content?.onlyFields ?? []}
+            isOpenColapsed={_content?.isOpenColapsed ?? []}
           />
         </CommonDialog>
 
@@ -218,6 +223,8 @@ export default memo(function LearnerCourse({
             staticFilter={staticFilter}
             filterState={filterState}
             handleFilterChange={handleFilterChange}
+            onlyFields={_content?.onlyFields ?? []}
+            isOpenColapsed={_content?.isOpenColapsed ?? []}
           />
         </Box>
         <Box flex={127}>

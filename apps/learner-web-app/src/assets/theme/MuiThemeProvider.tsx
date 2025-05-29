@@ -4,6 +4,47 @@
 import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
 import React from 'react';
 import { LanguageProvider } from '@shared-lib';
+import FontSizeTheme from '../../context/FontSizeTheme';
+import { SpeechProvider } from '@shared-lib-v2/lib/context/SpeechContext';
+
+// Add module augmentation for custom typography variants
+declare module '@mui/material/styles' {
+  interface TypographyVariants {
+    body3: React.CSSProperties;
+    body4: React.CSSProperties;
+    body5: React.CSSProperties;
+    body6: React.CSSProperties;
+    body7: React.CSSProperties;
+    body8: React.CSSProperties;
+    body9: React.CSSProperties;
+    body10: React.CSSProperties;
+  }
+
+  interface TypographyVariantsOptions {
+    body3?: React.CSSProperties;
+    body4?: React.CSSProperties;
+    body5?: React.CSSProperties;
+    body6?: React.CSSProperties;
+    body7?: React.CSSProperties;
+    body8?: React.CSSProperties;
+    body9?: React.CSSProperties;
+    body10?: React.CSSProperties;
+  }
+}
+
+// Update the Typography's variant prop options
+declare module '@mui/material/Typography' {
+  interface TypographyPropsVariantOverrides {
+    body3: true;
+    body4: true;
+    body5: true;
+    body6: true;
+    body7: true;
+    body8: true;
+    body9: true;
+    body10: true;
+  }
+}
 
 export const theme = createTheme({
   typography: {
@@ -12,59 +53,108 @@ export const theme = createTheme({
       fontFamily: 'Poppins, Arial, sans-serif',
     },
     h1: {
-      fontSize: '22px',
+      fontSize: 'calc(22px * var(--font-size-scale))',
       fontWeight: 400,
-      lineHeight: '28px',
-      marginBottom: '1rem',
+      lineHeight: 1.27,
+      // marginBottom: '1rem',
     },
     h2: {
-      fontSize: '16px',
+      fontSize: 'calc(16px * var(--font-size-scale))',
       fontWeight: 500,
-      lineHeight: '24px',
+      lineHeight: 1.5,
     },
     h3: {
-      fontSize: '14px',
+      fontSize: 'calc(14px * var(--font-size-scale))',
       fontWeight: 500,
-      lineHeight: '20px',
-      marginBottom: '0.5rem',
+      lineHeight: 1.43,
+      // marginBottom: '0.5rem',
     },
     h4: {
       //h4 is a large label style
-      fontSize: '14px',
+      fontSize: 'calc(14px * var(--font-size-scale))',
       fontWeight: 400,
-      lineHeight: '20px',
+      lineHeight: 1.43,
       letterSpacing: '0.1px',
     },
     h5: {
       //h5 is a medium label style
-      fontSize: '12px',
+      fontSize: 'calc(12px * var(--font-size-scale))',
       fontWeight: 500,
-      lineHeight: '16px',
+      lineHeight: 1.33,
       letterSpacing: '0.5px',
     },
     h6: {
       //h6 is a small label style
-      fontSize: '11px',
+      fontSize: 'calc(11px * var(--font-size-scale))',
       fontWeight: 500,
-      lineHeight: '16px',
+      lineHeight: 1.45,
       letterSpacing: '0.5px',
     },
     body1: {
-      fontSize: '16px',
+      fontSize: 'calc(16px * var(--font-size-scale))',
       fontWeight: 400,
-      lineHeight: '24px',
+      lineHeight: 1.5,
       letterSpacing: '0.5px',
     },
     body2: {
-      fontSize: '14px',
+      fontSize: 'calc(14px * var(--font-size-scale))',
       fontWeight: 400,
-      lineHeight: '20px',
+      lineHeight: 1.43,
       letterSpacing: '0.25px',
-      marginBottom: '1rem',
+      // marginBottom: '1rem',
     },
+    body3: {
+      fontSize: 'calc(72px * var(--font-size-scale))',
+      lineHeight: 2.43,
+      letterSpacing: '0.25px',
+      // marginBottom: '1.5rem',
+    },
+    body4: {
+      fontSize: 'calc(28px * var(--font-size-scale))',
+      lineHeight: 1.5,
+      letterSpacing: '0.25px',
+      // marginBottom: '1rem',
+    },
+    body5: {
+      fontSize: 'calc(18px * var(--font-size-scale))',
+      lineHeight: 1.5,
+      letterSpacing: '0.15px',
+      // marginBottom: '1rem',
+    },
+    body6: {
+      fontSize: 'calc(36px * var(--font-size-scale))',
+      lineHeight: 1.4,
+      letterSpacing: '0.4px',
+      //  marginBottom: '0.75rem',
+    },
+    body7: {
+      fontSize: 'calc(45px * var(--font-size-scale))',
+      lineHeight: 1.4,
+      letterSpacing: '0.4px',
+      //  marginBottom: '0.75rem',
+    },
+    body8: {
+      fontSize: 'calc(24px * var(--font-size-scale))',
+      lineHeight: 1.4,
+      letterSpacing: '0.4px',
+      //  marginBottom: '0.75rem',
+    },
+    body9: {
+      fontSize: 'calc(32px * var(--font-size-scale))',
+      lineHeight: 1.4,
+      letterSpacing: '0.4px',
+      //  marginBottom: '0.75rem',
+    },
+    body10: {
+      fontSize: 'calc(40px * var(--font-size-scale))',
+      lineHeight: 1.4,
+      letterSpacing: '0.4px',
+      //  marginBottom: '0.75rem',
+    },
+
     button: {
       textTransform: 'none',
-      fontSize: '14px',
+      fontSize: 'calc(14px * var(--font-size-scale))',
       fontWeight: 600,
     },
   },
@@ -136,7 +226,7 @@ export const theme = createTheme({
         {
           props: { variant: 'top-bar-link-text' },
           style: {
-            fontSize: '16px',
+            fontSize: 'calc(16px * var(--font-size-scale))',
             lineHeight: '24px',
             fontWeight: 400,
             color: '#1F1B13',
@@ -150,7 +240,7 @@ export const theme = createTheme({
         {
           props: { variant: 'top-bar-link-button' },
           style: {
-            fontSize: '16px',
+            fontSize: 'calc(16px * var(--font-size-scale))',
             lineHeight: '24px',
             fontWeight: 600,
             padding: '12px 10px',
@@ -188,10 +278,10 @@ export default function MuiThemeProvider({
   children: React.ReactNode;
 }) {
   return (
-    <ThemeProvider theme={theme}>
+    <FontSizeTheme baseTheme={theme}>
       <CssBaseline />
-      {children}
-    </ThemeProvider>
+      <SpeechProvider>{children}</SpeechProvider>
+    </FontSizeTheme>
   );
 }
 

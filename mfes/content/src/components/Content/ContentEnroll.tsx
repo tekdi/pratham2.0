@@ -21,6 +21,7 @@ import InfoCard from '@content-mfes/components/Card/InfoCard';
 import { hierarchyAPI } from '@content-mfes/services/Hierarchy';
 import { ContentSearchResponse } from '@content-mfes/services/Search';
 import { checkAuth, getUserId } from '@shared-lib-v2/utils/AuthService';
+import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 
 interface ContentDetailsProps {
   isShowLayout: boolean;
@@ -155,17 +156,21 @@ const ContentDetails = (props: ContentDetailsProps) => {
           >
             <Box>
               <Typography
+                variant="body1"
+                component="div"
                 sx={{
                   fontWeight: 400,
-                  fontSize: '16px',
-                  lineHeight: '24px',
+                  // fontSize: '16px',
+                  // lineHeight: '24px',
                   letterSpacing: '0.5px',
                   color: '#4D4639',
                   textTransform: 'capitalize',
                 }}
                 fontWeight={400}
               >
-                {contentDetails?.description ?? 'No description available'}
+                <SpeakableText>
+                  {contentDetails?.description ?? 'No description available'}
+                </SpeakableText>
               </Typography>
             </Box>
             <Box
@@ -176,16 +181,17 @@ const ContentDetails = (props: ContentDetailsProps) => {
               }}
             >
               <Typography
+                variant="h1"
                 sx={{
                   fontWeight: 400,
-                  fontSize: '22px',
-                  lineHeight: '28px',
+                  // fontSize: '22px',
+                  // lineHeight: '28px',
                   letterSpacing: '0px',
                   verticalAlign: 'middle',
                   color: '#1F1B13',
                 }}
               >
-                What You'll Learn
+                <SpeakableText>What You'll Learn</SpeakableText>
               </Typography>
 
               {contentDetails?.children &&
@@ -219,29 +225,33 @@ const ContentDetails = (props: ContentDetailsProps) => {
                               id="panel1-header"
                             >
                               <Typography
-                                component="span"
+                                variant="body1"
+                                component="div"
                                 sx={{
                                   fontWeight: 500,
-                                  fontSize: '16px',
-                                  letterSpacing: '0.15px',
+                                  // fontSize: '16px',
+                                  // letterSpacing: '0.15px',
                                 }}
                               >
-                                {item?.name}
+                                <SpeakableText>{item?.name}</SpeakableText>
                               </Typography>
                             </AccordionSummary>
                             <AccordionDetails>
                               <Typography
-                                component="span"
+                                variant="body1"
+                                component="div"
                                 sx={{
                                   fontWeight: 400,
-                                  fontSize: '16px',
-                                  lineHeight: '24px',
+                                  // fontSize: '16px',
+                                  // lineHeight: '24px',
                                   letterSpacing: '0.5px',
                                   color: '#4D4639',
                                 }}
                               >
-                                {item?.description ??
-                                  'No description available'}
+                                <SpeakableText>
+                                  {item?.description ??
+                                    'No description available'}
+                                </SpeakableText>
                               </Typography>
                             </AccordionDetails>
                           </Accordion>
