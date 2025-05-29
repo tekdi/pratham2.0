@@ -49,7 +49,7 @@ interface FilterSectionProps {
   repleaseCode?: string;
   staticFormData?: Record<string, object>;
   isShowStaticFilterValue?: boolean;
-  isOpenColapsed?: boolean;
+  isOpenColapsed?: boolean | any[];
 }
 
 interface FilterListProps {
@@ -58,7 +58,7 @@ interface FilterListProps {
   onApply?: any;
   filterFramework?: any;
   isShowStaticFilterValue?: boolean;
-  isOpenColapsed?: boolean;
+  isOpenColapsed?: boolean | any[];
   onlyFields?: string[];
 }
 
@@ -339,7 +339,11 @@ const FilterSection: React.FC<FilterSectionProps> = ({
         } else {
           return (
             <Accordion
-              defaultExpanded={isOpenColapsed}
+              defaultExpanded={
+                Array.isArray(isOpenColapsed)
+                  ? isOpenColapsed.includes(code)
+                  : isOpenColapsed
+              }
               key={code}
               sx={{ background: 'unset', boxShadow: 'unset' }}
             >

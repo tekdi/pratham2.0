@@ -8,12 +8,14 @@ const FilterComponent: React.FC<{
   staticFilter?: Record<string, object>;
   handleFilterChange: (newFilterState: any) => void;
   onlyFields?: string[];
+  isOpenColapsed?: boolean | any[];
 }> = ({
   filterState,
   staticFilter,
   filterFramework,
   handleFilterChange,
   onlyFields,
+  isOpenColapsed,
 }) => {
   const { t } = useTranslation();
   const [filterCount, setFilterCount] = useState<any>();
@@ -42,13 +44,20 @@ const FilterComponent: React.FC<{
           handleFilterChange(newFilterState);
         }}
         onlyFields={onlyFields}
-        isOpenColapsed
+        isOpenColapsed={isOpenColapsed}
         filterFramework={filterFramework}
         orginalFormData={filterState?.filters ?? {}}
         staticFilter={staticFilter}
       />
     ),
-    [handleFilterChange, filterFramework, staticFilter, filterState]
+    [
+      handleFilterChange,
+      filterFramework,
+      isOpenColapsed,
+      staticFilter,
+      onlyFields,
+      filterState,
+    ]
   );
 
   return (
