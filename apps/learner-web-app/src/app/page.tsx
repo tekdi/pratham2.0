@@ -64,8 +64,9 @@ export default function Index() {
                 />
               </Box>
               <Typography
+                variant="body9"
+                component="h1"
                 sx={{
-                  fontSize: { xs: '24px', sm: '32px' },
                   fontWeight: '400',
                   color: '#1F1B13',
                   textAlign: 'center',
@@ -74,9 +75,9 @@ export default function Index() {
                 {t('LEARNER_APP.HOME.WELCOME_TITLE')}
               </Typography>
               <Typography
+                variant="h1"
                 sx={{
                   fontWeight: '400',
-                  fontSize: { xs: '18px', sm: '22px' },
                   textAlign: 'center',
                 }}
               >
@@ -146,12 +147,11 @@ export default function Index() {
                       </Box>
                       <Box>
                         <Typography
-                          variant="subtitle1"
+                          variant="h3"
                           sx={{
                             textAlign: 'left',
                             color: '#1F1B13',
                             fontWeight: '500',
-                            fontSize: '14px',
                           }}
                           fontWeight="bold"
                         >
@@ -183,10 +183,10 @@ export default function Index() {
                       }}
                     />
                     <Typography
+                      variant="h4"
                       sx={{
                         my: 1,
                         color: '#1F1B13',
-                        fontSize: '14px',
                         fontWeight: '400',
                       }}
                     >
@@ -240,27 +240,26 @@ export default function Index() {
             <Grid container spacing={4}>
               <Grid item xs={12} md={7}>
                 <Typography
-                  variant="h5"
+                  variant="body9"
                   component="h2"
                   fontWeight="bold"
                   sx={{
                     mb: 3,
                     fontWeight: 600,
-                    fontSize: '32px',
                     color: '#1F1B13',
                   }}
                 >
                   {t('LEARNER_APP.HOME.ABOUT_PRATHAM_TITLE')}
                 </Typography>
                 <Typography
+                  variant="body1"
+                  component="h1"
+                  paragraph
                   sx={{
                     mb: 3,
                     fontWeight: 400,
-                    fontSize: '16px',
                     color: '#1F1B13',
                   }}
-                  variant="body1"
-                  paragraph
                 >
                   {t('LEARNER_APP.HOME.ABOUT_PRATHAM_DESC')}
                 </Typography>

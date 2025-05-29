@@ -17,6 +17,8 @@ import { useTranslation } from '../context/LanguageContext';
 import { filterContent, staticFilterContent } from '../../utils/AuthService';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Loader } from '../Loader/Loader';
+import { sortJsonByArray } from '../../utils/helper';
+import SpeakableText from '../textToSpeech/SpeakableText';
 
 export interface TermOption {
   code: string;
@@ -47,7 +49,7 @@ interface FilterSectionProps {
   repleaseCode?: string;
   staticFormData?: Record<string, object>;
   isShowStaticFilterValue?: boolean;
-  isOpenColapsed?: boolean;
+  isOpenColapsed?: boolean | any[];
 }
 
 interface FilterListProps {
@@ -56,7 +58,8 @@ interface FilterListProps {
   onApply?: any;
   filterFramework?: any;
   isShowStaticFilterValue?: boolean;
-  isOpenColapsed?: boolean;
+  isOpenColapsed?: boolean | any[];
+  onlyFields?: string[];
 }
 
 export function FilterForm({
@@ -66,16 +69,14 @@ export function FilterForm({
   filterFramework,
   isShowStaticFilterValue,
   isOpenColapsed,
+  onlyFields,
 }: Readonly<FilterListProps>) {
   const { t } = useTranslation();
-
-  const [filterData, setFilterData] = useState<Record<string, any>[]>([]);
-  const [renderForm, setRenderForm] = useState<Category[]>([]);
-  const [renderStaticForm, setRenderStaticForm] = useState<StaticField[]>([]);
+  const [filterData, setFilterData] = useState<any[]>([]);
+  const [renderForm, setRenderForm] = useState<(Category | StaticField)[]>([]);
   const [formData, setFormData] = useState<Record<string, TermOption[]>>({});
   const [loading, setLoading] = useState(true);
   const [showMore, setShowMore] = useState(false);
-  const [showMoreStatic, setShowMoreStatic] = useState(false);
 
   const fetchData = useCallback(
     async (noFilter = true) => {
@@ -89,25 +90,8 @@ export function FilterForm({
       }
 
       const categories = data?.framework?.categories ?? [];
-      const transformedCategories = transformCategories(categories);
       const transformedRenderForm = transformRenderForm(categories);
-      const defaults: Record<string, TermOption[]> = {};
-
-      transformedRenderForm.forEach((c) => {
-        if (c.options.length === 1) {
-          defaults[c.code] = [c.options[0]];
-        }
-      });
-
-      setFilterData(convertToStructuredArray(transformedCategories));
-      setRenderForm(transformedRenderForm);
-
-      if (noFilter) {
-        // merge orginalFormData
-        const mergedData = { ...orginalFormData };
-        setFormData(mergedData);
-      }
-
+      // Fetch static filter content
       const instantFramework = localStorage.getItem('channelId') ?? '';
       const staticResp = await staticFilterContent({ instantFramework });
       const props =
@@ -117,15 +101,27 @@ export function FilterForm({
         props,
         transformedRenderForm.map((r) => r.name)
       );
-      const fields = filtered[0]?.fields
-        ? filtered[0]?.fields.filter(
-            (e: any) => !['Primary User', 'Target Age group'].includes(e.name)
-          )
-        : [];
-      setRenderStaticForm(fields);
+
+      const sortFields = sortJsonByArray({
+        jsonArray: [...transformedRenderForm, ...(filtered[0]?.fields ?? [])],
+        nameArray: onlyFields,
+      });
+      setFilterData(sortFields);
+
+      if (noFilter) {
+        const mergedData = { ...orginalFormData, ...staticFilter };
+        const { updatedFilters: dormNewData, updatedFilterValue } =
+          replaceOptionsWithAssoc({
+            filterValue: mergedData,
+            filtersFields: sortFields,
+          });
+        setFormData(updatedFilterValue);
+        setRenderForm(dormNewData);
+      }
+
       setLoading(false);
     },
-    [orginalFormData, filterFramework]
+    [orginalFormData, staticFilter, onlyFields, filterFramework]
   );
 
   useEffect(() => {
@@ -137,76 +133,32 @@ export function FilterForm({
     onApply?.({ ...formattedPayload, ...staticFilter });
   };
 
-  const replaceOptionsWithAssoc = ({
-    category,
-    index,
-    newCategoryData,
-  }: {
-    category: string;
-    index: number;
-    newCategoryData: TermOption[];
-  }) => {
-    if (newCategoryData.length === 0 && index === 1) {
-      fetchData(false);
-      return;
-    }
-    const pruned = findAndRemoveIndexes(index, renderForm);
-    const updated = updateRenderFormWithAssociations(
-      category,
-      newCategoryData,
-      filterData,
-      pruned
-    );
-    setRenderForm(updated);
-  };
-
   return (
     <Loader isLoading={loading}>
       <Box display="flex" flexDirection="column" gap={2}>
-        <Box>
-          {/* <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 500,
-              fontSize: '16px',
-              my: 2,
-            }}
-          >
-            {t('LEARNER_APP.other_filters')}
-          </Typography> */}
-
-          <FilterSection
-            isShowStaticFilterValue={isShowStaticFilterValue}
-            isOpenColapsed={isOpenColapsed}
-            staticFormData={staticFilter}
-            fields={renderStaticForm}
-            selectedValues={formData}
-            onChange={(code, next) => {
-              setFormData((prev) => ({ ...prev, [code]: next }));
-            }}
-            showMore={showMoreStatic}
-            setShowMore={setShowMoreStatic}
-          />
-        </Box>
         <FilterSection
           isShowStaticFilterValue={isShowStaticFilterValue}
           isOpenColapsed={isOpenColapsed}
           staticFormData={staticFilter}
-          repleaseCode="se_{code}s"
           fields={renderForm}
           selectedValues={formData}
           onChange={(code, next) => {
-            const cat = renderForm.find(
-              (f) => 'se_{code}s'.replace('{code}', f.code) === code
+            const cat: any = renderForm.find(
+              (f: { code: string; old_code?: string }) =>
+                f.code === code &&
+                Object.prototype.hasOwnProperty.call(f, 'old_code')
             );
-            setFormData((prev) => ({ ...prev, [code]: next }));
+            let filterValue = { ...formData, [code]: next };
             if (cat) {
-              replaceOptionsWithAssoc({
-                category: code,
-                index: cat.index,
-                newCategoryData: next,
-              });
+              const { updatedFilters: dormNewData, updatedFilterValue } =
+                replaceOptionsWithAssoc({
+                  filterValue,
+                  filtersFields: filterData,
+                });
+              filterValue = updatedFilterValue;
+              setRenderForm(dormNewData);
             }
+            setFormData(filterValue);
           }}
           showMore={showMore}
           setShowMore={setShowMore}
@@ -217,7 +169,7 @@ export function FilterForm({
             sx={{ width: '50%' }}
             onClick={handleFilter}
           >
-            {t('Filter')}
+            <SpeakableText>{t('Filter')}</SpeakableText>
           </MuiButton>
         </Box>
       </Box>
@@ -240,19 +192,11 @@ const formatPayload = (payload: any) => {
   return formattedPayload;
 };
 
-function convertToStructuredArray(obj: Record<string, any>) {
-  return Object.keys(obj).map((key) => ({
-    [key]: {
-      name: obj[key].name,
-      code: obj[key].code,
-      options: obj[key].options,
-    },
-  }));
-}
-
 function filterObjectsWithSourceCategory(data: any[], filteredNames: string[]) {
   const filtered = data.filter((section) =>
-    section.fields?.some((f: any) => f.hasOwnProperty('sourceCategory'))
+    section.fields?.some((f: any) =>
+      Object.prototype.hasOwnProperty.call(f, 'sourceCategory')
+    )
   );
   return filtered.map((cat) => ({
     ...cat,
@@ -260,44 +204,13 @@ function filterObjectsWithSourceCategory(data: any[], filteredNames: string[]) {
   }));
 }
 
-export function transformCategories(categories: any[]) {
-  return categories
-    .sort((a, b) => a.index - b.index)
-    .reduce((acc: any, category: any) => {
-      acc[category.code] = {
-        name: category.name,
-        code: category.code,
-        index: category.index,
-        options: category.terms
-          .sort((a: any, b: any) => a.index - b.index)
-          .map((term: any) => {
-            const grouped =
-              term.associations?.reduce((g: any, assoc: any) => {
-                g[assoc.category] = g[assoc.category] || [];
-                g[assoc.category].push(assoc);
-                return g;
-              }, {}) || {};
-            Object.keys(grouped).forEach((k) =>
-              grouped[k].sort((a: any, b: any) => a.index - b.index)
-            );
-            return {
-              code: term.code,
-              name: term.name,
-              identifier: term.identifier,
-              associations: grouped,
-            };
-          }),
-      };
-      return acc;
-    }, {});
-}
-
 export function transformRenderForm(categories: any[]) {
   return categories
     .sort((a, b) => a.index - b.index)
     .map((category) => ({
       name: category.name,
-      code: category.code,
+      code: `se_${category.code}s`,
+      old_code: category.code,
       options: category.terms
         .sort((a: any, b: any) => a.index - b.index)
         .map((term: any) => ({
@@ -315,40 +228,60 @@ export function transformRenderForm(categories: any[]) {
     }));
 }
 
-function findAndRemoveIndexes(index: number, form: Category[]) {
-  return form.map((item) => ({
-    ...item,
-    options: item.index > index ? [] : item.options,
-  }));
-}
+function replaceOptionsWithAssoc({
+  filtersFields,
+  filterValue,
+}: {
+  filtersFields: any[];
+  filterValue: Record<string, TermOption[]>;
+}) {
+  const updatedFilters = JSON.parse(JSON.stringify(filtersFields));
 
-function updateRenderFormWithAssociations(
-  category: string,
-  newData: TermOption[],
-  baseFilter: any[],
-  currentForm: Category[]
-) {
-  const catName = category.replace(/(^se_)|(s$)/g, '');
-  const obj = baseFilter.find((f: any) => f[category] ?? f[catName]);
-  if (!obj) return currentForm;
-  const toPush: Record<string, any[]> = {};
-
-  newData.forEach((opt) => {
-    const associations =
-      opt.associations ??
-      obj[catName]?.options?.find((e: any) => e.code == opt.code)?.associations;
-    return Object.entries(associations ?? {}).forEach(([k, arr]: any) => {
-      toPush[k] = toPush[k] ?? [];
-      arr?.forEach((item: any) => {
-        if (!toPush[k].some((o) => o.code === item.code)) toPush[k].push(item);
+  for (let i = 0; i < updatedFilters.length; i++) {
+    const currentFilter = filtersFields[i];
+    const selectedValues = filterValue[currentFilter.code];
+    if (Array.isArray(selectedValues) && selectedValues.length > 0) {
+      const newfilterValue = selectedValues.map(
+        (item: any) => item.code ?? item
+      );
+      const selectedOptions = currentFilter?.options?.filter(
+        (opt: any) =>
+          newfilterValue.includes(opt.code) || newfilterValue.includes(opt.name)
+      );
+      const mergedAssociations: Record<string, any[]> = {};
+      selectedOptions?.forEach((opt: any) => {
+        if (opt.associations) {
+          Object.entries(opt.associations).forEach(
+            ([assocKey, assocOptions]: any) => {
+              if (!mergedAssociations[assocKey]) {
+                mergedAssociations[assocKey] = [];
+              }
+              assocOptions.forEach((assocOpt: any) => {
+                if (
+                  !mergedAssociations[assocKey].some(
+                    (o) => o.code === assocOpt.code
+                  )
+                ) {
+                  mergedAssociations[assocKey].push(assocOpt);
+                }
+              });
+            }
+          );
+        }
       });
-    });
-  });
 
-  return currentForm.map((item) => ({
-    ...item,
-    options: toPush[item.code]?.length ? toPush[item.code] : item.options,
-  }));
+      Object.entries(mergedAssociations).forEach(([assocKey, assocOptions]) => {
+        const nextFilterIndex = updatedFilters.findIndex(
+          (f: any, idx: number) => f.old_code === assocKey && idx > i
+        );
+        if (nextFilterIndex !== -1) {
+          updatedFilters[nextFilterIndex].options = assocOptions;
+        }
+      });
+    }
+  }
+
+  return { updatedFilters, updatedFilterValue: filterValue };
 }
 
 const FilterSection: React.FC<FilterSectionProps> = ({
@@ -358,17 +291,14 @@ const FilterSection: React.FC<FilterSectionProps> = ({
   onChange,
   showMore,
   setShowMore,
-  repleaseCode,
   isShowStaticFilterValue,
   isOpenColapsed,
 }) => {
   return (
     <Box>
-      {fields.map((field, idx) => {
+      {fields?.map((field, idx) => {
         const values = field.options ?? field.range ?? [];
-        const code = repleaseCode
-          ? repleaseCode.replace('{code}', field.code)
-          : field.code;
+        const code = field.code;
         const selected = selectedValues[code] ?? [];
         const optionsToShow = showMore ? values : values.slice(0, 3);
         const staticValues = Array.isArray(staticFormData?.[code])
@@ -390,9 +320,12 @@ const FilterSection: React.FC<FilterSectionProps> = ({
               }}
             >
               <Typography
-                sx={{ fontSize: '18px', fontWeight: '500', color: '#181D27' }}
+                /* @ts-ignore */
+                variant="body5"
+                component="div"
+                sx={{ fontWeight: '500', color: '#181D27' }}
               >
-                {field.name}
+                <SpeakableText>{field.name}</SpeakableText>
               </Typography>
               {staticValues.map((item: any, idx: number) => (
                 <Chip
@@ -406,7 +339,11 @@ const FilterSection: React.FC<FilterSectionProps> = ({
         } else {
           return (
             <Accordion
-              defaultExpanded={isOpenColapsed}
+              defaultExpanded={
+                Array.isArray(isOpenColapsed)
+                  ? isOpenColapsed.includes(code)
+                  : isOpenColapsed
+              }
               key={code}
               sx={{ background: 'unset', boxShadow: 'unset' }}
             >
@@ -423,9 +360,14 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                 }}
               >
                 <Typography
-                  sx={{ fontSize: '18px', fontWeight: '500', color: '#181D27' }}
+                  /* @ts-ignore */
+                  variant="body5"
+                  component="div"
+                  sx={{ fontWeight: '500', color: '#181D27' }}
                 >
-                  {field.name === 'Sub Domain' ? '' : field.name}
+                  <SpeakableText>
+                    {field.name === 'Sub Domain' ? '' : field.name}
+                  </SpeakableText>
                 </Typography>
               </AccordionSummary>
               <AccordionDetails
@@ -461,7 +403,9 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                             }}
                           />
                         }
-                        label={item.name ?? item}
+                        label={
+                          <SpeakableText>{item.name ?? item}</SpeakableText>
+                        }
                         sx={{
                           color: '#414651',
                           fontSize: '14px',
