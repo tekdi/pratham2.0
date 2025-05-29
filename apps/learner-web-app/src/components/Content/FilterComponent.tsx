@@ -7,7 +7,16 @@ const FilterComponent: React.FC<{
   filterFramework?: any;
   staticFilter?: Record<string, object>;
   handleFilterChange: (newFilterState: any) => void;
-}> = ({ filterState, staticFilter, filterFramework, handleFilterChange }) => {
+  onlyFields?: string[];
+  isOpenColapsed?: boolean | any[];
+}> = ({
+  filterState,
+  staticFilter,
+  filterFramework,
+  handleFilterChange,
+  onlyFields,
+  isOpenColapsed,
+}) => {
   const { t } = useTranslation();
   const [filterCount, setFilterCount] = useState<any>();
 
@@ -34,13 +43,21 @@ const FilterComponent: React.FC<{
           );
           handleFilterChange(newFilterState);
         }}
-        isOpenColapsed
+        onlyFields={onlyFields}
+        isOpenColapsed={isOpenColapsed}
         filterFramework={filterFramework}
         orginalFormData={filterState?.filters ?? {}}
         staticFilter={staticFilter}
       />
     ),
-    [handleFilterChange, filterFramework, staticFilter, filterState]
+    [
+      handleFilterChange,
+      filterFramework,
+      isOpenColapsed,
+      staticFilter,
+      onlyFields,
+      filterState,
+    ]
   );
 
   return (
@@ -60,10 +77,9 @@ const FilterComponent: React.FC<{
         }}
       >
         <Typography
-          variant="h6"
+          variant="h2"
           sx={{
             fontWeight: 500,
-            fontSize: '16px',
           }}
         >
           {t('LEARNER_APP.COURSE.FILTER_BY')}{' '}

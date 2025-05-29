@@ -12,6 +12,7 @@ import { Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 
 const slides = [
   {
@@ -63,7 +64,8 @@ const MoreWayCarousel = () => {
                 >
                   <Box sx={{ padding: '56px 40px 20px 40px' }}>
                     <Typography
-                      variant="h6"
+                      variant="body8"
+                      component="h6"
                       sx={{
                         fontFamily: 'Poppins',
                         fontWeight: 600,
@@ -73,19 +75,20 @@ const MoreWayCarousel = () => {
                         lineHeight: '32px',
                       }}
                     >
-                      {slide.title}
+                      <SpeakableText>{slide.title}</SpeakableText>
                     </Typography>
                     <Typography
+                      variant="h2"
                       sx={{
                         fontFamily: 'Poppins',
                         fontWeight: 400,
-                        fontSize: 16,
-                        lineHeight: '24px',
+                        // fontSize: 16,
+                        // lineHeight: '24px',
                         color: '#1F1B13',
                         mt: 2,
                       }}
                     >
-                      {slide.description}
+                      <SpeakableText>{slide.description}</SpeakableText>
                     </Typography>
                   </Box>
 
@@ -117,7 +120,7 @@ const MoreWayCarousel = () => {
                         letterSpacing: 0.15,
                       }}
                     >
-                      Get it from Play Store Now!
+                      <SpeakableText>Get it from Play Store Now!</SpeakableText>
                     </Button>
                   </Box>
                 </Box>
@@ -180,7 +183,7 @@ const MoreWayCarousel = () => {
                         },
                       }}
                     >
-                      Get it from Play Store Now!
+                      <SpeakableText>Get it from Play Store Now!</SpeakableText>
                     </Button>
                   </Box>
                 </Box>

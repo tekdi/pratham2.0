@@ -101,12 +101,11 @@ const MyComponent: React.FC = () => {
             }}
           >
             <Typography
-              variant="h4"
+              variant="body1"
+              component="h2"
               gutterBottom
               sx={{
                 fontWeight: 500,
-                fontSize: 16,
-                lineHeight: '24px',
                 color: '#1F1B13',
                 textTransform: 'capitalize',
               }}
@@ -142,6 +141,12 @@ const MyComponent: React.FC = () => {
             <LearnerCourse
               title={'LEARNER_APP.COURSE.GET_STARTED'}
               _content={{
+                onlyFields: ['contentLanguage', 'se_subDomains', 'se_subjects'],
+                isOpenColapsed: [
+                  'contentLanguage',
+                  'se_subDomains',
+                  'se_subjects',
+                ],
                 staticFilter: {
                   se_domains:
                     typeof filter.filters?.domain === 'string'

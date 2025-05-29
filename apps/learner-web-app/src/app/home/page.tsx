@@ -13,7 +13,6 @@ const HomePage = () => {
       overflow="hidden"
     >
       <Header />
-      
     </Box>
   );
 };

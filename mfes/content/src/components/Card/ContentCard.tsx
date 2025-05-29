@@ -92,7 +92,7 @@ const CardWrap = ({
           position: 'absolute',
           top: -8,
           zIndex: 0,
-          width: _card?.sx.width ?? '100%',
+          width: _card?.sx?.width ?? '100%',
           px: 2,
         }}
       >
@@ -111,7 +111,7 @@ const CardWrap = ({
           position: 'absolute',
           top: -4,
           zIndex: 0,
-          width: _card?.sx.width ?? '100%',
+          width: _card?.sx?.width ?? '100%',
           px: 1,
         }}
       >
@@ -125,7 +125,9 @@ const CardWrap = ({
           }}
         />
       </Box>
-      <Box sx={{ zIndex: 1, width: _card?.sx.width ?? '100%' }}>{children}</Box>
+      <Box sx={{ zIndex: 1, width: _card?.sx?.width ?? '100%' }}>
+        {children}
+      </Box>
     </Box>
   );
 };

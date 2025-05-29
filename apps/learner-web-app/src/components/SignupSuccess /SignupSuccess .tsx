@@ -22,11 +22,12 @@ const SignupSuccess = () => {
       />
 
       <Typography
+        variant="h1"
         sx={{
           fontWeight: 400,
-          fontSize: '22px',
-          lineHeight: '28px',
-          letterSpacing: '0px',
+          // fontSize: '22px',
+          // lineHeight: '28px',
+          // letterSpacing: '0px',
           textAlign: 'center',
           verticalAlign: 'middle',
           mb: 3,
@@ -35,10 +36,11 @@ const SignupSuccess = () => {
         Hurray!
       </Typography>
       <Typography
+        variant="h1"
         sx={{
           fontWeight: 200,
-          fontSize: '22px',
-          lineHeight: '28px',
+          // fontSize: '22px',
+          // lineHeight: '28px',
           letterSpacing: '0px',
           textAlign: 'center',
           verticalAlign: 'middle',
