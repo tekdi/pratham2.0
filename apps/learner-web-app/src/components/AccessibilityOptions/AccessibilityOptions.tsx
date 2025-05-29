@@ -305,22 +305,7 @@ export default function AccessibilityOptions() {
               >
                 <Typography variant="subtitle1">Underline Links</Typography>
               </Button>
-
-              <Button
-                variant="outlined"
-                color="primary"
-                startIcon={<MicIcon />}
-                sx={{
-                  flex: 1,
-                  justifyContent: 'flex-start',
-                  py: 1.5,
-                  borderRadius: 2,
-                  // bgcolor: '#FFBF00',
-                  border: '1px solid #CDC5BD',
-                }}
-              >
-                <Typography variant="subtitle1">Speech to Text</Typography>
-              </Button>
+              <Box sx={{ flex: 1 }} />
             </Stack>
           </Stack>
 
