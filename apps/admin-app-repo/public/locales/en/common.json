@@ -160,7 +160,8 @@
     "NOT_ABLE_CREATE_LEARNER": "Not Able To Create Learner",
     "NO_CONTENT_CREATOR_FOUND": "No Content Creator (SCTA) Found",
     "NO_CONTENT_REVIEWER_FOUND": "No Content Reviewer (CCTA) Found",
-    "NO_STATE_LEAD_FOUND": "No State Lead Found"
+    "NO_STATE_LEAD_FOUND": "No State Lead Found",
+    "FAQS": "FAQs"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",

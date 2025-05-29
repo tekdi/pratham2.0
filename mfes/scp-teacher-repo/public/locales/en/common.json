@@ -178,7 +178,8 @@
     "NEW_BATCH": "New Batch",
     "REASSIGN_BATCH": "Re-assign Batch",
     "NOT_ABLE_UPDATE_FACILITATOR": "Not Able To Update Facilitator",
-    "HI": "Hi, {{name}}"
+    "HI": "Hi, {{name}}",
+    "FAQS": "FAQs"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
