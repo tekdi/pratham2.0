@@ -95,7 +95,7 @@ export const Footer: React.FC = () => {
           <Grid container direction="column" spacing={4}>
             <Grid item>
               <Typography
-                variant="body1"
+                variant="h1"
                 component="h3"
                 sx={{ fontWeight: 600, color: '#1F1B13' }}
               >
@@ -127,7 +127,7 @@ export const Footer: React.FC = () => {
           <Grid container direction="column" spacing={4}>
             <Grid item>
               <Typography
-                variant="body1"
+                variant="h1"
                 component="h3"
                 sx={{
                   fontWeight: 600,
