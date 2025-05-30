@@ -206,7 +206,9 @@ const Brand = () => {
         height={32}
       />
       <Image
-        src="/images/pradigi.png"
+        src={
+          isColorInverted ? '/images/pradigi-white.png' : '/images/pradigi.png'
+        }
         alt="Pradigi"
         width={94}
         height={32}
