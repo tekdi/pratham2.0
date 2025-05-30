@@ -29,7 +29,7 @@ const ContentCard = ({
             ? item?.posterImage
             : default_img ?? `${AppConst.BASEPATH}/assests/images/image_ver.png`
         }
-        content={item?.description ? item?.description : ''}
+        content={item?.description ? item?.description : ' '}
         actions={
           type !== 'Course' && (
             <StatusIcon
@@ -54,7 +54,10 @@ const ContentCard = ({
         TrackData={trackData}
         type={type}
         onClick={() => handleCardClick(item)}
-        _card={_card}
+        _card={{
+          _contentText: { sx: { height: '120px' } },
+          ..._card,
+        }}
       />
     </CardWrap>
   );
