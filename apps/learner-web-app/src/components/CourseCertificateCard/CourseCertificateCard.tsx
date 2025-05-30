@@ -32,8 +32,13 @@ const CourseCertificateCard: React.FC<CertificateCardProps> = ({
         boxShadow: 3,
         overflow: 'hidden',
         mb: 3,
+        width: '100%',
         bgcolor: '#fff',
-        width: '231px',
+        maxWidth: '231px',
+        //  width: '231px',
+        //height: '380px', // Ensure consistent height
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
       {/* Image with overlay bar */}
@@ -68,7 +73,6 @@ const CourseCertificateCard: React.FC<CertificateCardProps> = ({
             sx={{
               color: '#00C853',
               fontWeight: 600,
-              // fontSize: 12,
             }}
           >
             Issued certificate on{' '}
@@ -83,25 +87,35 @@ const CourseCertificateCard: React.FC<CertificateCardProps> = ({
         </Box>
       </Box>
 
-      {/* Content */}
-      <CardContent sx={{ padding: 2 }}>
-        <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 1 }}>
-          {title}
-        </Typography>
+      {/* Content with button at bottom */}
+      <CardContent
+        sx={{
+          padding: 2,
+          display: 'flex',
+          flexDirection: 'column',
+          flexGrow: 1,
+        }}
+      >
+        <Box sx={{ flexGrow: 1 }}>
+          <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 1 }}>
+            {title}
+          </Typography>{' '}
+        </Box>
 
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          sx={{
-            mb: 2,
-            display: '-webkit-box',
-            overflow: 'hidden',
-            WebkitBoxOrient: 'vertical',
-            WebkitLineClamp: 2,
-          }}
-        >
-          {description}
-        </Typography>
+        <Box sx={{ flexGrow: 2 }}>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{
+              display: '-webkit-box',
+              overflow: 'hidden',
+              WebkitBoxOrient: 'vertical',
+              WebkitLineClamp: 2,
+            }}
+          >
+            {description}
+          </Typography>
+        </Box>
 
         <Button
           variant="text"
@@ -112,6 +126,8 @@ const CourseCertificateCard: React.FC<CertificateCardProps> = ({
             textTransform: 'none',
             color: '#1976D2',
             pl: 0,
+            mt: 'auto', // Push button to the bottom
+            alignSelf: 'flex-start',
           }}
           endIcon={<ArrowForwardIcon sx={{ fontSize: '18px' }} />}
         >

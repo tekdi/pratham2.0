@@ -70,15 +70,16 @@ const UnitCard = ({
               : default_img ??
                 `${AppConst.BASEPATH}/assests/images/image_ver.png`
           }
-          content={
-            item?.description ? item?.description : 'No description available'
-          }
+          content={item?.description ? item?.description : ''}
           orientation="horizontal"
           item={item}
           TrackData={trackData}
           type={type}
           onClick={() => handleCardClick(item)}
-          _card={_card}
+          _card={{
+            _contentText: { sx: { height: '120px' } },
+            ..._card,
+          }}
         />
       </Box>
     </Box>

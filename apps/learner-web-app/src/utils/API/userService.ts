@@ -20,6 +20,7 @@ export const userCheck = async ({
   mobile,
   email,
   firstName,
+  username,
 }: UserCheckParams): Promise<any> => {
   const apiUrl: string = API_ENDPOINTS.userCheck;
 
@@ -32,6 +33,8 @@ export const userCheck = async ({
       response = await post(apiUrl, { email });
     } else if (mobile && firstName) {
       response = await post(apiUrl, { mobile, email, firstName });
+    } else if (username) {
+      response = await post(apiUrl, { username });
     }
 
     return response?.data;

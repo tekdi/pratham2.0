@@ -44,8 +44,8 @@ interface FilterSectionProps {
   fields: any[];
   selectedValues: Record<string, any[]>;
   onChange: (code: string, next: any[]) => void;
-  showMore: boolean;
-  setShowMore: (b: boolean) => void;
+  showMore: string[];
+  setShowMore: any;
   repleaseCode?: string;
   staticFormData?: Record<string, object>;
   isShowStaticFilterValue?: boolean;
@@ -76,7 +76,7 @@ export function FilterForm({
   const [renderForm, setRenderForm] = useState<(Category | StaticField)[]>([]);
   const [formData, setFormData] = useState<Record<string, TermOption[]>>({});
   const [loading, setLoading] = useState(true);
-  const [showMore, setShowMore] = useState(false);
+  const [showMore, setShowMore] = useState([]);
 
   const fetchData = useCallback(
     async (noFilter = true) => {
@@ -101,19 +101,20 @@ export function FilterForm({
         props,
         transformedRenderForm.map((r) => r.name)
       );
+      const allFields = [
+        ...transformedRenderForm,
+        ...(filtered[0]?.fields ?? []),
+      ];
 
-      const sortFields = sortJsonByArray({
-        jsonArray: [...transformedRenderForm, ...(filtered[0]?.fields ?? [])],
-        nameArray: onlyFields,
-      });
-      setFilterData(sortFields);
+      setFilterData(allFields);
 
       if (noFilter) {
         const mergedData = { ...orginalFormData, ...staticFilter };
         const { updatedFilters: dormNewData, updatedFilterValue } =
           replaceOptionsWithAssoc({
             filterValue: mergedData,
-            filtersFields: sortFields,
+            filtersFields: allFields,
+            onlyFields,
           });
         setFormData(updatedFilterValue);
         setRenderForm(dormNewData);
@@ -154,6 +155,7 @@ export function FilterForm({
                 replaceOptionsWithAssoc({
                   filterValue,
                   filtersFields: filterData,
+                  onlyFields,
                 });
               filterValue = updatedFilterValue;
               setRenderForm(dormNewData);
@@ -231,9 +233,11 @@ export function transformRenderForm(categories: any[]) {
 function replaceOptionsWithAssoc({
   filtersFields,
   filterValue,
+  onlyFields,
 }: {
   filtersFields: any[];
   filterValue: Record<string, TermOption[]>;
+  onlyFields: any;
 }) {
   const updatedFilters = JSON.parse(JSON.stringify(filtersFields));
 
@@ -281,7 +285,12 @@ function replaceOptionsWithAssoc({
     }
   }
 
-  return { updatedFilters, updatedFilterValue: filterValue };
+  const sortFields = sortJsonByArray({
+    jsonArray: updatedFilters,
+    nameArray: onlyFields,
+  });
+
+  return { updatedFilters: sortFields, updatedFilterValue: filterValue };
 }
 
 const FilterSection: React.FC<FilterSectionProps> = ({
@@ -300,7 +309,9 @@ const FilterSection: React.FC<FilterSectionProps> = ({
         const values = field.options ?? field.range ?? [];
         const code = field.code;
         const selected = selectedValues[code] ?? [];
-        const optionsToShow = showMore ? values : values.slice(0, 3);
+        const optionsToShow = showMore.includes(code)
+          ? values
+          : values.slice(0, 3);
         const staticValues = Array.isArray(staticFormData?.[code])
           ? staticFormData[code]
           : [];
@@ -366,7 +377,8 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                   sx={{ fontWeight: '500', color: '#181D27' }}
                 >
                   <SpeakableText>
-                    {field.name === 'Sub Domain' ? '' : field.name}
+                    {field.name === 'Sub Domain' ? 'Category' : field.name}
+                    {/* {field?.options && field?.options?.length} */}
                   </SpeakableText>
                 </Typography>
               </AccordionSummary>
@@ -419,10 +431,16 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                   <Button
                     variant="text"
                     size="small"
-                    onClick={() => setShowMore(!showMore)}
+                    onClick={() =>
+                      setShowMore((prev: string[]) =>
+                        prev.includes(code)
+                          ? prev.filter((c) => c !== code)
+                          : [...prev, code]
+                      )
+                    }
                     sx={{ mt: 0 }}
                   >
-                    {showMore ? 'Show less ▲' : 'Show more ▼'}
+                    {showMore.includes(code) ? 'Show less ▲' : 'Show more ▼'}
                   </Button>
                 )}
               </AccordionDetails>
