@@ -143,7 +143,16 @@ const WelcomeScreen = () => {
               height={44}
             />
             <Box textAlign="center">
-              <Typography fontSize="14px" color="textSecondary">
+              <Typography
+                fontSize="14px"
+                color="textSecondary"
+                sx={{
+                  whiteSpace: 'normal',
+                  wordBreak: 'keep-all', // prevents breaking within words
+                  overflowWrap: 'break-word', // only break long words if needed
+                  textAlign: 'center',
+                }}
+              >
                 Search <b>"Pratham myLearning"</b>
                 <br />
                 on Playstore
