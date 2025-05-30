@@ -101,19 +101,20 @@ export function FilterForm({
         props,
         transformedRenderForm.map((r) => r.name)
       );
+      const allFields = [
+        ...transformedRenderForm,
+        ...(filtered[0]?.fields ?? []),
+      ];
 
-      const sortFields = sortJsonByArray({
-        jsonArray: [...transformedRenderForm, ...(filtered[0]?.fields ?? [])],
-        nameArray: onlyFields,
-      });
-      setFilterData(sortFields);
+      setFilterData(allFields);
 
       if (noFilter) {
         const mergedData = { ...orginalFormData, ...staticFilter };
         const { updatedFilters: dormNewData, updatedFilterValue } =
           replaceOptionsWithAssoc({
             filterValue: mergedData,
-            filtersFields: sortFields,
+            filtersFields: allFields,
+            onlyFields,
           });
         setFormData(updatedFilterValue);
         setRenderForm(dormNewData);
@@ -154,6 +155,7 @@ export function FilterForm({
                 replaceOptionsWithAssoc({
                   filterValue,
                   filtersFields: filterData,
+                  onlyFields,
                 });
               filterValue = updatedFilterValue;
               setRenderForm(dormNewData);
@@ -231,9 +233,11 @@ export function transformRenderForm(categories: any[]) {
 function replaceOptionsWithAssoc({
   filtersFields,
   filterValue,
+  onlyFields,
 }: {
   filtersFields: any[];
   filterValue: Record<string, TermOption[]>;
+  onlyFields: any;
 }) {
   const updatedFilters = JSON.parse(JSON.stringify(filtersFields));
 
@@ -281,7 +285,12 @@ function replaceOptionsWithAssoc({
     }
   }
 
-  return { updatedFilters, updatedFilterValue: filterValue };
+  const sortFields = sortJsonByArray({
+    jsonArray: updatedFilters,
+    nameArray: onlyFields,
+  });
+
+  return { updatedFilters: sortFields, updatedFilterValue: filterValue };
 }
 
 const FilterSection: React.FC<FilterSectionProps> = ({
@@ -367,6 +376,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                 >
                   <SpeakableText>
                     {field.name === 'Sub Domain' ? '' : field.name}
+                    {/* {field?.options && field?.options?.length} */}
                   </SpeakableText>
                 </Typography>
               </AccordionSummary>
