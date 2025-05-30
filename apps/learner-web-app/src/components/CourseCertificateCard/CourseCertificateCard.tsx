@@ -34,7 +34,7 @@ const CourseCertificateCard: React.FC<CertificateCardProps> = ({
         mb: 3,
         bgcolor: '#fff',
         width: '231px',
-        height: '360px', // Ensure consistent height
+        //height: '380px', // Ensure consistent height
         display: 'flex',
         flexDirection: 'column',
       }}
@@ -97,8 +97,10 @@ const CourseCertificateCard: React.FC<CertificateCardProps> = ({
         <Box sx={{ flexGrow: 1 }}>
           <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 1 }}>
             {title}
-          </Typography>
+          </Typography>{' '}
+        </Box>
 
+        <Box sx={{ flexGrow: 2 }}>
           <Typography
             variant="body2"
             color="text.secondary"
@@ -122,7 +124,7 @@ const CourseCertificateCard: React.FC<CertificateCardProps> = ({
             textTransform: 'none',
             color: '#1976D2',
             pl: 0,
-            mt: 2,
+            mt: 'auto', // Push button to the bottom
             alignSelf: 'flex-start',
           }}
           endIcon={<ArrowForwardIcon sx={{ fontSize: '18px' }} />}
