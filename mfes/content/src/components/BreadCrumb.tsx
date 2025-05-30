@@ -5,21 +5,24 @@ import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 const BreadCrumb = ({
   breadCrumbs,
   topic,
+  isShowLastLink,
 }: {
   breadCrumbs: any;
   topic?: string;
+  isShowLastLink?: boolean;
 }) => {
   const theme = useTheme();
 
   return (
     <Breadcrumbs separator="›" aria-label="breadcrumb">
       {breadCrumbs?.map((breadcrumb: any, index: number) =>
-        breadcrumb?.link && index !== breadCrumbs.length - 1 ? (
+        breadcrumb?.link &&
+        (index !== breadCrumbs.length - 1 || isShowLastLink) ? (
           <Button
             key={`${breadcrumb?.name ?? breadcrumb?.label ?? ''} ${index}`}
             variant="text"
             sx={{
-              color: theme.palette.primary.main,
+              color: theme.palette.secondary.main,
             }}
             href={breadcrumb?.link}
             rel="noopener noreferrer"

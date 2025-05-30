@@ -5,7 +5,6 @@ import {
   Box,
   IconButton,
   Button,
-  useTheme,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import React, { useState } from 'react';
@@ -31,7 +30,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
   const { t } = useTranslation();
   const { _infoCard } = _config || {};
   const [openModal, setOpenModal] = useState(false);
-  const theme = useTheme();
+
   return (
     <>
       <Card
@@ -50,7 +49,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
             // objectFit: 'contain',
             ..._infoCard?._cardMedia,
           }}
-          image={item?.appIcon || _infoCard?.default_img}
+          image={item?.posterImage || _infoCard?.default_img}
           alt={item?.name}
         />
         <Box
