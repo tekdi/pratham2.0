@@ -256,6 +256,9 @@ export const theme = createTheme({
             '& .MuiButton-startIcon': {
               marginRight: 0,
             },
+            '& span': {
+              color: '#987100',
+            },
           },
         },
       ],
