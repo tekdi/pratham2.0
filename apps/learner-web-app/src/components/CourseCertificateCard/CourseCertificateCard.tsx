@@ -32,8 +32,10 @@ const CourseCertificateCard: React.FC<CertificateCardProps> = ({
         boxShadow: 3,
         overflow: 'hidden',
         mb: 3,
+        width: '100%',
         bgcolor: '#fff',
-        width: '231px',
+        maxWidth: '231px',
+        //  width: '231px',
         //height: '380px', // Ensure consistent height
         display: 'flex',
         flexDirection: 'column',
