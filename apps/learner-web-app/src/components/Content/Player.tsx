@@ -45,15 +45,15 @@ const App = (props: { userIdLocalstorageName?: string }) => {
             suffix: activeLink ? `?activeLink=${activeLink}` : '',
           },
         ]);
-        setBreadCrumbs(breadcrum);
+        setBreadCrumbs(breadcrum?.slice(0, -1));
       } else {
-        const breadcrum = findCourseUnitPath(
-          response,
-          identifier as string,
-          ['name', 'identifier', 'mimeType'],
-          [{ name: 'Content' }]
-        );
-        setBreadCrumbs(breadcrum);
+        // const breadcrum = findCourseUnitPath(
+        //   response,
+        //   identifier as string,
+        //   ['name', 'identifier', 'mimeType'],
+        //   [{ name: 'Content' }]
+        // );
+        setBreadCrumbs([{ name: 'Content' }]);
       }
     };
     fetch();
@@ -100,7 +100,7 @@ const App = (props: { userIdLocalstorageName?: string }) => {
           >
             <ArrowBackIcon />
           </IconButton>
-          <BreadCrumb breadCrumbs={breadCrumbs} />
+          <BreadCrumb breadCrumbs={breadCrumbs} isShowLastLink />
         </Box>
         <Box
           sx={{

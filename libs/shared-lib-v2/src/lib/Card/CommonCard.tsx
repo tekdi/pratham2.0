@@ -148,7 +148,7 @@ export const CommonCard: React.FC<CommonCardProps> = ({
       <Box sx={{ position: 'relative', width: '100%' }}>
         {image && (
           <CardMedia
-            title={item.identifier}
+            title={title}
             component="img"
             image={image || '/assets/images/default.png'}
             alt={imageAlt || 'Image'}

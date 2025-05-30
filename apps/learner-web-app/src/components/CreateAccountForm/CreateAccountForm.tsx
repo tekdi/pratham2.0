@@ -10,7 +10,7 @@ import {
   Alert,
   Link,
 } from '@mui/material';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import CheckIcon from '@mui/icons-material/Check';
@@ -19,6 +19,7 @@ import face from '../../../public/images/Group 3.png';
 import tip from '../../../public/images/Group.png';
 import { useSearchParams } from 'next/navigation';
 import { showToastMessage } from '../ToastComponent/Toastify';
+import { userCheck } from '@learner/utils/API/userService';
 
 type Props = {
   username: string;
@@ -50,12 +51,36 @@ const CreateAccountForm = ({
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [agree, setAgree] = useState(false);
+  const [usernameError, setUsernameError] = useState('');
   const searchParams = useSearchParams();
   const newAccount = searchParams.get('newAccount');
   //const belowEighteen = newAccount === 'below-18';
   const [isGuardianConfirmed, setIsGuardianConfirmed] = useState(false);
   const togglePassword = () => setShowPassword((prev) => !prev);
   const toggleConfirmPassword = () => setShowConfirm((prev) => !prev);
+
+  const handleUsernameChange = (value: string) => {
+    onUsernameChange(value);
+    setUsernameError('');
+  };
+
+  const handleUsernameBlur = async (value: string) => {
+    if (value) {
+      try {
+        const response = await userCheck({ username: value });
+        const users = response?.result || [];
+        if (users.length > 0) {
+          setUsernameError('Username already exists');
+        } else {
+          setUsernameError('');
+        }
+      } catch (error) {
+        console.error('Error checking username:', error);
+      }
+    } else {
+      setUsernameError('');
+    }
+  };
 
   const validatePassword = (value: string) => {
     return (
@@ -188,10 +213,15 @@ const CreateAccountForm = ({
         <TextField
           label="Username"
           value={username}
-          onChange={(e) => onUsernameChange(e.target.value)}
+          onChange={(e) => handleUsernameChange(e.target.value)}
+          onBlur={(e) => handleUsernameBlur(e.target.value)}
           fullWidth
           margin="normal"
-          helperText="Make it unique! Customise it with your birth date or lucky number"
+          error={!!usernameError}
+          helperText={
+            usernameError ||
+            'Make it unique! Customise it with your birth date or lucky number'
+          }
         />
 
         {/* Password */}
@@ -318,7 +348,8 @@ const CreateAccountForm = ({
             (belowEighteen && !isGuardianConfirmed) ||
             username === '' ||
             password === '' ||
-            confirmPassword === ''
+            confirmPassword === '' ||
+            usernameError !== ''
           }
           sx={{
             backgroundColor: '#FFCB05',

@@ -113,15 +113,19 @@ const SpeakableText: React.FC<SpeakableTextProps> = ({
   };
 
   // Add a title based on browser compatibility
-  const getTitle = () => {
+  const getTitle = (): object => {
     if (!isSupported) {
-      return '';
+      return {};
     } else if (usingFallback) {
-      return '';
+      return {};
     } else if (!isSpeechEnabled) {
-      return '';
+      return {};
     } else {
-      return isSpeaking ? 'Click to stop speaking' : 'Click to hear this text';
+      return {
+        title: isSpeaking
+          ? 'Click to stop speaking'
+          : 'Click to hear this text',
+      };
     }
   };
 
@@ -132,7 +136,7 @@ const SpeakableText: React.FC<SpeakableTextProps> = ({
       onMouseLeave={handleMouseLeave}
       className={className}
       style={speakableStyle}
-      title={getTitle()}
+      {...getTitle()}
       data-speakable="true"
     >
       {children}
