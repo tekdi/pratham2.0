@@ -62,6 +62,8 @@ const EntryContent: React.FC<EntryContentProps> = ({
           );
         }
       } catch (error) {
+        sessionStorage.removeItem('currentEntry');
+
         console.error('Error fetching data', error);
       }
     };
