@@ -47,7 +47,7 @@ const UserProfileCard = () => {
     t('LEARNER_APP.USER_PROFILE_CARD.CHANGE_PASSWORD'),
     t('LEARNER_APP.USER_PROFILE_CARD.PRIVACY_GUIDELINES'),
     t('LEARNER_APP.USER_PROFILE_CARD.CONSENT_FORM'),
-    // t('COMMON.FAQS'),
+    t('COMMON.FAQS'),
   ];
   const isBelow18 = (dob: string): boolean => {
     const birthDate = new Date(dob);
@@ -114,9 +114,9 @@ const UserProfileCard = () => {
     ) {
       window.open('/files/consent_form_above_18_hindi.pdf', '_blank');
     }
-    // } else if (option === t('COMMON.FAQS')) {
-    //   router.push('/faqs');
-    // }
+    else if (option === t('COMMON.FAQS')) {
+      router.push('/faqs');
+    }
 
     setSelectedOption(option);
     setOpen(true);
