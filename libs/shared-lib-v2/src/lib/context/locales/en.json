@@ -30,7 +30,8 @@
     "INPROGRESS": "In-Progress",
     "SURE_LOGOUT": "Are you sure you want to Logout?",
     "LOGOUT": "Logout",
-    "LOADING": "Loading.."
+    "LOADING": "Loading..",
+    "FAQS":"Faqs"
   },
   "LEARNER_APP": {
     "COMPLETE_PROFILE_BANNER": {
