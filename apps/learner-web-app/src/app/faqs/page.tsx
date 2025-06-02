@@ -1,27 +1,23 @@
 'use client'
-import PDFViewerWithLanguage from '@learner/components/PDFViewerWithLanguage/PDFViewerWithLanguage';
 import { useTheme } from '@mui/material/styles';
 import React from 'react';
 import Layout from '@learner/components/Layout';
 import { useTranslation } from '@shared-lib';
+import GoogleDocViewer from '@learner/components/GoogleDocViewer/GoogleDocViewer';
 
 const FAQS = () => {
-  const theme = useTheme<any>();
-  const { t } = useTranslation();
 
 
-  const getPdfUrl = (language: string) => {
-    //temporary add that pdfs
-    return `/files/${
-      language === 'english'
-        ? 'consent_form_above_18_hindi.pdf'
-        : 'consent_form_below_18_hindi.pdf'
-    }`;
-  };
-
+ 
   return (
     <Layout>
-    <PDFViewerWithLanguage getPdfUrl={getPdfUrl} title={t('COMMON.FAQS')} />
+<GoogleDocViewer
+  getDocUrl={(lang: any) =>
+    lang === 'english'
+      ?        'https://docs.google.com/document/d/1GMnA5hF1MFsSOYn7WEJd2-4q6r41g9i4E3zbnQlY-0s/preview'
+:'https://docs.google.com/document/d/1fDAlDHKujB9YcubdsDiYhaOUKJ3TV1CH-w5or_7Z3bk/preview'
+  }
+/>
 
     </Layout>
   );

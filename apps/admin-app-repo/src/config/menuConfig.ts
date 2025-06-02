@@ -211,6 +211,18 @@ export const MENU_CONFIG = {
       link: '/certificate-issuance',
       roles: [Role.ADMIN],
     },
+    faqs: {
+      title: 'FAQs',
+      icon: '/images/live_help.png',
+      link: '/faqs',
+      roles: [
+        Role.ADMIN,
+        Role.CENTRAL_ADMIN,
+        Role.CCTA,
+        Role.SCTA,
+        // Role.CENTRAL_ADMIN, // check
+      ],
+    },
     supportRequest: {
       title: 'Support Request',
       icon: '/images/Support.svg',
