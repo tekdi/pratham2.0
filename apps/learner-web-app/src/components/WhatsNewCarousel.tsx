@@ -14,6 +14,7 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { Grid, useMediaQuery } from '@mui/material';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
+import { useColorInversion } from '../context/ColorInversionContext';
 
 const slides = [
   {
@@ -39,6 +40,7 @@ const slides = [
 
 const WhatsNewCarousel = () => {
   const mediaMD = useMediaQuery('(max-width: 900px)');
+  const { isColorInverted } = useColorInversion();
 
   return (
     <Box
@@ -54,7 +56,7 @@ const WhatsNewCarousel = () => {
             width: 16,
             height: 16,
             borderRadius: '50%',
-            background: '#CDC5BD',
+            background: isColorInverted ? '#1F1B13' : '#CDC5BD',
             display: 'inline-block',
             margin: '0 4px',
             transition: 'background 0.2s',
@@ -205,11 +207,17 @@ const WhatsNewCarousel = () => {
           aria-label="Previous"
           sx={{
             boxShadow: '0px 1px 2px 0px #0000004D',
-            background: '#fff',
+            background: isColorInverted ? '#1F1B13' : '#fff',
             borderRadius: '50%',
+            '&:hover': {
+              background: isColorInverted ? '#2A2520' : '#ffe082',
+            },
           }}
         >
-          <ArrowBackIosNewIcon fontSize="small" sx={{ color: '#1F1B13' }} />
+          <ArrowBackIosNewIcon
+            fontSize="small"
+            sx={{ color: isColorInverted ? '#000' : '#1F1B13' }}
+          />
         </IconButton>
         <Box className="custom-swiper-pagination" />
         <IconButton
@@ -217,11 +225,17 @@ const WhatsNewCarousel = () => {
           aria-label="Next"
           sx={{
             boxShadow: '0px 1px 2px 0px #0000004D',
-            background: '#fff',
+            background: isColorInverted ? '#1F1B13' : '#fff',
             borderRadius: '50%',
+            '&:hover': {
+              background: isColorInverted ? '#2A2520' : '#ffe082',
+            },
           }}
         >
-          <ArrowForwardIosIcon fontSize="small" sx={{ color: '#1F1B13' }} />
+          <ArrowForwardIosIcon
+            fontSize="small"
+            sx={{ color: isColorInverted ? '#000' : '#1F1B13' }}
+          />
         </IconButton>
       </Box>
     </Box>

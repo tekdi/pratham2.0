@@ -163,6 +163,8 @@ const page = () => {
                 lineHeight: '110%',
                 letterSpacing: '0%',
                 color: '#1F1B13',
+                position: 'relative',
+                zIndex: 1000,
                 '@media (min-width: 900px)': {
                   marginLeft: '-120px',
                 },

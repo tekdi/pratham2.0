@@ -17,9 +17,11 @@ import {
 import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
+import { useColorInversion } from '../../context/ColorInversionContext';
 
 export const Footer: React.FC = () => {
   const { t } = useTranslation('footer');
+  const { isColorInverted } = useColorInversion();
 
   const usefulLinks = [
     {
@@ -67,7 +69,11 @@ export const Footer: React.FC = () => {
             <Grid item>
               <Link href="/" passHref legacyBehavior>
                 <Image
-                  src="/images/appLogo.svg"
+                  src={
+                    isColorInverted
+                      ? '/images/PrathamLogowhite.png'
+                      : '/images/appLogo.svg'
+                  }
                   alt="Pratham"
                   width={146}
                   height={32}
