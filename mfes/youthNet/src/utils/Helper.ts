@@ -348,7 +348,6 @@ export const categorizeUsers = (users: any) => {
 
 export const filterSchema = (schemaObj: any) => {
   const locationFields = ['state', 'district', 'block', 'village'];
-
   const extractedFields: any = {};
   locationFields.forEach((field) => {
     if (schemaObj.schema.properties[field]) {
@@ -387,4 +386,24 @@ export const filterSchema = (schemaObj: any) => {
 
   console.log(newSchema);
   return { newSchema, extractedFields };
+};
+
+export const extractVillageIds = (users: any[]): number[] => {
+  const villageIds = users.flatMap((user) =>
+    user.customFields
+      ?.filter((field: any) => field.label === 'VILLAGE')
+      .flatMap(
+        (field: any) => field.selectedValues?.map((val: any) => val.id) || []
+      )
+  );
+
+  return Array.from(new Set(villageIds)); // Remove duplicates
+};
+
+export const filterOutUserVillages = (
+  transformedVillageData: { id: number; name: string }[],
+  userVillageIds: number[]
+): { id: number; name: string }[] => {
+  const userVillageIdSet = new Set(userVillageIds);
+  return transformedVillageData.filter(village => !userVillageIdSet.has(village.id));
 };
