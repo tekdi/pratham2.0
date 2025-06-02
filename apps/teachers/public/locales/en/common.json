@@ -152,7 +152,8 @@
     "LESS_THAN": "Less than {{range}} %",
     "MODIFY_CENTER_ATTENDANCE": "Modify Center Attendance",
     "NO_VILLAGES": "No Villages",
-    "ALL_VILLAGES": "All Villages"
+    "ALL_VILLAGES": "All Villages",
+    "FAQS": "FAQs"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -675,7 +676,6 @@
   "YOUTHNET_DASHBOARD": {
     "VILLAGES_MANAGED_BY_YOU": "Villages Managed by you : {{totalVillageCount}}",
     "VILLAGE_MANAGED_BY_YOU": "Village Managed by you : {{totalVillageCount}}",
-
     "MONTHLY_REGISTRATIONS_OVERVIEW": "Monthly Registrations Overview",
     "CLOSED_ON": "Closed on",
     "ABOVE_18": "Over 18 Registrations",
@@ -683,7 +683,6 @@
     "VLLAGE_18": "Today's New Registrations ",
     "VILLAGES_AND_YOUTH": "Villages and Youth",
     "VILLAGES": "Villages",
-
     "YOUTH_VOLUNTEERS": "Youth/Volunteers",
     "SEARCH_VILLAGES": "Search Villages"
   },
