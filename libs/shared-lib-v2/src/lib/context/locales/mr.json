@@ -1,0 +1,211 @@
+{
+  "LANGUAGE": "भाषा",
+  "ENGLISH": "इंग्रजी",
+  "HINDI": "हिंदी",
+  "MARATHI": "मराठी",
+  "URDU": "उर्दू",
+  "LEARNER_APP": {
+    "COMPLETE_PROFILE_BANNER": {
+      "MESSAGE": "तुमची प्रोफाइल पूर्ण करा जेणेकरून आम्ही तुमच्या शिकण्याच्या प्रवासात चांगले मार्गदर्शन करू शकू",
+      "BUTTON": "प्रोफाइल पूर्ण करा"
+    },
+    "COMMON": {
+      "L1_COURSES": "एल1 अभ्यासक्रम",
+      "EXPLORE": "अन्वेषण करा",
+      "SURVEYS": "सर्वेक्षणे",
+      "PROFILE": "प्रोफाइल",
+      "UNITS": "युनिट्स",
+      "COURSES": "अभ्यासक्रम"
+    },
+    "COURSE": {
+      "GET_STARTED": "एल1 अभ्यासक्रमांसह प्रारंभ करा",
+      "FILTER_BY": "याद्वारे फिल्टर करा"
+    },
+    "EXPLORE": {
+      "EXPLORE_ADDITIONAL_COURSES": "अतिरिक्त अभ्यासक्रमांचे अन्वेषण करा"
+    },
+    "HOME": {
+      "WELCOME_TITLE": "प्रथम मायलर्निंगमध्ये आपले स्वागत आहे!",
+      "WELCOME_SUBTITLE": "तुमचा शिकण्याचा प्रवास येथून सुरू होतो",
+      "SIGN_UP_BUTTON": "आत्ता प्रोग्रामसाठी साइन अप करा!",
+      "ALREADY_SIGNED_UP": "आधीच साइन अप केले आहे?",
+      "LOGIN_LINK": "लॉगिन करण्यासाठी येथे क्लिक करा",
+      "GET_THE_APP": "अॅप मिळवा",
+      "POINT_CAMERA": "तुमचा फोन कॅमेरा येथे रखा",
+      "OR": "किंवा",
+      "SEARCH_PLAYSTORE": "प्लेस्टोअरवर \"प्रथम मायलर्निंग\" शोधा",
+      "ABOUT_PRATHAM_TITLE": "प्रथम बद्दल",
+      "ABOUT_PRATHAM_DESC": "प्रथम वयोगटातील विचारशील, परिणामकारक हस्तक्षेपांसह नाविन्यपूर्ण शैक्षणिक उपाय तयार करते. थेट आणि सरकारी प्रणालींद्वारे काम करताना, हे कार्यक्रम दरवर्षी लाखो मुले आणि तरुणांपर्यंत पोहोचतात. थेट काम दोन ट्रॅकचे अनुसरण करते: प्रथम एकतर शाळेत किंवा समुदायात मुलांसोबत काम करते, तर \"भागीदारी\" मॉडेलमध्ये प्रथमच्या टीमा राज्य, जिल्हा किंवा ब्लॉक स्तरावर सरकारी टीमांसोबत जवळून काम करतात. शिकण्याचे परिणाम विकसित करणे, चाचणी करणे आणि सुधारणे यासाठीची आमची अचल प्रतिबद्धता भारतात आणि त्याबाहेरही एक मॉडेल म्हणून कार्य करत राहते.",
+      "OUR_PROGRAMS": "आमचे कार्यक्रम",
+      "SIGN_UP": "साइन अप"
+    },
+    "LOGIN": {
+      "welcome_title": "प्रथम मायलर्निंगमध्ये आपले स्वागत आहे!",
+      "welcome_subtitle": "तुमचा शिकण्याचा प्रवास येथून सुरू होतो",
+      "welcome_image_alt": "हसत चेहरा",
+      "qr_get_app": "अॅप मिळवा",
+      "qr_instruction": "तुमचा फोन कॅमेरा येथे रखा",
+      "qr_image_alt": "क्यूआर कोड",
+      "or": "किंवा",
+      "playstore_image_alt": "गूगल प्लेवर मिळवा",
+      "playstore_instruction": "प्लेस्टोअरवर \"प्रथम मायलर्निंग\" शोधा",
+      "login_title": "लॉगिन",
+      "username_label": "वापरकर्तानाव",
+      "password_label": "पासवर्ड",
+      "remember_me": "मला आठवा",
+      "forgot_password": "पासवर्ड विसरलात?",
+      "login_button": "लॉगिन",
+      "no_account": "माझे खाते नाही",
+      "make_sure_to_cross_check_the_state_district_block_village": "कृपया राज्य, जिल्हा, ब्लॉक आणि गाव यांची दुहेरी तपासणी करा"
+    },
+    "L_ONE_COURSE": {
+      "IN_PROGRESS_TITLE": "प्रगतीत",
+      "ONGOING_COURSES": "तुमचे {count} चालू अभ्यासक्रम आहेत",
+      "VIEW_ALL_BUTTON": "सर्व पहा"
+    },
+    "L_TWO_COURSE": {
+      "TITLE": "एल2 अभ्यासक्रम",
+      "DESCRIPTION": "तुम्ही आमच्या एल2 अभ्यासक्रमासह तुमचे कौशल्य वाढवू शकता आणि नवीन रोजगाराच्या संधी अनलॉक करू शकता.",
+      "SUB_DESCRIPTION": "आमच्या तज्ञाकडून वैयक्तिक मार्गदर्शन मिळविण्यासाठी तुमची रुची दर्शवा!",
+      "INTEREST_BUTTON": "मला रुची आहे",
+      "SUBMIT_BUTTON": "सबमिट करा",
+      "OKAY_BUTTON": "ठीक आहे"
+    },
+    "LEVEL_UP": {
+      "TITLE": "छान! तुम्हाला लेव्हल अप करण्यात मदत करण्यासाठी आम्ही उत्सुक आहोत!",
+      "SUB_TITLE": "तुम्हाला कोणत्या विषयात सर्वात जास्त रुची आहे?",
+      "TOPICS_PLACEHOLDER": "विषय",
+      "TOPIC_PLUMBING": "प्लंबिंग",
+      "TOPIC_ELECTRICAL": "इलेक्ट्रिकल",
+      "TOPIC_CARPENTRY": "सुतारकाम",
+      "TOPIC_MASONRY": "वस्तुकाम",
+      "TOPIC_PAINTING": "पेंटिंग",
+      "FOOTER_TEXT": "एकदा तुम्ही एखादा अभ्यासक्रम निवडल्यानंतर, आमचा तज्ञ तुमच्याशी अधिक माहितीसह संपर्क साधेल!"
+    },
+    "POS": {
+      "SCHOOL": "शाळा",
+      "WORK": "काम",
+      "LIFE": "जीवन",
+      "PROGRAM": "कार्यक्रम",
+      "ABOUT_US": "आमच्याविषयी",
+      "THEMATIC_REPOSITORY": "थिमेटिक रिपॉजिटरी"
+    },
+    "RESPONSE_RECORDED": {
+      "TITLE": "तुमची प्रतिक्रिया नोंदवली गेली आहे",
+      "SUB_TITLE": "आमचा तज्ञ लवकरच तुमच्याशी संपर्क साधेल",
+      "FOOTER_TEXT": "दरम्यान, अधिक अभ्यासक्रमांचे अन्वेषण करण्यासाठी किंवा तुमचे कौशल्य विकसित करणे सुरू ठेवण्यासाठी मोकळे वाटा!"
+    },
+    "CONTENT": {
+      "DEFAULT_IMAGE_ALT": "डीफॉल्ट अभ्यासक्रम प्रतिमा"
+    },
+    "IN_PROGRESS": {
+      "ALL_COURSES": "सर्व प्रगतीत असलेले अभ्यासक्रम"
+    },
+    "SEARCH_COMPONENT": {
+      "PLACEHOLDER": "सामग्री शोधा..",
+      "Course": "अभ्यासक्रम"
+    },
+    "CONTENT_TABS": {
+      "LOAD_MORE": "अधिक लोड करा",
+      "NO_MORE_DATA": "अधिक डेटा उपलब्ध नाही"
+    },
+    "PLAYER": {
+      "MORE_RELATED_RESOURCES": "अधिक संबंधित संसाधने"
+    },
+    "other_filters": "इतर फिल्टर्स",
+    "USER_PROFILE_CARD": {
+      "MY_PROFILE": "माझी प्रोफाइल",
+      "JOINED_ON": "सामील झाला",
+      "CONTACT_INFORMATION": "संपर्क माहिती",
+      "EMAIL_ADDRESS": "ईमेल पत्ता",
+      "PHONE_NUMBER": "फोन नंबर",
+      "PHONE_BELONGS_TO_YOU": "हा फोन तुमचा आहे का?",
+      "PERSONAL_INFORMATION": "वैयक्तिक माहिती",
+      "GENDER": "लिंग",
+      "DOB": "जन्मतारीख",
+      "MARITAL_STATUS": "वैवाहिक स्थिती",
+      "MOTHER_NAME": "आईचे नाव",
+      "HIGHEST_QUALIFICATION": "सर्वोच्च पात्रता/शेवटची उत्तीर्ण केलेली इयत्ता",
+      "LOCATION": "स्थान",
+      "ASPIRATION_EXPERIENCE": "आकांक्षा आणि अनुभव",
+      "PRIOR_TRAINING": "तुम्ही कोणतेही पूर्व प्रशिक्षण घेतले आहे का?",
+      "CURRENT_WORK": "तुम्ही कधी काम केले आहे किंवा सध्या काम करत आहात का?",
+      "FUTURE_WORK": "तुम्ही काय बनू इच्छिता?",
+      "EDIT_PROFILE": "प्रोफाइल संपादित करा",
+      "CHANGE_USERNAME": "वापरकर्तानाव बदला",
+      "CHANGE_PASSWORD": "पासवर्ड बदला",
+      "PRIVACY_GUIDELINES": "गोपनीयता मार्गदर्शक तत्त्वे",
+      "CONSENT_FORM": "सहमती फॉर्म"
+    },
+    "USERNAME_SUGGESTION": {
+      "USERNAME": "वापरकर्तानाव",
+      "AVAILABLE_USERNAMES": "उपलब्ध वापरकर्तानावे",
+      "CONTINUE": "पुढे जा"
+    },
+    "RESET_PASSWORD_FORM": {
+      "OLD_PASSWORD": "जुने पासवर्ड",
+      "NEW_PASSWORD": "नवीन पासवर्ड",
+      "CONFIRM_NEW_PASSWORD": "नवीन पासवर्डची पुष्टी करा",
+      "RESET_PASSWORD": "पासवर्ड रीसेट करा",
+      "FORGOT_PASSWORD": "पासवर्ड विसरलात?",
+      "FILL_ALL_FIELDS": "कृपया सर्व फील्ड भरा.",
+      "PASSWORDS_MUST_MATCH": "नवीन पासवर्ड आणि पुष्टीकरण पासवर्ड समान असणे आवश्यक आहे."
+    }
+  },
+  "LOGIN_PAGE": {
+    "USERNAME_PASSWORD_NOT_CORRECT": "वापरकर्तानाव किंवा पासवर्ड योग्य नाही",
+    "DEVICE_FINGERPRINT_SUCCESS": "डिव्हाइस फिंगरप्रिंट यशस्वीरित्या व्युत्पन्न केले",
+    "DEVICE_FINGERPRINT_ERROR": "डिव्हाइस फिंगरप्रिंट व्युत्पन्न करताना त्रुटी",
+    "LOADING": "लोड होत आहे..."
+  },
+  "STATE": "राज्य",
+  "DISTRICT": "जिल्हा",
+  "BLOCK": "ब्लॉक",
+  "VILLAGE": "गाव",
+  "first_name": "पहिले नाव",
+  "middle_name": "मधले नाव",
+  "last_name": "आडनाव",
+  "EMAIL": "ईमेल",
+  "phone_number": "फोन नंबर",
+  "dob": "जन्मतारीख",
+  "WHATS_YOUR_GENDER": "तुमचे लिंग काय आहे",
+  "MALE": "पुरुष",
+  "FEMALE": "स्त्री",
+  "TRANSGENDER": "ट्रान्सजेंडर",
+  "MOTHER_NAME": "आईचे नाव",
+  "HIGHEST_EDCATIONAL_QUALIFICATION_OR_LAST_PASSED_GRADE": "सर्वोच्च शैक्षणिक पात्रता किंवा शेवटची उत्तीर्ण केलेली इयत्ता",
+  "MARITAL_STATUS": "वैवाहिक स्थिती",
+  "TYPE_OF_PHONE_AVAILABLE": "उपलब्ध फोनचा प्रकार",
+  "SMARTPHONE": "स्मार्टफोन",
+  "KEYPAD": "कीपॅड",
+  "DOES_THIS_PHONE_BELONG_TO_YOU": "हा फोन तुमचा आहे का",
+  "YES": "होय",
+  "NO": "नाही",
+  "USERNAME": "वापरकर्तानाव",
+  "PASSWORD": "पासवर्ड",
+  "confirm_password": "पासवर्डची पुष्टी करा",
+  "NAME_OF_GUARDIAN": "पालकाचे नाव",
+  "RELATION_WITH_GUARDIAN": "पालकाशी संबंध",
+  "PARENT_GUARDIAN_PHONE_NO": "पालक/पालकाचा फोन नंबर",
+  "PROGRAM": "कार्यक्रम",
+  "SUBMIT": "सबमिट करा",
+  "CONTINUE": "पुढे जा",
+  "UNMARRIED": "अविवाहित",
+  "MARRIED": "विवाहित",
+  "DIVORCED": "घटस्फोटित",
+  "WHAT_DO_YOU_WANT_TO_BECOME": "तुम्ही काय बनू इच्छिता?",
+  "WHAT_IS_YOUR_PREFERRED_MODE_OF_LEARNING": "शिकण्याचा तुमचा प्राधान्यकृत मोड काय आहे?",
+  "REASON_FOR_DROP_OUT_FROM_SCHOOL": "शाळा सोडण्याचे कारण",
+  "ARE_YOU_CURRENTLY_WORKING_IF_YES_CHOOSE_THE_DOMAIN": "तुम्ही सध्या काम करत आहात का? होय असल्यास, डोमेन निवडा",
+  "FORGOT_PASSWORD": {
+    "TITLE": "लॉगिन करताना अडचण?",
+    "SUBTITLE": "काळजी करू नका, आम्ही तुम्हाला तुमच्या खात्यात परत येण्यास मदत करू",
+    "INPUT_LABEL": "वापरकर्तानाव किंवा फोन नंबर प्रविष्ट करा",
+    "BUTTON": "पुढे"
+  },
+  "OTP_VERIFICATION": {
+    "MESSAGE": "आम्ही तुमचा नंबर {{maskedNumber}} सत्यापित करण्यासाठी एक ओटीपी पाठवला आहे",
+    "RESEND_TIMER": "{{timer}} सेकंदात ओटीपी पुन्हा पाठवा",
+    "RESEND": "ओटीपी पुन्हा पाठवा"
+  }
+}

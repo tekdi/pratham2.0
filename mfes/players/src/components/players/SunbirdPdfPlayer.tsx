@@ -1,75 +1,89 @@
-import 'reflect-metadata';
-import React, { useEffect, useRef } from 'react';
-import { getTelemetryEvents, handleExitEvent } from '../utils/Helper';
-import { useRouter } from 'next/router';
+import React, { useRef, useEffect } from 'react';
+import { getTelemetryEvents } from '../../services/TelemetryService';
+import { handleExitEvent } from '../utils/Helper';
 
 interface PlayerConfigProps {
   playerConfig: any;
+  relatedData?: any;
 }
 
-const SunbirdPdfPlayer = ({ playerConfig }: PlayerConfigProps) => {
-  const sunbirdPdfPlayerRef = useRef<HTMLDivElement | null>(null);
-  const router = useRouter();
+const basePath = process.env.NEXT_PUBLIC_ASSETS_CONTENT || '/sbplayer';
+
+const SunbirdPdfPlayer = ({
+  playerConfig,
+  relatedData: { courseId, unitId, userId },
+}: PlayerConfigProps) => {
+  const sunbirdPdfPlayerRef = useRef<HTMLIFrameElement | null>(null);
 
   useEffect(() => {
-    // Dynamically load the Sunbird PDF Player script from CDN
-    const script = document.createElement('script');
-    script.src =
-      'https://cdn.jsdelivr.net/npm/@project-sunbird/sunbird-pdf-player-web-component@1.4.0/sunbird-pdf-player.js';
-    script.async = true;
-    document.body.appendChild(script);
+    const playerElement: any = sunbirdPdfPlayerRef.current;
+    if (playerElement) {
+      const originalSrc = playerElement.src;
+      playerElement.src = '';
+      playerElement.src = originalSrc;
 
-    if (!document.getElementById('sunbird-pdf-player-css')) {
-      const link = document.createElement('link');
-      link.id = 'sunbird-pdf-player-css';
-      link.rel = 'stylesheet';
-      link.href =
-        'https://cdn.jsdelivr.net/npm/@project-sunbird/sunbird-pdf-player-web-component@1.4.0/styles.css';
-      document.head.appendChild(link);
+      const handleLoad = () => {
+        setTimeout(() => {
+          if (
+            playerElement.contentWindow &&
+            playerElement.contentWindow.setData
+          ) {
+            // playerElement.contentWindow.setData(playerConfig);
+            const pdfElement = document.createElement('sunbird-pdf-player');
+            pdfElement.setAttribute(
+              'player-config',
+              JSON.stringify(playerConfig)
+            );
+            pdfElement.addEventListener('playerEvent', (event: any) => {
+              if (event?.detail?.edata?.type === 'EXIT') {
+                event.preventDefault();
+                handleExitEvent();
+              }
+            });
+            pdfElement.addEventListener(
+              'telemetryEvent',
+              async (event: any) => {
+                console.log('On telemetryEvent', event);
+                try {
+                  await getTelemetryEvents(event.detail, 'pdf', {
+                    courseId,
+                    unitId,
+                    userId,
+                  });
+                } catch (error) {
+                  console.error('Error submitting assessment:', error);
+                }
+              }
+            );
+
+            const myPlayer =
+              playerElement.contentDocument.getElementById('my-player');
+            if (myPlayer) {
+              myPlayer.appendChild(pdfElement);
+            }
+          }
+        }, 200);
+      };
+
+      playerElement.addEventListener('load', handleLoad);
+
+      return () => {
+        playerElement.removeEventListener('load', handleLoad);
+      };
     }
-    const playerElement = sunbirdPdfPlayerRef.current;
-
-    const handlePlayerEvent = (event: any) => {
-      console.log('Player Event', event.detail);
-      if (event?.detail?.edata?.type === 'EXIT') {
-        // handleExitEvent();
-        event.preventDefault();
-        router.back()
-      }
-    };
-    const handleTelemetryEvent = (event: any) => {
-      console.log('Telemetry Event', event.detail);
-      getTelemetryEvents(event.detail, 'pdf');
-    };
-
-    // Ensure the script has loaded before adding event listeners
-    script.onload = () => {
-      playerElement?.addEventListener('playerEvent', handlePlayerEvent);
-      playerElement?.addEventListener('telemetryEvent', handleTelemetryEvent);
-    };
-
-    return () => {
-      playerElement?.removeEventListener('playerEvent', handlePlayerEvent);
-      playerElement?.removeEventListener(
-        'telemetryEvent',
-        handleTelemetryEvent
-      );
-      document.body.removeChild(script);
-      const pdfPlayerCss = document.getElementById('sunbird-pdf-player-css');
-      if (pdfPlayerCss) document.head.removeChild(pdfPlayerCss);
-    };
-  }, []);
+  }, [playerConfig]);
 
   return (
-    <div className="player-grid" style={{ height: '100vh' }}>
-      {/* @ts-ignore */}
-      <sunbird-pdf-player
-        player-config={JSON.stringify(playerConfig)}
-        ref={sunbirdPdfPlayerRef}
-      >
-        {/* @ts-ignore */}
-      </sunbird-pdf-player>
-    </div>
+    <iframe
+      ref={sunbirdPdfPlayerRef}
+      id="contentPlayer"
+      title="Content Player"
+      src={`${basePath}/libs/sunbird-pdf-player/index.html`}
+      aria-label="Content Player"
+      style={{ border: 'none' }}
+      width={'100%'}
+      height={'100%'}
+    ></iframe>
   );
 };
 

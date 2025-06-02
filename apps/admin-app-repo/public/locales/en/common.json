@@ -769,6 +769,9 @@
   "REGULAR": "Regular",
   "REMOTE": "Remote",
   "IS_VOLUNTEER": "Is Volunteer",
+  "SKILLING_CENTER_IMAGE": "Sklling Center Image",
+  "INDUSTRY": "Industry",
+  "GOOGLE_MAP_LINK": "Google Map Link",
   "YOUTH": {
     "UPDATE_YOUTH": "Update Youth",
     "NEW_YOUTH": "New Youth",

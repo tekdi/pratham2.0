@@ -831,7 +831,8 @@
     "DISTRICTS": "Districts",
     "ASSIGN_VILLAGES_FINISH": "You can complete this later at your own pace. However, the villages will only be assigned once you click on ‘Finish.’",
     "ASSIGN_VILLAGES_FROM_BLOCKS": "Assign Villages from Blocks",
-    "BACK_TO_FORM": "Back to form"
+    "BACK_TO_FORM": "Back to form",
+    "SELECTED_VILLAGE_COUNT": "Selected village count : {{totalVillageCount}}"
   },
   "UNIT_NAME": "Unit Name",
   "TYPE_OF_CENTER": "Type Of Center",

@@ -296,8 +296,7 @@ const Index = () => {
                 isNew: isToday,
                 age: getAge(user?.dob),
                 showMore: true,
-                isVolunteer:
-                  isVolunteer?.selectedValues[0] || VolunteerField?.NO,
+                isVolunteer: isVolunteer?.selectedValues || VolunteerField?.NO,
               };
             }
           );
