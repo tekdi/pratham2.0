@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/router';
+import { useParams } from 'next/navigation';
 import {
   fetchContent,
   getHierarchy,
@@ -28,8 +28,8 @@ const Players: React.FC<SunbirdPlayerProps> = ({
   identifier: propIdentifier,
   playerConfig: propPlayerConfig,
 }) => {
-  const router = useRouter();
-  const queryIdentifier = router.query.identifier as string; // Get identifier from the query
+  const params = useParams();
+  const queryIdentifier = params?.identifier; // string | string[] | undefined
   const identifier = propIdentifier || queryIdentifier; // Prefer prop over query
   const [playerConfig, setPlayerConfig] = useState<PlayerConfig | undefined>(
     propPlayerConfig
@@ -52,7 +52,7 @@ const Players: React.FC<SunbirdPlayerProps> = ({
           const metadata = { ...Q1?.questionset, ...Q2?.questionset };
           config.metadata = metadata;
         } else if (MIME_TYPE.INTERACTIVE_MIME_TYPE.includes(data?.mimeType)) {
-          config = { ...V1PlayerConfig, metadata: data };
+          config = { ...V1PlayerConfig, metadata: data, data: data.body || {} };
           //@ts-ignore
           config.context['contentId'] = identifier;
         } else {
@@ -60,7 +60,6 @@ const Players: React.FC<SunbirdPlayerProps> = ({
           //@ts-ignore
           config.context['contentId'] = identifier;
         }
-
         setPlayerConfig(config);
       } catch (error) {
         console.error('Error loading content:', error);
@@ -97,7 +96,7 @@ const Players: React.FC<SunbirdPlayerProps> = ({
           <Loader showBackdrop={false} />
         </Box>
       ) : (
-        <Box marginTop="1rem" px="14px">
+        <Box height="100vh" width="100%" p="14px">
           {/* <Typography
             color="#024f9d"
             sx={{ padding: '0 0 4px 4px', fontWeight: 'bold' }}
