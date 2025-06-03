@@ -179,7 +179,7 @@
     "REASSIGN_BATCH": "Re-assign Batch",
     "NOT_ABLE_UPDATE_FACILITATOR": "Not Able To Update Facilitator",
     "HI": "Hi, {{name}}",
-    "FAQS": "FAQs"
+    "FAQS": "FAQ's"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",

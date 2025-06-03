@@ -1,14 +1,22 @@
-import { Box, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+'use client';
+import {
+  Box,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Typography,
+} from '@mui/material';
 import React, { useState } from 'react';
 
-interface PDFViewerWithLanguageProps {
-  getPdfUrl: (language: string) => string;
+interface GoogleDocViewerProps {
+  getDocUrl: (language: string) => string;
   title?: string;
 }
 
-const PDFViewerWithLanguage: React.FC<PDFViewerWithLanguageProps> = ({
-  getPdfUrl,
-  title = 'FAQs',
+const GoogleDocViewer: React.FC<GoogleDocViewerProps> = ({
+  getDocUrl,
+  title = `FAQ's`,
 }) => {
   const [selectedLanguage, setSelectedLanguage] = useState('english');
 
@@ -16,55 +24,54 @@ const PDFViewerWithLanguage: React.FC<PDFViewerWithLanguageProps> = ({
     setSelectedLanguage(event.target.value);
   };
 
+  const docUrl = getDocUrl(selectedLanguage);
+
   return (
-    <Box sx={{ position: 'relative', px: '16px' }}>
-      <Box
-        sx={{
-          color: 'warning.A200',
-          fontSize: '22px',
-          fontWeight: '400',
-          mt: 3,
-          mb: 2,
-        }}
+    <Box sx={{ position: 'relative', px: 2 }}>
+      {/* Title */}
+      <Typography
+        variant="h2"
+        sx={{ color: 'warning.A200', fontWeight: 500, mt: 3, mb: 2 }}
       >
         {title}
-      </Box>
+      </Typography>
+
+      {/* Language Selector */}
       <Box
         sx={{
           position: 'fixed',
-          top: '80px',
-          right: '32px',
-          zIndex: 9999,
-          backgroundColor: 'white',
-          padding: '4px',
-          borderRadius: '4px',
+          top: 80,
+          right: 24,
+          mt: '20px',
         }}
       >
-        <FormControl>
+        <FormControl size="small">
           <InputLabel id="language-select-label">Select Language</InputLabel>
           <Select
             labelId="language-select-label"
-            id="language-select"
             value={selectedLanguage}
             label="Select Language"
             onChange={handleLanguageChange}
-            sx={{ minWidth: '150px' }}
+            sx={{ minWidth: 140 }}
           >
             <MenuItem value="english">English</MenuItem>
             <MenuItem value="hindi">Hindi</MenuItem>
           </Select>
         </FormControl>
       </Box>
+
+      {/* Embedded Google Doc */}
       <Box
         sx={{
           height: 'calc(100vh - 200px)',
           display: 'flex',
           justifyContent: 'center',
+          alignItems: 'center',
           mt: 4,
         }}
       >
         <iframe
-          src={getPdfUrl(selectedLanguage)}
+          src={docUrl}
           style={{
             width: '100%',
             height: '100%',
@@ -72,11 +79,11 @@ const PDFViewerWithLanguage: React.FC<PDFViewerWithLanguageProps> = ({
             borderRadius: '8px',
             boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
           }}
-          title="PDF Viewer"
+          title="Google Doc Viewer"
         />
       </Box>
     </Box>
   );
 };
 
-export default PDFViewerWithLanguage;
+export default GoogleDocViewer;

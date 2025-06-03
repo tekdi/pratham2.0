@@ -31,7 +31,7 @@ import board from '../assets/images/Board.svg';
 import support from '../assets/images/Support.svg';
 import checkBook from '../assets/images/checkbook.svg';
 import assessment from '../assets/images/assessment.svg';
-import faqs from '../assets/images/faqs.png';
+import faqs from '../assets/images/live_help.png';
 
 import surveyForm from '../assets/images/surveyForm.svg';
 import { useDirection } from '../hooks/useDirection';
@@ -201,6 +201,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
   const isSupportRequest = router.pathname.includes('/support-request');
   const isVillagesAndYouths = router.pathname.includes('/youthboard/villages');
   const isSurveys = router.pathname.includes('/youthboard/surveys');
+  const isFaq=router.pathname.includes('/faqs')
 
   return (
     <Drawer
@@ -668,17 +669,17 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               width: '100%',
               display: 'flex',
               justifyContent: 'flex-start',
-              background: isAssessments
+              background: isFaq
                 ? theme.palette.primary.main
                 : 'transparent',
 
-              padding: isAssessments
+              padding: isFaq
                 ? '16px 18px !important'
                 : '0px 18px !important',
-              color: isAssessments ? '#2E1500' : theme.palette.warning.A200,
-              fontWeight: isAssessments ? '600' : 500,
+              color: isFaq ? '#2E1500' : theme.palette.warning.A200,
+              fontWeight: isFaq ? '600' : 500,
               '&:hover': {
-                background: isAssessments
+                background: isFaq
                   ? theme.palette.primary.main
                   : 'transparent',
               },
