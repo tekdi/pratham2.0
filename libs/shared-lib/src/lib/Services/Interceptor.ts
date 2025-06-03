@@ -37,7 +37,7 @@ instance.interceptors.request.use(
     }
     // config.headers.tenantid = '4783a636-1191-487a-8b09-55eca51b5036';
     // config.headers.tenantid = 'fbe108db-e236-48a7-8230-80d34c370800';
-    config.headers.tenantid = localStorage.getItem('tenantId') || "";
+    config.headers.tenantid = localStorage.getItem('tenantId') || '';
     return config;
   },
   (error) => {

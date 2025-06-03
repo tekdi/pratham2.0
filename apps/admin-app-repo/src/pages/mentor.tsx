@@ -498,6 +498,7 @@ const Mentor = () => {
             notificationMessage={notificationMessage}
             notificationContext={notificationContext}
             type="mentor"
+            hideSubmit={true}
           />
         </SimpleModal>
 

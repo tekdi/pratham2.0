@@ -225,6 +225,8 @@ function generateSchemaAndUISchema(fields) {
           hideError: true,
         },
       };
+    } else if (type === 'file') {
+      uiSchema[name] = { 'ui:widget': 'dateTime' };
     } else if (type === 'dateTime') {
       schemaField.format = 'date-time';
       uiSchema[name] = { 'ui:widget': 'dateTime' };
@@ -236,7 +238,7 @@ function generateSchemaAndUISchema(fields) {
     }
 
     //Our custom RJSF field attributes
-    if (api) {
+    if (api && type !== 'file') {
       schemaField.api = api;
       if (schemaField?.isMultiSelect === true) {
         schemaField.items = {
@@ -248,6 +250,17 @@ function generateSchemaAndUISchema(fields) {
         schemaField.enum = ['Select'];
         schemaField.enumNames = ['Select'];
       }
+    } else if (type === 'file' && schemaField?.isMultiSelect === true) {
+      schemaField.items = { type: 'string', format: 'uri' };
+      uiSchema[name] = {
+        'ui:widget': 'CustomFileUpload',
+        'ui:options': {
+          isRequired: schemaField?.isRequired,
+          isMultiSelect: schemaField?.isMultiSelect,
+          maxSelections: schemaField?.maxSelection,
+          allowedFormats: ['.jpg', '.png', '.jpeg'],
+        },
+      };
     }
 
     if (extra) {
