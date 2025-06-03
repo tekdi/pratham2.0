@@ -140,19 +140,25 @@ const Centers = () => {
       if (alterSchema?.properties?.grade) {
         alterSchema.properties.grade.maxSelection = 1000;
       }
-      if (alterSchema?.properties?.center_type?.enum?.includes('regular')) {
-        alterSchema.properties.center_type.default = 'regular';
-      }
+
+      // Uncomment for remote center changes
+      // if (alterSchema?.properties?.center_type?.enum?.includes('regular')) {
+      //   alterSchema.properties.center_type.default = 'regular';
+      // }
+
       setAddSchema(alterSchema);
-      // console.log('####1:', alterSchema);
-      const modifiedUiSchema = {
-        ...responseForm.uiSchema,
-        center_type: {
-          'ui:widget': 'hidden',
-        },
-      };
-      // console.log('####2:', responseForm?.uiSchema);
-      setAddUiSchema(modifiedUiSchema);
+      setAddUiSchema(responseForm?.uiSchema);
+
+      // Uncomment for remote center changes
+      // // console.log('####1:', alterSchema);
+      // const modifiedUiSchema = {
+      //   ...responseForm.uiSchema,
+      //   center_type: {
+      //     'ui:widget': 'hidden',
+      //   },
+      // };
+      // // console.log('####2:', responseForm?.uiSchema);
+      // setAddUiSchema(modifiedUiSchema);
     };
 
     setPrefilledAddFormData(initialFormData);
