@@ -25,27 +25,27 @@ export const Footer: React.FC = () => {
 
   const usefulLinks = [
     {
-      label: t('pratham'),
+      label: t('Pratham'),
       href: 'https://www.pratham.org/',
     },
     {
-      label: t('ourInterns'),
+      label: t('Our Interns'),
       href: 'https://prathamopenschool.org/Team/Interns',
     },
     {
-      label: t('pradigiCreativityClub'),
+      label: t('PraDigi Creativity Club'),
       href: 'https://www.pradigi.org/creative-club/',
     },
     {
-      label: t('communityProjects'),
+      label: t('Community Projects'),
       href: 'https://prathamopenschool.org/CommunityProjects/Contents/Pradigicp',
     },
     {
-      label: t('covid19Resources'),
+      label: t('Covid-19 Resources'),
       href: 'https://prathamopenschool.org/Covid19Resources',
     },
     {
-      label: t('mohallaLearningCamp'),
+      label: t('Mohalla Learning Camp'),
       href: 'https://prathamopenschool.org/MohallaLearningCamp/Contents/mohallalc',
     },
   ];

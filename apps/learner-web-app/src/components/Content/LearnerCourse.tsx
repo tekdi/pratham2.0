@@ -190,7 +190,7 @@ export default memo(function LearnerCourse({
           sx={{
             display: { xs: 'none', md: 'flex' },
             position: 'sticky',
-            top: 100,
+            top: !title ? 0 : 100,
             alignSelf: 'flex-start',
           }}
         >
