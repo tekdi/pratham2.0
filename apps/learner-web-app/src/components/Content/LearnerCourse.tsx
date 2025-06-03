@@ -172,7 +172,7 @@ export default memo(function LearnerCourse({
       )}
       <Stack
         direction="row"
-        sx={{ gap: 4, px: { xs: 1, md: 4 }, py: { xs: 1, md: 2 } }}
+        sx={{ gap: 4, px: { xs: 2, md: 4 }, py: { xs: 1, md: 2 } }}
       >
         <CommonDialog isOpen={isOpen} onClose={() => setIsOpen(false)}>
           <FilterComponent
