@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useEffect, useState } from 'react';
 import {
   Box,
@@ -12,12 +13,17 @@ import Loader from '@/components/Loader';
 import DynamicForm from '@/components/DynamicForm/DynamicForm';
 import _ from 'lodash';
 import axios from 'axios';
-import  API_ENDPOINTS  from '@/utils/API/APIEndpoints';
+import API_ENDPOINTS from '@/utils/API/APIEndpoints';
 import CohortBatchSelector from './CohortBatchSelector';
 import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { createUser, updateUser } from '@/services/CreateUserService';
-import { getUserFullName, toPascalCase } from '@/utils/Helper';
+import {
+  flresponsetotl,
+  getReassignPayload,
+  getUserFullName,
+  toPascalCase,
+} from '@/utils/Helper';
 import { sendCredentialService } from '@/services/NotificationService';
 import { showToastMessage } from '@/components/Toastify';
 import {
@@ -25,14 +31,19 @@ import {
   splitUserData,
   telemetryCallbacks,
 } from '../DynamicFormCallback';
+import {
+  bulkCreateCohortMembers,
+  getCohortData,
+} from '@/services/CohortServices';
+import { updateReassignUser } from '@/services/CohortService/cohortService';
 const FacilitatorForm = ({
   t,
   SuccessCallback,
   schema,
   uiSchema,
   editPrefilledFormData,
-  isEdit = false,
-  isReassign = false,
+  isEdit,
+  isReassign,
   UpdateSuccessCallback,
   extraFields,
   extraFieldsUpdate,
@@ -49,6 +60,7 @@ const FacilitatorForm = ({
   notificationKey,
   notificationMessage,
   telemetryCreateKey,
+  selectedUserData,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [alteredSchema, setAlteredSchema] = useState<any>(null);
@@ -63,6 +75,8 @@ const FacilitatorForm = ({
   const [blockId, setBlockId] = useState([]);
   const [centerList, setCenterList] = useState(null);
   const [selectedCenterBatches, setSelectedCenterBatches] = useState(null);
+
+  const [isChangeForm, setIsChangeForm] = useState(false);
 
   useEffect(() => {
     let isEditSchema = _.cloneDeep(schema);
@@ -112,37 +126,57 @@ const FacilitatorForm = ({
       );
       // console.log('isEditSchema', JSON.stringify(isEditSchema));
     } else if (isReassign) {
+      console.log(
+        '######### testdebugassign editPrefilledFormData',
+        editPrefilledFormData
+      );
+      console.log(
+        '######### testdebugassign prefilledFormData',
+        prefilledFormData
+      );
+      console.log('######## filteredKeys isReassign');
       let originalRequired = isEditSchema.required;
       const keysToHave = [
         'state',
         'district',
         'block',
         'village',
-        'center',
-        'batch',
+        // 'center',
+        // 'batch',
+        'designation',
       ];
-      isEditSchema = {
-        type: 'object',
-        properties: keysToHave.reduce((obj, key) => {
-          if (isEditSchema.properties[key]) {
-            obj[key] = isEditSchema.properties[key];
-          }
-          return obj;
-        }, {}),
-      };
-      isEditUiSchema = keysToHave.reduce((obj, key) => {
-        if (isEditUiSchema[key]) {
-          obj[key] = isEditUiSchema[key];
-        }
-        return obj;
-      }, {});
-      isEditSchema.required = originalRequired;
 
-      //also remove from required if present
-      isEditSchema.required = isEditSchema.required.filter((key) =>
-        keysToHave.includes(key)
+      console.log('######## filteredKeys keysToHave', keysToHave);
+      const properties = isEditSchema.properties;
+      const filteredKeys = Object.keys(properties).filter(
+        (key) => !keysToHave.includes(key)
       );
-      // console.log('isEditSchema', JSON.stringify(isEditSchema));
+      console.log('######## filteredKeys', filteredKeys);
+      let keysToRemove = filteredKeys;
+      keysToRemove.forEach((key) => delete isEditSchema.properties[key]);
+      keysToRemove.forEach((key) => delete isEditUiSchema[key]);
+      //also remove from required if present
+      isEditSchema.required = isEditSchema.required.filter(
+        (key) => !keysToRemove.includes(key)
+      );
+
+      //remove ui:order
+      isEditUiSchema['ui:order'] = isEditUiSchema['ui:order'].filter(
+        (key) => !keysToRemove.includes(key)
+      );
+
+      console.log('######## filteredKeys isEditSchema', isEditSchema);
+      console.log('######## filteredKeys isEditUiSchema', isEditUiSchema);
+      let alterPrefilledFormData = prefilledFormData;
+
+      const filteredData = Object.fromEntries(
+        Object.entries(alterPrefilledFormData).filter(
+          ([key]) => !keysToRemove.includes(key)
+        )
+      );
+      console.log('######## filteredKeys filteredData', filteredData);
+      setPrefilledFormData(filteredData);
+      setIsChangeForm((preVal) => !preVal);
     } else {
       const keysToRemove = [
         'password',
@@ -219,7 +253,7 @@ const FacilitatorForm = ({
       setButtonShow(false);
     }
   };
-  const onCloseNextForm = (cohortdata) => {
+  const onCloseNextForm = (cohortdata: any) => {
     setSelectedCenterBatches(cohortdata);
     setShowNextForm(false);
     setButtonShow(true);
@@ -349,6 +383,19 @@ const FacilitatorForm = ({
             (item) => item.childData && item.childData.length > 0
           );
 
+          //prefilled value for user
+          if (selectedCenterBatches == null && isReassign === true) {
+            //set setSelectedCenterBatches
+            let response = await getCohortData(editableUserId);
+            console.log('###### responsedebug editableUserId', editableUserId);
+            console.log('###### responsedebug mycohor', response);
+            if (response?.result) {
+              let centerId = await flresponsetotl(response.result);
+              setSelectedCenterBatches(centerId);
+              console.log('###### responsedebug centerId', centerId);
+            }
+          }
+
           setCenterList(centerBatchList);
         }
       })
@@ -373,52 +420,99 @@ const FacilitatorForm = ({
     formDataCreate['center'] = parentCohortIds;
     formDataCreate['batch'] = childCohortIds;
     // Optional extra root-level fields
-    // Extra Field for cohort creation
-    const transformedFormData = transformFormData(
-      formDataCreate,
-      alteredSchemaCB,
-      extraFields
-    );
-
-    transformedFormData.username = formDataCreate.email;
-    const randomNum = Math.floor(10000 + Math.random() * 90000).toString();
-    transformedFormData.password = randomNum;
-    if (transformedFormData?.batch) {
-      const cohortIds = transformedFormData.batch;
-      transformedFormData.tenantCohortRoleMapping[0]['cohortIds'] = cohortIds;
-      delete transformedFormData.batch;
-    }
-
-    console.log(
-      '######## debug issue facilitator transformedFormData',
-      transformedFormData
-    );
-
-    //create user
-    const responseUserData = await createUser(transformedFormData);
-    if (responseUserData?.userData?.userId) {
-      showToastMessage(t(successCreateMessage), 'success');
-
-      telemetryCallbacks(telemetryCreateKey);
-      SuccessCallback();
-
-      // Send Notification with credentials to user
+    if (isReassign === true) {
+      // Extra Field for cohort creation
+      const transformedFormData = transformFormData(
+        formDataCreate,
+        alteredSchemaCB,
+        extraFieldsUpdate
+      );
+      let payload = transformedFormData;
       try {
-        await notificationCallback(
-          successCreateMessage,
-          notificationContext,
-          notificationKey,
-          transformedFormData,
-          t,
-          notificationMessage,
-          type
+        // console.log('new', formData?.batch);
+        // console.log(editPrefilledFormData?.batch, 'old');
+        delete payload?.batch;
+        console.log('payload', payload);
+        const reassignmentPayload = {
+          ...payload,
+          userData: {
+            firstName: selectedUserData?.name,
+          },
+        };
+        const resp = await updateReassignUser(
+          editableUserId,
+          reassignmentPayload
         );
-      } catch (notificationError) {
-        console.error('Notification failed:', notificationError);
-        // No failure toast here to prevent duplicate messages
+        if (resp) {
+          const cohortIdPayload = getReassignPayload(
+            editPrefilledFormData.batch,
+            formDataCreate.batch
+          );
+          const res = await bulkCreateCohortMembers({
+            userId: [editableUserId],
+            cohortId: cohortIdPayload.cohortId,
+            ...(cohortIdPayload.removedIds.length > 0 && {
+              removeCohortId: cohortIdPayload.removedIds,
+            }),
+          });
+          showToastMessage(t(successUpdateMessage), 'success');
+          telemetryCallbacks(telemetryUpdateKey);
+          UpdateSuccessCallback();
+        } else {
+          // console.error('Error reassigning user:', error);
+          showToastMessage(t(failureUpdateMessage), 'error');
+        }
+      } catch (error) {
+        console.error('Error reassigning user:', error);
+        showToastMessage(t(failureUpdateMessage + 'ssdsds'), 'error');
       }
     } else {
-      showToastMessage(t(failureCreateMessage), 'error');
+      // Extra Field for cohort creation
+      const transformedFormData = transformFormData(
+        formDataCreate,
+        alteredSchemaCB,
+        extraFields
+      );
+      transformedFormData.username = formDataCreate.email;
+      const randomNum = Math.floor(10000 + Math.random() * 90000).toString();
+      transformedFormData.password = randomNum;
+      if (transformedFormData?.batch) {
+        const cohortIds = transformedFormData.batch;
+        transformedFormData.tenantCohortRoleMapping[0]['cohortIds'] = cohortIds;
+        delete transformedFormData.batch;
+      }
+
+      console.log(
+        '######## debug issue facilitator transformedFormData',
+        transformedFormData
+      );
+
+      //create user
+      const responseUserData = await createUser(transformedFormData);
+      if (responseUserData?.userData?.userId) {
+        showToastMessage(t(successCreateMessage), 'success');
+
+        telemetryCallbacks(telemetryCreateKey);
+        SuccessCallback();
+
+        // Send Notification with credentials to user
+        try {
+          await notificationCallback(
+            successCreateMessage,
+            notificationContext,
+            notificationKey,
+            transformedFormData,
+            t,
+            notificationMessage,
+            type
+          );
+        } catch (notificationError) {
+          console.error('Notification failed:', notificationError);
+          // No failure toast here to prevent duplicate messages
+        }
+      } else {
+        showToastMessage(t(failureCreateMessage), 'error');
+      }
     }
   };
 
@@ -482,6 +576,7 @@ const FacilitatorForm = ({
               )
             ) : (
               <DynamicForm
+                key={isChangeForm ? 'dynamicform' : 'defaultform'}
                 schema={alteredSchema}
                 uiSchema={alteredUiSchema}
                 t={t}

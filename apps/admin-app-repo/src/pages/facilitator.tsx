@@ -10,7 +10,7 @@ import {
   facilitatorSearchSchema,
   facilitatorSearchUISchema,
 } from '../constant/Forms/facilitatorSearch';
-import { RoleId, Status } from '@/utils/app.constant';
+import { Role, RoleId, Status } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
 import {
   Box,
@@ -156,7 +156,8 @@ const Facilitator = () => {
 
       console.log('########### alterUISchema', alterUISchema);
 
-      const districtFieldId = responseForm.schema.properties.district.fieldId;
+      const districtFieldId =
+        responseForm?.schema?.properties?.district?.fieldId;
       const blockFieldId = responseForm?.schema?.properties?.block.fieldId;
       const villageFieldId = responseForm?.schema?.properties?.village?.fieldId;
       // const centerFieldId = responseForm?.schema?.properties?.center?.fieldId;
@@ -197,10 +198,14 @@ const Facilitator = () => {
           ([_, value]) => !Array.isArray(value) || value.length > 0
         )
       );
+
       const staticFilter = {
         role: 'Instructor',
         tenantId: localStorage.getItem('tenantId'),
       };
+      if (localStorage.getItem('roleName') === Role.ADMIN) {
+        staticFilter.state = [localStorage.getItem('stateId')];
+      }
       const { sortBy } = formData;
       const staticSort = ['firstName', sortBy || 'asc'];
       await searchListData(
@@ -559,6 +564,9 @@ const Facilitator = () => {
   const notificationKey = 'onFacilitatorCreated';
   const notificationMessage = 'FACILITATORS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
+  const blockReassignmentNotificationKey = 'FACILITATOR_BLOCK_UPDATE';
+  const profileUpdateNotificationKey = 'FACILITATOR_PROFILE_UPDATE';
+  const centerUpdateNotificationKey = 'FACILITATOR_CENTER_UPDATE';
 
   const [open, setOpen] = useState(false);
   const [checked, setChecked] = useState(false);
@@ -670,6 +678,9 @@ const Facilitator = () => {
             hideSubmit={true}
             setButtonShow={setButtonShow}
             // isSteeper={true}
+            blockReassignmentNotificationKey={blockReassignmentNotificationKey}
+            profileUpdateNotificationKey={profileUpdateNotificationKey}
+            centerUpdateNotificationKey={centerUpdateNotificationKey}
           />
         </SimpleModal>
 

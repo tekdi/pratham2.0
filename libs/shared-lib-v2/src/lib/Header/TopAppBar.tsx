@@ -43,6 +43,7 @@ export interface AppBarProps {
   onLanguageChange?: (lang: string) => void;
   _navLinkBox?: React.CSSProperties;
   _brand?: object;
+  isColorInverted?: boolean;
 }
 
 export const TopAppBar: React.FC<AppBarProps> = ({
@@ -144,6 +145,7 @@ export const DesktopBar = ({
   onLanguageChange,
   _navLinkBox,
   _brand,
+  isColorInverted = false,
 }: AppBarProps) => {
   const [menus, setMenus] = useState<
     { anchorEl: HTMLElement | null; items: any[] }[]
@@ -236,7 +238,10 @@ export const DesktopBar = ({
                     openMenuAtLevel(0, e.currentTarget, link?.child ?? []);
                   }}
                 >
-                  <ArrowDropDownIcon />
+                  <ArrowDropDownIcon
+                    fontSize="small"
+                    sx={{ color: isColorInverted ? '#fff' : 'inherit' }}
+                  />
                 </IconButton>
               )}
             </Box>
@@ -314,7 +319,12 @@ export const DesktopBar = ({
                       >
                         <SpeakableText>{item.title}</SpeakableText>
                       </Typography>
-                      {hasChild && <ArrowDropDownIcon fontSize="small" />}
+                      {hasChild && (
+                        <ArrowDropDownIcon
+                          fontSize="small"
+                          sx={{ color: isColorInverted ? '#fff' : 'inherit' }}
+                        />
+                      )}
                     </MenuItem>
                   </Box>
                 );

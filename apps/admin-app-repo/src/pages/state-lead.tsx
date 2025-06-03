@@ -63,6 +63,20 @@ const StateLead = () => {
 
   const storedUserData = JSON.parse(localStorage.getItem('adminInfo') || '{}');
 
+  console.log(
+    '########### type state lead process.env.NEXT_PUBLIC_TEACHER_SBPLAYER',
+    process.env.NEXT_PUBLIC_TEACHER_SBPLAYER
+  );
+  console.log(
+    '########### type state lead process.env.NEXT_PUBLIC_ADMIN_SBPLAYER',
+    process.env.NEXT_PUBLIC_ADMIN_SBPLAYER
+  );
+  let cleanedUrl = process.env.NEXT_PUBLIC_ADMIN_SBPLAYER.replace(
+    /\/sbplayer$/,
+    ''
+  );
+  console.log('########### type cleanedUrl', cleanedUrl);
+
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
       searchData(prefilledFormData, 0);

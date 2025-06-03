@@ -28,7 +28,11 @@ const getCustomFieldValue = (customFields: any, label: string) => {
   const field = customFields.find((f: any) => f.label === label);
   return field?.selectedValues?.[0]?.value || field?.selectedValues?.[0] || '-';
 };
-
+const getCustomField = (customFields: any, label: string) => {
+  console.log(customFields);
+  const field = customFields.find((f: any) => f.label === label);
+  return field?.selectedValues?.[0]?.label || field?.selectedValues?.[0] || '-';
+};
 const UserProfileCard = () => {
   const router = useRouter();
   const [userData, setUserData] = useState<any>(null); // User data state
@@ -43,6 +47,7 @@ const UserProfileCard = () => {
     t('LEARNER_APP.USER_PROFILE_CARD.CHANGE_PASSWORD'),
     t('LEARNER_APP.USER_PROFILE_CARD.PRIVACY_GUIDELINES'),
     t('LEARNER_APP.USER_PROFILE_CARD.CONSENT_FORM'),
+    t('COMMON.FAQS'),
   ];
   const isBelow18 = (dob: string): boolean => {
     const birthDate = new Date(dob);
@@ -109,6 +114,9 @@ const UserProfileCard = () => {
     ) {
       window.open('/files/consent_form_above_18_hindi.pdf', '_blank');
     }
+    else if (option === t('COMMON.FAQS')) {
+      router.push('/faqs');
+    }
 
     setSelectedOption(option);
     setOpen(true);
@@ -150,7 +158,7 @@ const UserProfileCard = () => {
     .filter(Boolean)
     .join(' ');
   const maritalStatus = getCustomFieldValue(customFields, 'MARITAL_STATUS');
-  const qualification = getCustomFieldValue(
+  const qualification = getCustomField(
     customFields,
     'HIGHEST_EDCATIONAL_QUALIFICATION_OR_LAST_PASSED_GRADE'
   );
@@ -379,7 +387,7 @@ const UserProfileCard = () => {
               </Typography>
               <Typography sx={valueStyle}>
                 {/* {t(`form.${qualification}`)} */}
-                {t(`form.${qualification}`, { defaultValue: qualification })}
+                {t(`FORM.${qualification}`, { defaultValue: qualification })}
               </Typography>
             </Grid>
             <Grid item xs={12}>

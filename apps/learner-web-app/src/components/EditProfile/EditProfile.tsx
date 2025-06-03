@@ -150,7 +150,7 @@ const EditProfile = ({ completeProfile }: EditProfileProps) => {
               },
             };
           }
-
+         delete alterSchema?.properties?.is_volunteer;
           setAddSchema(alterSchema);
           setAddUiSchema(alterUISchema);
         }

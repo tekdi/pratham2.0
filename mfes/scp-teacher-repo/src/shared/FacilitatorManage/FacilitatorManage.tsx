@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Form from '@rjsf/mui';
 import validator from '@rjsf/validator-ajv8';
@@ -41,13 +42,22 @@ import AddIcon from '@mui/icons-material/Add';
 import apartment from '../../public/images/apartment.svg';
 import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 import FacilitatorForm from '@/components/DynamicForm/FacilitatorForm/FacilitatorForm';
+import { fetchUserData } from '@/utils/Helper';
 
-const FacilitatorManage = ({ open, onClose, onFacilitatorAdded }: any) => {
+const FacilitatorManage = ({
+  open,
+  onClose,
+  onFacilitatorAdded,
+  isReassign,
+  reassignuserId,
+  selectedUserData,
+  isEdit = false,
+}: any) => {
   const theme = useTheme<any>();
   const [isLoading, setIsLoading] = useState(false);
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
-  const [prefilledAddFormData, setPrefilledAddFormData] = useState({});
+  const [prefilledAddFormData, setPrefilledAddFormData] = useState(null);
   const [pageLimit, setPageLimit] = useState<number>(10);
   const [pageOffset, setPageOffset] = useState<number>(0);
   const [prefilledFormData, setPrefilledFormData] = useState({});
@@ -55,9 +65,11 @@ const FacilitatorManage = ({ open, onClose, onFacilitatorAdded }: any) => {
   const [response, setResponse] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [openModal, setOpenModal] = React.useState<boolean>(open);
-  const [isEdit, setIsEdit] = useState(false);
-  const [isReassign, setIsReassign] = useState(false);
-  const [editableUserId, setEditableUserId] = useState('');
+  // const [isEdit, setIsEdit] = useState(false);
+  // const [isReassign, setIsReassign] = useState(false);
+  const [editableUserId, setEditableUserId] = useState(
+    isReassign || isEdit ? selectedUserData?.userId : ''
+  );
   const [roleId, setRoleID] = useState('');
   const [tenantId, setTenantId] = useState('');
   const [memberShipID, setMemberShipID] = useState('');
@@ -65,6 +77,8 @@ const FacilitatorManage = ({ open, onClose, onFacilitatorAdded }: any) => {
   const [districtFieldId, setDistrictFieldId] = useState('');
   const [villageFieldId, setVillageFieldId] = useState('');
   // const [centerFieldId, setCenterFieldId] = useState('');
+  const [addEditSchema, setAddEditSchema] = useState(null);
+  const [addEditUiSchema, setAddEditUiSchema] = useState(null);
 
   const [userID, setUserId] = useState('');
   const [userData, setUserData] = useState({
@@ -79,116 +93,164 @@ const FacilitatorManage = ({ open, onClose, onFacilitatorAdded }: any) => {
 
   useEffect(() => {
     // Fetch form schema from API and set it in state.
-    const fetchData = async () => {
-      const responseForm = await fetchForm([
-        {
-          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.facilitator.context}&contextType=${FormContext.facilitator.contextType}`,
-          header: {},
-        },
-        {
-          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.facilitator.context}&contextType=${FormContext.facilitator.contextType}`,
-          header: {
-            tenantid: localStorage.getItem('tenantId'),
-          },
-        },
-      ]);
-      console.log('responseForm', responseForm);
-
-      //unit name is missing from required so handled from frotnend
-      let alterSchema = responseForm?.schema;
-      let alterUISchema = responseForm?.uiSchema;
-      let requiredArray = alterSchema?.required;
-      const mustRequired = ['email'];
-      // Merge only missing items from required2 into required1
-      mustRequired.forEach((item) => {
-        if (!requiredArray.includes(item)) {
-          requiredArray.push(item);
-        }
-      });
-      alterSchema.required = requiredArray;
-      //add max selection custom
-      if (alterSchema?.properties?.village) {
-        alterSchema.properties.village.maxSelection = 1000;
-      }
-      if (alterUISchema?.designation) {
-        alterUISchema = {
-          ...alterUISchema,
-          designation: {
-            ...alterUISchema.designation,
-            'ui:disabled': true,
-          },
-        };
-      }
-
-      console.log('########### alterUISchema', alterUISchema);
-
-      const requiredKeys = ['state', 'district', 'block'];
-      //set ui schema hide
-      const updatedUiSchema = { ...alterUISchema };
-      // Clone each key's config and set widget to 'hidden'
-      requiredKeys.forEach((key) => {
-        if (updatedUiSchema.hasOwnProperty(key)) {
-          updatedUiSchema[key] = {
-            ...updatedUiSchema[key],
-            'ui:widget': 'hidden',
-          };
-        }
-      });
-      alterUISchema = updatedUiSchema;
-
-      const districtFieldId = responseForm?.schema.properties.district.fieldId;
-      const blockFieldId = responseForm?.schema?.properties?.block.fieldId;
-      const villageFieldId = responseForm?.schema?.properties?.village?.fieldId;
-      // const centerFieldId = responseForm?.schema?.properties?.center?.fieldId;
-
-      setBlockFieldId(blockFieldId);
-      setDistrictFieldId(districtFieldId);
-      setVillageFieldId(villageFieldId);
-      // setCenterFieldId(centerFieldId)
-      setAddSchema(alterSchema);
-      setAddUiSchema(alterUISchema);
-    };
+    const fetchData = async () => {};
     fetchData();
-    setRoleID(RoleId.TEACHER);
-    setTenantId(localStorage.getItem('tenantId'));
-  }, []);
+  }, [isReassign]);
 
   useEffect(() => {
     if (open === true) {
-      let initialFormData = {};
-      if (localStorage.getItem('userData')) {
-        try {
-          const customFields = JSON.parse(
-            localStorage.getItem('userData')
-          ).customFields;
+      const prepareInitialData = async () => {
+        const responseForm = await fetchForm([
+          {
+            fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.facilitator.context}&contextType=${FormContext.facilitator.contextType}`,
+            header: {},
+          },
+          {
+            fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.facilitator.context}&contextType=${FormContext.facilitator.contextType}`,
+            header: {
+              tenantid: localStorage.getItem('tenantId'),
+            },
+          },
+        ]);
+        console.log('responseForm', responseForm);
+        setAddEditSchema(responseForm?.schema);
+        setAddEditUiSchema(responseForm?.uiSchema);
 
-          const getSelectedValueIds = (label) => {
-            const field = customFields.find(
-              (f) => f.label.toLowerCase() === label.toLowerCase()
+        //unit name is missing from required so handled from frotnend
+        let alterSchema = responseForm?.schema;
+        let alterUISchema = responseForm?.uiSchema;
+        let requiredArray = alterSchema?.required;
+        const mustRequired = ['email'];
+        // Merge only missing items from required2 into required1
+        mustRequired.forEach((item) => {
+          if (!requiredArray.includes(item)) {
+            requiredArray.push(item);
+          }
+        });
+        alterSchema.required = requiredArray;
+        //add max selection custom
+        if (alterSchema?.properties?.village) {
+          alterSchema.properties.village.maxSelection = 1000;
+        }
+        if (alterUISchema?.designation) {
+          alterUISchema = {
+            ...alterUISchema,
+            designation: {
+              ...alterUISchema.designation,
+              'ui:disabled': true,
+            },
+          };
+        }
+
+        console.log('########### alterUISchema', alterUISchema);
+
+        const requiredKeys = ['state', 'district', 'block'];
+        //set ui schema hide
+        const updatedUiSchema = { ...alterUISchema };
+        // Clone each key's config and set widget to 'hidden'
+        requiredKeys.forEach((key) => {
+          if (updatedUiSchema.hasOwnProperty(key)) {
+            updatedUiSchema[key] = {
+              ...updatedUiSchema[key],
+              // 'ui:widget': 'hidden',
+              'ui:disabled': true,
+            };
+          }
+        });
+        alterUISchema = updatedUiSchema;
+
+        const districtFieldId =
+          responseForm?.schema.properties.district.fieldId;
+        const blockFieldId = responseForm?.schema?.properties?.block.fieldId;
+        const villageFieldId =
+          responseForm?.schema?.properties?.village?.fieldId;
+        // const centerFieldId = responseForm?.schema?.properties?.center?.fieldId;
+
+        setBlockFieldId(blockFieldId);
+        setDistrictFieldId(districtFieldId);
+        setVillageFieldId(villageFieldId);
+        // setCenterFieldId(centerFieldId)
+        setAddSchema(alterSchema);
+        setAddUiSchema(alterUISchema);
+
+        let initialFormData = {};
+
+        if (isReassign === true) {
+          console.log('######## reassignuserId', selectedUserData);
+
+          try {
+            let batchList = await fetchUserData(selectedUserData?.userId);
+            let tempFormData = extractMatchingKeys(
+              selectedUserData,
+              alterSchema
             );
-            return field?.selectedValues?.map((val) => val.id.toString()) || [];
-          };
+            tempFormData = {
+              ...tempFormData,
+              batch: batchList,
+            };
 
-          const stateIds = getSelectedValueIds('STATE');
-          const districtIds = getSelectedValueIds('DISTRICT');
-          const blockIds = getSelectedValueIds('BLOCK');
-          const villageIds = getSelectedValueIds('VILLAGE');
-
-          initialFormData = {
-            state: stateIds,
-            district: districtIds,
-            block: blockIds,
-            village: villageIds,
-            designation: 'facilitator',
+            initialFormData = {
+              ...tempFormData,
+            };
+            // console.log('object!!!!', initialFormData);
+          } catch (error) {
+            console.error('Error fetching user data:', error);
+          }
+        } else if (isEdit) {
+          let tempFormData = extractMatchingKeys(selectedUserData, alterSchema);
+          const modifiedFormData = {
+            ...tempFormData,
+            mobile: tempFormData.mobile?.toString?.() || '',
           };
-        } catch (e) {}
-      }
-      console.log('######### setPrefilledAddFormData', initialFormData);
-      setPrefilledAddFormData(initialFormData);
-      setIsEdit(false);
-      setIsReassign(false);
-      setEditableUserId('');
-      setButtonShow(true);
+          setPrefilledAddFormData(modifiedFormData);
+          // console.log('tempFormData', tempFormData);
+          // console.log('alterSchema!!', alterSchema);
+        } else {
+          const userData = localStorage.getItem('userData');
+          if (userData) {
+            try {
+              const customFields = JSON.parse(userData).customFields;
+
+              const getSelectedValueIds = (label) => {
+                const field = customFields.find(
+                  (f) => f.label.toLowerCase() === label.toLowerCase()
+                );
+                return (
+                  field?.selectedValues?.map((val) => val.id.toString()) || []
+                );
+              };
+
+              const stateIds = getSelectedValueIds('STATE');
+              const districtIds = getSelectedValueIds('DISTRICT');
+              const blockIds = getSelectedValueIds('BLOCK');
+              // const villageIds = getSelectedValueIds('VILLAGE');
+
+              initialFormData = {
+                state: stateIds,
+                district: districtIds,
+                block: blockIds,
+                // village: villageIds,
+                designation: 'facilitator',
+              };
+            } catch (e) {
+              console.error('Error parsing user data from localStorage:', e);
+            }
+          }
+        }
+        if (!isEdit) {
+          console.log('######### setPrefilledAddFormData', initialFormData);
+          setPrefilledAddFormData(initialFormData);
+          setEditableUserId(
+            isReassign || isEdit ? selectedUserData?.userId : ''
+          );
+          setButtonShow(true);
+        }
+      };
+
+      prepareInitialData(); // Call the async function
+
+      setRoleID(RoleId.TEACHER);
+      setTenantId(localStorage.getItem('tenantId'));
     }
   }, [open]);
 
@@ -196,8 +258,9 @@ const FacilitatorManage = ({ open, onClose, onFacilitatorAdded }: any) => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
-    setIsReassign(false);
-    setIsEdit(false);
+    // setIsReassign(false);
+    // setIsEdit(false);
+    onClose();
   };
 
   //Add Edit Props
@@ -244,10 +307,10 @@ const FacilitatorManage = ({ open, onClose, onFacilitatorAdded }: any) => {
           id="dynamic-form-id"
           modalTitle={
             isEdit
-              ? t('FACILITATORS.EDIT_FACILITATOR')
+              ? t('COMMON.EDIT_FACILITATOR')
               : isReassign
-              ? t('FACILITATORS.RE_ASSIGN_facilitator')
-              : t('FACILITATORS.NEW_FACILITATOR')
+              ? t('FACILITATORS.RE_ASSIGN_FACILITATOR')
+              : t('COMMON.NEW_FACILITATOR')
           }
         >
           <FacilitatorForm
@@ -257,8 +320,8 @@ const FacilitatorManage = ({ open, onClose, onFacilitatorAdded }: any) => {
               onFacilitatorAdded();
               setOpenModal(false);
             }}
-            schema={addSchema}
-            uiSchema={addUiSchema}
+            schema={isEdit ? addEditSchema : addSchema}
+            uiSchema={isEdit ? addEditUiSchema : addUiSchema}
             editPrefilledFormData={prefilledAddFormData}
             isEdit={isEdit}
             isReassign={isReassign}
@@ -286,6 +349,7 @@ const FacilitatorManage = ({ open, onClose, onFacilitatorAdded }: any) => {
             hideSubmit={true}
             setButtonShow={setButtonShow}
             // isSteeper={true}
+            selectedUserData={selectedUserData}
           />
         </SimpleModal>
       )}

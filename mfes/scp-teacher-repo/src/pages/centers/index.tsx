@@ -10,6 +10,8 @@ import {
   Role,
   Telemetry,
   TelemetryEventType,
+  FormContext,
+  FormContextType,
 } from '@/utils/app.constant';
 import { accessGranted, toPascalCase } from '@/utils/Helper';
 import withAccessControl from '@/utils/hoc/withAccessControl';
@@ -41,6 +43,9 @@ import { telemetryFactory } from '@/utils/telemetry';
 import CenterDropdown from '@/components/CenterSelection';
 import BatchList from '@/components/BatchList';
 import manageUserStore from '@/store/manageUserStore';
+import SimpleModal from '@/components/SimpleModalV2';
+import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
+import { fetchForm } from '@/components/DynamicForm/DynamicFormCallback';
 
 const CentersPage = () => {
   const { t } = useTranslation();
@@ -69,7 +74,7 @@ const CentersPage = () => {
     React.useState(false);
   const handleFilterModalOpen = () => setFilterModalOpen(true);
   const handleFilterModalClose = () => setFilterModalOpen(false);
-  const [isCenterAdded, setIsCenterAdded] = useState(false);
+  const [isBatchAdded, setIsBatchAdded] = useState(false);
   const setType = taxonomyStore((state) => state.setType);
   const store = useStore();
   const userRole = store.userRole;
@@ -80,6 +85,11 @@ const CentersPage = () => {
   const [batchLoading, setBatchLoading] = useState(false);
   const [centerList, setCenterList] = useState<any[]>([]);
   const userStore = manageUserStore();
+  const [openBatchModal, setOpenBatchModal] = useState(false);
+  const [addBatchSchema, setAddBatchSchema] = useState<any>(null);
+  const [addBatchUiSchema, setAddBatchUiSchema] = useState<any>(null);
+  const [emptyFormData, setEmptyFormData] = useState<any>({});
+  const [tempVariable, setTempVariable] = useState([]);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -192,6 +202,38 @@ const CentersPage = () => {
   const { isRTL } = useDirection();
 
   useEffect(() => {
+    //setEmptyFormData
+
+    function getLocationFromCustomFields(data: any): any {
+      const location: any = {};
+
+      data?.customFields?.forEach((field: any) => {
+        const value = field.selectedValues?.[0]?.id?.toString();
+        if (!value) return;
+
+        switch (field.label?.toUpperCase()) {
+          case 'STATE':
+            location.state = [value];
+            break;
+          case 'DISTRICT':
+            location.district = [value];
+            break;
+          case 'BLOCK':
+            location.block = [value];
+            break;
+        }
+      });
+
+      return location;
+    }
+
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+    const location = getLocationFromCustomFields(userData);
+    // console.log('location', location);
+    setEmptyFormData(location);
+  }, [tempVariable]);
+
+  useEffect(() => {
     const getCohortListForTL = async () => {
       try {
         if (typeof window !== 'undefined' && window.localStorage) {
@@ -206,25 +248,37 @@ const CentersPage = () => {
               accessGranted('showBlockLevelCohort', accessControl, userRole) &&
               response
             ) {
-              const blockData = response.map((block: any) => {
-                const blockName = block.cohortName;
-                const blockId = block.cohortId;
+              const blockData = response.map((item: any) => {
+                const blockName = toPascalCase(item.cohortName);
+                const blockId = item.cohortId;
                 localStorage.setItem('blockParentId', blockId);
 
-                const stateField = block?.customField.find(
+                const stateField = item?.customField.find(
                   (field: any) => field.label === 'STATE'
                 );
                 const state = stateField
                   ? stateField?.selectedValues?.[0]?.value
                   : '';
 
-                const districtField = block?.customField.find(
+                const districtField = item?.customField.find(
                   (field: any) => field.label === 'DISTRICT'
                 );
                 const district = districtField
                   ? districtField?.selectedValues?.[0]?.value
                   : '';
-                return { blockName, blockId, state, district };
+                const blockField = item?.customField.find(
+                  (field: any) => field.label === 'BLOCK'
+                );
+                const block = blockField
+                  ? blockField?.selectedValues?.[0]?.value
+                  : '';
+                const villageField = item?.customField.find(
+                  (field: any) => field.label === 'VILLAGE'
+                );
+                const village = villageField
+                  ? villageField?.selectedValues?.[0]?.value
+                  : '';
+                return { blockName, blockId, state, district, block, village };
               });
               setBlockData(blockData);
             }
@@ -256,7 +310,7 @@ const CentersPage = () => {
               response
             ) {
               const cohortData = response.map((center: any) => {
-                const cohortName = center.cohortName;
+                const cohortName = toPascalCase(center.cohortName);
                 const cohortId = center.cohortId;
                 const centerTypeField = center?.customField.find(
                   (field: any) => field.label === 'TYPE_OF_COHORT'
@@ -283,10 +337,10 @@ const CentersPage = () => {
     };
     setCenterList([]);
     getCohortListForTL();
-  }, [isTeamLeader, isCenterAdded, reloadState]);
+  }, [isTeamLeader, isBatchAdded, reloadState]);
 
-  const handleCenterAdded = () => {
-    setIsCenterAdded((prev) => !prev);
+  const handleBatchAdded = () => {
+    setIsBatchAdded((prev) => !prev);
   };
 
   const getFilteredCenters = useMemo(() => {
@@ -365,7 +419,111 @@ const CentersPage = () => {
 
   console.log('filtered batches before render:', filteredBatches);
 
-  const handleOpenAddBatchModal = () => {};
+  useEffect(() => {
+    const fetchBatchFormSchema = async () => {
+      const responseForm: any = await fetchForm([
+        {
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.COHORTS}&contextType=${FormContextType.BATCH}`,
+          header: {},
+        },
+        {
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.COHORTS}&contextType=${FormContextType.BATCH}`,
+          header: {
+            tenantid: localStorage.getItem('tenantId'),
+          },
+        },
+      ]);
+
+      if (responseForm?.schema && responseForm?.uiSchema) {
+        // Remove unnecessary fields for batch creation
+        let alterSchema = responseForm?.schema;
+        let requiredArray = alterSchema?.required ?? [];
+        const mustRequired = [
+          'name',
+          'state',
+          'district',
+          'block',
+          'village',
+          'parentId',
+          'board',
+          'medium',
+          'grade',
+        ];
+        // Merge only missing items from required2 into required1
+        mustRequired.forEach((item) => {
+          if (!requiredArray.includes(item)) {
+            requiredArray.push(item);
+          }
+        });
+
+        alterSchema.required = requiredArray;
+        //add max selection custom
+        if (alterSchema?.properties?.state) {
+          alterSchema.properties.state.maxSelection = 1;
+        }
+        if (alterSchema?.properties?.district) {
+          alterSchema.properties.district.maxSelection = 1;
+        }
+        if (alterSchema?.properties?.block) {
+          alterSchema.properties.block.maxSelection = 1;
+        }
+        if (alterSchema?.properties?.village) {
+          alterSchema.properties.village.maxSelection = 1;
+        }
+        if (alterSchema?.properties?.board) {
+          alterSchema.properties.board.maxSelection = 1;
+        }
+        if (alterSchema?.properties?.medium) {
+          alterSchema.properties.medium.maxSelection = 1;
+        }
+        if (alterSchema?.properties?.grade) {
+          alterSchema.properties.grade.maxSelection = 1;
+        }
+
+        const hideFields = (data: any, fieldsToHide: string[]): any => {
+          const updatedData = { ...data };
+
+          fieldsToHide.forEach((field) => {
+            if (updatedData[field]) {
+              updatedData[field] = {
+                'ui:widget': 'hidden',
+              };
+            }
+          });
+
+          return updatedData;
+        };
+        const fieldsToHide = ['state', 'district', 'block'];
+        const updatedData = hideFields(responseForm?.uiSchema, fieldsToHide);
+        setAddBatchSchema(alterSchema);
+        setAddBatchUiSchema(updatedData);
+      }
+    };
+
+    fetchBatchFormSchema();
+  }, []);
+
+  const handleOpenAddBatchModal = () => {
+    setOpenBatchModal(true);
+    const telemetryInteract = {
+      context: {
+        env: 'teaching-center',
+        cdata: [],
+      },
+      edata: {
+        id: 'open-add-batch-modal',
+        type: Telemetry.CLICK,
+        subtype: '',
+        pageid: 'centers',
+      },
+    };
+    telemetryFactory.interact(telemetryInteract);
+  };
+
+  const handleCloseBatchModal = () => {
+    setOpenBatchModal(false);
+    // setIsEdit(false);
+  };
 
   const filteredBatchList = useMemo(() => {
     if (!filteredBatches) return [];
@@ -383,6 +541,10 @@ const CentersPage = () => {
       return false; // Or handle undefined values differently
     });
   }, [filteredBatches, batchSearchInput]);
+
+  // Add empty form data for required props
+  const emptyUserId = '';
+  const emptyCallback = () => {};
 
   return (
     <>
@@ -493,32 +655,40 @@ const CentersPage = () => {
                       ),
                     }}
                   />
-                  {/* <Button
-                  sx={{
-                    mt: 1.2,
-                    border: '1px solid #1E1B16',
-                    borderRadius: '100px',
-                    height: '40px',
-                    px: '16px',
-                    color: theme.palette.error.contrastText,
-                    alignSelf: 'flex-start',
-                    '& .MuiButton-endIcon': {
-                      marginLeft: isRTL ? '0px !important' : '8px !important',
-                      marginRight: isRTL ? '8px !important' : '-2px !important',
-                    },
-                  }}
-                  className="text-1E"
-                  endIcon={<AddIcon />}
-                  onClick={handleOpenAddBatchModal}
-                >
-                  {t('COMMON.ADD_NEW')}
-                </Button> */}
+                  {isTeamLeader && (
+                    <Button
+                      sx={{
+                        mt: 1.2,
+                        border: '1px solid #1E1B16',
+                        borderRadius: '100px',
+                        height: '40px',
+                        px: '16px',
+                        color: theme.palette.error.contrastText,
+                        alignSelf: 'flex-start',
+                        '& .MuiButton-endIcon': {
+                          marginLeft: isRTL
+                            ? '0px !important'
+                            : '8px !important',
+                          marginRight: isRTL
+                            ? '8px !important'
+                            : '-2px !important',
+                        },
+                      }}
+                      className="text-1E"
+                      endIcon={<AddIcon />}
+                      onClick={handleOpenAddBatchModal}
+                    >
+                      {t('COMMON.ADD_NEW')}
+                    </Button>
+                  )}
                 </Box>
                 <Box sx={{ minWidth: '300px' }}>
                   <CenterDropdown
                     cohortId={selectedCenter}
                     onChange={handleCenterChange}
                     centerList={centerList}
+                    selectedCenterId={selectedCenter}
+                    setSelectedCenterId={setSelectedCenter}
                   />
                 </Box>
               </Box>
@@ -566,6 +736,47 @@ const CentersPage = () => {
         setCenterType={setCenterType}
         onApply={handleFilterApply}
       />
+      <SimpleModal
+        open={openBatchModal}
+        onClose={handleCloseBatchModal}
+        showFooter={true}
+        primaryText={t('COMMON.CREATE')}
+        modalTitle={t('COMMON.NEW_BATCH')}
+        id="dynamic-form-id"
+      >
+        <AddEditUser
+          SuccessCallback={() => {
+            if (selectedCenter) {
+              getBlocksByCenterId(selectedCenter, centerList).then((res) => {
+                setFilteredBatches(res);
+              });
+            }
+            setOpenBatchModal(false);
+            handleBatchAdded();
+          }}
+          schema={addBatchSchema}
+          uiSchema={addBatchUiSchema}
+          editPrefilledFormData={emptyFormData}
+          isEdit={false}
+          isReassign={false}
+          editableUserId={emptyUserId}
+          UpdateSuccessCallback={emptyCallback}
+          extraFields={{
+            type: CenterType.BATCH,
+            parentId: selectedCenter,
+          }}
+          extraFieldsUpdate={{}}
+          successCreateMessage="BATCH.BATCH_CREATED_SUCCESSFULLY"
+          telemetryCreateKey="batch-created-successfully"
+          failureCreateMessage="BATCH.BATCH_CREATION_FAILED"
+          successUpdateMessage="BATCH.BATCH_UPDATED_SUCCESSFULLY"
+          telemetryUpdateKey="batch-updated-successfully"
+          failureUpdateMessage="BATCH.BATCH_UPDATE_FAILED"
+          isNotificationRequired={false}
+          hideSubmit={true}
+          type="batch"
+        />
+      </SimpleModal>
     </>
   );
 };

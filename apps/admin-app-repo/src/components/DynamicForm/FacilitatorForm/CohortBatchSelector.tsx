@@ -12,6 +12,10 @@ import {
   ListItemSecondaryAction,
   Divider,
   IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
@@ -46,27 +50,43 @@ const CohortBatchSelector: React.FC<> = ({
   const [selectedMap, setSelectedMap] = useState<Record<string, Set<string>>>(
     {}
   );
+  const [savedSelections, setSavedSelections] = useState<
+    Record<string, Set<string>>
+  >({});
+  const [tempSelectedMap, setTempSelectedMap] = useState<
+    Record<string, Set<string>>
+  >({});
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
 
   // Prefill setup
   useEffect(() => {
     const initialMap: Record<string, Set<string>> = {};
+    const initialSavedMap: Record<string, Set<string>> = {};
     prefillSelection.forEach((cohort) => {
       initialMap[cohort.cohortId] = new Set(
         cohort.childData.map((child) => child.cohortId)
       );
+      initialSavedMap[cohort.cohortId] = new Set(
+        cohort.childData.map((child) => child.cohortId)
+      );
     });
     setSelectedMap(initialMap);
+    setSavedSelections(initialSavedMap);
+    setTempSelectedMap(initialMap);
   }, [prefillSelection]);
 
   const handleCohortClick = (cohort: Cohort) => {
     setSelectedCohort(cohort);
     setStep('batch');
+    // Initialize temp map with current saved selections when entering batch selection
+    setTempSelectedMap({ ...savedSelections });
   };
 
   const toggleBatch = (batchId: string) => {
     if (!selectedCohort) return;
     const cohortId = selectedCohort.cohortId;
-    const currentSet = selectedMap[cohortId] || new Set();
+    const currentSet = tempSelectedMap[cohortId] || new Set();
     const updatedSet = new Set(currentSet);
 
     if (updatedSet.has(batchId)) {
@@ -75,8 +95,8 @@ const CohortBatchSelector: React.FC<> = ({
       updatedSet.add(batchId);
     }
 
-    setSelectedMap({
-      ...selectedMap,
+    setTempSelectedMap({
+      ...tempSelectedMap,
       [cohortId]: updatedSet,
     });
   };
@@ -85,42 +105,55 @@ const CohortBatchSelector: React.FC<> = ({
     if (!selectedCohort) return;
     const cohortId = selectedCohort.cohortId;
     const allIds = selectedCohort.childData.map((b) => b.cohortId);
-    const currentSet = selectedMap[cohortId] || new Set();
+    const currentSet = tempSelectedMap[cohortId] || new Set();
 
     const newSet =
       currentSet.size === allIds.length ? new Set() : new Set(allIds);
 
-    setSelectedMap({
-      ...selectedMap,
+    setTempSelectedMap({
+      ...tempSelectedMap,
       [cohortId]: newSet,
     });
   };
 
   const getSelectedCount = (cohort: Cohort) =>
-    selectedMap[cohort.cohortId]?.size || 0;
+    savedSelections[cohort.cohortId]?.size || 0;
 
-  const handleBack = () => {
-    setSelectedCohort(null);
+  const handleSaveSelection = () => {
+    setSavedSelections(tempSelectedMap);
+    setSelectedMap(tempSelectedMap);
     setStep('cohort');
   };
 
-  const handleFinish = () => {
-    const finalData: SelectedData[] = data
-      .map((cohort) => {
-        const selectedBatches = selectedMap[cohort.cohortId];
-        if (!selectedBatches || selectedBatches.size === 0) return null;
-        const selectedChildren = cohort.childData.filter((batch) =>
-          selectedBatches.has(batch.cohortId)
-        );
-        return {
-          cohortId: cohort.cohortId,
-          name: cohort.name,
-          childData: selectedChildren,
-        };
-      })
-      .filter(Boolean) as SelectedData[];
+  const hasUnsavedChanges = () => {
+    if (!selectedCohort) return false;
+    const cohortId = selectedCohort.cohortId;
+    const savedSet = savedSelections[cohortId] || new Set();
+    const tempSet = tempSelectedMap[cohortId] || new Set();
 
-    onFinish(finalData);
+    if (savedSet.size !== tempSet.size) return true;
+
+    for (const id of savedSet) {
+      if (!tempSet.has(id)) return true;
+    }
+    for (const id of tempSet) {
+      if (!savedSet.has(id)) return true;
+    }
+    return false;
+  };
+
+  const handleBack = () => {
+    if (hasUnsavedChanges()) {
+      setPendingAction(() => () => {
+        setTempSelectedMap(savedSelections);
+        setSelectedCohort(null);
+        setStep('cohort');
+      });
+      setShowConfirmDialog(true);
+    } else {
+      setSelectedCohort(null);
+      setStep('cohort');
+    }
   };
 
   const handleBackPress = () => {
@@ -142,12 +175,47 @@ const CohortBatchSelector: React.FC<> = ({
     onCloseNextForm(finalData);
   };
 
+  const handleConfirmDialogClose = (confirmed: boolean) => {
+    setShowConfirmDialog(false);
+    if (confirmed && pendingAction) {
+      pendingAction();
+    }
+    setPendingAction(null);
+  };
+
+  const handleFinish = () => {
+    const finalData: SelectedData[] = data
+      .map((cohort) => {
+        const selectedBatches = savedSelections[cohort.cohortId];
+        if (!selectedBatches || selectedBatches.size === 0) return null;
+        const selectedChildren = cohort.childData.filter((batch) =>
+          selectedBatches.has(batch.cohortId)
+        );
+        return {
+          cohortId: cohort.cohortId,
+          name: cohort.name,
+          childData: selectedChildren,
+        };
+      })
+      .filter(Boolean) as SelectedData[];
+
+    onFinish(finalData);
+  };
+
   return (
     <Box display="flex" flexDirection="column" height="100%">
       {step === 'cohort' ? (
         <>
+          <Box
+            sx={{ display: 'flex', justifyContent: 'flex-start', mb: 2 }}
+            onClick={handleBackPress}
+            cursor="pointer"
+          >
+            <ArrowBackIcon />
+            <Typography variant="h2">{t('MENTOR.BACK_TO_FORM')}</Typography>
+          </Box>
           <Box flex={1} overflow="auto">
-            <Typography variant="h2" mb={1} ml={1}>
+            <Typography variant="h2" mb={1}>
               Select Center
             </Typography>
             <Box>
@@ -217,16 +285,11 @@ const CohortBatchSelector: React.FC<> = ({
             position="sticky"
             bottom={0}
             bgcolor="#fff"
-            p={2}
             borderTop="1px solid #eee"
             display="flex"
+            padding="16px  0 0 0"
+            width={'100%'}
           >
-            <IconButton onClick={handleBackPress}>
-              <ArrowBackIcon />
-              <Typography variant="h2" ml={1}>
-                {t('MENTOR.BACK_TO_FORM')}
-              </Typography>
-            </IconButton>
             <Button
               fullWidth
               variant="contained"
@@ -234,6 +297,9 @@ const CohortBatchSelector: React.FC<> = ({
               disabled={Object.values(selectedMap).every(
                 (set) => set.size === 0
               )}
+              sx={{
+                width: '100%',
+              }}
             >
               {t('MENTOR.FINISH_ASSIGN')}
             </Button>
@@ -247,17 +313,18 @@ const CohortBatchSelector: React.FC<> = ({
             zIndex={10}
             bgcolor="#fff"
             px={2}
-            py={1}
+            pt={1}
             borderBottom="1px solid #eee"
             display="flex"
             alignItems="center"
           >
-            <IconButton onClick={handleBack}>
-              <ArrowBackIcon />
-              <Typography variant="h2" ml={1}>
-                Select Batches for: {selectedCohort?.name}
-              </Typography>
-            </IconButton>
+            {/* <IconButton onClick={handleBack}> */}
+            {/* <ArrowBackIcon /> */}
+            <Typography variant="h2" ml={1}>
+              Select Batches for {selectedCohort?.name} (
+              {tempSelectedMap[selectedCohort?.cohortId]?.size || 0} selected)
+            </Typography>
+            {/* </IconButton> */}
           </Box>
           <Box flex={1} overflow="auto">
             <List>
@@ -278,7 +345,7 @@ const CohortBatchSelector: React.FC<> = ({
                 >
                   <Checkbox
                     checked={
-                      selectedMap[selectedCohort.cohortId]?.has(
+                      tempSelectedMap[selectedCohort.cohortId]?.has(
                         batch.cohortId
                       ) || false
                     }
@@ -288,8 +355,62 @@ const CohortBatchSelector: React.FC<> = ({
               ))}
             </List>
           </Box>
+          <Box
+            position="sticky"
+            bottom={0}
+            bgcolor="#fff"
+            borderTop="1px solid #eee"
+            display="flex"
+            padding="16px 0"
+            width="100%"
+            gap={2}
+          >
+            <Button
+              fullWidth
+              variant="outlined"
+              onClick={handleBack}
+              sx={{ width: '50%' }}
+            >
+              {t('MENTOR.BACK')}
+            </Button>
+            <Button
+              fullWidth
+              variant="contained"
+              onClick={handleSaveSelection}
+              sx={{ width: '50%' }}
+            >
+              {t('MENTOR.SAVE_SELECTION')}
+            </Button>
+          </Box>
         </>
       )}
+
+      <Dialog
+        open={showConfirmDialog}
+        onClose={() => handleConfirmDialogClose(false)}
+      >
+        {/* <DialogTitle>Unsaved Changes</DialogTitle> */}
+        <DialogContent>
+          <Typography>
+            Are you sure you want to go back without saving?{' '}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => handleConfirmDialogClose(false)}
+            color="primary"
+          >
+            No, cancel
+          </Button>
+          <Button
+            onClick={() => handleConfirmDialogClose(true)}
+            color="primary"
+            variant="contained"
+          >
+            Yes, go back
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
