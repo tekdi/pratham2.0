@@ -162,33 +162,54 @@ export default memo(function LearnerCourse({
               }}
             >
               {filterState?.filters
-                ? Object.keys(filterState.filters)
+                ? Object.entries(filterState.filters)
                     .filter(
-                      (e) =>
+                      ([key, _]) =>
                         !['limit', ...Object.keys(staticFilter ?? {})].includes(
-                          e
+                          key
                         )
                     )
-                    .map((key, index) => (
-                      <Chip
-                        key={`${key}-${index}`}
-                        label={
-                          <Typography
-                            noWrap
-                            variant="body2"
-                            sx={{ maxWidth: 300, mb: 0 }}
-                          >
-                            {`${key}: ${filterState.filters[key]}`}
-                          </Typography>
-                        }
-                        onDelete={() => {
-                          const { [key]: _, ...rest } =
-                            filterState.filters ?? {};
-                          handleFilterChange(rest);
-                        }}
-                        sx={{ mr: 1, mb: 1, borderRadius: '8px' }}
-                      />
-                    ))
+                    .map(([key, value], index) => {
+                      if (typeof value === 'object') {
+                        return (value as string[]).map((option, index) => (
+                          <Chip
+                            key={`${key}-${index}`}
+                            label={option}
+                            onDelete={() => {
+                              const { [key]: options, ...rest } =
+                                filterState.filters ?? {};
+                              const newOptions = options.filter(
+                                (o: any) => o !== option
+                              );
+                              if (newOptions.length === 0) {
+                                handleFilterChange({
+                                  ...rest,
+                                });
+                              } else {
+                                handleFilterChange({
+                                  ...rest,
+                                  [key]: newOptions,
+                                });
+                              }
+                            }}
+                            sx={{ mr: 1, mb: 1, borderRadius: '8px' }}
+                          />
+                        ));
+                      } else {
+                        return (
+                          <Chip
+                            key={key}
+                            label={`${key}: ${value}`}
+                            onDelete={() => {
+                              const { [key]: _, ...rest } =
+                                filterState.filters ?? {};
+                              handleFilterChange(rest);
+                            }}
+                            sx={{ mr: 1, mb: 1, borderRadius: '8px' }}
+                          />
+                        );
+                      }
+                    })
                 : null}
             </Box>
           </Box>
