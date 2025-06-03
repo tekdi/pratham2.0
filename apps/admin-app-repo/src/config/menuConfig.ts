@@ -112,7 +112,18 @@ export const MENU_CONFIG = {
       link: '/workspace',
       roles: [Role.CCTA, Role.SCTA],
     },
-
+    faqs: {
+      title: 'FAQs',
+      icon: '/images/faqs.png',
+      link: '/faqs',
+      roles: [
+        Role.ADMIN,
+        Role.CENTRAL_ADMIN,
+        Role.CCTA,
+        Role.SCTA,
+        // Role.CENTRAL_ADMIN, // check
+      ],
+    },
     supportRequest: {
       title: 'Support Request',
       icon: '/images/Support.svg',
@@ -200,6 +211,18 @@ export const MENU_CONFIG = {
       link: '/certificate-issuance',
       roles: [Role.ADMIN],
     },
+    faqs: {
+      title: 'FAQs',
+      icon: '/images/live_help.png',
+      link: '/faqs',
+      roles: [
+        Role.ADMIN,
+        Role.CENTRAL_ADMIN,
+        Role.CCTA,
+        Role.SCTA,
+        // Role.CENTRAL_ADMIN, // check
+      ],
+    },
     supportRequest: {
       title: 'Support Request',
       icon: '/images/Support.svg',
@@ -256,6 +279,18 @@ export const MENU_CONFIG = {
       icon: '/images/dashboard.svg',
       link: '/workspace',
       roles: [Role.CCTA, Role.SCTA],
+    },
+    faqs: {
+      title: 'FAQs',
+      icon: '/images/centers.svg',
+      link: '/faqs',
+      roles: [
+        Role.ADMIN,
+        Role.CENTRAL_ADMIN,
+        Role.CCTA,
+        Role.SCTA,
+        // Role.CENTRAL_ADMIN, // check
+      ],
     },
     supportRequest: {
       title: 'Support Request',

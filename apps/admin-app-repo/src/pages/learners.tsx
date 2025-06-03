@@ -10,7 +10,7 @@ import {
   learnerSearchSchema,
   learnerSearchUISchema,
 } from '../constant/Forms/LearnerSearch';
-import { RoleId, Status } from '@/utils/app.constant';
+import { Role, RoleId, Status } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
 import {
   Box,
@@ -221,6 +221,9 @@ const Learner = () => {
         role: 'Learner',
         tenantId: localStorage.getItem('tenantId'),
       };
+      if (localStorage.getItem('roleName') === Role.ADMIN) {
+        staticFilter.state = [localStorage.getItem('stateId')];
+      }
       const { sortBy } = formData;
       const staticSort = ['firstName', sortBy || 'asc'];
       await searchListData(
@@ -578,6 +581,8 @@ const Learner = () => {
   const notificationKey = 'onLearnerCreated';
   const notificationMessage = 'LEARNERS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
+  const blockReassignmentNotificationKey = 'LEARNER_REASSIGNMENT_NOTIFICATION';
+  const profileUpdateNotificationKey = 'LEARNER_PROFILE_UPDATE_ALERT';
 
   useEffect(() => {
     setPrefilledFormData(initialFormDataSearch);
@@ -673,6 +678,8 @@ const Learner = () => {
             villageFieldId={villageFieldId}
             hideSubmit={true}
             type={'learner'}
+            blockReassignmentNotificationKey={blockReassignmentNotificationKey}
+            profileUpdateNotificationKey={profileUpdateNotificationKey}
           />
         </SimpleModal>
 

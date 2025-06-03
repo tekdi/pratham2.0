@@ -1,11 +1,13 @@
 // app/theme/ThemeRegistry.tsx or MuiThemeProvider.tsx
 'use client';
 
-import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { CssBaseline } from '@mui/material';
 import React from 'react';
 import { LanguageProvider } from '@shared-lib';
 import FontSizeTheme from '../../context/FontSizeTheme';
 import { SpeechProvider } from '@shared-lib-v2/lib/context/SpeechContext';
+import { ColorInversionProvider } from '../../context/ColorInversionContext';
 
 // Add module augmentation for custom typography variants
 declare module '@mui/material/styles' {
@@ -29,6 +31,52 @@ declare module '@mui/material/styles' {
     body8?: React.CSSProperties;
     body9?: React.CSSProperties;
     body10?: React.CSSProperties;
+  }
+
+  interface Palette {
+    customColors: {
+      primary100: string;
+      secondary200: string;
+      secondary300: string;
+      secondary400: string;
+      warning100: string;
+      warning200: string;
+      warning300: string;
+      warning400: string;
+      warning500: string;
+      warning600: string;
+      warning700: string;
+      warning800: string;
+      warning900: string;
+      warningA100: string;
+      warningA200: string;
+      warningA400: string;
+      warningA700: string;
+      warningContrastText: string;
+    };
+  }
+
+  interface PaletteOptions {
+    customColors?: {
+      primary100?: string;
+      secondary200?: string;
+      secondary300?: string;
+      secondary400?: string;
+      warning100?: string;
+      warning200?: string;
+      warning300?: string;
+      warning400?: string;
+      warning500?: string;
+      warning600?: string;
+      warning700?: string;
+      warning800?: string;
+      warning900?: string;
+      warningA100?: string;
+      warningA200?: string;
+      warningA400?: string;
+      warningA700?: string;
+      warningContrastText?: string;
+    };
   }
 }
 
@@ -56,7 +104,6 @@ export const theme = createTheme({
       fontSize: 'calc(22px * var(--font-size-scale))',
       fontWeight: 400,
       lineHeight: 1.27,
-      // marginBottom: '1rem',
     },
     h2: {
       fontSize: 'calc(16px * var(--font-size-scale))',
@@ -67,24 +114,20 @@ export const theme = createTheme({
       fontSize: 'calc(14px * var(--font-size-scale))',
       fontWeight: 500,
       lineHeight: 1.43,
-      // marginBottom: '0.5rem',
     },
     h4: {
-      //h4 is a large label style
       fontSize: 'calc(14px * var(--font-size-scale))',
       fontWeight: 400,
       lineHeight: 1.43,
       letterSpacing: '0.1px',
     },
     h5: {
-      //h5 is a medium label style
       fontSize: 'calc(12px * var(--font-size-scale))',
       fontWeight: 500,
       lineHeight: 1.33,
       letterSpacing: '0.5px',
     },
     h6: {
-      //h6 is a small label style
       fontSize: 'calc(11px * var(--font-size-scale))',
       fontWeight: 500,
       lineHeight: 1.45,
@@ -101,57 +144,47 @@ export const theme = createTheme({
       fontWeight: 400,
       lineHeight: 1.43,
       letterSpacing: '0.25px',
-      // marginBottom: '1rem',
     },
     body3: {
       fontSize: 'calc(72px * var(--font-size-scale))',
       lineHeight: 2.43,
       letterSpacing: '0.25px',
-      // marginBottom: '1.5rem',
     },
     body4: {
       fontSize: 'calc(28px * var(--font-size-scale))',
       lineHeight: 1.5,
       letterSpacing: '0.25px',
-      // marginBottom: '1rem',
     },
     body5: {
       fontSize: 'calc(18px * var(--font-size-scale))',
       lineHeight: 1.5,
       letterSpacing: '0.15px',
-      // marginBottom: '1rem',
     },
     body6: {
       fontSize: 'calc(36px * var(--font-size-scale))',
       lineHeight: 1.4,
       letterSpacing: '0.4px',
-      //  marginBottom: '0.75rem',
     },
     body7: {
       fontSize: 'calc(45px * var(--font-size-scale))',
       lineHeight: 1.4,
       letterSpacing: '0.4px',
-      //  marginBottom: '0.75rem',
     },
     body8: {
       fontSize: 'calc(24px * var(--font-size-scale))',
       lineHeight: 1.4,
       letterSpacing: '0.4px',
-      //  marginBottom: '0.75rem',
     },
     body9: {
       fontSize: 'calc(32px * var(--font-size-scale))',
       lineHeight: 1.4,
       letterSpacing: '0.4px',
-      //  marginBottom: '0.75rem',
     },
     body10: {
       fontSize: 'calc(40px * var(--font-size-scale))',
       lineHeight: 1.4,
       letterSpacing: '0.4px',
-      //  marginBottom: '0.75rem',
     },
-
     button: {
       textTransform: 'none',
       fontSize: 'calc(14px * var(--font-size-scale))',
@@ -162,16 +195,60 @@ export const theme = createTheme({
     primary: {
       main: '#FDBE16',
       light: '#FFDEA1',
+      contrastText: '#EBE1D4',
     },
     secondary: {
       main: '#0D599E',
       light: '#E7F3F8',
+      contrastText: '#cdc5bd',
     },
     success: {
-      main: '#50EE42',
+      main: '#1A8825',
+      light: '#C0FFC7',
+      contrastText: '#fff8f2',
+    },
+    info: {
+      main: '#064471',
+      light: '#D6EEFF',
+      contrastText: '#EFC570',
+    },
+    warning: {
+      main: '#FF9800',
+      light: '#FFB74D',
+      dark: '#F57C00',
+      contrastText: '#000000',
     },
     error: {
-      main: '#ff0000',
+      main: '#BA1A1A',
+      light: '#FFDAD6',
+    },
+    text: {
+      primary: '#1F1B13',
+      secondary: '#4d4639',
+    },
+    background: {
+      default: '#FFFFFF',
+      paper: '#FFFFFF',
+    },
+    customColors: {
+      primary100: '#000000',
+      secondary200: '#FFFFFF',
+      secondary300: '#EEEEEE',
+      secondary400: '#ddd',
+      warning100: '#17130B',
+      warning200: '#261900',
+      warning300: '#1F1B13',
+      warning400: '#7C766F',
+      warning500: '#969088',
+      warning600: '#B1AAA2',
+      warning700: '#DED8E1',
+      warning800: '#F8EFE7',
+      warning900: '#DADADA',
+      warningA100: '#D0C5B4',
+      warningA200: '#4d4639',
+      warningA400: '#FFFFFF',
+      warningA700: '#EDEDED',
+      warningContrastText: '#3B383E',
     },
   },
   components: {
@@ -224,7 +301,7 @@ export const theme = createTheme({
       },
       variants: [
         {
-          props: { variant: 'top-bar-link-text' },
+          props: { variant: 'top-bar-link-text' as any },
           style: {
             fontSize: 'calc(16px * var(--font-size-scale))',
             lineHeight: '24px',
@@ -238,7 +315,7 @@ export const theme = createTheme({
           },
         },
         {
-          props: { variant: 'top-bar-link-button' },
+          props: { variant: 'top-bar-link-button' as any },
           style: {
             fontSize: 'calc(16px * var(--font-size-scale))',
             lineHeight: '24px',
@@ -281,10 +358,12 @@ export default function MuiThemeProvider({
   children: React.ReactNode;
 }) {
   return (
-    <FontSizeTheme baseTheme={theme}>
-      <CssBaseline />
-      <SpeechProvider>{children}</SpeechProvider>
-    </FontSizeTheme>
+    <ColorInversionProvider>
+      <FontSizeTheme baseTheme={theme}>
+        <CssBaseline />
+        <SpeechProvider>{children}</SpeechProvider>
+      </FontSizeTheme>
+    </ColorInversionProvider>
   );
 }
 

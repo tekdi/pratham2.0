@@ -1,3 +1,4 @@
+// @ts-ignore
 import { CohortListParam, GetCohortSearchParams } from '@/utils/Interfaces';
 import { Role, Status } from '@/utils/app.constant';
 import { get, post } from './RestClient';
@@ -61,7 +62,11 @@ export const getCohortList = async (
       res = res.filter((block: any) => {
         if (
           block?.cohortStatus === Status.ACTIVE &&
-          block?.childData.length > 0
+          //if no center then also show in list only for facilitator
+          ((localStorage.getItem('role') === Role.TEACHER &&
+            block?.childData.length > 0) ||
+            localStorage.getItem('role') !== Role.TEACHER)
+          //
         ) {
           return block;
         }
@@ -176,15 +181,18 @@ export const getBlocksByCenterId = async (
   return matchingChildren;
 };
 
-const getChildDataByParentId = (data, parentId) => {
-  let result = [];
+const getChildDataByParentId = (data: any, parentId: string) => {
+  let result: any[] = [];
 
-  const search = (items) => {
+  const search = (items: any[]) => {
     for (const item of items) {
       if (item.childData && item.childData.length > 0) {
         for (const child of item.childData) {
           if (child.parentId === parentId) {
-            result.push(child);
+            console.log('######### testing batch', child);
+            if (child?.status === Status.ACTIVE) {
+              result.push(child);
+            }
           }
           // continue searching in case of deeper nesting
           if (child.childData && child.childData.length > 0) {
@@ -197,4 +205,17 @@ const getChildDataByParentId = (data, parentId) => {
 
   search(data);
   return result;
+};
+
+export const getCohortData = async (
+  userId: string | string[]
+): Promise<any> => {
+  const apiUrl: string = API_ENDPOINTS.myCohorts(userId);
+  try {
+    const response = await get(apiUrl);
+    return response?.data;
+  } catch (error) {
+    console.error('error in fetching user details', error);
+    return error;
+  }
 };

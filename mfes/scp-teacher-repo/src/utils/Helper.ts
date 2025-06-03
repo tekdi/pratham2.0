@@ -17,6 +17,8 @@ import {
   lowLearnerAttendanceLimit,
 } from '../../app.config';
 import API_ENDPOINTS from './API/APIEndpoints';
+import { getCohortData } from '@/services/CohortServices';
+import { customFields } from '@/components/GeneratedSchemas';
 
 export const ATTENDANCE_ENUM = {
   PRESENT: 'present',
@@ -557,6 +559,7 @@ export const getUserDetailsById = (data: any[], userId: any) => {
       status: user?.status,
       statusReason: user?.statusReason,
       cohortMembershipId: user?.cohortMembershipId,
+      customFields: user?.customField,
     };
   }
 
@@ -955,11 +958,9 @@ export const getUserFullName = (user?: {
   if (user) {
     userData = user;
   } else {
-    if (typeof window !== 'undefined') {
-      const storedData = localStorage.getItem('userData');
-      if (storedData) {
-        userData = JSON.parse(storedData);
-      }
+    if (typeof window !== 'undefined' && window.localStorage) {
+      userData = localStorage.getItem('userData');
+      userData = JSON.parse(userData || '{}');
     }
   }
 
@@ -983,26 +984,22 @@ export const calculateAge = (dob: any) => {
 };
 
 export const getBMG = (cohortData: any) => {
-  if (cohortData) {
-    if (cohortData?.customField?.length) {
-      const medium = cohortData.customField.find(
-        (item: CustomField) => item.label === 'MEDIUM'
+  if (cohortData?.customField?.length) {
+    const getValue = (label: string) => {
+      const field = cohortData.customField.find(
+        (item: any) => item.label === label
       );
+      const value = field?.selectedValues?.[0];
+      return typeof value === 'object' ? value.value : value;
+    };
 
-      const grade = cohortData.customField.find(
-        (item: CustomField) => item.label === 'GRADE'
-      );
+    const bmg = {
+      board: getValue('BOARD'),
+      medium: getValue('MEDIUM'),
+      grade: getValue('GRADE'),
+    };
 
-      const board = cohortData.customField.find(
-        (item: CustomField) => item.label === 'BOARD'
-      );
-      const bmg = {
-        board: board?.value,
-        medium: medium?.value,
-        grade: grade?.value,
-      };
-      return bmg;
-    }
+    return bmg;
   }
   return null;
 };
@@ -1169,10 +1166,47 @@ export const flresponsetotl = async (response: any[]) => {
 
   return transformedData;
 };
+
+export const fetchUserData = async (userId: any) => {
+  try {
+    let activeCohortIds = [];
+    const resp = await getCohortData(userId);
+    if (resp?.result) {
+      activeCohortIds = resp.result
+        .filter(
+          (cohort: any) =>
+            cohort.type === 'BATCH' && cohort.cohortMemberStatus === 'active'
+        )
+        .map((cohort: any) => cohort.cohortId);
+      console.log(activeCohortIds, 'activeBatches');
+    }
+    return activeCohortIds;
+  } catch (error) {
+    console.error('Error getting user details:', error);
+    return null;
+  }
+};
 export const getInitials = (name: any) => {
   if (!name) return ''; // Handle empty input
   const words = name?.trim().split(' ');
   return words?.length > 1
     ? words[0][0].toUpperCase() + words[1][0].toUpperCase()
     : words[0][0].toUpperCase();
+};
+export const isUnderEighteen = (dobString: any): boolean => {
+  if (!dobString) return false;
+
+  const dob = new Date(dobString);
+  if (isNaN(dob.getTime())) return false; // Invalid date check
+
+  const today = new Date();
+  let age = today.getFullYear() - dob.getFullYear();
+  const monthDiff = today.getMonth() - dob.getMonth();
+  const dayDiff = today.getDate() - dob.getDate();
+
+  if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+    age--;
+  }
+
+  return age < 18;
 };
