@@ -423,6 +423,19 @@
     "AVAILABLE_SUGGESTIONS": "Available suggestions:",
     "USERNAME_ALREADY_EXIST": "This username already exists",
     "DO_YOU_WANT_TO_DELETE": "Do you want to delete user from center?",
-    "TEST_BELONG_TO": "test belongs to below center"
+    "TEST_BELONG_TO": "test belongs to below center",
+    "UNIT_CODE": "Unit Code",
+    "ENROLLMENT_NUMBER": "Enrollment Number",
+    "BLOCK_NAME": "Block Name",
+    "STUDENT_TYPE": "Type of Learner",
+    "STATE_NAME": "State Name",
+    "SUPPORT_NEEDED": "Support needed",
+    "CLASS": "Class (Last passed grade)",
+       "PRIMARY_WORK": "Learner's Primary Work",
+    "MOBILISATION_METHOD": "How Was the Learner Mobilized?",
+    "MONTH_MOBILISATION": "Month of Mobilisation",
+    "DROP_OUT_REASON": "Reason for Drop Out From School"
+   
+   
   }
 }
