@@ -1,8 +1,20 @@
 import dynamic from 'next/dynamic';
 import React, { useState, useCallback, memo, useEffect } from 'react';
-import { Box, Button, Chip, Stack, Typography } from '@mui/material';
-import { CommonDialog, useTranslation } from '@shared-lib';
-import { FilterAltOutlined, FilterList } from '@mui/icons-material';
+import {
+  Box,
+  Button,
+  Chip,
+  Drawer,
+  IconButton,
+  Stack,
+  Typography,
+} from '@mui/material';
+import { useTranslation } from '@shared-lib';
+import {
+  Close as CloseIcon,
+  FilterAltOutlined,
+  FilterList,
+} from '@mui/icons-material';
 import SearchComponent from './SearchComponent';
 import FilterComponent from './FilterComponent';
 import { gredientStyle } from '@learner/utils/style';
@@ -174,7 +186,26 @@ export default memo(function LearnerCourse({
         direction="row"
         sx={{ gap: 4, px: { xs: 2, md: 4 }, py: { xs: 1, md: 2 } }}
       >
-        <CommonDialog isOpen={isOpen} onClose={() => setIsOpen(false)}>
+        <Drawer
+          anchor="left"
+          open={isOpen}
+          onClose={() => setIsOpen(false)}
+          PaperProps={{
+            sx: {
+              width: '80%',
+            },
+          }}
+        >
+          <IconButton
+            onClick={() => setIsOpen(false)}
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: 8,
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
           <FilterComponent
             filterFramework={filterFramework}
             staticFilter={staticFilter}
@@ -182,8 +213,20 @@ export default memo(function LearnerCourse({
             handleFilterChange={handleFilterChange}
             onlyFields={_content?.onlyFields ?? []}
             isOpenColapsed={_content?.isOpenColapsed ?? []}
+            _config={{
+              _filterText: { sx: { pt: 2, px: 2 } },
+              _filterBox: { sx: { gap: 0 } },
+              _filterBody: {
+                sx: {
+                  py: 2,
+                  px: 2,
+                  height: 'calc(100vh - 57px)',
+                  overflowY: 'auto',
+                },
+              },
+            }}
           />
-        </CommonDialog>
+        </Drawer>
 
         <Box
           flex={35}
