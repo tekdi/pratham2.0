@@ -20,74 +20,78 @@ import OtherWebsiteCarousel from '@learner/components/OtherWebsiteCarousel';
 import Learning from '@learner/components/Learning';
 import Image from 'next/image';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
+import dynamic from 'next/dynamic';
 
-const keyThemesList = [
-  [
-    {
-      title: 'Academics',
+const Content = dynamic(() => import('@Content'), {
+  ssr: false,
+});
+// const keyThemesList = [
+//   [
+//     {
+//       title: 'Academics',
 
-      desc: 'Math, Science, English...',
-    },
-    {
-      title: 'Growth & Learning',
+//       desc: 'Math, Science, English...',
+//     },
+//     {
+//       title: 'Growth & Learning',
 
-      desc: 'Activity Videos, Stories, Riddles...',
-    },
-    {
-      title: 'Media Moments',
+//       desc: 'Activity Videos, Stories, Riddles...',
+//     },
+//     {
+//       title: 'Media Moments',
 
-      desc: 'TV Episodes, Podcasts...',
-    },
-    {
-      title: 'Inclusive Education',
+//       desc: 'TV Episodes, Podcasts...',
+//     },
+//     {
+//       title: 'Inclusive Education',
 
-      desc: 'Innovative Strategies, Subject-specific...',
-    },
-  ],
-  [
-    {
-      title: 'Career Skills',
+//       desc: 'Innovative Strategies, Subject-specific...',
+//     },
+//   ],
+//   [
+//     {
+//       title: 'Career Skills',
 
-      desc: 'Resume, Interview, Communication...',
-    },
-    {
-      title: 'Entrepreneurship',
+//       desc: 'Resume, Interview, Communication...',
+//     },
+//     {
+//       title: 'Entrepreneurship',
 
-      desc: 'Startups, Business Ideas, Finance...',
-    },
-    {
-      title: 'Digital Literacy',
+//       desc: 'Startups, Business Ideas, Finance...',
+//     },
+//     {
+//       title: 'Digital Literacy',
 
-      desc: 'Computers, Internet, Safety...',
-    },
-    {
-      title: 'Professional Growth',
+//       desc: 'Computers, Internet, Safety...',
+//     },
+//     {
+//       title: 'Professional Growth',
 
-      desc: 'Leadership, Teamwork, Projects...',
-    },
-  ],
-  [
-    {
-      title: 'Life Skills',
+//       desc: 'Leadership, Teamwork, Projects...',
+//     },
+//   ],
+//   [
+//     {
+//       title: 'Life Skills',
 
-      desc: 'Critical Thinking, Problem Solving...',
-    },
-    {
-      title: 'Health & Wellness',
+//       desc: 'Critical Thinking, Problem Solving...',
+//     },
+//     {
+//       title: 'Health & Wellness',
 
-      desc: 'Nutrition, Exercise, Mindfulness...',
-    },
-    {
-      title: 'Civic Awareness',
-      desc: 'Rights, Responsibilities, Community...',
-    },
-    {
-      title: 'Creativity',
+//       desc: 'Nutrition, Exercise, Mindfulness...',
+//     },
+//     {
+//       title: 'Civic Awareness',
+//       desc: 'Rights, Responsibilities, Community...',
+//     },
+//     {
+//       title: 'Creativity',
 
-      desc: 'Art, Music, Innovation...',
-    },
-  ],
-];
+//       desc: 'Art, Music, Innovation...',
+//     },
+//   ],
+// ];
 const descriptions = [
   `
   Learning for School focuses on scholastic subjects, which include early years education and learning to read, write, and think. These skills are crucial for building children's confidence and dignity among their peers.
@@ -331,7 +335,7 @@ const page = () => {
         >
           <SpeakableText>Our Learning Pillars</SpeakableText>
         </Typography>
-        <Learning data={keyThemesList} descriptions={descriptions} />
+        <Learning descriptions={descriptions} />
       </Box>
 
       {/* Total Resources section  */}
@@ -464,10 +468,28 @@ const page = () => {
 
         <Box
           sx={{
-            mt: 1,
+            mt: 4,
           }}
         >
-          <FeautureCarousel />
+          {/* <FeautureCarousel /> */}
+          <Content
+            isShowLayout={false}
+            contentTabs={['Content']}
+            showFilter={false}
+            showSearch={false}
+            filters={{ limit: 10 }}
+            // showHelpDesk={false}
+            hasMoreData={false}
+            _config={{
+              _carousel: {
+                loop: true,
+                autoplay: { delay: 2500, disableOnInteraction: false },
+              },
+              isHideNavigation: true,
+              isShowInCarousel: true,
+              default_img: '/images/image_ver.png',
+            }}
+          />
         </Box>
       </Box>
 
