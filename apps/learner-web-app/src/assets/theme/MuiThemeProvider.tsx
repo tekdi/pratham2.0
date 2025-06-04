@@ -290,6 +290,18 @@ export const theme = createTheme({
         root: {},
       },
     },
+    MuiTabs: {
+      styleOverrides: {
+        root: {
+          '& .MuiTab-root': {
+            color: '#4D4639',
+            '&.Mui-selected': {
+              color: '#1F1B13',
+            },
+          },
+        },
+      },
+    },
     MuiButton: {
       styleOverrides: {
         root: {
@@ -300,6 +312,19 @@ export const theme = createTheme({
         },
       },
       variants: [
+        {
+          props: { variant: 'text-filter-show-more' as any },
+          style: {
+            fontSize: 'calc(16px * var(--font-size-scale))',
+            color: '#987100',
+            '&:hover': {
+              backgroundColor: 'transparent', // Change to desired hover background color
+            },
+            '& .MuiButton-startIcon': {
+              color: '#987100',
+            },
+          },
+        },
         {
           props: { variant: 'top-bar-link-text' as any },
           style: {

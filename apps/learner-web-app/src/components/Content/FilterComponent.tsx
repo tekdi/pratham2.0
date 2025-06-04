@@ -9,6 +9,7 @@ const FilterComponent: React.FC<{
   handleFilterChange: (newFilterState: any) => void;
   onlyFields?: string[];
   isOpenColapsed?: boolean | any[];
+  _config?: any;
 }> = ({
   filterState,
   staticFilter,
@@ -16,6 +17,7 @@ const FilterComponent: React.FC<{
   handleFilterChange,
   onlyFields,
   isOpenColapsed,
+  _config,
 }) => {
   const { t } = useTranslation();
   const [filterCount, setFilterCount] = useState<any>();
@@ -35,6 +37,17 @@ const FilterComponent: React.FC<{
   const memoizedFilterForm = useMemo(
     () => (
       <FilterForm
+        _config={{
+          _filterBody: _config?._filterBody,
+          _checkbox: {
+            sx: {
+              color: '#1F1B13',
+              '&.Mui-checked': {
+                color: '#1F1B13',
+              },
+            },
+          },
+        }}
         onApply={(newFilterState: any) => {
           setFilterCount(
             Object?.keys(newFilterState ?? {}).filter(
@@ -57,6 +70,7 @@ const FilterComponent: React.FC<{
       staticFilter,
       onlyFields,
       filterState,
+      _config,
     ]
   );
 
@@ -67,6 +81,7 @@ const FilterComponent: React.FC<{
         flexDirection: 'column',
         gap: 2,
         width: '100%',
+        ...(_config?._filterBox?.sx ?? {}),
       }}
     >
       <Box
@@ -74,6 +89,9 @@ const FilterComponent: React.FC<{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
+          borderBottom: '1px solid #D0C5B4',
+          pb: 2,
+          ...(_config?._filterText?.sx ?? {}),
         }}
       >
         <Typography
@@ -88,7 +106,7 @@ const FilterComponent: React.FC<{
         {filterCount > 0 && (
           <Button
             variant="text"
-            color="primary"
+            color="secondary"
             onClick={() => {
               setFilterCount(0);
               handleFilterChange({});
@@ -98,7 +116,6 @@ const FilterComponent: React.FC<{
           </Button>
         )}
       </Box>
-
       {memoizedFilterForm}
     </Box>
   );

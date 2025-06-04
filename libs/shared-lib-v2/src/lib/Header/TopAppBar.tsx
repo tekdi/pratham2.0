@@ -114,8 +114,13 @@ const LanguageSelect = ({
       size="small"
       onChange={handleChange}
       sx={{
+        width: 67,
         '& .MuiSelect-select': {
-          padding: '2px 12px 3px 12px',
+          padding: '2px 0px 3px 8px',
+          paddingRight: '20px !important',
+        },
+        '& .MuiSelect-icon': {
+          width: '20px',
         },
         color: theme.palette.text.primary,
         borderRadius: '8px',
@@ -221,10 +226,14 @@ export const DesktopBar = ({
               >
                 <Typography
                   variant="body1"
-                  sx={{ fontWeight: 500, color: '#1F1B13' }}
+                  sx={{
+                    fontWeight: 500,
+                    color: '#1F1B13',
+                    cursor: 'pointer',
+                  }}
                   data-speech-control="true"
                 >
-                  <SpeakableText>{link.title}</SpeakableText>
+                  <SpeakableText cursor={true}>{link.title}</SpeakableText>
                 </Typography>
               </Button>
               {link.child && (
@@ -314,10 +323,16 @@ export const DesktopBar = ({
                     >
                       <Typography
                         variant="body1"
-                        sx={{ fontWeight: 500, color: '#1F1B13' }}
+                        sx={{
+                          fontWeight: 500,
+                          color: '#1F1B13',
+                          cursor: 'pointer',
+                        }}
                         data-speech-control="true"
                       >
-                        <SpeakableText>{item.title}</SpeakableText>
+                        <SpeakableText cursor={true}>
+                          {item.title}
+                        </SpeakableText>
                       </Typography>
                       {hasChild && (
                         <ArrowDropDownIcon
@@ -366,7 +381,7 @@ const MobileTopBar = ({
             aria-label="menu"
             onClick={(e) => setIsDrawerOpen(true)}
           >
-            <MenuIcon />
+            <MenuIcon sx={{ cursor: 'pointer', color: '#1F1B13' }} />
           </IconButton>
           <Brand {..._brand} name={''} />
         </>

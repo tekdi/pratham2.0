@@ -21,7 +21,7 @@ const ContentCard = ({
   const { isWrap } = _card ?? {};
 
   return (
-    <CardWrap isWrap={isWrap} _card={_card}>
+    <CardWrap isWrap={isWrap && type === 'Course'} _card={_card}>
       <CommonCard
         title={(item?.name || '').trim()}
         image={
