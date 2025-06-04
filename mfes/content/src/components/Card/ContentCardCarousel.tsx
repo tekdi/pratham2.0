@@ -7,7 +7,7 @@ import {
   IconButton,
 } from '@mui/material';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation } from 'swiper/modules';
+import { Autoplay, Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import { ContentItem, useTranslation } from '@shared-lib';
@@ -78,7 +78,7 @@ const ContentCardCarousel = ({
         </IconButton>
       )}
       <Swiper
-        modules={[Navigation]}
+        modules={[Navigation, Autoplay]}
         spaceBetween={16}
         slidesPerView={2}
         navigation={{

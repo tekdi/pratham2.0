@@ -468,7 +468,7 @@ const page = () => {
 
         <Box
           sx={{
-            mt: 1,
+            mt: 4,
           }}
         >
           {/* <FeautureCarousel /> */}
