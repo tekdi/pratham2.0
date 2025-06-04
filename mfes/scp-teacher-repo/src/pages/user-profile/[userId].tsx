@@ -121,7 +121,7 @@ const UserId = () => {
 
   return (
     <>
-      <Box minHeight="100vh">
+      <Box>
         <Box>
           <Header />
         </Box>
