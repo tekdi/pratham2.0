@@ -94,9 +94,9 @@ export default function App({
           _infoCard: {
             default_img: `/images/pos_${pagename?.toLowerCase()}.jpg`,
             isHideStatus: true,
-            _textCard: { p: '40px' },
+            _textCard: { p: { md: '40px' } },
             _cardMedia: {
-              maxHeight: '250px',
+              maxHeight: { xs: '180px', sm: '200px', md: '250px' },
               position: 'relative',
               '&:after': {
                 content: '""',
