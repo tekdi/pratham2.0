@@ -599,6 +599,7 @@ const page = () => {
         sx={{
           mt: 7,
           mx: 7,
+          mb: 2,
           '@media (max-width: 900px)': {
             mx: '16px',
           },
