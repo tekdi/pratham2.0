@@ -19,6 +19,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Loader } from '../Loader/Loader';
 import { sortJsonByArray } from '../../utils/helper';
 import SpeakableText from '../textToSpeech/SpeakableText';
+import { debounce } from 'lodash';
 
 export interface TermOption {
   code: string;
@@ -50,6 +51,7 @@ interface FilterSectionProps {
   staticFormData?: Record<string, object>;
   isShowStaticFilterValue?: boolean;
   isOpenColapsed?: boolean | any[];
+  _checkbox?: any;
 }
 
 interface FilterListProps {
@@ -60,6 +62,7 @@ interface FilterListProps {
   isShowStaticFilterValue?: boolean;
   isOpenColapsed?: boolean | any[];
   onlyFields?: string[];
+  _config?: any;
 }
 
 export function FilterForm({
@@ -70,6 +73,7 @@ export function FilterForm({
   isShowStaticFilterValue,
   isOpenColapsed,
   onlyFields,
+  _config,
 }: Readonly<FilterListProps>) {
   const { t } = useTranslation();
   const [filterData, setFilterData] = useState<any[]>([]);
@@ -129,15 +133,21 @@ export function FilterForm({
     fetchData();
   }, [fetchData]);
 
-  const handleFilter = () => {
-    const formattedPayload = formatPayload(formData);
+  const handleFilter = (filterValue: any) => {
+    const formattedPayload = formatPayload(filterValue ?? formData);
     onApply?.({ ...formattedPayload, ...staticFilter });
   };
 
   return (
     <Loader isLoading={loading}>
-      <Box display="flex" flexDirection="column" gap={2}>
+      <Box
+        display="flex"
+        flexDirection="column"
+        gap={2}
+        {...(_config?._filterBody ?? {})}
+      >
         <FilterSection
+          {..._config}
           isShowStaticFilterValue={isShowStaticFilterValue}
           isOpenColapsed={isOpenColapsed}
           staticFormData={staticFilter}
@@ -161,19 +171,20 @@ export function FilterForm({
               setRenderForm(dormNewData);
             }
             setFormData(filterValue);
+            handleFilter(filterValue);
           }}
           showMore={showMore}
           setShowMore={setShowMore}
         />
-        <Box display={'flex'} justifyContent="center" gap={2} mt={2}>
+        {/* <Box display={'flex'} justifyContent="center" gap={2} mt={2}>
           <MuiButton
             variant="contained"
             sx={{ width: '50%' }}
             onClick={handleFilter}
           >
-            <SpeakableText>{t('Filter')}</SpeakableText>
+            <SpeakableText>{t('Apply Filter')}</SpeakableText>
           </MuiButton>
-        </Box>
+        </Box> */}
       </Box>
     </Loader>
   );
@@ -278,6 +289,19 @@ function replaceOptionsWithAssoc({
         const nextFilterIndex = updatedFilters.findIndex(
           (f: any, idx: number) => f.old_code === assocKey && idx > i
         );
+        // remove unwanted filterValue using options
+        if (filterValue?.[`se_${assocKey}s`]) {
+          filterValue[`se_${assocKey}s`] = filterValue[
+            `se_${assocKey}s`
+          ].filter((item: any) =>
+            assocOptions.find(
+              (sub) =>
+                sub.code === (item.code ?? item.name ?? item) ||
+                sub.name === (item.code ?? item.name ?? item) ||
+                sub === (item.code ?? item.name ?? item)
+            )
+          );
+        }
         if (nextFilterIndex !== -1) {
           updatedFilters[nextFilterIndex].options = assocOptions;
         }
@@ -302,6 +326,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
   setShowMore,
   isShowStaticFilterValue,
   isOpenColapsed,
+  _checkbox,
 }) => {
   return (
     <Box>
@@ -361,6 +386,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
               <AccordionSummary
                 expandIcon={<ExpandMoreIcon sx={{ color: '#1C1B1F' }} />}
                 sx={{
+                  px: 0,
                   minHeight: 20,
                   '&.Mui-expanded': {
                     minHeight: 20,
@@ -384,7 +410,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
               </AccordionSummary>
               <AccordionDetails
                 sx={{
-                  padding: '0px 16px',
+                  padding: '0px',
                   overflow: 'auto',
                   maxHeight: '150px',
                 }}
@@ -403,13 +429,24 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                         key={`${code}-${idx}`}
                         control={
                           <Checkbox
+                            {..._checkbox}
                             checked={isChecked}
                             onChange={(e) => {
                               const next = e.target.checked
                                 ? [...selected, item]
                                 : selected.filter(
                                     (s: any) =>
-                                      !(s === item.name || s.name === item.name)
+                                      !(
+                                        (s && item && s === item) ||
+                                        (s && item.code && s === item?.code) ||
+                                        (s && item?.name && s === item?.name) ||
+                                        (s?.code &&
+                                          item.code &&
+                                          s?.code === item?.code) ||
+                                        (s?.name &&
+                                          item?.name &&
+                                          s?.name === item?.name)
+                                      )
                                   );
                               onChange(code, next);
                             }}
@@ -427,23 +464,24 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                     );
                   })}
                 </FormGroup>
-                {values.length > 3 && !staticValues.length && (
-                  <Button
-                    variant="text"
-                    size="small"
-                    onClick={() =>
-                      setShowMore((prev: string[]) =>
-                        prev.includes(code)
-                          ? prev.filter((c) => c !== code)
-                          : [...prev, code]
-                      )
-                    }
-                    sx={{ mt: 0 }}
-                  >
-                    {showMore.includes(code) ? 'Show less ▲' : 'Show more ▼'}
-                  </Button>
-                )}
               </AccordionDetails>
+              {values.length > 3 && !staticValues.length && (
+                <Button
+                  /* @ts-ignore */
+                  variant="text-filter-show-more"
+                  size="small"
+                  onClick={() =>
+                    setShowMore((prev: string[]) =>
+                      prev.includes(code)
+                        ? prev.filter((c) => c !== code)
+                        : [...prev, code]
+                    )
+                  }
+                  sx={{ mt: 0, px: 0 }}
+                >
+                  {showMore.includes(code) ? 'Show less ▲' : 'Show more ▼'}
+                </Button>
+              )}
             </Accordion>
           );
         }

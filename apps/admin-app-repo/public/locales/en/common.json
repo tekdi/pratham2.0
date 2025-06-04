@@ -160,7 +160,8 @@
     "NOT_ABLE_CREATE_LEARNER": "Not Able To Create Learner",
     "NO_CONTENT_CREATOR_FOUND": "No Content Creator (SCTA) Found",
     "NO_CONTENT_REVIEWER_FOUND": "No Content Reviewer (CCTA) Found",
-    "NO_STATE_LEAD_FOUND": "No State Lead Found"
+    "NO_STATE_LEAD_FOUND": "No State Lead Found",
+    "FAQS": "FAQ's"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -342,7 +343,12 @@
     "SELECT_GRADE": "Select Grade",
     "SELECT_TYPE": "Select Type",
     "CLEAR_SELECTION": "Clear Selection",
-    "SELECT_ALL_MESSSAGE": "Select Medium, Grade, and Type"
+    "SELECT_ALL_MESSSAGE": "Select Medium, Grade, and Type",
+    "IMPORT_NEW_PLANNER": "Import New Planner",
+    "ADD_NEW_TOPIC": "Add New Topic",
+    "DELETE_PLANNER": "Delete Planner",
+    "CSV_TEMPLATE": "CSV Template",
+    "NEW_TOPIC": "New Topic"
   },
   "MASTER": {
     "STATE": "States",
@@ -674,7 +680,9 @@
     "ASSIGN_VILLAGES_FINISH": "You can complete this later at your own pace. However, the villages will only be assigned once you click on ‘Finish.’",
     "ASSIGN_VILLAGES_FROM_BLOCKS": "Assign Villages from Blocks",
     "BACK_TO_FORM": "Back to form",
-    "SEARCH_VILLAGES": "Search villages.."
+    "SEARCH_VILLAGES": "Search villages..",
+    "BACK": "Back",
+    "SAVE_SELECTION": "Save Selection"
   },
   "WHATS_YOUR_GENDER": "Gender",
   "first_name": " First Name",

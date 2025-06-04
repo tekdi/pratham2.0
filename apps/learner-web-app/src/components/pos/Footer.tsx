@@ -17,33 +17,35 @@ import {
 import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
+import { useColorInversion } from '../../context/ColorInversionContext';
 
 export const Footer: React.FC = () => {
   const { t } = useTranslation('footer');
+  const { isColorInverted } = useColorInversion();
 
   const usefulLinks = [
     {
-      label: t('pratham'),
+      label: t('Pratham'),
       href: 'https://www.pratham.org/',
     },
     {
-      label: t('ourInterns'),
+      label: t('Our Interns'),
       href: 'https://prathamopenschool.org/Team/Interns',
     },
     {
-      label: t('pradigiCreativityClub'),
+      label: t('PraDigi Creativity Club'),
       href: 'https://www.pradigi.org/creative-club/',
     },
     {
-      label: t('communityProjects'),
+      label: t('Community Projects'),
       href: 'https://prathamopenschool.org/CommunityProjects/Contents/Pradigicp',
     },
     {
-      label: t('covid19Resources'),
+      label: t('Covid-19 Resources'),
       href: 'https://prathamopenschool.org/Covid19Resources',
     },
     {
-      label: t('mohallaLearningCamp'),
+      label: t('Mohalla Learning Camp'),
       href: 'https://prathamopenschool.org/MohallaLearningCamp/Contents/mohallalc',
     },
   ];
@@ -67,7 +69,11 @@ export const Footer: React.FC = () => {
             <Grid item>
               <Link href="/" passHref legacyBehavior>
                 <Image
-                  src="/images/appLogo.svg"
+                  src={
+                    isColorInverted
+                      ? '/images/PrathamLogowhite.png'
+                      : '/images/appLogo.svg'
+                  }
                   alt="Pratham"
                   width={146}
                   height={32}
@@ -109,10 +115,14 @@ export const Footer: React.FC = () => {
                     <Link href={href} passHref legacyBehavior>
                       <Typography
                         variant="body1"
-                        sx={{ fontWeight: 400, color: '#1F1B13' }}
+                        sx={{
+                          fontWeight: 400,
+                          color: '#1F1B13',
+                          cursor: 'pointer',
+                        }}
                       >
                         <a target="_blank" rel="noopener noreferrer">
-                          <SpeakableText>{label}</SpeakableText>
+                          <SpeakableText cursor={true}>{label}</SpeakableText>
                         </a>
                       </Typography>
                     </Link>

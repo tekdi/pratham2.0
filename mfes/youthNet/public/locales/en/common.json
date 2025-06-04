@@ -621,7 +621,6 @@
     "MIN_LENGTH_CHARACTERS_ERROR": "Minimum {{minLength}} characters required",
     "MAX_LENGTH_CHARACTERS_ERROR": "Maximum {{maxLength}} characters allowed",
     "NUMBER_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "Numbers and special characters are not allowed",
-
     "ENTER_VALID_MOBILE_NUMBER": "Enter Valid mobile number",
     "ENTER_VALID_EMAIL": "Enter valid Email",
     "ENTER_VALID_YEAR": "Enter valid Year",
@@ -731,7 +730,6 @@
     "VILLAGES_MANAGED_BY_YOU": "Villages Managed by you : {{totalVillageCount}}",
     "VILLAGE_MANAGED_BY_YOU": "Village Managed by you : {{totalVillageCount}}",
     "VILLAGE": "Village",
-
     "MANAGES": "Manages",
     "VILLAGES": "Villages",
     "MONTHLY_REGISTRATIONS_OVERVIEW": "Registrations Overview",
@@ -771,6 +769,7 @@
     "FULL_NAME": "Full Name",
     "EMAIL_ID": "Email ID",
     "STATE_DISTRICT_BLOCK": "Block District State",
+    "STATE_DISTRICT": "District State",
     "STATE_DISTRICT_BLOCK_VILLAGE": "Village Block District State",
     "DESIGNATION": "Designation",
     "JOINED_ON": "Joined on",
@@ -786,7 +785,6 @@
     "LAST_NAME": "Last Name",
     "USERNAME": "Username"
   },
-
   "YOUTHNET_USERS_AND_VILLAGES": {
     "MENTORS": "Mentors",
     "CSV": "CSV",
@@ -812,7 +810,6 @@
     "DISTRICT": "District",
     "DISTRICTS": "Districts"
   },
-
   "YOUTHNET_CAMP_DETAILS": {
     "SUBMISSION": "Submission",
     "SUMMARY": "Summary"
@@ -828,7 +825,6 @@
   "MENTOR": {
     "MENTOR_CREATED_SUCCESSFULLY": "The mentor account has been created successfully, and the credentials have been sent",
     "MENTOR_CREATED": "The mentor account has been created successfully",
-
     "MENTOR_CREATED_FAILED": "Failed to create mentor account",
     "FINISH_ASSIGN": "Finish & Assign",
     "VILLAGES_SELECTED": "villages selected",

@@ -10,7 +10,7 @@ import {
   MentorLeadSearchSchema,
   MentorLeadSearchUISchema,
 } from '../constant/Forms/MentorLeadSearch';
-import { RoleId, Status } from '@/utils/app.constant';
+import { Role, RoleId, Status } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
 import {
   Box,
@@ -151,7 +151,9 @@ const MentorLead = () => {
       status: 'active',
       tenantId: localStorage.getItem('tenantId'),
     };
-
+    if (localStorage.getItem('roleName') === Role.ADMIN) {
+      staticFilter.state = [localStorage.getItem('stateId')];
+    }
     const { sortBy } = formData;
     const staticSort = ['firstName', sortBy || 'asc'];
     await searchListData(
@@ -452,12 +454,15 @@ const MentorLead = () => {
         <SimpleModal
           open={openModal}
           onClose={handleCloseModal}
-          showFooter={false}
+          showFooter={true}
           modalTitle={
             isEdit
               ? t('MENTOR_LEADERS.UPDATE_MENTOR_LEAD')
               : t('MENTOR_LEADERS.NEW_MENTOR_LEAD')
           }
+          id="dynamic-form-id"
+          primaryText={isEdit ? t('Update') : t('Create')}
+
         >
           <AddEditUser
             SuccessCallback={() => {
@@ -486,6 +491,8 @@ const MentorLead = () => {
             notificationKey={notificationKey}
             notificationMessage={notificationMessage}
             notificationContext={notificationContext}
+           hideSubmit={true}
+
           />
         </SimpleModal>
 

@@ -13,6 +13,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
+import { useColorInversion } from '../context/ColorInversionContext';
 
 const slides = [
   {
@@ -36,6 +37,8 @@ const slides = [
 ];
 
 const MoreWayCarousel = () => {
+  const { isColorInverted } = useColorInversion();
+
   return (
     <Box
       sx={{
@@ -250,33 +253,41 @@ const MoreWayCarousel = () => {
           className="moreway-swiper-prev"
           aria-label="Previous"
           sx={{
-            background: '#fff',
+            background: isColorInverted ? '#1F1B13' : '#fff',
             width: 40,
             height: 40,
             boxShadow: '0px 4px 16px 0px #0000001A',
             mb: 1,
-            '&:hover': { background: '#f5f5f5' },
+            '&:hover': {
+              background: isColorInverted ? '#2A2520' : '#f5f5f5',
+            },
           }}
         >
           <ChevronLeftIcon
-            sx={{ color: '#222', fontSize: 32, fontWeight: 900 }}
+            sx={{
+              color: isColorInverted ? '#000' : '#222',
+              fontSize: 32,
+              fontWeight: 900,
+            }}
           />
         </IconButton>
         <IconButton
           className="moreway-swiper-next"
           aria-label="Next"
           sx={{
-            background: '#fff',
+            background: isColorInverted ? '#1F1B13' : '#fff',
             width: 40,
             height: 40,
             boxShadow: '0px 4px 16px 0px #0000001A',
             mt: 1,
-            '&:hover': { background: '#f5f5f5' },
+            '&:hover': {
+              background: isColorInverted ? '#2A2520' : '#f5f5f5',
+            },
           }}
         >
           <ChevronLeftIcon
             sx={{
-              color: '#222',
+              color: isColorInverted ? '#000' : '#222',
               fontSize: 32,
               fontWeight: 900,
               transform: 'rotate(180deg)',
@@ -300,31 +311,39 @@ const MoreWayCarousel = () => {
           className="moreway-swiper-prev"
           aria-label="Previous"
           sx={{
-            background: '#fff',
+            background: isColorInverted ? '#1F1B13' : '#fff',
             width: 40,
             height: 40,
             boxShadow: '0px 4px 16px 0px #0000001A',
-            '&:hover': { background: '#f5f5f5' },
+            '&:hover': {
+              background: isColorInverted ? '#2A2520' : '#f5f5f5',
+            },
           }}
         >
           <ChevronLeftIcon
-            sx={{ color: '#222', fontSize: 32, fontWeight: 900 }}
+            sx={{
+              color: isColorInverted ? '#000' : '#222',
+              fontSize: 32,
+              fontWeight: 900,
+            }}
           />
         </IconButton>
         <IconButton
           className="moreway-swiper-next"
           aria-label="Next"
           sx={{
-            background: '#fff',
+            background: isColorInverted ? '#1F1B13' : '#fff',
             width: 40,
             height: 40,
             boxShadow: '0px 4px 16px 0px #0000001A',
-            '&:hover': { background: '#f5f5f5' },
+            '&:hover': {
+              background: isColorInverted ? '#2A2520' : '#f5f5f5',
+            },
           }}
         >
           <ChevronLeftIcon
             sx={{
-              color: '#222',
+              color: isColorInverted ? '#000' : '#222',
               fontSize: 32,
               fontWeight: 900,
               transform: 'rotate(180deg)',

@@ -1,8 +1,20 @@
 import dynamic from 'next/dynamic';
 import React, { useState, useCallback, memo, useEffect } from 'react';
-import { Box, Button, Chip, Stack, Typography } from '@mui/material';
-import { CommonDialog, useTranslation } from '@shared-lib';
-import { FilterAltOutlined, FilterList } from '@mui/icons-material';
+import {
+  Box,
+  Button,
+  Chip,
+  Drawer,
+  IconButton,
+  Stack,
+  Typography,
+} from '@mui/material';
+import { useTranslation } from '@shared-lib';
+import {
+  Close as CloseIcon,
+  FilterAltOutlined,
+  FilterList,
+} from '@mui/icons-material';
 import SearchComponent from './SearchComponent';
 import FilterComponent from './FilterComponent';
 import { gredientStyle } from '@learner/utils/style';
@@ -161,44 +173,39 @@ export default memo(function LearnerCourse({
                 width: '100%',
               }}
             >
-              {filterState?.filters
-                ? Object.keys(filterState.filters)
-                    .filter(
-                      (e) =>
-                        !['limit', ...Object.keys(staticFilter ?? {})].includes(
-                          e
-                        )
-                    )
-                    .map((key, index) => (
-                      <Chip
-                        key={`${key}-${index}`}
-                        label={
-                          <Typography
-                            noWrap
-                            variant="body2"
-                            sx={{ maxWidth: 300, mb: 0 }}
-                          >
-                            {`${key}: ${filterState.filters[key]}`}
-                          </Typography>
-                        }
-                        onDelete={() => {
-                          const { [key]: _, ...rest } =
-                            filterState.filters ?? {};
-                          handleFilterChange(rest);
-                        }}
-                        sx={{ mr: 1, mb: 1, borderRadius: '8px' }}
-                      />
-                    ))
-                : null}
+              <FilterChip
+                filters={filterState.filters}
+                staticFilter={staticFilter}
+                handleFilterChange={handleFilterChange}
+              />
             </Box>
           </Box>
         </Box>
       )}
       <Stack
         direction="row"
-        sx={{ gap: 4, px: { xs: 1, md: 4 }, py: { xs: 1, md: 2 } }}
+        sx={{ gap: 4, px: { xs: 2, md: 4 }, py: { xs: 1, md: 2 } }}
       >
-        <CommonDialog isOpen={isOpen} onClose={() => setIsOpen(false)}>
+        <Drawer
+          anchor="left"
+          open={isOpen}
+          onClose={() => setIsOpen(false)}
+          PaperProps={{
+            sx: {
+              width: '80%',
+            },
+          }}
+        >
+          <IconButton
+            onClick={() => setIsOpen(false)}
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: 8,
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
           <FilterComponent
             filterFramework={filterFramework}
             staticFilter={staticFilter}
@@ -206,15 +213,27 @@ export default memo(function LearnerCourse({
             handleFilterChange={handleFilterChange}
             onlyFields={_content?.onlyFields ?? []}
             isOpenColapsed={_content?.isOpenColapsed ?? []}
+            _config={{
+              _filterText: { sx: { pt: 2, px: 2 } },
+              _filterBox: { sx: { gap: 0 } },
+              _filterBody: {
+                sx: {
+                  py: 2,
+                  px: 2,
+                  height: 'calc(100vh - 57px)',
+                  overflowY: 'auto',
+                },
+              },
+            }}
           />
-        </CommonDialog>
+        </Drawer>
 
         <Box
           flex={35}
           sx={{
             display: { xs: 'none', md: 'flex' },
             position: 'sticky',
-            top: 100,
+            top: !title ? 0 : 100,
             alignSelf: 'flex-start',
           }}
         >
@@ -236,36 +255,11 @@ export default memo(function LearnerCourse({
               sx={{ mb: 2 }}
             >
               <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
-                {filterState?.filters
-                  ? Object.keys(filterState.filters)
-                      .filter(
-                        (e) =>
-                          ![
-                            'limit',
-                            ...Object.keys(staticFilter ?? {}),
-                          ].includes(e)
-                      )
-                      .map((key, index) => (
-                        <Chip
-                          key={`${key}-${index}`}
-                          label={
-                            <Typography
-                              noWrap
-                              variant="body2"
-                              sx={{ maxWidth: 300, mb: 0 }}
-                            >
-                              {`${key}: ${filterState.filters[key]}`}
-                            </Typography>
-                          }
-                          onDelete={() => {
-                            const { [key]: _, ...rest } =
-                              filterState.filters ?? {};
-                            handleFilterChange(rest);
-                          }}
-                          sx={{ mr: 1, mb: 1 }}
-                        />
-                      ))
-                  : null}
+                <FilterChip
+                  filters={filterState.filters}
+                  staticFilter={staticFilter}
+                  handleFilterChange={handleFilterChange}
+                />
               </Box>
               <Box
                 sx={{
@@ -317,3 +311,66 @@ export default memo(function LearnerCourse({
     </Stack>
   );
 });
+
+interface FilterChipProps {
+  filters: Record<string, any>;
+  staticFilter?: Record<string, object>;
+  handleFilterChange: (newFilterState: any) => void;
+}
+
+const FilterChip: React.FC<FilterChipProps> = ({
+  filters,
+  staticFilter,
+  handleFilterChange,
+}) => {
+  return (
+    <>
+      {filters
+        ? Object.entries(filters)
+            .filter(
+              ([key, _]) =>
+                !['limit', ...Object.keys(staticFilter ?? {})].includes(key)
+            )
+            .map(([key, value], index) => {
+              if (typeof value === 'object') {
+                return (value as string[]).map((option, index) => (
+                  <Chip
+                    key={`${key}-${index}`}
+                    label={option}
+                    onDelete={() => {
+                      const { [key]: options, ...rest } = filters ?? {};
+                      const newOptions = options.filter(
+                        (o: any) => o !== option
+                      );
+                      if (newOptions.length === 0) {
+                        handleFilterChange({
+                          ...rest,
+                        });
+                      } else {
+                        handleFilterChange({
+                          ...rest,
+                          [key]: newOptions,
+                        });
+                      }
+                    }}
+                    sx={{ mr: 1, mb: 1, borderRadius: '8px' }}
+                  />
+                ));
+              } else {
+                return (
+                  <Chip
+                    key={key}
+                    label={`${key}: ${value}`}
+                    onDelete={() => {
+                      const { [key]: _, ...rest } = filters ?? {};
+                      handleFilterChange(rest);
+                    }}
+                    sx={{ mr: 1, mb: 1, borderRadius: '8px' }}
+                  />
+                );
+              }
+            })
+        : null}
+    </>
+  );
+};

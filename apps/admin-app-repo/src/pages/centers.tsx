@@ -141,8 +141,24 @@ const Centers = () => {
         alterSchema.properties.grade.maxSelection = 1000;
       }
 
+      // Uncomment for remote center changes
+      // if (alterSchema?.properties?.center_type?.enum?.includes('regular')) {
+      //   alterSchema.properties.center_type.default = 'regular';
+      // }
+
       setAddSchema(alterSchema);
       setAddUiSchema(responseForm?.uiSchema);
+
+      // Uncomment for remote center changes
+      // // console.log('####1:', alterSchema);
+      // const modifiedUiSchema = {
+      //   ...responseForm.uiSchema,
+      //   center_type: {
+      //     'ui:widget': 'hidden',
+      //   },
+      // };
+      // // console.log('####2:', responseForm?.uiSchema);
+      // setAddUiSchema(modifiedUiSchema);
     };
 
     setPrefilledAddFormData(initialFormData);
@@ -159,7 +175,7 @@ const Centers = () => {
 
   const SubmitaFunction = async (formData: any) => {
     // console.log("###### debug issue formData", formData)
-    if (Object.keys(formData).length > 0) {
+    if (formData && Object.keys(formData).length > 0) {
       setPrefilledFormData(formData);
       //set prefilled search data on refresh
       localStorage.setItem(searchStoreKey, JSON.stringify(formData));

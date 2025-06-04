@@ -22,6 +22,7 @@ import LinkIcon from '@mui/icons-material/Link';
 import AccessibleIcon from '@mui/icons-material/Accessible';
 import { useFontSize } from '../../context/FontSizeContext';
 import { useUnderlineLinks } from '../../context/UnderlineLinksContext';
+import { useColorInversion } from '../../context/ColorInversionContext';
 import TextIncreaseIcon from '@mui/icons-material/TextIncrease';
 import TextDecreaseIcon from '@mui/icons-material/TextDecrease';
 import { useSpeechContext } from '@shared-lib-v2/lib/context/SpeechContext';
@@ -32,6 +33,7 @@ export default function AccessibilityOptions() {
     useFontSize();
   const { isSpeechEnabled, toggleSpeechEnabled } = useSpeechContext();
   const { isUnderlineLinksEnabled, toggleUnderlineLinks } = useUnderlineLinks();
+  const { isColorInverted, toggleColorInversion } = useColorInversion();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [isIncreased, setIsIncreased] = React.useState(false);
@@ -72,12 +74,18 @@ export default function AccessibilityOptions() {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('isSpeechEnabled');
       localStorage.removeItem('isUnderlineLinksEnabled');
+      localStorage.removeItem('isColorInverted');
     }
     disableSpeechEnabled();
 
     // Disable underline links
     if (isUnderlineLinksEnabled) {
       toggleUnderlineLinks();
+    }
+
+    // Disable color inversion
+    if (isColorInverted) {
+      toggleColorInversion();
     }
   };
 
@@ -106,19 +114,26 @@ export default function AccessibilityOptions() {
       <IconButton
         onClick={toggleDrawer(true)}
         aria-label="Accessibility Options"
+        data-no-invert
         sx={{
-          bgcolor: '#f5f3e7',
+          bgcolor: isColorInverted ? '#1F1B13' : '#f5f3e7',
           borderRadius: 1,
           padding: 1,
-          '&:hover': { bgcolor: '#ebe7d9' },
+          '&:hover': {
+            bgcolor: isColorInverted ? '#2A2520' : '#ebe7d9',
+          },
           position: 'absolute',
           right: 8,
           top: isMobile ? 100 : 150,
           zIndex: 1001,
-          border: '1px solid #CDC5BD',
+          border: isColorInverted ? '1px solid #CDC5BD' : '1px solid #CDC5BD',
         }}
       >
-        <AccessibleIcon sx={{ color: '#000' }} />
+        <AccessibleIcon
+          sx={{
+            color: isColorInverted ? '#fff' : '#000',
+          }}
+        />
       </IconButton>
       <SwipeableDrawer
         anchor="right"
@@ -231,7 +246,7 @@ export default function AccessibilityOptions() {
               <Button
                 variant={isSpeechEnabled ? 'contained' : 'outlined'}
                 color="primary"
-                startIcon={<RecordVoiceOverIcon />}
+                startIcon={<RecordVoiceOverIcon sx={{ color: '#635E57' }} />}
                 onClick={toggleSpeechEnabled}
                 sx={{
                   flex: 1,
@@ -249,15 +264,19 @@ export default function AccessibilityOptions() {
               </Button>
 
               <Button
-                variant="outlined"
+                variant={isColorInverted ? 'contained' : 'outlined'}
                 color="primary"
-                startIcon={<InvertColorsIcon />}
+                startIcon={<InvertColorsIcon sx={{ color: '#635E57' }} />}
+                onClick={toggleColorInversion}
                 sx={{
                   flex: 1,
                   justifyContent: 'flex-start',
                   py: 1.5,
                   borderRadius: 2,
-                  bgcolor: '#f5f5f5',
+                  bgcolor: isColorInverted ? '#FDBE16' : '#f5f5f5',
+                  '&:hover': {
+                    bgcolor: isColorInverted ? '#E6AC00' : '',
+                  },
                   border: '1px solid #CDC5BD',
                 }}
               >
@@ -269,7 +288,7 @@ export default function AccessibilityOptions() {
               <Button
                 variant={isUnderlineLinksEnabled ? 'contained' : 'outlined'}
                 color="primary"
-                startIcon={<LinkIcon />}
+                startIcon={<LinkIcon sx={{ color: '#635E57' }} />}
                 onClick={toggleUnderlineLinks}
                 sx={{
                   flex: 1,
@@ -285,22 +304,7 @@ export default function AccessibilityOptions() {
               >
                 <Typography variant="subtitle1">Underline Links</Typography>
               </Button>
-
-              <Button
-                variant="outlined"
-                color="primary"
-                startIcon={<MicIcon />}
-                sx={{
-                  flex: 1,
-                  justifyContent: 'flex-start',
-                  py: 1.5,
-                  borderRadius: 2,
-                  // bgcolor: '#FFBF00',
-                  border: '1px solid #CDC5BD',
-                }}
-              >
-                <Typography variant="subtitle1">Speech to Text</Typography>
-              </Button>
+              <Box sx={{ flex: 1 }} />
             </Stack>
           </Stack>
 

@@ -93,6 +93,7 @@ const CohortLearnerList: React.FC<CohortLearnerListProp> = ({
                 cohortMembershipId: user?.cohortMembershipId,
                 enrollmentNumber: user?.username,
                 age: ageField ? ageField.value : null,
+                customField: user?.customField,
               };
             });
 
@@ -226,6 +227,7 @@ const CohortLearnerList: React.FC<CohortLearnerListProp> = ({
                       setReloadState={setReloadState}
                       showMiniProfile={false}
                       onLearnerDelete={onDelete}
+                      customFields={data?.customField}
                     />
                   </Grid>
                 );

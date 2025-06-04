@@ -16,14 +16,40 @@ import { getDeviceIdUUID } from '@shared-lib-v2/DynamicForm/utils/Helper';
 import { validate as uuidValidate } from 'uuid';
 import { useGlobalData } from '../Provider/GlobalProvider';
 import AccessibilityOptions from '../AccessibilityOptions/AccessibilityOptions';
+import { useColorInversion } from '../../context/ColorInversionContext';
+
 interface NewDrawerItemProp extends DrawerItemProp {
   variant?: 'contained' | 'text';
   isActive?: boolean;
   customStyle?: React.CSSProperties;
 }
+
+// Custom function to transform categories to match expected structure
+const transformCategories = (categories: any[]) => {
+  const transformedCategories = transformRenderForm(categories);
+
+  // Create a structure that matches what the code expects
+  const result: any = {};
+
+  transformedCategories.forEach((category: any) => {
+    if (category.old_code === 'domain') {
+      result.domain = {
+        options: category.options.map((option: any) => ({
+          code: option.code,
+          name: option.name,
+          associations: option.associations,
+        })),
+      };
+    }
+  });
+
+  return result;
+};
+
 const App: React.FC<LayoutProps> = ({ children, ...props }) => {
   const router = useRouter();
   const { t } = useTranslation();
+  const { isColorInverted } = useColorInversion();
   const [defaultNavLinks, setDefaultNavLinks] = useState<NewDrawerItemProp[]>(
     []
   );
@@ -121,7 +147,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
       },
       {
         title: t('LEARNER_APP.POS.THEMATIC_REPOSITORY'),
-        to: () => router.push('/pos/thematic-repository'),
+        to: () => router.push('/pos/themantic'),
         isActive: currentPage === '/pos/thematic-repository',
       },
     ];
@@ -135,6 +161,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
       onlyHideElements={['footer']}
       _topAppBar={{
         isShowLang: false,
+        isColorInverted: isColorInverted,
         _brand: {
           _box: {
             brandlogo: <Brand />,
@@ -142,7 +169,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
           },
         },
         navLinks: defaultNavLinks,
-        _navLinkBox: { gap: '12px' },
+        _navLinkBox: { gap: '12px', cursor: 'pointer' },
         ...props?._topAppBar,
       }}
     >
@@ -159,6 +186,8 @@ export default App;
 
 const Brand = () => {
   const router = useRouter();
+  const { isColorInverted } = useColorInversion();
+
   return (
     <Box
       display="flex"
@@ -167,14 +196,19 @@ const Brand = () => {
       sx={{ cursor: 'pointer' }}
     >
       <Image
-        src="/images/appLogo.svg"
+        src={
+          isColorInverted
+            ? '/images/PrathamLogowhite.png'
+            : '/images/appLogo.svg'
+        }
         alt="Pratham"
         width={146}
         height={32}
-        style={{ height: '32px' }}
       />
       <Image
-        src="/images/pradigi.png"
+        src={
+          isColorInverted ? '/images/pradigi-white.png' : '/images/pradigi.png'
+        }
         alt="Pradigi"
         width={94}
         height={32}

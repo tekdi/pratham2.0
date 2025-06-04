@@ -91,10 +91,12 @@ const AboutUsPage = () => {
     ],
   ];
   const mediaMD = useMediaQuery('(max-width: 900px)');
+  const isColorInverted = false; // This should be replaced with actual logic to determine if the color is inverted
   return (
     <Layout>
       <Box sx={{ background: '#F3F3F3' }}>
         <Box
+          data-no-invert={true}
           sx={{
             width: '100%',
             height: '400px',
@@ -114,7 +116,7 @@ const AboutUsPage = () => {
               sx={{
                 fontWeight: 700,
                 textAlign: 'center',
-                color: '#FFF',
+                color: isColorInverted ? '#FFF' : '#fff',
               }}
             >
               <SpeakableText>About Us</SpeakableText>
@@ -295,7 +297,7 @@ const AboutUsPage = () => {
         <Box
           sx={{
             background: '#fff',
-            padding: '30px 40px',
+            padding: { xs: '30px 16px', md: '30px 40px' },
             mx: { xs: '16px', md: 7 },
             mt: 12,
           }}
@@ -310,7 +312,7 @@ const AboutUsPage = () => {
             }}
           >
             <Typography
-              variant="body9"
+              variant={mediaMD ? 'h1' : 'body9'}
               component="h2"
               sx={{
                 fontFamily: 'Poppins',
@@ -324,7 +326,7 @@ const AboutUsPage = () => {
             </Typography>
           </Box>
           <Typography
-            variant="h1"
+            variant={mediaMD ? 'h3' : 'h1'}
             component="h1"
             sx={{
               fontFamily: 'Poppins',
@@ -411,7 +413,7 @@ const AboutUsPage = () => {
                       sx={{ width: 48, height: 48, objectFit: 'contain' }}
                     />
                     <Typography
-                      variant="body4"
+                      variant={mediaMD ? 'h2' : 'body5'}
                       component="h2"
                       sx={{
                         fontFamily: 'Poppins',
@@ -427,7 +429,7 @@ const AboutUsPage = () => {
                   </Grid>
                   <Grid item xs={12} md={8}>
                     <Typography
-                      variant="h2"
+                      variant={mediaMD ? 'h3' : 'body5'}
                       component="h2"
                       sx={{
                         fontFamily: 'Poppins',
