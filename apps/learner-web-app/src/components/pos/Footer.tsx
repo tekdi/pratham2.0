@@ -112,7 +112,13 @@ export const Footer: React.FC = () => {
               <Grid container direction="column" spacing={1}>
                 {usefulLinks.map(({ label, href }) => (
                   <Grid item key={href}>
-                    <Link href={href} passHref legacyBehavior>
+                    <Link
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      passHref
+                      legacyBehavior
+                    >
                       <Typography
                         variant="body1"
                         sx={{ fontWeight: 400, color: '#1F1B13' }}
