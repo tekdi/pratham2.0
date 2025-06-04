@@ -111,7 +111,6 @@ const Learning = ({
                   width: '100%',
                   // height: '100%',
                   top: 150,
-
                   bgcolor: '#fff',
                   boxShadow: '0 4px 24px rgba(0,0,0,0.12)',
                   borderRadius: '12px',
