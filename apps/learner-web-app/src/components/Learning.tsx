@@ -46,6 +46,9 @@ const Learning = ({
               height: '100%',
               marginTop: '20px',
               position: 'relative',
+              '@media (min-width: 900px)': {
+                display: hovered === index ? '' : '',
+              },
             }}
           >
             {/* Default Card Content */}
@@ -57,9 +60,7 @@ const Learning = ({
                 }.png) no-repeat center center`,
                 backgroundSize: 'cover',
                 height: '273px',
-                '@media (min-width: 900px)': {
-                  display: hovered === index ? 'none' : 'flex',
-                },
+
                 alignItems: 'center',
                 justifyContent: 'center',
                 display: 'flex',
@@ -108,7 +109,9 @@ const Learning = ({
                 sx={{
                   position: 'absolute',
                   width: '100%',
-                  height: '100%',
+                  // height: '100%',
+                  top: 150,
+
                   bgcolor: '#fff',
                   boxShadow: '0 4px 24px rgba(0,0,0,0.12)',
                   borderRadius: '12px',
@@ -287,6 +290,7 @@ const Learning = ({
               </Typography>
             )}
 
+            {/* mobile accordion */}
             <Box
               sx={{
                 '@media (min-width: 900px)': {
