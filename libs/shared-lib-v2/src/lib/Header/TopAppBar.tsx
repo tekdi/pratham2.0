@@ -221,10 +221,14 @@ export const DesktopBar = ({
               >
                 <Typography
                   variant="body1"
-                  sx={{ fontWeight: 500, color: '#1F1B13' }}
+                  sx={{
+                    fontWeight: 500,
+                    color: '#1F1B13',
+                    cursor: 'pointer',
+                  }}
                   data-speech-control="true"
                 >
-                  <SpeakableText>{link.title}</SpeakableText>
+                  <SpeakableText cursor={true}>{link.title}</SpeakableText>
                 </Typography>
               </Button>
               {link.child && (
@@ -314,10 +318,16 @@ export const DesktopBar = ({
                     >
                       <Typography
                         variant="body1"
-                        sx={{ fontWeight: 500, color: '#1F1B13' }}
+                        sx={{
+                          fontWeight: 500,
+                          color: '#1F1B13',
+                          cursor: 'pointer',
+                        }}
                         data-speech-control="true"
                       >
-                        <SpeakableText>{item.title}</SpeakableText>
+                        <SpeakableText cursor={true}>
+                          {item.title}
+                        </SpeakableText>
                       </Typography>
                       {hasChild && (
                         <ArrowDropDownIcon
@@ -366,7 +376,7 @@ const MobileTopBar = ({
             aria-label="menu"
             onClick={(e) => setIsDrawerOpen(true)}
           >
-            <MenuIcon />
+            <MenuIcon sx={{ cursor: 'pointer', color: '#1F1B13' }} />
           </IconButton>
           <Brand {..._brand} name={''} />
         </>
