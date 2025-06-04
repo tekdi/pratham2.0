@@ -76,6 +76,17 @@ const Assessments = () => {
     totalCount: 0,
   });
 
+  const [selectedSortOption, setSelectedSortOption] = useState<{
+    sortByKey: string;
+    sortByValue: string;
+  } | null>(() => {
+    if (typeof window !== 'undefined') {
+      const savedSort = localStorage.getItem('assessmentSortOption');
+      return savedSort ? JSON.parse(savedSort) : null;
+    }
+    return null;
+  });
+
   const { query } = router;
 
   useEffect(() => {
@@ -236,7 +247,7 @@ const Assessments = () => {
       try {
         const options = {
           userId: cohortMembers?.map((user: any) => user.userId),
-          courseId: assessmentList, // temporary added here assessmentList(contentId)... if assessment is done then need to pass actual course id and unit id here
+          courseId: assessmentList,
           unitId: assessmentList,
           contentId: assessmentList,
         };
@@ -264,6 +275,46 @@ const Assessments = () => {
           console.log('userList', userList);
           setLearnerList(userList);
           setFilteredLearnerList(userList);
+
+          // Apply saved sort if exists
+          if (selectedSortOption) {
+            const sortedList = [...userList];
+            switch (selectedSortOption.sortByKey) {
+              case 'attendanceStatus':
+                const statusOrder: any = { ...DEFAULT_STATUS_ORDER };
+                if (selectedSortOption.sortByValue) {
+                  statusOrder[selectedSortOption.sortByValue] = -1;
+                  let orderIndex = 0;
+                  for (const key in statusOrder) {
+                    if (key !== selectedSortOption.sortByValue) {
+                      statusOrder[key] = orderIndex++;
+                    }
+                  }
+                }
+                sortedList.sort(
+                  (a: any, b: any) =>
+                    statusOrder[a.status] - statusOrder[b.status]
+                );
+                break;
+              case 'marksObtained':
+                sortedList.sort(
+                  (a: any, b: any) =>
+                    Number(a.percentage) - Number(b.percentage)
+                );
+                if (selectedSortOption.sortByValue === 'asc') {
+                  sortedList.reverse();
+                }
+                break;
+              case 'names':
+                if (selectedSortOption.sortByValue === 'A_To_Z') {
+                  sortedList.sort((a, b) => a.name.localeCompare(b.name));
+                } else {
+                  sortedList.sort((a, b) => b.name.localeCompare(a.name));
+                }
+                break;
+            }
+            setFilteredLearnerList(sortedList);
+          }
         }
 
         setTestCompletionCount({
@@ -279,7 +330,7 @@ const Assessments = () => {
     if (assessmentList?.length && cohortMembers?.length) {
       getAssessmentsForLearners();
     }
-  }, [assessmentList, cohortMembers]);
+  }, [assessmentList, cohortMembers, selectedSortOption]);
 
   const resetValues = () => {
     setFilteredLearnerList([]);
@@ -342,7 +393,7 @@ const Assessments = () => {
   };
 
   const sortByNames = (order: string) => {
-    const list = [...learnerList];
+    const list = [...filteredLearnerList];
     if (order === 'A_To_Z') {
       list.sort((a, b) => a.name.localeCompare(b.name));
     } else {
@@ -356,7 +407,11 @@ const Assessments = () => {
     sortByKey: string;
     sortByValue: string;
   }) => {
+    console.log(selectedValue.sortByValue);
     setModalOpen(false);
+    setSelectedSortOption(selectedValue);
+    // Save to localStorage
+    localStorage.setItem('assessmentSortOption', JSON.stringify(selectedValue));
 
     switch (selectedValue.sortByKey) {
       case 'attendanceStatus':
@@ -371,14 +426,30 @@ const Assessments = () => {
     }
   };
 
+  // Add effect to apply saved sort when component mounts
+  useEffect(() => {
+    if (selectedSortOption) {
+      switch (selectedSortOption.sortByKey) {
+        case 'attendanceStatus':
+          sortByStatus(selectedSortOption.sortByValue);
+          break;
+        case 'marksObtained':
+          sortByMarks(selectedSortOption.sortByValue);
+          break;
+        case 'names':
+          sortByNames(selectedSortOption.sortByValue);
+          break;
+      }
+    }
+  }, [classId, assessmentType]); // Re-apply sort when class or assessment type changes
+
   const handleAssessmentTypeChange = (newType: string) => {
     setAssessmentType(newType);
 
     const queryParams = { ...query };
     if (newType === 'post') queryParams.type = 'post';
-    if (newType === 'other') queryParams.type = 'other';
+    else if (newType === 'other') queryParams.type = 'other';
     else delete queryParams.type;
-
     router.push({ pathname: router.pathname, query: queryParams }, undefined, {
       shallow: true,
     });
@@ -389,6 +460,23 @@ const Assessments = () => {
       query.type === 'post' ? 'post' : query.type === 'other' ? 'other' : 'pre'
     );
   }, [query.type]);
+
+  // Add effect to handle route changes
+  useEffect(() => {
+    const handleRouteChange = (url: string) => {
+      if (!url.startsWith('/scp-teacher-repo/assessments')) {
+        // Clear sort filter when navigating away from assessments
+        localStorage.removeItem('assessmentSortOption');
+        setSelectedSortOption(null);
+      }
+    };
+
+    router.events.on('routeChangeStart', handleRouteChange);
+
+    return () => {
+      router.events.off('routeChangeStart', handleRouteChange);
+    };
+  }, [router]);
 
   return (
     <>
@@ -591,6 +679,7 @@ const Assessments = () => {
           modalTitle={t('COMMON.SORT_BY')}
           btnText={t('COMMON.APPLY')}
           onFilterApply={handleSorting}
+          selectedOption={selectedSortOption || undefined}
         />
       )}
     </>

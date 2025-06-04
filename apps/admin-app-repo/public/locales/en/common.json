@@ -160,7 +160,8 @@
     "NOT_ABLE_CREATE_LEARNER": "Not Able To Create Learner",
     "NO_CONTENT_CREATOR_FOUND": "No Content Creator (SCTA) Found",
     "NO_CONTENT_REVIEWER_FOUND": "No Content Reviewer (CCTA) Found",
-    "NO_STATE_LEAD_FOUND": "No State Lead Found"
+    "NO_STATE_LEAD_FOUND": "No State Lead Found",
+    "FAQS": "FAQ's"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -258,7 +259,7 @@
     "LEARNER_UPDATED_SUCCESSFULLY": "Learner has been successfully updated!",
     "EDIT_LEARNER": "Edit Learner",
     "NO_LEARNERS_FOUND": "No Learners Found",
-    "RE_ASSIGN_LEARNER":"Re-assign Learner"
+    "RE_ASSIGN_LEARNER": "Re-assign Learner"
   },
   "MENTORS": {
     "SEARCHBAR_PLACEHOLDER": "Search mentors..",
@@ -342,7 +343,12 @@
     "SELECT_GRADE": "Select Grade",
     "SELECT_TYPE": "Select Type",
     "CLEAR_SELECTION": "Clear Selection",
-    "SELECT_ALL_MESSSAGE": "Select Medium, Grade, and Type"
+    "SELECT_ALL_MESSSAGE": "Select Medium, Grade, and Type",
+    "IMPORT_NEW_PLANNER": "Import New Planner",
+    "ADD_NEW_TOPIC": "Add New Topic",
+    "DELETE_PLANNER": "Delete Planner",
+    "CSV_TEMPLATE": "CSV Template",
+    "NEW_TOPIC": "New Topic"
   },
   "MASTER": {
     "STATE": "States",
@@ -476,7 +482,7 @@
     "NAME": "Name",
     "MOBILE_NUMBER": "Mobile Number",
     "CENTER": "Center",
-    "BATCH":"Batch",
+    "BATCH": "Batch",
     "ENGLISH": "English",
     "HOME_SCIENCE": "Home Science",
     "MATH": "Math",
@@ -674,7 +680,9 @@
     "ASSIGN_VILLAGES_FINISH": "You can complete this later at your own pace. However, the villages will only be assigned once you click on ‘Finish.’",
     "ASSIGN_VILLAGES_FROM_BLOCKS": "Assign Villages from Blocks",
     "BACK_TO_FORM": "Back to form",
-    "SEARCH_VILLAGES": "Search villages.."
+    "SEARCH_VILLAGES": "Search villages..",
+    "BACK": "Back",
+    "SAVE_SELECTION": "Save Selection"
   },
   "WHATS_YOUR_GENDER": "Gender",
   "first_name": " First Name",
@@ -767,6 +775,9 @@
   "REGULAR": "Regular",
   "REMOTE": "Remote",
   "IS_VOLUNTEER": "Is Volunteer",
+  "SKILLING_CENTER_IMAGE": "Sklling Center Image",
+  "INDUSTRY": "Industry",
+  "GOOGLE_MAP_LINK": "Google Map Link",
   "YOUTH": {
     "UPDATE_YOUTH": "Update Youth",
     "NEW_YOUTH": "New Youth",
@@ -783,15 +794,19 @@
     "NON_AGRICULTURAL_LABORER": "Non-agricultural laborer",
     "SALARIED_WORK": "Salaried work",
     "SELF_EMPLOYMENT": "Self-employment",
-    "UNEMPLOYED_OR_DOMESTIC_WORK": "Unemployed or Domestic Work"
+    "UNEMPLOYED_OR_DOMESTIC_WORK": "Unemployed or Domestic Work",
+    "MARK_AS_VOLUNTEER": "Mark as Volunteer",
+    "DO_YOU_WANT_TO_MARK_AS_VOLUNTEER": "Do you want to mark as a volunteer",
+    "MARK_AS_VOLUNTEER_SUCCESSFULLY": "Marked as volunteer successfully",
+    "MARK_AS_VOLUNTEER_FAILED": "Failed to mark as volunteer"
   },
   "middle_name": "Middle Name",
-  "ADDRESS":" Address",
+  "ADDRESS": " Address",
   "DOB": "Date of Birth",
   "SUBJECT": "Subject",
-   "UNMARRIED": "Unmarried",
+  "UNMARRIED": "Unmarried",
   "MARRIED": "Married",
   "DIVORCED": "Divorced",
   "SELF_PLACED": "Self Placed",
-   "DESIGNATION": "Designation"
+  "DESIGNATION": "Designation"
 }

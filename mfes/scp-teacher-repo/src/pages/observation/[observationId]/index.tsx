@@ -611,9 +611,9 @@ const ObservationDetails = () => {
           sx={{
             display: 'flex',
             alignItems: 'center',
-            gap: '16px',
-            flexWrap: 'wrap',
+            gap: '22px',
             mb: 2,
+            color: '#1F1B13',
           }}
         >
           <KeyboardBackspaceOutlinedIcon
@@ -621,9 +621,15 @@ const ObservationDetails = () => {
             sx={{ color: theme.palette.warning['A200'] }}
             onClick={handleBackEvent}
           />
-          <Typography variant="h1" color="black">
+          <Box
+            sx={{
+              fontSize: '16px',
+              fontWeight: '400',
+              color: '#1F1B13',
+            }}
+          >
             {observationName}
-          </Typography>
+          </Box>
         </Box>
 
         <Grid container spacing={2}>
@@ -686,45 +692,62 @@ const ObservationDetails = () => {
                 )}
                 <Box
                   sx={{
-                    mt: '20px',
-                    ml: '14px',
+                    mt: '24px',
+                    '@media (min-width: 900px)': {
+                      width: '20%',
+                      marginLeft: '5px',
+                    },
                   }}
                 >
-                  <FormControl
-                    sx={{
-                      minWidth: {
-                        xs: '100%',
-                        sm: '100%',
-                        md: 300,
-                      },
-                      backgroundColor: 'white',
-                    }}
-                  >
-                    <InputLabel>
-                      <Typography variant="h2" color="black">
-                        {t('OBSERVATION.OBSERVATION_STATUS')}
-                      </Typography>
-                    </InputLabel>
-                    <Select
-                      value={status}
-                      onChange={handleStatusChange}
-                      label={t('OBSERVATION.OBSERVATION_STATUS')}
-                      defaultValue={ObservationStatus.ALL}
+                  <Box sx={{ minWidth: 120, gap: '15px' }} display={'flex'}>
+                    <FormControl
+                      sx={{
+                        borderRadius: '0.5rem',
+                        color: 'rgba(0, 0, 0, 0.6)',
+                        backgroundColor: 'white',
+                        marginBottom: '0rem',
+                        width: '100%',
+                        marginRight: '10px',
+                        '@media (max-width: 902px)': {
+                          width: '100%',
+                        },
+                        '@media (max-width: 702px)': {
+                          width: '100%',
+                        },
+                      }}
                     >
-                      <MenuItem value={ObservationStatus.ALL}>
-                        {t('COMMON.ALL')}
-                      </MenuItem>
-                      <MenuItem value={ObservationStatus.NOT_STARTED}>
-                        {t('OBSERVATION.NOT_STARTED')}
-                      </MenuItem>
-                      <MenuItem value={ObservationStatus.DRAFT}>
-                        {t('OBSERVATION.INPROGRESS')}
-                      </MenuItem>
-                      <MenuItem value={ObservationStatus.COMPLETED}>
-                        {t('OBSERVATION.COMPLETED')}
-                      </MenuItem>
-                    </Select>
-                  </FormControl>
+                      <InputLabel>
+                        <Typography
+                          variant="h2"
+                          sx={{ color: 'rgba(0, 0, 0, 0.6)', fontWeight: 400 }}
+                        >
+                          {t('OBSERVATION.OBSERVATION_STATUS')}
+                        </Typography>
+                      </InputLabel>
+                      <Select
+                        value={status}
+                        onChange={handleStatusChange}
+                        label={t('OBSERVATION.OBSERVATION_STATUS')}
+                        defaultValue={ObservationStatus.ALL}
+                        sx={{
+                          height: '52px',
+                        }}
+                      >
+                        <MenuItem value={ObservationStatus.ALL}>
+                          {t('COMMON.ALL')}
+                        </MenuItem>
+                        <MenuItem value={ObservationStatus.NOT_STARTED}>
+                          {t('OBSERVATION.NOT_STARTED')}
+                        </MenuItem>
+                        <MenuItem value={ObservationStatus.DRAFT}>
+                          {t('OBSERVATION.INPROGRESS')}
+                        </MenuItem>
+                        <MenuItem value={ObservationStatus.COMPLETED}>
+                          {t('OBSERVATION.COMPLETED')}
+                        </MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Box>
                 </Box>
               </Box>
               <Box width="100%" mt={{ xs: 2, md: 0 }}>
@@ -736,27 +759,6 @@ const ObservationDetails = () => {
                   fullWidth
                 />
               </Box>
-              {/* Dropdowns and filters */}
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: { xs: 'column', md: 'row' },
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  gap: 2,
-                  mt: 3,
-                }}
-              >
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: { xs: 'column', md: 'row' },
-                    alignItems: 'center',
-                    gap: 2,
-                    width: '100%',
-                  }}
-                ></Box>
-              </Box>
 
               {/* Entity cards or loader */}
               <Box
@@ -766,6 +768,7 @@ const ObservationDetails = () => {
                   flexWrap: 'wrap',
                   gap: '20px',
                   justifyContent: 'flex-start',
+                  mx: '11px',
                 }}
               >
                 {loading ? (

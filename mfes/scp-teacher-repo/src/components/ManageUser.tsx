@@ -87,6 +87,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
   const { isRTL } = useDirection();
   const isActiveYear = newStore.isActiveYearSelected;
   const loggedInUserRole = localStorage.getItem('role');
+  const tenantId = localStorage.getItem('tenantId') || '';
 
   const [value, setValue] = React.useState(1);
   const [users, setUsers] = useState<
@@ -199,6 +200,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
             block: blockIds,
             role: Role.TEACHER,
             status: [Status.ACTIVE],
+            tenantId: tenantId,
           };
           const fields = ['age'];
           // const test = isMobile ? infinitePage : page
@@ -263,7 +265,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                   (item: any) =>
                     item.type === 'BATCH' && item.cohortStatus === 'active'
                 )
-                .map((item: any) => item.cohortName);
+                .map((item: any) => toPascalCase(item.cohortName));
 
               const cohortNames = cohorts
                 .filter(
@@ -301,7 +303,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
             setUsers(extractedData);
             setFilteredUsers(extractedData);
             setLoading(false);
-          });
+          }, 50);
         }
       } catch (error) {
         console.log(error);
@@ -966,6 +968,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                     style={{
                                       width: '100%',
                                       textAlign: 'center',
+                                      fontWeight: '500',
                                     }}
                                   >
                                     {t('COMMON.NO_DATA_FOUND')}
@@ -1101,6 +1104,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                     style={{
                                       width: '100%',
                                       textAlign: 'center',
+                                      fontWeight: '500',
                                     }}
                                   >
                                     {t('COMMON.NO_DATA_FOUND')}

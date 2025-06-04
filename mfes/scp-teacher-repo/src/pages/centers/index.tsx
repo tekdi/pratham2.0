@@ -249,7 +249,7 @@ const CentersPage = () => {
               response
             ) {
               const blockData = response.map((item: any) => {
-                const blockName = item.cohortName;
+                const blockName = toPascalCase(item.cohortName);
                 const blockId = item.cohortId;
                 localStorage.setItem('blockParentId', blockId);
 
@@ -310,7 +310,7 @@ const CentersPage = () => {
               response
             ) {
               const cohortData = response.map((center: any) => {
-                const cohortName = center.cohortName;
+                const cohortName = toPascalCase(center.cohortName);
                 const cohortId = center.cohortId;
                 const centerTypeField = center?.customField.find(
                   (field: any) => field.label === 'TYPE_OF_COHORT'
@@ -655,28 +655,32 @@ const CentersPage = () => {
                       ),
                     }}
                   />
-                  <Button
-                    sx={{
-                      mt: 1.2,
-                      border: '1px solid #1E1B16',
-                      borderRadius: '100px',
-                      height: '40px',
-                      px: '16px',
-                      color: theme.palette.error.contrastText,
-                      alignSelf: 'flex-start',
-                      '& .MuiButton-endIcon': {
-                        marginLeft: isRTL ? '0px !important' : '8px !important',
-                        marginRight: isRTL
-                          ? '8px !important'
-                          : '-2px !important',
-                      },
-                    }}
-                    className="text-1E"
-                    endIcon={<AddIcon />}
-                    onClick={handleOpenAddBatchModal}
-                  >
-                    {t('COMMON.ADD_NEW')}
-                  </Button>
+                  {isTeamLeader && (
+                    <Button
+                      sx={{
+                        mt: 1.2,
+                        border: '1px solid #1E1B16',
+                        borderRadius: '100px',
+                        height: '40px',
+                        px: '16px',
+                        color: theme.palette.error.contrastText,
+                        alignSelf: 'flex-start',
+                        '& .MuiButton-endIcon': {
+                          marginLeft: isRTL
+                            ? '0px !important'
+                            : '8px !important',
+                          marginRight: isRTL
+                            ? '8px !important'
+                            : '-2px !important',
+                        },
+                      }}
+                      className="text-1E"
+                      endIcon={<AddIcon />}
+                      onClick={handleOpenAddBatchModal}
+                    >
+                      {t('COMMON.ADD_NEW')}
+                    </Button>
+                  )}
                 </Box>
                 <Box sx={{ minWidth: '300px' }}>
                   <CenterDropdown
