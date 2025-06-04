@@ -370,6 +370,7 @@ const MobileTopBar = ({
         justifyContent: 'space-between',
         alignItems: 'center',
         width: '100%',
+        color: '#1F1B13',
       }}
     >
       {!showBackIcon ? (
