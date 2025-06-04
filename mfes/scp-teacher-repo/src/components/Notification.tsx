@@ -91,21 +91,21 @@ console.log("notification teacher app")
       notify();
     }
   }, [notification]);
-  useEffect(() => {
-  const unsubscribe = onMessage(messaging, (payload) => {
-    console.log('Foreground message received:', payload);
-    if (payload.notification?.title) {
-      setNotification({
-        title: payload.notification.title,
-        body: payload.notification.body|| "",
-        icon: payload.notification.icon ||"",
-        navigate_to: payload.data?.navigate_to,
-      });
-    }
-  });
+//   useEffect(() => {
+//   const unsubscribe = onMessage(messaging, (payload) => {
+//     console.log('Foreground message received:', payload);
+//     if (payload.notification?.title) {
+//       setNotification({
+//         title: payload.notification.title,
+//         body: payload.notification.body|| "",
+//         icon: payload.notification.icon ||"",
+//         navigate_to: payload.data?.navigate_to,
+//       });
+//     }
+//   });
 
-  return () => unsubscribe();
-}, []);
+//   return () => unsubscribe();
+// }, []);
   onMessageListener()
     .then((payload) => {
       if (payload.notification?.title) {
