@@ -114,7 +114,7 @@ export const MENU_CONFIG = {
     },
     faqs: {
       title: "FAQ's",
-      icon: '/images/faqs.png',
+      icon: '/images/live_help.png',
       link: '/faqs',
       roles: [
         Role.ADMIN,
@@ -282,7 +282,7 @@ export const MENU_CONFIG = {
     },
     faqs: {
       title: 'FAQs',
-      icon: '/images/centers.svg',
+      icon: '/images/live_help.png',
       link: '/faqs',
       roles: [
         Role.ADMIN,

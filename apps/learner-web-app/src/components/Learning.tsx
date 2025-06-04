@@ -9,25 +9,116 @@ import {
 } from '@mui/material';
 import { Box } from '@mui/material';
 import { Grid } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 import { useColorInversion } from '../context/ColorInversionContext';
+import { useGlobalData } from './Provider/GlobalProvider';
+import { transformRenderForm } from '@shared-lib-v2/lib/Filter/FilterForm';
+
+interface Subject {
+  name: string;
+  code: string;
+  identifier: string;
+  description: string;
+  status: string;
+  category: string;
+  index: number;
+}
+
+interface SubDomain {
+  name: string;
+  description?: string;
+  code: string;
+  identifier: string;
+  status: string;
+  category: string;
+  index: number;
+}
+
+interface SubDomainOption {
+  code: string;
+  name: string;
+  identifier: string;
+  associations: {
+    subject: Subject[];
+  };
+}
+
+interface DomainOption {
+  code: string;
+  name: string;
+  identifier: string;
+  associations: {
+    subDomain?: SubDomain[];
+  };
+}
+
+interface Category {
+  name: string;
+  code: string;
+  old_code: string;
+  options: DomainOption[] | SubDomainOption[];
+  index: number;
+}
 
 const Learning = ({
-  data,
   descriptions,
   aboutDescriptionStyle = false,
 }: {
-  data: any;
   descriptions: any;
   aboutDescriptionStyle?: boolean;
 }) => {
   const [hovered, setHovered] = useState<number | null>(null);
   const { isColorInverted } = useColorInversion();
+  const [domainData, setDomainData] = useState<any[]>([]);
 
   const mediaMD = useMediaQuery('(max-width: 900px)');
+
+  const {
+    globalData: { filterFramework },
+  } = useGlobalData();
+
+  useEffect(() => {
+    const categories = filterFramework?.framework?.categories ?? [];
+    const transformedCategories = transformRenderForm(categories);
+
+    console.log(transformedCategories, 'transformedCategories');
+
+    // Find the Domain and SubDomain categories
+    const domainCategory = transformedCategories.find(
+      (cat: Category) => cat.name === 'Domain'
+    );
+    const subDomainCategory = transformedCategories.find(
+      (cat: Category) => cat.name === 'Sub Domain'
+    );
+
+    if (!domainCategory || !subDomainCategory) return;
+
+    // Map the learning domains to their subdomains with subjects
+    const mappedData = domainCategory.options.map((option: DomainOption) => {
+      const subDomains = option.associations.subDomain || [];
+      return subDomains.map((subDomain: SubDomain) => {
+        // Find matching subdomain in subDomainCategory to get associated subjects
+        const subDomainDetails = (
+          subDomainCategory.options as SubDomainOption[]
+        ).find((opt) => opt.name === subDomain.name);
+
+        // Get subject names as a comma-separated string
+        const subjectNames = subDomainDetails?.associations.subject
+          .map((subject) => subject.name)
+          .join(', ');
+
+        return {
+          title: subDomain.name,
+          desc: subjectNames || subDomain.name,
+        };
+      });
+    });
+
+    setDomainData(mappedData);
+  }, [filterFramework]);
 
   return (
     <Grid container spacing={4}>
@@ -46,6 +137,9 @@ const Learning = ({
               height: '100%',
               marginTop: '20px',
               position: 'relative',
+              '@media (min-width: 900px)': {
+                display: hovered === index ? '' : '',
+              },
             }}
           >
             {/* Default Card Content */}
@@ -57,11 +151,9 @@ const Learning = ({
                 }.png) no-repeat center center`,
                 backgroundSize: 'cover',
                 height: '273px',
-                '@media (min-width: 900px)': {
-                  display: hovered === index ? 'none' : 'flex',
-                },
                 alignItems: 'center',
                 justifyContent: 'center',
+                display: 'flex',
                 flexDirection: 'column',
                 borderRadius: '12px',
                 transition: 'all 0.3s',
@@ -74,8 +166,6 @@ const Learning = ({
                   mt: 2,
                   fontFamily: 'Poppins',
                   fontWeight: 400,
-                  // fontSize: '28px',
-                  // lineHeight: '36px',
                   letterSpacing: '0px',
                   textAlign: 'center',
                   color: '#fff',
@@ -90,8 +180,6 @@ const Learning = ({
                   mt: 1,
                   fontFamily: 'Poppins',
                   fontWeight: 700,
-                  // fontSize: '45px',
-                  // lineHeight: '52px',
                   letterSpacing: '0px',
                   textAlign: 'center',
                   color: '#FDBE16',
@@ -102,12 +190,12 @@ const Learning = ({
             </Box>
 
             {/* Hover Card Overlay */}
-            {hovered === index && (
+            {hovered === index && domainData[index] && (
               <Box
                 sx={{
                   position: 'absolute',
                   width: '100%',
-                  height: '100%',
+                  bottom: 50,
                   bgcolor: '#fff',
                   boxShadow: '0 4px 24px rgba(0,0,0,0.12)',
                   borderRadius: '12px',
@@ -127,7 +215,6 @@ const Learning = ({
                   sx={{
                     fontFamily: 'Poppins',
                     fontWeight: 600,
-                    // fontSize: '14px',
                     color: '#7C766F',
                     mb: 2,
                     letterSpacing: '1px',
@@ -135,14 +222,13 @@ const Learning = ({
                 >
                   <SpeakableText>KEY THEMES</SpeakableText>
                 </Typography>
-                {data[index].map((theme: any) => (
+                {domainData[index]?.map((theme: any) => (
                   <Box key={theme.title} sx={{ mb: 1 }}>
                     <Typography
                       variant="body5"
                       sx={{
                         fontFamily: 'Poppins',
                         fontWeight: 500,
-                        // fontSize: '18px',
                         lineHeight: '24px',
                         letterSpacing: '0.15px',
                         color: '#F17B06',
@@ -155,10 +241,13 @@ const Learning = ({
                       sx={{
                         fontFamily: 'Poppins',
                         fontWeight: 400,
-                        // fontSize: '14px',
                         lineHeight: '20px',
                         letterSpacing: '0.25px',
                         color: '#635E57',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        maxWidth: '100%',
                       }}
                     >
                       <SpeakableText>{theme.desc}</SpeakableText>
@@ -178,7 +267,6 @@ const Learning = ({
                     sx={{
                       fontFamily: 'Poppins',
                       fontWeight: 500,
-                      // fontSize: '18px',
                       lineHeight: '24px',
                       letterSpacing: '0.15px',
                       color: '#0D599E',
@@ -205,7 +293,6 @@ const Learning = ({
                       component="h1"
                       sx={{
                         fontWeight: 400,
-                        // fontSize: '16px',
                         color: '#7C766F',
                         fontFamily: 'Poppins',
                         mb: '8px',
@@ -228,7 +315,6 @@ const Learning = ({
                             component="h1"
                             sx={{
                               fontWeight: 600,
-                              // fontSize: '16px',
                               color: '#1F1B13',
                               fontFamily: 'Poppins',
                               mb: '2px',
@@ -243,7 +329,6 @@ const Learning = ({
                             component="h1"
                             sx={{
                               fontWeight: 400,
-                              // fontSize: '16px',
                               color: '#7C766F',
                               fontFamily: 'Poppins',
                             }}
@@ -259,7 +344,6 @@ const Learning = ({
                     component="h1"
                     sx={{
                       fontWeight: 400,
-                      // fontSize: '16px',
                       color: '#7C766F',
                       fontFamily: 'Poppins',
                     }}
@@ -275,7 +359,6 @@ const Learning = ({
                 sx={{
                   fontFamily: 'Poppins',
                   fontWeight: 400,
-                  // fontSize: '16px',
                   lineHeight: '24px',
                   letterSpacing: '0.5px',
                   color: '#7C766F',
@@ -286,6 +369,7 @@ const Learning = ({
               </Typography>
             )}
 
+            {/* mobile accordion */}
             <Box
               sx={{
                 '@media (min-width: 900px)': {
@@ -298,7 +382,6 @@ const Learning = ({
               }}
             >
               <Accordion
-                // defaultExpanded
                 sx={{
                   boxShadow: 'none',
                   bgcolor: 'transparent',
@@ -316,8 +399,6 @@ const Learning = ({
                     px: 2.5,
                     py: 1.5,
                     bgcolor: '#fff',
-
-                    // fontSize: '16px',
                   }}
                 >
                   <Typography
@@ -332,7 +413,7 @@ const Learning = ({
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails sx={{ px: 2.5, pt: 0, pb: 2 }}>
-                  {data[0].map((theme: any) => (
+                  {domainData[index]?.map((theme: any) => (
                     <Box key={theme.title} sx={{ mb: 2 }}>
                       <Typography
                         variant="body1"
@@ -340,7 +421,6 @@ const Learning = ({
                         sx={{
                           fontFamily: 'Poppins',
                           fontWeight: 600,
-                          // fontSize: '17px',
                           color: '#F17B06',
                           mb: 0.2,
                         }}
@@ -352,8 +432,11 @@ const Learning = ({
                         sx={{
                           fontFamily: 'Poppins',
                           fontWeight: 400,
-                          // fontSize: '14px',
                           color: '#7C766F',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          maxWidth: '100%',
                         }}
                       >
                         <SpeakableText>{theme.desc}</SpeakableText>
@@ -374,7 +457,6 @@ const Learning = ({
                       sx={{
                         fontFamily: 'Poppins',
                         fontWeight: 500,
-                        // fontSize: '16px',
                         color: '#0D599E',
                         mr: 1,
                       }}

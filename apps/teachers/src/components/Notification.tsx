@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
-import { onMessageListener } from './../../firebase';
+// import { onMessageListener } from './../../firebase';
 import { useRouter } from 'next/router';
 import { Box } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { onMessageListener } from 'apps/teachers/firebase';
 import { onMessage } from 'firebase/messaging';
 
 type NotificationData = {
@@ -91,21 +92,23 @@ console.log("notification teacher app")
       notify();
     }
   }, [notification]);
-//   useEffect(() => {
-//   const unsubscribe = onMessage(messaging, (payload) => {
-//     console.log('Foreground message received:', payload);
-//     if (payload.notification?.title) {
-//       setNotification({
-//         title: payload.notification.title,
-//         body: payload.notification.body|| "",
-//         icon: payload.notification.icon ||"",
-//         navigate_to: payload.data?.navigate_to,
-//       });
-//     }
-//   });
 
-//   return () => unsubscribe();
-// }, []);
+  useEffect(() => {
+  const unsubscribe = onMessage(messaging, (payload) => {
+    console.log('Foreground message received:', payload);
+    if (payload.notification?.title) {
+      setNotification({
+        title: payload.notification.title,
+        body: payload.notification.body|| "",
+        icon: payload.notification.icon ||"",
+        navigate_to: payload.data?.navigate_to,
+      });
+    }
+  });
+
+  return () => unsubscribe();
+}, []);
+
   onMessageListener()
     .then((payload) => {
       if (payload.notification?.title) {
