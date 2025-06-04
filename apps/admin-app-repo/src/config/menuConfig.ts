@@ -113,7 +113,7 @@ export const MENU_CONFIG = {
       roles: [Role.CCTA, Role.SCTA],
     },
     faqs: {
-      title: 'FAQs',
+      title: "FAQ's",
       icon: '/images/faqs.png',
       link: '/faqs',
       roles: [
@@ -136,7 +136,7 @@ export const MENU_CONFIG = {
       title: 'Skilling Centers',
       icon: '/images/centers.svg',
       link: '/centers',
-      roles: [Role.ADMIN],
+      roles: [Role.ADMIN,  Role.CENTRAL_ADMIN],
     },
     manageUsers: {
       title: 'Manage Users',
