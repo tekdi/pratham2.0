@@ -278,6 +278,19 @@ function replaceOptionsWithAssoc({
         const nextFilterIndex = updatedFilters.findIndex(
           (f: any, idx: number) => f.old_code === assocKey && idx > i
         );
+        // remove unwanted filterValue using options
+        if (filterValue?.[`se_${assocKey}s`]) {
+          filterValue[`se_${assocKey}s`] = filterValue[
+            `se_${assocKey}s`
+          ].filter((item: any) =>
+            assocOptions.find(
+              (sub) =>
+                sub.code === (item.code ?? item.name ?? item) ||
+                sub.name === (item.code ?? item.name ?? item) ||
+                sub === (item.code ?? item.name ?? item)
+            )
+          );
+        }
         if (nextFilterIndex !== -1) {
           updatedFilters[nextFilterIndex].options = assocOptions;
         }
@@ -409,7 +422,17 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                                 ? [...selected, item]
                                 : selected.filter(
                                     (s: any) =>
-                                      !(s === item.name || s.name === item.name)
+                                      !(
+                                        (s && item && s === item) ||
+                                        (s && item.code && s === item?.code) ||
+                                        (s && item?.name && s === item?.name) ||
+                                        (s?.code &&
+                                          item.code &&
+                                          s?.code === item?.code) ||
+                                        (s?.name &&
+                                          item?.name &&
+                                          s?.name === item?.name)
+                                      )
                                   );
                               onChange(code, next);
                             }}
