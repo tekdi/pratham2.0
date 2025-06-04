@@ -20,10 +20,6 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-
-  //cross import support
-  transpilePackages: ['@shared-lib-v2/*'],
-
   trailingSlash: false,
   reactStrictMode: true,
   i18n: nextI18nextConfig.i18n,

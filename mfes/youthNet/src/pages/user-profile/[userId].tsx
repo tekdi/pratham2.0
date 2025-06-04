@@ -392,7 +392,6 @@ const UserId = () => {
       >
         {schema && uiSchema && (
           <DynamicForm
-            hideSubmit={true}
             schema={schema}
             uiSchema={uiSchema}
             FormSubmitFunction={FormSubmitFunction}

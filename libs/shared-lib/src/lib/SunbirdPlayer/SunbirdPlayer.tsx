@@ -12,6 +12,7 @@ interface SunbirdPlayerProps {
 export const SunbirdPlayer: React.FC<SunbirdPlayerProps> = ({ identifier }) => {
   return (
     <div>
+      {' '}
       <Player identifier={identifier} />
     </div>
   );

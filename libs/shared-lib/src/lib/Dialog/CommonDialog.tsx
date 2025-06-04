@@ -8,7 +8,7 @@ interface CommonDialogProps {
   isOpen: boolean;
   onClose: () => void;
   header?: React.ReactNode;
-  children?: React.ReactNode;
+  content?: React.ReactNode;
   actions?: React.ReactNode;
   disableCloseOnBackdropClick?: boolean;
 }
@@ -17,7 +17,7 @@ export const CommonDialog: React.FC<CommonDialogProps> = ({
   isOpen,
   onClose,
   header,
-  children,
+  content,
   actions,
   disableCloseOnBackdropClick = false,
 }) => {
@@ -29,7 +29,7 @@ export const CommonDialog: React.FC<CommonDialogProps> = ({
       aria-describedby="common-dialog-description"
     >
       {header && <DialogTitle id="common-dialog-title">{header}</DialogTitle>}
-      {children && <DialogContent>{children}</DialogContent>}
+      {content && <DialogContent>{content}</DialogContent>}
       {actions && <DialogActions>{actions}</DialogActions>}
     </Dialog>
   );

@@ -107,33 +107,18 @@ export const MIME_TYPE = {
   INTERACTIVE_MIME_TYPE: [
     'application/vnd.ekstep.h5p-archive',
     'application/vnd.ekstep.html-archive',
-    'application/vnd.ekstep.ecml-archive',
   ],
 };
 
-export const getTelemetryConfig = (): Context => {
-  let localStorageData = {
-    userName: '',
-    accToken: '',
-    tenantId: '',
-    tenantCode: '',
-    did: '',
-    sid: '',
-    uid: '',
-  };
-  if (typeof window !== 'undefined' && window.localStorage) {
-    const ls = window.localStorage;
-    localStorageData = {
-      userName: ls.getItem('userIdName') ?? '',
-      accToken: ls.getItem('token') ?? '',
-      sid: ls.getItem('token') ?? '',
-      uid: ls.getItem('userId') ?? '',
-      tenantId: ls.getItem('tenantId') ?? '',
-      tenantCode: ls.getItem('channelId') ?? '',
-      did: ls.getItem('did') ?? '',
-    };
-  }
-  return {
+let userName = 'arif';
+if (typeof window !== 'undefined' && window.localStorage) {
+  userName = localStorage.getItem('userName') || '';
+}
+
+const DeviceId = '12345';
+
+export const V2PlayerConfig: PlayerConfig = {
+  context: {
     mode: 'play',
     partner: [],
     pdata: {
@@ -142,20 +127,18 @@ export const getTelemetryConfig = (): Context => {
       pid: 'admin-portal',
     },
     contentId: '',
+    sid: '',
+    uid: '',
     timeDiff: -0.089,
-    channel: localStorageData.tenantCode,
-    tags: [localStorageData.tenantCode],
-    contextRollup: { l1: localStorageData.tenantCode },
+    channel: process.env.NEXT_PUBLIC_CHANNEL_ID || '',
+    tags: [process.env.NEXT_PUBLIC_CHANNEL_ID || ''],
+    did: DeviceId,
+    contextRollup: { l1: process.env.NEXT_PUBLIC_CHANNEL_ID || '' },
     objectRollup: {},
-    userData: { firstName: localStorageData.userName, lastName: '' },
+    userData: { firstName: userName, lastName: '' },
     host: '',
     endpoint: '/v1/telemetry',
-    ...localStorageData,
-  };
-};
-
-export const V2PlayerConfig: PlayerConfig = {
-  context: getTelemetryConfig(),
+  },
   config: {
     showEndPage: false,
     endPage: [{ template: 'assessment', contentType: ['SelfAssess'] }],
@@ -197,7 +180,6 @@ export const V1PlayerConfig: PlayerConfig = {
     ],
     showStartPage: true,
     host: '',
-    endpoint: '/v1/telemetry',
     overlay: {
       enableUserSwitcher: true,
       showOverlay: true,
@@ -238,6 +220,29 @@ export const V1PlayerConfig: PlayerConfig = {
     },
     enableTelemetryValidation: false,
   },
-  context: getTelemetryConfig(),
+  context: {
+    mode: 'play',
+    // partner: [],
+    pdata: {
+      id: 'pratham.admin.portal',
+      ver: '1.0.0',
+      pid: 'admin-portal',
+    },
+    contentId: '',
+    sid: '',
+    uid: '',
+    timeDiff: -1.129,
+    contextRollup: {},
+    channel: process.env.NEXT_PUBLIC_CHANNEL_ID || '',
+    did: '',
+    dims: [],
+    tags: [process.env.NEXT_PUBLIC_CHANNEL_ID || ''],
+    app: [process.env.NEXT_PUBLIC_CHANNEL_ID || ''],
+    cdata: [],
+    userData: {
+      firstName: userName,
+      lastName: '',
+    },
+  },
   data: {},
 };

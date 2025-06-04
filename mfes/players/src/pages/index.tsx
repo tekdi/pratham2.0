@@ -29,12 +29,7 @@ const Players: React.FC<SunbirdPlayerProps> = ({
   playerConfig: propPlayerConfig,
 }) => {
   const router = useRouter();
-  const {
-    courseId,
-    unitId,
-    userId,
-    identifier: queryIdentifier,
-  } = router.query ?? {}; // Get identifier from the query
+  const queryIdentifier = router.query.identifier as string; // Get identifier from the query
   const identifier = propIdentifier || queryIdentifier; // Prefer prop over query
   const [playerConfig, setPlayerConfig] = useState<PlayerConfig | undefined>(
     propPlayerConfig
@@ -57,7 +52,7 @@ const Players: React.FC<SunbirdPlayerProps> = ({
           const metadata = { ...Q1?.questionset, ...Q2?.questionset };
           config.metadata = metadata;
         } else if (MIME_TYPE.INTERACTIVE_MIME_TYPE.includes(data?.mimeType)) {
-          config = { ...V1PlayerConfig, metadata: data, data: data.body || {} };
+          config = { ...V1PlayerConfig, metadata: data };
           //@ts-ignore
           config.context['contentId'] = identifier;
         } else {
@@ -102,19 +97,14 @@ const Players: React.FC<SunbirdPlayerProps> = ({
           <Loader showBackdrop={false} />
         </Box>
       ) : (
-        <Box sx={{ height: 'calc(100vh - 16px)' }}>
+        <Box marginTop="1rem" px="14px">
           {/* <Typography
             color="#024f9d"
             sx={{ padding: '0 0 4px 4px', fontWeight: 'bold' }}
           >
             {playerConfig?.metadata?.name || 'Loading...'}
           </Typography> */}
-          <SunbirdPlayers
-            player-config={playerConfig}
-            courseId={courseId as string}
-            unitId={unitId as string}
-            userId={userId as string}
-          />
+          <SunbirdPlayers player-config={playerConfig} />
         </Box>
       )}
     </Box>

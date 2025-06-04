@@ -27,9 +27,6 @@ import customTheme from '../styles/customTheme';
 import rtlPlugin from 'stylis-plugin-rtl';
 import { Box, IconButton } from '@mui/material';
 import { ToastContainer } from 'react-toastify';
-import { LanguageProvider } from '@shared-lib-v2/lib/context/LanguageContext';
-import Notification from '../components/Notification';
-import AllowNotification from '../components/AllowNotification';
 
 const ColorModeContext = React.createContext({ toggleColorMode: () => {} });
 const poppins = Poppins({
@@ -66,7 +63,6 @@ export function DarkTheme() {
         )}
       </IconButton>
     </Box>
-
   );
 }
 
@@ -127,7 +123,6 @@ function CustomApp({ Component, pageProps }: AppProps) {
           rel="stylesheet"
         />
       </Head>
-      <LanguageProvider>
 
       <CacheProvider value={isRTL ? rtlCache : ltrCache}>
         <CssVarsProvider theme={customTheme}>
@@ -139,14 +134,8 @@ function CustomApp({ Component, pageProps }: AppProps) {
             autoClose={3000}
             stacked={false}
           />
-                      <Notification/>
-                                  {!login && <AllowNotification/>}
-
-          
         </CssVarsProvider>
       </CacheProvider>
-      </LanguageProvider>
-
     </>
   );
 }

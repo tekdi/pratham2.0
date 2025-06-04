@@ -454,15 +454,12 @@ const MentorLead = () => {
         <SimpleModal
           open={openModal}
           onClose={handleCloseModal}
-          showFooter={true}
+          showFooter={false}
           modalTitle={
             isEdit
               ? t('MENTOR_LEADERS.UPDATE_MENTOR_LEAD')
               : t('MENTOR_LEADERS.NEW_MENTOR_LEAD')
           }
-          id="dynamic-form-id"
-          primaryText={isEdit ? t('Update') : t('Create')}
-
         >
           <AddEditUser
             SuccessCallback={() => {
@@ -491,8 +488,6 @@ const MentorLead = () => {
             notificationKey={notificationKey}
             notificationMessage={notificationMessage}
             notificationContext={notificationContext}
-           hideSubmit={true}
-
           />
         </SimpleModal>
 

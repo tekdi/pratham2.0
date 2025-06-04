@@ -125,22 +125,19 @@ const CohortLearnerList: React.FC<CohortLearnerListProp> = ({
         <Loader showBackdrop={true} loadingText={t('COMMON.LOADING')} />
       ) : (
         <>
-          {filteredData?.length ? (
-            <SearchBar
-              onSearch={handleSearch}
-              value={searchTerm}
-              placeholder={t('COMMON.SEARCH_STUDENT')}
-            />
-          ) : null}
+          <SearchBar
+            onSearch={handleSearch}
+            value={searchTerm}
+            placeholder={t('COMMON.SEARCH_STUDENT')}
+          />
 
           <Box
             sx={{
               '@media (min-width: 900px)': {
                 background: theme.palette.action.selected,
-                margin: '24px 18px 18px 18px',
+                marginTop: '12px',
                 paddingBottom: '20px',
                 paddingTop: '10px',
-                borderRadius: '12px',
               },
             }}
           >

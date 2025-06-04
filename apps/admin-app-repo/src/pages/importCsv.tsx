@@ -30,15 +30,9 @@ import {
 import dayjs from 'dayjs';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import Image from 'next/image';
-import deleteIcon from '../../public/images/deleteIcon.svg';
-import downloadIcon from '../../public/images/downloadIcon.svg';
 import { useRouter } from 'next/router';
 import Papa from 'papaparse';
 import { useCallback, useEffect, useState } from 'react';
-import AddIcon from '@mui/icons-material/Add';
-import SimpleModal from '@/components/SimpleModal';
-import AddNewTopic from '@/components/AddNewTopic';
 
 const ImportCsv = () => {
   const router = useRouter();
@@ -48,7 +42,6 @@ const ImportCsv = () => {
   const { t } = useTranslation();
 
   const [open, setOpen] = useState(false);
-  const [openAddTopicModal, setOpenAddTopicModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(true);
   const [expandedPanels, setExpandedPanels] = useState<{
@@ -298,10 +291,6 @@ const ImportCsv = () => {
     setSubTopics(totalChildren);
   }
 
-  const handleCloseModal = () => {
-    setOpenAddTopicModal(false);
-  };
-
   return (
     <Box sx={{ padding: isSmallScreen ? '16px' : '32px' }}>
       <Box
@@ -323,47 +312,19 @@ const ImportCsv = () => {
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          {/* Delete Planner */}
-          <Box
-            display="flex"
-            alignItems="center"
-            gap={0.5}
-            onClick={() => {
-              console.log('Dlete button clicked!!!');
-            }}
-          >
-            <Typography variant="h4" color={theme.palette.error.main}>
-              {t('COURSE_PLANNER.DELETE_PLANNER')}
-            </Typography>
-            <Image src={deleteIcon} alt="" />
-          </Box>
-          {/* Download CSV Template */}
-          <Box display="flex" alignItems="center" gap={0.5}>
-            <Typography
-              variant="h4"
-              color={theme.palette.secondary.main}
-              onClick={handleDownloadCSV}
-            >
-              {t('COURSE_PLANNER.CSV_TEMPLATE')}
-            </Typography>
-            <Image src={downloadIcon} alt="" />
-          </Box>
-          {/* Import New Planner */}
           <Button
-            variant="outlined"
+            variant="contained"
             sx={{
               borderRadius: '8px',
-              color: '#000000',
-              borderColor: '#000000',
+              backgroundColor: '#000000',
+              color: '#FFFFFF',
               '&:hover': {
-                borderColor: '#333333',
-                color: '#333333',
+                backgroundColor: '#333333',
               },
             }}
             onClick={handleClickOpen}
-            endIcon={<AddIcon />}
           >
-            {t('COURSE_PLANNER.IMPORT_NEW_PLANNER')}
+            {t('COURSE_PLANNER.IMPORT_PLANNER')}
           </Button>
           <Button
             variant="outlined"
@@ -376,12 +337,9 @@ const ImportCsv = () => {
                 color: '#333333',
               },
             }}
-            endIcon={<AddIcon />}
-            onClick={() => {
-              setOpenAddTopicModal(true);
-            }}
+            onClick={handleDownloadCSV}
           >
-            {t('COURSE_PLANNER.ADD_NEW_TOPIC')}
+            {t('COURSE_PLANNER.DOWNLOAD_SAMPLE_CSV')}
           </Button>
           <Button
             sx={{
@@ -399,16 +357,6 @@ const ImportCsv = () => {
           </Button>
         </Box>
       </Box>
-      <SimpleModal
-        open={openAddTopicModal}
-        onClose={handleCloseModal}
-        showFooter={true}
-        primaryText={t('COMMON.ADD')}
-        id="dynamic-form-id"
-        modalTitle={t('COURSE_PLANNER.NEW_TOPIC')}
-      >
-        <AddNewTopic />
-      </SimpleModal>
 
       <Box>
         {loading ? (

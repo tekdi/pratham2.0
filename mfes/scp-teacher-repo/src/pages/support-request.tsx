@@ -119,7 +119,7 @@ const SupportRequest = () => {
             }}
           />
         </Box>
-        <Box ml={'0.3rem'}>
+        <Box ml={'1rem'}>
           <Typography mt={0} variant="h2" color="black">
             {t('COMMON.WE_ARE_HERE_TO_HELP')}
           </Typography>

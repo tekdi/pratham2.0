@@ -5,20 +5,7 @@ module.exports = {
   compress: true,
   i18n: {
     defaultLocale: 'en',
-    locales: [
-      'en',
-      'mr',
-      'hi',
-      'or',
-      'ur',
-      'ml',
-      'gu',
-      'tel',
-      'kan',
-      'odi',
-      'tam',
-      'ben',
-    ],
+    locales: ['en', 'mr', 'hi', 'or', 'ur', 'ml'],
     localeDetection: false,
   },
 
