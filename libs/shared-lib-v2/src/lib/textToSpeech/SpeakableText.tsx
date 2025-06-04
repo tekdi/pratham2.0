@@ -8,6 +8,7 @@ interface SpeakableTextProps {
   text?: string; // Optional explicit text to speak (falls back to children if text is rendered as string)
   className?: string;
   style?: React.CSSProperties;
+  cursor?: boolean;
 }
 
 /**
@@ -19,6 +20,7 @@ const SpeakableText: React.FC<SpeakableTextProps> = ({
   text,
   className,
   style,
+  cursor,
 }) => {
   const { speak, stop, isSupported, usingFallback } = useSpeech();
   const { isSpeechEnabled } = useSpeechContext();
@@ -135,7 +137,10 @@ const SpeakableText: React.FC<SpeakableTextProps> = ({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className={className}
-      style={speakableStyle}
+      style={{
+        ...speakableStyle,
+        cursor: cursor ? 'pointer' : 'default',
+      }}
       {...getTitle()}
       data-speakable="true"
     >

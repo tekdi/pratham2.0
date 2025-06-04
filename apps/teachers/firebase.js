@@ -5,6 +5,7 @@ import firebaseConfig from './firebaseConfig';
 
 const firebaseApp = initializeApp(firebaseConfig);
 let messaging;
+console.log("messaging",messaging)
 if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
   messaging = getMessaging();
 } else {
@@ -30,6 +31,7 @@ export const requestPermission = async () => {
 export const onMessageListener = () =>
   new Promise((resolve) => {
     if (messaging) {
+      console.log("hoiiiii")
       onMessage(messaging, (payload) => {
         resolve(payload);
       });
