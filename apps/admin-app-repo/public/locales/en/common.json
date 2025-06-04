@@ -343,7 +343,12 @@
     "SELECT_GRADE": "Select Grade",
     "SELECT_TYPE": "Select Type",
     "CLEAR_SELECTION": "Clear Selection",
-    "SELECT_ALL_MESSSAGE": "Select Medium, Grade, and Type"
+    "SELECT_ALL_MESSSAGE": "Select Medium, Grade, and Type",
+    "IMPORT_NEW_PLANNER": "Import New Planner",
+    "ADD_NEW_TOPIC": "Add New Topic",
+    "DELETE_PLANNER": "Delete Planner",
+    "CSV_TEMPLATE": "CSV Template",
+    "NEW_TOPIC": "New Topic"
   },
   "MASTER": {
     "STATE": "States",

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import DynamicForm from '@/components/DynamicForm/DynamicForm';
+import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
 import { showToastMessage } from '../../Toastify';
@@ -15,7 +15,7 @@ import {
   notificationCallback,
   splitUserData,
   telemetryCallbacks,
-} from '@/components/DynamicForm/DynamicFormCallback';
+} from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import {
   bulkCreateCohortMembers,
   createCohort,
