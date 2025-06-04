@@ -50,8 +50,6 @@ const MentorAssignment: React.FC<MentorAssignmentProps> = ({
   const [districtName, setDistrictName] = useState<any>('');
   //const [formData, setFormData] = useState<any>();
   const [sdbvFieldData, setSdbvFieldData] = useState<any>();
-  const [totalVillageCount, setTotalVillageCount] = useState(0);
-
   const setSubmittedButtonStatus = useSubmittedButtonStore(
     (state: any) => state.setSubmittedButtonStatus
   );
@@ -70,14 +68,6 @@ const MentorAssignment: React.FC<MentorAssignmentProps> = ({
       [blockId]: villages,
     }));
   };
-  // console.log('selectedVillage', selectedVillages); //get count from here
-  useEffect(() => {
-    const count = Object.values(selectedVillages).reduce(
-      (sum, arr) => sum + arr.length,
-      0
-    );
-    setTotalVillageCount(count);
-  }, [selectedVillages]);
 
   const handleBackToForm = () => setShowAssignmentScreen(false); // Back to form screen
 
@@ -284,7 +274,6 @@ const MentorAssignment: React.FC<MentorAssignmentProps> = ({
         addSchema &&
         addUiSchema && (
           <DynamicForm
-            hideSubmit={true}
             schema={addSchema}
             uiSchema={addUiSchema}
             FormSubmitFunction={FormSubmitFunction}
@@ -314,11 +303,7 @@ const MentorAssignment: React.FC<MentorAssignmentProps> = ({
             sx={{ fontSize: '14px', color: '#7C766F', fontWeight: '400' }}
             mt={2}
           >
-            {districtName} {t('MENTOR.DISTRICTS')} (
-            {t('MENTOR.SELECTED_VILLAGE_COUNT', {
-              totalVillageCount: totalVillageCount,
-            })}
-            )
+            {districtName} {t('MENTOR.DISTRICTS')}
           </Typography>
 
           <Box

@@ -189,10 +189,7 @@ const getChildDataByParentId = (data: any, parentId: string) => {
       if (item.childData && item.childData.length > 0) {
         for (const child of item.childData) {
           if (child.parentId === parentId) {
-            console.log('######### testing batch', child);
-            if (child?.status === Status.ACTIVE) {
-              result.push(child);
-            }
+            result.push(child);
           }
           // continue searching in case of deeper nesting
           if (child.childData && child.childData.length > 0) {

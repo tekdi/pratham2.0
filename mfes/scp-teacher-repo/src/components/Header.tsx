@@ -7,7 +7,7 @@ import { telemetryFactory } from '@/utils/telemetry';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
-import { Box, Button, Divider, Menu, Stack, Typography } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
@@ -22,12 +22,6 @@ import useStore from '../store/store';
 import ConfirmationModal from './ConfirmationModal';
 import StyledMenu from './StyledMenu';
 import { TENANT_DATA } from '../../app.config';
-import {
-  firstLetterInUpperCase,
-  getInitials,
-  getUserFullName,
-} from '@/utils/Helper';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 interface HeaderProps {
   toggleDrawer?: (newOpen: boolean) => () => void;
@@ -48,9 +42,6 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
   const isActiveYear = store.isActiveYearSelected;
 
   const [userId, setUserId] = useState<string>('');
-  const [userRole, setuserRole] = useState<string>('');
-  const [userName, setuserName] = useState<string>('');
-
   const [openMenu, setOpenMenu] = useState<boolean>(false);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -59,7 +50,6 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
   const [language, setLanguage] = useState<string>(selectedLanguage);
   const [darkMode, setDarkMode] = useState<string | null>(null);
   const { isRTL } = useDirection();
-  const [adminInfo, setAdminInfo] = React.useState<any>();
 
   // Retrieve stored userId and language
   useEffect(() => {
@@ -67,14 +57,9 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
       const storedUserId = localStorage.getItem('userId') as string;
       const storedLanguage = localStorage.getItem('preferredLanguage');
       const storedDarkMode = localStorage.getItem('mui-mode');
-      const storedRole = localStorage.getItem('role');
-      const storedUserName = localStorage.getItem('userName');
-
       if (storedUserId) setUserId(storedUserId);
       if (storedLanguage) setSelectedLanguage(storedLanguage);
       if (storedDarkMode) setDarkMode(storedDarkMode);
-      if (storedRole) setuserRole(storedRole);
-      if (storedUserName) setuserName(storedUserName);
     }
   }, []);
 
@@ -104,14 +89,10 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
       category: 'Dashboard',
       label: 'Logout Clicked',
     });
+    const token = localStorage.getItem('token');
 
-    const token =
-      typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    const tenantid =
-      typeof window !== 'undefined' ? localStorage.getItem('tenantId') : null;
-    const deviceID =
-      typeof window !== 'undefined' ? localStorage.getItem('deviceID') : null;
-
+    const tenantid = localStorage.getItem('tenantId');
+    const deviceID = localStorage.getItem('deviceID');
     const windowUrl = window.location.pathname;
     const cleanedUrl = windowUrl.replace(/^\//, '');
     const env = cleanedUrl.split('/')[0];
@@ -179,13 +160,7 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
     handleClose();
     setModalOpen(true);
   };
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      const admin = localStorage.getItem('userData');
-      if (admin && admin !== 'undefined')
-        setAdminInfo(JSON?.parse(admin) || {});
-    }
-  }, []);
+
   return (
     <>
       <Box
@@ -270,37 +245,9 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
               flexDirection={'column'}
               mt={'0.5rem'}
             >
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  // ml: 1,
-                  // '@media (max-width: 600px)': {
-                  //   display: 'none',
-                  // },
-                }}
-              >
-                <AccountCircleIcon />
-
-                <Typography
-                  variant="body1"
-                  fontWeight="400"
-                  sx={{
-                    ml: 1,
-                    maxWidth: '200px',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    fontSize: '16px',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {t('COMMON.HI', {
-                    name: firstLetterInUpperCase(userName ?? ''),
-                  })}
-                </Typography>
-                {/* 
-            <FeatherIcon icon="chevron-down" size="20" /> */}
-              </Box>
+              <AccountCircleOutlinedIcon
+                sx={{ color: theme.palette.warning['A200'] }}
+              />
             </Box>
 
             <StyledMenu
@@ -312,7 +259,7 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
               open={open}
               onClose={handleClose}
             >
-              {/* {pathname !== `/user-profile/${userId}` && (
+              {pathname !== `/user-profile/${userId}` && (
                 <MenuItem
                   onClick={handleProfileClick}
                   disableRipple
@@ -334,153 +281,7 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
                   sx={{ color: theme.palette.warning['300'] }}
                 />
                 {t('COMMON.LOGOUT')}
-              </MenuItem> */}
-              <Menu
-                id="profile-menu"
-                anchorEl={anchorEl}
-                open={open}
-                onClose={handleClose}
-                sx={{
-                  border: 'none',
-                  paddingLeft: '0px !important',
-                  paddingRight: '0px !important',
-                  '@media (max-width: 600px)': {
-                    minWidth: '0px !important',
-                  },
-                }}
-                // sx={{
-                //   paddingTop: '0px',
-                //   //backgroundColor: "#F8EFE7",
-                // }}
-                PaperProps={{
-                  sx: {
-                    // width: "500px",
-                    minWidth: '320px',
-                    borderRadius: '12px',
-                  },
-                }}
-                MenuListProps={{
-                  sx: {
-                    paddingTop: '50px !important',
-                    paddingBottom: '0px !important',
-                  },
-                }}
-              >
-                {/* <Box
-                        sx={{ backgroundColor: "#F8EFE7", height: "56px", width: "100%" }}
-                      ></Box> */}
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    marginTop: '-25px',
-                  }}
-                >
-                  <Box
-                    sx={{
-                      backgroundColor: '#78590C',
-                      width: '50px',
-                      height: '50px',
-                      borderRadius: '50%',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <Typography
-                      variant="h6"
-                      color="white"
-                      sx={{ fontWeight: 'bold', fontSize: '18px' }}
-                    >
-                      {getInitials(getUserFullName())}
-                    </Typography>
-                  </Box>
-                </Box>
-
-                <Box
-                  sx={{
-                    position: 'relative',
-                    // marginTop:"10px",
-                    // borderRadius: "10px",
-                    backgroundColor: 'white',
-                  }}
-                >
-                  <Typography
-                    variant="h5"
-                    sx={{
-                      marginBottom: '15px',
-                      marginTop: '10px',
-                      textAlign: 'center',
-                      px: '20px',
-                      fontSize: '16px',
-                    }}
-                  >
-                    {getUserFullName()}
-                  </Typography>
-                  <Typography
-                    variant="subtitle1"
-                    sx={{
-                      marginBottom: '20px',
-                      textAlign: 'center',
-                      px: '20px',
-                      color: '#7C766F',
-                      fontSize: '14px',
-                    }}
-                  >
-                    {userRole}
-                  </Typography>
-
-                  <Divider sx={{ color: '#D0C5B4' }} />
-                  <Box
-                    sx={{
-                      px: '20px',
-                      display: 'flex',
-                      gap: '10px',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      '@media (max-width: 434px)': {
-                        flexDirection: 'column',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      },
-                    }}
-                  >
-                    <Button
-                      fullWidth
-                      variant="outlined"
-                      color="primary"
-                      onClick={handleProfileClick}
-                      sx={{
-                        fontSize: '16px',
-                        backgroundColor: 'white',
-                        border: '0.6px solid #1E1B16',
-                        my: '20px',
-                        width: '408px',
-                        '@media (max-width: 434px)': { width: '100%' },
-                      }}
-                      // endIcon={<EditIcon />}
-                    >
-                      {t('PROFILE.MY_PROFILE')}
-                    </Button>
-                    <Button
-                      fullWidth
-                      variant="contained"
-                      color="primary"
-                      onClick={logoutOpen}
-                      sx={{
-                        fontSize: '16px',
-                        backgroundColor: '#FDBE16',
-                        border: '0.6px solid #1E1B16',
-                        my: '20px',
-                        '@media (max-width: 434px)': { my: '0px', mb: '20px' },
-                      }}
-                      //   endIcon={<LogoutIcon />}
-                    >
-                      {t('COMMON.LOGOUT')}
-                    </Button>
-                  </Box>
-                </Box>
-              </Menu>
+              </MenuItem>
             </StyledMenu>
           </Stack>
         </Box>

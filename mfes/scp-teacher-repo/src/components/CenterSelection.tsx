@@ -9,7 +9,6 @@ import {
 import { getCohortList } from '@/services/CohortServices';
 import { QueryKeys } from '@/utils/app.constant';
 import { useQueryClient } from '@tanstack/react-query';
-import { toPascalCase } from '@/utils/Helper';
 
 interface CenterDropdownProps {
   cohortId?: string;
@@ -52,7 +51,7 @@ const CenterDropdown: React.FC<CenterDropdownProps> = ({
         ) : (
           centerList?.map((center: any) => (
             <MenuItem key={center?.cohortId} value={center?.cohortId}>
-              {toPascalCase(center?.cohortName)}
+              {center?.cohortName}
             </MenuItem>
           ))
         )}

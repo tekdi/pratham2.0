@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RoleId, Status } from '@/utils/app.constant';
@@ -28,7 +27,6 @@ import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import { fetchUserData } from '@/utils/Helper';
-import { getUserDetails } from '@/services/ProfileService';
 
 const LearnerManage = ({
   open,
@@ -38,13 +36,10 @@ const LearnerManage = ({
   isReassign,
   customFields,
   userId,
-  isEditProfile = false,
 }: any) => {
   const theme = useTheme<any>();
   const [isLoading, setIsLoading] = useState(false);
   const [addSchema, setAddSchema] = useState(null);
-  const [addEditSchema, setAddEditSchema] = useState(null);
-  const [addEditUiSchema, setAddEditUiSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
   const [prefilledAddFormData, setPrefilledAddFormData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -88,8 +83,6 @@ const LearnerManage = ({
         },
       ]);
       console.log('responseForm', responseForm);
-      setAddEditSchema(responseForm?.schema);
-      setAddEditUiSchema(responseForm?.uiSchema);
 
       //unit name is missing from required so handled from frotnend
       let alterSchema = responseForm?.schema;
@@ -178,20 +171,6 @@ const LearnerManage = ({
         };
         setPrefilledAddFormData(tempFormData);
         console.log('@@@@@@@@@', tempFormData);
-      }
-      if (isEditProfile) {
-        const user = await getUserDetails(userId, true);
-        // console.log('##### user', user);
-        let tempFormData = extractMatchingKeys(
-          user?.result?.userData,
-          alterSchema
-        );
-        const modifiedFormData = {
-          ...tempFormData,
-          mobile: tempFormData.mobile?.toString?.() || '',
-        };
-        setPrefilledAddFormData(modifiedFormData);
-        console.log('tempFormData', modifiedFormData);
       }
 
       const districtFieldId =
@@ -288,15 +267,11 @@ const LearnerManage = ({
           onClose={handleCloseModal}
           showFooter={true}
           primaryText={
-            isEdit || isEditProfile
-              ? t('Update')
-              : isReassign
-              ? t('Reassign')
-              : t('Create')
+            isEdit ? t('Update') : isReassign ? t('Reassign') : t('Create')
           }
           id="dynamic-form-id"
           modalTitle={
-            isEdit || isEditProfile
+            isEdit
               ? t('LEARNERS.EDIT_LEARNER')
               : isReassign
               ? t('LEARNERS.RE_ASSIGN_LEARNER')
@@ -309,15 +284,13 @@ const LearnerManage = ({
               onLearnerAdded();
               setOpenModal(false);
             }}
-            schema={isEditProfile ? addEditSchema : addSchema}
-            uiSchema={isEditProfile ? addEditUiSchema : addUiSchema}
+            schema={addSchema}
+            uiSchema={addUiSchema}
             editPrefilledFormData={prefilledAddFormData}
-            isEdit={isEdit || isEditProfile}
+            isEdit={isEdit}
             isReassign={isReassign}
             isExtraFields={true}
-            editableUserId={
-              isReassign || isEditProfile ? userId : editableUserId
-            }
+            editableUserId={isReassign ? userId : editableUserId}
             UpdateSuccessCallback={() => {
               setOpenModal(false);
             }}

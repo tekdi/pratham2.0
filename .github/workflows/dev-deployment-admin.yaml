@@ -13,11 +13,10 @@ jobs:
       # Step 1: Clone the repository
       - name: Checkout code
         uses: actions/checkout@v3
-        with:
-          ref: main-admin
+
       # Step 2: Create a .env file
       - name: Create .env file
-        run: git branch && echo "${{ secrets.DEV_LAP_ENV }}" > .env && ls -ltra
+        run: echo "${{ secrets.DEV_LAP_ENV }}" > .env && ls -ltra
 
       # Step 4: Build and tag the Docker image
       - name: Build Docker image
@@ -50,11 +49,6 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY_DEV }}
           script: |
             cd ${{ secrets.TARGET_DEV_LAP }}
-            if [ -f .env ]; then
-            rm .env
-            fi
-            echo "${{ secrets.DEV_LAP_ENV }}" > .env
-            ls -ltra
             docker ps -a --filter "status=exited" --format "{{.ID}}" | xargs -r docker start
             docker stop dev-lap || true
             docker system prune -af || true

@@ -409,9 +409,6 @@ const TeamLeader = () => {
   const notificationKey = 'onTeamLeaderCreated';
   const notificationMessage = 'TEAM_LEADERS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
-  const blockReassignmentNotificationKey = 'TL_BLOCK_REASSIGNMENT';
-  const profileUpdateNotificationKey = 'TL_PROFILE_UPDATE';
-  const districtUpdateNotificationKey = 'TL_DISTRICT_UPDATE';
 
   useEffect(() => {
     setPrefilledFormData(initialFormDataSearch);
@@ -505,9 +502,6 @@ const TeamLeader = () => {
             districtFieldId={districtFieldId}
             hideSubmit={true}
             type={'team-leader'}
-            blockReassignmentNotificationKey={blockReassignmentNotificationKey}
-            profileUpdateNotificationKey={profileUpdateNotificationKey}
-            districtUpdateNotificationKey={districtUpdateNotificationKey}
           />
         </SimpleModal>
 

@@ -1,6 +1,10 @@
 import { ObservationStatus } from '@/utils/app.constant';
 import CheckCircleSharpIcon from '@mui/icons-material/CheckCircleSharp';
-import { Box, Typography } from '@mui/material';
+import {
+  Box,
+
+  Typography,
+} from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -43,9 +47,6 @@ const Entity: React.FC<MemberProps> = ({
           border: '1px solid #D0C5B4', // Black border added here
           // borderRadius: '8px'
           width: '300px',
-          '@media (max-width: 600px)': {
-            width: '100%',
-          },
           borderTopLeftRadius: '8px',
           borderBottomLeftRadius: '8px',
           //  height:"56px"
@@ -100,16 +101,14 @@ const Entity: React.FC<MemberProps> = ({
               }}
             >
               <Typography
-                sx={{
-                  display: '-webkit-box',
-                  WebkitLineClamp: 1,
-                  WebkitBoxOrient: 'vertical',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}
-              >
-                {entityMemberValue}
-              </Typography>
+             sx={{
+              display: '-webkit-box',
+              WebkitLineClamp: 1,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+              >{entityMemberValue}</Typography>
               <Typography variant="h5" color={'#4D4639'}>
                 {observationStatus}
               </Typography>

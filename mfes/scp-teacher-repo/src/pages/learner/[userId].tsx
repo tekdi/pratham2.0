@@ -61,11 +61,7 @@ import React, { ComponentType, useEffect, useState } from 'react';
 import { accessControl, AttendanceAPILimit } from '../../../app.config';
 import { isEliminatedFromBuild } from '../../../featureEliminationUtil';
 import { useDirection } from '../../hooks/useDirection';
-import {
-  cohortCenterList,
-  getCohortDetails,
-} from '@/services/CenterListServices';
-import LearnerManage from '@/shared/LearnerManage/LearnerManage';
+import { cohortCenterList, getCohortDetails } from '@/services/CenterListServices';
 let AssessmentReport: ComponentType<AssessmentReportProp> | null = null;
 
 if (!isEliminatedFromBuild('AssessmentReport', 'component')) {
@@ -102,7 +98,6 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
   const [customFieldsData, setCustomFieldsData] = useState<UpdateCustomField[]>(
     []
   );
-  const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState<any | null>(null);
   const [isFromDate, setIsFromDate] = useState(
@@ -143,13 +138,7 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
     if (typeof window !== 'undefined' && window.localStorage) {
       localStorage.setItem('learnerId', userId);
       setCohortId(localStorage.getItem('classId') || '');
-      setClassId(localStorage.getItem('classId') || '');
     }
-    const todayFormattedDate = formatSelectedDate(new Date());
-    const lastSeventhDayFormattedDate = formatSelectedDate(
-      new Date(today.getTime() - 6 * 24 * 60 * 60 * 1000)
-    );
-    getAttendanceData(lastSeventhDayFormattedDate, todayFormattedDate);
   }, []);
 
   const handleReload = () => {
@@ -293,7 +282,6 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
     const response = await classesMissedAttendancePercentList({
       filters,
       facets: ['userId'],
-      sort: ['absent_percentage', 'asc'],
     });
     if (response?.responseCode === 200) {
       const userData = response?.data?.result?.userId[userId];
@@ -312,7 +300,6 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
           const response = await getUserDetails(user, true);
 
           console.log('response', response);
-          setUserData(response?.result?.userData);
 
           if (response?.responseCode === 200) {
             const data = response;
@@ -491,8 +478,8 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
             selectedOption !== '-'
               ? selectedOption.label
               : field?.value
-              ? translateString(t, field?.value)
-              : '-',
+                ? translateString(t, field?.value)
+                : '-',
         };
       }
 
@@ -721,9 +708,9 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
   }, [
     classId,
     selectedValue ===
-      t('DASHBOARD.LAST_SEVEN_DAYS_RANGE', {
-        date_range: dateRange,
-      }),
+    t('DASHBOARD.LAST_SEVEN_DAYS_RANGE', {
+      date_range: dateRange,
+    }),
   ]);
 
   const handleLearnerDelete = () => {
@@ -735,20 +722,20 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
       try {
         const userDetails = await getUserDetails(userId, true);
         const centerId = userDetails.result.userData.customFields.find(
-          (field: any) => field.label === 'CENTER'
+          (field: any) => field.label === "CENTER"
         )?.selectedValues[0];
 
         const response = await cohortCenterList({
           limit: 10,
           offset: 0,
           filters: {
-            cohortId: centerId,
-          },
+            cohortId: centerId
+          }
         });
         console.log('Cohort list:', response.results);
 
         const center = response.results.cohortDetails[0];
-        if (center.type === 'COHORT' && center.status === 'active') {
+        if (center.type === "COHORT" && center.status === "active") {
           console.log('Center name:', center.name);
           setCenter(center);
 
@@ -756,7 +743,7 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
           const cohortDetails = await getCohortDetails({
             userId: userId,
             children: true,
-            customField: true,
+            customField: true
           });
           console.log('Cohort details:', cohortDetails);
 
@@ -765,10 +752,7 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
 
           if (allBatches && Array.isArray(allBatches)) {
             const activeBatchNames = allBatches
-              .filter(
-                (batch: any) =>
-                  batch.cohortStatus === 'active' && batch.type === 'BATCH'
-              )
+              .filter((batch: any) => batch.cohortStatus === "active" && batch.type === "BATCH")
               .map((batch: any) => batch.cohortName);
 
             if (activeBatchNames.length > 0) {
@@ -776,6 +760,7 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
             }
           }
         }
+
       } catch (error) {
         console.error('Error fetching cohort list:', error);
       }
@@ -784,7 +769,7 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
     fetchCohortList();
   }, [userId]);
 
-  console.log(batchNames, 'batchNames');
+  console.log(batchNames, "batchNames");
 
   return (
     <>
@@ -852,11 +837,12 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
                 isDropout={userDetails.status === Status.DROPOUT}
                 statusReason={userDetails.statusReason}
                 reloadState={reloadState ?? false}
-                setReloadState={setReloadState ?? (() => {})}
+                setReloadState={setReloadState ?? (() => { })}
                 onLearnerDelete={handleLearnerDelete}
                 isFromProfile={true}
                 customFields={userDetails.customFields}
               />
+
             )}
           </Box>
         </Grid>
@@ -936,7 +922,7 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
                     color={theme.palette.warning['400']}
                     fontSize={'0.75rem'}
                     fontWeight={'500'}
-                    // pt={'1rem'}
+                  // pt={'1rem'}
                   >
                     {t('ATTENDANCE.ATTENDANCE_MARKED_OUT_OF_DAYS', {
                       count: numberOfDaysAttendanceMarked,
@@ -1007,7 +993,7 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
         // }}
         >
           {/* Hiding button for edit learner until edit functionality is developed */}
-          {isActiveYear && (
+          {/* {isActiveYear && (
             <Button
               sx={{
                 fontSize: '14px',
@@ -1041,11 +1027,11 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
                 <CreateOutlinedIcon sx={{ fontSize: '14px' }} />
               </Box>
             </Button>
-          )}
+          )} */}
 
           {openAddLearnerModal && (
             <div>
-              {/* <AddLearnerModal
+              <AddLearnerModal
                 open={openAddLearnerModal}
                 onClose={handleCloseAddLearnerModal}
                 formData={formData}
@@ -1054,14 +1040,6 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
                 onReload={handleReload}
                 learnerEmailId={selectedUserEmail}
                 learnerUserName={selectedUserUserName}
-              /> */}
-              <LearnerManage
-                open={openAddLearnerModal}
-                onClose={handleCloseAddLearnerModal}
-                isReassign={false}
-                customFields={userData}
-                userId={userId}
-                isEditProfile={true}
               />
             </div>
           )}
@@ -1085,12 +1063,7 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
             <Grid container spacing={4}>
               {learnerDetailsByOrder?.map((item, i) => {
                 let displayValue = item?.displayValue;
-                if (
-                  item.label?.toUpperCase() === 'CENTER' &&
-                  center &&
-                  center.type === 'COHORT' &&
-                  center.status === 'active'
-                ) {
+                if (item.label?.toUpperCase() === 'CENTER' && center && center.type === 'COHORT' && center.status === 'active') {
                   displayValue = center.name;
                 }
                 const labelText = item.label
@@ -1119,12 +1092,8 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
                       }}
                     >
                       {item.label?.toUpperCase() === 'BATCH'
-                        ? batchNames
-                            .map((name) => toPascalCase(name))
-                            .join(', ')
-                        : typeof displayValue === 'string'
-                        ? t(`FORM.${displayValue}`, toPascalCase(displayValue))
-                        : toPascalCase(displayValue)}
+                        ? batchNames.map(name => toPascalCase(name)).join(', ')
+                        : typeof displayValue === 'string' ? t(`FORM.${displayValue}`, toPascalCase(displayValue)) : toPascalCase(displayValue)}
                     </Typography>
                   </Grid>
                 );

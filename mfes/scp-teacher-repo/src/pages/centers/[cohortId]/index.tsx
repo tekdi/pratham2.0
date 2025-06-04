@@ -492,9 +492,7 @@ const CohortPage = () => {
   }, [router.isReady, router.query.tab]);
   useEffect(() => {
     if (router.isReady) {
-      const updatedQuery = isActiveYear
-        ? { ...router.query, tab: value }
-        : { ...router.query, tab: 2 };
+      const updatedQuery = { ...router.query, tab: value };
 
       router.push(
         {

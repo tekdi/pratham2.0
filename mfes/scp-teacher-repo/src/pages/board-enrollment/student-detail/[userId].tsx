@@ -137,11 +137,8 @@ const BoardEnrollmentDetail = () => {
   }, [extractFieldIdAndLabel]);
 
   React.useEffect(() => {
-    const uniqueFieldIdLabel = Array.from(
-      new Map(memoizedFieldIdLabel.map((item) => [item.fieldId, item])).values()
-    );
-    setFieldIdLabel(uniqueFieldIdLabel);
-    // console.log('uniqueFieldIdLabel', uniqueFieldIdLabel);
+    setFieldIdLabel(memoizedFieldIdLabel);
+    // console.log('memoizedFieldIdLabel', memoizedFieldIdLabel);
   }, [memoizedFieldIdLabel]);
 
   useEffect(() => {

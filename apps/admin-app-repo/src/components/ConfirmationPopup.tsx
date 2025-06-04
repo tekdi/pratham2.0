@@ -21,7 +21,6 @@ interface GenericModalProps {
   secondary: string;
   reason?: any;
   centerPrimary?: any;
-  isFromMarkAsVoluteer?: boolean;
 }
 
 const ConfirmationPopup: React.FC<GenericModalProps> = ({
@@ -35,7 +34,6 @@ const ConfirmationPopup: React.FC<GenericModalProps> = ({
   reason,
   centerPrimary,
   onClickPrimary,
-  isFromMarkAsVoluteer,
 }) => {
   const theme = useTheme<any>();
   return (
@@ -102,7 +100,7 @@ const ConfirmationPopup: React.FC<GenericModalProps> = ({
             <Button
               variant="contained"
               fullWidth
-              disabled={isFromMarkAsVoluteer ? !checked : !checked || !reason}
+              disabled={!checked || !reason}
               onClick={() => {
                 if (onClickPrimary) onClickPrimary();
                 if (onClose) onClose();

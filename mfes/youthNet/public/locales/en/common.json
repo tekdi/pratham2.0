@@ -163,7 +163,7 @@
     "RELOAD_TO_UPDATE": "Get the latest features and improvements—update now to enjoy a smoother experience and stay up-to-date!",
     "NO_ASSIGNED_BOARDS": "No assigned Board for selected Center",
     "HIGHT-TO_LOW": "High to low",
-    "INPROGRESS": "Continue Previous Submission"
+    "INPROGRESS":"Continue Previous Submission"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -621,6 +621,7 @@
     "MIN_LENGTH_CHARACTERS_ERROR": "Minimum {{minLength}} characters required",
     "MAX_LENGTH_CHARACTERS_ERROR": "Maximum {{maxLength}} characters allowed",
     "NUMBER_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "Numbers and special characters are not allowed",
+
     "ENTER_VALID_MOBILE_NUMBER": "Enter Valid mobile number",
     "ENTER_VALID_EMAIL": "Enter valid Email",
     "ENTER_VALID_YEAR": "Enter valid Year",
@@ -715,7 +716,7 @@
     "OBSERVATION_STATUS": "Survey Status",
     "OBSERVATION_NOT_STARTED_YET": "Survey not started yet",
     "EXPIRED": "Expired",
-    "ARE_YOU_SURE_YOU_TO_SUBMIT_FORM": "Are you sure to submit form?"
+    "ARE_YOU_SURE_YOU_TO_SUBMIT_FORM":"Are you sure to submit form?"
   },
   "YOUTHNET_SURVEY": {
     "SURVEY": "Surveys",
@@ -730,6 +731,7 @@
     "VILLAGES_MANAGED_BY_YOU": "Villages Managed by you : {{totalVillageCount}}",
     "VILLAGE_MANAGED_BY_YOU": "Village Managed by you : {{totalVillageCount}}",
     "VILLAGE": "Village",
+
     "MANAGES": "Manages",
     "VILLAGES": "Villages",
     "MONTHLY_REGISTRATIONS_OVERVIEW": "Registrations Overview",
@@ -769,7 +771,6 @@
     "FULL_NAME": "Full Name",
     "EMAIL_ID": "Email ID",
     "STATE_DISTRICT_BLOCK": "Block District State",
-    "STATE_DISTRICT": "District State",
     "STATE_DISTRICT_BLOCK_VILLAGE": "Village Block District State",
     "DESIGNATION": "Designation",
     "JOINED_ON": "Joined on",
@@ -785,6 +786,7 @@
     "LAST_NAME": "Last Name",
     "USERNAME": "Username"
   },
+
   "YOUTHNET_USERS_AND_VILLAGES": {
     "MENTORS": "Mentors",
     "CSV": "CSV",
@@ -810,6 +812,7 @@
     "DISTRICT": "District",
     "DISTRICTS": "Districts"
   },
+
   "YOUTHNET_CAMP_DETAILS": {
     "SUBMISSION": "Submission",
     "SUMMARY": "Summary"
@@ -825,14 +828,14 @@
   "MENTOR": {
     "MENTOR_CREATED_SUCCESSFULLY": "The mentor account has been created successfully, and the credentials have been sent",
     "MENTOR_CREATED": "The mentor account has been created successfully",
+
     "MENTOR_CREATED_FAILED": "Failed to create mentor account",
     "FINISH_ASSIGN": "Finish & Assign",
     "VILLAGES_SELECTED": "villages selected",
     "DISTRICTS": "Districts",
     "ASSIGN_VILLAGES_FINISH": "You can complete this later at your own pace. However, the villages will only be assigned once you click on ‘Finish.’",
     "ASSIGN_VILLAGES_FROM_BLOCKS": "Assign Villages from Blocks",
-    "BACK_TO_FORM": "Back to form",
-    "SELECTED_VILLAGE_COUNT": "Selected village count : {{totalVillageCount}}"
+    "BACK_TO_FORM": "Back to form"
   },
   "UNIT_NAME": "Unit Name",
   "TYPE_OF_CENTER": "Type Of Center",

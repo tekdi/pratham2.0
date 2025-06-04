@@ -958,10 +958,8 @@ export const getUserFullName = (user?: {
   if (user) {
     userData = user;
   } else {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      userData = localStorage.getItem('userData');
-      userData = JSON.parse(userData || '{}');
-    }
+    userData = localStorage.getItem('userData');
+    userData = JSON.parse(userData || '{}');
   }
 
   if (userData?.firstName) {
@@ -984,22 +982,26 @@ export const calculateAge = (dob: any) => {
 };
 
 export const getBMG = (cohortData: any) => {
-  if (cohortData?.customField?.length) {
-    const getValue = (label: string) => {
-      const field = cohortData.customField.find(
-        (item: any) => item.label === label
+  if (cohortData) {
+    if (cohortData?.customField?.length) {
+      const medium = cohortData.customField.find(
+        (item: CustomField) => item.label === 'MEDIUM'
       );
-      const value = field?.selectedValues?.[0];
-      return typeof value === 'object' ? value.value : value;
-    };
 
-    const bmg = {
-      board: getValue('BOARD'),
-      medium: getValue('MEDIUM'),
-      grade: getValue('GRADE'),
-    };
+      const grade = cohortData.customField.find(
+        (item: CustomField) => item.label === 'GRADE'
+      );
 
-    return bmg;
+      const board = cohortData.customField.find(
+        (item: CustomField) => item.label === 'BOARD'
+      );
+      const bmg = {
+        board: board?.value,
+        medium: medium?.value,
+        grade: grade?.value,
+      };
+      return bmg;
+    }
   }
   return null;
 };
@@ -1185,28 +1187,4 @@ export const fetchUserData = async (userId: any) => {
     console.error('Error getting user details:', error);
     return null;
   }
-};
-export const getInitials = (name: any) => {
-  if (!name) return ''; // Handle empty input
-  const words = name?.trim().split(' ');
-  return words?.length > 1
-    ? words[0][0].toUpperCase() + words[1][0].toUpperCase()
-    : words[0][0].toUpperCase();
-};
-export const isUnderEighteen = (dobString: any): boolean => {
-  if (!dobString) return false;
-
-  const dob = new Date(dobString);
-  if (isNaN(dob.getTime())) return false; // Invalid date check
-
-  const today = new Date();
-  let age = today.getFullYear() - dob.getFullYear();
-  const monthDiff = today.getMonth() - dob.getMonth();
-  const dayDiff = today.getDate() - dob.getDate();
-
-  if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
-    age--;
-  }
-
-  return age < 18;
 };

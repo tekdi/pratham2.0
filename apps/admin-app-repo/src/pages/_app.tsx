@@ -28,7 +28,6 @@ import TenantService from '@/services/TenantService';
 
 //menu config
 import MenuWrapper from '../config/MenuWrapper';
-import { LanguageProvider } from '@shared-lib-v2/lib/context/LanguageContext';
 
 function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -146,7 +145,6 @@ function App({ Component, pageProps }: AppProps) {
       <Head>
         <title>{metaTags?.title}</title>
       </Head>
-      <LanguageProvider>
       <QueryClientProvider client={client}>
         <AuthProvider>
           {/* for dynamic menu */}
@@ -162,7 +160,6 @@ function App({ Component, pageProps }: AppProps) {
         </AuthProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
-      </LanguageProvider>
     </>
   );
 }

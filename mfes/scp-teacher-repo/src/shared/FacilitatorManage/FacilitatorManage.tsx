@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Form from '@rjsf/mui';
 import validator from '@rjsf/validator-ajv8';
@@ -51,7 +50,6 @@ const FacilitatorManage = ({
   isReassign,
   reassignuserId,
   selectedUserData,
-  isEdit = false,
 }: any) => {
   const theme = useTheme<any>();
   const [isLoading, setIsLoading] = useState(false);
@@ -65,10 +63,10 @@ const FacilitatorManage = ({
   const [response, setResponse] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [openModal, setOpenModal] = React.useState<boolean>(open);
-  // const [isEdit, setIsEdit] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
   // const [isReassign, setIsReassign] = useState(false);
   const [editableUserId, setEditableUserId] = useState(
-    isReassign || isEdit ? selectedUserData?.userId : ''
+    isReassign ? selectedUserData?.userId : ''
   );
   const [roleId, setRoleID] = useState('');
   const [tenantId, setTenantId] = useState('');
@@ -77,8 +75,6 @@ const FacilitatorManage = ({
   const [districtFieldId, setDistrictFieldId] = useState('');
   const [villageFieldId, setVillageFieldId] = useState('');
   // const [centerFieldId, setCenterFieldId] = useState('');
-  const [addEditSchema, setAddEditSchema] = useState(null);
-  const [addEditUiSchema, setAddEditUiSchema] = useState(null);
 
   const [userID, setUserId] = useState('');
   const [userData, setUserData] = useState({
@@ -113,8 +109,6 @@ const FacilitatorManage = ({
           },
         ]);
         console.log('responseForm', responseForm);
-        setAddEditSchema(responseForm?.schema);
-        setAddEditUiSchema(responseForm?.uiSchema);
 
         //unit name is missing from required so handled from frotnend
         let alterSchema = responseForm?.schema;
@@ -196,15 +190,6 @@ const FacilitatorManage = ({
           } catch (error) {
             console.error('Error fetching user data:', error);
           }
-        } else if (isEdit) {
-          let tempFormData = extractMatchingKeys(selectedUserData, alterSchema);
-          const modifiedFormData = {
-            ...tempFormData,
-            mobile: tempFormData.mobile?.toString?.() || '',
-          };
-          setPrefilledAddFormData(modifiedFormData);
-          // console.log('tempFormData', tempFormData);
-          // console.log('alterSchema!!', alterSchema);
         } else {
           const userData = localStorage.getItem('userData');
           if (userData) {
@@ -237,14 +222,13 @@ const FacilitatorManage = ({
             }
           }
         }
-        if (!isEdit) {
-          console.log('######### setPrefilledAddFormData', initialFormData);
-          setPrefilledAddFormData(initialFormData);
-          setEditableUserId(
-            isReassign || isEdit ? selectedUserData?.userId : ''
-          );
-          setButtonShow(true);
-        }
+
+        console.log('######### setPrefilledAddFormData', initialFormData);
+        setPrefilledAddFormData(initialFormData);
+        setIsEdit(false);
+        // setIsReassign(false);
+        setEditableUserId(isReassign ? selectedUserData?.userId : '');
+        setButtonShow(true);
       };
 
       prepareInitialData(); // Call the async function
@@ -259,7 +243,7 @@ const FacilitatorManage = ({
   const handleCloseModal = () => {
     setOpenModal(false);
     // setIsReassign(false);
-    // setIsEdit(false);
+    setIsEdit(false);
     onClose();
   };
 
@@ -320,8 +304,8 @@ const FacilitatorManage = ({
               onFacilitatorAdded();
               setOpenModal(false);
             }}
-            schema={isEdit ? addEditSchema : addSchema}
-            uiSchema={isEdit ? addEditUiSchema : addUiSchema}
+            schema={addSchema}
+            uiSchema={addUiSchema}
             editPrefilledFormData={prefilledAddFormData}
             isEdit={isEdit}
             isReassign={isReassign}

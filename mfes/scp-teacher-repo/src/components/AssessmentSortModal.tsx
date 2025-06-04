@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import SimpleModal from './SimpleModal';
 import {
   FormControl,
@@ -18,10 +18,6 @@ interface IAssessmentSortModal {
   onClose: () => void;
   btnText: string;
   onFilterApply: (options: any) => void;
-  selectedOption?: {
-    sortByKey: string;
-    sortByValue: string;
-  };
 }
 
 const assessmentStatusOptions = [
@@ -64,21 +60,11 @@ const AssessmentSortModal: React.FC<IAssessmentSortModal> = ({
   onClose,
   btnText,
   onFilterApply,
-  selectedOption,
 }) => {
   const theme = useTheme<any>();
   const { t } = useTranslation();
-  const [selectedValue, setSelectedValue] = useState<string>(
-    selectedOption?.sortByValue || ''
-  );
-  const [sortBy, setSortBy] = useState<string>(selectedOption?.sortByKey || '');
-
-  useEffect(() => {
-    if (selectedOption) {
-      setSelectedValue(selectedOption.sortByValue);
-      setSortBy(selectedOption.sortByKey);
-    }
-  }, [selectedOption]);
+  const [selectedValue, setSelectedValue] = useState<string>('');
+  const [sortBy, setSortBy] = useState<string>('');
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement>,
