@@ -147,7 +147,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
       },
       {
         title: t('LEARNER_APP.POS.THEMATIC_REPOSITORY'),
-        to: () => router.push('/pos/thematic-repository'),
+        to: () => router.push('/pos/themantic'),
         isActive: currentPage === '/pos/thematic-repository',
       },
     ];
@@ -169,7 +169,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
           },
         },
         navLinks: defaultNavLinks,
-        _navLinkBox: { gap: '12px' },
+        _navLinkBox: { gap: '12px', cursor: 'pointer' },
         ...props?._topAppBar,
       }}
     >

@@ -115,10 +115,14 @@ export const Footer: React.FC = () => {
                     <Link href={href} passHref legacyBehavior>
                       <Typography
                         variant="body1"
-                        sx={{ fontWeight: 400, color: '#1F1B13' }}
+                        sx={{
+                          fontWeight: 400,
+                          color: '#1F1B13',
+                          cursor: 'pointer',
+                        }}
                       >
                         <a target="_blank" rel="noopener noreferrer">
-                          <SpeakableText>{label}</SpeakableText>
+                          <SpeakableText cursor={true}>{label}</SpeakableText>
                         </a>
                       </Typography>
                     </Link>

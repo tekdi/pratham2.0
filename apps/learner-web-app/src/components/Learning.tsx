@@ -62,6 +62,7 @@ const Learning = ({
                 },
                 alignItems: 'center',
                 justifyContent: 'center',
+                display: 'flex',
                 flexDirection: 'column',
                 borderRadius: '12px',
                 transition: 'all 0.3s',
