@@ -96,7 +96,7 @@ export const Layout: React.FC<LayoutProps> = ({
           }
         }}
         sx={{
-          zIndex: 1,
+          zIndex: 2,
           bgcolor: 'transparent',
         }}
       >
