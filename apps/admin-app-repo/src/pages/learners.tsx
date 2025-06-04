@@ -581,6 +581,8 @@ const Learner = () => {
   const notificationKey = 'onLearnerCreated';
   const notificationMessage = 'LEARNERS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
+  const blockReassignmentNotificationKey = 'LEARNER_REASSIGNMENT_NOTIFICATION';
+  const profileUpdateNotificationKey = 'LEARNER_PROFILE_UPDATE_ALERT';
 
   useEffect(() => {
     setPrefilledFormData(initialFormDataSearch);
@@ -676,6 +678,8 @@ const Learner = () => {
             villageFieldId={villageFieldId}
             hideSubmit={true}
             type={'learner'}
+            blockReassignmentNotificationKey={blockReassignmentNotificationKey}
+            profileUpdateNotificationKey={profileUpdateNotificationKey}
           />
         </SimpleModal>
 

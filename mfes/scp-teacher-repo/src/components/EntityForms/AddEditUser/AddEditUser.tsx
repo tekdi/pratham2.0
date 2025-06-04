@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import DynamicForm from '@/components/DynamicForm/DynamicForm';
+import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
 import { showToastMessage } from '../../Toastify';
@@ -8,13 +8,14 @@ import {
   firstLetterInUpperCase,
   getReassignPayload,
   getUserFullName,
+  isUnderEighteen,
 } from '@/utils/Helper';
 import { sendCredentialService } from '@/services/NotificationService';
 import {
   notificationCallback,
   splitUserData,
   telemetryCallbacks,
-} from '@/components/DynamicForm/DynamicFormCallback';
+} from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import {
   bulkCreateCohortMembers,
   createCohort,
@@ -236,6 +237,15 @@ const AddEditUser = ({
           }
           // console.log('userData', userData);
           // console.log('customFields', customFields);
+          if (type == 'learner') {
+            const parentPhoneField = customFields.find(
+              (field: any) => field.value === formData.parent_phone
+            );
+            console.log('Parent Phone Field:', parentPhoneField);
+            if (parentPhoneField) {
+              userData.mobile = parentPhoneField.value;
+            }
+          }
           const object = {
             userData: userData,
             customFields: customFields,
@@ -369,6 +379,9 @@ const AddEditUser = ({
           if (type == 'learner') {
             if (payload?.email == '') {
               delete payload.email;
+            }
+            if (isUnderEighteen(payload?.dob)) {
+              payload.mobile = formData?.parent_phone;
             }
           }
           const responseUserData = await createUser(payload, t);

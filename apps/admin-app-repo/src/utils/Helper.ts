@@ -447,10 +447,10 @@ export const filterAndMapAssociations = (
     }));
 };
 
-export const dataURLToBlob = (dataURLs: string[]): Blob[] => {
+export const dataURLToBlob = (dataURLs: any[]): Blob[] => {
   return dataURLs.map((dataURL) => {
     const [header, base64Data] = dataURL.split(',');
-    const mimeTypeMatch = header.match(/:(.*?);/);
+    const mimeTypeMatch = header?.match(/:(.*?);/);
     if (!mimeTypeMatch) {
       throw new Error('Invalid data URL format');
     }
@@ -684,4 +684,65 @@ export const fetchUserData = async (userId: any) => {
     console.error('Error getting user details:', error);
     return null;
   }
+};
+
+export const isBlockDifferent: any = (
+  originalPrefilledFormData: { block?: string[] },
+  formData: { block?: string[] }
+): boolean => {
+  const originalBlock = originalPrefilledFormData.block?.[0];
+  const currentBlock = formData.block?.[0];
+
+  return originalBlock !== currentBlock;
+};
+
+export const isDistrictDifferent: any = (
+  originalPrefilledFormData: { district?: string[] },
+  formData: { district?: string[] }
+): boolean => {
+  const originalDistrict = originalPrefilledFormData.district?.[0];
+  const currentDistrict = formData.district?.[0];
+
+  return originalDistrict !== currentDistrict;
+};
+
+export const isCenterDifferent = (
+  originalPrefilledFormData: any,
+  transformedFormData: any
+): boolean => {
+  const centerFromOriginal = originalPrefilledFormData.center ?? [];
+
+  const centerFieldFromTransformed = transformedFormData.customFields.find(
+    (field: { fieldId: string }) =>
+      field.fieldId === '753727ba-17e7-429b-99b9-ef6c3dc533e7'
+  );
+
+  const centerFromTransformed = Array.isArray(centerFieldFromTransformed?.value)
+    ? centerFieldFromTransformed?.value
+    : [];
+
+  const sortArr = (arr: string[]) => [...arr].sort();
+
+  return (
+    JSON.stringify(sortArr(centerFromOriginal)) !==
+    JSON.stringify(sortArr(centerFromTransformed))
+  );
+};
+
+export const isUnderEighteen = (dobString: any): boolean => {
+  if (!dobString) return false;
+
+  const dob = new Date(dobString);
+  if (isNaN(dob.getTime())) return false; // Invalid date check
+
+  const today = new Date();
+  let age = today.getFullYear() - dob.getFullYear();
+  const monthDiff = today.getMonth() - dob.getMonth();
+  const dayDiff = today.getDate() - dob.getDate();
+
+  if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+    age--;
+  }
+
+  return age < 18;
 };
