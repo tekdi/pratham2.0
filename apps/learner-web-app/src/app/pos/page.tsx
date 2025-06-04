@@ -424,7 +424,7 @@ const page = () => {
                   <SpeakableText>{item.value}</SpeakableText>
                 </Typography>
                 <Typography
-                  variant={mediaMD ? 'body1' : 'body6'}
+                  variant={mediaMD ? 'h2' : 'body8'}
                   component="h1"
                   sx={{
                     fontFamily: 'Poppins',
@@ -599,6 +599,7 @@ const page = () => {
         sx={{
           mt: 7,
           mx: 7,
+          mb: 2,
           '@media (max-width: 900px)': {
             mx: '16px',
           },
