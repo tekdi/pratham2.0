@@ -273,6 +273,7 @@ const InProgressContent: React.FC = () => {
             isShowInCarousel: true,
             isHideNavigation: true,
             _subBox: { px: { xs: 2, sm: 2, md: 0 } },
+            _carousel: { spaceBetween: isMdUp ? 16 : 8 },
           }}
         />
       </Grid>

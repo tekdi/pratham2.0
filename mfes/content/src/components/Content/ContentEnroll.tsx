@@ -151,7 +151,7 @@ const ContentDetails = (props: ContentDetailsProps) => {
               flexDirection: 'column',
               gap: 4,
               py: 4,
-              width: '85%',
+              width: { sx: '100%', sm: '90%', md: '85%' },
             }}
           >
             <Box>

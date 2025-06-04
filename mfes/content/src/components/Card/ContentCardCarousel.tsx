@@ -36,7 +36,8 @@ const ContentCardCarousel = ({
   isLoadingMoreData: boolean;
 }) => {
   const { t } = useTranslation();
-  const { default_img, _subBox, _card, isHideNavigation } = _config ?? {};
+  const { default_img, _subBox, _carousel, _card, isHideNavigation } =
+    _config ?? {};
   const prevRef = useRef(null);
   const nextRef = useRef(null);
 
@@ -90,6 +91,7 @@ const ContentCardCarousel = ({
           1200: { slidesPerView: 4 },
           1536: { slidesPerView: 5 },
         }}
+        {..._carousel}
       >
         {contentData?.map((item: any) => (
           <SwiperSlide

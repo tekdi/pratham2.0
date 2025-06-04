@@ -45,7 +45,7 @@ const AccountSelection = () => {
           setUsernames(userList);
         }
       } catch {
-        showToastMessage('please enter correct username', 'info');
+        showToastMessage('Please enter correct username', 'info');
       }
     };
     fetchUsernameByMobile();
@@ -115,7 +115,7 @@ const AccountSelection = () => {
         );
       }
     } catch {
-      showToastMessage('please enter correct username', 'info');
+      showToastMessage('Please enter correct username', 'info');
     }
   };
 
