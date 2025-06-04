@@ -114,8 +114,13 @@ const LanguageSelect = ({
       size="small"
       onChange={handleChange}
       sx={{
+        width: 67,
         '& .MuiSelect-select': {
-          padding: '2px 12px 3px 12px',
+          padding: '2px 0px 3px 8px',
+          paddingRight: '20px !important',
+        },
+        '& .MuiSelect-icon': {
+          width: '20px',
         },
         color: theme.palette.text.primary,
         borderRadius: '8px',
