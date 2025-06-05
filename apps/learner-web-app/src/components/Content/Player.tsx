@@ -63,7 +63,13 @@ const App = (props: { userIdLocalstorageName?: string }) => {
     return <div>Loading...</div>;
   }
   const onBackClick = () => {
-    router.back();
+    if (breadCrumbs?.length > 1) {
+      if (breadCrumbs?.[breadCrumbs.length - 1]?.link) {
+        router.push(breadCrumbs?.[breadCrumbs.length - 1]?.link);
+      }
+    } else {
+      router.push(`${activeLink ? activeLink : '/content'}`);
+    }
   };
 
   return (

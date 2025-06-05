@@ -182,12 +182,17 @@ export default function Details(props: DetailsProps) {
   };
 
   const onBackClick = () => {
-    router.back();
-    // if (unitId) {
-    //   router.push(`/content/${courseId}`);
-    // } else if (courseId) {
-    //   router.push(`/content`);
-    // }
+    if (breadCrumbs?.length > 1) {
+      if (breadCrumbs?.[breadCrumbs.length - 2]?.link) {
+        router.push(breadCrumbs?.[breadCrumbs.length - 2]?.link);
+      }
+    } else {
+      router.push(
+        `${props?._config?.contentBaseUrl ?? ''}${
+          activeLink ? activeLink : '/content'
+        }`
+      );
+    }
   };
 
   return (

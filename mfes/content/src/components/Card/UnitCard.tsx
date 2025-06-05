@@ -70,7 +70,7 @@ const UnitCard = ({
               : default_img ??
                 `${AppConst.BASEPATH}/assests/images/image_ver.png`
           }
-          content={item?.description ? item?.description : ''}
+          content={item?.description ? item?.description : ' '}
           orientation="horizontal"
           item={item}
           TrackData={trackData}
