@@ -58,15 +58,20 @@ export default function Details(props: DetailsProps) {
         if (unitId && !props?.isHideInfoCard) {
           const course = await hierarchyAPI(courseId as string);
           setCourseItem(course);
-          const breadcrum = findCourseUnitPath(course, unitId as string, [
-            'name',
-            'identifier',
-            'mimeType',
-            {
-              key: 'link',
-              suffix: activeLink ? `?activeLink=${activeLink}` : '',
-            },
-          ]);
+          const breadcrum = findCourseUnitPath({
+            contentBaseUrl: props?._config?.contentBaseUrl,
+            node: course,
+            targetId: unitId as string,
+            keyArray: [
+              'name',
+              'identifier',
+              'mimeType',
+              {
+                key: 'link',
+                suffix: activeLink ? `?activeLink=${activeLink}` : '',
+              },
+            ],
+          });
           setBreadCrumbs(breadcrum);
         }
 
@@ -182,12 +187,19 @@ export default function Details(props: DetailsProps) {
   };
 
   const onBackClick = () => {
-    router.back();
-    // if (unitId) {
-    //   router.push(`/content/${courseId}`);
-    // } else if (courseId) {
-    //   router.push(`/content`);
-    // }
+    if (breadCrumbs?.length > 1) {
+      if (breadCrumbs?.[breadCrumbs.length - 2]?.link) {
+        router.push(breadCrumbs?.[breadCrumbs.length - 2]?.link);
+      }
+    } else {
+      router.push(
+        `${
+          activeLink
+            ? activeLink
+            : `${props?._config?.contentBaseUrl ?? ''}/content`
+        }`
+      );
+    }
   };
 
   return (

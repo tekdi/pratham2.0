@@ -24,6 +24,7 @@ const App = () => {
           _card: { isHideProgress: true },
           _infoCard: {
             _cardMedia: { maxHeight: { xs: '200px', sm: '280px' } },
+            default_img: '/images/image_ver.png',
           },
         }}
       />

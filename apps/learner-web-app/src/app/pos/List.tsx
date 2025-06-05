@@ -67,9 +67,13 @@ export default function App({
     async (content: ContentItem) => {
       try {
         if (SUPPORTED_MIME_TYPES.includes(content?.mimeType)) {
-          router.push(`/pos/player/${content?.identifier}`);
+          router.push(
+            `/pos/player/${content?.identifier}?activeLink=${window.location.pathname}`
+          );
         } else {
-          router.push(`/pos/content-details/${content?.identifier}`);
+          router.push(
+            `/pos/content-details/${content?.identifier}?activeLink=${window.location.pathname}`
+          );
         }
       } catch (error) {
         console.error('Failed to handle card click:', error);
@@ -94,9 +98,9 @@ export default function App({
           _infoCard: {
             default_img: `/images/pos_${pagename?.toLowerCase()}.jpg`,
             isHideStatus: true,
-            _textCard: { p: '40px' },
+            _textCard: { p: { md: '40px' } },
             _cardMedia: {
-              maxHeight: '250px',
+              maxHeight: { xs: '180px', sm: '200px', md: '250px' },
               position: 'relative',
               '&:after': {
                 content: '""',

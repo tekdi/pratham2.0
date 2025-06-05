@@ -24,6 +24,7 @@ const App = () => {
             contentBaseUrl: '/pos/content',
             default_img: '/images/image_ver.png',
             _infoCard: {
+              default_img: '/images/image_ver.png',
               _cardMedia: { maxHeight: { xs: '200px', sm: '280px' } },
             },
           }}
