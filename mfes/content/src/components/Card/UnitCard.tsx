@@ -1,6 +1,7 @@
 import { CommonCard, ContentItem } from '@shared-lib';
 import { Box } from '@mui/material';
 import AppConst from '../../utils/AppConst/AppConst';
+import Dispription from './Discription';
 
 const UnitCard = ({
   item,
@@ -70,7 +71,7 @@ const UnitCard = ({
               : default_img ??
                 `${AppConst.BASEPATH}/assests/images/image_ver.png`
           }
-          content={item?.description ? item?.description : ' '}
+          content={item?.description ? item?.description : <Dispription />}
           orientation="horizontal"
           item={item}
           TrackData={trackData}
