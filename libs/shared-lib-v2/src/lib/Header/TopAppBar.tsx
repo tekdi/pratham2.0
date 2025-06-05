@@ -399,7 +399,7 @@ const MobileTopBar = ({
             <MenuIcon sx={{ cursor: 'pointer', color: '#1F1B13' }} />
           </IconButton>
           <Brand {..._brand} name={''} />
-          {!isShowLang && <Box />}
+          {/* {!isShowLang && <Box />} */}
         </>
       ) : (
         <>
