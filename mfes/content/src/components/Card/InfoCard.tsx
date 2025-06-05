@@ -108,6 +108,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
                 WebkitBoxOrient: 'vertical',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
+                textTransform: 'capitalize',
               }}
             >
               <SpeakableText>{item?.name}</SpeakableText>

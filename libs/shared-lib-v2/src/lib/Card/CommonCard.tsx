@@ -12,6 +12,7 @@ import { red } from '@mui/material/colors';
 import { Box, LinearProgress, useTheme } from '@mui/material';
 import { CircularProgressWithLabel } from '../Progress/CircularProgressWithLabel';
 import SpeakableText from '../textToSpeech/SpeakableText';
+import { capitalize } from 'lodash';
 export interface ContentItem {
   name: string;
   gradeLevel: string[];
@@ -233,7 +234,9 @@ export const CommonCard: React.FC<CommonCardProps> = ({
               ..._card?._contentText?.sx,
             }}
           >
-            <SpeakableText>{content}</SpeakableText>
+            {typeof content === 'string'
+              ? capitalize(content.split(' ')[0]) + content.slice(1)
+              : ''}
           </Typography>
         </CardContent>
       )}
