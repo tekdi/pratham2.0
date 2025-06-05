@@ -71,11 +71,11 @@ export const Footer: React.FC = () => {
                 <Image
                   src={
                     isColorInverted
-                      ? '/images/PrathamLogowhite.png'
-                      : '/images/appLogo.svg'
+                      ? '/images/pradigi-white.png'
+                      : '/images/pradigi.png'
                   }
                   alt="Pratham"
-                  width={146}
+                  width={97}
                   height={32}
                   style={{ height: '32px' }}
                 />
@@ -112,13 +112,23 @@ export const Footer: React.FC = () => {
               <Grid container direction="column" spacing={1}>
                 {usefulLinks.map(({ label, href }) => (
                   <Grid item key={href}>
-                    <Link href={href} passHref legacyBehavior>
+                    <Link
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      passHref
+                      legacyBehavior
+                    >
                       <Typography
                         variant="body1"
-                        sx={{ fontWeight: 400, color: '#1F1B13' }}
+                        sx={{
+                          fontWeight: 400,
+                          color: '#1F1B13',
+                          cursor: 'pointer',
+                        }}
                       >
                         <a target="_blank" rel="noopener noreferrer">
-                          <SpeakableText>{label}</SpeakableText>
+                          <SpeakableText cursor={true}>{label}</SpeakableText>
                         </a>
                       </Typography>
                     </Link>
