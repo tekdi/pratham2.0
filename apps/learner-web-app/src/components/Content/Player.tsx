@@ -16,7 +16,10 @@ import { hierarchyAPI } from '@content-mfes/services/Hierarchy';
 const CourseUnitDetails = dynamic(() => import('@CourseUnitDetails'), {
   ssr: false,
 });
-const App = (props: { userIdLocalstorageName?: string }) => {
+const App = (props: {
+  userIdLocalstorageName?: string;
+  contentBaseUrl?: string;
+}) => {
   const { t } = useTranslation();
   const router = useRouter();
   const params = useParams();
@@ -36,34 +39,41 @@ const App = (props: { userIdLocalstorageName?: string }) => {
       setItem({ content: response });
       if (unitId) {
         const course = await hierarchyAPI(courseId as string);
-        const breadcrum = findCourseUnitPath(course, identifier as string, [
-          'name',
-          'identifier',
-          'mimeType',
-          {
-            key: 'link',
-            suffix: activeLink ? `?activeLink=${activeLink}` : '',
-          },
-        ]);
+        const breadcrum = findCourseUnitPath({
+          contentBaseUrl: props?.contentBaseUrl,
+          node: course,
+          targetId: identifier as string,
+          keyArray: [
+            'name',
+            'identifier',
+            'mimeType',
+            {
+              key: 'link',
+              suffix: activeLink
+                ? `?activeLink=${encodeURIComponent(activeLink)}`
+                : '',
+            },
+          ],
+        });
         setBreadCrumbs(breadcrum?.slice(0, -1));
       } else {
-        // const breadcrum = findCourseUnitPath(
-        //   response,
-        //   identifier as string,
-        //   ['name', 'identifier', 'mimeType'],
-        //   [{ name: 'Content' }]
-        // );
         setBreadCrumbs([{ name: 'Content' }]);
       }
     };
     fetch();
-  }, [identifier, unitId, courseId, activeLink]);
+  }, [identifier, unitId, courseId, activeLink, props?.contentBaseUrl]);
 
   if (!identifier) {
     return <div>Loading...</div>;
   }
   const onBackClick = () => {
-    router.back();
+    if (breadCrumbs?.length > 1) {
+      if (breadCrumbs?.[breadCrumbs.length - 1]?.link) {
+        router.push(breadCrumbs?.[breadCrumbs.length - 1]?.link);
+      }
+    } else {
+      router.push(`${activeLink ? activeLink : '/content'}`);
+    }
   };
 
   return (
