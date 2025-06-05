@@ -50,6 +50,7 @@ interface FilterSectionProps {
   staticFormData?: Record<string, object>;
   isShowStaticFilterValue?: boolean;
   isOpenColapsed?: boolean | any[];
+  t: (key: string) => string;
 }
 
 interface FilterListProps {
@@ -138,6 +139,7 @@ export function FilterForm({
     <Loader isLoading={loading}>
       <Box display="flex" flexDirection="column" gap={2}>
         <FilterSection
+          t={t}
           isShowStaticFilterValue={isShowStaticFilterValue}
           isOpenColapsed={isOpenColapsed}
           staticFormData={staticFilter}
@@ -171,7 +173,7 @@ export function FilterForm({
             sx={{ width: '50%' }}
             onClick={handleFilter}
           >
-            <SpeakableText>{t('Filter')}</SpeakableText>
+            <SpeakableText>{t('COMMON.FILTER')}</SpeakableText>
           </MuiButton>
         </Box>
       </Box>
@@ -307,6 +309,7 @@ function replaceOptionsWithAssoc({
 }
 
 const FilterSection: React.FC<FilterSectionProps> = ({
+  t,
   staticFormData,
   fields,
   selectedValues,
@@ -463,7 +466,9 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                     }
                     sx={{ mt: 0 }}
                   >
-                    {showMore.includes(code) ? 'Show less ▲' : 'Show more ▼'}
+                    {showMore.includes(code)
+                      ? t('COMMON.SHOW_LESS')
+                      : t('COMMON.SHOW_MORE')}
                   </Button>
                 )}
               </AccordionDetails>

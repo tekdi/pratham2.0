@@ -22,7 +22,7 @@ import { hierarchyAPI } from '@content-mfes/services/Hierarchy';
 import { ContentSearchResponse } from '@content-mfes/services/Search';
 import { checkAuth, getUserId } from '@shared-lib-v2/utils/AuthService';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
-
+import { useTranslation } from '@shared-lib-v2/lib/context/LanguageContext';
 interface ContentDetailsProps {
   isShowLayout: boolean;
   id?: string;
@@ -45,7 +45,7 @@ const ContentDetails = (props: ContentDetailsProps) => {
       activeLink = '';
     }
   }
-
+  const { t } = useTranslation();
   useEffect(() => {
     const fetchContentDetails = async () => {
       try {
@@ -191,7 +191,7 @@ const ContentDetails = (props: ContentDetailsProps) => {
                   color: '#1F1B13',
                 }}
               >
-                <SpeakableText>What You'll Learn</SpeakableText>
+                <SpeakableText>{t('COMMON.WHAT_YOU_LL_LEARN')}</SpeakableText>
               </Typography>
 
               {contentDetails?.children &&
