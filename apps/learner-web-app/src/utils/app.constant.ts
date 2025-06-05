@@ -105,31 +105,7 @@ export enum RoleName {
   STATE_LEAD = 'State Lead',
 }
 
-export enum DataKey {
-  UPDATED_AT = 'updatedAt',
-  CREATED_AT = 'createdAt',
-  ACTIONS = 'actions',
-  CREATED_BY = 'createdBy',
-  UPDATED_BY = 'updatedBy',
-  STATUS = 'status',
-  NAME = 'name',
-  ACTIVE_MEMBER = 'totalActiveMembers',
-  ARCHIVED_MEMBERS = 'totalArchivedMembers',
-  TEMPLATE_TYPE = 'templateType',
-}
 
-export enum DateFormat {
-  YYYY_MM_DD = 'yyyy-MM-dd',
-}
-
-export enum Numbers {
-  ZERO = 0,
-  ONE = 1,
-  FIVE = 5,
-  TEN = 10,
-  FIFTEEN = 15,
-  TWENTY = 20,
-}
 
 export enum CohortTypes {
   BATCH = 'BATCH',
@@ -147,74 +123,4 @@ export enum FormValues {
   TRANSGENDER = 'TRANSGENDER',
 }
 
-export enum InputTypes {
-  CHECKBOX = 'checkbox',
-  RADIO = 'radio',
-  NUMERIC = 'numeric',
-  TEXT = 'text',
-}
-export enum apiCatchingDuration {
-  GETREADFORM = 36000000,
-}
 
-export const QueryKeys = {
-  USER_READ: 'userRead',
-  FIELD_OPTION_READ: 'fieldOptionRead',
-  MY_COHORTS: 'myCohorts',
-  GET_COHORT_LIST: 'getcohortList',
-  GET_STATE_COHORT_LIST: 'getStateCohortList',
-  GET_COHORT_MEMBER_LIST: 'getCohortMemberList',
-  GET_ALL_NOTIFICATION_TEMPLATE: 'getAllNotificationTemplate',
-  GET_NOTIFICATION_TEMPLATE_BY_KEY: 'getNotificationTemplateByKey',
-};
-
-export const monthColors: any = {
-  Jan: '#99CCFF',
-  Mar: '#D9B2FF',
-  Apr: '#FFABAB',
-  May: '#FFABAB',
-  Jun: '#FFABAB',
-  Jul: '#FFABAB',
-  Aug: '#FFABAB',
-  Sep: '#FFABAB',
-  Oct: '#FFD6D6',
-  Nov: '#FFD6D6',
-  Dec: '#FFD6D6',
-};
-
-export enum ResourceType {
-  LEARNER_PRE_REQUISITE = 'prerequisite',
-  LEARNER_POST_REQUISITE = 'postrequisite',
-  FACILITATOR_REQUISITE = 'facilitator-requisite',
-}
-
-import { StaticImageData } from 'next/image'; // Import StaticImageData for type safety with images
-
-export enum ContentType {
-  PDF = 'application/pdf',
-  EPUB = 'application/epub',
-  HTML = 'application/vnd.ekstep.html-archive',
-  VIDEO_MP4 = 'video/mp4',
-  QUESTION_SET = 'application/vnd.sunbird.questionset',
-  H5P = 'application/vnd.ekstep.h5p-archive',
-  YOUTUBE_VIDEO = 'video/youtube',
-  YOUTUBE_X_VIDEO = 'video/x-youtube',
-  WEBM_VIDEO = 'video/webm',
-  VND = 'application/vnd.ekstep.content-collection',
-}
-
-export type FileType = {
-  [key in ContentType]: {
-    name: string;
-    imgPath: StaticImageData;
-    BgImgPath?: StaticImageData;
-  };
-};
-
-// Create the mapping object with enum keys
-
-export enum fieldKeys {
-  GENDER = 'gender',
-}
-
-export const DEFAULT_TEMPLATE_CONTEXT = ['USER', 'OTP', 'CMS'];
