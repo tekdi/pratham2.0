@@ -67,9 +67,13 @@ export default function App({
     async (content: ContentItem) => {
       try {
         if (SUPPORTED_MIME_TYPES.includes(content?.mimeType)) {
-          router.push(`/pos/player/${content?.identifier}`);
+          router.push(
+            `/pos/player/${content?.identifier}?activeLink=${window.location.pathname}`
+          );
         } else {
-          router.push(`/pos/content-details/${content?.identifier}`);
+          router.push(
+            `/pos/content-details/${content?.identifier}?activeLink=${window.location.pathname}`
+          );
         }
       } catch (error) {
         console.error('Failed to handle card click:', error);

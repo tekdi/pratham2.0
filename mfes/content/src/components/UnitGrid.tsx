@@ -52,7 +52,10 @@ export const UnitGrid: React.FC<CommonAccordionProps> = ({
                   item={subItem}
                   trackData={trackData ?? []}
                   default_img={default_img}
-                  _card={_card}
+                  _card={{
+                    ..._card,
+                    sx: { ...(_card?.sx ?? {}), height: '100%' },
+                  }}
                   handleCardClick={(content: ContentItem) =>
                     handleItemClick?.(content)
                   }
@@ -62,7 +65,10 @@ export const UnitGrid: React.FC<CommonAccordionProps> = ({
                   item={subItem}
                   type={item.mimeType}
                   default_img={default_img}
-                  _card={_card}
+                  _card={{
+                    ..._card,
+                    sx: { ...(_card?.sx ?? {}), height: '100%' },
+                  }}
                   handleCardClick={(content: ContentItem) =>
                     handleItemClick?.(content)
                   }

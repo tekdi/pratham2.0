@@ -102,6 +102,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
                 fontWeight: 700,
                 // fontSize: { xs: '22px', sm: '24px', md: '36px' },
                 // lineHeight: { xs: '28px', sm: '32px', md: '44px' },
+                lineHeight: 1.5,
                 display: '-webkit-box',
                 WebkitLineClamp: 1,
                 WebkitBoxOrient: 'vertical',
