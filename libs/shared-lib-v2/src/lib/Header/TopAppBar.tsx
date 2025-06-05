@@ -46,6 +46,14 @@ export interface AppBarProps {
   isColorInverted?: boolean;
 }
 
+const withoutQueryString = () => {
+  if (typeof window !== 'undefined') {
+    const parsedUrl = new URL(window.location.href);
+    return parsedUrl?.pathname + parsedUrl?.search;
+  }
+  return '';
+};
+
 export const TopAppBar: React.FC<AppBarProps> = ({
   title = 'Title',
   showBackIcon = false,
@@ -114,8 +122,13 @@ const LanguageSelect = ({
       size="small"
       onChange={handleChange}
       sx={{
+        width: 67,
         '& .MuiSelect-select': {
-          padding: '2px 12px 3px 12px',
+          padding: '2px 0px 3px 8px',
+          paddingRight: '20px !important',
+        },
+        '& .MuiSelect-icon': {
+          width: '20px',
         },
         color: theme.palette.text.primary,
         borderRadius: '8px',
@@ -202,7 +215,12 @@ export const DesktopBar = ({
       >
         {navLinks.map((link, index) => (
           <Box key={`${link.title}-${index}`} onMouseLeave={handleLeave}>
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Box
+              sx={{ display: 'flex', alignItems: 'center' }}
+              onMouseEnter={(e) =>
+                openMenuAtLevel(0, e.currentTarget, link.child ?? [])
+              }
+            >
               <Button
                 component={typeof link.to === 'string' ? 'a' : 'button'}
                 href={typeof link.to === 'string' ? link.to : undefined}
@@ -234,9 +252,6 @@ export const DesktopBar = ({
               {link.child && (
                 <IconButton
                   size="small"
-                  onMouseEnter={(e) =>
-                    openMenuAtLevel(0, e.currentTarget, link.child ?? [])
-                  }
                   onClick={(e) => {
                     e.stopPropagation();
                     openMenuAtLevel(0, e.currentTarget, link?.child ?? []);
@@ -289,7 +304,6 @@ export const DesktopBar = ({
               {menu.items.map((item, idx) => {
                 const hasChild =
                   Array.isArray(item.child) && item.child.length > 0;
-                console.log(item.isActive, 'item');
                 return (
                   <Box
                     key={`${idx}-${item.label}`}
@@ -301,9 +315,14 @@ export const DesktopBar = ({
                       }
                     }}
                     sx={{
-                      bgcolor: item.isActive
-                        ? theme.palette.primary.main
-                        : 'inherit',
+                      bgcolor:
+                        typeof item.isActive === 'boolean'
+                          ? item.isActive
+                            ? theme.palette.primary.main
+                            : 'inherit'
+                          : item?.isActive === withoutQueryString()
+                          ? theme.palette.primary.main
+                          : 'inherit',
                     }}
                   >
                     <MenuItem
@@ -365,6 +384,7 @@ const MobileTopBar = ({
         justifyContent: 'space-between',
         alignItems: 'center',
         width: '100%',
+        color: '#1F1B13',
       }}
     >
       {!showBackIcon ? (
@@ -379,6 +399,7 @@ const MobileTopBar = ({
             <MenuIcon sx={{ cursor: 'pointer', color: '#1F1B13' }} />
           </IconButton>
           <Brand {..._brand} name={''} />
+          {/* {!isShowLang && <Box />} */}
         </>
       ) : (
         <>

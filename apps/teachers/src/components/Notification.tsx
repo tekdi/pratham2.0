@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
-import { onMessageListener } from './../../firebase';
+// import { onMessageListener } from './../../firebase';
 import { useRouter } from 'next/router';
 import { Box } from '@mui/material';
+import { initializeApp } from 'firebase/app';
+
 import CloseIcon from '@mui/icons-material/Close';
-import { onMessage } from 'firebase/messaging';
+import { onMessageListener } from 'apps/teachers/firebase';
+import { getMessaging, onMessage } from 'firebase/messaging';
+import firebaseConfig from 'apps/teachers/firebaseConfig';
+const firebaseApp = initializeApp(firebaseConfig);
 
 type NotificationData = {
   title: string;
@@ -91,21 +96,26 @@ console.log("notification teacher app")
       notify();
     }
   }, [notification]);
-//   useEffect(() => {
-//   const unsubscribe = onMessage(messaging, (payload) => {
-//     console.log('Foreground message received:', payload);
-//     if (payload.notification?.title) {
-//       setNotification({
-//         title: payload.notification.title,
-//         body: payload.notification.body|| "",
-//         icon: payload.notification.icon ||"",
-//         navigate_to: payload.data?.navigate_to,
-//       });
-//     }
-//   });
 
-//   return () => unsubscribe();
-// }, []);
+   useEffect(() => {
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      const messaging = getMessaging(firebaseApp); // ✅ Initialize here
+
+      const unsubscribe = onMessage(messaging, (payload) => {
+        console.log('Foreground message received:', payload);
+        if (payload.notification?.title) {
+          setNotification({
+            title: payload.notification.title,
+            body: payload.notification.body || '',
+            icon: payload.notification.icon || '',
+            navigate_to: payload.data?.navigate_to,
+          });
+        }
+      });
+
+      return () => unsubscribe();
+    }
+  }, []);
   onMessageListener()
     .then((payload) => {
       if (payload.notification?.title) {
