@@ -19,7 +19,10 @@ const ContentDetails = dynamic(
 const App: React.FC = () => {
   return (
     <Layout>
-      <ContentDetails userIdLocalstorageName={'did'} />
+      <ContentDetails
+        userIdLocalstorageName={'did'}
+        contentBaseUrl="/pos/content"
+      />
     </Layout>
   );
 };

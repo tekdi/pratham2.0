@@ -2,6 +2,7 @@ import { Box, CSSObject, useTheme } from '@mui/material';
 import { CommonCard, ContentItem } from '@shared-lib';
 import AppConst from '../../utils/AppConst/AppConst';
 import { StatusIcon } from '../CommonCollapse';
+import Dispription from './Discription';
 
 const ContentCard = ({
   item,
@@ -29,7 +30,7 @@ const ContentCard = ({
             ? item?.posterImage
             : default_img ?? `${AppConst.BASEPATH}/assests/images/image_ver.png`
         }
-        content={item?.description ? item?.description : ' '}
+        content={item?.description ? item?.description : <Dispription />}
         actions={
           type !== 'Course' && (
             <StatusIcon

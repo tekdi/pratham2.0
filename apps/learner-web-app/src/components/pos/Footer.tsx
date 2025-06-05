@@ -71,11 +71,11 @@ export const Footer: React.FC = () => {
                 <Image
                   src={
                     isColorInverted
-                      ? '/images/PrathamLogowhite.png'
-                      : '/images/appLogo.svg'
+                      ? '/images/pradigi-white.png'
+                      : '/images/pradigi.png'
                   }
                   alt="Pratham"
-                  width={146}
+                  width={97}
                   height={32}
                   style={{ height: '32px' }}
                 />
