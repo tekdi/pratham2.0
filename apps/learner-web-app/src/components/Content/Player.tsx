@@ -181,7 +181,7 @@ const App = (props: {
           _box={{
             pt: 1,
             pb: 1,
-            px: 1,
+            px: { md: 1 },
             height: 'calc(100vh - 185px)',
           }}
           _config={{
@@ -194,7 +194,7 @@ const App = (props: {
             },
             _parentGrid: { pb: 2 },
             default_img: '/images/image_ver.png',
-            _grid: { xs: 6, sm: 4, md: 6, lg: 4, xl: 3 },
+            _grid: { xs: 6, sm: 4, md: 6, lg: 6, xl: 6 },
             _card: { isHideProgress: true },
           }}
         />

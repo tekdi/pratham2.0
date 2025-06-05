@@ -194,6 +194,7 @@ export const CommonCard: React.FC<CommonCardProps> = ({
               textOverflow: 'ellipsis',
               display: '-webkit-box',
               WebkitBoxOrient: 'vertical',
+              textTransform: 'capitalize',
               WebkitLineClamp: 1,
             }}
           >
@@ -230,7 +231,6 @@ export const CommonCard: React.FC<CommonCardProps> = ({
               WebkitBoxOrient: 'vertical',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
-              textTransform: 'capitalize',
               ..._card?._contentText?.sx,
             }}
           >
