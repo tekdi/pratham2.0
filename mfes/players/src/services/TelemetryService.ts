@@ -29,15 +29,20 @@ export const handleTelemetryEventPDF = (event: any) => {
 
 export const handleTelemetryEventQuml = (
   event: any,
-  { courseId, unitId, userId }: any = {}
+  { courseId, unitId, userId, isGenerateCertificate }: any = {}
 ) => {
-  getTelemetryEvents(event.data, 'quml', { courseId, unitId, userId });
+  getTelemetryEvents(event.data, 'quml', {
+    courseId,
+    unitId,
+    userId,
+    isGenerateCertificate,
+  });
 };
 
 export const getTelemetryEvents = async (
   eventData: any,
   contentType: string,
-  { courseId, unitId, userId }: any = {}
+  { courseId, unitId, userId, isGenerateCertificate }: any = {}
 ) => {
   console.log('getTelemetryEvents hit', eventData, contentType, {
     courseId,
@@ -75,6 +80,7 @@ export const getTelemetryEvents = async (
       courseId,
       unitId,
       userId,
+      isGenerateCertificate,
     });
   }
 
@@ -179,6 +185,7 @@ export const getTelemetryEvents = async (
           courseId,
           unitId,
           userId,
+          isGenerateCertificate,
         });
       } catch (error) {
         console.log(error);
@@ -196,6 +203,7 @@ export const contentWithTelemetryData = async ({
   courseId,
   unitId,
   userId: propUserId,
+  isGenerateCertificate,
 }: any) => {
   try {
     const response = await fetchBulkContents([identifier, courseId]);

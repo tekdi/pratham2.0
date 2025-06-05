@@ -20,9 +20,14 @@ import { hierarchyAPI } from '@content-mfes/services/Hierarchy';
 const CourseUnitDetails = dynamic(() => import('@CourseUnitDetails'), {
   ssr: false,
 });
-const App = (props: {
+const App = ({
+  userIdLocalstorageName,
+  contentBaseUrl,
+  isGenerateCertificate,
+}: {
   userIdLocalstorageName?: string;
   contentBaseUrl?: string;
+  isGenerateCertificate?: boolean;
 }) => {
   const { t } = useTranslation();
   const router = useRouter();
@@ -44,7 +49,7 @@ const App = (props: {
       if (unitId) {
         const course = await hierarchyAPI(courseId as string);
         const breadcrum = findCourseUnitPath({
-          contentBaseUrl: props?.contentBaseUrl,
+          contentBaseUrl: contentBaseUrl,
           node: course,
           targetId: identifier as string,
           keyArray: [
@@ -65,7 +70,7 @@ const App = (props: {
       }
     };
     fetch();
-  }, [identifier, unitId, courseId, activeLink, props?.contentBaseUrl]);
+  }, [identifier, unitId, courseId, activeLink, contentBaseUrl]);
 
   if (!identifier) {
     return <div>Loading...</div>;
@@ -147,7 +152,8 @@ const App = (props: {
           )}
         </Box>
         <PlayerBox
-          userIdLocalstorageName={props.userIdLocalstorageName}
+          isGenerateCertificate={isGenerateCertificate}
+          userIdLocalstorageName={userIdLocalstorageName}
           item={item}
           identifier={identifier}
           courseId={courseId}
@@ -211,6 +217,7 @@ const PlayerBox = ({
   courseId,
   unitId,
   userIdLocalstorageName,
+  isGenerateCertificate,
 }: any) => {
   const router = useRouter();
   const [play, setPlay] = useState(false);
@@ -274,6 +281,9 @@ const PlayerBox = ({
       )}
       {play && (
         <iframe
+          name={JSON.stringify({
+            isGenerateCertificate: isGenerateCertificate,
+          })}
           src={`${
             process.env.NEXT_PUBLIC_LEARNER_SBPLAYER
           }?identifier=${identifier}${
