@@ -13,6 +13,11 @@ import { Box, LinearProgress, useTheme } from '@mui/material';
 import { CircularProgressWithLabel } from '../Progress/CircularProgressWithLabel';
 import SpeakableText from '../textToSpeech/SpeakableText';
 import { capitalize } from 'lodash';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import TripOriginOutlinedIcon from '@mui/icons-material/TripOriginOutlined';
+import PanoramaFishEyeIcon from '@mui/icons-material/PanoramaFishEye';
+import AdjustIcon from '@mui/icons-material/Adjust';
+
 export interface ContentItem {
   name: string;
   gradeLevel: string[];
@@ -50,6 +55,7 @@ interface StatuPorps {
   trackProgress?: number;
   status?: string;
   type?: string;
+  _card?: any;
 }
 export const getLeafNodes = (node: any) => {
   const result = [];
@@ -165,7 +171,7 @@ export const CommonCard: React.FC<CommonCardProps> = ({
         )}
 
         {/* Progress Bar Overlay */}
-        <StatusBar {...statusBar} />
+        <StatusBar {...statusBar} _card={_card} />
       </Box>
 
       <CardHeader
@@ -254,6 +260,7 @@ export const StatusBar: React.FC<StatuPorps> = ({
   trackProgress,
   status,
   type,
+  _card,
 }) => {
   const theme = useTheme();
   return (
@@ -287,31 +294,35 @@ export const StatusBar: React.FC<StatuPorps> = ({
         }}
       >
         {type === 'Course' ? (
-          <CircularProgressWithLabel
-            value={trackProgress !== undefined ? trackProgress : 100}
-            _text={{
-              sx: {
-                color: [
-                  'completed',
-                  'In Progress',
-                  'Enrolled, not started',
-                ].includes(status ?? '')
+          _card?.isHideProgress ? (
+            <StatusIcon status={status ?? ''} />
+          ) : (
+            <CircularProgressWithLabel
+              value={trackProgress !== undefined ? trackProgress : 100}
+              _text={{
+                sx: {
+                  color: [
+                    'completed',
+                    'In Progress',
+                    'Enrolled, not started',
+                  ].includes(status ?? '')
+                    ? theme.palette.success.main
+                    : 'white',
+                  fontSize: '10px',
+                  ...(trackProgress === undefined ? { display: 'none' } : {}),
+                },
+              }}
+              color={
+                ['Completed', 'In Progress', 'Enrolled, not started'].includes(
+                  status ?? ''
+                )
                   ? theme.palette.success.main
-                  : 'white',
-                fontSize: '10px',
-                ...(trackProgress === undefined ? { display: 'none' } : {}),
-              },
-            }}
-            color={
-              ['Completed', 'In Progress', 'Enrolled, not started'].includes(
-                status ?? ''
-              )
-                ? theme.palette.success.main
-                : 'white'
-            }
-            size={trackProgress !== undefined ? 35 : 16}
-            thickness={trackProgress !== undefined ? 2 : 4}
-          />
+                  : 'white'
+              }
+              size={trackProgress !== undefined ? 35 : 16}
+              thickness={trackProgress !== undefined ? 2 : 4}
+            />
+          )
         ) : (
           <LinearProgress
             sx={{
@@ -347,3 +358,23 @@ export const StatusBar: React.FC<StatuPorps> = ({
     </Box>
   );
 };
+
+interface StatusIconProps {
+  status: string;
+}
+
+const StatusIcon: React.FC<StatusIconProps> = ({ status }) => {
+  if (status !== 'In Progress') console.log('sagar status', status);
+  switch (status?.toLowerCase()) {
+    case 'completed':
+      return <CheckCircleIcon />;
+    case 'in progress':
+      return <AdjustIcon />;
+    case 'enrolled, not started':
+      return <TripOriginOutlinedIcon />;
+    default:
+      return <PanoramaFishEyeIcon />;
+  }
+};
+
+export default StatusIcon;
