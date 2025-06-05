@@ -1,10 +1,9 @@
 'use client';
 import { useEffect } from 'react';
 import { logout } from '@learner/utils/API/LoginService';
-import Loader from '@learner/components/Loader/Loader';
 import { useRouter } from 'next/navigation';
 import { preserveLocalStorage } from '@learner/utils/helper';
-import { useTranslation } from '@shared-lib';
+import { Loader, useTranslation } from '@shared-lib';
 import { Telemetry } from '@shared-lib-v2/DynamicForm/utils/app.constant';
 import { telemetryFactory } from '@shared-lib-v2/DynamicForm/utils/telemetry';
 
@@ -44,7 +43,7 @@ function Logout() {
     router.replace('/login');
   }, []);
 
-  return <Loader showBackdrop={true} loadingText={t('COMMON.LOADING')} />;
+  return <Loader isLoading={true} />;
 }
 
 export default Logout;

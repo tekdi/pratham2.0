@@ -7,7 +7,11 @@ import { Avatar, Box, Button, IconButton, Typography } from '@mui/material';
 import { useParams, useRouter } from 'next/navigation';
 // import { ContentSearch } from '@learner/utils/API/contentService';
 import { checkAuth } from '@shared-lib-v2/utils/AuthService';
-import { findCourseUnitPath, useTranslation } from '@shared-lib';
+import {
+  ExpandableText,
+  findCourseUnitPath,
+  useTranslation,
+} from '@shared-lib';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { fetchContent } from '@learner/utils/API/contentService';
 import BreadCrumb from '@content-mfes/components/BreadCrumb';
@@ -131,20 +135,15 @@ const App = (props: {
             {item?.content?.name ?? '-'}
           </Typography>
           {item?.content?.description && (
-            <Typography
-              variant="h3"
-              sx={{
-                fontWeight: 400,
-                // fontSize: '14px',
-                // lineHeight: '24px',
-                display: '-webkit-box',
-                WebkitLineClamp: 2,
-                overflow: 'hidden',
-                WebkitBoxOrient: 'vertical',
+            <ExpandableText
+              text={item?.content?.description}
+              maxWords={60}
+              maxLines={2}
+              _text={{
+                fontSize: { xs: '14px', sm: '16px', md: '18px' },
+                lineHeight: { xs: '20px', sm: '22px', md: '26px' },
               }}
-            >
-              {item?.content?.description ?? 'no description'}
-            </Typography>
+            />
           )}
         </Box>
         <PlayerBox

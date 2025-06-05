@@ -134,7 +134,7 @@ export const ExpandableText: React.FC<ExpandableTextProps> = memo(
               fontSize: 'inherit',
             }}
           >
-            {isExpanded ? 'see less' : 'see more'}
+            {isExpanded ? 'read less' : 'read more'}
           </Button>
         )}
       </Box>
