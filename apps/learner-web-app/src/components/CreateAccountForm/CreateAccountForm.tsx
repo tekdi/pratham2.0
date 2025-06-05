@@ -294,7 +294,7 @@ const CreateAccountForm = ({
           }
           label={
             <Typography variant="h3">
-              I have read and agree to the{' '}
+              I have read and agree to the
               <Typography
                 component="span"
                 fontWeight="bold"

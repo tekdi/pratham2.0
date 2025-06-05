@@ -30,7 +30,13 @@
     "INPROGRESS": "પ્રગતિમાં",
     "SURE_LOGOUT": "શું તમે ખરેખર લૉગઆઉટ કરવા માંગો છો?",
     "LOGOUT": "લૉગઆઉટ",
-    "LOADING": "લોડ થઈ રહ્યું છે..."
+    "LOADING": "લોડ થઈ રહ્યું છે...",
+    "STATUS": {
+      "completed": "પૂર્ણ",
+      "in_progress": "પ્રગતિમાં",
+      "enrolled_not_started": "નામાંકિત, શરૂ નહીં કરી",
+      "not_started": "શરૂ નહીં કરી"
+    }
   },
   "LEARNER_APP": {
     "COMPLETE_PROFILE_BANNER": {
@@ -94,7 +100,13 @@
       "forgot_password": "પાસવર્ડ ભૂલી ગયા?",
       "login_button": "લૉગિન",
       "no_account": "મારી પાસે ખાતું નથી",
-      "make_sure_to_cross_check_the_state_district_block_village": "રાજ્ય, જિલ્લો, બ્લોક, ગામની ખાતરી કરો"
+      "make_sure_to_cross_check_the_state_district_block_village": "રાજ્ય, જિલ્લો, બ્લોક, ગામની ખાતરી કરો",
+      "GET_THE_APP": "એપ્લિકેશન મેળવો",
+      "POINT_YOUR_PHONE": "તમારા ફોનનો કેમેરા અહીં નિર્દેશ કરો",
+      "POINT_CAMERA": "કેમેરા અહીં નિર્દેશ કરો",
+      "OR": "અથવા",
+      "SEARCH_PLAYSTORE": "પ્લેસ્ટોર પર \"પ્રથમ માયલર્નિંગ\" શોધો",
+      "ON_PLAYSTORE": "પ્લેસ્ટોર પર"
     },
     "L_ONE_COURSE": {
       "IN_PROGRESS_TITLE": "પ્રગતિમાં",

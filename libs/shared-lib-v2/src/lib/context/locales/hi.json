@@ -14,23 +14,30 @@
     "CLOSED_ON": "बंद हुआ"
   },
   "COMMON": {
-    "L1_COURSES": "एल1 पाठ्यक्रम",
-    "EXPLORE": "अन्वेषण करें",
-    "SURVEYS": "सर्वेक्षण",
+    "L1_COURSES": "एल1 कोर्स",
+    "EXPLORE": "एक्सप्लोर",
+    "SURVEYS": "सर्वे",
     "PROFILE": "प्रोफाइल",
-    "UNITS": "इकाइयाँ",
-    "COURSES": "पाठ्यक्रम",
+    "UNITS": "यूनिट्स",
+    "COURSES": "कोर्स",
     "YES": "हाँ",
     "ADD_NEW": "नया जोड़ें",
-    "YOU_HAVE_UNSAVED_CHANGES": "आपके पास असहेजित परिवर्तन हैं। क्या आप वाकई वापस जाना चाहते हैं?",
-    "SUBMIT": "जमा करें",
+    "YOU_HAVE_UNSAVED_CHANGES": "आपके पास असुरक्षित परिवर्तन हैं। क्या आप वापस जाना चाहते हैं?",
+    "SUBMIT": "सबमिट करें",
     "CLOSE": "बंद करें",
     "CANCEL": "रद्द करें",
     "OK": "ठीक है",
     "INPROGRESS": "प्रगति में",
-    "SURE_LOGOUT": "क्या आप वाकई लॉगआउट करना चाहते हैं?",
+    "SURE_LOGOUT": "क्या आप लॉगआउट करना चाहते हैं?",
     "LOGOUT": "लॉगआउट",
-    "LOADING": "लोड हो रहा है..."
+    "LOADING": "लोड हो रहा है..",
+    "FAQS": "सामान्य प्रश्न",
+    "STATUS": {
+      "completed": "पूर्ण",
+      "in_progress": "प्रगति में",
+      "enrolled_not_started": "नामांकित, शुरू नहीं किया",
+      "not_started": "शुरू नहीं किया"
+    }
   },
   "LEARNER_APP": {
     "COMPLETE_PROFILE_BANNER": {
@@ -96,7 +103,13 @@
       "forgot_password": "पासवर्ड भूल गए?",
       "login_button": "लॉगिन",
       "no_account": "मेरा कोई खाता नहीं है",
-      "make_sure_to_cross_check_the_state_district_block_village": "राज्य, जिला, ब्लॉक, गाँव को क्रॉस-चेक करना सुनिश्चित करें"
+      "make_sure_to_cross_check_the_state_district_block_village": "राज्य, जिला, ब्लॉक, गाँव को क्रॉस-चेक करना सुनिश्चित करें",
+      "GET_THE_APP": "एप्लिकेशन प्राप्त करें",
+      "POINT_YOUR_PHONE": "अपने फोन का कैमरा अहੀં निर્દੇશ करें",
+      "POINT_CAMERA": "कैमरा अहੀં निर્દੇશ करें",
+      "OR": "अथवा",
+      "SEARCH_PLAYSTORE": "प्लेस्टोर पर \"प्रथम मायलर्निंग\" खोजें",
+      "ON_PLAYSTORE": "प्लेस्टोर पर"
     },
     "L_ONE_COURSE": {
       "IN_PROGRESS_TITLE": "प्रगति में",

@@ -30,7 +30,13 @@
     "INPROGRESS": "प्रगतीपथावर",
     "SURE_LOGOUT": "तुम्हाला खात्री आहे की तुम्ही लॉगआउट करू इच्छिता?",
     "LOGOUT": "लॉगआउट",
-    "LOADING": "लोड होत आहे..."
+    "LOADING": "लोड होत आहे...",
+     "STATUS": {
+      "completed": "पूर्ण",
+      "in_progress": "प्रगतीपथावर",
+      "enrolled_not_started": "नामांकित, सुरू केलेले नाही",
+      "not_started": "सुरू केलेले नाही"
+    }
   },
   "LEARNER_APP": {
     "COMPLETE_PROFILE_BANNER": {
@@ -96,7 +102,13 @@
       "forgot_password": "पासवर्ड विसरलात?",
       "login_button": "लॉगिन",
       "no_account": "माझे खाते नाही",
-      "make_sure_to_cross_check_the_state_district_block_village": "राज्य, जिल्हा, ब्लॉक, गाव यांची खात्री करा"
+      "make_sure_to_cross_check_the_state_district_block_village": "राज्य, जिल्हा, ब्लॉक, गाव यांची खात्री करा",
+      "GET_THE_APP": "अ‍ॅप मिळवा",
+      "POINT_YOUR_PHONE": "तुमच्या फोनचा कॅमेरा येथे दाखवा",
+      "POINT_CAMERA": "कॅमेरा येथे दाखवा",
+      "OR": "किंवा",
+      "SEARCH_PLAYSTORE": "प्लेस्टोअरवर \"प्रथम मायलर्निंग\" शोधा",
+      "ON_PLAYSTORE": "प्लेस्टोअरवर"
     },
     "L_ONE_COURSE": {
       "IN_PROGRESS_TITLE": "प्रगतीपथावर",

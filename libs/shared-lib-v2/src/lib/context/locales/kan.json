@@ -30,7 +30,13 @@
     "INPROGRESS": "ಪ್ರಗತಿಯಲ್ಲಿದೆ",
     "SURE_LOGOUT": "ನೀವು ಲಾಗ್‌ಔಟ್ ಮಾಡಲು ಖಚಿತವಾಗಿರುವಿರಾ?",
     "LOGOUT": "ಲಾಗ್‌ಔಟ್",
-    "LOADING": "ಲೋಡ್ ಆಗುತ್ತಿದೆ.."
+    "LOADING": "ಲೋಡ್ ಆಗುತ್ತಿದೆ..",
+     "STATUS": {
+      "completed": "ಪೂರ್ಣ",
+      "in_progress": "ಪ್ರಗತಿಯಲ್ಲಿ",
+      "enrolled_not_started": "ನಾಮಾಂಕಿತ, ಶುರುವಾಗಿಲ್ಲ",
+      "not_started": "ಶುರುವಾಗಿಲ್ಲ"
+    }
   },
   "LEARNER_APP": {
     "COMPLETE_PROFILE_BANNER": {
@@ -94,8 +100,15 @@
       "forgot_password": "ಪಾಸ್‌ವರ್ಡ್ ಮರೆತಿದ್ದೀರಾ?",
       "login_button": "ಲಾಗಿನ್",
       "no_account": "ನನಗೆ ಖಾತೆ ಇಲ್ಲ",
-      "make_sure_to_cross_check_the_state_district_block_village": "ರಾಜ್ಯ, ಜಿಲ್ಲೆ, ಬ್ಲಾಕ್, ಗ್ರಾಮವನ್ನು ಪರಿಶೀಲಿಸಿ"
+      "make_sure_to_cross_check_the_state_district_block_village": "ರಾಜ್ಯ, ಜಿಲ್ಲೆ, ಬ್ಲಾಕ್, ಗ್ರಾಮವನ್ನು ಪರಿಶೀಲಿಸಿ",
+      "GET_THE_APP": "ಆಪ್ ಪಡೆಯಿರಿ",
+      "POINT_YOUR_PHONE": "ನಿಮ್ಮ ಫೋನ್ ತೋರಿಸಿ",
+      "POINT_CAMERA": "ಕ್ಯಾಮರಾ ಇಲ್ಲಿ",
+      "OR": "ಅಥವಾ",
+      "SEARCH_PLAYSTORE": "ಪ್ಲೇಸ್ಟೋರ್‌ನಲ್ಲಿ \"ಪ್ರಥಮ್ ಮೈಲರ್ನಿಂಗ್\" ಹುಡುಕಿ",
+      "ON_PLAYSTORE": "ಪ್ಲೇಸ್ಟೋರ್‌ನಲ್ಲಿ"
     },
+    
     "L_ONE_COURSE": {
       "IN_PROGRESS_TITLE": "ಪ್ರಗತಿಯಲ್ಲಿದೆ",
       "ONGOING_COURSES": "ನೀವು {count} ನಡೆಯುತ್ತಿರುವ ಕೋರ್ಸ್‌ಗಳನ್ನು ಹೊಂದಿದ್ದೀರಿ",

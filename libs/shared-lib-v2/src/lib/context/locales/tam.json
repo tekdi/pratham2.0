@@ -30,7 +30,13 @@
     "INPROGRESS": "நடந்து கொண்டிருக்கிறது",
     "SURE_LOGOUT": "நீங்கள் வெளியேற விரும்புகிறீர்களா?",
     "LOGOUT": "வெளியேறு",
-    "LOADING": "ஏற்றப்படுகிறது..."
+    "LOADING": "ஏற்றப்படுகிறது...",
+    "STATUS": {
+      "completed": "முடிந்தது",
+      "in_progress": "நடந்து கொண்டிருக்கிறது",
+      "enrolled_not_started": "பதிவு செய்திருக்கிறது, தொடங்கவில்லை",
+      "not_started": "शुरू नहीं किया"
+    }
   },
   "LEARNER_APP": {
     "COMPLETE_PROFILE_BANNER": {
@@ -94,7 +100,13 @@
       "forgot_password": "கடவுச்சொல் மறந்துவிட்டீர்களா?",
       "login_button": "உள்நுழை",
       "no_account": "எனக்கு கணக்கு இல்லை",
-      "make_sure_to_cross_check_the_state_district_block_village": "மாநிலம், மாவட்டம், தொகுதி, கிராமம் ஆகியவற்றை மறுபரிசீலனை செய்யவும்"
+      "make_sure_to_cross_check_the_state_district_block_village": "மாநிலம், மாவட்டம், தொகுதி, கிராமம் ஆகியவற்றை மறுபரிசீலனை செய்யவும்",
+      "GET_THE_APP": "பயன்பாட்டைப் பெறவும்",
+      "POINT_YOUR_PHONE": "உங்கள் மொபைல் கேமராவை இங்கே சுட்டிக்காட்டவும்",
+      "POINT_CAMERA": "உங்கள் மொபைல் கேமராவை இங்கே சுட்டிக்காட்டவும்",
+      "OR": "அல்லது",
+      "SEARCH_PLAYSTORE": "பிளேஸ்டோரில் \"பிரதம் மைலேர்னிங்\" என்று தேடவும்",
+      "ON_PLAYSTORE": "பிளேஸ்டோரில்"
     },
     "L_ONE_COURSE": {
       "IN_PROGRESS_TITLE": "நடந்து கொண்டிருக்கிறது",

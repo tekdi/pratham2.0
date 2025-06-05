@@ -95,7 +95,13 @@
     "SURE_LOGOUT": "Are you sure you want to Logout?",
     "LOGOUT": "Logout",
     "LOADING": "Loading..",
-    "FAQS":"FAQ's"
+    "FAQS":"FAQ's",
+    "STATUS": {
+      "completed": "Completed",
+      "in_progress": "In Progress",
+      "enrolled_not_started": "Enrolled, not started",
+      "not_started": "Not Started"
+    }
   },
   "LEARNER_APP": {
     "COMPLETE_PROFILE_BANNER": {
@@ -161,7 +167,13 @@
       "forgot_password": "Forgot Password?",
       "login_button": "Login",
       "no_account": "I don’t have an Account",
-      "make_sure_to_cross_check_the_state_district_block_village": "Make sure to cross check the State, District, Block, Village"
+      "make_sure_to_cross_check_the_state_district_block_village": "Make sure to cross check the State, District, Block, Village",
+      "GET_THE_APP": "Get the App",
+      "POINT_YOUR_PHONE": "Point your phone",
+      "POINT_CAMERA": "camera here",
+      "OR": "OR",
+      "SEARCH_PLAYSTORE": "Search “Pratham myLearning” on Playstore",
+      "ON_PLAYSTORE": "on Playstore"
     },
     "L_ONE_COURSE": {
       "IN_PROGRESS_TITLE": "In Progress",
@@ -427,7 +439,7 @@
     "TYPE_OF_COHORT": "Type Of Center",
     "UNIT_NAME": "Unit Name",
     "SUBJECTS_I_TEACH": "Subject I Teach",
-    "MY_MAIN_SUBJECTS": "Main subjects",
+    "MY_MAIN_SUBJECTS": "Main subjects", 
     "NUMBER_OF_CLUSTERS_I_TEACH": "Number of cluster",
     "DESIGNATION": "Designation",
     "REGULAR": "Regular",

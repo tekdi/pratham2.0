@@ -30,7 +30,13 @@
     "INPROGRESS": "పురోగతిలో",
     "SURE_LOGOUT": "మీరు లాగౌట్ చేయాలని ఖచ్చితంగా ఉన్నారా?",
     "LOGOUT": "లాగౌట్",
-    "LOADING": "లోడింగ్..."
+    "LOADING": "లోడింగ్...",
+    "STATUS": {
+      "completed": "పూర్తయించిన",
+      "in_progress": "పురోగతిలో",
+      "enrolled_not_started": "పేరుచేసిన, ప్రారంభమవుతుంది",
+      "not_started": "ప్రారంభమవుతుంది"
+    }
   },
   "LEARNER_APP": {
     "COMPLETE_PROFILE_BANNER": {
@@ -94,7 +100,13 @@
       "forgot_password": "పాస్‌వర్డ్ మర్చిపోయారా?",
       "login_button": "లాగిన్",
       "no_account": "నాకు ఖాతా లేదు",
-      "make_sure_to_cross_check_the_state_district_block_village": "రాష్ట్రం, జిల్లా, బ్లాక్, గ్రామాన్ని క్రాస్ చెక్ చేయండి"
+      "make_sure_to_cross_check_the_state_district_block_village": "రాష్ట్రం, జిల్లా, బ్లాక్, గ్రామాన్ని క్రాస్ చెక్ చేయండి",
+      "GET_THE_APP": "యాప్ పొందండి",
+      "POINT_YOUR_PHONE": "మీ ఫోన్ కెమెరాను ఇక్కడ సూచించండి",
+      "POINT_CAMERA": "ఇక్కడ కెమెరాను సూచించండి",
+      "OR": "లేదా",
+      "SEARCH_PLAYSTORE": "ప్లేస్టోర్‌లో \"ప్రథమ్ మైలెర్నింగ్\" శోధించండి",
+      "ON_PLAYSTORE": "ప్లేస్టోర్‌లో"
     },
     "L_ONE_COURSE": {
       "IN_PROGRESS_TITLE": "పురోగతిలో",
