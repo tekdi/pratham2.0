@@ -57,7 +57,8 @@
     "COURSE": {
       "GET_STARTED": "L1 படிப்புகளுடன் தொடங்கவும்",
       "FILTER_BY": "வடிகட்டு",
-      "CLEAR_FILTER": "வடிகட்டலை அழி"
+      "CLEAR_FILTER": "வடிகட்டலை அழி",
+      "APPLY_FILTER": "பயன்படுத்து"
     },
     "EXPLORE": {
       "EXPLORE_ADDITIONAL_COURSES": "கூடுதல் படிப்புகளை ஆராயுங்கள்"

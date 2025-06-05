@@ -57,7 +57,8 @@
     "COURSE": {
       "GET_STARTED": "ଏଲ୍‌୧ ପାଠ୍ୟକ୍ରମ ସହିତ ଆରମ୍ଭ କରନ୍ତୁ",
       "FILTER_BY": "ଦ୍ୱାରା ଫିଲ୍ଟର କରନ୍ତୁ",
-      "CLEAR_FILTER": "ଫିଲ୍ଟର ହଟାନ୍ତୁ"
+      "CLEAR_FILTER": "ଫିଲ୍ଟର ହଟାନ୍ତୁ",
+      "APPLY_FILTER": "ଫିଲ୍ଟର ଲଗାନ୍ତୁ"
     },
     "EXPLORE": {
       "EXPLORE_ADDITIONAL_COURSES": "ଅତିରିକ୍ତ ପାଠ୍ୟକ୍ରମ ଅନୁସନ୍ଧାନ କରନ୍ତୁ"

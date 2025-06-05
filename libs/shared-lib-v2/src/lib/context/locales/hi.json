@@ -59,7 +59,8 @@
       "STARTED_ON": "आरंभ किया",
       "GET_STARTED": "एल1 पाठ्यक्रमों के साथ शुरुआत करें",
       "FILTER_BY": "इसके द्वारा फ़िल्टर करें",
-      "CLEAR_FILTER": "फ़िल्टर साफ़ करें"
+      "CLEAR_FILTER": "फ़िल्टर साफ़ करें",
+      "APPLY_FILTER": "फिल्टर लागू करें"
     },
     "EXPLORE": {
       "EXPLORE_ADDITIONAL_COURSES": "अतिरिक्त पाठ्यक्रमों का अन्वेषण करें"

@@ -131,8 +131,7 @@ export const CommonCard: React.FC<CommonCardProps> = ({
         flexDirection: orientation === 'horizontal' ? 'column' : 'row',
         height: minheight || '100%',
         cursor: onClick ? 'pointer' : 'default',
-        bgcolor: '#FEF7FF',
-        boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.1)',
+        boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.2)',
         overflow: 'hidden',
         '&:hover': {
           boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.2)',

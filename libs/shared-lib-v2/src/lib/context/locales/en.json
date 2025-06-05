@@ -4,7 +4,7 @@
   "HINDI": "Hindi",
   "MARATHI": "Marathi",
   "URDU": "Urdu",
-   "UNIT_NAME": "Unit Name",
+  "UNIT_NAME": "Unit Name",
   "TYPE_OF_CENTER": "Type Of Center",
   "GOOGLE MAP_LINK": "Google Map Link",
   "MY_MAIN_SUBJECTS": "Main subjects",
@@ -14,7 +14,7 @@
   "SCIENCE": "Science",
   "SOCIAL_SCIENCE": "Social Science",
   "SUBJECTS_I_TEACH": "Subject I Teach",
-  
+
   "CENTER:": "Center:",
   "District": "District",
   "State": "State",
@@ -31,8 +31,8 @@
   "ADDRESS": " Address",
   "DOB": "Date of Birth",
   "SUBJECT": "Subject",
-   "SELF_PLACED": "Self Placed",
- 
+  "SELF_PLACED": "Self Placed",
+
   "Male": "Male",
   "Female": "Female",
   "Transgender": "Transgender",
@@ -46,10 +46,10 @@
   "Science": "Science",
   "Social Science": "Social Science",
   "Life Skills": "Life Skills",
-  
+
   "Smartphone": "Smartphone",
   "Keypad": "Keypad",
-   "SCHOOL_INACCESSIBLE": "School inaccessible",
+  "SCHOOL_INACCESSIBLE": "School inaccessible",
   "FINANCIAL_CONSTRAINTS": "Financial Constraints",
   "LACK_OF_INTEREST": "Lack of Interest",
   "FAMILY_RESPONSIBILITIES": "Family responsibilities",
@@ -67,7 +67,7 @@
   "SALARIED_WORK": "Salaried work",
   "SELF_EMPLOYMENT": "Self-employment",
   "UNEMPLOYED_OR_DOMESTIC_WORK": "Unemployed or Domestic Work",
- 
+
   "SURVEYS": {
     "SURVEYS": "Surveys",
     "ACTIVE_SURVEYS": "Active Surveys",
@@ -95,7 +95,7 @@
     "SURE_LOGOUT": "Are you sure you want to Logout?",
     "LOGOUT": "Logout",
     "LOADING": "Loading..",
-    "FAQS":"FAQ's"
+    "FAQS": "FAQ's"
   },
   "LEARNER_APP": {
     "COMPLETE_PROFILE_BANNER": {
@@ -124,7 +124,8 @@
       "STARTED_ON": "Started on",
       "GET_STARTED": "Get Started with L1 Courses",
       "FILTER_BY": "Filter by",
-      "CLEAR_FILTER": "Clear Filter"
+      "CLEAR_FILTER": "Clear Filter",
+      "APPLY_FILTER": "Apply Filter"
     },
     "EXPLORE": {
       "EXPLORE_ADDITIONAL_COURSES": "Explore Additional Courses"
@@ -495,12 +496,10 @@
     "STATE_NAME": "State Name",
     "SUPPORT_NEEDED": "Support needed",
     "CLASS": "Class (Last passed grade)",
-       "PRIMARY_WORK": "Learner's Primary Work",
+    "PRIMARY_WORK": "Learner's Primary Work",
     "MOBILISATION_METHOD": "How Was the Learner Mobilized?",
     "MONTH_MOBILISATION": "Month of Mobilisation",
     "DROP_OUT_REASON": "Reason for Drop Out From School"
-   
-   
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "Invalid Input.",
@@ -524,5 +523,4 @@
     "DATE_MUST_BE_ON_OR_BEFORE": "Date must be on or before {{date}}",
     "DATE_MUST_BE_ON_OR_AFTER": "Date must be on or after {{date}}"
   }
-
 }

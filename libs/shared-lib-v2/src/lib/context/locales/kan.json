@@ -57,7 +57,8 @@
     "COURSE": {
       "GET_STARTED": "L1 ಕೋರ್ಸ್‌ಗಳೊಂದಿಗೆ ಪ್ರಾರಂಭಿಸಿ",
       "FILTER_BY": "ಇದರಿಂದ ಫಿಲ್ಟರ್ ಮಾಡಿ",
-      "CLEAR_FILTER": "ಫಿಲ್ಟರ್ ತೆರವುಗೊಳಿಸಿ"
+      "CLEAR_FILTER": "ಫಿಲ್ಟರ್ ತೆರವುಗೊಳಿಸಿ",
+      "APPLY_FILTER": "ಫಿಲ್ಟರ್ ಅನ್ನು ಅನ್ವಯಿಸಿ"
     },
     "EXPLORE": {
       "EXPLORE_ADDITIONAL_COURSES": "ಹೆಚ್ಚುವರಿ ಕೋರ್ಸ್‌ಗಳನ್ನು ಅನ್ವೇಷಿಸಿ"

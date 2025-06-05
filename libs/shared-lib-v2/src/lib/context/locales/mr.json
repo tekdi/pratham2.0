@@ -59,7 +59,8 @@
       "STARTED_ON": "आरंभ केले",
       "GET_STARTED": "एल1 अभ्यासक्रमांसह सुरू करा",
       "FILTER_BY": "द्वारे फिल्टर करा",
-      "CLEAR_FILTER": "फिल्टर साफ करा"
+      "CLEAR_FILTER": "फिल्टर साफ करा",
+      "APPLY_FILTER": "फिल्टर लागू करा"
     },
     "EXPLORE": {
       "EXPLORE_ADDITIONAL_COURSES": "अतिरिक्त अभ्यासक्रम शोधा"

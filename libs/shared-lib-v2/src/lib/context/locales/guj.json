@@ -57,7 +57,8 @@
     "COURSE": {
       "GET_STARTED": "L1 અભ્યાસક્રમો સાથે શરૂઆત કરો",
       "FILTER_BY": "દ્વારા ફિલ્ટર કરો",
-      "CLEAR_FILTER": "ફિલ્ટર સાફ કરો"
+      "CLEAR_FILTER": "ફિલ્ટર સાફ કરો",
+      "APPLY_FILTER": "ફિલ્ટર લાગુ કરો"
     },
     "EXPLORE": {
       "EXPLORE_ADDITIONAL_COURSES": "વધારાના અભ્યાસક્રમો શોધો"

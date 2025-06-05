@@ -57,7 +57,8 @@
     "COURSE": {
       "GET_STARTED": "L1 కోర్సులతో ప్రారంభించండి",
       "FILTER_BY": "ఫిల్టర్ చేయండి",
-      "CLEAR_FILTER": "ఫిల్టర్‌ను తొలగించు"
+      "CLEAR_FILTER": "ఫిల్టర్‌ను తొలగించు",
+      "APPLY_FILTER": "ఫిల్టర్ వర్తింపజేయి"
     },
     "EXPLORE": {
       "EXPLORE_ADDITIONAL_COURSES": "అదనపు కోర్సులను అన్వేషించండి"
