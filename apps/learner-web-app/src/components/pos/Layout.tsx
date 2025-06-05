@@ -126,7 +126,8 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
       {
         title: t('LEARNER_APP.POS.THEMATIC_REPOSITORY'),
         to: () => router.push('/pos/themantic'),
-        isActive: currentPage === '/pos/thematic-repository',
+        // isActive: currentPage === '/pos/thematic-repository',
+        isActive: currentPage === '#',
       },
     ];
 
