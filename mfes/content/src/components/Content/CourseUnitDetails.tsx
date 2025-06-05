@@ -58,15 +58,20 @@ export default function Details(props: DetailsProps) {
         if (unitId && !props?.isHideInfoCard) {
           const course = await hierarchyAPI(courseId as string);
           setCourseItem(course);
-          const breadcrum = findCourseUnitPath(course, unitId as string, [
-            'name',
-            'identifier',
-            'mimeType',
-            {
-              key: 'link',
-              suffix: activeLink ? `?activeLink=${activeLink}` : '',
-            },
-          ]);
+          const breadcrum = findCourseUnitPath({
+            contentBaseUrl: props?._config?.contentBaseUrl,
+            node: course,
+            targetId: unitId as string,
+            keyArray: [
+              'name',
+              'identifier',
+              'mimeType',
+              {
+                key: 'link',
+                suffix: activeLink ? `?activeLink=${activeLink}` : '',
+              },
+            ],
+          });
           setBreadCrumbs(breadcrum);
         }
 
@@ -188,8 +193,10 @@ export default function Details(props: DetailsProps) {
       }
     } else {
       router.push(
-        `${props?._config?.contentBaseUrl ?? ''}${
-          activeLink ? activeLink : '/content'
+        `${
+          activeLink
+            ? activeLink
+            : `${props?._config?.contentBaseUrl ?? ''}/content`
         }`
       );
     }
