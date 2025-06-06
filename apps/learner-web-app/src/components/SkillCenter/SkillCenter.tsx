@@ -29,6 +29,7 @@ import {
 } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import { CohortSearchSchema, CohortSearchUISchema } from '../CohortSearch';
 import { FormContext } from '@shared-lib-v2/DynamicForm/components/DynamicFormConstant';
+import { useTranslation } from '@shared-lib';
 
 interface Center {
   name: string;
@@ -52,6 +53,7 @@ interface SkillCenterProps {
   visibleCenters?: any;
   setVisibleCenters?: any;
   hideFilter?: boolean;
+  isPadding?: boolean;
 }
 
 const ImageContainer = styled(Box)(({ theme }) => ({
@@ -115,6 +117,7 @@ const SkillCenter = ({
   visibleCenters,
   setVisibleCenters,
   hideFilter = true,
+  isPadding = true,
 }: SkillCenterProps) => {
   const router = useRouter();
   const [centers, setCenters] = useState<Center[]>([]);
@@ -147,6 +150,7 @@ const SkillCenter = ({
   const [totalCountBatch, setTotalCountBatch] = useState(0);
   const searchStoreKey = 'centers';
 
+  const { t } = useTranslation();
   const initialFormDataSearch =
     typeof window !== 'undefined' && typeof localStorage !== 'undefined'
       ? localStorage.getItem(searchStoreKey) &&
@@ -270,74 +274,112 @@ const SkillCenter = ({
     }
   };
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: isPadding ? 0 : 3 }}>
       <Box
         sx={{
+          width: '100%',
           display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          mb: 3,
+          px: isPadding ? 3 : 0,
+          flexDirection: { xs: 'column', sm: 'row' },
         }}
       >
-        <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
-          {isNavigateBack && (
-            <Box
-              onClick={() => {
-                router.back();
-              }}
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            justifyContent: 'space-between',
+            alignItems: { xs: 'flex-start', sm: 'center' },
+            mb: 3,
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              gap: '5px',
+              alignItems: 'center',
+              mb: { xs: 2, sm: 0 },
+            }}
+          >
+            {isNavigateBack && (
+              <Box
+                onClick={() => {
+                  router.back();
+                }}
+                sx={{
+                  color: '#4D4639',
+                  fontWeight: 500,
+                  fontSize: { xs: '14px', sm: '16px' },
+                  cursor: 'pointer',
+                }}
+              >
+                <ArrowBackIcon />
+              </Box>
+            )}
+            <Typography
+              variant="h5"
+              component="h3"
               sx={{
-                color: '#4D4639',
-                fontWeight: 500,
-                fontSize: '16px',
-                cursor: 'pointer',
+                fontWeight: 400,
+                color: '#1F1B13',
+                fontSize: { xs: '20px', sm: '22px' },
               }}
             >
-              <ArrowBackIcon />
-            </Box>
-          )}
-          <Typography
-            variant="h5"
-            component="h3"
-            sx={{ fontWeight: 400, color: '#1F1B13', fontSize: '22px' }}
-          >
-            {title}
-          </Typography>
-        </Box>
-        {!viewAll && visibleCenters.length > 3 && (
-          <Box
-            onClick={() => {
-              router.push('/skill-center');
-            }}
-            sx={{
-              color: '#0D599E',
-              fontWeight: 500,
-              fontSize: '16px',
-              cursor: 'pointer',
-            }}
-          >
-            View All{' '}
-            <ArrowForwardIcon
+              {title}
+            </Typography>
+          </Box>
+          {!viewAll && visibleCenters.length > 3 && (
+            <Box
+              onClick={() => {
+                router.push('/skill-center');
+              }}
               sx={{
                 color: '#0D599E',
                 fontWeight: 500,
-                fontSize: '16px',
+                fontSize: { xs: '14px', sm: '16px' },
                 cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
               }}
+            >
+              {t('COMMON.VIEW_ALL')}
+              <ArrowForwardIcon
+                sx={{
+                  color: '#0D599E',
+                  fontWeight: 500,
+                  fontSize: { xs: '14px', sm: '16px' },
+                  cursor: 'pointer',
+                }}
+              />
+            </Box>
+          )}
+        </Box>
+        {!hideFilter && schema && uiSchema && (
+          <Box
+            sx={{
+              width: '100%',
+              mt: { xs: 2, sm: 0 },
+            }}
+          >
+            <DynamicForm
+              schema={schema}
+              uiSchema={updatedUiSchema}
+              SubmitaFunction={SubmitaFunction}
+              isCallSubmitInHandle={true}
+              prefilledFormData={prefilledFormData}
             />
           </Box>
         )}
       </Box>
 
-      {!hideFilter && schema && uiSchema && (
-        <DynamicForm
-          schema={schema}
-          uiSchema={updatedUiSchema}
-          SubmitaFunction={SubmitaFunction}
-          isCallSubmitInHandle={true}
-          prefilledFormData={prefilledFormData}
-        />
-      )}
-      <Grid container spacing={3} marginTop={'80px'}>
+      <Grid
+        container
+        spacing={{ xs: 2, sm: 3 }}
+        marginTop={{ xs: '40px', sm: '80px' }}
+        sx={{
+          p: isPadding ? { xs: 2, sm: 3 } : 0,
+          backgroundColor: '#fff',
+        }}
+      >
         {(viewAll ? visibleCenters : visibleCenters?.slice(0, 3))?.map(
           (center: any, idx: any) => (
             <Grid item xs={12} sm={6} md={4} key={idx}>
@@ -365,14 +407,15 @@ const SkillCenter = ({
                     ))}
                   </Box>
 
-                  <Box sx={{ px: 2, pb: 2 }}>
+                  <Box sx={{ px: { xs: 1, sm: 2 }, pb: { xs: 1, sm: 2 } }}>
                     <Box
                       sx={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 1,
+                        gap: { xs: 0.5, sm: 1 },
                         mb: 1,
                         justifyContent: 'space-between',
+                        flexWrap: 'wrap',
                       }}
                     >
                       <Typography
@@ -380,7 +423,7 @@ const SkillCenter = ({
                         sx={{
                           fontWeight: 600,
                           color: '#1F1B13',
-                          fontSize: '18px',
+                          fontSize: { xs: '16px', sm: '18px' },
                         }}
                       >
                         {center.name}
@@ -391,10 +434,10 @@ const SkillCenter = ({
                         sx={{
                           backgroundColor: '#F5F5F5',
                           color: '#635E57',
-                          fontSize: '14px',
+                          fontSize: { xs: '12px', sm: '14px' },
                           fontWeight: 500,
                           borderRadius: '16px',
-                          height: '24px',
+                          height: { xs: '20px', sm: '24px' },
                         }}
                       />
                     </Box>
@@ -404,7 +447,7 @@ const SkillCenter = ({
                       sx={{
                         mb: 1.5,
                         color: '#635E57',
-                        fontSize: '14px',
+                        fontSize: { xs: '12px', sm: '14px' },
                         lineHeight: 1.5,
                       }}
                     >
@@ -422,13 +465,14 @@ const SkillCenter = ({
                         display: 'flex',
                         alignItems: 'center',
                         gap: 0.5,
-                        fontSize: '14px',
+                        fontSize: { xs: '12px', sm: '14px' },
                         '&:hover': {
                           color: '#004C99',
                         },
                       }}
                     >
-                      Open on Maps <LocationOnIcon sx={{ fontSize: 18 }} />
+                      Open on Maps{' '}
+                      <LocationOnIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />
                     </Link>
                   </Box>
                 </CardContent>
@@ -449,7 +493,7 @@ const SkillCenter = ({
           }}
         >
           <Typography variant="h6" sx={{ color: '#635E57', fontSize: '16px' }}>
-            No data found
+            {t('COMMON.NO_DATA_FOUND')}
           </Typography>
         </Box>
       )}
@@ -472,7 +516,7 @@ const SkillCenter = ({
               gap: 1,
             }}
           >
-            {loading ? 'Loading...' : 'Load More'}
+            {loading ? t('COMMON.LOADING') : t('COMMON.LOAD_MORE')}
             {loading && <CircularProgress size={20} color="inherit" />}
           </Box>
         </Box>

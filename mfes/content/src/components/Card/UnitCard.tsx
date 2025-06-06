@@ -1,7 +1,7 @@
 import { CommonCard, ContentItem } from '@shared-lib';
 import { Box } from '@mui/material';
 import AppConst from '../../utils/AppConst/AppConst';
-import Dispription from './Discription';
+import Description from './Description';
 import { StatusIcon } from '../CommonCollapse';
 import { CardWrap } from './ContentCard';
 
@@ -30,14 +30,14 @@ const UnitCard = ({
             ? item?.posterImage
             : default_img ?? `${AppConst.BASEPATH}/assests/images/image_ver.png`
         }
-        content={item?.description ? item?.description : <Dispription />}
+        content={item?.description ? item?.description : <Description />}
         orientation="horizontal"
         item={item}
         TrackData={trackData}
         type={type}
         onClick={() => handleCardClick(item)}
         _card={{
-          _contentText: { sx: { height: '120px' } },
+          _contentParentText: { sx: { height: '156px' } },
           _cardMedia: { sx: { maxHeight: '132px' } },
           ..._card,
         }}
