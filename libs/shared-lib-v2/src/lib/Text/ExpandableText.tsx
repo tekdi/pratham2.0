@@ -118,7 +118,7 @@ export const ExpandableText: React.FC<ExpandableTextProps> = memo(
         >
           <SpeakableText>
             {displayText
-              ? capitalize(displayText.split(' ')[0]) + displayText.slice(1)
+              ? capitalize(displayText[0]) + displayText.slice(1)
               : ''}
           </SpeakableText>
         </Typography>
