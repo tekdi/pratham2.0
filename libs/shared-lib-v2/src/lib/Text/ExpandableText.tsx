@@ -142,9 +142,9 @@ export const ExpandableText: React.FC<ExpandableTextProps> = memo(
             }}
           >
             {isExpanded ? (
-              <SpeakableText>{t('COMMON.SHOW_LESS')}</SpeakableText>
+              <SpeakableText>{t('COMMON.READ_LESS')}</SpeakableText>
             ) : (
-              <SpeakableText>{t('COMMON.SHOW_MORE')}</SpeakableText>
+              <SpeakableText>{t('COMMON.READ_MORE')}</SpeakableText>
             )}
           </Button>
         )}
