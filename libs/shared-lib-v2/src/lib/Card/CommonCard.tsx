@@ -178,79 +178,89 @@ export const CommonCard: React.FC<CommonCardProps> = ({
         {/* Progress Bar Overlay */}
         <StatusBar {...statusBar} _card={_card} />
       </Box>
-
-      <CardHeader
-        sx={{
-          pb: 0,
-          pt: 1,
-        }}
-        avatar={
-          avatarLetter && (
-            <Avatar sx={{ bgcolor: avatarColor }} aria-label="avatar">
-              {avatarLetter}
-            </Avatar>
-          )
-        }
-        title={
-          <Typography
-            variant="body1"
-            component="div"
-            title={title}
-            sx={{
-              fontWeight: 500,
-              // fontSize: '16px',
-              // lineHeight: '24px',
-              whiteSpace: 'wrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              display: '-webkit-box',
-              WebkitBoxOrient: 'vertical',
-              textTransform: 'capitalize',
-              WebkitLineClamp: 1,
-            }}
-          >
-            <SpeakableText>{title}</SpeakableText>
-          </Typography>
-        }
-        subheader={
-          subheader && (
-            <Typography variant="h3" component="div">
-              <SpeakableText>{subheader}</SpeakableText>
-            </Typography>
-          )
-        }
-      />
-      {content && (
-        <CardContent
+      {avatarLetter && subheader && (
+        <CardHeader
           sx={{
-            pt: 0.5,
             pb: 0,
+            pt: 1,
           }}
-        >
-          <Typography
-            variant="body1"
-            component="div"
-            // @ts-ignore
-            title={content}
+          avatar={
+            avatarLetter && (
+              <Avatar sx={{ bgcolor: avatarColor }} aria-label="avatar">
+                {avatarLetter}
+              </Avatar>
+            )
+          }
+          subheader={
+            subheader && (
+              <Typography variant="h3" component="div">
+                <SpeakableText>{subheader}</SpeakableText>
+              </Typography>
+            )
+          }
+        />
+      )}
+      <Box sx={_card?._contentParentText?.sx}>
+        {title && (
+          <CardContent
             sx={{
-              fontWeight: 400,
-              // fontSize: '15.4px',
-              // lineHeight: '22px',
-              color: '#49454F',
-              display: '-webkit-box',
-              WebkitLineClamp: 5,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              ..._card?._contentText?.sx,
+              pt: 1,
+              pb: '0 !important',
             }}
           >
-            {typeof content === 'string'
-              ? capitalize(content.split(' ')[0]) + content.slice(1)
-              : ''}
-          </Typography>
-        </CardContent>
-      )}
+            <Typography
+              variant="body1"
+              component="div"
+              title={title}
+              sx={{
+                fontWeight: 500,
+                // fontSize: '16px',
+                // lineHeight: '24px',
+                whiteSpace: 'wrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                display: '-webkit-box',
+                WebkitBoxOrient: 'vertical',
+                textTransform: 'capitalize',
+                WebkitLineClamp: 2,
+              }}
+            >
+              <SpeakableText>{title}</SpeakableText>
+            </Typography>
+          </CardContent>
+        )}
+        {content && (
+          <CardContent
+            sx={{
+              pt: 0.5,
+              pb: '0 !important',
+            }}
+          >
+            <Typography
+              variant="body1"
+              component="div"
+              // @ts-ignore
+              title={typeof content === 'string' ? content : ''}
+              sx={{
+                fontWeight: 400,
+                // fontSize: '15.4px',
+                // lineHeight: '22px',
+                color: '#49454F',
+                display: '-webkit-box',
+                WebkitLineClamp: 4,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                ..._card?._contentText?.sx,
+              }}
+            >
+              {typeof content === 'string'
+                ? capitalize(content[0]) + content.slice(1)
+                : content}
+            </Typography>
+          </CardContent>
+        )}
+      </Box>
       {children && <CardContent>{children}</CardContent>}
       {actions && (
         <CardActions sx={{ p: 2, pt: '14px' }}>
@@ -369,7 +379,6 @@ interface StatusIconProps {
 }
 
 const StatusIcon: React.FC<StatusIconProps> = ({ status }) => {
-  if (status !== 'In Progress') console.log('sagar status', status);
   switch (status?.toLowerCase()) {
     case 'completed':
       return <CheckCircleIcon />;

@@ -1,7 +1,7 @@
 import { Box, Typography } from '@mui/material';
 import SentimentSatisfiedIcon from '@mui/icons-material/SentimentSatisfied';
 
-const Dispription = () => {
+const Description = () => {
   return (
     <Box>
       <Typography
@@ -20,4 +20,4 @@ const Dispription = () => {
   );
 };
 
-export default Dispription;
+export default Description;
