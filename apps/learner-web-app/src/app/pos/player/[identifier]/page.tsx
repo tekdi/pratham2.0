@@ -11,7 +11,13 @@ const Player = dynamic(() => import('@learner/components/Content/Player'), {
 });
 
 const App: React.FC = () => {
-  return <Player userIdLocalstorageName="did" contentBaseUrl="/pos/content" />;
+  return (
+    <Player
+      userIdLocalstorageName="did"
+      contentBaseUrl="/pos/content"
+      isGenerateCertificate={false}
+    />
+  );
 };
 
 export default App;

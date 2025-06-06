@@ -64,7 +64,6 @@ export default memo(function LearnerCourse({
       ...prevState,
       filters: newFilterState,
     }));
-    setIsOpen(false);
   };
 
   return (
@@ -196,16 +195,6 @@ export default memo(function LearnerCourse({
             },
           }}
         >
-          <IconButton
-            onClick={() => setIsOpen(false)}
-            sx={{
-              position: 'absolute',
-              right: 8,
-              top: 8,
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
           <FilterComponent
             filterFramework={filterFramework}
             staticFilter={staticFilter}
@@ -220,12 +209,29 @@ export default memo(function LearnerCourse({
                 sx: {
                   py: 2,
                   px: 2,
-                  height: 'calc(100vh - 57px)',
+                  height: 'calc(100vh - 105px)',
                   overflowY: 'auto',
                 },
               },
             }}
           />
+          <Box
+            sx={{
+              bgcolor: 'white',
+              p: 1,
+              position: 'absolute',
+              bottom: 0,
+              width: '100%',
+            }}
+          >
+            <Button
+              variant="contained"
+              fullWidth
+              onClick={() => setIsOpen(false)}
+            >
+              {t('LEARNER_APP.COURSE.APPLY_FILTER')}
+            </Button>
+          </Box>
         </Drawer>
 
         <Box
@@ -296,6 +302,7 @@ export default memo(function LearnerCourse({
               tabChange: handleTabChange,
               default_img: '/images/image_ver.png',
               _card: { isHideProgress: true },
+              _subBox: { sx: { px: 0.5 } },
               ..._content?._config,
             }}
             filters={{

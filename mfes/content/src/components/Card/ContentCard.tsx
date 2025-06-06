@@ -66,7 +66,7 @@ const ContentCard = ({
 
 export default ContentCard;
 
-const CardWrap = ({
+export const CardWrap = ({
   children,
   isWrap,
   _card,
@@ -88,7 +88,7 @@ const CardWrap = ({
         position: 'relative',
         display: 'flex',
         alignItems: 'center',
-        mt: '18px',
+        mt: 1,
       }}
     >
       <Box

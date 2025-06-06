@@ -116,7 +116,9 @@ export default function Details(props: DetailsProps) {
 
             setTrackData(newTrackData ?? []);
             if (data?.result?.status === 'viewCertificate') {
-              setCertificateId(data?.result?.certificateId);
+              if (props?._config?.userIdLocalstorageName !== 'did') {
+                setCertificateId(data?.result?.certificateId);
+              }
             } else if (course_track_data?.data && !unitId) {
               const course_track = calculateTrackDataItem(
                 userTrackData?.[0] ?? {},
@@ -125,7 +127,8 @@ export default function Details(props: DetailsProps) {
 
               if (
                 course_track?.status === 'completed' &&
-                data?.result?.status === 'enrolled'
+                data?.result?.status === 'enrolled' &&
+                props?._config?.userIdLocalstorageName !== 'did'
               ) {
                 const userResponse: any = await getUserIdLocal();
                 const resultCertificate = await issueCertificate({

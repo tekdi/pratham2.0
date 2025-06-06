@@ -25,6 +25,7 @@ interface PlayerProps {
   courseId?: string;
   unitId?: string;
   userId?: string;
+  isGenerateCertificate?: boolean;
 }
 
 const SunbirdPlayers = ({
@@ -32,6 +33,7 @@ const SunbirdPlayers = ({
   courseId,
   unitId,
   userId,
+  isGenerateCertificate,
 }: PlayerProps) => {
   console.log('workspace playerconfig', playerConfig);
 
@@ -42,6 +44,7 @@ const SunbirdPlayers = ({
         <SunbirdPdfPlayer
           playerConfig={playerConfig}
           relatedData={{ courseId, unitId, userId }}
+          isGenerateCertificate={isGenerateCertificate}
         />
       );
     case 'video/mp4':
@@ -50,6 +53,7 @@ const SunbirdPlayers = ({
         <SunbirdVideoPlayer
           playerConfig={playerConfig}
           relatedData={{ courseId, unitId, userId }}
+          isGenerateCertificate={isGenerateCertificate}
         />
       );
     case 'application/vnd.sunbird.questionset':
@@ -57,6 +61,7 @@ const SunbirdPlayers = ({
         <SunbirdQuMLPlayer
           playerConfig={playerConfig}
           relatedData={{ courseId, unitId, userId }}
+          isGenerateCertificate={isGenerateCertificate}
         />
       );
     case 'application/epub':
@@ -64,6 +69,7 @@ const SunbirdPlayers = ({
         <SunbirdEpubPlayer
           playerConfig={playerConfig}
           relatedData={{ courseId, unitId, userId }}
+          isGenerateCertificate={isGenerateCertificate}
         />
       );
     case 'application/vnd.ekstep.h5p-archive':
@@ -75,6 +81,7 @@ const SunbirdPlayers = ({
         <SunbirdV1Player
           playerConfig={playerConfig}
           relatedData={{ courseId, unitId, userId }}
+          isGenerateCertificate={isGenerateCertificate}
         />
       );
     default:

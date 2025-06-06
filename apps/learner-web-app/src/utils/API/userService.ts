@@ -46,16 +46,31 @@ export const userCheck = async ({
 function setLocalStorageFromCustomFields(fields: any) {
   const getFieldId = (labelKey: any) => {
     const field = fields.find((f: any) => f.label === labelKey);
-    return field?.selectedValues?.[0]?.id ?? null;
+    console.log("statename",field?.selectedValues?.[0]?.value )  
+  //  localStorage.setItem("stateName", field?.selectedValues?.[0]?.value)
+     return field?.selectedValues?.[0]?.id ?? null;
+  };
+   const getFieldLabel = (labelKey: any) => {
+    const field = fields.find((f: any) => f.label === labelKey);
+    console.log("statename",field?.selectedValues?.[0]?.value )  
+    // localStorage.setItem("stateName", field?.selectedValues?.[0]?.value)
+     return field?.selectedValues?.[0]?.value ?? null;
   };
 
   const stateId = getFieldId('STATE');
+  const stateName=getFieldLabel('STATE')
   const districtId = getFieldId('DISTRICT');
   const blockId = getFieldId('BLOCK');
 
-  if (stateId) localStorage.setItem('mfe_state', String(stateId));
+  if (stateId) 
+    {localStorage.setItem('mfe_state', String(stateId));
+      localStorage.setItem('stateId', String(stateId));
+    }
   if (districtId) localStorage.setItem('mfe_district', String(districtId));
+  if(stateName)  localStorage.setItem("stateName", stateName)
   if (blockId) localStorage.setItem('mfe_block', String(blockId));
+  localStorage.setItem('roleName' , "Learner")
+
 }
 
 export const profileComplitionCheck = async (): Promise<any> => {
@@ -99,6 +114,8 @@ export const profileComplitionCheck = async (): Promise<any> => {
       }
       const result = getMissingFields(responseForm?.schema, userData);
       console.log('result', result);
+      delete result?.properties?.is_volunteer;
+
       const isPropertiesEmpty = Object.keys(result.properties).length === 0;
       return isPropertiesEmpty;
     }
