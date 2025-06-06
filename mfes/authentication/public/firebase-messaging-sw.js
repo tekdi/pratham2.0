@@ -4,14 +4,15 @@ importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-comp
 
 // Firebase configuration - same as in test.html
 const firebaseConfig = {
-      apiKey: env.NEXT_PUBLIC_FCM_API_KEY,
-      authDomain: env.NEXT_PUBLIC_FCM_AUTH_DOMAIN,
-      projectId: env.NEXT_PUBLIC_FCM_PROJECT_FCM_ID,
-      storageBucket: env.NEXT_PUBLIC_FCM_STORAGE_BUCKET,
-      messagingSenderId: env.NEXT_PUBLIC_FCM_MESSAGING_SENDER,
-      appId: env.NEXT_PUBLIC_FCM_FCM_APP_ID,
-      measurementId: env.NEXT_PUBLIC_FCM_MEASUREMENT_ID,
+      apiKey: "AIzaSyBRiog2xsk1dxHc90GzJ0WpECDxHD0_t_M",
+      authDomain: "pratham-learning-platform.firebaseapp.com",
+      projectId: "pratham-learning-platform",
+      storageBucket: "pratham-learning-platform.firebasestorage.app",
+      messagingSenderId: "143413160428",
+      appId: "1:143413160428:web:f47d141789f4f7833db8c9",
+      measurementId: "G-JBR0HDYSCR"
     };
+   
 
 // Initialize Firebase in service worker
 firebase.initializeApp(firebaseConfig);
