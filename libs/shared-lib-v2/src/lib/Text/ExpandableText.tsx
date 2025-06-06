@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback, memo, useRef } from 'react';
 import { Box, Typography, Button } from '@mui/material';
 import SpeakableText from '../textToSpeech/SpeakableText';
 import { capitalize } from 'lodash';
+import { useTranslation } from '../context/LanguageContext';
 
 type ExpandableTextProps = {
   text?: string;
@@ -18,6 +19,8 @@ export const ExpandableText: React.FC<ExpandableTextProps> = memo(
     const [truncatedText, setTruncatedText] = useState<string>('');
     const [needsTruncation, setNeedsTruncation] = useState(false);
     const textRef = useRef<HTMLDivElement>(null);
+
+    const { t } = useTranslation();
 
     // Function to truncate text by words
     const truncateByWords = useCallback(
@@ -138,7 +141,11 @@ export const ExpandableText: React.FC<ExpandableTextProps> = memo(
               fontSize: 'inherit',
             }}
           >
-            {isExpanded ? 'read less' : 'read more'}
+            {isExpanded ? (
+              <SpeakableText>{t('COMMON.SHOW_LESS')}</SpeakableText>
+            ) : (
+              <SpeakableText>{t('COMMON.SHOW_MORE')}</SpeakableText>
+            )}
           </Button>
         )}
       </Box>

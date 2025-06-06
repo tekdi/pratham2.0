@@ -204,7 +204,7 @@ const DynamicForm = ({
       // setFormData;
       //fix for auto submit and render
       if (Object.keys(prefilledFormData).length === 0) {
-        prefilledFormData = { test: 'test' };
+     prefilledFormData = { test: 'test' };
       }
       renderPrefilledForm();
     }

@@ -139,14 +139,14 @@ const LanguageSelect = ({
         },
       }}
     >
-      <MuiMenuItem value="en">EN</MuiMenuItem>
-      <MuiMenuItem value="hi">HI</MuiMenuItem>
-      <MuiMenuItem value="mr">MR</MuiMenuItem>
-      <MuiMenuItem value="odi">ODI</MuiMenuItem>
-      <MuiMenuItem value="tel">TEL</MuiMenuItem>
-      <MuiMenuItem value="kan">KAN</MuiMenuItem>
-      <MuiMenuItem value="tam">TAM</MuiMenuItem>
-      <MuiMenuItem value="guj">GUJ</MuiMenuItem>
+      <MuiMenuItem value="en">English</MuiMenuItem>
+      <MuiMenuItem value="hi">हिंदी</MuiMenuItem>
+      <MuiMenuItem value="mr">मराठी</MuiMenuItem>
+      <MuiMenuItem value="odi">ଓଡ଼ିଆ</MuiMenuItem>
+      <MuiMenuItem value="tel">తెలుగు</MuiMenuItem>
+      <MuiMenuItem value="kan">ಕನ್ನಡ</MuiMenuItem>
+      <MuiMenuItem value="tam">தமிழ்</MuiMenuItem>
+      <MuiMenuItem value="guj">ગુજરાતી</MuiMenuItem>
     </Select>
   );
 };

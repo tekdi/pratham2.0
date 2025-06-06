@@ -189,7 +189,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
                   sx={{ ml: 1 }}
                   onClick={() => setOpenModal(true)}
                 >
-                  <SpeakableText>Enroll Now</SpeakableText>
+                  <SpeakableText>{t('COMMON.ENROLL_NOW')}</SpeakableText>
                 </Button>
               )}
             </Box>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   LayoutProps,
   Layout,
@@ -11,35 +11,33 @@ import {
   AccountCircleOutlined,
   Home,
   AssignmentOutlined,
+  Logout,
 } from '@mui/icons-material';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+import { Box, useMediaQuery, useTheme } from '@mui/material';
 import ProfileMenu from './ProfileMenu/ProfileMenu';
-import { Box } from '@mui/material';
-import { usePathname } from 'next/navigation';
+import ConfirmationModal from './ConfirmationModal/ConfirmationModal';
 import { checkAuth } from '@shared-lib-v2/utils/AuthService';
 import MuiThemeProvider from '@learner/assets/theme/MuiThemeProvider';
-import ConfirmationModal from './ConfirmationModal/ConfirmationModal';
 
 interface NewDrawerItemProp extends DrawerItemProp {
   variant?: 'contained' | 'text';
   isActive?: boolean;
   customStyle?: React.CSSProperties;
 }
+
 const App: React.FC<LayoutProps> = ({ children, ...props }) => {
   const router = useRouter();
   const pathname = usePathname();
-
   const { t, setLanguage } = useTranslation();
-  const [defaultNavLinks, setDefaultNavLinks] = useState<NewDrawerItemProp[]>(
-    []
-  );
+
+  const [defaultNavLinks, setDefaultNavLinks] = useState<NewDrawerItemProp[]>([]);
   const [anchorEl, setAnchorEl] = useState<any>(null);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
 
-  const getMessage = () => {
-    if (modalOpen) return t('COMMON.SURE_LOGOUT');
-    return '';
-  };
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   const handleClose = () => setAnchorEl(null);
   const handleProfileClick = () => {
     if (pathname !== '/profile') {
@@ -47,79 +45,92 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
     }
     handleClose();
   };
-  const handleLogoutClick = () => {
-    router.push('/logout');
-  };
-  const handleLogoutModal = () => {
-    setModalOpen(true);
+  const handleLogoutClick = () => router.push('/logout');
+  const handleLogoutModal = () => setModalOpen(true);
+  const handleCloseModel = () => setModalOpen(false);
+
+  // ✅ Simplified version without trying to close drawer
+  const handleNavClick = (callback: () => void) => {
+    callback();
   };
 
-  React.useEffect(() => {
+  const getLinkStyle = (isActive: boolean): React.CSSProperties => ({
+    backgroundColor: isActive ? '#e0f7fa' : 'transparent',
+    borderRadius: 8,
+  });
+
+  const getMessage = () => (modalOpen ? t('COMMON.SURE_LOGOUT') : '');
+
+  useEffect(() => {
     let currentPage = '';
     if (typeof window !== 'undefined') {
       const searchParams = new URLSearchParams(window.location.search);
       const activeLink = searchParams.get('activeLink');
-      currentPage = activeLink
-        ? activeLink
-        : window.location.pathname
-        ? window.location.pathname
-        : '';
+      currentPage = activeLink || window.location.pathname || '';
     }
-    const navLinks = [
+
+    const navLinks: NewDrawerItemProp[] = [
       {
         title: t('LEARNER_APP.COMMON.L1_COURSES'),
         icon: <Home sx={{ width: 28, height: 28 }} />,
-        to: () => router.push('/content'),
+        to: () => handleNavClick(() => router.push('/content')),
         isActive: currentPage === '/content',
+        customStyle: getLinkStyle(currentPage === '/content'),
       },
-      // {
-      //   title: t('LEARNER_APP.COMMON.EXPLORE'),
-      //   icon: <ExploreOutlined sx={{ width: 28, height: 28 }} />,
-      //   to: () => router.push('/explore'),
-      //   isActive: currentPage === '/explore',
-      // },
     ];
-    const isVolunteer = JSON.parse(
-      localStorage.getItem('isVolunteer') || 'false'
-    );
 
+    const isVolunteer = JSON.parse(localStorage.getItem('isVolunteer') || 'false');
     if (isVolunteer) {
       navLinks.push({
         title: t('LEARNER_APP.COMMON.SURVEYS'),
         icon: <AssignmentOutlined sx={{ width: 28, height: 28 }} />,
-        to: () => router.push('/observations'),
+        to: () => handleNavClick(() => router.push('/observations')),
         isActive: currentPage === '/observations',
-      });
-    }
-    if (checkAuth()) {
-      navLinks.push({
-        title: t('LEARNER_APP.COMMON.PROFILE'),
-        icon: <AccountCircleOutlined sx={{ width: 28, height: 28 }} />,
-        to: () => {
-          setAnchorEl(true);
-        },
-        isActive: currentPage === '/profile',
+        customStyle: getLinkStyle(currentPage === '/observations'),
       });
     }
 
+    if (checkAuth()) {
+      if (isMobile) {
+        navLinks.push(
+          {
+            title: t('LEARNER_APP.COMMON.PROFILE'),
+            icon: <AccountCircleOutlined sx={{ width: 28, height: 28 }} />,
+            to: () => handleNavClick(handleProfileClick),
+            isActive: currentPage === '/profile',
+            customStyle: getLinkStyle(currentPage === '/profile'),
+          },
+          {
+            title: t('COMMON.LOGOUT'),
+            icon: <Logout sx={{ width: 28, height: 28 }} />,
+            to: () => handleNavClick(handleLogoutModal),
+            isActive: false,
+            customStyle: {},
+          }
+        );
+      } else {
+        navLinks.push({
+          title: t('LEARNER_APP.COMMON.PROFILE'),
+          icon: <AccountCircleOutlined sx={{ width: 28, height: 28 }} />,
+          to: () => setAnchorEl(true),
+          isActive: currentPage === '/profile',
+          customStyle: getLinkStyle(currentPage === '/profile'),
+        });
+      }
+    }
+
     setDefaultNavLinks(navLinks);
-  }, [t, router]);
-  const onLanguageChange = (val: string) => {
-    setLanguage(val);
-  };
-  const handleCloseModel = () => {
-    setModalOpen(false);
-  };
+  }, [t, router, isMobile]);
+
+  const onLanguageChange = (val: string) => setLanguage(val);
+
   return (
     <Layout
       onlyHideElements={['footer']}
       {...props}
       _topAppBar={{
         _brand: {
-          name:
-            typeof window !== 'undefined'
-              ? localStorage.getItem('userProgram') ?? ''
-              : '',
+          name: typeof window !== 'undefined' ? localStorage.getItem('userProgram') ?? '' : '',
           _box: {
             onClick: () => router.push('/content'),
             sx: {
@@ -144,19 +155,17 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
     >
       <Box>
         {children}
-        <Box
-          sx={{
-            marginTop: '20px',
-          }}
-        >
-          <ProfileMenu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleClose}
-            onProfileClick={handleProfileClick}
-            onLogout={handleLogoutModal}
-          />
-        </Box>
+        {!isMobile && (
+          <Box sx={{ marginTop: '20px' }}>
+            <ProfileMenu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleClose}
+              onProfileClick={handleProfileClick}
+              onLogout={handleLogoutModal}
+            />
+          </Box>
+        )}
       </Box>
       <ConfirmationModal
         message={getMessage()}
