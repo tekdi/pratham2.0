@@ -29,6 +29,7 @@ import {
 } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import { CohortSearchSchema, CohortSearchUISchema } from '../CohortSearch';
 import { FormContext } from '@shared-lib-v2/DynamicForm/components/DynamicFormConstant';
+import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 
 interface Center {
   name: string;
@@ -49,6 +50,7 @@ interface SkillCenterProps {
   isNavigateBack?: boolean;
   viewAll?: boolean;
   Limit?: number;
+  isPadding?: boolean;
 }
 
 const ImageContainer = styled(Box)(({ theme }) => ({
@@ -109,6 +111,7 @@ const SkillCenter = ({
   isNavigateBack,
   viewAll,
   Limit,
+  isPadding,
 }: SkillCenterProps) => {
   const router = useRouter();
   const [centers, setCenters] = useState<Center[]>([]);
@@ -325,38 +328,68 @@ const SkillCenter = ({
   };
   console.log('searchData', response);
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: isPadding ? 0 : 3 }}>
       <Box
         sx={{
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center',
+          alignItems: 'flex-start',
           mb: 3,
+          flexDirection: { xs: 'column', md: 'row' },
+          gap: { xs: 2, md: 0 },
         }}
       >
-        <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
-          {isNavigateBack && (
-            <Box
-              onClick={() => {
-                router.back();
-              }}
-              sx={{
-                color: '#4D4639',
-                fontWeight: 500,
-                fontSize: '16px',
-                cursor: 'pointer',
-              }}
+        <Box
+          sx={{
+            display: 'flex',
+            width: '100%',
+            flexDirection: { xs: 'column', md: 'row' },
+            gap: { xs: 1, md: 0 },
+            px: isPadding ? 3 : 0,
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              width: { xs: '100%', md: '300px' },
+              gap: '5px',
+              alignItems: 'center',
+            }}
+          >
+            {isNavigateBack && (
+              <Box
+                onClick={() => {
+                  router.back();
+                }}
+                sx={{
+                  color: '#4D4639',
+                  fontWeight: 500,
+                  fontSize: '16px',
+                  cursor: 'pointer',
+                }}
+              >
+                <ArrowBackIcon />
+              </Box>
+            )}
+            <Typography
+              variant="h5"
+              component="h3"
+              sx={{ fontWeight: 400, color: '#1F1B13', fontSize: '22px' }}
             >
-              <ArrowBackIcon />
+              {title}
+            </Typography>
+          </Box>
+          {schema && uiSchema && (
+            <Box sx={{ width: { xs: '100%', md: 'calc(100% - 300px)' } }}>
+              <DynamicForm
+                schema={schema}
+                uiSchema={updatedUiSchema}
+                SubmitaFunction={SubmitaFunction}
+                isCallSubmitInHandle={true}
+                prefilledFormData={prefilledFormData}
+              />
             </Box>
           )}
-          <Typography
-            variant="h5"
-            component="h3"
-            sx={{ fontWeight: 400, color: '#1F1B13', fontSize: '22px' }}
-          >
-            {title}
-          </Typography>
         </Box>
         {!viewAll && centers.length > 3 && (
           <Box
@@ -368,6 +401,9 @@ const SkillCenter = ({
               fontWeight: 500,
               fontSize: '16px',
               cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              mt: { xs: 1, md: 0 },
             }}
           >
             View All
@@ -383,16 +419,12 @@ const SkillCenter = ({
         )}
       </Box>
 
-      {schema && uiSchema && (
-        <DynamicForm
-          schema={schema}
-          uiSchema={updatedUiSchema}
-          SubmitaFunction={SubmitaFunction}
-          isCallSubmitInHandle={true}
-          prefilledFormData={prefilledFormData}
-        />
-      )}
-      <Grid container spacing={3} marginTop={'80px'}>
+      <Grid
+        container
+        spacing={3}
+        marginTop={'80px'}
+        sx={{ background: '#fff', px: isPadding ? 3 : 0 }}
+      >
         {visibleCenters?.map((center: any, idx: any) => (
           <Grid item xs={12} sm={6} md={4} key={idx}>
             <Card
@@ -410,7 +442,12 @@ const SkillCenter = ({
               <CardContent sx={{ p: 0 }}>
                 <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
                   {center.images.slice(0, 3).map((img: any, i: any) => (
-                    <ImageContainer key={i}>
+                    <ImageContainer
+                      key={i}
+                      sx={
+                        center.images.length === 1 ? { maxWidth: '33.33%' } : {}
+                      }
+                    >
                       <img src={img} alt={`${center.name} view ${i + 1}`} />
                       {i === 2 && center.moreImages > 0 && (
                         <ImageOverlay>+{center.moreImages}</ImageOverlay>
@@ -430,20 +467,19 @@ const SkillCenter = ({
                     }}
                   >
                     <Typography
-                      variant="subtitle1"
+                      variant="h2"
                       sx={{
                         fontWeight: 600,
                         color: '#1F1B13',
-                        fontSize: '18px',
                       }}
                     >
-                      {center.name}
+                      <SpeakableText>{center.name}</SpeakableText>
                     </Typography>
                     <Chip
                       label={center.category}
                       size="small"
                       sx={{
-                        backgroundColor: '#F5F5F5',
+                        backgroundColor: '#EDE1CF',
                         color: '#635E57',
                         fontSize: '14px',
                         fontWeight: 500,
@@ -454,15 +490,14 @@ const SkillCenter = ({
                   </Box>
 
                   <Typography
-                    variant="body2"
+                    variant="h2"
                     sx={{
                       mb: 1.5,
                       color: '#635E57',
-                      fontSize: '14px',
-                      lineHeight: 1.5,
+                      fontWeight: 400,
                     }}
                   >
-                    {center.address}
+                    <SpeakableText>{center.address}</SpeakableText>
                   </Typography>
 
                   <Link
@@ -470,13 +505,13 @@ const SkillCenter = ({
                     target="_blank"
                     rel="noopener noreferrer"
                     sx={{
-                      color: '#0066CC',
+                      color: '#0D599E',
                       textDecoration: 'none',
                       fontWeight: 500,
                       display: 'flex',
                       alignItems: 'center',
                       gap: 0.5,
-                      fontSize: '14px',
+                      fontSize: '16px',
                       '&:hover': {
                         color: '#004C99',
                       },
