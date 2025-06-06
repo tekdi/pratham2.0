@@ -148,87 +148,64 @@ const BasicsCard = ({
   card: any;
   index: number;
   onClick: (id: number) => void;
-}) => {
-  return (
-    <Grid item xs={12} sm={6} md={4} key={card.id}>
-      <Card
+}) => (
+  <Grid item xs={12} sm={6} md={4} key={card.id}>
+    <Card
+      onClick={() => onClick(card.id)}
+      sx={{
+        backgroundColor: '#fff',
+        position: 'relative',
+      }}
+    >
+      <CardContent
         sx={{
-          backgroundColor: card.backgroundColor,
-          borderRadius: '20px',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
-          overflow: 'hidden',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: 3,
           position: 'relative',
-          height: '350px',
-          border: '3px solid white',
-          maxWidth: '300px',
-          margin: '0 auto',
+          zIndex: 1,
         }}
       >
-        {/* Main Illustration Area */}
-        <Box
+        <Box sx={{ margin: '8px' }}>
+          <img height={'200px'} src={card.image} alt="" />
+        </Box>
+        {/* Title */}
+        <Typography
+          variant="h6"
           sx={{
-            height: '200px',
-
-            position: 'relative',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        ></Box>
-
-        <CardContent
-          sx={{
-            height: '150px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            padding: 2,
+            fontWeight: 'bold',
+            textAlign: 'center',
+            color: '#2C3E50',
+            fontSize: '18px',
+            letterSpacing: '1px',
+            lineHeight: 1.2,
+            mt: 2,
+            mb: 2,
           }}
         >
-          {/* Title */}
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 'bold',
-              textAlign: 'center',
-              color: '#2C3E50',
-              fontSize: '14px',
-              letterSpacing: '0.5px',
-              lineHeight: 1.1,
-              mb: 1,
-            }}
-          >
-            {card.title}
-          </Typography>
+          {card.title}
+        </Typography>
 
-          {/* Explore Button */}
-          <Button
-            variant="contained"
-            endIcon={<ArrowForwardIcon />}
-            onClick={() => onClick(card.id)}
-            sx={{
-              backgroundColor: '#29B6F6',
-              color: 'white',
-              fontWeight: 'bold',
-              borderRadius: '20px',
-              padding: '8px 20px',
-              textTransform: 'none',
-              fontSize: '14px',
-              alignSelf: 'center',
-              '&:hover': {
-                backgroundColor: '#1976D2',
-                transform: 'translateY(-1px)',
-              },
-              transition: 'all 0.3s ease',
-            }}
-          >
-            {card.subtitle}
-          </Button>
-        </CardContent>
-      </Card>
-    </Grid>
-  );
-};
+        {/* Explore Button */}
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            width: '100%',
+          }}
+        >
+          <Box>{card.subtitle}</Box>
+          <Box>
+            <img height={'20px'} src={'/images/arrow.png'} alt="" />
+          </Box>
+        </Box>
+      </CardContent>
+    </Card>
+  </Grid>
+);
 
 // Reusable Grid Container
 const CardGrid = ({ children }: { children: React.ReactNode }) => (
@@ -266,49 +243,37 @@ const ThemanticCard = () => {
       id: 1,
       title: 'ENERGY OUR INVISIBLE COMPANION',
       subtitle: 'Explore',
-      backgroundColor: '#E8F4FD',
-      illustration: 'running-person',
-      icons: ['🌊', '⚡', '🏠', '🔋'],
+      image: '/images/Basics_of_energ.png',
     },
     {
       id: 2,
       title: 'DID YOU WORK TODAY?',
       subtitle: 'Explore',
-      backgroundColor: '#E8F4FD',
-      illustration: 'car-boat',
-      icons: ['👨', '🐴', '🚗', '⛵'],
+      image: '/images/Basics_of_energ.png',
     },
     {
       id: 3,
       title: 'RENEWABLE ENERGY: INFINITE SOURCES OF ENERGY',
       subtitle: 'Explore',
-      backgroundColor: '#E8F4FD',
-      illustration: 'wind-farm',
-      icons: ['💨', '🏭', '🏠', '⚡'],
+      image: '/images/Basics_of_energ.png',
     },
     {
       id: 4,
       title: 'NON-RENEWABLE ENERGY: LIMITED SOURCES OF ENERGY',
       subtitle: 'Explore',
-      backgroundColor: '#E8F4FD',
-      illustration: 'power-plant',
-      icons: ['🔥', '🏭', '⛽', '☢️'],
+      image: '/images/Basics_of_energ.png',
     },
     {
       id: 5,
       title: 'HARNESSING SOLAR ENERGY: MAKING A SIMPLE SOLAR COOKER',
       subtitle: 'Explore',
-      backgroundColor: '#E8F4FD',
-      illustration: 'solar-cooking',
-      icons: ['☀️', '🍳', '👩‍🍳', '📚'],
+      image: '/images/Basics_of_energ.png',
     },
     {
       id: 6,
       title: 'FROM REST TO MOTION: ENERGY EVERYWHERE',
       subtitle: 'Explore',
-      backgroundColor: '#E8F4FD',
-      illustration: 'energy-motion',
-      icons: ['🏹', '⚖️', '🎯', '📐'],
+      image: '/images/Basics_of_energ.png',
     },
   ];
 
@@ -377,7 +342,7 @@ const ThemanticCard = () => {
   const renderBasicsOfEnergyView = () => (
     <>
       <CustomBreadcrumbs items={getBreadcrumbItems()} />
-      <Grid container spacing={3} justifyContent="center">
+      <CardGrid>
         {basicsOfEnergyCards.map((card, index) => (
           <BasicsCard
             key={card.id}
@@ -386,7 +351,7 @@ const ThemanticCard = () => {
             onClick={handleBasicsCardClick}
           />
         ))}
-      </Grid>
+      </CardGrid>
     </>
   );
 
@@ -623,7 +588,6 @@ const ThemanticCard = () => {
         backgroundRepeat: 'no-repeat',
         padding: { xs: 2, md: 4 },
         position: 'relative',
-        minHeight: '100vh',
         '&::before': {
           content: '""',
           position: 'absolute',

@@ -12,6 +12,8 @@ import { red } from '@mui/material/colors';
 import { Box, LinearProgress, useTheme } from '@mui/material';
 import { CircularProgressWithLabel } from '../Progress/CircularProgressWithLabel';
 import SpeakableText from '../textToSpeech/SpeakableText';
+import { useTranslation } from '../context/LanguageContext';
+
 export interface ContentItem {
   name: string;
   gradeLevel: string[];
@@ -26,6 +28,7 @@ export interface ContentItem {
   leafNodes?: [{}];
   children: [{}];
 }
+
 interface CommonCardProps {
   title: string;
   avatarLetter?: string;
@@ -50,6 +53,7 @@ interface StatuPorps {
   status?: string;
   type?: string;
 }
+
 export const getLeafNodes = (node: any) => {
   const result = [];
 
@@ -87,6 +91,8 @@ export const CommonCard: React.FC<CommonCardProps> = ({
   _card,
 }) => {
   const [statusBar, setStatusBar] = React.useState<StatuPorps>();
+  const { t } = useTranslation();
+
   React.useEffect(() => {
     const init = () => {
       try {
@@ -97,12 +103,12 @@ export const CommonCard: React.FC<CommonCardProps> = ({
             type,
             status:
               result?.status?.toLowerCase() === 'completed'
-                ? 'Completed'
+                ? t('COMMON.STATUS.completed')
                 : result?.status?.toLowerCase() === 'in progress'
-                ? 'In Progress'
+                ? t('COMMON.STATUS.in_progress')
                 : result?.enrolled === true
-                ? 'Enrolled, not started'
-                : 'Not Started',
+                ? t('COMMON.STATUS.enrolled_not_started')
+                : t('COMMON.STATUS.not_started'),
           };
           if (type === 'Course') {
             if (!_card?.isHideProgress) {
@@ -122,7 +128,7 @@ export const CommonCard: React.FC<CommonCardProps> = ({
       }
     };
     init();
-  }, [TrackData, item, type, _card?.isHideProgress]);
+  }, [TrackData, item, type, _card?.isHideProgress, t]);
 
   return (
     <Card
