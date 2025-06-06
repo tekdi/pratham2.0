@@ -258,13 +258,6 @@ const RegisterUser = () => {
   }, [verificationSuccessModal]);
   const handleCreateAccount = async () => {
     try {
-      console.log('Username:', username);
-      console.log('Username:', formData);
-      console.log('Username:', payload);
-
-      console.log('Password:', password);
-      console.log('Confirm Password:', confirmPassword);
-      console.log('Confirm Password:', confirmPassword);
       const localPayload = localStorage.getItem('localPayload');
       if (localPayload && tenantId) {
         const payloadData = JSON.parse(
@@ -475,10 +468,6 @@ const RegisterUser = () => {
 
     try {
       if (username && password) {
-        console.log('hii');
-
-        console.log('hello');
-
         const response = await login({ username, password });
         if (response?.result?.access_token) {
           if (typeof window !== 'undefined' && window.localStorage) {
@@ -657,7 +646,9 @@ const RegisterUser = () => {
                 textAlign: 'center',
               }}
             >
-              Sign Up for {tenantName}
+              {t('LEARNER_APP.REGISTRATION.SIGN_UP_FOR')}
+
+              {tenantName}
             </Typography>
 
             <Typography
@@ -671,17 +662,19 @@ const RegisterUser = () => {
                 p: '5px',
               }}
             >
-              Get vocational training to land
+              {t('LEARNER_APP.REGISTRATION.GET_VOCATIONAL_TRAINING_TO_LAND')}
               <Box
                 component="br"
                 sx={{ display: { xs: 'block', sm: 'none' } }}
               />
-              an entry level job with 2 months of
+              {t(
+                'LEARNER_APP.REGISTRATION.AN_ENTRY_LEVEL_JOB_WITH_2_MONTHS_OF'
+              )}
               <Box
                 component="br"
                 sx={{ display: { xs: 'block', sm: 'none' } }}
               />
-              training
+              {t('LEARNER_APP.REGISTRATION.TRAINING')}
             </Typography>
 
             <Typography
@@ -696,14 +689,14 @@ const RegisterUser = () => {
                 textAlign: 'center',
               }}
             >
-              Already signed up?{' '}
+              {t('LEARNER_APP.REGISTRATION.ALREADY_SIGNED_UP')}
               <Link
                 href="/login"
                 underline="hover"
                 color="secondary"
                 sx={{ fontWeight: '500' }}
               >
-                Click here to login
+                {t('LEARNER_APP.REGISTRATION.CLICK_HERE_TO_LOGIN')}
               </Link>
             </Typography>
           </Box>
@@ -727,7 +720,7 @@ const RegisterUser = () => {
             <Box display="flex" alignItems="center" gap={1} mb={2}>
               <Image src={face} alt="Step Icon" />
               <Typography fontWeight={600}>
-                1/2 Tell us about yourself
+                {t('LEARNER_APP.REGISTRATION.TELL_US_ABOUT_YOURSELF')}
               </Typography>
             </Box>
 
@@ -776,7 +769,7 @@ const RegisterUser = () => {
               form="dynamic-form-id"
               type="submit"
             >
-              Continue
+              {t('LEARNER_APP.REGISTRATION.CONTINUE')}
             </Button>
           </Box>
         </>
@@ -847,7 +840,7 @@ const RegisterUser = () => {
         primaryText={'Okay'}
         primaryActionHandler={renderHomePage}
       >
-        <Box p="10px">Invalid Link</Box>
+        <Box p="10px">{t('LEARNER_APP.REGISTRATION.INVALID_LINK')}</Box>
       </SimpleModal>
     </Box>
   );

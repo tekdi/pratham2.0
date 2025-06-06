@@ -22,6 +22,10 @@ import {
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useRouter } from 'next/navigation';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
+import { fetchForm, searchListData } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
+import { CohortSearchSchema, CohortSearchUISchema } from '../CohortSearch';
+import { FormContext } from '@shared-lib-v2/DynamicForm/components/DynamicFormConstant';
 
 interface Center {
   name: string;
@@ -108,6 +112,47 @@ const SkillCenter = ({
   const [loading, setLoading] = useState(true);
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+   const [schema, setSchema] = useState(CohortSearchSchema);
+  const [uiSchema, setUiSchema] = useState(CohortSearchUISchema);
+    const [prefilledFormData, setPrefilledFormData] = useState<any>(null);
+   const [isLoading, setIsLoading] = useState(false);
+  
+  const [addSchema, setAddSchema] = useState(null);
+  const [addUiSchema, setAddUiSchema] = useState(null);
+  const [prefilledAddFormData, setPrefilledAddFormData] = useState({});
+  const [pageLimit, setPageLimit] = useState<number>(10);
+  const [pageOffset, setPageOffset] = useState<number>(0);
+ 
+  const [response, setResponse] = useState<any>(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [openModal, setOpenModal] = React.useState<boolean>(false);
+  const [isEdit, setIsEdit] = useState(false);
+  const [editableUserId, setEditableUserId] = useState('');
+    const [visibleCenters, setVisibleCenters] = useState<any>([]);
+
+  const [cohortId, setCohortId] = useState('');
+  const [tenantId, setTenantId] = useState('');
+  const [open, setOpen] = useState(false);
+  const [firstName, setFirstName] = useState('');
+  const [totalCount, setTotalCount] = useState(0);
+  const [totalCountBatch, setTotalCountBatch] = useState(0);
+    const searchStoreKey = 'centers';
+
+ const initialFormDataSearch =
+  typeof window !== 'undefined' && typeof localStorage !== 'undefined'
+    ? localStorage.getItem(searchStoreKey) && localStorage.getItem(searchStoreKey) !== '{}'
+      ? JSON.parse(localStorage.getItem(searchStoreKey) || '')
+      : localStorage.getItem('stateId')
+      ? { state: [localStorage.getItem('stateId')] }
+      : {}
+    : {};
+
+useEffect(() => {
+    // Fetch form schema from API and set it in state.
+      
+    setPrefilledFormData(initialFormDataSearch);
+  }, [initialFormDataSearch]);
+  console.log("predfilledformdata", prefilledFormData)
   const limit = 10;
 
   const fetchCenters = async (currentOffset: number) => {
@@ -153,47 +198,54 @@ const SkillCenter = ({
       const blockId = blockField?.selectedValues[0]?.id;
       const villageId = villageField?.selectedValues[0]?.id;
 
-      console.log(
-        stateId,
-        districtId,
-        blockId,
-        villageId,
-        'stateId, districtId, blockId, villageId'
-      );
+      console.log(stateId, districtId, blockId, villageId, 'stateId, districtId, blockId, villageId');
+      
+      // const response = await searchCohort({
+      //   limit: limit,
+      //   offset: currentOffset,
+      //   filters: {
+      //     state: stateId,
+      //     district: districtId,
+      //     block: blockId,
+      //     village: villageId,
+      //   },
+      // });
+      // console.log("searchdata", response)
+ 
+    
 
-      const response = await searchCohort({
-        limit: limit,
-        offset: currentOffset,
-        filters: {
-          state: stateId,
-          district: districtId,
-          block: blockId,
-          village: villageId,
-        },
-      });
-      if (response?.result?.results?.cohortDetails) {
-        const apiCenters: Center[] = response.result.results.cohortDetails.map(
-          (cohort: CohortDetails) => ({
-            name: cohort.name,
-            category: getIndustryValues(cohort)[0] || 'General',
-            address:
-              getCustomFieldValue(cohort, 'ADDRESS') || 'Address not available',
-            distance: '0 km',
-            mapsUrl: getCustomFieldValue(cohort, 'GOOGLE_MAP_LINK') || '#',
-            images: cohort.image || ['/images/default.png'],
-            moreImages: cohort.image?.length > 3 ? cohort.image.length - 3 : 0,
-          })
-        );
+      if (response?.result.result.results?.cohortDetails) {
+        const apiCenters: Center[] = response.result.result.results.cohortDetails.map((cohort: CohortDetails) => ({
+          name: cohort.name,
+          category: getIndustryValues(cohort)[0] || 'General',
+          address: getCustomFieldValue(cohort, 'ADDRESS') || 'Address not available',
+          distance: '0 km',
+          mapsUrl: getCustomFieldValue(cohort, 'GOOGLE_MAP_LINK') || '#',
+          images: cohort.image || ['/images/default.png'],
+          moreImages: cohort.image?.length > 3 ? cohort.image.length - 3 : 0,
+        }));
 
         if (currentOffset === 0) {
           setCenters(apiCenters);
+            const visibleCenters = viewAll ? apiCenters : apiCenters.slice(0, Limit);
+            setVisibleCenters(visibleCenters)
+
         } else {
-          setCenters((prev) => [...prev, ...apiCenters]);
+          const r: any=((prev: any) => [...prev, ...apiCenters])
+                      const visibleCenters = viewAll ? r : r.slice(0, Limit);
+                      setVisibleCenters(visibleCenters)
+
+          setCenters(prev => [...prev, ...apiCenters]);
         }
 
         setHasMore(apiCenters.length === limit);
       }
+      else{
+              setVisibleCenters([])
+
+      }
     } catch (error) {
+      setVisibleCenters([])
       console.error('Failed to fetch centers:', error);
     } finally {
       setLoading(false);
@@ -202,7 +254,8 @@ const SkillCenter = ({
 
   useEffect(() => {
     fetchCenters(0);
-  }, []);
+    console.log("response", response)
+  }, [response]);
 
   const handleLoadMore = () => {
     const newOffset = offset + limit;
@@ -210,8 +263,9 @@ const SkillCenter = ({
     fetchCenters(newOffset);
   };
 
-  const visibleCenters = viewAll ? centers : centers.slice(0, Limit);
-
+ 
+    
+      console.log("Youth@16",visibleCenters)
   if (loading && centers.length === 0) {
     return (
       <Box sx={{ p: 3 }}>
@@ -219,7 +273,47 @@ const SkillCenter = ({
       </Box>
     );
   }
+ 
 
+  const updatedUiSchema = {
+    ...uiSchema,
+    'ui:submitButtonOptions': {
+      norender: true, // Hide submit button if isHide is true
+    },
+  };
+    const SubmitaFunction = async (formData: any) => {
+    // console.log("###### debug issue formData", formData)
+    if (formData && Object.keys(formData).length > 0) {
+      setPrefilledFormData(formData);
+      //set prefilled search data on refresh
+      localStorage.setItem(searchStoreKey, JSON.stringify(formData));
+      await searchData(formData, 0);
+    }
+  };
+ const searchData = async (formData: any, newPage: any) => {
+    if (formData) {
+      formData = Object.fromEntries(
+        Object.entries(formData).filter(
+          ([_, value]) => !Array.isArray(value) || value.length > 0
+        )
+      );
+      const staticFilter = { type: 'COHORT' };
+      const { sortBy } = formData;
+      const staticSort = ['name', sortBy || 'asc'];
+      await searchListData(
+        formData,
+        newPage,
+        staticFilter,
+        pageLimit,
+        setPageOffset,
+        setCurrentPage,
+        setResponse,
+        searchCohort,
+        staticSort
+      );
+    }
+  };
+console.log("searchData",response)
   return (
     <Box sx={{ p: 3 }}>
       <Box
@@ -279,8 +373,19 @@ const SkillCenter = ({
         )}
       </Box>
 
-      <Grid container spacing={3}>
-        {visibleCenters.map((center, idx) => (
+          {schema &&
+          uiSchema && (
+            <DynamicForm
+              schema={schema}
+              uiSchema={updatedUiSchema}
+              SubmitaFunction={SubmitaFunction}
+              isCallSubmitInHandle={true}
+              prefilledFormData={prefilledFormData}
+            />
+          )
+        }
+      <Grid container spacing={3} marginTop={"80px"}>
+        {visibleCenters?.map((center: any, idx: any) => (
           <Grid item xs={12} sm={6} md={4} key={idx}>
             <Card
               sx={{
@@ -296,7 +401,7 @@ const SkillCenter = ({
             >
               <CardContent sx={{ p: 0 }}>
                 <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-                  {center.images.slice(0, 3).map((img, i) => (
+                  {center.images.slice(0, 3).map((img: any, i: any) => (
                     <ImageContainer key={i}>
                       <img src={img} alt={`${center.name} view ${i + 1}`} />
                       {i === 2 && center.moreImages > 0 && (
