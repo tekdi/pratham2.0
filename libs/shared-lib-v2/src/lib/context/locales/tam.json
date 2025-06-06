@@ -100,6 +100,11 @@
     "ENROLL_NOW": "ఇప్పుడే నమోదు అవ్వండి",
     "GO_TO_MY_PROFILE": "నా ప్రొఫైల్ కు వెళ్ళండి",
     "WHAT_YOU_LL_LEARN": "మీరు ఏమి నేర్చుకుంటారు",
+    "VIEW_ALL": "ముందుకు వెళ్లండి",
+    "NO_DATA_FOUND": "ఏదీ కనుగొనిస్తాము",
+    "LOAD_MORE": "మరింత చూపించు",
+    "SKILLING_CENTERS": "ద్వారా ఫిల్టర్ చేయండి",
+    "SKILLING_CENTERS_NEAR_YOU": "మీ నుండి దూరంలో ఉన్న ద్వారా ఫిల్టర్ చేయండి",
     "STATUS": {
       "completed": "పూర్తయింది",
       "in_progress": "ప్రగతిలో ఉంది",
