@@ -19,6 +19,7 @@ interface InfoCardProps {
   topic?: string;
   onBackClick?: () => void;
   _config?: any;
+  checkLocalAuth?: boolean;
 }
 
 const InfoCard: React.FC<InfoCardProps> = ({
@@ -26,6 +27,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
   topic,
   onBackClick,
   _config,
+  checkLocalAuth,
 }) => {
   const { t } = useTranslation();
   const { _infoCard } = _config || {};
@@ -225,7 +227,9 @@ const InfoCard: React.FC<InfoCardProps> = ({
               mb: 1,
             }}
           >
-            <SpeakableText>Awesome!</SpeakableText>
+            <SpeakableText>
+              {checkLocalAuth ? 'Awesome!' : 'Login First'}
+            </SpeakableText>
           </Typography>
           <Typography
             variant="body1"
@@ -240,7 +244,11 @@ const InfoCard: React.FC<InfoCardProps> = ({
               color: '#1F1B13',
             }}
           >
-            <SpeakableText>You are now enrolled to the course!</SpeakableText>
+            <SpeakableText>
+              {checkLocalAuth
+                ? 'You are now enrolled to the course!'
+                : 'you need to login first'}
+            </SpeakableText>
           </Typography>
         </Box>
       </CommonModal>
