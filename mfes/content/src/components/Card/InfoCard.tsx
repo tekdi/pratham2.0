@@ -96,7 +96,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
             <Typography
               component="div"
               // @ts-ignore
-              variant="body6"
+              variant="body8"
               title={item?.name}
               sx={{
                 fontWeight: 700,
@@ -104,7 +104,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
                 // lineHeight: { xs: '28px', sm: '32px', md: '44px' },
                 lineHeight: 1.5,
                 display: '-webkit-box',
-                WebkitLineClamp: 1,
+                WebkitLineClamp: 2,
                 WebkitBoxOrient: 'vertical',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
