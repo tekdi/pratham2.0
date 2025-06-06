@@ -111,7 +111,7 @@ const MoreWayCarousel = () => {
                     <img src="/images/playstoreIcon.png" alt="Play Store" />
 
                     <Button
-                      href="https://play.google.com/store"
+                      href="https://play.google.com/store/apps/details?id=com.pratham.learning"
                       target="_blank"
                       endIcon={<ArrowForwardIcon />}
                       sx={{
@@ -120,10 +120,13 @@ const MoreWayCarousel = () => {
                         fontWeight: 500,
                         fontSize: 18,
                         lineHeight: '24px',
+                        cursor: 'pointer',
                         letterSpacing: 0.15,
                       }}
                     >
-                      <SpeakableText>Get it from Play Store Now!</SpeakableText>
+                      <SpeakableText cursor={true}>
+                        Get it from Play Store Now!
+                      </SpeakableText>
                     </Button>
                   </Box>
                 </Box>
@@ -167,11 +170,12 @@ const MoreWayCarousel = () => {
                       justifyContent: 'center',
                       mt: 2,
                       width: '100%',
+                      cursor: 'pointer',
                     }}
                   >
                     <img src="/images/playstoreIcon.png" alt="Play Store" />
                     <Button
-                      href="https://play.google.com/store"
+                      href="https://play.google.com/store/apps/details?id=com.pratham.learning"
                       target="_blank"
                       endIcon={<ArrowForwardIcon />}
                       sx={{
@@ -186,7 +190,9 @@ const MoreWayCarousel = () => {
                         },
                       }}
                     >
-                      <SpeakableText>Get it from Play Store Now!</SpeakableText>
+                      <SpeakableText cursor={true}>
+                        Get it from Play Store Now!
+                      </SpeakableText>
                     </Button>
                   </Box>
                 </Box>
