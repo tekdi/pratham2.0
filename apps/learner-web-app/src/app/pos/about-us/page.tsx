@@ -8,67 +8,11 @@ import Image from 'next/image';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 
 const AboutUsPage = () => {
-  const keyThemesList = [
-    [
-      {
-        title: 'Academics',
-        desc: 'Math, Science, English...',
-      },
-      {
-        title: 'Growth & Learning',
-        desc: 'Activity Videos, Stories, Riddles...',
-      },
-      {
-        title: 'Media Moments',
-        desc: 'TV Episodes, Podcasts...',
-      },
-      {
-        title: 'Inclusive Education',
-        desc: 'Innovative Strategies, Subject-specific...',
-      },
-    ],
-    [
-      {
-        title: 'Career Skills',
-        desc: 'Resume, Interview, Communication...',
-      },
-      {
-        title: 'Entrepreneurship',
-        desc: 'Startups, Business Ideas, Finance...',
-      },
-      {
-        title: 'Digital Literacy',
-        desc: 'Computers, Internet, Safety...',
-      },
-      {
-        title: 'Professional Growth',
-        desc: 'Leadership, Teamwork, Projects...',
-      },
-    ],
-    [
-      {
-        title: 'Life Skills',
-        desc: 'Critical Thinking, Problem Solving...',
-      },
-      {
-        title: 'Health & Wellness',
-        desc: 'Nutrition, Exercise, Mindfulness...',
-      },
-      {
-        title: 'Civic Awareness',
-        desc: 'Rights, Responsibilities, Community...',
-      },
-      {
-        title: 'Creativity',
-        desc: 'Art, Music, Innovation...',
-      },
-    ],
-  ];
   const descriptions = [
     [
       {
         cardDesc:
-          'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
+          "Learning for School focuses on scholastic subjects, which include early years education and learning to read, write, and think. These skills are crucial for building children's confidence and dignity among their peers.",
       },
       'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
       'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
@@ -76,7 +20,7 @@ const AboutUsPage = () => {
     [
       {
         cardDesc:
-          'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
+          'Learning for Work equips adolescents and youth with the skills and knowledge needed for employment and livelihoods.',
       },
       'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
       ' Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
@@ -84,7 +28,7 @@ const AboutUsPage = () => {
     [
       {
         cardDesc:
-          'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
+          'Learning for Life encompasses skills and knowledge that are a part of lifelong learning like transferable skills, interests, hobbies, and creativity. These also include life skills but are not limited to them.  It emphasises environmental awareness, physical and mental well-being, and extends learning beyond scholastic subjects.',
       },
       'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
       'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
@@ -287,7 +231,6 @@ const AboutUsPage = () => {
 
           <Box sx={{ mt: 6 }}>
             <Learning
-              data={keyThemesList}
               descriptions={descriptions}
               aboutDescriptionStyle={true}
             />
