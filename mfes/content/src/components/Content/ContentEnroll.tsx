@@ -31,6 +31,8 @@ interface ContentDetailsProps {
 }
 
 const ContentDetails = (props: ContentDetailsProps) => {
+  const [checkLocalAuth, setCheckLocalAuth] = useState(false);
+
   const router = useRouter();
   const params = useParams();
   const identifier = props.id ?? params?.identifier; // string | string[] | undefined
@@ -51,6 +53,7 @@ const ContentDetails = (props: ContentDetailsProps) => {
       try {
         const result = await hierarchyAPI(identifier as string);
         const userId = getUserId(props?._config?.userIdLocalstorageName);
+        setCheckLocalAuth(checkAuth(Boolean(userId)));
         if (checkAuth(Boolean(userId))) {
           const data = await getUserCertificateStatus({
             userId: userId as string,
@@ -129,6 +132,7 @@ const ContentDetails = (props: ContentDetailsProps) => {
         topic={contentDetails?.se_subjects?.join(',')}
         onBackClick={onBackClick}
         _config={{ onButtonClick: handleClick, ...props?._config }}
+        checkLocalAuth={checkLocalAuth}
       />
       <Box sx={{ display: 'flex' }}>
         <Box
