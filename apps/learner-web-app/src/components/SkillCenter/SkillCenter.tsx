@@ -345,15 +345,13 @@ const handleLoadMore = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 sx={{
-                  color: '#0066CC',
-                  textDecoration: 'none',
-                  fontWeight: 500,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 0.5,
-                  fontSize: '14px',
+                  height: '100%',
+                  borderRadius: 3,
+                  boxShadow: 'unset',
                   '&:hover': {
-                    color: '#004C99',
+                    boxShadow: 'unset',
+                    transform: 'translateY(-2px)',
+                    transition: 'all 0.3s ease',
                   },
                 }}
               >

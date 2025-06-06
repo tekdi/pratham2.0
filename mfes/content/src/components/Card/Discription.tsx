@@ -13,9 +13,7 @@ const Dispription = () => {
           letterSpacing: '0.48px',
         }}
       >
-        No description but
-        <br />
-        plenty to explore
+        No description available but plenty to explore
       </Typography>
       <SentimentSatisfiedIcon style={{ fontSize: 20, color: 'grey' }} />
     </Box>
