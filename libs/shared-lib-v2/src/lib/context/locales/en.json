@@ -4,7 +4,7 @@
   "HINDI": "Hindi",
   "MARATHI": "Marathi",
   "URDU": "Urdu",
-   "UNIT_NAME": "Unit Name",
+  "UNIT_NAME": "Unit Name",
   "TYPE_OF_CENTER": "Type Of Center",
   "GOOGLE MAP_LINK": "Google Map Link",
   "MY_MAIN_SUBJECTS": "Main subjects",
@@ -30,7 +30,7 @@
   "ADDRESS": " Address",
   "DOB": "Date of Birth",
   "SUBJECT": "Subject",
-   "SELF_PLACED": "Self Placed",
+  "SELF_PLACED": "Self Placed",
   "Male": "Male",
   "Female": "Female",
   "Transgender": "Transgender",
@@ -46,7 +46,7 @@
   "Life Skills": "Life Skills",
   "Smartphone": "Smartphone",
   "Keypad": "Keypad",
-   "SCHOOL_INACCESSIBLE": "School inaccessible",
+  "SCHOOL_INACCESSIBLE": "School inaccessible",
   "FINANCIAL_CONSTRAINTS": "Financial Constraints",
   "LACK_OF_INTEREST": "Lack of Interest",
   "FAMILY_RESPONSIBILITIES": "Family responsibilities",
@@ -91,13 +91,15 @@
     "SURE_LOGOUT": "Are you sure you want to Logout?",
     "LOGOUT": "Logout",
     "LOADING": "Loading..",
-    "FAQS":"FAQ's",
-    "SHOW_MORE":"Show more ▼",
-    "SHOW_LESS":"Show less ▲",
-    "FILTER":"Filter",
-    "ENROLL_NOW":"Enroll Now",
-    "GO_TO_MY_PROFILE":"Go to My Profile",
-    "WHAT_YOU_LL_LEARN":"What You'll Learn",
+    "FAQS": "FAQ's",
+    "SHOW_MORE": "Show more ▼",
+    "SHOW_LESS": "Show less ▲",
+    "READ_MORE": "Read more ▼",
+    "READ_LESS": "Read less ▲",
+    "FILTER": "Filter",
+    "ENROLL_NOW": "Enroll Now",
+    "GO_TO_MY_PROFILE": "Go to My Profile",
+    "WHAT_YOU_LL_LEARN": "What You'll Learn",
     "STATUS": {
       "completed": "Completed",
       "in_progress": "In Progress",
@@ -110,7 +112,7 @@
       "MESSAGE": "Complete your profile so we can guide you better on your learning journey",
       "BUTTON": "Complete Profile"
     },
-      "EDIT_PROFILE": {
+    "EDIT_PROFILE": {
       "TITLE": "Edit Profile",
       "COMPLETE_PROFILE_TITLE": "Complete Your Profile",
       "BACKGROUND_HELP_TEXT": "Help us with your background & other details",
@@ -139,7 +141,8 @@
       "STARTED_ON": "Started on",
       "GET_STARTED": "Get Started with L1 Courses",
       "FILTER_BY": "Filter by",
-      "CLEAR_FILTER": "Clear Filter"
+      "CLEAR_FILTER": "Clear Filter",
+      "APPLY_FILTER": "Apply Filter"
     },
     "EXPLORE": {
       "EXPLORE_ADDITIONAL_COURSES": "Explore Additional Courses"
@@ -469,7 +472,7 @@
     "TYPE_OF_COHORT": "Type Of Center",
     "UNIT_NAME": "Unit Name",
     "SUBJECTS_I_TEACH": "Subject I Teach",
-    "MY_MAIN_SUBJECTS": "Main subjects", 
+    "MY_MAIN_SUBJECTS": "Main subjects",
     "NUMBER_OF_CLUSTERS_I_TEACH": "Number of cluster",
     "DESIGNATION": "Designation",
     "REGULAR": "Regular",
@@ -537,7 +540,7 @@
     "STATE_NAME": "State Name",
     "SUPPORT_NEEDED": "Support needed",
     "CLASS": "Class (Last passed grade)",
-       "PRIMARY_WORK": "Learner's Primary Work",
+    "PRIMARY_WORK": "Learner's Primary Work",
     "MOBILISATION_METHOD": "How Was the Learner Mobilized?",
     "MONTH_MOBILISATION": "Month of Mobilisation",
     "DROP_OUT_REASON": "Reason for Drop Out From School"

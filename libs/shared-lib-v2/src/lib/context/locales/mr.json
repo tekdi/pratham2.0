@@ -94,6 +94,8 @@
     "FAQS": "वारंवार विचारले जाणारे प्रश्न",
     "SHOW_MORE": "अधिक दर्शवा ▼",
     "SHOW_LESS": "कमी दर्शवा ▲",
+    "READ_MORE": "अधिक वाचा ▼",
+    "READ_LESS": "कमी वाचा ▲",
     "FILTER": "फिल्टर",
     "ENROLL_NOW": "आता नावनोंद करा",
     "GO_TO_MY_PROFILE": "माझ्या प्रोफाइलवर जा",
@@ -139,7 +141,8 @@
       "STARTED_ON": "सुरू झाले",
       "GET_STARTED": "L1 अभ्यासक्रम सुरू करा",
       "FILTER_BY": "द्वारे फिल्टर करा",
-      "CLEAR_FILTER": "फिल्टर साफ करा"
+      "CLEAR_FILTER": "फिल्टर साफ करा",
+      "APPLY_FILTER": "फिल्टर लागू करा"
     },
     "EXPLORE": {
       "EXPLORE_ADDITIONAL_COURSES": "अतिरिक्त अभ्यासक्रम पाहा"

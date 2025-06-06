@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback, memo, useRef } from 'react';
 import { Box, Typography, Button } from '@mui/material';
 import SpeakableText from '../textToSpeech/SpeakableText';
+import { capitalize } from 'lodash';
 import { useTranslation } from '../context/LanguageContext';
 
 type ExpandableTextProps = {
@@ -100,7 +101,6 @@ export const ExpandableText: React.FC<ExpandableTextProps> = memo(
           component="div"
           // {..._text}
           sx={{
-            textTransform: 'capitalize',
             color: '#1F1B13',
             whiteSpace: 'pre-wrap',
             fontWeight: '400',
@@ -116,7 +116,11 @@ export const ExpandableText: React.FC<ExpandableTextProps> = memo(
             // ..._text?.sx,
           }}
         >
-          <SpeakableText>{displayText}</SpeakableText>
+          <SpeakableText>
+            {displayText
+              ? capitalize(displayText.split(' ')[0]) + displayText.slice(1)
+              : ''}
+          </SpeakableText>
         </Typography>
 
         {showButton && (
@@ -138,9 +142,9 @@ export const ExpandableText: React.FC<ExpandableTextProps> = memo(
             }}
           >
             {isExpanded ? (
-              <SpeakableText>{t('COMMON.SHOW_LESS')}</SpeakableText>
+              <SpeakableText>{t('COMMON.READ_LESS')}</SpeakableText>
             ) : (
-              <SpeakableText>{t('COMMON.SHOW_MORE')}</SpeakableText>
+              <SpeakableText>{t('COMMON.READ_MORE')}</SpeakableText>
             )}
           </Button>
         )}
