@@ -114,6 +114,8 @@ export const profileComplitionCheck = async (): Promise<any> => {
       }
       const result = getMissingFields(responseForm?.schema, userData);
       console.log('result', result);
+      delete result?.properties?.is_volunteer;
+
       const isPropertiesEmpty = Object.keys(result.properties).length === 0;
       return isPropertiesEmpty;
     }
