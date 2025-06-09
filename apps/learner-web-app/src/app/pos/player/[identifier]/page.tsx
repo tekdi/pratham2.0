@@ -16,6 +16,7 @@ const App: React.FC = () => {
       userIdLocalstorageName="did"
       contentBaseUrl="/pos/content"
       isGenerateCertificate={false}
+      trackable={false}
     />
   );
 };

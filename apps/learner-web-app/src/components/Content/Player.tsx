@@ -24,10 +24,12 @@ const App = ({
   userIdLocalstorageName,
   contentBaseUrl,
   isGenerateCertificate,
+  trackable,
 }: {
   userIdLocalstorageName?: string;
   contentBaseUrl?: string;
   isGenerateCertificate?: boolean;
+  trackable?: boolean;
 }) => {
   const { t } = useTranslation();
   const router = useRouter();
@@ -153,6 +155,7 @@ const App = ({
         </Box>
         <PlayerBox
           isGenerateCertificate={isGenerateCertificate}
+          trackable={trackable}
           userIdLocalstorageName={userIdLocalstorageName}
           item={item}
           identifier={identifier}
@@ -218,6 +221,7 @@ const PlayerBox = ({
   unitId,
   userIdLocalstorageName,
   isGenerateCertificate,
+  trackable,
 }: any) => {
   const router = useRouter();
   const [play, setPlay] = useState(false);
@@ -283,6 +287,7 @@ const PlayerBox = ({
         <iframe
           name={JSON.stringify({
             isGenerateCertificate: isGenerateCertificate,
+            trackable: trackable,
           })}
           src={`${
             process.env.NEXT_PUBLIC_LEARNER_SBPLAYER
