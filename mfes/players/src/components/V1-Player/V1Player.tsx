@@ -4,7 +4,7 @@ import { getTelemetryEvents } from '../../services/TelemetryService';
 interface PlayerProps {
   playerConfig: any;
   relatedData?: any;
-  isGenerateCertificate?: boolean;
+  configFunctionality?: boolean;
 }
 
 const basePath = process.env.NEXT_PUBLIC_ASSETS_CONTENT || '/sbplayer';
@@ -12,7 +12,7 @@ const basePath = process.env.NEXT_PUBLIC_ASSETS_CONTENT || '/sbplayer';
 const V1Player = ({
   playerConfig,
   relatedData: { courseId, unitId, userId },
-  isGenerateCertificate,
+  configFunctionality,
 }: PlayerProps) => {
   const previewRef = useRef<HTMLIFrameElement | null>(null);
 
@@ -48,7 +48,7 @@ const V1Player = ({
                 courseId,
                 unitId,
                 userId,
-                isGenerateCertificate,
+                configFunctionality,
               });
             }
           );

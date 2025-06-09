@@ -176,7 +176,10 @@ export const CommonCard: React.FC<CommonCardProps> = ({
         )}
 
         {/* Progress Bar Overlay */}
-        <StatusBar {...statusBar} _card={_card} />
+        {/* Progress Bar Overlay */}
+        {!_card?.isHideProgressStatus && (
+          <StatusBar {...statusBar} _card={_card} />
+        )}
       </Box>
       {avatarLetter && subheader && (
         <CardHeader

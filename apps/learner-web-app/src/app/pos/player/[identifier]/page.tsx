@@ -15,7 +15,11 @@ const App: React.FC = () => {
     <Player
       userIdLocalstorageName="did"
       contentBaseUrl="/pos/content"
-      isGenerateCertificate={false}
+      _config={{
+        player: {
+          trackable: false,
+        },
+      }}
     />
   );
 };

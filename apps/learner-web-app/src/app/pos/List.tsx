@@ -20,7 +20,7 @@ export default function App({
   _content,
 }: Readonly<{
   _infoCard?: any;
-  pagename?: string;
+  pagename?: any;
   hideStaticFilter?: boolean;
   _content?: any;
 }>) {
@@ -34,10 +34,14 @@ export default function App({
   const [staticFilter, setStaticFilter] = useState<any>({});
 
   useEffect(() => {
-    if (!hideStaticFilter && pagename === 'Program') {
+    if (
+      !hideStaticFilter &&
+      (pagename?.['SCP'] || pagename?.['Vocational Training'])
+    ) {
       const program = searchParams?.get('program')?.split(',');
       setItem({
         ..._infoCard?.item,
+        name: `Learning for ${pagename?.[program?.[0] || 'SCP']}`,
         description: _infoCard?.item?.description?.[program?.[0] || 'SCP'],
       });
       if (program?.includes('Vocational Training')) {
@@ -88,7 +92,7 @@ export default function App({
     <Layout>
       <InfoCard
         item={{
-          name: `Learning for ${pagename}`,
+          name: typeof pagename === 'string' ? `Learning for ${pagename}` : '',
           description:
             'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
           ...(item || {}),
@@ -96,7 +100,10 @@ export default function App({
         _config={{
           ...(_infoCard?._config || {}),
           _infoCard: {
-            default_img: `/images/pos_${pagename?.toLowerCase()}.jpg`,
+            default_img:
+              typeof pagename === 'object'
+                ? `/images/pos_program.jpg`
+                : `/images/pos_${pagename?.toLowerCase()}.jpg`,
             isHideStatus: true,
             _textCard: { p: { md: '40px' } },
             _cardMedia: {
@@ -126,6 +133,7 @@ export default function App({
                 userIdLocalstorageName: 'did',
                 _card: {
                   isHideProgress: true,
+                  isHideProgressStatus: true,
                   isWrap: true,
                   _cardMedia: { sx: { height: '153px' } },
                 },

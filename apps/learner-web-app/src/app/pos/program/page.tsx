@@ -8,7 +8,10 @@ const List = dynamic(() => import('@learner/app/pos/List'), {
 export default function PosPage() {
   return (
     <List
-      pagename="Program"
+      pagename={{
+        SCP: 'second chance program',
+        'Vocational Training': 'YouthNet',
+      }}
       _content={{
         contentTabs: ['content'],
         isOpenColapsed: ['se_domains', 'se_subDomains', 'se_subjects'],
