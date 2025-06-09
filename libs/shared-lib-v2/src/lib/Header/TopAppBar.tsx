@@ -46,7 +46,7 @@ export interface AppBarProps {
   isColorInverted?: boolean;
 }
 
-const withoutQueryString = () => {
+export const withoutQueryString = () => {
   if (typeof window !== 'undefined') {
     const parsedUrl = new URL(window.location.href);
     return parsedUrl?.pathname + parsedUrl?.search;
