@@ -120,8 +120,7 @@ const Players: React.FC<SunbirdPlayerProps> = ({
             courseId={courseId as string}
             unitId={unitId as string}
             userId={userId as string}
-            isGenerateCertificate={isGenerateCertificate}
-            trackable={trackable}
+            configFunctionality={{ isGenerateCertificate, trackable }}
           />
         </Box>
       )}

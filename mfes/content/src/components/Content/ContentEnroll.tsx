@@ -55,30 +55,45 @@ const ContentDetails = (props: ContentDetailsProps) => {
         const result = await hierarchyAPI(identifier as string);
         const userId = getUserId(props?._config?.userIdLocalstorageName);
         setCheckLocalAuth(checkAuth(Boolean(userId)));
-        if (checkAuth(Boolean(userId))) {
-          const data = await getUserCertificateStatus({
-            userId: userId as string,
-            courseId: identifier as string,
-          });
-          if (
-            ['enrolled', 'inprogress', 'completed', 'viewCertificate'].includes(
-              data?.result?.status
-            )
-          ) {
-            if (props?.getIfEnrolled) {
-              props?.getIfEnrolled(result as unknown as ContentSearchResponse);
+        if (props?._config?.isEnrollmentRequired !== false) {
+          if (checkAuth(Boolean(userId))) {
+            const data = await getUserCertificateStatus({
+              userId: userId as string,
+              courseId: identifier as string,
+            });
+            if (
+              [
+                'enrolled',
+                'inprogress',
+                'completed',
+                'viewCertificate',
+              ].includes(data?.result?.status)
+            ) {
+              if (props?.getIfEnrolled) {
+                props?.getIfEnrolled(
+                  result as unknown as ContentSearchResponse
+                );
+              } else {
+                router.replace(
+                  `${
+                    props?._config?.contentBaseUrl ?? '/content'
+                  }/${identifier}${
+                    activeLink ? `?activeLink=${activeLink}` : ''
+                  }`
+                );
+              }
             } else {
-              router.replace(
-                `${props?._config?.contentBaseUrl ?? '/content'}/${identifier}${
-                  activeLink ? `?activeLink=${activeLink}` : ''
-                }`
-              );
+              setIsProgressCompleted(true);
             }
           } else {
             setIsProgressCompleted(true);
           }
         } else {
-          setIsProgressCompleted(true);
+          router.replace(
+            `${props?._config?.contentBaseUrl ?? '/content'}/${identifier}${
+              activeLink ? `?activeLink=${activeLink}` : ''
+            }`
+          );
         }
         setContentDetails(result as unknown as ContentSearchResponse);
       } catch (error) {

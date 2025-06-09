@@ -126,6 +126,7 @@ export default function App({
                 userIdLocalstorageName: 'did',
                 _card: {
                   isHideProgress: true,
+                  isHideProgressStatus: true,
                   isWrap: true,
                   _cardMedia: { sx: { height: '153px' } },
                 },
