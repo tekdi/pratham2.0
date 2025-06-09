@@ -173,7 +173,7 @@ export default function AccessibilityOptions() {
 
             <CloseIcon
               sx={{
-                color: '#1C1B1F',
+                color: isColorInverted ? '#fff' : '#1C1B1F',
                 cursor: 'pointer',
               }}
               onClick={toggleDrawer(false)}

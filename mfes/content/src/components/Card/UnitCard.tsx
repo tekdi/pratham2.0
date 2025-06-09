@@ -1,7 +1,9 @@
 import { CommonCard, ContentItem } from '@shared-lib';
 import { Box } from '@mui/material';
 import AppConst from '../../utils/AppConst/AppConst';
-import Dispription from './Discription';
+import Description from './Description';
+import { StatusIcon } from '../CommonCollapse';
+import { CardWrap } from './ContentCard';
 
 const UnitCard = ({
   item,
@@ -19,71 +21,45 @@ const UnitCard = ({
   handleCardClick: (content: ContentItem) => void;
 }) => {
   return (
-    <Box
-      sx={{
-        position: 'relative',
-        display: 'flex',
-        alignItems: 'center',
-        mt: '18px',
-      }}
-    >
-      <Box
-        sx={{
-          position: 'absolute',
-          top: -12,
-          zIndex: 0,
-          width: _card?.sx?.width ?? '100%',
-          px: 3,
+    <CardWrap isWrap>
+      <CommonCard
+        minheight="100%"
+        title={(item?.name || '').trim()}
+        image={
+          item?.posterImage
+            ? item?.posterImage
+            : default_img ?? `${AppConst.BASEPATH}/assests/images/image_ver.png`
+        }
+        content={item?.description ? item?.description : <Description />}
+        orientation="horizontal"
+        item={item}
+        TrackData={trackData}
+        type={type}
+        onClick={() => handleCardClick(item)}
+        _card={{
+          _contentParentText: { sx: { height: '156px' } },
+          _cardMedia: { sx: { maxHeight: '132px' } },
+          ..._card,
         }}
-      >
-        <Box
-          sx={{
-            backgroundColor: '#6D6D70',
-            height: '32px',
-            borderRadius: '10px',
-          }}
-        />
-      </Box>
-      <Box
-        sx={{
-          position: 'absolute',
-          top: -6,
-          zIndex: 0,
-          width: _card?.sx?.width ?? '100%',
-          px: 1.5,
-        }}
-      >
-        <Box
-          sx={{
-            backgroundColor: '#bebec0',
-            height: '32px',
-            borderRadius: '10px',
-          }}
-        />
-      </Box>
-      <Box sx={{ zIndex: 1, width: _card?.sx?.width ?? '100%' }}>
-        <CommonCard
-          minheight="100%"
-          title={(item?.name || '').trim()}
-          image={
-            item?.posterImage
-              ? item?.posterImage
-              : default_img ??
-                `${AppConst.BASEPATH}/assests/images/image_ver.png`
-          }
-          content={item?.description ? item?.description : <Dispription />}
-          orientation="horizontal"
-          item={item}
-          TrackData={trackData}
-          type={type}
-          onClick={() => handleCardClick(item)}
-          _card={{
-            _contentText: { sx: { height: '120px' } },
-            ..._card,
-          }}
-        />
-      </Box>
-    </Box>
+        actions={
+          <StatusIcon
+            showMimeTypeIcon
+            mimeType={'application/unit'}
+            _icon={{
+              isShowText: true,
+              _box: {
+                py: '7px',
+                px: '8px',
+                borderRadius: '10px',
+                borderWidth: '1px',
+                borderStyle: 'solid',
+                borderColor: '#79747E',
+              },
+            }}
+          />
+        }
+      />
+    </CardWrap>
   );
 };
 

@@ -7,7 +7,11 @@ import { Avatar, Box, Button, IconButton, Typography } from '@mui/material';
 import { useParams, useRouter } from 'next/navigation';
 // import { ContentSearch } from '@learner/utils/API/contentService';
 import { checkAuth } from '@shared-lib-v2/utils/AuthService';
-import { findCourseUnitPath, useTranslation } from '@shared-lib';
+import {
+  ExpandableText,
+  findCourseUnitPath,
+  useTranslation,
+} from '@shared-lib';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { fetchContent } from '@learner/utils/API/contentService';
 import BreadCrumb from '@content-mfes/components/BreadCrumb';
@@ -16,14 +20,19 @@ import { hierarchyAPI } from '@content-mfes/services/Hierarchy';
 const CourseUnitDetails = dynamic(() => import('@CourseUnitDetails'), {
   ssr: false,
 });
-const App = (props: {
+const App = ({
+  userIdLocalstorageName,
+  contentBaseUrl,
+  _config,
+}: {
   userIdLocalstorageName?: string;
   contentBaseUrl?: string;
+  _config?: any;
 }) => {
   const { t } = useTranslation();
   const router = useRouter();
   const params = useParams();
-  const { identifier, courseId, unitId } = params; // string | string[] | undefined
+  const { identifier, courseId, unitId } = params || {}; // string | string[] | undefined
   const [item, setItem] = useState<{ [key: string]: any }>(null);
   const [breadCrumbs, setBreadCrumbs] = useState<any>();
   const [isShowMoreContent, setIsShowMoreContent] = useState(false);
@@ -40,7 +49,7 @@ const App = (props: {
       if (unitId) {
         const course = await hierarchyAPI(courseId as string);
         const breadcrum = findCourseUnitPath({
-          contentBaseUrl: props?.contentBaseUrl,
+          contentBaseUrl: contentBaseUrl,
           node: course,
           targetId: identifier as string,
           keyArray: [
@@ -61,7 +70,7 @@ const App = (props: {
       }
     };
     fetch();
-  }, [identifier, unitId, courseId, activeLink, props?.contentBaseUrl]);
+  }, [identifier, unitId, courseId, activeLink, contentBaseUrl]);
 
   if (!identifier) {
     return <div>Loading...</div>;
@@ -131,28 +140,24 @@ const App = (props: {
             {item?.content?.name ?? '-'}
           </Typography>
           {item?.content?.description && (
-            <Typography
-              variant="h3"
-              sx={{
-                fontWeight: 400,
-                // fontSize: '14px',
-                // lineHeight: '24px',
-                display: '-webkit-box',
-                WebkitLineClamp: 2,
-                overflow: 'hidden',
-                WebkitBoxOrient: 'vertical',
+            <ExpandableText
+              text={item?.content?.description}
+              maxWords={60}
+              maxLines={2}
+              _text={{
+                fontSize: { xs: '14px', sm: '16px', md: '18px' },
+                lineHeight: { xs: '20px', sm: '22px', md: '26px' },
               }}
-            >
-              {item?.content?.description ?? 'no description'}
-            </Typography>
+            />
           )}
         </Box>
         <PlayerBox
-          userIdLocalstorageName={props.userIdLocalstorageName}
+          userIdLocalstorageName={userIdLocalstorageName}
           item={item}
           identifier={identifier}
           courseId={courseId}
           unitId={unitId}
+          {..._config?.player}
         />
       </Box>
 
@@ -182,10 +187,11 @@ const App = (props: {
           _box={{
             pt: 1,
             pb: 1,
-            px: 1,
+            px: { md: 1 },
             height: 'calc(100vh - 185px)',
           }}
           _config={{
+            ...(_config?.courseUnitDetails || {}),
             getContentData: (item: any) => {
               setIsShowMoreContent(
                 item.children.filter(
@@ -195,8 +201,11 @@ const App = (props: {
             },
             _parentGrid: { pb: 2 },
             default_img: '/images/image_ver.png',
-            _grid: { xs: 6, sm: 4, md: 6, lg: 4, xl: 3 },
-            _card: { isHideProgress: true },
+            _grid: { xs: 6, sm: 4, md: 6, lg: 6, xl: 6 },
+            _card: {
+              isHideProgress: true,
+              ...(_config?.courseUnitDetails?._card || {}),
+            },
           }}
         />
       </Box>
@@ -212,8 +221,11 @@ const PlayerBox = ({
   courseId,
   unitId,
   userIdLocalstorageName,
+  isGenerateCertificate,
+  trackable,
 }: any) => {
   const router = useRouter();
+  const { t } = useTranslation();
   const [play, setPlay] = useState(false);
 
   useEffect(() => {
@@ -269,12 +281,16 @@ const PlayerBox = ({
               transform: 'translate(-50%, -50%)',
             }}
           >
-            Play
+            {t('Play')}
           </Button>
         </Box>
       )}
       {play && (
         <iframe
+          name={JSON.stringify({
+            isGenerateCertificate: isGenerateCertificate,
+            trackable: trackable,
+          })}
           src={`${
             process.env.NEXT_PUBLIC_LEARNER_SBPLAYER
           }?identifier=${identifier}${
