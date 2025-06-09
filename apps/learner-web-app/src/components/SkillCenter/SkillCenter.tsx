@@ -123,12 +123,19 @@ const SkillCenter = ({
   let totalcount=100;
     const { t } = useTranslation();
 
-  const initialFormDataSearch =
-    typeof window !== 'undefined' && localStorage.getItem(searchStoreKey)
-      ? JSON.parse(localStorage.getItem(searchStoreKey) || '{}')
-      : localStorage.getItem('stateId')
-      ? { state: [localStorage.getItem('stateId')] }
-      : {};
+let initialFormDataSearch = {};
+
+if (typeof window !== 'undefined') {
+  const storedSearch = localStorage.getItem(searchStoreKey);
+  const stateId = localStorage.getItem('stateId');
+
+  if (storedSearch) {
+    initialFormDataSearch = JSON.parse(storedSearch || '{}');
+  } else if (stateId) {
+    initialFormDataSearch = { state: [stateId] };
+  }
+}
+
 
   useEffect(() => {
     setPrefilledFormData(initialFormDataSearch);
@@ -146,7 +153,7 @@ const SkillCenter = ({
       images: cohort.image || ['/images/default.png'],
       moreImages: cohort.image?.length > 3 ? cohort.image.length - 3 : 0,
     }));
-
+console.log("apiCenters",visibleCenters,apiCenters)
     setCenters(apiCenters);
     setVisibleCenters(viewAll ? apiCenters : apiCenters.slice(0, Limit));
     setLoading(false);
@@ -196,15 +203,17 @@ const SkillCenter = ({
     await searchData(formData);
   };
 const handleLoadMore = () => {
-  setPageOffset((prev) => prev + 1);
+ // setPageOffset((prev) => prev + 1);
+    setPageLimit((prev) => prev + 10);
+
   isFetched.current = false;
 };
 
 useEffect(() => {
-  if (!isFetched.current && pageOffset > 0) {
+  if (!isFetched.current) {
     searchData(prefilledFormData);
   }
-}, [pageOffset]);
+}, [pageLimit]);
 
   return (
     <Box sx={{ p: isPadding ? 0 : 3 }}>
@@ -414,7 +423,7 @@ useEffect(() => {
         ))}
       </Grid>
 
-      {!loading && visibleCenters?.length === 0 && (
+      {visibleCenters?.length === 0 && (
         <Box
           sx={{
             display: 'flex',
@@ -454,11 +463,7 @@ useEffect(() => {
         </Box>
 )}
 
-      {!loading && visibleCenters?.length === 0 && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-          <Typography variant="h4" sx={{ color: '#635E57' }}>No data found</Typography>
-        </Box>
-      )}
+     
     </Box>
   );
 };
