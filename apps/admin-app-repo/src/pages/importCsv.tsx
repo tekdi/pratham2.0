@@ -39,6 +39,7 @@ import { useCallback, useEffect, useState } from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import SimpleModal from '@/components/SimpleModal';
 import AddNewTopic from '@/components/AddNewTopic';
+import CoursePlanForm from '@/components/CoursePlan/CoursePlanForm';
 
 const ImportCsv = () => {
   const router = useRouter();
@@ -302,6 +303,10 @@ const ImportCsv = () => {
     setOpenAddTopicModal(false);
   };
 
+  const CoursePlanFormAction = (params: any) => {
+    console.log('test', params);
+  };
+
   return (
     <Box sx={{ padding: isSmallScreen ? '16px' : '32px' }}>
       <Box
@@ -399,16 +404,15 @@ const ImportCsv = () => {
           </Button>
         </Box>
       </Box>
-      <SimpleModal
+      <CoursePlanForm
         open={openAddTopicModal}
         onClose={handleCloseModal}
-        showFooter={true}
-        primaryText={t('COMMON.ADD')}
-        id="dynamic-form-id"
-        modalTitle={t('COURSE_PLANNER.NEW_TOPIC')}
-      >
-        <AddNewTopic />
-      </SimpleModal>
+        title={t('COURSE_PLANNER.NEW_TOPIC')}
+        actionTitle={t('COMMON.ADD')}
+        onAction={CoursePlanFormAction}
+      />
+        {/* <AddNewTopic />
+      </CoursePlanForm> */}
 
       <Box>
         {loading ? (
