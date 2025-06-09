@@ -13,6 +13,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { ExpandableText, useTranslation } from '@shared-lib';
 import BreadCrumb from '../BreadCrumb';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
+import LoginIcon from '@mui/icons-material/Login';
 
 interface InfoCardProps {
   item: any;
@@ -202,6 +203,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
       <CommonModal
         open={openModal}
         // onClose={() => setOpenModal(false)}
+        buttonText={checkLocalAuth ? 'Start Learning' : 'Login First'}
         onStartLearning={_config?.onButtonClick}
       >
         <Box
@@ -213,7 +215,12 @@ const InfoCard: React.FC<InfoCardProps> = ({
             px: 3,
           }}
         >
-          <CheckCircleIcon sx={{ color: '#21A400', fontSize: 48, mb: 1 }} />
+          {checkLocalAuth ? (
+            <CheckCircleIcon sx={{ color: '#21A400', fontSize: 48, mb: 1 }} />
+          ) : (
+            <LoginIcon sx={{ color: '#21A400', fontSize: 48, mb: 1 }} />
+          )}
+
           <Typography
             variant="h1"
             component="div"

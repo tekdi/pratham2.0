@@ -320,7 +320,8 @@ export const DesktopBar = ({
                           ? item.isActive
                             ? theme.palette.primary.main
                             : 'inherit'
-                          : item?.isActive === withoutQueryString()
+                          : item?.isActive?.replaceAll(' ', '%20') ===
+                            withoutQueryString()
                           ? theme.palette.primary.main
                           : 'inherit',
                     }}
@@ -432,13 +433,21 @@ const MobileTopBar = ({
   );
 };
 
-const Brand = ({ _box, name = 'Pratham' }: { _box?: any; name?: string }) => {
+const Brand = ({
+  _box,
+  name = 'Pratham',
+  logo = '/logo.png',
+}: {
+  _box?: any;
+  name?: string;
+  logo?: string;
+}) => {
   const theme = useTheme();
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }} {..._box}>
       {_box?.brandlogo ?? (
         <>
-          <img src="/logo.png" alt="YouthNet" style={{ height: '40px' }} />
+          <img src={logo} alt="YouthNet" style={{ height: '40px' }} />
           {name && (
             <Typography
               variant="body1"
