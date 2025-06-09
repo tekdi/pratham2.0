@@ -46,6 +46,14 @@ export interface AppBarProps {
   isColorInverted?: boolean;
 }
 
+const withoutQueryString = () => {
+  if (typeof window !== 'undefined') {
+    const parsedUrl = new URL(window.location.href);
+    return parsedUrl?.pathname + parsedUrl?.search;
+  }
+  return '';
+};
+
 export const TopAppBar: React.FC<AppBarProps> = ({
   title = 'Title',
   showBackIcon = false,
@@ -131,14 +139,14 @@ const LanguageSelect = ({
         },
       }}
     >
-      <MuiMenuItem value="en">EN</MuiMenuItem>
-      <MuiMenuItem value="hi">HI</MuiMenuItem>
-      <MuiMenuItem value="mr">MR</MuiMenuItem>
-      <MuiMenuItem value="odi">ODI</MuiMenuItem>
-      <MuiMenuItem value="tel">TEL</MuiMenuItem>
-      <MuiMenuItem value="kan">KAN</MuiMenuItem>
-      <MuiMenuItem value="tam">TAM</MuiMenuItem>
-      <MuiMenuItem value="guj">GUJ</MuiMenuItem>
+      <MuiMenuItem value="en">English</MuiMenuItem>
+      <MuiMenuItem value="hi">हिंदी</MuiMenuItem>
+      <MuiMenuItem value="mr">मराठी</MuiMenuItem>
+      <MuiMenuItem value="odi">ଓଡ଼ିଆ</MuiMenuItem>
+      <MuiMenuItem value="tel">తెలుగు</MuiMenuItem>
+      <MuiMenuItem value="kan">ಕನ್ನಡ</MuiMenuItem>
+      <MuiMenuItem value="tam">தமிழ்</MuiMenuItem>
+      <MuiMenuItem value="guj">ગુજરાતી</MuiMenuItem>
     </Select>
   );
 };
@@ -207,7 +215,12 @@ export const DesktopBar = ({
       >
         {navLinks.map((link, index) => (
           <Box key={`${link.title}-${index}`} onMouseLeave={handleLeave}>
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Box
+              sx={{ display: 'flex', alignItems: 'center' }}
+              onMouseEnter={(e) =>
+                openMenuAtLevel(0, e.currentTarget, link.child ?? [])
+              }
+            >
               <Button
                 component={typeof link.to === 'string' ? 'a' : 'button'}
                 href={typeof link.to === 'string' ? link.to : undefined}
@@ -239,9 +252,6 @@ export const DesktopBar = ({
               {link.child && (
                 <IconButton
                   size="small"
-                  onMouseEnter={(e) =>
-                    openMenuAtLevel(0, e.currentTarget, link.child ?? [])
-                  }
                   onClick={(e) => {
                     e.stopPropagation();
                     openMenuAtLevel(0, e.currentTarget, link?.child ?? []);
@@ -294,7 +304,6 @@ export const DesktopBar = ({
               {menu.items.map((item, idx) => {
                 const hasChild =
                   Array.isArray(item.child) && item.child.length > 0;
-                console.log(item.isActive, 'item');
                 return (
                   <Box
                     key={`${idx}-${item.label}`}
@@ -306,9 +315,14 @@ export const DesktopBar = ({
                       }
                     }}
                     sx={{
-                      bgcolor: item.isActive
-                        ? theme.palette.primary.main
-                        : 'inherit',
+                      bgcolor:
+                        typeof item.isActive === 'boolean'
+                          ? item.isActive
+                            ? theme.palette.primary.main
+                            : 'inherit'
+                          : item?.isActive === withoutQueryString()
+                          ? theme.palette.primary.main
+                          : 'inherit',
                     }}
                   >
                     <MenuItem
@@ -370,6 +384,7 @@ const MobileTopBar = ({
         justifyContent: 'space-between',
         alignItems: 'center',
         width: '100%',
+        color: '#1F1B13',
       }}
     >
       {!showBackIcon ? (
@@ -384,6 +399,7 @@ const MobileTopBar = ({
             <MenuIcon sx={{ cursor: 'pointer', color: '#1F1B13' }} />
           </IconButton>
           <Brand {..._brand} name={''} />
+          {/* {!isShowLang && <Box />} */}
         </>
       ) : (
         <>

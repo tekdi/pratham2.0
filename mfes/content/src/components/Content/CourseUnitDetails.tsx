@@ -58,15 +58,20 @@ export default function Details(props: DetailsProps) {
         if (unitId && !props?.isHideInfoCard) {
           const course = await hierarchyAPI(courseId as string);
           setCourseItem(course);
-          const breadcrum = findCourseUnitPath(course, unitId as string, [
-            'name',
-            'identifier',
-            'mimeType',
-            {
-              key: 'link',
-              suffix: activeLink ? `?activeLink=${activeLink}` : '',
-            },
-          ]);
+          const breadcrum = findCourseUnitPath({
+            contentBaseUrl: props?._config?.contentBaseUrl,
+            node: course,
+            targetId: unitId as string,
+            keyArray: [
+              'name',
+              'identifier',
+              'mimeType',
+              {
+                key: 'link',
+                suffix: activeLink ? `?activeLink=${activeLink}` : '',
+              },
+            ],
+          });
           setBreadCrumbs(breadcrum);
         }
 
@@ -111,7 +116,9 @@ export default function Details(props: DetailsProps) {
 
             setTrackData(newTrackData ?? []);
             if (data?.result?.status === 'viewCertificate') {
-              setCertificateId(data?.result?.certificateId);
+              if (props?._config?.userIdLocalstorageName !== 'did') {
+                setCertificateId(data?.result?.certificateId);
+              }
             } else if (course_track_data?.data && !unitId) {
               const course_track = calculateTrackDataItem(
                 userTrackData?.[0] ?? {},
@@ -120,7 +127,8 @@ export default function Details(props: DetailsProps) {
 
               if (
                 course_track?.status === 'completed' &&
-                data?.result?.status === 'enrolled'
+                data?.result?.status === 'enrolled' &&
+                props?._config?.userIdLocalstorageName !== 'did'
               ) {
                 const userResponse: any = await getUserIdLocal();
                 const resultCertificate = await issueCertificate({
@@ -182,12 +190,19 @@ export default function Details(props: DetailsProps) {
   };
 
   const onBackClick = () => {
-    router.back();
-    // if (unitId) {
-    //   router.push(`/content/${courseId}`);
-    // } else if (courseId) {
-    //   router.push(`/content`);
-    // }
+    if (breadCrumbs?.length > 1) {
+      if (breadCrumbs?.[breadCrumbs.length - 2]?.link) {
+        router.push(breadCrumbs?.[breadCrumbs.length - 2]?.link);
+      }
+    } else {
+      router.push(
+        `${
+          activeLink
+            ? activeLink
+            : `${props?._config?.contentBaseUrl ?? ''}/content`
+        }`
+      );
+    }
   };
 
   return (

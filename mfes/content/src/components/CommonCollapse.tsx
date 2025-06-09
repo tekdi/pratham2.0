@@ -83,6 +83,12 @@ const GetIconByMimeType = React.memo(function GetIconByMimeTypeComponent({
       icon: <Image src="/images/Epub.svg" alt="epub" width="18" height="18" />,
       text: 'Epub',
     },
+    'application/unit': {
+      icon: (
+        <Image src="/images/unitIcon.svg" alt="unit" width="18" height="18" />
+      ),
+      text: 'Unit',
+    },
   };
   if (isShowText) {
     return (

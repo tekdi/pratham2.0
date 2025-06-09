@@ -19,6 +19,7 @@ interface InfoCardProps {
   topic?: string;
   onBackClick?: () => void;
   _config?: any;
+  checkLocalAuth?: boolean;
 }
 
 const InfoCard: React.FC<InfoCardProps> = ({
@@ -26,6 +27,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
   topic,
   onBackClick,
   _config,
+  checkLocalAuth,
 }) => {
   const { t } = useTranslation();
   const { _infoCard } = _config || {};
@@ -96,17 +98,19 @@ const InfoCard: React.FC<InfoCardProps> = ({
             <Typography
               component="div"
               // @ts-ignore
-              variant="body6"
+              variant="body8"
               title={item?.name}
               sx={{
                 fontWeight: 700,
                 // fontSize: { xs: '22px', sm: '24px', md: '36px' },
                 // lineHeight: { xs: '28px', sm: '32px', md: '44px' },
+                lineHeight: 1.5,
                 display: '-webkit-box',
-                WebkitLineClamp: 1,
+                WebkitLineClamp: 2,
                 WebkitBoxOrient: 'vertical',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
+                textTransform: 'capitalize',
               }}
             >
               <SpeakableText>{item?.name}</SpeakableText>
@@ -187,7 +191,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
                   sx={{ ml: 1 }}
                   onClick={() => setOpenModal(true)}
                 >
-                  <SpeakableText>Enroll Now</SpeakableText>
+                  <SpeakableText>{t('COMMON.ENROLL_NOW')}</SpeakableText>
                 </Button>
               )}
             </Box>
@@ -223,7 +227,9 @@ const InfoCard: React.FC<InfoCardProps> = ({
               mb: 1,
             }}
           >
-            <SpeakableText>Awesome!</SpeakableText>
+            <SpeakableText>
+              {checkLocalAuth ? 'Awesome!' : 'Login First'}
+            </SpeakableText>
           </Typography>
           <Typography
             variant="body1"
@@ -238,7 +244,11 @@ const InfoCard: React.FC<InfoCardProps> = ({
               color: '#1F1B13',
             }}
           >
-            <SpeakableText>You are now enrolled to the course!</SpeakableText>
+            <SpeakableText>
+              {checkLocalAuth
+                ? 'You are now enrolled to the course!'
+                : 'you need to login first'}
+            </SpeakableText>
           </Typography>
         </Box>
       </CommonModal>

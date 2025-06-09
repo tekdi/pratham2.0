@@ -22,7 +22,7 @@ import { hierarchyAPI } from '@content-mfes/services/Hierarchy';
 import { ContentSearchResponse } from '@content-mfes/services/Search';
 import { checkAuth, getUserId } from '@shared-lib-v2/utils/AuthService';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
-
+import { useTranslation } from '@shared-lib-v2/lib/context/LanguageContext';
 interface ContentDetailsProps {
   isShowLayout: boolean;
   id?: string;
@@ -31,6 +31,8 @@ interface ContentDetailsProps {
 }
 
 const ContentDetails = (props: ContentDetailsProps) => {
+  const [checkLocalAuth, setCheckLocalAuth] = useState(false);
+
   const router = useRouter();
   const params = useParams();
   const identifier = props.id ?? params?.identifier; // string | string[] | undefined
@@ -45,12 +47,13 @@ const ContentDetails = (props: ContentDetailsProps) => {
       activeLink = '';
     }
   }
-
+  const { t } = useTranslation();
   useEffect(() => {
     const fetchContentDetails = async () => {
       try {
         const result = await hierarchyAPI(identifier as string);
         const userId = getUserId(props?._config?.userIdLocalstorageName);
+        setCheckLocalAuth(checkAuth(Boolean(userId)));
         if (checkAuth(Boolean(userId))) {
           const data = await getUserCertificateStatus({
             userId: userId as string,
@@ -129,6 +132,7 @@ const ContentDetails = (props: ContentDetailsProps) => {
         topic={contentDetails?.se_subjects?.join(',')}
         onBackClick={onBackClick}
         _config={{ onButtonClick: handleClick, ...props?._config }}
+        checkLocalAuth={checkLocalAuth}
       />
       <Box sx={{ display: 'flex' }}>
         <Box
@@ -191,7 +195,7 @@ const ContentDetails = (props: ContentDetailsProps) => {
                   color: '#1F1B13',
                 }}
               >
-                <SpeakableText>What You'll Learn</SpeakableText>
+                <SpeakableText>{t('COMMON.WHAT_YOU_LL_LEARN')}</SpeakableText>
               </Typography>
 
               {contentDetails?.children &&

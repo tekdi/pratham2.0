@@ -5,6 +5,7 @@ import { handleExitEvent } from '../utils/Helper';
 interface PlayerConfigProps {
   playerConfig: any;
   relatedData?: any;
+  isGenerateCertificate?: boolean;
 }
 
 const basePath = process.env.NEXT_PUBLIC_ASSETS_CONTENT || '/sbplayer';
@@ -12,9 +13,25 @@ const basePath = process.env.NEXT_PUBLIC_ASSETS_CONTENT || '/sbplayer';
 const SunbirdPdfPlayer = ({
   playerConfig,
   relatedData: { courseId, unitId, userId },
+  isGenerateCertificate,
 }: PlayerConfigProps) => {
   const sunbirdPdfPlayerRef = useRef<HTMLIFrameElement | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [bottom, setBottom] = useState(10);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setBottom(window.matchMedia('(max-width: 655px)').matches ? 35 : 10);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    handleResize();
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   useEffect(() => {
     const playerElement: any = sunbirdPdfPlayerRef.current;
@@ -49,6 +66,7 @@ const SunbirdPdfPlayer = ({
                     courseId,
                     unitId,
                     userId,
+                    isGenerateCertificate,
                   });
                 } catch (error) {
                   console.error('Error submitting assessment:', error);
@@ -121,7 +139,7 @@ const SunbirdPdfPlayer = ({
         title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
         style={{
           position: 'absolute',
-          bottom: 10,
+          bottom: bottom,
           right: 10,
           border: 'none',
           background: 'transparent',

@@ -73,8 +73,9 @@ export default memo(function SearchComponent({
         }
       }}
       sx={{
-        backgroundColor: '#f0f0f0',
+        backgroundColor: '#fff',
         borderRadius: '50px',
+        border: '1px solid  #D0C5B4',
         width: '100%',
       }}
     />
