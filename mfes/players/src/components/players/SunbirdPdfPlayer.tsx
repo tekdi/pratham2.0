@@ -5,7 +5,7 @@ import { handleExitEvent } from '../utils/Helper';
 interface PlayerConfigProps {
   playerConfig: any;
   relatedData?: any;
-  isGenerateCertificate?: boolean;
+  configFunctionality?: any;
 }
 
 const basePath = process.env.NEXT_PUBLIC_ASSETS_CONTENT || '/sbplayer';
@@ -13,7 +13,7 @@ const basePath = process.env.NEXT_PUBLIC_ASSETS_CONTENT || '/sbplayer';
 const SunbirdPdfPlayer = ({
   playerConfig,
   relatedData: { courseId, unitId, userId },
-  isGenerateCertificate,
+  configFunctionality,
 }: PlayerConfigProps) => {
   const sunbirdPdfPlayerRef = useRef<HTMLIFrameElement | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -66,7 +66,7 @@ const SunbirdPdfPlayer = ({
                     courseId,
                     unitId,
                     userId,
-                    isGenerateCertificate,
+                    configFunctionality,
                   });
                 } catch (error) {
                   console.error('Error submitting assessment:', error);
