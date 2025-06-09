@@ -202,6 +202,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
       <CommonModal
         open={openModal}
         // onClose={() => setOpenModal(false)}
+        buttonText={checkLocalAuth ? 'Start Learning' : 'Login First'}
         onStartLearning={_config?.onButtonClick}
       >
         <Box
@@ -213,7 +214,12 @@ const InfoCard: React.FC<InfoCardProps> = ({
             px: 3,
           }}
         >
-          <CheckCircleIcon sx={{ color: '#21A400', fontSize: 48, mb: 1 }} />
+          {checkLocalAuth ? (
+            <CheckCircleIcon sx={{ color: '#21A400', fontSize: 48, mb: 1 }} />
+          ) : (
+            <></>
+          )}
+
           <Typography
             variant="h1"
             component="div"
