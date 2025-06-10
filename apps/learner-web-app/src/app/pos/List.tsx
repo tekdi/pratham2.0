@@ -100,6 +100,7 @@ export default function App({
               se_subDomains: searchParams?.get('se_subDomains')?.split(','),
             }
           : {}),
+        program: ['Open School'],
       });
       setItem(_infoCard?.item || {});
     }
@@ -177,6 +178,7 @@ export default function App({
                 userIdLocalstorageName: 'did',
                 _card: {
                   isHideProgress: true,
+                  isHideProgressStatus: true,
                   isWrap: true,
                   _cardMedia: { sx: { height: '153px' } },
                 },
