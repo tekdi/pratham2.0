@@ -74,6 +74,9 @@ export const staticFilterContent = async ({
 };
 
 export const checkAuth = (isAuthenticated?: boolean) => {
+  if (typeof window === 'undefined') {
+    return false;
+  }
   if (isAuthenticated === true) {
     return true;
   }

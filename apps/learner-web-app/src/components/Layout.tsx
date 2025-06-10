@@ -109,13 +109,23 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
           }
         );
       } else {
-        navLinks.push({
+        navLinks.push(
+           {
+          title: t('COMMON.SKILLING_CENTERS'),
+          // icon: <Logout sx={{ width: 28, height: 28 }} />,
+          to: () => handleNavClick(() => router.push('/skill-center')),
+          isActive: false,
+          customStyle: {},
+        },
+          {
           title: t('LEARNER_APP.COMMON.PROFILE'),
           icon: <AccountCircleOutlined sx={{ width: 28, height: 28 }} />,
           to: () => setAnchorEl(true),
           isActive: currentPage === '/profile',
           customStyle: getLinkStyle(currentPage === '/profile'),
-        });
+        },
+       
+      );
       }
     }
 
