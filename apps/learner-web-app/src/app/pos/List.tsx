@@ -12,7 +12,15 @@ import { useCallback, useEffect, useState } from 'react';
 const InfoCard = dynamic(() => import('@InfoCard'), {
   ssr: false,
 });
-
+const linkLabelName = {
+  school: 'School',
+  mediaMoments: 'Media Moments',
+  adult: 'Adult Education',
+  community: 'Community Development',
+  youth: 'Youth Development',
+  family: 'Family Development',
+  health: 'Health Development',
+};
 export default function App({
   pagename,
   _infoCard,
@@ -33,16 +41,32 @@ export default function App({
   const [item, setItem] = useState<any>({});
   const [staticFilter, setStaticFilter] = useState<any>({});
 
+  const [breadCrumbs, setBreadCrumbs] = useState<any>();
+
   useEffect(() => {
     if (
       !hideStaticFilter &&
       (pagename?.['SCP'] || pagename?.['Vocational Training'])
     ) {
-      const program = searchParams?.get('program')?.split(',');
+      const program = searchParams?.get('program');
+      if (program) {
+        setBreadCrumbs([
+          {
+            name: 'Program',
+          },
+          {
+            name:
+              linkLabelName[pagename?.[program || 'SCP']] ??
+              pagename?.[program || 'SCP'],
+          },
+        ]);
+      } else {
+        setBreadCrumbs();
+      }
       setItem({
         ..._infoCard?.item,
-        name: `Learning for ${pagename?.[program?.[0] || 'SCP']}`,
-        description: _infoCard?.item?.description?.[program?.[0] || 'SCP'],
+        name: `${pagename?.[program || 'SCP']}`,
+        description: _infoCard?.item?.description?.[program || 'SCP'],
       });
       if (program?.includes('Vocational Training')) {
         setStaticFilter({
@@ -55,6 +79,20 @@ export default function App({
         });
       }
     } else if (!hideStaticFilter) {
+      const subDomain = searchParams?.get('se_subDomains');
+      if (subDomain) {
+        setBreadCrumbs([
+          {
+            name: linkLabelName[pagename] ?? pagename,
+            link: `/pos/${pagename}`,
+          },
+          {
+            name: linkLabelName[subDomain] ?? subDomain,
+          },
+        ]);
+      } else {
+        setBreadCrumbs();
+      }
       setStaticFilter({
         se_domains: [`Learning for ${pagename}`],
         ...(searchParams?.get('se_subDomains')?.split(',')
@@ -88,9 +126,14 @@ export default function App({
 
   if (loading) return <Loader isLoading />;
 
+  const handleBackClick = () => {
+    router.back();
+  };
+
   return (
     <Layout>
       <InfoCard
+        onBackClick={breadCrumbs && handleBackClick}
         item={{
           name: typeof pagename === 'string' ? `Learning for ${pagename}` : '',
           description:
@@ -100,6 +143,7 @@ export default function App({
         _config={{
           ...(_infoCard?._config || {}),
           _infoCard: {
+            breadCrumbs: breadCrumbs,
             default_img:
               typeof pagename === 'object'
                 ? `/images/pos_program.jpg`
