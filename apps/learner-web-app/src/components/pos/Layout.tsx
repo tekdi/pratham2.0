@@ -131,7 +131,6 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         isActive: currentPage === '#',
       },
     ];
-
     setDefaultNavLinks(navLinks);
   }, [t, filterFramework?.framework?.categories, router]);
 

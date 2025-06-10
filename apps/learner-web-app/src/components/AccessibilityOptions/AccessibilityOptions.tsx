@@ -140,6 +140,8 @@ export default function AccessibilityOptions() {
         open={open}
         onClose={toggleDrawer(false)}
         onOpen={toggleDrawer(true)}
+        disableSwipeToOpen={true}
+        swipeAreaWidth={0}
         PaperProps={{
           sx: {
             height: 'auto',

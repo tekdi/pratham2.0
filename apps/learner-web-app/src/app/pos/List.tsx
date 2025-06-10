@@ -15,12 +15,20 @@ const InfoCard = dynamic(() => import('@InfoCard'), {
 const linkLabelName = {
   school: 'School',
   mediaMoments: 'Media Moments',
-  adult: 'Adult Education',
-  community: 'Community Development',
-  youth: 'Youth Development',
-  family: 'Family Development',
-  health: 'Health Development',
+  academics: 'Academics',
+  growthPlayfulLearning: 'Growth & Playful Learning',
+  inclusiveEducation: 'Inclusive Education',
+  newAgeSkills: 'New Age Skills',
+  careerExploration: 'Career Exploration',
+  creativeArts: 'Creative Arts',
+  environmentEducation: 'Environment Education',
+  inclusiveLearning: 'Inclusive Learning',
+  sports: 'Sports',
+  healthWellbeing: 'Health & Wellbeing',
 };
+
+type LinkLabelType = keyof typeof linkLabelName;
+
 export default function App({
   pagename,
   _infoCard,
@@ -28,7 +36,7 @@ export default function App({
   _content,
 }: Readonly<{
   _infoCard?: any;
-  pagename?: any;
+  pagename?: Record<string, string> | string;
   hideStaticFilter?: boolean;
   _content?: any;
 }>) {
@@ -41,11 +49,14 @@ export default function App({
   const [item, setItem] = useState<any>({});
   const [staticFilter, setStaticFilter] = useState<any>({});
 
-  const [breadCrumbs, setBreadCrumbs] = useState<any>();
+  const [breadCrumbs, setBreadCrumbs] = useState<
+    Array<{ name: string; link?: string }> | undefined
+  >(undefined);
 
   useEffect(() => {
     if (
       !hideStaticFilter &&
+      typeof pagename === 'object' &&
       (pagename?.['SCP'] || pagename?.['Vocational Training'])
     ) {
       const program = searchParams?.get('program');
@@ -56,12 +67,14 @@ export default function App({
           },
           {
             name:
-              linkLabelName[pagename?.[program || 'SCP']] ??
-              pagename?.[program || 'SCP'],
+              typeof pagename === 'object' && program in pagename
+                ? linkLabelName[pagename[program] as LinkLabelType] ??
+                  pagename[program]
+                : pagename?.['SCP'] || '',
           },
         ]);
       } else {
-        setBreadCrumbs();
+        setBreadCrumbs(undefined);
       }
       setItem({
         ..._infoCard?.item,
@@ -83,15 +96,18 @@ export default function App({
       if (subDomain) {
         setBreadCrumbs([
           {
-            name: linkLabelName[pagename] ?? pagename,
+            name:
+              typeof pagename === 'string'
+                ? linkLabelName[pagename as LinkLabelType] ?? pagename
+                : '',
             link: `/pos/${pagename}`,
           },
           {
-            name: linkLabelName[subDomain] ?? subDomain,
+            name: linkLabelName[subDomain as LinkLabelType] ?? subDomain,
           },
         ]);
       } else {
-        setBreadCrumbs();
+        setBreadCrumbs(undefined);
       }
       setStaticFilter({
         se_domains: [`Learning for ${pagename}`],
