@@ -19,6 +19,7 @@ const SearchPage = () => {
   React.useEffect(() => {
     const queryParam = searchParams?.get('q') || '';
     setSearchValue(queryParam);
+    setSubmitText(queryParam);
   }, [searchParams]);
 
   const handleSearch = (value: string) => {
