@@ -167,6 +167,7 @@ const App = () => {
           title={t('COMMON.SKILLING_CENTERS_NEAR_YOU')}
           visibleCenters={visibleCenters}
           setVisibleCenters={setVisibleCenters}
+
         />
       </Box>
     </Layout>

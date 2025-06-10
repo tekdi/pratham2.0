@@ -481,6 +481,7 @@ const page = () => {
             // showHelpDesk={false}
             hasMoreData={false}
             _config={{
+              contentBaseUrl: '/pos',
               _carousel: {
                 loop: true,
                 autoplay: { delay: 2500, disableOnInteraction: false },

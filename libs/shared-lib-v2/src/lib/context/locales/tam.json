@@ -144,6 +144,7 @@
     "COURSE": {
       "CLEAR_FILTER": "வடிகட்டலை அழி",
       "APPLY_FILTER": "பயன்படுத்து",
+      "DONE": "పూర్తయింది",
       "COMPLETED_ON": "పూర్తయింది:",
       "STARTED_ON": "ప్రారంభించబడింది:",
       "GET_STARTED": "L1 కోర్సులు ప్రారంభించండి",

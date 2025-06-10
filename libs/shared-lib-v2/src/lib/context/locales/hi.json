@@ -100,7 +100,7 @@
     "ENROLL_NOW": "अभी नामांकन करें",
     "GO_TO_MY_PROFILE": "मेरी प्रोफ़ाइल पर जाएं",
     "WHAT_YOU_LL_LEARN": "आप क्या सीखेंगे",
-     "VIEW_ALL": "View All",
+    "VIEW_ALL": "View All",
     "NO_DATA_FOUND": "कोई डेटा नहीं मिला",
     "LOAD_MORE": "अधिक लोड करें",
     "SKILLING_CENTERS": "कृषि केंद्र",
@@ -143,6 +143,7 @@
     },
     "COURSE": {
       "APPLY_FILTER": "फिल्टर लागू करें",
+      "DONE": "पूरा हुआ",
       "COMPLETED_ON": "पूरा हुआ",
       "STARTED_ON": "शुरू हुआ",
       "GET_STARTED": "L1 पाठ्यक्रम शुरू करें",

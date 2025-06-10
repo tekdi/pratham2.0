@@ -62,6 +62,7 @@ export default function App({
               se_subDomains: searchParams?.get('se_subDomains')?.split(','),
             }
           : {}),
+        program: ['Open School'],
       });
       setItem(_infoCard?.item || {});
     }

@@ -100,7 +100,7 @@
     "ENROLL_NOW": "ಈಗ ದಾಖಲು ಮಾಡಿ",
     "GO_TO_MY_PROFILE": "ನನ್ನ ಪ್ರೊಫೈಲ್‌ಗೆ ಹೋಗಿ",
     "WHAT_YOU_LL_LEARN": "ನೀವು ಏನು ಕಲಿಯುತ್ತೀರಿ",
-     "VIEW_ALL": "View All",
+    "VIEW_ALL": "View All",
     "NO_DATA_FOUND": "ಕೋಈ ಡೇಟಾ ಕಂಡುಬಂದಿಲ್ಲ",
     "LOAD_MORE": "ಹೆಚ್ಚು ಲೋಡ್ ಮಾಡಿ",
     "SKILLING_CENTERS": "ಕೃಷಿ ಕೇನ್ದ್ರ",
@@ -143,6 +143,7 @@
     },
     "COURSE": {
       "APPLY_FILTER": "ಫಿಲ್ಟರ್ ಅನ್ನು ಅನ್ವಯಿಸಿ",
+      "DONE": "ಪೂರ್ಣ",
       "COMPLETED_ON": "ಮುಗಿಯಿತು",
       "STARTED_ON": "ಆರಂಭಿಸಿತು",
       "GET_STARTED": "L1 ಕೋರ್ಸು ಆರಂಭಿಸಿ",
