@@ -229,7 +229,7 @@ export default memo(function LearnerCourse({
               fullWidth
               onClick={() => setIsOpen(false)}
             >
-              {t('LEARNER_APP.COURSE.APPLY_FILTER')}
+              {t('LEARNER_APP.COURSE.DONE')}
             </Button>
           </Box>
         </Drawer>
