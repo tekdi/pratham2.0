@@ -147,7 +147,8 @@
       "GET_STARTED": "Get Started with L1 Courses",
       "FILTER_BY": "Filter by",
       "CLEAR_FILTER": "Clear Filter",
-      "APPLY_FILTER": "Apply Filter"
+      "APPLY_FILTER": "Apply Filter",
+      "DONE": "Done"
     },
     "EXPLORE": {
       "EXPLORE_ADDITIONAL_COURSES": "Explore Additional Courses"
