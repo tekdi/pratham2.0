@@ -1,7 +1,7 @@
 'use client';
 import dynamic from 'next/dynamic';
 
-const List = dynamic(() => import('@learner/app/pos/List'), {
+const List = dynamic(() => import('@learner/components/pos/List'), {
   ssr: false,
 });
 
