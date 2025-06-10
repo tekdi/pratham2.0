@@ -280,6 +280,7 @@ useEffect(() => {
                 fontSize: { xs: '14px', sm: '16px' },
               cursor: 'pointer',
                 display: 'flex',
+                marginLeft: '20px',
                 alignItems: 'center',
             }}
           >
@@ -316,7 +317,7 @@ useEffect(() => {
       <Grid
         container
         spacing={{ xs: 2, sm: 3 }}
-        marginTop={{ xs: '40px', sm: '80px' }}
+marginTop={!viewAll ? '0px' : { xs: '40px', sm: '80px' }}
         sx={{
           p: isPadding ? { xs: 2, sm: 3 } : 0,
           backgroundColor: '#fff',
