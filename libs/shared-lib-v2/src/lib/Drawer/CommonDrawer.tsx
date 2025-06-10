@@ -61,25 +61,17 @@ export const CommonDrawer: React.FC<CommonDrawerProps> = ({
     return items.map((item, index) => {
       const key = `${parentKey}-${index}`;
       const hasChildren = !!item.child?.length;
-      if (
-        typeof item?.isActive === 'string' &&
-        item?.isActive === withoutQueryString()
-      )
-        console.log('item?.isActive', item?.isActive, withoutQueryString());
+
       return (
         <Box
           key={key}
           sx={{
-            // borderBottom: item?.isActive
-            //   ? `3px solid ${theme.palette.primary.main}`
-            //   : 'none',
-            borderBottom:
-              typeof item.isActive === 'boolean'
-                ? item.isActive
-                  ? `3px solid ${theme.palette.primary.main}`
-                  : 'inherit'
-                : item?.isActive === withoutQueryString()
-                ? `3px solid ${theme.palette.primary.main}`
+            bgcolor:
+              typeof item.isActive === 'string' &&
+              item.isActive === withoutQueryString()
+                ? `${theme.palette.primary.main}`
+                : level > 0
+                ? '#F1F2F2'
                 : 'inherit',
           }}
         >
@@ -89,6 +81,14 @@ export const CommonDrawer: React.FC<CommonDrawerProps> = ({
               alignItems: 'center',
               justifyContent: 'space-between',
               pr: 1,
+              borderBottom:
+                typeof item.isActive === 'boolean'
+                  ? item.isActive
+                    ? `3px solid ${theme.palette.primary.main}`
+                    : 'inherit'
+                  : item?.isActive === withoutQueryString()
+                  ? `3px solid ${theme.palette.primary.main}`
+                  : 'inherit',
             }}
           >
             <ListItemButton
