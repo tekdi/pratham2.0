@@ -103,7 +103,7 @@ const ChangeUserNamePage = () => {
         //  overflow="hidden"
       >
         <Box
-          sx={{ display: 'flex', alignItems: 'center', mb: 2, mt: 2 }}
+          sx={{ display: 'flex', alignItems: 'center', mb: 2.5, mt: 2 }}
           onClick={() => router.back()}
         >
           <IconButton>
