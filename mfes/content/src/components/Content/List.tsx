@@ -395,7 +395,7 @@ export default function Content(props: Readonly<ContentProps>) {
         console.error('Failed to handle card click:', error);
       }
     },
-    [propData?.handleCardClick, props._config.contentBaseUrl, router]
+    [propData?.handleCardClick, props?._config?.contentBaseUrl, router]
   );
 
   const handleApplyFilters = useCallback((selectedValues: any) => {

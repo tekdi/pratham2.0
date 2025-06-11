@@ -44,6 +44,7 @@ export interface AppBarProps {
   _navLinkBox?: React.CSSProperties;
   _brand?: object;
   isColorInverted?: boolean;
+  _config?: any;
 }
 
 export const withoutQueryString = () => {
@@ -159,6 +160,7 @@ export const DesktopBar = ({
   _navLinkBox,
   _brand,
   isColorInverted = false,
+  _config,
 }: AppBarProps) => {
   const [menus, setMenus] = useState<
     { anchorEl: HTMLElement | null; items: any[] }[]
@@ -203,7 +205,7 @@ export const DesktopBar = ({
       }}
     >
       <Brand {..._brand} />
-
+      {_config?.middleComponent && _config.middleComponent}
       <Box
         sx={{
           display: 'flex',

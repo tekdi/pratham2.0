@@ -528,7 +528,7 @@ mat-radio-group.mat-mdc-radio-group {
   background-color: var(--mui-palette-error-main) !important;
 } */
 ::-webkit-scrollbar {
-  width: 4px;
+  width: 8px;
   height: 4px;
 }
 

@@ -17,6 +17,7 @@ import { validate as uuidValidate } from 'uuid';
 import { useGlobalData } from '../Provider/GlobalProvider';
 import AccessibilityOptions from '../AccessibilityOptions/AccessibilityOptions';
 import { useColorInversion } from '../../context/ColorInversionContext';
+import { SearchButton } from './SearchButton';
 
 interface NewDrawerItemProp extends DrawerItemProp {
   variant?: 'contained' | 'text';
@@ -131,7 +132,6 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         isActive: currentPage === '#',
       },
     ];
-
     setDefaultNavLinks(navLinks);
   }, [t, filterFramework?.framework?.categories, router]);
 
@@ -140,6 +140,23 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
       {...props}
       onlyHideElements={['footer']}
       _topAppBar={{
+        _config: {
+          middleComponent: (
+            <SearchButton
+              onSearch={(search) => router.push('/pos/search?q=' + search)}
+              isHideSubmitButton
+              _box={{
+                sx: {
+                  maxWidth: '260px',
+                  height: '48px',
+                  '@media (max-width: 1200px)': {
+                    display: 'none',
+                  },
+                },
+              }}
+            />
+          ),
+        },
         isShowLang: false,
         isColorInverted: isColorInverted,
         _brand: {

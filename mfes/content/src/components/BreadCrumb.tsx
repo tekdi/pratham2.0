@@ -24,6 +24,7 @@ const BreadCrumb = ({
   const handleClick = (link: string) => {
     router.replace(link);
   };
+  console.log('123 shreyas', breadCrumbs);
 
   return (
     <Breadcrumbs separator="›" aria-label="breadcrumb">
