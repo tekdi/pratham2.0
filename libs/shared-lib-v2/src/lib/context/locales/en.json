@@ -64,6 +64,10 @@
   "SALARIED_WORK": "Salaried work",
   "SELF_EMPLOYMENT": "Self-employment",
   "UNEMPLOYED_OR_DOMESTIC_WORK": "Unemployed or Domestic Work",
+      "phone_type_accessible": "Type of Phone Accessible",
+      "PHONE_TYPE_ACCESSIBLE": "Type of Phone Accessible",
+"WHAT_IS_YOUR_PRIMARY_WORK": "What is your primary work?",
+"UNEMPLOYED_HOUSEWIFE_DOMESTIC_WORK": "Unemployed, Housewife or Domestic Work",
   "SURVEYS": {
     "SURVEYS": "Surveys",
     "ACTIVE_SURVEYS": "Active Surveys",
@@ -463,7 +467,7 @@
     "MARRIED": "Married",
     "DIVORCED": "Divorced",
     "PHONE_TYPE_AVAILABLE": "Type of Phone Available",
-    "SMARTPHONE": "Smartphone",
+        "SMARTPHONE": "Smartphone",
     "KEYPAD": "Keypad",
     "NO_PHONE": "No Phone",
     "IS_IT_YOUR_OWN_PHONE": "Is it your own phone?",
@@ -548,7 +552,11 @@
     "PRIMARY_WORK": "Learner's Primary Work",
     "MOBILISATION_METHOD": "How Was the Learner Mobilized?",
     "MONTH_MOBILISATION": "Month of Mobilisation",
-    "DROP_OUT_REASON": "Reason for Drop Out From School"
+    "DROP_OUT_REASON": "Reason for Drop Out From School",
+    "UNEMPLOYED_HOUSEWIFE_DOMESTIC_WORK": "Unemployed, Housewife or Domestic Work",
+"SELF_EMPLOYMENT_OWN_BUSINESS_SHOP":"Self Employment, Own Business or Shop",
+"STUDENT": "Student"
+    
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "Invalid Input.",
