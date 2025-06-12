@@ -5,6 +5,7 @@ import { handleExitEvent } from '../utils/Helper';
 interface PlayerConfigProps {
   playerConfig: any;
   relatedData?: any;
+  configFunctionality?: any;
 }
 
 const basePath = process.env.NEXT_PUBLIC_ASSETS_CONTENT || '/sbplayer';
@@ -12,6 +13,7 @@ const basePath = process.env.NEXT_PUBLIC_ASSETS_CONTENT || '/sbplayer';
 const SunbirdEpubPlayer = ({
   playerConfig,
   relatedData: { courseId, unitId, userId },
+  configFunctionality,
 }: PlayerConfigProps) => {
   const sunbirdEpubPlayerRef = useRef<HTMLIFrameElement | null>(null);
 
@@ -49,6 +51,7 @@ const SunbirdEpubPlayer = ({
                     courseId,
                     unitId,
                     userId,
+                    configFunctionality,
                   });
                 } catch (error) {
                   console.error('Error submitting assessment:', error);

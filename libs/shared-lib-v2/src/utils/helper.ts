@@ -83,12 +83,19 @@ export const calculateTrackDataItem = (newTrack: any, item: any) => {
 
 type KeyFormat = string | { key: string; format?: string; suffix: string };
 
-export function findCourseUnitPath(
-  node: any,
-  targetId: string,
-  keyArray: KeyFormat[],
-  path: any[] = []
-): any[] | null {
+export function findCourseUnitPath({
+  node,
+  targetId,
+  keyArray,
+  contentBaseUrl,
+  path = [],
+}: {
+  node: any;
+  targetId: string;
+  keyArray: KeyFormat[];
+  contentBaseUrl?: string;
+  path?: any[];
+}): any[] | null {
   // Build current node's object by processing keyArray
   const currentObj = keyArray.reduce((acc, keyItem) => {
     if (typeof keyItem === 'string') {
@@ -101,11 +108,11 @@ export function findCourseUnitPath(
           path?.length > 0 &&
           node.mimeType === 'application/vnd.ekstep.content-collection'
         ) {
-          formattedValue = `/content/${path?.[0]?.identifier}/${
-            node.identifier
-          }${keyItem?.suffix ?? ''}`;
+          formattedValue = `${contentBaseUrl ?? '/content'}/${
+            path?.[0]?.identifier
+          }/${node.identifier}${keyItem?.suffix ?? ''}`;
         } else {
-          formattedValue = `/content/${node.identifier}${
+          formattedValue = `${contentBaseUrl ?? '/content'}/${node.identifier}${
             keyItem?.suffix ?? ''
           }`;
         }
@@ -132,7 +139,13 @@ export function findCourseUnitPath(
 
   if (Array.isArray(children)) {
     for (const child of children) {
-      const result = findCourseUnitPath(child, targetId, keyArray, newPath);
+      const result = findCourseUnitPath({
+        node: child,
+        targetId,
+        keyArray,
+        contentBaseUrl,
+        path: newPath,
+      });
       if (result) return result;
     }
   }
