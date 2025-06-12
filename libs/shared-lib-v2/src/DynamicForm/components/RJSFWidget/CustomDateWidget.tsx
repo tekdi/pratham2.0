@@ -51,6 +51,20 @@ const CustomDateWidget = ({
   const errorText = rawErrors?.length > 0 ? rawErrors[0] : '';
 
   return (
+    <>
+     <input
+        value={value ?? ''}
+        required={required}
+        onChange={() => {}}
+        tabIndex={-1}
+        style={{
+          height: 1,
+          padding: 0,
+          border: 0,
+          ...(value && { visibility: 'hidden' }),
+        }}
+        aria-hidden="true"
+      />
     <LocalizationProvider dateAdapter={AdapterDayjs} required={required}>
       <DatePicker
         disabled={isDisabled}
@@ -73,7 +87,11 @@ const CustomDateWidget = ({
         }}
         required={required}
       />
+      
     </LocalizationProvider>
+    {/* Hidden text input to force native validation */}
+     
+    </>
   );
 };
 

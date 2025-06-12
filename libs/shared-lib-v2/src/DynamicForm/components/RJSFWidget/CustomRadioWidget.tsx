@@ -50,6 +50,7 @@ const CustomRadioWidget = ({
           ...(value && { visibility: 'hidden' }),
         }}
         aria-hidden="true"
+        marginTop="50px"
       />
       <FormLabel
         component="legend"
