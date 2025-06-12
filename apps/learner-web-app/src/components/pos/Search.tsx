@@ -6,6 +6,7 @@ import { Box, Typography } from '@mui/material';
 import dynamic from 'next/dynamic';
 import { SearchButton } from './SearchButton';
 import { debounce } from 'lodash';
+import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 
 const Content = dynamic(() => import('@Content'), {
   ssr: false,
@@ -44,6 +45,7 @@ const SearchPage = () => {
         showSearch={false}
         showHelpDesk={false}
         _config={{
+          _tabs: { variant: 'fullWidth' },
           _card: {
             isHideProgressStatus: true,
             isWrap: true,
@@ -58,7 +60,7 @@ const SearchPage = () => {
 
   return (
     <Layout _topAppBar={{ _config: {} }}>
-      <Box sx={{ bgcolor: '#F1F2F2', p: 7, position: 'relative' }}>
+      <Box sx={{ bgcolor: '#F1F2F2', p: 7, textAlign: 'center' }}>
         <Typography
           variant="body6"
           sx={{
@@ -67,21 +69,24 @@ const SearchPage = () => {
             textAlign: 'center',
           }}
         >
-          Search Subjects, Courses, Guides and Much More..
+          <SpeakableText>
+            Search Subjects, Courses, Guides and Much More..
+          </SpeakableText>
         </Typography>
         <Box
           sx={{
-            position: 'absolute',
-            bottom: '-25px',
-            left: '50%',
-            transform: 'translateX(-50%)',
+            mt: 2,
+            display: 'flex',
+            justifyContent: 'center',
           }}
         >
-          <SearchButton
-            searchValue={searchValue}
-            onSearch={onSearch}
-            handleSearch={handleSearch}
-          />
+          <Box sx={{ width: { md: '40%', xs: '100%' } }}>
+            <SearchButton
+              searchValue={searchValue}
+              onSearch={onSearch}
+              handleSearch={handleSearch}
+            />
+          </Box>
         </Box>
       </Box>
       <Box sx={{ p: 4 }}>{contentApp}</Box>
