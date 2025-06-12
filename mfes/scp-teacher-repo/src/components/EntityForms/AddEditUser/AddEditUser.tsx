@@ -591,6 +591,8 @@ const AddEditUser = ({
               extraFields={
                 isEdit || isReassign ? extraFieldsUpdate : extraFields
               }
+              type={type=="learner"? type: ""}
+
             />
           </>
         )

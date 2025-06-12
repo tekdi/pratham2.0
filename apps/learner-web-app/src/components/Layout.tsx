@@ -114,7 +114,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
           title: t('COMMON.SKILLING_CENTERS'),
           // icon: <Logout sx={{ width: 28, height: 28 }} />,
           to: () => handleNavClick(() => router.push('/skill-center')),
-          isActive: false,
+          isActive:currentPage === '/skill-center',
           customStyle: {},
         },
           {
