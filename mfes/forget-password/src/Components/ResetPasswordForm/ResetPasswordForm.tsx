@@ -23,10 +23,15 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSubmit }) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showValidation, setShowValidation] = useState(false);
 
   const handleTogglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
+  };
+
+  const handleToggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword((prev) => !prev);
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -132,15 +137,15 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSubmit }) => {
 
           <TextField
             label="Confirm Password"
-            type={showPassword ? 'text' : 'password'}
+            type={showConfirmPassword ? 'text' : 'password'}
             variant="outlined"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
-                  <IconButton onClick={handleTogglePasswordVisibility}>
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  <IconButton onClick={handleToggleConfirmPasswordVisibility}>
+                    {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
                 </InputAdornment>
               ),

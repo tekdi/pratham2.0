@@ -35,7 +35,7 @@ interface DetailsProps {
 export default function Details(props: DetailsProps) {
   const router = useRouter();
   const { courseId, unitId, identifier: contentId } = useParams();
-  const identifier = unitId ?? courseId;
+  const identifier = courseId;
   const [trackData, setTrackData] = useState<trackDataPorps[]>([]);
   const [selectedContent, setSelectedContent] = useState<any>(null);
   const [courseItem, setCourseItem] = useState<any>({});
@@ -51,16 +51,20 @@ export default function Details(props: DetailsProps) {
   useEffect(() => {
     const getDetails = async (identifier: string) => {
       try {
-        const resultHierarchy = await hierarchyAPI(identifier);
-        if (props?._config?.getContentData) {
-          props?._config?.getContentData(resultHierarchy);
-        }
+        let resultHierarchy: any = await hierarchyAPI(identifier, {
+          mode: 'edit',
+        });
+
         if (unitId && !props?.isHideInfoCard) {
-          const course = await hierarchyAPI(courseId as string);
-          setCourseItem(course);
+          setCourseItem(resultHierarchy);
+          if (unitId) {
+            resultHierarchy = resultHierarchy?.children?.find(
+              (item: any) => item.identifier === unitId
+            );
+          }
           const breadcrum = findCourseUnitPath({
             contentBaseUrl: props?._config?.contentBaseUrl,
-            node: course,
+            node: resultHierarchy,
             targetId: unitId as string,
             keyArray: [
               'name',
@@ -75,6 +79,9 @@ export default function Details(props: DetailsProps) {
           setBreadCrumbs(breadcrum);
         }
 
+        if (props?._config?.getContentData) {
+          props?._config?.getContentData(resultHierarchy);
+        }
         const userId = getUserId(props?._config?.userIdLocalstorageName);
         let startedOn = {};
         if (props?._config?.isEnrollmentRequired !== false) {

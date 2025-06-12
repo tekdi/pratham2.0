@@ -92,10 +92,19 @@ const getCustomFieldValue = (cohort: CohortDetails, label: string) => {
   return field?.selectedValues?.[0] || "";
 };
 
-const getIndustryValues = (cohort: CohortDetails): string[] => {
+const getIndustryValues = (cohort: CohortDetails, t : any): any => {
   const industryField = cohort.customFields.find(f => f.label === 'INDUSTRY');
-  return industryField ? industryField.selectedValues.map(v => v.label || v.value) : [];
+  console.log("industryField", industryField?.selectedValues.map(v => v.label || v.value));
+
+  return industryField
+    ? industryField.selectedValues.map(v =>
+        t(`FORM.${v.label || v.value}`, {
+          defaultValue: v.label || v.value,
+        })
+      ).join(', ')
+    : [];
 };
+
 
 const SkillCenter = ({
   title,
@@ -146,7 +155,7 @@ if (typeof window !== 'undefined') {
 
     const apiCenters: Center[] = response.result.result.results.cohortDetails.map((cohort: CohortDetails) => ({
       name: cohort.name,
-      category: getIndustryValues(cohort)[0] || 'General',
+      category: getIndustryValues(cohort, t) || 'General',
       address: getCustomFieldValue(cohort, 'ADDRESS') || 'Address not available',
       distance: '0 km',
       mapsUrl: getCustomFieldValue(cohort, 'GOOGLE_MAP_LINK') || '#',

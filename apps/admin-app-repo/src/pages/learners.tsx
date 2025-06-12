@@ -427,35 +427,35 @@ const Learner = () => {
   };
   // Define actions
   const actions = [
-    {
-      icon: (
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
-            padding: '10px',
-          }}
-        >
-          <Image src={editIcon} alt="" />
-        </Box>
-      ),
-      callback: (row) => {
-        // console.log('row:', row);
-        // console.log('AddSchema', addSchema);
-        // console.log('AddUISchema', addUiSchema);
+    // {
+    //   icon: (
+    //     <Box
+    //       sx={{
+    //         display: 'flex',
+    //         flexDirection: 'column',
+    //         alignItems: 'center',
+    //         cursor: 'pointer',
+    //         backgroundColor: 'rgb(227, 234, 240)',
+    //         padding: '10px',
+    //       }}
+    //     >
+    //       <Image src={editIcon} alt="" />
+    //     </Box>
+    //   ),
+    //   callback: (row) => {
+    //     // console.log('row:', row);
+    //     // console.log('AddSchema', addSchema);
+    //     // console.log('AddUISchema', addUiSchema);
 
-        let tempFormData = extractMatchingKeys(row, addSchema);
-        // console.log('tempFormData', tempFormData);
-        setPrefilledAddFormData(tempFormData);
-        setIsEdit(true);
-        setEditableUserId(row?.userId);
-        handleOpenModal();
-      },
-      show: (row) => row.status !== 'archived',
-    },
+    //     let tempFormData = extractMatchingKeys(row, addSchema);
+    //     // console.log('tempFormData', tempFormData);
+    //     setPrefilledAddFormData(tempFormData);
+    //     setIsEdit(true);
+    //     setEditableUserId(row?.userId);
+    //     handleOpenModal();
+    //   },
+    //   show: (row) => row.status !== 'archived',
+    // },
     {
       icon: (
         <Box
@@ -496,48 +496,48 @@ const Learner = () => {
       },
       show: (row) => row.status !== 'archived',
     },
-    {
-      icon: (
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
-            padding: '10px',
-          }}
-        >
-          <Image src={apartment} alt="" />
-        </Box>
-      ),
-      callback: async (row) => {
-        console.log('row:', row);
-        const centerField = row.customFields.find(
-          (field) => field.label === 'CENTER'
-        );
-        if (centerField) {
-          setCenterSelectiveValue(centerField.selectedValues);
-        } else {
-          console.log('CENTER field not found');
-        }
-        // console.log('AddSchema', addSchema);
-        // console.log('AddUISchema', addUiSchema);
+    // {
+    //   icon: (
+    //     <Box
+    //       sx={{
+    //         display: 'flex',
+    //         flexDirection: 'column',
+    //         alignItems: 'center',
+    //         cursor: 'pointer',
+    //         backgroundColor: 'rgb(227, 234, 240)',
+    //         padding: '10px',
+    //       }}
+    //     >
+    //       <Image src={apartment} alt="" />
+    //     </Box>
+    //   ),
+    //   callback: async (row) => {
+    //     console.log('row:', row);
+    //     const centerField = row.customFields.find(
+    //       (field) => field.label === 'CENTER'
+    //     );
+    //     if (centerField) {
+    //       setCenterSelectiveValue(centerField.selectedValues);
+    //     } else {
+    //       console.log('CENTER field not found');
+    //     }
+    //     // console.log('AddSchema', addSchema);
+    //     // console.log('AddUISchema', addUiSchema);
 
-        let batchList = await fetchUserData(row?.userId);
-        let tempFormData = extractMatchingKeys(row, addSchema);
-        tempFormData = {
-          ...tempFormData,
-          batch: batchList,
-        };
-        setPrefilledAddFormData(tempFormData);
-        // setIsEdit(true);
-        setIsReassign(true);
-        setEditableUserId(row?.userId);
-        handleOpenModal();
-      },
-      show: (row) => row.status !== 'archived',
-    },
+    //     let batchList = await fetchUserData(row?.userId);
+    //     let tempFormData = extractMatchingKeys(row, addSchema);
+    //     tempFormData = {
+    //       ...tempFormData,
+    //       batch: batchList,
+    //     };
+    //     setPrefilledAddFormData(tempFormData);
+    //     // setIsEdit(true);
+    //     setIsReassign(true);
+    //     setEditableUserId(row?.userId);
+    //     handleOpenModal();
+    //   },
+    //   show: (row) => row.status !== 'archived',
+    // },
   ];
 
   // Pagination handlers
@@ -605,7 +605,7 @@ const Learner = () => {
             />
           )
         )}
-        <Box mt={4} sx={{ display: 'flex', justifyContent: 'end' }}>
+        {/* <Box mt={4} sx={{ display: 'flex', justifyContent: 'end' }}>
           <Button
             variant="outlined"
             startIcon={<AddIcon />}
@@ -626,7 +626,7 @@ const Learner = () => {
           >
             {t('COMMON.ADD_NEW')}
           </Button>
-        </Box>
+        </Box> */}
 
         <SimpleModal
           open={openModal}
@@ -684,7 +684,7 @@ const Learner = () => {
         </SimpleModal>
 
         {response != null ? (
-          <>
+          <Box mt={4}>
             {response && response?.result?.getUserDetails ? (
               <Box sx={{ mt: 1 }}>
                 <PaginatedTable
@@ -710,7 +710,7 @@ const Learner = () => {
                 </Typography>
               </Box>
             )}
-          </>
+          </Box>
         ) : (
           <CenteredLoader />
         )}
