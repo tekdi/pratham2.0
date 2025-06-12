@@ -10,6 +10,7 @@ import {
   Paper,
   useMediaQuery,
   useTheme,
+  Alert,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
@@ -111,6 +112,25 @@ export default function AccessibilityOptions() {
 
   return (
     <div>
+      {isSpeechEnabled && (
+        <Alert
+          severity="warning"
+          sx={{
+            position: 'fixed',
+            bottom: isMobile ? '60px' : '20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 1002,
+            maxWidth: '90%',
+            width: 'auto',
+            fontSize: '16px',
+            fontWeight: 500,
+          }}
+        >
+          Navigation is disabled while Text-to-Speech is on. Turn off
+          Text-to-Speech to enable navigation.
+        </Alert>
+      )}
       <IconButton
         onClick={toggleDrawer(true)}
         aria-label="Accessibility Options"
@@ -140,6 +160,8 @@ export default function AccessibilityOptions() {
         open={open}
         onClose={toggleDrawer(false)}
         onOpen={toggleDrawer(true)}
+        disableSwipeToOpen={true}
+        swipeAreaWidth={0}
         PaperProps={{
           sx: {
             height: 'auto',
@@ -173,7 +195,7 @@ export default function AccessibilityOptions() {
 
             <CloseIcon
               sx={{
-                color: '#1C1B1F',
+                color: isColorInverted ? '#fff' : '#1C1B1F',
                 cursor: 'pointer',
               }}
               onClick={toggleDrawer(false)}

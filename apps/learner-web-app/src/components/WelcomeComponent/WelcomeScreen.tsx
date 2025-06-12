@@ -38,9 +38,6 @@ const WelcomeScreen = () => {
         variant="body9"
         component="h2"
         fontWeight={400}
-        // fontSize="32px"
-        // lineHeight="40px"
-        // letterSpacing="0px"
         textAlign="center"
         sx={{ verticalAlign: 'middle' }}
       >
@@ -49,9 +46,6 @@ const WelcomeScreen = () => {
       <Typography
         variant="h1"
         fontWeight={400}
-        // fontSize="22px"
-        // lineHeight="28px"
-        // letterSpacing="0px"
         textAlign="center"
         sx={{ verticalAlign: 'middle' }}
         mb={4}
@@ -59,16 +53,12 @@ const WelcomeScreen = () => {
         {t('LEARNER_APP.LOGIN.welcome_subtitle')}
       </Typography>
 
-      {/* App Download Section - Responsive Arrangement */}
       <Grid
         container
         alignItems="center"
         justifyContent="center"
-        // spacing={2}
         maxWidth="700px"
-        //  sx={{ mt: 2 }}
       >
-        {/* QR Code Section */}
         <Grid item xs={12} sm={5} md={4}>
           <Box
             display="flex"
@@ -90,18 +80,17 @@ const WelcomeScreen = () => {
             />
             <Box textAlign="center">
               <Typography fontWeight={600} fontSize="16px">
-                Get the App
+                {t('LEARNER_APP.WELCOME_SCREEN.GET_APP')}
               </Typography>
               <Typography fontSize="14px" color="textSecondary">
-                Point your phone
+                {t('LEARNER_APP.WELCOME_SCREEN.POINT_PHONE')}
                 <br />
-                camera here
+                {t('LEARNER_APP.WELCOME_SCREEN.CAMERA_HERE')}
               </Typography>
             </Box>
           </Box>
         </Grid>
 
-        {/* OR Divider */}
         <Grid
           item
           xs={12}
@@ -112,11 +101,10 @@ const WelcomeScreen = () => {
           justifyContent="center"
         >
           <Typography fontWeight={500} fontSize="18px">
-            OR
+            {t('LEARNER_APP.WELCOME_SCREEN.OR')}
           </Typography>
         </Grid>
 
-        {/* Play Store Section */}
         <Grid item xs={12} sm={5} md={5}>
           <Box
             display="flex"
@@ -148,14 +136,15 @@ const WelcomeScreen = () => {
                 color="textSecondary"
                 sx={{
                   whiteSpace: 'normal',
-                  wordBreak: 'keep-all', // prevents breaking within words
-                  overflowWrap: 'break-word', // only break long words if needed
+                  wordBreak: 'keep-all',
+                  overflowWrap: 'break-word',
                   textAlign: 'center',
                 }}
               >
-                Search <b>"Pratham myLearning"</b>
+                {t('LEARNER_APP.WELCOME_SCREEN.SEARCH_TEXT')}{' '}
+                <b>{t('LEARNER_APP.WELCOME_SCREEN.APP_NAME')}</b>
                 <br />
-                on Playstore
+                {t('LEARNER_APP.WELCOME_SCREEN.ON_PLAYSTORE')}
               </Typography>
             </Box>
           </Box>

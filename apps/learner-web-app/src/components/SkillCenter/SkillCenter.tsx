@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -9,19 +9,28 @@ import {
   Card,
   CardContent,
   Chip,
-  Container,
-  styled,
   CircularProgress,
+  styled,
 } from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useRouter } from 'next/navigation';
+
+import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
+import {
+  fetchForm,
+  searchListData,
+} from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import {
   searchCohort,
   CohortDetails,
-  getUserCohortsRead,
 } from '@learner/utils/API/CohortService';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { useRouter } from 'next/navigation';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import {
+  CohortSearchSchema,
+  CohortSearchUISchema,
+} from '../CohortSearch';
+import { useTranslation } from '@shared-lib';
 
 interface Center {
   name: string;
@@ -42,6 +51,10 @@ interface SkillCenterProps {
   isNavigateBack?: boolean;
   viewAll?: boolean;
   Limit?: number;
+  visibleCenters?: any;
+  setVisibleCenters?: any;
+  hideFilter?: boolean;
+  isPadding?: boolean;
 }
 
 const ImageContainer = styled(Box)(({ theme }) => ({
@@ -74,163 +87,170 @@ const ImageOverlay = styled(Box)(({ theme }) => ({
   fontWeight: 500,
 }));
 
-const getCustomFieldValue = (
-  cohort: CohortDetails,
-  fieldLabel: string
-): string | null => {
-  console.log(fieldLabel, 'fieldLabel');
-  console.log(cohort, 'cohort');
-
-  const field = cohort.customFields.find((f) => f.label === fieldLabel);
-  console.log(field, 'field');
-
-  if (field && field.selectedValues.length > 0) {
-    return field.selectedValues[0] as any;
-  }
-  return null;
+const getCustomFieldValue = (cohort: CohortDetails, label: string) => {
+  const field = cohort.customFields.find(f => f.label === label);
+  return field?.selectedValues?.[0] || "";
 };
-const getIndustryValues = (cohort: CohortDetails): string[] => {
-  const industryField = cohort.customFields.find((f) => f.label === 'INDUSTRY');
-  if (industryField) {
-    return industryField.selectedValues.map((v) => v.label || v.value);
-  }
-  return [];
+
+const getIndustryValues = (cohort: CohortDetails, t : any): any => {
+  const industryField = cohort.customFields.find(f => f.label === 'INDUSTRY');
+  console.log("industryField", industryField?.selectedValues.map(v => v.label || v.value));
+
+  return industryField
+    ? industryField.selectedValues.map(v =>
+        t(`FORM.${v.label || v.value}`, {
+          defaultValue: v.label || v.value,
+        })
+      ).join(', ')
+    : [];
 };
+
 
 const SkillCenter = ({
   title,
   isNavigateBack,
   viewAll,
   Limit,
+  visibleCenters,
+  setVisibleCenters,
+  hideFilter = true,
+  isPadding = true,
 }: SkillCenterProps) => {
   const router = useRouter();
   const [centers, setCenters] = useState<Center[]>([]);
   const [loading, setLoading] = useState(true);
-  const [offset, setOffset] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
-  const limit = 10;
+  const [schema] = useState(CohortSearchSchema);
+  const [uiSchema] = useState(CohortSearchUISchema);
+  const [prefilledFormData, setPrefilledFormData] = useState<any>(null);
+  const [response, setResponse] = useState<any>(null);
+  const isFetched = useRef(false);
+ const [pageLimit, setPageLimit] = useState<number>(10);
+  const [pageOffset, setPageOffset] = useState<number>(0);
+    const [totalCenters, setTotalCenters] = useState<number>(0);
 
-  const fetchCenters = async (currentOffset: number) => {
-    try {
-      const userId = localStorage.getItem('userId');
-      if (!userId) {
-        console.error('User ID not found in localStorage');
-        return;
-      }
-      const userCohorts = await getUserCohortsRead({
-        userId: userId,
-        fieldvalue: true,
-      });
+  const searchStoreKey = 'centers';
+  let totalcount=100;
+    const { t } = useTranslation();
 
-      console.log(userCohorts, 'userCohorts');
+let initialFormDataSearch = {};
 
-      // Extract state, district, block and village IDs from user data
-      const userData = userCohorts?.result?.userData;
-      const customFields = userData?.customFields || [];
+if (typeof window !== 'undefined') {
+  const storedSearch = localStorage.getItem(searchStoreKey);
+  const stateId = localStorage.getItem('stateId');
 
-      interface CustomField {
-        fieldId: string;
-        label: string;
-        type: string;
-        selectedValues: any[];
-      }
+  if (storedSearch) {
+    initialFormDataSearch = JSON.parse(storedSearch || '{}');
+  } else if (stateId) {
+    initialFormDataSearch = { state: [stateId] };
+  }
+}
 
-      const stateField = customFields.find(
-        (field: CustomField) => field.label === 'STATE'
-      );
-      const districtField = customFields.find(
-        (field: CustomField) => field.label === 'DISTRICT'
-      );
-      const blockField = customFields.find(
-        (field: CustomField) => field.label === 'BLOCK'
-      );
-      const villageField = customFields.find(
-        (field: CustomField) => field.label === 'VILLAGE'
-      );
 
-      const stateId = stateField?.selectedValues[0]?.id;
-      const districtId = districtField?.selectedValues[0]?.id;
-      const blockId = blockField?.selectedValues[0]?.id;
-      const villageId = villageField?.selectedValues[0]?.id;
+  useEffect(() => {
+    setPrefilledFormData(initialFormDataSearch);
+  }, []);
 
-      console.log(
-        stateId,
-        districtId,
-        blockId,
-        villageId,
-        'stateId, districtId, blockId, villageId'
-      );
+  const fetchCenters = async () => {
+    if (!response?.result?.result?.results?.cohortDetails) return;
 
-      const response = await searchCohort({
-        limit: limit,
-        offset: currentOffset,
-        filters: {
-          state: stateId,
-          district: districtId,
-          block: blockId,
-          village: villageId,
-        },
-      });
-      if (response?.result?.results?.cohortDetails) {
-        const apiCenters: Center[] = response.result.results.cohortDetails.map(
-          (cohort: CohortDetails) => ({
-            name: cohort.name,
-            category: getIndustryValues(cohort)[0] || 'General',
-            address:
-              getCustomFieldValue(cohort, 'ADDRESS') || 'Address not available',
-            distance: '0 km',
-            mapsUrl: getCustomFieldValue(cohort, 'GOOGLE_MAP_LINK') || '#',
-            images: cohort.image || ['/images/default.png'],
-            moreImages: cohort.image?.length > 3 ? cohort.image.length - 3 : 0,
-          })
-        );
-
-        if (currentOffset === 0) {
-          setCenters(apiCenters);
-        } else {
-          setCenters((prev) => [...prev, ...apiCenters]);
-        }
-
-        setHasMore(apiCenters.length === limit);
-      }
-    } catch (error) {
-      console.error('Failed to fetch centers:', error);
-    } finally {
-      setLoading(false);
-    }
+    const apiCenters: Center[] = response.result.result.results.cohortDetails.map((cohort: CohortDetails) => ({
+      name: cohort.name,
+      category: getIndustryValues(cohort, t) || 'General',
+      address: getCustomFieldValue(cohort, 'ADDRESS') || 'Address not available',
+      distance: '0 km',
+      mapsUrl: getCustomFieldValue(cohort, 'GOOGLE_MAP_LINK') || '#',
+      images: cohort.image || ['/images/default.png'],
+      moreImages: cohort.image?.length > 3 ? cohort.image.length - 3 : 0,
+    }));
+console.log("apiCenters",visibleCenters,apiCenters)
+    setCenters(apiCenters);
+    setVisibleCenters(viewAll ? apiCenters : apiCenters.slice(0, Limit));
+    setLoading(false);
   };
 
   useEffect(() => {
-    fetchCenters(0);
-  }, []);
+    if (response?.result?.result?.results?.cohortDetails?.length > 0 && !isFetched.current) {
+      isFetched.current = true;
+      fetchCenters();
+      setTotalCenters(response.result.result.count || 0);
+    } else if (!response || !response.result?.result?.results?.cohortDetails?.length) {
+      setCenters([]);
+      setVisibleCenters([]);
+      setLoading(false);
+      setTotalCenters(0);
+    }
+    else{
+      setTotalCenters(0);
+ setCenters([]);
+      setVisibleCenters([]);
+      setLoading(false);    }
+  }, [response]);
 
-  const handleLoadMore = () => {
-    const newOffset = offset + limit;
-    setOffset(newOffset);
-    fetchCenters(newOffset);
+  const searchData = async (formData: any) => {
+    if (!formData) return;
+    formData = Object.fromEntries(Object.entries(formData).filter(([_, v]) => !Array.isArray(v) || v.length > 0));
+    const staticFilter = { type: 'COHORT' };
+    const sort = ['name', formData.sortBy || 'asc'];
+
+    await searchListData(
+      formData,
+      pageOffset,
+      staticFilter,
+      pageLimit,
+      () => {},
+      () => {},
+      (newResponse: any) => setResponse({ ...newResponse }),
+      searchCohort,
+      sort
+    );
   };
 
-  const visibleCenters = viewAll ? centers : centers.slice(0, Limit);
+  const SubmitaFunction = async (formData: any) => {
+    setPrefilledFormData(formData);
+    localStorage.setItem(searchStoreKey, JSON.stringify(formData));
+    isFetched.current = false;
+    await searchData(formData);
+  };
+const handleLoadMore = () => {
+ // setPageOffset((prev) => prev + 1);
+    setPageLimit((prev) => prev + 10);
 
-  if (loading && centers.length === 0) {
-    return (
-      <Box sx={{ p: 3 }}>
-        <Typography>Loading centers...</Typography>
-      </Box>
-    );
+  isFetched.current = false;
+};
+
+useEffect(() => {
+  if (!isFetched.current) {
+    searchData(prefilledFormData);
   }
+}, [pageLimit]);
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: isPadding ? 0 : 3 }}>
       <Box
         sx={{
+          width: '100%',
           display: 'flex',
+          px: isPadding ? 3 : 0,
+          flexDirection: { xs: 'column', sm: 'row' },
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
           justifyContent: 'space-between',
-          alignItems: 'center',
+            alignItems: { xs: 'flex-start', sm: 'center' },
           mb: 3,
         }}
       >
-        <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              gap: '5px',
+              alignItems: 'center',
+              mb: { xs: 2, sm: 0 },
+            }}
+          >
           {isNavigateBack && (
             <Box
               onClick={() => {
@@ -239,7 +259,7 @@ const SkillCenter = ({
               sx={{
                 color: '#4D4639',
                 fontWeight: 500,
-                fontSize: '16px',
+                  fontSize: { xs: '14px', sm: '16px' },
                 cursor: 'pointer',
               }}
             >
@@ -249,12 +269,16 @@ const SkillCenter = ({
           <Typography
             variant="h5"
             component="h3"
-            sx={{ fontWeight: 400, color: '#1F1B13', fontSize: '22px' }}
+              sx={{
+                fontWeight: 400,
+                color: '#1F1B13',
+                fontSize: { xs: '20px', sm: '22px' },
+              }}
           >
             {title}
           </Typography>
         </Box>
-        {!viewAll && centers.length > 3 && (
+        {!viewAll && visibleCenters.length > 3 && (
           <Box
             onClick={() => {
               router.push('/skill-center');
@@ -262,41 +286,70 @@ const SkillCenter = ({
             sx={{
               color: '#0D599E',
               fontWeight: 500,
-              fontSize: '16px',
+                fontSize: { xs: '14px', sm: '16px' },
               cursor: 'pointer',
+                display: 'flex',
+                marginLeft: '20px',
+                alignItems: 'center',
             }}
           >
-            View All{' '}
+              {t('COMMON.VIEW_ALL')}
             <ArrowForwardIcon
               sx={{
                 color: '#0D599E',
                 fontWeight: 500,
-                fontSize: '16px',
+                  fontSize: { xs: '14px', sm: '16px' },
                 cursor: 'pointer',
               }}
             />
           </Box>
         )}
       </Box>
+        {!hideFilter &&(
+          <Box
+            sx={{
+              width: '100%',
+              mt: { xs: 2, sm: 0 },
+            }}
+          >
+        <DynamicForm
+          schema={schema}
+          uiSchema={{ ...uiSchema, 'ui:submitButtonOptions': { norender: true } }}
+          SubmitaFunction={SubmitaFunction}
+          isCallSubmitInHandle={true}
+          prefilledFormData={prefilledFormData}
+        />
+          </Box>
+        )}
+      </Box>
 
-      <Grid container spacing={3}>
-        {visibleCenters.map((center, idx) => (
+      <Grid
+        container
+        spacing={{ xs: 2, sm: 3 }}
+marginTop={!viewAll ? '0px' : { xs: '40px', sm: '80px' }}
+        sx={{
+          p: isPadding ? { xs: 2, sm: 3 } : 0,
+          backgroundColor: '#fff',
+        }}
+      >
+  {(viewAll ? visibleCenters : visibleCenters?.slice(0, 3))?.map(
+    (center: any, idx: any) => (
           <Grid item xs={12} sm={6} md={4} key={idx}>
-            <Card
-              sx={{
-                height: '100%',
-                borderRadius: 3,
-                boxShadow: 'unset',
-                '&:hover': {
-                  boxShadow: 'unset',
-                  transform: 'translateY(-2px)',
-                  transition: 'all 0.3s ease',
-                },
-              }}
-            >
+        <Card
+          sx={{
+            height: '100%',
+            borderRadius: 3,
+            boxShadow: 'unset',
+            '&:hover': {
+              boxShadow: 'unset',
+              transform: 'translateY(-2px)',
+              transition: 'all 0.3s ease',
+            },
+          }}
+        >
               <CardContent sx={{ p: 0 }}>
                 <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-                  {center.images.slice(0, 3).map((img, i) => (
+                    {center.images.slice(0, 3).map((img: any, i: any) => (
                     <ImageContainer key={i}>
                       <img src={img} alt={`${center.name} view ${i + 1}`} />
                       {i === 2 && center.moreImages > 0 && (
@@ -306,70 +359,72 @@ const SkillCenter = ({
                   ))}
                 </Box>
 
-                <Box sx={{ px: 2, pb: 2 }}>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1,
-                      mb: 1,
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    <Typography
-                      variant="subtitle1"
-                      sx={{
-                        fontWeight: 600,
-                        color: '#1F1B13',
-                        fontSize: '18px',
-                      }}
-                    >
-                      {center.name}
-                    </Typography>
-                    <Chip
-                      label={center.category}
-                      size="small"
-                      sx={{
-                        backgroundColor: '#F5F5F5',
-                        color: '#635E57',
-                        fontSize: '14px',
-                        fontWeight: 500,
-                        borderRadius: '16px',
-                        height: '24px',
-                      }}
-                    />
+                  <Box sx={{ px: { xs: 1, sm: 2 }, pb: { xs: 1, sm: 2 } }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                        gap: { xs: 0.5, sm: 1 },
+                  mb: 1,
+                  justifyContent: 'space-between',
+                        flexWrap: 'wrap',
+                }}
+              >
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    fontWeight: 600,
+                    color: '#1F1B13',
+                          fontSize: { xs: '16px', sm: '18px' },
+                  }}
+                >
+                  {center.name}
+                </Typography>
+                <Chip
+                  label={center.category}
+                  size="small"
+                  sx={{
+                    backgroundColor: '#F5F5F5',
+                    color: '#635E57',
+                          fontSize: { xs: '12px', sm: '14px' },
+                    fontWeight: 500,
+                    borderRadius: '16px',
+                          height: { xs: '20px', sm: '24px' },
+                  }}
+                />
                   </Box>
 
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      mb: 1.5,
-                      color: '#635E57',
-                      fontSize: '14px',
-                      lineHeight: 1.5,
-                    }}
-                  >
-                    {center.address}
-                  </Typography>
+              <Typography
+                variant="body2"
+                sx={{
+                  mb: 1.5,
+                  color: '#635E57',
+                        fontSize: { xs: '12px', sm: '14px' },
+                  lineHeight: 1.5,
+                }}
+              >
+                {center.address}
+              </Typography>
 
-                  <Link
-                    href={center.mapsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    sx={{
-                      color: '#0066CC',
-                      textDecoration: 'none',
-                      fontWeight: 500,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 0.5,
-                      fontSize: '14px',
-                      '&:hover': {
-                        color: '#004C99',
-                      },
-                    }}
-                  >
-                    Open on Maps <LocationOnIcon sx={{ fontSize: 18 }} />
+              <Link
+                href={center.mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{
+                  color: '#0066CC',
+                  textDecoration: 'none',
+                  fontWeight: 500,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.5,
+                        fontSize: { xs: '12px', sm: '14px' },
+                  '&:hover': {
+                    color: '#004C99',
+                  },
+                }}
+              >
+                      Open on Maps{' '}
+                      <LocationOnIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />
                   </Link>
                 </Box>
               </CardContent>
@@ -378,7 +433,7 @@ const SkillCenter = ({
         ))}
       </Grid>
 
-      {!loading && visibleCenters.length === 0 && (
+      {visibleCenters?.length === 0 && (
         <Box
           sx={{
             display: 'flex',
@@ -389,13 +444,13 @@ const SkillCenter = ({
           }}
         >
           <Typography variant="h6" sx={{ color: '#635E57', fontSize: '16px' }}>
-            No data found
+            {t('COMMON.NO_DATA_FOUND')}
           </Typography>
         </Box>
       )}
 
-      {viewAll && hasMore && offset > 10 && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+    {visibleCenters?.length < totalCenters  &&  visibleCenters?.length !==totalCenters  && (
+   <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
           <Box
             onClick={handleLoadMore}
             sx={{
@@ -416,9 +471,13 @@ const SkillCenter = ({
             {loading && <CircularProgress size={20} color="inherit" />}
           </Box>
         </Box>
-      )}
+)}
+
+     
     </Box>
   );
 };
 
 export default SkillCenter;
+
+
