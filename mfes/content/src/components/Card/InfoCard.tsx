@@ -82,7 +82,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   gap: 1,
-                  pt: { xs: 0, md: 2 },
+                  pt: { xs: 0, md: Boolean(onBackClick) ? 0 : 2 },
                 }}
               >
                 <IconButton
