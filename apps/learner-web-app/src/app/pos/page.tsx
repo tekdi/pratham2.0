@@ -2,17 +2,7 @@
 import React, { useState } from 'react';
 import Layout from '@learner/components/pos/Layout';
 
-import {
-  Container,
-  Typography,
-  TextField,
-  Button,
-  Grid,
-  Box,
-  useMediaQuery,
-} from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import FeautureCarousel from '@learner/components/FeautureCarousel';
+import { Container, Typography, Grid, Box, useMediaQuery } from '@mui/material';
 import WhatsNewCarousel from '@learner/components/WhatsNewCarousel';
 import MoreWayCarousel from '@learner/components/MoreWayCarousel';
 import KnwoledgeCarousel from '@learner/components/KnwoledgeCarousel';
@@ -21,77 +11,12 @@ import Learning from '@learner/components/Learning';
 import Image from 'next/image';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
+import { SearchButton } from '@learner/components/pos/SearchButton';
 
 const Content = dynamic(() => import('@Content'), {
   ssr: false,
 });
-// const keyThemesList = [
-//   [
-//     {
-//       title: 'Academics',
-
-//       desc: 'Math, Science, English...',
-//     },
-//     {
-//       title: 'Growth & Learning',
-
-//       desc: 'Activity Videos, Stories, Riddles...',
-//     },
-//     {
-//       title: 'Media Moments',
-
-//       desc: 'TV Episodes, Podcasts...',
-//     },
-//     {
-//       title: 'Inclusive Education',
-
-//       desc: 'Innovative Strategies, Subject-specific...',
-//     },
-//   ],
-//   [
-//     {
-//       title: 'Career Skills',
-
-//       desc: 'Resume, Interview, Communication...',
-//     },
-//     {
-//       title: 'Entrepreneurship',
-
-//       desc: 'Startups, Business Ideas, Finance...',
-//     },
-//     {
-//       title: 'Digital Literacy',
-
-//       desc: 'Computers, Internet, Safety...',
-//     },
-//     {
-//       title: 'Professional Growth',
-
-//       desc: 'Leadership, Teamwork, Projects...',
-//     },
-//   ],
-//   [
-//     {
-//       title: 'Life Skills',
-
-//       desc: 'Critical Thinking, Problem Solving...',
-//     },
-//     {
-//       title: 'Health & Wellness',
-
-//       desc: 'Nutrition, Exercise, Mindfulness...',
-//     },
-//     {
-//       title: 'Civic Awareness',
-//       desc: 'Rights, Responsibilities, Community...',
-//     },
-//     {
-//       title: 'Creativity',
-
-//       desc: 'Art, Music, Innovation...',
-//     },
-//   ],
-// ];
 const descriptions = [
   `
   Learning for School focuses on scholastic subjects, which include early years education and learning to read, write, and think. These skills are crucial for building children's confidence and dignity among their peers.
@@ -100,7 +25,9 @@ const descriptions = [
   'Learning for Life encompasses skills and knowledge that are a part of lifelong learning like transferable skills, interests, hobbies, and creativity. These also include life skills but are not limited to them.  It emphasises environmental awareness, physical and mental well-being, and extends learning beyond scholastic subjects.',
 ];
 
-const page = () => {
+const Page = () => {
+  const [search, setSearch] = useState('');
+  const router = useRouter();
   const partners = [
     { src: '/images/knowledge-one.png', alt: 'UBS' },
     { src: '/images/knowdlege-two.png', alt: 'Education Above All' },
@@ -135,7 +62,7 @@ const page = () => {
   const mediaMD = useMediaQuery('(max-width: 900px)');
 
   return (
-    <Layout onlyHideElements={['footer']}>
+    <Layout onlyHideElements={['footer']} _topAppBar={{ _config: {} }}>
       <Grid container spacing={4}>
         <Grid item xs={12} md={6}>
           <Image
@@ -251,56 +178,18 @@ const page = () => {
                 activities and projects.
               </SpeakableText>
             </Typography>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                bgcolor: '#F5F5F5',
-                borderRadius: '8px',
-                boxShadow: '0px 1px 2px 0px #0000004D',
+            <SearchButton
+              searchValue={search}
+              onSearch={() => router.push('/pos/search?q=' + search)}
+              handleSearch={setSearch}
+              _box={{
                 mx: 'auto',
                 mt: 4,
                 '@media (min-width: 900px)': {
                   mb: '100px',
                 },
               }}
-            >
-              <SearchIcon sx={{ color: '#757575', ml: 2, mr: 1 }} />
-              <TextField
-                variant="standard"
-                placeholder="Search.."
-                InputProps={{
-                  disableUnderline: true,
-                  sx: {
-                    fontFamily: 'Poppins',
-                    fontSize: '18px',
-                    pl: 1,
-                    bgcolor: 'transparent',
-                  },
-                }}
-                sx={{ flexGrow: 1, bgcolor: 'transparent' }}
-              />
-              <Button
-                variant="contained"
-                sx={{
-                  bgcolor: '#FDBE16',
-                  color: '#1F1B13',
-                  borderTopLeftRadius: 0,
-                  borderBottomLeftRadius: 0,
-                  borderTopRightRadius: '8px',
-                  borderBottomRightRadius: '8px',
-                  boxShadow: 'none',
-                  px: 4,
-                  py: 1.5,
-                  fontWeight: 600,
-                  fontSize: '16px',
-                  textTransform: 'none',
-                  '&:hover': { bgcolor: '#e9a416' },
-                }}
-              >
-                <SpeakableText>Search</SpeakableText>
-              </Button>
-            </Box>
+            />
           </Box>
         </Grid>
       </Grid>
@@ -481,6 +370,7 @@ const page = () => {
             // showHelpDesk={false}
             hasMoreData={false}
             _config={{
+              contentBaseUrl: '/pos',
               _carousel: {
                 loop: true,
                 autoplay: { delay: 2500, disableOnInteraction: false },
@@ -653,4 +543,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

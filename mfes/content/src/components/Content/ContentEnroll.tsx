@@ -23,6 +23,7 @@ import { ContentSearchResponse } from '@content-mfes/services/Search';
 import { checkAuth, getUserId } from '@shared-lib-v2/utils/AuthService';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 import { useTranslation } from '@shared-lib-v2/lib/context/LanguageContext';
+import { Loader } from '@shared-lib-v2/lib/Loader/Loader';
 interface ContentDetailsProps {
   isShowLayout: boolean;
   id?: string;
@@ -31,6 +32,8 @@ interface ContentDetailsProps {
 }
 
 const ContentDetails = (props: ContentDetailsProps) => {
+  const [checkLocalAuth, setCheckLocalAuth] = useState(false);
+  const [isProgressCompleted, setIsProgressCompleted] = useState(false);
   const router = useRouter();
   const params = useParams();
   const identifier = props.id ?? params?.identifier; // string | string[] | undefined
@@ -51,26 +54,46 @@ const ContentDetails = (props: ContentDetailsProps) => {
       try {
         const result = await hierarchyAPI(identifier as string);
         const userId = getUserId(props?._config?.userIdLocalstorageName);
-        if (checkAuth(Boolean(userId))) {
-          const data = await getUserCertificateStatus({
-            userId: userId as string,
-            courseId: identifier as string,
-          });
-          if (
-            ['enrolled', 'inprogress', 'completed', 'viewCertificate'].includes(
-              data?.result?.status
-            )
-          ) {
-            if (props?.getIfEnrolled) {
-              props?.getIfEnrolled(result as unknown as ContentSearchResponse);
+        setCheckLocalAuth(checkAuth(Boolean(userId)));
+        if (props?._config?.isEnrollmentRequired !== false) {
+          if (checkAuth(Boolean(userId))) {
+            const data = await getUserCertificateStatus({
+              userId: userId as string,
+              courseId: identifier as string,
+            });
+            if (
+              [
+                'enrolled',
+                'inprogress',
+                'completed',
+                'viewCertificate',
+              ].includes(data?.result?.status)
+            ) {
+              if (props?.getIfEnrolled) {
+                props?.getIfEnrolled(
+                  result as unknown as ContentSearchResponse
+                );
+              } else {
+                router.replace(
+                  `${
+                    props?._config?.contentBaseUrl ?? '/content'
+                  }/${identifier}${
+                    activeLink ? `?activeLink=${activeLink}` : ''
+                  }`
+                );
+              }
             } else {
-              router.replace(
-                `${props?._config?.contentBaseUrl ?? '/content'}/${identifier}${
-                  activeLink ? `?activeLink=${activeLink}` : ''
-                }`
-              );
+              setIsProgressCompleted(true);
             }
+          } else {
+            setIsProgressCompleted(true);
           }
+        } else {
+          router.replace(
+            `${props?._config?.contentBaseUrl ?? '/content'}/${identifier}${
+              activeLink ? `?activeLink=${activeLink}` : ''
+            }`
+          );
         }
         setContentDetails(result as unknown as ContentSearchResponse);
       } catch (error) {
@@ -119,158 +142,163 @@ const ContentDetails = (props: ContentDetailsProps) => {
     router.back();
   };
 
-  return (
-    <LayoutPage
-      isLoadingChildren={isLoading || activeLink === null}
-      isShow={props?.isShowLayout}
-    >
-      <InfoCard
-        item={contentDetails}
-        topic={contentDetails?.se_subjects?.join(',')}
-        onBackClick={onBackClick}
-        _config={{ onButtonClick: handleClick, ...props?._config }}
-      />
-      <Box sx={{ display: 'flex' }}>
-        <Box
-          sx={{
-            display: { xs: 'none', sm: 'none', md: 'flex' },
-            flex: { xs: 6, md: 4, lg: 3, xl: 3 },
-          }}
+  if (!isProgressCompleted) {
+    return <Loader isLoading={true} />;
+  } else {
+    return (
+      <LayoutPage
+        isLoadingChildren={isLoading || activeLink === null}
+        isShow={props?.isShowLayout}
+      >
+        <InfoCard
+          item={contentDetails}
+          topic={contentDetails?.se_subjects?.join(',')}
+          onBackClick={onBackClick}
+          _config={{ onButtonClick: handleClick, ...props?._config }}
+          checkLocalAuth={checkLocalAuth}
         />
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            flex: { xs: 6, md: 8, lg: 9, xl: 9 },
-            px: '18px',
-          }}
-        >
+        <Box sx={{ display: 'flex' }}>
+          <Box
+            sx={{
+              display: { xs: 'none', sm: 'none', md: 'flex' },
+              flex: { xs: 6, md: 4, lg: 3, xl: 3 },
+            }}
+          />
           <Box
             sx={{
               display: 'flex',
               flexDirection: 'column',
-              gap: 4,
-              py: 4,
-              width: { sx: '100%', sm: '90%', md: '85%' },
+              flex: { xs: 6, md: 8, lg: 9, xl: 9 },
+              px: '18px',
             }}
           >
-            <Box>
-              <Typography
-                variant="body1"
-                component="div"
-                sx={{
-                  fontWeight: 400,
-                  // fontSize: '16px',
-                  // lineHeight: '24px',
-                  letterSpacing: '0.5px',
-                  color: '#4D4639',
-                  textTransform: 'capitalize',
-                }}
-                fontWeight={400}
-              >
-                <SpeakableText>
-                  {contentDetails?.description ?? 'No description available'}
-                </SpeakableText>
-              </Typography>
-            </Box>
             <Box
               sx={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 3,
+                gap: 4,
+                py: 4,
+                width: { sx: '100%', sm: '90%', md: '85%' },
               }}
             >
-              <Typography
-                variant="h1"
+              <Box>
+                <Typography
+                  variant="body1"
+                  component="div"
+                  sx={{
+                    fontWeight: 400,
+                    // fontSize: '16px',
+                    // lineHeight: '24px',
+                    letterSpacing: '0.5px',
+                    color: '#4D4639',
+                    textTransform: 'capitalize',
+                  }}
+                  fontWeight={400}
+                >
+                  <SpeakableText>
+                    {contentDetails?.description ?? 'No description available'}
+                  </SpeakableText>
+                </Typography>
+              </Box>
+              <Box
                 sx={{
-                  fontWeight: 400,
-                  // fontSize: '22px',
-                  // lineHeight: '28px',
-                  letterSpacing: '0px',
-                  verticalAlign: 'middle',
-                  color: '#1F1B13',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 3,
                 }}
               >
-                <SpeakableText>{t('COMMON.WHAT_YOU_LL_LEARN')}</SpeakableText>
-              </Typography>
+                <Typography
+                  variant="h1"
+                  sx={{
+                    fontWeight: 400,
+                    // fontSize: '22px',
+                    // lineHeight: '28px',
+                    letterSpacing: '0px',
+                    verticalAlign: 'middle',
+                    color: '#1F1B13',
+                  }}
+                >
+                  <SpeakableText>{t('COMMON.WHAT_YOU_LL_LEARN')}</SpeakableText>
+                </Typography>
 
-              {contentDetails?.children &&
-                contentDetails?.children?.length > 0 && (
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: 2,
-                    }}
-                  >
-                    {contentDetails?.children?.map(
-                      (item: any, index: number) => (
-                        <>
-                          <Accordion
-                            key={item.identifier}
-                            sx={{
-                              backgroundColor: 'transparent',
-                              boxShadow: 'none',
-                              '&:before': {
-                                display: 'none',
-                              },
-                              '&.MuiAccordion-root': {
-                                border: 'none',
-                              },
-                            }}
-                          >
-                            <AccordionSummary
-                              expandIcon={<ExpandMoreIcon />}
-                              aria-controls="panel1-content"
-                              id="panel1-header"
+                {contentDetails?.children &&
+                  contentDetails?.children?.length > 0 && (
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 2,
+                      }}
+                    >
+                      {contentDetails?.children?.map(
+                        (item: any, index: number) => (
+                          <>
+                            <Accordion
+                              key={item.identifier}
+                              sx={{
+                                backgroundColor: 'transparent',
+                                boxShadow: 'none',
+                                '&:before': {
+                                  display: 'none',
+                                },
+                                '&.MuiAccordion-root': {
+                                  border: 'none',
+                                },
+                              }}
                             >
-                              <Typography
-                                variant="body1"
-                                component="div"
-                                sx={{
-                                  fontWeight: 500,
-                                  // fontSize: '16px',
-                                  // letterSpacing: '0.15px',
-                                }}
+                              <AccordionSummary
+                                expandIcon={<ExpandMoreIcon />}
+                                aria-controls="panel1-content"
+                                id="panel1-header"
                               >
-                                <SpeakableText>{item?.name}</SpeakableText>
-                              </Typography>
-                            </AccordionSummary>
-                            <AccordionDetails>
-                              <Typography
-                                variant="body1"
-                                component="div"
-                                sx={{
-                                  fontWeight: 400,
-                                  // fontSize: '16px',
-                                  // lineHeight: '24px',
-                                  letterSpacing: '0.5px',
-                                  color: '#4D4639',
-                                }}
-                              >
-                                <SpeakableText>
-                                  {item?.description ??
-                                    'No description available'}
-                                </SpeakableText>
-                              </Typography>
-                            </AccordionDetails>
-                          </Accordion>
+                                <Typography
+                                  variant="body1"
+                                  component="div"
+                                  sx={{
+                                    fontWeight: 500,
+                                    // fontSize: '16px',
+                                    // letterSpacing: '0.15px',
+                                  }}
+                                >
+                                  <SpeakableText>{item?.name}</SpeakableText>
+                                </Typography>
+                              </AccordionSummary>
+                              <AccordionDetails>
+                                <Typography
+                                  variant="body1"
+                                  component="div"
+                                  sx={{
+                                    fontWeight: 400,
+                                    // fontSize: '16px',
+                                    // lineHeight: '24px',
+                                    letterSpacing: '0.5px',
+                                    color: '#4D4639',
+                                  }}
+                                >
+                                  <SpeakableText>
+                                    {item?.description ??
+                                      'No description available'}
+                                  </SpeakableText>
+                                </Typography>
+                              </AccordionDetails>
+                            </Accordion>
 
-                          {index <
-                            (contentDetails?.children?.length ?? 0) - 1 && (
-                            <Divider />
-                          )}
-                        </>
-                      )
-                    )}
-                  </Box>
-                )}
+                            {index <
+                              (contentDetails?.children?.length ?? 0) - 1 && (
+                              <Divider />
+                            )}
+                          </>
+                        )
+                      )}
+                    </Box>
+                  )}
+              </Box>
             </Box>
           </Box>
         </Box>
-      </Box>
-    </LayoutPage>
-  );
+      </LayoutPage>
+    );
+  }
 };
 
 export default ContentDetails;

@@ -35,7 +35,7 @@ interface DetailsProps {
 export default function Details(props: DetailsProps) {
   const router = useRouter();
   const { courseId, unitId, identifier: contentId } = useParams();
-  const identifier = unitId ?? courseId;
+  const identifier = courseId;
   const [trackData, setTrackData] = useState<trackDataPorps[]>([]);
   const [selectedContent, setSelectedContent] = useState<any>(null);
   const [courseItem, setCourseItem] = useState<any>({});
@@ -51,16 +51,20 @@ export default function Details(props: DetailsProps) {
   useEffect(() => {
     const getDetails = async (identifier: string) => {
       try {
-        const resultHierarchy = await hierarchyAPI(identifier);
-        if (props?._config?.getContentData) {
-          props?._config?.getContentData(resultHierarchy);
-        }
+        let resultHierarchy: any = await hierarchyAPI(identifier, {
+          mode: 'edit',
+        });
+
         if (unitId && !props?.isHideInfoCard) {
-          const course = await hierarchyAPI(courseId as string);
-          setCourseItem(course);
+          setCourseItem(resultHierarchy);
+          if (unitId) {
+            resultHierarchy = resultHierarchy?.children?.find(
+              (item: any) => item.identifier === unitId
+            );
+          }
           const breadcrum = findCourseUnitPath({
             contentBaseUrl: props?._config?.contentBaseUrl,
-            node: course,
+            node: resultHierarchy,
             targetId: unitId as string,
             keyArray: [
               'name',
@@ -75,84 +79,91 @@ export default function Details(props: DetailsProps) {
           setBreadCrumbs(breadcrum);
         }
 
+        if (props?._config?.getContentData) {
+          props?._config?.getContentData(resultHierarchy);
+        }
         const userId = getUserId(props?._config?.userIdLocalstorageName);
         let startedOn = {};
-        if (checkAuth(Boolean(userId))) {
-          const data = await getUserCertificateStatus({
-            userId: userId as string,
-            courseId: courseId as string,
-          });
-          if (
-            ![
-              'enrolled',
-              'inprogress',
-              'completed',
-              'viewCertificate',
-            ].includes(data?.result?.status)
-          ) {
-            router.replace(
-              `${
-                props?._config?.contentBaseUrl ?? '/content'
-              }-details/${courseId}${
-                activeLink ? `?activeLink=${activeLink}` : ''
-              }`
-            );
-          } else {
-            const userIdArray: string[] = Array.isArray(userId)
-              ? (userId as string[]).filter(Boolean)
-              : [userId as string].filter(Boolean);
-            const course_track_data = await trackingData(userIdArray, [
-              courseId as string,
-            ]);
-            const userTrackData =
-              course_track_data.data.find(
-                (course: any) => course.userId === userId
-              )?.course || [];
+        if (props?._config?.isEnrollmentRequired !== false) {
+          if (checkAuth(Boolean(userId))) {
+            const data = await getUserCertificateStatus({
+              userId: userId as string,
+              courseId: courseId as string,
+            });
+            if (
+              ![
+                'enrolled',
+                'inprogress',
+                'completed',
+                'viewCertificate',
+              ].includes(data?.result?.status)
+            ) {
+              router.replace(
+                `${
+                  props?._config?.contentBaseUrl ?? '/content'
+                }-details/${courseId}${
+                  activeLink ? `?activeLink=${activeLink}` : ''
+                }`
+              );
+            } else {
+              const userIdArray: string[] = Array.isArray(userId)
+                ? (userId as string[]).filter(Boolean)
+                : [userId as string].filter(Boolean);
+              const course_track_data = await trackingData(userIdArray, [
+                courseId as string,
+              ]);
+              const userTrackData =
+                course_track_data.data.find(
+                  (course: any) => course.userId === userId
+                )?.course || [];
 
-            const newTrackData = calculateTrackData(
-              userTrackData?.[0] ?? {},
-              resultHierarchy?.children ?? []
-            );
-
-            setTrackData(newTrackData ?? []);
-            if (data?.result?.status === 'viewCertificate') {
-              if (props?._config?.userIdLocalstorageName !== 'did') {
-                setCertificateId(data?.result?.certificateId);
-              }
-            } else if (course_track_data?.data && !unitId) {
-              const course_track = calculateTrackDataItem(
+              const newTrackData = calculateTrackData(
                 userTrackData?.[0] ?? {},
-                resultHierarchy ?? {}
+                resultHierarchy?.children ?? []
               );
 
-              if (
-                course_track?.status === 'completed' &&
-                data?.result?.status === 'enrolled' &&
-                props?._config?.userIdLocalstorageName !== 'did'
-              ) {
-                const userResponse: any = await getUserIdLocal();
-                const resultCertificate = await issueCertificate({
-                  userId: userId,
-                  courseId: courseId,
-                  unitId: unitId,
-                  issuanceDate: new Date().toISOString(),
-                  expirationDate: new Date(
-                    new Date().setFullYear(new Date().getFullYear() + 20)
-                  ).toISOString(),
-                  credentialId: data?.result?.usercertificateId,
-                  firstName: userResponse?.firstName ?? '',
-                  middleName: userResponse?.middleName ?? '',
-                  lastName: userResponse?.lastName ?? '',
-                  courseName: resultHierarchy?.name ?? '',
-                });
-                setCertificateId(resultCertificate?.result?.credentialSchemaId);
+              setTrackData(newTrackData ?? []);
+              if (data?.result?.status === 'viewCertificate') {
+                if (props?._config?.userIdLocalstorageName !== 'did') {
+                  setCertificateId(data?.result?.certificateId);
+                }
+              } else if (course_track_data?.data && !unitId) {
+                const course_track = calculateTrackDataItem(
+                  userTrackData?.[0] ?? {},
+                  resultHierarchy ?? {}
+                );
+
+                if (
+                  course_track?.status === 'completed' &&
+                  data?.result?.status === 'enrolled' &&
+                  props?._config?.userIdLocalstorageName !== 'did'
+                ) {
+                  const userResponse: any = await getUserIdLocal();
+                  const resultCertificate = await issueCertificate({
+                    userId: userId,
+                    courseId: courseId,
+                    unitId: unitId,
+                    issuanceDate: new Date().toISOString(),
+                    expirationDate: new Date(
+                      new Date().setFullYear(new Date().getFullYear() + 20)
+                    ).toISOString(),
+                    credentialId: data?.result?.usercertificateId,
+                    firstName: userResponse?.firstName ?? '',
+                    middleName: userResponse?.middleName ?? '',
+                    lastName: userResponse?.lastName ?? '',
+                    courseName: resultHierarchy?.name ?? '',
+                  });
+                  setCertificateId(
+                    resultCertificate?.result?.credentialSchemaId
+                  );
+                }
               }
             }
+            startedOn = {
+              startedOn: data?.result?.createdOn,
+              issuedOn: data?.result?.issuedOn,
+            };
           }
-          startedOn = {
-            startedOn: data?.result?.createdOn,
-            issuedOn: data?.result?.issuedOn,
-          };
         }
         setSelectedContent({ ...resultHierarchy, ...startedOn });
       } catch (error) {
@@ -224,7 +235,10 @@ export default function Details(props: DetailsProps) {
             ...props?._config,
             _infoCard: {
               breadCrumbs: breadCrumbs,
-              isShowStatus: trackData,
+              isShowStatus:
+                props?._config?.isEnrollmentRequired !== false
+                  ? trackData
+                  : false,
               isHideStatus: true,
               default_img: `${AppConst.BASEPATH}/assests/images/image_ver.png`,
               ...props?._config?._infoCard,

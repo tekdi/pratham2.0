@@ -3,7 +3,6 @@
 import React from 'react';
 import Layout from '@learner/components/pos/Layout';
 import dynamic from 'next/dynamic';
-import { gredientStyle } from '@learner/utils/style';
 import { Box } from '@mui/material';
 import { getMetadata } from '@learner/utils/API/metabaseService';
 
@@ -15,11 +14,12 @@ const ContentEnrollDetails = dynamic(() => import('@ContentEnrollDetails'), {
 });
 const App = () => {
   return (
-    <Layout sx={gredientStyle}>
+    <Layout>
       <Box sx={{ paddingBottom: '32px' }}>
         <ContentEnrollDetails
           isShowLayout={false}
           _config={{
+            isEnrollmentRequired: false,
             userIdLocalstorageName: 'did',
             contentBaseUrl: '/pos/content',
             default_img: '/images/image_ver.png',

@@ -24,18 +24,18 @@ const slides = [
     description:
       "Pratham undertook an exploratory study for children to understand the problem of plastic waste management in rural India. This study is a part of Pratham's Learning for Life curriculum. In this study, we covered 8400 households, in 700 villages across 70 districts, in 15 states. Findings to be released in July 2022. Click here to sign up for the report.",
   },
-  {
-    image:
-      'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=800&q=80',
-    heading: 'Digital Learning Expansion 2023',
-    description:
-      'A new initiative to expand digital learning resources to rural schools. Over 5000 tablets distributed and 200+ workshops conducted.',
-    stats: [
-      { label: 'TABLETS', value: 5000 },
-      { label: 'WORKSHOPS', value: 200 },
-      { label: 'SCHOOLS', value: 120 },
-    ],
-  },
+  // {
+  //   image:
+  //     'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=800&q=80',
+  //   heading: 'Digital Learning Expansion 2023',
+  //   description:
+  //     'A new initiative to expand digital learning resources to rural schools. Over 5000 tablets distributed and 200+ workshops conducted.',
+  //   stats: [
+  //     { label: 'TABLETS', value: 5000 },
+  //     { label: 'WORKSHOPS', value: 200 },
+  //     { label: 'SCHOOLS', value: 120 },
+  //   ],
+  // },
 ];
 
 const WhatsNewCarousel = () => {

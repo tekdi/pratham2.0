@@ -40,6 +40,11 @@
     "ENROLL_NOW": "ఇప్పుడే నమోదు చేయండి",
     "GO_TO_MY_PROFILE": "నా ప్రొఫైల్‌కు వెళ్లు",
     "WHAT_YOU_LL_LEARN": "మీరు ఏమి నేర్చుకుంటారు",
+    "VIEW_ALL": "అన్ని చూపించు",
+    "NO_DATA_FOUND": "ఏదీ కనుగొనిస్తాము",
+    "LOAD_MORE": "మరిన్ని చూపించు",
+    "SKILLING_CENTERS": "దక్షతా కేంద్రాలు",
+    "SKILLING_CENTERS_NEAR_YOU": "మీ నుండి దక్షతా కేంద్రాలు",
     "STATUS": {
       "completed": "పూర్తయింది",
       "in_progress": "ప్రోగ్రెస్‌లో",
@@ -73,7 +78,8 @@
       "GET_STARTED": "L1 కోర్సులతో ప్రారంభించండి",
       "FILTER_BY": "ఫిల్టర్ చేయండి",
       "CLEAR_FILTER": "ఫిల్టర్‌ను తొలగించు",
-      "APPLY_FILTER": "ఫిల్టర్ వర్తింపజేయి"
+      "APPLY_FILTER": "ఫిల్టర్ వర్తింపజేయి",
+      "DONE": "పూర్తయింది"
     },
     "EXPLORE": {
       "EXPLORE_ADDITIONAL_COURSES": "అదనపు కోర్సులను అన్వేషించండి"

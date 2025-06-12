@@ -64,6 +64,10 @@
   "SALARIED_WORK": "Salaried work",
   "SELF_EMPLOYMENT": "Self-employment",
   "UNEMPLOYED_OR_DOMESTIC_WORK": "Unemployed or Domestic Work",
+      "phone_type_accessible": "Type of Phone Accessible",
+      "PHONE_TYPE_ACCESSIBLE": "Type of Phone Accessible",
+"WHAT_IS_YOUR_PRIMARY_WORK": "What is your primary work?",
+"UNEMPLOYED_HOUSEWIFE_DOMESTIC_WORK": "Unemployed, Housewife or Domestic Work",
   "SURVEYS": {
     "SURVEYS": "Surveys",
     "ACTIVE_SURVEYS": "Active Surveys",
@@ -100,6 +104,11 @@
     "ENROLL_NOW": "Enroll Now",
     "GO_TO_MY_PROFILE": "Go to My Profile",
     "WHAT_YOU_LL_LEARN": "What You'll Learn",
+    "VIEW_ALL": "View All",
+    "NO_DATA_FOUND": "No data found",
+    "LOAD_MORE": "Load More",
+    "SKILLING_CENTERS": "Skilling Centers",
+    "SKILLING_CENTERS_NEAR_YOU": "Skilling Center Near You",
     "STATUS": {
       "completed": "Completed",
       "in_progress": "In Progress",
@@ -142,7 +151,8 @@
       "GET_STARTED": "Get Started with L1 Courses",
       "FILTER_BY": "Filter by",
       "CLEAR_FILTER": "Clear Filter",
-      "APPLY_FILTER": "Apply Filter"
+      "APPLY_FILTER": "Apply Filter",
+      "DONE": "Done"
     },
     "EXPLORE": {
       "EXPLORE_ADDITIONAL_COURSES": "Explore Additional Courses"
@@ -458,7 +468,7 @@
     "MARRIED": "Married",
     "DIVORCED": "Divorced",
     "PHONE_TYPE_AVAILABLE": "Type of Phone Available",
-    "SMARTPHONE": "Smartphone",
+        "SMARTPHONE": "Smartphone",
     "KEYPAD": "Keypad",
     "NO_PHONE": "No Phone",
     "IS_IT_YOUR_OWN_PHONE": "Is it your own phone?",
@@ -543,7 +553,22 @@
     "PRIMARY_WORK": "Learner's Primary Work",
     "MOBILISATION_METHOD": "How Was the Learner Mobilized?",
     "MONTH_MOBILISATION": "Month of Mobilisation",
-    "DROP_OUT_REASON": "Reason for Drop Out From School"
+    "DROP_OUT_REASON": "Reason for Drop Out From School",
+    "UNEMPLOYED_HOUSEWIFE_DOMESTIC_WORK": "Unemployed, Housewife or Domestic Work",
+"SELF_EMPLOYMENT_OWN_BUSINESS_SHOP":"Self Employment, Own Business or Shop",
+"STUDENT": "Student",
+ "BEAUTY": "beauty",
+  "AUTO_2W": "auto_2w",
+  "AUTO_4W": "auto_4w",
+  "ELECTRICAL": "electrical",
+  "HEALTHCARE": "healthcare",
+  "HOSPITALITY": "hospitality",
+  "PLUMBING": "plumbing",
+  "WELDING": "welding",
+  "APPAREL": "apparel",
+  "CONSTRUCTION": "construction",
+  "GRAPHIC_DESIGN": "graphic design"
+    
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "Invalid Input.",

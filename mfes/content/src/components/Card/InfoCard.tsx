@@ -13,12 +13,14 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { ExpandableText, useTranslation } from '@shared-lib';
 import BreadCrumb from '../BreadCrumb';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
+import LoginIcon from '@mui/icons-material/Login';
 
 interface InfoCardProps {
   item: any;
   topic?: string;
   onBackClick?: () => void;
   _config?: any;
+  checkLocalAuth?: boolean;
 }
 
 const InfoCard: React.FC<InfoCardProps> = ({
@@ -26,11 +28,12 @@ const InfoCard: React.FC<InfoCardProps> = ({
   topic,
   onBackClick,
   _config,
+  checkLocalAuth,
 }) => {
   const { t } = useTranslation();
   const { _infoCard } = _config || {};
   const [openModal, setOpenModal] = useState(false);
-
+  console.log('shreyas', _infoCard);
   return (
     <>
       <Card
@@ -39,6 +42,8 @@ const InfoCard: React.FC<InfoCardProps> = ({
           flexDirection: { xs: 'column', sm: 'row', md: 'row' },
           borderRadius: 0,
           ..._infoCard?._card,
+          boxShadow: 'none',
+          backgroundColor: '#F5F5F5',
         }}
       >
         <CardMedia
@@ -77,7 +82,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   gap: 1,
-                  pt: { xs: 0, md: 2 },
+                  pt: { xs: 0, md: Boolean(onBackClick) ? 0 : 2 },
                 }}
               >
                 <IconButton
@@ -96,7 +101,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
             <Typography
               component="div"
               // @ts-ignore
-              variant="body6"
+              variant="body8"
               title={item?.name}
               sx={{
                 fontWeight: 700,
@@ -104,7 +109,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
                 // lineHeight: { xs: '28px', sm: '32px', md: '44px' },
                 lineHeight: 1.5,
                 display: '-webkit-box',
-                WebkitLineClamp: 1,
+                WebkitLineClamp: 2,
                 WebkitBoxOrient: 'vertical',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -200,6 +205,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
       <CommonModal
         open={openModal}
         // onClose={() => setOpenModal(false)}
+        buttonText={checkLocalAuth ? 'Start Learning' : 'Login First'}
         onStartLearning={_config?.onButtonClick}
       >
         <Box
@@ -211,7 +217,12 @@ const InfoCard: React.FC<InfoCardProps> = ({
             px: 3,
           }}
         >
-          <CheckCircleIcon sx={{ color: '#21A400', fontSize: 48, mb: 1 }} />
+          {checkLocalAuth ? (
+            <CheckCircleIcon sx={{ color: '#21A400', fontSize: 48, mb: 1 }} />
+          ) : (
+            <LoginIcon sx={{ color: '#21A400', fontSize: 48, mb: 1 }} />
+          )}
+
           <Typography
             variant="h1"
             component="div"
@@ -225,7 +236,9 @@ const InfoCard: React.FC<InfoCardProps> = ({
               mb: 1,
             }}
           >
-            <SpeakableText>Awesome!</SpeakableText>
+            <SpeakableText>
+              {checkLocalAuth ? 'Awesome!' : 'Login First'}
+            </SpeakableText>
           </Typography>
           <Typography
             variant="body1"
@@ -240,7 +253,11 @@ const InfoCard: React.FC<InfoCardProps> = ({
               color: '#1F1B13',
             }}
           >
-            <SpeakableText>You are now enrolled to the course!</SpeakableText>
+            <SpeakableText>
+              {checkLocalAuth
+                ? 'You are now enrolled to the course!'
+                : 'you need to login first'}
+            </SpeakableText>
           </Typography>
         </Box>
       </CommonModal>

@@ -100,6 +100,11 @@
     "ENROLL_NOW": "आता नावनोंद करा",
     "GO_TO_MY_PROFILE": "माझ्या प्रोफाइलवर जा",
     "WHAT_YOU_LL_LEARN": "तुम्ही काय शिकणार आहात",
+    "VIEW_ALL": "View All",
+    "NO_DATA_FOUND": "कोई डेटा नहीं मिला",
+    "LOAD_MORE": "अधिक लोड करें",
+    "SKILLING_CENTERS": "कृषि केंद्र",
+    "SKILLING_CENTERS_NEAR_YOU": "तुमचे नजीक कृषि केंद्र",
     "STATUS": {
       "completed": "पूर्ण झाले",
       "in_progress": "चालू",
@@ -142,7 +147,8 @@
       "GET_STARTED": "L1 अभ्यासक्रम सुरू करा",
       "FILTER_BY": "द्वारे फिल्टर करा",
       "CLEAR_FILTER": "फिल्टर साफ करा",
-      "APPLY_FILTER": "फिल्टर लागू करा"
+      "APPLY_FILTER": "फिल्टर लागू करा",
+      "DONE": "पूर्ण झाले"
     },
     "EXPLORE": {
       "EXPLORE_ADDITIONAL_COURSES": "अतिरिक्त अभ्यासक्रम पाहा"

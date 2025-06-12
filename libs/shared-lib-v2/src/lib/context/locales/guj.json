@@ -100,6 +100,11 @@
     "ENROLL_NOW": "હવે ઉમેરાઓ",
     "GO_TO_MY_PROFILE": "મારી પ્રોફાઇલ પર જાઓ",
     "WHAT_YOU_LL_LEARN": "શું શીખશો",
+    "VIEW_ALL": "વધારે દર્શાવો",
+    "NO_DATA_FOUND": "કોઈ ડેટા મળી નથી",
+    "LOAD_MORE": "વધારે લોડ કરો",
+    "SKILLING_CENTERS": "કૃષિ કેન્દ્ર",
+    "SKILLING_CENTERS_NEAR_YOU": "તમારા નજીકના કૃષિ કેન્દ્ર",
     "STATUS": {
       "completed": "પૂર્ણ થયું",
       "in_progress": "પ્રગતિ પર",
@@ -142,7 +147,8 @@
       "GET_STARTED": "L1 કોર્સ શરૂ કરો",
       "FILTER_BY": "દ્વારા ફિલ્ટર કરો",
       "CLEAR_FILTER": "ફિલ્ટર સાફ કરો",
-      "APPLY_FILTER": "ફિલ્ટર લાગુ કરો"
+      "APPLY_FILTER": "ફિલ્ટર લાગુ કરો",
+      "DONE": "પૂર્ણ"
     },
     "EXPLORE": {
       "EXPLORE_ADDITIONAL_COURSES": "અતિરિક્ત કોર્સ શોધો"

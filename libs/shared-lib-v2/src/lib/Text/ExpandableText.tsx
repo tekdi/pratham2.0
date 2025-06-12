@@ -13,7 +13,7 @@ type ExpandableTextProps = {
 };
 
 export const ExpandableText: React.FC<ExpandableTextProps> = memo(
-  ({ text = '', _text, maxWords = 30, maxLines = 2 }) => {
+  ({ text = '', _text, maxWords = 60, maxLines = 2 }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [showButton, setShowButton] = useState(false);
     const [truncatedText, setTruncatedText] = useState<string>('');
@@ -118,7 +118,7 @@ export const ExpandableText: React.FC<ExpandableTextProps> = memo(
         >
           <SpeakableText>
             {displayText
-              ? capitalize(displayText.split(' ')[0]) + displayText.slice(1)
+              ? capitalize(displayText[0]) + displayText.slice(1)
               : ''}
           </SpeakableText>
         </Typography>
