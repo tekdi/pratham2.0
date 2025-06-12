@@ -423,14 +423,14 @@ const Centers = () => {
       ),
       callback: async (row: any) => {
         window.open(
-          row.customFields.find((field) => field.label === 'GOOGLE MAP_LINK')
+          row.customFields.find((field) => field.label === 'GOOGLE_MAP_LINK')
             ?.selectedValues,
           '_blank',
           'noopener,noreferrer'
         );
       },
       show: (row) =>
-        row.customFields.find((field) => field.label === 'GOOGLE MAP_LINK')
+        row.customFields.find((field) => field.label === 'GOOGLE_MAP_LINK')
           ?.selectedValues,
     },
     {

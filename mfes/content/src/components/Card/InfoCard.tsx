@@ -33,7 +33,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
   const { t } = useTranslation();
   const { _infoCard } = _config || {};
   const [openModal, setOpenModal] = useState(false);
-
+  console.log('shreyas', _infoCard);
   return (
     <>
       <Card
@@ -42,6 +42,8 @@ const InfoCard: React.FC<InfoCardProps> = ({
           flexDirection: { xs: 'column', sm: 'row', md: 'row' },
           borderRadius: 0,
           ..._infoCard?._card,
+          boxShadow: 'none',
+          backgroundColor: '#F5F5F5',
         }}
       >
         <CardMedia
@@ -80,7 +82,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   gap: 1,
-                  pt: { xs: 0, md: 2 },
+                  pt: { xs: 0, md: Boolean(onBackClick) ? 0 : 2 },
                 }}
               >
                 <IconButton
