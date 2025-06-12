@@ -25,7 +25,7 @@ export const useCustomSnackbar = () => {
 
     setTimeout(() => {
       setOpen(false);
-    }, 200000);
+    }, 6000);
   }, []);
 
   const CustomSnackbar = (

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -30,15 +30,18 @@ import { SvgIconProps } from '@mui/material';
 
 import { useConfirmationDialog } from './ConfirmationDialog';
 import { useCustomSnackbar } from './useCustomSnackbar';
+import { useAlertDialog } from './AlertDialog';
 import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined';
 import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
+import { createTopic } from '@/services/coursePlanner';
 
 interface CoursePlanFormProps {
   open: boolean;
   onClose: () => void;
   title: string;
   actionTitle: string;
-  onAction: (params: any) => void;
+  onAction: () => void;
+  projectId: string;
 }
 
 const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
@@ -47,15 +50,25 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
   title,
   actionTitle,
   onAction,
+  projectId,
 }) => {
   const { ConfirmationDialog, openConfirmation } = useConfirmationDialog();
   const { CustomSnackbar, showSnackbar } = useCustomSnackbar();
+  const { AlertDialog, openAlert } = useAlertDialog();
+  const formRef = useRef<HTMLFormElement>(null);
 
   // showSnackbar({
   //   text: 'Operation successful!',
   //   bgColor: '#019722', //#BA1A1A
   //   textColor: '#fff',
   //   icon: <CheckCircleOutlineOutlinedIcon />, //ErrorOutlinedIcon
+  // });
+
+  // openAlert({
+  //   message: t(
+  //     'You were in the middle of creating a topic. Are you sure you want to close without saving?'
+  //   ),
+  //   okText: t('Yes, Close'),
   // });
 
   const { t } = useTranslation();
@@ -67,12 +80,12 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
   const [topics, setTopics] = React.useState<
     {
       name: string;
-      startDate: Date;
-      endDate: Date;
+      startDate: Date | null;
+      endDate: Date | null;
       subTopics: {
         name: string;
-        startDate: Date;
-        endDate: Date;
+        startDate: Date | null;
+        endDate: Date | null;
         resources: {
           resourceType: string;
           resourceId: string;
@@ -105,7 +118,7 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
 
   const handleAddSubTopic = (topicIndex: number) => {
     setTopics(
-      topics.map((topic, index) => {
+      topics.map((topic, index): any => {
         if (index === topicIndex) {
           return {
             ...topic,
@@ -199,8 +212,81 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
     );
   };
 
-  const handleSave = () => {
-    onAction(topics);
+  const handleSave = async (e: any) => {
+    e.preventDefault(); // Prevent default form submission
+    if (formRef.current?.checkValidity()) {
+      // All required fields are filled
+      console.log('Form valid. Submit here.', topics);
+
+      // Submit logic goes here
+      const payload = convertTopicsToTasks(topics);
+      //create course planner
+      const response = await createTopic(projectId, payload);
+      if (response) {
+        showSnackbar({
+          text: t('Topic has been successfully created'),
+          bgColor: '#BA1A1A', //#BA1A1A
+          textColor: '#fff',
+          icon: <CheckCircleOutlineOutlinedIcon />, //ErrorOutlinedIcon
+        });
+        //reload data
+        onCloseReset();
+        onAction();
+      } else {
+        showSnackbar({
+          text: t(
+            'Something went wrong. We couldn’t create the topic. Please try again'
+          ),
+          bgColor: '#BA1A1A', //#BA1A1A
+          textColor: '#fff',
+          icon: <ErrorOutlinedIcon />, //ErrorOutlinedIcon
+        });
+      }
+    } else {
+      // Trigger native validation messages
+      formRef.current?.reportValidity();
+    }
+  };
+  const convertTopicsToTasks = (topics: any) => {
+    const tasks: any = [];
+
+    topics.forEach((topic: any, topicIndex: any) => {
+      const topicId = `topic-${topicIndex + 1}-${Date.now()}`; // Unique externalId
+
+      // Add topic as a parent task
+      tasks.push({
+        name: topic.name,
+        externalId: topicId,
+        type: 'content',
+        startDate: dayjs(topic.startDate).format('DD-MM-YYYY'),
+        endDate: dayjs(topic.endDate).format('DD-MM-YYYY'),
+      });
+
+      // Add each subtopic as a child task
+      topic.subTopics.forEach((subTopic:any, subIndex:any) => {
+        const subTask = {
+          name: subTopic.name,
+          externalId: `sub-${topicIndex + 1}-${subIndex + 1}-${Date.now()}`, // Unique externalId
+          type: 'content',
+          hasAParentTask: 'YES',
+          parentTaskId: topicId,
+          startDate: dayjs(subTopic.startDate).format('DD-MM-YYYY'),
+          endDate: dayjs(subTopic.endDate).format('DD-MM-YYYY'),
+        };
+
+        if (subTopic.resources && subTopic.resources.length > 0) {
+          subTask.learningResources  = subTopic.resources.map((res:any) => ({
+            name: res.resourceName,
+            type: res.resourceType,
+            id: res.resourceId,
+          }));
+        }
+
+        tasks.push(subTask);
+      });
+    });
+
+    return { tasks };
   };
 
   //confirm box
@@ -256,6 +342,50 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
 
     return false;
   };
+  const alterTopicDates = (newTopics: any, topicIndex: any) => {
+    const topicStart = dayjs(newTopics[topicIndex].startDate);
+    const topicEnd = dayjs(newTopics[topicIndex].endDate);
+
+    newTopics[topicIndex].subTopics = newTopics[topicIndex].subTopics.map(
+      (sub: any) => {
+        const subStart = sub.startDate ? dayjs(sub.startDate) : null;
+        const subEnd = sub.endDate ? dayjs(sub.endDate) : null;
+
+        // Case 1: both null — skip
+        if (!subStart && !subEnd) return sub;
+
+        // Case 2: both outside range → reset both
+        if (
+          subStart &&
+          (subStart.isBefore(topicStart) || subStart.isAfter(topicEnd)) &&
+          subEnd &&
+          (subEnd.isBefore(topicStart) || subEnd.isAfter(topicEnd))
+        ) {
+          return { ...sub, startDate: null, endDate: null };
+        }
+
+        // Case 3: start is outside range → reset both
+        if (
+          subStart &&
+          (subStart.isBefore(topicStart) || subStart.isAfter(topicEnd))
+        ) {
+          return { ...sub, startDate: null, endDate: null };
+        }
+
+        // Case 4: end is outside range → reset only end
+        if (
+          subEnd &&
+          (subEnd.isBefore(topicStart) || subEnd.isAfter(topicEnd))
+        ) {
+          return { ...sub, endDate: null };
+        }
+
+        // Else: keep as is
+        return sub;
+      }
+    );
+    return newTopics;
+  };
 
   return (
     <>
@@ -299,108 +429,132 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
             <CloseIcon sx={{ color: 'black', fontWeight: 'bold' }} />
           </IconButton>
         </DialogTitle>
-
         {/* Scrollable Content */}
         <DialogContent sx={{ flex: 1, overflowY: 'auto', p: 2 }}>
-          {topics.map((topic, topicIndex) => (
-            <Grid
-              container
-              spacing={2.5}
-              key={topicIndex}
-              sx={{ pl: 1, pr: 1, pt: 3.5 }}
-            >
-              <Grid item xs={12} sm={12} md={12}>
-                {/* <Typography variant="h6">Topic {topicIndex + 1}</Typography> */}
-                <TextField
-                  fullWidth
-                  label={t('Topic Name')}
-                  required={true}
-                  variant="outlined"
-                  placeholder={t('Type here..')}
-                  value={topic.name}
-                  onChange={(e) => {
-                    const newTopics = [...topics];
-                    newTopics[topicIndex].name = e.target.value;
-                    setTopics(newTopics);
-                  }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: '8px',
-                    },
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6} md={6}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DatePicker
-                    label={t('Start Date')}
-                    value={topic.startDate}
-                    onChange={(newValue) => {
-                      const newTopics = [...topics];
-                      newTopics[topicIndex].startDate = newValue;
+          <form ref={formRef}>
+            {topics.map((topic, topicIndex) => (
+              <Grid
+                container
+                spacing={2.5}
+                key={topicIndex}
+                sx={{ pl: 1, pr: 1, pt: 3.5 }}
+              >
+                <Grid item xs={12} sm={12} md={12}>
+                  {/* <Typography variant="h6">Topic {topicIndex + 1}</Typography> */}
+                  <TextField
+                    fullWidth
+                    label={t('Topic Name')}
+                    required={true}
+                    variant="outlined"
+                    placeholder={t('Type here..')}
+                    value={topic.name}
+                    onChange={(e) => {
+                      const newTopics: any = [...topics];
+                      newTopics[topicIndex].name = e.target.value;
                       setTopics(newTopics);
                     }}
-                    format="DD-MM-YYYY"
-                    disableScrollLock
-                    slots={{
-                      openPickerIcon: BlackCalendarIcon,
-                    }}
-                    slotProps={{
-                      textField: {
-                        fullWidth: true,
-                        variant: 'outlined',
-                        required: true,
-                        sx: {
-                          '& .MuiOutlinedInput-root': {
-                            borderRadius: '4px',
-                          },
-                          '& .MuiOutlinedInput-notchedOutline': {
-                            borderRadius: '4px',
-                          },
-                        },
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: '8px',
                       },
                     }}
                   />
-                </LocalizationProvider>
-              </Grid>
-              <Grid item xs={12} sm={6} md={6}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DatePicker
-                    label={t('End Date')}
-                    value={topic.endDate}
-                    onChange={(newValue) => {
-                      const newTopics = [...topics];
-                      newTopics[topicIndex].endDate = newValue;
-                      setTopics(newTopics);
-                    }}
-                    format="DD-MM-YYYY"
-                    disableScrollLock
-                    slots={{
-                      openPickerIcon: BlackCalendarIcon,
-                    }}
-                    slotProps={{
-                      textField: {
-                        fullWidth: true,
-                        variant: 'outlined',
-                        required: true,
-                        sx: {
-                          '& .MuiOutlinedInput-root': {
-                            borderRadius: '4px',
-                          },
-                          '& .MuiOutlinedInput-notchedOutline': {
-                            borderRadius: '4px',
+                </Grid>
+                <Grid item xs={12} sm={6} md={6}>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                      label={t('Start Date')}
+                      value={topic.startDate}
+                      onChange={(newValue) => {
+                        let newTopics: any = [...topics];
+                        newTopics[topicIndex].startDate = newValue;
+                        const currentEndDate = newTopics[topicIndex].endDate;
+                        if (
+                          currentEndDate &&
+                          dayjs(currentEndDate).isBefore(dayjs(newValue), 'day')
+                        ) {
+                          newTopics[topicIndex].endDate = null; // Only reset if endDate is before new startDate
+                          // ✅ Reset all subTopic startDate and endDate
+                          newTopics[topicIndex].subTopics = newTopics[
+                            topicIndex
+                          ].subTopics.map((sub: any) => ({
+                            ...sub,
+                            startDate: null,
+                            endDate: null,
+                          }));
+                        } else {
+                          newTopics = alterTopicDates(newTopics, topicIndex);
+                        }
+                        setTopics(newTopics);
+                      }}
+                      format="DD-MM-YYYY"
+                      disableScrollLock
+                      minDate={dayjs()} // ✅ Allow same or after today's date
+                      slots={{
+                        openPickerIcon: BlackCalendarIcon,
+                      }}
+                      slotProps={{
+                        textField: {
+                          fullWidth: true,
+                          variant: 'outlined',
+                          required: true,
+                          onKeyDown: (e) => e.preventDefault(), // ✅ Block all key presses
+                          sx: {
+                            '& .MuiOutlinedInput-root': {
+                              borderRadius: '4px',
+                            },
+                            '& .MuiOutlinedInput-notchedOutline': {
+                              borderRadius: '4px',
+                            },
                           },
                         },
-                      },
-                    }}
-                  />
-                </LocalizationProvider>
-              </Grid>
-              <Grid item xs={12} sm={12} md={12}>
-                <Divider />
-              </Grid>
+                      }}
+                      required={true}
+                    />
+                  </LocalizationProvider>
+                </Grid>
+                <Grid item xs={12} sm={6} md={6}>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                      label={t('End Date')}
+                      value={topic.endDate}
+                      onChange={(newValue) => {
+                        let newTopics: any = [...topics];
+                        newTopics[topicIndex].endDate = newValue;
+                        newTopics = alterTopicDates(newTopics, topicIndex);
+                        setTopics(newTopics);
+                      }}
+                      format="DD-MM-YYYY"
+                      disableScrollLock
+                      minDate={topic.startDate || undefined} // ✅ Allow same or after start date
+                      slots={{
+                        openPickerIcon: BlackCalendarIcon,
+                      }}
+                      slotProps={{
+                        textField: {
+                          fullWidth: true,
+                          variant: 'outlined',
+                          required: true,
+                          onKeyDown: (e) => e.preventDefault(), // ✅ Block all key presses
+                          sx: {
+                            '& .MuiOutlinedInput-root': {
+                              borderRadius: '4px',
+                            },
+                            '& .MuiOutlinedInput-notchedOutline': {
+                              borderRadius: '4px',
+                            },
+                          },
+                        },
+                      }}
+                    />
+                  </LocalizationProvider>
+                </Grid>
 
-              {/* <Button
+                <Grid item xs={12} sm={12} md={12}>
+                  <Divider />
+                </Grid>
+
+                {/* <Button
                 onClick={() => handleRemoveTopic(topicIndex)}
                 color="error"
                 size="small"
@@ -408,337 +562,372 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
                 Remove Topic
               </Button> */}
 
-              {/* SubTopics */}
-              {topic.subTopics.map((sub, subIndex) => (
+                {/* SubTopics */}
+                {topic.subTopics.map((sub, subIndex) => (
+                  <Grid
+                    key={`${topicIndex}_${subIndex}`}
+                    item
+                    xs={12}
+                    sm={12}
+                    md={12}
+                    sx={{
+                      borderRadius: '12px',
+                      border: '1px solid #DADADA',
+                      backgroundColor: '#F9F9F9',
+                      p: 2,
+                      mt: 2,
+                      ml: 2.5,
+                    }}
+                  >
+                    <Grid container spacing={2.5}>
+                      <Grid item xs={6} sm={6} md={6}>
+                        <Typography
+                          variant="subtitle1"
+                          sx={{
+                            color: '#4D4639',
+                            backgroundColor: '#FFDEA1',
+                            borderRadius: '15px',
+                            p: 0.5,
+                            width: '130px',
+                            textAlign: 'center',
+                          }}
+                        >
+                          {t('Sub Topic')} {subIndex + 1}
+                        </Typography>
+                      </Grid>
+                      <Grid
+                        item
+                        xs={6}
+                        sm={6}
+                        md={6}
+                        sx={{ display: 'flex', justifyContent: 'flex-end' }}
+                      >
+                        <IconButton
+                          onClick={() =>
+                            handleRemoveSubTopic(topicIndex, subIndex)
+                          }
+                          size="small"
+                        >
+                          <DeleteOutlineOutlinedIcon
+                            sx={{ color: '#BA1A1A' }}
+                          />
+                        </IconButton>
+                      </Grid>
+
+                      <Grid item xs={12} sm={12} md={12}>
+                        <TextField
+                          fullWidth
+                          label={t('Sub Topic Name')}
+                          required={true}
+                          variant="outlined"
+                          placeholder={t('Type here..')}
+                          value={sub.name}
+                          onChange={(e) => {
+                            const newTopics: any = [...topics];
+                            newTopics[topicIndex].subTopics[subIndex].name =
+                              e.target.value;
+                            setTopics(newTopics);
+                          }}
+                          sx={{
+                            '& .MuiOutlinedInput-root': {
+                              borderRadius: '8px',
+                            },
+                          }}
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} sm={6} md={6}>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                          <DatePicker
+                            label={t('Start Date')}
+                            value={sub.startDate}
+                            onChange={(newValue) => {
+                              const newTopics: any = [...topics];
+                              newTopics[topicIndex].subTopics[
+                                subIndex
+                              ].startDate = newValue;
+                              const currentEndDate =
+                                newTopics[topicIndex].subTopics[subIndex]
+                                  .endDate;
+                              if (
+                                currentEndDate &&
+                                dayjs(currentEndDate).isBefore(
+                                  dayjs(newValue),
+                                  'day'
+                                )
+                              ) {
+                                newTopics[topicIndex].subTopics[
+                                  subIndex
+                                ].endDate = null; // Only reset if endDate is before new startDate
+                              }
+                              setTopics(newTopics);
+                            }}
+                            format="DD-MM-YYYY"
+                            disableScrollLock
+                            minDate={topic.startDate || undefined} // ✅ Allow same or after start date
+                            maxDate={topic.endDate || undefined} // ✅ Allow same or before end date
+                            slots={{
+                              openPickerIcon: BlackCalendarIcon,
+                            }}
+                            slotProps={{
+                              textField: {
+                                fullWidth: true,
+                                variant: 'outlined',
+                                required: true,
+                                onKeyDown: (e) => e.preventDefault(), // ✅ Block all key presses
+                                sx: {
+                                  '& .MuiOutlinedInput-root': {
+                                    borderRadius: '4px',
+                                  },
+                                  '& .MuiOutlinedInput-notchedOutline': {
+                                    borderRadius: '4px',
+                                  },
+                                },
+                              },
+                            }}
+                          />
+                        </LocalizationProvider>
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={6}>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                          <DatePicker
+                            label={t('End Date')}
+                            value={sub.endDate}
+                            onChange={(newValue) => {
+                              const newTopics: any = [...topics];
+                              newTopics[topicIndex].subTopics[
+                                subIndex
+                              ].endDate = newValue;
+                              setTopics(newTopics);
+                            }}
+                            format="DD-MM-YYYY"
+                            disableScrollLock
+                            minDate={
+                              topic?.subTopics[subIndex]?.startDate
+                                ? topic.subTopics[subIndex].startDate
+                                : topic?.startDate
+                                ? topic.startDate
+                                : undefined
+                            }
+                            maxDate={topic.endDate || undefined} // ✅ Allow same or before end date
+                            slots={{
+                              openPickerIcon: BlackCalendarIcon,
+                            }}
+                            slotProps={{
+                              textField: {
+                                fullWidth: true,
+                                variant: 'outlined',
+                                required: true,
+                                onKeyDown: (e) => e.preventDefault(), // ✅ Block all key presses
+                                sx: {
+                                  '& .MuiOutlinedInput-root': {
+                                    borderRadius: '4px',
+                                  },
+                                  '& .MuiOutlinedInput-notchedOutline': {
+                                    borderRadius: '4px',
+                                  },
+                                },
+                              },
+                            }}
+                          />
+                        </LocalizationProvider>
+                      </Grid>
+
+                      <Grid item xs={12} sm={12} md={12} sx={{ mt: -2 }}>
+                        {/* Resources */}
+                        {sub.resources.map((res, resIndex) => (
+                          <Grid
+                            key={`${topicIndex}_${subIndex}_${resIndex}`}
+                            container
+                            spacing={2.5}
+                            mt={1}
+                          >
+                            <Grid item xs={12} sm={12} md={12}>
+                              <Divider />
+                            </Grid>
+                            <Grid item xs={6} sm={6} md={6} sx={{ mt: 1 }}>
+                              <Typography
+                                variant="subtitle2"
+                                sx={{
+                                  color: '#4D4639',
+                                  backgroundColor: '#EDE1CF',
+                                  borderRadius: '15px',
+                                  p: 0.5,
+                                  width: '110px',
+                                  textAlign: 'center',
+                                }}
+                              >
+                                {t('Resource')} {subIndex + 1}.{resIndex + 1}
+                              </Typography>
+                            </Grid>
+                            <Grid
+                              item
+                              xs={6}
+                              sm={6}
+                              md={6}
+                              sx={{
+                                display: 'flex',
+                                justifyContent: 'flex-end',
+                              }}
+                            >
+                              <IconButton
+                                onClick={() =>
+                                  handleRemoveResource(
+                                    topicIndex,
+                                    subIndex,
+                                    resIndex
+                                  )
+                                }
+                                size="small"
+                              >
+                                <DeleteOutlineOutlinedIcon
+                                  sx={{ color: '#BA1A1A' }}
+                                />
+                              </IconButton>
+                            </Grid>
+
+                            <Grid item xs={12} sm={6} md={6}>
+                              <FormControl fullWidth>
+                                <InputLabel>{t('Resource Type')}</InputLabel>
+                                <Select
+                                  value={res.resourceType}
+                                  onChange={(e) => {
+                                    const newTopics: any = [...topics];
+                                    newTopics[topicIndex].subTopics[
+                                      subIndex
+                                    ].resources[resIndex].resourceType =
+                                      e.target.value;
+                                    setTopics(newTopics);
+                                  }}
+                                  label={t('Resource Type')}
+                                  required={true}
+                                >
+                                  <MenuItem value="prerequisite">
+                                    {t('prerequisite')}
+                                  </MenuItem>
+                                  <MenuItem value="postrequisite">
+                                    {t('postrequisite')}
+                                  </MenuItem>
+                                  <MenuItem value="facilitator-requisite">
+                                    {t('facilitator-requisite')}
+                                  </MenuItem>
+                                </Select>
+                              </FormControl>
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={6}>
+                              <TextField
+                                fullWidth
+                                label={t('Resource ID')}
+                                required={true}
+                                variant="outlined"
+                                placeholder={t('Type here..')}
+                                value={res.resourceId}
+                                onChange={(e) => {
+                                  const newTopics: any = [...topics];
+                                  newTopics[topicIndex].subTopics[
+                                    subIndex
+                                  ].resources[resIndex].resourceId =
+                                    e.target.value;
+                                  setTopics(newTopics);
+                                }}
+                                sx={{
+                                  '& .MuiOutlinedInput-root': {
+                                    borderRadius: '8px',
+                                  },
+                                }}
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={12} md={12}>
+                              <TextField
+                                fullWidth
+                                label={t('Resource Name')}
+                                required={true}
+                                variant="outlined"
+                                placeholder={t('Type here..')}
+                                value={res.resourceName}
+                                onChange={(e) => {
+                                  const newTopics: any = [...topics];
+                                  newTopics[topicIndex].subTopics[
+                                    subIndex
+                                  ].resources[resIndex].resourceName =
+                                    e.target.value;
+                                  setTopics(newTopics);
+                                }}
+                                sx={{
+                                  '& .MuiOutlinedInput-root': {
+                                    borderRadius: '8px',
+                                  },
+                                }}
+                              />
+                            </Grid>
+                          </Grid>
+                        ))}
+                      </Grid>
+                      <Grid
+                        item
+                        xs={12}
+                        sm={12}
+                        md={12}
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'flex-end',
+                          mt: -2,
+                        }}
+                      >
+                        <Button
+                          onClick={() =>
+                            handleAddResource(topicIndex, subIndex)
+                          }
+                          sx={{
+                            mt: 2,
+                            p: 1,
+                            pl: 2.5,
+                            pr: 2.5,
+                            fontSize: 'medium',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                          }}
+                          size="small"
+                          endIcon={<AddIcon fontSize="medium" />}
+                        >
+                          Add Resource
+                        </Button>
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={6}></Grid>
+                    </Grid>
+                  </Grid>
+                ))}
+
                 <Grid
-                  key={`${topicIndex}_${subIndex}`}
                   item
                   xs={12}
                   sm={12}
                   md={12}
-                  sx={{
-                    borderRadius: '12px',
-                    border: '1px solid #DADADA',
-                    backgroundColor: '#F9F9F9',
-                    p: 2,
-                    mt: 2,
-                    ml: 2.5,
-                  }}
+                  sx={{ display: 'flex', justifyContent: 'flex-end', mt: -2 }}
                 >
-                  <Grid container spacing={2.5}>
-                    <Grid item xs={6} sm={6} md={6}>
-                      <Typography
-                        variant="subtitle1"
-                        sx={{
-                          color: '#4D4639',
-                          backgroundColor: '#FFDEA1',
-                          borderRadius: '15px',
-                          p: 0.5,
-                          width: '130px',
-                          textAlign: 'center',
-                        }}
-                      >
-                        {t('Sub Topic')} {subIndex + 1}
-                      </Typography>
-                    </Grid>
-                    <Grid
-                      item
-                      xs={6}
-                      sm={6}
-                      md={6}
-                      sx={{ display: 'flex', justifyContent: 'flex-end' }}
-                    >
-                      <IconButton
-                        onClick={() =>
-                          handleRemoveSubTopic(topicIndex, subIndex)
-                        }
-                        size="small"
-                      >
-                        <DeleteOutlineOutlinedIcon sx={{ color: '#BA1A1A' }} />
-                      </IconButton>
-                    </Grid>
-
-                    <Grid item xs={12} sm={12} md={12}>
-                      <TextField
-                        fullWidth
-                        label={t('Sub Topic Name')}
-                        required={true}
-                        variant="outlined"
-                        placeholder={t('Type here..')}
-                        value={sub.name}
-                        onChange={(e) => {
-                          const newTopics = [...topics];
-                          newTopics[topicIndex].subTopics[subIndex].name =
-                            e.target.value;
-                          setTopics(newTopics);
-                        }}
-                        sx={{
-                          '& .MuiOutlinedInput-root': {
-                            borderRadius: '8px',
-                          },
-                        }}
-                      />
-                    </Grid>
-
-                    <Grid item xs={12} sm={6} md={6}>
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DatePicker
-                          label={t('Start Date')}
-                          value={sub.startDate}
-                          onChange={(newValue) => {
-                            const newTopics = [...topics];
-                            newTopics[topicIndex].subTopics[
-                              subIndex
-                            ].startDate = newValue;
-                            setTopics(newTopics);
-                          }}
-                          format="DD-MM-YYYY"
-                          disableScrollLock
-                          slots={{
-                            openPickerIcon: BlackCalendarIcon,
-                          }}
-                          slotProps={{
-                            textField: {
-                              fullWidth: true,
-                              variant: 'outlined',
-                              required: true,
-                              sx: {
-                                '& .MuiOutlinedInput-root': {
-                                  borderRadius: '4px',
-                                },
-                                '& .MuiOutlinedInput-notchedOutline': {
-                                  borderRadius: '4px',
-                                },
-                              },
-                            },
-                          }}
-                        />
-                      </LocalizationProvider>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={6}>
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DatePicker
-                          label={t('End Date')}
-                          value={sub.endDate}
-                          onChange={(newValue) => {
-                            const newTopics = [...topics];
-                            newTopics[topicIndex].subTopics[subIndex].endDate =
-                              newValue;
-                            setTopics(newTopics);
-                          }}
-                          format="DD-MM-YYYY"
-                          disableScrollLock
-                          slots={{
-                            openPickerIcon: BlackCalendarIcon,
-                          }}
-                          slotProps={{
-                            textField: {
-                              fullWidth: true,
-                              variant: 'outlined',
-                              required: true,
-                              sx: {
-                                '& .MuiOutlinedInput-root': {
-                                  borderRadius: '4px',
-                                },
-                                '& .MuiOutlinedInput-notchedOutline': {
-                                  borderRadius: '4px',
-                                },
-                              },
-                            },
-                          }}
-                        />
-                      </LocalizationProvider>
-                    </Grid>
-
-                    <Grid item xs={12} sm={12} md={12} sx={{ mt: -2 }}>
-                      {/* Resources */}
-                      {sub.resources.map((res, resIndex) => (
-                        <Grid
-                          key={`${topicIndex}_${subIndex}_${resIndex}`}
-                          container
-                          spacing={2.5}
-                          mt={1}
-                        >
-                          <Grid item xs={12} sm={12} md={12}>
-                            <Divider />
-                          </Grid>
-                          <Grid item xs={6} sm={6} md={6} sx={{ mt: 1 }}>
-                            <Typography
-                              variant="subtitle2"
-                              sx={{
-                                color: '#4D4639',
-                                backgroundColor: '#EDE1CF',
-                                borderRadius: '15px',
-                                p: 0.5,
-                                width: '110px',
-                                textAlign: 'center',
-                              }}
-                            >
-                              {t('Resource')} {subIndex + 1}.{resIndex + 1}
-                            </Typography>
-                          </Grid>
-                          <Grid
-                            item
-                            xs={6}
-                            sm={6}
-                            md={6}
-                            sx={{ display: 'flex', justifyContent: 'flex-end' }}
-                          >
-                            <IconButton
-                              onClick={() =>
-                                handleRemoveResource(
-                                  topicIndex,
-                                  subIndex,
-                                  resIndex
-                                )
-                              }
-                              size="small"
-                            >
-                              <DeleteOutlineOutlinedIcon
-                                sx={{ color: '#BA1A1A' }}
-                              />
-                            </IconButton>
-                          </Grid>
-
-                          <Grid item xs={12} sm={6} md={6}>
-                            <FormControl fullWidth>
-                              <InputLabel>{t('Resource Type')}</InputLabel>
-                              <Select
-                                value={res.resourceType}
-                                onChange={(e) => {
-                                  const newTopics = [...topics];
-                                  newTopics[topicIndex].subTopics[
-                                    subIndex
-                                  ].resources[resIndex].resourceType =
-                                    e.target.value;
-                                  setTopics(newTopics);
-                                }}
-                                label={t('Resource Type')}
-                              >
-                                <MenuItem value="prerequisite">
-                                  {t('prerequisite')}
-                                </MenuItem>
-                                <MenuItem value="postrequisite">
-                                  {t('postrequisite')}
-                                </MenuItem>
-                                <MenuItem value="facilitator-requisite">
-                                  {t('facilitator-requisite')}
-                                </MenuItem>
-                              </Select>
-                            </FormControl>
-                          </Grid>
-                          <Grid item xs={12} sm={6} md={6}>
-                            <TextField
-                              fullWidth
-                              label={t('Resource ID')}
-                              required={true}
-                              variant="outlined"
-                              placeholder={t('Type here..')}
-                              value={res.resourceId}
-                              onChange={(e) => {
-                                const newTopics = [...topics];
-                                newTopics[topicIndex].subTopics[
-                                  subIndex
-                                ].resources[resIndex].resourceId =
-                                  e.target.value;
-                                setTopics(newTopics);
-                              }}
-                              sx={{
-                                '& .MuiOutlinedInput-root': {
-                                  borderRadius: '8px',
-                                },
-                              }}
-                            />
-                          </Grid>
-                          <Grid item xs={12} sm={12} md={12}>
-                            <TextField
-                              fullWidth
-                              label={t('Resource Name')}
-                              required={true}
-                              variant="outlined"
-                              placeholder={t('Type here..')}
-                              value={res.resourceName}
-                              onChange={(e) => {
-                                const newTopics = [...topics];
-                                newTopics[topicIndex].subTopics[
-                                  subIndex
-                                ].resources[resIndex].resourceName =
-                                  e.target.value;
-                                setTopics(newTopics);
-                              }}
-                              sx={{
-                                '& .MuiOutlinedInput-root': {
-                                  borderRadius: '8px',
-                                },
-                              }}
-                            />
-                          </Grid>
-                        </Grid>
-                      ))}
-                    </Grid>
-                    <Grid
-                      item
-                      xs={12}
-                      sm={12}
-                      md={12}
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'flex-end',
-                        mt: -2,
-                      }}
-                    >
-                      <Button
-                        onClick={() => handleAddResource(topicIndex, subIndex)}
-                        sx={{
-                          mt: 2,
-                          p: 1,
-                          pl: 2.5,
-                          pr: 2.5,
-                          fontSize: 'medium',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                        }}
-                        size="small"
-                        endIcon={<AddIcon fontSize="medium" />}
-                      >
-                        Add Resource
-                      </Button>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={6}></Grid>
-                  </Grid>
+                  <Button
+                    onClick={() => handleAddSubTopic(topicIndex)}
+                    variant="outlined"
+                    sx={{
+                      mt: 2,
+                      p: 1,
+                      pl: 2.5,
+                      pr: 2.5,
+                      fontSize: 'medium',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}
+                    size="small"
+                    endIcon={<AddIcon fontSize="medium" />}
+                  >
+                    Add Sub Topic
+                  </Button>
                 </Grid>
-              ))}
-
-              <Grid
-                item
-                xs={12}
-                sm={12}
-                md={12}
-                sx={{ display: 'flex', justifyContent: 'flex-end', mt: -2 }}
-              >
-                <Button
-                  onClick={() => handleAddSubTopic(topicIndex)}
-                  variant="outlined"
-                  sx={{
-                    mt: 2,
-                    p: 1,
-                    pl: 2.5,
-                    pr: 2.5,
-                    fontSize: 'medium',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                  }}
-                  size="small"
-                  endIcon={<AddIcon fontSize="medium" />}
-                >
-                  Add Sub Topic
-                </Button>
               </Grid>
-            </Grid>
-          ))}
-          {/* 
+            ))}
+            {/* 
         <Button
           onClick={handleAddTopic}
           variant="outlined"
@@ -747,6 +936,7 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
         >
           + Add Topic
         </Button> */}
+          </form>
         </DialogContent>
 
         {/* Fixed Actions */}
@@ -759,7 +949,7 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
           <Button
             variant="contained"
             fullWidth
-            onClick={onAction}
+            onClick={handleSave}
             sx={{
               fontSize: 'large',
               borderRadius: '5px',
@@ -771,6 +961,7 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
       </Dialog>
       {ConfirmationDialog}
       {CustomSnackbar}
+      {AlertDialog}
     </>
   );
 };
