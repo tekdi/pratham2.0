@@ -555,7 +555,18 @@
     "DROP_OUT_REASON": "Reason for Drop Out From School",
     "UNEMPLOYED_HOUSEWIFE_DOMESTIC_WORK": "Unemployed, Housewife or Domestic Work",
 "SELF_EMPLOYMENT_OWN_BUSINESS_SHOP":"Self Employment, Own Business or Shop",
-"STUDENT": "Student"
+"STUDENT": "Student",
+ "BEAUTY": "beauty",
+  "AUTO_2W": "auto_2w",
+  "AUTO_4W": "auto_4w",
+  "ELECTRICAL": "electrical",
+  "HEALTHCARE": "healthcare",
+  "HOSPITALITY": "hospitality",
+  "PLUMBING": "plumbing",
+  "WELDING": "welding",
+  "APPAREL": "apparel",
+  "CONSTRUCTION": "construction",
+  "GRAPHIC_DESIGN": "graphic design"
     
   },
   "FORM_ERROR_MESSAGES": {
