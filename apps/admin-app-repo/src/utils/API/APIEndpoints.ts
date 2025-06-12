@@ -47,3 +47,5 @@ export const API_ENDPOINTS = {
 export const COURSE_PLANNER_UPLOAD_ENDPOINTS = `${process.env.NEXT_PUBLIC_BASE_URL}/prathamservice/v1/course-planner/upload`;
 
 export const TARGET_SOLUTION_ENDPOINTS = `${process.env.NEXT_PUBLIC_COURSE_PLANNER_API_URL}/solutions/targetedSolutions?type=improvementProject&currentScopeOnly=true`;
+export const COURSE_PLANNER_DELETE = `${process.env.NEXT_PUBLIC_COURSE_PLANNER_API_URL}/project/templateTasks/delete/`;
+export const COURSE_PLANNER_DELETE_CONTENT = `${process.env.NEXT_PUBLIC_COURSE_PLANNER_API_URL}/project/templateTasks/deleteTask/`;

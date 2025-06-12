@@ -497,8 +497,10 @@ const Youth = () => {
         <SimpleModal
           open={openModal}
           onClose={handleCloseModal}
-          showFooter={false}
+          showFooter={true}
           modalTitle={isEdit ? t('YOUTH.UPDATE_YOUTH') : t('YOUTH.NEW_YOUTH')}
+          id="dynamic-form-id"
+          primaryText={isEdit ? t('Update') : t('Create')}
         >
           <AddEditUser
             SuccessCallback={() => {
@@ -527,6 +529,8 @@ const Youth = () => {
             // notificationKey={notificationKey}
             // notificationMessage={notificationMessage}
             // notificationContext={notificationContext}
+            type="youth"
+            hideSubmit={true}
           />
         </SimpleModal>
 
