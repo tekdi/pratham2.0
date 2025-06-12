@@ -64,6 +64,8 @@ const CustomDateWidget = ({
           ...(value && { visibility: 'hidden' }),
         }}
         aria-hidden="true"
+                marginTop="50px"
+
       />
     <LocalizationProvider dateAdapter={AdapterDayjs} required={required}>
       <DatePicker
