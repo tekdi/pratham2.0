@@ -15,7 +15,7 @@ import { FormContext } from '@shared-lib-v2/DynamicForm/components/DynamicFormCo
 import { useRouter } from 'next/navigation';
 import { createUser } from '@shared-lib-v2/DynamicForm/services/CreateUserService';
 import { RoleId } from '@shared-lib-v2/DynamicForm/utils/app.constant';
-import { Loader } from '@shared-lib';
+import { Loader, useTranslation } from '@shared-lib';
 import {
   firstLetterInUpperCase,
   getMissingFields,
@@ -47,6 +47,7 @@ interface EditProfileProps {
 }
 
 const EditProfile = ({ completeProfile }: EditProfileProps) => {
+  const { t } = useTranslation();
   const searchParams = useSearchParams();
 
   // let formData: any = {};
@@ -150,7 +151,7 @@ const EditProfile = ({ completeProfile }: EditProfileProps) => {
               },
             };
           }
-         delete alterSchema?.properties?.is_volunteer;
+          delete alterSchema?.properties?.is_volunteer;
           setAddSchema(alterSchema);
           setAddUiSchema(alterUISchema);
         }
@@ -208,7 +209,10 @@ const EditProfile = ({ completeProfile }: EditProfileProps) => {
     }
     let userId = localStorage.getItem('userId');
     const object = {
-      userData: userData,
+      userData: {
+        ...userData,
+        future_work: t('LEARNER_APP.EDIT_PROFILE.FUTURE_WORK'),
+      },
       customFields: customFields,
     };
     if (userId) {
@@ -293,7 +297,11 @@ const EditProfile = ({ completeProfile }: EditProfileProps) => {
                 textAlign: 'center',
               }}
             >
-              {completeProfile ? 'Complete Your Profile' : 'Edit Profile'}
+              {t(
+                completeProfile
+                  ? 'LEARNER_APP.EDIT_PROFILE.COMPLETE_PROFILE_TITLE'
+                  : 'LEARNER_APP.EDIT_PROFILE.TITLE'
+              )}
             </Typography>
           </Box>
           <Box
@@ -314,7 +322,7 @@ const EditProfile = ({ completeProfile }: EditProfileProps) => {
               <Box display="flex" alignItems="center" gap={1} mb={2}>
                 <Image src={face} alt="Step Icon" />
                 <Typography fontWeight={600}>
-                  Help us with your background & other details
+                  {t('LEARNER_APP.EDIT_PROFILE.BACKGROUND_HELP_TEXT')}
                 </Typography>
               </Box>
             )}
@@ -341,7 +349,7 @@ const EditProfile = ({ completeProfile }: EditProfileProps) => {
               form="dynamic-form-id"
               type="submit"
             >
-              Submit
+              {t('COMMON.SUBMIT')}
             </Button>
           </Box>
         </>
@@ -354,7 +362,7 @@ const EditProfile = ({ completeProfile }: EditProfileProps) => {
         primaryText={'Okay'}
         primaryActionHandler={renderHomePage}
       >
-        <Box p="10px">Invalid Link</Box>
+        <Box p="10px">{t('LEARNER_APP.EDIT_PROFILE.INVALID_LINK')}</Box>
       </SimpleModal>
     </Box>
   );

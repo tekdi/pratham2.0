@@ -35,6 +35,7 @@ const MyComponent: React.FC = () => {
         if (checkAuth()) {
           setIsLogin(true);
           const result = await profileComplitionCheck();
+          console.log('Profile completion check result:', result);
           setIsProfileCard(!result);
         } else {
           setIsLogin(false);

@@ -17,34 +17,13 @@ import { validate as uuidValidate } from 'uuid';
 import { useGlobalData } from '../Provider/GlobalProvider';
 import AccessibilityOptions from '../AccessibilityOptions/AccessibilityOptions';
 import { useColorInversion } from '../../context/ColorInversionContext';
+import { SearchButton } from './SearchButton';
 
 interface NewDrawerItemProp extends DrawerItemProp {
   variant?: 'contained' | 'text';
   isActive?: boolean;
   customStyle?: React.CSSProperties;
 }
-
-// Custom function to transform categories to match expected structure
-const transformCategories = (categories: any[]) => {
-  const transformedCategories = transformRenderForm(categories);
-
-  // Create a structure that matches what the code expects
-  const result: any = {};
-
-  transformedCategories.forEach((category: any) => {
-    if (category.old_code === 'domain') {
-      result.domain = {
-        options: category.options.map((option: any) => ({
-          code: option.code,
-          name: option.name,
-          associations: option.associations,
-        })),
-      };
-    }
-  });
-
-  return result;
-};
 
 const App: React.FC<LayoutProps> = ({ children, ...props }) => {
   const router = useRouter();
@@ -70,14 +49,17 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
       }
     };
     init();
-    const currentPage =
-      typeof window !== 'undefined' && window.location.pathname
+    let currentPage = '';
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      const activeLink = searchParams.get('activeLink');
+      currentPage = activeLink
+        ? activeLink
+        : window.location.pathname
         ? window.location.pathname
         : '';
-    const withoutQueryString =
-      typeof window !== 'undefined'
-        ? window.location.pathname + window.location.search
-        : '';
+    }
+
     const categories = filterFramework?.framework?.categories ?? [];
     const transformedCategories = transformRenderForm(categories);
     const option = transformedCategories?.find(
@@ -106,8 +88,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         child: schoolSubCategory.map((item: any) => ({
           title: item?.name,
           to: () => router.push(`/pos/school?se_subDomains=${item?.code}`),
-          isActive:
-            withoutQueryString === `/pos/school?se_subDomains=${item?.code}`,
+          isActive: `/pos/school?se_subDomains=${item?.code}`,
         })),
       },
       {
@@ -117,8 +98,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         child: workSubCategory.map((item: any) => ({
           title: item?.name,
           to: () => router.push(`/pos/work?se_subDomains=${item?.code}`),
-          isActive:
-            withoutQueryString === `/pos/work?se_subDomains=${item?.code}`,
+          isActive: `/pos/work?se_subDomains=${item?.code}`,
         })),
       },
       {
@@ -128,8 +108,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         child: lifeSubCategory.map((item: any) => ({
           title: item?.name,
           to: () => router.push(`/pos/life?se_subDomains=${item?.code}`),
-          isActive:
-            withoutQueryString === `/pos/life?se_subDomains=${item?.code}`,
+          isActive: `/pos/life?se_subDomains=${item?.code}`,
         })),
       },
       {
@@ -142,16 +121,17 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         ].map((item: any) => ({
           title: item?.name,
           to: () => router.push(`/pos/program?program=${item?.code}`),
-          isActive: withoutQueryString === `/pos/program?program=${item?.code}`,
+          isActive: `/pos/program?program=${item?.code}`,
         })),
       },
       {
         title: t('LEARNER_APP.POS.THEMATIC_REPOSITORY'),
-        to: () => router.push('/pos/themantic'),
-        isActive: currentPage === '/pos/thematic-repository',
+        // to: () => router.push('/pos/themantic'),
+        to: () => router.push('#'),
+        // isActive: currentPage === '/pos/thematic-repository',
+        isActive: currentPage === '#',
       },
     ];
-
     setDefaultNavLinks(navLinks);
   }, [t, filterFramework?.framework?.categories, router]);
 
@@ -160,6 +140,23 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
       {...props}
       onlyHideElements={['footer']}
       _topAppBar={{
+        _config: {
+          middleComponent: (
+            <SearchButton
+              onSearch={(search) => router.push('/pos/search?q=' + search)}
+              isHideSubmitButton
+              _box={{
+                sx: {
+                  maxWidth: '260px',
+                  height: '48px',
+                  '@media (max-width: 1200px)': {
+                    display: 'none',
+                  },
+                },
+              }}
+            />
+          ),
+        },
         isShowLang: false,
         isColorInverted: isColorInverted,
         _brand: {

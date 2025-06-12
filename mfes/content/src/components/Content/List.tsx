@@ -380,18 +380,22 @@ export default function Content(props: Readonly<ContentProps>) {
           propData.handleCardClick(content);
         } else if (SUPPORTED_MIME_TYPES.includes(content?.mimeType)) {
           router.push(
-            `/player/${content?.identifier}?activeLink=${window.location.pathname}`
+            `${props?._config?.contentBaseUrl ?? ''}/player/${
+              content?.identifier
+            }?activeLink=${window.location.pathname}`
           );
         } else {
           router.push(
-            `/content-details/${content?.identifier}?activeLink=${window.location.pathname}`
+            `${props?._config?.contentBaseUrl ?? ''}/content-details/${
+              content?.identifier
+            }?activeLink=${window.location.pathname}`
           );
         }
       } catch (error) {
         console.error('Failed to handle card click:', error);
       }
     },
-    [propData?.handleCardClick, router]
+    [propData?.handleCardClick, props?._config?.contentBaseUrl, router]
   );
 
   const handleApplyFilters = useCallback((selectedValues: any) => {

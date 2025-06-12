@@ -11,7 +11,17 @@ const Player = dynamic(() => import('@learner/components/Content/Player'), {
 });
 
 const App: React.FC = () => {
-  return <Player userIdLocalstorageName="did" />;
+  return (
+    <Player
+      userIdLocalstorageName="did"
+      contentBaseUrl="/pos/content"
+      _config={{
+        player: {
+          trackable: false,
+        },
+      }}
+    />
+  );
 };
 
 export default App;

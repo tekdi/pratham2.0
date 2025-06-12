@@ -8,6 +8,7 @@ import { createAssessmentTracking } from '../../services/PlayerService';
 interface PlayerConfigProps {
   playerConfig: any;
   relatedData?: any;
+  configFunctionality?: boolean;
 }
 
 const basePath = process.env.NEXT_PUBLIC_ASSETS_CONTENT || '/sbplayer';
@@ -15,6 +16,7 @@ const basePath = process.env.NEXT_PUBLIC_ASSETS_CONTENT || '/sbplayer';
 const SunbirdQuMLPlayer = ({
   playerConfig,
   relatedData: { courseId, unitId, userId },
+  configFunctionality,
 }: PlayerConfigProps) => {
   const SunbirdQuMLPlayerRef = useRef<HTMLIFrameElement | null>(null);
 
@@ -98,6 +100,7 @@ const SunbirdQuMLPlayer = ({
           courseId,
           unitId,
           userId,
+          configFunctionality,
         });
       }
     };

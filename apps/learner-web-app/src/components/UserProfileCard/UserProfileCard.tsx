@@ -113,8 +113,7 @@ const UserProfileCard = () => {
       !isBelow18(userData.dob)
     ) {
       window.open('/files/consent_form_above_18_hindi.pdf', '_blank');
-    }
-    else if (option === t('COMMON.FAQS')) {
+    } else if (option === t('COMMON.FAQS')) {
       router.push('/faqs');
     }
 
@@ -402,26 +401,32 @@ const UserProfileCard = () => {
           </Grid>
         </Box>
 
-        <Typography sx={sectionTitleStyle}>Aspiration & Experience</Typography>
+        <Typography sx={sectionTitleStyle}>
+          {t('LEARNER_APP.USER_PROFILE_CARD.ASPIRATION_EXPERIENCE')}
+        </Typography>
         <Box sx={sectionCardStyle}>
           <Box sx={{ mb: 1.5 }}>
             <Typography sx={labelStyle}>
-              Have you received any prior training?
+              {t('LEARNER_APP.USER_PROFILE_CARD.PRIOR_TRAINING')}
             </Typography>
             <Typography sx={valueStyle}>{priorTraining}</Typography>
           </Box>
           <Box sx={{ mb: 1.5 }}>
             <Typography sx={labelStyle}>
-              Have you ever worked or are you currently working?
+              {t('LEARNER_APP.USER_PROFILE_CARD.CURRENT_WORK')}
             </Typography>
             <Typography sx={valueStyle}>
               {toPascalCase(currentWork).replaceAll('_', ' ')}
             </Typography>
           </Box>
           <Box>
-            <Typography sx={labelStyle}>What do you want to become?</Typography>
+            <Typography sx={labelStyle}>
+              {t('LEARNER_APP.USER_PROFILE_CARD.FUTURE_WORK')}
+            </Typography>
             <Typography sx={valueStyle}>
-              I want to become {futureWork}
+              {t('LEARNER_APP.USER_PROFILE_CARD.I_WANT_TO_BECOME', {
+                defaultValue: futureWork,
+              })}
             </Typography>
           </Box>
         </Box>

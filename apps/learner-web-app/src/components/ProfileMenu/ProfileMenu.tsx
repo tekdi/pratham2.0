@@ -12,7 +12,8 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { usePathname } from 'next/navigation';
-
+import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
+import { useTranslation } from '@shared-lib-v2/lib/context/LanguageContext';
 const ProfileMenu = ({
   anchorEl,
   open,
@@ -21,7 +22,7 @@ const ProfileMenu = ({
   onLogout,
 }: any) => {
   const pathname = usePathname();
-
+  const { t } = useTranslation();
   return (
     <Menu
       anchorEl={anchorEl}
@@ -64,7 +65,7 @@ const ProfileMenu = ({
           <Box display="flex" alignItems="center" gap={1}>
             <AccountCircleIcon sx={{ color: '#1e1e1e' }} />
             <Typography variant="body1" fontWeight={500}>
-              Go to My Profile
+              <SpeakableText>{t('COMMON.GO_TO_MY_PROFILE')}</SpeakableText>
             </Typography>
           </Box>
           <ArrowForwardIosIcon sx={{ fontSize: 16, color: '#1e1e1e' }} />
@@ -89,7 +90,7 @@ const ProfileMenu = ({
             fontWeight: 500,
           }}
         >
-          Log Out
+          <SpeakableText>{t('COMMON.LOGOUT')}</SpeakableText>
         </Button>
       </Box>
     </Menu>

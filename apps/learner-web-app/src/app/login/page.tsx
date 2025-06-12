@@ -56,12 +56,12 @@ const AppDownloadSection = () => {
           />
           <Box textAlign="center">
             <Typography fontWeight={600} fontSize="14px">
-              Get the App
+              {t('LEARNER_APP.LOGIN.GET_THE_APP')}
             </Typography>
             <Typography fontSize="12px" color="textSecondary">
-              Point your phone
+              {t('LEARNER_APP.LOGIN.POINT_YOUR_PHONE')}
               <br />
-              camera here
+              {t('LEARNER_APP.LOGIN.POINT_CAMERA')}
             </Typography>
           </Box>
         </Box>
@@ -78,7 +78,7 @@ const AppDownloadSection = () => {
         justifyContent="center"
       >
         <Typography fontWeight={500} fontSize="14px">
-          OR
+          {t('LEARNER_APP.LOGIN.OR')}
         </Typography>
       </Grid>
 
@@ -105,9 +105,9 @@ const AppDownloadSection = () => {
           />
           <Box textAlign="center">
             <Typography fontSize="12px" color="textSecondary">
-              Search <b>"Pratham myLearning"</b>
+              {t('LEARNER_APP.LOGIN.SEARCH_PLAYSTORE')}
               <br />
-              on Playstore
+              {t('LEARNER_APP.LOGIN.ON_PLAYSTORE')}
             </Typography>
           </Box>
         </Box>

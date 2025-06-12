@@ -29,15 +29,20 @@ export const handleTelemetryEventPDF = (event: any) => {
 
 export const handleTelemetryEventQuml = (
   event: any,
-  { courseId, unitId, userId }: any = {}
+  { courseId, unitId, userId, configFunctionality }: any = {}
 ) => {
-  getTelemetryEvents(event.data, 'quml', { courseId, unitId, userId });
+  getTelemetryEvents(event.data, 'quml', {
+    courseId,
+    unitId,
+    userId,
+    configFunctionality,
+  });
 };
 
 export const getTelemetryEvents = async (
   eventData: any,
   contentType: string,
-  { courseId, unitId, userId }: any = {}
+  { courseId, unitId, userId, configFunctionality }: any = {}
 ) => {
   console.log('getTelemetryEvents hit', eventData, contentType, {
     courseId,
@@ -75,6 +80,7 @@ export const getTelemetryEvents = async (
       courseId,
       unitId,
       userId,
+      configFunctionality,
     });
   }
 
@@ -179,6 +185,7 @@ export const getTelemetryEvents = async (
           courseId,
           unitId,
           userId,
+          configFunctionality,
         });
       } catch (error) {
         console.log(error);
@@ -196,7 +203,12 @@ export const contentWithTelemetryData = async ({
   courseId,
   unitId,
   userId: propUserId,
+  configFunctionality,
 }: any) => {
+  if (configFunctionality.trackable === false) {
+    console.log('not trackable');
+    return false;
+  }
   try {
     const response = await fetchBulkContents([identifier, courseId]);
     const course = response?.find(
@@ -231,7 +243,7 @@ export const contentWithTelemetryData = async ({
       };
       // if (detailsObject.length > 0) {
       const response = await createContentTracking(reqBody);
-      if (response) {
+      if (response && configFunctionality.isGenerateCertificate !== false) {
         await updateCOurseAndIssueCertificate({
           userId,
           course,

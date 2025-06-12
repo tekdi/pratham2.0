@@ -29,10 +29,15 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
 
-  const toggleShowPassword = () => {
-    setShowPassword((prev) => !prev);
+  const toggleShowOldPassword = () => {
+    setShowOldPassword((prev) => !prev);
+  };
+
+  const toggleShowNewPassword = () => {
+    setShowNewPassword((prev) => !prev);
   };
 
   const validatePasswordRules = (password: string) => ({
@@ -88,7 +93,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
     >
       <TextField
         label={t('LEARNER_APP.RESET_PASSWORD_FORM.OLD_PASSWORD')}
-        type={showPassword ? 'text' : 'password'}
+        type={showOldPassword ? 'text' : 'password'}
         value={oldPassword}
         onChange={(e) => setOldPassword(e.target.value)}
         fullWidth
@@ -97,8 +102,8 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
-              <IconButton onClick={toggleShowPassword} edge="end">
-                {showPassword ? <VisibilityOff /> : <Visibility />}
+              <IconButton onClick={toggleShowOldPassword} edge="end">
+                {showOldPassword ? <VisibilityOff /> : <Visibility />}
               </IconButton>
             </InputAdornment>
           ),
@@ -107,7 +112,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
 
       <TextField
         label={t('LEARNER_APP.RESET_PASSWORD_FORM.NEW_PASSWORD')}
-        type={showPassword ? 'text' : 'password'}
+        type={showNewPassword ? 'text' : 'password'}
         value={newPassword}
         onChange={(e) => setNewPassword(e.target.value)}
         fullWidth
@@ -116,8 +121,8 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
-              <IconButton onClick={toggleShowPassword} edge="end">
-                {showPassword ? <VisibilityOff /> : <Visibility />}
+              <IconButton onClick={toggleShowNewPassword} edge="end">
+                {showNewPassword ? <VisibilityOff /> : <Visibility />}
               </IconButton>
             </InputAdornment>
           ),
@@ -159,7 +164,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
 
       <TextField
         label={t('LEARNER_APP.RESET_PASSWORD_FORM.CONFIRM_NEW_PASSWORD')}
-        type={showPassword ? 'text' : 'password'}
+        type={showNewPassword ? 'text' : 'password'}
         value={confirmPassword}
         onChange={(e) => setConfirmPassword(e.target.value)}
         fullWidth
@@ -168,8 +173,8 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
-              <IconButton onClick={toggleShowPassword} edge="end">
-                {showPassword ? <VisibilityOff /> : <Visibility />}
+              <IconButton onClick={toggleShowNewPassword} edge="end">
+                {showNewPassword ? <VisibilityOff /> : <Visibility />}
               </IconButton>
             </InputAdornment>
           ),

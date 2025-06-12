@@ -40,6 +40,8 @@ const Players: React.FC<SunbirdPlayerProps> = ({
     propPlayerConfig
   );
   const [loading, setLoading] = useState(!propPlayerConfig);
+  const [isGenerateCertificate, setIsGenerateCertificate] = useState(true);
+  const [trackable, setTrackable] = useState(true);
 
   useEffect(() => {
     if (playerConfig || !identifier) return;
@@ -47,6 +49,10 @@ const Players: React.FC<SunbirdPlayerProps> = ({
     const loadContent = async () => {
       setLoading(true);
       try {
+        const name = window.name;
+        const jsonParse = name ? JSON.parse(name) : {};
+        setIsGenerateCertificate(jsonParse.generateCertificate ?? true);
+        setTrackable(jsonParse.trackable ?? true);
         const data = await fetchContent(identifier);
         let config: PlayerConfig;
 
@@ -114,6 +120,7 @@ const Players: React.FC<SunbirdPlayerProps> = ({
             courseId={courseId as string}
             unitId={unitId as string}
             userId={userId as string}
+            configFunctionality={{ isGenerateCertificate, trackable }}
           />
         </Box>
       )}

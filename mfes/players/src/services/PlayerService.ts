@@ -156,10 +156,12 @@ export const updateCOurseAndIssueCertificate = async ({
   course,
   userId,
   unitId,
+  isGenerateCertificate,
 }: {
   course: any;
   userId: string;
   unitId: any;
+  isGenerateCertificate?: boolean;
 }) => {
   const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/content/course/status`;
   const data = {
@@ -181,7 +183,7 @@ export const updateCOurseAndIssueCertificate = async ({
         courseId: course?.identifier,
         status: 'inprogress',
       });
-    } else if (courseStatus?.status === 'completed') {
+    } else if (courseStatus?.status === 'completed' && isGenerateCertificate) {
       const userResponse: any = await getUserId();
       await issueCertificate({
         userId: userId,
@@ -196,6 +198,12 @@ export const updateCOurseAndIssueCertificate = async ({
         middleName: userResponse?.middleName ?? '',
         lastName: userResponse?.lastName ?? '',
         courseName: course?.name ?? '',
+      });
+    } else {
+      updateUserCourseStatus({
+        userId,
+        courseId: course?.identifier,
+        status: 'completed',
       });
     }
   } catch (error) {

@@ -423,14 +423,14 @@ const Centers = () => {
       ),
       callback: async (row: any) => {
         window.open(
-          row.customFields.find((field) => field.label === 'GOOGLE MAP_LINK')
+          row.customFields.find((field) => field.label === 'GOOGLE_MAP_LINK')
             ?.selectedValues,
           '_blank',
           'noopener,noreferrer'
         );
       },
       show: (row) =>
-        row.customFields.find((field) => field.label === 'GOOGLE MAP_LINK')
+        row.customFields.find((field) => field.label === 'GOOGLE_MAP_LINK')
           ?.selectedValues,
     },
     {
@@ -545,7 +545,7 @@ const Centers = () => {
   const successCreateMessage = 'CENTERS.CENTER_CREATED';
   const telemetryCreateKey = 'center-created-successfully';
   const failureCreateMessage = 'CENTERS.CENTER_UPDATE_FAILED';
-
+console.log("prefilledFormData", prefilledFormData)
   return (
     <>
       <Box display={'flex'} flexDirection={'column'} gap={2}>
