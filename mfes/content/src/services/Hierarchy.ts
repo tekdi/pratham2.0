@@ -109,7 +109,8 @@ interface ContentSearchResponse {
 // Define the payload
 
 export const hierarchyAPI = async (
-  doId: string
+  doId: string,
+  params?: object
 ): Promise<ContentSearchResponse> => {
   try {
     // Ensure the environment variable is defined
@@ -122,6 +123,7 @@ export const hierarchyAPI = async (
       method: 'get',
       maxBodyLength: Infinity,
       url: `${searchApiUrl}/api/course/v1/hierarchy/${doId}`,
+      params: params,
     };
 
     // Execute the request
