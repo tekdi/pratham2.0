@@ -257,9 +257,13 @@ export const CommonCard: React.FC<CommonCardProps> = ({
                 ..._card?._contentText?.sx,
               }}
             >
-              {typeof content === 'string'
-                ? capitalize(content[0]) + content.slice(1)
-                : content}
+              {typeof content === 'string' ? (
+                <SpeakableText>
+                  {capitalize(content[0]) + content.slice(1)}
+                </SpeakableText>
+              ) : (
+                content
+              )}
             </Typography>
           </CardContent>
         )}

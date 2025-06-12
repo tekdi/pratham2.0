@@ -38,12 +38,18 @@ const RenderTabContent = memo(
     isHideEmptyDataMessage?: boolean;
   }) => {
     const { t } = useTranslation();
-    const { _box } = _config ?? {};
+    const { _box, _tabs } = _config ?? {};
+
     return (
       <Box sx={{ width: '100%', ...(_box?.sx ?? {}) }}>
         {tabs?.length !== undefined && tabs?.length > 1 && (
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs value={value ?? 0} onChange={onChange} aria-label={ariaLabel}>
+            <Tabs
+              {..._tabs}
+              value={value ?? 0}
+              onChange={onChange}
+              aria-label={ariaLabel}
+            >
               {tabs.map((tab: any, index: number) => (
                 <Tab
                   key={tab.label}
