@@ -13,6 +13,7 @@ import {
   COURSE_PLANNER_DELETE,
   COURSE_PLANNER_TOPIC_CREATE,
   COURSE_PLANNER_DELETE_CONTENT,
+  COURSE_PLANNER_UPDATE_CONTENT,
 } from '@/utils/API/APIEndpoints';
 import e from 'cors';
 
@@ -215,6 +216,24 @@ export const deleteContent = async (projectId: any,externalId: any): Promise<any
 
   try {
     const response = await deleteApi(apiUrl, requestBody, requestHeaders);
+    return response;
+  } catch (error) {
+    console.error('Error in deletPlanner Service', error);
+    return null;
+  }
+};
+
+export const updateContent = async (projectId: any,externalId: any,payload: any): Promise<any> => {
+  const apiUrl: string = `${COURSE_PLANNER_UPDATE_CONTENT}${projectId}?externalId=${externalId}`;
+  const requestBody = payload;
+  const requestHeaders = {
+    'X-auth-token': localStorage.getItem('token'),
+    'internal-access-token': 'Fqn0m0HQ0gXydRtBCg5l',
+    'Content-Type': 'application/json',
+  };
+
+  try {
+    const response = await post(apiUrl, requestBody, requestHeaders);
     return response;
   } catch (error) {
     console.error('Error in deletPlanner Service', error);

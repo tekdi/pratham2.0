@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -23,6 +23,7 @@ import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined
 import { useTranslation } from 'libs/shared-lib-v2/src/lib/context/LanguageContext';
 
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
@@ -33,7 +34,7 @@ import { useCustomSnackbar } from './useCustomSnackbar';
 import { useAlertDialog } from './AlertDialog';
 import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined';
 import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
-import { createTopic } from '@/services/coursePlanner';
+import { createTopic, updateContent } from '@/services/coursePlanner';
 
 interface CoursePlanFormProps {
   open: boolean;
@@ -42,6 +43,8 @@ interface CoursePlanFormProps {
   actionTitle: string;
   onAction: () => void;
   projectId: string;
+  formType: string;
+  prefilledObject: any;
 }
 
 const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
@@ -51,7 +54,11 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
   actionTitle,
   onAction,
   projectId,
+  formType,
+  prefilledObject,
 }) => {
+  console.log('###### formdatacourse formType', formType);
+  console.log('###### formdatacourse prefilledObject', prefilledObject);
   const { ConfirmationDialog, openConfirmation } = useConfirmationDialog();
   const { CustomSnackbar, showSnackbar } = useCustomSnackbar();
   const { AlertDialog, openAlert } = useAlertDialog();
@@ -101,6 +108,69 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
       subTopics: [{ name: '', startDate: null, endDate: null, resources: [] }],
     },
   ]);
+
+  const dateConvert = (date: any) => {
+    dayjs.extend(customParseFormat);
+    return dayjs(date, 'DD-MM-YYYY', true);
+  };
+  useEffect(() => {
+    if (prefilledObject && formType === 'addSubTopic') {
+      setTopics([
+        {
+          name: prefilledObject?.name,
+          startDate: prefilledObject?.metaInformation?.startDate
+            ? dateConvert(prefilledObject.metaInformation.startDate)
+            : null,
+          endDate: prefilledObject?.metaInformation?.endDate
+            ? dateConvert(prefilledObject.metaInformation.endDate)
+            : null,
+          subTopics: [
+            { name: '', startDate: null, endDate: null, resources: [] },
+          ],
+        },
+      ]);
+    }
+    if (prefilledObject && formType === 'addTopic') {
+      setTopics([
+        {
+          name: '',
+          startDate: null,
+          endDate: null,
+          subTopics: [
+            { name: '', startDate: null, endDate: null, resources: [] },
+          ],
+        },
+      ]);
+    }
+    if (prefilledObject && formType === 'editTopic') {
+      setTopics([
+        {
+          name: prefilledObject?.name,
+          startDate: prefilledObject?.metaInformation?.startDate
+            ? dateConvert(prefilledObject.metaInformation.startDate)
+            : null,
+          endDate: prefilledObject?.metaInformation?.endDate
+            ? dateConvert(prefilledObject.metaInformation.endDate)
+            : null,
+          subTopics:
+            prefilledObject?.children?.map((child) => ({
+              name: child?.name || '',
+              startDate: child?.metaInformation?.startDate
+                ? dateConvert(child.metaInformation.startDate)
+                : null,
+              endDate: child?.metaInformation?.endDate
+                ? dateConvert(child.metaInformation.endDate)
+                : null,
+              resources: (child?.learningResources || []).map((res) => ({
+                resourceType: res.type,
+                resourceId: res.id,
+                resourceName: res.name,
+              })),
+            })) || [],
+        },
+      ]);
+    }
+  }, [prefilledObject, formType]);
 
   const handleAddTopic = () => {
     setTopics([
@@ -221,7 +291,17 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
       // Submit logic goes here
       const payload = convertTopicsToTasks(topics);
       //create course planner
-      const response = await createTopic(projectId, payload);
+      let response = null;
+      if (formType == 'editTopic') {
+        response = await updateContent(
+          projectId,
+          payload?.tasks[0]?.externalId,
+          payload
+        );
+      } else {
+        response = await createTopic(projectId, payload);
+      }
+
       if (response) {
         showSnackbar({
           text: t('Topic has been successfully created'),
@@ -251,19 +331,25 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
     const tasks: any = [];
 
     topics.forEach((topic: any, topicIndex: any) => {
-      const topicId = `topic-${topicIndex + 1}-${Date.now()}`; // Unique externalId
+      let topicId = `topic-${topicIndex + 1}-${Date.now()}`; // Unique externalId
 
-      // Add topic as a parent task
-      tasks.push({
-        name: topic.name,
-        externalId: topicId,
-        type: 'content',
-        startDate: dayjs(topic.startDate).format('DD-MM-YYYY'),
-        endDate: dayjs(topic.endDate).format('DD-MM-YYYY'),
-      });
+      if (formType === 'addSubTopic' || formType === 'editTopic') {
+        topicId = prefilledObject?.externalId;
+      }
+
+      if (formType != 'addSubTopic') {
+        // Add topic as a parent task
+        tasks.push({
+          name: topic.name,
+          externalId: topicId,
+          type: 'content',
+          startDate: dayjs(topic.startDate).format('DD-MM-YYYY'),
+          endDate: dayjs(topic.endDate).format('DD-MM-YYYY'),
+        });
+      }
 
       // Add each subtopic as a child task
-      topic.subTopics.forEach((subTopic:any, subIndex:any) => {
+      topic.subTopics.forEach((subTopic: any, subIndex: any) => {
         const subTask = {
           name: subTopic.name,
           externalId: `sub-${topicIndex + 1}-${subIndex + 1}-${Date.now()}`, // Unique externalId
@@ -275,7 +361,7 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
         };
 
         if (subTopic.resources && subTopic.resources.length > 0) {
-          subTask.learningResources  = subTopic.resources.map((res:any) => ({
+          subTask.learningResources = subTopic.resources.map((res: any) => ({
             name: res.resourceName,
             type: res.resourceType,
             id: res.resourceId,
@@ -298,7 +384,15 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
       openConfirmation({
         title: t('Are you sure you want to close?'),
         message: t(
-          'You were in the middle of creating a topic. Are you sure you want to close without saving?'
+          `You were in the middle of ${
+            formType == 'editTopic' ? 'editing' : 'creating'
+          } a ${
+            formType == 'addTopic'
+              ? 'Topic'
+              : formType == 'addSubTopic'
+              ? 'Sub Topic'
+              : 'Topic and Sub Topic'
+          }. Are you sure you want to close without saving?`
         ),
         yesText: t('Yes, Close'),
         noText: t('No, Cancel'),
@@ -312,16 +406,16 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
   };
   const onCloseReset = () => {
     onClose();
-    setTopics([
-      {
-        name: '',
-        startDate: null,
-        endDate: null,
-        subTopics: [
-          { name: '', startDate: null, endDate: null, resources: [] },
-        ],
-      },
-    ]);
+    // setTopics([
+    //   {
+    //     name: '',
+    //     startDate: null,
+    //     endDate: null,
+    //     subTopics: [
+    //       { name: '', startDate: null, endDate: null, resources: [] },
+    //     ],
+    //   },
+    // ]);
   };
 
   //check value filled or not
@@ -458,6 +552,7 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
                         borderRadius: '8px',
                       },
                     }}
+                    disabled={formType === 'addSubTopic' ? true : false}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6} md={6}>
@@ -489,7 +584,14 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
                       }}
                       format="DD-MM-YYYY"
                       disableScrollLock
-                      minDate={dayjs()} // ✅ Allow same or after today's date
+                      minDate={
+                        formType === 'addSubTopic' ||
+                        (formType === 'editTopic' &&
+                          topic.startDate &&
+                          dayjs(topic.startDate).isBefore(dayjs(), 'day'))
+                          ? null
+                          : dayjs()
+                      } // ✅ Allow same or after today's date
                       slots={{
                         openPickerIcon: BlackCalendarIcon,
                       }}
@@ -510,6 +612,14 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
                         },
                       }}
                       required={true}
+                      disabled={
+                        formType === 'addSubTopic' ||
+                        (formType === 'editTopic' &&
+                          topic.startDate &&
+                          dayjs(topic.startDate).isBefore(dayjs(), 'day'))
+                          ? true
+                          : false
+                      }
                     />
                   </LocalizationProvider>
                 </Grid>
@@ -546,6 +656,7 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
                           },
                         },
                       }}
+                      disabled={formType === 'addSubTopic' ? true : false}
                     />
                   </LocalizationProvider>
                 </Grid>
@@ -898,33 +1009,34 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
                     </Grid>
                   </Grid>
                 ))}
-
-                <Grid
-                  item
-                  xs={12}
-                  sm={12}
-                  md={12}
-                  sx={{ display: 'flex', justifyContent: 'flex-end', mt: -2 }}
-                >
-                  <Button
-                    onClick={() => handleAddSubTopic(topicIndex)}
-                    variant="outlined"
-                    sx={{
-                      mt: 2,
-                      p: 1,
-                      pl: 2.5,
-                      pr: 2.5,
-                      fontSize: 'medium',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                    }}
-                    size="small"
-                    endIcon={<AddIcon fontSize="medium" />}
+                {formType != 'editTopic' && (
+                  <Grid
+                    item
+                    xs={12}
+                    sm={12}
+                    md={12}
+                    sx={{ display: 'flex', justifyContent: 'flex-end', mt: -2 }}
                   >
-                    Add Sub Topic
-                  </Button>
-                </Grid>
+                    <Button
+                      onClick={() => handleAddSubTopic(topicIndex)}
+                      variant="outlined"
+                      sx={{
+                        mt: 2,
+                        p: 1,
+                        pl: 2.5,
+                        pr: 2.5,
+                        fontSize: 'medium',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
+                      size="small"
+                      endIcon={<AddIcon fontSize="medium" />}
+                    >
+                      Add Sub Topic
+                    </Button>
+                  </Grid>
+                )}
               </Grid>
             ))}
             {/* 

@@ -49,7 +49,7 @@ interface CommonCardProps {
   TrackData?: any[];
   item: ContentItem;
   type: string;
-  onClick?: () => void;
+  onClick?: (e: any) => void;
   _card?: any;
 }
 

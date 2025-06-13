@@ -614,6 +614,7 @@
     "DOES_THIS_PHONE_BELONG_TO_YOU": "Does This Phone Belong to You?",
     "HIGHEST_EDCATIONAL_QUALIFICATION_OR_LAST_PASSED_GRADE": "Highest Educational Qualification or Last Passed Grade",
     "WHAT_IS_YOUR_PREFERRED_MODE_OF_LEARNING": "What is Your Preferred Mode of Learning?",
+    "WHAT_IS_YOUR_PRIMARY_WORK": "What is Your Primary Work?",
     "ARE_YOU_CURRENTLY_WORKING_IF_YES_CHOOSE_THE_DOMAIN": "Are You Currently Working? If Yes, Choose the Domain",
     "HAVE_YOU_RECEIVE_ANY_PRIOR_TRAINING": "Have You Received Any Prior Training?",
     "WHAT_DO_YOU_WANT_TO_BECOME": "What do you want to become?",
@@ -880,6 +881,8 @@
   "RELATION_WITH_GUARDIAN": "Relation with Guardian",
   "PARENT_GUARDIAN_PHONE_NO": "Parent/Guardian Phone Number",
   "WHAT_IS_YOUR_PREFERRED_MODE_OF_LEARNING": "What is Your Preferred Mode of Learning?",
+      "WHAT_IS_YOUR_PRIMARY_WORK": "What is Your Primary Work?",
+
   "REASON_FOR_DROP_OUT_FROM_SCHOOL": "Reason for drop out from School",
   "ARE_YOU_CURRENTLY_WORKING_IF_YES_CHOOSE_THE_DOMAIN": "Are You Currently Working? If Yes, Choose the Domain",
   "WHAT_DO_YOU_WANT_TO_BECOME": "What do you want to become?",
