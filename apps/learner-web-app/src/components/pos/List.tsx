@@ -100,7 +100,9 @@ export default function App({
               typeof pagename === 'string'
                 ? linkLabelName[pagename as LinkLabelType] ?? pagename
                 : '',
-            link: `/pos/${pagename}`,
+            link: `/pos/${
+              typeof pagename === 'string' ? pagename.toLowerCase() : ''
+            }`,
           },
           {
             name: linkLabelName[subDomain as LinkLabelType] ?? subDomain,
@@ -191,6 +193,7 @@ export default function App({
               ..._content,
               pageName: `${pagename}_Content`,
               filterFramework: filterFramework,
+              searchParams,
               _config: {
                 userIdLocalstorageName: 'did',
                 _card: {
