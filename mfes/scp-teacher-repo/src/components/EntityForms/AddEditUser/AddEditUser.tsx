@@ -214,9 +214,10 @@ const AddEditUser = ({
         'middleName',
         'lastName',
         'username',
-        'mobile',
+       
         'gender',
         'dob',
+         'mobile',
         'guardian_name',
         'guardian_relation',
         'parent_phone',
