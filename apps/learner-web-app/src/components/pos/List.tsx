@@ -189,6 +189,7 @@ export default function App({
           <LearnerCourse
             _content={{
               ..._content,
+              pageName: `${pagename}_Content`,
               filterFramework: filterFramework,
               _config: {
                 userIdLocalstorageName: 'did',
