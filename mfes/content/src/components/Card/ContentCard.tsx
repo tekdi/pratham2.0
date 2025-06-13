@@ -16,7 +16,7 @@ const ContentCard = ({
   type: any;
   default_img?: string;
   _card?: any;
-  handleCardClick: (content: ContentItem) => void;
+  handleCardClick: (content: ContentItem, e?: any) => void;
   trackData?: [];
 }) => {
   const { isWrap } = _card ?? {};
@@ -54,7 +54,7 @@ const ContentCard = ({
         item={item}
         TrackData={trackData}
         type={type}
-        onClick={() => handleCardClick(item)}
+        onClick={(e: any) => handleCardClick(item, e)}
         _card={{
           _contentParentText: {
             sx: { height: type !== 'Course' ? '156px' : '172px' },

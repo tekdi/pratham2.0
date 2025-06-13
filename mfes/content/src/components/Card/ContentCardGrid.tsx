@@ -8,7 +8,7 @@ interface ContentCardGridProps {
   contentData: ContentSearchResponse[];
   _config: any;
   type: string;
-  handleCardClick: (content: ContentItem) => void;
+  handleCardClick: (content: ContentItem, e?: any) => void;
   trackData?: any[];
   hasMoreData: boolean;
   handleLoadMore: (e: any) => void;
@@ -25,6 +25,7 @@ const ContentCardGrid = memo((props: ContentCardGridProps) => {
         {props.contentData?.map((item: any) => (
           <Grid
             key={item?.identifier}
+            id={item?.identifier}
             item
             xs={6}
             sm={6}
