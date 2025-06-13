@@ -66,7 +66,7 @@ const App = ({
         });
         setBreadCrumbs(breadcrum?.slice(0, -1));
       } else {
-        setBreadCrumbs([{ name: 'Content' }]);
+        setBreadCrumbs([]);
       }
     };
     fetch();

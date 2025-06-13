@@ -32,6 +32,21 @@ interface DetailsProps {
   _box?: any;
 }
 
+const getUnitFromHierarchy = (resultHierarchy: any, unitId: string): any => {
+  if (resultHierarchy?.identifier === unitId) {
+    return resultHierarchy;
+  }
+  if (resultHierarchy?.children) {
+    for (const child of resultHierarchy.children) {
+      const unit = getUnitFromHierarchy(child, unitId);
+      if (unit) {
+        return unit;
+      }
+    }
+  }
+  return null;
+};
+
 export default function Details(props: DetailsProps) {
   const router = useRouter();
   const { courseId, unitId, identifier: contentId } = useParams();
@@ -54,14 +69,14 @@ export default function Details(props: DetailsProps) {
         let resultHierarchy: any = await hierarchyAPI(identifier, {
           mode: 'edit',
         });
-
+        if (unitId) {
+          resultHierarchy = getUnitFromHierarchy(
+            resultHierarchy,
+            unitId as string
+          );
+        }
         if (unitId && !props?.isHideInfoCard) {
           setCourseItem(resultHierarchy);
-          if (unitId) {
-            resultHierarchy = resultHierarchy?.children?.find(
-              (item: any) => item.identifier === unitId
-            );
-          }
           const breadcrum = findCourseUnitPath({
             contentBaseUrl: props?._config?.contentBaseUrl,
             node: resultHierarchy,
