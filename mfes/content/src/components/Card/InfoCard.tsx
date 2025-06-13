@@ -70,8 +70,8 @@ const InfoCard: React.FC<InfoCardProps> = ({
               display: 'flex',
               flexDirection: 'column',
               flex: '1 0 auto',
-              p: { xs: '16px', md: '18px' },
-              pb: { xs: '0px', md: '18px' },
+              p: { xs: '16px', md: '0px' },
+              pb: { xs: '0px', md: '0px' },
               gap: 1.5,
               width: { xs: '90%', sm: '85%' },
             }}
@@ -82,7 +82,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   gap: 1,
-                  pt: { xs: 0, md: Boolean(onBackClick) ? 0 : 2 },
+                  pt: { xs: 0, md: 0 },
                 }}
               >
                 <IconButton
