@@ -2,17 +2,7 @@
 import React, { useState } from 'react';
 import Layout from '@learner/components/pos/Layout';
 
-import {
-  Container,
-  Typography,
-  TextField,
-  Button,
-  Grid,
-  Box,
-  useMediaQuery,
-} from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import FeautureCarousel from '@learner/components/FeautureCarousel';
+import { Container, Typography, Grid, Box, useMediaQuery } from '@mui/material';
 import WhatsNewCarousel from '@learner/components/WhatsNewCarousel';
 import MoreWayCarousel from '@learner/components/MoreWayCarousel';
 import KnwoledgeCarousel from '@learner/components/KnwoledgeCarousel';
@@ -21,77 +11,12 @@ import Learning from '@learner/components/Learning';
 import Image from 'next/image';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
+import { SearchButton } from '@learner/components/pos/SearchButton';
 
 const Content = dynamic(() => import('@Content'), {
   ssr: false,
 });
-// const keyThemesList = [
-//   [
-//     {
-//       title: 'Academics',
-
-//       desc: 'Math, Science, English...',
-//     },
-//     {
-//       title: 'Growth & Learning',
-
-//       desc: 'Activity Videos, Stories, Riddles...',
-//     },
-//     {
-//       title: 'Media Moments',
-
-//       desc: 'TV Episodes, Podcasts...',
-//     },
-//     {
-//       title: 'Inclusive Education',
-
-//       desc: 'Innovative Strategies, Subject-specific...',
-//     },
-//   ],
-//   [
-//     {
-//       title: 'Career Skills',
-
-//       desc: 'Resume, Interview, Communication...',
-//     },
-//     {
-//       title: 'Entrepreneurship',
-
-//       desc: 'Startups, Business Ideas, Finance...',
-//     },
-//     {
-//       title: 'Digital Literacy',
-
-//       desc: 'Computers, Internet, Safety...',
-//     },
-//     {
-//       title: 'Professional Growth',
-
-//       desc: 'Leadership, Teamwork, Projects...',
-//     },
-//   ],
-//   [
-//     {
-//       title: 'Life Skills',
-
-//       desc: 'Critical Thinking, Problem Solving...',
-//     },
-//     {
-//       title: 'Health & Wellness',
-
-//       desc: 'Nutrition, Exercise, Mindfulness...',
-//     },
-//     {
-//       title: 'Civic Awareness',
-//       desc: 'Rights, Responsibilities, Community...',
-//     },
-//     {
-//       title: 'Creativity',
-
-//       desc: 'Art, Music, Innovation...',
-//     },
-//   ],
-// ];
 const descriptions = [
   `
   Learning for School focuses on scholastic subjects, which include early years education and learning to read, write, and think. These skills are crucial for building children's confidence and dignity among their peers.
@@ -100,30 +25,64 @@ const descriptions = [
   'Learning for Life encompasses skills and knowledge that are a part of lifelong learning like transferable skills, interests, hobbies, and creativity. These also include life skills but are not limited to them.  It emphasises environmental awareness, physical and mental well-being, and extends learning beyond scholastic subjects.',
 ];
 
-const page = () => {
+const Page = () => {
+  const [search, setSearch] = useState('');
+  const router = useRouter();
   const partners = [
-    { src: '/images/knowledge-one.png', alt: 'UBS' },
-    { src: '/images/knowdlege-two.png', alt: 'Education Above All' },
-    { src: '/images/knowledge-three.png', alt: 'Sulzer' },
-    { src: '/images/knowledge-four.png', alt: 'Schmidt Futures' },
-    { src: '/images/knowledge-five.png', alt: 'Western Digital' },
-    { src: '/images/knowledge-one.png', alt: 'UBS' },
-    { src: '/images/knowdlege-two.png', alt: 'Education Above All' },
-    { src: '/images/knowledge-three.png', alt: 'Sulzer' },
-    { src: '/images/knowledge-four.png', alt: 'Schmidt Futures' },
-    { src: '/images/knowledge-five.png', alt: 'Western Digital' },
+    { src: '/Knowedge/Adobe.png', alt: 'Adobe' },
+    { src: '/Knowedge/EAA.png', alt: 'EAA' },
+    { src: '/Knowedge/Google.png', alt: 'Google' },
+    { src: '/Knowedge/SCHMIDT.png', alt: 'Hemant-Goradia' },
+    { src: '/Knowedge/smft_new.png', alt: 'Jaideep-Khanna' },
+    { src: '/Knowedge/Sulzer-Logo.jpg', alt: 'Schmidt-Futures' },
+    { src: '/Knowedge/UBS.png', alt: 'Schmidt-Futures' },
+    { src: '/Knowedge/WD.png', alt: 'Schmidt-Futures' },
   ];
   const ourPartners = [
-    { src: '/images/knowdlege-two.png', alt: 'Education Above All' },
-    { src: '/images/knowledge-one.png', alt: 'UBS' },
-    { src: '/images/knowledge-four.png', alt: 'Schmidt Futures' },
-    { src: '/images/knowledge-three.png', alt: 'Sulzer' },
-    { src: '/images/knowledge-one.png', alt: 'UBS' },
-    { src: '/images/knowdlege-two.png', alt: 'Education Above All' },
-    { src: '/images/knowledge-five.png', alt: 'Western Digital' },
-    { src: '/images/knowledge-four.png', alt: 'Schmidt Futures' },
-    { src: '/images/knowledge-five.png', alt: 'Western Digital' },
-    { src: '/images/knowledge-three.png', alt: 'Sulzer' },
+    { src: '/OurParthner/1.jpg', alt: 'logo1' },
+    { src: '/OurParthner/2.jpg', alt: 'logo2' },
+    { src: '/OurParthner/3.jpg', alt: 'logo3' },
+    { src: '/OurParthner/4.jpg', alt: 'logo4' },
+    { src: '/OurParthner/5.jpg', alt: 'logo5' },
+    { src: '/OurParthner/6.jpg', alt: 'logo6' },
+    { src: '/OurParthner/7.jpg', alt: 'logo7' },
+    { src: '/OurParthner/8.jpg', alt: 'logo8' },
+    { src: '/OurParthner/9.jpg', alt: 'logo9' },
+    { src: '/OurParthner/10.jpg', alt: 'logo10' },
+    { src: '/OurParthner/11.jpg', alt: 'logo11' },
+    { src: '/OurParthner/12.jpg', alt: 'logo12' },
+    { src: '/OurParthner/13.jpg', alt: 'logo13' },
+    { src: '/OurParthner/14.jpg', alt: 'logo14' },
+    { src: '/OurParthner/15.jpg', alt: 'logo15' },
+    { src: '/OurParthner/16.jpg', alt: 'logo16' },
+    { src: '/OurParthner/17.jpg', alt: 'logo17' },
+    { src: '/OurParthner/18.jpg', alt: 'logo18' },
+    { src: '/OurParthner/19.jpg', alt: 'logo19' },
+    { src: '/OurParthner/20.jpg', alt: 'logo20' },
+    { src: '/OurParthner/21.jpg', alt: 'logo21' },
+    { src: '/OurParthner/22.jpg', alt: 'logo22' },
+    { src: '/OurParthner/23.jpg', alt: 'logo23' },
+    { src: '/OurParthner/24.jpg', alt: 'logo24' },
+    { src: '/OurParthner/25.jpg', alt: 'logo25' },
+    { src: '/OurParthner/26.jpg', alt: 'logo26' },
+    { src: '/OurParthner/27.jpg', alt: 'logo27' },
+    { src: '/OurParthner/28.jpg', alt: 'logo28' },
+    { src: '/OurParthner/29.jpg', alt: 'logo29' },
+    { src: '/OurParthner/30.jpg', alt: 'logo30' },
+    { src: '/OurParthner/31.jpg', alt: 'logo31' },
+    { src: '/OurParthner/32.jpg', alt: 'logo32' },
+    { src: '/OurParthner/33.jpg', alt: 'logo33' },
+    { src: '/OurParthner/34.jpg', alt: 'logo34' },
+    { src: '/OurParthner/Adobe.png', alt: 'logo35' },
+    { src: '/OurParthner/EAA.png', alt: 'logo36' },
+    { src: '/OurParthner/Google.png', alt: 'logo37' },
+    { src: '/OurParthner/Hemant-Goradia.png', alt: 'logo38' },
+    { src: '/OurParthner/Jaideep-Khanna.png', alt: 'logo38' },
+    { src: '/OurParthner/Schmidt-Futures.png', alt: 'logo38' },
+    { src: '/OurParthner/SMFT.png', alt: 'logo38' },
+    { src: '/OurParthner/Sulzer-Logo.jpg', alt: 'logo38' },
+    { src: '/OurParthner/UBS.png', alt: 'logo38' },
+    { src: '/OurParthner/WD.png', alt: 'logo38' },
   ];
   const otherWebsites = [
     { src: '/images/website-1.png', alt: 'UBS' },
@@ -135,7 +94,7 @@ const page = () => {
   const mediaMD = useMediaQuery('(max-width: 900px)');
 
   return (
-    <Layout onlyHideElements={['footer']}>
+    <Layout onlyHideElements={['footer']} _topAppBar={{ _config: {} }}>
       <Grid container spacing={4}>
         <Grid item xs={12} md={6}>
           <Image
@@ -251,56 +210,18 @@ const page = () => {
                 activities and projects.
               </SpeakableText>
             </Typography>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                bgcolor: '#F5F5F5',
-                borderRadius: '8px',
-                boxShadow: '0px 1px 2px 0px #0000004D',
+            <SearchButton
+              searchValue={search}
+              onSearch={() => router.push('/pos/search?q=' + search)}
+              handleSearch={setSearch}
+              _box={{
                 mx: 'auto',
                 mt: 4,
                 '@media (min-width: 900px)': {
                   mb: '100px',
                 },
               }}
-            >
-              <SearchIcon sx={{ color: '#757575', ml: 2, mr: 1 }} />
-              <TextField
-                variant="standard"
-                placeholder="Search.."
-                InputProps={{
-                  disableUnderline: true,
-                  sx: {
-                    fontFamily: 'Poppins',
-                    fontSize: '18px',
-                    pl: 1,
-                    bgcolor: 'transparent',
-                  },
-                }}
-                sx={{ flexGrow: 1, bgcolor: 'transparent' }}
-              />
-              <Button
-                variant="contained"
-                sx={{
-                  bgcolor: '#FDBE16',
-                  color: '#1F1B13',
-                  borderTopLeftRadius: 0,
-                  borderBottomLeftRadius: 0,
-                  borderTopRightRadius: '8px',
-                  borderBottomRightRadius: '8px',
-                  boxShadow: 'none',
-                  px: 4,
-                  py: 1.5,
-                  fontWeight: 600,
-                  fontSize: '16px',
-                  textTransform: 'none',
-                  '&:hover': { bgcolor: '#e9a416' },
-                }}
-              >
-                <SpeakableText>Search</SpeakableText>
-              </Button>
-            </Box>
+            />
           </Box>
         </Grid>
       </Grid>
@@ -481,6 +402,7 @@ const page = () => {
             // showHelpDesk={false}
             hasMoreData={false}
             _config={{
+              contentBaseUrl: '/pos',
               _carousel: {
                 loop: true,
                 autoplay: { delay: 2500, disableOnInteraction: false },
@@ -653,4 +575,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

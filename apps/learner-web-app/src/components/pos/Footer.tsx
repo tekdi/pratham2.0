@@ -71,11 +71,11 @@ export const Footer: React.FC = () => {
                 <Image
                   src={
                     isColorInverted
-                      ? '/images/PrathamLogowhite.png'
-                      : '/images/appLogo.svg'
+                      ? '/images/pradigi-white.png'
+                      : '/images/pradigi.png'
                   }
                   alt="Pratham"
-                  width={146}
+                  width={97}
                   height={32}
                   style={{ height: '32px' }}
                 />
@@ -116,8 +116,10 @@ export const Footer: React.FC = () => {
                       href={href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      passHref
-                      legacyBehavior
+                      style={{
+                        textDecoration: 'none',
+                        color: 'inherit',
+                      }}
                     >
                       <Typography
                         variant="body1"
@@ -127,9 +129,7 @@ export const Footer: React.FC = () => {
                           cursor: 'pointer',
                         }}
                       >
-                        <a target="_blank" rel="noopener noreferrer">
-                          <SpeakableText cursor={true}>{label}</SpeakableText>
-                        </a>
+                        {label}
                       </Typography>
                     </Link>
                   </Grid>

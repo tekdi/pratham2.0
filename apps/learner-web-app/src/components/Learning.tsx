@@ -16,6 +16,7 @@ import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 import { useColorInversion } from '../context/ColorInversionContext';
 import { useGlobalData } from './Provider/GlobalProvider';
 import { transformRenderForm } from '@shared-lib-v2/lib/Filter/FilterForm';
+import { useRouter } from 'next/navigation';
 
 interface Subject {
   name: string;
@@ -73,6 +74,7 @@ const Learning = ({
   const [hovered, setHovered] = useState<number | null>(null);
   const { isColorInverted } = useColorInversion();
   const [domainData, setDomainData] = useState<any[]>([]);
+  const router = useRouter();
 
   const mediaMD = useMediaQuery('(max-width: 900px)');
 
@@ -261,6 +263,8 @@ const Learning = ({
                     alignItems: 'center',
                     justifyContent: 'space-between',
                   }}
+                  onClick={() => router.push(`/pos/${pillar.toLowerCase()}`)}
+                  style={{ cursor: 'pointer' }}
                 >
                   <Typography
                     variant="body5"
@@ -273,10 +277,14 @@ const Learning = ({
                       cursor: 'pointer',
                     }}
                   >
-                    <SpeakableText>View All</SpeakableText>
+                    <SpeakableText cursor={true}>View All</SpeakableText>
                   </Typography>
                   <ArrowForwardIcon
-                    sx={{ fontSize: '25px', color: '#0D599E' }}
+                    sx={{
+                      fontSize: '25px',
+                      color: '#0D599E',
+                      cursor: 'pointer',
+                    }}
                   />
                 </Box>
               </Box>
@@ -448,8 +456,9 @@ const Learning = ({
                       display: 'flex',
                       alignItems: 'center',
                       mt: 1,
-                      cursor: 'pointer',
                     }}
+                    onClick={() => router.push(`/pos/${pillar.toLowerCase()}`)}
+                    style={{ cursor: 'pointer' }}
                   >
                     <Typography
                       variant="body1"

@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import { withoutQueryString } from '../Header/TopAppBar';
 
 export interface DrawerItemProp {
   title: React.ReactNode;
@@ -65,9 +66,13 @@ export const CommonDrawer: React.FC<CommonDrawerProps> = ({
         <Box
           key={key}
           sx={{
-            borderBottom: item?.isActive
-              ? `3px solid ${theme.palette.primary.main}`
-              : 'none',
+            bgcolor:
+              typeof item.isActive === 'string' &&
+              item.isActive === withoutQueryString()
+                ? `${theme.palette.primary.main}`
+                : level > 0
+                ? '#F1F2F2'
+                : 'inherit',
           }}
         >
           <Box
@@ -76,6 +81,14 @@ export const CommonDrawer: React.FC<CommonDrawerProps> = ({
               alignItems: 'center',
               justifyContent: 'space-between',
               pr: 1,
+              borderBottom:
+                typeof item.isActive === 'boolean'
+                  ? item.isActive
+                    ? `3px solid ${theme.palette.primary.main}`
+                    : 'inherit'
+                  : item?.isActive === withoutQueryString()
+                  ? `3px solid ${theme.palette.primary.main}`
+                  : 'inherit',
             }}
           >
             <ListItemButton

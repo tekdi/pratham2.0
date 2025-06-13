@@ -36,7 +36,7 @@ const KnwoledgeCarousel = ({
         <Box
           sx={{
             display: 'flex',
-            animation: 'slide 20s linear infinite',
+            animation: `slide ${images.length > 20 ? 90 : 20}s linear infinite`,
             '@keyframes slide': {
               '0%': {
                 transform: 'translateX(0)',

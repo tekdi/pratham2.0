@@ -1,14 +1,17 @@
 'use client';
 import dynamic from 'next/dynamic';
 
-const List = dynamic(() => import('@learner/app/pos/List'), {
+const List = dynamic(() => import('@learner/components/pos/List'), {
   ssr: false,
 });
 
 export default function PosPage() {
   return (
     <List
-      pagename="Program"
+      pagename={{
+        SCP: 'second chance program',
+        'Vocational Training': 'YouthNet',
+      }}
       _content={{
         contentTabs: ['content'],
         isOpenColapsed: ['se_domains', 'se_subDomains', 'se_subjects'],

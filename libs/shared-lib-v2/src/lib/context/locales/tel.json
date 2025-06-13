@@ -14,7 +14,7 @@
     "CLOSED_ON": "మూసివేయబడిన తేదీ"
   },
   "COMMON": {
-    "L1_COURSES": "L1 కోర్సులు",
+    "L1_COURSES": "ఎల్1 కోర్సులు",
     "EXPLORE": "అన్వేషించు",
     "SURVEYS": "సర్వేలు",
     "PROFILE": "ప్రొఫైల్",
@@ -22,15 +22,35 @@
     "COURSES": "కోర్సులు",
     "YES": "అవును",
     "ADD_NEW": "కొత్తది జోడించు",
-    "YOU_HAVE_UNSAVED_CHANGES": "మీ వద్ద సేవ్ చేయని మార్పులు ఉన్నాయి. మీరు తిరిగి వెళ్లాలని ఖచ్చితంగా ఉన్నారా?",
+    "YOU_HAVE_UNSAVED_CHANGES": "మీరు సేవ్ చేయని మార్పులు కలిగి ఉన్నారు. మీరు నిజంగా వెనక్కి వెళ్లాలనుకుంటున్నారా?",
     "SUBMIT": "సమర్పించు",
     "CLOSE": "మూసివేయి",
     "CANCEL": "రద్దు చేయి",
     "OK": "సరే",
-    "INPROGRESS": "పురోగతిలో",
-    "SURE_LOGOUT": "మీరు లాగౌట్ చేయాలని ఖచ్చితంగా ఉన్నారా?",
+    "INPROGRESS": "ప్రోగ్రెస్‌లో",
+    "SURE_LOGOUT": "మీరు నిజంగా లాగౌట్ చేయాలనుకుంటున్నారా?",
     "LOGOUT": "లాగౌట్",
-    "LOADING": "లోడింగ్..."
+    "LOADING": "లోడ్ అవుతోంది..",
+    "FAQS": "తరచుగా అడిగే ప్రశ్నలు",
+    "SHOW_MORE": "మరిన్ని చూపించు ▼",
+    "SHOW_LESS": "తక్కువ చూపించు ▲",
+    "READ_MORE": "ఇంకా చదవండి ▼",
+    "READ_LESS": "తక్కువ చదవండి ▲",
+    "FILTER": "ఫిల్టర్",
+    "ENROLL_NOW": "ఇప్పుడే నమోదు చేయండి",
+    "GO_TO_MY_PROFILE": "నా ప్రొఫైల్‌కు వెళ్లు",
+    "WHAT_YOU_LL_LEARN": "మీరు ఏమి నేర్చుకుంటారు",
+    "VIEW_ALL": "అన్ని చూపించు",
+    "NO_DATA_FOUND": "ఏదీ కనుగొనిస్తాము",
+    "LOAD_MORE": "మరిన్ని చూపించు",
+    "SKILLING_CENTERS": "దక్షతా కేంద్రాలు",
+    "SKILLING_CENTERS_NEAR_YOU": "మీ నుండి దక్షతా కేంద్రాలు",
+    "STATUS": {
+      "completed": "పూర్తయింది",
+      "in_progress": "ప్రోగ్రెస్‌లో",
+      "enrolled_not_started": "నమోదు చేయబడింది, ప్రారంభం కాలేదు",
+      "not_started": "ప్రారంభం కాలేదు"
+    }
   },
   "LEARNER_APP": {
     "COMPLETE_PROFILE_BANNER": {
@@ -57,7 +77,9 @@
     "COURSE": {
       "GET_STARTED": "L1 కోర్సులతో ప్రారంభించండి",
       "FILTER_BY": "ఫిల్టర్ చేయండి",
-      "CLEAR_FILTER": "ఫిల్టర్‌ను తొలగించు"
+      "CLEAR_FILTER": "ఫిల్టర్‌ను తొలగించు",
+      "APPLY_FILTER": "ఫిల్టర్ వర్తింపజేయి",
+      "DONE": "పూర్తయింది"
     },
     "EXPLORE": {
       "EXPLORE_ADDITIONAL_COURSES": "అదనపు కోర్సులను అన్వేషించండి"
@@ -94,7 +116,13 @@
       "forgot_password": "పాస్‌వర్డ్ మర్చిపోయారా?",
       "login_button": "లాగిన్",
       "no_account": "నాకు ఖాతా లేదు",
-      "make_sure_to_cross_check_the_state_district_block_village": "రాష్ట్రం, జిల్లా, బ్లాక్, గ్రామాన్ని క్రాస్ చెక్ చేయండి"
+      "make_sure_to_cross_check_the_state_district_block_village": "రాష్ట్రం, జిల్లా, బ్లాక్, గ్రామాన్ని క్రాస్ చెక్ చేయండి",
+      "GET_THE_APP": "యాప్ పొందండి",
+      "POINT_YOUR_PHONE": "మీ ఫోన్ కెమెరాను ఇక్కడ సూచించండి",
+      "POINT_CAMERA": "ఇక్కడ కెమెరాను సూచించండి",
+      "OR": "లేదా",
+      "SEARCH_PLAYSTORE": "ప్లేస్టోర్‌లో \"ప్రథమ్ మైలెర్నింగ్\" శోధించండి",
+      "ON_PLAYSTORE": "ప్లేస్టోర్‌లో"
     },
     "L_ONE_COURSE": {
       "IN_PROGRESS_TITLE": "పురోగతిలో",

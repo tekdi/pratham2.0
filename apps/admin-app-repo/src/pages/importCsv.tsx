@@ -2,6 +2,8 @@ import FileUploadDialog from '@/components/FileUploadDialog';
 import Loader from '@/components/Loader';
 import { showToastMessage } from '@/components/Toastify';
 import {
+  deleteContent,
+  deletePlanner,
   getSolutionDetails,
   getTargetedSolutions,
   getUserProjectDetails,
@@ -28,6 +30,7 @@ import {
   useTheme,
 } from '@mui/material';
 import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Image from 'next/image';
@@ -40,7 +43,19 @@ import AddIcon from '@mui/icons-material/Add';
 import SimpleModal from '@/components/SimpleModal';
 import AddNewTopic from '@/components/AddNewTopic';
 
+//new course planner changes
+import CoursePlanForm from '@/components/CoursePlan/CoursePlanForm';
+import { useConfirmationDialog } from '@/components/CoursePlan/ConfirmationDialog';
+import { useCustomSnackbar } from '@/components/CoursePlan/useCustomSnackbar';
+import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined';
+import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+
 const ImportCsv = () => {
+  const { ConfirmationDialog, openConfirmation } = useConfirmationDialog();
+  const { CustomSnackbar, showSnackbar } = useCustomSnackbar();
+
   const router = useRouter();
   const store = coursePlannerStore();
   const tstore = taxonomyStore();
@@ -65,6 +80,11 @@ const ImportCsv = () => {
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const setResources = taxonomyStore((state) => state.setResources);
 
+  //new course planner changes
+  const [projectId, setProjectId] = useState('');
+  const [formType, setFormType] = useState('');
+  const [prefilledObject, setPrefilledObject] = useState({});
+
   const fetchCourseDetails = useCallback(async () => {
     try {
       setLoading(true);
@@ -78,15 +98,19 @@ const ImportCsv = () => {
       });
 
       const courseData = response?.result?.data[0];
-      let courseId = courseData._id;
+      let courseId = courseData?._id;
 
       if (!courseId) {
         courseId = await fetchCourseIdFromSolution(courseData?.solutionId);
       }
-
+      if (courseId) {
+        setProjectId(courseId);
+      }
       await fetchAndSetUserProjectDetails(courseId);
     } catch (error) {
       console.error('Error fetching course planner:', error);
+      //reset project details
+      setUserProjectDetails([]);
       setLoading(false);
     }
   }, [open]);
@@ -116,8 +140,12 @@ const ImportCsv = () => {
         courseType: tstore?.taxonomyType,
         medium: tstore?.taxonomyMedium,
       });
+      const courseData = updatedResponse?.result?.data[0];
+      if (courseData?._id) {
+        setProjectId(courseData?._id);
+      }
       setLoading(false);
-      return updatedResponse.result.data[0]._id;
+      return updatedResponse.result.data[0]?._id;
     } catch (error) {
       console.error('Error fetching solution details:', error);
       throw error;
@@ -273,11 +301,19 @@ const ImportCsv = () => {
   }
 
   const getAbbreviatedMonth = (dateString: string | number | Date) => {
-    const date = new Date(dateString);
-    const months = Array.from({ length: 12 }, (_, i) =>
-      dayjs().month(i).format('MMM')
-    );
-    return months[date.getMonth()];
+    dayjs.extend(customParseFormat);
+    //below considering date 12 as month
+    //12-02-1998
+    // const date = new Date(dateString);
+    // const months = Array.from({ length: 12 }, (_, i) =>
+    //   dayjs().month(i).format('MMM')
+    // );
+    // return months[date.getMonth()];
+    //fix this method to consider 02 as month
+    const date = dayjs(dateString, 'DD-MM-YYYY', true); // strict mode
+    if (!date.isValid()) return 'Invalid date';
+    // return date.format('DD/MMM/YYYY'); // e.g., "Feb"
+    return date.format('MMM'); // e.g., "Feb"
   };
 
   const handleResources = (subTopic: any) => {
@@ -302,6 +338,49 @@ const ImportCsv = () => {
     setOpenAddTopicModal(false);
   };
 
+  const CoursePlanFormAction = () => {
+    showSnackbar({
+      text: t('Topic has been successfully created'),
+      bgColor: '#BA1A1A', //#BA1A1A
+      textColor: '#fff',
+      icon: <CheckCircleOutlineOutlinedIcon />, //ErrorOutlinedIcon
+    });
+    fetchCourseDetails();
+  };
+
+  const handleDeleteContent = async (externalId: any, type: any) => {
+    openConfirmation({
+      title: t('Are you sure you want to delete?'),
+      message: t(
+        `${type} will be permanently deleted. Are you sure you want to delete?`
+      ),
+      yesText: t('Yes, Delete'),
+      noText: t('No, Cancel'),
+      onYes: async () => {
+        const response = await deleteContent(projectId, externalId);
+        if (response) {
+          showSnackbar({
+            text: t(`${type} has been successfully deleted`),
+            bgColor: '#BA1A1A', //#BA1A1A
+            textColor: '#fff',
+            icon: <CheckCircleOutlineOutlinedIcon />, //ErrorOutlinedIcon
+          });
+          //reload data
+          fetchCourseDetails();
+        } else {
+          showSnackbar({
+            text: t(
+              `Something went wrong. We couldn't delete the ${type}. Please try again`
+            ),
+            bgColor: '#BA1A1A', //#BA1A1A
+            textColor: '#fff',
+            icon: <ErrorOutlinedIcon />, //ErrorOutlinedIcon
+          });
+        }
+      },
+    });
+  };
+
   return (
     <Box sx={{ padding: isSmallScreen ? '16px' : '32px' }}>
       <Box
@@ -324,66 +403,113 @@ const ImportCsv = () => {
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           {/* Delete Planner */}
-          <Box
-            display="flex"
-            alignItems="center"
-            gap={0.5}
-            onClick={() => {
-              console.log('Dlete button clicked!!!');
-            }}
-          >
-            <Typography variant="h4" color={theme.palette.error.main}>
-              {t('COURSE_PLANNER.DELETE_PLANNER')}
-            </Typography>
-            <Image src={deleteIcon} alt="" />
-          </Box>
-          {/* Download CSV Template */}
-          <Box display="flex" alignItems="center" gap={0.5}>
-            <Typography
-              variant="h4"
-              color={theme.palette.secondary.main}
-              onClick={handleDownloadCSV}
+          {userProjectDetails?.length > 0 && (
+            <Box
+              display="flex"
+              alignItems="center"
+              gap={0.5}
+              onClick={() => {
+                console.log('Dlete button clicked!!!');
+                //call delete api
+                openConfirmation({
+                  title: t('Are you sure you want to delete?'),
+                  message: t(
+                    'All the topic content and resources will be permanently deleted. Are you sure you want to delete?'
+                  ),
+                  yesText: t('Yes, Delete'),
+                  noText: t('No, Cancel'),
+                  onYes: async () => {
+                    const response = await deletePlanner(projectId);
+                    if (response) {
+                      showSnackbar({
+                        text: t('Planner has been successfully deleted'),
+                        bgColor: '#BA1A1A', //#BA1A1A
+                        textColor: '#fff',
+                        icon: <CheckCircleOutlineOutlinedIcon />, //ErrorOutlinedIcon
+                      });
+                      //reload data
+                      fetchCourseDetails();
+                    } else {
+                      showSnackbar({
+                        text: t(
+                          'Something went wrong. We couldn’t delete the planner. Please try again'
+                        ),
+                        bgColor: '#BA1A1A', //#BA1A1A
+                        textColor: '#fff',
+                        icon: <ErrorOutlinedIcon />, //ErrorOutlinedIcon
+                      });
+                    }
+                  },
+                });
+              }}
+              sx={{ cursor: 'pointer' }}
             >
-              {t('COURSE_PLANNER.CSV_TEMPLATE')}
-            </Typography>
-            <Image src={downloadIcon} alt="" />
-          </Box>
-          {/* Import New Planner */}
-          <Button
-            variant="outlined"
-            sx={{
-              borderRadius: '8px',
-              color: '#000000',
-              borderColor: '#000000',
-              '&:hover': {
-                borderColor: '#333333',
-                color: '#333333',
-              },
-            }}
-            onClick={handleClickOpen}
-            endIcon={<AddIcon />}
-          >
-            {t('COURSE_PLANNER.IMPORT_NEW_PLANNER')}
-          </Button>
-          <Button
-            variant="outlined"
-            sx={{
-              borderRadius: '8px',
-              color: '#000000',
-              borderColor: '#000000',
-              '&:hover': {
-                borderColor: '#333333',
-                color: '#333333',
-              },
-            }}
-            endIcon={<AddIcon />}
-            onClick={() => {
-              setOpenAddTopicModal(true);
-            }}
-          >
-            {t('COURSE_PLANNER.ADD_NEW_TOPIC')}
-          </Button>
-          <Button
+              <Typography variant="h4" color={theme.palette.error.main}>
+                {t('COURSE_PLANNER.DELETE_PLANNER')}
+              </Typography>
+              <Image src={deleteIcon} alt="" />
+            </Box>
+          )}
+          {userProjectDetails?.length == 0 && (
+            <>
+              {/* Download CSV Template */}
+              <Box
+                display="flex"
+                alignItems="center"
+                gap={0.5}
+                sx={{ cursor: 'pointer' }}
+              >
+                <Typography
+                  variant="h4"
+                  color={theme.palette.secondary.main}
+                  onClick={handleDownloadCSV}
+                >
+                  {t('COURSE_PLANNER.CSV_TEMPLATE')}
+                </Typography>
+                <Image src={downloadIcon} alt="" />
+              </Box>
+              {/* Import New Planner */}
+              <Button
+                variant="outlined"
+                sx={{
+                  borderRadius: '8px',
+                  color: '#000000',
+                  borderColor: '#000000',
+                  '&:hover': {
+                    borderColor: '#333333',
+                    color: '#333333',
+                  },
+                }}
+                onClick={handleClickOpen}
+                endIcon={<AddIcon />}
+              >
+                {t('COURSE_PLANNER.IMPORT_NEW_PLANNER')}
+              </Button>
+            </>
+          )}
+          {userProjectDetails?.length > 0 && (
+            <Button
+              variant="outlined"
+              sx={{
+                borderRadius: '8px',
+                color: '#000000',
+                borderColor: '#000000',
+                '&:hover': {
+                  borderColor: '#333333',
+                  color: '#333333',
+                },
+              }}
+              endIcon={<AddIcon />}
+              onClick={() => {
+                setFormType('addTopic');
+                setPrefilledObject({});
+                setOpenAddTopicModal(true);
+              }}
+            >
+              {t('COURSE_PLANNER.ADD_NEW_TOPIC')}
+            </Button>
+          )}
+          {/* <Button
             sx={{
               borderRadius: '8px',
               color: '#000000',
@@ -395,21 +521,26 @@ const ImportCsv = () => {
             }}
             onClick={handleCopyLink}
           >
-            {/* <AttachmentIcon /> */}
-          </Button>
+            <AttachmentIcon />
+          </Button> */}
         </Box>
       </Box>
-      <SimpleModal
+      <CoursePlanForm
         open={openAddTopicModal}
         onClose={handleCloseModal}
-        showFooter={true}
-        primaryText={t('COMMON.ADD')}
-        id="dynamic-form-id"
-        modalTitle={t('COURSE_PLANNER.NEW_TOPIC')}
-      >
-        <AddNewTopic />
-      </SimpleModal>
-
+        title={
+          formType == 'addSubTopic'
+            ? t('New Sub Topic')
+            : formType == 'editTopic'
+            ? t('Edit Topic and Sub Topic')
+            : t('COURSE_PLANNER.NEW_TOPIC')
+        }
+        actionTitle={formType == 'editTopic' ? t('Save') : t('COMMON.ADD')}
+        onAction={CoursePlanFormAction}
+        projectId={projectId}
+        formType={formType}
+        prefilledObject={prefilledObject}
+      />
       <Box>
         {loading ? (
           <Loader showBackdrop={true} loadingText={t('COMMON.LOADING')} />
@@ -503,36 +634,111 @@ const ImportCsv = () => {
                             >
                               {getAbbreviatedMonth(
                                 topic?.metaInformation?.startDate
-                              )}
+                              )}{' '}
                               ,{' '}
                               {getAbbreviatedMonth(
                                 topic?.metaInformation?.endDate
                               )}
                             </Typography>
+
+                            <Button
+                              onClick={() => {
+                                setFormType('addSubTopic');
+                                setPrefilledObject(topic);
+                                setOpenAddTopicModal(true);
+                              }}
+                              sx={{
+                                p: 1,
+                                pl: 2.5,
+                                pr: 2.5,
+                                fontSize: 'small',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                              }}
+                              size="small"
+                              endIcon={<AddIcon fontSize="medium" />}
+                            >
+                              Add New Sub topic
+                            </Button>
+                            <IconButton
+                              onClick={() => {
+                                setFormType('editTopic');
+                                setPrefilledObject(topic);
+                                setOpenAddTopicModal(true);
+                              }}
+                              sx={{
+                                color: '#0D599E',
+                              }}
+                            >
+                              <EditOutlinedIcon />
+                            </IconButton>
+                            <IconButton
+                              onClick={() => {
+                                handleDeleteContent(topic?.externalId, 'Topic');
+                              }}
+                              sx={{
+                                color: '#BA1A1A',
+                              }}
+                            >
+                              <DeleteOutlineOutlinedIcon />
+                            </IconButton>
                           </Box>
                         </Box>
                       </AccordionSummary>
-                      <Box
-                        sx={{
-                          background: 'white',
-                          fontSize: '14px',
-                          display: 'flex',
-                          flexDirection: 'row',
-                          justifyContent: 'space-between',
-                          padding: '10px 25px 0px 25px',
-                          borderRadius: '8px',
-                        }}
-                      >
-                        <Box sx={{ flex: 1 }}>
-                          {t('COURSE_PLANNER.SUB-TOPIC')}
+                      {topic?.children?.length > 0 ? (
+                        <Box
+                          sx={{
+                            background: 'white',
+                            fontSize: '14px',
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            padding: '10px 25px 0px 25px',
+                            borderRadius: '8px',
+                          }}
+                        >
+                          <Box sx={{ flex: 1 }}>
+                            {t('COURSE_PLANNER.SUB-TOPIC')}
+                          </Box>
+                          <Box sx={{ flex: 1, textAlign: 'center' }}>
+                            {t('COURSE_PLANNER.RESOURCES')}
+                          </Box>
+                          <Box sx={{ flex: 1, textAlign: 'right' }}>
+                            {t('COURSE_PLANNER.DURATION/MONTH')}
+                          </Box>
+                          <Box sx={{ flex: 1, textAlign: 'right' }}>
+                            {t('Actions')}
+                          </Box>
                         </Box>
-                        <Box sx={{ flex: 1, textAlign: 'center' }}>
-                          {t('COURSE_PLANNER.RESOURCES')}
+                      ) : (
+                        <Box
+                          sx={{
+                            background: 'white',
+                            fontSize: '14px',
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            padding: '10px 25px 0px 25px',
+                            borderRadius: '8px',
+                          }}
+                        >
+                          <Typography
+                            variant="body1"
+                            sx={{
+                              fontStyle: 'italic',
+                              textAlign: 'center',
+                              padding: '10px',
+                              fontWeight: '100',
+                              color: '#777777',
+                            }}
+                          >
+                            {t(
+                              `Looks like you haven't added any sub topics yet`
+                            )}
+                          </Typography>
                         </Box>
-                        <Box sx={{ flex: 1, textAlign: 'right' }}>
-                          {t('COURSE_PLANNER.DURATION/MONTH')}
-                        </Box>
-                      </Box>
+                      )}
 
                       <AccordionDetails
                         sx={{
@@ -544,7 +750,6 @@ const ImportCsv = () => {
                         {topic.children.map((subTopic: any) => (
                           <Box
                             key={subTopic._id}
-                            onClick={() => handleResources(subTopic)}
                             sx={{
                               border: `1px solid #E0E0E0`,
                               padding: '10px',
@@ -568,6 +773,7 @@ const ImportCsv = () => {
                                 }}
                               >
                                 <Box
+                                  onClick={() => handleResources(subTopic)}
                                   sx={{
                                     flex: 1,
                                     display: 'flex',
@@ -579,6 +785,7 @@ const ImportCsv = () => {
                                   <FolderOutlinedIcon /> {subTopic.name}
                                 </Box>
                                 <Box
+                                  onClick={() => handleResources(subTopic)}
                                   sx={{
                                     flex: 1,
                                     textAlign: 'center',
@@ -592,6 +799,7 @@ const ImportCsv = () => {
                                   )}`}
                                 </Box>
                                 <Box
+                                  onClick={() => handleResources(subTopic)}
                                   sx={{
                                     flex: 1,
                                     display: 'flex',
@@ -618,6 +826,41 @@ const ImportCsv = () => {
                                     {getAbbreviatedMonth(
                                       subTopic?.metaInformation?.startDate
                                     )}
+                                    {/* {' '}-{' '} 
+                                    {getAbbreviatedMonth(
+                                      subTopic?.metaInformation?.endDate
+                                    )} */}
+                                  </Box>
+                                </Box>
+                                <Box
+                                  sx={{
+                                    flex: 1,
+                                    display: 'flex',
+                                    justifyContent: 'flex-end',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                  }}
+                                >
+                                  <Box
+                                    sx={{
+                                      padding: '2px',
+                                      background: '#FAEEEC',
+                                      borderRadius: '8px',
+                                    }}
+                                  >
+                                    <IconButton
+                                      onClick={() => {
+                                        handleDeleteContent(
+                                          subTopic?.externalId,
+                                          'Sub Topic'
+                                        );
+                                      }}
+                                      sx={{
+                                        color: '#BA1A1A',
+                                      }}
+                                    >
+                                      <DeleteOutlineOutlinedIcon />
+                                    </IconButton>
                                   </Box>
                                 </Box>
                               </Box>
@@ -646,6 +889,8 @@ const ImportCsv = () => {
         onRemoveFile={handleRemoveFile}
         onUpload={handleUpload}
       />
+      {ConfirmationDialog}
+      {CustomSnackbar}
     </Box>
   );
 };
