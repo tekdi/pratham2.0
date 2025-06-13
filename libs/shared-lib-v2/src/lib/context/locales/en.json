@@ -85,7 +85,17 @@
         "MOTHER":"Mother",
         "SPOUSE":"Spouse",
         "SPOUSE_NAME":"Spouse Name",
-        "FATHER_NAME":"Father Name"
+        "FATHER_NAME":"Father Name",
+         "GRADE_1": "grade 1",
+  "GRADE_2": "grade 2",
+  "GRADE_3": "grade 3",
+  "GRADE_4": "grade 4",
+  "GRADE_5": "grade 5",
+  "GRADE_6": "grade 6",
+  "GRADE_7": "grade 7",
+  "GRADE_8": "grade 8",
+  "GRADE_9": "grade 9",
+  "NO_SCHOOLING": "no schooling"
 
   },
   "COMMON": {
@@ -590,7 +600,16 @@
         "FATHER":"Father",
         "MOTHER":"Mother",
         "SPOUSE":"Spouse",
-         "SPOUSE_NAME":"Spouse Name"
+         "SPOUSE_NAME":"Spouse Name",
+          "GRADE_1": "grade 1",
+  "GRADE_2": "grade 2",
+  "GRADE_3": "grade 3",
+  "GRADE_4": "grade 4",
+  "GRADE_5": "grade 5",
+  "GRADE_6": "grade 6",
+  "GRADE_7": "grade 7",
+  "GRADE_8": "grade 8",
+  "GRADE_9": "grade 9"
 
     
   },
