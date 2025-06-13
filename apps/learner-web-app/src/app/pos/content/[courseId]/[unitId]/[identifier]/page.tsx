@@ -9,17 +9,29 @@ export async function generateMetadata({ params }: any) {
   return await getMetadata(params.identifier);
 }
 
-const ContentDetails = dynamic(
-  () => import('@learner/components/Content/Player'),
-  {
-    ssr: false,
-  }
-);
+const Player = dynamic(() => import('@learner/components/Content/Player'), {
+  ssr: false,
+});
 
 const App: React.FC = () => {
   return (
     <Layout>
-      <ContentDetails userIdLocalstorageName={'did'} />
+      <Player
+        userIdLocalstorageName={'did'}
+        contentBaseUrl="/pos/content"
+        _config={{
+          player: {
+            trackable: false,
+          },
+          courseUnitDetails: {
+            contentBaseUrl: '/pos/content',
+            isEnrollmentRequired: false,
+            _card: {
+              isHideProgressStatus: true,
+            },
+          },
+        }}
+      />
     </Layout>
   );
 };

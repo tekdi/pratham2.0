@@ -35,6 +35,7 @@ const MyComponent: React.FC = () => {
         if (checkAuth()) {
           setIsLogin(true);
           const result = await profileComplitionCheck();
+          console.log('Profile completion check result:', result);
           setIsProfileCard(!result);
         } else {
           setIsLogin(false);
@@ -141,6 +142,7 @@ const MyComponent: React.FC = () => {
             <LearnerCourse
               title={'LEARNER_APP.COURSE.GET_STARTED'}
               _content={{
+                pageName: 'L1_Content',
                 onlyFields: ['contentLanguage', 'se_subDomains', 'se_subjects'],
                 isOpenColapsed: [
                   'contentLanguage',

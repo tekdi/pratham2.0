@@ -386,7 +386,7 @@ const UserId = () => {
         showFooter={true}
         modalTitle={'New Mentor'}
         //  handleNext={FormSubmitFunction}
-        primaryText={'submit'}
+        primaryText={'Submit'}
         id="dynamic-form-id"
         // secondaryText={count === 1 ? 'Save Progress' : ''}
       >

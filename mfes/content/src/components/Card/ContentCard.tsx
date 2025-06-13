@@ -2,6 +2,7 @@ import { Box, CSSObject, useTheme } from '@mui/material';
 import { CommonCard, ContentItem } from '@shared-lib';
 import AppConst from '../../utils/AppConst/AppConst';
 import { StatusIcon } from '../CommonCollapse';
+import Description from './Description';
 
 const ContentCard = ({
   item,
@@ -15,7 +16,7 @@ const ContentCard = ({
   type: any;
   default_img?: string;
   _card?: any;
-  handleCardClick: (content: ContentItem) => void;
+  handleCardClick: (content: ContentItem, e?: any) => void;
   trackData?: [];
 }) => {
   const { isWrap } = _card ?? {};
@@ -29,7 +30,7 @@ const ContentCard = ({
             ? item?.posterImage
             : default_img ?? `${AppConst.BASEPATH}/assests/images/image_ver.png`
         }
-        content={item?.description ? item?.description : ' '}
+        content={item?.description ? item?.description : <Description />}
         actions={
           type !== 'Course' && (
             <StatusIcon
@@ -53,9 +54,11 @@ const ContentCard = ({
         item={item}
         TrackData={trackData}
         type={type}
-        onClick={() => handleCardClick(item)}
+        onClick={(e: any) => handleCardClick(item, e)}
         _card={{
-          _contentText: { sx: { height: '120px' } },
+          _contentParentText: {
+            sx: { height: type !== 'Course' ? '156px' : '172px' },
+          },
           ..._card,
         }}
       />
@@ -65,7 +68,7 @@ const ContentCard = ({
 
 export default ContentCard;
 
-const CardWrap = ({
+export const CardWrap = ({
   children,
   isWrap,
   _card,
@@ -87,7 +90,7 @@ const CardWrap = ({
         position: 'relative',
         display: 'flex',
         alignItems: 'center',
-        mt: '18px',
+        mt: 1,
       }}
     >
       <Box

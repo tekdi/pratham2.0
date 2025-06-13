@@ -4,7 +4,7 @@
   "HINDI": "Hindi",
   "MARATHI": "Marathi",
   "URDU": "Urdu",
-   "UNIT_NAME": "Unit Name",
+  "UNIT_NAME": "Unit Name",
   "TYPE_OF_CENTER": "Type Of Center",
   "GOOGLE MAP_LINK": "Google Map Link",
   "MY_MAIN_SUBJECTS": "Main subjects",
@@ -14,7 +14,6 @@
   "SCIENCE": "Science",
   "SOCIAL_SCIENCE": "Social Science",
   "SUBJECTS_I_TEACH": "Subject I Teach",
-  
   "CENTER:": "Center:",
   "District": "District",
   "State": "State",
@@ -31,8 +30,7 @@
   "ADDRESS": " Address",
   "DOB": "Date of Birth",
   "SUBJECT": "Subject",
-   "SELF_PLACED": "Self Placed",
- 
+  "SELF_PLACED": "Self Placed",
   "Male": "Male",
   "Female": "Female",
   "Transgender": "Transgender",
@@ -46,10 +44,9 @@
   "Science": "Science",
   "Social Science": "Social Science",
   "Life Skills": "Life Skills",
-  
   "Smartphone": "Smartphone",
   "Keypad": "Keypad",
-   "SCHOOL_INACCESSIBLE": "School inaccessible",
+  "SCHOOL_INACCESSIBLE": "School inaccessible",
   "FINANCIAL_CONSTRAINTS": "Financial Constraints",
   "LACK_OF_INTEREST": "Lack of Interest",
   "FAMILY_RESPONSIBILITIES": "Family responsibilities",
@@ -67,7 +64,10 @@
   "SALARIED_WORK": "Salaried work",
   "SELF_EMPLOYMENT": "Self-employment",
   "UNEMPLOYED_OR_DOMESTIC_WORK": "Unemployed or Domestic Work",
- 
+      "phone_type_accessible": "Type of Phone Accessible",
+      "PHONE_TYPE_ACCESSIBLE": "Type of Phone Accessible",
+"WHAT_IS_YOUR_PRIMARY_WORK": "What is your primary work?",
+"UNEMPLOYED_HOUSEWIFE_DOMESTIC_WORK": "Unemployed, Housewife or Domestic Work",
   "SURVEYS": {
     "SURVEYS": "Surveys",
     "ACTIVE_SURVEYS": "Active Surveys",
@@ -75,7 +75,28 @@
     "VILLAGES": "Villages",
     "SUBMISSION": "Submissions",
     "SUMMARY": "Summary",
-    "CLOSED_ON": "Closed on"
+    "CLOSED_ON": "Closed on",
+     "TYPE_OF_PHONE_ACCESSIBLE":"Type of Phone Accessible",
+     "FAMILY_MEMBER_DETAILS": "Family Member Details",
+     "family_member_details": "Family Member Details",
+
+      "NOPHONE":"No Phone",
+        "FATHER":"Father",
+        "MOTHER":"Mother",
+        "SPOUSE":"Spouse",
+        "SPOUSE_NAME":"Spouse Name",
+        "FATHER_NAME":"Father Name",
+         "GRADE_1": "Grade 1",
+  "GRADE_2": "Grade 2",
+  "GRADE_3": "Grade 3",
+  "GRADE_4": "Grade 4",
+  "GRADE_5": "Grade 5",
+  "GRADE_6": "Grade 6",
+  "GRADE_7": "Grade 7",
+  "GRADE_8": "Grade 8",
+  "GRADE_9": "Grade 9",
+  "NO_SCHOOLING": "No Schooling"
+
   },
   "COMMON": {
     "L1_COURSES": "L1 Courses",
@@ -95,12 +116,38 @@
     "SURE_LOGOUT": "Are you sure you want to Logout?",
     "LOGOUT": "Logout",
     "LOADING": "Loading..",
-    "FAQS":"FAQ's"
+    "FAQS": "FAQ's",
+    "SHOW_MORE": "Show more ▼",
+    "SHOW_LESS": "Show less ▲",
+    "READ_MORE": "Read more ▼",
+    "READ_LESS": "Read less ▲",
+    "FILTER": "Filter",
+    "ENROLL_NOW": "Enroll Now",
+    "GO_TO_MY_PROFILE": "Go to My Profile",
+    "WHAT_YOU_LL_LEARN": "What You'll Learn",
+    "VIEW_ALL": "View All",
+    "NO_DATA_FOUND": "No data found",
+    "LOAD_MORE": "Load More",
+    "SKILLING_CENTERS": "Skilling Centers",
+    "SKILLING_CENTERS_NEAR_YOU": "Skilling Center Near You",
+    "STATUS": {
+      "completed": "Completed",
+      "in_progress": "In Progress",
+      "enrolled_not_started": "Enrolled, not started",
+      "not_started": "Not Started"
+    }
   },
   "LEARNER_APP": {
     "COMPLETE_PROFILE_BANNER": {
       "MESSAGE": "Complete your profile so we can guide you better on your learning journey",
       "BUTTON": "Complete Profile"
+    },
+    "EDIT_PROFILE": {
+      "TITLE": "Edit Profile",
+      "COMPLETE_PROFILE_TITLE": "Complete Your Profile",
+      "BACKGROUND_HELP_TEXT": "Help us with your background & other details",
+      "INVALID_LINK": "Invalid Link",
+      "FUTURE_WORK": "What do you want to become?"
     },
     "COMMON": {
       "L1_COURSES": "L1 Courses",
@@ -124,7 +171,9 @@
       "STARTED_ON": "Started on",
       "GET_STARTED": "Get Started with L1 Courses",
       "FILTER_BY": "Filter by",
-      "CLEAR_FILTER": "Clear Filter"
+      "CLEAR_FILTER": "Clear Filter",
+      "APPLY_FILTER": "Apply Filter",
+      "DONE": "Done"
     },
     "EXPLORE": {
       "EXPLORE_ADDITIONAL_COURSES": "Explore Additional Courses"
@@ -161,7 +210,13 @@
       "forgot_password": "Forgot Password?",
       "login_button": "Login",
       "no_account": "I don’t have an Account",
-      "make_sure_to_cross_check_the_state_district_block_village": "Make sure to cross check the State, District, Block, Village"
+      "make_sure_to_cross_check_the_state_district_block_village": "Make sure to cross check the State, District, Block, Village",
+      "GET_THE_APP": "Get the App",
+      "POINT_YOUR_PHONE": "Point your phone",
+      "POINT_CAMERA": "camera here",
+      "OR": "OR",
+      "SEARCH_PLAYSTORE": "Search “Pratham myLearning” on Playstore",
+      "ON_PLAYSTORE": "on Playstore"
     },
     "L_ONE_COURSE": {
       "IN_PROGRESS_TITLE": "In Progress",
@@ -245,12 +300,24 @@
       "PARENT_PHONE_NUMBRER": "Parent's Phone Number",
       "GUARDIAN_RELATION": "Relation with Guardian",
       "GUARDIAN_NAME": "Guardian's Name",
-      "GUARDIAN_DETAILS": "Guardian Details"
+      "GUARDIAN_DETAILS": "Guardian Details",
+      "I_WANT_TO_BECOME": "I want to become {futureWork}"
     },
     "USERNAME_SUGGESTION": {
       "USERNAME": "Username",
       "AVAILABLE_USERNAMES": "Available usernames",
       "CONTINUE": "Continue"
+    },
+    "REGISTRATION": {
+      "SIGN_UP_FOR": "Sign Up for",
+      "GET_VOCATIONAL_TRAINING_TO_LAND": "Get vocational training to land",
+      "AN_ENTRY_LEVEL_JOB_WITH_2_MONTHS_OF": "an entry level job with 2 months of",
+      "TRAINING": "training",
+      "ALREADY_SIGNED_UP": "Already signed up?",
+      "CLICK_HERE_TO_LOGIN": "Click here to login",
+      "TELL_US_ABOUT_YOURSELF": "1/2 Tell us about yourself",
+      "CONTINUE": "Continue",
+      "INVALID_LINK": "Invalid Link"
     },
     "RESET_PASSWORD_FORM": {
       "OLD_PASSWORD": "Old Password",
@@ -266,6 +333,15 @@
       "PASSWORD_NUMBER": "Password must contain at least one number",
       "PASSWORD_SPECIAL": "Password must contain at least one special character",
       "PASSWORD_LETTER": "Password must contain at least one uppercase and lowercase letter"
+    },
+    "WELCOME_SCREEN": {
+      "GET_APP": "Get the App",
+      "POINT_PHONE": "Point your phone",
+      "CAMERA_HERE": "camera here",
+      "OR": "OR",
+      "SEARCH_TEXT": "Search",
+      "APP_NAME": "Pratham myLearning",
+      "ON_PLAYSTORE": "on Playstore"
     }
   },
   "LOGIN_PAGE": {
@@ -359,6 +435,11 @@
   "WHAT_IS_YOUR_PREFERRED_MODE_OF_LEARNING": "What is your preferred mode of learning?",
   "REASON_FOR_DROP_OUT_FROM_SCHOOL": "Reason for drop out from school",
   "ARE_YOU_CURRENTLY_WORKING_IF_YES_CHOOSE_THE_DOMAIN": "Are you currently working? If yes, choose the domain",
+    "TYPE_OF_PHONE_ACCESSIBLE":"Type of Phone Accessible",
+     "FAMILY_MEMBER_DETAILS": "Family Member Details",
+     "family_member_details": "Family Member Details",
+       "SPOUSE_NAME":"Spouse Name",
+        "FATHER_NAME":"Father Name",
   "FORGOT_PASSWORD": {
     "TITLE": "Trouble with logging in?",
     "SUBTITLE": "No worries, we’ll help you get back to your account",
@@ -413,7 +494,7 @@
     "MARRIED": "Married",
     "DIVORCED": "Divorced",
     "PHONE_TYPE_AVAILABLE": "Type of Phone Available",
-    "SMARTPHONE": "Smartphone",
+        "SMARTPHONE": "Smartphone",
     "KEYPAD": "Keypad",
     "NO_PHONE": "No Phone",
     "IS_IT_YOUR_OWN_PHONE": "Is it your own phone?",
@@ -495,12 +576,43 @@
     "STATE_NAME": "State Name",
     "SUPPORT_NEEDED": "Support needed",
     "CLASS": "Class (Last passed grade)",
-       "PRIMARY_WORK": "Learner's Primary Work",
+    "PRIMARY_WORK": "Learner's Primary Work",
     "MOBILISATION_METHOD": "How Was the Learner Mobilized?",
     "MONTH_MOBILISATION": "Month of Mobilisation",
-    "DROP_OUT_REASON": "Reason for Drop Out From School"
-   
-   
+    "DROP_OUT_REASON": "Reason for Drop Out From School",
+    "UNEMPLOYED_HOUSEWIFE_DOMESTIC_WORK": "Unemployed, Housewife or Domestic Work",
+"SELF_EMPLOYMENT_OWN_BUSINESS_SHOP":"Self Employment, Own Business or Shop",
+"STUDENT": "Student",
+ "BEAUTY": "beauty",
+  "AUTO_2W": "auto_2w",
+  "AUTO_4W": "auto_4w",
+  "ELECTRICAL": "electrical",
+  "HEALTHCARE": "healthcare",
+  "HOSPITALITY": "hospitality",
+  "PLUMBING": "plumbing",
+  "WELDING": "welding",
+  "APPAREL": "apparel",
+  "CONSTRUCTION": "construction",
+  "GRAPHIC_DESIGN": "graphic design",
+  "TYPE_OF_PHONE_ACCESSIBLE ":"Type of Phone Accessible",
+        "FAMILY_MEMBER_DETAILS": "Family Member Details",
+        "WHAT_IS_YOUR_PRIMARY_WORK": "What is your primary work?",
+        "NOPHONE":"No Phone",
+        "FATHER":"Father",
+        "MOTHER":"Mother",
+        "SPOUSE":"Spouse",
+         "SPOUSE_NAME":"Spouse Name",
+          "GRADE_1": "Grade 1",
+  "GRADE_2": "Grade 2",
+  "GRADE_3": "Grade 3",
+  "GRADE_4": "Grade 4",
+  "GRADE_5": "Grade 5",
+  "GRADE_6": "Grade 6",
+  "GRADE_7": "Grade 7",
+  "GRADE_8": "Grade 8",
+  "GRADE_9": "Grade 9"
+
+    
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "Invalid Input.",
@@ -524,5 +636,4 @@
     "DATE_MUST_BE_ON_OR_BEFORE": "Date must be on or before {{date}}",
     "DATE_MUST_BE_ON_OR_AFTER": "Date must be on or after {{date}}"
   }
-
 }
