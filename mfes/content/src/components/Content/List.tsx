@@ -64,7 +64,7 @@ export interface ContentProps {
   _config?: any;
   filters?: object;
   contentTabs?: string[];
-  cardName?: string;
+  pageName?: string;
   handleCardClick?: (content: ContentItem) => void | undefined;
   showFilter?: boolean;
   showSearch?: boolean;
@@ -100,10 +100,10 @@ export default function Content(props: Readonly<ContentProps>) {
 
   // Session keys
   const sessionKeys = {
-    filters: 'savedFilters',
-    search: 'searchValue',
-    tab: 'tabValue',
-    scrollId: 'scrollToContentId',
+    filters: `${props?.pageName}_savedFilters`,
+    search: `${props?.pageName}_searchValue`,
+    tab: `${props?.pageName}_tabValue`,
+    scrollId: `${props?.pageName}_scrollToContentId`,
   };
 
   // Save filters to session
@@ -169,7 +169,7 @@ export default function Content(props: Readonly<ContentProps>) {
       setIsPageLoading(false);
     };
     init();
-  }, [props]);
+  }, [props, sessionKeys.filters, sessionKeys.search, sessionKeys.tab]);
 
   // Fetch content with loop to load full data up to offset
   const fetchAllContent = useCallback(
@@ -341,6 +341,7 @@ export default function Content(props: Readonly<ContentProps>) {
       el.scrollIntoView({ behavior: 'smooth' });
       sessionStorage.removeItem(sessionKeys.scrollId);
       sessionStorage.removeItem(sessionKeys.filters);
+      sessionStorage.removeItem(sessionKeys.tab);
     } else {
       // Retry in the next animation frame if element not yet mounted
       requestAnimationFrame(() => {
@@ -349,6 +350,7 @@ export default function Content(props: Readonly<ContentProps>) {
           retryEl.scrollIntoView({ behavior: 'smooth' });
           sessionStorage.removeItem(sessionKeys.scrollId);
           sessionStorage.removeItem(sessionKeys.filters);
+          sessionStorage.removeItem(sessionKeys.tab);
         }
       });
     }

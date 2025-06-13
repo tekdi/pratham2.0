@@ -138,10 +138,6 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
     <Layout
       onlyHideElements={['footer']}
       {...props}
-      _children={{
-        _childrenBox: { id: 'content' },
-        ...props?._children,
-      }}
       _topAppBar={{
         _brand: {
           name: typeof window !== 'undefined' ? localStorage.getItem('userProgram') ?? '' : '',
