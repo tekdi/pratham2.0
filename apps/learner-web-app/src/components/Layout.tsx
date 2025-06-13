@@ -112,7 +112,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         navLinks.push(
           {
   title: t('COMMON.SKILLING_CENTERS'),
-  icon: <img src="images/engineering.png" alt="Skill Center" style={{ width: 28, height: 28 }} />,
+  icon: <img src="/images/engineering.png" alt="Skill Center" style={{ width: 28, height: 28 }} />,
   to: () => handleNavClick(() => router.push('/skill-center')),
   isActive: currentPage === '/skill-center',
   customStyle: {},
