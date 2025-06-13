@@ -66,9 +66,10 @@ export default function Details(props: DetailsProps) {
   useEffect(() => {
     const getDetails = async (identifier: string) => {
       try {
-        let resultHierarchy: any = await hierarchyAPI(identifier, {
+        const resultHierarchyCourse = await hierarchyAPI(identifier, {
           mode: 'edit',
         });
+        let resultHierarchy = resultHierarchyCourse;
         if (unitId) {
           resultHierarchy = getUnitFromHierarchy(
             resultHierarchy,
@@ -76,10 +77,10 @@ export default function Details(props: DetailsProps) {
           );
         }
         if (unitId && !props?.isHideInfoCard) {
-          setCourseItem(resultHierarchy);
+          setCourseItem(resultHierarchyCourse);
           const breadcrum = findCourseUnitPath({
             contentBaseUrl: props?._config?.contentBaseUrl,
-            node: resultHierarchy,
+            node: resultHierarchyCourse,
             targetId: unitId as string,
             keyArray: [
               'name',

@@ -24,6 +24,7 @@ const App: React.FC = () => {
             trackable: false,
           },
           courseUnitDetails: {
+            contentBaseUrl: '/pos/content',
             isEnrollmentRequired: false,
             _card: {
               isHideProgressStatus: true,
