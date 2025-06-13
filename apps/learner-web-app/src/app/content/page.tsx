@@ -142,6 +142,7 @@ const MyComponent: React.FC = () => {
             <LearnerCourse
               title={'LEARNER_APP.COURSE.GET_STARTED'}
               _content={{
+                pageName: 'L1_Content',
                 onlyFields: ['contentLanguage', 'se_subDomains', 'se_subjects'],
                 isOpenColapsed: [
                   'contentLanguage',

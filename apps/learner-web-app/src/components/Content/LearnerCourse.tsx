@@ -49,6 +49,7 @@ export default memo(function LearnerCourse({
     setFilterState((prevState: any) => ({
       ...prevState,
       query: searchValue,
+      offset: 0,
     }));
   }, []);
 
