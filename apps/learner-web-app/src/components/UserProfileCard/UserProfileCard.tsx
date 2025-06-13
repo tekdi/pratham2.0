@@ -424,9 +424,7 @@ const UserProfileCard = () => {
               {t('LEARNER_APP.USER_PROFILE_CARD.FUTURE_WORK')}
             </Typography>
             <Typography sx={valueStyle}>
-              {t('LEARNER_APP.USER_PROFILE_CARD.I_WANT_TO_BECOME', {
-                defaultValue: futureWork,
-              })}
+              - I want to become {futureWork}
             </Typography>
           </Box>
         </Box>

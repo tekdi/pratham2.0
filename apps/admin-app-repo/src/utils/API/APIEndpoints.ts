@@ -48,4 +48,6 @@ export const COURSE_PLANNER_UPLOAD_ENDPOINTS = `${process.env.NEXT_PUBLIC_BASE_U
 
 export const TARGET_SOLUTION_ENDPOINTS = `${process.env.NEXT_PUBLIC_COURSE_PLANNER_API_URL}/solutions/targetedSolutions?type=improvementProject&currentScopeOnly=true`;
 export const COURSE_PLANNER_DELETE = `${process.env.NEXT_PUBLIC_COURSE_PLANNER_API_URL}/project/templateTasks/delete/`;
+export const COURSE_PLANNER_TOPIC_CREATE = `${process.env.NEXT_PUBLIC_COURSE_PLANNER_API_URL}/project/templateTasks/bulkCreateJson/`;
 export const COURSE_PLANNER_DELETE_CONTENT = `${process.env.NEXT_PUBLIC_COURSE_PLANNER_API_URL}/project/templateTasks/deleteTask/`;
+export const COURSE_PLANNER_UPDATE_CONTENT = `${process.env.NEXT_PUBLIC_COURSE_PLANNER_API_URL}/project/templateTasks/updateTask/`;
