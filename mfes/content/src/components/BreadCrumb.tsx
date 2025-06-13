@@ -59,7 +59,7 @@ const BreadCrumb = ({
             );
       })}
       {(!breadCrumbs || breadCrumbs?.length === 0) &&
-        ['Course', ...(topic ? [topic] : [])].map((key) => (
+        [...(topic ? ['Course', topic] : [])].map((key) => (
           <Typography key={key} variant="body1">
             <SpeakableText>{key}</SpeakableText>
           </Typography>

@@ -147,7 +147,7 @@ export const getTelemetryConfig = (): Context => {
     tags: [localStorageData.tenantCode],
     contextRollup: { l1: localStorageData.tenantCode },
     objectRollup: {},
-    userData: { firstName: localStorageData.userName, lastName: '' },
+    userData: { firstName: localStorageData.userName || 'Guest', lastName: '' },
     host: '',
     endpoint: '/v1/telemetry',
     ...localStorageData,
