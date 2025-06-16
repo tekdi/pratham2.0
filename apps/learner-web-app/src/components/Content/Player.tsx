@@ -250,6 +250,8 @@ const PlayerBox = ({
       sx={{
         flex: { xs: 1, sm: 1, md: 8 },
         position: 'relative',
+        display: 'flex',
+        justifyContent: 'center',
       }}
     >
       {!play && (
@@ -285,35 +287,42 @@ const PlayerBox = ({
           </Button>
         </Box>
       )}
+
       {play && (
-        <iframe
-          name={JSON.stringify({
-            isGenerateCertificate: isGenerateCertificate,
-            trackable: trackable,
-          })}
-          src={`${
-            process.env.NEXT_PUBLIC_LEARNER_SBPLAYER
-          }?identifier=${identifier}${
-            courseId && unitId ? `&courseId=${courseId}&unitId=${unitId}` : ''
-          }${
-            userIdLocalstorageName
-              ? `&userId=${localStorage.getItem(userIdLocalstorageName)}`
-              : ''
-          }`}
-          style={{
-            border: 'none',
-            objectFit: 'contain',
-            aspectRatio: `${window.innerWidth / window.innerHeight}`,
+        <Box
+          sx={{
+            width: { xs: '100%', sm: '100%', md: '90%', lg: '80%', xl: '70%' },
           }}
-          allowFullScreen
-          width="100%"
-          height="100%"
-          title="Embedded Localhost"
-          allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
-          frameBorder="0"
-          scrolling="no"
-          sandbox="allow-forms allow-scripts allow-same-origin allow-top-navigation"
-        />
+        >
+          <iframe
+            name={JSON.stringify({
+              isGenerateCertificate: isGenerateCertificate,
+              trackable: trackable,
+            })}
+            src={`${
+              process.env.NEXT_PUBLIC_LEARNER_SBPLAYER
+            }?identifier=${identifier}${
+              courseId && unitId ? `&courseId=${courseId}&unitId=${unitId}` : ''
+            }${
+              userIdLocalstorageName
+                ? `&userId=${localStorage.getItem(userIdLocalstorageName)}`
+                : ''
+            }`}
+            style={{
+              border: 'none',
+              objectFit: 'contain',
+              aspectRatio: `${window.innerWidth / window.innerHeight}`,
+            }}
+            allowFullScreen
+            width="100%"
+            height="100%"
+            title="Embedded Localhost"
+            allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+            frameBorder="0"
+            scrolling="no"
+            sandbox="allow-forms allow-scripts allow-same-origin allow-top-navigation"
+          />
+        </Box>
       )}
     </Box>
   );
