@@ -7,17 +7,12 @@ export function generateMetadata({
 }) {
   const titles = {
     SCP: 'Second Chance Program',
-    VT: 'Vocational Training',
+    'Vocational Training': 'Vocational Training',
   };
 
   const descriptions = {
     SCP: `The Second Chance Program by Pratham is a powerful initiative that helps young girls and women who dropped out of school complete their Grade 10 education. By bringing learning closer to home and offering the support they need, the program breaks barriers like early marriage, household responsibilities, and lack of access. It opens doors to higher education, skills training, and better job opportunities, giving women a real shot at a brighter future.`,
-    VT: `Pratham’s Vocational Skilling Program, launched in 2005, empowers youth from underprivileged backgrounds by equipping them with practical, job-ready skills. With a presence across India, it opens doors to employment in over 10 key sectors, supported by affiliations like NSDC. In response to changing times, the program evolved into a Hybrid Skilling model, blending digital tools with training to help young people thrive in a post-pandemic world.`,
-  };
-
-  const images = {
-    SCP: `/images/pos_scp.jpg`,
-    VT: `/images/pos_vt.jpg`,
+    'Vocational Training': `Pratham’s Vocational Skilling Program, launched in 2005, empowers youth from underprivileged backgrounds by equipping them with practical, job-ready skills. With a presence across India, it opens doors to employment in over 10 key sectors, supported by affiliations like NSDC. In response to changing times, the program evolved into a Hybrid Skilling model, blending digital tools with training to help young people thrive in a post-pandemic world.`,
   };
 
   const title =
@@ -34,9 +29,7 @@ export function generateMetadata({
       description,
       images: [
         {
-          url:
-            (images as Record<string, string>)[program] ||
-            `/images/pos_life.jpg`,
+          url: `/images/pos_program.jpg`,
           width: 800,
           height: 600,
         },
