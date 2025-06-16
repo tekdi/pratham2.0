@@ -12,7 +12,7 @@ export const metadata = {
       'Learner web app is a platform for users to learn and grow by consuming educational content',
     images: [
       {
-        url: `${process.env.NEXT_PUBLIC_BASE_URL}/logo.png`,
+        url: `/logo.png`,
         width: 800,
         height: 600,
       },

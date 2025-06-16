@@ -17,8 +17,8 @@ export default memo(function SearchComponent({
   const debouncedSearch = useMemo(
     () =>
       debounce((value: string) => {
-        if (value.trim() !== '') {
-          onSearch(value.trim());
+        if (value?.trim() !== '') {
+          onSearch(value?.trim());
         }
       }, 300),
     [onSearch]
