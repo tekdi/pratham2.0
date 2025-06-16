@@ -38,7 +38,7 @@ const DynamicForm = ({
   
 }: any) => {
   const { t } = useTranslation();
-
+const hasPrefilled = useRef(false);
   const [submitted, setSubmitted] = useState(false);
   const formRef = useRef(null);
   const [formSchema, setFormSchema] = useState(schema);
@@ -290,18 +290,46 @@ const DynamicForm = ({
           });
 
         };
-        if (formData.family_member_details === 'mother') {
-
-          addField('mother_name', 'Mother Name');
-          removeFields(['father_name', 'spouse_name']);
-        } else if (formData.family_member_details === 'father') {
-
-          addField('father_name', 'Father Name');
-          removeFields(['mother_name', 'spouse_name']);
-        } else if (formData.family_member_details === 'spouse') {
-          addField('spouse_name', 'Spouse Name');
-          removeFields(['mother_name', 'father_name']);
-        }
+      if (formData.family_member_details === 'mother') {
+  addField('mother_name', 'Mother Name');
+  removeFields(['father_name', 'spouse_name']);
+  setFormData((prev) => ({
+    ...prev,
+    mother_name:
+      !hasPrefilled.current
+        ? prefilledFormData?.mother_name || prev.mother_name || ''
+        : prev.mother_name || '',
+    father_name: undefined,
+    spouse_name: undefined,
+  }));
+  hasPrefilled.current = true;
+} else if (formData.family_member_details === 'father') {
+  addField('father_name', 'Father Name');
+  removeFields(['mother_name', 'spouse_name']);
+  setFormData((prev) => ({
+    ...prev,
+    father_name:
+      !hasPrefilled.current
+        ? prefilledFormData?.father_name || prev.father_name || ''
+        : prev.father_name || '',
+    mother_name: undefined,
+    spouse_name: undefined,
+  }));
+  hasPrefilled.current = true;
+} else if (formData.family_member_details === 'spouse') {
+  addField('spouse_name', 'Spouse Name');
+  removeFields(['mother_name', 'father_name']);
+  setFormData((prev) => ({
+    ...prev,
+    spouse_name:
+      !hasPrefilled.current
+        ? prefilledFormData?.spouse_name || prev.spouse_name || ''
+        : prev.spouse_name || '',
+    mother_name: undefined,
+    father_name: undefined,
+  }));
+  hasPrefilled.current = true;
+}
       }
  
       
@@ -325,11 +353,15 @@ const DynamicForm = ({
       // setFormData;
       //fix for auto submit and render
       if (Object.keys(prefilledFormData).length === 0) {
+        if(type!== 'centers')
         prefilledFormData = { test: 'test' };
+      else
+              prefilledFormData = { type: 'COHORT' };
+
       }
       renderPrefilledForm();
     }
-  }, [isInitialCompleted]);
+  }, [isInitialCompleted, type]);
 
   useEffect(() => {
     if (isCallSubmitInHandle) {
