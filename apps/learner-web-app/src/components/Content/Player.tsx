@@ -311,7 +311,7 @@ const PlayerBox = ({
             style={{
               border: 'none',
               objectFit: 'contain',
-              aspectRatio: `${window.innerWidth / window.innerHeight}`,
+              aspectRatio: `${16 / 9}`,
             }}
             allowFullScreen
             width="100%"
