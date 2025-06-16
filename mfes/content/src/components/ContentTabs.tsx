@@ -26,7 +26,7 @@ const RenderTabContent = memo(
     _config: any;
     trackData?: [];
     type: string;
-    handleCardClick: (content: ContentItem) => void;
+    handleCardClick: (content: ContentItem, e?: any) => void;
     hasMoreData: boolean;
     handleLoadMore: (e: any) => void;
     tabs?: any[];
