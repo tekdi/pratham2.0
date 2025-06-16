@@ -50,6 +50,7 @@ import { useCustomSnackbar } from '@/components/CoursePlan/useCustomSnackbar';
 import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined';
 import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 
 const ImportCsv = () => {
   const { ConfirmationDialog, openConfirmation } = useConfirmationDialog();
@@ -81,6 +82,9 @@ const ImportCsv = () => {
 
   //new course planner changes
   const [projectId, setProjectId] = useState('');
+  const [solutionId, setSolutionId] = useState('');
+  const [formType, setFormType] = useState('');
+  const [prefilledObject, setPrefilledObject] = useState({});
 
   const fetchCourseDetails = useCallback(async () => {
     try {
@@ -96,12 +100,15 @@ const ImportCsv = () => {
 
       const courseData = response?.result?.data[0];
       let courseId = courseData?._id;
+      let solutionId = courseData?.solutionId;
 
       if (!courseId) {
         courseId = await fetchCourseIdFromSolution(courseData?.solutionId);
+        // setSolutionId(courseData?.solutionId);
       }
       if (courseId) {
         setProjectId(courseId);
+        setSolutionId(solutionId);
       }
       await fetchAndSetUserProjectDetails(courseId);
     } catch (error) {
@@ -140,6 +147,7 @@ const ImportCsv = () => {
       const courseData = updatedResponse?.result?.data[0];
       if (courseData?._id) {
         setProjectId(courseData?._id);
+        setSolutionId(courseData?.solutionId);
       }
       setLoading(false);
       return updatedResponse.result.data[0]?._id;
@@ -309,6 +317,7 @@ const ImportCsv = () => {
     //fix this method to consider 02 as month
     const date = dayjs(dateString, 'DD-MM-YYYY', true); // strict mode
     if (!date.isValid()) return 'Invalid date';
+    // return date.format('DD/MMM/YYYY'); // e.g., "Feb"
     return date.format('MMM'); // e.g., "Feb"
   };
 
@@ -335,6 +344,12 @@ const ImportCsv = () => {
   };
 
   const CoursePlanFormAction = () => {
+    showSnackbar({
+      text: t('Topic has been successfully created'),
+      bgColor: '#BA1A1A', //#BA1A1A
+      textColor: '#fff',
+      icon: <CheckCircleOutlineOutlinedIcon />, //ErrorOutlinedIcon
+    });
     fetchCourseDetails();
   };
 
@@ -347,7 +362,7 @@ const ImportCsv = () => {
       yesText: t('Yes, Delete'),
       noText: t('No, Cancel'),
       onYes: async () => {
-        const response = await deleteContent(projectId, externalId);
+        const response = await deleteContent(solutionId, externalId);
         if (response) {
           showSnackbar({
             text: t(`${type} has been successfully deleted`),
@@ -409,7 +424,7 @@ const ImportCsv = () => {
                   yesText: t('Yes, Delete'),
                   noText: t('No, Cancel'),
                   onYes: async () => {
-                    const response = await deletePlanner(projectId);
+                    const response = await deletePlanner(solutionId);
                     if (response) {
                       showSnackbar({
                         text: t('Planner has been successfully deleted'),
@@ -491,6 +506,8 @@ const ImportCsv = () => {
               }}
               endIcon={<AddIcon />}
               onClick={() => {
+                setFormType('addTopic');
+                setPrefilledObject({});
                 setOpenAddTopicModal(true);
               }}
             >
@@ -516,10 +533,18 @@ const ImportCsv = () => {
       <CoursePlanForm
         open={openAddTopicModal}
         onClose={handleCloseModal}
-        title={t('COURSE_PLANNER.NEW_TOPIC')}
-        actionTitle={t('COMMON.ADD')}
+        title={
+          formType == 'addSubTopic'
+            ? t('New Sub Topic')
+            : formType == 'editTopic'
+            ? t('Edit Topic and Sub Topic')
+            : t('COURSE_PLANNER.NEW_TOPIC')
+        }
+        actionTitle={formType == 'editTopic' ? t('Save') : t('COMMON.ADD')}
         onAction={CoursePlanFormAction}
-        projectId={projectId}
+        projectId={solutionId}
+        formType={formType}
+        prefilledObject={prefilledObject}
       />
       <Box>
         {loading ? (
@@ -614,12 +639,45 @@ const ImportCsv = () => {
                             >
                               {getAbbreviatedMonth(
                                 topic?.metaInformation?.startDate
-                              )}
+                              )}{' '}
                               ,{' '}
                               {getAbbreviatedMonth(
                                 topic?.metaInformation?.endDate
                               )}
                             </Typography>
+
+                            <Button
+                              onClick={() => {
+                                setFormType('addSubTopic');
+                                setPrefilledObject(topic);
+                                setOpenAddTopicModal(true);
+                              }}
+                              sx={{
+                                p: 1,
+                                pl: 2.5,
+                                pr: 2.5,
+                                fontSize: 'small',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                              }}
+                              size="small"
+                              endIcon={<AddIcon fontSize="medium" />}
+                            >
+                              Add New Sub topic
+                            </Button>
+                            <IconButton
+                              onClick={() => {
+                                setFormType('editTopic');
+                                setPrefilledObject(topic);
+                                setOpenAddTopicModal(true);
+                              }}
+                              sx={{
+                                color: '#0D599E',
+                              }}
+                            >
+                              <EditOutlinedIcon />
+                            </IconButton>
                             <IconButton
                               onClick={() => {
                                 handleDeleteContent(topic?.externalId, 'Topic');
@@ -773,6 +831,10 @@ const ImportCsv = () => {
                                     {getAbbreviatedMonth(
                                       subTopic?.metaInformation?.startDate
                                     )}
+                                    {/* {' '}-{' '} 
+                                    {getAbbreviatedMonth(
+                                      subTopic?.metaInformation?.endDate
+                                    )} */}
                                   </Box>
                                 </Box>
                                 <Box

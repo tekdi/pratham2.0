@@ -221,10 +221,22 @@
     "WORKSPACE": "Workspace",
     "MENTOR": "Mentor",
     "MENTOR_LEADER": "Mentor Leader",
+    "YOUTH": "Youth",
     "CERTIFICATE_ISSUANCE": "Certificate Issuance",
     "SUPPORT_REQUEST": "Support Request",
     "CONTENT_CREATOR": "Content Creator",
-    "CONTENT_REVIEWER": "Content Reviewer"
+    "CONTENT_REVIEWER": "Content Reviewer",
+    "FAQS":"FAQ's",
+    "STATE_LEAD":"State Lead",
+    "MASTER": "Master",
+    "STATES":"States",
+    "DISTRICTS":"Districts",
+    "BLOCKS":"Blocks",
+    "VILLAGES": "Villages",
+    "PROGRAMS":"Programs",
+    "SKILLING_CENTERS":"Skilling Centers",
+    "CURRICULUM_PLANNER":"Curriculum Planner",
+    "BATCH":"Batch"
   },
   "FACILITATORS": {
     "STATE": "State",

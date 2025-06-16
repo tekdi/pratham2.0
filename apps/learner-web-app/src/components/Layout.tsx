@@ -31,7 +31,9 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
   const pathname = usePathname();
   const { t, setLanguage } = useTranslation();
 
-  const [defaultNavLinks, setDefaultNavLinks] = useState<NewDrawerItemProp[]>([]);
+  const [defaultNavLinks, setDefaultNavLinks] = useState<NewDrawerItemProp[]>(
+    []
+  );
   const [anchorEl, setAnchorEl] = useState<any>(null);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
 
@@ -79,7 +81,9 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
       },
     ];
 
-    const isVolunteer = JSON.parse(localStorage.getItem('isVolunteer') || 'false');
+    const isVolunteer = JSON.parse(
+      localStorage.getItem('isVolunteer') || 'false'
+    );
     if (isVolunteer) {
       navLinks.push({
         title: t('LEARNER_APP.COMMON.SURVEYS'),
@@ -111,22 +115,26 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
       } else {
         navLinks.push(
           {
-  title: t('COMMON.SKILLING_CENTERS'),
-  icon: <img src="images/engineering.png" alt="Skill Center" style={{ width: 28, height: 28 }} />,
-  to: () => handleNavClick(() => router.push('/skill-center')),
-  isActive: currentPage === '/skill-center',
-  customStyle: {},
-}
-,
+            title: t('COMMON.SKILLING_CENTERS'),
+            icon: (
+              <img
+                src="/images/engineering.png"
+                alt="Skill Center"
+                style={{ width: 28, height: 28 }}
+              />
+            ),
+            to: () => handleNavClick(() => router.push('/skill-center')),
+            isActive: currentPage === '/skill-center',
+            customStyle: {},
+          },
           {
-          title: t('LEARNER_APP.COMMON.PROFILE'),
-          icon: <AccountCircleOutlined sx={{ width: 28, height: 28 }} />,
-          to: () => setAnchorEl(true),
-          isActive: currentPage === '/profile',
-          customStyle: getLinkStyle(currentPage === '/profile'),
-        },
-       
-      );
+            title: t('LEARNER_APP.COMMON.PROFILE'),
+            icon: <AccountCircleOutlined sx={{ width: 28, height: 28 }} />,
+            to: () => setAnchorEl(true),
+            isActive: currentPage === '/profile',
+            customStyle: getLinkStyle(currentPage === '/profile'),
+          }
+        );
       }
     }
 
@@ -141,7 +149,10 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
       {...props}
       _topAppBar={{
         _brand: {
-          name: typeof window !== 'undefined' ? localStorage.getItem('userProgram') ?? '' : '',
+          name:
+            typeof window !== 'undefined'
+              ? localStorage.getItem('userProgram') ?? ''
+              : '',
           _box: {
             onClick: () => router.push('/content'),
             sx: {

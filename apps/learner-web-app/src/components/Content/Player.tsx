@@ -66,7 +66,7 @@ const App = ({
         });
         setBreadCrumbs(breadcrum?.slice(0, -1));
       } else {
-        setBreadCrumbs([{ name: 'Content' }]);
+        setBreadCrumbs([]);
       }
     };
     fetch();
@@ -301,15 +301,18 @@ const PlayerBox = ({
               : ''
           }`}
           style={{
-            width: '100%',
-            height: 'calc(100vh - 235px)',
             border: 'none',
             objectFit: 'contain',
+            aspectRatio: `${window.innerWidth / window.innerHeight}`,
           }}
           allowFullScreen
           width="100%"
           height="100%"
           title="Embedded Localhost"
+          allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+          frameBorder="0"
+          scrolling="no"
+          sandbox="allow-forms allow-scripts allow-same-origin allow-top-navigation"
         />
       )}
     </Box>

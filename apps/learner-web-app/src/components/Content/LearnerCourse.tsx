@@ -31,13 +31,8 @@ export default memo(function LearnerCourse({
   const { staticFilter, filterFramework } = _content ?? {};
 
   useEffect(() => {
-    if (_content?.filters) {
-      setFilterState((prevState: any) => ({
-        ...prevState,
-        ..._content?.filters,
-      }));
-    }
-  }, [_content?.filters]);
+    setFilterState(_content?.filters ?? {});
+  }, [_content?.filters, _content?.searchParams]);
 
   const handleTabChange = useCallback((tab: any) => {
     setFilterState((prevState: any) => ({
@@ -49,6 +44,7 @@ export default memo(function LearnerCourse({
     setFilterState((prevState: any) => ({
       ...prevState,
       query: searchValue,
+      offset: 0,
     }));
   }, []);
 

@@ -75,7 +75,28 @@
     "VILLAGES": "Villages",
     "SUBMISSION": "Submissions",
     "SUMMARY": "Summary",
-    "CLOSED_ON": "Closed on"
+    "CLOSED_ON": "Closed on",
+     "TYPE_OF_PHONE_ACCESSIBLE":"Type of Phone Accessible",
+     "FAMILY_MEMBER_DETAILS": "Family Member Details",
+     "family_member_details": "Family Member Details",
+
+      "NOPHONE":"No Phone",
+        "FATHER":"Father",
+        "MOTHER":"Mother",
+        "SPOUSE":"Spouse",
+        "SPOUSE_NAME":"Spouse Name",
+        "FATHER_NAME":"Father Name",
+         "GRADE_1": "Grade 1",
+  "GRADE_2": "Grade 2",
+  "GRADE_3": "Grade 3",
+  "GRADE_4": "Grade 4",
+  "GRADE_5": "Grade 5",
+  "GRADE_6": "Grade 6",
+  "GRADE_7": "Grade 7",
+  "GRADE_8": "Grade 8",
+  "GRADE_9": "Grade 9",
+  "NO_SCHOOLING": "No Schooling"
+
   },
   "COMMON": {
     "L1_COURSES": "L1 Courses",
@@ -414,6 +435,11 @@
   "WHAT_IS_YOUR_PREFERRED_MODE_OF_LEARNING": "What is your preferred mode of learning?",
   "REASON_FOR_DROP_OUT_FROM_SCHOOL": "Reason for drop out from school",
   "ARE_YOU_CURRENTLY_WORKING_IF_YES_CHOOSE_THE_DOMAIN": "Are you currently working? If yes, choose the domain",
+    "TYPE_OF_PHONE_ACCESSIBLE":"Type of Phone Accessible",
+     "FAMILY_MEMBER_DETAILS": "Family Member Details",
+     "family_member_details": "Family Member Details",
+       "SPOUSE_NAME":"Spouse Name",
+        "FATHER_NAME":"Father Name",
   "FORGOT_PASSWORD": {
     "TITLE": "Trouble with logging in?",
     "SUBTITLE": "No worries, we’ll help you get back to your account",
@@ -567,7 +593,25 @@
   "WELDING": "welding",
   "APPAREL": "apparel",
   "CONSTRUCTION": "construction",
-  "GRAPHIC_DESIGN": "graphic design"
+  "GRAPHIC_DESIGN": "graphic design",
+  "TYPE_OF_PHONE_ACCESSIBLE ":"Type of Phone Accessible",
+        "FAMILY_MEMBER_DETAILS": "Family Member Details",
+        "WHAT_IS_YOUR_PRIMARY_WORK": "What is your primary work?",
+        "NOPHONE":"No Phone",
+        "FATHER":"Father",
+        "MOTHER":"Mother",
+        "SPOUSE":"Spouse",
+         "SPOUSE_NAME":"Spouse Name",
+          "GRADE_1": "Grade 1",
+  "GRADE_2": "Grade 2",
+  "GRADE_3": "Grade 3",
+  "GRADE_4": "Grade 4",
+  "GRADE_5": "Grade 5",
+  "GRADE_6": "Grade 6",
+  "GRADE_7": "Grade 7",
+  "GRADE_8": "Grade 8",
+  "GRADE_9": "Grade 9"
+
     
   },
   "FORM_ERROR_MESSAGES": {
