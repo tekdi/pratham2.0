@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { Grid, Typography, Box, IconButton } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack"; // Import the back arrow icon
-import ResourceCard from "../components/ResourceCard";
-import taxonomyStore from "@/store/tanonomyStore";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { ResourceType } from "@/utils/app.constant";
-import { useTranslation } from "next-i18next";
-import router from "next/router";
-import { fetchBulkContents } from "@/services/PlayerService";
+import React, { useEffect, useState } from 'react';
+import { Grid, Typography, Box, IconButton } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'; // Import the back arrow icon
+import ResourceCard from '../components/ResourceCard';
+import taxonomyStore from '@/store/tanonomyStore';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { ResourceType } from '@/utils/app.constant';
+import { useTranslation } from 'next-i18next';
+import router from 'next/router';
+import { fetchBulkContents } from '@/services/PlayerService';
 
 const ResourceList = () => {
   const [learnersPreReq, setLearnersPreReq] = useState<any[]>([]);
@@ -26,13 +26,12 @@ const ResourceList = () => {
         fetchedLearningResources.forEach((resource: { id: string }) => {
           resource.id = resource.id.toLowerCase();
         });
- 
 
         let contents = await fetchBulkContents(
           fetchedLearningResources?.map((item: any) => item.id)
         );
 
-        contents = contents.map((item: any) => {
+        contents = contents?.map((item: any) => {
           const contentType = fetchedLearningResources?.find(
             (resource: any) => resource.id === item.identifier
           )?.type;
@@ -41,15 +40,15 @@ const ResourceList = () => {
             ...item,
             type: contentType,
           };
-        }); 
+        });
 
-        const preRequisite = contents.filter(
+        const preRequisite = contents?.filter(
           (item: any) => item.type === ResourceType.LEARNER_PRE_REQUISITE
         );
-        const postRequisite = contents.filter(
+        const postRequisite = contents?.filter(
           (item: any) => item.type === ResourceType.LEARNER_POST_REQUISITE
         );
-        const facilitatorsRequisite = contents.filter(
+        const facilitatorsRequisite = contents?.filter(
           (item: any) => item.type === ResourceType.FACILITATOR_REQUISITE
         );
 
@@ -82,11 +81,11 @@ const ResourceList = () => {
         </Typography>
       </Box>
 
-      <Box sx={{ border: "1px solid #DDDDDD", borderRadius: "10px" }} p={2}>
+      <Box sx={{ border: '1px solid #DDDDDD', borderRadius: '10px' }} p={2}>
         <Typography variant="h4" fontWeight={500} mb={2}>
-          {t("COURSE_PLANNER.LEARNERS_PREREQISITE")}
+          {t('COURSE_PLANNER.LEARNERS_PREREQISITE')}
         </Typography>
-        {learnersPreReq.length > 0 ? (
+        {learnersPreReq?.length > 0 ? (
           <Grid container spacing={2} sx={{ mb: 4 }}>
             {learnersPreReq.map((item, index) => (
               <Grid item xs={12} md={4} lg={3} key={index}>
@@ -102,15 +101,15 @@ const ResourceList = () => {
             ))}
           </Grid>
         ) : (
-          <Typography variant="body2" sx={{ fontStyle: "italic" }}>
-            {t("COURSE_PLANNER.NO_DATA_PRE")}
+          <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+            {t('COURSE_PLANNER.NO_DATA_PRE')}
           </Typography>
         )}
 
         <Typography variant="h4" fontWeight={500} mb={2}>
-          {t("COURSE_PLANNER.LEARNERS_POSTREQISITE")}
+          {t('COURSE_PLANNER.LEARNERS_POSTREQISITE')}
         </Typography>
-        {learnersPostReq.length > 0 ? (
+        {learnersPostReq?.length > 0 ? (
           <Grid container spacing={2} sx={{ mb: 4 }}>
             {learnersPostReq.map((item, index) => (
               <Grid xs={12} md={4} lg={3} item key={index}>
@@ -126,22 +125,22 @@ const ResourceList = () => {
             ))}
           </Grid>
         ) : (
-          <Typography variant="body2" sx={{ fontStyle: "italic" }}>
-            {t("COURSE_PLANNER.NO_DATA_POST")}
+          <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+            {t('COURSE_PLANNER.NO_DATA_POST')}
           </Typography>
         )}
 
         <Typography variant="h4" fontWeight={500} mb={2}>
-          {t("COURSE_PLANNER.FACILITATORS")}
+          {t('COURSE_PLANNER.FACILITATORS')}
         </Typography>
-        {facilitatorsPreReq.length > 0 ? (
+        {facilitatorsPreReq?.length > 0 ? (
           <Grid container spacing={2}>
             {facilitatorsPreReq.map((item, index) => (
               <Grid xs={12} md={4} lg={3} item key={index}>
                 <ResourceCard
                   title={item.name}
                   // type={item.app || "Facilitator"}
-                   resource={item.contentType}
+                  resource={item.contentType}
                   appIcon={item?.appIcon}
                   identifier={item.identifier}
                   mimeType={item.mimeType}
@@ -150,8 +149,8 @@ const ResourceList = () => {
             ))}
           </Grid>
         ) : (
-          <Typography variant="body2" sx={{ fontStyle: "italic" }}>
-            {t("COURSE_PLANNER.NO_DATA")}
+          <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+            {t('COURSE_PLANNER.NO_DATA')}
           </Typography>
         )}
       </Box>
@@ -164,7 +163,7 @@ export default ResourceList;
 export async function getStaticProps({ locale }: { locale: string }) {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["common"])),
+      ...(await serverSideTranslations(locale, ['common'])),
     },
   };
 }
