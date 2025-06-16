@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Box, Button, Typography, useTheme } from '@mui/material';
 import { useTranslation, FilterForm } from '@shared-lib';
+import { useColorInversion } from '../../context/ColorInversionContext';
 
 const FilterComponent: React.FC<{
   filterState: any;
@@ -22,6 +23,17 @@ const FilterComponent: React.FC<{
   const { t } = useTranslation();
   const [filterCount, setFilterCount] = useState<any>();
   const theme = useTheme();
+  const { isColorInverted } = useColorInversion();
+
+  const checkboxStyle = useMemo(
+    () => ({
+      color: isColorInverted ? '#fff' : '#1F1B13',
+      '&.Mui-checked': {
+        color: isColorInverted ? '#fff' : '#1F1B13',
+      },
+    }),
+    [isColorInverted]
+  );
 
   useEffect(() => {
     setFilterCount(
@@ -41,12 +53,7 @@ const FilterComponent: React.FC<{
         _config={{
           _filterBody: _config?._filterBody,
           _checkbox: {
-            sx: {
-              color: '#1F1B13',
-              '&.Mui-checked': {
-                color: '#1F1B13',
-              },
-            },
+            sx: checkboxStyle,
           },
         }}
         onApply={(newFilterState: any) => {
@@ -72,6 +79,7 @@ const FilterComponent: React.FC<{
       onlyFields,
       filterState,
       _config,
+      checkboxStyle,
     ]
   );
 
