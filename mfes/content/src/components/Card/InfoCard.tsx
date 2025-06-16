@@ -33,7 +33,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
   const { t } = useTranslation();
   const { _infoCard } = _config || {};
   const [openModal, setOpenModal] = useState(false);
-  console.log('shreyas', _infoCard);
+
   return (
     <>
       <Card
@@ -70,8 +70,8 @@ const InfoCard: React.FC<InfoCardProps> = ({
               display: 'flex',
               flexDirection: 'column',
               flex: '1 0 auto',
-              p: { xs: '16px', md: '0px' },
-              pb: { xs: '0px', md: '0px' },
+              p: { xs: '16px', md: '18px' },
+              pb: { xs: '0px', md: '18px' },
               gap: 1.5,
               width: { xs: '90%', sm: '85%' },
             }}

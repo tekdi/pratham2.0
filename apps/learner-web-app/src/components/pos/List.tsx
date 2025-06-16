@@ -168,7 +168,7 @@ export default function App({
                 ? `/images/pos_program.jpg`
                 : `/images/pos_${pagename?.toLowerCase()}.jpg`,
             isHideStatus: true,
-            _textCard: { p: { md: '40px' } },
+            _textCard: { p: { md: breadCrumbs?.length ? '20px' : '40px' } },
             _cardMedia: {
               maxHeight: { xs: '180px', sm: '200px', md: '250px' },
               position: 'relative',
