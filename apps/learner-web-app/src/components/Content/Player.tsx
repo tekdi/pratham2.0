@@ -152,6 +152,7 @@ const App = ({
           )}
         </Box>
         <PlayerBox
+          isShowMoreContent={isShowMoreContent}
           userIdLocalstorageName={userIdLocalstorageName}
           item={item}
           identifier={identifier}
@@ -223,6 +224,7 @@ const PlayerBox = ({
   userIdLocalstorageName,
   isGenerateCertificate,
   trackable,
+  isShowMoreContent,
 }: any) => {
   const router = useRouter();
   const { t } = useTranslation();
@@ -291,7 +293,9 @@ const PlayerBox = ({
       {play && (
         <Box
           sx={{
-            width: { xs: '100%', sm: '100%', md: '90%', lg: '80%', xl: '70%' },
+            width: isShowMoreContent
+              ? '100%'
+              : { xs: '100%', sm: '100%', md: '90%', lg: '80%', xl: '70%' },
           }}
         >
           <iframe
@@ -311,7 +315,7 @@ const PlayerBox = ({
             style={{
               border: 'none',
               objectFit: 'contain',
-              aspectRatio: `${16 / 9}`,
+              aspectRatio: '16 / 9',
             }}
             allowFullScreen
             width="100%"
