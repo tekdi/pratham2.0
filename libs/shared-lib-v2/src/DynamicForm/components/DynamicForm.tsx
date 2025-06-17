@@ -331,36 +331,7 @@ const hasPrefilled = useRef(false);
   hasPrefilled.current = true;
 }
       }
-        const addField = (fieldKey, title) => {
-          setFormUiSchema((prevUiSchema) => ({
-            ...prevUiSchema,
-            [fieldKey]: {
-              'ui:widget': 'CustomTextFieldWidget',
-              'ui:options': {
-                validateOnBlur: true,
-                hideError: true,
-              },
-            },
-          }));
-
-          setFormSchema((prevSchema) => {
-            const updatedSchema = { ...prevSchema };
-            if (updatedSchema.properties) {
-              updatedSchema.properties = { ...updatedSchema.properties };
-              updatedSchema.properties[fieldKey] = {
-                type: 'string',
-                title,
-              };
-            }
-            if (
-              Array.isArray(updatedSchema.required) &&
-              !updatedSchema.required.includes(fieldKey)
-            ) {
-              updatedSchema.required = [...updatedSchema.required, fieldKey];
-            }
-            return updatedSchema;
-          });
-        };
+        
         console.log('editlearner', formUiSchema);
 
         // Remove the other two fields
