@@ -56,7 +56,7 @@ const LoginPage = () => {
   const setIsActiveYearSelected = useStore(
     (state: { setIsActiveYearSelected: any }) => state.setIsActiveYearSelected
   );
-
+console.log(setIsActiveYearSelected + "snehallltest")
   const theme = useTheme<any>();
   const router = useRouter();
   const { setUserId } = useUserIdStore();
