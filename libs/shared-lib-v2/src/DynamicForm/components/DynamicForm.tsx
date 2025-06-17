@@ -102,7 +102,7 @@ const hasPrefilled = useRef(false);
               if (updatedUiSchema.hasOwnProperty(key)) {
                 updatedUiSchema[key] = {
                   ...updatedUiSchema[key],
-                  // 'ui:widget': 'hidden',
+                  'ui:widget': 'hidden',
                   'ui:disabled': true,
                 };
               }
