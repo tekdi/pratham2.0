@@ -314,7 +314,7 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
             const normalized = normalizeName(subTopic?.name);
             const externalId = childrenMap?.get(normalized);
             if (externalId) {
-              subTopic?.externalId = externalId;
+              subTopic.externalId = externalId;
             }
           });
         });
