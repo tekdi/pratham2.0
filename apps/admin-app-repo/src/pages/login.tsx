@@ -56,14 +56,13 @@ const LoginPage = () => {
   const setIsActiveYearSelected = useStore(
     (state: { setIsActiveYearSelected: any }) => state.setIsActiveYearSelected
   );
-console.log(setIsActiveYearSelected + "snehallltest")
+  console.log(setIsActiveYearSelected + 'snehallltest');
   const theme = useTheme<any>();
   const router = useRouter();
   const { setUserId } = useUserIdStore();
   const setAdminInformation = useSubmittedButtonStore(
     (state: any) => state.setAdminInformation
   );
-
   // Use useMediaQuery to detect screen size
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isMedium = useMediaQuery(theme.breakpoints.between('sm', 'md'));

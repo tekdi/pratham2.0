@@ -95,6 +95,9 @@
   "GRADE_7": "Grade 7",
   "GRADE_8": "Grade 8",
   "GRADE_9": "Grade 9",
+   "GRADE_10": "Grade 10",
+  "GRADE_11": "Grade 11",
+  "GRADE_12": "Grade 12",
   "NO_SCHOOLING": "No Schooling"
 
   },
@@ -584,8 +587,8 @@
 "SELF_EMPLOYMENT_OWN_BUSINESS_SHOP":"Self Employment, Own Business or Shop",
 "STUDENT": "Student",
  "BEAUTY": "beauty",
-  "AUTO_2W": "auto_2w",
-  "AUTO_4W": "auto_4w",
+  "AUTO_2W": "auto-2w",
+  "AUTO_4W": "auto-4w",
   "ELECTRICAL": "electrical",
   "HEALTHCARE": "healthcare",
   "HOSPITALITY": "hospitality",
@@ -610,7 +613,11 @@
   "GRADE_6": "Grade 6",
   "GRADE_7": "Grade 7",
   "GRADE_8": "Grade 8",
-  "GRADE_9": "Grade 9"
+  "GRADE_9": "Grade 9",
+    "GRADE_10": "Grade 10",
+  "GRADE_11": "Grade 11",
+  "GRADE_12": "Grade 12"
+
 
     
   },
