@@ -63,7 +63,7 @@ const LoginPage = () => {
   const setAdminInformation = useSubmittedButtonStore(
     (state: any) => state.setAdminInformation
   );
-
+console.log('LoginPage rendered'); // Debugging line to check if the component is rendering
   // Use useMediaQuery to detect screen size
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isMedium = useMediaQuery(theme.breakpoints.between('sm', 'md'));
@@ -649,10 +649,7 @@ const LoginPage = () => {
                   cursor: 'pointer',
                 }}
                 onClick={() => {
-                  window.open(
-                    `${process.env.NEXT_PUBLIC_RESET_PASSWORD_URL}?redirectUrl=${window.location.origin}/login`,
-                    '_self'
-                  );
+                 router.push('/password-forget');
                 }}
               >
                 {t('LOGIN_PAGE.FORGOT_PASSWORD')}
