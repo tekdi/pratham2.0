@@ -346,7 +346,7 @@ const ImportCsv = () => {
   const CoursePlanFormAction = () => {
     showSnackbar({
       text: t('Topic has been successfully created'),
-      bgColor: '#BA1A1A', //#BA1A1A
+      bgColor: '#019722', //#BA1A1A
       textColor: '#fff',
       icon: <CheckCircleOutlineOutlinedIcon />, //ErrorOutlinedIcon
     });
