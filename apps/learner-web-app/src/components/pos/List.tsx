@@ -12,6 +12,22 @@ import { useCallback, useEffect, useState } from 'react';
 const InfoCard = dynamic(() => import('@InfoCard'), {
   ssr: false,
 });
+const linkLabelName = {
+  school: 'School',
+  mediaMoments: 'Media Moments',
+  academics: 'Academics',
+  growthPlayfulLearning: 'Growth & Playful Learning',
+  inclusiveEducation: 'Inclusive Education',
+  newAgeSkills: 'New Age Skills',
+  careerExploration: 'Career Exploration',
+  creativeArts: 'Creative Arts',
+  environmentEducation: 'Environment Education',
+  inclusiveLearning: 'Inclusive Learning',
+  sports: 'Sports',
+  healthWellbeing: 'Health & Wellbeing',
+};
+
+type LinkLabelType = keyof typeof linkLabelName;
 
 export default function App({
   pagename,
@@ -20,7 +36,7 @@ export default function App({
   _content,
 }: Readonly<{
   _infoCard?: any;
-  pagename?: string;
+  pagename?: Record<string, string> | string;
   hideStaticFilter?: boolean;
   _content?: any;
 }>) {
@@ -33,12 +49,37 @@ export default function App({
   const [item, setItem] = useState<any>({});
   const [staticFilter, setStaticFilter] = useState<any>({});
 
+  const [breadCrumbs, setBreadCrumbs] = useState<
+    Array<{ name: string; link?: string }> | undefined
+  >(undefined);
+
   useEffect(() => {
-    if (!hideStaticFilter && pagename === 'Program') {
-      const program = searchParams?.get('program')?.split(',');
+    if (
+      !hideStaticFilter &&
+      typeof pagename === 'object' &&
+      (pagename?.['SCP'] || pagename?.['Vocational Training'])
+    ) {
+      const program = searchParams?.get('program');
+      if (program) {
+        setBreadCrumbs([
+          {
+            name: 'Program',
+          },
+          {
+            name:
+              typeof pagename === 'object' && program in pagename
+                ? linkLabelName[pagename[program] as LinkLabelType] ??
+                  pagename[program]
+                : pagename?.['SCP'] || '',
+          },
+        ]);
+      } else {
+        setBreadCrumbs(undefined);
+      }
       setItem({
         ..._infoCard?.item,
-        description: _infoCard?.item?.description?.[program?.[0] || 'SCP'],
+        name: `${pagename?.[program || 'SCP']}`,
+        description: _infoCard?.item?.description?.[program || 'SCP'],
       });
       if (program?.includes('Vocational Training')) {
         setStaticFilter({
@@ -51,6 +92,25 @@ export default function App({
         });
       }
     } else if (!hideStaticFilter) {
+      const subDomain = searchParams?.get('se_subDomains');
+      if (subDomain) {
+        setBreadCrumbs([
+          {
+            name:
+              typeof pagename === 'string'
+                ? linkLabelName[pagename as LinkLabelType] ?? pagename
+                : '',
+            link: `/pos/${
+              typeof pagename === 'string' ? pagename.toLowerCase() : ''
+            }`,
+          },
+          {
+            name: linkLabelName[subDomain as LinkLabelType] ?? subDomain,
+          },
+        ]);
+      } else {
+        setBreadCrumbs(undefined);
+      }
       setStaticFilter({
         se_domains: [`Learning for ${pagename}`],
         ...(searchParams?.get('se_subDomains')?.split(',')
@@ -58,6 +118,7 @@ export default function App({
               se_subDomains: searchParams?.get('se_subDomains')?.split(','),
             }
           : {}),
+        program: ['Open School'],
       });
       setItem(_infoCard?.item || {});
     }
@@ -84,11 +145,16 @@ export default function App({
 
   if (loading) return <Loader isLoading />;
 
+  const handleBackClick = () => {
+    router.back();
+  };
+
   return (
     <Layout>
       <InfoCard
+        onBackClick={breadCrumbs && handleBackClick}
         item={{
-          name: `Learning for ${pagename}`,
+          name: typeof pagename === 'string' ? `Learning for ${pagename}` : '',
           description:
             'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
           ...(item || {}),
@@ -96,9 +162,13 @@ export default function App({
         _config={{
           ...(_infoCard?._config || {}),
           _infoCard: {
-            default_img: `/images/pos_${pagename?.toLowerCase()}.jpg`,
+            breadCrumbs: breadCrumbs,
+            default_img:
+              typeof pagename === 'object'
+                ? `/images/pos_program.jpg`
+                : `/images/pos_${pagename?.toLowerCase()}.jpg`,
             isHideStatus: true,
-            _textCard: { p: { md: '40px' } },
+            _textCard: { p: { md: breadCrumbs?.length ? '20px' : '40px' } },
             _cardMedia: {
               maxHeight: { xs: '180px', sm: '200px', md: '250px' },
               position: 'relative',
@@ -121,11 +191,14 @@ export default function App({
           <LearnerCourse
             _content={{
               ..._content,
+              pageName: `${pagename}_Content`,
               filterFramework: filterFramework,
+              searchParams,
               _config: {
                 userIdLocalstorageName: 'did',
                 _card: {
                   isHideProgress: true,
+                  isHideProgressStatus: true,
                   isWrap: true,
                   _cardMedia: { sx: { height: '153px' } },
                 },

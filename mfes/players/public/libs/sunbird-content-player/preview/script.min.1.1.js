@@ -72965,7 +72965,7 @@
                   });
               }),
               splashScreen.addEvents(),
-              org.ekstep.service.init(),
+              (typeof genieservice !== 'undefined') && org.ekstep.service.init(),
               "undefined" == typeof Promise &&
                 (alert(
                   "Your device isn’t compatible with this version of Genie."

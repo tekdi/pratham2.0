@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 import { getMetadata } from '@learner/utils/API/metabaseService';
 
 export async function generateMetadata({ params }: any) {
-  return await getMetadata(params.courseId);
+  return await getMetadata(params.courseId, params.unitId);
 }
 
 const CourseUnitDetails = dynamic(() => import('@CourseUnitDetails'), {
@@ -18,10 +18,11 @@ const App = () => {
       <CourseUnitDetails
         isShowLayout={false}
         _config={{
+          isEnrollmentRequired: false,
           userIdLocalstorageName: 'did',
           contentBaseUrl: '/pos/content',
           default_img: '/images/image_ver.png',
-          _card: { isHideProgress: true },
+          _card: { isHideProgress: true, isHideProgressStatus: true },
           _infoCard: {
             _cardMedia: { maxHeight: { xs: '200px', sm: '280px' } },
             default_img: '/images/image_ver.png',

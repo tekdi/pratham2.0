@@ -30,6 +30,7 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
@@ -267,11 +268,18 @@ const CoursePlannerDetail = () => {
   // };
 
   const getAbbreviatedMonth = (dateString: string | number | Date) => {
-    const date = new Date(dateString);
-    const months = Array.from({ length: 12 }, (_, i) =>
-      dayjs().month(i).format('MMM')
-    );
-    return months[date.getMonth()];
+    dayjs.extend(customParseFormat);
+    //below considering date 12 as month
+    //12-02-1998
+    // const date = new Date(dateString);
+    // const months = Array.from({ length: 12 }, (_, i) =>
+    //   dayjs().month(i).format('MMM')
+    // );
+    // return months[date.getMonth()];
+    //fix this method to consider 02 as month
+    const date = dayjs(dateString, 'DD-MM-YYYY', true); // strict mode
+    if (!date.isValid()) return 'Invalid date';
+    return date.format('MMM'); // e.g., "Feb"
   };
 
   const markMultipleStatuses = async (

@@ -23,16 +23,16 @@ const CourseUnitDetails = dynamic(() => import('@CourseUnitDetails'), {
 const App = ({
   userIdLocalstorageName,
   contentBaseUrl,
-  isGenerateCertificate,
+  _config,
 }: {
   userIdLocalstorageName?: string;
   contentBaseUrl?: string;
-  isGenerateCertificate?: boolean;
+  _config?: any;
 }) => {
   const { t } = useTranslation();
   const router = useRouter();
   const params = useParams();
-  const { identifier, courseId, unitId } = params; // string | string[] | undefined
+  const { identifier, courseId, unitId } = params || {}; // string | string[] | undefined
   const [item, setItem] = useState<{ [key: string]: any }>(null);
   const [breadCrumbs, setBreadCrumbs] = useState<any>();
   const [isShowMoreContent, setIsShowMoreContent] = useState(false);
@@ -66,7 +66,7 @@ const App = ({
         });
         setBreadCrumbs(breadcrum?.slice(0, -1));
       } else {
-        setBreadCrumbs([{ name: 'Content' }]);
+        setBreadCrumbs([]);
       }
     };
     fetch();
@@ -152,12 +152,12 @@ const App = ({
           )}
         </Box>
         <PlayerBox
-          isGenerateCertificate={isGenerateCertificate}
           userIdLocalstorageName={userIdLocalstorageName}
           item={item}
           identifier={identifier}
           courseId={courseId}
           unitId={unitId}
+          {..._config?.player}
         />
       </Box>
 
@@ -191,6 +191,7 @@ const App = ({
             height: 'calc(100vh - 185px)',
           }}
           _config={{
+            ...(_config?.courseUnitDetails || {}),
             getContentData: (item: any) => {
               setIsShowMoreContent(
                 item.children.filter(
@@ -201,7 +202,10 @@ const App = ({
             _parentGrid: { pb: 2 },
             default_img: '/images/image_ver.png',
             _grid: { xs: 6, sm: 4, md: 6, lg: 6, xl: 6 },
-            _card: { isHideProgress: true },
+            _card: {
+              isHideProgress: true,
+              ...(_config?.courseUnitDetails?._card || {}),
+            },
           }}
         />
       </Box>
@@ -218,8 +222,10 @@ const PlayerBox = ({
   unitId,
   userIdLocalstorageName,
   isGenerateCertificate,
+  trackable,
 }: any) => {
   const router = useRouter();
+  const { t } = useTranslation();
   const [play, setPlay] = useState(false);
 
   useEffect(() => {
@@ -275,7 +281,7 @@ const PlayerBox = ({
               transform: 'translate(-50%, -50%)',
             }}
           >
-            Play
+            {t('Play')}
           </Button>
         </Box>
       )}
@@ -283,6 +289,7 @@ const PlayerBox = ({
         <iframe
           name={JSON.stringify({
             isGenerateCertificate: isGenerateCertificate,
+            trackable: trackable,
           })}
           src={`${
             process.env.NEXT_PUBLIC_LEARNER_SBPLAYER
@@ -294,15 +301,18 @@ const PlayerBox = ({
               : ''
           }`}
           style={{
-            width: '100%',
-            height: 'calc(100vh - 235px)',
             border: 'none',
             objectFit: 'contain',
+            aspectRatio: `${window.innerWidth / window.innerHeight}`,
           }}
           allowFullScreen
           width="100%"
           height="100%"
           title="Embedded Localhost"
+          allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+          frameBorder="0"
+          scrolling="no"
+          sandbox="allow-forms allow-scripts allow-same-origin allow-top-navigation"
         />
       )}
     </Box>

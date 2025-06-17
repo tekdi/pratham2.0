@@ -1,19 +1,12 @@
 import dynamic from 'next/dynamic';
 import React, { useState, useCallback, memo, useEffect } from 'react';
-import {
-  Box,
-  Button,
-  Chip,
-  Drawer,
-  IconButton,
-  Stack,
-  Typography,
-} from '@mui/material';
+import { Box, Button, Chip, Drawer, Stack, Typography } from '@mui/material';
 import { useTranslation } from '@shared-lib';
 import {
   Close as CloseIcon,
   FilterAltOutlined,
   FilterList,
+  Search,
 } from '@mui/icons-material';
 import SearchComponent from './SearchComponent';
 import FilterComponent from './FilterComponent';
@@ -38,13 +31,8 @@ export default memo(function LearnerCourse({
   const { staticFilter, filterFramework } = _content ?? {};
 
   useEffect(() => {
-    if (_content?.filters) {
-      setFilterState((prevState: any) => ({
-        ...prevState,
-        ..._content?.filters,
-      }));
-    }
-  }, [_content?.filters]);
+    setFilterState(_content?.filters ?? {});
+  }, [_content?.filters, _content?.searchParams]);
 
   const handleTabChange = useCallback((tab: any) => {
     setFilterState((prevState: any) => ({
@@ -56,6 +44,7 @@ export default memo(function LearnerCourse({
     setFilterState((prevState: any) => ({
       ...prevState,
       query: searchValue,
+      offset: 0,
     }));
   }, []);
 
@@ -209,7 +198,7 @@ export default memo(function LearnerCourse({
                 sx: {
                   py: 2,
                   px: 2,
-                  height: 'calc(100vh - 105px)',
+                  height: 'calc(100vh - 130px)',
                   overflowY: 'auto',
                 },
               },
@@ -217,8 +206,8 @@ export default memo(function LearnerCourse({
           />
           <Box
             sx={{
-              bgcolor: 'white',
-              p: 1,
+              bgcolor: '#f1f1f1',
+              p: 2,
               position: 'absolute',
               bottom: 0,
               width: '100%',
@@ -229,7 +218,7 @@ export default memo(function LearnerCourse({
               fullWidth
               onClick={() => setIsOpen(false)}
             >
-              {t('LEARNER_APP.COURSE.APPLY_FILTER')}
+              {t('LEARNER_APP.COURSE.DONE')}
             </Button>
           </Box>
         </Drawer>
@@ -257,6 +246,11 @@ export default memo(function LearnerCourse({
             <Box
               display="flex"
               justifyContent="space-between"
+              flexDirection={{
+                xs: 'column-reverse',
+                sm: 'column-reverse',
+                md: 'row',
+              }}
               gap={2}
               sx={{ mb: 2 }}
             >
@@ -275,19 +269,64 @@ export default memo(function LearnerCourse({
                   gap: 2,
                 }}
               >
-                <SearchComponent
-                  onSearch={handleSearchClick}
-                  value={filterState?.query}
-                />
                 <Box sx={{ display: { xs: 'block', md: 'none' } }}>
                   <Button
                     variant="outlined"
                     onClick={() => setIsOpen(true)}
                     size="large"
+                    sx={{
+                      borderRadius: '8px',
+                      borderWidth: '1px',
+                      borderColor: '#DADADA !important',
+                      padding: '8px 10px',
+                    }}
                   >
-                    <FilterAltOutlined />
+                    <FilterList sx={{ width: 20, height: 20, mr: 0.5 }} />
+                    <Typography
+                      sx={{
+                        fontWeight: 500,
+                        fontSize: '14px',
+                        lineHeight: '20px',
+                        letterSpacing: '0.1px',
+                        mr: 0.5,
+                      }}
+                    >
+                      {t('LEARNER_APP.CONTENT.FILTERS')}
+                    </Typography>
+                    <Typography
+                      sx={{
+                        fontWeight: 500,
+                        fontSize: '14px',
+                        lineHeight: '20px',
+                        letterSpacing: '0.1px',
+                      }}
+                    >
+                      {Object.keys(filterState?.filters || {}).filter(
+                        (e) =>
+                          ![
+                            'limit',
+                            ...Object.keys(staticFilter ?? {}),
+                          ].includes(e)
+                      ).length
+                        ? `(${
+                            Object.keys(filterState.filters).filter(
+                              (e) =>
+                                ![
+                                  'limit',
+                                  ...Object.keys(staticFilter ?? {}),
+                                ].includes(e)
+                            ).length
+                          })`
+                        : null}
+                    </Typography>
                   </Button>
                 </Box>
+                <ButtonToggale icon={<Search />} _button={{ color: 'primary' }}>
+                  <SearchComponent
+                    onSearch={handleSearchClick}
+                    value={filterState?.query}
+                  />
+                </ButtonToggale>
               </Box>
             </Box>
           )}
@@ -379,5 +418,26 @@ const FilterChip: React.FC<FilterChipProps> = ({
             })
         : null}
     </>
+  );
+};
+
+const ButtonToggale = ({ children, icon }: any) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const toggle = () => setIsOpen(!isOpen);
+
+  return (
+    <Box>
+      <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+        {isOpen && children}
+        <Button
+          onClick={toggle}
+          variant="contained"
+          color="primary"
+          sx={{ ml: 1, borderRadius: '8px' }}
+        >
+          {isOpen ? <CloseIcon /> : icon}
+        </Button>
+      </Box>
+    </Box>
   );
 };

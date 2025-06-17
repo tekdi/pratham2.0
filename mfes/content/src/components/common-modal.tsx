@@ -6,6 +6,7 @@ interface CommonModalProps {
   onClose?: () => void;
   onStartLearning: () => void;
   children: React.ReactNode;
+  buttonText: string;
 }
 
 const CommonModal: React.FC<CommonModalProps> = ({
@@ -13,6 +14,7 @@ const CommonModal: React.FC<CommonModalProps> = ({
   onClose,
   onStartLearning,
   children,
+  buttonText,
 }) => {
   return (
     <Modal
@@ -54,7 +56,7 @@ const CommonModal: React.FC<CommonModalProps> = ({
             }}
             disableElevation
           >
-            Start Learning
+            {buttonText}
           </Button>
         </Box>
       </Paper>

@@ -19,7 +19,18 @@ const App: React.FC = () => {
       <Player
         userIdLocalstorageName={'did'}
         contentBaseUrl="/pos/content"
-        isGenerateCertificate={false}
+        _config={{
+          player: {
+            trackable: false,
+          },
+          courseUnitDetails: {
+            contentBaseUrl: '/pos/content',
+            isEnrollmentRequired: false,
+            _card: {
+              isHideProgressStatus: true,
+            },
+          },
+        }}
       />
     </Layout>
   );

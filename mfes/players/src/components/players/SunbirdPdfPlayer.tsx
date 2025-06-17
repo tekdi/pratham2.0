@@ -5,7 +5,7 @@ import { handleExitEvent } from '../utils/Helper';
 interface PlayerConfigProps {
   playerConfig: any;
   relatedData?: any;
-  isGenerateCertificate?: boolean;
+  configFunctionality?: any;
 }
 
 const basePath = process.env.NEXT_PUBLIC_ASSETS_CONTENT || '/sbplayer';
@@ -13,7 +13,7 @@ const basePath = process.env.NEXT_PUBLIC_ASSETS_CONTENT || '/sbplayer';
 const SunbirdPdfPlayer = ({
   playerConfig,
   relatedData: { courseId, unitId, userId },
-  isGenerateCertificate,
+  configFunctionality,
 }: PlayerConfigProps) => {
   const sunbirdPdfPlayerRef = useRef<HTMLIFrameElement | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -66,7 +66,7 @@ const SunbirdPdfPlayer = ({
                     courseId,
                     unitId,
                     userId,
-                    isGenerateCertificate,
+                    configFunctionality,
                   });
                 } catch (error) {
                   console.error('Error submitting assessment:', error);
@@ -129,6 +129,7 @@ const SunbirdPdfPlayer = ({
       <iframe
         ref={sunbirdPdfPlayerRef}
         id="contentPlayer"
+        sunbird-pdf-player
         title="Content Player"
         src={`${basePath}/libs/sunbird-pdf-player/index.html`}
         aria-label="Content Player"
@@ -139,8 +140,8 @@ const SunbirdPdfPlayer = ({
         title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
         style={{
           position: 'absolute',
-          bottom: bottom,
-          right: 10,
+          bottom: '4px',
+          left: '4px',
           border: 'none',
           background: 'transparent',
           cursor: 'pointer',
@@ -161,8 +162,8 @@ const SunbirdPdfPlayer = ({
         {isFullscreen ? (
           // Exit Fullscreen Icon (improved)
           <svg
-            width="40"
-            height="40"
+            width="25"
+            height="25"
             viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg"
             style={{ fill: 'black' }}
@@ -176,8 +177,8 @@ const SunbirdPdfPlayer = ({
         ) : (
           // Enter Fullscreen Icon
           <svg
-            width="40"
-            height="40"
+            width="25"
+            height="25"
             viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg"
             style={{ fill: 'black' }}
