@@ -382,9 +382,9 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
       }
 
       // Add each subtopic as a child task
-      topic.subTopics.forEach((subTopic: any, subIndex: any) => {
+      topic?.subTopics?.forEach((subTopic: any, subIndex: any) => {
         const subTask = {
-          name: subTopic.name,
+          name: subTopic?.name,
           externalId:
             formType === 'editTopic'
               ? subTopic?.externalId
