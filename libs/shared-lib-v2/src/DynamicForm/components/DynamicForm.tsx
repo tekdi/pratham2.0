@@ -75,7 +75,7 @@ const hasPrefilled = useRef(false);
             // Merge only missing items from required2 into required1 guardian details
             requiredKeys.forEach((item) => {
               if (!requiredArray.includes(item)) {
-                requiredArray.push(item);
+              //  requiredArray.push(item);
               }
             });
 
