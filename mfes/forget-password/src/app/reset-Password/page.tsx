@@ -28,7 +28,7 @@ const ResetPasswordPage = ({}) => {
   const onCloseSuccessModal = () => {
     const route = localStorage.getItem('redirectionRoute');
     if (route) router.push(route);
-
+    else router.push('/login');
     setResetPasswordSuccessModal(false);
   };
 
