@@ -56,7 +56,7 @@ const LoginPage = () => {
   const setIsActiveYearSelected = useStore(
     (state: { setIsActiveYearSelected: any }) => state.setIsActiveYearSelected
   );
-console.log(setIsActiveYearSelected + "snehallltest")
+  console.log(setIsActiveYearSelected + 'snehallltest');
   const theme = useTheme<any>();
   const router = useRouter();
   const { setUserId } = useUserIdStore();
@@ -648,10 +648,11 @@ console.log(setIsActiveYearSelected + "snehallltest")
                   cursor: 'pointer',
                 }}
                 onClick={() => {
- window.open(
+                  window.open(
                     `${process.env.NEXT_PUBLIC_RESET_PASSWORD_URL}?redirectUrl=${window.location.origin}/login`,
                     '_self'
-                  );                }}
+                  );
+                }}
               >
                 {t('LOGIN_PAGE.FORGOT_PASSWORD')}
               </Box>
