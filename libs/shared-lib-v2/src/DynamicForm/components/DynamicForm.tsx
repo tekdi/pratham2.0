@@ -102,7 +102,7 @@ const hasPrefilled = useRef(false);
               if (updatedUiSchema.hasOwnProperty(key)) {
                 updatedUiSchema[key] = {
                   ...updatedUiSchema[key],
-                  'ui:widget': 'hidden',
+                 // 'ui:widget': 'hidden',
                   'ui:disabled': true,
                 };
               }
@@ -331,6 +331,118 @@ const hasPrefilled = useRef(false);
   hasPrefilled.current = true;
 }
       }
+        const addField = (fieldKey, title) => {
+          setFormUiSchema((prevUiSchema) => ({
+            ...prevUiSchema,
+            [fieldKey]: {
+              'ui:widget': 'CustomTextFieldWidget',
+              'ui:options': {
+                validateOnBlur: true,
+                hideError: true,
+              },
+            },
+          }));
+
+          setFormSchema((prevSchema) => {
+            const updatedSchema = { ...prevSchema };
+            if (updatedSchema.properties) {
+              updatedSchema.properties = { ...updatedSchema.properties };
+              updatedSchema.properties[fieldKey] = {
+                type: 'string',
+                title,
+              };
+            }
+            if (
+              Array.isArray(updatedSchema.required) &&
+              !updatedSchema.required.includes(fieldKey)
+            ) {
+              updatedSchema.required = [...updatedSchema.required, fieldKey];
+            }
+            return updatedSchema;
+          });
+        };
+        console.log('editlearner', formUiSchema);
+
+        // Remove the other two fields
+        const removeFields = (fields) => {
+          console.log('removeFields', fields);
+          setFormUiSchema((prevUiSchema) => {
+            const updatedUiSchema = { ...prevUiSchema };
+            fields.forEach((field) => delete updatedUiSchema[field]);
+            console.log('updatedUiSchema', updatedUiSchema);
+
+            return updatedUiSchema;
+          });
+          setFormUiSchemaOriginal((prevUiSchema) => {
+            const updatedUiSchema = { ...prevUiSchema };
+            fields.forEach((field) => delete updatedUiSchema[field]);
+            console.log('updatedUiSchema', updatedUiSchema);
+
+            return updatedUiSchema;
+          });
+
+          setFormSchema((prevSchema) => {
+            const updatedSchema = { ...prevSchema };
+            if (updatedSchema.properties) {
+              updatedSchema.properties = { ...updatedSchema.properties };
+              fields.forEach((field) => delete updatedSchema.properties[field]);
+            }
+            if (Array.isArray(updatedSchema.required)) {
+              updatedSchema.required = updatedSchema.required.filter(
+                (key) => !fields.includes(key)
+              );
+            }
+
+            return updatedSchema;
+          });
+
+        };
+    if (formData.phone_type_accessible === "nophone") {
+  removeFields(['own_phone_check']);
+} else {
+  // 1. Add back to schema if missing
+  setFormSchema((prevSchema) => {
+    if (!prevSchema.properties?.own_phone_check) {
+      return {
+        ...prevSchema,
+        properties: {
+          ...prevSchema.properties,
+          own_phone_check: {
+           "type": "string",
+                "title": t("DOES_THIS_PHONE_BELONG_TO_YOU"),
+                "coreField": 0,
+                "fieldId": "d119d92f-fab7-4c7d-8370-8b40b5ed23dc",
+                "field_type": "radio",
+                "isRequired": true,
+                "enum": [
+                    "yes",
+                    "no"
+                ],
+                "enumNames": [
+                    "YES",
+                    "NO"
+                ]
+          },
+        },
+        required: prevSchema.required?.includes("own_phone_check")
+          ? prevSchema.required
+          : [...(prevSchema.required || []), "own_phone_check"],
+      };
+    }
+    return prevSchema;
+  });
+
+  // 2. Add back to uiSchema
+  setFormUiSchema((prevUiSchema) => ({
+    ...prevUiSchema,
+    own_phone_check: {
+      "ui:widget": "CustomRadioWidget",
+      "ui:options": {
+        "hideError": true,
+      },
+    },
+  }));
+}
  
       
     }
