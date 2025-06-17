@@ -300,21 +300,21 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
 
       if (formType === 'editTopic') {
         const childrenMap = new Map(
-          prefilledObject.children.map(
+          prefilledObject?.children?.map(
             (child: { name: string; externalId: any }) => [
-              normalizeName(child.name),
-              child.externalId,
+              normalizeName(child?.name),
+              child?.externalId,
             ]
           )
         );
 
         // Add externalId to subTopics
-        topics.forEach((chapter) => {
-          chapter.subTopics.forEach((subTopic) => {
-            const normalized = normalizeName(subTopic.name);
-            const externalId = childrenMap.get(normalized);
+        topics?.forEach((chapter) => {
+          chapter?.subTopics?.forEach((subTopic) => {
+            const normalized = normalizeName(subTopic?.name);
+            const externalId = childrenMap?.get(normalized);
             if (externalId) {
-              subTopic.externalId = externalId;
+              subTopic?.externalId = externalId;
             }
           });
         });
@@ -382,9 +382,9 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
       }
 
       // Add each subtopic as a child task
-      topic.subTopics.forEach((subTopic: any, subIndex: any) => {
+      topic?.subTopics?.forEach((subTopic: any, subIndex: any) => {
         const subTask = {
-          name: subTopic.name,
+          name: subTopic?.name,
           externalId:
             formType === 'editTopic'
               ? subTopic?.externalId
