@@ -287,7 +287,7 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
           if (response) {
             showSnackbar({
               text: t(`Sub Topic has been successfully deleted`),
-              bgColor: '#019722',
+              bgColor: '#BA1A1A',
               textColor: '#fff',
               icon: <CheckCircleOutlineOutlinedIcon />, //ErrorOutlinedIcon
             });
