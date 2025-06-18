@@ -139,7 +139,7 @@ const SpeakableText: React.FC<SpeakableTextProps> = ({
       className={className}
       style={{
         ...speakableStyle,
-        cursor: cursor ? 'pointer' : 'default',
+        cursor: cursor ? 'pointer' : 'inherit',
       }}
       {...getTitle()}
       data-speakable="true"
