@@ -935,9 +935,12 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
                             </Grid>
 
                             <Grid item xs={12} sm={6} md={6}>
-                              <FormControl fullWidth>
-                                <InputLabel>{t('Resource Type')}</InputLabel>
+                              <FormControl fullWidth required>
+                                <InputLabel required>
+                                  {t('Resource Type')}
+                                </InputLabel>
                                 <Select
+                                  native
                                   value={res.resourceType}
                                   onChange={(e) => {
                                     const newTopics: any = [...topics];
@@ -947,18 +950,21 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
                                       e.target.value;
                                     setTopics(newTopics);
                                   }}
-                                  label={t('Resource Type')}
-                                  required={true}
+                                  inputProps={{
+                                    name: 'resourceType',
+                                    required: true,
+                                  }}
                                 >
-                                  <MenuItem value="prerequisite">
+                                  <option value=""></option>
+                                  <option value="prerequisite">
                                     {t('prerequisite')}
-                                  </MenuItem>
-                                  <MenuItem value="postrequisite">
+                                  </option>
+                                  <option value="postrequisite">
                                     {t('postrequisite')}
-                                  </MenuItem>
-                                  <MenuItem value="facilitator-requisite">
+                                  </option>
+                                  <option value="facilitator-requisite">
                                     {t('facilitator-requisite')}
-                                  </MenuItem>
+                                  </option>
                                 </Select>
                               </FormControl>
                             </Grid>
