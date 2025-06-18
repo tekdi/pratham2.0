@@ -560,6 +560,7 @@ console.log("prefilledFormData", prefilledFormData)
               SubmitaFunction={SubmitaFunction}
               isCallSubmitInHandle={true}
               prefilledFormData={prefilledFormData}
+              type="centers"
             />
           )
         )}

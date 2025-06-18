@@ -82,6 +82,7 @@ const ImportCsv = () => {
 
   //new course planner changes
   const [projectId, setProjectId] = useState('');
+  const [solutionId, setSolutionId] = useState('');
   const [formType, setFormType] = useState('');
   const [prefilledObject, setPrefilledObject] = useState({});
 
@@ -99,12 +100,15 @@ const ImportCsv = () => {
 
       const courseData = response?.result?.data[0];
       let courseId = courseData?._id;
+      let solutionId = courseData?.solutionId;
 
       if (!courseId) {
         courseId = await fetchCourseIdFromSolution(courseData?.solutionId);
+        // setSolutionId(courseData?.solutionId);
       }
       if (courseId) {
         setProjectId(courseId);
+        setSolutionId(solutionId);
       }
       await fetchAndSetUserProjectDetails(courseId);
     } catch (error) {
@@ -143,6 +147,7 @@ const ImportCsv = () => {
       const courseData = updatedResponse?.result?.data[0];
       if (courseData?._id) {
         setProjectId(courseData?._id);
+        setSolutionId(courseData?.solutionId);
       }
       setLoading(false);
       return updatedResponse.result.data[0]?._id;
@@ -341,7 +346,7 @@ const ImportCsv = () => {
   const CoursePlanFormAction = () => {
     showSnackbar({
       text: t('Topic has been successfully created'),
-      bgColor: '#BA1A1A', //#BA1A1A
+      bgColor: '#019722', //#BA1A1A
       textColor: '#fff',
       icon: <CheckCircleOutlineOutlinedIcon />, //ErrorOutlinedIcon
     });
@@ -357,7 +362,7 @@ const ImportCsv = () => {
       yesText: t('Yes, Delete'),
       noText: t('No, Cancel'),
       onYes: async () => {
-        const response = await deleteContent(projectId, externalId);
+        const response = await deleteContent(solutionId, externalId);
         if (response) {
           showSnackbar({
             text: t(`${type} has been successfully deleted`),
@@ -419,7 +424,7 @@ const ImportCsv = () => {
                   yesText: t('Yes, Delete'),
                   noText: t('No, Cancel'),
                   onYes: async () => {
-                    const response = await deletePlanner(projectId);
+                    const response = await deletePlanner(solutionId);
                     if (response) {
                       showSnackbar({
                         text: t('Planner has been successfully deleted'),
@@ -537,7 +542,7 @@ const ImportCsv = () => {
         }
         actionTitle={formType == 'editTopic' ? t('Save') : t('COMMON.ADD')}
         onAction={CoursePlanFormAction}
-        projectId={projectId}
+        projectId={solutionId}
         formType={formType}
         prefilledObject={prefilledObject}
       />

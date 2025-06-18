@@ -1,3 +1,5 @@
+// @ts-noCheck
+
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Dialog,
@@ -34,7 +36,11 @@ import { useCustomSnackbar } from './useCustomSnackbar';
 import { useAlertDialog } from './AlertDialog';
 import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined';
 import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
-import { createTopic, updateContent } from '@/services/coursePlanner';
+import {
+  createTopic,
+  deleteContent,
+  updateContent,
+} from '@/services/coursePlanner';
 
 interface CoursePlanFormProps {
   open: boolean;
@@ -90,6 +96,7 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
       startDate: Date | null;
       endDate: Date | null;
       subTopics: {
+        externalId: {};
         name: string;
         startDate: Date | null;
         endDate: Date | null;
@@ -236,20 +243,66 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
   };
 
   const handleRemoveSubTopic = (topicIndex: number, subTopicIndex: number) => {
-    setTopics(
-      topics.map((topic, index) => {
-        if (index === topicIndex) {
-          return {
-            ...topic,
-            subTopics: topic.subTopics.filter(
-              (_, subIndex) => subIndex !== subTopicIndex
-            ),
-          };
-        } else {
-          return topic;
-        }
-      })
+    const extractExternalId = (
+      prefilledObject: any,
+      topicIndex: number,
+      subTopicIndex: number
+    ) => {
+      const children = prefilledObject?.children || [];
+      const selectedSubTopic = children[subTopicIndex];
+      return selectedSubTopic?.externalId || null;
+    };
+
+    const externalId = extractExternalId(
+      prefilledObject,
+      topicIndex,
+      subTopicIndex
     );
+    console.log('External ID:', externalId);
+    if (externalId) {
+      openConfirmation({
+        title: t('Are you sure you want to delete?'),
+        message: t(
+          `Sub Task will be permanently deleted. Are you sure you want to delete?`
+        ),
+        yesText: t('Yes, Delete'),
+        noText: t('No, Cancel'),
+        onYes: async () => {
+          const response = await deleteContent(projectId, externalId);
+          if (response) {
+            showSnackbar({
+              text: t(`Sub Topic has been successfully deleted`),
+              bgColor: '#BA1A1A',
+              textColor: '#fff',
+              icon: <CheckCircleOutlineOutlinedIcon />, //ErrorOutlinedIcon
+            });
+            setTopics(
+              topics.map((topic, index) => {
+                if (index === topicIndex) {
+                  return {
+                    ...topic,
+                    subTopics: topic.subTopics.filter(
+                      (_, subIndex) => subIndex !== subTopicIndex
+                    ),
+                  };
+                } else {
+                  return topic;
+                }
+              })
+            );
+          } else {
+            showSnackbar({
+              text: t(
+                `Something went wrong. We couldn't delete the sub topic. Please try again`
+              ),
+              bgColor: '#BA1A1A',
+              textColor: '#fff',
+              icon: <ErrorOutlinedIcon />, //ErrorOutlinedIcon
+            });
+          }
+        },
+      });
+    }
   };
 
   const handleRemoveResource = (
@@ -289,7 +342,37 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
       console.log('Form valid. Submit here.', topics);
 
       // Submit logic goes here
-      const payload = convertTopicsToTasks(topics);
+      // Normalize function to safely match subtopic names
+      const normalizeName = (name: string) =>
+        name.trim().replace(/\s+/g, ' ').replace(/\d+$/, '').toLowerCase();
+
+      let payload;
+
+      if (formType === 'editTopic') {
+        const childrenMap = new Map(
+          prefilledObject?.children?.map(
+            (child: { name: string; externalId: any }) => [
+              normalizeName(child?.name),
+              child?.externalId,
+            ]
+          )
+        );
+
+        // Add externalId to subTopics
+        topics?.forEach((chapter) => {
+          chapter?.subTopics?.forEach((subTopic) => {
+            const normalized = normalizeName(subTopic?.name);
+            const externalId = childrenMap?.get(normalized);
+            if (externalId) {
+              subTopic.externalId = externalId;
+            }
+          });
+        });
+
+        payload = convertTopicsToTasks(topics);
+      } else {
+        payload = convertTopicsToTasks(topics);
+      }
       //create course planner
       let response = null;
       if (formType == 'editTopic') {
@@ -305,7 +388,7 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
       if (response) {
         showSnackbar({
           text: t('Topic has been successfully created'),
-          bgColor: '#BA1A1A', //#BA1A1A
+          bgColor: '#019722', //#BA1A1A
           textColor: '#fff',
           icon: <CheckCircleOutlineOutlinedIcon />, //ErrorOutlinedIcon
         });
@@ -349,10 +432,13 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
       }
 
       // Add each subtopic as a child task
-      topic.subTopics.forEach((subTopic: any, subIndex: any) => {
+      topic?.subTopics?.forEach((subTopic: any, subIndex: any) => {
         const subTask = {
-          name: subTopic.name,
-          externalId: `sub-${topicIndex + 1}-${subIndex + 1}-${Date.now()}`, // Unique externalId
+          name: subTopic?.name,
+          externalId:
+            formType === 'editTopic'
+              ? subTopic?.externalId
+              : `sub-${topicIndex + 1}-${subIndex + 1}-${Date.now()}`, // Unique externalId
           type: 'content',
           hasAParentTask: 'YES',
           parentTaskId: topicId,
@@ -371,6 +457,7 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
         tasks.push(subTask);
       });
     });
+    console.log('Tasks#######', tasks);
 
     return { tasks };
   };
@@ -398,6 +485,7 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
         noText: t('No, Cancel'),
         onYes: () => {
           onCloseReset();
+          onAction();
         },
       });
     } else {
@@ -898,9 +986,12 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
                             </Grid>
 
                             <Grid item xs={12} sm={6} md={6}>
-                              <FormControl fullWidth>
-                                <InputLabel>{t('Resource Type')}</InputLabel>
+                              <FormControl fullWidth required>
+                                <InputLabel required>
+                                  {t('Resource Type')}
+                                </InputLabel>
                                 <Select
+                                  native
                                   value={res.resourceType}
                                   onChange={(e) => {
                                     const newTopics: any = [...topics];
@@ -910,18 +1001,21 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
                                       e.target.value;
                                     setTopics(newTopics);
                                   }}
-                                  label={t('Resource Type')}
-                                  required={true}
+                                  inputProps={{
+                                    name: 'resourceType',
+                                    required: true,
+                                  }}
                                 >
-                                  <MenuItem value="prerequisite">
+                                  <option value=""></option>
+                                  <option value="prerequisite">
                                     {t('prerequisite')}
-                                  </MenuItem>
-                                  <MenuItem value="postrequisite">
+                                  </option>
+                                  <option value="postrequisite">
                                     {t('postrequisite')}
-                                  </MenuItem>
-                                  <MenuItem value="facilitator-requisite">
+                                  </option>
+                                  <option value="facilitator-requisite">
                                     {t('facilitator-requisite')}
-                                  </MenuItem>
+                                  </option>
                                 </Select>
                               </FormControl>
                             </Grid>

@@ -35,10 +35,9 @@ const DynamicForm = ({
   extraFields,
   hideSubmit,
   type,
-  
 }: any) => {
   const { t } = useTranslation();
-
+  const hasPrefilled = useRef(false);
   const [submitted, setSubmitted] = useState(false);
   const formRef = useRef(null);
   const [formSchema, setFormSchema] = useState(schema);
@@ -53,14 +52,12 @@ const DynamicForm = ({
   //custom validation on formData for learner fields hide on dob
   useEffect(() => {
     if (type == 'learner') {
- 
-// ...existing code...
-      console.log("hello")
+      // ...existing code...
+      console.log('hello');
       let requiredKeys = ['parent_phone', 'guardian_relation', 'guardian_name'];
       let requiredKeys2 = ['mobile'];
       console.log('formDatadynamicform', formData.family_member_details);
       console.log('updatedUiSchema------', formUiSchema);
-     
 
       if (formData?.dob) {
         let age = calculateAgeFromDate(formData?.dob);
@@ -75,7 +72,7 @@ const DynamicForm = ({
             // Merge only missing items from required2 into required1 guardian details
             requiredKeys.forEach((item) => {
               if (!requiredArray.includes(item)) {
-                requiredArray.push(item);
+                //  requiredArray.push(item);
               }
             });
 
@@ -194,119 +191,216 @@ const DynamicForm = ({
         setFormUiSchema(oldFormUiSchema);
       }
 
-     if (!formData.family_member_details ) {
-  // Remove all three fields if nothing is selected
-  setFormUiSchema((prevUiSchema) => {
-    const updatedUiSchema = { ...prevUiSchema };
-    delete updatedUiSchema.mother_name;
-    delete updatedUiSchema.father_name;
-    delete updatedUiSchema.spouse_name;
-    return updatedUiSchema;
-  });
+      if (!formData.family_member_details) {
+        // Remove all three fields if nothing is selected
+        setFormUiSchema((prevUiSchema) => {
+          const updatedUiSchema = { ...prevUiSchema };
+          delete updatedUiSchema.mother_name;
+          delete updatedUiSchema.father_name;
+          delete updatedUiSchema.spouse_name;
+          return updatedUiSchema;
+        });
 
-  setFormSchema((prevSchema) => {
-    const updatedSchema = { ...prevSchema };
-    if (updatedSchema.properties) {
-      updatedSchema.properties = { ...updatedSchema.properties };
-      delete updatedSchema.properties.mother_name;
-      delete updatedSchema.properties.father_name;
-      delete updatedSchema.properties.spouse_name;
-    }
-    if (Array.isArray(updatedSchema.required)) {
-      updatedSchema.required = updatedSchema.required.filter(
-        (key) =>
-          key !== 'mother_name' &&
-          key !== 'father_name' &&
-          key !== 'spouse_name'
-      );
-    }
-    return updatedSchema;
-  });
-} else  {
-  // Helper to add a field
-  const addField = (fieldKey, title) => {
-    setFormUiSchema((prevUiSchema) => ({
-      ...prevUiSchema,
-      [fieldKey]: {
-        'ui:widget': 'CustomTextFieldWidget',
-         "ui:options": {
-                "validateOnBlur": true,
-                "hideError": true
+        setFormSchema((prevSchema) => {
+          const updatedSchema = { ...prevSchema };
+          if (updatedSchema.properties) {
+            updatedSchema.properties = { ...updatedSchema.properties };
+            delete updatedSchema.properties.mother_name;
+            delete updatedSchema.properties.father_name;
+            delete updatedSchema.properties.spouse_name;
+          }
+          if (Array.isArray(updatedSchema.required)) {
+            updatedSchema.required = updatedSchema.required.filter(
+              (key) =>
+                key !== 'mother_name' &&
+                key !== 'father_name' &&
+                key !== 'spouse_name'
+            );
+          }
+          return updatedSchema;
+        });
+      } else {
+        // Helper to add a field
+        const addField = (fieldKey, title) => {
+          setFormUiSchema((prevUiSchema) => ({
+            ...prevUiSchema,
+            [fieldKey]: {
+              'ui:widget': 'CustomTextFieldWidget',
+              'ui:options': {
+                validateOnBlur: true,
+                hideError: true,
+              },
+            },
+          }));
+
+          setFormSchema((prevSchema) => {
+            const updatedSchema = { ...prevSchema };
+            if (updatedSchema.properties) {
+              updatedSchema.properties = { ...updatedSchema.properties };
+              updatedSchema.properties[fieldKey] = {
+                type: 'string',
+                title,
+              };
             }
-      },
-    }));
-
-    setFormSchema((prevSchema) => {
-      const updatedSchema = { ...prevSchema };
-      if (updatedSchema.properties) {
-        updatedSchema.properties = { ...updatedSchema.properties };
-        updatedSchema.properties[fieldKey] = {
-          type: 'string',
-          title,
+            if (
+              Array.isArray(updatedSchema.required) &&
+              !updatedSchema.required.includes(fieldKey)
+            ) {
+              updatedSchema.required = [...updatedSchema.required, fieldKey];
+            }
+            return updatedSchema;
+          });
         };
+        console.log('editlearner', formUiSchema);
+
+        // Remove the other two fields
+        const removeFields = (fields) => {
+          console.log('removeFields', fields);
+          setFormUiSchema((prevUiSchema) => {
+            const updatedUiSchema = { ...prevUiSchema };
+            fields.forEach((field) => delete updatedUiSchema[field]);
+            console.log('updatedUiSchema', updatedUiSchema);
+
+            return updatedUiSchema;
+          });
+          setFormUiSchemaOriginal((prevUiSchema) => {
+            const updatedUiSchema = { ...prevUiSchema };
+            fields.forEach((field) => delete updatedUiSchema[field]);
+            console.log('updatedUiSchema', updatedUiSchema);
+
+            return updatedUiSchema;
+          });
+
+          setFormSchema((prevSchema) => {
+            const updatedSchema = { ...prevSchema };
+            if (updatedSchema.properties) {
+              updatedSchema.properties = { ...updatedSchema.properties };
+              fields.forEach((field) => delete updatedSchema.properties[field]);
+            }
+            if (Array.isArray(updatedSchema.required)) {
+              updatedSchema.required = updatedSchema.required.filter(
+                (key) => !fields.includes(key)
+              );
+            }
+
+            return updatedSchema;
+          });
+        };
+        if (formData.family_member_details === 'mother') {
+          addField('mother_name', 'Mother Name');
+          removeFields(['father_name', 'spouse_name']);
+          setFormData((prev) => ({
+            ...prev,
+            mother_name: !hasPrefilled.current
+              ? prefilledFormData?.mother_name || prev.mother_name || ''
+              : prev.mother_name || '',
+            father_name: undefined,
+            spouse_name: undefined,
+          }));
+          hasPrefilled.current = true;
+        } else if (formData.family_member_details === 'father') {
+          addField('father_name', 'Father Name');
+          removeFields(['mother_name', 'spouse_name']);
+          setFormData((prev) => ({
+            ...prev,
+            father_name: !hasPrefilled.current
+              ? prefilledFormData?.father_name || prev.father_name || ''
+              : prev.father_name || '',
+            mother_name: undefined,
+            spouse_name: undefined,
+          }));
+          hasPrefilled.current = true;
+        } else if (formData.family_member_details === 'spouse') {
+          addField('spouse_name', 'Spouse Name');
+          removeFields(['mother_name', 'father_name']);
+          setFormData((prev) => ({
+            ...prev,
+            spouse_name: !hasPrefilled.current
+              ? prefilledFormData?.spouse_name || prev.spouse_name || ''
+              : prev.spouse_name || '',
+            mother_name: undefined,
+            father_name: undefined,
+          }));
+          hasPrefilled.current = true;
+        }
       }
-      if (
-        Array.isArray(updatedSchema.required) &&
-        !updatedSchema.required.includes(fieldKey)
-      ) {
-        updatedSchema.required = [...updatedSchema.required, fieldKey];
+
+      console.log('editlearner', formUiSchema);
+
+      // Remove the other two fields
+      const removeFields = (fields) => {
+        console.log('removeFields', fields);
+        setFormUiSchema((prevUiSchema) => {
+          const updatedUiSchema = { ...prevUiSchema };
+          fields.forEach((field) => delete updatedUiSchema[field]);
+          console.log('updatedUiSchema', updatedUiSchema);
+
+          return updatedUiSchema;
+        });
+        setFormUiSchemaOriginal((prevUiSchema) => {
+          const updatedUiSchema = { ...prevUiSchema };
+          fields.forEach((field) => delete updatedUiSchema[field]);
+          console.log('updatedUiSchema', updatedUiSchema);
+
+          return updatedUiSchema;
+        });
+
+        setFormSchema((prevSchema) => {
+          const updatedSchema = { ...prevSchema };
+          if (updatedSchema.properties) {
+            updatedSchema.properties = { ...updatedSchema.properties };
+            fields.forEach((field) => delete updatedSchema.properties[field]);
+          }
+          if (Array.isArray(updatedSchema.required)) {
+            updatedSchema.required = updatedSchema.required.filter(
+              (key) => !fields.includes(key)
+            );
+          }
+
+          return updatedSchema;
+        });
+      };
+      if (formData.phone_type_accessible === 'nophone') {
+        removeFields(['own_phone_check']);
+      } else {
+        // 1. Add back to schema if missing
+        setFormSchema((prevSchema) => {
+          if (!prevSchema.properties?.own_phone_check) {
+            return {
+              ...prevSchema,
+              properties: {
+                ...prevSchema.properties,
+                own_phone_check: {
+                  type: 'string',
+                  title: t('DOES_THIS_PHONE_BELONG_TO_YOU'),
+                  coreField: 0,
+                  fieldId: 'd119d92f-fab7-4c7d-8370-8b40b5ed23dc',
+                  field_type: 'radio',
+                  isRequired: true,
+                  enum: ['yes', 'no'],
+                  enumNames: ['YES', 'NO'],
+                },
+              },
+              required: prevSchema.required?.includes('own_phone_check')
+                ? prevSchema.required
+                : [...(prevSchema.required || []), 'own_phone_check'],
+            };
+          }
+          return prevSchema;
+        });
+
+        // 2. Add back to uiSchema
+        setFormUiSchema((prevUiSchema) => ({
+          ...prevUiSchema,
+          own_phone_check: {
+            'ui:widget': 'CustomRadioWidget',
+            'ui:options': {
+              hideError: true,
+            },
+          },
+        }));
       }
-      return updatedSchema;
-    });
-  };
-          console.log("editlearner", formUiSchema)
-
-  // Remove the other two fields
-  const removeFields = (fields) => {
-console.log("removeFields", fields)
-    setFormUiSchema((prevUiSchema) => {
-      const updatedUiSchema = { ...prevUiSchema };
-      fields.forEach((field) => delete updatedUiSchema[field]);
-      console.log("updatedUiSchema", updatedUiSchema)
-
-      return updatedUiSchema;
-    });
-  setFormUiSchemaOriginal((prevUiSchema) => {
-      const updatedUiSchema = { ...prevUiSchema };
-      fields.forEach((field) => delete updatedUiSchema[field]);
-      console.log("updatedUiSchema", updatedUiSchema)
-
-      return updatedUiSchema;
-    });
-
-    setFormSchema((prevSchema) => {
-      const updatedSchema = { ...prevSchema };
-      if (updatedSchema.properties) {
-        updatedSchema.properties = { ...updatedSchema.properties };
-        fields.forEach((field) => delete updatedSchema.properties[field]);
-      }
-      if (Array.isArray(updatedSchema.required)) {
-        updatedSchema.required = updatedSchema.required.filter(
-          (key) => !fields.includes(key)
-        );
-      }
-
-      return updatedSchema;
-    });
-
-  };
-  if (formData.family_member_details === 'mother') {
-
-   addField('mother_name', 'Mother Name');
-   removeFields(['father_name', 'spouse_name']);
-  } else if (formData.family_member_details === 'father') {
-
-    addField('father_name', 'Father Name');
-    removeFields(['mother_name', 'spouse_name']);
-  } else if (formData.family_member_details === 'spouse') {
-    addField('spouse_name', 'Spouse Name');
-    removeFields(['mother_name', 'father_name']);
-  }
-}
- 
-      
     }
-    
   }, [formData]);
 
   const widgets = {
@@ -325,11 +419,12 @@ console.log("removeFields", fields)
       // setFormData;
       //fix for auto submit and render
       if (Object.keys(prefilledFormData).length === 0) {
-        prefilledFormData = { test: 'test' };
+        if (type !== 'centers') prefilledFormData = { test: 'test' };
+        else prefilledFormData = { type: 'COHORT' };
       }
       renderPrefilledForm();
     }
-  }, [isInitialCompleted]);
+  }, [isInitialCompleted, type]);
 
   useEffect(() => {
     if (isCallSubmitInHandle) {
@@ -1266,7 +1361,25 @@ console.log("removeFields", fields)
       setFormUiSchema(hiddenUISchema);
     }
   };
-
+  const handleFirstLastNameBlur = async (id: any, value: any) => {
+    console.log('Username onblur called', formData);
+    if (
+      formData?.firstName !== undefined &&
+      formData?.lastName !== undefined &&
+      type == 'learner'
+    ) {
+      const newUserName = `${formData.firstName}${formData.lastName}`;
+      if (!formData.username) {
+        if (formData.username !== newUserName) {
+          console.log('Usernameupdated', newUserName);
+          setFormData({
+            ...formData,
+            username: newUserName,
+          });
+        }
+      }
+    }
+  };
   const handleSubmit = ({ formData }: { formData: any }) => {
     console.log('########### issue debug formData', formData);
 
@@ -1460,6 +1573,7 @@ console.log("removeFields", fields)
           uiSchema={formUiSchema}
           formData={formData}
           onChange={handleChange}
+          onBlur={handleFirstLastNameBlur}
           // onSubmit={handleSubmit}
           onSubmit={({ formData, errors }) => {
             // console.log("########### issue debug SUBMIT", formData);
