@@ -366,7 +366,7 @@ const ImportCsv = () => {
         if (response) {
           showSnackbar({
             text: t(`${type} has been successfully deleted`),
-            bgColor: '#BA1A1A', //#BA1A1A
+            bgColor: '#019722', //#BA1A1A
             textColor: '#fff',
             icon: <CheckCircleOutlineOutlinedIcon />, //ErrorOutlinedIcon
           });
@@ -428,7 +428,7 @@ const ImportCsv = () => {
                     if (response) {
                       showSnackbar({
                         text: t('Planner has been successfully deleted'),
-                        bgColor: '#BA1A1A', //#BA1A1A
+                        bgColor: '#019722', //#BA1A1A
                         textColor: '#fff',
                         icon: <CheckCircleOutlineOutlinedIcon />, //ErrorOutlinedIcon
                       });
