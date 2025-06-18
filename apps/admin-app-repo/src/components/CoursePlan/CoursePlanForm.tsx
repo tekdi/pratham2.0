@@ -36,7 +36,11 @@ import { useCustomSnackbar } from './useCustomSnackbar';
 import { useAlertDialog } from './AlertDialog';
 import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined';
 import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
-import { createTopic, updateContent } from '@/services/coursePlanner';
+import {
+  createTopic,
+  deleteContent,
+  updateContent,
+} from '@/services/coursePlanner';
 
 interface CoursePlanFormProps {
   open: boolean;
@@ -239,20 +243,66 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
   };
 
   const handleRemoveSubTopic = (topicIndex: number, subTopicIndex: number) => {
-    setTopics(
-      topics.map((topic, index) => {
-        if (index === topicIndex) {
-          return {
-            ...topic,
-            subTopics: topic.subTopics.filter(
-              (_, subIndex) => subIndex !== subTopicIndex
-            ),
-          };
-        } else {
-          return topic;
-        }
-      })
+    const extractExternalId = (
+      prefilledObject: any,
+      topicIndex: number,
+      subTopicIndex: number
+    ) => {
+      const children = prefilledObject?.children || [];
+      const selectedSubTopic = children[subTopicIndex];
+      return selectedSubTopic?.externalId || null;
+    };
+
+    const externalId = extractExternalId(
+      prefilledObject,
+      topicIndex,
+      subTopicIndex
     );
+    console.log('External ID:', externalId);
+    if (externalId) {
+      openConfirmation({
+        title: t('Are you sure you want to delete?'),
+        message: t(
+          `Sub Task will be permanently deleted. Are you sure you want to delete?`
+        ),
+        yesText: t('Yes, Delete'),
+        noText: t('No, Cancel'),
+        onYes: async () => {
+          const response = await deleteContent(projectId, externalId);
+          if (response) {
+            showSnackbar({
+              text: t(`Sub Topic has been successfully deleted`),
+              bgColor: '#BA1A1A',
+              textColor: '#fff',
+              icon: <CheckCircleOutlineOutlinedIcon />, //ErrorOutlinedIcon
+            });
+            setTopics(
+              topics.map((topic, index) => {
+                if (index === topicIndex) {
+                  return {
+                    ...topic,
+                    subTopics: topic.subTopics.filter(
+                      (_, subIndex) => subIndex !== subTopicIndex
+                    ),
+                  };
+                } else {
+                  return topic;
+                }
+              })
+            );
+          } else {
+            showSnackbar({
+              text: t(
+                `Something went wrong. We couldn't delete the sub topic. Please try again`
+              ),
+              bgColor: '#BA1A1A',
+              textColor: '#fff',
+              icon: <ErrorOutlinedIcon />, //ErrorOutlinedIcon
+            });
+          }
+        },
+      });
+    }
   };
 
   const handleRemoveResource = (
@@ -435,6 +485,7 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
         noText: t('No, Cancel'),
         onYes: () => {
           onCloseReset();
+          onAction();
         },
       });
     } else {
