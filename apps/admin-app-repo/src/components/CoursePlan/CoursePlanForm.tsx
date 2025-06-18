@@ -987,11 +987,16 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
 
                             <Grid item xs={12} sm={6} md={6}>
                               <FormControl fullWidth required>
-                                <InputLabel required>
+                                <InputLabel
+                                  id={`resource-type-label-${resIndex}`}
+                                  required
+                                >
                                   {t('Resource Type')}
                                 </InputLabel>
                                 <Select
                                   native
+                                  labelId={`resource-type-label-${resIndex}`}
+                                  id={`resource-type-select-${resIndex}`}
                                   value={res.resourceType}
                                   onChange={(e) => {
                                     const newTopics: any = [...topics];
@@ -1001,6 +1006,7 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
                                       e.target.value;
                                     setTopics(newTopics);
                                   }}
+                                  label={t('Resource Type')}
                                   inputProps={{
                                     name: 'resourceType',
                                     required: true,
