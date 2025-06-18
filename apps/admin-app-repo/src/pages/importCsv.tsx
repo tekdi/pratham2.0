@@ -343,13 +343,15 @@ const ImportCsv = () => {
     setOpenAddTopicModal(false);
   };
 
-  const CoursePlanFormAction = () => {
-    showSnackbar({
-      text: t('Topic has been successfully created'),
-      bgColor: '#019722', //#BA1A1A
-      textColor: '#fff',
-      icon: <CheckCircleOutlineOutlinedIcon />, //ErrorOutlinedIcon
-    });
+  const CoursePlanFormAction = (params: any) => {
+    if (params.showSnackbar === true) {
+      showSnackbar({
+        text: t(`${params.type} has been successfully created`),
+        bgColor: '#019722', //#BA1A1A
+        textColor: '#fff',
+        icon: <CheckCircleOutlineOutlinedIcon />, //ErrorOutlinedIcon
+      });
+    }
     fetchCourseDetails();
   };
 
