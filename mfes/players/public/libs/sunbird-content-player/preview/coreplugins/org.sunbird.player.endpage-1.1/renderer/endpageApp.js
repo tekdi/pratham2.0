@@ -75,6 +75,7 @@ endPage.controller("endPageController", function($scope, $rootScope, $state,$ele
     };
     $scope.openGenie = function(){
         EkstepRendererAPI.dispatchEvent('renderer:genie:click');
+        window?.history?.back();
     };
     
     $scope.handleEndpage = function() {

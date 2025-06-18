@@ -83,9 +83,8 @@ const SunbirdVideoPlayer = ({
       title="Content Player"
       src={`${basePath}/libs/sunbird-video-player/index.html`}
       aria-label="Content Player"
-      style={{ border: 'none' }}
-      width={'100%'}
-      height={'100%'}
+      style={{ border: 'none', aspectRatio: `16 / 9` }}
+      width="100%"
     ></iframe>
   );
 };
