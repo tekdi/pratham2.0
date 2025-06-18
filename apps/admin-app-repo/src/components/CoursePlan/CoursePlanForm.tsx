@@ -96,7 +96,7 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
       startDate: Date | null;
       endDate: Date | null;
       subTopics: {
-        externalId: {};
+        externalId: string;
         name: string;
         startDate: Date | null;
         endDate: Date | null;
@@ -132,7 +132,13 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
             ? dateConvert(prefilledObject.metaInformation.endDate)
             : null,
           subTopics: [
-            { name: '', startDate: null, endDate: null, resources: [] },
+            {
+              externalId: '',
+              name: '',
+              startDate: null,
+              endDate: null,
+              resources: [],
+            },
           ],
         },
       ]);
@@ -140,6 +146,7 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
     if (prefilledObject && formType === 'addTopic') {
       setTopics([
         {
+          externalId: '',
           name: '',
           startDate: null,
           endDate: null,
@@ -161,6 +168,7 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
             : null,
           subTopics:
             prefilledObject?.children?.map((child) => ({
+              externalId: child?.externalId,
               name: child?.name || '',
               startDate: child?.metaInformation?.startDate
                 ? dateConvert(child.metaInformation.startDate)
@@ -183,6 +191,7 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
     setTopics([
       ...topics,
       {
+        externalId: '',
         name: '',
         startDate: null,
         endDate: null,
@@ -201,7 +210,13 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
             ...topic,
             subTopics: [
               ...topic.subTopics,
-              { name: '', startDate: null, endDate: null, resources: [] },
+              {
+                externalId: '',
+                name: '',
+                startDate: null,
+                endDate: null,
+                resources: [],
+              },
             ],
           };
         } else {
@@ -272,7 +287,7 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
           if (response) {
             showSnackbar({
               text: t(`Sub Topic has been successfully deleted`),
-              bgColor: '#019722',
+              bgColor: '#BA1A1A',
               textColor: '#fff',
               icon: <CheckCircleOutlineOutlinedIcon />, //ErrorOutlinedIcon
             });
@@ -340,39 +355,8 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
     if (formRef.current?.checkValidity()) {
       // All required fields are filled
       console.log('Form valid. Submit here.', topics);
+      const payload = convertTopicsToTasks(topics);
 
-      // Submit logic goes here
-      // Normalize function to safely match subtopic names
-      const normalizeName = (name: string) =>
-        name.trim().replace(/\s+/g, ' ').replace(/\d+$/, '').toLowerCase();
-
-      let payload;
-
-      if (formType === 'editTopic') {
-        const childrenMap = new Map(
-          prefilledObject?.children?.map(
-            (child: { name: string; externalId: any }) => [
-              normalizeName(child?.name),
-              child?.externalId,
-            ]
-          )
-        );
-
-        // Add externalId to subTopics
-        topics?.forEach((chapter) => {
-          chapter?.subTopics?.forEach((subTopic) => {
-            const normalized = normalizeName(subTopic?.name);
-            const externalId = childrenMap?.get(normalized);
-            if (externalId) {
-              subTopic.externalId = externalId;
-            }
-          });
-        });
-
-        payload = convertTopicsToTasks(topics);
-      } else {
-        payload = convertTopicsToTasks(topics);
-      }
       //create course planner
       let response = null;
       if (formType == 'editTopic') {
