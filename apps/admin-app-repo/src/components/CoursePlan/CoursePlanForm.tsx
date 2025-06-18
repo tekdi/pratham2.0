@@ -272,7 +272,7 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
           if (response) {
             showSnackbar({
               text: t(`Sub Topic has been successfully deleted`),
-              bgColor: '#BA1A1A',
+              bgColor: '#019722',
               textColor: '#fff',
               icon: <CheckCircleOutlineOutlinedIcon />, //ErrorOutlinedIcon
             });
@@ -987,11 +987,16 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
 
                             <Grid item xs={12} sm={6} md={6}>
                               <FormControl fullWidth required>
-                                <InputLabel required>
+                                <InputLabel
+                                  id={`resource-type-label-${resIndex}`}
+                                  required
+                                >
                                   {t('Resource Type')}
                                 </InputLabel>
                                 <Select
                                   native
+                                  labelId={`resource-type-label-${resIndex}`}
+                                  id={`resource-type-select-${resIndex}`}
                                   value={res.resourceType}
                                   onChange={(e) => {
                                     const newTopics: any = [...topics];
@@ -1001,6 +1006,7 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
                                       e.target.value;
                                     setTopics(newTopics);
                                   }}
+                                  label={t('Resource Type')}
                                   inputProps={{
                                     name: 'resourceType',
                                     required: true,
@@ -1008,13 +1014,13 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
                                 >
                                   <option value=""></option>
                                   <option value="prerequisite">
-                                    {t('prerequisite')}
+                                    {t('Prerequisite')}
                                   </option>
                                   <option value="postrequisite">
-                                    {t('postrequisite')}
+                                    {t('Postrequisite')}
                                   </option>
                                   <option value="facilitator-requisite">
-                                    {t('facilitator-requisite')}
+                                    {t('Facilitator-requisite')}
                                   </option>
                                 </Select>
                               </FormControl>

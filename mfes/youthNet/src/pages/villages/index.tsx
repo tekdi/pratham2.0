@@ -135,7 +135,9 @@ const Index = () => {
   });
 
   useEffect(() => {
+
     const getData = async () => {
+      try{
       let userDataString = localStorage.getItem('userData');
       let userData: any = userDataString ? JSON.parse(userDataString) : null;
       const districtResult = userData?.customFields?.find(
@@ -166,6 +168,10 @@ const Index = () => {
       );
       setBlockData(transformedBlockData);
       setSelectedBlockValue(blockId ? blockId : transformedBlockData[0]?.id);
+    } catch (error) {
+      console.error('Error fetching district and block data:', error);
+     // setDistrictData([]);
+      setBlockData([]);}
     };
     getData();
   }, [blockId, villageId]);
