@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import SimpleModal from '@forget-password/Components/SimpleModal/SimpleModal';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import OtpVerificationComponent from '@forget-password/Components/OtpVerificationComponent/OtpVerificationComponent';
 import ForgotPasswordComponent from '@forget-password/Components/ForgotPasswordComponent/ForgotPasswordComponent';
 import { sendOTP, verifyOTP } from '@forget-password/utils/API/OtPService';
@@ -13,6 +13,7 @@ import { Box } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 const ForgotPassword = ({}) => {
   const router = useRouter();
+  const pathname = usePathname();
 
   const [mobileNumber, setMobileNumber] = useState<string>('');
   const [hash, setHash] = useState<string>('');
@@ -128,7 +129,19 @@ const ForgotPassword = ({}) => {
           cursor: 'pointer',
           width: 'fit-content',
         }}
-        onClick={() => router.back()}
+        onClick={() => {
+         if (localStorage.getItem('appMode')) {
+      const query = new URLSearchParams({
+        tab: 'learnerAndroidApp',
+      }).toString();
+      router.push(`${pathname}?${query}`);
+    } 
+        else
+        {
+          router.back();
+        }
+          
+         }}
       >
         <ArrowBackIcon
           sx={{ color: '#4B5563', '&:hover': { color: '#000' } }}
