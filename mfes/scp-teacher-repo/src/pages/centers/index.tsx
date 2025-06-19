@@ -230,7 +230,7 @@ const CentersPage = () => {
     const userData = JSON.parse(localStorage.getItem('userData') || '{}');
     const location = getLocationFromCustomFields(userData);
     // console.log('location', location);
-    setEmptyFormData(location);
+    setEmptyFormData({...location,  name: ''});
   }, [tempVariable]);
 
   useEffect(() => {

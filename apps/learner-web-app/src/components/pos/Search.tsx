@@ -45,6 +45,7 @@ const SearchPage = () => {
         showSearch={false}
         showHelpDesk={false}
         _config={{
+          contentBaseUrl: '/pos',
           _tabs: { variant: 'fullWidth' },
           _card: {
             isHideProgressStatus: true,

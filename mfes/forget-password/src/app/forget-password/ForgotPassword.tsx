@@ -29,7 +29,16 @@ const ForgotPassword = ({}) => {
     const isValidMobileNumber = /^[0-9]{10}$/.test(value);
 
     if (isValidMobileNumber) {
-      router.push(`/account-selection?mobile=${value}`);
+      let mobile=value;
+       const response = await userCheck({ mobile });
+      console.log('response', response?.result[0]?.mobile);
+      if (response?.result[0]?.mobile) {
+       router.push(`/account-selection?mobile=${value}`);
+        }
+        else{
+                  showToastMessage('Please enter valid mobile number', 'error');
+
+        }
     } else {
       setEnterdUserName(value);
       const mobile = await fetchMobileByUsername(value);
