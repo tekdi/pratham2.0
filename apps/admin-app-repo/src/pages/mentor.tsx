@@ -463,11 +463,11 @@ const Mentor = () => {
         <SimpleModal
           open={openModal}
           onClose={handleCloseModal}
-          showFooter={!isEdit ? true : false}
+          showFooter={true}
           modalTitle={
             isEdit ? t('MENTORS.UPDATE_MENTOR') : t('MENTORS.NEW_MENTOR')
           }
-          primaryText={'Next'}
+          primaryText={ isEdit? 'Update':'Next'}
           id="dynamic-form-id"
         >
           <AddEditUser
