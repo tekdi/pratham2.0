@@ -1,4 +1,5 @@
-import { Grid } from "@mui/material";
+ //@ts-nocheck
+import { Grid } from '@mui/material';
 
 export const CustomObjectFieldTemplate = ({ properties }: any) => {
     return (
