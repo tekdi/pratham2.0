@@ -156,36 +156,38 @@ const InfoCard: React.FC<InfoCardProps> = ({
                     </SpeakableText>
                   </Typography>
                 ) : (
-                  <Typography
-                    variant="body1"
-                    component="div"
-                    sx={{
-                      width: 'fit-content',
-                      borderRadius: '12px',
-                      pt: 1,
-                      pr: 2,
-                      pb: 1,
-                      pl: 2,
-                      bgcolor: '#FFDEA1',
-                      // fontSize: { xs: '14px', sm: '16px', md: '16px' },
-                      // lineHeight: { xs: '20px', sm: '22px', md: '26px' },
-                    }}
-                  >
-                    <SpeakableText>
-                      {t('LEARNER_APP.COURSE.STARTED_ON')}:{' '}
-                      {item?.startedOn
-                        ? new Intl.DateTimeFormat('en-GB', {
-                            day: '2-digit',
-                            month: 'short',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: true,
-                          }).format(new Date(item.startedOn))
-                        : ' - '}
-                    </SpeakableText>
-                    {/* {JSON.stringify(_infoCard?.isShowStatus || {})} */}
-                  </Typography>
+                  item?.startedOn && (
+                    <Typography
+                      variant="body1"
+                      component="div"
+                      sx={{
+                        width: 'fit-content',
+                        borderRadius: '12px',
+                        pt: 1,
+                        pr: 2,
+                        pb: 1,
+                        pl: 2,
+                        bgcolor: '#FFDEA1',
+                        // fontSize: { xs: '14px', sm: '16px', md: '16px' },
+                        // lineHeight: { xs: '20px', sm: '22px', md: '26px' },
+                      }}
+                    >
+                      <SpeakableText>
+                        {t('LEARNER_APP.COURSE.STARTED_ON')}:{' '}
+                        {item?.startedOn
+                          ? new Intl.DateTimeFormat('en-GB', {
+                              day: '2-digit',
+                              month: 'short',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              hour12: true,
+                            }).format(new Date(item.startedOn))
+                          : ' - '}
+                      </SpeakableText>
+                      {/* {JSON.stringify(_infoCard?.isShowStatus || {})} */}
+                    </Typography>
+                  )
                 ))}
               {!_infoCard?.isHideStatus && (
                 <Button

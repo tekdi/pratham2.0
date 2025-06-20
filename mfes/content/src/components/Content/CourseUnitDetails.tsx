@@ -151,7 +151,7 @@ export default function Details(props: DetailsProps) {
 
                 if (
                   course_track?.status === 'completed' &&
-                  data?.result?.status === 'enrolled' &&
+                  ['enrolled', 'completed'].includes(data?.result?.status) &&
                   props?._config?.userIdLocalstorageName !== 'did'
                 ) {
                   const userResponse: any = await getUserIdLocal();

@@ -27,7 +27,7 @@ export const StateLeadSearchSchema = {
     },
     firstName: {
       type: 'string',
-      title: 'Search Key',
+      title: 'Search State Lead',
     },
     sortBy: {
       type: 'string',

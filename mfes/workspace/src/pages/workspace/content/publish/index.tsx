@@ -248,6 +248,7 @@ const PublishPage = () => {
                     columns={columns}
                     data={data}
                     tableTitle="publish"
+                    showQrCodeButton={true}
                   />
                 </Box>
               </>

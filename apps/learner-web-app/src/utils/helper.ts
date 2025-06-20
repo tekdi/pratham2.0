@@ -1,3 +1,4 @@
+
 export const firstLetterInUpperCase = (label: string): string => {
   if (!label) {
     return '';
@@ -40,9 +41,16 @@ export const mapUserData = (userData: any) => {
       mobile: userData.mobile ? userData.mobile?.toString() : '',
       dob: userData.dob || '',
       gender: userData.gender || '',
-      // mother_name: getSingleTextValue('MOTHER_NAME'),
+       mother_name: getSingleTextValue('MOTHER_NAME'),
+              father_name: getSingleTextValue('FATHER_NAME'),
+                            spouse_name: getSingleTextValue('SPOUSE_NAME'),
+
+
       marital_status: getSelectedValue('MARITAL_STATUS'),
-      phone_type_available: getSingleSelectedValue('TYPE_OF_PHONE_AVAILABLE'),
+      phone_type_accessible
+: getSingleSelectedValue('TYPE_OF_PHONE_ACCESSIBLE'),
+    family_member_details
+: getSingleSelectedValue('FAMILY_MEMBER_DETAILS'),
       own_phone_check: getSingleSelectedValue('DOES_THIS_PHONE_BELONG_TO_YOU'),
       state: getSelectedValue('STATE'),
       district: getSelectedValue('DISTRICT'),
@@ -53,7 +61,7 @@ export const mapUserData = (userData: any) => {
         getSelectedValue('REASON_FOR_DROP_OUT_FROM_SCHOOL') || [], // array
       work_domain:
         getSelectedValue(
-          'ARE_YOU_CURRENTLY_WORKING_IF_YES_CHOOSE_THE_DOMAIN'
+          'WHAT_IS_YOUR_PRIMARY_WORK'
         ) || [],
       training_check:
         getSelectedValue('HAVE_YOU_RECEIVE_ANY_PRIOR_TRAINING') || [],
@@ -207,6 +215,20 @@ export const getMissingFields = (schema: any, userData: any) => {
     //     }
     //   });
     // }
+    if(mappedUserData.spouse_name) {
+      delete result.properties.mother_name;
+            delete result.properties.father_name;
+
+    }
+   else if(mappedUserData.father_name ) {
+    delete result.properties.mother_name;
+            delete result.properties.spouse_name;
+    }
+   else if(mappedUserData.mother_name) {
+    delete result.properties.spouse_name;
+            delete result.properties.father_name;
+    }
+
 
     return result;
   } catch (error) {
