@@ -127,7 +127,7 @@ export const YouthSearchSchema = {
     },
     firstName: {
       type: 'string',
-      title: 'Search Key',
+      title: 'Search Youth',
       // description: 'Search for a specific user or entity',
     },
     sortBy: {
