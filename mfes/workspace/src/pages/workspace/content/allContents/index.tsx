@@ -74,7 +74,7 @@ const columns = [
     key: 'contentAction',
     title: 'ACTION',
     dataType: DataType.String,
-    width: '100px',
+    width: '140px',
   },
 ];
 const AllContentsPage = () => {
@@ -342,6 +342,7 @@ const AllContentsPage = () => {
                     columns={columns}
                     tableTitle="all-content"
                     data={data}
+                    showQrCodeButton={true}
                   />
                 </Box>
               </>

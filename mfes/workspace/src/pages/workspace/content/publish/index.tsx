@@ -54,7 +54,7 @@ const columns = [
     dataType: DataType.String,
     width: '180px',
   },
-  { key: 'action', title: 'ACTION', dataType: DataType.String, width: '100px' },
+  { key: 'action', title: 'ACTION', dataType: DataType.String, width: '140px' },
 ];
 const PublishPage = () => {
   const tenantConfig = useTenantConfig();
