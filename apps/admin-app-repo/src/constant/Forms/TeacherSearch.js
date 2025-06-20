@@ -127,7 +127,7 @@ export const TeacherSearchSchema = {
     },
     name: {
       type: 'string',
-      title: 'Search Key',
+      title: 'Search Facilitator',
       description: 'Search for a specific user or entity',
     },
     sortBy: {
