@@ -248,6 +248,7 @@ export const contentWithTelemetryData = async ({
           userId,
           course,
           unitId,
+          isGenerateCertificate: configFunctionality.isGenerateCertificate,
         });
       }
     }
