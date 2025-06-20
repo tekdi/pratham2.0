@@ -348,9 +348,48 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
               } else if (props.column.key === 'contentAction') {
                 {
                   return (
-                    <>
+                    <Box display="flex">
                       <ActionIcon rowData={props.rowData} />
-                    </>
+                      {showQrCodeButton && props.rowData.status === 'Live' && (
+                        <>
+                          <IconButton
+                            onClick={() => {
+                              // console.log('rowData', props.rowData);
+                              handleOpenQrModal(
+                                props.rowData.contentType === 'Course'
+                                  ? `${process.env.NEXT_PUBLIC_POS_URL}/pos/content/${props.rowData.identifier}?activeLink=/pos/program`
+                                  : `${process.env.NEXT_PUBLIC_POS_URL}/pos/player/${props.rowData.identifier}?activeLink=/pos/program`
+                              );
+                            }}
+                          >
+                            <QrCode2Icon />{' '}
+                          </IconButton>
+
+                          {/* ✅ Copy to Clipboard Button */}
+                          <IconButton
+                            onClick={() => {
+                              const link =
+                                props.rowData.contentType === 'Course'
+                                  ? `${process.env.NEXT_PUBLIC_POS_URL}/pos/content/${props.rowData.identifier}?activeLink=/pos/program`
+                                  : `${process.env.NEXT_PUBLIC_POS_URL}/pos/player/${props.rowData.identifier}?activeLink=/pos/program`;
+
+                              navigator.clipboard.writeText(link).then(() => {
+                                // Optional: show a tooltip or alert
+                                console.log('Link copied to clipboard');
+                              });
+                            }}
+                          >
+                            <ContentCopyIcon />
+                          </IconButton>
+
+                          <QrModal
+                            open={openQrCodeModal}
+                            onClose={() => setOpenQrCodeModal(false)}
+                            qrValue={selectedQrValue}
+                          />
+                        </>
+                      )}
+                    </Box>
                   );
                 }
               } else if (props.column.key === 'action') {
