@@ -30,11 +30,12 @@ const ResetPasswordPage = ({}) => {
     const route = localStorage.getItem('redirectionRoute');
     const appMode = localStorage.getItem('appMode');
     if (appMode) {
-      // const query = new URLSearchParams({
-      //   tab: 'learnerAndroidApp',
-      // }).toString();
-      // router.push(`${pathname}?${query}`);
-     window.open("pratham://learnerapp", '_self');
+      const query = new URLSearchParams({
+        tab: 'learnerAndroidApp',
+      }).toString();
+      router.push(`${pathname}?${query}`);
+   // window.open("pratham://learnerapp", '_self');
+
     } else if (route) router.push(route);
     else router.push('/login');
 

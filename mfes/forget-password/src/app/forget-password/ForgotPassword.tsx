@@ -131,12 +131,12 @@ const ForgotPassword = ({}) => {
         }}
         onClick={() => {
          if (localStorage.getItem('appMode')) {
-      // const query = new URLSearchParams({
-      //   tab: 'learnerAndroidApp',
+      const query = new URLSearchParams({
+        tab: 'learnerAndroidApp',
 
-      // }).toString();
-      // router.push(`${pathname}?${query}`);
-                    window.open("pratham://learnerapp", '_self');
+      }).toString();
+      router.push(`${pathname}?${query}`);
+                 //   window.open("pratham://learnerapp", '_self');
 
          } 
         else
