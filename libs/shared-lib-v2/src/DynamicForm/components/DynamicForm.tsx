@@ -35,7 +35,8 @@ const DynamicForm = ({
   extraFields,
   hideSubmit,
   type,
-  isCompleteProfile=false
+  isCompleteProfile=false,
+  isReassign=false
 }: any) => {
   const { t } = useTranslation();
   const hasPrefilled = useRef(false);
@@ -52,7 +53,7 @@ const DynamicForm = ({
 
   //custom validation on formData for learner fields hide on dob
   useEffect(() => {
-    if (type == 'learner') {
+    if (type == 'learner'  && !isReassign) {
       // ...existing code...
       console.log('hello');
       let requiredKeys = ['parent_phone'];
