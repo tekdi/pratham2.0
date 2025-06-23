@@ -112,9 +112,16 @@ const FacilitatorManage = ({
             },
           },
         ]);
+        const updatedData = {
+          ...responseForm?.uiSchema,
+          designation: {
+            ...responseForm?.uiSchema?.designation,
+            'ui:disabled': true,
+          },
+        };
         console.log('responseForm', responseForm);
         setAddEditSchema(responseForm?.schema);
-        setAddEditUiSchema(responseForm?.uiSchema);
+        setAddEditUiSchema(updatedData);
 
         //unit name is missing from required so handled from frotnend
         let alterSchema = responseForm?.schema;
