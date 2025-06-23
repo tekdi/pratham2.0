@@ -35,6 +35,8 @@ const DynamicForm = ({
   extraFields,
   hideSubmit,
   type,
+  isCompleteProfile=false,
+  isReassign=false
 }: any) => {
   const { t } = useTranslation();
   const hasPrefilled = useRef(false);
@@ -51,10 +53,10 @@ const DynamicForm = ({
 
   //custom validation on formData for learner fields hide on dob
   useEffect(() => {
-    if (type == 'learner') {
+    if (type == 'learner'  && !isReassign) {
       // ...existing code...
       console.log('hello');
-      let requiredKeys = ['parent_phone', 'guardian_relation', 'guardian_name'];
+      let requiredKeys = ['parent_phone'];
       let requiredKeys2 = ['mobile'];
       console.log('formDatadynamicform', formData.family_member_details);
       console.log('updatedUiSchema------', formUiSchema);
@@ -72,7 +74,7 @@ const DynamicForm = ({
             // Merge only missing items from required2 into required1 guardian details
             requiredKeys.forEach((item) => {
               if (!requiredArray.includes(item)) {
-                //  requiredArray.push(item);
+                  requiredArray.push(item);
               }
             });
 
@@ -365,7 +367,7 @@ const DynamicForm = ({
       } else {
         // 1. Add back to schema if missing
         setFormSchema((prevSchema) => {
-          if (!prevSchema.properties?.own_phone_check) {
+          if (!prevSchema.properties?.own_phone_check && !isCompleteProfile) {
             return {
               ...prevSchema,
               properties: {

@@ -420,6 +420,14 @@ export const genericEditorReviewFormResponse = {
                               "value": "Open School"
                           },
                           {
+                              "name": "Experimento India",
+                              "value": "Experimento India"
+                          },
+                          {
+                              "name": "Camp to Club",
+                              "value": "Camp to Club"
+                          },
+                          {
                               "name": "Other",
                               "value": "Other"
                           }
