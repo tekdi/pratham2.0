@@ -119,7 +119,7 @@ const MyComponent: React.FC = () => {
           </Box>
           <InProgressContent />
 
-          <Grid container>
+          {localStorage.getItem('userProgram') === 'YouthNet' &&(<Grid container>
             <Grid
               item
               xs={12}
@@ -132,7 +132,8 @@ const MyComponent: React.FC = () => {
             >
               <LTwoCourse />
             </Grid>
-          </Grid>
+          </Grid>)
+}
         </>
       )}
 
@@ -140,7 +141,7 @@ const MyComponent: React.FC = () => {
         <Grid item xs={12}>
           {filter && (
             <LearnerCourse
-              title={'LEARNER_APP.COURSE.GET_STARTED'}
+              title={localStorage.getItem('userProgram') === 'Camp to Club'?'LEARNER_APP.COURSE.GET_STARTED_CLUB_COURSES':'LEARNER_APP.COURSE.GET_STARTED'}
               _content={{
                 pageName: 'L1_Content',
                 onlyFields: ['contentLanguage', 'se_subDomains', 'se_subjects'],
@@ -149,6 +150,9 @@ const MyComponent: React.FC = () => {
                   'se_subDomains',
                   'se_subjects',
                 ],
+ ...(localStorage.getItem('userProgram') === 'Camp to Club'
+      ? { contentTabs: ['courses', 'content'] }
+      : {}),
                 staticFilter: {
                   se_domains:
                     typeof filter.filters?.domain === 'string'

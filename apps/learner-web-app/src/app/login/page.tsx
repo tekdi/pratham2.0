@@ -395,8 +395,12 @@ const handleSuccessfulLogin = async (
           router.push(
             `${redirectUrl}${activeLink ? `?activeLink=${activeLink}` : ''}`
           );
-        } else {
+        } else if(tenantName=== 'YouthNet') {
           router.push('/content');
+        }
+        else if (tenantName==="Camp to Club")
+        {
+          router.push('/club-courses');
         }
       } else {
         showToastMessage('Username or password not correct', 'error');
