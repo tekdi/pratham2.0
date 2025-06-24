@@ -27,7 +27,7 @@ export const ContentReviewerSearchSchema = {
     },
     firstName: {
       type: 'string',
-      title: 'Search Content Reviewer',
+      title: 'Search Key',
     },
     sortBy: {
       type: 'string',

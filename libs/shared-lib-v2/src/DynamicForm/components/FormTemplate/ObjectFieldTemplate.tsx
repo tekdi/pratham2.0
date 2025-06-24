@@ -1,10 +1,9 @@
- //@ts-nocheck
-import { Grid } from '@mui/material';
+import { Grid } from "@mui/material";
 
-export const CustomObjectFieldTemplate = ({ properties }: any) => {
+export const CustomObjectFieldTemplate = ({ properties }) => {
     return (
       <Grid container spacing={2}>
-        {properties.map((prop: any) => {
+        {properties.map((prop) => {
           const gridOptions = prop.content?.props?.uiSchema?.['ui:options']?.grid || {};
   
           return (

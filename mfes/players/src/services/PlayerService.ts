@@ -176,7 +176,7 @@ export const updateCOurseAndIssueCertificate = async ({
       allCourseIds: course.leafNodes ?? [],
       courseId: course?.identifier,
     });
-
+    console.log(courseStatus, 'sagar courseStatus');
     if (courseStatus?.status === 'in progress') {
       updateUserCourseStatus({
         userId,

@@ -54,7 +54,7 @@ const columns = [
     dataType: DataType.String,
     width: '180px',
   },
-  { key: 'action', title: 'ACTION', dataType: DataType.String, width: '140px' },
+  { key: 'action', title: 'ACTION', dataType: DataType.String, width: '100px' },
 ];
 const PublishPage = () => {
   const tenantConfig = useTenantConfig();
@@ -248,7 +248,6 @@ const PublishPage = () => {
                     columns={columns}
                     data={data}
                     tableTitle="publish"
-                    showQrCodeButton={true}
                   />
                 </Box>
               </>

@@ -47,7 +47,7 @@ interface CoursePlanFormProps {
   onClose: () => void;
   title: string;
   actionTitle: string;
-  onAction: (params: any) => void;
+  onAction: () => void;
   projectId: string;
   formType: string;
   prefilledObject: any;
@@ -317,21 +317,6 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
           }
         },
       });
-    } else {
-      setTopics(
-        topics.map((topic, index) => {
-          if (index === topicIndex) {
-            return {
-              ...topic,
-              subTopics: topic.subTopics.filter(
-                (_, subIndex) => subIndex !== subTopicIndex
-              ),
-            };
-          } else {
-            return topic;
-          }
-        })
-      );
     }
   };
 
@@ -385,12 +370,15 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
       }
 
       if (response) {
+        showSnackbar({
+          text: t('Topic has been successfully created'),
+          bgColor: '#019722', //#BA1A1A
+          textColor: '#fff',
+          icon: <CheckCircleOutlineOutlinedIcon />, //ErrorOutlinedIcon
+        });
         //reload data
         onCloseReset();
-        onAction({
-          showSnackbar: formType === 'editTopic' ? false : true,
-          type: formType === 'addTopic' ? 'Topic' : 'Sub Topic',
-        });
+        onAction();
       } else {
         showSnackbar({
           text: t(
@@ -481,7 +469,7 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
         noText: t('No, Cancel'),
         onYes: () => {
           onCloseReset();
-          onAction({ showSnackbar: false, type: '' });
+          onAction();
         },
       });
     } else {

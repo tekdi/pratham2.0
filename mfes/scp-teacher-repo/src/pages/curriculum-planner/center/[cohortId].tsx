@@ -98,9 +98,7 @@ const CoursePlannerDetail = () => {
   const fetchCourseDetails = useCallback(async () => {
     try {
       setLoading(true);
-
-      // Initial call with entityId
-      let response = await getTargetedSolutions({
+      const response = await getTargetedSolutions({
         subject: tStore?.taxonomySubject,
         class: tStore?.grade,
         board: tStore?.board,
@@ -109,29 +107,13 @@ const CoursePlannerDetail = () => {
         entityId: cohortId,
       });
 
-      // Retry without entityId if empty
-      if (
-        Array.isArray(response?.result?.data) &&
-        response?.result?.data.length === 0
-      ) {
-        response = await getTargetedSolutions({
-          subject: tStore?.taxonomySubject,
-          class: tStore?.grade,
-          board: tStore?.board,
-          courseType: tStore?.type,
-          medium: tStore?.medium,
-        });
-      }
-
-      if (
-        !Array.isArray(response?.result?.data) ||
-        response?.result?.data.length === 0
-      ) {
+      if (response?.result?.data == '') {
         setLoading(false);
         return;
       }
 
       const courseData = response?.result?.data[0];
+
       let courseId = courseData._id;
 
       if (!courseId) {
@@ -141,8 +123,6 @@ const CoursePlannerDetail = () => {
       await fetchAndSetUserProjectDetails(courseId);
     } catch (error) {
       console.error('Error fetching course planner:', error);
-    } finally {
-      setLoading(false);
     }
   }, [statusData]);
 
@@ -186,16 +166,7 @@ const CoursePlannerDetail = () => {
         templateId: externalId,
         solutionId,
         role: Role.TEACHER,
-        entityId: cohortId,
-        acl: {
-          visibility: 'SCOPE',
-          users: [],
-          subject: tStore?.taxonomySubject,
-          medium: tStore?.medium,
-          class: tStore?.grade,
-          board: tStore?.board,
-          courseType: tStore?.type,
-        },
+        cohortId,
       });
 
       const updatedResponse = await getTargetedSolutions({
@@ -315,20 +286,7 @@ const CoursePlannerDetail = () => {
     data: any,
     selectedSubtopics: { topid: string; subid: string }[]
   ) => {
-    const { entityId, ...dataWithoutEntityId } = data;
-    const extendedData = {
-      ...dataWithoutEntityId,
-      userProfileInformation: {
-        scope: {
-          subject: tStore?.taxonomySubject,
-          medium: tStore?.medium,
-          class: tStore?.grade,
-          board: tStore?.board,
-          courseType: tStore?.type,
-        },
-      },
-    };
-    const updatedData = { ...extendedData };
+    const updatedData = { ...data };
 
     selectedSubtopics.forEach(({ topid, subid }) => {
       updatedData.tasks = updatedData.tasks.map(

@@ -127,7 +127,7 @@ export const MentorSearchSchema = {
     },
     firstName: {
       type: 'string',
-      title: 'Search Mentor',
+      title: 'Search Key',
       // description: 'Search for a specific user or entity',
     },
     sortBy: {

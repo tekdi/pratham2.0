@@ -27,7 +27,7 @@ export const ContentCreatorSearchSchema = {
     },
     firstName: {
       type: 'string',
-      title: 'Search Content Creator',
+      title: 'Search Key',
     },
     sortBy: {
       type: 'string',

@@ -723,8 +723,6 @@ export interface GetUserProjectTemplateParams {
   solutionId: string;
   role: string;
   cohortId?: string;
-  entityId?: any;
-  acl?: any;
 }
 
 export interface HorizontalLinearStepperProps {

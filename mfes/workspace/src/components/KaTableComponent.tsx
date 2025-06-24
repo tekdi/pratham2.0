@@ -17,10 +17,6 @@ import { MIME_TYPE } from '@workspace/utils/app.config';
 import Image from 'next/image';
 import ActionIcon from './ActionIcon';
 import { Padding } from '@mui/icons-material';
-import QrCode2Icon from '@mui/icons-material/QrCode2';
-import QrModal from './QrModal';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-
 interface CustomTableProps {
   data: any[]; // Define a more specific type for your data if needed
   columns: Array<{
@@ -30,31 +26,23 @@ interface CustomTableProps {
   }>;
   handleDelete?: any;
   tableTitle?: string;
-  showQrCodeButton?: boolean;
 }
 
 const KaTableComponent: React.FC<CustomTableProps> = ({
   data,
   columns,
   tableTitle,
-  showQrCodeButton = false,
 }) => {
   const theme = useTheme<any>();
   const [open, setOpen] = useState(false);
-  const [openQrCodeModal, setOpenQrCodeModal] = useState(false);
-  const [selectedQrValue, setSelectedQrValue] = useState<string>('');
 
-  console.log('data', data);
-  console.log('coumnData', columns);
+  console.log(data);
+  console.log(columns);
 
   const handleClose = () => {
     setOpen(false);
   };
   const handleOpen = () => setOpen(true);
-  const handleOpenQrModal = (qrValue: string) => {
-    setSelectedQrValue(qrValue);
-    setOpenQrCodeModal(true);
-  };
 
   const openEditor = (content: any) => {
     console.log('content', content);
@@ -348,95 +336,15 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
               } else if (props.column.key === 'contentAction') {
                 {
                   return (
-                    <Box display="flex">
+                    <>
                       <ActionIcon rowData={props.rowData} />
-                      {showQrCodeButton && props.rowData.status === 'Live' && (
-                        <>
-                          <IconButton
-                            onClick={() => {
-                              // console.log('rowData', props.rowData);
-                              handleOpenQrModal(
-                                props.rowData.contentType === 'Course'
-                                  ? `${process.env.NEXT_PUBLIC_POS_URL}/pos/content/${props.rowData.identifier}?activeLink=/pos/program`
-                                  : `${process.env.NEXT_PUBLIC_POS_URL}/pos/player/${props.rowData.identifier}?activeLink=/pos/program`
-                              );
-                            }}
-                          >
-                            <QrCode2Icon />{' '}
-                          </IconButton>
-
-                          {/* ✅ Copy to Clipboard Button */}
-                          <IconButton
-                            onClick={() => {
-                              const link =
-                                props.rowData.contentType === 'Course'
-                                  ? `${process.env.NEXT_PUBLIC_POS_URL}/pos/content/${props.rowData.identifier}?activeLink=/pos/program`
-                                  : `${process.env.NEXT_PUBLIC_POS_URL}/pos/player/${props.rowData.identifier}?activeLink=/pos/program`;
-
-                              navigator.clipboard.writeText(link).then(() => {
-                                // Optional: show a tooltip or alert
-                                console.log('Link copied to clipboard');
-                              });
-                            }}
-                          >
-                            <ContentCopyIcon />
-                          </IconButton>
-
-                          <QrModal
-                            open={openQrCodeModal}
-                            onClose={() => setOpenQrCodeModal(false)}
-                            qrValue={selectedQrValue}
-                          />
-                        </>
-                      )}
-                    </Box>
+                    </>
                   );
                 }
               } else if (props.column.key === 'action') {
                 return (
-                  <Box display={'flex'}>
-                    <Box onClick={handleOpen}>
-                      <ActionIcon rowData={props.rowData} />
-                    </Box>
-                    {showQrCodeButton && (
-                      <>
-                        <IconButton
-                          onClick={() => {
-                            // console.log('rowData', props.rowData);
-                            handleOpenQrModal(
-                              props.rowData.contentType === 'Course'
-                                ? `${process.env.NEXT_PUBLIC_POS_URL}/pos/content/${props.rowData.identifier}?activeLink=/pos/program`
-                                : `${process.env.NEXT_PUBLIC_POS_URL}/pos/player/${props.rowData.identifier}?activeLink=/pos/program`
-                            );
-                          }}
-                        >
-                          <QrCode2Icon />{' '}
-                        </IconButton>
-
-                        {/* ✅ Copy to Clipboard Button */}
-                        <IconButton
-                          onClick={() => {
-                            const link =
-                              props.rowData.contentType === 'Course'
-                                ? `${process.env.NEXT_PUBLIC_POS_URL}/pos/content/${props.rowData.identifier}?activeLink=/pos/program`
-                                : `${process.env.NEXT_PUBLIC_POS_URL}/pos/player/${props.rowData.identifier}?activeLink=/pos/program`;
-
-                            navigator.clipboard.writeText(link).then(() => {
-                              // Optional: show a tooltip or alert
-                              console.log('Link copied to clipboard');
-                            });
-                          }}
-                        >
-                          <ContentCopyIcon />
-                        </IconButton>
-
-                        <QrModal
-                          open={openQrCodeModal}
-                          onClose={() => setOpenQrCodeModal(false)}
-                          qrValue={selectedQrValue}
-                        />
-                      </>
-                    )}
+                  <Box onClick={handleOpen}>
+                    <ActionIcon rowData={props.rowData} />
                   </Box>
                 );
               } else if (props.column.key === 'contentType') {

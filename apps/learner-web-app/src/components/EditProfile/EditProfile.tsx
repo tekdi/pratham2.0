@@ -334,7 +334,6 @@ const EditProfile = ({ completeProfile }: EditProfileProps) => {
                 prefilledFormData={completeProfile ? {} : userFormData}
                 hideSubmit={true}
                 type="learner"
-                isCompleteProfile={completeProfile}
               />
             )}
             <Button

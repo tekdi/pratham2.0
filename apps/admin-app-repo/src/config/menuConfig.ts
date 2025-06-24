@@ -8,7 +8,7 @@ export const MENU_CONFIG = {
       link: '/centers',
       roles: [
         Role.ADMIN,
-         Role.CENTRAL_ADMIN, 
+        // Role.CENTRAL_ADMIN, // check
       ],
     },
     batch: {
@@ -17,7 +17,7 @@ export const MENU_CONFIG = {
       link: '/batch',
       roles: [
         Role.ADMIN,
-       Role.CENTRAL_ADMIN, 
+        // Role.CENTRAL_ADMIN, //check
       ],
     },
     manageUsers: {

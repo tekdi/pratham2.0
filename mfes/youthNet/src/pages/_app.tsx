@@ -27,7 +27,6 @@ import rtlPlugin from 'stylis-plugin-rtl';
 import { Box, IconButton } from '@mui/material';
 import { ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
-import { LanguageProvider } from '@shared-lib-v2/lib/context/LanguageContext';
 
 const ColorModeContext = React.createContext({ toggleColorMode: () => {} });
 const poppins = Poppins({
@@ -127,8 +126,7 @@ function CustomApp({ Component, pageProps }: AppProps) {
 
       <CacheProvider value={isRTL ? rtlCache : ltrCache}>
         <CssVarsProvider theme={customTheme}>
-          <LanguageProvider>
-             <Box
+          <Box
             sx={{
               padding: '0',
               '@media (min-width: 900px)': {
@@ -153,8 +151,6 @@ function CustomApp({ Component, pageProps }: AppProps) {
             </QueryClientProvider>
           
           </Box>
-          </LanguageProvider>
-         
         </CssVarsProvider>
       </CacheProvider>
     </>

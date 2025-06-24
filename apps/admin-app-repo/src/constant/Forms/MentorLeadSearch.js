@@ -70,7 +70,7 @@ export const MentorLeadSearchSchema = {
 
     firstName: {
       type: 'string',
-      title: 'Search mentor lead',
+      title: 'Search Key',
       // description: 'Search for a specific user or entity',
     },
     sortBy: {

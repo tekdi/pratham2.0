@@ -30,41 +30,17 @@ const ResourceList = () => {
         let contents = await fetchBulkContents(
           fetchedLearningResources?.map((item: any) => item.id)
         );
-        const hasDuplicateIds = fetchedLearningResources.some(
-          (resource: { id: any }, index: any, array: any[]) => {
-            return array.findIndex((r) => r.id === resource.id) !== index;
-          }
-        );
 
-        if (hasDuplicateIds) {
-          contents = contents?.flatMap((item: any) => {
-            const matchedResources = fetchedLearningResources?.filter(
-              (resource: any) => resource.id === item.identifier
-            );
+        contents = contents?.map((item: any) => {
+          const contentType = fetchedLearningResources?.find(
+            (resource: any) => resource.id === item.identifier
+          )?.type;
 
-            // Create a copy of the item for each matched type
-            return (
-              matchedResources?.map((resource: any) => ({
-                ...item,
-                type: resource.type,
-              })) || []
-            );
-          });
-        } else {
-          contents = contents?.map((item: any) => {
-            const contentType = fetchedLearningResources?.find(
-              (resource: any) => resource.id === item.identifier
-            )?.type;
-
-            return {
-              ...item,
-              type: contentType,
-            };
-          });
-        }
-
-        // console.log('contents!!!!', contents);
-        // console.log('fetchedLearningResources!!!!', fetchedLearningResources);
+          return {
+            ...item,
+            type: contentType,
+          };
+        });
 
         const preRequisite = contents?.filter(
           (item: any) => item.type === ResourceType.LEARNER_PRE_REQUISITE
