@@ -121,7 +121,7 @@ const CreatePage = () => {
           sx={{ transform: 'scale(-1, 1)' }}
         />
       ),
-      onClick: openEditor,
+      onClick: () => router.push( `/ai-assessment-creatore`),
     },
   ];
 
