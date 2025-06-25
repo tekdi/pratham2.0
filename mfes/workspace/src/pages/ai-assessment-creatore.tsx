@@ -37,6 +37,9 @@ import {
   FormControlLabel,
   Snackbar,
   Backdrop,
+  Slider,
+  Checkbox,
+  TableSortLabel,
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -102,9 +105,425 @@ interface Assessment {
   updatedAt: Date;
 }
 
+const poppinsFont = {
+  fontFamily: 'Poppins',
+};
+
+const CustomStepper = () => (
+  <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
+    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+      <Box
+        sx={{
+          width: 32,
+          height: 32,
+          bgcolor: '#FDBE16',
+          borderRadius: '50%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <CheckIcon sx={{ color: '#1F1B13' }} />
+      </Box>
+      <Typography
+        sx={{
+          ml: 2,
+          ...poppinsFont,
+          fontWeight: 500,
+          fontSize: 16,
+          color: '#1F1B13',
+        }}
+      >
+        Select Content
+      </Typography>
+    </Box>
+    <Box sx={{ width: 40, height: 2, bgcolor: '#CDC5BD', mx: 2 }} />
+    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+      <Box
+        sx={{
+          width: 32,
+          height: 32,
+          bgcolor: '#FDBE16',
+          borderRadius: '50%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Typography sx={{ color: '#1F1B13', fontWeight: 500 }}>2</Typography>
+      </Box>
+      <Typography
+        sx={{
+          ml: 2,
+          ...poppinsFont,
+          fontWeight: 500,
+          fontSize: 16,
+          color: '#1F1B13',
+        }}
+      >
+        Set Parameters
+      </Typography>
+    </Box>
+    <Box sx={{ width: 40, height: 2, bgcolor: '#CDC5BD', mx: 2 }} />
+    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+      <Box
+        sx={{
+          width: 32,
+          height: 32,
+          bgcolor: '#DADADA',
+          borderRadius: '50%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Typography sx={{ color: '#FFFFFF', fontWeight: 500 }}>3</Typography>
+      </Box>
+      <Typography
+        sx={{
+          ml: 2,
+          ...poppinsFont,
+          fontWeight: 500,
+          fontSize: 16,
+          color: '#7C766F',
+        }}
+      >
+        Review Questions
+      </Typography>
+    </Box>
+  </Box>
+);
+
+const mockContentSources = [
+  {
+    id: '1',
+    title: 'Math - Chapter 1',
+    description: 'Some description of the content',
+    creator: 'Arun Desai',
+    status: 'Live',
+    lastModified: '24 Apr 2025',
+  },
+  {
+    id: '2',
+    title: 'Math - Chapter 2',
+    description: 'Some description of the content',
+    creator: 'Deepa Kumari',
+    status: 'Draft',
+    lastModified: '24 Apr 2025',
+  },
+  {
+    id: '3',
+    title: 'Math - Chapter 3',
+    description: 'Some description of the content',
+    creator: 'Ravi Kumar',
+    status: 'Draft',
+    lastModified: '4 Apr 2025',
+  },
+  {
+    id: '4',
+    title: 'Math - Chapter 4',
+    description: 'Some description of the content',
+    creator: 'Aarav Sharma',
+    status: 'Live',
+    lastModified: '2 Feb 2025',
+  },
+  {
+    id: '5',
+    title: 'Math - Chapter 5',
+    description: 'Some description of the content',
+    creator: 'Gourav Sen',
+    status: 'Live',
+    lastModified: '16 Jan 2025',
+  },
+];
+
+interface SelectContentStepProps {
+  selected: string[];
+  setSelected: (ids: string[]) => void;
+  onNext: () => void;
+}
+
+const SelectContentStep = ({
+  selected,
+  setSelected,
+  onNext,
+}: SelectContentStepProps) => {
+  const [search, setSearch] = useState('');
+  const [filters, setFilters] = useState({
+    program: '',
+    domain: '',
+    subDomain: '',
+    primaryUser: '',
+    language: '',
+    ageGroup: '',
+    status: '',
+    board: '',
+  });
+  const handleSelect = (id: string) => {
+    if (selected.includes(id)) {
+      setSelected(selected.filter((sid) => sid !== id));
+    } else if (selected.length < 3) {
+      setSelected([...selected, id]);
+    }
+  };
+  const filteredSources = mockContentSources.filter((item) =>
+    item.title.toLowerCase().includes(search.toLowerCase())
+  );
+  return (
+    <Box sx={{ bgcolor: '#F2F5F8', minHeight: '100vh', p: 4 }}>
+      <CustomStepper />
+      <Typography
+        variant="h5"
+        sx={{
+          ...poppinsFont,
+          fontWeight: 400,
+          fontSize: 22,
+          color: '#1F1B13',
+          mb: 2,
+        }}
+      >
+        AI Question Set Generator
+      </Typography>
+      {/* Filter Bar */}
+      <Grid container spacing={2} sx={{ mb: 2 }}>
+        <Grid item>
+          <TextField
+            label="Program(s)"
+            variant="outlined"
+            size="small"
+            sx={{ minWidth: 160 }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <KeyboardArrowRightIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Grid>
+        <Grid item>
+          <TextField
+            label="Domain"
+            variant="outlined"
+            size="small"
+            sx={{ minWidth: 160 }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <KeyboardArrowRightIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Grid>
+        <Grid item>
+          <TextField
+            label="Sub Domain(s)"
+            variant="outlined"
+            size="small"
+            sx={{ minWidth: 160 }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <KeyboardArrowRightIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Grid>
+        <Grid item>
+          <TextField
+            label="Primary User(s)"
+            variant="outlined"
+            size="small"
+            sx={{ minWidth: 160 }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <KeyboardArrowRightIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Grid>
+        <Grid item>
+          <TextField
+            label="Language"
+            variant="outlined"
+            size="small"
+            sx={{ minWidth: 120 }}
+            disabled
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <KeyboardArrowRightIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Grid>
+        <Grid item>
+          <TextField
+            label="Age Group"
+            variant="outlined"
+            size="small"
+            sx={{ minWidth: 120 }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <KeyboardArrowRightIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Grid>
+        <Grid item>
+          <TextField
+            label="Status"
+            variant="outlined"
+            size="small"
+            sx={{ minWidth: 120 }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <KeyboardArrowRightIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Grid>
+        <Grid item>
+          <TextField
+            label="Board"
+            variant="outlined"
+            size="small"
+            sx={{ minWidth: 120 }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <KeyboardArrowRightIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Grid>
+      </Grid>
+      {/* Search Bar */}
+      <Box sx={{ mb: 2, width: 400 }}>
+        <TextField
+          fullWidth
+          size="small"
+          placeholder="Search content.."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+            sx: { bgcolor: '#F0F0F0', borderRadius: 1 },
+          }}
+        />
+      </Box>
+      <Typography
+        sx={{
+          ...poppinsFont,
+          fontWeight: 400,
+          fontSize: 16,
+          color: '#7C766F',
+          mb: 2,
+        }}
+      >
+        Select up to 3 content sources for your questions
+      </Typography>
+      {/* Content Table */}
+      <Card sx={{ borderRadius: 2, boxShadow: 1, mb: 3 }}>
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell></TableCell>
+                <TableCell>Title and description</TableCell>
+                <TableCell>Creator</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell>Last modified</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredSources.map((row) => (
+                <TableRow key={row.id}>
+                  <TableCell>
+                    <Checkbox
+                      checked={selected.includes(row.id)}
+                      onChange={() => handleSelect(row.id)}
+                      disabled={
+                        !selected.includes(row.id) && selected.length >= 3
+                      }
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Typography sx={{ fontWeight: 500 }}>
+                      {row.title}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {row.description}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>{row.creator}</TableCell>
+                  <TableCell>
+                    <Chip
+                      label={row.status}
+                      color={row.status === 'Live' ? 'success' : 'default'}
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell>{row.lastModified}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Card>
+      {/* Navigation Buttons */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
+        <Button
+          variant="outlined"
+          sx={{
+            borderRadius: 100,
+            px: 4,
+            py: 1,
+            fontWeight: 500,
+            ...poppinsFont,
+          }}
+        >
+          Back to Workspace
+        </Button>
+        <Button
+          variant="contained"
+          sx={{
+            borderRadius: 100,
+            px: 4,
+            py: 1,
+            fontWeight: 500,
+            bgcolor: '#FDBE16',
+            color: '#1E1B16',
+            ...poppinsFont,
+          }}
+          disabled={selected.length === 0}
+          onClick={onNext}
+        >
+          Next: Set Parameters
+        </Button>
+      </Box>
+    </Box>
+  );
+};
+
 const AIAssessmentCreator: React.FC = () => {
-  const [selectedKey, setSelectedKey] = useState('create');
+  const [selectedContent, setSelectedContent] = useState<string[]>([]);
   const [activeStep, setActiveStep] = useState(0);
+  const [selectedKey, setSelectedKey] = useState('create');
   const [assessment, setAssessment] = useState<Assessment>({
     id: '',
     title: '',
@@ -224,13 +643,8 @@ const AIAssessmentCreator: React.FC = () => {
     { value: 'fill-blank', label: 'Fill in the Blank', icon: <SpaceBarIcon /> },
   ];
 
-  const handleNext = () => {
-    setActiveStep((prevStep) => prevStep + 1);
-  };
-
-  const handleBack = () => {
-    setActiveStep((prevStep) => prevStep - 1);
-  };
+  const handleNext = () => setActiveStep((s) => s + 1);
+  const handleBack = () => setActiveStep((s) => s - 1);
 
   const handleGenerateQuestions = async () => {
     setIsGenerating(true);
@@ -841,102 +1255,337 @@ const AIAssessmentCreator: React.FC = () => {
     }
   };
 
-  return (
-    <Layout selectedKey={selectedKey} onSelect={setSelectedKey}>
-      <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-        {/* Header */}
-        <Box sx={{ bgcolor: 'primary.main', color: 'white', p: 3 }}>
-          <Typography variant="h4" gutterBottom>
-            <AutoAwesomeIcon sx={{ mr: 2, verticalAlign: 'middle' }} />
-            AI Assessment Creator
-          </Typography>
-          <Typography variant="body1">
-            Create and manage assessments powered by artificial intelligence
-          </Typography>
-        </Box>
-
-        {/* Stepper */}
-        <Box sx={{ p: 3, bgcolor: 'white' }}>
-          <Stepper activeStep={activeStep} alternativeLabel>
-            {steps.map((label) => (
-              <Step key={label}>
-                <StepLabel>{label}</StepLabel>
-              </Step>
-            ))}
-          </Stepper>
-        </Box>
-
-        {/* Main Content */}
-        <Box sx={{ flexGrow: 1, p: 3 }}>
-          <Card>{renderStepContent(activeStep)}</Card>
-
-          {/* Navigation */}
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
-            <Button
-              disabled={activeStep === 0}
-              onClick={handleBack}
-              startIcon={<KeyboardArrowLeftIcon />}
-            >
-              Back
-            </Button>
-            <Box>
-              <Button
-                variant="outlined"
-                onClick={handleSave}
-                startIcon={<SaveIcon />}
-                sx={{ mr: 1 }}
-              >
-                Save Draft
-              </Button>
-              <Button
-                variant="contained"
-                onClick={handleNext}
-                disabled={activeStep === steps.length - 1}
-                endIcon={<KeyboardArrowRightIcon />}
-              >
-                {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-              </Button>
-            </Box>
-          </Box>
-        </Box>
-
-        {/* Snackbar for notifications */}
-        <Snackbar
-          open={snackbar.open}
-          autoHideDuration={6000}
-          onClose={handleCloseSnackbar}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        >
-          <Alert
-            onClose={handleCloseSnackbar}
-            severity={snackbar.severity}
-            sx={{ width: '100%' }}
-          >
-            {snackbar.message}
-          </Alert>
-        </Snackbar>
-
-        {/* Loading Backdrop */}
-        <Backdrop
-          sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-          open={isGenerating}
-        >
-          <Box
+  let stepContent = null;
+  if (activeStep === 0) {
+    stepContent = (
+      <SelectContentStep
+        selected={selectedContent}
+        setSelected={setSelectedContent}
+        onNext={handleNext}
+      />
+    );
+  } else if (activeStep === 1) {
+    stepContent = (
+      <Box>
+        <Box sx={{ bgcolor: '#F2F5F8', minHeight: '100vh', p: 4 }}>
+          <CustomStepper />
+          <Typography
+            variant="h5"
             sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
+              ...poppinsFont,
+              fontWeight: 400,
+              fontSize: 22,
+              color: '#1F1B13',
+              mb: 2,
             }}
           >
-            <CircularProgress color="inherit" />
-            <Typography sx={{ mt: 2 }}>
-              Generating questions with AI...
-            </Typography>
-          </Box>
-        </Backdrop>
+            AI Assessment Creator
+          </Typography>
+          {renderFigmaLayout({ onBack: handleBack })}
+        </Box>
       </Box>
+    );
+  }
+
+  return (
+    <Layout selectedKey={selectedKey} onSelect={setSelectedKey}>
+      {stepContent}
     </Layout>
   );
 };
+
+const renderFigmaLayout = ({ onBack }: { onBack: () => void }) => (
+  <Box>
+    <Grid container spacing={4}>
+      <Grid item xs={12} md={6}>
+        <Card sx={{ borderRadius: 2, boxShadow: 3, p: 3 }}>
+          <Typography
+            sx={{ ...poppinsFont, fontWeight: 500, fontSize: 14, mb: 2 }}
+          >
+            Assessment Information
+          </Typography>
+          <TextField
+            fullWidth
+            label="Assessment Title *"
+            variant="outlined"
+            sx={{ mb: 2 }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <KeyboardArrowRightIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            fullWidth
+            label="Program"
+            variant="outlined"
+            sx={{ mb: 2 }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <KeyboardArrowRightIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            fullWidth
+            label="Domain"
+            variant="outlined"
+            sx={{ mb: 2 }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <KeyboardArrowRightIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            fullWidth
+            label="Sub Domain"
+            variant="outlined"
+            sx={{ mb: 2 }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <KeyboardArrowRightIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            fullWidth
+            label="Subject"
+            variant="outlined"
+            sx={{ mb: 2 }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <KeyboardArrowRightIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            fullWidth
+            label="Target Age Group"
+            variant="outlined"
+            sx={{ mb: 2 }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <KeyboardArrowRightIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            fullWidth
+            label="Primary User"
+            variant="outlined"
+            sx={{ mb: 2 }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <KeyboardArrowRightIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            fullWidth
+            label="Content Language"
+            variant="outlined"
+            sx={{ mb: 2 }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <KeyboardArrowRightIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            fullWidth
+            label="Assessment Type"
+            variant="outlined"
+            sx={{ mb: 2 }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <KeyboardArrowRightIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            fullWidth
+            label="Description/Instructions (Optional)"
+            variant="outlined"
+            multiline
+            rows={4}
+            sx={{ mb: 2 }}
+          />
+        </Card>
+      </Grid>
+      <Grid item xs={12} md={6}>
+        <Card sx={{ borderRadius: 2, boxShadow: 3, p: 3 }}>
+          <Typography
+            sx={{ ...poppinsFont, fontWeight: 500, fontSize: 14, mb: 2 }}
+          >
+            Question Setting
+          </Typography>
+          <TextField
+            fullWidth
+            label="Difficulty Level"
+            variant="outlined"
+            sx={{ mb: 2 }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <KeyboardArrowRightIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            fullWidth
+            label="Question Type"
+            variant="outlined"
+            sx={{ mb: 2 }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <KeyboardArrowRightIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            fullWidth
+            label="Question Distribution"
+            variant="outlined"
+            sx={{ mb: 2 }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <KeyboardArrowRightIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <Box sx={{ mb: 2 }}>
+            <Typography
+              sx={{
+                ...poppinsFont,
+                fontWeight: 400,
+                fontSize: 14,
+                color: '#4D4639',
+                mb: 1,
+              }}
+            >
+              No. of MCQ&apos;s : 2
+            </Typography>
+            <Slider
+              defaultValue={2}
+              min={0}
+              max={10}
+              sx={{ color: '#FDBE16' }}
+            />
+          </Box>
+          <Box sx={{ mb: 2 }}>
+            <Typography
+              sx={{
+                ...poppinsFont,
+                fontWeight: 400,
+                fontSize: 14,
+                color: '#4D4639',
+                mb: 1,
+              }}
+            >
+              No. of Fill in the blanks: 2
+            </Typography>
+            <Slider
+              defaultValue={2}
+              min={0}
+              max={10}
+              sx={{ color: '#FDBE16' }}
+            />
+          </Box>
+          <Box sx={{ mb: 2 }}>
+            <Typography
+              sx={{
+                ...poppinsFont,
+                fontWeight: 400,
+                fontSize: 14,
+                color: '#4D4639',
+                mb: 1,
+              }}
+            >
+              No. of Short Answer Questions : 2
+            </Typography>
+            <Slider
+              defaultValue={2}
+              min={0}
+              max={10}
+              sx={{ color: '#FDBE16' }}
+            />
+          </Box>
+          <Box sx={{ mb: 2 }}>
+            <Typography
+              sx={{
+                ...poppinsFont,
+                fontWeight: 400,
+                fontSize: 14,
+                color: '#4D4639',
+                mb: 1,
+              }}
+            >
+              No. of Long Answer Questions : 2
+            </Typography>
+            <Slider
+              defaultValue={2}
+              min={0}
+              max={10}
+              sx={{ color: '#FDBE16' }}
+            />
+          </Box>
+        </Card>
+      </Grid>
+    </Grid>
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
+      <Button
+        variant="outlined"
+        sx={{
+          borderRadius: 100,
+          px: 4,
+          py: 1,
+          fontWeight: 500,
+          ...poppinsFont,
+        }}
+        onClick={onBack}
+      >
+        Back
+      </Button>
+      <Button
+        variant="contained"
+        sx={{
+          borderRadius: 100,
+          px: 4,
+          py: 1,
+          fontWeight: 500,
+          bgcolor: '#FDBE16',
+          color: '#1E1B16',
+          ...poppinsFont,
+        }}
+      >
+        Next: Review Questionnaire
+      </Button>
+    </Box>
+  </Box>
+);
 
 export default AIAssessmentCreator;
