@@ -20,16 +20,19 @@ const ContentCard = ({
   trackData?: [];
 }) => {
   const { isWrap } = _card ?? {};
+
   if (_card?.cardComponent) {
     return (
-      <_card.cardComponent
-        item={item}
-        type={type}
-        default_img={default_img}
-        _card={_card}
-        handleCardClick={handleCardClick}
-        trackData={trackData}
-      />
+      <CardWrap isWrap={isWrap && type === 'Course'} _card={_card}>
+        <_card.cardComponent
+          item={item}
+          type={type}
+          default_img={default_img}
+          _card={_card}
+          handleCardClick={handleCardClick}
+          trackData={trackData}
+        />
+      </CardWrap>
     );
   }
   return (
