@@ -12,6 +12,12 @@ import {
   AccordionSummary,
   AccordionDetails,
   Chip,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  OutlinedInput,
+  ListItemText,
 } from '@mui/material';
 import { useTranslation } from '../context/LanguageContext';
 import { filterContent, staticFilterContent } from '../../utils/AuthService';
@@ -53,11 +59,13 @@ interface FilterSectionProps {
   isOpenColapsed?: boolean | any[];
   t: (key: string) => string;
   _checkbox?: any;
+  inputType?: Record<string, 'checkbox' | 'dropdown'>;
+  _box?: any;
 }
 
 interface FilterListProps {
   orginalFormData: any;
-  staticFilter?: Record<string, object>;
+  staticFilter?: any;
   onApply?: any;
   filterFramework?: any;
   isShowStaticFilterValue?: boolean;
@@ -76,7 +84,6 @@ export function FilterForm({
   onlyFields,
   _config,
 }: Readonly<FilterListProps>) {
-  const { t } = useTranslation();
   const [filterData, setFilterData] = useState<any[]>([]);
   const [renderForm, setRenderForm] = useState<(Category | StaticField)[]>([]);
   const [formData, setFormData] = useState<Record<string, TermOption[]>>({});
@@ -148,7 +155,6 @@ export function FilterForm({
         {...(_config?._filterBody ?? {})}
       >
         <FilterSection
-          t={t}
           {..._config}
           isShowStaticFilterValue={isShowStaticFilterValue}
           isOpenColapsed={isOpenColapsed}
@@ -330,9 +336,18 @@ const FilterSection: React.FC<FilterSectionProps> = ({
   isShowStaticFilterValue,
   isOpenColapsed,
   _checkbox,
+  inputType = {},
+  _box,
 }) => {
   return (
-    <Box>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 1,
+        ...(_box?.sx ?? {}),
+      }}
+    >
       {fields?.map((field, idx) => {
         const values = field.options ?? field.range ?? [];
         const code = field.code;
@@ -343,7 +358,11 @@ const FilterSection: React.FC<FilterSectionProps> = ({
         const staticValues = Array.isArray(staticFormData?.[code])
           ? staticFormData[code]
           : [];
-        if (Array.isArray(staticValues) && staticValues.length > 0) {
+        if (
+          Array.isArray(staticValues) &&
+          staticValues.length > 0 &&
+          inputType[code] !== 'dropdown'
+        ) {
           if (!isShowStaticFilterValue) {
             return null;
           }
@@ -375,121 +394,177 @@ const FilterSection: React.FC<FilterSectionProps> = ({
               ))}
             </Box>
           );
-        } else {
+        }
+        if (inputType[code] === 'dropdown') {
           return (
-            <Accordion
-              defaultExpanded={
-                Array.isArray(isOpenColapsed)
-                  ? isOpenColapsed.includes(code)
-                  : isOpenColapsed
-              }
-              key={code}
-              sx={{ background: 'unset', boxShadow: 'unset' }}
-            >
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon sx={{ color: '#1C1B1F' }} />}
-                sx={{
-                  px: 0,
-                  minHeight: 20,
-                  '&.Mui-expanded': {
-                    minHeight: 20,
-                    '& .MuiAccordionSummary-content': {
-                      margin: '5px 0',
-                    },
-                  },
-                }}
-              >
-                <Typography
-                  /* @ts-ignore */
-                  variant="body5"
-                  component="div"
-                  sx={{ fontWeight: '500', color: '#181D27' }}
-                >
-                  <SpeakableText>
-                    {field.name === 'Sub Domain' ? 'Category' : field.name}
-                    {/* {field?.options && field?.options?.length} */}
-                  </SpeakableText>
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails
-                sx={{
-                  padding: '0px',
-                  overflow: 'auto',
-                  maxHeight: '150px',
-                }}
-              >
-                <FormGroup>
-                  {optionsToShow.map((item: any, idx: number) => {
-                    const isChecked =
-                      Array.isArray(selected) &&
-                      selected.some((s) =>
-                        typeof s === 'string'
-                          ? s === item.name || s === item
-                          : s.code === item.code || s.name === item.name
-                      );
-                    return (
-                      <FormControlLabel
-                        key={`${code}-${idx}`}
-                        control={
-                          <Checkbox
-                            {..._checkbox}
-                            checked={isChecked}
-                            onChange={(e) => {
-                              const next = e.target.checked
-                                ? [...selected, item]
-                                : selected.filter(
-                                    (s: any) =>
-                                      !(
-                                        (s && item && s === item) ||
-                                        (s && item.code && s === item?.code) ||
-                                        (s && item?.name && s === item?.name) ||
-                                        (s?.code &&
-                                          item.code &&
-                                          s?.code === item?.code) ||
-                                        (s?.name &&
-                                          item?.name &&
-                                          s?.name === item?.name)
-                                      )
-                                  );
-                              onChange(code, next);
-                            }}
-                          />
-                        }
-                        label={
-                          <SpeakableText>{item.name ?? item}</SpeakableText>
-                        }
-                        sx={{
-                          color: '#414651',
-                          fontSize: '14px',
-                          fontWeight: '500',
-                        }}
-                      />
-                    );
-                  })}
-                </FormGroup>
-              </AccordionDetails>
-              {values.length > 3 && !staticValues.length && (
-                <Button
-                  /* @ts-ignore */
-                  variant="text-filter-show-more"
-                  size="small"
-                  onClick={() =>
-                    setShowMore((prev: string[]) =>
-                      prev.includes(code)
-                        ? prev.filter((c) => c !== code)
-                        : [...prev, code]
-                    )
+            <Box key={code} sx={{ width: '100%' }}>
+              <FormControl fullWidth size="medium" sx={{ mt: 1 }}>
+                <InputLabel id={`multi-select-label-${code}`}>
+                  {field.name}
+                </InputLabel>
+                <Select
+                  readOnly={
+                    Array.isArray(staticValues) && staticValues.length > 0
                   }
-                  sx={{ mt: 0, px: 0 }}
+                  labelId={`multi-select-label-${code}`}
+                  multiple
+                  value={selected?.map((s: any) => s.code ?? s.name ?? s)}
+                  onChange={(e) => {
+                    const value = e.target.value as string[];
+                    const next = values.filter((item: any) =>
+                      value.includes(item.code ?? item.name ?? item)
+                    );
+                    onChange(code, next);
+                  }}
+                  renderValue={(selectedVals) =>
+                    (selectedVals as string[])
+                      .map(
+                        (val) =>
+                          values.find(
+                            (item: any) =>
+                              item.code === val || item.name === val
+                          )?.name ?? val
+                      )
+                      .join(', ')
+                  }
                 >
-                  {showMore.includes(code)
-                    ? t('COMMON.SHOW_LESS')
-                    : t('COMMON.SHOW_MORE')}
-                </Button>
-              )}
-            </Accordion>
+                  {values.map((item: any) => (
+                    <MenuItem
+                      key={item.code ?? item.name ?? item}
+                      value={item.code ?? item.name ?? item}
+                    >
+                      <Checkbox
+                        checked={selected.some(
+                          (s: any) =>
+                            (s.code &&
+                              s.code === (item.code ?? item.name ?? item)) ||
+                            (s.name &&
+                              s.name === (item.code ?? item.name ?? item)) ||
+                            s === (item.code ?? item.name ?? item)
+                        )}
+                      />
+                      <ListItemText primary={item.name ?? item} />
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
           );
         }
+        return (
+          <Accordion
+            defaultExpanded={
+              Array.isArray(isOpenColapsed)
+                ? isOpenColapsed.includes(code)
+                : isOpenColapsed
+            }
+            key={code}
+            sx={{ background: 'unset', boxShadow: 'unset' }}
+          >
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon sx={{ color: '#1C1B1F' }} />}
+              sx={{
+                px: 0,
+                minHeight: 20,
+                '&.Mui-expanded': {
+                  minHeight: 20,
+                  '& .MuiAccordionSummary-content': {
+                    margin: '5px 0',
+                  },
+                },
+              }}
+            >
+              <Typography
+                /* @ts-ignore */
+                variant="body5"
+                component="div"
+                sx={{ fontWeight: '500', color: '#181D27' }}
+              >
+                <SpeakableText>
+                  {field.name === 'Sub Domain' ? 'Category' : field.name}
+                </SpeakableText>
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails
+              sx={{
+                padding: '0px',
+                overflow: 'auto',
+                maxHeight: '150px',
+              }}
+            >
+              <FormGroup>
+                {optionsToShow.map((item: any, idx: number) => {
+                  const isChecked =
+                    Array.isArray(selected) &&
+                    selected.some((s) =>
+                      typeof s === 'string'
+                        ? s === item.name || s === item
+                        : s.code === item.code || s.name === item.name
+                    );
+                  return (
+                    <FormControlLabel
+                      key={`${code}-${idx}`}
+                      control={
+                        <Checkbox
+                          {..._checkbox}
+                          checked={isChecked}
+                          onChange={(e) => {
+                            const next = e.target.checked
+                              ? [...selected, item]
+                              : selected.filter(
+                                  (s: any) =>
+                                    !(
+                                      (s && item && s === item) ||
+                                      (s && item.code && s === item?.code) ||
+                                      (s && item?.name && s === item?.name) ||
+                                      (s?.code &&
+                                        item.code &&
+                                        s?.code === item?.code) ||
+                                      (s?.name &&
+                                        item?.name &&
+                                        s?.name === item?.name)
+                                    )
+                                );
+                            onChange(code, next);
+                          }}
+                        />
+                      }
+                      label={<SpeakableText>{item.name ?? item}</SpeakableText>}
+                      sx={{
+                        color: '#414651',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                      }}
+                    />
+                  );
+                })}
+              </FormGroup>
+            </AccordionDetails>
+            {values.length > 3 && !staticValues.length && (
+              <Button
+                /* @ts-ignore */
+                variant="text-filter-show-more"
+                size="small"
+                onClick={() =>
+                  setShowMore((prev: string[]) =>
+                    prev.includes(code)
+                      ? prev.filter((c) => c !== code)
+                      : [...prev, code]
+                  )
+                }
+                sx={{ mt: 0, px: 0 }}
+              >
+                {showMore.includes(code)
+                  ? t
+                    ? t('COMMON.SHOW_LESS')
+                    : 'Show less'
+                  : t
+                  ? t('COMMON.SHOW_MORE')
+                  : 'Show more'}
+              </Button>
+            )}
+          </Accordion>
+        );
       })}
     </Box>
   );

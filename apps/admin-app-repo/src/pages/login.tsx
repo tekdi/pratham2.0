@@ -392,7 +392,10 @@ const LoginPage = () => {
                 JSON.stringify(userResponse)
               );
               const tenantId = userResponse?.tenantData?.[0]?.tenantId;
+              const frameworkId =
+                userResponse?.tenantData?.[0]?.contentFramework;
               TenantService.setTenantId(tenantId);
+              localStorage.setItem('collectionFramework', frameworkId);
               localStorage.setItem('tenantId', tenantId);
             }
 
