@@ -28,6 +28,9 @@ const MyComponent: React.FC = () => {
   const [isLogin, setIsLogin] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isProfileCard, setIsProfileCard] = useState(false);
+const storedConfig = typeof window !== 'undefined'
+  ? JSON.parse(localStorage.getItem('uiConfig') || '{}')
+  : {};
 
   useEffect(() => {
     const fetchTenantInfo = async () => {
@@ -88,7 +91,7 @@ const MyComponent: React.FC = () => {
 
   return (
     <Layout isLoadingChildren={isLoading} sx={gredientStyle}>
-      {isProfileCard && <CompleteProfileBanner />}
+      {isProfileCard && storedConfig.isCompleteProfile && <CompleteProfileBanner />}
       {isLogin && (
         <>
           <Box
@@ -150,9 +153,15 @@ const MyComponent: React.FC = () => {
                   'se_subDomains',
                   'se_subjects',
                 ],
- ...(localStorage.getItem('userProgram') === 'Camp to Club'
-      ? { contentTabs: ['courses', 'content'] }
-      : {}),
+ ...(
+  Array.isArray(storedConfig.showContent)  &&
+  storedConfig.showContent.length === 2  &&
+  storedConfig.showContent.includes('courses') &&
+  storedConfig.showContent.includes('contents')
+    ? { contentTabs: ['courses', 'content'] }
+    : {}
+),
+
                 staticFilter: {
                   se_domains:
                     typeof filter.filters?.domain === 'string'

@@ -360,6 +360,22 @@ const handleSuccessfulLogin = async (
 
         const tenantId = userResponse?.tenantData?.[0]?.tenantId;
         const tenantName = userResponse?.tenantData?.[0]?.tenantName;
+               const uiConfig = userResponse?.tenantData?.[0]?.params?.uiConfig;
+// const uiConfig = {
+//   showSignIn: true,
+//   showSignup: false,
+//   showContent: ['contents', 'courses'],
+//   showProgram: false,
+//   isDoTracking: true,
+//   isTrackingShow: true,
+//   isCompleteProfile: false,
+//     isEditProfile: false
+
+// };
+
+// Store in localStorage
+localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
+
         localStorage.setItem('tenantId', tenantId);
         localStorage.setItem('userProgram', tenantName);
         await profileComplitionCheck();
