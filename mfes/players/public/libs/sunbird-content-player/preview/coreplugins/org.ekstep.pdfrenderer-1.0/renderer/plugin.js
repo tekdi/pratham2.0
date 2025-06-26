@@ -1,3 +1,4 @@
+
 org.ekstep.contentrenderer.baseLauncher.extend({
     _manifest: undefined,
     CURRENT_PAGE: undefined,
@@ -6,6 +7,16 @@ org.ekstep.contentrenderer.baseLauncher.extend({
     PAGE_RENDERING_IN_PROGRESS: undefined,
     PDF_DOC: undefined,
     CANVAS_CTX: undefined,
+    USE_ONLY_CSS_ZOOM: true,
+    TEXT_LAYER_MODE: 0, // DISABLE,
+    DEFAULT_SCALE_VALUE: 'auto',
+    DEFAULT_SCALE_DELTA : 1.1,
+    MIN_SCALE: 0.25,
+    MAX_SCALE: 10.0,
+    messages: {
+        noInternetConnection: "Internet not available. Please connect and try again."
+    },
+    optionalData: {},
     context: undefined,
     stageId: [],
     heartBeatData: {},
@@ -20,6 +31,9 @@ org.ekstep.contentrenderer.baseLauncher.extend({
             launchEvent: "renderer:launch:pdf"
         }
     },
+    pdfViewer: null,
+    pdfDocument:null,
+
     initLauncher: function(manifestData) {
         console.info('PDF Renderer init', manifestData)
         EkstepRendererAPI.addEventListener(this._constants.events.launchEvent, this.start, this);
@@ -29,22 +43,25 @@ org.ekstep.contentrenderer.baseLauncher.extend({
     },
 
     renderCurrentScaledPage: function () {
-        var instance = this;
-        context.PDF_DOC.getPage(context.CURRENT_PAGE).then(function (page) {
-            if (instance.headerTimer) clearTimeout(instance.headerTimer);
-            // Get viewport of the page at required scale
-            var viewport = page.getViewport(previousScale);
-            // Set canvas height
-            context.CANVAS.height = viewport.height;
-            var renderContext = {
-                canvasContext: context.CANVAS_CTX,
-                viewport: viewport
-            };
-            // Render the page contents in the canvas
-            page.render(renderContext).then(function () {
-                context.PAGE_RENDERING_IN_PROGRESS = 0;
-            });
+        var container = document.getElementById(this.manifest.id);
+        var pdfViewer = new pdfjsViewer.PDFViewer({
+            container: container,
+            l10n: context.l10n,
+            useOnlyCssZoom: context.USE_ONLY_CSS_ZOOM,
+            textLayerMode: context.TEXT_LAYER_MODE,
         });
+
+        this.pdfViewer = pdfViewer;
+       
+        document.addEventListener('pagesinit', function () {
+            // We can use pdfViewer now, e.g. let's change default scale.
+            context.pdfViewer.currentScaleValue = context.DEFAULT_SCALE_VALUE;
+            $("#pdf-loader").css("display","none");
+            $("#pdf-contents").show();
+            // $("#pdf-buttons").show();
+             $("#pdf-find-text").val(context.pdfViewer.currentPageNumber);
+        });
+    
     },
 
     enableOverly: function () {
@@ -53,9 +70,16 @@ org.ekstep.contentrenderer.baseLauncher.extend({
         $('#pdf-buttons').css({
             display: 'none'
         });
+        setTimeout(function() {
+            jQuery('previous-navigation').show();
+            jQuery('next-navigation').show();
+            jQuery('custom-previous-navigation').hide();
+            jQuery('custom-next-navigation').hide();
+        }, 100);
     },
     start: function() {
         this._super();
+        this.l10n = pdfjsViewer.NullL10n;
         context = this;
         var data = _.clone(content);
         this.initContentProgress();
@@ -66,16 +90,21 @@ org.ekstep.contentrenderer.baseLauncher.extend({
             if(!regex.test(globalConfigObj.basepath)){
                 var prefix_url = globalConfigObj.basepath || '';
                 path = prefix_url + "/" + data.artifactUrl + "?" + new Date().getSeconds();
+                context.optionalData = { "artifactUrl": path };
             }else
                 path = data.streamingUrl;
+                context.optionalData = { "streamingUrl": path };
         } else {
             path = data.artifactUrl + "?" + new Date().getSeconds();
+            context.optionalData = { "artifactUrl": path };
         }
-        console.log("path pdf is ", path);
+        
         var div = document.createElement('div');
         div.src = path;
         context.addToGameArea(div);
         context.renderPDF(path, document.getElementById(this.manifest.id), this.manifest);
+        
+
         setTimeout(function() {
             context.enableOverly();
         }, 100);
@@ -101,9 +130,14 @@ org.ekstep.contentrenderer.baseLauncher.extend({
         this.enableOverly();
     },
     renderPDF: function(path, canvasContainer) {
+
+
         EkstepRendererAPI.dispatchEvent("renderer:splash:hide");
         var pdfMainContainer = document.createElement("div");
         pdfMainContainer.id = "pdf-main-container";
+
+        var pdfBodyContainer = document.createElement("div");
+        pdfBodyContainer.id = "pdf-body-container";
 
         var pdfLoader = document.createElement("div");
         pdfLoader.id = "pdf-loader";
@@ -128,17 +162,26 @@ org.ekstep.contentrenderer.baseLauncher.extend({
         var pdfButtons = document.createElement("div");
         pdfButtons.id = "pdf-buttons";
 
-        var pdfPrevButton = document.createElement("button");
-        pdfPrevButton.id = "pdf-prev";
-        pdfPrevButton.textContent = "Previous";
+        // var pdfZoomIn = document.createElement("img");
+        // pdfZoomIn.src = "assets/icons/zoom-in1.png";
+        // pdfZoomIn.id = "pdf-zoomIn";
+        
 
-        var pdfNextButton = document.createElement("button");
-        pdfNextButton.id = "pdf-next";
-        pdfNextButton.textContent = "Next";
+        // var pdfZoomOut = document.createElement("img");
+        // pdfZoomOut.src = "assets/icons/zoom-out1.png";
+        // pdfZoomOut.id = "pdf-zoomOut";
+        
 
         var pdfDownloadContainer = document.createElement("div");
         pdfDownloadContainer.id = "pdf-download-container";
         pdfDownloadContainer.className = "download-pdf-image";
+
+        /**pdf error popup to download pdf */
+        var pdfErrorPopup = document.createElement("div");
+        var pdfErrorMessage = document.createElement("p");
+        pdfErrorPopup.id = "pdf-error-popup";
+        pdfErrorMessage.textContent = "Your internet connection is unstable. Please download the PDF to play the content.";
+        pdfErrorPopup.appendChild(pdfErrorMessage);
 
         var pdfTitleContainer = document.createElement("div");
         pdfTitleContainer.textContent = content.name;
@@ -150,11 +193,8 @@ org.ekstep.contentrenderer.baseLauncher.extend({
 
         if (!window.cordova){
             pdfMetaData.appendChild(pdfDownloadContainer);
-            this.addDownloadButton(path, pdfDownloadContainer);
+            this.addDownloadButton(path, pdfDownloadContainer, true);
         }
-
-        pdfButtons.appendChild(pdfPrevButton);
-        pdfButtons.appendChild(pdfNextButton);
 
         var pageCountContainer = document.createElement("div");
         pageCountContainer.id = "page-count-container";
@@ -169,11 +209,6 @@ org.ekstep.contentrenderer.baseLauncher.extend({
         var pageName = document.createElement("span");
         pageName.textContent = "Page ";
 
-        var findTextField = document.createElement("input");
-        findTextField.type = "number";
-        findTextField.id = "pdf-find-text";
-        findTextField.className = "search-input";
-        findTextField.min = 1;
 
         var goButton = document.createElement("div");
         goButton.className = "search-page-pdf-arrow-container";
@@ -192,6 +227,13 @@ org.ekstep.contentrenderer.baseLauncher.extend({
         pdfTotalPages.id = "pdf-total-pages";
         pdfTotalPages.className = "bold-page"
 
+        var findTextField = document.createElement("input");
+        findTextField.type = "number";
+        findTextField.id = "pdf-find-text";
+        findTextField.className = "search-input";
+        findTextField.min = 1;
+        // findTextField.max = parseInt(document.getElementById('pdf-total-pages').innerHTML);
+
         var searchPdfTotalPages = document.createElement('div');
         searchPdfTotalPages.className = "search-page-number";
 
@@ -204,10 +246,13 @@ org.ekstep.contentrenderer.baseLauncher.extend({
         pageCountContainer.appendChild(goButton);
         pageCountContainer.appendChild(searchPdfTotalPages);
 
-
-        pdfMetaData.appendChild(pdfButtons);
+        
+        // pdfButtons.appendChild(pdfZoomIn);
+        // pdfButtons.appendChild(pdfZoomOut);
+        
         pdfMetaData.appendChild(pdfSearchContainer);
         pdfMetaData.appendChild(pdfTitleContainer);
+        //pdfMetaData.appendChild(pdfButtons);
         pdfMetaData.appendChild(pageCountContainer);
 
         var sbPdfBody = document.createElement('div');
@@ -219,27 +264,26 @@ org.ekstep.contentrenderer.baseLauncher.extend({
         pdfCanvas.width = "700";
         pdfCanvas.style = "maxHeight:100px";
 
-        var pageLoader = document.createElement("div");
-        pageLoader.id = "page-loader";
-        pageLoader.textContent = "Loading page ...";
-
         sbPdfBody.appendChild(pdfCanvas);
 
         pdfContents.appendChild(pdfMetaData);
         pdfContents.appendChild(pdfMetaDataFake);
         pdfContents.appendChild(sbPdfBody);
-        pdfContents.appendChild(pageLoader);
         pdfContents.appendChild(pdfNoPage);
 
-        pdfMainContainer.appendChild(pdfLoader);
-        pdfMainContainer.appendChild(pdfContents);
-
+    
+        pdfBodyContainer.appendChild(pdfLoader);
+        pdfBodyContainer.appendChild(pdfContents);
+        //pdfBodyContainer.appendChild(sbPdfBody);
+        pdfBodyContainer.appendChild(pdfErrorPopup);
 
         canvasContainer.appendChild(pdfMainContainer);
 
+        canvasContainer.appendChild(pdfBodyContainer);
+
         document.getElementById(this.manifest.id).style.overflow = "auto";
 
-        var hammerManager = new Hammer(pdfContents, {
+        var hammerManager = new Hammer(pdfMainContainer, {
             touchAction: "pan-x pan-y"
         });
         hammerManager.get('pinch').set({ enable: true });
@@ -251,12 +295,14 @@ org.ekstep.contentrenderer.baseLauncher.extend({
             pinchType = 'pinchOut';
         });
         hammerManager.on("pinchend", function (ev) {
-            if (pinchType === 'pinchIn' && previousScale >= 0.50) {
-                previousScale = previousScale - 0.25;
-                context.renderCurrentScaledPage();
-            } else if (pinchType === 'pinchOut' && previousScale <= 3) {
-                previousScale = previousScale + 0.25;
-                context.renderCurrentScaledPage();
+            if (pinchType === 'pinchIn') {
+               // previousScale = previousScale - 0.25;
+                //context.renderCurrentScaledPage();
+                context.zoomOut();
+            } else if (pinchType === 'pinchOut') {
+                //previousScale = previousScale + 0.25;
+                //context.renderCurrentScaledPage();
+                 context.zoomIn();
             }
             pinchType = undefined;
         });
@@ -268,17 +314,20 @@ org.ekstep.contentrenderer.baseLauncher.extend({
         context.CANVAS = $('#pdf-canvas').get(0);
         context.CANVAS_CTX = context.CANVAS.getContext('2d');
 
-        console.log("CANVAS", context.CANVAS);
+        
+          context.renderCurrentScaledPage();
+        
 
         $(".search-page-pdf-arrow-container").on('click', function() {
             var searchText = document.getElementById("pdf-find-text");
             console.log("SEARCH TEXT", searchText.value);
+            context.value = searchText.value;
+            context.pdfViewer.currentPageNumber = (searchText.value | 0);
             context.logInteractEvent("TOUCH", "navigate", "TOUCH", {
-                stageId: context.CURRENT_PAGE.toString(),
+                stageId: context.pdfViewer.currentPageNumber.toString(),
                 subtype: ''
             });
-            context.logImpressionEvent(context.CURRENT_PAGE.toString(), searchText.value);
-            context.showPage(parseInt(searchText.value));
+            context.logImpressionEvent(context.pdfViewer.currentPageNumber.toString(), searchText.value);
         });
 
         $('#pdf-find-text').on('focus blur', function(e) {
@@ -297,50 +346,62 @@ org.ekstep.contentrenderer.baseLauncher.extend({
             event.preventDefault();
         });
 
-        $('#pdf-prev').on('click', function() {
-            context.logInteractEvent("TOUCH", "previous", "TOUCH", {
-                stageId: context.CURRENT_PAGE.toString()
-            });
-            context.previousNavigation();
-        });
-        $('#pdf-next').on('click', function() {
-            context.logInteractEvent("TOUCH", "next", "TOUCH", {
-                stageId: context.CURRENT_PAGE.toString()
-            });
-            context.nextNavigation();
-        });
+
+        // document.getElementById('pdf-zoomIn').addEventListener('click', function() {
+        //     context.zoomIn();
+        //   });
+      
+        //   document.getElementById('pdf-zoomOut').addEventListener('click', function() {
+        //     context.zoomOut();
+        //   });
+
         this.heartBeatData.stageId = context.CURRENT_PAGE.toString();
         context.showPDF(path, context.manifest);
         var obj = {"tempName": "navigationTop"};
         EkstepRendererAPI.dispatchEvent("renderer:navigation:load", obj);
 
         // listening to scroll event for pdf
+       
         document.getElementById(this.manifest.id).onscroll = function () {
-            if (!isPageRenderingInProgress) {
-                if ($(this).scrollTop() <= 0) {
-                    context.logInteractEvent("TOUCH", "previous", "TOUCH", {
-                        stageId: context.CURRENT_PAGE.toString()
-                    });
-                    if (context.CURRENT_PAGE != 1)
-                        context.previousNavigation();
-                } else if ($(this)[0].offsetHeight + $(this).scrollTop() >= $(this)[0].scrollHeight) {
-                    context.logInteractEvent("TOUCH", "next", "TOUCH", {
-                        stageId: context.CURRENT_PAGE.toString()
-                    })
-                    context.nextNavigation()
+                var pageNumber = document.getElementById('pdf-find-text').value;
+                if(!context.stageId.includes(context.pdfViewer.currentPageNumber.toString())){
+                    context.stageId.push(context.pdfViewer.currentPageNumber.toString());
                 }
-            }
+               $("#pdf-find-text").val(context.pdfViewer.currentPageNumber);
+                  if(pageNumber>context.pdfViewer.currentPageNumber){
+                    $("#pLoader").css("display","block");
+                    context.logInteractEvent("TOUCH", "previous", "TOUCH", {
+                        stageId: context.pdfViewer.currentPageNumber.toString()
+                    });
+                  }else if(pageNumber<context.pdfViewer.currentPageNumber){
+                    $("#pLoader").css("display","block");
+                    context.logInteractEvent("TOUCH", "next", "TOUCH", {
+                        stageId: context.pdfViewer.currentPageNumber.toString()
+                    });
+                  }
+
+                  if($(this)[0].offsetHeight + $(this).scrollTop() >= $(this)[0].scrollHeight) {
+                    EkstepRendererAPI.dispatchEvent('renderer:content:end');
+                }
+            
         }
     },
-    addDownloadButton: function(path, pdfSearchContainer){
+    addDownloadButton: function(path, pdfSearchContainer, showIcon, callback){
         if(!path.length) return false;
         var instance = this;
-        var downloadBtn = document.createElement("img");
-        downloadBtn.id = "download-btn";
-        downloadBtn.src = "assets/icons/down-arrow.png";
-        downloadBtn.className = "pdf-download-btn";
+        if (showIcon){
+            var downloadBtn = document.createElement("img");
+            downloadBtn.id = "download-btn";
+            downloadBtn.src = "assets/icons/down-arrow.png";
+            downloadBtn.className = "pdf-download-btn";
+        }else {
+            var downloadBtn = document.createElement("BUTTON");
+            downloadBtn.textContent = "Download PDF";
+            downloadBtn.className = "sb-btn sb-btn-normal sb-btn-primary";
+        }
         downloadBtn.onclick = function(){
-            window.open(path, '_blank');
+            callback && callback();
+            if (!window.cordova) window.open(path, '_blank');
             context.logInteractEvent("TOUCH", "Download", "TOUCH", {
                 stageId: context.CURRENT_PAGE.toString(),
                 subtype: ''
@@ -348,34 +409,57 @@ org.ekstep.contentrenderer.baseLauncher.extend({
         };
         pdfSearchContainer.appendChild(downloadBtn);
     },
+
+    zoomIn: function pdfViewZoomIn(ticks) {
+        var newScale = context.pdfViewer.currentScale;
+        do {
+          newScale = (newScale * context.DEFAULT_SCALE_DELTA).toFixed(2);
+          newScale = Math.ceil(newScale * 10) / 10;
+          newScale = Math.min(context.MAX_SCALE, newScale);
+        } while (--ticks && newScale < context.MAX_SCALE);
+        context.pdfViewer.currentScaleValue = newScale;
+      },
+    
+      zoomOut: function pdfViewZoomOut(ticks) {
+        var newScale = context.pdfViewer.currentScale;
+        do {
+          newScale = (newScale / context.DEFAULT_SCALE_DELTA).toFixed(2);
+          newScale = Math.floor(newScale * 10) / 10;
+          newScale = Math.max(context.MIN_SCALE, newScale);
+        } while (--ticks && newScale > context.MIN_SCALE);
+        context.pdfViewer.currentScaleValue = newScale;
+      },
+
     nextNavigation: function() {
         if (this.sleepMode) return;
-        context.logInteractEvent("TOUCH", "next", null, {
-            stageId: context.CURRENT_PAGE.toString()
-        });
-        //EkstepRendererAPI.getTelemetryService().navigate(context.CURRENT_PAGE.toString(), (context.CURRENT_PAGE + 1).toString());
-        if (context.CURRENT_PAGE != context.TOTAL_PAGES) {
-            context.showPage(++context.CURRENT_PAGE);
-        } else if (context.CURRENT_PAGE == context.TOTAL_PAGES) {
+        // context.logInteractEvent("TOUCH", "next", null, {
+        //     stageId: context.CURRENT_PAGE.toString()
+        // });
+        EkstepRendererAPI.getTelemetryService().navigate(context.pdfViewer.currentPageNumber.toString(), (context.pdfViewer.currentPageNumber + 1).toString());
+        if (context.pdfViewer.currentPageNumber != context.pdfDocument.numPages) {
+           context.pdfViewer.currentPageNumber++
+        } else if (context.pdfViewer.currentPageNumber === context.pdfDocument.numPages) {
             EkstepRendererAPI.dispatchEvent('renderer:content:end');
         }
     },
     previousNavigation: function() {
         if (this.sleepMode) return;
-        context.logInteractEvent("TOUCH", "previous", null, {
-            stageId: context.CURRENT_PAGE.toString()
-        });
-        //EkstepRendererAPI.getTelemetryService().navigate(context.CURRENT_PAGE.toString(), (context.CURRENT_PAGE - 1).toString());
-        if(context.CURRENT_PAGE == 1) {
-            contentExitCall();
+        // context.logInteractEvent("TOUCH", "previous", null, {
+        //     stageId: context.CURRENT_PAGE.toString()
+        // });
+        EkstepRendererAPI.getTelemetryService().navigate(context.pdfViewer.currentPageNumber.toString(), (context.pdfViewer.currentPageNumber - 1).toString());
+        if(context.pdfViewer.currentPageNumber != 1){
+            context.pdfViewer.currentPageNumber--
         }
-        if (context.CURRENT_PAGE != 1)
-            context.showPage(--context.CURRENT_PAGE);
     },
     showPDF: function(pdf_url) {
+        var instance = this;
+        if (!navigator.onLine) {
+            instance.throwError({ message: instance.messages.noInternetConnection });
+        }
         try {
-            var instance = this;
-            $("#pdf-loader").show(); // use rendere loader
+            $("#pdf-error-popup").css("display","none");
+            $("#pdf-loader").css("display","block"); // use rendere loader
             console.log("MANIFEST DATA", this.manifest)
             console.log("pdfjsLib lib", pdfjsLib)
             pdfjsLib.disableWorker = true;
@@ -384,141 +468,54 @@ org.ekstep.contentrenderer.baseLauncher.extend({
             // The workerSrc property shall be specified.
             pdfjsLib.GlobalWorkerOptions.workerSrc = org.ekstep.pluginframework.pluginManager.resolvePluginResource(this.manifest.id, this.manifest.ver, "renderer/libs/pdf.worker.js");
             var loadPDf = pdfjsLib.getDocument(pdf_url)
-            loadPDf.promise.then(function(pdf_doc) {
-                context.PDF_DOC = pdf_doc;
-                context.TOTAL_PAGES = context.PDF_DOC.numPages;
+            loadPDf.promise.then(function(pdfDocument) {
+                context.PDF_DOC = pdfDocument;
+                context.TOTAL_PAGES = pdfDocument.numPages;
+                context.pdfDocument = pdfDocument;
+                context.pdfViewer.setDocument(pdfDocument);
+                $("#pdf-total-pages").text(pdfDocument.numPages);
+                $('#pdf-find-text').prop('max',context.TOTAL_PAGES);
 
-                // Hide the pdf loader and show pdf container in HTML
-                $("#pdf-loader").hide();
-                $("#pdf-contents").show();
-                context.CANVAS.width = $('#pdf-contents').width();
-                $("#pdf-total-pages").text(context.TOTAL_PAGES);
-
-                // Show the first page
-                context.showPage(1);
             }).catch(function(error) {
                 // If error re-show the upload button
-                $("#pdf-loader").hide();
+                $("#pdf-loader").css("display","none");
                 $("#upload-button").show();
-                error.message = "Missing PDF"
-                context.throwError(error);
+                if (!error.message) {
+                    error.message = (navigator.onLine) ? "Missing PDF" : "No internet - Missing PDF";
+                }else{
+                    error.message = (navigator.onLine) ? error.message : "No internet - " + error.message;
+                }
+                error.logFullError = true;
+                error.message = error.message + "options: " + JSON.stringify(context.optionalData);
+                $("#pdf-error-popup").css("display","flex");
+                var pdfErrorPopup = $("#pdf-error-popup")[0];
+                instance.addDownloadButton(pdf_url, pdfErrorPopup, false, function(){
+                    error.pdfUrl = pdf_url;
+                    instance.postError(error);
+                });
+                EkstepRendererAPI.logErrorEvent(error, {
+                    'type': 'content',
+                    'action': 'play',
+                    'severity': 'error'
+                });
             });
         }
         catch (e){
             console.log(e);
-            // TelemetryService.error({
-            //     err: e.code,
-            //     errtype: "CONTENT",
-            //     stacktrace: data.stacktrace || "",
-            //     pageid: "PDF-renderer",
-            //     plugin: {
-            //         "id": instance.manifest.id,
-            //         "ver": instance.manifest.ver,
-            //         "category": "core"
-            //       }
-            // });
-        }
-    },
-    showPage: function(page_no) {
-        isPageRenderingInProgress = true;
-        var instance = this;
-
-        /** To log telemetyr impression event **/
-        var navigateStageId = context.CURRENT_PAGE;
-        var navigateStageTo = page_no;
-
-        EkstepRendererAPI.dispatchEvent("sceneEnter", context);
-        EkstepRendererAPI.dispatchEvent("overlayPrevious", true);
-        if(page_no == 1) {
-            EkstepRendererAPI.dispatchEvent("renderer:previous:show");
-        }
-        if (page_no <= context.TOTAL_PAGES && page_no > 0) {
-
-            context.PAGE_RENDERING_IN_PROGRESS = 1;
-            context.CURRENT_PAGE = this.heartBeatData.stageId = page_no;
-
-            // Disable Prev & Next buttons while page is being loaded
-            $("#pdf-next, #pdf-prev").attr('disabled', 'disabled');
-
-            // While page is being rendered hide the canvas and show a loading message
-            $("#pdf-canvas").hide();
-            $("#pdf-no-page").hide();
-            $("#page-loader").show();
-
-            // Update current page in HTML
-            $("#pdf-find-text").val(page_no);
-
-            // Fetch the page
-            context.PDF_DOC.getPage(page_no).then(function(page) {
-                if(instance.headerTimer) clearTimeout(instance.headerTimer);
-                // As the canvas is of a fixed width we need to set the scale of the viewport accordingly
-                var scale_required = context.CANVAS.width / page.getViewport(1).width;
-                previousScale = scale_required;
-                // Get viewport of the page at required scale
-                var viewport = page.getViewport(scale_required);
-
-                // Set canvas height
-                context.CANVAS.height = viewport.height;
-
-                var renderContext = {
-                    canvasContext: context.CANVAS_CTX,
-                    viewport: viewport
-                };
-
-                // Render the page contents in the canvas
-                page.render(renderContext).then(function() {
-                    context.PAGE_RENDERING_IN_PROGRESS = 0;
-
-                    // Re-enable Prev & Next buttons
-                    $("#pdf-next, #pdf-prev").removeAttr('disabled');
-
-                    // Show the canvas and hide the page loader
-                    $("#pdf-canvas").show();
-                    $("#page-loader").hide();
-
-                    instance.logImpressionEvent(navigateStageId, navigateStageTo);
-
-                    instance.applyOpacityToNavbar(true);
-                    instance.headerTimer = setTimeout(function() {
-                        clearTimeout(instance.headerTimer);
-                        instance.applyOpacityToNavbar(false);
-                    }, 2000);
-
-                    $("#pdf-meta").on("mouseover click", function() {
-                        if($("#pdf-meta").hasClass("loweropacity"))
-                            instance.applyOpacityToNavbar(true);
-                    });
-
-                    $("#pdf-meta").on("mouseleave scroll", function() {
-                        if($("#pdf-meta").hasClass("higheropacity"))
-                            instance.applyOpacityToNavbar(false);
-                    });
-                    setTimeout(function () {
-                        isPageRenderingInProgress = false;
-                        $(document.getElementById(instance.manifest.id)).scrollTop(1);
-                    }, 100)
-                });
+            TelemetryService.error({
+                err: e.code,
+                errtype: "CONTENT",
+                stacktrace: data.stacktrace || "",
+                pageid: "PDF-renderer",
+                plugin: {
+                    "id": instance.manifest.id,
+                    "ver": instance.manifest.ver,
+                    "category": "core"
+                  }
             });
-        } else {
-            showToaster('error', "Page not found");
-            //$("#pdf-no-page").show();
-            $("#page-loader").hide();
-            isPageRenderingInProgress = false;
-            //$("#pdf-canvas").hide();
         }
     },
-    applyOpacityToNavbar: function(opacity) {
-        if (!opacity) {
-            $("#pdf-meta, #page-count-container, #pdf-search-container").removeClass('higheropacity');
-            $("#pdf-meta, #page-count-container, #pdf-search-container").addClass('loweropacity');
-            $("#pdf-meta, #page-count-container, #pdf-download-container").addClass('loweropacity');
-        } else {
-            $("#pdf-meta, #page-count-container, #pdf-search-container").removeClass('loweropacity');
-            $("#pdf-meta, #page-count-container, #pdf-search-container").addClass('higheropacity');
-            $("#pdf-meta, #page-count-container, #pdf-download-container").addClass('higheropacity');
-
-        }
-    },
+   
     initContentProgress: function() {
         var instance = this;
         EkstepRendererAPI.addEventListener("sceneEnter", function(event) {
@@ -531,6 +528,29 @@ org.ekstep.contentrenderer.baseLauncher.extend({
         var currentStageIndex = _.size(_.uniq(this.stageId)) || 1;
         return this.progres(currentStageIndex, totalStages);
     },
+    contentPlaySummary: function () {
+        var playSummary =  [
+            {
+              "totallength":  parseInt(this.TOTAL_PAGES)
+            },
+            {
+              "visitedlength": parseInt(_.max(this.stageId))
+            },
+            {
+              "visitedcontentend": (this.TOTAL_PAGES == Math.max.apply(Math, this.stageId)) ? true : false
+            },
+            {
+              "totalseekedlength": parseInt(this.TOTAL_PAGES) - _.size(_.uniq(this.stageId))
+            }
+        ]
+        return playSummary;
+    },
+
+    // use this methos to send additional content statistics
+    additionalContentSummary: function () {
+        return
+    },
+
     logInteractEvent: function(type, id, extype, eks, eid){
         window.PLAYER_STAGE_START_TIME = Date.now()/1000;
         EkstepRendererAPI.getTelemetryService().interact(type, id, extype, eks,eid);
@@ -539,6 +559,20 @@ org.ekstep.contentrenderer.baseLauncher.extend({
         EkstepRendererAPI.getTelemetryService().navigate(stageId, stageTo, {
             "duration": (Date.now()/1000) - window.PLAYER_STAGE_START_TIME
         });
+    },
+    postError: function(error){
+        var origin = ""
+        if (!window.location.origin) {
+            origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ":" + window.location.port : "")
+        } else {
+            origin = window.location.origin
+        }
+
+        if (window.cordova){
+            window.postMessage({"player.pdf-renderer.error": error}, origin)
+        }else{
+            parent.postMessage({"player.pdf-renderer.error": error}, origin)
+        }
     }
 });
 
