@@ -19,6 +19,7 @@ const App = () => {
         <ContentEnrollDetails
           isShowLayout={false}
           _config={{
+            isEnrollmentRequired: false,
             userIdLocalstorageName: 'did',
             contentBaseUrl: '/pos/content',
             default_img: '/images/image_ver.png',

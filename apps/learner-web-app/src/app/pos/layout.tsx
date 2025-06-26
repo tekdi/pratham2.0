@@ -1,6 +1,7 @@
 import 'react-toastify/dist/ReactToastify.css';
 import POSMuiThemeProvider from '@learner/assets/theme/POSMuiThemeProvider';
 import { GlobalProvider } from '@learner/components/Provider/GlobalProvider';
+import GoogleAnalyticsTracker from '@learner/components/GoogleAnalyticsTracker/GoogleAnalyticsTracker';
 
 export const metadata = {
   title: 'Welcome to learner-web-app',
@@ -12,7 +13,7 @@ export const metadata = {
       'Learner web app is a platform for users to learn and grow by consuming educational content',
     images: [
       {
-        url: `${process.env.NEXT_PUBLIC_BASE_URL}/logo.png`,
+        url: `/logo.png`,
         width: 800,
         height: 600,
       },
@@ -26,7 +27,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <GlobalProvider>
-      <POSMuiThemeProvider>{children}</POSMuiThemeProvider>
+      <POSMuiThemeProvider>
+        <GoogleAnalyticsTracker />
+        {children}
+      </POSMuiThemeProvider>
     </GlobalProvider>
   );
 }

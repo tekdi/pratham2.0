@@ -13,6 +13,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { ExpandableText, useTranslation } from '@shared-lib';
 import BreadCrumb from '../BreadCrumb';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
+import LoginIcon from '@mui/icons-material/Login';
 
 interface InfoCardProps {
   item: any;
@@ -41,6 +42,8 @@ const InfoCard: React.FC<InfoCardProps> = ({
           flexDirection: { xs: 'column', sm: 'row', md: 'row' },
           borderRadius: 0,
           ..._infoCard?._card,
+          boxShadow: 'none',
+          backgroundColor: '#F5F5F5',
         }}
       >
         <CardMedia
@@ -79,7 +82,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   gap: 1,
-                  pt: { xs: 0, md: 2 },
+                  pt: { xs: 0, md: 0 },
                 }}
               >
                 <IconButton
@@ -153,36 +156,38 @@ const InfoCard: React.FC<InfoCardProps> = ({
                     </SpeakableText>
                   </Typography>
                 ) : (
-                  <Typography
-                    variant="body1"
-                    component="div"
-                    sx={{
-                      width: 'fit-content',
-                      borderRadius: '12px',
-                      pt: 1,
-                      pr: 2,
-                      pb: 1,
-                      pl: 2,
-                      bgcolor: '#FFDEA1',
-                      // fontSize: { xs: '14px', sm: '16px', md: '16px' },
-                      // lineHeight: { xs: '20px', sm: '22px', md: '26px' },
-                    }}
-                  >
-                    <SpeakableText>
-                      {t('LEARNER_APP.COURSE.STARTED_ON')}:{' '}
-                      {item?.startedOn
-                        ? new Intl.DateTimeFormat('en-GB', {
-                            day: '2-digit',
-                            month: 'short',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: true,
-                          }).format(new Date(item.startedOn))
-                        : ' - '}
-                    </SpeakableText>
-                    {/* {JSON.stringify(_infoCard?.isShowStatus || {})} */}
-                  </Typography>
+                  item?.startedOn && (
+                    <Typography
+                      variant="body1"
+                      component="div"
+                      sx={{
+                        width: 'fit-content',
+                        borderRadius: '12px',
+                        pt: 1,
+                        pr: 2,
+                        pb: 1,
+                        pl: 2,
+                        bgcolor: '#FFDEA1',
+                        // fontSize: { xs: '14px', sm: '16px', md: '16px' },
+                        // lineHeight: { xs: '20px', sm: '22px', md: '26px' },
+                      }}
+                    >
+                      <SpeakableText>
+                        {t('LEARNER_APP.COURSE.STARTED_ON')}:{' '}
+                        {item?.startedOn
+                          ? new Intl.DateTimeFormat('en-GB', {
+                              day: '2-digit',
+                              month: 'short',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              hour12: true,
+                            }).format(new Date(item.startedOn))
+                          : ' - '}
+                      </SpeakableText>
+                      {/* {JSON.stringify(_infoCard?.isShowStatus || {})} */}
+                    </Typography>
+                  )
                 ))}
               {!_infoCard?.isHideStatus && (
                 <Button
@@ -202,6 +207,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
       <CommonModal
         open={openModal}
         // onClose={() => setOpenModal(false)}
+        buttonText={checkLocalAuth ? 'Start Learning' : 'Login First'}
         onStartLearning={_config?.onButtonClick}
       >
         <Box
@@ -213,7 +219,12 @@ const InfoCard: React.FC<InfoCardProps> = ({
             px: 3,
           }}
         >
-          <CheckCircleIcon sx={{ color: '#21A400', fontSize: 48, mb: 1 }} />
+          {checkLocalAuth ? (
+            <CheckCircleIcon sx={{ color: '#21A400', fontSize: 48, mb: 1 }} />
+          ) : (
+            <LoginIcon sx={{ color: '#21A400', fontSize: 48, mb: 1 }} />
+          )}
+
           <Typography
             variant="h1"
             component="div"

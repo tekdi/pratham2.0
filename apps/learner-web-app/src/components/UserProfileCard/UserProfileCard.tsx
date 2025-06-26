@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Box,
   Typography,
@@ -40,15 +42,22 @@ const UserProfileCard = () => {
   const { t } = useTranslation();
   const [selectedOption, setSelectedOption] = useState('');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+const storedConfig = typeof window !== 'undefined'
+  ? JSON.parse(localStorage.getItem('uiConfig') || '{}')
+  : {};
+
 
   const options = [
-    t('LEARNER_APP.USER_PROFILE_CARD.EDIT_PROFILE'),
+   // t('LEARNER_APP.USER_PROFILE_CARD.EDIT_PROFILE'),
     // t('LEARNER_APP.USER_PROFILE_CARD.CHANGE_USERNAME'),
     t('LEARNER_APP.USER_PROFILE_CARD.CHANGE_PASSWORD'),
     t('LEARNER_APP.USER_PROFILE_CARD.PRIVACY_GUIDELINES'),
     t('LEARNER_APP.USER_PROFILE_CARD.CONSENT_FORM'),
     t('COMMON.FAQS'),
   ];
+if(storedConfig?.isEditProfile){
+options.push(t('LEARNER_APP.USER_PROFILE_CARD.EDIT_PROFILE'));
+}
   const isBelow18 = (dob: string): boolean => {
     const birthDate = new Date(dob);
     const today = new Date();
@@ -424,9 +433,7 @@ const UserProfileCard = () => {
               {t('LEARNER_APP.USER_PROFILE_CARD.FUTURE_WORK')}
             </Typography>
             <Typography sx={valueStyle}>
-              {t('LEARNER_APP.USER_PROFILE_CARD.I_WANT_TO_BECOME', {
-                defaultValue: futureWork,
-              })}
+              - I want to become {futureWork}
             </Typography>
           </Box>
         </Box>

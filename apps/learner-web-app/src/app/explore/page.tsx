@@ -150,6 +150,7 @@ const App = () => {
       <LearnerCourse
         title={'LEARNER_APP.EXPLORE.EXPLORE_ADDITIONAL_COURSES'}
         _content={{
+          pageName: 'explore_Content',
           onlyFields: ['contentLanguage', 'se_subDomains', 'se_subjects'],
           isOpenColapsed: ['contentLanguage', 'se_subDomains', 'se_subjects'],
           contentTabs: ['courses', 'content'],

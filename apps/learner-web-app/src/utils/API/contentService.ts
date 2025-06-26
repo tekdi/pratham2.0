@@ -1,5 +1,6 @@
 import { post, get } from '@shared-lib';
 import { API_ENDPOINTS, COURSE_L2_ENDPOINTS } from './EndUrls';
+import { AxiosHeaderValue } from 'axios';
 export interface courseWiseLernerListParam {
   limit?: number;
   offset?: number;
@@ -8,6 +9,29 @@ export interface courseWiseLernerListParam {
     userId?: string[];
   };
 }
+
+export const hierarchyAPI = async (doId: string, params?: object) => {
+  try {
+    // Ensure the environment variable is defined
+    const searchApiUrl = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;
+    if (!searchApiUrl) {
+      throw new Error('Search API URL environment variable is not configured');
+    }
+
+    // Execute the request
+    const response = await get(
+      `${searchApiUrl}/api/course/v1/hierarchy/${doId}`,
+      { params: params as AxiosHeaderValue, maxBodyLength: Infinity }
+    );
+    const res = response?.data?.result?.content;
+
+    return res;
+  } catch (error) {
+    console.error('Error in ContentSearch:', error);
+    return { error };
+  }
+};
+
 export const fetchContent = async (identifier: any) => {
   try {
     const API_URL = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/api/content/v1/read/${identifier}`;
@@ -21,7 +45,7 @@ export const fetchContent = async (identifier: any) => {
     return response?.data?.result?.content;
   } catch (error) {
     console.error('Error fetching content:', error);
-    throw error;
+    return error;
   }
 };
 

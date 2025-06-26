@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import SimpleModal from '@forget-password/Components/SimpleModal/SimpleModal';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import OtpVerificationComponent from '@forget-password/Components/OtpVerificationComponent/OtpVerificationComponent';
 import ForgotPasswordComponent from '@forget-password/Components/ForgotPasswordComponent/ForgotPasswordComponent';
 import { sendOTP, verifyOTP } from '@forget-password/utils/API/OtPService';
@@ -13,6 +13,7 @@ import { Box } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 const ForgotPassword = ({}) => {
   const router = useRouter();
+  const pathname = usePathname();
 
   const [mobileNumber, setMobileNumber] = useState<string>('');
   const [hash, setHash] = useState<string>('');
@@ -29,7 +30,16 @@ const ForgotPassword = ({}) => {
     const isValidMobileNumber = /^[0-9]{10}$/.test(value);
 
     if (isValidMobileNumber) {
-      router.push(`/account-selection?mobile=${value}`);
+      let mobile=value;
+       const response = await userCheck({ mobile });
+      console.log('response', response?.result[0]?.mobile);
+      if (response?.result[0]?.mobile) {
+       router.push(`/account-selection?mobile=${value}`);
+        }
+        else{
+                  showToastMessage('Please enter valid mobile number', 'error');
+
+        }
     } else {
       setEnterdUserName(value);
       const mobile = await fetchMobileByUsername(value);
@@ -119,7 +129,22 @@ const ForgotPassword = ({}) => {
           cursor: 'pointer',
           width: 'fit-content',
         }}
-        onClick={() => router.back()}
+        onClick={() => {
+         if (localStorage.getItem('appMode')) {
+      const query = new URLSearchParams({
+        tab: 'learnerAndroidApp',
+
+      }).toString();
+      router.push(`${pathname}?${query}`);
+                 //   window.open("pratham://learnerapp", '_self');
+
+         } 
+        else
+        {
+          router.back();
+        }
+          
+         }}
       >
         <ArrowBackIcon
           sx={{ color: '#4B5563', '&:hover': { color: '#000' } }}

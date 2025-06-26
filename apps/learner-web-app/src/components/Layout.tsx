@@ -20,18 +20,152 @@ import ConfirmationModal from './ConfirmationModal/ConfirmationModal';
 import { checkAuth } from '@shared-lib-v2/utils/AuthService';
 import MuiThemeProvider from '@learner/assets/theme/MuiThemeProvider';
 
+// Custom DrawerItem interface
 interface NewDrawerItemProp extends DrawerItemProp {
   variant?: 'contained' | 'text';
   isActive?: boolean;
   customStyle?: React.CSSProperties;
 }
 
+// Nav config by userProgram
+const NAV_CONFIG: Record<
+  string,
+  (params: {
+    router: any;
+    isMobile: boolean;
+    t: any;
+    handleNavClick: (cb: () => void) => void;
+    handleProfileClick: () => void;
+    handleLogoutModal: () => void;
+    setAnchorEl: (el: boolean) => void;
+    getLinkStyle: (active: boolean) => React.CSSProperties;
+    currentPage: string;
+    checkAuth: boolean;
+  }) => NewDrawerItemProp[]
+> = {
+  YouthNet: ({
+    router,
+    isMobile,
+    t,
+    handleNavClick,
+    handleProfileClick,
+    handleLogoutModal,
+    setAnchorEl,
+    getLinkStyle,
+    currentPage,
+    checkAuth,
+  }) => {
+    const navLinks: NewDrawerItemProp[] = [
+      {
+        title: t('LEARNER_APP.COMMON.L1_COURSES'),
+        icon: <Home sx={{ width: 28, height: 28 }} />,
+        to: () => handleNavClick(() => router.push('/content')),
+        isActive: currentPage === '/content',
+        customStyle: getLinkStyle(currentPage === '/content'),
+      },
+    ];
+
+    const isVolunteer = JSON.parse(
+      localStorage.getItem('isVolunteer') || 'false'
+    );
+    if (isVolunteer) {
+      navLinks.push({
+        title: t('LEARNER_APP.COMMON.SURVEYS'),
+        icon: <AssignmentOutlined sx={{ width: 28, height: 28 }} />,
+        to: () => handleNavClick(() => router.push('/observations')),
+        isActive: currentPage === '/observations',
+        customStyle: getLinkStyle(currentPage === '/observations'),
+      });
+    }
+
+    if (checkAuth) {
+      if (isMobile) {
+        navLinks.push(
+          {
+            title: t('LEARNER_APP.COMMON.PROFILE'),
+            icon: <AccountCircleOutlined sx={{ width: 28, height: 28 }} />,
+            to: () => handleNavClick(handleProfileClick),
+            isActive: currentPage === '/profile',
+            customStyle: getLinkStyle(currentPage === '/profile'),
+          },
+          {
+            title: t('COMMON.LOGOUT'),
+            icon: <Logout sx={{ width: 28, height: 28 }} />,
+            to: () => handleNavClick(handleLogoutModal),
+            isActive: false,
+            customStyle: {},
+          }
+        );
+      } else {
+        navLinks.push(
+          {
+            title: t('COMMON.SKILLING_CENTERS'),
+            icon: (
+              <img
+                src="/images/engineering.png"
+                alt="Skill Center"
+                style={{ width: 28, height: 28 }}
+              />
+            ),
+            to: () => handleNavClick(() => router.push('/skill-center')),
+            isActive: currentPage === '/skill-center',
+            customStyle: {},
+          }
+        );
+      }
+    }
+
+    // Always add Profile link at the end
+    navLinks.push({
+      title: t('LEARNER_APP.COMMON.PROFILE'),
+      icon: <AccountCircleOutlined sx={{ width: 28, height: 28 }} />,
+      to: () => setAnchorEl(true),
+      isActive: currentPage === '/profile',
+      customStyle: getLinkStyle(currentPage === '/profile'),
+    });
+
+    return navLinks;
+  },
+
+  'Camp to Club': ({
+    router,
+    t,
+    handleNavClick,
+    getLinkStyle,
+    currentPage,
+    setAnchorEl,
+  }) => {
+    const navLinks: NewDrawerItemProp[] = [
+      {
+        title: t('LEARNER_APP.COMMON.COURSES'),
+        icon: <AssignmentOutlined sx={{ width: 28, height: 28 }} />,
+        to: () => handleNavClick(() => router.push('/club-courses')),
+        isActive: currentPage === '/club-courses',
+        customStyle: getLinkStyle(currentPage === '/club-courses'),
+      },
+    ];
+
+    // Always add Profile link at the end
+    navLinks.push({
+      title: t('LEARNER_APP.COMMON.PROFILE'),
+      icon: <AccountCircleOutlined sx={{ width: 28, height: 28 }} />,
+      to: () => setAnchorEl(true),
+      isActive: currentPage === '/profile',
+      customStyle: getLinkStyle(currentPage === '/profile'),
+    });
+
+    return navLinks;
+  },
+};
+
 const App: React.FC<LayoutProps> = ({ children, ...props }) => {
   const router = useRouter();
   const pathname = usePathname();
   const { t, setLanguage } = useTranslation();
 
-  const [defaultNavLinks, setDefaultNavLinks] = useState<NewDrawerItemProp[]>([]);
+  const [defaultNavLinks, setDefaultNavLinks] = useState<NewDrawerItemProp[]>(
+    []
+  );
   const [anchorEl, setAnchorEl] = useState<any>(null);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
 
@@ -48,8 +182,6 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
   const handleLogoutClick = () => router.push('/logout');
   const handleLogoutModal = () => setModalOpen(true);
   const handleCloseModel = () => setModalOpen(false);
-
-  // ✅ Simplified version without trying to close drawer
   const handleNavClick = (callback: () => void) => {
     callback();
   };
@@ -69,55 +201,23 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
       currentPage = activeLink || window.location.pathname || '';
     }
 
-    const navLinks: NewDrawerItemProp[] = [
-      {
-        title: t('LEARNER_APP.COMMON.L1_COURSES'),
-        icon: <Home sx={{ width: 28, height: 28 }} />,
-        to: () => handleNavClick(() => router.push('/content')),
-        isActive: currentPage === '/content',
-        customStyle: getLinkStyle(currentPage === '/content'),
-      },
-    ];
+    const program = localStorage.getItem('userProgram') || '';
+    const configFn = NAV_CONFIG[program];
 
-    const isVolunteer = JSON.parse(localStorage.getItem('isVolunteer') || 'false');
-    if (isVolunteer) {
-      navLinks.push({
-        title: t('LEARNER_APP.COMMON.SURVEYS'),
-        icon: <AssignmentOutlined sx={{ width: 28, height: 28 }} />,
-        to: () => handleNavClick(() => router.push('/observations')),
-        isActive: currentPage === '/observations',
-        customStyle: getLinkStyle(currentPage === '/observations'),
-      });
-    }
-
-    if (checkAuth()) {
-      if (isMobile) {
-        navLinks.push(
-          {
-            title: t('LEARNER_APP.COMMON.PROFILE'),
-            icon: <AccountCircleOutlined sx={{ width: 28, height: 28 }} />,
-            to: () => handleNavClick(handleProfileClick),
-            isActive: currentPage === '/profile',
-            customStyle: getLinkStyle(currentPage === '/profile'),
-          },
-          {
-            title: t('COMMON.LOGOUT'),
-            icon: <Logout sx={{ width: 28, height: 28 }} />,
-            to: () => handleNavClick(handleLogoutModal),
-            isActive: false,
-            customStyle: {},
-          }
-        );
-      } else {
-        navLinks.push({
-          title: t('LEARNER_APP.COMMON.PROFILE'),
-          icon: <AccountCircleOutlined sx={{ width: 28, height: 28 }} />,
-          to: () => setAnchorEl(true),
-          isActive: currentPage === '/profile',
-          customStyle: getLinkStyle(currentPage === '/profile'),
-        });
-      }
-    }
+    const navLinks = configFn
+      ? configFn({
+          router,
+          isMobile,
+          t,
+          handleNavClick,
+          handleProfileClick,
+          handleLogoutModal,
+          setAnchorEl,
+          getLinkStyle,
+          currentPage,
+          checkAuth: checkAuth(),
+        })
+      : [];
 
     setDefaultNavLinks(navLinks);
   }, [t, router, isMobile]);
@@ -130,7 +230,10 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
       {...props}
       _topAppBar={{
         _brand: {
-          name: typeof window !== 'undefined' ? localStorage.getItem('userProgram') ?? '' : '',
+          name:
+            typeof window !== 'undefined'
+              ? localStorage.getItem('userProgram') ?? ''
+              : '',
           _box: {
             onClick: () => router.push('/content'),
             sx: {

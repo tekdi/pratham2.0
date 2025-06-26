@@ -8,6 +8,7 @@ interface LoaderProps {
   children?: ReactNode;
   _loader?: React.CSSProperties;
   _children?: React.CSSProperties;
+  _childrenBox?: any;
   isHideMaxHeight?: boolean;
 }
 
@@ -17,6 +18,7 @@ export const Loader: React.FC<LoaderProps> = memo(
     layoutHeight,
     _loader,
     _children,
+    _childrenBox,
     children,
     isHideMaxHeight,
   }) => {
@@ -42,7 +44,8 @@ export const Loader: React.FC<LoaderProps> = memo(
           </Box>
         )}
         <Box
-          style={{
+          {..._childrenBox}
+          sx={{
             width: '100%',
             overflowY: 'auto',
             display: isLoading ? 'none' : 'block',

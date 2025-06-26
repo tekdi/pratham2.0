@@ -4,12 +4,13 @@ import React, { useState } from 'react';
 import SimpleModal from '@forget-password/Components/SimpleModal/SimpleModal';
 import ResetPasswordForm from '@forget-password/Components/ResetPasswordForm/ResetPasswordForm';
 import PasswordResetSuccess from '@forget-password/Components/PasswordResetSuccess/PasswordResetSuccess';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Box } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { forgetPassword } from '@forget-password/utils/API/resetPasswordService';
 const ResetPasswordPage = ({}) => {
   const router = useRouter();
+  const pathname = usePathname();
 
   const [resetPasswordSuccessModal, setResetPasswordSuccessModal] =
     useState(false);
@@ -27,7 +28,16 @@ const ResetPasswordPage = ({}) => {
 
   const onCloseSuccessModal = () => {
     const route = localStorage.getItem('redirectionRoute');
-    if (route) router.push(route);
+    const appMode = localStorage.getItem('appMode');
+    if (appMode) {
+      const query = new URLSearchParams({
+        tab: 'learnerAndroidApp',
+      }).toString();
+      router.push(`${pathname}?${query}`);
+   // window.open("pratham://learnerapp", '_self');
+
+    } else if (route) router.push(route);
+    else router.push('/login');
 
     setResetPasswordSuccessModal(false);
   };

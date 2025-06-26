@@ -49,7 +49,7 @@ interface CommonCardProps {
   TrackData?: any[];
   item: ContentItem;
   type: string;
-  onClick?: () => void;
+  onClick?: (e: any) => void;
   _card?: any;
 }
 
@@ -176,7 +176,10 @@ export const CommonCard: React.FC<CommonCardProps> = ({
         )}
 
         {/* Progress Bar Overlay */}
-        <StatusBar {...statusBar} _card={_card} />
+        {/* Progress Bar Overlay */}
+        {!_card?.isHideProgressStatus && (
+          <StatusBar {...statusBar} _card={_card} />
+        )}
       </Box>
       {avatarLetter && subheader && (
         <CardHeader
@@ -254,9 +257,13 @@ export const CommonCard: React.FC<CommonCardProps> = ({
                 ..._card?._contentText?.sx,
               }}
             >
-              {typeof content === 'string'
-                ? capitalize(content[0]) + content.slice(1)
-                : content}
+              {typeof content === 'string' ? (
+                <SpeakableText>
+                  {capitalize(content[0]) + content.slice(1)}
+                </SpeakableText>
+              ) : (
+                content
+              )}
             </Typography>
           </CardContent>
         )}
