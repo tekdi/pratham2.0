@@ -180,6 +180,50 @@ export const getContent = async (
   }
 };
 
+
+export const getContentPDF = async ({
+  query,
+  limit,
+  offset,
+  sort_by,
+  filters,
+}: {
+  query: string;
+  limit: number;
+  offset: number;
+  sort_by: any;
+  filters: {
+    status?: string[];
+    primaryCategory?: string[];
+    channel?: any;
+    contentType?: string;
+    state?: string;
+    [key: string]: any; // Allow additional dynamic filters if needed
+  };
+}) => {
+  const apiURL = "/action/composite/v3/search";
+
+  try {
+    const reqBody = {
+      request: {
+        query,
+        filters: {
+          ...filters,
+          mimeType: "application/pdf",
+        },
+        sort_by,
+        limit,
+        offset,
+      },
+    };
+
+    const response = await post(apiURL, reqBody);
+    return response?.data?.result;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const createQuestionSet = async (frameworkId: any) => {
   const apiURL = `/action/questionset/v2/create`;
   const reqBody = {

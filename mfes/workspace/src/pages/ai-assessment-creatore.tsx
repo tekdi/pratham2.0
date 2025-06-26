@@ -5,26 +5,36 @@ import WorkspaceHeader from '../components/WorkspaceHeader';
 import { getLocalStoredUserId } from '../services/LocalStorageService';
 import SelectContent from '../components/ai-assessment/SelectContent';
 import SetParameters from '../components/ai-assessment/SetParameters';
+import useTenantConfig from '../hooks/useTenantConfig';
+import AIGenerationDialog from '../components/ai-assessment/AIGenerationDialog';
+import { createQuestionSet } from '@workspace/services/ContentService';
 
 const poppinsFont = {
   fontFamily: 'Poppins',
 };
 
-const CustomStepper = () => (
+const CustomStepper = ({ activeStep }: { activeStep: number }) => (
   <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
       <Box
         sx={{
           width: 32,
           height: 32,
-          bgcolor: '#FDBE16',
+          bgcolor: activeStep <= 2 ? '#FDBE16' : '#DADADA',
           borderRadius: '50%',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        <Typography sx={{ color: '#1F1B13', fontWeight: 500 }}>1</Typography>
+        <Typography
+          sx={{
+            color: activeStep <= 2 ? '#1F1B13' : '#FFFFFF',
+            fontWeight: 500,
+          }}
+        >
+          1
+        </Typography>
       </Box>
       <Typography
         sx={{
@@ -32,7 +42,7 @@ const CustomStepper = () => (
           ...poppinsFont,
           fontWeight: 500,
           fontSize: 16,
-          color: '#1F1B13',
+          color: activeStep <= 2 ? '#1F1B13' : '#7C766F',
         }}
       >
         Select Content
@@ -44,14 +54,21 @@ const CustomStepper = () => (
         sx={{
           width: 32,
           height: 32,
-          bgcolor: '#FDBE16',
+          bgcolor: activeStep === 1 ? '#FDBE16' : '#DADADA',
           borderRadius: '50%',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        <Typography sx={{ color: '#1F1B13', fontWeight: 500 }}>2</Typography>
+        <Typography
+          sx={{
+            color: activeStep === 1 ? '#1F1B13' : '#FFFFFF',
+            fontWeight: 500,
+          }}
+        >
+          2
+        </Typography>
       </Box>
       <Typography
         sx={{
@@ -59,7 +76,7 @@ const CustomStepper = () => (
           ...poppinsFont,
           fontWeight: 500,
           fontSize: 16,
-          color: '#1F1B13',
+          color: activeStep === 1 ? '#1F1B13' : '#7C766F',
         }}
       >
         Set Parameters
@@ -71,14 +88,21 @@ const CustomStepper = () => (
         sx={{
           width: 32,
           height: 32,
-          bgcolor: '#DADADA',
+          bgcolor: activeStep === 2 ? '#FDBE16' : '#DADADA',
           borderRadius: '50%',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        <Typography sx={{ color: '#FFFFFF', fontWeight: 500 }}>3</Typography>
+        <Typography
+          sx={{
+            color: activeStep === 2 ? '#1F1B13' : '#FFFFFF',
+            fontWeight: 500,
+          }}
+        >
+          3
+        </Typography>
       </Box>
       <Typography
         sx={{
@@ -86,7 +110,7 @@ const CustomStepper = () => (
           ...poppinsFont,
           fontWeight: 500,
           fontSize: 16,
-          color: '#7C766F',
+          color: activeStep === 2 ? '#1F1B13' : '#7C766F',
         }}
       >
         Review Questions
@@ -94,12 +118,41 @@ const CustomStepper = () => (
     </Box>
   </Box>
 );
+const staticFilter = {
+  program: [
+    typeof window !== 'undefined' ? localStorage.getItem('program') : '',
+  ],
+  // se_subjects: ['English'],
+};
 
+const onlyFields = [
+  'program',
+  'se_domains',
+  'se_subDomains',
+  'se_subjects',
+  'primaryUser',
+  'targetAgeGroup',
+  'contentLanguage',
+];
+const inputType = {
+  program: 'dropdown',
+  se_domains: 'dropdown',
+  se_subDomains: 'dropdown',
+  se_subjects: 'dropdown',
+  primaryUser: 'dropdown',
+  targetAgeGroup: 'dropdown',
+  contentLanguage: 'dropdown',
+};
 const AIAssessmentCreator: React.FC = () => {
   const [selectedContent, setSelectedContent] = useState<string[]>([]);
   const [activeStep, setActiveStep] = useState(0);
   const [selectedKey, setSelectedKey] = useState('create');
   const [showHeader, setShowHeader] = useState<boolean | null>(null);
+  const [formState, setFormState] = useState<any>({});
+  const tenantConfig = useTenantConfig();
+  const [showAIDialog, setShowAIDialog] = useState(false);
+  const [progress, setProgress] = useState(0);
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     const userId = getLocalStoredUserId();
@@ -112,21 +165,85 @@ const AIAssessmentCreator: React.FC = () => {
       document.cookie = `userId=${userId}; path=/; secure; SameSite=Strict`;
     }
   }, []);
-  const handleNext = () => setActiveStep((s) => s + 1);
+
+  const handleNextFromSelectContent = (newFormData: any) => {
+    setFormState((prev: any) => ({
+      ...prev,
+      ...newFormData,
+    }));
+    setActiveStep((s) => s + 1);
+  };
+
+  const fetchData = async () => {
+    try {
+      const response = await createQuestionSet(
+        tenantConfig?.COLLECTION_FRAMEWORK
+      );
+      return response?.result?.identifier;
+    } catch (error) {
+      console.error('Error creating question set:', error);
+    }
+  };
+  const handleNextFromSetParameters = (parameters: any) => {
+    const newFormState = {
+      framework: tenantConfig?.CONTENT_FRAMEWORK,
+      channel: tenantConfig?.CHANNEL_ID,
+      ...parameters,
+    };
+    setFormState((prev: any) => ({ ...prev, ...newFormState }));
+    // setActiveStep((s) => s + 1);
+    handleSubmit(newFormState);
+  };
+
   const handleBack = () => setActiveStep((s) => s - 1);
+
+  const handleSubmit = (formData: any) => {
+    // const identifier = fetchData();
+    setShowAIDialog(true);
+    setProgress(0);
+    let prog = 0;
+    const interval = setInterval(() => {
+      prog += 1;
+      setProgress(prog);
+      if (prog >= 100) {
+        clearInterval(interval);
+        setTimeout(() => setShowAIDialog(false), 400);
+      }
+    }, 600);
+    // TODO: Replace with real API call and progress logic
+    console.log('Form Data:', formData);
+  };
 
   let stepContent = null;
   if (activeStep === 0) {
     stepContent = (
       <SelectContent
+        formState={formState}
         selected={selectedContent}
         setSelected={setSelectedContent}
-        onNext={handleNext}
+        staticFilter={staticFilter}
+        onlyFields={onlyFields}
+        inputType={inputType}
+        onNext={handleNextFromSelectContent}
       />
     );
   } else if (activeStep === 1) {
     stepContent = (
-      <Box>
+      <SetParameters
+        formState={formState}
+        staticFilter={staticFilter}
+        onlyFields={onlyFields}
+        inputType={inputType}
+        onNext={(parameters: any) => handleNextFromSetParameters(parameters)}
+        onBack={handleBack}
+      />
+    );
+  }
+
+  return (
+    <Layout selectedKey={selectedKey} onSelect={setSelectedKey}>
+      {showHeader && <WorkspaceHeader />}
+      <Box p={3} sx={{ minHeight: '100vh', background: '#F2F5F8' }}>
         <Typography
           variant="h5"
           sx={{
@@ -137,20 +254,19 @@ const AIAssessmentCreator: React.FC = () => {
             mb: 2,
           }}
         >
-          AI Assessment Creator
+          AI Question Set Generator
         </Typography>
-        <SetParameters onBack={handleBack} />
-      </Box>
-    );
-  }
-
-  return (
-    <Layout selectedKey={selectedKey} onSelect={setSelectedKey}>
-      {showHeader && <WorkspaceHeader />}
-
-      <Box sx={{ bgcolor: '#F2F5F8', minHeight: '100vh', p: 4 }}>
-        <CustomStepper />
-        {stepContent}
+        <CustomStepper activeStep={activeStep} />
+        <Box
+          sx={{
+            background: '#fff',
+            borderRadius: '8px',
+            boxShadow: '0px 2px 6px 2px #00000026',
+          }}
+        >
+          {stepContent}
+        </Box>
+        <AIGenerationDialog open={showAIDialog} progress={progress} />
       </Box>
     </Layout>
   );

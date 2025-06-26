@@ -1,82 +1,177 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
-  Card,
   TextField,
   Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   InputAdornment,
   Chip,
-  Checkbox,
 } from '@mui/material';
-import { Search as SearchIcon } from '@mui/icons-material';
+import SearchIcon from '@mui/icons-material/Search';
 import { FilterForm } from '@shared-lib-v2/lib/Filter/FilterForm';
+import { getContentPDF } from '../../services/ContentService';
+import KaTableComponent from '../KaTableComponent';
+import { DataType } from 'ka-table/enums';
+import useTenantConfig from '../../hooks/useTenantConfig';
 
 const poppinsFont = {
   fontFamily: 'Poppins',
 };
 
-const mockContentSources = [
+interface SelectContentProps {
+  formState: any;
+  selected: string[];
+  setSelected: (ids: string[]) => void;
+  staticFilter: any;
+  onlyFields?: any;
+  inputType?: any;
+  onNext: (filter: any) => void;
+}
+
+const columns = [
   {
-    id: '1',
-    title: 'Math - Chapter 1',
-    description: 'Some description of the content',
-    creator: 'Arun Desai',
-    status: 'Live',
-    lastModified: '24 Apr 2025',
+    key: 'title_and_description',
+    title: 'TITLE & DESCRIPTION',
+    dataType: DataType.String,
+    width: '350px',
   },
   {
-    id: '2',
-    title: 'Math - Chapter 2',
-    description: 'Some description of the content',
-    creator: 'Deepa Kumari',
-    status: 'Draft',
-    lastModified: '24 Apr 2025',
+    key: 'create-by',
+    title: 'CREATED BY',
+    dataType: DataType.String,
+    width: '100px',
   },
+  // {
+  //   key: 'contentType',
+  //   title: 'CONTENT TYPE',
+  //   dataType: DataType.String,
+  //   width: '100px',
+  // },
+  // {
+  //   key: 'language',
+  //   title: 'Content Language',
+  //   dataType: DataType.String,
+  //   width: '200px',
+  // },
+  // { key: 'state', title: 'STATE', dataType: DataType.String, width: '100px' },
+  { key: 'status', title: 'STATUS', dataType: DataType.String, width: '100px' },
   {
-    id: '3',
-    title: 'Math - Chapter 3',
-    description: 'Some description of the content',
-    creator: 'Ravi Kumar',
-    status: 'Draft',
-    lastModified: '4 Apr 2025',
-  },
-  {
-    id: '4',
-    title: 'Math - Chapter 4',
-    description: 'Some description of the content',
-    creator: 'Aarav Sharma',
-    status: 'Live',
-    lastModified: '2 Feb 2025',
-  },
-  {
-    id: '5',
-    title: 'Math - Chapter 5',
-    description: 'Some description of the content',
-    creator: 'Gourav Sen',
-    status: 'Live',
-    lastModified: '16 Jan 2025',
+    key: 'lastUpdatedOn',
+    title: 'LAST MODIFIED',
+    dataType: DataType.String,
+    width: '100px',
   },
 ];
 
-interface SelectContentProps {
-  selected: string[];
-  setSelected: (ids: string[]) => void;
-  onNext: () => void;
-}
-
 const SelectContent: React.FC<SelectContentProps> = ({
+  formState,
   selected,
   setSelected,
+  staticFilter,
+  onlyFields,
+  inputType,
   onNext,
 }) => {
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
+  const [contentSources, setContentSources] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(0);
+  const LIMIT = 5;
+  const [hasMore, setHasMore] = useState(true);
+  const tenantConfig = useTenantConfig();
+  // Local filter state
+  const [filter, setFilter] = useState<any>({});
+
+  React.useEffect(() => {
+    setFilter({ ...formState, ...staticFilter });
+  }, [formState, staticFilter]);
+
+  // Debounce search input
+  React.useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [search]);
+
+  // Handler for FilterForm changes
+  const handleFilterChange = (newFilter: any) => {
+    setFilter(newFilter);
+    setPage(0);
+    setHasMore(true);
+  };
+
+  // Fetch content sources
+  React.useEffect(() => {
+    const fetchContentSources = async () => {
+      setLoading(true);
+      try {
+        const status = ['Live'];
+        const query = debouncedSearch || '';
+        const offset = page * LIMIT;
+        // Always use Learning Resource and PDF
+        const primaryCategory = ['Learning Resource'];
+        const sort_by = { lastUpdatedOn: 'desc' };
+        const channel = tenantConfig?.CHANNEL_ID;
+        // const contentType = 'discover-contents';
+        if (!channel) return;
+        // API call
+        const response = await getContentPDF({
+          query,
+          limit: LIMIT,
+          offset,
+          sort_by,
+          filters: {
+            ...filter, // existing filter object if any
+            status,
+            primaryCategory,
+            channel,
+            // contentType,
+            mimeType: 'application/pdf',
+            // 'mimeType' will be added inside the function, no need to pass here
+          },
+        });
+        // No need to filter for PDF mimeType here, API already does it
+        const contentList = (response?.content || []).concat(
+          response?.QuestionSet || []
+        );
+        if (page === 0) {
+          setContentSources(contentList);
+        } else {
+          setContentSources((prev) => [...prev, ...contentList]);
+        }
+        setHasMore(contentList.length === LIMIT);
+      } catch (error) {
+        setContentSources([]);
+        setHasMore(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchContentSources();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch, filter, page, tenantConfig]);
+
+  // Scroll to bottom on load more using MutationObserver
+  useEffect(() => {
+    if (page > 0) {
+      const tableContainer = document.querySelector('.ka-table-wrapper');
+      if (!tableContainer) return;
+      const observer = new MutationObserver(() => {
+        tableContainer.scrollTo({
+          top: tableContainer.scrollHeight,
+          behavior: 'smooth',
+        });
+        observer.disconnect(); // Only scroll once per update
+      });
+      observer.observe(tableContainer, { childList: true, subtree: true });
+      // Cleanup
+      return () => observer.disconnect();
+    }
+  }, [contentSources, page]);
+
+  // Selection logic for KaTableComponent
   const handleSelect = (id: string) => {
     if (selected.includes(id)) {
       setSelected(selected.filter((sid) => sid !== id));
@@ -84,144 +179,106 @@ const SelectContent: React.FC<SelectContentProps> = ({
       setSelected([...selected, id]);
     }
   };
-  const filteredSources = mockContentSources.filter((item) =>
-    item.title.toLowerCase().includes(search.toLowerCase())
+
+  // Remove selected content from chip
+  const handleRemoveChip = (id: string) => {
+    setSelected(selected.filter((sid) => sid !== id));
+  };
+
+  const filteredSources = contentSources.filter((item) =>
+    item.name.toLowerCase().includes(debouncedSearch.toLowerCase())
   );
   return (
     <Box>
-      {/* Stepper should be rendered by parent */}
-      <Typography
-        variant="h5"
-        sx={{
-          ...poppinsFont,
-          fontWeight: 400,
-          fontSize: 22,
-          color: '#1F1B13',
-          mb: 2,
-        }}
-      >
-        AI Question Set Generator
-      </Typography>
-      <FilterForm
-        orginalFormData={{}}
-        isShowStaticFilterValue={true}
-        onlyFields={[
-          'program',
-          'se_domains',
-          'se_subDomains',
-          'se_subjects',
-          'primaryUser',
-          'language',
-          'ageGroup',
-          'statu',
-          'board',
-        ]}
-        staticFilter={{
-          se_subjects: ['English'],
-        }}
-        _config={{
-          _box: { sx: { flexDirection: 'row' } },
-          inputType: {
-            program: 'dropdown',
-            se_domains: 'dropdown',
-            se_subDomains: 'dropdown',
-            se_subjects: 'dropdown',
-            primaryUser: 'dropdown',
-            language: 'dropdown',
-            ageGroup: 'dropdown',
-            statu: 'dropdown',
-            board: 'dropdown',
-          },
-        }}
-      />
-      <Box sx={{ mb: 2, width: 400 }}>
-        <TextField
-          fullWidth
-          size="small"
-          placeholder="Search content.."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-            sx: { bgcolor: '#F0F0F0', borderRadius: 1 },
+      <Box p={3}>
+        <FilterForm
+          orginalFormData={filter}
+          isShowStaticFilterValue={true}
+          onlyFields={onlyFields}
+          staticFilter={staticFilter}
+          _config={{
+            _loader: { _loader: { minHeight: 300 } },
+            _box: { sx: { flexDirection: 'row', flexWrap: 'wrap' } },
+            _selectOptionBox: { sx: { minWidth: 300 } },
+            inputType: inputType,
           }}
+          onApply={handleFilterChange}
         />
-      </Box>
-      <Typography
-        sx={{
-          ...poppinsFont,
-          fontWeight: 400,
-          fontSize: 16,
-          color: '#7C766F',
-          mb: 2,
-        }}
-      >
-        Select up to 3 content sources for your questions
-      </Typography>
-      <Card sx={{ borderRadius: 2, boxShadow: 1, mb: 3 }}>
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell></TableCell>
-                <TableCell>Title and description</TableCell>
-                <TableCell>Creator</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Last modified</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredSources.map((row) => (
-                <TableRow key={row.id}>
-                  <TableCell>
-                    <Checkbox
-                      checked={selected.includes(row.id)}
-                      onChange={() => handleSelect(row.id)}
-                      disabled={
-                        !selected.includes(row.id) && selected.length >= 3
-                      }
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Typography sx={{ fontWeight: 500 }}>
-                      {row.title}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {row.description}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>{row.creator}</TableCell>
-                  <TableCell>
-                    <Chip
-                      label={row.status}
-                      color={row.status === 'Live' ? 'success' : 'default'}
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell>{row.lastModified}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Card>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
-        <Button
-          variant="outlined"
+        <Box sx={{ my: 2, width: 400 }}>
+          <TextField
+            fullWidth
+            size="medium"
+            placeholder="Search content.."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(0);
+              setHasMore(true);
+            }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+              sx: { bgcolor: '#F0F0F0', borderRadius: 1 },
+            }}
+          />
+        </Box>
+        <Typography
           sx={{
-            borderRadius: 100,
-            px: 4,
-            py: 1,
-            fontWeight: 500,
             ...poppinsFont,
+            fontWeight: 400,
+            fontSize: 16,
+            color: '#7C766F',
+            mb: 2,
           }}
         >
-          Back to Workspace
-        </Button>
+          Select up to 3 content sources for your questions
+        </Typography>
+        {/* Selected content chips */}
+        {selected.length > 0 && (
+          <Box sx={{ mb: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+            {selected.map((id) => {
+              const item = contentSources.find((c) => c.identifier === id);
+              return (
+                <Chip
+                  key={id}
+                  label={item ? item.name : id}
+                  onDelete={() => handleRemoveChip(id)}
+                  color="primary"
+                  sx={{ fontWeight: 500 }}
+                />
+              );
+            })}
+          </Box>
+        )}
+      </Box>
+
+      <KaTableComponent
+        columns={columns}
+        tableTitle="discover-contents"
+        data={filteredSources}
+        selectable
+        selected={selected}
+        onSelect={handleSelect}
+      />
+      {loading && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
+          <Typography>Loading...</Typography>
+        </Box>
+      )}
+      {!loading && hasMore && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
+          <Button
+            variant="outlined"
+            onClick={() => setPage((prev) => prev + 1)}
+          >
+            Load More
+          </Button>
+        </Box>
+      )}
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 4 }}>
         <Button
           variant="contained"
           sx={{
@@ -234,7 +291,14 @@ const SelectContent: React.FC<SelectContentProps> = ({
             ...poppinsFont,
           }}
           disabled={selected.length === 0}
-          onClick={onNext}
+          onClick={() => {
+            // Prepare array of {id, pdfUrl} for onNext
+            const selectedArr = selected.map((id) => {
+              const item = contentSources.find((c) => c.identifier === id);
+              return { id, url: item?.downloadUrl || '' };
+            });
+            onNext({ content: selectedArr, ...filter });
+          }}
         >
           Next: Set Parameters
         </Button>

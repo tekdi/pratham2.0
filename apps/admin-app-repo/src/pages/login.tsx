@@ -393,9 +393,11 @@ const LoginPage = () => {
               );
               const tenantId = userResponse?.tenantData?.[0]?.tenantId;
               const frameworkId =
-                userResponse?.tenantData?.[0]?.contentFramework;
+                userResponse?.tenantData?.[0]?.collectionFramework;
+              const channel = userResponse?.tenantData?.[0]?.channelId;
               TenantService.setTenantId(tenantId);
               localStorage.setItem('collectionFramework', frameworkId);
+              localStorage.setItem('channelId', channel);
               localStorage.setItem('tenantId', tenantId);
             }
 

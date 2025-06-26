@@ -16,16 +16,14 @@ import {
   MenuItem,
   InputLabel,
   FormControl,
-  OutlinedInput,
   ListItemText,
+  FormHelperText,
 } from '@mui/material';
-import { useTranslation } from '../context/LanguageContext';
 import { filterContent, staticFilterContent } from '../../utils/AuthService';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Loader } from '../Loader/Loader';
 import { sortJsonByArray } from '../../utils/helper';
 import SpeakableText from '../textToSpeech/SpeakableText';
-import { debounce } from 'lodash';
 
 export interface TermOption {
   code: string;
@@ -61,6 +59,9 @@ interface FilterSectionProps {
   _checkbox?: any;
   inputType?: Record<string, 'checkbox' | 'dropdown'>;
   _box?: any;
+  _selectOptionBox?: any;
+  errors?: Record<string, string>;
+  required?: Record<string, boolean>;
 }
 
 interface FilterListProps {
@@ -72,6 +73,8 @@ interface FilterListProps {
   isOpenColapsed?: boolean | any[];
   onlyFields?: string[];
   _config?: any;
+  errors?: Record<string, string>;
+  required?: Record<string, boolean>;
 }
 
 export function FilterForm({
@@ -83,6 +86,8 @@ export function FilterForm({
   isOpenColapsed,
   onlyFields,
   _config,
+  errors,
+  required,
 }: Readonly<FilterListProps>) {
   const [filterData, setFilterData] = useState<any[]>([]);
   const [renderForm, setRenderForm] = useState<(Category | StaticField)[]>([]);
@@ -90,14 +95,20 @@ export function FilterForm({
   const [loading, setLoading] = useState(true);
   const [showMore, setShowMore] = useState([]);
 
-  const fetchData = useCallback(
-    async (noFilter = true) => {
+  // Memoize props to avoid unnecessary re-renders and effect triggers
+  const memoizedOrginalFormData = React.useMemo(() => orginalFormData, []);
+  const memoizedStaticFilter = React.useMemo(() => staticFilter, []);
+  const memoizedOnlyFields = React.useMemo(() => onlyFields, []);
+  const memoizedFilterFramework = React.useMemo(() => filterFramework, []);
+
+  useEffect(() => {
+    const fetchData = async (noFilter = true) => {
       const instantId = localStorage.getItem('collectionFramework') ?? '';
       let data: any = {};
 
-      if (filterFramework) {
-        data = filterFramework;
-      } else if (orginalFormData) {
+      if (memoizedFilterFramework) {
+        data = memoizedFilterFramework;
+      } else if (memoizedOrginalFormData) {
         data = await filterContent({ instantId });
       }
 
@@ -121,25 +132,25 @@ export function FilterForm({
       setFilterData(allFields);
 
       if (noFilter) {
-        const mergedData = { ...orginalFormData, ...staticFilter };
+        const mergedData = {
+          ...memoizedOrginalFormData,
+          ...memoizedStaticFilter,
+        };
         const { updatedFilters: dormNewData, updatedFilterValue } =
           replaceOptionsWithAssoc({
             filterValue: mergedData,
             filtersFields: allFields,
-            onlyFields,
+            onlyFields: memoizedOnlyFields,
           });
         setFormData(updatedFilterValue);
         setRenderForm(dormNewData);
       }
 
       setLoading(false);
-    },
-    [orginalFormData, staticFilter, onlyFields, filterFramework]
-  );
-
-  useEffect(() => {
+    };
     fetchData();
-  }, [fetchData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleFilter = (filterValue: any) => {
     const formattedPayload = formatPayload(filterValue ?? formData);
@@ -147,7 +158,7 @@ export function FilterForm({
   };
 
   return (
-    <Loader isLoading={loading}>
+    <Loader isLoading={loading} {...(_config?._loader ?? {})}>
       <Box
         display="flex"
         flexDirection="column"
@@ -183,6 +194,8 @@ export function FilterForm({
           }}
           showMore={showMore}
           setShowMore={setShowMore}
+          errors={errors}
+          required={required}
         />
         {/* <Box display={'flex'} justifyContent="center" gap={2} mt={2}>
           <MuiButton
@@ -338,6 +351,9 @@ const FilterSection: React.FC<FilterSectionProps> = ({
   _checkbox,
   inputType = {},
   _box,
+  _selectOptionBox,
+  errors = {},
+  required = {},
 }) => {
   return (
     <Box
@@ -358,6 +374,8 @@ const FilterSection: React.FC<FilterSectionProps> = ({
         const staticValues = Array.isArray(staticFormData?.[code])
           ? staticFormData[code]
           : [];
+        const fieldError = errors[code];
+        const isRequired = required[code];
         if (
           Array.isArray(staticValues) &&
           staticValues.length > 0 &&
@@ -378,7 +396,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
               }}
             >
               <Typography
-                /* @ts-ignore */
+                /* @ts-expect-error: MUI Typography variant 'body5' is not in the type definition, but is used for custom styling */
                 variant="body5"
                 component="div"
                 sx={{ fontWeight: '500', color: '#181D27' }}
@@ -397,9 +415,18 @@ const FilterSection: React.FC<FilterSectionProps> = ({
         }
         if (inputType[code] === 'dropdown') {
           return (
-            <Box key={code} sx={{ width: '100%' }}>
-              <FormControl fullWidth size="medium" sx={{ mt: 1 }}>
-                <InputLabel id={`multi-select-label-${code}`}>
+            <Box key={code} {...(_selectOptionBox ?? {})}>
+              <FormControl
+                required={isRequired}
+                fullWidth
+                size="medium"
+                sx={{ mt: 1 }}
+                error={!!fieldError}
+              >
+                <InputLabel
+                  id={`multi-select-label-${code}`}
+                  error={!!fieldError}
+                >
                   {field.name}
                 </InputLabel>
                 <Select
@@ -447,6 +474,9 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                     </MenuItem>
                   ))}
                 </Select>
+                {fieldError && (
+                  <FormHelperText error>{fieldError}</FormHelperText>
+                )}
               </FormControl>
             </Box>
           );
@@ -475,7 +505,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
               }}
             >
               <Typography
-                /* @ts-ignore */
+                /* @ts-expect-error: MUI Typography variant 'body5' is not in the type definition, but is used for custom styling */
                 variant="body5"
                 component="div"
                 sx={{ fontWeight: '500', color: '#181D27' }}
@@ -542,7 +572,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
             </AccordionDetails>
             {values.length > 3 && !staticValues.length && (
               <Button
-                /* @ts-ignore */
+                /* @ts-expect-error: Custom Button variant 'text-filter-show-more' is not in the type definition, but is used for custom styling */
                 variant="text-filter-show-more"
                 size="small"
                 onClick={() =>
