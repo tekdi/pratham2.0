@@ -1,9 +1,9 @@
 import React from 'react';
 import { Box } from '@mui/material';
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 
 const Header = () => {
-  const router = useRouter();
+  // const router = useRouter();
   return (
     <Box
       sx={{
@@ -33,7 +33,7 @@ const Header = () => {
       {/* Center/Middle: Pratham Logo with Mascot */}
       <Box
         sx={{ justifySelf: 'center', cursor: 'pointer' }}
-        onClick={() => router.push('/themantic')}
+        // onClick={() => router.push('/themantic')}
       >
         <img
           src="/images/pratham-left1.png"
