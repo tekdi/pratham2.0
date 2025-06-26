@@ -20,57 +20,41 @@ import ConfirmationModal from './ConfirmationModal/ConfirmationModal';
 import { checkAuth } from '@shared-lib-v2/utils/AuthService';
 import MuiThemeProvider from '@learner/assets/theme/MuiThemeProvider';
 
+// Custom DrawerItem interface
 interface NewDrawerItemProp extends DrawerItemProp {
   variant?: 'contained' | 'text';
   isActive?: boolean;
   customStyle?: React.CSSProperties;
 }
 
-const App: React.FC<LayoutProps> = ({ children, ...props }) => {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { t, setLanguage } = useTranslation();
-
-  const [defaultNavLinks, setDefaultNavLinks] = useState<NewDrawerItemProp[]>(
-    []
-  );
-  const [anchorEl, setAnchorEl] = useState<any>(null);
-  const [modalOpen, setModalOpen] = useState<boolean>(false);
-
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
-  const handleClose = () => setAnchorEl(null);
-  const handleProfileClick = () => {
-    if (pathname !== '/profile') {
-      router.push('/profile');
-    }
-    handleClose();
-  };
-  const handleLogoutClick = () => router.push('/logout');
-  const handleLogoutModal = () => setModalOpen(true);
-  const handleCloseModel = () => setModalOpen(false);
-
-  // ✅ Simplified version without trying to close drawer
-  const handleNavClick = (callback: () => void) => {
-    callback();
-  };
-
-  const getLinkStyle = (isActive: boolean): React.CSSProperties => ({
-    backgroundColor: isActive ? '#e0f7fa' : 'transparent',
-    borderRadius: 8,
-  });
-
-  const getMessage = () => (modalOpen ? t('COMMON.SURE_LOGOUT') : '');
-
-  useEffect(() => {
-    let currentPage = '';
-    if (typeof window !== 'undefined') {
-      const searchParams = new URLSearchParams(window.location.search);
-      const activeLink = searchParams.get('activeLink');
-      currentPage = activeLink || window.location.pathname || '';
-    }
-
+// Nav config by userProgram
+const NAV_CONFIG: Record<
+  string,
+  (params: {
+    router: any;
+    isMobile: boolean;
+    t: any;
+    handleNavClick: (cb: () => void) => void;
+    handleProfileClick: () => void;
+    handleLogoutModal: () => void;
+    setAnchorEl: (el: boolean) => void;
+    getLinkStyle: (active: boolean) => React.CSSProperties;
+    currentPage: string;
+    checkAuth: boolean;
+  }) => NewDrawerItemProp[]
+> = {
+  YouthNet: ({
+    router,
+    isMobile,
+    t,
+    handleNavClick,
+    handleProfileClick,
+    handleLogoutModal,
+    setAnchorEl,
+    getLinkStyle,
+    currentPage,
+    checkAuth,
+  }) => {
     const navLinks: NewDrawerItemProp[] = [
       {
         title: t('LEARNER_APP.COMMON.L1_COURSES'),
@@ -94,7 +78,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
       });
     }
 
-    if (checkAuth()) {
+    if (checkAuth) {
       if (isMobile) {
         navLinks.push(
           {
@@ -126,17 +110,114 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
             to: () => handleNavClick(() => router.push('/skill-center')),
             isActive: currentPage === '/skill-center',
             customStyle: {},
-          },
-          {
-            title: t('LEARNER_APP.COMMON.PROFILE'),
-            icon: <AccountCircleOutlined sx={{ width: 28, height: 28 }} />,
-            to: () => setAnchorEl(true),
-            isActive: currentPage === '/profile',
-            customStyle: getLinkStyle(currentPage === '/profile'),
           }
         );
       }
     }
+
+    // Always add Profile link at the end
+    navLinks.push({
+      title: t('LEARNER_APP.COMMON.PROFILE'),
+      icon: <AccountCircleOutlined sx={{ width: 28, height: 28 }} />,
+      to: () => setAnchorEl(true),
+      isActive: currentPage === '/profile',
+      customStyle: getLinkStyle(currentPage === '/profile'),
+    });
+
+    return navLinks;
+  },
+
+  'Camp to Club': ({
+    router,
+    t,
+    handleNavClick,
+    getLinkStyle,
+    currentPage,
+    setAnchorEl,
+  }) => {
+    const navLinks: NewDrawerItemProp[] = [
+      {
+        title: t('LEARNER_APP.COMMON.COURSES'),
+        icon: <AssignmentOutlined sx={{ width: 28, height: 28 }} />,
+        to: () => handleNavClick(() => router.push('/club-courses')),
+        isActive: currentPage === '/club-courses',
+        customStyle: getLinkStyle(currentPage === '/club-courses'),
+      },
+    ];
+
+    // Always add Profile link at the end
+    navLinks.push({
+      title: t('LEARNER_APP.COMMON.PROFILE'),
+      icon: <AccountCircleOutlined sx={{ width: 28, height: 28 }} />,
+      to: () => setAnchorEl(true),
+      isActive: currentPage === '/profile',
+      customStyle: getLinkStyle(currentPage === '/profile'),
+    });
+
+    return navLinks;
+  },
+};
+
+const App: React.FC<LayoutProps> = ({ children, ...props }) => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const { t, setLanguage } = useTranslation();
+
+  const [defaultNavLinks, setDefaultNavLinks] = useState<NewDrawerItemProp[]>(
+    []
+  );
+  const [anchorEl, setAnchorEl] = useState<any>(null);
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const handleClose = () => setAnchorEl(null);
+  const handleProfileClick = () => {
+    if (pathname !== '/profile') {
+      router.push('/profile');
+    }
+    handleClose();
+  };
+  const handleLogoutClick = () => router.push('/logout');
+  const handleLogoutModal = () => setModalOpen(true);
+  const handleCloseModel = () => setModalOpen(false);
+  const handleNavClick = (callback: () => void) => {
+    callback();
+  };
+
+  const getLinkStyle = (isActive: boolean): React.CSSProperties => ({
+    backgroundColor: isActive ? '#e0f7fa' : 'transparent',
+    borderRadius: 8,
+  });
+
+  const getMessage = () => (modalOpen ? t('COMMON.SURE_LOGOUT') : '');
+
+  useEffect(() => {
+    let currentPage = '';
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      const activeLink = searchParams.get('activeLink');
+      currentPage = activeLink || window.location.pathname || '';
+    }
+
+    const program = localStorage.getItem('userProgram') || '';
+    const configFn = NAV_CONFIG[program];
+
+    const navLinks = configFn
+      ? configFn({
+          router,
+          isMobile,
+          t,
+          handleNavClick,
+          handleProfileClick,
+          handleLogoutModal,
+          setAnchorEl,
+          getLinkStyle,
+          currentPage,
+          checkAuth: checkAuth(),
+        })
+      : [];
 
     setDefaultNavLinks(navLinks);
   }, [t, router, isMobile]);
