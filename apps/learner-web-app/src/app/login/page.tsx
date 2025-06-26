@@ -361,19 +361,8 @@ const handleSuccessfulLogin = async (
 
         const tenantId = userResponse?.tenantData?.[0]?.tenantId;
         const tenantName = userResponse?.tenantData?.[0]?.tenantName;
-          //  const uiConfig = userResponse?.tenantData?.[0]?.params?.uiConfig;
-          ///currently hardcode uiconfig for youthnet user here
-         const uiConfig = {
-             showSignIn: true,
-             showSignup: true,
-              showContent: ['courses'],
-              showProgram: false,
-              isDoTracking: true,
-              isTrackingShow: true,
-               isCompleteProfile: true,
-               isEditProfile: true
-
-           };
+            const uiConfig = userResponse?.tenantData?.[0]?.params?.uiConfig;
+         
 
 localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
 
