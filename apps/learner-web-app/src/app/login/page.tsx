@@ -19,6 +19,7 @@ import Image from 'next/image';
 import playstoreIcon from '../../../public/images/playstore.png';
 import prathamQRCode from '../../../public/images/prathamQR.png';
 import welcomeGIF from '../../../public/images/welcome.gif';
+import { logEvent } from '@learner/utils/googleAnalytics';
 
 const Login = dynamic(
   () => import('@login/Components/LoginComponent/LoginComponent'),
@@ -347,8 +348,8 @@ const handleSuccessfulLogin = async (
 
     if (userResponse) {
       if (
-        userResponse?.tenantData?.[0]?.roleName === 'Learner' &&
-        userResponse?.tenantData?.[0]?.tenantName === 'YouthNet'
+        userResponse?.tenantData?.[0]?.roleName === 'Learner' 
+       // userResponse?.tenantData?.[0]?.tenantName === 'YouthNet'
       ) {
         localStorage.setItem('userId', userResponse?.userId);
         localStorage.setItem(
@@ -360,12 +361,20 @@ const handleSuccessfulLogin = async (
 
         const tenantId = userResponse?.tenantData?.[0]?.tenantId;
         const tenantName = userResponse?.tenantData?.[0]?.tenantName;
+            const uiConfig = userResponse?.tenantData?.[0]?.params?.uiConfig;
+         
+
+localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
+
         localStorage.setItem('tenantId', tenantId);
         localStorage.setItem('userProgram', tenantName);
         await profileComplitionCheck();
+        if (tenantName === 'YouthNet') {
         const academicYearResponse = await getAcademicYear();
-
-        console.log(academicYearResponse[0]?.id, 'academicYearResponse');
+         if (academicYearResponse[0]?.id) {
+          localStorage.setItem('academicYearId', academicYearResponse[0]?.id);
+        }
+      }
         const telemetryInteract = {
           context: { env: 'sign-in', cdata: [] },
           edata: {
@@ -376,9 +385,7 @@ const handleSuccessfulLogin = async (
           },
         };
         telemetryFactory.interact(telemetryInteract);
-        if (academicYearResponse[0]?.id) {
-          localStorage.setItem('academicYearId', academicYearResponse[0]?.id);
-        }
+       
 
         const channelId = userResponse?.tenantData?.[0]?.channelId;
         localStorage.setItem('channelId', channelId);
@@ -395,8 +402,18 @@ const handleSuccessfulLogin = async (
           router.push(
             `${redirectUrl}${activeLink ? `?activeLink=${activeLink}` : ''}`
           );
-        } else {
+        } 
+          logEvent({
+      action: 'successfully-login-in-learner-app',
+      category: 'Login Page',
+      label: 'Login Button Clicked',
+    });
+        if(tenantName=== 'YouthNet') {
           router.push('/content');
+        }
+        else if (tenantName==="Camp to Club")
+        {
+          router.push('/club-courses');
         }
       } else {
         showToastMessage('Username or password not correct', 'error');

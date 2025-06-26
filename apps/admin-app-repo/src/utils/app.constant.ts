@@ -215,6 +215,9 @@ export enum ContentType {
   YOUTUBE_X_VIDEO = 'video/x-youtube',
   WEBM_VIDEO = 'video/webm',
   VND = 'application/vnd.ekstep.content-collection',
+  //new types
+  AUDIO_MP3 = 'audio/mp3',
+  AUDIO_WAV = 'audio/wav',
 }
 
 export type FileType = {
@@ -249,6 +252,8 @@ export const ContentCardsTypes: FileType = {
   },
   [ContentType.WEBM_VIDEO]: { name: 'WEBM', imgPath: mp4, BgImgPath: bgmp4 },
   [ContentType.VND]: { name: 'WEBM', imgPath: html, BgImgPath: bghtml },
+  [ContentType.AUDIO_MP3]: { name: 'Audio', imgPath: mp4, BgImgPath: bgmp4 },
+  [ContentType.AUDIO_WAV]: { name: 'Audio', imgPath: mp4, BgImgPath: bgmp4 },
 };
 export enum fieldKeys {
   GENDER = 'gender',
