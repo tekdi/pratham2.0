@@ -20,7 +20,9 @@ export const MIME_TYPE = {
     "application/vnd.ekstep.h5p-archive",
     "application/vnd.ekstep.html-archive",
     "video/x-youtube",
-    "video/youtube"]
+    "video/youtube",
+    'audio/mp3',
+    'audio/wav',]
 };
 
 export const CLOUD_STORAGE_URL = process.env.NEXT_PUBLIC_CLOUD_STORAGE_URL || "";
