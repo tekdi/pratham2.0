@@ -74,7 +74,10 @@ const V1Player = ({
       ref={previewRef}
       id="contentPlayer"
       title="Content Player"
+      //offline android app player
       src={`${basePath}/libs/sunbird-content-player/preview/preview.html?webview=true`}
+      //online cdn player
+      // src="/content/preview/preview.html?webview=true"
       aria-label="Content Player"
       style={{ border: 'none' }}
       width={'100%'}
