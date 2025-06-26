@@ -1,10 +1,12 @@
 'use client';
 import ContentEnroll from '@content-mfes/components/Content/ContentEnroll';
 import LayoutPage from '@content-mfes/components/LayoutPage';
+import SubHeader from '../subHeader/SubHeader';
 
 const ContentDetailsPage = () => {
   return (
     <LayoutPage isShow={false}>
+      <SubHeader showFilter={false} />
       <ContentEnroll
         isShowLayout={false}
         _config={{

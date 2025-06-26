@@ -6,6 +6,7 @@ import { getMetadata } from '@learner/utils/API/metabaseService';
 import Layout from '@learner/components/themantic/layout/Layout';
 import { CardComponent } from '@learner/components/themantic/content/List';
 import { Container } from '@mui/material';
+import SubHeader from '@learner/components/themantic/subHeader/SubHeader';
 
 export async function generateMetadata({ params }: any) {
   return await getMetadata(params.courseId);
@@ -17,6 +18,7 @@ const CourseUnitDetails = dynamic(() => import('@CourseUnitDetails'), {
 const App = () => {
   return (
     <Layout sx={{ backgroundImage: 'url(/images/energy-background.png)' }}>
+      <SubHeader showFilter={false} />
       <Container maxWidth="lg">
         <CourseUnitDetails
           isShowLayout={false}

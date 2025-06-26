@@ -57,8 +57,12 @@ const List: React.FC<ListProps> = ({
                 <Content
                   isShowLayout={false}
                   contentTabs={['Course']}
+                  pageName="Course"
                   filters={{
                     limit: 3,
+                    filters: {
+                      program: 'Experimento India',
+                    },
                   }}
                   _config={{
                     contentBaseUrl: '/themantic',
@@ -72,7 +76,7 @@ const List: React.FC<ListProps> = ({
                     _containerGrid: {
                       spacing: { xs: 6, sm: 6, md: 6 },
                     },
-                    default_img: '/images/default.png',
+                    default_img: '/images/image_ver.png',
                     _card: {
                       cardComponent: CardComponent,
                     },
@@ -123,8 +127,13 @@ const List: React.FC<ListProps> = ({
               <Content
                 isShowLayout={false}
                 contentTabs={['content']}
+                pageName="content"
                 filters={{
                   limit: 3,
+                  sort_by: { lastUpdatedOn: 'desc' },
+                  filters: {
+                    program: 'Experimento India',
+                  },
                 }}
                 _config={{
                   contentBaseUrl: '/themantic',
@@ -138,7 +147,7 @@ const List: React.FC<ListProps> = ({
                   _containerGrid: {
                     spacing: { xs: 6, sm: 6, md: 6 },
                   },
-                  default_img: '/images/default.png',
+                  default_img: '/images/image_ver.png',
                   _card: {
                     cardComponent: cardHideExplore,
                   },

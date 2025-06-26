@@ -40,7 +40,7 @@ const App = ({
   const router = useRouter();
   const params = useParams();
   const { identifier, courseId, unitId } = params || {}; // string | string[] | undefined
-  const [item, setItem] = useState<{ [key: string]: any }>(null);
+  const [item, setItem] = useState<{ [key: string]: any }>({});
   const [breadCrumbs, setBreadCrumbs] = useState<any>();
 
   let activeLink = null;
@@ -75,7 +75,10 @@ const App = ({
           ...(breadcrum?.slice(0, -1) || []),
         ]);
       } else {
-        setBreadCrumbs([]);
+        setBreadCrumbs([
+          { label: 'Home', link: '/themantic' },
+          { label: response?.name },
+        ]);
       }
     };
     fetch();
@@ -103,11 +106,17 @@ const App = ({
           display: 'flex',
           alignItems: 'center',
           gap: 1,
+          mb: 3,
         }}
       >
-        <BreadCrumb breadCrumbs={breadCrumbs} isShowLastLink />
+        <BreadCrumb
+          breadCrumbs={breadCrumbs}
+          isShowLastLink
+          customPlayerStyle={true}
+          customPlayerMarginTop={25}
+        />
       </Box>
-      <Grid container spacing={6} sx={{ mt: 2 }}>
+      <Grid container spacing={6}>
         <Grid item xs={12} sm={12} md={12} lg={3}>
           <Box
             sx={{
@@ -145,7 +154,7 @@ const App = ({
                 <Box sx={{ margin: '8px', px: 3 }}>
                   <img
                     height={'200px'}
-                    src={item?.content?.posterImage || '/images/default.png'}
+                    src={item?.content?.posterImage || '/images/image_ver.png'}
                     alt={
                       item?.content?.name || item?.content?.title || 'Content'
                     }

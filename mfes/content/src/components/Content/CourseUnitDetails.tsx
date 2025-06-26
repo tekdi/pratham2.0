@@ -286,7 +286,12 @@ export default function Details(props: DetailsProps) {
         />
       )}
       {props?.showBreadCrumbs && (
-        <BreadCrumb breadCrumbs={breadCrumbs} isShowLastLink />
+        <BreadCrumb
+          breadCrumbs={breadCrumbs}
+          isShowLastLink
+          customPlayerStyle={true}
+          customPlayerMarginTop={25}
+        />
       )}
       <Box
         sx={{

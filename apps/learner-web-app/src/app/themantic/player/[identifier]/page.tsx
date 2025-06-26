@@ -25,6 +25,7 @@ const HomePage: React.FC = () => {
           player: {
             trackable: false,
           },
+          default_img: '/images/image_ver.png',
         }}
       />
     </Layout>
