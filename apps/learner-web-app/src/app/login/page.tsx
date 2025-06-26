@@ -19,6 +19,7 @@ import Image from 'next/image';
 import playstoreIcon from '../../../public/images/playstore.png';
 import prathamQRCode from '../../../public/images/prathamQR.png';
 import welcomeGIF from '../../../public/images/welcome.gif';
+import { logEvent } from '@learner/utils/googleAnalytics';
 
 const Login = dynamic(
   () => import('@login/Components/LoginComponent/LoginComponent'),
@@ -347,8 +348,8 @@ const handleSuccessfulLogin = async (
 
     if (userResponse) {
       if (
-        userResponse?.tenantData?.[0]?.roleName === 'Learner' &&
-        userResponse?.tenantData?.[0]?.tenantName === 'YouthNet'
+        userResponse?.tenantData?.[0]?.roleName === 'Learner' 
+       // userResponse?.tenantData?.[0]?.tenantName === 'YouthNet'
       ) {
         localStorage.setItem('userId', userResponse?.userId);
         localStorage.setItem(
@@ -360,28 +361,31 @@ const handleSuccessfulLogin = async (
 
         const tenantId = userResponse?.tenantData?.[0]?.tenantId;
         const tenantName = userResponse?.tenantData?.[0]?.tenantName;
-               const uiConfig = userResponse?.tenantData?.[0]?.params?.uiConfig;
-// const uiConfig = {
-//   showSignIn: true,
-//   showSignup: false,
-//   showContent: ['contents', 'courses'],
-//   showProgram: false,
-//   isDoTracking: true,
-//   isTrackingShow: true,
-//   isCompleteProfile: false,
-//     isEditProfile: false
+          //  const uiConfig = userResponse?.tenantData?.[0]?.params?.uiConfig;
+          ///currently hardcode uiconfig for youthnet user here
+         const uiConfig = {
+             showSignIn: true,
+             showSignup: true,
+              showContent: ['courses'],
+              showProgram: false,
+              isDoTracking: true,
+              isTrackingShow: true,
+               isCompleteProfile: true,
+               isEditProfile: true
 
-// };
+           };
 
-// Store in localStorage
 localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
 
         localStorage.setItem('tenantId', tenantId);
         localStorage.setItem('userProgram', tenantName);
         await profileComplitionCheck();
+        if (tenantName === 'YouthNet') {
         const academicYearResponse = await getAcademicYear();
-
-        console.log(academicYearResponse[0]?.id, 'academicYearResponse');
+         if (academicYearResponse[0]?.id) {
+          localStorage.setItem('academicYearId', academicYearResponse[0]?.id);
+        }
+      }
         const telemetryInteract = {
           context: { env: 'sign-in', cdata: [] },
           edata: {
@@ -392,9 +396,7 @@ localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
           },
         };
         telemetryFactory.interact(telemetryInteract);
-        if (academicYearResponse[0]?.id) {
-          localStorage.setItem('academicYearId', academicYearResponse[0]?.id);
-        }
+       
 
         const channelId = userResponse?.tenantData?.[0]?.channelId;
         localStorage.setItem('channelId', channelId);
@@ -411,7 +413,13 @@ localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
           router.push(
             `${redirectUrl}${activeLink ? `?activeLink=${activeLink}` : ''}`
           );
-        } else if(tenantName=== 'YouthNet') {
+        } 
+          logEvent({
+      action: 'successfully-login-in-learner-app',
+      category: 'Login Page',
+      label: 'Login Button Clicked',
+    });
+        if(tenantName=== 'YouthNet') {
           router.push('/content');
         }
         else if (tenantName==="Camp to Club")
