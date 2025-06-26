@@ -4,17 +4,17 @@ import React, { useState } from 'react';
 import {
   Box,
   Typography,
-  Button,
   Grid,
   Card,
   CardContent,
-  CardMedia,
   Breadcrumbs,
   Link,
 } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import HomeIcon from '@mui/icons-material/Home';
+import Layout from '../../layout/Layout';
+import SubHeader from '../../subHeader/SubHeader';
 
 // Reusable Breadcrumb Component
 const CustomBreadcrumbs = ({
@@ -580,6 +580,8 @@ const ThemanticCard = () => {
   );
 
   return (
+    <Layout>
+      <SubHeader showFilter={false} />
     <Box
       sx={{
         backgroundImage: `url('/images/energy-background.png')`,
@@ -615,6 +617,7 @@ const ThemanticCard = () => {
           : renderEnergyCompanionView()}
       </Box>
     </Box>
+    </Layout>
   );
 };
 
