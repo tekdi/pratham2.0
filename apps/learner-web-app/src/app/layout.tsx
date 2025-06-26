@@ -6,6 +6,7 @@ import MuiThemeProvider, {
   MuiThemeProviderWithLanguage,
 } from '@learner/assets/theme/MuiThemeProvider';
 import ClientLayout from './ClientLayout';
+import GoogleAnalyticsTracker from '@learner/components/GoogleAnalyticsTracker/GoogleAnalyticsTracker';
 
 export const metadata = {
   title: 'Welcome to learner-web-app',
@@ -72,12 +73,16 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <ClientLayout>
+          <ClientLayout>
+            
           <MuiThemeProviderWithLanguage>
+                    <GoogleAnalyticsTracker />
+
             <MuiThemeProvider>{children}</MuiThemeProvider>
           </MuiThemeProviderWithLanguage>
           <ToastContainer />
         </ClientLayout>
+        
       </body>
     </html>
   );
