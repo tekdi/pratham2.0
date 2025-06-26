@@ -55,3 +55,7 @@ apps/admin-app-repo/build/
 
 #ignore workflow
 # .github/workflows/*
+
+#add below for generic editor
+mfes/workspace/public/content-plugins/
+mfes/workspace/public/generic-editor/
