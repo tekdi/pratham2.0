@@ -8,17 +8,21 @@ import qml from '../assets/images/Qml.svg';
 import youtube from '../assets/images/youtube.svg';
 import h5p from '../assets/images/h5p.png';
 import unit from '../assets/images/Unit.png';
+import mp3 from '../assets/images/MP4.svg';
+import wav from '../assets/images/MP4.svg';
 
 // background image
 
 import bgpdf from '../assets/images/bgPDF.svg';
 import bgepub from '../assets/images/bgEpub.svg';
 import bghtml from '../assets/images/bgHtml.svg';
-import bgmp4 from '../assets/images/bgMP4 .svg';
+import bgmp4 from '../assets/images/bgMP4.svg';
 import bgqml from '../assets/images/bgQml.svg';
 import bgyoutube from '../assets/images/bgYouTube.svg';
 import bgh5p from '../assets/images/bgh5p.png';
 import bgunit from '../assets/images/bgUnit.png';
+import bgmp3 from '../assets/images/bgMP4.svg';
+import bgwav from '../assets/images/bgMP4.svg';
 
 export const limit: number = 300;
 export const refetchInterval: number = 5 * 60 * 1000; // 5 min
@@ -235,6 +239,9 @@ export enum ContentType {
   YOUTUBE_X_VIDEO = 'video/x-youtube',
   WEBM_VIDEO = 'video/webm',
   COLLECTION = 'application/vnd.ekstep.content-collection',
+  //new types
+  AUDIO_MP3 = 'audio/mp3',
+  AUDIO_WAV = 'audio/wav',
 }
 
 // Define the type for the content type mapping
@@ -274,6 +281,8 @@ export const ContentCardsTypes: FileType = {
     imgPath: unit,
     BgImgPath: bgunit,
   },
+  [ContentType.AUDIO_MP3]: { name: 'Audio', imgPath: mp3, BgImgPath: bgmp3 },
+  [ContentType.AUDIO_WAV]: { name: 'Audio', imgPath: wav, BgImgPath: bgwav },
 };
 
 export enum contentStatus {

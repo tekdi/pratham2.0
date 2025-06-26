@@ -639,6 +639,7 @@ const AddEditUser = ({
                 isEdit || isReassign ? extraFieldsUpdate : extraFields
               }
               type={type == 'learner' ? type : ''}
+              isReassign={isReassign}
             />
           </>
         )

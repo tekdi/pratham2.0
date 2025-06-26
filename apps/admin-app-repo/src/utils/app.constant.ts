@@ -5,6 +5,8 @@ import html from '../assets/images/HTML.svg';
 import mp4 from '../assets/images/MP4.svg';
 import qml from '../assets/images/Qml.svg';
 import youtube from '../assets/images/youtube.svg';
+import mp3 from '../assets/images/MP4.svg';
+import wav from '../assets/images/MP4.svg';
 
 // background image
 
@@ -14,6 +16,8 @@ import bghtml from '../assets/images/bgHtml.svg';
 import bgmp4 from '../assets/images/bgMP4.svg';
 import bgqml from '../assets/images/bgQml.svg';
 import bgyoutube from '../assets/images/bgYouTube.svg';
+import bgmp3 from '../assets/images/bgMP4.svg';
+import bgwav from '../assets/images/bgMP4.svg';
 
 export const limit: number = 200;
 export const metaTags = {
@@ -215,6 +219,9 @@ export enum ContentType {
   YOUTUBE_X_VIDEO = 'video/x-youtube',
   WEBM_VIDEO = 'video/webm',
   VND = 'application/vnd.ekstep.content-collection',
+  //new types
+  AUDIO_MP3 = 'audio/mp3',
+  AUDIO_WAV = 'audio/wav',
 }
 
 export type FileType = {
@@ -249,6 +256,8 @@ export const ContentCardsTypes: FileType = {
   },
   [ContentType.WEBM_VIDEO]: { name: 'WEBM', imgPath: mp4, BgImgPath: bgmp4 },
   [ContentType.VND]: { name: 'WEBM', imgPath: html, BgImgPath: bghtml },
+  [ContentType.AUDIO_MP3]: { name: 'Audio', imgPath: mp3, BgImgPath: bgmp3 },
+  [ContentType.AUDIO_WAV]: { name: 'Audio', imgPath: wav, BgImgPath: bgwav },
 };
 export enum fieldKeys {
   GENDER = 'gender',
