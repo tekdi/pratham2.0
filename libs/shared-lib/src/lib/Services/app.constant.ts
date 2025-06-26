@@ -8,8 +8,6 @@ import qml from '../../assets/images/Qml.svg';
 import youtube from '../../assets/images/youtube.svg';
 import h5p from '../../assets/images/h5p.png';
 import unit from '../../assets/images/Unit.png';
-import mp3 from '../../assets/images/MP4.svg';
-import wav from '../../assets/images/MP4.svg';
 
 // background image
 
@@ -21,8 +19,6 @@ import bgqml from '../../assets/images/bgQml.svg';
 import bgyoutube from '../../assets/images/bgYouTube.svg';
 import bgh5p from '../../assets/images/bgh5p.png';
 import bgunit from '../../assets/images/bgUnit.png';
-import bgmp3 from '../../assets/images/bgMP4.svg';
-import bgwav from '../../assets/images/bgMP4.svg';
 
 export const limit: number = 300;
 export const refetchInterval: number = 5 * 60 * 1000; // 5 min
@@ -266,14 +262,14 @@ export const ContentCardsTypes: FileType = {
   },
   [ContentType.AUDIO_MP3]: { name: 'Audio',
     //@ts-ignore
-     imgPath: mp3,
+     imgPath: mp4,
     //@ts-ignore
-     BgImgPath: bgmp3 },
+     BgImgPath: bgmp4 },
   [ContentType.AUDIO_WAV]: { name: 'Audio', 
     //@ts-ignore
-    imgPath: wav, 
+    imgPath: mp4, 
     //@ts-ignore
-    BgImgPath: bgwav },
+    BgImgPath: bgmp4 },
 };
 
 export enum contentStatus {
