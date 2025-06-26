@@ -28,6 +28,9 @@ const MyComponent: React.FC = () => {
   const [isLogin, setIsLogin] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isProfileCard, setIsProfileCard] = useState(false);
+const storedConfig = typeof window !== 'undefined'
+  ? JSON.parse(localStorage.getItem('uiConfig') || '{}')
+  : {};
 
   useEffect(() => {
     const fetchTenantInfo = async () => {
@@ -88,7 +91,7 @@ const MyComponent: React.FC = () => {
 
   return (
     <Layout isLoadingChildren={isLoading} sx={gredientStyle}>
-      {isProfileCard && <CompleteProfileBanner />}
+      {isProfileCard && storedConfig.isCompleteProfile && <CompleteProfileBanner />}
       {isLogin && (
         <>
           <Box
@@ -119,7 +122,7 @@ const MyComponent: React.FC = () => {
           </Box>
           <InProgressContent />
 
-          <Grid container>
+          {localStorage.getItem('userProgram') === 'YouthNet' &&(<Grid container>
             <Grid
               item
               xs={12}
@@ -132,7 +135,8 @@ const MyComponent: React.FC = () => {
             >
               <LTwoCourse />
             </Grid>
-          </Grid>
+          </Grid>)
+}
         </>
       )}
 
@@ -140,7 +144,7 @@ const MyComponent: React.FC = () => {
         <Grid item xs={12}>
           {filter && (
             <LearnerCourse
-              title={'LEARNER_APP.COURSE.GET_STARTED'}
+              title={localStorage.getItem('userProgram') === 'Camp to Club'?'LEARNER_APP.COURSE.GET_STARTED_CLUB_COURSES':'LEARNER_APP.COURSE.GET_STARTED'}
               _content={{
                 pageName: 'L1_Content',
                 onlyFields: ['contentLanguage', 'se_subDomains', 'se_subjects'],
@@ -149,6 +153,15 @@ const MyComponent: React.FC = () => {
                   'se_subDomains',
                   'se_subjects',
                 ],
+ ...(
+  Array.isArray(storedConfig.showContent)  &&
+  storedConfig.showContent.length === 2  &&
+  storedConfig.showContent.includes('courses') &&
+  storedConfig.showContent.includes('contents')
+    ? { contentTabs: ['courses', 'content'] }
+    : {}
+),
+
                 staticFilter: {
                   se_domains:
                     typeof filter.filters?.domain === 'string'

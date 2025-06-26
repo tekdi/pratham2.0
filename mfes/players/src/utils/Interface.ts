@@ -20,6 +20,9 @@ export enum ContentType {
   YOUTUBE_X_VIDEO = 'video/x-youtube',
   WEBM_VIDEO = 'video/webm',
   COLLECTION = 'application/vnd.ekstep.content-collection',
+  //new types
+  AUDIO_MP3 = 'audio/mp3',
+  AUDIO_WAV = 'audio/wav',
 }
 
 export interface ContentCreate {
