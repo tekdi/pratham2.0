@@ -435,9 +435,9 @@ const DynamicForm = ({
   }, [formData]);
 
   useEffect(() => {
-    if (isRenderCompleted === true) {
+    if (isRenderCompleted === true && isReassign) {
       //commented below to fix bug of no district load
-      // handleChange({ formData: prefilledFormData });
+      handleChange({ formData: prefilledFormData });
     }
   }, [isRenderCompleted]);
 
@@ -1363,25 +1363,35 @@ const DynamicForm = ({
       setFormUiSchema(hiddenUISchema);
     }
   };
+  const prevNameRef = useRef({ firstName: '', lastName: '' });
+
   const handleFirstLastNameBlur = async (id: any, value: any) => {
-    console.log('Username onblur called', formData);
+  if (
+    formData?.firstName !== undefined &&
+    formData?.lastName !== undefined &&
+    type === 'learner'
+  ) {
+    // Only update if firstName or lastName changed
     if (
-      formData?.firstName !== undefined &&
-      formData?.lastName !== undefined &&
-      type == 'learner'
+      formData.firstName !== prevNameRef.current.firstName ||
+      formData.lastName !== prevNameRef.current.lastName
     ) {
-      const newUserName = `${formData.firstName}${formData.lastName}`;
-      if (!formData.username) {
-        if (formData.username !== newUserName) {
-          console.log('Usernameupdated', newUserName);
-          setFormData({
-            ...formData,
-            username: newUserName,
-          });
-        }
+      const randomTwoDigit = Math.floor(10 + Math.random() * 90);
+      const newUserName = `${formData.firstName}${formData.lastName}${randomTwoDigit}`;
+      if (formData.username !== newUserName) {
+        setFormData({
+          ...formData,
+          username: newUserName,
+        });
       }
+      // Update the ref to current values
+      prevNameRef.current = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+      };
     }
-  };
+  }
+};
   const handleSubmit = ({ formData }: { formData: any }) => {
     console.log('########### issue debug formData', formData);
 

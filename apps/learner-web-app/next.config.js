@@ -3,6 +3,18 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { composePlugins, withNx } = require('@nx/next');
 
+const PORTAL_BASE_URL = 'https://sunbird-editor.tekdinext.com';
+
+const routes = {
+  API: {
+    GENERAL: {
+      CONTENT_PREVIEW: '/content/preview/:path*',
+      CONTENT_PLUGINS: '/content-plugins/:path*',
+      GENERIC_EDITOR: '/generic-editor/:path*',
+    },
+  },
+};
+
 /**
  * @type {import('@nx/next/plugins/with-nx').WithNxOptions}
  **/
@@ -43,6 +55,11 @@ const nextConfig = {
       {
         source: '/assets/public/:path*', // Match any URL starting with /assets/public/
         destination: `${process.env.NEXT_PUBLIC_CLOUD_STORAGE_URL}/:path*`, // Forward to S3, stripping "/assets/public"
+      },
+      //for player content v1
+      {
+        source: routes.API.GENERAL.CONTENT_PREVIEW,
+        destination: `${PORTAL_BASE_URL}${routes.API.GENERAL.CONTENT_PREVIEW}`, // Proxy to portal
       },
     ];
   },
