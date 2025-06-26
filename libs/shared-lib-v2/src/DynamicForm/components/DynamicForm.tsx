@@ -35,6 +35,8 @@ const DynamicForm = ({
   extraFields,
   hideSubmit,
   type,
+  isCompleteProfile=false,
+  isReassign=false
 }: any) => {
   const { t } = useTranslation();
   const hasPrefilled = useRef(false);
@@ -51,10 +53,10 @@ const DynamicForm = ({
 
   //custom validation on formData for learner fields hide on dob
   useEffect(() => {
-    if (type == 'learner') {
+    if (type == 'learner'  && !isReassign) {
       // ...existing code...
       console.log('hello');
-      let requiredKeys = ['parent_phone', 'guardian_relation', 'guardian_name'];
+      let requiredKeys = ['parent_phone'];
       let requiredKeys2 = ['mobile'];
       console.log('formDatadynamicform', formData.family_member_details);
       console.log('updatedUiSchema------', formUiSchema);
@@ -72,7 +74,7 @@ const DynamicForm = ({
             // Merge only missing items from required2 into required1 guardian details
             requiredKeys.forEach((item) => {
               if (!requiredArray.includes(item)) {
-                //  requiredArray.push(item);
+                  requiredArray.push(item);
               }
             });
 
@@ -365,7 +367,7 @@ const DynamicForm = ({
       } else {
         // 1. Add back to schema if missing
         setFormSchema((prevSchema) => {
-          if (!prevSchema.properties?.own_phone_check) {
+          if (!prevSchema.properties?.own_phone_check && !isCompleteProfile) {
             return {
               ...prevSchema,
               properties: {
@@ -433,9 +435,9 @@ const DynamicForm = ({
   }, [formData]);
 
   useEffect(() => {
-    if (isRenderCompleted === true) {
+    if (isRenderCompleted === true && isReassign) {
       //commented below to fix bug of no district load
-      // handleChange({ formData: prefilledFormData });
+      handleChange({ formData: prefilledFormData });
     }
   }, [isRenderCompleted]);
 
@@ -1361,25 +1363,35 @@ const DynamicForm = ({
       setFormUiSchema(hiddenUISchema);
     }
   };
+  const prevNameRef = useRef({ firstName: '', lastName: '' });
+
   const handleFirstLastNameBlur = async (id: any, value: any) => {
-    console.log('Username onblur called', formData);
+  if (
+    formData?.firstName !== undefined &&
+    formData?.lastName !== undefined &&
+    type === 'learner'
+  ) {
+    // Only update if firstName or lastName changed
     if (
-      formData?.firstName !== undefined &&
-      formData?.lastName !== undefined &&
-      type == 'learner'
+      formData.firstName !== prevNameRef.current.firstName ||
+      formData.lastName !== prevNameRef.current.lastName
     ) {
-      const newUserName = `${formData.firstName}${formData.lastName}`;
-      if (!formData.username) {
-        if (formData.username !== newUserName) {
-          console.log('Usernameupdated', newUserName);
-          setFormData({
-            ...formData,
-            username: newUserName,
-          });
-        }
+      const randomTwoDigit = Math.floor(10 + Math.random() * 90);
+      const newUserName = `${formData.firstName}${formData.lastName}${randomTwoDigit}`;
+      if (formData.username !== newUserName) {
+        setFormData({
+          ...formData,
+          username: newUserName,
+        });
       }
+      // Update the ref to current values
+      prevNameRef.current = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+      };
     }
-  };
+  }
+};
   const handleSubmit = ({ formData }: { formData: any }) => {
     console.log('########### issue debug formData', formData);
 

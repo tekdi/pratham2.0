@@ -36,7 +36,15 @@ const ChangePassword = () => {
   ) => {
     try {
       let userIdName = localStorage.getItem('userIdName');
-      if (userIdName) {
+      if(oldPassword== newPassword)
+      {
+ showToastMessage(
+   'New password cannot be the same as the current password.',
+   'error'
+ );
+ return;
+      }
+      else if (userIdName) {
         try {
           const response = await login({
             username: userIdName,
