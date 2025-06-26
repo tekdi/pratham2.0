@@ -1,8 +1,8 @@
 /** @type {import('next').NextConfig} */
 import nextI18nextConfig from './next-i18next.config.js';
 
-// const PORTAL_BASE_URL = "https://sunbird-editor.tekdinext.com";
-const PORTAL_BASE_URL = 'http://localhost:3002/mfe_workspace';
+const PORTAL_BASE_URL = "https://sunbird-editor.tekdinext.com";
+// const PORTAL_BASE_URL = 'http://localhost:3002/mfe_workspace';
 
 const routes = {
   API: {
