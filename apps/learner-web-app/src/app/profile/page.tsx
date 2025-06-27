@@ -117,7 +117,7 @@ const ProfilePage = () => {
         </Box>
 
         {/* Certificates Section */}
-        <Box flexGrow={1} p={2}>
+        {localStorage.getItem('userProgram')==="YouthNet" &&(<Box flexGrow={1} p={2}>
           <Typography color={'#78590C'}>YouthNet</Typography>
 
           <Typography color={'#78590C'}>
@@ -153,7 +153,8 @@ const ProfilePage = () => {
                 />
               ))}
           </Box>
-        </Box>
+        </Box>)
+        }
       </Box>
       <CertificateModal
         certificateId={certificateId?.toString()}
