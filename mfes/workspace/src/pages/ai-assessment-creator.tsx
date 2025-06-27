@@ -142,9 +142,9 @@ const onlyFields = [
   'contentLanguage',
 ];
 const inputType = {
-  program: 'dropdown-single',
+  program: 'dropdown-multi',
   se_domains: 'dropdown-single',
-  se_subDomains: 'dropdown-multi',
+  se_subDomains: 'dropdown-single',
   se_subjects: 'dropdown-multi',
   primaryUser: 'dropdown-multi',
   targetAgeGroup: 'dropdown-multi',
@@ -157,8 +157,7 @@ const AIAssessmentCreator: React.FC = () => {
   const [showHeader, setShowHeader] = useState<boolean | null>(null);
   const [formState, setFormState] = useState<any>({});
   const tenantConfig = useTenantConfig();
-  const [showAIDialog, setShowAIDialog] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [showAIDialog, setShowAIDialog] = useState<any>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -202,6 +201,7 @@ const AIAssessmentCreator: React.FC = () => {
       console.error('Error creating question set:', error);
     }
   };
+
   const handleNextFromSetParameters = (parameters: any) => {
     const newFormState = {
       framework: tenantConfig?.CONTENT_FRAMEWORK,
@@ -228,7 +228,7 @@ const AIAssessmentCreator: React.FC = () => {
       if (
         inputType?.[key as keyof typeof inputType] === 'dropdown-single' &&
         Array.isArray(formData?.metadata?.[key]) &&
-        key !== 'program'
+        key !== 'se_subDomains'
       ) {
         formattedData[newKey] = formData?.metadata?.[key][0] || '';
       } else {
@@ -239,37 +239,13 @@ const AIAssessmentCreator: React.FC = () => {
       }
     });
     const newFormData = { ...formData, metadata: formattedData };
-    const identifier = await fetchData(newFormData);
-    const resultAi = await createAIQuestionsSet({
-      ...newFormData,
-      questionSetId: identifier,
-      token,
-    });
-    console.log('resultAi sagar', resultAi);
-    if (identifier) {
-      setShowAIDialog(true);
-      setProgress(0);
-      let prog = 0;
-      const interval = setInterval(async () => {
-        // Increase progress by 16.67 to reach 100 in 1 minute (6 intervals of 10 seconds)
-        prog += 16.67;
-        setProgress(Math.min(prog, 100)); // Ensure we don't exceed 100
-
-        // Check AI status every 10 seconds
-        try {
-          const status = await getAIQuestionSetStatus(identifier, token);
-          console.log('AI Status:', status);
-        } catch (error) {
-          console.error('Error checking AI status:', error);
-        }
-
-        if (prog >= 100) {
-          clearInterval(interval);
-          setTimeout(() => setShowAIDialog(false), 400);
-        }
-      }, 10000); // Run every 10 seconds for 1 minute total
-      // TODO: Replace with real API call and progress logic
-      console.log('Form Data:', newFormData);
+    try {
+      const identifier = await fetchData(newFormData);
+      if (identifier) {
+        setShowAIDialog({ newFormData, identifier, token });
+      }
+    } catch (error) {
+      console.error('Error creating question set:', error);
     }
   };
 
@@ -325,7 +301,10 @@ const AIAssessmentCreator: React.FC = () => {
         >
           {stepContent}
         </Box>
-        <AIGenerationDialog open={showAIDialog} progress={progress} />
+        <AIGenerationDialog
+          open={showAIDialog}
+          onClose={() => setShowAIDialog(null)}
+        />
       </Box>
     </Layout>
   );

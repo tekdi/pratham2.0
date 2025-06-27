@@ -1,26 +1,102 @@
-import React from 'react';
-import { Dialog, Box, Typography, Fade, Slider } from '@mui/material';
-import Image from 'next/image';
+import React, { useEffect, useState } from 'react';
+import { Dialog, Box, Typography, Fade, Slider, Button } from '@mui/material';
+import {
+  createAIQuestionsSet,
+  getAIQuestionSetStatus,
+} from '../../services/ContentService';
+import { useRouter } from 'next/router';
 
 const poppinsFont = {
   fontFamily: 'Poppins',
 };
 
 interface AIGenerationDialogProps {
-  open: boolean;
-  progress: number; // 0-100
+  open: any;
   onClose?: () => void;
 }
 
 const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
   open,
-  progress,
   onClose,
 }) => {
+  const [progress, setProgress] = useState(0);
+  const [showRetry, setShowRetry] = useState(false);
+  const [aiStatus, setAIStatus] = useState<string | null>(null);
+  const [aiStatusLoading, setAIStatusLoading] = useState(false);
+  const router = useRouter();
+
+  const sendToAi = React.useCallback(() => {
+    setProgress(0);
+    let prog = 0;
+    const interval = setInterval(async () => {
+      prog += 16.67;
+      setProgress(Math.min(prog, 100)); // Ensure we don't exceed 100
+      setAIStatusLoading(true);
+      try {
+        const status = await getAIQuestionSetStatus(
+          open.identifier,
+          open.token
+        );
+        setAIStatus(status);
+        console.log('AI Status:', status);
+      } catch (error) {
+        console.error('Error checking AI status:', error);
+      } finally {
+        setAIStatusLoading(false);
+      }
+      if (prog >= 100) {
+        clearInterval(interval);
+        setTimeout(() => {
+          router.push(`/editor?identifier=${open.identifier}`);
+        }, 400);
+      }
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [open, router]);
+
+  const handleAIQuestionSetCreation = React.useCallback(
+    async (newFormData: any, identifier: string, token: string) => {
+      try {
+        setShowRetry(false);
+        const response = await createAIQuestionsSet({
+          ...newFormData,
+          questionSetId: identifier,
+          token,
+        });
+        sendToAi();
+        return { success: true, data: response };
+      } catch (error) {
+        console.error('Error creating AI question set:', error);
+        setShowRetry(true);
+        return { success: false, error };
+      }
+    },
+    [sendToAi]
+  );
+
+  const handleRetry = () => {
+    if (open && open.newFormData && open.identifier && open.token) {
+      handleAIQuestionSetCreation(
+        open.newFormData,
+        open.identifier,
+        open.token
+      );
+    }
+  };
+
+  useEffect(() => {
+    if (open) {
+      handleAIQuestionSetCreation(
+        open.newFormData,
+        open.identifier,
+        open.token
+      );
+    }
+  }, [open, handleAIQuestionSetCreation]);
+
   return (
     <Dialog
       open={open}
-      onClose={onClose}
       PaperProps={{
         sx: {
           borderRadius: 2,
@@ -74,6 +150,32 @@ const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
             {progress}%
           </Typography>
         </Box>
+        {/* AI Status */}
+        {aiStatusLoading ? (
+          <Typography
+            sx={{
+              ...poppinsFont,
+              fontWeight: 400,
+              fontSize: 16,
+              color: '#1976d2',
+              mb: 1,
+            }}
+          >
+            AI Status: Checking again...
+          </Typography>
+        ) : aiStatus ? (
+          <Typography
+            sx={{
+              ...poppinsFont,
+              fontWeight: 400,
+              fontSize: 16,
+              color: '#1976d2',
+              mb: 1,
+            }}
+          >
+            AI Status: {aiStatus}
+          </Typography>
+        ) : null}
         {/* Main Text */}
         <Box sx={{ textAlign: 'center', mt: 2 }}>
           <Typography
@@ -100,6 +202,26 @@ const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
             Sit tight while we create a tailored set of questions based on your
             content.
           </Typography>
+          <Box
+            sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 2 }}
+          >
+            {showRetry && (
+              <>
+                <Button variant="outlined" onClick={handleRetry}>
+                  Retry
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="error"
+                  onClick={() =>
+                    router.push(`/editor?identifier=${open.identifier}`)
+                  }
+                >
+                  Close
+                </Button>
+              </>
+            )}
+          </Box>
         </Box>
       </Box>
     </Dialog>
