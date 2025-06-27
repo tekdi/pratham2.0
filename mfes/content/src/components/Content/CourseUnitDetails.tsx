@@ -22,10 +22,12 @@ import {
 import AppConst from '@content-mfes/utils/AppConst/AppConst';
 import { checkAuth, getUserId } from '@shared-lib-v2/utils/AuthService';
 import { getUserId as getUserIdLocal } from '@content-mfes/services/LoginService';
+import BreadCrumb from '../BreadCrumb';
 
 interface DetailsProps {
   isShowLayout?: any;
   isHideInfoCard?: boolean;
+  showBreadCrumbs?: any;
   id?: string;
   type?: 'collapse' | 'card';
   _config?: any;
@@ -76,12 +78,33 @@ export default function Details(props: DetailsProps) {
             unitId as string
           );
         }
+        if (props?.showBreadCrumbs) {
+          const breadcrum = findCourseUnitPath({
+            contentBaseUrl: props?._config?.contentBaseUrl,
+            node: resultHierarchyCourse,
+            targetId: (unitId as string) || (courseId as string),
+            keyArray: [
+              'name',
+              'identifier',
+              'mimeType',
+              {
+                key: 'link',
+                suffix: activeLink ? `?activeLink=${activeLink}` : '',
+              },
+            ],
+          });
+          setBreadCrumbs([
+            ...(props?.showBreadCrumbs?.prefix || []),
+            ...(breadcrum || []),
+            ...(props?.showBreadCrumbs?.suffix || []),
+          ]);
+        }
         if (unitId && !props?.isHideInfoCard) {
           setCourseItem(resultHierarchyCourse);
           const breadcrum = findCourseUnitPath({
             contentBaseUrl: props?._config?.contentBaseUrl,
             node: resultHierarchyCourse,
-            targetId: unitId as string,
+            targetId: (unitId as string) || (courseId as string),
             keyArray: [
               'name',
               'identifier',
@@ -260,6 +283,14 @@ export default function Details(props: DetailsProps) {
               ...props?._config?._infoCard,
             },
           }}
+        />
+      )}
+      {props?.showBreadCrumbs && (
+        <BreadCrumb
+          breadCrumbs={breadCrumbs}
+          isShowLastLink
+          customPlayerStyle={true}
+          customPlayerMarginTop={25}
         />
       )}
       <Box
