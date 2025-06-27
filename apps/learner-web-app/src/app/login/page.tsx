@@ -413,7 +413,11 @@ localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
         }
         else if (tenantName==="Camp to Club")
         {
-          router.push('/club-courses');
+          router.push('/courses-contents');
+        }
+        else if(tenantName==="Pragyanpath")
+        {
+          router.push('/courses-contents');
         }
       } else {
         showToastMessage('Username or password not correct', 'error');
