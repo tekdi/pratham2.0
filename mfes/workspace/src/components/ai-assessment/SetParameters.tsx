@@ -55,6 +55,10 @@ const SetParameters: React.FC<SetParametersProps> = ({
   onBack,
 }) => {
   const [formState, setFormState] = React.useState({
+    mcqCount: 0,
+    fillInTheBlanksCount: 0,
+    shortAnswerCount: 0,
+    longAnswerCount: 0,
     ...formStateProps,
     ...staticFilter,
   });
@@ -114,6 +118,16 @@ const SetParameters: React.FC<SetParametersProps> = ({
       newErrors.selectedDistributions =
         'At least one Question Distribution is required';
     }
+    // Validate at least one question count is >= 1
+    if (
+      (formState.mcqCount || 0) < 1 &&
+      (formState.fillInTheBlanksCount || 0) < 1 &&
+      (formState.shortAnswerCount || 0) < 1 &&
+      (formState.longAnswerCount || 0) < 1
+    ) {
+      newErrors.questionCount =
+        'At least one question type must have at least 1 question.';
+    }
     // Validate FilterForm fields if onlyFields is provided
     if (onlyFields && Array.isArray(onlyFields)) {
       onlyFields.forEach((field: string) => {
@@ -150,6 +164,10 @@ const SetParameters: React.FC<SetParametersProps> = ({
       selectedDistributions,
       content,
       difficulty_level,
+      mcqCount,
+      fillInTheBlanksCount,
+      shortAnswerCount,
+      longAnswerCount,
       ...otherFields
     } = formState;
     const metadata = {
@@ -164,9 +182,15 @@ const SetParameters: React.FC<SetParametersProps> = ({
       'Short Answer': 'short',
       'Long Answer': 'long',
     };
+    const typeCountMap: Record<string, number> = {
+      MCQ: mcqCount,
+      'Fill in the blanks': fillInTheBlanksCount,
+      'Short Answer': shortAnswerCount,
+      'Long Answer': longAnswerCount,
+    };
     const questionsDetails = selectedTypes.map((type: string) => ({
       type: typeMap[type] || type,
-      no: 2, // Replace with actual slider value if available
+      no: typeCountMap[type] || 0,
     }));
     onNext({
       difficulty_level,
@@ -374,13 +398,19 @@ const SetParameters: React.FC<SetParametersProps> = ({
                   mb: 1,
                 }}
               >
-                No. of MCQ's : 2
+                No. of MCQ's : {formState.mcqCount}
               </Typography>
               <Slider
-                defaultValue={2}
+                value={formState.mcqCount}
                 min={0}
                 max={10}
                 sx={{ color: '#FDBE16' }}
+                onChange={(_, value) =>
+                  setFormState((prev: any) => ({
+                    ...prev,
+                    mcqCount: value,
+                  }))
+                }
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -393,13 +423,19 @@ const SetParameters: React.FC<SetParametersProps> = ({
                   mb: 1,
                 }}
               >
-                No. of Fill in the blanks: 2
+                No. of Fill in the blanks: {formState.fillInTheBlanksCount}
               </Typography>
               <Slider
-                defaultValue={2}
+                value={formState.fillInTheBlanksCount}
                 min={0}
                 max={10}
                 sx={{ color: '#FDBE16' }}
+                onChange={(_, value) =>
+                  setFormState((prev: any) => ({
+                    ...prev,
+                    fillInTheBlanksCount: value,
+                  }))
+                }
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -412,13 +448,19 @@ const SetParameters: React.FC<SetParametersProps> = ({
                   mb: 1,
                 }}
               >
-                No. of Short Answer Questions : 2
+                No. of Short Answer Questions : {formState.shortAnswerCount}
               </Typography>
               <Slider
-                defaultValue={2}
+                value={formState.shortAnswerCount}
                 min={0}
                 max={10}
                 sx={{ color: '#FDBE16' }}
+                onChange={(_, value) =>
+                  setFormState((prev: any) => ({
+                    ...prev,
+                    shortAnswerCount: value,
+                  }))
+                }
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -431,15 +473,29 @@ const SetParameters: React.FC<SetParametersProps> = ({
                   mb: 1,
                 }}
               >
-                No. of Long Answer Questions : 2
+                No. of Long Answer Questions : {formState.longAnswerCount}
               </Typography>
               <Slider
-                defaultValue={2}
+                value={formState.longAnswerCount}
                 min={0}
                 max={10}
                 sx={{ color: '#FDBE16' }}
+                onChange={(_, value) =>
+                  setFormState((prev: any) => ({
+                    ...prev,
+                    longAnswerCount: value,
+                  }))
+                }
               />
             </Grid>
+            {/* Show error if questionCount validation fails */}
+            {errors.questionCount && (
+              <Grid item xs={12}>
+                <Typography color="error" variant="caption">
+                  {errors.questionCount}
+                </Typography>
+              </Grid>
+            )}
             <Grid item xs={12} md={6}>
               <FormControl
                 fullWidth
