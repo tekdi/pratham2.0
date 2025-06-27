@@ -199,7 +199,7 @@ const SelectContent: React.FC<SelectContentProps> = ({
           _config={{
             _loader: { _loader: { minHeight: 300 } },
             _box: { sx: { flexDirection: 'row', flexWrap: 'wrap' } },
-            _selectOptionBox: { sx: { minWidth: 300 } },
+            _selectOptionBox: { sx: { minWidth: 300, maxWidth: 300 } },
             inputType: inputType,
           }}
           onApply={handleFilterChange}

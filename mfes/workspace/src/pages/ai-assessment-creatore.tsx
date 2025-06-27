@@ -7,7 +7,14 @@ import SelectContent from '../components/ai-assessment/SelectContent';
 import SetParameters from '../components/ai-assessment/SetParameters';
 import useTenantConfig from '../hooks/useTenantConfig';
 import AIGenerationDialog from '../components/ai-assessment/AIGenerationDialog';
-import { createQuestionSet } from '@workspace/services/ContentService';
+import {
+  createAIQuestionsSet,
+  createQuestionSet,
+  deleteContent,
+  getAIQuestionSetStatus,
+  updateQuestionSet,
+} from '@workspace/services/ContentService';
+import { MIME_TYPE } from '@workspace/utils/app.config';
 
 const poppinsFont = {
   fontFamily: 'Poppins',
@@ -135,13 +142,13 @@ const onlyFields = [
   'contentLanguage',
 ];
 const inputType = {
-  program: 'dropdown',
-  se_domains: 'dropdown',
-  se_subDomains: 'dropdown',
-  se_subjects: 'dropdown',
-  primaryUser: 'dropdown',
-  targetAgeGroup: 'dropdown',
-  contentLanguage: 'dropdown',
+  program: 'dropdown-single',
+  se_domains: 'dropdown-single',
+  se_subDomains: 'dropdown-multi',
+  se_subjects: 'dropdown-multi',
+  primaryUser: 'dropdown-multi',
+  targetAgeGroup: 'dropdown-multi',
+  contentLanguage: 'dropdown-single',
 };
 const AIAssessmentCreator: React.FC = () => {
   const [selectedContent, setSelectedContent] = useState<string[]>([]);
@@ -174,13 +181,24 @@ const AIAssessmentCreator: React.FC = () => {
     setActiveStep((s) => s + 1);
   };
 
-  const fetchData = async () => {
+  const fetchData = async (data: any) => {
+    let response: any = '';
     try {
-      const response = await createQuestionSet(
-        tenantConfig?.COLLECTION_FRAMEWORK
-      );
-      return response?.result?.identifier;
+      response = await createQuestionSet(tenantConfig?.COLLECTION_FRAMEWORK);
+      const updateResponse = await updateQuestionSet({
+        identifier: response?.result?.identifier,
+        ...(data?.metadata || {}),
+      });
+      console.log('updateResponse', updateResponse);
+      return updateResponse?.result?.identifier;
     } catch (error) {
+      if (response?.result?.identifier) {
+        const resultDelet = await deleteContent(
+          response?.result?.identifier,
+          MIME_TYPE.QUESTIONSET_MIME_TYPE
+        );
+        console.log('resultDelet', resultDelet);
+      }
       console.error('Error creating question set:', error);
     }
   };
@@ -197,21 +215,62 @@ const AIAssessmentCreator: React.FC = () => {
 
   const handleBack = () => setActiveStep((s) => s - 1);
 
-  const handleSubmit = (formData: any) => {
-    // const identifier = fetchData();
-    setShowAIDialog(true);
-    setProgress(0);
-    let prog = 0;
-    const interval = setInterval(() => {
-      prog += 1;
-      setProgress(prog);
-      if (prog >= 100) {
-        clearInterval(interval);
-        setTimeout(() => setShowAIDialog(false), 400);
+  const handleSubmit = async (formData: any) => {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('No token found');
+    // Convert dropdown-single array values to single string
+    const formattedData = { ...(formData?.metadata || {}) };
+    Object.keys(inputType).forEach((key: string) => {
+      let newKey = key;
+      if (key.startsWith('se_') && key.endsWith('s')) {
+        newKey = key.slice(3, -1); // Remove 'se_' prefix and 's' suffix
       }
-    }, 600);
-    // TODO: Replace with real API call and progress logic
-    console.log('Form Data:', formData);
+      if (
+        inputType?.[key as keyof typeof inputType] === 'dropdown-single' &&
+        Array.isArray(formData?.metadata?.[key]) &&
+        key !== 'program'
+      ) {
+        formattedData[newKey] = formData?.metadata?.[key][0] || '';
+      } else {
+        formattedData[newKey] = formData?.metadata?.[key];
+      }
+      if (key.startsWith('se_') && key.endsWith('s')) {
+        delete formattedData[key];
+      }
+    });
+    const newFormData = { ...formData, metadata: formattedData };
+    const identifier = await fetchData(newFormData);
+    const resultAi = await createAIQuestionsSet({
+      ...newFormData,
+      questionSetId: identifier,
+      token,
+    });
+    console.log('resultAi sagar', resultAi);
+    if (identifier) {
+      setShowAIDialog(true);
+      setProgress(0);
+      let prog = 0;
+      const interval = setInterval(async () => {
+        // Increase progress by 16.67 to reach 100 in 1 minute (6 intervals of 10 seconds)
+        prog += 16.67;
+        setProgress(Math.min(prog, 100)); // Ensure we don't exceed 100
+
+        // Check AI status every 10 seconds
+        try {
+          const status = await getAIQuestionSetStatus(identifier, token);
+          console.log('AI Status:', status);
+        } catch (error) {
+          console.error('Error checking AI status:', error);
+        }
+
+        if (prog >= 100) {
+          clearInterval(interval);
+          setTimeout(() => setShowAIDialog(false), 400);
+        }
+      }, 10000); // Run every 10 seconds for 1 minute total
+      // TODO: Replace with real API call and progress logic
+      console.log('Form Data:', newFormData);
+    }
   };
 
   let stepContent = null;

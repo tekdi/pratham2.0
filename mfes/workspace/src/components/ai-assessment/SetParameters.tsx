@@ -269,8 +269,8 @@ const SetParameters: React.FC<SetParametersProps> = ({
                   }
                   input={<OutlinedInput label="Assessment Type" />}
                 >
-                  <MenuItem value="Pre">Pre Test</MenuItem>
-                  <MenuItem value="Post">Post Test</MenuItem>
+                  <MenuItem value="Pre Test">Pre Test</MenuItem>
+                  <MenuItem value="Post Test">Post Test</MenuItem>
                   <MenuItem value="Other">Other</MenuItem>
                 </Select>
                 {errors.assessmentType && (

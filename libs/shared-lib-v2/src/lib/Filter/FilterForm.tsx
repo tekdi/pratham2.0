@@ -57,7 +57,10 @@ interface FilterSectionProps {
   isOpenColapsed?: boolean | any[];
   t: (key: string) => string;
   _checkbox?: any;
-  inputType?: Record<string, 'checkbox' | 'dropdown'>;
+  inputType?: Record<
+    string,
+    'checkbox' | 'dropdown' | 'dropdown-single' | 'dropdown-multi'
+  >;
   _box?: any;
   _selectOptionBox?: any;
   errors?: Record<string, string>;
@@ -376,10 +379,13 @@ const FilterSection: React.FC<FilterSectionProps> = ({
           : [];
         const fieldError = errors[code];
         const isRequired = required[code];
+        const isDropdownSingle = inputType[code] === 'dropdown-single';
+        const isDropdownMulti = inputType[code] === 'dropdown-multi';
         if (
           Array.isArray(staticValues) &&
           staticValues.length > 0 &&
-          inputType[code] !== 'dropdown'
+          !isDropdownSingle &&
+          !isDropdownMulti
         ) {
           if (!isShowStaticFilterValue) {
             return null;
@@ -413,7 +419,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
             </Box>
           );
         }
-        if (inputType[code] === 'dropdown') {
+        if (isDropdownSingle || isDropdownMulti) {
           return (
             <Box key={code} {...(_selectOptionBox ?? {})}>
               <FormControl
@@ -423,36 +429,55 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                 sx={{ mt: 1 }}
                 error={!!fieldError}
               >
-                <InputLabel
-                  id={`multi-select-label-${code}`}
-                  error={!!fieldError}
-                >
+                <InputLabel id={`select-label-${code}`} error={!!fieldError}>
                   {field.name}
                 </InputLabel>
                 <Select
                   readOnly={
                     Array.isArray(staticValues) && staticValues.length > 0
                   }
-                  labelId={`multi-select-label-${code}`}
-                  multiple
-                  value={selected?.map((s: any) => s.code ?? s.name ?? s)}
+                  labelId={`select-label-${code}`}
+                  multiple={isDropdownMulti}
+                  value={
+                    isDropdownMulti
+                      ? selected?.map((s: any) => s.code ?? s.name ?? s)
+                      : selected[0]?.code ??
+                        selected[0]?.name ??
+                        selected[0] ??
+                        ''
+                  }
                   onChange={(e) => {
-                    const value = e.target.value as string[];
-                    const next = values.filter((item: any) =>
-                      value.includes(item.code ?? item.name ?? item)
-                    );
-                    onChange(code, next);
+                    if (isDropdownMulti) {
+                      const value = e.target.value as string[];
+                      const next = values.filter((item: any) =>
+                        value.includes(item.code ?? item.name ?? item)
+                      );
+                      onChange(code, next);
+                    } else {
+                      const value = e.target.value as string;
+                      const next = values.filter(
+                        (item: any) =>
+                          (item.code ?? item.name ?? item) === value
+                      );
+                      onChange(code, next);
+                    }
                   }}
                   renderValue={(selectedVals) =>
-                    (selectedVals as string[])
-                      .map(
-                        (val) =>
-                          values.find(
-                            (item: any) =>
-                              item.code === val || item.name === val
-                          )?.name ?? val
-                      )
-                      .join(', ')
+                    isDropdownMulti
+                      ? (selectedVals as string[])
+                          .map(
+                            (val) =>
+                              values.find(
+                                (item: any) =>
+                                  item.code === val || item.name === val
+                              )?.name ?? val
+                          )
+                          .join(', ')
+                      : values.find(
+                          (item: any) =>
+                            item.code === selectedVals ||
+                            item.name === selectedVals
+                        )?.name ?? selectedVals
                   }
                 >
                   {values.map((item: any) => (
@@ -460,16 +485,18 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                       key={item.code ?? item.name ?? item}
                       value={item.code ?? item.name ?? item}
                     >
-                      <Checkbox
-                        checked={selected.some(
-                          (s: any) =>
-                            (s.code &&
-                              s.code === (item.code ?? item.name ?? item)) ||
-                            (s.name &&
-                              s.name === (item.code ?? item.name ?? item)) ||
-                            s === (item.code ?? item.name ?? item)
-                        )}
-                      />
+                      {isDropdownMulti && (
+                        <Checkbox
+                          checked={selected.some(
+                            (s: any) =>
+                              (s.code &&
+                                s.code === (item.code ?? item.name ?? item)) ||
+                              (s.name &&
+                                s.name === (item.code ?? item.name ?? item)) ||
+                              s === (item.code ?? item.name ?? item)
+                          )}
+                        />
+                      )}
                       <ListItemText primary={item.name ?? item} />
                     </MenuItem>
                   ))}
