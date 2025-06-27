@@ -638,7 +638,28 @@
     "VILLAGE": "Village",
     "BLOCK": "Block",
     "DISTRICT": "District",
-    "STATE": "State"
+    "STATE": "State",
+    "FAMILY_MEMBER_DETAILS":"Family member Details",
+    "SPOUSE_NAME":"Spouse Name",
+    "Unemployed_housewife_domestic_work":"Unemployed/Housewife/Domestic Work",
+        "SELF_EMPLOYMENT_OWN_BUSINESS_SHOP": "Self Employment, Own Business or Shop",
+          "NOPHONE": "No Phone",
+    "FATHER": "Father",
+    "MOTHER": "Mother",
+    "SPOUSE": "Spouse",
+    "GRADE_1": "Grade 1",
+    "GRADE_2": "Grade 2",
+    "GRADE_3": "Grade 3",
+    "GRADE_4": "Grade 4",
+    "GRADE_5": "Grade 5",
+    "GRADE_6": "Grade 6",
+    "GRADE_7": "Grade 7",
+    "GRADE_8": "Grade 8",
+    "GRADE_9": "Grade 9",
+    "GRADE_10": "Grade 10",
+    "GRADE_11": "Grade 11",
+    "GRADE_12": "Grade 12"
+
 
   },
   "FORM_ERROR_MESSAGES": {
@@ -923,4 +944,5 @@
   "BOARD": "Board",
   "MEDIUM": "Medium",
   "GRADE": "Grade"
+  
 }
