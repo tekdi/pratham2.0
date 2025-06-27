@@ -192,6 +192,48 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
   });
 
   const getMessage = () => (modalOpen ? t('COMMON.SURE_LOGOUT') : '');
+useEffect(() => {
+  let currentPage = '';
+  if (typeof window !== 'undefined') {
+    const searchParams = new URLSearchParams(window.location.search);
+    const activeLink = searchParams.get('activeLink');
+    currentPage = activeLink || window.location.pathname || '';
+  }
+
+  const program = localStorage.getItem('userProgram') || '';
+
+  const disallowedPathsMap: Record<string, string[]> = {
+    YouthNet: ['/club-courses'],
+    'Camp to Club': ['/content', '/observations', '/skill-center'],
+  };
+
+  const disallowedPaths = disallowedPathsMap[program] || [];
+
+  if (disallowedPaths.includes(currentPage)) {
+    // Redirect to a safe/default page
+    const fallbackPath = program === 'Camp to Club' ? '/club-courses' : '/content';
+    router.push('/unauthorized');
+    return;
+  }
+
+  const configFn = NAV_CONFIG[program];
+  const navLinks = configFn
+    ? configFn({
+        router,
+        isMobile,
+        t,
+        handleNavClick,
+        handleProfileClick,
+        handleLogoutModal,
+        setAnchorEl,
+        getLinkStyle,
+        currentPage,
+        checkAuth: checkAuth(),
+      })
+    : [];
+
+  setDefaultNavLinks(navLinks);
+}, [t, router, isMobile]);
 
   useEffect(() => {
     let currentPage = '';

@@ -432,8 +432,13 @@ const RegisterUser = () => {
   const onCloseSuccessModal = () => {
     //  const route = localStorage.getItem('redirectionRoute');
     //   if (route) router.push(route);
-
-    setVerificationSuccessModal(false);
+console.log("onCloseSuccessModal" ,formData)
+setUsername(
+  (formData?.firstName || '') +
+    (formData?.lastName || '') +
+    Math.floor(10 + Math.random() * 90) // random 2-digit number
+);
+  setVerificationSuccessModal(false);
     setUsernamePasswordForm(true);
   };
   const onCloseSignupSuccessModal = () => {
@@ -479,16 +484,21 @@ const RegisterUser = () => {
 
             if (userResponse) {
               if (
-                userResponse?.tenantData?.[0]?.roleName === 'Learner' &&
-                userResponse?.tenantData?.[0]?.tenantName === 'YouthNet'
+                userResponse?.tenantData?.[0]?.roleName === 'Learner' 
+              //  userResponse?.tenantData?.[0]?.tenantName === 'YouthNet'
               ) {
+             const tenantName = userResponse?.tenantData?.[0]?.tenantName;
+                localStorage.setItem('userProgram', tenantName);
+            const uiConfig = userResponse?.tenantData?.[0]?.params?.uiConfig;
+             localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
+
                 localStorage.setItem('userId', userResponse?.userId);
                 console.log(userResponse?.tenantData);
                 localStorage.setItem(
                   'templtateId',
                   userResponse?.tenantData?.[0]?.templateId
                 );
-
+                
                 localStorage.setItem('userIdName', userResponse?.username);
                 localStorage.setItem('name', userResponse?.firstName);
                 localStorage.setItem(
