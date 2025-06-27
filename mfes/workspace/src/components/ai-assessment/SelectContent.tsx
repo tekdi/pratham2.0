@@ -191,7 +191,7 @@ const SelectContent: React.FC<SelectContentProps> = ({
 
   return (
     <Box>
-      <Box p={3}>
+      <Box p={3} pb={0}>
         {tenantConfig?.COLLECTION_FRAMEWORK && (
           <FilterForm
             orginalFormData={filter}
@@ -280,7 +280,7 @@ const SelectContent: React.FC<SelectContentProps> = ({
         </Box>
       )}
       {!loading && hasMore && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', pt: 2 }}>
           <Button
             variant="outlined"
             onClick={() => setPage((prev) => prev + 1)}
@@ -289,7 +289,7 @@ const SelectContent: React.FC<SelectContentProps> = ({
           </Button>
         </Box>
       )}
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 3 }}>
         <Button
           variant="contained"
           sx={{

@@ -13,9 +13,9 @@ import {
   deleteContent,
   getAIQuestionSetStatus,
   updateQuestionSet,
-} from '@workspace/services/ContentService';
-import { MIME_TYPE } from '@workspace/utils/app.config';
-
+} from '../services/ContentService';
+import { MIME_TYPE } from '../utils/app.config';
+import { useRouter } from 'next/router';
 const poppinsFont = {
   fontFamily: 'Poppins',
 };
@@ -163,8 +163,15 @@ const AIAssessmentCreator: React.FC = () => {
   const [showHeader, setShowHeader] = useState<boolean | null>(null);
   const [formState, setFormState] = useState<any>({});
   const tenantConfig = useTenantConfig();
-  const [showAIDialog, setShowAIDialog] = useState<any>(null);
+  const [showAIDialog, setShowAIDialog] = useState(false);
   const [staticFilter, setStaticFilter] = useState({});
+  const [aiDialogState, setAIDialogState] = useState<
+    'loader' | 'success' | 'failed'
+  >('loader');
+  const [aiProgress, setAIProgress] = useState(0);
+  const [aiStatus, setAIStatus] = useState<string | null>(null);
+  const [aiDialogParams, setAIDialogParams] = useState<any>(null); // for retry
+  const router = useRouter();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -219,6 +226,58 @@ const AIAssessmentCreator: React.FC = () => {
     }
   };
 
+  // Orchestrate AI generation dialog and API
+  const handleAIGeneration = async ({
+    newFormData,
+    identifier,
+    token,
+  }: {
+    newFormData: any;
+    identifier: string;
+    token: string;
+  }) => {
+    setAIDialogParams({ newFormData, identifier, token });
+    setAIDialogState('loader');
+    setAIProgress(0);
+    setAIStatus(null);
+    setShowAIDialog(true);
+
+    try {
+      // 1. Call AI generation API
+      await createAIQuestionsSet({
+        ...newFormData,
+        questionSetId: identifier,
+        token,
+      });
+
+      // 2. Poll for status (sendToAi logic)
+      let prog = 0;
+      const interval = setInterval(async () => {
+        prog += 1.67;
+        setAIProgress(Math.round(Math.min(prog, 100)));
+        try {
+          if (Math.floor(prog / 1.67) % 10 === 0 && prog > 0) {
+            const status = await getAIQuestionSetStatus(identifier, token);
+            setAIStatus(status);
+            if (status === 'COMPLETED') {
+              clearInterval(interval);
+              setAIDialogState('success');
+            }
+          }
+        } catch (error) {
+          console.error('Error getting AI question set status:', error);
+        }
+        if (prog >= 100) {
+          clearInterval(interval);
+          setAIDialogState('success'); // or 'failed' if you want
+        }
+      }, 1000);
+    } catch (error: any) {
+      setAIDialogState('failed');
+      console.error('Error creating AI question set:', error);
+    }
+  };
+
   const handleNextFromSetParameters = (parameters: any) => {
     const newFormState = {
       framework:
@@ -229,7 +288,6 @@ const AIAssessmentCreator: React.FC = () => {
       ...parameters,
     };
     setFormState((prev: any) => ({ ...prev, ...newFormState }));
-    // setActiveStep((s) => s + 1);
     handleSubmit(newFormState);
   };
 
@@ -276,7 +334,7 @@ const AIAssessmentCreator: React.FC = () => {
     try {
       const identifier = await fetchData(newFormData);
       if (identifier) {
-        setShowAIDialog({ newFormData, identifier, token });
+        handleAIGeneration({ newFormData, identifier, token });
       }
     } catch (error) {
       console.error('Error creating question set:', error);
@@ -341,7 +399,14 @@ const AIAssessmentCreator: React.FC = () => {
         </Box>
         <AIGenerationDialog
           open={showAIDialog}
-          onClose={() => setShowAIDialog(null)}
+          state={aiDialogState}
+          progress={aiProgress}
+          aiStatus={aiStatus}
+          onRetry={() => handleAIGeneration(aiDialogParams)}
+          onClose={() => setShowAIDialog(false)}
+          onGoToEditor={() => {
+            router.push(`/editor?identifier=${aiDialogParams?.identifier}`);
+          }}
         />
       </Box>
     </Layout>

@@ -17,6 +17,7 @@ import {
 } from '@mui/material';
 import { FilterForm } from 'libs/shared-lib-v2/src/lib/Filter/FilterForm';
 import useTenantConfig from '@workspace/hooks/useTenantConfig';
+import ConfirmationDialog from './ConfirmationDialog';
 
 const poppinsFont = {
   fontFamily: 'Poppins',
@@ -59,6 +60,7 @@ const SetParameters: React.FC<SetParametersProps> = ({
   });
   const [errors, setErrors] = React.useState<any>({});
   const tenantConfig = useTenantConfig();
+  const [showConfirm, setShowConfirm] = React.useState(false);
 
   // Handler for FilterForm changes (local only)
   const handleFilterChange = (newFilter: any) => {
@@ -131,10 +133,14 @@ const SetParameters: React.FC<SetParametersProps> = ({
   const handleNext = () => {
     const validationErrors = validate();
     setErrors(validationErrors);
-
     if (Object.keys(validationErrors).length > 0) {
       return;
     }
+    setShowConfirm(true);
+  };
+
+  const handleConfirm = () => {
+    setShowConfirm(false);
     // Build metadata from assessment info and all formState fields (no filter)
     const {
       assessmentTitle,
@@ -152,9 +158,6 @@ const SetParameters: React.FC<SetParametersProps> = ({
       assessmentType,
       ...otherFields,
     };
-
-    // Build questionsDetails array from selectedTypes and sliders (hardcoded for now)
-    // You can replace the hardcoded numbers with actual slider values if you wire them up
     const typeMap: Record<string, string> = {
       MCQ: 'MCQ',
       'Fill in the blanks': 'fill_in_the_blanks',
@@ -165,7 +168,6 @@ const SetParameters: React.FC<SetParametersProps> = ({
       type: typeMap[type] || type,
       no: 2, // Replace with actual slider value if available
     }));
-
     onNext({
       difficulty_level,
       question_types: selectedTypes,
@@ -513,9 +515,14 @@ const SetParameters: React.FC<SetParametersProps> = ({
           }}
           onClick={handleNext}
         >
-          Next: Review Questionnaire
+          Next: Initiate Question Generation
         </Button>
       </Box>
+      <ConfirmationDialog
+        open={showConfirm}
+        onConfirm={handleConfirm}
+        onCancel={() => setShowConfirm(false)}
+      />
     </Box>
   );
 };
