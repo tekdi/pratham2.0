@@ -17,11 +17,12 @@ interface ContentCardGridProps {
 
 const ContentCardGrid = memo((props: ContentCardGridProps) => {
   const { t } = useTranslation();
-  const { default_img, _subBox, _grid, _card } = props._config ?? {};
+  const { default_img, _subBox, _grid, _containerGrid, _card } =
+    props._config ?? {};
 
   return (
     <Box {..._subBox} sx={{ ...(_subBox?.sx ?? {}) }}>
-      <Grid container spacing={{ xs: 1, sm: 1, md: 2 }}>
+      <Grid container spacing={{ xs: 1, sm: 1, md: 2 }} {..._containerGrid}>
         {props.contentData?.map((item: any) => (
           <Grid
             key={item?.identifier}

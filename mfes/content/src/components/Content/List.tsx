@@ -16,7 +16,7 @@ import {
   ContentItem,
   getData,
 } from '@shared-lib';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import BackToTop from '@content-mfes/components/BackToTop';
 import RenderTabContent from '@content-mfes/components/ContentTabs';
 import HelpDesk from '@content-mfes/components/HelpDesk';
@@ -76,6 +76,7 @@ export interface ContentProps {
 
 export default function Content(props: Readonly<ContentProps>) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [searchValue, setSearchValue] = useState('');
   const [tabValue, setTabValue] = useState<number>(0);
   const [tabs, setTabs] = useState<typeof DEFAULT_TABS>([]);
@@ -102,7 +103,6 @@ export default function Content(props: Readonly<ContentProps>) {
   const sessionKeys = {
     filters: `${props?.pageName}_savedFilters`,
     search: `${props?.pageName}_searchValue`,
-    tab: `${props?.pageName}_tabValue`,
     scrollId: `${props?.pageName}_scrollToContentId`,
   };
 
@@ -130,7 +130,10 @@ export default function Content(props: Readonly<ContentProps>) {
         sessionStorage.getItem(sessionKeys.filters) || 'null'
       );
       const savedSearch = sessionStorage.getItem(sessionKeys.search) || '';
-      const savedTab = parseInt(sessionStorage.getItem(sessionKeys.tab) || '0');
+
+      // Get tab value from URL parameter
+      const urlTab = searchParams.get('tab');
+      const savedTab = urlTab ? parseInt(urlTab) : 0;
 
       const config = props ?? (await getData('mfes_content_pages_content'));
       setPropData(config);
@@ -169,7 +172,7 @@ export default function Content(props: Readonly<ContentProps>) {
       setIsPageLoading(false);
     };
     init();
-  }, [props, sessionKeys.filters, sessionKeys.search, sessionKeys.tab]);
+  }, [props, sessionKeys.filters, sessionKeys.search, searchParams]);
 
   // Fetch content with loop to load full data up to offset
   const fetchAllContent = useCallback(
@@ -341,7 +344,6 @@ export default function Content(props: Readonly<ContentProps>) {
       el.scrollIntoView({ behavior: 'smooth' });
       sessionStorage.removeItem(sessionKeys.scrollId);
       sessionStorage.removeItem(sessionKeys.filters);
-      sessionStorage.removeItem(sessionKeys.tab);
     } else {
       // Retry in the next animation frame if element not yet mounted
       requestAnimationFrame(() => {
@@ -350,7 +352,6 @@ export default function Content(props: Readonly<ContentProps>) {
           retryEl.scrollIntoView({ behavior: 'smooth' });
           sessionStorage.removeItem(sessionKeys.scrollId);
           sessionStorage.removeItem(sessionKeys.filters);
-          sessionStorage.removeItem(sessionKeys.tab);
         }
       });
     }
@@ -387,13 +388,18 @@ export default function Content(props: Readonly<ContentProps>) {
 
   const handleTabChange = (event: any, newValue: number) => {
     setTabValue(newValue);
-    sessionStorage.setItem(sessionKeys.tab, newValue.toString());
+
+    // Update URL with new tab parameter
+    const url = new URL(window.location.href);
+    url.searchParams.set('tab', newValue.toString());
+    router.replace(url.pathname + url.search);
+
     handleSetFilters({
       offset: 0,
       type: tabs[newValue].type,
     });
   };
-
+  console.log('tabValue', props?.pageName);
   const handleCardClickLocal = useCallback(
     async (content: ContentItem) => {
       try {

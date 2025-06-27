@@ -20,6 +20,20 @@ const UnitCard = ({
   default_img?: string;
   handleCardClick: (content: ContentItem) => void;
 }) => {
+  if (_card?.cardComponent) {
+    return (
+      <CardWrap isWrap={_card?.isWrap} _card={_card}>
+        <_card.cardComponent
+          item={item}
+          type={type}
+          default_img={default_img}
+          _card={_card}
+          handleCardClick={handleCardClick}
+          trackData={trackData}
+        />
+      </CardWrap>
+    );
+  }
   return (
     <CardWrap isWrap>
       <CommonCard
