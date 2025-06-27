@@ -117,43 +117,48 @@ const ProfilePage = () => {
         </Box>
 
         {/* Certificates Section */}
-        <Box flexGrow={1} p={2}>
-          <Typography color={'#78590C'}>YouthNet</Typography>
+      {typeof window !== "undefined" && localStorage.getItem('userProgram') === "YouthNet" ? (
+  <Box flexGrow={1} p={2}>
+    <Typography color={'#78590C'}>YouthNet</Typography>
 
-          <Typography color={'#78590C'}>
-            Completed Courses & Certificates
-          </Typography>
-          {courseData.length === 0 && (
-            <Box display="flex" alignItems="center" p="20px">
-              <InfoIcon color="info" sx={{ color: '#FDBE16', mr: 1 }} />
-              <Typography>Certification has not been completed yet.</Typography>
-            </Box>
-          )}
-          <Box
-            mt="20px"
-            display="grid"
-            gridTemplateColumns={{
-              xs: '1fr', // 1 column for mobile
-              sm: '1fr 1fr', // 2 columns for small screens
-              md: '1fr 1fr', // 2 columns for medium
-              lg: '1fr 1fr 1fr', // 3 columns for large screens
-              xl: '1fr 1fr 1fr 1fr', // 4 columns for extra-large screens
-            }}
-            gap={2}
-          >
-            {courseData.length !== 0 &&
-              courseData?.map((cert: any, index: any) => (
-                <CourseCertificateCard
-                  key={index}
-                  title={cert.program}
-                  description={cert.description}
-                  imageUrl={cert.posterImage}
-                  completionDate={cert.completedOn}
-                  onPreviewCertificate={() => handlePreview(cert.certificateId)}
-                />
-              ))}
-          </Box>
-        </Box>
+    <Typography color={'#78590C'}>
+      Completed Courses & Certificates
+    </Typography>
+
+    {courseData.length === 0 && (
+      <Box display="flex" alignItems="center" p="20px">
+        <InfoIcon color="info" sx={{ color: '#FDBE16', mr: 1 }} />
+        <Typography>Certification has not been completed yet.</Typography>
+      </Box>
+    )}
+
+    <Box
+      mt="20px"
+      display="grid"
+      gridTemplateColumns={{
+        xs: '1fr',
+        sm: '1fr 1fr',
+        md: '1fr 1fr',
+        lg: '1fr 1fr 1fr',
+        xl: '1fr 1fr 1fr 1fr',
+      }}
+      gap={2}
+    >
+      {courseData.length !== 0 &&
+        courseData?.map((cert: any, index: any) => (
+          <CourseCertificateCard
+            key={index}
+            title={cert.program}
+            description={cert.description}
+            imageUrl={cert.posterImage}
+            completionDate={cert.completedOn}
+            onPreviewCertificate={() => handlePreview(cert.certificateId)}
+          />
+        ))}
+    </Box>
+  </Box>
+) : null}
+
       </Box>
       <CertificateModal
         certificateId={certificateId?.toString()}
