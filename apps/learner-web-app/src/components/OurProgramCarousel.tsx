@@ -25,6 +25,15 @@ interface Program {
   ordering: number;
   name: string;
   tenantId: string;
+  params?: {
+    uiConfig?: {
+      showSignup?: boolean;
+      showSignIn?: boolean;
+      showProgram?: boolean;
+      [key: string]: any;
+    };
+    [key: string]: any;
+  } | null;
   programImages: {
     label: string;
     description: string;
@@ -47,8 +56,13 @@ const OurProgramCarousel = () => {
     const fetchTenantInfo = async () => {
       try {
         const res = await getTenantInfo();
-        console.log('Tenant Info:', res);
-        setPrograms(res?.result || []);
+        // console.log('Tenant Info:', res?.result);
+        const programsData = res?.result || [];
+        const visiblePrograms = programsData?.filter(
+          (program: any) => program?.params?.uiConfig?.showProgram === true
+        );
+        // console.log('visiblePrograms', visiblePrograms);
+        setPrograms(visiblePrograms || []);
         const tenantIds = res?.result?.map((item: any) => item.tenantId);
         setTenantId(tenantIds);
       } catch (error) {
@@ -254,25 +268,44 @@ const OurProgramCarousel = () => {
                   <CardActions
                     sx={{ justifyContent: 'center', p: 2, mt: 'auto' }}
                   >
-                    <Button
-                      fullWidth
-                      variant="contained"
-                      color="primary"
-                      sx={{
-                        borderRadius: 50,
-                        backgroundColor: '#FDBE16',
-                        '&:hover': {
+                    {program?.params?.uiConfig?.showSignup === true && (
+                      <Button
+                        fullWidth
+                        variant="contained"
+                        color="primary"
+                        sx={{
+                          borderRadius: 50,
                           backgroundColor: '#FDBE16',
-                        },
-                      }}
-                      onClick={() =>
-                        router.push(
-                          '/registration?tenantId=' + program?.tenantId
-                        )
-                      }
-                    >
-                      {t('LEARNER_APP.HOME.SIGN_UP')}
-                    </Button>
+                          '&:hover': {
+                            backgroundColor: '#FDBE16',
+                          },
+                        }}
+                        onClick={() =>
+                          router.push(
+                            '/registration?tenantId=' + program?.tenantId
+                          )
+                        }
+                      >
+                        {t('LEARNER_APP.HOME.SIGN_UP')}
+                      </Button>
+                    )}
+                    {program?.params?.uiConfig?.showSignIn === true && (
+                      <Button
+                        fullWidth
+                        variant="contained"
+                        color="primary"
+                        sx={{
+                          borderRadius: 50,
+                          backgroundColor: '#FDBE16',
+                          '&:hover': {
+                            backgroundColor: '#FDBE16',
+                          },
+                        }}
+                        onClick={() => router.push('/login')}
+                      >
+                        {t('LEARNER_APP.HOME.SIGN_IN')}
+                      </Button>
+                    )}
                   </CardActions>
                 </Card>
               </SwiperSlide>
