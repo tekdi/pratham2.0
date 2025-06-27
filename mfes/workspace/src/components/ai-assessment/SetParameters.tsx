@@ -16,6 +16,7 @@ import {
   Grid,
 } from '@mui/material';
 import { FilterForm } from 'libs/shared-lib-v2/src/lib/Filter/FilterForm';
+import useTenantConfig from '@workspace/hooks/useTenantConfig';
 
 const poppinsFont = {
   fontFamily: 'Poppins',
@@ -57,6 +58,7 @@ const SetParameters: React.FC<SetParametersProps> = ({
     ...staticFilter,
   });
   const [errors, setErrors] = React.useState<any>({});
+  const tenantConfig = useTenantConfig();
 
   // Handler for FilterForm changes (local only)
   const handleFilterChange = (newFilter: any) => {
@@ -211,25 +213,29 @@ const SetParameters: React.FC<SetParametersProps> = ({
                 helperText={errors.assessmentTitle}
                 InputLabelProps={{ style: { fontFamily: 'Poppins' } }}
               />
-              <FilterForm
-                orginalFormData={formState}
-                isShowStaticFilterValue={true}
-                onlyFields={onlyFields}
-                staticFilter={staticFilter}
-                _config={{
-                  inputType: inputType,
-                  _loader: { _loader: { minHeight: 100 } },
-                }}
-                onApply={handleFilterChange}
-                errors={errors}
-                required={
-                  onlyFields && Array.isArray(onlyFields)
-                    ? Object.fromEntries(
-                        onlyFields.map((f: string) => [f, true])
-                      )
-                    : {}
-                }
-              />
+              {tenantConfig?.COLLECTION_FRAMEWORK && (
+                <FilterForm
+                  orginalFormData={formState}
+                  isShowStaticFilterValue={true}
+                  onlyFields={onlyFields}
+                  staticFilter={staticFilter}
+                  _config={{
+                    COLLECTION_FRAMEWORK: tenantConfig?.COLLECTION_FRAMEWORK,
+                    CHANNEL_ID: tenantConfig?.CHANNEL_ID,
+                    inputType: inputType,
+                    _loader: { _loader: { minHeight: 100 } },
+                  }}
+                  onApply={handleFilterChange}
+                  errors={errors}
+                  required={
+                    onlyFields && Array.isArray(onlyFields)
+                      ? Object.fromEntries(
+                          onlyFields.map((f: string) => [f, true])
+                        )
+                      : {}
+                  }
+                />
+              )}
             </Grid>
             <Grid item xs={12} md={6}>
               <TextField

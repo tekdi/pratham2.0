@@ -125,15 +125,17 @@ const CustomStepper = ({ activeStep }: { activeStep: number }) => (
     </Box>
   </Box>
 );
-const staticFilter = {
-  program: [
-    typeof window !== 'undefined' ? localStorage.getItem('program') : '',
-  ],
-  // se_subjects: ['English'],
-};
 
+const onlyFields1 = [
+  'se_boards',
+  'se_mediums',
+  'se_gradeLevels',
+  'se_subjects',
+  'se_courseTypes',
+  // 'contentLanguage',
+];
 const onlyFields = [
-  'program',
+  // 'program',
   'se_domains',
   'se_subDomains',
   'se_subjects',
@@ -143,6 +145,10 @@ const onlyFields = [
 ];
 const inputType = {
   program: 'dropdown-multi',
+  se_boards: 'dropdown-single',
+  se_mediums: 'dropdown-multi',
+  se_gradeLevels: 'dropdown-multi',
+  se_courseTypes: 'dropdown-multi',
   se_domains: 'dropdown-single',
   se_subDomains: 'dropdown-single',
   se_subjects: 'dropdown-multi',
@@ -158,6 +164,7 @@ const AIAssessmentCreator: React.FC = () => {
   const [formState, setFormState] = useState<any>({});
   const tenantConfig = useTenantConfig();
   const [showAIDialog, setShowAIDialog] = useState<any>(null);
+  const [staticFilter, setStaticFilter] = useState({});
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -166,11 +173,22 @@ const AIAssessmentCreator: React.FC = () => {
     const headerValue = localStorage.getItem('showHeader');
     setShowHeader(headerValue === 'true');
 
+    const staticFilterData = {
+      program: [
+        tenantConfig?.COLLECTION_FRAMEWORK === 'scp-framework'
+          ? 'Second Chance'
+          : localStorage.getItem('program'),
+      ],
+      se_subjects: ['English'],
+      se_domains: ['Learning for School'],
+      se_subDomains: ['Academics'],
+    };
+    setStaticFilter(staticFilterData);
     if (token && userId) {
       document.cookie = `authToken=${token}; path=/; secure; SameSite=Strict`;
       document.cookie = `userId=${userId}; path=/; secure; SameSite=Strict`;
     }
-  }, []);
+  }, [tenantConfig]);
 
   const handleNextFromSelectContent = (newFormData: any) => {
     setFormState((prev: any) => ({
@@ -188,7 +206,6 @@ const AIAssessmentCreator: React.FC = () => {
         identifier: response?.result?.identifier,
         ...(data?.metadata || {}),
       });
-      console.log('updateResponse', updateResponse);
       return updateResponse?.result?.identifier;
     } catch (error) {
       if (response?.result?.identifier) {
@@ -204,7 +221,10 @@ const AIAssessmentCreator: React.FC = () => {
 
   const handleNextFromSetParameters = (parameters: any) => {
     const newFormState = {
-      framework: tenantConfig?.CONTENT_FRAMEWORK,
+      framework:
+        tenantConfig?.COLLECTION_FRAMEWORK === 'scp-framework'
+          ? 'scp'
+          : tenantConfig?.COLLECTION_FRAMEWORK,
       channel: tenantConfig?.CHANNEL_ID,
       ...parameters,
     };
@@ -219,8 +239,12 @@ const AIAssessmentCreator: React.FC = () => {
     const token = localStorage.getItem('token');
     if (!token) throw new Error('No token found');
     // Convert dropdown-single array values to single string
-    const formattedData = { ...(formData?.metadata || {}) };
-    Object.keys(inputType).forEach((key: string) => {
+    const formattedData = {};
+    const onlyFieldsNew =
+      tenantConfig?.COLLECTION_FRAMEWORK === 'scp-framework'
+        ? onlyFields1
+        : onlyFields;
+    onlyFieldsNew.forEach((key: string) => {
       let newKey = key;
       if (key.startsWith('se_') && key.endsWith('s')) {
         newKey = key.slice(3, -1); // Remove 'se_' prefix and 's' suffix
@@ -228,17 +252,27 @@ const AIAssessmentCreator: React.FC = () => {
       if (
         inputType?.[key as keyof typeof inputType] === 'dropdown-single' &&
         Array.isArray(formData?.metadata?.[key]) &&
-        key !== 'se_subDomains'
+        !['se_subDomains'].includes(key)
       ) {
-        formattedData[newKey] = formData?.metadata?.[key][0] || '';
+        (formattedData as Record<string, string>)[newKey] =
+          formData?.metadata?.[key][0] || '';
       } else {
-        formattedData[newKey] = formData?.metadata?.[key];
+        (formattedData as Record<string, any>)[newKey] =
+          formData?.metadata?.[key];
       }
       if (key.startsWith('se_') && key.endsWith('s')) {
-        delete formattedData[key];
+        delete (formattedData as Record<string, any>)[key];
       }
     });
-    const newFormData = { ...formData, metadata: formattedData };
+    const newFormData = {
+      ...formData,
+      metadata: {
+        ...formattedData,
+        name: formData?.metadata?.name,
+        description: formData?.metadata?.description,
+        assessmentType: formData?.metadata?.assessmentType,
+      },
+    };
     try {
       const identifier = await fetchData(newFormData);
       if (identifier) {
@@ -267,7 +301,11 @@ const AIAssessmentCreator: React.FC = () => {
       <SetParameters
         formState={formState}
         staticFilter={staticFilter}
-        onlyFields={onlyFields}
+        onlyFields={
+          tenantConfig?.COLLECTION_FRAMEWORK === 'scp-framework'
+            ? onlyFields1
+            : onlyFields
+        }
         inputType={inputType}
         onNext={(parameters: any) => handleNextFromSetParameters(parameters)}
         onBack={handleBack}

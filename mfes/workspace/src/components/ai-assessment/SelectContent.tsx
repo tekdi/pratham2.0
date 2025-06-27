@@ -188,22 +188,33 @@ const SelectContent: React.FC<SelectContentProps> = ({
   const filteredSources = contentSources.filter((item) =>
     item.name.toLowerCase().includes(debouncedSearch.toLowerCase())
   );
+
   return (
     <Box>
       <Box p={3}>
-        <FilterForm
-          orginalFormData={filter}
-          isShowStaticFilterValue={true}
-          onlyFields={onlyFields}
-          staticFilter={staticFilter}
-          _config={{
-            _loader: { _loader: { minHeight: 300 } },
-            _box: { sx: { flexDirection: 'row', flexWrap: 'wrap' } },
-            _selectOptionBox: { sx: { minWidth: 300, maxWidth: 300 } },
-            inputType: inputType,
-          }}
-          onApply={handleFilterChange}
-        />
+        {tenantConfig?.COLLECTION_FRAMEWORK && (
+          <FilterForm
+            orginalFormData={filter}
+            isShowStaticFilterValue={true}
+            onlyFields={onlyFields}
+            staticFilter={staticFilter}
+            _config={{
+              COLLECTION_FRAMEWORK:
+                tenantConfig?.COLLECTION_FRAMEWORK === 'scp-framework'
+                  ? 'pos-framework'
+                  : tenantConfig?.COLLECTION_FRAMEWORK,
+              CHANNEL_ID:
+                tenantConfig?.CHANNEL_ID === 'scp-channel'
+                  ? 'pos-channel'
+                  : tenantConfig?.CHANNEL_ID,
+              _loader: { _loader: { minHeight: 300 } },
+              _box: { sx: { flexDirection: 'row', flexWrap: 'wrap' } },
+              _selectOptionBox: { sx: { minWidth: 300, maxWidth: 300 } },
+              inputType: inputType,
+            }}
+            onApply={handleFilterChange}
+          />
+        )}
         <Box sx={{ my: 2, width: 400 }}>
           <TextField
             fullWidth

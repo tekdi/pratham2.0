@@ -103,10 +103,12 @@ export function FilterForm({
   const memoizedStaticFilter = React.useMemo(() => staticFilter, []);
   const memoizedOnlyFields = React.useMemo(() => onlyFields, []);
   const memoizedFilterFramework = React.useMemo(() => filterFramework, []);
-
   useEffect(() => {
     const fetchData = async (noFilter = true) => {
-      const instantId = localStorage.getItem('collectionFramework') ?? '';
+      const instantId =
+        _config?.COLLECTION_FRAMEWORK ??
+        localStorage.getItem('collectionFramework') ??
+        '';
       let data: any = {};
 
       if (memoizedFilterFramework) {
@@ -118,7 +120,8 @@ export function FilterForm({
       const categories = data?.framework?.categories ?? [];
       const transformedRenderForm = transformRenderForm(categories);
       // Fetch static filter content
-      const instantFramework = localStorage.getItem('channelId') ?? '';
+      const instantFramework =
+        _config?.CHANNEL_ID ?? localStorage.getItem('channelId') ?? '';
       const staticResp = await staticFilterContent({ instantFramework });
       const props =
         staticResp?.objectCategoryDefinition?.forms?.create?.properties ?? [];
@@ -220,7 +223,7 @@ const formatPayload = (payload: any) => {
   Object.keys(payload).forEach((key) => {
     if (Array.isArray(payload[key])) {
       formattedPayload[key] = payload[key].map(
-        (item: any) => item.name ?? item
+        (item: any) => item?.name ?? item
       );
     } else {
       formattedPayload[key] = payload[key];
@@ -281,7 +284,7 @@ function replaceOptionsWithAssoc({
     const selectedValues = filterValue[currentFilter.code];
     if (Array.isArray(selectedValues) && selectedValues.length > 0) {
       const newfilterValue = selectedValues.map(
-        (item: any) => item.code ?? item
+        (item: any) => item?.code ?? item
       );
       const selectedOptions = currentFilter?.options?.filter(
         (opt: any) =>
@@ -440,7 +443,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                   multiple={isDropdownMulti}
                   value={
                     isDropdownMulti
-                      ? selected?.map((s: any) => s.code ?? s.name ?? s)
+                      ? selected?.map((s: any) => s?.code ?? s?.name ?? s)
                       : selected[0]?.code ??
                         selected[0]?.name ??
                         selected[0] ??
@@ -489,10 +492,10 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                         <Checkbox
                           checked={selected.some(
                             (s: any) =>
-                              (s.code &&
-                                s.code === (item.code ?? item.name ?? item)) ||
-                              (s.name &&
-                                s.name === (item.code ?? item.name ?? item)) ||
+                              (s?.code &&
+                                s?.code === (item.code ?? item.name ?? item)) ||
+                              (s?.name &&
+                                s?.name === (item.code ?? item.name ?? item)) ||
                               s === (item.code ?? item.name ?? item)
                           )}
                         />
