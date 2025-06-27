@@ -13,8 +13,8 @@ import {
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import HomeIcon from '@mui/icons-material/Home';
-import Layout from '../../layout/Layout';
-import SubHeader from '../../subHeader/SubHeader';
+import Layout from '../../../../components/themantic/layout/Layout';
+import SubHeader from '../../../../components/themantic/subHeader/SubHeader';
 
 // Reusable Breadcrumb Component
 const CustomBreadcrumbs = ({
