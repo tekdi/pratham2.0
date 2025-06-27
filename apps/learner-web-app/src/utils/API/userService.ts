@@ -45,13 +45,13 @@ export const userCheck = async ({
 };
 function setLocalStorageFromCustomFields(fields: any) {
   const getFieldId = (labelKey: any) => {
-    const field = fields.find((f: any) => f.label === labelKey);
+    const field = fields?.find?.((f: any) => f.label === labelKey);
     console.log("statename",field?.selectedValues?.[0]?.value )  
   //  localStorage.setItem("stateName", field?.selectedValues?.[0]?.value)
      return field?.selectedValues?.[0]?.id ?? null;
   };
    const getFieldLabel = (labelKey: any) => {
-    const field = fields.find((f: any) => f.label === labelKey);
+    const field = fields?.find?.((f: any) => f.label === labelKey);
     console.log("statename",field?.selectedValues?.[0]?.value )  
     // localStorage.setItem("stateName", field?.selectedValues?.[0]?.value)
      return field?.selectedValues?.[0]?.value ?? null;
@@ -82,7 +82,7 @@ export const profileComplitionCheck = async (): Promise<any> => {
         tenantId: localStorage.getItem('tenantId'),
       });
       const userData = response?.data?.result?.userData;
-      const isVolunteerField = userData?.customFields.find(
+      const isVolunteerField = userData?.customFields?.find(
         (field: any) => field.label === 'IS_VOLUNTEER'
       );
       console.log(isVolunteerField);
@@ -116,7 +116,7 @@ export const profileComplitionCheck = async (): Promise<any> => {
       console.log('result', result);
       delete result?.properties?.is_volunteer;
 
-      const isPropertiesEmpty = Object.keys(result.properties).length === 0;
+const isPropertiesEmpty = Object.keys(result?.properties || {}).length === 0;
       return isPropertiesEmpty;
     }
   } catch (error) {
