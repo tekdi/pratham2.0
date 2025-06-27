@@ -632,7 +632,14 @@
     "REASON_FOR_DROP_OUT_FROM_SCHOOL": "Reason for drop out from School",
     "WHAT_IS_YOUR_PRIMARY_WORK": "What is Your Primary Work?",
     "CENTER": "Center",
-    "BATCH": "Batch"
+    "BATCH": "Batch",
+    "PARENT_GUARDIAN_PHONE_NO": "Parent/Guardian Phone Number",
+    "TYPE_OF_PHONE_ACCESSIBLE": "Type of Phone Accessible",
+    "VILLAGE": "Village",
+    "BLOCK": "Block",
+    "DISTRICT": "District",
+    "STATE": "State"
+
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "Invalid Input.",
