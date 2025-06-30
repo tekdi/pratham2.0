@@ -2,13 +2,14 @@ import React from 'react';
 import { Dialog, Box, Typography, Fade, Slider, Button } from '@mui/material';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined';
+import PendingOutlinedIcon from '@mui/icons-material/PendingOutlined';
 const poppinsFont = {
   fontFamily: 'Poppins',
 };
 
 interface AIGenerationDialogProps {
   open: boolean;
-  state: 'loader' | 'success' | 'failed';
+  state: 'loader' | 'success' | 'failed' | 'processing';
   progress?: number;
   aiStatus?: string | null;
   onRetry?: () => void;
@@ -58,17 +59,46 @@ const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
           width: { xs: 320, sm: 536 },
         }}
       >
-        {state === 'loader' && (
+        {/* Processing State */}
+        {state === 'processing' && (
           <>
-            {/* Logo */}
             <Box sx={{ mb: 3 }}>
-              <img src={'/logo.png'} alt="Logo" height={64} />
+              <PendingOutlinedIcon sx={{ fontSize: 80, color: '#FDBE16' }} />
             </Box>
+            <Typography
+              sx={{
+                ...poppinsFont,
+                fontWeight: 600,
+                fontSize: 24,
+                color: '#1F1B13',
+                mb: 1,
+                textAlign: 'center',
+              }}
+            >
+              Taking longer than expected..
+            </Typography>
+            <Typography
+              sx={{
+                ...poppinsFont,
+                fontWeight: 400,
+                fontSize: 16,
+                color: '#635E57',
+                mb: 4,
+                textAlign: 'center',
+                maxWidth: 400,
+                lineHeight: 1.5,
+              }}
+            >
+              Hold on, we will redirect you to the editor in some time
+            </Typography>
           </>
         )}
         {/* Loader State */}
         {state === 'loader' && (
           <>
+            <Box sx={{ mb: 3 }}>
+              <img src={'/logo.png'} alt="Logo" height={64} />
+            </Box>
             <Box sx={{ position: 'relative', width: 414, height: 80 }}>
               <Slider
                 value={progress}
