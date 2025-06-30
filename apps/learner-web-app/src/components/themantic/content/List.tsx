@@ -178,7 +178,7 @@ export const CardComponent = ({
   handleCardClick: any;
   isExplore?: boolean;
 }) => {
-  console.log(item, 'sagar');
+  console.log(item, 'shreays');
 
   const onClick = (id: string) => {
     if (handleCardClick) {
@@ -217,7 +217,7 @@ export const CardComponent = ({
         <Box sx={{ margin: '8px' }}>
           <img
             height={'200px'}
-            src={item.image || item.thumbnail || default_img}
+            src={item.posterImage || item.thumbnail || default_img}
             alt={item.name || item.title || 'Content'}
             style={{ width: '100%', objectFit: 'cover' }}
           />
