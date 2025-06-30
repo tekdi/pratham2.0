@@ -96,6 +96,10 @@ const SubHeader = ({ showFilter }: { showFilter: boolean }) => {
                 fontSize: { xs: '1.1rem', sm: '1.25rem' },
                 color: '#222',
                 mb: 0.5,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                maxWidth: '100%',
               }}
             >
               72 Resources
