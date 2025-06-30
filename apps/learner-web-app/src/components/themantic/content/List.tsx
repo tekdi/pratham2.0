@@ -67,36 +67,44 @@ const List: React.FC<ListProps> = ({
               }
             >
               <Container maxWidth="lg">
-                <Content
-                  isShowLayout={false}
-                  contentTabs={['Course']}
-                  pageName="Course"
-                  onTotalCountChange={handleTotalCountChange}
-                  filters={{
-                    limit: 3,
-                    filters: {
-                      program: 'Experimento India',
+                <Box
+                  sx={{
+                    '& .css-17kujh3': {
+                      overflowY: 'unset !important',
                     },
                   }}
-                  _config={{
-                    contentBaseUrl: '/themantic',
-                    _grid: {
-                      xs: 12,
-                      sm: 6,
-                      md: 4,
-                      lg: 4,
-                      xl: 4,
-                    },
-                    _containerGrid: {
-                      spacing: { xs: 6, sm: 6, md: 6 },
-                    },
-                    default_img: '/images/image_ver.png',
-                    _card: {
-                      cardComponent: mainCourseCard,
-                    },
-                  }}
-                  hasMoreData={false}
-                />
+                >
+                  <Content
+                    isShowLayout={false}
+                    contentTabs={['Course']}
+                    pageName="Course"
+                    onTotalCountChange={handleTotalCountChange}
+                    filters={{
+                      limit: 3,
+                      filters: {
+                        program: 'Experimento India',
+                      },
+                    }}
+                    _config={{
+                      contentBaseUrl: '/themantic',
+                      _grid: {
+                        xs: 12,
+                        sm: 6,
+                        md: 4,
+                        lg: 4,
+                        xl: 4,
+                      },
+                      _containerGrid: {
+                        spacing: { xs: 6, sm: 6, md: 6 },
+                      },
+                      default_img: '/images/image_ver.png',
+                      _card: {
+                        cardComponent: mainCourseCard,
+                      },
+                    }}
+                    hasMoreData={false}
+                  />
+                </Box>
               </Container>
             </Suspense>
           </div>
@@ -137,7 +145,17 @@ const List: React.FC<ListProps> = ({
                 New Arrivals
               </Typography>
             </Box>
-            <Box>
+            <Box
+              sx={{
+                '& .css-4oqe9z': {
+                  display: 'none !important',
+                  marginBottom: '0 !important',
+                },
+                '& .css-17kujh3': {
+                  overflowY: 'unset !important',
+                },
+              }}
+            >
               <Content
                 isShowLayout={false}
                 contentTabs={['content']}

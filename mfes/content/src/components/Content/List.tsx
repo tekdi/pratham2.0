@@ -461,6 +461,7 @@ export default function Content(props: Readonly<ContentProps>) {
             width: '100%',
             display: 'flex',
             justifyContent: 'space-between',
+            overflow: 'unset !important',
           }}
         >
           {propData?.showSearch && (
