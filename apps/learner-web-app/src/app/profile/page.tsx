@@ -120,6 +120,7 @@ const ProfilePage = () => {
       {typeof window !== "undefined" && localStorage.getItem('userProgram') === "YouthNet" ? (
   <Box flexGrow={1} p={2}>
     <Typography color={'#78590C'}>YouthNet</Typography>
+    
 
     <Typography color={'#78590C'}>
       Completed Courses & Certificates
