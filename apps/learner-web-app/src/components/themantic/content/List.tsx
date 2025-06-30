@@ -92,7 +92,7 @@ const List: React.FC<ListProps> = ({
                     },
                     default_img: '/images/image_ver.png',
                     _card: {
-                      cardComponent: CardComponent,
+                      cardComponent: mainCourseCard,
                     },
                   }}
                   hasMoreData={false}
@@ -119,7 +119,7 @@ const List: React.FC<ListProps> = ({
                 backgroundColor: '#FFC107',
                 width: 'fit-content',
                 position: 'absolute',
-                top: '-40px',
+                top: '-46px',
                 left: 0,
                 p: 1,
                 border: '1px solid white',
@@ -129,7 +129,7 @@ const List: React.FC<ListProps> = ({
             >
               <Typography
                 sx={{
-                  fontSize: '16px',
+                  fontSize: '20px',
                   fontWeight: 600,
                   color: '#000',
                 }}
@@ -179,19 +179,27 @@ const List: React.FC<ListProps> = ({
 
 export default List;
 
+export const mainCourseCard = (props: any) => (
+  <CardComponent {...props} titleFontSize="24px" fontWeight={700} />
+);
+
 export const cardHideExplore = (props: any) => (
-  <CardComponent {...props} isExplore={false} />
+  <CardComponent {...props} titleFontSize="16px" isExplore={false} />
 );
 export const CardComponent = ({
   item,
   default_img,
   handleCardClick,
   isExplore = true,
+  titleFontSize,
+  fontWeight,
 }: {
   item: any;
   default_img: any;
   handleCardClick: any;
   isExplore?: boolean;
+  titleFontSize?: string;
+  fontWeight?: number;
 }) => {
   const onClick = (id: string) => {
     if (handleCardClick) {
@@ -240,9 +248,9 @@ export const CardComponent = ({
         <Typography
           variant="h6"
           sx={{
-            fontWeight: '400',
+            fontWeight: fontWeight || 400,
             textAlign: 'center',
-            fontSize: '16px',
+            fontSize: titleFontSize || '16px',
             letterSpacing: '1px',
             lineHeight: 1.2,
             mt: 1,
