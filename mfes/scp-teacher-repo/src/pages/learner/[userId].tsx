@@ -300,7 +300,6 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
       setOverallAttendance(userData);
     }
   };
-
   // ger user information
   const fetchUserDetails = async () => {
     setLoading(true);
@@ -457,14 +456,68 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
     fetchUserDetails();
   }, [reload]);
 
-  const uniqueFields = customFieldsData.filter(
+  const coreFields = [
+    // { label: 'FIRST_NAME', value: userData?.firstName },
+    // { label: 'MIDDLE_NAME', value: userData?.middleName },
+    // { label: 'LAST_NAME', value: userData?.lastName },
+    { label: 'GENDER', value: userData?.gender },
+    { label: 'DOB', value: userData?.dob },
+    { label: 'EMAIL', value: userData?.email },
+    { label: 'MOBILE', value: userData?.mobile },
+  ];
+
+  const coreFieldsForDisplay = coreFields
+    .filter(f => f.value) // Only include fields with values
+    .map((f, idx) => ({
+      fieldId: f.label,
+      label: f.label,
+      type: 'text',
+      value: f.value,
+      displayValue: f.value,
+      order: idx, 
+      coreField: 1,
+    }));
+
+  const mergedCustomFields = [
+    ...coreFieldsForDisplay,
+    ...customFieldsData,
+    ...(userData?.customFields || []),
+  ];
+
+  const uniqueFields = mergedCustomFields.filter(
     (field, index, self) =>
       index === self.findIndex((f) => f.label === field.label)
   );
 
+  const specialFieldsOrder = [
+    'STATE',
+    'DISTRICT',
+    'BLOCK',
+    'VILLAGE',
+    'CENTER',
+    'BATCH',
+  ];
+
   const learnerDetailsByOrder = [...uniqueFields]
-    ?.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-    ?.filter((field) => (field.order ?? 0) <= 12)
+    ?.map((field, idx) => {
+      // If not already set, assign a default order
+      if (field.order === undefined) field.order = idx;
+      return field;
+    })
+    .sort((a, b) => {
+      const aIdx = specialFieldsOrder.indexOf((a.label || '').toUpperCase());
+      const bIdx = specialFieldsOrder.indexOf((b.label || '').toUpperCase());
+
+      if (aIdx === -1 && bIdx === -1) {
+        // Neither is a special field: sort by order
+        return (a.order ?? 0) - (b.order ?? 0);
+      }
+      if (aIdx === -1) return -1; // a comes before b
+      if (bIdx === -1) return 1;  // b comes before a
+      // Both are special fields: sort by their order in specialFieldsOrder
+      return aIdx - bIdx;
+    })
+    ?.filter((field) => (field.order ?? 0) <= 12 || specialFieldsOrder.includes((field.label || '').toUpperCase()))
     ?.map((field) => {
       const getSelectedOption = (field: any) => {
         return (
@@ -647,8 +700,6 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
   //   return questionValues;
   // }
   // questionValues
-  // const questionValues = getQuestionValues(assesmentData);
-
   // all function call when page render
   // useEffect(() => {
   //   const class_Id = localStorage.getItem('classId') || '';
@@ -1085,6 +1136,23 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
             <Grid container spacing={4}>
               {learnerDetailsByOrder?.map((item, i) => {
                 let displayValue = item?.displayValue;
+
+                // Prefer displayValue if present and not '-'
+                if (displayValue && displayValue !== '-') {
+                  // Use displayValue as is
+                } else if (item.selectedValues && Array.isArray(item.selectedValues) && item.selectedValues.length > 0) {
+                  // For drop_down or radio, selectedValues can be array of objects or strings
+                  if (typeof item.selectedValues[0] === 'object' && item.selectedValues[0] !== null) {
+                    // For objects with value/label
+                    displayValue = item.selectedValues.map((v: any) => v.label || v.value).join(', ');
+                  } else {
+                    // For array of strings
+                    displayValue = item.selectedValues.join(', ');
+                  }
+                } else {
+                  displayValue = '-';
+                }
+
                 if (
                   item.label?.toUpperCase() === 'CENTER' &&
                   center &&
@@ -1093,12 +1161,16 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
                 ) {
                   displayValue = center.name;
                 }
+                if (item.label?.toUpperCase() === 'BATCH') {
+                  displayValue = batchNames.map((name) => toPascalCase(name)).join(', ');
+                }
+
                 const labelText = item.label
                   ? t(`FORM.${item?.label?.toUpperCase()}`, item?.label)
                   : item?.label;
 
                 return (
-                  <Grid item xs={6} key={i}>
+                  <Grid item xs={4} key={i}>
                     <Typography
                       variant="h4"
                       sx={{
@@ -1118,11 +1190,7 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
                         color: theme.palette.warning['A200'],
                       }}
                     >
-                      {item.label?.toUpperCase() === 'BATCH'
-                        ? batchNames
-                            .map((name) => toPascalCase(name))
-                            .join(', ')
-                        : typeof displayValue === 'string'
+                      {displayValue !== '-' && typeof displayValue === 'string'
                         ? t(`FORM.${displayValue}`, toPascalCase(displayValue))
                         : toPascalCase(displayValue)}
                     </Typography>
