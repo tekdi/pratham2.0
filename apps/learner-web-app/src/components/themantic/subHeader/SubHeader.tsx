@@ -14,9 +14,15 @@ import SearchIcon from '@mui/icons-material/Search';
 import { SearchButton } from '../SearchButton';
 import { useRouter } from 'next/navigation';
 
-const languages = ['English', 'Hindi', 'Marathi'];
+const languages = ['English', 'Marathi', 'Hindi'];
 
-const SubHeader = ({ showFilter }: { showFilter: boolean }) => {
+const SubHeader = ({
+  showFilter,
+  resourceCount = 0,
+}: {
+  showFilter: boolean;
+  resourceCount?: number;
+}) => {
   const [search, setSearch] = useState('');
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [selectedLang, setSelectedLang] = React.useState('English');
@@ -26,9 +32,10 @@ const SubHeader = ({ showFilter }: { showFilter: boolean }) => {
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = (lang?: string) => {
-    if (lang) setSelectedLang(lang);
     setAnchorEl(null);
+    if (lang) setSelectedLang(lang);
   };
 
   return (
@@ -93,16 +100,17 @@ const SubHeader = ({ showFilter }: { showFilter: boolean }) => {
               variant="h6"
               sx={{
                 fontWeight: 600,
-                fontSize: { xs: '1.1rem', sm: '1.25rem' },
-                color: '#222',
+                fontSize: '18px',
+                color: 'black',
                 mb: 0.5,
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 maxWidth: '100%',
+                fontFamily: '"Montserrat", sans-serif',
               }}
             >
-              72 Resources
+              {resourceCount} Resources
             </Typography>
             <Box
               sx={{

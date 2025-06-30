@@ -1,9 +1,16 @@
 'use client';
 
-import React, { Suspense } from 'react';
+import React, { Suspense, useState } from 'react';
 import dynamic from 'next/dynamic';
 import HomeCards from '@learner/app/themantic/HomeCards/HomeCards';
-import { Box, Container, Card, CardContent, Typography } from '@mui/material';
+import {
+  Box,
+  Container,
+  Card,
+  CardContent,
+  Typography,
+  Divider,
+} from '@mui/material';
 import Layout from '../layout/Layout';
 import SubHeader from '../subHeader/SubHeader';
 
@@ -28,9 +35,15 @@ const List: React.FC<ListProps> = ({
   // title = 'Content List',
   className = '',
 }) => {
+  const [totalCount, setTotalCount] = useState<number>(0);
+
+  const handleTotalCountChange = (count: number) => {
+    setTotalCount(count);
+  };
+
   return (
     <Layout>
-      <SubHeader showFilter={true} />
+      <SubHeader showFilter={true} resourceCount={totalCount} />
       <Box
         sx={{
           minHeight: '100vh',
@@ -58,6 +71,7 @@ const List: React.FC<ListProps> = ({
                   isShowLayout={false}
                   contentTabs={['Course']}
                   pageName="Course"
+                  onTotalCountChange={handleTotalCountChange}
                   filters={{
                     limit: 3,
                     filters: {
@@ -91,7 +105,7 @@ const List: React.FC<ListProps> = ({
           <Box
             sx={{
               backgroundColor: '#fff',
-              padding: 2,
+              padding: 3,
               position: 'relative',
               zIndex: 1000,
               borderRadius: '0px 6px 6px 6px',
@@ -128,6 +142,7 @@ const List: React.FC<ListProps> = ({
                 isShowLayout={false}
                 contentTabs={['content']}
                 pageName="content"
+                onTotalCountChange={handleTotalCountChange}
                 filters={{
                   limit: 3,
                   sort_by: { lastUpdatedOn: 'desc' },
@@ -178,8 +193,6 @@ export const CardComponent = ({
   handleCardClick: any;
   isExplore?: boolean;
 }) => {
-  console.log(item, 'shreays');
-
   const onClick = (id: string) => {
     if (handleCardClick) {
       handleCardClick(id);
@@ -196,6 +209,7 @@ export const CardComponent = ({
         transition: 'transform 0.2s ease-in-out',
         boxShadow: '0 0.15rem 1.75rem 0 rgba(33, 40, 50, 0.15)',
         border: '1px solid rgba(0, 0, 0, .125)',
+        minHeight: '317px',
         borderRadius: '.25rem',
         '&:hover': {
           transform: 'scale(1.02)',
@@ -209,12 +223,11 @@ export const CardComponent = ({
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: 3,
           position: 'relative',
           zIndex: 1,
         }}
       >
-        <Box sx={{ margin: '8px' }}>
+        <Box sx={{ margin: '8px', padding: '25px 25px 0px 25px' }}>
           <img
             height={'200px'}
             src={item.posterImage || item.thumbnail || default_img}
@@ -227,36 +240,56 @@ export const CardComponent = ({
         <Typography
           variant="h6"
           sx={{
-            fontWeight: 'bold',
+            fontWeight: '400',
             textAlign: 'center',
-            color: '#2C3E50',
-            fontSize: '18px',
+            fontSize: '16px',
             letterSpacing: '1px',
             lineHeight: 1.2,
-            mt: 2,
-            mb: 2,
+            mt: 1,
+            mb: 1,
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            color: '#212529',
           }}
         >
           {item.name || item.title || 'Untitled'}
         </Typography>
 
         {/* Explore Button */}
+
         {isExplore && (
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              width: '100%',
-              alignItems: 'center',
-            }}
-          >
-            <Box sx={{ fontSize: '16px', color: '#363d47', fontWeight: 600 }}>
-              Explore
+          <>
+            <Divider
+              sx={{
+                mt: 2,
+                mb: 2,
+                width: '100%',
+                borderColor: '#e0e0e0',
+                borderWidth: '1px',
+              }}
+              variant="fullWidth"
+            />
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                width: '100%',
+                alignItems: 'center',
+                px: 2,
+                pb: 2,
+              }}
+            >
+              <Box sx={{ fontSize: '16px', color: '#363d47', fontWeight: 600 }}>
+                Explore
+              </Box>
+              <Box>
+                <img height={'20px'} src={'/images/arrow.png'} alt="arrow" />
+              </Box>
             </Box>
-            <Box>
-              <img height={'20px'} src={'/images/arrow.png'} alt="arrow" />
-            </Box>
-          </Box>
+          </>
         )}
       </Box>
     </Box>
