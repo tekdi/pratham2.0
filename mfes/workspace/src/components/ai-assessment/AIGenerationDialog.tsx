@@ -159,6 +159,24 @@ const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
               Sit tight while we create a tailored set of questions based on
               your content.
             </Typography>
+            <Button
+              variant="contained"
+              fullWidth
+              sx={{
+                bgcolor: '#FDBE16',
+                color: '#1E1B16',
+                borderRadius: '100px',
+                py: 1.5,
+                textTransform: 'none',
+                fontWeight: 500,
+                '&:hover': {
+                  bgcolor: '#E5AB14',
+                },
+              }}
+              onClick={onGoToEditor}
+            >
+              Start Editing
+            </Button>
           </>
         )}
         {/* Success State */}

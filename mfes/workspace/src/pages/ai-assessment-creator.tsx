@@ -275,9 +275,6 @@ const AIAssessmentCreator: React.FC = () => {
             setAIDialogState('success');
           } else if (lastStatus === 'PROCESSING') {
             setAIDialogState('processing');
-            setTimeout(() => {
-              router.push(`/editor?identifier=${identifier}`);
-            }, 5000);
           } else {
             setAIDialogState('failed');
           }

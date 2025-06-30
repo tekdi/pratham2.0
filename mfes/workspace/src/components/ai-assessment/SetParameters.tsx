@@ -14,10 +14,31 @@ import {
   ListItemText,
   OutlinedInput,
   Grid,
+  styled,
 } from '@mui/material';
 import { FilterForm } from 'libs/shared-lib-v2/src/lib/Filter/FilterForm';
 import useTenantConfig from '@workspace/hooks/useTenantConfig';
 import ConfirmationDialog from './ConfirmationDialog';
+
+const CustomSlider = styled(Slider)(({ theme }) => ({
+  color: '#3a8589',
+  height: 3,
+  padding: '13px 0',
+  '& .MuiSlider-thumb': {
+    height: 30,
+    width: 30,
+  },
+  '& .MuiSlider-track': {
+    height: 16,
+  },
+  '& .MuiSlider-rail': {
+    height: 16,
+    backgroundColor: '#CDC5BD',
+    ...(theme.palette.mode === 'dark' && {
+      backgroundColor: '#bfbfbf',
+    }),
+  },
+}));
 
 const poppinsFont = {
   fontFamily: 'Poppins',
@@ -351,7 +372,7 @@ const SetParameters: React.FC<SetParametersProps> = ({
                 )}
               </FormControl>
             </Grid>
-            <Grid item xs={12} md={6}>
+            {/* <Grid item xs={12} md={6}>
               <FormControl fullWidth error={!!errors.selectedTypes} required>
                 <InputLabel id="question-type-label">Question Type</InputLabel>
                 <Select
@@ -385,117 +406,7 @@ const SetParameters: React.FC<SetParametersProps> = ({
                   </Typography>
                 )}
               </FormControl>
-            </Grid>
-          </Grid>
-          <Grid container spacing={2} mb={2}>
-            <Grid item xs={12} md={6}>
-              <Typography
-                sx={{
-                  ...poppinsFont,
-                  fontWeight: 400,
-                  fontSize: 14,
-                  color: '#4D4639',
-                  mb: 1,
-                }}
-              >
-                No. of MCQ's : {formState.mcqCount}
-              </Typography>
-              <Slider
-                value={formState.mcqCount}
-                min={0}
-                max={10}
-                sx={{ color: '#FDBE16' }}
-                onChange={(_, value) =>
-                  setFormState((prev: any) => ({
-                    ...prev,
-                    mcqCount: value,
-                  }))
-                }
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Typography
-                sx={{
-                  ...poppinsFont,
-                  fontWeight: 400,
-                  fontSize: 14,
-                  color: '#4D4639',
-                  mb: 1,
-                }}
-              >
-                No. of Fill in the blanks: {formState.fillInTheBlanksCount}
-              </Typography>
-              <Slider
-                value={formState.fillInTheBlanksCount}
-                min={0}
-                max={10}
-                sx={{ color: '#FDBE16' }}
-                onChange={(_, value) =>
-                  setFormState((prev: any) => ({
-                    ...prev,
-                    fillInTheBlanksCount: value,
-                  }))
-                }
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Typography
-                sx={{
-                  ...poppinsFont,
-                  fontWeight: 400,
-                  fontSize: 14,
-                  color: '#4D4639',
-                  mb: 1,
-                }}
-              >
-                No. of Short Answer Questions : {formState.shortAnswerCount}
-              </Typography>
-              <Slider
-                value={formState.shortAnswerCount}
-                min={0}
-                max={10}
-                sx={{ color: '#FDBE16' }}
-                onChange={(_, value) =>
-                  setFormState((prev: any) => ({
-                    ...prev,
-                    shortAnswerCount: value,
-                  }))
-                }
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Typography
-                sx={{
-                  ...poppinsFont,
-                  fontWeight: 400,
-                  fontSize: 14,
-                  color: '#4D4639',
-                  mb: 1,
-                }}
-              >
-                No. of Long Answer Questions : {formState.longAnswerCount}
-              </Typography>
-              <Slider
-                value={formState.longAnswerCount}
-                min={0}
-                max={10}
-                sx={{ color: '#FDBE16' }}
-                onChange={(_, value) =>
-                  setFormState((prev: any) => ({
-                    ...prev,
-                    longAnswerCount: value,
-                  }))
-                }
-              />
-            </Grid>
-            {/* Show error if questionCount validation fails */}
-            {errors.questionCount && (
-              <Grid item xs={12}>
-                <Typography color="error" variant="caption">
-                  {errors.questionCount}
-                </Typography>
-              </Grid>
-            )}
+            </Grid> */}
             <Grid item xs={12} md={6}>
               <FormControl
                 fullWidth
@@ -539,6 +450,125 @@ const SetParameters: React.FC<SetParametersProps> = ({
                 )}
               </FormControl>
             </Grid>
+          </Grid>
+          <Grid container spacing={2} mb={2}>
+            <Grid item xs={12} md={6}>
+              <Typography
+                sx={{
+                  ...poppinsFont,
+                  fontWeight: 400,
+                  fontSize: 14,
+                  color: '#4D4639',
+                  mb: 1,
+                }}
+              >
+                No. of MCQ's : {formState.mcqCount}
+              </Typography>
+              <Box sx={{ px: 2 }}>
+                <CustomSlider
+                  value={formState.mcqCount}
+                  min={0}
+                  max={20}
+                  sx={{ color: '#FDBE16' }}
+                  onChange={(_, value) =>
+                    setFormState((prev: any) => ({
+                      ...prev,
+                      mcqCount: value,
+                    }))
+                  }
+                />
+              </Box>
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <Typography
+                sx={{
+                  ...poppinsFont,
+                  fontWeight: 400,
+                  fontSize: 14,
+                  color: '#4D4639',
+                  mb: 1,
+                }}
+              >
+                No. of Fill in the blanks: {formState.fillInTheBlanksCount}
+              </Typography>
+              <Box sx={{ px: 2 }}>
+                <CustomSlider
+                  value={formState.fillInTheBlanksCount}
+                  min={0}
+                  max={20}
+                  sx={{ color: '#FDBE16' }}
+                  onChange={(_, value) =>
+                    setFormState((prev: any) => ({
+                      ...prev,
+                      fillInTheBlanksCount: value,
+                    }))
+                  }
+                />
+              </Box>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Typography
+                sx={{
+                  ...poppinsFont,
+                  fontWeight: 400,
+                  fontSize: 14,
+                  color: '#4D4639',
+                  mb: 1,
+                }}
+              >
+                No. of Short Answer Questions : {formState.shortAnswerCount}
+              </Typography>
+              <Box sx={{ px: 2 }}>
+                <CustomSlider
+                  value={formState.shortAnswerCount}
+                  min={0}
+                  max={20}
+                  sx={{ color: '#FDBE16' }}
+                  onChange={(_, value) =>
+                    setFormState((prev: any) => ({
+                      ...prev,
+                      shortAnswerCount: value,
+                    }))
+                  }
+                />
+              </Box>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Typography
+                sx={{
+                  ...poppinsFont,
+                  fontWeight: 400,
+                  fontSize: 14,
+                  color: '#4D4639',
+                  mb: 1,
+                }}
+              >
+                No. of Long Answer Questions : {formState.longAnswerCount}
+              </Typography>
+              <Box sx={{ px: 2 }}>
+                <CustomSlider
+                  value={formState.longAnswerCount}
+                  min={0}
+                  max={20}
+                  sx={{ color: '#FDBE16' }}
+                  onChange={(_, value) =>
+                    setFormState((prev: any) => ({
+                      ...prev,
+                      longAnswerCount: value,
+                    }))
+                  }
+                />
+              </Box>
+            </Grid>
+            {/* Show error if questionCount validation fails */}
+            {errors.questionCount && (
+              <Grid item xs={12}>
+                <Typography color="error" variant="caption">
+                  {errors.questionCount}
+                </Typography>
+              </Grid>
+            )}
           </Grid>
         </Card>
       </Box>
