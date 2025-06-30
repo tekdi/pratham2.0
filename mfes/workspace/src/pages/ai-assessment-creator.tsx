@@ -166,7 +166,7 @@ const AIAssessmentCreator: React.FC = () => {
   const [showAIDialog, setShowAIDialog] = useState(false);
   const [staticFilter, setStaticFilter] = useState({});
   const [aiDialogState, setAIDialogState] = useState<
-    'loader' | 'success' | 'failed'
+    'loader' | 'success' | 'failed' | 'processing'
   >('loader');
   const [aiProgress, setAIProgress] = useState(0);
   const [aiStatus, setAIStatus] = useState<string | null>(null);
@@ -252,14 +252,16 @@ const AIAssessmentCreator: React.FC = () => {
 
       // 2. Poll for status (sendToAi logic)
       let prog = 0;
+      let lastStatus: string | null = null;
       const interval = setInterval(async () => {
         prog += 1.67;
         setAIProgress(Math.round(Math.min(prog, 100)));
         try {
           if (Math.floor(prog / 1.67) % 10 === 0 && prog > 0) {
             const status = await getAIQuestionSetStatus(identifier, token);
-            setAIStatus(status);
-            if (status === 'COMPLETED') {
+            setAIStatus(status?.result?.status);
+            lastStatus = status?.result?.status;
+            if (status?.result?.status === 'COMPLETED') {
               clearInterval(interval);
               setAIDialogState('success');
             }
@@ -269,7 +271,16 @@ const AIAssessmentCreator: React.FC = () => {
         }
         if (prog >= 100) {
           clearInterval(interval);
-          setAIDialogState('success'); // or 'failed' if you want
+          if (lastStatus === 'COMPLETED') {
+            setAIDialogState('success');
+          } else if (lastStatus === 'PROCESSING') {
+            setAIDialogState('processing');
+            setTimeout(() => {
+              router.push(`/editor?identifier=${identifier}`);
+            }, 5000);
+          } else {
+            setAIDialogState('failed');
+          }
         }
       }, 1000);
     } catch (error: any) {
