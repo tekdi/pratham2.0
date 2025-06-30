@@ -285,10 +285,8 @@ export const createAIQuestionsSet = async (payload: {
         createdBy: userId,
       },
       {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${payload.token}`,
-        },
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${payload.token}`,
       }
     );
     return response?.data;
@@ -304,10 +302,8 @@ export const getAIQuestionSetStatus = async (
   const apiURL = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/ai-assessment/read/${questionSetId}`;
   try {
     const response = await get(apiURL, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
     });
     return response?.data;
   } catch (error) {
