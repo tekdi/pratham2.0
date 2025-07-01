@@ -70,7 +70,7 @@ const CustomFileUpload = ({
 
       // Upload logic placeholder
       const uploadedUrl = await uploadToServer(file);
-      newFiles.push(uploadedUrl);
+      newFiles.push(encodeURI(uploadedUrl));
     }
 
     const updatedList = [...fileList, ...newFiles];
@@ -137,6 +137,20 @@ const CustomFileUpload = ({
   return (
     <FormControl fullWidth error={rawErrors.length > 0} required={required}>
       <FormLabel>{t(schema?.title)}</FormLabel>
+      <input
+        value={value && value.length > 0 ? 'added' : ''}
+        required={required}
+        onChange={() => {}}
+        tabIndex={-1}
+        style={{
+          height: 1,
+          padding: 0,
+          border: 0,
+          opacity: 0,
+        }}
+        aria-hidden="true"
+      />
+      {/* Hidden text input to force native validation */}
       {!isDisabled && isEditable && (
         <Box mb={2} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <label htmlFor="file-upload">
