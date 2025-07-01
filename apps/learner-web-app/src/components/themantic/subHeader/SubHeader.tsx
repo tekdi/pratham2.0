@@ -13,6 +13,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import SearchIcon from '@mui/icons-material/Search';
 import { SearchButton } from '../SearchButton';
 import { useRouter } from 'next/navigation';
+import { logEvent } from '@learner/utils/googleAnalytics';
 
 const languages = ['English', 'Hindi', 'Marathi'];
 
@@ -133,7 +134,22 @@ const SubHeader = ({ showFilter }: { showFilter: boolean }) => {
         >
           <SearchButton
             searchValue={search}
-            onSearch={() => router.push('/themantic/search?q=' + search)}
+            onSearch={() => 
+              {
+                if (typeof window !== 'undefined') {
+
+                 const windowUrl = window.location.pathname;
+                 const cleanedUrl = windowUrl.replace(/^\/pos\//, '').replace(/^\//, '');
+
+                logEvent({
+                  action: 'search in thematic coneten by ' + search,
+                  category: cleanedUrl+" Page",
+                  label: 'Search thematic content',
+                });
+                router.push('/themantic/search?q=' + search)
+              }}
+            
+            }
             handleSearch={setSearch}
             _box={{
               mx: 'auto',
