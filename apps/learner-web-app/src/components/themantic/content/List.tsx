@@ -46,7 +46,6 @@ const List: React.FC<ListProps> = ({
       <SubHeader showFilter={true} resourceCount={totalCount} />
       <Box
         sx={{
-          minHeight: '100vh',
           backgroundImage: `url('/images/mainpagebig.png')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
@@ -117,6 +116,7 @@ const List: React.FC<ListProps> = ({
               position: 'relative',
               zIndex: 1000,
               borderRadius: '0px 6px 6px 6px',
+              mt: '110px',
             }}
           >
             <Box
