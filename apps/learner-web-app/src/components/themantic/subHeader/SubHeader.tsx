@@ -15,9 +15,15 @@ import { SearchButton } from '../SearchButton';
 import { useRouter } from 'next/navigation';
 import { logEvent } from '@learner/utils/googleAnalytics';
 
-const languages = ['English', 'Hindi', 'Marathi'];
+const languages = ['English', 'Marathi', 'Hindi'];
 
-const SubHeader = ({ showFilter }: { showFilter: boolean }) => {
+const SubHeader = ({
+  showFilter,
+  resourceCount = 0,
+}: {
+  showFilter: boolean;
+  resourceCount?: number;
+}) => {
   const [search, setSearch] = useState('');
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [selectedLang, setSelectedLang] = React.useState('English');
@@ -27,114 +33,161 @@ const SubHeader = ({ showFilter }: { showFilter: boolean }) => {
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = (lang?: string) => {
-    if (lang) setSelectedLang(lang);
     setAnchorEl(null);
+    if (lang) setSelectedLang(lang);
   };
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        px: { xs: 1, sm: 4 },
-        py: 2,
-        bgcolor: '#fff',
-        boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
-        borderRadius: 2,
-        minHeight: 64,
-        width: '100%',
-        gap: 2,
-      }}
-    >
-      {/* Language Dropdown */}
-      {showFilter && (
-        <Box sx={{ width: '100%' }}>
-          <Button
-            variant="outlined"
-            onClick={handleClick}
-            endIcon={<KeyboardArrowDownIcon />}
+    <>
+      {/* Main Title */}
+      <Box
+        sx={{
+          fontSize: { xs: '24px', sm: '28px', md: '32px', lg: '36px' },
+          fontWeight: 700,
+          color: '#3891CE',
+          fontFamily: '"Montserrat", sans-serif',
+          textAlign: 'center',
+          bgcolor: '#fff',
+          px: { xs: 2, sm: 3, md: 4 },
+          py: { xs: 2, sm: 3 },
+          wordWrap: 'break-word',
+          lineHeight: 1.2,
+        }}
+      >
+        STEM Education for Innovation : Experimento India
+      </Box>
+
+      {/* Main Container */}
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
+          alignItems: { xs: 'stretch', md: 'center' },
+          justifyContent: 'space-between',
+          px: { xs: 2, sm: 4, md: 6, lg: 8 },
+          py: { xs: 2, sm: 3 },
+          bgcolor: '#fff',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
+          borderRadius: 2,
+          minHeight: { xs: 'auto', md: 64 },
+          width: '100%',
+          gap: { xs: 2, md: 2 },
+        }}
+      >
+        {/* Language Dropdown */}
+        {showFilter && (
+          <Box
             sx={{
-              bgcolor: '#f5f6fa',
-              color: '#222',
-              borderRadius: 2,
-              textTransform: 'none',
-              fontWeight: 500,
-              border: 'none',
-              px: 2,
-              boxShadow: 'none',
-              '&:hover': { bgcolor: '#ececec', border: 'none' },
+              width: '100%',
+              display: 'flex',
+              justifyContent: { xs: 'center', md: 'flex-start' },
             }}
           >
-            {selectedLang}
-          </Button>
-          <Menu anchorEl={anchorEl} open={open} onClose={() => handleClose()}>
-            {languages.map((lang) => (
-              <MenuItem key={lang} onClick={() => handleClose(lang)}>
-                {lang}
-              </MenuItem>
-            ))}
-          </Menu>
-        </Box>
-      )}
-
-      {/* Centered Label */}
-      {showFilter && (
-        <Box
-          sx={{
-            flex: 1,
-            display: 'flex',
-            justifyContent: 'center',
-            width: '100%',
-          }}
-        >
-          <Box sx={{ textAlign: 'center' }}>
-            <Typography
-              variant="h6"
+            <Button
+              variant="outlined"
+              onClick={handleClick}
+              endIcon={<KeyboardArrowDownIcon />}
               sx={{
-                fontWeight: 600,
-                fontSize: { xs: '1.1rem', sm: '1.25rem' },
+                bgcolor: '#fff',
                 color: '#222',
-                mb: 0.5,
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                maxWidth: '100%',
+                borderRadius: '8px',
+                textTransform: 'none',
+                fontWeight: 500,
+                border: '1px solid #d1d5db',
+                px: { xs: 2, sm: 2.5 },
+                py: { xs: 1.5, sm: 1 },
+                minWidth: { xs: 140, sm: 120 },
+                maxWidth: { xs: 200, sm: 'none' },
+                width: { xs: '100%', sm: 'auto' },
+                boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+                justifyContent: 'space-between',
+                '&:hover': { bgcolor: '#f5f6fa', border: '1px solid #d1d5db' },
               }}
             >
-              72 Resources
-            </Typography>
-            <Box
+              {selectedLang}
+            </Button>
+            <Menu
+              anchorEl={anchorEl}
+              open={open}
+              onClose={() => handleClose()}
               sx={{
-                height: 3,
-                width: 48,
-                mx: 'auto',
-                bgcolor: 'primary.main',
-                borderRadius: 2,
-                opacity: 0.2,
+                '& .MuiPaper-root': {
+                  minWidth: { xs: 140, sm: 120 },
+                },
               }}
-            />
+            >
+              {languages.map((lang) => (
+                <MenuItem key={lang} onClick={() => handleClose(lang)}>
+                  {lang}
+                </MenuItem>
+              ))}
+            </Menu>
           </Box>
-        </Box>
-      )}
+        )}
 
-      {/* Search Bar */}
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
+        {/* Centered Label */}
+        {showFilter && (
+          <Box
+            sx={{
+              flex: 1,
+              display: 'flex',
+              justifyContent: 'center',
+              width: '100%',
+              order: { xs: 2, md: 1 },
+            }}
+          >
+            <Box sx={{ textAlign: 'center' }}>
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 600,
+                  fontSize: { xs: '16px', sm: '18px' },
+                  color: 'black',
+                  mb: 0.5,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  maxWidth: '100%',
+                  fontFamily: '"Montserrat", sans-serif',
+                }}
+              >
+                {resourceCount} Resources
+              </Typography>
+              <Box
+                sx={{
+                  height: 3,
+                  width: { xs: 40, sm: 48 },
+                  mx: 'auto',
+                  bgcolor: 'primary.main',
+                  borderRadius: 2,
+                  opacity: 0.2,
+                }}
+              />
+            </Box>
+          </Box>
+        )}
+
+        {/* Search Bar */}
         <Box
           sx={{
             display: 'flex',
-            alignItems: 'center',
-            borderRadius: 2,
-            justifyContent: 'center',
-            minWidth: { xs: 120, sm: 260 },
-            maxWidth: 340,
-            width: { xs: '100%', sm: 'auto' },
+            justifyContent: { xs: 'center', md: 'flex-end' },
+            width: '100%',
+            order: { xs: 1, md: 2 },
           }}
         >
-          <SearchButton
-            searchValue={search}
-            onSearch={() => 
+          <Box
+            sx={{
+              minWidth: { xs: '100%', sm: 260 },
+              maxWidth: { xs: '100%', sm: 340 },
+              width: { xs: '100%', sm: 'auto' },
+            }}
+          >
+            <SearchButton
+              searchValue={search}
+ onSearch={() => 
               {
                 if (typeof window !== 'undefined') {
 
@@ -148,20 +201,20 @@ const SubHeader = ({ showFilter }: { showFilter: boolean }) => {
                 });
                 router.push('/themantic/search?q=' + search)
               }}
-            
-            }
-            handleSearch={setSearch}
-            _box={{
-              mx: 'auto',
-              mt: 4,
-              '@media (min-width: 900px)': {
-                mb: '100px',
-              },
-            }}
-          />
+
+            }              handleSearch={setSearch}
+              _box={{
+                mx: 'auto',
+                mt: { xs: 0, sm: 4 },
+                '@media (min-width: 900px)': {
+                  mb: '100px',
+                },
+              }}
+            />
+          </Box>
         </Box>
       </Box>
-    </Box>
+    </>
   );
 };
 
