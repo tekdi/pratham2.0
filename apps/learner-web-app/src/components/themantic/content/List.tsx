@@ -117,6 +117,9 @@ const List: React.FC<ListProps> = ({
               zIndex: 1000,
               borderRadius: '0px 6px 6px 6px',
               mt: '110px',
+              '& .css-17kujh3': {
+                overflowY: 'unset !important',
+              },
             }}
           >
             <Box
