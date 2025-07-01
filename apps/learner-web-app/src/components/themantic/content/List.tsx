@@ -198,11 +198,21 @@ const List: React.FC<ListProps> = ({
 export default List;
 
 export const mainCourseCard = (props: any) => (
-  <CardComponent {...props} titleFontSize="24px" fontWeight={700} />
+  <CardComponent
+    {...props}
+    titleFontSize="24px"
+    fontWeight={700}
+    minHeight="317px"
+  />
 );
 
 export const cardHideExplore = (props: any) => (
-  <CardComponent {...props} titleFontSize="16px" isExplore={false} />
+  <CardComponent
+    {...props}
+    titleFontSize="16px"
+    isExplore={false}
+    minHeight="286px"
+  />
 );
 export const CardComponent = ({
   item,
@@ -211,6 +221,7 @@ export const CardComponent = ({
   isExplore = true,
   titleFontSize,
   fontWeight,
+  minHeight,
 }: {
   item: any;
   default_img: any;
@@ -218,6 +229,7 @@ export const CardComponent = ({
   isExplore?: boolean;
   titleFontSize?: string;
   fontWeight?: number;
+  minHeight?: string;
 }) => {
   const onClick = (id: string) => {
     if (handleCardClick) {
@@ -235,7 +247,7 @@ export const CardComponent = ({
         transition: 'transform 0.2s ease-in-out',
         boxShadow: '0 0.15rem 1.75rem 0 rgba(33, 40, 50, 0.15)',
         border: '1px solid rgba(0, 0, 0, .125)',
-        minHeight: '317px',
+        minHeight: minHeight || '317px',
         borderRadius: '.25rem',
         '&:hover': {
           transform: 'scale(1.02)',
@@ -253,7 +265,7 @@ export const CardComponent = ({
           zIndex: 1,
         }}
       >
-        <Box sx={{ margin: '8px', padding: '25px 25px 0px 25px' }}>
+        <Box sx={{ margin: '8px' }}>
           <img
             height={'200px'}
             src={
@@ -281,6 +293,7 @@ export const CardComponent = ({
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             color: '#212529',
+            px: '16px',
           }}
         >
           {item.name || item.title || 'Untitled'}

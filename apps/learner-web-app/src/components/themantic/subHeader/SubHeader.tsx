@@ -40,39 +40,50 @@ const SubHeader = ({
 
   return (
     <>
+      {/* Main Title */}
       <Box
         sx={{
-          fontSize: '36px',
+          fontSize: { xs: '24px', sm: '28px', md: '32px', lg: '36px' },
           fontWeight: 700,
           color: '#3891CE',
           fontFamily: '"Montserrat", sans-serif',
           textAlign: 'center',
           bgcolor: '#fff',
-
-          // py: 2,
-          px: 4,
+          px: { xs: 2, sm: 3, md: 4 },
+          py: { xs: 2, sm: 3 },
+          wordWrap: 'break-word',
+          lineHeight: 1.2,
         }}
       >
         STEM Education for Innovation : Experimento India
       </Box>
+
+      {/* Main Container */}
       <Box
         sx={{
           display: 'flex',
-          alignItems: 'center',
+          flexDirection: { xs: 'column', md: 'row' },
+          alignItems: { xs: 'stretch', md: 'center' },
           justifyContent: 'space-between',
-          px: { xs: 1, sm: 8 },
-          py: 2,
+          px: { xs: 2, sm: 4, md: 6, lg: 8 },
+          py: { xs: 2, sm: 3 },
           bgcolor: '#fff',
           boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
           borderRadius: 2,
-          minHeight: 64,
+          minHeight: { xs: 'auto', md: 64 },
           width: '100%',
-          gap: 2,
+          gap: { xs: 2, md: 2 },
         }}
       >
         {/* Language Dropdown */}
         {showFilter && (
-          <Box sx={{ width: '100%' }}>
+          <Box
+            sx={{
+              width: '100%',
+              display: 'flex',
+              justifyContent: { xs: 'center', md: 'flex-start' },
+            }}
+          >
             <Button
               variant="outlined"
               onClick={handleClick}
@@ -84,9 +95,11 @@ const SubHeader = ({
                 textTransform: 'none',
                 fontWeight: 500,
                 border: '1px solid #d1d5db',
-                px: 2.5,
-                py: 1,
-                minWidth: 120,
+                px: { xs: 2, sm: 2.5 },
+                py: { xs: 1.5, sm: 1 },
+                minWidth: { xs: 140, sm: 120 },
+                maxWidth: { xs: 200, sm: 'none' },
+                width: { xs: '100%', sm: 'auto' },
                 boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
                 justifyContent: 'space-between',
                 '&:hover': { bgcolor: '#f5f6fa', border: '1px solid #d1d5db' },
@@ -94,7 +107,16 @@ const SubHeader = ({
             >
               {selectedLang}
             </Button>
-            <Menu anchorEl={anchorEl} open={open} onClose={() => handleClose()}>
+            <Menu
+              anchorEl={anchorEl}
+              open={open}
+              onClose={() => handleClose()}
+              sx={{
+                '& .MuiPaper-root': {
+                  minWidth: { xs: 140, sm: 120 },
+                },
+              }}
+            >
               {languages.map((lang) => (
                 <MenuItem key={lang} onClick={() => handleClose(lang)}>
                   {lang}
@@ -112,6 +134,7 @@ const SubHeader = ({
               display: 'flex',
               justifyContent: 'center',
               width: '100%',
+              order: { xs: 2, md: 1 },
             }}
           >
             <Box sx={{ textAlign: 'center' }}>
@@ -119,7 +142,7 @@ const SubHeader = ({
                 variant="h6"
                 sx={{
                   fontWeight: 600,
-                  fontSize: '18px',
+                  fontSize: { xs: '16px', sm: '18px' },
                   color: 'black',
                   mb: 0.5,
                   whiteSpace: 'nowrap',
@@ -134,7 +157,7 @@ const SubHeader = ({
               <Box
                 sx={{
                   height: 3,
-                  width: 48,
+                  width: { xs: 40, sm: 48 },
                   mx: 'auto',
                   bgcolor: 'primary.main',
                   borderRadius: 2,
@@ -147,12 +170,17 @@ const SubHeader = ({
 
         {/* Search Bar */}
         <Box
-          sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}
+          sx={{
+            display: 'flex',
+            justifyContent: { xs: 'center', md: 'flex-end' },
+            width: '100%',
+            order: { xs: 1, md: 2 },
+          }}
         >
           <Box
             sx={{
-              minWidth: { xs: 120, sm: 260 },
-              maxWidth: 340,
+              minWidth: { xs: '100%', sm: 260 },
+              maxWidth: { xs: '100%', sm: 340 },
               width: { xs: '100%', sm: 'auto' },
             }}
           >
@@ -162,7 +190,7 @@ const SubHeader = ({
               handleSearch={setSearch}
               _box={{
                 mx: 'auto',
-                mt: 4,
+                mt: { xs: 0, sm: 4 },
                 '@media (min-width: 900px)': {
                   mb: '100px',
                 },
