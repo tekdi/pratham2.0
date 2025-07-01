@@ -125,13 +125,6 @@ const SetParameters: React.FC<SetParametersProps> = ({
       newErrors.difficulty_level = 'Difficulty Level is required';
     }
     if (
-      !formState.selectedTypes ||
-      !Array.isArray(formState.selectedTypes) ||
-      formState.selectedTypes.length === 0
-    ) {
-      newErrors.selectedTypes = 'At least one Question Type is required';
-    }
-    if (
       !formState.selectedDistributions ||
       !Array.isArray(formState.selectedDistributions) ||
       formState.selectedDistributions.length === 0
@@ -181,7 +174,6 @@ const SetParameters: React.FC<SetParametersProps> = ({
       assessmentTitle,
       description,
       assessmentType,
-      selectedTypes,
       selectedDistributions,
       content,
       difficulty_level,
@@ -191,6 +183,12 @@ const SetParameters: React.FC<SetParametersProps> = ({
       longAnswerCount,
       ...otherFields
     } = formState;
+    // Automatically set selectedTypes based on slider values
+    const selectedTypes = [];
+    if (mcqCount >= 1) selectedTypes.push('MCQ');
+    if (fillInTheBlanksCount >= 1) selectedTypes.push('Fill in the blanks');
+    if (shortAnswerCount >= 1) selectedTypes.push('Short Answer');
+    if (longAnswerCount >= 1) selectedTypes.push('Long Answer');
     const metadata = {
       name: assessmentTitle,
       description,
@@ -372,41 +370,6 @@ const SetParameters: React.FC<SetParametersProps> = ({
                 )}
               </FormControl>
             </Grid>
-            {/* <Grid item xs={12} md={6}>
-              <FormControl fullWidth error={!!errors.selectedTypes} required>
-                <InputLabel id="question-type-label">Question Type</InputLabel>
-                <Select
-                  labelId="question-type-label"
-                  multiple
-                  value={formState?.selectedTypes || []}
-                  onChange={(e) =>
-                    setFormState((prev: any) => ({
-                      ...prev,
-                      selectedTypes:
-                        typeof e.target.value === 'string'
-                          ? e.target.value.split(',')
-                          : (e.target.value as string[]),
-                    }))
-                  }
-                  input={<OutlinedInput label="Question Type" />}
-                  renderValue={(selected) => (selected as string[]).join(', ')}
-                >
-                  {questionTypes.map((type) => (
-                    <MenuItem key={type} value={type}>
-                      <Checkbox
-                        checked={formState?.selectedTypes?.indexOf(type) > -1}
-                      />
-                      <ListItemText primary={type} />
-                    </MenuItem>
-                  ))}
-                </Select>
-                {errors.selectedTypes && (
-                  <Typography color="error" variant="caption">
-                    {errors.selectedTypes}
-                  </Typography>
-                )}
-              </FormControl>
-            </Grid> */}
             <Grid item xs={12} md={6}>
               <FormControl
                 fullWidth
