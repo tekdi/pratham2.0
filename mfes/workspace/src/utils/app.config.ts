@@ -21,8 +21,6 @@ export const MIME_TYPE = {
     'application/vnd.ekstep.html-archive',
     'video/x-youtube',
     'video/youtube',
-    'audio/mp3',
-    'audio/wav',
   ],
 };
 
