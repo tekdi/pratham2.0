@@ -423,6 +423,13 @@ const FilterSection: React.FC<FilterSectionProps> = ({
           );
         }
         if (isDropdownSingle || isDropdownMulti) {
+          if (
+            Array.isArray(staticValues) &&
+            staticValues.length > 0 &&
+            !isShowStaticFilterValue
+          ) {
+            return null;
+          }
           return (
             <Box key={code} {...(_selectOptionBox ?? {})}>
               <FormControl
@@ -432,7 +439,14 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                 sx={{ mt: 1 }}
                 error={!!fieldError}
               >
-                <InputLabel id={`select-label-${code}`} error={!!fieldError}>
+                <InputLabel
+                  id={`select-label-${code}`}
+                  error={!!fieldError}
+                  sx={{
+                    background: 'white',
+                    padding: '0 5px',
+                  }}
+                >
                   {field.name}
                 </InputLabel>
                 <Select
@@ -505,7 +519,15 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                   ))}
                 </Select>
                 {fieldError && (
-                  <FormHelperText error>{fieldError}</FormHelperText>
+                  <FormHelperText
+                    error
+                    sx={{
+                      marginLeft: 0,
+                      marginRight: 0,
+                    }}
+                  >
+                    {fieldError}
+                  </FormHelperText>
                 )}
               </FormControl>
             </Box>

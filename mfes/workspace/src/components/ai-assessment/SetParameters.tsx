@@ -14,10 +14,54 @@ import {
   ListItemText,
   OutlinedInput,
   Grid,
+  styled,
 } from '@mui/material';
 import { FilterForm } from 'libs/shared-lib-v2/src/lib/Filter/FilterForm';
 import useTenantConfig from '@workspace/hooks/useTenantConfig';
 import ConfirmationDialog from './ConfirmationDialog';
+
+function formatField(field: string) {
+  let hasPrefix = false;
+
+  // Step 1: Remove `se_` prefix if present
+  if (field.startsWith('se_')) {
+    field = field.slice(3);
+    hasPrefix = true;
+  }
+
+  // Step 2: Remove trailing 's' only if `se_` was present
+  if (hasPrefix && field.endsWith('s')) {
+    field = field.slice(0, -1);
+  }
+
+  // Step 3: Replace underscores with spaces and capitalize words
+  const formatted = field
+    .replace(/_/g, ' ')
+    .replace(/([a-z])([A-Z])/g, '$1 $2') // camelCase support
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+
+  return formatted;
+}
+
+const CustomSlider = styled(Slider)(({ theme }) => ({
+  color: '#3a8589',
+  height: 3,
+  padding: '13px 0',
+  '& .MuiSlider-thumb': {
+    height: 30,
+    width: 30,
+  },
+  '& .MuiSlider-track': {
+    height: 16,
+  },
+  '& .MuiSlider-rail': {
+    height: 16,
+    backgroundColor: '#CDC5BD',
+    ...(theme.palette.mode === 'dark' && {
+      backgroundColor: '#bfbfbf',
+    }),
+  },
+}));
 
 const poppinsFont = {
   fontFamily: 'Poppins',
@@ -33,12 +77,6 @@ interface SetParametersProps {
 }
 
 const difficultyLevels = ['Easy', 'Medium', 'Hard'];
-const questionTypes = [
-  'MCQ',
-  'Fill in the blanks',
-  'Short Answer',
-  'Long Answer',
-];
 const questionDistributions = [
   'Knowledge',
   'Inference',
@@ -104,13 +142,6 @@ const SetParameters: React.FC<SetParametersProps> = ({
       newErrors.difficulty_level = 'Difficulty Level is required';
     }
     if (
-      !formState.selectedTypes ||
-      !Array.isArray(formState.selectedTypes) ||
-      formState.selectedTypes.length === 0
-    ) {
-      newErrors.selectedTypes = 'At least one Question Type is required';
-    }
-    if (
       !formState.selectedDistributions ||
       !Array.isArray(formState.selectedDistributions) ||
       formState.selectedDistributions.length === 0
@@ -136,7 +167,7 @@ const SetParameters: React.FC<SetParametersProps> = ({
           (typeof formState[field] === 'string' &&
             formState[field].trim() === '')
         ) {
-          newErrors[field] = `${field.replace(/([A-Z])/g, ' $1')} is required`;
+          newErrors[field] = `${formatField(field)} is required`;
         }
       });
     }
@@ -160,7 +191,6 @@ const SetParameters: React.FC<SetParametersProps> = ({
       assessmentTitle,
       description,
       assessmentType,
-      selectedTypes,
       selectedDistributions,
       content,
       difficulty_level,
@@ -170,6 +200,12 @@ const SetParameters: React.FC<SetParametersProps> = ({
       longAnswerCount,
       ...otherFields
     } = formState;
+    // Automatically set selectedTypes based on slider values
+    const selectedTypes = [];
+    if (mcqCount >= 1) selectedTypes.push('MCQ');
+    if (fillInTheBlanksCount >= 1) selectedTypes.push('Fill in the blanks');
+    if (shortAnswerCount >= 1) selectedTypes.push('Short Answer');
+    if (longAnswerCount >= 1) selectedTypes.push('Long Answer');
     const metadata = {
       name: assessmentTitle,
       description,
@@ -237,14 +273,19 @@ const SetParameters: React.FC<SetParametersProps> = ({
                 }
                 error={!!errors.assessmentTitle}
                 helperText={errors.assessmentTitle}
-                InputLabelProps={{ style: { fontFamily: 'Poppins' } }}
+                FormHelperTextProps={{
+                  sx: {
+                    marginLeft: 0,
+                    marginRight: 0,
+                  },
+                }}
               />
               {tenantConfig?.COLLECTION_FRAMEWORK && (
                 <FilterForm
                   orginalFormData={formState}
                   isShowStaticFilterValue={true}
                   onlyFields={onlyFields}
-                  staticFilter={staticFilter}
+                  // staticFilter={staticFilter}
                   _config={{
                     COLLECTION_FRAMEWORK: tenantConfig?.COLLECTION_FRAMEWORK,
                     CHANNEL_ID: tenantConfig?.CHANNEL_ID,
@@ -265,7 +306,6 @@ const SetParameters: React.FC<SetParametersProps> = ({
             </Grid>
             <Grid item xs={12} md={6}>
               <TextField
-                required
                 sx={{ mb: 2 }}
                 label="Description/Instructions (Optional)"
                 multiline
@@ -352,151 +392,6 @@ const SetParameters: React.FC<SetParametersProps> = ({
               </FormControl>
             </Grid>
             <Grid item xs={12} md={6}>
-              <FormControl fullWidth error={!!errors.selectedTypes} required>
-                <InputLabel id="question-type-label">Question Type</InputLabel>
-                <Select
-                  labelId="question-type-label"
-                  multiple
-                  value={formState?.selectedTypes || []}
-                  onChange={(e) =>
-                    setFormState((prev: any) => ({
-                      ...prev,
-                      selectedTypes:
-                        typeof e.target.value === 'string'
-                          ? e.target.value.split(',')
-                          : (e.target.value as string[]),
-                    }))
-                  }
-                  input={<OutlinedInput label="Question Type" />}
-                  renderValue={(selected) => (selected as string[]).join(', ')}
-                >
-                  {questionTypes.map((type) => (
-                    <MenuItem key={type} value={type}>
-                      <Checkbox
-                        checked={formState?.selectedTypes?.indexOf(type) > -1}
-                      />
-                      <ListItemText primary={type} />
-                    </MenuItem>
-                  ))}
-                </Select>
-                {errors.selectedTypes && (
-                  <Typography color="error" variant="caption">
-                    {errors.selectedTypes}
-                  </Typography>
-                )}
-              </FormControl>
-            </Grid>
-          </Grid>
-          <Grid container spacing={2} mb={2}>
-            <Grid item xs={12} md={6}>
-              <Typography
-                sx={{
-                  ...poppinsFont,
-                  fontWeight: 400,
-                  fontSize: 14,
-                  color: '#4D4639',
-                  mb: 1,
-                }}
-              >
-                No. of MCQ's : {formState.mcqCount}
-              </Typography>
-              <Slider
-                value={formState.mcqCount}
-                min={0}
-                max={10}
-                sx={{ color: '#FDBE16' }}
-                onChange={(_, value) =>
-                  setFormState((prev: any) => ({
-                    ...prev,
-                    mcqCount: value,
-                  }))
-                }
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Typography
-                sx={{
-                  ...poppinsFont,
-                  fontWeight: 400,
-                  fontSize: 14,
-                  color: '#4D4639',
-                  mb: 1,
-                }}
-              >
-                No. of Fill in the blanks: {formState.fillInTheBlanksCount}
-              </Typography>
-              <Slider
-                value={formState.fillInTheBlanksCount}
-                min={0}
-                max={10}
-                sx={{ color: '#FDBE16' }}
-                onChange={(_, value) =>
-                  setFormState((prev: any) => ({
-                    ...prev,
-                    fillInTheBlanksCount: value,
-                  }))
-                }
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Typography
-                sx={{
-                  ...poppinsFont,
-                  fontWeight: 400,
-                  fontSize: 14,
-                  color: '#4D4639',
-                  mb: 1,
-                }}
-              >
-                No. of Short Answer Questions : {formState.shortAnswerCount}
-              </Typography>
-              <Slider
-                value={formState.shortAnswerCount}
-                min={0}
-                max={10}
-                sx={{ color: '#FDBE16' }}
-                onChange={(_, value) =>
-                  setFormState((prev: any) => ({
-                    ...prev,
-                    shortAnswerCount: value,
-                  }))
-                }
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Typography
-                sx={{
-                  ...poppinsFont,
-                  fontWeight: 400,
-                  fontSize: 14,
-                  color: '#4D4639',
-                  mb: 1,
-                }}
-              >
-                No. of Long Answer Questions : {formState.longAnswerCount}
-              </Typography>
-              <Slider
-                value={formState.longAnswerCount}
-                min={0}
-                max={10}
-                sx={{ color: '#FDBE16' }}
-                onChange={(_, value) =>
-                  setFormState((prev: any) => ({
-                    ...prev,
-                    longAnswerCount: value,
-                  }))
-                }
-              />
-            </Grid>
-            {/* Show error if questionCount validation fails */}
-            {errors.questionCount && (
-              <Grid item xs={12}>
-                <Typography color="error" variant="caption">
-                  {errors.questionCount}
-                </Typography>
-              </Grid>
-            )}
-            <Grid item xs={12} md={6}>
               <FormControl
                 fullWidth
                 error={!!errors.selectedDistributions}
@@ -539,6 +434,125 @@ const SetParameters: React.FC<SetParametersProps> = ({
                 )}
               </FormControl>
             </Grid>
+          </Grid>
+          <Grid container spacing={2} mb={2}>
+            <Grid item xs={12} md={6}>
+              <Typography
+                sx={{
+                  ...poppinsFont,
+                  fontWeight: 400,
+                  fontSize: 14,
+                  color: '#4D4639',
+                  mb: 1,
+                }}
+              >
+                No. of MCQ's : {formState.mcqCount}
+              </Typography>
+              <Box sx={{ px: 2 }}>
+                <CustomSlider
+                  value={formState.mcqCount}
+                  min={0}
+                  max={20}
+                  sx={{ color: '#FDBE16' }}
+                  onChange={(_, value) =>
+                    setFormState((prev: any) => ({
+                      ...prev,
+                      mcqCount: value,
+                    }))
+                  }
+                />
+              </Box>
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <Typography
+                sx={{
+                  ...poppinsFont,
+                  fontWeight: 400,
+                  fontSize: 14,
+                  color: '#4D4639',
+                  mb: 1,
+                }}
+              >
+                No. of Fill in the blanks: {formState.fillInTheBlanksCount}
+              </Typography>
+              <Box sx={{ px: 2 }}>
+                <CustomSlider
+                  value={formState.fillInTheBlanksCount}
+                  min={0}
+                  max={20}
+                  sx={{ color: '#FDBE16' }}
+                  onChange={(_, value) =>
+                    setFormState((prev: any) => ({
+                      ...prev,
+                      fillInTheBlanksCount: value,
+                    }))
+                  }
+                />
+              </Box>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Typography
+                sx={{
+                  ...poppinsFont,
+                  fontWeight: 400,
+                  fontSize: 14,
+                  color: '#4D4639',
+                  mb: 1,
+                }}
+              >
+                No. of Short Answer Questions : {formState.shortAnswerCount}
+              </Typography>
+              <Box sx={{ px: 2 }}>
+                <CustomSlider
+                  value={formState.shortAnswerCount}
+                  min={0}
+                  max={20}
+                  sx={{ color: '#FDBE16' }}
+                  onChange={(_, value) =>
+                    setFormState((prev: any) => ({
+                      ...prev,
+                      shortAnswerCount: value,
+                    }))
+                  }
+                />
+              </Box>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Typography
+                sx={{
+                  ...poppinsFont,
+                  fontWeight: 400,
+                  fontSize: 14,
+                  color: '#4D4639',
+                  mb: 1,
+                }}
+              >
+                No. of Long Answer Questions : {formState.longAnswerCount}
+              </Typography>
+              <Box sx={{ px: 2 }}>
+                <CustomSlider
+                  value={formState.longAnswerCount}
+                  min={0}
+                  max={20}
+                  sx={{ color: '#FDBE16' }}
+                  onChange={(_, value) =>
+                    setFormState((prev: any) => ({
+                      ...prev,
+                      longAnswerCount: value,
+                    }))
+                  }
+                />
+              </Box>
+            </Grid>
+            {/* Show error if questionCount validation fails */}
+            {errors.questionCount && (
+              <Grid item xs={12}>
+                <Typography color="error" variant="caption">
+                  {errors.questionCount}
+                </Typography>
+              </Grid>
+            )}
           </Grid>
         </Card>
       </Box>

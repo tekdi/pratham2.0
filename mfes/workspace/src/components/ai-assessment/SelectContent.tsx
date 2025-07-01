@@ -195,7 +195,7 @@ const SelectContent: React.FC<SelectContentProps> = ({
         {tenantConfig?.COLLECTION_FRAMEWORK && (
           <FilterForm
             orginalFormData={filter}
-            isShowStaticFilterValue={true}
+            // isShowStaticFilterValue={true}
             onlyFields={onlyFields}
             staticFilter={staticFilter}
             _config={{
