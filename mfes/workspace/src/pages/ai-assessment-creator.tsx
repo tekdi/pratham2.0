@@ -16,6 +16,7 @@ import {
 } from '../services/ContentService';
 import { MIME_TYPE } from '../utils/app.config';
 import { useRouter } from 'next/router';
+import Loader from '../components/Loader';
 const poppinsFont = {
   fontFamily: 'Poppins',
 };
@@ -135,7 +136,7 @@ const onlyFields1 = [
   // 'contentLanguage',
 ];
 const onlyFields = [
-  // 'program',
+  'program',
   'se_domains',
   'se_subDomains',
   'se_subjects',
@@ -186,7 +187,7 @@ const AIAssessmentCreator: React.FC = () => {
           ? 'Second Chance'
           : localStorage.getItem('program'),
       ],
-      se_subjects: ['English'],
+      contentLanguage: ['English'],
       se_domains: ['Learning for School'],
       se_subDomains: ['Academics'],
     };
@@ -275,9 +276,6 @@ const AIAssessmentCreator: React.FC = () => {
             setAIDialogState('success');
           } else if (lastStatus === 'PROCESSING') {
             setAIDialogState('processing');
-            setTimeout(() => {
-              router.push(`/editor?identifier=${identifier}`);
-            }, 5000);
           } else {
             setAIDialogState('failed');
           }
@@ -291,10 +289,7 @@ const AIAssessmentCreator: React.FC = () => {
 
   const handleNextFromSetParameters = (parameters: any) => {
     const newFormState = {
-      framework:
-        tenantConfig?.COLLECTION_FRAMEWORK === 'scp-framework'
-          ? 'scp'
-          : tenantConfig?.COLLECTION_FRAMEWORK,
+      framework: tenantConfig?.CONTENT_FRAMEWORK,
       channel: tenantConfig?.CHANNEL_ID,
       ...parameters,
     };
@@ -352,6 +347,10 @@ const AIAssessmentCreator: React.FC = () => {
     }
   };
 
+  if (Object.keys(staticFilter).length === 0) {
+    return <Loader showBackdrop loadingText="Loading..." />;
+  }
+
   let stepContent = null;
   if (activeStep === 0) {
     stepContent = (
@@ -360,7 +359,9 @@ const AIAssessmentCreator: React.FC = () => {
         selected={selectedContent}
         setSelected={setSelectedContent}
         staticFilter={staticFilter}
-        onlyFields={onlyFields}
+        onlyFields={onlyFields.filter(
+          (field) => !['primaryUser', 'targetAgeGroup'].includes(field)
+        )}
         inputType={inputType}
         onNext={handleNextFromSelectContent}
       />
