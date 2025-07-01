@@ -34,50 +34,64 @@ export const SearchButton: React.FC<SearchButtonProps> = ({
 
   return (
     <Box
-      {..._box}
       sx={{
         display: 'flex',
         alignItems: 'center',
-        bgcolor: '#fff',
-        borderRadius: '8px',
-        border: '1px solid #d3d3d3',
-        boxShadow: 'none',
-        px: 2,
-        py: 0.5,
-        ...(_box?.sx ?? {}),
+        width: '100%',
+        maxWidth: 500,
       }}
     >
-      <TextField
-        variant="standard"
-        placeholder="Search"
-        {..._input}
-        InputProps={{
-          disableUnderline: true,
-          ...(_input?.InputProps ?? {}),
-          sx: {
-            fontFamily: 'Poppins',
-            fontSize: '18px',
-            pl: 1,
-            bgcolor: 'transparent',
-            ...(_input?.InputProps?.sx ?? {}),
-          },
+      <Box
+        sx={{
+          flexGrow: 1,
+          bgcolor: '#fff',
+          borderRadius: '8px',
+          border: '1px solid #d3d3d3',
+          boxShadow: 'none',
+          px: 1.5,
+          py: 0.5,
+          display: 'flex',
+          alignItems: 'center',
+          ...(_box?.sx ?? {}),
         }}
-        value={search}
-        onChange={(e) => {
-          setSearch(e.target.value);
-          handleSearch?.(e.target.value);
-        }}
-        sx={{ flexGrow: 1, bgcolor: 'transparent', ...(_input?.sx ?? {}) }}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            onSearch(search, e);
-          }
-        }}
-      />
-      <Box sx={{ display: 'flex', alignItems: 'center', ml: 1, mr: 1 }}>
+      >
+        <TextField
+          variant="standard"
+          placeholder="Search"
+          {..._input}
+          InputProps={{
+            disableUnderline: true,
+            ...(_input?.InputProps ?? {}),
+            sx: {
+              fontFamily: 'Poppins',
+              fontSize: '18px',
+              pl: 1,
+              bgcolor: 'transparent',
+              ...(_input?.InputProps?.sx ?? {}),
+            },
+          }}
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            handleSearch?.(e.target.value);
+          }}
+          sx={{ flexGrow: 1, bgcolor: 'transparent', ...(_input?.sx ?? {}) }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              onSearch(search, e);
+            }
+          }}
+        />
+      </Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', ml: 1 }}>
         <SearchIcon
           {..._icon}
-          sx={{ color: '#212121', cursor: 'pointer', ...(_icon?.sx ?? {}) }}
+          sx={{
+            color: '#212121',
+            cursor: 'pointer',
+            fontSize: 24,
+            ...(_icon?.sx ?? {}),
+          }}
           onClick={(e: any) => onSearch(search, e)}
         />
       </Box>

@@ -117,7 +117,7 @@ const App = ({
         />
       </Box>
       <Grid container spacing={6}>
-        <Grid item xs={12} sm={12} md={12} lg={3}>
+        <Grid item xs={12} sm={12} md={12} lg={3.5}>
           <Box
             sx={{
               display: 'flex',
@@ -166,15 +166,16 @@ const App = ({
                 <Typography
                   variant="h6"
                   sx={{
-                    fontWeight: 'bold',
+                    fontWeight: '700',
                     textAlign: 'center',
-                    color: '#2C3E50',
-                    fontSize: '18px',
+                    color: '#000',
+                    fontSize: '24px',
                     letterSpacing: '1px',
                     lineHeight: 1.2,
                     mt: 2,
                     mb: 2,
-                    px: 3,
+                    px: 2,
+                    fontFamily: '"Montserrat", sans-serif',
                   }}
                 >
                   {item?.content?.name || item?.content?.title || 'Untitled'}
@@ -192,9 +193,11 @@ const App = ({
 
                 <Typography
                   sx={{
-                    fontSize: '14px',
+                    fontSize: '16px',
                     color: '#363d47',
-                    px: 3,
+                    fontWeight: '400',
+                    px: 2,
+                    fontFamily: '"Montserrat", sans-serif',
                   }}
                 >
                   {item?.content?.description || 'No description'}
@@ -203,7 +206,7 @@ const App = ({
             </Box>
           </Box>
         </Grid>
-        <Grid item xs={12} sm={12} md={12} lg={9}>
+        <Grid item xs={12} sm={12} md={12} lg={8.5}>
           <PlayerBox
             userIdLocalstorageName={userIdLocalstorageName}
             item={item}
