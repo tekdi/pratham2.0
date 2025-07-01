@@ -36,11 +36,10 @@ const BreadCrumb = ({
         separator={
           <EastIcon
             sx={{
-              fontSize: '2.2rem',
-              color: '#111',
+              fontSize: '25px',
+              color: '#000000',
               fontWeight: 900,
               verticalAlign: 'middle',
-              mx: 0.5,
             }}
           />
         }
@@ -58,11 +57,12 @@ const BreadCrumb = ({
             <Typography
               key={`${breadcrumb?.name ?? breadcrumb?.label ?? ''} ${index}`}
               sx={{
-                color: '#111',
+                color: '#212529',
                 fontWeight: index === breadCrumbs.length - 1 ? 700 : 400,
-                fontSize: '2rem',
+                fontSize: '24px',
                 display: 'inline',
                 cursor: 'pointer',
+                fontFamily: '"Montserrat", sans-serif',
                 '&:hover': {
                   textDecoration: 'underline',
                 },
@@ -76,10 +76,11 @@ const BreadCrumb = ({
             <Typography
               key={`${breadcrumb?.name ?? breadcrumb?.label ?? ''} ${index}`}
               sx={{
-                color: '#111',
+                color: '#000000',
                 fontWeight: index === breadCrumbs.length - 1 ? 700 : 400,
-                fontSize: '2rem',
+                fontSize: '24px',
                 display: 'inline',
+                fontFamily: '"Montserrat", sans-serif',
               }}
               component="span"
             >
