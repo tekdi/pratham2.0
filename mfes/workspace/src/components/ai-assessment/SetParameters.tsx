@@ -20,6 +20,29 @@ import { FilterForm } from 'libs/shared-lib-v2/src/lib/Filter/FilterForm';
 import useTenantConfig from '@workspace/hooks/useTenantConfig';
 import ConfirmationDialog from './ConfirmationDialog';
 
+function formatField(field: string) {
+  let hasPrefix = false;
+
+  // Step 1: Remove `se_` prefix if present
+  if (field.startsWith('se_')) {
+    field = field.slice(3);
+    hasPrefix = true;
+  }
+
+  // Step 2: Remove trailing 's' only if `se_` was present
+  if (hasPrefix && field.endsWith('s')) {
+    field = field.slice(0, -1);
+  }
+
+  // Step 3: Replace underscores with spaces and capitalize words
+  const formatted = field
+    .replace(/_/g, ' ')
+    .replace(/([a-z])([A-Z])/g, '$1 $2') // camelCase support
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+
+  return formatted;
+}
+
 const CustomSlider = styled(Slider)(({ theme }) => ({
   color: '#3a8589',
   height: 3,
@@ -54,12 +77,6 @@ interface SetParametersProps {
 }
 
 const difficultyLevels = ['Easy', 'Medium', 'Hard'];
-const questionTypes = [
-  'MCQ',
-  'Fill in the blanks',
-  'Short Answer',
-  'Long Answer',
-];
 const questionDistributions = [
   'Knowledge',
   'Inference',
@@ -150,7 +167,7 @@ const SetParameters: React.FC<SetParametersProps> = ({
           (typeof formState[field] === 'string' &&
             formState[field].trim() === '')
         ) {
-          newErrors[field] = `${field.replace(/([A-Z])/g, ' $1')} is required`;
+          newErrors[field] = `${formatField(field)} is required`;
         }
       });
     }
@@ -256,14 +273,19 @@ const SetParameters: React.FC<SetParametersProps> = ({
                 }
                 error={!!errors.assessmentTitle}
                 helperText={errors.assessmentTitle}
-                InputLabelProps={{ style: { fontFamily: 'Poppins' } }}
+                FormHelperTextProps={{
+                  sx: {
+                    marginLeft: 0,
+                    marginRight: 0,
+                  },
+                }}
               />
               {tenantConfig?.COLLECTION_FRAMEWORK && (
                 <FilterForm
                   orginalFormData={formState}
                   isShowStaticFilterValue={true}
                   onlyFields={onlyFields}
-                  staticFilter={staticFilter}
+                  // staticFilter={staticFilter}
                   _config={{
                     COLLECTION_FRAMEWORK: tenantConfig?.COLLECTION_FRAMEWORK,
                     CHANNEL_ID: tenantConfig?.CHANNEL_ID,
@@ -284,7 +306,6 @@ const SetParameters: React.FC<SetParametersProps> = ({
             </Grid>
             <Grid item xs={12} md={6}>
               <TextField
-                required
                 sx={{ mb: 2 }}
                 label="Description/Instructions (Optional)"
                 multiline
