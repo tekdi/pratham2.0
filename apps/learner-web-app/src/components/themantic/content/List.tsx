@@ -256,7 +256,9 @@ export const CardComponent = ({
         <Box sx={{ margin: '8px', padding: '25px 25px 0px 25px' }}>
           <img
             height={'200px'}
-            src={item.posterImage || item.thumbnail || default_img}
+            src={
+              item.posterImage || item.appIcon || item.thumbnail || default_img
+            }
             alt={item.name || item.title || 'Content'}
             style={{ width: '100%', objectFit: 'cover' }}
           />
