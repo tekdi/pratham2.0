@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Suspense, useState } from 'react';
+import React, { Suspense, useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import HomeCards from '@learner/app/themantic/HomeCards/HomeCards';
 import {
@@ -36,14 +36,35 @@ const List: React.FC<ListProps> = ({
   className = '',
 }) => {
   const [totalCount, setTotalCount] = useState<number>(0);
+  const [selectedFilter, setSelectedFilter] = useState<any>('');
+
+  // Load selectedFilter from localStorage on component mount
+  useEffect(() => {
+    const savedFilter = localStorage.getItem('selectedFilter');
+    if (savedFilter) {
+      setSelectedFilter(savedFilter);
+    }
+  }, []);
 
   const handleTotalCountChange = (count: number) => {
     setTotalCount(count);
   };
 
+  // Update localStorage when selectedFilter changes
+  const handleFilterChange = (filter: any) => {
+    setSelectedFilter(filter);
+    localStorage.setItem('selectedFilter', filter);
+  };
+
+  console.log(selectedFilter, 'selectedFilter');
+
   return (
     <Layout>
-      <SubHeader showFilter={true} resourceCount={totalCount} />
+      <SubHeader
+        showFilter={true}
+        resourceCount={totalCount}
+        getFilter={(e) => handleFilterChange(e)}
+      />
       <Box
         sx={{
           backgroundImage: `url('/images/mainpagebig.png')`,
@@ -82,6 +103,7 @@ const List: React.FC<ListProps> = ({
                       limit: 3,
                       filters: {
                         program: 'Experimento India',
+                        contentLanguage: [selectedFilter || 'English'],
                       },
                     }}
                     _config={{
@@ -169,6 +191,7 @@ const List: React.FC<ListProps> = ({
                   sort_by: { lastUpdatedOn: 'desc' },
                   filters: {
                     program: 'Experimento India',
+                    contentLanguage: [selectedFilter || 'English'],
                   },
                 }}
                 _config={{
