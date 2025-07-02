@@ -29,14 +29,16 @@ const Page = () => {
   const [search, setSearch] = useState('');
   const router = useRouter();
   const partners = [
-    { src: '/Knowedge/Adobe.png', alt: 'Adobe' },
-    { src: '/Knowedge/EAA.png', alt: 'EAA' },
-    { src: '/Knowedge/Google.png', alt: 'Google' },
-    { src: '/Knowedge/SCHMIDT.png', alt: 'Hemant-Goradia' },
-    { src: '/Knowedge/smft_new.png', alt: 'Jaideep-Khanna' },
-    { src: '/Knowedge/Sulzer-Logo.jpg', alt: 'Schmidt-Futures' },
-    { src: '/Knowedge/UBS.png', alt: 'Schmidt-Futures' },
-    { src: '/Knowedge/WD.png', alt: 'Schmidt-Futures' },
+    { src: '/Knowedge/Abhivyaktilogo.png', alt: 'Adobe' },
+    { src: '/Knowedge/Arpan.png', alt: 'EAA' },
+    { src: '/Knowedge/Ccmb_logo_color.png', alt: 'Google' },
+    { src: '/Knowedge/GCF-Mobile-Logo-Medium.jpg', alt: 'Hemant-Goradia' },
+    { src: '/Knowedge/IISER-Pune.png', alt: 'Jaideep-Khanna' },
+    { src: '/Knowedge/Khetee_Transparent.png', alt: 'Schmidt-Futures' },
+    { src: '/Knowedge/menstrupedia.png', alt: 'Schmidt-Futures' },
+    { src: '/Knowedge/Sarmaya.png', alt: 'Schmidt-Futures' },
+    { src: '/Knowedge/Terra-Conscious.png', alt: 'Schmidt-Futures' },
+    { src: '/Knowedge/ThinkTac.png', alt: 'Schmidt-Futures' },
   ];
   const ourPartners = [
     { src: '/OurParthner/1.jpg', alt: 'logo1' },
