@@ -116,12 +116,29 @@ const AboutUsPage = () => {
                 }}
               >
                 <SpeakableText>
-                  Pratham undertook an exploratory study for children to
-                  understand the problem of plastic waste management in rural
-                  India. This study is a part of Pratham's Learning for Life
-                  curriculum. In this study, we covered 8400 households, in 700
-                  villages across 70 districts, in 15 states. Findings to be
-                  released in July 2022.
+                  Digital technology is an integral component of Pratham’s
+                  initiatives, seamlessly integrated into all its programs to
+                  overcome barriers of geography, infrastructure, and resources,
+                  while enhancing learning and engagement. Pratham leverages
+                  innovative technology and digital content to enhance learning
+                  beyond basics and foster a community-wide learning environment
+                  for children
+                </SpeakableText>
+              </Typography>
+              <Typography
+                variant={mediaMD ? 'h3' : 'h2'}
+                component="h2"
+                sx={{
+                  fontFamily: 'Poppins',
+
+                  letterSpacing: '0.5px',
+                  color: '#1F1B13',
+                  mt: 2,
+                  fontWeight: 700,
+                }}
+              >
+                <SpeakableText>
+                  Key objectives of the program: Innovation through technology:
                 </SpeakableText>
               </Typography>
               <Typography
@@ -133,14 +150,34 @@ const AboutUsPage = () => {
 
                   letterSpacing: '0.5px',
                   color: '#1F1B13',
+                  mt: 1,
+                }}
+              >
+                <SpeakableText>
+                  Developing and testing products and programs that leverage AI
+                  to reach low-resource communities. Scaling impact: Driving the
+                  adoption of products and the Open Learning model within the
+                  education ecosystem through partnerships with state
+                  governments, organisations and individuals. Resource
+                  development: Developing audio-visual resources tailored to the
+                  unique demands of different Pratham programs..
+                </SpeakableText>
+              </Typography>
+
+              <Typography
+                variant={mediaMD ? 'h3' : 'h2'}
+                component="h2"
+                sx={{
+                  fontFamily: 'Poppins',
+                  fontWeight: 700,
+
+                  letterSpacing: '0.5px',
+                  color: '#1F1B13',
                   mt: 2,
                 }}
               >
                 <SpeakableText>
-                  Pratham undertook an exploratory study for children to
-                  understand the problem of plastic waste management in rural
-                  India. This study is a part of Pratham's Learning for Life
-                  curriculum.
+                  Pratham-Shah PraDigi Innovation Centre (India)
                 </SpeakableText>
               </Typography>
               <Typography
@@ -151,14 +188,23 @@ const AboutUsPage = () => {
                   fontWeight: 400,
                   letterSpacing: '0.5px',
                   color: '#1F1B13',
-                  mt: 2,
+                  mt: 1,
                 }}
               >
                 <SpeakableText>
-                  Pratham undertook an exploratory study for children to
-                  understand the problem of plastic waste management in rural
-                  India. This study is a part of Pratham's Learning for Life
-                  curriculum.
+                  The Pratham-Shah PraDigi Innovation Centre, also known as
+                  PraDigi Centre (India), was established to develop an open
+                  learning model designed to foster lifelong learning and equip
+                  children and youth with essential skills for school, life, and
+                  work. It is an extension of the international Pratham-Shah
+                  PraDigi Innovation Centre set up in Pratham USA with anchor
+                  support from the Sarva Mangal Family Trust of USA. The centre
+                  aims to leverage technology to transform educational
+                  experiences and to create engaging, supportive, contextual,
+                  and relevant learning environments. It supports this vision
+                  through innovations like the Creativity Club program and tools
+                  like the AI-powered BaalSakhi chatbot and the recently
+                  launched PadhAI app, among others
                 </SpeakableText>
               </Typography>
             </Grid>
