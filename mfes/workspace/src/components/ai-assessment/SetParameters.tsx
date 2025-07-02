@@ -284,7 +284,9 @@ const SetParameters: React.FC<SetParametersProps> = ({
                 <FilterForm
                   orginalFormData={formState}
                   isShowStaticFilterValue={true}
-                  onlyFields={onlyFields}
+                  onlyFields={onlyFields.filter(
+                    (field) => !['se_gradeLevels'].includes(field)
+                  )}
                   // staticFilter={staticFilter}
                   _config={{
                     COLLECTION_FRAMEWORK: tenantConfig?.COLLECTION_FRAMEWORK,
