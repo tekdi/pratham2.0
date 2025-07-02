@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -15,19 +15,42 @@ import { SearchButton } from '../SearchButton';
 import { useRouter } from 'next/navigation';
 
 const languages = ['English', 'Marathi', 'Hindi'];
+const STORAGE_KEY = 'selectedLanguage';
 
 const SubHeader = ({
   showFilter,
+  getFilter,
   resourceCount = 0,
 }: {
   showFilter: boolean;
+  getFilter?: (lang: string) => void;
   resourceCount?: number;
 }) => {
   const [search, setSearch] = useState('');
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [selectedLang, setSelectedLang] = React.useState('English');
+
+  // Initialize selectedLang with value from localStorage to prevent flash
+  const getInitialLanguage = () => {
+    if (typeof window !== 'undefined') {
+      const savedLang = localStorage.getItem(STORAGE_KEY);
+      if (savedLang && languages.includes(savedLang)) {
+        return savedLang;
+      }
+    }
+    return 'English';
+  };
+
+  const [selectedLang, setSelectedLang] = React.useState(getInitialLanguage);
   const open = Boolean(anchorEl);
   const router = useRouter();
+
+  // Load selected language from localStorage on component mount and call getFilter
+  useEffect(() => {
+    const savedLang = localStorage.getItem(STORAGE_KEY);
+    if (savedLang && languages.includes(savedLang) && getFilter) {
+      getFilter(savedLang);
+    }
+  }, [getFilter]);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -35,7 +58,12 @@ const SubHeader = ({
 
   const handleClose = (lang?: string) => {
     setAnchorEl(null);
-    if (lang) setSelectedLang(lang);
+    if (lang) {
+      setSelectedLang(lang);
+      // Save selected language to localStorage
+      localStorage.setItem(STORAGE_KEY, lang);
+    }
+    if (getFilter) getFilter(lang || '');
   };
 
   return (
