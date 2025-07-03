@@ -165,7 +165,8 @@ const SetParameters: React.FC<SetParametersProps> = ({
         if (
           !formState[field] ||
           (typeof formState[field] === 'string' &&
-            formState[field].trim() === '')
+            formState[field].trim() === '') ||
+          (Array.isArray(formState[field]) && formState[field].length === 0)
         ) {
           newErrors[field] = `${formatField(field)} is required`;
         }
@@ -236,7 +237,7 @@ const SetParameters: React.FC<SetParametersProps> = ({
       content,
     });
   };
-
+  console.log(formState, errors, 'sagar');
   return (
     <Box p={3}>
       <Typography
@@ -285,7 +286,7 @@ const SetParameters: React.FC<SetParametersProps> = ({
                   orginalFormData={formState}
                   isShowStaticFilterValue={true}
                   onlyFields={onlyFields.filter(
-                    (field) => !['se_gradeLevels'].includes(field)
+                    (field: string) => !['se_gradeLevels'].includes(field)
                   )}
                   // staticFilter={staticFilter}
                   _config={{

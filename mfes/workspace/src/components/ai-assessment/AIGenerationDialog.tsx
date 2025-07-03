@@ -11,6 +11,7 @@ import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined
 import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined';
 import PendingOutlinedIcon from '@mui/icons-material/PendingOutlined';
 import { useRouter } from 'next/router';
+import Image from 'next/image';
 const poppinsFont = {
   fontFamily: 'Poppins',
 };
@@ -116,16 +117,23 @@ const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
                 lineHeight: 1.5,
               }}
             >
-              Hold on, we will redirect you to the editor in some time
+              You can continue to wait here or check back later
             </Typography>
-            <CircularProgress sx={{ mb: 4 }} />
+            <CircularProgress sx={{ mb: 4, color: '#635E57' }} />
           </>
         )}
         {/* Loader State */}
         {state === 'loader' && (
           <>
             <Box sx={{ mb: 3 }}>
-              <img src={'/logo.png'} alt="Logo" height={64} />
+              <Image
+                src="/mfe_workspace/logo.png"
+                alt="Logo"
+                height={64}
+                width={69}
+                loading="lazy"
+                style={{ objectFit: 'contain' }}
+              />
             </Box>
             <Box
               sx={{
@@ -153,15 +161,15 @@ const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
                     value={100}
                     size={120}
                     thickness={4}
-                    sx={{ color: '#DED8E1' }}
+                    sx={{ color: '#987100' }}
                   />
                   <CircularProgress
                     variant="determinate"
-                    value={(timer / 60) * 100}
+                    value={((60 - timer) / 60) * 100}
                     size={120}
                     thickness={4}
                     sx={{
-                      color: '#987100',
+                      color: '#DED8E1',
                       position: 'absolute',
                       left: 0,
                     }}
@@ -182,17 +190,30 @@ const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
                     height: '100%',
                   }}
                 >
-                  <Typography
-                    sx={{
-                      ...poppinsFont,
-                      fontWeight: 600,
-                      fontSize: 32,
-                      color: '#1F1B13',
-                      textAlign: 'center',
-                    }}
-                  >
-                    {timer}s
-                  </Typography>
+                  <Box sx={{ display: 'flex' }}>
+                    <Typography
+                      sx={{
+                        ...poppinsFont,
+                        fontWeight: 400,
+                        fontSize: 32,
+                        color: '#1F1B13',
+                        textAlign: 'center',
+                      }}
+                    >
+                      {timer}
+                    </Typography>
+                    <Typography
+                      sx={{
+                        ...poppinsFont,
+                        fontWeight: 400,
+                        fontSize: 32,
+                        color: '#B1AAA2',
+                        textAlign: 'center',
+                      }}
+                    >
+                      s
+                    </Typography>
+                  </Box>
                 </Box>
               </Box>
             </Box>
@@ -314,8 +335,8 @@ const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
                   lineHeight: 1.5,
                 }}
               >
-                We couldn't generate the questions due to a technical issue.
-                Please try again or restart after some time
+                We couldn&apos;t generate the questions due to a technical
+                issue. Please try again or restart after some time
               </Typography>
               <Box
                 sx={{

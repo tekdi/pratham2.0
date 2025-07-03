@@ -84,7 +84,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
             }}
             onClick={onConfirm}
           >
-            Yes, start
+            Yes, Start
           </Button>
           <Button
             variant="outlined"
