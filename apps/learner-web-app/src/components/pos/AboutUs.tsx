@@ -13,24 +13,18 @@ const AboutUsPage = () => {
         cardDesc:
           "Learning for School focuses on scholastic subjects, which include early years education and learning to read, write, and think. These skills are crucial for building children's confidence and dignity among their peers.",
       },
-      'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
-      'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
     ],
     [
       {
         cardDesc:
           'Learning for Work equips adolescents and youth with the skills and knowledge needed for employment and livelihoods.',
       },
-      'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
-      ' Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
     ],
     [
       {
         cardDesc:
           'Learning for Life encompasses skills and knowledge that are a part of lifelong learning like transferable skills, interests, hobbies, and creativity. These also include life skills but are not limited to them.  It emphasises environmental awareness, physical and mental well-being, and extends learning beyond scholastic subjects.',
       },
-      'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
-      'Lorem ipsum dolor sit amet, consectetur dipiscing elit. Ut elit tellus, luctus nec llamcorper mattis, pulvinar dapibus leo. ullamcorper mattis, pulvinar dapibus leo.',
     ],
   ];
   const mediaMD = useMediaQuery('(max-width: 900px)');
@@ -339,7 +333,7 @@ const AboutUsPage = () => {
               of lives every year.
             </SpeakableText>
           </Typography>
-          <Box
+          {/* <Box
             sx={{
               mt: 3,
             }}
@@ -437,7 +431,7 @@ const AboutUsPage = () => {
                 )}
               </React.Fragment>
             ))}
-          </Box>
+          </Box> */}
         </Box>
       </Box>
     </Layout>
