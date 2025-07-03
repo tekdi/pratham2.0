@@ -281,7 +281,10 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
       },
       {
         title: t('LEARNER_APP.POS.THEMATIC_REPOSITORY'),
-        to: () => router.push('/themantic'),
+        to: () => {
+          const domain = process.env.NEXT_PUBLIC_THEMATIC_DOMAIN || '';
+          window.open(`${domain}`, '_blank');
+        },
         isActive: currentPage === '/themantic',
       },
     ];
