@@ -28,6 +28,7 @@ import { useGlobalData } from '../Provider/GlobalProvider';
 import AccessibilityOptions from '../AccessibilityOptions/AccessibilityOptions';
 import { useColorInversion } from '../../context/ColorInversionContext';
 import { SearchButton } from './SearchButton';
+import { logEvent } from '@learner/utils/googleAnalytics';
 
 interface SubMenuItem {
   title: string | React.ReactNode;
@@ -299,7 +300,22 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         _config: {
           middleComponent: (
             <SearchButton
-              onSearch={(search) => router.push('/pos/search?q=' + search)}
+              onSearch={(search) =>
+                {
+                        if (typeof window !== 'undefined') {     
+
+                       const windowUrl = window.location.pathname;
+                                   const cleanedUrl = windowUrl
+                  
+                                  logEvent({
+                                    action: 'Searched on about page by ' + search,
+                                    category: cleanedUrl,
+                                    label: 'Searched on about page',
+                                  });
+                                }
+                  router.push('/pos/search?q=' + search)
+                }
+                }
               isHideSubmitButton
               _box={{
                 sx: {
