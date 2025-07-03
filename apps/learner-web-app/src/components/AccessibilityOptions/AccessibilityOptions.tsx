@@ -306,11 +306,10 @@ export default function AccessibilityOptions() {
                   if (!isSpeechEnabled && typeof window !== 'undefined') {
                     const windowUrl = window.location.pathname;
                     const cleanedUrl = windowUrl
-                      .replace(/^\/pos\//, '')
-                      .replace(/^\//, '');
+              
                     logEvent({
                       action: 'text-to-speech-enable',
-                      category: cleanedUrl + ' Page',
+                      category: cleanedUrl ,
                       label: 'Text to Speech',
                     });
                   }
@@ -339,11 +338,10 @@ export default function AccessibilityOptions() {
                   if (!isColorInverted && typeof window !== 'undefined') {
                     const windowUrl = window.location.pathname;
                     const cleanedUrl = windowUrl
-                      .replace(/^\/pos\//, '')
-                      .replace(/^\//, '');
+                    
                     logEvent({
                       action: 'click-on-invert-colours-accessibility-options',
-                      category: cleanedUrl + ' Page',
+                      category: cleanedUrl ,
                       label: 'Invert Colours',
                     });
                   }
@@ -374,11 +372,10 @@ export default function AccessibilityOptions() {
                   if (!isUnderlineLinksEnabled && typeof window !== 'undefined') {
                     const windowUrl = window.location.pathname;
                     const cleanedUrl = windowUrl
-                      .replace(/^\/pos\//, '')
-                      .replace(/^\//, '');
+                  
                     logEvent({
                       action: 'click-on-underline-links-enable-accessibility-options',
-                      category: cleanedUrl + ' Page',
+                      category: cleanedUrl ,
                       label: 'Underline Links',
                     });
                   }
