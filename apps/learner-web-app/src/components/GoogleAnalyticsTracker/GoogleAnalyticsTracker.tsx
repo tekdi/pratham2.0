@@ -12,13 +12,24 @@ declare global {
 
 const GoogleAnalyticsTracker = () => {
   const pathname = usePathname();
-
+ 
   useEffect(() => {
     if (!window.GA_INITIALIZED) {
-      initGA(`${process.env.NEXT_PUBLIC_MEASUREMENT_ID_ADMIN}`);
+      if (typeof window !== 'undefined') {     
+         let windowUrl = window.location.pathname;
+    let cleanedUrl = windowUrl.replace(/^\/pos\//, '').replace(/^\//, '');
+    console.log('Cleaned URL:', cleanedUrl);
+      if(cleanedUrl.startsWith('themantic')) {
+        console.log('Initializing GA for Themantic');
+        initGA(`${process.env.NEXT_PUBLIC_MEASUREMENT_ID_THEMATIC}`);
+      }
+      else
+      initGA(`${process.env.NEXT_PUBLIC_MEASUREMENT_ID_POS}`);
       window.GA_INITIALIZED = true;
     }
+  }
     logPageView(pathname);
+  
   }, [pathname]);
 
   return null;

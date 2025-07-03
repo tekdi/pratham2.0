@@ -18,6 +18,7 @@ import { useGlobalData } from '../Provider/GlobalProvider';
 import AccessibilityOptions from '../AccessibilityOptions/AccessibilityOptions';
 import { useColorInversion } from '../../context/ColorInversionContext';
 import { SearchButton } from './SearchButton';
+import { logEvent } from '@learner/utils/googleAnalytics';
 
 interface NewDrawerItemProp extends DrawerItemProp {
   variant?: 'contained' | 'text';
@@ -143,7 +144,22 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         _config: {
           middleComponent: (
             <SearchButton
-              onSearch={(search) => router.push('/pos/search?q=' + search)}
+              onSearch={(search) =>
+                {
+                        if (typeof window !== 'undefined') {     
+
+                       const windowUrl = window.location.pathname;
+                                   const cleanedUrl = windowUrl.replace(/^\/pos\//, '').replace(/^\//, '');
+                  
+                                  logEvent({
+                                    action: 'Searched on about page by ' + search,
+                                    category: cleanedUrl+" Page",
+                                    label: 'Searched on about page',
+                                  });
+                                }
+                  router.push('/pos/search?q=' + search)
+                }
+                }
               isHideSubmitButton
               _box={{
                 sx: {

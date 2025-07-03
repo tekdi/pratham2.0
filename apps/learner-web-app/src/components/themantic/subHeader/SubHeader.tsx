@@ -54,6 +54,18 @@ const SubHeader = ({
   }, [getFilter]);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    console.log('Clicked button:', selectedLang);
+          if (typeof window !== 'undefined') {     
+
+     const windowUrl = window.location.pathname;
+                 const cleanedUrl = windowUrl.replace(/^\/pos\//, '').replace(/^\//, '');
+
+                logEvent({
+                  action: 'filter thematic content by language ' + selectedLang,
+                  category: cleanedUrl+" Page",
+                  label: 'Filter thematic content by language ',
+                });
+              }
     setAnchorEl(event.currentTarget);
   };
 
