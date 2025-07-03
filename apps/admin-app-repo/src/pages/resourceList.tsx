@@ -16,6 +16,16 @@ const ResourceList = () => {
 
   const tstore = taxonomyStore();
   const { t } = useTranslation();
+function reorderByIdentifiers(dataArray: any, idOrder: any) {
+  const dataCopy = [...dataArray]; // Clone to avoid mutating original array
+  return idOrder.map((id: any) => {
+    const index = dataCopy.findIndex(item => item.identifier === id);
+    if (index !== -1) {
+      return dataCopy.splice(index, 1)[0]; // Remove and return matched item
+    }
+    return null; // or throw error or skip if not found
+  }).filter(Boolean); // Remove nulls if any
+}
 
   useEffect(() => {
     const fetchData = async () => {
@@ -64,17 +74,48 @@ const ResourceList = () => {
         }
 
         // console.log('contents!!!!', contents);
-        // console.log('fetchedLearningResources!!!!', fetchedLearningResources);
+       console.log('fetchedLearningResources!!!!', fetchedLearningResources);
 
-        const preRequisite = contents?.filter(
+        let preRequisite = contents?.filter(
           (item: any) => item.type === ResourceType.LEARNER_PRE_REQUISITE
         );
-        const postRequisite = contents?.filter(
+        let postRequisite = contents?.filter(
           (item: any) => item.type === ResourceType.LEARNER_POST_REQUISITE
         );
-        const facilitatorsRequisite = contents?.filter(
+        let facilitatorsRequisite = contents?.filter(
           (item: any) => item.type === ResourceType.FACILITATOR_REQUISITE
         );
+
+const groupedIds: any = {};
+
+fetchedLearningResources.forEach((item: any) => {
+  const type = item.type;
+  if (!groupedIds[type]) {
+    groupedIds[type] = [];
+  }
+  groupedIds[type].push(item.id); // Keep all IDs including duplicates
+});
+// Convert Sets to Arrays (if needed)
+const result: any = {};
+for (const type in groupedIds) {
+  result[type] = Array.from(groupedIds[type]);
+}
+if(result?.prerequisite)
+{
+    preRequisite = reorderByIdentifiers(preRequisite, result?.prerequisite);
+
+}
+if(result?.facilitatorsRequisite)
+{
+   facilitatorsRequisite= reorderByIdentifiers(facilitatorsRequisite, result?.facilitatorsRequisite);
+}
+if(result?.postRequisite)
+{
+   postRequisite = reorderByIdentifiers(postRequisite, result?.postRequisite);
+}
+console.log('preRequisiteIdsresult',result);
+console.log('preRequisite', preRequisite);
+console.log('preRequisitefetchedLearningResources', fetchedLearningResources);
 
         setLearnersPreReq(preRequisite);
         setLearnersPostReq(postRequisite);

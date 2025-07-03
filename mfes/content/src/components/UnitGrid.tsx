@@ -21,11 +21,17 @@ export const UnitGrid: React.FC<CommonAccordionProps> = ({
   _config,
   handleItemClick,
 }) => {
-  const { default_img, _grid, _parentGrid, _card } = _config || {};
+  const { default_img, _grid, _parentGrid, _card, _containerGrid } =
+    _config || {};
   const { t } = useTranslation();
 
   return (
-    <Grid container spacing={{ xs: 1, sm: 1, md: 2 }} {..._parentGrid}>
+    <Grid
+      container
+      spacing={{ xs: 1, sm: 1, md: 2 }}
+      {..._containerGrid}
+      {..._parentGrid}
+    >
       {item?.children?.length <= 0 ? (
         <Grid item xs={12} textAlign="center">
           <Typography variant="body1" sx={{ mt: 4, textAlign: 'center' }}>

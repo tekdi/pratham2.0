@@ -49,41 +49,49 @@ const SearchPage = () => {
           customPlayerStyle={true}
           customPlayerMarginTop={0}
         />
-        <Box sx={{ mt: 3 }}>
-          <Content
-            filters={{
-              query: submitText,
-              filters: {
-                program: 'Experimento India',
-              },
-            }}
-            contentTabs={['content']}
-            isShowLayout={false}
-            showFilter={false}
-            showSearch={false}
-            showHelpDesk={false}
-            _config={{
-              contentBaseUrl: '/pos',
-              _tabs: { variant: 'fullWidth' },
-              _card: {
-                isHideProgressStatus: true,
-                isWrap: true,
-                _cardMedia: { sx: { height: '153px' } },
-                cardComponent: CardComponent,
-              },
-              default_img: '/images/image_ver.png',
-              _grid: {
-                xs: 12,
-                sm: 6,
-                md: 4,
-                lg: 4,
-                xl: 4,
-              },
-              _containerGrid: {
-                spacing: { xs: 6, sm: 6, md: 6 },
-              },
-            }}
-          />
+        <Box
+          sx={{
+            '& .css-17kujh3': {
+              overflowY: 'unset !important',
+            },
+          }}
+        >
+          <Box sx={{ mt: 3 }}>
+            <Content
+              filters={{
+                query: submitText,
+                filters: {
+                  program: 'Experimento India',
+                },
+              }}
+              contentTabs={['content']}
+              isShowLayout={false}
+              showFilter={false}
+              showSearch={false}
+              showHelpDesk={false}
+              _config={{
+                contentBaseUrl: '/themantic',
+                _tabs: { variant: 'fullWidth' },
+                _card: {
+                  isHideProgressStatus: true,
+                  isWrap: true,
+                  _cardMedia: { sx: { height: '153px' } },
+                  cardComponent: CardComponent,
+                },
+                default_img: '/images/image_ver.png',
+                _grid: {
+                  xs: 12,
+                  sm: 6,
+                  md: 4,
+                  lg: 4,
+                  xl: 4,
+                },
+                _containerGrid: {
+                  spacing: { xs: 6, sm: 6, md: 6 },
+                },
+              }}
+            />
+          </Box>
         </Box>
       </Container>
     ),

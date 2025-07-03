@@ -123,7 +123,7 @@ const LanguageSelect = ({
       size="small"
       onChange={handleChange}
       sx={{
-        width: 67,
+        width: 'auto',
         '& .MuiSelect-select': {
           padding: '2px 0px 3px 8px',
           paddingRight: '20px !important',

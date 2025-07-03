@@ -1,8 +1,13 @@
 import React from 'react';
 
 import List from '@learner/components/themantic/content/List';
+import GoogleAnalyticsTracker from '@learner/components/GoogleAnalyticsTracker/GoogleAnalyticsTracker';
 const page = () => {
-  return <List />;
+  return <>
+   <GoogleAnalyticsTracker />
+  
+  <List />;
+  </>
 };
 
 export default page;

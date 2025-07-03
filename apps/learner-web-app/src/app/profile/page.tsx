@@ -109,11 +109,14 @@ const ProfilePage = () => {
         <Box
           sx={{
             flexShrink: 0,
-            width: { xs: '100%', md: '530px' },
+            width: { xs: '100%', md: courseData.length === 0 ?'100%':'530px' },
             mb: { xs: 2, md: 0 },
           }}
         >
-          <UserProfileCard />
+           {courseData.length === 0?
+          (<UserProfileCard maxWidth='100%' />):
+          (<UserProfileCard  />)
+           }
         </Box>
 
         {/* Certificates Section */}
