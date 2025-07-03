@@ -288,7 +288,7 @@ useEffect(() => {
               ? localStorage.getItem('userProgram') ?? ''
               : '',
           _box: {
-            onClick: () => router.push('/content'),
+            onClick: () => router.push('/courses-contents'),
             sx: {
               cursor: 'pointer',
               display: 'flex',
