@@ -145,8 +145,8 @@ export default function Content(props: Readonly<ContentProps>) {
           ...(config?.filters ?? {}),
           type:
             props?.contentTabs?.length === 1
-              ? props.contentTabs[0]
-              : DEFAULT_TABS[0].type,
+              ? props.contentTabs[savedTab]
+              : DEFAULT_TABS[savedTab].type,
           ...savedFilters,
           loadOld: true,
         });
@@ -156,8 +156,8 @@ export default function Content(props: Readonly<ContentProps>) {
           ...(config?.filters ?? {}),
           type:
             props?.contentTabs?.length === 1
-              ? props.contentTabs[0]
-              : DEFAULT_TABS[0].type,
+              ? props.contentTabs[savedTab]
+              : DEFAULT_TABS[savedTab].type,
           loadOld: false,
         }));
       }
@@ -170,16 +170,14 @@ export default function Content(props: Readonly<ContentProps>) {
         )
       );
       setTabValue(savedTab);
-
       setIsPageLoading(false);
     };
     init();
-  }, [props, sessionKeys.filters, sessionKeys.search, searchParams]);
-
+  }, [ props.contentTabs, sessionKeys.filters, sessionKeys.search, searchParams]);
   // Fetch content with loop to load full data up to offset
   const fetchAllContent = useCallback(
     async (filter: any) => {
-      const content: any[] = [];
+      const content: any[] = [];  
       const QuestionSet: any[] = [];
       let count = 0;
 
@@ -395,7 +393,7 @@ export default function Content(props: Readonly<ContentProps>) {
   const handleTabChange = (event: any, newValue: number) => {
     setTabValue(newValue);
 
-    // Update URL with new tab parameter
+     // Update URL with new tab parameter
     const url = new URL(window.location.href);
     url.searchParams.set('tab', newValue.toString());
     router.replace(url.pathname + url.search);
