@@ -72,6 +72,7 @@ export interface ContentProps {
   showHelpDesk?: boolean;
   isShowLayout?: boolean;
   hasMoreData?: boolean;
+  onTotalCountChange?: (count: number) => void;
 }
 
 export default function Content(props: Readonly<ContentProps>) {
@@ -95,6 +96,7 @@ export default function Content(props: Readonly<ContentProps>) {
     }
   >(DEFAULT_FILTERS);
   const [trackData, setTrackData] = useState<TrackDataItem[]>([]);
+  const [totalCount, setTotalCount] = useState<number>(0);
   const [filterShow, setFilterShow] = useState(false);
   const [propData, setPropData] = useState<ContentProps>();
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -201,6 +203,10 @@ export default function Content(props: Readonly<ContentProps>) {
         limit: adjustedLimit,
         signal: controller.signal,
       });
+
+      if (resultResponse?.result?.count) {
+        setTotalCount(resultResponse?.result?.count);
+      }
 
       const response = resultResponse?.result;
       if (props?._config?.getContentData) {
@@ -455,6 +461,7 @@ export default function Content(props: Readonly<ContentProps>) {
             width: '100%',
             display: 'flex',
             justifyContent: 'space-between',
+            overflow: 'unset !important',
           }}
         >
           {propData?.showSearch && (
@@ -502,6 +509,13 @@ export default function Content(props: Readonly<ContentProps>) {
       handleApplyFilters,
     ]
   );
+
+  // Call onTotalCountChange callback when totalCount changes
+  useEffect(() => {
+    if (props?.onTotalCountChange) {
+      props.onTotalCountChange(totalCount);
+    }
+  }, [totalCount, props?.onTotalCountChange]);
 
   return (
     <LayoutPage

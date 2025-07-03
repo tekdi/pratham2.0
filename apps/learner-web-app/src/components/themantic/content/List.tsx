@@ -1,9 +1,16 @@
 'use client';
 
-import React, { Suspense } from 'react';
+import React, { Suspense, useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import HomeCards from '@learner/app/themantic/HomeCards/HomeCards';
-import { Box, Container, Card, CardContent, Typography } from '@mui/material';
+import {
+  Box,
+  Container,
+  Card,
+  CardContent,
+  Typography,
+  Divider,
+} from '@mui/material';
 import Layout from '../layout/Layout';
 import SubHeader from '../subHeader/SubHeader';
 
@@ -28,12 +35,38 @@ const List: React.FC<ListProps> = ({
   // title = 'Content List',
   className = '',
 }) => {
+  const [totalCount, setTotalCount] = useState<number>(0);
+  const [selectedFilter, setSelectedFilter] = useState<any>('');
+
+  // Load selectedFilter from localStorage on component mount
+  useEffect(() => {
+    const savedFilter = localStorage.getItem('selectedFilter');
+    if (savedFilter) {
+      setSelectedFilter(savedFilter);
+    }
+  }, []);
+
+  const handleTotalCountChange = (count: number) => {
+    setTotalCount(count);
+  };
+
+  // Update localStorage when selectedFilter changes
+  const handleFilterChange = (filter: any) => {
+    setSelectedFilter(filter);
+    localStorage.setItem('selectedFilter', filter);
+  };
+
+  console.log(selectedFilter, 'selectedFilter');
+
   return (
     <Layout>
-      <SubHeader showFilter={true} />
+      <SubHeader
+        showFilter={true}
+        resourceCount={totalCount}
+        getFilter={(e) => handleFilterChange(e)}
+      />
       <Box
         sx={{
-          minHeight: '100vh',
           backgroundImage: `url('/images/mainpagebig.png')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
@@ -54,35 +87,45 @@ const List: React.FC<ListProps> = ({
               }
             >
               <Container maxWidth="lg">
-                <Content
-                  isShowLayout={false}
-                  contentTabs={['Course']}
-                  pageName="Course"
-                  filters={{
-                    limit: 3,
-                    filters: {
-                      program: 'Experimento India',
+                <Box
+                  sx={{
+                    '& .css-17kujh3': {
+                      overflowY: 'unset !important',
                     },
                   }}
-                  _config={{
-                    contentBaseUrl: '/themantic',
-                    _grid: {
-                      xs: 12,
-                      sm: 6,
-                      md: 4,
-                      lg: 4,
-                      xl: 4,
-                    },
-                    _containerGrid: {
-                      spacing: { xs: 6, sm: 6, md: 6 },
-                    },
-                    default_img: '/images/image_ver.png',
-                    _card: {
-                      cardComponent: CardComponent,
-                    },
-                  }}
-                  hasMoreData={false}
-                />
+                >
+                  <Content
+                    isShowLayout={false}
+                    contentTabs={['Course']}
+                    pageName="Course"
+                    onTotalCountChange={handleTotalCountChange}
+                    filters={{
+                      limit: 3,
+                      filters: {
+                        program: 'Experimento India',
+                        contentLanguage: [selectedFilter || 'English'],
+                      },
+                    }}
+                    _config={{
+                      contentBaseUrl: '/themantic',
+                      _grid: {
+                        xs: 12,
+                        sm: 6,
+                        md: 4,
+                        lg: 4,
+                        xl: 4,
+                      },
+                      _containerGrid: {
+                        spacing: { xs: 6, sm: 6, md: 6 },
+                      },
+                      default_img: '/images/image_ver.png',
+                      _card: {
+                        cardComponent: mainCourseCard,
+                      },
+                    }}
+                    hasMoreData={false}
+                  />
+                </Box>
               </Container>
             </Suspense>
           </div>
@@ -91,10 +134,14 @@ const List: React.FC<ListProps> = ({
           <Box
             sx={{
               backgroundColor: '#fff',
-              padding: 2,
+              padding: 3,
               position: 'relative',
               zIndex: 1000,
               borderRadius: '0px 6px 6px 6px',
+              mt: '110px',
+              '& .css-17kujh3': {
+                overflowY: 'unset !important',
+              },
             }}
           >
             <Box
@@ -105,7 +152,7 @@ const List: React.FC<ListProps> = ({
                 backgroundColor: '#FFC107',
                 width: 'fit-content',
                 position: 'absolute',
-                top: '-40px',
+                top: '-46px',
                 left: 0,
                 p: 1,
                 border: '1px solid white',
@@ -115,7 +162,7 @@ const List: React.FC<ListProps> = ({
             >
               <Typography
                 sx={{
-                  fontSize: '16px',
+                  fontSize: '20px',
                   fontWeight: 600,
                   color: '#000',
                 }}
@@ -123,16 +170,28 @@ const List: React.FC<ListProps> = ({
                 New Arrivals
               </Typography>
             </Box>
-            <Box>
+            <Box
+              sx={{
+                '& .css-4oqe9z': {
+                  display: 'none !important',
+                  marginBottom: '0 !important',
+                },
+                '& .css-17kujh3': {
+                  overflowY: 'unset !important',
+                },
+              }}
+            >
               <Content
                 isShowLayout={false}
                 contentTabs={['content']}
                 pageName="content"
+                onTotalCountChange={handleTotalCountChange}
                 filters={{
                   limit: 3,
                   sort_by: { lastUpdatedOn: 'desc' },
                   filters: {
                     program: 'Experimento India',
+                    contentLanguage: [selectedFilter || 'English'],
                   },
                 }}
                 _config={{
@@ -164,22 +223,40 @@ const List: React.FC<ListProps> = ({
 
 export default List;
 
+export const mainCourseCard = (props: any) => (
+  <CardComponent
+    {...props}
+    titleFontSize="24px"
+    fontWeight={700}
+    minHeight="317px"
+  />
+);
+
 export const cardHideExplore = (props: any) => (
-  <CardComponent {...props} isExplore={false} />
+  <CardComponent
+    {...props}
+    titleFontSize="16px"
+    isExplore={false}
+    minHeight="286px"
+  />
 );
 export const CardComponent = ({
   item,
   default_img,
   handleCardClick,
   isExplore = true,
+  titleFontSize,
+  fontWeight,
+  minHeight,
 }: {
   item: any;
   default_img: any;
   handleCardClick: any;
   isExplore?: boolean;
+  titleFontSize?: string;
+  fontWeight?: number;
+  minHeight?: string;
 }) => {
-  console.log(item, 'sagar');
-
   const onClick = (id: string) => {
     if (handleCardClick) {
       handleCardClick(id);
@@ -196,6 +273,7 @@ export const CardComponent = ({
         transition: 'transform 0.2s ease-in-out',
         boxShadow: '0 0.15rem 1.75rem 0 rgba(33, 40, 50, 0.15)',
         border: '1px solid rgba(0, 0, 0, .125)',
+        minHeight: minHeight || '317px',
         borderRadius: '.25rem',
         '&:hover': {
           transform: 'scale(1.02)',
@@ -209,7 +287,6 @@ export const CardComponent = ({
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: 3,
           position: 'relative',
           zIndex: 1,
         }}
@@ -217,7 +294,9 @@ export const CardComponent = ({
         <Box sx={{ margin: '8px' }}>
           <img
             height={'200px'}
-            src={item.image || item.thumbnail || default_img}
+            src={
+              item.posterImage || item.appIcon || item.thumbnail || default_img
+            }
             alt={item.name || item.title || 'Content'}
             style={{ width: '100%', objectFit: 'cover' }}
           />
@@ -227,36 +306,57 @@ export const CardComponent = ({
         <Typography
           variant="h6"
           sx={{
-            fontWeight: 'bold',
+            fontWeight: fontWeight || 400,
             textAlign: 'center',
-            color: '#2C3E50',
-            fontSize: '18px',
+            fontSize: titleFontSize || '16px',
             letterSpacing: '1px',
             lineHeight: 1.2,
-            mt: 2,
-            mb: 2,
+            mt: 1,
+            mb: 1,
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            color: '#212529',
+            px: '16px',
           }}
         >
           {item.name || item.title || 'Untitled'}
         </Typography>
 
         {/* Explore Button */}
+
         {isExplore && (
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              width: '100%',
-              alignItems: 'center',
-            }}
-          >
-            <Box sx={{ fontSize: '16px', color: '#363d47', fontWeight: 600 }}>
-              Explore
+          <>
+            <Divider
+              sx={{
+                mt: 2,
+                mb: 2,
+                width: '100%',
+                borderColor: '#e0e0e0',
+                borderWidth: '1px',
+              }}
+              variant="fullWidth"
+            />
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                width: '100%',
+                alignItems: 'center',
+                px: 2,
+                pb: 2,
+              }}
+            >
+              <Box sx={{ fontSize: '16px', color: '#363d47', fontWeight: 600 }}>
+                Explore
+              </Box>
+              <Box>
+                <img height={'20px'} src={'/images/arrow.png'} alt="arrow" />
+              </Box>
             </Box>
-            <Box>
-              <img height={'20px'} src={'/images/arrow.png'} alt="arrow" />
-            </Box>
-          </Box>
+          </>
         )}
       </Box>
     </Box>
