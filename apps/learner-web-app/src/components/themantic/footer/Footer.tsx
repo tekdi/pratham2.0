@@ -44,7 +44,9 @@ const Footer = () => {
                   fontSize: { xs: '13px', sm: '14px' },
                   fontWeight: 400,
                   color: '#000000',
+                  textAlign: { xs: 'center', sm: 'left' },
                   mb: { xs: 1, sm: 0 },
+                  width: { xs: '100%', sm: 'auto' },
                 }}
               >
                 Useful links:
@@ -52,7 +54,7 @@ const Footer = () => {
               <Box
                 sx={{
                   display: 'flex',
-                  flexDirection: { xs: 'column', sm: 'row' },
+
                   flexWrap: 'wrap',
                   gap: { xs: 0.5, sm: 1 },
                   alignItems: { xs: 'flex-start', sm: 'center' },
@@ -98,14 +100,7 @@ const Footer = () => {
                       {link.text}
                     </Link>
                     {index < arr.length - 1 && (
-                      <Typography
-                        color="text.secondary"
-                        sx={{
-                          display: { xs: 'none', sm: 'block' },
-                        }}
-                      >
-                        |
-                      </Typography>
+                      <Typography color="text.secondary">|</Typography>
                     )}
                   </React.Fragment>
                 ))}
