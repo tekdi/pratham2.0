@@ -258,7 +258,13 @@ const SelectContent: React.FC<SelectContentProps> = ({
                   label={item ? item.name : id}
                   onDelete={() => handleRemoveChip(id)}
                   color="primary"
-                  sx={{ fontWeight: 500 }}
+                  sx={{
+                    fontWeight: 500,
+                    color: '#1E1B16',
+                    '& .MuiChip-deleteIcon': {
+                      color: 'rgba(30, 27, 22, 0.7)', // delete button color
+                    },
+                  }}
                 />
               );
             })}

@@ -509,8 +509,10 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                               (s?.code &&
                                 s?.code === (item.code ?? item.name ?? item)) ||
                               (s?.name &&
-                                s?.name === (item.code ?? item.name ?? item)) ||
-                              s === (item.code ?? item.name ?? item)
+                                s?.name === (item.name ?? item.code ?? item)) ||
+                              s ===
+                                (typeof item === 'string' ? item : item.icon) ||
+                              s === item.name
                           )}
                         />
                       )}
