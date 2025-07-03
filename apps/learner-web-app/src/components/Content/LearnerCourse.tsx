@@ -44,10 +44,10 @@ export default memo(function LearnerCourse({
   const handleSearchClick = useCallback((searchValue: string) => {
 if (typeof window !== 'undefined') {
      const windowUrl = window.location.pathname;
-    const cleanedUrl = windowUrl.replace(/^\/pos\//, '').replace(/^\//, '');
+    const cleanedUrl = windowUrl
     logEvent({
         action: 'search content by '+searchValue,
-        category: cleanedUrl + ' Page',
+        category: cleanedUrl ,
         label: 'Search content'
       });
     }

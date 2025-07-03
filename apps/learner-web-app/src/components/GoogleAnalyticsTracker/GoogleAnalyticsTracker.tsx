@@ -17,7 +17,7 @@ const GoogleAnalyticsTracker = () => {
     if (!window.GA_INITIALIZED) {
       if (typeof window !== 'undefined') {     
          let windowUrl = window.location.pathname;
-    let cleanedUrl = windowUrl.replace(/^\/pos\//, '').replace(/^\//, '');
+    let cleanedUrl = windowUrl.replace(/^\//, '');
     console.log('Cleaned URL:', cleanedUrl);
       if(cleanedUrl.startsWith('themantic')) {
         console.log('Initializing GA for Themantic');

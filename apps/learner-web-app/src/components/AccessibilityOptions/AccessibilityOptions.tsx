@@ -62,11 +62,11 @@ export default function AccessibilityOptions() {
       if (typeof window !== 'undefined') {
 
     const windowUrl = window.location.pathname;
-    const cleanedUrl = windowUrl.replace(/^\/pos\//, '').replace(/^\//, '');
+    const cleanedUrl = windowUrl
 
     logEvent({
       action: 'click-on-increase-font-size-accessibility-options',
-      category: cleanedUrl + ' Page',
+      category: cleanedUrl ,
       label: 'Increase Font Size',
     });
   }
@@ -79,11 +79,11 @@ export default function AccessibilityOptions() {
           if (typeof window !== 'undefined') {
 
     const windowUrl = window.location.pathname;
-    const cleanedUrl = windowUrl.replace(/^\/pos\//, '').replace(/^\//, '');
+    const cleanedUrl = windowUrl
 
     logEvent({
       action: 'click-on-decrease-font-size-accessibility-options',
-      category: cleanedUrl + ' Page',
+      category: cleanedUrl,
       label: 'Decrease Font Size',
     });
   }
@@ -114,10 +114,10 @@ export default function AccessibilityOptions() {
           if (typeof window !== 'undefined') {
 
     const windowUrl = window.location.pathname;
-    const cleanedUrl = windowUrl.replace(/^\/pos\//, '').replace(/^\//, '');
+    const cleanedUrl = windowUrl
     logEvent({
       action: 'click-on-reset-font-size-accessibility-options',
-      category: cleanedUrl + ' Page',
+      category: cleanedUrl,
       label: 'Reset Font Size',
     });
   }

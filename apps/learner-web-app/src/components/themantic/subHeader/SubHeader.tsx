@@ -58,11 +58,11 @@ const SubHeader = ({
           if (typeof window !== 'undefined') {     
 
      const windowUrl = window.location.pathname;
-                 const cleanedUrl = windowUrl.replace(/^\/pos\//, '').replace(/^\//, '');
+                 const cleanedUrl = windowUrl;
 
                 logEvent({
                   action: 'filter thematic content by language ' + selectedLang,
-                  category: cleanedUrl+" Page",
+                  category: cleanedUrl,
                   label: 'Filter thematic content by language ',
                 });
               }
@@ -232,11 +232,11 @@ const SubHeader = ({
                 if (typeof window !== 'undefined') {
 
                  const windowUrl = window.location.pathname;
-                 const cleanedUrl = windowUrl.replace(/^\/pos\//, '').replace(/^\//, '');
+                 const cleanedUrl = windowUrl;
 
                 logEvent({
                   action: 'search in thematic coneten by ' + search,
-                  category: cleanedUrl+" Page",
+                  category: cleanedUrl,
                   label: 'Search thematic content',
                 });
                 router.push('/themantic/search?q=' + search)

@@ -28,7 +28,7 @@ const FilterComponent: React.FC<{
   let cleanedUrl = '';
 if (typeof window !== 'undefined') {
   const windowUrl = window.location.pathname;
-  cleanedUrl = windowUrl.replace(/^\/pos\//, '').replace(/^\//, '');
+  cleanedUrl = windowUrl;
 }
   const checkboxStyle = useMemo(
     () => ({
@@ -87,42 +87,42 @@ if (typeof window !== 'undefined') {
           if (newFilterState?.se_domains && hasChanged('se_domains', newFilterState.se_domains)) {
             logEvent({
               action: 'filter-selection-by-domain:' + newFilterState.se_domains.join(','),
-              category: cleanedUrl + ' Page',
+              category: cleanedUrl ,
               label: 'Selection of domain',
             });
           }
           if (newFilterState?.se_subDomains && hasChanged('se_subDomains', newFilterState.se_subDomains)) {
             logEvent({
               action: 'filter-selection-by-category:' + newFilterState.se_subDomains.join(','),
-              category: cleanedUrl + ' Page',
+              category: cleanedUrl,
               label: 'Selection of category',
             });
           }
           if (newFilterState?.se_subjects && hasChanged('se_subjects', newFilterState.se_subjects)) {
             logEvent({
               action: 'filter-selection-by-subject:' + newFilterState.se_subjects.join(','),
-              category: cleanedUrl + ' Page',
+              category: cleanedUrl ,
               label: 'Selection of subject',
             });
           }
           if (newFilterState?.targetAgeGroup && hasChanged('targetAgeGroup', newFilterState.targetAgeGroup)) {
             logEvent({
               action: 'filter-selection-by-age-group:' + newFilterState.targetAgeGroup.join(','),
-              category: cleanedUrl + ' Page',
+              category: cleanedUrl ,
               label: 'Selection of age group',
             });
           }
           if (newFilterState?.primaryUser && hasChanged('primaryUser', newFilterState.primaryUser)) {
             logEvent({
               action: 'filter-selection-by-primary-user:' + newFilterState.primaryUser.join(','),
-              category: cleanedUrl + ' Page',
+              category: cleanedUrl,
               label: 'Selection of primary user',
             });
           }
           if (newFilterState?.contentLanguage && hasChanged('contentLanguage', newFilterState.contentLanguage)) {
             logEvent({
               action: 'filter-selection-by-content-language:' + newFilterState.contentLanguage.join(',').toString(),
-              category: cleanedUrl + ' Page',
+              category: cleanedUrl,
               label: 'Selection of content language',
             });
           }

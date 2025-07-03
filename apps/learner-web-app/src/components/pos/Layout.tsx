@@ -149,11 +149,11 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
                         if (typeof window !== 'undefined') {     
 
                        const windowUrl = window.location.pathname;
-                                   const cleanedUrl = windowUrl.replace(/^\/pos\//, '').replace(/^\//, '');
+                                   const cleanedUrl = windowUrl
                   
                                   logEvent({
                                     action: 'Searched on about page by ' + search,
-                                    category: cleanedUrl+" Page",
+                                    category: cleanedUrl,
                                     label: 'Searched on about page',
                                   });
                                 }
