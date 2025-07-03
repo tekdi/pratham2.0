@@ -1,8 +1,17 @@
-import React from 'react';
-import { Dialog, Box, Typography, Fade, Slider, Button } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import {
+  Dialog,
+  Box,
+  Typography,
+  Fade,
+  Button,
+  CircularProgress,
+} from '@mui/material';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined';
 import PendingOutlinedIcon from '@mui/icons-material/PendingOutlined';
+import { useRouter } from 'next/router';
+import Image from 'next/image';
 const poppinsFont = {
   fontFamily: 'Poppins',
 };
@@ -10,7 +19,6 @@ const poppinsFont = {
 interface AIGenerationDialogProps {
   open: boolean;
   state: 'loader' | 'success' | 'failed' | 'processing';
-  progress?: number;
   aiStatus?: string | null;
   onRetry?: () => void;
   onClose?: () => void;
@@ -20,18 +28,38 @@ interface AIGenerationDialogProps {
 const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
   open,
   state,
-  progress = 0,
   aiStatus = null,
   onRetry,
   onClose,
   onGoToEditor,
 }) => {
+  const router = useRouter();
   // Helper for close button in failed state
   const handleFailedClose = () => {
     if (typeof window !== 'undefined') {
       window.location.reload();
     }
   };
+
+  // Footer button handler
+  const handleGoBackToWorkspace = () => {
+    router.push('/');
+  };
+
+  // Timer state for loader
+  const [timer, setTimer] = useState(60);
+  useEffect(() => {
+    if (state === 'loader' && open) {
+      setTimer(60);
+      const interval = setInterval(() => {
+        setTimer((prev) => {
+          if (prev > 0) return prev - 1;
+          return 0;
+        });
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [state, open]);
 
   return (
     <Dialog
@@ -62,16 +90,16 @@ const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
         {/* Processing State */}
         {state === 'processing' && (
           <>
-            <Box sx={{ mb: 3 }}>
-              <PendingOutlinedIcon sx={{ fontSize: 80, color: '#FDBE16' }} />
+            <Box sx={{ mb: 2 }}>
+              <PendingOutlinedIcon sx={{ fontSize: 40, color: '#B1AAA2' }} />
             </Box>
             <Typography
               sx={{
                 ...poppinsFont,
-                fontWeight: 600,
-                fontSize: 24,
+                fontWeight: 400,
+                fontSize: 22,
                 color: '#1F1B13',
-                mb: 1,
+                mb: 2,
                 textAlign: 'center',
               }}
             >
@@ -83,47 +111,113 @@ const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
                 fontWeight: 400,
                 fontSize: 16,
                 color: '#635E57',
-                mb: 4,
+                mb: 2,
                 textAlign: 'center',
                 maxWidth: 400,
                 lineHeight: 1.5,
               }}
             >
-              Hold on, we will redirect you to the editor in some time
+              You can continue to wait here or check back later
             </Typography>
+            <CircularProgress sx={{ mb: 4, color: '#635E57' }} />
           </>
         )}
         {/* Loader State */}
         {state === 'loader' && (
           <>
             <Box sx={{ mb: 3 }}>
-              <img src={'/logo.png'} alt="Logo" height={64} />
-            </Box>
-            <Box sx={{ position: 'relative', width: 414, height: 80 }}>
-              <Slider
-                value={progress}
-                min={0}
-                max={100}
-                sx={{ color: '#FDBE16' }}
+              <Image
+                src="/mfe_workspace/logo.png"
+                alt="Logo"
+                height={64}
+                width={69}
+                loading="lazy"
+                style={{ objectFit: 'contain' }}
               />
+            </Box>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                mb: 2,
+              }}
+            >
               <Typography
                 sx={{
-                  position: 'absolute',
-                  right: 0,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
                   ...poppinsFont,
                   fontWeight: 400,
-                  fontSize: 14,
-                  color: '#635E57',
-                  textAlign: 'center',
-                  width: 40,
+                  fontSize: 22,
+                  color: '#1F1B13',
+                  mb: 3,
                 }}
               >
-                {progress}%
+                Generating your questions in
               </Typography>
+              <Box sx={{ position: 'relative', display: 'inline-flex', mb: 1 }}>
+                <Box sx={{ position: 'relative' }}>
+                  <CircularProgress
+                    variant="determinate"
+                    value={100}
+                    size={120}
+                    thickness={4}
+                    sx={{ color: '#987100' }}
+                  />
+                  <CircularProgress
+                    variant="determinate"
+                    value={((60 - timer) / 60) * 100}
+                    size={120}
+                    thickness={4}
+                    sx={{
+                      color: '#DED8E1',
+                      position: 'absolute',
+                      left: 0,
+                    }}
+                  />
+                </Box>
+
+                <Box
+                  sx={{
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0,
+                    position: 'absolute',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '100%',
+                    height: '100%',
+                  }}
+                >
+                  <Box sx={{ display: 'flex' }}>
+                    <Typography
+                      sx={{
+                        ...poppinsFont,
+                        fontWeight: 400,
+                        fontSize: 32,
+                        color: '#1F1B13',
+                        textAlign: 'center',
+                      }}
+                    >
+                      {timer}
+                    </Typography>
+                    <Typography
+                      sx={{
+                        ...poppinsFont,
+                        fontWeight: 400,
+                        fontSize: 32,
+                        color: '#B1AAA2',
+                        textAlign: 'center',
+                      }}
+                    >
+                      s
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
             </Box>
-            <Typography
+            {/* <Typography
               sx={{
                 ...poppinsFont,
                 fontWeight: 400,
@@ -132,19 +226,9 @@ const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
                 mb: 1,
               }}
             >
-              {aiStatus ? `AI Status: ${aiStatus}` : ''}
-            </Typography>
-            <Typography
-              sx={{
-                ...poppinsFont,
-                fontWeight: 400,
-                fontSize: 22,
-                color: '#1F1B13',
-                mb: 1,
-              }}
-            >
-              Generating your questions..
-            </Typography>
+              {`AI Status: ${aiStatus ?? 'Loading... '}`}
+            </Typography> */}
+
             <Typography
               sx={{
                 ...poppinsFont,
@@ -154,29 +238,24 @@ const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
                 opacity: 0.8,
                 letterSpacing: '3.1%',
                 textAlign: 'center',
+                mb: 3,
               }}
             >
               Sit tight while we create a tailored set of questions based on
               your content.
             </Typography>
-            <Button
-              variant="contained"
-              fullWidth
+            <Typography
               sx={{
-                bgcolor: '#FDBE16',
-                color: '#1E1B16',
-                borderRadius: '100px',
-                py: 1.5,
-                textTransform: 'none',
-                fontWeight: 500,
-                '&:hover': {
-                  bgcolor: '#E5AB14',
-                },
+                ...poppinsFont,
+                fontWeight: 400,
+                fontSize: 15,
+                color: '#7C766F',
+                textAlign: 'center',
+                mb: 2,
               }}
-              onClick={onGoToEditor}
             >
-              Start Editing
-            </Button>
+              You can continue to wait here or check back later in the list view
+            </Typography>
           </>
         )}
         {/* Success State */}
@@ -184,20 +263,20 @@ const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
           <>
             <Box sx={{ mb: 3 }}>
               <CheckCircleOutlineOutlinedIcon
-                sx={{ fontSize: 80, color: '#019722' }}
+                sx={{ fontSize: 40, color: '#019722' }}
               />
             </Box>
             <Typography
               sx={{
                 ...poppinsFont,
-                fontWeight: 600,
-                fontSize: 24,
+                fontWeight: 400,
+                fontSize: 22,
                 color: '#1F1B13',
-                mb: 1,
                 textAlign: 'center',
+                mb: 2,
               }}
             >
-              Questions Generated Successfully
+              Questions generated successfully!
             </Typography>
             <Typography
               sx={{
@@ -207,30 +286,12 @@ const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
                 color: '#635E57',
                 mb: 4,
                 textAlign: 'center',
-                maxWidth: 400,
+                maxWidth: 600,
                 lineHeight: 1.5,
               }}
             >
-              Redirecting you to the editor for review.
+              You can head to the editor and review the questions.
             </Typography>
-            <Button
-              variant="contained"
-              fullWidth
-              sx={{
-                bgcolor: '#FDBE16',
-                color: '#1E1B16',
-                borderRadius: '100px',
-                py: 1.5,
-                textTransform: 'none',
-                fontWeight: 500,
-                '&:hover': {
-                  bgcolor: '#E5AB14',
-                },
-              }}
-              onClick={onGoToEditor}
-            >
-              Start Editing
-            </Button>
           </>
         )}
         {/* Failed/Retry State */}
@@ -242,13 +303,13 @@ const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
                 flexDirection: 'column',
                 alignItems: 'center',
                 width: '100%',
+                gap: 2,
               }}
             >
               <ReportProblemOutlinedIcon
                 sx={{
-                  fontSize: 80,
+                  fontSize: 40,
                   color: '#BA1A1A',
-                  mb: 3,
                 }}
               />
               <Typography
@@ -257,11 +318,10 @@ const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
                   fontWeight: 600,
                   fontSize: 24,
                   color: '#1F1B13',
-                  mb: 1,
                   textAlign: 'center',
                 }}
               >
-                Generation Failed
+                Something Went Wrong
               </Typography>
               <Typography
                 sx={{
@@ -269,14 +329,14 @@ const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
                   fontWeight: 400,
                   fontSize: 16,
                   color: '#635E57',
-                  mb: 4,
+                  mb: 1,
                   textAlign: 'center',
-                  maxWidth: 400,
+                  maxWidth: 600,
                   lineHeight: 1.5,
                 }}
               >
-                Something went wrong while generating your questions. Please try
-                again.
+                We couldn&apos;t generate the questions due to a technical
+                issue. Please try again or restart after some time
               </Typography>
               <Box
                 sx={{
@@ -284,7 +344,8 @@ const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
                   justifyContent: 'center',
                   gap: 2,
                   width: '100%',
-                  mt: 2,
+                  borderTop: '1px solid #D0C5B4',
+                  pt: 3,
                 }}
               >
                 <Button
@@ -294,7 +355,7 @@ const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
                     borderRadius: '100px',
                     py: 1.5,
                     borderColor: '#635E57',
-                    color: '#635E57',
+                    color: '#1E1B16',
                     textTransform: 'none',
                     fontWeight: 500,
                     '&:hover': {
@@ -302,9 +363,9 @@ const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
                       color: '#1F1B13',
                     },
                   }}
-                  onClick={handleFailedClose}
+                  onClick={handleGoBackToWorkspace}
                 >
-                  Go back
+                  Go Back to Workspace
                 </Button>
                 <Button
                   variant="contained"
@@ -327,6 +388,26 @@ const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
               </Box>
             </Box>
           </>
+        )}
+        {/* Sub-message and Footer Button for all states */}
+        {state !== 'failed' && (
+          <Box
+            sx={{
+              width: '100%',
+              borderTop: '1px solid #D0C5B4',
+              pt: 4,
+            }}
+          >
+            <Button
+              variant="contained"
+              fullWidth
+              onClick={
+                state === 'success' ? onGoToEditor : handleGoBackToWorkspace
+              }
+            >
+              {state === 'success' ? 'Go to Editor' : 'Go Back to Workspace'}
+            </Button>
+          </Box>
         )}
       </Box>
     </Dialog>

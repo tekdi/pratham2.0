@@ -169,7 +169,6 @@ const AIAssessmentCreator: React.FC = () => {
   const [aiDialogState, setAIDialogState] = useState<
     'loader' | 'success' | 'failed' | 'processing'
   >('loader');
-  const [aiProgress, setAIProgress] = useState(0);
   const [aiStatus, setAIStatus] = useState<string | null>(null);
   const [aiDialogParams, setAIDialogParams] = useState<any>(null); // for retry
   const router = useRouter();
@@ -239,7 +238,6 @@ const AIAssessmentCreator: React.FC = () => {
   }) => {
     setAIDialogParams({ newFormData, identifier, token });
     setAIDialogState('loader');
-    setAIProgress(0);
     setAIStatus(null);
     setShowAIDialog(true);
 
@@ -256,7 +254,6 @@ const AIAssessmentCreator: React.FC = () => {
       let lastStatus: string | null = null;
       const interval = setInterval(async () => {
         prog += 1.67;
-        setAIProgress(Math.round(Math.min(prog, 100)));
         try {
           if (Math.floor(prog / 1.67) % 10 === 0 && prog > 0) {
             const status = await getAIQuestionSetStatus(identifier, token);
@@ -369,7 +366,12 @@ const AIAssessmentCreator: React.FC = () => {
   } else if (activeStep === 1) {
     stepContent = (
       <SetParameters
-        formState={formState}
+        formState={{
+          ...formState,
+          ...(tenantConfig?.COLLECTION_FRAMEWORK === 'scp-framework'
+            ? { se_gradeLevels: ['Grade 10'] }
+            : {}),
+        }}
         staticFilter={staticFilter}
         onlyFields={
           tenantConfig?.COLLECTION_FRAMEWORK === 'scp-framework'
@@ -412,7 +414,6 @@ const AIAssessmentCreator: React.FC = () => {
         <AIGenerationDialog
           open={showAIDialog}
           state={aiDialogState}
-          progress={aiProgress}
           aiStatus={aiStatus}
           onRetry={() => handleAIGeneration(aiDialogParams)}
           onClose={() => setShowAIDialog(false)}
