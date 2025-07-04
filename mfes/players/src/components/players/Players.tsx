@@ -49,6 +49,8 @@ const SunbirdPlayers = ({
       );
     case 'video/mp4':
     case 'video/webm':
+    case 'audio/mp3':
+    case 'audio/wav':
       return (
         <SunbirdVideoPlayer
           playerConfig={playerConfig}
@@ -76,8 +78,6 @@ const SunbirdPlayers = ({
     case 'application/vnd.ekstep.html-archive':
     case 'video/youtube':
     case 'video/x-youtube':
-    case 'audio/mp3':
-    case 'audio/wav':
       //case 'application/vnd.ekstep.ecml-archive':
       return (
         <SunbirdV1Player

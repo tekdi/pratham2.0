@@ -3,8 +3,8 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { composePlugins, withNx } = require('@nx/next');
 
-// const PORTAL_BASE_URL = 'https://sunbird-editor.tekdinext.com';
-const PORTAL_BASE_URL = 'http://localhost:4104/mfe_workspace';
+const PORTAL_BASE_URL = 'https://sunbird-editor.tekdinext.com';
+// const PORTAL_BASE_URL = 'http://localhost:4104/mfe_workspace';
 
 const routes = {
   API: {

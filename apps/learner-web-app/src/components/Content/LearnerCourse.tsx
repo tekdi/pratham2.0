@@ -11,6 +11,7 @@ import {
 import SearchComponent from './SearchComponent';
 import FilterComponent from './FilterComponent';
 import { gredientStyle } from '@learner/utils/style';
+import { logEvent } from '@learner/utils/googleAnalytics';
 
 interface LearnerCourseProps {
   title?: string;
@@ -41,6 +42,15 @@ export default memo(function LearnerCourse({
     }));
   }, []);
   const handleSearchClick = useCallback((searchValue: string) => {
+if (typeof window !== 'undefined') {
+     const windowUrl = window.location.pathname;
+    const cleanedUrl = windowUrl
+    logEvent({
+        action: 'search content by '+searchValue,
+        category: cleanedUrl ,
+        label: 'Search content'
+      });
+    }
     setFilterState((prevState: any) => ({
       ...prevState,
       query: searchValue,
