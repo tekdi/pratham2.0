@@ -16,7 +16,7 @@ import {
   ContentItem,
   getData,
 } from '@shared-lib';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import BackToTop from '@content-mfes/components/BackToTop';
 import RenderTabContent from '@content-mfes/components/ContentTabs';
 import HelpDesk from '@content-mfes/components/HelpDesk';
@@ -72,10 +72,12 @@ export interface ContentProps {
   showHelpDesk?: boolean;
   isShowLayout?: boolean;
   hasMoreData?: boolean;
+  onTotalCountChange?: (count: number) => void;
 }
 
 export default function Content(props: Readonly<ContentProps>) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [searchValue, setSearchValue] = useState('');
   const [tabValue, setTabValue] = useState<number>(0);
   const [tabs, setTabs] = useState<typeof DEFAULT_TABS>([]);
@@ -94,6 +96,7 @@ export default function Content(props: Readonly<ContentProps>) {
     }
   >(DEFAULT_FILTERS);
   const [trackData, setTrackData] = useState<TrackDataItem[]>([]);
+  const [totalCount, setTotalCount] = useState<number>(0);
   const [filterShow, setFilterShow] = useState(false);
   const [propData, setPropData] = useState<ContentProps>();
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -102,7 +105,6 @@ export default function Content(props: Readonly<ContentProps>) {
   const sessionKeys = {
     filters: `${props?.pageName}_savedFilters`,
     search: `${props?.pageName}_searchValue`,
-    tab: `${props?.pageName}_tabValue`,
     scrollId: `${props?.pageName}_scrollToContentId`,
   };
 
@@ -130,7 +132,10 @@ export default function Content(props: Readonly<ContentProps>) {
         sessionStorage.getItem(sessionKeys.filters) || 'null'
       );
       const savedSearch = sessionStorage.getItem(sessionKeys.search) || '';
-      const savedTab = parseInt(sessionStorage.getItem(sessionKeys.tab) || '0');
+
+      // Get tab value from URL parameter
+      const urlTab = searchParams.get('tab');
+      const savedTab = urlTab ? parseInt(urlTab) : 0;
 
       const config = props ?? (await getData('mfes_content_pages_content'));
       setPropData(config);
@@ -140,8 +145,8 @@ export default function Content(props: Readonly<ContentProps>) {
           ...(config?.filters ?? {}),
           type:
             props?.contentTabs?.length === 1
-              ? props.contentTabs[0]
-              : DEFAULT_TABS[0].type,
+              ? props.contentTabs[savedTab]
+              : DEFAULT_TABS[savedTab].type,
           ...savedFilters,
           loadOld: true,
         });
@@ -151,8 +156,8 @@ export default function Content(props: Readonly<ContentProps>) {
           ...(config?.filters ?? {}),
           type:
             props?.contentTabs?.length === 1
-              ? props.contentTabs[0]
-              : DEFAULT_TABS[0].type,
+              ? props.contentTabs[savedTab]
+              : DEFAULT_TABS[savedTab].type,
           loadOld: false,
         }));
       }
@@ -165,16 +170,14 @@ export default function Content(props: Readonly<ContentProps>) {
         )
       );
       setTabValue(savedTab);
-
       setIsPageLoading(false);
     };
     init();
-  }, [props, sessionKeys.filters, sessionKeys.search, sessionKeys.tab]);
-
+  }, [ props.contentTabs, sessionKeys.filters, sessionKeys.search, searchParams]);
   // Fetch content with loop to load full data up to offset
   const fetchAllContent = useCallback(
     async (filter: any) => {
-      const content: any[] = [];
+      const content: any[] = [];  
       const QuestionSet: any[] = [];
       let count = 0;
 
@@ -198,6 +201,10 @@ export default function Content(props: Readonly<ContentProps>) {
         limit: adjustedLimit,
         signal: controller.signal,
       });
+
+      if (resultResponse?.result?.count) {
+        setTotalCount(resultResponse?.result?.count);
+      }
 
       const response = resultResponse?.result;
       if (props?._config?.getContentData) {
@@ -341,7 +348,6 @@ export default function Content(props: Readonly<ContentProps>) {
       el.scrollIntoView({ behavior: 'smooth' });
       sessionStorage.removeItem(sessionKeys.scrollId);
       sessionStorage.removeItem(sessionKeys.filters);
-      sessionStorage.removeItem(sessionKeys.tab);
     } else {
       // Retry in the next animation frame if element not yet mounted
       requestAnimationFrame(() => {
@@ -350,7 +356,6 @@ export default function Content(props: Readonly<ContentProps>) {
           retryEl.scrollIntoView({ behavior: 'smooth' });
           sessionStorage.removeItem(sessionKeys.scrollId);
           sessionStorage.removeItem(sessionKeys.filters);
-          sessionStorage.removeItem(sessionKeys.tab);
         }
       });
     }
@@ -387,13 +392,18 @@ export default function Content(props: Readonly<ContentProps>) {
 
   const handleTabChange = (event: any, newValue: number) => {
     setTabValue(newValue);
-    sessionStorage.setItem(sessionKeys.tab, newValue.toString());
+
+     // Update URL with new tab parameter
+    const url = new URL(window.location.href);
+    url.searchParams.set('tab', newValue.toString());
+    router.replace(url.pathname + url.search);
+
     handleSetFilters({
       offset: 0,
       type: tabs[newValue].type,
     });
   };
-
+  console.log('tabValue', props?.pageName);
   const handleCardClickLocal = useCallback(
     async (content: ContentItem) => {
       try {
@@ -449,6 +459,7 @@ export default function Content(props: Readonly<ContentProps>) {
             width: '100%',
             display: 'flex',
             justifyContent: 'space-between',
+            overflow: 'unset !important',
           }}
         >
           {propData?.showSearch && (
@@ -496,6 +507,13 @@ export default function Content(props: Readonly<ContentProps>) {
       handleApplyFilters,
     ]
   );
+
+  // Call onTotalCountChange callback when totalCount changes
+  useEffect(() => {
+    if (props?.onTotalCountChange) {
+      props.onTotalCountChange(totalCount);
+    }
+  }, [totalCount, props?.onTotalCountChange]);
 
   return (
     <LayoutPage

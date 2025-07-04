@@ -8,15 +8,20 @@ import {
 } from '@mui/material';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 import { useRouter } from 'next/navigation';
+import EastIcon from '@mui/icons-material/East';
 
 const BreadCrumb = ({
   breadCrumbs,
   topic,
   isShowLastLink,
+  customPlayerStyle,
+  customPlayerMarginTop,
 }: {
   breadCrumbs: any;
   topic?: string;
   isShowLastLink?: boolean;
+  customPlayerStyle?: boolean;
+  customPlayerMarginTop?: number;
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -24,6 +29,68 @@ const BreadCrumb = ({
   const handleClick = (link: string) => {
     router.replace(link);
   };
+
+  if (customPlayerStyle) {
+    return (
+      <Breadcrumbs
+        separator={
+          <EastIcon
+            sx={{
+              fontSize: '25px',
+              color: '#000000',
+              fontWeight: 900,
+              verticalAlign: 'middle',
+            }}
+          />
+        }
+        aria-label="breadcrumb"
+        sx={{
+          mt: customPlayerMarginTop ? `${customPlayerMarginTop}px` : undefined,
+        }}
+      >
+        {breadCrumbs?.map((breadcrumb: any, index: number) => {
+          const isClickable =
+            breadcrumb?.link &&
+            (index !== breadCrumbs.length - 1 || isShowLastLink);
+
+          return isClickable ? (
+            <Typography
+              key={`${breadcrumb?.name ?? breadcrumb?.label ?? ''} ${index}`}
+              sx={{
+                color: '#212529',
+                fontWeight: index === breadCrumbs.length - 1 ? 700 : 400,
+                fontSize: '24px',
+                display: 'inline',
+                cursor: 'pointer',
+                fontFamily: '"Montserrat", sans-serif',
+                '&:hover': {
+                  textDecoration: 'underline',
+                },
+              }}
+              component="span"
+              onClick={() => handleClick(breadcrumb?.link)}
+            >
+              {breadcrumb?.name ?? breadcrumb?.label ?? ''}
+            </Typography>
+          ) : (
+            <Typography
+              key={`${breadcrumb?.name ?? breadcrumb?.label ?? ''} ${index}`}
+              sx={{
+                color: '#000000',
+                fontWeight: index === breadCrumbs.length - 1 ? 700 : 400,
+                fontSize: '24px',
+                display: 'inline',
+                fontFamily: '"Montserrat", sans-serif',
+              }}
+              component="span"
+            >
+              {breadcrumb?.name ?? breadcrumb?.label ?? ''}
+            </Typography>
+          );
+        })}
+      </Breadcrumbs>
+    );
+  }
 
   return (
     <Breadcrumbs separator="›" aria-label="breadcrumb">

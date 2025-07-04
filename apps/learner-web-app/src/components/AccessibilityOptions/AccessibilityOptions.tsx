@@ -27,6 +27,7 @@ import { useColorInversion } from '../../context/ColorInversionContext';
 import TextIncreaseIcon from '@mui/icons-material/TextIncrease';
 import TextDecreaseIcon from '@mui/icons-material/TextDecrease';
 import { useSpeechContext } from '@shared-lib-v2/lib/context/SpeechContext';
+import { logEvent } from '@learner/utils/googleAnalytics';
 
 export default function AccessibilityOptions() {
   const [open, setOpen] = React.useState(false);
@@ -58,12 +59,34 @@ export default function AccessibilityOptions() {
     increaseFontSize();
     setIsIncreased(true);
     setIsDecreased(false);
+      if (typeof window !== 'undefined') {
+
+    const windowUrl = window.location.pathname;
+    const cleanedUrl = windowUrl
+
+    logEvent({
+      action: 'click-on-increase-font-size-accessibility-options',
+      category: cleanedUrl ,
+      label: 'Increase Font Size',
+    });
+  }
   };
 
   const handleDecreaseFontSize = () => {
     decreaseFontSize();
     setIsDecreased(true);
     setIsIncreased(false);
+          if (typeof window !== 'undefined') {
+
+    const windowUrl = window.location.pathname;
+    const cleanedUrl = windowUrl
+
+    logEvent({
+      action: 'click-on-decrease-font-size-accessibility-options',
+      category: cleanedUrl,
+      label: 'Decrease Font Size',
+    });
+  }
   };
 
   const handleResetFontSize = () => {
@@ -88,6 +111,16 @@ export default function AccessibilityOptions() {
     if (isColorInverted) {
       toggleColorInversion();
     }
+          if (typeof window !== 'undefined') {
+
+    const windowUrl = window.location.pathname;
+    const cleanedUrl = windowUrl
+    logEvent({
+      action: 'click-on-reset-font-size-accessibility-options',
+      category: cleanedUrl,
+      label: 'Reset Font Size',
+    });
+  }
   };
 
   const disableSpeechEnabled = () => {
@@ -269,7 +302,19 @@ export default function AccessibilityOptions() {
                 variant={isSpeechEnabled ? 'contained' : 'outlined'}
                 color="primary"
                 startIcon={<RecordVoiceOverIcon sx={{ color: '#635E57' }} />}
-                onClick={toggleSpeechEnabled}
+                onClick={() => {
+                  if (!isSpeechEnabled && typeof window !== 'undefined') {
+                    const windowUrl = window.location.pathname;
+                    const cleanedUrl = windowUrl
+              
+                    logEvent({
+                      action: 'text-to-speech-enable',
+                      category: cleanedUrl ,
+                      label: 'Text to Speech',
+                    });
+                  }
+                  toggleSpeechEnabled();
+                }}
                 sx={{
                   flex: 1,
                   justifyContent: 'flex-start',
@@ -289,7 +334,19 @@ export default function AccessibilityOptions() {
                 variant={isColorInverted ? 'contained' : 'outlined'}
                 color="primary"
                 startIcon={<InvertColorsIcon sx={{ color: '#635E57' }} />}
-                onClick={toggleColorInversion}
+                  onClick={() => {
+                  if (!isColorInverted && typeof window !== 'undefined') {
+                    const windowUrl = window.location.pathname;
+                    const cleanedUrl = windowUrl
+                    
+                    logEvent({
+                      action: 'click-on-invert-colours-accessibility-options',
+                      category: cleanedUrl ,
+                      label: 'Invert Colours',
+                    });
+                  }
+                  toggleColorInversion();
+                }}
                 sx={{
                   flex: 1,
                   justifyContent: 'flex-start',
@@ -311,7 +368,19 @@ export default function AccessibilityOptions() {
                 variant={isUnderlineLinksEnabled ? 'contained' : 'outlined'}
                 color="primary"
                 startIcon={<LinkIcon sx={{ color: '#635E57' }} />}
-                onClick={toggleUnderlineLinks}
+                 onClick={() => {
+                  if (!isUnderlineLinksEnabled && typeof window !== 'undefined') {
+                    const windowUrl = window.location.pathname;
+                    const cleanedUrl = windowUrl
+                  
+                    logEvent({
+                      action: 'click-on-underline-links-enable-accessibility-options',
+                      category: cleanedUrl ,
+                      label: 'Underline Links',
+                    });
+                  }
+                  toggleUnderlineLinks();
+                }}
                 sx={{
                   flex: 1,
                   justifyContent: 'flex-start',

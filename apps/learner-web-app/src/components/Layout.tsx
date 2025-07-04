@@ -26,6 +26,40 @@ interface NewDrawerItemProp extends DrawerItemProp {
   isActive?: boolean;
   customStyle?: React.CSSProperties;
 }
+const getClubStyleNavConfig = ({
+  router,
+  t,
+  handleNavClick,
+  getLinkStyle,
+  currentPage,
+  setAnchorEl,
+}: {
+  router: any;
+  t: any;
+  handleNavClick: (cb: () => void) => void;
+  getLinkStyle: (active: boolean) => React.CSSProperties;
+  currentPage: string;
+  setAnchorEl: (el: boolean) => void;
+}): NewDrawerItemProp[] => {
+  const navLinks: NewDrawerItemProp[] = [
+    {
+      title: t('LEARNER_APP.COMMON.COURSES'),
+      icon: <AssignmentOutlined sx={{ width: 28, height: 28 }} />,
+      to: () => handleNavClick(() => router.push('/courses-contents')),
+      isActive: currentPage === '/courses-contents',
+      customStyle: getLinkStyle(currentPage === '/courses-contents'),
+    },
+    {
+      title: t('LEARNER_APP.COMMON.PROFILE'),
+      icon: <AccountCircleOutlined sx={{ width: 28, height: 28 }} />,
+      to: () => setAnchorEl(true),
+      isActive: currentPage === '/profile',
+      customStyle: getLinkStyle(currentPage === '/profile'),
+    },
+  ];
+
+  return navLinks;
+};
 
 // Nav config by userProgram
 const NAV_CONFIG: Record<
@@ -127,35 +161,11 @@ const NAV_CONFIG: Record<
     return navLinks;
   },
 
-  'Camp to Club': ({
-    router,
-    t,
-    handleNavClick,
-    getLinkStyle,
-    currentPage,
-    setAnchorEl,
-  }) => {
-    const navLinks: NewDrawerItemProp[] = [
-      {
-        title: t('LEARNER_APP.COMMON.COURSES'),
-        icon: <AssignmentOutlined sx={{ width: 28, height: 28 }} />,
-        to: () => handleNavClick(() => router.push('/club-courses')),
-        isActive: currentPage === '/club-courses',
-        customStyle: getLinkStyle(currentPage === '/club-courses'),
-      },
-    ];
+'Camp to Club': ({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl }) =>
+    getClubStyleNavConfig({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl }),
 
-    // Always add Profile link at the end
-    navLinks.push({
-      title: t('LEARNER_APP.COMMON.PROFILE'),
-      icon: <AccountCircleOutlined sx={{ width: 28, height: 28 }} />,
-      to: () => setAnchorEl(true),
-      isActive: currentPage === '/profile',
-      customStyle: getLinkStyle(currentPage === '/profile'),
-    });
-
-    return navLinks;
-  },
+  Pragyanpath: ({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl }) =>
+    getClubStyleNavConfig({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl }),
 };
 
 const App: React.FC<LayoutProps> = ({ children, ...props }) => {
@@ -192,6 +202,49 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
   });
 
   const getMessage = () => (modalOpen ? t('COMMON.SURE_LOGOUT') : '');
+useEffect(() => {
+  let currentPage = '';
+  if (typeof window !== 'undefined') {
+    const searchParams = new URLSearchParams(window.location.search);
+    const activeLink = searchParams.get('activeLink');
+    currentPage = activeLink || window.location.pathname || '';
+  }
+
+  const program = localStorage.getItem('userProgram') || '';
+
+  const disallowedPathsMap: Record<string, string[]> = {
+    YouthNet: ['/courses-contents'],
+    'Camp to Club': ['/content', '/observations', '/skill-center'],
+    'Pragyanpath': ['/content', '/observations', '/skill-center'],
+  };
+
+  const disallowedPaths = disallowedPathsMap[program] || [];
+
+  if (disallowedPaths.includes(currentPage)) {
+    // Redirect to a safe/default page
+    const fallbackPath = program === 'Camp to Club' ? '/courses-contents' : '/content';
+    router.push('/unauthorized');
+    return;
+  }
+
+  const configFn = NAV_CONFIG[program];
+  const navLinks = configFn
+    ? configFn({
+        router,
+        isMobile,
+        t,
+        handleNavClick,
+        handleProfileClick,
+        handleLogoutModal,
+        setAnchorEl,
+        getLinkStyle,
+        currentPage,
+        checkAuth: checkAuth(),
+      })
+    : [];
+
+  setDefaultNavLinks(navLinks);
+}, [t, router, isMobile]);
 
   useEffect(() => {
     let currentPage = '';
@@ -235,7 +288,22 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
               ? localStorage.getItem('userProgram') ?? ''
               : '',
           _box: {
-            onClick: () => router.push('/content'),
+            onClick: () =>
+              {
+                const tenantName = localStorage.getItem('userProgram') || '';
+                if(tenantName=== 'YouthNet') {
+          router.push('/content');
+        }
+        else if (tenantName==="Camp to Club")
+        {
+          router.push('/courses-contents');
+        }
+        else if(tenantName==="Pragyanpath")
+        {
+          router.push('/courses-contents');
+        }
+             },
+
             sx: {
               cursor: 'pointer',
               display: 'flex',
