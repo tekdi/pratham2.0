@@ -288,7 +288,22 @@ useEffect(() => {
               ? localStorage.getItem('userProgram') ?? ''
               : '',
           _box: {
-            onClick: () => router.push('/courses-contents'),
+            onClick: () =>
+              {
+                const tenantName = localStorage.getItem('userProgram') || '';
+                if(tenantName=== 'YouthNet') {
+          router.push('/content');
+        }
+        else if (tenantName==="Camp to Club")
+        {
+          router.push('/courses-contents');
+        }
+        else if(tenantName==="Pragyanpath")
+        {
+          router.push('/courses-contents');
+        }
+             },
+
             sx: {
               cursor: 'pointer',
               display: 'flex',

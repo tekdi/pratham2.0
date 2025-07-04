@@ -362,13 +362,15 @@ const Learner = () => {
 
   const userDelete = async () => {
     try {
-      let membershipId = null;
+      let membershipIds = null;
 
       // Attempt to get the cohort list
       try {
         const userCohortResp = await getCohortList(userID);
-        if (userCohortResp?.result?.cohortData?.length) {
-          membershipId = userCohortResp.result.cohortData[0].cohortMembershipId;
+        if (userCohortResp?.result?.length) {
+          membershipIds = userCohortResp?.result?.map(
+            (item) => item.cohortMembershipId
+          );
         } else {
           console.warn('No cohort data found for the user.');
         }
@@ -377,24 +379,31 @@ const Learner = () => {
       }
 
       // Attempt to update cohort member status only if we got a valid membershipId
-      if (membershipId) {
-        try {
-          const updateResponse = await updateCohortMemberStatus({
-            memberStatus: 'archived',
-            statusReason: reason,
-            membershipId: membershipId,
-          });
+      if (membershipIds && Array.isArray(membershipIds)) {
+        for (const membershipId of membershipIds) {
+          try {
+            const updateResponse = await updateCohortMemberStatus({
+              memberStatus: 'archived',
+              statusReason: reason,
+              membershipId,
+            });
 
-          if (updateResponse?.responseCode !== 200) {
+            if (updateResponse?.responseCode !== 200) {
+              console.error(
+                `Failed to archive user with membershipId ${membershipId}:`,
+                updateResponse
+              );
+            } else {
+              console.log(
+                `User with membershipId ${membershipId} successfully archived.`
+              );
+            }
+          } catch (error) {
             console.error(
-              'Failed to archive user from center:',
-              updateResponse
+              `Error archiving user with membershipId ${membershipId}:`,
+              error
             );
-          } else {
-            console.log('User successfully archived from center.');
           }
-        } catch (error) {
-          console.error('Error archiving user from center:', error);
         }
       }
 
