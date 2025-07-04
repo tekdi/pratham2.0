@@ -91,6 +91,7 @@ export interface CohortListParam {
 export interface CohortMemberList {
   limit?: number;
   page?: number;
+  offset?: number;
   filters: {
     cohortId: string;
     role?: string;
