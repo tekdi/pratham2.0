@@ -52,7 +52,7 @@ const getClubStyleNavConfig = ({
     {
       title: t('LEARNER_APP.COMMON.PROFILE'),
       icon: <AccountCircleOutlined sx={{ width: 28, height: 28 }} />,
-      to: () => setAnchorEl(true),
+      to: () => handleNavClick(() => router.push('/profile')),
       isActive: currentPage === '/profile',
       customStyle: getLinkStyle(currentPage === '/profile'),
     },
