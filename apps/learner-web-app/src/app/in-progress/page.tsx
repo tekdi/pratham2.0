@@ -25,6 +25,10 @@ const InProgress: React.FC = () => {
         {
           router.push('/courses-contents');
         }
+        else
+        {
+          router.push('/content');
+        }
 };
 
 
