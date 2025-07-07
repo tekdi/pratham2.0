@@ -28,7 +28,8 @@ const MyComponent: React.FC = () => {
   const pathname = usePathname();
     const searchParams = useSearchParams();
   const tab = searchParams.get('tab'); // '1', '2', etc. as a string
-  console.log("Current tab:", typeof tab);
+
+  console.log("Current tab:", tab);
   const [filter, setFilter] = useState<Record<string, any> | null>(null);
   const [isLogin, setIsLogin] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -125,7 +126,7 @@ const storedConfig = typeof window !== 'undefined'
               Welcome, {localStorage.getItem('firstName')}!
             </Typography>
           </Box>
-          {tab =="0" && (<InProgressContent />)}
+          {(tab =="0" || tab===null) && (<InProgressContent />)}
 
           {localStorage.getItem('userProgram') === 'YouthNet' &&(<Grid container>
             <Grid
