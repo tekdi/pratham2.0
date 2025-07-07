@@ -31,13 +31,16 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
   handleForgotPassword,
 }) => {
   const { t } = useTranslation(); // Initialize translation function
-
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
     password: '',
     remember: false,
   });
+  const storedConfig =
+    typeof window !== 'undefined'
+      ? JSON.parse(localStorage.getItem('uiConfig') || '{}')
+      : {};
 
   const handleChange = (e: any) => {
     const { name, value, type, checked } = e.target;
@@ -153,16 +156,19 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
           {t('LEARNER_APP.LOGIN.login_button')}
         </Button>
 
-        <Typography
-          variant="body2"
-          color="secondary"
-          align="center"
-          mt={2}
-          sx={{ cursor: 'pointer' }}
-          onClick={handleAddAccount}
-        >
-          {t('LEARNER_APP.LOGIN.no_account')}
-        </Typography>
+        {(storedConfig?.showSignup === true ||
+          Object.keys(storedConfig).length === 0) && (
+          <Typography
+            variant="body2"
+            color="secondary"
+            align="center"
+            mt={2}
+            sx={{ cursor: 'pointer' }}
+            onClick={handleAddAccount}
+          >
+            {t('LEARNER_APP.LOGIN.no_account')}
+          </Typography>
+        )}
       </form>
     </Paper>
   );
