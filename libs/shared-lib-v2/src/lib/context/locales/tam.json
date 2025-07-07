@@ -122,6 +122,8 @@
     "LOAD_MORE": "மேலும் ஏற்று",
     "SKILLING_CENTERS": "திறன் மையங்கள்",
     "SKILLING_CENTERS_NEAR_YOU": "உங்களுக்கு அருகிலுள்ள திறன் மையம்",
+        "WELCOME": "வணக்கம்",
+
     "STATUS": {
       "completed": "முடிந்தது",
       "in_progress": "நடந்து கொண்டிருக்கிறது",

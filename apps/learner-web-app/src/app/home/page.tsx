@@ -30,7 +30,7 @@ export default function Index() {
               : '',
           logo: checkAuth() ? '/logo.png' : '/images/appLogo.svg',
           _box: {
-            onClick: () => router.push('/content'),
+            onClick: () => router.push('/'),
             sx: {
               cursor: 'pointer',
               display: 'flex',
