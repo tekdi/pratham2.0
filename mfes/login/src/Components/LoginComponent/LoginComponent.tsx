@@ -14,7 +14,6 @@ import {
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { Loader, useTranslation } from '@shared-lib'; // Updated import
-import { useSearchParams } from 'next/navigation';
 
 interface LoginComponentProps {
   onLogin: (data: {
@@ -32,15 +31,16 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
   handleForgotPassword,
 }) => {
   const { t } = useTranslation(); // Initialize translation function
-  const searchParams = useSearchParams();
-  const isCampToClub = searchParams.get('isCampToClub');
-
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
     password: '',
     remember: false,
   });
+  const storedConfig =
+    typeof window !== 'undefined'
+      ? JSON.parse(localStorage.getItem('uiConfig') || '{}')
+      : {};
 
   const handleChange = (e: any) => {
     const { name, value, type, checked } = e.target;
@@ -156,7 +156,7 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
           {t('LEARNER_APP.LOGIN.login_button')}
         </Button>
 
-        {!isCampToClub && (
+        {storedConfig?.showSignup === true && (
           <Typography
             variant="body2"
             color="secondary"

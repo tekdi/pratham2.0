@@ -35,29 +35,29 @@ const getCustomField = (customFields: any, label: string) => {
   const field = customFields.find((f: any) => f.label === label);
   return field?.selectedValues?.[0]?.label || field?.selectedValues?.[0] || '-';
 };
-const UserProfileCard = ({maxWidth= '600px'}) => {
+const UserProfileCard = ({ maxWidth = '600px' }) => {
   const router = useRouter();
   const [userData, setUserData] = useState<any>(null); // User data state
   const [open, setOpen] = useState(false);
   const { t } = useTranslation();
   const [selectedOption, setSelectedOption] = useState('');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-const storedConfig = typeof window !== 'undefined'
-  ? JSON.parse(localStorage.getItem('uiConfig') || '{}')
-  : {};
-
+  const storedConfig =
+    typeof window !== 'undefined'
+      ? JSON.parse(localStorage.getItem('uiConfig') || '{}')
+      : {};
 
   const options = [
-   // t('LEARNER_APP.USER_PROFILE_CARD.EDIT_PROFILE'),
+    // t('LEARNER_APP.USER_PROFILE_CARD.EDIT_PROFILE'),
     // t('LEARNER_APP.USER_PROFILE_CARD.CHANGE_USERNAME'),
     t('LEARNER_APP.USER_PROFILE_CARD.CHANGE_PASSWORD'),
     t('LEARNER_APP.USER_PROFILE_CARD.PRIVACY_GUIDELINES'),
     t('LEARNER_APP.USER_PROFILE_CARD.CONSENT_FORM'),
     t('COMMON.FAQS'),
   ];
-if(storedConfig?.isEditProfile){
-options.push(t('LEARNER_APP.USER_PROFILE_CARD.EDIT_PROFILE'));
-}
+  if (storedConfig?.isEditProfile) {
+    options.push(t('LEARNER_APP.USER_PROFILE_CARD.EDIT_PROFILE'));
+  }
   const isBelow18 = (dob: string): boolean => {
     const birthDate = new Date(dob);
     const today = new Date();
@@ -235,7 +235,7 @@ options.push(t('LEARNER_APP.USER_PROFILE_CARD.EDIT_PROFILE'));
       <Box
         sx={{
           background: 'linear-gradient(to bottom, #FFFDF6, #F8EFDA)',
-          maxWidth: {maxWidth},
+          maxWidth: { maxWidth },
           padding: '20px',
           position: 'relative',
         }}
@@ -276,7 +276,11 @@ options.push(t('LEARNER_APP.USER_PROFILE_CARD.EDIT_PROFILE'));
       </Box>
 
       <Box
-        sx={{ padding: '16px', backgroundColor: '#FFF8F2', maxWidth: {maxWidth} }}
+        sx={{
+          padding: '16px',
+          backgroundColor: '#FFF8F2',
+          maxWidth: { maxWidth },
+        }}
       >
         {!isUnderEighteen(dob) ? (
           <>
@@ -417,7 +421,8 @@ options.push(t('LEARNER_APP.USER_PROFILE_CARD.EDIT_PROFILE'));
                 </Typography>
               </Grid>
             )}
-            {[state, district, block, village].filter(Boolean).join(', ') !== '-' && (
+            {[state, district, block, village].filter(Boolean).join(', ') !==
+              '-' && (
               <Grid item xs={12}>
                 <Typography sx={labelStyle}>
                   {t('LEARNER_APP.USER_PROFILE_CARD.LOCATION')}
@@ -430,39 +435,44 @@ options.push(t('LEARNER_APP.USER_PROFILE_CARD.EDIT_PROFILE'));
           </Grid>
         </Box>
 
-        <Typography sx={sectionTitleStyle}>
-          {t('LEARNER_APP.USER_PROFILE_CARD.ASPIRATION_EXPERIENCE')}
-        </Typography>
-        <Box sx={sectionCardStyle}>
-          {priorTraining !== '-' && (
-            <Box sx={{ mb: 1.5 }}>
-              <Typography sx={labelStyle}>
-                {t('LEARNER_APP.USER_PROFILE_CARD.PRIOR_TRAINING')}
-              </Typography>
-              <Typography sx={valueStyle}>{priorTraining}</Typography>
+        {priorTraining !== '-' && currentWork !== '-' && futureWork !== '-' && (
+          <>
+            <Typography sx={sectionTitleStyle}>
+              {t('LEARNER_APP.USER_PROFILE_CARD.ASPIRATION_EXPERIENCE')}
+            </Typography>
+
+            <Box sx={sectionCardStyle}>
+              {priorTraining !== '-' && (
+                <Box sx={{ mb: 1.5 }}>
+                  <Typography sx={labelStyle}>
+                    {t('LEARNER_APP.USER_PROFILE_CARD.PRIOR_TRAINING')}
+                  </Typography>
+                  <Typography sx={valueStyle}>{priorTraining}</Typography>
+                </Box>
+              )}
+              {currentWork !== '-' && (
+                <Box sx={{ mb: 1.5 }}>
+                  <Typography sx={labelStyle}>
+                    {t('LEARNER_APP.USER_PROFILE_CARD.CURRENT_WORK')}
+                  </Typography>
+                  <Typography sx={valueStyle}>
+                    {toPascalCase(currentWork).replaceAll('_', ' ')}
+                  </Typography>
+                </Box>
+              )}
+              {futureWork !== '-' && (
+                <Box>
+                  <Typography sx={labelStyle}>
+                    {t('LEARNER_APP.USER_PROFILE_CARD.FUTURE_WORK')}
+                  </Typography>
+                  <Typography sx={valueStyle}>
+                    - I want to become {futureWork}
+                  </Typography>
+                </Box>
+              )}
             </Box>
-          )}
-          {currentWork !== '-' && (
-            <Box sx={{ mb: 1.5 }}>
-              <Typography sx={labelStyle}>
-                {t('LEARNER_APP.USER_PROFILE_CARD.CURRENT_WORK')}
-              </Typography>
-              <Typography sx={valueStyle}>
-                {toPascalCase(currentWork).replaceAll('_', ' ')}
-              </Typography>
-            </Box>
-          )}
-          {futureWork !== '-' && (
-            <Box>
-              <Typography sx={labelStyle}>
-                {t('LEARNER_APP.USER_PROFILE_CARD.FUTURE_WORK')}
-              </Typography>
-              <Typography sx={valueStyle}>
-                - I want to become {futureWork}
-              </Typography>
-            </Box>
-          )}
-        </Box>
+          </>
+        )}
       </Box>
 
       <Menu

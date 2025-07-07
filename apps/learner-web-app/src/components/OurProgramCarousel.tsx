@@ -71,6 +71,7 @@ const OurProgramCarousel = () => {
     };
 
     fetchTenantInfo();
+    localStorage.removeItem('uiConfig');
   }, []);
   return (
     <Container maxWidth="xl">
@@ -302,9 +303,13 @@ const OurProgramCarousel = () => {
                           },
                         }}
                         onClick={() => {
-                          program?.name === 'Camp to Club'
-                            ? router.push('/login?isCampToClub=' + true)
-                            : router.push('/login');
+                          // console.log('Test####', program?.params?.uiConfig);
+                          const uiConfig = program?.params?.uiConfig || {};
+                          localStorage.setItem(
+                            'uiConfig',
+                            JSON.stringify(uiConfig || {})
+                          );
+                          router.push('/login');
                         }}
                       >
                         {t('LEARNER_APP.HOME.SIGN_IN')}
