@@ -141,15 +141,7 @@ const QuestionPaperPDF = ({ data }: any) => {
         <View style={styles.content}>
           <View style={styles.row}>
             <View style={[gridCol(12), styles.box]}>
-              {/* <Image
-                // src={"/images/background.jpg"}
-                src={clslogo}
-                style={{
-                  width: 50, // adjust as needed
-                  height: 50,
-                  borderRadius: 50,
-                }}
-              /> */}
+              {/*  */}
               <Text
                 style={{ ...styles.title, ...styles.center, ...styles.bold }}
               >
@@ -199,8 +191,8 @@ const QuestionPaperPDF = ({ data }: any) => {
                         ...styles.bold,
                       }}
                     >
-                      ({String.fromCharCode(65 + sectionIndex)}){' '}
-                      {section?.sectionTitle}
+                      {/* ({String.fromCharCode(65 + sectionIndex)}){' '} */}
+                      {`(${sectionIndex + 1})`} {section?.sectionTitle}
                     </Text>
                   </View>
                   <View style={[gridCol(2), styles.box]}>
@@ -227,7 +219,8 @@ const QuestionPaperPDF = ({ data }: any) => {
                             ...styles.bold,
                           }}
                         >
-                          ({qIndex + 1}) {question?.questionTitle}
+                          ({sectionIndex + 1}.{qIndex + 1}){' '}
+                          {question?.questionTitle}
                         </Text>
                       </View>
                       <View style={[gridCol(1), styles.box]}>
@@ -242,21 +235,43 @@ const QuestionPaperPDF = ({ data }: any) => {
                         </Text>
                       </View>
                     </View>
-                    {question.options.map((option: any, oIndex: any) => (
-                      <View style={styles.row} key={oIndex}>
-                        <View style={[gridCol(1), styles.box]}></View>
-                        <View style={[gridCol(11), styles.box]}>
-                          <Text
-                            style={{
-                              ...styles.sub_title,
-                              ...styles.left,
-                            }}
-                          >
-                            {toRoman(oIndex + 1)}) {option.label}
-                          </Text>
+                    {question?.options?.map((option: any, oIndex: any) => {
+                      let isImage = false;
+                      let imageUrl = '';
+                      if (option.label.includes('<img')) {
+                        isImage = true;
+                        imageUrl = option.label.match(/src="([^"]*)"/)[1];
+                      }
+                      let label = option.label
+                        .replace(/<[^>]*>/g, '')
+                        .replace(/&nbsp;/g, '');
+                      return (
+                        <View style={styles.row} key={oIndex}>
+                          <View style={[gridCol(1), styles.box]}></View>
+                          <View style={[gridCol(11), styles.box]}>
+                            <Text
+                              style={{
+                                ...styles.sub_title,
+                                ...styles.left,
+                              }}
+                            >
+                              ({toRoman(oIndex + 1)}) {!isImage && label}
+                            </Text>
+                            {isImage && (
+                              <Image
+                                src={imageUrl}
+                                // src={clslogo}
+                                style={{
+                                  width: 150, // adjust as needed
+                                  // height: 50,
+                                  // borderRadius: 0,
+                                }}
+                              />
+                            )}
+                          </View>
                         </View>
-                      </View>
-                    ))}
+                      );
+                    })}
                   </View>
                 ))}
               </View>
@@ -282,13 +297,13 @@ export default function QP() {
   //data fetch variable
   const [do_id, set_do_id] = useState<string | null>(null);
   const [status, set_status] = useState<string>('');
+  const [error, set_error] = useState<boolean>(false);
   const [content_details, set_content_details] = useState<any>(null);
 
   //temp variable
   const [list_temp_load, set_list_temp_load] = useState([]);
   useEffect(() => {
     const getDoIdAndDownload = async () => {
-      let isError = false;
       set_status('Getting DO ID');
       let local_do_id: string | null = sessionStorage.getItem(do_var);
       if (local_do_id) {
@@ -296,15 +311,20 @@ export default function QP() {
         set_do_id(local_do_id);
         await downloadContentQuML(local_do_id);
       } else {
-        isError = true;
-      }
-      if (isError) {
-        sessionStorage.removeItem(do_var);
-        window.close();
+        set_error(true);
       }
     };
     getDoIdAndDownload();
   }, [list_temp_load]);
+
+  useEffect(() => {
+    if (error === true) {
+      // sessionStorage.removeItem(do_var);
+      // window.open('http://localhost', '_self');
+      // window.close();
+      console.log('############ error', error);
+    }
+  }, [error]);
 
   useEffect(() => {
     const handleDownloadPDF = async () => {
@@ -323,7 +343,7 @@ export default function QP() {
       }
     };
     if (content_details != null) {
-      handleDownloadPDF();
+      // handleDownloadPDF();
     }
   }, [content_details]);
 
@@ -335,6 +355,7 @@ export default function QP() {
     let content_response: any = await hierarchyContent(content_do_id);
     if (content_response == null) {
       set_status('Invalid Do Id...');
+      set_error(true);
     } else {
       let contentObj = content_response?.result?.questionSet;
       //fix for response with questionset
@@ -459,17 +480,21 @@ export default function QP() {
               await generateQuestionSet(file_content);
               set_status('Completed...');
             } else {
-              set_status('Invalid File 1');
+              set_status('Invalid File');
+              set_error(true);
             }
             //end download
           } catch (error) {
             set_status(`Failed to create file: ${error}`);
+            set_error(true);
           }
         } catch (err) {
           set_status(`Failed to create file: ${err}`);
+          set_error(true);
         }
       } else {
-        set_status('Invalid File 2');
+        set_status('Invalid File');
+        set_error(true);
       }
     }
   };
@@ -501,7 +526,7 @@ export default function QP() {
           ]?.interactions?.response1?.options?.map((option: any) => {
             return {
               ...option,
-              label: option.label.replace(/<[^>]*>/g, ''),
+              label: option.label,
             };
           });
           totalMarks += maxScore;
@@ -643,11 +668,32 @@ export default function QP() {
   }
   return (
     <div>
-      {/* DO ID ={do_id} */}
+      DO ID ={do_id}
       <br />
       {status}
       <br />
-      {/* <pre>{JSON.stringify(content_details, null, 2)}</pre> */}
+      {content_details && (
+        <BlobProvider
+          document={
+            <QuestionPaperPDF key={Date.now()} data={content_details} />
+          }
+        >
+          {({ url, loading }) =>
+            loading ? (
+              <div>Loading PDF...</div>
+            ) : (
+              <iframe
+                src={url}
+                width="100%"
+                height="600px"
+                title="PDF Preview"
+              />
+            )
+          }
+        </BlobProvider>
+      )}
+      <br />
+      <pre>{JSON.stringify(content_details, null, 2)}</pre>
     </div>
   );
 }
