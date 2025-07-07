@@ -17,7 +17,7 @@ const InProgress: React.FC = () => {
   };
 
   return (
-    <Layout _children={{ _children: gredientStyle }}>
+    <Layout >
       <Grid container>
         <Grid item xs={12} sx={{ p: { xs: 2, md: 5 }, pb: { xs: 1, md: 0 } }}>
           <Button
