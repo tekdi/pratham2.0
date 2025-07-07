@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Header from '@/components/Header';
+import Header from '../../../../components/Header';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import {
   Box,
@@ -19,6 +19,10 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useRouter } from 'next/router';
+import {
+  UploadOptionsPopup,
+  UploadedImage,
+} from '../../../../components/assessment';
 
 const AssessmentDetails = () => {
   const theme = useTheme();
@@ -26,10 +30,44 @@ const AssessmentDetails = () => {
   const router = useRouter();
   const [expandedPanel, setExpandedPanel] = useState<string | false>(false);
 
+  // Upload Options Popup state
+  const [uploadPopupOpen, setUploadPopupOpen] = useState(false);
+
   const handleAccordionChange =
     (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
       setExpandedPanel(isExpanded ? panel : false);
     };
+
+  // Sample uploaded images data
+  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
+
+  // Upload Options Popup handlers
+  const handleUploadInfoClick = () => {
+    setUploadPopupOpen(true);
+  };
+
+  const handleCloseUploadPopup = () => {
+    setUploadPopupOpen(false);
+  };
+
+  const handleReupload = () => {
+    console.log('Re-upload images');
+    // Implement re-upload logic
+  };
+
+  const handleViewImages = () => {
+    console.log('View all images');
+    // Implement view images logic
+  };
+
+  const handleDownload = () => {
+    console.log('Download all images');
+    // Implement download logic
+  };
+
+  const handleImageUpload = (newImage: UploadedImage) => {
+    setUploadedImages((prev) => [...prev, newImage]);
+  };
 
   const [assessmentData] = useState({
     studentName: 'Bharat Kumar',
@@ -150,6 +188,7 @@ const AssessmentDetails = () => {
       <Box sx={{ mx: '16px', my: '16px' }}>
         {/* Images Info */}
         <Box
+          onClick={handleUploadInfoClick}
           sx={{
             display: 'flex',
             justifyContent: 'space-between',
@@ -158,6 +197,14 @@ const AssessmentDetails = () => {
             borderRadius: '12px',
             p: { xs: 2, md: 3 },
             mb: { xs: 2, md: 3 },
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              borderColor: '#1976d2',
+              backgroundColor: '#f5f5f5',
+              transform: 'translateY(-1px)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            },
           }}
         >
           <Box>
@@ -480,6 +527,20 @@ const AssessmentDetails = () => {
           </Box>
         </Box>
       </Box>
+
+      {/* Upload Options Popup */}
+      <UploadOptionsPopup
+        isOpen={uploadPopupOpen}
+        onClose={handleCloseUploadPopup}
+        uploadedImages={uploadedImages}
+        onReupload={handleReupload}
+        onViewImages={handleViewImages}
+        onDownload={handleDownload}
+        onImageUpload={handleImageUpload}
+        title="Upload Assessment Images"
+        maxFileSize={10 * 1024 * 1024} // 10MB
+        allowedFormats={['image/jpeg', 'image/png', 'image/gif']}
+      />
     </div>
   );
 };
