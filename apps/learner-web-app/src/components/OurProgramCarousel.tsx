@@ -301,7 +301,11 @@ const OurProgramCarousel = () => {
                             backgroundColor: '#FDBE16',
                           },
                         }}
-                        onClick={() => router.push('/login')}
+                        onClick={() => {
+                          program?.name === 'Camp to Club'
+                            ? router.push('/login?isCampToClub=' + true)
+                            : router.push('/login');
+                        }}
                       >
                         {t('LEARNER_APP.HOME.SIGN_IN')}
                       </Button>
