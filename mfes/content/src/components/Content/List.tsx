@@ -173,7 +173,7 @@ export default function Content(props: Readonly<ContentProps>) {
       setIsPageLoading(false);
     };
     init();
-  }, [ props.contentTabs, sessionKeys.filters, sessionKeys.search, searchParams]);
+  }, [ props, sessionKeys.filters, sessionKeys.search, searchParams]);
   // Fetch content with loop to load full data up to offset
   const fetchAllContent = useCallback(
     async (filter: any) => {

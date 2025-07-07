@@ -71,6 +71,7 @@ const OurProgramCarousel = () => {
     };
 
     fetchTenantInfo();
+    localStorage.removeItem('uiConfig');
   }, []);
   return (
     <Container maxWidth="xl">
@@ -301,7 +302,15 @@ const OurProgramCarousel = () => {
                             backgroundColor: '#FDBE16',
                           },
                         }}
-                        onClick={() => router.push('/login')}
+                        onClick={() => {
+                          // console.log('Test####', program?.params?.uiConfig);
+                          const uiConfig = program?.params?.uiConfig || {};
+                          localStorage.setItem(
+                            'uiConfig',
+                            JSON.stringify(uiConfig || {})
+                          );
+                          router.push('/login');
+                        }}
                       >
                         {t('LEARNER_APP.HOME.SIGN_IN')}
                       </Button>
