@@ -13,6 +13,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import SearchIcon from '@mui/icons-material/Search';
 import { SearchButton } from '../SearchButton';
 import { useRouter } from 'next/navigation';
+import { logEvent } from '@learner/utils/googleAnalytics';
 
 const languages = ['English', 'Marathi', 'Hindi'];
 const STORAGE_KEY = 'selectedLanguage';
@@ -53,6 +54,18 @@ const SubHeader = ({
   }, [getFilter]);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    console.log('Clicked button:', selectedLang);
+          if (typeof window !== 'undefined') {     
+
+     const windowUrl = window.location.pathname;
+                 const cleanedUrl = windowUrl;
+
+                logEvent({
+                  action: 'filter thematic content by language ' + selectedLang,
+                  category: cleanedUrl,
+                  label: 'Filter thematic content by language ',
+                });
+              }
     setAnchorEl(event.currentTarget);
   };
 
@@ -214,8 +227,22 @@ const SubHeader = ({
           >
             <SearchButton
               searchValue={search}
-              onSearch={() => router.push('/themantic/search?q=' + search)}
-              handleSearch={setSearch}
+ onSearch={() => 
+              {
+                if (typeof window !== 'undefined') {
+
+                 const windowUrl = window.location.pathname;
+                 const cleanedUrl = windowUrl;
+
+                logEvent({
+                  action: 'search in thematic coneten by ' + search,
+                  category: cleanedUrl,
+                  label: 'Search thematic content',
+                });
+                router.push('/themantic/search?q=' + search)
+              }}
+
+            }              handleSearch={setSearch}
               _box={{
                 mx: 'auto',
                 mt: { xs: 0, sm: 4 },

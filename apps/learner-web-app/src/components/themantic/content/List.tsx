@@ -95,6 +95,7 @@ const List: React.FC<ListProps> = ({
                   }}
                 >
                   <Content
+                    key={`course-${selectedFilter}`}
                     isShowLayout={false}
                     contentTabs={['Course']}
                     pageName="Course"
@@ -182,6 +183,7 @@ const List: React.FC<ListProps> = ({
               }}
             >
               <Content
+                key={`content-${selectedFilter}`}
                 isShowLayout={false}
                 contentTabs={['content']}
                 pageName="content"
