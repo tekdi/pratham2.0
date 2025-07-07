@@ -10,7 +10,17 @@ import {
   transformRenderForm,
 } from '@shared-lib';
 import { useRouter } from 'next/navigation';
-import { Box } from '@mui/material';
+import {
+  Box,
+  Button,
+  Menu,
+  MenuItem,
+  Popper,
+  Paper,
+  Grow,
+  MenuList,
+  Select,
+} from '@mui/material';
 import { Footer } from './Footer';
 import { getDeviceIdUUID } from '@shared-lib-v2/DynamicForm/utils/Helper';
 import { validate as uuidValidate } from 'uuid';
@@ -18,12 +28,155 @@ import { useGlobalData } from '../Provider/GlobalProvider';
 import AccessibilityOptions from '../AccessibilityOptions/AccessibilityOptions';
 import { useColorInversion } from '../../context/ColorInversionContext';
 import { SearchButton } from './SearchButton';
+import { logEvent } from '@learner/utils/googleAnalytics';
 
-interface NewDrawerItemProp extends DrawerItemProp {
+interface SubMenuItem {
+  title: string | React.ReactNode;
+  to: () => void;
+  isActive: boolean;
+  code?: string;
+}
+
+interface BaseDrawerItemProp {
+  title: React.ReactNode;
+  icon?: React.ReactNode;
+  to?: ((event: React.MouseEvent<HTMLAnchorElement>) => void) | (() => void);
   variant?: 'contained' | 'text';
   isActive?: boolean;
   customStyle?: React.CSSProperties;
+  child?: SubMenuItem[];
 }
+
+type NewDrawerItemProp = BaseDrawerItemProp;
+
+interface AppBarProps {
+  title?: string;
+  showBackIcon?: boolean;
+  backIconClick?: () => void;
+  navLinks?: NewDrawerItemProp[];
+  rightComponent?: React.ReactNode;
+  isShowLang?: boolean;
+  onLanguageChange?: (lang: string) => void;
+  _navLinkBox?: React.CSSProperties;
+  _brand?: any;
+  _topAppBar?: any;
+}
+
+const NavButton: React.FC<{
+  link: NewDrawerItemProp;
+  index: number;
+}> = ({ link, index }) => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+
+  const handleMouseEnter = (event: React.MouseEvent<HTMLElement>) => {
+    if (link.child) {
+      setAnchorEl(event.currentTarget);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setAnchorEl(null);
+  };
+
+  const handleClick = () => {
+    if (typeof link.to === 'function') {
+      link.to({} as any);
+    }
+    setAnchorEl(null);
+  };
+
+  return (
+    <Box onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+      <Button
+        key={index}
+        variant={
+          link.variant ??
+          (link.isActive ? 'top-bar-link-button' : 'top-bar-link-text')
+        }
+        startIcon={link?.icon}
+        onClick={handleClick}
+        sx={{
+          color: 'inherit',
+          '&:hover': {
+            backgroundColor: 'rgba(0, 0, 0, 0.04)',
+          },
+        }}
+      >
+        {link.title}
+      </Button>
+      {link.child && (
+        <Popper
+          open={open}
+          anchorEl={anchorEl}
+          placement="bottom-start"
+          transition
+          sx={{ zIndex: 1300 }}
+        >
+          {({ TransitionProps }) => (
+            <Grow {...TransitionProps}>
+              <Paper>
+                <MenuList>
+                  {link?.child?.map((childItem, childIndex) => (
+                    <MenuItem
+                      key={childIndex}
+                      onClick={() => {
+                        childItem.to();
+                        setAnchorEl(null);
+                      }}
+                    >
+                      {childItem.title}
+                    </MenuItem>
+                  ))}
+                </MenuList>
+              </Paper>
+            </Grow>
+          )}
+        </Popper>
+      )}
+    </Box>
+  );
+};
+
+const LanguageSelect = ({
+  onLanguageChange,
+}: {
+  onLanguageChange?: (lang: string) => void;
+}) => {
+  const [selectedLanguage, setSelectedLanguage] = useState('en');
+
+  React.useEffect(() => {
+    const storedLanguage = localStorage.getItem('lang');
+    if (storedLanguage) {
+      setSelectedLanguage(storedLanguage);
+    }
+  }, []);
+
+  const handleChange = (event: any) => {
+    const newLanguage = event.target.value;
+    setSelectedLanguage(newLanguage);
+    if (onLanguageChange) {
+      onLanguageChange(newLanguage);
+    } else {
+      localStorage.setItem('lang', newLanguage);
+    }
+  };
+
+  return (
+    <Select
+      value={selectedLanguage}
+      size="small"
+      onChange={handleChange}
+      sx={{
+        minWidth: 80,
+        height: 40,
+      }}
+    >
+      <MenuItem value="en">EN</MenuItem>
+      <MenuItem value="hi">HI</MenuItem>
+    </Select>
+  );
+};
 
 const App: React.FC<LayoutProps> = ({ children, ...props }) => {
   const router = useRouter();
@@ -75,7 +228,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
     const lifeSubCategory =
       option?.find((category: any) => category.code === 'learningForLife')
         ?.associations?.subDomain ?? [];
-    const navLinks = [
+    const navLinks: NewDrawerItemProp[] = [
       {
         title: t('LEARNER_APP.POS.ABOUT_US'),
         to: () => router.push('/pos/about-us'),
@@ -88,7 +241,8 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         child: schoolSubCategory.map((item: any) => ({
           title: item?.name,
           to: () => router.push(`/pos/school?se_subDomains=${item?.code}`),
-          isActive: `/pos/school?se_subDomains=${item?.code}`,
+          isActive: currentPage === `/pos/school?se_subDomains=${item?.code}`,
+          code: item?.code,
         })),
       },
       {
@@ -98,7 +252,8 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         child: workSubCategory.map((item: any) => ({
           title: item?.name,
           to: () => router.push(`/pos/work?se_subDomains=${item?.code}`),
-          isActive: `/pos/work?se_subDomains=${item?.code}`,
+          isActive: currentPage === `/pos/work?se_subDomains=${item?.code}`,
+          code: item?.code,
         })),
       },
       {
@@ -108,12 +263,12 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         child: lifeSubCategory.map((item: any) => ({
           title: item?.name,
           to: () => router.push(`/pos/life?se_subDomains=${item?.code}`),
-          isActive: `/pos/life?se_subDomains=${item?.code}`,
+          isActive: currentPage === `/pos/life?se_subDomains=${item?.code}`,
+          code: item?.code,
         })),
       },
       {
         title: t('LEARNER_APP.POS.PROGRAM'),
-        // to: () => router.push('/pos/program'),
         isActive: currentPage === '/pos/program',
         child: [
           { code: 'Vocational Training', name: 'YouthNet' },
@@ -121,15 +276,17 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         ].map((item: any) => ({
           title: item?.name,
           to: () => router.push(`/pos/program?program=${item?.code}`),
-          isActive: `/pos/program?program=${item?.code}`,
+          isActive: currentPage === `/pos/program?program=${item?.code}`,
+          code: item?.code,
         })),
       },
       {
         title: t('LEARNER_APP.POS.THEMATIC_REPOSITORY'),
-        to: () => router.push('/themantic'),
-        // to: () => router.push('#'),
+        to: () => {
+          const domain = process.env.NEXT_PUBLIC_THEMATIC_DOMAIN || '';
+          window.open(`${domain}`, '_blank');
+        },
         isActive: currentPage === '/themantic',
-        // isActive: currentPage === '#',
       },
     ];
     setDefaultNavLinks(navLinks);
@@ -143,7 +300,22 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         _config: {
           middleComponent: (
             <SearchButton
-              onSearch={(search) => router.push('/pos/search?q=' + search)}
+              onSearch={(search) =>
+                {
+                        if (typeof window !== 'undefined') {     
+
+                       const windowUrl = window.location.pathname;
+                                   const cleanedUrl = windowUrl
+                  
+                                  logEvent({
+                                    action: 'Searched on about page by ' + search,
+                                    category: cleanedUrl,
+                                    label: 'Searched on about page',
+                                  });
+                                }
+                  router.push('/pos/search?q=' + search)
+                }
+                }
               isHideSubmitButton
               _box={{
                 sx: {
@@ -211,6 +383,45 @@ const Brand = () => {
         height={32}
         style={{ height: '32px' }}
       />
+    </Box>
+  );
+};
+
+const DesktopBar: React.FC<AppBarProps> = ({
+  navLinks = [],
+  rightComponent,
+  isShowLang = true,
+  onLanguageChange,
+  _navLinkBox,
+  _brand,
+}) => {
+  return (
+    <Box
+      sx={{
+        display: { xs: 'none', md: 'flex' },
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
+      }}
+    >
+      <Brand {..._brand} />
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2,
+          justifyContent: 'center',
+          ..._navLinkBox,
+        }}
+      >
+        {navLinks.map((link: NewDrawerItemProp, index: number) => (
+          <NavButton key={index} link={link} index={index} />
+        ))}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          {rightComponent}
+          {isShowLang && <LanguageSelect onLanguageChange={onLanguageChange} />}
+        </Box>
+      </Box>
     </Box>
   );
 };
