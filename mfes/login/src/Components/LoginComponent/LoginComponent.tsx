@@ -156,7 +156,8 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
           {t('LEARNER_APP.LOGIN.login_button')}
         </Button>
 
-        {storedConfig?.showSignup === true && (
+        {(storedConfig?.showSignup === true ||
+          Object.keys(storedConfig).length === 0) && (
           <Typography
             variant="body2"
             color="secondary"
