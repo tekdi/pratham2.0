@@ -12,9 +12,21 @@ const InProgress: React.FC = () => {
   const { t } = useTranslation();
   const router = useRouter();
 
-  const onBackClick = () => {
-    router.back();
-  };
+ const onBackClick = () => {
+                  const tenantName = localStorage.getItem('userProgram') || '';
+  if(tenantName=== 'YouthNet') {
+          router.push('/content');
+        }
+        else if (tenantName==="Camp to Club")
+        {
+          router.push('/courses-contents');
+        }
+        else if(tenantName==="Pragyanpath")
+        {
+          router.push('/courses-contents');
+        }
+};
+
 
   return (
     <Layout >
