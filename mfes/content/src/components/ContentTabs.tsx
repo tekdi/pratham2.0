@@ -54,7 +54,7 @@ const RenderTabContent = memo(
                 <Tab
                   key={tab.label}
                   icon={tab.icon ?? undefined}
-                  label={tab.label}
+                  label={t('COMMON.'+tab.label)}
                   {...{
                     id: `simple-tab-${index}`,
                     'aria-controls': `simple-tabpanel-${index}`,
