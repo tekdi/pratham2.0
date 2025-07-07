@@ -72,7 +72,6 @@ const OurProgramCarousel = () => {
 
     fetchTenantInfo();
   }, []);
-  localStorage.removeItem('uiConfig');
 
   return (
     <Container maxWidth="xl">
