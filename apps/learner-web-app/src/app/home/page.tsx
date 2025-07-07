@@ -7,6 +7,7 @@ import { useRef, Suspense } from 'react';
 import { Layout, useTranslation } from '@shared-lib';
 import OurProgramCarousel from '@learner/components/OurProgramCarousel';
 import { checkAuth } from '@shared-lib-v2/utils/AuthService';
+import Header from '@learner/components/Header/Header';
 
 export default function Index() {
   const router = useRouter();
@@ -20,34 +21,10 @@ export default function Index() {
   };
 
   return (
-    <Layout
-      onlyHideElements={['footer']}
-      _topAppBar={{
-        _brand: {
-          name:
-            typeof window !== 'undefined'
-              ? localStorage.getItem('userProgram') ?? ''
-              : '',
-          logo: checkAuth() ? '/logo.png' : '/images/appLogo.svg',
-          _box: {
-            onClick: () => router.push('/'),
-            sx: {
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-            },
-            _text: {
-              fontWeight: 400,
-              fontSize: '22px',
-              lineHeight: '28px',
-              textAlign: 'center',
-            },
-          },
-        },
-      }}
-    >
+   
       <Suspense fallback={<div>Loading...</div>}>
+                <Header/>
+        
         <Box
           display="flex"
           flexDirection="column"
@@ -62,6 +39,7 @@ export default function Index() {
               pt: '20px',
             }}
           >
+            
             <Container>
               <Box
                 sx={{
@@ -336,6 +314,5 @@ export default function Index() {
           </Box>
         </Box>
       </Suspense>
-    </Layout>
   );
 }

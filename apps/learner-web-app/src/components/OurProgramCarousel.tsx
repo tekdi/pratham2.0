@@ -199,26 +199,28 @@ const OurProgramCarousel = () => {
                           gap={2}
                         >
                           {/* Left Arrow Button */}
-                          <Button
-                            className={`prev-${program.ordering}`}
-                            sx={{
-                              minWidth: '30px',
-                              width: '30px',
-                              height: '30px',
-                              p: 0,
-                              borderRadius: '50%',
-                              backgroundColor: '#FFFFFF',
-                              boxShadow: '0px 1px 2px 0px #0000004D',
-                              color: 'gray',
-                              '&:hover': {
-                                backgroundColor: '#e0e0e0',
-                              },
-                            }}
-                          >
-                            <ChevronLeftIcon
-                              sx={{ color: '#1F1B13', fontSize: '30px' }}
-                            />
-                          </Button>
+                          {program?.programImages?.length > 1 && (
+                            <Button
+                              className={`prev-${program.ordering}`}
+                              sx={{
+                                minWidth: '30px',
+                                width: '30px',
+                                height: '30px',
+                                p: 0,
+                                borderRadius: '50%',
+                                backgroundColor: '#FFFFFF',
+                                boxShadow: '0px 1px 2px 0px #0000004D',
+                                color: 'gray',
+                                '&:hover': {
+                                  backgroundColor: '#e0e0e0',
+                                },
+                              }}
+                            >
+                              <ChevronLeftIcon
+                                sx={{ color: '#1F1B13', fontSize: '30px' }}
+                              />
+                            </Button>
+                          )}
 
                           {/* Pagination Dots */}
                           <Box
@@ -240,35 +242,41 @@ const OurProgramCarousel = () => {
                           ></Box>
 
                           {/* Right Arrow Button */}
-                          <Button
-                            className={`next-${program?.ordering}`}
-                            sx={{
-                              minWidth: '30px',
-                              width: '30px',
-                              height: '30px',
-                              p: 0,
-                              borderRadius: '50%',
-                              backgroundColor: '#FFFFFF',
-                              boxShadow: '0px 1px 2px 0px #0000004D',
-                              color: 'gray',
-                              '&:hover': {
-                                backgroundColor: '#e0e0e0',
-                              },
-                            }}
-                          >
-                            <ChevronRightIcon
-                              sx={{ color: '#1F1B13', fontSize: '30px' }}
-                              fontSize="small"
-                            />
-                          </Button>
+                          {program?.programImages?.length > 1 && (
+                            <Button
+                              className={`next-${program?.ordering}`}
+                              sx={{
+                                minWidth: '30px',
+                                width: '30px',
+                                height: '30px',
+                                p: 0,
+                                borderRadius: '50%',
+                                backgroundColor: '#FFFFFF',
+                                boxShadow: '0px 1px 2px 0px #0000004D',
+                                color: 'gray',
+                                '&:hover': {
+                                  backgroundColor: '#e0e0e0',
+                                },
+                              }}
+                            >
+                              <ChevronRightIcon
+                                sx={{ color: '#1F1B13', fontSize: '30px' }}
+                                fontSize="small"
+                              />
+                            </Button>
+                          )}
                         </Box>
                       </Box>
                     </Box>
                   </Box>
 
-                  <CardActions
-                    sx={{ justifyContent: 'center', p: 2, mt: 'auto' }}
-                  >
+                 <CardActions
+  sx={{
+    // justifyContent: 'center',
+    // p: 2,
+    // mt: 'auto',
+  }}
+>
                     {program?.params?.uiConfig?.showSignup === true && (
                       <Button
                         fullWidth

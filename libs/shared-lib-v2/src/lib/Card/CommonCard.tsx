@@ -284,6 +284,8 @@ export const StatusBar: React.FC<StatuPorps> = ({
   type,
   _card,
 }) => {
+    const { t } = useTranslation();
+
   const theme = useTheme();
   return (
     <Box
@@ -305,7 +307,8 @@ export const StatusBar: React.FC<StatuPorps> = ({
           fontSize: '14px',
           lineHeight: '20px',
           fontWeight: '500',
-          color: ['Completed', 'In Progress', 'Enrolled, not started'].includes(
+          
+          color: [t('COMMON.STATUS.completed'), t('COMMON.STATUS.enrolled_not_started'),'Completed','In Progress', 'Enrolled, not started', t('COMMON.STATUS.in_progress')].includes(
             status ?? ''
           )
             ? '#50EE42'
@@ -355,10 +358,11 @@ export const StatusBar: React.FC<StatuPorps> = ({
             value={
               typeof trackProgress === 'number'
                 ? trackProgress
-                : status?.toLowerCase() === 'completed'
+                            : [t('COMMON.STATUS.completed').toLowerCase(), 'completed'].includes(status?.toLowerCase() || '')               
+
                 ? 100
-                : status?.toLowerCase() === 'in progress'
-                ? 50
+            : [t('COMMON.STATUS.in_progress').toLowerCase(), 'in progress'].includes(status?.toLowerCase() || '')               
+              ? 50
                 : 0
             }
           />
