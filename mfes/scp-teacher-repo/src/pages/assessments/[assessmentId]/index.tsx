@@ -31,16 +31,17 @@ import ErrorIcon from '@mui/icons-material/Error';
 import RemoveIcon from '@mui/icons-material/Remove';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import { showToastMessage } from '../../../../components/Toastify';
-import Header from '../../../../components/Header';
-import Loader from '../../../../components/Loader';
+import { showToastMessage } from '../../../components/Toastify';
+import Header from '../../../components/Header';
+import Loader from '../../../components/Loader';
 import {
   getAssessmentList,
   getAssessmentStatus,
   getAssessmentDetails,
-} from '../../../../services/AssesmentService';
-import { getMyCohortMemberList } from '../../../../services/MyClassDetailsService';
-import { AssessmentStatus } from '../../../../utils/app.constant';
+} from '../../../services/AssesmentService';
+import { getMyCohortMemberList } from '../../../services/MyClassDetailsService';
+import { AssessmentStatus } from '../../../utils/app.constant';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 interface LearnerData {
   learnerId: string;
@@ -82,7 +83,6 @@ const AssessmentDetails: React.FC = () => {
   const { t } = useTranslation();
   const router = useRouter();
   const { assessmentId, cohortId } = router.query;
-
   // State management
   const [loading, setLoading] = useState(true);
   const [assessmentData, setAssessmentData] = useState<AssessmentData | null>(
@@ -425,9 +425,7 @@ const AssessmentDetails: React.FC = () => {
   };
 
   const handleLearnerClick = (learnerId: string) => {
-    router.push(
-      `/assessments/${assessmentId}/${cohortId}/user/${learnerId}/details`
-    );
+    router.push(`/assessments/${assessmentId}/${learnerId}`);
   };
 
   if (loading) {
@@ -996,5 +994,26 @@ const AssessmentDetails: React.FC = () => {
     </>
   );
 };
+
+export async function getStaticPaths() {
+  return {
+    paths: [],
+    fallback: 'blocking',
+  };
+}
+
+export async function getStaticProps({
+  params,
+  locale,
+}: {
+  params: any;
+  locale: string;
+}) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common'])),
+    },
+  };
+}
 
 export default AssessmentDetails;

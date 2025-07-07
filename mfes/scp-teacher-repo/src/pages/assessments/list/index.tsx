@@ -366,7 +366,7 @@ const AssessmentList = () => {
   const handleAssessmentDetails = (identifier: string, subject: string) => {
     // Navigate to assessment details page with assessmentId, cohortId, and subject
     if (identifier && classId) {
-      const navigationUrl = `/assessments/${identifier}/${classId}?subject=${encodeURIComponent(
+      const navigationUrl = `/assessments/${identifier}?cohortId=${classId}&subject=${encodeURIComponent(
         subject
       )}`;
       console.log('Navigating to assessment:', {
