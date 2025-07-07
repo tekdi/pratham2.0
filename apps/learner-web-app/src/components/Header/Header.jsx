@@ -6,12 +6,14 @@ import LanguageIcon from '@mui/icons-material/Language';
 import Image from 'next/image';
 import appLogo from '../../../public/images/appLogo.svg';
 import { useTranslation } from '@shared-lib';
+import { useRouter } from 'next/navigation';
 
 const Header = () => {
   const { t, setLanguage } = useTranslation();
   const [lang, setLang] = useState(
     typeof window !== 'undefined' ? localStorage.getItem('lang') || 'en' : 'en'
   ); // state for selected language
+  const router = useRouter();
 
   const handleLanguageChange = (event) => {
     const newLang = event.target.value;
@@ -30,7 +32,7 @@ const Header = () => {
       bgcolor="#fff"
     >
       {/* Logo */}
-      <Box display="flex" alignItems="center" gap={2}>
+      <Box display="flex" alignItems="center" gap={2} onClick={() => router.push('/')} style={{ cursor: 'pointer' }}>
         <Image src={appLogo} alt="Pratham Logo" width={200} height={40} />
       </Box>
 
