@@ -422,7 +422,7 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
               </Grid>
             )}
             {[state, district, block, village].filter(Boolean).join(', ') !==
-              '-' && (
+              '-, -, -, -' && (
               <Grid item xs={12}>
                 <Typography sx={labelStyle}>
                   {t('LEARNER_APP.USER_PROFILE_CARD.LOCATION')}
