@@ -30,7 +30,7 @@ export default function Index() {
               : '',
           logo: checkAuth() ? '/logo.png' : '/images/appLogo.svg',
           _box: {
-            onClick: () => router.push('/content'),
+            onClick: () => router.push('/'),
             sx: {
               cursor: 'pointer',
               display: 'flex',
@@ -145,7 +145,10 @@ export default function Index() {
                       fontWeight: '500',
                     }}
                     display="inline"
-                    onClick={() => router.push('/login')}
+                    onClick={() => {
+                      localStorage.removeItem('uiConfig');
+                      router.push('/login');
+                    }}
                   >
                     {t('LEARNER_APP.HOME.LOGIN_LINK')}
                   </Typography>

@@ -33,6 +33,8 @@ const getClubStyleNavConfig = ({
   getLinkStyle,
   currentPage,
   setAnchorEl,
+  isMobile,
+  handleLogoutModal,
 }: {
   router: any;
   t: any;
@@ -40,6 +42,8 @@ const getClubStyleNavConfig = ({
   getLinkStyle: (active: boolean) => React.CSSProperties;
   currentPage: string;
   setAnchorEl: (el: boolean) => void;
+  isMobile: boolean;
+  handleLogoutModal: () => void;
 }): NewDrawerItemProp[] => {
   const navLinks: NewDrawerItemProp[] = [
     {
@@ -52,11 +56,23 @@ const getClubStyleNavConfig = ({
     {
       title: t('LEARNER_APP.COMMON.PROFILE'),
       icon: <AccountCircleOutlined sx={{ width: 28, height: 28 }} />,
-      to: () => handleNavClick(() => router.push('/profile')),
+      to: isMobile
+        ? () => handleNavClick(() => router.push('/profile'))
+        : () => { setAnchorEl(true) },
       isActive: currentPage === '/profile',
       customStyle: getLinkStyle(currentPage === '/profile'),
     },
   ];
+
+  if (isMobile) {
+    navLinks.push({
+      title: t('COMMON.LOGOUT'),
+      icon: <Logout sx={{ width: 28, height: 28 }} />,
+      to: () => handleNavClick(handleLogoutModal),
+      isActive: false,
+      customStyle: {},
+    });
+  }
 
   return navLinks;
 };
@@ -161,11 +177,11 @@ const NAV_CONFIG: Record<
     return navLinks;
   },
 
-'Camp to Club': ({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl }) =>
-    getClubStyleNavConfig({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl }),
+'Camp to Club': ({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl, isMobile, handleLogoutModal }) =>
+    getClubStyleNavConfig({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl, isMobile, handleLogoutModal }),
 
-  Pragyanpath: ({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl }) =>
-    getClubStyleNavConfig({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl }),
+  Pragyanpath: ({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl, isMobile, handleLogoutModal }) =>
+    getClubStyleNavConfig({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl, isMobile, handleLogoutModal }),
 };
 
 const App: React.FC<LayoutProps> = ({ children, ...props }) => {
