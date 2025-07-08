@@ -50,7 +50,7 @@ const getClubStyleNavConfig = ({
       title: t('LEARNER_APP.COMMON.COURSES'),
       icon: <AssignmentOutlined sx={{ width: 28, height: 28 }} />,
       to: () => handleNavClick(() => router.push('/courses-contents')),
-      isActive: currentPage === '/courses-contents',
+      isActive: currentPage === '/courses-contents' || currentPage === '/in-progress',
       customStyle: getLinkStyle(currentPage === '/courses-contents'),
     },
     {
@@ -110,7 +110,7 @@ const NAV_CONFIG: Record<
         title: t('LEARNER_APP.COMMON.L1_COURSES'),
         icon: <Home sx={{ width: 28, height: 28 }} />,
         to: () => handleNavClick(() => router.push('/content')),
-        isActive: currentPage === '/content',
+        isActive: currentPage === '/content' || currentPage === '/in-progress',
         customStyle: getLinkStyle(currentPage === '/content'),
       },
     ];
