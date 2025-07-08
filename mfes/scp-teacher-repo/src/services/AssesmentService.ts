@@ -3,10 +3,10 @@ import {
   GetDoIdServiceParam,
   IAssessmentStatusOptions,
   ISearchAssessment,
-} from '@/utils/Interfaces';
+} from '../utils/Interfaces';
 import { get, post } from './RestClient';
-import { URL_CONFIG } from '@/utils/url.config';
-import API_ENDPOINTS from '@/utils/API/APIEndpoints';
+import { URL_CONFIG } from '../utils/url.config';
+import API_ENDPOINTS from '../utils/API/APIEndpoints';
 
 export const getAssessmentList = async ({
   sort,
@@ -56,7 +56,7 @@ export const getAssessmentDetails = async (doId: string) => {
 export const getDoIdForAssessmentDetails = async ({
   filters,
 }: GetDoIdServiceParam): Promise<any> => {
-  const apiUrl: string = `${URL_CONFIG.API.COMPOSITE_SEARCH}`;
+  const apiUrl = `${URL_CONFIG.API.COMPOSITE_SEARCH}`;
   // const apiUrl: string =
   //   'https://sunbirdsaas.com/api/content/v1/search?orgdetails=orgName%2Cemail&licenseDetails=name%2Cdescription%2Curl';
   const data = {
@@ -78,6 +78,34 @@ export const getDoIdForAssessmentDetails = async ({
   } catch (error) {
     console.error('Error in getDoIdForAssessmentDetails Service', error);
     return error;
+  }
+};
+
+// answer sheet submissions
+export const answerSheetSubmissions = async ({
+  userId,
+  questionSetId,
+  identifier,
+  fileUrls,
+}: {
+  userId: string;
+  questionSetId: string;
+  identifier: string;
+  fileUrls: string[];
+}) => {
+  const apiURL = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/answer-sheet-submissions/create`;
+
+  try {
+    const response = await post(apiURL, {
+      userId,
+      questionSetId,
+      identifier,
+      fileUrls,
+    });
+    return response?.data;
+  } catch (error) {
+    console.error('Error in answer sheet submissions:', error);
+    throw error;
   }
 };
 
