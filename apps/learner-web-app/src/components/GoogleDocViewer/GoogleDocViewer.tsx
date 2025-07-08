@@ -76,7 +76,7 @@ const GoogleDocViewer: React.FC<GoogleDocViewerProps> = ({
             sx={{ minWidth: 140 }}
           >
             <MenuItem value="english">English</MenuItem>
-            <MenuItem value="hindi">Hindi</MenuItem>
+            <MenuItem value="hindi">हिंदी</MenuItem>
           </Select>
         </FormControl>
       </Box>
