@@ -12,12 +12,28 @@ const InProgress: React.FC = () => {
   const { t } = useTranslation();
   const router = useRouter();
 
-  const onBackClick = () => {
-    router.back();
-  };
+ const onBackClick = () => {
+                  const tenantName = localStorage.getItem('userProgram') || '';
+  if(tenantName=== 'YouthNet') {
+          router.push('/content');
+        }
+        else if (tenantName==="Camp to Club")
+        {
+          router.push('/courses-contents');
+        }
+        else if(tenantName==="Pragyanpath")
+        {
+          router.push('/courses-contents');
+        }
+        else
+        {
+          router.push('/content');
+        }
+};
+
 
   return (
-    <Layout _children={{ _children: gredientStyle }}>
+    <Layout >
       <Grid container>
         <Grid item xs={12} sx={{ p: { xs: 2, md: 5 }, pb: { xs: 1, md: 0 } }}>
           <Button
