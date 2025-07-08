@@ -415,13 +415,13 @@ export default function Content(props: Readonly<ContentProps>) {
           router.push(
             `${props?._config?.contentBaseUrl ?? ''}/player/${
               content?.identifier
-            }?activeLink=${window.location.pathname}`
+            }?activeLink=${ window.location.pathname + window.location.search}`
           );
         } else {
           router.push(
             `${props?._config?.contentBaseUrl ?? ''}/content-details/${
               content?.identifier
-            }?activeLink=${window.location.pathname}`
+            }?activeLink=${ window.location.pathname + window.location.search}`
           );
         }
       } catch (error) {

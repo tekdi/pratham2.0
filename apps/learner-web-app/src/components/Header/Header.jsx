@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Box, Select, MenuItem } from '@mui/material';
 import LanguageIcon from '@mui/icons-material/Language';
 import Image from 'next/image';
-import appLogo from '../../../public/images/appLogo.svg';
+import appLogo from '../../../public/images/Pratham_Logo.png';
 import { useTranslation } from '@shared-lib';
 import { useRouter } from 'next/navigation';
 
@@ -52,7 +52,7 @@ const Header = () => {
           }}
         >
           <MenuItem value="en">English</MenuItem>
-          <MenuItem value="hi">Hindi</MenuItem>
+          <MenuItem value="hi">हिंदी</MenuItem>
           {/* Add more languages as needed */}
         </Select>
       </Box>

@@ -21,6 +21,7 @@ type FilterDetails = {
 };
 const ProfilePage = () => {
   const router = useRouter();
+ const tenantName =      (typeof window !== 'undefined' && localStorage.getItem('userProgram')) || '';
 
   const [filters] = useState<FilterDetails>({
     status: ['completed', 'viewCertificate'],
@@ -109,11 +110,11 @@ const ProfilePage = () => {
         <Box
           sx={{
             flexShrink: 0,
-            width: { xs: '100%', md: courseData.length === 0 ?'100%':'530px' },
+            width: { xs: '100%', md: courseData.length === 0  || tenantName==="Camp to Club" ?'100%':'530px' },
             mb: { xs: 2, md: 0 },
           }}
         >
-           {courseData.length === 0?
+           {courseData.length === 0 || tenantName==="Camp to Club"?
           (<UserProfileCard maxWidth='100%' />):
           (<UserProfileCard  />)
            }
@@ -122,7 +123,7 @@ const ProfilePage = () => {
         {/* Certificates Section */}
       {typeof window !== "undefined" && localStorage.getItem('userProgram') === "YouthNet" ? (
   <Box flexGrow={1} p={2}>
-    <Typography color={'#78590C'}>YouthNet</Typography>
+    <Typography color={'#78590C'}>{tenantName}</Typography>
     
 
     <Typography color={'#78590C'}>
