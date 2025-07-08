@@ -2,6 +2,7 @@ import { Role, TenantName } from '@/utils/app.constant';
 
 export const PUBLIC_ROUTES = [
   '/',
+  '/qp',
   '/404',
   '/login',
   '/demo',

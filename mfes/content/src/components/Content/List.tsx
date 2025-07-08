@@ -72,6 +72,7 @@ export interface ContentProps {
   showHelpDesk?: boolean;
   isShowLayout?: boolean;
   hasMoreData?: boolean;
+  onTotalCountChange?: (count: number) => void;
 }
 
 export default function Content(props: Readonly<ContentProps>) {
@@ -95,6 +96,7 @@ export default function Content(props: Readonly<ContentProps>) {
     }
   >(DEFAULT_FILTERS);
   const [trackData, setTrackData] = useState<TrackDataItem[]>([]);
+  const [totalCount, setTotalCount] = useState<number>(0);
   const [filterShow, setFilterShow] = useState(false);
   const [propData, setPropData] = useState<ContentProps>();
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -143,8 +145,8 @@ export default function Content(props: Readonly<ContentProps>) {
           ...(config?.filters ?? {}),
           type:
             props?.contentTabs?.length === 1
-              ? props.contentTabs[0]
-              : DEFAULT_TABS[0].type,
+              ? props.contentTabs[savedTab]
+              : DEFAULT_TABS[savedTab].type,
           ...savedFilters,
           loadOld: true,
         });
@@ -154,8 +156,8 @@ export default function Content(props: Readonly<ContentProps>) {
           ...(config?.filters ?? {}),
           type:
             props?.contentTabs?.length === 1
-              ? props.contentTabs[0]
-              : DEFAULT_TABS[0].type,
+              ? props.contentTabs[savedTab]
+              : DEFAULT_TABS[savedTab].type,
           loadOld: false,
         }));
       }
@@ -168,16 +170,14 @@ export default function Content(props: Readonly<ContentProps>) {
         )
       );
       setTabValue(savedTab);
-
       setIsPageLoading(false);
     };
     init();
-  }, [props, sessionKeys.filters, sessionKeys.search, searchParams]);
-
+  }, [ props, sessionKeys.filters, sessionKeys.search, searchParams]);
   // Fetch content with loop to load full data up to offset
   const fetchAllContent = useCallback(
     async (filter: any) => {
-      const content: any[] = [];
+      const content: any[] = [];  
       const QuestionSet: any[] = [];
       let count = 0;
 
@@ -201,6 +201,10 @@ export default function Content(props: Readonly<ContentProps>) {
         limit: adjustedLimit,
         signal: controller.signal,
       });
+
+      if (resultResponse?.result?.count) {
+        setTotalCount(resultResponse?.result?.count);
+      }
 
       const response = resultResponse?.result;
       if (props?._config?.getContentData) {
@@ -389,7 +393,7 @@ export default function Content(props: Readonly<ContentProps>) {
   const handleTabChange = (event: any, newValue: number) => {
     setTabValue(newValue);
 
-    // Update URL with new tab parameter
+     // Update URL with new tab parameter
     const url = new URL(window.location.href);
     url.searchParams.set('tab', newValue.toString());
     router.replace(url.pathname + url.search);
@@ -411,13 +415,13 @@ export default function Content(props: Readonly<ContentProps>) {
           router.push(
             `${props?._config?.contentBaseUrl ?? ''}/player/${
               content?.identifier
-            }?activeLink=${window.location.pathname}`
+            }?activeLink=${ window.location.pathname + window.location.search}`
           );
         } else {
           router.push(
             `${props?._config?.contentBaseUrl ?? ''}/content-details/${
               content?.identifier
-            }?activeLink=${window.location.pathname}`
+            }?activeLink=${ window.location.pathname + window.location.search}`
           );
         }
       } catch (error) {
@@ -455,6 +459,7 @@ export default function Content(props: Readonly<ContentProps>) {
             width: '100%',
             display: 'flex',
             justifyContent: 'space-between',
+            overflow: 'unset !important',
           }}
         >
           {propData?.showSearch && (
@@ -502,6 +507,13 @@ export default function Content(props: Readonly<ContentProps>) {
       handleApplyFilters,
     ]
   );
+
+  // Call onTotalCountChange callback when totalCount changes
+  useEffect(() => {
+    if (props?.onTotalCountChange) {
+      props.onTotalCountChange(totalCount);
+    }
+  }, [totalCount, props?.onTotalCountChange]);
 
   return (
     <LayoutPage

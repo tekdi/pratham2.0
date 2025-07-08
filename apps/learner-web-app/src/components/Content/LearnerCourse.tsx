@@ -11,6 +11,7 @@ import {
 import SearchComponent from './SearchComponent';
 import FilterComponent from './FilterComponent';
 import { gredientStyle } from '@learner/utils/style';
+import { logEvent } from '@learner/utils/googleAnalytics';
 
 interface LearnerCourseProps {
   title?: string;
@@ -31,7 +32,12 @@ export default memo(function LearnerCourse({
   const { staticFilter, filterFramework } = _content ?? {};
 
   useEffect(() => {
-    setFilterState(_content?.filters ?? {});
+    const savedFilters = localStorage.getItem('learnerCourseFilters');
+    if (savedFilters) {
+      setFilterState(JSON.parse(savedFilters));
+    } else {
+      setFilterState(_content?.filters ?? {});
+    }
   }, [_content?.filters, _content?.searchParams]);
 
   const handleTabChange = useCallback((tab: any) => {
@@ -41,6 +47,15 @@ export default memo(function LearnerCourse({
     }));
   }, []);
   const handleSearchClick = useCallback((searchValue: string) => {
+if (typeof window !== 'undefined') {
+     const windowUrl = window.location.pathname;
+    const cleanedUrl = windowUrl
+    logEvent({
+        action: 'search content by '+searchValue,
+        category: cleanedUrl ,
+        label: 'Search content'
+      });
+    }
     setFilterState((prevState: any) => ({
       ...prevState,
       query: searchValue,
@@ -49,10 +64,14 @@ export default memo(function LearnerCourse({
   }, []);
 
   const handleFilterChange = (newFilterState: typeof filterState) => {
-    setFilterState((prevState: any) => ({
-      ...prevState,
-      filters: newFilterState,
-    }));
+    setFilterState((prevState: any) => {
+      const updated = {
+        ...prevState,
+        filters: newFilterState,
+      };
+      localStorage.setItem('learnerCourseFilters', JSON.stringify(updated));
+      return updated;
+    });
   };
 
   return (

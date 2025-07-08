@@ -24,6 +24,7 @@ import { checkAuth, getUserId } from '@shared-lib-v2/utils/AuthService';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 import { useTranslation } from '@shared-lib-v2/lib/context/LanguageContext';
 import { Loader } from '@shared-lib-v2/lib/Loader/Loader';
+import { on } from 'events';
 interface ContentDetailsProps {
   isShowLayout: boolean;
   id?: string;
@@ -110,6 +111,7 @@ const ContentDetails = (props: ContentDetailsProps) => {
   }, [identifier, activeLink, props, router]);
 
   const handleClick = async () => {
+    console.log("helloooooooo")
     setIsLoading(true);
     try {
       const userId = getUserId(props?._config?.userIdLocalstorageName);
@@ -118,6 +120,33 @@ const ContentDetails = (props: ContentDetailsProps) => {
           userId,
           courseId: identifier as string,
         });
+
+        // router.replace(
+        //   `${props?._config?.contentBaseUrl ?? '/content'}/${identifier}${
+        //     activeLink ? `?activeLink=${activeLink}` : ''
+        //   }`
+        // );
+      } else {
+        // router.replace(
+        //   `/login?redirectUrl=${
+        //     props?._config?.contentBaseUrl ?? '/content'
+        //   }-details/${identifier}${
+        //     activeLink ? `&activeLink=${activeLink}` : ''
+        //   }`
+        // );
+      }
+    } catch (error) {
+      console.error('Failed to create user certificate:', error);
+    }
+    setIsLoading(false);
+  };
+   const handleRouting = async () => {
+    // console.log("helloooooooo")
+    setIsLoading(true);
+    try {
+      const userId = getUserId(props?._config?.userIdLocalstorageName);
+      if (userId) {
+       
 
         router.replace(
           `${props?._config?.contentBaseUrl ?? '/content'}/${identifier}${
@@ -154,7 +183,7 @@ const ContentDetails = (props: ContentDetailsProps) => {
           item={contentDetails}
           topic={contentDetails?.se_subjects?.join(',')}
           onBackClick={onBackClick}
-          _config={{ onButtonClick: handleClick, ...props?._config }}
+          _config={{ onButtonClick: handleClick, onRouting: handleRouting, ...props?._config }}
           checkLocalAuth={checkLocalAuth}
         />
         <Box sx={{ display: 'flex' }}>

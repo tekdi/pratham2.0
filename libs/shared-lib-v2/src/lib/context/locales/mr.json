@@ -105,6 +105,8 @@
     "LOAD_MORE": "अधिक लोड करें",
     "SKILLING_CENTERS": "कृषि केंद्र",
     "SKILLING_CENTERS_NEAR_YOU": "तुमचे नजीक कृषि केंद्र",
+        "WELCOME": "स्वागत आहे",
+
     "STATUS": {
       "completed": "पूर्ण झाले",
       "in_progress": "चालू",

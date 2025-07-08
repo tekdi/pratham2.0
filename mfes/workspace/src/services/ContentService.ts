@@ -246,6 +246,7 @@ export const createQuestionSet = async (frameworkId: any) => {
   }
 };
 
+// ai question set creation
 export const createAIQuestionsSet = async (payload: {
   questionSetId: string;
   framework: string;
@@ -277,38 +278,33 @@ export const createAIQuestionsSet = async (payload: {
   token: string;
 }) => {
   const apiURL = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/ai-assessment/create`;
-  try {
-    const response = await post(
-      apiURL,
-      {
-        ...payload,
-        createdBy: userId,
-      },
-      {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${payload.token}`,
-      }
-    );
-    return response?.data;
-  } catch (error) {
-    throw error;
-  }
+
+  const response = await post(
+    apiURL,
+    {
+      ...payload,
+      createdBy: userId,
+    },
+    {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${payload.token}`,
+    }
+  );
+  return response?.data;
 };
 
+// ai question set status
 export const getAIQuestionSetStatus = async (
   questionSetId: string,
   token: string
 ) => {
   const apiURL = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/ai-assessment/read/${questionSetId}`;
-  try {
-    const response = await get(apiURL, {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    });
-    return response?.data;
-  } catch (error) {
-    throw error;
-  }
+
+  const response = await get(apiURL, {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${token}`,
+  });
+  return response?.data;
 };
 
 export const updateQuestionSet = async ({ identifier, ...metadata }: any) => {
