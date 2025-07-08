@@ -161,7 +161,8 @@
     "SUBMIT_YOUR_REQUEST_FOR_ISSUES": "Submit your request and let us assist you with any issues or concerns.",
     "WE_ARE_HERE_TO_HELP": "We’re Here to Help",
     "NO_STATE_LEAD_FOUND": "No State Lead Found",
-    "FAQS": "FAQ's"
+    "FAQS": "FAQ's",
+    "RESET_FILTERS": "Reset Filters"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
