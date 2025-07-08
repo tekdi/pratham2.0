@@ -12,6 +12,8 @@ import {
   Button,
   TextField,
   CircularProgress,
+  Snackbar,
+  Alert,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
@@ -23,7 +25,10 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useRouter } from 'next/router';
 import GenericModal from '../../../../components/GenericModal';
 import ConfirmationModal from '../../../../components/ConfirmationModal';
-import { getAssessmentTracking } from '../../../../services/AssesmentService';
+import {
+  getAssessmentTracking,
+  updateAssessmentScore,
+} from '../../../../services/AssesmentService';
 import {
   UploadOptionsPopup,
   UploadedImage,
@@ -55,6 +60,48 @@ interface AssessmentTrackingData {
   unitId: string;
   score_details: ScoreDetail[];
 }
+
+interface AssessmentSummaryItem {
+  item: {
+    id: string;
+    title: string;
+    type: string;
+    maxscore: number;
+    params: any[];
+    sectionId: string;
+  };
+  index: number;
+  pass: string;
+  score: number;
+  resvalues: Array<{
+    label?: string;
+    value: any;
+    selected: boolean;
+    AI_suggestion: string;
+  }>;
+  duration: number;
+  sectionName: string;
+}
+
+interface AssessmentSection {
+  sectionId: string;
+  sectionName: string;
+  data: AssessmentSummaryItem[];
+}
+
+interface UpdateAssessmentScorePayload {
+  userId: string;
+  courseId: string;
+  contentId: string;
+  attemptId: string;
+  lastAttemptedOn: string;
+  timeSpent: number;
+  totalMaxScore: number;
+  totalScore: number;
+  unitId: string;
+  assessmentSummary: AssessmentSection[];
+}
+
 const AssessmentDetails = () => {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -71,6 +118,16 @@ const AssessmentDetails = () => {
 
   // Upload Options Popup state
   const [uploadPopupOpen, setUploadPopupOpen] = useState(false);
+
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: 'success' | 'error';
+  }>({
+    open: false,
+    message: '',
+    severity: 'success',
+  });
 
   const handleAccordionChange =
     (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
@@ -221,17 +278,99 @@ const AssessmentDetails = () => {
     setIsEditModalOpen(true);
   };
 
-  const handleSaveScore = () => {
-    // TODO: Add API call to save the updated score
-    if (selectedQuestion) {
-      console.log(
-        'Saving score:',
-        editScore,
-        'for question:',
-        selectedQuestion
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  const handleSaveScore = async () => {
+    if (!selectedQuestion || !assessmentTrackingData) return;
+
+    try {
+      setLoading(true);
+
+      // Find the question in the assessment summary
+      const updatedAssessmentSummary = assessmentTrackingData.score_details.map(
+        (detail) => {
+          const section: AssessmentSection = {
+            sectionId: detail.sectionId,
+            sectionName: 'Section 1', // You might want to get this from somewhere
+            data: [
+              {
+                item: {
+                  id: detail.questionId || '',
+                  title: detail.queTitle,
+                  type: 'sa', // You might want to get this from somewhere
+                  maxscore: detail.maxScore,
+                  params: [],
+                  sectionId: detail.sectionId,
+                },
+                index: 1, // You might want to calculate this
+                pass: Number(editScore) > 0 ? 'yes' : 'no',
+                score: Number(editScore),
+                resvalues: [JSON.parse(detail.resValue)],
+                duration: detail.duration,
+                sectionName: 'Section 1', // You might want to get this from somewhere
+              },
+            ],
+          };
+          return section;
+        }
       );
+
+      const payload: UpdateAssessmentScorePayload = {
+        userId: assessmentTrackingData.userId,
+        courseId: assessmentTrackingData.courseId,
+        contentId: assessmentTrackingData.contentId,
+        attemptId: assessmentTrackingData.attemptId,
+        lastAttemptedOn: assessmentTrackingData.lastAttemptedOn,
+        timeSpent: parseInt(assessmentTrackingData.timeSpent),
+        totalMaxScore: assessmentTrackingData.totalMaxScore,
+        totalScore:
+          assessmentTrackingData.totalScore -
+          selectedQuestion.score +
+          Number(editScore), // Update total score
+        unitId: assessmentTrackingData.unitId,
+        assessmentSummary: updatedAssessmentSummary,
+      };
+
+      await updateAssessmentScore(payload);
+
+      // Update local state
+      const updatedScoreDetails = assessmentTrackingData.score_details.map(
+        (detail) => {
+          if (detail === selectedQuestion) {
+            return {
+              ...detail,
+              score: Number(editScore),
+              pass: Number(editScore) > 0 ? 'yes' : 'no',
+            };
+          }
+          return detail;
+        }
+      );
+
+      setAssessmentTrackingData({
+        ...assessmentTrackingData,
+        totalScore: payload.totalScore,
+        score_details: updatedScoreDetails,
+      });
+
+      setSnackbar({
+        open: true,
+        message: 'Score updated successfully',
+        severity: 'success',
+      });
+      setIsEditModalOpen(false);
+    } catch (error) {
+      console.error('Error updating assessment score:', error);
+      setSnackbar({
+        open: true,
+        message: 'Failed to update score. Please try again.',
+        severity: 'error',
+      });
+    } finally {
+      setLoading(false);
     }
-    setIsEditModalOpen(false);
   };
 
   const handleApproveClick = () => {
@@ -680,6 +819,7 @@ const AssessmentDetails = () => {
               max: selectedQuestion?.maxScore || 0,
             }}
             helperText={`Maximum marks: ${selectedQuestion?.maxScore || 0}`}
+            disabled={loading}
           />
         </Box>
       </GenericModal>
@@ -704,6 +844,22 @@ const AssessmentDetails = () => {
         }
         identifier={typeof assessmentId === 'string' ? assessmentId : undefined}
       />
+
+      {/* Snackbar for feedback */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

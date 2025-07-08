@@ -227,7 +227,7 @@ export const createAssessmentTracking = async (data: ICreateAssessmentTracking) 
 };
 
 export const updateAssessmentScore = async (data: IUpdateAssessmentScore) => {
-  const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/assessment/update-score`;
+  const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/assessment/create`;
   try {
     const response = await post(apiUrl, data);
     return response?.data;
