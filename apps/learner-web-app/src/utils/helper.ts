@@ -253,6 +253,7 @@ export const preserveLocalStorage = () => {
     'mui-color-scheme-light',
     'hasSeenTutorial',
     'lang',
+    'uiConfig'
   ];
 
   const valuesToKeep: { [key: string]: any } = {};

@@ -20,7 +20,7 @@ interface GoogleDocViewerProps {
 
 const GoogleDocViewer: React.FC<GoogleDocViewerProps> = ({
   getDocUrl,
-  title = 'FAQs',
+  title = `FAQ's`
 }) => {
   const [selectedLanguage, setSelectedLanguage] = useState('english');
   const router = useRouter();

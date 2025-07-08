@@ -308,7 +308,7 @@ export const StatusBar: React.FC<StatuPorps> = ({
           lineHeight: '20px',
           fontWeight: '500',
           
-          color: [t('COMMON.STATUS.completed'), t('COMMON.STATUS.enrolled_not_started'),'Completed','In Progress', 'Enrolled, not started', t('COMMON.STATUS.in_progress')].includes(
+          color: [t('COMMON.STATUS.completed'), t('COMMON.STATUS.enrolled_not_started'),'Completed','In Progress', 'Enrolled, not started', t('COMMON.STATUS.not_started'), t('COMMON.STATUS.in_progress')].includes(
             status ?? ''
           )
             ? '#50EE42'
@@ -338,7 +338,7 @@ export const StatusBar: React.FC<StatuPorps> = ({
                 },
               }}
               color={
-                ['Completed', 'In Progress', 'Enrolled, not started'].includes(
+                ['Completed', t('COMMON.STATUS.completed'), 'In Progress',   t('COMMON.STATUS.enrolled_not_started'),t('COMMON.STATUS.in_progress'),  t('COMMON.STATUS.not_started'),'Enrolled, not started'].includes(
                   status ?? ''
                 )
                   ? theme.palette.success.main

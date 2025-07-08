@@ -194,7 +194,9 @@ const InfoCard: React.FC<InfoCardProps> = ({
                   variant="contained"
                   color="primary"
                   sx={{ ml: 1 }}
-                  onClick={() => setOpenModal(true)}
+                  onClick={() => {
+                    _config?.onButtonClick()
+                    setOpenModal(true)}}
                 >
                   <SpeakableText>{t('COMMON.ENROLL_NOW')}</SpeakableText>
                 </Button>
@@ -208,7 +210,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
         open={openModal}
         // onClose={() => setOpenModal(false)}
         buttonText={checkLocalAuth ? 'Start Learning' : 'Login First'}
-        onStartLearning={_config?.onButtonClick}
+        onStartLearning={_config?.onRouting}
       >
         <Box
           sx={{
