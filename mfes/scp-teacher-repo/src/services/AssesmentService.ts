@@ -8,6 +8,77 @@ import { get, post } from './RestClient';
 import { URL_CONFIG } from '../utils/url.config';
 import API_ENDPOINTS from '../utils/API/APIEndpoints';
 
+interface IAssessmentItemParam {
+  answer: boolean;
+  value: {
+    body: string;
+    value: number;
+  };
+}
+
+interface IAssessmentItem {
+  id: string;
+  title: string;
+  type: string;
+  maxscore: number;
+  params: IAssessmentItemParam[];
+  sectionId: string;
+}
+
+interface IAssessmentResValue {
+  label?: string;
+  value: string | number;
+  selected: boolean;
+  AI_suggestion: string;
+}
+
+interface IAssessmentData {
+  item: IAssessmentItem;
+  index: number;
+  pass: 'yes' | 'no';
+  score: number;
+  resvalues: IAssessmentResValue[];
+  duration: number;
+  sectionName: string;
+}
+
+interface IAssessmentSummarySection {
+  sectionId: string;
+  sectionName: string;
+  data: IAssessmentData[];
+}
+
+interface ICreateAssessmentTracking {
+  userId: string;
+  courseId: string;
+  contentId: string;
+  attemptId: string;
+  lastAttemptedOn: string;
+  timeSpent: number;
+  totalMaxScore: number;
+  totalScore: number;
+  unitId: string;
+  assessmentSummary: IAssessmentSummarySection[];
+}
+
+interface IUpdateAssessmentScore {
+  userId: string;
+  courseId: string;
+  contentId: string;
+  attemptId: string;
+  totalScore: number;
+  assessmentSummary: {
+    sectionId: string;
+    sectionName: string;
+    data: {
+      item: {
+        id: string;
+      };
+      score: number;
+    }[];
+  }[];
+}
+
 export const getAssessmentList = async ({
   sort,
   pagination,
@@ -130,5 +201,38 @@ export const searchAssessment = async (body: ISearchAssessment) => {
     console.error('error in getting Assessment Status Service list', error);
 
     return error;
+  }
+};
+
+export const getAssessmentTracking = async (params: ISearchAssessment) => {
+  const apiUrl = API_ENDPOINTS.assessmentSearch;
+  try {
+    const response = await post(apiUrl, params);
+    return response?.data;
+  } catch (error) {
+    console.error('Error in getting assessment tracking:', error);
+    throw error;
+  }
+};
+
+export const createAssessmentTracking = async (data: ICreateAssessmentTracking) => {
+  const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/assessment/create`;
+  try {
+    const response = await post(apiUrl, data);
+    return response?.data;
+  } catch (error) {
+    console.error('Error in creating assessment tracking:', error);
+    throw error;
+  }
+};
+
+export const updateAssessmentScore = async (data: IUpdateAssessmentScore) => {
+  const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/assessment/create`;
+  try {
+    const response = await post(apiUrl, data);
+    return response?.data;
+  } catch (error) {
+    console.error('Error in updating assessment score:', error);
+    throw error;
   }
 };
