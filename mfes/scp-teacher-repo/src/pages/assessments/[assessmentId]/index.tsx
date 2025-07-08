@@ -18,6 +18,12 @@ import {
   ListItemIcon,
   ListItemText,
   Chip,
+  Menu,
+  MenuItem,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  FormControl,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
@@ -31,6 +37,7 @@ import ErrorIcon from '@mui/icons-material/Error';
 import RemoveIcon from '@mui/icons-material/Remove';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import SortIcon from '@mui/icons-material/Sort';
 import { showToastMessage } from '../../../components/Toastify';
 import Header from '../../../components/Header';
 import Loader from '../../../components/Loader';
@@ -78,6 +85,17 @@ interface AssessmentData {
   courseId?: string;
 }
 
+type SortOption =
+  | 'all'
+  | 'completed'
+  | 'awaiting_approval'
+  | 'not_started'
+  | 'in_progress'
+  | 'name_asc'
+  | 'name_desc'
+  | 'score_desc'
+  | 'score_asc';
+
 const AssessmentDetails: React.FC = () => {
   const theme = useTheme<any>();
   const { t } = useTranslation();
@@ -95,6 +113,11 @@ const AssessmentDetails: React.FC = () => {
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Sort functionality state
+  const [showSortPopup, setShowSortPopup] = useState(false);
+  const [sortOption, setSortOption] = useState<SortOption>('all');
+  const [sortAnchorEl, setSortAnchorEl] = useState<null | HTMLElement>(null);
+
   // Fetch assessment data and learner list
   useEffect(() => {
     if (assessmentId && cohortId) {
@@ -103,16 +126,57 @@ const AssessmentDetails: React.FC = () => {
     }
   }, [assessmentId, cohortId]);
 
-  // Filter learners based on search
+  // Filter and sort learners based on search and sort options
   useEffect(() => {
-    let filtered = learnerList;
+    let filtered = [...learnerList];
+
+    // Apply search filter
     if (searchTerm) {
       filtered = filtered.filter((learner) =>
         learner.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
+
+    // Apply sort/filter
+    switch (sortOption) {
+      case 'completed':
+        filtered = filtered.filter((learner) => learner.status === 'completed');
+        break;
+      case 'awaiting_approval':
+        filtered = filtered.filter(
+          (learner) => learner.status === 'awaiting_approval'
+        );
+        break;
+      case 'not_started':
+        filtered = filtered.filter(
+          (learner) => learner.status === 'not_started'
+        );
+        break;
+      case 'in_progress':
+        filtered = filtered.filter(
+          (learner) => learner.status === 'in_progress'
+        );
+        break;
+      case 'name_asc':
+        filtered.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'name_desc':
+        filtered.sort((a, b) => b.name.localeCompare(a.name));
+        break;
+      case 'score_desc':
+        filtered.sort((a, b) => b.score - a.score);
+        break;
+      case 'score_asc':
+        filtered.sort((a, b) => a.score - b.score);
+        break;
+      case 'all':
+      default:
+        // No additional filtering, show all
+        break;
+    }
+
     setFilteredLearners(filtered);
-  }, [learnerList, searchTerm]);
+  }, [learnerList, searchTerm, sortOption]);
 
   const fetchAssessmentData = async () => {
     try {
@@ -257,7 +321,9 @@ const AssessmentDetails: React.FC = () => {
 
         // Fetch assessment status for all learners in a single call
         try {
-          const allUserIds = learners.map((learner) => learner.userId);
+          const allUserIds = learners.map(
+            (learner: LearnerData) => learner.userId
+          );
           const statusResponse = await getAssessmentStatus({
             userId: allUserIds,
             courseId: [assessmentId as string],
@@ -268,7 +334,7 @@ const AssessmentDetails: React.FC = () => {
           console.log('Assessment Status Response:', statusResponse);
 
           // Map status data to learners
-          const learnersWithStatus = learners.map((learner) => {
+          const learnersWithStatus = learners.map((learner: LearnerData) => {
             // Find status data for this learner
             const learnerStatus =
               statusResponse?.result?.find?.(
@@ -361,6 +427,48 @@ const AssessmentDetails: React.FC = () => {
     }
   };
 
+  const handleSortClick = (event: React.MouseEvent<HTMLElement>) => {
+    setShowSortPopup(true);
+  };
+
+  const handleSortClose = () => {
+    setShowSortPopup(false);
+  };
+
+  const handleSortOptionChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setSortOption(event.target.value as SortOption);
+  };
+
+  const applySortAndClose = () => {
+    setShowSortPopup(false);
+  };
+
+  const getSortButtonText = () => {
+    switch (sortOption) {
+      case 'completed':
+        return 'Marks Approved';
+      case 'awaiting_approval':
+        return 'Awaiting Approval';
+      case 'not_started':
+        return 'Not Submitted';
+      case 'in_progress':
+        return 'In Progress';
+      case 'name_asc':
+        return 'Name (A-Z)';
+      case 'name_desc':
+        return 'Name (Z-A)';
+      case 'score_desc':
+        return 'Score (High-Low)';
+      case 'score_asc':
+        return 'Score (Low-High)';
+      case 'all':
+      default:
+        return 'Sort by Status';
+    }
+  };
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed':
@@ -437,7 +545,7 @@ const AssessmentDetails: React.FC = () => {
   return (
     <>
       <Header />
-      <Box sx={{ backgroundColor: '#FBF4E4', minHeight: '100vh' }}>
+      <Box>
         {/* Header Section */}
         <Box
           sx={{
@@ -456,7 +564,6 @@ const AssessmentDetails: React.FC = () => {
               fontSize: '22px',
               lineHeight: '28px',
               color: '#4D4639',
-              fontFamily: 'Poppins',
             }}
           >
             {assessmentData?.title}
@@ -479,18 +586,18 @@ const AssessmentDetails: React.FC = () => {
         )}
 
         {/* Assessment Info Chip */}
-        <Box sx={{ px: 2, mb: 2 }}>
+        {/* <Box sx={{ px: 2, mb: 2 }}>
           <Chip
             label={`${assessmentData?.totalQuestions} Questions • ${assessmentData?.duration} mins • ${assessmentData?.subject}`}
             sx={{
               backgroundColor: '#E8F5E8',
               color: '#2E7D32',
-              fontFamily: 'Poppins',
+
               fontSize: '12px',
               height: '28px',
             }}
           />
-        </Box>
+        </Box> */}
 
         {/* Search Bar */}
         <Box sx={{ px: 2, mb: 2 }}>
@@ -501,7 +608,7 @@ const AssessmentDetails: React.FC = () => {
             fullWidth
             size="small"
             sx={{
-              backgroundColor: '#FFFFFF',
+              backgroundColor: '#EDEDED',
               borderRadius: '24px',
               '& .MuiOutlinedInput-root': {
                 borderRadius: '24px',
@@ -517,8 +624,8 @@ const AssessmentDetails: React.FC = () => {
               },
               '& .MuiInputBase-input': {
                 padding: '10px 16px',
-                fontFamily: 'Poppins',
                 fontSize: '14px',
+                height: '28px',
                 color: '#4D4639',
               },
             }}
@@ -563,7 +670,6 @@ const AssessmentDetails: React.FC = () => {
                   />
                   <Typography
                     sx={{
-                      fontFamily: 'Poppins',
                       fontWeight: 500,
                       fontSize: '14px',
                       color: '#1F1B13',
@@ -580,6 +686,48 @@ const AssessmentDetails: React.FC = () => {
             </Card>
           </Box>
         )}
+
+        {/* Total Learners and Sort */}
+        <Box
+          sx={{
+            px: 2,
+            mb: 2,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <Typography
+            sx={{
+              fontWeight: 500,
+              fontSize: '14px',
+              color: '#7C766F',
+            }}
+          >
+            {filteredLearners.length} of {learnerList.length} Learners
+          </Typography>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={handleSortClick}
+            startIcon={<SortIcon />}
+            sx={{
+              borderColor: '#D0C5B4',
+              color: '#4D4639',
+              fontWeight: 500,
+              fontSize: '14px',
+              textTransform: 'none',
+              borderRadius: '8px',
+              height: '32px',
+              '&:hover': {
+                borderColor: '#4D4639',
+                backgroundColor: 'rgba(77, 70, 57, 0.04)',
+              },
+            }}
+          >
+            {getSortButtonText()}
+          </Button>
+        </Box>
 
         {/* Status Summary Cards */}
         <Box sx={{ px: 2, mb: 2 }}>
@@ -603,7 +751,6 @@ const AssessmentDetails: React.FC = () => {
               >
                 <Typography
                   sx={{
-                    fontFamily: 'Poppins',
                     fontWeight: 600,
                     fontSize: '20px',
                     color: '#1F1B13',
@@ -614,7 +761,6 @@ const AssessmentDetails: React.FC = () => {
                 </Typography>
                 <Typography
                   sx={{
-                    fontFamily: 'Poppins',
                     fontWeight: 500,
                     fontSize: '12px',
                     color: '#7C766F',
@@ -646,7 +792,6 @@ const AssessmentDetails: React.FC = () => {
               >
                 <Typography
                   sx={{
-                    fontFamily: 'Poppins',
                     fontWeight: 600,
                     fontSize: '20px',
                     color: '#1F1B13',
@@ -657,7 +802,6 @@ const AssessmentDetails: React.FC = () => {
                 </Typography>
                 <Typography
                   sx={{
-                    fontFamily: 'Poppins',
                     fontWeight: 500,
                     fontSize: '12px',
                     color: '#7C766F',
@@ -689,7 +833,6 @@ const AssessmentDetails: React.FC = () => {
               >
                 <Typography
                   sx={{
-                    fontFamily: 'Poppins',
                     fontWeight: 600,
                     fontSize: '20px',
                     color: '#1F1B13',
@@ -700,7 +843,6 @@ const AssessmentDetails: React.FC = () => {
                 </Typography>
                 <Typography
                   sx={{
-                    fontFamily: 'Poppins',
                     fontWeight: 500,
                     fontSize: '12px',
                     color: '#7C766F',
@@ -715,53 +857,11 @@ const AssessmentDetails: React.FC = () => {
           </Box>
         </Box>
 
-        {/* Total Learners and Sort */}
-        <Box
-          sx={{
-            px: 2,
-            mb: 2,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <Typography
-            sx={{
-              fontFamily: 'Poppins',
-              fontWeight: 500,
-              fontSize: '14px',
-              color: '#7C766F',
-            }}
-          >
-            {filteredLearners.length} of {learnerList.length} Learners
-          </Typography>
-          <Button
-            variant="outlined"
-            size="small"
-            sx={{
-              borderColor: '#D0C5B4',
-              color: '#4D4639',
-              fontFamily: 'Poppins',
-              fontWeight: 500,
-              fontSize: '14px',
-              textTransform: 'none',
-              borderRadius: '8px',
-              height: '32px',
-              '&:hover': {
-                borderColor: '#4D4639',
-                backgroundColor: 'rgba(77, 70, 57, 0.04)',
-              },
-            }}
-          >
-            Sort by Status
-          </Button>
-        </Box>
-
         {/* Learner List */}
         <Box sx={{ px: 2, pb: 2 }}>
           <Card
             sx={{
-              backgroundColor: '#FFFFFF',
+              backgroundColor: '#FBF4E4',
               borderRadius: '12px',
               border: '1px solid #E0E0E0',
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
@@ -802,7 +902,8 @@ const AssessmentDetails: React.FC = () => {
                         alignItems: 'center',
                         justifyContent: 'center',
                         width: 48,
-                        height: '100%',
+                        py: 3,
+                        height: '101%',
                         minHeight: 'inherit',
                       }}
                     >
@@ -818,7 +919,6 @@ const AssessmentDetails: React.FC = () => {
                       primary={
                         <Typography
                           sx={{
-                            fontFamily: 'Poppins',
                             fontWeight: 500,
                             fontSize: '16px',
                             color: '#1F1B13',
@@ -832,7 +932,6 @@ const AssessmentDetails: React.FC = () => {
                         <Box>
                           <Typography
                             sx={{
-                              fontFamily: 'Poppins',
                               fontWeight:
                                 learner.status === 'completed' ? 500 : 400,
                               fontSize: '14px',
@@ -849,7 +948,6 @@ const AssessmentDetails: React.FC = () => {
                           {getStatusDate(learner) && (
                             <Typography
                               sx={{
-                                fontFamily: 'Poppins',
                                 fontWeight: 400,
                                 fontSize: '12px',
                                 color: '#7C766F',
@@ -883,7 +981,7 @@ const AssessmentDetails: React.FC = () => {
                     variant="body1"
                     sx={{
                       color: '#7C766F',
-                      fontFamily: 'Poppins',
+
                       fontSize: '16px',
                     }}
                   >
@@ -937,10 +1035,7 @@ const AssessmentDetails: React.FC = () => {
               >
                 {assessmentData?.title}
               </Typography>
-              <Typography
-                variant="body2"
-                sx={{ color: '#7C766F', fontFamily: 'Poppins', mt: 0.5 }}
-              >
+              <Typography variant="body2" sx={{ color: '#7C766F', mt: 0.5 }}>
                 {assessmentData?.totalQuestions} Questions •{' '}
                 {assessmentData?.duration} minutes
               </Typography>
@@ -952,7 +1047,7 @@ const AssessmentDetails: React.FC = () => {
               disabled={downloading}
               sx={{
                 color: '#7C766F',
-                fontFamily: 'Poppins',
+
                 textTransform: 'none',
               }}
             >
@@ -972,7 +1067,7 @@ const AssessmentDetails: React.FC = () => {
               sx={{
                 backgroundColor: '#4D4639',
                 color: '#FFFFFF',
-                fontFamily: 'Poppins',
+
                 textTransform: 'none',
                 borderRadius: '8px',
                 '&:hover': {
@@ -987,6 +1082,285 @@ const AssessmentDetails: React.FC = () => {
               {downloading
                 ? 'Downloading...'
                 : t('ASSESSMENTS.DOWNLOAD') || 'Download'}
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Sort by Status Popup */}
+        <Dialog
+          open={showSortPopup}
+          onClose={handleSortClose}
+          maxWidth="sm"
+          fullWidth
+          PaperProps={{
+            sx: {
+              borderRadius: '16px',
+              p: 1,
+              maxWidth: '400px',
+            },
+          }}
+        >
+          <DialogTitle>
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 600,
+                fontFamily: 'Poppins',
+                fontSize: '18px',
+                color: '#1F1B13',
+              }}
+            >
+              Sort & Filter Learners
+            </Typography>
+          </DialogTitle>
+          <DialogContent sx={{ pb: 1 }}>
+            <FormControl component="fieldset" fullWidth>
+              <RadioGroup
+                value={sortOption}
+                onChange={handleSortOptionChange}
+                sx={{ gap: 1 }}
+              >
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    fontWeight: 600,
+                    color: '#4D4639',
+                    mt: 1,
+                    mb: 1,
+                    fontSize: '14px',
+                  }}
+                >
+                  Filter by Status
+                </Typography>
+
+                <FormControlLabel
+                  value="all"
+                  control={<Radio size="small" sx={{ color: '#4D4639' }} />}
+                  label={
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        width: '100%',
+                      }}
+                    >
+                      <Typography sx={{ fontSize: '14px', color: '#1F1B13' }}>
+                        All Learners
+                      </Typography>
+                      <Typography sx={{ fontSize: '14px', color: '#7C766F' }}>
+                        ({learnerList.length})
+                      </Typography>
+                    </Box>
+                  }
+                  sx={{
+                    mx: 0,
+                    width: '100%',
+                    '& .MuiFormControlLabel-label': { width: '100%' },
+                  }}
+                />
+
+                <FormControlLabel
+                  value="completed"
+                  control={<Radio size="small" sx={{ color: '#4D4639' }} />}
+                  label={
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        width: '100%',
+                      }}
+                    >
+                      <Typography sx={{ fontSize: '14px', color: '#1F1B13' }}>
+                        Marks Approved
+                      </Typography>
+                      <Typography sx={{ fontSize: '14px', color: '#7C766F' }}>
+                        ({getStatusCounts().completed})
+                      </Typography>
+                    </Box>
+                  }
+                  sx={{
+                    mx: 0,
+                    width: '100%',
+                    '& .MuiFormControlLabel-label': { width: '100%' },
+                  }}
+                />
+
+                <FormControlLabel
+                  value="awaiting_approval"
+                  control={<Radio size="small" sx={{ color: '#4D4639' }} />}
+                  label={
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        width: '100%',
+                      }}
+                    >
+                      <Typography sx={{ fontSize: '14px', color: '#1F1B13' }}>
+                        Awaiting Approval
+                      </Typography>
+                      <Typography sx={{ fontSize: '14px', color: '#7C766F' }}>
+                        ({getStatusCounts().awaiting_approval})
+                      </Typography>
+                    </Box>
+                  }
+                  sx={{
+                    mx: 0,
+                    width: '100%',
+                    '& .MuiFormControlLabel-label': { width: '100%' },
+                  }}
+                />
+
+                <FormControlLabel
+                  value="in_progress"
+                  control={<Radio size="small" sx={{ color: '#4D4639' }} />}
+                  label={
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        width: '100%',
+                      }}
+                    >
+                      <Typography sx={{ fontSize: '14px', color: '#1F1B13' }}>
+                        In Progress
+                      </Typography>
+                      <Typography sx={{ fontSize: '14px', color: '#7C766F' }}>
+                        ({getStatusCounts().in_progress})
+                      </Typography>
+                    </Box>
+                  }
+                  sx={{
+                    mx: 0,
+                    width: '100%',
+                    '& .MuiFormControlLabel-label': { width: '100%' },
+                  }}
+                />
+
+                <FormControlLabel
+                  value="not_started"
+                  control={<Radio size="small" sx={{ color: '#4D4639' }} />}
+                  label={
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        width: '100%',
+                      }}
+                    >
+                      <Typography sx={{ fontSize: '14px', color: '#1F1B13' }}>
+                        Not Submitted
+                      </Typography>
+                      <Typography sx={{ fontSize: '14px', color: '#7C766F' }}>
+                        ({getStatusCounts().not_started})
+                      </Typography>
+                    </Box>
+                  }
+                  sx={{
+                    mx: 0,
+                    width: '100%',
+                    '& .MuiFormControlLabel-label': { width: '100%' },
+                  }}
+                />
+
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    fontWeight: 600,
+                    color: '#4D4639',
+                    mt: 2,
+                    mb: 1,
+                    fontSize: '14px',
+                  }}
+                >
+                  Sort by Name
+                </Typography>
+
+                <FormControlLabel
+                  value="name_asc"
+                  control={<Radio size="small" sx={{ color: '#4D4639' }} />}
+                  label={
+                    <Typography sx={{ fontSize: '14px', color: '#1F1B13' }}>
+                      Name (A to Z)
+                    </Typography>
+                  }
+                  sx={{ mx: 0 }}
+                />
+
+                <FormControlLabel
+                  value="name_desc"
+                  control={<Radio size="small" sx={{ color: '#4D4639' }} />}
+                  label={
+                    <Typography sx={{ fontSize: '14px', color: '#1F1B13' }}>
+                      Name (Z to A)
+                    </Typography>
+                  }
+                  sx={{ mx: 0 }}
+                />
+
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    fontWeight: 600,
+                    color: '#4D4639',
+                    mt: 2,
+                    mb: 1,
+                    fontSize: '14px',
+                  }}
+                >
+                  Sort by Score
+                </Typography>
+
+                <FormControlLabel
+                  value="score_desc"
+                  control={<Radio size="small" sx={{ color: '#4D4639' }} />}
+                  label={
+                    <Typography sx={{ fontSize: '14px', color: '#1F1B13' }}>
+                      Score (High to Low)
+                    </Typography>
+                  }
+                  sx={{ mx: 0 }}
+                />
+
+                <FormControlLabel
+                  value="score_asc"
+                  control={<Radio size="small" sx={{ color: '#4D4639' }} />}
+                  label={
+                    <Typography sx={{ fontSize: '14px', color: '#1F1B13' }}>
+                      Score (Low to High)
+                    </Typography>
+                  }
+                  sx={{ mx: 0 }}
+                />
+              </RadioGroup>
+            </FormControl>
+          </DialogContent>
+          <DialogActions sx={{ p: 3, pt: 2 }}>
+            <Button
+              onClick={handleSortClose}
+              sx={{
+                color: '#7C766F',
+                textTransform: 'none',
+                fontWeight: 500,
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={applySortAndClose}
+              variant="contained"
+              sx={{
+                backgroundColor: '#4D4639',
+                color: '#FFFFFF',
+                textTransform: 'none',
+                borderRadius: '8px',
+                fontWeight: 500,
+                '&:hover': {
+                  backgroundColor: '#3A3529',
+                },
+              }}
+            >
+              Apply
             </Button>
           </DialogActions>
         </Dialog>
