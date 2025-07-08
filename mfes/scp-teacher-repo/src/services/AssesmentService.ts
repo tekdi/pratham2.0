@@ -3,10 +3,81 @@ import {
   GetDoIdServiceParam,
   IAssessmentStatusOptions,
   ISearchAssessment,
-} from '@/utils/Interfaces';
+} from '../utils/Interfaces';
 import { get, post } from './RestClient';
-import { URL_CONFIG } from '@/utils/url.config';
-import API_ENDPOINTS from '@/utils/API/APIEndpoints';
+import { URL_CONFIG } from '../utils/url.config';
+import API_ENDPOINTS from '../utils/API/APIEndpoints';
+
+interface IAssessmentItemParam {
+  answer: boolean;
+  value: {
+    body: string;
+    value: number;
+  };
+}
+
+interface IAssessmentItem {
+  id: string;
+  title: string;
+  type: string;
+  maxscore: number;
+  params: IAssessmentItemParam[];
+  sectionId: string;
+}
+
+interface IAssessmentResValue {
+  label?: string;
+  value: string | number;
+  selected: boolean;
+  AI_suggestion: string;
+}
+
+interface IAssessmentData {
+  item: IAssessmentItem;
+  index: number;
+  pass: 'yes' | 'no';
+  score: number;
+  resvalues: IAssessmentResValue[];
+  duration: number;
+  sectionName: string;
+}
+
+interface IAssessmentSummarySection {
+  sectionId: string;
+  sectionName: string;
+  data: IAssessmentData[];
+}
+
+interface ICreateAssessmentTracking {
+  userId: string;
+  courseId: string;
+  contentId: string;
+  attemptId: string;
+  lastAttemptedOn: string;
+  timeSpent: number;
+  totalMaxScore: number;
+  totalScore: number;
+  unitId: string;
+  assessmentSummary: IAssessmentSummarySection[];
+}
+
+interface IUpdateAssessmentScore {
+  userId: string;
+  courseId: string;
+  contentId: string;
+  attemptId: string;
+  totalScore: number;
+  assessmentSummary: {
+    sectionId: string;
+    sectionName: string;
+    data: {
+      item: {
+        id: string;
+      };
+      score: number;
+    }[];
+  }[];
+}
 
 export const getAssessmentList = async ({
   sort,
@@ -56,7 +127,7 @@ export const getAssessmentDetails = async (doId: string) => {
 export const getDoIdForAssessmentDetails = async ({
   filters,
 }: GetDoIdServiceParam): Promise<any> => {
-  const apiUrl: string = `${URL_CONFIG.API.COMPOSITE_SEARCH}`;
+  const apiUrl = `${URL_CONFIG.API.COMPOSITE_SEARCH}`;
   // const apiUrl: string =
   //   'https://sunbirdsaas.com/api/content/v1/search?orgdetails=orgName%2Cemail&licenseDetails=name%2Cdescription%2Curl';
   const data = {
@@ -78,6 +149,34 @@ export const getDoIdForAssessmentDetails = async ({
   } catch (error) {
     console.error('Error in getDoIdForAssessmentDetails Service', error);
     return error;
+  }
+};
+
+// answer sheet submissions
+export const answerSheetSubmissions = async ({
+  userId,
+  questionSetId,
+  identifier,
+  fileUrls,
+}: {
+  userId: string;
+  questionSetId: string;
+  identifier: string;
+  fileUrls: string[];
+}) => {
+  const apiURL = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/answer-sheet-submissions/create`;
+
+  try {
+    const response = await post(apiURL, {
+      userId,
+      questionSetId,
+      identifier,
+      fileUrls,
+    });
+    return response?.data;
+  } catch (error) {
+    console.error('Error in answer sheet submissions:', error);
+    throw error;
   }
 };
 
@@ -106,12 +205,34 @@ export const searchAssessment = async (body: ISearchAssessment) => {
 };
 
 export const getAssessmentTracking = async (params: ISearchAssessment) => {
-  const apiUrl = 'https://dev-interface.prathamdigital.org/interface/v1/tracking/assessment/search';
+  const apiUrl = API_ENDPOINTS.assessmentSearch;
   try {
     const response = await post(apiUrl, params);
     return response?.data;
   } catch (error) {
     console.error('Error in getting assessment tracking:', error);
+    throw error;
+  }
+};
+
+export const createAssessmentTracking = async (data: ICreateAssessmentTracking) => {
+  const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/assessment/create`;
+  try {
+    const response = await post(apiUrl, data);
+    return response?.data;
+  } catch (error) {
+    console.error('Error in creating assessment tracking:', error);
+    throw error;
+  }
+};
+
+export const updateAssessmentScore = async (data: IUpdateAssessmentScore) => {
+  const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/assessment/update-score`;
+  try {
+    const response = await post(apiUrl, data);
+    return response?.data;
+  } catch (error) {
+    console.error('Error in updating assessment score:', error);
     throw error;
   }
 };

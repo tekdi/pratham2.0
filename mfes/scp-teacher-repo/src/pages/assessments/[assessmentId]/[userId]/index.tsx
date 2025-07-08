@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Header from '@/components/Header';
+import Header from '../../../../components/Header';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import {
   Box,
@@ -23,8 +23,11 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useRouter } from 'next/router';
 import GenericModal from '../../../../components/GenericModal';
 import ConfirmationModal from '../../../../components/ConfirmationModal';
-import { getAssessmentTracking } from '@/services/AssesmentService';
-import { format } from 'date-fns';
+import { getAssessmentTracking } from '../../../../services/AssesmentService';
+import {
+  UploadOptionsPopup,
+  UploadedImage,
+} from '../../../../components/assessment';
 
 interface ScoreDetail {
   questionId: string | null;
@@ -52,7 +55,6 @@ interface AssessmentTrackingData {
   unitId: string;
   score_details: ScoreDetail[];
 }
-
 const AssessmentDetails = () => {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -66,6 +68,46 @@ const AssessmentDetails = () => {
   const [loading, setLoading] = useState(true);
   const [assessmentTrackingData, setAssessmentTrackingData] =
     useState<AssessmentTrackingData | null>();
+
+  // Upload Options Popup state
+  const [uploadPopupOpen, setUploadPopupOpen] = useState(false);
+
+  const handleAccordionChange =
+    (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+      setExpandedPanel(isExpanded ? panel : false);
+    };
+
+  // Sample uploaded images data
+  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
+
+  // Upload Options Popup handlers
+  const handleUploadInfoClick = () => {
+    setUploadPopupOpen(true);
+  };
+
+  const handleCloseUploadPopup = () => {
+    setUploadPopupOpen(false);
+  };
+
+  const handleReupload = () => {
+    console.log('Re-upload images');
+    // Implement re-upload logic
+  };
+
+  const handleViewImages = () => {
+    console.log('View all images');
+    // Implement view images logic
+  };
+
+  const handleDownload = () => {
+    console.log('Download all images');
+    // Implement download logic
+  };
+
+  const handleImageUpload = (newImage: UploadedImage) => {
+    setUploadedImages((prev) => [...prev, newImage]);
+  };
+
   const [assessmentData, setAssessmentData] = useState({
     studentName: 'Bharat Kumar',
     examType: 'Mid Term Exam',
@@ -115,10 +157,17 @@ const AssessmentDetails = () => {
   });
 
   useEffect(() => {
+    console.log('assessmentId', assessmentId);
+    console.log('userId', userId);
     const fetchAssessmentData = async () => {
       if (assessmentId && userId) {
         try {
           const response = await getAssessmentTracking({
+            // userId: userId as string,
+            // contentId: assessmentId as string,
+            // courseId: assessmentId as string,
+            // unitId: assessmentId as string,
+
             userId: 'fb6b2e58-0f14-4d4f-90e4-bae092e7a235',
             contentId: 'do_214343524576083968177',
             courseId: 'do_214343524576083968177',
@@ -161,11 +210,6 @@ const AssessmentDetails = () => {
 
     fetchAssessmentData();
   }, [assessmentId, userId]);
-
-  const handleAccordionChange =
-    (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-      setExpandedPanel(isExpanded ? panel : false);
-    };
 
   const handleBack = () => {
     router.back();
@@ -326,6 +370,7 @@ const AssessmentDetails = () => {
       <Box sx={{ mx: '16px', my: '16px' }}>
         {/* Images Info */}
         <Box
+          onClick={handleUploadInfoClick}
           sx={{
             display: 'flex',
             justifyContent: 'space-between',
@@ -646,6 +691,18 @@ const AssessmentDetails = () => {
         onConfirm={handleConfirmApprove}
         title="Are you sure you want to approve Marks?"
         message="Be sure to review the answers and make any necessary changes to the marks before approving the final scores."
+      />
+      {/* Upload Options Popup */}
+      <UploadOptionsPopup
+        isOpen={uploadPopupOpen}
+        onClose={handleCloseUploadPopup}
+        uploadedImages={uploadedImages}
+        onImageUpload={handleImageUpload}
+        userId={typeof userId === 'string' ? userId : undefined}
+        questionSetId={
+          typeof assessmentId === 'string' ? assessmentId : undefined
+        }
+        identifier={typeof assessmentId === 'string' ? assessmentId : undefined}
       />
     </div>
   );
