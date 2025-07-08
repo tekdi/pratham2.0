@@ -29,6 +29,7 @@ import TenantService from '@/services/TenantService';
 //menu config
 import MenuWrapper from '../config/MenuWrapper';
 import { LanguageProvider } from '@shared-lib-v2/lib/context/LanguageContext';
+import { PUBLIC_ROUTES } from '@/config/routesConfig';
 
 function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -45,7 +46,11 @@ function App({ Component, pageProps }: AppProps) {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (!token && router.pathname !== '/login') {
+    if (
+      !PUBLIC_ROUTES.includes(router.pathname) &&
+      !token &&
+      router.pathname !== '/login'
+    ) {
       if (router.pathname !== '/logout') router.push('/logout');
     }
     setIsArchived(false);
@@ -147,21 +152,21 @@ function App({ Component, pageProps }: AppProps) {
         <title>{metaTags?.title}</title>
       </Head>
       <LanguageProvider>
-      <QueryClientProvider client={client}>
-        <AuthProvider>
-          {/* for dynamic menu */}
-          <CssVarsProvider theme={customTheme}>
-            {/* <RouteGuard>{renderComponent()}</RouteGuard> */}
-            <MenuWrapper>{renderComponent()}</MenuWrapper>
-            <ToastContainer
-              position="bottom-left"
-              autoClose={3000}
-              stacked={false}
-            />
-          </CssVarsProvider>
-        </AuthProvider>
-        <ReactQueryDevtools initialIsOpen={false} />
-      </QueryClientProvider>
+        <QueryClientProvider client={client}>
+          <AuthProvider>
+            {/* for dynamic menu */}
+            <CssVarsProvider theme={customTheme}>
+              {/* <RouteGuard>{renderComponent()}</RouteGuard> */}
+              <MenuWrapper>{renderComponent()}</MenuWrapper>
+              <ToastContainer
+                position="bottom-left"
+                autoClose={3000}
+                stacked={false}
+              />
+            </CssVarsProvider>
+          </AuthProvider>
+          <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
       </LanguageProvider>
     </>
   );
