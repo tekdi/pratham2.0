@@ -180,7 +180,7 @@ const QuestionPaperPDF = ({ data }: any) => {
             </View>
           </View>
           <View style={styles.row}>
-            {data.sections.map((section: any, sectionIndex: any) => (
+            {data?.sections?.map((section: any, sectionIndex: any) => (
               <View key={sectionIndex}>
                 <View style={styles.row}>
                   <View style={[gridCol(10), styles.box]}>
@@ -207,73 +207,96 @@ const QuestionPaperPDF = ({ data }: any) => {
                     </Text>
                   </View>
                 </View>
-                {section.questions.map((question: any, qIndex: any) => (
-                  <View key={qIndex}>
-                    <View style={styles.row}>
-                      <View style={[gridCol(0.5), styles.box]}></View>
-                      <View style={[gridCol(10.5), styles.box]}>
-                        <Text
-                          style={{
-                            ...styles.sub_title,
-                            ...styles.left,
-                            ...styles.bold,
-                          }}
-                        >
-                          ({sectionIndex + 1}.{qIndex + 1}){' '}
-                          {question?.questionTitle}
-                        </Text>
-                      </View>
-                      <View style={[gridCol(1), styles.box]}>
-                        <Text
-                          style={{
-                            ...styles.sub_title,
-                            ...styles.right,
-                            ...styles.bold,
-                          }}
-                        >
-                          {`(${question?.maxScore})`}
-                        </Text>
-                      </View>
-                    </View>
-                    {question?.options?.map((option: any, oIndex: any) => {
-                      let isImage = false;
-                      let imageUrl = '';
-                      if (option.label.includes('<img')) {
-                        isImage = true;
-                        imageUrl = option.label.match(/src="([^"]*)"/)[1];
-                      }
-                      let label = option.label
-                        .replace(/<[^>]*>/g, '')
-                        .replace(/&nbsp;/g, '');
-                      return (
-                        <View style={styles.row} key={oIndex}>
-                          <View style={[gridCol(1), styles.box]}></View>
-                          <View style={[gridCol(11), styles.box]}>
-                            <Text
-                              style={{
-                                ...styles.sub_title,
-                                ...styles.left,
-                              }}
-                            >
-                              ({toRoman(oIndex + 1)}) {!isImage && label}
-                            </Text>
-                            {isImage && (
-                              <Image
-                                src={imageUrl}
-                                // src={clslogo}
-                                style={{
-                                  width: 150, // adjust as needed
-                                  // height: 50,
-                                  // borderRadius: 0,
-                                }}
-                              />
-                            )}
-                          </View>
+                {section?.questions?.map((question: any, qIndex: any) => {
+                  let isQuestionImage = false;
+                  let imageQuestionUrl = '';
+                  if (question?.questionTitle.includes('<img')) {
+                    isQuestionImage = true;
+                    imageQuestionUrl =
+                      question?.questionTitle.match(/src="([^"]*)"/)[1];
+                  }
+                  let questionTitle = question?.questionTitle
+                    .replace(/<[^>]*>/g, '')
+                    .replace(/&nbsp;/g, '');
+                  return (
+                    <View key={qIndex}>
+                      <View style={styles.row}>
+                        <View style={[gridCol(0.5), styles.box]}></View>
+                        <View style={[gridCol(10.5), styles.box]}>
+                          <Text
+                            style={{
+                              ...styles.sub_title,
+                              ...styles.left,
+                              ...styles.bold,
+                            }}
+                          >
+                            ({sectionIndex + 1}.{qIndex + 1}) {questionTitle}
+                          </Text>
                         </View>
-                      );
-                    })}
-                  </View>
-                ))}
+                        <View style={[gridCol(1), styles.box]}>
+                          <Text
+                            style={{
+                              ...styles.sub_title,
+                              ...styles.right,
+                              ...styles.bold,
+                            }}
+                          >
+                            {`(${question?.maxScore})`}
+                          </Text>
+                        </View>
+                        <View style={[gridCol(0.5), styles.box]}></View>
+                        {isQuestionImage && (
+                          <Image
+                            src={imageQuestionUrl}
+                            // src={clslogo}
+                            style={{
+                              width: 150, // adjust as needed
+                              // height: 50,
+                              // borderRadius: 0,
+                            }}
+                          />
+                        )}
+                      </View>
+                      {question?.options?.map((option: any, oIndex: any) => {
+                        let isImage = false;
+                        let imageUrl = '';
+                        if (option?.label.includes('<img')) {
+                          isImage = true;
+                          imageUrl = option?.label.match(/src="([^"]*)"/)[1];
+                        }
+                        let label = option?.label
+                          .replace(/<[^>]*>/g, '')
+                          .replace(/&nbsp;/g, '');
+                        return (
+                          <View style={styles.row} key={oIndex}>
+                            <View style={[gridCol(1), styles.box]}></View>
+                            <View style={[gridCol(11), styles.box]}>
+                              <Text
+                                style={{
+                                  ...styles.sub_title,
+                                  ...styles.left,
+                                }}
+                              >
+                                ({toRoman(oIndex + 1)}) {!isImage && label}
+                              </Text>
+                              {isImage && (
+                                <Image
+                                  src={imageUrl}
+                                  // src={clslogo}
+                                  style={{
+                                    width: 50, // adjust as needed
+                                    // height: 50,
+                                    // borderRadius: 0,
+                                  }}
+                                />
+                              )}
+                            </View>
+                          </View>
+                        );
+                      })}
+                    </View>
+                  );
+                })}
               </View>
             ))}
           </View>
@@ -319,9 +342,9 @@ export default function QP() {
 
   useEffect(() => {
     if (error === true) {
-      // sessionStorage.removeItem(do_var);
+      sessionStorage.removeItem(do_var);
       // window.open('http://localhost', '_self');
-      // window.close();
+      window.close();
       console.log('############ error', error);
     }
   }, [error]);
@@ -343,7 +366,7 @@ export default function QP() {
       }
     };
     if (content_details != null) {
-      // handleDownloadPDF();
+      handleDownloadPDF();
     }
   }, [content_details]);
 
@@ -531,9 +554,8 @@ export default function QP() {
           });
           totalMarks += maxScore;
           questions.push({
-            questionTitle: file_content?.content?.children[i]?.children[
-              j
-            ]?.body?.replace(/<[^>]*>/g, ''),
+            questionTitle:
+              file_content?.content?.children[i]?.children[j]?.body,
             maxScore: maxScore,
             options: options,
           });
@@ -668,10 +690,10 @@ export default function QP() {
   }
   return (
     <div>
-      DO ID ={do_id}
+      {/* DO ID ={do_id} */}
       <br />
       {status}
-      <br />
+      {/* <br />
       {content_details && (
         <BlobProvider
           document={
@@ -693,7 +715,7 @@ export default function QP() {
         </BlobProvider>
       )}
       <br />
-      <pre>{JSON.stringify(content_details, null, 2)}</pre>
+      <pre>{JSON.stringify(content_details, null, 2)}</pre> */}
     </div>
   );
 }
