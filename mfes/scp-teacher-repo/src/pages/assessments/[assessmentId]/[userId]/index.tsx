@@ -26,6 +26,7 @@ import { useRouter } from 'next/router';
 import GenericModal from '../../../../components/GenericModal';
 import ConfirmationModal from '../../../../components/ConfirmationModal';
 import {
+  getAssessmentDetails,
   getAssessmentTracking,
   updateAssessmentScore,
 } from '../../../../services/AssesmentService';
@@ -33,6 +34,7 @@ import {
   UploadOptionsPopup,
   UploadedImage,
 } from '../../../../components/assessment';
+import { getUserDetails } from '../../../../services/ProfileService';
 
 interface ScoreDetail {
   questionId: string | null;
@@ -119,6 +121,11 @@ const AssessmentDetails = () => {
 
   // Upload Options Popup state
   const [uploadPopupOpen, setUploadPopupOpen] = useState(false);
+  const [userDetails, setUserDetails] = useState<any>({
+    name: '',
+    lastName: '',
+  });
+  const [assessmentType, setAssessmentType] = useState<any>('');
 
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
@@ -379,6 +386,35 @@ const AssessmentDetails = () => {
     setIsConfirmModalOpen(false);
   };
 
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      if (userId) {
+        const userDetailsResponse = await getUserDetails(
+          userId as string,
+          true
+        );
+        console.log('userDetailsResponse', userDetailsResponse);
+        setUserDetails({
+          name: userDetailsResponse?.result?.userData?.firstName,
+          lastName: userDetailsResponse?.result?.userData?.lastName,
+        });
+      }
+    };
+    fetchUserDetails();
+  }, []);
+
+  useEffect(() => {
+    const fetchAssessmentDetails = async () => {
+      if (assessmentId) {
+        const response = await getAssessmentDetails(assessmentId as string);
+        console.log('response', response.assessmentType);
+        setAssessmentType(response?.assessmentType);
+      }
+      console.log('userDetails', userDetails);
+    };
+    fetchAssessmentDetails();
+  }, []);
+
   // Update parseResValue function
   const parseResValue = (
     resValue: string
@@ -470,7 +506,7 @@ const AssessmentDetails = () => {
               fontWeight: 400,
             }}
           >
-            {assessmentData.studentName}
+            {userDetails.name} {userDetails.lastName}
           </Typography>
           <Typography
             sx={{
@@ -481,7 +517,7 @@ const AssessmentDetails = () => {
               letterSpacing: '0.71%',
             }}
           >
-            {assessmentData.examType}
+            {assessmentType}
           </Typography>
         </Box>
       </Box>
