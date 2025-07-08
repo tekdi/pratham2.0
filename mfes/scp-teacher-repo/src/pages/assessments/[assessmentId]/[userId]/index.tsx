@@ -113,6 +113,7 @@ const AssessmentDetails = () => {
   const [editScore, setEditScore] = useState<string>('');
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [editLoading, setEditLoading] = useState(false);
   const [assessmentTrackingData, setAssessmentTrackingData] =
     useState<AssessmentTrackingData | null>();
 
@@ -281,7 +282,7 @@ const AssessmentDetails = () => {
     if (!selectedQuestion || !assessmentTrackingData) return;
 
     try {
-      setLoading(true);
+      setEditLoading(true);
 
       // Find the question in the assessment summary
       const updatedAssessmentSummary = assessmentTrackingData.score_details.map(
@@ -364,7 +365,7 @@ const AssessmentDetails = () => {
         severity: 'error',
       });
     } finally {
-      setLoading(false);
+      setEditLoading(false);
     }
   };
 
@@ -605,16 +606,22 @@ const AssessmentDetails = () => {
                 mb: { xs: 2, md: 3 },
               }}
             >
-              Marks : {assessmentTrackingData.totalScore}/
-              {assessmentTrackingData.totalMaxScore} (
-              {assessmentTrackingData.totalMaxScore > 0
-                ? (
-                    (assessmentTrackingData.totalScore /
-                      assessmentTrackingData.totalMaxScore) *
-                    100
-                  ).toFixed(0)
-                : 0}
-              %)
+              {assessmentTrackingData ? (
+                <>
+                  Marks: {assessmentTrackingData.totalScore || 0}/
+                  {assessmentTrackingData.totalMaxScore || 0} (
+                  {assessmentTrackingData.totalMaxScore > 0
+                    ? Math.round(
+                        (assessmentTrackingData.totalScore /
+                          assessmentTrackingData.totalMaxScore) *
+                          100
+                      )
+                    : 0}
+                  %)
+                </>
+              ) : (
+                'Marks: Not Available'
+              )}
             </Typography>
 
             {/* Questions List */}
@@ -790,7 +797,7 @@ const AssessmentDetails = () => {
         onSave={handleSaveScore}
         maxWidth="400px"
       >
-        <Box sx={{ width: '100%' }}>
+        <Box sx={{ width: '100%', position: 'relative' }}>
           <TextField
             label="Marks"
             type="number"
@@ -811,8 +818,25 @@ const AssessmentDetails = () => {
               max: selectedQuestion?.maxScore || 0,
             }}
             helperText={`Maximum marks: ${selectedQuestion?.maxScore || 0}`}
-            disabled={loading}
+            disabled={editLoading}
           />
+          {editLoading && (
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: 'rgba(255, 255, 255, 0.7)',
+              }}
+            >
+              <CircularProgress size={24} />
+            </Box>
+          )}
         </Box>
       </GenericModal>
 
