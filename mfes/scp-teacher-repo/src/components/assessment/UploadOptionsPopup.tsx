@@ -6,453 +6,497 @@ import {
   Button,
   IconButton,
   Divider,
-  Paper,
-  Grid,
-  Card,
-  CardMedia,
-  CardContent,
-  CardActions,
-  Chip,
-  LinearProgress,
-  Alert,
   Snackbar,
+  Alert,
 } from '@mui/material';
-import {
-  Close as CloseIcon,
-  PhotoCamera as PhotoCameraIcon,
-  PhotoLibrary as PhotoLibraryIcon,
-  Download as DownloadIcon,
-  Delete as DeleteIcon,
-  CloudUpload as CloudUploadIcon,
-  Visibility as VisibilityIcon,
-  RefreshOutlined as RefreshIcon,
-} from '@mui/icons-material';
+import CloseIcon from '@mui/icons-material/Close';
+import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
+import FilterIcon from '@mui/icons-material/Filter';
 import { UploadOptionsPopupProps, UploadedImage } from './types';
 import Camera from './Camera';
-
-// Simulated S3 upload function - replace with actual implementation
-const uploadToS3 = async (
-  file: File,
-  onProgress?: (progress: number) => void
-): Promise<string> => {
-  return new Promise((resolve) => {
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += 10;
-      if (onProgress) {
-        onProgress(progress);
-      }
-      if (progress >= 100) {
-        clearInterval(interval);
-        // Return a mock S3 URL
-        resolve(
-          `https://s3-bucket.amazonaws.com/uploads/${file.name}_${Date.now()}`
-        );
-      }
-    }, 100);
-  });
-};
+import { answerSheetSubmissions } from '../../services/AssesmentService';
+import {
+  uploadFileToS3,
+  dataUrlToFile,
+} from '../../services/FileUploadService';
 
 const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
   isOpen,
   onClose,
   uploadedImages = [],
-  onReupload,
-  onViewImages,
-  onDownload,
   onImageUpload,
-  title = 'Upload Options',
-  maxFileSize = 10 * 1024 * 1024, // 10MB default
-  allowedFormats = ['image/jpeg', 'image/png', 'image/gif'],
+  userId,
+  questionSetId,
+  identifier,
 }) => {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState<{
-    [key: string]: number;
-  }>({});
-  const [uploadingFiles, setUploadingFiles] = useState<string[]>([]);
-  const [errorMessage, setErrorMessage] = useState<string>('');
-  const [successMessage, setSuccessMessage] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileSelect = async (files: FileList | null) => {
-    if (!files) return;
+  // Toast state
+  const [toast, setToast] = useState({
+    open: false,
+    message: '',
+    severity: 'error' as 'error' | 'success' | 'warning' | 'info',
+  });
 
-    const validFiles: File[] = [];
-    const errors: string[] = [];
-
-    // Validate files
-    Array.from(files).forEach((file) => {
-      if (!allowedFormats.includes(file.type)) {
-        errors.push(
-          `${file.name}: Invalid format. Allowed: ${allowedFormats.join(', ')}`
-        );
-        return;
-      }
-      if (file.size > maxFileSize) {
-        errors.push(
-          `${file.name}: File too large. Max size: ${(
-            maxFileSize /
-            (1024 * 1024)
-          ).toFixed(1)}MB`
-        );
-        return;
-      }
-      validFiles.push(file);
-    });
-
-    if (errors.length > 0) {
-      setErrorMessage(errors.join('\n'));
-      return;
-    }
-
-    // Upload valid files
-    for (const file of validFiles) {
-      const fileId = `${file.name}_${Date.now()}`;
-      setUploadingFiles((prev) => [...prev, fileId]);
-
-      try {
-        const url = await uploadToS3(file, (progress) => {
-          setUploadProgress((prev) => ({ ...prev, [fileId]: progress }));
-        });
-
-        const newImage: UploadedImage = {
-          id: fileId,
-          url: url,
-          previewUrl: URL.createObjectURL(file),
-          name: file.name,
-          size: file.size,
-          uploadedAt: new Date().toISOString(),
-        };
-
-        if (onImageUpload) {
-          onImageUpload(newImage);
-        }
-
-        setSuccessMessage(`${file.name} uploaded successfully!`);
-      } catch (error) {
-        setErrorMessage(`Failed to upload ${file.name}`);
-      } finally {
-        setUploadingFiles((prev) => prev.filter((id) => id !== fileId));
-        setUploadProgress((prev) => {
-          const newProgress = { ...prev };
-          delete newProgress[fileId];
-          return newProgress;
-        });
-      }
-    }
+  const showToast = (
+    message: string,
+    severity: 'error' | 'success' | 'warning' | 'info' = 'error'
+  ) => {
+    setToast({ open: true, message, severity });
   };
 
-  const handleCameraCapture = async (imageData: string, fileName: string) => {
-    try {
-      // Convert base64 to blob
-      const response = await fetch(imageData);
-      const blob = await response.blob();
-      const file = new File([blob], fileName, { type: 'image/jpeg' });
-
-      const fileId = `camera_${Date.now()}`;
-      setUploadingFiles((prev) => [...prev, fileId]);
-
-      const url = await uploadToS3(file, (progress) => {
-        setUploadProgress((prev) => ({ ...prev, [fileId]: progress }));
-      });
-
-      const newImage: UploadedImage = {
-        id: fileId,
-        url: url,
-        previewUrl: imageData,
-        name: fileName,
-        size: file.size,
-        uploadedAt: new Date().toISOString(),
-      };
-
-      if (onImageUpload) {
-        onImageUpload(newImage);
-      }
-
-      setSuccessMessage('Photo captured and uploaded successfully!');
-    } catch (error) {
-      setErrorMessage('Failed to upload captured photo');
-    } finally {
-      setUploadingFiles((prev) =>
-        prev.filter((id) => id.startsWith('camera_'))
-      );
-      setIsCameraOpen(false);
-    }
+  const handleCloseToast = () => {
+    setToast({ ...toast, open: false });
   };
 
-  const handleGalleryClick = () => {
+  const handleTakePhoto = () => {
+    setIsCameraOpen(true);
+  };
+
+  const handleChooseFromGallery = () => {
     fileInputRef.current?.click();
   };
 
-  const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  const handleFileSelect = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+
+      // Ensure file is defined
+      if (!file) return;
+
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/jpg'];
+      if (!allowedTypes.includes(file.type)) {
+        showToast('Please select a valid image file (jpg, jpeg)', 'error');
+        return;
+      }
+
+      // Validate file size (50MB)
+      const maxSize = 50 * 1024 * 1024;
+      if (file.size > maxSize) {
+        showToast('File size must be less than 50MB', 'error');
+        return;
+      }
+
+      setIsUploading(true);
+      try {
+        const uploadedUrl = await uploadFileToS3(file);
+        if (uploadedUrl) {
+          const newImage: UploadedImage = {
+            id: Date.now().toString(),
+            url: uploadedUrl,
+            previewUrl: uploadedUrl,
+            name: file.name,
+            size: file.size,
+            uploadedAt: new Date().toISOString(),
+          };
+          onImageUpload?.(newImage);
+          showToast('Image uploaded successfully!', 'success');
+        }
+      } catch (error) {
+        console.error('Error uploading file from gallery:', error);
+        showToast(
+          'Failed to upload image from gallery. Please try again.',
+          'error'
+        );
+      } finally {
+        setIsUploading(false);
+      }
+    }
+
+    // Reset input
+    event.target.value = '';
   };
 
-  const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+  const handleCameraCapture = async (imageData: string, fileName: string) => {
+    setIsUploading(true);
+    try {
+      const file = dataUrlToFile(imageData, fileName);
+      const uploadedUrl = await uploadFileToS3(file);
+      if (uploadedUrl) {
+        const newImage: UploadedImage = {
+          id: Date.now().toString(),
+          url: uploadedUrl,
+          previewUrl: uploadedUrl,
+          name: fileName,
+          size: file.size,
+          uploadedAt: new Date().toISOString(),
+        };
+        onImageUpload?.(newImage);
+        showToast('Photo captured and uploaded successfully!', 'success');
+      }
+    } catch (error) {
+      console.error('Error uploading file from camera:', error);
+      showToast(
+        'Failed to upload image from camera. Please try again.',
+        'error'
+      );
+    } finally {
+      setIsUploading(false);
+    }
+    setIsCameraOpen(false);
   };
 
-  if (!isOpen) return null;
+  const handleRemoveImage = (imageId: string) => {
+    // This should be handled by parent component
+    console.log('Remove image:', imageId);
+  };
+
+  const handleStartAIEvaluation = async () => {
+    if (!userId || !questionSetId || !identifier) {
+      showToast('Missing required parameters for AI evaluation.', 'error');
+      return;
+    }
+
+    if (uploadedImages.length === 0) {
+      showToast(
+        'Please upload at least one image before starting AI evaluation.',
+        'warning'
+      );
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const fileUrls = uploadedImages.map((image) => image.url);
+
+      await answerSheetSubmissions({
+        userId,
+        questionSetId,
+        identifier,
+        fileUrls,
+      });
+
+      showToast('Answer sheet submitted successfully!', 'success');
+      onClose();
+    } catch (error) {
+      console.error('Error submitting answer sheet:', error);
+      showToast('Failed to submit answer sheet. Please try again.', 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const formatFileSize = (bytes?: number) => {
+    if (!bytes) return '';
+    const mb = bytes / (1024 * 1024);
+    return `${mb.toFixed(1)} MB`;
+  };
 
   return (
     <>
       <Modal
         open={isOpen}
         onClose={onClose}
-        aria-labelledby="upload-options-modal-title"
+        aria-labelledby="upload-options-modal"
         sx={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          p: 2,
+          '& .MuiModal-backdrop': {
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          },
         }}
       >
-        <Paper
+        <Box
           sx={{
-            width: '100%',
-            maxWidth: 800,
-            maxHeight: '90vh',
-            overflow: 'auto',
+            width: 320,
+            bgcolor: '#FFFFFF',
             borderRadius: '16px',
-            boxShadow: '0 24px 48px rgba(0, 0, 0, 0.2)',
+            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+            outline: 'none',
+            display: 'flex',
+            flexDirection: 'column',
+            maxHeight: '90vh',
+            overflow: 'hidden',
           }}
         >
           {/* Header */}
           <Box
             sx={{
               display: 'flex',
-              justifyContent: 'space-between',
               alignItems: 'center',
-              p: 3,
-              borderBottom: '1px solid #E5E5E5',
+              justifyContent: 'space-between',
+              padding: '12px 12px 12px 16px',
             }}
           >
-            <Typography
-              id="upload-options-modal-title"
-              variant="h5"
+            <Box sx={{ padding: '12px 0px 0px' }}>
+              <Typography
+                sx={{
+                  color: '#4D4639',
+                }}
+              >
+                Submit Answers for AI Evaluation
+              </Typography>
+            </Box>
+            <Box
               sx={{
-                fontWeight: 600,
-                color: '#1A1A1A',
+                width: 48,
+                height: 48,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
-              {title}
-            </Typography>
-            <IconButton
-              onClick={onClose}
-              sx={{
-                color: '#666',
-                '&:hover': {
-                  backgroundColor: '#F5F5F5',
-                },
-              }}
-            >
-              <CloseIcon />
-            </IconButton>
+              <Box
+                sx={{
+                  borderRadius: '100px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <IconButton
+                  onClick={onClose}
+                  sx={{
+                    width: 40,
+                    height: 40,
+                    padding: '8px',
+                    '&:hover': {
+                      backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                    },
+                  }}
+                >
+                  <CloseIcon
+                    sx={{
+                      width: 24,
+                      height: 24,
+                      color: '#4D4639',
+                    }}
+                  />
+                </IconButton>
+              </Box>
+            </Box>
           </Box>
 
-          {/* Upload Options */}
-          <Box sx={{ p: 3 }}>
-            <Typography
-              variant="h6"
+          {/* Divider */}
+          <Divider
+            sx={{
+              borderColor: '#D0C5B4',
+              borderWidth: '1px',
+            }}
+          />
+
+          {/* Content */}
+          <Box
+            sx={{
+              padding: '24px 16px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '16px',
+              width: 320,
+              minHeight: 472,
+              height: '100%',
+            }}
+          >
+            <Box
               sx={{
-                mb: 2,
-                fontWeight: 500,
-                color: '#1A1A1A',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+                width: 288,
               }}
             >
-              Add New Images
-            </Typography>
-
-            <Grid container spacing={2} sx={{ mb: 4 }}>
-              {/* Camera Option */}
-              <Grid item xs={12} sm={6}>
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  startIcon={<PhotoCameraIcon />}
-                  onClick={() => setIsCameraOpen(true)}
-                  sx={{
-                    height: '80px',
-                    borderColor: '#FDBE16',
-                    color: '#4D4639',
-                    borderWidth: '2px',
-                    borderRadius: '12px',
-                    fontSize: '16px',
-                    fontWeight: 500,
-                    '&:hover': {
-                      borderColor: '#FDBE16',
-                      backgroundColor: '#FFF8E1',
-                      borderWidth: '2px',
-                    },
-                  }}
-                >
-                  Take Photo
-                </Button>
-              </Grid>
-
-              {/* Gallery Option */}
-              <Grid item xs={12} sm={6}>
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  startIcon={<PhotoLibraryIcon />}
-                  onClick={handleGalleryClick}
-                  sx={{
-                    height: '80px',
-                    borderColor: '#FDBE16',
-                    color: '#4D4639',
-                    borderWidth: '2px',
-                    borderRadius: '12px',
-                    fontSize: '16px',
-                    fontWeight: 500,
-                    '&:hover': {
-                      borderColor: '#FDBE16',
-                      backgroundColor: '#FFF8E1',
-                      borderWidth: '2px',
-                    },
-                  }}
-                >
-                  Choose from Gallery
-                </Button>
-              </Grid>
-            </Grid>
-
-            {/* Upload Progress */}
-            {uploadingFiles.length > 0 && (
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="subtitle2" sx={{ mb: 1, color: '#666' }}>
-                  Uploading files...
-                </Typography>
-                {uploadingFiles.map((fileId) => (
-                  <Box key={fileId} sx={{ mb: 1 }}>
-                    <Box
-                      sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}
-                    >
-                      <CloudUploadIcon
-                        sx={{ mr: 1, fontSize: 16, color: '#666' }}
-                      />
-                      <Typography variant="body2" sx={{ color: '#666' }}>
-                        {fileId.split('_')[0]}
-                      </Typography>
-                    </Box>
-                    <LinearProgress
-                      variant="determinate"
-                      value={uploadProgress[fileId] || 0}
-                      sx={{
-                        height: 6,
-                        borderRadius: 3,
-                        backgroundColor: '#F5F5F5',
-                        '& .MuiLinearProgress-bar': {
-                          backgroundColor: '#FDBE16',
-                        },
-                      }}
-                    />
-                  </Box>
-                ))}
-              </Box>
-            )}
-
-            {/* Uploaded Images */}
-            {uploadedImages.length > 0 && (
-              <>
-                <Divider sx={{ my: 3 }} />
+              {/* Upload Options */}
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                  width: 288,
+                }}
+              >
+                {/* Upload Buttons */}
                 <Box
                   sx={{
                     display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    mb: 2,
+                    gap: '8px',
+                    width: '100%',
                   }}
                 >
-                  <Typography
-                    variant="h6"
+                  {/* Take Photo Button */}
+                  <Box
+                    onClick={!isUploading ? handleTakePhoto : undefined}
                     sx={{
-                      fontWeight: 500,
-                      color: '#1A1A1A',
+                      width: 140,
+                      height: 104,
+                      border: '1px solid #D0C5B4',
+                      borderRadius: '12px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      padding: '10px 24px 10px 16px',
+                      cursor: isUploading ? 'not-allowed' : 'pointer',
+                      opacity: isUploading ? 0.6 : 1,
+                      '&:hover': {
+                        backgroundColor: !isUploading
+                          ? 'rgba(0, 0, 0, 0.04)'
+                          : 'transparent',
+                      },
                     }}
                   >
-                    Uploaded Images ({uploadedImages.length})
-                  </Typography>
-                  {uploadedImages.length > 0 && (
-                    <Box sx={{ display: 'flex', gap: 1 }}>
-                      {onViewImages && (
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          startIcon={<VisibilityIcon />}
-                          onClick={() => onViewImages()}
-                          sx={{
-                            borderColor: '#E5E5E5',
-                            color: '#666',
-                            '&:hover': {
-                              borderColor: '#FDBE16',
-                              color: '#4D4639',
-                            },
-                          }}
-                        >
-                          View All
-                        </Button>
-                      )}
-                      {onDownload && (
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          startIcon={<DownloadIcon />}
-                          onClick={() => onDownload()}
-                          sx={{
-                            borderColor: '#E5E5E5',
-                            color: '#666',
-                            '&:hover': {
-                              borderColor: '#FDBE16',
-                              color: '#4D4639',
-                            },
-                          }}
-                        >
-                          Download All
-                        </Button>
-                      )}
+                    <Box
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <PhotoCameraIcon
+                        sx={{
+                          width: 26.67,
+                          height: 24,
+                          color: '#1C1B1F',
+                        }}
+                      />
                     </Box>
-                  )}
+                    <Typography
+                      sx={{
+                        fontWeight: 500,
+                        fontSize: '14px',
+                        lineHeight: '20px',
+                        letterSpacing: '0.1px',
+                        textAlign: 'center',
+                        color: '#7C766F',
+                      }}
+                    >
+                      {isUploading ? 'Uploading...' : 'Take Photo'}
+                    </Typography>
+                  </Box>
+
+                  {/* Choose from Gallery Button */}
+                  <Box
+                    onClick={!isUploading ? handleChooseFromGallery : undefined}
+                    sx={{
+                      width: 140,
+                      height: 104,
+                      border: '1px solid #D0C5B4',
+                      borderRadius: '12px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      padding: '10px 24px 10px 16px',
+                      cursor: isUploading ? 'not-allowed' : 'pointer',
+                      opacity: isUploading ? 0.6 : 1,
+                      '&:hover': {
+                        backgroundColor: !isUploading
+                          ? 'rgba(0, 0, 0, 0.04)'
+                          : 'transparent',
+                      },
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <FilterIcon
+                        sx={{
+                          width: 26.67,
+                          height: 26.67,
+                          color: '#1C1B1F',
+                        }}
+                      />
+                    </Box>
+                    <Typography
+                      sx={{
+                        fontWeight: 500,
+                        fontSize: '14px',
+                        lineHeight: '20px',
+                        letterSpacing: '0.1px',
+                        textAlign: 'center',
+                        color: '#7C766F',
+                      }}
+                    >
+                      {isUploading ? 'Uploading...' : 'Choose from Gallery'}
+                    </Typography>
+                  </Box>
                 </Box>
 
-                <Grid container spacing={2}>
-                  {uploadedImages.map((image) => (
-                    <Grid item xs={12} sm={6} md={4} key={image.id}>
-                      <Card
+                {/* Format Info */}
+                <Typography
+                  sx={{
+                    fontWeight: 400,
+                    fontSize: '14px',
+                    lineHeight: '20px',
+                    letterSpacing: '0.25px',
+                    textAlign: 'center',
+                    color: '#5F5E5E',
+                  }}
+                >
+                  Format: jpg, jpeg, size: 50 MB{'\n'}
+                  Up to 4 images
+                </Typography>
+
+                {/* Uploaded Images List */}
+                {uploadedImages.length > 0 && (
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '8px',
+                      width: '100%',
+                    }}
+                  >
+                    {uploadedImages.map((image) => (
+                      <Box
+                        key={image.id}
                         sx={{
-                          borderRadius: '12px',
-                          overflow: 'hidden',
-                          border: '1px solid #E5E5E5',
-                          '&:hover': {
-                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                          },
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          gap: '16px',
+                          padding: '16px',
+                          border: '1px solid #DBDBDB',
+                          borderRadius: '16px',
+                          width: '100%',
                         }}
                       >
-                        <CardMedia
-                          component="img"
-                          height="140"
-                          image={image.previewUrl || image.url}
-                          alt={image.name}
+                        <Box
                           sx={{
-                            objectFit: 'cover',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
                           }}
-                        />
-                        <CardContent sx={{ p: 2 }}>
+                        >
+                          <Box
+                            sx={{
+                              width: 24,
+                              height: 24,
+                              borderRadius: '4px',
+                              backgroundImage: `url(${
+                                image.previewUrl || image.url
+                              })`,
+                              backgroundSize: 'cover',
+                              backgroundPosition: 'center',
+                              backgroundColor: '#f0f0f0',
+                            }}
+                          />
                           <Typography
-                            variant="subtitle2"
                             sx={{
                               fontWeight: 500,
-                              mb: 1,
+                              fontSize: '14px',
+                              lineHeight: '20px',
+                              letterSpacing: '0.1px',
+                              color: '#000000',
+                              maxWidth: '180px',
                               overflow: 'hidden',
                               textOverflow: 'ellipsis',
                               whiteSpace: 'nowrap',
@@ -460,162 +504,164 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
                           >
                             {image.name}
                           </Typography>
-                          <Box
+                        </Box>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                          }}
+                        >
+                          <IconButton
+                            onClick={() => handleRemoveImage(image.id)}
                             sx={{
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              mb: 1,
+                              width: 18,
+                              height: 18,
+                              padding: 0,
+                              '&:hover': {
+                                backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                              },
                             }}
                           >
-                            <Chip
-                              label={formatFileSize(image.size)}
-                              size="small"
+                            <CloseIcon
                               sx={{
-                                backgroundColor: '#F5F5F5',
-                                color: '#666',
-                                fontSize: '12px',
+                                width: 10.5,
+                                height: 10.5,
+                                color: '#1F1B13',
                               }}
                             />
-                          </Box>
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              color: '#999',
-                              display: 'block',
-                            }}
-                          >
-                            {formatDate(image.uploadedAt)}
-                          </Typography>
-                        </CardContent>
-                        <CardActions sx={{ p: 2, pt: 0 }}>
-                          <Box sx={{ display: 'flex', gap: 1, width: '100%' }}>
-                            <Button
-                              size="small"
-                              startIcon={<VisibilityIcon />}
-                              onClick={() => window.open(image.url, '_blank')}
-                              sx={{
-                                color: '#666',
-                                '&:hover': {
-                                  color: '#4D4639',
-                                  backgroundColor: '#FFF8E1',
-                                },
-                              }}
-                            >
-                              View
-                            </Button>
-                            <Button
-                              size="small"
-                              startIcon={<DownloadIcon />}
-                              onClick={() => {
-                                const link = document.createElement('a');
-                                link.href = image.url;
-                                link.download = image.name;
-                                link.click();
-                              }}
-                              sx={{
-                                color: '#666',
-                                '&:hover': {
-                                  color: '#4D4639',
-                                  backgroundColor: '#FFF8E1',
-                                },
-                              }}
-                            >
-                              Download
-                            </Button>
-                          </Box>
-                        </CardActions>
-                      </Card>
-                    </Grid>
-                  ))}
-                </Grid>
-
-                {onReupload && (
-                  <Box sx={{ mt: 3, textAlign: 'center' }}>
-                    <Button
-                      variant="outlined"
-                      startIcon={<RefreshIcon />}
-                      onClick={onReupload}
-                      sx={{
-                        borderColor: '#FDBE16',
-                        color: '#4D4639',
-                        '&:hover': {
-                          borderColor: '#FDBE16',
-                          backgroundColor: '#FFF8E1',
-                        },
-                      }}
-                    >
-                      Re-upload Images
-                    </Button>
+                          </IconButton>
+                        </Box>
+                      </Box>
+                    ))}
                   </Box>
                 )}
-              </>
-            )}
+              </Box>
+            </Box>
+          </Box>
 
-            {uploadedImages.length === 0 && uploadingFiles.length === 0 && (
-              <Box
+          {/* Actions */}
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              width: '100%',
+            }}
+          >
+            {/* Horizontal Divider */}
+            <Divider
+              sx={{
+                width: '100%',
+                borderColor: '#D0C5B4',
+                borderWidth: '1px',
+              }}
+            />
+            {/* Button Container */}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                padding: '16px 24px',
+                width: '100%',
+              }}
+            >
+              <Button
+                onClick={handleStartAIEvaluation}
+                disabled={
+                  isSubmitting || isUploading || uploadedImages.length === 0
+                }
                 sx={{
-                  textAlign: 'center',
-                  py: 4,
-                  color: '#999',
+                  width: 288,
+                  height: 40,
+                  backgroundColor:
+                    uploadedImages.length > 0 && !isUploading
+                      ? '#FDBE16'
+                      : '#D0C5B4',
+                  borderRadius: '100px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '10px 24px',
+                  '&:hover': {
+                    backgroundColor:
+                      uploadedImages.length > 0 && !isUploading
+                        ? '#FDBE16'
+                        : '#D0C5B4',
+                    opacity:
+                      uploadedImages.length > 0 && !isUploading ? 0.9 : 1,
+                  },
+                  '&:active': {
+                    backgroundColor:
+                      uploadedImages.length > 0 && !isUploading
+                        ? '#FDBE16'
+                        : '#D0C5B4',
+                    opacity:
+                      uploadedImages.length > 0 && !isUploading ? 0.8 : 1,
+                  },
+                  '&:disabled': {
+                    backgroundColor: '#D0C5B4',
+                    cursor: 'not-allowed',
+                  },
                 }}
               >
-                <CloudUploadIcon sx={{ fontSize: 48, mb: 2, opacity: 0.5 }} />
-                <Typography variant="body1">No images uploaded yet</Typography>
-                <Typography variant="body2">
-                  Use the options above to add images
+                <Typography
+                  sx={{
+                    fontWeight: 500,
+                    fontSize: '14px',
+                    lineHeight: '20px',
+                    letterSpacing: '0.1px',
+                    color:
+                      uploadedImages.length > 0 && !isUploading
+                        ? '#4D4639'
+                        : '#8D8D8D',
+                    textTransform: 'none',
+                  }}
+                >
+                  {isSubmitting
+                    ? 'Submitting...'
+                    : isUploading
+                    ? 'Uploading Files...'
+                    : 'Start AI Evaluation'}
                 </Typography>
-              </Box>
-            )}
+              </Button>
+            </Box>
           </Box>
-        </Paper>
+        </Box>
       </Modal>
 
-      {/* Hidden File Input */}
+      {/* Hidden file input */}
       <input
-        ref={fileInputRef}
         type="file"
-        multiple
-        accept={allowedFormats.join(',')}
+        ref={fileInputRef}
+        onChange={handleFileSelect}
+        accept="image/jpeg,image/jpg"
         style={{ display: 'none' }}
-        onChange={(e) => handleFileSelect(e.target.files)}
       />
 
-      {/* Camera Modal */}
+      {/* Camera Component */}
       <Camera
         isOpen={isCameraOpen}
         onClose={() => setIsCameraOpen(false)}
         onCapture={handleCameraCapture}
       />
 
-      {/* Success Snackbar */}
+      {/* Toast Notifications */}
       <Snackbar
-        open={!!successMessage}
+        open={toast.open}
         autoHideDuration={4000}
-        onClose={() => setSuccessMessage('')}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        onClose={handleCloseToast}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
         <Alert
-          onClose={() => setSuccessMessage('')}
-          severity="success"
+          onClose={handleCloseToast}
+          severity={toast.severity}
+          variant="filled"
           sx={{ width: '100%' }}
         >
-          {successMessage}
-        </Alert>
-      </Snackbar>
-
-      {/* Error Snackbar */}
-      <Snackbar
-        open={!!errorMessage}
-        autoHideDuration={6000}
-        onClose={() => setErrorMessage('')}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert
-          onClose={() => setErrorMessage('')}
-          severity="error"
-          sx={{ width: '100%' }}
-        >
-          {errorMessage}
+          {toast.message}
         </Alert>
       </Snackbar>
     </>

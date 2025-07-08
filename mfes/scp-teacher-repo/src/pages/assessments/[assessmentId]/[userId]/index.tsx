@@ -28,6 +28,7 @@ const AssessmentDetails = () => {
   const theme = useTheme();
   const { t } = useTranslation();
   const router = useRouter();
+  const { assessmentId, userId } = router.query;
   const [expandedPanel, setExpandedPanel] = useState<string | false>(false);
 
   // Upload Options Popup state
@@ -533,13 +534,12 @@ const AssessmentDetails = () => {
         isOpen={uploadPopupOpen}
         onClose={handleCloseUploadPopup}
         uploadedImages={uploadedImages}
-        onReupload={handleReupload}
-        onViewImages={handleViewImages}
-        onDownload={handleDownload}
         onImageUpload={handleImageUpload}
-        title="Upload Assessment Images"
-        maxFileSize={10 * 1024 * 1024} // 10MB
-        allowedFormats={['image/jpeg', 'image/png', 'image/gif']}
+        userId={typeof userId === 'string' ? userId : undefined}
+        questionSetId={
+          typeof assessmentId === 'string' ? assessmentId : undefined
+        }
+        identifier={typeof assessmentId === 'string' ? assessmentId : undefined}
       />
     </div>
   );
