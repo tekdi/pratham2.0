@@ -104,3 +104,14 @@ export const searchAssessment = async (body: ISearchAssessment) => {
     return error;
   }
 };
+
+export const getAssessmentTracking = async (params: ISearchAssessment) => {
+  const apiUrl = 'https://dev-interface.prathamdigital.org/interface/v1/tracking/assessment/search';
+  try {
+    const response = await post(apiUrl, params);
+    return response?.data;
+  } catch (error) {
+    console.error('Error in getting assessment tracking:', error);
+    throw error;
+  }
+};

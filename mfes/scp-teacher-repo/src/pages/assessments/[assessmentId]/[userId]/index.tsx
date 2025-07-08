@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import {
@@ -10,6 +10,8 @@ import {
   AccordionSummary,
   AccordionDetails,
   Button,
+  TextField,
+  CircularProgress,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
@@ -19,19 +21,52 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useRouter } from 'next/router';
+import GenericModal from '../../../../components/GenericModal';
+import ConfirmationModal from '../../../../components/ConfirmationModal';
+import { getAssessmentTracking } from '@/services/AssesmentService';
+import { format } from 'date-fns';
+
+interface ScoreDetail {
+  questionId: string | null;
+  pass: string;
+  sectionId: string;
+  resValue: string;
+  duration: number;
+  score: number;
+  maxScore: number;
+  queTitle: string;
+}
+
+interface AssessmentTrackingData {
+  assessmentTrackingId: string;
+  userId: string;
+  courseId: string;
+  contentId: string;
+  attemptId: string;
+  createdOn: string;
+  lastAttemptedOn: string;
+  totalMaxScore: number;
+  totalScore: number;
+  updatedOn: string;
+  timeSpent: string;
+  unitId: string;
+  score_details: ScoreDetail[];
+}
 
 const AssessmentDetails = () => {
   const theme = useTheme();
   const { t } = useTranslation();
   const router = useRouter();
+  const { assessmentId, userId } = router.query;
   const [expandedPanel, setExpandedPanel] = useState<string | false>(false);
-
-  const handleAccordionChange =
-    (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-      setExpandedPanel(isExpanded ? panel : false);
-    };
-
-  const [assessmentData] = useState({
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedQuestion, setSelectedQuestion] = useState<any>(null);
+  const [editScore, setEditScore] = useState<string>('');
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [assessmentTrackingData, setAssessmentTrackingData] =
+    useState<AssessmentTrackingData | null>();
+  const [assessmentData, setAssessmentData] = useState({
     studentName: 'Bharat Kumar',
     examType: 'Mid Term Exam',
     date: '2 Feb, 2024',
@@ -79,13 +114,154 @@ const AssessmentDetails = () => {
     ],
   });
 
+  useEffect(() => {
+    const fetchAssessmentData = async () => {
+      if (assessmentId && userId) {
+        try {
+          const response = await getAssessmentTracking({
+            userId: 'fb6b2e58-0f14-4d4f-90e4-bae092e7a235',
+            contentId: 'do_214343524576083968177',
+            courseId: 'do_214343524576083968177',
+            unitId: 'do_214343524576083968177',
+          });
+
+          if (response?.data?.length > 0) {
+            // Find the latest assessment data by comparing timestamps
+            const latestAssessment = response.data.reduce(
+              (
+                latest: AssessmentTrackingData,
+                current: AssessmentTrackingData
+              ) => {
+                const currentDate = Math.max(
+                  new Date(current.createdOn).getTime(),
+                  new Date(current.lastAttemptedOn).getTime(),
+                  new Date(current.updatedOn).getTime()
+                );
+
+                const latestDate = Math.max(
+                  new Date(latest.createdOn).getTime(),
+                  new Date(latest.lastAttemptedOn).getTime(),
+                  new Date(latest.updatedOn).getTime()
+                );
+
+                return currentDate > latestDate ? current : latest;
+              },
+              response.data[0]
+            );
+
+            setAssessmentTrackingData(latestAssessment);
+          }
+        } catch (error) {
+          console.error('Error fetching assessment data:', error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchAssessmentData();
+  }, [assessmentId, userId]);
+
+  const handleAccordionChange =
+    (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+      setExpandedPanel(isExpanded ? panel : false);
+    };
+
   const handleBack = () => {
     router.back();
   };
 
+  const handleScoreClick = (question: ScoreDetail) => {
+    setSelectedQuestion(question);
+    setEditScore(question.score.toString());
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveScore = () => {
+    // TODO: Add API call to save the updated score
+    if (selectedQuestion) {
+      console.log(
+        'Saving score:',
+        editScore,
+        'for question:',
+        selectedQuestion
+      );
+    }
+    setIsEditModalOpen(false);
+  };
+
+  const handleApproveClick = () => {
+    setIsConfirmModalOpen(true);
+  };
+
+  const handleConfirmApprove = () => {
+    // TODO: Add API call to approve marks
+    console.log('Marks approved');
+    setIsConfirmModalOpen(false);
+  };
+
+  // Update parseResValue function
+  const parseResValue = (
+    resValue: string
+  ): { response: string; aiSuggestion: string } => {
+    try {
+      const parsed = JSON.parse(resValue);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        const response = parsed[0];
+        return {
+          response: response.label
+            ? response.label.replace(/<\/?p>/g, '')
+            : response.value || 'No response',
+          aiSuggestion: response.AI_suggestion || 'No AI suggestion available',
+        };
+      }
+      return {
+        response: 'No response',
+        aiSuggestion: 'No AI suggestion available',
+      };
+    } catch (error) {
+      console.error('Error parsing resValue:', error);
+      return {
+        response: 'Invalid response format',
+        aiSuggestion: 'No AI suggestion available',
+      };
+    }
+  };
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '100vh',
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (!assessmentData || !assessmentTrackingData) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '100vh',
+        }}
+      >
+        <Typography>No assessment data found</Typography>
+      </Box>
+    );
+  }
+
   return (
     <div>
       <Header />
+
       <Box
         component="header"
         sx={{
@@ -158,6 +334,14 @@ const AssessmentDetails = () => {
             borderRadius: '12px',
             p: { xs: 2, md: 3 },
             mb: { xs: 2, md: 3 },
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              borderColor: '#1976d2',
+              backgroundColor: '#f5f5f5',
+              transform: 'translateY(-1px)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            },
           }}
         >
           <Box>
@@ -201,6 +385,7 @@ const AssessmentDetails = () => {
         <Button
           variant="contained"
           fullWidth
+          onClick={handleApproveClick}
           sx={{
             bgcolor: '#FDBE16',
             color: '#4D4639',
@@ -233,12 +418,10 @@ const AssessmentDetails = () => {
       >
         <Box
           sx={{
-            // maxWidth: { xs: '360px', md: '800px' },
             margin: '0 auto',
             px: { xs: 2, md: 3 },
           }}
         >
-          {/* Marks Display */}
           <Typography
             sx={{
               color: '#1F1B13',
@@ -249,102 +432,33 @@ const AssessmentDetails = () => {
               mb: { xs: 2, md: 3 },
             }}
           >
-            Marks : {assessmentData.marksObtained}/{assessmentData.totalMarks} (
-            {assessmentData.percentage}%)
+            Marks : {assessmentTrackingData.totalScore}/
+            {assessmentTrackingData.totalMaxScore} (
+            {assessmentTrackingData.totalMaxScore > 0
+              ? (
+                  (assessmentTrackingData.totalScore /
+                    assessmentTrackingData.totalMaxScore) *
+                  100
+                ).toFixed(0)
+              : 0}
+            %)
           </Typography>
 
-          {/* Awaiting Approval Status */}
+          {/* Questions List */}
           <Box
             sx={{
               display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              mb: { xs: 2, md: 3 },
+              flexDirection: 'column',
+              gap: { xs: '16px', md: '24px' },
             }}
           >
-            <Box
-              component="span"
-              sx={{
-                width: { xs: 18, md: 20 },
-                height: { xs: 18, md: 20 },
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                '& svg': {
-                  width: { xs: 15, md: 16 },
-                  height: { xs: 15, md: 16 },
-                  color: '#1C1B1F',
-                },
-              }}
-            >
-              <KeyboardArrowDownIcon />
-            </Box>
-            <Typography
-              sx={{
-                color: '#1F1B13',
-                fontSize: { xs: '14px', md: '16px' },
-                fontWeight: 400,
-                letterSpacing: '1.79%',
-                lineHeight: 1.43,
-              }}
-            >
-              Awaiting Your Approval
-            </Typography>
-          </Box>
-
-          {/* Assessment Info */}
-          <Box
-            sx={{
-              bgcolor: '#F8EFE7',
-              borderRadius: '16px',
-              p: { xs: 2, md: 3 },
-              mb: { xs: 2, md: 3 },
-            }}
-          >
-            <Typography
-              sx={{
-                color: '#7C766F',
-                fontSize: { xs: '12px', md: '14px' },
-                fontWeight: 500,
-                letterSpacing: '4.17%',
-                lineHeight: 1.33,
-                mb: { xs: 1.5, md: 2 },
-              }}
-            >
-              AI Evaluation On : {assessmentData.date}
-            </Typography>
-
-            <Divider sx={{ borderColor: '#D0C5B4', mb: { xs: 1.5, md: 2 } }} />
-
-            <Typography
-              sx={{
-                color: '#7C766F',
-                fontSize: { xs: '12px', md: '14px' },
-                fontWeight: 500,
-                letterSpacing: '4.17%',
-                lineHeight: 1.33,
-                mb: { xs: 2, md: 3 },
-              }}
-            >
-              {assessmentData.questions.filter((q) => q.isCorrect).length} out
-              of {assessmentData.questions.length} correct answers
-            </Typography>
-
-            {/* Questions List */}
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: { xs: '16px', md: '24px' },
-              }}
-            >
-              {assessmentData.questions.map((question, index) => (
+            {assessmentTrackingData?.score_details.map((question, index) => (
+              <Box key={index}>
                 <Box
-                  key={question.id}
                   sx={{
-                    bgcolor: '#FFFFFF',
-                    borderRadius: '8px',
-                    p: { xs: 2, md: 3 },
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '12px',
                   }}
                 >
                   <Box
@@ -353,7 +467,6 @@ const AssessmentDetails = () => {
                       gap: { xs: '16px', md: '24px' },
                       justifyContent: 'space-between',
                       alignItems: 'flex-start',
-                      mb: question.explanation ? { xs: 1, md: 1.5 } : 0,
                     }}
                   >
                     <Box sx={{ flex: 1 }}>
@@ -366,30 +479,27 @@ const AssessmentDetails = () => {
                           lineHeight: 1.43,
                           mb: { xs: 0.5, md: 1 },
                         }}
-                      >
-                        Q{index + 1}. {question.question}
-                      </Typography>
-                      <Typography
-                        sx={{
-                          color: question.isCorrect ? '#1A8825' : '#BA1A1A',
-                          fontSize: { xs: '16px', md: '18px' },
-                          fontWeight: 500,
-                          letterSpacing: '0.94%',
-                          lineHeight: 1.5,
+                        dangerouslySetInnerHTML={{
+                          __html: `Q${index + 1}. ${question.queTitle}`,
                         }}
-                      >
-                        {question.answer}
-                      </Typography>
+                      />
                     </Box>
                     <Box
+                      onClick={() => handleScoreClick(question)}
                       sx={{
                         display: 'flex',
                         alignItems: 'center',
                         gap: '4px',
                         padding: { xs: '4px 8px', md: '6px 12px' },
-                        bgcolor: question.isCorrect ? '#1A8825' : '#BA1A1A',
+                        bgcolor:
+                          question.pass.toLowerCase() === 'yes'
+                            ? question.score === question.maxScore
+                              ? '#1A8825'
+                              : '#FFB800'
+                            : '#BA1A1A',
                         borderRadius: '4px',
                         border: '1px solid #FFFFFF',
+                        cursor: 'pointer',
                       }}
                     >
                       <Typography
@@ -398,7 +508,7 @@ const AssessmentDetails = () => {
                           fontSize: { xs: '14px', md: '16px' },
                         }}
                       >
-                        {question.score}/{question.marks}
+                        {question.score}/{question.maxScore}
                       </Typography>
                       <BorderColorIcon
                         sx={{
@@ -408,78 +518,135 @@ const AssessmentDetails = () => {
                       />
                     </Box>
                   </Box>
-
-                  {!question.isCorrect && question.explanation && (
-                    <Accordion
-                      expanded={expandedPanel === `panel-${question.id}`}
-                      onChange={handleAccordionChange(`panel-${question.id}`)}
-                      sx={{
-                        bgcolor: '#F7F7F7',
-                        border: '1px solid #D0C5B4',
-                        borderRadius: '8px !important',
-                        boxShadow: 'none',
-                        '&:before': {
-                          display: 'none',
-                        },
-                        '& .MuiAccordionSummary-root': {
-                          minHeight: { xs: '48px', md: '56px' },
-                          p: 0,
-                        },
-                        '& .MuiAccordionSummary-content': {
-                          m: 0,
-                        },
-                      }}
-                    >
-                      <AccordionSummary
-                        expandIcon={
-                          expandedPanel === `panel-${question.id}` ? (
-                            <KeyboardArrowUpIcon sx={{ color: '#1C1B1F' }} />
-                          ) : (
-                            <KeyboardArrowDownIcon sx={{ color: '#1C1B1F' }} />
-                          )
-                        }
+                  {/* Student Response and AI Suggestion */}
+                  <Typography
+                    sx={{
+                      fontSize: { xs: '14px', md: '16px' },
+                      fontWeight: 400,
+                      mb: 1,
+                      color:
+                        question.pass.toLowerCase() === 'yes'
+                          ? question.score === question.maxScore
+                            ? '#1A8825'
+                            : '#FFB800'
+                          : '#BA1A1A',
+                    }}
+                  >
+                    {parseResValue(question.resValue).response}
+                  </Typography>
+                  {parseResValue(question.resValue).aiSuggestion &&
+                    parseResValue(question.resValue).aiSuggestion !==
+                      'No AI suggestion available' && (
+                      <Accordion
+                        expanded={expandedPanel === `panel-${index}`}
+                        onChange={handleAccordionChange(`panel-${index}`)}
                         sx={{
-                          px: { xs: 2, md: 3 },
-                          py: { xs: 1, md: 1.5 },
+                          backgroundColor: '#FFF5F5',
+                          boxShadow: 'none',
+                          borderRadius: '8px',
+                          border: '1px solid #FFE6E6',
+                          '&:before': {
+                            display: 'none',
+                          },
+                          '&.Mui-expanded': {
+                            margin: 0,
+                          },
                         }}
                       >
-                        <Typography
+                        <AccordionSummary
+                          expandIcon={
+                            <KeyboardArrowDownIcon sx={{ color: '#666666' }} />
+                          }
                           sx={{
-                            color: '#1F1B13',
-                            fontSize: { xs: '14px', md: '16px' },
-                            fontWeight: 500,
+                            padding: '12px 16px',
+                            minHeight: 'unset',
+                            '&.Mui-expanded': {
+                              minHeight: '48px',
+                            },
+                            '& .MuiAccordionSummary-content': {
+                              margin: 0,
+                              '&.Mui-expanded': {
+                                margin: '0px 0',
+                              },
+                            },
                           }}
                         >
-                          Explanation
-                        </Typography>
-                      </AccordionSummary>
-                      <AccordionDetails
-                        sx={{
-                          px: { xs: 2, md: 3 },
-                          py: { xs: 1, md: 1.5 },
-                          borderTop: '1px solid #D0C5B4',
-                        }}
-                      >
-                        <Typography
-                          sx={{
-                            color: '#1F1B13',
-                            fontSize: { xs: '14px', md: '16px' },
-                            fontWeight: 400,
-                            letterSpacing: '1.79%',
-                            lineHeight: 1.43,
-                          }}
+                          <Typography
+                            sx={{
+                              color: '#666666',
+                              fontSize: { xs: '14px', md: '16px' },
+                              fontWeight: 500,
+                              letterSpacing: '0.5px',
+                              textTransform: 'uppercase',
+                            }}
+                          >
+                            Explanation:
+                          </Typography>
+                        </AccordionSummary>
+                        <AccordionDetails
+                          sx={{ padding: '0px 16px 16px 16px' }}
                         >
-                          {question.explanation}
-                        </Typography>
-                      </AccordionDetails>
-                    </Accordion>
-                  )}
+                          <Typography
+                            sx={{
+                              color: '#666666',
+                              fontSize: { xs: '14px', md: '16px' },
+                              fontWeight: 400,
+                              lineHeight: 1.6,
+                            }}
+                          >
+                            {parseResValue(question.resValue).aiSuggestion}
+                          </Typography>
+                        </AccordionDetails>
+                      </Accordion>
+                    )}
                 </Box>
-              ))}
-            </Box>
+              </Box>
+            ))}
           </Box>
         </Box>
       </Box>
+
+      {/* Edit Modal */}
+      <GenericModal
+        open={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        title="Edit Marks"
+        onSave={handleSaveScore}
+        maxWidth="400px"
+      >
+        <Box sx={{ width: '100%' }}>
+          <TextField
+            label="Marks"
+            type="number"
+            value={editScore}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (
+                selectedQuestion &&
+                Number(value) <= selectedQuestion.maxScore
+              ) {
+                setEditScore(value);
+              }
+            }}
+            fullWidth
+            required
+            inputProps={{
+              min: 0,
+              max: selectedQuestion?.maxScore || 0,
+            }}
+            helperText={`Maximum marks: ${selectedQuestion?.maxScore || 0}`}
+          />
+        </Box>
+      </GenericModal>
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        open={isConfirmModalOpen}
+        onClose={() => setIsConfirmModalOpen(false)}
+        onConfirm={handleConfirmApprove}
+        title="Are you sure you want to approve Marks?"
+        message="Be sure to review the answers and make any necessary changes to the marks before approving the final scores."
+      />
     </div>
   );
 };
