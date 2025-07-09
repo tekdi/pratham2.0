@@ -126,7 +126,7 @@ const AssessmentDetails = () => {
     name: '',
     lastName: '',
   });
-  const [assessmentType, setAssessmentType] = useState<any>('');
+  const [assessmentName, setAssessmentName] = useState<any>('');
 
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
@@ -409,7 +409,7 @@ const AssessmentDetails = () => {
       if (assessmentId) {
         const response = await getAssessmentDetails(assessmentId as string);
         console.log('response', response.name);
-        setAssessmentType(response?.name);
+        setAssessmentName(response?.name);
       }
     };
     fetchAssessmentDetails();
@@ -517,7 +517,7 @@ const AssessmentDetails = () => {
               letterSpacing: '0.71%',
             }}
           >
-            {assessmentType}
+            {assessmentName}
           </Typography>
         </Box>
       </Box>
