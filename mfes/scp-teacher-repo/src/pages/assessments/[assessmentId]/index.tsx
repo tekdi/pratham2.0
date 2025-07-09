@@ -398,7 +398,7 @@ const AssessmentDetails: React.FC = () => {
     try {
       setDownloading(true);
       // Simulate download delay
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      /*await new Promise((resolve) => setTimeout(resolve, 2000));
 
       // Create download link
       const element = document.createElement('a');
@@ -411,7 +411,18 @@ const AssessmentDetails: React.FC = () => {
       }.pdf`;
       document.body.appendChild(element);
       element.click();
-      document.body.removeChild(element);
+      document.body.removeChild(element);*/
+
+      const downloadUrl =
+        process.env.NEXT_PUBLIC_ADMIN_SBPLAYER?.replace('sbplayer', '') +
+        '/qp?do_id=' +
+        assessmentId;
+      const newWindow = window.open(
+        downloadUrl,
+        '_blank',
+        'noopener,noreferrer'
+      );
+      if (newWindow) newWindow.focus();
 
       showToastMessage(
         t('ASSESSMENTS.DOWNLOAD_SUCCESS') ||
