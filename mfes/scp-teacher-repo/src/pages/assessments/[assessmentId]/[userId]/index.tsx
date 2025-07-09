@@ -35,6 +35,7 @@ import {
   UploadedImage,
 } from '../../../../components/assessment';
 import { getUserDetails } from '../../../../services/ProfileService';
+import FileUploadIcon from '@mui/icons-material/FileUpload';
 
 interface ScoreDetail {
   questionId: string | null;
@@ -407,10 +408,9 @@ const AssessmentDetails = () => {
     const fetchAssessmentDetails = async () => {
       if (assessmentId) {
         const response = await getAssessmentDetails(assessmentId as string);
-        console.log('response', response.assessmentType);
-        setAssessmentType(response?.assessmentType);
+        console.log('response', response.name);
+        setAssessmentType(response?.name);
       }
-      console.log('userDetails', userDetails);
     };
     fetchAssessmentDetails();
   }, []);
@@ -547,16 +547,16 @@ const AssessmentDetails = () => {
           <Box>
             <Typography
               sx={{
-                color: '#000000',
+                color: '#635E57',
                 fontSize: { xs: '14px', md: '16px' },
-                fontWeight: 500,
-                letterSpacing: '0.71%',
-                lineHeight: 1.43,
+                fontWeight: 400,
+                letterSpacing: '0.1px',
               }}
             >
-              {assessmentData.uploadedImages} images uploaded
+              {/* {assessmentData.uploadedImages} images uploaded */}
+              No images uploaded
             </Typography>
-            <Typography
+            {/* <Typography
               sx={{
                 color: '#7C766F',
                 fontSize: { xs: '12px', md: '14px' },
@@ -566,7 +566,7 @@ const AssessmentDetails = () => {
               }}
             >
               {assessmentData.date}
-            </Typography>
+            </Typography> */}
           </Box>
           <IconButton
             sx={{
@@ -577,7 +577,7 @@ const AssessmentDetails = () => {
               },
             }}
           >
-            <ArrowForwardIcon />
+            <FileUploadIcon />
           </IconButton>
         </Box>
       </Box>
