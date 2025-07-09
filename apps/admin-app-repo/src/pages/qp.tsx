@@ -18,7 +18,8 @@ import {
 } from '@react-pdf/renderer';
 import moment from 'moment';
 
-//QuestionPaperPDF
+// utils/encryption.ts
+import { useSearchParams } from 'next/navigation';
 
 const QuestionPaperPDF = ({ data }: any) => {
   Font.register({
@@ -316,9 +317,17 @@ const QuestionPaperPDF = ({ data }: any) => {
 };
 
 export default function QP() {
-  const do_var = 'ewhfnfi3qy4587364v8t7';
-  //data fetch variable
+  const searchParams = useSearchParams();
+  const do_var = 'do_id';
   const [do_id, set_do_id] = useState<string | null>(null);
+  const do_id_from_url = searchParams.get(do_var);
+  useEffect(() => {
+    if (do_id_from_url) {
+      set_do_id(do_id_from_url);
+    }
+  }, [do_id_from_url]);
+
+  //data fetch variable
   const [status, set_status] = useState<string>('');
   const [error, set_error] = useState<boolean>(false);
   const [content_details, set_content_details] = useState<any>(null);
@@ -328,7 +337,8 @@ export default function QP() {
   useEffect(() => {
     const getDoIdAndDownload = async () => {
       set_status('Getting DO ID');
-      let local_do_id: string | null = sessionStorage.getItem(do_var);
+      let local_do_id: string | null = do_id;
+      console.log('######## doid', local_do_id);
       if (local_do_id) {
         set_status('Got DO ID');
         set_do_id(local_do_id);
@@ -337,8 +347,10 @@ export default function QP() {
         set_error(true);
       }
     };
-    getDoIdAndDownload();
-  }, [list_temp_load]);
+    if (do_id) {
+      getDoIdAndDownload();
+    }
+  }, [do_id]);
 
   useEffect(() => {
     if (error === true) {
