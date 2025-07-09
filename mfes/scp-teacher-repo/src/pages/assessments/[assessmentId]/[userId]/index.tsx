@@ -229,14 +229,10 @@ const AssessmentDetails = () => {
       if (assessmentId && userId) {
         try {
           const response = await getAssessmentTracking({
-            // userId: userId as string,
-            // contentId: assessmentId as string,
-            // courseId: assessmentId as string,
-            // unitId: assessmentId as string,
-            userId: 'fb6b2e58-0f14-4d4f-90e4-bae092e7a235',
-            contentId: 'do_214343524576083968177',
-            courseId: 'do_214343524576083968177',
-            unitId: 'do_214343524576083968177',
+            userId: userId as string,
+            contentId: assessmentId as string,
+            courseId: assessmentId as string,
+            unitId: assessmentId as string,
           });
 
           if (response?.data?.length > 0) {
