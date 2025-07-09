@@ -113,6 +113,7 @@ const AssessmentDetails = () => {
   const [editScore, setEditScore] = useState<string>('');
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [editLoading, setEditLoading] = useState(false);
   const [assessmentTrackingData, setAssessmentTrackingData] =
     useState<AssessmentTrackingData | null>();
 
@@ -220,15 +221,10 @@ const AssessmentDetails = () => {
       if (assessmentId && userId) {
         try {
           const response = await getAssessmentTracking({
-            // userId: userId as string,
-            // contentId: assessmentId as string,
-            // courseId: assessmentId as string,
-            // unitId: assessmentId as string,
-
-            userId: 'fb6b2e58-0f14-4d4f-90e4-bae092e7a235',
-            contentId: 'do_214343524576083968177',
-            courseId: 'do_214343524576083968177',
-            unitId: 'do_214343524576083968177',
+            userId: userId as string,
+            contentId: assessmentId as string,
+            courseId: assessmentId as string,
+            unitId: assessmentId as string,
           });
 
           if (response?.data?.length > 0) {
@@ -286,7 +282,7 @@ const AssessmentDetails = () => {
     if (!selectedQuestion || !assessmentTrackingData) return;
 
     try {
-      setLoading(true);
+      setEditLoading(true);
 
       // Find the question in the assessment summary
       const updatedAssessmentSummary = assessmentTrackingData.score_details.map(
@@ -369,7 +365,7 @@ const AssessmentDetails = () => {
         severity: 'error',
       });
     } finally {
-      setLoading(false);
+      setEditLoading(false);
     }
   };
 
@@ -418,25 +414,9 @@ const AssessmentDetails = () => {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          minHeight: '100vh',
         }}
       >
         <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (!assessmentData || !assessmentTrackingData) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: '100vh',
-        }}
-      >
-        <Typography>No assessment data found</Typography>
       </Box>
     );
   }
@@ -564,231 +544,250 @@ const AssessmentDetails = () => {
             <ArrowForwardIcon />
           </IconButton>
         </Box>
-
-        {/* Approve Button */}
-        <Button
-          variant="contained"
-          fullWidth
-          onClick={handleApproveClick}
-          sx={{
-            bgcolor: '#FDBE16',
-            color: '#4D4639',
-            textTransform: 'none',
-            borderRadius: '100px',
-            height: { xs: '40px', md: '48px' },
-            fontSize: { xs: '14px', md: '16px' },
-            fontWeight: 500,
-            letterSpacing: '0.71%',
-            maxWidth: { xs: '100%', md: '400px' },
-            display: 'block',
-            margin: '0 auto',
-            '&:hover': {
-              bgcolor: '#FDBE16',
-            },
-          }}
-        >
-          Approve Marks & Notify Learner
-        </Button>
       </Box>
 
-      <Box
-        sx={{
-          bgcolor: '#F8EFE7',
-          minHeight: 'calc(100vh - 64px)',
-          width: '100%',
-          pt: { xs: 2, md: 3 },
-          pb: { xs: 4, md: 6 },
-        }}
-      >
+      {!assessmentData || !assessmentTrackingData ? (
         <Box
           sx={{
-            margin: '0 auto',
-            px: { xs: 2, md: 3 },
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
         >
-          <Typography
+          <Typography>No assessment data found</Typography>
+        </Box>
+      ) : (
+        <Box
+          sx={{
+            bgcolor: '#F8EFE7',
+            minHeight: 'calc(100vh - 64px)',
+            width: '100%',
+            pt: { xs: 2, md: 3 },
+            pb: { xs: 4, md: 6 },
+          }}
+        >
+          {/* Approve Button */}
+          <Button
+            variant="contained"
+            fullWidth
+            onClick={handleApproveClick}
             sx={{
-              color: '#1F1B13',
+              bgcolor: '#FDBE16',
+              color: '#4D4639',
+              textTransform: 'none',
+              borderRadius: '100px',
+              height: { xs: '40px', md: '48px' },
               fontSize: { xs: '14px', md: '16px' },
               fontWeight: 500,
               letterSpacing: '0.71%',
-              lineHeight: 1.43,
-              mb: { xs: 2, md: 3 },
+              maxWidth: { xs: '100%', md: '400px' },
+              display: 'block',
+              margin: '0 auto',
+              '&:hover': {
+                bgcolor: '#FDBE16',
+              },
             }}
           >
-            Marks : {assessmentTrackingData.totalScore}/
-            {assessmentTrackingData.totalMaxScore} (
-            {assessmentTrackingData.totalMaxScore > 0
-              ? (
-                  (assessmentTrackingData.totalScore /
-                    assessmentTrackingData.totalMaxScore) *
-                  100
-                ).toFixed(0)
-              : 0}
-            %)
-          </Typography>
-
-          {/* Questions List */}
+            Approve Marks & Notify Learner
+          </Button>
           <Box
             sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: { xs: '16px', md: '24px' },
+              margin: '0 auto',
+              px: { xs: 2, md: 3 },
             }}
           >
-            {assessmentTrackingData?.score_details.map((question, index) => (
-              <Box key={index}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '12px',
-                  }}
-                >
+            <Typography
+              sx={{
+                color: '#1F1B13',
+                fontSize: { xs: '14px', md: '16px' },
+                fontWeight: 500,
+                letterSpacing: '0.71%',
+                lineHeight: 1.43,
+                mb: { xs: 2, md: 3 },
+              }}
+            >
+              {assessmentTrackingData ? (
+                <>
+                  Marks: {assessmentTrackingData.totalScore || 0}/
+                  {assessmentTrackingData.totalMaxScore || 0} (
+                  {assessmentTrackingData.totalMaxScore > 0
+                    ? Math.round(
+                        (assessmentTrackingData.totalScore /
+                          assessmentTrackingData.totalMaxScore) *
+                          100
+                      )
+                    : 0}
+                  %)
+                </>
+              ) : (
+                'Marks: Not Available'
+              )}
+            </Typography>
+
+            {/* Questions List */}
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: { xs: '16px', md: '24px' },
+              }}
+            >
+              {assessmentTrackingData.score_details.map((question, index) => (
+                <Box key={index}>
                   <Box
                     sx={{
                       display: 'flex',
-                      gap: { xs: '16px', md: '24px' },
-                      justifyContent: 'space-between',
-                      alignItems: 'flex-start',
+                      flexDirection: 'column',
+                      gap: '12px',
                     }}
                   >
-                    <Box sx={{ flex: 1 }}>
-                      <Typography
-                        sx={{
-                          color: '#1F1B13',
-                          fontSize: { xs: '14px', md: '16px' },
-                          fontWeight: 400,
-                          letterSpacing: '1.79%',
-                          lineHeight: 1.43,
-                          mb: { xs: 0.5, md: 1 },
-                        }}
-                        dangerouslySetInnerHTML={{
-                          __html: `Q${index + 1}. ${question.queTitle}`,
-                        }}
-                      />
-                    </Box>
                     <Box
-                      onClick={() => handleScoreClick(question)}
                       sx={{
                         display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                        padding: { xs: '4px 8px', md: '6px 12px' },
-                        bgcolor:
+                        gap: { xs: '16px', md: '24px' },
+                        justifyContent: 'space-between',
+                        alignItems: 'flex-start',
+                      }}
+                    >
+                      <Box sx={{ flex: 1 }}>
+                        <Typography
+                          sx={{
+                            color: '#1F1B13',
+                            fontSize: { xs: '14px', md: '16px' },
+                            fontWeight: 400,
+                            letterSpacing: '1.79%',
+                            lineHeight: 1.43,
+                            mb: { xs: 0.5, md: 1 },
+                          }}
+                          dangerouslySetInnerHTML={{
+                            __html: `Q${index + 1}. ${question.queTitle}`,
+                          }}
+                        />
+                      </Box>
+                      <Box
+                        onClick={() => handleScoreClick(question)}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          padding: { xs: '4px 8px', md: '6px 12px' },
+                          bgcolor:
+                            question.pass.toLowerCase() === 'yes'
+                              ? question.score === question.maxScore
+                                ? '#1A8825'
+                                : '#FFB800'
+                              : '#BA1A1A',
+                          borderRadius: '4px',
+                          border: '1px solid #FFFFFF',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            color: '#FFFFFF',
+                            fontSize: { xs: '14px', md: '16px' },
+                          }}
+                        >
+                          {question.score}/{question.maxScore}
+                        </Typography>
+                        <BorderColorIcon
+                          sx={{
+                            color: '#FFFFFF',
+                            fontSize: { xs: 18, md: 20 },
+                          }}
+                        />
+                      </Box>
+                    </Box>
+                    {/* Student Response and AI Suggestion */}
+                    <Typography
+                      sx={{
+                        fontSize: { xs: '14px', md: '16px' },
+                        fontWeight: 400,
+                        mb: 1,
+                        color:
                           question.pass.toLowerCase() === 'yes'
                             ? question.score === question.maxScore
                               ? '#1A8825'
                               : '#FFB800'
                             : '#BA1A1A',
-                        borderRadius: '4px',
-                        border: '1px solid #FFFFFF',
-                        cursor: 'pointer',
                       }}
                     >
-                      <Typography
-                        sx={{
-                          color: '#FFFFFF',
-                          fontSize: { xs: '14px', md: '16px' },
-                        }}
-                      >
-                        {question.score}/{question.maxScore}
-                      </Typography>
-                      <BorderColorIcon
-                        sx={{
-                          color: '#FFFFFF',
-                          fontSize: { xs: 18, md: 20 },
-                        }}
-                      />
-                    </Box>
-                  </Box>
-                  {/* Student Response and AI Suggestion */}
-                  <Typography
-                    sx={{
-                      fontSize: { xs: '14px', md: '16px' },
-                      fontWeight: 400,
-                      mb: 1,
-                      color:
-                        question.pass.toLowerCase() === 'yes'
-                          ? question.score === question.maxScore
-                            ? '#1A8825'
-                            : '#FFB800'
-                          : '#BA1A1A',
-                    }}
-                  >
-                    {parseResValue(question.resValue).response}
-                  </Typography>
-                  {parseResValue(question.resValue).aiSuggestion &&
-                    parseResValue(question.resValue).aiSuggestion !==
-                      'No AI suggestion available' && (
-                      <Accordion
-                        expanded={expandedPanel === `panel-${index}`}
-                        onChange={handleAccordionChange(`panel-${index}`)}
-                        sx={{
-                          backgroundColor: '#FFF5F5',
-                          boxShadow: 'none',
-                          borderRadius: '8px',
-                          border: '1px solid #FFE6E6',
-                          '&:before': {
-                            display: 'none',
-                          },
-                          '&.Mui-expanded': {
-                            margin: 0,
-                          },
-                        }}
-                      >
-                        <AccordionSummary
-                          expandIcon={
-                            <KeyboardArrowDownIcon sx={{ color: '#666666' }} />
-                          }
+                      {parseResValue(question.resValue).response}
+                    </Typography>
+                    {parseResValue(question.resValue).aiSuggestion &&
+                      parseResValue(question.resValue).aiSuggestion !==
+                        'No AI suggestion available' && (
+                        <Accordion
+                          expanded={expandedPanel === `panel-${index}`}
+                          onChange={handleAccordionChange(`panel-${index}`)}
                           sx={{
-                            padding: '12px 16px',
-                            minHeight: 'unset',
-                            '&.Mui-expanded': {
-                              minHeight: '48px',
+                            backgroundColor: '#FFF5F5',
+                            boxShadow: 'none',
+                            borderRadius: '8px',
+                            border: '1px solid #FFE6E6',
+                            '&:before': {
+                              display: 'none',
                             },
-                            '& .MuiAccordionSummary-content': {
+                            '&.Mui-expanded': {
                               margin: 0,
-                              '&.Mui-expanded': {
-                                margin: '0px 0',
-                              },
                             },
                           }}
                         >
-                          <Typography
+                          <AccordionSummary
+                            expandIcon={
+                              <KeyboardArrowDownIcon
+                                sx={{ color: '#666666' }}
+                              />
+                            }
                             sx={{
-                              color: '#666666',
-                              fontSize: { xs: '14px', md: '16px' },
-                              fontWeight: 500,
-                              letterSpacing: '0.5px',
-                              textTransform: 'uppercase',
+                              padding: '12px 16px',
+                              minHeight: 'unset',
+                              '&.Mui-expanded': {
+                                minHeight: '48px',
+                              },
+                              '& .MuiAccordionSummary-content': {
+                                margin: 0,
+                                '&.Mui-expanded': {
+                                  margin: '0px 0',
+                                },
+                              },
                             }}
                           >
-                            Explanation:
-                          </Typography>
-                        </AccordionSummary>
-                        <AccordionDetails
-                          sx={{ padding: '0px 16px 16px 16px' }}
-                        >
-                          <Typography
-                            sx={{
-                              color: '#666666',
-                              fontSize: { xs: '14px', md: '16px' },
-                              fontWeight: 400,
-                              lineHeight: 1.6,
-                            }}
+                            <Typography
+                              sx={{
+                                color: '#666666',
+                                fontSize: { xs: '14px', md: '16px' },
+                                fontWeight: 500,
+                                letterSpacing: '0.5px',
+                                textTransform: 'uppercase',
+                              }}
+                            >
+                              Explanation:
+                            </Typography>
+                          </AccordionSummary>
+                          <AccordionDetails
+                            sx={{ padding: '0px 16px 16px 16px' }}
                           >
-                            {parseResValue(question.resValue).aiSuggestion}
-                          </Typography>
-                        </AccordionDetails>
-                      </Accordion>
-                    )}
+                            <Typography
+                              sx={{
+                                color: '#666666',
+                                fontSize: { xs: '14px', md: '16px' },
+                                fontWeight: 400,
+                                lineHeight: 1.6,
+                              }}
+                            >
+                              {parseResValue(question.resValue).aiSuggestion}
+                            </Typography>
+                          </AccordionDetails>
+                        </Accordion>
+                      )}
+                  </Box>
                 </Box>
-              </Box>
-            ))}
+              ))}
+            </Box>
           </Box>
         </Box>
-      </Box>
+      )}
 
       {/* Edit Modal */}
       <GenericModal
@@ -798,7 +797,7 @@ const AssessmentDetails = () => {
         onSave={handleSaveScore}
         maxWidth="400px"
       >
-        <Box sx={{ width: '100%' }}>
+        <Box sx={{ width: '100%', position: 'relative' }}>
           <TextField
             label="Marks"
             type="number"
@@ -819,8 +818,25 @@ const AssessmentDetails = () => {
               max: selectedQuestion?.maxScore || 0,
             }}
             helperText={`Maximum marks: ${selectedQuestion?.maxScore || 0}`}
-            disabled={loading}
+            disabled={editLoading}
           />
+          {editLoading && (
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: 'rgba(255, 255, 255, 0.7)',
+              }}
+            >
+              <CircularProgress size={24} />
+            </Box>
+          )}
         </Box>
       </GenericModal>
 
