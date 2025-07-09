@@ -26,6 +26,7 @@ import { useRouter } from 'next/router';
 import GenericModal from '../../../../components/GenericModal';
 import ConfirmationModal from '../../../../components/ConfirmationModal';
 import {
+  getAssessmentDetails,
   getAssessmentTracking,
   updateAssessmentScore,
 } from '../../../../services/AssesmentService';
@@ -33,6 +34,8 @@ import {
   UploadOptionsPopup,
   UploadedImage,
 } from '../../../../components/assessment';
+import { getUserDetails } from '../../../../services/ProfileService';
+import FileUploadIcon from '@mui/icons-material/FileUpload';
 
 interface ScoreDetail {
   questionId: string | null;
@@ -119,6 +122,11 @@ const AssessmentDetails = () => {
 
   // Upload Options Popup state
   const [uploadPopupOpen, setUploadPopupOpen] = useState(false);
+  const [userDetails, setUserDetails] = useState<any>({
+    name: '',
+    lastName: '',
+  });
+  const [assessmentName, setAssessmentName] = useState<any>('');
 
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
@@ -379,6 +387,34 @@ const AssessmentDetails = () => {
     setIsConfirmModalOpen(false);
   };
 
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      if (userId) {
+        const userDetailsResponse = await getUserDetails(
+          userId as string,
+          true
+        );
+        console.log('userDetailsResponse', userDetailsResponse);
+        setUserDetails({
+          name: userDetailsResponse?.result?.userData?.firstName,
+          lastName: userDetailsResponse?.result?.userData?.lastName,
+        });
+      }
+    };
+    fetchUserDetails();
+  }, []);
+
+  useEffect(() => {
+    const fetchAssessmentDetails = async () => {
+      if (assessmentId) {
+        const response = await getAssessmentDetails(assessmentId as string);
+        console.log('response', response.name);
+        setAssessmentName(response?.name);
+      }
+    };
+    fetchAssessmentDetails();
+  }, []);
+
   // Update parseResValue function
   const parseResValue = (
     resValue: string
@@ -470,7 +506,7 @@ const AssessmentDetails = () => {
               fontWeight: 400,
             }}
           >
-            {assessmentData.studentName}
+            {userDetails.name} {userDetails.lastName}
           </Typography>
           <Typography
             sx={{
@@ -481,7 +517,7 @@ const AssessmentDetails = () => {
               letterSpacing: '0.71%',
             }}
           >
-            {assessmentData.examType}
+            {assessmentName}
           </Typography>
         </Box>
       </Box>
@@ -511,16 +547,16 @@ const AssessmentDetails = () => {
           <Box>
             <Typography
               sx={{
-                color: '#000000',
+                color: '#635E57',
                 fontSize: { xs: '14px', md: '16px' },
-                fontWeight: 500,
-                letterSpacing: '0.71%',
-                lineHeight: 1.43,
+                fontWeight: 400,
+                letterSpacing: '0.1px',
               }}
             >
-              {assessmentData.uploadedImages} images uploaded
+              {/* {assessmentData.uploadedImages} images uploaded */}
+              No images uploaded
             </Typography>
-            <Typography
+            {/* <Typography
               sx={{
                 color: '#7C766F',
                 fontSize: { xs: '12px', md: '14px' },
@@ -530,7 +566,7 @@ const AssessmentDetails = () => {
               }}
             >
               {assessmentData.date}
-            </Typography>
+            </Typography> */}
           </Box>
           <IconButton
             sx={{
@@ -541,7 +577,7 @@ const AssessmentDetails = () => {
               },
             }}
           >
-            <ArrowForwardIcon />
+            <FileUploadIcon />
           </IconButton>
         </Box>
       </Box>
@@ -557,58 +593,23 @@ const AssessmentDetails = () => {
           <Typography>No assessment data found</Typography>
         </Box>
       ) : (
-        <Box
-          sx={{
-            bgcolor: '#F8EFE7',
-            minHeight: 'calc(100vh - 64px)',
-            width: '100%',
-            pt: { xs: 2, md: 3 },
-            pb: { xs: 4, md: 6 },
-          }}
-        >
-          {/* Approve Button */}
-          <Button
-            variant="contained"
-            fullWidth
-            onClick={handleApproveClick}
+        <>
+          <Typography
             sx={{
-              bgcolor: '#FDBE16',
-              color: '#4D4639',
-              textTransform: 'none',
-              borderRadius: '100px',
-              height: { xs: '40px', md: '48px' },
+              color: '#1F1B13',
               fontSize: { xs: '14px', md: '16px' },
               fontWeight: 500,
               letterSpacing: '0.71%',
-              maxWidth: { xs: '100%', md: '400px' },
-              display: 'block',
-              margin: '0 auto',
-              '&:hover': {
-                bgcolor: '#FDBE16',
-              },
+              lineHeight: 1.43,
+              mb: { xs: 2, md: 3 },
+              mx: { xs: 2, md: 3 },
             }}
           >
-            Approve Marks & Notify Learner
-          </Button>
-          <Box
-            sx={{
-              margin: '0 auto',
-              px: { xs: 2, md: 3 },
-            }}
-          >
-            <Typography
-              sx={{
-                color: '#1F1B13',
-                fontSize: { xs: '14px', md: '16px' },
-                fontWeight: 500,
-                letterSpacing: '0.71%',
-                lineHeight: 1.43,
-                mb: { xs: 2, md: 3 },
-              }}
-            >
-              {assessmentTrackingData ? (
-                <>
-                  Marks: {assessmentTrackingData.totalScore || 0}/
+            {assessmentTrackingData ? (
+              <>
+                Marks:{' '}
+                <span style={{ color: '#1A8825' }}>
+                  {assessmentTrackingData.totalScore || 0}/
                   {assessmentTrackingData.totalMaxScore || 0} (
                   {assessmentTrackingData.totalMaxScore > 0
                     ? Math.round(
@@ -618,175 +619,237 @@ const AssessmentDetails = () => {
                       )
                     : 0}
                   %)
-                </>
-              ) : (
-                'Marks: Not Available'
-              )}
-            </Typography>
-
-            {/* Questions List */}
-            <Box
+                </span>
+              </>
+            ) : (
+              'Marks: Not Available'
+            )}
+          </Typography>
+          <Box
+            sx={{
+              px: { xs: 2, md: 3 },
+            }}
+          >
+            <Button
+              variant="contained"
+              fullWidth
+              onClick={handleApproveClick}
               sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: { xs: '16px', md: '24px' },
+                bgcolor: '#FDBE16',
+                color: '#4D4639',
+                textTransform: 'none',
+                borderRadius: '100px',
+                height: { xs: '40px', md: '48px' },
+                fontSize: { xs: '14px', md: '16px' },
+                fontWeight: 500,
+                letterSpacing: '0.71%',
+                maxWidth: { xs: '100%', md: '400px' },
+                display: 'block',
+                margin: '0 auto 24px',
+                '&:hover': {
+                  bgcolor: '#FDBE16',
+                },
               }}
             >
-              {assessmentTrackingData.score_details.map((question, index) => (
-                <Box key={index}>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '12px',
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        gap: { xs: '16px', md: '24px' },
-                        justifyContent: 'space-between',
-                        alignItems: 'flex-start',
-                      }}
-                    >
-                      <Box sx={{ flex: 1 }}>
-                        <Typography
+              Approve Marks & Notify Learner
+            </Button>
+          </Box>
+
+          <Box
+            sx={{
+              px: { xs: 2, md: 3 },
+            }}
+          >
+            <Box
+              sx={{
+                bgcolor: '#F8EFE7',
+                border: '1px solid #D0C5B4',
+                borderRadius: '16px',
+                width: '100%',
+                pt: { xs: 2, md: 3 },
+                pb: { xs: 4, md: 6 },
+              }}
+            >
+              {/* Approve Button */}
+
+              <Box
+                sx={{
+                  margin: '0 auto',
+                  px: { xs: 2, md: 3 },
+                }}
+              >
+                {/* Questions List */}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: { xs: '16px', md: '24px' },
+                  }}
+                >
+                  {assessmentTrackingData.score_details.map(
+                    (question, index) => (
+                      <Box key={index}>
+                        <Box
                           sx={{
-                            color: '#1F1B13',
-                            fontSize: { xs: '14px', md: '16px' },
-                            fontWeight: 400,
-                            letterSpacing: '1.79%',
-                            lineHeight: 1.43,
-                            mb: { xs: 0.5, md: 1 },
-                          }}
-                          dangerouslySetInnerHTML={{
-                            __html: `Q${index + 1}. ${question.queTitle}`,
-                          }}
-                        />
-                      </Box>
-                      <Box
-                        onClick={() => handleScoreClick(question)}
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '4px',
-                          padding: { xs: '4px 8px', md: '6px 12px' },
-                          bgcolor:
-                            question.pass.toLowerCase() === 'yes'
-                              ? question.score === question.maxScore
-                                ? '#1A8825'
-                                : '#FFB800'
-                              : '#BA1A1A',
-                          borderRadius: '4px',
-                          border: '1px solid #FFFFFF',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        <Typography
-                          sx={{
-                            color: '#FFFFFF',
-                            fontSize: { xs: '14px', md: '16px' },
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '12px',
                           }}
                         >
-                          {question.score}/{question.maxScore}
-                        </Typography>
-                        <BorderColorIcon
-                          sx={{
-                            color: '#FFFFFF',
-                            fontSize: { xs: 18, md: 20 },
-                          }}
-                        />
-                      </Box>
-                    </Box>
-                    {/* Student Response and AI Suggestion */}
-                    <Typography
-                      sx={{
-                        fontSize: { xs: '14px', md: '16px' },
-                        fontWeight: 400,
-                        mb: 1,
-                        color:
-                          question.pass.toLowerCase() === 'yes'
-                            ? question.score === question.maxScore
-                              ? '#1A8825'
-                              : '#FFB800'
-                            : '#BA1A1A',
-                      }}
-                    >
-                      {parseResValue(question.resValue).response}
-                    </Typography>
-                    {parseResValue(question.resValue).aiSuggestion &&
-                      parseResValue(question.resValue).aiSuggestion !==
-                        'No AI suggestion available' && (
-                        <Accordion
-                          expanded={expandedPanel === `panel-${index}`}
-                          onChange={handleAccordionChange(`panel-${index}`)}
-                          sx={{
-                            backgroundColor: '#FFF5F5',
-                            boxShadow: 'none',
-                            borderRadius: '8px',
-                            border: '1px solid #FFE6E6',
-                            '&:before': {
-                              display: 'none',
-                            },
-                            '&.Mui-expanded': {
-                              margin: 0,
-                            },
-                          }}
-                        >
-                          <AccordionSummary
-                            expandIcon={
-                              <KeyboardArrowDownIcon
-                                sx={{ color: '#666666' }}
-                              />
-                            }
+                          <Box
                             sx={{
-                              padding: '12px 16px',
-                              minHeight: 'unset',
-                              '&.Mui-expanded': {
-                                minHeight: '48px',
-                              },
-                              '& .MuiAccordionSummary-content': {
-                                margin: 0,
-                                '&.Mui-expanded': {
-                                  margin: '0px 0',
-                                },
-                              },
+                              display: 'flex',
+                              gap: { xs: '16px', md: '24px' },
+                              justifyContent: 'space-between',
+                              alignItems: 'flex-start',
                             }}
                           >
-                            <Typography
+                            <Box sx={{ flex: 1 }}>
+                              <Typography
+                                sx={{
+                                  fontFamily: 'Poppins',
+                                  fontWeight: 400,
+                                  fontSize: { xs: '14px', md: '16px' },
+                                  letterSpacing: '0.25px',
+                                  color: '#1F1B13',
+                                }}
+                                dangerouslySetInnerHTML={{
+                                  __html: `Q${index + 1}. ${question.queTitle}`,
+                                }}
+                              />
+                            </Box>
+                            <Box
+                              onClick={() => handleScoreClick(question)}
                               sx={{
-                                color: '#666666',
-                                fontSize: { xs: '14px', md: '16px' },
-                                fontWeight: 500,
-                                letterSpacing: '0.5px',
-                                textTransform: 'uppercase',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                padding: { xs: '4px 8px', md: '6px 12px' },
+                                bgcolor:
+                                  question.pass.toLowerCase() === 'yes'
+                                    ? question.score === question.maxScore
+                                      ? '#1A8825'
+                                      : '#987100'
+                                    : '#BA1A1A',
+                                borderRadius: '4px',
+                                border: '1px solid #FFFFFF',
+                                cursor: 'pointer',
                               }}
                             >
-                              Explanation:
-                            </Typography>
-                          </AccordionSummary>
-                          <AccordionDetails
-                            sx={{ padding: '0px 16px 16px 16px' }}
+                              <Typography
+                                sx={{
+                                  color: '#FFFFFF',
+                                  fontSize: { xs: '14px', md: '16px' },
+                                }}
+                              >
+                                {question.score}/{question.maxScore}
+                              </Typography>
+                              <BorderColorIcon
+                                sx={{
+                                  color: '#FFFFFF',
+                                  fontSize: { xs: 18, md: 20 },
+                                }}
+                              />
+                            </Box>
+                          </Box>
+                          {/* Student Response and AI Suggestion */}
+                          <Typography
+                            sx={{
+                              fontFamily: 'Poppins',
+                              fontWeight: 500,
+                              fontSize: { xs: '16px', md: '18px' },
+                              letterSpacing: '0.15px',
+                              color:
+                                question.pass.toLowerCase() === 'yes'
+                                  ? question.score === question.maxScore
+                                    ? '#1A8825'
+                                    : '#987100'
+                                  : '#BA1A1A',
+                            }}
                           >
-                            <Typography
-                              sx={{
-                                color: '#666666',
-                                fontSize: { xs: '14px', md: '16px' },
-                                fontWeight: 400,
-                                lineHeight: 1.6,
-                              }}
-                            >
-                              {parseResValue(question.resValue).aiSuggestion}
-                            </Typography>
-                          </AccordionDetails>
-                        </Accordion>
-                      )}
-                  </Box>
+                            {parseResValue(question.resValue).response}
+                          </Typography>
+                          {parseResValue(question.resValue).aiSuggestion &&
+                            parseResValue(question.resValue).aiSuggestion !==
+                              'No AI suggestion available' && (
+                              <Accordion
+                                expanded={expandedPanel === `panel-${index}`}
+                                onChange={handleAccordionChange(
+                                  `panel-${index}`
+                                )}
+                                sx={{
+                                  backgroundColor: '#FFF5F5',
+                                  boxShadow: 'none',
+                                  borderRadius: '8px',
+                                  border: '1px solid #FFE6E6',
+                                  '&:before': {
+                                    display: 'none',
+                                  },
+                                  '&.Mui-expanded': {
+                                    margin: 0,
+                                  },
+                                }}
+                              >
+                                <AccordionSummary
+                                  expandIcon={
+                                    <KeyboardArrowDownIcon
+                                      sx={{ color: '#666666' }}
+                                    />
+                                  }
+                                  sx={{
+                                    padding: '12px 16px',
+                                    minHeight: 'unset',
+                                    '&.Mui-expanded': {
+                                      minHeight: '48px',
+                                    },
+                                    '& .MuiAccordionSummary-content': {
+                                      margin: 0,
+                                      '&.Mui-expanded': {
+                                        margin: '0px 0',
+                                      },
+                                    },
+                                  }}
+                                >
+                                  <Typography
+                                    sx={{
+                                      color: '#666666',
+                                      fontSize: { xs: '14px', md: '16px' },
+                                      fontWeight: 500,
+                                      letterSpacing: '0.5px',
+                                      textTransform: 'uppercase',
+                                    }}
+                                  >
+                                    Explanation:
+                                  </Typography>
+                                </AccordionSummary>
+                                <AccordionDetails
+                                  sx={{ padding: '0px 16px 16px 16px' }}
+                                >
+                                  <Typography
+                                    sx={{
+                                      color: '#666666',
+                                      fontSize: { xs: '14px', md: '16px' },
+                                      fontWeight: 400,
+                                      lineHeight: 1.6,
+                                    }}
+                                  >
+                                    {
+                                      parseResValue(question.resValue)
+                                        .aiSuggestion
+                                    }
+                                  </Typography>
+                                </AccordionDetails>
+                              </Accordion>
+                            )}
+                        </Box>
+                      </Box>
+                    )
+                  )}
                 </Box>
-              ))}
+              </Box>
             </Box>
           </Box>
-        </Box>
+        </>
       )}
 
       {/* Edit Modal */}
