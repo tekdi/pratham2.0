@@ -1,113 +1,138 @@
-import * as React from 'react';
-
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import { Divider } from '@mui/material';
-import Modal from '@mui/material/Modal';
-import { useTheme } from '@mui/material/styles';
+import React from 'react';
+import {
+  Box,
+  Button,
+  Divider,
+  IconButton,
+  Modal,
+  Typography,
+} from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 
 interface ConfirmationModalProps {
+  open: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
   message: string;
-  handleAction?: () => void;
-  buttonNames: ButtonNames;
-  handleCloseModal: () => void;
-  modalOpen: boolean;
-}
-
-interface ButtonNames {
-  primary: string;
-  secondary: string;
+  confirmText?: string;
+  cancelText?: string;
 }
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
-  modalOpen,
+  open,
+  onClose,
+  onConfirm,
+  title,
   message,
-  handleAction,
-  buttonNames,
-  handleCloseModal,
+  confirmText = 'Yes, Approve',
+  cancelText = 'No, Cancel',
 }) => {
-  const theme = useTheme<any>();
-
-  const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: '75%',
-    bgcolor: '#fff',
-    boxShadow: 24,
-    borderRadius: '16px',
-    '@media (min-width: 600px)': {
-      width: '350px',
-    },
-  };
-
   return (
     <Modal
-      open={modalOpen}
-      onClose={(event, reason) => {
-        if (reason !== 'backdropClick') {
-          handleCloseModal();
-        }
-      }}
+      open={open}
+      onClose={onClose}
       aria-labelledby="confirmation-modal-title"
-      aria-describedby="confirmation-modal-description"
     >
-      <Box sx={style}>
-        <Box
-          sx={{ p: 3 }}
-          color={theme.palette.warning['300']}
-          id="confirmation-modal-title"
-        >
-          {message}
-        </Box>
-        <Divider />
+      <Box
+        sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          bgcolor: 'background.paper',
+          borderRadius: '8px',
+          boxShadow: 24,
+          maxWidth: '400px',
+          width: '90%',
+          p: 0,
+          outline: 'none',
+        }}
+      >
+        {/* Header */}
         <Box
           sx={{
             display: 'flex',
-            justifyContent: 'flex-end',
-            gap: '18px',
+            justifyContent: 'space-between',
+            alignItems: 'center',
             p: 2,
+            pb: 2,
           }}
         >
-          <Button
+          <Typography
+            variant="h6"
+            component="h2"
+            id="confirmation-modal-title"
             sx={{
-              border: 'none',
-              color: theme.palette.secondary.main,
-              fontSize: '14px',
-              fontWeight: '500',
-              '&:hover': {
-                border: 'none',
-                backgroundColor: 'transparent',
-              },
-            }}
-            className="one-line-text"
-            variant="outlined"
-            onClick={handleCloseModal}
-          >
-            {buttonNames.secondary}
-          </Button>
-          <Button
-            sx={{
-              width: 'auto',
-              height: '40px',
-              fontSize: '14px',
-              fontWeight: '500',
-            }}
-            className="one-line-text"
-            variant="contained"
-            color="primary"
-            onClick={() => {
-              if (handleAction !== undefined) {
-                handleAction();
-                handleCloseModal();
-              } else {
-                handleCloseModal();
-              }
+              fontSize: '16px',
+              fontWeight: 500,
             }}
           >
-            {buttonNames.primary}
-          </Button>
+            {title}
+          </Typography>
+          <IconButton
+            aria-label="close"
+            onClick={onClose}
+            size="small"
+            sx={{
+              color: 'text.secondary',
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        <Divider />
+
+        {/* Content */}
+        <Box>
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+              mb: 3,
+              p: 2,
+              pt: 1,
+            }}
+          >
+            {message}
+          </Typography>
+
+          {/* Actions */}
+          <Divider />
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: 1,
+              p: 2,
+            }}
+          >
+            <Button
+              variant="outlined"
+              onClick={onClose}
+              sx={{
+                textTransform: 'none',
+                borderColor: 'grey.300',
+                color: 'text.primary',
+              }}
+            >
+              {cancelText}
+            </Button>
+            <Button
+              variant="contained"
+              onClick={onConfirm}
+              sx={{
+                textTransform: 'none',
+                bgcolor: '#FFB800',
+                '&:hover': {
+                  bgcolor: '#E6A600',
+                },
+              }}
+            >
+              {confirmText}
+            </Button>
+          </Box>
         </Box>
       </Box>
     </Modal>
