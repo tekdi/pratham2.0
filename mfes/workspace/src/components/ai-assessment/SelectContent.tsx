@@ -312,7 +312,7 @@ const SelectContent: React.FC<SelectContentProps> = ({
             // Prepare array of {id, pdfUrl} for onNext
             const selectedArr = selected.map((id) => {
               const item = contentSources.find((c) => c.identifier === id);
-              return { id, url: item?.downloadUrl || '' };
+              return { id, url: item?.previewUrl || '' };
             });
             onNext({ content: selectedArr, ...filter });
           }}
