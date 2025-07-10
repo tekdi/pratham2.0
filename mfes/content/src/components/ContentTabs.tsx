@@ -21,6 +21,7 @@ const RenderTabContent = memo(
     isLoadingMoreData,
     isPageLoading,
     isHideEmptyDataMessage,
+    pageName,
   }: {
     contentData: ContentSearchResponse[];
     _config: any;
@@ -36,6 +37,7 @@ const RenderTabContent = memo(
     isLoadingMoreData: boolean;
     isPageLoading: boolean;
     isHideEmptyDataMessage?: boolean;
+    pageName?:string
   }) => {
     const { t } = useTranslation();
     const { _box, _tabs } = _config ?? {};
@@ -54,7 +56,7 @@ const RenderTabContent = memo(
                 <Tab
                   key={tab.label}
                   icon={tab.icon ?? undefined}
-                  label={tab.label}
+                  label={t('COMMON.'+tab.label)}
                   {...{
                     id: `simple-tab-${index}`,
                     'aria-controls': `simple-tabpanel-${index}`,
@@ -86,6 +88,7 @@ const RenderTabContent = memo(
                 hasMoreData={hasMoreData}
                 handleLoadMore={handleLoadMore}
                 isLoadingMoreData={isLoadingMoreData}
+                pageName={pageName}
               />
             )}
             {!_config?.isShowInCarousel && (
@@ -98,6 +101,7 @@ const RenderTabContent = memo(
                 hasMoreData={hasMoreData}
                 handleLoadMore={handleLoadMore}
                 isLoadingMoreData={isLoadingMoreData}
+                pageName={pageName}
               />
             )}
           </Loader>

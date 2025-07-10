@@ -173,7 +173,7 @@ export default function Content(props: Readonly<ContentProps>) {
       setIsPageLoading(false);
     };
     init();
-  }, [ props.contentTabs, sessionKeys.filters, sessionKeys.search, searchParams]);
+  }, [ props, sessionKeys.filters, sessionKeys.search, searchParams]);
   // Fetch content with loop to load full data up to offset
   const fetchAllContent = useCallback(
     async (filter: any) => {
@@ -407,7 +407,7 @@ export default function Content(props: Readonly<ContentProps>) {
   const handleCardClickLocal = useCallback(
     async (content: ContentItem) => {
       try {
-        sessionStorage.setItem(sessionKeys.scrollId, content.identifier);
+        sessionStorage.setItem(sessionKeys.scrollId, `${props?.pageName}-${content?.identifier}`);
         persistFilters(localFilters);
         if (propData?.handleCardClick) {
           propData.handleCardClick(content);
@@ -415,13 +415,13 @@ export default function Content(props: Readonly<ContentProps>) {
           router.push(
             `${props?._config?.contentBaseUrl ?? ''}/player/${
               content?.identifier
-            }?activeLink=${window.location.pathname}`
+            }?activeLink=${ window.location.pathname + window.location.search}`
           );
         } else {
           router.push(
             `${props?._config?.contentBaseUrl ?? ''}/content-details/${
               content?.identifier
-            }?activeLink=${window.location.pathname}`
+            }?activeLink=${ window.location.pathname + window.location.search}`
           );
         }
       } catch (error) {
