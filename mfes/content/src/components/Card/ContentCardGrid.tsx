@@ -13,6 +13,7 @@ interface ContentCardGridProps {
   hasMoreData: boolean;
   handleLoadMore: (e: any) => void;
   isLoadingMoreData: boolean;
+  pageName?: string;
 }
 
 const ContentCardGrid = memo((props: ContentCardGridProps) => {
@@ -26,7 +27,7 @@ const ContentCardGrid = memo((props: ContentCardGridProps) => {
         {props.contentData?.map((item: any) => (
           <Grid
             key={item?.identifier}
-            id={item?.identifier}
+            id={`${props?.pageName}-${item?.identifier}`}
             item
             xs={6}
             sm={6}

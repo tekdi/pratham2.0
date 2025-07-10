@@ -25,6 +25,7 @@ const ContentCardCarousel = ({
   hasMoreData,
   handleLoadMore,
   isLoadingMoreData,
+  pageName
 }: {
   contentData: ContentSearchResponse[];
   _config: any;
@@ -34,6 +35,7 @@ const ContentCardCarousel = ({
   hasMoreData: boolean;
   handleLoadMore: (e: any) => void;
   isLoadingMoreData: boolean;
+  pageName?: string;
 }) => {
   const { t } = useTranslation();
   const { default_img, _subBox, _carousel, _card, isHideNavigation } =
@@ -97,6 +99,7 @@ const ContentCardCarousel = ({
           <SwiperSlide
             key={item?.identifier}
             style={{ height: 'auto', paddingBottom: '8px' }}
+            id={`${pageName}-${item?.identifier}`}
           >
             <ContentCard
               item={item}
