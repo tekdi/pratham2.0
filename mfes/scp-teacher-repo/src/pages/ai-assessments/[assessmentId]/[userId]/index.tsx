@@ -5,7 +5,6 @@ import {
   Box,
   Typography,
   IconButton,
-  Divider,
   Accordion,
   AccordionSummary,
   AccordionDetails,
@@ -19,15 +18,14 @@ import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
 import KeyboardBackspaceOutlinedIcon from '@mui/icons-material/KeyboardBackspaceOutlined';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useRouter } from 'next/router';
 import GenericModal from '../../../../components/GenericModal';
 import ConfirmationModal from '../../../../components/ConfirmationModal';
 import {
   getAssessmentDetails,
   getAssessmentTracking,
+  getOfflineAssessmentStatus,
   updateAssessmentScore,
 } from '../../../../services/AssesmentService';
 import {
@@ -155,76 +153,13 @@ const AssessmentDetails = () => {
     setUploadPopupOpen(false);
   };
 
-  const handleReupload = () => {
-    console.log('Re-upload images');
-    // Implement re-upload logic
-  };
-
-  const handleViewImages = () => {
-    console.log('View all images');
-    // Implement view images logic
-  };
-
-  const handleDownload = () => {
-    console.log('Download all images');
-    // Implement download logic
-  };
-
   const handleImageUpload = (newImage: UploadedImage) => {
     setUploadedImages((prev) => [...prev, newImage]);
   };
 
-  const [assessmentData, setAssessmentData] = useState({
-    studentName: 'Bharat Kumar',
-    examType: 'Mid Term Exam',
-    date: '2 Feb, 2024',
-    totalMarks: 250,
-    marksObtained: 210,
-    percentage: 88,
-    uploadedImages: 4,
-    questions: [
-      {
-        id: 1,
-        question: 'What is the derivative of x²?',
-        marks: 3,
-        score: 0,
-        answer: '788',
-        explanation:
-          'The derivative of x² is 2x. This is because to find the derivative you take the number x is being powered to, in this case 2, and move it to the front of the variable. After doing this you subtract the number x is being powered to by one.',
-        isCorrect: false,
-      },
-      {
-        id: 2,
-        question: 'What is the derivative of x⁵?',
-        marks: 3,
-        score: 3,
-        answer: '2x',
-        isCorrect: true,
-      },
-      {
-        id: 3,
-        question: 'What is the derivative of x³?',
-        marks: 3,
-        score: 3,
-        answer: 'A long question answer here just for example.',
-        isCorrect: true,
-      },
-      {
-        id: 4,
-        question: 'What is the derivative of x⁴?',
-        marks: 3,
-        score: 0,
-        answer: '788',
-        explanation:
-          'The derivative of x² is 2x. This is because to find the derivative you take the number x is being powered to, in this case 2, and move it to the front of the variable. After doing this you subtract the number x is being powered to by one.',
-        isCorrect: false,
-      },
-    ],
-  });
+  const [assessmentData, setAssessmentData] = useState({});
 
   useEffect(() => {
-    console.log('assessmentId', assessmentId);
-    console.log('userId', userId);
     const fetchAssessmentData = async () => {
       if (assessmentId && userId) {
         try {
@@ -234,6 +169,28 @@ const AssessmentDetails = () => {
             courseId: assessmentId as string,
             unitId: assessmentId as string,
           });
+
+          if (assessmentId) {
+            const response = await getAssessmentDetails(assessmentId as string);
+            setAssessmentName(response?.name);
+          }
+          if (userId) {
+            const userDetailsResponse = await getUserDetails(
+              userId as string,
+              true
+            );
+            setUserDetails({
+              name: userDetailsResponse?.result?.userData?.firstName,
+              lastName: userDetailsResponse?.result?.userData?.lastName,
+            });
+          }
+          const userData = await getOfflineAssessmentStatus({
+            userIds: [userId as string],
+            questionSetId: assessmentId as string,
+          });
+          if (userData?.result?.length > 0) {
+            setAssessmentData(userData?.result);
+          }
 
           if (response?.data?.length > 0) {
             // Find the latest assessment data by comparing timestamps
@@ -387,34 +344,6 @@ const AssessmentDetails = () => {
     setIsConfirmModalOpen(false);
   };
 
-  useEffect(() => {
-    const fetchUserDetails = async () => {
-      if (userId) {
-        const userDetailsResponse = await getUserDetails(
-          userId as string,
-          true
-        );
-        console.log('userDetailsResponse', userDetailsResponse);
-        setUserDetails({
-          name: userDetailsResponse?.result?.userData?.firstName,
-          lastName: userDetailsResponse?.result?.userData?.lastName,
-        });
-      }
-    };
-    fetchUserDetails();
-  }, []);
-
-  useEffect(() => {
-    const fetchAssessmentDetails = async () => {
-      if (assessmentId) {
-        const response = await getAssessmentDetails(assessmentId as string);
-        console.log('response', response.name);
-        setAssessmentName(response?.name);
-      }
-    };
-    fetchAssessmentDetails();
-  }, []);
-
   // Update parseResValue function
   const parseResValue = (
     resValue: string
@@ -553,8 +482,7 @@ const AssessmentDetails = () => {
                 letterSpacing: '0.1px',
               }}
             >
-              {/* {assessmentData.uploadedImages} images uploaded */}
-              No images uploaded
+              {assessmentData.uploadedImages} images uploaded No images uploaded
             </Typography>
             {/* <Typography
               sx={{
@@ -905,10 +833,11 @@ const AssessmentDetails = () => {
 
       {/* Confirmation Modal */}
       <ConfirmationModal
-        open={isConfirmModalOpen}
-        onClose={() => setIsConfirmModalOpen(false)}
-        onConfirm={handleConfirmApprove}
-        title="Are you sure you want to approve Marks?"
+        buttonNames={{ primary: 'Approve', secondary: 'Cancel' }}
+        modalOpen={isConfirmModalOpen}
+        handleCloseModal={() => setIsConfirmModalOpen(false)}
+        handleAction={handleConfirmApprove}
+        // title="Are you sure you want to approve Marks?"
         message="Be sure to review the answers and make any necessary changes to the marks before approving the final scores."
       />
       {/* Upload Options Popup */}

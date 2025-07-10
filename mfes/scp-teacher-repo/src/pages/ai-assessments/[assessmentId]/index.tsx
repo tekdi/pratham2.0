@@ -17,9 +17,6 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Chip,
-  Menu,
-  MenuItem,
   Radio,
   RadioGroup,
   FormControlLabel,
@@ -42,9 +39,9 @@ import { showToastMessage } from '../../../components/Toastify';
 import Header from '../../../components/Header';
 import Loader from '../../../components/Loader';
 import {
-  getAssessmentList,
   getAssessmentStatus,
   getAssessmentDetails,
+  getOfflineAssessmentStatus,
 } from '../../../services/AssesmentService';
 import { getMyCohortMemberList } from '../../../services/MyClassDetailsService';
 import { AssessmentStatus } from '../../../utils/app.constant';
@@ -289,6 +286,13 @@ const AssessmentDetails: React.FC = () => {
       const cohortResponse = await getMyCohortMemberList({ filters });
 
       if (cohortResponse?.result?.userDetails) {
+        const userData = await getOfflineAssessmentStatus({
+          userIds: cohortResponse.result.userDetails.map(
+            (user: any) => user.userId
+          ),
+          questionSetId: assessmentId as string,
+        });
+        console.log('🚀 ~ userData:', userData);
         const learners = cohortResponse.result.userDetails.map((user: any) => ({
           learnerId: user.userId,
           name:
@@ -544,7 +548,7 @@ const AssessmentDetails: React.FC = () => {
   };
 
   const handleLearnerClick = (learnerId: string) => {
-    router.push(`/assessments/${assessmentId}/${learnerId}`);
+    router.push(`/ai-assessments/${assessmentId}/${learnerId}`);
   };
 
   if (loading) {
