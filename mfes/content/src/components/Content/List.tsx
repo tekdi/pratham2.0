@@ -407,7 +407,7 @@ export default function Content(props: Readonly<ContentProps>) {
   const handleCardClickLocal = useCallback(
     async (content: ContentItem) => {
       try {
-        sessionStorage.setItem(sessionKeys.scrollId, content.identifier);
+        sessionStorage.setItem(sessionKeys.scrollId, `${props?.pageName}-${content?.identifier}`);
         persistFilters(localFilters);
         if (propData?.handleCardClick) {
           propData.handleCardClick(content);
