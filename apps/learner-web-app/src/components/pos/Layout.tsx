@@ -281,7 +281,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         })),
       },
       {
-        title: t('LEARNER_APP.POS.THEMATIC_REPOSITORY'),
+        title: t('Experimento India'),
         to: () => {
           const domain = process.env.NEXT_PUBLIC_THEMATIC_DOMAIN || '';
           window.open(`${domain}`, '_blank');
@@ -300,22 +300,19 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         _config: {
           middleComponent: (
             <SearchButton
-              onSearch={(search) =>
-                {
-                        if (typeof window !== 'undefined') {     
+              onSearch={(search) => {
+                if (typeof window !== 'undefined') {
+                  const windowUrl = window.location.pathname;
+                  const cleanedUrl = windowUrl;
 
-                       const windowUrl = window.location.pathname;
-                                   const cleanedUrl = windowUrl
-                  
-                                  logEvent({
-                                    action: 'Searched on about page by ' + search,
-                                    category: cleanedUrl,
-                                    label: 'Searched on about page',
-                                  });
-                                }
-                  router.push('/pos/search?q=' + search)
+                  logEvent({
+                    action: 'Searched on about page by ' + search,
+                    category: cleanedUrl,
+                    label: 'Searched on about page',
+                  });
                 }
-                }
+                router.push('/pos/search?q=' + search);
+              }}
               isHideSubmitButton
               _box={{
                 sx: {
