@@ -313,11 +313,13 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
                 }
                 router.push('/pos/search?q=' + search);
               }}
-              isHideSubmitButton
+              // isHideSubmitButton
+              _input={{
+                placeholder: 'Search courses, subjects..',
+              }}
               _box={{
                 sx: {
-                  maxWidth: '260px',
-                  height: '48px',
+                  maxWidth: '480px',
                   '@media (max-width: 1200px)': {
                     display: 'none',
                   },
