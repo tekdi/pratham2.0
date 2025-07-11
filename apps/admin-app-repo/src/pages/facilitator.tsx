@@ -58,6 +58,7 @@ import apartment from '../../public/images/apartment.svg';
 import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 import FacilitatorForm from '@/components/DynamicForm/FacilitatorForm/FacilitatorForm';
 import CenterLabel from '@/components/Centerlabel';
+import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
 
 const Facilitator = () => {
   const theme = useTheme<any>();
@@ -84,6 +85,7 @@ const Facilitator = () => {
   const [districtFieldId, setDistrictFieldId] = useState('');
   const [villageFieldId, setVillageFieldId] = useState('');
   // const [centerFieldId, setCenterFieldId] = useState('');
+     const formRef = useRef(null);
 
   const [userID, setUserId] = useState('');
   const [userData, setUserData] = useState({
@@ -608,10 +610,17 @@ const Facilitator = () => {
               SubmitaFunction={SubmitaFunction}
               isCallSubmitInHandle={true}
               prefilledFormData={prefilledFormData}
+              ref={formRef}
             />
           )
         )}
         <Box mt={4} sx={{ display: 'flex', justifyContent: 'end' }}>
+            <ResetFiltersButton
+            searchStoreKey="facilitator"
+            formRef={formRef}
+            SubmitaFunction={SubmitaFunction}
+            setPrefilledFormData={setPrefilledFormData}
+          />
           <Button
             variant="outlined"
             startIcon={<AddIcon />}
