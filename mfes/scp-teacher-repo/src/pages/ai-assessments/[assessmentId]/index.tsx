@@ -22,7 +22,6 @@ import {
   FormControlLabel,
   FormControl,
 } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -50,8 +49,6 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 interface LearnerData {
   learnerId: string;
   name: string;
-  email: string;
-  status: 'completed' | 'in_progress' | 'not_started' | 'awaiting_approval';
   score: number;
   submittedAt: string | null;
   timeSpent: number;
@@ -65,6 +62,7 @@ interface LearnerData {
   mobile?: string;
   cohortMembershipId?: string;
   customField?: any[];
+  answerSheetStatus: 'AI Pending' | 'AI Processed' | 'Approved';
 }
 
 interface AssessmentData {
@@ -94,10 +92,17 @@ type SortOption =
   | 'score_asc';
 
 const AssessmentDetails: React.FC = () => {
-  const theme = useTheme<any>();
   const { t } = useTranslation();
   const router = useRouter();
   const { assessmentId, cohortId } = router.query;
+
+  // Status mapping for labels
+  const statusMapping = {
+    'AI Pending': 'Evaluating with AI',
+    'AI Processed': 'Awaiting Your Approval',
+    Approved: 'Marks Approved',
+  };
+
   // State management
   const [loading, setLoading] = useState(true);
   const [assessmentData, setAssessmentData] = useState<AssessmentData | null>(
@@ -113,7 +118,6 @@ const AssessmentDetails: React.FC = () => {
   // Sort functionality state
   const [showSortPopup, setShowSortPopup] = useState(false);
   const [sortOption, setSortOption] = useState<SortOption>('all');
-  const [sortAnchorEl, setSortAnchorEl] = useState<null | HTMLElement>(null);
 
   // Fetch assessment data and learner list
   useEffect(() => {
@@ -122,6 +126,29 @@ const AssessmentDetails: React.FC = () => {
       fetchLearnerData();
     }
   }, [assessmentId, cohortId]);
+
+  // Helper function to get display label from answerSheetStatus
+  const getStatusLabel = (
+    answerSheetStatus: 'AI Pending' | 'AI Processed' | 'Approved'
+  ): string => {
+    return statusMapping[answerSheetStatus] || 'Not Submitted';
+  };
+
+  // Helper function to map answerSheetStatus to internal status for filtering/sorting
+  const mapAnswerSheetStatusToInternalStatus = (
+    answerSheetStatus: 'AI Pending' | 'AI Processed' | 'Approved'
+  ): 'completed' | 'in_progress' | 'not_started' | 'awaiting_approval' => {
+    switch (answerSheetStatus) {
+      case 'Approved':
+        return 'completed';
+      case 'AI Pending':
+        return 'in_progress';
+      case 'AI Processed':
+        return 'awaiting_approval';
+      default:
+        return 'not_started';
+    }
+  };
 
   // Filter and sort learners based on search and sort options
   useEffect(() => {
@@ -137,21 +164,31 @@ const AssessmentDetails: React.FC = () => {
     // Apply sort/filter
     switch (sortOption) {
       case 'completed':
-        filtered = filtered.filter((learner) => learner.status === 'completed');
+        filtered = filtered.filter(
+          (learner) =>
+            mapAnswerSheetStatusToInternalStatus(learner.answerSheetStatus) ===
+            'completed'
+        );
         break;
       case 'awaiting_approval':
         filtered = filtered.filter(
-          (learner) => learner.status === 'awaiting_approval'
+          (learner) =>
+            mapAnswerSheetStatusToInternalStatus(learner.answerSheetStatus) ===
+            'awaiting_approval'
         );
         break;
       case 'not_started':
         filtered = filtered.filter(
-          (learner) => learner.status === 'not_started'
+          (learner) =>
+            mapAnswerSheetStatusToInternalStatus(learner.answerSheetStatus) ===
+            'not_started'
         );
         break;
       case 'in_progress':
         filtered = filtered.filter(
-          (learner) => learner.status === 'in_progress'
+          (learner) =>
+            mapAnswerSheetStatusToInternalStatus(learner.answerSheetStatus) ===
+            'in_progress'
         );
         break;
       case 'name_asc':
@@ -167,9 +204,31 @@ const AssessmentDetails: React.FC = () => {
         filtered.sort((a, b) => a.score - b.score);
         break;
       case 'all':
-      default:
-        // No additional filtering, show all
+      default: {
+        // Sort by status priority: "Evaluating with AI" → "Awaiting Your Approval" → "Marks Approved"
+        const statusOrder = {
+          in_progress: 1, // "Evaluating with AI"
+          awaiting_approval: 2, // "Awaiting Your Approval"
+          completed: 3, // "Marks Approved"
+          not_started: 4, // "Not Submitted"
+        };
+        filtered.sort((a, b) => {
+          const orderA =
+            statusOrder[
+              mapAnswerSheetStatusToInternalStatus(
+                a.answerSheetStatus
+              ) as keyof typeof statusOrder
+            ] || 5;
+          const orderB =
+            statusOrder[
+              mapAnswerSheetStatusToInternalStatus(
+                b.answerSheetStatus
+              ) as keyof typeof statusOrder
+            ] || 5;
+          return orderA - orderB;
+        });
         break;
+      }
     }
 
     setFilteredLearners(filtered);
@@ -292,36 +351,25 @@ const AssessmentDetails: React.FC = () => {
           ),
           questionSetId: assessmentId as string,
         });
-        console.log('🚀 ~ userData:', userData);
-        const learners = cohortResponse.result.userDetails.map((user: any) => ({
-          learnerId: user.userId,
-          name:
-            [user.firstName, user.middleName, user.lastName]
-              .filter(Boolean)
-              .join(' ') ||
-            user.username ||
-            'Unknown Learner',
-          email:
-            user.username && user.username.includes('@')
-              ? user.username
-              : `${
-                  user.username || user.firstName?.toLowerCase() || 'learner'
-                }@example.com`,
-          status: 'not_started' as const, // Default status, will be updated with assessment status
-          score: 0,
-          submittedAt: null,
-          timeSpent: 0,
-          userId: user.userId,
-          progress: user.status,
-          username: user.username,
-          firstName: user.firstName,
-          middleName: user.middleName,
-          lastName: user.lastName,
-          role: user.role,
-          mobile: user.mobile,
-          cohortMembershipId: user.cohortMembershipId,
-          customField: user.customField,
-        }));
+
+        // Directly use cohortResponse data without complex mapping
+        const learners = cohortResponse.result.userDetails.map((user: any) => {
+          const matchingUserData = userData.result?.find(
+            (data: any) => data.userId === user.userId
+          );
+
+          return {
+            ...user,
+            learnerId: user.userId,
+            name:
+              [user.firstName, user.middleName, user.lastName]
+                .filter(Boolean)
+                .join(' ') ||
+              user.username ||
+              'Unknown Learner',
+            answerSheetStatus: matchingUserData?.status,
+          };
+        });
 
         // Fetch assessment status for all learners in a single call
         try {
@@ -463,24 +511,24 @@ const AssessmentDetails: React.FC = () => {
   const getSortButtonText = () => {
     switch (sortOption) {
       case 'completed':
-        return 'Marks Approved';
+        return statusMapping['Approved']; // 'Marks Approved'
       case 'awaiting_approval':
-        return 'Awaiting Approval';
+        return statusMapping['AI Processed']; // 'Awaiting Your Approval'
       case 'not_started':
         return 'Not Submitted';
       case 'in_progress':
-        return 'In Progress';
+        return statusMapping['AI Pending']; // 'Evaluating with AI'
       case 'name_asc':
         return 'Name (A-Z)';
       case 'name_desc':
         return 'Name (Z-A)';
       case 'score_desc':
-        return 'Score (High-Low)';
+        return 'Score (High to Low)';
       case 'score_asc':
-        return 'Score (Low-High)';
+        return 'Score (Low to High)';
       case 'all':
       default:
-        return 'Sort by Status';
+        return 'All Learners';
     }
   };
 
@@ -506,7 +554,7 @@ const AssessmentDetails: React.FC = () => {
           maxScore || assessmentData?.maxScore || 130
         }`;
       case 'in_progress':
-        return 'Evaluating with AI..';
+        return 'Evaluating with AI';
       case 'awaiting_approval':
         return 'Awaiting Your Approval';
       case 'not_started':
@@ -517,14 +565,17 @@ const AssessmentDetails: React.FC = () => {
   };
 
   const getStatusDate = (learner: LearnerData) => {
-    if (learner.status === 'completed' && learner.submittedAt) {
+    const internalStatus = mapAnswerSheetStatusToInternalStatus(
+      learner.answerSheetStatus
+    );
+    if (internalStatus === 'completed' && learner.submittedAt) {
       const date = new Date(learner.submittedAt);
       return `Approved on: ${date.toLocaleDateString('en-GB', {
         day: 'numeric',
         month: 'short',
         year: 'numeric',
       })}`;
-    } else if (learner.status === 'awaiting_approval' && learner.submittedAt) {
+    } else if (internalStatus === 'awaiting_approval' && learner.submittedAt) {
       const date = new Date(learner.submittedAt);
       return `Uploaded on: ${date.toLocaleDateString('en-GB', {
         day: 'numeric',
@@ -537,14 +588,45 @@ const AssessmentDetails: React.FC = () => {
 
   const getStatusCounts = () => {
     const counts = {
-      not_started: learnerList.filter((l) => l.status === 'not_started').length,
-      awaiting_approval: learnerList.filter(
-        (l) => l.status === 'awaiting_approval'
+      not_started: learnerList.filter(
+        (l) =>
+          mapAnswerSheetStatusToInternalStatus(l.answerSheetStatus) ===
+          'not_started'
       ).length,
-      completed: learnerList.filter((l) => l.status === 'completed').length,
-      in_progress: learnerList.filter((l) => l.status === 'in_progress').length,
+      in_progress: learnerList.filter(
+        (l) =>
+          mapAnswerSheetStatusToInternalStatus(l.answerSheetStatus) ===
+          'in_progress'
+      ).length,
+      awaiting_approval: learnerList.filter(
+        (l) =>
+          mapAnswerSheetStatusToInternalStatus(l.answerSheetStatus) ===
+          'awaiting_approval'
+      ).length,
+      completed: learnerList.filter(
+        (l) =>
+          mapAnswerSheetStatusToInternalStatus(l.answerSheetStatus) ===
+          'completed'
+      ).length,
     };
-    return counts;
+    return [
+      {
+        count: counts.not_started,
+        label: 'Not Submitted',
+      },
+      {
+        count: counts.in_progress,
+        label: statusMapping['AI Pending'], // 'Evaluating with AI'
+      },
+      {
+        count: counts.awaiting_approval,
+        label: statusMapping['AI Processed'], // 'Awaiting Your Approval'
+      },
+      {
+        count: counts.completed,
+        label: statusMapping['Approved'], // 'Marks Approved'
+      },
+    ];
   };
 
   const handleLearnerClick = (learnerId: string) => {
@@ -747,128 +829,49 @@ const AssessmentDetails: React.FC = () => {
         {/* Status Summary Cards */}
         <Box sx={{ px: 2, mb: 2 }}>
           <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-            <Card
-              sx={{
-                backgroundColor: '#FDF2E5',
-                borderRadius: '12px',
-                minWidth: 100,
-                flex: 1,
-              }}
-            >
-              <CardContent
+            {statusCounts?.map((item, index) => (
+              <Card
+                key={index}
                 sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  p: '16px !important',
+                  backgroundColor: '#FDF2E5',
+                  borderRadius: '12px',
+                  minWidth: 100,
+                  flex: 1,
                 }}
               >
-                <Typography
+                <CardContent
                   sx={{
-                    fontWeight: 600,
-                    fontSize: '20px',
-                    color: '#1F1B13',
-                    mb: 0.5,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    p: '16px !important',
                   }}
                 >
-                  {statusCounts.not_started}
-                </Typography>
-                <Typography
-                  sx={{
-                    fontWeight: 500,
-                    fontSize: '12px',
-                    color: '#7C766F',
-                    textAlign: 'center',
-                    lineHeight: '16px',
-                  }}
-                >
-                  Not Submitted
-                </Typography>
-              </CardContent>
-            </Card>
-
-            <Card
-              sx={{
-                backgroundColor: '#FDF2E5',
-                borderRadius: '12px',
-                minWidth: 100,
-                flex: 1,
-              }}
-            >
-              <CardContent
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  p: '16px !important',
-                }}
-              >
-                <Typography
-                  sx={{
-                    fontWeight: 600,
-                    fontSize: '20px',
-                    color: '#1F1B13',
-                    mb: 0.5,
-                  }}
-                >
-                  {statusCounts.awaiting_approval}
-                </Typography>
-                <Typography
-                  sx={{
-                    fontWeight: 500,
-                    fontSize: '12px',
-                    color: '#7C766F',
-                    textAlign: 'center',
-                    lineHeight: '16px',
-                  }}
-                >
-                  Awaiting Approval
-                </Typography>
-              </CardContent>
-            </Card>
-
-            <Card
-              sx={{
-                backgroundColor: '#FDF2E5',
-                borderRadius: '12px',
-                minWidth: 100,
-                flex: 1,
-              }}
-            >
-              <CardContent
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  p: '16px !important',
-                }}
-              >
-                <Typography
-                  sx={{
-                    fontWeight: 600,
-                    fontSize: '20px',
-                    color: '#1F1B13',
-                    mb: 0.5,
-                  }}
-                >
-                  {statusCounts.completed}
-                </Typography>
-                <Typography
-                  sx={{
-                    fontWeight: 500,
-                    fontSize: '12px',
-                    color: '#7C766F',
-                    textAlign: 'center',
-                    lineHeight: '16px',
-                  }}
-                >
-                  Marks Approved
-                </Typography>
-              </CardContent>
-            </Card>
+                  <Typography
+                    sx={{
+                      fontWeight: 600,
+                      fontSize: '20px',
+                      color: '#1F1B13',
+                      mb: 0.5,
+                    }}
+                  >
+                    {item.count}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontWeight: 500,
+                      fontSize: '12px',
+                      color: '#7C766F',
+                      textAlign: 'center',
+                      lineHeight: '16px',
+                    }}
+                  >
+                    {item.label}
+                  </Typography>
+                </CardContent>
+              </Card>
+            ))}
           </Box>
         </Box>
 
@@ -895,8 +898,12 @@ const AssessmentDetails: React.FC = () => {
                       cursor: 'pointer',
                       p: 0,
                       minHeight:
-                        learner.status === 'awaiting_approval' ||
-                        learner.status === 'completed'
+                        mapAnswerSheetStatusToInternalStatus(
+                          learner.answerSheetStatus
+                        ) === 'awaiting_approval' ||
+                        mapAnswerSheetStatusToInternalStatus(
+                          learner.answerSheetStatus
+                        ) === 'completed'
                           ? '80px'
                           : '64px',
                       transition: 'all 0.2s ease-in-out',
@@ -922,7 +929,11 @@ const AssessmentDetails: React.FC = () => {
                         minHeight: 'inherit',
                       }}
                     >
-                      {getStatusIcon(learner.status)}
+                      {getStatusIcon(
+                        mapAnswerSheetStatusToInternalStatus(
+                          learner.answerSheetStatus
+                        )
+                      )}
                     </Box>
 
                     {/* Content */}
@@ -948,17 +959,24 @@ const AssessmentDetails: React.FC = () => {
                           <Typography
                             sx={{
                               fontWeight:
-                                learner.status === 'completed' ? 500 : 400,
+                                mapAnswerSheetStatusToInternalStatus(
+                                  learner.answerSheetStatus
+                                ) === 'completed'
+                                  ? 500
+                                  : 400,
                               fontSize: '14px',
                               color: '#4D4639',
                               lineHeight: '20px',
                             }}
                           >
-                            {getStatusText(
-                              learner.status,
-                              learner.score,
-                              assessmentData?.maxScore
-                            )}
+                            {getStatusLabel(learner.answerSheetStatus) ||
+                              getStatusText(
+                                mapAnswerSheetStatusToInternalStatus(
+                                  learner.answerSheetStatus
+                                ),
+                                learner.score,
+                                assessmentData?.maxScore
+                              )}
                           </Typography>
                           {getStatusDate(learner) && (
                             <Typography
@@ -1186,10 +1204,14 @@ const AssessmentDetails: React.FC = () => {
                       }}
                     >
                       <Typography sx={{ fontSize: '14px', color: '#1F1B13' }}>
-                        Marks Approved
+                        {statusMapping['Approved']}
                       </Typography>
                       <Typography sx={{ fontSize: '14px', color: '#7C766F' }}>
-                        ({getStatusCounts().completed})
+                        (
+                        {getStatusCounts().find(
+                          (item) => item.label === statusMapping['Approved']
+                        )?.count || 0}
+                        )
                       </Typography>
                     </Box>
                   }
@@ -1212,10 +1234,14 @@ const AssessmentDetails: React.FC = () => {
                       }}
                     >
                       <Typography sx={{ fontSize: '14px', color: '#1F1B13' }}>
-                        Awaiting Approval
+                        {statusMapping['AI Processed']}
                       </Typography>
                       <Typography sx={{ fontSize: '14px', color: '#7C766F' }}>
-                        ({getStatusCounts().awaiting_approval})
+                        (
+                        {getStatusCounts().find(
+                          (item) => item.label === statusMapping['AI Processed']
+                        )?.count || 0}
+                        )
                       </Typography>
                     </Box>
                   }
@@ -1238,10 +1264,14 @@ const AssessmentDetails: React.FC = () => {
                       }}
                     >
                       <Typography sx={{ fontSize: '14px', color: '#1F1B13' }}>
-                        In Progress
+                        {statusMapping['AI Pending']}
                       </Typography>
                       <Typography sx={{ fontSize: '14px', color: '#7C766F' }}>
-                        ({getStatusCounts().in_progress})
+                        (
+                        {getStatusCounts().find(
+                          (item) => item.label === statusMapping['AI Pending']
+                        )?.count || 0}
+                        )
                       </Typography>
                     </Box>
                   }
@@ -1267,7 +1297,11 @@ const AssessmentDetails: React.FC = () => {
                         Not Submitted
                       </Typography>
                       <Typography sx={{ fontSize: '14px', color: '#7C766F' }}>
-                        ({getStatusCounts().not_started})
+                        (
+                        {getStatusCounts().find(
+                          (item) => item.label === 'Not Submitted'
+                        )?.count || 0}
+                        )
                       </Typography>
                     </Box>
                   }

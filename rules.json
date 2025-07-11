@@ -41,7 +41,7 @@
     },
     {
       "role": "user",
-      "content": "Use React hooks (`useState`, `useEffect`, `useCallback`, etc.) correctly. Avoid unnecessary re-renders and memoize logic when needed."
+      "content": "Use React hooks (`useState`, `useEffect`, `useCallback`, `useMemo` etc.) correctly. Avoid unnecessary re-renders and memoize logic when needed."
     },
     {
       "role": "user",
