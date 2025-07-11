@@ -19,6 +19,7 @@ import { useTranslation } from 'next-i18next';
 import KeyboardBackspaceOutlinedIcon from '@mui/icons-material/KeyboardBackspaceOutlined';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useRouter } from 'next/router';
 import GenericModal from '../../../../components/GenericModal';
 import ConfirmationModal from '../../../../components/ConfirmationModal';
@@ -34,6 +35,11 @@ import {
 } from '../../../../components/assessment';
 import { getUserDetails } from '../../../../services/ProfileService';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
+import {
+  getStatusIcon,
+  getStatusLabel,
+  mapAnswerSheetStatusToInternalStatus,
+} from '../index';
 
 interface ScoreDetail {
   questionId: string | null;
@@ -103,6 +109,28 @@ interface UpdateAssessmentScorePayload {
   assessmentSummary: AssessmentSection[];
 }
 
+interface AssessmentRecord {
+  id: string;
+  questionId: string;
+  answer: string;
+  score?: number;
+  maxScore?: number;
+  // Add other record properties as needed
+}
+
+interface OfflineAssessmentData {
+  userId: string;
+  status: 'AI Pending' | 'AI Processed' | 'Approved';
+  fileUrls: string[];
+  records: AssessmentRecord[];
+  // Add other properties as needed based on API response
+}
+
+interface AssessmentDataResponse {
+  result: OfflineAssessmentData[];
+  responseCode?: string;
+}
+
 const AssessmentDetails = () => {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -146,7 +174,18 @@ const AssessmentDetails = () => {
 
   // Upload Options Popup handlers
   const handleUploadInfoClick = () => {
-    setUploadPopupOpen(true);
+    if (assessmentData?.status === 'AI Pending') {
+      // setSnackbar({
+      //   open: true,
+      //   message: 'Please wait for the AI to process the assessment.',
+      //   severity: 'error',
+      // });
+      router.push(`/ai-assessments/${assessmentId}/${userId}/upload-files`);
+    } else if (assessmentData?.status === 'AI Processed') {
+      router.push(`/ai-assessments/${assessmentId}/${userId}/upload-files`);
+    } else {
+      setUploadPopupOpen(true);
+    }
   };
 
   const handleCloseUploadPopup = () => {
@@ -155,9 +194,66 @@ const AssessmentDetails = () => {
 
   const handleImageUpload = (newImage: UploadedImage) => {
     setUploadedImages((prev) => [...prev, newImage]);
+
+    // Update assessmentData with new file URL
+    if (assessmentData) {
+      setAssessmentData({
+        ...assessmentData,
+        fileUrls: [...assessmentData.fileUrls, newImage.url],
+      });
+    }
   };
 
-  const [assessmentData, setAssessmentData] = useState({});
+  const handleImageRemove = (imageId: string) => {
+    // Remove from uploadedImages state
+    const imageToRemove = uploadedImages.find((img) => img.id === imageId);
+    if (imageToRemove) {
+      setUploadedImages((prev) => prev.filter((img) => img.id !== imageId));
+
+      // Update assessmentData by removing the file URL
+      if (assessmentData) {
+        setAssessmentData({
+          ...assessmentData,
+          fileUrls: assessmentData.fileUrls.filter(
+            (url) => url !== imageToRemove.url
+          ),
+        });
+      }
+    }
+  };
+
+  const [assessmentData, setAssessmentData] =
+    useState<OfflineAssessmentData | null>(null);
+
+  // Sync uploadedImages with assessmentData.fileUrls when data is loaded
+  useEffect(() => {
+    if (assessmentData?.fileUrls) {
+      const imagesFromFileUrls = assessmentData.fileUrls.map((url, index) => ({
+        id: `existing-${index}`,
+        url: url,
+        previewUrl: url,
+        name: `uploaded-image-${index + 1}`,
+        uploadedAt: new Date().toISOString(),
+      }));
+      setUploadedImages(imagesFromFileUrls);
+    }
+  }, [assessmentData]);
+
+  // Helper function to get status color
+  const getStatusColor = (
+    status: 'AI Pending' | 'AI Processed' | 'Approved'
+  ) => {
+    switch (status) {
+      case 'AI Pending':
+        return '#FF9800'; // Orange
+      case 'AI Processed':
+        return '#2196F3'; // Blue
+      case 'Approved':
+        return '#4CAF50'; // Green
+      default:
+        return '#757575'; // Gray
+    }
+  };
 
   useEffect(() => {
     const fetchAssessmentData = async () => {
@@ -188,8 +284,27 @@ const AssessmentDetails = () => {
             userIds: [userId as string],
             questionSetId: assessmentId as string,
           });
+
           if (userData?.result?.length > 0) {
-            setAssessmentData(userData?.result);
+            // Find the assessment data for the current user
+            const currentUserData = userData.result.find(
+              (item: OfflineAssessmentData) => item.userId === userId
+            );
+            if (currentUserData) {
+              // Ensure fileUrls and records are arrays
+              const sanitizedData: OfflineAssessmentData = {
+                ...currentUserData,
+                fileUrls: Array.isArray(currentUserData.fileUrls)
+                  ? currentUserData.fileUrls
+                  : [],
+                records: Array.isArray(currentUserData.records)
+                  ? currentUserData.records
+                  : [],
+              };
+              setAssessmentData(sanitizedData);
+            }
+          } else {
+            console.log('No offline assessment data found for user:', userId);
           }
 
           if (response?.data?.length > 0) {
@@ -452,6 +567,31 @@ const AssessmentDetails = () => {
       </Box>
 
       <Box sx={{ mx: '16px', my: '16px' }}>
+        {/* Assessment Status */}
+        {assessmentData?.status && (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2,
+              pb: 2,
+            }}
+          >
+            {getStatusIcon(
+              mapAnswerSheetStatusToInternalStatus(assessmentData.status)
+            )}
+            <Typography
+              sx={{
+                color: '#1F1B13',
+                fontSize: { xs: '14px', md: '16px' },
+                fontWeight: 400,
+              }}
+            >
+              {getStatusLabel(assessmentData.status)}
+            </Typography>
+          </Box>
+        )}
+
         {/* Images Info */}
         <Box
           onClick={handleUploadInfoClick}
@@ -461,12 +601,12 @@ const AssessmentDetails = () => {
             alignItems: 'center',
             border: '1px solid #DBDBDB',
             borderRadius: '12px',
-            p: { xs: 2, md: 3 },
-            mb: { xs: 2, md: 3 },
+            p: { xs: 2, md: 2 },
+            mb: { xs: 2, md: 2 },
             cursor: 'pointer',
             transition: 'all 0.2s ease',
             '&:hover': {
-              borderColor: '#1976d2',
+              borderColor: theme.palette.primary.main,
               backgroundColor: '#f5f5f5',
               transform: 'translateY(-1px)',
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
@@ -482,19 +622,23 @@ const AssessmentDetails = () => {
                 letterSpacing: '0.1px',
               }}
             >
-              {assessmentData.uploadedImages} images uploaded No images uploaded
+              {assessmentData?.fileUrls && assessmentData.fileUrls.length > 0
+                ? `${assessmentData.fileUrls.length} images uploaded`
+                : 'No images uploaded'}
             </Typography>
-            {/* <Typography
-              sx={{
-                color: '#7C766F',
-                fontSize: { xs: '12px', md: '14px' },
-                fontWeight: 500,
-                letterSpacing: '4.17%',
-                lineHeight: 1.33,
-              }}
-            >
-              {assessmentData.date}
-            </Typography> */}
+            {assessmentData?.records && assessmentData.records.length > 0 && (
+              <Typography
+                sx={{
+                  color: '#7C766F',
+                  fontSize: { xs: '12px', md: '14px' },
+                  fontWeight: 500,
+                  letterSpacing: '4.17%',
+                  lineHeight: 1.33,
+                }}
+              >
+                {assessmentData.records.length} assessment record(s) available
+              </Typography>
+            )}
           </Box>
           <IconButton
             sx={{
@@ -505,17 +649,24 @@ const AssessmentDetails = () => {
               },
             }}
           >
-            <FileUploadIcon />
+            {assessmentData?.status === 'AI Pending' ? (
+              <CircularProgress size={24} />
+            ) : assessmentData?.status === 'AI Processed' ? (
+              <ArrowForwardIcon />
+            ) : (
+              <FileUploadIcon />
+            )}
           </IconButton>
         </Box>
       </Box>
 
-      {!assessmentData || !assessmentTrackingData ? (
+      {!assessmentTrackingData ? (
         <Box
           sx={{
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
+            minHeight: '200px',
           }}
         >
           <Typography>No assessment data found</Typography>
@@ -846,6 +997,7 @@ const AssessmentDetails = () => {
         onClose={handleCloseUploadPopup}
         uploadedImages={uploadedImages}
         onImageUpload={handleImageUpload}
+        onImageRemove={handleImageRemove}
         userId={typeof userId === 'string' ? userId : undefined}
         questionSetId={
           typeof assessmentId === 'string' ? assessmentId : undefined

@@ -25,6 +25,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
   onClose,
   uploadedImages = [],
   onImageUpload,
+  onImageRemove,
   userId,
   questionSetId,
   identifier,
@@ -144,8 +145,10 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
   };
 
   const handleRemoveImage = (imageId: string) => {
-    // This should be handled by parent component
-    console.log('Remove image:', imageId);
+    // Call parent's remove handler if provided
+    if (onImageRemove) {
+      onImageRemove(imageId);
+    }
   };
 
   const handleStartAIEvaluation = async () => {

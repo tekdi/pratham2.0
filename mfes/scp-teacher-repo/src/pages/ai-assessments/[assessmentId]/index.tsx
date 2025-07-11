@@ -91,17 +91,55 @@ type SortOption =
   | 'score_desc'
   | 'score_asc';
 
+// Status mapping for labels
+const statusMapping = {
+  'AI Pending': 'Evaluating with AI',
+  'AI Processed': 'Awaiting Your Approval',
+  Approved: 'Marks Approved',
+};
+
+// Helper function to get display label from answerSheetStatus
+export const getStatusLabel = (
+  answerSheetStatus: 'AI Pending' | 'AI Processed' | 'Approved'
+): string => {
+  return statusMapping[answerSheetStatus] || 'Not Submitted';
+};
+
+export const getStatusIcon = (status: string) => {
+  switch (status) {
+    case 'completed':
+      return <CheckCircleIcon sx={{ color: '#4CAF50', fontSize: 24 }} />;
+    case 'in_progress':
+      return <MoreHorizIcon sx={{ color: '#FF9800', fontSize: 24 }} />;
+    case 'awaiting_approval':
+      return <ErrorIcon sx={{ color: '#FF5722', fontSize: 24 }} />;
+    case 'not_started':
+      return <RemoveIcon sx={{ color: '#9E9E9E', fontSize: 24 }} />;
+    default:
+      return null;
+  }
+};
+
+// Helper function to map answerSheetStatus to internal status for filtering/sorting
+export const mapAnswerSheetStatusToInternalStatus = (
+  answerSheetStatus: 'AI Pending' | 'AI Processed' | 'Approved'
+): 'completed' | 'in_progress' | 'not_started' | 'awaiting_approval' => {
+  switch (answerSheetStatus) {
+    case 'Approved':
+      return 'completed';
+    case 'AI Pending':
+      return 'in_progress';
+    case 'AI Processed':
+      return 'awaiting_approval';
+    default:
+      return 'not_started';
+  }
+};
+
 const AssessmentDetails: React.FC = () => {
   const { t } = useTranslation();
   const router = useRouter();
   const { assessmentId, cohortId } = router.query;
-
-  // Status mapping for labels
-  const statusMapping = {
-    'AI Pending': 'Evaluating with AI',
-    'AI Processed': 'Awaiting Your Approval',
-    Approved: 'Marks Approved',
-  };
 
   // State management
   const [loading, setLoading] = useState(true);
@@ -126,29 +164,6 @@ const AssessmentDetails: React.FC = () => {
       fetchLearnerData();
     }
   }, [assessmentId, cohortId]);
-
-  // Helper function to get display label from answerSheetStatus
-  const getStatusLabel = (
-    answerSheetStatus: 'AI Pending' | 'AI Processed' | 'Approved'
-  ): string => {
-    return statusMapping[answerSheetStatus] || 'Not Submitted';
-  };
-
-  // Helper function to map answerSheetStatus to internal status for filtering/sorting
-  const mapAnswerSheetStatusToInternalStatus = (
-    answerSheetStatus: 'AI Pending' | 'AI Processed' | 'Approved'
-  ): 'completed' | 'in_progress' | 'not_started' | 'awaiting_approval' => {
-    switch (answerSheetStatus) {
-      case 'Approved':
-        return 'completed';
-      case 'AI Pending':
-        return 'in_progress';
-      case 'AI Processed':
-        return 'awaiting_approval';
-      default:
-        return 'not_started';
-    }
-  };
 
   // Filter and sort learners based on search and sort options
   useEffect(() => {
@@ -529,21 +544,6 @@ const AssessmentDetails: React.FC = () => {
       case 'all':
       default:
         return 'All Learners';
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return <CheckCircleIcon sx={{ color: '#4CAF50', fontSize: 24 }} />;
-      case 'in_progress':
-        return <MoreHorizIcon sx={{ color: '#FF9800', fontSize: 24 }} />;
-      case 'awaiting_approval':
-        return <ErrorIcon sx={{ color: '#FF5722', fontSize: 24 }} />;
-      case 'not_started':
-        return <RemoveIcon sx={{ color: '#9E9E9E', fontSize: 24 }} />;
-      default:
-        return null;
     }
   };
 
