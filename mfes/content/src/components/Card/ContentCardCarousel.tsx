@@ -25,7 +25,7 @@ const ContentCardCarousel = ({
   hasMoreData,
   handleLoadMore,
   isLoadingMoreData,
-  pageName
+  pageName,
 }: {
   contentData: ContentSearchResponse[];
   _config: any;
@@ -142,7 +142,7 @@ const ContentCardCarousel = ({
             alignItems: 'center',
           }}
         >
-          {t('LEARNER_APP.CONTENT_TABS.NO_MORE_DATA')}
+          {_config?.noDataText || t('LEARNER_APP.CONTENT_TABS.NO_MORE_DATA')}
         </Typography>
       )}
     </Box>
