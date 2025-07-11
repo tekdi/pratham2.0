@@ -72,7 +72,8 @@ const ContentCardGrid = memo((props: ContentCardGridProps) => {
             alignItems: 'center',
           }}
         >
-          {t('LEARNER_APP.CONTENT_TABS.NO_MORE_DATA')}
+          {props._config?.noDataText ||
+            t('LEARNER_APP.CONTENT_TABS.NO_MORE_DATA')}
         </Typography>
       )}
     </Box>

@@ -412,6 +412,9 @@ const Page = () => {
               isHideNavigation: true,
               isShowInCarousel: true,
               default_img: '/images/image_ver.png',
+              _card: {
+                isHideProgressStatus: true,
+              },
             }}
           />
         </Box>

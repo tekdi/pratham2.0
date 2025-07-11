@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import DynamicForm from '@/components/DynamicForm/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
@@ -7,6 +7,7 @@ import {
   ContentCreatorSearchSchema,
   ContentCreatorUISchema,
 } from '../constant/Forms/ContentCreatorSearch';
+import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
 
 import { RoleId, RoleName, Status, TenantName } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
@@ -53,7 +54,8 @@ const ContentCreator = () => {
   const { t, i18n } = useTranslation();
 
   const searchStoreKey = 'contentCreator';
-
+         const formRef = useRef(null);
+    
   const initialFormDataSearch =
     localStorage.getItem(searchStoreKey) &&
     localStorage.getItem(searchStoreKey) != '{}'
@@ -383,10 +385,18 @@ const ContentCreator = () => {
               SubmitaFunction={SubmitaFunction}
               isCallSubmitInHandle={true}
               prefilledFormData={prefilledFormData || {}}
+                            ref={formRef}
+
             />
           )
         )}
         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }} mt={4}>
+           <ResetFiltersButton
+            searchStoreKey="contentCreator"
+            formRef={formRef}
+            SubmitaFunction={SubmitaFunction}
+            setPrefilledFormData={setPrefilledFormData}
+          />
           <Button
             variant="outlined"
             startIcon={<AddIcon />}

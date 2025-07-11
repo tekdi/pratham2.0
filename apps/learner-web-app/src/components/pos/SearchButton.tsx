@@ -40,6 +40,7 @@ export const SearchButton: React.FC<SearchButtonProps> = ({
         alignItems: 'center',
         bgcolor: '#F5F5F5',
         borderRadius: '8px',
+        mx: '25px',
         boxShadow: '0px 1px 2px 0px #0000004D',
         ...(_box?.sx ?? {}),
       }}

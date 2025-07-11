@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import DynamicForm from '@/components/DynamicForm/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
@@ -41,6 +41,7 @@ import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import MarkAsVolunteer from '@/components/MarkAsVolunteer';
 import { showToastMessage } from '@/components/Toastify';
+import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
 
 //import { DynamicForm } from '@shared-lib';
 
@@ -77,6 +78,7 @@ const Youth = () => {
   const [isVolunteerFieldId, setIsVolunteerFieldId] = useState('');
 
   const { t, i18n } = useTranslation();
+     const formRef = useRef(null);
 
   const initialFormData = localStorage.getItem('stateId')
     ? { state: [localStorage.getItem('stateId')] }
@@ -485,6 +487,8 @@ const Youth = () => {
           schema &&
           uiSchema && (
             <DynamicForm
+               ref={formRef}
+
               schema={schema}
               uiSchema={updatedUiSchema}
               SubmitaFunction={SubmitaFunction}
@@ -493,7 +497,7 @@ const Youth = () => {
             />
           )
         )}
-
+      
         <SimpleModal
           open={openModal}
           onClose={handleCloseModal}
@@ -533,7 +537,19 @@ const Youth = () => {
             hideSubmit={true}
           />
         </SimpleModal>
-
+          <Box
+                  sx={{ display: 'flex', justifyContent: 'flex-end' }}
+                  gap={2}
+                  mt={4}
+                >
+                   <ResetFiltersButton
+          searchStoreKey="youth"
+          formRef={formRef}
+          SubmitaFunction={SubmitaFunction}
+          setPrefilledFormData={setPrefilledFormData}
+        />
+                </Box>
+ 
         {response && response?.result?.getUserDetails ? (
           <Box sx={{ mt: 5 }}>
             <PaginatedTable

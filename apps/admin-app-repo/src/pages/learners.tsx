@@ -55,6 +55,7 @@ import apartment from '../../public/images/apartment.svg';
 import { getCenterList } from '@/services/MasterDataService';
 import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 import CenterLabel from '@/components/Centerlabel';
+import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
 
 const Learner = () => {
   const theme = useTheme<any>();
@@ -96,6 +97,7 @@ const Learner = () => {
   const initialFormData = localStorage.getItem('stateId')
     ? { state: [localStorage.getItem('stateId')] }
     : {};
+     const formRef = useRef(null);
 
   const searchStoreKey = 'learner';
   const initialFormDataSearch =
@@ -606,6 +608,7 @@ const Learner = () => {
           schema &&
           uiSchema && (
             <DynamicForm
+              ref={formRef}
               schema={schema}
               uiSchema={updatedUiSchema}
               SubmitaFunction={SubmitaFunction}
@@ -614,8 +617,14 @@ const Learner = () => {
             />
           )
         )}
-        {/* <Box mt={4} sx={{ display: 'flex', justifyContent: 'end' }}>
-          <Button
+        <Box mt={4} sx={{ display: 'flex', justifyContent: 'end' }}>
+            <ResetFiltersButton
+            searchStoreKey="learner"
+            formRef={formRef}
+            SubmitaFunction={SubmitaFunction}
+            setPrefilledFormData={setPrefilledFormData}
+          />
+          {/* <Button
             variant="outlined"
             startIcon={<AddIcon />}
             color="primary"
@@ -634,8 +643,8 @@ const Learner = () => {
             }}
           >
             {t('COMMON.ADD_NEW')}
-          </Button>
-        </Box> */}
+          </Button> */}
+        </Box>
 
         <SimpleModal
           open={openModal}

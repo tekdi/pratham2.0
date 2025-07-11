@@ -89,6 +89,7 @@ const SearchPage = () => {
                 _containerGrid: {
                   spacing: { xs: 6, sm: 6, md: 6 },
                 },
+                noDataText: 'No matching results found.',
               }}
             />
           </Box>
@@ -99,7 +100,7 @@ const SearchPage = () => {
   );
 
   return (
-    <Layout sx={{ backgroundImage: 'url(/images/energy-background.png)' }}>
+    <Layout sx={{ backgroundImage: 'url(/images/mainpagebig.png)' }}>
       <SubHeader showFilter={false} />
       <Box sx={{ p: 4 }}>{contentApp}</Box>
     </Layout>
