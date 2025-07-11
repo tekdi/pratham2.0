@@ -446,35 +446,7 @@ const formRef = useRef(null);
           gap={2}
           mt={4}
         >
-          {/* <Button
-            variant="outlined"
-            color="primary"
-            sx={{
-              textTransform: 'none',
-              fontSize: '14px',
-              color: theme.palette.primary['100'],
-              width: '200px',
-            }}
-            onClick={() => {
-              const resetFormData = localStorage.getItem('stateId')
-                ? { state: [localStorage.getItem('stateId')] }
-                : {};
-
-              localStorage.setItem(
-                searchStoreKey,
-                JSON.stringify(resetFormData)
-              );
-              setPrefilledFormData(resetFormData);
-              SubmitaFunction(resetFormData);
-
-              // Trigger UI reset
-              if (formRef.current?.resetForm) {
-                formRef.current.resetForm(resetFormData);
-              }
-            }}
-          >
-            {t('COMMON.RESET_FILTERS')}
-          </Button> */}
+       
           <ResetFiltersButton
   searchStoreKey="mentor"
   formRef={formRef}
