@@ -1,8 +1,10 @@
 import React from 'react';
 import Box from '@mui/material/Box';
 import SearchIcon from '@mui/icons-material/Search';
+import ClearIcon from '@mui/icons-material/Clear';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 
 interface SearchButtonProps {
@@ -32,6 +34,11 @@ export const SearchButton: React.FC<SearchButtonProps> = ({
     setSearch(searchValue || '');
   }, [searchValue]);
 
+  const handleClear = () => {
+    setSearch('');
+    handleSearch?.('');
+  };
+
   return (
     <Box
       sx={{
@@ -52,6 +59,7 @@ export const SearchButton: React.FC<SearchButtonProps> = ({
           py: 0.5,
           display: 'flex',
           alignItems: 'center',
+          position: 'relative',
           ...(_box?.sx ?? {}),
         }}
       >
@@ -61,12 +69,29 @@ export const SearchButton: React.FC<SearchButtonProps> = ({
           {..._input}
           InputProps={{
             disableUnderline: true,
+            endAdornment: search && (
+              <IconButton
+                onClick={handleClear}
+                size="small"
+                sx={{
+                  color: '#757575',
+                  '&:hover': {
+                    color: '#1F1B13',
+                  },
+                }}
+              >
+                <ClearIcon sx={{ fontSize: '20px' }} />
+              </IconButton>
+            ),
             ...(_input?.InputProps ?? {}),
             sx: {
               fontFamily: 'Poppins',
               fontSize: '18px',
               pl: 1,
               bgcolor: 'transparent',
+              '& .MuiInputAdornment-root': {
+                marginRight: 0,
+              },
               ...(_input?.InputProps?.sx ?? {}),
             },
           }}
