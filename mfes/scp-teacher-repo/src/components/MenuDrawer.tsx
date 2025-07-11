@@ -31,6 +31,7 @@ import board from '../assets/images/Board.svg';
 import support from '../assets/images/Support.svg';
 import checkBook from '../assets/images/checkbook.svg';
 import assessment from '../assets/images/assessment.svg';
+import aiAssessment from '../assets/images/aicheckbook.svg';
 import faqs from '../assets/images/live_help.png';
 
 import surveyForm from '../assets/images/surveyForm.svg';
@@ -196,12 +197,15 @@ const MenuDrawer: React.FC<DrawerProps> = ({
   ].includes(router.pathname);
   const isObservation = router.pathname.includes('/observation');
 
-  const isAssessments = router.pathname.includes('/assessments');
+  const isAiAssessment = router.pathname.includes('/ai-assessments');
+  const isAssessments = isAiAssessment
+    ? false
+    : router.pathname.includes('/assessments');
   const isBoard = router.pathname.includes('/board-enrollment');
   const isSupportRequest = router.pathname.includes('/support-request');
   const isVillagesAndYouths = router.pathname.includes('/youthboard/villages');
   const isSurveys = router.pathname.includes('/youthboard/surveys');
-  const isFaq=router.pathname.includes('/faqs')
+  const isFaq = router.pathname.includes('/faqs');
 
   return (
     <Drawer
@@ -625,6 +629,45 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               >
                 {t('ASSESSMENTS.ASSESSMENTS')}
               </Button>
+              <Button
+                className="fs-14 joyride-step-10"
+                sx={{
+                  width: '100%',
+                  display: 'flex',
+                  justifyContent: 'flex-start',
+                  background: isAiAssessment
+                    ? theme.palette.primary.main
+                    : 'transparent',
+
+                  padding: isAiAssessment
+                    ? '16px 18px !important'
+                    : '0px 18px !important',
+                  color: isAiAssessment
+                    ? '#2E1500'
+                    : theme.palette.warning.A200,
+                  fontWeight: isAiAssessment ? '600' : 500,
+                  '&:hover': {
+                    background: isAiAssessment
+                      ? theme.palette.primary.main
+                      : 'transparent',
+                  },
+                  marginTop: '15px',
+                  gap: '10px',
+                }}
+                startIcon={
+                  <Image
+                    src={aiAssessment}
+                    alt="Assessment Icon"
+                    width={24}
+                    height={24}
+                  />
+                }
+                onClick={() => {
+                  router.push(`/ai-assessments`);
+                }}
+              >
+                {t('ASSESSMENTS.AI_ASSESSMENT')}
+              </Button>
             </Box>
           )}
         {isActiveYear && !tenantName && (
@@ -669,19 +712,13 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               width: '100%',
               display: 'flex',
               justifyContent: 'flex-start',
-              background: isFaq
-                ? theme.palette.primary.main
-                : 'transparent',
+              background: isFaq ? theme.palette.primary.main : 'transparent',
 
-              padding: isFaq
-                ? '16px 18px !important'
-                : '0px 18px !important',
+              padding: isFaq ? '16px 18px !important' : '0px 18px !important',
               color: isFaq ? '#2E1500' : theme.palette.warning.A200,
               fontWeight: isFaq ? '600' : 500,
               '&:hover': {
-                background: isFaq
-                  ? theme.palette.primary.main
-                  : 'transparent',
+                background: isFaq ? theme.palette.primary.main : 'transparent',
               },
               marginTop: '15px',
               gap: '10px',

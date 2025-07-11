@@ -1,16 +1,15 @@
 import React from 'react';
-import AssessmentSortModal from '../../../components/AssessmentSortModal';
-import CohortSelectionSection from '../../../components/CohortSelectionSection';
-import Header from '../../../components/Header';
-import Loader from '../../../components/Loader';
-import SearchBar from '../../../components/Searchbar';
-import { showToastMessage } from '../../../components/Toastify';
-import NoDataFound from '../../../components/common/NoDataFound';
-import { getDoIdForAssessmentDetails } from '../../../services/AssesmentService';
-import { getAssessmentType } from '../../../utils/Helper';
-import { ICohort } from '../../../utils/Interfaces';
-import { Role, Status } from '../../../utils/app.constant';
-import withAccessControl from '../../../utils/hoc/withAccessControl';
+import AssessmentSortModal from '../../components/AssessmentSortModal';
+import CohortSelectionSection from '../../components/CohortSelectionSection';
+import Header from '../../components/Header';
+import Loader from '../../components/Loader';
+import SearchBar from '../../components/Searchbar';
+import { showToastMessage } from '../../components/Toastify';
+import NoDataFound from '../../components/common/NoDataFound';
+import { getOfflineAssessmentDetails } from '../../services/AssesmentService';
+import { getAssessmentType } from '../../utils/Helper';
+import { ICohort } from '../../utils/Interfaces';
+import withAccessControl from '../../utils/hoc/withAccessControl';
 import ArrowDropDownSharpIcon from '@mui/icons-material/ArrowDropDownSharp';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import {
@@ -24,37 +23,16 @@ import {
   Typography,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { accessControl, Program } from '../../../../app.config';
+import { accessControl, Program } from '../../../app.config';
 
 const AssessmentList = () => {
   const theme = useTheme<any>();
   const router = useRouter();
-  const queryClient = useQueryClient();
   const { t } = useTranslation();
-
-  // Debug environment variables and configuration
-  useEffect(() => {
-    console.log('🌍 Environment and Config Debug:');
-    console.log(
-      '- NEXT_PUBLIC_MIDDLEWARE_URL:',
-      process.env.NEXT_PUBLIC_MIDDLEWARE_URL
-    );
-    console.log('- Program:', Program);
-    console.log(
-      '- URL_CONFIG.API.COMPOSITE_SEARCH:',
-      `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/action/composite/v3/search`
-    );
-    console.log('- AssessmentType enum check:', {
-      PRE_TEST: getAssessmentType('pre'),
-      POST_TEST: getAssessmentType('post'),
-      OTHER: getAssessmentType('other'),
-    });
-  }, []);
 
   // Core state management (following /assessments/index.tsx pattern)
   const [modalOpen, setModalOpen] = useState(false);
@@ -76,8 +54,6 @@ const AssessmentList = () => {
     state: '',
   });
   const [assessmentType, setAssessmentType] = useState<string>('pre');
-  const [searchTerm, setSearchTerm] = useState<string>('');
-
   const [selectedSortOption, setSelectedSortOption] = useState<{
     sortByKey: string;
     sortByValue: string;
@@ -93,25 +69,15 @@ const AssessmentList = () => {
 
   // Authentication check (following existing pattern)
   useEffect(() => {
-    console.log('🔐 Authentication useEffect triggered');
     if (typeof window !== 'undefined' && window.localStorage) {
       const token = localStorage.getItem('token');
       const storedUserId = localStorage.getItem('userId');
       const storedClassId = localStorage.getItem('classId') ?? '';
 
-      console.log('🔑 Auth data:', {
-        hasToken: !!token,
-        storedUserId,
-        storedClassId,
-        currentClassId: classId,
-      });
-
       setClassId(storedClassId);
       if (token) {
         setIsAuthenticated(true);
-        console.log('✅ User authenticated');
       } else {
-        console.log('❌ No token found, redirecting to login');
         router.push('/login');
       }
       setUserId(storedUserId);
@@ -122,31 +88,16 @@ const AssessmentList = () => {
   useEffect(() => {
     const newAssessmentType =
       query.type === 'post' ? 'post' : query.type === 'other' ? 'other' : 'pre';
-    console.log('📝 Assessment type useEffect:', {
-      queryType: query.type,
-      newAssessmentType,
-    });
     setAssessmentType(newAssessmentType);
   }, [query.type]);
 
   // Extract center data from cohorts (following /assessments/index.tsx pattern)
   useEffect(() => {
-    console.log('🔍 Center data useEffect triggered:', {
-      classId,
-      cohortsDataLength: cohortsData?.length,
-      assessmentType,
-    });
-
     if (classId && cohortsData?.length) {
-      console.log('📊 CohortsData:', cohortsData);
       const cohort = cohortsData.find((item: any) => item.cohortId === classId);
-      console.log('🎯 Found cohort:', cohort);
-
       if (!cohort?.customField) {
-        console.log('❌ No custom field found in cohort');
         return;
       }
-
       const selectedState =
         cohort.customField.find((item: any) => item.label === 'STATE')
           ?.selectedValues?.[0]?.value || '';
@@ -155,29 +106,16 @@ const AssessmentList = () => {
         cohort.customField.find((item: any) => item.label === 'BOARD')
           ?.selectedValues?.[0] || '';
 
-      console.log('🏛️ Extracted data:', { selectedState, selectedBoard });
       setCenterData({ state: selectedState, board: selectedBoard });
     }
   }, [assessmentType, classId, cohortsData]);
 
   // Get assessment data (following /assessments/index.tsx pattern)
   useEffect(() => {
-    console.log('🚀 Assessment data useEffect triggered:', {
-      assessmentType,
-      centerDataBoard: centerData?.board,
-      centerDataState: centerData?.state,
-    });
-
     const getDoIdForAssessmentReport = async (
       selectedState: string,
       selectedBoard: string
     ) => {
-      console.log('📡 Starting API call with:', {
-        selectedState,
-        selectedBoard,
-        assessmentType,
-      });
-
       const filters = {
         program: Program,
         board: [selectedBoard],
@@ -185,29 +123,18 @@ const AssessmentList = () => {
         assessmentType: getAssessmentType(assessmentType),
         primaryCategory: ['Practice Question Set'],
       };
-
-      console.log('🔧 API Filters:', filters);
-
       try {
         if (filters) {
           setIsLoading(true);
           setAssessmentList([]);
           setFilteredAssessments([]);
 
-          console.log('📞 Calling getDoIdForAssessmentDetails API...');
-          const searchResults = await getDoIdForAssessmentDetails({ filters });
-          console.log('📋 API Response:', searchResults);
+          const searchResults = await getOfflineAssessmentDetails({ filters });
 
           if (searchResults?.responseCode === 'OK') {
             const result = searchResults?.result;
             if (result) {
-              console.log('✅ Result found:', result);
               if (result?.QuestionSet?.length > 0) {
-                console.log(
-                  '📚 QuestionSet found:',
-                  result.QuestionSet.length,
-                  'items'
-                );
                 const assessmentData = result.QuestionSet.map((item: any) => ({
                   subject: item?.name,
                   identifier: item?.IL_UNIQUE_ID,
@@ -218,11 +145,9 @@ const AssessmentList = () => {
                   medium: item?.medium,
                   gradeLevel: item?.gradeLevel,
                 }));
-                console.log('🎯 Processed assessment data:', assessmentData);
                 setAssessmentList(assessmentData);
                 setFilteredAssessments(assessmentData);
               } else {
-                console.log('📭 No QuestionSet found in result');
                 setAssessmentList([]);
                 setFilteredAssessments([]);
               }
@@ -246,13 +171,8 @@ const AssessmentList = () => {
 
     // This condition should match the working implementation
     if (centerData?.board && assessmentType) {
-      console.log('✅ Conditions met, calling API');
       getDoIdForAssessmentReport(centerData.state, centerData.board);
     } else {
-      console.log('❌ Conditions not met:', {
-        hasCenterDataBoard: !!centerData?.board,
-        hasAssessmentType: !!assessmentType,
-      });
       // If no board data, ensure loading is false
       setIsLoading(false);
     }
@@ -282,7 +202,6 @@ const AssessmentList = () => {
 
   // Search functionality
   const handleSearch = (searchTerm: string) => {
-    setSearchTerm(searchTerm);
     if (searchTerm.trim() === '') {
       setFilteredAssessments(assessmentList);
     } else {
@@ -366,22 +285,11 @@ const AssessmentList = () => {
   const handleAssessmentDetails = (identifier: string, subject: string) => {
     // Navigate to assessment details page with assessmentId, cohortId, and subject
     if (identifier && classId) {
-      const navigationUrl = `/assessments/${identifier}?cohortId=${classId}&subject=${encodeURIComponent(
+      const navigationUrl = `/ai-assessments/${identifier}?cohortId=${classId}&subject=${encodeURIComponent(
         subject
       )}`;
-      console.log('Navigating to assessment:', {
-        identifier,
-        classId,
-        subject,
-        url: navigationUrl,
-      });
       router.push(navigationUrl);
     } else {
-      console.warn('Missing required data for navigation:', {
-        identifier,
-        classId,
-        subject,
-      });
       showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
     }
   };

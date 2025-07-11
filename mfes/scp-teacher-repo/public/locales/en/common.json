@@ -695,6 +695,7 @@
   },
   "ASSESSMENTS": {
     "ASSESSMENTS": "Assessments",
+    "AI_ASSESSMENT": "AI Assessment",
     "ASSESSMENT_LIST": "Assessment List",
     "CENTER": "Center",
     "ASSESSMENT_TYPE": "Assessment Type",
