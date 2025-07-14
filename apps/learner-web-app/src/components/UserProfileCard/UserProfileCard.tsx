@@ -42,6 +42,8 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
   const { t } = useTranslation();
   const [selectedOption, setSelectedOption] = useState('');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const tenantName = typeof window !== 'undefined' ? localStorage.getItem('userProgram') || '' : '';
+
   const storedConfig =
     typeof window !== 'undefined'
       ? JSON.parse(localStorage.getItem('uiConfig') || '{}')
@@ -306,7 +308,7 @@ const ptmName = getCustomFieldValue(customFields, 'PTM_NAME');
                     <Typography sx={valueStyle}>{mobile}</Typography>
                   </Grid>
                 )}
-                {phoneOwnership !== '-' && (
+                {phoneOwnership !== '-' && tenantName!=="Camp to Club"  &&(
                   <Grid item xs={6}>
                     <Typography sx={labelStyle}>
                       {t('LEARNER_APP.USER_PROFILE_CARD.PHONE_BELONGS_TO_YOU')}
@@ -423,7 +425,7 @@ const ptmName = getCustomFieldValue(customFields, 'PTM_NAME');
               </Grid>
             )}
               
-            {qualification !== '-' && (
+            {qualification !== '-' &&  tenantName!=="Camp to Club" &&(
               <Grid item xs={6}>
                 <Typography sx={labelStyle}>
                   {t('LEARNER_APP.USER_PROFILE_CARD.HIGHEST_QUALIFICATION')}
