@@ -12,13 +12,13 @@ export default memo(function SearchComponent({
 }) {
   const { t } = useTranslation();
   const [searchValue, setSearchValue] = useState('');
-  const isFirstRender = useRef(true); 
+  const isFirstRender = useRef(true);
 
   const debouncedSearch = useMemo(
     () =>
       debounce((value: string) => {
         if (value?.trim() !== '') {
-          onSearch(value.trim());
+          onSearch(value?.trim());
         }
       }, 500),
     [onSearch]
