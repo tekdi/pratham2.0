@@ -155,6 +155,7 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
     username,
     customFields = [],
   } = userData;
+  console.log("customFields", customFields);
   if (typeof window !== 'undefined' && mobile) {
     localStorage.setItem('usermobile', mobile);
   }
@@ -196,6 +197,7 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
     customFields,
     'RELATION_WITH_GUARDIAN'
   );
+const ptmName = getCustomFieldValue(customFields, 'PTM_NAME');
 
   const state = getCustomFieldValue(customFields, 'STATE');
   const district = getCustomFieldValue(customFields, 'DISTRICT');
@@ -377,6 +379,14 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
                 <Typography sx={valueStyle}>{toPascalCase(gender)}</Typography>
               </Grid>
             )}
+            {ptmName !== '-' && (
+    <Grid item xs={3}>
+      <Typography sx={labelStyle}>
+        {t('LEARNER_APP.USER_PROFILE_CARD.PTM_NAME')}
+      </Typography>
+      <Typography sx={valueStyle}>{toPascalCase(ptmName)}</Typography>
+    </Grid>
+  )}
             {dob !== '-' && (
               <Grid item xs={6}>
                 <Typography sx={labelStyle}>
@@ -391,6 +401,7 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
                 </Typography>
               </Grid>
             )}
+            
             {maritalStatus !== '-' && (
               <Grid item xs={6}>
                 <Typography sx={labelStyle}>
@@ -411,8 +422,9 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
                 </Typography>
               </Grid>
             )}
+              
             {qualification !== '-' && (
-              <Grid item xs={12}>
+              <Grid item xs={6}>
                 <Typography sx={labelStyle}>
                   {t('LEARNER_APP.USER_PROFILE_CARD.HIGHEST_QUALIFICATION')}
                 </Typography>
@@ -432,6 +444,8 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
                 </Typography>
               </Grid>
             )}
+          
+
           </Grid>
         </Box>
 
