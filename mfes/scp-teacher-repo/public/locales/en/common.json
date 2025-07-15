@@ -733,7 +733,7 @@
     "DOWNLOAD_SUCCESS": "Question paper downloaded successfully",
     "CANCEL": "Cancel",
     "MARKS_APPROVED_SCORE": "Marks approved: {{score}}/{{maxScore}}",
-    "EVALUATING_WITH_AI": "Evaluating with AI..",
+    "UNDER_AI_EVALUATION": "Under AI Evaluation",
     "AWAITING_YOUR_APPROVAL": "Awaiting Your Approval",
     "NOT_SUBMITTED": "Not Submitted",
     "APPROVED_ON": "Approved on: {{date}}",

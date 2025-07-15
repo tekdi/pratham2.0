@@ -29,6 +29,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
   userId,
   questionSetId,
   identifier,
+  onSubmissionSuccess,
 }) => {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -178,6 +179,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
 
       showToast('Answer sheet submitted successfully!', 'success');
       onClose();
+      onSubmissionSuccess?.();
     } catch (error) {
       console.error('Error submitting answer sheet:', error);
       showToast('Failed to submit answer sheet. Please try again.', 'error');

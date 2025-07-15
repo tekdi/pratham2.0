@@ -93,7 +93,7 @@ type SortOption =
 
 // Status mapping for labels
 const statusMapping = {
-  'AI Pending': 'Evaluating with AI',
+  'AI Pending': 'Under AI Evaluation',
   'AI Processed': 'Awaiting Your Approval',
   Approved: 'Marks Approved',
 };
@@ -220,9 +220,9 @@ const AssessmentDetails: React.FC = () => {
         break;
       case 'all':
       default: {
-        // Sort by status priority: "Evaluating with AI" → "Awaiting Your Approval" → "Marks Approved"
+        // Sort by status priority: "Under AI Evaluation" → "Awaiting Your Approval" → "Marks Approved"
         const statusOrder = {
-          in_progress: 1, // "Evaluating with AI"
+          in_progress: 1, // "Under AI Evaluation"
           awaiting_approval: 2, // "Awaiting Your Approval"
           completed: 3, // "Marks Approved"
           not_started: 4, // "Not Submitted"
@@ -532,7 +532,7 @@ const AssessmentDetails: React.FC = () => {
       case 'not_started':
         return 'Not Submitted';
       case 'in_progress':
-        return statusMapping['AI Pending']; // 'Evaluating with AI'
+        return statusMapping['AI Pending']; // 'Under AI Evaluation'
       case 'name_asc':
         return 'Name (A-Z)';
       case 'name_desc':
@@ -554,7 +554,7 @@ const AssessmentDetails: React.FC = () => {
           maxScore || assessmentData?.maxScore || 130
         }`;
       case 'in_progress':
-        return 'Evaluating with AI';
+        return 'Under AI Evaluation';
       case 'awaiting_approval':
         return 'Awaiting Your Approval';
       case 'not_started':
@@ -616,7 +616,7 @@ const AssessmentDetails: React.FC = () => {
       },
       {
         count: counts.in_progress,
-        label: statusMapping['AI Pending'], // 'Evaluating with AI'
+        label: statusMapping['AI Pending'], // 'Under AI Evaluation'
       },
       {
         count: counts.awaiting_approval,
@@ -681,20 +681,6 @@ const AssessmentDetails: React.FC = () => {
             </Card>
           </Box>
         )}
-
-        {/* Assessment Info Chip */}
-        {/* <Box sx={{ px: 2, mb: 2 }}>
-          <Chip
-            label={`${assessmentData?.totalQuestions} Questions • ${assessmentData?.duration} mins • ${assessmentData?.subject}`}
-            sx={{
-              backgroundColor: '#E8F5E8',
-              color: '#2E7D32',
-
-              fontSize: '12px',
-              height: '28px',
-            }}
-          />
-        </Box> */}
 
         {/* Search Bar */}
         <Box sx={{ px: 2, mb: 2 }}>
@@ -828,15 +814,26 @@ const AssessmentDetails: React.FC = () => {
 
         {/* Status Summary Cards */}
         <Box sx={{ px: 2, mb: 2 }}>
-          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+          <Box
+            sx={{
+              display: { xs: 'grid', sm: 'grid', md: 'flex' },
+              gridTemplateColumns: { xs: '1fr 1fr', sm: '1fr 1fr' },
+              gap: 2,
+              width: '100%',
+              flexWrap: { md: 'wrap' },
+            }}
+          >
             {statusCounts?.map((item, index) => (
               <Card
                 key={index}
                 sx={{
                   backgroundColor: '#FDF2E5',
                   borderRadius: '12px',
-                  minWidth: 100,
-                  flex: 1,
+                  minHeight: { xs: 80, md: 'auto' },
+                  minWidth: { md: 100 },
+                  flex: { md: 1 },
+                  display: 'flex',
+                  flexDirection: 'column',
                 }}
               >
                 <CardContent
@@ -846,6 +843,7 @@ const AssessmentDetails: React.FC = () => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     p: '16px !important',
+                    flex: 1,
                   }}
                 >
                   <Typography
@@ -876,11 +874,11 @@ const AssessmentDetails: React.FC = () => {
         </Box>
 
         {/* Learner List */}
-        <Box sx={{ px: 2, pb: 2 }}>
+        <Box sx={{ px: { sm: 0, md: 2 }, pb: 2 }}>
           <Card
             sx={{
               backgroundColor: '#FBF4E4',
-              borderRadius: '12px',
+              borderRadius: { md: '12px' },
               border: '1px solid #E0E0E0',
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
             }}

@@ -214,6 +214,94 @@ const AssessmentDetails = () => {
     }
   }, [assessmentData]);
 
+  const fetchOfflineAssessmentData = async (showSuccessMessage = false) => {
+    try {
+      const userData = await getOfflineAssessmentStatus({
+        userIds: [userId as string],
+        questionSetId: assessmentId as string,
+      });
+
+      if (userData?.result?.length > 0) {
+        // Find the assessment data for the current user
+        const currentUserData = userData.result.find(
+          (item: OfflineAssessmentData) => item.userId === userId
+        );
+        if (currentUserData) {
+          // Ensure fileUrls and records are arrays
+          const sanitizedData: OfflineAssessmentData = {
+            ...currentUserData,
+            fileUrls: Array.isArray(currentUserData.fileUrls)
+              ? currentUserData.fileUrls
+              : [],
+            records: Array.isArray(currentUserData.records)
+              ? currentUserData.records
+              : [],
+          };
+          setAssessmentData(sanitizedData);
+
+          if (showSuccessMessage) {
+            setSnackbar({
+              open: true,
+              message: 'Assessment status updated successfully',
+              severity: 'success',
+            });
+          }
+
+          // Check if we should fetch assessment tracking data
+          if (
+            currentUserData.status &&
+            currentUserData.status !== 'AI Pending'
+          ) {
+            const response = await getAssessmentTracking({
+              userId: userId as string,
+              contentId: assessmentId as string,
+              courseId: assessmentId as string,
+              unitId: assessmentId as string,
+            });
+            if (response?.data?.length > 0) {
+              // Find the latest assessment data by comparing timestamps
+              const latestAssessment = response.data.reduce(
+                (
+                  latest: AssessmentTrackingData,
+                  current: AssessmentTrackingData
+                ) => {
+                  const currentDate = Math.max(
+                    new Date(current.createdOn).getTime(),
+                    new Date(current.lastAttemptedOn).getTime(),
+                    new Date(current.updatedOn).getTime()
+                  );
+
+                  const latestDate = Math.max(
+                    new Date(latest.createdOn).getTime(),
+                    new Date(latest.lastAttemptedOn).getTime(),
+                    new Date(latest.updatedOn).getTime()
+                  );
+
+                  return currentDate > latestDate ? current : latest;
+                },
+                response.data[0]
+              );
+
+              setAssessmentTrackingData(latestAssessment);
+            }
+          }
+        }
+      } else {
+        console.log('No offline assessment data found for user:', userId);
+      }
+    } catch (error) {
+      console.error('Error fetching offline assessment data:', error);
+      if (showSuccessMessage) {
+        setSnackbar({
+          open: true,
+          message: 'Failed to refresh assessment status',
+          severity: 'error',
+        });
+      }
+      throw error;
+    }
+  };
+
   useEffect(() => {
     const fetchAssessmentData = async () => {
       if (assessmentId && userId) {
@@ -234,71 +322,7 @@ const AssessmentDetails = () => {
               lastName: userDetailsResponse?.result?.userData?.lastName,
             });
           }
-          const userData = await getOfflineAssessmentStatus({
-            userIds: [userId as string],
-            questionSetId: assessmentId as string,
-          });
-
-          if (userData?.result?.length > 0) {
-            // Find the assessment data for the current user
-            const currentUserData = userData.result.find(
-              (item: OfflineAssessmentData) => item.userId === userId
-            );
-            if (currentUserData) {
-              // Ensure fileUrls and records are arrays
-              const sanitizedData: OfflineAssessmentData = {
-                ...currentUserData,
-                fileUrls: Array.isArray(currentUserData.fileUrls)
-                  ? currentUserData.fileUrls
-                  : [],
-                records: Array.isArray(currentUserData.records)
-                  ? currentUserData.records
-                  : [],
-              };
-              setAssessmentData(sanitizedData);
-
-              if (
-                (currentUserData.status &&
-                  currentUserData.status !== 'AI Pending') ||
-                true
-              ) {
-                const response = await getAssessmentTracking({
-                  userId: userId as string,
-                  contentId: assessmentId as string,
-                  courseId: assessmentId as string,
-                  unitId: assessmentId as string,
-                });
-                if (response?.data?.length > 0) {
-                  // Find the latest assessment data by comparing timestamps
-                  const latestAssessment = response.data.reduce(
-                    (
-                      latest: AssessmentTrackingData,
-                      current: AssessmentTrackingData
-                    ) => {
-                      const currentDate = Math.max(
-                        new Date(current.createdOn).getTime(),
-                        new Date(current.lastAttemptedOn).getTime(),
-                        new Date(current.updatedOn).getTime()
-                      );
-
-                      const latestDate = Math.max(
-                        new Date(latest.createdOn).getTime(),
-                        new Date(latest.lastAttemptedOn).getTime(),
-                        new Date(latest.updatedOn).getTime()
-                      );
-
-                      return currentDate > latestDate ? current : latest;
-                    },
-                    response.data[0]
-                  );
-
-                  setAssessmentTrackingData(latestAssessment);
-                }
-              }
-            }
-          } else {
-            console.log('No offline assessment data found for user:', userId);
-          }
+          await fetchOfflineAssessmentData(false);
         } catch (error) {
           console.error('Error fetching assessment data:', error);
         } finally {
@@ -425,32 +449,8 @@ const AssessmentDetails = () => {
     setIsConfirmModalOpen(false);
   };
 
-  // Update parseResValue function
-  const parseResValue = (
-    resValue: string
-  ): { response: string; aiSuggestion: string } => {
-    try {
-      const parsed = JSON.parse(resValue);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        const response = parsed[0];
-        return {
-          response: response.label
-            ? response.label.replace(/<\/?p>/g, '')
-            : response.value || 'No response',
-          aiSuggestion: response.AI_suggestion || 'No AI suggestion available',
-        };
-      }
-      return {
-        response: 'No response',
-        aiSuggestion: 'No AI suggestion available',
-      };
-    } catch (error) {
-      console.error('Error parsing resValue:', error);
-      return {
-        response: 'Invalid response format',
-        aiSuggestion: 'No AI suggestion available',
-      };
-    }
+  const handleRefreshAssessmentData = async () => {
+    await fetchOfflineAssessmentData(true);
   };
 
   if (loading) {
@@ -719,6 +719,7 @@ const AssessmentDetails = () => {
           typeof assessmentId === 'string' ? assessmentId : undefined
         }
         identifier={typeof assessmentId === 'string' ? assessmentId : undefined}
+        onSubmissionSuccess={handleRefreshAssessmentData}
       />
 
       {/* Snackbar for feedback */}

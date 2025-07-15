@@ -7,6 +7,7 @@ export interface UploadOptionsPopupProps {
   userId?: string;
   questionSetId?: string;
   identifier?: string;
+  onSubmissionSuccess?: () => void;
 }
 
 export interface UploadedImage {
