@@ -233,11 +233,9 @@ export default function Content(props: Readonly<ContentProps>) {
         config?._config?._grid
       );
       setCurrentLimit(dynamicLimit);
-      console.log('savedFilters sagar', savedFilters);
+
       if (savedFilters) {
         setLocalFilters({
-          limit: dynamicLimit, // Always use current device limit
-          offset: 0, // Reset offset when using dynamic limit
           ...(config?.filters ?? {}),
           type:
             props?.contentTabs?.length === 1
@@ -674,7 +672,7 @@ function scrollToSavedContent(
     }
     sessionStorage.removeItem(scrollName);
 
-    if (sessionKeys.scrollId) {
+    if (sessionKeys.filters) {
       sessionStorage.removeItem(sessionKeys.filters);
     }
   } else {
