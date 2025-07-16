@@ -40,8 +40,10 @@ import { useTheme } from '@mui/material/styles';
 import { useRouter } from 'next/router';
 import AddIcon from '@mui/icons-material/Add';
 import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
-
-//import { DynamicForm } from '@shared-lib';
+import MentorForm from '@/components/DynamicForm/MentorForm/MentorForm';
+import { modifiedSchema } from 'mfes/youthNet/src/utils/Helper';
+import apartment from '../../public/images/apartment.svg';
+import { getStateBlockDistrictList } from '@/services/MasterDataService';
 
 const Mentor = () => {
   const theme = useTheme<any>();
@@ -50,6 +52,7 @@ const Mentor = () => {
   const [uiSchema, setUiSchema] = useState(MentorSearchUISchema);
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
+  const [originalSchema, setOriginalSchema] = useState(null);
   const [prefilledAddFormData, setPrefilledAddFormData] = useState({});
   const [pageLimit, setPageLimit] = useState<number>(10);
   const [pageOffset, setPageOffset] = useState<number>(0);
@@ -72,8 +75,12 @@ const Mentor = () => {
   });
   const [reason, setReason] = useState('');
   const [memberShipID, setMemberShipID] = useState('');
-const formRef = useRef(null);
-
+  const [blockVillageMap, setBlockVillageMap] = useState<
+    Record<number, number[]>
+  >({});
+  const [buttonShow, setButtonShowState] = useState(true);
+  const [isReassign, setIsReassign] = useState(false);
+  const formRef = useRef(null);
   const { t, i18n } = useTranslation();
 
   const initialFormData = localStorage.getItem('stateId')
@@ -88,6 +95,8 @@ const formRef = useRef(null);
       : localStorage.getItem('stateId')
       ? { state: [localStorage.getItem('stateId')] }
       : {};
+
+  console.log('prefilledFormData!!!', prefilledFormData);
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -110,8 +119,10 @@ const formRef = useRef(null);
         },
       ]);
       console.log('responseForm', responseForm);
-      setAddSchema(responseForm?.schema);
-      setAddUiSchema(responseForm?.uiSchema);
+      const { newSchema, extractedFields } = modifiedSchema(responseForm);
+      setAddSchema(newSchema?.schema);
+      setAddUiSchema(newSchema?.uiSchema);
+      setOriginalSchema(responseForm?.schema);
     };
 
     setPrefilledAddFormData(initialFormData);
@@ -332,6 +343,7 @@ const formRef = useRef(null);
         // console.log('tempFormData', tempFormData);
         setPrefilledAddFormData(tempFormData);
         setIsEdit(true);
+        setIsReassign(false);
         setEditableUserId(row?.userId);
         handleOpenModal();
       },
@@ -358,20 +370,6 @@ const formRef = useRef(null);
             return item;
           }
         });
-
-        // console.log('row:', row?.customFields[2].selectedValues[0].value);
-        // setEditableUserId(row?.userId);
-        // const memberStatus = Status.ARCHIVED;
-        // const statusReason = '';
-        // const membershipId = row?.userId;
-
-        // const response = await updateCohortMemberStatus({
-        //   memberStatus,
-        //   statusReason,
-        //   membershipId,
-        // });
-        // setPrefilledFormData({});
-        // searchData(prefilledFormData, currentPage);
         setOpen(true);
         setUserId(row?.userId);
 
@@ -381,6 +379,83 @@ const formRef = useRef(null);
           village: findVillage?.selectedValues?.[0]?.value || '',
         });
       },
+    },
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            backgroundColor: 'rgb(227, 234, 240)',
+            padding: '10px',
+          }}
+        >
+          <Image src={apartment} alt="" />
+        </Box>
+      ),
+      callback: async (row) => {
+        // console.log('row:', row);
+        let tempFormData = extractMatchingKeys(row, addSchema);
+        let blockIds = [];
+        let villageIds = [];
+        row?.customFields?.forEach((field) => {
+          if (field.label === 'BLOCK') {
+            blockIds = field.selectedValues.map((item) => item.id);
+          }
+          if (field.label === 'VILLAGE') {
+            villageIds = field.selectedValues.map((item) => item.id);
+          }
+        });
+        // console.log('blockIds', blockIds);
+        // console.log('villageIds', villageIds);
+        // console.log('tempFormData>>>>', tempFormData);
+        const getVillageMapByBlock = async () => {
+          const result: Record<number, number[]> = {};
+
+          for (const blockId of blockIds) {
+            console.log('Processing blockId:', blockId); // Debug log
+
+            if (!blockId) continue;
+
+            try {
+              const villageResponse = await getStateBlockDistrictList({
+                controllingfieldfk: [blockId],
+                fieldName: 'village',
+              });
+
+              const villages = villageResponse?.result?.values || [];
+
+              const matchedVillages = villages
+                .filter((item: any) => villageIds.includes(item?.value))
+                .map((item: any) => item?.value);
+
+              if (matchedVillages.length > 0) {
+                result[blockId] = matchedVillages;
+              }
+            } catch (error) {
+              console.error(
+                `Error fetching villages for blockId ${blockId}:`,
+                error
+              );
+            }
+          }
+          return result;
+        };
+
+        // Call the function
+        const villageMap = await getVillageMapByBlock();
+        // console.log('Final block-village map:', villageMap);
+        setBlockVillageMap(villageMap);
+        setPrefilledAddFormData(tempFormData);
+        setIsEdit(false);
+        setIsReassign(true);
+        setButtonShow(true);
+        setEditableUserId(row?.userId);
+        handleOpenModal();
+      },
+      show: (row) => row.status !== 'archived',
     },
   ];
 
@@ -399,6 +474,9 @@ const formRef = useRef(null);
 
   const handleCloseModal = () => {
     setOpenModal(false);
+    setIsReassign(false);
+    setIsEdit(false);
+    setButtonShow(true);
   };
 
   //Add Edit Props
@@ -423,6 +501,11 @@ const formRef = useRef(null);
   const notificationMessage = 'MENTORS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
 
+  const setButtonShow = (status) => {
+    console.log('########## changed', status);
+    setButtonShowState(status);
+  };
+
   return (
     <>
       <Box display={'flex'} flexDirection={'column'} gap={2}>
@@ -446,13 +529,12 @@ const formRef = useRef(null);
           gap={2}
           mt={4}
         >
-       
           <ResetFiltersButton
-  searchStoreKey="mentor"
-  formRef={formRef}
-  SubmitaFunction={SubmitaFunction}
-  setPrefilledFormData={setPrefilledFormData}
-/>
+            searchStoreKey="mentor"
+            formRef={formRef}
+            SubmitaFunction={SubmitaFunction}
+            setPrefilledFormData={setPrefilledFormData}
+          />
 
           <Button
             variant="outlined"
@@ -467,6 +549,7 @@ const formRef = useRef(null);
             onClick={() => {
               setPrefilledAddFormData(initialFormData);
               setIsEdit(false);
+              setIsReassign(false);
               setEditableUserId('');
               handleOpenModal();
             }}
@@ -478,26 +561,32 @@ const formRef = useRef(null);
         <SimpleModal
           open={openModal}
           onClose={handleCloseModal}
-          showFooter={true}
-          modalTitle={
-            isEdit ? t('MENTORS.UPDATE_MENTOR') : t('MENTORS.NEW_MENTOR')
-          }
-          primaryText={isEdit ? 'Update' : 'Next'}
+          showFooter={buttonShow}
+          primaryText={isEdit ? t('Update') : t('Next')}
           id="dynamic-form-id"
+          modalTitle={
+            isEdit
+              ? t('MENTORS.UPDATE_MENTOR')
+              : isReassign
+              ? t('MENTORS.RE_ASSIGN_MENTOR')
+              : t('MENTORS.NEW_MENTOR')
+          }
         >
-          <AddEditUser
+          <MentorForm
+            t={t}
             SuccessCallback={() => {
-              setPrefilledFormData({});
-              searchData({}, 0);
+              setPrefilledFormData(initialFormDataSearch);
+              searchData(initialFormDataSearch, 0);
               setOpenModal(false);
             }}
             schema={addSchema}
             uiSchema={addUiSchema}
             editPrefilledFormData={prefilledAddFormData}
             isEdit={isEdit}
+            isReassign={isReassign}
             editableUserId={editableUserId}
             UpdateSuccessCallback={() => {
-              setPrefilledFormData({});
+              setPrefilledFormData(prefilledFormData);
               searchData(prefilledFormData, currentPage);
               setOpenModal(false);
             }}
@@ -514,6 +603,13 @@ const formRef = useRef(null);
             notificationContext={notificationContext}
             type="mentor"
             hideSubmit={true}
+            setButtonShow={setButtonShow}
+            sdbvFieldData={originalSchema}
+            blockVillageMap={isReassign ? blockVillageMap : {}}
+            // isSteeper={true}
+            // blockReassignmentNotificationKey={blockReassignmentNotificationKey}
+            // profileUpdateNotificationKey={profileUpdateNotificationKey}
+            // centerUpdateNotificationKey={centerUpdateNotificationKey}
           />
         </SimpleModal>
 
