@@ -232,19 +232,23 @@ const SubHeader = ({
           >
             <SearchButton
               searchValue={search}
-              onSearch={() => {
+              onSearch={(value) => {
                 if (typeof window !== 'undefined') {
                   const windowUrl = window.location.pathname;
                   const cleanedUrl = windowUrl;
 
                   logEvent({
-                    action: 'search in thematic coneten by ' + search,
+                    action: 'search in thematic coneten by ' + value,
                     category: cleanedUrl,
                     label: 'Search thematic content',
                   });
-                  router.push(
-                    '/themantic/search?q=' + encodeURIComponent(search)
-                  );
+                  if (value) {
+                    router.push(
+                      '/themantic/search?q=' + encodeURIComponent(value)
+                    );
+                  } else {
+                    router.push('/themantic/search');
+                  }
                 }
               }}
               handleSearch={setSearch}

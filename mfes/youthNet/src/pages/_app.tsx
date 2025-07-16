@@ -92,6 +92,23 @@ function CustomApp({ Component, pageProps }: AppProps) {
     }
   }, [i18n.language]);
 
+    useEffect(() => {
+      if (!window.GA_INITIALIZED) {
+        console.log('Initializing GA');
+        initGA(`${process.env.NEXT_PUBLIC_MEASUREMENT_ID_TEACHER}`);
+        window.GA_INITIALIZED = true;
+      }
+
+      const handleRouteChange = (url: string) => {
+        logPageView(url);
+      };
+
+      handleRouteChange(window.location.pathname);
+    }, [router.events]);
+
+
+
+
   useEffect(() => {
     telemetryFactory.init();
   }, []);

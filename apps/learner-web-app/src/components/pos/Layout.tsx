@@ -357,12 +357,7 @@ const Brand = () => {
   const { isColorInverted } = useColorInversion();
 
   return (
-    <Box
-      display="flex"
-      gap={1}
-      onClick={() => router.push('/pos')}
-      sx={{ cursor: 'pointer' }}
-    >
+    <Box display="flex" gap={1}>
       <Image
         src={
           isColorInverted
@@ -372,16 +367,26 @@ const Brand = () => {
         alt="Pratham"
         width={146}
         height={32}
+        style={{ height: '32px', cursor: 'pointer' }}
+        onClick={() => router.push('/pos')}
       />
-      <Image
-        src={
-          isColorInverted ? '/images/pradigi-white.png' : '/images/pradigi.png'
-        }
-        alt="Pradigi"
-        width={94}
-        height={32}
-        style={{ height: '32px' }}
-      />
+      <a
+        href="https://www.pradigi.org"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <Image
+          src={
+            isColorInverted
+              ? '/images/pradigi-white.png'
+              : '/images/pradigi.png'
+          }
+          alt="Pradigi"
+          width={94}
+          height={32}
+          style={{ height: '32px', cursor: 'pointer' }}
+        />
+      </a>
     </Box>
   );
 };

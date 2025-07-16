@@ -87,10 +87,26 @@ const Page = () => {
     { src: '/our-partner/WD.png', alt: 'logo38' },
   ];
   const otherWebsites = [
-    { src: '/images/website-1.png', alt: 'UBS' },
-    { src: '/images/Websites-2.png', alt: 'Education Above All' },
-    { src: '/images/website-3.png', alt: 'Sulzer' },
-    { src: '/images/website-4.png', alt: 'Schmidt Futures' },
+    {
+      src: '/images/ASER.jpg',
+      alt: 'UBS',
+      href: 'https://asercentre.org/',
+    },
+    {
+      src: '/images/info-foundation.png',
+      alt: 'Education Above All',
+      href: 'https://pif.org.in/',
+    },
+    {
+      src: '/images/pratham-shah-centre2.png',
+      alt: 'Sulzer',
+      href: 'https://www.pradigi.org/',
+    },
+    {
+      src: '/images/Pratham-International.png',
+      alt: 'Schmidt Futures',
+      href: 'https://prathaminternational.org/',
+    },
   ];
 
   const mediaMD = useMediaQuery('(max-width: 900px)');

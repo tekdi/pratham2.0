@@ -9,7 +9,7 @@ import 'swiper/css/pagination';
 const OtherWebsiteCarousel = ({
   images,
 }: {
-  images: { src: string; alt: string }[];
+  images: { src: string; alt: string; href: string }[];
 }) => {
   const theme = useTheme();
   return (
@@ -74,7 +74,15 @@ const OtherWebsiteCarousel = ({
                 px: 3,
                 flexDirection: 'column',
                 position: 'relative',
+                cursor: 'pointer',
+                '&:hover img': {
+                  transform: 'scale(1.05)',
+                  transition: 'transform 0.3s ease',
+                },
               }}
+              onClick={() =>
+                window.open(image.href, '_blank', 'noopener,noreferrer')
+              }
             >
               <img
                 src={image.src}
@@ -85,6 +93,7 @@ const OtherWebsiteCarousel = ({
                   objectFit: 'contain',
                   display: 'block',
                   margin: '0 auto',
+                  transition: 'transform 0.3s ease',
                 }}
                 loading="lazy"
               />

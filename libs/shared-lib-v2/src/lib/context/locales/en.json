@@ -314,7 +314,8 @@
       "GUARDIAN_RELATION": "Relation with Guardian",
       "GUARDIAN_NAME": "Guardian's Name",
       "GUARDIAN_DETAILS": "Guardian Details",
-      "I_WANT_TO_BECOME": "I want to become {futureWork}"
+      "I_WANT_TO_BECOME": "I want to become {futureWork}",
+      "PTM_NAME":"PTM Name"
     },
     "USERNAME_SUGGESTION": {
       "USERNAME": "Username",
