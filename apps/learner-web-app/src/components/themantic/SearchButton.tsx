@@ -37,6 +37,7 @@ export const SearchButton: React.FC<SearchButtonProps> = ({
   const handleClear = () => {
     setSearch('');
     handleSearch?.('');
+    onSearch('');
   };
 
   return (
