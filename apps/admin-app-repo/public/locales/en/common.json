@@ -683,7 +683,8 @@
     "BACK_TO_FORM": "Back to form",
     "SEARCH_VILLAGES": "Search villages..",
     "BACK": "Back",
-    "SAVE_SELECTION": "Save Selection"
+    "SAVE_SELECTION": "Save Selection",
+    "SELECTED_VILLAGE_COUNT": "Selected village count : {{totalVillageCount}}"
   },
   "WHATS_YOUR_GENDER": "Gender",
   "first_name": "First Name",
@@ -780,7 +781,8 @@
     "EDIT_MENTOR": "Edit Mentor",
     "NOT_ABLE_UPDATE_MENTOR": "Not able to update mentor",
     "NOT_ABLE_CREATE_MENTOR": "Not able to create mentor",
-    "UPDATE_MENTOR": "Update Mentor"
+    "UPDATE_MENTOR": "Update Mentor",
+    "RE_ASSIGN_MENTOR": "Re-assign Mentor"
   },
   "GOOGLE MAP_LINK": "Google Map Link",
   "District": "District",
