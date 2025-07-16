@@ -1,13 +1,8 @@
 import dynamic from 'next/dynamic';
-import React, { useState, useCallback, memo, useEffect } from 'react';
+import React, { useState, useCallback, memo, useEffect, useRef } from 'react';
 import { Box, Button, Chip, Drawer, Stack, Typography } from '@mui/material';
 import { useTranslation } from '@shared-lib';
-import {
-  Close as CloseIcon,
-  FilterAltOutlined,
-  FilterList,
-  Search,
-} from '@mui/icons-material';
+import { Close as CloseIcon, FilterList, Search } from '@mui/icons-material';
 import SearchComponent from './SearchComponent';
 import FilterComponent from './FilterComponent';
 import { gredientStyle } from '@learner/utils/style';
@@ -30,9 +25,15 @@ export default memo(function LearnerCourse({
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useTranslation();
   const { staticFilter, filterFramework } = _content ?? {};
+  const contentListRef = useRef(null);
 
   useEffect(() => {
-    setFilterState(_content?.filters ?? {});
+    const savedFilters = localStorage.getItem('learnerCourseFilters');
+    if (savedFilters) {
+      setFilterState(JSON.parse(savedFilters));
+    } else {
+      setFilterState(_content?.filters ?? {});
+    }
   }, [_content?.filters, _content?.searchParams]);
 
   const handleTabChange = useCallback((tab: any) => {
@@ -42,13 +43,13 @@ export default memo(function LearnerCourse({
     }));
   }, []);
   const handleSearchClick = useCallback((searchValue: string) => {
-if (typeof window !== 'undefined') {
-     const windowUrl = window.location.pathname;
-    const cleanedUrl = windowUrl
-    logEvent({
-        action: 'search content by '+searchValue,
-        category: cleanedUrl ,
-        label: 'Search content'
+    if (typeof window !== 'undefined') {
+      const windowUrl = window.location.pathname;
+      const cleanedUrl = windowUrl;
+      logEvent({
+        action: 'search content by ' + searchValue,
+        category: cleanedUrl,
+        label: 'Search content',
       });
     }
     setFilterState((prevState: any) => ({
@@ -59,16 +60,21 @@ if (typeof window !== 'undefined') {
   }, []);
 
   const handleFilterChange = (newFilterState: typeof filterState) => {
-    setFilterState((prevState: any) => ({
-      ...prevState,
-      filters: newFilterState,
-    }));
+    setFilterState((prevState: any) => {
+      const updated = {
+        ...prevState,
+        filters: newFilterState,
+      };
+      localStorage.setItem('learnerCourseFilters', JSON.stringify(updated));
+      return updated;
+    });
   };
 
   return (
     <Stack sx={{ gap: { xs: 0, sm: 0, md: 2 }, pb: 4 }}>
       {title && (
         <Box
+          ref={contentListRef}
           sx={{
             position: 'sticky',
             top: 0,
@@ -347,6 +353,13 @@ if (typeof window !== 'undefined') {
             showSearch={false}
             showHelpDesk={false}
             {..._content}
+            bodyElementObj={{
+              bodyId: 'l1-content-list-home',
+              topPadding: contentListRef.current?.clientHeight
+                ? contentListRef.current?.clientHeight
+                : 0,
+              ..._content?._config?.bodyElementObj,
+            }}
             _config={{
               tabChange: handleTabChange,
               default_img: '/images/image_ver.png',

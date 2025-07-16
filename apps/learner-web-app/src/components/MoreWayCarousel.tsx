@@ -22,18 +22,6 @@ const slides = [
       'Breif description about the app here. Pratham undertook an exploratory study for children to understand the problem of plastic waste management in rural India.',
     image: '/images/banners.png',
   },
-  {
-    title: 'Digital Learning Expansion',
-    description:
-      'A new initiative to expand digital learning resources to rural schools. Over 5000 tablets distributed and 200+ workshops conducted.',
-    image: '/images/banners.png',
-  },
-  {
-    title: 'Fun Science Lab',
-    description:
-      'Explore science with fun experiments and activities. Designed for curious young minds to learn by doing.',
-    image: '/images/banners.png',
-  },
 ];
 
 const MoreWayCarousel = () => {

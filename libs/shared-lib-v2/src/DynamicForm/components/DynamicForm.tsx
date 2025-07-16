@@ -56,7 +56,7 @@ const DynamicForm = ({
     if (type == 'learner'  && !isReassign) {
       // ...existing code...
       console.log('hello');
-      let requiredKeys = ['parent_phone'];
+      let requiredKeys = ['parent_phone', "guardian_relation" , "guardian_name"];
       let requiredKeys2 = ['mobile'];
       console.log('formDatadynamicform', formData.family_member_details);
       console.log('updatedUiSchema------', formUiSchema);
@@ -74,6 +74,7 @@ const DynamicForm = ({
             // Merge only missing items from required2 into required1 guardian details
             requiredKeys.forEach((item) => {
               if (!requiredArray.includes(item)) {
+                if(item==="parent_phone")
                   requiredArray.push(item);
               }
             });

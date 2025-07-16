@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect , useRef} from 'react';
 import DynamicForm from '@/components/DynamicForm/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
@@ -31,6 +31,7 @@ import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 import { transformLabel } from '@/utils/Helper';
+import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
 
 const ContentReviewer = () => {
   const theme = useTheme<any>();
@@ -52,7 +53,8 @@ const ContentReviewer = () => {
 
   const { t, i18n } = useTranslation();
   const storedUserData = JSON.parse(localStorage.getItem('adminInfo') || '{}');
-
+   const formRef = useRef(null);
+    
   const searchStoreKey = 'contentReviewer';
   const initialFormDataSearch =
     localStorage.getItem(searchStoreKey) &&
@@ -382,10 +384,18 @@ const ContentReviewer = () => {
               SubmitaFunction={SubmitaFunction}
               isCallSubmitInHandle={true}
               prefilledFormData={prefilledFormData || {}}
+               ref={formRef}
+
             />
           )
         )}
         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }} mt={4}>
+            <ResetFiltersButton
+            searchStoreKey="contentReviewer"
+            formRef={formRef}
+            SubmitaFunction={SubmitaFunction}
+            setPrefilledFormData={setPrefilledFormData}
+          />
           <Button
             variant="outlined"
             startIcon={<AddIcon />}

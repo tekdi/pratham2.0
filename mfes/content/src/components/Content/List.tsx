@@ -9,7 +9,7 @@ import React, {
 } from 'react';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import SearchIcon from '@mui/icons-material/Search';
-import { Box, Button } from '@mui/material';
+import { Box, Button, useTheme, useMediaQuery } from '@mui/material';
 import {
   calculateTrackDataItem,
   CommonSearch,
@@ -48,7 +48,47 @@ const DEFAULT_TABS = [
   { label: 'Content', type: 'Learning Resource' },
 ];
 
-const LIMIT = 5;
+// Custom hook to get current breakpoint
+const useCurrentBreakpoint = (theme: any) => {
+  const isXs = useMediaQuery(theme.breakpoints.only('xs'));
+  const isSm = useMediaQuery(theme.breakpoints.only('sm'));
+  const isMd = useMediaQuery(theme.breakpoints.only('md'));
+  const isLg = useMediaQuery(theme.breakpoints.only('lg'));
+  const isXl = useMediaQuery(theme.breakpoints.up('xl'));
+
+  if (isXl) return 'xl';
+  if (isLg) return 'lg';
+  if (isMd) return 'md';
+  if (isSm) return 'sm';
+  return 'xs';
+};
+
+// Calculate minimum limit for 2 rows based on specific breakpoint
+const calculateLimitForBreakpoint = (breakpoint: string, gridConfig?: any) => {
+  const defaultBreakpoints = {
+    xs: 6, // 2 items per row -> 4 items for 2 rows
+    sm: 6, // 2 items per row -> 4 items for 2 rows
+    md: 4, // 3 items per row -> 6 items for 2 rows
+    lg: 3, // 4 items per row -> 8 items for 2 rows
+    xl: 2.4, // 5 items per row -> 10 items for 2 rows
+  };
+
+  const actualBreakpoints = {
+    xs: gridConfig?.xs ?? defaultBreakpoints.xs,
+    sm: gridConfig?.sm ?? defaultBreakpoints.sm,
+    md: gridConfig?.md ?? defaultBreakpoints.md,
+    lg: gridConfig?.lg ?? defaultBreakpoints.lg,
+    xl: gridConfig?.xl ?? defaultBreakpoints.xl,
+  };
+
+  const currentGridValue =
+    actualBreakpoints[breakpoint as keyof typeof actualBreakpoints];
+  const itemsPerRow = Math.floor(12 / currentGridValue);
+  const limitForTwoRows = itemsPerRow * 2;
+  return limitForTwoRows;
+};
+
+const LIMIT = calculateLimitForBreakpoint('xl'); // Will be 10 for xl breakpoint
 const DEFAULT_FILTERS = {
   limit: LIMIT,
   offset: 0,
@@ -65,7 +105,15 @@ export interface ContentProps {
   filters?: object;
   contentTabs?: string[];
   pageName?: string;
-  handleCardClick?: (content: ContentItem) => void | undefined;
+  bodyElementObj?: {
+    bodyId?: string;
+    topPadding?: number;
+  };
+  handleCardClick?: (
+    content: ContentItem,
+    e?: any,
+    rowNumber?: number
+  ) => void | undefined;
   showFilter?: boolean;
   showSearch?: boolean;
   showBackToTop?: boolean;
@@ -78,6 +126,8 @@ export interface ContentProps {
 export default function Content(props: Readonly<ContentProps>) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const theme = useTheme();
+  const currentBreakpoint = useCurrentBreakpoint(theme);
   const [searchValue, setSearchValue] = useState('');
   const [tabValue, setTabValue] = useState<number>(0);
   const [tabs, setTabs] = useState<typeof DEFAULT_TABS>([]);
@@ -99,6 +149,7 @@ export default function Content(props: Readonly<ContentProps>) {
   const [totalCount, setTotalCount] = useState<number>(0);
   const [filterShow, setFilterShow] = useState(false);
   const [propData, setPropData] = useState<ContentProps>();
+  const [currentLimit, setCurrentLimit] = useState<number>(LIMIT);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Session keys
@@ -125,6 +176,41 @@ export default function Content(props: Readonly<ContentProps>) {
     [localFilters]
   );
 
+  // Responsive limit calculation - recalculate when screen size changes
+  useEffect(() => {
+    const calculateResponsiveLimit = () => {
+      if (propData?._config) {
+        const newLimit = calculateLimitForBreakpoint(
+          currentBreakpoint,
+          propData._config._grid
+        );
+        if (newLimit !== currentLimit) {
+          console.log(
+            `Limit changed from ${currentLimit} to ${newLimit} due to screen size change`
+          );
+          setCurrentLimit(newLimit);
+          // Reset offset when limit changes
+          setLocalFilters((prev) => ({
+            ...prev,
+            limit: newLimit,
+            offset: 0,
+          }));
+        }
+      }
+    };
+
+    // Calculate on mount and when propData changes
+    calculateResponsiveLimit();
+
+    // Listen for window resize to recalculate
+    const handleResize = () => {
+      calculateResponsiveLimit();
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [propData, currentBreakpoint, currentLimit]);
+
   // Restore saved state
   useEffect(() => {
     const init = async () => {
@@ -140,6 +226,14 @@ export default function Content(props: Readonly<ContentProps>) {
       const config = props ?? (await getData('mfes_content_pages_content'));
       setPropData(config);
       setSearchValue(savedSearch);
+
+      // Calculate dynamic limit based on current device breakpoint
+      const dynamicLimit = calculateLimitForBreakpoint(
+        currentBreakpoint,
+        config?._config?._grid
+      );
+      setCurrentLimit(dynamicLimit);
+
       if (savedFilters) {
         setLocalFilters({
           ...(config?.filters ?? {}),
@@ -158,6 +252,8 @@ export default function Content(props: Readonly<ContentProps>) {
             props?.contentTabs?.length === 1
               ? props.contentTabs[savedTab]
               : DEFAULT_TABS[savedTab].type,
+          limit: dynamicLimit, // Use dynamic limit for new sessions
+          offset: 0, // Start with offset 0
           loadOld: false,
         }));
       }
@@ -173,11 +269,17 @@ export default function Content(props: Readonly<ContentProps>) {
       setIsPageLoading(false);
     };
     init();
-  }, [ props.contentTabs, sessionKeys.filters, sessionKeys.search, searchParams]);
+  }, [
+    props,
+    sessionKeys.filters,
+    sessionKeys.search,
+    searchParams,
+    currentBreakpoint,
+  ]);
   // Fetch content with loop to load full data up to offset
   const fetchAllContent = useCallback(
     async (filter: any) => {
-      const content: any[] = [];  
+      const content: any[] = [];
       const QuestionSet: any[] = [];
       let count = 0;
 
@@ -341,25 +443,10 @@ export default function Content(props: Readonly<ContentProps>) {
 
   // Scroll to saved card ID
   useEffect(() => {
-    const scrollId = sessionStorage.getItem(sessionKeys.scrollId);
-    if (!scrollId || !contentData?.length) return;
-    const el = document.getElementById(scrollId);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-      sessionStorage.removeItem(sessionKeys.scrollId);
-      sessionStorage.removeItem(sessionKeys.filters);
-    } else {
-      // Retry in the next animation frame if element not yet mounted
-      requestAnimationFrame(() => {
-        const retryEl = document.getElementById(scrollId);
-        if (retryEl) {
-          retryEl.scrollIntoView({ behavior: 'smooth' });
-          sessionStorage.removeItem(sessionKeys.scrollId);
-          sessionStorage.removeItem(sessionKeys.filters);
-        }
-      });
+    if (contentData?.length > 0) {
+      scrollToSavedContent(sessionKeys, props?.bodyElementObj);
     }
-  }, [contentData, sessionKeys.scrollId]);
+  }, [contentData, sessionKeys, props?.bodyElementObj]);
 
   // Event handlers
   const handleLoadMore = useCallback(
@@ -393,7 +480,7 @@ export default function Content(props: Readonly<ContentProps>) {
   const handleTabChange = (event: any, newValue: number) => {
     setTabValue(newValue);
 
-     // Update URL with new tab parameter
+    // Update URL with new tab parameter
     const url = new URL(window.location.href);
     url.searchParams.set('tab', newValue.toString());
     router.replace(url.pathname + url.search);
@@ -403,25 +490,31 @@ export default function Content(props: Readonly<ContentProps>) {
       type: tabs[newValue].type,
     });
   };
-  console.log('tabValue', props?.pageName);
+
   const handleCardClickLocal = useCallback(
-    async (content: ContentItem) => {
+    async (content: ContentItem, e?: any, rowNumber?: number) => {
       try {
-        sessionStorage.setItem(sessionKeys.scrollId, content.identifier);
+        sessionStorage.setItem(
+          sessionKeys.scrollId,
+          JSON.stringify({
+            id: `${props?.pageName}-${content?.identifier}`,
+            rowNumber,
+          })
+        );
         persistFilters(localFilters);
         if (propData?.handleCardClick) {
-          propData.handleCardClick(content);
+          propData.handleCardClick(content, e, rowNumber);
         } else if (SUPPORTED_MIME_TYPES.includes(content?.mimeType)) {
           router.push(
             `${props?._config?.contentBaseUrl ?? ''}/player/${
               content?.identifier
-            }?activeLink=${window.location.pathname}`
+            }?activeLink=${window.location.pathname + window.location.search}`
           );
         } else {
           router.push(
             `${props?._config?.contentBaseUrl ?? ''}/content-details/${
               content?.identifier
-            }?activeLink=${window.location.pathname}`
+            }?activeLink=${window.location.pathname + window.location.search}`
           );
         }
       } catch (error) {
@@ -541,4 +634,62 @@ export default function Content(props: Readonly<ContentProps>) {
       {propData?.showBackToTop && <BackToTop />}
     </LayoutPage>
   );
+}
+
+function scrollToSavedContent(
+  sessionKeys: any,
+  config?: { topPadding?: number; bodyId?: string }
+) {
+  const scrollName = sessionKeys.scrollId;
+  const keyValue = sessionStorage.getItem(scrollName);
+  const scrollId = keyValue
+    ? keyValue.startsWith('{')
+      ? JSON.parse(keyValue)
+      : {}
+    : {};
+  if (!scrollId.id) return;
+
+  const el = document.getElementById(scrollId.id);
+  if (el) {
+    if (config?.bodyId) {
+      const body = document.getElementById(config?.bodyId);
+      if (body) {
+        const top =
+          el.getBoundingClientRect().top +
+          body.scrollTop -
+          (scrollId?.rowNumber === 1 && config?.topPadding
+            ? config?.topPadding * 2
+            : 0); // 100px top padding
+        console.log('top sagar', top);
+        body.scrollTo({ top, behavior: 'smooth' });
+      }
+    } else {
+      el.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+        inline: 'nearest',
+      });
+    }
+    sessionStorage.removeItem(scrollName);
+
+    if (sessionKeys.filters) {
+      sessionStorage.removeItem(sessionKeys.filters);
+    }
+  } else {
+    // Retry in the next animation frame if element not yet mounted
+    requestAnimationFrame(() => {
+      const retryEl = document.getElementById(scrollId);
+      if (retryEl) {
+        retryEl.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+          inline: 'nearest',
+        });
+        sessionStorage.removeItem(scrollName);
+        if (sessionKeys.scrollId) {
+          sessionStorage.removeItem(sessionKeys.filters);
+        }
+      }
+    });
+  }
 }

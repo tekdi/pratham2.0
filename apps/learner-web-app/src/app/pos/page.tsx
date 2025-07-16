@@ -27,7 +27,11 @@ const Home = dynamic(() => import('@learner/components/pos/Home'), {
   ssr: false,
 });
 const App = () => {
-  return <Home />;
+  return (
+    <>
+      <Home />
+    </>
+  );
 };
 
 export default App;

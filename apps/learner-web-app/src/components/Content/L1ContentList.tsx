@@ -21,21 +21,21 @@ import { CompleteProfileBanner } from '@learner/components/CompleteProfileBanner
 import { profileComplitionCheck } from '@learner/utils/API/userService';
 import { usePathname } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
-
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 const MyComponent: React.FC = () => {
   const pathname = usePathname();
-    const searchParams = useSearchParams();
+  const searchParams = useSearchParams();
   const tab = searchParams.get('tab'); // '1', '2', etc. as a string
-  console.log("Current tab:", typeof tab);
+  const { t } = useTranslation();
   const [filter, setFilter] = useState<Record<string, any> | null>(null);
   const [isLogin, setIsLogin] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isProfileCard, setIsProfileCard] = useState(false);
-const storedConfig = typeof window !== 'undefined'
-  ? JSON.parse(localStorage.getItem('uiConfig') || '{}')
-  : {};
+  const storedConfig =
+    typeof window !== 'undefined'
+      ? JSON.parse(localStorage.getItem('uiConfig') || '{}')
+      : {};
 
   useEffect(() => {
     const fetchTenantInfo = async () => {
@@ -95,8 +95,18 @@ const storedConfig = typeof window !== 'undefined'
   }, [pathname]);
 
   return (
-    <Layout isLoadingChildren={isLoading} sx={gredientStyle}>
-      {isProfileCard && storedConfig.isCompleteProfile && <CompleteProfileBanner />}
+    <Layout
+      _children={{
+        _childrenBox: {
+          id: 'l1-content-list-home',
+        },
+      }}
+      isLoadingChildren={isLoading}
+      sx={gredientStyle}
+    >
+      {isProfileCard && storedConfig.isCompleteProfile && (
+        <CompleteProfileBanner />
+      )}
       {isLogin && (
         <>
           <Box
@@ -122,26 +132,27 @@ const storedConfig = typeof window !== 'undefined'
               <span role="img" aria-label="wave">
                 👋
               </span>
-              Welcome, {localStorage.getItem('firstName')}!
+              {t('COMMON.WELCOME')}, {localStorage.getItem('firstName')}!
             </Typography>
           </Box>
-          {tab =="0" && (<InProgressContent />)}
+          {(tab == '0' || tab === null) && <InProgressContent />}
 
-          {localStorage.getItem('userProgram') === 'YouthNet' &&(<Grid container>
-            <Grid
-              item
-              xs={12}
-              md={12}
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-              }}
-            >
-              <LTwoCourse />
+          {localStorage.getItem('userProgram') === 'YouthNet' && (
+            <Grid container>
+              <Grid
+                item
+                xs={12}
+                md={12}
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                }}
+              >
+                <LTwoCourse />
+              </Grid>
             </Grid>
-          </Grid>)
-}
+          )}
         </>
       )}
 
@@ -149,7 +160,11 @@ const storedConfig = typeof window !== 'undefined'
         <Grid item xs={12}>
           {filter && (
             <LearnerCourse
-              title={localStorage.getItem('userProgram') === 'Camp to Club'?'LEARNER_APP.COURSE.GET_STARTED_CLUB_COURSES':'LEARNER_APP.COURSE.GET_STARTED'}
+              title={
+                localStorage.getItem('userProgram') === 'Camp to Club'
+                  ? 'LEARNER_APP.COURSE.GET_STARTED_CLUB_COURSES'
+                  : 'LEARNER_APP.COURSE.GET_STARTED'
+              }
               _content={{
                 pageName: 'L1_Content',
                 onlyFields: ['contentLanguage', 'se_subDomains', 'se_subjects'],
@@ -158,14 +173,12 @@ const storedConfig = typeof window !== 'undefined'
                   'se_subDomains',
                   'se_subjects',
                 ],
- ...(
-  Array.isArray(storedConfig.showContent)  &&
-  storedConfig.showContent.length === 2  &&
-  storedConfig.showContent.includes('courses') &&
-  storedConfig.showContent.includes('contents')
-    ? { contentTabs: ['courses', 'content'] }
-    : {}
-),
+                ...(Array.isArray(storedConfig.showContent) &&
+                storedConfig.showContent.length === 2 &&
+                storedConfig.showContent.includes('courses') &&
+                storedConfig.showContent.includes('contents')
+                  ? { contentTabs: ['courses', 'content'] }
+                  : {}),
 
                 staticFilter: {
                   se_domains:
@@ -295,6 +308,7 @@ const InProgressContent: React.FC = () => {
             _subBox: { px: { xs: 2, sm: 2, md: 0 } },
             _carousel: { spaceBetween: isMdUp ? 16 : 8 },
           }}
+          //  pageName="Inprogress"
         />
       </Grid>
     </Grid>

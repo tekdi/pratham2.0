@@ -281,7 +281,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         })),
       },
       {
-        title: t('LEARNER_APP.POS.THEMATIC_REPOSITORY'),
+        title: t('Experimento India'),
         to: () => {
           const domain = process.env.NEXT_PUBLIC_THEMATIC_DOMAIN || '';
           window.open(`${domain}`, '_blank');
@@ -300,27 +300,26 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         _config: {
           middleComponent: (
             <SearchButton
-              onSearch={(search) =>
-                {
-                        if (typeof window !== 'undefined') {     
+              onSearch={(search) => {
+                if (typeof window !== 'undefined') {
+                  const windowUrl = window.location.pathname;
+                  const cleanedUrl = windowUrl;
 
-                       const windowUrl = window.location.pathname;
-                                   const cleanedUrl = windowUrl
-                  
-                                  logEvent({
-                                    action: 'Searched on about page by ' + search,
-                                    category: cleanedUrl,
-                                    label: 'Searched on about page',
-                                  });
-                                }
-                  router.push('/pos/search?q=' + search)
+                  logEvent({
+                    action: 'Searched on about page by ' + search,
+                    category: cleanedUrl,
+                    label: 'Searched on about page',
+                  });
                 }
-                }
-              isHideSubmitButton
+                router.push('/pos/search?q=' + search);
+              }}
+              // isHideSubmitButton
+              _input={{
+                placeholder: 'Search courses, subjects..',
+              }}
               _box={{
                 sx: {
-                  maxWidth: '260px',
-                  height: '48px',
+                  maxWidth: '480px',
                   '@media (max-width: 1200px)': {
                     display: 'none',
                   },
@@ -358,12 +357,7 @@ const Brand = () => {
   const { isColorInverted } = useColorInversion();
 
   return (
-    <Box
-      display="flex"
-      gap={1}
-      onClick={() => router.push('/pos')}
-      sx={{ cursor: 'pointer' }}
-    >
+    <Box display="flex" gap={1}>
       <Image
         src={
           isColorInverted
@@ -373,16 +367,26 @@ const Brand = () => {
         alt="Pratham"
         width={146}
         height={32}
+        style={{ height: '32px', cursor: 'pointer' }}
+        onClick={() => router.push('/pos')}
       />
-      <Image
-        src={
-          isColorInverted ? '/images/pradigi-white.png' : '/images/pradigi.png'
-        }
-        alt="Pradigi"
-        width={94}
-        height={32}
-        style={{ height: '32px' }}
-      />
+      <a
+        href="https://www.pradigi.org"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <Image
+          src={
+            isColorInverted
+              ? '/images/pradigi-white.png'
+              : '/images/pradigi.png'
+          }
+          alt="Pradigi"
+          width={94}
+          height={32}
+          style={{ height: '32px', cursor: 'pointer' }}
+        />
+      </a>
     </Box>
   );
 };

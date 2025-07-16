@@ -15,10 +15,12 @@ import { login, resetPassword } from '@learner/utils/API/LoginService';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Layout from '../../components/Layout';
 import { checkAuth } from '@shared-lib-v2/utils/AuthService';
+import { useTranslation } from '@shared-lib';
 const ChangePassword = () => {
   const [otp, setOtp] = useState<string[]>(['', '', '', '']);
   const [otpmodal, setOtpModal] = useState(false);
   const [hash, setHash] = useState<string>('');
+    const { t } = useTranslation();
 
   const [mobile] = useState(
     typeof window !== 'undefined'
@@ -176,7 +178,7 @@ const ChangePassword = () => {
               textAlign: 'center',
             }}
           >
-            Change Password
+   { t('LEARNER_APP.USER_PROFILE_CARD.CHANGE_PASSWORD')}
           </Typography>
           <ResetPasswordForm
             onResetPassword={handleResetPassword}
