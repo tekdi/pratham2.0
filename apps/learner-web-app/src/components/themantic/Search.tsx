@@ -1,6 +1,6 @@
 'use client';
 import React, { useCallback, useMemo } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Layout from './layout/Layout';
 import { Box, Container, Typography } from '@mui/material';
 import dynamic from 'next/dynamic';
@@ -19,6 +19,7 @@ const SearchPage = () => {
   const [searchValue, setSearchValue] = React.useState('');
   const [submitText, setSubmitText] = React.useState('');
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   React.useEffect(() => {
     const queryParam = searchParams?.get('q') || '';
@@ -30,12 +31,17 @@ const SearchPage = () => {
     setSearchValue(value);
   };
 
-  const onSearch = useCallback((value: string) => {
-    const url = new URL(window.location.href);
-    url.searchParams.set('q', value);
-    window.history.replaceState({}, '', url.toString());
-    setSubmitText(value);
-  }, []);
+  const onSearch = useCallback(
+    (value: string) => {
+      if (value) {
+        router.push('/themantic/search?q=' + encodeURIComponent(value));
+      } else {
+        router.push('/themantic/search');
+      }
+      setSubmitText(value);
+    },
+    [router]
+  );
 
   const contentApp = useMemo(
     () => (
