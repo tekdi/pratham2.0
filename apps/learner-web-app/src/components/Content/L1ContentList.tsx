@@ -50,7 +50,8 @@ const MyComponent: React.FC = () => {
         }
         const res = await getTenantInfo();
         const youthnetContentFilter = res?.result.find(
-          (program: any) => program.name === 'YouthNet'
+          // (program: any) => program.name === 'YouthNet'
+          (program: any) => program.name === localStorage.getItem('userProgram')
         );
 
         const storedChannelId = localStorage.getItem('channelId');
