@@ -23,13 +23,13 @@ const ContentCardGrid = memo((props: ContentCardGridProps) => {
 
   return (
     <Box {..._subBox} sx={{ ...(_subBox?.sx ?? {}) }}>
-      <Grid container spacing={{ xs: 1, sm: 1, md: 2 }} {..._containerGrid}>
+      <Grid container spacing={{ xs: 2, sm: 2, md: 2 }} {..._containerGrid}>
         {props.contentData?.map((item: any) => (
           <Grid
             key={item?.identifier}
             id={`${props?.pageName}-${item?.identifier}`}
             item
-            xs={6}
+            xs={12}
             sm={6}
             md={4}
             lg={3}

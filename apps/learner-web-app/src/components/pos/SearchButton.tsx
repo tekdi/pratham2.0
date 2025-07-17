@@ -16,6 +16,7 @@ interface SearchButtonProps {
   _button?: any;
   _input?: any;
   _icon?: any;
+  _topAppBarUi?: boolean;
 }
 
 export const SearchButton: React.FC<SearchButtonProps> = ({
@@ -27,6 +28,7 @@ export const SearchButton: React.FC<SearchButtonProps> = ({
   _button,
   _input,
   _icon,
+  _topAppBarUi,
 }) => {
   const [search, setSearch] = React.useState<string>(searchValue || '');
 
@@ -36,8 +38,8 @@ export const SearchButton: React.FC<SearchButtonProps> = ({
 
   const handleClear = () => {
     setSearch('');
-    handleSearch?.('');
-    onSearch('');
+    // handleSearch?.('');
+    // onSearch('');
   };
 
   return (
@@ -53,10 +55,12 @@ export const SearchButton: React.FC<SearchButtonProps> = ({
         ...(_box?.sx ?? {}),
       }}
     >
-      <SearchIcon
-        {..._icon}
-        sx={{ color: '#757575', ml: 2, mr: 1, ...(_icon?.sx ?? {}) }}
-      />
+      {!_topAppBarUi && (
+        <SearchIcon
+          {..._icon}
+          sx={{ color: '#757575', ml: '8px', ...(_icon?.sx ?? {}) }}
+        />
+      )}
       <TextField
         variant="standard"
         placeholder="Search.."
@@ -116,8 +120,9 @@ export const SearchButton: React.FC<SearchButtonProps> = ({
             borderTopRightRadius: '8px',
             borderBottomRightRadius: '8px',
             boxShadow: 'none',
-            px: 4,
-            py: 1.5,
+            minWidth: _topAppBarUi ? '40px' : '65px',
+            px: _topAppBarUi ? 0 : 4,
+            py: _topAppBarUi ? 1 : 1.5,
             fontWeight: 600,
             fontSize: '16px',
             textTransform: 'none',
@@ -126,7 +131,9 @@ export const SearchButton: React.FC<SearchButtonProps> = ({
           }}
           onClick={(e) => onSearch(search, e)}
         >
-          <SpeakableText>Search</SpeakableText>
+          <SpeakableText>
+            {_topAppBarUi ? <SearchIcon sx={{ fontSize: '22px' }} /> : 'Search'}
+          </SpeakableText>
         </Button>
       )}
     </Box>
