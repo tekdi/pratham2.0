@@ -128,8 +128,6 @@ export const getDoIdForAssessmentDetails = async ({
   filters,
 }: GetDoIdServiceParam): Promise<any> => {
   const apiUrl = `${URL_CONFIG.API.COMPOSITE_SEARCH}`;
-  // const apiUrl: string =
-  //   'https://sunbirdsaas.com/api/content/v1/search?orgdetails=orgName%2Cemail&licenseDetails=name%2Cdescription%2Curl';
   const data = {
     request: {
       filters: {
@@ -164,7 +162,8 @@ export const answerSheetSubmissions = async ({
   identifier: string;
   fileUrls: string[];
 }) => {
-  const apiURL = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/answer-sheet-submissions/create`;
+  // const apiURL = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/answer-sheet-submissions/create`;
+  const apiURL = `https://e49a1216cbca.ngrok-free.app/interface/v1/tracking/answer-sheet-submissions/create`;
 
   try {
     const response = await post(apiURL, {
@@ -215,7 +214,9 @@ export const getAssessmentTracking = async (params: ISearchAssessment) => {
   }
 };
 
-export const createAssessmentTracking = async (data: ICreateAssessmentTracking) => {
+export const createAssessmentTracking = async (
+  data: ICreateAssessmentTracking
+) => {
   const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/assessment/create`;
   try {
     const response = await post(apiUrl, data);
@@ -234,5 +235,78 @@ export const updateAssessmentScore = async (data: IUpdateAssessmentScore) => {
   } catch (error) {
     console.error('Error in updating assessment score:', error);
     throw error;
+  }
+};
+
+export const getOfflineAssessmentStatus = async (data: {
+  userIds: string[];
+  questionSetId: string;
+}) => {
+  // const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/assessment/offline-assessment-status`;
+  const apiUrl = `https://e49a1216cbca.ngrok-free.app/interface/v1/tracking/assessment/offline-assessment-status`;
+  try {
+    const response = await post(apiUrl, data);
+    return response?.data;
+  } catch (error) {
+    console.error('Error in getting offline assessment status:', error);
+    throw error;
+  }
+};
+
+export const searchAiAssessment = async (data: {
+  question_set_id: string[];
+}) => {
+  const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/ai-assessment/search`;
+  try {
+    const response = await post(apiUrl, data);
+    return response?.data;
+  } catch (error) {
+    console.error('Error in searching ai assessment:', error);
+    throw error;
+  }
+};
+
+export const getOfflineAssessmentDetails = async ({
+  filters,
+}: GetDoIdServiceParam): Promise<any> => {
+  const apiUrl = `${URL_CONFIG.API.COMPOSITE_SEARCH}`;
+  const data = {
+    request: {
+      filters: {
+        program: filters.program,
+        board: filters.board,
+        // state: filters.state,
+        assessmentType: filters.assessmentType,
+        status: ['Live'],
+        primaryCategory: ['Practice Question Set'],
+      },
+    },
+  };
+
+  try {
+    const response1 = await post(apiUrl, data);
+    const response = await searchAiAssessment({
+      question_set_id: response1?.data?.result?.QuestionSet?.map(
+        (item: any) => item.identifier
+      ),
+    });
+    const QuestionSet = response1?.data?.result?.QuestionSet?.filter(
+      (item: any) =>
+        response.data.find(
+          (sub: any) => item.identifier === sub.question_set_id
+        )
+    );
+
+    return {
+      result: {
+        ...response1?.data?.result,
+        QuestionSet,
+        count: QuestionSet.length,
+      },
+      responseCode: response1?.data?.responseCode,
+    };
+  } catch (error) {
+    console.error('Error in getDoIdForAssessmentDetails Service', error);
+    return error;
   }
 };

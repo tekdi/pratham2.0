@@ -3,9 +3,11 @@ export interface UploadOptionsPopupProps {
   onClose: () => void;
   uploadedImages?: UploadedImage[];
   onImageUpload?: (image: UploadedImage) => void;
+  onImageRemove?: (imageId: string) => void;
   userId?: string;
   questionSetId?: string;
   identifier?: string;
+  onSubmissionSuccess?: () => void;
 }
 
 export interface UploadedImage {

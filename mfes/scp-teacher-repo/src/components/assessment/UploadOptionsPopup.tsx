@@ -25,9 +25,11 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
   onClose,
   uploadedImages = [],
   onImageUpload,
+  onImageRemove,
   userId,
   questionSetId,
   identifier,
+  onSubmissionSuccess,
 }) => {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -78,7 +80,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
       }
 
       // Validate file size (50MB)
-      const maxSize = 50 * 1024 * 1024;
+      const maxSize = 5 * 1024 * 1024;
       if (file.size > maxSize) {
         showToast('File size must be less than 50MB', 'error');
         return;
@@ -144,8 +146,10 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
   };
 
   const handleRemoveImage = (imageId: string) => {
-    // This should be handled by parent component
-    console.log('Remove image:', imageId);
+    // Call parent's remove handler if provided
+    if (onImageRemove) {
+      onImageRemove(imageId);
+    }
   };
 
   const handleStartAIEvaluation = async () => {
@@ -175,6 +179,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
 
       showToast('Answer sheet submitted successfully!', 'success');
       onClose();
+      onSubmissionSuccess?.();
     } catch (error) {
       console.error('Error submitting answer sheet:', error);
       showToast('Failed to submit answer sheet. Please try again.', 'error');
@@ -206,7 +211,13 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
       >
         <Box
           sx={{
-            width: 320,
+            width: {
+              xs: 280,
+              sm: 320,
+              md: 400,
+              lg: 480,
+              xl: 520,
+            },
             bgcolor: '#FFFFFF',
             borderRadius: '16px',
             boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
@@ -291,7 +302,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
               flexDirection: 'column',
               alignItems: 'center',
               gap: '16px',
-              width: 320,
+              width: '100%',
               minHeight: 472,
               height: '100%',
             }}
@@ -317,7 +328,11 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
                 <Box
                   sx={{
                     display: 'flex',
-                    gap: '8px',
+                    gap: {
+                      xs: '16px',
+                      sm: '20px',
+                      md: '24px',
+                    },
                     width: '100%',
                   }}
                 >
@@ -441,7 +456,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
                     color: '#5F5E5E',
                   }}
                 >
-                  Format: jpg, jpeg, size: 50 MB{'\n'}
+                  Format: jpg, jpeg, size: 5 MB{'\n'}
                   Up to 4 images
                 </Typography>
 
