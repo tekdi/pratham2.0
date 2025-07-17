@@ -7,13 +7,7 @@ import {
   Container,
   Divider,
 } from '@mui/material';
-import {
-  Facebook,
-  Twitter,
-  Instagram,
-  LinkedIn,
-  YouTube,
-} from '@mui/icons-material';
+import { Facebook, Instagram, LinkedIn, YouTube } from '@mui/icons-material';
 import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
@@ -174,9 +168,14 @@ export const Footer: React.FC = () => {
                     href="https://x.com/Pratham_India"
                     target="_blank"
                     rel="noopener noreferrer"
-                    sx={{ color: '#1DA1F2' }}
+                    sx={{ color: '#1DA1F2', padding: '8px' }}
                   >
-                    <Twitter />
+                    <Image
+                      src="/images/twiteer.png"
+                      alt="Twitter"
+                      width={24}
+                      height={24}
+                    />
                   </IconButton>
                 </Grid>
                 <Grid item>

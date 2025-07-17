@@ -11,22 +11,23 @@ export default memo(function SearchComponent({
   onSearch: (value: string) => void;
 }) {
   const { t } = useTranslation();
-  const [searchValue, setSearchValue] = useState('');
-  const isFirstRender = useRef(true); 
+  const [searchValue, setSearchValue] = useState(value || '');
+  const isInitialized = useRef(false);
 
   const debouncedSearch = useMemo(
     () =>
       debounce((value: string) => {
         if (value?.trim() !== '') {
-          onSearch(value.trim());
+          onSearch(value?.trim());
         }
       }, 500),
     [onSearch]
   );
 
   useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
+    // Only trigger search if component is initialized and search value actually changed from user input
+    if (!isInitialized.current) {
+      isInitialized.current = true;
       return;
     }
 
@@ -46,7 +47,11 @@ export default memo(function SearchComponent({
   }, [searchValue, debouncedSearch, onSearch]);
 
   useEffect(() => {
-    setSearchValue(value);
+    // Only update searchValue from prop if component hasn't been initialized yet
+    // This prevents triggering search on initial prop value setting
+    if (!isInitialized.current) {
+      setSearchValue(value || '');
+    }
   }, [value]);
 
   const handleSearchChange = (value: string) => {

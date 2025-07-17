@@ -29,7 +29,11 @@ const SearchPage = () => {
 
   const onSearch = useCallback((value: string) => {
     const url = new URL(window.location.href);
-    url.searchParams.set('q', value);
+    if (value) {
+      url.searchParams.set('q', value);
+    } else {
+      url.searchParams.delete('q');
+    }
     window.history.replaceState({}, '', url.toString());
     setSubmitText(value);
   }, []);
