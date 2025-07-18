@@ -228,6 +228,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
     const lifeSubCategory =
       option?.find((category: any) => category.code === 'learningForLife')
         ?.associations?.subDomain ?? [];
+
     const navLinks: NewDrawerItemProp[] = [
       {
         title: t('LEARNER_APP.POS.ABOUT_US'),
@@ -289,6 +290,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         isActive: currentPage === '/themantic',
       },
     ];
+
     setDefaultNavLinks(navLinks);
   }, [t, filterFramework?.framework?.categories, router]);
 
@@ -300,6 +302,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         _config: {
           middleComponent: (
             <SearchButton
+              _topAppBarUi={true}
               onSearch={(search) => {
                 if (typeof window !== 'undefined') {
                   const windowUrl = window.location.pathname;
@@ -315,7 +318,15 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
               }}
               // isHideSubmitButton
               _input={{
-                placeholder: 'Search courses, subjects..',
+                placeholder: 'Search..',
+                sx: {
+                  '& input::placeholder': {
+                    fontSize: '14px',
+                  },
+                  '& .MuiInputAdornment-root': {
+                    marginRight: 0,
+                  },
+                },
               }}
               _box={{
                 sx: {

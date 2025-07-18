@@ -210,7 +210,6 @@ export const DesktopBar = ({
         sx={{
           display: 'flex',
           alignItems: 'center',
-          gap: 2,
           justifyContent: 'center',
           ..._navLinkBox,
         }}
@@ -232,6 +231,10 @@ export const DesktopBar = ({
                     ? 'top-bar-link-button'
                     : link.variant ?? 'top-bar-link-text'
                 }
+                sx={{
+                  minWidth: 'unset',
+                  mr: -0.5, // Slightly reduce margin to bring icon closer
+                }}
                 startIcon={link?.icon && link.icon}
                 onClick={(e: any) => {
                   typeof link.to !== 'string' && link.to !== undefined
@@ -245,6 +248,10 @@ export const DesktopBar = ({
                     fontWeight: 500,
                     color: '#1F1B13',
                     cursor: 'pointer',
+                    maxWidth: 'fit-content',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
                   }}
                   data-speech-control="true"
                 >
@@ -254,6 +261,7 @@ export const DesktopBar = ({
               {link.child && (
                 <IconButton
                   size="small"
+                  sx={{ ml: -0.5 }} // Slightly reduce left margin
                   onClick={(e) => {
                     e.stopPropagation();
                     openMenuAtLevel(0, e.currentTarget, link?.child ?? []);

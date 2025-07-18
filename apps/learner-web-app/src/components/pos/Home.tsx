@@ -228,18 +228,20 @@ const Page = () => {
                 activities and projects.
               </SpeakableText>
             </Typography>
-            <SearchButton
-              searchValue={search}
-              onSearch={() => router.push('/pos/search?q=' + search)}
-              handleSearch={setSearch}
-              _box={{
-                mx: 'auto',
-                mt: 4,
-                '@media (min-width: 900px)': {
-                  mb: '100px',
-                },
-              }}
-            />
+            <Box sx={{ '@media (min-width: 900px)': { mb: 8 } }}>
+              <SearchButton
+                searchValue={search}
+                onSearch={() => router.push('/pos/search?q=' + search)}
+                handleSearch={setSearch}
+                _box={{
+                  mx: 'auto',
+                  mt: 4,
+                  '@media (min-width: 900px)': {
+                    mb: '100px',
+                  },
+                }}
+              />
+            </Box>
           </Box>
         </Grid>
       </Grid>
