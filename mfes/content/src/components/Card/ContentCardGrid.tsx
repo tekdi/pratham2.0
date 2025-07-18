@@ -106,7 +106,7 @@ const ContentCardGrid = memo((props: ContentCardGridProps) => {
   return (
     <Box {..._subBox} sx={{ ...(_subBox?.sx ?? {}) }}>
       <Grid container spacing={{ xs: 2, sm: 2, md: 2 }} {..._containerGrid}>
-        {props.contentData?.map((item: any) => (
+        {props.contentData?.map((item: any, index: number) => (
           <Grid
             key={item?.identifier}
             id={`${props?.pageName}-${item?.identifier}`}
