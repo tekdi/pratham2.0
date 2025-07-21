@@ -19,13 +19,14 @@ export const ROLE_BASED_ROUTES = {
       '/notification-templates/create',
       '/notification-templates/update/[identifier]',
       '/edit-password',
+      '/subjectDetails', '/importCsv', '/edit-password', '/resourceList', '/csvDetails', '/csvList', '/play'
     ],
     [Role.CCTA]: ['/subjectDetails', '/importCsv', '/edit-password', '/resourceList', '/csvDetails', '/csvList', '/play'],
     [Role.SCTA]: ['/subjectDetails', '/importCsv ', '/edit-password', '/resourceList', '/csvDetails', '/csvList', '/play'],
   },
   [TenantName.YOUTHNET]: {
     [Role.ADMIN]: ['/edit-password'],
-    [Role.CENTRAL_ADMIN]: ['/edit-password'],
+    [Role.CENTRAL_ADMIN]: ['/edit-password', '/subjectDetails', '/importCsv', '/edit-password', '/resourceList', '/csvDetails', '/csvList', '/play'],
     [Role.CCTA]: ['/edit-password', '/subjectDetails', '/importCsv '],
     [Role.SCTA]: ['/edit-password', '/subjectDetails', '/importCsv '],
   },
