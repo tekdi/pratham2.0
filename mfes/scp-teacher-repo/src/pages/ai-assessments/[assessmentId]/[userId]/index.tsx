@@ -37,6 +37,7 @@ import {
 import AnswerSheet, {
   AssessmentTrackingData,
 } from '../../../../components/assessment/AnswerSheet';
+import MinimizeIcon from '@mui/icons-material/Minimize';
 interface ScoreDetail {
   questionId: string | null;
   pass: string;
@@ -534,18 +535,30 @@ const AssessmentDetails = () => {
 
       <Box sx={{ mx: '16px', my: '16px' }}>
         {/* Assessment Status */}
-        {assessmentData?.status && (
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 2,
-              pb: 2,
-            }}
-          >
-            {getStatusIcon(
-              mapAnswerSheetStatusToInternalStatus(assessmentData.status)
-            )}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            pb: 2,
+          }}
+        >
+          {assessmentData?.status ? (
+            <>
+              {getStatusIcon(
+                mapAnswerSheetStatusToInternalStatus(assessmentData.status)
+              )}
+              <Typography
+                sx={{
+                  color: '#1F1B13',
+                  fontSize: { xs: '14px', md: '16px' },
+                  fontWeight: 400,
+                }}
+              >
+                {getStatusLabel(assessmentData.status)}
+              </Typography>
+            </>
+          ) : (
             <Typography
               sx={{
                 color: '#1F1B13',
@@ -553,10 +566,11 @@ const AssessmentDetails = () => {
                 fontWeight: 400,
               }}
             >
-              {getStatusLabel(assessmentData.status)}
+              <MinimizeIcon />
+              Not Submitted
             </Typography>
-          </Box>
-        )}
+          )}
+        </Box>
 
         {/* Images Info */}
         <Box
