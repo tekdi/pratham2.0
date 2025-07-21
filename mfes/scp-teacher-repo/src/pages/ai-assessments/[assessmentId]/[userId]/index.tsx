@@ -649,7 +649,7 @@ const AssessmentDetails = () => {
             minHeight: '200px',
           }}
         >
-          <Typography>No assessment data found</Typography>
+          <Typography>No answer sheet has been submitted yet</Typography>
         </Box>
       ) : (
         <AnswerSheet

@@ -24,6 +24,7 @@ import {
   getOfflineAssessmentStatus,
 } from '../../../../../services/AssesmentService';
 import { getUserDetails } from '../../../../../services/ProfileService';
+import ImageViewer from '../../../../../components/assessment/ImageViewer';
 
 interface AssessmentRecord {
   id: string;
@@ -64,6 +65,7 @@ const FilesPage = () => {
   const [assessmentName, setAssessmentName] = useState<string>('');
   const [selectedImages, setSelectedImages] = useState<Set<string>>(new Set());
   const [isSelecting, setIsSelecting] = useState(false);
+  const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
 
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
@@ -93,13 +95,15 @@ const FilesPage = () => {
           setAssessmentData(data);
 
           // Convert fileUrls to UploadedImage format
-          const images: UploadedImage[] = data.fileUrls.map((url, index) => ({
-            id: `image-${index}`,
-            url: url,
-            previewUrl: url,
-            name: `Image ${index + 1}`,
-            uploadedAt: new Date().toISOString(),
-          }));
+          const images: UploadedImage[] = data.fileUrls.map(
+            (url: any, index: any) => ({
+              id: `image-${index}`,
+              url: url,
+              previewUrl: url,
+              name: `Image ${index + 1}`,
+              uploadedAt: new Date().toISOString(),
+            })
+          );
           setUploadedImages(images);
         }
 
@@ -172,6 +176,12 @@ const FilesPage = () => {
       newSelected.add(imageId);
     }
     setSelectedImages(newSelected);
+  };
+
+  const handleImageClick = (imageUrl: string) => {
+    if (!isSelecting) {
+      setSelectedImageUrl(imageUrl);
+    }
   };
 
   const handleCloseSnackbar = () => {
@@ -474,10 +484,14 @@ const FilesPage = () => {
           flex: 1,
         }}
       >
-        {uploadedImages.map((image, index) => (
+        {uploadedImages.map((image: UploadedImage) => (
           <Box
             key={image.id}
-            onClick={() => handleImageSelect(image.id)}
+            onClick={() =>
+              isSelecting
+                ? handleImageSelect(image.id)
+                : handleImageClick(image.url)
+            }
             sx={{
               position: 'relative',
               backgroundColor: '#F5F5F5',
@@ -485,10 +499,10 @@ const FilesPage = () => {
               backgroundImage: `url(${image.url})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
-              cursor: isSelecting ? 'pointer' : 'default',
+              cursor: 'pointer',
               aspectRatio: '9/12',
               '&:hover': {
-                opacity: isSelecting ? 0.8 : 1,
+                opacity: isSelecting ? 0.8 : 0.9,
               },
             }}
           >
@@ -562,6 +576,13 @@ const FilesPage = () => {
           </Box>
         )}
       </Box>
+
+      {/* Image Viewer */}
+      <ImageViewer
+        open={!!selectedImageUrl}
+        onClose={() => setSelectedImageUrl(null)}
+        imageUrl={selectedImageUrl || ''}
+      />
 
       {/* Upload Options Popup */}
       <UploadOptionsPopup
