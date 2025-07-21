@@ -495,17 +495,26 @@ const FilesPage = () => {
             sx={{
               position: 'relative',
               backgroundColor: '#F5F5F5',
-              border: '1px solid #000000',
-              backgroundImage: `url(${image.url})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
+              border: '1px solid rgba(0, 0, 0, 0.1)',
               cursor: 'pointer',
               aspectRatio: '9/12',
+              overflow: 'hidden',
               '&:hover': {
                 opacity: isSelecting ? 0.8 : 0.9,
               },
             }}
           >
+            <Box
+              component="img"
+              src={image.url}
+              alt={image.name}
+              sx={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                objectPosition: 'center',
+              }}
+            />
             {isSelecting && (
               <Box
                 sx={{
