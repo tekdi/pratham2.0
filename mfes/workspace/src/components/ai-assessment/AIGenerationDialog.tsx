@@ -20,6 +20,7 @@ interface AIGenerationDialogProps {
   open: boolean;
   state: 'loader' | 'success' | 'failed' | 'processing';
   aiStatus?: string | null;
+  errorMessage?: string;
   onRetry?: () => void;
   onClose?: () => void;
   onGoToEditor?: () => void;
@@ -29,6 +30,7 @@ const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
   open,
   state,
   aiStatus = null,
+  errorMessage,
   onRetry,
   onClose,
   onGoToEditor,
@@ -335,8 +337,8 @@ const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
                   lineHeight: 1.5,
                 }}
               >
-                We couldn&apos;t generate the questions due to a technical
-                issue. Please try again or restart after some time
+                {errorMessage ||
+                  "We couldn't generate the questions due to a technical issue. Please try again or restart after some time"}
               </Typography>
               <Box
                 sx={{

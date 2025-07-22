@@ -201,37 +201,38 @@ const SetParameters: React.FC<SetParametersProps> = ({
       longAnswerCount,
       ...otherFields
     } = formState;
-    // Automatically set selectedTypes based on slider values
-    const selectedTypes = [];
-    if (mcqCount >= 1) selectedTypes.push('MCQ');
-    if (fillInTheBlanksCount >= 1) selectedTypes.push('Fill in the blanks');
-    if (shortAnswerCount >= 1) selectedTypes.push('Short Answer');
-    if (longAnswerCount >= 1) selectedTypes.push('Long Answer');
+
     const metadata = {
       name: assessmentTitle,
       description,
       assessmentType,
       ...otherFields,
     };
+
     const typeMap: Record<string, string> = {
       MCQ: 'MCQ',
       'Fill in the blanks': 'fill_in_the_blanks',
       'Short Answer': 'short',
       'Long Answer': 'long',
     };
+
     const typeCountMap: Record<string, number> = {
       MCQ: mcqCount,
       'Fill in the blanks': fillInTheBlanksCount,
       'Short Answer': shortAnswerCount,
       'Long Answer': longAnswerCount,
     };
-    const questionsDetails = selectedTypes.map((type: string) => ({
-      type: typeMap[type] || type,
-      no: typeCountMap[type] || 0,
-    }));
+
+    const questionsDetails = Object.entries(typeCountMap)
+      .filter(([_, count]) => count > 0)
+      .map(([type, count]) => ({
+        type: typeMap[type] || type,
+        no: count,
+      }));
+
     onNext({
       difficulty_level,
-      question_types: selectedTypes,
+      question_types: selectedDistributions,
       metadata,
       questionsDetails,
       content,

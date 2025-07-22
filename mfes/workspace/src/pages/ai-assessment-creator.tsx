@@ -171,6 +171,7 @@ const AIAssessmentCreator: React.FC = () => {
   >('loader');
   const [aiStatus, setAIStatus] = useState<string | null>(null);
   const [aiDialogParams, setAIDialogParams] = useState<any>(null); // for retry
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -239,6 +240,7 @@ const AIAssessmentCreator: React.FC = () => {
     setAIDialogParams({ newFormData, identifier, token });
     setAIDialogState('loader');
     setAIStatus(null);
+    setErrorMessage(null);
     setShowAIDialog(true);
 
     try {
@@ -264,8 +266,12 @@ const AIAssessmentCreator: React.FC = () => {
               setAIDialogState('success');
             }
           }
-        } catch (error) {
+        } catch (error: any) {
           console.error('Error getting AI question set status:', error);
+          setErrorMessage(
+            error?.response?.data?.params?.errmsg ||
+              'Something went wrong in AI assessment'
+          );
         }
         if (prog >= 100) {
           clearInterval(interval);
@@ -280,6 +286,10 @@ const AIAssessmentCreator: React.FC = () => {
       }, 1000);
     } catch (error: any) {
       setAIDialogState('failed');
+      setErrorMessage(
+        error?.response?.data?.params?.errmsg ||
+          'Something went wrong in AI assessment'
+      );
       console.error('Error creating AI question set:', error);
     }
   };
@@ -327,6 +337,8 @@ const AIAssessmentCreator: React.FC = () => {
     });
     const newFormData = {
       ...formData,
+      framework: tenantConfig?.COLLECTION_FRAMEWORK,
+      channel: tenantConfig?.CHANNEL_ID,
       metadata: {
         ...formattedData,
         name: formData?.metadata?.name,
@@ -415,6 +427,7 @@ const AIAssessmentCreator: React.FC = () => {
           open={showAIDialog}
           state={aiDialogState}
           aiStatus={aiStatus}
+          errorMessage={errorMessage || undefined}
           onRetry={() => handleAIGeneration(aiDialogParams)}
           onClose={() => setShowAIDialog(false)}
           onGoToEditor={() => {
