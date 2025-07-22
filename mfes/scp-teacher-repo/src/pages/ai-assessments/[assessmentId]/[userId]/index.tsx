@@ -641,16 +641,115 @@ const AssessmentDetails = () => {
       </Box>
 
       {!assessmentTrackingData ? (
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            minHeight: '200px',
-          }}
-        >
-          <Typography>No answer sheet has been submitted yet</Typography>
-        </Box>
+        assessmentData?.status === 'AI Pending' ? (
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minHeight: '200px',
+              gap: 2,
+              padding: '20px',
+              textAlign: 'center',
+            }}
+          >
+            <Typography
+              variant="h6"
+              sx={{
+                color: '#1F1B13',
+                fontSize: { xs: '18px', md: '20px' },
+                fontWeight: 500,
+                marginBottom: '16px',
+              }}
+            >
+              Your answer sheets have been successfully uploaded
+            </Typography>
+            <Typography
+              variant="h6"
+              sx={{
+                color: '#1F1B13',
+                fontSize: { xs: '16px', md: '18px' },
+                fontWeight: 400,
+                marginBottom: '8px',
+              }}
+            >
+              What's happening now:
+            </Typography>
+            <Box sx={{ textAlign: 'left', width: '100%', maxWidth: '400px' }}>
+              <Typography
+                sx={{
+                  color: '#1F1B13',
+                  fontSize: { xs: '14px', md: '16px' },
+                  fontWeight: 400,
+                  marginBottom: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  '&:before': {
+                    content: '"•"',
+                    marginRight: '8px',
+                  },
+                }}
+              >
+                Answers are being scanned and digitized
+              </Typography>
+              <Typography
+                sx={{
+                  color: '#1F1B13',
+                  fontSize: { xs: '14px', md: '16px' },
+                  fontWeight: 400,
+                  marginBottom: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  '&:before': {
+                    content: '"•"',
+                    marginRight: '8px',
+                  },
+                }}
+              >
+                The AI is assigning marks based on the rubric
+              </Typography>
+              <Typography
+                sx={{
+                  color: '#1F1B13',
+                  fontSize: { xs: '14px', md: '16px' },
+                  fontWeight: 400,
+                  marginBottom: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  '&:before': {
+                    content: '"•"',
+                    marginRight: '8px',
+                  },
+                }}
+              >
+                Question-wise feedback and an overall score will be available
+                shortly
+              </Typography>
+            </Box>
+            {/* <Typography
+              sx={{
+                color: '#1F1B13',
+                fontSize: { xs: '14px', md: '16px' },
+                fontWeight: 400,
+                marginTop: '8px',
+              }}
+            >
+              You'll be notified once the results are ready.
+            </Typography> */}
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              minHeight: '200px',
+            }}
+          >
+            <Typography>No answer sheet has been submitted yet</Typography>
+          </Box>
+        )
       ) : (
         <AnswerSheet
           assessmentTrackingData={assessmentTrackingData}

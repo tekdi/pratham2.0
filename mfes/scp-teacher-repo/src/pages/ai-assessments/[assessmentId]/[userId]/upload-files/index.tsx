@@ -10,6 +10,7 @@ import {
   CircularProgress,
   Snackbar,
   Alert,
+  Grid,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import KeyboardBackspaceOutlinedIcon from '@mui/icons-material/KeyboardBackspaceOutlined';
@@ -475,116 +476,119 @@ const FilesPage = () => {
       </Box>
 
       {/* Images Grid */}
-      <Box
+      <Grid
+        container
+        spacing={2}
         sx={{
-          display: 'grid',
-          gridTemplateColumns:
-            uploadedImages.length === 0 ? '1fr' : 'repeat(2, 1fr)',
-          gap: 0,
           flex: 1,
+          padding: 2,
+          width: '100%',
         }}
       >
         {uploadedImages.map((image: UploadedImage) => (
-          <Box
-            key={image.id}
-            onClick={() =>
-              isSelecting
-                ? handleImageSelect(image.id)
-                : handleImageClick(image.url)
-            }
-            sx={{
-              position: 'relative',
-              backgroundColor: '#F5F5F5',
-              border: '1px solid rgba(0, 0, 0, 0.1)',
-              cursor: 'pointer',
-              aspectRatio: '9/12',
-              overflow: 'hidden',
-              '&:hover': {
-                opacity: isSelecting ? 0.8 : 0.9,
-              },
-            }}
-          >
+          <Grid item xs={6} md={3} key={image.id}>
             <Box
-              component="img"
-              src={image.url}
-              alt={image.name}
+              onClick={() =>
+                isSelecting
+                  ? handleImageSelect(image.id)
+                  : handleImageClick(image.url)
+              }
               sx={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                objectPosition: 'center',
+                position: 'relative',
+                backgroundColor: '#F5F5F5',
+                border: '1px solid #000000',
+                cursor: 'pointer',
+                aspectRatio: '9/12',
+                overflow: 'hidden',
+                '&:hover': {
+                  opacity: isSelecting ? 0.8 : 0.9,
+                },
               }}
-            />
-            {isSelecting && (
+            >
               <Box
+                component="img"
+                src={image.url}
+                alt={image.name}
                 sx={{
-                  position: 'absolute',
-                  top: '8px',
-                  right: '8px',
-                  width: '24px',
-                  height: '24px',
-                  borderRadius: '50%',
-                  backgroundColor: selectedImages.has(image.id)
-                    ? '#0D599E'
-                    : 'rgba(255, 255, 255, 0.8)',
-                  border: selectedImages.has(image.id)
-                    ? 'none'
-                    : '2px solid #FFFFFF',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  objectPosition: 'center',
                 }}
-              >
-                {selectedImages.has(image.id) && (
-                  <Box
-                    sx={{
-                      width: '12px',
-                      height: '12px',
-                      backgroundColor: '#FFFFFF',
-                      borderRadius: '50%',
-                    }}
-                  />
-                )}
-              </Box>
-            )}
-          </Box>
+              />
+              {isSelecting && (
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: '8px',
+                    right: '8px',
+                    width: '24px',
+                    height: '24px',
+                    borderRadius: '50%',
+                    backgroundColor: selectedImages.has(image.id)
+                      ? '#0D599E'
+                      : 'rgba(255, 255, 255, 0.8)',
+                    border: selectedImages.has(image.id)
+                      ? 'none'
+                      : '2px solid #FFFFFF',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {selectedImages.has(image.id) && (
+                    <Box
+                      sx={{
+                        width: '12px',
+                        height: '12px',
+                        backgroundColor: '#FFFFFF',
+                        borderRadius: '50%',
+                      }}
+                    />
+                  )}
+                </Box>
+              )}
+            </Box>
+          </Grid>
         ))}
 
         {uploadedImages.length === 0 && (
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              minHeight: '200px',
-              width: '100%',
-            }}
-          >
-            <Typography
+          <Grid item xs={12}>
+            <Box
               sx={{
-                color: '#969088',
-                fontSize: '16px',
-                fontWeight: 500,
-                textAlign: 'center',
-                mb: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: '200px',
+                width: '100%',
               }}
             >
-              No images uploaded yet
-            </Typography>
-            <Typography
-              sx={{
-                color: '#969088',
-                fontSize: '14px',
-                fontWeight: 400,
-                textAlign: 'center',
-              }}
-            >
-              Please upload assessment images to begin
-            </Typography>
-          </Box>
+              <Typography
+                sx={{
+                  color: '#969088',
+                  fontSize: '16px',
+                  fontWeight: 500,
+                  textAlign: 'center',
+                  mb: 1,
+                }}
+              >
+                No images uploaded yet
+              </Typography>
+              <Typography
+                sx={{
+                  color: '#969088',
+                  fontSize: '14px',
+                  fontWeight: 400,
+                  textAlign: 'center',
+                }}
+              >
+                Please upload assessment images to begin
+              </Typography>
+            </Box>
+          </Grid>
         )}
-      </Box>
+      </Grid>
 
       {/* Image Viewer */}
       <ImageViewer
