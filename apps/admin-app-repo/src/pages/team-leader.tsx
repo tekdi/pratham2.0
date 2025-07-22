@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useCallback , useRef} from 'react';
 import Form from '@rjsf/mui';
 import validator from '@rjsf/validator-ajv8';
 import axios from 'axios';
@@ -51,6 +51,7 @@ import {
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
+import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
 
 const TeamLeader = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -85,6 +86,7 @@ const TeamLeader = () => {
 
   const { t, i18n } = useTranslation();
   const theme = useTheme<any>();
+     const formRef = useRef(null);
 
   const initialFormData = localStorage.getItem('stateId')
     ? { state: [localStorage.getItem('stateId')] }
@@ -151,9 +153,8 @@ const TeamLeader = () => {
       norender: true, // Hide submit button if isHide is true
     },
   };
-
   const SubmitaFunction = async (formData: any) => {
-    // console.log("###### debug issue formData", formData)
+    console.log("###### debug issue formData", formData)
     if (Object.keys(formData).length > 0) {
       setPrefilledFormData(formData);
       //set prefilled search data on refresh
@@ -426,6 +427,7 @@ const TeamLeader = () => {
           schema &&
           uiSchema && (
             <DynamicForm
+              ref={formRef}
               schema={schema}
               uiSchema={updatedUiSchema}
               SubmitaFunction={SubmitaFunction}
@@ -435,6 +437,12 @@ const TeamLeader = () => {
           )
         )}
         <Box mt={4} sx={{ display: 'flex', justifyContent: 'end' }}>
+          <ResetFiltersButton
+            searchStoreKey="teamLeader"
+            formRef={formRef}
+            SubmitaFunction={SubmitaFunction}
+            setPrefilledFormData={setPrefilledFormData}
+          />
           <Button
             variant="outlined"
             startIcon={<AddIcon />}

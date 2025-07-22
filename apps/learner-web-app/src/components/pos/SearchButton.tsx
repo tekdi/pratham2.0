@@ -1,8 +1,10 @@
 import React from 'react';
 import Box from '@mui/material/Box';
 import SearchIcon from '@mui/icons-material/Search';
+import ClearIcon from '@mui/icons-material/Clear';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 
 interface SearchButtonProps {
@@ -14,6 +16,7 @@ interface SearchButtonProps {
   _button?: any;
   _input?: any;
   _icon?: any;
+  _topAppBarUi?: boolean;
 }
 
 export const SearchButton: React.FC<SearchButtonProps> = ({
@@ -25,12 +28,19 @@ export const SearchButton: React.FC<SearchButtonProps> = ({
   _button,
   _input,
   _icon,
+  _topAppBarUi,
 }) => {
   const [search, setSearch] = React.useState<string>(searchValue || '');
 
   React.useEffect(() => {
     setSearch(searchValue || '');
   }, [searchValue]);
+
+  const handleClear = () => {
+    setSearch('');
+    // handleSearch?.('');
+    // onSearch('');
+  };
 
   return (
     <Box
@@ -40,14 +50,17 @@ export const SearchButton: React.FC<SearchButtonProps> = ({
         alignItems: 'center',
         bgcolor: '#F5F5F5',
         borderRadius: '8px',
+        mx: '25px',
         boxShadow: '0px 1px 2px 0px #0000004D',
         ...(_box?.sx ?? {}),
       }}
     >
-      <SearchIcon
-        {..._icon}
-        sx={{ color: '#757575', ml: 2, mr: 1, ...(_icon?.sx ?? {}) }}
-      />
+      {!_topAppBarUi && (
+        <SearchIcon
+          {..._icon}
+          sx={{ color: '#757575', ml: '8px', ...(_icon?.sx ?? {}) }}
+        />
+      )}
       <TextField
         variant="standard"
         placeholder="Search.."
@@ -59,6 +72,11 @@ export const SearchButton: React.FC<SearchButtonProps> = ({
             fontFamily: 'Poppins',
             fontSize: '18px',
             pl: 1,
+            // mr: 1,
+            textWrap: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
             bgcolor: 'transparent',
             ...(_input?.InputProps?.sx ?? {}),
           },
@@ -75,6 +93,21 @@ export const SearchButton: React.FC<SearchButtonProps> = ({
           }
         }}
       />
+      {search && (
+        <IconButton
+          onClick={handleClear}
+          size="small"
+          sx={{
+            mr: 1,
+            color: '#757575',
+            '&:hover': {
+              color: '#1F1B13',
+            },
+          }}
+        >
+          <ClearIcon sx={{ fontSize: '25px', color: 'black' }} />
+        </IconButton>
+      )}
       {!isHideSubmitButton && (
         <Button
           variant="contained"
@@ -87,8 +120,9 @@ export const SearchButton: React.FC<SearchButtonProps> = ({
             borderTopRightRadius: '8px',
             borderBottomRightRadius: '8px',
             boxShadow: 'none',
-            px: 4,
-            py: 1.5,
+            minWidth: _topAppBarUi ? '40px' : '65px',
+            px: _topAppBarUi ? 0 : 4,
+            py: _topAppBarUi ? 1 : 1.5,
             fontWeight: 600,
             fontSize: '16px',
             textTransform: 'none',
@@ -97,7 +131,9 @@ export const SearchButton: React.FC<SearchButtonProps> = ({
           }}
           onClick={(e) => onSearch(search, e)}
         >
-          <SpeakableText>Search</SpeakableText>
+          <SpeakableText>
+            {_topAppBarUi ? <SearchIcon sx={{ fontSize: '22px' }} /> : 'Search'}
+          </SpeakableText>
         </Button>
       )}
     </Box>
