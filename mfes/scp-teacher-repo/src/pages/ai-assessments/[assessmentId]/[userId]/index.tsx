@@ -180,7 +180,10 @@ const AssessmentDetails = () => {
 
   // Upload Options Popup handlers
   const handleUploadInfoClick = () => {
-    if (assessmentData?.status === 'AI Pending') {
+    if (
+      assessmentData?.status === 'AI Pending' ||
+      assessmentData?.status === 'Approved'
+    ) {
       // setSnackbar({
       //   open: true,
       //   message: 'Please wait for the AI to process the assessment.',
@@ -942,7 +945,8 @@ const AssessmentDetails = () => {
           >
             {assessmentData?.status === 'AI Pending' ? (
               <CircularProgress size={24} />
-            ) : assessmentData?.status === 'AI Processed' ? (
+            ) : assessmentData?.status === 'AI Processed' ||
+              assessmentData?.status === 'Approved' ? (
               <ArrowForwardIcon />
             ) : (
               <FileUploadIcon />
@@ -952,7 +956,8 @@ const AssessmentDetails = () => {
       </Box>
 
       {!assessmentTrackingData ? (
-        assessmentData?.status === 'AI Pending' ? (
+        assessmentData?.status === 'AI Pending' ||
+        assessmentData?.status === 'Approved' ? (
           <Box
             sx={{
               display: 'flex',
