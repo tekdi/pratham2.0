@@ -159,6 +159,9 @@ const SetParameters: React.FC<SetParametersProps> = ({
       newErrors.questionCount =
         'At least one question type must have at least 1 question.';
     }
+    if (!formState.description || formState.description.trim() === '') {
+      newErrors.description = 'Description is required';
+    }
     // Validate FilterForm fields if onlyFields is provided
     if (onlyFields && Array.isArray(onlyFields)) {
       onlyFields.forEach((field: string) => {
@@ -311,9 +314,10 @@ const SetParameters: React.FC<SetParametersProps> = ({
             <Grid item xs={12} md={6}>
               <TextField
                 sx={{ mb: 2 }}
-                label="Description/Instructions (Optional)"
+                label="Description"
                 multiline
                 minRows={4}
+                required
                 fullWidth
                 value={formState?.description || ''}
                 onChange={(e) =>
@@ -322,7 +326,15 @@ const SetParameters: React.FC<SetParametersProps> = ({
                     description: e.target.value,
                   }))
                 }
+                error={!!errors.description}
+                helperText={errors.description}
                 InputLabelProps={{ style: { fontFamily: 'Poppins' } }}
+                FormHelperTextProps={{
+                  sx: {
+                    marginLeft: 0,
+                    marginRight: 0,
+                  },
+                }}
               />
               <FormControl
                 required={true}
