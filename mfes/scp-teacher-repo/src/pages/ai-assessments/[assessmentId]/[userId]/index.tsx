@@ -37,6 +37,7 @@ import {
 import AnswerSheet, {
   AssessmentTrackingData,
 } from '../../../../components/assessment/AnswerSheet';
+import MinimizeIcon from '@mui/icons-material/Minimize';
 interface ScoreDetail {
   questionId: string | null;
   pass: string;
@@ -87,15 +88,41 @@ interface UpdateAssessmentScorePayload {
   totalScore: number;
   unitId: string;
   assessmentSummary: AssessmentSection[];
+  submitedBy?: string; // Optional field for evaluation source
 }
 
 interface AssessmentRecord {
-  id: string;
-  questionId: string;
-  answer: string;
-  score?: number;
-  maxScore?: number;
-  // Add other record properties as needed
+  assessmentTrackingId: string;
+  userId: string;
+  courseId: string;
+  contentId: string;
+  attemptId: string;
+  createdOn: string;
+  lastAttemptedOn: string;
+  assessmentSummary: {
+    data: {
+      item: {
+        id: string;
+        title: string;
+        maxscore: number;
+        sectionId: string;
+      };
+      pass: string;
+      duration: number;
+      score: number;
+      resvalues: Array<{
+        value: any;
+        selected: boolean;
+        AI_suggestion: string;
+      }>;
+    }[];
+  }[];
+  totalMaxScore: number;
+  totalScore: number;
+  updatedOn: string;
+  timeSpent: string;
+  unitId: string;
+  submitedBy: string;
 }
 
 interface OfflineAssessmentData {
@@ -105,6 +132,10 @@ interface OfflineAssessmentData {
   records: AssessmentRecord[];
   // Add other properties as needed based on API response
 }
+
+const stripHtmlTags = (html: string) => {
+  return html.replace(/<[^>]*>/g, '');
+};
 
 const AssessmentDetails = () => {
   const theme = useTheme();
@@ -252,37 +283,165 @@ const AssessmentDetails = () => {
             currentUserData.status &&
             currentUserData.status !== 'AI Pending'
           ) {
-            const response = await getAssessmentTracking({
-              userId: userId as string,
-              contentId: assessmentId as string,
-              courseId: assessmentId as string,
-              unitId: assessmentId as string,
-            });
-            if (response?.data?.length > 0) {
-              // Find the latest assessment data by comparing timestamps
-              const latestAssessment = response.data.reduce(
-                (
-                  latest: AssessmentTrackingData,
-                  current: AssessmentTrackingData
-                ) => {
-                  const currentDate = Math.max(
-                    new Date(current.createdOn).getTime(),
-                    new Date(current.lastAttemptedOn).getTime(),
-                    new Date(current.updatedOn).getTime()
-                  );
-
-                  const latestDate = Math.max(
-                    new Date(latest.createdOn).getTime(),
-                    new Date(latest.lastAttemptedOn).getTime(),
-                    new Date(latest.updatedOn).getTime()
-                  );
-
+            // If status is AI Processed and we have records with evaluatedBy: "AI"
+            if (
+              currentUserData.status === 'AI Processed' &&
+              currentUserData.records?.length > 0 &&
+              currentUserData.records[0].evaluatedBy === 'AI'
+            ) {
+              // Get the latest record based on updatedOn timestamp
+              const latestRecord = currentUserData.records.reduce(
+                (latest: AssessmentRecord, current: AssessmentRecord) => {
+                  const currentDate = new Date(current.updatedOn).getTime();
+                  const latestDate = new Date(latest.updatedOn).getTime();
                   return currentDate > latestDate ? current : latest;
                 },
-                response.data[0]
+                currentUserData.records[0]
               );
 
-              setAssessmentTrackingData(latestAssessment);
+              // Transform the record into AssessmentTrackingData format
+              const transformedData: AssessmentTrackingData = {
+                assessmentTrackingId: latestRecord.assessmentTrackingId,
+                userId: latestRecord.userId,
+                courseId: latestRecord.courseId,
+                contentId: latestRecord.contentId,
+                attemptId: latestRecord.attemptId,
+                createdOn: latestRecord.createdOn,
+                lastAttemptedOn: latestRecord.lastAttemptedOn,
+                updatedOn: latestRecord.updatedOn,
+                timeSpent: latestRecord.timeSpent,
+                totalMaxScore: latestRecord.totalMaxScore,
+                totalScore: latestRecord.totalScore,
+                unitId: latestRecord.unitId,
+                score_details: latestRecord.assessmentSummary.flatMap(
+                  (section: {
+                    data: Array<{
+                      item: {
+                        id: string;
+                        title: string;
+                        maxscore: number;
+                        sectionId: string;
+                      };
+                      pass: string;
+                      duration: number;
+                      score: number;
+                      resvalues: Array<{
+                        value: any;
+                        selected: boolean;
+                        AI_suggestion: string;
+                      }>;
+                    }>;
+                  }) =>
+                    section.data.map(
+                      (item: {
+                        item: {
+                          id: string;
+                          title: string;
+                          maxscore: number;
+                          sectionId: string;
+                        };
+                        pass: string;
+                        duration: number;
+                        score: number;
+                        resvalues: Array<{
+                          value: any;
+                          selected: boolean;
+                          AI_suggestion: string;
+                        }>;
+                      }) => {
+                        // Check localStorage for edited score
+                        const savedData = localStorage.getItem(
+                          `tracking_${userId}_${item.item.id}`
+                        );
+                        const savedScore = savedData
+                          ? JSON.parse(savedData).score
+                          : item.score;
+
+                        return {
+                          questionId: item.item.id,
+                          pass: savedScore > 0 ? 'yes' : 'no',
+                          sectionId: item.item.sectionId,
+                          resValue: JSON.stringify(item.resvalues[0]),
+                          duration: item.duration,
+                          score: savedScore,
+                          maxScore: item.item.maxscore,
+                          queTitle: stripHtmlTags(item.item.title),
+                        };
+                      }
+                    )
+                ),
+              };
+
+              // Recalculate total score based on localStorage values
+              transformedData.totalScore = transformedData.score_details.reduce(
+                (total, detail) => total + detail.score,
+                0
+              );
+
+              setAssessmentTrackingData(transformedData);
+            } else {
+              // Fallback to existing assessment tracking API call
+              const response = await getAssessmentTracking({
+                userId: userId as string,
+                contentId: assessmentId as string,
+                courseId: assessmentId as string,
+                unitId: assessmentId as string,
+              });
+              if (response?.data?.length > 0) {
+                // Find the latest assessment data by comparing timestamps
+                const latestAssessment = response.data.reduce(
+                  (
+                    latest: AssessmentTrackingData,
+                    current: AssessmentTrackingData
+                  ) => {
+                    const currentDate = Math.max(
+                      new Date(current.createdOn).getTime(),
+                      new Date(current.lastAttemptedOn).getTime(),
+                      new Date(current.updatedOn).getTime()
+                    );
+
+                    const latestDate = Math.max(
+                      new Date(latest.createdOn).getTime(),
+                      new Date(latest.lastAttemptedOn).getTime(),
+                      new Date(latest.updatedOn).getTime()
+                    );
+
+                    return currentDate > latestDate ? current : latest;
+                  },
+                  response.data[0]
+                );
+
+                // Check localStorage for any edited scores before setting the state
+                if (latestAssessment.score_details) {
+                  latestAssessment.score_details =
+                    latestAssessment.score_details.map(
+                      (detail: ScoreDetail) => {
+                        const savedData = localStorage.getItem(
+                          `tracking_${userId}_${detail.questionId}`
+                        );
+                        if (savedData) {
+                          const savedScore = JSON.parse(savedData).score;
+                          return {
+                            ...detail,
+                            score: savedScore,
+                            pass: savedScore > 0 ? 'yes' : 'no',
+                          };
+                        }
+                        return detail;
+                      }
+                    );
+
+                  // Recalculate total score
+                  latestAssessment.totalScore =
+                    latestAssessment.score_details.reduce(
+                      (total: number, detail: ScoreDetail) =>
+                        total + detail.score,
+                      0
+                    );
+                }
+
+                setAssessmentTrackingData(latestAssessment);
+              }
             }
           }
         }
@@ -340,7 +499,16 @@ const AssessmentDetails = () => {
 
   const handleScoreClick = (question: ScoreDetail) => {
     setSelectedQuestion(question);
-    setEditScore(question.score.toString());
+    // Check if there's a saved score in localStorage
+    const savedData = localStorage.getItem(
+      `tracking_${userId}_${question.questionId}`
+    );
+    if (savedData) {
+      const parsedData = JSON.parse(savedData);
+      setEditScore(parsedData.score.toString());
+    } else {
+      setEditScore(question.score.toString());
+    }
     setIsEditModalOpen(true);
   };
 
@@ -354,28 +522,75 @@ const AssessmentDetails = () => {
     try {
       setEditLoading(true);
 
-      // Find the question in the assessment summary
+      // If status is AI Processed, only save to localStorage
+      if (assessmentData?.status === 'AI Processed') {
+        localStorage.setItem(
+          `tracking_${userId}_${selectedQuestion.questionId}`,
+          JSON.stringify({
+            score: Number(editScore),
+            answer: selectedQuestion.resValue
+              ? JSON.parse(selectedQuestion.resValue).value
+              : '',
+            editedAt: new Date().toISOString(),
+          })
+        );
+
+        // Update local state without API call
+        const updatedLocalScoreDetails =
+          assessmentTrackingData.score_details.map((detail) => {
+            if (detail.questionId === selectedQuestion.questionId) {
+              return {
+                ...detail,
+                score: Number(editScore),
+                pass: Number(editScore) > 0 ? 'yes' : 'no',
+              };
+            }
+            return detail;
+          });
+
+        // Calculate new total score by summing all scores
+        const newTotalScore = updatedLocalScoreDetails.reduce(
+          (total, detail) => total + detail.score,
+          0
+        );
+
+        setAssessmentTrackingData({
+          ...assessmentTrackingData,
+          totalScore: newTotalScore,
+          score_details: updatedLocalScoreDetails,
+        });
+
+        setSnackbar({
+          open: true,
+          message: 'Score saved successfully',
+          severity: 'success',
+        });
+        setIsEditModalOpen(false);
+        return;
+      }
+
+      // For other statuses, proceed with API call
       const updatedAssessmentSummary = assessmentTrackingData.score_details.map(
         (detail) => {
           const section: AssessmentSection = {
             sectionId: detail.sectionId,
-            sectionName: 'Section 1', // You might want to get this from somewhere
+            sectionName: 'Section 1',
             data: [
               {
                 item: {
                   id: detail.questionId || '',
-                  title: detail.queTitle,
-                  type: 'sa', // You might want to get this from somewhere
+                  title: stripHtmlTags(detail.queTitle),
+                  type: 'sa',
                   maxscore: detail.maxScore,
                   params: [],
                   sectionId: detail.sectionId,
                 },
-                index: 1, // You might want to calculate this
+                index: 1,
                 pass: Number(editScore) > 0 ? 'yes' : 'no',
                 score: Number(editScore),
                 resvalues: [JSON.parse(detail.resValue)],
                 duration: detail.duration,
-                sectionName: 'Section 1', // You might want to get this from somewhere
+                sectionName: 'Section 1',
               },
             ],
           };
@@ -394,7 +609,7 @@ const AssessmentDetails = () => {
         totalScore:
           assessmentTrackingData.totalScore -
           selectedQuestion.score +
-          Number(editScore), // Update total score
+          Number(editScore),
         unitId: assessmentTrackingData.unitId,
         assessmentSummary: updatedAssessmentSummary,
       };
@@ -402,7 +617,7 @@ const AssessmentDetails = () => {
       await updateAssessmentScore(payload);
 
       // Update local state
-      const updatedScoreDetails = assessmentTrackingData.score_details.map(
+      const updatedApiScoreDetails = assessmentTrackingData.score_details.map(
         (detail) => {
           if (detail === selectedQuestion) {
             return {
@@ -418,7 +633,7 @@ const AssessmentDetails = () => {
       setAssessmentTrackingData({
         ...assessmentTrackingData,
         totalScore: payload.totalScore,
-        score_details: updatedScoreDetails,
+        score_details: updatedApiScoreDetails,
       });
 
       setSnackbar({
@@ -443,10 +658,107 @@ const AssessmentDetails = () => {
     setIsConfirmModalOpen(true);
   };
 
-  const handleConfirmApprove = () => {
-    // TODO: Add API call to approve marks
-    console.log('Marks approved');
-    setIsConfirmModalOpen(false);
+  const handleConfirmApprove = async () => {
+    if (!assessmentTrackingData) return;
+
+    try {
+      setEditLoading(true);
+
+      // Create payload with all current scores including any edited ones from localStorage
+      const updatedAssessmentSummary = assessmentTrackingData.score_details.map(
+        (detail) => {
+          // Check if there's an edited score in localStorage
+          const savedData = localStorage.getItem(
+            `tracking_${userId}_${detail.questionId}`
+          );
+          const score = savedData ? JSON.parse(savedData).score : detail.score;
+
+          const section: AssessmentSection = {
+            sectionId: detail.sectionId,
+            sectionName: 'Section 1',
+            data: [
+              {
+                item: {
+                  id: detail.questionId || '',
+                  title: stripHtmlTags(detail.queTitle),
+                  type: 'sa',
+                  maxscore: detail.maxScore,
+                  params: [],
+                  sectionId: detail.sectionId,
+                },
+                index: 1,
+                pass: Number(score) > 0 ? 'yes' : 'no',
+                score: Number(score),
+                resvalues: [JSON.parse(detail.resValue)],
+                duration: detail.duration,
+                sectionName: 'Section 1',
+              },
+            ],
+          };
+          return section;
+        }
+      );
+
+      const payload: UpdateAssessmentScorePayload = {
+        userId: assessmentTrackingData.userId,
+        courseId: assessmentTrackingData.courseId,
+        contentId: assessmentTrackingData.contentId,
+        attemptId: assessmentTrackingData.attemptId,
+        lastAttemptedOn: assessmentTrackingData.lastAttemptedOn,
+        timeSpent: parseInt(assessmentTrackingData.timeSpent),
+        totalMaxScore: assessmentTrackingData.totalMaxScore,
+        totalScore: assessmentTrackingData.score_details.reduce(
+          (total, detail) => {
+            const savedData = localStorage.getItem(
+              `tracking_${userId}_${detail.questionId}`
+            );
+            return (
+              total + (savedData ? JSON.parse(savedData).score : detail.score)
+            );
+          },
+          0
+        ),
+        unitId: assessmentTrackingData.unitId,
+        assessmentSummary: updatedAssessmentSummary,
+        submitedBy: 'Manual',
+      };
+
+      await updateAssessmentScore(payload);
+
+      // After successful approval, fetch fresh data from tracking API
+      const response = await getAssessmentTracking({
+        userId: userId as string,
+        contentId: assessmentId as string,
+        courseId: assessmentId as string,
+        unitId: assessmentId as string,
+      });
+
+      if (response?.data?.length > 0) {
+        setAssessmentTrackingData(response.data[0]);
+      }
+
+      setSnackbar({
+        open: true,
+        message: 'Assessment approved successfully',
+        severity: 'success',
+      });
+
+      // Clear localStorage after approval
+      assessmentTrackingData.score_details.forEach((detail) => {
+        localStorage.removeItem(`tracking_${userId}_${detail.questionId}`);
+      });
+
+      setIsConfirmModalOpen(false);
+    } catch (error) {
+      console.error('Error approving assessment:', error);
+      setSnackbar({
+        open: true,
+        message: 'Failed to approve assessment. Please try again.',
+        severity: 'error',
+      });
+    } finally {
+      setEditLoading(false);
+    }
   };
 
   const handleRefreshAssessmentData = async () => {
@@ -534,18 +846,30 @@ const AssessmentDetails = () => {
 
       <Box sx={{ mx: '16px', my: '16px' }}>
         {/* Assessment Status */}
-        {assessmentData?.status && (
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 2,
-              pb: 2,
-            }}
-          >
-            {getStatusIcon(
-              mapAnswerSheetStatusToInternalStatus(assessmentData.status)
-            )}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            pb: 2,
+          }}
+        >
+          {assessmentData?.status ? (
+            <>
+              {getStatusIcon(
+                mapAnswerSheetStatusToInternalStatus(assessmentData.status)
+              )}
+              <Typography
+                sx={{
+                  color: '#1F1B13',
+                  fontSize: { xs: '14px', md: '16px' },
+                  fontWeight: 400,
+                }}
+              >
+                {getStatusLabel(assessmentData.status)}
+              </Typography>
+            </>
+          ) : (
             <Typography
               sx={{
                 color: '#1F1B13',
@@ -553,10 +877,11 @@ const AssessmentDetails = () => {
                 fontWeight: 400,
               }}
             >
-              {getStatusLabel(assessmentData.status)}
+              <MinimizeIcon />
+              Not Submitted
             </Typography>
-          </Box>
-        )}
+          )}
+        </Box>
 
         {/* Images Info */}
         <Box
@@ -627,16 +952,115 @@ const AssessmentDetails = () => {
       </Box>
 
       {!assessmentTrackingData ? (
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            minHeight: '200px',
-          }}
-        >
-          <Typography>No assessment data found</Typography>
-        </Box>
+        assessmentData?.status === 'AI Pending' ? (
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minHeight: '200px',
+              gap: 2,
+              padding: '20px',
+              textAlign: 'center',
+            }}
+          >
+            <Typography
+              variant="h6"
+              sx={{
+                color: '#1F1B13',
+                fontSize: { xs: '18px', md: '20px' },
+                fontWeight: 500,
+                marginBottom: '16px',
+              }}
+            >
+              Your answer sheets have been successfully uploaded
+            </Typography>
+            <Typography
+              variant="h6"
+              sx={{
+                color: '#1F1B13',
+                fontSize: { xs: '16px', md: '18px' },
+                fontWeight: 400,
+                marginBottom: '8px',
+              }}
+            >
+              What's happening now:
+            </Typography>
+            <Box sx={{ textAlign: 'left', width: '100%', maxWidth: '400px' }}>
+              <Typography
+                sx={{
+                  color: '#1F1B13',
+                  fontSize: { xs: '14px', md: '16px' },
+                  fontWeight: 400,
+                  marginBottom: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  '&:before': {
+                    content: '"•"',
+                    marginRight: '8px',
+                  },
+                }}
+              >
+                Answers are being scanned and digitized
+              </Typography>
+              <Typography
+                sx={{
+                  color: '#1F1B13',
+                  fontSize: { xs: '14px', md: '16px' },
+                  fontWeight: 400,
+                  marginBottom: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  '&:before': {
+                    content: '"•"',
+                    marginRight: '8px',
+                  },
+                }}
+              >
+                The AI is assigning marks based on the rubric
+              </Typography>
+              <Typography
+                sx={{
+                  color: '#1F1B13',
+                  fontSize: { xs: '14px', md: '16px' },
+                  fontWeight: 400,
+                  marginBottom: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  '&:before': {
+                    content: '"•"',
+                    marginRight: '8px',
+                  },
+                }}
+              >
+                Question-wise feedback and an overall score will be available
+                shortly
+              </Typography>
+            </Box>
+            {/* <Typography
+              sx={{
+                color: '#1F1B13',
+                fontSize: { xs: '14px', md: '16px' },
+                fontWeight: 400,
+                marginTop: '8px',
+              }}
+            >
+              You'll be notified once the results are ready.
+            </Typography> */}
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              minHeight: '200px',
+            }}
+          >
+            <Typography>No answer sheet has been submitted yet</Typography>
+          </Box>
+        )
       ) : (
         <AnswerSheet
           assessmentTrackingData={assessmentTrackingData}
@@ -644,6 +1068,7 @@ const AssessmentDetails = () => {
           onScoreEdit={handleScoreClick}
           expandedPanel={expandedPanel}
           onAccordionChange={handleAccordionChange}
+          isApproved={assessmentData?.status === 'Approved'}
         />
       )}
 
@@ -656,6 +1081,26 @@ const AssessmentDetails = () => {
         maxWidth="400px"
       >
         <Box sx={{ width: '100%', position: 'relative' }}>
+          {selectedQuestion && (
+            <>
+              <Typography variant="body1" sx={{ mb: 2 }}>
+                Answer:{' '}
+                {selectedQuestion.resValue
+                  ? JSON.parse(selectedQuestion.resValue).value
+                  : 'No answer provided'}
+              </Typography>
+              {selectedQuestion.resValue &&
+                JSON.parse(selectedQuestion.resValue).AI_suggestion && (
+                  <Typography
+                    variant="body2"
+                    sx={{ mb: 2, color: 'text.secondary' }}
+                  >
+                    AI Suggestion:{' '}
+                    {JSON.parse(selectedQuestion.resValue).AI_suggestion}
+                  </Typography>
+                )}
+            </>
+          )}
           <TextField
             label="Marks"
             type="number"
@@ -676,7 +1121,7 @@ const AssessmentDetails = () => {
               max: selectedQuestion?.maxScore || 0,
             }}
             helperText={`Maximum marks: ${selectedQuestion?.maxScore || 0}`}
-            disabled={editLoading}
+            disabled={editLoading || assessmentData?.status === 'Approved'}
           />
           {editLoading && (
             <Box

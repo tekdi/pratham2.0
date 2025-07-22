@@ -14,11 +14,13 @@ import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import FilterIcon from '@mui/icons-material/Filter';
 import { UploadOptionsPopupProps, UploadedImage } from './types';
 import Camera from './Camera';
+import ImageViewer from './ImageViewer';
 import { answerSheetSubmissions } from '../../services/AssesmentService';
 import {
   uploadFileToS3,
   dataUrlToFile,
 } from '../../services/FileUploadService';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
 const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
   isOpen,
@@ -34,6 +36,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Toast state
@@ -489,7 +492,9 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
                             display: 'flex',
                             alignItems: 'center',
                             gap: '8px',
+                            cursor: 'pointer',
                           }}
+                          onClick={() => setSelectedImage(image.url)}
                         >
                           <Box
                             sx={{
@@ -501,16 +506,20 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
                               })`,
                               backgroundSize: 'cover',
                               backgroundPosition: 'center',
-                              backgroundColor: '#f0f0f0',
+                              cursor: 'pointer',
+                              '&:hover': {
+                                opacity: 0.8,
+                              },
                             }}
                           />
                           <Typography
                             sx={{
+                              fontFamily: 'Poppins',
                               fontWeight: 500,
                               fontSize: '14px',
-                              lineHeight: '20px',
+                              lineHeight: '1.43em',
                               letterSpacing: '0.1px',
-                              color: '#000000',
+                              color: '#1F1B13',
                               maxWidth: '180px',
                               overflow: 'hidden',
                               textOverflow: 'ellipsis',
@@ -520,33 +529,23 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
                             {image.name}
                           </Typography>
                         </Box>
-                        <Box
+                        <IconButton
+                          onClick={() => handleRemoveImage(image.id)}
                           sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '10px',
+                            padding: 0,
+                            '&:hover': {
+                              backgroundColor: 'transparent',
+                              opacity: 0.8,
+                            },
                           }}
                         >
-                          <IconButton
-                            onClick={() => handleRemoveImage(image.id)}
+                          <DeleteOutlineIcon
                             sx={{
-                              width: 18,
-                              height: 18,
-                              padding: 0,
-                              '&:hover': {
-                                backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                              },
+                              color: '#BA1A1A',
+                              fontSize: '25px',
                             }}
-                          >
-                            <CloseIcon
-                              sx={{
-                                width: 10.5,
-                                height: 10.5,
-                                color: '#1F1B13',
-                              }}
-                            />
-                          </IconButton>
-                        </Box>
+                          />
+                        </IconButton>
                       </Box>
                     ))}
                   </Box>
@@ -679,6 +678,15 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
           {toast.message}
         </Alert>
       </Snackbar>
+
+      {/* Image Viewer */}
+      {selectedImage && (
+        <ImageViewer
+          open={!!selectedImage}
+          onClose={() => setSelectedImage(null)}
+          imageUrl={selectedImage}
+        />
+      )}
     </>
   );
 };

@@ -44,13 +44,14 @@ export interface ParsedResponse {
 }
 
 export interface AnswerSheetProps {
-  assessmentTrackingData: AssessmentTrackingData | null;
+  assessmentTrackingData: AssessmentTrackingData;
   onApprove: () => void;
   onScoreEdit: (question: ScoreDetail) => void;
   expandedPanel: string | false;
   onAccordionChange: (
     panel: string
   ) => (event: React.SyntheticEvent, isExpanded: boolean) => void;
+  isApproved?: boolean;
 }
 
 // Utility function to parse response values
@@ -256,10 +257,18 @@ interface QuestionItemProps {
   isExpanded: boolean;
   onScoreClick: () => void;
   onAccordionToggle: (event: React.SyntheticEvent, isExpanded: boolean) => void;
+  isApproved: boolean;
 }
 
 const QuestionItem: React.FC<QuestionItemProps> = React.memo(
-  ({ question, index, isExpanded, onScoreClick, onAccordionToggle }) => {
+  ({
+    question,
+    index,
+    isExpanded,
+    onScoreClick,
+    onAccordionToggle,
+    isApproved,
+  }) => {
     const parsedResponse = useMemo(
       () => parseResValue(question.resValue),
       [question.resValue]
@@ -319,12 +328,45 @@ const QuestionItem: React.FC<QuestionItemProps> = React.memo(
               Q{index + 1}. {question.queTitle}
             </Typography>
           </Box>
-          <ScoreBadge
-            score={question.score}
-            maxScore={question.maxScore}
-            pass={question.pass}
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              padding: '4px 8px',
+              bgcolor: responseBoxStyle.color,
+              borderRadius: '4px',
+              border: '1px solid #FFFFFF',
+              cursor: isApproved ? 'default' : 'pointer',
+              transition: 'all 0.2s ease-in-out',
+              '&:hover': !isApproved
+                ? {
+                    opacity: 0.8,
+                    transform: 'scale(1.02)',
+                  }
+                : {},
+            }}
             onClick={onScoreClick}
-          />
+          >
+            <Typography
+              sx={{
+                color: '#FFFFFF',
+                fontSize: '14px',
+                fontWeight: 400,
+                letterSpacing: '1.79%',
+              }}
+            >
+              {question.score}/{question.maxScore}
+            </Typography>
+            {!isApproved && (
+              <BorderColorIcon
+                sx={{
+                  color: '#FFFFFF',
+                  fontSize: 15,
+                }}
+              />
+            )}
+          </Box>
         </Box>
 
         {/* Response Box */}
@@ -403,10 +445,13 @@ ScoreSummary.displayName = 'ScoreSummary';
 // Approve Button Component
 interface ApproveButtonProps {
   onApprove: () => void;
+  isApproved: boolean;
 }
 
 const ApproveButton: React.FC<ApproveButtonProps> = React.memo(
-  ({ onApprove }) => {
+  ({ onApprove, isApproved }) => {
+    if (isApproved) return null;
+
     return (
       <Box sx={{ px: '16px', mb: '16px' }}>
         <Button
@@ -448,15 +493,24 @@ interface QuestionsListProps {
     panel: string
   ) => (event: React.SyntheticEvent, isExpanded: boolean) => void;
   onScoreEdit: (question: ScoreDetail) => void;
+  isApproved: boolean;
 }
 
 const QuestionsList: React.FC<QuestionsListProps> = React.memo(
-  ({ scoreDetails, expandedPanel, onAccordionChange, onScoreEdit }) => {
+  ({
+    scoreDetails,
+    expandedPanel,
+    onAccordionChange,
+    onScoreEdit,
+    isApproved,
+  }) => {
     const handleScoreClick = useCallback(
       (question: ScoreDetail) => {
-        onScoreEdit(question);
+        if (!isApproved) {
+          onScoreEdit(question);
+        }
       },
-      [onScoreEdit]
+      [onScoreEdit, isApproved]
     );
 
     return (
@@ -485,6 +539,7 @@ const QuestionsList: React.FC<QuestionsListProps> = React.memo(
                 isExpanded={expandedPanel === `panel-${index}`}
                 onScoreClick={() => handleScoreClick(question)}
                 onAccordionToggle={onAccordionChange(`panel-${index}`)}
+                isApproved={isApproved}
               />
             ))}
           </Box>
@@ -542,6 +597,7 @@ const AnswerSheet: React.FC<AnswerSheetProps> = ({
   onScoreEdit,
   expandedPanel,
   onAccordionChange,
+  isApproved = false,
 }) => {
   // Early return for empty state
   if (
@@ -560,7 +616,7 @@ const AnswerSheet: React.FC<AnswerSheetProps> = ({
       />
 
       {/* Approve Button */}
-      <ApproveButton onApprove={onApprove} />
+      <ApproveButton onApprove={onApprove} isApproved={isApproved} />
 
       {/* Questions List */}
       <QuestionsList
@@ -568,6 +624,7 @@ const AnswerSheet: React.FC<AnswerSheetProps> = ({
         expandedPanel={expandedPanel}
         onAccordionChange={onAccordionChange}
         onScoreEdit={onScoreEdit}
+        isApproved={isApproved}
       />
     </Box>
   );

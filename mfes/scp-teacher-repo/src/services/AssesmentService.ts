@@ -61,22 +61,78 @@ interface ICreateAssessmentTracking {
   assessmentSummary: IAssessmentSummarySection[];
 }
 
-interface IUpdateAssessmentScore {
+export interface AssessmentSection {
+  sectionId: string;
+  sectionName: string;
+  data: Array<{
+    item: {
+      id: string;
+      title: string;
+      type: string;
+      maxscore: number;
+      params: any[];
+      sectionId: string;
+    };
+    index: number;
+    pass: string;
+    score: number;
+    resvalues: Array<{
+      label?: string;
+      value: any;
+      selected: boolean;
+      AI_suggestion: string;
+    }>;
+    duration: number;
+    sectionName: string;
+  }>;
+}
+
+export interface UpdateAssessmentScorePayload {
   userId: string;
   courseId: string;
   contentId: string;
   attemptId: string;
+  lastAttemptedOn: string;
+  timeSpent: number;
+  totalMaxScore: number;
   totalScore: number;
+  unitId: string;
+  assessmentSummary: AssessmentSection[];
+  submitedBy?: string;
+}
+
+export interface AssessmentRecord {
+  assessmentTrackingId: string;
+  userId: string;
+  courseId: string;
+  contentId: string;
+  attemptId: string;
+  createdOn: string;
+  lastAttemptedOn: string;
   assessmentSummary: {
-    sectionId: string;
-    sectionName: string;
     data: {
       item: {
         id: string;
+        title: string;
+        maxscore: number;
+        sectionId: string;
       };
+      pass: string;
+      duration: number;
       score: number;
+      resvalues: Array<{
+        value: any;
+        selected: boolean;
+        AI_suggestion: string;
+      }>;
     }[];
   }[];
+  totalMaxScore: number;
+  totalScore: number;
+  updatedOn: string;
+  timeSpent: string;
+  unitId: string;
+  submitedBy: string;
 }
 
 export const getAssessmentList = async ({
@@ -227,13 +283,16 @@ export const createAssessmentTracking = async (
   }
 };
 
-export const updateAssessmentScore = async (data: IUpdateAssessmentScore) => {
-  const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/assessment/create`;
+export const updateAssessmentScore = async (
+  payload: UpdateAssessmentScorePayload
+): Promise<any> => {
   try {
-    const response = await post(apiUrl, data);
-    return response?.data;
+    const response = await post(
+      `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/assessment/create`,
+      payload
+    );
+    return response;
   } catch (error) {
-    console.error('Error in updating assessment score:', error);
     throw error;
   }
 };
