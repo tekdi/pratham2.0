@@ -293,6 +293,22 @@ export const createAIQuestionsSet = async (payload: {
   return response?.data;
 };
 
+// update ai question set
+export const updateAIQuestionSet = async (questionSetId: string) => {
+  const apiURL = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/ai-assessment/update_question_set`;
+
+  const response = await post(
+    apiURL,
+    {
+      questionSetId,
+    },
+    {
+      'Content-Type': 'application/json',
+    }
+  );
+  return response?.data;
+};
+
 // ai question set status
 export const getAIQuestionSetStatus = async (
   questionSetId: string,
