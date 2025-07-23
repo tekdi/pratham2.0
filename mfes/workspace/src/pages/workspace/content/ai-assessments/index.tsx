@@ -1,9 +1,22 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Layout from '../../../../components/Layout';
-import { Typography, Box, CircularProgress } from '@mui/material';
+import {
+  Typography,
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  IconButton,
+  CircularProgress,
+} from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { getContent } from '@workspace/services/ContentService';
 import SearchBox from '../../../../components/SearchBox';
 import PaginationComponent from '@workspace/components/PaginationComponent';
+import NoDataFound from '@workspace/components/NoDataFound';
 import { LIMIT } from '@workspace/utils/app.constant';
 import { useRouter } from 'next/router';
 import { MIME_TYPE } from '@workspace/utils/app.config';
@@ -47,7 +60,7 @@ const PublishPage = () => {
   const tenantConfig = useTenantConfig();
   const router = useRouter();
 
-  const [selectedKey, setSelectedKey] = useState('publish');
+  const [selectedKey, setSelectedKey] = useState('ai-assessments');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState('');
