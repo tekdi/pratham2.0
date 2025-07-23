@@ -288,7 +288,8 @@ const AssessmentDetails = () => {
           ) {
             // If status is AI Processed and we have records with evaluatedBy: "AI"
             if (
-              currentUserData.status === 'AI Processed' &&
+              (currentUserData.status === 'AI Processed' ||
+                currentUserData.status === 'Approved') &&
               currentUserData.records?.length > 0 &&
               currentUserData.records[0].evaluatedBy === 'AI'
             ) {
@@ -751,6 +752,7 @@ const AssessmentDetails = () => {
         localStorage.removeItem(`tracking_${userId}_${detail.questionId}`);
       });
 
+      await handleRefreshAssessmentData();
       setIsConfirmModalOpen(false);
     } catch (error) {
       console.error('Error approving assessment:', error);
