@@ -5,7 +5,14 @@ import {
   updateAIQuestionSet,
 } from '@workspace/services/ContentService';
 import { useRouter } from 'next/router';
-import { Dialog, Box, Typography, CircularProgress, Fade } from '@mui/material';
+import {
+  Dialog,
+  Box,
+  Typography,
+  CircularProgress,
+  Fade,
+  Button,
+} from '@mui/material';
 import PendingOutlinedIcon from '@mui/icons-material/PendingOutlined';
 
 const Editor = () => {
@@ -110,6 +117,15 @@ const Editor = () => {
             You can continue to wait here or check back later
           </Typography>
           <CircularProgress sx={{ mb: 4, color: '#635E57' }} />
+          <Button
+            variant="contained"
+            sx={{
+              colorScheme: 'primary',
+            }}
+            onClick={() => router.back()}
+          >
+            Go Back
+          </Button>
         </Box>
       </Dialog>
     </Box>
