@@ -737,7 +737,9 @@ const AssessmentDetails: React.FC = () => {
                   backgroundColor: '#E1D5E7',
                 },
               }}
-              onClick={() => setShowDownloadPopup(true)}
+              // onClick={() => setShowDownloadPopup(true)}
+              // onClick={handleDownloadQuestionPaper}
+              onClick={handleDownloadQuestionPaper}
             >
               <CardContent
                 sx={{
