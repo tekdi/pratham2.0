@@ -17,6 +17,7 @@ import { timeAgo } from '@workspace/utils/Helper';
 import useSharedStore from '@workspace/utils/useSharedState';
 import useTenantConfig from '@workspace/hooks/useTenantConfig';
 import WorkspaceHeader from '@workspace/components/WorkspaceHeader';
+import NoDataFound from '@workspace/components/NoDataFound';
 
 const columns = [
   {
@@ -95,12 +96,16 @@ const PublishPage = () => {
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
+      // Reset page when search term changes
+      if (searchTerm !== debouncedSearchTerm) {
+        setPage(0);
+      }
     }, 300);
 
     return () => {
       clearTimeout(handler);
     };
-  }, [searchTerm]);
+  }, [searchTerm, debouncedSearchTerm]);
   useEffect(() => {
     const filteredArray = contentList.map((item: any) => ({
       image: item?.appIcon,
@@ -151,7 +156,7 @@ const PublishPage = () => {
         const aiQuestionSetStatus = await searchAiAssessment({
           createdBy: localStorage.getItem('userId'),
         });
-        const identifiers = aiQuestionSetStatus?.data?.map(
+        const identifiers = (aiQuestionSetStatus?.data || []).map(
           (item: any) => item.question_set_id as string
         );
         const response = await getContent(
@@ -170,16 +175,18 @@ const PublishPage = () => {
         //   response?.QuestionSet || []
         // );
         setContentList(
-          response?.QuestionSet.map((item: any) => ({
+          (response?.QuestionSet || []).map((item: any) => ({
             ...item,
             aiStatus: aiQuestionSetStatus?.data?.find(
               (aiItem: any) => aiItem.question_set_id === item.identifier
             )?.status,
           }))
         );
-        setTotalCount(response?.count);
+        setTotalCount(response?.count || 0);
       } catch (error) {
         console.error(error);
+        setContentList([]);
+        setTotalCount(0);
       } finally {
         setLoading(false);
       }
@@ -231,7 +238,7 @@ const PublishPage = () => {
               <Box display="flex" justifyContent="center" my={5}>
                 <CircularProgress />
               </Box>
-            ) : (
+            ) : data.length > 0 ? (
               <>
                 <Box className="table-ka-container">
                   <KaTableComponent
@@ -242,8 +249,10 @@ const PublishPage = () => {
                   />
                 </Box>
               </>
+            ) : (
+              <NoDataFound title="No data found" />
             )}
-            {totalCount > LIMIT && (
+            {totalCount > LIMIT && data.length > 0 && (
               <PaginationComponent
                 count={Math.ceil(totalCount / LIMIT)}
                 page={page}
