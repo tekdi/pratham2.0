@@ -57,7 +57,7 @@ export default function App({
     if (
       !hideStaticFilter &&
       typeof pagename === 'object' &&
-      (pagename?.['SCP'] || pagename?.['Vocational Training'])
+      (pagename?.['Second Chance'] || pagename?.['Vocational Training'])
     ) {
       const program = searchParams?.get('program');
       if (program) {
@@ -70,7 +70,7 @@ export default function App({
               typeof pagename === 'object' && program in pagename
                 ? linkLabelName[pagename[program] as LinkLabelType] ??
                   pagename[program]
-                : pagename?.['SCP'] || '',
+                : pagename?.['Second Chance'] || '',
           },
         ]);
       } else {
