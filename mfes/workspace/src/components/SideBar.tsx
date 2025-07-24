@@ -28,6 +28,7 @@ import { getLocalStoredUserRole } from '@workspace/services/LocalStorageService'
 import { TENANT_DATA } from '@workspace/utils/app.constant';
 import TenantService from '@workspace/services/TenantService';
 const route = process.env.NEXT_PUBLIC_WORKSPACE_ROUTES;
+import aiAssessment from '../assets/images/aicheckbook.svg';
 
 let isAdmin: boolean;
 if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
@@ -49,12 +50,11 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
 
   const [showHeader, setShowHeader] = useState<boolean | null>(null);
 
-
   useEffect(() => {
     setUserRole(getLocalStoredUserRole());
     const userData = localStorage.getItem('userData');
-    const headerValue = localStorage.getItem("showHeader");
-      setShowHeader(headerValue === "true");
+    const headerValue = localStorage.getItem('showHeader');
+    setShowHeader(headerValue === 'true');
     const tenant = userData ? JSON.parse(userData) : null;
     setTenantName(tenant?.tenantData[0]?.tenantName);
   }, []);
@@ -92,6 +92,18 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
       text: 'Discover Contents',
       key: 'discover-contents',
       icon: <ManageSearchIcon />,
+    },
+    {
+      text: 'AI-Assessments',
+      key: 'ai-assessments',
+      icon: (
+        <Image
+          src={aiAssessment}
+          alt="Assessment Icon"
+          width={24}
+          height={24}
+        />
+      ),
     },
   ];
 
@@ -137,24 +149,25 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
       <Box
         sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
       >
-              {showHeader ? (
-        <img src="/logo.png" alt="logo" height={60} />
-      ) : (
-        <Box sx={{ textAlign: "center", mt: 2 }}>
-          <Typography variant="h2"
-            sx={{
-              color:"#635E57",
-                marginRight: "10px",
-                
-                fontSize: "22px",
-                fontWeight: 400,
-                '@media (max-width: 900px)': { paddingLeft: '34px' }
-            }}>
-            Workspace
-          </Typography>
-        </Box>
-      )}
+        {showHeader ? (
+          <img src="/logo.png" alt="logo" height={60} />
+        ) : (
+          <Box sx={{ textAlign: 'center', mt: 2 }}>
+            <Typography
+              variant="h2"
+              sx={{
+                color: '#635E57',
+                marginRight: '10px',
 
+                fontSize: '22px',
+                fontWeight: 400,
+                '@media (max-width: 900px)': { paddingLeft: '34px' },
+              }}
+            >
+              Workspace
+            </Typography>
+          </Box>
+        )}
       </Box>
       <Box
         display="flex"
@@ -163,21 +176,21 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
         paddingTop={'1rem'}
       >
         {tenantName === TENANT_DATA.SECOND_CHANCE_PROGRAM && (
-      <Box display="flex" alignItems="center">
-        <ListItemIcon>
-          <IconButton onClick={goBack}>
-            <ArrowBackIcon sx={{  color:"#635E57", }} />
-          </IconButton>
-        </ListItemIcon>
-        <Typography
-          variant="h2"
-          fontSize={'16px'}
-          sx={{ color: theme.palette.warning['100'], fontWeight: 500 }}
-        >
-         Exit Workspace
-        </Typography>
-      </Box>
-       )}
+          <Box display="flex" alignItems="center">
+            <ListItemIcon>
+              <IconButton onClick={goBack}>
+                <ArrowBackIcon sx={{ color: '#635E57' }} />
+              </IconButton>
+            </ListItemIcon>
+            <Typography
+              variant="h2"
+              fontSize={'16px'}
+              sx={{ color: theme.palette.warning['100'], fontWeight: 500 }}
+            >
+              Exit Workspace
+            </Typography>
+          </Box>
+        )}
         {isMobile && (
           <IconButton onClick={toggleDrawer}>
             <CloseIcon />
