@@ -12,6 +12,8 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import FilterIcon from '@mui/icons-material/Filter';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { UploadOptionsPopupProps, UploadedImage } from './types';
 import Camera from './Camera';
 import ImageViewer from './ImageViewer';
@@ -37,6 +39,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [isInstructionsExpanded, setIsInstructionsExpanded] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Toast state
@@ -228,10 +231,10 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
         <Box
           sx={{
             width: {
-              xs: 280,
-              sm: 320,
+              xs: 340,
+              sm: 350,
               md: 400,
-              lg: 480,
+              lg: 450,
               xl: 520,
             },
             bgcolor: '#FFFFFF',
@@ -321,6 +324,8 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
               width: '100%',
               minHeight: 472,
               height: '100%',
+              maxHeight: '80vh',
+              overflowY: 'auto',
             }}
           >
             <Box
@@ -328,7 +333,6 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '16px',
-                width: 288,
               }}
             >
               {/* Upload Options */}
@@ -337,7 +341,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '8px',
-                  width: 288,
+                  width: '100%',
                 }}
               >
                 {/* Upload Buttons */}
@@ -350,6 +354,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
                       md: '24px',
                     },
                     width: '100%',
+                    justifyContent: 'center',
                   }}
                 >
                   {/* Take Photo Button */}
@@ -472,9 +477,148 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
                     color: '#5F5E5E',
                   }}
                 >
-                  Format: jpg, jpeg, size: 5 MB{'\n'}
+                  Format: jpg, size: 50 MB{'\n'}
                   Up to 4 images
                 </Typography>
+
+                {/* Submission Instructions Accordion */}
+                <Box
+                  sx={{
+                    backgroundColor: '#FFF8E1',
+                    borderRadius: '12px',
+                    padding: '16px',
+                    width: '100%',
+                  }}
+                >
+                  <Box
+                    onClick={() =>
+                      setIsInstructionsExpanded(!isInstructionsExpanded)
+                    }
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      cursor: 'pointer',
+                      marginBottom: isInstructionsExpanded ? '12px' : 0,
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        fontWeight: 600,
+                        fontSize: '14px',
+                        lineHeight: '20px',
+                        color: '#4D4639',
+                      }}
+                    >
+                      SUBMISSION INSTRUCTIONS:
+                    </Typography>
+                    {isInstructionsExpanded ? (
+                      <ExpandLessIcon
+                        sx={{
+                          color: '#4D4639',
+                          fontSize: '20px',
+                        }}
+                      />
+                    ) : (
+                      <ExpandMoreIcon
+                        sx={{
+                          color: '#4D4639',
+                          fontSize: '20px',
+                        }}
+                      />
+                    )}
+                  </Box>
+
+                  {isInstructionsExpanded && (
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '8px',
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          fontSize: '14px',
+                          lineHeight: '20px',
+                          color: '#4D4639',
+                          '&::before': {
+                            content: '"• "',
+                            fontWeight: 'bold',
+                          },
+                        }}
+                      >
+                        Place the piece of paper on a flat, clean surface
+                      </Typography>
+                      <Typography
+                        sx={{
+                          fontSize: '14px',
+                          lineHeight: '20px',
+                          color: '#4D4639',
+                          '&::before': {
+                            content: '"• "',
+                            fontWeight: 'bold',
+                          },
+                        }}
+                      >
+                        Hold the phone straight above the piece of paper
+                      </Typography>
+                      <Typography
+                        sx={{
+                          fontSize: '14px',
+                          lineHeight: '20px',
+                          color: '#4D4639',
+                          '&::before': {
+                            content: '"• "',
+                            fontWeight: 'bold',
+                          },
+                        }}
+                      >
+                        Ensure good lighting and avoid shadows or glare
+                      </Typography>
+                      <Typography
+                        sx={{
+                          fontSize: '14px',
+                          lineHeight: '20px',
+                          color: '#4D4639',
+                          '&::before': {
+                            content: '"• "',
+                            fontWeight: 'bold',
+                          },
+                        }}
+                      >
+                        Ensure all text is clear and fully visible
+                      </Typography>
+                      <Typography
+                        sx={{
+                          fontSize: '14px',
+                          lineHeight: '20px',
+                          color: '#4D4639',
+                          '&::before': {
+                            content: '"• "',
+                            fontWeight: 'bold',
+                          },
+                        }}
+                      >
+                        Click an image and upload to the portal
+                      </Typography>
+                      <Typography
+                        sx={{
+                          fontSize: '14px',
+                          lineHeight: '20px',
+                          color: '#4D4639',
+                          '&::before': {
+                            content: '"• "',
+                            fontWeight: 'bold',
+                          },
+                        }}
+                      >
+                        If the answer sheet has multiple pages, take a picture
+                        of each page separately and upload
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
 
                 {/* Uploaded Images List */}
                 {uploadedImages.length > 0 && (
@@ -651,7 +795,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
                     ? 'Submitting...'
                     : isUploading
                     ? 'Uploading Files...'
-                    : 'Start AI Evaluation'}
+                    : 'Submit for Review'}
                 </Typography>
               </Button>
             </Box>
