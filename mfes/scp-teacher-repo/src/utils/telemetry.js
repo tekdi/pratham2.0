@@ -34,7 +34,7 @@ const telemetryConfig = {
     (typeof window !== 'undefined' && localStorage.getItem('userName')) ||
     'Anonymous',
   sid: generateUUID(),
-  batchsize: 5,
+  batchsize: 3,
   mode: '',
   host: hostURL,
   endpoint: '/v1/telemetry',
@@ -52,6 +52,7 @@ export const telemetryFactory = {
   init: () => {
     if (typeof window !== 'undefined') {
       if (!CsTelemetryModule.instance.isInitialised) {
+        console.log("hello from telemetryFactory"),
         CsTelemetryModule.instance.init({});
         CsTelemetryModule.instance.telemetryService.initTelemetry({
           config: telemetryConfig,
