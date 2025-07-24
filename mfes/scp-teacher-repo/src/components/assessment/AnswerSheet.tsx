@@ -70,7 +70,7 @@ const parseResValue = (resValue: string): ParsedResponse => {
         // Extract response from different possible fields
         let response = '';
 
-        // Priority order: label (with HTML stripped), value, then fallback
+        // Always prioritize label over value for display
         if (selectedItem.label) {
           // Remove HTML tags from label
           response = selectedItem.label.replace(/<[^>]*>/g, '').trim();
@@ -100,6 +100,7 @@ const parseResValue = (resValue: string): ParsedResponse => {
       response:
         parsed.response ||
         parsed.answer ||
+        parsed.label ||
         parsed.value ||
         'No response available',
       aiSuggestion:
