@@ -151,6 +151,9 @@ const PublishPage = () => {
         const aiQuestionSetStatus = await searchAiAssessment({
           createdBy: localStorage.getItem('userId'),
         });
+        const identifiers = aiQuestionSetStatus?.data?.map(
+          (item: any) => item.question_set_id as string
+        );
         const response = await getContent(
           ['Live'],
           query,
@@ -159,9 +162,9 @@ const PublishPage = () => {
           primaryCategory,
           sort_by,
           tenantConfig?.CHANNEL_ID,
-          aiQuestionSetStatus?.data?.map(
-            (item: any) => item.question_set_id as string
-          )
+          '',
+          '',
+          identifiers
         );
         // const contentList = (response?.content || []).concat(
         //   response?.QuestionSet || []

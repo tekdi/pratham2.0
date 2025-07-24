@@ -85,7 +85,7 @@ const getReqBodyWithStatus = (
             primaryCategory,
             createdBy: { '!=': getLocalStoredUserId() },
             state: state,
-            identifiers: identifiers,
+            identifier: identifiers,
           },
 
           query,
@@ -106,7 +106,7 @@ const getReqBodyWithStatus = (
           primaryCategory,
           createdBy: { '!=': getLocalStoredUserId() },
           channel: channel,
-          identifiers: identifiers,
+          identifier: identifiers,
         },
 
         query,
@@ -125,7 +125,7 @@ const getReqBodyWithStatus = (
           status,
           primaryCategory,
           channel: channel,
-          identifiers: identifiers,
+          identifier: identifiers,
         },
         query,
         limit,
@@ -134,7 +134,7 @@ const getReqBodyWithStatus = (
       },
     };
   }
-  console.log('identifiers', identifiers);
+
   return {
     ...defaultReqBody,
     request: {
@@ -144,7 +144,7 @@ const getReqBodyWithStatus = (
         status,
         primaryCategory,
         channel: channel,
-        identifiers: identifiers,
+        identifier: identifiers,
       },
       query,
       limit,
@@ -180,6 +180,7 @@ export const getContent = async (
       state,
       identifiers
     );
+
     const response = await post(apiURL, reqBody);
     return response?.data?.result;
   } catch (error) {

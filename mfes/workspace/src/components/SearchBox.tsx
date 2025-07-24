@@ -53,7 +53,7 @@ const SearchBox: React.FC<SearchBarProps> = ({
   onStateChange,
   allContents = false,
   discoverContents = false,
-  staticFilter = {},
+  staticFilter = [],
 }) => {
   const router = useRouter();
 
