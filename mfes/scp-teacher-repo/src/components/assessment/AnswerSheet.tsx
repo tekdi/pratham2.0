@@ -52,6 +52,8 @@ export interface AnswerSheetProps {
     panel: string
   ) => (event: React.SyntheticEvent, isExpanded: boolean) => void;
   isApproved?: boolean;
+  questionNumberingMap?: Record<string, string>;
+  sectionMapping?: Record<string, string>;
 }
 
 // Utility function to parse response values
@@ -68,7 +70,7 @@ const parseResValue = (resValue: string): ParsedResponse => {
         // Extract response from different possible fields
         let response = '';
 
-        // Priority order: label (with HTML stripped), value, then fallback
+        // Always prioritize label over value for display
         if (selectedItem.label) {
           // Remove HTML tags from label
           response = selectedItem.label.replace(/<[^>]*>/g, '').trim();
@@ -87,6 +89,7 @@ const parseResValue = (resValue: string): ParsedResponse => {
           aiSuggestion:
             selectedItem.AI_suggestion ||
             selectedItem.aiSuggestion ||
+            selectedItem.explanation ||
             'No AI suggestion available',
         };
       }
@@ -97,11 +100,13 @@ const parseResValue = (resValue: string): ParsedResponse => {
       response:
         parsed.response ||
         parsed.answer ||
+        parsed.label ||
         parsed.value ||
         'No response available',
       aiSuggestion:
         parsed.AI_suggestion ||
         parsed.aiSuggestion ||
+        parsed.explanation ||
         'No AI suggestion available',
     };
   } catch (error) {
@@ -147,6 +152,7 @@ const ScoreBadge: React.FC<ScoreBadgeProps> = React.memo(
             opacity: 0.8,
             transform: 'scale(1.02)',
           },
+          mb: 2,
         }}
       >
         <Typography
@@ -182,7 +188,11 @@ interface AISuggestionAccordionProps {
 
 const AISuggestionAccordion: React.FC<AISuggestionAccordionProps> = React.memo(
   ({ aiSuggestion, isExpanded, onToggle }) => {
-    if (!aiSuggestion || aiSuggestion === 'No AI suggestion available') {
+    if (
+      !aiSuggestion ||
+      aiSuggestion === 'No AI suggestion available' ||
+      aiSuggestion.trim() === ''
+    ) {
       return null;
     }
 
@@ -258,6 +268,7 @@ interface QuestionItemProps {
   onScoreClick: () => void;
   onAccordionToggle: (event: React.SyntheticEvent, isExpanded: boolean) => void;
   isApproved: boolean;
+  questionNumberingMap?: Record<string, string>;
 }
 
 const QuestionItem: React.FC<QuestionItemProps> = React.memo(
@@ -268,11 +279,13 @@ const QuestionItem: React.FC<QuestionItemProps> = React.memo(
     onScoreClick,
     onAccordionToggle,
     isApproved,
+    questionNumberingMap = {},
   }) => {
-    const parsedResponse = useMemo(
-      () => parseResValue(question.resValue),
-      [question.resValue]
-    );
+    const parsedResponse = useMemo(() => {
+      const result = parseResValue(question.resValue);
+      console.log('Parsed response for question:', question.questionId, result);
+      return result;
+    }, [question.resValue, question.questionId]);
 
     // Response box styling based on score
     const responseBoxStyle = useMemo(() => {
@@ -306,6 +319,7 @@ const QuestionItem: React.FC<QuestionItemProps> = React.memo(
           gap: '8px',
           display: 'flex',
           flexDirection: 'column',
+          mt: '16px',
         }}
       >
         {/* Question and Score Row */}
@@ -325,7 +339,11 @@ const QuestionItem: React.FC<QuestionItemProps> = React.memo(
                 color: '#1F1B13',
               }}
             >
-              Q{index + 1}. {question.queTitle}
+              {question.questionId && questionNumberingMap[question.questionId]
+                ? `${questionNumberingMap[question.questionId]}. ${
+                    question.queTitle
+                  }`
+                : `Q${index + 1}. ${question.queTitle}`}
             </Typography>
           </Box>
           <Box
@@ -415,7 +433,7 @@ const ScoreSummary: React.FC<ScoreSummaryProps> = React.memo(
   ({ totalScore, totalMaxScore }) => {
     const percentage = useMemo(() => {
       return totalMaxScore > 0
-        ? Math.round((totalScore / totalMaxScore) * 100)
+        ? Math.min(Math.round((totalScore / totalMaxScore) * 100), 100)
         : 0;
     }, [totalScore, totalMaxScore]);
 
@@ -494,6 +512,8 @@ interface QuestionsListProps {
   ) => (event: React.SyntheticEvent, isExpanded: boolean) => void;
   onScoreEdit: (question: ScoreDetail) => void;
   isApproved: boolean;
+  questionNumberingMap?: Record<string, string>;
+  sectionMapping?: Record<string, string>;
 }
 
 const QuestionsList: React.FC<QuestionsListProps> = React.memo(
@@ -503,6 +523,8 @@ const QuestionsList: React.FC<QuestionsListProps> = React.memo(
     onAccordionChange,
     onScoreEdit,
     isApproved,
+    questionNumberingMap = {},
+    sectionMapping = {},
   }) => {
     const handleScoreClick = useCallback(
       (question: ScoreDetail) => {
@@ -513,6 +535,45 @@ const QuestionsList: React.FC<QuestionsListProps> = React.memo(
       [onScoreEdit, isApproved]
     );
 
+    // Function to format section names
+    const formatSectionName = (name: string): string => {
+      // Handle common patterns
+      const nameMap: Record<string, string> = {
+        fill_in_the_blanks: 'Fill in the Blanks',
+        mcq: 'Multiple Choice Questions',
+        short: 'Short Answer Questions',
+        long: 'Long Answer Questions',
+      };
+
+      const lowerName = name.toLowerCase();
+      const mappedName = nameMap[lowerName];
+      if (mappedName) {
+        return mappedName;
+      }
+
+      // Default formatting: replace underscores and capitalize
+      return name.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+    };
+
+    // Group questions by section
+    const groupedQuestions = useMemo(() => {
+      const groups: Record<string, ScoreDetail[]> = {};
+
+      scoreDetails.forEach((question) => {
+        const sectionName = question.questionId
+          ? sectionMapping[question.questionId] || 'Unknown Section'
+          : 'Unknown Section';
+
+        if (!groups[sectionName]) {
+          groups[sectionName] = [];
+        }
+
+        groups[sectionName].push(question);
+      });
+
+      return groups;
+    }, [scoreDetails, sectionMapping]);
+
     return (
       <Box sx={{ px: '16px' }}>
         <Box
@@ -522,6 +583,7 @@ const QuestionsList: React.FC<QuestionsListProps> = React.memo(
             borderRadius: '16px',
             width: '100%',
             padding: '16px',
+            mb: '20px',
           }}
         >
           <Box
@@ -531,17 +593,55 @@ const QuestionsList: React.FC<QuestionsListProps> = React.memo(
               gap: '16px',
             }}
           >
-            {scoreDetails.map((question, index) => (
-              <QuestionItem
-                key={`${question.questionId}-${index}`}
-                question={question}
-                index={index}
-                isExpanded={expandedPanel === `panel-${index}`}
-                onScoreClick={() => handleScoreClick(question)}
-                onAccordionToggle={onAccordionChange(`panel-${index}`)}
-                isApproved={isApproved}
-              />
-            ))}
+            {Object.entries(groupedQuestions).map(
+              ([sectionName, questions]) => (
+                <Box key={sectionName} sx={{ mb: '24px' }}>
+                  {/* Section Header */}
+                  <Box
+                    sx={{
+                      // backgroundColor: '#F0F0F0',
+                      borderRadius: '8px',
+                      // p: '12px 16px',
+                      mb: '16px',
+                      mt: '24px',
+                      '&:first-of-type': {
+                        mt: '0px',
+                      },
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        fontWeight: 600,
+                        fontSize: '18px',
+                        lineHeight: '24px',
+                        color: '#1F1B13',
+                        textTransform: 'capitalize',
+                      }}
+                    >
+                      {formatSectionName(sectionName)}
+                    </Typography>
+                  </Box>
+
+                  {/* Questions in this section */}
+                  {questions.map((question, index) => (
+                    <QuestionItem
+                      key={`${question.questionId}-${index}`}
+                      question={question}
+                      index={index}
+                      isExpanded={
+                        expandedPanel === `panel-${question.questionId}`
+                      }
+                      onScoreClick={() => handleScoreClick(question)}
+                      onAccordionToggle={onAccordionChange(
+                        `panel-${question.questionId}`
+                      )}
+                      isApproved={isApproved}
+                      questionNumberingMap={questionNumberingMap}
+                    />
+                  ))}
+                </Box>
+              )
+            )}
           </Box>
         </Box>
       </Box>
@@ -598,6 +698,8 @@ const AnswerSheet: React.FC<AnswerSheetProps> = ({
   expandedPanel,
   onAccordionChange,
   isApproved = false,
+  questionNumberingMap = {},
+  sectionMapping = {},
 }) => {
   // Early return for empty state
   if (
@@ -625,6 +727,8 @@ const AnswerSheet: React.FC<AnswerSheetProps> = ({
         onAccordionChange={onAccordionChange}
         onScoreEdit={onScoreEdit}
         isApproved={isApproved}
+        questionNumberingMap={questionNumberingMap}
+        sectionMapping={sectionMapping}
       />
     </Box>
   );

@@ -369,3 +369,42 @@ export const getOfflineAssessmentDetails = async ({
     return error;
   }
 };
+
+const API_URL = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;
+export const hierarchyContent = async (content_do_id: string) => {
+  // console.log({ content_do_id });
+  const url = `${API_URL}/action/questionset/v2/hierarchy/` + content_do_id;
+
+  let api_response = null;
+
+  let config = {
+    method: 'get',
+    maxBodyLength: Infinity,
+    url: url,
+    headers: {
+      accept: '*/*',
+      'Content-Type': 'application/json',
+    },
+  };
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        accept: '*/*',
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.ok) {
+      api_response = await response.json();
+      return api_response;
+    } else {
+      console.error('Error fetching hierarchy content:', response.status);
+      return null;
+    }
+  } catch (error) {
+    console.error('Error fetching hierarchy content:', error);
+    return null;
+  }
+};
