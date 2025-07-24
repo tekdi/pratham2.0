@@ -27,7 +27,11 @@ const RenderTabContent = memo(
     _config: any;
     trackData?: [];
     type: string;
-    handleCardClick: (content: ContentItem, e?: any) => void;
+    handleCardClick: (
+      content: ContentItem,
+      e?: any,
+      rowNumber?: number
+    ) => void;
     hasMoreData: boolean;
     handleLoadMore: (e: any) => void;
     tabs?: any[];
@@ -37,7 +41,7 @@ const RenderTabContent = memo(
     isLoadingMoreData: boolean;
     isPageLoading: boolean;
     isHideEmptyDataMessage?: boolean;
-    pageName?:string
+    pageName?: string;
   }) => {
     const { t } = useTranslation();
     const { _box, _tabs } = _config ?? {};
@@ -56,7 +60,7 @@ const RenderTabContent = memo(
                 <Tab
                   key={tab.label}
                   icon={tab.icon ?? undefined}
-                  label={t('COMMON.'+tab.label)}
+                  label={t('COMMON.' + tab.label)}
                   {...{
                     id: `simple-tab-${index}`,
                     'aria-controls': `simple-tabpanel-${index}`,

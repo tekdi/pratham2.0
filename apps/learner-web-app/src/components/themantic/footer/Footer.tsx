@@ -187,7 +187,7 @@ const Footer = () => {
               textAlign: 'center',
             }}
           >
-            © 2024 Pratham
+            © 2025 Pratham
           </Typography>
         </Box>
       </Box>
