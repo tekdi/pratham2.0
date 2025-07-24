@@ -69,50 +69,63 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const files = event.target.files;
-    if (files && files.length > 0) {
-      const file = files[0];
+    if (!files || files.length === 0) return;
 
-      // Ensure file is defined
-      if (!file) return;
+    // Check if adding new files would exceed the limit
+    if (uploadedImages.length + files.length > 4) {
+      showToast('You can only upload up to 4 images', 'warning');
+      return;
+    }
 
-      // Validate file type
-      const allowedTypes = ['image/jpeg', 'image/jpg'];
-      if (!allowedTypes.includes(file.type)) {
-        showToast('Please select a valid image file (jpg, jpeg)', 'error');
-        return;
-      }
+    setIsUploading(true);
+    try {
+      // Convert FileList to array for easier processing
+      const fileArray = Array.from(files);
 
-      // Validate file size (50MB)
-      const maxSize = 5 * 1024 * 1024;
-      if (file.size > maxSize) {
-        showToast('File size must be less than 50MB', 'error');
-        return;
-      }
-
-      setIsUploading(true);
-      try {
-        const uploadedUrl = await uploadFileToS3(file);
-        if (uploadedUrl) {
-          const newImage: UploadedImage = {
-            id: Date.now().toString(),
-            url: uploadedUrl,
-            previewUrl: uploadedUrl,
-            name: file.name,
-            size: file.size,
-            uploadedAt: new Date().toISOString(),
-          };
-          onImageUpload?.(newImage);
-          showToast('Image uploaded successfully!', 'success');
+      for (const file of fileArray) {
+        // Validate file type
+        const allowedTypes = ['image/jpeg', 'image/jpg'];
+        if (!allowedTypes.includes(file.type)) {
+          showToast('Please select valid image files (jpg, jpeg)', 'error');
+          continue;
         }
-      } catch (error) {
-        console.error('Error uploading file from gallery:', error);
-        showToast(
-          'Failed to upload image from gallery. Please try again.',
-          'error'
-        );
-      } finally {
-        setIsUploading(false);
+
+        // Validate file size (5MB)
+        const maxSize = 5 * 1024 * 1024;
+        if (file.size > maxSize) {
+          showToast(`File ${file.name} exceeds 5MB limit`, 'error');
+          continue;
+        }
+
+        try {
+          const uploadedUrl = await uploadFileToS3(file);
+          if (uploadedUrl) {
+            const newImage: UploadedImage = {
+              id:
+                Date.now().toString() + Math.random().toString(36).substr(2, 9),
+              url: uploadedUrl,
+              previewUrl: uploadedUrl,
+              name: file.name,
+              size: file.size,
+              uploadedAt: new Date().toISOString(),
+            };
+            onImageUpload?.(newImage);
+          }
+        } catch (error) {
+          console.error('Error uploading file:', file.name, error);
+          showToast(`Failed to upload ${file.name}`, 'error');
+        }
       }
+
+      showToast('Images uploaded successfully!', 'success');
+    } catch (error) {
+      console.error('Error uploading files from gallery:', error);
+      showToast(
+        'Failed to upload images from gallery. Please try again.',
+        'error'
+      );
+    } finally {
+      setIsUploading(false);
     }
 
     // Reset input
@@ -652,6 +665,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
         ref={fileInputRef}
         onChange={handleFileSelect}
         accept="image/jpeg,image/jpg"
+        multiple
         style={{ display: 'none' }}
       />
 

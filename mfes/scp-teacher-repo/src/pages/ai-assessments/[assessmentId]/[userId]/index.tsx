@@ -146,6 +146,7 @@ const AssessmentDetails = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState<any>(null);
   const [editScore, setEditScore] = useState<string>('');
+  const [editSuggestion, setEditSuggestion] = useState<string>('');
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [editLoading, setEditLoading] = useState(false);
@@ -288,8 +289,7 @@ const AssessmentDetails = () => {
           ) {
             // If status is AI Processed and we have records with evaluatedBy: "AI"
             if (
-              (currentUserData.status === 'AI Processed' ||
-                currentUserData.status === 'Approved') &&
+              currentUserData.status === 'AI Processed' &&
               currentUserData.records?.length > 0 &&
               currentUserData.records[0].evaluatedBy === 'AI'
             ) {
@@ -503,15 +503,22 @@ const AssessmentDetails = () => {
 
   const handleScoreClick = (question: ScoreDetail) => {
     setSelectedQuestion(question);
-    // Check if there's a saved score in localStorage
+    // Check if there's a saved score and suggestion in localStorage
     const savedData = localStorage.getItem(
       `tracking_${userId}_${question.questionId}`
     );
     if (savedData) {
       const parsedData = JSON.parse(savedData);
       setEditScore(parsedData.score.toString());
+      setEditSuggestion(
+        parsedData.suggestion ||
+          (question.resValue ? JSON.parse(question.resValue).AI_suggestion : '')
+      );
     } else {
       setEditScore(question.score.toString());
+      setEditSuggestion(
+        question.resValue ? JSON.parse(question.resValue).AI_suggestion : ''
+      );
     }
     setIsEditModalOpen(true);
   };
@@ -528,13 +535,15 @@ const AssessmentDetails = () => {
 
       // If status is AI Processed, only save to localStorage
       if (assessmentData?.status === 'AI Processed') {
+        const resValue = selectedQuestion.resValue
+          ? JSON.parse(selectedQuestion.resValue)
+          : {};
         localStorage.setItem(
           `tracking_${userId}_${selectedQuestion.questionId}`,
           JSON.stringify({
             score: Number(editScore),
-            answer: selectedQuestion.resValue
-              ? JSON.parse(selectedQuestion.resValue).value
-              : '',
+            suggestion: editSuggestion,
+            answer: resValue.value || '',
             editedAt: new Date().toISOString(),
           })
         );
@@ -543,10 +552,15 @@ const AssessmentDetails = () => {
         const updatedLocalScoreDetails =
           assessmentTrackingData.score_details.map((detail) => {
             if (detail.questionId === selectedQuestion.questionId) {
+              const updatedResValue = {
+                ...JSON.parse(detail.resValue),
+                AI_suggestion: editSuggestion,
+              };
               return {
                 ...detail,
                 score: Number(editScore),
                 pass: Number(editScore) > 0 ? 'yes' : 'no',
+                resValue: JSON.stringify(updatedResValue),
               };
             }
             return detail;
@@ -566,7 +580,7 @@ const AssessmentDetails = () => {
 
         setSnackbar({
           open: true,
-          message: 'Score saved successfully',
+          message: 'Score and suggestion saved successfully',
           severity: 'success',
         });
         setIsEditModalOpen(false);
@@ -576,6 +590,11 @@ const AssessmentDetails = () => {
       // For other statuses, proceed with API call
       const updatedAssessmentSummary = assessmentTrackingData.score_details.map(
         (detail) => {
+          const resValue = detail.resValue ? JSON.parse(detail.resValue) : {};
+          if (detail.questionId === selectedQuestion.questionId) {
+            resValue.AI_suggestion = editSuggestion;
+          }
+
           const section: AssessmentSection = {
             sectionId: detail.sectionId,
             sectionName: 'Section 1',
@@ -590,9 +609,17 @@ const AssessmentDetails = () => {
                   sectionId: detail.sectionId,
                 },
                 index: 1,
-                pass: Number(editScore) > 0 ? 'yes' : 'no',
-                score: Number(editScore),
-                resvalues: [JSON.parse(detail.resValue)],
+                pass:
+                  detail.questionId === selectedQuestion.questionId
+                    ? Number(editScore) > 0
+                      ? 'yes'
+                      : 'no'
+                    : detail.pass,
+                score:
+                  detail.questionId === selectedQuestion.questionId
+                    ? Number(editScore)
+                    : detail.score,
+                resvalues: [resValue],
                 duration: detail.duration,
                 sectionName: 'Section 1',
               },
@@ -1096,40 +1123,40 @@ const AssessmentDetails = () => {
                   ? JSON.parse(selectedQuestion.resValue).value
                   : 'No answer provided'}
               </Typography>
-              {selectedQuestion.resValue &&
-                JSON.parse(selectedQuestion.resValue).AI_suggestion && (
-                  <Typography
-                    variant="body2"
-                    sx={{ mb: 2, color: 'text.secondary' }}
-                  >
-                    AI Suggestion:{' '}
-                    {JSON.parse(selectedQuestion.resValue).AI_suggestion}
-                  </Typography>
-                )}
+              <TextField
+                label="Suggestion"
+                multiline
+                rows={4}
+                value={editSuggestion}
+                onChange={(e) => setEditSuggestion(e.target.value)}
+                fullWidth
+                sx={{ mb: 2 }}
+                disabled={editLoading || assessmentData?.status === 'Approved'}
+              />
+              <TextField
+                label="Marks"
+                type="number"
+                value={editScore}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (
+                    selectedQuestion &&
+                    Number(value) <= selectedQuestion.maxScore
+                  ) {
+                    setEditScore(value);
+                  }
+                }}
+                fullWidth
+                required
+                inputProps={{
+                  min: 0,
+                  max: selectedQuestion?.maxScore || 0,
+                }}
+                helperText={`Maximum marks: ${selectedQuestion?.maxScore || 0}`}
+                disabled={editLoading || assessmentData?.status === 'Approved'}
+              />
             </>
           )}
-          <TextField
-            label="Marks"
-            type="number"
-            value={editScore}
-            onChange={(e) => {
-              const value = e.target.value;
-              if (
-                selectedQuestion &&
-                Number(value) <= selectedQuestion.maxScore
-              ) {
-                setEditScore(value);
-              }
-            }}
-            fullWidth
-            required
-            inputProps={{
-              min: 0,
-              max: selectedQuestion?.maxScore || 0,
-            }}
-            helperText={`Maximum marks: ${selectedQuestion?.maxScore || 0}`}
-            disabled={editLoading || assessmentData?.status === 'Approved'}
-          />
           {editLoading && (
             <Box
               sx={{

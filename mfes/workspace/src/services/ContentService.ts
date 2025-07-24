@@ -61,7 +61,8 @@ const getReqBodyWithStatus = (
   sort_by: any,
   channel: string,
   contentType?: string,
-  state?: string
+  state?: string,
+  identifiers?: string[]
 ) => {
   if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
     var PrimaryCategory =
@@ -84,6 +85,7 @@ const getReqBodyWithStatus = (
             primaryCategory,
             createdBy: { '!=': getLocalStoredUserId() },
             state: state,
+            identifier: identifiers,
           },
 
           query,
@@ -104,6 +106,7 @@ const getReqBodyWithStatus = (
           primaryCategory,
           createdBy: { '!=': getLocalStoredUserId() },
           channel: channel,
+          identifier: identifiers,
         },
 
         query,
@@ -122,6 +125,7 @@ const getReqBodyWithStatus = (
           status,
           primaryCategory,
           channel: channel,
+          identifier: identifiers,
         },
         query,
         limit,
@@ -140,6 +144,7 @@ const getReqBodyWithStatus = (
         status,
         primaryCategory,
         channel: channel,
+        identifier: identifiers,
       },
       query,
       limit,
@@ -158,7 +163,8 @@ export const getContent = async (
   sort_by: any,
   channel: any,
   contentType?: string,
-  state?: string
+  state?: string,
+  identifiers?: string[]
 ) => {
   const apiURL = '/action/composite/v3/search';
   try {
@@ -171,8 +177,10 @@ export const getContent = async (
       sort_by,
       channel,
       contentType,
-      state
+      state,
+      identifiers
     );
+
     const response = await post(apiURL, reqBody);
     return response?.data?.result;
   } catch (error) {
@@ -293,6 +301,22 @@ export const createAIQuestionsSet = async (payload: {
   return response?.data;
 };
 
+// update ai question set
+export const updateAIQuestionSet = async (questionSetId: string) => {
+  const apiURL = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/ai-assessment/update_question_set`;
+
+  const response = await post(
+    apiURL,
+    {
+      questionSetId,
+    },
+    {
+      'Content-Type': 'application/json',
+    }
+  );
+  return response?.data;
+};
+
 // ai question set status
 export const getAIQuestionSetStatus = async (
   questionSetId: string,
@@ -305,6 +329,17 @@ export const getAIQuestionSetStatus = async (
     Authorization: `Bearer ${token}`,
   });
   return response?.data;
+};
+
+export const searchAiAssessment = async (data: any) => {
+  const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/ai-assessment/search`;
+  try {
+    const response = await post(apiUrl, data);
+    return response?.data;
+  } catch (error) {
+    console.error('Error in searching ai assessment:', error);
+    throw error;
+  }
 };
 
 export const updateQuestionSet = async ({ identifier, ...metadata }: any) => {
