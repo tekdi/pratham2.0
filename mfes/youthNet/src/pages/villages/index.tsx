@@ -721,6 +721,8 @@ const Index = () => {
   const notificationKey = 'onMentorCreate';
   const notificationMessage = 'MENTORS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
+  const blockReassignmentNotificationKey = 'onMentorBlockReassign';
+  const villageReassignmentNotificationKey = 'onMentorVillageReassign';
 
   const setButtonShow = (
     status: boolean | ((prevState: boolean) => boolean)
@@ -1307,10 +1309,12 @@ const Index = () => {
                 setButtonShow={setButtonShow}
                 sdbvFieldData={originalSchema}
                 blockVillageMap={isReassign ? blockVillageMap : {}}
-                // isSteeper={true}
-                // blockReassignmentNotificationKey={blockReassignmentNotificationKey}
-                // profileUpdateNotificationKey={profileUpdateNotificationKey}
-                // centerUpdateNotificationKey={centerUpdateNotificationKey}
+                blockReassignmentNotificationKey={
+                  blockReassignmentNotificationKey
+                }
+                villageReassignmentNotificationKey={
+                  villageReassignmentNotificationKey
+                }
               />
             </SimpleModal>
           </>

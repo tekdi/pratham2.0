@@ -22,7 +22,9 @@ import {
   getReassignPayload,
   getUserFullName,
   isBlockDifferent,
+  isBlockSetDifferent,
   isCenterDifferent,
+  isVillageDifferent,
   toPascalCase,
 } from '@/utils/Helper';
 import { sendCredentialService } from '@/services/NotificationService';
@@ -68,9 +70,8 @@ const MentorForm = ({
   telemetryCreateKey,
   sdbvFieldData,
   blockVillageMap,
-  // blockReassignmentNotificationKey,
-  // profileUpdateNotificationKey,
-  // centerUpdateNotificationKey,
+  blockReassignmentNotificationKey,
+  villageReassignmentNotificationKey,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [alteredSchema, setAlteredSchema] = useState<any>(null);
@@ -492,14 +493,16 @@ const MentorForm = ({
       );
       const payload = { customFields: customFields };
 
-      // const toSendBlockChangeNotification = isBlockDifferent(
-      //   originalPrefilledFormData,
-      //   transformedFormData
-      // );
-      // const toSendCenterChangeNotification = isCenterDifferent(
-      //   originalPrefilledFormData,
-      //   transformedFormData
-      // );
+      // Check for block change (using blockVillageMap and selectedVillages)
+      const toSendBlockChangeNotification = isBlockSetDifferent(
+        blockVillageMap,
+        selectedVillages
+      );
+      // Check for village change
+      const toSendVillageChangeNotification = isVillageDifferent(
+        blockVillageMap,
+        selectedVillages
+      );
 
       try {
         console.log('payload', payload);
@@ -515,13 +518,21 @@ const MentorForm = ({
         );
         if (resp) {
           showToastMessage(t(successUpdateMessage), 'success');
-          // // Send notification if block or center is changed
-          // if (toSendBlockChangeNotification) {
-          //   getNotification(editableUserId, blockReassignmentNotificationKey);
-          // }
-          // if (toSendCenterChangeNotification) {
-          //   getNotification(editableUserId, centerUpdateNotificationKey);
-          // }
+          // Send notification if block is changed
+          if (
+            toSendBlockChangeNotification &&
+            typeof blockReassignmentNotificationKey !== 'undefined'
+          ) {
+            getNotification(editableUserId, blockReassignmentNotificationKey);
+          }
+
+          // Send notification if village is changed
+          if (
+            toSendVillageChangeNotification &&
+            typeof villageReassignmentNotificationKey !== 'undefined'
+          ) {
+            getNotification(editableUserId, villageReassignmentNotificationKey);
+          }
           telemetryCallbacks(telemetryUpdateKey);
           UpdateSuccessCallback();
         } else {

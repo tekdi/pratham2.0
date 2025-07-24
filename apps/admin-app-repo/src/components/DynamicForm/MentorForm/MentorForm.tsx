@@ -21,9 +21,12 @@ import { createUser, updateUser } from '@/services/CreateUserService';
 import {
   getReassignPayload,
   getUserFullName,
-  isBlockDifferent,
   isCenterDifferent,
   toPascalCase,
+  isDistrictDifferent,
+  isVillageDifferent,
+  isBlockSetDifferent,
+  isStateDifferent,
 } from '@/utils/Helper';
 import { sendCredentialService } from '@/services/NotificationService';
 import { showToastMessage } from '@/components/Toastify';
@@ -68,10 +71,10 @@ const MentorForm = ({
   telemetryCreateKey,
   sdbvFieldData,
   blockVillageMap,
-  // districtReassignmentNotificationKey,
-  // villageReassignmentNotificationKey,
-  // profileUpdateNotificationKey,
-  // centerUpdateNotificationKey,
+  stateReassignmentNotificationKey,
+  districtReassignmentNotificationKey,
+  blockReassignmentNotificationKey,
+  villageReassignmentNotificationKey,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [alteredSchema, setAlteredSchema] = useState<any>(null);
@@ -492,17 +495,30 @@ const MentorForm = ({
         customFields
       );
       const payload = { customFields: customFields };
-      console.log('original***', originalPrefilledFormData);
-      console.log('original', customFields);
+      // console.log('original***', originalPrefilledFormData);
+      // console.log('original', districtId);
 
-      // const toSendDistrictChangeNotification = isBlockDifferent(
-      //   originalPrefilledFormData,
-      //   transformedFormData
-      // );
-      // const toSendVillageChangeNotification = isCenterDifferent(
-      //   originalPrefilledFormData,
-      //   transformedFormData
-      // );
+      // Check for state change
+      const toSendStateChangeNotification = isStateDifferent(
+        originalPrefilledFormData,
+        { state: stateId }
+      );
+
+      // Check for district change
+      const toSendDistrictChangeNotification = isDistrictDifferent(
+        originalPrefilledFormData,
+        { district: districtId }
+      );
+      // Check for block change (using blockVillageMap and selectedVillages)
+      const toSendBlockChangeNotification = isBlockSetDifferent(
+        blockVillageMap,
+        selectedVillages
+      );
+      // Check for village change
+      const toSendVillageChangeNotification = isVillageDifferent(
+        blockVillageMap,
+        selectedVillages
+      );
 
       try {
         console.log('payload', payload);
@@ -518,13 +534,40 @@ const MentorForm = ({
         );
         if (resp) {
           showToastMessage(t(successUpdateMessage), 'success');
-          // // Send notification if block or center is changed
-          // if (toSendDistrictChangeNotification) {
-          //   getNotification(editableUserId, districtReassignmentNotificationKey);
-          // }
-          // if (toSendVillageChangeNotification) {
-          //   getNotification(editableUserId, villageReassignmentNotificationKey);
-          // }
+          // Send notification if state is changed
+          if (
+            toSendStateChangeNotification &&
+            typeof stateReassignmentNotificationKey !== 'undefined'
+          ) {
+            getNotification(editableUserId, stateReassignmentNotificationKey);
+          }
+          // Send notification if district is changed
+          if (
+            toSendDistrictChangeNotification &&
+            typeof districtReassignmentNotificationKey !== 'undefined'
+          ) {
+            getNotification(
+              editableUserId,
+              districtReassignmentNotificationKey
+            );
+          }
+
+          // Send notification if block is changed
+          if (
+            toSendBlockChangeNotification &&
+            typeof blockReassignmentNotificationKey !== 'undefined'
+          ) {
+            getNotification(editableUserId, blockReassignmentNotificationKey);
+          }
+
+          // Send notification if village is changed
+          if (
+            toSendVillageChangeNotification &&
+            typeof villageReassignmentNotificationKey !== 'undefined'
+          ) {
+            getNotification(editableUserId, villageReassignmentNotificationKey);
+          }
+
           telemetryCallbacks(telemetryUpdateKey);
           UpdateSuccessCallback();
         } else {
