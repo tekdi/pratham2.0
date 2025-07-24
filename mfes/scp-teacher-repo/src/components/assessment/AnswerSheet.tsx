@@ -52,6 +52,7 @@ export interface AnswerSheetProps {
     panel: string
   ) => (event: React.SyntheticEvent, isExpanded: boolean) => void;
   isApproved?: boolean;
+  questionNumberingMap?: Record<string, string>;
 }
 
 // Utility function to parse response values
@@ -258,6 +259,7 @@ interface QuestionItemProps {
   onScoreClick: () => void;
   onAccordionToggle: (event: React.SyntheticEvent, isExpanded: boolean) => void;
   isApproved: boolean;
+  questionNumberingMap?: Record<string, string>;
 }
 
 const QuestionItem: React.FC<QuestionItemProps> = React.memo(
@@ -268,6 +270,7 @@ const QuestionItem: React.FC<QuestionItemProps> = React.memo(
     onScoreClick,
     onAccordionToggle,
     isApproved,
+    questionNumberingMap = {},
   }) => {
     const parsedResponse = useMemo(
       () => parseResValue(question.resValue),
@@ -325,7 +328,11 @@ const QuestionItem: React.FC<QuestionItemProps> = React.memo(
                 color: '#1F1B13',
               }}
             >
-              Q{index + 1}. {question.queTitle}
+              {question.questionId && questionNumberingMap[question.questionId]
+                ? `${questionNumberingMap[question.questionId]}. ${
+                    question.queTitle
+                  }`
+                : `Q${index + 1}. ${question.queTitle}`}
             </Typography>
           </Box>
           <Box
@@ -494,6 +501,7 @@ interface QuestionsListProps {
   ) => (event: React.SyntheticEvent, isExpanded: boolean) => void;
   onScoreEdit: (question: ScoreDetail) => void;
   isApproved: boolean;
+  questionNumberingMap?: Record<string, string>;
 }
 
 const QuestionsList: React.FC<QuestionsListProps> = React.memo(
@@ -503,6 +511,7 @@ const QuestionsList: React.FC<QuestionsListProps> = React.memo(
     onAccordionChange,
     onScoreEdit,
     isApproved,
+    questionNumberingMap = {},
   }) => {
     const handleScoreClick = useCallback(
       (question: ScoreDetail) => {
@@ -540,6 +549,7 @@ const QuestionsList: React.FC<QuestionsListProps> = React.memo(
                 onScoreClick={() => handleScoreClick(question)}
                 onAccordionToggle={onAccordionChange(`panel-${index}`)}
                 isApproved={isApproved}
+                questionNumberingMap={questionNumberingMap}
               />
             ))}
           </Box>
@@ -598,6 +608,7 @@ const AnswerSheet: React.FC<AnswerSheetProps> = ({
   expandedPanel,
   onAccordionChange,
   isApproved = false,
+  questionNumberingMap = {},
 }) => {
   // Early return for empty state
   if (
@@ -625,6 +636,7 @@ const AnswerSheet: React.FC<AnswerSheetProps> = ({
         onAccordionChange={onAccordionChange}
         onScoreEdit={onScoreEdit}
         isApproved={isApproved}
+        questionNumberingMap={questionNumberingMap}
       />
     </Box>
   );

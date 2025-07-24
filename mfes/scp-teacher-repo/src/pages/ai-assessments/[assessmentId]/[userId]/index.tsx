@@ -22,6 +22,7 @@ import {
   getAssessmentTracking,
   getOfflineAssessmentStatus,
   updateAssessmentScore,
+  hierarchyContent,
 } from '../../../../services/AssesmentService';
 import {
   UploadOptionsPopup,
@@ -34,6 +35,7 @@ import {
   getStatusLabel,
   mapAnswerSheetStatusToInternalStatus,
 } from '../index';
+import { createQuestionNumberingMap } from '../../../../utils/questionNumbering';
 import AnswerSheet, {
   AssessmentTrackingData,
 } from '../../../../components/assessment/AnswerSheet';
@@ -152,6 +154,12 @@ const AssessmentDetails = () => {
   const [editLoading, setEditLoading] = useState(false);
   const [assessmentTrackingData, setAssessmentTrackingData] =
     useState<AssessmentTrackingData | null>();
+
+  // Hierarchy data for question numbering
+  const [hierarchyData, setHierarchyData] = useState<any>(null);
+  const [questionNumberingMap, setQuestionNumberingMap] = useState<
+    Record<string, string>
+  >({});
 
   // Upload Options Popup state
   const [uploadPopupOpen, setUploadPopupOpen] = useState(false);
@@ -485,6 +493,25 @@ const AssessmentDetails = () => {
               lastName: userDetailsResponse?.result?.userData?.lastName,
             });
           }
+
+          // Fetch hierarchy data for question numbering
+          if (assessmentId) {
+            try {
+              const hierarchyResponse = await hierarchyContent(
+                assessmentId as string
+              );
+              if (hierarchyResponse) {
+                setHierarchyData(hierarchyResponse);
+                const numberingMap =
+                  createQuestionNumberingMap(hierarchyResponse);
+                setQuestionNumberingMap(numberingMap);
+                console.log('Question numbering map created:', numberingMap);
+              }
+            } catch (error) {
+              console.error('Error fetching hierarchy data:', error);
+            }
+          }
+
           await fetchOfflineAssessmentData(false);
         } catch (error) {
           console.error('Error fetching assessment data:', error);
@@ -1103,6 +1130,7 @@ const AssessmentDetails = () => {
           expandedPanel={expandedPanel}
           onAccordionChange={handleAccordionChange}
           isApproved={assessmentData?.status === 'Approved'}
+          questionNumberingMap={questionNumberingMap}
         />
       )}
 
