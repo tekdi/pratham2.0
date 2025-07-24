@@ -64,7 +64,7 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
   const menuItems = [
     { text: 'Create', key: 'create', icon: <AddOutlinedIcon /> },
     { text: 'Drafts', key: 'draft', icon: <CreateOutlinedIcon /> },
-    ...(userRole !== Role.CCTA
+    ...(userRole !== Role.CCTA && userRole !== Role.CENTRAL_ADMIN
       ? [
           {
             text: 'Submitted for Review',
@@ -73,7 +73,7 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
           },
         ]
       : []),
-    ...(userRole === Role.CCTA
+    ...(userRole === Role.CCTA || userRole === Role.CENTRAL_ADMIN
       ? [
           {
             text: 'Up for Review',

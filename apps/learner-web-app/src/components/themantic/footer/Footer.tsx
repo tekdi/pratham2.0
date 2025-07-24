@@ -61,11 +61,11 @@ const Footer = () => {
                 }}
               >
                 {[
-                  { text: 'Pratham', href: '/https://www.pratham.org/' },
-                  {
-                    text: 'Pratham Open School',
-                    href: 'https://www.prathamopenschool.org/catalog/contents/1000001',
-                  },
+                  // { text: 'Pratham', href: '/https://www.pratham.org/' },
+                  // {
+                  //   text: 'Pratham Open School',
+                  //   href: 'https://www.prathamopenschool.org/catalog/contents/1000001',
+                  // },
                   {
                     text: 'Experimento India',
                     href: 'https://www.siemens-stiftung.org/en/projects/experimento/stem-education-for-innovation-experimento-india/',
@@ -187,7 +187,7 @@ const Footer = () => {
               textAlign: 'center',
             }}
           >
-            © 2024 Pratham
+            © 2025 Pratham
           </Typography>
         </Box>
       </Box>

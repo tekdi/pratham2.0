@@ -1,4 +1,4 @@
-import React, { memo, useState, useMemo, useEffect, use } from 'react';
+import React, { memo, useState, useMemo, useEffect, useRef } from 'react';
 import { CommonSearch, useTranslation } from '@shared-lib';
 import { Search as SearchIcon } from '@mui/icons-material';
 import debounce from 'lodash/debounce';
@@ -11,26 +11,31 @@ export default memo(function SearchComponent({
   onSearch: (value: string) => void;
 }) {
   const { t } = useTranslation();
-  const [searchValue, setSearchValue] = useState('');
+  const [searchValue, setSearchValue] = useState(value || '');
+  const isInitialized = useRef(false);
 
-  // Debounced function (only called for non-empty values)
   const debouncedSearch = useMemo(
     () =>
       debounce((value: string) => {
         if (value?.trim() !== '') {
           onSearch(value?.trim());
         }
-      }, 300),
+      }, 500),
     [onSearch]
   );
 
   useEffect(() => {
+    // Only trigger search if component is initialized and search value actually changed from user input
+    if (!isInitialized.current) {
+      isInitialized.current = true;
+      return;
+    }
+
     const trimmed = searchValue?.trim();
 
     if (trimmed === '') {
-      // Immediately clear results (optional: depending on your app logic)
-      debouncedSearch.cancel(); // Cancel any pending debounced call
-      onSearch(''); // Notify parent to clear results
+      debouncedSearch.cancel();
+      onSearch('');
       return;
     }
 
@@ -42,7 +47,11 @@ export default memo(function SearchComponent({
   }, [searchValue, debouncedSearch, onSearch]);
 
   useEffect(() => {
-    setSearchValue(value);
+    // Only update searchValue from prop if component hasn't been initialized yet
+    // This prevents triggering search on initial prop value setting
+    if (!isInitialized.current) {
+      setSearchValue(value || '');
+    }
   }, [value]);
 
   const handleSearchChange = (value: string) => {
@@ -51,12 +60,12 @@ export default memo(function SearchComponent({
 
   const handleSearchClick = () => {
     const trimmed = searchValue.trim();
-    debouncedSearch.cancel(); // Cancel debounce before immediate search
+    debouncedSearch.cancel();
 
     if (trimmed !== '') {
       onSearch(trimmed);
     } else {
-      onSearch(''); // Ensure reset on manual clear + click
+      onSearch('');
     }
   };
 

@@ -14,6 +14,7 @@ export const CourseCompletionBanner: React.FC<CourseCompletionBannerProps> = ({
 }) => {
   const [showCertificate, setShowCertificate] = useState(false);
 
+ const tenantName =      (typeof window !== 'undefined' && localStorage.getItem('userProgram')) || '';
   const handlePreviewClick = () => {
     setShowCertificate(true);
   };
@@ -55,7 +56,7 @@ export const CourseCompletionBanner: React.FC<CourseCompletionBannerProps> = ({
         </Paper>
 
         {/* Right box with button */}
-        <Button
+        {tenantName!=="Camp to Club" &&(<Button
           variant="contained"
           onClick={handlePreviewClick}
           endIcon={<ArrowForwardIcon />}
@@ -73,7 +74,8 @@ export const CourseCompletionBanner: React.FC<CourseCompletionBannerProps> = ({
           }}
         >
           Preview Certificate
-        </Button>
+        </Button>)
+        }
       </Box>
       <CertificateModal
         open={showCertificate}

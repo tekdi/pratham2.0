@@ -152,6 +152,30 @@ export const createAssessmentTracking = async ({
   }
 };
 
+
+
+const fetchCertificateStatus = async ({ userId, courseId }: any) => {
+  try {
+    const response = await axios.post(
+     `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/user_certificate/status/get`,
+      { userId, courseId },
+      {
+        headers: {
+          'Authorization': localStorage.getItem('token') || '',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'tenantId': localStorage.getItem('tenantId') || '',
+        },
+      }
+    );
+     const status = response.data?.result?.status;
+    return status || 'No status found';
+  } catch (error) {
+    console.error('API call failed:', error);
+    // return { error: error.message };
+  }
+};
+
 export const updateCOurseAndIssueCertificate = async ({
   course,
   userId,
@@ -184,7 +208,12 @@ export const updateCOurseAndIssueCertificate = async ({
         status: 'inprogress',
       });
     } else if (courseStatus?.status === 'completed' && isGenerateCertificate) {
+
       const userResponse: any = await getUserId();
+     const data= await fetchCertificateStatus({
+        userId: userId,
+        courseId: course?.identifier,})
+        if(data!=="viewCertificate"){
       await issueCertificate({
         userId: userId,
         courseId: course?.identifier,
@@ -199,6 +228,7 @@ export const updateCOurseAndIssueCertificate = async ({
         lastName: userResponse?.lastName ?? '',
         courseName: course?.name ?? '',
       });
+    }
     } else {
       updateUserCourseStatus({
         userId,

@@ -46,6 +46,7 @@ import { transformLabel } from '@/utils/Helper';
 import { getCohortList } from '@/services/GetCohortList';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
+import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
 
 const MentorLead = () => {
   console.log(
@@ -83,6 +84,7 @@ const MentorLead = () => {
   const [memberShipID, setMemberShipID] = useState('');
 
   const { t, i18n } = useTranslation();
+const formRef = useRef(null);
 
   const initialFormData = localStorage.getItem('stateId')
     ? { state: [localStorage.getItem('stateId')] }
@@ -426,10 +428,18 @@ const MentorLead = () => {
               SubmitaFunction={SubmitaFunction}
               isCallSubmitInHandle={true}
               prefilledFormData={prefilledFormData}
+              ref={formRef}
             />
           )
         )}
         <Box mt={4} sx={{ display: 'flex', justifyContent: 'end' }}>
+          <ResetFiltersButton
+            searchStoreKey="mentorLeader"
+            formRef={formRef}
+            SubmitaFunction={SubmitaFunction}
+            setPrefilledFormData={setPrefilledFormData}
+          />
+
           <Button
             variant="outlined"
             startIcon={<AddIcon />}
@@ -462,7 +472,6 @@ const MentorLead = () => {
           }
           id="dynamic-form-id"
           primaryText={isEdit ? t('Update') : t('Create')}
-
         >
           <AddEditUser
             SuccessCallback={() => {
@@ -491,8 +500,7 @@ const MentorLead = () => {
             notificationKey={notificationKey}
             notificationMessage={notificationMessage}
             notificationContext={notificationContext}
-           hideSubmit={true}
-
+            hideSubmit={true}
           />
         </SimpleModal>
 

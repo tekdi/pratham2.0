@@ -39,11 +39,14 @@ const UnitCard = ({
       <CommonCard
         minheight="100%"
         title={(item?.name || '').trim()}
-        image={
-          item?.posterImage
-            ? item?.posterImage
-            : default_img ?? `${AppConst.BASEPATH}/assests/images/image_ver.png`
-        }
+      image={
+  item?.posterImage
+    ? item.posterImage
+    : item?.appIcon
+      ? item.appIcon
+      : default_img ?? `${AppConst.BASEPATH}/assests/images/image_ver.png`
+}
+
         content={item?.description ? item?.description : <Description />}
         orientation="horizontal"
         item={item}

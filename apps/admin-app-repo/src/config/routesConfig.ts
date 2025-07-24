@@ -2,6 +2,7 @@ import { Role, TenantName } from '@/utils/app.constant';
 
 export const PUBLIC_ROUTES = [
   '/',
+  '/qp',
   '/404',
   '/login',
   '/demo',
@@ -18,6 +19,7 @@ export const ROLE_BASED_ROUTES = {
       '/notification-templates/create',
       '/notification-templates/update/[identifier]',
       '/edit-password',
+      '/subjectDetails', '/importCsv', '/edit-password', '/resourceList', '/csvDetails', '/csvList', '/play'
     ],
     [Role.CCTA]: ['/subjectDetails', '/importCsv', '/edit-password', '/resourceList', '/csvDetails', '/csvList', '/play'],
     [Role.SCTA]: ['/subjectDetails', '/importCsv ', '/edit-password', '/resourceList', '/csvDetails', '/csvList', '/play'],

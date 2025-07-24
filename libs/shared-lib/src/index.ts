@@ -10,7 +10,7 @@ export * from './lib/Select/CommonSelect';
 export * from './lib/Search/CommonSearch';
 export * from './lib/Tabs/CommonTabs';
 export * from './lib/Card/CommonCard';
-export * from './lib/Collapse/CommonAccordian';
+// export * from './lib/Collapse/CommonAccordian'; // Temporarily disabled due to React Router compatibility issues
 export * from './lib/Drawer/CommonDrawer';
 export * from './lib/Services/LoginService';
 export * from './lib/Services/RestClient';
