@@ -22,6 +22,7 @@ import {
   getAssessmentTracking,
   getOfflineAssessmentStatus,
   updateAssessmentScore,
+  hierarchyContent,
 } from '../../../../services/AssesmentService';
 import {
   UploadOptionsPopup,
@@ -34,6 +35,7 @@ import {
   getStatusLabel,
   mapAnswerSheetStatusToInternalStatus,
 } from '../index';
+import { createQuestionNumberingMap } from '../../../../utils/questionNumbering';
 import AnswerSheet, {
   AssessmentTrackingData,
 } from '../../../../components/assessment/AnswerSheet';
@@ -152,6 +154,12 @@ const AssessmentDetails = () => {
   const [editLoading, setEditLoading] = useState(false);
   const [assessmentTrackingData, setAssessmentTrackingData] =
     useState<AssessmentTrackingData | null>();
+
+  // Hierarchy data for question numbering
+  const [hierarchyData, setHierarchyData] = useState<any>(null);
+  const [questionNumberingMap, setQuestionNumberingMap] = useState<
+    Record<string, string>
+  >({});
 
   // Upload Options Popup state
   const [uploadPopupOpen, setUploadPopupOpen] = useState(false);
@@ -353,7 +361,7 @@ const AssessmentDetails = () => {
                           AI_suggestion: string;
                         }>;
                       }) => {
-                        // Check localStorage for edited score
+                        // Check localStorage for edited score and suggestion
                         const savedData = localStorage.getItem(
                           `tracking_${userId}_${item.item.id}`
                         );
@@ -361,11 +369,21 @@ const AssessmentDetails = () => {
                           ? JSON.parse(savedData).score
                           : item.score;
 
+                        // Update resValue with saved suggestion if available
+                        let updatedResValue = { ...item.resvalues[0] };
+                        if (savedData) {
+                          const parsedSavedData = JSON.parse(savedData);
+                          if (parsedSavedData.suggestion) {
+                            updatedResValue.AI_suggestion =
+                              parsedSavedData.suggestion;
+                          }
+                        }
+
                         return {
                           questionId: item.item.id,
                           pass: savedScore > 0 ? 'yes' : 'no',
                           sectionId: item.item.sectionId,
-                          resValue: JSON.stringify(item.resvalues[0]),
+                          resValue: JSON.stringify(updatedResValue),
                           duration: item.duration,
                           score: savedScore,
                           maxScore: item.item.maxscore,
@@ -424,11 +442,23 @@ const AssessmentDetails = () => {
                           `tracking_${userId}_${detail.questionId}`
                         );
                         if (savedData) {
-                          const savedScore = JSON.parse(savedData).score;
+                          const parsedSavedData = JSON.parse(savedData);
+                          const savedScore = parsedSavedData.score;
+
+                          // Update resValue with saved suggestion if available
+                          let updatedResValue = detail.resValue
+                            ? JSON.parse(detail.resValue)
+                            : {};
+                          if (parsedSavedData.suggestion) {
+                            updatedResValue.AI_suggestion =
+                              parsedSavedData.suggestion;
+                          }
+
                           return {
                             ...detail,
                             score: savedScore,
                             pass: savedScore > 0 ? 'yes' : 'no',
+                            resValue: JSON.stringify(updatedResValue),
                           };
                         }
                         return detail;
@@ -485,6 +515,25 @@ const AssessmentDetails = () => {
               lastName: userDetailsResponse?.result?.userData?.lastName,
             });
           }
+
+          // Fetch hierarchy data for question numbering
+          if (assessmentId) {
+            try {
+              const hierarchyResponse = await hierarchyContent(
+                assessmentId as string
+              );
+              if (hierarchyResponse) {
+                setHierarchyData(hierarchyResponse);
+                const numberingMap =
+                  createQuestionNumberingMap(hierarchyResponse);
+                setQuestionNumberingMap(numberingMap);
+                console.log('Question numbering map created:', numberingMap);
+              }
+            } catch (error) {
+              console.error('Error fetching hierarchy data:', error);
+            }
+          }
+
           await fetchOfflineAssessmentData(false);
         } catch (error) {
           console.error('Error fetching assessment data:', error);
@@ -1103,6 +1152,7 @@ const AssessmentDetails = () => {
           expandedPanel={expandedPanel}
           onAccordionChange={handleAccordionChange}
           isApproved={assessmentData?.status === 'Approved'}
+          questionNumberingMap={questionNumberingMap}
         />
       )}
 
