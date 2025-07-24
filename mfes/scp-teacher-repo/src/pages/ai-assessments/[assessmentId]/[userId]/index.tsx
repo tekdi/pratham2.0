@@ -35,7 +35,10 @@ import {
   getStatusLabel,
   mapAnswerSheetStatusToInternalStatus,
 } from '../index';
-import { createQuestionNumberingMap } from '../../../../utils/questionNumbering';
+import {
+  createQuestionNumberingMap,
+  createSectionMapping,
+} from '../../../../utils/questionNumbering';
 import AnswerSheet, {
   AssessmentTrackingData,
 } from '../../../../components/assessment/AnswerSheet';
@@ -160,6 +163,9 @@ const AssessmentDetails = () => {
   const [questionNumberingMap, setQuestionNumberingMap] = useState<
     Record<string, string>
   >({});
+  const [sectionMapping, setSectionMapping] = useState<Record<string, string>>(
+    {}
+  );
 
   // Upload Options Popup state
   const [uploadPopupOpen, setUploadPopupOpen] = useState(false);
@@ -526,8 +532,11 @@ const AssessmentDetails = () => {
                 setHierarchyData(hierarchyResponse);
                 const numberingMap =
                   createQuestionNumberingMap(hierarchyResponse);
+                const sectionMap = createSectionMapping(hierarchyResponse);
                 setQuestionNumberingMap(numberingMap);
+                setSectionMapping(sectionMap);
                 console.log('Question numbering map created:', numberingMap);
+                console.log('Section mapping created:', sectionMap);
               }
             } catch (error) {
               console.error('Error fetching hierarchy data:', error);
@@ -1153,6 +1162,7 @@ const AssessmentDetails = () => {
           onAccordionChange={handleAccordionChange}
           isApproved={assessmentData?.status === 'Approved'}
           questionNumberingMap={questionNumberingMap}
+          sectionMapping={sectionMapping}
         />
       )}
 
