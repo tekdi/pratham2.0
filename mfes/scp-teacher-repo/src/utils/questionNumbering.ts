@@ -63,4 +63,47 @@ export const createQuestionNumberingMap = (hierarchyData: HierarchyData): Record
   });
   
   return numberingMap;
+};
+
+// New function to create section mapping
+export const createSectionMapping = (hierarchyData: HierarchyData): Record<string, string> => {
+  const sectionMap: Record<string, string> = {};
+  
+  if (!hierarchyData?.result?.questionset?.children) {
+    return sectionMap;
+  }
+
+  const sections = hierarchyData.result.questionset.children;
+  
+  sections.forEach((section) => {
+    if (section.children) {
+      section.children.forEach((question) => {
+        sectionMap[question.identifier] = section.name;
+      });
+    }
+  });
+  
+  return sectionMap;
+};
+
+// New function to group questions by section
+export const groupQuestionsBySection = (
+  scoreDetails: any[],
+  sectionMapping: Record<string, string>
+): Record<string, any[]> => {
+  const groupedQuestions: Record<string, any[]> = {};
+  
+  scoreDetails.forEach((question) => {
+    const sectionName = question.questionId 
+      ? sectionMapping[question.questionId] || 'Unknown Section'
+      : 'Unknown Section';
+    
+    if (!groupedQuestions[sectionName]) {
+      groupedQuestions[sectionName] = [];
+    }
+    
+    groupedQuestions[sectionName].push(question);
+  });
+  
+  return groupedQuestions;
 }; 
