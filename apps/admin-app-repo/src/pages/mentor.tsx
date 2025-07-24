@@ -500,6 +500,10 @@ const Mentor = () => {
   const notificationKey = 'onMentorCreate';
   const notificationMessage = 'MENTORS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
+  // const districtReassignmentNotificationKey = 'onMentorReassign';
+  // const villageReassignmentNotificationKey = 'MENTOR_VILLAGE_REASSIGNMENT';
+  // const profileUpdateNotificationKey = 'TL_PROFILE_UPDATE';
+  // const districtUpdateNotificationKey = 'TL_DISTRICT_UPDATE';
 
   const setButtonShow = (status) => {
     console.log('########## changed', status);
@@ -608,6 +612,12 @@ const Mentor = () => {
             blockVillageMap={isReassign ? blockVillageMap : {}}
             // isSteeper={true}
             // blockReassignmentNotificationKey={blockReassignmentNotificationKey}
+            // districtReassignmentNotificationKey={
+            //   districtReassignmentNotificationKey
+            // }
+            // villageReassignmentNotificationKey={
+            //   villageReassignmentNotificationKey
+            // }
             // profileUpdateNotificationKey={profileUpdateNotificationKey}
             // centerUpdateNotificationKey={centerUpdateNotificationKey}
           />

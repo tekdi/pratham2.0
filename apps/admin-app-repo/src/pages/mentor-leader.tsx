@@ -42,11 +42,17 @@ import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
 import { deleteUser } from '@/services/UserService';
-import { transformLabel } from '@/utils/Helper';
+import {
+  extractStateAndDistrictSchema,
+  extractStateAndDistrictUiSchema,
+  transformLabel,
+} from '@/utils/Helper';
 import { getCohortList } from '@/services/GetCohortList';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
+import apartment from '../../public/images/apartment.svg';
+import { modifiedSchema } from 'mfes/youthNet/src/utils/Helper';
 
 const MentorLead = () => {
   console.log(
@@ -59,6 +65,8 @@ const MentorLead = () => {
   const [uiSchema, setUiSchema] = useState(MentorLeadSearchUISchema);
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
+  const [reassignUiSchema, setReassignUiSchema] = useState(null);
+  const [reassignSchema, setReassignSchema] = useState(null);
   const [prefilledAddFormData, setPrefilledAddFormData] = useState({});
   const [pageLimit, setPageLimit] = useState<number>(10);
   const [pageOffset, setPageOffset] = useState<number>(0);
@@ -82,9 +90,10 @@ const MentorLead = () => {
   });
   const [reason, setReason] = useState('');
   const [memberShipID, setMemberShipID] = useState('');
+  const [isReassign, setIsReassign] = useState(false);
 
   const { t, i18n } = useTranslation();
-const formRef = useRef(null);
+  const formRef = useRef(null);
 
   const initialFormData = localStorage.getItem('stateId')
     ? { state: [localStorage.getItem('stateId')] }
@@ -120,8 +129,20 @@ const formRef = useRef(null);
         },
       ]);
       console.log('responseForm', responseForm);
-      setAddSchema(responseForm?.schema);
+      //unit name is missing from required so handled from frotnend
+      let alterSchema = responseForm?.schema;
+      //add max selection custom
+      if (alterSchema?.properties?.district) {
+        alterSchema.properties.district.maxSelection = 1;
+      }
+      setAddSchema(alterSchema);
       setAddUiSchema(responseForm?.uiSchema);
+      const filteredAddSchema = extractStateAndDistrictSchema(alterSchema);
+      setReassignSchema(filteredAddSchema);
+      const extractedReassignUiSchema = extractStateAndDistrictUiSchema(
+        responseForm?.uiSchema
+      );
+      setReassignUiSchema(extractedReassignUiSchema);
     };
     setPrefilledAddFormData(initialFormData);
     setPrefilledFormData(initialFormDataSearch);
@@ -321,6 +342,7 @@ const formRef = useRef(null);
         setIsEdit(true);
         setEditableUserId(row?.userId);
         handleOpenModal();
+        setIsReassign(false);
       },
     },
     {
@@ -362,6 +384,7 @@ const formRef = useRef(null);
         // searchData(prefilledFormData, currentPage);
         setOpen(true);
         setUserId(row?.userId);
+        setIsReassign(false);
 
         setUserData({
           firstName: row?.firstName || '',
@@ -369,6 +392,35 @@ const formRef = useRef(null);
           village: findVillage?.selectedValues?.[0]?.value || '',
         });
       },
+    },
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            backgroundColor: 'rgb(227, 234, 240)',
+            padding: '10px',
+          }}
+        >
+          <Image src={apartment} alt="" />
+        </Box>
+      ),
+      callback: async (row) => {
+        console.log('row:', row);
+        let tempFormData = extractMatchingKeys(row, reassignSchema);
+
+        console.log(tempFormData, ' tempFormData');
+        setPrefilledAddFormData(tempFormData);
+        setIsEdit(false);
+        setIsReassign(true);
+        // setButtonShow(true);
+        setEditableUserId(row?.userId);
+        handleOpenModal();
+      },
+      show: (row) => row.status !== 'archived',
     },
   ];
 
@@ -387,6 +439,7 @@ const formRef = useRef(null);
 
   const handleCloseModal = () => {
     setOpenModal(false);
+    setIsReassign(false);
   };
 
   //Add Edit Props
@@ -466,12 +519,12 @@ const formRef = useRef(null);
           onClose={handleCloseModal}
           showFooter={true}
           modalTitle={
-            isEdit
+            isEdit || isReassign
               ? t('MENTOR_LEADERS.UPDATE_MENTOR_LEAD')
               : t('MENTOR_LEADERS.NEW_MENTOR_LEAD')
           }
           id="dynamic-form-id"
-          primaryText={isEdit ? t('Update') : t('Create')}
+          primaryText={isEdit || isReassign ? t('Update') : t('Create')}
         >
           <AddEditUser
             SuccessCallback={() => {
@@ -479,10 +532,11 @@ const formRef = useRef(null);
               searchData({}, 0);
               setOpenModal(false);
             }}
-            schema={addSchema}
-            uiSchema={addUiSchema}
+            schema={isReassign ? reassignSchema : addSchema}
+            uiSchema={isReassign ? reassignUiSchema : addUiSchema}
             editPrefilledFormData={prefilledAddFormData}
             isEdit={isEdit}
+            isReassign={isReassign}
             editableUserId={editableUserId}
             UpdateSuccessCallback={() => {
               setPrefilledFormData({});
@@ -501,6 +555,7 @@ const formRef = useRef(null);
             notificationMessage={notificationMessage}
             notificationContext={notificationContext}
             hideSubmit={true}
+            type="mentor-leader"
           />
         </SimpleModal>
 

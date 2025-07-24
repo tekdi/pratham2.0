@@ -351,7 +351,7 @@ const AddEditUser = ({
           reassignmentPayload
         );
         if (resp) {
-          if (type !== 'team-leader') {
+          if (type !== 'team-leader' && type !== 'mentor-leader') {
             const cohortIdPayload = getReassignPayload(
               editPrefilledFormData.batch,
               formData.batch
@@ -630,7 +630,7 @@ const AddEditUser = ({
               extraFields={
                 isEdit || isReassign ? extraFieldsUpdate : extraFields
               }
-              type={type=="learner"? type: ""}
+              type={type == 'learner' ? type : ''}
             />
           </>
         )

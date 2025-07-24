@@ -68,8 +68,7 @@ const MentorForm = ({
   telemetryCreateKey,
   sdbvFieldData,
   blockVillageMap,
-  // districtReassignmentNotificationKey,
-  // villageReassignmentNotificationKey,
+  // blockReassignmentNotificationKey,
   // profileUpdateNotificationKey,
   // centerUpdateNotificationKey,
 }) => {
@@ -138,7 +137,7 @@ const MentorForm = ({
           isEditUiSchema.firstName['ui:widget'] = 'hidden';
         }
 
-        if (userRole === Role.TEACHER || userRole === Role.TEAM_LEADER) {
+        if (userRole === Role.ADMIN) {
           if (isEditUiSchema?.district) {
             isEditUiSchema.district['ui:disabled'] = true;
           }
@@ -492,14 +491,12 @@ const MentorForm = ({
         customFields
       );
       const payload = { customFields: customFields };
-      console.log('original***', originalPrefilledFormData);
-      console.log('original', customFields);
 
-      // const toSendDistrictChangeNotification = isBlockDifferent(
+      // const toSendBlockChangeNotification = isBlockDifferent(
       //   originalPrefilledFormData,
       //   transformedFormData
       // );
-      // const toSendVillageChangeNotification = isCenterDifferent(
+      // const toSendCenterChangeNotification = isCenterDifferent(
       //   originalPrefilledFormData,
       //   transformedFormData
       // );
@@ -519,11 +516,11 @@ const MentorForm = ({
         if (resp) {
           showToastMessage(t(successUpdateMessage), 'success');
           // // Send notification if block or center is changed
-          // if (toSendDistrictChangeNotification) {
-          //   getNotification(editableUserId, districtReassignmentNotificationKey);
+          // if (toSendBlockChangeNotification) {
+          //   getNotification(editableUserId, blockReassignmentNotificationKey);
           // }
-          // if (toSendVillageChangeNotification) {
-          //   getNotification(editableUserId, villageReassignmentNotificationKey);
+          // if (toSendCenterChangeNotification) {
+          //   getNotification(editableUserId, centerUpdateNotificationKey);
           // }
           telemetryCallbacks(telemetryUpdateKey);
           UpdateSuccessCallback();

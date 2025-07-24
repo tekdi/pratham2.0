@@ -746,3 +746,32 @@ export const isUnderEighteen = (dobString: any): boolean => {
 
   return age < 18;
 };
+
+export const extractStateAndDistrictSchema = (schemaObj: any) => {
+  const selectedFields = ['state', 'district'];
+
+  const newSchema = {
+    type: 'object',
+    properties: Object.fromEntries(
+      Object.entries(schemaObj.properties).filter(([key]) =>
+        selectedFields.includes(key)
+      )
+    ),
+    required: schemaObj.required?.filter((key: string) =>
+      selectedFields.includes(key)
+    ),
+  };
+  // console.log('newUIii', newSchema);
+
+  return newSchema;
+};
+
+export const extractStateAndDistrictUiSchema = (uiSchemaObj: any) => {
+  const selectedFields = ['state', 'district'];
+
+  const newUiSchema = Object.fromEntries(
+    Object.entries(uiSchemaObj).filter(([key]) => selectedFields.includes(key))
+  );
+  // console.log('newUI', newUiSchema);
+  return newUiSchema;
+};

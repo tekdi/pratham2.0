@@ -287,7 +287,8 @@
     "NOT_ABLE_CREATE_MENTOR_LEAD": "Not able to create mentor lead",
     "UPDATE_MENTOR_LEAD": "Update Mentor Lead",
     "NEW_MENTOR_LEAD": "New Mentor Lead",
-    "ER": "New Mentor leaders"
+    "ER": "New Mentor leaders",
+    "RE_ASSIGN_MENTOR_LEAD": "Re-assign Mentor lead"
   },
   "TEAM_LEADERS": {
     "SEARCHBAR_PLACEHOLDER": "Search Team leaders..",
