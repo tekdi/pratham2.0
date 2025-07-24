@@ -17,6 +17,7 @@ import {
   downloadCertificate,
   renderCertificate,
 } from '../../utils/CertificateService/coursesCertificates';
+import { telemetryFactory } from '@shared-lib-v2/DynamicForm/utils/telemetry';
 
 const style = {
   position: 'absolute' as const,
@@ -124,6 +125,26 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
   };
   const onDownloadCertificate = async () => {
     try {
+       const windowUrl = window.location.pathname;
+      const cleanedUrl = windowUrl.replace(/^\//, '');
+      const env = cleanedUrl.split('/')[0];
+     const telemetryInteract = {
+        context: {
+          env: env,
+          cdata: [],
+
+        },
+        edata: {
+          id: 'clicked on download certificate:' ,
+          type: "CLICK",
+          subtype: '',
+          pageid: cleanedUrl,
+                    program: localStorage.getItem('userProgram') || '',
+                    certificateId: certificateId,
+
+        },
+      };
+      telemetryFactory.interact(telemetryInteract);
       const response = await downloadCertificate({
         credentialId: certificateId,
         templateId: localStorage.getItem('templtateId') || '',
