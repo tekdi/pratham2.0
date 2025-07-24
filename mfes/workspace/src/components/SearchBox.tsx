@@ -283,8 +283,9 @@ const SearchBox: React.FC<SearchBarProps> = ({
           <FormControl sx={{ width: '100%', mt: 2 }}>
             <InputLabel sx={{ color: '#000000DB' }}>Filter By</InputLabel>
             <Select
-              readOnly={staticFilter ? true : false}
+              // readOnly={staticFilter ? true : false}
               multiple
+              disabled={router.pathname.includes('ai-assessments')}
               value={staticFilter ? staticFilter : selectedFilters}
               onChange={handleFilterChange}
               input={<OutlinedInput label="Filter By" />}
@@ -297,6 +298,10 @@ const SearchBox: React.FC<SearchBarProps> = ({
                   height: '20px',
                   display: 'flex',
                   alignItems: 'center',
+                },
+                '&.Mui-disabled': {
+                  backgroundColor: '#f5f5f5',
+                  opacity: 0.6,
                 },
               }}
             >
