@@ -361,7 +361,7 @@ const AssessmentDetails = () => {
                           AI_suggestion: string;
                         }>;
                       }) => {
-                        // Check localStorage for edited score
+                        // Check localStorage for edited score and suggestion
                         const savedData = localStorage.getItem(
                           `tracking_${userId}_${item.item.id}`
                         );
@@ -369,11 +369,21 @@ const AssessmentDetails = () => {
                           ? JSON.parse(savedData).score
                           : item.score;
 
+                        // Update resValue with saved suggestion if available
+                        let updatedResValue = { ...item.resvalues[0] };
+                        if (savedData) {
+                          const parsedSavedData = JSON.parse(savedData);
+                          if (parsedSavedData.suggestion) {
+                            updatedResValue.AI_suggestion =
+                              parsedSavedData.suggestion;
+                          }
+                        }
+
                         return {
                           questionId: item.item.id,
                           pass: savedScore > 0 ? 'yes' : 'no',
                           sectionId: item.item.sectionId,
-                          resValue: JSON.stringify(item.resvalues[0]),
+                          resValue: JSON.stringify(updatedResValue),
                           duration: item.duration,
                           score: savedScore,
                           maxScore: item.item.maxscore,
@@ -432,11 +442,23 @@ const AssessmentDetails = () => {
                           `tracking_${userId}_${detail.questionId}`
                         );
                         if (savedData) {
-                          const savedScore = JSON.parse(savedData).score;
+                          const parsedSavedData = JSON.parse(savedData);
+                          const savedScore = parsedSavedData.score;
+
+                          // Update resValue with saved suggestion if available
+                          let updatedResValue = detail.resValue
+                            ? JSON.parse(detail.resValue)
+                            : {};
+                          if (parsedSavedData.suggestion) {
+                            updatedResValue.AI_suggestion =
+                              parsedSavedData.suggestion;
+                          }
+
                           return {
                             ...detail,
                             score: savedScore,
                             pass: savedScore > 0 ? 'yes' : 'no',
+                            resValue: JSON.stringify(updatedResValue),
                           };
                         }
                         return detail;

@@ -88,6 +88,7 @@ const parseResValue = (resValue: string): ParsedResponse => {
           aiSuggestion:
             selectedItem.AI_suggestion ||
             selectedItem.aiSuggestion ||
+            selectedItem.explanation ||
             'No AI suggestion available',
         };
       }
@@ -103,6 +104,7 @@ const parseResValue = (resValue: string): ParsedResponse => {
       aiSuggestion:
         parsed.AI_suggestion ||
         parsed.aiSuggestion ||
+        parsed.explanation ||
         'No AI suggestion available',
     };
   } catch (error) {
@@ -183,7 +185,11 @@ interface AISuggestionAccordionProps {
 
 const AISuggestionAccordion: React.FC<AISuggestionAccordionProps> = React.memo(
   ({ aiSuggestion, isExpanded, onToggle }) => {
-    if (!aiSuggestion || aiSuggestion === 'No AI suggestion available') {
+    if (
+      !aiSuggestion ||
+      aiSuggestion === 'No AI suggestion available' ||
+      aiSuggestion.trim() === ''
+    ) {
       return null;
     }
 
@@ -272,10 +278,11 @@ const QuestionItem: React.FC<QuestionItemProps> = React.memo(
     isApproved,
     questionNumberingMap = {},
   }) => {
-    const parsedResponse = useMemo(
-      () => parseResValue(question.resValue),
-      [question.resValue]
-    );
+    const parsedResponse = useMemo(() => {
+      const result = parseResValue(question.resValue);
+      console.log('Parsed response for question:', question.questionId, result);
+      return result;
+    }, [question.resValue, question.questionId]);
 
     // Response box styling based on score
     const responseBoxStyle = useMemo(() => {
@@ -422,7 +429,7 @@ const ScoreSummary: React.FC<ScoreSummaryProps> = React.memo(
   ({ totalScore, totalMaxScore }) => {
     const percentage = useMemo(() => {
       return totalMaxScore > 0
-        ? Math.round((totalScore / totalMaxScore) * 100)
+        ? Math.min(Math.round((totalScore / totalMaxScore) * 100), 100)
         : 0;
     }, [totalScore, totalMaxScore]);
 
