@@ -150,6 +150,7 @@ const ScoreBadge: React.FC<ScoreBadgeProps> = React.memo(
             opacity: 0.8,
             transform: 'scale(1.02)',
           },
+          mb: 2,
         }}
       >
         <Typography
@@ -538,6 +539,7 @@ const QuestionsList: React.FC<QuestionsListProps> = React.memo(
             borderRadius: '16px',
             width: '100%',
             padding: '16px',
+            mb: '20px',
           }}
         >
           <Box

@@ -20,6 +20,7 @@ const Editor = () => {
   const { identifier } = router.query;
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [status, setStatus] = useState<string>('');
   useEffect(() => {
     const init = async () => {
       setIsLoading(true);
@@ -31,7 +32,8 @@ const Editor = () => {
           response.data?.[0].status &&
           response.data?.[0].status !== 'COMPLETED'
         ) {
-          setIsModalOpen(response.data?.[0].status);
+          setStatus(response.data?.[0].status);
+          setIsModalOpen(true);
         }
       }
       setIsLoading(false);
@@ -89,7 +91,7 @@ const Editor = () => {
               textAlign: 'center',
             }}
           >
-            Status: {isModalOpen === 'COMPLETED' ? 'Completed' : 'Processing'}
+            Status: {status === 'COMPLETED' ? 'Completed' : 'Processing'}
           </Typography>
 
           <Typography
