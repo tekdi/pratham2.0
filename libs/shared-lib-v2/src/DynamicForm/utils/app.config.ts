@@ -71,7 +71,7 @@ export const DaysOfWeek = {
   Sat: 6,
 };
 
-export const Program = ['SCP'];
+export const Program =['Second Chance'];
 
 export const tenantId =
   typeof window !== 'undefined' && localStorage.getItem('tenantId');
