@@ -1,10 +1,9 @@
 'use client';
 
 import { Box, Button, Container, Typography } from '@mui/material';
-import Link from 'next/link';
-import Image from 'next/image';
-import router from 'next/router';
+
 import { useRouter } from 'next/navigation';
+import error from '../../public/404.png';
 
 export default function NotFound() {
   const router = useRouter();
@@ -24,7 +23,7 @@ export default function NotFound() {
       >
         <Box position="relative" width="100%" mb={4}>
           <img
-            src="/404.png"
+            src={error.src}
             alt="404 Error"
             style={{ objectFit: 'contain' }}
           />
@@ -60,7 +59,7 @@ export default function NotFound() {
           variant="contained"
           color="primary"
           size="large"
-          onClick={() => router.back()}
+  onClick={() => { window.location.href = '/'; }}
           sx={{
             textTransform: 'none',
             px: 2,
@@ -76,7 +75,7 @@ export default function NotFound() {
             borderRadius: '100px',
           }}
         >
-          Go back
+          Go to Home
         </Button>
       </Box>
     </Container>

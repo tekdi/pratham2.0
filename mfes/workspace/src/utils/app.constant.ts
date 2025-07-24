@@ -19,7 +19,8 @@ export enum Publish {
 }
 export enum Role {
   SCTA = "Content creator",
-  CCTA = "Content reviewer"
+  CCTA = "Content reviewer",
+  CENTRAL_ADMIN = "Central Lead",
 }
 export enum ContentStatus {
   PUBLISHED = "Published",
