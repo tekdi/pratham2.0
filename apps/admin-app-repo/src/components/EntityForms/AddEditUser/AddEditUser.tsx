@@ -11,6 +11,7 @@ import {
   getUserFullName,
   isBlockDifferent,
   isDistrictDifferent,
+  isStateDifferent,
   isUnderEighteen,
 } from '@/utils/Helper';
 import { sendCredentialService } from '@/services/NotificationService';
@@ -320,6 +321,10 @@ const AddEditUser = ({
         originalPrefilledFormData,
         formData
       );
+      const toSendStateChangeNotification = isStateDifferent(
+        originalPrefilledFormData,
+        formData
+      );
       // console.log(
       //   'toSendBlockChangeNotification###',
       //   toSendBlockChangeNotification
@@ -351,7 +356,7 @@ const AddEditUser = ({
           reassignmentPayload
         );
         if (resp) {
-          if (type !== 'team-leader') {
+          if (type !== 'team-leader' && type !== 'mentor-leader') {
             const cohortIdPayload = getReassignPayload(
               editPrefilledFormData.batch,
               formData.batch
@@ -367,6 +372,11 @@ const AddEditUser = ({
           if (toSendBlockChangeNotification) {
             getNotification(editableUserId, blockReassignmentNotificationKey);
           }
+
+          if (toSendStateChangeNotification) {
+            getNotification(editableUserId, stateUpdateNotificationKey);
+          }
+
           if (toSendDistrictChangeNotification) {
             getNotification(editableUserId, districtUpdateNotificationKey);
           }
@@ -630,7 +640,7 @@ const AddEditUser = ({
               extraFields={
                 isEdit || isReassign ? extraFieldsUpdate : extraFields
               }
-              type={type=="learner"? type: ""}
+              type={type == 'learner' ? type : ''}
             />
           </>
         )

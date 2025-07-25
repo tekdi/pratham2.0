@@ -81,7 +81,7 @@ export const MentorSearchSchema = {
         payload: {
           fieldName: 'block',
           controllingfieldfk: '**',
-          sort: ['block_nCustomRadioWidgetame', 'asc'],
+          sort: ['block_name', 'asc'],
         },
         options: {
           optionObj: 'result.values',
