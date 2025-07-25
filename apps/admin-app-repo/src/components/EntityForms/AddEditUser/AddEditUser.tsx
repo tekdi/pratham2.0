@@ -11,6 +11,7 @@ import {
   getUserFullName,
   isBlockDifferent,
   isDistrictDifferent,
+  isStateDifferent,
   isUnderEighteen,
 } from '@/utils/Helper';
 import { sendCredentialService } from '@/services/NotificationService';
@@ -320,6 +321,10 @@ const AddEditUser = ({
         originalPrefilledFormData,
         formData
       );
+      const toSendStateChangeNotification = isStateDifferent(
+        originalPrefilledFormData,
+        formData
+      );
       // console.log(
       //   'toSendBlockChangeNotification###',
       //   toSendBlockChangeNotification
@@ -367,6 +372,11 @@ const AddEditUser = ({
           if (toSendBlockChangeNotification) {
             getNotification(editableUserId, blockReassignmentNotificationKey);
           }
+
+          if (toSendStateChangeNotification) {
+            getNotification(editableUserId, stateUpdateNotificationKey);
+          }
+
           if (toSendDistrictChangeNotification) {
             getNotification(editableUserId, districtUpdateNotificationKey);
           }
