@@ -835,6 +835,18 @@
     "SELECTED_VILLAGE_COUNT": "Selected village count : {{totalVillageCount}}",
     "RE_ASSIGN_VILLAGES": "Re-assign Villages"
   },
+  "MENTORS": {
+    "NEW_MENTOR": "New Mentor",
+    "FIRST_SELECT_REQUIRED_FIELDS": "First select required fields",
+    "MENTOR_CREATED_SUCCESSFULLY": "Mentor has been successfully created!",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "Mentor is created, credentials will be sent soon",
+    "MENTOR_UPDATED_SUCCESSFULLY": "Mentor has been successfully updated!",
+    "EDIT_MENTOR": "Edit Mentor",
+    "NOT_ABLE_UPDATE_MENTOR": "Not able to update mentor",
+    "NOT_ABLE_CREATE_MENTOR": "Not able to create mentor",
+    "UPDATE_MENTOR": "Update Mentor",
+    "RE_ASSIGN_MENTOR": "Re-assign Mentor"
+  },
   "UNIT_NAME": "Unit Name",
   "TYPE_OF_CENTER": "Type Of Center",
   "GOOGLE MAP_LINK": "Google Map Link",
