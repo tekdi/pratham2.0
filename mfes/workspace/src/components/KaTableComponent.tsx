@@ -8,6 +8,8 @@ import {
   Box,
   Grid,
   Tooltip,
+  Snackbar,
+  Alert,
 } from '@mui/material';
 import UpReviewTinyImage from '@mui/icons-material/LibraryBooks';
 import 'ka-table/style.css';
@@ -43,6 +45,7 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
   const [open, setOpen] = useState(false);
   const [openQrCodeModal, setOpenQrCodeModal] = useState(false);
   const [selectedQrValue, setSelectedQrValue] = useState<string>('');
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   console.log('data', data);
   console.log('coumnData', columns);
@@ -54,6 +57,12 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
   const handleOpenQrModal = (qrValue: string) => {
     setSelectedQrValue(qrValue);
     setOpenQrCodeModal(true);
+  };
+
+  const handleCopyLink = (link: string) => {
+    navigator.clipboard.writeText(link).then(() => {
+      setSnackbarOpen(true);
+    });
   };
 
   const openEditor = (content: any) => {
@@ -372,11 +381,7 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
                                 props.rowData.contentType === 'Course'
                                   ? `${process.env.NEXT_PUBLIC_POS_URL}/pos/content/${props.rowData.identifier}?activeLink=/pos/program`
                                   : `${process.env.NEXT_PUBLIC_POS_URL}/pos/player/${props.rowData.identifier}?activeLink=/pos/program`;
-
-                              navigator.clipboard.writeText(link).then(() => {
-                                // Optional: show a tooltip or alert
-                                console.log('Link copied to clipboard');
-                              });
+                              handleCopyLink(link);
                             }}
                           >
                             <ContentCopyIcon />
@@ -420,11 +425,7 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
                               props.rowData.contentType === 'Course'
                                 ? `${process.env.NEXT_PUBLIC_POS_URL}/pos/content/${props.rowData.identifier}?activeLink=/pos/program`
                                 : `${process.env.NEXT_PUBLIC_POS_URL}/pos/player/${props.rowData.identifier}?activeLink=/pos/program`;
-
-                            navigator.clipboard.writeText(link).then(() => {
-                              // Optional: show a tooltip or alert
-                              console.log('Link copied to clipboard');
-                            });
+                            handleCopyLink(link);
                           }}
                         >
                           <ContentCopyIcon />
@@ -469,6 +470,21 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
           text: 'No data found',
         }}
       />
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={2000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity="success"
+          sx={{ width: '100%', bgcolor: '#06A816', color: '#fff' }}
+          icon={false}
+        >
+          Link copied to clipboard!
+        </Alert>
+      </Snackbar>
     </>
   );
 };

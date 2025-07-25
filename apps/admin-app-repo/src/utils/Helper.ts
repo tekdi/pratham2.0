@@ -690,20 +690,34 @@ export const isBlockDifferent: any = (
   originalPrefilledFormData: { block?: string[] },
   formData: { block?: string[] }
 ): boolean => {
-  const originalBlock = originalPrefilledFormData.block?.[0];
-  const currentBlock = formData.block?.[0];
+  const originalBlocks = originalPrefilledFormData.block || [];
+  const currentBlocks = formData.block || [];
 
-  return originalBlock !== currentBlock;
+  // If lengths differ, blocks are different
+  if (originalBlocks.length !== currentBlocks.length) {
+    return true;
+  }
+
+  // If any block in original is not in current, they are different
+  return !originalBlocks.every((block) => currentBlocks.includes(block));
 };
 
 export const isDistrictDifferent: any = (
   originalPrefilledFormData: { district?: string[] },
   formData: { district?: string[] }
 ): boolean => {
-  const originalDistrict = originalPrefilledFormData.district?.[0];
-  const currentDistrict = formData.district?.[0];
+  const originalDistricts = originalPrefilledFormData.district || [];
+  const currentDistricts = formData.district || [];
 
-  return originalDistrict !== currentDistrict;
+  // If lengths don't match, they are different
+  if (originalDistricts.length !== currentDistricts.length) {
+    return true;
+  }
+
+  // Check if every original district exists in current districts
+  return !originalDistricts.every((district) =>
+    currentDistricts.includes(district)
+  );
 };
 
 export const isCenterDifferent = (
@@ -745,4 +759,77 @@ export const isUnderEighteen = (dobString: any): boolean => {
   }
 
   return age < 18;
+};
+
+export const extractStateAndDistrictSchema = (schemaObj: any) => {
+  const selectedFields = ['state', 'district'];
+
+  const newSchema = {
+    type: 'object',
+    properties: Object.fromEntries(
+      Object.entries(schemaObj.properties).filter(([key]) =>
+        selectedFields.includes(key)
+      )
+    ),
+    required: schemaObj.required?.filter((key: string) =>
+      selectedFields.includes(key)
+    ),
+  };
+  // console.log('newUIii', newSchema);
+
+  return newSchema;
+};
+
+export const extractStateAndDistrictUiSchema = (uiSchemaObj: any) => {
+  const selectedFields = ['state', 'district'];
+
+  const newUiSchema = Object.fromEntries(
+    Object.entries(uiSchemaObj).filter(([key]) => selectedFields.includes(key))
+  );
+  // console.log('newUI', newUiSchema);
+  return newUiSchema;
+};
+
+export const isVillageDifferent = (
+  originalVillages: Record<string, string[]>,
+  newVillages: Record<string, string[]>
+): boolean => {
+  const allBlockIds = new Set([
+    ...Object.keys(originalVillages),
+    ...Object.keys(newVillages),
+  ]);
+  for (const blockId of allBlockIds) {
+    const orig = (originalVillages[blockId] || []).map(String).sort();
+    const curr = (newVillages[blockId] || []).map(String).sort();
+    if (orig.length !== curr.length || !orig.every((v, i) => v === curr[i])) {
+      return true;
+    }
+  }
+  return false;
+};
+
+export const isBlockSetDifferent = (
+  originalBlockVillageMap: Record<string, string[]>,
+  newBlockVillageMap: Record<string, string[]>
+): boolean => {
+  const origBlocks = Object.keys(originalBlockVillageMap).map(String).sort();
+  const newBlocks = Object.keys(newBlockVillageMap).map(String).sort();
+  if (origBlocks.length !== newBlocks.length) return true;
+  return !origBlocks.every((blockId, i) => blockId === newBlocks[i]);
+};
+
+export const isStateDifferent = (
+  originalPrefilledFormData: { state?: string[] },
+  formData: { state?: string[] }
+): boolean => {
+  const originalStates = originalPrefilledFormData.state || [];
+  const currentStates = formData.state || [];
+
+  // If lengths don't match, they are different
+  if (originalStates.length !== currentStates.length) {
+    return true;
+  }
+
+  // Check if every original state exists in current states
+  return !originalStates.every((state) => currentStates.includes(state));
 };
