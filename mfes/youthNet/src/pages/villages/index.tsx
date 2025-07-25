@@ -1276,7 +1276,7 @@ const Index = () => {
                 SuccessCallback={async () => {
                   setPrefilledFormData({});
                   setOpenModal(false);
-                  await getMentorData(); 
+                  await getMentorData();
                 }}
                 schema={isReassign ? originalSchema : addSchema}
                 uiSchema={isReassign ? originalUiSchema : addUiSchema}
@@ -1286,7 +1286,7 @@ const Index = () => {
                 editableUserId={editableUserId}
                 UpdateSuccessCallback={async () => {
                   setOpenModal(false);
-                  await getMentorData(); 
+                  await getMentorData();
                 }}
                 extraFields={extraFields}
                 extraFieldsUpdate={extraFieldsUpdate}
