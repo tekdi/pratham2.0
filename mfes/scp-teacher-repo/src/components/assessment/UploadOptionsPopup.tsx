@@ -81,9 +81,13 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
     }
 
     setIsUploading(true);
+    let successCount = 0;
+    let totalFiles = 0;
+
     try {
       // Convert FileList to array for easier processing
       const fileArray = Array.from(files);
+      totalFiles = fileArray.length;
 
       for (const file of fileArray) {
         // Validate file type
@@ -113,6 +117,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
               uploadedAt: new Date().toISOString(),
             };
             onImageUpload?.(newImage);
+            successCount++;
           }
         } catch (error) {
           console.error('Error uploading file:', file.name, error);
@@ -120,7 +125,10 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
         }
       }
 
-      showToast('Images uploaded successfully!', 'success');
+      // Only show success toast if at least one file was uploaded successfully
+      if (successCount > 0) {
+        showToast('Images uploaded successfully!', 'success');
+      }
     } catch (error) {
       console.error('Error uploading files from gallery:', error);
       showToast(
@@ -160,8 +168,8 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
       );
     } finally {
       setIsUploading(false);
+      setIsCameraOpen(false);
     }
-    setIsCameraOpen(false);
   };
 
   const handleRemoveImage = (imageId: string) => {
@@ -333,6 +341,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '16px',
+                width: '100%',
               }}
             >
               {/* Upload Options */}
