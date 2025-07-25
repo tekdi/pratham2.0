@@ -111,13 +111,14 @@ export const MENU_CONFIG = {
       title:  'SIDEBAR.CURRICULUM_PLANNER',
       icon: '/images/event_available.svg',
       link: '/course-planner',
-      roles: [Role.CCTA, Role.SCTA],
+      roles: [Role.CCTA, Role.SCTA, Role.CENTRAL_ADMIN]
+
     },
     workspace: {
       title: 'SIDEBAR.WORKSPACE',
       icon: '/images/dashboard.svg',
       link: '/workspace',
-      roles: [Role.CCTA, Role.SCTA],
+      roles: [Role.CCTA, Role.SCTA, Role.CENTRAL_ADMIN],
     },
     faqs: {
       title: 'SIDEBAR.FAQS',
@@ -241,7 +242,7 @@ export const MENU_CONFIG = {
       title: 'SIDEBAR.WORKSPACE',
       icon: '/images/dashboard.svg',
       link: '/workspace',
-      roles: [Role.CCTA, Role.SCTA],
+      roles: [Role.CCTA, Role.SCTA, Role.CENTRAL_ADMIN,],
     },
   },
   [TenantName.POS]: {
@@ -286,7 +287,7 @@ export const MENU_CONFIG = {
       title: 'SIDEBAR.WORKSPACE',
       icon: '/images/dashboard.svg',
       link: '/workspace',
-      roles: [Role.CCTA, Role.SCTA],
+      roles: [Role.CCTA, Role.SCTA, Role.CENTRAL_ADMIN,],
     },
     faqs: {
       title: 'SIDEBAR.FAQS',
