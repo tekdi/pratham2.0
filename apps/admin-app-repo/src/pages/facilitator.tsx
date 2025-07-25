@@ -58,6 +58,7 @@ import apartment from '../../public/images/apartment.svg';
 import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 import FacilitatorForm from '@/components/DynamicForm/FacilitatorForm/FacilitatorForm';
 import CenterLabel from '@/components/Centerlabel';
+import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
 
 const Facilitator = () => {
   const theme = useTheme<any>();
@@ -84,6 +85,7 @@ const Facilitator = () => {
   const [districtFieldId, setDistrictFieldId] = useState('');
   const [villageFieldId, setVillageFieldId] = useState('');
   // const [centerFieldId, setCenterFieldId] = useState('');
+     const formRef = useRef(null);
 
   const [userID, setUserId] = useState('');
   const [userData, setUserData] = useState({
@@ -156,7 +158,8 @@ const Facilitator = () => {
 
       console.log('########### alterUISchema', alterUISchema);
 
-      const districtFieldId = responseForm.schema.properties.district.fieldId;
+      const districtFieldId =
+        responseForm?.schema?.properties?.district?.fieldId;
       const blockFieldId = responseForm?.schema?.properties?.block.fieldId;
       const villageFieldId = responseForm?.schema?.properties?.village?.fieldId;
       // const centerFieldId = responseForm?.schema?.properties?.center?.fieldId;
@@ -338,13 +341,15 @@ const Facilitator = () => {
 
   const userDelete = async () => {
     try {
-      let membershipId = null;
+      let membershipIds = null;
 
       // Attempt to get the cohort list
       try {
         const userCohortResp = await getCohortList(userID);
-        if (userCohortResp?.result?.cohortData?.length) {
-          membershipId = userCohortResp.result.cohortData[0].cohortMembershipId;
+        if (userCohortResp?.result?.length) {
+          membershipIds = userCohortResp?.result?.map(
+            (item) => item.cohortMembershipId
+          );
         } else {
           console.warn('No cohort data found for the user.');
         }
@@ -353,24 +358,31 @@ const Facilitator = () => {
       }
 
       // Attempt to update cohort member status only if we got a valid membershipId
-      if (membershipId) {
-        try {
-          const updateResponse = await updateCohortMemberStatus({
-            memberStatus: 'archived',
-            statusReason: reason,
-            membershipId: membershipId,
-          });
+      if (membershipIds && Array.isArray(membershipIds)) {
+        for (const membershipId of membershipIds) {
+          try {
+            const updateResponse = await updateCohortMemberStatus({
+              memberStatus: 'archived',
+              statusReason: reason,
+              membershipId,
+            });
 
-          if (updateResponse?.responseCode !== 200) {
+            if (updateResponse?.responseCode !== 200) {
+              console.error(
+                `Failed to archive user with membershipId ${membershipId}:`,
+                updateResponse
+              );
+            } else {
+              console.log(
+                `User with membershipId ${membershipId} successfully archived.`
+              );
+            }
+          } catch (error) {
             console.error(
-              'Failed to archive user from center:',
-              updateResponse
+              `Error archiving user with membershipId ${membershipId}:`,
+              error
             );
-          } else {
-            console.log('User successfully archived from center.');
           }
-        } catch (error) {
-          console.error('Error archiving user from center:', error);
         }
       }
 
@@ -563,6 +575,9 @@ const Facilitator = () => {
   const notificationKey = 'onFacilitatorCreated';
   const notificationMessage = 'FACILITATORS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
+  const blockReassignmentNotificationKey = 'FACILITATOR_BLOCK_UPDATE';
+  const profileUpdateNotificationKey = 'FACILITATOR_PROFILE_UPDATE';
+  const centerUpdateNotificationKey = 'FACILITATOR_CENTER_UPDATE';
 
   const [open, setOpen] = useState(false);
   const [checked, setChecked] = useState(false);
@@ -595,10 +610,17 @@ const Facilitator = () => {
               SubmitaFunction={SubmitaFunction}
               isCallSubmitInHandle={true}
               prefilledFormData={prefilledFormData}
+              ref={formRef}
             />
           )
         )}
         <Box mt={4} sx={{ display: 'flex', justifyContent: 'end' }}>
+            <ResetFiltersButton
+            searchStoreKey="facilitator"
+            formRef={formRef}
+            SubmitaFunction={SubmitaFunction}
+            setPrefilledFormData={setPrefilledFormData}
+          />
           <Button
             variant="outlined"
             startIcon={<AddIcon />}
@@ -674,6 +696,9 @@ const Facilitator = () => {
             hideSubmit={true}
             setButtonShow={setButtonShow}
             // isSteeper={true}
+            blockReassignmentNotificationKey={blockReassignmentNotificationKey}
+            profileUpdateNotificationKey={profileUpdateNotificationKey}
+            centerUpdateNotificationKey={centerUpdateNotificationKey}
           />
         </SimpleModal>
 

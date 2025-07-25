@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import DynamicForm from '@/components/DynamicForm/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +16,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
 import { Button } from '@mui/material';
 import SimpleModal from '@/components/SimpleModal';
@@ -33,11 +34,14 @@ import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
-import { deleteUser } from '@/services/UserService';
+import { deleteUser, editEditUser } from '@/services/UserService';
 import { transformLabel } from '@/utils/Helper';
 import { getCohortList } from '@/services/GetCohortList';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
+import MarkAsVolunteer from '@/components/MarkAsVolunteer';
+import { showToastMessage } from '@/components/Toastify';
+import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
 
 //import { DynamicForm } from '@shared-lib';
 
@@ -70,8 +74,11 @@ const Youth = () => {
   });
   const [reason, setReason] = useState('');
   const [memberShipID, setMemberShipID] = useState('');
+  const [openMarkVolunteerModal, setOpenMarkVolunteerModal] = useState(false);
+  const [isVolunteerFieldId, setIsVolunteerFieldId] = useState('');
 
   const { t, i18n } = useTranslation();
+     const formRef = useRef(null);
 
   const initialFormData = localStorage.getItem('stateId')
     ? { state: [localStorage.getItem('stateId')] }
@@ -295,6 +302,29 @@ const Youth = () => {
     }
   };
 
+  const handlemarkAsVolunteer = async () => {
+    console.log('selected!!!', editableUserId);
+    try {
+      const userId = editableUserId;
+      const userDetails = {
+        userData: {},
+        customFields: [
+          {
+            fieldId:
+              isVolunteerFieldId || '59716ca7-37af-4527-a1ad-ce0f1dabeb00',
+            value: 'yes',
+          },
+        ],
+      };
+      const response = await editEditUser(userId, userDetails);
+      showToastMessage(t('YOUTH.MARK_AS_VOLUNTEER_SUCCESSFULLY'), 'success');
+      searchData({}, 0);
+    } catch (e) {
+      showToastMessage(t('YOUTH.MARK_AS_VOLUNTEER_FAILED'), 'error');
+      console.log(e);
+    }
+  };
+
   // Define actions
   const actions = [
     {
@@ -371,6 +401,42 @@ const Youth = () => {
         });
       },
     },
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            backgroundColor: 'rgb(227, 234, 240)',
+            height: '34px',
+            width: '34px',
+          }}
+        >
+          <SwapHorizIcon />
+        </Box>
+      ),
+      callback: (row: any) => {
+        console.log('row:', row);
+        setEditableUserId(row?.userId);
+        setOpenMarkVolunteerModal(true);
+        const volunteerField = row.customFields.find(
+          (field) => field.label === 'IS_VOLUNTEER'
+        );
+        setIsVolunteerFieldId(volunteerField?.fieldId);
+      },
+      show: (row: any) => {
+        const isVolunteerField = row.customFields.find(
+          (field) => field.label === 'IS_VOLUNTEER'
+        );
+
+        const isVolunteer = isVolunteerField?.selectedValues?.[0] === 'yes';
+
+        return !isVolunteer;
+      },
+    },
   ];
 
   // Pagination handlers
@@ -421,6 +487,8 @@ const Youth = () => {
           schema &&
           uiSchema && (
             <DynamicForm
+               ref={formRef}
+
               schema={schema}
               uiSchema={updatedUiSchema}
               SubmitaFunction={SubmitaFunction}
@@ -429,12 +497,14 @@ const Youth = () => {
             />
           )
         )}
-
+      
         <SimpleModal
           open={openModal}
           onClose={handleCloseModal}
-          showFooter={false}
+          showFooter={true}
           modalTitle={isEdit ? t('YOUTH.UPDATE_YOUTH') : t('YOUTH.NEW_YOUTH')}
+          id="dynamic-form-id"
+          primaryText={isEdit ? t('Update') : t('Create')}
         >
           <AddEditUser
             SuccessCallback={() => {
@@ -463,9 +533,23 @@ const Youth = () => {
             // notificationKey={notificationKey}
             // notificationMessage={notificationMessage}
             // notificationContext={notificationContext}
+            type="youth"
+            hideSubmit={true}
           />
         </SimpleModal>
-
+          <Box
+                  sx={{ display: 'flex', justifyContent: 'flex-end' }}
+                  gap={2}
+                  mt={4}
+                >
+                   <ResetFiltersButton
+          searchStoreKey="youth"
+          formRef={formRef}
+          SubmitaFunction={SubmitaFunction}
+          setPrefilledFormData={setPrefilledFormData}
+        />
+                </Box>
+ 
         {response && response?.result?.getUserDetails ? (
           <Box sx={{ mt: 5 }}>
             <PaginatedTable
@@ -511,6 +595,21 @@ const Youth = () => {
           reason={reason}
           setReason={setReason}
         />
+      </ConfirmationPopup>
+      <ConfirmationPopup
+        checked={checked}
+        open={openMarkVolunteerModal}
+        onClose={() => {
+          setOpenMarkVolunteerModal(false);
+          setChecked(false);
+        }}
+        title={t('YOUTH.MARK_AS_VOLUNTEER')}
+        primary={t('YOUTH.MARK_AS_VOLUNTEER')}
+        secondary={t('COMMON.CANCEL')}
+        onClickPrimary={handlemarkAsVolunteer}
+        isFromMarkAsVoluteer={true}
+      >
+        <MarkAsVolunteer checked={checked} setChecked={setChecked} />
       </ConfirmationPopup>
     </>
   );

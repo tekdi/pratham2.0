@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useEffect, useState } from 'react';
 import {
   Box,
@@ -18,6 +19,7 @@ import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { createUser, updateUser } from '@/services/CreateUserService';
 import {
+  flresponsetotl,
   getReassignPayload,
   getUserFullName,
   toPascalCase,
@@ -29,7 +31,10 @@ import {
   splitUserData,
   telemetryCallbacks,
 } from '../DynamicFormCallback';
-import { bulkCreateCohortMembers } from '@/services/CohortServices';
+import {
+  bulkCreateCohortMembers,
+  getCohortData,
+} from '@/services/CohortServices';
 import { updateReassignUser } from '@/services/CohortService/cohortService';
 const FacilitatorForm = ({
   t,
@@ -248,7 +253,7 @@ const FacilitatorForm = ({
       setButtonShow(false);
     }
   };
-  const onCloseNextForm = (cohortdata) => {
+  const onCloseNextForm = (cohortdata: any) => {
     setSelectedCenterBatches(cohortdata);
     setShowNextForm(false);
     setButtonShow(true);
@@ -377,6 +382,19 @@ const FacilitatorForm = ({
           const centerBatchList = cohortWithChildren.filter(
             (item) => item.childData && item.childData.length > 0
           );
+
+          //prefilled value for user
+          if (selectedCenterBatches == null && isReassign === true) {
+            //set setSelectedCenterBatches
+            let response = await getCohortData(editableUserId);
+            console.log('###### responsedebug editableUserId', editableUserId);
+            console.log('###### responsedebug mycohor', response);
+            if (response?.result) {
+              let centerId = await flresponsetotl(response.result);
+              setSelectedCenterBatches(centerId);
+              console.log('###### responsedebug centerId', centerId);
+            }
+          }
 
           setCenterList(centerBatchList);
         }

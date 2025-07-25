@@ -230,7 +230,7 @@ const CentersPage = () => {
     const userData = JSON.parse(localStorage.getItem('userData') || '{}');
     const location = getLocationFromCustomFields(userData);
     // console.log('location', location);
-    setEmptyFormData(location);
+    setEmptyFormData({...location,  name: ''});
   }, [tempVariable]);
 
   useEffect(() => {
@@ -249,7 +249,7 @@ const CentersPage = () => {
               response
             ) {
               const blockData = response.map((item: any) => {
-                const blockName = item.cohortName;
+                const blockName = toPascalCase(item.cohortName);
                 const blockId = item.cohortId;
                 localStorage.setItem('blockParentId', blockId);
 
@@ -310,7 +310,7 @@ const CentersPage = () => {
               response
             ) {
               const cohortData = response.map((center: any) => {
-                const cohortName = center.cohortName;
+                const cohortName = toPascalCase(center.cohortName);
                 const cohortId = center.cohortId;
                 const centerTypeField = center?.customField.find(
                   (field: any) => field.label === 'TYPE_OF_COHORT'

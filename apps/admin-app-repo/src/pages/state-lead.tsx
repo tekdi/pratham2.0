@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import DynamicForm from '@/components/DynamicForm/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
@@ -31,6 +31,7 @@ import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 import { transformLabel } from '@/utils/Helper';
+import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
 
 const StateLead = () => {
   const theme = useTheme<any>();
@@ -51,6 +52,7 @@ const StateLead = () => {
   const [editableUserId, setEditableUserId] = useState('');
 
   const { t, i18n } = useTranslation();
+     const formRef = useRef(null);
 
   const searchStoreKey = 'stateLead';
   const initialFormDataSearch =
@@ -296,6 +298,7 @@ const StateLead = () => {
           schema &&
           uiSchema && (
             <DynamicForm
+              ref={formRef}
               schema={schema}
               uiSchema={updatedUiSchema}
               SubmitaFunction={SubmitaFunction}
@@ -305,7 +308,12 @@ const StateLead = () => {
           )
         )}
         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }} mt={4}>
-        new changes 8 may
+            <ResetFiltersButton
+                      searchStoreKey="stateLead"
+                      formRef={formRef}
+                      SubmitaFunction={SubmitaFunction}
+                      setPrefilledFormData={setPrefilledFormData}
+                    />
           <Button
             variant="outlined"
             startIcon={<AddIcon />}

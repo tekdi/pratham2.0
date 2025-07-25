@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import DynamicForm from '@/components/DynamicForm/DynamicForm';
+import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
 import { showToastMessage } from '../../Toastify';
@@ -8,13 +8,14 @@ import {
   firstLetterInUpperCase,
   getReassignPayload,
   getUserFullName,
+  isUnderEighteen,
 } from '@/utils/Helper';
 import { sendCredentialService } from '@/services/NotificationService';
 import {
   notificationCallback,
   splitUserData,
   telemetryCallbacks,
-} from '@/components/DynamicForm/DynamicFormCallback';
+} from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import {
   bulkCreateCohortMembers,
   createCohort,
@@ -55,6 +56,7 @@ const AddEditUser = ({
   setButtonShow,
   isSteeper,
 }) => {
+  console.log("editPrefilledFormData", editPrefilledFormData)
   const [isLoading, setIsLoading] = useState(false);
   const [showAssignmentScreen, setShowAssignmentScreen] =
     useState<boolean>(false);
@@ -128,7 +130,6 @@ const AddEditUser = ({
           'drop_out_reason',
           'work_domain',
           'what_do_you_want_to_become',
-          'mother_name',
           'guardian_name',
           'guardian_relation',
           'dob',
@@ -157,8 +158,10 @@ const AddEditUser = ({
       isEditSchema.required = isEditSchema.required.filter(
         (key) => !keysToRemove.includes(key)
       );
-      // console.log('isEditSchema', JSON.stringify(isEditSchema));
-    } else if (isReassign) {
+       // console.log('isEditSchema', JSON.stringify(isEditSchema));
+    } 
+    
+    else if (isReassign) {
       let originalRequired = isEditSchema.required;
       const keysToHave = [
         'state',
@@ -200,6 +203,51 @@ const AddEditUser = ({
       );
       // console.log('isEditSchema', JSON.stringify(isEditSchema));
     }
+    console.log('isEditUiSchema', isEditUiSchema);
+    if (type == 'learner') {
+      const desiredOrder = [
+        'state',
+        'district',
+        'block',
+        'village',
+        'firstName',
+        'middleName',
+        'lastName',
+        'username',
+       
+        'gender',
+        'dob',
+         'mobile',
+        'guardian_name',
+        'guardian_relation',
+        'parent_phone',
+        'family_member_details',
+        'father_name',
+        'mother_name',
+        'spouse_name',
+        'class',
+        'marital_status',
+        'phone_type_accessible',
+        'own_phone_check',
+
+        'password',
+        'confirm_password',
+        'program',
+      ];
+
+      // Filter only existing keys from the object
+      const updatedOrder = desiredOrder.filter((key) => key in isEditUiSchema);
+
+      // Optionally, include any extra keys that were not in your desired list but exist in uiSchema
+      const remainingKeys = Object.keys(isEditUiSchema).filter(
+        (key) => key !== 'ui:order' && !updatedOrder.includes(key)
+      );
+
+      isEditUiSchema['ui:order'] = [...updatedOrder, ...remainingKeys];
+
+      console.log('Updated ui:order', isEditUiSchema['ui:order']);
+    }
+
     setAlteredSchema(isEditSchema);
     setAlteredUiSchema(isEditUiSchema);
   }, [isEdit, isReassign]);
@@ -236,6 +284,15 @@ const AddEditUser = ({
           }
           // console.log('userData', userData);
           // console.log('customFields', customFields);
+          if (type == 'learner') {
+            const parentPhoneField = customFields.find(
+              (field: any) => field.value === formData.parent_phone
+            );
+            console.log('Parent Phone Field:', parentPhoneField);
+            if (parentPhoneField) {
+              userData.mobile = parentPhoneField.value;
+            }
+          }
           const object = {
             userData: userData,
             customFields: customFields,
@@ -369,6 +426,9 @@ const AddEditUser = ({
           if (type == 'learner') {
             if (payload?.email == '') {
               delete payload.email;
+            }
+            if (isUnderEighteen(payload?.dob)) {
+              payload.mobile = formData?.parent_phone;
             }
           }
           const responseUserData = await createUser(payload, t);
@@ -578,6 +638,8 @@ const AddEditUser = ({
               extraFields={
                 isEdit || isReassign ? extraFieldsUpdate : extraFields
               }
+              type={type == 'learner' ? type : ''}
+              isReassign={isReassign}
             />
           </>
         )

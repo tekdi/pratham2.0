@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import DynamicForm from '@/components/DynamicForm/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
@@ -39,6 +39,7 @@ import { getCohortList } from '@/services/GetCohortList';
 import { useTheme } from '@mui/material/styles';
 import { useRouter } from 'next/router';
 import AddIcon from '@mui/icons-material/Add';
+import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
 
 //import { DynamicForm } from '@shared-lib';
 
@@ -71,6 +72,7 @@ const Mentor = () => {
   });
   const [reason, setReason] = useState('');
   const [memberShipID, setMemberShipID] = useState('');
+const formRef = useRef(null);
 
   const { t, i18n } = useTranslation();
 
@@ -430,6 +432,7 @@ const Mentor = () => {
           schema &&
           uiSchema && (
             <DynamicForm
+              ref={formRef}
               schema={schema}
               uiSchema={updatedUiSchema}
               SubmitaFunction={SubmitaFunction}
@@ -438,7 +441,19 @@ const Mentor = () => {
             />
           )
         )}
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }} mt={4}>
+        <Box
+          sx={{ display: 'flex', justifyContent: 'flex-end' }}
+          gap={2}
+          mt={4}
+        >
+       
+          <ResetFiltersButton
+  searchStoreKey="mentor"
+  formRef={formRef}
+  SubmitaFunction={SubmitaFunction}
+  setPrefilledFormData={setPrefilledFormData}
+/>
+
           <Button
             variant="outlined"
             startIcon={<AddIcon />}
@@ -456,18 +471,18 @@ const Mentor = () => {
               handleOpenModal();
             }}
           >
-            {t('COMMON.ADD_NEW')}{' '}
+            {t('COMMON.ADD_NEW')}
           </Button>
         </Box>
 
         <SimpleModal
           open={openModal}
           onClose={handleCloseModal}
-          showFooter={!isEdit ? true : false}
+          showFooter={true}
           modalTitle={
             isEdit ? t('MENTORS.UPDATE_MENTOR') : t('MENTORS.NEW_MENTOR')
           }
-          primaryText={'Next'}
+          primaryText={isEdit ? 'Update' : 'Next'}
           id="dynamic-form-id"
         >
           <AddEditUser
@@ -498,6 +513,7 @@ const Mentor = () => {
             notificationMessage={notificationMessage}
             notificationContext={notificationContext}
             type="mentor"
+            hideSubmit={true}
           />
         </SimpleModal>
 

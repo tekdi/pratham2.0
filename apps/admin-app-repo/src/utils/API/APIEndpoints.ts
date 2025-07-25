@@ -39,9 +39,15 @@ export const API_ENDPOINTS = {
   issueCertificate: `${baseurl}/tracking/certificate/issue`,
   renderCertificate: `${baseurl}/tracking/certificate/render`,
   downloadCertificate: `${baseurl}/tracking/certificate/render-PDF`,
+  framework : (frameworkId: string) => `${baseurl}/framework/v1/read/${frameworkId}`,
+  actionObject : `${baseurl}/action/object/category/definition/v1/read?fields=objectMetadata,forms,name,label`,
 
 };
 
 export const COURSE_PLANNER_UPLOAD_ENDPOINTS = `${process.env.NEXT_PUBLIC_BASE_URL}/prathamservice/v1/course-planner/upload`;
 
 export const TARGET_SOLUTION_ENDPOINTS = `${process.env.NEXT_PUBLIC_COURSE_PLANNER_API_URL}/solutions/targetedSolutions?type=improvementProject&currentScopeOnly=true`;
+export const COURSE_PLANNER_DELETE = `${process.env.NEXT_PUBLIC_COURSE_PLANNER_API_URL}/project/templateTasks/delete/`;
+export const COURSE_PLANNER_TOPIC_CREATE = `${process.env.NEXT_PUBLIC_COURSE_PLANNER_API_URL}/project/templateTasks/bulkCreateJson/`;
+export const COURSE_PLANNER_DELETE_CONTENT = `${process.env.NEXT_PUBLIC_COURSE_PLANNER_API_URL}/project/templateTasks/deleteTask/`;
+export const COURSE_PLANNER_UPDATE_CONTENT = `${process.env.NEXT_PUBLIC_COURSE_PLANNER_API_URL}/project/templateTasks/updateTask/`;

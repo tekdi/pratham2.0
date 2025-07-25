@@ -55,6 +55,7 @@ import apartment from '../../public/images/apartment.svg';
 import { getCenterList } from '@/services/MasterDataService';
 import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 import CenterLabel from '@/components/Centerlabel';
+import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
 
 const Learner = () => {
   const theme = useTheme<any>();
@@ -96,6 +97,7 @@ const Learner = () => {
   const initialFormData = localStorage.getItem('stateId')
     ? { state: [localStorage.getItem('stateId')] }
     : {};
+     const formRef = useRef(null);
 
   const searchStoreKey = 'learner';
   const initialFormDataSearch =
@@ -362,13 +364,15 @@ const Learner = () => {
 
   const userDelete = async () => {
     try {
-      let membershipId = null;
+      let membershipIds = null;
 
       // Attempt to get the cohort list
       try {
         const userCohortResp = await getCohortList(userID);
-        if (userCohortResp?.result?.cohortData?.length) {
-          membershipId = userCohortResp.result.cohortData[0].cohortMembershipId;
+        if (userCohortResp?.result?.length) {
+          membershipIds = userCohortResp?.result?.map(
+            (item) => item.cohortMembershipId
+          );
         } else {
           console.warn('No cohort data found for the user.');
         }
@@ -377,24 +381,31 @@ const Learner = () => {
       }
 
       // Attempt to update cohort member status only if we got a valid membershipId
-      if (membershipId) {
-        try {
-          const updateResponse = await updateCohortMemberStatus({
-            memberStatus: 'archived',
-            statusReason: reason,
-            membershipId: membershipId,
-          });
+      if (membershipIds && Array.isArray(membershipIds)) {
+        for (const membershipId of membershipIds) {
+          try {
+            const updateResponse = await updateCohortMemberStatus({
+              memberStatus: 'archived',
+              statusReason: reason,
+              membershipId,
+            });
 
-          if (updateResponse?.responseCode !== 200) {
+            if (updateResponse?.responseCode !== 200) {
+              console.error(
+                `Failed to archive user with membershipId ${membershipId}:`,
+                updateResponse
+              );
+            } else {
+              console.log(
+                `User with membershipId ${membershipId} successfully archived.`
+              );
+            }
+          } catch (error) {
             console.error(
-              'Failed to archive user from center:',
-              updateResponse
+              `Error archiving user with membershipId ${membershipId}:`,
+              error
             );
-          } else {
-            console.log('User successfully archived from center.');
           }
-        } catch (error) {
-          console.error('Error archiving user from center:', error);
         }
       }
 
@@ -427,35 +438,35 @@ const Learner = () => {
   };
   // Define actions
   const actions = [
-    {
-      icon: (
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
-            padding: '10px',
-          }}
-        >
-          <Image src={editIcon} alt="" />
-        </Box>
-      ),
-      callback: (row) => {
-        // console.log('row:', row);
-        // console.log('AddSchema', addSchema);
-        // console.log('AddUISchema', addUiSchema);
+    // {
+    //   icon: (
+    //     <Box
+    //       sx={{
+    //         display: 'flex',
+    //         flexDirection: 'column',
+    //         alignItems: 'center',
+    //         cursor: 'pointer',
+    //         backgroundColor: 'rgb(227, 234, 240)',
+    //         padding: '10px',
+    //       }}
+    //     >
+    //       <Image src={editIcon} alt="" />
+    //     </Box>
+    //   ),
+    //   callback: (row) => {
+    //     // console.log('row:', row);
+    //     // console.log('AddSchema', addSchema);
+    //     // console.log('AddUISchema', addUiSchema);
 
-        let tempFormData = extractMatchingKeys(row, addSchema);
-        // console.log('tempFormData', tempFormData);
-        setPrefilledAddFormData(tempFormData);
-        setIsEdit(true);
-        setEditableUserId(row?.userId);
-        handleOpenModal();
-      },
-      show: (row) => row.status !== 'archived',
-    },
+    //     let tempFormData = extractMatchingKeys(row, addSchema);
+    //     // console.log('tempFormData', tempFormData);
+    //     setPrefilledAddFormData(tempFormData);
+    //     setIsEdit(true);
+    //     setEditableUserId(row?.userId);
+    //     handleOpenModal();
+    //   },
+    //   show: (row) => row.status !== 'archived',
+    // },
     {
       icon: (
         <Box
@@ -496,48 +507,48 @@ const Learner = () => {
       },
       show: (row) => row.status !== 'archived',
     },
-    {
-      icon: (
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
-            padding: '10px',
-          }}
-        >
-          <Image src={apartment} alt="" />
-        </Box>
-      ),
-      callback: async (row) => {
-        console.log('row:', row);
-        const centerField = row.customFields.find(
-          (field) => field.label === 'CENTER'
-        );
-        if (centerField) {
-          setCenterSelectiveValue(centerField.selectedValues);
-        } else {
-          console.log('CENTER field not found');
-        }
-        // console.log('AddSchema', addSchema);
-        // console.log('AddUISchema', addUiSchema);
+    // {
+    //   icon: (
+    //     <Box
+    //       sx={{
+    //         display: 'flex',
+    //         flexDirection: 'column',
+    //         alignItems: 'center',
+    //         cursor: 'pointer',
+    //         backgroundColor: 'rgb(227, 234, 240)',
+    //         padding: '10px',
+    //       }}
+    //     >
+    //       <Image src={apartment} alt="" />
+    //     </Box>
+    //   ),
+    //   callback: async (row) => {
+    //     console.log('row:', row);
+    //     const centerField = row.customFields.find(
+    //       (field) => field.label === 'CENTER'
+    //     );
+    //     if (centerField) {
+    //       setCenterSelectiveValue(centerField.selectedValues);
+    //     } else {
+    //       console.log('CENTER field not found');
+    //     }
+    //     // console.log('AddSchema', addSchema);
+    //     // console.log('AddUISchema', addUiSchema);
 
-        let batchList = await fetchUserData(row?.userId);
-        let tempFormData = extractMatchingKeys(row, addSchema);
-        tempFormData = {
-          ...tempFormData,
-          batch: batchList,
-        };
-        setPrefilledAddFormData(tempFormData);
-        // setIsEdit(true);
-        setIsReassign(true);
-        setEditableUserId(row?.userId);
-        handleOpenModal();
-      },
-      show: (row) => row.status !== 'archived',
-    },
+    //     let batchList = await fetchUserData(row?.userId);
+    //     let tempFormData = extractMatchingKeys(row, addSchema);
+    //     tempFormData = {
+    //       ...tempFormData,
+    //       batch: batchList,
+    //     };
+    //     setPrefilledAddFormData(tempFormData);
+    //     // setIsEdit(true);
+    //     setIsReassign(true);
+    //     setEditableUserId(row?.userId);
+    //     handleOpenModal();
+    //   },
+    //   show: (row) => row.status !== 'archived',
+    // },
   ];
 
   // Pagination handlers
@@ -581,6 +592,8 @@ const Learner = () => {
   const notificationKey = 'onLearnerCreated';
   const notificationMessage = 'LEARNERS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
+  const blockReassignmentNotificationKey = 'LEARNER_REASSIGNMENT_NOTIFICATION';
+  const profileUpdateNotificationKey = 'LEARNER_PROFILE_UPDATE_ALERT';
 
   useEffect(() => {
     setPrefilledFormData(initialFormDataSearch);
@@ -595,6 +608,7 @@ const Learner = () => {
           schema &&
           uiSchema && (
             <DynamicForm
+              ref={formRef}
               schema={schema}
               uiSchema={updatedUiSchema}
               SubmitaFunction={SubmitaFunction}
@@ -604,7 +618,13 @@ const Learner = () => {
           )
         )}
         <Box mt={4} sx={{ display: 'flex', justifyContent: 'end' }}>
-          <Button
+            <ResetFiltersButton
+            searchStoreKey="learner"
+            formRef={formRef}
+            SubmitaFunction={SubmitaFunction}
+            setPrefilledFormData={setPrefilledFormData}
+          />
+          {/* <Button
             variant="outlined"
             startIcon={<AddIcon />}
             color="primary"
@@ -623,7 +643,7 @@ const Learner = () => {
             }}
           >
             {t('COMMON.ADD_NEW')}
-          </Button>
+          </Button> */}
         </Box>
 
         <SimpleModal
@@ -676,11 +696,13 @@ const Learner = () => {
             villageFieldId={villageFieldId}
             hideSubmit={true}
             type={'learner'}
+            blockReassignmentNotificationKey={blockReassignmentNotificationKey}
+            profileUpdateNotificationKey={profileUpdateNotificationKey}
           />
         </SimpleModal>
 
         {response != null ? (
-          <>
+          <Box mt={4}>
             {response && response?.result?.getUserDetails ? (
               <Box sx={{ mt: 1 }}>
                 <PaginatedTable
@@ -706,7 +728,7 @@ const Learner = () => {
                 </Typography>
               </Box>
             )}
-          </>
+          </Box>
         ) : (
           <CenteredLoader />
         )}

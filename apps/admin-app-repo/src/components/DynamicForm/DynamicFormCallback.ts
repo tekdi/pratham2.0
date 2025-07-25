@@ -233,8 +233,6 @@ export const notificationCallback = async (
       );
     }
   }
-  cleanedUrl = 'testlink';
-  alert("cleanedUrl "+cleanedUrl)
   if (creatorName) {
     if (type == 'learner') {
       let sentName = JSON.parse(localStorage.getItem('userData'))?.firstName;

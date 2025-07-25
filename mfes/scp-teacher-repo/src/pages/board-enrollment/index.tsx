@@ -519,9 +519,9 @@ const BoardEnrollment = () => {
       </Box>
 
       <Box sx={{ mr: '20px' }}>
-        <Grid container alignItems={'end'} spacing={2}>
+        <Grid container alignItems="center" spacing={2} sx={{ mt: 0 }}>
           <Grid item xs={8} ref={searchRef}>
-            <Box sx={{ px: '16px', mt: 2 }}>
+            <Box sx={{ px: '16px' }}>
               <Paper
                 component="form"
                 onSubmit={(event) => {

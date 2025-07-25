@@ -158,6 +158,7 @@ export const genericEditorReviewFormResponse = {
                         "code": "domain",
                         "visible": true,
                         "depends": [
+                            "subject",
                             "subDomain"
                         ],
                         "editable": true,
@@ -175,6 +176,7 @@ export const genericEditorReviewFormResponse = {
                         "code": "subDomain",
                         "visible": true,
                         "depends": [
+                            "subject"
                         ],
                         "editable": true,
                         "dataType": "list",
@@ -188,11 +190,27 @@ export const genericEditorReviewFormResponse = {
                         "placeholder": "Sub Domain"
                     },
                     {
+                        "code": "subject",
+                        "visible": true,
+                        "depends": [
+                        ],
+                        "editable": true,
+                        "dataType": "list",
+                        "renderingHints": {},
+                        "description": "Subject",
+                        "index": 7,
+                        "label": "Subject",
+                        "required": true,
+                        "name": "Subject",
+                        "inputType": "multiselect",
+                        "placeholder": "Subject"
+                    },
+                    {
                         "code": "targetAgeGroup",
                         "dataType": "list",
                         "description": "Target Age group / Grade level (Who is the content targeted for?)",
                         "editable": true,
-                        "index": 7,
+                        "index": 8,
                         "inputType": "multiselect",
                         "label": "Target Age group",
                         "name": "Target Age group",
@@ -236,7 +254,7 @@ export const genericEditorReviewFormResponse = {
                         "dataType": "list",
                         "description": "Primary User",
                         "editable": true,
-                        "index": 8,
+                        "index": 9,
                         "inputType": "multiselect",
                         "label": "Primary User",
                         "name": "Primary User",
@@ -264,7 +282,7 @@ export const genericEditorReviewFormResponse = {
                         "dataType": "text",
                         "description": "Content Language",
                         "editable": true,
-                        "index": 8,
+                        "index": 10,
                         "inputType": "select",
                         "label": "Content Language",
                         "name": "Content Language",
@@ -352,7 +370,7 @@ export const genericEditorReviewFormResponse = {
                         "dataType": "list",
                         "description": "Program",
                         "editable": true,
-                        "index": 10,
+                        "index": 11,
                         "inputType": "multiselect",
                         "label": "Program",
                         "name": "Program",
@@ -400,6 +418,14 @@ export const genericEditorReviewFormResponse = {
                           {
                               "name": "Open School",
                               "value": "Open School"
+                          },
+                          {
+                              "name": "Experimento India",
+                              "value": "Experimento India"
+                          },
+                          {
+                              "name": "Camp to Club",
+                              "value": "Camp to Club"
                           },
                           {
                               "name": "Other",

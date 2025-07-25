@@ -958,8 +958,10 @@ export const getUserFullName = (user?: {
   if (user) {
     userData = user;
   } else {
-    userData = localStorage.getItem('userData');
-    userData = JSON.parse(userData || '{}');
+    if (typeof window !== 'undefined' && window.localStorage) {
+      userData = localStorage.getItem('userData');
+      userData = JSON.parse(userData || '{}');
+    }
   }
 
   if (userData?.firstName) {
@@ -1183,4 +1185,28 @@ export const fetchUserData = async (userId: any) => {
     console.error('Error getting user details:', error);
     return null;
   }
+};
+export const getInitials = (name: any) => {
+  if (!name) return ''; // Handle empty input
+  const words = name?.trim().split(' ');
+  return words?.length > 1
+    ? words[0][0].toUpperCase() + words[1][0].toUpperCase()
+    : words[0][0].toUpperCase();
+};
+export const isUnderEighteen = (dobString: any): boolean => {
+  if (!dobString) return false;
+
+  const dob = new Date(dobString);
+  if (isNaN(dob.getTime())) return false; // Invalid date check
+
+  const today = new Date();
+  let age = today.getFullYear() - dob.getFullYear();
+  const monthDiff = today.getMonth() - dob.getMonth();
+  const dayDiff = today.getDate() - dob.getDate();
+
+  if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+    age--;
+  }
+
+  return age < 18;
 };

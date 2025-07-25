@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React, { useEffect, useState } from 'react';
-import DynamicForm from '@/components/DynamicForm/DynamicForm';
+import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
 import { showToastMessage } from '../../Toastify';
@@ -9,13 +9,16 @@ import {
   firstLetterInUpperCase,
   getReassignPayload,
   getUserFullName,
+  isBlockDifferent,
+  isDistrictDifferent,
+  isUnderEighteen,
 } from '@/utils/Helper';
 import { sendCredentialService } from '@/services/NotificationService';
 import {
   notificationCallback,
   splitUserData,
   telemetryCallbacks,
-} from '@/components/DynamicForm/DynamicFormCallback';
+} from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import {
   bulkCreateCohortMembers,
   createCohort,
@@ -24,8 +27,9 @@ import {
 } from '@/services/CohortService/cohortService';
 import { CohortTypes, RoleId } from '@/utils/app.constant';
 import _ from 'lodash';
-import StepperForm from '@/components/DynamicForm/StepperForm';
+import StepperForm from '@shared-lib-v2/DynamicForm/components/StepperForm';
 import CohortManager from '@/utils/CohortManager';
+import useNotification from '@/hooks/useNotification';
 const AddEditUser = ({
   SuccessCallback,
   schema,
@@ -56,6 +60,10 @@ const AddEditUser = ({
   hideSubmit,
   setButtonShow,
   isSteeper,
+  blockReassignmentNotificationKey,
+  profileUpdateNotificationKey,
+  districtUpdateNotificationKey,
+  centerUpdateNotificationKey,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showAssignmentScreen, setShowAssignmentScreen] =
@@ -65,12 +73,16 @@ const AddEditUser = ({
   const [prefilledFormData, setPrefilledFormData] = useState(
     editPrefilledFormData
   );
+  const [originalPrefilledFormData, setOriginalPrefilledFormData] = useState(
+    editPrefilledFormData
+  );
   // console.log(
   //   '#### reassign issue debug editPrefilledFormData',
   //   editPrefilledFormData
   // );
 
   const { t } = useTranslation();
+  const { getNotification } = useNotification();
 
   const [tempArray, setTempArray] = useState<any>([]);
   const [alteredSchema, setAlteredSchema] = useState<any>(null);
@@ -215,6 +227,7 @@ const AddEditUser = ({
     setPrefilledFormData(formData);
     console.log(formData, 'formdata');
     console.log('########## debug username', payload);
+    console.log('########## debug formdata', formData);
 
     if (isEdit) {
       if (isNotificationRequired) {
@@ -245,6 +258,14 @@ const AddEditUser = ({
           }
           // console.log('userData', userData);
           // console.log('customFields', customFields);
+          if (type == 'learner') {
+            const parentPhoneField = customFields.find(
+              (field: any) => field.value === formData.parent_phone
+            );
+            if (parentPhoneField) {
+              userData.mobile = parentPhoneField.value;
+            }
+          }
           const object = {
             userData: userData,
             customFields: customFields,
@@ -256,6 +277,7 @@ const AddEditUser = ({
             updateUserResponse &&
             updateUserResponse?.data?.params?.err === null
           ) {
+            getNotification(editableUserId, profileUpdateNotificationKey);
             showToastMessage(t(successUpdateMessage), 'success');
             telemetryCallbacks(telemetryUpdateKey);
 
@@ -288,6 +310,24 @@ const AddEditUser = ({
         }
       }
     } else if (isReassign) {
+      // console.log('Block!!!!!', originalPrefilledFormData);
+      // console.log('Block!!###', formData);
+      const toSendBlockChangeNotification = isBlockDifferent(
+        originalPrefilledFormData,
+        formData
+      );
+      const toSendDistrictChangeNotification = isDistrictDifferent(
+        originalPrefilledFormData,
+        formData
+      );
+      // console.log(
+      //   'toSendBlockChangeNotification###',
+      //   toSendBlockChangeNotification
+      // );
+      // console.log(
+      //   'toSendDistrictChangeNotification###',
+      //   toSendDistrictChangeNotification
+      // );
       try {
         // console.log('new', formData?.batch);
         // console.log(editPrefilledFormData?.batch, 'old');
@@ -323,6 +363,14 @@ const AddEditUser = ({
             });
           }
           showToastMessage(t(successUpdateMessage), 'success');
+          // Send notification if block is changed
+          if (toSendBlockChangeNotification) {
+            getNotification(editableUserId, blockReassignmentNotificationKey);
+          }
+          if (toSendDistrictChangeNotification) {
+            getNotification(editableUserId, districtUpdateNotificationKey);
+          }
+
           telemetryCallbacks(telemetryUpdateKey);
           UpdateSuccessCallback();
         } else {
@@ -371,6 +419,9 @@ const AddEditUser = ({
             if (payload?.email == '') {
               delete payload.email;
             }
+          }
+          if (isUnderEighteen(payload?.dob) && type == 'learner') {
+            payload.mobile = formData?.parent_phone;
           }
           const responseUserData = await createUser(payload, t);
 
@@ -579,6 +630,7 @@ const AddEditUser = ({
               extraFields={
                 isEdit || isReassign ? extraFieldsUpdate : extraFields
               }
+              type={type=="learner"? type: ""}
             />
           </>
         )

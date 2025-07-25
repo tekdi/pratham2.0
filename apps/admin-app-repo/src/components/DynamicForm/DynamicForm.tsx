@@ -1,5 +1,9 @@
 // @ts-nocheck
-import React, { useState, useEffect, useRef } from 'react';
+import React, {  useImperativeHandle,
+  forwardRef,
+  useState,
+  useEffect,
+  useRef,} from 'react';
 import Form from '@rjsf/mui';
 import validator from '@rjsf/validator-ajv8';
 import axios from 'axios';
@@ -21,7 +25,7 @@ import {
   transformLabel,
 } from '@/utils/Helper';
 
-const DynamicForm = ({
+const DynamicForm = forwardRef(({
   schema,
   uiSchema,
   SubmitaFunction,
@@ -30,7 +34,7 @@ const DynamicForm = ({
   FormSubmitFunction,
   extraFields,
   hideSubmit,
-}: any) => {
+}: any, ref) => {
   const { t } = useTranslation();
 
   const [submitted, setSubmitted] = useState(false);
@@ -108,7 +112,12 @@ const DynamicForm = ({
     CustomRadioWidget,
     CustomTextFieldWidget,
   };
-
+useImperativeHandle(ref, () => ({
+    resetForm: (newFormData) => {
+      setFormData(newFormData);
+      handleChange({ formData: newFormData });
+    },
+  }));
   useEffect(() => {
     if (isInitialCompleted === true) {
       // setFormData;
@@ -1314,7 +1323,7 @@ const DynamicForm = ({
       )}
     </>
   );
-};
+});
 
 export default DynamicForm;
 

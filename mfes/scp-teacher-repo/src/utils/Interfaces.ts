@@ -91,6 +91,7 @@ export interface CohortListParam {
 export interface CohortMemberList {
   limit?: number;
   page?: number;
+  offset?: number;
   filters: {
     cohortId: string;
     role?: string;
@@ -723,6 +724,8 @@ export interface GetUserProjectTemplateParams {
   solutionId: string;
   role: string;
   cohortId?: string;
+  entityId?: any;
+  acl?: any;
 }
 
 export interface HorizontalLinearStepperProps {

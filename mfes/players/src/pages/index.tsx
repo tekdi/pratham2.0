@@ -29,12 +29,19 @@ const Players: React.FC<SunbirdPlayerProps> = ({
   playerConfig: propPlayerConfig,
 }) => {
   const router = useRouter();
-  const queryIdentifier = router.query.identifier as string; // Get identifier from the query
+  const {
+    courseId,
+    unitId,
+    userId,
+    identifier: queryIdentifier,
+  } = router.query ?? {}; // Get identifier from the query
   const identifier = propIdentifier || queryIdentifier; // Prefer prop over query
   const [playerConfig, setPlayerConfig] = useState<PlayerConfig | undefined>(
     propPlayerConfig
   );
   const [loading, setLoading] = useState(!propPlayerConfig);
+  const [isGenerateCertificate, setIsGenerateCertificate] = useState(true);
+  const [trackable, setTrackable] = useState(true);
 
   useEffect(() => {
     if (playerConfig || !identifier) return;
@@ -42,6 +49,10 @@ const Players: React.FC<SunbirdPlayerProps> = ({
     const loadContent = async () => {
       setLoading(true);
       try {
+        const name = window.name;
+        const jsonParse = name ? JSON.parse(name) : {};
+        setIsGenerateCertificate(jsonParse.generateCertificate ?? true);
+        setTrackable(jsonParse.trackable ?? true);
         const data = await fetchContent(identifier);
         let config: PlayerConfig;
 
@@ -52,7 +63,7 @@ const Players: React.FC<SunbirdPlayerProps> = ({
           const metadata = { ...Q1?.questionset, ...Q2?.questionset };
           config.metadata = metadata;
         } else if (MIME_TYPE.INTERACTIVE_MIME_TYPE.includes(data?.mimeType)) {
-          config = { ...V1PlayerConfig, metadata: data };
+          config = { ...V1PlayerConfig, metadata: data, data: data.body || {} };
           //@ts-ignore
           config.context['contentId'] = identifier;
         } else {
@@ -97,14 +108,20 @@ const Players: React.FC<SunbirdPlayerProps> = ({
           <Loader showBackdrop={false} />
         </Box>
       ) : (
-        <Box marginTop="1rem" px="14px">
+        <Box sx={{ height: 'calc(100vh - 16px)' }}>
           {/* <Typography
             color="#024f9d"
             sx={{ padding: '0 0 4px 4px', fontWeight: 'bold' }}
           >
             {playerConfig?.metadata?.name || 'Loading...'}
           </Typography> */}
-          <SunbirdPlayers player-config={playerConfig} />
+          <SunbirdPlayers
+            player-config={playerConfig}
+            courseId={courseId as string}
+            unitId={unitId as string}
+            userId={userId as string}
+            configFunctionality={{ isGenerateCertificate, trackable }}
+          />
         </Box>
       )}
     </Box>

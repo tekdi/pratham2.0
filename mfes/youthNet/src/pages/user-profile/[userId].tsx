@@ -21,10 +21,10 @@ import {
   updateUser,
 } from '../../services/youthNet/Dashboard/UserServices';
 import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
-import { FormContext } from 'apps/admin-app-repo/src/components/DynamicForm/DynamicFormConstant';
-import { fetchForm } from 'apps/admin-app-repo/src/components/DynamicForm/DynamicFormCallback';
+import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
+import { FormContext } from '@shared-lib-v2/DynamicForm/components/DynamicFormConstant';
+import { fetchForm } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import SimpleModal from '../../components/SimpleModal';
-import DynamicForm from 'apps/admin-app-repo/src/components/DynamicForm/DynamicForm';
 import { showToastMessage } from '@/components/Toastify';
 
 const UserId = () => {
@@ -386,12 +386,13 @@ const UserId = () => {
         showFooter={true}
         modalTitle={'New Mentor'}
         //  handleNext={FormSubmitFunction}
-        primaryText={'submit'}
+        primaryText={'Submit'}
         id="dynamic-form-id"
         // secondaryText={count === 1 ? 'Save Progress' : ''}
       >
         {schema && uiSchema && (
           <DynamicForm
+            hideSubmit={true}
             schema={schema}
             uiSchema={uiSchema}
             FormSubmitFunction={FormSubmitFunction}
