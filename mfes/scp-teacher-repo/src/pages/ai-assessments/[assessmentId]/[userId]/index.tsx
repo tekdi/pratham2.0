@@ -588,6 +588,27 @@ const AssessmentDetails = () => {
   const handleSaveScore = async () => {
     if (!selectedQuestion || !assessmentTrackingData) return;
 
+    // Validate that the score is not negative
+    const scoreValue = Number(editScore);
+    if (scoreValue < 0) {
+      setSnackbar({
+        open: true,
+        message: 'Marks cannot be negative. Please enter a valid score.',
+        severity: 'error',
+      });
+      return;
+    }
+
+    // Validate that the score doesn't exceed maximum marks
+    if (scoreValue > selectedQuestion.maxScore) {
+      setSnackbar({
+        open: true,
+        message: `Marks cannot exceed maximum marks (${selectedQuestion.maxScore}).`,
+        severity: 'error',
+      });
+      return;
+    }
+
     try {
       setEditLoading(true);
 
@@ -1199,9 +1220,10 @@ const AssessmentDetails = () => {
                 value={editScore}
                 onChange={(e) => {
                   const value = e.target.value;
+                  const numValue = Number(value);
                   if (
                     selectedQuestion &&
-                    Number(value) <= selectedQuestion.maxScore
+                    numValue <= selectedQuestion.maxScore
                   ) {
                     setEditScore(value);
                   }
@@ -1212,7 +1234,12 @@ const AssessmentDetails = () => {
                   min: 0,
                   max: selectedQuestion?.maxScore || 0,
                 }}
-                helperText={`Maximum marks: ${selectedQuestion?.maxScore || 0}`}
+                helperText={
+                  Number(editScore) < 0
+                    ? 'Negative marks are not allowed'
+                    : `Maximum marks: ${selectedQuestion?.maxScore || 0}`
+                }
+                error={Number(editScore) < 0}
                 disabled={editLoading || assessmentData?.status === 'Approved'}
               />
             </>
