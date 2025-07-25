@@ -62,7 +62,9 @@ const getReqBodyWithStatus = (
   channel: string,
   contentType?: string,
   state?: string,
+  filters?: any // <-- Add this line
 ) => {
+  console.log("contentType", contentType)
   if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
     var PrimaryCategory =
       JSON.parse(localStorage.getItem("PrimaryCategory") as string) ||
@@ -70,7 +72,38 @@ const getReqBodyWithStatus = (
   }
   primaryCategory =
     primaryCategory.length === 0 ? PrimaryCategory : primaryCategory;
-  if (contentType === "discover-contents") {
+  // Merge custom filters into filters object
+  const extraFilters = filters ? { ...filters } : {};
+
+  if (contentType === "content-library") {
+  // console.log("upForReviewReqBody", upForReviewReqBody)
+    const userRole = getLocalStoredUserRole();
+     primaryCategory=["Learning Resource"]
+         console.log("PrimaryCategory", PrimaryCategory)
+
+      console.log("upForReviewReqBody", upForReviewReqBody)
+      return {
+        ...upForReviewReqBody,
+        request: {
+          ...upForReviewReqBody.request,
+          filters: {
+            ...upForReviewReqBody.request.filters,
+            status,
+            primaryCategory,
+            state: state,
+            ...extraFilters, // <-- Merge here
+          },
+
+          query,
+          limit,
+          offset,
+          sort_by,
+        },
+    }
+
+  
+  }
+ else if (contentType === "discover-contents") {
     const userRole = getLocalStoredUserRole();
 
     if (state) {
@@ -103,7 +136,8 @@ const getReqBodyWithStatus = (
           status,
           primaryCategory,
           createdBy: { "!=": getLocalStoredUserId() },
-          channel: channel
+          channel: channel,
+          ...extraFilters // <-- Merge here
         },
 
         query,
@@ -112,7 +146,9 @@ const getReqBodyWithStatus = (
         sort_by,
       },
     };
-  } else if (contentType === "upReview") {
+  }
+  
+  else if (contentType === "upReview") {
     return {
       ...upForReviewReqBody,
       request: {
@@ -121,7 +157,8 @@ const getReqBodyWithStatus = (
           ...upForReviewReqBody.request.filters,
           status,
           primaryCategory,
-          channel: channel
+          channel: channel,
+          ...extraFilters // <-- Merge here
         },
         query,
         limit,
@@ -139,7 +176,8 @@ const getReqBodyWithStatus = (
         ...defaultReqBody.request.filters,
         status,
         primaryCategory,
-        channel: channel
+        channel: channel,
+        ...extraFilters, // <-- Merge here
       },
       query,
       limit,
@@ -156,9 +194,11 @@ export const getContent = async (
   offset: number,
   primaryCategory: string[],
   sort_by: any,
-  channel: any,
+  channel?: any,
   contentType?: string,
-  state?: string
+  state?: string,
+  // program?: any[],
+  filters?: any // <-- Add this line
 ) => {
   const apiURL = "/action/composite/v3/search";
   try {
@@ -171,8 +211,10 @@ export const getContent = async (
       sort_by,
       channel,
       contentType,
-      state
+      state,
+      filters // <-- Pass filters here
     );
+    console.log("reqBody", reqBody);
     const response = await post(apiURL, reqBody);
     return response?.data?.result;
   } catch (error) {
@@ -348,6 +390,38 @@ export const getFormFields = async (): Promise<any> => {
       },
     });
     return response?.data;
+  } catch (error) {
+    console.error("Error in getting Framework Details", error);
+    return error;
+  }
+};
+
+export const getfilterList = async (): Promise<any> => {
+  const apiUrl: string = `/action/data/v1/form/read`;
+
+  try {
+    const response = await post(apiUrl, {
+      request: {
+        action: "review",
+        subType: "resource",
+      },
+    });
+    return response?.data?.result?.form?.data?.fields;
+    
+
+  } catch (error) {
+    console.error("Error in getting Framework Details", error);
+    return error;
+  }
+};
+export const getPosFrameworkList = async (): Promise<any> => {
+  const apiUrl: string = `/api/framework/v1/read/pos-framework`;
+
+  try {
+    const response = await get(apiUrl );
+    return response?.data?.result?.framework?.categories;
+    
+
   } catch (error) {
     console.error("Error in getting Framework Details", error);
     return error;

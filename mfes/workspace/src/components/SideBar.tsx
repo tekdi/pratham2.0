@@ -93,16 +93,23 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
       key: 'discover-contents',
       icon: <ManageSearchIcon />,
     },
+     {
+      text: 'Content Library',
+      key: 'content-library',
+      icon: <ManageSearchIcon />,
+    },
   ];
 
   const handleNavigation = (key: string) => {
-    console.log(key);
+    // Clear filter retention if navigating away from content-library
+    if (key !== 'content-library') {
+      localStorage.removeItem('contentLibraryFilters');
+      localStorage.removeItem('contentLibrarySelectedNames');
+    }
     router.push(`/workspace/content/${key}`);
     localStorage.setItem('selectedFilters', JSON.stringify([]));
     onSelect(key);
-    if (isMobile) {
-      setDrawerOpen(false); // Close drawer after selecting in mobile view
-    }
+    if (isMobile) setDrawerOpen(false);
   };
 
   const toggleDrawer = () => {
