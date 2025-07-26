@@ -93,7 +93,7 @@ type SortOption =
 
 // Status mapping for labels
 const statusMapping = {
-  'AI Pending': 'Under AI Evaluation',
+  'AI Pending': 'Under Evaluation',
   'AI Processed': 'Awaiting Your Approval',
   Approved: 'Marks Approved',
 };
@@ -112,7 +112,7 @@ export const getStatusIcon = (status: string) => {
     case 'in_progress':
       return <MoreHorizIcon sx={{ color: '#FF9800', fontSize: 24 }} />;
     case 'awaiting_approval':
-      return <ErrorIcon sx={{ color: '#FF5722', fontSize: 24 }} />;
+      return <ErrorIcon sx={{ color: '#2196F3', fontSize: 24 }} />;
     case 'not_started':
       return <RemoveIcon sx={{ color: '#9E9E9E', fontSize: 24 }} />;
     default:
