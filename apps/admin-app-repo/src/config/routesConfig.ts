@@ -19,6 +19,7 @@ export const ROLE_BASED_ROUTES = {
       '/notification-templates/create',
       '/notification-templates/update/[identifier]',
       '/edit-password',
+      '/subjectDetails', '/importCsv', '/edit-password', '/resourceList', '/csvDetails', '/csvList', '/play'
     ],
     [Role.CCTA]: ['/subjectDetails', '/importCsv', '/edit-password', '/resourceList', '/csvDetails', '/csvList', '/play'],
     [Role.SCTA]: ['/subjectDetails', '/importCsv ', '/edit-password', '/resourceList', '/csvDetails', '/csvList', '/play'],

@@ -22,26 +22,26 @@ export const Footer: React.FC = () => {
       label: t('Pratham'),
       href: 'https://www.pratham.org/',
     },
-    {
-      label: t('Our Interns'),
-      href: 'https://prathamopenschool.org/Team/Interns',
-    },
-    {
-      label: t('PraDigi Creativity Club'),
-      href: 'https://www.pradigi.org/creative-club/',
-    },
-    {
-      label: t('Community Projects'),
-      href: 'https://prathamopenschool.org/CommunityProjects/Contents/Pradigicp',
-    },
-    {
-      label: t('Covid-19 Resources'),
-      href: 'https://prathamopenschool.org/Covid19Resources',
-    },
-    {
-      label: t('Mohalla Learning Camp'),
-      href: 'https://prathamopenschool.org/MohallaLearningCamp/Contents/mohallalc',
-    },
+    // {
+    //   label: t('Our Interns'),
+    //   href: 'https://prathamopenschool.org/Team/Interns',
+    // },
+    // {
+    //   label: t('PraDigi Creativity Club'),
+    //   href: 'https://www.pradigi.org/creative-club/',
+    // },
+    // {
+    //   label: t('Community Projects'),
+    //   href: 'https://prathamopenschool.org/CommunityProjects/Contents/Pradigicp',
+    // },
+    // {
+    //   label: t('Covid-19 Resources'),
+    //   href: 'https://prathamopenschool.org/Covid19Resources',
+    // },
+    // {
+    //   label: t('Mohalla Learning Camp'),
+    //   href: 'https://prathamopenschool.org/MohallaLearningCamp/Contents/mohallalc',
+    // },
   ];
 
   return (
