@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
-import FilterIcon from '@mui/icons-material/Filter';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { UploadOptionsPopupProps, UploadedImage } from './types';
@@ -23,6 +23,7 @@ import {
   dataUrlToFile,
 } from '../../services/FileUploadService';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 
 const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
   isOpen,
@@ -39,7 +40,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [isInstructionsExpanded, setIsInstructionsExpanded] = useState(true);
+  const [isInstructionsExpanded, setIsInstructionsExpanded] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Toast state
@@ -75,8 +76,8 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
     if (!files || files.length === 0) return;
 
     // Check if adding new files would exceed the limit
-    if (uploadedImages.length + files.length > 4) {
-      showToast('You can only upload up to 4 images', 'warning');
+    if (uploadedImages.length + files.length > 6) {
+      showToast('You can only upload up to 6 images', 'warning');
       return;
     }
 
@@ -91,16 +92,19 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
 
       for (const file of fileArray) {
         // Validate file type
-        const allowedTypes = ['image/jpeg', 'image/jpg'];
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
         if (!allowedTypes.includes(file.type)) {
-          showToast('Please select valid image files (jpg, jpeg)', 'error');
+          showToast(
+            'Please select valid image files (jpg, jpeg, png)',
+            'error'
+          );
           continue;
         }
 
-        // Validate file size (5MB)
-        const maxSize = 5 * 1024 * 1024;
+        // Validate file size (50MB)
+        const maxSize = 50 * 1024 * 1024;
         if (file.size > maxSize) {
-          showToast(`File ${file.name} exceeds 5MB limit`, 'error');
+          showToast(`File ${file.name} exceeds 50MB limit`, 'error');
           continue;
         }
 
@@ -239,11 +243,11 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
         <Box
           sx={{
             width: {
-              xs: 340,
-              sm: 350,
-              md: 400,
-              lg: 450,
-              xl: 520,
+              xs: 380,
+              sm: 420,
+              md: 480,
+              lg: 740,
+              xl: 800,
             },
             bgcolor: '#FFFFFF',
             borderRadius: '16px',
@@ -261,553 +265,334 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              padding: '12px 12px 12px 16px',
+              padding: '20px 24px 16px 24px',
             }}
           >
-            <Box sx={{ padding: '12px 0px 0px' }}>
-              <Typography
-                sx={{
-                  color: '#4D4639',
-                }}
-              >
-                Submit Answers for AI Evaluation
-              </Typography>
-            </Box>
-            <Box
+            <Typography
               sx={{
-                width: 48,
-                height: 48,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
+                fontSize: '20px',
+                fontWeight: 600,
+                color: '#4D4639',
               }}
             >
-              <Box
+              Assessment Sheets
+            </Typography>
+            <IconButton
+              onClick={onClose}
+              sx={{
+                width: 32,
+                height: 32,
+                padding: '4px',
+                '&:hover': {
+                  backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                },
+              }}
+            >
+              <CloseIcon
                 sx={{
-                  borderRadius: '100px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  width: 20,
+                  height: 20,
+                  color: '#4D4639',
                 }}
-              >
-                <IconButton
-                  onClick={onClose}
-                  sx={{
-                    width: 40,
-                    height: 40,
-                    padding: '8px',
-                    '&:hover': {
-                      backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                    },
-                  }}
-                >
-                  <CloseIcon
-                    sx={{
-                      width: 24,
-                      height: 24,
-                      color: '#4D4639',
-                    }}
-                  />
-                </IconButton>
-              </Box>
-            </Box>
+              />
+            </IconButton>
           </Box>
 
-          {/* Divider */}
-          <Divider
-            sx={{
-              borderColor: '#D0C5B4',
-              borderWidth: '1px',
-            }}
-          />
+          <Divider sx={{ mb: 2 }} />
+
+          {/* Format Info */}
+          <Box sx={{ padding: '0 24px 16px 24px' }}>
+            <Typography
+              sx={{
+                fontSize: '14px',
+                color: '#666666',
+                fontWeight: 400,
+              }}
+            >
+              * Formats: jpg, png. upto 50MB
+            </Typography>
+          </Box>
 
           {/* Content */}
           <Box
             sx={{
-              padding: '24px 16px',
+              padding: '0 24px 24px 24px',
               display: 'flex',
               flexDirection: 'column',
-              alignItems: 'center',
-              gap: '16px',
-              width: '100%',
-              minHeight: 472,
-              height: '100%',
-              maxHeight: '80vh',
+              gap: '20px',
+              flex: 1,
               overflowY: 'auto',
             }}
           >
+            {/* Upload Buttons */}
             <Box
               sx={{
                 display: 'flex',
-                flexDirection: 'column',
                 gap: '16px',
-                width: '100%',
+                justifyContent: 'center',
               }}
             >
-              {/* Upload Options */}
-              <Box
+              {/* Take Photo Button */}
+              <Button
+                onClick={!isUploading ? handleTakePhoto : undefined}
+                disabled={isUploading}
+                variant="outlined"
+                startIcon={<PhotoCameraIcon />}
                 sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '8px',
-                  width: '100%',
+                  minWidth: '140px',
+                  height: '48px',
+                  border: '1px solid #D0C5B4',
+                  borderRadius: '8px',
+                  color: '#4D4639',
+                  textTransform: 'none',
+                  fontWeight: 500,
+                  fontSize: '14px',
+                  '&:hover': {
+                    borderColor: '#4D4639',
+                    backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                  },
+                  '&:disabled': {
+                    opacity: 0.6,
+                  },
                 }}
               >
-                {/* Upload Buttons */}
-                <Box
-                  sx={{
-                    display: 'flex',
-                    gap: {
-                      xs: '16px',
-                      sm: '20px',
-                      md: '24px',
-                    },
-                    width: '100%',
-                    justifyContent: 'center',
-                  }}
-                >
-                  {/* Take Photo Button */}
-                  <Box
-                    onClick={!isUploading ? handleTakePhoto : undefined}
+                {isUploading ? 'Uploading...' : 'Take A Photo'}
+              </Button>
+
+              {/* Upload Photo Button */}
+              <Button
+                onClick={!isUploading ? handleChooseFromGallery : undefined}
+                disabled={isUploading}
+                variant="outlined"
+                startIcon={<CloudUploadIcon />}
+                sx={{
+                  minWidth: '140px',
+                  height: '48px',
+                  border: '1px solid #D0C5B4',
+                  borderRadius: '8px',
+                  color: '#4D4639',
+                  textTransform: 'none',
+                  fontWeight: 500,
+                  fontSize: '14px',
+                  '&:hover': {
+                    borderColor: '#4D4639',
+                    backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                  },
+                  '&:disabled': {
+                    opacity: 0.6,
+                  },
+                }}
+              >
+                {isUploading ? 'Uploading...' : 'Upload A Photo'}
+              </Button>
+            </Box>
+
+            {/* Guidelines Section */}
+            <Box
+              sx={{
+                backgroundColor: '#F8F8F8',
+                borderRadius: '8px',
+                padding: '16px',
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: '14px',
+                  lineHeight: '20px',
+                  color: '#4D4639',
+                  marginBottom: '8px',
+                }}
+              >
+                • Place the piece of paper on a flat, clean surface
+              </Typography>
+              <Typography
+                sx={{
+                  fontSize: '14px',
+                  lineHeight: '20px',
+                  color: '#4D4639',
+                  marginBottom: '8px',
+                }}
+              >
+                • Hold the phone straight above the piece of paper
+              </Typography>
+              <Typography
+                sx={{
+                  fontSize: '14px',
+                  lineHeight: '20px',
+                  color: '#4D4639',
+                  marginBottom: '8px',
+                }}
+              >
+                • Ensure good lighting and avoid shadows or glare
+              </Typography>
+              <Typography
+                sx={{
+                  fontSize: '14px',
+                  lineHeight: '20px',
+                  color: '#4D4639',
+                  marginBottom: '8px',
+                }}
+              >
+                • Ensure all text is clear and fully visible
+              </Typography>
+
+              {isInstructionsExpanded && (
+                <>
+                  <Typography
                     sx={{
-                      width: 140,
-                      height: 104,
-                      border: '1px solid #D0C5B4',
-                      borderRadius: '12px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      padding: '10px 24px 10px 16px',
-                      cursor: isUploading ? 'not-allowed' : 'pointer',
-                      opacity: isUploading ? 0.6 : 1,
-                      '&:hover': {
-                        backgroundColor: !isUploading
-                          ? 'rgba(0, 0, 0, 0.04)'
-                          : 'transparent',
-                      },
+                      fontSize: '14px',
+                      lineHeight: '20px',
+                      color: '#4D4639',
+                      marginBottom: '8px',
                     }}
                   >
-                    <Box
-                      sx={{
-                        width: 32,
-                        height: 32,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <PhotoCameraIcon
-                        sx={{
-                          width: 26.67,
-                          height: 24,
-                          color: '#1C1B1F',
-                        }}
-                      />
-                    </Box>
-                    <Typography
-                      sx={{
-                        fontWeight: 500,
-                        fontSize: '14px',
-                        lineHeight: '20px',
-                        letterSpacing: '0.1px',
-                        textAlign: 'center',
-                        color: '#7C766F',
-                      }}
-                    >
-                      {isUploading ? 'Uploading...' : 'Take Photo'}
-                    </Typography>
-                  </Box>
-
-                  {/* Choose from Gallery Button */}
-                  <Box
-                    onClick={!isUploading ? handleChooseFromGallery : undefined}
+                    • Click an image and upload to the portal
+                  </Typography>
+                  <Typography
                     sx={{
-                      width: 140,
-                      height: 104,
-                      border: '1px solid #D0C5B4',
-                      borderRadius: '12px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      padding: '10px 24px 10px 16px',
-                      cursor: isUploading ? 'not-allowed' : 'pointer',
-                      opacity: isUploading ? 0.6 : 1,
-                      '&:hover': {
-                        backgroundColor: !isUploading
-                          ? 'rgba(0, 0, 0, 0.04)'
-                          : 'transparent',
-                      },
+                      fontSize: '14px',
+                      lineHeight: '20px',
+                      color: '#4D4639',
+                      marginBottom: '8px',
                     }}
                   >
-                    <Box
-                      sx={{
-                        width: 32,
-                        height: 32,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <FilterIcon
-                        sx={{
-                          width: 26.67,
-                          height: 26.67,
-                          color: '#1C1B1F',
-                        }}
-                      />
-                    </Box>
-                    <Typography
-                      sx={{
-                        fontWeight: 500,
-                        fontSize: '14px',
-                        lineHeight: '20px',
-                        letterSpacing: '0.1px',
-                        textAlign: 'center',
-                        color: '#7C766F',
-                      }}
-                    >
-                      {isUploading ? 'Uploading...' : 'Choose from Gallery'}
-                    </Typography>
-                  </Box>
-                </Box>
+                    • If the answer sheet has multiple pages, take a picture of
+                    each page separately and upload
+                  </Typography>
+                </>
+              )}
 
-                {/* Format Info */}
-                <Typography
-                  sx={{
-                    fontWeight: 400,
-                    fontSize: '14px',
-                    lineHeight: '20px',
-                    letterSpacing: '0.25px',
-                    textAlign: 'center',
-                    color: '#5F5E5E',
-                  }}
-                >
-                  Format: jpg, size: 50 MB{'\n'}
-                  Up to 4 images
-                </Typography>
+              <Button
+                onClick={() =>
+                  setIsInstructionsExpanded(!isInstructionsExpanded)
+                }
+                sx={{
+                  textTransform: 'none',
+                  color: '#FDBE16',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  padding: 0,
+                  minWidth: 'auto',
+                  '&:hover': {
+                    backgroundColor: 'transparent',
+                    textDecoration: 'underline',
+                  },
+                }}
+              >
+                {isInstructionsExpanded ? 'Read Less' : 'Read More'}
+              </Button>
+            </Box>
 
-                {/* Submission Instructions Accordion */}
-                <Box
-                  sx={{
-                    backgroundColor: '#FFF8E1',
-                    borderRadius: '12px',
-                    padding: '16px',
-                    width: '100%',
-                  }}
-                >
+            {/* Uploaded Files List */}
+            {uploadedImages.length > 0 && (
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                  gap: '12px',
+                }}
+              >
+                {uploadedImages.map((image) => (
                   <Box
-                    onClick={() =>
-                      setIsInstructionsExpanded(!isInstructionsExpanded)
-                    }
+                    key={image.id}
                     sx={{
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      cursor: 'pointer',
-                      marginBottom: isInstructionsExpanded ? '12px' : 0,
+                      padding: '12px',
+                      border: '1px solid #E0E0E0',
+                      borderRadius: '8px',
+                      backgroundColor: '#FAFAFA',
                     }}
                   >
-                    <Typography
-                      sx={{
-                        fontWeight: 600,
-                        fontSize: '14px',
-                        lineHeight: '20px',
-                        color: '#4D4639',
-                      }}
-                    >
-                      SUBMISSION INSTRUCTIONS:
-                    </Typography>
-                    {isInstructionsExpanded ? (
-                      <ExpandLessIcon
-                        sx={{
-                          color: '#4D4639',
-                          fontSize: '20px',
-                        }}
-                      />
-                    ) : (
-                      <ExpandMoreIcon
-                        sx={{
-                          color: '#4D4639',
-                          fontSize: '20px',
-                        }}
-                      />
-                    )}
-                  </Box>
-
-                  {isInstructionsExpanded && (
                     <Box
                       sx={{
                         display: 'flex',
-                        flexDirection: 'column',
+                        alignItems: 'center',
                         gap: '8px',
+                        cursor: 'pointer',
+                        flex: 1,
                       }}
+                      onClick={() => setSelectedImage(image.url)}
                     >
+                      <InsertDriveFileIcon
+                        sx={{
+                          color: '#666666',
+                          fontSize: '20px',
+                        }}
+                      />
                       <Typography
                         sx={{
                           fontSize: '14px',
-                          lineHeight: '20px',
                           color: '#4D4639',
-                          '&::before': {
-                            content: '"• "',
-                            fontWeight: 'bold',
-                          },
+                          fontWeight: 500,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
                         }}
                       >
-                        Place the piece of paper on a flat, clean surface
-                      </Typography>
-                      <Typography
-                        sx={{
-                          fontSize: '14px',
-                          lineHeight: '20px',
-                          color: '#4D4639',
-                          '&::before': {
-                            content: '"• "',
-                            fontWeight: 'bold',
-                          },
-                        }}
-                      >
-                        Hold the phone straight above the piece of paper
-                      </Typography>
-                      <Typography
-                        sx={{
-                          fontSize: '14px',
-                          lineHeight: '20px',
-                          color: '#4D4639',
-                          '&::before': {
-                            content: '"• "',
-                            fontWeight: 'bold',
-                          },
-                        }}
-                      >
-                        Ensure good lighting and avoid shadows or glare
-                      </Typography>
-                      <Typography
-                        sx={{
-                          fontSize: '14px',
-                          lineHeight: '20px',
-                          color: '#4D4639',
-                          '&::before': {
-                            content: '"• "',
-                            fontWeight: 'bold',
-                          },
-                        }}
-                      >
-                        Ensure all text is clear and fully visible
-                      </Typography>
-                      <Typography
-                        sx={{
-                          fontSize: '14px',
-                          lineHeight: '20px',
-                          color: '#4D4639',
-                          '&::before': {
-                            content: '"• "',
-                            fontWeight: 'bold',
-                          },
-                        }}
-                      >
-                        Click an image and upload to the portal
-                      </Typography>
-                      <Typography
-                        sx={{
-                          fontSize: '14px',
-                          lineHeight: '20px',
-                          color: '#4D4639',
-                          '&::before': {
-                            content: '"• "',
-                            fontWeight: 'bold',
-                          },
-                        }}
-                      >
-                        If the answer sheet has multiple pages, take a picture
-                        of each page separately and upload
+                        {image.name}
                       </Typography>
                     </Box>
-                  )}
-                </Box>
-
-                {/* Uploaded Images List */}
-                {uploadedImages.length > 0 && (
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '8px',
-                      width: '100%',
-                    }}
-                  >
-                    {uploadedImages.map((image) => (
-                      <Box
-                        key={image.id}
+                    <IconButton
+                      onClick={() => handleRemoveImage(image.id)}
+                      sx={{
+                        padding: '4px',
+                        '&:hover': {
+                          backgroundColor: 'rgba(186, 26, 26, 0.1)',
+                        },
+                      }}
+                    >
+                      <DeleteOutlineIcon
                         sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          gap: '16px',
-                          padding: '16px',
-                          border: '1px solid #DBDBDB',
-                          borderRadius: '16px',
-                          width: '100%',
+                          color: '#BA1A1A',
+                          fontSize: '20px',
                         }}
-                      >
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            cursor: 'pointer',
-                          }}
-                          onClick={() => setSelectedImage(image.url)}
-                        >
-                          <Box
-                            sx={{
-                              width: 24,
-                              height: 24,
-                              borderRadius: '4px',
-                              backgroundImage: `url(${
-                                image.previewUrl || image.url
-                              })`,
-                              backgroundSize: 'cover',
-                              backgroundPosition: 'center',
-                              cursor: 'pointer',
-                              '&:hover': {
-                                opacity: 0.8,
-                              },
-                            }}
-                          />
-                          <Typography
-                            sx={{
-                              fontFamily: 'Poppins',
-                              fontWeight: 500,
-                              fontSize: '14px',
-                              lineHeight: '1.43em',
-                              letterSpacing: '0.1px',
-                              color: '#1F1B13',
-                              maxWidth: '180px',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap',
-                            }}
-                          >
-                            {image.name}
-                          </Typography>
-                        </Box>
-                        <IconButton
-                          onClick={() => handleRemoveImage(image.id)}
-                          sx={{
-                            padding: 0,
-                            '&:hover': {
-                              backgroundColor: 'transparent',
-                              opacity: 0.8,
-                            },
-                          }}
-                        >
-                          <DeleteOutlineIcon
-                            sx={{
-                              color: '#BA1A1A',
-                              fontSize: '25px',
-                            }}
-                          />
-                        </IconButton>
-                      </Box>
-                    ))}
+                      />
+                    </IconButton>
                   </Box>
-                )}
+                ))}
               </Box>
-            </Box>
+            )}
           </Box>
 
           {/* Actions */}
           <Box
             sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              width: '100%',
+              padding: '16px 24px 24px 24px',
+              borderTop: '1px solid #E0E0E0',
             }}
           >
-            {/* Horizontal Divider */}
-            <Divider
+            <Button
+              onClick={handleStartAIEvaluation}
+              disabled={
+                isSubmitting || isUploading || uploadedImages.length === 0
+              }
+              variant="contained"
               sx={{
                 width: '100%',
-                borderColor: '#D0C5B4',
-                borderWidth: '1px',
-              }}
-            />
-            {/* Button Container */}
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                padding: '16px 24px',
-                width: '100%',
+                height: '48px',
+                backgroundColor: '#FDBE16',
+                borderRadius: '8px',
+                textTransform: 'none',
+                fontWeight: 600,
+                fontSize: '16px',
+                color: '#4D4639',
+                '&:hover': {
+                  backgroundColor: '#E6A800',
+                },
+                '&:disabled': {
+                  backgroundColor: '#D0C5B4',
+                  color: '#8D8D8D',
+                },
               }}
             >
-              <Button
-                onClick={handleStartAIEvaluation}
-                disabled={
-                  isSubmitting || isUploading || uploadedImages.length === 0
-                }
-                sx={{
-                  width: 288,
-                  height: 40,
-                  backgroundColor:
-                    uploadedImages.length > 0 && !isUploading
-                      ? '#FDBE16'
-                      : '#D0C5B4',
-                  borderRadius: '100px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '10px 24px',
-                  '&:hover': {
-                    backgroundColor:
-                      uploadedImages.length > 0 && !isUploading
-                        ? '#FDBE16'
-                        : '#D0C5B4',
-                    opacity:
-                      uploadedImages.length > 0 && !isUploading ? 0.9 : 1,
-                  },
-                  '&:active': {
-                    backgroundColor:
-                      uploadedImages.length > 0 && !isUploading
-                        ? '#FDBE16'
-                        : '#D0C5B4',
-                    opacity:
-                      uploadedImages.length > 0 && !isUploading ? 0.8 : 1,
-                  },
-                  '&:disabled': {
-                    backgroundColor: '#D0C5B4',
-                    cursor: 'not-allowed',
-                  },
-                }}
-              >
-                <Typography
-                  sx={{
-                    fontWeight: 500,
-                    fontSize: '14px',
-                    lineHeight: '20px',
-                    letterSpacing: '0.1px',
-                    color:
-                      uploadedImages.length > 0 && !isUploading
-                        ? '#4D4639'
-                        : '#8D8D8D',
-                    textTransform: 'none',
-                  }}
-                >
-                  {isSubmitting
-                    ? 'Submitting...'
-                    : isUploading
-                    ? 'Uploading Files...'
-                    : 'Submit for Review'}
-                </Typography>
-              </Button>
-            </Box>
+              {isSubmitting
+                ? 'Submitting...'
+                : isUploading
+                ? 'Uploading Files...'
+                : 'Save and Upload'}
+            </Button>
           </Box>
         </Box>
       </Modal>
@@ -817,7 +602,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
         type="file"
         ref={fileInputRef}
         onChange={handleFileSelect}
-        accept="image/jpeg,image/jpg"
+        accept="image/jpeg,image/jpg,image/png"
         multiple
         style={{ display: 'none' }}
       />
