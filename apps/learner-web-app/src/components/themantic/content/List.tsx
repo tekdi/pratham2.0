@@ -255,6 +255,7 @@ export const CardComponent = ({
   minHeight,
   textTransform,
   titleColor,
+  _card,
 }: {
   item: any;
   default_img: any;
@@ -265,7 +266,14 @@ export const CardComponent = ({
   minHeight?: string;
   textTransform?: string;
   titleColor?: string;
+  _card?: any;
 }) => {
+  // Extract styling props from _card object if they exist
+  const finalTitleFontSize = titleFontSize || _card?.titleFontSize;
+  const finalFontWeight = fontWeight || _card?.fontWeight;
+  const finalMinHeight = minHeight || _card?.minHeight;
+  const finalTextTransform = textTransform || _card?.textTransform;
+  const finalTitleColor = titleColor || _card?.titleColor;
   const onClick = (id: string) => {
     if (handleCardClick) {
       handleCardClick(id);
@@ -282,7 +290,7 @@ export const CardComponent = ({
         transition: 'transform 0.2s ease-in-out',
         boxShadow: '0 0.15rem 1.75rem 0 rgba(33, 40, 50, 0.15)',
         border: '1px solid rgba(0, 0, 0, .125)',
-        minHeight: minHeight || '317px',
+        minHeight: finalMinHeight || '317px',
         borderRadius: '.25rem',
         '&:hover': {
           transform: 'scale(1.02)',
@@ -315,11 +323,11 @@ export const CardComponent = ({
         <Typography
           variant="h6"
           sx={{
-            fontWeight: fontWeight || 400,
+            fontWeight: finalFontWeight || 400,
             textAlign: 'center',
-            fontSize: titleFontSize || '16px',
+            fontSize: finalTitleFontSize || '16px',
             letterSpacing: '1px',
-            lineHeight: 1.2,
+            // lineHeight: 1.2,
             mt: 1,
             mb: 1,
             display: '-webkit-box',
@@ -327,9 +335,9 @@ export const CardComponent = ({
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
-            color: titleColor || '#212529',
+            color: finalTitleColor || '#212529',
             px: '16px',
-            textTransform: textTransform || 'uppercase',
+            textTransform: finalTextTransform || 'uppercase',
           }}
         >
           {item.name || item.title || 'Untitled'}

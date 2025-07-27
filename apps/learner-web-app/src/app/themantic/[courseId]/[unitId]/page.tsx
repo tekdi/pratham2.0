@@ -48,7 +48,12 @@ const App = () => {
                   spacing: { xs: 6, sm: 6, md: 6 },
                 },
                 default_img: '/images/image_ver.png',
-                _card: { cardComponent: CardComponent },
+                _card: {
+                  cardComponent: CardComponent,
+                  titleFontSize: '14px',
+                  fontWeight: 700,
+                  titleColor: 'black',
+                },
                 _infoCard: {
                   _cardMedia: { maxHeight: { xs: '200px', sm: '280px' } },
                   default_img: '/images/unit.png',
