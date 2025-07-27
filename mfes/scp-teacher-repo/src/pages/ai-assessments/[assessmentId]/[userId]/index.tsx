@@ -147,7 +147,7 @@ const AssessmentDetails = () => {
   const { t } = useTranslation();
   const router = useRouter();
   const { assessmentId, userId } = router.query;
-  const [expandedPanel, setExpandedPanel] = useState<string | false>(false);
+
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState<any>(null);
   const [editScore, setEditScore] = useState<string>('');
@@ -184,11 +184,6 @@ const AssessmentDetails = () => {
     message: '',
     severity: 'success',
   });
-
-  const handleAccordionChange =
-    (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-      setExpandedPanel(isExpanded ? panel : false);
-    };
 
   // Sample uploaded images data
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
@@ -587,6 +582,27 @@ const AssessmentDetails = () => {
 
   const handleSaveScore = async () => {
     if (!selectedQuestion || !assessmentTrackingData) return;
+
+    // Validate that the score is not negative
+    const scoreValue = Number(editScore);
+    if (scoreValue < 0) {
+      setSnackbar({
+        open: true,
+        message: 'Marks cannot be negative. Please enter a valid score.',
+        severity: 'error',
+      });
+      return;
+    }
+
+    // Validate that the score doesn't exceed maximum marks
+    if (scoreValue > selectedQuestion.maxScore) {
+      setSnackbar({
+        open: true,
+        message: `Marks cannot exceed maximum marks (${selectedQuestion.maxScore}).`,
+        severity: 'error',
+      });
+      return;
+    }
 
     try {
       setEditLoading(true);
@@ -1004,22 +1020,9 @@ const AssessmentDetails = () => {
               }}
             >
               {assessmentData?.fileUrls && assessmentData.fileUrls.length > 0
-                ? `${assessmentData.fileUrls.length} images uploaded`
+                ? `${assessmentData.fileUrls.length} images uploaded View`
                 : 'No images uploaded'}
             </Typography>
-            {assessmentData?.records && assessmentData.records.length > 0 && (
-              <Typography
-                sx={{
-                  color: '#7C766F',
-                  fontSize: { xs: '12px', md: '14px' },
-                  fontWeight: 500,
-                  letterSpacing: '4.17%',
-                  lineHeight: 1.33,
-                }}
-              >
-                {assessmentData.records.length} assessment record(s) available
-              </Typography>
-            )}
           </Box>
           <IconButton
             sx={{
@@ -1030,10 +1033,8 @@ const AssessmentDetails = () => {
               },
             }}
           >
-            {assessmentData?.status === 'AI Pending' ? (
-              <CircularProgress size={24} />
-            ) : assessmentData?.status === 'AI Processed' ||
-              assessmentData?.status === 'Approved' ? (
+            {assessmentData?.status === 'AI Processed' ||
+            assessmentData?.status === 'Approved' ? (
               <ArrowForwardIcon />
             ) : (
               <FileUploadIcon />
@@ -1096,22 +1097,7 @@ const AssessmentDetails = () => {
               >
                 Answers are being scanned and digitized
               </Typography>
-              <Typography
-                sx={{
-                  color: '#1F1B13',
-                  fontSize: { xs: '14px', md: '16px' },
-                  fontWeight: 400,
-                  marginBottom: '8px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  '&:before': {
-                    content: '"•"',
-                    marginRight: '8px',
-                  },
-                }}
-              >
-                The AI is assigning marks based on the rubric
-              </Typography>
+
               <Typography
                 sx={{
                   color: '#1F1B13',
@@ -1126,8 +1112,8 @@ const AssessmentDetails = () => {
                   },
                 }}
               >
-                Question-wise feedback and an overall score will be available
-                shortly
+                Question-wise feedback and an overall score will be available in
+                24 hours
               </Typography>
             </Box>
             {/* <Typography
@@ -1158,8 +1144,6 @@ const AssessmentDetails = () => {
           assessmentTrackingData={assessmentTrackingData}
           onApprove={handleApproveClick}
           onScoreEdit={handleScoreClick}
-          expandedPanel={expandedPanel}
-          onAccordionChange={handleAccordionChange}
           isApproved={assessmentData?.status === 'Approved'}
           questionNumberingMap={questionNumberingMap}
           sectionMapping={sectionMapping}
@@ -1199,9 +1183,10 @@ const AssessmentDetails = () => {
                 value={editScore}
                 onChange={(e) => {
                   const value = e.target.value;
+                  const numValue = Number(value);
                   if (
                     selectedQuestion &&
-                    Number(value) <= selectedQuestion.maxScore
+                    numValue <= selectedQuestion.maxScore
                   ) {
                     setEditScore(value);
                   }
@@ -1212,7 +1197,12 @@ const AssessmentDetails = () => {
                   min: 0,
                   max: selectedQuestion?.maxScore || 0,
                 }}
-                helperText={`Maximum marks: ${selectedQuestion?.maxScore || 0}`}
+                helperText={
+                  Number(editScore) < 0
+                    ? 'Negative marks are not allowed'
+                    : `Maximum marks: ${selectedQuestion?.maxScore || 0}`
+                }
+                error={Number(editScore) < 0}
                 disabled={editLoading || assessmentData?.status === 'Approved'}
               />
             </>

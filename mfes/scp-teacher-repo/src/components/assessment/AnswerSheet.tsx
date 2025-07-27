@@ -1,14 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
-import {
-  Box,
-  Typography,
-  Button,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-} from '@mui/material';
+import { Box, Typography, Button } from '@mui/material';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 // Types and Interfaces
 export interface ScoreDetail {
@@ -47,10 +39,6 @@ export interface AnswerSheetProps {
   assessmentTrackingData: AssessmentTrackingData;
   onApprove: () => void;
   onScoreEdit: (question: ScoreDetail) => void;
-  expandedPanel: string | false;
-  onAccordionChange: (
-    panel: string
-  ) => (event: React.SyntheticEvent, isExpanded: boolean) => void;
   isApproved?: boolean;
   questionNumberingMap?: Record<string, string>;
   sectionMapping?: Record<string, string>;
@@ -179,15 +167,15 @@ const ScoreBadge: React.FC<ScoreBadgeProps> = React.memo(
 
 ScoreBadge.displayName = 'ScoreBadge';
 
-// AI Suggestion Accordion Component
-interface AISuggestionAccordionProps {
+// AI Suggestion Component with See More/Less functionality
+interface AISuggestionProps {
   aiSuggestion: string;
-  isExpanded: boolean;
-  onToggle: (event: React.SyntheticEvent, isExpanded: boolean) => void;
 }
 
-const AISuggestionAccordion: React.FC<AISuggestionAccordionProps> = React.memo(
-  ({ aiSuggestion, isExpanded, onToggle }) => {
+const AISuggestion: React.FC<AISuggestionProps> = React.memo(
+  ({ aiSuggestion }) => {
+    const [isExpanded, setIsExpanded] = React.useState(false);
+
     if (
       !aiSuggestion ||
       aiSuggestion === 'No AI suggestion available' ||
@@ -196,77 +184,100 @@ const AISuggestionAccordion: React.FC<AISuggestionAccordionProps> = React.memo(
       return null;
     }
 
+    // Function to truncate text to 25 words with better handling for Hindi text
+    const truncateText = (text: string, maxWords: number = 25) => {
+      if (!text || text.trim() === '') {
+        return text;
+      }
+
+      // Split by whitespace to handle both Hindi and English text properly
+      const words = text.trim().split(/\s+/);
+
+      if (words.length <= maxWords) {
+        return text;
+      }
+
+      // Take first maxWords and join them back
+      const truncatedWords = words.slice(0, maxWords);
+      return truncatedWords.join(' ') + '...';
+    };
+
+    const truncatedText = truncateText(aiSuggestion);
+    const wordCount = aiSuggestion.trim().split(/\s+/).length;
+    const shouldShowToggle = wordCount > 25;
+    const displayText = isExpanded ? aiSuggestion : truncatedText;
+
+    // Debug log to verify truncation
+    console.log(
+      'AI Suggestion word count:',
+      wordCount,
+      'Should show toggle:',
+      shouldShowToggle
+    );
+
     return (
-      <Accordion
-        expanded={isExpanded}
-        onChange={onToggle}
+      <Box
         sx={{
           backgroundColor: '#FFF5F5',
-          boxShadow: 'none',
           borderRadius: '8px',
           border: '1px solid #D0C5B4',
-          '&:before': {
-            display: 'none',
-          },
-          '&.Mui-expanded': {
-            margin: 0,
-          },
+          padding: '8px',
         }}
       >
-        <AccordionSummary
-          expandIcon={<KeyboardArrowDownIcon sx={{ color: '#666666' }} />}
+        <Typography
           sx={{
-            padding: '6px 8px',
-            minHeight: 'unset',
-            '&.Mui-expanded': {
-              minHeight: 'auto',
-            },
-            '& .MuiAccordionSummary-content': {
-              margin: 0,
-              '&.Mui-expanded': {
-                margin: '0px 0',
-              },
-            },
+            color: '#7C766F',
+            fontSize: { xs: '14px', md: '16px' },
+            fontWeight: 500,
+            letterSpacing: '0.5px',
+            textTransform: 'uppercase',
+            mb: '8px',
           }}
         >
-          <Typography
+          Explanation:
+        </Typography>
+        <Typography
+          sx={{
+            color: '#1F1B13',
+            fontSize: { xs: '14px', md: '16px' },
+            fontWeight: 400,
+            lineHeight: 1.6,
+            mb: shouldShowToggle ? '8px' : 0,
+          }}
+        >
+          {displayText}
+        </Typography>
+        {shouldShowToggle && (
+          <Button
+            onClick={() => setIsExpanded(!isExpanded)}
             sx={{
-              color: '#7C766F',
-              fontSize: { xs: '14px', md: '16px' },
+              color: '#1A8825',
+              textTransform: 'none',
+              fontSize: '14px',
               fontWeight: 500,
-              letterSpacing: '0.5px',
-              textTransform: 'uppercase',
+              padding: '0',
+              minWidth: 'auto',
+              '&:hover': {
+                backgroundColor: 'transparent',
+                textDecoration: 'underline',
+              },
             }}
           >
-            Explanation:
-          </Typography>
-        </AccordionSummary>
-        <AccordionDetails sx={{ padding: '0px 8px 8px 8px' }}>
-          <Typography
-            sx={{
-              color: '#1F1B13',
-              fontSize: { xs: '14px', md: '16px' },
-              fontWeight: 400,
-              lineHeight: 1.6,
-            }}
-          >
-            {aiSuggestion}
-          </Typography>
-        </AccordionDetails>
-      </Accordion>
+            {isExpanded ? 'See less' : 'See more'}
+          </Button>
+        )}
+      </Box>
     );
   }
 );
 
-AISuggestionAccordion.displayName = 'AISuggestionAccordion';
+AISuggestion.displayName = 'AISuggestion';
 
 // Question Item Component
 interface QuestionItemProps {
   question: ScoreDetail;
   index: number;
-  isExpanded: boolean;
   onScoreClick: () => void;
-  onAccordionToggle: (event: React.SyntheticEvent, isExpanded: boolean) => void;
   isApproved: boolean;
   questionNumberingMap?: Record<string, string>;
 }
@@ -275,9 +286,7 @@ const QuestionItem: React.FC<QuestionItemProps> = React.memo(
   ({
     question,
     index,
-    isExpanded,
     onScoreClick,
-    onAccordionToggle,
     isApproved,
     questionNumberingMap = {},
   }) => {
@@ -411,11 +420,7 @@ const QuestionItem: React.FC<QuestionItemProps> = React.memo(
         </Box>
 
         {/* AI Suggestion */}
-        <AISuggestionAccordion
-          aiSuggestion={parsedResponse.aiSuggestion}
-          isExpanded={isExpanded}
-          onToggle={onAccordionToggle}
-        />
+        <AISuggestion aiSuggestion={parsedResponse.aiSuggestion} />
       </Box>
     );
   }
@@ -506,10 +511,6 @@ ApproveButton.displayName = 'ApproveButton';
 // Questions List Component
 interface QuestionsListProps {
   scoreDetails: ScoreDetail[];
-  expandedPanel: string | false;
-  onAccordionChange: (
-    panel: string
-  ) => (event: React.SyntheticEvent, isExpanded: boolean) => void;
   onScoreEdit: (question: ScoreDetail) => void;
   isApproved: boolean;
   questionNumberingMap?: Record<string, string>;
@@ -519,8 +520,6 @@ interface QuestionsListProps {
 const QuestionsList: React.FC<QuestionsListProps> = React.memo(
   ({
     scoreDetails,
-    expandedPanel,
-    onAccordionChange,
     onScoreEdit,
     isApproved,
     questionNumberingMap = {},
@@ -628,13 +627,7 @@ const QuestionsList: React.FC<QuestionsListProps> = React.memo(
                       key={`${question.questionId}-${index}`}
                       question={question}
                       index={index}
-                      isExpanded={
-                        expandedPanel === `panel-${question.questionId}`
-                      }
                       onScoreClick={() => handleScoreClick(question)}
-                      onAccordionToggle={onAccordionChange(
-                        `panel-${question.questionId}`
-                      )}
                       isApproved={isApproved}
                       questionNumberingMap={questionNumberingMap}
                     />
@@ -695,8 +688,6 @@ const AnswerSheet: React.FC<AnswerSheetProps> = ({
   assessmentTrackingData,
   onApprove,
   onScoreEdit,
-  expandedPanel,
-  onAccordionChange,
   isApproved = false,
   questionNumberingMap = {},
   sectionMapping = {},
@@ -723,8 +714,6 @@ const AnswerSheet: React.FC<AnswerSheetProps> = ({
       {/* Questions List */}
       <QuestionsList
         scoreDetails={assessmentTrackingData.score_details}
-        expandedPanel={expandedPanel}
-        onAccordionChange={onAccordionChange}
         onScoreEdit={onScoreEdit}
         isApproved={isApproved}
         questionNumberingMap={questionNumberingMap}
