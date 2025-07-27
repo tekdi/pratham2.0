@@ -240,6 +240,9 @@ export const cardHideExplore = (props: any) => (
     titleFontSize="16px"
     isExplore={false}
     minHeight="286px"
+    textTransform="uppercase"
+    fontWeight={600}
+    titleColor="black"
   />
 );
 export const CardComponent = ({
@@ -250,6 +253,8 @@ export const CardComponent = ({
   titleFontSize,
   fontWeight,
   minHeight,
+  textTransform,
+  titleColor,
 }: {
   item: any;
   default_img: any;
@@ -258,6 +263,8 @@ export const CardComponent = ({
   titleFontSize?: string;
   fontWeight?: number;
   minHeight?: string;
+  textTransform?: string;
+  titleColor?: string;
 }) => {
   const onClick = (id: string) => {
     if (handleCardClick) {
@@ -320,8 +327,9 @@ export const CardComponent = ({
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
-            color: '#212529',
+            color: titleColor || '#212529',
             px: '16px',
+            textTransform: textTransform || 'uppercase',
           }}
         >
           {item.name || item.title || 'Untitled'}
@@ -351,7 +359,7 @@ export const CardComponent = ({
                 pb: 2,
               }}
             >
-              <Box sx={{ fontSize: '16px', color: '#363d47', fontWeight: 600 }}>
+              <Box sx={{ fontSize: '18px', color: '#363d47', fontWeight: 600 }}>
                 Explore
               </Box>
               <Box>
