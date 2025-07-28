@@ -109,7 +109,8 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
         }
 
         try {
-          const uploadedUrl = await uploadFileToS3(file);
+          const foldername = 'AIAssessment';
+          const uploadedUrl = await uploadFileToS3(file, foldername);
           if (uploadedUrl) {
             const newImage: UploadedImage = {
               id:
