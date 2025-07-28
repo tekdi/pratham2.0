@@ -185,6 +185,7 @@ const SetParameters: React.FC<SetParametersProps> = ({
 
   const handleConfirm = () => {
     setShowConfirm(false);
+
     // Build metadata from assessment info and all formState fields (no filter)
     const {
       assessmentTitle,
@@ -200,13 +201,43 @@ const SetParameters: React.FC<SetParametersProps> = ({
       ...otherFields
     } = formState;
 
+    // Create attributions array as per the API requirement
+    const attributions = [
+      {
+        name: 'difficulty_level',
+        value: difficulty_level,
+      },
+      {
+        name: 'question_types',
+        value: selectedDistributions || [],
+      },
+      {
+        name: 'questionsDetails',
+        value: [
+          ...(mcqCount > 0 ? [{ type: 'MCQ', no: mcqCount }] : []),
+          ...(fillInTheBlanksCount > 0
+            ? [{ type: 'fill_in_the_blanks', no: fillInTheBlanksCount }]
+            : []),
+          ...(shortAnswerCount > 0
+            ? [{ type: 'short', no: shortAnswerCount }]
+            : []),
+          ...(longAnswerCount > 0
+            ? [{ type: 'long', no: longAnswerCount }]
+            : []),
+        ],
+      },
+    ];
+
+    // Prepare metadata for the API call
     const metadata = {
       name: assessmentTitle,
       description,
       assessmentType,
+      attributions,
       ...otherFields,
     };
 
+    // Also call onNext with the original data structure for backward compatibility
     const typeMap: Record<string, string> = {
       MCQ: 'MCQ',
       'Fill in the blanks': 'fill_in_the_blanks',
