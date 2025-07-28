@@ -11,7 +11,7 @@ export interface CenterListParam {
 export interface StateListParam {
   limit?: number;
   offset?: number;
-  controllingfieldfk?: string;
+  controllingfieldfk?: any;
   fieldName: string;
   optionName?: string;
   sort?: [string, string]; //
