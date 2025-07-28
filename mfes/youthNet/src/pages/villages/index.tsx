@@ -536,13 +536,7 @@ const Index = () => {
     };
     if (villageList?.length !== 0) getVillageYouthData();
   }, [villageList, selectedBlockValue]);
-  //   useEffect(() => {
-  //     setSelectedVillageValue(villageId);
-  //     setSelectedBlockValue(blockId)
 
-  //   }
-
-  // , [blockId, villageId]);
   useEffect(() => {
     const getVillageList = async () => {
       try {
@@ -894,6 +888,10 @@ const Index = () => {
     //router.push(`/add-mentor`);
     // setPrefilledAddFormData(initialFormData);
     setOpenModal(true);
+    setPrefilledAddFormData({
+      state: [selectedStateValue],
+      district: [selectedDistrictValue],
+    });
     // setIsReassign(false);
     // setEditableUserId('');
   };
@@ -1107,91 +1105,7 @@ const Index = () => {
               title={toggledMentor}
               buttons={Mentorbuttons}
             />
-            {/* <SimpleModal
-              open={openReassignVillage}
-              onClose={onClose}
-              showFooter={true}
-              modalTitle={t(
-                'YOUTHNET_USERS_AND_VILLAGES.ADD_OR_REASSIGN_VILLAGES'
-              )}
-              primaryText={t('YOUTHNET_USERS_AND_VILLAGES.SAVE_PROGRESS')}
-              secondaryText={t('YOUTHNET_USERS_AND_VILLAGES.FINISH_ASSIGN')}
 
-              //pass function handler as props
-            >
-              <Box>
-                <Box mt={2}>
-                  <Typography
-                    sx={{
-                      fontSize: '14px',
-                      fontWeight: 500,
-                      color: theme.palette.warning['300'],
-                    }}
-                  >
-                    {t(
-                      'YOUTHNET_USERS_AND_VILLAGES.ASSIGN_VILLAGES_FROM_BLOCK'
-                    )}
-                  </Typography>
-                  <Typography
-                    sx={{
-                      fontSize: '14px',
-                      fontWeight: 400,
-                      color: theme.palette.warning['300'],
-                      marginTop: '10px',
-                    }}
-                  >
-                    {t(
-                      'YOUTHNET_USERS_AND_VILLAGES.ASSIGN_VILLAGES_FROM_BLOCK_INFO'
-                    )}
-                  </Typography>
-                </Box>
-                <Box display="flex" flexDirection="column" gap={2} p={2}>
-                  {reAssignVillages?.map((survey, index) => (
-                    <Surveys
-                      key={index}
-                      title={survey.title}
-                      date={survey.date}
-                    />
-                  ))}
-                </Box>
-              </Box>
-            </SimpleModal>
-            <SimpleModal
-              open={openReassignDistrict}
-              onClose={onClose}
-              showFooter={true}
-              modalTitle={t(
-                'YOUTHNET_USERS_AND_VILLAGES.REQUEST_USER_TO_DIFFERENT_MENTOR'
-              )}
-              primaryText={t('COMMON.SEND_REQUEST')}
-              //pass function handler as props
-            >
-              <Box>
-                <Box m={2}>
-                  <Typography sx={{ color: theme.palette.warning['A200'] }}>
-                    {t(
-                      'YOUTHNET_USERS_AND_VILLAGES.SEND_REQUEST_TO_ADMIN_TEXT'
-                    )}
-                  </Typography>
-                </Box>
-                <Box m={2}>
-                  <Dropdown
-                    name={t('YOUTHNET_USERS_AND_VILLAGES.SELECT_STATE')}
-                    // values={districtData?.DISTRICT_OPTIONS}
-                    // defaultValue={t('YOUTHNET_USERS_AND_VILLAGES.SELECT_STATE')}
-                    onSelect={(value) => console.log('Selected:', value)}
-                  />
-                </Box>
-                <Box m={2}>
-                  <Dropdown
-                    name={t('YOUTHNET_USERS_AND_VILLAGES.SELECT_DISTRICT')}
-                    // values={blockData?.BLOCK_OPTIONS}
-                    // defaultValue={t('YOUTHNET_USERS_AND_VILLAGES.SELECT')}
-                    onSelect={(value) => console.log('Selected:', value)}
-                  />
-                </Box>
-              </Box>
-            </SimpleModal> */}
             <SimpleModal
               open={openDelete}
               onClose={onClose}
@@ -1239,26 +1153,6 @@ const Index = () => {
                 </Box>
               </Box>
             </SimpleModal>
-
-            {/* <SimpleModal
-              open={addNew}
-              onClose={onClose}
-              showFooter={true}
-              modalTitle={'New Mentor'}
-              primaryText={!showAssignmentScreen ? 'Next' : undefined}
-              secondaryText={count === 1 ? 'Save Progress' : ''}
-              id="dynamic-form-id"
-            >
-              <MentorAssignment
-                FormSubmitFunction={FormSubmitFunction}
-                setShowAssignmentScreen={setShowAssignmentScreen}
-                showAssignmentScreen={showAssignmentScreen}
-                formData={formData}
-                setFormData={setFormData}
-                onClose={onClose}
-              />
-            </SimpleModal> */}
-
             <SimpleModal
               open={openModal}
               onClose={onClose}
