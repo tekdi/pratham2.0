@@ -512,6 +512,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
                         gap: '8px',
                         cursor: 'pointer',
                         flex: 1,
+                        minWidth: 0, // This is crucial for ellipsis to work
                       }}
                       onClick={() => setSelectedImage(image.url)}
                     >
@@ -519,6 +520,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
                         sx={{
                           color: '#666666',
                           fontSize: '20px',
+                          flexShrink: 0, // Prevent icon from shrinking
                         }}
                       />
                       <Typography
@@ -529,6 +531,8 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                           whiteSpace: 'nowrap',
+                          minWidth: 0, // This is crucial for ellipsis to work
+                          flex: 1, // Take remaining space
                         }}
                       >
                         {image.name}
