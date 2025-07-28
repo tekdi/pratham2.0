@@ -77,12 +77,7 @@ interface SetParametersProps {
 }
 
 const difficultyLevels = ['Easy', 'Medium', 'Hard'];
-const questionDistributions = [
-  'Knowledge',
-  'Inference',
-  'Understanding',
-  'Application',
-];
+const questionDistributions = ['Knowledge', 'Understanding', 'Application'];
 
 const SetParameters: React.FC<SetParametersProps> = ({
   staticFilter,
