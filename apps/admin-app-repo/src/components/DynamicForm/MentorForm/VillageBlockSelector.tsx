@@ -13,13 +13,13 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import SortIcon from '@mui/icons-material/Sort';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { getStateBlockDistrictList } from 'mfes/youthNet/src/services/youthNet/Dashboard/VillageServices';
-import { fetchUserList } from 'mfes/youthNet/src/services/youthNet/Dashboard/UserServices';
 import { Role } from '@/utils/app.constant';
 import {
   extractVillageIds,
   filterOutUserVillages,
-} from 'mfes/youthNet/src/utils/Helper';
+} from '@shared-lib-v2/utils/helper';
+import { getStateBlockDistrictList } from '@/services/MasterDataService';
+import { userList } from '@/services/UserList';
 // import DynamicForm from '../../components/DynamicForm/DynamicForm';
 
 const VillageBlockSelector = ({
@@ -114,7 +114,7 @@ const VillageBlockSelector = ({
           },
         };
 
-        const userListResponse = await fetchUserList(payload);
+        const userListResponse = await userList(payload);
         if (userListResponse.length === 0 || isReassign) {
           setVillages(transformedVillageData);
         } else {
