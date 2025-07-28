@@ -1177,7 +1177,10 @@ const AssessmentDetails = () => {
               <Typography variant="body1" sx={{ mb: 2 }}>
                 Answer:{' '}
                 {selectedQuestion.resValue
-                  ? JSON.parse(selectedQuestion.resValue).value
+                  ? (() => {
+                      const resValue = JSON.parse(selectedQuestion.resValue);
+                      return resValue.label || 'No answer provided';
+                    })()
                   : 'No answer provided'}
               </Typography>
               <TextField
