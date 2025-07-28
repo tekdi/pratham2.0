@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState, useEffect, useCallback , useRef} from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Form from '@rjsf/mui';
 import validator from '@rjsf/validator-ajv8';
 import axios from 'axios';
@@ -86,7 +86,7 @@ const TeamLeader = () => {
 
   const { t, i18n } = useTranslation();
   const theme = useTheme<any>();
-     const formRef = useRef(null);
+  const formRef = useRef(null);
 
   const initialFormData = localStorage.getItem('stateId')
     ? { state: [localStorage.getItem('stateId')] }
@@ -154,7 +154,7 @@ const TeamLeader = () => {
     },
   };
   const SubmitaFunction = async (formData: any) => {
-    console.log("###### debug issue formData", formData)
+    // console.log('###### debug issue formData', formData);
     if (Object.keys(formData).length > 0) {
       setPrefilledFormData(formData);
       //set prefilled search data on refresh
