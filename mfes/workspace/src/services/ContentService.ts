@@ -6,6 +6,7 @@ import { delApi, get, post } from "./RestClient";
 import { MIME_TYPE } from "@workspace/utils/app.config";
 import { v4 as uuidv4 } from "uuid";
 import { PrimaryCategoryValue, Role } from "@workspace/utils/app.constant";
+import axios from "axios";
 const userId = getLocalStoredUserId();
 console.log("userId ==>", userId);
 
@@ -62,7 +63,8 @@ const getReqBodyWithStatus = (
   channel: string,
   contentType?: string,
   state?: string,
-  filters?: any // <-- Add this line
+  filters?: any, // <-- Add this line
+   selectedMimeTypes?: string[]
 ) => {
   console.log("contentType", contentType)
   if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
@@ -76,7 +78,7 @@ const getReqBodyWithStatus = (
   const extraFilters = filters ? { ...filters } : {};
 
   if (contentType === "content-library") {
-  // console.log("upForReviewReqBody", upForReviewReqBody)
+   console.log("upForReviewReqBody", upForReviewReqBody)
     const userRole = getLocalStoredUserRole();
      primaryCategory=["Learning Resource"]
          console.log("PrimaryCategory", PrimaryCategory)
@@ -91,6 +93,7 @@ const getReqBodyWithStatus = (
             status,
             primaryCategory,
             state: state,
+            mimeType: selectedMimeTypes?.length  ? selectedMimeTypes : [],
             ...extraFilters, // <-- Merge here
           },
 
@@ -198,7 +201,8 @@ export const getContent = async (
   contentType?: string,
   state?: string,
   // program?: any[],
-  filters?: any // <-- Add this line
+  filters?: any, // <-- Add this line
+  selectedMimeTypes?: string[]
 ) => {
   const apiURL = "/action/composite/v3/search";
   try {
@@ -212,7 +216,9 @@ export const getContent = async (
       channel,
       contentType,
       state,
-      filters // <-- Pass filters here
+      filters ,
+      selectedMimeTypes
+      // <-- Pass filters here
     );
     console.log("reqBody", reqBody);
     const response = await post(apiURL, reqBody);
@@ -420,6 +426,31 @@ export const getPosFrameworkList = async (): Promise<any> => {
   try {
     const response = await get(apiUrl );
     return response?.data?.result?.framework?.categories;
+    
+
+  } catch (error) {
+    console.error("Error in getting Framework Details", error);
+    return error;
+  }
+};
+export const getMediaFilterList = async (): Promise<any> => {
+  const baseurl = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;
+
+  const apiUrl: string = `${baseurl}/action/object/category/definition/v1/read?fields=objectMetadata,forms,name,label`;
+
+  try {
+    const response = await axios.post(apiUrl, {
+      request: {
+        objectCategoryDefinition: {
+          objectType: "Collection",
+          name: "Course"
+      }
+      }
+
+      
+    });
+    console.log("response", response?.data?.result?.objectCategoryDefinition?.forms?.search?.properties?.filter((item:any)=>item.code==="mimeType"));
+    return response?.data?.result?.objectCategoryDefinition?.forms?.search?.properties?.filter((item:any)=>item.code==="mimeType")?.[0];
     
 
   } catch (error) {

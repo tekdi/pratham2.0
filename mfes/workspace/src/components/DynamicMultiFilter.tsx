@@ -147,7 +147,7 @@ const getSelectedFiltersByCodeWithNames = (
     const field = readData.find(f => f.code === code);
     if (field && selectedFilters[code] && selectedFilters[code].length > 0) {
       // Get options for this field
-      let options: { code: string; name: string }[] = [];
+      let options: { code: string; name: string; value?: string }[] = [];
       if (code === 'domain') {
         options = getDomainOptions(posFrameworkData);
       } else if (code === 'subDomain') {
@@ -158,11 +158,19 @@ const getSelectedFiltersByCodeWithNames = (
         options = field.range.map(r => ({
           code: String(r.key || r.value || r.name),
           name: String(r.name || r.value || r.key),
+          value: String(r.value || r.key || r.name),
         }));
       }
-      // Map selected codes to names
+      // Map selected codes to names (or values for mimetype)
       result[code] = selectedFilters[code]
-        .map(val => options.find(opt => opt.code === val)?.name || val);
+        .map(val => {
+          const option = options.find(opt => opt.code === val);
+          if (code === "mimeType") {
+            console.log("option", option);
+            return option?.value || val;
+          }
+          return option?.name || val;
+        });
     }
   });
   return result;
