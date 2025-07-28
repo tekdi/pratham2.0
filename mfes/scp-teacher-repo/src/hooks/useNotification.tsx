@@ -14,7 +14,7 @@ const useNotification = () => {
           key: key,
           replacements: replacements,
           push: {
-            receipients: deviceId,
+            receipients: Array.isArray(deviceId) ? deviceId : [deviceId],
           },
         });
 
