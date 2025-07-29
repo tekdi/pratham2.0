@@ -92,19 +92,16 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
 
       for (const file of fileArray) {
         // Validate file type
-        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+        const allowedTypes = ['image/jpeg', 'image/jpg'];
         if (!allowedTypes.includes(file.type)) {
-          showToast(
-            'Please select valid image files (jpg, jpeg, png)',
-            'error'
-          );
+          showToast('Please select valid image files (jpg, jpeg)', 'error');
           continue;
         }
 
-        // Validate file size (50MB)
-        const maxSize = 50 * 1024 * 1024;
+        // Validate file size (5MB)
+        const maxSize = 5 * 1024 * 1024;
         if (file.size > maxSize) {
-          showToast(`File ${file.name} exceeds 50MB limit`, 'error');
+          showToast(`File exceeds 5MB limit. Please select a smaller image.`);
           continue;
         }
 
@@ -159,6 +156,18 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
     setIsUploading(true);
     try {
       const file = dataUrlToFile(imageData, fileName);
+
+      // Validate file size (5MB)
+      const maxSize = 5 * 1024 * 1024;
+      if (file.size > maxSize) {
+        showToast(
+          `File "${fileName}" exceeds 5MB limit. Please capture a smaller image.`,
+          'error'
+        );
+        setIsCameraOpen(false);
+        return;
+      }
+
       const uploadedUrl = await uploadFileToS3(file);
       if (uploadedUrl) {
         const newImage: UploadedImage = {
@@ -622,7 +631,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
         type="file"
         ref={fileInputRef}
         onChange={handleFileSelect}
-        accept="image/jpeg,image/jpg,image/png"
+        accept="image/jpeg,image/jpg"
         multiple
         style={{ display: 'none' }}
       />
