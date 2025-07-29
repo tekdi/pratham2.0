@@ -75,6 +75,8 @@ const SelectContent: React.FC<SelectContentProps> = ({
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState(search);
   const [contentSources, setContentSources] = useState<any[]>([]);
+  // Add state to store selected items' data
+  const [selectedItemsData, setSelectedItemsData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
   const LIMIT = 5;
@@ -171,18 +173,63 @@ const SelectContent: React.FC<SelectContentProps> = ({
     }
   }, [contentSources, page]);
 
+  // Sync selectedItemsData when contentSources changes or selected items change
+  useEffect(() => {
+    if (contentSources.length > 0) {
+      // Remove items from selectedItemsData that are no longer selected
+      setSelectedItemsData((prev) =>
+        prev.filter((item) => selected.includes(item.identifier))
+      );
+
+      if (selected.length > 0) {
+        // Find any selected items that are not in selectedItemsData
+        const missingItems = selected.filter(
+          (id) => !selectedItemsData.find((item) => item.identifier === id)
+        );
+
+        if (missingItems.length > 0) {
+          const foundItems = missingItems
+            .map((id) => contentSources.find((c) => c.identifier === id))
+            .filter(Boolean); // Remove any undefined items
+
+          if (foundItems.length > 0) {
+            setSelectedItemsData((prev) => [
+              ...prev.filter((item) => selected.includes(item.identifier)),
+              ...foundItems,
+            ]);
+          }
+        }
+      }
+    }
+  }, [contentSources, selected]);
+
   // Selection logic for KaTableComponent
   const handleSelect = (id: string) => {
     if (selected.includes(id)) {
+      // Remove from selected
       setSelected(selected.filter((sid) => sid !== id));
+      // Remove from selectedItemsData
+      setSelectedItemsData((prev) =>
+        prev.filter((item) => item.identifier !== id)
+      );
     } else if (selected.length < 3) {
+      // Add to selected
       setSelected([...selected, id]);
+      // Find and store the item data
+      const item = contentSources.find((c) => c.identifier === id);
+      if (item) {
+        setSelectedItemsData((prev) => [...prev, item]);
+      }
     }
   };
 
   // Remove selected content from chip
   const handleRemoveChip = (id: string) => {
     setSelected(selected.filter((sid) => sid !== id));
+    // Remove from selectedItemsData
+    setSelectedItemsData((prev) =>
+      prev.filter((item) => item.identifier !== id)
+    );
   };
 
   const filteredSources = contentSources.filter((item) =>
@@ -251,7 +298,7 @@ const SelectContent: React.FC<SelectContentProps> = ({
         {selected.length > 0 && (
           <Box sx={{ mb: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
             {selected.map((id) => {
-              const item = contentSources.find((c) => c.identifier === id);
+              const item = selectedItemsData.find((c) => c.identifier === id);
               return (
                 <Chip
                   key={id}
@@ -309,9 +356,9 @@ const SelectContent: React.FC<SelectContentProps> = ({
           }}
           disabled={selected.length === 0}
           onClick={() => {
-            // Prepare array of {id, pdfUrl} for onNext
+            // Use selectedItemsData instead of searching in contentSources
             const selectedArr = selected.map((id) => {
-              const item = contentSources.find((c) => c.identifier === id);
+              const item = selectedItemsData.find((c) => c.identifier === id);
               return { id, url: item?.previewUrl || '' };
             });
             onNext({ content: selectedArr, ...filter });
