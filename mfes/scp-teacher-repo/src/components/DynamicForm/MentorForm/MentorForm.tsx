@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -106,6 +106,9 @@ const MentorForm = ({
   const { getNotification } = useNotification();
   const userRole = localStorage.getItem('roleName');
 
+  const [autoSkipInProgress, setAutoSkipInProgress] = useState(false);
+  const autoSkipTriggered = useRef(false);
+
   useEffect(() => {
     const fetchData = async () => {
       let isEditSchema = _.cloneDeep(schema);
@@ -199,6 +202,31 @@ const MentorForm = ({
     };
     fetchData();
   }, []);
+
+  useEffect(() => {
+    // Only run if reassign case, and not already triggered
+    if (
+      isReassign === true &&
+      alteredSchema &&
+      alteredUiSchema &&
+      !autoSkipTriggered.current
+    ) {
+      autoSkipTriggered.current = true;
+      setAutoSkipInProgress(true);
+      // Use transformFormData to get the payload
+      const payload = transformFormData(
+        prefilledFormData || {},
+        alteredSchema,
+        isEdit ? extraFieldsUpdate : extraFields
+      );
+      // Call StepperFormSubmitFunction and then stop loader
+      Promise.resolve(
+        StepperFormSubmitFunction(prefilledFormData || {}, payload)
+      ).finally(() => {
+        setAutoSkipInProgress(false);
+      });
+    }
+  }, [alteredSchema, alteredUiSchema, isReassign]);
 
   // const flresponsetotl = async (response: any[]) => {
   //   console.log('###### responsedebug flresponsetotl', response);
@@ -674,10 +702,8 @@ const MentorForm = ({
 
   return (
     <>
-      {isLoading ? (
-        <>
-          <Loader showBackdrop={false} loadingText={t('COMMON.LOADING')} />
-        </>
+      {isLoading || autoSkipInProgress ? (
+        <Loader showBackdrop={false} loadingText={t('COMMON.LOADING')} />
       ) : (
         alteredSchema &&
         alteredUiSchema && (
@@ -685,13 +711,15 @@ const MentorForm = ({
             {showNextForm ? (
               blocks ? (
                 <Box display="flex" flexDirection="column">
-                  <Button
-                    variant="text"
-                    color="primary"
-                    onClick={handleBackToForm}
-                  >
-                    {t('MENTOR.BACK_TO_FORM')}
-                  </Button>
+                  {isReassign ? null : (
+                    <Button
+                      variant="text"
+                      color="primary"
+                      onClick={handleBackToForm}
+                    >
+                      {t('MENTOR.BACK_TO_FORM')}
+                    </Button>
+                  )}
                   <Typography
                     sx={{
                       fontSize: '14px',
