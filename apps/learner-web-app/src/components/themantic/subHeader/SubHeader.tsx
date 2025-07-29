@@ -8,6 +8,8 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Select,
+  FormControl,
 } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import SearchIcon from '@mui/icons-material/Search';
@@ -29,7 +31,6 @@ const SubHeader = ({
 }) => {
   const searchParams = useSearchParams();
   const [search, setSearch] = useState(searchParams?.get('q') || '');
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   // Initialize selectedLang with value from localStorage to prevent flash
   const getInitialLanguage = () => {
@@ -43,7 +44,6 @@ const SubHeader = ({
   };
 
   const [selectedLang, setSelectedLang] = React.useState(getInitialLanguage);
-  const open = Boolean(anchorEl);
   const router = useRouter();
 
   // Load selected language from localStorage on component mount and call getFilter
@@ -59,29 +59,24 @@ const SubHeader = ({
     setSearch(queryParam);
   }, [searchParams]);
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    console.log('Clicked button:', selectedLang);
+  const handleLanguageChange = (event: any) => {
+    const lang = event.target.value;
+    setSelectedLang(lang);
+    // Save selected language to localStorage
+    localStorage.setItem(STORAGE_KEY, lang);
+
     if (typeof window !== 'undefined') {
       const windowUrl = window.location.pathname;
       const cleanedUrl = windowUrl;
 
       logEvent({
-        action: 'filter thematic content by language ' + selectedLang,
+        action: 'filter thematic content by language ' + lang,
         category: cleanedUrl,
         label: 'Filter thematic content by language ',
       });
     }
-    setAnchorEl(event.currentTarget);
-  };
 
-  const handleClose = (lang?: string) => {
-    setAnchorEl(null);
-    if (lang) {
-      setSelectedLang(lang);
-      // Save selected language to localStorage
-      localStorage.setItem(STORAGE_KEY, lang);
-    }
-    if (getFilter) getFilter(lang || '');
+    if (getFilter) getFilter(lang);
   };
 
   return (
@@ -95,8 +90,8 @@ const SubHeader = ({
           fontFamily: '"Montserrat", sans-serif',
           textAlign: 'center',
           bgcolor: '#fff',
-          px: { xs: 2, sm: 3, md: 4 },
-          py: { xs: 2, sm: 3 },
+          px: { md: '78px' },
+          py: { xs: [0, 2], sm: [0, 3] },
           wordWrap: 'break-word',
           lineHeight: 1.2,
         }}
@@ -111,8 +106,9 @@ const SubHeader = ({
           flexDirection: { xs: 'column', md: 'row' },
           alignItems: { xs: 'stretch', md: 'center' },
           justifyContent: 'space-between',
-          px: { xs: 2, sm: 4, md: 6, lg: 8 },
-          py: { xs: 2, sm: 3 },
+          px: { xs: 2, sm: 4, md: 6, lg: '48px' },
+          pb: { xs: 2, sm: 2 },
+          pt: '15px',
           bgcolor: '#fff',
           boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
           borderRadius: 2,
@@ -130,45 +126,46 @@ const SubHeader = ({
               justifyContent: { xs: 'center', md: 'flex-start' },
             }}
           >
-            <Button
-              variant="outlined"
-              onClick={handleClick}
-              endIcon={<KeyboardArrowDownIcon />}
-              sx={{
-                bgcolor: '#fff',
-                color: '#222',
-                borderRadius: '8px',
-                textTransform: 'none',
-                fontWeight: 500,
-                border: '1px solid #d1d5db',
-                px: { xs: 2, sm: 2.5 },
-                py: { xs: 1.5, sm: 1 },
-                minWidth: { xs: 140, sm: 120 },
-                maxWidth: { xs: 200, sm: 'none' },
-                width: { xs: '100%', sm: 'auto' },
-                boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
-                justifyContent: 'space-between',
-                '&:hover': { bgcolor: '#f5f6fa', border: '1px solid #d1d5db' },
-              }}
-            >
-              {selectedLang}
-            </Button>
-            <Menu
-              anchorEl={anchorEl}
-              open={open}
-              onClose={() => handleClose()}
-              sx={{
-                '& .MuiPaper-root': {
-                  minWidth: { xs: 140, sm: 120 },
-                },
-              }}
-            >
-              {languages.map((lang) => (
-                <MenuItem key={lang} onClick={() => handleClose(lang)}>
-                  {lang}
-                </MenuItem>
-              ))}
-            </Menu>
+            <FormControl>
+              <Select
+                value={selectedLang}
+                onChange={handleLanguageChange}
+                IconComponent={KeyboardArrowDownIcon}
+                sx={{
+                  bgcolor: '#fff',
+                  color: '#222',
+                  borderRadius: '8px',
+                  fontWeight: 500,
+                  border: '1px solid #d1d5db',
+
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+                  '& .MuiSelect-select': {
+                    padding: '4px 8px',
+                    fontSize: '14px',
+                    textAlign: 'center',
+                  },
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    border: 'none',
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    border: 'none',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    border: 'none',
+                  },
+                  '& .MuiSvgIcon-root': {
+                    fontSize: '16px',
+                    color: '#222',
+                  },
+                }}
+              >
+                {languages.map((lang) => (
+                  <MenuItem key={lang} value={lang}>
+                    {lang}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Box>
         )}
 
@@ -187,7 +184,7 @@ const SubHeader = ({
               <Typography
                 variant="h6"
                 sx={{
-                  fontWeight: 600,
+                  fontWeight: 700,
                   fontSize: { xs: '16px', sm: '18px' },
                   color: 'black',
                   mb: 0.5,
