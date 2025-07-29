@@ -76,8 +76,8 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
     if (!files || files.length === 0) return;
 
     // Check if adding new files would exceed the limit
-    if (uploadedImages.length + files.length > 6) {
-      showToast('You can only upload up to 6 images', 'warning');
+    if (uploadedImages.length + files.length > 4) {
+      showToast('You can only upload up to 4 images', 'warning');
       return;
     }
 
@@ -149,6 +149,13 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
   };
 
   const handleCameraCapture = async (imageData: string, fileName: string) => {
+    // Check if adding new image would exceed the limit
+    if (uploadedImages.length >= 4) {
+      showToast('You can only upload up to 4 images', 'warning');
+      setIsCameraOpen(false);
+      return;
+    }
+
     setIsUploading(true);
     try {
       const file = dataUrlToFile(imageData, fileName);
@@ -310,7 +317,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
                 fontWeight: 400,
               }}
             >
-              * Formats: jpg, png. upto 50MB
+              * Format: jpg, size: 5 MB Up to 4 images
             </Typography>
           </Box>
 
@@ -336,7 +343,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
               {/* Take Photo Button */}
               <Button
                 onClick={!isUploading ? handleTakePhoto : undefined}
-                disabled={isUploading}
+                disabled={isUploading || uploadedImages.length >= 4}
                 variant="outlined"
                 startIcon={<PhotoCameraIcon />}
                 sx={{
@@ -357,13 +364,17 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
                   },
                 }}
               >
-                {isUploading ? 'Uploading...' : 'Take A Photo'}
+                {isUploading
+                  ? 'Uploading...'
+                  : uploadedImages.length >= 4
+                  ? 'Max 4 Images'
+                  : 'Take A Photo'}
               </Button>
 
               {/* Upload Photo Button */}
               <Button
                 onClick={!isUploading ? handleChooseFromGallery : undefined}
-                disabled={isUploading}
+                disabled={isUploading || uploadedImages.length >= 4}
                 variant="outlined"
                 startIcon={<CloudUploadIcon />}
                 sx={{
@@ -384,7 +395,11 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
                   },
                 }}
               >
-                {isUploading ? 'Uploading...' : 'Upload A Photo'}
+                {isUploading
+                  ? 'Uploading...'
+                  : uploadedImages.length >= 4
+                  ? 'Max 4 Images'
+                  : 'Upload A Photo'}
               </Button>
             </Box>
 
