@@ -63,9 +63,10 @@ const getReqBodyWithStatus = (
   channel: string,
   contentType?: string,
   state?: string,
-  identifiers?: string[],
-   filters?: any, // <-- Add this line
-   selectedMimeTypes?: string[]
+   filters?: any,
+     identifiers?: string[],
+ // <-- Add this line
+  //  selectedMimeTypes?: string[]
 ) => {
   if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
     var PrimaryCategory =
@@ -76,6 +77,7 @@ const getReqBodyWithStatus = (
     primaryCategory.length === 0 ? PrimaryCategory : primaryCategory;
   // Merge custom filters into filters object
   const extraFilters = filters ? { ...filters } : {};
+  console.log("extraFilters", extraFilters)
 
   if (contentType === "content-library") {
    console.log("upForReviewReqBody", upForReviewReqBody)
@@ -93,7 +95,7 @@ const getReqBodyWithStatus = (
             status,
             primaryCategory,
             state: state,
-            mimeType: selectedMimeTypes?.length  ? selectedMimeTypes : [],
+            // mimeType: selectedMimeTypes?.length  ? selectedMimeTypes : [],
             ...extraFilters, // <-- Merge here
           },
 
@@ -206,7 +208,6 @@ export const getContent = async (
   state?: string,
   // program?: any[],
   filters?: any, // <-- Add this line
-  selectedMimeTypes?: string[],
   identifiers?: string[]
 ) => {
   const apiURL = '/action/composite/v3/search';
@@ -222,7 +223,7 @@ export const getContent = async (
       contentType,
       state,
       filters ,
-      selectedMimeTypes,
+      // selectedMimeTypes,
             identifiers
 
       // <-- Pass filters here
