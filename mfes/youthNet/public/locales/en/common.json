@@ -845,7 +845,9 @@
     "NOT_ABLE_UPDATE_MENTOR": "Not able to update mentor",
     "NOT_ABLE_CREATE_MENTOR": "Not able to create mentor",
     "UPDATE_MENTOR": "Update Mentor",
-    "RE_ASSIGN_MENTOR": "Re-assign Mentor"
+    "RE_ASSIGN_MENTOR": "Re-assign Mentor",
+    "MENTOR_DELETED_SUCCESSFULLY": "Mentor deleted successfully",
+    "MENTOR_DELETE_FAIL": "Failed to delete mentor"
   },
   "UNIT_NAME": "Unit Name",
   "TYPE_OF_CENTER": "Type Of Center",
