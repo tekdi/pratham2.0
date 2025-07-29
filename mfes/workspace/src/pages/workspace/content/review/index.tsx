@@ -40,7 +40,7 @@ const ReviewContentSubmissions = () => {
     useState(false);
   const router = useRouter();
   const { identifier } = router.query;
-  const { isDiscoverContent } = router.query;
+  const { isDiscoverContent , isContentLibrary, isAllContents}  = router.query;
   const { isReadOnly } = router.query;
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
  const [showHeader, setShowHeader] = useState<boolean | null>(null);
@@ -106,6 +106,14 @@ const ReviewContentSubmissions = () => {
   const redirectToReviewPage = () => {
     if (isDiscoverContent === "true") {
       router.push({ pathname: `/workspace/content/discover-contents` });
+
+    }
+    else if(isContentLibrary === "true") {
+      router.push({ pathname: `/workspace/content/content-library` });
+    }
+    else if(isAllContents==="true")
+    {
+      router.push({ pathname: `/workspace/content/allContents` });
 
     }
     else if (getLocalStoredUserRole() === Role.CCTA ||  getLocalStoredUserRole() === Role.CENTRAL_ADMIN) {
