@@ -1,12 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Layout from '../../../../components/Layout';
 import { Typography, Box, CircularProgress } from '@mui/material';
-import { getContent } from '@workspace/services/ContentService';
+import {
+  getContent,
+  // searchAiAssessment,
+} from '@workspace/services/ContentService';
 import SearchBox from '../../../../components/SearchBox';
 import PaginationComponent from '@workspace/components/PaginationComponent';
 import { LIMIT } from '@workspace/utils/app.constant';
 import { useRouter } from 'next/router';
-import { MIME_TYPE } from '@workspace/utils/app.config';
 import WorkspaceText from '@workspace/components/WorkspaceText';
 import { DataType } from 'ka-table/enums';
 import KaTableComponent from '@workspace/components/KaTableComponent';
@@ -14,6 +16,8 @@ import { timeAgo } from '@workspace/utils/Helper';
 import useSharedStore from '@workspace/utils/useSharedState';
 import useTenantConfig from '@workspace/hooks/useTenantConfig';
 import WorkspaceHeader from '@workspace/components/WorkspaceHeader';
+import NoDataFound from '@workspace/components/NoDataFound';
+
 const columns = [
   {
     key: 'title_and_description',
@@ -22,10 +26,10 @@ const columns = [
     width: '450px',
   },
   {
-    key: 'contentType',
-    title: 'CONTENT TYPE',
+    key: 'aiStatus',
+    title: 'AI STATUS',
     dataType: DataType.String,
-    width: '200px',
+    width: '140px',
   },
   {
     key: 'language',
@@ -41,15 +45,16 @@ const columns = [
     dataType: DataType.String,
     width: '180px',
   },
-  { key: 'action', title: 'ACTION', dataType: DataType.String, width: '140px' },
+
+  // { key: 'action', title: 'ACTION', dataType: DataType.String, width: '140px' },
 ];
+
+const staticFilter = ['Practice Question Set'];
 const PublishPage = () => {
   const tenantConfig = useTenantConfig();
   const router = useRouter();
-
-  const [selectedKey, setSelectedKey] = useState('publish');
+  const [selectedKey, setSelectedKey] = useState('ai-assessments');
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState('');
   const [showHeader, setShowHeader] = useState<boolean | null>(null);
   const { filterOptions, sort } = router.query;
@@ -90,12 +95,16 @@ const PublishPage = () => {
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
+      // Reset page when search term changes
+      if (searchTerm !== debouncedSearchTerm) {
+        setPage(0);
+      }
     }, 300);
 
     return () => {
       clearTimeout(handler);
     };
-  }, [searchTerm]);
+  }, [searchTerm, debouncedSearchTerm]);
   useEffect(() => {
     const filteredArray = contentList.map((item: any) => ({
       image: item?.appIcon,
@@ -103,13 +112,13 @@ const PublishPage = () => {
       name: item?.name,
       description: item?.description,
       language: item.contentLanguage ? item.contentLanguage : item?.language,
-
-      contentType: item.primaryCategory,
+      contentType: staticFilter,
       lastUpdatedOn: timeAgo(item.lastUpdatedOn),
       status: item.status,
       identifier: item.identifier,
       mimeType: item.mimeType,
       mode: item.mode,
+      aiStatus: item.aiStatus,
     }));
     setData(filteredArray);
     console.log(filteredArray);
@@ -126,25 +135,6 @@ const PublishPage = () => {
     setSortBy(sortBy);
   };
 
-  const openEditor = (content: any) => {
-    const identifier = content?.identifier;
-    const mode = 'read';
-    if (content?.mimeType === MIME_TYPE.QUESTIONSET_MIME_TYPE) {
-      router.push({ pathname: `/editor`, query: { identifier, mode } });
-    } else if (
-      content?.mimeType &&
-      MIME_TYPE.GENERIC_MIME_TYPE.includes(content?.mimeType)
-    ) {
-      sessionStorage.setItem('previousPage', window.location.href);
-      router.push({ pathname: `/upload-editor`, query: { identifier } });
-    } else if (
-      content?.mimeType &&
-      MIME_TYPE.COLLECTION_MIME_TYPE.includes(content?.mimeType)
-    ) {
-      router.push({ pathname: `/collection`, query: { identifier, mode } });
-    }
-  };
-
   useEffect(() => {
     const getPublishContentList = async () => {
       try {
@@ -153,7 +143,7 @@ const PublishPage = () => {
         const query = debouncedSearchTerm || '';
         let offset = debouncedSearchTerm !== '' ? 0 : page * LIMIT;
 
-        const primaryCategory = filter.length ? filter : [];
+        const primaryCategory = staticFilter;
         if (prevFilterRef.current !== filter) {
           offset = 0;
           setPage(0);
@@ -162,6 +152,12 @@ const PublishPage = () => {
         }
         const order = sortBy === 'Created On' ? 'asc' : 'desc';
         const sort_by = { lastUpdatedOn: order };
+        // const aiQuestionSetStatus = await searchAiAssessment({
+        //   createdBy: localStorage.getItem('userId'),
+        // });
+        // const identifiers = (aiQuestionSetStatus?.data || []).map(
+        //   (item: any) => item.question_set_id as string
+        // );
         const response = await getContent(
           ['Live'],
           query,
@@ -170,14 +166,25 @@ const PublishPage = () => {
           primaryCategory,
           sort_by,
           tenantConfig?.CHANNEL_ID
+          // '',
+          // '',
+          // identifiers
         );
-        const contentList = (response?.content || []).concat(
-          response?.QuestionSet || []
-        );
-        setContentList(contentList);
-        setTotalCount(response?.count);
+        setContentList(response?.QuestionSet || []);
+
+        // setContentList(
+        //   (response?.QuestionSet || []).map((item: any) => ({
+        //     ...item,
+        //     aiStatus: aiQuestionSetStatus?.data?.find(
+        //       (aiItem: any) => aiItem.question_set_id === item.identifier
+        //     )?.status,
+        //   }))
+        // );
+        setTotalCount(response?.count || 0);
       } catch (error) {
         console.error(error);
+        setContentList([]);
+        setTotalCount(0);
       } finally {
         setLoading(false);
       }
@@ -212,23 +219,24 @@ const PublishPage = () => {
                 variant="h4"
                 sx={{ fontWeight: 'bold', fontSize: '16px' }}
               >
-                Published
+                Ai-assessments
               </Typography>
             </Box>
             <Box mb={3}>
               <SearchBox
+                staticFilter={staticFilter}
                 placeholder="Search by title..."
                 onSearch={handleSearch}
                 onFilterChange={handleFilterChange}
                 onSortChange={handleSortChange}
               />
             </Box>
-            {/* <Typography mb={2}>Here you see all your published content.</Typography> */}
+            {/* <Typography mb={2}>Here you see all your "Ai-assessments content.</Typography> */}
             {loading ? (
               <Box display="flex" justifyContent="center" my={5}>
                 <CircularProgress />
               </Box>
-            ) : (
+            ) : data.length > 0 ? (
               <>
                 <Box className="table-ka-container">
                   <KaTableComponent
@@ -239,8 +247,10 @@ const PublishPage = () => {
                   />
                 </Box>
               </>
+            ) : (
+              <NoDataFound title="No data found" />
             )}
-            {totalCount > LIMIT && (
+            {totalCount > LIMIT && data.length > 0 && (
               <PaginationComponent
                 count={Math.ceil(totalCount / LIMIT)}
                 page={page}
