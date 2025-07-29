@@ -1,12 +1,12 @@
 import {
   getLocalStoredUserId,
   getLocalStoredUserRole,
-} from "./LocalStorageService";
-import { delApi, get, post, patch  } from "./RestClient";
-import { MIME_TYPE } from "@workspace/utils/app.config";
-import { v4 as uuidv4 } from "uuid";
-import { PrimaryCategoryValue, Role } from "@workspace/utils/app.constant";
-import axios from "axios";
+} from './LocalStorageService';
+import { delApi, get, post, patch } from './RestClient';
+import { MIME_TYPE } from '@workspace/utils/app.config';
+import { v4 as uuidv4 } from 'uuid';
+import { PrimaryCategoryValue, Role } from '@workspace/utils/app.constant';
+import axios from 'axios';
 const userId = getLocalStoredUserId();
 console.log('userId ==>', userId);
 
@@ -63,9 +63,9 @@ const getReqBodyWithStatus = (
   channel: string,
   contentType?: string,
   state?: string,
-   filters?: any,
-     identifiers?: string[],
- // <-- Add this line
+  filters?: any,
+  identifiers?: string[]
+  // <-- Add this line
   //  selectedMimeTypes?: string[]
 ) => {
   if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
@@ -77,38 +77,35 @@ const getReqBodyWithStatus = (
     primaryCategory.length === 0 ? PrimaryCategory : primaryCategory;
   // Merge custom filters into filters object
   const extraFilters = filters ? { ...filters } : {};
-  console.log("extraFilters", extraFilters)
+  console.log('extraFilters', extraFilters);
 
-  if (contentType === "content-library") {
-   console.log("upForReviewReqBody", upForReviewReqBody)
+  if (contentType === 'content-library') {
+    console.log('upForReviewReqBody', upForReviewReqBody);
     const userRole = getLocalStoredUserRole();
-     primaryCategory=["Learning Resource"]
-         console.log("PrimaryCategory", PrimaryCategory)
+    primaryCategory = ['Learning Resource'];
+    console.log('PrimaryCategory', PrimaryCategory);
 
-      console.log("upForReviewReqBody", upForReviewReqBody)
-      return {
-        ...upForReviewReqBody,
-        request: {
-          ...upForReviewReqBody.request,
-          filters: {
-            ...upForReviewReqBody.request.filters,
-            status,
-            primaryCategory,
-            state: state,
-            // mimeType: selectedMimeTypes?.length  ? selectedMimeTypes : [],
-            ...extraFilters, // <-- Merge here
-          },
-
-          query,
-          limit,
-          offset,
-          sort_by,
+    console.log('upForReviewReqBody', upForReviewReqBody);
+    return {
+      ...upForReviewReqBody,
+      request: {
+        ...upForReviewReqBody.request,
+        filters: {
+          ...upForReviewReqBody.request.filters,
+          status,
+          primaryCategory,
+          state: state,
+          // mimeType: selectedMimeTypes?.length  ? selectedMimeTypes : [],
+          ...extraFilters, // <-- Merge here
         },
-    }
 
-  
-  }
- else if (contentType === "discover-contents") {
+        query,
+        limit,
+        offset,
+        sort_by,
+      },
+    };
+  } else if (contentType === 'discover-contents') {
     const userRole = getLocalStoredUserRole();
 
     if (state) {
@@ -144,7 +141,7 @@ const getReqBodyWithStatus = (
           createdBy: { '!=': getLocalStoredUserId() },
           channel: channel,
           identifier: identifiers,
-          ...extraFilters, 
+          ...extraFilters,
         },
 
         query,
@@ -153,9 +150,7 @@ const getReqBodyWithStatus = (
         sort_by,
       },
     };
-  }
-  
-  else if (contentType === "upReview") {
+  } else if (contentType === 'upReview') {
     return {
       ...upForReviewReqBody,
       request: {
@@ -165,7 +160,7 @@ const getReqBodyWithStatus = (
           status,
           primaryCategory,
           channel: channel,
-          ...extraFilters ,// <-- Merge here
+          ...extraFilters, // <-- Merge here
           identifier: identifiers,
         },
         query,
@@ -222,13 +217,13 @@ export const getContent = async (
       channel,
       contentType,
       state,
-      filters ,
+      filters,
       // selectedMimeTypes,
-            identifiers
+      identifiers
 
       // <-- Pass filters here
     );
-    console.log("reqBody", reqBody);
+    console.log('reqBody', reqBody);
     const response = await post(apiURL, reqBody);
     return response?.data?.result;
   } catch (error) {
@@ -535,21 +530,62 @@ export const getFormFields = async (): Promise<any> => {
   }
 };
 
+export const getContentPDF = async ({
+  query,
+  limit,
+  offset,
+  sort_by,
+  filters,
+}: {
+  query: string;
+  limit: number;
+  offset: number;
+  sort_by: any;
+  filters: {
+    status?: string[];
+    primaryCategory?: string[];
+    channel?: any;
+    contentType?: string;
+    state?: string;
+    [key: string]: any; // Allow additional dynamic filters if needed
+  };
+}) => {
+  const apiURL = '/action/composite/v3/search';
+
+  try {
+    const reqBody = {
+      request: {
+        query,
+        filters: {
+          ...filters,
+          mimeType: 'application/pdf',
+        },
+        sort_by,
+        limit,
+        offset,
+      },
+    };
+
+    const response = await post(apiURL, reqBody);
+    return response?.data?.result;
+  } catch (error) {
+    return error;
+  }
+};
+
 export const getfilterList = async (): Promise<any> => {
   const apiUrl: string = `/action/data/v1/form/read`;
 
   try {
     const response = await post(apiUrl, {
       request: {
-        action: "review",
-        subType: "resource",
+        action: 'review',
+        subType: 'resource',
       },
     });
     return response?.data?.result?.form?.data?.fields;
-    
-
   } catch (error) {
-    console.error("Error in getting Framework Details", error);
+    console.error('Error in getting Framework Details', error);
     return error;
   }
 };
@@ -557,12 +593,10 @@ export const getPosFrameworkList = async (): Promise<any> => {
   const apiUrl: string = `/api/framework/v1/read/pos-framework`;
 
   try {
-    const response = await get(apiUrl );
+    const response = await get(apiUrl);
     return response?.data?.result?.framework?.categories;
-    
-
   } catch (error) {
-    console.error("Error in getting Framework Details", error);
+    console.error('Error in getting Framework Details', error);
     return error;
   }
 };
@@ -575,19 +609,22 @@ export const getMediaFilterList = async (): Promise<any> => {
     const response = await axios.post(apiUrl, {
       request: {
         objectCategoryDefinition: {
-          objectType: "Collection",
-          name: "Course"
-      }
-      }
-
-      
+          objectType: 'Collection',
+          name: 'Course',
+        },
+      },
     });
-    console.log("response", response?.data?.result?.objectCategoryDefinition?.forms?.search?.properties?.filter((item:any)=>item.code==="mimeType"));
-    return response?.data?.result?.objectCategoryDefinition?.forms?.search?.properties?.filter((item:any)=>item.code==="mimeType")?.[0];
-    
-
+    console.log(
+      'response',
+      response?.data?.result?.objectCategoryDefinition?.forms?.search?.properties?.filter(
+        (item: any) => item.code === 'mimeType'
+      )
+    );
+    return response?.data?.result?.objectCategoryDefinition?.forms?.search?.properties?.filter(
+      (item: any) => item.code === 'mimeType'
+    )?.[0];
   } catch (error) {
-    console.error("Error in getting Framework Details", error);
+    console.error('Error in getting Framework Details', error);
     return error;
   }
 };
