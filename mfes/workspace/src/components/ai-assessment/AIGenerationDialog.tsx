@@ -24,6 +24,7 @@ interface AIGenerationDialogProps {
   onRetry?: () => void;
   onClose?: () => void;
   onGoToEditor?: () => void;
+  onGoAssessment?: () => void;
 }
 
 const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
@@ -34,6 +35,7 @@ const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
   onRetry,
   onClose,
   onGoToEditor,
+  onGoAssessment,
 }) => {
   const router = useRouter();
   // Helper for close button in failed state
@@ -232,11 +234,11 @@ const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
             <Button
               variant="contained"
               fullWidth
-              onClick={
-                state === 'success' ? onGoToEditor : handleGoBackToWorkspace
-              }
+              onClick={state === 'success' ? onGoToEditor : onGoAssessment}
             >
-              {state === 'success' ? 'Go to Editor' : 'Go Back to Workspace'}
+              {state === 'success'
+                ? 'Go to Editor'
+                : 'Go Back to Assessment List'}
             </Button>
           </Box>
         )}

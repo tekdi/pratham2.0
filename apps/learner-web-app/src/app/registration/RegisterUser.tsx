@@ -656,7 +656,7 @@ setUsername(
                 textAlign: 'center',
               }}
             >
-              {t('LEARNER_APP.REGISTRATION.SIGN_UP_FOR')}
+              {`${t('LEARNER_APP.REGISTRATION.SIGN_UP_FOR')} `}
 
               {tenantName}
             </Typography>

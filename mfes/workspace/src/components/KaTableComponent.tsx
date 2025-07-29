@@ -22,6 +22,7 @@ import { Padding } from '@mui/icons-material';
 import QrCode2Icon from '@mui/icons-material/QrCode2';
 import QrModal from './QrModal';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { table } from 'console';
 import Checkbox from '@mui/material/Checkbox';
 
 interface CustomTableProps {
@@ -146,7 +147,7 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
           })
         : router.push({
             pathname: `/workspace/content/review`,
-            query: { identifier, isReadOnly: true },
+            query: { identifier, isReadOnly: true  , isAllContents: true },
           });
     } else if (tableTitle === 'discover-contents') {
       content.contentType === 'Course'
@@ -158,7 +159,19 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
             pathname: `/workspace/content/review`,
             query: { identifier, isDiscoverContent: true },
           });
-    } else if (
+    }
+    else if (tableTitle === 'content-library') {
+      content.contentType === 'Course'
+        ? router.push({
+            pathname: `/course-hierarchy/${identifier}`,
+            query: { identifier, previousPage: 'content-library' },
+          })
+        : router.push({
+            pathname: `/workspace/content/review`,
+            query: { identifier, isContentLibrary :true },
+          });
+    }
+    else if (
       content?.mimeType &&
       MIME_TYPE.GENERIC_MIME_TYPE.includes(content?.mimeType)
     ) {
@@ -168,6 +181,11 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
         tableTitle === 'upForReview'
           ? `/workspace/content/review`
           : `/upload-editor`;
+          if(tableTitle === 'all-content') {
+                  router.push({ pathname, query: { identifier,  isAllContents: true } });
+
+          }
+          else
       router.push({ pathname, query: { identifier } });
     } else if (
       content?.mimeType &&
