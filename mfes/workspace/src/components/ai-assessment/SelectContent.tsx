@@ -145,6 +145,7 @@ const SelectContent: React.FC<SelectContentProps> = ({
         }
         setHasMore(contentList.length === LIMIT);
       } catch (error) {
+        console.log(error, 'error');
         setContentSources([]);
         setHasMore(false);
       } finally {
@@ -231,7 +232,7 @@ const SelectContent: React.FC<SelectContentProps> = ({
       prev.filter((item) => item.identifier !== id)
     );
   };
-
+  console.log(contentSources, 'sagar');
   const filteredSources = contentSources.filter((item) =>
     item.name.toLowerCase().includes(debouncedSearch.toLowerCase())
   );

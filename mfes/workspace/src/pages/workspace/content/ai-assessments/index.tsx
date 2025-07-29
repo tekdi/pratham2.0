@@ -77,7 +77,6 @@ const PublishPage = () => {
     setSortBy(sort?.toString() || 'Modified On');
   }, [sort]);
   const [contentList, setContentList] = React.useState([]);
-  const [contentDeleted, setContentDeleted] = React.useState(false);
   const [loading, setLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [data, setData] = React.useState<any[]>([]);
@@ -196,7 +195,6 @@ const PublishPage = () => {
     filter,
     sortBy,
     fetchContentAPI,
-    contentDeleted,
     page,
   ]);
 
