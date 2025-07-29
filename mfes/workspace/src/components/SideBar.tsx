@@ -28,7 +28,7 @@ import { getLocalStoredUserRole } from '@workspace/services/LocalStorageService'
 import { TENANT_DATA } from '@workspace/utils/app.constant';
 import TenantService from '@workspace/services/TenantService';
 const route = process.env.NEXT_PUBLIC_WORKSPACE_ROUTES;
-import aiAssessment from '../assets/images/aicheckbook.svg';
+import aiAssessment from '../assets/images/assessment.svg';
 
 let isAdmin: boolean;
 if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
@@ -94,7 +94,7 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
       icon: <ManageSearchIcon />,
     },
     {
-      text: 'AI-Assessments',
+      text: 'Assessments',
       key: 'ai-assessments',
       icon: (
         <Image

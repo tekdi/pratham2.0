@@ -29,8 +29,8 @@ const Editor = () => {
           question_set_id: [identifier],
         });
         if (
-          response.data?.[0].status &&
-          response.data?.[0].status !== 'COMPLETED'
+          response.data?.[0]?.status &&
+          response.data?.[0]?.status !== 'COMPLETED'
         ) {
           setStatus(response.data?.[0].status);
           setIsModalOpen(true);
