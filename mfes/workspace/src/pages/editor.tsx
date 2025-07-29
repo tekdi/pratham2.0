@@ -12,6 +12,7 @@ import {
   CircularProgress,
   Fade,
   Button,
+  Divider,
 } from '@mui/material';
 import PendingOutlinedIcon from '@mui/icons-material/PendingOutlined';
 
@@ -76,7 +77,7 @@ const Editor = () => {
             flexDirection: 'column',
             alignItems: 'center',
             p: { xs: 3, sm: 4 },
-            width: { xs: 320, sm: 536 },
+            width: '100%',
           }}
         >
           <Box sx={{ mb: 2 }}>
@@ -119,10 +120,12 @@ const Editor = () => {
             You can continue to wait here or check back later
           </Typography>
           <CircularProgress sx={{ mb: 4, color: '#635E57' }} />
+          <Divider />
           <Button
             variant="contained"
             sx={{
               colorScheme: 'primary',
+              width: '100%',
             }}
             onClick={() => router.back()}
           >
