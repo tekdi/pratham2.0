@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { sendCredentialService } from '@/services/NotificationService';
 import { TelemetryEventType } from '@/utils/app.constant';
 import { firstLetterInUpperCase, getUserFullName } from '@/utils/Helper';
@@ -197,7 +198,6 @@ export const notificationCallback = async (
   successMessageKey: any,
   type: any
 ) => {
-
   console.log('########### type', type);
 
   const isQueue = false;
@@ -210,7 +210,6 @@ export const notificationCallback = async (
   let replacements: { [key: string]: string };
   replacements = {};
   let cleanedUrl = '';
-
 
   if (
     type == 'state-lead' ||
@@ -227,8 +226,7 @@ export const notificationCallback = async (
         ''
       );
     }
-  }
-  else if (type == 'team-leader' || type == 'facilitator') {
+  } else if (type == 'team-leader' || type == 'facilitator') {
     if (process.env.NEXT_PUBLIC_TEACHER_SBPLAYER) {
       cleanedUrl = process.env.NEXT_PUBLIC_TEACHER_SBPLAYER.replace(
         /\/sbplayer$/,

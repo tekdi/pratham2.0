@@ -861,6 +861,18 @@
     "NOT_ABLE_CREATE_LEARNER": "Not able to create learner",
     "LEARNERS.USER_CREDENTIALS_WILL_BE_SEND_SOON": "User credentials will be sent soon"
   },
+  "MENTORS": {
+    "NEW_MENTOR": "New Mentor",
+    "FIRST_SELECT_REQUIRED_FIELDS": "First select required fields",
+    "MENTOR_CREATED_SUCCESSFULLY": "Mentor has been successfully created!",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "Mentor is created, credentials will be sent soon",
+    "MENTOR_UPDATED_SUCCESSFULLY": "Mentor has been successfully updated!",
+    "EDIT_MENTOR": "Edit Mentor",
+    "NOT_ABLE_UPDATE_MENTOR": "Not able to update mentor",
+    "NOT_ABLE_CREATE_MENTOR": "Not able to create mentor",
+    "UPDATE_MENTOR": "Update Mentor",
+    "RE_ASSIGN_MENTOR": "Re-assign Mentor"
+  },
   "VILLAGE": "Village",
   "first_name": "First Name",
   "middle_name": "Middle Name",

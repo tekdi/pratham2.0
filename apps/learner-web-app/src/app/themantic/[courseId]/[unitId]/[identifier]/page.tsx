@@ -18,16 +18,18 @@ const Player = dynamic(
 
 const HomePage: React.FC = () => {
   return (
-    <Layout sx={{ backgroundImage: 'url(/images/energy-background.png)' }}>
-      <Player
-        contentBaseUrl="/themantic"
-        _config={{
-          player: {
-            trackable: false,
-          },
-        }}
-      />
-    </Layout>
+    <div className="thematic-page">
+      <Layout sx={{ backgroundImage: 'url(/images/energy-background.png)' }}>
+        <Player
+          contentBaseUrl="/themantic"
+          _config={{
+            player: {
+              trackable: false,
+            },
+          }}
+        />
+      </Layout>
+    </div>
   );
 };
 

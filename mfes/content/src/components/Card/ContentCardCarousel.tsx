@@ -140,6 +140,7 @@ const ContentCardCarousel = ({
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
+            ...(_config?._noData?.sx ?? {}),
           }}
         >
           {_config?.noDataText || t('LEARNER_APP.CONTENT_TABS.NO_MORE_DATA')}
