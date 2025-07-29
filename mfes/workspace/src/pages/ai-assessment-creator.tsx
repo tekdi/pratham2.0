@@ -456,6 +456,9 @@ const AIAssessmentCreator: React.FC = () => {
           onGoToEditor={() => {
             router.push(`/editor?identifier=${aiDialogParams?.identifier}`);
           }}
+          onGoAssessment={() => {
+            router.push('/workspace/content/ai-assessments');
+          }}
         />
       </Box>
     </Layout>
