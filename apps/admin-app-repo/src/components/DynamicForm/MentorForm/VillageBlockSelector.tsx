@@ -145,9 +145,7 @@ const VillageBlockSelector = ({
         <IconButton onClick={onBack}>
           <ArrowBackIcon />
         </IconButton>
-        <Typography>
-          {t('YOUTHNET_USERS_AND_VILLAGES.PLEASE_GO_BACK_MSG')}
-        </Typography>
+        <Typography>{t('YOUTH.PLEASE_GO_BACK_MSG')}</Typography>
       </Box>
 
       <Box
