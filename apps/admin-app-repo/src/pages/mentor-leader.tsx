@@ -467,7 +467,7 @@ const MentorLead = () => {
     'MENTOR_LEADERS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
   const stateUpdateNotificationKey = 'onMentorStateReassign';
-  const districtUpdateNotificationKey = 'onMentorDistrictReassign';
+  const districtUpdateNotificationKey = 'onMentorReassign';
 
   return (
     <>

@@ -5,14 +5,17 @@ import { CLOUD_STORAGE_URL } from "../utils/app.config";
 import {
   getLocalStoredUserId,
   getLocalStoredUserName,
-  getLocalStoredUserSpecificBoard
+  getLocalStoredUserSpecificBoard,
 } from "../services/LocalStorageService";
 import { fetchCCTAList } from "../services/userServices";
 import { sendCredentialService } from "../services/NotificationService";
 import useTenantConfig from "../hooks/useTenantConfig";
 import { sendContentNotification } from "../services/sendContentNotification";
 import { ContentStatus, Editor } from "../utils/app.constant";
-const QuestionSetEditor: React.FC = () => {
+
+const QuestionSetEditor: React.FC<{
+  onEvent?: (event: any) => void;
+}> = ({ onEvent }) => {
   const tenantConfig = useTenantConfig();
   const router = useRouter();
   const { identifier, contentMode } = router.query;
@@ -34,7 +37,6 @@ const QuestionSetEditor: React.FC = () => {
     const storedMode = localStorage.getItem("contentMode");
     setMode(storedMode || "edit");
     setFullName(storedFullName ?? "Anonymous User");
-
 
     const generatedDeviceId = uuidv4();
     setDeviceId(generatedDeviceId);
@@ -88,7 +90,7 @@ const QuestionSetEditor: React.FC = () => {
       },
     },
     config: {
-      mode: contentMode ||mode || "edit",
+      mode: contentMode || mode || "edit",
       userSpecificFrameworkField: getLocalStoredUserSpecificBoard(),
       enableQuestionCreation: true,
       enableAddFromLibrary: true,
@@ -133,10 +135,10 @@ const QuestionSetEditor: React.FC = () => {
           "{contentId}": notificationData?.contentId,
           "{appUrl}": url,
           "{submissionDate}": new Date().toLocaleDateString(),
-        "{contentType}":"Course",
-        "{contentTitle}":data?.result?.content?.name
+          "{contentType}": "Course",
+          "{contentTitle}": data?.result?.content?.name,
         };
-  
+
         return sendCredentialService({
           isQueue,
           context,
@@ -145,12 +147,12 @@ const QuestionSetEditor: React.FC = () => {
           email: { receipients: [user?.email] },
         });
       });
-  
+
       await Promise.all(promises);
-  
+
       console.log("All emails sent successfully.");
-      
-      window.history.back(); 
+
+      window.history.back();
     } catch (error) {
       console.error("Error sending email notifications:", error);
     }
@@ -163,11 +165,26 @@ const QuestionSetEditor: React.FC = () => {
       year: "numeric",
     });
   };
-  
- 
-  const sendCreatorNotification = () => sendContentNotification(ContentStatus.PUBLISHED, Editor.QUESTION_SET ,"", identifier, undefined, router);
-  const sendContentRejectNotification = () => sendContentNotification(ContentStatus.REJECTED, Editor.QUESTION_SET ,"", identifier, undefined, router);
- 
+
+  const sendCreatorNotification = () =>
+    sendContentNotification(
+      ContentStatus.PUBLISHED,
+      Editor.QUESTION_SET,
+      "",
+      identifier,
+      undefined,
+      router
+    );
+  const sendContentRejectNotification = () =>
+    sendContentNotification(
+      ContentStatus.REJECTED,
+      Editor.QUESTION_SET,
+      "",
+      identifier,
+      undefined,
+      router
+    );
+
   useEffect(() => {
     const loadAssets = () => {
       if (!document.getElementById("sunbird-editor-css")) {
@@ -216,42 +233,38 @@ const QuestionSetEditor: React.FC = () => {
 
       questionsetEditorElement.addEventListener(
         "editorEmitter",
-        (event: any) => {
+        async (event: any) => {
           console.log("Editor event:", event);
+
           if (
             event.detail?.action === "backContent" ||
             event.detail?.action === "submitContent" ||
             event.detail?.action === "publishContent" ||
             event.detail?.action === "rejectContent"
           ) {
+            await onEvent?.(event);
             if (event.detail?.action === "submitContent") {
               console.log("collection");
-            
+
               sendReviewNotification({
                 contentId: identifier,
                 creator: getLocalStoredUserName(),
               })
                 .then(() => {
-                  window.history.back(); 
+                  window.history.back();
                 })
                 .catch((error) => {
                   console.error("Error in sendReviewNotification:", error);
                 });
-            } 
-            else if (event.detail?.action === "publishContent")
-            {
-              sendCreatorNotification()
-            }
-            else if(event.detail?.action === "rejectContent")
-            {
-              sendContentRejectNotification()
-            }
-            
-            else {
+            } else if (event.detail?.action === "publishContent") {
+              sendCreatorNotification();
+            } else if (event.detail?.action === "rejectContent") {
+              sendContentRejectNotification();
+            } else {
               window.history.back();
             }
             localStorage.removeItem("contentMode");
-          //  window.history.back();
+            //  window.history.back();
             window.addEventListener(
               "popstate",
               () => {

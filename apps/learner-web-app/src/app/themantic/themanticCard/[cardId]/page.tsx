@@ -580,44 +580,46 @@ const ThemanticCard = () => {
   );
 
   return (
-    <Layout>
-      <SubHeader showFilter={false} />
-    <Box
-      sx={{
-        backgroundImage: `url('/images/energy-background.png')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        padding: { xs: 2, md: 4 },
-        position: 'relative',
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background:
-            'linear-gradient(135deg, rgba(135,206,235,0.8) 0%, rgba(70,130,180,0.8) 50%, rgba(30,144,255,0.8) 100%)',
-          backgroundImage: `
-            radial-gradient(circle at 20% 30%, rgba(255,255,255,0.1) 2px, transparent 2px),
-            radial-gradient(circle at 80% 70%, rgba(255,255,255,0.1) 1px, transparent 1px),
-            radial-gradient(circle at 60% 20%, rgba(255,255,255,0.1) 1.5px, transparent 1.5px)
-          `,
-          backgroundSize: '100px 100px, 80px 80px, 120px 120px',
-          zIndex: 0,
-        },
-      }}
-    >
-      <Box sx={{ position: 'relative', zIndex: 1 }}>
-        {currentView === 'main'
-          ? renderMainView()
-          : currentView === 'basics-of-energy'
-          ? renderBasicsOfEnergyView()
-          : renderEnergyCompanionView()}
-      </Box>
-    </Box>
-    </Layout>
+    <div className="thematic-page">
+      <Layout>
+        <SubHeader showFilter={false} />
+        <Box
+          sx={{
+            backgroundImage: `url('/images/energy-background.png')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            padding: { xs: 2, md: 4 },
+            position: 'relative',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background:
+                'linear-gradient(135deg, rgba(135,206,235,0.8) 0%, rgba(70,130,180,0.8) 50%, rgba(30,144,255,0.8) 100%)',
+              backgroundImage: `
+                radial-gradient(circle at 20% 30%, rgba(255,255,255,0.1) 2px, transparent 2px),
+                radial-gradient(circle at 80% 70%, rgba(255,255,255,0.1) 1px, transparent 1px),
+                radial-gradient(circle at 60% 20%, rgba(255,255,255,0.1) 1.5px, transparent 1.5px)
+              `,
+              backgroundSize: '100px 100px, 80px 80px, 120px 120px',
+              zIndex: 0,
+            },
+          }}
+        >
+          <Box sx={{ position: 'relative', zIndex: 1 }}>
+            {currentView === 'main'
+              ? renderMainView()
+              : currentView === 'basics-of-energy'
+              ? renderBasicsOfEnergyView()
+              : renderEnergyCompanionView()}
+          </Box>
+        </Box>
+      </Layout>
+    </div>
   );
 };
 

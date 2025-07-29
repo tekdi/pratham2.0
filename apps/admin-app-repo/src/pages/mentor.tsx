@@ -501,7 +501,7 @@ const Mentor = () => {
   const notificationMessage = 'MENTORS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
   const stateReassignmentNotificationKey = 'onMentorStateReassign';
-  const districtReassignmentNotificationKey = 'onMentorDistrictReassign';
+  const districtReassignmentNotificationKey = 'onMentorReassign';
   const blockReassignmentNotificationKey = 'onMentorBlockReassign';
   const villageReassignmentNotificationKey = 'onMentorVillageReassign';
 
