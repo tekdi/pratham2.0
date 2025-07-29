@@ -13,7 +13,7 @@ export interface UploadedFile {
  * @param fileName - The name for the file
  * @returns Promise with uploaded file data
  */
-export const uploadFileToS3 = async (file: File): Promise<any> => {
+export const uploadFileToS3 = async (file: File , foldername : string = 'cohort'  ): Promise<any> => {
   console.log(file);
   try {
     const extension = file.name.split('.').pop()?.toLowerCase();
@@ -21,7 +21,7 @@ export const uploadFileToS3 = async (file: File): Promise<any> => {
 
     // Step 1: Get Presigned URL
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/presigned-url?filename=${fileName}&foldername=cohort&fileType=.${extension}`
+      `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/presigned-url?filename=${fileName}&foldername=${foldername}&fileType=.${extension}`
     );
     const presignedData = await res.json();
 

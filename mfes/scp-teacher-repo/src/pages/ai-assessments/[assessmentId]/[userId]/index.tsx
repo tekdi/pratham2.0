@@ -1019,9 +1019,23 @@ const AssessmentDetails = () => {
                 letterSpacing: '0.1px',
               }}
             >
-              {assessmentData?.fileUrls && assessmentData.fileUrls.length > 0
-                ? `${assessmentData.fileUrls.length} images uploaded View`
-                : 'No images uploaded'}
+              {assessmentData?.fileUrls &&
+              assessmentData.fileUrls.length > 0 ? (
+                <>
+                  {`${assessmentData.fileUrls.length} images uploaded `}
+                  <span
+                    style={{
+                      color: '#1976d2',
+                      textDecoration: 'underline',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    View
+                  </span>
+                </>
+              ) : (
+                'No images uploaded'
+              )}
             </Typography>
           </Box>
           <IconButton
@@ -1033,11 +1047,10 @@ const AssessmentDetails = () => {
               },
             }}
           >
-            {assessmentData?.status === 'AI Processed' ||
-            assessmentData?.status === 'Approved' ? (
-              <ArrowForwardIcon />
-            ) : (
+            {!assessmentData?.status ? (
               <FileUploadIcon />
+            ) : (
+              <ArrowForwardIcon />
             )}
           </IconButton>
         </Box>
@@ -1164,7 +1177,10 @@ const AssessmentDetails = () => {
               <Typography variant="body1" sx={{ mb: 2 }}>
                 Answer:{' '}
                 {selectedQuestion.resValue
-                  ? JSON.parse(selectedQuestion.resValue).value
+                  ? (() => {
+                      const resValue = JSON.parse(selectedQuestion.resValue);
+                      return resValue.label || 'No answer provided';
+                    })()
                   : 'No answer provided'}
               </Typography>
               <TextField
