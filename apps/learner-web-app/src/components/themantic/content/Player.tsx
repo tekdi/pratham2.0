@@ -100,7 +100,7 @@ const App = ({
   // };
 
   return (
-    <Box sx={{ px: 7 }}>
+    <Box sx={{ px: 7, pb: 3 }}>
       <Box
         sx={{
           display: 'flex',
@@ -176,6 +176,7 @@ const App = ({
                     mb: 2,
                     px: 2,
                     fontFamily: '"Montserrat", sans-serif',
+                    textDecoration: 'underline',
                   }}
                 >
                   {item?.content?.name || item?.content?.title || 'Untitled'}
