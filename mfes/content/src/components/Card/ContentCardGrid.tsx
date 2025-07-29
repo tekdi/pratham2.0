@@ -154,6 +154,7 @@ const ContentCardGrid = memo((props: ContentCardGridProps) => {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
+            ...(props._config?._noData?.sx ?? {}),
           }}
         >
           {props._config?.noDataText ||

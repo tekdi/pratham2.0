@@ -96,6 +96,16 @@ const SearchPage = () => {
                   spacing: { xs: 6, sm: 6, md: 6 },
                 },
                 noDataText: 'No matching results found.',
+                _noData: {
+                  sx: {
+                    textAlign: 'left',
+                    fontSize: '28px',
+                    fontWeight: 700,
+                    display: 'flex',
+                    justifyContent: 'start',
+                    minHeight: '5px',
+                  },
+                },
               }}
             />
           </Box>
