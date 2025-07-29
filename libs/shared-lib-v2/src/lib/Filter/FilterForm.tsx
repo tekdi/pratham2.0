@@ -372,11 +372,17 @@ const FilterSection: React.FC<FilterSectionProps> = ({
     >
       {fields?.map((field, idx) => {
         const values = field.options ?? field.range ?? [];
+        // Sort values alphabetically by name
+        const sortedValues = [...values].sort((a, b) => {
+          const nameA = (a.name || a).toString().toLowerCase();
+          const nameB = (b.name || b).toString().toLowerCase();
+          return nameA.localeCompare(nameB);
+        });
         const code = field.code;
         const selected = selectedValues[code] ?? [];
         const optionsToShow = showMore.includes(code)
-          ? values
-          : values.slice(0, 3);
+          ? sortedValues
+          : sortedValues.slice(0, 3);
         const staticValues = Array.isArray(staticFormData?.[code])
           ? staticFormData[code]
           : [];
@@ -466,13 +472,13 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                   onChange={(e) => {
                     if (isDropdownMulti) {
                       const value = e.target.value as string[];
-                      const next = values.filter((item: any) =>
+                      const next = sortedValues.filter((item: any) =>
                         value.includes(item.code ?? item.name ?? item)
                       );
                       onChange(code, next);
                     } else {
                       const value = e.target.value as string;
-                      const next = values.filter(
+                      const next = sortedValues.filter(
                         (item: any) =>
                           (item.code ?? item.name ?? item) === value
                       );
@@ -484,20 +490,20 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                       ? (selectedVals as string[])
                           .map(
                             (val) =>
-                              values.find(
+                              sortedValues.find(
                                 (item: any) =>
                                   item.code === val || item.name === val
                               )?.name ?? val
                           )
                           .join(', ')
-                      : values.find(
+                      : sortedValues.find(
                           (item: any) =>
                             item.code === selectedVals ||
                             item.name === selectedVals
                         )?.name ?? selectedVals
                   }
                 >
-                  {values.map((item: any) => (
+                  {sortedValues.map((item: any) => (
                     <MenuItem
                       key={item.code ?? item.name ?? item}
                       value={item.code ?? item.name ?? item}

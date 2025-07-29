@@ -220,14 +220,23 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
     )?.options;
 
     const schoolSubCategory =
-      option?.find((category: any) => category.code === 'learningForSchool')
-        ?.associations?.subDomain ?? [];
+      option
+        ?.find((category: any) => category.code === 'learningForSchool')
+        ?.associations?.subDomain?.sort((a: any, b: any) =>
+          (a?.name || '').localeCompare(b?.name || '')
+        ) ?? [];
     const workSubCategory =
-      option?.find((category: any) => category.code === 'learningForWork')
-        ?.associations?.subDomain ?? [];
+      option
+        ?.find((category: any) => category.code === 'learningForWork')
+        ?.associations?.subDomain?.sort((a: any, b: any) =>
+          (a?.name || '').localeCompare(b?.name || '')
+        ) ?? [];
     const lifeSubCategory =
-      option?.find((category: any) => category.code === 'learningForLife')
-        ?.associations?.subDomain ?? [];
+      option
+        ?.find((category: any) => category.code === 'learningForLife')
+        ?.associations?.subDomain?.sort((a: any, b: any) =>
+          (a?.name || '').localeCompare(b?.name || '')
+        ) ?? [];
 
     const navLinks: NewDrawerItemProp[] = [
       {
