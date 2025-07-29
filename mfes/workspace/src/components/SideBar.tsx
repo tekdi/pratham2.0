@@ -28,7 +28,7 @@ import { getLocalStoredUserRole } from '@workspace/services/LocalStorageService'
 import { TENANT_DATA } from '@workspace/utils/app.constant';
 import TenantService from '@workspace/services/TenantService';
 const route = process.env.NEXT_PUBLIC_WORKSPACE_ROUTES;
-import aiAssessment from '../assets/images/aicheckbook.svg';
+import aiAssessment from '../assets/images/assessment.svg';
 
 let isAdmin: boolean;
 if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
@@ -93,8 +93,13 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
       key: 'discover-contents',
       icon: <ManageSearchIcon />,
     },
+     {
+      text: 'Content Library',
+      key: 'content-library',
+      icon: <ManageSearchIcon />,
+     },
     {
-      text: 'AI-Assessments',
+      text: 'Assessments',
       key: 'ai-assessments',
       icon: (
         <Image
@@ -108,13 +113,15 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
   ];
 
   const handleNavigation = (key: string) => {
-    console.log(key);
+    // Clear filter retention if navigating away from content-library
+    if (key !== 'content-library') {
+      localStorage.removeItem('contentLibraryFilters');
+      localStorage.removeItem('contentLibrarySelectedNames');
+    }
     router.push(`/workspace/content/${key}`);
     localStorage.setItem('selectedFilters', JSON.stringify([]));
     onSelect(key);
-    if (isMobile) {
-      setDrawerOpen(false); // Close drawer after selecting in mobile view
-    }
+    if (isMobile) setDrawerOpen(false);
   };
 
   const toggleDrawer = () => {

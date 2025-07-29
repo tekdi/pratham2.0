@@ -496,6 +496,7 @@ export default function Content(props: Readonly<ContentProps>) {
   const handleCardClickLocal = useCallback(
     async (content: ContentItem, e?: any, rowNumber?: number) => {
       console.log('Card clicked--------:', content);
+       if (typeof window !== 'undefined'){
        const windowUrl = window.location.href;
       // const cleanedUrl = windowUrl.replace(/^\//, '');
       // const env = cleanedUrl.split('/')[0];
@@ -517,6 +518,7 @@ export default function Content(props: Readonly<ContentProps>) {
         },
       };
       telemetryFactory.interact(telemetryInteract);
+    }
 
       try {
         sessionStorage.setItem(
