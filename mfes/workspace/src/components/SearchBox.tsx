@@ -38,6 +38,7 @@ export interface SearchBarProps {
 
   allContents?: boolean;
   discoverContents?: boolean;
+  isPrimaryCategory?: boolean;
 }
 
 const sortOptions = SortOptions;
@@ -52,6 +53,7 @@ const SearchBox: React.FC<SearchBarProps> = ({
   onStateChange,
   allContents = false,
   discoverContents = false,
+  isPrimaryCategory = true,
 }) => {
   const router = useRouter();
 
@@ -271,7 +273,7 @@ const SearchBox: React.FC<SearchBarProps> = ({
           </Box>
         </Grid>
 
-        <Grid
+        {isPrimaryCategory &&(<Grid
           item
           xs={12}
           md={12}
@@ -326,7 +328,7 @@ const SearchBox: React.FC<SearchBarProps> = ({
               ))}
             </Select>
           </FormControl>
-        </Grid>
+        </Grid>)}
 
         <Grid
           item
