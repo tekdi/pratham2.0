@@ -89,213 +89,42 @@ const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
           width: { xs: 320, sm: 536 },
         }}
       >
-        {/* Processing State */}
-        {state === 'processing' && (
-          <>
-            <Box sx={{ mb: 2 }}>
-              <PendingOutlinedIcon sx={{ fontSize: 40, color: '#B1AAA2' }} />
-            </Box>
-            <Typography
-              sx={{
-                ...poppinsFont,
-                fontWeight: 400,
-                fontSize: 22,
-                color: '#1F1B13',
-                mb: 2,
-                textAlign: 'center',
-              }}
-            >
-              Taking longer than expected..
-            </Typography>
-            <Typography
-              sx={{
-                ...poppinsFont,
-                fontWeight: 400,
-                fontSize: 16,
-                color: '#635E57',
-                mb: 2,
-                textAlign: 'center',
-                maxWidth: 400,
-                lineHeight: 1.5,
-              }}
-            >
-              You can continue to wait here or check back later
-            </Typography>
-            <CircularProgress sx={{ mb: 4, color: '#635E57' }} />
-          </>
-        )}
-        {/* Loader State */}
-        {state === 'loader' && (
-          <>
-            <Box sx={{ mb: 3 }}>
-              <Image
-                src="/mfe_workspace/logo.png"
-                alt="Logo"
-                height={64}
-                width={69}
-                loading="lazy"
-                style={{ objectFit: 'contain' }}
-              />
-            </Box>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                mb: 2,
-              }}
-            >
-              <Typography
-                sx={{
-                  ...poppinsFont,
-                  fontWeight: 400,
-                  fontSize: 22,
-                  color: '#1F1B13',
-                  mb: 3,
-                }}
-              >
-                Generating your questions in
-              </Typography>
-              <Box sx={{ position: 'relative', display: 'inline-flex', mb: 1 }}>
-                <Box sx={{ position: 'relative' }}>
-                  <CircularProgress
-                    variant="determinate"
-                    value={100}
-                    size={120}
-                    thickness={4}
-                    sx={{ color: '#987100' }}
-                  />
-                  <CircularProgress
-                    variant="determinate"
-                    value={((60 - timer) / 60) * 100}
-                    size={120}
-                    thickness={4}
-                    sx={{
-                      color: '#DED8E1',
-                      position: 'absolute',
-                      left: 0,
-                    }}
-                  />
-                </Box>
-
-                <Box
-                  sx={{
-                    top: 0,
-                    left: 0,
-                    bottom: 0,
-                    right: 0,
-                    position: 'absolute',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: '100%',
-                    height: '100%',
-                  }}
-                >
-                  <Box sx={{ display: 'flex' }}>
-                    <Typography
-                      sx={{
-                        ...poppinsFont,
-                        fontWeight: 400,
-                        fontSize: 32,
-                        color: '#1F1B13',
-                        textAlign: 'center',
-                      }}
-                    >
-                      {timer}
-                    </Typography>
-                    <Typography
-                      sx={{
-                        ...poppinsFont,
-                        fontWeight: 400,
-                        fontSize: 32,
-                        color: '#B1AAA2',
-                        textAlign: 'center',
-                      }}
-                    >
-                      s
-                    </Typography>
-                  </Box>
-                </Box>
-              </Box>
-            </Box>
-            {/* <Typography
-              sx={{
-                ...poppinsFont,
-                fontWeight: 400,
-                fontSize: 16,
-                color: '#1976d2',
-                mb: 1,
-              }}
-            >
-              {`AI Status: ${aiStatus ?? 'Loading... '}`}
-            </Typography> */}
-
-            <Typography
-              sx={{
-                ...poppinsFont,
-                fontWeight: 400,
-                fontSize: 16,
-                color: '#1F1B13',
-                opacity: 0.8,
-                letterSpacing: '3.1%',
-                textAlign: 'center',
-                mb: 3,
-              }}
-            >
-              Sit tight while we create a tailored set of questions based on
-              your content.
-            </Typography>
-            <Typography
-              sx={{
-                ...poppinsFont,
-                fontWeight: 400,
-                fontSize: 15,
-                color: '#7C766F',
-                textAlign: 'center',
-                mb: 2,
-              }}
-            >
-              You can continue to wait here or check back later in the list view
-            </Typography>
-          </>
-        )}
         {/* Success State */}
-        {state === 'success' && (
-          <>
-            <Box sx={{ mb: 3 }}>
-              <CheckCircleOutlineOutlinedIcon
-                sx={{ fontSize: 40, color: '#019722' }}
-              />
-            </Box>
-            <Typography
-              sx={{
-                ...poppinsFont,
-                fontWeight: 400,
-                fontSize: 22,
-                color: '#1F1B13',
-                textAlign: 'center',
-                mb: 2,
-              }}
-            >
-              Questions generated successfully!
-            </Typography>
-            <Typography
-              sx={{
-                ...poppinsFont,
-                fontWeight: 400,
-                fontSize: 16,
-                color: '#635E57',
-                mb: 4,
-                textAlign: 'center',
-                maxWidth: 600,
-                lineHeight: 1.5,
-              }}
-            >
-              You can head to the editor and review the questions.
-            </Typography>
-          </>
-        )}
+
+        <>
+          <Box sx={{ mb: 3 }}>
+            <CheckCircleOutlineOutlinedIcon
+              sx={{ fontSize: 40, color: '#019722' }}
+            />
+          </Box>
+          <Typography
+            sx={{
+              ...poppinsFont,
+              fontWeight: 400,
+              fontSize: 22,
+              color: '#1F1B13',
+              textAlign: 'center',
+              mb: 2,
+            }}
+          >
+            Questions generated successfully!
+          </Typography>
+          <Typography
+            sx={{
+              ...poppinsFont,
+              fontWeight: 400,
+              fontSize: 16,
+              color: '#635E57',
+              mb: 4,
+              textAlign: 'center',
+              maxWidth: 600,
+              lineHeight: 1.5,
+            }}
+          >
+            You can head to the editor and review the questions.
+          </Typography>
+        </>
+
         {/* Failed/Retry State */}
         {state === 'failed' && (
           <>
@@ -365,7 +194,7 @@ const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
                       color: '#1F1B13',
                     },
                   }}
-                  onClick={handleGoBackToWorkspace}
+                  onClick={onGoToEditor}
                 >
                   Go Back to Workspace
                 </Button>

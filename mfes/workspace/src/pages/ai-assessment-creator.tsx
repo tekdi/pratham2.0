@@ -210,9 +210,32 @@ const AIAssessmentCreator: React.FC = () => {
     let response: any = '';
     try {
       response = await createQuestionSet(tenantConfig?.COLLECTION_FRAMEWORK);
+
+      // Create the attributions array as per the API requirement
+      const attributions = [
+        {
+          name: 'difficulty_level',
+          value: data?.difficulty_level || 'Medium',
+        },
+        {
+          name: 'question_types',
+          value: data?.question_types || [],
+        },
+        {
+          name: 'questionsDetails',
+          value: data?.questionsDetails || [],
+        },
+      ];
+
+      // Prepare metadata with attributions
+      const metadata = {
+        ...(data?.metadata || {}),
+        attributions,
+      };
+
       const updateResponse = await updateQuestionSet({
         identifier: response?.result?.identifier,
-        ...(data?.metadata || {}),
+        ...metadata,
       });
       return updateResponse?.result?.identifier;
     } catch (error) {

@@ -12,6 +12,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useTheme } from '@mui/material/styles';
 import { getAge, getAgeInMonths } from '../../utils/Helper';
 import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useTranslation } from 'next-i18next';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import { VolunteerField } from '../../utils/app.constant';
@@ -32,7 +33,7 @@ type UserCardProps = {
   totalCount?: number;
   newRegistrations?: number;
   onClick?: (Id: string, name?: string) => void;
-  onToggleClick?: (name: string, id: string) => void;
+  onToggleClick?: (user: UserCardProps) => void;
   onUserClick?: (name: string) => void;
   customFields?: any;
   showAvtar?: any;
@@ -72,6 +73,8 @@ const UserCard: React.FC<UserCardProps> = ({
 }) => {
   const theme = useTheme<any>();
   const { t } = useTranslation();
+  const searchParams = useSearchParams();
+  const value = searchParams.get('value');
 
   return (
     <Box
@@ -86,7 +89,9 @@ const UserCard: React.FC<UserCardProps> = ({
         }),
       }}
     >
-      <ListItem sx={{ paddingLeft: '0px !important', paddingRight: '0px !important'}}>
+      <ListItem
+        sx={{ paddingLeft: '0px !important', paddingRight: '0px !important' }}
+      >
         {firstName && (
           <Avatar
             src={image}
@@ -204,16 +209,45 @@ const UserCard: React.FC<UserCardProps> = ({
                 )}
               </Typography>
             )}
-            {showMore && isVolunteer === VolunteerField.NO && (
-              <MoreVertIcon
-                sx={{
-                  fontSize: '24px',
-                  color: theme.palette.warning['300'],
-                  cursor: 'pointer',
-                }}
-                onClick={() => onToggleClick?.(name, Id)}
-              />
-            )}
+            {/* TODO: Check condition here */}
+            {showMore &&
+              (isVolunteer === VolunteerField.NO || value === '1') && (
+                <MoreVertIcon
+                  sx={{
+                    fontSize: '24px',
+                    color: theme.palette.warning['300'],
+                    cursor: 'pointer',
+                  }}
+                  onClick={() =>
+                    onToggleClick?.({
+                      name,
+                      userId,
+                      age,
+                      village,
+                      image,
+                      joinOn,
+                      isNew,
+                      showMore,
+                      totalCount,
+                      newRegistrations,
+                      onClick,
+                      onToggleClick,
+                      firstName,
+                      lastName,
+                      dob,
+                      customFields,
+                      onUserClick,
+                      showAvtar,
+                      Id,
+                      blockNames,
+                      villageCount,
+                      isVolunteer,
+                      villageNames,
+                      nameRedirection,
+                    })
+                  }
+                />
+              )}
           </Box>
         </Box>
       </ListItem>
@@ -224,7 +258,7 @@ const UserCard: React.FC<UserCardProps> = ({
 type UserListProps = {
   users: UserCardProps[];
   layout?: 'list' | 'grid';
-  onToggleUserClick?: (name: string) => void;
+  onToggleUserClick?: (user: UserCardProps) => void;
   onUserClick?: (Id: string, name?: string) => void;
   nameRedirection?: boolean;
 };
@@ -236,8 +270,8 @@ export const UserList: React.FC<UserListProps> = ({
   onUserClick,
   nameRedirection = true,
 }) => {
-  console.log(users);
   const router = useRouter();
+
   // const onUserClick=(userId: any)=>
   //   {
   //     console.log(userId)

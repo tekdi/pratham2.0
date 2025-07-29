@@ -25,8 +25,8 @@ const Header = () => {
           alt="Siemens Stiftung Logo"
           style={{
             width: '100%',
-            maxWidth: '280px',
-            height: 'auto',
+            maxWidth: '206px',
+            height: '71px',
             minWidth: '150px',
           }}
         />
@@ -42,8 +42,8 @@ const Header = () => {
           alt="Pratham Logo"
           style={{
             width: '100%',
-            maxWidth: '89px',
-            height: 'auto',
+            maxWidth: '65px',
+            height: '60px',
             minWidth: '60px',
           }}
         />
@@ -56,8 +56,8 @@ const Header = () => {
           alt="SIEMENS Logo"
           style={{
             width: '100%',
-            maxWidth: '178px',
-            height: 'auto',
+            maxWidth: '131px',
+            height: '66px',
             minWidth: '120px',
           }}
         />
