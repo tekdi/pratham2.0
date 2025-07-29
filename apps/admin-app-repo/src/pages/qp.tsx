@@ -442,7 +442,6 @@ const QuestionPaperPDF = ({ data }: any) => {
               />
             </View>
           </View>
-          
           <View style={styles.row}>
             {data?.sections?.map((section: any, sectionIndex: any) => (
               <View key={sectionIndex}>
@@ -641,7 +640,7 @@ export default function QP() {
       }
     };
     if (content_details != null) {
-      // handleDownloadPDF();
+      handleDownloadPDF();
     }
   }, [content_details]);
 
@@ -968,7 +967,7 @@ export default function QP() {
       {/* DO ID ={do_id} */}
       <br />
       {status}
-      <br />
+      {/* <br />
       {content_details && (
         <BlobProvider
           document={
@@ -990,7 +989,7 @@ export default function QP() {
         </BlobProvider>
       )}
       <br />
-      <pre>{JSON.stringify(content_details, null, 2)}</pre>
+      <pre>{JSON.stringify(content_details, null, 2)}</pre> */}
     </div>
   );
 }
