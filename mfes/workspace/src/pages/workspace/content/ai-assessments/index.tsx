@@ -3,13 +3,12 @@ import Layout from '../../../../components/Layout';
 import { Typography, Box, CircularProgress } from '@mui/material';
 import {
   getContent,
-  searchAiAssessment,
+  // searchAiAssessment,
 } from '@workspace/services/ContentService';
 import SearchBox from '../../../../components/SearchBox';
 import PaginationComponent from '@workspace/components/PaginationComponent';
 import { LIMIT } from '@workspace/utils/app.constant';
 import { useRouter } from 'next/router';
-import { MIME_TYPE } from '@workspace/utils/app.config';
 import WorkspaceText from '@workspace/components/WorkspaceText';
 import { DataType } from 'ka-table/enums';
 import KaTableComponent from '@workspace/components/KaTableComponent';
@@ -153,12 +152,12 @@ const PublishPage = () => {
         }
         const order = sortBy === 'Created On' ? 'asc' : 'desc';
         const sort_by = { lastUpdatedOn: order };
-        const aiQuestionSetStatus = await searchAiAssessment({
-          createdBy: localStorage.getItem('userId'),
-        });
-        const identifiers = (aiQuestionSetStatus?.data || []).map(
-          (item: any) => item.question_set_id as string
-        );
+        // const aiQuestionSetStatus = await searchAiAssessment({
+        //   createdBy: localStorage.getItem('userId'),
+        // });
+        // const identifiers = (aiQuestionSetStatus?.data || []).map(
+        //   (item: any) => item.question_set_id as string
+        // );
         const response = await getContent(
           ['Live'],
           query,
@@ -166,22 +165,21 @@ const PublishPage = () => {
           offset,
           primaryCategory,
           sort_by,
-          tenantConfig?.CHANNEL_ID,
-          '',
-          '',
-          identifiers
+          tenantConfig?.CHANNEL_ID
+          // '',
+          // '',
+          // identifiers
         );
-        // const contentList = (response?.content || []).concat(
-        //   response?.QuestionSet || []
+        setContentList(response?.QuestionSet || []);
+
+        // setContentList(
+        //   (response?.QuestionSet || []).map((item: any) => ({
+        //     ...item,
+        //     aiStatus: aiQuestionSetStatus?.data?.find(
+        //       (aiItem: any) => aiItem.question_set_id === item.identifier
+        //     )?.status,
+        //   }))
         // );
-        setContentList(
-          (response?.QuestionSet || []).map((item: any) => ({
-            ...item,
-            aiStatus: aiQuestionSetStatus?.data?.find(
-              (aiItem: any) => aiItem.question_set_id === item.identifier
-            )?.status,
-          }))
-        );
         setTotalCount(response?.count || 0);
       } catch (error) {
         console.error(error);
