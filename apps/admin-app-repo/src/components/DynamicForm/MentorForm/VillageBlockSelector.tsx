@@ -20,6 +20,7 @@ import {
 } from '@shared-lib-v2/utils/helper';
 import { getStateBlockDistrictList } from '@/services/MasterDataService';
 import { userList } from '@/services/UserList';
+import { useTranslation } from 'react-i18next';
 // import DynamicForm from '../../components/DynamicForm/DynamicForm';
 
 const VillageBlockSelector = ({
@@ -35,6 +36,7 @@ const VillageBlockSelector = ({
   );
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [villages, setVillages] = useState<any>([]);
+  const { t } = useTranslation();
 
   const categorizedVillages = villages
     .sort((a: any, b: any) => a.name.localeCompare(b.name))
@@ -143,6 +145,9 @@ const VillageBlockSelector = ({
         <IconButton onClick={onBack}>
           <ArrowBackIcon />
         </IconButton>
+        <Typography>
+          {t('YOUTHNET_USERS_AND_VILLAGES.PLEASE_GO_BACK_MSG')}
+        </Typography>
       </Box>
 
       <Box
