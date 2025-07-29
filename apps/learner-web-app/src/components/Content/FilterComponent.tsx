@@ -70,6 +70,7 @@ if (typeof window !== 'undefined') {
     () => (
       <FilterForm
         _config={{
+          t: t,
           _filterBody: _config?._filterBody,
           _checkbox: {
             sx: checkboxStyle,

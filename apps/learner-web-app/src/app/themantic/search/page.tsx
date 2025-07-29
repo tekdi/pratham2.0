@@ -6,5 +6,9 @@ const Search = dynamic(() => import('@learner/components/themantic/Search'), {
 });
 
 export default function PosPage() {
-  return <Search />;
+  return (
+    <div className="thematic-page">
+      <Search />
+    </div>
+  );
 }

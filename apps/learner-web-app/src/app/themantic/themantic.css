@@ -1,0 +1,22 @@
+/* Thematic specific styles with Montserrat font */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+.thematic-page {
+  font-family: 'Montserrat', Arial, sans-serif !important;
+}
+
+.thematic-page * {
+  font-family: 'Montserrat', Arial, sans-serif !important;
+}
+
+/* Ensure all MUI components in thematic pages use Montserrat */
+.thematic-page .MuiTypography-root,
+.thematic-page .MuiButton-root,
+.thematic-page .MuiTextField-root,
+.thematic-page .MuiCard-root,
+.thematic-page .MuiAppBar-root,
+.thematic-page .MuiToolbar-root,
+.thematic-page .MuiTabs-root,
+.thematic-page .MuiTab-root {
+  font-family: 'Montserrat', Arial, sans-serif !important;
+} 
