@@ -758,6 +758,10 @@ const AssessmentDetails: React.FC = () => {
                       fontWeight: 500,
                       fontSize: '14px',
                       color: '#1F1B13',
+                      width: '280px',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
                     }}
                   >
                     {assessmentData?.title
