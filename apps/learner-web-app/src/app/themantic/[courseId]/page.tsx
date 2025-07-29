@@ -17,48 +17,55 @@ const CourseUnitDetails = dynamic(() => import('@CourseUnitDetails'), {
 });
 const App = () => {
   return (
-    <Layout sx={{ backgroundImage: 'url(/images/energy-background.png)' }}>
-      <SubHeader showFilter={false} />
-      <Container maxWidth="lg">
-        <Box
-          sx={{
-            '& .css-17kujh3': {
-              overflowY: 'unset !important',
-            },
-          }}
-        >
-          <CourseUnitDetails
-            isShowLayout={false}
-            isHideInfoCard={true}
-            showBreadCrumbs={{
-              prefix: [{ label: 'Home', link: '/themantic' }],
+    <div className="thematic-page">
+      <Layout sx={{ backgroundImage: 'url(/images/energy-background.png)' }}>
+        <SubHeader showFilter={false} />
+        <Container maxWidth="lg">
+          <Box
+            sx={{
+              '& .css-17kujh3': {
+                overflowY: 'unset !important',
+              },
             }}
-            _box={{ px: { xs: 0, sm: 0, md: 0 } }}
-            _config={{
-              default_img: '/images/image_ver.png',
-              contentBaseUrl: '/themantic',
-              _grid: {
-                xs: 12,
-                sm: 6,
-                md: 4,
-                lg: 4,
-                xl: 4,
-              },
-              _containerGrid: {
-                spacing: { xs: 6, sm: 6, md: 6 },
-              },
-
-              isEnrollmentRequired: false,
-              _card: { cardComponent: CardComponent },
-              _infoCard: {
-                _cardMedia: { maxHeight: { xs: '200px', sm: '280px' } },
+          >
+            <CourseUnitDetails
+              isShowLayout={false}
+              isHideInfoCard={true}
+              showBreadCrumbs={{
+                prefix: [{ label: 'Home', link: '/themantic' }],
+              }}
+              _box={{ px: { xs: 0, sm: 0, md: 0 } }}
+              _config={{
                 default_img: '/images/image_ver.png',
-              },
-            }}
-          />
-        </Box>
-      </Container>
-    </Layout>
+                contentBaseUrl: '/themantic',
+                _grid: {
+                  xs: 12,
+                  sm: 6,
+                  md: 4,
+                  lg: 4,
+                  xl: 4,
+                },
+                _containerGrid: {
+                  spacing: { xs: 6, sm: 6, md: 6 },
+                },
+
+                isEnrollmentRequired: false,
+                _card: {
+                  cardComponent: CardComponent,
+                  titleFontSize: '14px',
+                  fontWeight: 700,
+                  titleColor: 'black',
+                },
+                _infoCard: {
+                  _cardMedia: { maxHeight: { xs: '200px', sm: '280px' } },
+                  default_img: '/images/image_ver.png',
+                },
+              }}
+            />
+          </Box>
+        </Container>
+      </Layout>
+    </div>
   );
 };
 
