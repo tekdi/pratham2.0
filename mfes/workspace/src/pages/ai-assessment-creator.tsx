@@ -327,7 +327,17 @@ const AIAssessmentCreator: React.FC = () => {
     handleSubmit(newFormState);
   };
 
-  const handleBack = () => setActiveStep((s) => s - 1);
+  const handleBack = () => {
+    setActiveStep((s) => {
+      const newStep = s - 1;
+      // When going back to step 0, restore selectedContent from formState.content
+      if (newStep === 0 && formState.content) {
+        const contentIds = formState.content.map((item: any) => item.id);
+        setSelectedContent(contentIds);
+      }
+      return newStep;
+    });
+  };
 
   const handleSubmit = async (formData: any) => {
     const token = localStorage.getItem('token');
@@ -383,7 +393,7 @@ const AIAssessmentCreator: React.FC = () => {
     return <Loader showBackdrop loadingText="Loading..." />;
   }
 
-  let stepContent = null;
+  let stepContent: React.ReactElement | null = null;
   if (activeStep === 0) {
     stepContent = (
       <SelectContent
