@@ -26,8 +26,10 @@ import customTheme from '../styles/customTheme';
 import rtlPlugin from 'stylis-plugin-rtl';
 import { Box, IconButton } from '@mui/material';
 import { ToastContainer } from 'react-toastify';
-import "react-toastify/dist/ReactToastify.css";
+import 'react-toastify/dist/ReactToastify.css';
 import { LanguageProvider } from '@shared-lib-v2/lib/context/LanguageContext';
+import Notification from '../components/Notification';
+import AllowNotification from '../components/AllowNotification';
 
 const ColorModeContext = React.createContext({ toggleColorMode: () => {} });
 const poppins = Poppins({
@@ -92,22 +94,19 @@ function CustomApp({ Component, pageProps }: AppProps) {
     }
   }, [i18n.language]);
 
-    useEffect(() => {
-      if (!window.GA_INITIALIZED) {
-        console.log('Initializing GA');
-        initGA(`${process.env.NEXT_PUBLIC_MEASUREMENT_ID_TEACHER}`);
-        window.GA_INITIALIZED = true;
-      }
+  useEffect(() => {
+    if (!window.GA_INITIALIZED) {
+      console.log('Initializing GA');
+      initGA(`${process.env.NEXT_PUBLIC_MEASUREMENT_ID_TEACHER}`);
+      window.GA_INITIALIZED = true;
+    }
 
-      const handleRouteChange = (url: string) => {
-        logPageView(url);
-      };
+    const handleRouteChange = (url: string) => {
+      logPageView(url);
+    };
 
-      handleRouteChange(window.location.pathname);
-    }, [router.events]);
-
-
-
+    handleRouteChange(window.location.pathname);
+  }, [router.events]);
 
   useEffect(() => {
     telemetryFactory.init();
@@ -145,33 +144,33 @@ function CustomApp({ Component, pageProps }: AppProps) {
       <CacheProvider value={isRTL ? rtlCache : ltrCache}>
         <CssVarsProvider theme={customTheme}>
           <LanguageProvider>
-             <Box
-            sx={{
-              padding: '0',
-              '@media (min-width: 900px)': {
-                // width: '100%',
-                marginLeft: !isFullWidthPage ? '351px' : '0',
-              },
-              '@media (min-width: 2000px)': {
-                // width: '100%',
-                marginLeft: !isFullWidthPage ? '351px' : '0',
-              },
-              background: theme.palette.warning['A400'],
-              overflowX: 'hidden',
-            }}
-          >
-            <QueryClientProvider client={client}>
-              <Component {...pageProps} />
-              <ToastContainer
-              position="bottom-left"
-              autoClose={3000}
-              stacked={false}
-            />
-            </QueryClientProvider>
-          
-          </Box>
+            <Box
+              sx={{
+                padding: '0',
+                '@media (min-width: 900px)': {
+                  // width: '100%',
+                  marginLeft: !isFullWidthPage ? '351px' : '0',
+                },
+                '@media (min-width: 2000px)': {
+                  // width: '100%',
+                  marginLeft: !isFullWidthPage ? '351px' : '0',
+                },
+                background: theme.palette.warning['A400'],
+                overflowX: 'hidden',
+              }}
+            >
+              <QueryClientProvider client={client}>
+                <Component {...pageProps} />
+                <ToastContainer
+                  position="bottom-left"
+                  autoClose={3000}
+                  stacked={false}
+                />
+                <Notification />
+                {!login && <AllowNotification />}
+              </QueryClientProvider>
+            </Box>
           </LanguageProvider>
-         
         </CssVarsProvider>
       </CacheProvider>
     </>
