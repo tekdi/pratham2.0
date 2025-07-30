@@ -15,6 +15,7 @@ import {
   Divider,
 } from '@mui/material';
 import PendingOutlinedIcon from '@mui/icons-material/PendingOutlined';
+import { getAIQuestionSetStatus } from '../services/ContentService';
 
 const Editor = () => {
   const router = useRouter();
@@ -35,12 +36,28 @@ const Editor = () => {
         ) {
           setStatus(response.data?.[0].status);
           setIsModalOpen(true);
+          const interval = setInterval(async () => {
+            try {
+              const status = await getAIQuestionSetStatus(
+                identifier as string,
+                localStorage.getItem('token') as string
+              );
+              if (status?.result?.status === 'COMPLETED') {
+                clearInterval(interval);
+                setStatus(response.data?.[0].status);
+                setIsModalOpen(false);
+                router.reload();
+              }
+            } catch (error: any) {
+              console.log(error, 'error');
+            }
+          }, 10000);
         }
       }
       setIsLoading(false);
     };
     init();
-  }, [identifier]);
+  }, [identifier, router]);
 
   const onEvent = async (event: any) => {
     if (event.detail?.action === 'publishContent') {
