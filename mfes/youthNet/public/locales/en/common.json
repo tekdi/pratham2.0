@@ -808,7 +808,9 @@
     "VILLAGES": "Villages",
     "BLOCKS": "Blocks",
     "DISTRICT": "District",
-    "DISTRICTS": "Districts"
+    "DISTRICTS": "Districts",
+    "PLEASE_GO_BACK_MSG": "Please go back after selection to proceed further"
+
   },
   "YOUTHNET_CAMP_DETAILS": {
     "SUBMISSION": "Submission",
