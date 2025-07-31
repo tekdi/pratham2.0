@@ -88,22 +88,20 @@ const ImageOverlay = styled(Box)(({ theme }) => ({
 }));
 
 const getCustomFieldValue = (cohort: CohortDetails, label: string) => {
-  if (!cohort?.customFields) return "";
   const field = cohort.customFields.find(f => f.label === label);
   return field?.selectedValues?.[0] || "";
 };
 
 const getIndustryValues = (cohort: CohortDetails, t : any): any => {
-  if (!cohort?.customFields) return [];
   const industryField = cohort.customFields.find(f => f.label === 'INDUSTRY');
-  console.log("industryField", industryField?.selectedValues?.map(v => v.label || v.value));
+  console.log("industryField", industryField?.selectedValues.map(v => v.label || v.value));
 
   return industryField
-    ? industryField.selectedValues?.map(v =>
+    ? industryField.selectedValues.map(v =>
         t(`FORM.${v.label || v.value}`, {
           defaultValue: v.label || v.value,
         })
-      ).join(', ') || []
+      ).join(', ')
     : [];
 };
 
@@ -156,13 +154,13 @@ if (typeof window !== 'undefined') {
     if (!response?.result?.result?.results?.cohortDetails) return;
 
     const apiCenters: Center[] = response.result.result.results.cohortDetails.map((cohort: CohortDetails) => ({
-      name: cohort?.name || 'Unknown Center',
+      name: cohort.name,
       category: getIndustryValues(cohort, t) || 'General',
       address: getCustomFieldValue(cohort, 'ADDRESS') || 'Address not available',
       distance: '0 km',
       mapsUrl: getCustomFieldValue(cohort, 'GOOGLE_MAP_LINK') || '#',
-      images: cohort?.image || ['/images/default.png'],
-      moreImages: cohort?.image?.length > 3 ? cohort.image.length - 3 : 0,
+      images: cohort.image || ['/images/default.png'],
+      moreImages: cohort.image?.length > 3 ? cohort.image.length - 3 : 0,
     }));
 console.log("apiCenters",visibleCenters,apiCenters)
     setCenters(apiCenters);
@@ -335,7 +333,7 @@ marginTop={!viewAll ? '0px' : { xs: '40px', sm: '80px' }}
         }}
       >
   {(viewAll ? visibleCenters : visibleCenters?.slice(0, 3))?.map(
-    (center: any, idx: any) => center && (
+    (center: any, idx: any) => (
           <Grid item xs={12} sm={6} md={4} key={idx}>
         <Card
           sx={{
@@ -351,10 +349,10 @@ marginTop={!viewAll ? '0px' : { xs: '40px', sm: '80px' }}
         >
               <CardContent sx={{ p: 0 }}>
                 <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-                    {center?.images?.slice(0, 3).map((img: any, i: any) => (
+                    {center.images.slice(0, 3).map((img: any, i: any) => (
                     <ImageContainer key={i}>
-                      <img src={img} alt={`${center?.name || 'Center'} view ${i + 1}`} />
-                      {i === 2 && center?.moreImages > 0 && (
+                      <img src={img} alt={`${center.name} view ${i + 1}`} />
+                      {i === 2 && center.moreImages > 0 && (
                         <ImageOverlay>+{center.moreImages}</ImageOverlay>
                       )}
                     </ImageContainer>
@@ -380,10 +378,10 @@ marginTop={!viewAll ? '0px' : { xs: '40px', sm: '80px' }}
                           fontSize: { xs: '16px', sm: '18px' },
                   }}
                 >
-                  {center?.name || 'Unknown Center'}
+                  {center.name}
                 </Typography>
                 <Chip
-                  label={center?.category || '#'}
+                  label={center.category}
                   size="small"
                   sx={{
                     backgroundColor: '#F5F5F5',
@@ -405,11 +403,11 @@ marginTop={!viewAll ? '0px' : { xs: '40px', sm: '80px' }}
                   lineHeight: 1.5,
                 }}
               >
-                {center?.address || 'Address not available'}
+                {center.address}
               </Typography>
 
               <Link
-                href={center?.mapsUrl || '#'}
+                href={center.mapsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 sx={{
@@ -481,5 +479,3 @@ marginTop={!viewAll ? '0px' : { xs: '40px', sm: '80px' }}
 };
 
 export default SkillCenter;
-
-
