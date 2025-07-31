@@ -50,6 +50,12 @@ const DynamicForm = ({
 
   const getInitialFormData = () => {
     console.log('prefilledFormData dob', prefilledFormData);
+    
+    // Handle case where prefilledFormData is null or undefined
+    if (!prefilledFormData) {
+      return {};
+    }
+    
     let cleaned = { ...prefilledFormData };
     
     if (!prefilledFormData.class) {
@@ -77,7 +83,7 @@ const DynamicForm = ({
   };
 
   const getInitialSchema = () => {
-    if (!prefilledFormData.family_member_details) {
+    if (!prefilledFormData || !prefilledFormData.family_member_details) {
       const cleanedSchema = { ...schema };
       if (cleanedSchema.properties) {
         delete cleanedSchema.properties.mother_name;
@@ -98,7 +104,7 @@ const DynamicForm = ({
   };
 
   const getInitialUiSchema = () => {
-    if (!prefilledFormData.family_member_details) {
+    if (!prefilledFormData || !prefilledFormData.family_member_details) {
       const cleanedUiSchema = { ...uiSchema };
       delete cleanedUiSchema.mother_name;
       delete cleanedUiSchema.father_name;
