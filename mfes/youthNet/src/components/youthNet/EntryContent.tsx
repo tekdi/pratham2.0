@@ -182,9 +182,13 @@ const EntryContent: React.FC<EntryContentProps> = ({
     // window.open(fileUrl, "_blank");
   };
   const getFileNameFromUrl = (url: any) => {
-    const urlObj = new URL(url);
+    if(url)
+    {
+ const urlObj = new URL(url);
     const pathname = urlObj.pathname; // Get the path after domain
     return pathname.substring(pathname.lastIndexOf('/') + 1); // Extract file name
+    }
+   
   };
   console.log("############ questionResponse", questionResponse)
   return (
