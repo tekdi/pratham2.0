@@ -768,9 +768,9 @@
     "PROFILE_DETAILS": "Profile Details",
     "FULL_NAME": "Full Name",
     "EMAIL_ID": "Email ID",
-    "STATE_DISTRICT_BLOCK": "Block District State",
-    "STATE_DISTRICT": "District State",
-    "STATE_DISTRICT_BLOCK_VILLAGE": "Village Block District State",
+    "STATE_DISTRICT_BLOCK": "State District Block",
+    "STATE_DISTRICT": "State District",
+    "STATE_DISTRICT_BLOCK_VILLAGE": "State District Block Village",
     "DESIGNATION": "Designation",
     "JOINED_ON": "Joined on",
     "PHONE_NUMBER": "Phone Number",
@@ -810,7 +810,6 @@
     "DISTRICT": "District",
     "DISTRICTS": "Districts",
     "PLEASE_GO_BACK_MSG": "Please go back after selection to proceed further"
-
   },
   "YOUTHNET_CAMP_DETAILS": {
     "SUBMISSION": "Submission",
