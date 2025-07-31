@@ -42,14 +42,84 @@ const DynamicForm = ({
   const hasPrefilled = useRef(false);
   const [submitted, setSubmitted] = useState(false);
   const formRef = useRef(null);
-  const [formSchema, setFormSchema] = useState(schema);
-  const [formUiSchemaOriginal, setFormUiSchemaOriginal] = useState(uiSchema);
-  const [formUiSchema, setFormUiSchema] = useState(uiSchema);
-  const [formData, setFormData] = useState(prefilledFormData);
+  // const [formData, setFormData] = useState({});
   const [dependentSchema, setDependentSchema] = useState([]);
   const [isInitialCompleted, setIsInitialCompleted] = useState(false);
   const [hideAndSkipFields, setHideAndSkipFields] = useState({});
   const [isRenderCompleted, setIsRenderCompleted] = useState(false);
+
+  const getInitialFormData = () => {
+    console.log('prefilledFormData dob', prefilledFormData);
+    
+    // Handle case where prefilledFormData is null or undefined
+    if (!prefilledFormData) {
+      return {};
+    }
+    
+    let cleaned = { ...prefilledFormData };
+    
+    if (!prefilledFormData.class) {
+      console.log('prefilledFormData class', prefilledFormData);
+      delete cleaned.class;
+    }
+    
+    if (!prefilledFormData.marital_status) {
+      delete cleaned.marital_status;
+    }
+    if(!prefilledFormData.dob) {
+      delete cleaned.dob
+    }
+  
+    if (!prefilledFormData.family_member_details) {
+      // Remove the three fields if no family member is selected
+      delete cleaned.mother_name;
+      delete cleaned.father_name;
+      delete cleaned.spouse_name;
+      delete cleaned.family_member_details;
+      // delete cleaned.dob;
+    }
+    
+    return cleaned;
+  };
+
+  const getInitialSchema = () => {
+    if (!prefilledFormData || !prefilledFormData.family_member_details) {
+      const cleanedSchema = { ...schema };
+      if (cleanedSchema.properties) {
+        delete cleanedSchema.properties.mother_name;
+        delete cleanedSchema.properties.father_name;
+        delete cleanedSchema.properties.spouse_name;
+      }
+      if (Array.isArray(cleanedSchema.required)) {
+        cleanedSchema.required = cleanedSchema.required.filter(
+          (key) =>
+            key !== 'mother_name' &&
+            key !== 'father_name' &&
+            key !== 'spouse_name'
+        );
+      }
+      return cleanedSchema;
+    }
+    return schema;
+  };
+
+  const getInitialUiSchema = () => {
+    if (!prefilledFormData || !prefilledFormData.family_member_details) {
+      const cleanedUiSchema = { ...uiSchema };
+      delete cleanedUiSchema.mother_name;
+      delete cleanedUiSchema.father_name;
+      delete cleanedUiSchema.spouse_name;
+      return cleanedUiSchema;
+    }
+    return uiSchema;
+  };
+
+  const [formData, setFormData] = useState(getInitialFormData());
+
+  const [formUiSchemaOriginal, setFormUiSchemaOriginal] = useState(getInitialUiSchema());
+  const [formUiSchema, setFormUiSchema] = useState(getInitialUiSchema());
+    const [formSchema, setFormSchema] = useState(getInitialSchema());
+
 
   //custom validation on formData for learner fields hide on dob
   useEffect(() => {
