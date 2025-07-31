@@ -923,6 +923,17 @@ const Index = () => {
     }
   };
 
+  useEffect(() => {
+    if (
+      value === 3 &&
+      villageList &&
+      villageList.length > 0 &&
+      !selectedVillageValue
+    ) {
+      setSelectedVillageValue(villageList[0].Id);
+    }
+  }, [value, villageList, selectedVillageValue]);
+
   return (
     <Box minHeight="100vh">
       <Box>
@@ -1351,7 +1362,6 @@ const Index = () => {
                   fontSize: '16px',
                   color: 'textSecondary',
                   marginLeft: '2rem',
-                  cursor: 'pointer',
                   pr: '20px',
                 }}
                 className="one-line-text"
@@ -1363,7 +1373,6 @@ const Index = () => {
                 sx={{
                   fontSize: '16px',
                   color: 'textSecondary',
-                  cursor: 'pointer',
                   pr: '20px',
                 }}
               >
