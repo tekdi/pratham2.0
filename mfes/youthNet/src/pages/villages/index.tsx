@@ -923,6 +923,17 @@ const Index = () => {
     }
   };
 
+  useEffect(() => {
+    if (
+      value === 3 &&
+      villageList &&
+      villageList.length > 0 &&
+      !selectedVillageValue
+    ) {
+      setSelectedVillageValue(villageList[0].Id);
+    }
+  }, [value, villageList, selectedVillageValue]);
+
   return (
     <Box minHeight="100vh">
       <Box>
@@ -1517,7 +1528,9 @@ const Index = () => {
                       marginLeft: '25%',
                     }}
                   >
-                    {t('YOUTHNET_USERS_AND_VILLAGES.NO_DATA_FOUND')}
+                    {t(
+                      'YOUTHNET_USERS_AND_VILLAGES.NO_DATA_FOUND_APPLY_FILTER'
+                    )}
                   </Typography>
                 </>
               ) : (
