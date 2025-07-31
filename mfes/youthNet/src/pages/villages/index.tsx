@@ -1528,9 +1528,7 @@ const Index = () => {
                       marginLeft: '25%',
                     }}
                   >
-                    {t(
-                      'YOUTHNET_USERS_AND_VILLAGES.NO_DATA_FOUND_APPLY_FILTER'
-                    )}
+                    {t('YOUTHNET_USERS_AND_VILLAGES.NO_DATA_FOUND')}
                   </Typography>
                 </>
               ) : (
