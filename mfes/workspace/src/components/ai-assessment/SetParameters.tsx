@@ -16,7 +16,7 @@ import {
   Grid,
   styled,
 } from '@mui/material';
-import { FilterForm } from 'libs/shared-lib-v2/src/lib/Filter/FilterForm';
+import { FilterForm } from '@shared-lib-v2/lib/Filter/FilterForm';
 import useTenantConfig from '@workspace/hooks/useTenantConfig';
 import ConfirmationDialog from './ConfirmationDialog';
 

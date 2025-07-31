@@ -216,7 +216,7 @@ const PublishPage = () => {
                 variant="h4"
                 sx={{ fontWeight: 'bold', fontSize: '16px' }}
               >
-                Ai-assessments
+                Assessments
               </Typography>
             </Box>
             <Box mb={3}>
@@ -228,7 +228,7 @@ const PublishPage = () => {
                 onSortChange={handleSortChange}
               />
             </Box>
-            {/* <Typography mb={2}>Here you see all your "Ai-assessments content.</Typography> */}
+            {/* <Typography mb={2}>Here you see all your "Assessments content.</Typography> */}
             {loading ? (
               <Box display="flex" justifyContent="center" my={5}>
                 <CircularProgress />

@@ -479,5 +479,3 @@ marginTop={!viewAll ? '0px' : { xs: '40px', sm: '80px' }}
 };
 
 export default SkillCenter;
-
-
