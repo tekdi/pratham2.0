@@ -1210,3 +1210,31 @@ export const isUnderEighteen = (dobString: any): boolean => {
 
   return age < 18;
 };
+
+export const isVillageDifferent = (
+  originalVillages: Record<string, string[]>,
+  newVillages: Record<string, string[]>
+): boolean => {
+  const allBlockIds = new Set([
+    ...Object.keys(originalVillages),
+    ...Object.keys(newVillages),
+  ]);
+  for (const blockId of allBlockIds) {
+    const orig = (originalVillages[blockId] || []).map(String).sort();
+    const curr = (newVillages[blockId] || []).map(String).sort();
+    if (orig.length !== curr.length || !orig.every((v, i) => v === curr[i])) {
+      return true;
+    }
+  }
+  return false;
+};
+
+export const isBlockSetDifferent = (
+  originalBlockVillageMap: Record<string, string[]>,
+  newBlockVillageMap: Record<string, string[]>
+): boolean => {
+  const origBlocks = Object.keys(originalBlockVillageMap).map(String).sort();
+  const newBlocks = Object.keys(newBlockVillageMap).map(String).sort();
+  if (origBlocks.length !== newBlocks.length) return true;
+  return !origBlocks.every((blockId, i) => blockId === newBlocks[i]);
+};

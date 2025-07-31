@@ -1,16 +1,14 @@
 import React, { Suspense } from 'react';
 
 import List from '@learner/components/themantic/content/List';
-import GoogleAnalyticsTracker from '@learner/components/GoogleAnalyticsTracker/GoogleAnalyticsTracker';
 
 const Page = () => {
   return (
-    <>
-      <GoogleAnalyticsTracker />
+    <div className="thematic-page">
       <Suspense fallback={<div>Loading...</div>}>
         <List />
       </Suspense>
-    </>
+    </div>
   );
 };
 

@@ -768,9 +768,9 @@
     "PROFILE_DETAILS": "Profile Details",
     "FULL_NAME": "Full Name",
     "EMAIL_ID": "Email ID",
-    "STATE_DISTRICT_BLOCK": "Block District State",
-    "STATE_DISTRICT": "District State",
-    "STATE_DISTRICT_BLOCK_VILLAGE": "Village Block District State",
+    "STATE_DISTRICT_BLOCK": "State District Block",
+    "STATE_DISTRICT": "State District",
+    "STATE_DISTRICT_BLOCK_VILLAGE": "State District Block Village",
     "DESIGNATION": "Designation",
     "JOINED_ON": "Joined on",
     "PHONE_NUMBER": "Phone Number",
@@ -808,7 +808,8 @@
     "VILLAGES": "Villages",
     "BLOCKS": "Blocks",
     "DISTRICT": "District",
-    "DISTRICTS": "Districts"
+    "DISTRICTS": "Districts",
+    "PLEASE_GO_BACK_MSG": "Please go back after selection to proceed further"
   },
   "YOUTHNET_CAMP_DETAILS": {
     "SUBMISSION": "Submission",
@@ -832,7 +833,22 @@
     "ASSIGN_VILLAGES_FINISH": "You can complete this later at your own pace. However, the villages will only be assigned once you click on ‘Finish.’",
     "ASSIGN_VILLAGES_FROM_BLOCKS": "Assign Villages from Blocks",
     "BACK_TO_FORM": "Back to form",
-    "SELECTED_VILLAGE_COUNT": "Selected village count : {{totalVillageCount}}"
+    "SELECTED_VILLAGE_COUNT": "Selected village count : {{totalVillageCount}}",
+    "RE_ASSIGN_VILLAGES": "Re-assign Villages"
+  },
+  "MENTORS": {
+    "NEW_MENTOR": "New Mentor",
+    "FIRST_SELECT_REQUIRED_FIELDS": "First select required fields",
+    "MENTOR_CREATED_SUCCESSFULLY": "Mentor has been successfully created!",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "Mentor is created, credentials will be sent soon",
+    "MENTOR_UPDATED_SUCCESSFULLY": "Mentor has been successfully updated!",
+    "EDIT_MENTOR": "Edit Mentor",
+    "NOT_ABLE_UPDATE_MENTOR": "Not able to update mentor",
+    "NOT_ABLE_CREATE_MENTOR": "Not able to create mentor",
+    "UPDATE_MENTOR": "Update Mentor",
+    "RE_ASSIGN_MENTOR": "Re-assign Mentor",
+    "MENTOR_DELETED_SUCCESSFULLY": "Mentor deleted successfully",
+    "MENTOR_DELETE_FAIL": "Failed to delete mentor"
   },
   "UNIT_NAME": "Unit Name",
   "TYPE_OF_CENTER": "Type Of Center",

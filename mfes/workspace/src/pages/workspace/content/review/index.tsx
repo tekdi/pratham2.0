@@ -40,7 +40,7 @@ const ReviewContentSubmissions = () => {
     useState(false);
   const router = useRouter();
   const { identifier } = router.query;
-  const { isDiscoverContent } = router.query;
+  const { isDiscoverContent , isContentLibrary, isAllContents}  = router.query;
   const { isReadOnly } = router.query;
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
  const [showHeader, setShowHeader] = useState<boolean | null>(null);
@@ -108,7 +108,15 @@ const ReviewContentSubmissions = () => {
       router.push({ pathname: `/workspace/content/discover-contents` });
 
     }
-    else if (getLocalStoredUserRole() === Role.CCTA) {
+    else if(isContentLibrary === "true") {
+      router.push({ pathname: `/workspace/content/content-library` });
+    }
+    else if(isAllContents==="true")
+    {
+      router.push({ pathname: `/workspace/content/allContents` });
+
+    }
+    else if (getLocalStoredUserRole() === Role.CCTA ||  getLocalStoredUserRole() === Role.CENTRAL_ADMIN) {
       router.push({ pathname: `/workspace/content/up-review` });
 
     }
@@ -143,7 +151,7 @@ const ReviewContentSubmissions = () => {
       setOpenConfirmationPopup(false);
       await delay(2000);
 
-      if (getLocalStoredUserRole() === Role.CCTA) {
+      if (getLocalStoredUserRole() === Role.CCTA || getLocalStoredUserRole() === Role.CENTRAL_ADMIN) {
         setPublishOpenToast(true)
         sendContentPublishNotification()
 
@@ -168,7 +176,7 @@ const ReviewContentSubmissions = () => {
       console.log("Comment submitted successfully:", response);
       // Add toaster success message here
       setOpenCommentPopup(false);
-      if (getLocalStoredUserRole() === Role.CCTA) {
+      if (getLocalStoredUserRole() === Role.CCTA ||  getLocalStoredUserRole() === Role.CENTRAL_ADMIN) {
         setRequestOpenToast(true)
         sendContentRejectNotification(comment)
 
@@ -221,7 +229,7 @@ const ReviewContentSubmissions = () => {
         <IconButton onClick={handleBackClick}>
           <ArrowBackIcon />
         </IconButton>
-        {getLocalStoredUserRole() === Role.CCTA && isDiscoverContent !== "true" && isReadOnly !== "true" && (<Typography
+        {(getLocalStoredUserRole() === Role.CCTA ||  getLocalStoredUserRole() === Role.CENTRAL_ADMIN)&& isDiscoverContent !== "true" && isReadOnly !== "true" && (<Typography
           variant="h5"
           sx={{
             fontFamily: "inherit",
@@ -447,7 +455,7 @@ const ReviewContentSubmissions = () => {
             </Grid>
           </Grid>
 
-          {getLocalStoredUserRole() === Role.CCTA && isDiscoverContent !== "true" && isReadOnly !== "true" && (<Box
+          {(getLocalStoredUserRole() === Role.CCTA  || getLocalStoredUserRole() === Role.CENTRAL_ADMIN)&& isDiscoverContent !== "true" && isReadOnly !== "true" && (<Box
             sx={{
               display: "flex",
               justifyContent: "flex-end",

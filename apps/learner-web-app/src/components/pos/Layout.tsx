@@ -220,14 +220,24 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
     )?.options;
 
     const schoolSubCategory =
-      option?.find((category: any) => category.code === 'learningForSchool')
-        ?.associations?.subDomain ?? [];
+      option
+        ?.find((category: any) => category.code === 'learningForSchool')
+        ?.associations?.subDomain?.sort((a: any, b: any) =>
+          (a?.name || '').localeCompare(b?.name || '')
+        ) ?? [];
     const workSubCategory =
-      option?.find((category: any) => category.code === 'learningForWork')
-        ?.associations?.subDomain ?? [];
+      option
+        ?.find((category: any) => category.code === 'learningForWork')
+        ?.associations?.subDomain?.sort((a: any, b: any) =>
+          (a?.name || '').localeCompare(b?.name || '')
+        ) ?? [];
     const lifeSubCategory =
-      option?.find((category: any) => category.code === 'learningForLife')
-        ?.associations?.subDomain ?? [];
+      option
+        ?.find((category: any) => category.code === 'learningForLife')
+        ?.associations?.subDomain?.sort((a: any, b: any) =>
+          (a?.name || '').localeCompare(b?.name || '')
+        ) ?? [];
+
     const navLinks: NewDrawerItemProp[] = [
       {
         title: t('LEARNER_APP.POS.ABOUT_US'),
@@ -289,6 +299,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         isActive: currentPage === '/themantic',
       },
     ];
+
     setDefaultNavLinks(navLinks);
   }, [t, filterFramework?.framework?.categories, router]);
 
@@ -300,6 +311,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         _config: {
           middleComponent: (
             <SearchButton
+              _topAppBarUi={true}
               onSearch={(search) => {
                 if (typeof window !== 'undefined') {
                   const windowUrl = window.location.pathname;
@@ -315,7 +327,15 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
               }}
               // isHideSubmitButton
               _input={{
-                placeholder: 'Search courses, subjects..',
+                placeholder: 'Search..',
+                sx: {
+                  '& input::placeholder': {
+                    fontSize: '14px',
+                  },
+                  '& .MuiInputAdornment-root': {
+                    marginRight: 0,
+                  },
+                },
               }}
               _box={{
                 sx: {
