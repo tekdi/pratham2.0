@@ -143,7 +143,7 @@ const EditProfile = ({ completeProfile }: EditProfileProps) => {
               },
               dob: {
                 ...alterUISchema.dob,
-                'ui:disabled': true,
+                // 'ui:disabled': true,
               },
               lastName: {
                 ...alterUISchema.lastName,
