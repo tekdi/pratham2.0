@@ -11,7 +11,7 @@ import { getAssessmentType } from '../../utils/Helper';
 import { ICohort } from '../../utils/Interfaces';
 import withAccessControl from '../../utils/hoc/withAccessControl';
 import ArrowDropDownSharpIcon from '@mui/icons-material/ArrowDropDownSharp';
-import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import {
   Box,
   Button,
@@ -34,6 +34,9 @@ const AssessmentList = () => {
   const router = useRouter();
   const { t } = useTranslation();
 
+  // Add client-side mounting state to prevent hydration mismatch
+  const [isMounted, setIsMounted] = useState(false);
+
   // Core state management (following /assessments/index.tsx pattern)
   const [modalOpen, setModalOpen] = useState(false);
   const [assessmentList, setAssessmentList] = useState([]);
@@ -54,22 +57,39 @@ const AssessmentList = () => {
     state: '',
   });
   const [assessmentType, setAssessmentType] = useState<string>('pre');
+
+  // Fix hydration issue: Initialize as null, load from localStorage in useEffect
   const [selectedSortOption, setSelectedSortOption] = useState<{
     sortByKey: string;
     sortByValue: string;
-  } | null>(() => {
-    if (typeof window !== 'undefined') {
-      const savedSort = localStorage.getItem('assessmentListSortOption');
-      return savedSort ? JSON.parse(savedSort) : null;
-    }
-    return null;
-  });
+  } | null>(null);
 
   const { query } = router;
 
+  // Client-side mounting effect to prevent hydration mismatch
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Load selectedSortOption from localStorage after mounting
+  useEffect(() => {
+    if (isMounted && typeof window !== 'undefined') {
+      const savedSort = localStorage.getItem('assessmentListSortOption');
+      if (savedSort) {
+        try {
+          setSelectedSortOption(JSON.parse(savedSort));
+        } catch (error) {
+          console.error('Error parsing saved sort option:', error);
+          // Clear invalid data
+          localStorage.removeItem('assessmentListSortOption');
+        }
+      }
+    }
+  }, [isMounted]);
+
   // Authentication check (following existing pattern)
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.localStorage) {
+    if (isMounted && typeof window !== 'undefined' && window.localStorage) {
       const token = localStorage.getItem('token');
       const storedUserId = localStorage.getItem('userId');
       const storedClassId = localStorage.getItem('classId') ?? '';
@@ -82,7 +102,7 @@ const AssessmentList = () => {
       }
       setUserId(storedUserId);
     }
-  }, []);
+  }, [isMounted, router]);
 
   // Assessment type from query params
   useEffect(() => {
@@ -144,6 +164,7 @@ const AssessmentList = () => {
                   board: item?.board,
                   medium: item?.medium,
                   gradeLevel: item?.gradeLevel,
+                  lastPublishedOn: item?.lastPublishedOn,
                 }));
                 setAssessmentList(assessmentData);
                 setFilteredAssessments(assessmentData);
@@ -296,8 +317,10 @@ const AssessmentList = () => {
 
   // Route change cleanup
   useEffect(() => {
+    if (!isMounted) return;
+
     const handleRouteChange = (url: string) => {
-      if (!url.startsWith('/scp-teacher-repo/assessments/list')) {
+      if (!url.startsWith('/ai-assessments')) {
         localStorage.removeItem('assessmentListSortOption');
         setSelectedSortOption(null);
       }
@@ -308,7 +331,12 @@ const AssessmentList = () => {
     return () => {
       router.events.off('routeChangeStart', handleRouteChange);
     };
-  }, [router]);
+  }, [router, isMounted]);
+
+  // Don't render until mounted to prevent hydration mismatch
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <>
@@ -511,12 +539,13 @@ const AssessmentList = () => {
                     sx={{
                       border: `1px solid ${theme.palette.warning['A100']}`,
                       background: theme.palette.warning['A400'],
-                      padding: '16px',
+                      padding: '8px 16px',
                       borderRadius: '8px',
                       cursor: 'pointer',
                       height: '100%',
                       display: 'flex',
                       flexDirection: 'column',
+                      gap: '4px',
                       transition: 'all 0.2s ease-in-out',
                       '&:hover': {
                         transform: 'translateY(-2px)',
@@ -534,10 +563,9 @@ const AssessmentList = () => {
                     <Typography
                       sx={{
                         fontSize: '16px',
-                        fontWeight: '500',
-                        color: theme.palette.warning['300'],
-                        mb: 1,
-                        lineHeight: 1.3,
+                        fontWeight: '400',
+                        color: '#1F1B13',
+                        lineHeight: '24px',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         display: '-webkit-box',
@@ -550,36 +578,49 @@ const AssessmentList = () => {
                     </Typography>
                     <Box
                       sx={{
+                        gap: '4px',
                         display: 'flex',
-                        gap: '8px',
-                        alignItems: 'center',
                         flexWrap: 'wrap',
-                        mt: 'auto',
+                        flexDirection: 'column',
                       }}
                     >
                       <Typography
                         sx={{
-                          fontSize: '12px',
-                          fontWeight: '500',
-                          color: theme.palette.warning['300'],
+                          fontSize: '14px',
+                          fontWeight: '400',
+                          color: '#4D4639',
+                          lineHeight: '20px',
                         }}
                       >
-                        {assessment?.gradeLevel || '--'}
+                        {`Published on ${new Date(assessment?.lastPublishedOn)
+                          .toLocaleDateString('en-GB', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric',
+                          })
+                          .split('/')
+                          .join(' ')}`}
                       </Typography>
-                      <FiberManualRecordIcon
-                        sx={{
-                          fontSize: '8px',
-                          color: theme.palette.warning['400'],
-                        }}
-                      />
+
                       <Typography
                         sx={{
                           fontSize: '12px',
-                          fontWeight: '500',
-                          color: theme.palette.warning['400'],
+                          fontWeight: '400',
+                          color: '#7C766F',
+                          display: 'flex',
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: '2px',
+                          lineHeight: '16px',
                         }}
                       >
-                        {assessment?.board || '--'}
+                        {'AI Generated'}
+                        <AutoAwesomeIcon
+                          sx={{
+                            fontSize: '14px',
+                            color: '#1877CF',
+                          }}
+                        />
                       </Typography>
                     </Box>
                   </Box>
