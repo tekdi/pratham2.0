@@ -130,8 +130,9 @@ const EntryContent: React.FC<EntryContentProps> = ({
 
 
   const onUserClick = (userId: string) => {
-    if(localStorage.getItem('mfe_state'))
-    router.push(`/user-profile/${userId}`);
+    if (localStorage.getItem('role')==="Instructor" || localStorage.getItem('role')==="Lead") {
+      router.push(`/user-profile/${userId}`);
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -181,9 +182,13 @@ const EntryContent: React.FC<EntryContentProps> = ({
     // window.open(fileUrl, "_blank");
   };
   const getFileNameFromUrl = (url: any) => {
-    const urlObj = new URL(url);
+    if(url)
+    {
+ const urlObj = new URL(url);
     const pathname = urlObj.pathname; // Get the path after domain
     return pathname.substring(pathname.lastIndexOf('/') + 1); // Extract file name
+    }
+   
   };
   console.log("############ questionResponse", questionResponse)
   return (
