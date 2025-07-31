@@ -1351,7 +1351,6 @@ const Index = () => {
                   fontSize: '16px',
                   color: 'textSecondary',
                   marginLeft: '2rem',
-                  cursor: 'pointer',
                   pr: '20px',
                 }}
                 className="one-line-text"
@@ -1363,7 +1362,6 @@ const Index = () => {
                 sx={{
                   fontSize: '16px',
                   color: 'textSecondary',
-                  cursor: 'pointer',
                   pr: '20px',
                 }}
               >
