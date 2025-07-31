@@ -17,6 +17,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useRouter } from 'next/router';
 import GenericModal from '../../../../components/GenericModal';
 import ConfirmationModal from '../../../../components/ConfirmationModal';
+import UnauthorizedAccess from '../../../../components/UnauthorizedAccess';
 import {
   getAssessmentDetails,
   getAssessmentTracking,
@@ -29,6 +30,7 @@ import {
   UploadedImage,
 } from '../../../../components/assessment';
 import { getUserDetails } from '../../../../services/ProfileService';
+import { getCohortList } from '../../../../services/CohortServices';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import {
   getStatusIcon,
@@ -147,6 +149,11 @@ const AssessmentDetails = () => {
   const { t } = useTranslation();
   const router = useRouter();
   const { assessmentId, userId } = router.query;
+
+  // Cohort authorization state
+  const [cohortAuthLoading, setCohortAuthLoading] = useState(true);
+  const [isAuthorizedForCohort, setIsAuthorizedForCohort] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState<any>(null);
@@ -371,7 +378,7 @@ const AssessmentDetails = () => {
                           : item.score;
 
                         // Update resValue with saved suggestion if available
-                        let updatedResValue = { ...item.resvalues[0] };
+                        const updatedResValue = { ...item.resvalues[0] };
                         if (savedData) {
                           const parsedSavedData = JSON.parse(savedData);
                           if (parsedSavedData.suggestion) {
@@ -447,7 +454,7 @@ const AssessmentDetails = () => {
                           const savedScore = parsedSavedData.score;
 
                           // Update resValue with saved suggestion if available
-                          let updatedResValue = detail.resValue
+                          const updatedResValue = detail.resValue
                             ? JSON.parse(detail.resValue)
                             : {};
                           if (parsedSavedData.suggestion) {
@@ -549,6 +556,74 @@ const AssessmentDetails = () => {
 
     fetchAssessmentData();
   }, [assessmentId, userId]);
+
+  // Cohort authorization check
+  useEffect(() => {
+    const checkCohortAuthorization = async () => {
+      if (typeof window === 'undefined') {
+        setCohortAuthLoading(false);
+        return;
+      }
+
+      try {
+        const currentUserId = localStorage.getItem('userId');
+        if (!currentUserId) {
+          setAuthError('User not authenticated');
+          setIsAuthorizedForCohort(false);
+          setCohortAuthLoading(false);
+          return;
+        }
+
+        // If no target userId in router query, skip authorization check
+        if (!userId) {
+          setIsAuthorizedForCohort(true);
+          setCohortAuthLoading(false);
+          return;
+        }
+
+        // Get cohort lists for both current user and target user
+        const [currentUserCohorts, targetUserCohorts] = await Promise.all([
+          getCohortList(currentUserId),
+          getCohortList(userId as string),
+        ]);
+
+        if (
+          currentUserCohorts &&
+          Array.isArray(currentUserCohorts) &&
+          targetUserCohorts &&
+          Array.isArray(targetUserCohorts)
+        ) {
+          // Check if there's any matching cohort between the two users
+          const hasSharedCohort = currentUserCohorts.some(
+            (currentCohort: any) =>
+              targetUserCohorts.some(
+                (targetCohort: any) =>
+                  currentCohort.cohortId === targetCohort.cohortId
+              )
+          );
+
+          setIsAuthorizedForCohort(hasSharedCohort);
+
+          if (!hasSharedCohort) {
+            setAuthError(
+              'You do not have permission to access this assessment. You and the target user do not share any common cohort.'
+            );
+          }
+        } else {
+          setAuthError('Unable to verify cohort access');
+          setIsAuthorizedForCohort(false);
+        }
+      } catch (error) {
+        console.error('Error checking cohort authorization:', error);
+        setAuthError('Error verifying access permissions');
+        setIsAuthorizedForCohort(false);
+      } finally {
+        setCohortAuthLoading(false);
+      }
+    };
+
+    checkCohortAuthorization();
+  }, [userId]);
 
   const handleBack = () => {
     router.back();
@@ -870,6 +945,33 @@ const AssessmentDetails = () => {
   const handleRefreshAssessmentData = async () => {
     await fetchOfflineAssessmentData(true);
   };
+
+  // Show loading spinner while checking authorization
+  if (cohortAuthLoading) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  // Show unauthorized page if user doesn't have access
+  if (!isAuthorizedForCohort) {
+    return (
+      <UnauthorizedAccess
+        message={
+          authError || 'You do not have permission to access this assessment'
+        }
+      />
+    );
+  }
 
   if (loading) {
     return (

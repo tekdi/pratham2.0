@@ -49,6 +49,10 @@ const Assessments = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { t } = useTranslation();
+
+  // Add client-side mounting state to prevent hydration mismatch
+  const [isMounted, setIsMounted] = useState(false);
+
   const [modalOpen, setModalOpen] = useState(false);
   const [assessmentList, setAssessmentList] = useState([]);
   const [classId, setClassId] = useState('');
@@ -76,21 +80,37 @@ const Assessments = () => {
     totalCount: 0,
   });
 
+  // Fix hydration issue: Initialize as null, load from localStorage in useEffect
   const [selectedSortOption, setSelectedSortOption] = useState<{
     sortByKey: string;
     sortByValue: string;
-  } | null>(() => {
-    if (typeof window !== 'undefined') {
-      const savedSort = localStorage.getItem('assessmentSortOption');
-      return savedSort ? JSON.parse(savedSort) : null;
-    }
-    return null;
-  });
+  } | null>(null);
 
   const { query } = router;
 
+  // Client-side mounting effect to prevent hydration mismatch
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.localStorage) {
+    setIsMounted(true);
+  }, []);
+
+  // Load selectedSortOption from localStorage after mounting
+  useEffect(() => {
+    if (isMounted && typeof window !== 'undefined') {
+      const savedSort = localStorage.getItem('assessmentSortOption');
+      if (savedSort) {
+        try {
+          setSelectedSortOption(JSON.parse(savedSort));
+        } catch (error) {
+          console.error('Error parsing saved sort option:', error);
+          // Clear invalid data
+          localStorage.removeItem('assessmentSortOption');
+        }
+      }
+    }
+  }, [isMounted]);
+
+  useEffect(() => {
+    if (isMounted && typeof window !== 'undefined' && window.localStorage) {
       const token = localStorage.getItem('token');
       const storedUserId = localStorage.getItem('userId');
       setClassId(localStorage.getItem('classId') ?? '');
@@ -101,7 +121,7 @@ const Assessments = () => {
       }
       setUserId(storedUserId);
     }
-  }, []);
+  }, [isMounted, router]);
 
   useEffect(() => {
     const getCohortMemberList = async () => {
@@ -463,8 +483,10 @@ const Assessments = () => {
 
   // Add effect to handle route changes
   useEffect(() => {
+    if (!isMounted) return;
+
     const handleRouteChange = (url: string) => {
-      if (!url.startsWith('/scp-teacher-repo/assessments')) {
+      if (!url.startsWith('/assessments')) {
         // Clear sort filter when navigating away from assessments
         localStorage.removeItem('assessmentSortOption');
         setSelectedSortOption(null);
@@ -476,7 +498,12 @@ const Assessments = () => {
     return () => {
       router.events.off('routeChangeStart', handleRouteChange);
     };
-  }, [router]);
+  }, [router, isMounted]);
+
+  // Don't render until mounted to prevent hydration mismatch
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <>
