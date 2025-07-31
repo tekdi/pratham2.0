@@ -241,7 +241,7 @@ const EntryContent: React.FC<EntryContentProps> = ({
                           {getFileNameFromUrl(fileUrl)}
                         </Typography>
                       </Box>
-                      <IconButton onClick={() => handleFileDownload(fileUrl, getFileNameFromUrl(fileUrl))} sx={{ color: "black" }}>
+                      <IconButton onClick={() => handleFileDownload(fileUrl, getFileNameFromUrl(fileUrl) || 'downloaded-file')} sx={{ color: "black" }}>
                         <Download />
                       </IconButton>
                     </Box>
