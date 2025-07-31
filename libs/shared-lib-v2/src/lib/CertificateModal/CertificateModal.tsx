@@ -125,6 +125,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
   };
   const onDownloadCertificate = async () => {
     try {
+        if (typeof window !== 'undefined'){
        const windowUrl = window.location.pathname;
       const cleanedUrl = windowUrl.replace(/^\//, '');
       const env = cleanedUrl.split('/')[0];
@@ -145,6 +146,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
         },
       };
       telemetryFactory.interact(telemetryInteract);
+    }
       const response = await downloadCertificate({
         credentialId: certificateId,
         templateId: localStorage.getItem('templtateId') || '',

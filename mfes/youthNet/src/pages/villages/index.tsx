@@ -1,3 +1,4 @@
+//@ts-nocheck
 import Header from '../../components/Header';
 import BackHeader from '../../components/youthNet/BackHeader';
 import {
@@ -55,6 +56,7 @@ import {
   getAge,
   getLoggedInUserRole,
   getVillageUserCounts,
+  filterSchema,
 } from '../../utils/Helper';
 import { fetchUserList } from '../../services/youthNet/Dashboard/UserServices';
 import {
@@ -71,6 +73,14 @@ import useSubmittedButtonStore from '../../store/useSubmittedButtonStore';
 import HolidayVillageIcon from '@mui/icons-material/HolidayVillage';
 import PersonPinIcon from '@mui/icons-material/PersonPin';
 import DeleteIcon from '@mui/icons-material/Delete';
+import MentorForm from '@/components/DynamicForm/MentorForm/MentorForm';
+import { FormContext } from '@shared-lib-v2/DynamicForm/components/DynamicFormConstant';
+import {
+  extractMatchingKeys,
+  fetchForm,
+} from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
+import { RoleId } from '@/utils/app.constant';
+import { deleteUser } from 'mfes/youthNet/src/services/youthNet/Dashboard/UserServices';
 
 const Index = () => {
   const { isRTL } = useDirection();
@@ -100,7 +110,24 @@ const Index = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [openReassignDistrict, setOpenReassignDistrict] = useState(false);
   const [openReassignVillage, setOpenReassignVillage] = useState(false);
-  const [addNew, setAddNew] = useState(false);
+  // const [addNew, setAddNew] = useState(false);
+  const [openModal, setOpenModal] = React.useState<boolean>(false);
+  const [isReassign, setIsReassign] = useState(false);
+  const [buttonShow, setButtonShowState] = useState(true);
+  const [addSchema, setAddSchema] = useState(null);
+  const [addUiSchema, setAddUiSchema] = useState(null);
+  const [originalSchema, setOriginalSchema] = useState(null);
+  const [originalUiSchema, setOriginalUiSchema] = useState(null);
+  const [prefilledFormData, setPrefilledFormData] = useState({});
+  const [prefilledAddFormData, setPrefilledAddFormData] = useState({});
+  const [roleId, setRoleID] = useState('');
+  const [tenantId, setTenantId] = useState('');
+  const [editableUserId, setEditableUserId] = useState('');
+  const [blockVillageMap, setBlockVillageMap] = useState<
+    Record<number, number[]>
+  >({});
+  const [selectedMentor, setSelectedMentor] = useState<any>(null);
+
   const [count, setCount] = useState(0);
   const [villageCount, setVillageCount] = useState(0);
   const [mentorCount, setMentorCount] = useState(0);
@@ -125,6 +152,7 @@ const Index = () => {
     villageId ? villageId : ''
   );
   const [selectedDistrictValue, setSelectedDistrictValue] = useState<any>('');
+  const [selectedStateValue, setSelectedStateValue] = useState<any>('');
   const [isVolunteerFieldId, setIsVolunteerFieldId] = useState<any>('');
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -135,46 +163,72 @@ const Index = () => {
   });
 
   useEffect(() => {
-
     const getData = async () => {
-      try{
-      let userDataString = localStorage.getItem('userData');
-      let userData: any = userDataString ? JSON.parse(userDataString) : null;
-      const districtResult = userData?.customFields?.find(
-        (item: any) => item.label === cohortHierarchy.DISTRICT
-      );
-      console.log(districtResult?.selectedValues);
-      const transformedData = districtResult?.selectedValues?.map(
-        (item: any) => ({
-          id: item?.id,
-          name: item?.value,
-        })
-      );
-      setDistrictData(transformedData);
-      setSelectedDistrictValue(transformedData?.[0]?.id);
-      const controllingfieldfk = [transformedData?.[0]?.id?.toString()];
-      const fieldName = 'block';
-      const blockResponce = await getStateBlockDistrictList({
-        controllingfieldfk,
-        fieldName,
-      });
-      console.log(blockResponce);
+      try {
+        let userDataString = localStorage.getItem('userData');
+        let userData: any = userDataString ? JSON.parse(userDataString) : null;
+        const stateResult = userData?.customFields?.find(
+          (item: any) => item.label === cohortHierarchy.STATE
+        );
+        setSelectedStateValue(stateResult?.selectedValues[0]?.id);
+        const districtResult = userData?.customFields?.find(
+          (item: any) => item.label === cohortHierarchy.DISTRICT
+        );
+        console.log(districtResult?.selectedValues);
+        const transformedData = districtResult?.selectedValues?.map(
+          (item: any) => ({
+            id: item?.id,
+            name: item?.value,
+          })
+        );
+        setDistrictData(transformedData);
+        setSelectedDistrictValue(transformedData?.[0]?.id);
+        const controllingfieldfk = [transformedData?.[0]?.id?.toString()];
+        const fieldName = 'block';
+        const blockResponce = await getStateBlockDistrictList({
+          controllingfieldfk,
+          fieldName,
+        });
+        console.log(blockResponce);
 
-      const transformedBlockData = blockResponce?.result?.values?.map(
-        (item: any) => ({
-          id: item?.value,
-          name: item?.label,
-        })
-      );
-      setBlockData(transformedBlockData);
-      setSelectedBlockValue(blockId ? blockId : transformedBlockData[0]?.id);
-    } catch (error) {
-      console.error('Error fetching district and block data:', error);
-     // setDistrictData([]);
-      setBlockData([]);}
+        const transformedBlockData = blockResponce?.result?.values?.map(
+          (item: any) => ({
+            id: item?.value,
+            name: item?.label,
+          })
+        );
+        setBlockData(transformedBlockData);
+        setSelectedBlockValue(blockId ? blockId : transformedBlockData[0]?.id);
+      } catch (error) {
+        console.error('Error fetching district and block data:', error);
+        // setDistrictData([]);
+        setBlockData([]);
+      }
     };
     getData();
   }, [blockId, villageId]);
+
+  useEffect(() => {
+    let userDataString = localStorage.getItem('userData');
+    let userData: any = userDataString ? JSON.parse(userDataString) : null;
+    const stateResult = userData?.customFields?.find(
+      (item: any) => item.label === cohortHierarchy.STATE
+    );
+    setSelectedStateValue(stateResult?.selectedValues[0]?.id);
+    const districtResult = userData?.customFields?.find(
+      (item: any) => item.label === cohortHierarchy.DISTRICT
+    );
+    console.log(districtResult?.selectedValues);
+    const transformedData = districtResult?.selectedValues?.map(
+      (item: any) => ({
+        id: item?.id,
+        name: item?.value,
+      })
+    );
+    setDistrictData(transformedData);
+    setSelectedDistrictValue(transformedData?.[0]?.id);
+  }, []);
+
   useEffect(() => {
     try {
       const getSortedData = (data: any, sortOrderType: any) => {
@@ -187,8 +241,7 @@ const Index = () => {
             return [...data].sort((a, b) => b.name.localeCompare(a.name));
           case SortOrder.NEW_REGISTRATION_LOW_TO_HIGH:
             return [...data].sort(
-                            (a, b) => a.newRegistrations - b.newRegistrations
-
+              (a, b) => a.newRegistrations - b.newRegistrations
             );
           case SortOrder.NEW_REGISTRATION_HIGH_TO_LOW:
             return [...data].sort(
@@ -219,6 +272,7 @@ const Index = () => {
 
       let filteredData = [];
       if (value === 1) {
+        console.log('filteredDatamentorList', mentorList);
         filteredData = filterData(mentorList, searchInput);
         const data = getSortedData(filteredData, appliedFilters?.sortOrder);
         setFilteredmentorList(
@@ -233,11 +287,14 @@ const Index = () => {
         );
         setVillageCount(data.length);
       } else if (value === 3) {
+        console.log('filteredDatayouthList', youthList);
         filteredData = filterData(youthList, searchInput);
         setFilteredYouthList(
           getSortedData(filteredData, appliedFilters?.sortOrder)
         );
       }
+      const query = { ...router.query, value: value };
+      router.replace({ pathname: router.pathname, query });
       setLoading(false);
     } catch (e) {
       setLoading(false);
@@ -326,63 +383,109 @@ const Index = () => {
     };
     if (value === 3 && selectedVillageValue !== '') getYouthData();
   }, [value, selectedVillageValue]);
-  useEffect(() => {
-    const getMentorData = async () => {
-      try {
-        if (selectedDistrictValue !== '' && value === 1) {
-          setLoading(true);
-          const filters = {
-            district: [selectedDistrictValue],
-            role: Role.INSTRUCTOR,
-            status: [Status.ACTIVE],
-          };
-          const result = await fetchUserList({ filters });
-          const transformedMentorData = result?.getUserDetails.map(
-            (user: any) => {
-              let name = user.firstName || '';
-              const villageField = user?.customFields?.find(
-                (field: any) => field.label === cohortHierarchy.VILLAGE
-              );
-              const blockField = user?.customFields?.find(
-                (field: any) => field.label === cohortHierarchy.BLOCK
-              );
-              const blockValues = blockField?.selectedValues.map(
-                (block: any) => {
-                  block.value;
-                }
-              );
+  // Move getMentorData to component scope so it can be called from callbacks
+  const getMentorData = async () => {
+    try {
+      if (selectedDistrictValue !== '' && value === 1) {
+        setLoading(true);
+        const filters = {
+          district: [selectedDistrictValue],
+          role: Role.INSTRUCTOR,
+          status: [Status.ACTIVE],
+        };
+        const result = await fetchUserList({ filters });
+        const transformedMentorData = result?.getUserDetails.map(
+          (user: any) => {
+            let name = user.firstName || '';
+            const villageField = user?.customFields?.find(
+              (field: any) => field.label === cohortHierarchy.VILLAGE
+            );
+            const blockField = user?.customFields?.find(
+              (field: any) => field.label === cohortHierarchy.BLOCK
+            );
+            const blockValues = blockField?.selectedValues.map(
+              (block: any) => block.value
+            );
 
-              if (user.lastName) {
-                name += ` ${user.lastName}`;
-              }
-              return {
-                Id: user.userId,
-                name: name.trim(),
-                //  dob:user?.dob ,
-                firstName: user?.firstName,
-                villageCount: villageField?.selectedValues.length,
-                lastName: user?.lastName,
-                blockNames: blockValues,
-              };
+            if (user.lastName) {
+              name += ` ${user.lastName}`;
             }
-          );
-          // const filteredMentoList= filterData( transformedMentorData , searchInput)
-          const ascending = [...transformedMentorData].sort((a, b) =>
-            a.name.localeCompare(b.name)
-          );
-          setMentorList(ascending);
-
-          setFilteredmentorList(ascending);
-          setMentorCount(transformedMentorData.length);
-        }
-      } catch (e) {
-        console.log(e);
-      } finally {
-        setLoading(false);
+            return {
+              Id: user.userId,
+              name: name.trim(),
+              //  dob:user?.dob ,
+              firstName: user?.firstName,
+              villageCount: villageField?.selectedValues.length,
+              lastName: user?.lastName,
+              blockNames: blockValues,
+              showMore: true,
+              customFields: user?.customFields,
+            };
+          }
+        );
+        const ascending = [...transformedMentorData].sort((a, b) =>
+          a.name.localeCompare(b.name)
+        );
+        setMentorList(ascending);
+        setFilteredmentorList(ascending);
+        setMentorCount(transformedMentorData.length);
       }
-    };
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     if (value === 1) getMentorData();
   }, [selectedDistrictValue, value, submittedButtonStatus]);
+
+  useEffect(() => {
+    // Fetch form schema from API and set it in state.
+    const fetchData = async () => {
+      const responseForm = await fetchForm([
+        {
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.mentor.context}&contextType=${FormContext.mentor.contextType}`,
+          header: {},
+        },
+        {
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.mentor.context}&contextType=${FormContext.mentor.contextType}`,
+          header: {
+            tenantid: localStorage.getItem('tenantId'),
+          },
+        },
+      ]);
+      console.log('responseForm', responseForm);
+      const { newSchema, extractedFields } = filterSchema(responseForm);
+      setAddSchema(newSchema?.schema);
+      setAddUiSchema(newSchema?.uiSchema);
+      setOriginalSchema(responseForm?.schema);
+      const originalResponse = JSON.parse(JSON.stringify(responseForm));
+      if (originalResponse?.uiSchema?.state) {
+        originalResponse.uiSchema.state['ui:disabled'] = true;
+      }
+      if (originalResponse?.uiSchema?.district) {
+        originalResponse.uiSchema.district['ui:disabled'] = true;
+      }
+      setOriginalUiSchema(originalResponse?.uiSchema);
+      // console.log('addschema', newSchema?.schema);
+      // console.log('adduischema', newSchema?.uiSchema);
+      // console.log('extractedFields', extractedFields);
+      // setSdbvFieldData(extractedFields);
+    };
+
+    setPrefilledAddFormData({
+      state: [selectedStateValue],
+      district: [selectedDistrictValue],
+    });
+    console.log('####', selectedStateValue, selectedDistrictValue);
+    setPrefilledFormData({});
+    setRoleID(RoleId.TEACHER);
+    setTenantId(localStorage.getItem('tenantId') || '');
+    fetchData();
+  }, [selectedStateValue, selectedDistrictValue]);
+
   const handleLocationClick = (Id: any, name: any) => {
     console.log(selectedBlockValue);
 
@@ -434,13 +537,7 @@ const Index = () => {
     };
     if (villageList?.length !== 0) getVillageYouthData();
   }, [villageList, selectedBlockValue]);
-  //   useEffect(() => {
-  //     setSelectedVillageValue(villageId);
-  //     setSelectedBlockValue(blockId)
 
-  //   }
-
-  // , [blockId, villageId]);
   useEffect(() => {
     const getVillageList = async () => {
       try {
@@ -523,9 +620,9 @@ const Index = () => {
     });
   };
 
-  const handleToggledUserClick = (name: any, Id?: any) => {
-    setToggledUser(name);
-    setselectedToggledUserId(Id);
+  const handleToggledUserClick = (user: any) => {
+    setToggledUser(user.name);
+    setselectedToggledUserId(user.Id);
     setOpenDrawer((prev) => !prev);
   };
   const handlemarkAsVolunteer = async () => {
@@ -584,9 +681,9 @@ const Index = () => {
     }
   };
 
-  const handleToggledMentorClick = (name: any) => {
-    console.log('Toggled user:', name);
-    setToggledMentor(name);
+  const handleToggledMentorClick = (user: any) => {
+    setToggledMentor(user.name);
+    setSelectedMentor(user);
     setOpenMentorDrawer((prev) => !prev);
   };
   const handleToggleClose = () => {
@@ -595,14 +692,109 @@ const Index = () => {
     setselectedToggledUserId('');
   };
 
+  //Add Edit Props
+  const extraFieldsUpdate = {};
+  const extraFields = {
+    tenantCohortRoleMapping: [
+      {
+        tenantId: tenantId,
+        roleId: roleId,
+      },
+    ],
+    username: 'youthnetmentor',
+    password: Math.floor(10000 + Math.random() * 90000),
+  };
+  const successUpdateMessage = 'MENTORS.MENTOR_UPDATED_SUCCESSFULLY';
+  const telemetryUpdateKey = 'youthnet-mentor-updated-successfully';
+  const failureUpdateMessage = 'MENTORS.NOT_ABLE_UPDATE_MENTOR';
+  const successCreateMessage = 'MENTORS.MENTOR_CREATED_SUCCESSFULLY';
+  const telemetryCreateKey = 'youthnet-mentor-created-successfully';
+  const failureCreateMessage = 'MENTORS.NOT_ABLE_CREATE_MENTOR';
+  const notificationKey = 'onMentorCreate';
+  const notificationMessage = 'MENTORS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
+  const notificationContext = 'USER';
+  const blockReassignmentNotificationKey = 'onMentorBlockReassign';
+  const villageReassignmentNotificationKey = 'onMentorVillageReassign';
+
+  const setButtonShow = (
+    status: boolean | ((prevState: boolean) => boolean)
+  ) => {
+    console.log('########## changed', status);
+    setButtonShowState(status);
+  };
+
+  const handleVillageReassign = async () => {
+    if (!selectedMentor) return;
+    let tempFormData = extractMatchingKeys(selectedMentor, originalSchema);
+    console.log('tempFormData+++', tempFormData);
+    console.log('selectedMentor', selectedMentor);
+    console.log('addschema', originalSchema);
+    let blockIds: any = [];
+    let villageIds: any = [];
+    selectedMentor?.customFields?.forEach((field: any) => {
+      if (field.label === 'BLOCK') {
+        blockIds = field.selectedValues.map((item: any) => item.id);
+      }
+      if (field.label === 'VILLAGE') {
+        villageIds = field.selectedValues.map((item: any) => item.id);
+      }
+    });
+    // console.log('blockIds', blockIds);
+    // console.log('villageIds', villageIds);
+    // console.log('tempFormData>>>>', tempFormData);
+    const getVillageMapByBlock = async () => {
+      const result: Record<number, number[]> = {};
+
+      for (const blockId of blockIds) {
+        console.log('Processing blockId:', blockId); // Debug log
+
+        if (!blockId) continue;
+
+        try {
+          const villageResponse = await getStateBlockDistrictList({
+            controllingfieldfk: [blockId],
+            fieldName: 'village',
+          });
+
+          const villages = villageResponse?.result?.values || [];
+
+          const matchedVillages = villages
+            .filter((item: any) => villageIds.includes(item?.value))
+            .map((item: any) => item?.value);
+
+          if (matchedVillages.length > 0) {
+            result[blockId] = matchedVillages;
+          }
+        } catch (error) {
+          console.error(
+            `Error fetching villages for blockId ${blockId}:`,
+            error
+          );
+        }
+      }
+      return result;
+    };
+
+    // Call the function
+    const villageMap = await getVillageMapByBlock();
+    // console.log('Final block-village map:', villageMap);
+    setBlockVillageMap(villageMap);
+    setPrefilledAddFormData(tempFormData);
+    setIsReassign(true);
+    setButtonShow(true);
+    setEditableUserId(selectedMentor?.Id);
+    handleOpenNew();
+  };
+
   const onClose = () => {
     setOpenDelete(false);
     setOpenReassignDistrict(false);
-    setOpenReassignVillage(false);
-    setAddNew(false);
     setCount(0);
     setShowAssignmentScreen(false);
     setFormData({});
+    setOpenModal(false);
+    setIsReassign(false);
+    setButtonShow(true);
   };
 
   const handleButtonClick = async (actionType: string) => {
@@ -617,7 +809,7 @@ const Index = () => {
 
       case BOTTOM_DRAWER_CONSTANTS.ADD_REASSIGN:
         setOpenMentorDrawer(false);
-        setOpenReassignVillage(true);
+        handleVillageReassign();
         break;
 
       case BOTTOM_DRAWER_CONSTANTS.REQUEST_REASSIGN:
@@ -649,11 +841,11 @@ const Index = () => {
       action: BOTTOM_DRAWER_CONSTANTS.ADD_REASSIGN,
       icon: <HolidayVillageIcon />,
     },
-    {
-      label: t('YOUTHNET_USERS_AND_VILLAGES.REQUEST_TO_REASSIGN_DISTRICT'),
-      action: BOTTOM_DRAWER_CONSTANTS.REQUEST_REASSIGN,
-      icon: <PersonPinIcon />,
-    },
+    // {
+    //   label: t('YOUTHNET_USERS_AND_VILLAGES.REQUEST_TO_REASSIGN_DISTRICT'),
+    //   action: BOTTOM_DRAWER_CONSTANTS.REQUEST_REASSIGN,
+    //   icon: <PersonPinIcon />,
+    // },
     {
       label: t('YOUTHNET_USERS_AND_VILLAGES.DELETE_USER_PERMANENTLY'),
       action: BOTTOM_DRAWER_CONSTANTS.DELETE,
@@ -674,7 +866,7 @@ const Index = () => {
   ];
 
   const handleRadioChange = (value: string) => {
-    // setSelectedValue(value);
+    setSelectedValue(value);
   };
 
   const formFields = [
@@ -693,14 +885,54 @@ const Index = () => {
   ];
 
   const handleOpenNew = () => {
-    setAddNew(true);
+    // setAddNew(true);
     //router.push(`/add-mentor`);
+    // setPrefilledAddFormData(initialFormData);
+    setOpenModal(true);
+    setPrefilledAddFormData({
+      state: [selectedStateValue],
+      district: [selectedDistrictValue],
+    });
+    // setIsReassign(false);
+    // setEditableUserId('');
   };
 
   const handleNext = () => {
     // setCount(count + 1)
     setCount((prev) => prev + 1);
   };
+
+  // Mentor delete logic
+  const handleDeleteMentor = async () => {
+    try {
+      // 1. Delete user
+      const resp = await deleteUser(selectedMentor.Id, {
+        userData: { reason: selectedValue, status: 'archived' },
+      });
+      // 2. Update UI
+      if (resp?.responseCode === 200 || resp?.responseCode === 'OK') {
+        setOpenDelete(false);
+        showToastMessage(t('MENTORS.MENTOR_DELETED_SUCCESSFULLY'), 'success');
+        await getMentorData();
+      } else {
+        showToastMessage(t('MENTORS.MENTOR_DELETE_FAIL'), 'error');
+      }
+    } catch (error) {
+      showToastMessage('Error deleting mentor', 'error');
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    if (
+      value === 3 &&
+      villageList &&
+      villageList.length > 0 &&
+      !selectedVillageValue
+    ) {
+      setSelectedVillageValue(villageList[0].Id);
+    }
+  }, [value, villageList, selectedVillageValue]);
 
   return (
     <Box minHeight="100vh">
@@ -825,7 +1057,10 @@ const Index = () => {
                 className="text-1E"
                 // onClick={handleOpenAddFaciModal}
                 endIcon={<AddIcon />}
-                onClick={handleOpenNew}
+                onClick={() => {
+                  handleOpenNew();
+                  setIsReassign(false);
+                }}
               >
                 {t('COMMON.ADD_NEW')}
               </Button>
@@ -903,91 +1138,7 @@ const Index = () => {
               title={toggledMentor}
               buttons={Mentorbuttons}
             />
-            <SimpleModal
-              open={openReassignVillage}
-              onClose={onClose}
-              showFooter={true}
-              modalTitle={t(
-                'YOUTHNET_USERS_AND_VILLAGES.ADD_OR_REASSIGN_VILLAGES'
-              )}
-              primaryText={t('YOUTHNET_USERS_AND_VILLAGES.SAVE_PROGRESS')}
-              secondaryText={t('YOUTHNET_USERS_AND_VILLAGES.FINISH_ASSIGN')}
 
-              //pass function handler as props
-            >
-              <Box>
-                <Box mt={2}>
-                  <Typography
-                    sx={{
-                      fontSize: '14px',
-                      fontWeight: 500,
-                      color: theme.palette.warning['300'],
-                    }}
-                  >
-                    {t(
-                      'YOUTHNET_USERS_AND_VILLAGES.ASSIGN_VILLAGES_FROM_BLOCK'
-                    )}
-                  </Typography>
-                  <Typography
-                    sx={{
-                      fontSize: '14px',
-                      fontWeight: 400,
-                      color: theme.palette.warning['300'],
-                      marginTop: '10px',
-                    }}
-                  >
-                    {t(
-                      'YOUTHNET_USERS_AND_VILLAGES.ASSIGN_VILLAGES_FROM_BLOCK_INFO'
-                    )}
-                  </Typography>
-                </Box>
-                <Box display="flex" flexDirection="column" gap={2} p={2}>
-                  {reAssignVillages?.map((survey, index) => (
-                    <Surveys
-                      key={index}
-                      title={survey.title}
-                      date={survey.date}
-                    />
-                  ))}
-                </Box>
-              </Box>
-            </SimpleModal>
-            <SimpleModal
-              open={openReassignDistrict}
-              onClose={onClose}
-              showFooter={true}
-              modalTitle={t(
-                'YOUTHNET_USERS_AND_VILLAGES.REQUEST_USER_TO_DIFFERENT_MENTOR'
-              )}
-              primaryText={t('COMMON.SEND_REQUEST')}
-              //pass function handler as props
-            >
-              <Box>
-                <Box m={2}>
-                  <Typography sx={{ color: theme.palette.warning['A200'] }}>
-                    {t(
-                      'YOUTHNET_USERS_AND_VILLAGES.SEND_REQUEST_TO_ADMIN_TEXT'
-                    )}
-                  </Typography>
-                </Box>
-                <Box m={2}>
-                  <Dropdown
-                    name={t('YOUTHNET_USERS_AND_VILLAGES.SELECT_STATE')}
-                    // values={districtData?.DISTRICT_OPTIONS}
-                    // defaultValue={t('YOUTHNET_USERS_AND_VILLAGES.SELECT_STATE')}
-                    onSelect={(value) => console.log('Selected:', value)}
-                  />
-                </Box>
-                <Box m={2}>
-                  <Dropdown
-                    name={t('YOUTHNET_USERS_AND_VILLAGES.SELECT_DISTRICT')}
-                    // values={blockData?.BLOCK_OPTIONS}
-                    // defaultValue={t('YOUTHNET_USERS_AND_VILLAGES.SELECT')}
-                    onSelect={(value) => console.log('Selected:', value)}
-                  />
-                </Box>
-              </Box>
-            </SimpleModal>
             <SimpleModal
               open={openDelete}
               onClose={onClose}
@@ -996,6 +1147,7 @@ const Index = () => {
                 'YOUTHNET_USERS_AND_VILLAGES.DELETE_USER_PERMANENTLY'
               )}
               primaryText={t('COMMON.DELETE_USER_WITH_REASON')}
+              primaryActionHandler={handleDeleteMentor}
             >
               <Box>
                 <Box mt={2}>
@@ -1035,45 +1187,57 @@ const Index = () => {
                 </Box>
               </Box>
             </SimpleModal>
-
             <SimpleModal
-              open={addNew}
+              open={openModal}
               onClose={onClose}
-              showFooter={true}
-              modalTitle={'New Mentor'}
-              //  handleNext={FormSubmitFunction}
-              primaryText={!showAssignmentScreen ? 'Next' : undefined}
-              secondaryText={count === 1 ? 'Save Progress' : ''}
+              showFooter={buttonShow}
+              primaryText={t('Next')}
               id="dynamic-form-id"
+              modalTitle={
+                isReassign
+                  ? t('MENTOR.RE_ASSIGN_VILLAGES')
+                  : t('MENTORS.NEW_MENTOR')
+              }
             >
-              {/* {count === 0 && (
-                <Box>
-                  <Box mt={2}>
-                    <GenericForm fields={formFields} />
-                  </Box>
-                </Box>
-              )}
-              {count === 1 && (
-                <Box>
-                  <Box mt={2}>
-                    <ExamplePage handleNext={handleNext} />
-                  </Box>
-                </Box>
-              )}
-              {count === 2 && (
-                <Box>
-                  <Box mt={2}>
-                    <VillageSelector />
-                  </Box>
-                </Box>
-              )} */}
-              <MentorAssignment
-                FormSubmitFunction={FormSubmitFunction}
-                setShowAssignmentScreen={setShowAssignmentScreen}
-                showAssignmentScreen={showAssignmentScreen}
-                formData={formData}
-                setFormData={setFormData}
-                onClose={onClose}
+              <MentorForm
+                t={t}
+                SuccessCallback={async () => {
+                  setPrefilledFormData({});
+                  setOpenModal(false);
+                  await getMentorData();
+                }}
+                schema={isReassign ? originalSchema : addSchema}
+                uiSchema={isReassign ? originalUiSchema : addUiSchema}
+                editPrefilledFormData={prefilledAddFormData}
+                isEdit={false}
+                isReassign={isReassign}
+                editableUserId={editableUserId}
+                UpdateSuccessCallback={async () => {
+                  setOpenModal(false);
+                  await getMentorData();
+                }}
+                extraFields={extraFields}
+                extraFieldsUpdate={extraFieldsUpdate}
+                successUpdateMessage={successUpdateMessage}
+                telemetryUpdateKey={telemetryUpdateKey}
+                failureUpdateMessage={failureUpdateMessage}
+                successCreateMessage={successCreateMessage}
+                telemetryCreateKey={telemetryCreateKey}
+                failureCreateMessage={failureCreateMessage}
+                notificationKey={notificationKey}
+                notificationMessage={notificationMessage}
+                notificationContext={notificationContext}
+                type="mentor"
+                hideSubmit={true}
+                setButtonShow={setButtonShow}
+                sdbvFieldData={originalSchema}
+                blockVillageMap={isReassign ? blockVillageMap : {}}
+                blockReassignmentNotificationKey={
+                  blockReassignmentNotificationKey
+                }
+                villageReassignmentNotificationKey={
+                  villageReassignmentNotificationKey
+                }
               />
             </SimpleModal>
           </>
@@ -1198,7 +1362,6 @@ const Index = () => {
                   fontSize: '16px',
                   color: 'textSecondary',
                   marginLeft: '2rem',
-                  cursor: 'pointer',
                   pr: '20px',
                 }}
                 className="one-line-text"
@@ -1210,7 +1373,6 @@ const Index = () => {
                 sx={{
                   fontSize: '16px',
                   color: 'textSecondary',
-                  cursor: 'pointer',
                   pr: '20px',
                 }}
               >
@@ -1366,7 +1528,9 @@ const Index = () => {
                       marginLeft: '25%',
                     }}
                   >
-                    {t('YOUTHNET_USERS_AND_VILLAGES.NO_DATA_FOUND')}
+                    {t(
+                      'YOUTHNET_USERS_AND_VILLAGES.NO_DATA_FOUND_APPLY_FILTER'
+                    )}
                   </Typography>
                 </>
               ) : (

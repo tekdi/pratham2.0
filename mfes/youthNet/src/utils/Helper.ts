@@ -317,6 +317,7 @@ export const filterData = (data: any[], searchKey: string) => {
 };
 
 export const categorizeUsers = (users: any) => {
+  console.log('users', users);
   const volunteerUsers: any = [];
   const youthUsers: any = [];
 
@@ -327,7 +328,7 @@ export const categorizeUsers = (users: any) => {
 
     if (
       isVolunteerField &&
-      isVolunteerField.selectedValues === VolunteerField.YES
+      isVolunteerField.selectedValues[0] === VolunteerField.YES
     ) {
       volunteerUsers.push({
         userId: user.userId,
@@ -388,6 +389,48 @@ export const filterSchema = (schemaObj: any) => {
   return { newSchema, extractedFields };
 };
 
+export const modifiedSchema = (schemaObj: any) => {
+  const locationFields = ['block', 'village'];
+  const extractedFields: any = {};
+  locationFields.forEach((field) => {
+    if (schemaObj.schema.properties[field]) {
+      extractedFields[field] = {
+        title: schemaObj.schema.properties[field].title,
+        fieldId: schemaObj.schema.properties[field].fieldId,
+        field_type: schemaObj.schema.properties[field].field_type,
+        maxSelection: schemaObj.schema.properties[field].maxSelection,
+        isMultiSelect: schemaObj.schema.properties[field].isMultiSelect,
+        'ui:widget': schemaObj.uiSchema[field]?.['ui:widget'] || 'select',
+      };
+    }
+  });
+
+  // Deep copy the schema object
+  const newSchema = JSON.parse(JSON.stringify(schemaObj));
+
+  locationFields.forEach((field) => {
+    // Remove from schema properties
+    delete newSchema.schema.properties[field];
+    // Remove from uiSchema
+    delete newSchema.uiSchema[field];
+
+    // Remove from required array if exists
+    const requiredIndex = newSchema.schema.required?.indexOf(field);
+    if (requiredIndex > -1) {
+      newSchema.schema.required.splice(requiredIndex, 1);
+    }
+
+    // Remove from ui:order array if exists
+    const orderIndex = newSchema.uiSchema['ui:order']?.indexOf(field);
+    if (orderIndex > -1) {
+      newSchema.uiSchema['ui:order'].splice(orderIndex, 1);
+    }
+  });
+
+  console.log(newSchema);
+  return { newSchema, extractedFields };
+};
+
 export const extractVillageIds = (users: any[]): number[] => {
   const villageIds = users.flatMap((user) =>
     user.customFields
@@ -405,5 +448,7 @@ export const filterOutUserVillages = (
   userVillageIds: number[]
 ): { id: number; name: string }[] => {
   const userVillageIdSet = new Set(userVillageIds);
-  return transformedVillageData.filter(village => !userVillageIdSet.has(village.id));
+  return transformedVillageData.filter(
+    (village) => !userVillageIdSet.has(village.id)
+  );
 };

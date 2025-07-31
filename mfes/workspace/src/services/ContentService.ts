@@ -1,13 +1,14 @@
 import {
   getLocalStoredUserId,
   getLocalStoredUserRole,
-} from "./LocalStorageService";
-import { delApi, get, post } from "./RestClient";
-import { MIME_TYPE } from "@workspace/utils/app.config";
-import { v4 as uuidv4 } from "uuid";
-import { PrimaryCategoryValue, Role } from "@workspace/utils/app.constant";
+} from './LocalStorageService';
+import { delApi, get, post, patch } from './RestClient';
+import { MIME_TYPE } from '@workspace/utils/app.config';
+import { v4 as uuidv4 } from 'uuid';
+import { PrimaryCategoryValue, Role } from '@workspace/utils/app.constant';
+import axios from 'axios';
 const userId = getLocalStoredUserId();
-console.log("userId ==>", userId);
+console.log('userId ==>', userId);
 
 export const getPrimaryCategory = async (channelId: any) => {
   const apiURL = `/api/channel/v1/read/${channelId}`;
@@ -38,7 +39,7 @@ const defaultReqBody = {
       createdBy: userId,
     },
     sort_by: {
-      lastUpdatedOn: "desc",
+      lastUpdatedOn: 'desc',
     },
   },
 };
@@ -48,7 +49,7 @@ const upForReviewReqBody = {
       //  createdBy: { userId},
     },
     sort_by: {
-      lastUpdatedOn: "desc",
+      lastUpdatedOn: 'desc',
     },
   },
 };
@@ -62,15 +63,49 @@ const getReqBodyWithStatus = (
   channel: string,
   contentType?: string,
   state?: string,
+  filters?: any,
+  identifiers?: string[]
+  // <-- Add this line
+  //  selectedMimeTypes?: string[]
 ) => {
-  if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
+  if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
     var PrimaryCategory =
-      JSON.parse(localStorage.getItem("PrimaryCategory") as string) ||
+      JSON.parse(localStorage.getItem('PrimaryCategory') as string) ||
       PrimaryCategoryValue;
   }
   primaryCategory =
     primaryCategory.length === 0 ? PrimaryCategory : primaryCategory;
-  if (contentType === "discover-contents") {
+  // Merge custom filters into filters object
+  const extraFilters = filters ? { ...filters } : {};
+  console.log('extraFilters', extraFilters);
+
+  if (contentType === 'content-library') {
+    console.log('upForReviewReqBody', upForReviewReqBody);
+    const userRole = getLocalStoredUserRole();
+    primaryCategory = ['Learning Resource'];
+    console.log('PrimaryCategory', PrimaryCategory);
+
+    console.log('upForReviewReqBody', upForReviewReqBody);
+    return {
+      ...upForReviewReqBody,
+      request: {
+        ...upForReviewReqBody.request,
+        filters: {
+          ...upForReviewReqBody.request.filters,
+          status,
+          primaryCategory,
+          state: state,
+          // mimeType: selectedMimeTypes?.length  ? selectedMimeTypes : [],
+          ...extraFilters, // <-- Merge here
+        },
+
+        query,
+        limit,
+        offset,
+        sort_by,
+      },
+    };
+  } else if (contentType === 'discover-contents') {
     const userRole = getLocalStoredUserRole();
 
     if (state) {
@@ -82,8 +117,9 @@ const getReqBodyWithStatus = (
             ...upForReviewReqBody.request.filters,
             status,
             primaryCategory,
-            createdBy: { "!=": getLocalStoredUserId() },
+            createdBy: { '!=': getLocalStoredUserId() },
             state: state,
+            identifier: identifiers,
           },
 
           query,
@@ -102,8 +138,10 @@ const getReqBodyWithStatus = (
           ...upForReviewReqBody.request.filters,
           status,
           primaryCategory,
-          createdBy: { "!=": getLocalStoredUserId() },
-          channel: channel
+          createdBy: { '!=': getLocalStoredUserId() },
+          channel: channel,
+          identifier: identifiers,
+          ...extraFilters,
         },
 
         query,
@@ -112,7 +150,7 @@ const getReqBodyWithStatus = (
         sort_by,
       },
     };
-  } else if (contentType === "upReview") {
+  } else if (contentType === 'upReview') {
     return {
       ...upForReviewReqBody,
       request: {
@@ -121,7 +159,9 @@ const getReqBodyWithStatus = (
           ...upForReviewReqBody.request.filters,
           status,
           primaryCategory,
-          channel: channel
+          channel: channel,
+          ...extraFilters, // <-- Merge here
+          identifier: identifiers,
         },
         query,
         limit,
@@ -139,7 +179,9 @@ const getReqBodyWithStatus = (
         ...defaultReqBody.request.filters,
         status,
         primaryCategory,
-        channel: channel
+        channel: channel,
+        ...extraFilters, // <-- Merge here
+        identifier: identifiers,
       },
       query,
       limit,
@@ -156,11 +198,14 @@ export const getContent = async (
   offset: number,
   primaryCategory: string[],
   sort_by: any,
-  channel: any,
+  channel?: any,
   contentType?: string,
-  state?: string
+  state?: string,
+  // program?: any[],
+  filters?: any, // <-- Add this line
+  identifiers?: string[]
 ) => {
-  const apiURL = "/action/composite/v3/search";
+  const apiURL = '/action/composite/v3/search';
   try {
     const reqBody = getReqBodyWithStatus(
       status,
@@ -171,8 +216,14 @@ export const getContent = async (
       sort_by,
       channel,
       contentType,
-      state
+      state,
+      filters,
+      // selectedMimeTypes,
+      identifiers
+
+      // <-- Pass filters here
     );
+    console.log('reqBody', reqBody);
     const response = await post(apiURL, reqBody);
     return response?.data?.result;
   } catch (error) {
@@ -185,9 +236,9 @@ export const createQuestionSet = async (frameworkId: any) => {
   const reqBody = {
     request: {
       questionset: {
-        name: "Untitled QuestionSet",
-        mimeType: "application/vnd.sunbird.questionset",
-        primaryCategory: "Practice Question Set",
+        name: 'Untitled QuestionSet',
+        mimeType: 'application/vnd.sunbird.questionset',
+        primaryCategory: 'Practice Question Set',
         code: uuidv4(),
         createdBy: userId,
         framework: frameworkId,
@@ -203,10 +254,130 @@ export const createQuestionSet = async (frameworkId: any) => {
   }
 };
 
+// ai question set creation
+export const createAIQuestionsSet = async (payload: {
+  questionSetId: string;
+  framework: string;
+  channel: string;
+  difficulty_level: string;
+  question_types: string[];
+  metadata: {
+    name: string;
+    board: string;
+    medium: string[];
+    gradeLevel: string[];
+    subject: string[];
+    courseType: string[];
+    program: string[];
+    author: string;
+    description: string;
+    instructions: string;
+    contentLanguage: string;
+    assessmentType: string;
+  };
+  questionsDetails: Array<{
+    type: string;
+    no: number;
+  }>;
+  content: Array<{
+    id: string;
+    url: string;
+  }>;
+  token: string;
+}) => {
+  const apiURL = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/ai-assessment/create`;
+
+  const response = await post(
+    apiURL,
+    {
+      ...payload,
+      createdBy: userId,
+    },
+    {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${payload.token}`,
+    }
+  );
+  return response?.data;
+};
+
+// update ai question set
+export const updateAIQuestionSet = async (questionSetId: string) => {
+  const apiURL = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/ai-assessment/update_question_set`;
+
+  const response = await post(
+    apiURL,
+    {
+      questionSetId,
+    },
+    {
+      'Content-Type': 'application/json',
+    }
+  );
+  return response?.data;
+};
+
+// ai question set status
+export const getAIQuestionSetStatus = async (
+  questionSetId: string,
+  token: string
+) => {
+  const apiURL = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/ai-assessment/read/${questionSetId}`;
+
+  const response = await get(apiURL, {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${token}`,
+  });
+  return response?.data;
+};
+
+export const searchAiAssessment = async (data: any) => {
+  const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/ai-assessment/search`;
+  try {
+    const response = await post(apiUrl, data);
+    return response?.data;
+  } catch (error) {
+    console.error('Error in searching ai assessment:', error);
+    throw error;
+  }
+};
+
+export const updateQuestionSet = async ({ identifier, ...metadata }: any) => {
+  const apiURL = '/mfe_workspace/action/questionset/v2/hierarchy/update';
+  const reqBody = {
+    request: {
+      data: {
+        lastUpdatedBy: userId,
+        nodesModified: {
+          [identifier]: {
+            root: true,
+            objectType: 'QuestionSet',
+            isNew: false,
+            metadata,
+          },
+        },
+        hierarchy: {
+          [identifier]: {
+            name: 'Untitled QuestionSet',
+            children: [],
+            root: true,
+          },
+        },
+      },
+    },
+  };
+  const response = await patch(apiURL, reqBody, {
+    Accept: 'application/json, text/plain, */*',
+    'Content-Type': 'application/json',
+    // Add more headers if needed, e.g., authorization, channel, etc.
+  });
+  return response?.data;
+};
+
 export const deleteContent = async (identifier: string, mimeType: string) => {
   const questionsetRetireURL = `/action/questionset/v2/retire/${identifier}`;
   const contentRetireURL = `/action/content/v3/retire/${identifier}`;
-  let apiURL = "";
+  let apiURL = '';
   if (mimeType === MIME_TYPE.QUESTIONSET_MIME_TYPE) {
     apiURL = questionsetRetireURL;
   } else if (
@@ -223,22 +394,27 @@ export const deleteContent = async (identifier: string, mimeType: string) => {
   }
 };
 
-export const createCourse = async (userId: any, channelId: any, contentFW: any, targetFW: any) => {
+export const createCourse = async (
+  userId: any,
+  channelId: any,
+  contentFW: any,
+  targetFW: any
+) => {
   const apiURL = `/action/content/v3/create`;
 
   const reqBody = {
     request: {
       content: {
         code: uuidv4(), // Generate a unique ID for 'code'
-        name: "Untitled Course",
+        name: 'Untitled Course',
         createdBy: userId,
         createdFor: [channelId],
         mimeType: MIME_TYPE.COURSE_MIME_TYPE,
-        resourceType: "Course",
-        primaryCategory: "Course",
-        contentType: "Course",
+        resourceType: 'Course',
+        primaryCategory: 'Course',
+        contentType: 'Course',
         framework: contentFW,
-        targetFWIds: [targetFW]
+        targetFWIds: [targetFW],
       },
     },
   };
@@ -247,7 +423,7 @@ export const createCourse = async (userId: any, channelId: any, contentFW: any, 
     const response = await post(apiURL, reqBody);
     return response?.data;
   } catch (error) {
-    console.error("Error creating course:", error);
+    console.error('Error creating course:', error);
     throw error;
   }
 };
@@ -272,7 +448,7 @@ export const publishContent = async (
     );
     return response.data;
   } catch (error) {
-    console.error("Error during publishing:", error);
+    console.error('Error during publishing:', error);
     throw error;
   }
 };
@@ -298,41 +474,41 @@ export const submitComment = async (
     );
     return response.data;
   } catch (error) {
-    console.error("Error submitting comment:", error);
+    console.error('Error submitting comment:', error);
     throw error;
   }
 };
 
 export const getContentHierarchy = async ({
   doId,
-  contentMode
+  contentMode,
 }: {
   doId: string;
   contentMode: string;
 }): Promise<any> => {
   let apiUrl: string = `/action/content/v3/hierarchy/${doId}`;
-  if (contentMode == "edit") {
+  if (contentMode == 'edit') {
     apiUrl = `/action/content/v3/hierarchy/${doId}?mode=edit`;
   }
 
   try {
-    console.log("Request data", apiUrl);
+    console.log('Request data', apiUrl);
     const response = await get(apiUrl);
     // console.log('response', response);
     return response;
   } catch (error) {
-    console.error("Error in getContentHierarchy Service", error);
+    console.error('Error in getContentHierarchy Service', error);
     throw error;
   }
 };
-export const getFrameworkDetails = async (frameworkId:any): Promise<any> => {
+export const getFrameworkDetails = async (frameworkId: any): Promise<any> => {
   const apiUrl: string = `/api/framework/v1/read/${frameworkId}`;
 
   try {
     const response = await get(apiUrl);
     return response?.data;
   } catch (error) {
-    console.error("Error in getting Framework Details", error);
+    console.error('Error in getting Framework Details', error);
     return error;
   }
 };
@@ -342,14 +518,113 @@ export const getFormFields = async (): Promise<any> => {
   try {
     const response = await post(apiUrl, {
       request: {
-        action: "publish",
-        type: "content",
-        subType: "resource",
+        action: 'publish',
+        type: 'content',
+        subType: 'resource',
       },
     });
     return response?.data;
   } catch (error) {
-    console.error("Error in getting Framework Details", error);
+    console.error('Error in getting Framework Details', error);
+    return error;
+  }
+};
+
+export const getContentPDF = async ({
+  query,
+  limit,
+  offset,
+  sort_by,
+  filters,
+}: {
+  query: string;
+  limit: number;
+  offset: number;
+  sort_by: any;
+  filters: {
+    status?: string[];
+    primaryCategory?: string[];
+    channel?: any;
+    contentType?: string;
+    state?: string;
+    [key: string]: any; // Allow additional dynamic filters if needed
+  };
+}) => {
+  const apiURL = '/action/composite/v3/search';
+
+  try {
+    const reqBody = {
+      request: {
+        query,
+        filters: {
+          ...filters,
+          mimeType: 'application/pdf',
+        },
+        sort_by,
+        limit,
+        offset,
+      },
+    };
+
+    const response = await post(apiURL, reqBody);
+    return response?.data?.result;
+  } catch (error) {
+    return error;
+  }
+};
+
+export const getfilterList = async (): Promise<any> => {
+  const apiUrl: string = `/action/data/v1/form/read`;
+
+  try {
+    const response = await post(apiUrl, {
+      request: {
+        action: 'review',
+        subType: 'resource',
+      },
+    });
+    return response?.data?.result?.form?.data?.fields;
+  } catch (error) {
+    console.error('Error in getting Framework Details', error);
+    return error;
+  }
+};
+export const getPosFrameworkList = async (): Promise<any> => {
+  const apiUrl: string = `/api/framework/v1/read/pos-framework`;
+
+  try {
+    const response = await get(apiUrl);
+    return response?.data?.result?.framework?.categories;
+  } catch (error) {
+    console.error('Error in getting Framework Details', error);
+    return error;
+  }
+};
+export const getMediaFilterList = async (): Promise<any> => {
+  const baseurl = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;
+
+  const apiUrl: string = `${baseurl}/action/object/category/definition/v1/read?fields=objectMetadata,forms,name,label`;
+
+  try {
+    const response = await axios.post(apiUrl, {
+      request: {
+        objectCategoryDefinition: {
+          objectType: 'Collection',
+          name: 'Course',
+        },
+      },
+    });
+    console.log(
+      'response',
+      response?.data?.result?.objectCategoryDefinition?.forms?.search?.properties?.filter(
+        (item: any) => item.code === 'mimeType'
+      )
+    );
+    return response?.data?.result?.objectCategoryDefinition?.forms?.search?.properties?.filter(
+      (item: any) => item.code === 'mimeType'
+    )?.[0];
+  } catch (error) {
+    console.error('Error in getting Framework Details', error);
     return error;
   }
 };

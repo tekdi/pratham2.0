@@ -122,7 +122,7 @@ export interface ContentProps {
   isShowLayout?: boolean;
   hasMoreData?: boolean;
   onTotalCountChange?: (count: number) => void;
-  telemetryFunctionCalls?:any
+  telemetryFunctionCalls?: any;
 }
 
 export default function Content(props: Readonly<ContentProps>) {
@@ -405,6 +405,7 @@ export default function Content(props: Readonly<ContentProps>) {
           ...(response?.QuestionSet ?? []),
         ];
         const userTrackData = await fetchDataTrack(newContentData);
+        console.log('userTrackData', userTrackData);
         if (!isMounted) return;
         if (localFilters.offset === 0) {
           setContentData(newContentData);
@@ -496,27 +497,26 @@ export default function Content(props: Readonly<ContentProps>) {
   const handleCardClickLocal = useCallback(
     async (content: ContentItem, e?: any, rowNumber?: number) => {
       console.log('Card clicked--------:', content);
-       const windowUrl = window.location.href;
-      // const cleanedUrl = windowUrl.replace(/^\//, '');
-      // const env = cleanedUrl.split('/')[0];
-     const telemetryInteract = {
-        context: {
-          env: windowUrl.split('/')[0],
-          cdata: [],
-      
-
-        },
-        edata: {
-          id: 'clicked on ' + content?.contentType +":" + content?.name,
-          type: "CLICK",
-          subtype: '',
-          pageid: windowUrl,
-                    program: localStorage.getItem('userProgram') || '',
-                    doId: content?.identifier,
-
-        },
-      };
-      telemetryFactory.interact(telemetryInteract);
+      if (typeof window !== 'undefined') {
+        const windowUrl = window.location.href;
+        // const cleanedUrl = windowUrl.replace(/^\//, '');
+        // const env = cleanedUrl.split('/')[0];
+        const telemetryInteract = {
+          context: {
+            env: windowUrl.split('/')[0],
+            cdata: [],
+          },
+          edata: {
+            id: 'clicked on ' + content?.contentType + ':' + content?.name,
+            type: 'CLICK',
+            subtype: '',
+            pageid: windowUrl,
+            program: localStorage.getItem('userProgram') || '',
+            doId: content?.identifier,
+          },
+        };
+        telemetryFactory.interact(telemetryInteract);
+      }
 
       try {
         sessionStorage.setItem(
