@@ -317,6 +317,7 @@ export const filterData = (data: any[], searchKey: string) => {
 };
 
 export const categorizeUsers = (users: any) => {
+  console.log('users', users);
   const volunteerUsers: any = [];
   const youthUsers: any = [];
 
@@ -327,7 +328,7 @@ export const categorizeUsers = (users: any) => {
 
     if (
       isVolunteerField &&
-      isVolunteerField.selectedValues === VolunteerField.YES
+      isVolunteerField.selectedValues[0] === VolunteerField.YES
     ) {
       volunteerUsers.push({
         userId: user.userId,
