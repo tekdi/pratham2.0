@@ -152,23 +152,21 @@ export const createAssessmentTracking = async ({
   }
 };
 
-
-
 const fetchCertificateStatus = async ({ userId, courseId }: any) => {
   try {
     const response = await axios.post(
-     `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/user_certificate/status/get`,
+      `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/user_certificate/status/get`,
       { userId, courseId },
       {
         headers: {
-          'Authorization': localStorage.getItem('token') || '',
+          Authorization: localStorage.getItem('token') || '',
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'tenantId': localStorage.getItem('tenantId') || '',
+          Accept: 'application/json',
+          tenantId: localStorage.getItem('tenantId') || '',
         },
       }
     );
-     const status = response.data?.result?.status;
+    const status = response.data?.result?.status;
     return status || 'No status found';
   } catch (error) {
     console.error('API call failed:', error);
@@ -208,27 +206,32 @@ export const updateCOurseAndIssueCertificate = async ({
         status: 'inprogress',
       });
     } else if (courseStatus?.status === 'completed' && isGenerateCertificate) {
-
+      await updateUserCourseStatus({
+        userId,
+        courseId: course?.identifier,
+        status: 'completed',
+      });
       const userResponse: any = await getUserId();
-     const data= await fetchCertificateStatus({
-        userId: userId,
-        courseId: course?.identifier,})
-        if(data!=="viewCertificate"){
-      await issueCertificate({
+      const data = await fetchCertificateStatus({
         userId: userId,
         courseId: course?.identifier,
-        unitId: unitId,
-        issuanceDate: new Date().toISOString(),
-        expirationDate: new Date(
-          new Date().setFullYear(new Date().getFullYear() + 20)
-        ).toISOString(),
-        // credentialId: data?.result?.usercertificateId,
-        firstName: userResponse?.firstName ?? '',
-        middleName: userResponse?.middleName ?? '',
-        lastName: userResponse?.lastName ?? '',
-        courseName: course?.name ?? '',
       });
-    }
+      if (data !== 'viewCertificate') {
+        await issueCertificate({
+          userId: userId,
+          courseId: course?.identifier,
+          unitId: unitId,
+          issuanceDate: new Date().toISOString(),
+          expirationDate: new Date(
+            new Date().setFullYear(new Date().getFullYear() + 20)
+          ).toISOString(),
+          // credentialId: data?.result?.usercertificateId,
+          firstName: userResponse?.firstName ?? '',
+          middleName: userResponse?.middleName ?? '',
+          lastName: userResponse?.lastName ?? '',
+          courseName: course?.name ?? '',
+        });
+      }
     } else {
       updateUserCourseStatus({
         userId,

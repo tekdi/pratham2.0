@@ -48,6 +48,7 @@ const ObservationComponent: React.FC<QuestionnaireAppProps> = ({
   observationName,
   backButtonShow = true,
 }) => {
+  console.log('ObservationComponent rendered with props:', observationQuestions)
   const questionairePlayerMainRef = useRef<HTMLElement | null>(null);
   const [isBackConfirmationOpen, setIsBackConfirmationOpen] = useState(false);
 
@@ -61,6 +62,7 @@ const ObservationComponent: React.FC<QuestionnaireAppProps> = ({
   const theme = useTheme<any>();
 
   const uploadFileToPresignedUrl = async (event: FileUploadEvent) => {
+    console.log('uploadFileToPresignedUrl called with event:', event);
     const payload: any = {
       ref: 'survey',
       request: {},
@@ -173,11 +175,40 @@ const ObservationComponent: React.FC<QuestionnaireAppProps> = ({
 
   const receiveUploadData = (event: any) => {
     if (event.data && event.data.file) {
+      // Validate file type before processing
+      if (!validateFileType(event.data.file)) {
+        showToastMessage(t('OBSERVATION.ONLY_SPECIFIED_FILE_TYPES_ALLOWED'), 'error');
+        
+        // Send rejection response to web component immediately
+        const rejectionResponse = {
+          status: 400,
+          data: null,
+          question_id: event.data.question_id,
+          error: 'File type not allowed'
+        };
+        
+        // Set the file upload response to stop the web component's upload process
+        setFileUploadResponse(rejectionResponse);
+        
+        // Clear the response after a short delay to reset the state
+        setTimeout(() => {
+          setFileUploadResponse(null);
+        }, 2000);
+        
+        return;
+      }
       uploadFileToPresignedUrl(event as FileUploadEvent);
     }
   };
   const uploadToServer = async (file: File) => {
     console.log(file);
+    
+    // Validate file type before upload
+    if (!validateFileType(file)) {
+      showToastMessage(t('OBSERVATION.ONLY_SPECIFIED_FILE_TYPES_ALLOWED'), 'error');
+      return '';
+    }
+    
     try {
       // setUploading(true);
 
@@ -297,6 +328,112 @@ const ObservationComponent: React.FC<QuestionnaireAppProps> = ({
   useEffect(() => {
     if (questionairePlayerMainRef.current) {
       console.log('Web component ref set correctly');
+      
+            // Add file type restriction text to file upload areas
+      const addFileTypeRestrictionText = () => {
+        const fileUploadAreas = questionairePlayerMainRef.current?.querySelectorAll('input[type="file"]');
+        if (fileUploadAreas) {
+          fileUploadAreas.forEach((fileInput) => {
+            const parentElement = fileInput.parentElement;
+            if (parentElement && !fileInput.hasAttribute('data-restriction-added')) {
+              // Check if restriction text already exists for this file input
+              const existingRestriction = parentElement.parentNode?.querySelector('.file-type-restriction-container');
+              if (!existingRestriction) {
+                // Create a separate container for the restriction text below the file upload parent
+                const restrictionContainer = document.createElement('div');
+                restrictionContainer.className = 'file-type-restriction-container';
+                restrictionContainer.style.cssText = `
+                  margin-top: 8px;
+                  padding: 8px 12px;
+                  background-color: #f8f9fa;
+                  border: 1px solid #e9ecef;
+                  border-radius: 4px;
+                  font-size: 12px;
+                  color: #666;
+                  font-style: italic;
+                  margin:9px
+                `;
+                restrictionContainer.textContent = 'Allowed file types: JPG, JPEG, PNG, GIF, ICO, WEBP, MP4, MP3, PDF, DOC';
+                
+                // Insert the restriction container after the parent element
+                parentElement.parentNode?.insertBefore(restrictionContainer, parentElement.nextSibling);
+                
+                // Mark this file input as having restriction text added
+                fileInput.setAttribute('data-restriction-added', 'true');
+              }
+            }
+            
+                  // Add file validation on change event
+      if (!fileInput.hasAttribute('data-validation-added')) {
+        fileInput.addEventListener('change', (event) => {
+          const target = event.target as HTMLInputElement;
+          const files = target.files;
+          
+          if (files && files.length > 0) {
+            const file = files[0];
+            if (!validateFileType(file)) {
+              showToastMessage(t('OBSERVATION.ONLY_SPECIFIED_FILE_TYPES_ALLOWED'), 'error');
+              // Clear the file input
+              target.value = '';
+              // Prevent the event from bubbling up to the web component
+              event.stopPropagation();
+              event.preventDefault();
+              return;
+            }
+          }
+        });
+        
+        // Also add validation to the parent form to catch any other file upload methods
+        const form = fileInput.closest('form');
+        if (form && !form.hasAttribute('data-validation-added')) {
+          form.addEventListener('submit', (event) => {
+            const fileInputs = form.querySelectorAll('input[type="file"]');
+            let hasInvalidFile = false;
+            
+            fileInputs.forEach((input) => {
+              const files = (input as HTMLInputElement).files;
+              if (files && files.length > 0) {
+                const file = files[0];
+                if (!validateFileType(file)) {
+                  hasInvalidFile = true;
+                }
+              }
+            });
+            
+            if (hasInvalidFile) {
+              showToastMessage(t('OBSERVATION.ONLY_SPECIFIED_FILE_TYPES_ALLOWED'), 'error');
+              event.preventDefault();
+              event.stopPropagation();
+            }
+          });
+          
+          form.setAttribute('data-validation-added', 'true');
+        }
+        
+        fileInput.setAttribute('data-validation-added', 'true');
+      }
+          });
+        }
+      };
+
+      // Initial setup
+      addFileTypeRestrictionText();
+
+      // Set up observer to handle dynamically added file inputs
+      const observer = new MutationObserver(() => {
+        addFileTypeRestrictionText();
+      });
+
+      if (questionairePlayerMainRef.current) {
+        observer.observe(questionairePlayerMainRef.current, {
+          childList: true,
+          subtree: true
+        });
+      }
+
+      return () => {
+        observer.disconnect();
+      };
     } else {
       console.log('Web component ref not set');
     }
@@ -321,6 +458,30 @@ const ObservationComponent: React.FC<QuestionnaireAppProps> = ({
   const handleConfirmBack = () => {
     setIsBackConfirmationOpen(false);
     router.push(`${localStorage.getItem('observationPath')}`);
+  };
+
+  // Helper function to get allowed file types for UI display
+  const getAllowedFileTypes = () => {
+    return ['jpg', 'jpeg', 'png', 'gif', 'ico', 'webp', 'mp4', 'mp3', 'pdf', 'doc'];
+  };
+
+  // Helper function to validate file type
+  const validateFileType = (file: File): boolean => {
+    const allowedExtensions = [
+      '.jpg',
+      '.jpeg', 
+      '.png',
+      '.gif',
+      '.ico',
+      '.webp',
+      '.mp4',
+      '.mp3',
+      '.pdf',
+      '.doc'
+    ];
+    
+    const fileName = file.name.toLowerCase();
+    return allowedExtensions.some(ext => fileName.endsWith(ext));
   };
 
   return (

@@ -389,7 +389,7 @@ const ptmName = getCustomFieldValue(customFields, 'PTM_NAME');
       <Typography sx={valueStyle}>{toPascalCase(ptmName)}</Typography>
     </Grid>
   )}
-            {dob !== '-' && (
+            {dob !== '-' && dob &&  (
               <Grid item xs={6}>
                 <Typography sx={labelStyle}>
                   {t('LEARNER_APP.USER_PROFILE_CARD.DOB')}
