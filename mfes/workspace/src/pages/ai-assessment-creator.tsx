@@ -130,7 +130,7 @@ const CustomStepper = ({ activeStep }: { activeStep: number }) => (
 const onlyFields1 = [
   'se_boards',
   'se_mediums',
-  'se_gradeLevels',
+  // 'se_gradeLevels',
   'se_subjects',
   'se_courseTypes',
   // 'contentLanguage',
@@ -148,7 +148,7 @@ const inputType = {
   program: 'dropdown-multi',
   se_boards: 'dropdown-single',
   se_mediums: 'dropdown-multi',
-  se_gradeLevels: 'dropdown-multi',
+  // se_gradeLevels: 'dropdown-multi',
   se_courseTypes: 'dropdown-multi',
   se_domains: 'dropdown-single',
   se_subDomains: 'dropdown-single',
@@ -212,25 +212,26 @@ const AIAssessmentCreator: React.FC = () => {
       response = await createQuestionSet(tenantConfig?.COLLECTION_FRAMEWORK);
 
       // Create the attributions array as per the API requirement
-      const attributions = [
-        {
-          name: 'difficulty_level',
-          value: data?.difficulty_level || 'Medium',
-        },
-        {
-          name: 'question_types',
-          value: data?.question_types || [],
-        },
-        {
-          name: 'questionsDetails',
-          value: data?.questionsDetails || [],
-        },
-      ];
+      // const attributions = [
+      //   {
+      //     name: 'difficulty_level',
+      //     value: data?.difficulty_level || 'Medium',
+      //   },
+      //   {
+      //     name: 'question_types',
+      //     value: data?.question_types || [],
+      //   },
+      //   {
+      //     name: 'questionsDetails',
+      //     value: data?.questionsDetails || [],
+      //   },
+      // ];
 
       // Prepare metadata with attributions
       const metadata = {
         ...(data?.metadata || {}),
-        attributions,
+        se_gradeLevels: ['Grade 10'],
+        // attributions,
       };
 
       const updateResponse = await updateQuestionSet({
@@ -275,38 +276,38 @@ const AIAssessmentCreator: React.FC = () => {
       });
 
       // 2. Poll for status (sendToAi logic)
-      let prog = 0;
-      let lastStatus: string | null = null;
-      const interval = setInterval(async () => {
-        prog += 1.67;
-        try {
-          if (Math.floor(prog / 1.67) % 10 === 0 && prog > 0) {
-            const status = await getAIQuestionSetStatus(identifier, token);
-            setAIStatus(status?.result?.status);
-            lastStatus = status?.result?.status;
-            if (status?.result?.status === 'COMPLETED') {
-              clearInterval(interval);
-              setAIDialogState('success');
-            }
-          }
-        } catch (error: any) {
-          console.error('Error getting AI question set status:', error);
-          setErrorMessage(
-            error?.response?.data?.params?.errmsg ||
-              'Something went wrong in AI assessment'
-          );
-        }
-        if (prog >= 100) {
-          clearInterval(interval);
-          if (lastStatus === 'COMPLETED') {
-            setAIDialogState('success');
-          } else if (lastStatus === 'PROCESSING') {
-            setAIDialogState('processing');
-          } else {
-            setAIDialogState('failed');
-          }
-        }
-      }, 1000);
+      // let prog = 0;
+      // let lastStatus: string | null = null;
+      // const interval = setInterval(async () => {
+      //   prog += 1.67;
+      //   try {
+      //     if (Math.floor(prog / 1.67) % 10 === 0 && prog > 0) {
+      //       const status = await getAIQuestionSetStatus(identifier, token);
+      //       setAIStatus(status?.result?.status);
+      //       lastStatus = status?.result?.status;
+      //       if (status?.result?.status === 'COMPLETED') {
+      //         clearInterval(interval);
+      //         setAIDialogState('success');
+      //       }
+      //     }
+      //   } catch (error: any) {
+      //     console.error('Error getting AI question set status:', error);
+      //     setErrorMessage(
+      //       error?.response?.data?.params?.errmsg ||
+      //         'Something went wrong in AI assessment'
+      //     );
+      //   }
+      //   if (prog >= 100) {
+      //     clearInterval(interval);
+      //     if (lastStatus === 'COMPLETED') {
+      //       setAIDialogState('success');
+      //     } else if (lastStatus === 'PROCESSING') {
+      //       setAIDialogState('processing');
+      //     } else {
+      //       setAIDialogState('failed');
+      //     }
+      //   }
+      // }, 1000);
     } catch (error: any) {
       setAIDialogState('failed');
       setErrorMessage(
@@ -327,7 +328,17 @@ const AIAssessmentCreator: React.FC = () => {
     handleSubmit(newFormState);
   };
 
-  const handleBack = () => setActiveStep((s) => s - 1);
+  const handleBack = () => {
+    setActiveStep((s) => {
+      const newStep = s - 1;
+      // When going back to step 0, restore selectedContent from formState.content
+      if (newStep === 0 && formState.content) {
+        const contentIds = formState.content.map((item: any) => item.id);
+        setSelectedContent(contentIds);
+      }
+      return newStep;
+    });
+  };
 
   const handleSubmit = async (formData: any) => {
     const token = localStorage.getItem('token');
@@ -383,7 +394,7 @@ const AIAssessmentCreator: React.FC = () => {
     return <Loader showBackdrop loadingText="Loading..." />;
   }
 
-  let stepContent = null;
+  let stepContent: React.ReactElement | null = null;
   if (activeStep === 0) {
     stepContent = (
       <SelectContent
@@ -401,12 +412,7 @@ const AIAssessmentCreator: React.FC = () => {
   } else if (activeStep === 1) {
     stepContent = (
       <SetParameters
-        formState={{
-          ...formState,
-          ...(tenantConfig?.COLLECTION_FRAMEWORK === 'scp-framework'
-            ? { se_gradeLevels: ['Grade 10'] }
-            : {}),
-        }}
+        formState={formState}
         staticFilter={staticFilter}
         onlyFields={
           tenantConfig?.COLLECTION_FRAMEWORK === 'scp-framework'
@@ -455,6 +461,9 @@ const AIAssessmentCreator: React.FC = () => {
           onClose={() => setShowAIDialog(false)}
           onGoToEditor={() => {
             router.push(`/editor?identifier=${aiDialogParams?.identifier}`);
+          }}
+          onGoAssessment={() => {
+            router.push('/workspace/content/ai-assessments');
           }}
         />
       </Box>

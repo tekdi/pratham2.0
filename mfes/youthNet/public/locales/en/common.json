@@ -768,9 +768,9 @@
     "PROFILE_DETAILS": "Profile Details",
     "FULL_NAME": "Full Name",
     "EMAIL_ID": "Email ID",
-    "STATE_DISTRICT_BLOCK": "Block District State",
-    "STATE_DISTRICT": "District State",
-    "STATE_DISTRICT_BLOCK_VILLAGE": "Village Block District State",
+    "STATE_DISTRICT_BLOCK": "State District Block",
+    "STATE_DISTRICT": "State District",
+    "STATE_DISTRICT_BLOCK_VILLAGE": "State District Block Village",
     "DESIGNATION": "Designation",
     "JOINED_ON": "Joined on",
     "PHONE_NUMBER": "Phone Number",
@@ -808,7 +808,8 @@
     "VILLAGES": "Villages",
     "BLOCKS": "Blocks",
     "DISTRICT": "District",
-    "DISTRICTS": "Districts"
+    "DISTRICTS": "Districts",
+    "PLEASE_GO_BACK_MSG": "Please go back after selection to proceed further"
   },
   "YOUTHNET_CAMP_DETAILS": {
     "SUBMISSION": "Submission",
@@ -845,7 +846,9 @@
     "NOT_ABLE_UPDATE_MENTOR": "Not able to update mentor",
     "NOT_ABLE_CREATE_MENTOR": "Not able to create mentor",
     "UPDATE_MENTOR": "Update Mentor",
-    "RE_ASSIGN_MENTOR": "Re-assign Mentor"
+    "RE_ASSIGN_MENTOR": "Re-assign Mentor",
+    "MENTOR_DELETED_SUCCESSFULLY": "Mentor deleted successfully",
+    "MENTOR_DELETE_FAIL": "Failed to delete mentor"
   },
   "UNIT_NAME": "Unit Name",
   "TYPE_OF_CENTER": "Type Of Center",

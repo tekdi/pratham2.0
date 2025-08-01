@@ -3,7 +3,7 @@ import Layout from '../../../../components/Layout';
 import { Typography, Box, CircularProgress } from '@mui/material';
 import {
   getContent,
-  // searchAiAssessment,
+  searchAiAssessment,
 } from '@workspace/services/ContentService';
 import SearchBox from '../../../../components/SearchBox';
 import PaginationComponent from '@workspace/components/PaginationComponent';
@@ -38,7 +38,7 @@ const columns = [
     width: '200px',
   },
 
-  // { key: 'status', title: 'STATUS', dataType: DataType.String, width: "100px" },
+  { key: 'status', title: 'STATUS', dataType: DataType.String, width: '100px' },
   {
     key: 'lastUpdatedOn',
     title: 'LAST MODIFIED',
@@ -46,7 +46,7 @@ const columns = [
     width: '180px',
   },
 
-  // { key: 'action', title: 'ACTION', dataType: DataType.String, width: '140px' },
+  { key: 'action', title: 'ACTION', dataType: DataType.String, width: '140px' },
 ];
 
 const staticFilter = ['Practice Question Set'];
@@ -77,7 +77,6 @@ const PublishPage = () => {
     setSortBy(sort?.toString() || 'Modified On');
   }, [sort]);
   const [contentList, setContentList] = React.useState([]);
-  const [contentDeleted, setContentDeleted] = React.useState(false);
   const [loading, setLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [data, setData] = React.useState<any[]>([]);
@@ -152,34 +151,33 @@ const PublishPage = () => {
         }
         const order = sortBy === 'Created On' ? 'asc' : 'desc';
         const sort_by = { lastUpdatedOn: order };
-        // const aiQuestionSetStatus = await searchAiAssessment({
-        //   createdBy: localStorage.getItem('userId'),
-        // });
-        // const identifiers = (aiQuestionSetStatus?.data || []).map(
-        //   (item: any) => item.question_set_id as string
-        // );
+        const aiQuestionSetStatus = await searchAiAssessment({
+          createdBy: localStorage.getItem('userId'),
+        });
+        const identifiers = (aiQuestionSetStatus?.data || []).map(
+          (item: any) => item.question_set_id as string
+        );
         const response = await getContent(
-          ['Live'],
+          ['Live', 'Draft'],
           query,
           LIMIT,
           offset,
           primaryCategory,
           sort_by,
-          tenantConfig?.CHANNEL_ID
-          // '',
-          // '',
-          // identifiers
+          tenantConfig?.CHANNEL_ID,
+          '',
+          '',
+          { identifier: identifiers }
         );
-        setContentList(response?.QuestionSet || []);
 
-        // setContentList(
-        //   (response?.QuestionSet || []).map((item: any) => ({
-        //     ...item,
-        //     aiStatus: aiQuestionSetStatus?.data?.find(
-        //       (aiItem: any) => aiItem.question_set_id === item.identifier
-        //     )?.status,
-        //   }))
-        // );
+        setContentList(
+          (response?.QuestionSet || []).map((item: any) => ({
+            ...item,
+            aiStatus: aiQuestionSetStatus?.data?.find(
+              (aiItem: any) => aiItem.question_set_id === item.identifier
+            )?.status,
+          }))
+        );
         setTotalCount(response?.count || 0);
       } catch (error) {
         console.error(error);
@@ -196,7 +194,6 @@ const PublishPage = () => {
     filter,
     sortBy,
     fetchContentAPI,
-    contentDeleted,
     page,
   ]);
 
@@ -219,7 +216,7 @@ const PublishPage = () => {
                 variant="h4"
                 sx={{ fontWeight: 'bold', fontSize: '16px' }}
               >
-                Ai-assessments
+                Assessments
               </Typography>
             </Box>
             <Box mb={3}>
@@ -231,7 +228,7 @@ const PublishPage = () => {
                 onSortChange={handleSortChange}
               />
             </Box>
-            {/* <Typography mb={2}>Here you see all your "Ai-assessments content.</Typography> */}
+            {/* <Typography mb={2}>Here you see all your "Assessments content.</Typography> */}
             {loading ? (
               <Box display="flex" justifyContent="center" my={5}>
                 <CircularProgress />

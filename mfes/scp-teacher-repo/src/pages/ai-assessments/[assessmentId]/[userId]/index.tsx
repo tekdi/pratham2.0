@@ -1101,7 +1101,6 @@ const AssessmentDetails = () => {
                   fontWeight: 400,
                   marginBottom: '8px',
                   display: 'flex',
-                  alignItems: 'center',
                   '&:before': {
                     content: '"•"',
                     marginRight: '8px',
@@ -1118,7 +1117,6 @@ const AssessmentDetails = () => {
                   fontWeight: 400,
                   marginBottom: '16px',
                   display: 'flex',
-                  alignItems: 'center',
                   '&:before': {
                     content: '"•"',
                     marginRight: '8px',

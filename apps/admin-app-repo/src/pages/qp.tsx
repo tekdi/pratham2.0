@@ -181,6 +181,268 @@ const QuestionPaperPDF = ({ data }: any) => {
             </View>
           </View>
           <View style={styles.row}>
+            <View style={[gridCol(12), styles.box]}>
+              <Text
+                style={{
+                  ...styles.sub_title,
+                  ...styles.left,
+                  ...styles.bold,
+                }}
+              >
+                Submission Instructions
+              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                <Text
+                  style={{
+                    ...styles.sub_title,
+                    ...styles.left,
+                  }}
+                >
+                  •
+                </Text>
+                <Text
+                  style={{
+                    ...styles.sub_title,
+                    ...styles.left,
+                    marginLeft: 5,
+                  }}
+                >
+                  Place the piece of paper on a flat, clean surface 
+                </Text>
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                <Text
+                  style={{
+                    ...styles.sub_title,
+                    ...styles.left,
+                  }}
+                >
+                  •
+                </Text>
+                <Text
+                  style={{
+                    ...styles.sub_title,
+                    ...styles.left,
+                    marginLeft: 5,
+                  }}
+                >
+                  Hold the phone straight above the piece of paper
+                </Text>
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                <Text
+                  style={{
+                    ...styles.sub_title,
+                    ...styles.left,
+                  }}
+                >
+                  •
+                </Text>
+                <Text
+                  style={{
+                    ...styles.sub_title,
+                    ...styles.left,
+                    marginLeft: 5,
+                  }}
+                >
+                  Ensure good lighting and avoid shadows or glare
+                </Text>
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                <Text
+                  style={{
+                    ...styles.sub_title,
+                    ...styles.left,
+                  }}
+                >
+                  •
+                </Text>
+                <Text
+                  style={{
+                    ...styles.sub_title,
+                    ...styles.left,
+                    marginLeft: 5,
+                  }}
+                >
+                  Ensure all text is clear and fully visible
+                </Text>
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                <Text
+                  style={{
+                    ...styles.sub_title,
+                    ...styles.left,
+                  }}
+                >
+                  •
+                </Text>
+                <Text
+                  style={{
+                    ...styles.sub_title,
+                    ...styles.left,
+                    marginLeft: 5,
+                  }}
+                >
+                  Click an image and upload to the portal
+                </Text>
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                <Text
+                  style={{
+                    ...styles.sub_title,
+                    ...styles.left,
+                  }}
+                >
+                  •
+                </Text>
+                <Text
+                  style={{
+                    ...styles.sub_title,
+                    ...styles.left,
+                    marginLeft: 5,
+                  }}
+                >
+                  If the answer sheet has multiple pages, take a picture of each
+                  page separately and upload
+                </Text>
+              </View>
+              <Text
+                style={{
+                  ...styles.sub_title,
+                  ...styles.left,
+                  ...styles.bold,
+                }}
+              >
+                जमा करने के निर्देश
+              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                <Text
+                  style={{
+                    ...styles.sub_title,
+                    ...styles.left,
+                  }}
+                >
+                  •
+                </Text>
+                <Text
+                  style={{
+                    ...styles.sub_title,
+                    ...styles.left,
+                    marginLeft: 5,
+                  }}
+                >
+                  कागज़ को समतल और साफ़ सतह पर रखें
+                </Text>
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                <Text
+                  style={{
+                    ...styles.sub_title,
+                    ...styles.left,
+                  }}
+                >
+                  •
+                </Text>
+                <Text
+                  style={{
+                    ...styles.sub_title,
+                    ...styles.left,
+                    marginLeft: 5,
+                  }}
+                >
+                  फ़ोन को कागज़ के ठीक ऊपर सीधा रखें
+                </Text>
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                <Text
+                  style={{
+                    ...styles.sub_title,
+                    ...styles.left,
+                  }}
+                >
+                  •
+                </Text>
+                <Text
+                  style={{
+                    ...styles.sub_title,
+                    ...styles.left,
+                    marginLeft: 5,
+                  }}
+                >
+                  यह सुनिश्चित करें कि अच्छी लाइटिंग (lighting – रोशनी) हो और
+                  ग्लेयर (glare – चमक) या परछाईं (shadow) न हो
+                </Text>
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                <Text
+                  style={{
+                    ...styles.sub_title,
+                    ...styles.left,
+                  }}
+                >
+                  •
+                </Text>
+                <Text
+                  style={{
+                    ...styles.sub_title,
+                    ...styles.left,
+                    marginLeft: 5,
+                  }}
+                >
+                  यह सुनिश्चित करें कि सभी लेखन स्पष्ट और पूरा दिखाई दे
+                </Text>
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                <Text
+                  style={{
+                    ...styles.sub_title,
+                    ...styles.left,
+                  }}
+                >
+                  •
+                </Text>
+                <Text
+                  style={{
+                    ...styles.sub_title,
+                    ...styles.left,
+                    marginLeft: 5,
+                  }}
+                >
+                  इमेज क्लिक करें और पोर्टल पर अपलोड करें
+                </Text>
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                <Text
+                  style={{
+                    ...styles.sub_title,
+                    ...styles.left,
+                  }}
+                >
+                  •
+                </Text>
+                <Text
+                  style={{
+                    ...styles.sub_title,
+                    ...styles.left,
+                    marginLeft: 5,
+                  }}
+                >
+                  अगर उत्तर पत्र में एक से अधिक पेज हों, तो हर पेज की अलग-अलग
+                  तस्वीर लें और अपलोड करें
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View style={styles.row}>
+            <View style={[gridCol(12), styles.box]}>
+              <View
+                style={{
+                  borderBottom: '2px solid #000',
+                }}
+              />
+            </View>
+          </View>
+          <View style={styles.row}>
             {data?.sections?.map((section: any, sectionIndex: any) => (
               <View key={sectionIndex}>
                 <View style={styles.row}>

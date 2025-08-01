@@ -80,6 +80,7 @@ import {
   fetchForm,
 } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import { RoleId } from '@/utils/app.constant';
+import { deleteUser } from 'mfes/youthNet/src/services/youthNet/Dashboard/UserServices';
 
 const Index = () => {
   const { isRTL } = useDirection();
@@ -402,9 +403,9 @@ const Index = () => {
             const blockField = user?.customFields?.find(
               (field: any) => field.label === cohortHierarchy.BLOCK
             );
-            const blockValues = blockField?.selectedValues.map((block: any) => {
-              block.value;
-            });
+            const blockValues = blockField?.selectedValues.map(
+              (block: any) => block.value
+            );
 
             if (user.lastName) {
               name += ` ${user.lastName}`;
@@ -619,9 +620,9 @@ const Index = () => {
     });
   };
 
-  const handleToggledUserClick = (name: any, Id?: any) => {
-    setToggledUser(name);
-    setselectedToggledUserId(Id);
+  const handleToggledUserClick = (user: any) => {
+    setToggledUser(user.name);
+    setselectedToggledUserId(user.Id);
     setOpenDrawer((prev) => !prev);
   };
   const handlemarkAsVolunteer = async () => {
@@ -901,6 +902,38 @@ const Index = () => {
     setCount((prev) => prev + 1);
   };
 
+  // Mentor delete logic
+  const handleDeleteMentor = async () => {
+    try {
+      // 1. Delete user
+      const resp = await deleteUser(selectedMentor.Id, {
+        userData: { reason: selectedValue, status: 'archived' },
+      });
+      // 2. Update UI
+      if (resp?.responseCode === 200 || resp?.responseCode === 'OK') {
+        setOpenDelete(false);
+        showToastMessage(t('MENTORS.MENTOR_DELETED_SUCCESSFULLY'), 'success');
+        await getMentorData();
+      } else {
+        showToastMessage(t('MENTORS.MENTOR_DELETE_FAIL'), 'error');
+      }
+    } catch (error) {
+      showToastMessage('Error deleting mentor', 'error');
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    if (
+      value === 3 &&
+      villageList &&
+      villageList.length > 0 &&
+      !selectedVillageValue
+    ) {
+      setSelectedVillageValue(villageList[0].Id);
+    }
+  }, [value, villageList, selectedVillageValue]);
+
   return (
     <Box minHeight="100vh">
       <Box>
@@ -1114,6 +1147,7 @@ const Index = () => {
                 'YOUTHNET_USERS_AND_VILLAGES.DELETE_USER_PERMANENTLY'
               )}
               primaryText={t('COMMON.DELETE_USER_WITH_REASON')}
+              primaryActionHandler={handleDeleteMentor}
             >
               <Box>
                 <Box mt={2}>
@@ -1328,7 +1362,6 @@ const Index = () => {
                   fontSize: '16px',
                   color: 'textSecondary',
                   marginLeft: '2rem',
-                  cursor: 'pointer',
                   pr: '20px',
                 }}
                 className="one-line-text"
@@ -1340,7 +1373,6 @@ const Index = () => {
                 sx={{
                   fontSize: '16px',
                   color: 'textSecondary',
-                  cursor: 'pointer',
                   pr: '20px',
                 }}
               >

@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
-  TextField,
+  InputBase,
   Button,
-  InputAdornment,
+  Paper,
+  IconButton,
   Chip,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import ClearIcon from '@mui/icons-material/Clear';
 import { FilterForm } from '@shared-lib-v2/lib/Filter/FilterForm';
 import { getContentPDF } from '../../services/ContentService';
 import KaTableComponent from '../KaTableComponent';
@@ -86,7 +88,9 @@ const SelectContent: React.FC<SelectContentProps> = ({
   const [filter, setFilter] = useState<any>({});
 
   React.useEffect(() => {
-    setFilter({ ...formState, ...staticFilter });
+    setTimeout(() => {
+      setFilter({ ...staticFilter });
+    }, 100);
   }, [formState, staticFilter]);
 
   // Debounce search input
@@ -118,6 +122,7 @@ const SelectContent: React.FC<SelectContentProps> = ({
         const channel = tenantConfig?.CHANNEL_ID;
         // const contentType = 'discover-contents';
         if (!channel) return;
+        const { content, contentLanguage, ...newFilter } = filter || {};
         // API call
         const response = await getContentPDF({
           query,
@@ -125,7 +130,7 @@ const SelectContent: React.FC<SelectContentProps> = ({
           offset,
           sort_by,
           filters: {
-            ...filter, // existing filter object if any
+            ...newFilter, // existing filter object if any
             status,
             primaryCategory,
             channel,
@@ -145,6 +150,7 @@ const SelectContent: React.FC<SelectContentProps> = ({
         }
         setHasMore(contentList.length === LIMIT);
       } catch (error) {
+        console.log(error, 'error');
         setContentSources([]);
         setHasMore(false);
       } finally {
@@ -239,49 +245,77 @@ const SelectContent: React.FC<SelectContentProps> = ({
   return (
     <Box>
       <Box p={3} pb={0}>
-        {tenantConfig?.COLLECTION_FRAMEWORK && (
-          <FilterForm
-            orginalFormData={filter}
-            // isShowStaticFilterValue={true}
-            onlyFields={onlyFields}
-            staticFilter={staticFilter}
-            _config={{
-              COLLECTION_FRAMEWORK:
-                tenantConfig?.COLLECTION_FRAMEWORK === 'scp-framework'
-                  ? 'pos-framework'
-                  : tenantConfig?.COLLECTION_FRAMEWORK,
-              CHANNEL_ID:
-                tenantConfig?.CHANNEL_ID === 'scp-channel'
-                  ? 'pos-channel'
-                  : tenantConfig?.CHANNEL_ID,
-              _loader: { _loader: { minHeight: 300 } },
-              _box: { sx: { flexDirection: 'row', flexWrap: 'wrap' } },
-              _selectOptionBox: { sx: { minWidth: 300, maxWidth: 300 } },
-              inputType: inputType,
-            }}
-            onApply={handleFilterChange}
-          />
-        )}
+        {tenantConfig?.COLLECTION_FRAMEWORK &&
+          Object.keys(filter).length > 0 && (
+            <FilterForm
+              orginalFormData={filter}
+              // isShowStaticFilterValue={true}
+              onlyFields={onlyFields}
+              staticFilter={staticFilter}
+              _config={{
+                COLLECTION_FRAMEWORK:
+                  tenantConfig?.COLLECTION_FRAMEWORK === 'scp-framework'
+                    ? 'pos-framework'
+                    : tenantConfig?.COLLECTION_FRAMEWORK,
+                CHANNEL_ID:
+                  tenantConfig?.CHANNEL_ID === 'scp-channel'
+                    ? 'pos-channel'
+                    : tenantConfig?.CHANNEL_ID,
+                _loader: { _loader: { minHeight: 300 } },
+                _box: { sx: { flexDirection: 'row', flexWrap: 'wrap' } },
+                _selectOptionBox: { sx: { minWidth: 300, maxWidth: 300 } },
+                inputType: inputType,
+              }}
+              onApply={handleFilterChange}
+            />
+          )}
         <Box sx={{ my: 2, width: 400 }}>
-          <TextField
-            fullWidth
-            size="medium"
-            placeholder="Search content.."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setPage(0);
-              setHasMore(true);
+          <Paper
+            component="form"
+            onSubmit={(e) => e.preventDefault()}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: '#F0F0F0',
+              borderRadius: '8px',
+              '& .MuiOutlinedInput-root fieldset': { border: 'none' },
+              '& .MuiOutlinedInput-input': { borderRadius: 8 },
             }}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-              sx: { bgcolor: '#F0F0F0', borderRadius: 1 },
-            }}
-          />
+          >
+            <InputBase
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(0);
+                setHasMore(true);
+              }}
+              sx={{
+                ml: 3,
+                flex: 1,
+                fontSize: '16px',
+                fontFamily: 'Poppins',
+                color: '#000000DB',
+              }}
+              placeholder="Search content.."
+              inputProps={{ 'aria-label': 'search content' }}
+            />
+            <IconButton
+              type="button"
+              onClick={
+                search
+                  ? () => {
+                      setSearch('');
+                      setPage(0);
+                      setHasMore(true);
+                    }
+                  : undefined
+              }
+              sx={{ p: 1.25 }}
+              aria-label={search ? 'Clear' : 'Search'}
+            >
+              {search ? <ClearIcon /> : <SearchIcon />}
+            </IconButton>
+          </Paper>
         </Box>
         <Typography
           sx={{
