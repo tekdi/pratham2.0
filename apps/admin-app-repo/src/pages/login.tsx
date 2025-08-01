@@ -244,26 +244,6 @@ const LoginPage = () => {
         // } else {
         setAdminInformation(userInfo);
         const getAcademicYearList = async () => {
-          if (userInfo?.role === Role.SCTA || userInfo?.role === Role.CCTA) {
-            // For SCTA and CCTA roles, redirect directly without fetching academic year
-            const { locale } = router;
-            if (
-              userInfo?.tenantData[0]?.tenantName !=
-              TenantName.SECOND_CHANCE_PROGRAM
-            ) {
-              window.location.href = '/workspace';
-              router.push('/workspace');
-            } else {
-              window.location.href = '/course-planner';
-              if (locale) {
-                router.push('/course-planner', undefined, {
-                  locale: locale,
-                });
-              } else router.push('/course-planner');
-            }
-            return;
-          }
-          
           const academicYearList: AcademicYear[] = await getAcademicYear();
           if (academicYearList) {
             localStorage.setItem(
