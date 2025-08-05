@@ -8,18 +8,22 @@ import {
   Box,
   Grid,
   Tooltip,
+  Snackbar,
+  Alert,
 } from '@mui/material';
 import UpReviewTinyImage from '@mui/icons-material/LibraryBooks';
 import 'ka-table/style.css';
 import DeleteIcon from '@mui/icons-material/Delete';
 import router from 'next/router';
-import { MIME_TYPE } from '@workspace/utils/app.config';
+import { MIME_TYPE } from '../utils/app.config';
 import Image from 'next/image';
 import ActionIcon from './ActionIcon';
 import { Padding } from '@mui/icons-material';
 import QrCode2Icon from '@mui/icons-material/QrCode2';
 import QrModal from './QrModal';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { table } from 'console';
+import Checkbox from '@mui/material/Checkbox';
 
 interface CustomTableProps {
   data: any[]; // Define a more specific type for your data if needed
@@ -31,6 +35,9 @@ interface CustomTableProps {
   handleDelete?: any;
   tableTitle?: string;
   showQrCodeButton?: boolean;
+  selectable?: boolean;
+  selected?: string[];
+  onSelect?: (id: string) => void;
 }
 
 const KaTableComponent: React.FC<CustomTableProps> = ({
@@ -38,14 +45,15 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
   columns,
   tableTitle,
   showQrCodeButton = false,
+  selectable = false,
+  selected = [],
+  onSelect,
 }) => {
   const theme = useTheme<any>();
   const [open, setOpen] = useState(false);
   const [openQrCodeModal, setOpenQrCodeModal] = useState(false);
   const [selectedQrValue, setSelectedQrValue] = useState<string>('');
-
-  console.log('data', data);
-  console.log('coumnData', columns);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   const handleClose = () => {
     setOpen(false);
@@ -54,6 +62,12 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
   const handleOpenQrModal = (qrValue: string) => {
     setSelectedQrValue(qrValue);
     setOpenQrCodeModal(true);
+  };
+
+  const handleCopyLink = (link: string) => {
+    navigator.clipboard.writeText(link).then(() => {
+      setSnackbarOpen(true);
+    });
   };
 
   const openEditor = (content: any) => {
@@ -133,7 +147,7 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
           })
         : router.push({
             pathname: `/workspace/content/review`,
-            query: { identifier, isReadOnly: true },
+            query: { identifier, isReadOnly: true  , isAllContents: true },
           });
     } else if (tableTitle === 'discover-contents') {
       content.contentType === 'Course'
@@ -145,7 +159,19 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
             pathname: `/workspace/content/review`,
             query: { identifier, isDiscoverContent: true },
           });
-    } else if (
+    }
+    else if (tableTitle === 'content-library') {
+      content.contentType === 'Course'
+        ? router.push({
+            pathname: `/course-hierarchy/${identifier}`,
+            query: { identifier, previousPage: 'content-library' },
+          })
+        : router.push({
+            pathname: `/workspace/content/review`,
+            query: { identifier, isContentLibrary :true },
+          });
+    }
+    else if (
       content?.mimeType &&
       MIME_TYPE.GENERIC_MIME_TYPE.includes(content?.mimeType)
     ) {
@@ -155,6 +181,11 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
         tableTitle === 'upForReview'
           ? `/workspace/content/review`
           : `/upload-editor`;
+          if(tableTitle === 'all-content') {
+                  router.push({ pathname, query: { identifier,  isAllContents: true } });
+
+          }
+          else
       router.push({ pathname, query: { identifier } });
     } else if (
       content?.mimeType &&
@@ -167,12 +198,45 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
   return (
     <>
       <KaTable
-        columns={columns}
+        columns={
+          selectable
+            ? [
+                {
+                  key: '__select__',
+                  title: '',
+                  dataType: DataType.Boolean,
+                  style: { width: 40 },
+                },
+                ...columns,
+              ]
+            : columns
+        }
         data={data}
-        // editingMode={EditingMode.Cell}
-        rowKeyField={'id'}
+        rowKeyField={'identifier'}
         sortingMode={SortingMode.Single}
         childComponents={{
+          cell: selectable
+            ? {
+                content: (props) => {
+                  if (props.column.key === '__select__') {
+                    return (
+                      <Checkbox
+                        checked={selected.includes(props.rowData.identifier)}
+                        disabled={
+                          !selected.includes(props.rowData.identifier) &&
+                          selected.length >= 3
+                        }
+                        onChange={() =>
+                          onSelect && onSelect(props.rowData.identifier)
+                        }
+                        size="small"
+                      />
+                    );
+                  }
+                  return undefined;
+                },
+              }
+            : undefined,
           cellText: {
             content: (props) => {
               if (
@@ -186,9 +250,6 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
                         <Typography variant="body2" sx={{ fontWeight: 500 }}>
                           {props.rowData.name}
                         </Typography>
-                        {/* <Typography variant="body2">
-                          {props.rowData.description}
-                        </Typography> */}
                       </Box>
                     }
                     arrow
@@ -198,9 +259,9 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
                       style={{
                         display: 'flex',
                         alignItems: 'center',
-                        cursor: 'pointer',
+                        cursor: selectable ? 'default' : 'pointer',
                       }}
-                      onClick={() => openEditor(props.rowData)}
+                      onClick={() => !selectable && openEditor(props.rowData)}
                     >
                       <Grid container alignItems="center" spacing={1}>
                         <Grid item xs={3} md={3} lg={3} xl={2}>
@@ -324,7 +385,6 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
                   );
                 }
               } else if (props.column.key === 'create-by') {
-                console.log('props.rowData ====>', props.rowData);
                 if (props?.rowData?.creator || props?.rowData?.author)
                   return (
                     <Typography
@@ -372,11 +432,7 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
                                 props.rowData.contentType === 'Course'
                                   ? `${process.env.NEXT_PUBLIC_POS_URL}/pos/content/${props.rowData.identifier}?activeLink=/pos/program`
                                   : `${process.env.NEXT_PUBLIC_POS_URL}/pos/player/${props.rowData.identifier}?activeLink=/pos/program`;
-
-                              navigator.clipboard.writeText(link).then(() => {
-                                // Optional: show a tooltip or alert
-                                console.log('Link copied to clipboard');
-                              });
+                              handleCopyLink(link);
                             }}
                           >
                             <ContentCopyIcon />
@@ -420,11 +476,7 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
                               props.rowData.contentType === 'Course'
                                 ? `${process.env.NEXT_PUBLIC_POS_URL}/pos/content/${props.rowData.identifier}?activeLink=/pos/program`
                                 : `${process.env.NEXT_PUBLIC_POS_URL}/pos/player/${props.rowData.identifier}?activeLink=/pos/program`;
-
-                            navigator.clipboard.writeText(link).then(() => {
-                              // Optional: show a tooltip or alert
-                              console.log('Link copied to clipboard');
-                            });
+                            handleCopyLink(link);
                           }}
                         >
                           <ContentCopyIcon />
@@ -469,6 +521,21 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
           text: 'No data found',
         }}
       />
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={2000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity="success"
+          sx={{ width: '100%', bgcolor: '#06A816', color: '#fff' }}
+          icon={false}
+        >
+          Link copied to clipboard!
+        </Alert>
+      </Snackbar>
     </>
   );
 };

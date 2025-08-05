@@ -248,10 +248,10 @@ const Profile: React.FC<ProfileDetailsProps> = ({
               sx={{ fontSize: '16px', fontWeight: 400 }}
               gutterBottom
             >
-              {village ? `${village} , ` : ''}
               {designation === Role.LEAD
-                ? `${district}, ${state}`
-                : `${block}, ${district}, ${state}`}
+                ? `${state}, ${district}`
+                : `${state}, ${district}, ${block}`}
+              {village ? `, ${village}` : ''}
             </Typography>
           </Grid>
         </Grid>
