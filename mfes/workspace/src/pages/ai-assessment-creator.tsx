@@ -224,13 +224,13 @@ const AIAssessmentCreator: React.FC = () => {
       //   {
       //     name: 'questionsDetails',
       //     value: data?.questionsDetails || [],
-      //   },
+      //   }, 
       // ];
 
       // Prepare metadata with attributions
       const metadata = {
         ...(data?.metadata || {}),
-        se_gradeLevels: ['Grade 10'],
+        gradeLevel: ['Grade 10'],
         // attributions,
       };
 
