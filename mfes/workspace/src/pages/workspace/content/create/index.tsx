@@ -23,6 +23,7 @@ const CreatePage = () => {
   const theme = useTheme();
   const [selectedKey, setSelectedKey] = useState("create");
   const [showHeader, setShowHeader] = useState<boolean | null>(null);
+  const [isSCP, setIsSCP] = useState<boolean>(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -31,6 +32,12 @@ const CreatePage = () => {
 
     const headerValue = localStorage.getItem("showHeader");
     setShowHeader(headerValue === "true");
+
+    // Set isSCP based on localStorage program value
+    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+      const isSCPValue = localStorage.getItem('program') === 'Second Chance Program';
+      setIsSCP(isSCPValue);
+    }
 
     if (token && userId) {
       document.cookie = `authToken=${token}; path=/; secure; SameSite=Strict`;
@@ -112,7 +119,7 @@ const CreatePage = () => {
         }); // Removed an extra comma
       },
     },
-    {
+    ...(isSCP ? [{
       title: 'AI Assessment Creator',
       description: 'Generate assessments and question sets with AI',
       icon: (
@@ -122,7 +129,7 @@ const CreatePage = () => {
         />
       ),
       onClick: () => router.push( `/ai-assessment-creator`),
-    },
+    }] : []),
   ];
 
  
