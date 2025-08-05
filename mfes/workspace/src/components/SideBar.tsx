@@ -31,6 +31,10 @@ const route = process.env.NEXT_PUBLIC_WORKSPACE_ROUTES;
 import aiAssessment from '../assets/images/assessment.svg';
 
 let isAdmin: boolean;
+let isSCP: boolean;
+if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+  isSCP = localStorage.getItem('program')==='Second Chance Program' ? true : false;
+}
 if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
   isAdmin = localStorage.getItem('adminInfo') ? true : false;
 }
@@ -98,18 +102,22 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
       key: 'content-library',
       icon: <ManageSearchIcon />,
      },
-    {
-      text: 'Assessments',
-      key: 'ai-assessments',
-      icon: (
-        <Image
-          src={aiAssessment}
-          alt="Assessment Icon"
-          width={24}
-          height={24}
-        />
-      ),
-    },
+    ...(isSCP
+      ? [
+          {
+            text: 'Assessments',
+            key: 'ai-assessments',
+            icon: (
+              <Image
+                src={aiAssessment}
+                alt="Assessment Icon"
+                width={24}
+                height={24}
+              />
+            ),
+          },
+        ]
+      : []),
   ];
 
   const handleNavigation = (key: string) => {
