@@ -71,12 +71,17 @@ const DynamicForm = ({
     }
   
     if (!prefilledFormData.family_member_details) {
-      // Remove the three fields if no family member is selected
-      delete cleaned.mother_name;
-      delete cleaned.father_name;
-      delete cleaned.spouse_name;
+      // Only remove family member fields if they don't exist in the original data
+      if (!prefilledFormData.mother_name) {
+        delete cleaned.mother_name;
+      }
+      if (!prefilledFormData.father_name) {
+        delete cleaned.father_name;
+      }
+      if (!prefilledFormData.spouse_name) {
+        delete cleaned.spouse_name;
+      }
       delete cleaned.family_member_details;
-      // delete cleaned.dob;
     }
     
     return cleaned;
@@ -125,7 +130,6 @@ const DynamicForm = ({
   useEffect(() => {
     if (type == 'learner'  && !isReassign) {
       // ...existing code...
-      console.log('hello');
       let requiredKeys = ['parent_phone', "guardian_relation" , "guardian_name"];
       let requiredKeys2 = ['mobile'];
       console.log('formDatadynamicform', formData.family_member_details);
