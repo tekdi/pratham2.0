@@ -35,6 +35,7 @@ interface CustomTableProps {
   handleDelete?: any;
   tableTitle?: string;
   showQrCodeButton?: boolean;
+  hideDeleteButton?: boolean;
   selectable?: boolean;
   selected?: string[];
   onSelect?: (id: string) => void;
@@ -45,6 +46,7 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
   columns,
   tableTitle,
   showQrCodeButton = false,
+  hideDeleteButton = false,
   selectable = false,
   selected = [],
   onSelect,
@@ -147,7 +149,7 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
           })
         : router.push({
             pathname: `/workspace/content/review`,
-            query: { identifier, isReadOnly: true  , isAllContents: true },
+            query: { identifier, isReadOnly: true, isAllContents: true },
           });
     } else if (tableTitle === 'discover-contents') {
       content.contentType === 'Course'
@@ -159,8 +161,7 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
             pathname: `/workspace/content/review`,
             query: { identifier, isDiscoverContent: true },
           });
-    }
-    else if (tableTitle === 'content-library') {
+    } else if (tableTitle === 'content-library') {
       content.contentType === 'Course'
         ? router.push({
             pathname: `/course-hierarchy/${identifier}`,
@@ -168,10 +169,9 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
           })
         : router.push({
             pathname: `/workspace/content/review`,
-            query: { identifier, isContentLibrary :true },
+            query: { identifier, isContentLibrary: true },
           });
-    }
-    else if (
+    } else if (
       content?.mimeType &&
       MIME_TYPE.GENERIC_MIME_TYPE.includes(content?.mimeType)
     ) {
@@ -181,12 +181,9 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
         tableTitle === 'upForReview'
           ? `/workspace/content/review`
           : `/upload-editor`;
-          if(tableTitle === 'all-content') {
-                  router.push({ pathname, query: { identifier,  isAllContents: true } });
-
-          }
-          else
-      router.push({ pathname, query: { identifier } });
+      if (tableTitle === 'all-content') {
+        router.push({ pathname, query: { identifier, isAllContents: true } });
+      } else router.push({ pathname, query: { identifier } });
     } else if (
       content?.mimeType &&
       MIME_TYPE.COLLECTION_MIME_TYPE.includes(content?.mimeType)
@@ -409,12 +406,14 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
                 {
                   return (
                     <Box display="flex">
-                      <ActionIcon rowData={props.rowData} />
+                      {!hideDeleteButton && (
+                        <ActionIcon rowData={props.rowData} />
+                      )}
                       {showQrCodeButton && props.rowData.status === 'Live' && (
                         <>
                           <IconButton
                             onClick={() => {
-                              // console.log('rowData', props.rowData);
+                              // console.log('rowData++', props.rowData);
                               handleOpenQrModal(
                                 props.rowData.contentType === 'Course'
                                   ? `${process.env.NEXT_PUBLIC_POS_URL}/pos/content/${props.rowData.identifier}?activeLink=/pos/program`
@@ -451,14 +450,16 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
               } else if (props.column.key === 'action') {
                 return (
                   <Box display={'flex'}>
-                    <Box onClick={handleOpen}>
-                      <ActionIcon rowData={props.rowData} />
-                    </Box>
-                    {showQrCodeButton && (
+                    {!hideDeleteButton && (
+                      <Box onClick={handleOpen}>
+                        <ActionIcon rowData={props.rowData} />
+                      </Box>
+                    )}
+                    {showQrCodeButton && props.rowData.status === 'Live' && (
                       <>
                         <IconButton
                           onClick={() => {
-                            // console.log('rowData', props.rowData);
+                            // console.log('rowData++', props.rowData);
                             handleOpenQrModal(
                               props.rowData.contentType === 'Course'
                                 ? `${process.env.NEXT_PUBLIC_POS_URL}/pos/content/${props.rowData.identifier}?activeLink=/pos/program`
