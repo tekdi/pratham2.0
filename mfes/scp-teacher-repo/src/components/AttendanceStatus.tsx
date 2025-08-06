@@ -230,6 +230,7 @@ function AttendanceStatus({
                 attendanceStatus === 'futureDate' ||
                 learnerAttendanceStatus === 'notMarked' ||
                 (attendanceStatus !== 'futureDate' &&
+                  modifyAttendanceLimit > 0 &&
                   formatedSevenDaysAgo > selectedDate)
               }
               className="one-line-text"
@@ -240,9 +241,9 @@ function AttendanceStatus({
               learnerAttendanceStatus === 'absent'
                 ? t('COMMON.MODIFY')
                 : attendanceStatus === 'notMarked' ||
-                    attendanceStatus === 'futureDate'
-                  ? t('COMMON.MARK')
-                  : t('COMMON.MODIFY')}
+                  attendanceStatus === 'futureDate'
+                ? t('COMMON.MARK')
+                : t('COMMON.MODIFY')}
             </Button>
           </Grid>
         )}
