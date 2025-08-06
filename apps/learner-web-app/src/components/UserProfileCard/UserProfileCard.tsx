@@ -168,6 +168,24 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
   ]
     .filter(Boolean)
     .join(' ');
+
+  // Smart name truncation - preserve all names but handle very long ones
+  const getDisplayName = (name: string) => {
+    if (name.length <= 35) return name;
+    
+    const nameParts = name.split(' ');
+    if (nameParts.length <= 3) return name;
+    
+    // For very long names with more than 3 parts, show first, middle, and last
+    const firstName = nameParts[0];
+    const middleName = nameParts[1];
+    const lastName = nameParts[nameParts.length - 1];
+    
+    // If middle name is very long, abbreviate it
+    const middleInitial = middleName && middleName.length > 8 ? middleName.charAt(0) + '.' : middleName;
+    
+    return `${firstName} ${middleInitial} ${lastName}`.trim();
+  };
   const maritalStatus = getCustomFieldValue(customFields, 'MARITAL_STATUS');
   const qualification = getCustomField(
     customFields,
@@ -269,8 +287,21 @@ const ptmName = getCustomFieldValue(customFields, 'PTM_NAME');
           </IconButton>{' '}
         </Box>
 
-        <Typography fontSize="1.25rem" fontWeight="600" sx={{ mb: 1 }}>
-          {fullName}
+        <Typography 
+          fontWeight="600" 
+          sx={{ 
+            mb: 1,
+            fontSize: {
+              xs: '0.9rem',
+              sm: '1rem', 
+              md: '1.1rem'
+            },
+            lineHeight: 1.2,
+            wordBreak: 'break-word',
+            hyphens: 'auto'
+          }}
+        >
+          {getDisplayName(fullName)}
         </Typography>
 
         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
@@ -344,21 +375,45 @@ const ptmName = getCustomFieldValue(customFields, 'PTM_NAME');
                   </Grid>
                 )}
                 {guarduianRelation !== '-' && (
-                  <Grid item xs={6}>
+                  <Grid item xs={12} sm={6}>
                     <Typography sx={labelStyle}>
                       {t('LEARNER_APP.USER_PROFILE_CARD.GUARDIAN_RELATION')}
                     </Typography>
-                    <Typography sx={valueStyle}>
+                    <Typography 
+                      sx={{
+                        ...valueStyle,
+                        fontSize: {
+                          xs: '0.75rem',
+                          sm: '0.8rem',
+                          md: '0.85rem'
+                        },
+                        lineHeight: 1.0,
+                        wordBreak: 'keep-all',
+                        overflowWrap: 'normal'
+                      }}
+                    >
                       {toPascalCase(guarduianRelation)}
                     </Typography>
                   </Grid>
                 )}
                 {guardianName !== '-' && (
-                  <Grid item xs={6}>
+                  <Grid item xs={12} sm={6}>
                     <Typography sx={labelStyle}>
                       {t('LEARNER_APP.USER_PROFILE_CARD.GUARDIAN_NAME')}
                     </Typography>
-                    <Typography sx={valueStyle}>
+                    <Typography 
+                      sx={{
+                        ...valueStyle,
+                        fontSize: {
+                          xs: '0.75rem',
+                          sm: '0.8rem',
+                          md: '0.85rem'
+                        },
+                        lineHeight: 1.0,
+                        wordBreak: 'keep-all',
+                        overflowWrap: 'normal'
+                      }}
+                    >
                       {toPascalCase(guardianName)}
                     </Typography>
                   </Grid>

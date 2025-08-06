@@ -189,7 +189,7 @@ const QuestionPaperPDF = ({ data }: any) => {
                   ...styles.bold,
                 }}
               >
-                Submission Instructions
+                Exam Instructions
               </Text>
               <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                 <Text
@@ -207,7 +207,7 @@ const QuestionPaperPDF = ({ data }: any) => {
                     marginLeft: 5,
                   }}
                 >
-                  Place the piece of paper on a flat, clean surface 
+                  Take a plain white paper
                 </Text>
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
@@ -226,7 +226,7 @@ const QuestionPaperPDF = ({ data }: any) => {
                     marginLeft: 5,
                   }}
                 >
-                  Hold the phone straight above the piece of paper
+                  Use pen with black or blue ink only
                 </Text>
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
@@ -245,7 +245,8 @@ const QuestionPaperPDF = ({ data }: any) => {
                     marginLeft: 5,
                   }}
                 >
-                  Ensure good lighting and avoid shadows or glare
+                  Write all the answers, including MCQs and fill-in-the-blanks,
+                  on the piece of paper
                 </Text>
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
@@ -264,7 +265,8 @@ const QuestionPaperPDF = ({ data }: any) => {
                     marginLeft: 5,
                   }}
                 >
-                  Ensure all text is clear and fully visible
+                  Use the same numbering system as the question paper; take
+                  extra care to write the numbers clearly
                 </Text>
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
@@ -283,7 +285,8 @@ const QuestionPaperPDF = ({ data }: any) => {
                     marginLeft: 5,
                   }}
                 >
-                  Click an image and upload to the portal
+                  Write clearly and make sure the letters do not touch the edges
+                  of the page
                 </Text>
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
@@ -302,8 +305,7 @@ const QuestionPaperPDF = ({ data }: any) => {
                     marginLeft: 5,
                   }}
                 >
-                  If the answer sheet has multiple pages, take a picture of each
-                  page separately and upload
+                  If a mistake is made, strike it out neatly and write it again
                 </Text>
               </View>
               <Text
@@ -313,7 +315,7 @@ const QuestionPaperPDF = ({ data }: any) => {
                   ...styles.bold,
                 }}
               >
-                जमा करने के निर्देश
+                परीक्षा निर्देश
               </Text>
               <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                 <Text
@@ -331,7 +333,7 @@ const QuestionPaperPDF = ({ data }: any) => {
                     marginLeft: 5,
                   }}
                 >
-                  कागज़ को समतल और साफ़ सतह पर रखें
+                  एक सादा सफेद कागज़ लें
                 </Text>
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
@@ -350,7 +352,7 @@ const QuestionPaperPDF = ({ data }: any) => {
                     marginLeft: 5,
                   }}
                 >
-                  फ़ोन को कागज़ के ठीक ऊपर सीधा रखें
+                  केवल काले या नीले इंक (ink) वाले पेन (pen) का उपयोग करें
                 </Text>
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
@@ -369,8 +371,7 @@ const QuestionPaperPDF = ({ data }: any) => {
                     marginLeft: 5,
                   }}
                 >
-                  यह सुनिश्चित करें कि अच्छी लाइटिंग (lighting – रोशनी) हो और
-                  ग्लेयर (glare – चमक) या परछाईं (shadow) न हो
+                  सभी प्रश्न के उत्तर उसी कागज़ पर लिखें
                 </Text>
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
@@ -389,7 +390,8 @@ const QuestionPaperPDF = ({ data }: any) => {
                     marginLeft: 5,
                   }}
                 >
-                  यह सुनिश्चित करें कि सभी लेखन स्पष्ट और पूरा दिखाई दे
+                  प्रश्न पत्र की तरह ही नंबरिंग सिस्टम (numbering system – क्रम
+                  संख्या प्रणाली) का उपयोग करें
                 </Text>
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
@@ -408,7 +410,7 @@ const QuestionPaperPDF = ({ data }: any) => {
                     marginLeft: 5,
                   }}
                 >
-                  इमेज क्लिक करें और पोर्टल पर अपलोड करें
+                  क्रम संख्या साफ़-साफ़ लिखना सुनिश्चित करें
                 </Text>
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
@@ -427,8 +429,28 @@ const QuestionPaperPDF = ({ data }: any) => {
                     marginLeft: 5,
                   }}
                 >
-                  अगर उत्तर पत्र में एक से अधिक पेज हों, तो हर पेज की अलग-अलग
-                  तस्वीर लें और अपलोड करें
+                  साफ़-साफ़ लिखें और ध्यान रखें कि अक्षर पन्ने के किनारों को न
+                  छुएं
+                </Text>
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                <Text
+                  style={{
+                    ...styles.sub_title,
+                    ...styles.left,
+                  }}
+                >
+                  •
+                </Text>
+                <Text
+                  style={{
+                    ...styles.sub_title,
+                    ...styles.left,
+                    marginLeft: 5,
+                  }}
+                >
+                  यदि कोई गलती हो जाए, तो उसे एक बार में काटकर (strike out)
+                  दोबारा साफ़-साफ़ लिखें
                 </Text>
               </View>
             </View>
@@ -540,7 +562,9 @@ const QuestionPaperPDF = ({ data }: any) => {
                                   ...styles.left,
                                 }}
                               >
-                                ({toRoman(oIndex + 1)}) {!isImage && label}
+                                {/* ({toRoman(oIndex + 1)}) {!isImage && label} */}
+                                ({String.fromCharCode(97 + oIndex)}){' '}
+                                {!isImage && label}
                               </Text>
                               {isImage && (
                                 <Image
