@@ -1122,7 +1122,8 @@ const Dashboard: React.FC<DashboardProps> = () => {
                                 disabled={
                                   currentAttendance === 'futureDate' ||
                                   classId === 'all' ||
-                                  formattedSevenDaysAgo > selectedDate
+                                  (modifyAttendanceLimit > 0 &&
+                                    formattedSevenDaysAgo > selectedDate)
                                 }
                               >
                                 {currentAttendance === 'notMarked' ||
