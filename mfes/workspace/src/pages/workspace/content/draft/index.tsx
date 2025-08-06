@@ -24,7 +24,7 @@ import WorkspaceText from '@workspace/components/WorkspaceText';
 import { DataType } from 'ka-table/enums';
 import KaTableComponent from '@workspace/components/KaTableComponent';
 import { timeAgo } from '@workspace/utils/Helper';
-import useSharedStore from '@workspace/utils/useSharedState';
+import useSharedStore from '../../../../../../shared-store';
 import useTenantConfig from '@workspace/hooks/useTenantConfig';
 import WorkspaceHeader from '@workspace/components/WorkspaceHeader';
 

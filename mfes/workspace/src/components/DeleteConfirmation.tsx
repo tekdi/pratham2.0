@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { deleteContent } from '@workspace/services/ContentService';
-import useSharedStore from '@workspace/utils/useSharedState';
+import useSharedStore from '../../../shared-store';
 import { toast } from 'react-hot-toast';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
