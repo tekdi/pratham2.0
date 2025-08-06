@@ -231,12 +231,12 @@ export const getContent = async (
   }
 };
 
-export const createQuestionSet = async (frameworkId: any) => {
+export const createQuestionSet = async (frameworkId: any, name?: string) => {
   const apiURL = `/action/questionset/v2/create`;
   const reqBody = {
     request: {
       questionset: {
-        name: 'Untitled QuestionSet',
+        name: name || 'Untitled QuestionSet',
         mimeType: 'application/vnd.sunbird.questionset',
         primaryCategory: 'Practice Question Set',
         code: uuidv4(),
@@ -398,7 +398,8 @@ export const createCourse = async (
   userId: any,
   channelId: any,
   contentFW: any,
-  targetFW: any
+  targetFW: any,
+  name?: string
 ) => {
   const apiURL = `/action/content/v3/create`;
 
@@ -406,7 +407,7 @@ export const createCourse = async (
     request: {
       content: {
         code: uuidv4(), // Generate a unique ID for 'code'
-        name: 'Untitled Course',
+        name: name || 'Untitled Course',
         createdBy: userId,
         createdFor: [channelId],
         mimeType: MIME_TYPE.COURSE_MIME_TYPE,
