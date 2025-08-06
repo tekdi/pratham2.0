@@ -37,12 +37,14 @@ import SortIcon from '@mui/icons-material/Sort';
 import { showToastMessage } from '../../../components/Toastify';
 import Header from '../../../components/Header';
 import Loader from '../../../components/Loader';
+import UnauthorizedAccess from '../../../components/UnauthorizedAccess';
 import {
   getAssessmentStatus,
   getAssessmentDetails,
   getOfflineAssessmentStatus,
 } from '../../../services/AssesmentService';
 import { getMyCohortMemberList } from '../../../services/MyClassDetailsService';
+import { getCohortList } from '../../../services/CohortServices';
 import { AssessmentStatus } from '../../../utils/app.constant';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
@@ -141,8 +143,15 @@ const AssessmentDetails: React.FC = () => {
   const router = useRouter();
   const { assessmentId, cohortId } = router.query;
 
-  // State management
+  // Single loading state with different phases
   const [loading, setLoading] = useState(true);
+  const [loadingPhase, setLoadingPhase] = useState<'auth' | 'data' | null>(
+    'auth'
+  );
+  const [isAuthorizedForCohort, setIsAuthorizedForCohort] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+
+  // State management
   const [assessmentData, setAssessmentData] = useState<AssessmentData | null>(
     null
   );
@@ -157,13 +166,79 @@ const AssessmentDetails: React.FC = () => {
   const [showSortPopup, setShowSortPopup] = useState(false);
   const [sortOption, setSortOption] = useState<SortOption>('all');
 
-  // Fetch assessment data and learner list
+  // Cohort authorization check
   useEffect(() => {
-    if (assessmentId && cohortId) {
+    const checkCohortAccess = async () => {
+      if (!cohortId) {
+        setAuthError('Cohort ID not found');
+        setLoading(false);
+        setLoadingPhase(null);
+        return;
+      }
+
+      try {
+        setLoadingPhase('auth');
+        const userId = localStorage.getItem('userId');
+
+        if (!userId) {
+          setAuthError('User not authenticated');
+          setLoading(false);
+          setLoadingPhase(null);
+          return;
+        }
+
+        // Fetch user's cohort list with customField enabled
+        const cohortList = await getCohortList(
+          userId,
+          { customField: 'true' },
+          true
+        );
+
+        if (!Array.isArray(cohortList)) {
+          setAuthError('Invalid cohort list response');
+          setLoading(false);
+          setLoadingPhase(null);
+          return;
+        }
+
+        // Check if the requested cohortId exists in user's accessible cohorts and has active status
+        const hasAccess = cohortList.some((cohort: any) => {
+          const cohortIdMatch =
+            cohort.cohortId === cohortId || cohort.id === cohortId;
+          const isActive =
+            cohort.cohortStatus === 'active' || cohort.status === 'active';
+          return cohortIdMatch && isActive;
+        });
+
+        if (hasAccess) {
+          setIsAuthorizedForCohort(true);
+          setAuthError(null);
+        } else {
+          setAuthError('Access denied to this cohort');
+          setLoading(false);
+          setLoadingPhase(null);
+        }
+      } catch (error) {
+        console.error('Error checking cohort authorization:', error);
+        setAuthError('Failed to verify cohort access');
+        setLoading(false);
+        setLoadingPhase(null);
+      }
+    };
+
+    if (typeof window !== 'undefined' && cohortId) {
+      checkCohortAccess();
+    }
+  }, [cohortId, router]);
+
+  // Fetch assessment data and learner data
+  useEffect(() => {
+    if (assessmentId && cohortId && isAuthorizedForCohort) {
+      setLoadingPhase('data');
       fetchAssessmentData();
       fetchLearnerData();
     }
-  }, [assessmentId, cohortId]);
+  }, [assessmentId, cohortId, isAuthorizedForCohort]);
 
   // Filter and sort learners based on search and sort options
   useEffect(() => {
@@ -251,7 +326,6 @@ const AssessmentDetails: React.FC = () => {
 
   const fetchAssessmentData = async () => {
     try {
-      setLoading(true);
       setError(null);
 
       // Use getAssessmentDetails with assessmentId as doId
@@ -345,14 +419,11 @@ const AssessmentDetails: React.FC = () => {
         grade: 'Not specified',
       };
       setAssessmentData(mockAssessmentData);
-    } finally {
-      setLoading(false);
     }
   };
 
   const fetchLearnerData = async () => {
     try {
-      setLoading(true);
       setError(null);
 
       // Use getMyCohortMemberList to fetch learners
@@ -438,6 +509,7 @@ const AssessmentDetails: React.FC = () => {
       showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
     } finally {
       setLoading(false);
+      setLoadingPhase(null);
     }
   };
 
@@ -633,8 +705,26 @@ const AssessmentDetails: React.FC = () => {
     router.push(`/ai-assessments/${assessmentId}/${learnerId}`);
   };
 
+  // Show loading with appropriate message based on phase
   if (loading) {
-    return <Loader showBackdrop={true} loadingText={t('COMMON.LOADING')} />;
+    const loadingText =
+      loadingPhase === 'auth'
+        ? 'Verifying access...'
+        : loadingPhase === 'data'
+        ? t('COMMON.LOADING')
+        : t('COMMON.LOADING');
+
+    return <Loader showBackdrop={true} loadingText={loadingText} />;
+  }
+
+  // Show unauthorized if access is denied
+  if (!isAuthorizedForCohort) {
+    return (
+      <UnauthorizedAccess
+        message={authError || 'You do not have access to this cohort.'}
+        backUrl="/ai-assessments"
+      />
+    );
   }
 
   const statusCounts = getStatusCounts();
@@ -671,7 +761,10 @@ const AssessmentDetails: React.FC = () => {
         {error && (
           <Box sx={{ px: 2, mb: 2 }}>
             <Card
-              sx={{ backgroundColor: '#FFEBEE', border: '1px solid #F44336' }}
+              sx={{
+                backgroundColor: '#FFEBEE',
+                border: '1px solid #F44336',
+              }}
             >
               <CardContent sx={{ p: 2 }}>
                 <Typography color="error" variant="body2">
