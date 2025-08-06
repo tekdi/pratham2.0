@@ -121,7 +121,7 @@ const ObservationComponent: React.FC<QuestionnaireAppProps> = ({
         let fileName = event.data.name;
         fileType = event.data.file?.type;
         console.log(fileName, fileType);
-        const extension = `.${fileType.split('/')[1]}`;
+        const extension = fileType ? `.${fileType.split('/')[1]}` : '';
 
         //  const nameWithoutExtension = fileName.split('.').slice(0, -1).join('.');
         // const result = await axios.get(

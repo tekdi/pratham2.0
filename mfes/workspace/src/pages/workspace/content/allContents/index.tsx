@@ -34,7 +34,7 @@ import { Table as KaTable } from 'ka-table';
 import { DataType } from 'ka-table/enums';
 import 'ka-table/style.css';
 import KaTableComponent from '@workspace/components/KaTableComponent';
-import useSharedStore from '@workspace/utils/useSharedState';
+import useSharedStore from '../../../../../../shared-store';
 import useTenantConfig from '@workspace/hooks/useTenantConfig';
 import WorkspaceHeader from '@workspace/components/WorkspaceHeader';
 // const columns = [
