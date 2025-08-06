@@ -4,7 +4,7 @@ import PaginationComponent from '@workspace/components/PaginationComponent';
 import WorkspaceText from '@workspace/components/WorkspaceText';
 import { timeAgo } from '@workspace/utils/Helper';
 import { LIMIT } from '@workspace/utils/app.constant';
-import useSharedStore from '@workspace/utils/useSharedState';
+import useSharedStore from '../../../../../../shared-store';
 import { Box, Typography, useTheme } from '@mui/material';
 import { DataType } from 'ka-table/enums';
 import 'ka-table/style.css';
