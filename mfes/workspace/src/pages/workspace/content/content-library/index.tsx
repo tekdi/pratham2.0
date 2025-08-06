@@ -12,7 +12,12 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Layout from '../../../../components/Layout';
 import SearchBox from '../../../../components/SearchBox';
-import { getContent, getfilterList, getPosFrameworkList, getMediaFilterList } from '../../../../services/ContentService';
+import {
+  getContent,
+  getfilterList,
+  getPosFrameworkList,
+  getMediaFilterList,
+} from '../../../../services/ContentService';
 import useTenantConfig from '@workspace/hooks/useTenantConfig';
 import WorkspaceHeader from '@workspace/components/WorkspaceHeader';
 import DynamicMultiFilter from '../../../../components/DynamicMultiFilter';
@@ -52,6 +57,12 @@ const columns = [
     dataType: DataType.String,
     width: '100px',
   },
+  {
+    key: 'contentAction',
+    title: 'ACTION',
+    dataType: DataType.String,
+    width: '140px',
+  },
 ];
 const ContentsPage = () => {
   const tenantConfig = useTenantConfig();
@@ -62,7 +73,9 @@ const ContentsPage = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedNames, setSelectedNames] = useState<Record<string, string[]>>({});
+  const [selectedNames, setSelectedNames] = useState<Record<string, string[]>>(
+    {}
+  );
 
   const { filterOptions, sort, programOption } = router.query;
 
@@ -193,7 +206,7 @@ const ContentsPage = () => {
           tenantConfig?.CHANNEL_ID,
           contentType,
           state !== 'All' ? state : undefined,
-          selectedNames,
+          selectedNames
         );
 
         const contentList = (response?.content || []).concat(
@@ -215,7 +228,8 @@ const ContentsPage = () => {
     sortBy,
     state,
     page,
-    selectedNames  ]);
+    selectedNames,
+  ]);
 
   useEffect(() => {
     const filteredArray = contentList.map((item: any) => ({
@@ -265,22 +279,21 @@ const ContentsPage = () => {
   useEffect(() => {
     const fetchReadData = async () => {
       const response = await getfilterList();
-      const posFrameworkData= await getPosFrameworkList()
-      const mediaFilterList= await getMediaFilterList()
+      const posFrameworkData = await getPosFrameworkList();
+      const mediaFilterList = await getMediaFilterList();
 
-      const convertedArray = mediaFilterList?.range.map((item : any)=> ({
-  name: item.label,
-  value: item.identifier
-}));
-mediaFilterList.range = convertedArray;
+      const convertedArray = mediaFilterList?.range.map((item: any) => ({
+        name: item.label,
+        value: item.identifier,
+      }));
+      mediaFilterList.range = convertedArray;
 
-      response.push(mediaFilterList)
+      response.push(mediaFilterList);
       setReadData(response);
 
-     setPosFrameworkData(posFrameworkData)
+      setPosFrameworkData(posFrameworkData);
+    };
 
-    }
-      
     fetchReadData();
   }, []);
   console.log('selectedFilters', selectedFilters);
@@ -289,7 +302,9 @@ mediaFilterList.range = convertedArray;
   useEffect(() => {
     if (router.query && router.asPath.includes('content-library')) {
       const savedFilters = localStorage.getItem('contentLibraryFilters');
-      const savedSelectedNames = localStorage.getItem('contentLibrarySelectedNames');
+      const savedSelectedNames = localStorage.getItem(
+        'contentLibrarySelectedNames'
+      );
       if (savedFilters) setSelectedFilters(JSON.parse(savedFilters));
       if (savedSelectedNames) setSelectedNames(JSON.parse(savedSelectedNames));
     }
@@ -298,8 +313,14 @@ mediaFilterList.range = convertedArray;
   // Save filters only for content-library
   useEffect(() => {
     if (router.asPath.includes('content-library')) {
-      localStorage.setItem('contentLibraryFilters', JSON.stringify(selectedFilters));
-      localStorage.setItem('contentLibrarySelectedNames', JSON.stringify(selectedNames));
+      localStorage.setItem(
+        'contentLibraryFilters',
+        JSON.stringify(selectedFilters)
+      );
+      localStorage.setItem(
+        'contentLibrarySelectedNames',
+        JSON.stringify(selectedNames)
+      );
     }
   }, [selectedFilters, selectedNames, router.asPath]);
   return (
@@ -328,7 +349,7 @@ mediaFilterList.range = convertedArray;
             {/* <Typography mb={2}>Here you see all your content.</Typography> */}
 
             {/* DynamicMultiFilter goes here */}
-           
+
             <Box mb={3}>
               <SearchBox
                 placeholder="Search by title..."
@@ -338,16 +359,15 @@ mediaFilterList.range = convertedArray;
                 onStateChange={handleStateChange}
                 isPrimaryCategory={false}
               />
-               <Box m={3}>
-             <DynamicMultiFilter
-                readData={readData}
-                posFrameworkData={posFrameworkData}
-                selectedFilters={selectedFilters}
-                onChange={setSelectedFilters}
-                onSelectedNamesChange={setSelectedNames}
-              />
-            </Box>
-               
+              <Box m={3}>
+                <DynamicMultiFilter
+                  readData={readData}
+                  posFrameworkData={posFrameworkData}
+                  selectedFilters={selectedFilters}
+                  onChange={setSelectedFilters}
+                  onSelectedNamesChange={setSelectedNames}
+                />
+              </Box>
             </Box>
             {loading ? (
               <Loader showBackdrop={true} loadingText={'Loading'} />
@@ -358,6 +378,8 @@ mediaFilterList.range = convertedArray;
                     columns={columns}
                     tableTitle="content-library"
                     data={data}
+                    showQrCodeButton={true}
+                    hideDeleteButton={true}
                   />
                 </Box>
               </>
