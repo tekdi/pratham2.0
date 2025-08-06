@@ -520,7 +520,12 @@ setUsername(
                 );
 
                 document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
-
+                const hasBothContentCoursetab = uiConfig?.showContent?.includes("courses") && uiConfig?.showContent?.includes("contents");
+              
+                if (hasBothContentCoursetab) {
+                  router.push('/courses-contents');
+                }
+                 else
                 router.push('/content');
               } else {
                 // showToastMessage(
