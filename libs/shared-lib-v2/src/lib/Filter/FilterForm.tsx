@@ -99,10 +99,10 @@ export function FilterForm({
   const [showMore, setShowMore] = useState([]);
 
   // Memoize props to avoid unnecessary re-renders and effect triggers
-  const memoizedOrginalFormData = React.useMemo(() => orginalFormData, []);
-  const memoizedStaticFilter = React.useMemo(() => staticFilter, []);
-  const memoizedOnlyFields = React.useMemo(() => onlyFields, []);
-  const memoizedFilterFramework = React.useMemo(() => filterFramework, []);
+  const memoizedOrginalFormData = React.useMemo(() => orginalFormData, [orginalFormData]);
+  const memoizedStaticFilter = React.useMemo(() => staticFilter, [staticFilter]);
+  const memoizedOnlyFields = React.useMemo(() => onlyFields, [onlyFields]);
+  const memoizedFilterFramework = React.useMemo(() => filterFramework, [filterFramework]);
   useEffect(() => {
     const fetchData = async (noFilter = true) => {
       const instantId =
@@ -155,8 +155,7 @@ export function FilterForm({
       setLoading(false);
     };
     fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [memoizedFilterFramework, memoizedOrginalFormData, memoizedStaticFilter, memoizedOnlyFields, _config?.COLLECTION_FRAMEWORK, _config?.CHANNEL_ID]);
 
   const handleFilter = (filterValue: any) => {
     const formattedPayload = formatPayload(filterValue ?? formData);
@@ -336,9 +335,21 @@ function replaceOptionsWithAssoc({
     }
   }
 
+  // Custom sorting to prioritize Content Language at the top
   const sortFields = sortJsonByArray({
     jsonArray: updatedFilters,
     nameArray: onlyFields,
+  }).sort((a, b) => {
+    // Check if either field is "Content Language"
+    const aIsContentLanguage = a.name === 'Content Language';
+    const bIsContentLanguage = b.name === 'Content Language';
+    
+    // If a is Content Language, it should come first
+    if (aIsContentLanguage && !bIsContentLanguage) return -1;
+    // If b is Content Language, it should come first
+    if (!aIsContentLanguage && bIsContentLanguage) return 1;
+    // If both are Content Language or neither is, maintain original order
+    return 0;
   });
 
   return { updatedFilters: sortFields, updatedFilterValue: filterValue };
