@@ -110,24 +110,34 @@ const UserAttendanceHistory = () => {
 
   const handleAttendanceDataUpdate = (data: any) => {
     setAttendanceData(data);
+    let attendanceInfo = {};
 
-    const attendanceInfo = {
-      present_students: data.presentCount,
-      totalcount: data.numberOfCohortMembers,
-      present_percentage:
-        data.numberOfCohortMembers === 0
-          ? '0'
-          : `${((data.presentCount / data.numberOfCohortMembers) * 100).toFixed(
-              2
-            )}`,
-    };
+    if (data?.presentCount === 0 && data?.absentCount === 0) {
+      attendanceInfo = {};
+    } else {
+      attendanceInfo = {
+        present_students: data.presentCount,
+        totalcount: data.numberOfCohortMembers,
+        present_percentage:
+          data.numberOfCohortMembers === 0
+            ? '0'
+            : `${(
+                (data.presentCount / data.numberOfCohortMembers) *
+                100
+              ).toFixed(2)}`,
+      };
+    }
 
     if (shortDateFormat(selectedDate) > shortDateFormat(new Date())) {
       setAttendanceProgressBarData({});
     } else {
-      setAttendanceProgressBarData({
-        [shortDateFormat(selectedDate)]: attendanceInfo,
-      });
+      if (Object.keys(attendanceInfo).length === 0) {
+        setAttendanceProgressBarData({});
+      } else {
+        setAttendanceProgressBarData({
+          [shortDateFormat(selectedDate)]: attendanceInfo,
+        });
+      }
     }
   };
 
