@@ -57,6 +57,12 @@ const columns = [
     dataType: DataType.String,
     width: '100px',
   },
+  {
+    key: 'contentAction',
+    title: 'ACTION',
+    dataType: DataType.String,
+    width: '140px',
+  },
 ];
 const ContentsPage = () => {
   const tenantConfig = useTenantConfig();
@@ -284,6 +290,8 @@ const ContentsPage = () => {
                     columns={columns}
                     tableTitle="discover-contents"
                     data={data}
+                    showQrCodeButton={true}
+                    hideDeleteButton={true}
                   />
                 </Box>
               </>
