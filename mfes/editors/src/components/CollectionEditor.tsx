@@ -12,12 +12,18 @@ import { sendCredentialService } from "../services/NotificationService";
 import { sendContentNotification } from "../services/sendContentNotification";
 import { ContentStatus, Editor } from "../utils/app.constant";
 import useTenantConfig from "../hooks/useTenantConfig";
+import useSharedStore from "../../../shared-store";
 const CollectionEditor: React.FC = () => {
   const router = useRouter();
   const { identifier, contentMode } = router.query;
   const [mode, setMode] = useState<any>();
   const [fullName, setFullName] = useState("Anonymous User");
   const [deviceId, setDeviceId] = useState("");
+  const setFetchContentAPI = useSharedStore(
+    (state: any) => state.setFetchContentAPI
+  );
+  const fetchContentAPI = useSharedStore((state: any) => state.fetchContentAPI);
+  const addToContentArray = useSharedStore((state: any) => state.addToContentArray);
 
   const [firstName, lastName] = fullName.split(" ");
   const tenantConfig = useTenantConfig();
@@ -282,11 +288,16 @@ const CollectionEditor: React.FC = () => {
                 });
             } 
             else if( event.detail?.action === "publishContent")
+              
             {
+              console.log("Publishing content");
+             setFetchContentAPI(!fetchContentAPI);
               sendContentPublishNotification();
             }
             else if( event.detail?.action === "rejectContent")
             {
+              setFetchContentAPI(!fetchContentAPI);
+
               sendContentRejectNotification();
             }
             else {
