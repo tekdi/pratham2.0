@@ -124,15 +124,15 @@ export default function Details(props: DetailsProps) {
         }
 
         // Auto-redirect if there's only one child and we're at course level
-        if (!unitId && resultHierarchy?.children?.length === 1) {
-          const singleChild = resultHierarchy.children[0] as any;
-          const childIdentifier = typeof singleChild === 'string' ? singleChild : singleChild?.identifier;
-          if (childIdentifier) {
-            const redirectPath = `${props?._config?.contentBaseUrl ?? '/content'}/${courseId}/${childIdentifier}${activeLink ? `?activeLink=${activeLink}` : ''}`;
-            router.replace(redirectPath);
-            return;
-          }
-        }
+        // if (!unitId && resultHierarchy?.children?.length === 1) {
+        //   const singleChild = resultHierarchy.children[0] as any;
+        //   const childIdentifier = typeof singleChild === 'string' ? singleChild : singleChild?.identifier;
+        //   if (childIdentifier) {
+        //     const redirectPath = `${props?._config?.contentBaseUrl ?? '/content'}/${courseId}/${childIdentifier}${activeLink ? `?activeLink=${activeLink}` : ''}`;
+        //     router.replace(redirectPath);
+        //     return;
+        //   }
+        // }
 
         const userId = getUserId(props?._config?.userIdLocalstorageName);
         let startedOn = {};
