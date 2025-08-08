@@ -28,7 +28,7 @@ export default function PosPage() {
   return (
     <List
       pagename="Work"
-      _content={{ isOpenColapsed: ['se_subDomains', 'se_subjects'] }}
+      _content={{ isOpenColapsed: ['contentLanguage', 'se_subDomains', 'se_subjects'] }}
       _infoCard={{
         item: {
           description:
