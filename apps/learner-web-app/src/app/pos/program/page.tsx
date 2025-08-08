@@ -52,7 +52,7 @@ export default function PosPage() {
       }}
       _content={{
         contentTabs: ['content'],
-        isOpenColapsed: ['se_domains', 'se_subDomains', 'se_subjects'],
+        isOpenColapsed: ['contentLanguage', 'se_domains', 'se_subDomains', 'se_subjects'],
       }}
       _infoCard={{
         item: {

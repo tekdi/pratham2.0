@@ -215,6 +215,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
     }
 
     setIsSubmitting(true);
+    const currentUserId = localStorage.getItem('userId') || '';
     try {
       const fileUrls = uploadedImages.map((image) => image.url);
 
@@ -223,6 +224,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
         questionSetId,
         identifier,
         fileUrls,
+        createdBy: currentUserId,
       });
 
       showToast('Answer sheet submitted successfully!', 'success');
@@ -376,8 +378,8 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
                 {isUploading
                   ? 'Uploading...'
                   : uploadedImages.length >= 4
-                  ? 'Max 4 Images'
-                  : 'Take A Photo'}
+                    ? 'Max 4 Images'
+                    : 'Take A Photo'}
               </Button>
 
               {/* Upload Photo Button */}
@@ -407,8 +409,8 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
                 {isUploading
                   ? 'Uploading...'
                   : uploadedImages.length >= 4
-                  ? 'Max 4 Images'
-                  : 'Upload A Photo'}
+                    ? 'Max 4 Images'
+                    : 'Upload A Photo'}
               </Button>
             </Box>
 
@@ -619,8 +621,8 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
               {isSubmitting
                 ? 'Submitting...'
                 : isUploading
-                ? 'Uploading Files...'
-                : 'Save and Upload'}
+                  ? 'Uploading Files...'
+                  : 'Save and Upload'}
             </Button>
           </Box>
         </Box>
