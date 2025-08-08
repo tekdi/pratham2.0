@@ -21,6 +21,7 @@ import {
   issueCertificate,
   renderCertificate,
 } from '@/services/CertificateService/coursesCertificates';
+import { checkCriteriaForCertificate } from '@shared-lib-v2/utils/CertificateService/coursesCertificates';
 import { getUserDetailsInfo } from '@/services/UserList';
 import TenantService from '@/services/TenantService';
 import { showToastMessage } from '../Toastify';
@@ -79,29 +80,37 @@ const CourseTable: React.FC = () => {
         courseId: selectedRowData?.courseId,
         courseName: selectedRowData?.courseName,
       };
-
-      const response = await issueCertificate(payload);
-      setData((prevData) =>
-        prevData.map((course) =>
-          course.courseId === selectedRowData?.courseId
-            ? {
-                ...course,
-                courseStatus: Status.ISSUED,
-                certificateId: response?.credential?.id,
-              }
-            : course
-        )
-      );
-      if (selectedRowData.courseStatus === Status.ISSUED) {
-        showToastMessage(
-          t('CERTIFICATES.REISSUED_CERTIFICATE_SUCCESSFULLY'),
-          'success'
+      const responseCriteria = await checkCriteriaForCertificate({
+        userId: selectedRowData?.userId,
+        courseId: selectedRowData?.courseId,
+      });
+      console.log('responseCriteria', responseCriteria);
+      if (responseCriteria === true) {
+        const response = await issueCertificate(payload);
+        setData((prevData) =>
+          prevData.map((course) =>
+            course.courseId === selectedRowData?.courseId
+              ? {
+                  ...course,
+                  courseStatus: Status.ISSUED,
+                  certificateId: response?.credential?.id,
+                }
+              : course
+          )
         );
-      } else
-        showToastMessage(
-          t('CERTIFICATES.ISSUED_CERTIFICATE_SUCCESSFULLY'),
-          'success'
-        );
+        if (selectedRowData.courseStatus === Status.ISSUED) {
+          showToastMessage(
+            t('CERTIFICATES.REISSUED_CERTIFICATE_SUCCESSFULLY'),
+            'success'
+          );
+        } else
+          showToastMessage(
+            t('CERTIFICATES.ISSUED_CERTIFICATE_SUCCESSFULLY'),
+            'success'
+          );
+      } else {
+        showToastMessage(t('CERTIFICATES.ISSUED_CERTIFICATE_FAILED'), 'error');
+      }
     } catch (e) {
       if (selectedRowData.courseStatus === Status.ISSUED) {
         showToastMessage(
