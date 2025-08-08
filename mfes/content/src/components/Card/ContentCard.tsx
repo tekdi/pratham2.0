@@ -23,7 +23,11 @@ const ContentCard = ({
 
   if (_card?.cardComponent) {
     return (
-      <CardWrap isWrap={isWrap && type === 'Course'} _card={_card}>
+      <CardWrap
+        // isWrap={isWrap && type === 'Course'}
+        _card={_card}
+
+        isWrap={false}>
         <_card.cardComponent
           item={item}
           type={type}
@@ -36,7 +40,10 @@ const ContentCard = ({
     );
   }
   return (
-    <CardWrap isWrap={isWrap && type === 'Course'} _card={_card}>
+    <CardWrap
+      // isWrap={isWrap && type === 'Course'} 
+
+      _card={_card} isWrap={false}>
       <CommonCard
         title={(item?.name || '').trim()}
         image={
