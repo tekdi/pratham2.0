@@ -7,13 +7,14 @@ import {
   Button,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CommonModal from '../common-modal';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { ExpandableText, useTranslation } from '@shared-lib';
 import BreadCrumb from '../BreadCrumb';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 import LoginIcon from '@mui/icons-material/Login';
+import { checkCourseScore } from '@shared-lib-v2/utils/CertificateService/coursesCertificates';
 
 interface InfoCardProps {
   item: any;
@@ -33,6 +34,31 @@ const InfoCard: React.FC<InfoCardProps> = ({
   const { t } = useTranslation();
   const { _infoCard } = _config || {};
   const [openModal, setOpenModal] = useState(false);
+  const [courseScoreResponse, setCourseScoreResponse] = useState<any>({});
+  const [isLoadingScore, setIsLoadingScore] = useState(false);
+
+  // Call checkCourseScore function
+  useEffect(() => {
+    const checkCourseScoreDetails = async () => {
+      if (item?.identifier && localStorage.getItem('userId')) {
+        setIsLoadingScore(true);
+        try {
+          const response = await checkCourseScore({
+            userId: localStorage.getItem('userId'),
+            courseId: item.identifier,
+          });
+          setCourseScoreResponse(response);
+        } catch (error) {
+          console.error('Error checking course score:', error);
+          setCourseScoreResponse({});
+        } finally {
+          setIsLoadingScore(false);
+        }
+      }
+    };
+
+    checkCourseScoreDetails();
+  }, [item?.identifier]);
 
   return (
     <>
@@ -195,12 +221,38 @@ const InfoCard: React.FC<InfoCardProps> = ({
                   color="primary"
                   sx={{ ml: 1 }}
                   onClick={() => {
-                    _config?.onButtonClick()
-                    setOpenModal(true)}}
+                    _config?.onButtonClick();
+                    setOpenModal(true);
+                  }}
                 >
                   <SpeakableText>{t('COMMON.ENROLL_NOW')}</SpeakableText>
                 </Button>
               )}
+              {isLoadingScore == false &&
+                Object.keys(courseScoreResponse).length > 0 &&
+                courseScoreResponse?.status === 'Completed' && (
+                  <Typography
+                    variant="body1"
+                    component="div"
+                    sx={{
+                      width: 'fit-content',
+                      borderRadius: '12px',
+                      pt: 1,
+                      pr: 2,
+                      pb: 1,
+                      pl: 2,
+                      bgcolor: '#FFDEA1',
+                      // fontSize: { xs: '14px', sm: '16px', md: '16px' },
+                      // lineHeight: { xs: '20px', sm: '22px', md: '26px' },
+                      mt: 1,
+                    }}
+                  >
+                    <SpeakableText>
+                      {t('Assessment Score')} :{' '}
+                      {courseScoreResponse?.percentageString}
+                    </SpeakableText>
+                  </Typography>
+                )}
             </Box>
           </Box>
         </Box>

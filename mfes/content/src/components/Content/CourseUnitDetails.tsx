@@ -19,6 +19,7 @@ import {
   getUserCertificateStatus,
   issueCertificate,
 } from '@content-mfes/services/Certificate';
+import { checkCriteriaForCertificate } from '@shared-lib-v2/utils/CertificateService/coursesCertificates';
 import AppConst from '@content-mfes/utils/AppConst/AppConst';
 import { checkAuth, getUserId } from '@shared-lib-v2/utils/AuthService';
 import { getUserId as getUserIdLocal } from '@content-mfes/services/LoginService';
@@ -178,23 +179,31 @@ export default function Details(props: DetailsProps) {
                   props?._config?.userIdLocalstorageName !== 'did'
                 ) {
                   const userResponse: any = await getUserIdLocal();
-                  const resultCertificate = await issueCertificate({
+                  const responseCriteria = await checkCriteriaForCertificate({
                     userId: userId,
                     courseId: courseId,
-                    unitId: unitId,
-                    issuanceDate: new Date().toISOString(),
-                    expirationDate: new Date(
-                      new Date().setFullYear(new Date().getFullYear() + 20)
-                    ).toISOString(),
-                    credentialId: data?.result?.usercertificateId,
-                    firstName: userResponse?.firstName ?? '',
-                    middleName: userResponse?.middleName ?? '',
-                    lastName: userResponse?.lastName ?? '',
-                    courseName: resultHierarchy?.name ?? '',
                   });
-                  setCertificateId(
-                    resultCertificate?.result?.credentialSchemaId
-                  );
+                  console.log('responseCriteria', responseCriteria);
+                  if (responseCriteria === true) {
+                    const resultCertificate = await issueCertificate({
+                      userId: userId,
+                      courseId: courseId,
+                      unitId: unitId,
+                      issuanceDate: new Date().toISOString(),
+                      expirationDate: new Date(
+                        new Date().setFullYear(new Date().getFullYear() + 20)
+                      ).toISOString(),
+                      credentialId: data?.result?.usercertificateId,
+                      firstName: userResponse?.firstName ?? '',
+                      middleName: userResponse?.middleName ?? '',
+                      lastName: userResponse?.lastName ?? '',
+                      courseName: resultHierarchy?.name ?? '',
+                    });
+                    setCertificateId(
+                      resultCertificate?.result?.credentialSchemaId
+                    );
+                  } else {
+                  }
                 }
               }
             }
