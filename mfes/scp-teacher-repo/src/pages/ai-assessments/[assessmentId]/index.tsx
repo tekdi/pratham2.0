@@ -230,15 +230,15 @@ const AssessmentDetails: React.FC = () => {
         filtered.sort((a, b) => {
           const orderA =
             statusOrder[
-              mapAnswerSheetStatusToInternalStatus(
-                a.answerSheetStatus
-              ) as keyof typeof statusOrder
+            mapAnswerSheetStatusToInternalStatus(
+              a.answerSheetStatus
+            ) as keyof typeof statusOrder
             ] || 5;
           const orderB =
             statusOrder[
-              mapAnswerSheetStatusToInternalStatus(
-                b.answerSheetStatus
-              ) as keyof typeof statusOrder
+            mapAnswerSheetStatusToInternalStatus(
+              b.answerSheetStatus
+            ) as keyof typeof statusOrder
             ] || 5;
           return orderA - orderB;
         });
@@ -493,7 +493,7 @@ const AssessmentDetails: React.FC = () => {
 
       showToastMessage(
         t('ASSESSMENTS.DOWNLOAD_SUCCESS') ||
-          'Question paper downloaded successfully',
+        'Question paper downloaded successfully',
         'success'
       );
       setShowDownloadPopup(false);
@@ -550,9 +550,8 @@ const AssessmentDetails: React.FC = () => {
   const getStatusText = (status: string, score?: number, maxScore?: number) => {
     switch (status) {
       case 'completed':
-        return `Marks approved: ${score || 125}/${
-          maxScore || assessmentData?.maxScore || 130
-        }`;
+        return `Marks approved: ${score || 125}/${maxScore || assessmentData?.maxScore || 130
+          }`;
       case 'in_progress':
         return 'Under AI Evaluation';
       case 'awaiting_approval':
@@ -654,17 +653,42 @@ const AssessmentDetails: React.FC = () => {
           <IconButton onClick={handleBack} sx={{ mr: 1 }}>
             <ArrowBackIcon sx={{ color: '#4D4639' }} />
           </IconButton>
-          <Typography
-            variant="h5"
-            sx={{
-              fontWeight: 500,
-              fontSize: '22px',
-              lineHeight: '28px',
-              color: '#4D4639',
-            }}
-          >
-            {assessmentData?.title}
-          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: 500,
+                fontSize: '22px',
+                lineHeight: '28px',
+                color: '#4D4639',
+              }}
+            >
+              {assessmentData?.title}
+            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Button
+                variant="contained"
+                color="primary"
+                endIcon={<DownloadIcon />}
+                sx={{
+                  color: '#4D4639 ',
+                  borderRadius: '8px',
+                  fontWeight: 500,
+                  textTransform: 'none',
+                }}
+                onClick={() => {
+                  const link = document.createElement('a');
+                  link.href = '/document/dummy.pdf';
+                  link.download = '/document/dummy.pdf';
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }}
+              >
+                Sample Question and Answer Paper
+              </Button>
+            </Box>
+          </Box>
         </Box>
 
         {/* Error Message */}
@@ -726,54 +750,57 @@ const AssessmentDetails: React.FC = () => {
 
         {/* Download PDF Card */}
         {assessmentData?.hasLongShortAnswers && (
-          <Box sx={{ px: 2, mb: 2 }}>
-            <Card
-              sx={{
-                backgroundColor: '#ECE6F0',
-                border: '1px solid #D0C5B4',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                '&:hover': {
-                  backgroundColor: '#E1D5E7',
-                },
-              }}
-              // onClick={() => setShowDownloadPopup(true)}
-              // onClick={handleDownloadQuestionPaper}
-              onClick={handleDownloadQuestionPaper}
-            >
-              <CardContent
+          <>
+            <Box sx={{ px: 2, mb: 1 }}>
+              <Card
                 sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  p: '12px !important',
+                  backgroundColor: '#ECE6F0',
+                  border: '1px solid #D0C5B4',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  '&:hover': {
+                    backgroundColor: '#E1D5E7',
+                  },
                 }}
+                // onClick={() => setShowDownloadPopup(true)}
+                // onClick={handleDownloadQuestionPaper}
+                onClick={handleDownloadQuestionPaper}
               >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                  <PictureAsPdfIcon
-                    sx={{ color: '#D32F2F', width: 24, height: 24 }}
-                  />
-                  <Typography
-                    sx={{
-                      fontWeight: 500,
-                      fontSize: '14px',
-                      color: '#1F1B13',
-                      width: '280px',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {assessmentData?.title
-                      ?.replace(/\s+/g, '_')
-                      .toLowerCase() || 'mid_term_exam'}
-                    .pdf
-                  </Typography>
-                </Box>
-                <DownloadIcon sx={{ color: '#4D4639' }} />
-              </CardContent>
-            </Card>
-          </Box>
+                <CardContent
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    p: '12px !important',
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <PictureAsPdfIcon
+                      sx={{ color: '#D32F2F', width: 24, height: 24 }}
+                    />
+                    <Typography
+                      sx={{
+                        fontWeight: 500,
+                        fontSize: '14px',
+                        color: '#1F1B13',
+                        width: '280px',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {assessmentData?.title
+                        ?.replace(/\s+/g, '_')
+                        .toLowerCase() || 'mid_term_exam'}
+                      .pdf
+                    </Typography>
+                  </Box>
+                  <DownloadIcon sx={{ color: '#4D4639' }} />
+                </CardContent>
+              </Card>
+            </Box>
+
+          </>
         )}
 
         {/* Total Learners and Sort */}
@@ -905,9 +932,9 @@ const AssessmentDetails: React.FC = () => {
                         mapAnswerSheetStatusToInternalStatus(
                           learner.answerSheetStatus
                         ) === 'awaiting_approval' ||
-                        mapAnswerSheetStatusToInternalStatus(
-                          learner.answerSheetStatus
-                        ) === 'completed'
+                          mapAnswerSheetStatusToInternalStatus(
+                            learner.answerSheetStatus
+                          ) === 'completed'
                           ? '80px'
                           : '64px',
                       transition: 'all 0.2s ease-in-out',

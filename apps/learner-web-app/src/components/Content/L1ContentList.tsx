@@ -168,12 +168,26 @@ const MyComponent: React.FC = () => {
               }
               _content={{
                 pageName: 'L1_Content',
-                onlyFields: ['contentLanguage', 'se_subDomains', 'se_subjects'],
+                onlyFields: [
+                  'contentLanguage',
+                  ...(filter.filters?.domain ? [] : ['se_domains']),
+                  'se_subDomains',
+                  'se_subjects'
+                ],
                 isOpenColapsed: [
                   'contentLanguage',
+                  ...(filter.filters?.domain ? [] : ['se_domains']),
                   'se_subDomains',
                   'se_subjects',
                 ],
+                filters: {
+                  ...(filter.filters?.domain ? {} : {
+                    se_domains:
+                      typeof filter.filters?.domain === 'string'
+                        ? [filter.filters?.domain]
+                        : filter.filters?.domain,
+                  }),
+                },
                 ...(Array.isArray(storedConfig.showContent) &&
                 storedConfig.showContent.length === 2 &&
                 storedConfig.showContent.includes('courses') &&
@@ -182,14 +196,16 @@ const MyComponent: React.FC = () => {
                   : {}),
 
                 staticFilter: {
-                  se_domains:
-                    typeof filter.filters?.domain === 'string'
-                      ? [filter.filters?.domain]
-                      : filter.filters?.domain,
                   program:
                     typeof filter.filters?.program === 'string'
                       ? [filter.filters?.program]
                       : filter.filters?.program,
+                  ...(filter.filters?.domain ? {
+                    se_domains:
+                      typeof filter.filters?.domain === 'string'
+                        ? [filter.filters?.domain]
+                        : filter.filters?.domain,
+                  } : {}),
                 },
               }}
             />
