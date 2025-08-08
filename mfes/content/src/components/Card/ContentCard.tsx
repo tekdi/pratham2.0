@@ -23,7 +23,11 @@ const ContentCard = ({
 
   if (_card?.cardComponent) {
     return (
-      <CardWrap isWrap={isWrap && type === 'Course'} _card={_card}>
+      <CardWrap
+        // isWrap={isWrap && type === 'Course'}
+        _card={_card}
+
+        isWrap={false}>
         <_card.cardComponent
           item={item}
           type={type}
@@ -37,7 +41,10 @@ const ContentCard = ({
   }
   console.log('ContentCard: No cardComponent found in _card', item);
   return (
-    <CardWrap isWrap={isWrap && type === 'Course'} _card={_card}>
+    <CardWrap
+      // isWrap={isWrap && type === 'Course'} 
+
+      _card={_card} isWrap={false}>
       <CommonCard
         title={(item?.name || '').trim()}
         // image={

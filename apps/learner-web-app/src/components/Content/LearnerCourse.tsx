@@ -152,15 +152,14 @@ export default memo(function LearnerCourse({
                           e
                         )
                     ).length
-                      ? `(${
-                          Object.keys(filterState.filters).filter(
-                            (e) =>
-                              ![
-                                'limit',
-                                ...Object.keys(staticFilter ?? {}),
-                              ].includes(e)
-                          ).length
-                        })`
+                      ? `(${Object.keys(filterState.filters).filter(
+                        (e) =>
+                          ![
+                            'limit',
+                            ...Object.keys(staticFilter ?? {}),
+                          ].includes(e)
+                      ).length
+                      })`
                       : null}
                   </Typography>
                 </Button>
@@ -324,15 +323,14 @@ export default memo(function LearnerCourse({
                             ...Object.keys(staticFilter ?? {}),
                           ].includes(e)
                       ).length
-                        ? `(${
-                            Object.keys(filterState.filters).filter(
-                              (e) =>
-                                ![
-                                  'limit',
-                                  ...Object.keys(staticFilter ?? {}),
-                                ].includes(e)
-                            ).length
-                          })`
+                        ? `(${Object.keys(filterState.filters).filter(
+                          (e) =>
+                            ![
+                              'limit',
+                              ...Object.keys(staticFilter ?? {}),
+                            ].includes(e)
+                        ).length
+                        })`
                         : null}
                     </Typography>
                   </Button>
@@ -364,7 +362,7 @@ export default memo(function LearnerCourse({
               tabChange: handleTabChange,
               default_img: '/images/image_ver.png',
               _card: { isHideProgress: true },
-              _subBox: { sx: { px: 0.5 } },
+              _subBox: { sx: { px: 0.5, } },
               ..._content?._config,
             }}
             filters={{
@@ -396,49 +394,49 @@ const FilterChip: React.FC<FilterChipProps> = ({
     <>
       {filters
         ? Object.entries(filters)
-            .filter(
-              ([key, _]) =>
-                !['limit', ...Object.keys(staticFilter ?? {})].includes(key)
-            )
-            .map(([key, value], index) => {
-              if (typeof value === 'object') {
-                return (value as string[]).map((option, index) => (
-                  <Chip
-                    key={`${key}-${index}`}
-                    label={option}
-                    onDelete={() => {
-                      const { [key]: options, ...rest } = filters ?? {};
-                      const newOptions = options.filter(
-                        (o: any) => o !== option
-                      );
-                      if (newOptions.length === 0) {
-                        handleFilterChange({
-                          ...rest,
-                        });
-                      } else {
-                        handleFilterChange({
-                          ...rest,
-                          [key]: newOptions,
-                        });
-                      }
-                    }}
-                    sx={{ mr: 1, mb: 1, borderRadius: '8px' }}
-                  />
-                ));
-              } else {
-                return (
-                  <Chip
-                    key={key}
-                    label={`${key}: ${value}`}
-                    onDelete={() => {
-                      const { [key]: _, ...rest } = filters ?? {};
-                      handleFilterChange(rest);
-                    }}
-                    sx={{ mr: 1, mb: 1, borderRadius: '8px' }}
-                  />
-                );
-              }
-            })
+          .filter(
+            ([key, _]) =>
+              !['limit', ...Object.keys(staticFilter ?? {})].includes(key)
+          )
+          .map(([key, value], index) => {
+            if (typeof value === 'object') {
+              return (value as string[]).map((option, index) => (
+                <Chip
+                  key={`${key}-${index}`}
+                  label={option}
+                  onDelete={() => {
+                    const { [key]: options, ...rest } = filters ?? {};
+                    const newOptions = options.filter(
+                      (o: any) => o !== option
+                    );
+                    if (newOptions.length === 0) {
+                      handleFilterChange({
+                        ...rest,
+                      });
+                    } else {
+                      handleFilterChange({
+                        ...rest,
+                        [key]: newOptions,
+                      });
+                    }
+                  }}
+                  sx={{ mr: 1, mb: 1, borderRadius: '8px' }}
+                />
+              ));
+            } else {
+              return (
+                <Chip
+                  key={key}
+                  label={`${key}: ${value}`}
+                  onDelete={() => {
+                    const { [key]: _, ...rest } = filters ?? {};
+                    handleFilterChange(rest);
+                  }}
+                  sx={{ mr: 1, mb: 1, borderRadius: '8px' }}
+                />
+              );
+            }
+          })
         : null}
     </>
   );
