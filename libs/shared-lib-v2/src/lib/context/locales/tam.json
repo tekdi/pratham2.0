@@ -630,5 +630,6 @@
     "SPACE_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "இடைவெளி மற்றும் சிறப்பு எழுத்துகள் அனுமதிக்கப்படவில்லை",
     "DATE_MUST_BE_ON_OR_BEFORE": "தேதி {{date}} அன்று அல்லது அதற்கு முன் இருக்க வேண்டும்",
     "DATE_MUST_BE_ON_OR_AFTER": "தேதி {{date}} அன்று அல்லது அதற்கு பின் இருக்க வேண்டும்"
-  }
+  },
+  "Assessment Score": "பரீக்ஷ்டுதல் மதிப்பெண்"
 }

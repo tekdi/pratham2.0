@@ -25,7 +25,7 @@ export default memo(function LearnerCourse({
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useTranslation();
   const { staticFilter, filterFramework } = _content ?? {};
-  const contentListRef = useRef(null);
+  const contentListRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const savedFilters = localStorage.getItem('learnerCourseFilters');

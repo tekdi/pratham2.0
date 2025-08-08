@@ -2,6 +2,8 @@ import { ContentCreate } from '../utils/Interface';
 import { URL_CONFIG } from '../utils/url.config';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
+import { checkCriteriaForCertificate } from '@shared-lib-v2/utils/CertificateService/coursesCertificates';
+
 export const fetchContent = async (identifier: any) => {
   try {
     const API_URL = `${URL_CONFIG.API.CONTENT_READ}${identifier}`;
@@ -206,31 +208,47 @@ export const updateCOurseAndIssueCertificate = async ({
         status: 'inprogress',
       });
     } else if (courseStatus?.status === 'completed' && isGenerateCertificate) {
-      await updateUserCourseStatus({
-        userId,
-        courseId: course?.identifier,
-        status: 'completed',
-      });
       const userResponse: any = await getUserId();
       const data = await fetchCertificateStatus({
         userId: userId,
         courseId: course?.identifier,
       });
       if (data !== 'viewCertificate') {
-        await issueCertificate({
+        const responseCriteria = await checkCriteriaForCertificate({
           userId: userId,
           courseId: course?.identifier,
-          unitId: unitId,
-          issuanceDate: new Date().toISOString(),
-          expirationDate: new Date(
-            new Date().setFullYear(new Date().getFullYear() + 20)
-          ).toISOString(),
-          // credentialId: data?.result?.usercertificateId,
-          firstName: userResponse?.firstName ?? '',
-          middleName: userResponse?.middleName ?? '',
-          lastName: userResponse?.lastName ?? '',
-          courseName: course?.name ?? '',
         });
+
+        if (responseCriteria === true) {
+          try {
+            await issueCertificate({
+              userId: userId,
+              courseId: course?.identifier,
+              unitId: unitId,
+              issuanceDate: new Date().toISOString(),
+              expirationDate: new Date(
+                new Date().setFullYear(new Date().getFullYear() + 20)
+              ).toISOString(),
+              // credentialId: data?.result?.usercertificateId,
+              firstName: userResponse?.firstName ?? '',
+              middleName: userResponse?.middleName ?? '',
+              lastName: userResponse?.lastName ?? '',
+              courseName: course?.name ?? '',
+            });
+          } catch (error) {
+            await updateUserCourseStatus({
+              userId,
+              courseId: course?.identifier,
+              status: 'completed',
+            });
+          }
+        } else if (data !== 'completed') {
+          await updateUserCourseStatus({
+            userId,
+            courseId: course?.identifier,
+            status: 'completed',
+          });
+        }
       }
     } else {
       updateUserCourseStatus({

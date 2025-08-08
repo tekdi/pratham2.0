@@ -188,7 +188,7 @@ const ProfilePage = () => {
         lg: '1fr 1fr 1fr',
         xl: '1fr 1fr 1fr 1fr',
       }}
-      gap={0}
+      gap={3}
       sx={{
         '& > *': {
           margin: '0 !important',
