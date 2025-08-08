@@ -575,5 +575,6 @@
     "SPACE_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "स्पेस और विशेष वर्णों की अनुमति नहीं है",
     "DATE_MUST_BE_ON_OR_BEFORE": "तिथि {{date}} या उससे पहले होनी चाहिए",
     "DATE_MUST_BE_ON_OR_AFTER": "तिथि {{date}} या उसके बाद होनी चाहिए"
-  }
+  },
+  "Assessment Score": "परीक्षण स्कोर"
 }

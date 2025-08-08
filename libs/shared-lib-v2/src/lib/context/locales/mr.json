@@ -575,5 +575,6 @@
     "SPACE_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "मोकळे जागा आणि विशेष अक्षरे परवानगी नाही",
     "DATE_MUST_BE_ON_OR_BEFORE": "तारीख {{date}} किंवा त्यापूर्वीची असावी",
     "DATE_MUST_BE_ON_OR_AFTER": "तारीख {{date}} किंवा नंतरची असावी"
-  }
+  },
+  "Assessment Score": "परीक्षण स्कोर"
 }

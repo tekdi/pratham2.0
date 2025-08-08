@@ -565,7 +565,7 @@ const AssessmentDetails = () => {
       setEditScore(parsedData.score.toString());
       setEditSuggestion(
         parsedData.suggestion ||
-          (question.resValue ? JSON.parse(question.resValue).AI_suggestion : '')
+        (question.resValue ? JSON.parse(question.resValue).AI_suggestion : '')
       );
     } else {
       setEditScore(question.score.toString());
@@ -1019,8 +1019,7 @@ const AssessmentDetails = () => {
                 letterSpacing: '0.1px',
               }}
             >
-              {assessmentData?.fileUrls &&
-              assessmentData.fileUrls.length > 0 ? (
+              {assessmentData?.fileUrls && assessmentData.fileUrls.length > 0 ? (
                 <>
                   {`${assessmentData.fileUrls.length} images uploaded `}
                   <span
@@ -1028,10 +1027,32 @@ const AssessmentDetails = () => {
                       color: '#1976d2',
                       textDecoration: 'underline',
                       cursor: 'pointer',
+                      fontWeight: 500,
+                      marginLeft: '8px',
                     }}
+                    onClick={handleUploadInfoClick}
                   >
                     View
                   </span>
+                  {['AI Processed', 'Awaiting Your Approval', 'AI Pending'].includes(assessmentData?.status || '') && (
+                    <>
+                      <span style={{ margin: '0 8px', color: '#bdbdbd' }}>|</span>
+                      <span
+                        style={{
+                          color: '#1976d2',
+                          textDecoration: 'underline',
+                          cursor: 'pointer',
+                          fontWeight: 500,
+                        }}
+                        onClick={e => {
+                          e.stopPropagation();
+                          setUploadPopupOpen(true);
+                        }}
+                      >
+                        Re-upload
+                      </span>
+                    </>
+                  )}
                 </>
               ) : (
                 'No images uploaded'
@@ -1058,7 +1079,7 @@ const AssessmentDetails = () => {
 
       {!assessmentTrackingData ? (
         assessmentData?.status === 'AI Pending' ||
-        assessmentData?.status === 'Approved' ? (
+          assessmentData?.status === 'Approved' ? (
           <Box
             sx={{
               display: 'flex',
@@ -1176,9 +1197,9 @@ const AssessmentDetails = () => {
                 Answer:{' '}
                 {selectedQuestion.resValue
                   ? (() => {
-                      const resValue = JSON.parse(selectedQuestion.resValue);
-                      return resValue.label || 'No answer provided';
-                    })()
+                    const resValue = JSON.parse(selectedQuestion.resValue);
+                    return resValue.label || 'No answer provided';
+                  })()
                   : 'No answer provided'}
               </Typography>
               <TextField

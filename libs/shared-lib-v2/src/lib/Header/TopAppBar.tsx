@@ -215,12 +215,14 @@ export const DesktopBar = ({
         }}
       >
         {navLinks.map((link, index) => (
-          <Box key={`${link.title}-${index}`} onMouseLeave={handleLeave}>
+          <Box key={`${link.title}-${index}`} 
+            onMouseEnter={handleEnter}
+            onMouseLeave={handleLeave}
+            sx={{ display: 'inline-block', position: 'relative' }}
+          >
             <Box
               sx={{ display: 'flex', alignItems: 'center' }}
-              onMouseEnter={(e) =>
-                openMenuAtLevel(0, e.currentTarget, link.child ?? [])
-              }
+              // Removed onMouseEnter from here
             >
               <Button
                 component={typeof link.to === 'string' ? 'a' : 'button'}
@@ -241,6 +243,7 @@ export const DesktopBar = ({
                     ? link.to(e)
                     : openMenuAtLevel(0, e.currentTarget, link.child ?? []);
                 }}
+                onMouseEnter={link.child ? (e: any) => openMenuAtLevel(0, e.currentTarget, link.child ?? []) : undefined}
               >
                 <Typography
                   variant="body1"
@@ -266,6 +269,7 @@ export const DesktopBar = ({
                     e.stopPropagation();
                     openMenuAtLevel(0, e.currentTarget, link?.child ?? []);
                   }}
+                  onMouseEnter={(e) => openMenuAtLevel(0, e.currentTarget, link.child ?? [])}
                 >
                   <ArrowDropDownIcon
                     fontSize="small"
@@ -274,6 +278,23 @@ export const DesktopBar = ({
                 </IconButton>
               )}
             </Box>
+            {/* Popper for this nav item */}
+            {menus[0] && menus[0].anchorEl === document.activeElement && (
+              <></>
+            )}
+            {menus[0] && menus[0].anchorEl === document.activeElement && (
+              <></>
+            )}
+            {menus[0] && menus[0].anchorEl === document.activeElement && (
+              <></>
+            )}
+            {menus[0] && menus[0].anchorEl === document.activeElement && (
+              <></>
+            )}
+            {/* Render Popper for this nav item if open */}
+            {menus[0] && menus[0].anchorEl === document.activeElement && (
+              <></>
+            )}
           </Box>
         ))}
 
@@ -294,8 +315,7 @@ export const DesktopBar = ({
           anchorEl={menu.anchorEl}
           placement="bottom"
           disablePortal
-          onMouseEnter={handleEnter}
-          onMouseLeave={handleLeave}
+          // Removed onMouseEnter/onMouseLeave from here
           modifiers={[
             {
               name: 'offset',
@@ -309,7 +329,7 @@ export const DesktopBar = ({
             mt: level === 0 ? 0.5 : 0,
           }}
         >
-          <Paper elevation={3}>
+          <Paper elevation={3} onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
             <Box display="flex" flexDirection="row" flexWrap="wrap">
               {menu.items.map((item, idx) => {
                 const hasChild =

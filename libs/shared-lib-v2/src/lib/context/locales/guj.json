@@ -105,7 +105,7 @@
     "LOAD_MORE": "વધારે લોડ કરો",
     "SKILLING_CENTERS": "કૃષિ કેન્દ્ર",
     "SKILLING_CENTERS_NEAR_YOU": "તમારા નજીકના કૃષિ કેન્દ્ર",
-        "WELCOME": "స్వాగతం",
+    "WELCOME": "స్వాగతం",
 
     "STATUS": {
       "completed": "પૂર્ણ થયું",
@@ -575,5 +575,6 @@
     "SPACE_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "ખાલી જગ્યા અને વિશેષ અક્ષરો મંજૂર નથી",
     "DATE_MUST_BE_ON_OR_BEFORE": "તારીખ {{date}} કે પહેલાં હોવી જોઈએ",
     "DATE_MUST_BE_ON_OR_AFTER": "તારીખ {{date}} કે પછી હોવી જોઈએ"
-  }
+  },
+  "Assessment Score": "પ્રયત્નની સ્કોર"
 }

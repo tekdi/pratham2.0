@@ -531,14 +531,12 @@ export default function Content(props: Readonly<ContentProps>) {
           propData.handleCardClick(content, e, rowNumber);
         } else if (SUPPORTED_MIME_TYPES.includes(content?.mimeType)) {
           router.push(
-            `${props?._config?.contentBaseUrl ?? ''}/player/${
-              content?.identifier
+            `${props?._config?.contentBaseUrl ?? ''}/player/${content?.identifier
             }?activeLink=${window.location.pathname + window.location.search}`
           );
         } else {
           router.push(
-            `${props?._config?.contentBaseUrl ?? ''}/content-details/${
-              content?.identifier
+            `${props?._config?.contentBaseUrl ?? ''}/content-details/${content?.identifier
             }?activeLink=${window.location.pathname + window.location.search}`
           );
         }

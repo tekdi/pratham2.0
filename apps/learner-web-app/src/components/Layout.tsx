@@ -130,22 +130,13 @@ const NAV_CONFIG: Record<
 
     if (checkAuth) {
       if (isMobile) {
-        navLinks.push(
-          {
-            title: t('LEARNER_APP.COMMON.PROFILE'),
-            icon: <AccountCircleOutlined sx={{ width: 28, height: 28 }} />,
-            to: () => handleNavClick(handleProfileClick),
-            isActive: currentPage === '/profile',
-            customStyle: getLinkStyle(currentPage === '/profile'),
-          },
-          {
-            title: t('COMMON.LOGOUT'),
-            icon: <Logout sx={{ width: 28, height: 28 }} />,
-            to: () => handleNavClick(handleLogoutModal),
-            isActive: false,
-            customStyle: {},
-          }
-        );
+        navLinks.push({
+          title: t('COMMON.LOGOUT'),
+          icon: <Logout sx={{ width: 28, height: 28 }} />,
+          to: () => handleNavClick(handleLogoutModal),
+          isActive: false,
+          customStyle: {},
+        });
       } else {
         navLinks.push(
           {
@@ -165,11 +156,13 @@ const NAV_CONFIG: Record<
       }
     }
 
-    // Always add Profile link at the end
+    // Add Profile link at the end
     navLinks.push({
       title: t('LEARNER_APP.COMMON.PROFILE'),
       icon: <AccountCircleOutlined sx={{ width: 28, height: 28 }} />,
-      to: () => setAnchorEl(true),
+      to: isMobile 
+        ? () => handleNavClick(handleProfileClick)
+        : () => setAnchorEl(true),
       isActive: currentPage === '/profile',
       customStyle: getLinkStyle(currentPage === '/profile'),
     });
