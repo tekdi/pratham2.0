@@ -574,5 +574,6 @@
     "SPACE_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "ಖಾಲಿ ಜಾಗ ۽ ವಿಶೇಷ ಅಕ್ಷರಗಳು ಅನುಮತಿಸಲಾಗುವುದಿಲ್ಲ",
     "DATE_MUST_BE_ON_OR_BEFORE": "ದಿನಾಂಕ {{date}} ಅಥವಾ ಮುಂಚೆಯಿರಬೇಕು",
     "DATE_MUST_BE_ON_OR_AFTER": "ದಿನಾಂಕ {{date}} ಅಥವಾ ನಂತರಿರಬೇಕು"
-  }
+  },
+  "Assessment Score": "ಪರೀಕ್ಷೆ ಸ್ಕೋರ್"
 }
