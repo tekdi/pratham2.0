@@ -111,7 +111,7 @@ const NavButton: React.FC<{
           anchorEl={anchorEl}
           placement="bottom-start"
           transition
-          sx={{ zIndex: 1300 }}
+          sx={{ zIndex: 999999 }}
         >
           {({ TransitionProps }) => (
             <Grow {...TransitionProps}>
