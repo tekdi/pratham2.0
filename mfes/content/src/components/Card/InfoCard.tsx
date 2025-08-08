@@ -54,7 +54,14 @@ const InfoCard: React.FC<InfoCardProps> = ({
             // objectFit: 'contain',
             ..._infoCard?._cardMedia,
           }}
-          image={item?.posterImage || _infoCard?.default_img}
+          // image={item?.posterImage || _infoCard?.default_img}
+            image={
+  item?.posterImage
+    ? item.posterImage
+    : item?.appIcon
+      ? item.appIcon
+      : _infoCard?.default_img 
+}
           alt={item?.name}
         />
         <Box

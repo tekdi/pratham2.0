@@ -335,6 +335,8 @@ const EditProfile = ({ completeProfile }: EditProfileProps) => {
                 hideSubmit={true}
                 type="learner"
                 isCompleteProfile={completeProfile}
+                createNew={false}
+
               />
             )}
             <Button
