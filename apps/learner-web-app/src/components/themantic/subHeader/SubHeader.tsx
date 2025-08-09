@@ -85,7 +85,7 @@ const SubHeader = ({
       <Box
         sx={{
           fontSize: { xs: '24px', sm: '28px', md: '32px', lg: '36px' },
-          fontWeight: 700,
+          fontWeight: 600,
           color: '#3891CE',
           fontFamily: '"Montserrat", sans-serif',
           textAlign: 'center',
@@ -134,9 +134,10 @@ const SubHeader = ({
                 sx={{
                   bgcolor: '#fff',
                   color: '#222',
-                  borderRadius: '8px',
+                  borderRadius: '4px',
                   fontWeight: 500,
                   border: '1px solid #d1d5db',
+                  height: '40px',
 
                   boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
                   '& .MuiSelect-select': {
@@ -184,7 +185,7 @@ const SubHeader = ({
               <Typography
                 variant="h6"
                 sx={{
-                  fontWeight: 700,
+                  fontWeight: 600,
                   fontSize: { xs: '16px', sm: '18px' },
                   color: 'black',
                   mb: 0.5,
@@ -197,16 +198,7 @@ const SubHeader = ({
               >
                 {resourceCount} Resources
               </Typography>
-              <Box
-                sx={{
-                  height: 3,
-                  width: { xs: 40, sm: 48 },
-                  mx: 'auto',
-                  bgcolor: 'primary.main',
-                  borderRadius: 2,
-                  opacity: 0.2,
-                }}
-              />
+
             </Box>
           </Box>
         )}

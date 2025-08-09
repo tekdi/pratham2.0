@@ -51,7 +51,7 @@ const App = () => {
                 _card: {
                   cardComponent: CardComponent,
                   titleFontSize: '14px',
-                  fontWeight: 700,
+                  fontWeight: 600,
                   titleColor: 'black',
                 },
                 _infoCard: {

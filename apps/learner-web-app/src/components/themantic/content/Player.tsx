@@ -117,7 +117,7 @@ const App = ({
         />
       </Box>
       <Grid container spacing={6}>
-        <Grid item xs={12} sm={12} md={12} lg={3.5}>
+        <Grid item xs={12} sm={12} md={3.5} lg={3.5}>
           <Box
             sx={{
               display: 'flex',
@@ -151,9 +151,9 @@ const App = ({
                   zIndex: 1,
                 }}
               >
-                <Box sx={{ margin: '8px', px: 3 }}>
+                <Box sx={{ margin: '8px', px: 3, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                   <img
-                    height={'200px'}
+                    // height={'200px'}
                     src={item?.content?.posterImage || '/images/image_ver.png'}
                     alt={
                       item?.content?.name || item?.content?.title || 'Content'
@@ -166,7 +166,7 @@ const App = ({
                 <Typography
                   variant="h6"
                   sx={{
-                    fontWeight: '700',
+                    fontWeight: '600',
                     textAlign: 'center',
                     color: '#000',
                     fontSize: '24px',
@@ -207,7 +207,7 @@ const App = ({
             </Box>
           </Box>
         </Grid>
-        <Grid item xs={12} sm={12} md={12} lg={8.5}>
+        <Grid item xs={12} sm={12} md={8.5} lg={8.5}>
           <PlayerBox
             userIdLocalstorageName={userIdLocalstorageName}
             item={item}
@@ -298,15 +298,12 @@ const PlayerBox = ({
               isGenerateCertificate: isGenerateCertificate,
               trackable: trackable,
             })}
-            src={`${
-              process.env.NEXT_PUBLIC_LEARNER_SBPLAYER
-            }?identifier=${identifier}${
-              courseId && unitId ? `&courseId=${courseId}&unitId=${unitId}` : ''
-            }${
-              userIdLocalstorageName
+            src={`${process.env.NEXT_PUBLIC_LEARNER_SBPLAYER
+              }?identifier=${identifier}${courseId && unitId ? `&courseId=${courseId}&unitId=${unitId}` : ''
+              }${userIdLocalstorageName
                 ? `&userId=${localStorage.getItem(userIdLocalstorageName)}`
                 : ''
-            }`}
+              }`}
             style={{
               border: 'none',
               objectFit: 'contain',

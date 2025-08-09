@@ -229,7 +229,7 @@ export const mainCourseCard = (props: any) => (
   <CardComponent
     {...props}
     titleFontSize="24px"
-    fontWeight={700}
+    fontWeight={600}
     minHeight="317px"
   />
 );
@@ -327,10 +327,8 @@ export const CardComponent = ({
             textAlign: 'center',
             fontSize: finalTitleFontSize || '16px',
             letterSpacing: '1px',
-            // lineHeight: 1.2,
             mt: 1,
             mb: 1,
-            display: '-webkit-box',
             WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
@@ -338,6 +336,10 @@ export const CardComponent = ({
             color: finalTitleColor || '#212529',
             px: '16px',
             textTransform: finalTextTransform || 'uppercase',
+            minHeight: '42px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
           }}
         >
           {item.name || item.title || 'Untitled'}
@@ -367,7 +369,7 @@ export const CardComponent = ({
                 pb: 2,
               }}
             >
-              <Box sx={{ fontSize: '18px', color: '#363d47', fontWeight: 600 }}>
+              <Box sx={{ fontSize: '18px', color: '#363d47', fontWeight: 500 }}>
                 Explore
               </Box>
               <Box>

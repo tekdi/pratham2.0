@@ -343,7 +343,7 @@ function replaceOptionsWithAssoc({
     // Check if either field is "Content Language"
     const aIsContentLanguage = a.name === 'Content Language';
     const bIsContentLanguage = b.name === 'Content Language';
-    
+
     // If a is Content Language, it should come first
     if (aIsContentLanguage && !bIsContentLanguage) return -1;
     // If b is Content Language, it should come first
@@ -421,14 +421,39 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                 pb: 1,
               }}
             >
-              <Typography
-                /* @ts-expect-error: MUI Typography variant 'body5' is not in the type definition, but is used for custom styling */
-                variant="body5"
-                component="div"
-                sx={{ fontWeight: '500', color: '#181D27' }}
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                }}
               >
-                <SpeakableText>{field.name}</SpeakableText>
-              </Typography>
+                <Typography
+                  /* @ts-expect-error: MUI Typography variant 'body5' is not in the type definition, but is used for custom styling */
+                  variant="body5"
+                  component="div"
+                  sx={{ fontWeight: '500', color: '#181D27' }}
+                >
+                  <SpeakableText>{field.name}</SpeakableText>
+                </Typography>
+                {staticValues && staticValues.length > 0 && (
+                  <Chip
+                    label={staticValues.length}
+                    size="small"
+                    sx={{
+                      height: '20px',
+                      minWidth: '20px',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      backgroundColor: '#1976d2',
+                      color: 'white',
+                      '& .MuiChip-label': {
+                        padding: '0 6px',
+                      },
+                    }}
+                  />
+                )}
+              </Box>
               {staticValues.map((item: any, idx: number) => (
                 <Chip
                   key={`${code}-chip-${idx}`}
@@ -449,6 +474,40 @@ const FilterSection: React.FC<FilterSectionProps> = ({
           }
           return (
             <Box key={code} {...(_selectOptionBox ?? {})}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  mb: 1,
+                }}
+              >
+                <Typography
+                  /* @ts-expect-error: MUI Typography variant 'body5' is not in the type definition, but is used for custom styling */
+                  variant="body5"
+                  component="div"
+                  sx={{ fontWeight: '500', color: '#181D27' }}
+                >
+                  <SpeakableText>{field.name}</SpeakableText>
+                </Typography>
+                {selected && selected.length > 0 && (
+                  <Chip
+                    label={selected.length}
+                    size="small"
+                    sx={{
+                      height: '20px',
+                      minWidth: '20px',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      backgroundColor: '#1976d2',
+                      color: 'white',
+                      '& .MuiChip-label': {
+                        padding: '0 6px',
+                      },
+                    }}
+                  />
+                )}
+              </Box>
               <FormControl
                 required={isRequired}
                 fullWidth
@@ -464,7 +523,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                     padding: '0 5px',
                   }}
                 >
-                  {field.name}
+                  Select option
                 </InputLabel>
                 <Select
                   readOnly={
@@ -476,9 +535,9 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                     isDropdownMulti
                       ? selected?.map((s: any) => s?.code ?? s?.name ?? s)
                       : selected[0]?.code ??
-                        selected[0]?.name ??
-                        selected[0] ??
-                        ''
+                      selected[0]?.name ??
+                      selected[0] ??
+                      ''
                   }
                   onChange={(e) => {
                     if (isDropdownMulti) {
@@ -499,19 +558,19 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                   renderValue={(selectedVals) =>
                     isDropdownMulti
                       ? (selectedVals as string[])
-                          .map(
-                            (val) =>
-                              sortedValues.find(
-                                (item: any) =>
-                                  item.code === val || item.name === val
-                              )?.name ?? val
-                          )
-                          .join(', ')
+                        .map(
+                          (val) =>
+                            sortedValues.find(
+                              (item: any) =>
+                                item.code === val || item.name === val
+                            )?.name ?? val
+                        )
+                        .join(', ')
                       : sortedValues.find(
-                          (item: any) =>
-                            item.code === selectedVals ||
-                            item.name === selectedVals
-                        )?.name ?? selectedVals
+                        (item: any) =>
+                          item.code === selectedVals ||
+                          item.name === selectedVals
+                      )?.name ?? selectedVals
                   }
                 >
                   {sortedValues.map((item: any) => (
@@ -528,7 +587,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                               (s?.name &&
                                 s?.name === (item.name ?? item.code ?? item)) ||
                               s ===
-                                (typeof item === 'string' ? item : item.icon) ||
+                              (typeof item === 'string' ? item : item.icon) ||
                               s === item.name
                           )}
                         />
@@ -575,16 +634,42 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                 },
               }}
             >
-              <Typography
-                /* @ts-expect-error: MUI Typography variant 'body5' is not in the type definition, but is used for custom styling */
-                variant="body5"
-                component="div"
-                sx={{ fontWeight: '500', color: '#181D27' }}
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  width: '100%',
+                }}
               >
-                <SpeakableText>
-                  {field.name === 'Sub Domain' ? 'Category' : field.name}
-                </SpeakableText>
-              </Typography>
+                <Typography
+                  /* @ts-expect-error: MUI Typography variant 'body5' is not in the type definition, but is used for custom styling */
+                  variant="body5"
+                  component="div"
+                  sx={{ fontWeight: '500', color: '#181D27' }}
+                >
+                  <SpeakableText>
+                    {field.name === 'Sub Domain' ? 'Category' : field.name}
+                  </SpeakableText>
+                </Typography>
+                {selected && selected.length > 0 && (
+                  <Chip
+                    label={selected.length}
+                    size="small"
+                    sx={{
+                      height: '20px',
+                      minWidth: '20px',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      backgroundColor: '#1976d2',
+                      color: 'white',
+                      '& .MuiChip-label': {
+                        padding: '0 6px',
+                      },
+                    }}
+                  />
+                )}
+              </Box>
             </AccordionSummary>
             <AccordionDetails
               sx={{
@@ -613,19 +698,19 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                             const next = e.target.checked
                               ? [...selected, item]
                               : selected.filter(
-                                  (s: any) =>
-                                    !(
-                                      (s && item && s === item) ||
-                                      (s && item.code && s === item?.code) ||
-                                      (s && item?.name && s === item?.name) ||
-                                      (s?.code &&
-                                        item.code &&
-                                        s?.code === item?.code) ||
-                                      (s?.name &&
-                                        item?.name &&
-                                        s?.name === item?.name)
-                                    )
-                                );
+                                (s: any) =>
+                                  !(
+                                    (s && item && s === item) ||
+                                    (s && item.code && s === item?.code) ||
+                                    (s && item?.name && s === item?.name) ||
+                                    (s?.code &&
+                                      item.code &&
+                                      s?.code === item?.code) ||
+                                    (s?.name &&
+                                      item?.name &&
+                                      s?.name === item?.name)
+                                  )
+                              );
                             onChange(code, next);
                           }}
                         />
@@ -660,8 +745,8 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                     ? t('COMMON.SHOW_LESS')
                     : 'Show less'
                   : t
-                  ? t('COMMON.SHOW_MORE')
-                  : 'Show more'}
+                    ? t('COMMON.SHOW_MORE')
+                    : 'Show more'}
               </Button>
             )}
           </Accordion>
