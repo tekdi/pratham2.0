@@ -294,7 +294,7 @@ export const CardComponent = ({
         minHeight: finalMinHeight || '317px',
         borderRadius: '.25rem',
         '&:hover': {
-          transform: 'scale(1.02)',
+          transform: 'scale(1.10)',
         },
       }}
     >

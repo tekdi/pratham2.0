@@ -135,9 +135,6 @@ const App = ({
                   boxShadow: '0 0.15rem 1.75rem 0 rgba(33, 40, 50, 0.15)',
                   border: '1px solid rgba(0, 0, 0, .125)',
                   borderRadius: '5px',
-                  '&:hover': {
-                    transform: 'scale(1.02)',
-                  },
                 }}
               >
                 <Box

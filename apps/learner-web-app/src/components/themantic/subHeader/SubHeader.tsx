@@ -80,7 +80,7 @@ const SubHeader = ({
   };
 
   return (
-    <Box className='bs-container-fluid  bs-px-md-5 bs-px-sm-3'>
+    <Box className='bs-container-fluid  bs-px-md-5 bs-px-sm-3' sx={{ background: '#fff' }}>
       {/* Main Title */}
       <Box
         sx={{
