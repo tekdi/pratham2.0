@@ -80,7 +80,7 @@ const SubHeader = ({
   };
 
   return (
-    <>
+    <Box className='bs-container-fluid  bs-px-md-5 bs-px-sm-3'>
       {/* Main Title */}
       <Box
         sx={{
@@ -90,10 +90,10 @@ const SubHeader = ({
           fontFamily: '"Montserrat", sans-serif',
           textAlign: 'center',
           bgcolor: '#fff',
-          px: { md: '78px' },
           py: { xs: [0, 2], sm: [0, 3] },
           wordWrap: 'break-word',
           lineHeight: 1.2,
+          pt: '10px'
         }}
       >
         STEM Education for Innovation : Experimento India
@@ -106,7 +106,7 @@ const SubHeader = ({
           flexDirection: { xs: 'column', md: 'row' },
           alignItems: { xs: 'stretch', md: 'center' },
           justifyContent: 'space-between',
-          px: { xs: 2, sm: 4, md: 6, lg: '48px' },
+
           pb: { xs: 2, sm: 2 },
           pt: '15px',
           bgcolor: '#fff',
@@ -252,7 +252,7 @@ const SubHeader = ({
           </Box>
         </Box>
       </Box>
-    </>
+    </Box>
   );
 };
 

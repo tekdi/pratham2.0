@@ -7,16 +7,15 @@ const Footer = () => {
   return (
     <Box
       component="footer"
+      className='bs-px-5 bs-pt-3 bs-pb-3'
       sx={{
-        px: { xs: 2, sm: 4, md: 8 },
-        pb: 2,
         backgroundColor: '#fff',
         borderTop: '1px solid',
         borderColor: (theme) => theme.palette.divider,
       }}
     >
       <Box>
-        <Box sx={{ mx: { xs: 0, md: '22px' }, my: { xs: 0, md: '16px' } }}>
+        <Box>
           <Box
             mb={1}
             sx={{
@@ -39,7 +38,7 @@ const Footer = () => {
                 textAlign: { xs: 'center', md: 'right' },
               }}
             >
-              <Box sx={{ mt: { xs: 1, md: 3 } }}>
+              <Box>
                 <Typography
                   sx={{
                     fontSize: { xs: '14px', sm: '15px', md: '16px' },

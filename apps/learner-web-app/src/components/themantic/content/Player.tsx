@@ -100,7 +100,7 @@ const App = ({
   // };
 
   return (
-    <Box sx={{ px: 7, pb: 3 }}>
+    <Box className="bs-px-5" sx={{ mx: '2vh' }}>
       <Box
         sx={{
           display: 'flex',
@@ -116,108 +116,115 @@ const App = ({
           customPlayerMarginTop={25}
         />
       </Box>
-      <Grid container spacing={6}>
-        <Grid item xs={12} sm={12} md={3.5} lg={3.5}>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              // pb: 2,
-            }}
-          >
+      <Box sx={{ pb: 5, px: '12px' }}>
+        <Grid container spacing={5}>
+          <Grid item xs={12} sm={12} md={3.5} lg={3.5}>
             <Box
               sx={{
-                backgroundColor: 'rgba(255, 255, 255, 0.6)',
-                position: 'relative',
-                cursor: 'pointer',
-                transition: 'transform 0.2s ease-in-out',
-                boxShadow: '0 0.15rem 1.75rem 0 rgba(33, 40, 50, 0.15)',
-                border: '1px solid rgba(0, 0, 0, .125)',
-                borderRadius: '5px',
-                '&:hover': {
-                  transform: 'scale(1.02)',
-                },
+                display: 'flex',
+                flexDirection: 'column',
+                // pb: 2,
               }}
             >
               <Box
                 sx={{
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  py: 3,
+                  backgroundColor: 'rgba(255, 255, 255, 0.6)',
                   position: 'relative',
-                  zIndex: 1,
+                  cursor: 'pointer',
+                  transition: 'transform 0.2s ease-in-out',
+                  boxShadow: '0 0.15rem 1.75rem 0 rgba(33, 40, 50, 0.15)',
+                  border: '1px solid rgba(0, 0, 0, .125)',
+                  borderRadius: '5px',
+                  '&:hover': {
+                    transform: 'scale(1.02)',
+                  },
                 }}
               >
-                <Box sx={{ margin: '8px', px: 3, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                  <img
-                    // height={'200px'}
-                    src={item?.content?.posterImage || '/images/image_ver.png'}
-                    alt={
-                      item?.content?.name || item?.content?.title || 'Content'
-                    }
-                    style={{ width: '100%', objectFit: 'cover' }}
+                <Box
+                  sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    py: 3,
+                    position: 'relative',
+                    zIndex: 1,
+                  }}
+                >
+                  <Box >
+                    <Grid container sx={{ px: 3, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                      <Grid item xs={9}>
+                        <img
+                          // height={'200px'}
+                          src={item?.content?.posterImage || '/images/image_ver.png'}
+                          alt={
+                            item?.content?.name || item?.content?.title || 'Content'
+                          }
+                          style={{ width: '100%', objectFit: 'cover' }}
+                        />
+                      </Grid>
+                    </Grid>
+
+                  </Box>
+
+                  {/* Title */}
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontWeight: '600',
+                      textAlign: 'center',
+                      color: '#000',
+                      fontSize: '23px',
+                      letterSpacing: '1px',
+                      lineHeight: 1.2,
+                      mt: 2,
+                      mb: 2,
+                      px: 2,
+                      fontFamily: '"Montserrat", sans-serif',
+                      textDecoration: 'underline',
+                    }}
+                  >
+                    {item?.content?.name || item?.content?.title || 'Untitled'}
+                  </Typography>
+
+                  <Divider
+                    sx={{
+                      width: '100%',
+                      mt: 2,
+                      mb: 2,
+                      height: '4px',
+                      backgroundColor: '#9EB6BE',
+                    }}
                   />
+
+                  <Typography
+                    sx={{
+                      fontSize: '16px',
+                      color: '#363d47',
+                      fontWeight: '400',
+                      px: 2,
+                      fontFamily: '"Montserrat", sans-serif',
+                    }}
+                  >
+                    {item?.content?.description || 'No description'}
+                  </Typography>
                 </Box>
-
-                {/* Title */}
-                <Typography
-                  variant="h6"
-                  sx={{
-                    fontWeight: '600',
-                    textAlign: 'center',
-                    color: '#000',
-                    fontSize: '24px',
-                    letterSpacing: '1px',
-                    lineHeight: 1.2,
-                    mt: 2,
-                    mb: 2,
-                    px: 2,
-                    fontFamily: '"Montserrat", sans-serif',
-                    textDecoration: 'underline',
-                  }}
-                >
-                  {item?.content?.name || item?.content?.title || 'Untitled'}
-                </Typography>
-
-                <Divider
-                  sx={{
-                    width: '100%',
-                    mt: 2,
-                    mb: 2,
-                    height: '4px',
-                    backgroundColor: '#9EB6BE',
-                  }}
-                />
-
-                <Typography
-                  sx={{
-                    fontSize: '16px',
-                    color: '#363d47',
-                    fontWeight: '400',
-                    px: 2,
-                    fontFamily: '"Montserrat", sans-serif',
-                  }}
-                >
-                  {item?.content?.description || 'No description'}
-                </Typography>
               </Box>
             </Box>
-          </Box>
+          </Grid>
+          <Grid item xs={12} sm={12} md={8.5} lg={8.5}>
+            <PlayerBox
+              userIdLocalstorageName={userIdLocalstorageName}
+              item={item}
+              identifier={identifier}
+              courseId={courseId}
+              unitId={unitId}
+              {..._config?.player}
+            />
+          </Grid>
         </Grid>
-        <Grid item xs={12} sm={12} md={8.5} lg={8.5}>
-          <PlayerBox
-            userIdLocalstorageName={userIdLocalstorageName}
-            item={item}
-            identifier={identifier}
-            courseId={courseId}
-            unitId={unitId}
-            {..._config?.player}
-          />
-        </Grid>
-      </Grid>
+      </Box>
     </Box>
   );
 };
