@@ -443,10 +443,8 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                     sx={{
                       height: '20px',
                       minWidth: '20px',
-                      fontSize: '12px',
+                      fontSize: '14px',
                       fontWeight: '600',
-                      backgroundColor: '#1976d2',
-                      color: 'white',
                       '& .MuiChip-label': {
                         padding: '0 6px',
                       },
@@ -497,10 +495,8 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                     sx={{
                       height: '20px',
                       minWidth: '20px',
-                      fontSize: '12px',
+                      fontSize: '14px',
                       fontWeight: '600',
-                      backgroundColor: '#1976d2',
-                      color: 'white',
                       '& .MuiChip-label': {
                         padding: '0 6px',
                       },
@@ -619,17 +615,33 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                 : isOpenColapsed
             }
             key={code}
-            sx={{ background: 'unset', boxShadow: 'unset' }}
+            sx={{
+              boxShadow: 'unset',
+              transition: 'all 0.3s ease-in-out',
+              '& .MuiAccordion-region': {
+                transition: 'height 0.3s ease-in-out',
+              },
+              '& .MuiAccordionDetails-root': {
+                transition: 'padding 0.3s ease-in-out',
+              }
+            }}
           >
             <AccordionSummary
-              expandIcon={<ExpandMoreIcon sx={{ color: '#1C1B1F' }} />}
+              expandIcon={<ExpandMoreIcon sx={{
+                color: '#1C1B1F',
+                transition: 'transform 0.3s ease-in-out',
+              }} />}
               sx={{
                 px: 0,
                 minHeight: 20,
+                transition: 'all 0.3s ease-in-out',
                 '&.Mui-expanded': {
                   minHeight: 20,
                   '& .MuiAccordionSummary-content': {
                     margin: '5px 0',
+                  },
+                  '& .MuiAccordionSummary-expandIconWrapper': {
+                    transform: 'rotate(180deg)',
                   },
                 },
               }}
@@ -659,10 +671,8 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                     sx={{
                       height: '20px',
                       minWidth: '20px',
-                      fontSize: '12px',
+                      fontSize: '14px',
                       fontWeight: '600',
-                      backgroundColor: '#1976d2',
-                      color: 'white',
                       '& .MuiChip-label': {
                         padding: '0 6px',
                       },
@@ -676,6 +686,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                 padding: '0px',
                 overflow: 'auto',
                 maxHeight: '150px',
+                transition: 'all 0.3s ease-in-out',
               }}
             >
               <FormGroup>
