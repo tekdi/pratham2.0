@@ -678,8 +678,8 @@ const AssessmentDetails: React.FC = () => {
                 }}
                 onClick={() => {
                   const link = document.createElement('a');
-                  link.href = '/document/dummy.pdf';
-                  link.download = '/document/dummy.pdf';
+                  link.href = '/document/Sample_answer_sheet_format.pdf';
+                  link.download = '/document/Sample_answer_sheet_format.pdf';
                   document.body.appendChild(link);
                   link.click();
                   document.body.removeChild(link);

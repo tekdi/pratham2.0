@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic';
 import React, { useState, useCallback, memo, useEffect, useRef } from 'react';
-import { Box, Button, Chip, Drawer, Stack, Typography } from '@mui/material';
+import { Box, Button, Chip, Drawer, Stack, Typography, Fade, Grow } from '@mui/material';
 import { useTranslation } from '@shared-lib';
 import { Close as CloseIcon, FilterList, Search } from '@mui/icons-material';
 import SearchComponent from './SearchComponent';
@@ -23,6 +23,7 @@ export default memo(function LearnerCourse({
 }: LearnerCourseProps) {
   const [filterState, setFilterState] = useState<any>({ limit: 10 });
   const [isOpen, setIsOpen] = useState(false);
+  const [isContentLoaded, setIsContentLoaded] = useState(false);
   const { t } = useTranslation();
   const { staticFilter, filterFramework } = _content ?? {};
   const contentListRef = useRef<HTMLDivElement>(null);
@@ -35,6 +36,14 @@ export default memo(function LearnerCourse({
       setFilterState(_content?.filters ?? {});
     }
   }, [_content?.filters, _content?.searchParams]);
+
+  // Add animation trigger when component mounts
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsContentLoaded(true);
+    }, 100); // Small delay to ensure smooth animation
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleTabChange = useCallback((tab: any) => {
     setFilterState((prevState: any) => ({
@@ -344,35 +353,86 @@ export default memo(function LearnerCourse({
               </Box>
             </Box>
           )}
-          <Content
-            isShowLayout={false}
-            contentTabs={['Course']}
-            showFilter={false}
-            showSearch={false}
-            showHelpDesk={false}
-            {..._content}
-            bodyElementObj={{
-              bodyId: 'l1-content-list-home',
-              topPadding: contentListRef.current?.clientHeight
-                ? contentListRef.current?.clientHeight
-                : 0,
-              ..._content?._config?.bodyElementObj,
-            }}
-            _config={{
-              tabChange: handleTabChange,
-              default_img: '/images/image_ver.png',
-              _card: { isHideProgress: true },
-              _subBox: { sx: { px: 0.5, } },
-              ..._content?._config,
-            }}
-            filters={{
-              ...filterState,
-              filters: {
-                ...filterState.filters,
-                ...staticFilter,
-              },
-            }}
-          />
+          <Fade in={isContentLoaded} timeout={800}>
+            <Box>
+              <Content
+                isShowLayout={false}
+                contentTabs={['Course']}
+                showFilter={false}
+                showSearch={false}
+                showHelpDesk={false}
+                {..._content}
+                bodyElementObj={{
+                  bodyId: 'l1-content-list-home',
+                  topPadding: contentListRef.current?.clientHeight
+                    ? contentListRef.current?.clientHeight
+                    : 0,
+                  ..._content?._config?.bodyElementObj,
+                }}
+                _config={{
+                  tabChange: handleTabChange,
+                  default_img: '/images/image_ver.png',
+                  _card: {
+                    isHideProgress: true,
+                    sx: {
+                      transition: 'all 0.3s ease-in-out',
+                      '&:hover': {
+                        transform: 'translateY(-4px)',
+                        boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
+                      }
+                    }
+                  },
+                  _subBox: {
+                    sx: {
+                      px: 0.5,
+                      '& .MuiGrid-item': {
+                        opacity: 0,
+                        transform: 'translateY(-50px)',
+                        animation: 'slideDownFade 0.8s ease-out forwards',
+                        '&:nth-of-type(1)': { animationDelay: '0.1s' },
+                        '&:nth-of-type(2)': { animationDelay: '0.2s' },
+                        '&:nth-of-type(3)': { animationDelay: '0.3s' },
+                        '&:nth-of-type(4)': { animationDelay: '0.4s' },
+                        '&:nth-of-type(5)': { animationDelay: '0.5s' },
+                        '&:nth-of-type(6)': { animationDelay: '0.6s' },
+                        '&:nth-of-type(7)': { animationDelay: '0.7s' },
+                        '&:nth-of-type(8)': { animationDelay: '0.8s' },
+                        '&:nth-of-type(9)': { animationDelay: '0.9s' },
+                        '&:nth-of-type(10)': { animationDelay: '1.0s' },
+                        '&:nth-of-type(n+11)': { animationDelay: '1.1s' },
+                      }
+                    },
+                  },
+                  _containerGrid: {
+                    sx: {
+                      '@keyframes slideDownFade': {
+                        '0%': {
+                          opacity: 0,
+                          transform: 'translateY(-50px) scale(0.95)',
+                        },
+                        '60%': {
+                          opacity: 0.8,
+                          transform: 'translateY(5px) scale(1.02)',
+                        },
+                        '100%': {
+                          opacity: 1,
+                          transform: 'translateY(0) scale(1)',
+                        },
+                      },
+                    }
+                  },
+                  ..._content?._config,
+                }}
+                filters={{
+                  ...filterState,
+                  filters: {
+                    ...filterState.filters,
+                    ...staticFilter,
+                  },
+                }}
+              />
+            </Box>
+          </Fade>
         </Box>
       </Stack>
     </Stack>

@@ -236,6 +236,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
     } finally {
       setIsSubmitting(false);
     }
+    window.location.reload()
   };
 
   const formatFileSize = (bytes?: number) => {

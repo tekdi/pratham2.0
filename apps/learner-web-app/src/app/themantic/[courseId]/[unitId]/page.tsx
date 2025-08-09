@@ -15,12 +15,19 @@ export async function generateMetadata({ params }: any) {
 const CourseUnitDetails = dynamic(() => import('@CourseUnitDetails'), {
   ssr: false,
 });
-const App = () => {
+const App = ({ params }: { params: { unitId: string } }) => {
+  // Check if this is the "Basics of Energy" unit
+  const isBasicsOfEnergyUnit = params.unitId === 'do_21434524858639155211476';
+
   return (
     <div className="thematic-page">
-      <Layout sx={{ backgroundImage: 'url(/images/energy-background.png)' }}>
+      <Layout
+        sx={{
+          backgroundImage: 'url(/images/energy-background.png)',
+        }}
+      >
         <SubHeader showFilter={false} />
-        <Container maxWidth="lg">
+        <Box className='bs-container bs-px-5'>
           <Box
             sx={{
               '& .css-17kujh3': {
@@ -45,13 +52,13 @@ const App = () => {
                   xl: 4,
                 },
                 _containerGrid: {
-                  spacing: { xs: 6, sm: 6, md: 6 },
+                  spacing: { xs: 5, sm: 5, md: 5 },
                 },
                 default_img: '/images/image_ver.png',
                 _card: {
                   cardComponent: CardComponent,
                   titleFontSize: '14px',
-                  fontWeight: 700,
+                  fontWeight: 600,
                   titleColor: 'black',
                 },
                 _infoCard: {
@@ -61,7 +68,7 @@ const App = () => {
               }}
             />
           </Box>
-        </Container>
+        </Box>
       </Layout>
     </div>
   );

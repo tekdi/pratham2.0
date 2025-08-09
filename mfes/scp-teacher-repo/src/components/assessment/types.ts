@@ -8,6 +8,7 @@ export interface UploadOptionsPopupProps {
   questionSetId?: string;
   identifier?: string;
   onSubmissionSuccess?: () => void;
+  isReUploadMode?: boolean;
 }
 
 export interface UploadedImage {
