@@ -15,10 +15,17 @@ export async function generateMetadata({ params }: any) {
 const CourseUnitDetails = dynamic(() => import('@CourseUnitDetails'), {
   ssr: false,
 });
-const App = () => {
+const App = ({ params }: { params: { unitId: string } }) => {
+  // Check if this is the "Basics of Energy" unit
+  const isBasicsOfEnergyUnit = params.unitId === 'do_21434524858639155211476';
+
   return (
     <div className="thematic-page">
-      <Layout sx={{ backgroundImage: 'url(/images/energy-background.png)' }}>
+      <Layout sx={{
+        ...(isBasicsOfEnergyUnit
+          ? { backgroundColor: 'red' }
+          : { backgroundImage: 'url(/images/energy-background.png)' })
+      }}>
         <SubHeader showFilter={false} />
         <Container maxWidth="lg">
           <Box
