@@ -358,3 +358,27 @@
         padding-left: 3rem !important;
     }
 }
+
+.bs-d-flex {
+    display: flex !important;
+}
+
+.bs-justify-content-between {
+    justify-content: space-between !important;
+}
+
+.bs-align-items-center {
+    align-items: center !important;
+}
+
+.bs-flex-wrap {
+    flex-wrap: wrap !important;
+}
+
+.bs-justify-content-start {
+    justify-content: flex-start !important;
+}
+
+.bs-align-items-end {
+    align-items: flex-end !important;
+}
