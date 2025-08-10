@@ -126,6 +126,9 @@ const Header = () => {
             md: '16.6667%', // offset-md-2
             lg: '25%',      // offset-lg-3
             xl: '25%',      // offset-xl-3
+            '@media (max-width: 600px)': {
+              justifyContent: 'center'
+            }
           },
         }}
       >

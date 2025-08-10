@@ -617,6 +617,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
             key={code}
             sx={{
               boxShadow: 'unset',
+              padding: '8px',
               transition: 'all 0.3s ease-in-out',
               '& .MuiAccordion-region': {
                 transition: 'height 0.3s ease-in-out',
