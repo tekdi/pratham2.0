@@ -258,9 +258,10 @@ export default function Details(props: DetailsProps) {
 
   const onBackClick = () => {
     if (breadCrumbs?.length > 1) {
-      if (breadCrumbs?.[breadCrumbs.length - 2]?.link) {
-        router.push(breadCrumbs?.[breadCrumbs.length - 2]?.link);
-      }
+      router.back()
+      // if (breadCrumbs?.[breadCrumbs.length - 2]?.link) {
+      //   router.push(breadCrumbs?.[breadCrumbs.length - 2]?.link);
+      // }
     } else {
       router.push(
         `${activeLink

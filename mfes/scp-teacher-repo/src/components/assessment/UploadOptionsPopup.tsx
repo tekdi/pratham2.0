@@ -35,6 +35,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
   questionSetId,
   identifier,
   onSubmissionSuccess,
+  setAssessmentTrackingData
 }) => {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -236,7 +237,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
     } finally {
       setIsSubmitting(false);
     }
-    window.location.reload()
+    setAssessmentTrackingData?.(null);
   };
 
   const formatFileSize = (bytes?: number) => {

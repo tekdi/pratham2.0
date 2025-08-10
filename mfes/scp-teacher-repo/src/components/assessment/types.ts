@@ -9,6 +9,7 @@ export interface UploadOptionsPopupProps {
   identifier?: string;
   onSubmissionSuccess?: () => void;
   isReUploadMode?: boolean;
+  setAssessmentTrackingData?: (data: any) => void;
 }
 
 export interface UploadedImage {

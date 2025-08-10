@@ -1313,6 +1313,7 @@ const AssessmentDetails = () => {
         identifier={typeof assessmentId === 'string' ? assessmentId : undefined}
         onSubmissionSuccess={handleSubmissionSuccess}
         isReUploadMode={isReUploadMode}
+        setAssessmentTrackingData={setAssessmentTrackingData}
       />
 
       {/* Snackbar for feedback */}
