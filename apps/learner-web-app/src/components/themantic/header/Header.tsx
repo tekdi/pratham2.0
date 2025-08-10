@@ -138,19 +138,14 @@ const Header = () => {
               lg: '66.6667%', // col-lg-8
               xl: '58.3333%', // col-xl-7
             },
-            mx: {
-              xs: '33.3333%', // offset-4
-              sm: '16.6667%', // offset-sm-2
-              md: '33.3333%', // offset-md-4
-              lg: '33.3333%', // offset-lg-4
-              xl: '41.6667%', // offset-xl-5
-            },
+
           }}
         >
-          <img
+          <Image
             src="/images/siemens-logo_updated.png"
             alt="SIEMENS Logo"
-
+            width={200}
+            height={80}
             style={{
               width: '100%',
               height: 'auto',
