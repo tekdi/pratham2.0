@@ -100,13 +100,27 @@ const App = ({
   // };
 
   return (
-    <Box className="bs-px-5" sx={{ mx: '2vh' }}>
+    <Box className="bs-px-5" sx={{ mx: '2vh', position: 'relative' }}>
       <Box
         sx={{
           display: 'flex',
           alignItems: 'center',
           gap: 1,
           mb: 3,
+          position: 'relative',
+          zIndex: 10,
+          '& .MuiBreadcrumbs-root': {
+            position: 'relative',
+            zIndex: 11,
+          },
+          '& .MuiBreadcrumbs-ol': {
+            position: 'relative',
+            zIndex: 11,
+          },
+          '& .MuiBreadcrumbs-li': {
+            position: 'relative',
+            zIndex: 11,
+          },
         }}
       >
         <BreadCrumb
@@ -116,7 +130,7 @@ const App = ({
           customPlayerMarginTop={25}
         />
       </Box>
-      <Box sx={{ pb: 5, px: '12px' }}>
+      <Box sx={{ pb: 5, px: '12px', position: 'relative', zIndex: 1 }}>
         <Grid container spacing={5}>
           <Grid item xs={12} sm={12} md={3.5} lg={3.5}>
             <Box
@@ -241,9 +255,9 @@ const PlayerBox = ({
   const { t } = useTranslation();
   const [play, setPlay] = useState(false);
 
-  useEffect(() => {
-    setPlay(true);
-  }, []);
+  // useEffect(() => {
+  //   setPlay(false);
+  // }, []);
 
   const handlePlay = () => {
     setPlay(true);
@@ -255,43 +269,83 @@ const PlayerBox = ({
         position: 'relative',
         display: 'flex',
         justifyContent: 'center',
+
       }}
     >
-      {!play && (
+      {!play ? (
         <Box
           sx={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             position: 'relative',
+            width: '100%',
+            backgroundColor: '#f5f5f5',
+            justifyContent: 'center',
+            height: '470px'
           }}
         >
-          <Avatar
-            src={item?.posterImage ?? `/images/image_ver.png`}
-            alt={item?.identifier}
-            style={{
-              height: 'calc(100vh - 235px)',
-              width: '100%',
-              borderRadius: 0,
-            }}
-          />
-          <Button
-            variant="contained"
-            onClick={handlePlay}
+          {/* Show content poster image as preview instead of iframe */}
+          <Box
             sx={{
-              mt: 2,
-              position: 'absolute',
-              left: '50%',
-              top: '50%',
-              transform: 'translate(-50%, -50%)',
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'relative',
+
             }}
           >
-            {t('Play')}
-          </Button>
+            <img
+              src={item?.content?.posterImage || '/images/image_ver.png'}
+              alt={item?.content?.name || item?.content?.title || 'Content Preview'}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+              }}
+            />
+            {/* Play button overlay */}
+            <Button
+              variant="contained"
+              onClick={handlePlay}
+              sx={{
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: '50px',
+                height: '50px',
+                minWidth: 'unset',
+                borderRadius: '50%',
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                border: '3px solid #666666',
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 1)',
+                  transform: 'translate(-50%, -50%) scale(1.05)',
+                  boxShadow: '0 6px 12px rgba(0, 0, 0, 0.4)',
+                },
+                '&::before': {
+                  content: '""',
+                  width: 0,
+                  height: 0,
+                  borderLeft: '25px solid #000000',
+                  borderTop: '15px solid transparent',
+                  borderBottom: '15px solid transparent',
+                  marginLeft: '6px',
+                },
+              }}
+            >
+              <span style={{ display: 'none' }}>{t('Play')}</span>
+            </Button>
+          </Box>
         </Box>
-      )}
-
-      {play && (
+      ) : (
         <Box
           sx={{
             width: '100%',
@@ -324,6 +378,6 @@ const PlayerBox = ({
           />
         </Box>
       )}
-    </Box>
+    </Box >
   );
 };

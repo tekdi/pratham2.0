@@ -306,12 +306,12 @@ export default function Details(props: DetailsProps) {
           breadCrumbs={breadCrumbs}
           isShowLastLink
           customPlayerStyle={true}
-          customPlayerMarginTop={25}
+          customPlayerMarginTop={35}
         />
       )}
       <Box
         sx={{
-          pt: { xs: 4, md: 5 },
+          pt: { xs: 1, md: 2 },
           pb: { xs: 4, md: 10 },
           px: { xs: 2, sm: 3, md: 10 },
           gap: 2,

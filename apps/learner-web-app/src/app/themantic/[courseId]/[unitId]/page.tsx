@@ -27,7 +27,7 @@ const App = ({ params }: { params: { unitId: string } }) => {
         }}
       >
         <SubHeader showFilter={false} />
-        <Box className='bs-container bs-px-5'>
+        <Box className='bs-container' sx={{ px: { xs: 1, sm: 2, md: 3 } }}>
           <Box
             sx={{
               '& .css-17kujh3': {
@@ -41,7 +41,11 @@ const App = ({ params }: { params: { unitId: string } }) => {
               showBreadCrumbs={{
                 prefix: [{ label: 'Home', link: '/themantic' }],
               }}
-              _box={{ px: { xs: 0, sm: 0, md: 0 } }}
+              _box={{
+                px: { xs: 0, sm: 0, md: 0 },
+                pt: { xs: 0, sm: 0, md: 0 },
+                mt: 2.5
+              }}
               _config={{
                 contentBaseUrl: '/themantic',
                 _grid: {

@@ -90,10 +90,10 @@ const SubHeader = ({
           fontFamily: '"Montserrat", sans-serif',
           textAlign: 'center',
           bgcolor: '#fff',
-          py: { xs: [0, 2], sm: [0, 3] },
+          py: { xs: [0, 1], sm: [0, 1] },
           wordWrap: 'break-word',
           lineHeight: 1.2,
-          pt: '10px'
+          pt: '5px'
         }}
       >
         STEM Education for Innovation : Experimento India
@@ -107,8 +107,8 @@ const SubHeader = ({
           alignItems: { xs: 'stretch', md: 'center' },
           justifyContent: 'space-between',
 
-          pb: { xs: 2, sm: 2 },
-          pt: '15px',
+          pb: { xs: 1, sm: 1 },
+          pt: '8px',
           bgcolor: '#fff',
           boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
           borderRadius: 2,
