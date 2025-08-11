@@ -45,16 +45,18 @@ const SearchPage = () => {
 
   const contentApp = useMemo(
     () => (
-      <Container maxWidth="lg">
-        <BreadCrumb
-          breadCrumbs={[
-            { label: 'Home', link: '/themantic' },
-            { label: 'Search', link: '/themantic/search' },
-          ]}
-          isShowLastLink
-          customPlayerStyle={true}
-          customPlayerMarginTop={0}
-        />
+      <Box className='bs-container bs-px-5'>
+        <Box sx={{ position: 'relative', zIndex: 1 }}>
+          <BreadCrumb
+            breadCrumbs={[
+              { label: 'Home', link: '/themantic' },
+              { label: 'Search', link: '/themantic/search' },
+            ]}
+            isShowLastLink
+            customPlayerStyle={true}
+            customPlayerMarginTop={0}
+          />
+        </Box>
         <Box
           sx={{
             '& .css-17kujh3': {
@@ -110,7 +112,7 @@ const SearchPage = () => {
             />
           </Box>
         </Box>
-      </Container>
+      </Box>
     ),
     [submitText]
   );

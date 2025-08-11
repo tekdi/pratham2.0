@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Box } from '@mui/material';
+import { Box, Fade } from '@mui/material';
 import {
   calculateTrackData,
   calculateTrackDataItem,
@@ -123,16 +123,16 @@ export default function Details(props: DetailsProps) {
           props?._config?.getContentData(resultHierarchy);
         }
 
-        // Auto-redirect if there's only one child and we're at course level
-        // if (!unitId && resultHierarchy?.children?.length === 1) {
-        //   const singleChild = resultHierarchy.children[0] as any;
-        //   const childIdentifier = typeof singleChild === 'string' ? singleChild : singleChild?.identifier;
-        //   if (childIdentifier) {
-        //     const redirectPath = `${props?._config?.contentBaseUrl ?? '/content'}/${courseId}/${childIdentifier}${activeLink ? `?activeLink=${activeLink}` : ''}`;
-        //     router.replace(redirectPath);
-        //     return;
-        //   }
-        // }
+        // Auto - redirect if there's only one child and we're at course level
+        if (!unitId && resultHierarchy?.children?.length === 1) {
+          const singleChild = resultHierarchy.children[0] as any;
+          const childIdentifier = typeof singleChild === 'string' ? singleChild : singleChild?.identifier;
+          if (childIdentifier) {
+            const redirectPath = `${props?._config?.contentBaseUrl ?? '/content'}/${courseId}/${childIdentifier}${activeLink ? `?activeLink=${activeLink}` : ''}`;
+            router.replace(redirectPath);
+            return;
+          }
+        }
 
         const userId = getUserId(props?._config?.userIdLocalstorageName);
         let startedOn = {};
@@ -258,9 +258,10 @@ export default function Details(props: DetailsProps) {
 
   const onBackClick = () => {
     if (breadCrumbs?.length > 1) {
-      if (breadCrumbs?.[breadCrumbs.length - 2]?.link) {
-        router.push(breadCrumbs?.[breadCrumbs.length - 2]?.link);
-      }
+      router.back()
+      // if (breadCrumbs?.[breadCrumbs.length - 2]?.link) {
+      //   router.push(breadCrumbs?.[breadCrumbs.length - 2]?.link);
+      // }
     } else {
       router.push(
         `${activeLink
@@ -306,12 +307,12 @@ export default function Details(props: DetailsProps) {
           breadCrumbs={breadCrumbs}
           isShowLastLink
           customPlayerStyle={true}
-          customPlayerMarginTop={25}
+          customPlayerMarginTop={35}
         />
       )}
       <Box
         sx={{
-          pt: { xs: 4, md: 5 },
+          pt: { xs: 1, md: 2 },
           pb: { xs: 4, md: 10 },
           px: { xs: 2, sm: 3, md: 10 },
           gap: 2,
@@ -329,15 +330,72 @@ export default function Details(props: DetailsProps) {
             />
           )
         ) : (
-          <UnitGrid
-            handleItemClick={handleItemClick}
-            item={selectedContent}
-            skipContentId={
-              typeof contentId === 'string' ? contentId : undefined
-            }
-            trackData={trackData}
-            _config={props?._config}
-          />
+          <Fade in={!loading && !!selectedContent} timeout={800}>
+            <Box>
+              <UnitGrid
+                handleItemClick={handleItemClick}
+                item={selectedContent}
+                skipContentId={
+                  typeof contentId === 'string' ? contentId : undefined
+                }
+                trackData={trackData}
+                _config={{
+                  ...props?._config,
+                  _card: {
+                    ...props?._config?._card,
+                    sx: {
+                      transition: 'all 0.3s ease-in-out',
+                      '&:hover': {
+                        transform: 'translateY(-4px)',
+                        boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
+                      },
+                      ...props?._config?._card?.sx,
+                    }
+                  },
+                  _grid: {
+                    ...props?._config?._grid,
+                    // sx: {
+                    //   opacity: 0,
+                    //   transform: 'translateY(-50px)',
+                    //   animation: 'slideDownFade 0.8s ease-out forwards',
+                    //   '&:nth-of-type(1)': { animationDelay: '0.1s' },
+                    //   '&:nth-of-type(2)': { animationDelay: '0.2s' },
+                    //   '&:nth-of-type(3)': { animationDelay: '0.3s' },
+                    //   '&:nth-of-type(4)': { animationDelay: '0.4s' },
+                    //   '&:nth-of-type(5)': { animationDelay: '0.5s' },
+                    //   '&:nth-of-type(6)': { animationDelay: '0.6s' },
+                    //   '&:nth-of-type(7)': { animationDelay: '0.7s' },
+                    //   '&:nth-of-type(8)': { animationDelay: '0.8s' },
+                    //   '&:nth-of-type(9)': { animationDelay: '0.9s' },
+                    //   '&:nth-of-type(10)': { animationDelay: '1.0s' },
+                    //   '&:nth-of-type(n+11)': { animationDelay: '1.1s' },
+                    //   ...props?._config?._grid?.sx,
+                    // }
+                  },
+                  _containerGrid: {
+                    ...props?._config?._containerGrid,
+                    sx: {
+                      '@keyframes slideDownFade': {
+                        '0%': {
+                          opacity: 0,
+                          transform: 'translateY(-50px) scale(0.95)',
+                        },
+                        '60%': {
+                          opacity: 0.8,
+                          transform: 'translateY(5px) scale(1.02)',
+                        },
+                        '100%': {
+                          opacity: 1,
+                          transform: 'translateY(0) scale(1)',
+                        },
+                      },
+                      ...props?._config?._containerGrid?.sx,
+                    }
+                  },
+                }}
+              />
+            </Box>
+          </Fade>
         )}
       </Box>
     </LayoutPage>

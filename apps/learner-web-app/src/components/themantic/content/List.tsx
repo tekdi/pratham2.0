@@ -71,8 +71,8 @@ const List: React.FC<ListProps> = ({
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
-          padding: { xs: 2, md: 4 },
-          py: 4,
+          // px: { xs: 2, md: 4 },
+          py: '48px',
         }}
       >
         <div className={`list-container ${className}`}>
@@ -86,12 +86,13 @@ const List: React.FC<ListProps> = ({
                 </div>
               }
             >
-              <Container maxWidth="lg">
+              <Box className='bs-container bs-px-5'>
                 <Box
                   sx={{
                     '& .css-17kujh3': {
                       overflowY: 'unset !important',
                     },
+
                   }}
                 >
                   <Content
@@ -127,15 +128,15 @@ const List: React.FC<ListProps> = ({
                     hasMoreData={false}
                   />
                 </Box>
-              </Container>
+              </Box>
             </Suspense>
           </div>
         </div>
-        <Container maxWidth="lg" sx={{ mt: 8 }}>
+        <Box className='bs-container bs-px-5' sx={{ mt: 8 }}>
           <Box
             sx={{
               backgroundColor: '#fff',
-              padding: 3,
+              padding: 3.5,
               position: 'relative',
               zIndex: 1000,
               borderRadius: '0px 6px 6px 6px',
@@ -217,7 +218,7 @@ const List: React.FC<ListProps> = ({
               />
             </Box>
           </Box>
-        </Container>
+        </Box>
       </Box>
     </Layout>
   );
@@ -229,7 +230,7 @@ export const mainCourseCard = (props: any) => (
   <CardComponent
     {...props}
     titleFontSize="24px"
-    fontWeight={700}
+    fontWeight={600}
     minHeight="317px"
   />
 );
@@ -293,7 +294,7 @@ export const CardComponent = ({
         minHeight: finalMinHeight || '317px',
         borderRadius: '.25rem',
         '&:hover': {
-          transform: 'scale(1.02)',
+          transform: 'scale(1.07)',
         },
       }}
     >
@@ -327,10 +328,8 @@ export const CardComponent = ({
             textAlign: 'center',
             fontSize: finalTitleFontSize || '16px',
             letterSpacing: '1px',
-            // lineHeight: 1.2,
-            mt: 1,
-            mb: 1,
-            display: '-webkit-box',
+            mt: 0.3,
+            mb: 0.3,
             WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
@@ -338,6 +337,10 @@ export const CardComponent = ({
             color: finalTitleColor || '#212529',
             px: '16px',
             textTransform: finalTextTransform || 'uppercase',
+            minHeight: '42px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
           }}
         >
           {item.name || item.title || 'Untitled'}
@@ -367,7 +370,7 @@ export const CardComponent = ({
                 pb: 2,
               }}
             >
-              <Box sx={{ fontSize: '18px', color: '#363d47', fontWeight: 600 }}>
+              <Box sx={{ fontSize: '18px', color: '#363d47', fontWeight: 500 }}>
                 Explore
               </Box>
               <Box>

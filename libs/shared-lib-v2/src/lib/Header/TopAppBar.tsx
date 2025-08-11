@@ -215,14 +215,14 @@ export const DesktopBar = ({
         }}
       >
         {navLinks.map((link, index) => (
-          <Box key={`${link.title}-${index}`} 
+          <Box key={`${link.title}-${index}`}
             onMouseEnter={handleEnter}
             onMouseLeave={handleLeave}
             sx={{ display: 'inline-block', position: 'relative' }}
           >
             <Box
               sx={{ display: 'flex', alignItems: 'center' }}
-              // Removed onMouseEnter from here
+            // Removed onMouseEnter from here
             >
               <Button
                 component={typeof link.to === 'string' ? 'a' : 'button'}
@@ -243,7 +243,13 @@ export const DesktopBar = ({
                     ? link.to(e)
                     : openMenuAtLevel(0, e.currentTarget, link.child ?? []);
                 }}
-                onMouseEnter={link.child ? (e: any) => openMenuAtLevel(0, e.currentTarget, link.child ?? []) : undefined}
+                onMouseEnter={(e: any) => {
+                  if (link.child && link.child.length > 0) {
+                    openMenuAtLevel(0, e.currentTarget, link.child);
+                  } else {
+                    setMenus([]); // Close all menus if no children
+                  }
+                }}
               >
                 <Typography
                   variant="body1"
@@ -269,7 +275,13 @@ export const DesktopBar = ({
                     e.stopPropagation();
                     openMenuAtLevel(0, e.currentTarget, link?.child ?? []);
                   }}
-                  onMouseEnter={(e) => openMenuAtLevel(0, e.currentTarget, link.child ?? [])}
+                  onMouseEnter={(e) => {
+                    if (link.child && link.child.length > 0) {
+                      openMenuAtLevel(0, e.currentTarget, link.child);
+                    } else {
+                      setMenus([]); // Close all menus if no children
+                    }
+                  }}
                 >
                   <ArrowDropDownIcon
                     fontSize="small"
@@ -352,8 +364,8 @@ export const DesktopBar = ({
                             : 'inherit'
                           : item?.isActive?.replaceAll(' ', '%20') ===
                             withoutQueryString()
-                          ? theme.palette.primary.main
-                          : 'inherit',
+                            ? theme.palette.primary.main
+                            : 'inherit',
                     }}
                   >
                     <MenuItem

@@ -526,38 +526,40 @@ const AssessmentDetails: React.FC = () => {
   const getSortButtonText = () => {
     switch (sortOption) {
       case 'completed':
-        return statusMapping['Approved']; // 'Marks Approved'
+        return t('AI.MARKS_APPROVED');
       case 'awaiting_approval':
-        return statusMapping['AI Processed']; // 'Awaiting Your Approval'
+        return t('AI.AWAITING_YOUR_APPROVAL');
       case 'not_started':
-        return 'Not Submitted';
+        return t('AI.NOT_SUBMITTED');
       case 'in_progress':
-        return statusMapping['AI Pending']; // 'Under AI Evaluation'
+        return t('AI.UNDER_AI_EVALUATION');
       case 'name_asc':
-        return 'Name (A-Z)';
+        return t('AI.NAME_A_TO_Z');
       case 'name_desc':
-        return 'Name (Z-A)';
+        return t('AI.NAME_Z_TO_A');
       case 'score_desc':
-        return 'Score (High to Low)';
+        return t('AI.SCORE_HIGH_TO_LOW');
       case 'score_asc':
-        return 'Score (Low to High)';
+        return t('AI.SCORE_LOW_TO_HIGH');
       case 'all':
       default:
-        return 'All Learners';
+        return t('AI.ALL_LEARNERS');
     }
   };
 
   const getStatusText = (status: string, score?: number, maxScore?: number) => {
     switch (status) {
       case 'completed':
-        return `Marks approved: ${score || 125}/${maxScore || assessmentData?.maxScore || 130
-          }`;
+        return t('AI.MARKS_APPROVED_SCORE', {
+          score: score || 125,
+          maxScore: maxScore || assessmentData?.maxScore || 130
+        });
       case 'in_progress':
-        return 'Under AI Evaluation';
+        return t('AI.UNDER_AI_EVALUATION');
       case 'awaiting_approval':
-        return 'Awaiting Your Approval';
+        return t('AI.AWAITING_YOUR_APPROVAL');
       case 'not_started':
-        return 'Not Submitted';
+        return t('AI.NOT_SUBMITTED');
       default:
         return '';
     }
@@ -615,15 +617,15 @@ const AssessmentDetails: React.FC = () => {
       },
       {
         count: counts.in_progress,
-        label: statusMapping['AI Pending'], // 'Under AI Evaluation'
+        label: t('AI.UNDER_AI_EVALUATION'),
       },
       {
         count: counts.awaiting_approval,
-        label: statusMapping['AI Processed'], // 'Awaiting Your Approval'
+        label: t('AI.AWAITING_YOUR_APPROVAL'),
       },
       {
         count: counts.completed,
-        label: statusMapping['Approved'], // 'Marks Approved'
+        label: t('AI.MARKS_APPROVED'),
       },
     ];
   };
@@ -678,14 +680,14 @@ const AssessmentDetails: React.FC = () => {
                 }}
                 onClick={() => {
                   const link = document.createElement('a');
-                  link.href = '/document/dummy.pdf';
-                  link.download = '/document/dummy.pdf';
+                  link.href = '/document/Sample_answer_sheet_format.pdf';
+                  link.download = '/document/Sample_answer_sheet_format.pdf';
                   document.body.appendChild(link);
                   link.click();
                   document.body.removeChild(link);
                 }}
               >
-                Sample Question and Answer Paper
+                {t('AI.SAMPLE_QUESTION_AND_ANSWER_PAPER')}
               </Button>
             </Box>
           </Box>
@@ -1050,7 +1052,7 @@ const AssessmentDetails: React.FC = () => {
                     }}
                   >
                     {searchTerm
-                      ? 'No learners found matching your search.'
+                      ? t('AI.NO_LEARNERS_FOUND_MATCHING_SEARCH')
                       : t('ASSESSMENTS.NO_DATA_FOUND')}
                   </Typography>
                 </Box>
@@ -1077,13 +1079,12 @@ const AssessmentDetails: React.FC = () => {
               variant="h6"
               sx={{ fontWeight: 600, fontFamily: 'Poppins' }}
             >
-              {t('ASSESSMENTS.OFFLINE_ASSESSMENT') || 'Offline Assessment'}
+              {t('AI.OFFLINE_ASSESSMENT')}
             </Typography>
           </DialogTitle>
           <DialogContent>
             <Typography variant="body1" sx={{ mb: 3, fontFamily: 'Poppins' }}>
-              {t('ASSESSMENTS.DOWNLOAD_ASSESSMENT_MESSAGE') ||
-                'This assessment contains Long/Short Answer questions. Would you like to download the offline question paper?'}
+              {t('AI.DOWNLOAD_ASSESSMENT_MESSAGE')}
             </Typography>
             <Box
               sx={{
@@ -1235,12 +1236,12 @@ const AssessmentDetails: React.FC = () => {
                       }}
                     >
                       <Typography sx={{ fontSize: '14px', color: '#1F1B13' }}>
-                        {statusMapping['Approved']}
+                        {t('AI.MARKS_APPROVED')}
                       </Typography>
                       <Typography sx={{ fontSize: '14px', color: '#7C766F' }}>
                         (
                         {getStatusCounts().find(
-                          (item) => item.label === statusMapping['Approved']
+                          (item) => item.label === t('AI.MARKS_APPROVED')
                         )?.count || 0}
                         )
                       </Typography>
@@ -1265,14 +1266,13 @@ const AssessmentDetails: React.FC = () => {
                       }}
                     >
                       <Typography sx={{ fontSize: '14px', color: '#1F1B13' }}>
-                        {statusMapping['AI Processed']}
+                        {t('AI.AWAITING_YOUR_APPROVAL')}
                       </Typography>
                       <Typography sx={{ fontSize: '14px', color: '#7C766F' }}>
                         (
                         {getStatusCounts().find(
-                          (item) => item.label === statusMapping['AI Processed']
+                          (item) => item.label === t('AI.AWAITING_YOUR_APPROVAL')
                         )?.count || 0}
-                        )
                       </Typography>
                     </Box>
                   }
@@ -1295,12 +1295,12 @@ const AssessmentDetails: React.FC = () => {
                       }}
                     >
                       <Typography sx={{ fontSize: '14px', color: '#1F1B13' }}>
-                        {statusMapping['AI Pending']}
+                        {t('AI.UNDER_AI_EVALUATION')}
                       </Typography>
                       <Typography sx={{ fontSize: '14px', color: '#7C766F' }}>
                         (
                         {getStatusCounts().find(
-                          (item) => item.label === statusMapping['AI Pending']
+                          (item) => item.label === t('AI.UNDER_AI_EVALUATION')
                         )?.count || 0}
                         )
                       </Typography>
