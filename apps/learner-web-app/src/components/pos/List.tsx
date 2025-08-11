@@ -69,7 +69,7 @@ export default function App({
             name:
               typeof pagename === 'object' && program in pagename
                 ? linkLabelName[pagename[program] as LinkLabelType] ??
-                  pagename[program]
+                pagename[program]
                 : pagename?.['Second Chance'] || '',
           },
         ]);
@@ -100,9 +100,8 @@ export default function App({
               typeof pagename === 'string'
                 ? linkLabelName[pagename as LinkLabelType] ?? pagename
                 : '',
-            link: `/pos/${
-              typeof pagename === 'string' ? pagename.toLowerCase() : ''
-            }`,
+            link: `/pos/${typeof pagename === 'string' ? pagename.toLowerCase() : ''
+              }`,
           },
           {
             name: linkLabelName[subDomain as LinkLabelType] ?? subDomain,
@@ -115,8 +114,8 @@ export default function App({
         se_domains: [`Learning for ${pagename}`],
         ...(searchParams?.get('se_subDomains')?.split(',')
           ? {
-              se_subDomains: searchParams?.get('se_subDomains')?.split(','),
-            }
+            se_subDomains: searchParams?.get('se_subDomains')?.split(','),
+          }
           : {}),
         program: ['Open School'],
       });
@@ -200,7 +199,7 @@ export default function App({
                   isHideProgress: true,
                   isHideProgressStatus: true,
                   isWrap: true,
-                  _cardMedia: { sx: { height: '153px' } },
+                  _cardMedia: { sx: { height: '153px' } }
                 },
               },
               handleCardClick: handleCardClickLocal,

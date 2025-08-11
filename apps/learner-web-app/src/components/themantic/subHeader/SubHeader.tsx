@@ -80,20 +80,20 @@ const SubHeader = ({
   };
 
   return (
-    <>
+    <Box className='bs-container-fluid  bs-px-md-5 bs-px-sm-3' sx={{ background: '#fff' }}>
       {/* Main Title */}
       <Box
         sx={{
           fontSize: { xs: '24px', sm: '28px', md: '32px', lg: '36px' },
-          fontWeight: 700,
+          fontWeight: 600,
           color: '#3891CE',
           fontFamily: '"Montserrat", sans-serif',
           textAlign: 'center',
           bgcolor: '#fff',
-          px: { md: '78px' },
-          py: { xs: [0, 2], sm: [0, 3] },
+          py: { xs: [0, 1], sm: [0, 1] },
           wordWrap: 'break-word',
           lineHeight: 1.2,
+          pt: '5px'
         }}
       >
         STEM Education for Innovation : Experimento India
@@ -106,9 +106,9 @@ const SubHeader = ({
           flexDirection: { xs: 'column', md: 'row' },
           alignItems: { xs: 'stretch', md: 'center' },
           justifyContent: 'space-between',
-          px: { xs: 2, sm: 4, md: 6, lg: '48px' },
-          pb: { xs: 2, sm: 2 },
-          pt: '15px',
+
+          pb: { xs: 1, sm: 1 },
+          pt: '8px',
           bgcolor: '#fff',
           boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
           borderRadius: 2,
@@ -134,9 +134,10 @@ const SubHeader = ({
                 sx={{
                   bgcolor: '#fff',
                   color: '#222',
-                  borderRadius: '8px',
+                  borderRadius: '4px',
                   fontWeight: 500,
                   border: '1px solid #d1d5db',
+                  height: '40px',
 
                   boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
                   '& .MuiSelect-select': {
@@ -184,7 +185,7 @@ const SubHeader = ({
               <Typography
                 variant="h6"
                 sx={{
-                  fontWeight: 700,
+                  fontWeight: 600,
                   fontSize: { xs: '16px', sm: '18px' },
                   color: 'black',
                   mb: 0.5,
@@ -197,16 +198,7 @@ const SubHeader = ({
               >
                 {resourceCount} Resources
               </Typography>
-              <Box
-                sx={{
-                  height: 3,
-                  width: { xs: 40, sm: 48 },
-                  mx: 'auto',
-                  bgcolor: 'primary.main',
-                  borderRadius: 2,
-                  opacity: 0.2,
-                }}
-              />
+
             </Box>
           </Box>
         )}
@@ -260,7 +252,7 @@ const SubHeader = ({
           </Box>
         </Box>
       </Box>
-    </>
+    </Box>
   );
 };
 

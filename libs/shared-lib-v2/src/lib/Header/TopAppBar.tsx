@@ -215,12 +215,14 @@ export const DesktopBar = ({
         }}
       >
         {navLinks.map((link, index) => (
-          <Box key={`${link.title}-${index}`} onMouseLeave={handleLeave}>
+          <Box key={`${link.title}-${index}`}
+            onMouseEnter={handleEnter}
+            onMouseLeave={handleLeave}
+            sx={{ display: 'inline-block', position: 'relative' }}
+          >
             <Box
               sx={{ display: 'flex', alignItems: 'center' }}
-              onMouseEnter={(e) =>
-                openMenuAtLevel(0, e.currentTarget, link.child ?? [])
-              }
+            // Removed onMouseEnter from here
             >
               <Button
                 component={typeof link.to === 'string' ? 'a' : 'button'}
@@ -240,6 +242,13 @@ export const DesktopBar = ({
                   typeof link.to !== 'string' && link.to !== undefined
                     ? link.to(e)
                     : openMenuAtLevel(0, e.currentTarget, link.child ?? []);
+                }}
+                onMouseEnter={(e: any) => {
+                  if (link.child && link.child.length > 0) {
+                    openMenuAtLevel(0, e.currentTarget, link.child);
+                  } else {
+                    setMenus([]); // Close all menus if no children
+                  }
                 }}
               >
                 <Typography
@@ -266,6 +275,13 @@ export const DesktopBar = ({
                     e.stopPropagation();
                     openMenuAtLevel(0, e.currentTarget, link?.child ?? []);
                   }}
+                  onMouseEnter={(e) => {
+                    if (link.child && link.child.length > 0) {
+                      openMenuAtLevel(0, e.currentTarget, link.child);
+                    } else {
+                      setMenus([]); // Close all menus if no children
+                    }
+                  }}
                 >
                   <ArrowDropDownIcon
                     fontSize="small"
@@ -274,6 +290,23 @@ export const DesktopBar = ({
                 </IconButton>
               )}
             </Box>
+            {/* Popper for this nav item */}
+            {menus[0] && menus[0].anchorEl === document.activeElement && (
+              <></>
+            )}
+            {menus[0] && menus[0].anchorEl === document.activeElement && (
+              <></>
+            )}
+            {menus[0] && menus[0].anchorEl === document.activeElement && (
+              <></>
+            )}
+            {menus[0] && menus[0].anchorEl === document.activeElement && (
+              <></>
+            )}
+            {/* Render Popper for this nav item if open */}
+            {menus[0] && menus[0].anchorEl === document.activeElement && (
+              <></>
+            )}
           </Box>
         ))}
 
@@ -294,8 +327,7 @@ export const DesktopBar = ({
           anchorEl={menu.anchorEl}
           placement="bottom"
           disablePortal
-          onMouseEnter={handleEnter}
-          onMouseLeave={handleLeave}
+          // Removed onMouseEnter/onMouseLeave from here
           modifiers={[
             {
               name: 'offset',
@@ -309,7 +341,7 @@ export const DesktopBar = ({
             mt: level === 0 ? 0.5 : 0,
           }}
         >
-          <Paper elevation={3}>
+          <Paper elevation={3} onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
             <Box display="flex" flexDirection="row" flexWrap="wrap">
               {menu.items.map((item, idx) => {
                 const hasChild =
@@ -332,8 +364,8 @@ export const DesktopBar = ({
                             : 'inherit'
                           : item?.isActive?.replaceAll(' ', '%20') ===
                             withoutQueryString()
-                          ? theme.palette.primary.main
-                          : 'inherit',
+                            ? theme.palette.primary.main
+                            : 'inherit',
                     }}
                   >
                     <MenuItem

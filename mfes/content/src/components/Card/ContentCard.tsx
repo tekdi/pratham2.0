@@ -23,7 +23,11 @@ const ContentCard = ({
 
   if (_card?.cardComponent) {
     return (
-      <CardWrap isWrap={isWrap && type === 'Course'} _card={_card}>
+      <CardWrap
+        // isWrap={isWrap && type === 'Course'}
+        _card={_card}
+
+        isWrap={false}>
         <_card.cardComponent
           item={item}
           type={type}
@@ -35,15 +39,26 @@ const ContentCard = ({
       </CardWrap>
     );
   }
+  console.log('ContentCard: No cardComponent found in _card', item);
   return (
-    <CardWrap isWrap={isWrap && type === 'Course'} _card={_card}>
+    <CardWrap
+      // isWrap={isWrap && type === 'Course'} 
+
+      _card={_card} isWrap={false}>
       <CommonCard
         title={(item?.name || '').trim()}
-        image={
-          item?.posterImage && item?.posterImage !== 'undefined'
-            ? item?.posterImage
-            : default_img ?? `${AppConst.BASEPATH}/assests/images/image_ver.png`
-        }
+        // image={
+        //   item?.posterImage && item?.posterImage !== 'undefined'
+        //     ? item?.posterImage
+        //     : default_img ?? `${AppConst.BASEPATH}/assests/images/image_ver.png`
+        // }
+         image={
+  item?.posterImage
+    ? item.posterImage
+    : item?.appIcon
+      ? item.appIcon
+      : default_img ?? `${AppConst.BASEPATH}/assests/images/image_ver.png`
+}
         content={item?.description ? item?.description : <Description />}
         actions={
           type !== 'Course' && (

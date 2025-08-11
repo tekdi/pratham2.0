@@ -144,7 +144,7 @@ const Page = () => {
                 lineHeight: '110%',
                 letterSpacing: '0%',
                 color: '#1F1B13',
-                position: 'relative',
+                // position: 'relative',
                 zIndex: 1000,
                 '@media (min-width: 900px)': {
                   marginLeft: '-120px',
@@ -253,7 +253,7 @@ const Page = () => {
           backgroundColor: '#F1F2F2',
           p: '32px',
           marginTop: '-60px',
-          zIndex: 1000,
+          zIndex: 1,
           position: 'relative',
           '@media (max-width: 900px)': {
             mx: '16px',
