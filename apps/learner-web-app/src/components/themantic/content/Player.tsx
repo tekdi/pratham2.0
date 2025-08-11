@@ -87,6 +87,7 @@ const App = ({
   if (!identifier) {
     return <div>Loading...</div>;
   }
+
   // const onBackClick = () => {
   //   if (breadCrumbs?.length > 1) {
   //     if (breadCrumbs?.[breadCrumbs.length - 1]?.link) {
@@ -255,9 +256,9 @@ const PlayerBox = ({
   const { t } = useTranslation();
   const [play, setPlay] = useState(false);
 
-  // useEffect(() => {
-  //   setPlay(false);
-  // }, []);
+  useEffect(() => {
+    setPlay(true);
+  }, []);
 
   const handlePlay = () => {
     setPlay(true);
@@ -277,12 +278,12 @@ const PlayerBox = ({
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'center',
+            // alignItems: 'center',
             position: 'relative',
-            width: '100%',
+            width: '85%',
             backgroundColor: '#f5f5f5',
             justifyContent: 'center',
-            height: '470px'
+            height: '100%'
           }}
         >
           {/* Show content poster image as preview instead of iframe */}
