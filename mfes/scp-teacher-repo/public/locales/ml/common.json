@@ -238,7 +238,7 @@
     "NO_LEARNER_WITH_LOW_ATTENDANCE": "എന്തും ഇല്ല",
     "ATTENDANCE_MARKED_OUT_OF_DAYS": "ഹാജർ അടയാളപ്പെടുത്തിയിരിക്കുന്നു: {{count}} കഴിഞ്ഞ 7 ദിവസങ്ങളിൽ"
   },
-   "PROFILE": {
+  "PROFILE": {
     "EDIT_PROFILE": "പ്രൊഫൈൽ എഡിറ്റ് ചെയ്യുക",
     "CONTACT_INFORMATION": "ബന്ധപ്പെടാനുള്ള വിവരങ്ങൾ",
     "OTHER_INFORMATION": "മറ്റുള്ള വിവരങ്ങൾ",
@@ -301,7 +301,7 @@
     "MONTH_MOBILISATION": "സൗകര്യമാക്കുന്നതിനുള്ള മാസങ്ങൾ",
     "DROP_OUT_REASON": "സ്കൂളിൽ നിന്നും ഒഴിഞ്ഞതിന്റെ കാരണം"
   },
-   "DROPOUT_REASONS": {
+  "DROPOUT_REASONS": {
     "UNABLE_TO_COPE_WITH_STUDIES": "അഭ്യസിക്കുവാൻ സാധിക്കുന്നില്ല",
     "FAMILY_RESPONSIBILITIES": "കുടുംബത്തിന്റെ ഉത്തരവാദിത്തങ്ങൾ",
     "NEED_TO_GO_TO_WORK_OWN_WORK": "ജോലിക്ക് / സ്വന്തം ജോലിക്ക് പോകണം",
@@ -338,7 +338,7 @@
     "SEARCH_BLOCKS": "ബ്ലോക്കുകൾ തിരയുക",
     "REASSIGN_BLOCK_REQUESTED": "ബ്ലോക്ക് പുനർക്രമീകരണ ആവശ്യകം വിജയകരമായി അയച്ചു!"
   },
-   "CENTERS": {
+  "CENTERS": {
     "CENTERS": "കേന്ദ്രങ്ങൾ",
     "REGULAR_CENTERS": "സാധാരണ കേന്ദ്രങ്ങൾ",
     "REMOTE_CENTERS": "ദൂര കേന്ദ്രങ്ങൾ",
@@ -536,7 +536,7 @@
     "MUST_BE_GREATER_THAN": "{{fieldname}} {{minLength}}-നു കൂടുതലായിരിക്കണം",
     "ENTER_VALID_CENTER_NAME": "സാധുവായ കേന്ദ്രത്തിന്റെ പേര് നൽകുക"
   },
-    "COURSE_PLANNER": {
+  "COURSE_PLANNER": {
     "COURSE_PLANNER": "പാഠ്യപദ്ധതി പദ്ധതി",
     "FOUNDATION_COURSE": "അധാരം കോഴ്‌സ്",
     "MAIN_COURSE": "പ്രധാന കോഴ്‌സ്",
@@ -544,7 +544,7 @@
     "EXPAND_ALL": "എല്ലാം വ്യാപിപ്പിക്കുക",
     "RESOURCES": "ശ്രദ്ധിക്കാവുന്ന കാര്യങ്ങൾ"
   },
-"ASSESSMENTS": {
+  "ASSESSMENTS": {
     "ASSESSMENTS": "അവലോകനങ്ങൾ",
     "CENTER": "കേന്ദ്രം",
     "ASSESSMENT_TYPE": "അവലോകന തരം",
@@ -566,7 +566,7 @@
     "NO_SUBJECT_FOUND": "വിദ്യാഭ്യാസ വിഷയം കണ്ടെത്തിയില്ല",
     "NO_ASSIGNED": "ഒന്നും നിയോഗിച്ചിട്ടില്ല"
   },
-   "BOARD_ENROLMENT": {
+  "BOARD_ENROLMENT": {
     "BOARD_ENROLLMENT": "ബോർഡ് രജിസ്ട്രേഷൻ",
     "BOARD_SELECTION": "ബോർഡ് തിരഞ്ഞെടുപ്പ്",
     "SUBJECTS_SELECTION": "വിദ്യാഭ്യാസ വിഷയങ്ങൾ തിരഞ്ഞെടുപ്പ്",
@@ -579,6 +579,62 @@
     "TO_SAVE_YOUR_PROGRESS": "നിങ്ങളുടെ പുരോഗതി സംരക്ഷിക്കാൻ “സേവ് ചെയ്യുക & അടുത്തത്” ക്ലിക്ക് ചെയ്യുക. നിങ്ങൾക്ക് എപ്പോഴും തിരിച്ചുവരാൻ കഴിയും.",
     "MANDATORY": "{{FeesStepBoards}} നു മാത്രം ആവിശ്യമാണ്. മറ്റ് ബോർഡുകൾക്കായി, ഈ ഘട്ടം സ്വയം പൂർത്തിയായിരിക്കുന്നു. ഡാറ്റ സമർപ്പിക്കാൻ ദയവായി സേവ് ക്ലിക്ക് ചെയ്യുക.",
     "COMPLETED": "പൂർത്തിയായി",
-     "MARK_AS_COMPLETE": "പൂർണ്ണമായതായി അടയാളപ്പെടുത്തുക"
+    "MARK_AS_COMPLETE": "പൂർണ്ണമായതായി അടയാളപ്പെടുത്തുക"
+  },
+  "AI": {
+    "ASSESSMENT_DETAILS": "മൂല്യനിർണ്ണയ വിശദാംശങ്ങൾ",
+    "SAMPLE_QUESTION_AND_ANSWER_PAPER": "സാമ്പിൾ ചോദ്യം ഉത്തരം പേപ്പർ",
+    "SEARCH_LEARNER": "പഠിതാവിനെ തിരയുക..",
+    "TOTAL_LEARNERS": "{{count}} / {{total}} പഠിതാക്കൾ",
+    "SORT_AND_FILTER_LEARNERS": "പഠിതാക്കളെ ക്രമീകരിക്കുക, ഫിൽറ്റർ ചെയ്യുക",
+    "FILTER_BY_STATUS": "സ്ഥിതിപ്രകാരം ഫിൽറ്റർ ചെയ്യുക",
+    "ALL_LEARNERS": "എല്ലാ പഠിതാക്കളും",
+    "SORT_BY_NAME": "പേരിനുസരിച്ച് ക്രമീകരിക്കുക",
+    "SORT_BY_SCORE": "മാർക്കിനുസരിച്ച് ക്രമീകരിക്കുക",
+    "NAME_A_TO_Z": "പേര് (A മുതൽ Z വരെ)",
+    "NAME_Z_TO_A": "പേര് (Z മുതൽ A വരെ)",
+    "SCORE_HIGH_TO_LOW": "മാർക്ക് (ഉയർന്നത് മുതൽ താഴേക്ക്)",
+    "SCORE_LOW_TO_HIGH": "മാർക്ക് (താഴ്ന്നത് മുതൽ ഉയരേക്ക്)",
+    "NAME_A_TO_Z_DETAILED": "പേര് (A മുതൽ Z വരെ)",
+    "NAME_Z_TO_A_DETAILED": "പേര് (Z മുതൽ A വരെ)",
+    "SCORE_HIGH_TO_LOW_DETAILED": "മാർക്ക് (ഉയർന്നത് മുതൽ താഴേക്ക്)",
+    "SCORE_LOW_TO_HIGH_DETAILED": "മാർക്ക് (താഴ്ന്നത് മുതൽ ഉയരേക്ക്)",
+    "CANCEL": "റദ്ദാക്കുക",
+    "APPLY": "പ്രയോഗിക്കുക",
+    "NOT_SUBMITTED": "സമർപ്പിച്ചിട്ടില്ല",
+    "UNDER_AI_EVALUATION": "എഐ മൂല്യനിർണ്ണയത്തിൽ",
+    "AWAITING_YOUR_APPROVAL": "നിങ്ങളുടെ അംഗീകാരം കാത്തിരിക്കുന്നു",
+    "MARKS_APPROVED": "മാർക്ക് അംഗീകരിച്ചു",
+    "MARKS_APPROVED_SCORE": "അംഗീകരിച്ച മാർക്ക്: {{score}}/{{maxScore}}",
+    "APPROVED_ON": "അംഗീകരിച്ച തീയതി: {{date}}",
+    "UPLOADED_ON": "അപ്‌ലോഡ് തീയതി: {{date}}",
+    "NO_LEARNERS_FOUND_SEARCH": "നിങ്ങളുടെ തിരച്ചിലിന് യോജിച്ച പഠിതാക്കൾ ഇല്ല.",
+    "NO_LEARNERS_FOUND": "പഠിതാക്കൾ ഒന്നും കണ്ടെത്തിയില്ല",
+    "DOWNLOADING": "ഡൗൺലോഡ് ചെയ്യുന്നു...",
+    "QUESTION_PAPER": "ചോദ്യപേപ്പർ",
+    "ASSESSMENT": "മൂല്യനിർണ്ണയം",
+    "ASSESSMENT_DESCRIPTION": "മൂല്യനിർണ്ണയ വിവരണം",
+    "GENERAL": "പൊതു",
+    "NOT_SPECIFIED": "സൂചിപ്പിച്ചിട്ടില്ല",
+    "UNKNOWN_LEARNER": "അജ്ഞാത പഠിതാവ്",
+    "SORT_BY_STATUS": "സ്ഥിതിപ്രകാരം ക്രമീകരിക്കുക",
+    "LEARNERS_COUNT": "{{count}} / {{total}} പഠിതാക്കൾ",
+    "NO_LEARNERS_FOUND_MATCHING_SEARCH": "നിങ്ങളുടെ തിരച്ചിലിന് യോജിച്ച പഠിതാക്കൾ ഇല്ല.",
+    "OFFLINE_ASSESSMENT": "ഓഫ്‌ലൈൻ മൂല്യനിർണ്ണയം",
+    "DOWNLOAD_ASSESSMENT_MESSAGE": "ഈ മൂല്യനിർണ്ണയത്തിൽ ദൈർഘ്യമേറിയ/ചെറുതായ ഉത്തര ചോദ്യങ്ങളുണ്ട്. നിങ്ങൾക്ക് ഓഫ്ലൈൻ ചോദ്യപേപ്പർ ഡൗൺലോഡ് ചെയ്യണോ?",
+    "ENROLLMENT_ID": "ചേരൽ ഐഡി",
+    "UPLOAD": "അപ്‌ലോഡ്",
+    "NO_IMAGES_UPLOADED_YET": "ഇനി ചിത്രങ്ങൾ അപ്‌ലോഡ് ചെയ്തിട്ടില്ല",
+    "PLEASE_UPLOAD_ASSESSMENT_IMAGES": "ദയവായി മൂല്യനിർണ്ണയ ചിത്രങ്ങൾ അപ്‌ലോഡ് ചെയ്യുക",
+    "ASSESSMENT_SHEETS": "മൂല്യനിർണ്ണയ ഷീറ്റുകൾ",
+    "FORMAT_JPG_SIZE_5MB_UP_TO_4_IMAGES": "* ഫോർമാറ്റ്: jpg, വലുപ്പം: 5 MB വരെ പരമാവധി 4 ചിത്രങ്ങൾ",
+    "PLACE_PAPER_ON_FLAT_CLEAN_SURFACE": "• പേപ്പർ നിരപ്പായ വൃത്തിയുള്ള ഉപരിതലത്തിൽ വയ്ക്കുക",
+    "HOLD_PHONE_STRAIGHT_ABOVE_PAPER": "• ഫോൺ പേപ്പറിന് നേരെ മുകളിൽ പിടിക്കുക",
+    "ENSURE_GOOD_LIGHTING_AVOID_SHADOWS": "• നല്ല വെളിച്ചം ഉറപ്പാക്കുക, നിഴൽ ഒഴിവാക്കുക",
+    "ENSURE_ALL_TEXT_CLEAR_VISIBLE": "• എല്ലാ എഴുത്തും വ്യക്തമായി കാണുന്നുവെന്ന് ഉറപ്പാക്കുക",
+    "CLICK_IMAGE_AND_UPLOAD_TO_PORTAL": "• ചിത്രം എടുത്ത് പോർട്ടലിൽ അപ്‌ലോഡ് ചെയ്യുക",
+    "IF_ANSWER_SHEET_MULTIPLE_PAGES": "• ഉത്തര ഷീറ്റിൽ ഒന്നിലധികം പേജുകൾ ഉണ്ടെങ്കിൽ, ഓരോന്നും വേർതിരിച്ച് ചിത്രമെടുത്ത് അപ്‌ലോഡ് ചെയ്യുക",
+    "READ_LESS": "കുറച്ച് വായിക്കുക",
+    "READ_MORE": "കൂടുതൽ വായിക്കുക"
   }
 }
