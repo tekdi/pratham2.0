@@ -36,7 +36,8 @@ const DynamicForm = ({
   hideSubmit,
   type,
   isCompleteProfile=false,
-  isReassign=false
+  isReassign=false,
+  createNew=true
 }: any) => {
   const { t } = useTranslation();
   const hasPrefilled = useRef(false);
@@ -71,12 +72,17 @@ const DynamicForm = ({
     }
   
     if (!prefilledFormData.family_member_details) {
-      // Remove the three fields if no family member is selected
-      delete cleaned.mother_name;
-      delete cleaned.father_name;
-      delete cleaned.spouse_name;
+      // Only remove family member fields if they don't exist in the original data
+      if (!prefilledFormData.mother_name) {
+        delete cleaned.mother_name;
+      }
+      if (!prefilledFormData.father_name) {
+        delete cleaned.father_name;
+      }
+      if (!prefilledFormData.spouse_name) {
+        delete cleaned.spouse_name;
+      }
       delete cleaned.family_member_details;
-      // delete cleaned.dob;
     }
     
     return cleaned;
@@ -113,19 +119,18 @@ const DynamicForm = ({
     }
     return uiSchema;
   };
-
-  const [formData, setFormData] = useState(getInitialFormData());
-
-  const [formUiSchemaOriginal, setFormUiSchemaOriginal] = useState(getInitialUiSchema());
-  const [formUiSchema, setFormUiSchema] = useState(getInitialUiSchema());
-    const [formSchema, setFormSchema] = useState(getInitialSchema());
+  // Initialize state based on createNewLearner flag
+  const [formSchema, setFormSchema] = useState(createNew? schema : getInitialSchema());
+  const [formUiSchemaOriginal, setFormUiSchemaOriginal] = useState(createNew ? uiSchema : getInitialUiSchema());
+  const [formUiSchema, setFormUiSchema] = useState(createNew ? uiSchema : getInitialUiSchema());
+  const [formData, setFormData] = useState(createNew ? prefilledFormData : getInitialFormData());
+  
 
 
   //custom validation on formData for learner fields hide on dob
   useEffect(() => {
     if (type == 'learner'  && !isReassign) {
       // ...existing code...
-      console.log('hello');
       let requiredKeys = ['parent_phone', "guardian_relation" , "guardian_name"];
       let requiredKeys2 = ['mobile'];
       console.log('formDatadynamicform', formData.family_member_details);

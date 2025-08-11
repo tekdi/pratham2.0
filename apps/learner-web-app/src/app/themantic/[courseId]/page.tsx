@@ -7,20 +7,46 @@ import Layout from '@learner/components/themantic/layout/Layout';
 import { CardComponent } from '@learner/components/themantic/content/List';
 import { Box, Container } from '@mui/material';
 import SubHeader from '@learner/components/themantic/subHeader/SubHeader';
+import { cookies } from 'next/headers';
+import { hierarchyAPI } from '@content-mfes/services/Hierarchy';
 
 export async function generateMetadata({ params }: any) {
   return await getMetadata(params.courseId);
 }
 
+
+
 const CourseUnitDetails = dynamic(() => import('@CourseUnitDetails'), {
   ssr: false,
 });
-const App = () => {
+
+const App = async ({ params }: any) => {
+  const courseId = params?.courseId;
+  let backgroundSx: any = { backgroundImage: "url(/images/energy-background.png)" };
+
+  if (courseId) {
+    try {
+      const data = await hierarchyAPI(courseId, { mode: 'edit' });
+      const keyWord = data?.name?.trim();
+      if (keyWord === 'Energy') {
+        backgroundSx = { backgroundImage: "url(/images/energy-background.png)" };
+      } else if (keyWord === 'Environment') {
+        backgroundSx = { backgroundImage: "url(/images/environment-background.png)" };
+      } else if (keyWord === 'Health') {
+        backgroundSx = { backgroundImage: "url(/images/healthbackground.png)" };
+      }
+      console.log('backgroundSx', backgroundSx);
+      console.log('keyWord', keyWord);
+    } catch (e) {
+      // fallback to default background
+    }
+  }
+
   return (
     <div className="thematic-page">
-      <Layout sx={{ backgroundImage: 'url(/images/energy-background.png)' }}>
+      <Layout sx={backgroundSx}>
         <SubHeader showFilter={false} />
-        <Container maxWidth="lg">
+        <Box className='bs-container bs-px-5'>
           <Box
             sx={{
               '& .css-17kujh3': {
@@ -46,9 +72,8 @@ const App = () => {
                   xl: 4,
                 },
                 _containerGrid: {
-                  spacing: { xs: 6, sm: 6, md: 6 },
+                  spacing: { xs: 5, sm: 5, md: 5 },
                 },
-
                 isEnrollmentRequired: false,
                 _card: {
                   cardComponent: CardComponent,
@@ -63,7 +88,7 @@ const App = () => {
               }}
             />
           </Box>
-        </Container>
+        </Box>
       </Layout>
     </div>
   );

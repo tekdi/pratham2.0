@@ -110,18 +110,18 @@ const ProfilePage = () => {
         <Box
           sx={{
             flexShrink: 0,
-            width: { xs: '100%', md: courseData.length === 0  || tenantName==="Camp to Club" ?'100%':'530px' },
+            width: { xs: '100%', md: courseData.length === 0   ?'100%':'530px' },
             mb: { xs: 2, md: 0 },
           }}
         >
-           {courseData.length === 0 || tenantName==="Camp to Club"?
+           {courseData.length === 0 ?
           (<UserProfileCard maxWidth='100%' />):
           (<UserProfileCard  />)
            }
         </Box>
 
         {/* Certificates Section */}
-      {typeof window !== "undefined" && localStorage.getItem('userProgram') === "YouthNet" ? (
+      {/* {typeof window !== "undefined" && localStorage.getItem('userProgram') === "YouthNet" ? (
   <Box flexGrow={1} p={2}>
     <Typography color={'#78590C'}>{tenantName}</Typography>
     
@@ -147,7 +147,7 @@ const ProfilePage = () => {
         lg: '1fr 1fr 1fr',
         xl: '1fr 1fr 1fr 1fr',
       }}
-      gap={2}
+      gap={1}
     >
       {courseData.length !== 0 &&
         courseData?.map((cert: any, index: any) => (
@@ -162,7 +162,53 @@ const ProfilePage = () => {
         ))}
     </Box>
   </Box>
-) : null}
+) : null} */}
+ <Box flexGrow={1} p={1}>
+    <Typography color={'#78590C'}>{tenantName}</Typography>
+    
+
+    <Typography color={'#78590C'}>
+      Completed Courses & Certificates
+    </Typography>
+
+    {courseData.length === 0 && (
+      <Box display="flex" alignItems="center" p="20px">
+        <InfoIcon color="info" sx={{ color: '#FDBE16', mr: 1 }} />
+        <Typography>Certification has not been completed yet.</Typography>
+      </Box>
+    )}
+
+    <Box
+      mt="20px"
+      display="grid"
+      gridTemplateColumns={{
+        xs: '1fr',
+        sm: '1fr 1fr',
+        md: '1fr 1fr',
+        lg: '1fr 1fr 1fr',
+        xl: '1fr 1fr 1fr 1fr',
+      }}
+      gap={3}
+      sx={{
+        '& > *': {
+          margin: '0 !important',
+          padding: '0 !important'
+        }
+      }}
+    >
+      {courseData.length !== 0 &&
+        courseData?.map((cert: any, index: any) => (
+          <CourseCertificateCard
+            key={index}
+            title={cert.program}
+            description={cert.description}
+            imageUrl={cert.posterImage}
+            completionDate={cert.completedOn}
+            onPreviewCertificate={() => handlePreview(cert.certificateId)}
+          />
+        ))}
+    </Box>
+  </Box>
 
       </Box>
       <CertificateModal

@@ -313,21 +313,21 @@ const Index = () => {
           <Grid item xs={4}>
             <RegistrationStatistics
               onPrimaryClick={() => handleClick('above')}
-              cardTitle={'Above 18 y/o'}
+              cardTitle={t('YOUTHNET_DASHBOARD.ABOVE_18_YO')}
               statistic={aboveEighteenUsers?.length}
             />
           </Grid>
           <Grid item xs={4}>
             <RegistrationStatistics
               onPrimaryClick={() => handleClick('below')}
-              cardTitle={'Below 18 y/o'}
+              cardTitle={t('YOUTHNET_DASHBOARD.BELOW_18_YO')}
               statistic={belowEighteenUsers?.length}
             />
           </Grid>
           <Grid item xs={4}>
             <RegistrationStatistics
               onPrimaryClick={() => handleClick('village')}
-              cardTitle={'From'}
+              cardTitle={t('YOUTHNET_DASHBOARD.FROM')}
               statistic={
                 registeredVillages.length <= 1
                   ? `${registeredVillages.length} ${t(
