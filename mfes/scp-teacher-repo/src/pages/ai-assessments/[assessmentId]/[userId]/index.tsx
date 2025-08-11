@@ -169,6 +169,7 @@ const AssessmentDetails = () => {
 
   // Upload Options Popup state
   const [uploadPopupOpen, setUploadPopupOpen] = useState(false);
+  const [isReUploadMode, setIsReUploadMode] = useState(false);
   const [userDetails, setUserDetails] = useState<any>({
     name: '',
     lastName: '',
@@ -209,13 +210,24 @@ const AssessmentDetails = () => {
 
   const handleCloseUploadPopup = () => {
     setUploadPopupOpen(false);
+    setIsReUploadMode(false);
+  };
+
+  // New handler for re-upload that clears existing images
+  const handleReUpload = () => {
+    // Clear the uploadedImages state to provide a fresh start
+    setUploadedImages([]);
+    setIsReUploadMode(true);
+    setUploadPopupOpen(true);
+
   };
 
   const handleImageUpload = (newImage: UploadedImage) => {
     setUploadedImages((prev) => [...prev, newImage]);
 
-    // Update assessmentData with new file URL
-    if (assessmentData) {
+    // In re-upload mode, we don't update assessmentData immediately
+    // We'll update it when the user clicks "Save and Upload"
+    if (!isReUploadMode && assessmentData) {
       setAssessmentData({
         ...assessmentData,
         fileUrls: [...assessmentData.fileUrls, newImage.url],
@@ -871,6 +883,22 @@ const AssessmentDetails = () => {
     await fetchOfflineAssessmentData(true);
   };
 
+  const handleSubmissionSuccess = async () => {
+    if (isReUploadMode) {
+      // In re-upload mode, update the assessmentData with the new uploaded images
+      if (assessmentData && uploadedImages.length > 0) {
+        const newFileUrls = uploadedImages.map(img => img.url);
+        setAssessmentData({
+          ...assessmentData,
+          fileUrls: newFileUrls,
+        });
+      }
+      // Reset re-upload mode
+      setIsReUploadMode(false);
+    }
+    await fetchOfflineAssessmentData(true);
+  };
+
   if (loading) {
     return (
       <Box
@@ -1046,7 +1074,7 @@ const AssessmentDetails = () => {
                         }}
                         onClick={e => {
                           e.stopPropagation();
-                          setUploadPopupOpen(true);
+                          handleReUpload();
                         }}
                       >
                         Re-upload
@@ -1283,7 +1311,9 @@ const AssessmentDetails = () => {
           typeof assessmentId === 'string' ? assessmentId : undefined
         }
         identifier={typeof assessmentId === 'string' ? assessmentId : undefined}
-        onSubmissionSuccess={handleRefreshAssessmentData}
+        onSubmissionSuccess={handleSubmissionSuccess}
+        isReUploadMode={isReUploadMode}
+        setAssessmentTrackingData={setAssessmentTrackingData}
       />
 
       {/* Snackbar for feedback */}

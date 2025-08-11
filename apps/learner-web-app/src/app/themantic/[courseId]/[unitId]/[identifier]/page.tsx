@@ -4,6 +4,8 @@ import React from 'react';
 import dynamic from 'next/dynamic';
 import { getMetadata } from '@learner/utils/API/metabaseService';
 import Layout from '@learner/components/themantic/layout/Layout';
+import SubHeader from '@learner/components/themantic/subHeader/SubHeader';
+import { Box } from '@mui/material';
 
 export async function generateMetadata({ params }: any) {
   return await getMetadata(params.identifier);
@@ -18,8 +20,9 @@ const Player = dynamic(
 
 const HomePage: React.FC = () => {
   return (
-    <div className="thematic-page">
+    <Box className="thematic-page">
       <Layout sx={{ backgroundImage: 'url(/images/energy-background.png)' }}>
+        <SubHeader showFilter={false} />
         <Player
           contentBaseUrl="/themantic"
           _config={{
@@ -29,7 +32,7 @@ const HomePage: React.FC = () => {
           }}
         />
       </Layout>
-    </div>
+    </Box>
   );
 };
 
