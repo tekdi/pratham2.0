@@ -142,6 +142,70 @@ const stripHtmlTags = (html: string) => {
   return html.replace(/<[^>]*>/g, '');
 };
 
+// Safely format answer text from resValue for display (handles MCQ arrays and objects)
+const formatAnswerForDisplay = (resValue: string | undefined | null): string => {
+  if (!resValue) return 'No answer provided';
+  try {
+    const parsed = JSON.parse(resValue);
+    // If array of options (MCQ)
+    if (Array.isArray(parsed)) {
+      const selectedItem = parsed.find((i: any) => i && i.selected) || parsed[0];
+      if (!selectedItem) return 'No answer provided';
+
+      if (selectedItem.label !== undefined && selectedItem.label !== null) {
+        if (Array.isArray(selectedItem.label)) {
+          return selectedItem.label
+            .map((l: any) =>
+              typeof l === 'string' ? l.replace(/<[^>]*>/g, '').trim() : String(l)
+            )
+            .join(', ');
+        }
+        if (typeof selectedItem.label === 'string') {
+          return selectedItem.label.replace(/<[^>]*>/g, '').trim();
+        }
+        return String(selectedItem.label);
+      }
+
+      if (selectedItem.value !== undefined && selectedItem.value !== null) {
+        return Array.isArray(selectedItem.value)
+          ? selectedItem.value.join(', ')
+          : String(selectedItem.value);
+      }
+
+      return 'No answer provided';
+    }
+
+    // Object format
+    if (parsed.label !== undefined && parsed.label !== null) {
+      if (Array.isArray(parsed.label)) {
+        return parsed.label
+          .map((l: any) =>
+            typeof l === 'string' ? l.replace(/<[^>]*>/g, '').trim() : String(l)
+          )
+          .join(', ');
+      }
+      if (typeof parsed.label === 'string') {
+        return parsed.label.replace(/<[^>]*>/g, '').trim();
+      }
+      return String(parsed.label);
+    }
+
+    if (parsed.value !== undefined && parsed.value !== null) {
+      return Array.isArray(parsed.value)
+        ? parsed.value.join(', ')
+        : String(parsed.value);
+    }
+
+    if (parsed.answer) return String(parsed.answer);
+    if (parsed.response) return String(parsed.response);
+
+    return 'No answer provided';
+  } catch (e) {
+    // Not JSON; return as-is
+    return resValue;
+  }
+};
+
 const AssessmentDetails = () => {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -1224,10 +1288,7 @@ const AssessmentDetails = () => {
               <Typography variant="body1" sx={{ mb: 2 }}>
                 Answer:{' '}
                 {selectedQuestion.resValue
-                  ? (() => {
-                    const resValue = JSON.parse(selectedQuestion.resValue);
-                    return resValue.label || 'No answer provided';
-                  })()
+                  ? formatAnswerForDisplay(selectedQuestion.resValue)
                   : 'No answer provided'}
               </Typography>
               <TextField
