@@ -33,7 +33,7 @@ const App = ({
   const router = useRouter();
   const params = useParams();
   const { identifier, courseId, unitId } = params || {}; // string | string[] | undefined
-  const [item, setItem] = useState<{ [key: string]: any }>(null);
+  const [item, setItem] = useState<{ [key: string]: any }>({});
   const [breadCrumbs, setBreadCrumbs] = useState<any>();
   const [isShowMoreContent, setIsShowMoreContent] = useState(false);
 
@@ -95,7 +95,7 @@ const App = ({
         gap: 2,
         px: { xs: 2 },
         pb: { xs: 1 },
-        pt: { xs: 2, sm: 2, md: 4 },
+        pt: { xs: 2, sm: 2, md: 1 },
       }}
     >
       <Box
@@ -243,8 +243,7 @@ const PlayerBox = ({
       setPlay(true);
     } else {
       router.push(
-        `/login?redirectUrl=${
-          courseId ? `/content-details/${courseId}` : `/player/${identifier}`
+        `/login?redirectUrl=${courseId ? `/content-details/${courseId}` : `/player/${identifier}`
         }`
       );
     }
@@ -305,15 +304,12 @@ const PlayerBox = ({
               isGenerateCertificate: isGenerateCertificate,
               trackable: trackable,
             })}
-            src={`${
-              process.env.NEXT_PUBLIC_LEARNER_SBPLAYER
-            }?identifier=${identifier}${
-              courseId && unitId ? `&courseId=${courseId}&unitId=${unitId}` : ''
-            }${
-              userIdLocalstorageName
+            src={`${process.env.NEXT_PUBLIC_LEARNER_SBPLAYER
+              }?identifier=${identifier}${courseId && unitId ? `&courseId=${courseId}&unitId=${unitId}` : ''
+              }${userIdLocalstorageName
                 ? `&userId=${localStorage.getItem(userIdLocalstorageName)}`
                 : ''
-            }`}
+              }`}
             style={{
               border: 'none',
               objectFit: 'contain',
