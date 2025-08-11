@@ -142,6 +142,70 @@ const stripHtmlTags = (html: string) => {
   return html.replace(/<[^>]*>/g, '');
 };
 
+// Safely format answer text from resValue for display (handles MCQ arrays and objects)
+const formatAnswerForDisplay = (resValue: string | undefined | null): string => {
+  if (!resValue) return 'No answer provided';
+  try {
+    const parsed = JSON.parse(resValue);
+    // If array of options (MCQ)
+    if (Array.isArray(parsed)) {
+      const selectedItem = parsed.find((i: any) => i && i.selected) || parsed[0];
+      if (!selectedItem) return 'No answer provided';
+
+      if (selectedItem.label !== undefined && selectedItem.label !== null) {
+        if (Array.isArray(selectedItem.label)) {
+          return selectedItem.label
+            .map((l: any) =>
+              typeof l === 'string' ? l.replace(/<[^>]*>/g, '').trim() : String(l)
+            )
+            .join(', ');
+        }
+        if (typeof selectedItem.label === 'string') {
+          return selectedItem.label.replace(/<[^>]*>/g, '').trim();
+        }
+        return String(selectedItem.label);
+      }
+
+      if (selectedItem.value !== undefined && selectedItem.value !== null) {
+        return Array.isArray(selectedItem.value)
+          ? selectedItem.value.join(', ')
+          : String(selectedItem.value);
+      }
+
+      return 'No answer provided';
+    }
+
+    // Object format
+    if (parsed.label !== undefined && parsed.label !== null) {
+      if (Array.isArray(parsed.label)) {
+        return parsed.label
+          .map((l: any) =>
+            typeof l === 'string' ? l.replace(/<[^>]*>/g, '').trim() : String(l)
+          )
+          .join(', ');
+      }
+      if (typeof parsed.label === 'string') {
+        return parsed.label.replace(/<[^>]*>/g, '').trim();
+      }
+      return String(parsed.label);
+    }
+
+    if (parsed.value !== undefined && parsed.value !== null) {
+      return Array.isArray(parsed.value)
+        ? parsed.value.join(', ')
+        : String(parsed.value);
+    }
+
+    if (parsed.answer) return String(parsed.answer);
+    if (parsed.response) return String(parsed.response);
+
+    return 'No answer provided';
+  } catch (e) {
+    // Not JSON; return as-is
+    return resValue;
+  }
+};
+
 const AssessmentDetails = () => {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -169,6 +233,7 @@ const AssessmentDetails = () => {
 
   // Upload Options Popup state
   const [uploadPopupOpen, setUploadPopupOpen] = useState(false);
+  const [isReUploadMode, setIsReUploadMode] = useState(false);
   const [userDetails, setUserDetails] = useState<any>({
     name: '',
     lastName: '',
@@ -209,13 +274,24 @@ const AssessmentDetails = () => {
 
   const handleCloseUploadPopup = () => {
     setUploadPopupOpen(false);
+    setIsReUploadMode(false);
+  };
+
+  // New handler for re-upload that clears existing images
+  const handleReUpload = () => {
+    // Clear the uploadedImages state to provide a fresh start
+    setUploadedImages([]);
+    setIsReUploadMode(true);
+    setUploadPopupOpen(true);
+
   };
 
   const handleImageUpload = (newImage: UploadedImage) => {
     setUploadedImages((prev) => [...prev, newImage]);
 
-    // Update assessmentData with new file URL
-    if (assessmentData) {
+    // In re-upload mode, we don't update assessmentData immediately
+    // We'll update it when the user clicks "Save and Upload"
+    if (!isReUploadMode && assessmentData) {
       setAssessmentData({
         ...assessmentData,
         fileUrls: [...assessmentData.fileUrls, newImage.url],
@@ -871,6 +947,22 @@ const AssessmentDetails = () => {
     await fetchOfflineAssessmentData(true);
   };
 
+  const handleSubmissionSuccess = async () => {
+    if (isReUploadMode) {
+      // In re-upload mode, update the assessmentData with the new uploaded images
+      if (assessmentData && uploadedImages.length > 0) {
+        const newFileUrls = uploadedImages.map(img => img.url);
+        setAssessmentData({
+          ...assessmentData,
+          fileUrls: newFileUrls,
+        });
+      }
+      // Reset re-upload mode
+      setIsReUploadMode(false);
+    }
+    await fetchOfflineAssessmentData(true);
+  };
+
   if (loading) {
     return (
       <Box
@@ -1046,7 +1138,7 @@ const AssessmentDetails = () => {
                         }}
                         onClick={e => {
                           e.stopPropagation();
-                          setUploadPopupOpen(true);
+                          handleReUpload();
                         }}
                       >
                         Re-upload
@@ -1196,10 +1288,7 @@ const AssessmentDetails = () => {
               <Typography variant="body1" sx={{ mb: 2 }}>
                 Answer:{' '}
                 {selectedQuestion.resValue
-                  ? (() => {
-                    const resValue = JSON.parse(selectedQuestion.resValue);
-                    return resValue.label || 'No answer provided';
-                  })()
+                  ? formatAnswerForDisplay(selectedQuestion.resValue)
                   : 'No answer provided'}
               </Typography>
               <TextField
@@ -1283,7 +1372,9 @@ const AssessmentDetails = () => {
           typeof assessmentId === 'string' ? assessmentId : undefined
         }
         identifier={typeof assessmentId === 'string' ? assessmentId : undefined}
-        onSubmissionSuccess={handleRefreshAssessmentData}
+        onSubmissionSuccess={handleSubmissionSuccess}
+        isReUploadMode={isReUploadMode}
+        setAssessmentTrackingData={setAssessmentTrackingData}
       />
 
       {/* Snackbar for feedback */}

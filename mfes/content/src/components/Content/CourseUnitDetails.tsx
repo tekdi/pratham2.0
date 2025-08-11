@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Box } from '@mui/material';
+import { Box, Fade } from '@mui/material';
 import {
   calculateTrackData,
   calculateTrackDataItem,
@@ -123,7 +123,7 @@ export default function Details(props: DetailsProps) {
           props?._config?.getContentData(resultHierarchy);
         }
 
-        // Auto-redirect if there's only one child and we're at course level
+        // Auto - redirect if there's only one child and we're at course level
         // if (!unitId && resultHierarchy?.children?.length === 1) {
         //   const singleChild = resultHierarchy.children[0] as any;
         //   const childIdentifier = typeof singleChild === 'string' ? singleChild : singleChild?.identifier;
@@ -258,6 +258,7 @@ export default function Details(props: DetailsProps) {
 
   const onBackClick = () => {
     if (breadCrumbs?.length > 1) {
+      // router.back()
       if (breadCrumbs?.[breadCrumbs.length - 2]?.link) {
         router.push(breadCrumbs?.[breadCrumbs.length - 2]?.link);
       }
@@ -302,16 +303,21 @@ export default function Details(props: DetailsProps) {
         />
       )}
       {props?.showBreadCrumbs && (
-        <BreadCrumb
-          breadCrumbs={breadCrumbs}
-          isShowLastLink
-          customPlayerStyle={true}
-          customPlayerMarginTop={25}
-        />
+        <Box sx={{
+          position: 'relative',
+          zIndex: 1000,
+        }}>
+          <BreadCrumb
+            breadCrumbs={breadCrumbs}
+            isShowLastLink
+            customPlayerStyle={true}
+            customPlayerMarginTop={35}
+          />
+        </Box>
       )}
       <Box
         sx={{
-          pt: { xs: 4, md: 5 },
+          pt: { xs: 1, md: 2 },
           pb: { xs: 4, md: 10 },
           px: { xs: 2, sm: 3, md: 10 },
           gap: 2,

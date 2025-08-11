@@ -7,16 +7,15 @@ const Footer = () => {
   return (
     <Box
       component="footer"
+      className='bs-px-5 bs-pt-3 bs-pb-3'
       sx={{
-        px: { xs: 2, sm: 4, md: 8 },
-        pb: 2,
         backgroundColor: '#fff',
         borderTop: '1px solid',
         borderColor: (theme) => theme.palette.divider,
       }}
     >
       <Box>
-        <Box sx={{ mx: { xs: 0, md: '22px' }, my: { xs: 0, md: '16px' } }}>
+        <Box>
           <Box
             mb={1}
             sx={{
@@ -31,7 +30,7 @@ const Footer = () => {
               width={'104px'}
               src="/images/pradigi1.png"
               alt="PraDigi"
-              // height={40}
+            // height={40}
             />
             <Box
               sx={{
@@ -39,7 +38,7 @@ const Footer = () => {
                 textAlign: { xs: 'center', md: 'right' },
               }}
             >
-              <Box sx={{ mt: { xs: 1, md: 3 } }}>
+              <Box>
                 <Typography
                   sx={{
                     fontSize: { xs: '14px', sm: '15px', md: '16px' },
@@ -86,11 +85,11 @@ const Footer = () => {
               }}
             >
               {[
-                // { text: 'Pratham', href: '/https://www.pratham.org/' },
-                // {
-                //   text: 'Pratham Open School',
-                //   href: 'https://www.prathamopenschool.org/catalog/contents/1000001',
-                // },
+                { text: 'Pratham', href: 'https://www.pratham.org/' },
+                {
+                  text: 'Pratham Open School',
+                  href: 'https://www.prathamopenschool.org/catalog/contents/1000001',
+                },
                 {
                   text: 'Experimento India',
                   href: 'https://www.siemens-stiftung.org/en/projects/experimento/stem-education-for-innovation-experimento-india/',
