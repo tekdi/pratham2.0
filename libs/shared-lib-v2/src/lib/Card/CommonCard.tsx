@@ -111,10 +111,10 @@ export const CommonCard: React.FC<CommonCardProps> = ({
               result?.status?.toLowerCase() === 'completed'
                 ? t('COMMON.STATUS.completed')
                 : result?.status?.toLowerCase() === 'in progress'
-                ? t('COMMON.STATUS.in_progress')
-                : result?.enrolled === true
-                ? t('COMMON.STATUS.enrolled_not_started')
-                : t('COMMON.STATUS.not_started'),
+                  ? t('COMMON.STATUS.in_progress')
+                  : result?.enrolled === true
+                    ? t('COMMON.STATUS.enrolled_not_started')
+                    : t('COMMON.STATUS.not_started'),
           };
           if (type === 'Course') {
             if (!_card?.isHideProgress) {
@@ -145,6 +145,7 @@ export const CommonCard: React.FC<CommonCardProps> = ({
         cursor: onClick ? 'pointer' : 'default',
         boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.2)',
         overflow: 'hidden',
+        borderRadius: '20px',
         '&:hover': {
           boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.2)',
         },
@@ -375,16 +376,16 @@ export const StatusBar: React.FC<StatuPorps> = ({
               typeof trackProgress === 'number'
                 ? trackProgress
                 : [
-                    t('COMMON.STATUS.completed').toLowerCase(),
-                    'completed',
-                  ].includes(status?.toLowerCase() || '')
-                ? 100
-                : [
+                  t('COMMON.STATUS.completed').toLowerCase(),
+                  'completed',
+                ].includes(status?.toLowerCase() || '')
+                  ? 100
+                  : [
                     t('COMMON.STATUS.in_progress').toLowerCase(),
                     'in progress',
                   ].includes(status?.toLowerCase() || '')
-                ? 50
-                : 0
+                    ? 50
+                    : 0
             }
           />
         )}

@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Modal,
   Box,
@@ -35,7 +36,9 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
   questionSetId,
   identifier,
   onSubmissionSuccess,
+  setAssessmentTrackingData
 }) => {
+  const { t } = useTranslation();
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -215,6 +218,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
     }
 
     setIsSubmitting(true);
+    const currentUserId = localStorage.getItem('userId') || '';
     try {
       const fileUrls = uploadedImages.map((image) => image.url);
 
@@ -223,6 +227,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
         questionSetId,
         identifier,
         fileUrls,
+        createdBy: currentUserId,
       });
 
       showToast('Answer sheet submitted successfully!', 'success');
@@ -234,6 +239,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
     } finally {
       setIsSubmitting(false);
     }
+    setAssessmentTrackingData?.(null);
   };
 
   const formatFileSize = (bytes?: number) => {
@@ -292,7 +298,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
                 color: '#4D4639',
               }}
             >
-              Assessment Sheets
+              {t('AI.ASSESSMENT_SHEETS')}
             </Typography>
             <IconButton
               onClick={onClose}
@@ -326,7 +332,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
                 fontWeight: 400,
               }}
             >
-              * Format: jpg, size: 5 MB Up to 4 images
+              {t('AI.FORMAT_JPG_SIZE_5MB_UP_TO_4_IMAGES')}
             </Typography>
           </Box>
 
@@ -376,8 +382,8 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
                 {isUploading
                   ? 'Uploading...'
                   : uploadedImages.length >= 4
-                  ? 'Max 4 Images'
-                  : 'Take A Photo'}
+                    ? 'Max 4 Images'
+                    : 'Take A Photo'}
               </Button>
 
               {/* Upload Photo Button */}
@@ -407,8 +413,8 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
                 {isUploading
                   ? 'Uploading...'
                   : uploadedImages.length >= 4
-                  ? 'Max 4 Images'
-                  : 'Upload A Photo'}
+                    ? 'Max 4 Images'
+                    : 'Upload A Photo'}
               </Button>
             </Box>
 
@@ -428,7 +434,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
                   marginBottom: '8px',
                 }}
               >
-                • Place the piece of paper on a flat, clean surface
+                {t('AI.PLACE_PAPER_ON_FLAT_CLEAN_SURFACE')}
               </Typography>
               <Typography
                 sx={{
@@ -438,7 +444,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
                   marginBottom: '8px',
                 }}
               >
-                • Hold the phone straight above the piece of paper
+                {t('AI.HOLD_PHONE_STRAIGHT_ABOVE_PAPER')}
               </Typography>
               <Typography
                 sx={{
@@ -448,7 +454,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
                   marginBottom: '8px',
                 }}
               >
-                • Ensure good lighting and avoid shadows or glare
+                {t('AI.ENSURE_GOOD_LIGHTING_AVOID_SHADOWS')}
               </Typography>
               <Typography
                 sx={{
@@ -458,7 +464,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
                   marginBottom: '8px',
                 }}
               >
-                • Ensure all text is clear and fully visible
+                {t('AI.ENSURE_ALL_TEXT_CLEAR_VISIBLE')}
               </Typography>
 
               {isInstructionsExpanded && (
@@ -471,7 +477,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
                       marginBottom: '8px',
                     }}
                   >
-                    • Click an image and upload to the portal
+                    {t('AI.CLICK_IMAGE_AND_UPLOAD_TO_PORTAL')}
                   </Typography>
                   <Typography
                     sx={{
@@ -481,8 +487,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
                       marginBottom: '8px',
                     }}
                   >
-                    • If the answer sheet has multiple pages, take a picture of
-                    each page separately and upload
+                    {t('AI.IF_ANSWER_SHEET_MULTIPLE_PAGES')}
                   </Typography>
                 </>
               )}
@@ -504,7 +509,7 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
                   },
                 }}
               >
-                {isInstructionsExpanded ? 'Read Less' : 'Read More'}
+                {isInstructionsExpanded ? t('AI.READ_LESS') : t('AI.READ_MORE')}
               </Button>
             </Box>
 
@@ -619,8 +624,8 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
               {isSubmitting
                 ? 'Submitting...'
                 : isUploading
-                ? 'Uploading Files...'
-                : 'Save and Upload'}
+                  ? 'Uploading Files...'
+                  : 'Save and Upload'}
             </Button>
           </Box>
         </Box>

@@ -230,15 +230,15 @@ const AssessmentDetails: React.FC = () => {
         filtered.sort((a, b) => {
           const orderA =
             statusOrder[
-              mapAnswerSheetStatusToInternalStatus(
-                a.answerSheetStatus
-              ) as keyof typeof statusOrder
+            mapAnswerSheetStatusToInternalStatus(
+              a.answerSheetStatus
+            ) as keyof typeof statusOrder
             ] || 5;
           const orderB =
             statusOrder[
-              mapAnswerSheetStatusToInternalStatus(
-                b.answerSheetStatus
-              ) as keyof typeof statusOrder
+            mapAnswerSheetStatusToInternalStatus(
+              b.answerSheetStatus
+            ) as keyof typeof statusOrder
             ] || 5;
           return orderA - orderB;
         });
@@ -493,7 +493,7 @@ const AssessmentDetails: React.FC = () => {
 
       showToastMessage(
         t('ASSESSMENTS.DOWNLOAD_SUCCESS') ||
-          'Question paper downloaded successfully',
+        'Question paper downloaded successfully',
         'success'
       );
       setShowDownloadPopup(false);
@@ -526,39 +526,40 @@ const AssessmentDetails: React.FC = () => {
   const getSortButtonText = () => {
     switch (sortOption) {
       case 'completed':
-        return statusMapping['Approved']; // 'Marks Approved'
+        return t('AI.MARKS_APPROVED');
       case 'awaiting_approval':
-        return statusMapping['AI Processed']; // 'Awaiting Your Approval'
+        return t('AI.AWAITING_YOUR_APPROVAL');
       case 'not_started':
-        return 'Not Submitted';
+        return t('AI.NOT_SUBMITTED');
       case 'in_progress':
-        return statusMapping['AI Pending']; // 'Under AI Evaluation'
+        return t('AI.UNDER_AI_EVALUATION');
       case 'name_asc':
-        return 'Name (A-Z)';
+        return t('AI.NAME_A_TO_Z');
       case 'name_desc':
-        return 'Name (Z-A)';
+        return t('AI.NAME_Z_TO_A');
       case 'score_desc':
-        return 'Score (High to Low)';
+        return t('AI.SCORE_HIGH_TO_LOW');
       case 'score_asc':
-        return 'Score (Low to High)';
+        return t('AI.SCORE_LOW_TO_HIGH');
       case 'all':
       default:
-        return 'All Learners';
+        return t('AI.ALL_LEARNERS');
     }
   };
 
   const getStatusText = (status: string, score?: number, maxScore?: number) => {
     switch (status) {
       case 'completed':
-        return `Marks approved: ${score || 125}/${
-          maxScore || assessmentData?.maxScore || 130
-        }`;
+        return t('AI.MARKS_APPROVED_SCORE', {
+          score: score || 125,
+          maxScore: maxScore || assessmentData?.maxScore || 130
+        });
       case 'in_progress':
-        return 'Under AI Evaluation';
+        return t('AI.UNDER_AI_EVALUATION');
       case 'awaiting_approval':
-        return 'Awaiting Your Approval';
+        return t('AI.AWAITING_YOUR_APPROVAL');
       case 'not_started':
-        return 'Not Submitted';
+        return t('AI.NOT_SUBMITTED');
       default:
         return '';
     }
@@ -616,15 +617,15 @@ const AssessmentDetails: React.FC = () => {
       },
       {
         count: counts.in_progress,
-        label: statusMapping['AI Pending'], // 'Under AI Evaluation'
+        label: t('AI.UNDER_AI_EVALUATION'),
       },
       {
         count: counts.awaiting_approval,
-        label: statusMapping['AI Processed'], // 'Awaiting Your Approval'
+        label: t('AI.AWAITING_YOUR_APPROVAL'),
       },
       {
         count: counts.completed,
-        label: statusMapping['Approved'], // 'Marks Approved'
+        label: t('AI.MARKS_APPROVED'),
       },
     ];
   };
@@ -654,17 +655,42 @@ const AssessmentDetails: React.FC = () => {
           <IconButton onClick={handleBack} sx={{ mr: 1 }}>
             <ArrowBackIcon sx={{ color: '#4D4639' }} />
           </IconButton>
-          <Typography
-            variant="h5"
-            sx={{
-              fontWeight: 500,
-              fontSize: '22px',
-              lineHeight: '28px',
-              color: '#4D4639',
-            }}
-          >
-            {assessmentData?.title}
-          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: 500,
+                fontSize: '22px',
+                lineHeight: '28px',
+                color: '#4D4639',
+              }}
+            >
+              {assessmentData?.title}
+            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Button
+                variant="contained"
+                color="primary"
+                endIcon={<DownloadIcon />}
+                sx={{
+                  color: '#4D4639 ',
+                  borderRadius: '8px',
+                  fontWeight: 500,
+                  textTransform: 'none',
+                }}
+                onClick={() => {
+                  const link = document.createElement('a');
+                  link.href = '/document/Sample_answer_sheet_format.pdf';
+                  link.download = '/document/Sample_answer_sheet_format.pdf';
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }}
+              >
+                {t('AI.SAMPLE_QUESTION_AND_ANSWER_PAPER')}
+              </Button>
+            </Box>
+          </Box>
         </Box>
 
         {/* Error Message */}
@@ -726,54 +752,57 @@ const AssessmentDetails: React.FC = () => {
 
         {/* Download PDF Card */}
         {assessmentData?.hasLongShortAnswers && (
-          <Box sx={{ px: 2, mb: 2 }}>
-            <Card
-              sx={{
-                backgroundColor: '#ECE6F0',
-                border: '1px solid #D0C5B4',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                '&:hover': {
-                  backgroundColor: '#E1D5E7',
-                },
-              }}
-              // onClick={() => setShowDownloadPopup(true)}
-              // onClick={handleDownloadQuestionPaper}
-              onClick={handleDownloadQuestionPaper}
-            >
-              <CardContent
+          <>
+            <Box sx={{ px: 2, mb: 1 }}>
+              <Card
                 sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  p: '12px !important',
+                  backgroundColor: '#ECE6F0',
+                  border: '1px solid #D0C5B4',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  '&:hover': {
+                    backgroundColor: '#E1D5E7',
+                  },
                 }}
+                // onClick={() => setShowDownloadPopup(true)}
+                // onClick={handleDownloadQuestionPaper}
+                onClick={handleDownloadQuestionPaper}
               >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                  <PictureAsPdfIcon
-                    sx={{ color: '#D32F2F', width: 24, height: 24 }}
-                  />
-                  <Typography
-                    sx={{
-                      fontWeight: 500,
-                      fontSize: '14px',
-                      color: '#1F1B13',
-                      width: '280px',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {assessmentData?.title
-                      ?.replace(/\s+/g, '_')
-                      .toLowerCase() || 'mid_term_exam'}
-                    .pdf
-                  </Typography>
-                </Box>
-                <DownloadIcon sx={{ color: '#4D4639' }} />
-              </CardContent>
-            </Card>
-          </Box>
+                <CardContent
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    p: '12px !important',
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <PictureAsPdfIcon
+                      sx={{ color: '#D32F2F', width: 24, height: 24 }}
+                    />
+                    <Typography
+                      sx={{
+                        fontWeight: 500,
+                        fontSize: '14px',
+                        color: '#1F1B13',
+                        width: '280px',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {assessmentData?.title
+                        ?.replace(/\s+/g, '_')
+                        .toLowerCase() || 'mid_term_exam'}
+                      .pdf
+                    </Typography>
+                  </Box>
+                  <DownloadIcon sx={{ color: '#4D4639' }} />
+                </CardContent>
+              </Card>
+            </Box>
+
+          </>
         )}
 
         {/* Total Learners and Sort */}
@@ -905,9 +934,9 @@ const AssessmentDetails: React.FC = () => {
                         mapAnswerSheetStatusToInternalStatus(
                           learner.answerSheetStatus
                         ) === 'awaiting_approval' ||
-                        mapAnswerSheetStatusToInternalStatus(
-                          learner.answerSheetStatus
-                        ) === 'completed'
+                          mapAnswerSheetStatusToInternalStatus(
+                            learner.answerSheetStatus
+                          ) === 'completed'
                           ? '80px'
                           : '64px',
                       transition: 'all 0.2s ease-in-out',
@@ -1023,7 +1052,7 @@ const AssessmentDetails: React.FC = () => {
                     }}
                   >
                     {searchTerm
-                      ? 'No learners found matching your search.'
+                      ? t('AI.NO_LEARNERS_FOUND_MATCHING_SEARCH')
                       : t('ASSESSMENTS.NO_DATA_FOUND')}
                   </Typography>
                 </Box>
@@ -1050,13 +1079,12 @@ const AssessmentDetails: React.FC = () => {
               variant="h6"
               sx={{ fontWeight: 600, fontFamily: 'Poppins' }}
             >
-              {t('ASSESSMENTS.OFFLINE_ASSESSMENT') || 'Offline Assessment'}
+              {t('AI.OFFLINE_ASSESSMENT')}
             </Typography>
           </DialogTitle>
           <DialogContent>
             <Typography variant="body1" sx={{ mb: 3, fontFamily: 'Poppins' }}>
-              {t('ASSESSMENTS.DOWNLOAD_ASSESSMENT_MESSAGE') ||
-                'This assessment contains Long/Short Answer questions. Would you like to download the offline question paper?'}
+              {t('AI.DOWNLOAD_ASSESSMENT_MESSAGE')}
             </Typography>
             <Box
               sx={{
@@ -1208,12 +1236,12 @@ const AssessmentDetails: React.FC = () => {
                       }}
                     >
                       <Typography sx={{ fontSize: '14px', color: '#1F1B13' }}>
-                        {statusMapping['Approved']}
+                        {t('AI.MARKS_APPROVED')}
                       </Typography>
                       <Typography sx={{ fontSize: '14px', color: '#7C766F' }}>
                         (
                         {getStatusCounts().find(
-                          (item) => item.label === statusMapping['Approved']
+                          (item) => item.label === t('AI.MARKS_APPROVED')
                         )?.count || 0}
                         )
                       </Typography>
@@ -1238,14 +1266,13 @@ const AssessmentDetails: React.FC = () => {
                       }}
                     >
                       <Typography sx={{ fontSize: '14px', color: '#1F1B13' }}>
-                        {statusMapping['AI Processed']}
+                        {t('AI.AWAITING_YOUR_APPROVAL')}
                       </Typography>
                       <Typography sx={{ fontSize: '14px', color: '#7C766F' }}>
                         (
                         {getStatusCounts().find(
-                          (item) => item.label === statusMapping['AI Processed']
+                          (item) => item.label === t('AI.AWAITING_YOUR_APPROVAL')
                         )?.count || 0}
-                        )
                       </Typography>
                     </Box>
                   }
@@ -1268,12 +1295,12 @@ const AssessmentDetails: React.FC = () => {
                       }}
                     >
                       <Typography sx={{ fontSize: '14px', color: '#1F1B13' }}>
-                        {statusMapping['AI Pending']}
+                        {t('AI.UNDER_AI_EVALUATION')}
                       </Typography>
                       <Typography sx={{ fontSize: '14px', color: '#7C766F' }}>
                         (
                         {getStatusCounts().find(
-                          (item) => item.label === statusMapping['AI Pending']
+                          (item) => item.label === t('AI.UNDER_AI_EVALUATION')
                         )?.count || 0}
                         )
                       </Typography>
