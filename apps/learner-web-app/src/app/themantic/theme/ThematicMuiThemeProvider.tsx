@@ -8,6 +8,8 @@ import FontSizeTheme from '../../../context/FontSizeTheme';
 import { SpeechProvider } from '@shared-lib-v2/lib/context/SpeechContext';
 import { ColorInversionProvider } from '../../../context/ColorInversionContext';
 
+import './style.css'
+
 // Add module augmentation for custom typography variants
 declare module '@mui/material/styles' {
   interface TypographyVariants {

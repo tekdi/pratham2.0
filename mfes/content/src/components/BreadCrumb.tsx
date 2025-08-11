@@ -58,14 +58,12 @@ const BreadCrumb = ({
               key={`${breadcrumb?.name ?? breadcrumb?.label ?? ''} ${index}`}
               sx={{
                 color: '#212529',
-                fontWeight: index === breadCrumbs.length - 1 ? 700 : 400,
+                fontWeight: index === breadCrumbs.length - 1 ? 600 : 400,
                 fontSize: '24px',
                 display: 'inline',
                 cursor: 'pointer',
                 fontFamily: '"Montserrat", sans-serif',
-                '&:hover': {
-                  textDecoration: 'underline',
-                },
+
               }}
               component="span"
               onClick={() => handleClick(breadcrumb?.link)}
@@ -98,32 +96,32 @@ const BreadCrumb = ({
         return breadcrumb?.link &&
           (index !== breadCrumbs.length - 1 || isShowLastLink)
           ? ((isMobile &&
-              index === breadCrumbs.length - (isShowLastLink ? 1 : 2)) ||
-              !isMobile) && (
-              <Button
-                key={`${breadcrumb?.name ?? breadcrumb?.label ?? ''} ${index}`}
-                variant="text"
-                sx={{
-                  color: theme.palette.secondary.main,
-                }}
-                onClick={() => handleClick(breadcrumb?.link)}
-              >
-                <SpeakableText>
-                  {breadcrumb?.name ?? breadcrumb?.label ?? ''}
-                </SpeakableText>
-              </Button>
-            )
+            index === breadCrumbs.length - (isShowLastLink ? 1 : 2)) ||
+            !isMobile) && (
+            <Button
+              key={`${breadcrumb?.name ?? breadcrumb?.label ?? ''} ${index}`}
+              variant="text"
+              sx={{
+                color: theme.palette.secondary.main,
+              }}
+              onClick={() => handleClick(breadcrumb?.link)}
+            >
+              <SpeakableText>
+                {breadcrumb?.name ?? breadcrumb?.label ?? ''}
+              </SpeakableText>
+            </Button>
+          )
           : !isMobile && (
-              <Typography
-                key={`${breadcrumb?.name ?? breadcrumb?.label ?? ''} ${index}`}
-                variant="body1"
-                color="text.secondary"
-              >
-                <SpeakableText>
-                  {breadcrumb?.name ?? breadcrumb?.label ?? ''}
-                </SpeakableText>
-              </Typography>
-            );
+            <Typography
+              key={`${breadcrumb?.name ?? breadcrumb?.label ?? ''} ${index}`}
+              variant="body1"
+              color="text.secondary"
+            >
+              <SpeakableText>
+                {breadcrumb?.name ?? breadcrumb?.label ?? ''}
+              </SpeakableText>
+            </Typography>
+          );
       })}
       {(!breadCrumbs || breadCrumbs?.length === 0) &&
         [...(topic ? ['Course', topic] : [])].map((key) => (
