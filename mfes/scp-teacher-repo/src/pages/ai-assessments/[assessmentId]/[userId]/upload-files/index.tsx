@@ -381,7 +381,7 @@ const FilesPage = () => {
               color: '#969088',
             }}
           >
-            Enrollment ID
+            {t('AI.ENROLLMENT_ID')}
           </Typography>
           <Typography
             sx={{
@@ -439,7 +439,7 @@ const FilesPage = () => {
               textTransform: 'none',
             }}
           >
-            Upload
+            {t('AI.UPLOAD')}
           </Typography>
         </Button>
 
@@ -573,7 +573,7 @@ const FilesPage = () => {
                   mb: 1,
                 }}
               >
-                No images uploaded yet
+                {t('AI.NO_IMAGES_UPLOADED_YET')}
               </Typography>
               <Typography
                 sx={{
@@ -583,7 +583,7 @@ const FilesPage = () => {
                   textAlign: 'center',
                 }}
               >
-                Please upload assessment images to begin
+                {t('AI.PLEASE_UPLOAD_ASSESSMENT_IMAGES')}
               </Typography>
             </Box>
           </Grid>
