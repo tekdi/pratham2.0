@@ -27,16 +27,16 @@ const App = async ({ params }: any) => {
   if (courseId) {
     try {
       const data = await hierarchyAPI(courseId, { mode: 'edit' });
-      const name = data?.name?.trim();
-      if (name === 'Energy') {
+      const keyWord = data?.name?.trim();
+      if (keyWord === 'Energy') {
         backgroundSx = { backgroundImage: "url(/images/energy-background.png)" };
-      } else if (name === 'Environment') {
+      } else if (keyWord === 'Environment') {
         backgroundSx = { backgroundImage: "url(/images/environment-background.png)" };
-      } else if (name === 'Health') {
+      } else if (keyWord === 'Health') {
         backgroundSx = { backgroundImage: "url(/images/healthbackground.png)" };
       }
       console.log('backgroundSx', backgroundSx);
-      console.log('name', name);
+      console.log('keyWord', keyWord);
     } catch (e) {
       // fallback to default background
     }
