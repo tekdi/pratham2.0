@@ -25,24 +25,25 @@ const App = async ({ params }: { params: { courseId: string; unitId: string } })
   let backgroundSx: any = { backgroundImage: "url(/images/energy-background.png)" };
 
   if (courseId) {
-    try {
-      const data = await hierarchyAPI(courseId);
+  try {
+    const data = await hierarchyAPI(courseId);
 
-      const keywords = data?.keywords || [];
-      if (keywords.includes('Health')) {
-        backgroundSx = { backgroundImage: "url(/images/healthbackground.png)" };
-      } else if (keywords.includes('Environment')) {
-        backgroundSx = { backgroundImage: "url(/images/environment-background.png)" };
-      } else if (keywords.includes('Energy')) {
-        backgroundSx = { backgroundImage: "url(/images/energy-background.png)" };
-      }
+    const keywords = (data?.keywords || []).map(k => k.toLowerCase());
 
-      console.log('backgroundSx', backgroundSx);
-      console.log('keywords', keywords);
-    } catch (e) {
-      // fallback to default background
+    if (keywords.includes('health')) {
+      backgroundSx = { backgroundImage: "url(/images/healthbackground.png)" };
+    } else if (keywords.includes('environment')) {
+      backgroundSx = { backgroundImage: "url(/images/environment-background.png)" };
+    } else if (keywords.includes('energy')) {
+      backgroundSx = { backgroundImage: "url(/images/energy-background.png)" };
     }
+
+    console.log('backgroundSx', backgroundSx);
+    console.log('keywords', keywords);
+  } catch (e) {
+    // fallback to default background
   }
+}
 
   return (
     <div className="thematic-page">
