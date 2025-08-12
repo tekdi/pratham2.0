@@ -227,9 +227,9 @@ const Header = ({
 
         <Box flexGrow={1} />
 
-        {userRole !== Role.CCTA &&
+        {(localStorage.getItem('academicYearId')) &&(userRole !== Role.CCTA &&
           userRole !== Role.SCTA &&
-          userRole !== '' && (
+          userRole !== '') && (
             <Box sx={{ flexBasis: '20%' }}>
               {/* <FormControl className="drawer-select" sx={{ width: '100%' }}> */}
               <Select
