@@ -227,7 +227,7 @@ const Header = ({
 
         <Box flexGrow={1} />
 
-        {(localStorage.getItem('academicYearId')) &&(userRole !== Role.CCTA &&
+        {(typeof window !== 'undefined' && localStorage.getItem('academicYearId')) &&(userRole !== Role.CCTA &&
           userRole !== Role.SCTA &&
           userRole !== '') && (
             <Box sx={{ flexBasis: '20%' }}>
