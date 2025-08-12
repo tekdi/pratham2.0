@@ -26,17 +26,19 @@ const App = async ({ params }: { params: { courseId: string; unitId: string } })
 
   if (courseId) {
     try {
-      const data = await hierarchyAPI(courseId, { mode: 'edit' });
-      const keyWord = data?.name?.trim();
-      if (keyWord === 'Energy') {
-        backgroundSx = { backgroundImage: "url(/images/energy-background.png)" };
-      } else if (keyWord === 'Environment') {
-        backgroundSx = { backgroundImage: "url(/images/environment-background.png)" };
-      } else if (keyWord === 'Health') {
+      const data = await hierarchyAPI(courseId);
+
+      const keywords = data?.keywords || [];
+      if (keywords.includes('Health')) {
         backgroundSx = { backgroundImage: "url(/images/healthbackground.png)" };
+      } else if (keywords.includes('Environment')) {
+        backgroundSx = { backgroundImage: "url(/images/environment-background.png)" };
+      } else if (keywords.includes('Energy')) {
+        backgroundSx = { backgroundImage: "url(/images/energy-background.png)" };
       }
+
       console.log('backgroundSx', backgroundSx);
-      console.log('keyWord', keyWord);
+      console.log('keywords', keywords);
     } catch (e) {
       // fallback to default background
     }
