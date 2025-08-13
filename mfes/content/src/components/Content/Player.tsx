@@ -13,16 +13,14 @@ const PlayerPage: React.FC<PlayerPageProps> = ({ id }) => {
 
   return (
     <iframe
-      src={`${
-        process.env.NEXT_PUBLIC_LEARNER_SBPLAYER
-      }?identifier=${identifier}${
-        courseId && unitId ? `&courseId=${courseId}&unitId=${unitId}` : ''
-      }`}
+      src={`${process.env.NEXT_PUBLIC_LEARNER_SBPLAYER
+        }?identifier=${identifier}${courseId && unitId ? `&courseId=${courseId}&unitId=${unitId}` : ''
+        }`}
       style={{
         // display: 'block',
         // padding: 0,
         border: 'none',
-        height: 'calc(100vh - 20px)',
+        height: 'calc(100vh - 60px)',
       }}
       width="100%"
       height="100%"

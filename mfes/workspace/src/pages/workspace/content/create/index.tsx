@@ -276,8 +276,14 @@ const CreatePage = () => {
               fullWidth
               value={modalName}
               onChange={(e) => {
-                setModalName(e.target.value);
-                if (modalNameError) setModalNameError('');
+                const value = e.target.value;
+                // Allow only letters and spaces
+                if (/^[a-zA-Z\s]*$/.test(value)) {
+                  setModalName(value);
+                  if (modalNameError) setModalNameError('');
+                } else {
+                  setModalNameError('Only letters and spaces are allowed');
+                }
               }}
               error={!!modalNameError}
               helperText={modalNameError}
