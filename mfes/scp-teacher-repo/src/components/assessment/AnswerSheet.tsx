@@ -49,7 +49,7 @@ const parseResValue = (resValue: string): ParsedResponse => {
   try {
     const parsed = JSON.parse(resValue);
 
-    // Handle array format like: [{"label":"<p>4</p>","value":0,"selected":true,"AI_suggestion":""}]
+    // Handle array format like: [{"label":["a"],"value":1,"selected":true,"AI_suggestion":"a"}]
     if (Array.isArray(parsed)) {
       const selectedItem =
         parsed.find((item) => item.selected === true) || parsed[0];
@@ -59,15 +59,27 @@ const parseResValue = (resValue: string): ParsedResponse => {
         let response = '';
 
         // Always prioritize label over value for display
-        if (selectedItem.label) {
-          // Remove HTML tags from label
-          response = selectedItem.label.replace(/<[^>]*>/g, '').trim();
+        if (selectedItem.label !== undefined && selectedItem.label !== null) {
+          if (Array.isArray(selectedItem.label)) {
+            response = selectedItem.label
+              .map((l: any) =>
+                typeof l === 'string' ? l.replace(/<[^>]*>/g, '').trim() : String(l)
+              )
+              .join(', ');
+          } else if (typeof selectedItem.label === 'string') {
+            // Remove HTML tags from label
+            response = selectedItem.label.replace(/<[^>]*>/g, '').trim();
+          } else {
+            response = String(selectedItem.label);
+          }
         } else if (
           selectedItem.value !== undefined &&
           selectedItem.value !== null &&
           selectedItem.value !== ''
         ) {
-          response = String(selectedItem.value).trim();
+          response = Array.isArray(selectedItem.value)
+            ? selectedItem.value.join(', ')
+            : String(selectedItem.value).trim();
         } else {
           response = 'No response available';
         }
@@ -85,12 +97,29 @@ const parseResValue = (resValue: string): ParsedResponse => {
 
     // Handle object format (fallback for backward compatibility)
     return {
-      response:
-        parsed.response ||
-        parsed.answer ||
-        parsed.label ||
-        parsed.value ||
-        'No response available',
+      response: (() => {
+        if (parsed.label !== undefined && parsed.label !== null) {
+          if (Array.isArray(parsed.label)) {
+            return parsed.label
+              .map((l: any) =>
+                typeof l === 'string' ? l.replace(/<[^>]*>/g, '').trim() : String(l)
+              )
+              .join(', ');
+          }
+          if (typeof parsed.label === 'string') {
+            return parsed.label.replace(/<[^>]*>/g, '').trim();
+          }
+          return String(parsed.label);
+        }
+        if (parsed.response) return parsed.response;
+        if (parsed.answer) return parsed.answer;
+        if (parsed.value !== undefined) {
+          return Array.isArray(parsed.value)
+            ? parsed.value.join(', ')
+            : String(parsed.value);
+        }
+        return 'No response available';
+      })(),
       aiSuggestion:
         parsed.AI_suggestion ||
         parsed.aiSuggestion ||
@@ -349,9 +378,8 @@ const QuestionItem: React.FC<QuestionItemProps> = React.memo(
               }}
             >
               {question.questionId && questionNumberingMap[question.questionId]
-                ? `${questionNumberingMap[question.questionId]}. ${
-                    question.queTitle
-                  }`
+                ? `${questionNumberingMap[question.questionId]}. ${question.queTitle
+                }`
                 : `Q${index + 1}. ${question.queTitle}`}
             </Typography>
           </Box>
@@ -368,9 +396,9 @@ const QuestionItem: React.FC<QuestionItemProps> = React.memo(
               transition: 'all 0.2s ease-in-out',
               '&:hover': !isApproved
                 ? {
-                    opacity: 0.8,
-                    transform: 'scale(1.02)',
-                  }
+                  opacity: 0.8,
+                  transform: 'scale(1.02)',
+                }
                 : {},
             }}
             onClick={onScoreClick}

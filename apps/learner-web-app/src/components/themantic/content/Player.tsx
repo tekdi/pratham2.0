@@ -87,6 +87,7 @@ const App = ({
   if (!identifier) {
     return <div>Loading...</div>;
   }
+
   // const onBackClick = () => {
   //   if (breadCrumbs?.length > 1) {
   //     if (breadCrumbs?.[breadCrumbs.length - 1]?.link) {
@@ -100,13 +101,27 @@ const App = ({
   // };
 
   return (
-    <Box sx={{ px: 7, pb: 3 }}>
+    <Box className="bs-px-5" sx={{ mx: '2vh', position: 'relative' }}>
       <Box
         sx={{
           display: 'flex',
           alignItems: 'center',
           gap: 1,
           mb: 3,
+          position: 'relative',
+          zIndex: 10,
+          '& .MuiBreadcrumbs-root': {
+            position: 'relative',
+            zIndex: 11,
+          },
+          '& .MuiBreadcrumbs-ol': {
+            position: 'relative',
+            zIndex: 11,
+          },
+          '& .MuiBreadcrumbs-li': {
+            position: 'relative',
+            zIndex: 11,
+          },
         }}
       >
         <BreadCrumb
@@ -116,108 +131,112 @@ const App = ({
           customPlayerMarginTop={25}
         />
       </Box>
-      <Grid container spacing={6}>
-        <Grid item xs={12} sm={12} md={12} lg={3.5}>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              // pb: 2,
-            }}
-          >
+      <Box sx={{ pb: 5, px: '12px', position: 'relative', zIndex: 1 }}>
+        <Grid container spacing={5}>
+          <Grid item xs={12} sm={12} md={3.5} lg={3.5}>
             <Box
               sx={{
-                backgroundColor: 'rgba(255, 255, 255, 0.6)',
-                position: 'relative',
-                cursor: 'pointer',
-                transition: 'transform 0.2s ease-in-out',
-                boxShadow: '0 0.15rem 1.75rem 0 rgba(33, 40, 50, 0.15)',
-                border: '1px solid rgba(0, 0, 0, .125)',
-                borderRadius: '5px',
-                '&:hover': {
-                  transform: 'scale(1.02)',
-                },
+                display: 'flex',
+                flexDirection: 'column',
+                // pb: 2,
               }}
             >
               <Box
                 sx={{
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  py: 3,
+                  backgroundColor: 'rgba(255, 255, 255, 0.6)',
                   position: 'relative',
-                  zIndex: 1,
+                  cursor: 'pointer',
+                  transition: 'transform 0.2s ease-in-out',
+                  boxShadow: '0 0.15rem 1.75rem 0 rgba(33, 40, 50, 0.15)',
+                  border: '1px solid rgba(0, 0, 0, .125)',
+                  borderRadius: '5px',
                 }}
               >
-                <Box sx={{ margin: '8px', px: 3 }}>
-                  <img
-                    height={'200px'}
-                    src={item?.content?.posterImage || '/images/image_ver.png'}
-                    alt={
-                      item?.content?.name || item?.content?.title || 'Content'
-                    }
-                    style={{ width: '100%', objectFit: 'cover' }}
+                <Box
+                  sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    py: 3,
+                    position: 'relative',
+                    zIndex: 1,
+                  }}
+                >
+                  <Box >
+                    <Grid container sx={{ px: 3, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                      <Grid item xs={9}>
+                        <img
+                          // height={'200px'}
+                          src={item?.content?.posterImage || '/images/image_ver.png'}
+                          alt={
+                            item?.content?.name || item?.content?.title || 'Content'
+                          }
+                          style={{ width: '100%', objectFit: 'cover' }}
+                        />
+                      </Grid>
+                    </Grid>
+
+                  </Box>
+
+                  {/* Title */}
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontWeight: '600',
+                      textAlign: 'center',
+                      color: '#000',
+                      fontSize: '23px',
+                      letterSpacing: '1px',
+                      lineHeight: 1.2,
+                      mt: 2,
+                      mb: 2,
+                      px: 2,
+                      fontFamily: '"Montserrat", sans-serif',
+                      textDecoration: 'underline',
+                    }}
+                  >
+                    {item?.content?.name || item?.content?.title || 'Untitled'}
+                  </Typography>
+
+                  <Divider
+                    sx={{
+                      width: '100%',
+                      mt: 2,
+                      mb: 2,
+                      height: '4px',
+                      backgroundColor: '#9EB6BE',
+                    }}
                   />
+
+                  <Typography
+                    sx={{
+                      fontSize: '16px',
+                      color: '#363d47',
+                      fontWeight: '400',
+                      px: 2,
+                      fontFamily: '"Montserrat", sans-serif',
+                    }}
+                  >
+                    {item?.content?.description || 'No description'}
+                  </Typography>
                 </Box>
-
-                {/* Title */}
-                <Typography
-                  variant="h6"
-                  sx={{
-                    fontWeight: '700',
-                    textAlign: 'center',
-                    color: '#000',
-                    fontSize: '24px',
-                    letterSpacing: '1px',
-                    lineHeight: 1.2,
-                    mt: 2,
-                    mb: 2,
-                    px: 2,
-                    fontFamily: '"Montserrat", sans-serif',
-                    textDecoration: 'underline',
-                  }}
-                >
-                  {item?.content?.name || item?.content?.title || 'Untitled'}
-                </Typography>
-
-                <Divider
-                  sx={{
-                    width: '100%',
-                    mt: 2,
-                    mb: 2,
-                    height: '4px',
-                    backgroundColor: '#9EB6BE',
-                  }}
-                />
-
-                <Typography
-                  sx={{
-                    fontSize: '16px',
-                    color: '#363d47',
-                    fontWeight: '400',
-                    px: 2,
-                    fontFamily: '"Montserrat", sans-serif',
-                  }}
-                >
-                  {item?.content?.description || 'No description'}
-                </Typography>
               </Box>
             </Box>
-          </Box>
+          </Grid>
+          <Grid item xs={12} sm={12} md={8.5} lg={8.5}>
+            <PlayerBox
+              userIdLocalstorageName={userIdLocalstorageName}
+              item={item}
+              identifier={identifier}
+              courseId={courseId}
+              unitId={unitId}
+              {..._config?.player}
+            />
+          </Grid>
         </Grid>
-        <Grid item xs={12} sm={12} md={12} lg={8.5}>
-          <PlayerBox
-            userIdLocalstorageName={userIdLocalstorageName}
-            item={item}
-            identifier={identifier}
-            courseId={courseId}
-            unitId={unitId}
-            {..._config?.player}
-          />
-        </Grid>
-      </Grid>
+      </Box>
     </Box>
   );
 };
@@ -251,43 +270,83 @@ const PlayerBox = ({
         position: 'relative',
         display: 'flex',
         justifyContent: 'center',
+
       }}
     >
-      {!play && (
+      {!play ? (
         <Box
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'center',
+            // alignItems: 'center',
             position: 'relative',
+            width: '85%',
+            backgroundColor: '#f5f5f5',
+            justifyContent: 'center',
+            height: '100%'
           }}
         >
-          <Avatar
-            src={item?.posterImage ?? `/images/image_ver.png`}
-            alt={item?.identifier}
-            style={{
-              height: 'calc(100vh - 235px)',
-              width: '100%',
-              borderRadius: 0,
-            }}
-          />
-          <Button
-            variant="contained"
-            onClick={handlePlay}
+          {/* Show content poster image as preview instead of iframe */}
+          <Box
             sx={{
-              mt: 2,
-              position: 'absolute',
-              left: '50%',
-              top: '50%',
-              transform: 'translate(-50%, -50%)',
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'relative',
+
             }}
           >
-            {t('Play')}
-          </Button>
+            <img
+              src={item?.content?.posterImage || '/images/image_ver.png'}
+              alt={item?.content?.name || item?.content?.title || 'Content Preview'}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+              }}
+            />
+            {/* Play button overlay */}
+            <Button
+              variant="contained"
+              onClick={handlePlay}
+              sx={{
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: '50px',
+                height: '50px',
+                minWidth: 'unset',
+                borderRadius: '50%',
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                border: '3px solid #666666',
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 1)',
+                  transform: 'translate(-50%, -50%) scale(1.05)',
+                  boxShadow: '0 6px 12px rgba(0, 0, 0, 0.4)',
+                },
+                '&::before': {
+                  content: '""',
+                  width: 0,
+                  height: 0,
+                  borderLeft: '25px solid #000000',
+                  borderTop: '15px solid transparent',
+                  borderBottom: '15px solid transparent',
+                  marginLeft: '6px',
+                },
+              }}
+            >
+              <span style={{ display: 'none' }}>{t('Play')}</span>
+            </Button>
+          </Box>
         </Box>
-      )}
-
-      {play && (
+      ) : (
         <Box
           sx={{
             width: '100%',
@@ -298,15 +357,12 @@ const PlayerBox = ({
               isGenerateCertificate: isGenerateCertificate,
               trackable: trackable,
             })}
-            src={`${
-              process.env.NEXT_PUBLIC_LEARNER_SBPLAYER
-            }?identifier=${identifier}${
-              courseId && unitId ? `&courseId=${courseId}&unitId=${unitId}` : ''
-            }${
-              userIdLocalstorageName
+            src={`${process.env.NEXT_PUBLIC_LEARNER_SBPLAYER
+              }?identifier=${identifier}${courseId && unitId ? `&courseId=${courseId}&unitId=${unitId}` : ''
+              }${userIdLocalstorageName
                 ? `&userId=${localStorage.getItem(userIdLocalstorageName)}`
                 : ''
-            }`}
+              }`}
             style={{
               border: 'none',
               objectFit: 'contain',
@@ -323,6 +379,6 @@ const PlayerBox = ({
           />
         </Box>
       )}
-    </Box>
+    </Box >
   );
 };

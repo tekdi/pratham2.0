@@ -574,5 +574,6 @@
     "SPACE_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "ଖାଲି ଜାଗା ଏବଂ ବିଶେଷ ପାତ୍ରଗୁଡ଼ିକ ଅନୁମତି ନାହିଁ",
     "DATE_MUST_BE_ON_OR_BEFORE": "ତାରିଖ {{date}} କିମ୍ବା ସେଠାରୁ ପୂର୍ବରେ ହେବା ଆବଶ୍ୟକ",
     "DATE_MUST_BE_ON_OR_AFTER": "ତାରିଖ {{date}} କିମ୍ବା ପରେ ହେବା ଆବଶ୍ୟକ"
-  }
+  },
+  "Assessment Score": "ପରୀକ୍ଷଣ ସ୍କୋର"
 }

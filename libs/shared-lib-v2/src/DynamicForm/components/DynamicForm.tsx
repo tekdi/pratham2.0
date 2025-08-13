@@ -36,7 +36,8 @@ const DynamicForm = ({
   hideSubmit,
   type,
   isCompleteProfile=false,
-  isReassign=false
+  isReassign=false,
+  createNew=true
 }: any) => {
   const { t } = useTranslation();
   const hasPrefilled = useRef(false);
@@ -118,12 +119,12 @@ const DynamicForm = ({
     }
     return uiSchema;
   };
-
-  const [formData, setFormData] = useState(getInitialFormData());
-
-  const [formUiSchemaOriginal, setFormUiSchemaOriginal] = useState(getInitialUiSchema());
-  const [formUiSchema, setFormUiSchema] = useState(getInitialUiSchema());
-    const [formSchema, setFormSchema] = useState(getInitialSchema());
+  // Initialize state based on createNewLearner flag
+  const [formSchema, setFormSchema] = useState(createNew || isCompleteProfile? schema : getInitialSchema());
+  const [formUiSchemaOriginal, setFormUiSchemaOriginal] = useState(createNew ||isCompleteProfile ? uiSchema : getInitialUiSchema());
+  const [formUiSchema, setFormUiSchema] = useState(createNew || isCompleteProfile? uiSchema : getInitialUiSchema());
+  const [formData, setFormData] = useState(createNew || isCompleteProfile ? prefilledFormData : getInitialFormData());
+  
 
 
   //custom validation on formData for learner fields hide on dob
