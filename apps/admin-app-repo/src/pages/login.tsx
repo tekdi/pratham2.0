@@ -244,7 +244,7 @@ const LoginPage = () => {
         // } else {
         setAdminInformation(userInfo);
         
-        if (userInfo?.tenantData?.[0]?.type === 'e-learning') {
+        if (userInfo?.tenantData?.[0]?.tenantType === 'elearning') {
           if (userInfo?.role === Role.CENTRAL_ADMIN) {
             const { locale } = router;
             if (locale) {
