@@ -461,6 +461,47 @@ const MenuDrawer: React.FC<DrawerProps> = ({
             >
               {t('SURVEYS.SURVEYS')}
             </Button>
+
+            <Box sx={{ marginTop: '18px' }} className="joyride-step-12">
+              <Button
+                className="fs-14"
+                sx={{
+                  width: '100%',
+                  display: 'flex',
+                  justifyContent: 'flex-start',
+                  background: isSupportRequest
+                    ? theme.palette.primary.main
+                    : 'transparent',
+                  gap: '10px',
+                  padding: isSupportRequest
+                    ? '16px 18px !important'
+                    : '0px 18px !important',
+                  color: isSupportRequest
+                    ? '#2E1500'
+                    : theme.palette.warning.A200,
+                  fontWeight: isSupportRequest ? '600' : 500,
+                  '&:hover': {
+                    background: isSupportRequest
+                      ? theme.palette.primary.main
+                      : 'transparent',
+                  },
+                  marginTop: '15px',
+                }}
+                startIcon={
+                  <Image
+                    src={support}
+                    alt="support-icon"
+                    width={24}
+                    height={24}
+                  />
+                }
+                onClick={() => {
+                  router.push(`/support-request`);
+                }}
+              >
+                {t('COMMON.SUPPORT_REQUEST')}
+              </Button>
+            </Box>
           </Box>
         )}
         {!tenantName && (

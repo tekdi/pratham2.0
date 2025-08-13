@@ -681,7 +681,7 @@ const AssessmentDetails: React.FC = () => {
                 onClick={() => {
                   const link = document.createElement('a');
                   link.href = '/document/Sample_answer_sheet_format.pdf';
-                  link.download = '/document/Sample_answer_sheet_format.pdf';
+                  link.download = 'Sample_answer_sheet_format.pdf';
                   document.body.appendChild(link);
                   link.click();
                   document.body.removeChild(link);
@@ -801,7 +801,6 @@ const AssessmentDetails: React.FC = () => {
                 </CardContent>
               </Card>
             </Box>
-
           </>
         )}
 
