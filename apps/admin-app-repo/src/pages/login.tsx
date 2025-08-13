@@ -307,6 +307,12 @@ const LoginPage = () => {
                   ) {
                     window.location.href = '/mentor';
                     router.push('/mentor', undefined, { locale: locale });
+                  } else if (
+                    userInfo?.role === Role.CENTRAL_ADMIN &&
+                    userInfo?.tenantData[0]?.tenantName == TenantName.CAMP_TO_CLUB
+                  ) {
+                    window.location.href = '/learners';
+                    router.push('/learners', undefined, { locale: locale });
                   }
                 } else {
                   if (
@@ -329,6 +335,12 @@ const LoginPage = () => {
                   ) {
                     window.location.href = '/mentor';
                     router.push('/mentor');
+                  } else if (
+                    userInfo?.role === Role.CENTRAL_ADMIN &&
+                    userInfo?.tenantData[0]?.tenantName == TenantName.CAMP_TO_CLUB
+                  ) {
+                    window.location.href = '/learners';
+                    router.push('/learners');
                   }
                 }
               }
