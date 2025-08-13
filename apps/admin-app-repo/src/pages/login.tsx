@@ -244,9 +244,7 @@ const LoginPage = () => {
         // } else {
         setAdminInformation(userInfo);
         
-        // Skip academic year API call for Camp to Club tenant
-        if (userInfo?.tenantData?.[0]?.tenantName === TenantName.CAMP_TO_CLUB) {
-          // For Camp to Club tenant, directly navigate without calling getAcademicYear
+        if (userInfo?.tenantData?.[0]?.type === 'e-learning') {
           if (userInfo?.role === Role.CENTRAL_ADMIN) {
             const { locale } = router;
             if (locale) {
@@ -254,6 +252,22 @@ const LoginPage = () => {
               router.push('/learners', undefined, { locale: locale });
             } else {
               window.location.href = '/learners';
+              router.push('/learners');
+            }
+          } else if (userInfo?.role === Role.ADMIN) {
+            // Handle ADMIN role for e-learning tenants
+            const { locale } = router;
+            if (locale) {
+              router.push('/learners', undefined, { locale: locale });
+            } else {
+              router.push('/learners');
+            }
+          } else if (userInfo?.role === Role.SCTA || userInfo?.role === Role.CCTA) {
+            // Handle SCTA/CCTA roles for e-learning tenants
+            const { locale } = router;
+            if (locale) {
+              router.push('/learners', undefined, { locale: locale });
+            } else {
               router.push('/learners');
             }
           }
