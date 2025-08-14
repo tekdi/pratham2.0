@@ -245,7 +245,7 @@ const LoginPage = () => {
         setAdminInformation(userInfo);
         
         if (userInfo?.tenantData?.[0]?.tenantType === 'elearning') {
-          if (userInfo?.role === Role.CENTRAL_ADMIN) {
+          if (userInfo?.role === Role.CENTRAL_ADMIN && userInfo?.tenantData[0]?.tenantName == TenantName.CAMP_TO_CLUB) {
             const { locale } = router;
             if (locale) {
               window.location.href = '/learners';
@@ -254,23 +254,82 @@ const LoginPage = () => {
               window.location.href = '/learners';
               router.push('/learners');
             }
-          } else if (userInfo?.role === Role.ADMIN) {
-            // Handle ADMIN role for e-learning tenants
-            const { locale } = router;
-            if (locale) {
-              router.push('/learners', undefined, { locale: locale });
-            } else {
-              router.push('/learners');
-            }
-          } else if (userInfo?.role === Role.SCTA || userInfo?.role === Role.CCTA) {
-            // Handle SCTA/CCTA roles for e-learning tenants
-            const { locale } = router;
-            if (locale) {
-              router.push('/learners', undefined, { locale: locale });
-            } else {
-              router.push('/learners');
-            }
-          }
+          } 
+          if (
+                  userInfo?.role === Role.SCTA ||
+                  userInfo?.role === Role.CCTA
+                ) {
+                  const { locale } = router;
+                  // To do :- hardcoding to be removed
+                  if (
+                    userInfo?.tenantData[0]?.tenantName !=
+                    TenantName.SECOND_CHANCE_PROGRAM
+                  ) {
+                    window.location.href = '/workspace';
+                    router.push('/workspace');
+                  } else {
+                    window.location.href = '/course-planner';
+                    if (locale) {
+                      router.push('/course-planner', undefined, {
+                        locale: locale,
+                      });
+                    } else router.push('/course-planner');
+                  }
+                } else {
+                  //window.location.href = "/centers";
+                  const { locale } = router;
+                  if (locale) {
+                    if (
+                      userInfo?.role === Role.CENTRAL_ADMIN &&
+                      userInfo?.tenantData[0]?.tenantName ==
+                        TenantName.SECOND_CHANCE_PROGRAM
+                    ) {
+                      window.location.href = '/programs';
+                      router.push('/programs', undefined, { locale: locale });
+                    } else if (
+                      userInfo?.role === Role.ADMIN &&
+                      userInfo?.tenantData[0]?.tenantName ==
+                        TenantName.SECOND_CHANCE_PROGRAM
+                    ) {
+                      window.location.href = '/centers';
+                      router.push('/centers', undefined, { locale: locale });
+                    } else if (
+                      userInfo?.role === Role.ADMIN ||
+                      (Role.CENTRAL_ADMIN &&
+                        userInfo?.tenantData[0]?.tenantName ==
+                          TenantName.YOUTHNET)
+                    ) {
+                      window.location.href = '/mentor';
+                      router.push('/mentor', undefined, { locale: locale });
+                    }
+                  } else {
+                    if (
+                      userInfo?.role === Role.CENTRAL_ADMIN &&
+                      userInfo?.tenantData[0]?.tenantName ==
+                        TenantName.SECOND_CHANCE_PROGRAM
+                    ) {
+                      window.location.href = '/programs';
+                      router.push('/programs');
+                    } else if (
+                      userInfo?.role === Role.ADMIN &&
+                      userInfo?.tenantData[0]?.tenantName ==
+                        TenantName.SECOND_CHANCE_PROGRAM
+                    ) {
+                      window.location.href = '/centers';
+                      router.push('/centers');
+                    } else if (
+                      userInfo?.role === Role.ADMIN &&
+                      userInfo?.tenantData[0]?.tenantName == TenantName.YOUTHNET
+                    ) {
+                      window.location.href = '/mentor';
+                      router.push('/mentor');
+                    }
+                  }
+                }
+
+
+
+
         } else {
           // For other tenants, proceed with academic year logic
           const getAcademicYearList = async () => {
