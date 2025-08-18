@@ -316,4 +316,81 @@ export const MENU_CONFIG = {
       roles: [Role.CCTA, Role.SCTA],
     },
   },
+  [TenantName.CAMP_TO_CLUB]: {
+     manageUsers: {
+      title: 'SIDEBAR.MANAGE_USERS',
+      icon: '/images/group.svg',
+      roles: [Role.CENTRAL_ADMIN],
+      subMenu: [
+        {
+          title: 'SIDEBAR.LEARNERS',
+          link: '/learners',
+          roles: [Role.CENTRAL_ADMIN],
+        },
+        {
+          title: 'SIDEBAR.CONTENT_CREATOR',
+          link: '/content-creator',
+          roles: [Role.CENTRAL_ADMIN],
+        },
+        {
+          title: 'SIDEBAR.CONTENT_REVIEWER',
+          link: '/content-reviewer',
+          roles: [Role.CENTRAL_ADMIN],
+        },
+      ],
+    },
+     master: {
+      title: 'SIDEBAR.MASTER',
+      icon: '/images/database.svg',
+      roles: [Role.CENTRAL_ADMIN],
+      subMenu: [
+        {
+          title: 'SIDEBAR.STATES',
+          link: '/state',
+          roles: [Role.CENTRAL_ADMIN],
+        },
+        {
+          title: 'SIDEBAR.DISTRICTS',
+          link: '/district',
+          roles: [Role.CENTRAL_ADMIN],
+        },
+        {
+          title: 'SIDEBAR.BLOCKS',
+          link: '/block',
+          roles: [Role.CENTRAL_ADMIN],
+        },
+        {
+          title: 'SIDEBAR.VILLAGES',
+          link: '/village',
+          roles: [Role.CENTRAL_ADMIN],
+        },
+      ],
+    },
+    workspace: {
+      title: 'SIDEBAR.WORKSPACE',
+      icon: '/images/dashboard.svg',
+      link: '/workspace',
+      roles: [Role.CENTRAL_ADMIN],
+    },
+    manageNotificationTemplates: {
+      title: 'SIDEBAR.MANAGE_NOTIFICATION',
+      icon: '/images/centers.svg',
+      link: '/notification-templates',
+      roles: [Role.CENTRAL_ADMIN],
+    },
+    supportRequest: {
+      title: 'SIDEBAR.SUPPORT_REQUEST',
+      icon: '/images/Support.svg',
+      link: '/support-request',
+      roles: [Role.CENTRAL_ADMIN],
+    },
+   
+    faqs: {
+      title: 'SIDEBAR.FAQS',
+      icon: '/images/live_help.png',
+      link: '/faqs',
+      roles: [Role.CENTRAL_ADMIN],
+    },
+   
+  },
 };
