@@ -277,12 +277,14 @@ const CreatePage = () => {
               value={modalName}
               onChange={(e) => {
                 const value = e.target.value;
-                // Allow only letters and spaces
-                if (/^[a-zA-Z\s]*$/.test(value)) {
+                // Allow letters, numbers, spaces, and select punctuation: ( ) , . - & '
+                if (/^[a-zA-Z0-9\s(),.\-&']*$/.test(value)) {
                   setModalName(value);
                   if (modalNameError) setModalNameError('');
                 } else {
-                  setModalNameError('Only letters and spaces are allowed');
+                  setModalNameError(
+                    "Only letters, numbers, spaces, and () , . - & ' are allowed"
+                  );
                 }
               }}
               error={!!modalNameError}

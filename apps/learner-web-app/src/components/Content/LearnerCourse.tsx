@@ -61,11 +61,21 @@ export default memo(function LearnerCourse({
         label: 'Search content',
       });
     }
-    setFilterState((prevState: any) => ({
-      ...prevState,
-      query: searchValue,
-      offset: 0,
-    }));
+    // setFilterState((prevState: any) => ({
+    //   ...prevState,
+    //   query: searchValue,
+    //   offset: 0,
+    // }));
+    setFilterState((prevState: any) => {
+      const updated = {
+        ...prevState,
+        query: searchValue,
+        offset: 0,
+
+      };
+      localStorage.setItem('learnerCourseFilters', JSON.stringify(updated));
+      return updated;
+    });
   }, []);
 
   const handleFilterChange = (newFilterState: typeof filterState) => {
