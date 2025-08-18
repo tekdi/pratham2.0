@@ -162,6 +162,7 @@ const CollectionEditor: React.FC = () => {
   const editorRef = useRef<HTMLDivElement | null>(null);
   const isAppendedRef = useRef(false);
   const [assetsLoaded, setAssetsLoaded] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
 
   useEffect(() => {
     const loadJQuery = () => {
@@ -298,26 +299,42 @@ const CollectionEditor: React.FC = () => {
                 .catch((error) => {
                   console.error('Error in sendReviewNotification:', error);
                 });
-            } else if (event.detail?.action === 'publishContent') {
-              console.log('Publishing content');
-              setFetchContentAPI(!fetchContentAPI);
-              sendContentPublishNotification();
-            } else if (event.detail?.action === 'rejectContent') {
+            } 
+            else if( event.detail?.action === "publishContent")
+              
+            {
+              console.log("Publishing content");
+              setIsPublishing(true);
+              
+              // Add 5 second delay before executing publish actions
+              setTimeout(() => {
+                setFetchContentAPI(!fetchContentAPI);
+                sendContentPublishNotification();
+                setIsPublishing(false);
+              }, 5000);
+            
+            }
+            else if( event.detail?.action === "rejectContent")
+            {
               setFetchContentAPI(!fetchContentAPI);
 
               sendContentRejectNotification();
             } else {
               window.history.back();
             }
-            localStorage.removeItem('contentMode');
+            // Add 5 second delay before cleanup operations
+            setTimeout(() => {
+              localStorage.removeItem("contentMode");
 
-            window.addEventListener(
-              'popstate',
-              () => {
-                window.location.reload();
-              },
-              { once: true }
-            );
+              
+              window.addEventListener(
+                "popstate",
+                () => {
+                  window.location.reload();
+                },
+                { once: true }
+              );
+            }, 5000);
           }
         }
       );
@@ -330,6 +347,46 @@ const CollectionEditor: React.FC = () => {
   return (
     <div>
       {assetsLoaded ? <div ref={editorRef}></div> : <p>Loading editor...</p>}
+      
+      {/* Publishing Loader */}
+      {isPublishing && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 9999
+        }}>
+          <div style={{
+          //  backgroundColor: 'white',
+            padding: '20px',
+            borderRadius: '8px',
+            textAlign: 'center'
+          }}>
+            <div style={{
+              width: '40px',
+              height: '40px',
+              border: '4px solid #f3f3f3',
+              borderTop: '4px solid #3498db',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+              margin: '0 auto 10px'
+            }}></div>
+            {/* <p>Publishing content... Please wait 5 seconds</p> */}
+            <style jsx>{`
+              @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+              }
+            `}</style>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

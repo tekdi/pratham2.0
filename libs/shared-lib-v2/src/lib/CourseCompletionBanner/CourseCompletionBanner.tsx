@@ -56,7 +56,7 @@ export const CourseCompletionBanner: React.FC<CourseCompletionBannerProps> = ({
         </Paper>
 
         {/* Right box with button */}
-        {tenantName!=="Camp to Club" &&(<Button
+        {(<Button
           variant="contained"
           onClick={handlePreviewClick}
           endIcon={<ArrowForwardIcon />}

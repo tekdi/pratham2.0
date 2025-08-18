@@ -81,6 +81,8 @@ const ProfilePage = () => {
             description: courseDetails.description || '',
             posterImage: courseDetails.posterImage || '',
             program: courseDetails.program || [],
+                        name: courseDetails.name || "",
+
           };
           finalArray.push(obj);
         } catch (error) {
@@ -200,7 +202,7 @@ const ProfilePage = () => {
         courseData?.map((cert: any, index: any) => (
           <CourseCertificateCard
             key={index}
-            title={cert.program}
+            title={cert.name}
             description={cert.description}
             imageUrl={cert.posterImage}
             completionDate={cert.completedOn}
