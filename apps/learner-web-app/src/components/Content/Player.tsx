@@ -3,7 +3,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Avatar, Box, Button, IconButton, Typography } from '@mui/material';
+import { Avatar, Box, Button, Grid, IconButton, Typography } from '@mui/material';
 import { useParams, useRouter } from 'next/navigation';
 // import { ContentSearch } from '@learner/utils/API/contentService';
 import { checkAuth } from '@shared-lib-v2/utils/AuthService';
@@ -88,7 +88,9 @@ const App = ({
   };
 
   return (
-    <Box
+    <Grid
+      container
+      spacing={2}
       sx={{
         display: 'flex',
         flexDirection: { xs: 'column', md: 'row' },
@@ -98,7 +100,7 @@ const App = ({
         pt: { xs: 2, sm: 2, md: 1 },
       }}
     >
-      <Box
+      <Grid
         sx={{
           display: 'flex',
           flex: { xs: 1, md: 15 },
@@ -106,6 +108,12 @@ const App = ({
           flexDirection: 'column',
           width: isShowMoreContent ? 'initial' : '100%',
         }}
+        item
+        xs={12}
+        sm={12}
+        md={isShowMoreContent ? 8 : 12}
+        lg={isShowMoreContent ? 8 : 12}
+        xl={isShowMoreContent ? 8 : 12}
       >
         <Box
           sx={{
@@ -162,14 +170,19 @@ const App = ({
           unitId={unitId}
           {..._config?.player}
         />
-      </Box>
+      </Grid>
 
-      <Box
+      <Grid
         sx={{
           display: isShowMoreContent ? 'flex' : 'none',
           flexDirection: 'column',
           flex: { xs: 1, sm: 1, md: 9 },
         }}
+        xs={12}
+        sm={12}
+        md={isShowMoreContent ? 4 : 12}
+        lg={isShowMoreContent ? 4 : 12}
+        xl={isShowMoreContent ? 4 : 12}
       >
         <Typography
           variant="body5"
@@ -179,6 +192,7 @@ const App = ({
             fontWeight: 500,
             // fontSize: '18px',
             // lineHeight: '24px',
+            mt:3,
           }}
         >
           {t('LEARNER_APP.PLAYER.MORE_RELATED_RESOURCES')}
@@ -211,8 +225,8 @@ const App = ({
             },
           }}
         />
-      </Box>
-    </Box>
+      </Grid>
+    </Grid>
   );
 };
 
