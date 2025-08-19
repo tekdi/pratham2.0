@@ -44,6 +44,7 @@ const WorkspaceHeader = () => {
         borderBottom: '1px solid #ddd',
         position: 'sticky',
         top: 0,
+        zIndex: 9900,
       }}
     >
       <Typography
