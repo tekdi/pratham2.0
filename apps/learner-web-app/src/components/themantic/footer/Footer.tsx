@@ -88,7 +88,8 @@ const Footer = () => {
                 { text: 'Pratham', href: 'https://www.pratham.org/' },
                 {
                   text: 'Pratham Open School',
-                  href: 'https://www.prathamopenschool.org/catalog/contents/1000001',
+                  // href: 'https://www.prathamopenschool.org/catalog/contents/1000001',
+                  href: 'https://www.prathamopenschool.org/',
                 },
                 {
                   text: 'Experimento India',
