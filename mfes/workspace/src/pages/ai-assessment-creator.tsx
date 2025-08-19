@@ -230,7 +230,7 @@ const AIAssessmentCreator: React.FC = () => {
       // Prepare metadata with attributions
       const metadata = {
         ...(data?.metadata || {}),
-        gradeLevel: ['Grade 10'],
+        
         // attributions,
       };
 
@@ -378,6 +378,7 @@ const AIAssessmentCreator: React.FC = () => {
         name: formData?.metadata?.name,
         description: formData?.metadata?.description,
         assessmentType: formData?.metadata?.assessmentType,
+        gradeLevel: ['Grade 10'],
       },
     };
     try {
