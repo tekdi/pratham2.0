@@ -28,29 +28,35 @@ const CourseCertificateCard: React.FC<CertificateCardProps> = ({
   return (
     <Card
       sx={{
-        borderRadius: '12px',
-        boxShadow: 3,
-        overflow: 'hidden',
-        mb: 3,
-        width: '100%',
-        bgcolor: '#fff',
-        maxWidth: '231px',
-        //  width: '231px',
-        //height: '380px', // Ensure consistent height
         display: 'flex',
         flexDirection: 'column',
+        height: 'auto',
+        cursor: 'pointer',
+        borderRadius: '12px',
+        bgcolor: '#FEF7FF',
+        boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.1)',
+        overflow: 'hidden',
+        '&:hover': {
+          boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.2)',
+        },
+        '@media (max-width: 600px)': {
+          flexDirection: 'column',
+        },
       }}
     >
       {/* Image with overlay bar */}
-      <Box sx={{ position: 'relative' }}>
+      <Box sx={{ position: 'relative', width: '100%' }}>
         <CardMedia
           component="img"
-          height="200"
           image={imageUrl || '/images/image_ver.png'}
           alt={title}
           sx={{
             width: '100%',
+            height: '297px',
             objectFit: 'cover',
+            '@media (max-width: 600px)': {
+              height: '200px',
+            },
           }}
         />
 
@@ -61,10 +67,11 @@ const CourseCertificateCard: React.FC<CertificateCardProps> = ({
             top: 0,
             left: 0,
             width: '100%',
-            backgroundColor: 'rgba(0,0,0,0.5)',
+            height: '40px',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
             display: 'flex',
             alignItems: 'center',
-            padding: '4px 8px',
+            padding: '0px 5px',
           }}
         >
           <CheckCircleIcon sx={{ color: '#00C853', fontSize: 18, mr: 0.5 }} />
@@ -90,19 +97,31 @@ const CourseCertificateCard: React.FC<CertificateCardProps> = ({
       {/* Content with button at bottom */}
       <CardContent
         sx={{
-          padding: 2,
+          padding: '16px',
           display: 'flex',
           flexDirection: 'column',
           flexGrow: 1,
         }}
       >
-        <Box sx={{ flexGrow: 1 }}>
-          <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 1 }}>
+        <Box sx={{ flexGrow: 1, mb: 1 }}>
+          <Typography 
+           // fontWeight={700} 
+            sx={{ 
+              // fontSize: '16px',
+              whiteSpace: 'wrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: '-webkit-box',
+              WebkitBoxOrient: 'vertical',
+              WebkitLineClamp: 1,
+              paddingLeft: '5px',
+            }}
+          >
             {title}
-          </Typography>{' '}
+          </Typography>
         </Box>
 
-        <Box sx={{ flexGrow: 2 }}>
+        <Box sx={{ flexGrow: 2, mb: 2 }}>
           <Typography
             variant="body2"
             color="text.secondary"
@@ -111,6 +130,9 @@ const CourseCertificateCard: React.FC<CertificateCardProps> = ({
               overflow: 'hidden',
               WebkitBoxOrient: 'vertical',
               WebkitLineClamp: 2,
+              // fontSize: '14px',
+              // fontWeight: 700,
+              paddingLeft: '5px',
             }}
           >
             {description}
@@ -125,9 +147,19 @@ const CourseCertificateCard: React.FC<CertificateCardProps> = ({
             fontWeight: 700,
             textTransform: 'none',
             color: '#1976D2',
-            pl: 0,
-            mt: 'auto', // Push button to the bottom
+            padding: 0,
+            margin: 0,
+            mt: 'auto',
             alignSelf: 'flex-start',
+            minHeight: 'auto',
+            lineHeight: 1.2,
+            '@media (max-width: 600px)': {
+              padding: '8px 0',
+              fontSize: '13px',
+              lineHeight: 1.4,
+              textAlign: 'left',
+              justifyContent: 'flex-start',
+            },
           }}
           endIcon={<ArrowForwardIcon sx={{ fontSize: '18px' }} />}
         >
