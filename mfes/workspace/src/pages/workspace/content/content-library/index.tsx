@@ -343,7 +343,7 @@ const ContentsPage = () => {
                 variant="h4"
                 sx={{ fontWeight: 'bold', fontSize: '16px' }}
               >
-                content Library{' '}
+                content Library
               </Typography>
             </Box>
             {/* <Typography mb={2}>Here you see all your content.</Typography> */}
