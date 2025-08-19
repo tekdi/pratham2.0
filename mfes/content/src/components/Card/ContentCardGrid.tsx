@@ -111,7 +111,7 @@ const ContentCardGrid = memo((props: ContentCardGridProps) => {
             key={item?.identifier}
             id={`${props?.pageName}-${item?.identifier}`}
             item
-            xs={12}
+            xs={6}
             sm={6}
             md={4}
             lg={3}
