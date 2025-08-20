@@ -283,7 +283,10 @@ const StepperForm: React.FC<StepperFormProps> = ({
               '{FirstName}': toPascalCase(payload?.firstName),
               '{UserName}': payload?.email,
               '{Password}': payload?.password,
-              '{appUrl}': (process.env.NEXT_PUBLIC_TEACHER_APP_URL as string) || '',
+              '{appUrl}': (process.env.NEXT_PUBLIC_TEACHER_SBPLAYER as string).replace(
+                /\/sbplayer$/,
+                ''
+              )|| ""
             };
           }
 
