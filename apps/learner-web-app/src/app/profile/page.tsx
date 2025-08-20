@@ -184,13 +184,14 @@ const ProfilePage = () => {
       mt="20px"
       display="grid"
       gridTemplateColumns={{
-        xs: '1fr',
+        xs: '1fr 1fr',
         sm: '1fr 1fr',
-        md: '1fr 1fr',
-        lg: '1fr 1fr 1fr',
-        xl: '1fr 1fr 1fr 1fr',
+        md: '1fr 1fr 1fr',
+        lg: '1fr 1fr 1fr 1fr',
+        xl: '1fr 1fr 1fr 1fr 1fr',
       }}
-      gap={3}
+      p={'5px'}
+      gap={2}
       sx={{
         '& > *': {
           margin: '0 !important',
