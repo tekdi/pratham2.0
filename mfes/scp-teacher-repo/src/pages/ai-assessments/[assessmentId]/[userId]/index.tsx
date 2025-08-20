@@ -31,6 +31,7 @@ import {
 } from '../../../../components/assessment';
 import { getUserDetails } from '../../../../services/ProfileService';
 import { getCohortList } from '../../../../services/CohortServices';
+import { getUserId } from '../../../../services/ProfileService';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import {
   getStatusIcon,
@@ -581,37 +582,87 @@ const AssessmentDetails = () => {
           return;
         }
 
-        // Get cohort lists for both current user and target user
-        const [currentUserCohorts, targetUserCohorts] = await Promise.all([
-          getCohortList(currentUserId),
-          getCohortList(userId as string),
-        ]);
+        // Get user role from getUserId API
+        const { tenantData } = await getUserId();
+        const role =
+          tenantData.find((e: any) => e.roleName === 'Lead')?.roleName ||
+          tenantData.find((e: any) => e.roleName === 'Instructor')?.roleName;
 
-        if (
-          currentUserCohorts &&
-          Array.isArray(currentUserCohorts) &&
-          targetUserCohorts &&
-          Array.isArray(targetUserCohorts)
-        ) {
-          // Check if there's any matching cohort between the two users
-          const hasSharedCohort = currentUserCohorts.some(
-            (currentCohort: any) =>
-              targetUserCohorts.some(
-                (targetCohort: any) =>
-                  currentCohort.cohortId === targetCohort.cohortId
-              )
+        if (!role) {
+          setAuthError('Invalid user role for accessing assessments');
+          setIsAuthorizedForCohort(false);
+          setCohortAuthLoading(false);
+          return;
+        }
+
+        let currentUserAccessibleBatches: any[] = [];
+        let targetUserCohorts: any[] = [];
+
+        if (role === 'Lead') {
+          // For Lead: Get cohorts where type === "COHORT" and cohortStatus === "active"
+          const cohortList = await getCohortList(
+            currentUserId,
+            { customField: 'true' },
+            true
           );
 
-          setIsAuthorizedForCohort(hasSharedCohort);
+          if (Array.isArray(cohortList)) {
+            // Filter active cohorts of type "COHORT"
+            const activeCohorts = cohortList.filter(
+              (cohort: any) =>
+                cohort.type === 'COHORT' && cohort.cohortStatus === 'active'
+            );
 
-          if (!hasSharedCohort) {
-            setAuthError(
-              'You do not have permission to access this assessment. You and the target user do not share any common cohort.'
+            // Extract batches from childData
+            activeCohorts.forEach((cohort: any) => {
+              if (cohort.childData && Array.isArray(cohort.childData)) {
+                const activeBatches = cohort.childData.filter(
+                  (batch: any) =>
+                    batch.type === 'BATCH' &&
+                    batch.status === 'active' &&
+                    batch.cohortId === cohort.cohortId
+                );
+                currentUserAccessibleBatches.push(...activeBatches);
+              }
+            });
+          }
+        } else if (role === 'Instructor') {
+          // For Instructor: Use assigned cohortId with cohortMemberStatus === "active"
+          const cohortList = await getCohortList(
+            currentUserId,
+            { customField: 'true' },
+            true
+          );
+
+          if (Array.isArray(cohortList)) {
+            // Filter cohorts where cohortMemberStatus === "active"
+            currentUserAccessibleBatches = cohortList.filter(
+              (cohort: any) => cohort.cohortMemberStatus === 'active'
             );
           }
-        } else {
-          setAuthError('Unable to verify cohort access');
-          setIsAuthorizedForCohort(false);
+        }
+
+        // Get target user's cohorts
+        const targetUserCohortList = await getCohortList(userId as string);
+        if (Array.isArray(targetUserCohortList)) {
+          targetUserCohorts = targetUserCohortList;
+        }
+
+        // Check if there's any matching cohort between current user accessible batches and target user cohorts
+        const hasSharedCohort = currentUserAccessibleBatches.some(
+          (accessibleBatch: any) =>
+            targetUserCohorts.some(
+              (targetCohort: any) =>
+                accessibleBatch.cohortId === targetCohort.cohortId
+            )
+        );
+
+        setIsAuthorizedForCohort(hasSharedCohort);
+
+        if (!hasSharedCohort) {
+          setAuthError(
+            'You do not have permission to access this assessment. You and the target user do not share any common cohort.'
+          );
         }
       } catch (error) {
         console.error('Error checking cohort authorization:', error);

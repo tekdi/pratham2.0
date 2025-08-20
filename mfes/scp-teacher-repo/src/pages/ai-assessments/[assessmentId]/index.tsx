@@ -47,6 +47,7 @@ import { getMyCohortMemberList } from '../../../services/MyClassDetailsService';
 import { getCohortList } from '../../../services/CohortServices';
 import { AssessmentStatus } from '../../../utils/app.constant';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { getUserId } from '../../../services/ProfileService';
 
 interface LearnerData {
   learnerId: string;
@@ -178,37 +179,86 @@ const AssessmentDetails: React.FC = () => {
 
       try {
         setLoadingPhase('auth');
-        const userId = localStorage.getItem('userId');
+        const currentUserId = localStorage.getItem('userId');
 
-        if (!userId) {
+        if (!currentUserId) {
           setAuthError('User not authenticated');
           setLoading(false);
           setLoadingPhase(null);
           return;
         }
 
-        // Fetch user's cohort list with customField enabled
-        const cohortList = await getCohortList(
-          userId,
-          { customField: 'true' },
-          true
-        );
+        // Get user role from getUserId API
+        const { tenantData } = await getUserId();
+        const role =
+          tenantData.find((e: any) => e.roleName === 'Lead')?.roleName ||
+          tenantData.find((e: any) => e.roleName === 'Instructor')?.roleName;
 
-        if (!Array.isArray(cohortList)) {
-          setAuthError('Invalid cohort list response');
+        let accessibleBatches: any[] = [];
+
+        if (role === 'Lead') {
+          // For Lead: Get cohorts where type === "COHORT" and cohortStatus === "active"
+          const cohortList = await getCohortList(
+            currentUserId,
+            { customField: 'true' },
+            true
+          );
+
+          if (!Array.isArray(cohortList)) {
+            setAuthError('Invalid cohort list response');
+            setLoading(false);
+            setLoadingPhase(null);
+            return;
+          }
+
+          // Filter active cohorts of type "COHORT"
+          const activeCohorts = cohortList.filter(
+            (cohort: any) =>
+              cohort.type === 'COHORT' && cohort.cohortStatus === 'active'
+          );
+
+          // Extract batches from childData
+          activeCohorts.forEach((cohort: any) => {
+            if (cohort.childData && Array.isArray(cohort.childData)) {
+              const activeBatches = cohort.childData.filter(
+                (batch: any) =>
+                  batch.type === 'BATCH' &&
+                  batch.status === 'active' &&
+                  batch.cohortId === cohort.cohortId
+              );
+              accessibleBatches.push(...activeBatches);
+            }
+          });
+        } else if (role === 'Instructor') {
+          // For Instructor: Use assigned cohortId with cohortMemberStatus === "active"
+          const cohortList = await getCohortList(
+            currentUserId,
+            { customField: 'true' },
+            true
+          );
+
+          if (!Array.isArray(cohortList)) {
+            setAuthError('Invalid cohort list response');
+            setLoading(false);
+            setLoadingPhase(null);
+            return;
+          }
+
+          // Filter cohorts where cohortMemberStatus === "active"
+          accessibleBatches = cohortList.filter(
+            (cohort: any) => cohort.cohortMemberStatus === 'active'
+          );
+        } else {
+          setAuthError('Invalid user role for accessing assessments');
           setLoading(false);
           setLoadingPhase(null);
           return;
         }
 
-        // Check if the requested cohortId exists in user's accessible cohorts and has active status
-        const hasAccess = cohortList.some((cohort: any) => {
-          const cohortIdMatch =
-            cohort.cohortId === cohortId || cohort.id === cohortId;
-          const isActive =
-            cohort.cohortStatus === 'active' || cohort.status === 'active';
-          return cohortIdMatch && isActive;
-        });
+        // Check if the requested cohortId exists in accessible batches
+        const hasAccess = accessibleBatches.some(
+          (batch: any) => batch.cohortId === cohortId
+        );
 
         if (hasAccess) {
           setIsAuthorizedForCohort(true);
@@ -708,12 +758,7 @@ const AssessmentDetails: React.FC = () => {
   // Show loading with appropriate message based on phase
   if (loading) {
     const loadingText =
-      loadingPhase === 'auth'
-        ? 'Verifying access...'
-        : loadingPhase === 'data'
-        ? t('COMMON.LOADING')
-        : t('COMMON.LOADING');
-
+      loadingPhase === 'auth' ? 'Verifying access...' : t('COMMON.LOADING');
     return <Loader showBackdrop={true} loadingText={loadingText} />;
   }
 
