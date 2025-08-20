@@ -612,7 +612,10 @@ const MentorForm = ({
               '{UserName}': payload?.email,
               '{Password}': payload?.password,
               '{appUrl}':
-                (process.env.NEXT_PUBLIC_TEACHER_APP_URL as string) || '', //TODO: check url
+              (process.env.NEXT_PUBLIC_TEACHER_SBPLAYER as string).replace(
+                /\/sbplayer$/,
+                ''
+              )|| ""
             };
           }
 
