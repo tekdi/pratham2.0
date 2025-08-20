@@ -5,11 +5,12 @@ import KeyboardBackspaceOutlinedIcon from '@mui/icons-material/KeyboardBackspace
 import { useTheme } from '@mui/material/styles';
 import { Box } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import { useTranslation } from '@shared-lib';
+import Layout from '../../components/Layout';
 import { useEffect, useState } from 'react';
 import { jotFormId } from '../../../app.config';
 import { useDirection } from '../../utils/hooks/useDirection';
 import { toPascalCase } from '../../utils/helper';
+import { useTranslation } from '@shared-lib';
 
 type QueryParams = {
   fullName: string;
@@ -98,7 +99,7 @@ const SupportRequest = () => {
 
   return (
     <>
-      <Header />
+       <Layout>
       <Box display={'flex'} sx={{ marginBottom: '1.2rem' }}>
         <Box
           onClick={() => {
@@ -131,6 +132,7 @@ const SupportRequest = () => {
       <Box>
         <JotFormEmbed formId={jotFormId} queryParams={queryParams} />
       </Box>
+      </Layout> 
     </>
   );
 };
