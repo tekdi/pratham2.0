@@ -194,42 +194,6 @@ legend.Mui-focused {
   text-decoration: none;
 }
 
-/* Admin-app specific styling from customTheme */
-.ka-thead-background {
-  z-index: 1;
-  color: white;
-  background: #a8a6a6;
-  background-color: #f8efe7 !important;
-}
-
-.ka-tbody .ka-tr {
-  border-bottom: 2px solid #ececec;
-}
-
-.table-cell {
-  font-size: 14px;
-}
-
-.ka-table {
-  font-size: 14px;
-}
-
-.ka-cell {
-  line-height: 24px !important;
-  word-wrap: break-word;
-}
-
-.ka-thead-cell {
-  font-weight: 600;
-}
-
-.ka-thead-cell-content {
-  font-weight: normal !important;
-  font-size: 12px !important;
-  color: #635e57 !important;
-  font-weight: 400 !important;
-}
-
 /* Focus styling to match admin-app */
 .Mui-focused {
   color: #1f1b13 !important;
@@ -272,10 +236,4 @@ legend.Mui-focused {
   font-weight: 600 !important;
   color: #1e1b16 !important;
   margin-bottom: 16px !important;
-}
-
-@media (max-width: 768px) {
-  .ka-cell {
-    word-wrap: break-word;
-  }
 }

@@ -160,9 +160,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
           rowsPerPage={5}
           emptyStateMessage="No terms available"
           getRowKey={(row: Record<string, unknown>) =>
-            (row.identifier as string) ||
-            (row.code as string) ||
-            Math.random().toString()
+            (row.identifier as string) || (row.code as string)
           }
         />
       </CardContent>
