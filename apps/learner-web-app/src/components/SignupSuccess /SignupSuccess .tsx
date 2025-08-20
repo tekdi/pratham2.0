@@ -35,20 +35,22 @@ const SignupSuccess = () => {
       >
         Hurray!
       </Typography>
-      <Typography
-        variant="h1"
-        sx={{
-          fontWeight: 200,
-          // fontSize: '22px',
-          // lineHeight: '28px',
-          letterSpacing: '0px',
-          textAlign: 'center',
-          verticalAlign: 'middle',
-          mb: 3,
-        }}
-      >
-        You’ve successfully signed up for YouthNet!{' '}
-      </Typography>
+     {typeof window !== 'undefined' &&  window.localStorage && window.localStorage.getItem('userProgram') && (
+  <Typography
+    sx={{
+      fontWeight: 200,
+      fontSize: '22px',
+      lineHeight: '28px',
+      letterSpacing: '0px',
+      textAlign: 'center',
+      verticalAlign: 'middle',
+      mb: 3,
+    }}
+  >
+    You’ve successfully signed up for {localStorage.getItem('userProgram')}.
+  </Typography>
+)}
+
     </Box>
   );
 };
