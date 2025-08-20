@@ -13,6 +13,7 @@ export default memo(function SearchComponent({
   const { t } = useTranslation();
   const [searchValue, setSearchValue] = useState(value || '');
   const isInitialized = useRef(false);
+  const isUserInput = useRef(false);
 
   const debouncedSearch = useMemo(
     () =>
@@ -28,6 +29,11 @@ export default memo(function SearchComponent({
     // Only trigger search if component is initialized and search value actually changed from user input
     if (!isInitialized.current) {
       isInitialized.current = true;
+      return;
+    }
+
+    // Don't trigger search if this change is from prop value, not user input
+    if (!isUserInput.current) {
       return;
     }
 
@@ -51,10 +57,15 @@ export default memo(function SearchComponent({
     // This prevents triggering search on initial prop value setting
     if (!isInitialized.current) {
       setSearchValue(value || '');
+    } else {
+      // If component is already initialized, update searchValue without triggering search
+      isUserInput.current = false;
+      setSearchValue(value || '');
     }
   }, [value]);
 
   const handleSearchChange = (value: string) => {
+    isUserInput.current = true;
     setSearchValue(value);
   };
 

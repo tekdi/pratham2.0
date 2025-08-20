@@ -3,7 +3,14 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Avatar, Box, Button, Grid, IconButton, Typography } from '@mui/material';
+import {
+  Avatar,
+  Box,
+  Button,
+  Grid,
+  IconButton,
+  Typography,
+} from '@mui/material';
 import { useParams, useRouter } from 'next/navigation';
 // import { ContentSearch } from '@learner/utils/API/contentService';
 import { checkAuth } from '@shared-lib-v2/utils/AuthService';
@@ -184,47 +191,60 @@ const App = ({
         lg={isShowMoreContent ? 4 : 12}
         xl={isShowMoreContent ? 4 : 12}
       >
-        <Typography
-          variant="body5"
-          component="h2"
+        <Box
           sx={{
             mb: 2,
-            fontWeight: 500,
-            // fontSize: '18px',
-            // lineHeight: '24px',
-            mt:3,
+            px: {
+              xs: 2,
+              sm: 3,
+              md: 4,
+              lg: 0,
+              xl: 0,
+            },
           }}
         >
-          {t('LEARNER_APP.PLAYER.MORE_RELATED_RESOURCES')}
-        </Typography>
+          <Typography
+            variant="body5"
+            component="h2"
+            sx={{
+              mb: 2,
+              fontWeight: 500,
+              // fontSize: '18px',
+              // lineHeight: '24px',
+              mt: 3,
+            }}
+          >
+            {t('LEARNER_APP.PLAYER.MORE_RELATED_RESOURCES')}
+          </Typography>
 
-        <CourseUnitDetails
-          isShowLayout={false}
-          isHideInfoCard={true}
-          _box={{
-            pt: 1,
-            pb: 1,
-            px: { md: 1 },
-            height: 'calc(100vh - 185px)',
-          }}
-          _config={{
-            ...(_config?.courseUnitDetails || {}),
-            getContentData: (item: any) => {
-              setIsShowMoreContent(
-                item.children.filter(
-                  (item: any) => item.identifier !== identifier
-                )?.length > 0
-              );
-            },
-            _parentGrid: { pb: 2 },
-            default_img: '/images/image_ver.png',
-            _grid: { xs: 6, sm: 4, md: 6, lg: 6, xl: 6 },
-            _card: {
-              isHideProgress: true,
-              ...(_config?.courseUnitDetails?._card || {}),
-            },
-          }}
-        />
+          <CourseUnitDetails
+            isShowLayout={false}
+            isHideInfoCard={true}
+            _box={{
+              pt: 1,
+              pb: 1,
+              px: { md: 1 },
+              height: 'calc(100vh - 185px)',
+            }}
+            _config={{
+              ...(_config?.courseUnitDetails || {}),
+              getContentData: (item: any) => {
+                setIsShowMoreContent(
+                  item.children.filter(
+                    (item: any) => item.identifier !== identifier
+                  )?.length > 0
+                );
+              },
+              _parentGrid: { pb: 2 },
+              default_img: '/images/image_ver.png',
+              _grid: { xs: 6, sm: 4, md: 6, lg: 6, xl: 6 },
+              _card: {
+                isHideProgress: true,
+                ...(_config?.courseUnitDetails?._card || {}),
+              },
+            }}
+          />
+        </Box>
       </Grid>
     </Grid>
   );
@@ -257,7 +277,8 @@ const PlayerBox = ({
       setPlay(true);
     } else {
       router.push(
-        `/login?redirectUrl=${courseId ? `/content-details/${courseId}` : `/player/${identifier}`
+        `/login?redirectUrl=${
+          courseId ? `/content-details/${courseId}` : `/player/${identifier}`
         }`
       );
     }
@@ -318,12 +339,15 @@ const PlayerBox = ({
               isGenerateCertificate: isGenerateCertificate,
               trackable: trackable,
             })}
-            src={`${process.env.NEXT_PUBLIC_LEARNER_SBPLAYER
-              }?identifier=${identifier}${courseId && unitId ? `&courseId=${courseId}&unitId=${unitId}` : ''
-              }${userIdLocalstorageName
+            src={`${
+              process.env.NEXT_PUBLIC_LEARNER_SBPLAYER
+            }?identifier=${identifier}${
+              courseId && unitId ? `&courseId=${courseId}&unitId=${unitId}` : ''
+            }${
+              userIdLocalstorageName
                 ? `&userId=${localStorage.getItem(userIdLocalstorageName)}`
                 : ''
-              }`}
+            }`}
             style={{
               border: 'none',
               objectFit: 'contain',
