@@ -42,10 +42,7 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
   const { t } = useTranslation();
   const [selectedOption, setSelectedOption] = useState('');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const tenantName =
-    typeof window !== 'undefined'
-      ? localStorage.getItem('userProgram') || ''
-      : '';
+  const tenantName = typeof window !== 'undefined' ? localStorage.getItem('userProgram') || '' : '';
 
   const storedConfig =
     typeof window !== 'undefined'
@@ -59,7 +56,6 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
     t('LEARNER_APP.USER_PROFILE_CARD.PRIVACY_GUIDELINES'),
     t('LEARNER_APP.USER_PROFILE_CARD.CONSENT_FORM'),
     t('COMMON.FAQS'),
-    t('COMMON.SUPPORT_REQUEST'),
   ];
   if (storedConfig?.isEditProfile) {
     options.push(t('LEARNER_APP.USER_PROFILE_CARD.EDIT_PROFILE'));
@@ -130,8 +126,6 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
       window.open('/files/consent_form_above_18_hindi.pdf', '_blank');
     } else if (option === t('COMMON.FAQS')) {
       router.push('/faqs');
-    } else if (option === t('COMMON.SUPPORT_REQUEST')) {
-      router.push('/support-request');
     }
 
     setSelectedOption(option);
@@ -151,7 +145,7 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
       </Loader>
     ); // Show loading while data is being fetched
   }
-  // console.log('userData', userData);
+  console.log(userData);
   const {
     firstName,
     middleName,
@@ -163,7 +157,7 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
     username,
     customFields = [],
   } = userData;
-  console.log('customFields', customFields);
+  console.log("customFields", customFields);
   if (typeof window !== 'undefined' && mobile) {
     localStorage.setItem('usermobile', mobile);
   }
@@ -175,28 +169,21 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
     .filter(Boolean)
     .join(' ');
 
-  if (typeof window !== 'undefined' && fullName) {
-    localStorage.setItem('userfullname', fullName);
-  }
-
   // Smart name truncation - preserve all names but handle very long ones
   const getDisplayName = (name: string) => {
     if (name.length <= 35) return name;
-
+    
     const nameParts = name.split(' ');
     if (nameParts.length <= 3) return name;
-
+    
     // For very long names with more than 3 parts, show first, middle, and last
     const firstName = nameParts[0];
     const middleName = nameParts[1];
     const lastName = nameParts[nameParts.length - 1];
-
+    
     // If middle name is very long, abbreviate it
-    const middleInitial =
-      middleName && middleName.length > 8
-        ? middleName.charAt(0) + '.'
-        : middleName;
-
+    const middleInitial = middleName && middleName.length > 8 ? middleName.charAt(0) + '.' : middleName;
+    
     return `${firstName} ${middleInitial} ${lastName}`.trim();
   };
   const maritalStatus = getCustomFieldValue(customFields, 'MARITAL_STATUS');
@@ -230,7 +217,7 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
     customFields,
     'RELATION_WITH_GUARDIAN'
   );
-  const ptmName = getCustomFieldValue(customFields, 'PTM_NAME');
+const ptmName = getCustomFieldValue(customFields, 'PTM_NAME');
 
   const state = getCustomFieldValue(customFields, 'STATE');
   const district = getCustomFieldValue(customFields, 'DISTRICT');
@@ -300,18 +287,18 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
           </IconButton>{' '}
         </Box>
 
-        <Typography
-          fontWeight="600"
-          sx={{
+        <Typography 
+          fontWeight="600" 
+          sx={{ 
             mb: 1,
             fontSize: {
               xs: '0.9rem',
-              sm: '1rem',
-              md: '1.1rem',
+              sm: '1rem', 
+              md: '1.1rem'
             },
             lineHeight: 1.2,
             wordBreak: 'break-word',
-            hyphens: 'auto',
+            hyphens: 'auto'
           }}
         >
           {getDisplayName(fullName)}
@@ -352,7 +339,7 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
                     <Typography sx={valueStyle}>{mobile}</Typography>
                   </Grid>
                 )}
-                {phoneOwnership !== '-' && tenantName !== 'Camp to Club' && (
+                {phoneOwnership !== '-' && tenantName!=="Camp to Club"  &&(
                   <Grid item xs={6}>
                     <Typography sx={labelStyle}>
                       {t('LEARNER_APP.USER_PROFILE_CARD.PHONE_BELONGS_TO_YOU')}
@@ -392,17 +379,17 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
                     <Typography sx={labelStyle}>
                       {t('LEARNER_APP.USER_PROFILE_CARD.GUARDIAN_RELATION')}
                     </Typography>
-                    <Typography
+                    <Typography 
                       sx={{
                         ...valueStyle,
                         fontSize: {
                           xs: '0.75rem',
                           sm: '0.8rem',
-                          md: '0.85rem',
+                          md: '0.85rem'
                         },
                         lineHeight: 1.0,
                         wordBreak: 'keep-all',
-                        overflowWrap: 'normal',
+                        overflowWrap: 'normal'
                       }}
                     >
                       {toPascalCase(guarduianRelation)}
@@ -414,17 +401,17 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
                     <Typography sx={labelStyle}>
                       {t('LEARNER_APP.USER_PROFILE_CARD.GUARDIAN_NAME')}
                     </Typography>
-                    <Typography
+                    <Typography 
                       sx={{
                         ...valueStyle,
                         fontSize: {
                           xs: '0.75rem',
                           sm: '0.8rem',
-                          md: '0.85rem',
+                          md: '0.85rem'
                         },
                         lineHeight: 1.0,
                         wordBreak: 'keep-all',
-                        overflowWrap: 'normal',
+                        overflowWrap: 'normal'
                       }}
                     >
                       {toPascalCase(guardianName)}
@@ -450,14 +437,14 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
               </Grid>
             )}
             {ptmName !== '-' && (
-              <Grid item xs={3}>
-                <Typography sx={labelStyle}>
-                  {t('LEARNER_APP.USER_PROFILE_CARD.PTM_NAME')}
-                </Typography>
-                <Typography sx={valueStyle}>{toPascalCase(ptmName)}</Typography>
-              </Grid>
-            )}
-            {dob !== '-' && dob && (
+    <Grid item xs={3}>
+      <Typography sx={labelStyle}>
+        {t('LEARNER_APP.USER_PROFILE_CARD.PTM_NAME')}
+      </Typography>
+      <Typography sx={valueStyle}>{toPascalCase(ptmName)}</Typography>
+    </Grid>
+  )}
+            {dob !== '-' && dob &&  (
               <Grid item xs={6}>
                 <Typography sx={labelStyle}>
                   {t('LEARNER_APP.USER_PROFILE_CARD.DOB')}
@@ -471,7 +458,7 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
                 </Typography>
               </Grid>
             )}
-
+            
             {maritalStatus !== '-' && (
               <Grid item xs={6}>
                 <Typography sx={labelStyle}>
@@ -492,8 +479,8 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
                 </Typography>
               </Grid>
             )}
-
-            {qualification !== '-' && tenantName !== 'Camp to Club' && (
+              
+            {qualification !== '-' &&  tenantName!=="Camp to Club" &&(
               <Grid item xs={6}>
                 <Typography sx={labelStyle}>
                   {t('LEARNER_APP.USER_PROFILE_CARD.HIGHEST_QUALIFICATION')}
@@ -514,6 +501,8 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
                 </Typography>
               </Grid>
             )}
+          
+
           </Grid>
         </Box>
 

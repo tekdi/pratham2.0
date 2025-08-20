@@ -555,16 +555,20 @@ export const publishResourceFormResponse = {
               {
                 name: "Usability",
                 checkList: [
-                  "Correct Spellings, Grammar and Simple Language used.",
-                  "No abusive, violent, sexual, offensive, or discriminatory content.",
-                  "Used Good Quality Content (Audio/Video/pdf, etc) which runs in all the applications."
+                  "Correct Spellings and Grammar",
+                  "Simple Language",
+                  "Content/Audio/Video quality",
+                  "Suitable font size for app and portal",
+                  "Copyright infringement (images and texts)",
                 ],
               },
               {
                 name: "Content details",
                 checkList: [
-                  "Check for Appropriate Title, Description, Keywords, Tags, and Thumbnails used.",
-                  "Check for Copyright infringement (images, texts, etc)",
+                  "Appropriate Title",
+                  "Standard description of the course/resource",
+                  "Relevant tags and keywords",
+                  "Appropritae image ",
                 ],
               },
             ],
