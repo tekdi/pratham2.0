@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import Layout from '../../../../components/Layout';
 import {
@@ -277,12 +278,14 @@ const CreatePage = () => {
               value={modalName}
               onChange={(e) => {
                 const value = e.target.value;
-                // Allow only letters and spaces
-                if (/^[a-zA-Z\s]*$/.test(value)) {
+                // Allow letters, numbers, spaces, and select punctuation: & ( ) _ - : ; ? , .
+                if (/^[a-zA-Z0-9 &()_\-:;?,.]*$/.test(value)) {
                   setModalName(value);
                   if (modalNameError) setModalNameError('');
                 } else {
-                  setModalNameError('Only letters and spaces are allowed');
+                  setModalNameError(
+                    'Only letters, numbers, spaces, and & ( ) _ - : ; ? , . are allowed. Quotes are not allowed.'
+                  );
                 }
               }}
               error={!!modalNameError}

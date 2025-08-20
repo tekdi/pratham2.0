@@ -1,3 +1,8 @@
+export enum Storage {
+  USER_DATA = 'userData',
+  NAME = 'name',
+  USER_ID = 'userId',
+}
 
 export const firstLetterInUpperCase = (label: string): string => {
   if (!label) {
