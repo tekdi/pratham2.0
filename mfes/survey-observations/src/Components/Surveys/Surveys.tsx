@@ -92,8 +92,10 @@ function Surveys({
                 }}
                 className="one-line-text"
               >
-                {t('SURVEYS.CLOSED_ON')} {date}
-              </Typography>
+{new Date(date) > new Date() 
+                  ? `${t('SURVEYS.CLOSES_ON')} ${date}`
+                  : `${t('SURVEYS.CLOSED_ON')} ${date}`
+                }              </Typography>
             )}
           </Box>
 
