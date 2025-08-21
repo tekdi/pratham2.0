@@ -258,13 +258,13 @@ const Header = ({
                   color: '#fff',
                   border: '1px solid #fff',
                   '& .MuiSvgIcon-root': {
-                    color: '#fff',
+                    color: 'black'
                   },
                 }}
               >
                 {academicYearList.map(({ id, session }) => (
                   <MenuItem key={id} value={id}>
-                    {session}
+<span style={{ color: 'black' }}>{session}</span>
                   </MenuItem>
                 ))}
               </Select>
