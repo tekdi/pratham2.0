@@ -290,9 +290,17 @@ const OurProgramCarousel = () => {
                           },
                         }}
                         onClick={() =>
+                        {
+                          if(typeof window !== 'undefined' &&  window.localStorage){
+                            localStorage.setItem(
+                            'userProgram',
+                            program?.name ); 
+                          }
+                         
                           router.push(
                             '/registration?tenantId=' + program?.tenantId
                           )
+                        }
                         }
                       >
                         {t('LEARNER_APP.HOME.SIGN_UP')}
