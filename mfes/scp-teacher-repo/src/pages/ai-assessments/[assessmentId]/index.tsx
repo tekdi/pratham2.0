@@ -791,22 +791,7 @@ const AssessmentDetails: React.FC = () => {
                 // onClick={handleDownloadQuestionPaper}
                 onClick={handleDownloadQuestionPaper}
               >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                  <Typography
-                    sx={{
-                      fontWeight: 500,
-                      fontSize: '14px',
-                      color: '#1F1B13',
-                      width: '280px',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {'Download Question Paper'}
-                    .pdf
-                  </Typography>
-                </Box>
+                {t('AI.DOWNLOAD_QUESTION_PAPER')}.pdf
               </Button>
             )}
           </Box>
