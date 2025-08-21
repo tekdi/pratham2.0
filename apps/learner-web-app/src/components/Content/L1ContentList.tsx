@@ -139,7 +139,7 @@ const MyComponent: React.FC = () => {
           </Box>
           {(tab == '0' || tab === null) && <InProgressContent />}
 
-          {localStorage.getItem('userProgram') === TenantName.CAMP_TO_CLUB && (
+          {localStorage.getItem('userProgram') === TenantName.YOUTHNET && (
             <Grid container>
               <Grid
                 item

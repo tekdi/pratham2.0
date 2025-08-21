@@ -25,7 +25,7 @@ import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import logo from '/public/logo.png';
 import { Role } from '@workspace/utils/app.constant';
 import { getLocalStoredUserRole } from '@workspace/services/LocalStorageService';
-import { TENANT_DATA} from '@workspace/utils/app.constant';
+import { TENANT_DATA } from '@workspace/utils/app.constant';
 import TenantService from '@workspace/services/TenantService';
 const route = process.env.NEXT_PUBLIC_WORKSPACE_ROUTES;
 import aiAssessment from '../assets/images/assessment.svg';
