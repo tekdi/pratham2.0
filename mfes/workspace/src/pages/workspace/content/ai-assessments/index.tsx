@@ -239,7 +239,7 @@ const PublishPage = () => {
                   <KaTableComponent
                     columns={columns}
                     data={data}
-                    tableTitle="publish"
+                    tableTitle="all-content"
                     showQrCodeButton={true}
                   />
                 </Box>

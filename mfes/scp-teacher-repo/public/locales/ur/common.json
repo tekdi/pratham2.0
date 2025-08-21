@@ -143,7 +143,7 @@
     "SORT_BY_NAMES": "ناموں کے ذریعے ترتیب دیں",
     "INCORRECT_DATA_ENTRY": "غلط ڈیٹا انٹری",
     "DUPLICATED_USER": "ڈپلیکیٹ صارف",
-    "SUPPORT_REQUEST":"سروس کی درخواست",
+    "SUPPORT_REQUEST": "سروس کی درخواست",
     "RESIGNATION": "استعفیٰ",
     "WE_ARE_HERE_TO_HELP": "ہم آپ کی مدد کے لیے موجود ہیں",
     "SUBMIT_YOUR_REQUEST_FOR_ISSUES": "اپنی درخواست جمع کریں اور ہمیں کسی بھی مسئلے یا تشویش میں آپ کی مدد کرنے دیں۔",
@@ -646,12 +646,12 @@
     "SUBTOPICS_SELECTED": "منتخب ذیلی موضوعات",
     "NO_RESOURCES_FOUND": "کوئی وسائل نہیں ملے",
     "INVALID_RESOURCE": "غلط وسیلہ"
-    
   },
   "ASSESSMENTS": {
     "ASSESSMENTS": "جائزے",
     "CENTER": "مرکز",
     "ASSESSMENT_TYPE": "جائزے کی قسم",
+    "AI_ASSESSMENT_LIST": "AI جائزے فہرست",
     "COMPLETED_THE_ASSESSMENT": "جائزہ مکمل کیا",
     "SUBMITTED_ON": "جمع کرایا گیا",
     "CORRECT_ANSWER": "درست جوابات",
@@ -734,16 +734,16 @@
       "MONTHLY_REGISTRATIONS_OVERVIEW": "ماہانہ رجسٹریشن کا جائزہ",
       "CLOSED_ON": "بند کیا گیا",
       "USERS_&VILLAGES": "صارفین اور دیہات",
-    "VILLAGES": "دیہات",
-    "YOUTH_VOLUNTEERS": "نوجوان/رضاکار",
-    "SEARCH_VILLAGES": "دیہات تلاش کریں"
+      "VILLAGES": "دیہات",
+      "YOUTH_VOLUNTEERS": "نوجوان/رضاکار",
+      "SEARCH_VILLAGES": "دیہات تلاش کریں"
     }
   },
-    "VOLUNTEERLIST": {
-      "ENTRIES": "اندراجات",
-      "VOLUNTEERS_ASSIGNED": "رضاکار تفویض کیے گئے"
-    },
-    "YOUTHNET_DASHlBOARD": {
+  "VOLUNTEERLIST": {
+    "ENTRIES": "اندراجات",
+    "VOLUNTEERS_ASSIGNED": "رضاکار تفویض کیے گئے"
+  },
+  "YOUTHNET_DASHlBOARD": {
     "MANAGES": "منتظم کرتا ہے",
     "ABOVE_18": "18 سے زائد",
     "BELOW_18": "18 سے کم",
@@ -867,5 +867,4 @@
     "SUBJECTS_I_TEACH": "وہ مضامین جو میں پڑھاتا ہوں",
     "MY_MAIN_SUBJECTS": "میرے اہم مضامین"
   }
-
 }
