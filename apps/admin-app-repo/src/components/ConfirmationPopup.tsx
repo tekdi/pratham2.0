@@ -18,7 +18,7 @@ interface GenericModalProps {
   children?: React.ReactNode;
   checked?: boolean;
   primary?: string;
-  secondary: string;
+  secondary?: string;
   reason?: any;
   centerPrimary?: any;
   isFromMarkAsVoluteer?: boolean;

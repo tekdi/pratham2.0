@@ -87,7 +87,7 @@ const AssessmentList = () => {
   // Assessment type from query params
   useEffect(() => {
     const newAssessmentType =
-      query.type === 'post' ? 'post' : query.type === 'other' ? 'other' : 'pre';
+      query.type === 'post' ? 'post' : query.type === 'other' ? 'other' : 'other';
     setAssessmentType(newAssessmentType);
   }, [query.type]);
 
@@ -330,7 +330,7 @@ const AssessmentList = () => {
         width="100%"
       >
         <Typography fontSize="22px">
-          {t('ASSESSMENTS.ASSESSMENT_LIST')}
+          {t('ASSESSMENTS.AI_ASSESSMENT_LIST')}
         </Typography>
       </Box>
 

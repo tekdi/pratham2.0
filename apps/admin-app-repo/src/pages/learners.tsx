@@ -32,6 +32,8 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { updateCohortMemberStatus } from '@/services/CohortService/cohortService';
 import editIcon from '../../public/images/editIcon.svg';
 import deleteIcon from '../../public/images/deleteIcon.svg';
+import restoreIcon from '../../public/images/restore_user.svg';
+
 import Image from 'next/image';
 import {
   extractMatchingKeys,
@@ -56,6 +58,7 @@ import { getCenterList } from '@/services/MasterDataService';
 import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 import CenterLabel from '@/components/Centerlabel';
 import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
+import { showToastMessage } from '@/components/Toastify';
 
 const Learner = () => {
   const theme = useTheme<any>();
@@ -78,6 +81,7 @@ const Learner = () => {
   const [tenantId, setTenantId] = useState('');
   const [isReassign, setIsReassign] = useState(false);
   const [open, setOpen] = useState(false);
+  const [archiveToActiveOpen, setArchiveToActiveOpen] = useState(false);
   const [checked, setChecked] = useState(false);
   const [userID, setUserId] = useState('');
   const [centerSelectiveValue, setCenterSelectiveValue] = useState('');
@@ -436,6 +440,83 @@ const Learner = () => {
       console.error('Error updating team leader:', error);
     }
   };
+   const archiveToactive = async () => {
+    try {
+      let membershipIds = null;
+
+      // Attempt to get the cohort list
+      try {
+        const userCohortResp = await getCohortList(userID);
+        if (userCohortResp?.result?.length) {
+          membershipIds = userCohortResp?.result?.map(
+            (item) => item.cohortMembershipId
+          );
+        } else {
+          console.warn('No cohort data found for the user.');
+        }
+      } catch (error) {
+        console.error('Failed to fetch cohort list:', error);
+      }
+
+      // Attempt to update cohort member status only if we got a valid membershipId
+      if (membershipIds && Array.isArray(membershipIds)) {
+        for (const membershipId of membershipIds) {
+          try {
+            const updateResponse = await updateCohortMemberStatus({
+              memberStatus: 'active',
+           //   statusReason: reason,
+              membershipId,
+            });
+
+            if (updateResponse?.responseCode !== 200) {
+              console.error(
+                `Failed to archive user with membershipId ${membershipId}:`,
+                updateResponse
+              );
+            } else {
+              console.log(
+                `User with membershipId ${membershipId} successfully archived.`
+              );
+            }
+          } catch (error) {
+            console.error(
+              `Error archiving user with membershipId ${membershipId}:`,
+              error
+            );
+          }
+        }
+      }
+
+      // Always attempt to delete the user
+      console.log('Proceeding to self-delete...');
+      const resp = await deleteUser(userID, {
+        userData: { status: 'active' },
+      });
+                        showToastMessage(t("LEARNERS.ACTIVATE_USER_SUCCESS"), "success");
+
+
+      if (resp?.responseCode === 200) {
+        // setResponse((prev) => ({
+        //   ...prev,
+        //   result: {
+        //     ...prev?.result,
+        //     getUserDetails: prev?.result?.getUserDetails?.filter(
+        //       (item) => item?.userId !== userID
+        //     ),
+        //   },
+        // }));
+        searchData(prefilledFormData, currentPage);
+        
+        console.log('learner successfully aactive.');
+      } else {
+        console.error('Failed to archive team leader:', resp);
+      }
+
+      return resp;
+    } catch (error) {
+      console.error('Error updating team leader:', error);
+    }
+  };
   // Define actions
   const actions = [
     // {
@@ -467,7 +548,8 @@ const Learner = () => {
     //   },
     //   show: (row) => row.status !== 'archived',
     // },
-    {
+   
+     {
       icon: (
         <Box
           sx={{
@@ -506,6 +588,46 @@ const Learner = () => {
         setChecked(false);
       },
       show: (row) => row.status !== 'archived',
+    },
+       {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            backgroundColor: 'rgb(227, 234, 240)',
+            padding: '10px',
+          }}
+        >
+          {' '}
+          <Image src={restoreIcon} alt="" />{' '}
+        </Box>
+      ),
+      callback: async (row) => {
+        const findVillage = row?.customFields.find((item) => {
+          if (item.label === 'VILLAGE') {
+            return item;
+          }
+        });
+
+        // console.log('row:', row?.customFields[2].selectedValues[0].value);
+        setEditableUserId(row?.userId);
+
+        setArchiveToActiveOpen(true);
+
+        setUserId(row?.userId);
+
+        setUserData({
+          firstName: row?.firstName || '',
+          lastName: row?.lastName || '',
+          village: findVillage?.selectedValues?.[0]?.value || '',
+        });
+        // setReason('');
+        // setChecked(false);
+      },
+      show: (row) => row.status !== 'active',
     },
     // {
     //   icon: (
@@ -744,6 +866,7 @@ const Learner = () => {
         reason={reason}
         onClickPrimary={userDelete}
       >
+       
         <DeleteDetails
           firstName={userData.firstName}
           lastName={userData.lastName}
@@ -754,6 +877,35 @@ const Learner = () => {
           setReason={setReason}
         />
       </ConfirmationPopup>
+        <ConfirmationPopup
+        checked={true}
+        open={archiveToActiveOpen}
+        onClose={() => setArchiveToActiveOpen(false)}
+        title={t('COMMON.ACTIVATE_USER')}
+        primary={t('COMMON.ACTIVATE')}
+        secondary={t('COMMON.CANCEL')}
+        reason={"yes"}
+        onClickPrimary={archiveToactive}
+      >
+        <Box
+                sx={{
+                  border: '1px solid #ddd',
+                  borderRadius: 2,
+                  mb: 2,
+                  p: 1,
+                }}
+              >
+                <Typography>
+                  { userData.firstName } { userData.lastName } {t("FORM.WAS_BELONG_TO")}
+                </Typography>
+                <TextField fullWidth value={userData.village} disabled sx={{ mt: 1 }} />
+              </Box>
+         <Typography fontWeight="bold">
+                   {t("FORM.CONFIRM_TO_ACTIVATE")}  
+
+                </Typography>
+
+ </ConfirmationPopup>
     </>
   );
 };

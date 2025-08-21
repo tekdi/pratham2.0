@@ -9,7 +9,7 @@ interface GenericModalProps {
   children: ReactNode;
   onSave?: () => void;
   showActions?: boolean;
-  maxWidth?: string | number;
+  maxWidth?: string | number | object;
   saveButtonText?: string;
   cancelButtonText?: string;
   disableSaveButton?: boolean;
@@ -55,7 +55,7 @@ const GenericModal: React.FC<GenericModalProps> = ({
             p: 2,
           }}
         >
-          <Typography variant="h6" component="h2" id="modal-title">
+          <Typography variant="h4" component="h2" id="modal-title">
             {title}
           </Typography>
           <IconButton
@@ -78,7 +78,7 @@ const GenericModal: React.FC<GenericModalProps> = ({
           <Box
             sx={{
               display: 'flex',
-              justifyContent: 'flex-end',
+              justifyContent: 'space-between',
               gap: 1,
               borderTop: '1px solid',
               borderColor: 'divider',
@@ -87,9 +87,9 @@ const GenericModal: React.FC<GenericModalProps> = ({
           >
             <Button
               variant="outlined"
-              sx={{
-                width: '100%',
-              }}
+              // sx={{
+              //   width: '100%',
+              // }}
               onClick={onClose}
             >
               {cancelButtonText}
@@ -99,9 +99,9 @@ const GenericModal: React.FC<GenericModalProps> = ({
                 variant="contained"
                 onClick={onSave}
                 disabled={disableSaveButton}
-                sx={{
-                  width: '100%',
-                }}
+                // sx={{
+                //   width: '100%',
+                // }}
               >
                 {saveButtonText}
               </Button>

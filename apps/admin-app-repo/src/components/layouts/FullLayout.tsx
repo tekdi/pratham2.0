@@ -31,9 +31,9 @@ const FullLayout = ({ children }: any) => {
     <MainWrapper>
       <Header
         sx={{
-          paddingLeft: isSidebarOpen && lgUp ? "265px" : "",
-          backgroundColor: "#4d4639",
-          boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+          paddingLeft: isSidebarOpen && lgUp ? "" : "",
+          background: 'linear-gradient(to right, white, #F8EFDA)',
+          borderBottom: '1px solid #ddd',
         }}
         toggleMobileSidebar={() => setMobileSidebarOpen(true)}
       />
