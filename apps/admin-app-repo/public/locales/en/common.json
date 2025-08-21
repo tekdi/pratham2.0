@@ -3,7 +3,7 @@
     "LANGUAGE": "Language",
     "ADD_NEW": "Add New",
     "PAGE_SIZE": "Page Size",
-    "DELETE_USER": "Delete User Permanently",
+    "DELETE_USER": "Delete User",
     "DELETE_USER_WITH_REASON": "Delete User",
     "USER_DELETED_PERMANENTLY": "User Successfully Deleted!",
     "OTHER_REASON": "Other Reason",

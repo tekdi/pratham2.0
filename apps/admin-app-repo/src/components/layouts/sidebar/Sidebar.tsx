@@ -74,7 +74,7 @@ const Sidebar = ({
       bgcolor="#F8EFDA"
       sx={{
         background: 'linear-gradient(to bottom, white, #F8EFDA)',
-        height: '100vh',
+        height: 'calc(100vh - 100px)',
         overflowY: 'auto',
       }}
     >
@@ -162,6 +162,7 @@ const Sidebar = ({
             width: '284px',
             border: '0 !important',
             boxShadow: '0px 7px 30px 0px rgb(113 122 131 / 11%)',
+            top: '65px',
           },
         }}
       >

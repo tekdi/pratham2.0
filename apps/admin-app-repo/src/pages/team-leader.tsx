@@ -52,6 +52,8 @@ import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
+import restoreIcon from '../../public/images/restore_user.svg';
+import { showToastMessage } from '@/components/Toastify';
 
 const TeamLeader = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -69,6 +71,7 @@ const TeamLeader = () => {
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [isEdit, setIsEdit] = useState(false);
   const [isReassign, setIsReassign] = useState(false);
+  const [archiveToActiveOpen, setArchiveToActiveOpen] = useState(false);
 
   const [editableUserId, setEditableUserId] = useState('');
   const [roleId, setRoleID] = useState('');
@@ -189,7 +192,83 @@ const TeamLeader = () => {
       console.error('Error updating team leader:', error);
     }
   };
+ const archiveToactive = async () => {
+    try {
+      let membershipIds = null;
 
+      // Attempt to get the cohort list
+      try {
+        const userCohortResp = await getCohortList(userID);
+        if (userCohortResp?.result?.length) {
+          membershipIds = userCohortResp?.result?.map(
+            (item) => item.cohortMembershipId
+          );
+        } else {
+          console.warn('No cohort data found for the user.');
+        }
+      } catch (error) {
+        console.error('Failed to fetch cohort list:', error);
+      }
+
+      // Attempt to update cohort member status only if we got a valid membershipId
+      if (membershipIds && Array.isArray(membershipIds)) {
+        for (const membershipId of membershipIds) {
+          try {
+            const updateResponse = await updateCohortMemberStatus({
+              memberStatus: 'active',
+           //   statusReason: reason,
+              membershipId,
+            });
+
+            if (updateResponse?.responseCode !== 200) {
+              console.error(
+                `Failed to archive user with membershipId ${membershipId}:`,
+                updateResponse
+              );
+            } else {
+              console.log(
+                `User with membershipId ${membershipId} successfully archived.`
+              );
+            }
+          } catch (error) {
+            console.error(
+              `Error archiving user with membershipId ${membershipId}:`,
+              error
+            );
+          }
+        }
+      }
+
+      // Always attempt to delete the user
+      console.log('Proceeding to self-delete...');
+      const resp = await deleteUser(userID, {
+        userData: { status: 'active' },
+      });
+                        showToastMessage(t("LEARNERS.ACTIVATE_USER_SUCCESS"), "success");
+
+
+      if (resp?.responseCode === 200) {
+        // setResponse((prev) => ({
+        //   ...prev,
+        //   result: {
+        //     ...prev?.result,
+        //     getUserDetails: prev?.result?.getUserDetails?.filter(
+        //       (item) => item?.userId !== userID
+        //     ),
+        //   },
+        // }));
+        searchData(prefilledFormData, currentPage);
+        
+        console.log('learner successfully aactive.');
+      } else {
+        console.error('Failed to archive team leader:', resp);
+      }
+
+      return resp;
+    } catch (error) {
+      console.error('Error updating team leader:', error);
+    }
+  };
   const searchData = async (formData, newPage) => {
     if (formData) {
       formData = Object.fromEntries(
@@ -368,6 +447,50 @@ const TeamLeader = () => {
       },
       show: (row) => row.status !== 'archived',
     },
+     {
+          icon: (
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                cursor: 'pointer',
+                backgroundColor: 'rgb(227, 234, 240)',
+                padding: '10px',
+              }}
+            >
+              {' '}
+              <Image src={restoreIcon} alt="" />{' '}
+            </Box>
+          ),
+          callback: async (row) => {
+            const findVillage = row?.customFields.find((item) => {
+              if (item.label === 'VILLAGE') {
+                return item;
+              }
+            });
+    
+            // console.log('row:', row?.customFields[2].selectedValues[0].value);
+            setEditableUserId(row?.userId);
+    
+            setArchiveToActiveOpen(true);
+    
+            setUserId(row?.userId);
+     const findVillagename = row?.customFields.find((item) => {
+          if (item.label === 'BLOCK') {
+            return item;
+          }
+        });
+         setVillage(findVillagename?.selectedValues[0]?.value);
+        setUserId(row?.userId);
+        setFirstName(row?.firstName);
+        setLastName(row?.lastName);
+
+            // setReason('');
+            // setChecked(false);
+          },
+          show: (row) => row.status !== 'active',
+        }
   ];
 
   // Pagination handlers
@@ -572,6 +695,35 @@ const TeamLeader = () => {
           setReason={setReason}
         />
       </ConfirmationPopup>
+      <ConfirmationPopup
+        checked={true}
+        open={archiveToActiveOpen}
+        onClose={() => setArchiveToActiveOpen(false)}
+        title={t('COMMON.ACTIVATE_USER')}
+        primary={t('COMMON.ACTIVATE')}
+        secondary={t('COMMON.CANCEL')}
+        reason={"yes"}
+        onClickPrimary={archiveToactive}
+      >
+        <Box
+                sx={{
+                  border: '1px solid #ddd',
+                  borderRadius: 2,
+                  mb: 2,
+                  p: 1,
+                }}
+              >
+                <Typography>
+                  { firstName } { lastName } {t("FORM.WAS_BELONG_TO")}
+                </Typography>
+                <TextField fullWidth value={village} disabled sx={{ mt: 1 }} />
+              </Box>
+         <Typography fontWeight="bold">
+                   {t("FORM.CONFIRM_TO_ACTIVATE")}  
+
+                </Typography>
+
+ </ConfirmationPopup>
     </>
   );
 };
