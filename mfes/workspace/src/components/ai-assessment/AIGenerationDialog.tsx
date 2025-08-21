@@ -93,6 +93,9 @@ const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
       >
         {/* Success State */}
 
+
+
+        {state === 'loader' &&(
         <>
           <Box sx={{ mb: 3 }}>
             <CheckCircleOutlineOutlinedIcon
@@ -126,6 +129,9 @@ const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
             You can head to the editor and review the questions.
           </Typography>
         </>
+        )}
+
+        {/* Loader State */}
 
         {/* Failed/Retry State */}
         {state === 'failed' && (
