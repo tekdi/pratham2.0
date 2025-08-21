@@ -25,7 +25,7 @@ import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import logo from '/public/logo.png';
 import { Role } from '@workspace/utils/app.constant';
 import { getLocalStoredUserRole } from '@workspace/services/LocalStorageService';
-import { TENANT_DATA } from '@workspace/utils/app.constant';
+import { TENANT_DATA} from '@workspace/utils/app.constant';
 import TenantService from '@workspace/services/TenantService';
 const route = process.env.NEXT_PUBLIC_WORKSPACE_ROUTES;
 import aiAssessment from '../assets/images/assessment.svg';
@@ -33,7 +33,7 @@ import aiAssessment from '../assets/images/assessment.svg';
 let isAdmin: boolean;
 let isSCP: boolean;
 if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
-  isSCP = localStorage.getItem('program')==='Second Chance Program' ? true : false;
+  isSCP = localStorage.getItem('program')===TENANT_DATA.SECOND_CHANCE_PROGRAM ? true : false;
 }
 if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
   isAdmin = localStorage.getItem('adminInfo') ? true : false;

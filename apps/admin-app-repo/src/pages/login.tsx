@@ -86,7 +86,7 @@ const LoginPage = () => {
             role = JSON.parse(storedUserData);
             if (role?.role === Role.SCTA || role?.role === Role.CCTA) {
               // To do :- hardcoding to be removed
-              if (role?.tenantData[0]?.tenantName != 'Second Chance Program') {
+              if (role?.tenantData[0]?.tenantName != TenantName.SECOND_CHANCE_PROGRAM) {
                 router.push('/workspace');
               } else {
                 router.push('/course-planner', undefined, { locale: locale });

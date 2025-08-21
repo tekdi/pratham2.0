@@ -8,6 +8,7 @@ import { ContentItem, Loader } from '@shared-lib';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
+import { TenantName } from '../../utils/app.constant';
 
 const InfoCard = dynamic(() => import('@InfoCard'), {
   ssr: false,
@@ -117,7 +118,7 @@ export default function App({
             se_subDomains: searchParams?.get('se_subDomains')?.split(','),
           }
           : {}),
-        program: ['Open School'],
+        program: [TenantName.POS],
       });
       setItem(_infoCard?.item || {});
     }

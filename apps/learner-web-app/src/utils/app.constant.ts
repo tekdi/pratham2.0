@@ -42,7 +42,9 @@ export enum TenantName {
   SECOND_CHANCE_PROGRAM = 'Second Chance Program',
   YOUTHNET = 'YouthNet',
   POS = 'Open School',
-  PRAGYANPATH = 'Pragyanpath'
+  PRAGYANPATH = 'Pragyanpath',
+  CAMP_TO_CLUB = 'Camp to Club'
+
 }
 
 export enum Status {

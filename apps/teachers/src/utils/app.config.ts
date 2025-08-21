@@ -125,6 +125,11 @@ export const TENANT_DATA = {
   YOUTHNET: 'YouthNet',
   MENTOR: 'mentor',
   LEADER: 'leader',
+  CAMP_TO_CLUB : 'Camp to Club',
+
+  POS :'Open School',
+  PRAGYANPATH : 'Pragyanpath',
+
 };
 
 export const jotFormId = process.env.NEXT_PUBLIC_JOTFORM_ID || '';
