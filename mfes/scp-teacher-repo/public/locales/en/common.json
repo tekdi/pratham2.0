@@ -697,6 +697,7 @@
     "ASSESSMENTS": "Assessments",
     "AI_ASSESSMENT": "AI Assessment",
     "ASSESSMENT_LIST": "Assessment List",
+    "AI_ASSESSMENT_LIST": "AI Assessment List",
     "CENTER": "Center",
     "ASSESSMENT_TYPE": "Assessment Type",
     "COMPLETED_THE_ASSESSMENT": "completed the assessment",
@@ -982,7 +983,8 @@
   "GRADE": "Grade",
   "AI": {
     "ASSESSMENT_DETAILS": "Assessment Details",
-    "SAMPLE_QUESTION_AND_ANSWER_PAPER": "Sample Question and Answer Paper",
+    "SAMPLE_QUESTION_AND_ANSWER_PAPER": "Sample Answer Sheet",
+    "DOWNLOAD_QUESTION_PAPER": "Download Question Paper",
     "SEARCH_LEARNER": "Search Learner..",
     "TOTAL_LEARNERS": "{{count}} of {{total}} Learners",
     "SORT_AND_FILTER_LEARNERS": "Sort & Filter Learners",
