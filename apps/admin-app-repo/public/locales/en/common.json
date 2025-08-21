@@ -162,7 +162,9 @@
     "WE_ARE_HERE_TO_HELP": "We’re Here to Help",
     "NO_STATE_LEAD_FOUND": "No State Lead Found",
     "FAQS": "FAQ's",
-    "RESET_FILTERS": "Reset Filters"
+    "RESET_FILTERS": "Reset Filters",
+        "ACTIVATE_USER": "Activate User",
+    "ACTIVATE": "Activate"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -272,7 +274,10 @@
     "LEARNER_UPDATED_SUCCESSFULLY": "Learner has been successfully updated!",
     "EDIT_LEARNER": "Edit Learner",
     "NO_LEARNERS_FOUND": "No Learners Found",
-    "RE_ASSIGN_LEARNER": "Re-assign Learner"
+    "RE_ASSIGN_LEARNER": "Re-assign Learner",
+    "TEST_BELONG_TO": "test belongs to below center",
+       "WAS_BELONG_TO": "was archived in the below location",
+    "CONFIRM_TO_ACTIVATE":"Are you sure you want to activate this user again?"
   },
   "MENTOR_LEADERS": {
     "SEARCHBAR_PLACEHOLDER": "Search mentor leaders..",
@@ -373,6 +378,7 @@
     "BLOCK_CODE": "Block Code",
     "CODE": "Code",
     "MASTER": "Master"
+    
   },
   "CENTERS": {
     "CENTER": "center",
@@ -530,7 +536,9 @@
     "LAST_NAME": "Last Name",
     "MOTHER_NAME": "Mother Name",
     "DATE_OF_BIRTH": "Date of Birth",
-    "TEST_BELONG_TO": "test belongs to below center"
+    "TEST_BELONG_TO": "test belongs to below center",
+     "RE_ASSIGN_LEARNER": "Re-assign Learner",
+        "ACTIVATE_USER_SUCCESS": "User has been successfully activated"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "Invalid Input.",
