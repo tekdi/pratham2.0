@@ -47,6 +47,7 @@ export const mapUserData = (userData: any) => {
       dob: userData.dob || '',
       gender: userData.gender || '',
        mother_name: getSingleTextValue('MOTHER_NAME'),
+        number_of_children:getSingleTextValue('NUMBER_OF_CHILDREN'),
               father_name: getSingleTextValue('FATHER_NAME'),
                             spouse_name: getSingleTextValue('SPOUSE_NAME'),
 
@@ -88,6 +89,9 @@ export const mapUserData = (userData: any) => {
     }
     if (getSingleTextValue('IS_VOLUNTEER')) {
       result.is_volunteer = getSingleTextValue('IS_VOLUNTEER');
+    }
+     if (getSingleTextValue('NUMBER_OF_CHILDREN')) {
+result.number_of_children = getSingleTextValue('NUMBER_OF_CHILDREN');
     }
     if (getSelectedValueName(userData.customFields, 'NAME_OF_GUARDIAN')) {
       result.guardian_name =
