@@ -563,7 +563,7 @@ const QuestionPaperPDF = ({ data }: any) => {
                                 }}
                               >
                                 {/* ({toRoman(oIndex + 1)}) {!isImage && label} */}
-                                <Text>{String.fromCharCode(65 + oIndex)}</Text>{' '}
+                                <Text>{String.fromCharCode(65 + oIndex)}.</Text>{' '}
                                 {!isImage && label}
                               </Text>
                               {isImage && (
