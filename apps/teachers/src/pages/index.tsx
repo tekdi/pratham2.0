@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { TenantName } from '../utils/app.constant';
 
 const Home: React.FC = () => {
   const { push } = useRouter();
@@ -14,7 +15,7 @@ const Home: React.FC = () => {
       const token = localStorage.getItem('token');
       if (token) {
         let tenantName = localStorage.getItem('tenantName');
-        if (tenantName == 'YouthNet') {
+        if (tenantName == TenantName.YOUTHNET) {
           push('/youthnet');
         } else {
           push('/scp-teacher-repo');
