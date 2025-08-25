@@ -322,6 +322,7 @@ const QuestionSetEditor: React.FC<{
               margin: '0 auto 10px'
             }}></div>
             {/* <p>Publishing content... Please wait 5 seconds</p> */}
+            {/* @ts-ignore */}
             <style jsx>{`
               @keyframes spin {
                 0% { transform: rotate(0deg); }

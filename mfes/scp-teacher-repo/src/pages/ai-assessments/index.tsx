@@ -87,7 +87,7 @@ const AssessmentList = () => {
   // Assessment type from query params
   useEffect(() => {
     const newAssessmentType =
-      query.type === 'post' ? 'post' : query.type === 'other' ? 'other' : 'other';
+      query.type === 'post' ? 'post' : query.type === 'pre' ? 'pre' : 'other';
     setAssessmentType(newAssessmentType);
   }, [query.type]);
 
@@ -231,7 +231,7 @@ const AssessmentList = () => {
     const queryParams = { ...query };
 
     if (newType === 'post') queryParams.type = 'post';
-    else if (newType === 'other') queryParams.type = 'other';
+    else if (newType === 'pre') queryParams.type = 'pre';
     else delete queryParams.type;
 
     router.push({ pathname: router.pathname, query: queryParams }, undefined, {
