@@ -28,6 +28,8 @@ export * from './lib/Progress/Circular';
 export * from './lib/Progress/Progress';
 export * from './lib/Progress/CircularProgressWithLabel';
 export * from './lib/Loader/Loader';
+// @ts-ignore
+
 import Image from '../images/default.png';
 export const IMAGES = {
   DEFAULT_PLACEHOLDER: Image,
