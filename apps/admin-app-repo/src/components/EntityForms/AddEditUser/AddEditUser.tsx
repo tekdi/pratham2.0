@@ -26,7 +26,7 @@ import {
   updateCohortUpdate,
   updateReassignUser,
 } from '@/services/CohortService/cohortService';
-import { CohortTypes, RoleId } from '@/utils/app.constant';
+import { CohortTypes, RoleId, TenantName } from '@/utils/app.constant';
 import _ from 'lodash';
 import StepperForm from '@shared-lib-v2/DynamicForm/components/StepperForm';
 import CohortManager from '@/utils/CohortManager';
@@ -405,7 +405,7 @@ const AddEditUser = ({
         Array.isArray(payload.tenantCohortRoleMapping) &&
         payload.tenantCohortRoleMapping[0] &&
         payload.tenantCohortRoleMapping[0]['roleId'] === RoleId.TEAM_LEADER &&
-        localStorage.getItem('program') === 'Second Chance Program'
+        localStorage.getItem('program') === TenantName.SECOND_CHANCE_PROGRAM
       ) {
         payload.automaticMember = {
           value: true,
