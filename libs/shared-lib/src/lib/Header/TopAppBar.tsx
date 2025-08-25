@@ -150,7 +150,6 @@ const DesktopBar = ({
             <Button
               key={index}
               // @ts-ignore
-
               variant={
                 link.variant ??
                 (link.isActive ? 'top-bar-link-button' : 'top-bar-link-text')
