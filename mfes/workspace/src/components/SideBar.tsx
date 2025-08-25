@@ -33,7 +33,7 @@ import aiAssessment from '../assets/images/assessment.svg';
 let isAdmin: boolean;
 let isSCP: boolean;
 if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
-  isSCP = localStorage.getItem('program')==='Second Chance Program' ? true : false;
+  isSCP = localStorage.getItem('program')===TENANT_DATA.SECOND_CHANCE_PROGRAM ? true : false;
 }
 if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
   isAdmin = localStorage.getItem('adminInfo') ? true : false;

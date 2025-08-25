@@ -29,6 +29,7 @@ import AccessibilityOptions from '../AccessibilityOptions/AccessibilityOptions';
 import { useColorInversion } from '../../context/ColorInversionContext';
 import { SearchButton } from './SearchButton';
 import { logEvent } from '@learner/utils/googleAnalytics';
+import { TenantName } from '../../utils/app.constant';
 
 interface SubMenuItem {
   title: string | React.ReactNode;
@@ -281,8 +282,8 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         title: t('LEARNER_APP.POS.PROGRAM'),
         isActive: currentPage === '/pos/program',
         child: [
-          { code: 'Vocational Training', name: 'YouthNet' },
-          { name: 'Second Chance Program', code: 'SCP' },
+          { code: 'Vocational Training', name: TenantName.YOUTHNET },
+          { name: TenantName.SECOND_CHANCE_PROGRAM, code: 'SCP' },
         ].map((item: any) => ({
           title: item?.name,
           to: () => router.push(`/pos/program?program=${item?.code}`),
