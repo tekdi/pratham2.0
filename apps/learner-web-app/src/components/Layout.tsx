@@ -19,6 +19,7 @@ import ProfileMenu from './ProfileMenu/ProfileMenu';
 import ConfirmationModal from './ConfirmationModal/ConfirmationModal';
 import { checkAuth } from '@shared-lib-v2/utils/AuthService';
 import MuiThemeProvider from '@learner/assets/theme/MuiThemeProvider';
+import { TenantName } from '../utils/app.constant';
 
 // Custom DrawerItem interface
 interface NewDrawerItemProp extends DrawerItemProp {
@@ -93,7 +94,7 @@ const NAV_CONFIG: Record<
     checkAuth: boolean;
   }) => NewDrawerItemProp[]
 > = {
-  YouthNet: ({
+  [TenantName.YOUTHNET]: ({
     router,
     isMobile,
     t,
@@ -170,10 +171,10 @@ const NAV_CONFIG: Record<
     return navLinks;
   },
 
-'Camp to Club': ({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl, isMobile, handleLogoutModal }) =>
+  [TenantName.CAMP_TO_CLUB]: ({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl, isMobile, handleLogoutModal }) =>
     getClubStyleNavConfig({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl, isMobile, handleLogoutModal }),
 
-  Pragyanpath: ({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl, isMobile, handleLogoutModal }) =>
+  [TenantName.PRAGYANPATH]: ({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl, isMobile, handleLogoutModal }) =>
     getClubStyleNavConfig({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl, isMobile, handleLogoutModal }),
 };
 
@@ -222,16 +223,16 @@ useEffect(() => {
   const program = localStorage.getItem('userProgram') || '';
 
   const disallowedPathsMap: Record<string, string[]> = {
-    YouthNet: ['/courses-contents'],
-    'Camp to Club': ['/content', '/observations', '/skill-center'],
-    'Pragyanpath': ['/content', '/observations', '/skill-center'],
+    [TenantName.YOUTHNET]: ['/courses-contents'],
+    [TenantName.CAMP_TO_CLUB]: ['/content', '/observations', '/skill-center'],
+    [TenantName.PRAGYANPATH]: ['/content', '/observations', '/skill-center'],
   };
 
   const disallowedPaths = disallowedPathsMap[program] || [];
 
   if (disallowedPaths.includes(currentPage)) {
     // Redirect to a safe/default page
-    const fallbackPath = program === 'Camp to Club' ? '/courses-contents' : '/content';
+    const fallbackPath = program === TenantName.CAMP_TO_CLUB ? '/courses-contents' : '/content';
     router.push('/unauthorized');
     return;
   }
@@ -300,14 +301,14 @@ useEffect(() => {
             onClick: () =>
               {
                 const tenantName = localStorage.getItem('userProgram') || '';
-                if(tenantName=== 'YouthNet') {
+                if(tenantName=== TenantName.YOUTHNET) {
           router.push('/content');
         }
-        else if (tenantName==="Camp to Club")
+        else if (tenantName===TenantName.CAMP_TO_CLUB)
         {
           router.push('/courses-contents');
         }
-        else if(tenantName==="Pragyanpath")
+        else if(tenantName===TenantName.PRAGYANPATH)
         {
           router.push('/courses-contents');
         }

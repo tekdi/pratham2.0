@@ -7,6 +7,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useRouter } from 'next/navigation';
 import ContentComponent from '@learner/components/Content/Content';
 import { useTranslation } from '@shared-lib'; // Updated import
+import { TenantName } from '@learner/utils/app.constant';
 
 const InProgress: React.FC = () => {
   const { t } = useTranslation();
@@ -14,11 +15,11 @@ const InProgress: React.FC = () => {
 
   const onBackClick = () => {
     const tenantName = localStorage.getItem('userProgram') || '';
-    if (tenantName === 'YouthNet') {
+    if (tenantName === TenantName.YOUTHNET) {
       router.push('/content');
-    } else if (tenantName === 'Camp to Club') {
+    } else if (tenantName === TenantName.CAMP_TO_CLUB) {
       router.push('/courses-contents');
-    } else if (tenantName === 'Pragyanpath') {
+    } else if (tenantName === TenantName.PRAGYANPATH) {
       router.push('/courses-contents');
     } else {
       router.push('/content');
