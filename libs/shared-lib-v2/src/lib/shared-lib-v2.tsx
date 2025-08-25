@@ -1,3 +1,5 @@
+// @ts-ignore
+
 import styles from './shared-lib-v2.module.css';
 
 export function SharedLibV2() {
