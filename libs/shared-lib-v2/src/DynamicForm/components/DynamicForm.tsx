@@ -120,10 +120,10 @@ const DynamicForm = ({
     return uiSchema;
   };
   // Initialize state based on createNewLearner flag
-  const [formSchema, setFormSchema] = useState(createNew || isCompleteProfile? schema : getInitialSchema());
-  const [formUiSchemaOriginal, setFormUiSchemaOriginal] = useState(createNew ||isCompleteProfile ? uiSchema : getInitialUiSchema());
-  const [formUiSchema, setFormUiSchema] = useState(createNew || isCompleteProfile? uiSchema : getInitialUiSchema());
-  const [formData, setFormData] = useState(createNew || isCompleteProfile ? prefilledFormData : getInitialFormData());
+  const [formSchema, setFormSchema] = useState(createNew ? schema : getInitialSchema());
+  const [formUiSchemaOriginal, setFormUiSchemaOriginal] = useState(createNew  ? uiSchema : getInitialUiSchema());
+  const [formUiSchema, setFormUiSchema] = useState(createNew ? uiSchema : getInitialUiSchema());
+  const [formData, setFormData] = useState(createNew  ? prefilledFormData : getInitialFormData());
   
 
 
