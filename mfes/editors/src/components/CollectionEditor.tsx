@@ -1,3 +1,5 @@
+// @ts-ignore
+
 import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import { v4 as uuidv4 } from 'uuid';
@@ -378,6 +380,7 @@ const CollectionEditor: React.FC = () => {
               margin: '0 auto 10px'
             }}></div>
             {/* <p>Publishing content... Please wait 5 seconds</p> */}
+            {/* @ts-ignore */}
             <style jsx>{`
               @keyframes spin {
                 0% { transform: rotate(0deg); }
