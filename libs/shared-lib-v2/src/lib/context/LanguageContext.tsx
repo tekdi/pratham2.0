@@ -12,13 +12,28 @@ import React, {
 import { getTitleFromValue } from './Languages';
 
 // Translation files
+// @ts-ignore
 import en from './locales/en.json';
+// @ts-ignore
+
 import hi from './locales/hi.json';
+// @ts-ignore
+
 import mr from './locales/mr.json';
+// @ts-ignore
+
 import odi from './locales/odi.json';
+// @ts-ignore
+
 import tel from './locales/tel.json';
+// @ts-ignore
+
 import kan from './locales/kan.json';
+// @ts-ignore
+
 import tam from './locales/tam.json';
+// @ts-ignore
+
 import guj from './locales/guj.json';
 
 // Define translations object

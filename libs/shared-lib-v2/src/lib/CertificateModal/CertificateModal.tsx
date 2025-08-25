@@ -17,7 +17,8 @@ import {
   downloadCertificate,
   renderCertificate,
 } from '../../utils/CertificateService/coursesCertificates';
-import { telemetryFactory } from '@shared-lib-v2/DynamicForm/utils/telemetry';
+// @ts-ignore
+import { telemetryFactory } from '../../DynamicForm/utils/telemetry';
 
 const style = {
   position: 'absolute' as const,
