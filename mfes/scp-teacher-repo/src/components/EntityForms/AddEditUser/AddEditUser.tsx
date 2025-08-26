@@ -22,7 +22,7 @@ import {
   updateCohortUpdate,
   updateReassignUser,
 } from '@/services/CohortService/cohortService';
-import { RoleId } from '@/utils/app.constant';
+import { RoleId , TENANT_DATA} from '@/utils/app.constant';
 import _ from 'lodash';
 import { fetchAttendanceStats } from '@/utils/helperAttendanceStatApi';
 const AddEditUser = ({
@@ -403,7 +403,7 @@ const AddEditUser = ({
         Array.isArray(payload.tenantCohortRoleMapping) &&
         payload.tenantCohortRoleMapping[0] &&
         payload.tenantCohortRoleMapping[0]['roleId'] === RoleId.TEAM_LEADER &&
-        localStorage.getItem('program') === 'Second Chance Program'
+        localStorage.getItem('program') === TENANT_DATA.SECOND_CHANCE_PROGRAM
       ) {
         payload.automaticMember = {
           value: true,

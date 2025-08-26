@@ -14,6 +14,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { CommonDrawer } from '../Drawer/CommonDrawer';
 import type { DrawerItemProp } from '../Drawer/CommonDrawer';
+import { TenantName } from '../../utils/app.constant';
 
 interface NewDrawerItemProp extends DrawerItemProp {
   variant?: 'contained' | 'text';
@@ -149,7 +150,6 @@ const DesktopBar = ({
             <Button
               key={index}
               // @ts-ignore
-
               variant={
                 link.variant ??
                 (link.isActive ? 'top-bar-link-button' : 'top-bar-link-text')
@@ -259,7 +259,7 @@ const Brand = ({ _box, name = 'Pratham' }: { _box?: any; name?: string }) => {
   const theme = useTheme();
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }} {..._box}>
-      <img src="/logo.png" alt="YouthNet" style={{ height: '32px' }} />
+      <img src="/logo.png" alt={TenantName.YOUTHNET} style={{ height: '32px' }} />
       <Typography
         variant="h6"
         sx={{
