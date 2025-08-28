@@ -243,6 +243,7 @@ const DynamicForm = ({
           oldFormSchema.required = requiredArray;
           setFormSchema(oldFormSchema);
           setFormUiSchema(oldFormUiSchema);
+          setFormUiSchemaOriginal(oldFormUiSchema);
         }
       } else {
         //initially hide all
@@ -283,6 +284,7 @@ const DynamicForm = ({
         oldFormSchema.required = requiredArray;
         setFormSchema(oldFormSchema);
         setFormUiSchema(oldFormUiSchema);
+        setFormUiSchemaOriginal(oldFormUiSchema);
       }
 
       if (!formData.family_member_details) {
@@ -331,6 +333,17 @@ const DynamicForm = ({
               },
             },
           }));
+           setFormUiSchemaOriginal((prevUiSchema) => ({
+            ...prevUiSchema,
+            [fieldKey]: {
+              'ui:widget': 'CustomTextFieldWidget',
+              'ui:options': {
+                validateOnBlur: true,
+                hideError: true,
+              },
+            },
+          }));
+
 
           setFormSchema((prevSchema) => {
             const updatedSchema = { ...prevSchema };
