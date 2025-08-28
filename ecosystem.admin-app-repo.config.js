@@ -30,7 +30,7 @@ module.exports = {
     {
       name: 'taxonomy-manager',
       script: 'node_modules/.bin/next',
-      args: 'start -p 4113',
+      args: 'start -p 4114',
       cwd: 'mfes/taxonomy-manager',
       env: {
         NODE_ENV: 'production',
