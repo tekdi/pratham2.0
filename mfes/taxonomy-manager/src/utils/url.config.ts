@@ -6,6 +6,7 @@ export const URL_CONFIG = {
     FRAMEWORK_CREATE: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/api/framework/v1/create`,
     FRAMEWORK_PUBLISH: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/api/framework/v1/publish`,
     CATEGORY_CREATE: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/api/framework/v1/category/create`,
+    CATEGORY_UPDATE: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/api/framework/v1/category/update`,
     TERM_CREATE: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/api/framework/v1/term/create`,
     TERM_UPDATE: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/api/framework/v1/term/update`,
     TERM_DELETE: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/api/framework/v1/term/retire`,

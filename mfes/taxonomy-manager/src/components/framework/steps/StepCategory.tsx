@@ -10,6 +10,8 @@ import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
+import IconButton from '@mui/material/IconButton';
+import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 import { useFrameworkFormStore } from '../../../store/frameworkFormStore';
 import SortableDataTable, { ColumnDefinition } from '../../SortableDataTable';
@@ -18,6 +20,7 @@ import PendingCategoriesSection from '../../category/PendingCategoriesSection';
 import BatchCreationModal from '../BatchCreationModal';
 import BatchStatusList from '../BatchStatusList';
 import { useStepCategory } from '../../../hooks/useStepCategory';
+import { useEditCategory } from '../../../hooks/useEditCategory';
 import type {
   StepCategoryHandle,
   Category,
@@ -25,6 +28,8 @@ import type {
 
 const StepCategory = forwardRef<StepCategoryHandle, object>((props, ref) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
+  const [editSuccess, setEditSuccess] = useState<string | null>(null);
 
   const categories = useFrameworkFormStore((state) => state.categories);
   const setCategories = useFrameworkFormStore((state) => state.setCategories);
@@ -45,17 +50,37 @@ const StepCategory = forwardRef<StepCategoryHandle, object>((props, ref) => {
     handleRetry,
     hasUnsavedCategories,
     handleDeletePendingCategory,
+    setForm,
   } = useStepCategory(categories, setCategories, framework);
+
+  const {
+    isEditMode,
+    handleEditCategory,
+    handleCancelEdit,
+    handleUpdateCategory,
+  } = useEditCategory({
+    categories,
+    setCategories,
+    framework,
+    form,
+    setForm,
+    setError: setEditError,
+    setSuccess: setEditSuccess,
+  });
 
   // Close modal when form is successfully submitted
   useEffect(() => {
-    if (success && isModalOpen) {
+    const currentSuccess = isEditMode ? editSuccess : success;
+    if (currentSuccess && isModalOpen) {
       const timer = setTimeout(() => {
         setIsModalOpen(false);
+        if (isEditMode) {
+          handleCancelEdit();
+        }
       }, 1500); // Close after showing success message briefly
       return () => clearTimeout(timer);
     }
-  }, [success, isModalOpen]);
+  }, [success, editSuccess, isModalOpen, isEditMode, handleCancelEdit]);
 
   useImperativeHandle(ref, () => ({
     hasUnsavedCategories: () => {
@@ -84,6 +109,21 @@ const StepCategory = forwardRef<StepCategoryHandle, object>((props, ref) => {
       sortable: true,
       render: (value) => (value as string) || '—',
     },
+    {
+      key: 'actions' as keyof Category,
+      label: 'Actions',
+      sortable: false,
+      render: (_, row) => (
+        <IconButton
+          onClick={() => handleEditCategoryClick(row)}
+          size="small"
+          color="primary"
+          aria-label={`Edit category ${row.name}`}
+        >
+          <EditIcon />
+        </IconButton>
+      ),
+    },
   ];
 
   const handleOpenModal = () => {
@@ -92,10 +132,22 @@ const StepCategory = forwardRef<StepCategoryHandle, object>((props, ref) => {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    if (isEditMode) {
+      handleCancelEdit();
+    }
+  };
+
+  const handleEditCategoryClick = (category: Category) => {
+    handleEditCategory(category);
+    setIsModalOpen(true);
   };
 
   const handleFormSubmitWithClose = (e: React.FormEvent) => {
-    handleAddCategory(e);
+    if (isEditMode) {
+      handleUpdateCategory(e);
+    } else {
+      handleAddCategory(e);
+    }
   };
 
   // Wrapper function to handle type compatibility
@@ -180,7 +232,7 @@ const StepCategory = forwardRef<StepCategoryHandle, object>((props, ref) => {
         aria-labelledby="category-form-dialog-title"
       >
         <DialogTitle id="category-form-dialog-title">
-          Add New Category
+          {isEditMode ? 'Edit Category' : 'Add New Category'}
         </DialogTitle>
         <DialogContent>
           <Box pt={1}>
@@ -188,9 +240,9 @@ const StepCategory = forwardRef<StepCategoryHandle, object>((props, ref) => {
               form={form}
               onChange={handleCategoryFormChange}
               onSubmit={handleFormSubmitWithClose}
-              error={error}
-              success={success}
-              isEditMode={false}
+              error={isEditMode ? editError : error}
+              success={isEditMode ? editSuccess : success}
+              isEditMode={isEditMode}
             />
 
             {/* Action Buttons aligned with form */}
@@ -201,7 +253,7 @@ const StepCategory = forwardRef<StepCategoryHandle, object>((props, ref) => {
                 variant="contained"
                 color="primary"
               >
-                Add Category
+                {isEditMode ? 'Update Category' : 'Add Category'}
               </Button>
             </Box>
           </Box>

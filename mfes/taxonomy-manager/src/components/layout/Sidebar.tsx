@@ -6,6 +6,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Collapse from '@mui/material/Collapse';
+import IconButton from '@mui/material/IconButton';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import ChannelIcon from '@mui/icons-material/Cast';
@@ -13,6 +14,7 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import Box from '@mui/material/Box';
@@ -121,40 +123,77 @@ const CollapsibleSection: React.FC<{
 );
 
 // Component for sidebar header
-const SidebarHeader: React.FC<{ collapsed: boolean }> = ({ collapsed }) => (
-  <Box
-    sx={{
-      display: 'flex',
-      alignItems: 'center',
-      minHeight: 64,
-      px: collapsed ? 1 : 3,
-      py: 2,
-      borderBottom: '1px solid',
-      borderColor: 'divider',
-      justifyContent: collapsed ? 'center' : 'flex-start',
-      background: 'transparent',
-    }}
-  >
+const SidebarHeader: React.FC<{ collapsed: boolean }> = ({ collapsed }) => {
+  const goBack = () => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const userInfo = JSON.parse(localStorage.getItem('adminInfo') || '{}');
+      console.log('userInfo', userInfo);
+      const route = process.env.NEXT_PUBLIC_WORKSPACE_ROUTES || '/';
+      // Navigate back to the main workspace or admin area
+      window.parent.location.href = `${route}`;
+    }
+  };
+
+  return (
     <Box
       sx={{
         display: 'flex',
         alignItems: 'center',
-        gap: collapsed ? 0 : 2,
+        minHeight: 64,
+        px: collapsed ? 1 : 3,
+        py: 2,
+        borderBottom: '1px solid',
+        borderColor: 'divider',
+        justifyContent: collapsed ? 'center' : 'space-between',
+        background: 'transparent',
       }}
     >
       {!collapsed && (
-        <Typography
-          variant="h6"
-          fontWeight={600}
-          color="text.primary"
-          sx={{ fontSize: '18px' }}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <IconButton
+            onClick={goBack}
+            size="small"
+            sx={{
+              color: '#635E57',
+              '&:hover': {
+                backgroundColor: 'rgba(253, 190, 22, 0.08)',
+              },
+            }}
+            aria-label="Exit Editor"
+          >
+            <ArrowBackIcon />
+          </IconButton>
+          <Typography
+            variant="body2"
+            sx={{
+              color: '#635E57',
+              fontWeight: 500,
+              fontSize: '14px',
+            }}
+          >
+            Exit Editor
+          </Typography>
+        </Box>
+      )}
+
+      {collapsed && (
+        <IconButton
+          onClick={goBack}
+          size="small"
+          sx={{
+            color: '#635E57',
+            '&:hover': {
+              backgroundColor: 'rgba(253, 190, 22, 0.08)',
+            },
+          }}
+          aria-label="Exit Editor"
         >
-          Taxonomy Editor
-        </Typography>
+          <ArrowBackIcon />
+        </IconButton>
       )}
     </Box>
-  </Box>
-);
+  );
+};
 
 // Component for collapse toggle
 const CollapseToggle: React.FC<{

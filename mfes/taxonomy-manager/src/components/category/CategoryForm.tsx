@@ -16,14 +16,14 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
       label: 'Name',
       value: form.name,
       required: true,
-      disabled: isEditMode,
+      disabled: false, // Name can always be edited
     },
     {
       name: 'code',
       label: 'Code',
       value: form.code,
       required: true,
-      disabled: isEditMode,
+      disabled: isEditMode, // Code is disabled in edit mode
     },
   ];
 

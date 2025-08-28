@@ -3,7 +3,7 @@ import { Category } from '../interfaces/CategoryInterface';
 import { Term } from '../interfaces/TermInterface';
 import { Association } from '../interfaces/AssociationInterface';
 import { publishFrameworkAfterBatchOperation } from '../utils/HelperService';
-import { post } from './RestClient';
+import { post, patch } from './RestClient';
 import { URL_CONFIG } from '../utils/url.config';
 
 // Get live categories from a framework
@@ -143,3 +143,41 @@ export function getAllTermsFromCategories(categories: Category[]): (Record<
     }))
   );
 }
+
+// Update an existing category
+export const updateCategory = async (
+  categoryData: {
+    identifier: string;
+    code: string;
+    name: string;
+    description: string;
+  },
+  frameworkCode: string
+): Promise<void> => {
+  try {
+    const url = `${URL_CONFIG.API.CATEGORY_UPDATE}/${categoryData.code}?framework=${frameworkCode}`;
+
+    const requestBody = {
+      request: {
+        category: {
+          name: categoryData.name,
+          description: categoryData.description,
+        },
+      },
+    };
+
+    const response = await patch(url, requestBody);
+
+    if (!response.data) {
+      throw new Error('Failed to update category');
+    }
+
+    return response.data;
+  } catch (error: unknown) {
+    console.error('Error updating category:', error);
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error('Failed to update category');
+  }
+};

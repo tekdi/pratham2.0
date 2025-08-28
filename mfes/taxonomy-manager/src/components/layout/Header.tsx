@@ -5,7 +5,7 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { HeaderProps } from '../../interfaces/LayoutInterface';
 import UserProfile from './UserProfile';
 
@@ -38,6 +38,21 @@ const Header: React.FC<HeaderProps> = ({ onMobileMenuClick }) => {
               <MenuIcon />
             </IconButton>
           )}
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <Typography
+              variant="h6"
+              fontWeight={600}
+              color="text.primary"
+              sx={{ fontSize: '18px' }}
+            >
+              Taxonomy Editor
+            </Typography>
+          </Box>
         </Box>
 
         <UserProfile />
