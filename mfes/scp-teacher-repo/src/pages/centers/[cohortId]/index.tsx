@@ -61,7 +61,7 @@ import withAccessControl from '@/utils/hoc/withAccessControl';
 import {
   accessControl,
   eventDaysLimit,
-  modifyAttendanceLimit,
+  lastSevenDaysLimit,
 } from '../../../../app.config';
 import { useDirection } from '../../../hooks/useDirection';
 
@@ -420,7 +420,7 @@ const CohortPage = () => {
   const eventDates = useEventDates(
     cohortId,
     'cohortId',
-    modifyAttendanceLimit,
+    lastSevenDaysLimit,
     selectedDate,
     eventUpdated,
     eventDeleted,
@@ -433,7 +433,7 @@ const CohortPage = () => {
         const date = new Date();
         const startDate = shortDateFormat(new Date());
         const lastDate = new Date(
-          date.setDate(date.getDate() + modifyAttendanceLimit)
+          date.setDate(date.getDate() + lastSevenDaysLimit)
         );
         const endDate = shortDateFormat(lastDate);
         const afterDate = getAfterDate(startDate);
@@ -467,7 +467,7 @@ const CohortPage = () => {
     setEventUpdated(false);
     setEventDeleted(false);
     getExtraSessionsData();
-  }, [eventCreated, eventDeleted, eventUpdated]);
+  }, [eventCreated, eventDeleted, eventUpdated, selectedDate]);
 
   useEffect(() => {
     if (extraSessions) {
