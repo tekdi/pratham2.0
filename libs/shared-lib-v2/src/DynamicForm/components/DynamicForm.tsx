@@ -39,6 +39,7 @@ const DynamicForm = ({
   isReassign=false,
   createNew=true
 }: any) => {
+  console.log('prefilledFormData', prefilledFormData);
   const { t } = useTranslation();
   const hasPrefilled = useRef(false);
   const [submitted, setSubmitted] = useState(false);
@@ -71,8 +72,13 @@ const DynamicForm = ({
       delete cleaned.dob
     }
   
-    if (!prefilledFormData.family_member_details) {
+    // When isCompleteProfile is true, preserve all family member fields that exist
+    if (isCompleteProfile) {
+      // Keep all family member fields as they are in prefilledFormData
+      // Don't delete anything related to family members
+    } else if (!prefilledFormData.family_member_details) {
       // Only remove family member fields if they don't exist in the original data
+      // and this is not a complete profile scenario
       if (!prefilledFormData.mother_name) {
         delete cleaned.mother_name;
       }
@@ -89,6 +95,11 @@ const DynamicForm = ({
   };
 
   const getInitialSchema = () => {
+    // When isCompleteProfile is true, preserve all family member fields
+    if (isCompleteProfile) {
+      return schema;
+    }
+    
     if (!prefilledFormData || !prefilledFormData.family_member_details) {
       const cleanedSchema = { ...schema };
       if (cleanedSchema.properties) {
@@ -110,6 +121,11 @@ const DynamicForm = ({
   };
 
   const getInitialUiSchema = () => {
+    // When isCompleteProfile is true, preserve all family member fields
+    if (isCompleteProfile) {
+      return uiSchema;
+    }
+    
     if (!prefilledFormData || !prefilledFormData.family_member_details) {
       const cleanedUiSchema = { ...uiSchema };
       delete cleanedUiSchema.mother_name;
@@ -270,33 +286,38 @@ const DynamicForm = ({
       }
 
       if (!formData.family_member_details) {
-        // Remove all three fields if nothing is selected
-        setFormUiSchema((prevUiSchema) => {
-          const updatedUiSchema = { ...prevUiSchema };
-          delete updatedUiSchema.mother_name;
-          delete updatedUiSchema.father_name;
-          delete updatedUiSchema.spouse_name;
-          return updatedUiSchema;
-        });
+        // When isCompleteProfile is true, preserve all family member fields
+        if (isCompleteProfile) {
+          // Don't remove any fields, keep them as they are
+        } else {
+          // Remove all three fields if nothing is selected
+          setFormUiSchema((prevUiSchema) => {
+            const updatedUiSchema = { ...prevUiSchema };
+            delete updatedUiSchema.mother_name;
+            delete updatedUiSchema.father_name;
+            delete updatedUiSchema.spouse_name;
+            return updatedUiSchema;
+          });
 
-        setFormSchema((prevSchema) => {
-          const updatedSchema = { ...prevSchema };
-          if (updatedSchema.properties) {
-            updatedSchema.properties = { ...updatedSchema.properties };
-            delete updatedSchema.properties.mother_name;
-            delete updatedSchema.properties.father_name;
-            delete updatedSchema.properties.spouse_name;
-          }
-          if (Array.isArray(updatedSchema.required)) {
-            updatedSchema.required = updatedSchema.required.filter(
-              (key) =>
-                key !== 'mother_name' &&
-                key !== 'father_name' &&
-                key !== 'spouse_name'
-            );
-          }
-          return updatedSchema;
-        });
+          setFormSchema((prevSchema) => {
+            const updatedSchema = { ...prevSchema };
+            if (updatedSchema.properties) {
+              updatedSchema.properties = { ...updatedSchema.properties };
+              delete updatedSchema.properties.mother_name;
+              delete updatedSchema.properties.father_name;
+              delete updatedSchema.properties.spouse_name;
+            }
+            if (Array.isArray(updatedSchema.required)) {
+              updatedSchema.required = updatedSchema.required.filter(
+                (key) =>
+                  key !== 'mother_name' &&
+                  key !== 'father_name' &&
+                  key !== 'spouse_name'
+              );
+            }
+            return updatedSchema;
+          });
+        }
       } else {
         // Helper to add a field
         const addField = (fieldKey, title) => {
