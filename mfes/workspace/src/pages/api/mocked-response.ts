@@ -428,8 +428,12 @@ export const genericEditorReviewFormResponse = {
                               "value": "Camp to Club"
                           },
                           {
-                              "name": "Other",
-                              "value": "Other"
+                              "name": "Creativity Club",
+                              "value": "Creativity Club"
+                          },
+                         {
+                              "name": "Education for Education",
+                              "value": "Education for Education"
                           }
                         ],
                         "placeholder": "Please select an option",
