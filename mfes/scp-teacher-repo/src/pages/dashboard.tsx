@@ -32,6 +32,7 @@ import {
   accessControl,
   dashboardDaysLimit,
   eventDaysLimit,
+  lastSevenDaysLimit,
   lowLearnerAttendanceLimit,
 } from './../../app.config';
 
@@ -820,7 +821,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
   const eventDates = useEventDates(
     userId,
     'userId',
-    modifyAttendanceLimit,
+    lastSevenDaysLimit,
     timeTableDate,
     eventUpdated,
     eventDeleted
