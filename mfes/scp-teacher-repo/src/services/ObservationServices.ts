@@ -9,8 +9,8 @@ export const targetSolution = async (): Promise<any> => {
     };
 
     const response = await post(apiUrl, {
-    "isMappedTo":"team_leader:teacher"
-}, headers);
+      "isMappedTo":"team_leader:teacher"
+  }, headers);  
     return response?.data;
   } catch (error) {
     console.error('Error in fetching attendance list', error);
