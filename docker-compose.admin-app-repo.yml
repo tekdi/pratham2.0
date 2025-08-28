@@ -8,5 +8,6 @@ services:
       - '3032:3002'
       - '4104:4104'
       - '4106:4106'
+      - '4113:4113'
     environment:
       - NODE_ENV=production
