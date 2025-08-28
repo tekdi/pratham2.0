@@ -1,7 +1,6 @@
 import {
   publishFramework,
   publishFrameworkAfterBatchOperation,
-  AxiosErrorType,
 } from '../utils/HelperService';
 import { post, patch, delApi } from './RestClient';
 import { URL_CONFIG } from '../utils/url.config';
@@ -50,41 +49,8 @@ export async function createTerm(
 
     return data;
   } catch (error: unknown) {
-    const axiosError = error as AxiosErrorType;
-    const status = axiosError?.response?.status;
-
-    // Handle specific HTTP status codes
-    let errorMessage: string;
-    switch (status) {
-      case 401:
-        errorMessage =
-          'Authorization failed. Please check your credentials and try again.';
-        break;
-      case 403:
-        errorMessage =
-          'Access forbidden. You do not have permission to create terms.';
-        break;
-      case 404:
-        errorMessage =
-          'Resource not found. Please check the codes and try again.';
-        break;
-      case 500:
-        errorMessage =
-          'Server error occurred while creating term. Please try again later.';
-        break;
-      default:
-        errorMessage = `Failed to create term (Status: ${status || 'Unknown'})`;
-    }
-
-    // Try to get error details from response
-    const errorData = axiosError?.response?.data;
-    if (errorData?.params?.errmsg || errorData?.params?.err) {
-      errorMessage = errorData.params.errmsg ?? errorData.params.err;
-    } else if (errorData?.message) {
-      errorMessage = errorData.message;
-    }
-
-    throw new Error(errorMessage);
+    // The interceptor already extracts meaningful error messages
+    throw error instanceof Error ? error : new Error('Failed to create term');
   }
 }
 
@@ -138,41 +104,8 @@ export async function updateTerm(
       throw error;
     }
 
-    const axiosError = error as AxiosErrorType;
-    const status = axiosError?.response?.status;
-
-    // Handle specific HTTP status codes
-    let errorMessage: string;
-    switch (status) {
-      case 401:
-        errorMessage =
-          'Authorization failed. Please check your credentials and try again.';
-        break;
-      case 403:
-        errorMessage =
-          'Access forbidden. You do not have permission to update terms.';
-        break;
-      case 404:
-        errorMessage =
-          'Resource not found. Please check the codes and try again.';
-        break;
-      case 500:
-        errorMessage =
-          'Server error occurred while updating term. Please try again later.';
-        break;
-      default:
-        errorMessage = `Failed to update term (Status: ${status || 'Unknown'})`;
-    }
-
-    // Try to get error details from response
-    const errorData = axiosError?.response?.data;
-    if (errorData?.params?.errmsg || errorData?.params?.err) {
-      errorMessage = errorData.params.errmsg ?? errorData.params.err;
-    } else if (errorData?.message) {
-      errorMessage = errorData.message;
-    }
-
-    throw new Error(errorMessage);
+    // The interceptor already extracts meaningful error messages
+    throw error instanceof Error ? error : new Error('Failed to update term');
   }
 }
 
@@ -255,7 +188,7 @@ export const deleteTerm = async (
     console.error('Error deleting term:', error);
     return {
       success: false,
-      message: error.response?.data?.message || 'Failed to delete term',
+      message: error instanceof Error ? error.message : 'Failed to delete term',
     };
   }
 };
