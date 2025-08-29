@@ -121,44 +121,9 @@ export async function publishFramework(
 
     return response.data;
   } catch (error: unknown) {
-    let errorMessage: string;
-
-    // Handle Axios errors
-    const axiosError = error as AxiosErrorType;
-
-    // Handle specific HTTP status codes
-    const status = axiosError?.response?.status;
-    switch (status) {
-      case 401:
-        errorMessage =
-          'Authorization failed. Please check your credentials and try again.';
-        break;
-      case 403:
-        errorMessage =
-          'Access forbidden. You do not have permission to publish this framework.';
-        break;
-      case 404:
-        errorMessage =
-          'Framework not found. Please check the framework code and try again.';
-        break;
-      case 500:
-        errorMessage =
-          'Server error occurred while publishing framework. Please try again later.';
-        break;
-      default:
-        errorMessage = `Failed to publish framework (Status: ${
-          status || 'Unknown'
-        })`;
-    }
-
-    // Try to get error details from response
-    const errorData = axiosError?.response?.data;
-    if (errorData?.params?.errmsg) {
-      errorMessage = errorData.params.errmsg;
-    } else if (errorData?.message) {
-      errorMessage = errorData.message;
-    }
-
+    // The interceptor already extracts meaningful error messages
+    const errorMessage =
+      error instanceof Error ? error.message : 'Failed to publish framework';
     console.error('Publish error:', errorMessage);
     throw new Error(errorMessage);
   }

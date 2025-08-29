@@ -164,6 +164,14 @@ const StepAssociation = forwardRef<StepAssociationHandle>((props, ref) => {
     [workingAssociationsList, setWorkingAssociationsList, isAssociationFormOpen]
   );
 
+  // Extract the nested ternary into a clear variable
+  const getButtonText = () => {
+    if (associationFormSuccess) {
+      return isEditMode ? 'Updated!' : 'Added to Preview!';
+    }
+    return isEditMode ? 'Update Associations' : 'Add to Preview';
+  };
+
   return (
     <Box>
       {/* Header Section */}
@@ -383,13 +391,7 @@ const StepAssociation = forwardRef<StepAssociationHandle>((props, ref) => {
                 color="primary"
                 disabled={checkedTermCodes.length === 0}
               >
-                {associationFormSuccess
-                  ? isEditMode
-                    ? 'Updated!'
-                    : 'Added to Preview!'
-                  : isEditMode
-                  ? 'Update Associations'
-                  : 'Add to Preview'}
+                {getButtonText()}
               </Button>
             </Box>
           </Box>

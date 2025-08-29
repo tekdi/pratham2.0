@@ -618,9 +618,9 @@ const StepTerms = forwardRef<StepTermsHandle, object>((props, ref) => {
                   </Typography>
                   {cascadingResults.errors.length > 0 && (
                     <Box sx={{ mt: 1, maxHeight: 100, overflow: 'auto' }}>
-                      {cascadingResults.errors.map((error, index) => (
+                      {cascadingResults.errors.map((error) => (
                         <Typography
-                          key={index}
+                          key={error}
                           variant="caption"
                           color="error.main"
                           sx={{ display: 'block', fontSize: '0.75rem' }}

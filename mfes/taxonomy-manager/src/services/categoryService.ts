@@ -70,12 +70,10 @@ export async function createCategory(
 
     return data;
   } catch (error: unknown) {
-    const axiosError = error as {
-      response?: { data?: { params?: { errmsg?: string } } };
-    };
-    const errorMessage =
-      axiosError?.response?.data?.params?.errmsg ?? 'Failed to create category';
-    throw new Error(errorMessage);
+    // The interceptor already extracts meaningful error messages
+    throw error instanceof Error
+      ? error
+      : new Error('Failed to create category');
   }
 }
 

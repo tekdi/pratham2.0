@@ -15,10 +15,10 @@ import type { Framework } from '../../interfaces/FrameworkInterface';
 interface StepRendererProps {
   step: number;
   framework: Partial<Framework> | null;
-  masterCategoryRef: React.RefObject<StepMasterCategoryHandle | null>;
-  categoryRef: React.RefObject<StepCategoryHandle | null>;
-  termsRef: React.RefObject<StepTermsHandle | null>;
-  associationRef: React.RefObject<StepAssociationHandle | null>;
+  masterCategoryRef: React.RefObject<StepMasterCategoryHandle>;
+  categoryRef: React.RefObject<StepCategoryHandle>;
+  termsRef: React.RefObject<StepTermsHandle>;
+  associationRef: React.RefObject<StepAssociationHandle>;
 }
 
 // Component responsible for rendering the appropriate step content based on the current step
