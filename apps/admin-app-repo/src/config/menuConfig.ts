@@ -3,22 +3,16 @@ import { Role, TenantName } from '@/utils/app.constant';
 export const MENU_CONFIG = {
   [TenantName.SECOND_CHANCE_PROGRAM]: {
     centers: {
-      title:  'SIDEBAR.CENTERS',
+      title: 'SIDEBAR.CENTERS',
       icon: '/images/centers.svg',
       link: '/centers',
-      roles: [
-        Role.ADMIN,
-         Role.CENTRAL_ADMIN, 
-      ],
+      roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
     },
     batch: {
       title: 'SIDEBAR.BATCH',
       icon: '/images/centers.svg',
       link: '/batch',
-      roles: [
-        Role.ADMIN,
-       Role.CENTRAL_ADMIN, 
-      ],
+      roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
     },
     manageUsers: {
       title: 'SIDEBAR.MANAGE_USERS',
@@ -26,7 +20,7 @@ export const MENU_CONFIG = {
       roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
       subMenu: [
         {
-          title:  'SIDEBAR.TEAM_LEADERS',
+          title: 'SIDEBAR.TEAM_LEADERS',
           link: '/team-leader',
           roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
@@ -46,12 +40,12 @@ export const MENU_CONFIG = {
           roles: [Role.CENTRAL_ADMIN],
         },
         {
-          title:  'SIDEBAR.CONTENT_REVIEWER',
+          title: 'SIDEBAR.CONTENT_REVIEWER',
           link: '/content-reviewer',
           roles: [Role.CENTRAL_ADMIN],
         },
         {
-                 title:  'SIDEBAR.STATE_LEAD',
+          title: 'SIDEBAR.STATE_LEAD',
 
           link: '/state-lead',
           roles: [Role.CENTRAL_ADMIN],
@@ -60,12 +54,12 @@ export const MENU_CONFIG = {
     },
 
     master: {
-          title:  'SIDEBAR.MASTER',
+      title: 'SIDEBAR.MASTER',
       icon: '/images/database.svg',
       roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
       subMenu: [
         {
-                    title:  'SIDEBAR.STATES',
+          title: 'SIDEBAR.STATES',
 
           link: '/state',
           roles: [
@@ -74,50 +68,53 @@ export const MENU_CONFIG = {
           ],
         },
         {
-                              title:  'SIDEBAR.DISTRICTS',
+          title: 'SIDEBAR.DISTRICTS',
 
           link: '/district',
           roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
         {
-        
-          title:  'SIDEBAR.BLOCKS',
+          title: 'SIDEBAR.BLOCKS',
 
           link: '/block',
           roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
         {
-         title:  'SIDEBAR.VILLAGES',
+          title: 'SIDEBAR.VILLAGES',
           link: '/village',
           roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
       ],
     },
     programs: {
-              
-      title:  'SIDEBAR.PROGRAMS',
+      title: 'SIDEBAR.PROGRAMS',
 
       icon: '/images/programIcon.svg',
       link: '/programs',
       roles: [Role.CENTRAL_ADMIN],
     },
     manageNotificationTemplates: {
-      title:  'SIDEBAR.MANAGE_NOTIFICATION', 
+      title: 'SIDEBAR.MANAGE_NOTIFICATION',
       icon: '/images/centers.svg',
       link: '/notification-templates',
       roles: [Role.CENTRAL_ADMIN],
     },
     coursePlanner: {
-      title:  'SIDEBAR.CURRICULUM_PLANNER',
+      title: 'SIDEBAR.CURRICULUM_PLANNER',
       icon: '/images/event_available.svg',
       link: '/course-planner',
-      roles: [Role.CCTA, Role.SCTA, Role.CENTRAL_ADMIN]
-
+      roles: [Role.CCTA, Role.SCTA, Role.CENTRAL_ADMIN],
     },
     workspace: {
       title: 'SIDEBAR.WORKSPACE',
       icon: '/images/dashboard.svg',
       link: '/workspace',
+      roles: [Role.CCTA, Role.SCTA, Role.CENTRAL_ADMIN],
+    },
+    taxonomy: {
+      title: 'SIDEBAR.TAXONOMY_EDITOR',
+      icon: '/images/taxonomy.svg',
+      link: '/taxonomy-manager',
       roles: [Role.CCTA, Role.SCTA, Role.CENTRAL_ADMIN],
     },
     faqs: {
@@ -144,7 +141,7 @@ export const MENU_CONFIG = {
       title: 'SIDEBAR.SKILLING_CENTERS',
       icon: '/images/centers.svg',
       link: '/centers',
-      roles: [Role.ADMIN,  Role.CENTRAL_ADMIN],
+      roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
     },
     manageUsers: {
       title: 'SIDEBAR.MANAGE_USERS',
@@ -152,7 +149,7 @@ export const MENU_CONFIG = {
       roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
       subMenu: [
         {
-          title:  'SIDEBAR.MENTOR',
+          title: 'SIDEBAR.MENTOR',
           link: '/mentor',
           roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
@@ -167,12 +164,12 @@ export const MENU_CONFIG = {
           roles: [Role.ADMIN, Role.CENTRAL_ADMIN], // yet to come
         },
         {
-          title:  'SIDEBAR.CONTENT_CREATOR',
+          title: 'SIDEBAR.CONTENT_CREATOR',
           link: '/content-creator',
           roles: [Role.CENTRAL_ADMIN],
         },
         {
-          title:  'SIDEBAR.CONTENT_REVIEWER',
+          title: 'SIDEBAR.CONTENT_REVIEWER',
           link: '/content-reviewer',
           roles: [Role.CENTRAL_ADMIN],
         },
@@ -184,12 +181,12 @@ export const MENU_CONFIG = {
       ],
     },
     master: {
-          title:  'SIDEBAR.MASTER',
+      title: 'SIDEBAR.MASTER',
       icon: '/images/database.svg',
       roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
       subMenu: [
         {
-         title:  'SIDEBAR.STATES',
+          title: 'SIDEBAR.STATES',
           link: '/state',
           roles: [
             // Role.ADMIN,
@@ -197,25 +194,25 @@ export const MENU_CONFIG = {
           ],
         },
         {
-                   title:  'SIDEBAR.DISTRICTS',
+          title: 'SIDEBAR.DISTRICTS',
 
           link: '/district',
           roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
         {
-          title:  'SIDEBAR.BLOCKS',
+          title: 'SIDEBAR.BLOCKS',
           link: '/block',
           roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
         {
-           title:  'SIDEBAR.VILLAGES',
+          title: 'SIDEBAR.VILLAGES',
           link: '/village',
           roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
       ],
     },
     certificateIssuance: {
-      title:  'SIDEBAR.CERTIFICATE_ISSUANCE',
+      title: 'SIDEBAR.CERTIFICATE_ISSUANCE',
       icon: '/images/certificate_custom.svg',
       link: '/certificate-issuance',
       roles: [Role.ADMIN],
@@ -242,7 +239,13 @@ export const MENU_CONFIG = {
       title: 'SIDEBAR.WORKSPACE',
       icon: '/images/dashboard.svg',
       link: '/workspace',
-      roles: [Role.CCTA, Role.SCTA, Role.CENTRAL_ADMIN,],
+      roles: [Role.CCTA, Role.SCTA, Role.CENTRAL_ADMIN],
+    },
+    taxonomy: {
+      title: 'SIDEBAR.TAXONOMY_EDITOR',
+      icon: '/images/taxonomy.svg',
+      link: '/taxonomy-manager',
+      roles: [Role.CCTA, Role.SCTA, Role.CENTRAL_ADMIN],
     },
   },
   [TenantName.POS]: {
@@ -252,7 +255,7 @@ export const MENU_CONFIG = {
       roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
       subMenu: [
         {
-          title:  'SIDEBAR.MENTOR',
+          title: 'SIDEBAR.MENTOR',
           link: '/mentor',
           roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
@@ -267,12 +270,12 @@ export const MENU_CONFIG = {
           roles: [Role.ADMIN, Role.CENTRAL_ADMIN], // yet to come
         },
         {
-          title:  'SIDEBAR.CONTENT_CREATOR',
+          title: 'SIDEBAR.CONTENT_CREATOR',
           link: '/content-creator',
           roles: [Role.CENTRAL_ADMIN],
         },
         {
-          title:  'SIDEBAR.CONTENT_REVIEWER',
+          title: 'SIDEBAR.CONTENT_REVIEWER',
           link: '/content-reviewer',
           roles: [Role.CENTRAL_ADMIN],
         },
@@ -287,7 +290,13 @@ export const MENU_CONFIG = {
       title: 'SIDEBAR.WORKSPACE',
       icon: '/images/dashboard.svg',
       link: '/workspace',
-      roles: [Role.CCTA, Role.SCTA, Role.CENTRAL_ADMIN,],
+      roles: [Role.CCTA, Role.SCTA, Role.CENTRAL_ADMIN],
+    },
+    taxonomy: {
+      title: 'SIDEBAR.TAXONOMY_EDITOR',
+      icon: '/images/taxonomy.svg',
+      link: '/taxonomy-manager',
+      roles: [Role.CCTA, Role.SCTA, Role.CENTRAL_ADMIN],
     },
     faqs: {
       title: 'SIDEBAR.FAQS',
@@ -314,6 +323,12 @@ export const MENU_CONFIG = {
       icon: '/images/dashboard.svg',
       link: '/workspace',
       roles: [Role.CCTA, Role.SCTA],
+    },
+    taxonomy: {
+      title: 'SIDEBAR.TAXONOMY_EDITOR',
+      icon: '/images/taxonomy.svg',
+      link: '/taxonomy-manager',
+      roles: [Role.CCTA, Role.SCTA, Role.CENTRAL_ADMIN],
     },
   },
   [TenantName.CAMP_TO_CLUB]: {
