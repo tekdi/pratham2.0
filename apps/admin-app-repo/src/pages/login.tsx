@@ -19,7 +19,7 @@ import Loader from '../components/Loader';
 import MenuItem from '@mui/material/MenuItem';
 import appLogo from '../../public/images/appLogo.png';
 import config from '../../config.json';
-import { getUserId, login } from '../services/LoginService';
+import { getTenantInfo, getUserId, login } from '../services/LoginService';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import { useTheme } from '@mui/material/styles';
@@ -489,6 +489,7 @@ const LoginPage = () => {
               localStorage.setItem('collectionFramework', frameworkId);
               localStorage.setItem('channelId', channel);
               localStorage.setItem('tenantId', tenantId);
+              fetchTenantInfo();
             }
 
             await fetchUserDetail();
@@ -517,6 +518,26 @@ const LoginPage = () => {
       }
     }
   };
+
+    const fetchTenantInfo = async () => {
+      const storedTenantId = localStorage.getItem('tenantId');
+      try {
+        const res = await getTenantInfo();
+        // console.log('Tenant Info:', res?.result);
+        const programsData = res?.result || [];
+        const tenant = programsData.find((item: { tenantId: string | null; }) => item.tenantId === storedTenantId);
+
+if (tenant?.domain) {
+  localStorage.setItem("tenantDomain", tenant.domain);
+  console.log("Domain stored:", tenant.domain);
+} else {
+  console.log("Tenant not found");
+}
+        console.log('programsData++++', programsData);
+       } catch (error) {
+        console.error('Failed to fetch tenant info:', error);
+      }
+    };
 
   const isButtonDisabled =
     !username || !password || usernameError || passwordError;
