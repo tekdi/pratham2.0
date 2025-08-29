@@ -399,26 +399,27 @@ localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
         const query = new URLSearchParams(window.location.search);
         const redirectUrl = query.get('redirectUrl');
         const activeLink = query.get('activeLink');
+        logEvent({
+          action: 'successfully-login-in-learner-app',
+          category: 'Login Page',
+          label: 'Login Button Clicked',
+        });
         if (redirectUrl && redirectUrl.startsWith('/')) {
           router.push(
             `${redirectUrl}${activeLink ? `?activeLink=${activeLink}` : ''}`
-          );
-        } 
-          logEvent({
-      action: 'successfully-login-in-learner-app',
-      category: 'Login Page',
-      label: 'Login Button Clicked',
-    });
-        if(tenantName=== TenantName.YOUTHNET) {
-          router.push('/content');
-        }
-        else if (tenantName===TenantName.CAMP_TO_CLUB)
-        {
-          router.push('/courses-contents');
-        }
-        else if(tenantName===TenantName.PRAGYANPATH)
-        {
-          router.push('/courses-contents');
+          );      
+        } else{
+          if(tenantName=== TenantName.YOUTHNET) {
+            router.push('/content');
+          }
+          else if (tenantName===TenantName.CAMP_TO_CLUB)
+          {
+            router.push('/courses-contents');
+          }
+          else if(tenantName===TenantName.PRAGYANPATH)
+          {
+            router.push('/courses-contents');
+          }
         }
       } else {
         showToastMessage('Username or password not correct', 'error');
