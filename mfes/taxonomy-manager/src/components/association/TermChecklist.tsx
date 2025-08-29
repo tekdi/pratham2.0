@@ -37,6 +37,11 @@ const TermChecklist: React.FC<TermChecklistProps> = ({
         term.code.toLowerCase().includes(query)
     );
   }, [termsInAvailableCategory, searchQuery]);
+
+  const emptyMessage = searchQuery.trim()
+    ? `No terms found matching "${searchQuery}"`
+    : 'No terms available in this category';
+
   return (
     <Card variant="outlined" sx={{ height: '100%' }}>
       <CardContent sx={{ p: 3 }}>
@@ -87,9 +92,7 @@ const TermChecklist: React.FC<TermChecklistProps> = ({
         ) : (
           <Typography variant="body2" color="text.secondary">
             {selectedAvailableCategory
-              ? searchQuery.trim()
-                ? `No terms found matching "${searchQuery}"`
-                : 'No terms available in this category'
+              ? emptyMessage
               : 'Select a category to view terms'}
           </Typography>
         )}

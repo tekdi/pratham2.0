@@ -109,8 +109,6 @@ const theme = createTheme({
       disabledBackground: 'rgba(73,82,88,0.12)',
       hoverOpacity: 0.02,
       hover: 'rgba(0, 0, 0, 0.03)',
-      activeChannel: '#987100',
-      selectedChannel: '#dba403',
     },
     background: {
       default: '#FFFFFF',

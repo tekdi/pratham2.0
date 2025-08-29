@@ -106,7 +106,7 @@ function SortableDataTable<T = Record<string, unknown>>({
   rowsPerPage = 5,
   emptyStateMessage = 'No data found.',
   getRowKey,
-}: SortableDataTableProps<T>) {
+}: Readonly<SortableDataTableProps<T>>) {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');

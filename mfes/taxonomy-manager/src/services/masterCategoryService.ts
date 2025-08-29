@@ -32,9 +32,10 @@ export async function fetchMasterCategories(): Promise<MasterCategory[]> {
 
     return data.result.Category as MasterCategory[];
   } catch (error: unknown) {
-    const axiosError = error as { response?: { status?: number } };
-    const status = axiosError?.response?.status;
-    throw new Error(`Error: ${status || 'Unknown error'}`);
+    // The interceptor already extracts meaningful error messages
+    throw error instanceof Error
+      ? error
+      : new Error('Failed to fetch master categories');
   }
 }
 
@@ -74,17 +75,10 @@ export async function createMasterCategory(category: {
 
     return data;
   } catch (error: unknown) {
-    const axiosError = error as {
-      response?: { status?: number; data?: { params?: { errmsg?: string } } };
-    };
-    const status = axiosError?.response?.status;
-    const errorMessage = axiosError?.response?.data?.params?.errmsg;
-
-    if (errorMessage) {
-      throw new Error(errorMessage);
-    }
-
-    throw new Error(`Error: ${status || 'Unknown error'}`);
+    // The interceptor already extracts meaningful error messages
+    throw error instanceof Error
+      ? error
+      : new Error('Failed to create master category');
   }
 }
 

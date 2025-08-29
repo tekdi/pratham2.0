@@ -90,14 +90,22 @@ const PendingCategoriesSection: React.FC<PendingCategoriesSectionProps> = ({
         getRowKey={(row) => row.code}
       />
 
-      <Button
-        variant="contained"
-        color="primary"
-        sx={{ mt: 2, minWidth: 180 }}
-        onClick={onCreate}
+      <Box
+        sx={{
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'flex-end',
+        }}
       >
-        Create Categories
-      </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          sx={{ mt: 2, minWidth: 180 }}
+          onClick={onCreate}
+        >
+          Create Categories
+        </Button>
+      </Box>
     </Box>
   );
 };

@@ -38,9 +38,9 @@ export async function createTermAssociations({
     const response = await patch(url, requestBody);
     return response.data;
   } catch (error: unknown) {
-    const axiosError = error as { response?: { data?: string } };
+    // The interceptor already extracts meaningful error messages
     const errorMessage =
-      axiosError?.response?.data || 'Failed to update associations';
+      error instanceof Error ? error.message : 'Failed to update associations';
     throw new Error(`Failed to update associations: ${errorMessage}`);
   }
 }
