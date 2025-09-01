@@ -281,16 +281,14 @@ const DynamicForm = ({
           delete updatedUiSchema.spouse_name;
           return updatedUiSchema;
         });
-         // Remove all three fields if nothing is selected
-        setFormUiSchema((prevUiSchema) => {
+          setFormUiSchemaOriginal((prevUiSchema) => {
           const updatedUiSchema = { ...prevUiSchema };
           delete updatedUiSchema.mother_name;
           delete updatedUiSchema.father_name;
           delete updatedUiSchema.spouse_name;
           return updatedUiSchema;
         });
-
-        setFormUiSchemaOriginal((prevSchema) => {
+        setFormSchema((prevSchema) => {
           const updatedSchema = { ...prevSchema };
           if (updatedSchema.properties) {
             updatedSchema.properties = { ...updatedSchema.properties };
@@ -308,6 +306,7 @@ const DynamicForm = ({
           }
           return updatedSchema;
         });
+      
       } else {
         // Helper to add a field
         const addField = (fieldKey, title) => {

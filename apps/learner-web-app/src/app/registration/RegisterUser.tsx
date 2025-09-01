@@ -689,7 +689,7 @@ setUsername(
                 component="br"
                 sx={{ display: { xs: 'block', sm: 'none' } }}
               />
-              {t('LEARNER_APP.REGISTRATION.TRAINING')}
+              {" "+t('LEARNER_APP.REGISTRATION.TRAINING')}
             </Typography>
 
             <Typography
@@ -711,7 +711,7 @@ setUsername(
                 color="secondary"
                 sx={{ fontWeight: '500' }}
               >
-                {t('LEARNER_APP.REGISTRATION.CLICK_HERE_TO_LOGIN')}
+                {' ' +t('LEARNER_APP.REGISTRATION.CLICK_HERE_TO_LOGIN')}
               </Link>
             </Typography>
           </Box>
