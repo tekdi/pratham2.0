@@ -228,7 +228,7 @@ const DynamicForm = ({
           oldFormSchema.required = requiredArray;
           setFormSchema(oldFormSchema);
           setFormUiSchema(oldFormUiSchema);
-          setFormUiSchemaOriginal(oldFormUiSchema);
+         // setFormUiSchemaOriginal(oldFormUiSchema);
         }
       } else {
         //initially hide all
@@ -269,7 +269,7 @@ const DynamicForm = ({
         oldFormSchema.required = requiredArray;
         setFormSchema(oldFormSchema);
         setFormUiSchema(oldFormUiSchema);
-        setFormUiSchemaOriginal(oldFormUiSchema);
+      //  setFormUiSchemaOriginal(oldFormUiSchema);
       }
 
       if (!formData.family_member_details) {
