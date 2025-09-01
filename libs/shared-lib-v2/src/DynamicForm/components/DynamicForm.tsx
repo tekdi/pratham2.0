@@ -37,9 +37,10 @@ const DynamicForm = ({
   type,
   isCompleteProfile=false,
   isReassign=false,
-  createNew=true
+  createNew=true,
+  forEditedschema
 }: any) => {
-  console.log('prefilledFormData', prefilledFormData);
+  console.log('forEditedschema', forEditedschema);
   const { t } = useTranslation();
   const hasPrefilled = useRef(false);
   const [submitted, setSubmitted] = useState(false);
@@ -213,7 +214,7 @@ const DynamicForm = ({
             });
 
             //show mobile
-            // Clone each key's config and set widget to 'hidden'
+            // Clone each key's config and set widget to 'CustomTextFieldWidget'
             requiredKeys2.forEach((key) => {
               if (updatedUiSchema.hasOwnProperty(key)) {
                 updatedUiSchema[key] = {
@@ -1519,6 +1520,19 @@ const DynamicForm = ({
       schema: any,
       extraFields: Record<string, any> = {} // Optional root-level custom fields
     ) {
+// schema=forEditedschema
+if(schema.properties.family_member_details)
+{
+schema.properties = {
+  ...schema.properties,
+  ...(forEditedschema?.father_name && { father_name: forEditedschema.father_name }),
+  ...(forEditedschema?.mother_name && { mother_name: forEditedschema.mother_name }),
+  ...(forEditedschema?.spouse_name && { spouse_name: forEditedschema.spouse_name }),
+};
+
+
+}
+
       const transformedData: Record<string, any> = {
         ...extraFields, // Add optional root-level custom fields dynamically
         customFields: [],

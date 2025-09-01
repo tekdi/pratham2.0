@@ -57,7 +57,7 @@ const EditProfile = ({ completeProfile }: EditProfileProps) => {
   const localFormData = JSON.parse(localStorage.getItem('formData') || '{}');
   const [userFormData, setUserFormData] = useState<any>(localFormData);
   const [userData, setuserData] = useState<any>({});
-
+const [responseFormData, setResponseFormData] = useState<any>({});
   const localPayload = JSON.parse(localStorage.getItem('localPayload') || '{}');
 
   //formData.email = 'a@tekditechnologies.com';
@@ -92,7 +92,9 @@ const EditProfile = ({ completeProfile }: EditProfileProps) => {
             },
           },
         ]);
-        console.log('responseForm', responseForm?.schema);
+        const responseFormCopy = JSON.parse(JSON.stringify(responseForm));
+        setResponseFormData(responseFormCopy);
+        console.log('responseForm===>', responseFormCopy?.schema);
         const r = await profileComplitionCheck();
         console.log(r);
         delete responseForm?.schema?.properties.password;
@@ -330,6 +332,7 @@ const EditProfile = ({ completeProfile }: EditProfileProps) => {
               <DynamicForm
                 schema={addSchema}
                 uiSchema={addUiSchema}
+                forEditedschema={responseFormData?.schema?.properties}
                 FormSubmitFunction={FormSubmitFunction}
                 prefilledFormData={completeProfile ? {} : userFormData}
                 hideSubmit={true}
