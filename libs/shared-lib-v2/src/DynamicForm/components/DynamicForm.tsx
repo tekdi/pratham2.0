@@ -166,15 +166,15 @@ console.log('formUiSchema', formUiSchema);
       // Handle parent data schema fields
       if (Object.keys(parentDataSchema).length > 0) {
         if (parentDataSchema.parent_phone) {
-          parentDataSchema.parent_phone.title = t("parent_phone");
+          parentDataSchema.parent_phone.title = t("PARENT_GUARDIAN_PHONE_NO");
           schemaa.properties.parent_phone = parentDataSchema.parent_phone;
         }
         if (parentDataSchema.guardian_relation) {
-          parentDataSchema.guardian_relation.title = t("guardian_relation");
+          parentDataSchema.guardian_relation.title = t("RELATION_WITH_GUARDIAN");
           schemaa.properties.guardian_relation = parentDataSchema.guardian_relation;
         }
         if (parentDataSchema.guardian_name) {
-          parentDataSchema.guardian_name.title = t("guardian_name");
+          parentDataSchema.guardian_name.title = t("NAME_OF_GUARDIAN");
           schemaa.properties.guardian_name = parentDataSchema.guardian_name;
         }
       }
@@ -238,6 +238,7 @@ console.log('formUiSchema', formUiSchema);
             delete formData?.parent_phone;
             delete formData?.guardian_relation;
             delete formData?.guardian_name;
+            
             // remove from required
             requiredArray = requiredArray.filter(
               (key) => !requiredKeys.includes(key)
@@ -278,6 +279,7 @@ console.log('formUiSchema', formUiSchema);
           oldFormSchema.required = requiredArray;
           setFormSchema(oldFormSchema);
           setFormUiSchema(oldFormUiSchema);
+          if(isCompleteProfile)
           setFormUiSchemaOriginal(oldFormUiSchema);
         }
       } else {

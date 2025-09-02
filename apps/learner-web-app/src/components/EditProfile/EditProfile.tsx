@@ -256,8 +256,18 @@ const [responseFormData, setResponseFormData] = useState<any>({});
         showToastMessage('Profile Updated succeessfully', 'success');
       }
       if (completeProfile) {
-        router.push('/content');
-      }
+          const uiConfig =
+    typeof window !== 'undefined'
+      ? JSON.parse(localStorage.getItem('uiConfig') || '{}')
+      : {};
+ const hasBothContentCoursetab = uiConfig?.showContent?.includes("courses") && uiConfig?.showContent?.includes("contents");
+              
+                if (hasBothContentCoursetab) {
+                  router.push('/courses-contents');
+                }
+                 else
+                router.push('/content');      }
+      
     }
 
     console.log(payload);
