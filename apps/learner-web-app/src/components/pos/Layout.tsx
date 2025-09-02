@@ -251,8 +251,8 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         isActive: currentPage === '/pos/school',
         child: schoolSubCategory.map((item: any) => ({
           title: item?.name,
-          to: () => router.push(`/pos/school?se_subDomains=${item?.code}`),
-          isActive: currentPage === `/pos/school?se_subDomains=${item?.code}`,
+          to: () => router.push(`/pos/school?se_subDomains=${item?.name}`),
+          isActive: currentPage === `/pos/school?se_subDomains=${item?.name}`,
           code: item?.code,
         })),
       },
@@ -262,8 +262,8 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         isActive: currentPage === '/pos/work',
         child: workSubCategory.map((item: any) => ({
           title: item?.name,
-          to: () => router.push(`/pos/work?se_subDomains=${item?.code}`),
-          isActive: currentPage === `/pos/work?se_subDomains=${item?.code}`,
+          to: () => router.push(`/pos/work?se_subDomains=${item?.name}`),
+          isActive: currentPage === `/pos/work?se_subDomains=${item?.name}`,
           code: item?.code,
         })),
       },
@@ -273,8 +273,8 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         isActive: currentPage === '/pos/life',
         child: lifeSubCategory.map((item: any) => ({
           title: item?.name,
-          to: () => router.push(`/pos/life?se_subDomains=${item?.code}`),
-          isActive: currentPage === `/pos/life?se_subDomains=${item?.code}`,
+          to: () => router.push(`/pos/life?se_subDomains=${item?.name}`),
+          isActive: currentPage === `/pos/life?se_subDomains=${item?.name}`,
           code: item?.code,
         })),
       },
@@ -286,8 +286,8 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
           { name: TenantName.SECOND_CHANCE_PROGRAM, code: 'SCP' },
         ].map((item: any) => ({
           title: item?.name,
-          to: () => router.push(`/pos/program?program=${item?.code}`),
-          isActive: currentPage === `/pos/program?program=${item?.code}`,
+          to: () => router.push(`/pos/program?program=${item?.name}`),
+          isActive: currentPage === `/pos/program?program=${item?.name}`,
           code: item?.code,
         })),
       },
