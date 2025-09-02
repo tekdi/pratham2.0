@@ -38,9 +38,6 @@ export default function CmsLinkPage() {
         : null
     );
     setIdentifier(identifierFromRoute);
-    console.log('typeFromRoute11', typeFromRoute);
-    console.log('typeFromRouteidenti', identifierFromRoute);
-    console.log('typeFromRouteprogram', programFromRoute);
 
     if (
       typeFromRoute == null ||
