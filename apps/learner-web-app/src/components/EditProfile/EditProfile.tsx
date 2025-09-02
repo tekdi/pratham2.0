@@ -67,6 +67,17 @@ const [responseFormData, setResponseFormData] = useState<any>({});
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
 
+  // Mobile field states
+  const [mobileAddUiSchema, setMobileAddUiSchema] = useState({});
+  const [mobileSchema, setMobileSchema] = useState({});
+  
+  // Parent data states (parent_phone, guardian_relation, guardian_name)
+  const [parentDataAddUiSchema, setParentDataAddUiSchema] = useState({});
+  const [parentDataSchema, setParentDataSchema] = useState({});
+
+
+  console.log('addSchema', addSchema);
+
   // const [schema, setSchema] = useState(facilitatorSearchSchema);
   // const [uiSchema, setUiSchema] = useState(facilitatorSearchUISchema);
   useEffect(() => {
@@ -132,7 +143,23 @@ const [responseFormData, setResponseFormData] = useState<any>({});
             ? updatedSchema
             : responseForm?.schema;
           let alterUISchema = responseForm?.uiSchema;
-
+          
+          // Set mobile field states
+          setMobileAddUiSchema(responseForm?.uiSchema?.mobile);
+          setMobileSchema(responseFormCopy?.schema?.properties?.mobile);
+          
+          // Set parent data states (grouping parent_phone, guardian_relation, guardian_name)
+          setParentDataAddUiSchema({
+            parent_phone: responseForm?.uiSchema?.parent_phone,
+            guardian_relation: responseForm?.uiSchema?.guardian_relation,
+            guardian_name: responseForm?.uiSchema?.guardian_name
+          });
+          setParentDataSchema({
+            parent_phone: responseFormCopy?.schema?.properties?.parent_phone,
+            guardian_relation: responseFormCopy?.schema?.properties?.guardian_relation,
+            guardian_name: responseFormCopy?.schema?.properties?.guardian_name
+          });
+          
           //set 2 grid layout
           alterUISchema = enhanceUiSchemaWithGrid(alterUISchema);
           console.log('alterUISchema', alterUISchema);
@@ -155,6 +182,7 @@ const [responseFormData, setResponseFormData] = useState<any>({});
           }
           delete alterSchema?.properties?.is_volunteer;
           setAddSchema(alterSchema);
+          alterUISchema.mobile=responseForm?.uiSchema?.mobile
           setAddUiSchema(alterUISchema);
         }
       } catch (error) {
@@ -332,6 +360,10 @@ const [responseFormData, setResponseFormData] = useState<any>({});
               <DynamicForm
                 schema={addSchema}
                 uiSchema={addUiSchema}
+                mobileAddUiSchema={mobileAddUiSchema}
+                mobileSchema={mobileSchema}
+                parentDataAddUiSchema={parentDataAddUiSchema}
+                parentDataSchema={parentDataSchema}
                 forEditedschema={responseFormData?.schema?.properties}
                 FormSubmitFunction={FormSubmitFunction}
                 prefilledFormData={completeProfile ? {} : userFormData}
@@ -339,7 +371,6 @@ const [responseFormData, setResponseFormData] = useState<any>({});
                 type="learner"
                 isCompleteProfile={completeProfile}
                 createNew={false}
-
               />
             )}
             <Button
