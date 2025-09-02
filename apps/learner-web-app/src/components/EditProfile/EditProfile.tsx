@@ -57,7 +57,7 @@ const EditProfile = ({ completeProfile }: EditProfileProps) => {
   const localFormData = JSON.parse(localStorage.getItem('formData') || '{}');
   const [userFormData, setUserFormData] = useState<any>(localFormData);
   const [userData, setuserData] = useState<any>({});
-
+const [responseFormData, setResponseFormData] = useState<any>({});
   const localPayload = JSON.parse(localStorage.getItem('localPayload') || '{}');
 
   //formData.email = 'a@tekditechnologies.com';
@@ -66,6 +66,17 @@ const EditProfile = ({ completeProfile }: EditProfileProps) => {
 
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
+
+  // Mobile field states
+  const [mobileAddUiSchema, setMobileAddUiSchema] = useState({});
+  const [mobileSchema, setMobileSchema] = useState({});
+  
+  // Parent data states (parent_phone, guardian_relation, guardian_name)
+  const [parentDataAddUiSchema, setParentDataAddUiSchema] = useState({});
+  const [parentDataSchema, setParentDataSchema] = useState({});
+
+
+  console.log('addSchema', addSchema);
 
   // const [schema, setSchema] = useState(facilitatorSearchSchema);
   // const [uiSchema, setUiSchema] = useState(facilitatorSearchUISchema);
@@ -92,7 +103,9 @@ const EditProfile = ({ completeProfile }: EditProfileProps) => {
             },
           },
         ]);
-        console.log('responseForm', responseForm?.schema);
+        const responseFormCopy = JSON.parse(JSON.stringify(responseForm));
+        setResponseFormData(responseFormCopy);
+        console.log('responseForm===>', responseFormCopy?.schema);
         const r = await profileComplitionCheck();
         console.log(r);
         delete responseForm?.schema?.properties.password;
@@ -130,7 +143,23 @@ const EditProfile = ({ completeProfile }: EditProfileProps) => {
             ? updatedSchema
             : responseForm?.schema;
           let alterUISchema = responseForm?.uiSchema;
-
+          
+          // Set mobile field states
+          setMobileAddUiSchema(responseForm?.uiSchema?.mobile);
+          setMobileSchema(responseFormCopy?.schema?.properties?.mobile);
+          
+          // Set parent data states (grouping parent_phone, guardian_relation, guardian_name)
+          setParentDataAddUiSchema({
+            parent_phone: responseForm?.uiSchema?.parent_phone,
+            guardian_relation: responseForm?.uiSchema?.guardian_relation,
+            guardian_name: responseForm?.uiSchema?.guardian_name
+          });
+          setParentDataSchema({
+            parent_phone: responseFormCopy?.schema?.properties?.parent_phone,
+            guardian_relation: responseFormCopy?.schema?.properties?.guardian_relation,
+            guardian_name: responseFormCopy?.schema?.properties?.guardian_name
+          });
+          
           //set 2 grid layout
           alterUISchema = enhanceUiSchemaWithGrid(alterUISchema);
           console.log('alterUISchema', alterUISchema);
@@ -153,6 +182,7 @@ const EditProfile = ({ completeProfile }: EditProfileProps) => {
           }
           delete alterSchema?.properties?.is_volunteer;
           setAddSchema(alterSchema);
+          alterUISchema.mobile=responseForm?.uiSchema?.mobile
           setAddUiSchema(alterUISchema);
         }
       } catch (error) {
@@ -226,8 +256,18 @@ const EditProfile = ({ completeProfile }: EditProfileProps) => {
         showToastMessage('Profile Updated succeessfully', 'success');
       }
       if (completeProfile) {
-        router.push('/content');
-      }
+          const uiConfig =
+    typeof window !== 'undefined'
+      ? JSON.parse(localStorage.getItem('uiConfig') || '{}')
+      : {};
+ const hasBothContentCoursetab = uiConfig?.showContent?.includes("courses") && uiConfig?.showContent?.includes("contents");
+              
+                if (hasBothContentCoursetab) {
+                  router.push('/courses-contents');
+                }
+                 else
+                router.push('/content');      }
+      
     }
 
     console.log(payload);
@@ -330,13 +370,17 @@ const EditProfile = ({ completeProfile }: EditProfileProps) => {
               <DynamicForm
                 schema={addSchema}
                 uiSchema={addUiSchema}
+                mobileAddUiSchema={mobileAddUiSchema}
+                mobileSchema={mobileSchema}
+                parentDataAddUiSchema={parentDataAddUiSchema}
+                parentDataSchema={parentDataSchema}
+                forEditedschema={responseFormData?.schema?.properties}
                 FormSubmitFunction={FormSubmitFunction}
                 prefilledFormData={completeProfile ? {} : userFormData}
                 hideSubmit={true}
                 type="learner"
                 isCompleteProfile={completeProfile}
                 createNew={false}
-
               />
             )}
             <Button
