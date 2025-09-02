@@ -12,11 +12,10 @@ import {
 } from '@mui/material';
 import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone';
 import LanguageIcon from '@mui/icons-material/Language';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 export default function CmsLinkPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   const [programName, setProgramName] = React.useState<string | null>(null);
   const [contentType, setContentType] = React.useState<
@@ -25,9 +24,12 @@ export default function CmsLinkPage() {
   const [identifier, setIdentifier] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    const typeFromRoute = searchParams.get('type');
-    const identifierFromRoute = searchParams.get('identifier');
-    const programFromRoute = searchParams.get('program');
+    if (typeof window === 'undefined') return;
+
+    const params = new URLSearchParams(window.location.search);
+    const typeFromRoute = params.get('type');
+    const identifierFromRoute = params.get('identifier');
+    const programFromRoute = params.get('program');
 
     setProgramName(programFromRoute);
     setContentType(
@@ -36,14 +38,18 @@ export default function CmsLinkPage() {
         : null
     );
     setIdentifier(identifierFromRoute);
-    console.log("typeFromRoute11", typeFromRoute)
-    console.log("typeFromRouteidenti", identifierFromRoute)
-    console.log("typeFromRouteprogram", programFromRoute)
+    console.log('typeFromRoute11', typeFromRoute);
+    console.log('typeFromRouteidenti', identifierFromRoute);
+    console.log('typeFromRouteprogram', programFromRoute);
 
-    if (typeFromRoute == null || identifierFromRoute == null || programFromRoute == null) {
+    if (
+      typeFromRoute == null ||
+      identifierFromRoute == null ||
+      programFromRoute == null
+    ) {
       router.push('/');
     }
-  }, [router, searchParams]);
+  }, [router]);
 
   const handleOpenInMobile = () => {
     alert('Mobile link not supported yet!!!');
