@@ -94,20 +94,20 @@ const LoginPage = () => {
             } else if (
               role?.role === Role.CENTRAL_ADMIN &&
               role?.tenantData[0]?.tenantName ==
-                TenantName.SECOND_CHANCE_PROGRAM
+              TenantName.SECOND_CHANCE_PROGRAM
             ) {
               router.push('/programs', undefined, { locale: locale });
             } else if (
               role?.role === Role.ADMIN &&
               role?.tenantData[0]?.tenantName ==
-                TenantName.SECOND_CHANCE_PROGRAM
+              TenantName.SECOND_CHANCE_PROGRAM
             ) {
               router.push('/centers', undefined, { locale: locale });
             } else if (
               role?.role === Role.ADMIN &&
               role?.tenantData[0]?.tenantName == TenantName.YOUTHNET
             ) {
-              router.push('/mentor');
+              router.push('/mentor-leader');
             }
           }
         } else {
@@ -120,13 +120,13 @@ const LoginPage = () => {
             if (
               role?.role === Role.CENTRAL_ADMIN &&
               role?.tenantData[0]?.tenantName ==
-                TenantName.SECOND_CHANCE_PROGRAM
+              TenantName.SECOND_CHANCE_PROGRAM
             ) {
               router.push('/programs');
             } else if (
               role?.role === Role.ADMIN &&
               role?.tenantData[0]?.tenantName ==
-                TenantName.SECOND_CHANCE_PROGRAM
+             TenantName.SECOND_CHANCE_PROGRAM
             ) {
               router.push('/centers');
             } else if (
@@ -134,7 +134,7 @@ const LoginPage = () => {
                 role?.role === Role.ADMIN) &&
               role?.tenantData[0]?.tenantName == TenantName.YOUTHNET
             ) {
-              router.push('/mentor');
+              router.push('/mentor-leader');
             }
           }
         }
@@ -243,7 +243,7 @@ const LoginPage = () => {
         //   });
         // } else {
         setAdminInformation(userInfo);
-        
+
         if (userInfo?.tenantData?.[0]?.tenantType === 'elearning') {
           if (userInfo?.role === Role.CENTRAL_ADMIN && userInfo?.tenantData[0]?.tenantName == TenantName.CAMP_TO_CLUB) {
             const { locale } = router;
@@ -254,78 +254,78 @@ const LoginPage = () => {
               window.location.href = '/learners';
               router.push('/learners');
             }
-          } 
+          }
           if (
-                  userInfo?.role === Role.SCTA ||
-                  userInfo?.role === Role.CCTA
-                ) {
-                  const { locale } = router;
-                  // To do :- hardcoding to be removed
-                  if (
-                    userInfo?.tenantData[0]?.tenantName !=
-                    TenantName.SECOND_CHANCE_PROGRAM
-                  ) {
-                    window.location.href = '/workspace';
-                    router.push('/workspace');
-                  } else {
-                    window.location.href = '/course-planner';
-                    if (locale) {
-                      router.push('/course-planner', undefined, {
-                        locale: locale,
-                      });
-                    } else router.push('/course-planner');
-                  }
-                } else {
-                  //window.location.href = "/centers";
-                  const { locale } = router;
-                  if (locale) {
-                    if (
-                      userInfo?.role === Role.CENTRAL_ADMIN &&
-                      userInfo?.tenantData[0]?.tenantName ==
-                        TenantName.SECOND_CHANCE_PROGRAM
-                    ) {
-                      window.location.href = '/programs';
-                      router.push('/programs', undefined, { locale: locale });
-                    } else if (
-                      userInfo?.role === Role.ADMIN &&
-                      userInfo?.tenantData[0]?.tenantName ==
-                        TenantName.SECOND_CHANCE_PROGRAM
-                    ) {
-                      window.location.href = '/centers';
-                      router.push('/centers', undefined, { locale: locale });
-                    } else if (
-                      userInfo?.role === Role.ADMIN ||
-                      (Role.CENTRAL_ADMIN &&
-                        userInfo?.tenantData[0]?.tenantName ==
-                          TenantName.YOUTHNET)
-                    ) {
-                      window.location.href = '/mentor';
-                      router.push('/mentor', undefined, { locale: locale });
-                    }
-                  } else {
-                    if (
-                      userInfo?.role === Role.CENTRAL_ADMIN &&
-                      userInfo?.tenantData[0]?.tenantName ==
-                        TenantName.SECOND_CHANCE_PROGRAM
-                    ) {
-                      window.location.href = '/programs';
-                      router.push('/programs');
-                    } else if (
-                      userInfo?.role === Role.ADMIN &&
-                      userInfo?.tenantData[0]?.tenantName ==
-                        TenantName.SECOND_CHANCE_PROGRAM
-                    ) {
-                      window.location.href = '/centers';
-                      router.push('/centers');
-                    } else if (
-                      userInfo?.role === Role.ADMIN &&
-                      userInfo?.tenantData[0]?.tenantName == TenantName.YOUTHNET
-                    ) {
-                      window.location.href = '/mentor';
-                      router.push('/mentor');
-                    }
-                  }
-                }
+            userInfo?.role === Role.SCTA ||
+            userInfo?.role === Role.CCTA
+          ) {
+            const { locale } = router;
+            // To do :- hardcoding to be removed
+            if (
+              userInfo?.tenantData[0]?.tenantName !=
+              TenantName.SECOND_CHANCE_PROGRAM
+            ) {
+              window.location.href = '/workspace';
+              router.push('/workspace');
+            } else {
+              window.location.href = '/course-planner';
+              if (locale) {
+                router.push('/course-planner', undefined, {
+                  locale: locale,
+                });
+              } else router.push('/course-planner');
+            }
+          } else {
+            //window.location.href = "/centers";
+            const { locale } = router;
+            if (locale) {
+              if (
+                userInfo?.role === Role.CENTRAL_ADMIN &&
+                userInfo?.tenantData[0]?.tenantName ==
+                TenantName.SECOND_CHANCE_PROGRAM
+              ) {
+                window.location.href = '/programs';
+                router.push('/programs', undefined, { locale: locale });
+              } else if (
+                userInfo?.role === Role.ADMIN &&
+                userInfo?.tenantData[0]?.tenantName ==
+                TenantName.SECOND_CHANCE_PROGRAM
+              ) {
+                window.location.href = '/centers';
+                router.push('/centers', undefined, { locale: locale });
+              } else if (
+                userInfo?.role === Role.ADMIN ||
+                (Role.CENTRAL_ADMIN &&
+                  userInfo?.tenantData[0]?.tenantName ==
+                  TenantName.YOUTHNET)
+              ) {
+                window.location.href = '/mentor-leader';
+                router.push('/mentor-leader', undefined, { locale: locale });
+              }
+            } else {
+              if (
+                userInfo?.role === Role.CENTRAL_ADMIN &&
+                userInfo?.tenantData[0]?.tenantName ==
+                TenantName.SECOND_CHANCE_PROGRAM
+              ) {
+                window.location.href = '/programs';
+                router.push('/programs');
+              } else if (
+                userInfo?.role === Role.ADMIN &&
+                userInfo?.tenantData[0]?.tenantName ==
+                TenantName.SECOND_CHANCE_PROGRAM
+              ) {
+                window.location.href = '/centers';
+                router.push('/centers');
+              } else if (
+                userInfo?.role === Role.ADMIN &&
+                userInfo?.tenantData[0]?.tenantName == TenantName.YOUTHNET
+              ) {
+                window.location.href = '/mentor-leader';
+                router.push('/mentor-leader');
+              }
+            }
+          }
 
 
 
@@ -377,14 +377,14 @@ const LoginPage = () => {
                     if (
                       userInfo?.role === Role.CENTRAL_ADMIN &&
                       userInfo?.tenantData[0]?.tenantName ==
-                        TenantName.SECOND_CHANCE_PROGRAM
+                      TenantName.SECOND_CHANCE_PROGRAM
                     ) {
                       window.location.href = '/programs';
                       router.push('/programs', undefined, { locale: locale });
                     } else if (
                       userInfo?.role === Role.ADMIN &&
                       userInfo?.tenantData[0]?.tenantName ==
-                        TenantName.SECOND_CHANCE_PROGRAM
+                      TenantName.SECOND_CHANCE_PROGRAM
                     ) {
                       window.location.href = '/centers';
                       router.push('/centers', undefined, { locale: locale });
@@ -392,23 +392,23 @@ const LoginPage = () => {
                       userInfo?.role === Role.ADMIN ||
                       (Role.CENTRAL_ADMIN &&
                         userInfo?.tenantData[0]?.tenantName ==
-                          TenantName.YOUTHNET)
+                        TenantName.YOUTHNET)
                     ) {
-                      window.location.href = '/mentor';
-                      router.push('/mentor', undefined, { locale: locale });
+                      window.location.href = '/mentor-leader';
+                      router.push('/mentor-leader', undefined, { locale: locale });
                     }
                   } else {
                     if (
                       userInfo?.role === Role.CENTRAL_ADMIN &&
                       userInfo?.tenantData[0]?.tenantName ==
-                        TenantName.SECOND_CHANCE_PROGRAM
+                      TenantName.SECOND_CHANCE_PROGRAM
                     ) {
                       window.location.href = '/programs';
                       router.push('/programs');
                     } else if (
                       userInfo?.role === Role.ADMIN &&
                       userInfo?.tenantData[0]?.tenantName ==
-                        TenantName.SECOND_CHANCE_PROGRAM
+                      TenantName.SECOND_CHANCE_PROGRAM
                     ) {
                       window.location.href = '/centers';
                       router.push('/centers');
@@ -416,8 +416,8 @@ const LoginPage = () => {
                       userInfo?.role === Role.ADMIN &&
                       userInfo?.tenantData[0]?.tenantName == TenantName.YOUTHNET
                     ) {
-                      window.location.href = '/mentor';
-                      router.push('/mentor');
+                      window.location.href = '/mentor-leader';
+                      router.push('/mentor-leader');
                     }
                   }
                 }
@@ -519,25 +519,25 @@ const LoginPage = () => {
     }
   };
 
-    const fetchTenantInfo = async () => {
-      const storedTenantId = localStorage.getItem('tenantId');
-      try {
-        const res = await getTenantInfo();
-        // console.log('Tenant Info:', res?.result);
-        const programsData = res?.result || [];
-        const tenant = programsData.find((item: { tenantId: string | null; }) => item.tenantId === storedTenantId);
+  const fetchTenantInfo = async () => {
+    const storedTenantId = localStorage.getItem('tenantId');
+    try {
+      const res = await getTenantInfo();
+      // console.log('Tenant Info:', res?.result);
+      const programsData = res?.result || [];
+      const tenant = programsData.find((item: { tenantId: string | null; }) => item.tenantId === storedTenantId);
 
-if (tenant?.domain) {
-  localStorage.setItem("tenantDomain", tenant.domain);
-  console.log("Domain stored:", tenant.domain);
-} else {
-  console.log("Tenant not found");
-}
-        console.log('programsData++++', programsData);
-       } catch (error) {
-        console.error('Failed to fetch tenant info:', error);
+      if (tenant?.domain) {
+        localStorage.setItem("tenantDomain", tenant.domain);
+        console.log("Domain stored:", tenant.domain);
+      } else {
+        console.log("Tenant not found");
       }
-    };
+      console.log('programsData++++', programsData);
+    } catch (error) {
+      console.error('Failed to fetch tenant info:', error);
+    }
+  };
 
   const isButtonDisabled =
     !username || !password || usernameError || passwordError;
@@ -668,7 +668,7 @@ if (tenant?.domain) {
                 alignItems={'center'}
                 justifyContent={'center'}
                 zIndex={99}
-                // sx={{ margin: '5px 10px 25px', }}
+              // sx={{ margin: '5px 10px 25px', }}
               >
                 <Box
                   sx={{
@@ -790,9 +790,8 @@ if (tenant?.domain) {
                       logEvent({
                         action: 'remember-me-button-clicked',
                         category: 'Login Page',
-                        label: `Remember Me ${
-                          rememberMe ? 'Checked' : 'Unchecked'
-                        }`,
+                        label: `Remember Me ${rememberMe ? 'Checked' : 'Unchecked'
+                          }`,
                       });
                     }}
                     sx={{
