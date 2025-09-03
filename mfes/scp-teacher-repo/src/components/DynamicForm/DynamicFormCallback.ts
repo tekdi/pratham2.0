@@ -69,6 +69,8 @@ export const searchListData = async (
       if (value !== undefined && value !== '') {
         if (key === 'status') {
           acc[key] = [value];
+        } else if (key === 'name' && typeof value === 'string') {
+          acc[key] = value.trimEnd();
         } else {
           acc[key] = value;
         }
@@ -94,7 +96,7 @@ export const searchListData = async (
     filters,
   };
 
-  if (filters.firstName) {
+  if (filters.name) {
     debouncedGetList(data, setResponse, getListApiCall);
   } else {
     const resp = await getListApiCall(data);
