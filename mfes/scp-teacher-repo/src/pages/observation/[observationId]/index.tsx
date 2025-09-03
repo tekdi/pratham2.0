@@ -411,7 +411,7 @@ const ObservationDetails = () => {
         const filters = {
           cohortId: classId,
         } as CohortMemberList['filters'];
-        if (searchInput !== '') filters.firstName = searchInput;
+        if (searchInput !== '') filters.name = searchInput.trimEnd();
         //const limit=limit;
         let response;
         if (entity === ObservationEntityType?.LEARNER) {
