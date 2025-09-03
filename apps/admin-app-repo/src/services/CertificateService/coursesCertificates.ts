@@ -98,8 +98,13 @@ export const downloadCertificate = async (
 ): Promise<Blob> => {
   const apiUrl: string = API_ENDPOINTS.downloadCertificate;
   try {
+    const tenantId = typeof window !== "undefined" ? localStorage.getItem("tenantId") : null;
+
     const response: AxiosResponse<Blob> = await axios.post(apiUrl, { credentialId, templateId }, { 
-      responseType: 'blob'  // Ensures we get a binary file
+      responseType: 'blob',  // Ensures we get a binary file
+      headers: {
+        ...(tenantId ? { tenantid: tenantId } : {}),
+      },
     });
 
     if (!response.data) {
