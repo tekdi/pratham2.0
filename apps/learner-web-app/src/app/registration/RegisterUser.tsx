@@ -137,7 +137,7 @@ const RegisterUser = () => {
           //   },
           // },
         ]);
-        console.log('responseForm', responseForm?.schema);
+        console.log('responseForm####', responseForm?.schema?.required);
         delete responseForm?.schema?.properties.password;
         delete responseForm?.schema?.properties.confirm_password;
         delete responseForm?.schema?.properties.username;
@@ -159,6 +159,7 @@ const RegisterUser = () => {
           'district',
           'block',
           'village',
+          'family_member_details'
           // 'center',
           // 'batch',
           // 'username',

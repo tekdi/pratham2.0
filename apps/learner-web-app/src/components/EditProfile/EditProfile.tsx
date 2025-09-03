@@ -181,6 +181,9 @@ const [responseFormData, setResponseFormData] = useState<any>({});
             };
           }
           delete alterSchema?.properties?.is_volunteer;
+          if(alterSchema?.properties?.family_member_details){
+          alterSchema?.required?.push('family_member_details')
+          }
           setAddSchema(alterSchema);
           alterUISchema.mobile=responseForm?.uiSchema?.mobile
           setAddUiSchema(alterUISchema);
