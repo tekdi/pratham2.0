@@ -71,8 +71,12 @@ export const checkCriteriaForCertificate = async (reqBody: any) => {
   const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/api/course/v1/hierarchy/${courseId}`;
 
   try {
+    const tenantId = typeof window !== "undefined" ? localStorage.getItem("tenantId") : null;
+
     const response = await axios.get(apiUrl, {
-      headers: {},
+      headers: {
+        ...(tenantId ? { tenantid: tenantId } : {}),
+      },
     });
 
     if (Object.keys(response?.data?.result?.content).length > 0) {
@@ -191,8 +195,12 @@ export const checkCourseScore = async (reqBody: any) => {
   const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/api/course/v1/hierarchy/${courseId}`;
 
   try {
+    const tenantId = typeof window !== "undefined" ? localStorage.getItem("tenantId") : null;
+
     const response = await axios.get(apiUrl, {
-      headers: {},
+      headers: {
+        ...(tenantId ? { tenantid: tenantId } : {}),
+      },
     });
 
     if (Object.keys(response?.data?.result?.content).length > 0) {
@@ -316,11 +324,16 @@ export const downloadCertificate = async ({
 }: renderCertificateParam): Promise<Blob> => {
   const apiUrl: string = API_ENDPOINTS.downloadCertificate;
   try {
+    const tenantId = typeof window !== "undefined" ? localStorage.getItem("tenantId") : null;
+
     const response: AxiosResponse<Blob> = await axios.post(
       apiUrl,
       { credentialId, templateId },
       {
         responseType: 'blob', // Ensures we get a binary file
+        headers: {
+          ...(tenantId ? { tenantid: tenantId } : {}),
+        },
       }
     );
 
