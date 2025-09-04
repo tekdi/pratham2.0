@@ -54,13 +54,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSubmit }) => {
   };
 
   const validatePassword = (value: string) => {
-    return (
-      /[A-Z]/.test(value) &&
-      /[a-z]/.test(value) &&
-      /\d/.test(value) &&
-      /[!@#$%^&*(),.?":{}|<>]/.test(value) &&
-      value.length >= 8
-    );
+    return value.length >= 4;
   };
 
   return (
@@ -107,31 +101,22 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSubmit }) => {
               endAdornment: (
                 <InputAdornment position="end">
                   <IconButton onClick={handleTogglePasswordVisibility}>
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                    {showPassword ? <Visibility /> : <VisibilityOff />}
                   </IconButton>
                 </InputAdornment>
               ),
             }}
           />
 
+          {/* Show password checklist only when there are unmet requirements */}
           {showValidation && !validatePassword(password) && (
-            <Box pl={1} pt={1}>
-              <ValidationItem
-                valid={/[A-Z]/.test(password) && /[a-z]/.test(password)}
-                label="Include both uppercase and lowercase letters"
-              />
-              <ValidationItem
-                valid={/\d/.test(password)}
-                label="Include at least one number"
-              />
-              <ValidationItem
-                valid={/[!@#$%^&*(),.?":{}|<>]/.test(password)}
-                label="Include at least one special character"
-              />
-              <ValidationItem
-                valid={password.length >= 8}
-                label="At least 8 characters"
-              />
+            <Box sx={{ textAlign: 'left', mb: 2 }}>
+              <Typography
+                variant="caption"
+                color={password.length >= 4 ? 'green' : 'error'}
+              >
+                • At least 4 characters
+              </Typography>
             </Box>
           )}
 
