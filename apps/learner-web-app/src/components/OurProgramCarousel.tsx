@@ -397,7 +397,7 @@ const OurProgramCarousel = () => {
                                     typeof window !== 'undefined'
                                       ? window.location.origin
                                       : '';
-                                  const callbackUrl = `${currentBaseUrl}/sso?env=dev&tenantid=${program?.tenantId}&roleId=1234`;
+                                  const callbackUrl = `${currentBaseUrl}/sso?env=newton&tenantid=${program?.tenantId}`;
                                   const encodedCallbackUrl = callbackUrl;
                                   // encodeURIComponent(callbackUrl);
                                   // roleId
@@ -407,7 +407,7 @@ const OurProgramCarousel = () => {
                                   window.open(ssoUrl, '_blank');
                                 }}
                               >
-                                {ssoOption?.label ||
+                                {t(ssoOption?.label) ||
                                   `Login with ${ssoOption?.type}`}
                               </Button>
                             );
