@@ -759,7 +759,11 @@
     "MARK_AS_VOLUNTEER_FAILED": "Failed to mark youth as a volunteer",
     "ABOVE_18_YO":"Above 18 y/o",
     "BELOW_18_YO":"Below 18 y/o",
-    "FROM":"From"
+    "FROM":"From",
+    "UNMARK_AS_VOLUNTEER": "Unmark as Volunteer",
+    "DO_YOU_WANT_TO_UNMARK_AS_VOLUNTEER": "Do you want to unmark as a volunteer",
+    "UNMARK_AS_VOLUNTEER_SUCCESSFULLY": "Unmarked as volunteer successfully",
+    "UNMARK_AS_VOLUNTEER_FAILED": "Failed to unmark as volunteer"
   },
   "YOUTHNET_VOLUNTEERLIST": {
     "ENTRIES": "Entries",

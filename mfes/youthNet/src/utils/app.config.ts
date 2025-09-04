@@ -140,6 +140,7 @@ if (!jotFormId) {
 
 export const BOTTOM_DRAWER_CONSTANTS = {
   MARK_VOLUNTEER: 'Marked as Volunteer',
+  UNMARK_VOLUNTEER: 'Unmark as Volunteer',
   ADD_REASSIGN: 'Add or Reassign',
   REQUEST_REASSIGN: 'Request to Reassign',
   DELETE: 'Delete User',
