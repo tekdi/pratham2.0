@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
-import { CohortTypes, Status } from '@/utils/app.constant';
+import { CohortTypes, Status, TenantName } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
 import { Box, Typography } from '@mui/material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
@@ -108,7 +108,7 @@ const Centers = () => {
       let alterSchema = responseForm?.schema;
       let requiredArray = alterSchema?.required;
       const mustRequired = ['name', 'state', 'district', 'block', 'village'];
-      if (storedProgram === 'Second Chance Program') {
+      if (storedProgram === TenantName.SECOND_CHANCE_PROGRAM) {
         mustRequired.push('center_type', 'board', 'medium', 'grade');
       }
       // Merge only missing items from required2 into required1
@@ -338,7 +338,7 @@ const Centers = () => {
     },
   ];
 
-  // Extra columns for 'Second Chance Program'
+  // Extra columns for TenantName.SECOND_CHANCE_PROGRAM
   const extraColumnsForSCP = [
     {
       key: 'type',
@@ -397,10 +397,10 @@ const Centers = () => {
     },
   ];
 
-  if (storedProgram === 'Second Chance Program') {
+  if (storedProgram === TenantName.SECOND_CHANCE_PROGRAM) {
     columns.push(...extraColumnsForSCP);
   }
-  if (storedProgram === 'YouthNet') {
+  if (storedProgram === TenantName.YOUTHNET) {
     columns.push(...extraColumnsForYouthnet);
   }
 

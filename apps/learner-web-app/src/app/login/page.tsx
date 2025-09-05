@@ -20,6 +20,7 @@ import playstoreIcon from '../../../public/images/playstore.png';
 import prathamQRCode from '../../../public/images/prathamQR.png';
 import welcomeGIF from '../../../public/images/welcome.gif';
 import { logEvent } from '@learner/utils/googleAnalytics';
+import { TenantName } from '../../utils/app.constant';
 
 const Login = dynamic(
   () => import('@login/Components/LoginComponent/LoginComponent'),
@@ -349,7 +350,7 @@ const handleSuccessfulLogin = async (
     if (userResponse) {
       if (
         userResponse?.tenantData?.[0]?.roleName === 'Learner' 
-       // userResponse?.tenantData?.[0]?.tenantName === 'YouthNet'
+       // userResponse?.tenantData?.[0]?.tenantName === TenantName.YOUTHNET
       ) {
         localStorage.setItem('userId', userResponse?.userId);
         localStorage.setItem(
@@ -369,7 +370,7 @@ localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
         localStorage.setItem('tenantId', tenantId);
         localStorage.setItem('userProgram', tenantName);
         await profileComplitionCheck();
-        if (tenantName === 'YouthNet') {
+        if (tenantName === TenantName.YOUTHNET) {
         const academicYearResponse = await getAcademicYear();
          if (academicYearResponse[0]?.id) {
           localStorage.setItem('academicYearId', academicYearResponse[0]?.id);
@@ -398,26 +399,27 @@ localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
         const query = new URLSearchParams(window.location.search);
         const redirectUrl = query.get('redirectUrl');
         const activeLink = query.get('activeLink');
+        logEvent({
+          action: 'successfully-login-in-learner-app',
+          category: 'Login Page',
+          label: 'Login Button Clicked',
+        });
         if (redirectUrl && redirectUrl.startsWith('/')) {
           router.push(
             `${redirectUrl}${activeLink ? `?activeLink=${activeLink}` : ''}`
-          );
-        } 
-          logEvent({
-      action: 'successfully-login-in-learner-app',
-      category: 'Login Page',
-      label: 'Login Button Clicked',
-    });
-        if(tenantName=== 'YouthNet') {
-          router.push('/content');
-        }
-        else if (tenantName==="Camp to Club")
-        {
-          router.push('/courses-contents');
-        }
-        else if(tenantName==="Pragyanpath")
-        {
-          router.push('/courses-contents');
+          );      
+        } else{
+          if(tenantName=== TenantName.YOUTHNET) {
+            router.push('/content');
+          }
+          else if (tenantName===TenantName.CAMP_TO_CLUB)
+          {
+            router.push('/courses-contents');
+          }
+          else if(tenantName===TenantName.PRAGYANPATH)
+          {
+            router.push('/courses-contents');
+          }
         }
       } else {
         showToastMessage('Username or password not correct', 'error');

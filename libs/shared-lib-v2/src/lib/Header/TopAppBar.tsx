@@ -20,6 +20,7 @@ import { CommonDrawer } from '../Drawer/CommonDrawer';
 import type { DrawerItemProp } from '../Drawer/CommonDrawer';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import SpeakableText from '../textToSpeech/SpeakableText';
+import { TenantName } from '../../utils/app.constant';
 
 interface NewDrawerItemProp extends DrawerItemProp {
   variant?: 'contained' | 'text';
@@ -489,7 +490,7 @@ const Brand = ({
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }} {..._box}>
       {_box?.brandlogo ?? (
         <>
-          <img src={logo} alt="YouthNet" style={{ height: '40px' }} />
+          <img src={logo} alt={TenantName.YOUTHNET} style={{ height: '40px' }} />
           {name && (
             <Typography
               variant="body1"

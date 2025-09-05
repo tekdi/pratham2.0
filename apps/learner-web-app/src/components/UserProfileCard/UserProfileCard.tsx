@@ -21,6 +21,7 @@ import { getUserDetails } from '@learner/utils/API/userService';
 import { Loader, useTranslation } from '@shared-lib';
 import { isUnderEighteen, toPascalCase } from '@learner/utils/helper';
 import { isUndefined } from 'lodash';
+import { TenantName } from '../../utils/app.constant';
 
 // Assuming an API function fetchUserData is available
 // Example: const fetchUserData = async () => { ... };
@@ -352,7 +353,7 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
                     <Typography sx={valueStyle}>{mobile}</Typography>
                   </Grid>
                 )}
-                {phoneOwnership !== '-' && tenantName !== 'Camp to Club' && (
+                {phoneOwnership !== '-' && tenantName !== TenantName.CAMP_TO_CLUB && (
                   <Grid item xs={6}>
                     <Typography sx={labelStyle}>
                       {t('LEARNER_APP.USER_PROFILE_CARD.PHONE_BELONGS_TO_YOU')}
@@ -493,7 +494,7 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
               </Grid>
             )}
 
-            {qualification !== '-' && tenantName !== 'Camp to Club' && (
+            {qualification !== '-' && tenantName !== TenantName.CAMP_TO_CLUB && (
               <Grid item xs={6}>
                 <Typography sx={labelStyle}>
                   {t('LEARNER_APP.USER_PROFILE_CARD.HIGHEST_QUALIFICATION')}

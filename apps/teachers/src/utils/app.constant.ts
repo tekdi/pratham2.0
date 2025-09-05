@@ -268,3 +268,12 @@ export enum sessionType {
   PLANNED = 'planned',
   EXTRA = 'extra',
 }
+
+export enum TenantName {
+  SECOND_CHANCE_PROGRAM = 'Second Chance Program',
+  YOUTHNET ='Vocational Training',
+  POS = 'Open School',
+  PRAGYANPATH = 'Pragyanpath',
+  CAMP_TO_CLUB = 'Camp to Club'
+
+}
