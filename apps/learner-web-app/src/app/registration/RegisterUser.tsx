@@ -423,7 +423,7 @@ const RegisterUser = () => {
   };
   const onResend = async () => {
     try {
-      let reason = 'forgot';
+      let reason = 'signup';
       const response = await sendOTP({ mobile: mobile, reason });
       console.log('sendOTP', response);
       setHash(response?.result?.data?.hash);
