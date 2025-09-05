@@ -11,7 +11,7 @@ import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButt
 
 import { RoleId, RoleName, Status, TenantName } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
-import { Box, Typography } from '@mui/material';
+import { Box, TextField, Typography } from '@mui/material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
 import { Button } from '@mui/material';
 import SimpleModal from '@/components/SimpleModal';
@@ -32,8 +32,12 @@ import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 import { transformLabel } from '@/utils/Helper';
-
+import restoreIcon from '../../public/images/restore_user.svg';
+import { showToastMessage } from '@/components/Toastify';
+import ConfirmationPopup from '@/components/ConfirmationPopup';
 const ContentCreator = () => {
+    const [archiveToActiveOpen, setArchiveToActiveOpen] = useState(false);
+  
   const theme = useTheme<any>();
   const [isLoading, setIsLoading] = useState(false);
   const [schema, setSchema] = useState(ContentCreatorSearchSchema);
@@ -50,7 +54,9 @@ const ContentCreator = () => {
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [isEdit, setIsEdit] = useState(false);
   const [editableUserId, setEditableUserId] = useState('');
-
+  const [state, setState] = useState("");
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const { t, i18n } = useTranslation();
 
   const searchStoreKey = 'contentCreator';
@@ -320,6 +326,40 @@ const ContentCreator = () => {
       },
       show: (row) => row.status !== 'archived',
     },
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            backgroundColor: 'rgb(227, 234, 240)',
+            padding: '10px',
+          }}
+        >
+          {' '}
+          <Image src={restoreIcon} alt="" />
+        </Box>
+      ),
+      callback: async (row: any) => {
+        const findState = row?.customFields.find((item) => {
+          if (item.label === 'STATE') {
+            return item;
+          }
+        });
+        setState(findState?.selectedValues[0]?.value);
+        console.log('row:', findState);
+        setFirstName(row?.firstName);
+        setLastName(row?.lastName);
+        setEditableUserId(row?.userId);
+        const userId = row?.userId;
+        // const response = await archiveToactive(userId);
+        setArchiveToActiveOpen(true);
+        setPrefilledFormData({});
+      },
+      show: (row) => row.status !== 'active',
+    }
   ];
 
   // Pagination handlers
@@ -338,7 +378,18 @@ const ContentCreator = () => {
   const handleCloseModal = () => {
     setOpenModal(false);
   };
+ 
 
+  const archiveToactive = async () => {
+    try {
+      const resp = await deleteUser(editableUserId, {
+        userData: { status: 'active' },
+      });
+      showToastMessage(t('LEARNERS.ACTIVATE_USER_SUCCESS'), 'success');
+    } catch (error) {
+      console.error('Error updating team leader:', error);
+    }
+  };
   //Add Edit Props
   const extraFieldsUpdate = {};
   const extraFields = {
@@ -494,6 +545,35 @@ const ContentCreator = () => {
           <CenteredLoader />
         )}
       </Box>
+      <ConfirmationPopup
+        checked={true}
+        open={archiveToActiveOpen}
+        onClose={() => setArchiveToActiveOpen(false)}
+        title={t('COMMON.ACTIVATE_USER')}
+        primary={t('COMMON.ACTIVATE')}
+        secondary={t('COMMON.CANCEL')}
+        reason={"yes"}
+        onClickPrimary={archiveToactive}
+      >
+        <Box
+                sx={{
+                  border: '1px solid #ddd',
+                  borderRadius: 2,
+                  mb: 2,
+                  p: 1,
+                }}
+              >
+                <Typography>
+                  { firstName } { lastName } {t("FORM.WAS_BELONG_TO")}
+                </Typography>
+                <TextField fullWidth value={state} disabled sx={{ mt: 1 }} />
+              </Box>
+         <Typography fontWeight="bold">
+                   {t("FORM.CONFIRM_TO_ACTIVATE")}  
+
+                </Typography>
+
+ </ConfirmationPopup>
     </>
   );
 };

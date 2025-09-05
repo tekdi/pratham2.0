@@ -22,8 +22,17 @@ import EditIcon from '@mui/icons-material/Edit';
 import LogoutIcon from '@mui/icons-material/Logout';
 import MailIcon from '@mui/icons-material/Mail';
 import PhoneIcon from '@mui/icons-material/Phone';
-import { Box, Button, Divider, Menu, Typography } from '@mui/material';
+import {
+  Avatar,
+  Box,
+  Button,
+  Divider,
+  IconButton,
+  Menu,
+  Typography,
+} from '@mui/material';
 import { useRouter } from 'next/router';
+import { ArrowDropDownIcon } from '@mui/x-date-pickers';
 
 const Profile = () => {
   const [anchorEl4, setAnchorEl4] = React.useState<null | HTMLElement>(null);
@@ -236,9 +245,9 @@ const Profile = () => {
           },
         }}
       >
-        <Box display="flex" alignItems="center" color="white">
-          <AccountCircleIcon />
-          <Box
+        <Box display="flex" alignItems="center" color="#bdbdbd">
+          {/*<Avatar sx={{ width: 32, height: 32, mr: 1 }} />
+           <Box
             sx={{
               display: 'flex',
               alignItems: 'center',
@@ -253,6 +262,7 @@ const Profile = () => {
               fontWeight="400"
               sx={{
                 ml: 1,
+                color: 'black',
                 maxWidth: '200px',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -262,9 +272,26 @@ const Profile = () => {
             >
               {t('COMMON.HI', { name: firstLetterInUpperCase(userName ?? '') })}
             </Typography>
-            {/* 
-            <FeatherIcon icon="chevron-down" size="20" /> */}
-          </Box>
+            
+          </Box> */}
+          <Avatar sx={{ width: 32, height: 32, mr: 1 }} />
+          <Typography
+            variant="body1"
+            sx={{
+              ml: 1,
+              color: 'black',
+              maxWidth: '200px',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              fontSize: '16px',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {userName}
+          </Typography>
+          <IconButton size="small">
+            <ArrowDropDownIcon />
+          </IconButton>
         </Box>
       </Button>
       <Menu

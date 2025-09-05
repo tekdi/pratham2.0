@@ -431,6 +431,8 @@
   "FEMALE": "Female",
   "TRANSGENDER": "Transgender",
   "MOTHER_NAME": "Mother Name",
+  "NUMBER_OF_CHILDREN": "Number of Children",
+  "NUMBER_OF_CHILDREN_IN_YOUR_GROUP": "Number of Children in your group",
   "HIGHEST_EDCATIONAL_QUALIFICATION_OR_LAST_PASSED_GRADE": "Highest Educational Qualification or Last Passed Grade",
   "MARITAL_STATUS": "Marital Status",
   "TYPE_OF_PHONE_AVAILABLE": "Type of Phone Available",

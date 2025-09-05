@@ -1,5 +1,5 @@
 import { updateFacilitator } from '@/services/ManageUser';
-import { updateCohortMemberStatus } from '@/services/MyClassDetailsService';
+import { deleteUser, updateCohortMemberStatus } from '@/services/MyClassDetailsService';
 import manageUserStore from '@/store/manageUserStore';
 import { Role, Status } from '@/utils/app.constant';
 import { fetchAttendanceStats } from '@/utils/helperAttendanceStatApi';
@@ -61,6 +61,7 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
   };
 
   const handleDeleteAction = async () => {
+    try{
     if (type === Role.TEACHER) {
       const studentData = {
         status: Status.ARCHIVED,
@@ -88,14 +89,23 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
           statusReason,
           membershipId,
         });
+           const resp = await deleteUser(userId, {
+                userData: { reason: statusReason, status: 'archived' },
+              });
         showToastMessage(t('COMMON.USER_DELETED_PERMANENTLY'), 'success');
       }
     }
+  }
+  catch(error){
 
+  }
+  finally{
     setSelectedValue('');
     onClose();
     onUserDelete();
     setReloadState(true);
+  }
+    
   };
 
   // const handleOtherReasonChange = (event: any) => {

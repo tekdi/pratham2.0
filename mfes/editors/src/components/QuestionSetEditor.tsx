@@ -193,7 +193,7 @@ const QuestionSetEditor: React.FC<{
         link.id = "sunbird-editor-css";
         link.rel = "stylesheet";
         link.href =
-          "https://cdn.jsdelivr.net/npm/@tekdi/sunbird-questionset-editor-web-component@5.0.0-beta.9/styles.css";
+          "https://cdn.jsdelivr.net/npm/@tekdi/sunbird-questionset-editor-web-component@5.0.0-beta.10/styles.css";
         document.head.appendChild(link);
       }
 
@@ -201,7 +201,7 @@ const QuestionSetEditor: React.FC<{
         const script = document.createElement("script");
         script.id = "sunbird-editor-js";
         script.src =
-          "https://cdn.jsdelivr.net/npm/@tekdi/sunbird-questionset-editor-web-component@5.0.0-beta.9/sunbird-questionset-editor.js";
+          "https://cdn.jsdelivr.net/npm/@tekdi/sunbird-questionset-editor-web-component@5.0.0-beta.10/sunbird-questionset-editor.js";
         script.async = true;
         script.onload = () => setAssetsLoaded(true);
         document.body.appendChild(script);
@@ -322,6 +322,7 @@ const QuestionSetEditor: React.FC<{
               margin: '0 auto 10px'
             }}></div>
             {/* <p>Publishing content... Please wait 5 seconds</p> */}
+            {/* @ts-ignore */}
             <style jsx>{`
               @keyframes spin {
                 0% { transform: rotate(0deg); }

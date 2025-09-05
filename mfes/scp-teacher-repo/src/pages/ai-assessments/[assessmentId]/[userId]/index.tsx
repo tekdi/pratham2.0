@@ -143,20 +143,25 @@ const stripHtmlTags = (html: string) => {
 };
 
 // Safely format answer text from resValue for display (handles MCQ arrays and objects)
-const formatAnswerForDisplay = (resValue: string | undefined | null): string => {
+const formatAnswerForDisplay = (
+  resValue: string | undefined | null
+): string => {
   if (!resValue) return 'No answer provided';
   try {
     const parsed = JSON.parse(resValue);
     // If array of options (MCQ)
     if (Array.isArray(parsed)) {
-      const selectedItem = parsed.find((i: any) => i && i.selected) || parsed[0];
+      const selectedItem =
+        parsed.find((i: any) => i && i.selected) || parsed[0];
       if (!selectedItem) return 'No answer provided';
 
       if (selectedItem.label !== undefined && selectedItem.label !== null) {
         if (Array.isArray(selectedItem.label)) {
           return selectedItem.label
             .map((l: any) =>
-              typeof l === 'string' ? l.replace(/<[^>]*>/g, '').trim() : String(l)
+              typeof l === 'string'
+                ? l.replace(/<[^>]*>/g, '').trim()
+                : String(l)
             )
             .join(', ');
         }
@@ -283,7 +288,6 @@ const AssessmentDetails = () => {
     setUploadedImages([]);
     setIsReUploadMode(true);
     setUploadPopupOpen(true);
-
   };
 
   const handleImageUpload = (newImage: UploadedImage) => {
@@ -641,7 +645,7 @@ const AssessmentDetails = () => {
       setEditScore(parsedData.score.toString());
       setEditSuggestion(
         parsedData.suggestion ||
-        (question.resValue ? JSON.parse(question.resValue).AI_suggestion : '')
+          (question.resValue ? JSON.parse(question.resValue).AI_suggestion : '')
       );
     } else {
       setEditScore(question.score.toString());
@@ -951,7 +955,7 @@ const AssessmentDetails = () => {
     if (isReUploadMode) {
       // In re-upload mode, update the assessmentData with the new uploaded images
       if (assessmentData && uploadedImages.length > 0) {
-        const newFileUrls = uploadedImages.map(img => img.url);
+        const newFileUrls = uploadedImages.map((img) => img.url);
         setAssessmentData({
           ...assessmentData,
           fileUrls: newFileUrls,
@@ -1111,7 +1115,8 @@ const AssessmentDetails = () => {
                 letterSpacing: '0.1px',
               }}
             >
-              {assessmentData?.fileUrls && assessmentData.fileUrls.length > 0 ? (
+              {assessmentData?.fileUrls &&
+              assessmentData.fileUrls.length > 0 ? (
                 <>
                   {`${assessmentData.fileUrls.length} images uploaded `}
                   <span
@@ -1126,9 +1131,15 @@ const AssessmentDetails = () => {
                   >
                     View
                   </span>
-                  {['AI Processed', 'Awaiting Your Approval', 'AI Pending'].includes(assessmentData?.status || '') && (
+                  {[
+                    'AI Processed',
+                    'Awaiting Your Approval',
+                    'AI Pending',
+                  ].includes(assessmentData?.status || '') && (
                     <>
-                      <span style={{ margin: '0 8px', color: '#bdbdbd' }}>|</span>
+                      <span style={{ margin: '0 8px', color: '#bdbdbd' }}>
+                        |
+                      </span>
                       <span
                         style={{
                           color: '#1976d2',
@@ -1136,7 +1147,7 @@ const AssessmentDetails = () => {
                           cursor: 'pointer',
                           fontWeight: 500,
                         }}
-                        onClick={e => {
+                        onClick={(e) => {
                           e.stopPropagation();
                           handleReUpload();
                         }}
@@ -1171,7 +1182,7 @@ const AssessmentDetails = () => {
 
       {!assessmentTrackingData ? (
         assessmentData?.status === 'AI Pending' ||
-          assessmentData?.status === 'Approved' ? (
+        assessmentData?.status === 'Approved' ? (
           <Box
             sx={{
               display: 'flex',
@@ -1280,7 +1291,7 @@ const AssessmentDetails = () => {
         onClose={() => setIsEditModalOpen(false)}
         title="Edit Marks"
         onSave={handleSaveScore}
-        maxWidth="400px"
+        maxWidth={{ xs: '90%', sm: '90%', md: '80%', lg: '80%', xl: '80%' }}
       >
         <Box sx={{ width: '100%', position: 'relative' }}>
           {selectedQuestion && (

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 // import FeatherIcon from "feather-icons-react";
-import { AppBar, Box, IconButton, Toolbar } from '@mui/material';
+import { AppBar, Box, IconButton, Toolbar, Typography } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import config from '../../../../config.json';
@@ -197,6 +197,18 @@ const Header = ({
   return (
     <AppBar sx={sx} position={position} elevation={0} className={customClass}>
       <Toolbar sx={{ gap: '15px' }}>
+        <Typography
+          variant="h2"
+          sx={{
+            color: '#635E57',
+            marginRight: '10px',
+            fontSize: '22px',
+            fontWeight: 400,
+            '@media (max-width: 900px)': { paddingLeft: '34px' },
+          }}
+        >
+          Admin
+        </Typography>
         <IconButton
           size="large"
           color="inherit"
@@ -246,13 +258,13 @@ const Header = ({
                   color: '#fff',
                   border: '1px solid #fff',
                   '& .MuiSvgIcon-root': {
-                    color: '#fff',
+                    color: 'black',
                   },
                 }}
               >
-                {academicYearList.map(({ id, session }) => (
+                  {academicYearList.map(({ id, session }) => (
                   <MenuItem key={id} value={id}>
-                    {session}
+<span style={{ color: 'black' }}>{session}</span>
                   </MenuItem>
                 ))}
               </Select>
@@ -264,7 +276,7 @@ const Header = ({
           sx={{
             display: 'flex',
             // gap:"10px",
-            backgroundColor: 'white',
+            backgroundColor: '#bdbdbd',
             padding: '5px',
             alignItems: 'center',
             justifyContent: 'center',

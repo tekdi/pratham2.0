@@ -47,6 +47,8 @@ export const mapUserData = (userData: any) => {
       dob: userData.dob || '',
       gender: userData.gender || '',
        mother_name: getSingleTextValue('MOTHER_NAME'),
+        number_of_children:getSingleTextValue('NUMBER_OF_CHILDREN'),
+        number_of_children_in_your_group: getSingleTextValue('NUMBER_OF_CHILDREN_IN_YOUR_GROUP'),
               father_name: getSingleTextValue('FATHER_NAME'),
                             spouse_name: getSingleTextValue('SPOUSE_NAME'),
 
@@ -88,6 +90,10 @@ export const mapUserData = (userData: any) => {
     }
     if (getSingleTextValue('IS_VOLUNTEER')) {
       result.is_volunteer = getSingleTextValue('IS_VOLUNTEER');
+    }
+     if (getSingleTextValue('NUMBER_OF_CHILDREN')) {
+result.number_of_children = getSingleTextValue('NUMBER_OF_CHILDREN');
+result.number_of_children_in_your_group = getSingleTextValue('NUMBER_OF_CHILDREN_IN_YOUR_GROUP');
     }
     if (getSelectedValueName(userData.customFields, 'NAME_OF_GUARDIAN')) {
       result.guardian_name =
@@ -182,6 +188,17 @@ export const getMissingFields = (schema: any, userData: any) => {
       result.required = clonedSchema.required.filter(
         (field: any) =>
           !(field in mappedUserData) || isEmpty(mappedUserData[field])
+      );
+    }
+
+    // Remove guardian fields from result
+    guardianFields.forEach((field) => {
+      delete result.properties[field];
+    });
+
+    if (Array.isArray(result.required)) {
+      result.required = result.required.filter(
+        (field: any) => !guardianFields.includes(field)
       );
     }
 

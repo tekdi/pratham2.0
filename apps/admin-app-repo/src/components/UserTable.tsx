@@ -868,7 +868,7 @@ const UserTable: React.FC<UserTableProps> = ({
   const handleSearch = (keyword: string) => {
     setFilters((prevFilters) => ({
       ...prevFilters,
-      firstName: keyword,
+      name: keyword.trimEnd(),
     }));
   };
   useEffect(() => {
@@ -885,7 +885,7 @@ const UserTable: React.FC<UserTableProps> = ({
         let offset = pageOffset * limit;
         // const filters = { role: role , status:"active"};
         const sort = enableCenterFilter ? sortByForCohortMemberList : sortBy;
-        if (filters.firstName) {
+        if (filters.name) {
           offset = 0;
         }
         let resp;

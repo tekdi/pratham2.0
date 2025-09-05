@@ -60,6 +60,9 @@ export default function Details(props: DetailsProps) {
   const [breadCrumbs, setBreadCrumbs] = useState<any>();
   const [loading, setLoading] = useState(true);
   const [certificateId, setCertificateId] = useState();
+  const [effectiveUnitId, setEffectiveUnitId] = useState<string | undefined>(
+    Array.isArray(unitId) ? unitId[0] : unitId
+  );
   let activeLink = null;
   if (typeof window !== 'undefined') {
     const searchParams = new URLSearchParams(window.location.search);
@@ -73,17 +76,25 @@ export default function Details(props: DetailsProps) {
           mode: 'edit',
         });
         let resultHierarchy = resultHierarchyCourse;
-        if (unitId) {
-          resultHierarchy = getUnitFromHierarchy(
-            resultHierarchy,
-            unitId as string
-          );
+        console.log('resultHierarchyCourse', resultHierarchyCourse);
+        
+        // If no unitId is provided (course level), automatically use the first unit ONLY if there's exactly one child
+        if (!unitId && resultHierarchyCourse?.children && resultHierarchyCourse.children.length === 1) {
+          const firstUnit = resultHierarchyCourse.children[0];
+          const firstUnitId = typeof firstUnit === 'string' ? firstUnit : (firstUnit as any)?.identifier;
+          if (firstUnitId) {
+            setEffectiveUnitId(firstUnitId);
+            resultHierarchy = getUnitFromHierarchy(resultHierarchyCourse, firstUnitId);
+          }
+        } else if (unitId) {
+          resultHierarchy = getUnitFromHierarchy(resultHierarchyCourse, unitId as string);
         }
+        
         if (props?.showBreadCrumbs) {
           const breadcrum = findCourseUnitPath({
             contentBaseUrl: props?._config?.contentBaseUrl,
             node: resultHierarchyCourse,
-            targetId: (unitId as string) || (courseId as string),
+            targetId: (effectiveUnitId as string) || (courseId as string),
             keyArray: [
               'name',
               'identifier',
@@ -100,12 +111,12 @@ export default function Details(props: DetailsProps) {
             ...(props?.showBreadCrumbs?.suffix || []),
           ]);
         }
-        if (unitId && !props?.isHideInfoCard) {
+        if (effectiveUnitId && !props?.isHideInfoCard) {
           setCourseItem(resultHierarchyCourse);
           const breadcrum = findCourseUnitPath({
             contentBaseUrl: props?._config?.contentBaseUrl,
             node: resultHierarchyCourse,
-            targetId: (unitId as string) || (courseId as string),
+            targetId: (effectiveUnitId as string) || (courseId as string),
             keyArray: [
               'name',
               'identifier',
@@ -119,27 +130,32 @@ export default function Details(props: DetailsProps) {
           setBreadCrumbs(breadcrum);
         }
 
+        // Always set courseItem when at course level to show course info in header
+        if (!unitId) {
+          const courseStartDate = resultHierarchyCourse?.createdOn || 
+                                 resultHierarchyCourse?.lastUpdatedOn || 
+                                 new Date().toISOString();
+          
+          setCourseItem({ 
+            ...resultHierarchyCourse, 
+            startedOn: courseStartDate,
+            // Ensure these fields are set for the InfoCard to display properly
+            createdOn: courseStartDate,
+            enrollmentDate: courseStartDate
+          });
+        }
+
         if (props?._config?.getContentData) {
           props?._config?.getContentData(resultHierarchy);
         }
-
-        // Auto - redirect if there's only one child and we're at course level
-        // if (!unitId && resultHierarchy?.children?.length === 1) {
-        //   const singleChild = resultHierarchy.children[0] as any;
-        //   const childIdentifier = typeof singleChild === 'string' ? singleChild : singleChild?.identifier;
-        //   if (childIdentifier) {
-        //     const redirectPath = `${props?._config?.contentBaseUrl ?? '/content'}/${courseId}/${childIdentifier}${activeLink ? `?activeLink=${activeLink}` : ''}`;
-        //     router.replace(redirectPath);
-        //     return;
-        //   }
-        // }
 
         const userId = getUserId(props?._config?.userIdLocalstorageName);
         let startedOn = {};
         if (props?._config?.isEnrollmentRequired !== false) {
           if (checkAuth(Boolean(userId))) {
+            const userIdString = Array.isArray(userId) ? userId[0] : userId;
             const data = await getUserCertificateStatus({
-              userId: userId as string,
+              userId: userIdString as string,
               courseId: courseId as string,
             });
             if (
@@ -164,7 +180,7 @@ export default function Details(props: DetailsProps) {
               ]);
               const userTrackData =
                 course_track_data.data.find(
-                  (course: any) => course.userId === userId
+                  (course: any) => course.userId === userIdString
                 )?.course || [];
 
               const newTrackData = calculateTrackData(
@@ -177,7 +193,7 @@ export default function Details(props: DetailsProps) {
                 if (props?._config?.userIdLocalstorageName !== 'did') {
                   setCertificateId(data?.result?.certificateId);
                 }
-              } else if (course_track_data?.data && !unitId) {
+              } else if (course_track_data?.data && !effectiveUnitId) {
                 const course_track = calculateTrackDataItem(
                   userTrackData?.[0] ?? {},
                   resultHierarchy ?? {}
@@ -190,15 +206,15 @@ export default function Details(props: DetailsProps) {
                 ) {
                   const userResponse: any = await getUserIdLocal();
                   const responseCriteria = await checkCriteriaForCertificate({
-                    userId: userId,
+                    userId: userIdString as string,
                     courseId: courseId,
                   });
                   console.log('responseCriteria', responseCriteria);
                   if (responseCriteria === true) {
                     const resultCertificate = await issueCertificate({
-                      userId: userId,
+                      userId: userIdString as string,
                       courseId: courseId,
-                      unitId: unitId,
+                      unitId: effectiveUnitId as string,
                       issuanceDate: new Date().toISOString(),
                       expirationDate: new Date(
                         new Date().setFullYear(new Date().getFullYear() + 20)
@@ -221,9 +237,41 @@ export default function Details(props: DetailsProps) {
               startedOn: data?.result?.createdOn,
               issuedOn: data?.result?.issuedOn,
             };
+            
+            // Update courseItem with completion status if at course level
+            if (!unitId) {
+              setCourseItem((prev: any) => ({
+                ...prev,
+                startedOn: data?.result?.status === 'completed' || data?.result?.status === 'viewCertificate' 
+                  ? undefined 
+                  : data?.result?.createdOn || prev?.startedOn,
+                issuedOn: data?.result?.status === 'completed' || data?.result?.status === 'viewCertificate'
+                  ? data?.result?.issuedOn || data?.result?.completedOn
+                  : undefined
+              }));
+            }
           }
         }
         setSelectedContent({ ...resultHierarchy, ...startedOn });
+        
+        // If at course level, ensure selectedContent has course start date for InfoCard
+        if (!unitId) {
+          const courseStartDate = resultHierarchyCourse?.createdOn || 
+                                 resultHierarchyCourse?.lastUpdatedOn || 
+                                 new Date().toISOString();
+          
+          // Check if we have completion data from enrollment
+          const hasCompletionData = (startedOn as any)?.issuedOn || (startedOn as any)?.completedOn;
+          const isCompleted = hasCompletionData && ((startedOn as any)?.status === 'completed' || (startedOn as any)?.status === 'viewCertificate');
+          
+          setSelectedContent((prev: any) => ({ 
+            ...prev, 
+            startedOn: isCompleted ? undefined : courseStartDate,
+            issuedOn: isCompleted ? ((startedOn as any)?.issuedOn || (startedOn as any)?.completedOn) : undefined,
+            createdOn: courseStartDate,
+            enrollmentDate: courseStartDate
+          }));
+        }
       } catch (error) {
         console.error('Failed to fetch content:', error);
       } finally {
@@ -251,23 +299,31 @@ export default function Details(props: DetailsProps) {
           ? `${props?._config?.contentBaseUrl ?? '/content'}/${courseId}/${subItem?.identifier
           }`
           : `${props?._config?.contentBaseUrl ?? '/content'
-          }/${courseId}/${unitId}/${subItem?.identifier}`;
+          }/${courseId}/${effectiveUnitId}/${subItem?.identifier}`;
       router.push(`${path}${activeLink ? `?activeLink=${activeLink}` : ''}`);
     }
   };
 
   const onBackClick = () => {
+    // If we're at course level (no unitId), go back to the activeLink or courses page
+    if (!unitId) {
+      if (activeLink) {
+        router.push(activeLink);
+      } else {
+        router.push(`${props?._config?.contentBaseUrl ?? ''}/content`);
+      }
+      return;
+    }
+
+    // If we have breadcrumbs and there are multiple levels, go to previous level
     if (breadCrumbs?.length > 1) {
-      // router.back()
       if (breadCrumbs?.[breadCrumbs.length - 2]?.link) {
         router.push(breadCrumbs?.[breadCrumbs.length - 2]?.link);
       }
     } else {
+      // Fallback: go back to course level
       router.push(
-        `${activeLink
-          ? activeLink
-          : `${props?._config?.contentBaseUrl ?? ''}/content`
-        }`
+        `${props?._config?.contentBaseUrl ?? '/content'}/${courseId}${activeLink ? `?activeLink=${activeLink}` : ''}`
       );
     }
   };
@@ -283,24 +339,30 @@ export default function Details(props: DetailsProps) {
       onlyHideElements={['footer']}
     >
       {!props?.isHideInfoCard && (
-        <InfoCard
-          item={selectedContent}
-          topic={courseItem?.se_subjects ?? selectedContent?.se_subjects}
-          onBackClick={onBackClick}
-          _config={{
-            ...props?._config,
-            _infoCard: {
-              breadCrumbs: breadCrumbs,
-              isShowStatus:
-                props?._config?.isEnrollmentRequired !== false
-                  ? trackData
-                  : false,
-              isHideStatus: true,
-              default_img: `${AppConst.BASEPATH}/assests/images/image_ver.png`,
-              ...props?._config?._infoCard,
-            },
-          }}
-        />
+        <>
+          {console.log('InfoCard item data:', !unitId ? courseItem : selectedContent)}
+          {console.log('Course completion status:', !unitId ? courseItem?.issuedOn : selectedContent?.issuedOn)}
+          <InfoCard
+            item={!unitId ? courseItem : selectedContent}
+            topic={courseItem?.se_subjects ?? selectedContent?.se_subjects}
+            onBackClick={onBackClick}
+            _config={{
+              ...props?._config,
+              _infoCard: {
+                breadCrumbs: breadCrumbs,
+                isShowStatus:
+                  props?._config?.isEnrollmentRequired !== false
+                    ? trackData
+                    : false,
+                isHideStatus: true,
+                default_img: `${AppConst.BASEPATH}/assests/images/image_ver.png`,
+                // Ensure completion date is properly displayed
+                showCompletionDate: true,
+                ...props?._config?._infoCard,
+              },
+            }}
+          />
+        </>
       )}
       {props?.showBreadCrumbs && (
         <Box sx={{
@@ -324,8 +386,13 @@ export default function Details(props: DetailsProps) {
           ...props?._box,
         }}
       >
-        {certificateId && !unitId && (
+        {certificateId && !effectiveUnitId && (
           <CourseCompletionBanner certificateId={certificateId} />
+        )}
+        
+        {/* Show completion banner for completed courses */}
+        {!unitId && courseItem?.children?.length === 1 && courseItem?.issuedOn && (
+          <CourseCompletionBanner certificateId={certificateId || ''} />
         )}
         {props?.type === 'collapse' ? (
           selectedContent?.children?.length > 0 && (

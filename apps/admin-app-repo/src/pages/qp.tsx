@@ -515,7 +515,7 @@ const QuestionPaperPDF = ({ data }: any) => {
                               ...styles.bold,
                             }}
                           >
-                            ({sectionIndex + 1}.{qIndex + 1}) {questionTitle}
+                            {sectionIndex + 1}.{qIndex + 1} {questionTitle}
                           </Text>
                         </View>
                         <View style={[gridCol(1), styles.box]}>
@@ -563,7 +563,7 @@ const QuestionPaperPDF = ({ data }: any) => {
                                 }}
                               >
                                 {/* ({toRoman(oIndex + 1)}) {!isImage && label} */}
-                                ({String.fromCharCode(97 + oIndex)}){' '}
+                                <Text>{String.fromCharCode(65 + oIndex)}.</Text>{' '}
                                 {!isImage && label}
                               </Text>
                               {isImage && (
