@@ -5,6 +5,7 @@ export const lowLearnerAttendanceLimit: number = 32;
 export const avgLearnerAttendanceLimit: number = 66;
 export const dashboardDaysLimit: number = 30;
 export const modifyAttendanceLimit: number = 0;
+export const lastSevenDaysLimit: number = 6;
 export const eventDaysLimit: number = 7;
 export const toastAutoHideDuration: number = 5000; // 5 seconds
 export const idealTimeForSession: string = '120';
@@ -122,9 +123,12 @@ export const TENANT_DATA = {
   TENANT_NAME: 'tenantName',
   SECOND_CHANCE_PROGRAM: 'Second Chance Program',
   PRATHAM_SCP: 'pratham SCP',
-  YOUTHNET: 'YouthNet',
+  YOUTHNET: 'Vocational Training',
   MENTOR: 'mentor',
   LEADER: 'leader',
+  CAMP_TO_CLUB: 'Camp to Club',
+  POS : 'Open School',
+  PRAGYANPATH :'Pragyanpath',
 };
 
 export const jotFormId = process.env.NEXT_PUBLIC_JOTFORM_ID || '';

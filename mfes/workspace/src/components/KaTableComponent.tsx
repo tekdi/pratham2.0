@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Table as KaTable } from 'ka-table';
 import { DataType, EditingMode, SortingMode } from 'ka-table/enums';
 import {
@@ -24,6 +24,7 @@ import QrModal from './QrModal';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { table } from 'console';
 import Checkbox from '@mui/material/Checkbox';
+import { TENANT_DATA } from '@workspace/utils/app.constant';
 
 interface CustomTableProps {
   data: any[]; // Define a more specific type for your data if needed
@@ -56,6 +57,18 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
   const [openQrCodeModal, setOpenQrCodeModal] = useState(false);
   const [selectedQrValue, setSelectedQrValue] = useState<string>('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+
+  const [loggedInProgram, setLoggedInProgram] = useState<string | null>(null);
+  const [loggedInProgramDomain, setLoggedInProgramDomain] = useState<
+    string | null
+  >(null);
+
+  useEffect(() => {
+    const program = localStorage.getItem('program');
+    setLoggedInProgram(program);
+    const programDomain = localStorage.getItem('tenantDomain');
+    setLoggedInProgramDomain(programDomain);
+  }, []);
 
   const handleClose = () => {
     setOpen(false);
@@ -130,47 +143,47 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
     } else if (tableTitle === 'submitted') {
       content.contentType === 'Course'
         ? router.push({
-            pathname: `/course-hierarchy/${identifier}`,
-            query: { identifier, isReadOnly: true, previousPage: 'submitted' },
-          })
+          pathname: `/course-hierarchy/${identifier}`,
+          query: { identifier, isReadOnly: true, previousPage: 'submitted' },
+        })
         : router.push({
-            pathname: `/workspace/content/review`,
-            query: { identifier },
-          });
+          pathname: `/workspace/content/review`,
+          query: { identifier },
+        });
     } else if (tableTitle === 'all-content' && mode === 'review') {
       content.contentType === 'Course'
         ? router.push({
-            pathname: `/course-hierarchy/${identifier}`,
-            query: {
-              identifier,
-              isReadOnly: true,
-              previousPage: 'allContents',
-            },
-          })
+          pathname: `/course-hierarchy/${identifier}`,
+          query: {
+            identifier,
+            isReadOnly: true,
+            previousPage: 'allContents',
+          },
+        })
         : router.push({
-            pathname: `/workspace/content/review`,
-            query: { identifier, isReadOnly: true, isAllContents: true },
-          });
+          pathname: `/workspace/content/review`,
+          query: { identifier, isReadOnly: true, isAllContents: true },
+        });
     } else if (tableTitle === 'discover-contents') {
       content.contentType === 'Course'
         ? router.push({
-            pathname: `/course-hierarchy/${identifier}`,
-            query: { identifier, previousPage: 'discover-contents' },
-          })
+          pathname: `/course-hierarchy/${identifier}`,
+          query: { identifier, previousPage: 'discover-contents' },
+        })
         : router.push({
-            pathname: `/workspace/content/review`,
-            query: { identifier, isDiscoverContent: true },
-          });
+          pathname: `/workspace/content/review`,
+          query: { identifier, isDiscoverContent: true },
+        });
     } else if (tableTitle === 'content-library') {
       content.contentType === 'Course'
         ? router.push({
-            pathname: `/course-hierarchy/${identifier}`,
-            query: { identifier, previousPage: 'content-library' },
-          })
+          pathname: `/course-hierarchy/${identifier}`,
+          query: { identifier, previousPage: 'content-library' },
+        })
         : router.push({
-            pathname: `/workspace/content/review`,
-            query: { identifier, isContentLibrary: true },
-          });
+          pathname: `/workspace/content/review`,
+          query: { identifier, isContentLibrary: true },
+        });
     } else if (
       content?.mimeType &&
       MIME_TYPE.GENERIC_MIME_TYPE.includes(content?.mimeType)
@@ -198,14 +211,14 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
         columns={
           selectable
             ? [
-                {
-                  key: '__select__',
-                  title: '',
-                  dataType: DataType.Boolean,
-                  style: { width: 40 },
-                },
-                ...columns,
-              ]
+              {
+                key: '__select__',
+                title: '',
+                dataType: DataType.Boolean,
+                style: { width: 40 },
+              },
+              ...columns,
+            ]
             : columns
         }
         data={data}
@@ -214,25 +227,25 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
         childComponents={{
           cell: selectable
             ? {
-                content: (props) => {
-                  if (props.column.key === '__select__') {
-                    return (
-                      <Checkbox
-                        checked={selected.includes(props.rowData.identifier)}
-                        disabled={
-                          !selected.includes(props.rowData.identifier) &&
-                          selected.length >= 3
-                        }
-                        onChange={() =>
-                          onSelect && onSelect(props.rowData.identifier)
-                        }
-                        size="small"
-                      />
-                    );
-                  }
-                  return undefined;
-                },
-              }
+              content: (props) => {
+                if (props.column.key === '__select__') {
+                  return (
+                    <Checkbox
+                      checked={selected.includes(props.rowData.identifier)}
+                      disabled={
+                        !selected.includes(props.rowData.identifier) &&
+                        selected.length >= 3
+                      }
+                      onChange={() =>
+                        onSelect && onSelect(props.rowData.identifier)
+                      }
+                      size="small"
+                    />
+                  );
+                }
+                return undefined;
+              },
+            }
             : undefined,
           cellText: {
             content: (props) => {
@@ -413,12 +426,32 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
                         <>
                           <IconButton
                             onClick={() => {
-                              // console.log('rowData++', props.rowData);
-                              handleOpenQrModal(
-                                props.rowData.contentType === 'Course'
-                                  ? `${process.env.NEXT_PUBLIC_POS_URL}/pos/content/${props.rowData.identifier}?activeLink=/pos/program`
-                                  : `${process.env.NEXT_PUBLIC_POS_URL}/pos/player/${props.rowData.identifier}?activeLink=/pos/program`
-                              );
+                              const { identifier, contentType } = props.rowData;
+                              let link = '';
+
+                              if (loggedInProgram === TENANT_DATA.POS) {
+                                // ✅ POS program
+                                link =
+                                  contentType === 'Course'
+                                    ? `${loggedInProgramDomain}pos/content/${identifier}?activeLink=/pos/program`
+                                    : `${loggedInProgramDomain}pos/player/${identifier}?activeLink=/pos/program`;
+                                handleOpenQrModal(link);
+                              } else if (
+                                loggedInProgram ===
+                                TENANT_DATA.SECOND_CHANCE_PROGRAM
+                              ) {
+                                link =
+                                  contentType === 'Course'
+                                    ? `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=course&identifier=${identifier}`
+                                    : `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=content&identifier=${identifier}`;
+                                handleOpenQrModal(link);
+                              } else {
+                                link =
+                                  contentType === 'Course'
+                                    ? `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=course&identifier=${identifier}`
+                                    : `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=content&identifier=${identifier}`;
+                                handleOpenQrModal(link);
+                              }
                             }}
                           >
                             <QrCode2Icon />{' '}
@@ -427,11 +460,32 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
                           {/* ✅ Copy to Clipboard Button */}
                           <IconButton
                             onClick={() => {
-                              const link =
-                                props.rowData.contentType === 'Course'
-                                  ? `${process.env.NEXT_PUBLIC_POS_URL}/pos/content/${props.rowData.identifier}?activeLink=/pos/program`
-                                  : `${process.env.NEXT_PUBLIC_POS_URL}/pos/player/${props.rowData.identifier}?activeLink=/pos/program`;
-                              handleCopyLink(link);
+                              const { identifier, contentType } = props.rowData;
+                              let link = '';
+
+                              if (loggedInProgram === TENANT_DATA.POS) {
+                                // ✅ POS program
+                                link =
+                                  contentType === 'Course'
+                                    ? `${loggedInProgramDomain}pos/content/${identifier}?activeLink=/pos/program`
+                                    : `${loggedInProgramDomain}pos/player/${identifier}?activeLink=/pos/program`;
+                                handleCopyLink(link);
+                              } else if (
+                                loggedInProgram ===
+                                TENANT_DATA.SECOND_CHANCE_PROGRAM
+                              ) {
+                                link =
+                                  contentType === 'Course'
+                                    ? `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=course&identifier=${identifier}`
+                                    : `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=content&identifier=${identifier}`;
+                                handleCopyLink(link);
+                              } else {
+                                link =
+                                  contentType === 'Course'
+                                    ? `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=course&identifier=${identifier}`
+                                    : `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=content&identifier=${identifier}`;
+                                handleCopyLink(link);
+                              }
                             }}
                           >
                             <ContentCopyIcon />
@@ -459,12 +513,32 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
                       <>
                         <IconButton
                           onClick={() => {
-                            // console.log('rowData++', props.rowData);
-                            handleOpenQrModal(
-                              props.rowData.contentType === 'Course'
-                                ? `${process.env.NEXT_PUBLIC_POS_URL}/pos/content/${props.rowData.identifier}?activeLink=/pos/program`
-                                : `${process.env.NEXT_PUBLIC_POS_URL}/pos/player/${props.rowData.identifier}?activeLink=/pos/program`
-                            );
+                            const { identifier, contentType } = props.rowData;
+                            let link = '';
+
+                            if (loggedInProgram === TENANT_DATA.POS) {
+                              // ✅ POS program
+                              link =
+                                contentType === 'Course'
+                                  ? `${loggedInProgramDomain}pos/content/${identifier}?activeLink=/pos/program`
+                                  : `${loggedInProgramDomain}pos/player/${identifier}?activeLink=/pos/program`;
+                              handleOpenQrModal(link);
+                            } else if (
+                              loggedInProgram ===
+                              TENANT_DATA.SECOND_CHANCE_PROGRAM
+                            ) {
+                              link =
+                                contentType === 'Course'
+                                  ? `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=course&identifier=${identifier}`
+                                  : `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=content&identifier=${identifier}`;
+                              handleOpenQrModal(link);
+                            } else {
+                              link =
+                                contentType === 'Course'
+                                  ? `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=course&identifier=${identifier}`
+                                  : `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=content&identifier=${identifier}`;
+                              handleOpenQrModal(link);
+                            }
                           }}
                         >
                           <QrCode2Icon />{' '}
@@ -473,11 +547,32 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
                         {/* ✅ Copy to Clipboard Button */}
                         <IconButton
                           onClick={() => {
-                            const link =
-                              props.rowData.contentType === 'Course'
-                                ? `${process.env.NEXT_PUBLIC_POS_URL}/pos/content/${props.rowData.identifier}?activeLink=/pos/program`
-                                : `${process.env.NEXT_PUBLIC_POS_URL}/pos/player/${props.rowData.identifier}?activeLink=/pos/program`;
-                            handleCopyLink(link);
+                            const { identifier, contentType } = props.rowData;
+                            let link = '';
+
+                            if (loggedInProgram === TENANT_DATA.POS) {
+                              // ✅ POS program
+                              link =
+                                contentType === 'Course'
+                                  ? `${loggedInProgramDomain}pos/content/${identifier}?activeLink=/pos/program`
+                                  : `${loggedInProgramDomain}pos/player/${identifier}?activeLink=/pos/program`;
+                              handleCopyLink(link);
+                            } else if (
+                              loggedInProgram ===
+                              TENANT_DATA.SECOND_CHANCE_PROGRAM
+                            ) {
+                              link =
+                                contentType === 'Course'
+                                  ? `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=course&identifier=${identifier}`
+                                  : `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=content&identifier=${identifier}`;
+                              handleCopyLink(link);
+                            } else {
+                              link =
+                                contentType === 'Course'
+                                  ? `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=course&identifier=${identifier}`
+                                  : `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=content&identifier=${identifier}`;
+                              handleCopyLink(link);
+                            }
                           }}
                         >
                           <ContentCopyIcon />

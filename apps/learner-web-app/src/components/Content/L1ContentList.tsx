@@ -22,6 +22,7 @@ import { profileComplitionCheck } from '@learner/utils/API/userService';
 import { usePathname } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { TenantName } from '../../utils/app.constant';
 
 const MyComponent: React.FC = () => {
   const pathname = usePathname();
@@ -50,7 +51,7 @@ const MyComponent: React.FC = () => {
         }
         const res = await getTenantInfo();
         const youthnetContentFilter = res?.result.find(
-          // (program: any) => program.name === 'YouthNet'
+          // (program: any) => program.name === TenantName.YOUTHNET
           (program: any) => program.name === localStorage.getItem('userProgram')
         );
 
@@ -131,14 +132,14 @@ const MyComponent: React.FC = () => {
               }}
             >
               <span role="img" aria-label="wave">
-                👋
+                👋 {' '}
               </span>
               {t('COMMON.WELCOME')}, {localStorage.getItem('firstName')}!
             </Typography>
           </Box>
           {(tab == '0' || tab === null) && <InProgressContent />}
 
-          {localStorage.getItem('userProgram') === 'YouthNet' && (
+          {localStorage.getItem('userProgram') === TenantName.YOUTHNET && (
             <Grid container>
               <Grid
                 item
@@ -162,7 +163,7 @@ const MyComponent: React.FC = () => {
           {filter && (
             <LearnerCourse
               title={
-                localStorage.getItem('userProgram') === 'Camp to Club'
+                localStorage.getItem('userProgram') === TenantName.CAMP_TO_CLUB
                   ? 'LEARNER_APP.COURSE.GET_STARTED_CLUB_COURSES'
                   : 'LEARNER_APP.COURSE.GET_STARTED'
               }

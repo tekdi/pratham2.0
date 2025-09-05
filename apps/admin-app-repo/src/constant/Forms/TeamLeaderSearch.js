@@ -96,7 +96,7 @@ export const TeamLeaderSearchSchema = {
       isMultiSelect: true,
       maxSelections: 1000,
     },
-    firstName: {
+    name: {
       type: 'string',
       title: 'Search Team Leader',
       // description: 'Search for a specific user or entity',
@@ -117,7 +117,7 @@ export const TeamLeaderSearchSchema = {
 };
 
 export const TeamLeaderSearchUISchema = {
-  'ui:order': ['state', 'district', 'block', 'firstName', 'sortBy', 'status'],
+  'ui:order': ['state', 'district', 'block', 'name', 'sortBy', 'status'],
 
   state: {
     'ui:widget': 'CustomMultiSelectWidget',
