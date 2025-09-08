@@ -325,6 +325,21 @@ const OurProgramCarousel = () => {
                         }}
                         onClick={() => {
                           // console.log('Test####', program?.params?.uiConfig);
+                          if (
+                            typeof window !== 'undefined' &&
+                            window.localStorage
+                          ) {
+                            localStorage.setItem('userProgram', program?.name);
+                          }
+                          if (
+                            typeof window !== 'undefined' &&
+                            window.localStorage
+                          ) {
+                            localStorage.setItem(
+                              'userProgramTenantId',
+                              program?.tenantId
+                            );
+                          }
                           const uiConfig = program?.params?.uiConfig || {};
                           localStorage.setItem(
                             'uiConfig',

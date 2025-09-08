@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Suspense, useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState, useRef } from 'react';
 import {
   Box,
   Container,
@@ -64,10 +64,23 @@ const SSOPage = () => {
   const searchParams = useSearchParams();
   const [processing, setProcessing] = useState(true);
   const [success, setSuccess] = useState(false);
+  const [hasAuthenticated, setHasAuthenticated] = useState(false); // Prevent duplicate calls
+  const authenticationRef = useRef(false); // Additional safeguard with useRef
 
   useEffect(() => {
+    // Prevent duplicate authentication calls using both state and ref
+    if (hasAuthenticated || authenticationRef.current) {
+      console.log('Authentication already in progress or completed');
+      return;
+    }
+
     const handleSSOCallback = async () => {
       try {
+        // Mark authentication as started to prevent duplicates
+        setHasAuthenticated(true);
+        authenticationRef.current = true;
+        console.log('Starting SSO authentication...');
+
         // Extract parameters from URL
         const env = searchParams.get('env');
         const tenantId = searchParams.get('tenantid');
@@ -98,7 +111,7 @@ const SSOPage = () => {
 
         // Make API call to authenticate
         const baseUrl = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;
-        const apiUrl = `${baseUrl}/interface/v1/sso/authenticate`;
+        const apiUrl = `${baseUrl}/user/sso/authenticate`;
 
         const response = await post(apiUrl, ssoAuthData);
 
@@ -122,6 +135,10 @@ const SSOPage = () => {
         console.error('SSO authentication error:', error);
         showToastMessage(error.message || 'Authentication failed', 'error');
 
+        // Reset authentication flags on error so user can retry
+        setHasAuthenticated(false);
+        authenticationRef.current = false;
+
         // Redirect to home page after error
         setTimeout(() => {
           router.push('/');
@@ -134,7 +151,7 @@ const SSOPage = () => {
     };
 
     handleSSOCallback();
-  }, [searchParams, router]);
+  }, [searchParams.toString()]); // Use toString() to stabilize the dependency
 
   const handleSuccessfulLogin = async (
     response: any,
