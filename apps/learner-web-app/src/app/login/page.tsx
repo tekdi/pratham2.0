@@ -409,17 +409,25 @@ localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
             `${redirectUrl}${activeLink ? `?activeLink=${activeLink}` : ''}`
           );      
         } else{
-          if(tenantName=== TenantName.YOUTHNET) {
-            router.push('/content');
-          }
-          else if (tenantName===TenantName.CAMP_TO_CLUB)
-          {
-            router.push('/courses-contents');
-          }
-          else if(tenantName===TenantName.PRAGYANPATH)
-          {
-            router.push('/courses-contents');
-          }
+          // if(tenantName=== TenantName.YOUTHNET) {
+          //   router.push('/content');
+          // }
+          // else if (tenantName===TenantName.CAMP_TO_CLUB)
+          // {
+          //   router.push('/courses-contents');
+          // }
+          // else if(tenantName===TenantName.PRAGYANPATH)
+          // {
+          //   router.push('/courses-contents');
+          // }
+      
+ const hasBothContentCoursetab = uiConfig?.showContent?.includes("courses") && uiConfig?.showContent?.includes("contents");
+              
+                if (hasBothContentCoursetab) {
+                  router.push('/courses-contents');
+                }
+                 else
+                router.push('/content'); 
         }
       } else {
         showToastMessage('Username or password not correct', 'error');
