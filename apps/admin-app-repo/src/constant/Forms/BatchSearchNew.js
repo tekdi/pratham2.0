@@ -6,26 +6,26 @@ export const BatchSearchSchema = {
       title: 'Search Batch..',
       // description: 'Search for a specific user or entity',
     },
-    sortBy: {
-      type: 'string',
-      title: 'Sort By',
-      enum: ['asc', 'desc'],
-      enumNames: ['A-Z', 'Z-A'],
-    },
     status: {
       type: 'string',
       title: 'Status',
       enum: ['active', 'archived'],
       enumNames: ['Active', 'Archived'],
     },
+    sortBy: {
+      type: 'string',
+      title: 'Sort By',
+      enum: ['asc', 'desc'],
+      enumNames: ['A-Z', 'Z-A'],
+    }
   },
 };
 
 export const BatchSearchUISchema = {
   'ui:order': [
     'name',
-    'sortBy',
     'status',
+    'sortBy'
   ],
 
   name: {
