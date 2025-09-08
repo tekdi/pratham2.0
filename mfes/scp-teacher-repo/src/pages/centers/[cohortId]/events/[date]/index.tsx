@@ -60,7 +60,7 @@ const EventMonthView: React.FC<any> = () => {
   let classId: string = '';
   if (typeof window !== 'undefined' && window.localStorage) {
     userId = localStorage.getItem('userId') || '';
-    classId = localStorage.getItem('classId') || '';
+    classId = localStorage.getItem('cohortId') || '';
   }
   useEffect(() => {
     const getSessionsData = async () => {
@@ -69,7 +69,7 @@ const EventMonthView: React.FC<any> = () => {
         let cohortId;
 
         if (typeof window !== 'undefined' && window.localStorage) {
-          cohortId = localStorage.getItem('classId') || '';
+          cohortId = localStorage.getItem('cohortId') || '';
         }
 
         if (cohortId !== '') {
@@ -161,6 +161,8 @@ const EventMonthView: React.FC<any> = () => {
 
   const handleSelectedDateChange = (date: Date | Date[] | null) => {
     setSelectedDate(date as Date);
+    setSessions([]);
+    setExtraSessions([]);
   };
 
   const handleEventDeleted = () => {
@@ -187,10 +189,10 @@ const EventMonthView: React.FC<any> = () => {
             );
             const districtCode = district?.code || '';
             const districtId = district?.fieldId || '';
-            const state = cohortData.customField.find(
+            const state = cohortData?.customField?.find(
               (item: CustomField) => item.label === 'STATE'
             );
-            setState(state.selectedValues?.[0]?.value || '');
+            setState(state?.selectedValues?.[0]?.value || '');
             const stateCode = state?.code || '';
             const stateId = state?.fieldId || '';
 

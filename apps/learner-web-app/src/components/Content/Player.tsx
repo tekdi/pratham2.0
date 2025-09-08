@@ -83,15 +83,16 @@ const App = ({
     return <div>Loading...</div>;
   }
   const onBackClick = () => {
-    if (breadCrumbs?.length > 1) {
-      if (breadCrumbs?.[breadCrumbs.length - 1]?.link) {
-        router.push(breadCrumbs?.[breadCrumbs.length - 1]?.link);
-      }
-    } else if (contentBaseUrl) {
-      router.back();
-    } else {
-      router.push(`${activeLink ? activeLink : '/content'}`);
-    }
+    // if (breadCrumbs?.length > 1) {
+    //   if (breadCrumbs?.[breadCrumbs.length - 1]?.link) {
+    //     router.push(breadCrumbs?.[breadCrumbs.length - 1]?.link);
+    //   }
+    // } else if (contentBaseUrl) {
+    //   router.back();
+    // } else {
+    //   router.push(`${activeLink ? activeLink : '/content'}`);
+    // }
+    router.back();
   };
 
   return (
