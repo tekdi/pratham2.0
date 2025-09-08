@@ -136,8 +136,8 @@
     "YOU_DONT_HAVE_PERMISSION_TO_ACCESS_THIS_PAGE": "You don't have access to this page",
     "ACCESS_DENIED": "Access Denied",
     "WELCOME": "Welcome",
-     "Courses": "Courses",
-      "Content": "Content",
+    "Courses": "Courses",
+    "Content": "Content",
     "SUPPORT_REQUEST": "Support Request",
     "SUBMIT_YOUR_REQUEST_FOR_ISSUES": "Submit your request and let us assist you with any issues or concerns.",
     "WE_ARE_HERE_TO_HELP": "We’re Here to Help",
@@ -177,8 +177,6 @@
       "OK": "OK",
       "INPROGRESS": "In-Progress",
       "LOADING": "Loading.."
-
-     
     },
     "COURSE": {
       "COMPLETED_ON": "Completed on",
@@ -208,7 +206,8 @@
       "ABOUT_PRATHAM_DESC": "Pratham addresses gaps in education systems with innovative, low-cost, replicable interventions that span the age spectrum. Working both directly and through government systems, these programs collectively reach millions of children and thousands of school dropouts each year. In “direct” work, a Pratham instructor works with children either in the school or in the community, whereas the “partnership” model involves Pratham teams working closely with government teams at the state, district or city level to design and implement programs. Pratham’s approach to improving learning outcomes continues to serve as a model, both within India and beyond.",
       "OUR_PROGRAMS": "Our Programs",
       "SIGN_UP": "Sign Up",
-      "SIGN_IN": "Sign In"
+      "SIGN_IN": "Sign In",
+      "Login with Newton ERP": "Login with Newton ERP"
     },
     "LOGIN": {
       "welcome_title": "Welcome to Pratham myLearning!",
@@ -319,7 +318,7 @@
       "GUARDIAN_NAME": "Guardian's Name",
       "GUARDIAN_DETAILS": "Guardian Details",
       "I_WANT_TO_BECOME": "I want to become {futureWork}",
-      "PTM_NAME":"PTM Name"
+      "PTM_NAME": "PTM Name"
     },
     "USERNAME_SUGGESTION": {
       "USERNAME": "Username",
@@ -360,8 +359,26 @@
       "SEARCH_TEXT": "Search",
       "APP_NAME": "Pratham myLearning",
       "ON_PLAYSTORE": "on Playstore"
+    },
+    "SSO": {
+      "TITLE": "SSO Authentication",
+      "IMAGE_ALT": "Authentication in progress",
+      "INITIALIZING": "Initializing SSO authentication...",
+      "EXTRACTING_PARAMS": "Extracting authentication parameters...",
+      "AUTHENTICATING": "Authenticating with server...",
+      "AUTH_SUCCESS": "Authentication successful! Redirecting...",
+      "AUTH_FAILED": "Authentication failed",
+      "PLEASE_WAIT": "Please wait while we verify your credentials...",
+      "REDIRECTING_LOGIN": "Redirecting you to the login page in a moment...",
+      "REDIRECTING_DASHBOARD": "Redirecting you to your dashboard...",
+      "SUCCESS_MESSAGE": "SSO authentication successful!",
+      "ERROR_GENERAL": "An error occurred during SSO authentication",
+      "ERROR_MISSING_PARAMS": "Missing required parameters",
+      "ERROR_AUTH_FAILED": "Authentication failed"
     }
   },
+  "Login with Newton ERP": "Login with Newton ERP",
+
   "LOGIN_PAGE": {
     "USERNAME_PASSWORD_NOT_CORRECT": "Username or Password is not correct",
     "DEVICE_FINGERPRINT_SUCCESS": "Device fingerprint generated successfully",
@@ -393,8 +410,7 @@
     "OBSERVATION_NOT_STARTED_YET": "Survey not started yet",
     "EXPIRED": "Expired",
     "ARE_YOU_SURE_YOU_TO_SUBMIT_FORM": "Are you sure to submit the form?",
-            "ONLY_SPECIFIED_FILE_TYPES_ALLOWED": "Only specified file types are allowed"
-
+    "ONLY_SPECIFIED_FILE_TYPES_ALLOWED": "Only specified file types are allowed"
   },
   "YOUTHNET_USERS_AND_VILLAGES": {
     "MENTORS": "Mentors",
