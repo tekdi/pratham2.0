@@ -52,11 +52,13 @@ export const fetchContent = async (identifier: any) => {
 export const ContentSearch = async ({
   query,
   filters,
+  fields,
   limit = 5,
   offset = 0,
 }: {
   query?: string;
   filters?: object;
+  fields?: string[];
   limit?: number;
   offset?: number;
 }) => {
@@ -79,7 +81,7 @@ export const ContentSearch = async ({
           //   ],
           //   channel: localStorage.getItem('channelId'),
         },
-        fields: [
+        fields: fields || [
           'name',
           'appIcon',
           'description',

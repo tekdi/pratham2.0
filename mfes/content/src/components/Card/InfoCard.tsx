@@ -81,13 +81,13 @@ const InfoCard: React.FC<InfoCardProps> = ({
             ..._infoCard?._cardMedia,
           }}
           // image={item?.posterImage || _infoCard?.default_img}
-            image={
-  item?.posterImage
-    ? item.posterImage
-    : item?.appIcon
-      ? item.appIcon
-      : _infoCard?.default_img 
-}
+          image={
+            item?.posterImage
+              ? item.posterImage
+              : item?.appIcon
+                ? item.appIcon
+                : _infoCard?.default_img
+          }
           alt={item?.name}
         />
         <Box
@@ -209,13 +209,13 @@ const InfoCard: React.FC<InfoCardProps> = ({
                         {t('LEARNER_APP.COURSE.STARTED_ON')}:{' '}
                         {item?.startedOn
                           ? new Intl.DateTimeFormat('en-GB', {
-                              day: '2-digit',
-                              month: 'short',
-                              year: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit',
-                              hour12: true,
-                            }).format(new Date(item.startedOn))
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: true,
+                          }).format(new Date(item.startedOn))
                           : ' - '}
                       </SpeakableText>
                       {/* {JSON.stringify(_infoCard?.isShowStatus || {})} */}
@@ -319,7 +319,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
             <SpeakableText>
               {checkLocalAuth
                 ? 'You are now enrolled to the course!'
-                : 'you need to login first'}
+                : 'You need to login first'}
             </SpeakableText>
           </Typography>
         </Box>
