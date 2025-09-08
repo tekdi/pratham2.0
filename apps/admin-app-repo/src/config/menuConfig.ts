@@ -152,13 +152,13 @@ export const MENU_CONFIG = {
       roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
       subMenu: [
         {
-          title:  'SIDEBAR.MENTOR',
-          link: '/mentor',
+          title: 'SIDEBAR.MENTOR_LEADER',
+          link: '/mentor-leader',
           roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
         {
-          title: 'SIDEBAR.MENTOR_LEADER',
-          link: '/mentor-leader',
+          title:  'SIDEBAR.MENTOR',
+          link: '/mentor',
           roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
         {
