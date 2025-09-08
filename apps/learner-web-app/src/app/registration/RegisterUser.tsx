@@ -137,7 +137,7 @@ const RegisterUser = () => {
           //   },
           // },
         ]);
-        console.log('responseForm', responseForm?.schema);
+        console.log('responseForm####', responseForm?.schema?.required);
         delete responseForm?.schema?.properties.password;
         delete responseForm?.schema?.properties.confirm_password;
         delete responseForm?.schema?.properties.username;
@@ -159,6 +159,7 @@ const RegisterUser = () => {
           'district',
           'block',
           'village',
+          'family_member_details'
           // 'center',
           // 'batch',
           // 'username',
@@ -422,7 +423,7 @@ const RegisterUser = () => {
   };
   const onResend = async () => {
     try {
-      let reason = 'forgot';
+      let reason = 'signup';
       const response = await sendOTP({ mobile: mobile, reason });
       console.log('sendOTP', response);
       setHash(response?.result?.data?.hash);
