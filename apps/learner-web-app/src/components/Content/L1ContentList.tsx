@@ -132,7 +132,7 @@ const MyComponent: React.FC = () => {
               }}
             >
               <span role="img" aria-label="wave">
-                👋
+                👋 {' '}
               </span>
               {t('COMMON.WELCOME')}, {localStorage.getItem('firstName')}!
             </Typography>

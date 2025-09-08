@@ -242,38 +242,59 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
     const navLinks: NewDrawerItemProp[] = [
       {
         title: t('LEARNER_APP.POS.ABOUT_US'),
-        to: () => router.push('/pos/about-us'),
+        to: () => {
+          localStorage.removeItem('learnerCourseFilters');
+          router.push('/pos/about-us');
+        },
         isActive: currentPage === '/pos/about-us',
       },
       {
         title: t('LEARNER_APP.POS.SCHOOL'),
-        to: () => router.push('/pos/school'),
+        to: () => {
+          localStorage.removeItem('learnerCourseFilters');
+          router.push('/pos/school');
+        },
         isActive: currentPage === '/pos/school',
         child: schoolSubCategory.map((item: any) => ({
           title: item?.name,
-          to: () => router.push(`/pos/school?se_subDomains=${item?.name}`),
+          to: () => {
+            localStorage.removeItem('learnerCourseFilters');
+            router.push(`/pos/school?se_subDomains=${item?.name}`);
+          },
           isActive: currentPage === `/pos/school?se_subDomains=${item?.name}`,
           code: item?.code,
         })),
       },
       {
         title: t('LEARNER_APP.POS.WORK'),
-        to: () => router.push('/pos/work'),
+        to: () => {
+          localStorage.removeItem('learnerCourseFilters');
+          router.push('/pos/work');
+        },
         isActive: currentPage === '/pos/work',
         child: workSubCategory.map((item: any) => ({
           title: item?.name,
-          to: () => router.push(`/pos/work?se_subDomains=${item?.name}`),
+          to: () => {
+            localStorage.removeItem('learnerCourseFilters');
+            router.push(`/pos/work?se_subDomains=${item?.name}`);
+          },
           isActive: currentPage === `/pos/work?se_subDomains=${item?.name}`,
           code: item?.code,
         })),
       },
       {
         title: t('LEARNER_APP.POS.LIFE'),
-        to: () => router.push('/pos/life'),
+        to: () => {
+          localStorage.removeItem('learnerCourseFilters');
+          router.push('/pos/life');
+        },
         isActive: currentPage === '/pos/life',
         child: lifeSubCategory.map((item: any) => ({
           title: item?.name,
-          to: () => router.push(`/pos/life?se_subDomains=${item?.name}`),
+          to: () => {
+            localStorage.removeItem('learnerCourseFilters');
+            router.push(`/pos/life?se_subDomains=${item?.name}`);
+          },
           isActive: currentPage === `/pos/life?se_subDomains=${item?.name}`,
           code: item?.code,
         })),
@@ -286,7 +307,10 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
           { name: TenantName.SECOND_CHANCE_PROGRAM, code: 'SCP' },
         ].map((item: any) => ({
           title: item?.name,
-          to: () => router.push(`/pos/program?program=${item?.name}`),
+          to: () => {
+            localStorage.removeItem('learnerCourseFilters');
+            router.push(`/pos/program?program=${item?.name}`);
+          },
           isActive: currentPage === `/pos/program?program=${item?.name}`,
           code: item?.code,
         })),
@@ -294,6 +318,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
       {
         title: t('Experimento India'),
         to: () => {
+          localStorage.removeItem('learnerCourseFilters');
           const domain = process.env.NEXT_PUBLIC_THEMATIC_DOMAIN || '';
           window.open(`${domain}`, '_blank');
         },
@@ -354,7 +379,10 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         _brand: {
           _box: {
             brandlogo: <Brand />,
-            onClick: () => router.push('/pos'),
+            onClick: () => {
+              localStorage.removeItem('learnerCourseFilters');
+              router.push('/pos');
+            },
           },
         },
         navLinks: defaultNavLinks,
@@ -389,7 +417,10 @@ const Brand = () => {
         width={146}
         height={32}
         style={{ height: '32px', cursor: 'pointer' }}
-        onClick={() => router.push('/pos')}
+        onClick={() => {
+          localStorage.removeItem('learnerCourseFilters');
+          router.push('/pos');
+        }}
       />
       <a
         href="https://www.pradigi.org"

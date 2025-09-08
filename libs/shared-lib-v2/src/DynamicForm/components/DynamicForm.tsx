@@ -37,9 +37,14 @@ const DynamicForm = ({
   type,
   isCompleteProfile=false,
   isReassign=false,
-  createNew=true
+  createNew=true,
+  forEditedschema,
+  mobileAddUiSchema={},
+  mobileSchema={},
+  parentDataAddUiSchema={},
+  parentDataSchema={},
 }: any) => {
-  console.log('prefilledFormData', prefilledFormData);
+  console.log('forEditedschema', forEditedschema);
   const { t } = useTranslation();
   const hasPrefilled = useRef(false);
   const [submitted, setSubmitted] = useState(false);
@@ -126,11 +131,56 @@ const DynamicForm = ({
   const [formUiSchema, setFormUiSchema] = useState(createNew ? uiSchema : getInitialUiSchema());
   const [formData, setFormData] = useState(createNew  ? prefilledFormData : getInitialFormData());
   
-
+console.log('formUiSchema', formUiSchema);
 
   //custom validation on formData for learner fields hide on dob
   useEffect(() => {
     if (type == 'learner'  && !isReassign) {
+     
+      let uischema = { ...formUiSchema };
+
+      if (Object.keys(mobileAddUiSchema).length > 0) {
+        uischema.mobile = mobileAddUiSchema;
+      }
+
+      // Handle parent data fields (parent_phone, guardian_relation, guardian_name)
+      if (Object.keys(parentDataAddUiSchema).length > 0) {
+        if (parentDataAddUiSchema.parent_phone) {
+          uischema.parent_phone = parentDataAddUiSchema.parent_phone;
+        }
+        if (parentDataAddUiSchema.guardian_relation) {
+          uischema.guardian_relation = parentDataAddUiSchema.guardian_relation;
+        }
+        if (parentDataAddUiSchema.guardian_name) {
+          uischema.guardian_name = parentDataAddUiSchema.guardian_name;
+        }
+      }
+
+      let schemaa = { ...formSchema, properties: { ...formSchema.properties } };
+
+      if (Object.keys(mobileSchema).length > 0) {
+        mobileSchema.title = t("phone_number");
+        schemaa.properties.mobile = mobileSchema;
+      }
+
+      // Handle parent data schema fields
+      if (Object.keys(parentDataSchema).length > 0) {
+        if (parentDataSchema.parent_phone) {
+          parentDataSchema.parent_phone.title = t("PARENT_GUARDIAN_PHONE_NO");
+          schemaa.properties.parent_phone = parentDataSchema.parent_phone;
+        }
+        if (parentDataSchema.guardian_relation) {
+          parentDataSchema.guardian_relation.title = t("RELATION_WITH_GUARDIAN");
+          schemaa.properties.guardian_relation = parentDataSchema.guardian_relation;
+        }
+        if (parentDataSchema.guardian_name) {
+          parentDataSchema.guardian_name.title = t("NAME_OF_GUARDIAN");
+          schemaa.properties.guardian_name = parentDataSchema.guardian_name;
+        }
+      }
+
+      setFormSchema(schemaa);
+      setFormUiSchema(uischema);
       // ...existing code...
       let requiredKeys = ['parent_phone', "guardian_relation" , "guardian_name"];
       let requiredKeys2 = ['mobile'];
@@ -139,12 +189,12 @@ const DynamicForm = ({
 
       if (formData?.dob) {
         let age = calculateAgeFromDate(formData?.dob);
-        let oldFormSchema = formSchema;
-        let oldFormUiSchema = formUiSchema;
+        let oldFormSchema = schemaa; // ✅ Use schemaa instead of formSchema
+        let oldFormUiSchema = uischema; // ✅ Use uischema instead of formUiSchema
         let requiredArray = oldFormSchema?.required;
 
         //if learner form then only apply
-        if (oldFormSchema?.properties?.guardian_relation) {
+        if (oldFormSchema?.properties?.guardian_relation || isCompleteProfile) {
           if (age < 18) {
             delete formData?.mobile;
             // Merge only missing items from required2 into required1 guardian details
@@ -188,6 +238,7 @@ const DynamicForm = ({
             delete formData?.parent_phone;
             delete formData?.guardian_relation;
             delete formData?.guardian_name;
+            
             // remove from required
             requiredArray = requiredArray.filter(
               (key) => !requiredKeys.includes(key)
@@ -213,7 +264,7 @@ const DynamicForm = ({
             });
 
             //show mobile
-            // Clone each key's config and set widget to 'hidden'
+            // Clone each key's config and set widget to 'CustomTextFieldWidget'
             requiredKeys2.forEach((key) => {
               if (updatedUiSchema.hasOwnProperty(key)) {
                 updatedUiSchema[key] = {
@@ -228,6 +279,7 @@ const DynamicForm = ({
           oldFormSchema.required = requiredArray;
           setFormSchema(oldFormSchema);
           setFormUiSchema(oldFormUiSchema);
+          if(isCompleteProfile)
           setFormUiSchemaOriginal(oldFormUiSchema);
         }
       } else {
@@ -269,7 +321,7 @@ const DynamicForm = ({
         oldFormSchema.required = requiredArray;
         setFormSchema(oldFormSchema);
         setFormUiSchema(oldFormUiSchema);
-        setFormUiSchemaOriginal(oldFormUiSchema);
+      //  setFormUiSchemaOriginal(oldFormUiSchema);
       }
 
       if (!formData.family_member_details) {
@@ -281,16 +333,14 @@ const DynamicForm = ({
           delete updatedUiSchema.spouse_name;
           return updatedUiSchema;
         });
-         // Remove all three fields if nothing is selected
-        setFormUiSchema((prevUiSchema) => {
+          setFormUiSchemaOriginal((prevUiSchema) => {
           const updatedUiSchema = { ...prevUiSchema };
           delete updatedUiSchema.mother_name;
           delete updatedUiSchema.father_name;
           delete updatedUiSchema.spouse_name;
           return updatedUiSchema;
         });
-
-        setFormUiSchemaOriginal((prevSchema) => {
+        setFormSchema((prevSchema) => {
           const updatedSchema = { ...prevSchema };
           if (updatedSchema.properties) {
             updatedSchema.properties = { ...updatedSchema.properties };
@@ -308,6 +358,7 @@ const DynamicForm = ({
           }
           return updatedSchema;
         });
+      
       } else {
         // Helper to add a field
         const addField = (fieldKey, title) => {
@@ -947,9 +998,7 @@ const DynamicForm = ({
                           } else {
                             updatedProperties[fieldKey] = {
                               ...updatedProperties[fieldKey],
-                              enum: data?.map((item) =>
-                                item?.[value].toString()
-                              ),
+                              enum: data?.map((item) => item?.[value].toString()),
                               enumNames: data?.map((item) =>
                                 transformLabel(item?.[label].toString())
                               ),
@@ -1520,6 +1569,19 @@ const DynamicForm = ({
       schema: any,
       extraFields: Record<string, any> = {} // Optional root-level custom fields
     ) {
+// schema=forEditedschema
+if(schema.properties.family_member_details)
+{
+schema.properties = {
+  ...schema.properties,
+  ...(forEditedschema?.father_name && { father_name: forEditedschema.father_name }),
+  ...(forEditedschema?.mother_name && { mother_name: forEditedschema.mother_name }),
+  ...(forEditedschema?.spouse_name && { spouse_name: forEditedschema.spouse_name }),
+};
+
+
+}
+
       const transformedData: Record<string, any> = {
         ...extraFields, // Add optional root-level custom fields dynamically
         customFields: [],
