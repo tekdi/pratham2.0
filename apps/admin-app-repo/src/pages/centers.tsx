@@ -688,7 +688,9 @@ const Centers = () => {
           open={openBatchModal}
           onClose={() => setOpenBatchModal(false)}
           showFooter={false}
-          modalTitle={`Batches - ${transformLabel(selectedCenter?.name || '')}`}
+          modalTitle={t("CENTERS.BATCHES_FOR_CENTER", {
+            centerName: transformLabel(selectedCenter?.name || "")
+          })}
           isFullwidth={true}
         >
           {selectedCenter ? (
