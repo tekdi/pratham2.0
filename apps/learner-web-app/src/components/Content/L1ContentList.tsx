@@ -132,7 +132,7 @@ const MyComponent: React.FC = () => {
               }}
             >
               <span role="img" aria-label="wave">
-                👋
+                👋 {' '}
               </span>
               {t('COMMON.WELCOME')}, {localStorage.getItem('firstName')}!
             </Typography>
@@ -190,9 +190,9 @@ const MyComponent: React.FC = () => {
                   }),
                 },
                 ...(Array.isArray(storedConfig.showContent) &&
-                storedConfig.showContent.length === 2 &&
-                storedConfig.showContent.includes('courses') &&
-                storedConfig.showContent.includes('contents')
+                  storedConfig.showContent.length === 2 &&
+                  storedConfig.showContent.includes('courses') &&
+                  storedConfig.showContent.includes('contents')
                   ? { contentTabs: ['courses', 'content'] }
                   : {}),
 
@@ -297,15 +297,15 @@ const InProgressContent: React.FC = () => {
               sx={
                 !isMdUp
                   ? {
-                      color: theme.palette.secondary.main,
-                      minWidth: '100px',
-                      fontWeight: 500,
-                      fontSize: '14px',
-                      lineHeight: '20px',
-                      letterSpacing: '0.1px',
-                      textAlign: 'center',
-                      verticalAlign: 'middle',
-                    }
+                    color: theme.palette.secondary.main,
+                    minWidth: '100px',
+                    fontWeight: 500,
+                    fontSize: '14px',
+                    lineHeight: '20px',
+                    letterSpacing: '0.1px',
+                    textAlign: 'center',
+                    verticalAlign: 'middle',
+                  }
                   : {}
               }
               endIcon={<ArrowForwardIcon />}
@@ -326,7 +326,7 @@ const InProgressContent: React.FC = () => {
             _subBox: { px: { xs: 2, sm: 2, md: 0 } },
             _carousel: { spaceBetween: isMdUp ? 16 : 8 },
           }}
-          //  pageName="Inprogress"
+        //  pageName="Inprogress"
         />
       </Grid>
     </Grid>

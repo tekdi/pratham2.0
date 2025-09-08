@@ -10,9 +10,11 @@ import {
   Grid,
   IconButton,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import { useParams, useRouter } from 'next/navigation';
-// import { ContentSearch } from '@learner/utils/API/contentService';
+import { ContentSearch } from '@learner/utils/API/contentService';
 import { checkAuth } from '@shared-lib-v2/utils/AuthService';
 import {
   ExpandableText,
@@ -43,6 +45,8 @@ const App = ({
   const [item, setItem] = useState<{ [key: string]: any }>({});
   const [breadCrumbs, setBreadCrumbs] = useState<any>();
   const [isShowMoreContent, setIsShowMoreContent] = useState(false);
+    const [mimeType, setMemetype] = useState("");
+
 
   let activeLink = null;
   if (typeof window !== 'undefined') {
@@ -52,6 +56,20 @@ const App = ({
   useEffect(() => {
     const fetch = async () => {
       const response = await fetchContent(identifier);
+      const response2 = await ContentSearch({
+        filters: {
+          identifier: [identifier]
+        },
+        limit: 1,
+        offset: 0
+      });
+     const resultKeys = Object.keys(response2.result).filter(k => k !== "count");
+const firstKey = resultKeys[0];
+
+const mimeType = response2.result[firstKey][0].mimeType;
+     console.log('response2=======>', mimeType);
+
+     setMemetype(mimeType);
       setItem({ content: response });
       if (unitId) {
         const course = await hierarchyAPI(courseId as string);
@@ -83,15 +101,16 @@ const App = ({
     return <div>Loading...</div>;
   }
   const onBackClick = () => {
-    if (breadCrumbs?.length > 1) {
-      if (breadCrumbs?.[breadCrumbs.length - 1]?.link) {
-        router.push(breadCrumbs?.[breadCrumbs.length - 1]?.link);
-      }
-    } else if (contentBaseUrl) {
-      router.back();
-    } else {
-      router.push(`${activeLink ? activeLink : '/content'}`);
-    }
+    // if (breadCrumbs?.length > 1) {
+    //   if (breadCrumbs?.[breadCrumbs.length - 1]?.link) {
+    //     router.push(breadCrumbs?.[breadCrumbs.length - 1]?.link);
+    //   }
+    // } else if (contentBaseUrl) {
+    //   router.back();
+    // } else {
+    //   router.push(`${activeLink ? activeLink : '/content'}`);
+    // }
+    router.back();
   };
 
   return (
@@ -175,6 +194,7 @@ const App = ({
           identifier={identifier}
           courseId={courseId}
           unitId={unitId}
+          mimeType={mimeType}
           {..._config?.player}
         />
       </Grid>
@@ -261,10 +281,21 @@ const PlayerBox = ({
   isGenerateCertificate,
   trackable,
   isShowMoreContent,
+  mimeType,
 }: any) => {
   const router = useRouter();
   const { t } = useTranslation();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [play, setPlay] = useState(false);
+
+  // Determine aspectRatio based on mimeType and mobile mode
+  const getAspectRatio = () => {
+    if (mimeType === 'application/vnd.sunbird.questionset' && isMobile) {
+      return '9/16';
+    }
+    return '16/9';
+  };
 
   useEffect(() => {
     if (checkAuth() || userIdLocalstorageName) {
@@ -351,7 +382,7 @@ const PlayerBox = ({
             style={{
               border: 'none',
               objectFit: 'contain',
-              aspectRatio: '16 / 9',
+              aspectRatio: getAspectRatio(),
             }}
             allowFullScreen
             width="100%"
