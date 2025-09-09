@@ -7,7 +7,7 @@ export function generateMetadata({
   searchParams: { program: string };
 }) {
   const titles = {
-    "Second Chance": 'second chance program',
+    "Second Chance": TenantName.SECOND_CHANCE_PROGRAM,
     'Vocational Training': 'Vocational Training',
   };
 
@@ -49,7 +49,7 @@ export default function PosPage() {
     <List
       pagename={{
         'Vocational Training': TenantName.YOUTHNET,
-        "Second Chance": 'second chance program',
+        "Second Chance": TenantName.SECOND_CHANCE_PROGRAM,
       }}
       _content={{
         contentTabs: ['content'],
