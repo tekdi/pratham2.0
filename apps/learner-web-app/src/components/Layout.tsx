@@ -173,10 +173,13 @@ const NAV_CONFIG: Record<
 
   [TenantName.CAMP_TO_CLUB]: ({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl, isMobile, handleLogoutModal }) =>
     getClubStyleNavConfig({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl, isMobile, handleLogoutModal }),
+ [TenantName.SECOND_CHANCE_PROGRAM]: ({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl, isMobile, handleLogoutModal }) =>
+    getClubStyleNavConfig({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl, isMobile, handleLogoutModal }),
 
   [TenantName.PRAGYANPATH]: ({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl, isMobile, handleLogoutModal }) =>
     getClubStyleNavConfig({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl, isMobile, handleLogoutModal }),
 };
+
 
 const App: React.FC<LayoutProps> = ({ children, ...props }) => {
   const router = useRouter();
