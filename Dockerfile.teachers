@@ -20,7 +20,7 @@ COPY . .
 RUN npx nx run-many --target=build --projects=teachers,authentication,scp-teacher-repo,youthNet,players
 
 # Install PM2 to manage multiple apps
-RUN npm install -g pm2
+RUN npm install -g pm2@6.0.8
 
 # Expose the ports for all apps
 EXPOSE 3001 4101 4102 4103 4107

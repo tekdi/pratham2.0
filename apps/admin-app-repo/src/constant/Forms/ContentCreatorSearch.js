@@ -25,7 +25,7 @@ export const ContentCreatorSearchSchema = {
       isMultiSelect: true,
       maxSelections: 1000,
     },
-    firstName: {
+    name: {
       type: 'string',
       title: 'Search Content Creator',
     },
@@ -45,7 +45,7 @@ export const ContentCreatorSearchSchema = {
 };
 
 export const ContentCreatorUISchema = {
-  'ui:order': ['state', 'firstName', 'sortBy', 'status'],
+  'ui:order': ['state', 'name', 'sortBy', 'status'],
 
   state: {
     'ui:widget': 'CustomMultiSelectWidget',

@@ -301,7 +301,7 @@ const CreateAccountForm = ({
                 color="#0071E3"
                 onClick={handlePrivacyGuidelines}
               >
-                Privacy Guidelines
+                {' '} Privacy Guidelines
               </Typography>{' '}
               and I consent to the collection and use of my personal data as
               described in the{' '}

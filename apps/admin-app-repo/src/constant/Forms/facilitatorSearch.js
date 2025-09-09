@@ -125,7 +125,7 @@ export const facilitatorSearchSchema = {
       isMultiSelect: true,
       maxSelections: 1000,
     },
-    firstName: {
+    name: {
       type: 'string',
       title: 'Search Facilitator',
       // description: 'Search for a specific user or entity',
@@ -151,7 +151,7 @@ export const facilitatorSearchUISchema = {
     'district',
     'block',
     'village',
-    'firstName',
+    'name',
     'sortBy',
     'status',
   ],

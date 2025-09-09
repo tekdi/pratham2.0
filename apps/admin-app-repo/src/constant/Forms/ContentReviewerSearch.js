@@ -25,7 +25,7 @@ export const ContentReviewerSearchSchema = {
       isMultiSelect: true,
       maxSelections: 1000,
     },
-    firstName: {
+    name: {
       type: 'string',
       title: 'Search Content Reviewer',
     },
@@ -45,7 +45,7 @@ export const ContentReviewerSearchSchema = {
 };
 
 export const ContentReviewerUISchema = {
-  'ui:order': ['state', 'firstName', 'sortBy', 'status'],
+  'ui:order': ['state', 'name', 'sortBy', 'status'],
 
   state: {
     'ui:widget': 'CustomMultiSelectWidget',

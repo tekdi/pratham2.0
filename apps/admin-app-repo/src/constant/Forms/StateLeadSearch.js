@@ -25,7 +25,7 @@ export const StateLeadSearchSchema = {
       isMultiSelect: true,
       maxSelections: 1000,
     },
-    firstName: {
+    name: {
       type: 'string',
       title: 'Search State Lead',
     },
@@ -45,7 +45,7 @@ export const StateLeadSearchSchema = {
 };
 
 export const StateLeadUISchema = {
-  'ui:order': ['state', 'firstName', 'sortBy', 'status'],
+  'ui:order': ['state', 'name', 'sortBy', 'status'],
 
   state: {
     'ui:widget': 'CustomMultiSelectWidget',

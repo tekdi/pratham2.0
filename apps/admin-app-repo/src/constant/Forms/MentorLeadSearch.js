@@ -68,7 +68,7 @@ export const MentorLeadSearchSchema = {
       maxSelections: 1000,
     },
 
-    firstName: {
+    name: {
       type: 'string',
       title: 'Search mentor lead',
       // description: 'Search for a specific user or entity',
@@ -89,7 +89,7 @@ export const MentorLeadSearchSchema = {
 };
 
 export const MentorLeadSearchUISchema = {
-  'ui:order': ['state', 'district', 'firstName', 'sortBy', 'status'],
+  'ui:order': ['state', 'district', 'name', 'sortBy', 'status'],
 
   state: {
     'ui:widget': 'CustomMultiSelectWidget',
