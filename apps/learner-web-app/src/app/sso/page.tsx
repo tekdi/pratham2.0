@@ -59,7 +59,7 @@ const checkmarkAnimation = keyframes`
   }
 `;
 
-const SSOPage = () => {
+const SSOContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [processing, setProcessing] = useState(true);
@@ -255,150 +255,177 @@ const SSOPage = () => {
   };
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #FFFDF6, #F8EFDA)',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <Header />
+
+      <Container
+        maxWidth="sm"
+        sx={{ flex: 1, display: 'flex', alignItems: 'center', py: 4 }}
+      >
+        <Card
+          sx={{
+            width: '100%',
+            borderRadius: 3,
+            boxShadow: 3,
+            overflow: 'hidden',
+          }}
+        >
+          <CardContent sx={{ p: 6, textAlign: 'center' }}>
+            <Box
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              gap={4}
+            >
+              {/* Animated GIF */}
+              <Fade in={true}>
+                <Box>
+                  <Image
+                    src={welcomeGIF}
+                    alt="Authentication"
+                    width={100}
+                    height={100}
+                    style={{
+                      borderRadius: '50%',
+                      boxShadow: '0 4px 20px rgba(253, 190, 22, 0.3)',
+                    }}
+                  />
+                </Box>
+              </Fade>
+
+              {/* Loading State */}
+              {processing && !success && (
+                <Fade in={processing}>
+                  <Box
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                    gap={3}
+                  >
+                    <CircularProgress
+                      size={60}
+                      thickness={4}
+                      sx={{
+                        color: '#FDBE16',
+                        '& .MuiCircularProgress-circle': {
+                          strokeLinecap: 'round',
+                        },
+                      }}
+                    />
+
+                    {/* Animated loading dots */}
+                    <Box display="flex" gap={1} alignItems="center">
+                      {[0, 1, 2].map((index) => (
+                        <Box
+                          key={index}
+                          sx={{
+                            width: 8,
+                            height: 8,
+                            borderRadius: '50%',
+                            backgroundColor: '#FDBE16',
+                            animation: `${pulseAnimation} 1.4s ease-in-out infinite`,
+                            animationDelay: `${index * 0.2}s`,
+                          }}
+                        />
+                      ))}
+                    </Box>
+                  </Box>
+                </Fade>
+              )}
+
+              {/* Success State */}
+              {success && (
+                <Fade in={success}>
+                  <Box
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                    gap={3}
+                  >
+                    {/* Success checkmark */}
+                    <Box
+                      sx={{
+                        width: 60,
+                        height: 60,
+                        borderRadius: '50%',
+                        backgroundColor: '#1A8825',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        position: 'relative',
+                        animation: `${checkmarkAnimation} 0.6s ease-in-out`,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 24,
+                          height: 12,
+                          border: '3px solid white',
+                          borderTop: 'none',
+                          borderRight: 'none',
+                          transform: 'rotate(-45deg)',
+                          position: 'absolute',
+                          top: '18px',
+                          left: '18px',
+                        }}
+                      />
+                    </Box>
+
+                    {/* Success pulse effect */}
+                    <Box
+                      sx={{
+                        width: 80,
+                        height: 80,
+                        borderRadius: '50%',
+                        border: '2px solid #1A8825',
+                        position: 'absolute',
+                        animation: `${pulseAnimation} 2s ease-in-out infinite`,
+                        opacity: 0.3,
+                      }}
+                    />
+                  </Box>
+                </Fade>
+              )}
+            </Box>
+          </CardContent>
+        </Card>
+      </Container>
+    </Box>
+  );
+};
+
+const SSOPage = () => {
+  return (
+    <Suspense fallback={
       <Box
         sx={{
           minHeight: '100vh',
           background: 'linear-gradient(135deg, #FFFDF6, #F8EFDA)',
           display: 'flex',
-          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
-        <Header />
-
-        <Container
-          maxWidth="sm"
-          sx={{ flex: 1, display: 'flex', alignItems: 'center', py: 4 }}
-        >
-          <Card
-            sx={{
-              width: '100%',
-              borderRadius: 3,
-              boxShadow: 3,
-              overflow: 'hidden',
-            }}
-          >
-            <CardContent sx={{ p: 6, textAlign: 'center' }}>
-              <Box
-                display="flex"
-                flexDirection="column"
-                alignItems="center"
-                gap={4}
-              >
-                {/* Animated GIF */}
-                <Fade in={true}>
-                  <Box>
-                    <Image
-                      src={welcomeGIF}
-                      alt="Authentication"
-                      width={100}
-                      height={100}
-                      style={{
-                        borderRadius: '50%',
-                        boxShadow: '0 4px 20px rgba(253, 190, 22, 0.3)',
-                      }}
-                    />
-                  </Box>
-                </Fade>
-
-                {/* Loading State */}
-                {processing && !success && (
-                  <Fade in={processing}>
-                    <Box
-                      display="flex"
-                      flexDirection="column"
-                      alignItems="center"
-                      gap={3}
-                    >
-                      <CircularProgress
-                        size={60}
-                        thickness={4}
-                        sx={{
-                          color: '#FDBE16',
-                          '& .MuiCircularProgress-circle': {
-                            strokeLinecap: 'round',
-                          },
-                        }}
-                      />
-
-                      {/* Animated loading dots */}
-                      <Box display="flex" gap={1} alignItems="center">
-                        {[0, 1, 2].map((index) => (
-                          <Box
-                            key={index}
-                            sx={{
-                              width: 8,
-                              height: 8,
-                              borderRadius: '50%',
-                              backgroundColor: '#FDBE16',
-                              animation: `${pulseAnimation} 1.4s ease-in-out infinite`,
-                              animationDelay: `${index * 0.2}s`,
-                            }}
-                          />
-                        ))}
-                      </Box>
-                    </Box>
-                  </Fade>
-                )}
-
-                {/* Success State */}
-                {success && (
-                  <Fade in={success}>
-                    <Box
-                      display="flex"
-                      flexDirection="column"
-                      alignItems="center"
-                      gap={3}
-                    >
-                      {/* Success checkmark */}
-                      <Box
-                        sx={{
-                          width: 60,
-                          height: 60,
-                          borderRadius: '50%',
-                          backgroundColor: '#1A8825',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          position: 'relative',
-                          animation: `${checkmarkAnimation} 0.6s ease-in-out`,
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            width: 24,
-                            height: 12,
-                            border: '3px solid white',
-                            borderTop: 'none',
-                            borderRight: 'none',
-                            transform: 'rotate(-45deg)',
-                            position: 'absolute',
-                            top: '18px',
-                            left: '18px',
-                          }}
-                        />
-                      </Box>
-
-                      {/* Success pulse effect */}
-                      <Box
-                        sx={{
-                          width: 80,
-                          height: 80,
-                          borderRadius: '50%',
-                          border: '2px solid #1A8825',
-                          position: 'absolute',
-                          animation: `${pulseAnimation} 2s ease-in-out infinite`,
-                          opacity: 0.3,
-                        }}
-                      />
-                    </Box>
-                  </Fade>
-                )}
-              </Box>
-            </CardContent>
-          </Card>
-        </Container>
+        <CircularProgress
+          size={60}
+          thickness={4}
+          sx={{
+            color: '#FDBE16',
+            '& .MuiCircularProgress-circle': {
+              strokeLinecap: 'round',
+            },
+          }}
+        />
       </Box>
+    }>
+      <SSOContent />
     </Suspense>
   );
 };
