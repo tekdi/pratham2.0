@@ -7,13 +7,11 @@ export function generateMetadata({
   searchParams: { program: string };
 }) {
   const titles = {
-    SCP: TenantName.SECOND_CHANCE_PROGRAM,
     "Second Chance": 'second chance program',
     'Vocational Training': 'Vocational Training',
   };
 
   const descriptions = {
-        SCP: `The ${TenantName.SECOND_CHANCE_PROGRAM} by Pratham is a powerful initiative that helps young girls and women who dropped out of school complete their Grade 10 education. By bringing learning closer to home and offering the support they need, the program breaks barriers like early marriage, household responsibilities, and lack of access. It opens doors to higher education, skills training, and better job opportunities, giving women a real shot at a brighter future.`,
       "Second Chance": `The ${TenantName.SECOND_CHANCE_PROGRAM} by Pratham is a powerful initiative that helps young girls and women who dropped out of school complete their Grade 10 education. By bringing learning closer to home and offering the support they need, the program breaks barriers like early marriage, household responsibilities, and lack of access. It opens doors to higher education, skills training, and better job opportunities, giving women a real shot at a brighter future.`,
     'Vocational Training': `Pratham's Vocational Skilling Program, launched in 2005, empowers youth from underprivileged backgrounds by equipping them with practical, job-ready skills. With a presence across India, it opens doors to employment in over 10 key sectors, supported by affiliations like NSDC. In response to changing times, the program evolved into a Hybrid Skilling model, blending digital tools with training to help young people thrive in a post-pandemic world.`,
   };
@@ -50,7 +48,6 @@ export default function PosPage() {
   return (
     <List
       pagename={{
-        SCP: 'second chance program',
         'Vocational Training': TenantName.YOUTHNET,
         "Second Chance": 'second chance program',
       }}
@@ -61,7 +58,6 @@ export default function PosPage() {
       _infoCard={{
         item: {
           description: {
-            SCP: `The ${TenantName.SECOND_CHANCE_PROGRAM} by Pratham is a powerful initiative that helps young girls and women who dropped out of school complete their Grade 10 education. By bringing learning closer to home and offering the support they need, the program breaks barriers like early marriage, household responsibilities, and lack of access. It opens doors to higher education, skills training, and better job opportunities, giving women a real shot at a brighter future.`,
             "Second Chance": `The ${TenantName.SECOND_CHANCE_PROGRAM} by Pratham is a powerful initiative that helps young girls and women who dropped out of school complete their Grade 10 education. By bringing learning closer to home and offering the support they need, the program breaks barriers like early marriage, household responsibilities, and lack of access. It opens doors to higher education, skills training, and better job opportunities, giving women a real shot at a brighter future.`,
             'Vocational Training':
               'Pratham\'s Vocational Skilling Program, launched in 2005, empowers youth from underprivileged backgrounds by equipping them with practical, job-ready skills. With a presence across India, it opens doors to employment in over 10 key sectors, supported by affiliations like NSDC. In response to changing times, the program evolved into a Hybrid Skilling model, blending digital tools with training to help young people thrive in a post-pandemic world.',
