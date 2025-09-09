@@ -171,9 +171,86 @@ const NAV_CONFIG: Record<
     return navLinks;
   },
 
+  [TenantName.LEARNING_AND_DEVELOPMENT]: ({
+    router,
+    isMobile,
+    t,
+    handleNavClick,
+    handleProfileClick,
+    handleLogoutModal,
+    setAnchorEl,
+    getLinkStyle,
+    currentPage,
+    checkAuth,
+  }) => {
+    const navLinks: NewDrawerItemProp[] = [
+      {
+        title: t('LEARNER_APP.COMMON.L1_COURSES'),
+        icon: <Home sx={{ width: 28, height: 28 }} />,
+        to: () => handleNavClick(() => router.push('/content')),
+        isActive: currentPage === '/content' || currentPage === '/in-progress',
+        customStyle: getLinkStyle(currentPage === '/content'),
+      },
+    ];
+
+    const isVolunteer = JSON.parse(
+      localStorage.getItem('isVolunteer') || 'false'
+    );
+    if (isVolunteer) {
+      navLinks.push({
+        title: t('LEARNER_APP.COMMON.SURVEYS'),
+        icon: <AssignmentOutlined sx={{ width: 28, height: 28 }} />,
+        to: () => handleNavClick(() => router.push('/observations')),
+        isActive: currentPage === '/observations',
+        customStyle: getLinkStyle(currentPage === '/observations'),
+      });
+    }
+
+    if (checkAuth) {
+      if (isMobile) {
+        navLinks.push({
+          title: t('COMMON.LOGOUT'),
+          icon: <Logout sx={{ width: 28, height: 28 }} />,
+          to: () => handleNavClick(handleLogoutModal),
+          isActive: false,
+          customStyle: {},
+        });
+      } else {
+        navLinks.push(
+          {
+            title: t('COMMON.SKILLING_CENTERS'),
+            icon: (
+              <img
+                src="/images/engineering.png"
+                alt="Skill Center"
+                style={{ width: 28, height: 28 }}
+              />
+            ),
+            to: () => handleNavClick(() => router.push('/skill-center')),
+            isActive: currentPage === '/skill-center',
+            customStyle: {},
+          }
+        );
+      }
+    }
+
+    // Add Profile link at the end
+    navLinks.push({
+      title: t('LEARNER_APP.COMMON.PROFILE'),
+      icon: <AccountCircleOutlined sx={{ width: 28, height: 28 }} />,
+      to: isMobile 
+        ? () => handleNavClick(handleProfileClick)
+        : () => setAnchorEl(true),
+      isActive: currentPage === '/profile',
+      customStyle: getLinkStyle(currentPage === '/profile'),
+    });
+
+    return navLinks;
+  },
+
   [TenantName.CAMP_TO_CLUB]: ({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl, isMobile, handleLogoutModal }) =>
     getClubStyleNavConfig({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl, isMobile, handleLogoutModal }),
- [TenantName.SECOND_CHANCE_PROGRAM]: ({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl, isMobile, handleLogoutModal }) =>
+  [TenantName.SECOND_CHANCE_PROGRAM]: ({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl, isMobile, handleLogoutModal }) =>
     getClubStyleNavConfig({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl, isMobile, handleLogoutModal }),
 
   [TenantName.PRAGYANPATH]: ({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl, isMobile, handleLogoutModal }) =>
