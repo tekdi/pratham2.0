@@ -27,6 +27,8 @@ const descriptions = [
 
 const Page = () => {
   const [search, setSearch] = useState('');
+    const [totalResources, setTotalResources] = useState<number>(0);
+  
   const router = useRouter();
   const partners = [
     { src: '/knowledge/Abhivyaktilogo.png', alt: 'Adobe' },
@@ -305,7 +307,9 @@ const Page = () => {
               color: '#1F1B13',
             }}
           >
-            <SpeakableText>3524</SpeakableText>
+<SpeakableText>
+  {totalResources}
+</SpeakableText>
           </Typography>
           <Typography
             variant="body8"
@@ -434,6 +438,8 @@ const Page = () => {
                 isHideProgressStatus: true,
               },
             }}
+            totalResources={totalResources}
+            setTotalResources={setTotalResources}
           />
         </Box>
       </Box>
