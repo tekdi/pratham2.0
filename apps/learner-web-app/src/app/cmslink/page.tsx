@@ -38,9 +38,6 @@ export default function CmsLinkPage() {
         : null
     );
     setIdentifier(identifierFromRoute);
-    console.log('typeFromRoute11', typeFromRoute);
-    console.log('typeFromRouteidenti', identifierFromRoute);
-    console.log('typeFromRouteprogram', programFromRoute);
 
     if (
       typeFromRoute == null ||
@@ -86,7 +83,8 @@ export default function CmsLinkPage() {
         <Card elevation={2} sx={{ borderRadius: 2 }}>
           <CardContent sx={{ p: { xs: 3, md: 4 } }}>
             <Stack spacing={2.5} alignItems="stretch">
-              <Box>
+              {/* TODO: uncomment after deep linking done for mobile redirect */}
+              {/* <Box>
                 <Typography
                   variant="h5"
                   component="h1"
@@ -101,10 +99,12 @@ export default function CmsLinkPage() {
                 >
                   Choose an option below to proceed with your content.
                 </Typography>
-              </Box>
+              </Box> */}
 
               <Stack spacing={1.5} sx={{ mt: 1 }}>
-                <Button
+                {/* TODO: uncomment after deep linking done for mobile redirect */}
+
+                {/* <Button
                   variant="contained"
                   size="large"
                   onClick={handleOpenInMobile}
@@ -112,7 +112,7 @@ export default function CmsLinkPage() {
                   fullWidth
                 >
                   Open in mobile
-                </Button>
+                </Button> */}
 
                 <Button
                   variant="outlined"
