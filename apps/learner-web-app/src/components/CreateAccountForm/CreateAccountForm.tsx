@@ -20,6 +20,7 @@ import tip from '../../../public/images/Group.png';
 import { useSearchParams } from 'next/navigation';
 import { showToastMessage } from '../ToastComponent/Toastify';
 import { userCheck } from '@learner/utils/API/userService';
+import { useTranslation } from '@shared-lib';
 
 type Props = {
   username: string;
@@ -58,6 +59,7 @@ const CreateAccountForm = ({
   const [isGuardianConfirmed, setIsGuardianConfirmed] = useState(false);
   const togglePassword = () => setShowPassword((prev) => !prev);
   const toggleConfirmPassword = () => setShowConfirm((prev) => !prev);
+  const { t } = useTranslation();
 
   const handleUsernameChange = (value: string) => {
     onUsernameChange(value);
@@ -242,8 +244,7 @@ const CreateAccountForm = ({
           <Box pl={1} pt={1}>
             <ValidationItem
               valid={password.length >= 4}
-              label="At least 4 characters"
-            />
+              label={t('LEARNER_APP.RESET_PASSWORD_FORM.PASSWORD_MIN_LENGTH')}            />
           </Box>
         )}
 

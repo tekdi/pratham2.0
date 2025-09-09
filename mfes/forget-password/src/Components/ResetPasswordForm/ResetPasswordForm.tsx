@@ -14,6 +14,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import CheckIcon from '@mui/icons-material/Check';
 import { showToastMessage } from '../ToastComponent/Toastify';
+import { useTranslation } from '@shared-lib';
 
 interface ResetPasswordFormProps {
   onSubmit: (password: string, confirmPassword: string) => void;
@@ -25,6 +26,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSubmit }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showValidation, setShowValidation] = useState(false);
+  const { t } = useTranslation();
 
   const handleTogglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
@@ -115,8 +117,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSubmit }) => {
                 variant="caption"
                 color={password.length >= 4 ? 'green' : 'error'}
               >
-                • At least 4 characters
-              </Typography>
+{t('LEARNER_APP.RESET_PASSWORD_FORM.PASSWORD_MIN_LENGTH')}              </Typography>
             </Box>
           )}
 
