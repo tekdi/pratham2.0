@@ -304,7 +304,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         isActive: currentPage === '/pos/program',
         child: [
           { code: 'Vocational Training', name: TenantName.YOUTHNET },
-          { name: TenantName.SECOND_CHANCE_PROGRAM, code: 'SCP' },
+          { name: 'Second Chance', code: 'SCP' },
         ].map((item: any) => ({
           title: item?.name,
           to: () => {
