@@ -20,6 +20,7 @@ import tip from '../../../public/images/Group.png';
 import { useSearchParams } from 'next/navigation';
 import { showToastMessage } from '../ToastComponent/Toastify';
 import { userCheck } from '@learner/utils/API/userService';
+import { useTranslation } from '@shared-lib';
 
 type Props = {
   username: string;
@@ -58,6 +59,7 @@ const CreateAccountForm = ({
   const [isGuardianConfirmed, setIsGuardianConfirmed] = useState(false);
   const togglePassword = () => setShowPassword((prev) => !prev);
   const toggleConfirmPassword = () => setShowConfirm((prev) => !prev);
+  const { t } = useTranslation();
 
   const handleUsernameChange = (value: string) => {
     onUsernameChange(value);
@@ -83,13 +85,7 @@ const CreateAccountForm = ({
   };
 
   const validatePassword = (value: string) => {
-    return (
-      /[A-Z]/.test(value) &&
-      /[a-z]/.test(value) &&
-      /\d/.test(value) &&
-      /[!@#$%^&*(),.?":{}|<>]/.test(value) &&
-      value.length >= 8
-    );
+    return value.length >= 4;
   };
   const handleConsentform = () => {
     if (belowEighteen) {
@@ -236,7 +232,7 @@ const CreateAccountForm = ({
             endAdornment: (
               <InputAdornment position="end">
                 <IconButton onClick={togglePassword} edge="end">
-                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                  {showPassword ? <Visibility /> : <VisibilityOff />}
                 </IconButton>
               </InputAdornment>
             ),
@@ -247,21 +243,8 @@ const CreateAccountForm = ({
         {password && !isPasswordValid && (
           <Box pl={1} pt={1}>
             <ValidationItem
-              valid={/[A-Z]/.test(password) && /[a-z]/.test(password)}
-              label="Include both uppercase and lowercase letters"
-            />
-            <ValidationItem
-              valid={/\d/.test(password)}
-              label="Include at least one number"
-            />
-            <ValidationItem
-              valid={/[!@#$%^&*(),.?":{}|<>]/.test(password)}
-              label="Include at least one special character"
-            />
-            <ValidationItem
-              valid={password.length >= 8}
-              label="At least 8 characters"
-            />
+              valid={password.length >= 4}
+              label={t('LEARNER_APP.RESET_PASSWORD_FORM.PASSWORD_MIN_LENGTH')}            />
           </Box>
         )}
 
@@ -277,7 +260,7 @@ const CreateAccountForm = ({
             endAdornment: (
               <InputAdornment position="end">
                 <IconButton onClick={toggleConfirmPassword} edge="end">
-                  {showConfirm ? <VisibilityOff /> : <Visibility />}
+                  {showConfirm ? <Visibility /> : <VisibilityOff />}
                 </IconButton>
               </InputAdornment>
             ),

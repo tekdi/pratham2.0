@@ -211,7 +211,7 @@ const UserCard: React.FC<UserCardProps> = ({
             )}
             {/* TODO: Check condition here */}
             {showMore &&
-              (isVolunteer === VolunteerField.NO || value === '1') && (
+              (
                 <MoreVertIcon
                   sx={{
                     fontSize: '24px',

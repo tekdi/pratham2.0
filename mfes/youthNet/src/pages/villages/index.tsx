@@ -681,6 +681,62 @@ const Index = () => {
     }
   };
 
+  const handleUnmarkAsVolunteer = async () => {
+    try {
+      if (selectedToggledUserId !== '') {
+        const userId = selectedToggledUserId;
+        const userDetails = {
+          userData: {},
+          customFields: [
+            {
+              fieldId:
+                isVolunteerFieldId || '59716ca7-37af-4527-a1ad-ce0f1dabeb00',
+              value: 'no',
+            },
+          ],
+        };
+
+        const response = await editEditUser(userId, userDetails);
+        console.log(filteredyouthList);
+
+        const updateIsVolunteer = (
+          array: any[],
+          targetId: any,
+          newValue: any
+        ) => {
+          return array.map((item) =>
+            item.Id === targetId ? { ...item, isVolunteer: newValue } : item
+          );
+        };
+
+        const updatedYouthList = updateIsVolunteer(
+          youthList,
+          selectedToggledUserId,
+          VolunteerField.NO
+        );
+        const updatedFilteredList = updateIsVolunteer(
+          filteredyouthList,
+          selectedToggledUserId,
+          VolunteerField.NO
+        );
+
+        setYouthList(updatedYouthList);
+        setFilteredYouthList(updatedFilteredList);
+        showToastMessage(
+          t('YOUTHNET_DASHBOARD.UNMARK_AS_VOLUNTEER_SUCCESSFULLY'),
+          'success'
+        );
+      }
+    } catch (e) {
+      showToastMessage(
+        t('YOUTHNET_DASHBOARD.UNMARK_AS_VOLUNTEER_FAILED'),
+        'error'
+      );
+
+      console.log(e);
+    }
+  };
+
   const handleToggledMentorClick = (user: any) => {
     setToggledMentor(user.name);
     setSelectedMentor(user);
@@ -807,6 +863,12 @@ const Index = () => {
         break;
       }
 
+      case BOTTOM_DRAWER_CONSTANTS.UNMARK_VOLUNTEER: {
+        setOpenDrawer(false);
+        await handleUnmarkAsVolunteer();
+        break;
+      }
+
       case BOTTOM_DRAWER_CONSTANTS.ADD_REASSIGN:
         setOpenMentorDrawer(false);
         handleVillageReassign();
@@ -827,12 +889,23 @@ const Index = () => {
     }
   };
 
+  // Get current selected user from filteredyouthList
+  const selectedUser = filteredyouthList.find((user: any) => user.Id === selectedToggledUserId);
+  const isCurrentUserVolunteer = selectedUser?.isVolunteer === VolunteerField.YES;
+
   const buttons = [
-    {
-      label: t('YOUTHNET_USERS_AND_VILLAGES.MARK_AS_VOLUNTEER'),
-      icon: <SwapHorizIcon />,
-      onClick: () => handleButtonClick(BOTTOM_DRAWER_CONSTANTS.MARK_VOLUNTEER),
-    },
+    // Show mark button for non-volunteers, unmark button for volunteers
+    isCurrentUserVolunteer
+      ? {
+          label: t('YOUTHNET_DASHBOARD.UNMARK_AS_VOLUNTEER'),
+          icon: <SwapHorizIcon />,
+          onClick: () => handleButtonClick(BOTTOM_DRAWER_CONSTANTS.UNMARK_VOLUNTEER),
+        }
+      : {
+          label: t('YOUTHNET_USERS_AND_VILLAGES.MARK_AS_VOLUNTEER'),
+          icon: <SwapHorizIcon />,
+          onClick: () => handleButtonClick(BOTTOM_DRAWER_CONSTANTS.MARK_VOLUNTEER),
+        },
   ];
 
   const mentorActions = [
@@ -1515,7 +1588,7 @@ const Index = () => {
                   users={filteredyouthList}
                   onUserClick={handleUserClick}
                   onToggleUserClick={handleToggledUserClick}
-                  // showMore={true}
+                  showMore={true}
                 />
               ) : filteredyouthList.length === 0 && !loading ? (
                 <>
