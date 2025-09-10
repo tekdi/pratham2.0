@@ -384,7 +384,7 @@ const UserId = () => {
         open={editModal}
         onClose={onClose}
         showFooter={true}
-        modalTitle={'New Mentor'}
+        modalTitle= {t('YOUTHNET_PROFILE.UPDATE_PROFILE')}
         //  handleNext={FormSubmitFunction}
         primaryText={'Submit'}
         id="dynamic-form-id"
