@@ -14,6 +14,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import CheckIcon from '@mui/icons-material/Check';
 import { showToastMessage } from '../ToastComponent/Toastify';
+import { useTranslation } from '@shared-lib';
 
 interface ResetPasswordFormProps {
   onSubmit: (password: string, confirmPassword: string) => void;
@@ -25,6 +26,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSubmit }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showValidation, setShowValidation] = useState(false);
+  const { t } = useTranslation();
 
   const handleTogglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
@@ -54,13 +56,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSubmit }) => {
   };
 
   const validatePassword = (value: string) => {
-    return (
-      /[A-Z]/.test(value) &&
-      /[a-z]/.test(value) &&
-      /\d/.test(value) &&
-      /[!@#$%^&*(),.?":{}|<>]/.test(value) &&
-      value.length >= 8
-    );
+    return value.length >= 4;
   };
 
   return (
@@ -107,31 +103,21 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({ onSubmit }) => {
               endAdornment: (
                 <InputAdornment position="end">
                   <IconButton onClick={handleTogglePasswordVisibility}>
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                    {showPassword ? <Visibility /> : <VisibilityOff />}
                   </IconButton>
                 </InputAdornment>
               ),
             }}
           />
 
+          {/* Show password checklist only when there are unmet requirements */}
           {showValidation && !validatePassword(password) && (
-            <Box pl={1} pt={1}>
-              <ValidationItem
-                valid={/[A-Z]/.test(password) && /[a-z]/.test(password)}
-                label="Include both uppercase and lowercase letters"
-              />
-              <ValidationItem
-                valid={/\d/.test(password)}
-                label="Include at least one number"
-              />
-              <ValidationItem
-                valid={/[!@#$%^&*(),.?":{}|<>]/.test(password)}
-                label="Include at least one special character"
-              />
-              <ValidationItem
-                valid={password.length >= 8}
-                label="At least 8 characters"
-              />
+            <Box sx={{ textAlign: 'left', mb: 2 }}>
+              <Typography
+                variant="caption"
+                color={password.length >= 4 ? 'green' : 'error'}
+              >
+{t('LEARNER_APP.RESET_PASSWORD_FORM.PASSWORD_MIN_LENGTH')}              </Typography>
             </Box>
           )}
 
