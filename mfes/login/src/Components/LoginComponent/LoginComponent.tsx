@@ -117,7 +117,7 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
                   onClick={() => setShowPassword((prev) => !prev)}
                   edge="end"
                 >
-                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                  {showPassword ? <Visibility /> : <VisibilityOff />}
                 </IconButton>
               </InputAdornment>
             ),

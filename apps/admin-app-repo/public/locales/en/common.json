@@ -833,6 +833,10 @@
     "DO_YOU_WANT_TO_MARK_AS_VOLUNTEER": "Do you want to mark as a volunteer",
     "MARK_AS_VOLUNTEER_SUCCESSFULLY": "Marked as volunteer successfully",
     "MARK_AS_VOLUNTEER_FAILED": "Failed to mark as volunteer",
-    "PLEASE_GO_BACK_MSG": "Please go back after selection to proceed further"
+    "PLEASE_GO_BACK_MSG": "Please go back after selection to proceed further",
+    "UNMARK_AS_VOLUNTEER": "Unmark as Volunteer",
+    "DO_YOU_WANT_TO_UNMARK_AS_VOLUNTEER": "Do you want to unmark as a volunteer",
+    "UNMARK_AS_VOLUNTEER_SUCCESSFULLY": "Unmarked as volunteer successfully",
+    "UNMARK_AS_VOLUNTEER_FAILED": "Failed to unmark as volunteer"
   }
 }
