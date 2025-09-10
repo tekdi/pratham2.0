@@ -42,6 +42,13 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
       ? JSON.parse(localStorage.getItem('uiConfig') || '{}')
       : {};
 
+  const programName =
+    typeof window !== 'undefined' ? localStorage.getItem('userProgram') : '';
+  const programTenantId =
+    typeof window !== 'undefined'
+      ? localStorage.getItem('userProgramTenantId')
+      : '';
+
   const handleChange = (e: any) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -110,7 +117,7 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
                   onClick={() => setShowPassword((prev) => !prev)}
                   edge="end"
                 >
-                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                  {showPassword ? <Visibility /> : <VisibilityOff />}
                 </IconButton>
               </InputAdornment>
             ),
@@ -169,6 +176,74 @@ const LoginComponent: React.FC<LoginComponentProps> = ({
             {t('LEARNER_APP.LOGIN.no_account')}
           </Typography>
         )}
+
+        {/* SSO Login Buttons */}
+        {/*storedConfig?.sso?.length > 0 && (
+          <Box
+            sx={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 1,
+              width: '100%',
+              mt: 2,
+            }}
+          >
+            {storedConfig?.sso?.map((ssoOption: any, index: number) => {
+              // Check if current domain is in enable_domain array
+              const currentDomain =
+                typeof window !== 'undefined' ? window.location.origin : '';
+              const isDomainEnabled =
+                ssoOption?.enable_domain?.includes(currentDomain) || false;
+
+              if (!isDomainEnabled) return null;
+
+              return (
+                <Button
+                  key={index}
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  sx={{
+                    borderRadius: 50,
+                    backgroundColor: '#FDBE16',
+                    '&:hover': {
+                      backgroundColor: '#FDBE16',
+                    },
+                    flex: '1 1 calc(50% - 4px)', // Side by side layout with gap
+                    minWidth: '120px',
+                  }}
+                  onClick={() => {
+                    // Store program info and open SSO URL
+                    if (typeof window !== 'undefined' && window.localStorage) {
+                      localStorage.setItem('userProgram', programName || '');
+                      localStorage.setItem('userProgramTenantId', programTenantId || '');
+                      const uiConfig = storedConfig || {};
+                      localStorage.setItem(
+                        'uiConfig',
+                        JSON.stringify(uiConfig)
+                      );
+                    }
+                    // Construct SSO URL with callback parameters
+                    const currentBaseUrl =
+                      typeof window !== 'undefined'
+                        ? window.location.origin
+                        : '';
+                    const callbackUrl = `${currentBaseUrl}/sso?env=newton&tenantid=${programTenantId}`;
+                    const encodedCallbackUrl = callbackUrl;
+                    // encodeURIComponent(callbackUrl);
+                    // roleId
+                    const ssoUrl = `${ssoOption?.url}?callbackurl=${encodedCallbackUrl}`;
+
+                    // Open SSO URL in new tab
+                    window.open(ssoUrl, '_blank');
+                  }}
+                >
+                  {t(ssoOption?.label) || `Login with ${ssoOption?.type}`}
+                </Button>
+              );
+            })}
+          </Box>
+        )}*/}
       </form>
     </Paper>
   );

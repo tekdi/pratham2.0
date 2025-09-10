@@ -40,6 +40,7 @@ import { getCohortList } from '@/services/GetCohortList';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import MarkAsVolunteer from '@/components/MarkAsVolunteer';
+import UnmarkAsVolunteer from '@/components/UnmarkAsVolunteer';
 import { showToastMessage } from '@/components/Toastify';
 import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
 import restoreIcon from '../../public/images/restore_user.svg';
@@ -76,6 +77,7 @@ const Youth = () => {
   const [reason, setReason] = useState('');
   const [memberShipID, setMemberShipID] = useState('');
   const [openMarkVolunteerModal, setOpenMarkVolunteerModal] = useState(false);
+  const [openUnmarkVolunteerModal, setOpenUnmarkVolunteerModal] = useState(false);
   const [isVolunteerFieldId, setIsVolunteerFieldId] = useState('');
   const [archiveToActiveOpen, setArchiveToActiveOpen] = useState(false);
 
@@ -327,6 +329,29 @@ const Youth = () => {
       console.log(e);
     }
   };
+
+  const handleUnmarkAsVolunteer = async () => {
+    console.log('unmarking volunteer!!!', editableUserId);
+    try {
+      const userId = editableUserId;
+      const userDetails = {
+        userData: {},
+        customFields: [
+          {
+            fieldId:
+              isVolunteerFieldId || '59716ca7-37af-4527-a1ad-ce0f1dabeb00',
+            value: 'no',
+          },
+        ],
+      };
+      const response = await editEditUser(userId, userDetails);
+      showToastMessage(t('YOUTH.UNMARK_AS_VOLUNTEER_SUCCESSFULLY'), 'success');
+      searchData({}, 0);
+    } catch (e) {
+      showToastMessage(t('YOUTH.UNMARK_AS_VOLUNTEER_FAILED'), 'error');
+      console.log(e);
+    }
+  };
  const archiveToactive = async () => {
     try {
       let membershipIds = null;
@@ -515,6 +540,42 @@ const Youth = () => {
         const isVolunteer = isVolunteerField?.selectedValues?.[0] === 'yes';
 
         return !isVolunteer;
+      },
+    },
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            backgroundColor: 'rgb(255, 182, 193)',
+            height: '34px',
+            width: '34px',
+          }}
+        >
+          <SwapHorizIcon />
+        </Box>
+      ),
+      callback: (row: any) => {
+        console.log('unmark volunteer row:', row);
+        setEditableUserId(row?.userId);
+        setOpenUnmarkVolunteerModal(true);
+        const volunteerField = row.customFields.find(
+          (field) => field.label === 'IS_VOLUNTEER'
+        );
+        setIsVolunteerFieldId(volunteerField?.fieldId);
+      },
+      show: (row: any) => {
+        const isVolunteerField = row.customFields.find(
+          (field) => field.label === 'IS_VOLUNTEER'
+        );
+
+        const isVolunteer = isVolunteerField?.selectedValues?.[0] === 'yes';
+
+        return isVolunteer;
       },
     },
      {
@@ -759,6 +820,21 @@ const Youth = () => {
         isFromMarkAsVoluteer={true}
       >
         <MarkAsVolunteer checked={checked} setChecked={setChecked} />
+      </ConfirmationPopup>
+      <ConfirmationPopup
+        checked={checked}
+        open={openUnmarkVolunteerModal}
+        onClose={() => {
+          setOpenUnmarkVolunteerModal(false);
+          setChecked(false);
+        }}
+        title={t('YOUTH.UNMARK_AS_VOLUNTEER')}
+        primary={t('YOUTH.UNMARK_AS_VOLUNTEER')}
+        secondary={t('COMMON.CANCEL')}
+        onClickPrimary={handleUnmarkAsVolunteer}
+        isFromMarkAsVoluteer={true}
+      >
+        <UnmarkAsVolunteer checked={checked} setChecked={setChecked} />
       </ConfirmationPopup>
     </>
   );

@@ -185,7 +185,7 @@ const CollectionEditor: React.FC = () => {
 
         script.id = 'collection-editor-js';
         script.src =
-          "https://cdn.jsdelivr.net/npm/@tekdi/sunbird-collection-editor-web-component@6.1.0-beta.5/sunbird-collection-editor.js";
+          "https://cdn.jsdelivr.net/npm/@tekdi/sunbird-collection-editor-web-component@6.1.0-beta.6/sunbird-collection-editor.js";
         script.async = true;
         script.onload = () => setAssetsLoaded(true);
         document.body.appendChild(script);
@@ -200,7 +200,7 @@ const CollectionEditor: React.FC = () => {
         link.id = 'collection-editor-css';
         link.rel = 'stylesheet';
         link.href =
-          'https://cdn.jsdelivr.net/npm/@tekdi/sunbird-collection-editor-web-component@6.1.0-beta.4/styles.css';
+          'https://cdn.jsdelivr.net/npm/@tekdi/sunbird-collection-editor-web-component@6.1.0-beta.6/styles.css';
         document.head.appendChild(link);
       }
 
@@ -314,7 +314,7 @@ const CollectionEditor: React.FC = () => {
                 sendContentPublishNotification();
                 setIsPublishing(false);
               }, 5000);
-            
+
             }
             else if( event.detail?.action === "rejectContent")
             {
@@ -349,7 +349,7 @@ const CollectionEditor: React.FC = () => {
   return (
     <div>
       {assetsLoaded ? <div ref={editorRef}></div> : <p>Loading editor...</p>}
-      
+
       {/* Publishing Loader */}
       {isPublishing && (
         <div style={{

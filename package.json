@@ -12,7 +12,9 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.705.0",
     "@aws-sdk/s3-request-presigner": "^3.726.0",
+    "@emotion/cache": "^11.14.0",
     "@emotion/react": "^11.11.4",
+    "@emotion/server": "^11.11.0",
     "@emotion/styled": "^11.11.5",
     "@fingerprintjs/fingerprintjs": "^4.5.1",
     "@hookform/resolvers": "^3.10.0",
@@ -20,6 +22,7 @@
     "@module-federation/utilities": "3.0.11",
     "@mui/icons-material": "^5.15.15",
     "@mui/material": "^5.15.21",
+    "@mui/material-nextjs": "^7.2.0",
     "@mui/x-date-pickers": "^7.10.0",
     "@project-sunbird/client-services": "^7.0.6",
     "@project-sunbird/sunbird-collection-editor-web-component": "^1.6.0",
