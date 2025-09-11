@@ -9,6 +9,7 @@ import {
   useTheme,
 } from '@mui/material';
 import React, { ReactNode } from 'react';
+import { SxProps, Theme } from '@mui/material/styles';
 
 interface SimpleModalProps {
   secondaryActionHandler?: () => void;
@@ -43,42 +44,71 @@ const SimpleModal: React.FC<SimpleModalProps> = ({
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('lg'));
 
-  const modalStyle = {
+  const modalStyle: SxProps<Theme> = {
     display: 'flex',
     flexDirection: 'column',
     position: 'absolute',
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: '40%',
-    maxHeight: '80vh',
+    width: isFullwidth ? '96%' : '40%',
+    maxWidth: isFullwidth ? '96%' : '40%',
+    height: isFullwidth ? '96vh' : 'auto',
+    maxHeight: isFullwidth ? '96vh' : '80vh',
     backgroundColor: 'rgb(255, 255, 255)',
     borderRadius: '8px',
     boxShadow:
       'rgba(0, 0, 0, 0.2) 0px 3px 5px -1px, rgba(0, 0, 0, 0.14) 0px 5px 8px 0px, rgba(0, 0, 0, 0.12) 0px 1px 14px 0px',
   };
 
-  const titleStyle = {
-    position: 'sticky' as const,
-    top: '0',
-    backgroundColor: '#fff',
-    padding: theme.spacing(2),
-    zIndex: 9999,
-    borderBottom: `1px solid ${theme.palette.divider}`,
-    borderTopLeftRadius: '8px',
-    borderTopRightRadius: '8px',
-  };
+  const titleStyle = isFullwidth
+    ? {
+        position: 'sticky' as const,
+        top: 0,
+        backgroundColor: '#fff',
+        padding: theme.spacing(2),
+        zIndex: 9999,
+        borderBottom: `1px solid ${theme.palette.divider}`,
+        borderTopLeftRadius: '8px',
+        borderTopRightRadius: '8px',
+      }
+    : {
+        position: 'sticky' as const,
+        top: '0',
+        backgroundColor: '#fff',
+        padding: theme.spacing(2),
+        zIndex: 9999,
+        borderBottom: `1px solid ${theme.palette.divider}`,
+        borderTopLeftRadius: '8px',
+        borderTopRightRadius: '8px',
+      };
 
-  const contentStyle = {
-    flex: 1,
-    overflowY: 'auto' as const,
-    padding: theme.spacing(2),
-  };
+  const contentStyle = isFullwidth
+    ? {
+        flex: 1,
+        overflowY: 'auto' as const,
+        padding: theme.spacing(2),
+      }
+    : {
+        flex: 1,
+        overflowY: 'auto' as const,
+        padding: theme.spacing(2),
+      };
 
-  const footerStyle = {
-    padding: theme.spacing(2),
-    borderTop: `1px solid ${theme.palette.divider}`,
-  };
+  const footerStyle = isFullwidth
+    ? {
+        padding: theme.spacing(2),
+        borderTop: `1px solid ${theme.palette.divider}`,
+        position: 'sticky' as const,
+        bottom: 0,
+        backgroundColor: '#fff',
+        borderBottomLeftRadius: '8px',
+        borderBottomRightRadius: '8px',
+      }
+    : {
+        padding: theme.spacing(2),
+        borderTop: `1px solid ${theme.palette.divider}`,
+      };
 
   return (
     <Modal
@@ -111,7 +141,7 @@ const SimpleModal: React.FC<SimpleModalProps> = ({
         <Divider />
         {showFooter &&
           (footer ? (
-            <Box sx={footerStyle}>{footer}</Box> // Render the custom footer content if provided
+            <Box sx={footerStyle}>{footer}</Box>
           ) : (
             <Box
               display="flex"

@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import { Box, Typography, TextField, Button, Paper } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
-import { Loader, useTranslation } from '@shared-lib'; // Updated import
+import { Loader } from '@shared-lib';
+import { useTranslation } from '@shared-lib-v2/lib/context/LanguageContext';
 
 const ForgotPasswordComponent = ({
   onNext,

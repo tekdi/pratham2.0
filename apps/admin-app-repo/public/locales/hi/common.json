@@ -369,7 +369,8 @@
     "CENTER_CREATED_SUCCESSFULLY": "केंद्र यशस्वीपणे तयार केले",
     "SEARCHBAR_PLACEHOLDER": "शोधा केंद्र..",
     "CENTER_UPDATE_FAILED": "केंद्र अद्ययावत करताना काहीतरी चूक झाली",
-    "YOU_CANT_DELETE_CENTER_HAS_ACTIVE_LEARNERS": "तुम्ही केंद्र हटवू शकत नाही कारण त्यात {{activeMembers}} सक्रिय शिकणारे आहेत"
+    "YOU_CANT_DELETE_CENTER_HAS_ACTIVE_LEARNERS": "तुम्ही केंद्र हटवू शकत नाही कारण त्यात {{activeMembers}} सक्रिय शिकणारे आहेत",
+    "BATCHES_FOR_CENTER": "{{centerName}} केंद्र के बैच"
   },
   "BATCH": {
     "NEW_BATCH": "नया बैच",

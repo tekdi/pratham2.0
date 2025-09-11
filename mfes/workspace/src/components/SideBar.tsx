@@ -190,7 +190,7 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
         justifyContent="space-between"
         paddingTop={'1rem'}
       >
-        {tenantName === TENANT_DATA.SECOND_CHANCE_PROGRAM && (
+        {userRole === Role.CENTRAL_ADMIN&& (
           <Box display="flex" alignItems="center">
             <ListItemIcon>
               <IconButton onClick={goBack}>

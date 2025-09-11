@@ -191,6 +191,17 @@ export const getMissingFields = (schema: any, userData: any) => {
       );
     }
 
+    // Remove guardian fields from result
+    guardianFields.forEach((field) => {
+      delete result.properties[field];
+    });
+
+    if (Array.isArray(result.required)) {
+      result.required = result.required.filter(
+        (field: any) => !guardianFields.includes(field)
+      );
+    }
+
     // const hasDOB = !!mappedUserData.dob;
     // if (hasDOB) {
     //   guardianFields.forEach((field) => {
@@ -264,7 +275,9 @@ export const preserveLocalStorage = () => {
     'mui-color-scheme-light',
     'hasSeenTutorial',
     'lang',
-    'uiConfig'
+    'uiConfig',
+    'userProgram',
+    'userProgramTenantId'
   ];
 
   const valuesToKeep: { [key: string]: any } = {};

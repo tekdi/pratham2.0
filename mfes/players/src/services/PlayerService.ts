@@ -88,7 +88,13 @@ export const getQumlData = async (identifier: any) => {
 export const createContentTracking = async (reqBody: ContentCreate) => {
   const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/content/create`;
   try {
-    const response = await axios.post(apiUrl, reqBody);
+    const tenantId = typeof window !== "undefined" ? localStorage.getItem("tenantId") : null;
+
+    const response = await axios.post(apiUrl, reqBody, {
+      headers: {
+        ...(tenantId ? { tenantid: tenantId } : {}),
+      },
+    });
     return response?.data;
   } catch (error) {
     console.log(error);
@@ -144,7 +150,13 @@ export const createAssessmentTracking = async ({
       };
       const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/assessment/create`;
 
-      const response = await axios.post(apiUrl, data);
+      const tenantId = typeof window !== "undefined" ? localStorage.getItem("tenantId") : null;
+
+      const response = await axios.post(apiUrl, data, {
+        headers: {
+          ...(tenantId ? { tenantid: tenantId } : {}),
+        },
+      });
       console.log('Assessment tracking created:', response.data);
       return response.data;
     }
@@ -155,6 +167,8 @@ export const createAssessmentTracking = async ({
 
 const fetchCertificateStatus = async ({ userId, courseId }: any) => {
   try {
+    const tenantId = typeof window !== "undefined" ? localStorage.getItem("tenantId") : null;
+
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/user_certificate/status/get`,
       { userId, courseId },
@@ -163,7 +177,7 @@ const fetchCertificateStatus = async ({ userId, courseId }: any) => {
           Authorization: localStorage.getItem('token') || '',
           'Content-Type': 'application/json',
           Accept: 'application/json',
-          tenantId: localStorage.getItem('tenantId') || '',
+          ...(tenantId ? { tenantid: tenantId } : {}),
         },
       }
     );
@@ -193,7 +207,13 @@ export const updateCOurseAndIssueCertificate = async ({
   };
 
   try {
-    const response = await axios.post(apiUrl, data);
+const tenantId = typeof window !== "undefined" ? localStorage.getItem("tenantId") : null;
+
+const headers = {
+  ...(tenantId && { tenantid: tenantId }),
+};
+
+const response = await axios.post(apiUrl, data, { headers });
     const courseStatus = calculateCourseStatus({
       statusData: response?.data?.data?.[0]?.course?.[0],
       allCourseIds: course.leafNodes ?? [],
@@ -322,6 +342,8 @@ export const updateUserCourseStatus = async ({
 }) => {
   const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/user_certificate/status/update`;
   try {
+    const tenantId = typeof window !== "undefined" ? localStorage.getItem("tenantId") : null;
+
     const response = await axios.post(
       apiUrl,
       {
@@ -331,7 +353,7 @@ export const updateUserCourseStatus = async ({
       },
       {
         headers: {
-          tenantId: localStorage.getItem('tenantId'),
+          ...(tenantId ? { tenantid: tenantId } : {}),
         },
       }
     );
@@ -349,8 +371,12 @@ export const checkCriteriaForCertificate = async (reqBody: any) => {
   const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/api/course/v1/hierarchy/${courseId}`;
 
   try {
+    const tenantId = typeof window !== "undefined" ? localStorage.getItem("tenantId") : null;
+
     const response = await axios.get(apiUrl, {
-      headers: {},
+      headers: {
+        ...(tenantId ? { tenantid: tenantId } : {}),
+      },
     });
 
     if (Object.keys(response?.data?.result?.content).length > 0) {
@@ -467,9 +493,11 @@ export const checkCriteriaForCertificate = async (reqBody: any) => {
 export const issueCertificate = async (reqBody: any) => {
   const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/certificate/issue`;
   try {
+    const tenantId = typeof window !== "undefined" ? localStorage.getItem("tenantId") : null;
+
     const response = await axios.post(apiUrl, reqBody, {
       headers: {
-        tenantId: localStorage.getItem('tenantId'),
+        ...(tenantId ? { tenantid: tenantId } : {}),
       },
     });
     return response?.data;
