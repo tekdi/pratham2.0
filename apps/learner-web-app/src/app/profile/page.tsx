@@ -85,6 +85,8 @@ const ProfilePage = () => {
 
           };
           finalArray.push(obj);
+                setCourseData(finalArray);
+
         } catch (error) {
           console.error(
             `Failed to fetch course details for courseId: ${item.courseId}`,
@@ -93,7 +95,6 @@ const ProfilePage = () => {
         }
       }
       console.log('finalArray', finalArray);
-      setCourseData(finalArray);
       // return finalArray;
     };
     prepareCertificateData();
