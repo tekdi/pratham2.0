@@ -1,3 +1,4 @@
+
 import {
   Box,
   Button,
@@ -40,6 +41,8 @@ import useStore from '@/store/store';
 import loginImg from '../../public/images/login-image.jpg';
 import TenantService from '@/services/TenantService';
 import { transformLabel } from '@/utils/Helper';
+
+import SwitchAccountDialog from '@shared-lib-v2/SwitchAccount/SwitchAccount';
 
 const LoginPage = () => {
   const { t } = useTranslation();
@@ -86,7 +89,10 @@ const LoginPage = () => {
             role = JSON.parse(storedUserData);
             if (role?.role === Role.SCTA || role?.role === Role.CCTA) {
               // To do :- hardcoding to be removed
-              if (role?.tenantData[0]?.tenantName != TenantName.SECOND_CHANCE_PROGRAM) {
+              if (
+                role?.tenantData[0]?.tenantName !=
+                TenantName.SECOND_CHANCE_PROGRAM
+              ) {
                 router.push('/workspace');
               } else {
                 router.push('/course-planner', undefined, { locale: locale });
@@ -94,20 +100,20 @@ const LoginPage = () => {
             } else if (
               role?.role === Role.CENTRAL_ADMIN &&
               role?.tenantData[0]?.tenantName ==
-              TenantName.SECOND_CHANCE_PROGRAM
+                TenantName.SECOND_CHANCE_PROGRAM
             ) {
               router.push('/programs', undefined, { locale: locale });
             } else if (
               role?.role === Role.ADMIN &&
               role?.tenantData[0]?.tenantName ==
-              TenantName.SECOND_CHANCE_PROGRAM
+                TenantName.SECOND_CHANCE_PROGRAM
             ) {
               router.push('/centers', undefined, { locale: locale });
             } else if (
               role?.role === Role.ADMIN &&
               role?.tenantData[0]?.tenantName == TenantName.YOUTHNET
             ) {
-              router.push('/central-head');
+              router.push('/mentor-leader');
             }
           }
         } else {
@@ -120,13 +126,13 @@ const LoginPage = () => {
             if (
               role?.role === Role.CENTRAL_ADMIN &&
               role?.tenantData[0]?.tenantName ==
-              TenantName.SECOND_CHANCE_PROGRAM
+                TenantName.SECOND_CHANCE_PROGRAM
             ) {
               router.push('/programs');
             } else if (
               role?.role === Role.ADMIN &&
               role?.tenantData[0]?.tenantName ==
-             TenantName.SECOND_CHANCE_PROGRAM
+                TenantName.SECOND_CHANCE_PROGRAM
             ) {
               router.push('/centers');
             } else if (
@@ -134,7 +140,7 @@ const LoginPage = () => {
                 role?.role === Role.ADMIN) &&
               role?.tenantData[0]?.tenantName == TenantName.YOUTHNET
             ) {
-              router.push('/central-head');
+              router.push('/mentor-leader');
             }
           }
         }
@@ -177,6 +183,15 @@ const LoginPage = () => {
       }
       const fieldValue = true;
       if (userId) {
+
+
+        const tenantId = typeof window !== 'undefined' && window.localStorage ? localStorage.getItem('tenantId') : '';
+        const tenantName = typeof window !== 'undefined' && window.localStorage ? localStorage.getItem('tenantName') : '';
+        const roleId = typeof window !== 'undefined' && window.localStorage ? localStorage.getItem('roleId') : '';
+        const roleName = typeof window !== 'undefined' && window.localStorage ? localStorage.getItem('roleName') : '';
+        const program = tenantName;
+
+
         const response = await getUserDetailsInfo(userId, fieldValue);
 
         const userInfo = response?.userData;
@@ -204,13 +219,12 @@ const LoginPage = () => {
             }
 
             localStorage.setItem('adminInfo', JSON.stringify(userInfo));
-            const roleId = userInfo.tenantData?.[0]?.roleId || '';
-            const roleName = userInfo.tenantData?.[0]?.roleName || '';
-            const program = userInfo.tenantData?.[0]?.tenantName || '';
 
-            localStorage.setItem('roleId', roleId);
-            localStorage.setItem('roleName', roleName);
-            localStorage.setItem('program', program);
+            localStorage.setItem('tenantId', tenantId || '');
+            localStorage.setItem('tenantName', tenantName || '');
+            localStorage.setItem('roleId', roleId || '');
+            localStorage.setItem('roleName', roleName || '');
+            localStorage.setItem('program', program || '');
           }
           const selectedStateName = transformLabel(
             userInfo?.customFields?.find(
@@ -244,8 +258,13 @@ const LoginPage = () => {
         // } else {
         setAdminInformation(userInfo);
 
-        if (userInfo?.tenantData?.[0]?.tenantType === 'elearning') {
-          if (userInfo?.role === Role.CENTRAL_ADMIN && userInfo?.tenantData[0]?.tenantName == TenantName.CAMP_TO_CLUB) {
+        const tenantData= userInfo?.tenantData?.find((tenant: any) => tenant.tenantId === tenantId);
+
+        if (tenantData?.tenantType === 'elearning') {
+          if (
+            userInfo?.role === Role.CENTRAL_ADMIN &&
+            tenantData?.tenantName == TenantName.CAMP_TO_CLUB
+          ) {
             const { locale } = router;
             if (locale) {
               window.location.href = '/learners';
@@ -255,14 +274,11 @@ const LoginPage = () => {
               router.push('/learners');
             }
           }
-          if (
-            userInfo?.role === Role.SCTA ||
-            userInfo?.role === Role.CCTA
-          ) {
+          if (userInfo?.role === Role.SCTA || userInfo?.role === Role.CCTA) {
             const { locale } = router;
             // To do :- hardcoding to be removed
             if (
-              userInfo?.tenantData[0]?.tenantName !=
+              tenantData?.tenantName !=
               TenantName.SECOND_CHANCE_PROGRAM
             ) {
               window.location.href = '/workspace';
@@ -281,55 +297,50 @@ const LoginPage = () => {
             if (locale) {
               if (
                 userInfo?.role === Role.CENTRAL_ADMIN &&
-                userInfo?.tenantData[0]?.tenantName ==
-                TenantName.SECOND_CHANCE_PROGRAM
+                tenantData?.tenantName ==
+                  TenantName.SECOND_CHANCE_PROGRAM
               ) {
                 window.location.href = '/programs';
                 router.push('/programs', undefined, { locale: locale });
               } else if (
                 userInfo?.role === Role.ADMIN &&
-                userInfo?.tenantData[0]?.tenantName ==
-                TenantName.SECOND_CHANCE_PROGRAM
+                tenantData?.tenantName ==
+                  TenantName.SECOND_CHANCE_PROGRAM
               ) {
                 window.location.href = '/centers';
                 router.push('/centers', undefined, { locale: locale });
               } else if (
                 userInfo?.role === Role.ADMIN ||
                 (Role.CENTRAL_ADMIN &&
-                  userInfo?.tenantData[0]?.tenantName ==
-                  TenantName.YOUTHNET)
+                  tenantData?.tenantName == TenantName.YOUTHNET)
               ) {
-                window.location.href = '/central-head';
-                router.push('/central-head', undefined, { locale: locale });
+                window.location.href = '/mentor-leader';
+                router.push('/mentor-leader', undefined, { locale: locale });
               }
             } else {
               if (
                 userInfo?.role === Role.CENTRAL_ADMIN &&
-                userInfo?.tenantData[0]?.tenantName ==
-                TenantName.SECOND_CHANCE_PROGRAM
+                tenantData?.tenantName ==
+                  TenantName.SECOND_CHANCE_PROGRAM
               ) {
                 window.location.href = '/programs';
                 router.push('/programs');
               } else if (
                 userInfo?.role === Role.ADMIN &&
-                userInfo?.tenantData[0]?.tenantName ==
-                TenantName.SECOND_CHANCE_PROGRAM
+                tenantData?.tenantName ==
+                  TenantName.SECOND_CHANCE_PROGRAM
               ) {
                 window.location.href = '/centers';
                 router.push('/centers');
               } else if (
                 userInfo?.role === Role.ADMIN &&
-                userInfo?.tenantData[0]?.tenantName == TenantName.YOUTHNET
+                tenantData?.tenantName == TenantName.YOUTHNET
               ) {
-                window.location.href = '/central-head';
-                router.push('/central-head');
+                window.location.href = '/mentor-leader';
+                router.push('/mentor-leader');
               }
             }
           }
-
-
-
-
         } else {
           // For other tenants, proceed with academic year logic
           const getAcademicYearList = async () => {
@@ -357,7 +368,7 @@ const LoginPage = () => {
                   const { locale } = router;
                   // To do :- hardcoding to be removed
                   if (
-                    userInfo?.tenantData[0]?.tenantName !=
+                    tenantData?.tenantName !=
                     TenantName.SECOND_CHANCE_PROGRAM
                   ) {
                     window.location.href = '/workspace';
@@ -376,39 +387,41 @@ const LoginPage = () => {
                   if (locale) {
                     if (
                       userInfo?.role === Role.CENTRAL_ADMIN &&
-                      userInfo?.tenantData[0]?.tenantName ==
-                      TenantName.SECOND_CHANCE_PROGRAM
+                      tenantData?.tenantName ==
+                        TenantName.SECOND_CHANCE_PROGRAM
                     ) {
                       window.location.href = '/programs';
                       router.push('/programs', undefined, { locale: locale });
                     } else if (
                       userInfo?.role === Role.ADMIN &&
-                      userInfo?.tenantData[0]?.tenantName ==
-                      TenantName.SECOND_CHANCE_PROGRAM
+                      tenantData?.tenantName ==
+                        TenantName.SECOND_CHANCE_PROGRAM
                     ) {
                       window.location.href = '/centers';
                       router.push('/centers', undefined, { locale: locale });
                     } else if (
                       userInfo?.role === Role.ADMIN ||
                       (Role.CENTRAL_ADMIN &&
-                        userInfo?.tenantData[0]?.tenantName ==
-                        TenantName.YOUTHNET)
+                        tenantData?.tenantName ==
+                          TenantName.YOUTHNET)
                     ) {
-                      window.location.href = '/central-head';
-                      router.push('/central-head', undefined, { locale: locale });
+                      window.location.href = '/mentor-leader';
+                      router.push('/mentor-leader', undefined, {
+                        locale: locale,
+                      });
                     }
                   } else {
                     if (
                       userInfo?.role === Role.CENTRAL_ADMIN &&
-                      userInfo?.tenantData[0]?.tenantName ==
-                      TenantName.SECOND_CHANCE_PROGRAM
+                      tenantData?.tenantName ==
+                        TenantName.SECOND_CHANCE_PROGRAM
                     ) {
                       window.location.href = '/programs';
                       router.push('/programs');
                     } else if (
                       userInfo?.role === Role.ADMIN &&
-                      userInfo?.tenantData[0]?.tenantName ==
-                      TenantName.SECOND_CHANCE_PROGRAM
+                      tenantData?.tenantName ==
+                        TenantName.SECOND_CHANCE_PROGRAM
                     ) {
                       window.location.href = '/centers';
                       router.push('/centers');
@@ -416,8 +429,8 @@ const LoginPage = () => {
                       userInfo?.role === Role.ADMIN &&
                       userInfo?.tenantData[0]?.tenantName == TenantName.YOUTHNET
                     ) {
-                      window.location.href = '/central-head';
-                      router.push('/central-head');
+                      window.location.href = '/mentor-leader';
+                      router.push('/mentor-leader');
                     }
                   }
                 }
@@ -436,6 +449,13 @@ const LoginPage = () => {
   useEffect(() => {
     fetchUserDetail();
   }, []);
+
+  const [switchDialogOpen, setSwitchDialogOpen] = useState(false);
+  const [userResponse, setUserResponse] = useState<any>(null);
+  const [tenantId, setTenantId] = useState<string>('');
+  const [tenantName, setTenantName] = useState<string>('');
+  const [roleId, setRoleId] = useState<string>('');
+  const [roleName, setRoleName] = useState<string>('');
 
   const handleFormSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -458,41 +478,9 @@ const LoginPage = () => {
               : localStorage.removeItem('refreshToken');
 
             const userResponse = await getUserId();
+            setUserResponse(userResponse);
 
-            if (userResponse) {
-              localStorage.setItem('userId', userResponse?.userId);
-              console.log(userResponse?.tenantData);
-              localStorage.setItem(
-                'templtateId',
-                userResponse?.tenantData?.[0]?.templateId
-              );
-
-              localStorage.setItem('userIdName', userResponse?.username);
-              // Update Zustand store
-              setUserId(userResponse?.userId || '');
-
-              if (userResponse?.userId) {
-                document.cookie = `authToken=${token}; path=/; secure; SameSite=Strict`;
-                document.cookie = `userId=${userResponse.userId}; path=/; secure; SameSite=Strict`;
-              }
-
-              localStorage.setItem('name', userResponse?.firstName);
-              localStorage.setItem(
-                Storage.USER_DATA,
-                JSON.stringify(userResponse)
-              );
-              const tenantId = userResponse?.tenantData?.[0]?.tenantId;
-              const frameworkId =
-                userResponse?.tenantData?.[0]?.collectionFramework;
-              const channel = userResponse?.tenantData?.[0]?.channelId;
-              TenantService.setTenantId(tenantId);
-              localStorage.setItem('collectionFramework', frameworkId);
-              localStorage.setItem('channelId', channel);
-              localStorage.setItem('tenantId', tenantId);
-              fetchTenantInfo();
-            }
-
-            await fetchUserDetail();
+            setSwitchDialogOpen(true);
           }
         } else {
           showToastMessage(
@@ -519,19 +507,69 @@ const LoginPage = () => {
     }
   };
 
+  const callBackSwitchDialog = async (
+    tenantId: string,
+    tenantName: string,
+    roleId: string,
+    roleName: string
+  ) => {
+    setSwitchDialogOpen(false);
+
+    // Set the state values
+    setTenantId(tenantId);
+    setTenantName(tenantName);
+    setRoleId(roleId);
+    setRoleName(roleName);
+
+    // const userResponse = await getUserId();
+
+    if (userResponse) {
+      const token = localStorage.getItem('token');
+      localStorage.setItem('userId', userResponse?.userId);
+      console.log(userResponse?.tenantData);
+      localStorage.setItem('templtateId', tenantId);
+      localStorage.setItem('tenantName', tenantName);
+      localStorage.setItem('roleId', roleId);
+      localStorage.setItem('roleName', roleName);
+
+      localStorage.setItem('userIdName', userResponse?.username);
+      // Update Zustand store
+      setUserId(userResponse?.userId || '');
+
+      if (userResponse?.userId) {
+        document.cookie = `authToken=${token}; path=/; secure; SameSite=Strict`;
+        document.cookie = `userId=${userResponse.userId}; path=/; secure; SameSite=Strict`;
+      }
+
+      localStorage.setItem('name', userResponse?.firstName);
+      localStorage.setItem(Storage.USER_DATA, JSON.stringify(userResponse));
+      const frameworkId = userResponse?.tenantData?.[0]?.collectionFramework;
+      const channel = userResponse?.tenantData?.[0]?.channelId;
+      TenantService.setTenantId(tenantId);
+      localStorage.setItem('collectionFramework', frameworkId);
+      localStorage.setItem('channelId', channel);
+      localStorage.setItem('tenantId', tenantId);
+      fetchTenantInfo();
+    }
+
+    await fetchUserDetail();
+  };
+
   const fetchTenantInfo = async () => {
     const storedTenantId = localStorage.getItem('tenantId');
     try {
       const res = await getTenantInfo();
       // console.log('Tenant Info:', res?.result);
       const programsData = res?.result || [];
-      const tenant = programsData.find((item: { tenantId: string | null; }) => item.tenantId === storedTenantId);
+      const tenant = programsData.find(
+        (item: { tenantId: string | null }) => item.tenantId === storedTenantId
+      );
 
       if (tenant?.domain) {
-        localStorage.setItem("tenantDomain", tenant.domain);
-        console.log("Domain stored:", tenant.domain);
+        localStorage.setItem('tenantDomain', tenant.domain);
+        console.log('Domain stored:', tenant.domain);
       } else {
-        console.log("Tenant not found");
+        console.log('Tenant not found');
       }
       console.log('programsData++++', programsData);
     } catch (error) {
@@ -668,7 +706,7 @@ const LoginPage = () => {
                 alignItems={'center'}
                 justifyContent={'center'}
                 zIndex={99}
-              // sx={{ margin: '5px 10px 25px', }}
+                // sx={{ margin: '5px 10px 25px', }}
               >
                 <Box
                   sx={{
@@ -790,8 +828,9 @@ const LoginPage = () => {
                       logEvent({
                         action: 'remember-me-button-clicked',
                         category: 'Login Page',
-                        label: `Remember Me ${rememberMe ? 'Checked' : 'Unchecked'
-                          }`,
+                        label: `Remember Me ${
+                          rememberMe ? 'Checked' : 'Unchecked'
+                        }`,
                       });
                     }}
                     sx={{
@@ -820,6 +859,13 @@ const LoginPage = () => {
           </Box>
         </Grid>
       </Grid>
+
+      <SwitchAccountDialog
+        open={switchDialogOpen}
+        onClose={() => setSwitchDialogOpen(false)}
+        callbackFunction={callBackSwitchDialog}
+        authResponse={userResponse?.tenantData}
+      />
     </>
   );
 };
