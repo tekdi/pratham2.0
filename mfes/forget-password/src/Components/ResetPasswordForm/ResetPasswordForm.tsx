@@ -14,7 +14,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import CheckIcon from '@mui/icons-material/Check';
 import { showToastMessage } from '../ToastComponent/Toastify';
-import { useTranslation } from '@shared-lib';
+import { useTranslation } from '@shared-lib-v2/lib/context/LanguageContext';
 
 interface ResetPasswordFormProps {
   onSubmit: (password: string, confirmPassword: string) => void;
