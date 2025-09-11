@@ -244,3 +244,19 @@ export const courseWiseLernerList = async ({
     throw error;
   }
 };
+export const getfilterList = async (): Promise<any> => {
+  const apiUrl: string = `/action/data/v1/form/read`;
+
+  try {
+    const response = await post(apiUrl, {
+      request: {
+        action: 'review',
+        subType: 'resource',
+      },
+    });
+    return response?.data?.result?.form?.data?.fields;
+  } catch (error) {
+    console.error('Error in getting Framework Details', error);
+    return error;
+  }
+};
