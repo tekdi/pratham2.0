@@ -24,7 +24,7 @@ const ProfilePage = () => {
  const tenantName =      (typeof window !== 'undefined' && localStorage.getItem('userProgram')) || '';
 
   const [filters] = useState<FilterDetails>({
-    status: ['completed', 'viewCertificate'],
+    status: [  'viewCertificate'],
     tenantId:
       (typeof window !== 'undefined' && localStorage.getItem('tenantId')) || '',
     userId:
@@ -84,7 +84,14 @@ const ProfilePage = () => {
                         name: courseDetails.name || "",
 
           };
-          finalArray.push(obj);
+          
+          // Only push to finalArray if certificateId is not null
+          if (item.certificateId !== null) {
+            finalArray.push(obj);
+          }
+                setCourseData(finalArray);
+
+
         } catch (error) {
           console.error(
             `Failed to fetch course details for courseId: ${item.courseId}`,
@@ -93,7 +100,6 @@ const ProfilePage = () => {
         }
       }
       console.log('finalArray', finalArray);
-      setCourseData(finalArray);
       // return finalArray;
     };
     prepareCertificateData();
