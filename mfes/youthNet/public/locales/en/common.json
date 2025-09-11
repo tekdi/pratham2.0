@@ -237,7 +237,7 @@
     "BLOCK": "Block",
     "ATTENDANCE": "Attendance (%)",
     "VILLAGES_AND_YOUTH": "Villages and Youth",
-    "USERS_&_VILLAGES": "Users & Villages",
+    "USERS_&_VILLAGES": "Mentor, Villages and Youths",
     "VILLAGES": "Villages",
     "YOUTH_VOLUNTEERS": "Youth/Volunteers",
     "SEARCH_VILLAGES": "Search Village",
@@ -759,7 +759,11 @@
     "MARK_AS_VOLUNTEER_FAILED": "Failed to mark youth as a volunteer",
     "ABOVE_18_YO":"Above 18 y/o",
     "BELOW_18_YO":"Below 18 y/o",
-    "FROM":"From"
+    "FROM":"From",
+    "UNMARK_AS_VOLUNTEER": "Unmark as Volunteer",
+    "DO_YOU_WANT_TO_UNMARK_AS_VOLUNTEER": "Do you want to unmark as a volunteer",
+    "UNMARK_AS_VOLUNTEER_SUCCESSFULLY": "Unmarked as volunteer successfully",
+    "UNMARK_AS_VOLUNTEER_FAILED": "Failed to unmark as volunteer"
   },
   "YOUTHNET_VOLUNTEERLIST": {
     "ENTRIES": "Entries",
@@ -773,6 +777,14 @@
     "EMAIL_ID": "Email ID",
     "STATE_DISTRICT_BLOCK": "State District Block",
     "STATE_DISTRICT": "State District",
+    "STATE": "State",
+    "DISTRICT": "District",
+    "BLOCK": "Block",
+    "VILLAGE": "Village",
+    "STATES": "States",
+    "DISTRICTS": "Districts",
+    "BLOCKS": "Blocks",
+    "VILLAGES": "Villages",
     "STATE_DISTRICT_BLOCK_VILLAGE": "State District Block Village",
     "DESIGNATION": "Designation",
     "JOINED_ON": "Joined on",
@@ -786,7 +798,8 @@
     "FIRST_NAME": "First Name",
     "MIDDLE_NAME": "Middle Name",
     "LAST_NAME": "Last Name",
-    "USERNAME": "Username"
+    "USERNAME": "Username",
+    "UPDATE_PROFILE": "Update Profile"
   },
   "YOUTHNET_USERS_AND_VILLAGES": {
     "MENTORS": "Mentors",
@@ -796,7 +809,7 @@
     "ADD_OR_REASSIGN_VILLAGES": "Add or Re-assign Villages",
     "REQUEST_TO_REASSIGN_DISTRICT": "Request to Re-assign District",
     "DELETE_USER_PERMANENTLY": "Delete User Permanently",
-    "REQUEST_USER_TO_DIFFERENT_MENTOR": "Re-assign user to a different Mentor Leader",
+    "REQUEST_USER_TO_DIFFERENT_MENTOR": "Re-assign user to a different Center Head",
     "SAVE_PROGRESS": "Save progress",
     "FINISH_ASSIGN": "Finish & Assign",
     "SEND_REQUEST_TO_ADMIN_TEXT": "You are sending a request to the State Admin to re-assign this user to another district",

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { Box, Grid, Typography } from '@mui/material';
 import dynamic from 'next/dynamic';
 import WelcomeScreen from '@learner/components/WelcomeComponent/WelcomeScreen';
@@ -21,6 +21,8 @@ import prathamQRCode from '../../../public/images/prathamQR.png';
 import welcomeGIF from '../../../public/images/welcome.gif';
 import { logEvent } from '@learner/utils/googleAnalytics';
 import { TenantName } from '../../utils/app.constant';
+
+import SwitchAccountDialog from '@shared-lib-v2/SwitchAccount/SwitchAccount';
 
 const Login = dynamic(
   () => import('@login/Components/LoginComponent/LoginComponent'),
@@ -245,6 +247,133 @@ const LoginPage = () => {
       telemetryFactory.interact(telemetryInteract);
     }
   };
+
+  const [switchDialogOpen, setSwitchDialogOpen] = useState(false);
+  const [userResponse, setUserResponse] = useState<any>(null);
+  const [tenantId, setTenantId] = useState<string>('');
+  const [tenantName, setTenantName] = useState<string>('');
+  const [roleId, setRoleId] = useState<string>('');
+  const [roleName, setRoleName] = useState<string>('');
+
+  const handleSuccessfulLogin = async (
+    response: any,
+    data: { remember: boolean },
+    router: any
+  ) => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const token = response.access_token;
+      const refreshToken = response?.refresh_token;
+      localStorage.setItem('token', token);
+      data?.remember
+        ? localStorage.setItem('refreshToken', refreshToken)
+        : localStorage.removeItem('refreshToken');
+
+      const userResponse = await getUserId();
+
+      setUserResponse(userResponse);
+
+      setSwitchDialogOpen(true);
+    }
+  };
+  const callBackSwitchDialog = async (
+    tenantId: string,
+    tenantName: string,
+    roleId: string,
+    roleName: string
+  ) => {
+    setSwitchDialogOpen(false);
+
+    // Set the state values
+    setTenantId(tenantId);
+    setTenantName(tenantName);
+    setRoleId(roleId);
+    setRoleName(roleName);
+
+    const token =
+      typeof window !== 'undefined' && window.localStorage
+        ? localStorage.getItem('token')
+        : '';
+
+    if (userResponse) {
+      const tenantData = userResponse?.tenantData?.find(
+        (tenant: any) => tenant.tenantId === tenantId
+      );
+
+      if (roleName === 'Learner') {
+        localStorage.setItem('userId', userResponse?.userId);
+        localStorage.setItem('templtateId', tenantData?.templateId);
+        localStorage.setItem('userIdName', userResponse?.username);
+        localStorage.setItem('firstName', userResponse?.firstName || '');
+
+        const tenantId = tenantData?.tenantId;
+        const tenantName = tenantData?.tenantName;
+        const uiConfig = tenantData?.params?.uiConfig;
+
+        localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
+
+        localStorage.setItem('tenantId', tenantId);
+        localStorage.setItem('userProgram', tenantName);
+        await profileComplitionCheck();
+        if (tenantName === TenantName.YOUTHNET) {
+          const academicYearResponse = await getAcademicYear();
+          if (academicYearResponse[0]?.id) {
+            localStorage.setItem('academicYearId', academicYearResponse[0]?.id);
+          }
+        }
+        const telemetryInteract = {
+          context: { env: 'sign-in', cdata: [] },
+          edata: {
+            id: 'login-success',
+            type: 'CLICK',
+            pageid: 'sign-in',
+            uid: userResponse?.userId || 'Anonymous',
+          },
+        };
+        telemetryFactory.interact(telemetryInteract);
+
+        const channelId = tenantData?.channelId;
+        localStorage.setItem('channelId', channelId);
+
+        const collectionFramework = tenantData?.collectionFramework;
+        localStorage.setItem('collectionFramework', collectionFramework);
+
+        document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
+        const query = new URLSearchParams(window.location.search);
+        const redirectUrl = query.get('redirectUrl');
+        const activeLink = query.get('activeLink');
+        logEvent({
+          action: 'successfully-login-in-learner-app',
+          category: 'Login Page',
+          label: 'Login Button Clicked',
+        });
+        if (redirectUrl && redirectUrl.startsWith('/')) {
+          router.push(
+            `${redirectUrl}${activeLink ? `?activeLink=${activeLink}` : ''}`
+          );
+        } else {
+          if (tenantName === TenantName.YOUTHNET) {
+            router.push('/content');
+          } else if (tenantName === TenantName.CAMP_TO_CLUB) {
+            router.push('/courses-contents');
+          } else if (tenantName === TenantName.PRAGYANPATH) {
+            router.push('/courses-contents');
+          }
+        }
+      } else {
+        showToastMessage('Username or password not correct', 'error');
+        const telemetryInteract = {
+          context: { env: 'sign-in', cdata: [] },
+          edata: {
+            id: 'login-failed',
+            type: 'CLICK',
+            pageid: 'sign-in',
+          },
+        };
+        telemetryFactory.interact(telemetryInteract);
+      }
+    }
+  };
+
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <Box
@@ -326,113 +455,14 @@ const LoginPage = () => {
           </Box>
         </Box>
       </Box>
+      <SwitchAccountDialog
+        open={switchDialogOpen}
+        onClose={() => setSwitchDialogOpen(false)}
+        callbackFunction={callBackSwitchDialog}
+        authResponse={userResponse?.tenantData}
+      />
     </Suspense>
   );
 };
 
 export default LoginPage;
-
-const handleSuccessfulLogin = async (
-  response: any,
-  data: { remember: boolean },
-  router: any
-) => {
-  if (typeof window !== 'undefined' && window.localStorage) {
-    const token = response.access_token;
-    const refreshToken = response?.refresh_token;
-    localStorage.setItem('token', token);
-    data?.remember
-      ? localStorage.setItem('refreshToken', refreshToken)
-      : localStorage.removeItem('refreshToken');
-
-    const userResponse = await getUserId();
-
-    if (userResponse) {
-      if (
-        userResponse?.tenantData?.[0]?.roleName === 'Learner' 
-       // userResponse?.tenantData?.[0]?.tenantName === TenantName.YOUTHNET
-      ) {
-        localStorage.setItem('userId', userResponse?.userId);
-        localStorage.setItem(
-          'templtateId',
-          userResponse?.tenantData?.[0]?.templateId
-        );
-        localStorage.setItem('userIdName', userResponse?.username);
-        localStorage.setItem('firstName', userResponse?.firstName || '');
-
-        const tenantId = userResponse?.tenantData?.[0]?.tenantId;
-        const tenantName = userResponse?.tenantData?.[0]?.tenantName;
-            const uiConfig = userResponse?.tenantData?.[0]?.params?.uiConfig;
-         
-
-localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
-
-        localStorage.setItem('tenantId', tenantId);
-        localStorage.setItem('userProgram', tenantName);
-        await profileComplitionCheck();
-        if (tenantName === TenantName.YOUTHNET) {
-        const academicYearResponse = await getAcademicYear();
-         if (academicYearResponse[0]?.id) {
-          localStorage.setItem('academicYearId', academicYearResponse[0]?.id);
-        }
-      }
-        const telemetryInteract = {
-          context: { env: 'sign-in', cdata: [] },
-          edata: {
-            id: 'login-success',
-            type: 'CLICK',
-            pageid: 'sign-in',
-            uid: userResponse?.userId || 'Anonymous',
-          },
-        };
-        telemetryFactory.interact(telemetryInteract);
-       
-
-        const channelId = userResponse?.tenantData?.[0]?.channelId;
-        localStorage.setItem('channelId', channelId);
-
-        const collectionFramework =
-          userResponse?.tenantData?.[0]?.collectionFramework;
-        localStorage.setItem('collectionFramework', collectionFramework);
-
-        document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
-        const query = new URLSearchParams(window.location.search);
-        const redirectUrl = query.get('redirectUrl');
-        const activeLink = query.get('activeLink');
-        logEvent({
-          action: 'successfully-login-in-learner-app',
-          category: 'Login Page',
-          label: 'Login Button Clicked',
-        });
-        if (redirectUrl && redirectUrl.startsWith('/')) {
-          router.push(
-            `${redirectUrl}${activeLink ? `?activeLink=${activeLink}` : ''}`
-          );      
-        } else{
-          if(tenantName=== TenantName.YOUTHNET) {
-            router.push('/content');
-          }
-          else if (tenantName===TenantName.CAMP_TO_CLUB)
-          {
-            router.push('/courses-contents');
-          }
-          else if(tenantName===TenantName.PRAGYANPATH)
-          {
-            router.push('/courses-contents');
-          }
-        }
-      } else {
-        showToastMessage('Username or password not correct', 'error');
-        const telemetryInteract = {
-          context: { env: 'sign-in', cdata: [] },
-          edata: {
-            id: 'login-failed',
-            type: 'CLICK',
-            pageid: 'sign-in',
-          },
-        };
-        telemetryFactory.interact(telemetryInteract);
-      }
-    }
-  }
-};
