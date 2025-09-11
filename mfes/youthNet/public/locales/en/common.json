@@ -237,7 +237,7 @@
     "BLOCK": "Block",
     "ATTENDANCE": "Attendance (%)",
     "VILLAGES_AND_YOUTH": "Villages and Youth",
-    "USERS_&_VILLAGES": "Mentor,Villages and Youths",
+    "USERS_&_VILLAGES": "Mentor, Villages and Youths",
     "VILLAGES": "Villages",
     "YOUTH_VOLUNTEERS": "Youth/Volunteers",
     "SEARCH_VILLAGES": "Search Village",
@@ -798,7 +798,8 @@
     "FIRST_NAME": "First Name",
     "MIDDLE_NAME": "Middle Name",
     "LAST_NAME": "Last Name",
-    "USERNAME": "Username"
+    "USERNAME": "Username",
+    "UPDATE_PROFILE": "Update Profile"
   },
   "YOUTHNET_USERS_AND_VILLAGES": {
     "MENTORS": "Mentors",
@@ -808,7 +809,7 @@
     "ADD_OR_REASSIGN_VILLAGES": "Add or Re-assign Villages",
     "REQUEST_TO_REASSIGN_DISTRICT": "Request to Re-assign District",
     "DELETE_USER_PERMANENTLY": "Delete User Permanently",
-    "REQUEST_USER_TO_DIFFERENT_MENTOR": "Re-assign user to a different Mentor Leader",
+    "REQUEST_USER_TO_DIFFERENT_MENTOR": "Re-assign user to a different Center Head",
     "SAVE_PROGRESS": "Save progress",
     "FINISH_ASSIGN": "Finish & Assign",
     "SEND_REQUEST_TO_ADMIN_TEXT": "You are sending a request to the State Admin to re-assign this user to another district",

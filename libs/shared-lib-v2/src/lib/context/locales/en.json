@@ -420,7 +420,7 @@
     "ADD_OR_REASSIGN_VILLAGES": "Add or Re-assign Villages",
     "REQUEST_TO_REASSIGN_DISTRICT": "Request to Re-assign District",
     "DELETE_USER_PERMANENTLY": "Delete User Permanently",
-    "REQUEST_USER_TO_DIFFERENT_MENTOR": "Re-assign user to a different Mentor Leader",
+    "REQUEST_USER_TO_DIFFERENT_MENTOR": "Re-assign user to a different Center Head",
     "SAVE_PROGRESS": "Save progress",
     "FINISH_ASSIGN": "Finish & Assign",
     "SEND_REQUEST_TO_ADMIN_TEXT": "You are sending a request to the State Admin to re-assign this user to another district",
