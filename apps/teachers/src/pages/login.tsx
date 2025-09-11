@@ -161,6 +161,7 @@ const LoginComponent = () => {
       }
 
       localStorage.setItem('role', roleName);
+      localStorage.setItem('roleId', roleId || '');
       localStorage.setItem('userEmail', receivedToken?.email);
       localStorage.setItem('userName', receivedToken?.firstName);
       localStorage.setItem('userIdName', receivedToken?.username);
