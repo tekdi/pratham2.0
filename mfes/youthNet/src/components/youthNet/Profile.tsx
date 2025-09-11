@@ -7,9 +7,9 @@ import { Role } from '../../utils/app.constant';
 interface ProfileDetailsProps {
   fullName: string;
   emailId: string;
-  state?: string;
-  district?: string;
-  block?: string;
+  state?: any;
+  district?: any;
+  block?: any;
   designation?: string;
   joinedOn?: string | null;
   phoneNumber?: string;
@@ -17,7 +17,7 @@ interface ProfileDetailsProps {
   gender?: string;
   age?: number;
   dob?: string;
-  village?: string | null;
+  village?: any
   middleName?: string | null;
   userName?: string | null;
   firstName?: string | null;
@@ -232,28 +232,81 @@ const Profile: React.FC<ProfileDetailsProps> = ({
               {dob}
             </Typography>
           </Grid>
-          <Grid item xs={6}>
-            <Typography
-              color={theme.palette.warning['500']}
-              sx={{ fontSize: '12px', fontWeight: 600, mt: 2 }}
-            >
-              {village
-                ? t('YOUTHNET_PROFILE.STATE_DISTRICT_BLOCK_VILLAGE')
-                : designation === Role.LEAD
-                ? t('YOUTHNET_PROFILE.STATE_DISTRICT')
-                : t('YOUTHNET_PROFILE.STATE_DISTRICT_BLOCK')}
-            </Typography>
-            <Typography
-              color={theme.palette.warning['A200']}
-              sx={{ fontSize: '16px', fontWeight: 400 }}
-              gutterBottom
-            >
-              {designation === Role.LEAD
-                ? `${state}, ${district}`
-                : `${state}, ${district}, ${block}`}
-              {village ? `, ${village}` : ''}
-            </Typography>
-          </Grid>
+        </Grid>
+
+        {/* Location Fields - Separate Display */}
+        <Grid container spacing={2}>
+          {state && (
+            <Grid item xs={6}>
+              <Typography
+                color={theme.palette.warning['500']}
+                sx={{ fontSize: '12px', fontWeight: 600, mt: 2 }}
+              >
+                {state.includes(',') ? t('YOUTHNET_PROFILE.STATES') : t('YOUTHNET_PROFILE.STATE')}
+              </Typography>
+              <Typography
+                color={theme.palette.warning['A200']}
+                sx={{ fontSize: '16px', fontWeight: 400 }}
+                gutterBottom
+              >
+                {state}
+              </Typography>
+            </Grid>
+          )}
+          
+          {district && (
+            <Grid item xs={6}>
+              <Typography
+                color={theme.palette.warning['500']}
+                sx={{ fontSize: '12px', fontWeight: 600, mt: 2 }}
+              >
+                {district.includes(',') ? t('YOUTHNET_PROFILE.DISTRICTS') : t('YOUTHNET_PROFILE.DISTRICT')}
+              </Typography>
+              <Typography
+                color={theme.palette.warning['A200']}
+                sx={{ fontSize: '16px', fontWeight: 400 }}
+                gutterBottom
+              >
+                {district}
+              </Typography>
+            </Grid>
+          )}
+          
+          {block && designation !== Role.LEAD && (
+            <Grid item xs={6}>
+              <Typography
+                color={theme.palette.warning['500']}
+                sx={{ fontSize: '12px', fontWeight: 600, mt: 2 }}
+              >
+                {block.includes(',') ? t('YOUTHNET_PROFILE.BLOCKS') : t('YOUTHNET_PROFILE.BLOCK')}
+              </Typography>
+              <Typography
+                color={theme.palette.warning['A200']}
+                sx={{ fontSize: '16px', fontWeight: 400 }}
+                gutterBottom
+              >
+                {block}
+              </Typography>
+            </Grid>
+          )}
+          
+          {village && (
+            <Grid item xs={6}>
+              <Typography
+                color={theme.palette.warning['500']}
+                sx={{ fontSize: '12px', fontWeight: 600, mt: 2 }}
+              >
+                {village.includes(',') ? t('YOUTHNET_PROFILE.VILLAGES') : t('YOUTHNET_PROFILE.VILLAGE')}
+              </Typography>
+              <Typography
+                color={theme.palette.warning['A200']}
+                sx={{ fontSize: '16px', fontWeight: 400 }}
+                gutterBottom
+              >
+                {village}
+              </Typography>
+            </Grid>
+          )}
         </Grid>
       </CardContent>
     </Card>
