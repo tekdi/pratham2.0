@@ -43,7 +43,8 @@ export enum TenantName {
   YOUTHNET = 'Vocational Training',
   POS = 'Open School',
   PRAGYANPATH = 'Pragyanpath',
-  CAMP_TO_CLUB = 'Camp to Club'
+  CAMP_TO_CLUB = 'Camp to Club',
+ LEARNING_AND_DEVELOPMENT ="Learning and Development"
 
 }
 
