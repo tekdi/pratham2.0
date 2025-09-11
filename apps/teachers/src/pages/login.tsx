@@ -1,5 +1,5 @@
 import dynamic from 'next/dynamic';
-import React from 'react';
+import React, { useState } from 'react';
 import manageUserStore from '../store/manageUserStore';
 import { UpdateDeviceNotification } from '../services/NotificationService';
 import useStore from '../store/store';
@@ -10,6 +10,8 @@ import { getAcademicYear } from '../services/AcademicYearService';
 import router from 'next/router';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { RoleNames } from '../utils/app.constant';
+
+import SwitchAccountDialog from '@shared-lib-v2/SwitchAccount/SwitchAccount';
 
 const Login = dynamic(() => import('@login'), {
   ssr: false,
@@ -82,14 +84,44 @@ const LoginComponent = () => {
     }
   };
 
+  const [switchDialogOpen, setSwitchDialogOpen] = useState(false);
+  const [receivedToken, setReceivedToken] = useState<any>(null);
+  const [tenantId, setTenantId] = useState<string>('');
+  const [tenantName, setTenantName] = useState<string>('');
+  const [roleId, setRoleId] = useState<string>('');
+  const [roleName, setRoleName] = useState<string>('');
+
   const handleLoginSuccess = async (receivedToken: any) => {
     const userId = receivedToken?.userId;
     const token = localStorage.getItem('token');
     console.log(receivedToken, token);
 
+    setReceivedToken(receivedToken);
+
+    setSwitchDialogOpen(true);
+  };
+
+  const callBackSwitchDialog = async (
+    tenantId: string,
+    tenantName: string,
+    roleId: string,
+    roleName: string
+  ) => {
+    setSwitchDialogOpen(false);
+
+    // Set the state values
+    setTenantId(tenantId);
+    setTenantName(tenantName);
+    setRoleId(roleId);
+    setRoleName(roleName);
+
+    const token =
+      typeof window !== 'undefined' && window.localStorage
+        ? localStorage.getItem('token')
+        : '';
+    const userId = receivedToken?.userId;
+
     if (receivedToken.tenantData && receivedToken.tenantData.length > 0) {
-      const tenantName = receivedToken.tenantData[0].tenantName;
-      const tenantId = receivedToken.tenantData[0].tenantId;
       localStorage.setItem('tenantName', tenantName);
       localStorage.setItem('tenantId', tenantId);
     } else {
@@ -109,7 +141,7 @@ const LoginComponent = () => {
         try {
           // Update device notification
           const headers = {
-            tenantId: receivedToken?.tenantData[0]?.tenantId,
+            tenantId: tenantId,
             Authorization: `Bearer ${token}`,
           };
 
@@ -128,7 +160,7 @@ const LoginComponent = () => {
         }
       }
 
-      localStorage.setItem('role', receivedToken?.tenantData[0]?.roleName);
+      localStorage.setItem('role', roleName);
       localStorage.setItem('userEmail', receivedToken?.email);
       localStorage.setItem('userName', receivedToken?.firstName);
       localStorage.setItem('userIdName', receivedToken?.username);
@@ -137,7 +169,7 @@ const LoginComponent = () => {
         receivedToken?.temporaryPassword ?? 'false'
       );
       localStorage.setItem('userData', JSON.stringify(receivedToken));
-      setUserRole(receivedToken?.tenantData[0]?.roleName);
+      setUserRole(roleName);
       setAccessToken(token);
 
       const tenant = localStorage.getItem('tenantName');
@@ -211,7 +243,18 @@ const LoginComponent = () => {
       }
     }
   };
-  return <Login onLoginSuccess={handleLoginSuccess} />;
+
+  return (
+    <>
+      <Login onLoginSuccess={handleLoginSuccess} />
+      <SwitchAccountDialog
+        open={switchDialogOpen}
+        onClose={() => setSwitchDialogOpen(false)}
+        callbackFunction={callBackSwitchDialog}
+        authResponse={receivedToken?.tenantData}
+      />
+    </>
+  );
 };
 
 export async function getStaticProps({ locale }: any) {
