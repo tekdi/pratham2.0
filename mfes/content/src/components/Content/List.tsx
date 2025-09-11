@@ -123,6 +123,8 @@ export interface ContentProps {
   hasMoreData?: boolean;
   onTotalCountChange?: (count: number) => void;
   telemetryFunctionCalls?: any;
+  totalResources?:number;
+  setTotalResources?: (count:number) => void;
 }
 
 export default function Content(props: Readonly<ContentProps>) {
@@ -308,6 +310,11 @@ export default function Content(props: Readonly<ContentProps>) {
 
       if (resultResponse?.result?.count) {
         setTotalCount(resultResponse?.result?.count);
+        if(props.setTotalResources)
+        {
+          props.setTotalResources(resultResponse?.result?.count);
+        }
+     
       }
 
       const response = resultResponse?.result;
