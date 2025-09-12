@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
@@ -9,22 +9,78 @@ import {
 } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { get } from '@shared-lib';
+import { baseurl } from '@learner/utils/API/EndUrls';
+import CardShimmer from './CardShimmer';
 
 interface CertificateCardProps {
-  title: string;
-  description: string;
-  imageUrl: string;
-  completionDate: string;
+  certificateData: {
+    usercertificateId: string;
+    userId: string;
+    courseId: string;
+    certificateId: string;
+    issuedOn: string;
+  };
   onPreviewCertificate: () => void;
 }
 
+interface CourseDetails {
+  name: string;
+  description: string;
+  posterImage: string;
+}
+
 const CourseCertificateCard: React.FC<CertificateCardProps> = ({
-  title,
-  description,
-  imageUrl,
-  completionDate,
+  certificateData,
   onPreviewCertificate,
 }) => {
+  const [courseDetails, setCourseDetails] = useState<CourseDetails | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCourseDetails = async () => {
+      try {
+        setIsLoading(true);
+        const Details: any = await get(
+          `${baseurl}/action/content/v3/read/${certificateData.courseId}`,
+          {
+            tenantId: localStorage.getItem('tenantId') || '',
+            Authorization: `Bearer ${localStorage.getItem('accToken') || ''}`,
+          }
+        );
+        console.log('courseDetails', Details);
+        const content = Details.data.result.content;
+        
+        setCourseDetails({
+          name: content.name || '',
+          description: content.description || '',
+          posterImage: content.posterImage || '',
+        });
+      } catch (error) {
+        console.error(
+          `Failed to fetch course details for courseId: ${certificateData.courseId}`,
+          error
+        );
+        // Set fallback data in case of error
+        setCourseDetails({
+          name: 'Course Title Unavailable',
+          description: 'Course description unavailable',
+          posterImage: '',
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (certificateData.courseId) {
+      fetchCourseDetails();
+    }
+  }, [certificateData.courseId]);
+
+  if (isLoading) {
+    return <CardShimmer />;
+  }
+
   return (
     <Card
       sx={{
@@ -48,8 +104,8 @@ const CourseCertificateCard: React.FC<CertificateCardProps> = ({
       <Box sx={{ position: 'relative', width: '100%' }}>
         <CardMedia
           component="img"
-          image={imageUrl || '/images/image_ver.png'}
-          alt={title}
+          image={courseDetails?.posterImage || '/images/image_ver.png'}
+          alt={courseDetails?.name || 'Course Image'}
           sx={{
             width: '100%',
             height: '297px',
@@ -83,7 +139,7 @@ const CourseCertificateCard: React.FC<CertificateCardProps> = ({
             }}
           >
             Issued certificate on{' '}
-            {new Date(completionDate)
+            {new Date(certificateData.issuedOn)
               .toLocaleDateString('en-US', {
                 day: 'numeric',
                 month: 'long',
@@ -117,7 +173,7 @@ const CourseCertificateCard: React.FC<CertificateCardProps> = ({
               paddingLeft: '5px',
             }}
           >
-            {title}
+            {courseDetails?.name || 'Loading...'}
           </Typography>
         </Box>
 
@@ -135,7 +191,7 @@ const CourseCertificateCard: React.FC<CertificateCardProps> = ({
               paddingLeft: '5px',
             }}
           >
-            {description}
+            {courseDetails?.description || 'Loading description...'}
           </Typography>
         </Box>
 
