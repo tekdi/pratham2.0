@@ -43,7 +43,6 @@ import face from '../../../public/images/Group 3.png';
 import { useSearchParams } from 'next/navigation';
 import { getTenantInfo } from '@learner/utils/API/ProgramService';
 import Image from 'next/image';
-import SwitchAccountDialog from '@shared-lib-v2/SwitchAccount/SwitchAccount';
 
 type UserAccount = {
   name: string;
@@ -91,9 +90,6 @@ const RegisterUser = () => {
   const [mobile, setMobile] = useState('');
   const [tenantName, setTenantName] = useState('');
 
-  const [switchDialogOpen, setSwitchDialogOpen] = useState(false);
-  const [userResponse, setUserResponse] = useState<any>(null);
-
   const router = useRouter();
 
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -120,7 +116,7 @@ const RegisterUser = () => {
         if (!isPresent) {
           setInvalidLinkModal(true);
         }
-      } catch (error) {}
+      } catch (error) { }
     };
     fetchData();
   }, [tenantId]);
@@ -163,7 +159,7 @@ const RegisterUser = () => {
           'district',
           'block',
           'village',
-          'family_member_details',
+          'family_member_details'
           // 'center',
           // 'batch',
           // 'username',
@@ -317,7 +313,7 @@ const RegisterUser = () => {
 
         console.log(responseUserData);
       }
-    } catch (error) {}
+    } catch (error) { }
   };
   // formData.mobile = '8793607919';
   // formData.firstName = 'karan';
@@ -343,11 +339,11 @@ const RegisterUser = () => {
       const payload = isEmailCheck
         ? { email: formData.email }
         : {
-            firstName: formData.firstName,
-            mobile: isUnderEighteen(formData.dob)
-              ? formData.parent_phone
-              : formData.mobile,
-          };
+          firstName: formData.firstName,
+          mobile: isUnderEighteen(formData.dob)
+            ? formData.parent_phone
+            : formData.mobile,
+        };
 
       const response = await userCheck(payload);
       const users = response?.result || [];
@@ -431,17 +427,17 @@ const RegisterUser = () => {
       const response = await sendOTP({ mobile: mobile, reason });
       console.log('sendOTP', response);
       setHash(response?.result?.data?.hash);
-    } catch (error) {}
+    } catch (error) { }
   };
 
   const onCloseSuccessModal = () => {
     //  const route = localStorage.getItem('redirectionRoute');
     //   if (route) router.push(route);
-    console.log('onCloseSuccessModal', formData);
+    console.log("onCloseSuccessModal", formData)
     setUsername(
       (formData?.firstName || '') +
-        (formData?.lastName || '') +
-        Math.floor(10 + Math.random() * 90) // random 2-digit number
+      (formData?.lastName || '') +
+      Math.floor(10 + Math.random() * 90) // random 2-digit number
     );
     setVerificationSuccessModal(false);
     setUsernamePasswordForm(true);
@@ -453,7 +449,7 @@ const RegisterUser = () => {
     setSignupSuccessModal(false);
     // setUsernamePasswordForm(true);
   };
-  const onCloseInvalidLinkModal = () => {};
+  const onCloseInvalidLinkModal = () => { };
   const renderHomePage = () => {
     router.push('/');
   };
@@ -485,9 +481,60 @@ const RegisterUser = () => {
             const refreshToken = response?.result?.refresh_token;
             localStorage.setItem('token', token);
 
-            const userResponseData = await getUserId();
-            setUserResponse(userResponseData);
-            setSwitchDialogOpen(true);
+            const userResponse = await getUserId();
+
+            if (userResponse) {
+              if (
+                userResponse?.tenantData?.[0]?.roleName === 'Learner'
+                //  userResponse?.tenantData?.[0]?.tenantName === 'YouthNet'
+              ) {
+                const tenantName = userResponse?.tenantData?.[0]?.tenantName;
+                localStorage.setItem('userProgram', tenantName);
+                const uiConfig = userResponse?.tenantData?.[0]?.params?.uiConfig;
+                localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
+
+                localStorage.setItem('userId', userResponse?.userId);
+                console.log(userResponse?.tenantData);
+                localStorage.setItem(
+                  'templtateId',
+                  userResponse?.tenantData?.[0]?.templateId
+                );
+
+                localStorage.setItem('userIdName', userResponse?.username);
+                localStorage.setItem('name', userResponse?.firstName);
+                localStorage.setItem(
+                  'firstName',
+                  userResponse?.firstName || ''
+                );
+
+                const tenantId = userResponse?.tenantData?.[0]?.tenantId;
+                localStorage.setItem('tenantId', tenantId);
+
+                const channelId = userResponse?.tenantData?.[0]?.channelId;
+                localStorage.setItem('channelId', channelId);
+
+                const collectionFramework =
+                  userResponse?.tenantData?.[0]?.collectionFramework;
+                localStorage.setItem(
+                  'collectionFramework',
+                  collectionFramework
+                );
+
+                document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
+                const hasBothContentCoursetab = uiConfig?.showContent?.includes("courses") && uiConfig?.showContent?.includes("contents");
+
+                if (hasBothContentCoursetab) {
+                  router.push('/courses-contents');
+                }
+                else
+                  router.push('/content');
+              } else {
+                // showToastMessage(
+                //   'LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT',
+                //   'error'
+                // );
+              }
+            }
           }
         } else {
           // showToastMessage('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT', 'error');
@@ -500,66 +547,6 @@ const RegisterUser = () => {
       const errorMessage = 'LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT';
       showToastMessage(errorMessage, 'error');
     }
-  };
-  const callBackSwitchDialog = async (
-    selectedTenantId: string,
-    selectedTenantName: string,
-    selectedRoleId: string,
-    selectedRoleName: string
-  ) => {
-    setSwitchDialogOpen(false);
-    try {
-      if (userResponse) {
-        const token = localStorage.getItem('token') || '';
-
-        // Persist core user info
-        localStorage.setItem('userId', userResponse?.userId);
-        localStorage.setItem('userIdName', userResponse?.username);
-        localStorage.setItem('name', userResponse?.firstName);
-        localStorage.setItem('firstName', userResponse?.firstName || '');
-
-        // Persist selected tenant/role
-        localStorage.setItem('tenantName', selectedTenantName);
-        localStorage.setItem('roleId', selectedRoleId);
-        localStorage.setItem('roleName', selectedRoleName);
-        localStorage.setItem('tenantId', selectedTenantId);
-
-        // Lookup selected tenant details from response
-        const selectedTenant = userResponse?.tenantData?.find(
-          (t: any) => t?.tenantId === selectedTenantId
-        );
-
-        if (selectedTenant) {
-          localStorage.setItem('userProgram', selectedTenantName);
-          const uiConfig = selectedTenant?.params?.uiConfig;
-          localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
-
-          if (selectedTenant?.templateId) {
-            localStorage.setItem('templtateId', selectedTenant?.templateId);
-          }
-          if (selectedTenant?.channelId) {
-            localStorage.setItem('channelId', selectedTenant?.channelId);
-          }
-          if (selectedTenant?.collectionFramework) {
-            localStorage.setItem(
-              'collectionFramework',
-              selectedTenant?.collectionFramework
-            );
-          }
-
-          document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
-
-          const hasBothContentCoursetab =
-            uiConfig?.showContent?.includes('courses') &&
-            uiConfig?.showContent?.includes('contents');
-          if (hasBothContentCoursetab) {
-            router.push('/courses-contents');
-          } else {
-            router.push('/content');
-          }
-        }
-      }
-    } catch (e) {}
   };
   //   const handleLogin = async () => {
   //     if (formData.email) {
@@ -703,7 +690,7 @@ const RegisterUser = () => {
                 component="br"
                 sx={{ display: { xs: 'block', sm: 'none' } }}
               />
-              {' ' + t('LEARNER_APP.REGISTRATION.TRAINING')}
+              {" " + t('LEARNER_APP.REGISTRATION.TRAINING')}
             </Typography>
 
             <Typography
@@ -861,13 +848,6 @@ const RegisterUser = () => {
           <SignupSuccess />
         </Box>
       </SimpleModal>
-
-      <SwitchAccountDialog
-        open={switchDialogOpen}
-        onClose={() => setSwitchDialogOpen(false)}
-        callbackFunction={callBackSwitchDialog}
-        authResponse={userResponse?.tenantData}
-      />
 
       <SimpleModal
         open={invalidLinkModal}
