@@ -1,3 +1,4 @@
+
 import {
   Box,
   Button,
@@ -86,6 +87,8 @@ const LoginPage = () => {
           let role;
           if (storedUserData) {
             role = JSON.parse(storedUserData);
+            let tenantId= localStorage.getItem('tenantId');
+            let tenantData= role?.tenantData?.find((tenant: any) => tenant.tenantId === tenantId);
             if (role?.role === Role.SCTA || role?.role === Role.CCTA) {
               // To do :- hardcoding to be removed
               if (
@@ -112,7 +115,7 @@ const LoginPage = () => {
               role?.role === Role.ADMIN &&
               role?.tenantData[0]?.tenantName == TenantName.YOUTHNET
             ) {
-              router.push('/mentor-leader');
+              router.push('/central-head');
             }
           }
         } else {
@@ -139,7 +142,7 @@ const LoginPage = () => {
                 role?.role === Role.ADMIN) &&
               role?.tenantData[0]?.tenantName == TenantName.YOUTHNET
             ) {
-              router.push('/mentor-leader');
+              router.push('/central-head');
             }
           }
         }
@@ -313,8 +316,8 @@ const LoginPage = () => {
                 (Role.CENTRAL_ADMIN &&
                   tenantData?.tenantName == TenantName.YOUTHNET)
               ) {
-                window.location.href = '/mentor-leader';
-                router.push('/mentor-leader', undefined, { locale: locale });
+                window.location.href = '/central-head';
+                router.push('/central-head', undefined, { locale: locale });
               }
             } else {
               if (
@@ -335,8 +338,8 @@ const LoginPage = () => {
                 userInfo?.role === Role.ADMIN &&
                 tenantData?.tenantName == TenantName.YOUTHNET
               ) {
-                window.location.href = '/mentor-leader';
-                router.push('/mentor-leader');
+                window.location.href = '/central-head';
+                router.push('/central-head');
               }
             }
           }
@@ -404,8 +407,8 @@ const LoginPage = () => {
                         tenantData?.tenantName ==
                           TenantName.YOUTHNET)
                     ) {
-                      window.location.href = '/mentor-leader';
-                      router.push('/mentor-leader', undefined, {
+                      window.location.href = '/central-head';
+                      router.push('/central-head', undefined, {
                         locale: locale,
                       });
                     }
@@ -428,8 +431,8 @@ const LoginPage = () => {
                       userInfo?.role === Role.ADMIN &&
                       userInfo?.tenantData[0]?.tenantName == TenantName.YOUTHNET
                     ) {
-                      window.location.href = '/mentor-leader';
-                      router.push('/mentor-leader');
+                      window.location.href = '/central-head';
+                      router.push('/central-head');
                     }
                   }
                 }

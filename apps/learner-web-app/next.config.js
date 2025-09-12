@@ -56,6 +56,10 @@ const nextConfig = {
         source: '/assets/public/:path*', // Match any URL starting with /assets/public/
         destination: `${process.env.NEXT_PUBLIC_CLOUD_STORAGE_URL}/:path*`, // Forward to S3, stripping "/assets/public"
       },
+      {
+        source: '/action/:path*',
+        destination: `${process.env.NEXT_PUBLIC_WORKSPACE_BASE_URL}/api/proxy?path=/action/:path*`,
+      },
       //for player content v1
       {
         source: routes.API.GENERAL.CONTENT_PREVIEW,

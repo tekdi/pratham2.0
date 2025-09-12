@@ -45,7 +45,7 @@ const Menuitems = [
       },
       {
         title: 'SIDEBAR.MENTOR_LEADER',
-        href: ['/mentor-leader'],
+        href: ['/central-head'],
       },
     ],
   },
