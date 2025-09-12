@@ -128,6 +128,10 @@ export enum RoleId {
   TEACHER = 'a5f1dbc9-2ad4-442c-b762-0e3fc1f6c6da',
   TEAM_LEADER = 'c4454929-954e-4c51-bb7d-cca834ab9375',
   ADMIN = '4a3493aa-a4f7-4e2b-b141-f213084b5599',
+  SCTA = '45b8b0d7-e5c6-4f3f-a7bf-70f86e9357ce',
+  CONTENT_CREATOR = '45b8b0d7-e5c6-4f3f-a7bf-70f86e9357ce',
+  CONTENT_REVIEWER = '2dc13fcc-29c4-42c1-b125-82d3dcaa4b42',
+  CENTRAL_LEAD = '3873fc80-0940-4598-9c25-8af2590305e7',
 }
 
 export enum Pagination {
@@ -269,9 +273,8 @@ export enum sessionType {
 
 export enum TenantName {
   SECOND_CHANCE_PROGRAM = 'Second Chance Program',
-  YOUTHNET ='Vocational Training',
+  YOUTHNET = 'Vocational Training',
   POS = 'Open School',
   PRAGYANPATH = 'Pragyanpath',
-  CAMP_TO_CLUB = 'Camp to Club'
-
+  CAMP_TO_CLUB = 'Camp to Club',
 }
