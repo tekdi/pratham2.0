@@ -35,6 +35,7 @@ import surveyForm from '../assets/images/surveyForm.svg';
 import { useDirection } from '../hooks/useDirection';
 import GroupsIcon from '@mui/icons-material/Groups';
 import { YOUTHNET_USER_ROLE } from './youthNet/tempConfigs';
+import { Role } from '../utils/app.constant';
 interface DrawerProps {
   toggleDrawer?: (open: boolean) => () => void;
   open: boolean;
@@ -420,9 +421,9 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 router.push(`/villages`);
               }}
             >
-              {YOUTHNET_USER_ROLE.MENTOR_LEAD === TENANT_DATA.LEADER
-                ? t('DASHBOARD.USERS_&_VILLAGES')
-                : t('DASHBOARD.VILLAGES_AND_YOUTH')}
+             {typeof window !== 'undefined' && window.localStorage.getItem('role') === Role.LEAD
+  ? t('DASHBOARD.USERS_&_VILLAGES')
+  : t('DASHBOARD.VILLAGES_AND_YOUTH')}
             </Button>
 
             <Button

@@ -46,10 +46,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
   };
 
   const validatePasswordRules = (password: string) => ({
-    minLength: password.length >= 8,
-    hasLetter: /[a-zA-Z]/.test(password),
-    number: /[0-9]/.test(password),
-    specialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+    minLength: password.length >= 4,
   });
 
   const rules = validatePasswordRules(newPassword);
@@ -108,7 +105,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
           endAdornment: (
             <InputAdornment position="end">
               <IconButton onClick={toggleShowOldPassword} edge="end">
-                {showOldPassword ? <VisibilityOff /> : <Visibility />}
+                {showOldPassword ? <Visibility /> : <VisibilityOff />}
               </IconButton>
             </InputAdornment>
           ),
@@ -127,7 +124,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
           endAdornment: (
             <InputAdornment position="end">
               <IconButton onClick={toggleShowNewPassword} edge="end">
-                {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                {showNewPassword ? <Visibility /> : <VisibilityOff />}
               </IconButton>
             </InputAdornment>
           ),
@@ -142,27 +139,6 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
             color={rules.minLength ? 'green' : 'error'}
           >
             • {t('LEARNER_APP.RESET_PASSWORD_FORM.PASSWORD_MIN_LENGTH')}
-          </Typography>
-          <br />
-          <Typography
-            variant="caption"
-            color={rules.hasLetter ? 'green' : 'error'}
-          >
-            • {t('LEARNER_APP.RESET_PASSWORD_FORM.PASSWORD_LETTER')}
-          </Typography>
-          <br />
-          <Typography
-            variant="caption"
-            color={rules.number ? 'green' : 'error'}
-          >
-            • {t('LEARNER_APP.RESET_PASSWORD_FORM.PASSWORD_NUMBER')}
-          </Typography>
-          <br />
-          <Typography
-            variant="caption"
-            color={rules.specialChar ? 'green' : 'error'}
-          >
-            • {t('LEARNER_APP.RESET_PASSWORD_FORM.PASSWORD_SPECIAL')}
           </Typography>
         </Box>
       )}
@@ -179,7 +155,7 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
           endAdornment: (
             <InputAdornment position="end">
               <IconButton onClick={toggleShowConfirmPassword} edge="end">
-                {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                {showConfirmPassword ? <Visibility /> : <VisibilityOff />}
               </IconButton>
             </InputAdornment>
           ),

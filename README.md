@@ -162,8 +162,6 @@ nx dev survey-observations --port=4112 --verbose
 basePath : `http://localhost:4112`
 Port : `4112`
 
-##
-
 ### content
 
 Next JS, run:
@@ -174,6 +172,19 @@ nx dev content --port=4113 --verbose
 
 basePath : `http://localhost:4113/mfe_content/`
 Port : `4113`
+
+### taxonomy-manager
+
+Next JS, run:
+
+```sh
+nx dev taxonomy-manager --port=4114 --verbose
+```
+
+basePath : `http://localhost:4114/taxonomy-manager/`
+Port : `4114`
+
+##
 
 ## NX Command
 

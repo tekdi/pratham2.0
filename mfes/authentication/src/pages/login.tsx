@@ -374,9 +374,9 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                               edge="end"
                             >
                               {showPassword ? (
-                                <VisibilityOff />
-                              ) : (
                                 <Visibility />
+                              ) : (
+                                <VisibilityOff />
                               )}
                             </IconButton>
                           </InputAdornment>

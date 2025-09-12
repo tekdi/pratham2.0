@@ -201,7 +201,7 @@ const MentorLead = () => {
   const columns = [
     {
       keys: ['firstName', 'middleName', 'lastName'],
-      label: 'Mentor Lead Name',
+      label: 'Central Head Name',
       render: (row) =>
         `${transformLabel(row.firstName) || ''} ${
           transformLabel(row.middleName) || ''
