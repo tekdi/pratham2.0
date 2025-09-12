@@ -114,6 +114,7 @@
     "CLOSE": "Close",
     "CANCEL": "Cancel",
     "OK": "OK",
+    "BACK": "Back",
     "INPROGRESS": "In-Progress",
     "SURE_LOGOUT": "Are you sure you want to Logout?",
     "LOGOUT": "Logout",
@@ -148,6 +149,17 @@
       "enrolled_not_started": "Enrolled, not started",
       "not_started": "Not Started"
     }
+  },
+  "SWITCH_ACCOUNT": {
+    "TITLE": "Switch Account",
+    "STEP_SELECT_TENANT": "Select Tenant",
+    "STEP_SELECT_ROLE": "Select Role",
+    "SELECT_YOUR_ORGANIZATION": "Select Your Organization",
+    "CHOOSE_ORGANIZATION_SUBTEXT": "Choose the organization you want to access",
+    "SELECT_ROLE_FOR": "Select Role for",
+    "CHOOSE_ROLE_SUBTEXT": "Choose the role you want to access",
+    "ROLE_ID_LABEL": "Role ID:",
+    "CONFIRM_SELECTION": "Confirm Selection"
   },
   "LEARNER_APP": {
     "COMPLETE_PROFILE_BANNER": {

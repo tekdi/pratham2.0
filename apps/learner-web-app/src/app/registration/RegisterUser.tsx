@@ -116,7 +116,7 @@ const RegisterUser = () => {
         if (!isPresent) {
           setInvalidLinkModal(true);
         }
-      } catch (error) {}
+      } catch (error) { }
     };
     fetchData();
   }, [tenantId]);
@@ -313,7 +313,7 @@ const RegisterUser = () => {
 
         console.log(responseUserData);
       }
-    } catch (error) {}
+    } catch (error) { }
   };
   // formData.mobile = '8793607919';
   // formData.firstName = 'karan';
@@ -339,11 +339,11 @@ const RegisterUser = () => {
       const payload = isEmailCheck
         ? { email: formData.email }
         : {
-            firstName: formData.firstName,
-            mobile: isUnderEighteen(formData.dob)
-              ? formData.parent_phone
-              : formData.mobile,
-          };
+          firstName: formData.firstName,
+          mobile: isUnderEighteen(formData.dob)
+            ? formData.parent_phone
+            : formData.mobile,
+        };
 
       const response = await userCheck(payload);
       const users = response?.result || [];
@@ -427,19 +427,19 @@ const RegisterUser = () => {
       const response = await sendOTP({ mobile: mobile, reason });
       console.log('sendOTP', response);
       setHash(response?.result?.data?.hash);
-    } catch (error) {}
+    } catch (error) { }
   };
 
   const onCloseSuccessModal = () => {
     //  const route = localStorage.getItem('redirectionRoute');
     //   if (route) router.push(route);
-console.log("onCloseSuccessModal" ,formData)
-setUsername(
-  (formData?.firstName || '') +
-    (formData?.lastName || '') +
-    Math.floor(10 + Math.random() * 90) // random 2-digit number
-);
-  setVerificationSuccessModal(false);
+    console.log("onCloseSuccessModal", formData)
+    setUsername(
+      (formData?.firstName || '') +
+      (formData?.lastName || '') +
+      Math.floor(10 + Math.random() * 90) // random 2-digit number
+    );
+    setVerificationSuccessModal(false);
     setUsernamePasswordForm(true);
   };
   const onCloseSignupSuccessModal = () => {
@@ -449,7 +449,7 @@ setUsername(
     setSignupSuccessModal(false);
     // setUsernamePasswordForm(true);
   };
-  const onCloseInvalidLinkModal = () => {};
+  const onCloseInvalidLinkModal = () => { };
   const renderHomePage = () => {
     router.push('/');
   };
@@ -485,13 +485,13 @@ setUsername(
 
             if (userResponse) {
               if (
-                userResponse?.tenantData?.[0]?.roleName === 'Learner' 
-              //  userResponse?.tenantData?.[0]?.tenantName === 'YouthNet'
+                userResponse?.tenantData?.[0]?.roleName === 'Learner'
+                //  userResponse?.tenantData?.[0]?.tenantName === 'YouthNet'
               ) {
-             const tenantName = userResponse?.tenantData?.[0]?.tenantName;
+                const tenantName = userResponse?.tenantData?.[0]?.tenantName;
                 localStorage.setItem('userProgram', tenantName);
-            const uiConfig = userResponse?.tenantData?.[0]?.params?.uiConfig;
-             localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
+                const uiConfig = userResponse?.tenantData?.[0]?.params?.uiConfig;
+                localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
 
                 localStorage.setItem('userId', userResponse?.userId);
                 console.log(userResponse?.tenantData);
@@ -499,7 +499,7 @@ setUsername(
                   'templtateId',
                   userResponse?.tenantData?.[0]?.templateId
                 );
-                
+
                 localStorage.setItem('userIdName', userResponse?.username);
                 localStorage.setItem('name', userResponse?.firstName);
                 localStorage.setItem(
@@ -522,12 +522,12 @@ setUsername(
 
                 document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
                 const hasBothContentCoursetab = uiConfig?.showContent?.includes("courses") && uiConfig?.showContent?.includes("contents");
-              
+
                 if (hasBothContentCoursetab) {
                   router.push('/courses-contents');
                 }
-                 else
-                router.push('/content');
+                else
+                  router.push('/content');
               } else {
                 // showToastMessage(
                 //   'LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT',
@@ -690,7 +690,7 @@ setUsername(
                 component="br"
                 sx={{ display: { xs: 'block', sm: 'none' } }}
               />
-              {" "+t('LEARNER_APP.REGISTRATION.TRAINING')}
+              {" " + t('LEARNER_APP.REGISTRATION.TRAINING')}
             </Typography>
 
             <Typography
@@ -712,7 +712,7 @@ setUsername(
                 color="secondary"
                 sx={{ fontWeight: '500' }}
               >
-                {' ' +t('LEARNER_APP.REGISTRATION.CLICK_HERE_TO_LOGIN')}
+                {' ' + t('LEARNER_APP.REGISTRATION.CLICK_HERE_TO_LOGIN')}
               </Link>
             </Typography>
           </Box>
