@@ -356,7 +356,7 @@ const AddEditUser = ({
           reassignmentPayload
         );
         if (resp) {
-          if (type !== 'team-leader' && type !== 'mentor-leader') {
+          if (type !== 'team-leader' && type !== 'central-head') {
             const cohortIdPayload = getReassignPayload(
               editPrefilledFormData.batch,
               formData.batch
