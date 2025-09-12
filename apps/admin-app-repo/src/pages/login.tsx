@@ -87,6 +87,8 @@ const LoginPage = () => {
           let role;
           if (storedUserData) {
             role = JSON.parse(storedUserData);
+            let tenantId= localStorage.getItem('tenantId');
+            let tenantData= role?.tenantData?.find((tenant: any) => tenant.tenantId === tenantId);
             if (role?.role === Role.SCTA || role?.role === Role.CCTA) {
               // To do :- hardcoding to be removed
               if (
