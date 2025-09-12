@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -31,6 +31,7 @@ import {
   Person,
 } from '@mui/icons-material';
 import { useTranslation } from '../lib/context/LanguageContext';
+import switchAccountConfig from './SwitchAccount.config';
 
 // TypeScript interfaces
 interface Role {
@@ -94,6 +95,28 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const host = useMemo(() => {
+    if (typeof window !== 'undefined') {
+      return window.location.host;
+    }
+    return '';
+  }, []);
+
+  const allowedRoleIds = useMemo(() => {
+    const allowed = (switchAccountConfig as any)?.[host];
+    return Array.isArray(allowed) ? (allowed as string[]) : [];
+  }, [host]);
+
+  const visibleTenants: TenantData[] = useMemo(() => {
+    const tenants = authResponse ?? [];
+    return tenants.map((tenant) => ({
+      ...tenant,
+      roles: (tenant?.roles ?? []).filter((r) =>
+        allowedRoleIds.includes(r.roleId)
+      ),
+    }));
+  }, [authResponse, allowedRoleIds]);
+
   useEffect(() => {
     if (open) {
       setActiveStep(0);
@@ -102,11 +125,11 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
     }
   }, [open]);
 
-  // Auto-select or bypass based on tenant/role counts
+  // Auto-select or bypass based on tenant/role counts (uses filtered roles)
   useEffect(() => {
     if (!open) return;
 
-    const tenants = authResponse ?? [];
+    const tenants = visibleTenants ?? [];
     if (tenants.length === 1) {
       const tenant = tenants[0];
       const roles = tenant?.roles ?? [];
@@ -131,7 +154,7 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
       // Multiple tenants: start at tenant selection
       setActiveStep(0);
     }
-  }, [open, authResponse, callbackFunction, onClose]);
+  }, [open, visibleTenants, callbackFunction, onClose]);
 
   const handleTenantSelect = (tenant: TenantData) => {
     setSelectedTenant(tenant);
@@ -203,6 +226,7 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
           defaultValue: 'Select Your Organization',
         })}
       </Typography>
+
       <Typography
         variant="body1"
         color="text.secondary"
@@ -215,7 +239,7 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
 
       <Box sx={{ flexGrow: 1 }}>
         <Box component={require('@mui/material').Grid} container spacing={2}>
-          {authResponse?.map((tenant) => (
+          {visibleTenants?.map((tenant) => (
             <Box
               key={tenant.tenantId}
               component={require('@mui/material').Grid}
@@ -260,6 +284,7 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
                       <Typography variant="body2" color="text.secondary">
                         {tenant.tenantType}
                       </Typography>
+
                       {/* <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
                         {tenant.roles.map((role) => (
                           <Chip
@@ -313,65 +338,73 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
       </Typography>
 
       <Box sx={{ flexGrow: 1 }}>
-        <Box component={require('@mui/material').Grid} container spacing={2}>
-          {selectedTenant?.roles?.map((role) => (
-            <Box
-              key={role.roleId}
-              component={require('@mui/material').Grid}
-              item
-              xs={12}
-              sm={6}
-            >
-              <Card
-                sx={{
-                  cursor: 'pointer',
-                  borderRadius: 2,
-                  border: selectedRole?.roleId === role.roleId ? 2 : 1,
-                  borderColor:
-                    selectedRole?.roleId === role.roleId
-                      ? 'primary.main'
-                      : 'divider',
-                  '&:hover': {
-                    boxShadow: 4,
-                  },
-                  transition: 'box-shadow 0.2s ease',
-                }}
-                onClick={() => handleRoleSelect(role)}
+        {selectedTenant?.roles?.length ? (
+          <Box component={require('@mui/material').Grid} container spacing={2}>
+            {selectedTenant?.roles?.map((role) => (
+              <Box
+                key={role.roleId}
+                component={require('@mui/material').Grid}
+                item
+                xs={12}
+                sm={6}
               >
-                <CardContent>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Avatar
-                      sx={{
-                        bgcolor: 'warning.main',
-                        color: 'warning.contrastText',
-                      }}
-                    >
-                      <Person />
-                    </Avatar>
-                    <Box sx={{ flex: 1 }}>
-                      <Typography
-                        variant="subtitle1"
-                        fontWeight={700}
-                        color={theme.palette.text.primary}
+                <Card
+                  sx={{
+                    cursor: 'pointer',
+                    borderRadius: 2,
+                    border: selectedRole?.roleId === role.roleId ? 2 : 1,
+                    borderColor:
+                      selectedRole?.roleId === role.roleId
+                        ? 'primary.main'
+                        : 'divider',
+                    '&:hover': {
+                      boxShadow: 4,
+                    },
+                    transition: 'box-shadow 0.2s ease',
+                  }}
+                  onClick={() => handleRoleSelect(role)}
+                >
+                  <CardContent>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <Avatar
+                        sx={{
+                          bgcolor: 'warning.main',
+                          color: 'warning.contrastText',
+                        }}
                       >
-                        {role.roleName}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {t('SWITCH_ACCOUNT.ROLE_ID_LABEL', {
-                          defaultValue: 'Role ID:',
-                        })}{' '}
-                        {role.roleId}
-                      </Typography>
+                        <Person />
+                      </Avatar>
+                      <Box sx={{ flex: 1 }}>
+                        <Typography
+                          variant="subtitle1"
+                          fontWeight={700}
+                          color={theme.palette.text.primary}
+                        >
+                          {role.roleName}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {t('SWITCH_ACCOUNT.ROLE_ID_LABEL', {
+                            defaultValue: 'Role ID:',
+                          })}{' '}
+                          {role.roleId}
+                        </Typography>
+                      </Box>
+                      {selectedRole?.roleId === role.roleId && (
+                        <CheckCircle color="primary" />
+                      )}
                     </Box>
-                    {selectedRole?.roleId === role.roleId && (
-                      <CheckCircle color="primary" />
-                    )}
-                  </Box>
-                </CardContent>
-              </Card>
-            </Box>
-          ))}
-        </Box>
+                  </CardContent>
+                </Card>
+              </Box>
+            ))}
+          </Box>
+        ) : (
+          <Typography variant="body2" color="error" sx={{ fontWeight: 600 }}>
+            {t('COMMON.UNAUTHORIZED', {
+              defaultValue: 'You are not authorise to access this site',
+            })}
+          </Typography>
+        )}
       </Box>
     </Box>
   );
