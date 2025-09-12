@@ -22,6 +22,7 @@ import { profileComplitionCheck } from '@learner/utils/API/userService';
 import { getAcademicYear } from '@learner/utils/API/AcademicYearService';
 import { telemetryFactory } from '@shared-lib-v2/DynamicForm/utils/telemetry';
 import { logEvent } from '@learner/utils/googleAnalytics';
+import SwitchAccountDialog from '@shared-lib-v2/SwitchAccount/SwitchAccount';
 
 interface SSOAuthParams {
   accessToken: string;
@@ -153,6 +154,13 @@ const SSOContent = () => {
     handleSSOCallback();
   }, [searchParams.toString()]); // Use toString() to stabilize the dependency
 
+  const [switchDialogOpen, setSwitchDialogOpen] = useState(false);
+  const [userResponse, setUserResponse] = useState<any>(null);
+  const [tenantId, setTenantId] = useState<string>('');
+  const [tenantName, setTenantName] = useState<string>('');
+  const [roleId, setRoleId] = useState<string>('');
+  const [roleName, setRoleName] = useState<string>('');
+
   const handleSuccessfulLogin = async (
     response: any,
     data: { remember: boolean },
@@ -167,89 +175,104 @@ const SSOContent = () => {
         : localStorage.removeItem('refreshToken');
 
       const userResponse = await getUserId();
+      setUserResponse(userResponse);
 
-      if (userResponse) {
-        if (userResponse?.tenantData?.[0]?.roleName === 'Learner') {
-          localStorage.setItem('userId', userResponse?.userId);
-          localStorage.setItem(
-            'templtateId',
-            userResponse?.tenantData?.[0]?.templateId
-          );
-          localStorage.setItem('userIdName', userResponse?.username);
-          localStorage.setItem('firstName', userResponse?.firstName || '');
+      setSwitchDialogOpen(true);
+    }
+  };
 
-          const tenantId = userResponse?.tenantData?.[0]?.tenantId;
-          const tenantName = userResponse?.tenantData?.[0]?.tenantName;
-          const uiConfig = userResponse?.tenantData?.[0]?.params?.uiConfig;
+  const callBackSwitchDialog = async (
+    tenantId: string,
+    tenantName: string,
+    roleId: string,
+    roleName: string
+  ) => {
+    setSwitchDialogOpen(false);
 
-          localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
+    // Set the state values
+    setTenantId(tenantId);
+    setTenantName(tenantName);
+    setRoleId(roleId);
+    setRoleName(roleName);
 
-          localStorage.setItem('tenantId', tenantId);
-          localStorage.setItem('userProgram', tenantName);
-          await profileComplitionCheck();
-          if (tenantName === TenantName.YOUTHNET) {
-            const academicYearResponse = await getAcademicYear();
-            if (academicYearResponse[0]?.id) {
-              localStorage.setItem(
-                'academicYearId',
-                academicYearResponse[0]?.id
-              );
-            }
+    // const userResponse = await getUserId();
+
+    if (userResponse) {
+      const token =
+        typeof window !== 'undefined' && window.localStorage
+          ? localStorage.getItem('token')
+          : '';
+      if (roleName === 'Learner') {
+        const tenantData = userResponse?.tenantData?.find(
+          (tenant: any) => tenant.tenantId === tenantId
+        );
+        localStorage.setItem('userId', userResponse?.userId);
+        localStorage.setItem('templtateId', tenantData.templateId);
+        localStorage.setItem('userIdName', userResponse?.username);
+        localStorage.setItem('firstName', userResponse?.firstName || '');
+
+        const uiConfig = tenantData?.params?.uiConfig;
+
+        localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
+
+        localStorage.setItem('tenantId', tenantId);
+        localStorage.setItem('userProgram', tenantName);
+        await profileComplitionCheck();
+        if (tenantName === TenantName.YOUTHNET) {
+          const academicYearResponse = await getAcademicYear();
+          if (academicYearResponse[0]?.id) {
+            localStorage.setItem('academicYearId', academicYearResponse[0]?.id);
           }
-          const telemetryInteract = {
-            context: { env: 'sign-in', cdata: [] },
-            edata: {
-              id: 'sso-login-success',
-              type: 'CLICK',
-              pageid: 'sign-in',
-              uid: userResponse?.userId || 'Anonymous',
-            },
-          };
-          telemetryFactory.interact(telemetryInteract);
-
-          const channelId = userResponse?.tenantData?.[0]?.channelId;
-          localStorage.setItem('channelId', channelId);
-
-          const collectionFramework =
-            userResponse?.tenantData?.[0]?.collectionFramework;
-          localStorage.setItem('collectionFramework', collectionFramework);
-
-          document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
-          const query = new URLSearchParams(window.location.search);
-          const redirectUrl = query.get('redirectUrl');
-          const activeLink = query.get('activeLink');
-          if (redirectUrl && redirectUrl.startsWith('/')) {
-            router.push(
-              `${redirectUrl}${activeLink ? `?activeLink=${activeLink}` : ''}`
-            );
-          }
-          logEvent({
-            action: 'successfully-login-in-learner-app-sso',
-            category: 'SSO ERP',
-            label: 'Login Button Clicked',
-          });
-          if (tenantName === TenantName.YOUTHNET) {
-            router.push('/content');
-          } else if (tenantName === TenantName.CAMP_TO_CLUB) {
-            router.push('/courses-contents');
-          } else if (tenantName === TenantName.PRAGYANPATH) {
-            router.push('/courses-contents');
-          }
-        } else {
-          showToastMessage(
-            'Authentication failed - invalid user role',
-            'error'
-          );
-          const telemetryInteract = {
-            context: { env: 'sign-in', cdata: [] },
-            edata: {
-              id: 'login-failed',
-              type: 'CLICK',
-              pageid: 'sign-in',
-            },
-          };
-          telemetryFactory.interact(telemetryInteract);
         }
+        const telemetryInteract = {
+          context: { env: 'sign-in', cdata: [] },
+          edata: {
+            id: 'sso-login-success',
+            type: 'CLICK',
+            pageid: 'sign-in',
+            uid: userResponse?.userId || 'Anonymous',
+          },
+        };
+        telemetryFactory.interact(telemetryInteract);
+
+        const channelId = tenantData.channelId;
+        localStorage.setItem('channelId', channelId);
+
+        const collectionFramework = tenantData?.collectionFramework;
+        localStorage.setItem('collectionFramework', collectionFramework);
+
+        document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
+        const query = new URLSearchParams(window.location.search);
+        const redirectUrl = query.get('redirectUrl');
+        const activeLink = query.get('activeLink');
+        if (redirectUrl && redirectUrl.startsWith('/')) {
+          router.push(
+            `${redirectUrl}${activeLink ? `?activeLink=${activeLink}` : ''}`
+          );
+        }
+        logEvent({
+          action: 'successfully-login-in-learner-app-sso',
+          category: 'SSO ERP',
+          label: 'Login Button Clicked',
+        });
+        if (tenantName === TenantName.YOUTHNET) {
+          router.push('/content');
+        } else if (tenantName === TenantName.CAMP_TO_CLUB) {
+          router.push('/courses-contents');
+        } else if (tenantName === TenantName.PRAGYANPATH) {
+          router.push('/courses-contents');
+        }
+      } else {
+        showToastMessage('Authentication failed - invalid user role', 'error');
+        const telemetryInteract = {
+          context: { env: 'sign-in', cdata: [] },
+          edata: {
+            id: 'login-failed',
+            type: 'CLICK',
+            pageid: 'sign-in',
+          },
+        };
+        telemetryFactory.interact(telemetryInteract);
       }
     }
   };
@@ -397,34 +420,42 @@ const SSOContent = () => {
           </CardContent>
         </Card>
       </Container>
+      <SwitchAccountDialog
+        open={switchDialogOpen}
+        onClose={() => setSwitchDialogOpen(false)}
+        callbackFunction={callBackSwitchDialog}
+        authResponse={userResponse?.tenantData}
+      />
     </Box>
   );
 };
 
 const SSOPage = () => {
   return (
-    <Suspense fallback={
-      <Box
-        sx={{
-          minHeight: '100vh',
-          background: 'linear-gradient(135deg, #FFFDF6, #F8EFDA)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <CircularProgress
-          size={60}
-          thickness={4}
+    <Suspense
+      fallback={
+        <Box
           sx={{
-            color: '#FDBE16',
-            '& .MuiCircularProgress-circle': {
-              strokeLinecap: 'round',
-            },
+            minHeight: '100vh',
+            background: 'linear-gradient(135deg, #FFFDF6, #F8EFDA)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
-        />
-      </Box>
-    }>
+        >
+          <CircularProgress
+            size={60}
+            thickness={4}
+            sx={{
+              color: '#FDBE16',
+              '& .MuiCircularProgress-circle': {
+                strokeLinecap: 'round',
+              },
+            }}
+          />
+        </Box>
+      }
+    >
       <SSOContent />
     </Suspense>
   );

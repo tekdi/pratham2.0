@@ -150,7 +150,7 @@ export const MENU_CONFIG = {
       subMenu: [
         {
           title: 'SIDEBAR.MENTOR_LEADER',
-          link: '/mentor-leader',
+          link: '/central-head',
           roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
         {
