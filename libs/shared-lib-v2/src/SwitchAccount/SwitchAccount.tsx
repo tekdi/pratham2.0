@@ -444,7 +444,7 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
             color={theme.palette.text.primary}
             mt={2}
           >
-            {t('SWITCH_ACCOUNT.TITLE', { defaultValue: 'Switch Account' })}
+            {t('SWITCH_ACCOUNT.TITLE', { defaultValue: 'Select Account' })}
           </Typography>
         </Box>
         <Stepper
