@@ -95,6 +95,7 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [loading, setLoading] = useState(false);
 
+
   const host = useMemo(() => {
     if (typeof window !== 'undefined') {
       return window.location.host;
@@ -103,18 +104,88 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
   }, []);
 
   const allowedRoleIds = useMemo(() => {
-    const allowed = (switchAccountConfig as any)?.[host];
-    return Array.isArray(allowed) ? (allowed as string[]) : [];
+    const config = switchAccountConfig as any;
+    const candidates: string[] = [];
+    if (host) {
+      const noPort = host.split(':')[0];
+      candidates.push(host);
+      // try without port
+      if (noPort && noPort !== host) candidates.push(noPort);
+      // try stripping/adding www
+      const stripWww = (h: string) => (h.startsWith('www.') ? h.slice(4) : h);
+      const addWww = (h: string) => (h.startsWith('www.') ? h : `www.${h}`);
+      candidates.push(stripWww(host));
+      candidates.push(addWww(host));
+      if (noPort) {
+        candidates.push(stripWww(noPort));
+        candidates.push(addWww(noPort));
+      }
+    }
+
+    let matchedHost: string | undefined;
+    let resolved: string[] | undefined;
+    for (const key of candidates) {
+      const val = config?.[key];
+      if (Array.isArray(val) && val.length) {
+        matchedHost = key;
+        resolved = val as string[];
+        break;
+      }
+    }
+
+    // console.log('SwitchAccount host resolution', {
+    //   host,
+    //   candidates,
+    //   matchedHost: matchedHost ?? null,
+    //   allowedRoleIds: resolved ?? null,
+    // });
+
+    // If no mapping found, return undefined to signal no filtering
+    return resolved as unknown as string[] | undefined;
   }, [host]);
 
   const visibleTenants: TenantData[] = useMemo(() => {
     const tenants = authResponse ?? [];
-    return tenants.map((tenant) => ({
-      ...tenant,
-      roles: (tenant?.roles ?? []).filter((r) =>
-        allowedRoleIds.includes(r.roleId)
-      ),
-    }));
+    // If no host mapping found, do not filter roles
+    if (
+      !allowedRoleIds ||
+      (Array.isArray(allowedRoleIds) && allowedRoleIds.length === 0)
+    ) {
+      console.log('SwitchAccount role filter', {
+        note: 'No host mapping found, using backend roles as-is',
+        host,
+        tenants: tenants.map((t) => ({
+          tenantId: t.tenantId,
+          tenantName: t.tenantName,
+          inputRoles: (t.roles ?? []).map((r) => r.roleId),
+        })),
+      });
+      return tenants;
+    }
+
+    const filteredTenants = tenants.map((tenant) => {
+      const inputRoles = tenant?.roles ?? [];
+      const filteredRoles = inputRoles.filter((r) =>
+        (allowedRoleIds as string[]).includes(r.roleId)
+      );
+      return {
+        ...tenant,
+        roles: filteredRoles,
+      };
+    });
+
+    console.log('SwitchAccount role filter', {
+      allowedRoleIds,
+      host,
+      tenants: tenants.map((t, idx) => ({
+        tenantId: t.tenantId,
+        tenantName: t.tenantName,
+        inputRoles: (t.roles ?? []).map((r) => r.roleId),
+        filteredRoles: (filteredTenants[idx].roles ?? []).map((r) => r.roleId),
+      })),
+    });
+
+    return filteredTenants;
   }, [authResponse, allowedRoleIds]);
 
   useEffect(() => {
