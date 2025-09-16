@@ -308,6 +308,10 @@ const LoginPage = () => {
         const tenantId = tenantData?.tenantId;
         const tenantName = tenantData?.tenantName;
         const uiConfig = tenantData?.params?.uiConfig;
+        console.log('uiConfig', uiConfig);
+        const landingPage = tenantData?.params?.uiConfig?.landingPage;
+        localStorage.setItem('landingPage', landingPage);
+
 
         localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
 
@@ -351,13 +355,14 @@ const LoginPage = () => {
             `${redirectUrl}${activeLink ? `?activeLink=${activeLink}` : ''}`
           );
         } else {
-          if (tenantName === TenantName.YOUTHNET) {
-            router.push('/content');
-          } else if (tenantName === TenantName.CAMP_TO_CLUB) {
-            router.push('/courses-contents');
-          } else if (tenantName === TenantName.PRAGYANPATH) {
-            router.push('/courses-contents');
-          }
+          // if (tenantName === TenantName.YOUTHNET) {
+          //   router.push('/content');
+          // } else if (tenantName === TenantName.CAMP_TO_CLUB) {
+          //   router.push('/courses-contents');
+          // } else if (tenantName === TenantName.PRAGYANPATH) {
+          //   router.push('/courses-contents');
+          // }
+          router.push(landingPage);
         }
       } else {
         showToastMessage('Username or password not correct', 'error');

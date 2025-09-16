@@ -188,7 +188,11 @@
       "CANCEL": "Cancel",
       "OK": "OK",
       "INPROGRESS": "In-Progress",
-      "LOADING": "Loading.."
+      "LOADING": "Loading..",
+      "SKILLING_CENTERS": "Skilling Centers",
+      "HOME": "Home",
+      "KNOWLEDGE_BANK": "Knowledge Bank"
+
     },
     "COURSE": {
       "COMPLETED_ON": "Completed on",

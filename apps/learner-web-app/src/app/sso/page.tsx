@@ -127,8 +127,13 @@ const SSOContent = () => {
 
           // Redirect after brief success display
           setTimeout(() => {
-            router.push('/content');
-          }, 1500);
+            const landingPage = localStorage.getItem('landingPage') || '';
+
+            if (landingPage) {
+              router.push(landingPage);
+            } else {
+              router.push('/content');
+            }          }, 1500);
         } else {
           throw new Error(response?.data?.message || 'Authentication failed');
         }
@@ -175,6 +180,16 @@ const SSOContent = () => {
         : localStorage.removeItem('refreshToken');
 
       const userResponse = await getUserId();
+      console.log('userResponse', userResponse);
+      localStorage.setItem('userId', userResponse?.userId);
+      const uiConfig = userResponse?.tenantData[0]?.params?.uiConfig;
+      console.log('uiConfig', uiConfig);
+      const landingPage = userResponse?.tenantData[0]?.params?.uiConfig?.landingPage;
+      localStorage.setItem('landingPage', landingPage);
+
+
+      localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
+
       setUserResponse(userResponse);
 
       setSwitchDialogOpen(true);
@@ -255,12 +270,19 @@ const SSOContent = () => {
           category: 'SSO ERP',
           label: 'Login Button Clicked',
         });
-        if (tenantName === TenantName.YOUTHNET) {
+        // if (tenantName === TenantName.YOUTHNET) {
+        //   router.push('/content');
+        // } else if (tenantName === TenantName.CAMP_TO_CLUB) {
+        //   router.push('/courses-contents');
+        // } else if (tenantName === TenantName.PRAGYANPATH) {
+        //   router.push('/courses-contents');
+        // }
+        const landingPage = localStorage.getItem('landingPage') || '';
+
+        if (landingPage) {
+          router.push(landingPage);
+        } else {
           router.push('/content');
-        } else if (tenantName === TenantName.CAMP_TO_CLUB) {
-          router.push('/courses-contents');
-        } else if (tenantName === TenantName.PRAGYANPATH) {
-          router.push('/courses-contents');
         }
       } else {
         showToastMessage('Authentication failed - invalid user role', 'error');
