@@ -94,6 +94,7 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
   const [selectedTenant, setSelectedTenant] = useState<TenantData | null>(null);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isLanguageReady, setIsLanguageReady] = useState(true);
 
   const host = useMemo(() => {
     if (typeof window !== 'undefined') {
@@ -218,12 +219,44 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
   }, [authResponse, allowedRoleIds]);
 
   useEffect(() => {
-    if (open) {
-      setActiveStep(0);
-      setSelectedTenant(null);
-      setSelectedRole(null);
+    if (!open) return;
+
+    setActiveStep(0);
+    setSelectedTenant(null);
+    setSelectedRole(null);
+
+    // Immediate language sync on dialog open to avoid late reflection
+    if (typeof window !== 'undefined') {
+      try {
+        const preferred =
+          localStorage.getItem('preferredLanguage') ||
+          localStorage.getItem('lang');
+        if (preferred && preferred !== language) {
+          setIsLanguageReady(false);
+          setLanguage(preferred);
+        } else {
+          setIsLanguageReady(true);
+        }
+      } catch (e) {
+        setIsLanguageReady(true);
+      }
     }
   }, [open]);
+
+  // Mark language ready as soon as current language matches preferred (if any)
+  useEffect(() => {
+    if (!open || typeof window === 'undefined') return;
+    try {
+      const preferred =
+        localStorage.getItem('preferredLanguage') ||
+        localStorage.getItem('lang');
+      if (!preferred || preferred === language) {
+        setIsLanguageReady(true);
+      }
+    } catch (e) {
+      setIsLanguageReady(true);
+    }
+  }, [language, open]);
 
   // Live-sync language while dialog is open (same-tab changes)
   useEffect(() => {
@@ -556,66 +589,85 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
         },
       }}
     >
-      <DialogTitle sx={{ pb: 1 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Person color="primary" />
-          <Typography
-            variant="h1"
-            fontWeight={700}
-            color={theme.palette.text.primary}
-            mt={2}
-          >
-            {t('SWITCH_ACCOUNT.TITLE', { defaultValue: 'Select Account' })}
-          </Typography>
-        </Box>
-        <Stepper
-          activeStep={activeStep}
+      {!isLanguageReady ? (
+        <Box
           sx={{
-            mt: 2,
-            '.MuiStepLabel-label': { fontWeight: 600, fontSize: '1.25rem' },
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: {
+              xs: 'calc(100vh - 16px)',
+              sm: 'calc(100vh - 32px)',
+              md: 'calc(100vh - 48px)',
+            },
           }}
         >
-          {steps.map((label) => (
-            <Step key={label}>
-              <StepLabel>{label}</StepLabel>
-            </Step>
-          ))}
-        </Stepper>
-      </DialogTitle>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <Box key={language}>
+          <DialogTitle sx={{ pb: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Person color="primary" />
+              <Typography
+                variant="h1"
+                fontWeight={700}
+                color={theme.palette.text.primary}
+                mt={2}
+              >
+                {t('SWITCH_ACCOUNT.TITLE', { defaultValue: 'Select Account' })}
+              </Typography>
+            </Box>
+            <Stepper
+              activeStep={activeStep}
+              sx={{
+                mt: 2,
+                '.MuiStepLabel-label': { fontWeight: 600, fontSize: '1.25rem' },
+              }}
+            >
+              {steps.map((label) => (
+                <Step key={label}>
+                  <StepLabel>{label}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+          </DialogTitle>
 
-      <Divider />
+          <Divider />
 
-      <DialogContent sx={{ py: 3 }}>
-        {activeStep === 0 && renderTenantSelection()}
-        {activeStep === 1 && renderRoleSelection()}
-      </DialogContent>
+          <DialogContent sx={{ py: 3 }}>
+            {activeStep === 0 && renderTenantSelection()}
+            {activeStep === 1 && renderRoleSelection()}
+          </DialogContent>
 
-      <Divider />
+          <Divider />
 
-      <DialogActions sx={{ p: 2, gap: 1.5 }}>
-        {activeStep === 1 && (
-          <Button
-            onClick={handleBack}
-            color="inherit"
-            startIcon={<ArrowBack />}
-          >
-            {t('COMMON.BACK', { defaultValue: 'Back' })}
-          </Button>
-        )}
-        <Button onClick={onClose} color="inherit">
-          {t('COMMON.CANCEL', { defaultValue: 'Cancel' })}
-        </Button>
-        <Button
-          onClick={handleConfirm}
-          variant="contained"
-          size="large"
-          disabled={!selectedTenant || !selectedRole}
-        >
-          {t('SWITCH_ACCOUNT.CONFIRM_SELECTION', {
-            defaultValue: 'Confirm Selection',
-          })}
-        </Button>
-      </DialogActions>
+          <DialogActions sx={{ p: 2, gap: 1.5 }}>
+            {activeStep === 1 && (
+              <Button
+                onClick={handleBack}
+                color="inherit"
+                startIcon={<ArrowBack />}
+              >
+                {t('COMMON.BACK', { defaultValue: 'Back' })}
+              </Button>
+            )}
+            <Button onClick={onClose} color="inherit">
+              {t('COMMON.CANCEL', { defaultValue: 'Cancel' })}
+            </Button>
+            <Button
+              onClick={handleConfirm}
+              variant="contained"
+              size="large"
+              disabled={!selectedTenant || !selectedRole}
+            >
+              {t('SWITCH_ACCOUNT.CONFIRM_SELECTION', {
+                defaultValue: 'Confirm Selection',
+              })}
+            </Button>
+          </DialogActions>
+        </Box>
+      )}
     </Dialog>
   );
 };
