@@ -88,13 +88,12 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
   callbackFunction,
   authResponse,
 }) => {
-  const { t } = useTranslation();
+  const { t, language, setLanguage } = useTranslation();
   const theme = useTheme();
   const [activeStep, setActiveStep] = useState(0);
   const [selectedTenant, setSelectedTenant] = useState<TenantData | null>(null);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [loading, setLoading] = useState(false);
-
 
   const host = useMemo(() => {
     if (typeof window !== 'undefined') {
@@ -143,6 +142,36 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
     // If no mapping found, return undefined to signal no filtering
     return resolved as unknown as string[] | undefined;
   }, [host]);
+
+  // Sync component's language with apps that use `preferredLanguage` key
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const syncLanguageFromStorage = () => {
+      try {
+        const preferred =
+          localStorage.getItem('preferredLanguage') ||
+          localStorage.getItem('lang');
+        if (preferred && preferred !== language) {
+          setLanguage(preferred);
+        }
+      } catch (e) {
+        // no-op
+      }
+    };
+
+    // Initial sync on mount
+    syncLanguageFromStorage();
+
+    // React to language changes in other tabs/windows
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'preferredLanguage' || e.key === 'lang') {
+        syncLanguageFromStorage();
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, [language, setLanguage]);
 
   const visibleTenants: TenantData[] = useMemo(() => {
     const tenants = authResponse ?? [];
@@ -195,6 +224,27 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
       setSelectedRole(null);
     }
   }, [open]);
+
+  // Live-sync language while dialog is open (same-tab changes)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!open) return;
+
+    const intervalId = window.setInterval(() => {
+      try {
+        const preferred =
+          localStorage.getItem('preferredLanguage') ||
+          localStorage.getItem('lang');
+        if (preferred && preferred !== language) {
+          setLanguage(preferred);
+        }
+      } catch (e) {
+        // no-op
+      }
+    }, 500);
+
+    return () => window.clearInterval(intervalId);
+  }, [open, language, setLanguage]);
 
   // Auto-select or bypass based on tenant/role counts (uses filtered roles)
   useEffect(() => {
