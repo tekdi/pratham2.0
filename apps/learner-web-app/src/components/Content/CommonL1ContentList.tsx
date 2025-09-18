@@ -164,9 +164,8 @@ const MyComponent: React.FC = () => {
           {filter && (
             <CommonLearnerCourse
               title={
-                localStorage.getItem('userProgram') === TenantName.CAMP_TO_CLUB
-                  ? 'LEARNER_APP.COURSE.GET_STARTED_CLUB_COURSES'
-                  : 'LEARNER_APP.COURSE.GET_STARTED'
+                'LEARNER_APP.COURSE.EXPLORE_MORE_COURSES'
+                  
               }
               _content={{
                 pageName: 'L1_Content',

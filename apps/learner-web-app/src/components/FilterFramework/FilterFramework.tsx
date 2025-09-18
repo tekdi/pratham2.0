@@ -16,6 +16,7 @@ import {
   Paper,
   useTheme
 } from '@mui/material';
+import StaticFilterFields from '../staticFilterFields/StaticFilterFields';
 
 interface FilterFrameworkProps {
   framework: string;
@@ -66,29 +67,36 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
   const [frameworkData, setFrameworkData] = useState<any>(null);
   const [categories, setCategories] = useState<FilterCategory[]>([]);
   const [selectedFilters, setSelectedFilters] = useState<FilterState>({});
+  const [staticFilters, setStaticFilters] = useState<Record<string, string[]>>({});
   const [collapseState, setCollapseState] = useState<CollapseState>({});
   const [showMoreState, setShowMoreState] = useState<ShowMoreState>({});
   const [dependencyMap, setDependencyMap] = useState<DependencyMap>({});
+  const [clearTrigger, setClearTrigger] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const theme = useTheme();
 
   const ITEMS_TO_SHOW = 3; // Number of items to show initially
   
-  // Calculate filter count
-  const filterCount = Object.keys(selectedFilters).filter(categoryCode => 
+  // Calculate filter count (including static filters)
+  const frameworkFilterCount = Object.keys(selectedFilters).filter(categoryCode => 
     selectedFilters[categoryCode] && selectedFilters[categoryCode].length > 0
   ).length;
+  const staticFilterCount = Object.keys(staticFilters).length;
+  const filterCount = frameworkFilterCount + staticFilterCount;
 
   // Clear all filters
   const clearAllFilters = () => {
     setSelectedFilters({});
+    setStaticFilters({});
+    setClearTrigger(prev => prev + 1); // Trigger clear in static filters
     onFiltersChange?.({});
   };
   
   // Transform filters for callback - convert keys and values to desired format
-  const transformFiltersForCallback = (filters: FilterState): Record<string, string[]> => {
+  const transformFiltersForCallback = (filters: FilterState, staticFiltersData: Record<string, string[]> = {}): Record<string, string[]> => {
     const transformedFilters: Record<string, string[]> = {};
     
+    // Transform framework filters
     Object.keys(filters).forEach(categoryCode => {
       const selectedTermCodes = filters[categoryCode];
       if (selectedTermCodes && selectedTermCodes.length > 0) {
@@ -107,8 +115,23 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
         }
       }
     });
+
+    // Add static filters directly (they're already in the correct format)
+    Object.keys(staticFiltersData).forEach(key => {
+      if (staticFiltersData[key] && staticFiltersData[key].length > 0) {
+        transformedFilters[key] = staticFiltersData[key];
+      }
+    });
     
     return transformedFilters;
+  };
+
+  // Handle static filter changes
+  const handleStaticFiltersChange = (newStaticFilters: Record<string, string[]>) => {
+    setStaticFilters(newStaticFilters);
+    // Call the callback with merged filters
+    const mergedFilters = transformFiltersForCallback(selectedFilters, newStaticFilters);
+    onFiltersChange?.(mergedFilters);
   };
 
   useEffect(() => {
@@ -302,10 +325,12 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
       // Clear dependent categories when parent selection changes
       clearDependentFilters(newFilters, categoryCode);
 
-      // Call the callback if provided
-      onFiltersChange?.(transformFiltersForCallback(newFilters));
+      // Call the callback if provided (merge with static filters)
+      const mergedFilters = transformFiltersForCallback(newFilters, staticFilters);
+      onFiltersChange?.(mergedFilters);
       console.log('newFilters', newFilters);
-      console.log('transformedFilters', transformFiltersForCallback(newFilters));
+      console.log('staticFilters', staticFilters);
+      console.log('mergedTransformedFilters', mergedFilters);
       
       return newFilters;
     });
@@ -680,7 +705,20 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
 
       {/* Filter Content */}
       <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
+      <StaticFilterFields 
+          onFiltersChange={handleStaticFiltersChange} 
+          showHeader={false} 
+          clearTrigger={clearTrigger}
+        />
         {categories.map(renderFilterSection)}
+        
+        {/* Divider */}
+        {categories.length > 0 && (
+          <Box sx={{ borderTop: '1px solid #E0E0E0', my: 2 }} />
+        )}
+        
+        {/* Static Filter Fields */}
+       
       </Box>
     </Box>
   );

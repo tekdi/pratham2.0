@@ -1,6 +1,7 @@
 import React from 'react';
 import HomeCoursesClient from './HomeCoursesClient';
 import dynamic from 'next/dynamic';
+ import StaticFilterFields from '@learner/components/staticFilterFields/StaticFilterFields';
 
 
 const title = 'Welcome to Pratham Learning Platform';
@@ -32,7 +33,7 @@ const L1ContentList = dynamic(
 const App = () => {
   return (
     <>
-     <L1ContentList />;
+      <L1ContentList />
     </>
   );
 };
