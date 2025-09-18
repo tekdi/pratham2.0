@@ -25,12 +25,22 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: { xs: '90vw', sm: '85vw', md: '80vw', lg: 900 },
-  maxHeight: '90vh',
+  width: { 
+    xs: '95vw', 
+    sm: '90vw', 
+    md: '85vw', 
+    lg: '100vw',
+    '@media (orientation: landscape)': '100vw'
+  },
+  height: {
+    xs: '90vh',
+    '@media (orientation: landscape)': '95vh'
+  },
+  maxHeight: '95vh',
   bgcolor: 'background.paper',
-  borderRadius: 2,
+  borderRadius: { xs: 2, '@media (orientation: landscape)': 0 },
   boxShadow: 24,
-  p: { xs: 2, sm: 3 },
+  p: { xs: 2, sm: 3, '@media (orientation: landscape)': 1 },
   display: 'flex',
   flexDirection: 'column',
 };
@@ -80,31 +90,141 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
   }, [certificateId]);
 
   useEffect(() => {
-    const userAgent = navigator.userAgent.toLowerCase();
+    const detectDeviceType = () => {
+      const userAgent = navigator.userAgent.toLowerCase();
+      const isMobileUserAgent = /mobile|android|touch|webos|iphone|ipad|ipod/i.test(userAgent);
+      const isMobileScreen = window.innerWidth <= 768;
+      
+      // Consider both user agent and screen size for better detection
+      if (isMobileUserAgent || isMobileScreen) {
+        setDeviceType('mobile');
+      } else {
+        setDeviceType('desktop');
+      }
+    };
 
-    // Check for mobile or tablet in the userAgent string
-    if (/mobile|android|touch|webos|iphone|ipad|ipod/i.test(userAgent)) {
-      setDeviceType('mobile');
-    } else {
-      setDeviceType('desktop');
-    }
+    // Initial detection
+    detectDeviceType();
+
+    // Add listeners for resize and orientation change
+    const handleResize = () => {
+      detectDeviceType();
+    };
+
+    const handleOrientationChange = () => {
+      // Small delay to ensure dimensions are updated after orientation change
+      setTimeout(detectDeviceType, 100);
+    };
+
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleOrientationChange);
+
+    // Cleanup listeners
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleOrientationChange);
+    };
   }, []);
 
   const CertificatePage: React.FC<{ htmlContent: string }> = ({
     htmlContent,
   }) => {
-    const encodedHtml = encodeURIComponent(htmlContent);
+    // Different behavior for mobile vs desktop
+    const responsiveHtml = deviceType === 'mobile' ? `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=1024, initial-scale=0.5, maximum-scale=2.0, user-scalable=yes">
+          <style>
+            body {
+              margin: 0;
+              padding: 20px;
+              font-family: Arial, sans-serif;
+              min-width: 800px;
+              width: 100%;
+              box-sizing: border-box;
+              background: white;
+            }
+            * {
+              box-sizing: border-box;
+            }
+            
+            /* Force desktop-like layout for mobile */
+            body {
+              min-width: 800px;
+              transform-origin: top left;
+              zoom: 0.8;
+            }
+            
+            /* Ensure certificate content is centered and properly sized */
+            div[style*="font-family"], 
+            .certificate-container {
+              max-width: 100%;
+              margin: 0 auto;
+            }
+          </style>
+          <script>
+            window.addEventListener('load', function() {
+              // Auto-adjust scale for mobile devices
+              const scale = Math.min(window.innerWidth / 850, 1);
+              document.body.style.transform = 'scale(' + scale + ')';
+              document.body.style.transformOrigin = 'top left';
+              document.body.style.width = (100 / scale) + '%';
+            });
+          </script>
+        </head>
+        <body>
+          ${htmlContent}
+        </body>
+      </html>
+    ` : `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body {
+              margin: 0;
+              padding: 20px;
+              font-family: Arial, sans-serif;
+              width: 100%;
+              box-sizing: border-box;
+              background: white;
+            }
+            * {
+              box-sizing: border-box;
+            }
+          </style>
+        </head>
+        <body>
+          ${htmlContent}
+        </body>
+      </html>
+    `;
+    
+    const encodedHtml = encodeURIComponent(responsiveHtml);
     const dataUri = `data:text/html;charset=utf-8,${encodedHtml}`;
     setCertificateSite(dataUri);
+    
     return (
-      <Box sx={{ width: '100%', height: '100%', display: 'flex' }}>
+      <Box sx={{ 
+        width: '100%', 
+        height: '100%', 
+        display: 'flex',
+        overflow: deviceType === 'mobile' ? 'auto' : 'hidden'
+      }}>
         <iframe
+          key={deviceType}
           src={dataUri}
           style={{
             width: '100%',
-            height: '1200px',
-            // minHeight: '800px',
+            height: deviceType === 'mobile' ? '1000px' : 
+                   (window.innerHeight > window.innerWidth ? '1200px' : '80vh'),
+            minHeight: '600px',
             border: 'none',
+            backgroundColor: 'white'
           }}
         />
       </Box>
@@ -344,7 +464,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
             alignItems="center"
             mb={2}
           >
-            <Typography variant="h6">Certificate</Typography>
+            <Typography variant="h2">Certificate</Typography>
             <Stack direction="row" spacing={1}>
               <Tooltip title="Download">
                 <IconButton onClick={onDownloadCertificate}>
@@ -366,8 +486,15 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
             </Stack>
           </Stack>
 
-          <Box sx={{ maxHeight: '80vh', overflowY: 'auto' }}>
-            <CertificatePage htmlContent={certificateHtml} />
+          <Box sx={{ 
+            maxHeight: { xs: '80vh', '@media (orientation: landscape)': '85vh' }, 
+            overflowY: 'auto',
+            flex: 1
+          }}>
+            <CertificatePage 
+              key={`${deviceType}-${certificateId}`}
+              htmlContent={certificateHtml} 
+            />
           </Box>
         </Box>
       </Modal>
