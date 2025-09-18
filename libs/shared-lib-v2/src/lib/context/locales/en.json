@@ -154,7 +154,7 @@
     }
   },
   "SWITCH_ACCOUNT": {
-    "TITLE": "Switch Account",
+    "TITLE": "Select Account",
     "STEP_SELECT_TENANT": "Select Tenant",
     "STEP_SELECT_ROLE": "Select Role",
     "SELECT_YOUR_ORGANIZATION": "Select Your Organization",

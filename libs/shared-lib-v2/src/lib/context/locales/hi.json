@@ -114,6 +114,17 @@
       "not_started": "शुरू नहीं हुआ"
     }
   },
+  "SWITCH_ACCOUNT": {
+    "TITLE": "खाता चुनें",
+    "STEP_SELECT_TENANT": "टेनेंट चुनें",
+    "STEP_SELECT_ROLE": "भूमिका चुनें",
+    "SELECT_YOUR_ORGANIZATION": "अपना संगठन चुनें",
+    "CHOOSE_ORGANIZATION_SUBTEXT": "वह संगठन चुनें जिसे आप एक्सेस करना चाहते हैं",
+    "SELECT_ROLE_FOR": "भूमिका चुनें -",
+    "CHOOSE_ROLE_SUBTEXT": "वह भूमिका चुनें जिसे आप एक्सेस करना चाहते हैं",
+    "ROLE_ID_LABEL": "भूमिका आईडी:",
+    "CONFIRM_SELECTION": "चयन की पुष्टि करें"
+  },
   "LEARNER_APP": {
     "COMPLETE_PROFILE_BANNER": {
       "MESSAGE": "अपनी प्रोफ़ाइल पूरी करें ताकि हम आपके सीखने की यात्रा में बेहतर मार्गदर्शन कर सकें",
