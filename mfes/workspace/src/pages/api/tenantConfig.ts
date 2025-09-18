@@ -18,9 +18,9 @@ export const mockData: Record<string, any> = {
     COLLECTION_FRAMEWORK: 'pos-framework',
   },
   '914ca990-9b45-4385-a06b-05054f35d0b9': {
-    CHANNEL_ID: 'pos-channel',
-    CONTENT_FRAMEWORK: 'pos-framework',
-    COLLECTION_FRAMEWORK: 'pos-framework',
+    CHANNEL_ID: 'pragyanpath',
+    CONTENT_FRAMEWORK: 'pragyanpathFw',
+    COLLECTION_FRAMEWORK: 'pragyanpathFw',
   },
   'fd8f3180-9988-495b-8a0d-ed201d7d28df': {
     CHANNEL_ID: 'pos-channel',
