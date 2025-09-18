@@ -56,31 +56,39 @@ const getDynamicNavConfig = ({
       : {};
 
   console.log('storedConfig:', storedConfig);
-  const navbarItems = storedConfig?.navbarItems || {};
+  const navbarItems = storedConfig?.navbarItems || [];
   console.log('navbarItems:', navbarItems);
   const navLinks: NewDrawerItemProp[] = [];
 
   // Check if navbarItems exists and has entries
-  if (!navbarItems || Object.keys(navbarItems).length === 0) {
+  if (!Array.isArray(navbarItems) || navbarItems.length === 0) {
     // Return empty array if no navbar items configured
     return navLinks;
   }
 
-  // Generate navigation items from uiConfig.navbarItems in exact sequence
-  Object.entries(navbarItems).forEach(([title, route]) => {
-    const routePath = route as string;
+  // Sort navigation items by order and generate navigation items
+  const sortedNavItems = [...navbarItems].sort((a, b) => (a.order || 0) - (b.order || 0));
+  
+  sortedNavItems.forEach((item) => {
+    const { key, route, order } = item;
     
-    // Skip if title or route is missing
-    if (!title || !routePath) {
-      console.warn('Skipping navbar item with missing title or route:', { title, route });
+    // Skip if key or route is missing
+    if (!key || !route) {
+      console.warn('Skipping navbar item with missing key or route:', { key, route, order });
       return;
     }
     
-    // Get appropriate icon based on title
+    // Get appropriate icon based on key
     const getIcon = () => {
-      if (title.toLowerCase() === 'courses' || title.toLowerCase().includes('course')) {
+      const keyLower = key.toLowerCase();
+      console.log('keyLower:', keyLower);
+      if (keyLower === 'knowledge_bank') {
+        return <img src="/images/book_5.svg" alt="Knowledge Bank" style={{ width: 28, height: 28 }} />;
+      } else if (keyLower === 'home') {
+        return <Home sx={{ width: 28, height: 28 }} />;
+      } else if (keyLower.includes('course')) {
         return <AssignmentOutlined sx={{ width: 28, height: 28 }} />;
-      } else if (title.toLowerCase() === 'profile') {
+      } else if (keyLower === 'profile') {
         return <AccountCircleOutlined sx={{ width: 28, height: 28 }} />;
       } else {
         return <Home sx={{ width: 28, height: 28 }} />;
@@ -89,22 +97,22 @@ const getDynamicNavConfig = ({
 
     // Get appropriate click handler
     const getClickHandler = () => {
-      if (title.toLowerCase() === 'profile') {
+      if (key.toLowerCase() === 'profile') {
         return isMobile
           ? () => handleNavClick(handleProfileClick)
           : () => setAnchorEl(true);
       } else {
-        return () => handleNavClick(() => router.push(routePath));
+        return () => handleNavClick(() => router.push(route));
       }
     };
 
-    // Add navigation item maintaining exact sequence
+    // Add navigation item maintaining exact sequence by order
     navLinks.push({
-      title: t(`LEARNER_APP.COMMON.${title}`),
+      title: t(`LEARNER_APP.COMMON.${key}`),
       icon: getIcon(),
       to: getClickHandler(),
-      isActive: currentPage === routePath || (title.toLowerCase().includes('course') && currentPage === '/in-progress'),
-      customStyle: getLinkStyle(currentPage === routePath),
+      isActive: currentPage === route || (key.toLowerCase().includes('course') && currentPage === '/in-progress'),
+      customStyle: getLinkStyle(currentPage === route),
     });
   });
 

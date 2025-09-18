@@ -44,7 +44,13 @@ const SUPPORTED_MIME_TYPES = [
   'application/vnd.sunbird.questionset',
 ];
 
-const DEFAULT_TABS = [
+interface TabItem {
+  label: string;
+  type: string;
+  filterKey?: string;
+}
+
+const DEFAULT_TABS: TabItem[] = [
   { label: 'Courses', type: 'Course' },
   { label: 'Content', type: 'Learning Resource' },
   {
@@ -148,7 +154,7 @@ export default function Content(props: Readonly<ContentProps>) {
   const [tabValue, setTabValue] = useState<number>(0);
   console.log('DEFAULT_TABS======>', DEFAULT_TABS);
   
-  const [tabs, setTabs] = useState<typeof DEFAULT_TABS>([]);
+  const [tabs, setTabs] = useState<TabItem[]>([]);
   const [contentData, setContentData] = useState<
     ImportedContentSearchResponse[]
   >([]);
@@ -161,6 +167,7 @@ export default function Content(props: Readonly<ContentProps>) {
       query?: string;
       filters?: object;
       identifier?: string;
+      filterKey?: string;
     }
   >(DEFAULT_FILTERS);
   const [trackData, setTrackData] = useState<TrackDataItem[]>([]);
@@ -185,10 +192,29 @@ export default function Content(props: Readonly<ContentProps>) {
 
   const handleSetFilters = useCallback(
     (updater: any) => {
-      const updated =
-        typeof updater === 'function'
-          ? updater(localFilters)
-          : { ...localFilters, ...updater };
+      console.log('🔄 handleSetFilters called with:', updater);
+      console.log('🔄 Current localFilters:', localFilters);
+      
+      let updated;
+      if (typeof updater === 'function') {
+        updated = updater(localFilters);
+      } else {
+        // Check if this is a tab change (has type and offset 0) - do complete replacement
+        if (updater.type && updater.offset === 0 && updater.hasOwnProperty('filters')) {
+          // Complete replacement for tab changes
+          updated = { 
+            ...DEFAULT_FILTERS, 
+            ...updater,
+            loadOld: false 
+          };
+          console.log('🔄 Complete filter replacement:', updated);
+        } else {
+          // Normal merge for other filter updates (search, load more, etc.)
+          updated = { ...localFilters, ...updater };
+          console.log('🔄 Filter merge:', updated);
+        }
+      }
+      
       setLocalFilters({ ...updated, loadOld: false });
     },
     [localFilters]
@@ -253,25 +279,45 @@ export default function Content(props: Readonly<ContentProps>) {
       setCurrentLimit(dynamicLimit);
 
       // 🎯 First filter tabs based on contentTabs configuration
-      const filteredTabs = DEFAULT_TABS.filter((tab) =>
-        config?.contentTabs?.length
-          ? config.contentTabs.includes(tab.label.toLowerCase())
-          : true
-      );
+      let filteredTabs: TabItem[];
+      if (config?.contentTabs?.length) {
+        // Check if contentTabs contains objects with label and filterKey
+        const firstTab = config.contentTabs[0] as any;
+        if (typeof firstTab === 'object' && firstTab?.label) {
+          // New format: array of objects with label and filterKey
+          filteredTabs = config.contentTabs.map((configTab: any) => ({
+            label: configTab.label,
+            type: configTab.label, // Use label as type for now, can be customized
+            filterKey: configTab.filterKey
+          }));
+        } else {
+          // Old format: array of strings (labels)
+          filteredTabs = DEFAULT_TABS.filter((tab) =>
+            (config.contentTabs as string[]).includes(tab.label.toLowerCase())
+          );
+        }
+      } else {
+        // No configuration, use default tabs
+        filteredTabs = DEFAULT_TABS;
+      }
       
-      // 🔧 Get the correct type based on filtered tabs, not DEFAULT_TABS
-      const getCorrectType = (tabIndex: number) => {
+      // 🔧 Get the correct type and filterKey based on filtered tabs
+      const getCorrectTabData = (tabIndex: number) => {
         // Ensure we don't exceed the filtered tabs array
         const safeIndex = Math.min(tabIndex, filteredTabs.length - 1);
         const selectedTab = filteredTabs[safeIndex];
-        console.log(`🎯 Tab ${tabIndex} → Using type: "${selectedTab?.type}" from tab: "${selectedTab?.label}"`);
-        return selectedTab?.type || filteredTabs[0]?.type || 'Course';
+        console.log(`🎯 Tab ${tabIndex} → Using type: "${selectedTab?.type}" filterKey: "${(selectedTab as any)?.filterKey}" from tab: "${selectedTab?.label}"`);
+        return {
+          type: selectedTab?.type || filteredTabs[0]?.type || 'Course',
+          filterKey: (selectedTab as any)?.filterKey || null
+        };
       };
 
       if (savedFilters) {
         setLocalFilters({
           ...(config?.filters ?? {}),
-          type: getCorrectType(savedTab),
+          type: getCorrectTabData(savedTab).type,
+          filterKey: getCorrectTabData(savedTab).filterKey,
           ...savedFilters,
           loadOld: true,
         });
@@ -279,7 +325,8 @@ export default function Content(props: Readonly<ContentProps>) {
         setLocalFilters((prev) => ({
           ...prev,
           ...(config?.filters ?? {}),
-          type: getCorrectType(savedTab),
+          type: getCorrectTabData(savedTab).type,
+          filterKey: getCorrectTabData(savedTab).filterKey,
           limit: (config?.filters as any)?.limit || dynamicLimit, // Use explicit limit if provided, otherwise dynamic limit
           offset: 0, // Start with offset 0
           loadOld: false,
@@ -325,8 +372,33 @@ export default function Content(props: Readonly<ContentProps>) {
         limit: adjustedLimit
       });
 
+      // Prepare the API call filter with filterKey support
+      const apiFilter = { ...filter };
+      
+      // If filterKey is present, get value from localStorage and add to filters
+      if (filter.filterKey) {
+        const filterValue = localStorage.getItem(filter.filterKey);
+        if (filterValue) {
+          // Parse the localStorage value (could be JSON array, number, etc.)
+          let parsedValue;
+          try {
+            parsedValue = JSON.parse(filterValue);
+          } catch {
+            // If parsing fails, use the original value
+            parsedValue = filterValue;
+          }
+          
+          // Ensure we start with existing filters and add the filterKey value
+          apiFilter.filters = {
+            ...(filter.filters || {}),
+            [filter.filterKey]: parsedValue
+          };
+          console.log('🔑 Adding filterKey to API call:', filter.filterKey, '=', parsedValue);
+        }
+      }
+
       const resultResponse = await CommonContentSearch({
-        ...filter,
+        ...apiFilter,
         offset: adjustedOffset,
         limit: adjustedLimit,
         signal: controller.signal,
@@ -419,29 +491,50 @@ export default function Content(props: Readonly<ContentProps>) {
   // Load content when filters change
   useEffect(() => {
     let isMounted = true;
+    console.log('🔄 useEffect triggered - localFilters changed:', localFilters);
+    
     const fetchData = async () => {
       if (
         !localFilters.type ||
         !localFilters.limit ||
         localFilters.offset === undefined
-      )
+      ) {
+        console.log('⚠️ Skipping fetch - missing required filter data:', {
+          type: localFilters.type,
+          limit: localFilters.limit,
+          offset: localFilters.offset
+        });
         return;
+      }
 
+      console.log('🔄 Starting data fetch with filters:', localFilters);
       setIsLoading(true);
+      
       try {
         const response = await fetchAllContent(localFilters);
-        if (!response || !isMounted) return;
+        if (!response || !isMounted) {
+          console.log('⚠️ Fetch cancelled or component unmounted');
+          return;
+        }
+        
         const newContentData = [
           ...(response.content ?? []),
           ...(response?.QuestionSet ?? []),
         ];
+        
+        console.log('✅ Fetched content data:', newContentData.length, 'items');
+        
         const userTrackData = await fetchDataTrack(newContentData);
-        console.log('userTrackData', userTrackData);
+        console.log('✅ Fetched track data:', userTrackData);
+        
         if (!isMounted) return;
+        
         if (localFilters.offset === 0) {
+          console.log('🔄 Replacing content data (offset=0)');
           setContentData(newContentData);
           setTrackData(userTrackData);
         } else {
+          console.log('🔄 Appending content data (offset>0)');
           setContentData((prev) => [...(prev ?? []), ...newContentData]);
           setTrackData((prev) => [...prev, ...userTrackData]);
         }
@@ -452,13 +545,15 @@ export default function Content(props: Readonly<ContentProps>) {
             : response.count > localFilters.offset + newContentData.length
         );
         setIsLoading(false);
+        console.log('✅ Data fetch completed successfully');
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('❌ Error fetching data:', error);
         // Set empty arrays on error to maintain array type
         if (localFilters.offset === 0) {
           setContentData([]);
           setTrackData([]);
         }
+        setIsLoading(false);
       }
     };
     fetchData();
@@ -516,6 +611,13 @@ export default function Content(props: Readonly<ContentProps>) {
     console.log('📋 Available tabs:', tabs);
     console.log('🎯 Selected tab:', tabs[newValue]);
     console.log('🔍 Setting filter type:', tabs[newValue]?.type);
+    console.log('🔑 Filter key:', tabs[newValue]?.filterKey);
+    
+    // 🧹 IMMEDIATELY clear existing data when switching tabs
+    setContentData([]);
+    setTrackData([]);
+    setTotalCount(0);
+    setHasMoreData(false);
     
     setTabValue(newValue);
 
@@ -524,10 +626,37 @@ export default function Content(props: Readonly<ContentProps>) {
     url.searchParams.set('tab', newValue.toString());
     router.replace(url.pathname + url.search);
 
-    handleSetFilters({
+    // Prepare filter update - start with clean filters
+    const baseFilters = propData?.filters || {};
+    const filterUpdate: any = {
       offset: 0,
       type: tabs[newValue].type,
-    });
+      filterKey: tabs[newValue]?.filterKey || null,
+      filters: { ...baseFilters }, // Start with only base filters from props
+    };
+
+    // If there's a filterKey, get the value from localStorage and add it to filters
+    if (tabs[newValue]?.filterKey) {
+      const filterValue = localStorage.getItem(tabs[newValue].filterKey);
+      if (filterValue) {
+        // Parse the localStorage value (could be JSON array, number, etc.)
+        let parsedValue;
+        try {
+          parsedValue = JSON.parse(filterValue);
+        } catch {
+          // If parsing fails, use the original value
+          parsedValue = filterValue;
+        }
+        
+        // Add the new filterKey value to the clean base filters
+        filterUpdate.filters[tabs[newValue].filterKey] = parsedValue;
+        console.log('🎯 Setting filter:', tabs[newValue].filterKey, '=', parsedValue);
+      }
+    }
+
+    console.log('🔄 Complete filter update:', filterUpdate);
+
+    handleSetFilters(filterUpdate);
   };
 
   const handleCardClickLocal = useCallback(

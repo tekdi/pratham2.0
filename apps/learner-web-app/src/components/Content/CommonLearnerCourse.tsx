@@ -240,45 +240,70 @@ export default memo(function LearnerCourse({
             },
           }}
         >
-          {/* <FilterComponent
-            filterFramework={filterFramework}
-            staticFilter={staticFilter}
-            filterState={filterState}
-            handleFilterChange={handleFilterChange}
-            onlyFields={_content?.onlyFields ?? []}
-            isOpenColapsed={_content?.isOpenColapsed ?? []}
-            _config={{
-              _filterText: { sx: { pt: 2, px: 2 } },
-              _filterBox: { sx: { gap: 0 } },
-              _filterBody: {
-                sx: {
-                  py: 2,
-                  px: 2,
-                  height: 'calc(100vh - 130px)',
-                  overflowY: 'auto',
-                },
-              },
-            }}
-          /> */}
-<FilterFrameworkWrapper
-        framework={getFrameworkFromStorage()} 
-        onFiltersChange={handleFiltersReceived}
-      />          <Box
+          <Box
             sx={{
-              bgcolor: '#f1f1f1',
-              p: 2,
-              position: 'absolute',
-              bottom: 0,
-              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              height: '100vh',
             }}
           >
-            <Button
-              variant="contained"
-              fullWidth
-              onClick={() => setIsOpen(false)}
+            {/* Header */}
+            {/* <Box
+              sx={{
+                p: 2,
+                borderBottom: '1px solid #e0e0e0',
+                bgcolor: '#fff',
+              }}
             >
-              {t('LEARNER_APP.COURSE.DONE')}
-            </Button>
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 600,
+                  fontSize: '18px',
+                  color: '#333',
+                }}
+              >
+                {t('LEARNER_APP.CONTENT.FILTERS')}
+              </Typography>
+            </Box> */}
+            
+            {/* Filter Content */}
+            <Box
+              sx={{
+                flex: 1,
+                py: 2,
+                px: 2,
+                overflowY: 'auto',
+                bgcolor: '#fafafa',
+              }}
+            >
+              <FilterFrameworkWrapper
+                framework={getFrameworkFromStorage()} 
+                onFiltersChange={handleFiltersReceived}
+              />
+            </Box>
+            
+            {/* Done Button */}
+            <Box
+              sx={{
+                bgcolor: '#f1f1f1',
+                p: 2,
+                borderTop: '1px solid #e0e0e0',
+              }}
+            >
+              <Button
+                variant="contained"
+                fullWidth
+                onClick={() => setIsOpen(false)}
+                sx={{
+                  borderRadius: '8px',
+                  py: 1.5,
+                  fontWeight: 600,
+                }}
+              >
+                {t('LEARNER_APP.COURSE.DONE')}
+              </Button>
+            </Box>
           </Box>
         </Drawer>
 

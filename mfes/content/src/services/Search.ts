@@ -218,26 +218,7 @@ export const CommonContentSearch = async ({
           // channel: '0135656861912678406',
           ...filters,
           status: ['live'],
-          primaryCategory: (() => {
-            const lowerType = type?.toLowerCase();
-            console.log('🔍 ContentSearch: Received type =', type);
-            
-            // Handle standard course type
-            if (lowerType === 'course') {
-              console.log('✅ Using Course primaryCategory');
-              return ['Course'];
-            }
-            
-            // Handle custom types - use the type as primaryCategory
-            if (lowerType && !['learning resource', 'content'].includes(lowerType)) {
-              console.log('✅ Using custom primaryCategory =', [type]);
-              return [type]; // Use original case, not lowercase
-            }
-            
-            // Default to Learning Resource for content/learning resource
-            console.log('✅ Using Learning Resource primaryCategory (default)');
-            return ['Learning Resource', 'Practice Question Set'];
-          })(),
+        
           channel: localStorage.getItem('channelId'),
         },
         fields: [

@@ -85,6 +85,32 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
     onFiltersChange?.({});
   };
   
+  // Transform filters for callback - convert keys and values to desired format
+  const transformFiltersForCallback = (filters: FilterState): Record<string, string[]> => {
+    const transformedFilters: Record<string, string[]> = {};
+    
+    Object.keys(filters).forEach(categoryCode => {
+      const selectedTermCodes = filters[categoryCode];
+      if (selectedTermCodes && selectedTermCodes.length > 0) {
+        // Transform key: add prefix 'se_' and suffix 's'
+        const transformedKey = `se_${categoryCode}s`;
+        
+        // Transform values: convert term codes to term names
+        const category = categories.find(cat => cat.code === categoryCode);
+        const termNames = selectedTermCodes.map(termCode => {
+          const term = category?.terms.find(t => t.code === termCode);
+          return term?.name || termCode; // fallback to code if name not found
+        }).filter(Boolean);
+        
+        if (termNames.length > 0) {
+          transformedFilters[transformedKey] = termNames;
+        }
+      }
+    });
+    
+    return transformedFilters;
+  };
+
   useEffect(() => {
     const fetchFrameworkData = async () => {
       if (framework) {
@@ -163,11 +189,11 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
     setCategories(parsedCategories);
     setDependencyMap(dependencyGraph);
     
-    // Initialize collapse state - first category expanded by default
+    // Initialize collapse state - all categories expanded by default
     const initialCollapseState: CollapseState = {};
     const initialShowMoreState: ShowMoreState = {};
     parsedCategories.forEach((category, index) => {
-      initialCollapseState[category.code] = index === 0; // First category expanded
+      initialCollapseState[category.code] = true; // All categories expanded
       initialShowMoreState[category.code] = false;
     });
     
@@ -277,7 +303,9 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
       clearDependentFilters(newFilters, categoryCode);
 
       // Call the callback if provided
-      onFiltersChange?.(newFilters);
+      onFiltersChange?.(transformFiltersForCallback(newFilters));
+      console.log('newFilters', newFilters);
+      console.log('transformedFilters', transformFiltersForCallback(newFilters));
       
       return newFilters;
     });

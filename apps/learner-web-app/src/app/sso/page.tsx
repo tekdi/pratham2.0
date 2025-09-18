@@ -12,13 +12,13 @@ import {
 } from '@mui/material';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { post } from '@learner/utils/API/RestClient';
-import { RoleId, TenantName } from '@learner/utils/app.constant';
+import { RoleId, TenantName, FilterKey } from '@learner/utils/app.constant';
 import { showToastMessage } from '@learner/components/ToastComponent/Toastify';
 import Header from '@learner/components/Header/Header';
 import Image from 'next/image';
 import welcomeGIF from '../../../public/images/welcome.gif';
 import { getUserId } from '@learner/utils/API/LoginService';
-import { profileComplitionCheck } from '@learner/utils/API/userService';
+import { getUserDetails, profileComplitionCheck } from '@learner/utils/API/userService';
 import { getAcademicYear } from '@learner/utils/API/AcademicYearService';
 import { telemetryFactory } from '@shared-lib-v2/DynamicForm/utils/telemetry';
 import { logEvent } from '@learner/utils/googleAnalytics';
@@ -182,17 +182,47 @@ const SSOContent = () => {
       const userResponse = await getUserId();
       console.log('userResponse', userResponse);
       localStorage.setItem('userId', userResponse?.userId);
-      const uiConfig = userResponse?.tenantData[0]?.params?.uiConfig;
-      console.log('uiConfig', uiConfig);
-      const landingPage = userResponse?.tenantData[0]?.params?.uiConfig?.landingPage;
-      localStorage.setItem('landingPage', landingPage);
+      localStorage.setItem('tenantId', userResponse?.tenantData[0]?.tenantId);
+localStorage.setItem('firstName', userResponse?.firstName);
+      setTimeout(async () => {
+        const res = await getUserDetails(userResponse?.userId, true);
+        console.log('response=========>', res?.result);
+        
+        // Store custom fields in localStorage
+        if (res?.result?.userData?.customFields) {
+          res.result.userData.customFields.forEach((field: any) => {
+            const { label, selectedValues } = field;
+            localStorage.setItem(FilterKey[label as keyof typeof FilterKey], JSON.stringify(selectedValues));
 
+            // Map the label to the corresponding FilterKey and store in localStorage
+            // switch (label) {
+            //   case 'GROUP_MEMBERSHIP':
+            //     localStorage.setItem(FilterKey.GROUP_MEMBERSHIP, selectedValues);
+            //     break;
+            //   case 'JOB_FAMILY':
+            //     localStorage.setItem(FilterKey.JOB_FAMILY, selectedValues);
+            //     break;
+            //   case 'PSU':
+            //     localStorage.setItem(FilterKey.PSU, selectedValues);
+            //     break;
+            //   default:
+            //     // For any other custom fields, store them as is
+            //     localStorage.setItem(label, selectedValues);
+            //     break;
+            // }
+          });
+        }
+        const uiConfig = userResponse?.tenantData[0]?.params?.uiConfig;
+        console.log('uiConfig', uiConfig);
+        const landingPage = userResponse?.tenantData[0]?.params?.uiConfig?.landingPage;
+        localStorage.setItem('landingPage', landingPage);
 
-      localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
+        localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
 
-      setUserResponse(userResponse);
+        setUserResponse(userResponse);
 
-      setSwitchDialogOpen(true);
+        setSwitchDialogOpen(true);
+      }, 1000);
     }
   };
 

@@ -196,8 +196,8 @@ const MyComponent: React.FC = () => {
                     return {}; // No configuration, show all tabs
                   }
                   
-                  // Convert stored tab names to lowercase for matching
-                  const configTabs = storedConfig.showContent.map((tab: string) => tab.toLowerCase());
+                  // Pass the full objects with label and filterKey
+                  const configTabs = storedConfig.showContent;
                   console.log('🎯 Setting contentTabs to:', configTabs);
                   return { contentTabs: configTabs };
                 })(),

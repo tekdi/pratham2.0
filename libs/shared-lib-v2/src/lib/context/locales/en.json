@@ -694,5 +694,11 @@
     "DATE_MUST_BE_ON_OR_BEFORE": "Date must be on or before {{date}}",
     "DATE_MUST_BE_ON_OR_AFTER": "Date must be on or after {{date}}"
   },
-  "Assessment Score": "Assessment Score"
+  "Assessment Score": "Assessment Score",
+  "FILTER_KEY": {
+     "GROUP_MEMBERSHIP": "groupMembership",
+      "JOB_FAMILY": "jobFamily",
+      "PSU":"psu"
+
+  }
 }
