@@ -58,7 +58,7 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
   const [selectedQrValue, setSelectedQrValue] = useState<string>('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
-  const [loggedInProgram, setLoggedInProgram] = useState<string | null>(null);
+  const [loggedInProgram, setLoggedInProgram] = useState<string | null | any>(null);
   const [loggedInProgramDomain, setLoggedInProgramDomain] = useState<
     string | null
   >(null);
@@ -442,14 +442,14 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
                               ) {
                                 link =
                                   contentType === 'Course'
-                                    ? `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=course&identifier=${identifier}`
-                                    : `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=content&identifier=${identifier}`;
+                                    ? `${loggedInProgramDomain}cmslink?program=${encodeURIComponent(loggedInProgram)}&type=course&identifier=${identifier}`
+                                    : `${loggedInProgramDomain}cmslink?program=${encodeURIComponent(loggedInProgram)}&type=content&identifier=${identifier}`;
                                 handleOpenQrModal(link);
                               } else {
                                 link =
                                   contentType === 'Course'
-                                    ? `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=course&identifier=${identifier}`
-                                    : `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=content&identifier=${identifier}`;
+                                    ? `${loggedInProgramDomain}cmslink?program=${encodeURIComponent(loggedInProgram)}&type=course&identifier=${identifier}`
+                                    : `${loggedInProgramDomain}cmslink?program=${encodeURIComponent(loggedInProgram)}&type=content&identifier=${identifier}`;
                                 handleOpenQrModal(link);
                               }
                             }}
@@ -476,14 +476,14 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
                               ) {
                                 link =
                                   contentType === 'Course'
-                                    ? `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=course&identifier=${identifier}`
-                                    : `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=content&identifier=${identifier}`;
+                                    ? `${loggedInProgramDomain}cmslink?program=${encodeURIComponent(loggedInProgram)}&type=course&identifier=${encodeURIComponent(identifier)}`
+                                    : `${loggedInProgramDomain}cmslink?program=${encodeURIComponent(loggedInProgram)}&type=content&identifier=${encodeURIComponent(identifier)}`;
                                 handleCopyLink(link);
                               } else {
                                 link =
                                   contentType === 'Course'
-                                    ? `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=course&identifier=${identifier}`
-                                    : `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=content&identifier=${identifier}`;
+                                    ? `${loggedInProgramDomain}cmslink?program=${encodeURIComponent(loggedInProgram)}&type=course&identifier=${encodeURIComponent(identifier)}`
+                                    : `${loggedInProgramDomain}cmslink?program=${encodeURIComponent(loggedInProgram)}&type=content&identifier=${encodeURIComponent(identifier)}`;
                                 handleCopyLink(link);
                               }
                             }}
@@ -529,14 +529,14 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
                             ) {
                               link =
                                 contentType === 'Course'
-                                  ? `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=course&identifier=${identifier}`
-                                  : `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=content&identifier=${identifier}`;
+                                  ? `${loggedInProgramDomain}cmslink?program=${encodeURIComponent(loggedInProgram)}&type=course&identifier=${identifier}`
+                                  : `${loggedInProgramDomain}cmslink?program=${encodeURIComponent(loggedInProgram)}&type=content&identifier=${identifier}`;
                               handleOpenQrModal(link);
                             } else {
                               link =
                                 contentType === 'Course'
-                                  ? `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=course&identifier=${identifier}`
-                                  : `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=content&identifier=${identifier}`;
+                                  ? `${loggedInProgramDomain}cmslink?program=${encodeURIComponent(loggedInProgram)}&type=course&identifier=${identifier}`
+                                  : `${loggedInProgramDomain}cmslink?program=${encodeURIComponent(loggedInProgram)}&type=content&identifier=${identifier}`;
                               handleOpenQrModal(link);
                             }
                           }}
@@ -563,14 +563,14 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
                             ) {
                               link =
                                 contentType === 'Course'
-                                  ? `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=course&identifier=${identifier}`
-                                  : `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=content&identifier=${identifier}`;
+                                  ? `${loggedInProgramDomain}cmslink?program=${encodeURIComponent(loggedInProgram)}&type=course&identifier=${encodeURIComponent(identifier)}`
+                                  : `${loggedInProgramDomain}cmslink?program=${encodeURIComponent(loggedInProgram)}&type=content&identifier=${encodeURIComponent(identifier)}`;
                               handleCopyLink(link);
                             } else {
                               link =
                                 contentType === 'Course'
-                                  ? `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=course&identifier=${identifier}`
-                                  : `${loggedInProgramDomain}cmslink?program=${loggedInProgram}&type=content&identifier=${identifier}`;
+                                  ? `${loggedInProgramDomain}cmslink?program=${encodeURIComponent(loggedInProgram)}&type=course&identifier=${encodeURIComponent(identifier)}`
+                                  : `${loggedInProgramDomain}cmslink?program=${encodeURIComponent(loggedInProgram)}&type=content&identifier=${encodeURIComponent(identifier)}`;
                               handleCopyLink(link);
                             }
                           }}
