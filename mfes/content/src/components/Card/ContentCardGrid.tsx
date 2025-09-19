@@ -160,7 +160,7 @@ const ContentCardGrid = memo((props: ContentCardGridProps) => {
     props.handleLoadMore,
     props.contentData?.length,
   ]);
-
+console.log("props.contentData",props.contentData)
   return (
     <Box {..._subBox} sx={{ ...(_subBox?.sx ?? {}) }}>
       <Grid container spacing={{ xs: 2, sm: 2, md: 2 }} {..._containerGrid}>
