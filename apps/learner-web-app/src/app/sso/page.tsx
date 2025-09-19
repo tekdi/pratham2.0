@@ -12,13 +12,13 @@ import {
 } from '@mui/material';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { post } from '@learner/utils/API/RestClient';
-import { RoleId, TenantName } from '@learner/utils/app.constant';
+import { RoleId, TenantName, FilterKey } from '@learner/utils/app.constant';
 import { showToastMessage } from '@learner/components/ToastComponent/Toastify';
 import Header from '@learner/components/Header/Header';
 import Image from 'next/image';
 import welcomeGIF from '../../../public/images/welcome.gif';
 import { getUserId } from '@learner/utils/API/LoginService';
-import { profileComplitionCheck } from '@learner/utils/API/userService';
+import { getUserDetails, profileComplitionCheck } from '@learner/utils/API/userService';
 import { getAcademicYear } from '@learner/utils/API/AcademicYearService';
 import { telemetryFactory } from '@shared-lib-v2/DynamicForm/utils/telemetry';
 import { logEvent } from '@learner/utils/googleAnalytics';
@@ -127,8 +127,13 @@ const SSOContent = () => {
 
           // Redirect after brief success display
           setTimeout(() => {
-            router.push('/content');
-          }, 1500);
+            const landingPage = localStorage.getItem('landingPage') || '';
+
+            if (landingPage) {
+              router.push(landingPage);
+            } else {
+              router.push('/content');
+            }          }, 1500);
         } else {
           throw new Error(response?.data?.message || 'Authentication failed');
         }
@@ -175,9 +180,49 @@ const SSOContent = () => {
         : localStorage.removeItem('refreshToken');
 
       const userResponse = await getUserId();
-      setUserResponse(userResponse);
+      console.log('userResponse', userResponse);
+      localStorage.setItem('userId', userResponse?.userId);
+      localStorage.setItem('tenantId', userResponse?.tenantData[0]?.tenantId);
+localStorage.setItem('firstName', userResponse?.firstName);
+      setTimeout(async () => {
+        const res = await getUserDetails(userResponse?.userId, true);
+        console.log('response=========>', res?.result);
+        
+        // Store custom fields in localStorage
+        if (res?.result?.userData?.customFields) {
+          res.result.userData.customFields.forEach((field: any) => {
+            const { label, selectedValues } = field;
+            localStorage.setItem(FilterKey[label as keyof typeof FilterKey], JSON.stringify(selectedValues));
 
-      setSwitchDialogOpen(true);
+            // Map the label to the corresponding FilterKey and store in localStorage
+            // switch (label) {
+            //   case 'GROUP_MEMBERSHIP':
+            //     localStorage.setItem(FilterKey.GROUP_MEMBERSHIP, selectedValues);
+            //     break;
+            //   case 'JOB_FAMILY':
+            //     localStorage.setItem(FilterKey.JOB_FAMILY, selectedValues);
+            //     break;
+            //   case 'PSU':
+            //     localStorage.setItem(FilterKey.PSU, selectedValues);
+            //     break;
+            //   default:
+            //     // For any other custom fields, store them as is
+            //     localStorage.setItem(label, selectedValues);
+            //     break;
+            // }
+          });
+        }
+        const uiConfig = userResponse?.tenantData[0]?.params?.uiConfig;
+        console.log('uiConfig', uiConfig);
+        const landingPage = userResponse?.tenantData[0]?.params?.uiConfig?.landingPage;
+        localStorage.setItem('landingPage', landingPage);
+
+        localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
+
+        setUserResponse(userResponse);
+
+        setSwitchDialogOpen(true);
+      }, 1000);
     }
   };
 
@@ -255,12 +300,19 @@ const SSOContent = () => {
           category: 'SSO ERP',
           label: 'Login Button Clicked',
         });
-        if (tenantName === TenantName.YOUTHNET) {
+        // if (tenantName === TenantName.YOUTHNET) {
+        //   router.push('/content');
+        // } else if (tenantName === TenantName.CAMP_TO_CLUB) {
+        //   router.push('/courses-contents');
+        // } else if (tenantName === TenantName.PRAGYANPATH) {
+        //   router.push('/courses-contents');
+        // }
+        const landingPage = localStorage.getItem('landingPage') || '';
+
+        if (landingPage) {
+          router.push(landingPage);
+        } else {
           router.push('/content');
-        } else if (tenantName === TenantName.CAMP_TO_CLUB) {
-          router.push('/courses-contents');
-        } else if (tenantName === TenantName.PRAGYANPATH) {
-          router.push('/courses-contents');
         }
       } else {
         showToastMessage('Authentication failed - invalid user role', 'error');
