@@ -225,40 +225,70 @@ const StaticFilterFields: React.FC<StaticFilterFieldsProps> = ({ onFiltersChange
         const hasMoreItems = field.range.length > ITEMS_TO_SHOW;
         
         return (
-          <Box key={field.code} sx={{ mb: 2 }}>
+          <Paper 
+            key={field.code} 
+            elevation={0}
+            sx={{ 
+              width: { xs: '100%', sm: '300px' }, 
+              mb: 2,
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E0E0E0',
+              borderRadius: '8px',
+              overflow: 'hidden'
+            }}
+          >
             {/* Field Header */}
             <Box
               sx={{
-                py: 1,
+                py: { xs: 1.5, sm: 2 }, 
+                px: { xs: 1.5, sm: 2 },
                 cursor: 'pointer',
                 display: 'flex',
                 justifyContent: 'space-between',
-                alignItems: 'center'
+                alignItems: 'center',
+                borderBottom: isExpanded ? '1px solid #F0F0F0' : 'none'
               }}
               onClick={() => toggleCollapse(field.code)}
             >
               <Typography
-                variant="subtitle1"
+                variant="h6"
+                component="h3"
                 sx={{
                   fontSize: '1rem',
                   fontWeight: 500,
                   color: '#1F1B13',
+                  letterSpacing: '-0.025em'
                 }}
               >
                 {getCleanLabel(field.label)} {selectedOptions.length > 0 && `(${selectedOptions.length})`}
               </Typography>
               {isExpanded ? (
-                <KeyboardArrowUp sx={{ width: 20, height: 20, color: '#1F1B13' }} />
+                <KeyboardArrowUp 
+                  sx={{ 
+                    width: 20, 
+                    height: 20, 
+                    color: '#1F1B13',
+                    transition: 'transform 0.2s'
+                  }} 
+                />
               ) : (
-                <KeyboardArrowDown sx={{ width: 20, height: 20, color: '#1F1B13' }} />
+                <KeyboardArrowDown 
+                  sx={{ 
+                    width: 20, 
+                    height: 20, 
+                    color: '#1F1B13',
+                    transition: 'transform 0.2s'
+                  }} 
+                />
               )}
             </Box>
 
             {/* Field Options */}
             <Collapse in={isExpanded}>
-              <Box sx={{ pl: 1, pt: 1 }}>
+              <Box sx={{ width: '100%', px: { xs: 1.5, sm: 2 }, pt: 1, pb: { xs: 1.5, sm: 2 } }}>
                 <Box 
                   sx={{ 
+                    width: '100%', 
                     display: 'flex', 
                     flexDirection: 'column', 
                     gap: 0.5,
@@ -287,46 +317,48 @@ const StaticFilterFields: React.FC<StaticFilterFieldsProps> = ({ onFiltersChange
                     const optionKey = getOptionKey(option, index);
                     
                     return (
-                      <FormControlLabel
-                        key={optionKey}
-                        control={
-                          <Checkbox
-                            checked={selectedOptions.includes(optionValue)}
-                            onChange={(e) => handleFilterChange(field.code, optionValue, e.target.checked)}
-                            sx={{
-                              '& .MuiSvgIcon-root': {
-                                fontSize: 18
-                              },
-                              color: '#666',
-                              '&.Mui-checked': {
-                                color: '#000',
-                              },
-                              padding: '6px'
-                            }}
-                          />
-                        }
-                        label={
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              fontSize: '0.875rem',
-                              color: '#1F1B13',
-                              fontWeight: 400,
-                            }}
-                          >
-                            {optionLabel}
-                          </Typography>
-                        }
-                        sx={{
-                          margin: 0,
-                          display: 'flex',
-                          alignItems: 'center',
-                          mb: 0.5,
-                          '& .MuiFormControlLabel-label': {
-                            paddingLeft: '6px'
+                      <Box key={optionKey} sx={{ width: '100%' }}>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={selectedOptions.includes(optionValue)}
+                              onChange={(e) => handleFilterChange(field.code, optionValue, e.target.checked)}
+                              sx={{
+                                '& .MuiSvgIcon-root': {
+                                  fontSize: 18
+                                },
+                                color: '#666',
+                                '&.Mui-checked': {
+                                  color: '#000',
+                                },
+                                padding: '6px'
+                              }}
+                            />
                           }
-                        }}
-                      />
+                          label={
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                fontSize: '0.875rem',
+                                color: '#1F1B13',
+                                fontWeight: 400,
+                                lineHeight: 1.5,
+                              }}
+                            >
+                              {optionLabel}
+                            </Typography>
+                          }
+                          sx={{
+                            margin: 0,
+                            width: '100%',
+                            cursor: 'pointer',
+                            alignItems: 'center',
+                            '& .MuiFormControlLabel-label': {
+                              paddingLeft: '6px'
+                            }
+                          }}
+                        />
+                      </Box>
                     );
                   })}
                 </Box>
@@ -359,7 +391,7 @@ const StaticFilterFields: React.FC<StaticFilterFieldsProps> = ({ onFiltersChange
                 )}
               </Box>
             </Collapse>
-          </Box>
+          </Paper>
         );
       })}
     </Box>

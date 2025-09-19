@@ -407,7 +407,7 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
         key={category.code} 
         elevation={0}
         sx={{ 
-          width: '300px', 
+          width: { xs: '100%', sm: '300px' }, 
           mb: 2,
          // backgroundColor: '#FFFFFF',
           border: '1px solid #E0E0E0',
@@ -418,8 +418,8 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
         {/* Filter Header */}
         <Box 
           sx={{ 
-            py: 2, 
-            px: 2,
+            py: { xs: 1.5, sm: 2 }, 
+            px: { xs: 1.5, sm: 2 },
             cursor: 'pointer',
             display: 'flex',
             justifyContent: 'space-between',
@@ -463,7 +463,7 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
 
         {/* Filter Options */}
         <Collapse in={isExpanded}>
-          <Box sx={{ width: '100%', px: 2, pt: 1, pb: 2 }}>
+          <Box sx={{ width: '100%', px: { xs: 1.5, sm: 2 }, pt: 1, pb: { xs: 1.5, sm: 2 } }}>
             <Box 
               sx={{ 
                 width: '100%', 
@@ -679,7 +679,7 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
         gap: 2,
         width: '100%',
        // backgroundColor: '#F8F9FA',
-        padding: 2,
+        padding: { xs: 1, sm: 2 },
         borderRadius: 2
       }}
     >
@@ -721,26 +721,14 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
       </Box>
 
       {/* Filter Content */}
-      <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 0 }}>
+      <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 1 }}>
         {/* Static Filter Fields */}
-        <Paper 
-          elevation={0}
-          sx={{ 
-            width: '100%', 
-            mb: 2,
-            backgroundColor: '#FFFFFF',
-            border: '1px solid #E0E0E0',
-            borderRadius: '8px',
-            overflow: 'hidden',
-            padding: 2
-          }}
-        >
+       
           <StaticFilterFields 
             onFiltersChange={handleStaticFiltersChange} 
             showHeader={false} 
             clearTrigger={clearTrigger}
           />
-        </Paper>
         
         {categories.map(renderFilterSection)}
       </Box>

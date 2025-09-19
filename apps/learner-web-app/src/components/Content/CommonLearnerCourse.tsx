@@ -142,7 +142,7 @@ export default memo(function LearnerCourse({
                 fontWeight: 400,
                 fontSize: '22px',
                 lineHeight: '28px',
-                 color:'#987100'
+                // color:'#987100'
               }}
              
             >

@@ -56,21 +56,35 @@ const RenderTabContent = memo(
               onChange={onChange}
               aria-label={ariaLabel}
               sx={{
-                // Desktop styles
-                '@media (min-width: 768px)': {
+                // Large desktop styles
+                '@media (min-width: 1200px)': {
                   '& .MuiTab-root': {
-                    marginRight: '160px', // Add gap between tabs
+                    marginRight: '160px', // Large gap for very wide screens
                     minWidth: 'auto',
                   },
                   '& .MuiTab-root:last-child': {
-                    marginRight: 0, // Remove margin from last tab
+                    marginRight: 0,
                   },
                   '& .MuiTabs-indicator': {
-                    height: '3px', // Optional: make indicator thicker if needed
+                    height: '3px',
                     transform: 'none',
                   },
                 },
-                // Mobile styles (normal behavior)
+                // Medium to desktop styles
+                '@media (min-width: 768px) and (max-width: 1199px)': {
+                  '& .MuiTab-root': {
+                    marginRight: '60px', // Smaller gap for medium screens
+                    minWidth: 'auto',
+                  },
+                  '& .MuiTab-root:last-child': {
+                    marginRight: 0,
+                  },
+                  '& .MuiTabs-indicator': {
+                    height: '3px',
+                    transform: 'none',
+                  },
+                },
+                // Mobile styles
                 '@media (max-width: 767px)': {
                   '& .MuiTab-root': {
                     minWidth: 'auto',
