@@ -1,7 +1,4 @@
-import React from 'react';
-import HomeCoursesClient from './HomeCoursesClient';
-import dynamic from 'next/dynamic';
- import StaticFilterFields from '@learner/components/staticFilterFields/StaticFilterFields';
+import React from 'react';import dynamic from 'next/dynamic';
 
 
 const title = 'Welcome to Pratham Learning Platform';
@@ -30,12 +27,12 @@ const L1ContentList = dynamic(
     ssr: false,
   }
 );
-const HomeCoursesPage = () => {
+const KnowledgeBankPage = () => {
   return (
     <>
-      <L1ContentList />
+      <L1ContentList notab={true} />
     </>
   );
 };
 
-export default HomeCoursesPage;
+export default KnowledgeBankPage;

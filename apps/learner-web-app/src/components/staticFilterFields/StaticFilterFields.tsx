@@ -77,9 +77,10 @@ const StaticFilterFields: React.FC<StaticFilterFieldsProps> = ({ onFiltersChange
   useEffect(() => {
     if (clearTrigger > 0) {
       setSelectedFilters({});
-      onFiltersChange?.({});
+      // Don't call onFiltersChange here - let the parent handle it
+      // The parent (FilterFramework) will call onFiltersChange after setting clearTrigger
     }
-  }, [clearTrigger, onFiltersChange]);
+  }, [clearTrigger]);
 
   useEffect(() => {
     const fetchStaticFilterContent = async () => {
@@ -341,13 +342,13 @@ const StaticFilterFields: React.FC<StaticFilterFieldsProps> = ({ onFiltersChange
                       sx={{
                         mt: 1,
                         fontSize: '0.875rem',
-                        color: '#f97316',
+                        color: '#987100',
                         fontWeight: 500,
                         textTransform: 'none',
                         padding: 0,
                         minWidth: 'auto',
                         '&:hover': {
-                          color: '#ea580c',
+                          color: '#987100',
                           backgroundColor: 'transparent'
                         }
                       }}

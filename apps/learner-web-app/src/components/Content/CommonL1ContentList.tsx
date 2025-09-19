@@ -14,7 +14,7 @@ import { gredientStyle } from '@learner/utils/style';
 import LTwoCourse from '@learner/components/Content/LTwoCourse';
 import { useEffect, useState } from 'react';
 import { getTenantInfo } from '@learner/utils/API/ProgramService';
-import ContentComponent from '@learner/components/Content/Content';
+import ContentComponent from '@learner/components/Content/CommonInprogressContent';
 import { useTranslation } from '@shared-lib';
 import { checkAuth } from '@shared-lib-v2/utils/AuthService';
 import { CompleteProfileBanner } from '@learner/components/CompleteProfileBanner/CompleteProfileBanner';
@@ -25,7 +25,11 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { TenantName } from '../../utils/app.constant';
 import CommonLearnerCourse from './CommonLearnerCourse';
 
-const MyComponent: React.FC = () => {
+interface CommonL1ContentListProps {
+  notab?: boolean;
+}
+
+const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const tab = searchParams.get('tab'); // '1', '2', etc. as a string
@@ -112,7 +116,7 @@ const MyComponent: React.FC = () => {
       )}
       {isLogin && (
         <>
-          <Box
+         { !notab && <Box
             sx={{
               height: 24,
               display: 'flex',
@@ -137,8 +141,8 @@ const MyComponent: React.FC = () => {
               </span>
               {t('COMMON.WELCOME')}, {localStorage.getItem('firstName')}!
             </Typography>
-          </Box>
-          {(tab == '0' || tab === null) && <InProgressContent />}
+          </Box>}
+          { !notab && <InProgressContent />}
 
           {localStorage.getItem('userProgram') === TenantName.YOUTHNET && (
             <Grid container>
@@ -163,7 +167,7 @@ const MyComponent: React.FC = () => {
         <Grid item xs={12}>
           {filter && (
             <CommonLearnerCourse
-              title={
+              title={ notab? 'LEARNER_APP.COURSE.EXPLORE_ADDITIONAL_RESOURCES' :
                 'LEARNER_APP.COURSE.EXPLORE_MORE_COURSES'
                   
               }
@@ -191,6 +195,13 @@ const MyComponent: React.FC = () => {
                 },
                 // 🎯 Dynamic content tabs based on stored configuration
                 ...(() => {
+                  // If notab prop is true, hide all tabs
+                  if (notab) {
+                    return { 
+                      contentTabs: ['no-tabs-please'] // Pass non-existent tab label to result in empty tabs array
+                    };
+                  }
+                  
                   if (!Array.isArray(storedConfig.showContent) || storedConfig.showContent.length === 0) {
                     return {}; // No configuration, show all tabs
                   }
@@ -235,7 +246,12 @@ const InProgressContent: React.FC = () => {
     <Grid
       container
       style={gredientStyle}
-      sx={{ px: { xs: 0, sm: 0, md: 4 } }}
+      sx={{ 
+        px: { xs: 0, sm: 0, md: 4 },
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+        borderRadius: '8px',
+        mb: 2
+      }}
       {...(isShow ? {} : { sx: { display: 'none' } })}
     >
       <Grid item xs={12} md={2.7}>

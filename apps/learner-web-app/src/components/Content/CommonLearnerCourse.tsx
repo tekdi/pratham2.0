@@ -121,7 +121,7 @@ export default memo(function LearnerCourse({
             top: 0,
             bgcolor: '',
             px: { xs: 1, md: 4 },
-            py: { xs: 1, md: 2 },
+           //py: { xs: 1, md: 2 },
             zIndex: 1,
           }}
           style={gredientStyle}
@@ -142,7 +142,9 @@ export default memo(function LearnerCourse({
                 fontWeight: 400,
                 fontSize: '22px',
                 lineHeight: '28px',
+                 color:'#987100'
               }}
+             
             >
               {t(title ?? 'LEARNER_APP.COURSE.GET_STARTED')}
             </Typography>
@@ -205,10 +207,10 @@ export default memo(function LearnerCourse({
                   </Typography>
                 </Button>
               </Box>
-              <SearchComponent
+              {<Box sx={{mt:"10px"}}><SearchComponent
                 onSearch={handleSearchClick}
                 value={filterState?.query}
-              />
+              /></Box>}
             </Box>
             <Box
               sx={{
@@ -340,7 +342,6 @@ export default memo(function LearnerCourse({
                 md: 'row',
               }}
               gap={2}
-              sx={{ mb: 2 }}
             >
               <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
                 <FilterChip

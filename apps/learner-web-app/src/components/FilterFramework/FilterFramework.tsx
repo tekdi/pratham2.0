@@ -86,9 +86,14 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
 
   // Clear all filters
   const clearAllFilters = () => {
+    // Clear framework filters
     setSelectedFilters({});
     setStaticFilters({});
-    setClearTrigger(prev => prev + 1); // Trigger clear in static filters
+    
+    // Clear static filters
+    setClearTrigger(prev => prev + 1);
+    
+    // Notify parent with empty filters immediately
     onFiltersChange?.({});
   };
   
@@ -398,21 +403,28 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
     const hasMoreItems = options.length > ITEMS_TO_SHOW;
 
     return (
-      <Box 
+      <Paper 
         key={category.code} 
+        elevation={0}
         sx={{ 
-          width: '100%', 
-          mb: 2
+          width: '300px', 
+          mb: 2,
+         // backgroundColor: '#FFFFFF',
+          border: '1px solid #E0E0E0',
+          borderRadius: '8px',
+          overflow: 'hidden'
         }}
       >
         {/* Filter Header */}
         <Box 
           sx={{ 
-            py: 1, 
+            py: 2, 
+            px: 2,
             cursor: 'pointer',
             display: 'flex',
             justifyContent: 'space-between',
-            alignItems: 'center'
+            alignItems: 'center',
+            borderBottom: isExpanded ? '1px solid #F0F0F0' : 'none'
           }}
           onClick={() => toggleCollapse(category.code)}
         >
@@ -451,7 +463,7 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
 
         {/* Filter Options */}
         <Collapse in={isExpanded}>
-          <Box sx={{ width: '100%', pt: 1, pb: 2 }}>
+          <Box sx={{ width: '100%', px: 2, pt: 1, pb: 2 }}>
             <Box 
               sx={{ 
                 width: '100%', 
@@ -524,7 +536,7 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
             </Box>
             
             {/* Show More/Less Button */}
-            {hasMoreItems && (
+                        {hasMoreItems && (
               <Box sx={{ width: '100%' }}>
                 <Button
                   onClick={(e) => {
@@ -534,13 +546,13 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
                   sx={{
                     mt: 1,
                     fontSize: '0.875rem',
-                    color: '#f97316',
+                    color: '#987100',
                     fontWeight: 500,
                     textTransform: 'none',
                     padding: 0,
                     minWidth: 'auto',
                     '&:hover': {
-                      color: '#ea580c',
+                      color: '#987100',
                       backgroundColor: 'transparent'
                     }
                   }}
@@ -551,7 +563,7 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
             )}
           </Box>
         </Collapse>
-      </Box>
+      </Paper>
     );
   };
 
@@ -666,6 +678,9 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
         flexDirection: 'column',
         gap: 2,
         width: '100%',
+       // backgroundColor: '#F8F9FA',
+        padding: 2,
+        borderRadius: 2
       }}
     >
       {/* Filter Header */}
@@ -674,8 +689,10 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          borderBottom: '1px solid #D0C5B4',
+          borderBottom: '1px solid #E0E0E0',
           pb: 2,
+          mb: 1,
+          backgroundColor: 'transparent'
         }}
       >
         <Typography
@@ -704,21 +721,28 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
       </Box>
 
       {/* Filter Content */}
-      <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
-      <StaticFilterFields 
-          onFiltersChange={handleStaticFiltersChange} 
-          showHeader={false} 
-          clearTrigger={clearTrigger}
-        />
-        {categories.map(renderFilterSection)}
-        
-        {/* Divider */}
-        {categories.length > 0 && (
-          <Box sx={{ borderTop: '1px solid #E0E0E0', my: 2 }} />
-        )}
-        
+      <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 0 }}>
         {/* Static Filter Fields */}
-       
+        <Paper 
+          elevation={0}
+          sx={{ 
+            width: '100%', 
+            mb: 2,
+            backgroundColor: '#FFFFFF',
+            border: '1px solid #E0E0E0',
+            borderRadius: '8px',
+            overflow: 'hidden',
+            padding: 2
+          }}
+        >
+          <StaticFilterFields 
+            onFiltersChange={handleStaticFiltersChange} 
+            showHeader={false} 
+            clearTrigger={clearTrigger}
+          />
+        </Paper>
+        
+        {categories.map(renderFilterSection)}
       </Box>
     </Box>
   );
