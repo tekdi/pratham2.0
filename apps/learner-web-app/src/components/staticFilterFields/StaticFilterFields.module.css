@@ -1,0 +1,104 @@
+.staticFilterFields {
+  padding: 16px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  margin: 16px 0;
+}
+
+.loading {
+  text-align: center;
+  color: #666;
+}
+
+.error {
+  color: #d32f2f;
+  background-color: #ffebee;
+  border: 1px solid #ffcdd2;
+}
+
+.filterContainer {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.filterContainer h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.filterField {
+  margin-bottom: 24px;
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background-color: #fafafa;
+}
+
+.filterField h4 {
+  margin: 0 0 12px 0;
+  color: #555;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.filterOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filterOption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filterOption input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #1976d2;
+}
+
+.filterOption label {
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #333;
+  user-select: none;
+}
+
+.filterOption label:hover {
+  color: #1976d2;
+}
+
+.filterLoading {
+  padding: 20px;
+  font-size: 1rem;
+  color: #666;
+}
+
+.filterError {
+  padding: 16px;
+  font-size: 0.875rem;
+  border-radius: 4px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .staticFilterFields {
+    padding: 12px;
+    margin: 12px 0;
+  }
+  
+  .filterContainer {
+    padding: 16px;
+  }
+  
+  .filterField {
+    padding: 12px;
+  }
+} 
