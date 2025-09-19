@@ -19,7 +19,7 @@ export const mockData: Record<string, any> = {
   },
   '914ca990-9b45-4385-a06b-05054f35d0b9': {
     CHANNEL_ID: 'pragyanpath',
-    CONTENT_FRAMEWORK: 'pragyanpathFw',
+    CONTENT_FRAMEWORK: 'pos-framework',
     COLLECTION_FRAMEWORK: 'pragyanpathFw',
   },
   'fd8f3180-9988-495b-8a0d-ed201d7d28df': {

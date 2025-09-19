@@ -1,0 +1,1734 @@
+{
+    "lastStatusChangedOn": "2025-09-16T12:00:15.073+0000",
+    "name": "pragyanpath-fw",
+    "createdOn": "2025-09-16T12:00:15.073+0000",
+    "channel": "pragyanpath",
+    "lastUpdatedOn": "2025-09-16T12:00:15.073+0000",
+    "identifier": "pragyanpathFw",
+    "description": "test",
+    "languageCode": [],
+    "systemDefault": "No",
+    "versionKey": "1758024015073",
+    "code": "pragyanpathFw",
+    "objectType": "Framework",
+    "status": "Live",
+    "categories": [
+        {
+            "identifier": "pragyanpathfw_area",
+            "code": "area",
+            "terms": [
+                {
+                    "associations": [
+                        {
+                            "name": "Other Leadership Skills",
+                            "identifier": "pragyanpathfw_topic_otherleadershipskills",
+                            "description": "Other Leadership Skills",
+                            "code": "otherLeadershipSkills",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Leading People",
+                            "identifier": "pragyanpathfw_topic_leadingpeople",
+                            "description": "Leading People",
+                            "code": "leadingPeople",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Communication & Feedback",
+                            "identifier": "pragyanpathfw_topic_communicationandfeedback",
+                            "description": "Communication & Feedback",
+                            "code": "communicationAndFeedback",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Strategic Leadership",
+                            "identifier": "pragyanpathfw_topic_strategicleadership",
+                            "description": "Strategic Leadership",
+                            "code": "strategicLeadership",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Change & Stakeholder Leadership",
+                            "identifier": "pragyanpathfw_topic_changeandstakeholderleadership",
+                            "description": "Change & Stakeholder Leadership",
+                            "code": "changeAndStakeholderLeadership",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Foundations of Leadership",
+                            "identifier": "pragyanpathfw_topic_foundationsofleadership",
+                            "description": "Foundations of Leadership",
+                            "code": "foundationsOfLeadership",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        }
+                    ],
+                    "identifier": "pragyanpathfw_area_leadership",
+                    "code": "leadership",
+                    "name": "Leadership",
+                    "description": "Leadership",
+                    "index": 1,
+                    "category": "area",
+                    "status": "Live"
+                },
+                {
+                    "associations": [
+                        {
+                            "name": "Other Program and Pedagogy Skills",
+                            "identifier": "pragyanpathfw_topic_otherprogramandpedagogyskills",
+                            "description": "Other Program and Pedagogy Skills",
+                            "code": "otherProgramAndPedagogySkills",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Inclusive Education",
+                            "identifier": "pragyanpathfw_topic_inclusiveeducation",
+                            "description": "Inclusive Education",
+                            "code": "inclusiveEducation",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Elementary Years",
+                            "identifier": "pragyanpathfw_topic_elementaryyears",
+                            "description": "Elementary Years",
+                            "code": "elementaryYears",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Presentation Skills",
+                            "identifier": "pragyanpathfw_topic_presentationskills",
+                            "description": "Presentation Skills",
+                            "code": "presentationSkills",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Critical Thinking & Problem Solving",
+                            "identifier": "pragyanpathfw_topic_criticalthinkingandproblemsolving",
+                            "description": "Critical Thinking & Problem Solving",
+                            "code": "criticalThinkingAndProblemSolving",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Designing Teacher Training Modules",
+                            "identifier": "pragyanpathfw_topic_designingteachertrainingmodules",
+                            "description": "Designing Teacher Training Modules",
+                            "code": "designingTeacherTrainingModules",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Teaching at the Right Level",
+                            "identifier": "pragyanpathfw_topic_teachingattherightlevel",
+                            "description": "Teaching at the Right Level",
+                            "code": "teachingAtTheRightLevel",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Other General Skills",
+                            "identifier": "pragyanpathfw_topic_othergeneralskills",
+                            "description": "Other General Skills",
+                            "code": "otherGeneralSkills",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Collaboration & Teamwork",
+                            "identifier": "pragyanpathfw_topic_collaborationandteamwork",
+                            "description": "Collaboration & Teamwork",
+                            "code": "collaborationAndTeamwork",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Time Management & Prioritization",
+                            "identifier": "pragyanpathfw_topic_timemanagementandprioritization",
+                            "description": "Time Management & Prioritization",
+                            "code": "timeManagementAndPrioritization",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Communication Skills",
+                            "identifier": "pragyanpathfw_topic_communicationskills",
+                            "description": "Communication Skills",
+                            "code": "communicationSkills",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Community Engagement",
+                            "identifier": "pragyanpathfw_topic_communityengagement",
+                            "description": "Community Engagement",
+                            "code": "communityEngagement",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Academic Mentoring & Classroom Support",
+                            "identifier": "pragyanpathfw_topic_academicmentoringandclassroomsupport",
+                            "description": "Academic Mentoring & Classroom Support",
+                            "code": "academicMentoringAndClassroomSupport",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        }
+                    ],
+                    "identifier": "pragyanpathfw_area_generalskills",
+                    "code": "generalSkills",
+                    "name": "General Skills",
+                    "description": "General Skills",
+                    "index": 2,
+                    "category": "area",
+                    "status": "Live"
+                },
+                {
+                    "associations": [
+                        {
+                            "name": "Academic Mentoring & Classroom Support",
+                            "identifier": "pragyanpathfw_topic_academicmentoringandclassroomsupport",
+                            "description": "Academic Mentoring & Classroom Support",
+                            "code": "academicMentoringAndClassroomSupport",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Inclusive Education",
+                            "identifier": "pragyanpathfw_topic_inclusiveeducation",
+                            "description": "Inclusive Education",
+                            "code": "inclusiveEducation",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Elementary Years",
+                            "identifier": "pragyanpathfw_topic_elementaryyears",
+                            "description": "Elementary Years",
+                            "code": "elementaryYears",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Early Years Pedagogy",
+                            "identifier": "pragyanpathfw_topic_earlyyearspedagogy",
+                            "description": "Early Years Pedagogy",
+                            "code": "earlyYearsPedagogy",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Communicating Program Model & Impact with Officials",
+                            "identifier": "pragyanpathfw_topic_communicatingprogrammodelandimpactwithofficials",
+                            "description": "Communicating Program Model & Impact with Officials",
+                            "code": "communicatingProgramModelAndImpactWithOfficials",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Teaching at the Right Level",
+                            "identifier": "pragyanpathfw_topic_teachingattherightlevel",
+                            "description": "Teaching at the Right Level",
+                            "code": "teachingAtTheRightLevel",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Other Program and Pedagogy Skills",
+                            "identifier": "pragyanpathfw_topic_otherprogramandpedagogyskills",
+                            "description": "Other Program and Pedagogy Skills",
+                            "code": "otherProgramAndPedagogySkills",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Other Program Communication Skills",
+                            "identifier": "pragyanpathfw_topic_otherprogramcommunicationskills",
+                            "description": "Other Program Communication Skills",
+                            "code": "otherProgramCommunicationSkills",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Advocacy with the Government",
+                            "identifier": "pragyanpathfw_topic_advocacywiththegovernment",
+                            "description": "Advocacy with the Government",
+                            "code": "advocacyWithTheGovernment",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Storytelling with Data: Translating numbers into narratives",
+                            "identifier": "pragyanpathfw_topic_storytellingwithdatatranslatingnumbersintonarratives",
+                            "description": "Storytelling with Data: Translating numbers into narratives",
+                            "code": "storytellingWithDataTranslatingNumbersIntoNarratives",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Explaining Program Data & Results",
+                            "identifier": "pragyanpathfw_topic_explainingprogramdataandresults",
+                            "description": "Explaining Program Data & Results",
+                            "code": "explainingProgramDataAndResults",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Designing Teacher Training Modules",
+                            "identifier": "pragyanpathfw_topic_designingteachertrainingmodules",
+                            "description": "Designing Teacher Training Modules",
+                            "code": "designingTeacherTrainingModules",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Community Engagement",
+                            "identifier": "pragyanpathfw_topic_communityengagement",
+                            "description": "Community Engagement",
+                            "code": "communityEngagement",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Stakeholder Engagement",
+                            "identifier": "pragyanpathfw_topic_stakeholderengagement",
+                            "description": "Stakeholder Engagement",
+                            "code": "stakeholderEngagement",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        }
+                    ],
+                    "identifier": "pragyanpathfw_area_programandpedagogy",
+                    "code": "programAndPedagogy",
+                    "name": "Program & Pedagogy",
+                    "description": "Program & Pedagogy",
+                    "index": 3,
+                    "category": "area",
+                    "status": "Live"
+                },
+                {
+                    "associations": [
+                        {
+                            "name": "Stakeholder Engagement",
+                            "identifier": "pragyanpathfw_topic_stakeholderengagement",
+                            "description": "Stakeholder Engagement",
+                            "code": "stakeholderEngagement",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Explaining Program Data & Results",
+                            "identifier": "pragyanpathfw_topic_explainingprogramdataandresults",
+                            "description": "Explaining Program Data & Results",
+                            "code": "explainingProgramDataAndResults",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Other Program Communication Skills",
+                            "identifier": "pragyanpathfw_topic_otherprogramcommunicationskills",
+                            "description": "Other Program Communication Skills",
+                            "code": "otherProgramCommunicationSkills",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Storytelling with Data: Translating numbers into narratives",
+                            "identifier": "pragyanpathfw_topic_storytellingwithdatatranslatingnumbersintonarratives",
+                            "description": "Storytelling with Data: Translating numbers into narratives",
+                            "code": "storytellingWithDataTranslatingNumbersIntoNarratives",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Advocacy with the Government",
+                            "identifier": "pragyanpathfw_topic_advocacywiththegovernment",
+                            "description": "Advocacy with the Government",
+                            "code": "advocacyWithTheGovernment",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Communicating Program Model & Impact with Officials",
+                            "identifier": "pragyanpathfw_topic_communicatingprogrammodelandimpactwithofficials",
+                            "description": "Communicating Program Model & Impact with Officials",
+                            "code": "communicatingProgramModelAndImpactWithOfficials",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        }
+                    ],
+                    "identifier": "pragyanpathfw_area_programcommunication",
+                    "code": "programCommunication",
+                    "name": "Program Communication",
+                    "description": "Program Communication",
+                    "index": 4,
+                    "category": "area",
+                    "status": "Live"
+                },
+                {
+                    "associations": [
+                        {
+                            "name": "Data Analysis & Visualization",
+                            "identifier": "pragyanpathfw_topic_dataanalysisandvisualization",
+                            "description": "Data Analysis & Visualization",
+                            "code": "dataAnalysisAndVisualization",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Evidence-Based Decision-Making",
+                            "identifier": "pragyanpathfw_topic_evidencebaseddecisionmaking",
+                            "description": "Evidence-Based Decision-Making",
+                            "code": "evidenceBasedDecisionMaking",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Other Data, Monitoring & Evaluation Skills",
+                            "identifier": "pragyanpathfw_topic_otherdatamonitoringandevaluationskills",
+                            "description": "Other Data, Monitoring & Evaluation Skills",
+                            "code": "otherDataMonitoringAndEvaluationSkills",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Data Collection & Quality",
+                            "identifier": "pragyanpathfw_topic_datacollectionandquality",
+                            "description": "Data Collection & Quality",
+                            "code": "dataCollectionAndQuality",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "MIS Development & Management for Programs",
+                            "identifier": "pragyanpathfw_topic_misdevelopmentandmanagementforprograms",
+                            "description": "MIS Development & Management for Programs",
+                            "code": "misDevelopmentAndManagementForPrograms",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Basics of Monitoring & Evaluation",
+                            "identifier": "pragyanpathfw_topic_basicsofmonitoringandevaluation",
+                            "description": "Basics of Monitoring & Evaluation",
+                            "code": "basicsOfMonitoringAndEvaluation",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        }
+                    ],
+                    "identifier": "pragyanpathfw_area_datamonitoringandevaluation",
+                    "code": "dataMonitoringAndEvaluation",
+                    "name": "Data, Monitoring & Evaluation",
+                    "description": "Data, Monitoring & Evaluation",
+                    "index": 5,
+                    "category": "area",
+                    "status": "Live"
+                },
+                {
+                    "associations": [
+                        {
+                            "name": "Strategy Development & Scaling",
+                            "identifier": "pragyanpathfw_topic_strategydevelopmentandscaling",
+                            "description": "Strategy Development & Scaling",
+                            "code": "strategyDevelopmentAndScaling",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Risk & Scenario Management",
+                            "identifier": "pragyanpathfw_topic_riskandscenariomanagement",
+                            "description": "Risk & Scenario Management",
+                            "code": "riskAndScenarioManagement",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Analytical Thinking",
+                            "identifier": "pragyanpathfw_topic_analyticalthinking",
+                            "description": "Analytical Thinking",
+                            "code": "analyticalThinking",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Strategy Execution",
+                            "identifier": "pragyanpathfw_topic_strategyexecution",
+                            "description": "Strategy Execution",
+                            "code": "strategyExecution",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Operational Planning",
+                            "identifier": "pragyanpathfw_topic_operationalplanning",
+                            "description": "Operational Planning",
+                            "code": "operationalPlanning",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Other Planning & Strategy Skills",
+                            "identifier": "pragyanpathfw_topic_otherplanningandstrategyskills",
+                            "description": "Other Planning & Strategy Skills",
+                            "code": "otherPlanningAndStrategySkills",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        }
+                    ],
+                    "identifier": "pragyanpathfw_area_planningandstrategy",
+                    "code": "planningAndStrategy",
+                    "name": "Planning & Strategy",
+                    "description": "Planning & Strategy",
+                    "index": 6,
+                    "category": "area",
+                    "status": "Live"
+                },
+                {
+                    "associations": [
+                        {
+                            "name": "Creating and Implementing Standard Operating Procedures",
+                            "identifier": "pragyanpathfw_topic_creatingandimplementingstandardoperatingprocedures",
+                            "description": "Creating and Implementing Standard Operating Procedures",
+                            "code": "creatingAndImplementingStandardOperatingProcedures",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Animation & Motion Graphics",
+                            "identifier": "pragyanpathfw_topic_animationandmotiongraphics",
+                            "description": "Animation & Motion Graphics",
+                            "code": "animationAndMotionGraphics",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Other Technical Skills",
+                            "identifier": "pragyanpathfw_topic_othertechnicalskills",
+                            "description": "Other Technical Skills",
+                            "code": "otherTechnicalSkills",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Graphic Design",
+                            "identifier": "pragyanpathfw_topic_graphicdesign",
+                            "description": "Graphic Design",
+                            "code": "graphicDesign",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Orientation on AI for Leaders",
+                            "identifier": "pragyanpathfw_topic_orientationonaiforleaders",
+                            "description": "Orientation on AI for Leaders",
+                            "code": "orientationOnAiForLeaders",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Procurement & Resource Planning",
+                            "identifier": "pragyanpathfw_topic_procurementandresourceplanning",
+                            "description": "Procurement & Resource Planning",
+                            "code": "procurementAndResourcePlanning",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Field Operations Management",
+                            "identifier": "pragyanpathfw_topic_fieldoperationsmanagement",
+                            "description": "Field Operations Management",
+                            "code": "fieldOperationsManagement",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Learning Platforms & Digital Ecosystems",
+                            "identifier": "pragyanpathfw_topic_learningplatformsanddigitalecosystems",
+                            "description": "Learning Platforms & Digital Ecosystems",
+                            "code": "learningPlatformsAndDigitalEcosystems",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Basics of Financial Management for Program Teams",
+                            "identifier": "pragyanpathfw_topic_basicsoffinancialmanagementforprogramteams",
+                            "description": "Basics of Financial Management for Program Teams",
+                            "code": "basicsOfFinancialManagementForProgramTeams",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Other Operational Management Skills",
+                            "identifier": "pragyanpathfw_topic_otheroperationalmanagementskills",
+                            "description": "Other Operational Management Skills",
+                            "code": "otherOperationalManagementSkills",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Project Management",
+                            "identifier": "pragyanpathfw_topic_projectmanagement",
+                            "description": "Project Management",
+                            "code": "projectManagement",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Applications of AI in Education",
+                            "identifier": "pragyanpathfw_topic_applicationsofaiineducation",
+                            "description": "Applications of AI in Education",
+                            "code": "applicationsOfAiInEducation",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Digital Content Development",
+                            "identifier": "pragyanpathfw_topic_digitalcontentdevelopment",
+                            "description": "Digital Content Development",
+                            "code": "digitalContentDevelopment",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Video Production",
+                            "identifier": "pragyanpathfw_topic_videoproduction",
+                            "description": "Video Production",
+                            "code": "videoProduction",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Photography for Programs & Impact Stories",
+                            "identifier": "pragyanpathfw_topic_photographyforprogramsandimpactstories",
+                            "description": "Photography for Programs & Impact Stories",
+                            "code": "photographyForProgramsAndImpactStories",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        }
+                    ],
+                    "identifier": "pragyanpathfw_area_operationalmanagement",
+                    "code": "operationalManagement",
+                    "name": "Operational Management",
+                    "description": "Operational Management",
+                    "index": 7,
+                    "category": "area",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_area_technicalskills",
+                    "code": "technicalSkills",
+                    "name": "Technical Skills",
+                    "description": "Technical Skills",
+                    "index": 8,
+                    "category": "area",
+                    "status": "Live"
+                },
+                {
+                    "associations": [
+                        {
+                            "name": "Employee Engagement & Retention Strategies",
+                            "identifier": "pragyanpathfw_topic_employeeengagementandretentionstrategies",
+                            "description": "Employee Engagement & Retention Strategies",
+                            "code": "employeeEngagementAndRetentionStrategies",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Hiring Effectively",
+                            "identifier": "pragyanpathfw_topic_hiringeffectively",
+                            "description": "Hiring Effectively",
+                            "code": "hiringEffectively",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "ERP for HR",
+                            "identifier": "pragyanpathfw_topic_erpforhr",
+                            "description": "ERP for HR",
+                            "code": "erpForHr",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Organizational Development & Change Management",
+                            "identifier": "pragyanpathfw_topic_organizationaldevelopmentandchangemanagement",
+                            "description": "Organizational Development & Change Management",
+                            "code": "organizationalDevelopmentAndChangeManagement",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Designing Performance Management Processes",
+                            "identifier": "pragyanpathfw_topic_designingperformancemanagementprocesses",
+                            "description": "Designing Performance Management Processes",
+                            "code": "designingPerformanceManagementProcesses",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Building Inclusive & Equitable Workplaces",
+                            "identifier": "pragyanpathfw_topic_buildinginclusiveandequitableworkplaces",
+                            "description": "Building Inclusive & Equitable Workplaces",
+                            "code": "buildingInclusiveAndEquitableWorkplaces",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Other Human Resource Skills",
+                            "identifier": "pragyanpathfw_topic_otherhumanresourceskills",
+                            "description": "Other Human Resource Skills",
+                            "code": "otherHumanResourceSkills",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Designing Compensation & Rewards Structures",
+                            "identifier": "pragyanpathfw_topic_designingcompensationandrewardsstructures",
+                            "description": "Designing Compensation & Rewards Structures",
+                            "code": "designingCompensationAndRewardsStructures",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        }
+                    ],
+                    "identifier": "pragyanpathfw_area_hr",
+                    "code": "hr",
+                    "name": "HR",
+                    "description": "HR",
+                    "index": 9,
+                    "category": "area",
+                    "status": "Live"
+                },
+                {
+                    "associations": [
+                        {
+                            "name": "Procurement & Financial Due Diligence",
+                            "identifier": "pragyanpathfw_topic_procurementandfinancialduediligence",
+                            "description": "Procurement & Financial Due Diligence",
+                            "code": "procurementAndFinancialDueDiligence",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Internal Controls & Audit Readiness",
+                            "identifier": "pragyanpathfw_topic_internalcontrolsandauditreadiness",
+                            "description": "Internal Controls & Audit Readiness",
+                            "code": "internalControlsAndAuditReadiness",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Regulatory Compliance",
+                            "identifier": "pragyanpathfw_topic_regulatorycompliance",
+                            "description": "Regulatory Compliance",
+                            "code": "regulatoryCompliance",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Financial MIS through ERP",
+                            "identifier": "pragyanpathfw_topic_financialmisthrougherp",
+                            "description": "Financial MIS through ERP",
+                            "code": "financialMisThroughErp",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Basics of Financial Management",
+                            "identifier": "pragyanpathfw_topic_basicsoffinancialmanagement",
+                            "description": "Basics of Financial Management",
+                            "code": "basicsOfFinancialManagement",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Accounting Principles ",
+                            "identifier": "pragyanpathfw_topic_accountingprinciples",
+                            "description": "Accounting Principles ",
+                            "code": "accountingPrinciples",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Other Financial Management Skills",
+                            "identifier": "pragyanpathfw_topic_otherfinancialmanagementskills",
+                            "description": "Other Financial Management Skills",
+                            "code": "otherFinancialManagementSkills",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        }
+                    ],
+                    "identifier": "pragyanpathfw_area_financeandaccounts",
+                    "code": "financeAndAccounts",
+                    "name": "Finance & Accounts",
+                    "description": "Finance & Accounts",
+                    "index": 10,
+                    "category": "area",
+                    "status": "Live"
+                },
+                {
+                    "associations": [
+                        {
+                            "name": "Strategic Communication with External Stakeholders",
+                            "identifier": "pragyanpathfw_topic_strategiccommunicationwithexternalstakeholders",
+                            "description": "Strategic Communication with External Stakeholders",
+                            "code": "strategicCommunicationWithExternalStakeholders",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Building and Managing External Partnerships",
+                            "identifier": "pragyanpathfw_topic_buildingandmanagingexternalpartnerships",
+                            "description": "Building and Managing External Partnerships",
+                            "code": "buildingAndManagingExternalPartnerships",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Proposal Writing & Fundraising Strategies",
+                            "identifier": "pragyanpathfw_topic_proposalwritingandfundraisingstrategies",
+                            "description": "Proposal Writing & Fundraising Strategies",
+                            "code": "proposalWritingAndFundraisingStrategies",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Negotiation & Agreement Management",
+                            "identifier": "pragyanpathfw_topic_negotiationandagreementmanagement",
+                            "description": "Negotiation & Agreement Management",
+                            "code": "negotiationAndAgreementManagement",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Corporate Social Responsibility (CSR) Engagement",
+                            "identifier": "pragyanpathfw_topic_corporatesocialresponsibilitycsrengagement",
+                            "description": "Corporate Social Responsibility (CSR) Engagement",
+                            "code": "corporateSocialResponsibilityCsrEngagement",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Donor Relations & Reporting",
+                            "identifier": "pragyanpathfw_topic_donorrelationsandreporting",
+                            "description": "Donor Relations & Reporting",
+                            "code": "donorRelationsAndReporting",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        },
+                        {
+                            "name": "Government Liaison & Relationship Management",
+                            "identifier": "pragyanpathfw_topic_governmentliaisonandrelationshipmanagement",
+                            "description": "Government Liaison & Relationship Management",
+                            "code": "governmentLiaisonAndRelationshipManagement",
+                            "status": "Live",
+                            "category": "topic",
+                            "index": 1
+                        }
+                    ],
+                    "identifier": "pragyanpathfw_area_partnershipsandexternalengagement",
+                    "code": "partnershipsAndExternalEngagement",
+                    "name": "Partnerships & External Engagement",
+                    "description": "Partnerships & External Engagement",
+                    "index": 11,
+                    "category": "area",
+                    "status": "Live"
+                }
+            ],
+            "name": "Area",
+            "description": "Area",
+            "index": 1,
+            "status": "Live"
+        },
+        {
+            "identifier": "pragyanpathfw_topic",
+            "code": "topic",
+            "terms": [
+                {
+                    "identifier": "pragyanpathfw_topic_foundationsofleadership",
+                    "code": "foundationsOfLeadership",
+                    "name": "Foundations of Leadership",
+                    "description": "Foundations of Leadership",
+                    "index": 1,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_leadingpeople",
+                    "code": "leadingPeople",
+                    "name": "Leading People",
+                    "description": "Leading People",
+                    "index": 2,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_communicationandfeedback",
+                    "code": "communicationAndFeedback",
+                    "name": "Communication & Feedback",
+                    "description": "Communication & Feedback",
+                    "index": 3,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_strategicleadership",
+                    "code": "strategicLeadership",
+                    "name": "Strategic Leadership",
+                    "description": "Strategic Leadership",
+                    "index": 4,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_changeandstakeholderleadership",
+                    "code": "changeAndStakeholderLeadership",
+                    "name": "Change & Stakeholder Leadership",
+                    "description": "Change & Stakeholder Leadership",
+                    "index": 5,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_otherleadershipskills",
+                    "code": "otherLeadershipSkills",
+                    "name": "Other Leadership Skills",
+                    "description": "Other Leadership Skills",
+                    "index": 6,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_communicationskills",
+                    "code": "communicationSkills",
+                    "name": "Communication Skills",
+                    "description": "Communication Skills",
+                    "index": 7,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_timemanagementandprioritization",
+                    "code": "timeManagementAndPrioritization",
+                    "name": "Time Management & Prioritization",
+                    "description": "Time Management & Prioritization",
+                    "index": 8,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_criticalthinkingandproblemsolving",
+                    "code": "criticalThinkingAndProblemSolving",
+                    "name": "Critical Thinking & Problem Solving",
+                    "description": "Critical Thinking & Problem Solving",
+                    "index": 9,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_collaborationandteamwork",
+                    "code": "collaborationAndTeamwork",
+                    "name": "Collaboration & Teamwork",
+                    "description": "Collaboration & Teamwork",
+                    "index": 10,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_presentationskills",
+                    "code": "presentationSkills",
+                    "name": "Presentation Skills",
+                    "description": "Presentation Skills",
+                    "index": 11,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_othergeneralskills",
+                    "code": "otherGeneralSkills",
+                    "name": "Other General Skills",
+                    "description": "Other General Skills",
+                    "index": 12,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_teachingattherightlevel",
+                    "code": "teachingAtTheRightLevel",
+                    "name": "Teaching at the Right Level",
+                    "description": "Teaching at the Right Level",
+                    "index": 13,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_earlyyearspedagogy",
+                    "code": "earlyYearsPedagogy",
+                    "name": "Early Years Pedagogy",
+                    "description": "Early Years Pedagogy",
+                    "index": 14,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_elementaryyears",
+                    "code": "elementaryYears",
+                    "name": "Elementary Years",
+                    "description": "Elementary Years",
+                    "index": 15,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_academicmentoringandclassroomsupport",
+                    "code": "academicMentoringAndClassroomSupport",
+                    "name": "Academic Mentoring & Classroom Support",
+                    "description": "Academic Mentoring & Classroom Support",
+                    "index": 16,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_designingteachertrainingmodules",
+                    "code": "designingTeacherTrainingModules",
+                    "name": "Designing Teacher Training Modules",
+                    "description": "Designing Teacher Training Modules",
+                    "index": 17,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_communityengagement",
+                    "code": "communityEngagement",
+                    "name": "Community Engagement",
+                    "description": "Community Engagement",
+                    "index": 18,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_inclusiveeducation",
+                    "code": "inclusiveEducation",
+                    "name": "Inclusive Education",
+                    "description": "Inclusive Education",
+                    "index": 19,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_otherprogramandpedagogyskills",
+                    "code": "otherProgramAndPedagogySkills",
+                    "name": "Other Program and Pedagogy Skills",
+                    "description": "Other Program and Pedagogy Skills",
+                    "index": 20,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_communicatingprogrammodelandimpactwithofficials",
+                    "code": "communicatingProgramModelAndImpactWithOfficials",
+                    "name": "Communicating Program Model & Impact with Officials",
+                    "description": "Communicating Program Model & Impact with Officials",
+                    "index": 21,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_explainingprogramdataandresults",
+                    "code": "explainingProgramDataAndResults",
+                    "name": "Explaining Program Data & Results",
+                    "description": "Explaining Program Data & Results",
+                    "index": 22,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_storytellingwithdatatranslatingnumbersintonarratives",
+                    "code": "storytellingWithDataTranslatingNumbersIntoNarratives",
+                    "name": "Storytelling with Data: Translating numbers into narratives",
+                    "description": "Storytelling with Data: Translating numbers into narratives",
+                    "index": 23,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_stakeholderengagement",
+                    "code": "stakeholderEngagement",
+                    "name": "Stakeholder Engagement",
+                    "description": "Stakeholder Engagement",
+                    "index": 24,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_advocacywiththegovernment",
+                    "code": "advocacyWithTheGovernment",
+                    "name": "Advocacy with the Government",
+                    "description": "Advocacy with the Government",
+                    "index": 25,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_otherprogramcommunicationskills",
+                    "code": "otherProgramCommunicationSkills",
+                    "name": "Other Program Communication Skills",
+                    "description": "Other Program Communication Skills",
+                    "index": 26,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_basicsofmonitoringandevaluation",
+                    "code": "basicsOfMonitoringAndEvaluation",
+                    "name": "Basics of Monitoring & Evaluation",
+                    "description": "Basics of Monitoring & Evaluation",
+                    "index": 27,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_datacollectionandquality",
+                    "code": "dataCollectionAndQuality",
+                    "name": "Data Collection & Quality",
+                    "description": "Data Collection & Quality",
+                    "index": 28,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_dataanalysisandvisualization",
+                    "code": "dataAnalysisAndVisualization",
+                    "name": "Data Analysis & Visualization",
+                    "description": "Data Analysis & Visualization",
+                    "index": 29,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_misdevelopmentandmanagementforprograms",
+                    "code": "misDevelopmentAndManagementForPrograms",
+                    "name": "MIS Development & Management for Programs",
+                    "description": "MIS Development & Management for Programs",
+                    "index": 30,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_evidencebaseddecisionmaking",
+                    "code": "evidenceBasedDecisionMaking",
+                    "name": "Evidence-Based Decision-Making",
+                    "description": "Evidence-Based Decision-Making",
+                    "index": 31,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_otherdatamonitoringandevaluationskills",
+                    "code": "otherDataMonitoringAndEvaluationSkills",
+                    "name": "Other Data, Monitoring & Evaluation Skills",
+                    "description": "Other Data, Monitoring & Evaluation Skills",
+                    "index": 32,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_strategydevelopmentandscaling",
+                    "code": "strategyDevelopmentAndScaling",
+                    "name": "Strategy Development & Scaling",
+                    "description": "Strategy Development & Scaling",
+                    "index": 33,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_operationalplanning",
+                    "code": "operationalPlanning",
+                    "name": "Operational Planning",
+                    "description": "Operational Planning",
+                    "index": 34,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_analyticalthinking",
+                    "code": "analyticalThinking",
+                    "name": "Analytical Thinking",
+                    "description": "Analytical Thinking",
+                    "index": 35,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_riskandscenariomanagement",
+                    "code": "riskAndScenarioManagement",
+                    "name": "Risk & Scenario Management",
+                    "description": "Risk & Scenario Management",
+                    "index": 36,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_strategyexecution",
+                    "code": "strategyExecution",
+                    "name": "Strategy Execution",
+                    "description": "Strategy Execution",
+                    "index": 37,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_otherplanningandstrategyskills",
+                    "code": "otherPlanningAndStrategySkills",
+                    "name": "Other Planning & Strategy Skills",
+                    "description": "Other Planning & Strategy Skills",
+                    "index": 38,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_projectmanagement",
+                    "code": "projectManagement",
+                    "name": "Project Management",
+                    "description": "Project Management",
+                    "index": 39,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_basicsoffinancialmanagementforprogramteams",
+                    "code": "basicsOfFinancialManagementForProgramTeams",
+                    "name": "Basics of Financial Management for Program Teams",
+                    "description": "Basics of Financial Management for Program Teams",
+                    "index": 40,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_procurementandresourceplanning",
+                    "code": "procurementAndResourcePlanning",
+                    "name": "Procurement & Resource Planning",
+                    "description": "Procurement & Resource Planning",
+                    "index": 41,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_fieldoperationsmanagement",
+                    "code": "fieldOperationsManagement",
+                    "name": "Field Operations Management",
+                    "description": "Field Operations Management",
+                    "index": 42,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_creatingandimplementingstandardoperatingprocedures",
+                    "code": "creatingAndImplementingStandardOperatingProcedures",
+                    "name": "Creating and Implementing Standard Operating Procedures",
+                    "description": "Creating and Implementing Standard Operating Procedures",
+                    "index": 43,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_otheroperationalmanagementskills",
+                    "code": "otherOperationalManagementSkills",
+                    "name": "Other Operational Management Skills",
+                    "description": "Other Operational Management Skills",
+                    "index": 44,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_digitalcontentdevelopment",
+                    "code": "digitalContentDevelopment",
+                    "name": "Digital Content Development",
+                    "description": "Digital Content Development",
+                    "index": 45,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_graphicdesign",
+                    "code": "graphicDesign",
+                    "name": "Graphic Design",
+                    "description": "Graphic Design",
+                    "index": 46,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_animationandmotiongraphics",
+                    "code": "animationAndMotionGraphics",
+                    "name": "Animation & Motion Graphics",
+                    "description": "Animation & Motion Graphics",
+                    "index": 47,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_videoproduction",
+                    "code": "videoProduction",
+                    "name": "Video Production",
+                    "description": "Video Production",
+                    "index": 48,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_photographyforprogramsandimpactstories",
+                    "code": "photographyForProgramsAndImpactStories",
+                    "name": "Photography for Programs & Impact Stories",
+                    "description": "Photography for Programs & Impact Stories",
+                    "index": 49,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_orientationonaiforleaders",
+                    "code": "orientationOnAiForLeaders",
+                    "name": "Orientation on AI for Leaders",
+                    "description": "Orientation on AI for Leaders",
+                    "index": 50,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_applicationsofaiineducation",
+                    "code": "applicationsOfAiInEducation",
+                    "name": "Applications of AI in Education",
+                    "description": "Applications of AI in Education",
+                    "index": 51,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_learningplatformsanddigitalecosystems",
+                    "code": "learningPlatformsAndDigitalEcosystems",
+                    "name": "Learning Platforms & Digital Ecosystems",
+                    "description": "Learning Platforms & Digital Ecosystems",
+                    "index": 52,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_othertechnicalskills",
+                    "code": "otherTechnicalSkills",
+                    "name": "Other Technical Skills",
+                    "description": "Other Technical Skills",
+                    "index": 53,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_designingperformancemanagementprocesses",
+                    "code": "designingPerformanceManagementProcesses",
+                    "name": "Designing Performance Management Processes",
+                    "description": "Designing Performance Management Processes",
+                    "index": 54,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_designingcompensationandrewardsstructures",
+                    "code": "designingCompensationAndRewardsStructures",
+                    "name": "Designing Compensation & Rewards Structures",
+                    "description": "Designing Compensation & Rewards Structures",
+                    "index": 55,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_hiringeffectively",
+                    "code": "hiringEffectively",
+                    "name": "Hiring Effectively",
+                    "description": "Hiring Effectively",
+                    "index": 56,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_erpforhr",
+                    "code": "erpForHr",
+                    "name": "ERP for HR",
+                    "description": "ERP for HR",
+                    "index": 57,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_organizationaldevelopmentandchangemanagement",
+                    "code": "organizationalDevelopmentAndChangeManagement",
+                    "name": "Organizational Development & Change Management",
+                    "description": "Organizational Development & Change Management",
+                    "index": 58,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_buildinginclusiveandequitableworkplaces",
+                    "code": "buildingInclusiveAndEquitableWorkplaces",
+                    "name": "Building Inclusive & Equitable Workplaces",
+                    "description": "Building Inclusive & Equitable Workplaces",
+                    "index": 59,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_employeeengagementandretentionstrategies",
+                    "code": "employeeEngagementAndRetentionStrategies",
+                    "name": "Employee Engagement & Retention Strategies",
+                    "description": "Employee Engagement & Retention Strategies",
+                    "index": 60,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_otherhumanresourceskills",
+                    "code": "otherHumanResourceSkills",
+                    "name": "Other Human Resource Skills",
+                    "description": "Other Human Resource Skills",
+                    "index": 61,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_basicsoffinancialmanagement",
+                    "code": "basicsOfFinancialManagement",
+                    "name": "Basics of Financial Management",
+                    "description": "Basics of Financial Management",
+                    "index": 62,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_accountingprinciples",
+                    "code": "accountingPrinciples",
+                    "name": "Accounting Principles ",
+                    "description": "Accounting Principles ",
+                    "index": 63,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_internalcontrolsandauditreadiness",
+                    "code": "internalControlsAndAuditReadiness",
+                    "name": "Internal Controls & Audit Readiness",
+                    "description": "Internal Controls & Audit Readiness",
+                    "index": 64,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_procurementandfinancialduediligence",
+                    "code": "procurementAndFinancialDueDiligence",
+                    "name": "Procurement & Financial Due Diligence",
+                    "description": "Procurement & Financial Due Diligence",
+                    "index": 65,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_financialmisthrougherp",
+                    "code": "financialMisThroughErp",
+                    "name": "Financial MIS through ERP",
+                    "description": "Financial MIS through ERP",
+                    "index": 66,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_regulatorycompliance",
+                    "code": "regulatoryCompliance",
+                    "name": "Regulatory Compliance",
+                    "description": "Regulatory Compliance",
+                    "index": 67,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_otherfinancialmanagementskills",
+                    "code": "otherFinancialManagementSkills",
+                    "name": "Other Financial Management Skills",
+                    "description": "Other Financial Management Skills",
+                    "index": 68,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_donorrelationsandreporting",
+                    "code": "donorRelationsAndReporting",
+                    "name": "Donor Relations & Reporting",
+                    "description": "Donor Relations & Reporting",
+                    "index": 69,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_proposalwritingandfundraisingstrategies",
+                    "code": "proposalWritingAndFundraisingStrategies",
+                    "name": "Proposal Writing & Fundraising Strategies",
+                    "description": "Proposal Writing & Fundraising Strategies",
+                    "index": 70,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_corporatesocialresponsibilitycsrengagement",
+                    "code": "corporateSocialResponsibilityCsrEngagement",
+                    "name": "Corporate Social Responsibility (CSR) Engagement",
+                    "description": "Corporate Social Responsibility (CSR) Engagement",
+                    "index": 71,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_buildingandmanagingexternalpartnerships",
+                    "code": "buildingAndManagingExternalPartnerships",
+                    "name": "Building and Managing External Partnerships",
+                    "description": "Building and Managing External Partnerships",
+                    "index": 72,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_governmentliaisonandrelationshipmanagement",
+                    "code": "governmentLiaisonAndRelationshipManagement",
+                    "name": "Government Liaison & Relationship Management",
+                    "description": "Government Liaison & Relationship Management",
+                    "index": 73,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_negotiationandagreementmanagement",
+                    "code": "negotiationAndAgreementManagement",
+                    "name": "Negotiation & Agreement Management",
+                    "description": "Negotiation & Agreement Management",
+                    "index": 74,
+                    "category": "topic",
+                    "status": "Live"
+                },
+                {
+                    "identifier": "pragyanpathfw_topic_strategiccommunicationwithexternalstakeholders",
+                    "code": "strategicCommunicationWithExternalStakeholders",
+                    "name": "Strategic Communication with External Stakeholders",
+                    "description": "Strategic Communication with External Stakeholders",
+                    "index": 75,
+                    "category": "topic",
+                    "status": "Live"
+                }
+            ],
+            "name": "Topic",
+            "description": "Topic",
+            "index": 2,
+            "status": "Live"
+        }
+    ],
+    "type": "K-12"
+}
+
+
+this is response of framework api...now we wanna to to develop dynamic filter selection checkmark ui
+
+here some filters are dependent on each other so how can we identified it let me tell you:
+
+so here in categories array first object is area so our first filter is area which have filtering values :
+Leadership
+General Skills
+Program & Pedagogy
+Program Communication
+Data, Monitoring & Evaluation
+Planning & Strategy
+Operational Management
+Technical Skills
+HR
+Finance & Accounts
+Partnerships & External Engagementd
+
+
+But can you observed here each have associations array of objects:
+means uppon selection of any value from area other coming fields are depends on it 
+so how depends it let me tell you:
+lets take first example leadership assotiation:
+ "terms": [
+                        {
+                            "associations": [
+                                {
+                                    "name": "Other Leadership Skills",
+                                    "identifier": "pragyanpathfw_topic_otherleadershipskills",
+                                    "description": "Other Leadership Skills",
+                                    "code": "otherLeadershipSkills",
+                                    "status": "Live",
+                                    "category": "topic",
+                                    "index": 1
+                                },
+                                {
+                                    "name": "Leading People",
+                                    "identifier": "pragyanpathfw_topic_leadingpeople",
+                                    "description": "Leading People",
+                                    "code": "leadingPeople",
+                                    "status": "Live",
+                                    "category": "topic",
+                                    "index": 1
+                                },
+                                {
+                                    "name": "Communication & Feedback",
+                                    "identifier": "pragyanpathfw_topic_communicationandfeedback",
+                                    "description": "Communication & Feedback",
+                                    "code": "communicationAndFeedback",
+                                    "status": "Live",
+                                    "category": "topic",
+                                    "index": 1
+                                },
+                                {
+                                    "name": "Strategic Leadership",
+                                    "identifier": "pragyanpathfw_topic_strategicleadership",
+                                    "description": "Strategic Leadership",
+                                    "code": "strategicLeadership",
+                                    "status": "Live",
+                                    "category": "topic",
+                                    "index": 1
+                                },
+                                {
+                                    "name": "Change & Stakeholder Leadership",
+                                    "identifier": "pragyanpathfw_topic_changeandstakeholderleadership",
+                                    "description": "Change & Stakeholder Leadership",
+                                    "code": "changeAndStakeholderLeadership",
+                                    "status": "Live",
+                                    "category": "topic",
+                                    "index": 1
+                                },
+                                {
+                                    "name": "Foundations of Leadership",
+                                    "identifier": "pragyanpathfw_topic_foundationsofleadership",
+                                    "description": "Foundations of Leadership",
+                                    "code": "foundationsOfLeadership",
+                                    "status": "Live",
+                                    "category": "topic",
+                                    "index": 1
+                                }
+                            ],
+                            "identifier": "pragyanpathfw_area_leadership",
+                            "code": "leadership",
+                            "name": "Leadership",
+                            "description": "Leadership",
+                            "index": 1,
+                            "category": "area",
+                            "status": "Live"
+                        } 
+
+so here can you observe associations object have category as well category as in our second filter topic consider (first one is area)
+so upon selection of area value leadership topic selection values changes display according to that associations values
+
+so first task is that you have to find object inside array  categories :
+  "name": "Area",   "code": "area"
+   "name": "Topic","code": "topic"
+
+These are our filters
+then check dependency if associations then change options according to that display in terms array
+
+and rememeber i want dynamic component dont hardcode anything..in future there are multiple objects coming now here only topic and area
+I want all configurabele
+
+
+
+
+
+
+

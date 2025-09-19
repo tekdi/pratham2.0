@@ -47,7 +47,11 @@ export enum TenantName {
  LEARNING_AND_DEVELOPMENT ="Learning and Development"
 
 }
-
+export enum FilterKey {
+  GROUP_MEMBERSHIP = 'groupMembership',
+  JOB_FAMILY = 'jobFamily',
+  PSU = 'psu',
+}
 export enum Status {
   ARCHIVED = 'archived',
   ARCHIVED_LABEL = 'Archived',
