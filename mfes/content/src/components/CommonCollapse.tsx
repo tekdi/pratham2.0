@@ -89,6 +89,10 @@ const GetIconByMimeType = React.memo(function GetIconByMimeTypeComponent({
       ),
       text: 'Unit',
     },
+    'application/vnd.ekstep.content-collection': {
+      icon: <Image src="/images/unitIcon.svg" alt="unit" width="18" height="18" />,
+      text: 'Unit',
+    },
   };
   if (isShowText) {
     return (
