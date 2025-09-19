@@ -308,7 +308,9 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
       // Multiple tenants: start at tenant selection
       setActiveStep(0);
     }
-  }, [open, visibleTenants, callbackFunction, onClose]);
+    // }, [open, visibleTenants, callbackFunction, onClose]);
+  }, [open]);
+
 
   const handleTenantSelect = (tenant: TenantData) => {
     setSelectedTenant(tenant);
