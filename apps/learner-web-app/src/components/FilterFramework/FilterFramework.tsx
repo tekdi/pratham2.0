@@ -722,15 +722,24 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
 
       {/* Filter Content */}
       <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 1 }}>
-        {/* Static Filter Fields */}
-       
-          <StaticFilterFields 
-            onFiltersChange={handleStaticFiltersChange} 
-            showHeader={false} 
-            clearTrigger={clearTrigger}
-          />
+        {/* Content Language Filter - First */}
+        <StaticFilterFields 
+          onFiltersChange={handleStaticFiltersChange} 
+          showHeader={false} 
+          clearTrigger={clearTrigger}
+          filterTypes={['contentLanguage']}
+        />
         
+        {/* Framework Filters - Middle */}
         {categories.map(renderFilterSection)}
+        
+        {/* Skills and Course Type Filters - Last */}
+        <StaticFilterFields 
+          onFiltersChange={handleStaticFiltersChange} 
+          showHeader={false} 
+          clearTrigger={clearTrigger}
+          filterTypes={['skills', 'courseType']}
+        />
       </Box>
     </Box>
   );
