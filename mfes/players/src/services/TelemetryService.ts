@@ -214,7 +214,7 @@ export const contentWithTelemetryData = async ({
     const course = response?.find(
       (content: any) => content.identifier === courseId
     );
-    const resolvedMimeType = response[0]?.mimeType || '';
+    const resolvedMimeType = response?.[0]?.mimeType || '';
     if (!resolvedMimeType) {
       console.error('Failed to fetch mimeType.');
       return;

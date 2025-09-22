@@ -16,6 +16,10 @@ const SunbirdQuMLPlayer = dynamic(() => import('./SunbirdQuMLPlayer'), {
   ssr: false,
 });
 
+const TekdiQuMLPlayer = dynamic(() => import('./TekdiQuMLPlayer'), {
+  ssr: false,
+});
+
 const SunbirdV1Player = dynamic(() => import('../V1-Player/V1Player'), {
   ssr: false,
 });
@@ -60,7 +64,7 @@ const SunbirdPlayers = ({
       );
     case 'application/vnd.sunbird.questionset':
       return (
-        <SunbirdQuMLPlayer
+        <TekdiQuMLPlayer
           playerConfig={playerConfig}
           relatedData={{ courseId, unitId, userId }}
           configFunctionality={configFunctionality}
