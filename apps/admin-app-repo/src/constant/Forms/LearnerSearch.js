@@ -35,7 +35,7 @@ export const learnerSearchSchema = {
       //for multiselect
       uniqueItems: true,
       isMultiSelect: true,
-      maxSelections: 1,
+      maxSelection: 1,
     },
     district: {
       type: 'array',
@@ -65,7 +65,7 @@ export const learnerSearchSchema = {
       //for multiselect
       uniqueItems: true,
       isMultiSelect: true,
-      maxSelections: 1,
+      maxSelection: 1,
     },
     block: {
       type: 'array',
@@ -94,7 +94,7 @@ export const learnerSearchSchema = {
       //for multiselect
       uniqueItems: true,
       isMultiSelect: true,
-      maxSelections: 1000,
+      maxSelection: 1000,
     },
     // village: {
     //   type: 'array',
@@ -123,7 +123,7 @@ export const learnerSearchSchema = {
     //   //for multiselect
     //   uniqueItems: true,
     //   isMultiSelect: true,
-    //   maxSelections: 1000,
+    //   maxSelection: 1000,
     // },
     center: {
       type: 'array',
@@ -165,7 +165,7 @@ export const learnerSearchSchema = {
       },
       uniqueItems: true,
       isMultiSelect: true,
-      maxSelections: 1000,
+      maxSelection: 1000,
     },
     batch: {
       type: 'array',
@@ -207,7 +207,7 @@ export const learnerSearchSchema = {
       },
       uniqueItems: true,
       isMultiSelect: true,
-      maxSelections: 1000,
+      maxSelection: 1000,
     },
     name: {
       type: 'string',
