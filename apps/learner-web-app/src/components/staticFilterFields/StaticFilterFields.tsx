@@ -16,6 +16,7 @@ interface StaticFilterFieldsProps {
   onFiltersChange?: (filters: Record<string, string[]>) => void;
   showHeader?: boolean;
   clearTrigger?: number;
+  filterTypes?: string[]; // Specify which filter types to show
 }
 
 interface StaticFilterOption {
@@ -31,7 +32,7 @@ interface StaticFilterField {
   range: (string | StaticFilterOption)[];
 }
 
-const StaticFilterFields: React.FC<StaticFilterFieldsProps> = ({ onFiltersChange, showHeader = false, clearTrigger = 0 }) => {
+const StaticFilterFields: React.FC<StaticFilterFieldsProps> = ({ onFiltersChange, showHeader = false, clearTrigger = 0, filterTypes }) => {
   const [filterFields, setFilterFields] = useState<StaticFilterField[]>([]);
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [collapseState, setCollapseState] = useState<Record<string, boolean>>({});
@@ -97,18 +98,45 @@ const StaticFilterFields: React.FC<StaticFilterFieldsProps> = ({ onFiltersChange
       
       if (result?.objectCategoryDefinition?.forms) {
         const forms = result.objectCategoryDefinition.forms as any;
-        if (forms.search?.properties) {
-          const searchProperties = forms.search.properties;
-        
-                  // Extract only contentLanguage field
-        const staticFields: StaticFilterField[] = searchProperties
-          .filter((field: any) => field.code === 'contentLanguage' && field.range && Array.isArray(field.range))
-          .map((field: any) => ({
-            code: field.code,
-            name: field.name,
-            label: field.label,
-            range: field.range
-          }));
+        if (forms.search?.properties || forms.create?.properties) {
+          const searchProperties = forms.search?.properties || [];
+          const createProperties = forms.create?.properties || [];
+          
+          // Combine and extract fields from both search and create properties
+          const targetFields = filterTypes || ['contentLanguage', 'skills', 'courseType'];
+          const staticFields: StaticFilterField[] = [];
+          
+          // First, check search properties for contentLanguage
+          searchProperties.forEach((field: any) => {
+            if (targetFields.includes(field.code) && field.range && Array.isArray(field.range) && field.range.length > 0) {
+              staticFields.push({
+                code: field.code,
+                name: field.name,
+                label: field.label,
+                range: field.range
+              });
+            }
+          });
+          
+          // Then, check create properties for skills and courseType
+          createProperties.forEach((section: any) => {
+            if (section.fields) {
+              section.fields.forEach((field: any) => {
+                if (targetFields.includes(field.code) && field.range && Array.isArray(field.range) && field.range.length > 0) {
+                  // Check if we already have this field from search properties
+                  const existingField = staticFields.find(f => f.code === field.code);
+                  if (!existingField) {
+                    staticFields.push({
+                      code: field.code,
+                      name: field.name,
+                      label: field.label,
+                      range: field.range
+                    });
+                  }
+                }
+              });
+            }
+          });
 
                   setFilterFields(staticFields);
         

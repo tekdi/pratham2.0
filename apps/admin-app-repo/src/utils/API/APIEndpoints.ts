@@ -41,7 +41,8 @@ export const API_ENDPOINTS = {
   downloadCertificate: `${baseurl}/tracking/certificate/render-PDF`,
   framework : (frameworkId: string) => `${baseurl}/framework/v1/read/${frameworkId}`,
   actionObject : `${baseurl}/action/object/category/definition/v1/read?fields=objectMetadata,forms,name,label`,
-  program: `${baseurl}/tenant/read`
+  program: `${baseurl}/tenant/read`,
+  hierarchialSearch: `${baseurl}/user/hierarchical-search`,
 };
 
 export const COURSE_PLANNER_UPLOAD_ENDPOINTS = `${process.env.NEXT_PUBLIC_BASE_URL}/prathamservice/v1/course-planner/upload`;
