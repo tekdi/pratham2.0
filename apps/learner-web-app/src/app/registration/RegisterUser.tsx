@@ -549,14 +549,21 @@ const RegisterUser = () => {
 
           document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
 
-          const hasBothContentCoursetab =
-            uiConfig?.showContent?.includes('courses') &&
-            uiConfig?.showContent?.includes('contents');
-          if (hasBothContentCoursetab) {
-            router.push('/courses-contents');
-          } else {
-            router.push('/content');
-          }
+          // const hasBothContentCoursetab =
+          //   uiConfig?.showContent?.includes('courses') &&
+          //   uiConfig?.showContent?.includes('contents');
+          // if (hasBothContentCoursetab) {
+          //   router.push('/courses-contents');
+          // } else {
+          //   router.push('/content');
+          // }
+          const landingPage = localStorage.getItem('landingPage') || '';
+
+        if (landingPage) {
+          router.push(landingPage);
+        } else {
+          router.push('/content');
+        }
         }
       }
     } catch (e) { }
