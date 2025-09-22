@@ -332,26 +332,50 @@ export const getOfflineAssessmentDetails = async ({
   filters,
 }: GetDoIdServiceParam): Promise<any> => {
   const apiUrl = `${URL_CONFIG.API.COMPOSITE_SEARCH}`;
+
+  // Build filters dynamically
+  const requestFilters: any = {
+    program: filters.program,
+    board: filters.board,
+    status: ['Live'],
+    primaryCategory: ['Practice Question Set'],
+  };
+
+  // Optional filters
+  if (filters.assessmentType) {
+    requestFilters.assessmentType = filters.assessmentType;
+  }
+
+  if (filters.evaluationType) {
+    requestFilters.evaluationType = filters.evaluationType;
+  }
+
   const data = {
     request: {
-      filters: {
-        program: filters.program,
-        board: filters.board,
-        // state: filters.state,
-        assessmentType: filters.assessmentType,
-        status: ['Live'],
-        primaryCategory: ['Practice Question Set'],
-      },
+      filters: requestFilters,
     },
   };
 
   try {
     const response1 = await post(apiUrl, data);
+
+    // 🚀 If evaluationType is provided, return directly without extra API call
+    if (filters.evaluationType) {
+      return {
+        result: {
+          ...response1?.data?.result,
+        },
+        responseCode: response1?.data?.responseCode,
+      };
+    }
+
+    // ✅ Default behavior (when evaluationType not provided)
     const response = await searchAiAssessment({
       question_set_id: response1?.data?.result?.QuestionSet?.map(
         (item: any) => item.identifier
       ),
     });
+
     const QuestionSet = response1?.data?.result?.QuestionSet?.filter(
       (item: any) =>
         response.data.find(

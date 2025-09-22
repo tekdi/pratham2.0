@@ -329,7 +329,9 @@
     "CONTACT_NUMBER": "Contact Number",
     "ENROLLMENT_NUMBER": "User Name",
     "SELECT_OPTION": "Select Option",
-    "HINDI": "Hindi"
+    "HINDI": "Hindi",
+    "MOCK_TEST": "Mock Test",
+    "UNIT_TEST": "Unit Test"
   },
   "FIELDS": {
     "DESIGNATION": "Designation",
@@ -741,7 +743,9 @@
     "UPLOADED_ON": "Uploaded on: {{date}}",
     "SORT_BY_STATUS": "Sort by Status",
     "LEARNERS_COUNT": "{{count}} of {{total}} Learners",
-    "NO_LEARNERS_FOUND": "No learners found matching your search."
+    "NO_LEARNERS_FOUND": "No learners found matching your search.",
+    "MANUAL_ASSESSMENT": "Manual Assessment",
+    "MANUAL_ASSESSMENT_LIST": "Manual Assessment List"
   },
   "BOARD_ENROLMENT": {
     "BOARD_ENROLLMENT": "Board Enrollment",
