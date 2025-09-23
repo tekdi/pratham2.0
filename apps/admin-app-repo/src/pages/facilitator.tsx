@@ -324,6 +324,24 @@ const Facilitator = () => {
       },
     },
     {
+      key: 'batch',
+      label: 'Batch',
+      render: (row) => {
+        // console.log('BacthRow', row?.cohortData)
+        const batches =
+          row.cohortData
+            ?.filter(
+              (c: any) =>
+                c.batchStatus === 'active' &&
+                c.cohortMember?.status === 'active'
+            )
+            .map((c: any) => transformLabel(c.batchName))
+            .filter(Boolean) || [];
+
+        return batches.join(', ');
+      },
+    },
+    {
       key: 'mysubject',
       label: 'Main Subjects',
       render: (row) => transformLabel(row?.customfield?.main_subject) || '-',
