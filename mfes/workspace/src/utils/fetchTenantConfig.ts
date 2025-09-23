@@ -2,6 +2,7 @@ export interface TenantConfig {
   CHANNEL_ID: string;
   CONTENT_FRAMEWORK: string;
   COLLECTION_FRAMEWORK: string;
+  QUESTION_SET_FRAMEWORK: string;
 }
 
 /**
@@ -27,8 +28,8 @@ export const fetchTenantConfig = async (tenantId?: string, req?: any): Promise<T
 
     if (!response.ok) throw new Error("Tenant not found");
 
-    const { CHANNEL_ID, CONTENT_FRAMEWORK, COLLECTION_FRAMEWORK } = await response.json();
-    return { CHANNEL_ID, CONTENT_FRAMEWORK, COLLECTION_FRAMEWORK };
+    const { CHANNEL_ID, CONTENT_FRAMEWORK, COLLECTION_FRAMEWORK , QUESTION_SET_FRAMEWORK} = await response.json();
+    return { CHANNEL_ID, CONTENT_FRAMEWORK, COLLECTION_FRAMEWORK , QUESTION_SET_FRAMEWORK};
   } catch (error) {
     console.error("Error fetching tenant config:", error);
     return null;
