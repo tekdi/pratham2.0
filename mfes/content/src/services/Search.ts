@@ -216,6 +216,7 @@ export const CommonContentSearch = async ({
           // identifier: 'do_1141652605790289921389',
           //need below after login user channel for dynamic load content
           // channel: '0135656861912678406',
+          primaryCategory:['Course'],
           ...filters,
           status: ['live'],
         

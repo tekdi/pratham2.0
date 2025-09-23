@@ -284,10 +284,10 @@ export default function Content(props: Readonly<ContentProps>) {
         // Check if contentTabs contains objects with label and filterKey
         const firstTab = config.contentTabs[0] as any;
         if (typeof firstTab === 'object' && firstTab?.label) {
-          // New format: array of objects with label and filterKey
+          // New format: array of objects with label, type and filterKey
           filteredTabs = config.contentTabs.map((configTab: any) => ({
             label: configTab.label,
-            type: configTab.label, // Use label as type for now, can be customized
+            type: configTab.type || configTab.label, // Use configTab.type if provided, otherwise fallback to label
             filterKey: configTab.filterKey
           }));
         } else {
