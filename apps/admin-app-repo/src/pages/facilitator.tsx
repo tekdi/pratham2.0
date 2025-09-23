@@ -521,9 +521,16 @@ const Facilitator = () => {
           selectedUserId,
           true
         );
-        console.log('selectedUserDetails:', selectedUserDetails);
+        // console.log('selectedUserDetails:', selectedUserDetails);
+        const updatedUserDetails = {
+          ...selectedUserDetails,
+          userData: {
+            ...selectedUserDetails.userData,
+            mobile: String(selectedUserDetails.userData.mobile),
+          },
+        };
 
-        let tempFormData = extractMatchingKeys(selectedUserDetails?.userData, addSchema);
+        let tempFormData = extractMatchingKeys(updatedUserDetails?.userData, addSchema);
         // console.log('tempFormData', tempFormData);
         setPrefilledAddFormData(tempFormData);
         setIsEdit(true);
