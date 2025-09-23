@@ -154,28 +154,18 @@ const PaginatedTable = ({
         <Table>
           <TableHead>
             <TableRow>
+            {actions.length > 0 && <TableCell>Actions</TableCell>}
               {columns?.map((col) => (
                 <TableCell key={col.key || col.keys?.join('-')}>
                   {col.label}
                 </TableCell>
               ))}
-              {actions.length > 0 && <TableCell>Actions</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
             {data && data?.map((row, index) => (
               <TableRow key={index}>
-                {columns?.map((col) => (
-                  <TableCell key={col.key || col.keys?.join('-')}>
-                    {/* ✅ Keep custom render logic if provided */}
-                    {col.render
-                      ? col.render(row)
-                      : Array.isArray(col.keys)
-                        ? col.keys.map((key) => row[key] ?? '').join(' ')
-                        : row[col.key] ?? ''}
-                  </TableCell>
-                ))}
-                {actions.length > 0 && (
+                 {actions.length > 0 && (
                   <TableCell>
                     <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                       {actions
@@ -188,6 +178,17 @@ const PaginatedTable = ({
                     </Box>
                   </TableCell>
                 )}
+                {columns?.map((col) => (
+                  <TableCell key={col.key || col.keys?.join('-')}>
+                    {/* ✅ Keep custom render logic if provided */}
+                    {col.render
+                      ? col.render(row)
+                      : Array.isArray(col.keys)
+                        ? col.keys.map((key) => row[key] ?? '').join(' ')
+                        : row[col.key] ?? ''}
+                  </TableCell>
+                ))}
+               
               </TableRow>
             ))}
           </TableBody>
