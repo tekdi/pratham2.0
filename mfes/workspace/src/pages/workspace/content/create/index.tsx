@@ -121,10 +121,12 @@ const CreatePage = () => {
 
   const fetchQuestionSetData = async (name?: string) => {
     try {
+      console.log('tenantConfig?.QUESTION_SET_FRAMEWORK', tenantConfig?.QUESTION_SET_FRAMEWORK);
       const response = await createQuestionSet(
-        tenantConfig?.COLLECTION_FRAMEWORK,
+        tenantConfig?.QUESTION_SET_FRAMEWORK,
         name
       );
+      
       console.log('Question set created successfully:', response);
       const identifier = response?.result?.identifier;
       router.push({
