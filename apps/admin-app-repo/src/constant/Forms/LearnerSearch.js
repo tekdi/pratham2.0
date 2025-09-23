@@ -169,7 +169,7 @@ export const learnerSearchSchema = {
     },
     batch: {
       type: 'array',
-      title: 'BATCH',
+      title: 'FORM.BATCH',
       items: {
         type: 'string',
         enum: ['Select'],
