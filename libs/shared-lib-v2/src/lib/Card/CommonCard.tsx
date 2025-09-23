@@ -116,7 +116,7 @@ export const CommonCard: React.FC<CommonCardProps> = ({
                     ? t('COMMON.STATUS.enrolled_not_started')
                     : t('COMMON.STATUS.not_started'),
           };
-          if (type === 'Course') {
+          if (type === 'Course' || type!=='Job family' || type!=='PSU' || type!=='Group Membership') {
             if (!_card?.isHideProgress) {
               setStatusBar({
                 ...newObj,
@@ -325,7 +325,7 @@ export const StatusBar: React.FC<StatuPorps> = ({
           gap: '8px',
         }}
       >
-        {type === 'Course' ? (
+        {type === 'Course' || type!=='Job family' || type!=='PSU' || type!=='Group Membership' ? (
           _card?.isHideProgress ? (
             <StatusIcon status={status ?? ''} />
           ) : (
