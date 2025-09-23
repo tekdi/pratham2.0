@@ -39,7 +39,7 @@ export const facilitatorSearchSchema = {
     },
     district: {
       type: 'array',
-      title: 'District',
+      title: 'FORM.DISTRICT',
       items: {
         type: 'string',
         enum: ['Select'],
@@ -169,7 +169,7 @@ export const facilitatorSearchSchema = {
     },
     batch: {
       type: 'array',
-      title: 'BATCH',
+      title: 'FORM.BATCH',
       items: {
         type: 'string',
         enum: ['Select'],
