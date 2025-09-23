@@ -243,7 +243,7 @@ const UserId = () => {
           phone: userData?.mobile || '',
           gender: userData?.gender || '',
           userRole:
-            toPascalCase(userData?.tenantData?.[0]?.roleName) ||
+            toPascalCase(userData?.tenantData?.[0]?.roles?.[0]?.roleName) ||
             toPascalCase(role),
           dob: formattedDOBDate || '',
           district: getFieldValue('DISTRICT'),
