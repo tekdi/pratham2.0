@@ -355,6 +355,24 @@ const Learner = () => {
         return centers.join(', ');
       },
     },
+     {
+          key: 'batch',
+          label: 'Batch',
+          render: (row) => {
+            // console.log('BacthRow', row?.cohortData)
+            const batches =
+              row.cohortData
+                ?.filter(
+                  (c: any) =>
+                    c.batchStatus === 'active' &&
+                    c.cohortMember?.status === 'active'
+                )
+                .map((c: any) => transformLabel(c.batchName))
+                .filter(Boolean) || [];
+    
+            return batches.join(', ');
+          },
+        },
     {
       key: 'status',
       label: 'Status',
