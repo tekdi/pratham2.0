@@ -153,7 +153,13 @@ const PaginatedTable = ({
       <TableContainer>
         <Table
           size="small"
-          sx={{ '& .MuiTableCell-root': { padding: '6px 8px' } }}
+          sx={{
+            borderCollapse: 'collapse',
+            '& .MuiTableCell-root': {
+              padding: '6px 8px',
+              border: '1px solid #e0e0e0',
+            },
+          }}
         >
           <TableHead>
             <TableRow>
