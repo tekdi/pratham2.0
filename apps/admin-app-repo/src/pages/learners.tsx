@@ -324,7 +324,7 @@ const Learner = () => {
         const state = transformLabel(row?.customfield?.state) || '';
         const district = transformLabel(row?.customfield?.district) || '';
         const block = transformLabel(row?.customfield?.block) || '';
-        const village = transformLabel(row?.customFields?.village) || '';
+        const village = transformLabel(row?.customfield?.village) || '';
         return `${state == '' ? '' : `${state}`}${district == '' ? '' : `, ${district}`
           }${block == '' ? '' : `, ${block}`}${village == '' ? '' : `, ${village}`
           }`;
@@ -355,24 +355,24 @@ const Learner = () => {
         return centers.join(', ');
       },
     },
-     {
-          key: 'batch',
-          label: 'Batch',
-          render: (row) => {
-            // console.log('BacthRow', row?.cohortData)
-            const batches =
-              row.cohortData
-                ?.filter(
-                  (c: any) =>
-                    c.batchStatus === 'active' &&
-                    c.cohortMember?.status === 'active'
-                )
-                .map((c: any) => transformLabel(c.batchName))
-                .filter(Boolean) || [];
-    
-            return batches.join(', ');
-          },
-        },
+    {
+      key: 'batch',
+      label: 'Batch',
+      render: (row) => {
+        // console.log('BacthRow', row?.cohortData)
+        const batches =
+          row.cohortData
+            ?.filter(
+              (c: any) =>
+                c.batchStatus === 'active' &&
+                c.cohortMember?.status === 'active'
+            )
+            .map((c: any) => transformLabel(c.batchName))
+            .filter(Boolean) || [];
+
+        return batches.join(', ');
+      },
+    },
     {
       key: 'status',
       label: 'Status',
