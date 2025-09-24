@@ -1,9 +1,8 @@
-import React, { memo } from 'react';
+import React, { memo, useEffect, useRef } from 'react';
 import {
   Box,
   Grid,
   Typography,
-  Button,
   CircularProgress,
   useTheme,
   useMediaQuery,
@@ -103,6 +102,65 @@ const ContentCardGrid = memo((props: ContentCardGridProps) => {
   const { default_img, _subBox, _grid, _containerGrid, _card } =
     props._config ?? {};
 
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const isRequestingRef = useRef<boolean>(false);
+
+  // Reset request lock when loading completes
+  useEffect(() => {
+    if (!props.isLoadingMoreData) {
+      isRequestingRef.current = false;
+    }
+  }, [props.isLoadingMoreData]);
+  const triggerLoadMore = () =>
+    props.handleLoadMore({
+      preventDefault: () => {},
+      stopPropagation: () => {},
+    } as any);
+
+  useEffect(() => {
+    if (!props.hasMoreData) return;
+    if (props.isLoadingMoreData) return;
+    if (!props.contentData || props.contentData.length === 0) return; // wait for first page
+    if (typeof window === 'undefined') return; // SSR safeguard
+    const node = sentinelRef.current;
+    if (!node) return;
+
+    let observer: IntersectionObserver | null = null;
+
+    const onIntersect: IntersectionObserverCallback = (entries) => {
+      const first = entries[0];
+      if (
+        first.isIntersecting &&
+        !props.isLoadingMoreData &&
+        !isRequestingRef.current &&
+        props.hasMoreData
+      ) {
+        isRequestingRef.current = true;
+        triggerLoadMore();
+      }
+    };
+
+    if (!('IntersectionObserver' in window)) return;
+    observer = new IntersectionObserver(onIntersect, {
+      root: null,
+      rootMargin: '400px',
+      threshold: 0,
+    });
+    observer.observe(node);
+
+    return () => {
+      if (observer && node) {
+        observer.unobserve(node);
+        observer.disconnect();
+      }
+    };
+  }, [
+    props.hasMoreData,
+    props.isLoadingMoreData,
+    props.handleLoadMore,
+    props.contentData?.length,
+  ]);
+console.log("props.contentData",props.contentData)
   return (
     <Box {..._subBox} sx={{ ...(_subBox?.sx ?? {}) }}>
       <Grid container spacing={{ xs: 2, sm: 2, md: 2 }} {..._containerGrid}>
@@ -133,18 +191,9 @@ const ContentCardGrid = memo((props: ContentCardGridProps) => {
       </Grid>
       <Box sx={{ textAlign: 'center', mt: 4 }}>
         {props.hasMoreData && (
-          <Button
-            variant="contained"
-            onClick={props.handleLoadMore}
-            disabled={props.isLoadingMoreData}
-          >
-            {props.isLoadingMoreData ? (
-              <CircularProgress size={20} />
-            ) : (
-              t('LEARNER_APP.CONTENT_TABS.LOAD_MORE')
-            )}
-          </Button>
+          <div ref={sentinelRef} style={{ height: 1, width: '100%' }} />
         )}
+        {props.isLoadingMoreData && <CircularProgress size={20} />}
       </Box>
       {!props.contentData?.length && (
         <Typography

@@ -27,7 +27,9 @@ interface NewDrawerItemProp extends DrawerItemProp {
   isActive?: boolean;
   customStyle?: React.CSSProperties;
 }
-const getClubStyleNavConfig = ({
+
+// Dynamic navigation configuration based on uiConfig
+const getDynamicNavConfig = ({
   router,
   t,
   handleNavClick,
@@ -36,6 +38,7 @@ const getClubStyleNavConfig = ({
   setAnchorEl,
   isMobile,
   handleLogoutModal,
+  handleProfileClick,
 }: {
   router: any;
   t: any;
@@ -45,26 +48,75 @@ const getClubStyleNavConfig = ({
   setAnchorEl: (el: boolean) => void;
   isMobile: boolean;
   handleLogoutModal: () => void;
+  handleProfileClick: () => void;
 }): NewDrawerItemProp[] => {
-  const navLinks: NewDrawerItemProp[] = [
-    {
-      title: t('LEARNER_APP.COMMON.COURSES'),
-      icon: <AssignmentOutlined sx={{ width: 28, height: 28 }} />,
-      to: () => handleNavClick(() => router.push('/courses-contents')),
-      isActive: currentPage === '/courses-contents' || currentPage === '/in-progress',
-      customStyle: getLinkStyle(currentPage === '/courses-contents'),
-    },
-    {
-      title: t('LEARNER_APP.COMMON.PROFILE'),
-      icon: <AccountCircleOutlined sx={{ width: 28, height: 28 }} />,
-      to: isMobile
-        ? () => handleNavClick(() => router.push('/profile'))
-        : () => { setAnchorEl(true) },
-      isActive: currentPage === '/profile',
-      customStyle: getLinkStyle(currentPage === '/profile'),
-    },
-  ];
+  const storedConfig =
+    typeof window !== 'undefined'
+      ? JSON.parse(localStorage.getItem('uiConfig') || '{}')
+      : {};
 
+  console.log('storedConfig:', storedConfig);
+  const navbarItems = storedConfig?.navbarItems || [];
+  console.log('navbarItems:', navbarItems);
+  const navLinks: NewDrawerItemProp[] = [];
+
+  // Check if navbarItems exists and has entries
+  if (!Array.isArray(navbarItems) || navbarItems.length === 0) {
+    // Return empty array if no navbar items configured
+    return navLinks;
+  }
+
+  // Sort navigation items by order and generate navigation items
+  const sortedNavItems = [...navbarItems].sort((a, b) => (a.order || 0) - (b.order || 0));
+  
+  sortedNavItems.forEach((item) => {
+    const { key, route, order } = item;
+    
+    // Skip if key or route is missing
+    if (!key || !route) {
+      console.warn('Skipping navbar item with missing key or route:', { key, route, order });
+      return;
+    }
+    
+    // Get appropriate icon based on key
+    const getIcon = () => {
+      const keyLower = key.toLowerCase();
+      console.log('keyLower:', keyLower);
+      if (keyLower === 'knowledge_bank') {
+        return <img src="/images/book_5.svg" alt="Knowledge Bank" style={{ width: 28, height: 28 }} />;
+      } else if (keyLower === 'home') {
+        return <Home sx={{ width: 28, height: 28 }} />;
+      } else if (keyLower.includes('course')) {
+        return <AssignmentOutlined sx={{ width: 28, height: 28 }} />;
+      } else if (keyLower === 'profile') {
+        return <AccountCircleOutlined sx={{ width: 28, height: 28 }} />;
+      } else {
+        return <Home sx={{ width: 28, height: 28 }} />;
+      }
+    };
+
+    // Get appropriate click handler
+    const getClickHandler = () => {
+      if (key.toLowerCase() === 'profile') {
+        return isMobile
+          ? () => handleNavClick(handleProfileClick)
+          : () => setAnchorEl(true);
+      } else {
+        return () => handleNavClick(() => router.push(route));
+      }
+    };
+
+    // Add navigation item maintaining exact sequence by order
+    navLinks.push({
+      title: t(`LEARNER_APP.COMMON.${key}`),
+      icon: getIcon(),
+      to: getClickHandler(),
+      isActive: currentPage === route || (key.toLowerCase().includes('course') && currentPage === '/in-progress'),
+      customStyle: getLinkStyle(currentPage === route),
+    });
+  });
+
+  // Add logout for mobile
   if (isMobile) {
     navLinks.push({
       title: t('COMMON.LOGOUT'),
@@ -78,105 +130,6 @@ const getClubStyleNavConfig = ({
   return navLinks;
 };
 
-// Nav config by userProgram
-const NAV_CONFIG: Record<
-  string,
-  (params: {
-    router: any;
-    isMobile: boolean;
-    t: any;
-    handleNavClick: (cb: () => void) => void;
-    handleProfileClick: () => void;
-    handleLogoutModal: () => void;
-    setAnchorEl: (el: boolean) => void;
-    getLinkStyle: (active: boolean) => React.CSSProperties;
-    currentPage: string;
-    checkAuth: boolean;
-  }) => NewDrawerItemProp[]
-> = {
-  [TenantName.YOUTHNET]: ({
-    router,
-    isMobile,
-    t,
-    handleNavClick,
-    handleProfileClick,
-    handleLogoutModal,
-    setAnchorEl,
-    getLinkStyle,
-    currentPage,
-    checkAuth,
-  }) => {
-    const navLinks: NewDrawerItemProp[] = [
-      {
-        title: t('LEARNER_APP.COMMON.L1_COURSES'),
-        icon: <Home sx={{ width: 28, height: 28 }} />,
-        to: () => handleNavClick(() => router.push('/content')),
-        isActive: currentPage === '/content' || currentPage === '/in-progress',
-        customStyle: getLinkStyle(currentPage === '/content'),
-      },
-    ];
-
-    const isVolunteer = JSON.parse(
-      localStorage.getItem('isVolunteer') || 'false'
-    );
-    if (isVolunteer) {
-      navLinks.push({
-        title: t('LEARNER_APP.COMMON.SURVEYS'),
-        icon: <AssignmentOutlined sx={{ width: 28, height: 28 }} />,
-        to: () => handleNavClick(() => router.push('/observations')),
-        isActive: currentPage === '/observations',
-        customStyle: getLinkStyle(currentPage === '/observations'),
-      });
-    }
-
-    if (checkAuth) {
-      if (isMobile) {
-        navLinks.push({
-          title: t('COMMON.LOGOUT'),
-          icon: <Logout sx={{ width: 28, height: 28 }} />,
-          to: () => handleNavClick(handleLogoutModal),
-          isActive: false,
-          customStyle: {},
-        });
-      } else {
-        navLinks.push(
-          {
-            title: t('COMMON.SKILLING_CENTERS'),
-            icon: (
-              <img
-                src="/images/engineering.png"
-                alt="Skill Center"
-                style={{ width: 28, height: 28 }}
-              />
-            ),
-            to: () => handleNavClick(() => router.push('/skill-center')),
-            isActive: currentPage === '/skill-center',
-            customStyle: {},
-          }
-        );
-      }
-    }
-
-    // Add Profile link at the end
-    navLinks.push({
-      title: t('LEARNER_APP.COMMON.PROFILE'),
-      icon: <AccountCircleOutlined sx={{ width: 28, height: 28 }} />,
-      to: isMobile 
-        ? () => handleNavClick(handleProfileClick)
-        : () => setAnchorEl(true),
-      isActive: currentPage === '/profile',
-      customStyle: getLinkStyle(currentPage === '/profile'),
-    });
-
-    return navLinks;
-  },
-
-  [TenantName.CAMP_TO_CLUB]: ({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl, isMobile, handleLogoutModal }) =>
-    getClubStyleNavConfig({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl, isMobile, handleLogoutModal }),
-
-  [TenantName.PRAGYANPATH]: ({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl, isMobile, handleLogoutModal }) =>
-    getClubStyleNavConfig({ router, t, handleNavClick, getLinkStyle, currentPage, setAnchorEl, isMobile, handleLogoutModal }),
-};
 
 const App: React.FC<LayoutProps> = ({ children, ...props }) => {
   const router = useRouter();
@@ -212,7 +165,8 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
   });
 
   const getMessage = () => (modalOpen ? t('COMMON.SURE_LOGOUT') : '');
-useEffect(() => {
+  
+  useEffect(() => {
   let currentPage = '';
   if (typeof window !== 'undefined') {
     const searchParams = new URLSearchParams(window.location.search);
@@ -237,21 +191,17 @@ useEffect(() => {
     return;
   }
 
-  const configFn = NAV_CONFIG[program];
-  const navLinks = configFn
-    ? configFn({
-        router,
-        isMobile,
-        t,
-        handleNavClick,
-        handleProfileClick,
-        handleLogoutModal,
-        setAnchorEl,
-        getLinkStyle,
-        currentPage,
-        checkAuth: checkAuth(),
-      })
-    : [];
+  const navLinks = getDynamicNavConfig({
+    router,
+    t,
+    handleNavClick,
+    getLinkStyle,
+    currentPage,
+    setAnchorEl,
+    isMobile,
+    handleLogoutModal,
+    handleProfileClick,
+  });
 
   setDefaultNavLinks(navLinks);
 }, [t, router, isMobile]);
@@ -265,22 +215,17 @@ useEffect(() => {
     }
 
     const program = localStorage.getItem('userProgram') || '';
-    const configFn = NAV_CONFIG[program];
-
-    const navLinks = configFn
-      ? configFn({
-          router,
-          isMobile,
-          t,
-          handleNavClick,
-          handleProfileClick,
-          handleLogoutModal,
-          setAnchorEl,
-          getLinkStyle,
-          currentPage,
-          checkAuth: checkAuth(),
-        })
-      : [];
+    const navLinks = getDynamicNavConfig({
+      router,
+      t,
+      handleNavClick,
+      getLinkStyle,
+      currentPage,
+      setAnchorEl,
+      isMobile,
+      handleLogoutModal,
+      handleProfileClick,
+    });
 
     setDefaultNavLinks(navLinks);
   }, [t, router, isMobile]);
@@ -300,17 +245,24 @@ useEffect(() => {
           _box: {
             onClick: () =>
               {
-                const tenantName = localStorage.getItem('userProgram') || '';
-                if(tenantName=== TenantName.YOUTHNET) {
+        //         const tenantName = localStorage.getItem('userProgram') || '';
+        //         if(tenantName=== TenantName.YOUTHNET) {
+        //   router.push('/content');
+        // }
+        // else if (tenantName===TenantName.CAMP_TO_CLUB)
+        // {
+        //   router.push('/courses-contents');
+        // }
+        // else if(tenantName===TenantName.PRAGYANPATH)
+        // {
+        //   router.push('/courses-contents');
+        // }
+        const landingPage = localStorage.getItem('landingPage') || '';
+
+        if (landingPage) {
+          router.push(landingPage);
+        } else {
           router.push('/content');
-        }
-        else if (tenantName===TenantName.CAMP_TO_CLUB)
-        {
-          router.push('/courses-contents');
-        }
-        else if(tenantName===TenantName.PRAGYANPATH)
-        {
-          router.push('/courses-contents');
         }
              },
 

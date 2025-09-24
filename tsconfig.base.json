@@ -16,6 +16,12 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["mfes/scp-teacher-repo/src/*"],
+      "@Content": ["mfes/content/src/pages/content.tsx"],
+      "@ContentDetails": ["mfes/content/src/pages/details/[identifier].tsx"],
+      "@ContentEnrollDetails": [
+        "mfes/content/src/pages/content-details/[identifier].tsx"
+      ],
+      "@ContentPlayer": ["mfes/content/src/pages/player/[identifier].tsx"],
       "@collection": ["mfes/editors/src/components/CollectionEditor.tsx"],
       "@generic-editor": ["mfes/editors/src/components/GenericEditor.tsx"],
       "@login": ["mfes/authentication/src/pages/login.tsx"],
@@ -29,19 +35,12 @@
       "@registration": ["mfes/registration/src/app/page.tsx"],
       "@scp-teacher-repo": ["mfes/scp-teacher-repo/src/pages/index.tsx"],
       "@shared-lib": ["libs/shared-lib/src/index.ts"],
+      "@shared-lib-v2/*": ["libs/shared-lib-v2/src/*"],
       "@sunbirdPlayers": ["mfes/workspace/src/pages/sunbirdPlayers.tsx"],
       "@test-next-route": ["mfes/test-next-route/src/pages/index.tsx"],
       "@test-react-vite": ["mfes/mfes/test-react-vite"],
       "@workspace/*": ["mfes/workspace/src/*"],
-      "@youthNet": ["mfes/youthNet/src/pages/index.tsx"],
-      "@Content": ["mfes/content/src/pages/content.tsx"],
-      "@ContentEnrollDetails": [
-        "mfes/content/src/pages/content-details/[identifier].tsx"
-      ],
-      "@ContentDetails": ["mfes/content/src/pages/details/[identifier].tsx"],
-      "@ContentPlayer": ["mfes/content/src/pages/player/[identifier].tsx"],
-      "@shared-lib-v2/*": ["libs/shared-lib-v2/src/*"],
-
+      "@youthNet": ["mfes/youthNet/src/pages/index.tsx"]
     }
   },
   "exclude": ["node_modules", "tmp"]

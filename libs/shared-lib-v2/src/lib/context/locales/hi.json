@@ -105,7 +105,7 @@
     "LOAD_MORE": "अधिक लोड करें",
     "SKILLING_CENTERS": "कृषि केंद्र",
     "SKILLING_CENTERS_NEAR_YOU": "आपके निकट का कृषि केंद्र",
-        "WELCOME": "स्वागत है",
+    "WELCOME": "स्वागत है",
 
     "STATUS": {
       "completed": "पूरा हुआ",
@@ -113,6 +113,17 @@
       "enrolled_not_started": "नामांकित, शुरू नहीं हुआ",
       "not_started": "शुरू नहीं हुआ"
     }
+  },
+  "SWITCH_ACCOUNT": {
+    "TITLE": "खाता चुनें",
+    "STEP_SELECT_TENANT": "टेनेंट चुनें",
+    "STEP_SELECT_ROLE": "भूमिका चुनें",
+    "SELECT_YOUR_ORGANIZATION": "अपना संगठन चुनें",
+    "CHOOSE_ORGANIZATION_SUBTEXT": "वह संगठन चुनें जिसे आप एक्सेस करना चाहते हैं",
+    "SELECT_ROLE_FOR": "भूमिका चुनें -",
+    "CHOOSE_ROLE_SUBTEXT": "वह भूमिका चुनें जिसे आप एक्सेस करना चाहते हैं",
+    "ROLE_ID_LABEL": "भूमिका आईडी:",
+    "CONFIRM_SELECTION": "चयन की पुष्टि करें"
   },
   "LEARNER_APP": {
     "COMPLETE_PROFILE_BANNER": {
@@ -168,7 +179,9 @@
       "ABOUT_PRATHAM_TITLE": "Pratham के बारे में",
       "ABOUT_PRATHAM_DESC": "Pratham शिक्षा प्रणालियों में अंतर को शिक्षण, कम-लागत, दोहराने योग्य हस्तक्षेपों के साथ भरता है जो आयु स्पेक्ट्रम में फैले होते हैं। प्रत्यक्ष कार्य में, एक Pratham प्रशिक्षक बच्चों के साथ स्कूल या समुदाय में काम करता है, जबकि साझेदारी मॉडल में Pratham टीमें राज्य, जिला या शहर स्तर पर सरकारी टीमों के साथ मिलकर कार्यक्रमों को डिज़ाइन और कार्यान्वित करती हैं। सीखने के परिणामों में सुधार के लिए Pratham का दृष्टिकोण भारत में और विदेशों में एक मॉडल के रूप में कार्य करता है।",
       "OUR_PROGRAMS": "हमारे कार्यक्रम",
-      "SIGN_UP": "साइन अप करें"
+      "SIGN_UP": "साइन अप करें",
+      "SIGN_IN": "लॉग इन करें",
+      "Login with Newton ERP": "Newton ERP वापरून लॉगिन करें"
     },
     "LOGIN": {
       "welcome_title": "Pratham myLearning में आपका स्वागत है!",
@@ -305,7 +318,7 @@
       "FORGOT_PASSWORD": "पासवर्ड भूल गए?",
       "FILL_ALL_FIELDS": "कृपया सभी फ़ील्ड भरें।",
       "PASSWORDS_MUST_MATCH": "नया पासवर्ड और पुष्टि पासवर्ड समान होने चाहिए।",
-      "PASSWORD_MIN_LENGTH": "पासवर्ड कम से कम 8 वर्ण का होना चाहिए",
+      "PASSWORD_MIN_LENGTH": "पासवर्ड कम से कम 4 वर्ण का होना चाहिए",
       "PASSWORD_UPPERCASE": "पासवर्ड में कम से कम एक बड़ा अक्षर होना चाहिए",
       "PASSWORD_LOWERCASE": "पासवर्ड में कम से कम एक छोटा अक्षर होना चाहिए",
       "PASSWORD_NUMBER": "पासवर्ड में कम से कम एक अंक होना चाहिए",
@@ -322,6 +335,7 @@
       "ON_PLAYSTORE": "प्लेस्टोर पर"
     }
   },
+  "Login with Newton ERP": "Newton ERP वापरून लॉगिन करें",
   "LOGIN_PAGE": {
     "USERNAME_PASSWORD_NOT_CORRECT": "यूज़रनेम या पासवर्ड सही नहीं है",
     "DEVICE_FINGERPRINT_SUCCESS": "डिवाइस फिंगरप्रिंट सफलतापूर्वक उत्पन्न हुआ",

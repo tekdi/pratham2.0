@@ -6,26 +6,36 @@ export const mockData: Record<string, any> = {
     CHANNEL_ID: 'scp-channel',
     CONTENT_FRAMEWORK: 'pos-framework',
     COLLECTION_FRAMEWORK: 'scp-framework',
+    QUESTION_SET_FRAMEWORK: 'scp-framework'
+
   },
   '29f8c9a6-032f-48c7-a14a-9e3db3d7b76e': {
     CHANNEL_ID: 'pos-channel',
     CONTENT_FRAMEWORK: 'pos-framework',
     COLLECTION_FRAMEWORK: 'pos-framework',
+    QUESTION_SET_FRAMEWORK: 'pos-framework'
+
   },
   '6c8b810a-66c2-4f0d-8c0c-c025415a4414': {
     CHANNEL_ID: 'pos-channel',
     CONTENT_FRAMEWORK: 'pos-framework',
     COLLECTION_FRAMEWORK: 'pos-framework',
+    QUESTION_SET_FRAMEWORK: 'pos-framework'
+
   },
   '914ca990-9b45-4385-a06b-05054f35d0b9': {
-    CHANNEL_ID: 'pos-channel',
+    CHANNEL_ID: 'pragyanpath',
     CONTENT_FRAMEWORK: 'pos-framework',
-    COLLECTION_FRAMEWORK: 'pos-framework',
+    COLLECTION_FRAMEWORK: 'pragyanpathFw',
+    QUESTION_SET_FRAMEWORK: 'pos-framework'
+
   },
   'fd8f3180-9988-495b-8a0d-ed201d7d28df': {
     CHANNEL_ID: 'pos-channel',
     CONTENT_FRAMEWORK: 'pos-framework',
     COLLECTION_FRAMEWORK: 'pos-framework',
+    QUESTION_SET_FRAMEWORK: 'pos-framework'
+
   },
 };
 

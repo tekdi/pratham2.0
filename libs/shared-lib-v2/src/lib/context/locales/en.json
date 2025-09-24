@@ -114,6 +114,7 @@
     "CLOSE": "Close",
     "CANCEL": "Cancel",
     "OK": "OK",
+    "BACK": "Back",
     "INPROGRESS": "In-Progress",
     "SURE_LOGOUT": "Are you sure you want to Logout?",
     "LOGOUT": "Logout",
@@ -136,11 +137,14 @@
     "YOU_DONT_HAVE_PERMISSION_TO_ACCESS_THIS_PAGE": "You don't have access to this page",
     "ACCESS_DENIED": "Access Denied",
     "WELCOME": "Welcome",
-     "Courses": "Courses",
-      "Content": "Content",
+    "Courses": "Courses",
+    "Content": "Content",
     "SUPPORT_REQUEST": "Support Request",
     "SUBMIT_YOUR_REQUEST_FOR_ISSUES": "Submit your request and let us assist you with any issues or concerns.",
     "WE_ARE_HERE_TO_HELP": "We’re Here to Help",
+    "Job family": "Job family",
+    "Group Membership": "Group Membership",
+    "PSU": "PSU",
 
     "STATUS": {
       "completed": "Completed",
@@ -148,6 +152,17 @@
       "enrolled_not_started": "Enrolled, not started",
       "not_started": "Not Started"
     }
+  },
+  "SWITCH_ACCOUNT": {
+    "TITLE": "Select Account",
+    "STEP_SELECT_TENANT": "Select Tenant",
+    "STEP_SELECT_ROLE": "Select Role",
+    "SELECT_YOUR_ORGANIZATION": "Select Your Organization",
+    "CHOOSE_ORGANIZATION_SUBTEXT": "Choose the organization you want to access",
+    "SELECT_ROLE_FOR": "Select Role for",
+    "CHOOSE_ROLE_SUBTEXT": "Choose the role you want to access",
+    "ROLE_ID_LABEL": "Role ID:",
+    "CONFIRM_SELECTION": "Confirm Selection"
   },
   "LEARNER_APP": {
     "COMPLETE_PROFILE_BANNER": {
@@ -176,15 +191,19 @@
       "CANCEL": "Cancel",
       "OK": "OK",
       "INPROGRESS": "In-Progress",
-      "LOADING": "Loading.."
+      "LOADING": "Loading..",
+      "SKILLING_CENTERS": "Skilling Centers",
+      "HOME": "Home",
+      "KNOWLEDGE_BANK": "Knowledge Bank"
 
-     
     },
     "COURSE": {
       "COMPLETED_ON": "Completed on",
       "STARTED_ON": "Started on",
       "GET_STARTED": "Get Started with L1 Courses",
       "GET_STARTED_CLUB_COURSES": "Get Started with Camp to Club Courses/Contents",
+      "EXPLORE_MORE_COURSES":"Explore More Courses",
+      "EXPLORE_ADDITIONAL_RESOURCES":"Explore Additional Resources & Materials",
 
       "FILTER_BY": "Filter by",
       "CLEAR_FILTER": "Clear Filter",
@@ -208,7 +227,8 @@
       "ABOUT_PRATHAM_DESC": "Pratham addresses gaps in education systems with innovative, low-cost, replicable interventions that span the age spectrum. Working both directly and through government systems, these programs collectively reach millions of children and thousands of school dropouts each year. In “direct” work, a Pratham instructor works with children either in the school or in the community, whereas the “partnership” model involves Pratham teams working closely with government teams at the state, district or city level to design and implement programs. Pratham’s approach to improving learning outcomes continues to serve as a model, both within India and beyond.",
       "OUR_PROGRAMS": "Our Programs",
       "SIGN_UP": "Sign Up",
-      "SIGN_IN": "Sign In"
+      "SIGN_IN": "Sign In",
+      "Login with Newton ERP": "Login with Newton ERP"
     },
     "LOGIN": {
       "welcome_title": "Welcome to Pratham myLearning!",
@@ -319,7 +339,7 @@
       "GUARDIAN_NAME": "Guardian's Name",
       "GUARDIAN_DETAILS": "Guardian Details",
       "I_WANT_TO_BECOME": "I want to become {futureWork}",
-      "PTM_NAME":"PTM Name"
+      "PTM_NAME": "PTM Name"
     },
     "USERNAME_SUGGESTION": {
       "USERNAME": "Username",
@@ -345,7 +365,7 @@
       "FORGOT_PASSWORD": "Forgot Password?",
       "FILL_ALL_FIELDS": "Please fill in all fields.",
       "PASSWORDS_MUST_MATCH": "New Password and Confirm Password must be the same.",
-      "PASSWORD_MIN_LENGTH": "Password must be at least 8 characters long",
+      "PASSWORD_MIN_LENGTH": "Password must be at least 4 characters long",
       "PASSWORD_UPPERCASE": "Password must contain at least one uppercase letter",
       "PASSWORD_LOWERCASE": "Password must contain at least one lowercase letter",
       "PASSWORD_NUMBER": "Password must contain at least one number",
@@ -360,8 +380,26 @@
       "SEARCH_TEXT": "Search",
       "APP_NAME": "Pratham myLearning",
       "ON_PLAYSTORE": "on Playstore"
+    },
+    "SSO": {
+      "TITLE": "SSO Authentication",
+      "IMAGE_ALT": "Authentication in progress",
+      "INITIALIZING": "Initializing SSO authentication...",
+      "EXTRACTING_PARAMS": "Extracting authentication parameters...",
+      "AUTHENTICATING": "Authenticating with server...",
+      "AUTH_SUCCESS": "Authentication successful! Redirecting...",
+      "AUTH_FAILED": "Authentication failed",
+      "PLEASE_WAIT": "Please wait while we verify your credentials...",
+      "REDIRECTING_LOGIN": "Redirecting you to the login page in a moment...",
+      "REDIRECTING_DASHBOARD": "Redirecting you to your dashboard...",
+      "SUCCESS_MESSAGE": "SSO authentication successful!",
+      "ERROR_GENERAL": "An error occurred during SSO authentication",
+      "ERROR_MISSING_PARAMS": "Missing required parameters",
+      "ERROR_AUTH_FAILED": "Authentication failed"
     }
   },
+  "Login with Newton ERP": "Login with Newton ERP",
+
   "LOGIN_PAGE": {
     "USERNAME_PASSWORD_NOT_CORRECT": "Username or Password is not correct",
     "DEVICE_FINGERPRINT_SUCCESS": "Device fingerprint generated successfully",
@@ -393,8 +431,7 @@
     "OBSERVATION_NOT_STARTED_YET": "Survey not started yet",
     "EXPIRED": "Expired",
     "ARE_YOU_SURE_YOU_TO_SUBMIT_FORM": "Are you sure to submit the form?",
-            "ONLY_SPECIFIED_FILE_TYPES_ALLOWED": "Only specified file types are allowed"
-
+    "ONLY_SPECIFIED_FILE_TYPES_ALLOWED": "Only specified file types are allowed"
   },
   "YOUTHNET_USERS_AND_VILLAGES": {
     "MENTORS": "Mentors",
@@ -404,7 +441,7 @@
     "ADD_OR_REASSIGN_VILLAGES": "Add or Re-assign Villages",
     "REQUEST_TO_REASSIGN_DISTRICT": "Request to Re-assign District",
     "DELETE_USER_PERMANENTLY": "Delete User Permanently",
-    "REQUEST_USER_TO_DIFFERENT_MENTOR": "Re-assign user to a different Mentor Leader",
+    "REQUEST_USER_TO_DIFFERENT_MENTOR": "Re-assign user to a different Center Head",
     "SAVE_PROGRESS": "Save progress",
     "FINISH_ASSIGN": "Finish & Assign",
     "SEND_REQUEST_TO_ADMIN_TEXT": "You are sending a request to the State Admin to re-assign this user to another district",
@@ -659,5 +696,11 @@
     "DATE_MUST_BE_ON_OR_BEFORE": "Date must be on or before {{date}}",
     "DATE_MUST_BE_ON_OR_AFTER": "Date must be on or after {{date}}"
   },
-  "Assessment Score": "Assessment Score"
+  "Assessment Score": "Assessment Score",
+  "FILTER_KEY": {
+     "GROUP_MEMBERSHIP": "groupMembership",
+      "JOB_FAMILY": "jobFamily",
+      "PSU":"psu"
+
+  }
 }

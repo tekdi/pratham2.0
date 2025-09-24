@@ -43,10 +43,15 @@ export enum TenantName {
   YOUTHNET = 'Vocational Training',
   POS = 'Open School',
   PRAGYANPATH = 'Pragyanpath',
-  CAMP_TO_CLUB = 'Camp to Club'
+  CAMP_TO_CLUB = 'Camp to Club',
+ LEARNING_AND_DEVELOPMENT ="Learning and Development"
 
 }
-
+export enum FilterKey {
+  GROUP_MEMBERSHIP = 'groupMembership',
+  JOB_FAMILY = 'jobFamily',
+  PSU = 'psu',
+}
 export enum Status {
   ARCHIVED = 'archived',
   ARCHIVED_LABEL = 'Archived',

@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '@learner/components/pos/Layout';
 
 import { Container, Typography, Grid, Box, useMediaQuery } from '@mui/material';
@@ -13,6 +13,7 @@ import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { SearchButton } from '@learner/components/pos/SearchButton';
+import { ContentSearch, getfilterList } from '@learner/utils/API/contentService';
 
 const Content = dynamic(() => import('@Content'), {
   ssr: false,
@@ -27,7 +28,98 @@ const descriptions = [
 
 const Page = () => {
   const [search, setSearch] = useState('');
+    const [totalResources, setTotalResources] = useState<number>(0);
+  const [videosCount, setVideosCount] = useState<number>(0);
+  const [gamesCount, setGamesCount] = useState<number>(0);
+  const [audiosCount, setAudiosCount] = useState<number>(0);
+  const [languagesCount, setLanguagesCount] = useState<number>(0);
+
+  const [otherFormatsCount, setOtherFormatsCount] = useState<number>(0);
+  
   const router = useRouter();
+  
+  useEffect(() => {
+    // Helper function to get content count for specific mimeTypes
+    const getContentCountByMimeType = async (mimeTypes: string[]) => {
+      const baseFilter = {
+        "status": ["live"],
+        "primaryCategory": ["Learning Resource", "Practice Question Set"],
+        "channel": "pos-channel"
+      };
+      
+      const filter = {
+        ...baseFilter,
+        "mimeType": mimeTypes
+      };
+      
+      const response = await ContentSearch({
+        filters: filter,
+        offset: 0,
+        limit: 1,
+        fields: ["name"]
+      });
+      
+      return response?.result?.count || 0;
+    };
+
+    const fetchContentCounts = async () => {
+      try {
+        // Define mimeType categories
+        const mimeTypeCategories = {
+          videos: ["video/Webm", "video/mp4", "video/x-youtube"],
+          games: ["application/vnd.ekstep.h5p-archive", "application/vnd.ekstep.html-archive", "application/vnd.ekstep.ecml-archive"],
+          audios: ["audio/mp3", "audio/wav", "video/mp3"],
+          otherFormats: ["application/pdf", "application/epub", "application/vnd.sunbird.questionset"]
+        };
+
+        // Make all API calls in parallel
+        const [
+          videosCountResult,
+          gamesCountResult,
+          audiosCountResult,
+          otherFormatsCountResult,
+          filterListResponse
+        ] = await Promise.all([
+          getContentCountByMimeType(mimeTypeCategories.videos),
+          getContentCountByMimeType(mimeTypeCategories.games),
+          getContentCountByMimeType(mimeTypeCategories.audios),
+          getContentCountByMimeType(mimeTypeCategories.otherFormats),
+          getfilterList()
+        ]);
+
+        // Set all counts
+        setVideosCount(videosCountResult);
+        setGamesCount(gamesCountResult);
+        setAudiosCount(audiosCountResult);
+        setOtherFormatsCount(otherFormatsCountResult);
+
+        // Handle language count
+        console.log('response======>', filterListResponse);
+        const contentLangField = filterListResponse.find((field: any) => field.code === "contentLanguage");
+        const contentLangCount = contentLangField?.range?.length || 0;
+        setLanguagesCount(contentLangCount);
+
+        // Calculate and set total resources
+        const total = videosCountResult + gamesCountResult + audiosCountResult + otherFormatsCountResult;
+        setTotalResources(total);
+
+        console.log('Content counts:', {
+          videos: videosCountResult,
+          games: gamesCountResult,
+          audios: audiosCountResult,
+          otherFormats: otherFormatsCountResult,
+          languages: contentLangCount,
+          total: total
+        });
+
+      } catch (error) {
+        console.error('Error fetching content counts:', error);
+      }
+    };
+
+    fetchContentCounts();
+  }, []);
+  
   const partners = [
     { src: '/knowledge/Abhivyaktilogo.png', alt: 'Adobe' },
     { src: '/knowledge/Arpan.png', alt: 'EAA' },
@@ -305,7 +397,9 @@ const Page = () => {
               color: '#1F1B13',
             }}
           >
-            <SpeakableText>3524</SpeakableText>
+<SpeakableText>
+  {totalResources}
+</SpeakableText>
           </Typography>
           <Typography
             variant="body8"
@@ -337,12 +431,12 @@ const Page = () => {
             sx={{ mt: 2, mb: 2 }}
           >
             {[
-              { value: 230, label: 'Videos' },
-              { value: 1700, label: 'Stories' },
-              { value: 512, label: 'Games' },
-              { value: 781, label: 'Audios' },
-              { value: 562, label: 'Other Formats' },
-              { value: 15, label: 'Languages' },
+              { value: videosCount, label: 'Videos' },
+              // { value: 1700, label: 'Stories' },
+              { value: gamesCount, label: 'Games' },
+              { value: audiosCount, label: 'Audios' },
+              { value: otherFormatsCount, label: 'Other Formats' },
+              { value: languagesCount, label: 'Languages' },
             ].map((item, idx) => (
               <Grid
                 item
@@ -434,6 +528,8 @@ const Page = () => {
                 isHideProgressStatus: true,
               },
             }}
+            totalResources={totalResources}
+            setTotalResources={setTotalResources}
           />
         </Box>
       </Box>

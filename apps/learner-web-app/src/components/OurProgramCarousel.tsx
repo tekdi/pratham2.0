@@ -59,7 +59,9 @@ const OurProgramCarousel = () => {
         // console.log('Tenant Info:', res?.result);
         const programsData = res?.result || [];
         const visiblePrograms = programsData?.filter(
-          (program: any) => program?.params?.uiConfig?.showProgram === true
+          (program: any) =>
+            program?.params?.uiConfig?.showProgram === true ||
+            program?.params?.uiConfig?.sso?.length > 0
         );
         // console.log('visiblePrograms', visiblePrograms);
         setPrograms(visiblePrograms || []);
@@ -191,92 +193,96 @@ const OurProgramCarousel = () => {
                           );
                         })}
                       </Swiper>
-                      <Box sx={{ my: 2 }}>
-                        <Box
-                          display="flex"
-                          justifyContent="center"
-                          alignItems="center"
-                          gap={2}
-                        >
-                          {/* Left Arrow Button */}
-                          {program?.programImages?.length > 1 && (
-                            <Button
-                              className={`prev-${program.ordering}`}
-                              sx={{
-                                minWidth: '30px',
-                                width: '30px',
-                                height: '30px',
-                                p: 0,
-                                borderRadius: '50%',
-                                backgroundColor: '#FFFFFF',
-                                boxShadow: '0px 1px 2px 0px #0000004D',
-                                color: 'gray',
-                                '&:hover': {
-                                  backgroundColor: '#e0e0e0',
-                                },
-                              }}
-                            >
-                              <ChevronLeftIcon
-                                sx={{ color: '#1F1B13', fontSize: '30px' }}
-                              />
-                            </Button>
-                          )}
-
-                          {/* Pagination Dots */}
+                      {program?.programImages?.length > 0 && (
+                        <Box sx={{ my: 2 }}>
                           <Box
-                            className={`pagination-${program?.ordering}`}
-                            sx={{
-                              display: 'flex',
-                              '& .swiper-pagination-bullet': {
-                                width: '30px',
-                                height: '4px',
-                                borderRadius: '2px',
-                                backgroundColor: '#CDC5BD',
-                                opacity: 1,
-                                mx: 0.5,
-                              },
-                              '& .swiper-pagination-bullet-active': {
-                                backgroundColor: '#FDB813',
-                              },
-                            }}
-                          ></Box>
+                            display="flex"
+                            justifyContent="center"
+                            alignItems="center"
+                            gap={2}
+                          >
+                            {/* Left Arrow Button */}
+                            {program?.programImages?.length > 1 && (
+                              <Button
+                                className={`prev-${program.ordering}`}
+                                sx={{
+                                  minWidth: '30px',
+                                  width: '30px',
+                                  height: '30px',
+                                  p: 0,
+                                  borderRadius: '50%',
+                                  backgroundColor: '#FFFFFF',
+                                  boxShadow: '0px 1px 2px 0px #0000004D',
+                                  color: 'gray',
+                                  '&:hover': {
+                                    backgroundColor: '#e0e0e0',
+                                  },
+                                }}
+                              >
+                                <ChevronLeftIcon
+                                  sx={{ color: '#1F1B13', fontSize: '30px' }}
+                                />
+                              </Button>
+                            )}
 
-                          {/* Right Arrow Button */}
-                          {program?.programImages?.length > 1 && (
-                            <Button
-                              className={`next-${program?.ordering}`}
+                            {/* Pagination Dots */}
+                            <Box
+                              className={`pagination-${program?.ordering}`}
                               sx={{
-                                minWidth: '30px',
-                                width: '30px',
-                                height: '30px',
-                                p: 0,
-                                borderRadius: '50%',
-                                backgroundColor: '#FFFFFF',
-                                boxShadow: '0px 1px 2px 0px #0000004D',
-                                color: 'gray',
-                                '&:hover': {
-                                  backgroundColor: '#e0e0e0',
+                                display: 'flex',
+                                '& .swiper-pagination-bullet': {
+                                  width: '30px',
+                                  height: '4px',
+                                  borderRadius: '2px',
+                                  backgroundColor: '#CDC5BD',
+                                  opacity: 1,
+                                  mx: 0.5,
+                                },
+                                '& .swiper-pagination-bullet-active': {
+                                  backgroundColor: '#FDB813',
                                 },
                               }}
-                            >
-                              <ChevronRightIcon
-                                sx={{ color: '#1F1B13', fontSize: '30px' }}
-                                fontSize="small"
-                              />
-                            </Button>
-                          )}
+                            ></Box>
+
+                            {/* Right Arrow Button */}
+                            {program?.programImages?.length > 1 && (
+                              <Button
+                                className={`next-${program?.ordering}`}
+                                sx={{
+                                  minWidth: '30px',
+                                  width: '30px',
+                                  height: '30px',
+                                  p: 0,
+                                  borderRadius: '50%',
+                                  backgroundColor: '#FFFFFF',
+                                  boxShadow: '0px 1px 2px 0px #0000004D',
+                                  color: 'gray',
+                                  '&:hover': {
+                                    backgroundColor: '#e0e0e0',
+                                  },
+                                }}
+                              >
+                                <ChevronRightIcon
+                                  sx={{ color: '#1F1B13', fontSize: '30px' }}
+                                  fontSize="small"
+                                />
+                              </Button>
+                            )}
+                          </Box>
                         </Box>
-                      </Box>
+                      )}
                     </Box>
                   </Box>
 
-                 <CardActions
-  sx={{
-    // justifyContent: 'center',
-    // p: 2,
-    // mt: 'auto',
-  }}
->
+                  <CardActions
+                    sx={
+                      {
+                        // justifyContent: 'center',
+                        // p: 2,
+                        // mt: 'auto',
+                      }
+                    }
+                  >
                     {program?.params?.uiConfig?.showSignup === true && (
                       <Button
                         fullWidth
@@ -289,19 +295,18 @@ const OurProgramCarousel = () => {
                             backgroundColor: '#FDBE16',
                           },
                         }}
-                        onClick={() =>
-                        {
-                          if(typeof window !== 'undefined' &&  window.localStorage){
-                            localStorage.setItem(
-                            'userProgram',
-                            program?.name ); 
+                        onClick={() => {
+                          if (
+                            typeof window !== 'undefined' &&
+                            window.localStorage
+                          ) {
+                            localStorage.setItem('userProgram', program?.name);
                           }
-                         
+
                           router.push(
                             '/registration?tenantId=' + program?.tenantId
-                          )
-                        }
-                        }
+                          );
+                        }}
                       >
                         {t('LEARNER_APP.HOME.SIGN_UP')}
                       </Button>
@@ -320,6 +325,21 @@ const OurProgramCarousel = () => {
                         }}
                         onClick={() => {
                           // console.log('Test####', program?.params?.uiConfig);
+                          if (
+                            typeof window !== 'undefined' &&
+                            window.localStorage
+                          ) {
+                            localStorage.setItem('userProgram', program?.name);
+                          }
+                          if (
+                            typeof window !== 'undefined' &&
+                            window.localStorage
+                          ) {
+                            localStorage.setItem(
+                              'userProgramTenantId',
+                              program?.tenantId
+                            );
+                          }
                           const uiConfig = program?.params?.uiConfig || {};
                           localStorage.setItem(
                             'uiConfig',
@@ -330,6 +350,89 @@ const OurProgramCarousel = () => {
                       >
                         {t('LEARNER_APP.HOME.SIGN_IN')}
                       </Button>
+                    )}
+                    {/* SSO Login Buttons */}
+                    {program?.params?.uiConfig?.sso?.length > 0 && (
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexWrap: 'wrap',
+                          gap: 1,
+                          width: '100%',
+                        }}
+                      >
+                        {program?.params?.uiConfig?.sso?.map(
+                          (ssoOption: any, index: number) => {
+                            // Check if current domain is in enable_domain array
+                            const currentDomain =
+                              typeof window !== 'undefined'
+                                ? window.location.origin
+                                : '';
+                            const isDomainEnabled =
+                              ssoOption?.enable_domain?.includes(
+                                currentDomain
+                              ) || false;
+
+                            if (!isDomainEnabled) return null;
+
+                            return (
+                              <Button
+                                key={index}
+                                fullWidth
+                                variant="contained"
+                                color="primary"
+                                sx={{
+                                  borderRadius: 50,
+                                  backgroundColor: '#FDBE16',
+                                  '&:hover': {
+                                    backgroundColor: '#FDBE16',
+                                  },
+                                  flex: '1 1 calc(50% - 4px)', // Side by side layout with gap
+                                  minWidth: '120px',
+                                }}
+                                onClick={() => {
+                                  // Store program info and open SSO URL
+                                  if (
+                                    typeof window !== 'undefined' &&
+                                    window.localStorage
+                                  ) {
+                                    localStorage.setItem(
+                                      'landingPage',
+                                      program?.params?.uiConfig?.landingPage
+                                    );
+                                    localStorage.setItem(
+                                      'userProgram',
+                                      program?.name
+                                    );
+                                    const uiConfig =
+                                      program?.params?.uiConfig || {};
+                                    localStorage.setItem(
+                                      'uiConfig',
+                                      JSON.stringify(uiConfig)
+                                    );
+                                  }
+                                  // Construct SSO URL with callback parameters
+                                  const currentBaseUrl =
+                                    typeof window !== 'undefined'
+                                      ? window.location.origin
+                                      : '';
+                                  const callbackUrl = `${currentBaseUrl}/sso?env=newton&tenantid=${program?.tenantId}`;
+                                  const encodedCallbackUrl = callbackUrl;
+                                  // encodeURIComponent(callbackUrl);
+                                  // roleId
+                                  const ssoUrl = `${ssoOption?.url}?callbackurl=${encodedCallbackUrl}`;
+
+                                  // Open SSO URL in new tab
+                                  window.open(ssoUrl, '_blank');
+                                }}
+                              >
+                                {t(ssoOption?.label) ||
+                                  `Login with ${ssoOption?.type}`}
+                              </Button>
+                            );
+                          }
+                        )}
+                      </Box>
                     )}
                   </CardActions>
                 </Card>

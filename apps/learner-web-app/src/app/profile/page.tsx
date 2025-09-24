@@ -24,7 +24,7 @@ const ProfilePage = () => {
  const tenantName =      (typeof window !== 'undefined' && localStorage.getItem('userProgram')) || '';
 
   const [filters] = useState<FilterDetails>({
-    status: ['completed', 'viewCertificate'],
+    status: [ 'viewCertificate'],
     tenantId:
       (typeof window !== 'undefined' && localStorage.getItem('tenantId')) || '',
     userId:
@@ -55,48 +55,23 @@ const ProfilePage = () => {
   };
 
   useEffect(() => {
-    const prepareCertificateData = async () => {
-      const finalArray = [];
-
-      const response = await courseWiseLernerList({ filters });
-      console.log('response', response.data);
-      for (const item of response.data) {
-        try {
-          const url = baseurl;
-          const Details: any = await get(
-            `${baseurl}/action/content/v3/read/${item.courseId}`,
-            {
-              tenantId: localStorage.getItem('tenantId') || '',
-              Authorization: `Bearer ${localStorage.getItem('accToken') || ''}`,
-            }
-          );
-          console.log('courseDetails', Details);
-          let courseDetails = Details.data.result.content;
-          const obj = {
-            usercertificateId: item.usercertificateId,
-            userId: item.userId,
-            courseId: item.courseId,
-            certificateId: item.certificateId,
-            completedOn: item.issuedOn,
-            description: courseDetails.description || '',
-            posterImage: courseDetails.posterImage || '',
-            program: courseDetails.program || [],
-                        name: courseDetails.name || "",
-
-          };
-          finalArray.push(obj);
-        } catch (error) {
-          console.error(
-            `Failed to fetch course details for courseId: ${item.courseId}`,
-            error
-          );
-        }
+    const fetchCertificateData = async () => {
+      try {
+        const response = await courseWiseLernerList({ filters });
+        console.log('response', response.data);
+        
+        // Filter out items that don't have certificateId
+        const validCertificates = (response.data || []).filter((item: any) => 
+          item?.certificateId
+        );
+        
+        setCourseData(validCertificates);
+      } catch (error) {
+        console.error('Failed to fetch certificate data:', error);
+        setCourseData([]);
       }
-      console.log('finalArray', finalArray);
-      setCourseData(finalArray);
-      // return finalArray;
     };
-    prepareCertificateData();
+    fetchCertificateData();
   }, []);
   useEffect(() => {
     // const token = localStorage.getItem('token');
@@ -203,10 +178,7 @@ const ProfilePage = () => {
         courseData?.map((cert: any, index: any) => (
           <CourseCertificateCard
             key={index}
-            title={cert.name}
-            description={cert.description}
-            imageUrl={cert.posterImage}
-            completionDate={cert.completedOn}
+            certificateData={cert}
             onPreviewCertificate={() => handlePreview(cert.certificateId)}
           />
         ))}

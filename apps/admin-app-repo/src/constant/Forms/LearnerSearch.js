@@ -35,7 +35,7 @@ export const learnerSearchSchema = {
       //for multiselect
       uniqueItems: true,
       isMultiSelect: true,
-      maxSelections: 1000,
+      maxSelection: 1,
     },
     district: {
       type: 'array',
@@ -65,7 +65,7 @@ export const learnerSearchSchema = {
       //for multiselect
       uniqueItems: true,
       isMultiSelect: true,
-      maxSelections: 1000,
+      maxSelection: 1,
     },
     block: {
       type: 'array',
@@ -94,36 +94,120 @@ export const learnerSearchSchema = {
       //for multiselect
       uniqueItems: true,
       isMultiSelect: true,
-      maxSelections: 1000,
+      maxSelection: 1000,
     },
-    village: {
+    // village: {
+    //   type: 'array',
+    //   title: 'Village',
+    //   items: {
+    //     type: 'string',
+    //     enum: ['Select'],
+    //     enumNames: ['Select'],
+    //   },
+    //   api: {
+    //     url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
+    //     method: 'POST',
+    //     payload: {
+    //       fieldName: 'village',
+    //       controllingfieldfk: '**',
+    //       sort: ['village_name', 'asc'],
+    //     },
+    //     options: {
+    //       optionObj: 'result.values',
+    //       label: 'label',
+    //       value: 'value',
+    //     },
+    //     callType: 'dependent',
+    //     dependent: 'block',
+    //   },
+    //   //for multiselect
+    //   uniqueItems: true,
+    //   isMultiSelect: true,
+    //   maxSelection: 1000,
+    // },
+    center: {
       type: 'array',
-      title: 'Village',
+      title: 'CENTER',
       items: {
         type: 'string',
         enum: ['Select'],
         enumNames: ['Select'],
       },
+      // coreField: 1,
+      //fieldId: null,
+      field_type: 'drop_down',
+      // enum: ['Select'],
+      // enumNames: ['Select'],
       api: {
-        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
-        method: 'POST',
-        payload: {
-          fieldName: 'village',
-          controllingfieldfk: '**',
-          sort: ['village_name', 'asc'],
+        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/cohort/search`,
+        header: {
+          tenantId: '**',
+          Authorization: '**',
+          academicyearid: '**',
         },
+        method: 'POST',
         options: {
-          optionObj: 'result.values',
-          label: 'label',
-          value: 'value',
+          label: 'name',
+          value: 'cohortId',
+          optionObj: 'result.results.cohortDetails',
+        },
+        payload: {
+          limit: 200,
+          offset: 0,
+          filters: {
+            type: 'COHORT',
+            status: ['active'],
+            block: '**',
+          },
         },
         callType: 'dependent',
         dependent: 'block',
       },
-      //for multiselect
       uniqueItems: true,
       isMultiSelect: true,
-      maxSelections: 1000,
+      maxSelection: 1000,
+    },
+    batch: {
+      type: 'array',
+      title: 'FORM.BATCH',
+      items: {
+        type: 'string',
+        enum: ['Select'],
+        enumNames: ['Select'],
+      },
+      // coreField: 1,
+      //fieldId: null,
+      field_type: 'drop_down',
+      // enum: ['Select'],
+      // enumNames: ['Select'],
+      api: {
+        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/cohort/search`,
+        header: {
+          tenantId: '**',
+          Authorization: '**',
+          academicyearid: '**',
+        },
+        method: 'POST',
+        options: {
+          label: 'name',
+          value: 'cohortId',
+          optionObj: 'result.results.cohortDetails',
+        },
+        payload: {
+          limit: 200,
+          offset: 0,
+          filters: {
+            type: 'BATCH',
+            status: ['active'],
+            parentId: '**',
+          },
+        },
+        callType: 'dependent',
+        dependent: 'center',
+      },
+      uniqueItems: true,
+      isMultiSelect: true,
+      maxSelection: 1000,
     },
     name: {
       type: 'string',
@@ -150,7 +234,9 @@ export const learnerSearchUISchema = {
     'state',
     'district',
     'block',
-    'village',
+    // 'village',
+    "center",
+    "batch",
     'name',
     'sortBy',
     'status',
@@ -181,7 +267,15 @@ export const learnerSearchUISchema = {
     },
   },
 
-  village: {
+  // village: {
+  //   'ui:widget': 'CustomMultiSelectWidget',
+  //   'ui:options': {
+  //     multiple: true,
+  //     uniqueItems: true,
+  //   },
+  // },
+
+  center: {
     'ui:widget': 'CustomMultiSelectWidget',
     'ui:options': {
       multiple: true,
@@ -189,6 +283,14 @@ export const learnerSearchUISchema = {
     },
   },
 
+  batch: {
+    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:options': {
+      multiple: true,
+      uniqueItems: true,
+    },
+  },
+  
   firstName: {
     'ui:widget': 'SearchTextFieldWidget',
   },

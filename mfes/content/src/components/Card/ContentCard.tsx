@@ -61,7 +61,7 @@ const ContentCard = ({
 }
         content={item?.description ? item?.description : <Description />}
         actions={
-          type !== 'Course' && (
+          type !== 'Course' || type!=='Job family' || type!=='PSU' || type!=='Group Membership' && (
             <StatusIcon
               showMimeTypeIcon
               mimeType={item?.mimeType}
