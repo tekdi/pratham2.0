@@ -521,7 +521,8 @@ const Facilitator = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
           title="Edit Facilitator"
@@ -568,7 +569,8 @@ const Facilitator = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
           title="Delete Facilitator"
@@ -626,7 +628,8 @@ const Facilitator = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
           title="Reassign Facilitator"
@@ -670,7 +673,8 @@ const Facilitator = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
           title="Reactivate Facilitator"
