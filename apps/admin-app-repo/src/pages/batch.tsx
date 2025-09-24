@@ -305,7 +305,8 @@ const Batch = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
           title="Edit Batch"
@@ -330,7 +331,8 @@ const Batch = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+             justifyContent: 'center',
             padding: '10px',
           }}
           title="Delete Batch"
