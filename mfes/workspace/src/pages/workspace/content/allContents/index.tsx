@@ -21,7 +21,13 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import UpReviewTinyImage from '@mui/icons-material/LibraryBooks';
 import SearchBox from '../../../../components/SearchBox';
-import { deleteContent, getContent } from '../../../../services/ContentService';
+import {
+  deleteContent,
+  getContent,
+  getfilterList,
+  getPosFrameworkList,
+  getMediaFilterList,
+} from '../../../../services/ContentService';
 import { timeAgo } from '@workspace/utils/Helper';
 import Loader from '@workspace/components/Loader';
 import NoDataFound from '@workspace/components/NoDataFound';
@@ -37,6 +43,7 @@ import KaTableComponent from '@workspace/components/KaTableComponent';
 import useSharedStore from '../../../../../../shared-store';
 import useTenantConfig from '@workspace/hooks/useTenantConfig';
 import WorkspaceHeader from '@workspace/components/WorkspaceHeader';
+import DynamicMultiFilter from '../../../../components/DynamicMultiFilter';
 // const columns = [
 //   { key: 'name', title: 'Content', dataType: DataType.String, width: "450px" },
 //   { key: 'lastUpdatedOn', title: 'Last Updated', dataType: DataType.String, width: "300px" },
@@ -86,6 +93,9 @@ const AllContentsPage = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedNames, setSelectedNames] = useState<Record<string, string[]>>(
+    {}
+  );
   const { filterOptions, sort, status } = router.query;
 
   const [filter, setFilter] = useState<any[]>([]);
@@ -242,7 +252,10 @@ const AllContentsPage = () => {
           offset,
           primaryCategory,
           sort_by,
-          tenantConfig?.CHANNEL_ID
+          tenantConfig?.CHANNEL_ID,
+          undefined,
+          undefined,
+          selectedNames
         );
         const contentList = (response?.content || []).concat(
           response?.QuestionSet || []
@@ -263,6 +276,7 @@ const AllContentsPage = () => {
     sortBy,
     statusBy,
     page,
+    selectedNames,
   ]);
 
   useEffect(() => {
@@ -298,6 +312,62 @@ const AllContentsPage = () => {
   );
 
   console.log('contentList', contentList);
+
+  // Add state for dynamic filter
+  const [readData, setReadData] = useState<any[]>([]);
+  const [posFrameworkData, setPosFrameworkData] = useState<any>(null);
+  const [selectedFilters, setSelectedFilters] = useState<{
+    [key: string]: string[];
+  }>({});
+
+  // Mock fetch for readData and posFrameworkData (replace with real API calls)
+  useEffect(() => {
+    const fetchReadData = async () => {
+      const response = await getfilterList();
+      const posFrameworkData = await getPosFrameworkList();
+      const mediaFilterList = await getMediaFilterList();
+
+      const convertedArray = mediaFilterList?.range.map((item: any) => ({
+        name: item.label,
+        value: item.identifier,
+      }));
+      mediaFilterList.range = convertedArray;
+
+      response.push(mediaFilterList);
+      setReadData(response);
+
+      setPosFrameworkData(posFrameworkData);
+    };
+
+    fetchReadData();
+  }, []);
+
+  // Restore filters only for allContents
+  useEffect(() => {
+    if (router.query && router.asPath.includes('allContents')) {
+      const savedFilters = localStorage.getItem('allContentsFilters');
+      const savedSelectedNames = localStorage.getItem(
+        'allContentsSelectedNames'
+      );
+      if (savedFilters) setSelectedFilters(JSON.parse(savedFilters));
+      if (savedSelectedNames) setSelectedNames(JSON.parse(savedSelectedNames));
+    }
+  }, [router.asPath]);
+
+  // Save filters only for allContents
+  useEffect(() => {
+    if (router.asPath.includes('allContents')) {
+      localStorage.setItem(
+        'allContentsFilters',
+        JSON.stringify(selectedFilters)
+      );
+      localStorage.setItem(
+        'allContentsSelectedNames',
+        JSON.stringify(selectedNames)
+      );
+    }
+  }, [selectedFilters, selectedNames, router.asPath]);
+
   return (
     <>
       {showHeader && <WorkspaceHeader />}
@@ -332,6 +402,16 @@ const AllContentsPage = () => {
                 onStatusChange={handleStatusChange}
                 allContents={true}
               />
+              <Box m={3}>
+                <DynamicMultiFilter
+                  readData={readData}
+                  posFrameworkData={posFrameworkData}
+                  selectedFilters={selectedFilters}
+                  onChange={setSelectedFilters}
+                  onSelectedNamesChange={setSelectedNames}
+                  isProgramFilter={false}
+                />
+              </Box>
             </Box>
             {loading ? (
               <Loader showBackdrop={true} loadingText={'Loading'} />
