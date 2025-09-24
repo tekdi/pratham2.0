@@ -154,10 +154,8 @@ const PaginatedTable = ({
         <Table
           size="small"
           sx={{
-            borderCollapse: 'collapse',
             '& .MuiTableCell-root': {
               padding: '6px 8px',
-              border: '1px solid #e0e0e0',
             },
           }}
         >
@@ -178,7 +176,27 @@ const PaginatedTable = ({
                   {actions.length > 0 && (
                     <TableCell>
                       <Box
-                        sx={{ display: 'flex', gap: 0, alignItems: 'center' }}
+                        sx={{
+                          display: 'flex',
+                          gap: 0,
+                          alignItems: 'center',
+                          '& .MuiIconButton-root': {
+                            width: 28,
+                            height: 28,
+                            p: 0,
+                            m: 0,
+                            border: '1px solid #e0e0e0',
+                            borderRadius: 1,
+                          },
+                          '& .MuiIconButton-root + .MuiIconButton-root': {
+                            ml: '-1px',
+                          },
+                          '& .MuiIconButton-root img, & .MuiIconButton-root svg':
+                            {
+                              width: 16,
+                              height: 16,
+                            },
+                        }}
                       >
                         {actions
                           .filter((action) =>
