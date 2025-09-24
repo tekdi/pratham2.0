@@ -210,7 +210,8 @@ const StateLead = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
           title="Edit State Lead"
@@ -240,7 +241,8 @@ const StateLead = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
           title="Delete State Lead"
@@ -273,7 +275,8 @@ const StateLead = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
           title="Reactivate State Lead"

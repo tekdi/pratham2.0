@@ -572,7 +572,8 @@ const Learner = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
           title="Delete Learner"
@@ -621,10 +622,11 @@ const Learner = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
-           title="Reactivate Learner"
+          title="Reactivate Learner"
         >
           {' '}
           <Image src={restoreIcon} alt="" />{' '}
