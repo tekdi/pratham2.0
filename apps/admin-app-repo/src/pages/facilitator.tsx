@@ -296,7 +296,7 @@ const Facilitator = () => {
       render: (row) => {
         // let centerArray = row?.customfield?.find(
         //   (field) => field.label === 'CENTER'
-        // )?.selectedValues;
+        // )?.selectedValues
         // return (
         //   <>
         //     {centerArray && (
@@ -321,6 +321,24 @@ const Facilitator = () => {
             .filter(Boolean) || [];
 
         return centers.join(', ');
+      },
+    },
+    {
+      key: 'batch',
+      label: 'Batch',
+      render: (row) => {
+        // console.log('BacthRow', row?.cohortData)
+        const batches =
+          row.cohortData
+            ?.filter(
+              (c: any) =>
+                c.batchStatus === 'active' &&
+                c.cohortMember?.status === 'active'
+            )
+            .map((c: any) => transformLabel(c.batchName))
+            .filter(Boolean) || [];
+
+        return batches.join(', ');
       },
     },
     {
@@ -506,6 +524,7 @@ const Facilitator = () => {
             backgroundColor: 'rgb(227, 234, 240)',
             padding: '10px',
           }}
+          title="Edit Facilitator"
         >
           <Image src={editIcon} alt="" />
         </Box>
@@ -552,6 +571,7 @@ const Facilitator = () => {
             backgroundColor: 'rgb(227, 234, 240)',
             padding: '10px',
           }}
+          title="Delete Facilitator"
         >
           {' '}
           <Image src={deleteIcon} alt="" />{' '}
@@ -609,6 +629,7 @@ const Facilitator = () => {
             backgroundColor: 'rgb(227, 234, 240)',
             padding: '10px',
           }}
+          title="Reassign Facilitator"
         >
           <Image src={apartment} alt="" />
         </Box>
@@ -652,6 +673,7 @@ const Facilitator = () => {
             backgroundColor: 'rgb(227, 234, 240)',
             padding: '10px',
           }}
+          title="Reactivate Facilitator"
         >
           {' '}
           <Image src={restoreIcon} alt="" />{' '}

@@ -208,7 +208,12 @@ export const CommonContentSearch = async ({
       throw new Error('Search API URL environment variable is not configured');
     }
     // Axios request configuration
-
+    if (filters && typeof filters === 'object' && 'program' in filters) {
+      // Create a shallow copy to avoid mutating the original filters object
+      // const { program, ...restFilters } = filters as { [key: string]: any };
+      // filters = restFilters;
+      delete filters?.program;
+    }
     const data = {
       request: {
         filters: {
