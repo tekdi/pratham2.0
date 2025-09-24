@@ -37,8 +37,8 @@ import { showToastMessage } from '@/components/Toastify';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 
 const StateLead = () => {
-    const [archiveToActiveOpen, setArchiveToActiveOpen] = useState(false);
-  
+  const [archiveToActiveOpen, setArchiveToActiveOpen] = useState(false);
+
   const theme = useTheme<any>();
   const [isLoading, setIsLoading] = useState(false);
   const [schema, setSchema] = useState(StateLeadSearchSchema);
@@ -59,16 +59,16 @@ const StateLead = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const { t, i18n } = useTranslation();
-     const formRef = useRef(null);
+  const formRef = useRef(null);
 
   const searchStoreKey = 'stateLead';
   const initialFormDataSearch =
     localStorage.getItem(searchStoreKey) &&
-    localStorage.getItem(searchStoreKey) != '{}'
+      localStorage.getItem(searchStoreKey) != '{}'
       ? JSON.parse(localStorage.getItem(searchStoreKey))
       : localStorage.getItem('stateId')
-      ? { state: [localStorage.getItem('stateId')] }
-      : {};
+        ? { state: [localStorage.getItem('stateId')] }
+        : {};
 
   const storedUserData = JSON.parse(localStorage.getItem('adminInfo') || '{}');
 
@@ -164,9 +164,8 @@ const StateLead = () => {
       keys: ['firstName', 'middleName', 'lastName'],
       label: 'State Lead Name',
       render: (row: any) =>
-        `${row.firstName || ''} ${row.middleName || ''} ${
-          row.lastName || ''
-        }`.trim(),
+        `${row.firstName || ''} ${row.middleName || ''} ${row.lastName || ''
+          }`.trim(),
     },
     {
       key: 'status',
@@ -187,7 +186,7 @@ const StateLead = () => {
       },
     },
   ];
-   
+
   const archiveToactive = async () => {
     try {
       const resp = await deleteUser(editableUserId, {
@@ -214,6 +213,7 @@ const StateLead = () => {
             backgroundColor: 'rgb(227, 234, 240)',
             padding: '10px',
           }}
+          title="Edit State Lead"
         >
           <Image src={editIcon} alt="" />
         </Box>
@@ -243,6 +243,7 @@ const StateLead = () => {
             backgroundColor: 'rgb(227, 234, 240)',
             padding: '10px',
           }}
+          title="Delete State Lead"
         >
           {' '}
           <Image src={deleteIcon} alt="" />
@@ -275,6 +276,7 @@ const StateLead = () => {
             backgroundColor: 'rgb(227, 234, 240)',
             padding: '10px',
           }}
+          title="Reactivate State Lead"
         >
           {' '}
           <Image src={restoreIcon} alt="" />
@@ -363,12 +365,12 @@ const StateLead = () => {
           )
         )}
         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }} mt={4}>
-            <ResetFiltersButton
-                      searchStoreKey="stateLead"
-                      formRef={formRef}
-                      SubmitaFunction={SubmitaFunction}
-                      setPrefilledFormData={setPrefilledFormData}
-                    />
+          <ResetFiltersButton
+            searchStoreKey="stateLead"
+            formRef={formRef}
+            SubmitaFunction={SubmitaFunction}
+            setPrefilledFormData={setPrefilledFormData}
+          />
           <Button
             variant="outlined"
             startIcon={<AddIcon />}
@@ -467,35 +469,35 @@ const StateLead = () => {
         )}
 
 
-<ConfirmationPopup
-        checked={true}
-        open={archiveToActiveOpen}
-        onClose={() => setArchiveToActiveOpen(false)}
-        title={t('COMMON.ACTIVATE_USER')}
-        primary={t('COMMON.ACTIVATE')}
-        secondary={t('COMMON.CANCEL')}
-        reason={"yes"}
-        onClickPrimary={archiveToactive}
-      >
-        <Box
-                sx={{
-                  border: '1px solid #ddd',
-                  borderRadius: 2,
-                  mb: 2,
-                  p: 1,
-                }}
-              >
-                <Typography>
-                  { firstName } { lastName } {t("FORM.WAS_BELONG_TO")}
-                </Typography>
-                <TextField fullWidth value={state} disabled sx={{ mt: 1 }} />
-              </Box>
-         <Typography fontWeight="bold">
-                   {t("FORM.CONFIRM_TO_ACTIVATE")}  
+        <ConfirmationPopup
+          checked={true}
+          open={archiveToActiveOpen}
+          onClose={() => setArchiveToActiveOpen(false)}
+          title={t('COMMON.ACTIVATE_USER')}
+          primary={t('COMMON.ACTIVATE')}
+          secondary={t('COMMON.CANCEL')}
+          reason={"yes"}
+          onClickPrimary={archiveToactive}
+        >
+          <Box
+            sx={{
+              border: '1px solid #ddd',
+              borderRadius: 2,
+              mb: 2,
+              p: 1,
+            }}
+          >
+            <Typography>
+              {firstName} {lastName} {t("FORM.WAS_BELONG_TO")}
+            </Typography>
+            <TextField fullWidth value={state} disabled sx={{ mt: 1 }} />
+          </Box>
+          <Typography fontWeight="bold">
+            {t("FORM.CONFIRM_TO_ACTIVATE")}
 
-                </Typography>
+          </Typography>
 
- </ConfirmationPopup>
+        </ConfirmationPopup>
       </Box>
     </>
   );

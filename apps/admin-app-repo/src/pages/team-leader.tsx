@@ -98,11 +98,11 @@ const TeamLeader = () => {
   const searchStoreKey = 'teamLeader';
   const initialFormDataSearch =
     localStorage.getItem(searchStoreKey) &&
-    localStorage.getItem(searchStoreKey) != '{}'
+      localStorage.getItem(searchStoreKey) != '{}'
       ? JSON.parse(localStorage.getItem(searchStoreKey))
       : localStorage.getItem('stateId')
-      ? { state: [localStorage.getItem('stateId')] }
-      : {};
+        ? { state: [localStorage.getItem('stateId')] }
+        : {};
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -192,7 +192,7 @@ const TeamLeader = () => {
       console.error('Error updating team leader:', error);
     }
   };
- const archiveToactive = async () => {
+  const archiveToactive = async () => {
     try {
       let membershipIds = null;
 
@@ -216,7 +216,7 @@ const TeamLeader = () => {
           try {
             const updateResponse = await updateCohortMemberStatus({
               memberStatus: 'active',
-           //   statusReason: reason,
+              //   statusReason: reason,
               membershipId,
             });
 
@@ -244,7 +244,7 @@ const TeamLeader = () => {
       const resp = await deleteUser(userID, {
         userData: { status: 'active' },
       });
-                        showToastMessage(t("LEARNERS.ACTIVATE_USER_SUCCESS"), "success");
+      showToastMessage(t("LEARNERS.ACTIVATE_USER_SUCCESS"), "success");
 
 
       if (resp?.responseCode === 200) {
@@ -258,7 +258,7 @@ const TeamLeader = () => {
         //   },
         // }));
         searchData(prefilledFormData, currentPage);
-        
+
         console.log('learner successfully aactive.');
       } else {
         console.error('Failed to archive team leader:', resp);
@@ -305,9 +305,8 @@ const TeamLeader = () => {
       keys: ['firstName', 'middleName', 'lastName'],
       label: 'Team Lead Name',
       render: (row) =>
-        `${transformLabel(row.firstName) || ''} ${
-          transformLabel(row.middleName) || ''
-        } ${transformLabel(row.lastName) || ''}`.trim(),
+        `${transformLabel(row.firstName) || ''} ${transformLabel(row.middleName) || ''
+          } ${transformLabel(row.lastName) || ''}`.trim(),
     },
     {
       keys: ['age'],
@@ -341,9 +340,8 @@ const TeamLeader = () => {
               (field: { label: string }) => field.label === 'BLOCK'
             )?.selectedValues?.[0]?.value
           ) || '';
-        return `${state == '' ? '' : `${state}`}${
-          district == '' ? '' : `, ${district}`
-        }${block == '' ? '' : `, ${block}`}`;
+        return `${state == '' ? '' : `${state}`}${district == '' ? '' : `, ${district}`
+          }${block == '' ? '' : `, ${block}`}`;
       },
     },
     {
@@ -367,6 +365,7 @@ const TeamLeader = () => {
             backgroundColor: 'rgb(227, 234, 240)',
             padding: '10px',
           }}
+          title="Edit Team Leader"
         >
           <Image src={editIcon} alt="" />
         </Box>
@@ -396,6 +395,7 @@ const TeamLeader = () => {
             backgroundColor: 'rgb(227, 234, 240)',
             padding: '10px',
           }}
+          title="Delete Team Leader"
         >
           {' '}
           <Image src={deleteIcon} alt="" />{' '}
@@ -429,6 +429,7 @@ const TeamLeader = () => {
             backgroundColor: 'rgb(227, 234, 240)',
             padding: '10px',
           }}
+          title="Reassign Team Leader"
         >
           <Image src={apartment} alt="" />
         </Box>
@@ -447,50 +448,51 @@ const TeamLeader = () => {
       },
       show: (row) => row.status !== 'archived',
     },
-     {
-          icon: (
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                cursor: 'pointer',
-                backgroundColor: 'rgb(227, 234, 240)',
-                padding: '10px',
-              }}
-            >
-              {' '}
-              <Image src={restoreIcon} alt="" />{' '}
-            </Box>
-          ),
-          callback: async (row) => {
-            const findVillage = row?.customFields.find((item) => {
-              if (item.label === 'VILLAGE') {
-                return item;
-              }
-            });
-    
-            // console.log('row:', row?.customFields[2].selectedValues[0].value);
-            setEditableUserId(row?.userId);
-    
-            setArchiveToActiveOpen(true);
-    
-            setUserId(row?.userId);
-     const findVillagename = row?.customFields.find((item) => {
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            backgroundColor: 'rgb(227, 234, 240)',
+            padding: '10px',
+          }}
+          title="Reactivate Team Leader"
+        >
+          {' '}
+          <Image src={restoreIcon} alt="" />{' '}
+        </Box>
+      ),
+      callback: async (row) => {
+        const findVillage = row?.customFields.find((item) => {
+          if (item.label === 'VILLAGE') {
+            return item;
+          }
+        });
+
+        // console.log('row:', row?.customFields[2].selectedValues[0].value);
+        setEditableUserId(row?.userId);
+
+        setArchiveToActiveOpen(true);
+
+        setUserId(row?.userId);
+        const findVillagename = row?.customFields.find((item) => {
           if (item.label === 'BLOCK') {
             return item;
           }
         });
-         setVillage(findVillagename?.selectedValues[0]?.value);
+        setVillage(findVillagename?.selectedValues[0]?.value);
         setUserId(row?.userId);
         setFirstName(row?.firstName);
         setLastName(row?.lastName);
 
-            // setReason('');
-            // setChecked(false);
-          },
-          show: (row) => row.status !== 'active',
-        }
+        // setReason('');
+        // setChecked(false);
+      },
+      show: (row) => row.status !== 'active',
+    }
   ];
 
   // Pagination handlers
@@ -600,8 +602,8 @@ const TeamLeader = () => {
             isEdit
               ? t('TEAM_LEADERS.EDIT_TEAM_LEADER')
               : isReassign
-              ? t('TEAM_LEADERS.RE_ASSIGN_TEAM_LEAD')
-              : t('TEAM_LEADERS.NEW_TEAM_LEADER')
+                ? t('TEAM_LEADERS.RE_ASSIGN_TEAM_LEAD')
+                : t('TEAM_LEADERS.NEW_TEAM_LEADER')
           }
         >
           <AddEditUser
@@ -706,24 +708,24 @@ const TeamLeader = () => {
         onClickPrimary={archiveToactive}
       >
         <Box
-                sx={{
-                  border: '1px solid #ddd',
-                  borderRadius: 2,
-                  mb: 2,
-                  p: 1,
-                }}
-              >
-                <Typography>
-                  { firstName } { lastName } {t("FORM.WAS_BELONG_TO")}
-                </Typography>
-                <TextField fullWidth value={village} disabled sx={{ mt: 1 }} />
-              </Box>
-         <Typography fontWeight="bold">
-                   {t("FORM.CONFIRM_TO_ACTIVATE")}  
+          sx={{
+            border: '1px solid #ddd',
+            borderRadius: 2,
+            mb: 2,
+            p: 1,
+          }}
+        >
+          <Typography>
+            {firstName} {lastName} {t("FORM.WAS_BELONG_TO")}
+          </Typography>
+          <TextField fullWidth value={village} disabled sx={{ mt: 1 }} />
+        </Box>
+        <Typography fontWeight="bold">
+          {t("FORM.CONFIRM_TO_ACTIVATE")}
 
-                </Typography>
+        </Typography>
 
- </ConfirmationPopup>
+      </ConfirmationPopup>
     </>
   );
 };

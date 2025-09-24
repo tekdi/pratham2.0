@@ -296,7 +296,7 @@ const Facilitator = () => {
       render: (row) => {
         // let centerArray = row?.customfield?.find(
         //   (field) => field.label === 'CENTER'
-        // )?.selectedValues;
+        // )?.selectedValues
         // return (
         //   <>
         //     {centerArray && (
@@ -524,6 +524,7 @@ const Facilitator = () => {
             backgroundColor: 'rgb(227, 234, 240)',
             padding: '10px',
           }}
+          title="Edit Facilitator"
         >
           <Image src={editIcon} alt="" />
         </Box>
@@ -570,6 +571,7 @@ const Facilitator = () => {
             backgroundColor: 'rgb(227, 234, 240)',
             padding: '10px',
           }}
+          title="Delete Facilitator"
         >
           {' '}
           <Image src={deleteIcon} alt="" />{' '}
@@ -627,6 +629,7 @@ const Facilitator = () => {
             backgroundColor: 'rgb(227, 234, 240)',
             padding: '10px',
           }}
+          title="Reassign Facilitator"
         >
           <Image src={apartment} alt="" />
         </Box>
@@ -670,6 +673,7 @@ const Facilitator = () => {
             backgroundColor: 'rgb(227, 234, 240)',
             padding: '10px',
           }}
+          title="Reactivate Facilitator"
         >
           {' '}
           <Image src={restoreIcon} alt="" />{' '}
