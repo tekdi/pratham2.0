@@ -308,6 +308,7 @@ const Batch = () => {
             backgroundColor: 'rgb(227, 234, 240)',
             padding: '10px',
           }}
+          title="Edit Batch"
         >
           <Image src={editIcon} alt="" />
         </Box>
@@ -332,6 +333,7 @@ const Batch = () => {
             backgroundColor: 'rgb(227, 234, 240)',
             padding: '10px',
           }}
+          title="Delete Batch"
         >
           {' '}
           <Image src={deleteIcon} alt="" />
@@ -346,7 +348,7 @@ const Batch = () => {
           filters: {
             cohortId: row?.cohortId,
             status: ['active'],
-            role:'Learner',
+            role: 'Learner',
           },
         };
         const response = await fetchCohortMemberList(data);
