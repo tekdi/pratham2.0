@@ -417,7 +417,8 @@ const Centers = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
           title="Google Map Link"
@@ -445,7 +446,8 @@ const Centers = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
           title="View Batch"
@@ -467,7 +469,8 @@ const Centers = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
           title="Edit Center"
@@ -493,7 +496,8 @@ const Centers = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
           title="Delete Center"
