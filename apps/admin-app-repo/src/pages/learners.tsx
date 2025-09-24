@@ -575,6 +575,7 @@ const Learner = () => {
             backgroundColor: 'rgb(227, 234, 240)',
             padding: '10px',
           }}
+          title="Delete Learner"
         >
           {' '}
           <Image src={deleteIcon} alt="" />{' '}
@@ -623,6 +624,7 @@ const Learner = () => {
             backgroundColor: 'rgb(227, 234, 240)',
             padding: '10px',
           }}
+           title="Reactivate Learner"
         >
           {' '}
           <Image src={restoreIcon} alt="" />{' '}
