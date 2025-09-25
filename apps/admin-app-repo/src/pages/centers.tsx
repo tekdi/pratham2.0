@@ -5,7 +5,7 @@ import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
 import { CohortTypes, Status, TenantName } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
-import { Box, Typography } from '@mui/material';
+import { Box, Tooltip, Typography } from '@mui/material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
 import { Button } from '@mui/material';
 import SimpleModal from '@/components/SimpleModal';
@@ -38,6 +38,7 @@ import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 import ActiveArchivedLearner from '@/components/ActiveArchivedLearner';
 import { API_ENDPOINTS } from '@/utils/API/APIEndpoints';
 import ActiveArchivedBatch from '@/components/ActiveArchivedBatch';
+import BatchFlow from '@/components/BatchFlow/BatchFlow';
 
 //import { DynamicForm } from '@shared-lib';
 
@@ -61,6 +62,8 @@ const Centers = () => {
   const [cohortId, setCohortId] = useState('');
   const [tenantId, setTenantId] = useState('');
   const [open, setOpen] = useState(false);
+  const [openBatchModal, setOpenBatchModal] = useState(false);
+  const [selectedCenter, setSelectedCenter] = useState<any>(null);
   const [firstName, setFirstName] = useState('');
   const [totalCount, setTotalCount] = useState(0);
   const [totalCountBatch, setTotalCountBatch] = useState(0);
@@ -73,11 +76,11 @@ const Centers = () => {
   const searchStoreKey = 'centers';
   const initialFormDataSearch =
     localStorage.getItem(searchStoreKey) &&
-    localStorage.getItem(searchStoreKey) != '{}'
+      localStorage.getItem(searchStoreKey) != '{}'
       ? JSON.parse(localStorage.getItem(searchStoreKey))
       : localStorage.getItem('stateId')
-      ? { state: [localStorage.getItem('stateId')] }
-      : {};
+        ? { state: [localStorage.getItem('stateId')] }
+        : {};
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -414,9 +417,11 @@ const Centers = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
+          title="Google Map Link"
         >
           <MapIcon />
         </Box>
@@ -441,9 +446,34 @@ const Centers = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
+          title="View Batch"
+        >
+          <Image src={'/images/centers.svg'} alt="" width={24} height={24} />
+        </Box>
+      ),
+      callback: async (row: any) => {
+        setSelectedCenter(row);
+        setOpenBatchModal(true);
+      },
+      show: (row) => true,
+    },
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
+            padding: '10px',
+          }}
+          title="Edit Center"
         >
           <Image src={editIcon} alt="" />
         </Box>
@@ -466,9 +496,11 @@ const Centers = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
+          title="Delete Center"
         >
           {' '}
           <Image src={deleteIcon} alt="" />
@@ -545,7 +577,7 @@ const Centers = () => {
   const successCreateMessage = 'CENTERS.CENTER_CREATED';
   const telemetryCreateKey = 'center-created-successfully';
   const failureCreateMessage = 'CENTERS.CENTER_UPDATE_FAILED';
-console.log("prefilledFormData", prefilledFormData)
+  console.log('prefilledFormData', prefilledFormData);
   return (
     <>
       <Box display={'flex'} flexDirection={'column'} gap={2}>
@@ -629,7 +661,7 @@ console.log("prefilledFormData", prefilledFormData)
         {response != null ? (
           <>
             {response &&
-            response?.result?.results?.cohortDetails?.length > 0 ? (
+              response?.result?.results?.cohortDetails?.length > 0 ? (
               <Box sx={{ mt: 1 }}>
                 <PaginatedTable
                   count={response?.result?.count}
@@ -658,6 +690,36 @@ console.log("prefilledFormData", prefilledFormData)
         ) : (
           <CenteredLoader />
         )}
+        <SimpleModal
+          open={openBatchModal}
+          onClose={() => setOpenBatchModal(false)}
+          showFooter={false}
+          modalTitle={t("CENTERS.BATCHES_FOR_CENTER", {
+            centerName: transformLabel(selectedCenter?.name || "")
+          })}
+          isFullwidth={true}
+        >
+          {selectedCenter ? (
+            <BatchFlow
+              initialParentId={selectedCenter?.cohortId}
+              centerBoards={
+                selectedCenter?.customFields?.find(
+                  (field: any) => field.label === 'BOARD'
+                )?.selectedValues || []
+              }
+              centerMediums={
+                selectedCenter?.customFields?.find(
+                  (field: any) => field.label === 'MEDIUM'
+                )?.selectedValues || []
+              }
+              centerGrades={
+                selectedCenter?.customFields?.find(
+                  (field: any) => field.label === 'GRADE'
+                )?.selectedValues || []
+              }
+            />
+          ) : null}
+        </SimpleModal>
       </Box>
       {totalCount > 0 || totalCountBatch > 0 ? (
         <ConfirmationPopup

@@ -203,11 +203,21 @@ const UserId = () => {
       }
 
       if (userData) {
-        const getFieldValue = (label: string) =>
-          toPascalCase(
-            userData?.customFields?.find((item: any) => item.label === label)
-              ?.selectedValues?.[0]?.value || ''
-          );
+        const getFieldValue = (label: string) => {
+          const field = userData?.customFields?.find((item: any) => item.label === label);
+          const selectedValues = field?.selectedValues;
+          
+          if (!selectedValues || selectedValues.length === 0) {
+            return '';
+          }
+          
+          if (selectedValues.length === 1) {
+            return toPascalCase(selectedValues[0]?.value || '');
+          }
+          
+          // If multiple values, return all values as array or concatenated string
+          return selectedValues.map((item: any) => toPascalCase(item?.value || '')).join(', ');
+        };
         let date;
         let formattedDOBDate;
         if (userData.dob) {
@@ -233,7 +243,7 @@ const UserId = () => {
           phone: userData?.mobile || '',
           gender: userData?.gender || '',
           userRole:
-            toPascalCase(userData?.tenantData?.[0]?.roleName) ||
+            toPascalCase(userData?.tenantData?.[0]?.roles?.[0]?.roleName) ||
             toPascalCase(role),
           dob: formattedDOBDate || '',
           district: getFieldValue('DISTRICT'),
@@ -384,7 +394,7 @@ const UserId = () => {
         open={editModal}
         onClose={onClose}
         showFooter={true}
-        modalTitle={'New Mentor'}
+        modalTitle= {t('YOUTHNET_PROFILE.UPDATE_PROFILE')}
         //  handleNext={FormSubmitFunction}
         primaryText={'Submit'}
         id="dynamic-form-id"

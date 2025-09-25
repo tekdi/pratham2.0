@@ -15,6 +15,7 @@ import BreadCrumb from '../BreadCrumb';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 import LoginIcon from '@mui/icons-material/Login';
 import { checkCourseScore } from '@shared-lib-v2/utils/CertificateService/coursesCertificates';
+import HoverableText from '../HoverableText';
 
 interface InfoCardProps {
   item: any;
@@ -81,13 +82,13 @@ const InfoCard: React.FC<InfoCardProps> = ({
             ..._infoCard?._cardMedia,
           }}
           // image={item?.posterImage || _infoCard?.default_img}
-            image={
-  item?.posterImage
-    ? item.posterImage
-    : item?.appIcon
-      ? item.appIcon
-      : _infoCard?.default_img 
-}
+          image={
+            item?.posterImage
+              ? item.posterImage
+              : item?.appIcon
+                ? item.appIcon
+                : _infoCard?.default_img
+          }
           alt={item?.name}
         />
         <Box
@@ -131,26 +132,14 @@ const InfoCard: React.FC<InfoCardProps> = ({
                 />
               </Box>
             )}
-            <Typography
-              component="div"
-              // @ts-ignore
+            <HoverableText 
+              name={item?.name}
+              maxLines={2}
               variant="body8"
-              title={item?.name}
-              sx={{
-                fontWeight: 700,
-                // fontSize: { xs: '22px', sm: '24px', md: '36px' },
-                // lineHeight: { xs: '28px', sm: '32px', md: '44px' },
-                lineHeight: 1.5,
-                display: '-webkit-box',
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                textTransform: 'capitalize',
-              }}
-            >
-              <SpeakableText>{item?.name}</SpeakableText>
-            </Typography>
+              component="div"
+              fontWeight={700}
+              textTransform="capitalize"
+            />
             <ExpandableText
               text={item?.description}
               maxLines={2}
@@ -209,13 +198,13 @@ const InfoCard: React.FC<InfoCardProps> = ({
                         {t('LEARNER_APP.COURSE.STARTED_ON')}:{' '}
                         {item?.startedOn
                           ? new Intl.DateTimeFormat('en-GB', {
-                              day: '2-digit',
-                              month: 'short',
-                              year: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit',
-                              hour12: true,
-                            }).format(new Date(item.startedOn))
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: true,
+                          }).format(new Date(item.startedOn))
                           : ' - '}
                       </SpeakableText>
                       {/* {JSON.stringify(_infoCard?.isShowStatus || {})} */}
@@ -319,7 +308,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
             <SpeakableText>
               {checkLocalAuth
                 ? 'You are now enrolled to the course!'
-                : 'you need to login first'}
+                : 'You need to login first'}
             </SpeakableText>
           </Typography>
         </Box>

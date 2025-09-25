@@ -151,45 +151,83 @@ const PaginatedTable = ({
   return (
     <Paper>
       <TableContainer>
-        <Table>
+        <Table
+          size="small"
+          sx={{
+            '& .MuiTableCell-root': {
+              padding: '6px 8px',
+            },
+          }}
+        >
           <TableHead>
             <TableRow>
+              {actions.length > 0 && <TableCell>Actions</TableCell>}
               {columns?.map((col) => (
                 <TableCell key={col.key || col.keys?.join('-')}>
                   {col.label}
                 </TableCell>
               ))}
-              {actions.length > 0 && <TableCell>Actions</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
-            {data && data?.map((row, index) => (
-              <TableRow key={index}>
-                {columns?.map((col) => (
-                  <TableCell key={col.key || col.keys?.join('-')}>
-                    {/* ✅ Keep custom render logic if provided */}
-                    {col.render
-                      ? col.render(row)
-                      : Array.isArray(col.keys)
+            {data &&
+              data?.map((row, index) => (
+                <TableRow key={index}>
+                  {actions.length > 0 && (
+                    <TableCell>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          gap: 0,
+                          alignItems: 'center',
+                          '& .MuiIconButton-root': {
+                            width: 28,
+                            height: 28,
+                            p: 0,
+                            m: 0,
+                            border: '1px solid #e0e0e0',
+                            borderRadius: 1,
+                          },
+                          '& .MuiIconButton-root + .MuiIconButton-root': {
+                            ml: '-1px',
+                          },
+                          '& .MuiIconButton-root img, & .MuiIconButton-root svg':
+                            {
+                              width: 16,
+                              height: 16,
+                            },
+                        }}
+                      >
+                        {actions
+                          .filter((action) =>
+                            typeof action.show === 'function'
+                              ? action.show(row)
+                              : true
+                          )
+                          .map((action, idx) => (
+                            <IconButton
+                              size="small"
+                              key={idx}
+                              onClick={() => action.callback(row)}
+                            >
+                              {action.icon}
+                            </IconButton>
+                          ))}
+                      </Box>
+                    </TableCell>
+                  )}
+                  {columns?.map((col) => (
+                    <TableCell key={col.key || col.keys?.join('-')}>
+                      {/* ✅ Keep custom render logic if provided */}
+                      {col.render
+                        ? col.render(row)
+                        : Array.isArray(col.keys)
                         ? col.keys.map((key) => row[key] ?? '').join(' ')
                         : row[col.key] ?? ''}
-                  </TableCell>
-                ))}
-                {actions.length > 0 && (
-                  <TableCell>
-                    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                      {actions
-                        .filter((action) => (typeof action.show === 'function' ? action.show(row) : true))
-                        .map((action, idx) => (
-                          <IconButton key={idx} onClick={() => action.callback(row)}>
-                            {action.icon}
-                          </IconButton>
-                        ))}
-                    </Box>
-                  </TableCell>
-                )}
-              </TableRow>
-            ))}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </TableContainer>

@@ -259,9 +259,10 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
           title: item?.name,
           to: () => {
             localStorage.removeItem('learnerCourseFilters');
-            router.push(`/pos/school?se_subDomains=${item?.name}`);
+            const encodedName = item?.name?.replace(/&/g, '%26');
+            router.push(`/pos/school?se_subDomains=${encodedName}`);
           },
-          isActive: currentPage === `/pos/school?se_subDomains=${item?.name}`,
+          isActive: currentPage === `/pos/school?se_subDomains=${item?.name?.replace(/&/g, '%26')}`,
           code: item?.code,
         })),
       },
@@ -276,9 +277,10 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
           title: item?.name,
           to: () => {
             localStorage.removeItem('learnerCourseFilters');
-            router.push(`/pos/work?se_subDomains=${item?.name}`);
+            const encodedName = item?.name?.replace(/&/g, '%26');
+            router.push(`/pos/work?se_subDomains=${encodedName}`);
           },
-          isActive: currentPage === `/pos/work?se_subDomains=${item?.name}`,
+          isActive: currentPage === `/pos/work?se_subDomains=${item?.name?.replace(/&/g, '%26')}`,
           code: item?.code,
         })),
       },
@@ -293,9 +295,10 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
           title: item?.name,
           to: () => {
             localStorage.removeItem('learnerCourseFilters');
-            router.push(`/pos/life?se_subDomains=${item?.name}`);
+            const encodedName = item?.name?.replace(/&/g, '%26');
+            router.push(`/pos/life?se_subDomains=${encodedName}`);
           },
-          isActive: currentPage === `/pos/life?se_subDomains=${item?.name}`,
+          isActive: currentPage === `/pos/life?se_subDomains=${item?.name?.replace(/&/g, '%26')}`,
           code: item?.code,
         })),
       },
@@ -304,14 +307,15 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         isActive: currentPage === '/pos/program',
         child: [
           { code: 'Vocational Training', name: TenantName.YOUTHNET },
-          { name: TenantName.SECOND_CHANCE_PROGRAM, code: 'SCP' },
+          { name: 'Second Chance', code: 'SCP' },
         ].map((item: any) => ({
           title: item?.name,
           to: () => {
             localStorage.removeItem('learnerCourseFilters');
-            router.push(`/pos/program?program=${item?.name}`);
+            const encodedName = item?.name?.replace(/&/g, '%26');
+            router.push(`/pos/program?program=${encodedName}`);
           },
-          isActive: currentPage === `/pos/program?program=${item?.name}`,
+          isActive: currentPage === `/pos/program?program=${item?.name?.replace(/&/g, '%26')}`,
           code: item?.code,
         })),
       },
