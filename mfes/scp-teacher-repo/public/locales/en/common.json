@@ -745,7 +745,8 @@
     "LEARNERS_COUNT": "{{count}} of {{total}} Learners",
     "NO_LEARNERS_FOUND": "No learners found matching your search.",
     "MANUAL_ASSESSMENT": "Manual Assessment",
-    "MANUAL_ASSESSMENT_LIST": "Manual Assessment List"
+    "MANUAL_ASSESSMENT_LIST": "Manual Assessment List",
+    "UNDER_EVALUATION": "Under Evaluation"
   },
   "BOARD_ENROLMENT": {
     "BOARD_ENROLLMENT": "Board Enrollment",

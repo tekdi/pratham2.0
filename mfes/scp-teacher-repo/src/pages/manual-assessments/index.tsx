@@ -27,6 +27,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { accessControl, Program } from '../../../app.config';
+import { toPascalCase } from '../../utils/Helper';
 
 const AssessmentList = () => {
   const theme = useTheme<any>();
@@ -348,7 +349,7 @@ const AssessmentList = () => {
   const handleAssessmentDetails = (identifier: string, subject: string) => {
     // Navigate to assessment details page with assessmentId, cohortId, and subject
     if (identifier && classId) {
-      const navigationUrl = `/ai-assessments/${identifier}?cohortId=${classId}&subject=${encodeURIComponent(
+      const navigationUrl = `/manual-assessments/${identifier}?cohortId=${classId}&subject=${encodeURIComponent(
         subject
       )}`;
       router.push(navigationUrl);
@@ -610,7 +611,7 @@ const AssessmentList = () => {
                       }}
                       title={assessment?.subject}
                     >
-                      {assessment?.subject}
+                      {toPascalCase(assessment?.subject)}
                     </Typography>
                     <Box
                       sx={{
@@ -643,7 +644,7 @@ const AssessmentList = () => {
                           color: theme.palette.warning['400'],
                         }}
                       >
-                        {assessment?.board || '--'}
+                        {toPascalCase(assessment?.board) || '--'}
                       </Typography>
                     </Box>
                   </Box>

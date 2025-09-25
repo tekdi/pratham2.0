@@ -38,6 +38,7 @@ import surveyForm from '../assets/images/surveyForm.svg';
 import { useDirection } from '../hooks/useDirection';
 import GroupsIcon from '@mui/icons-material/Groups';
 import { YOUTHNET_USER_ROLE } from './youthNet/tempConfigs';
+import EditNoteIcon from '@mui/icons-material/EditNote';
 interface DrawerProps {
   toggleDrawer?: (open: boolean) => () => void;
   open: boolean;
@@ -695,12 +696,13 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                   gap: '10px',
                 }}
                 startIcon={
-                  <Image
-                    src={aiAssessment}
-                    alt="Assessment Icon"
-                    width={24}
-                    height={24}
-                  />
+                  // <Image
+                  //   src={aiAssessment}
+                  //   alt="Assessment Icon"
+                  //   width={24}
+                  //   height={24}
+                  // />
+                  <EditNoteIcon/>
                 }
                 onClick={() => {
                   router.push(`/manual-assessments`);
