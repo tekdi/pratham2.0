@@ -15,6 +15,7 @@ import BreadCrumb from '../BreadCrumb';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 import LoginIcon from '@mui/icons-material/Login';
 import { checkCourseScore } from '@shared-lib-v2/utils/CertificateService/coursesCertificates';
+import HoverableText from '../HoverableText';
 
 interface InfoCardProps {
   item: any;
@@ -131,26 +132,14 @@ const InfoCard: React.FC<InfoCardProps> = ({
                 />
               </Box>
             )}
-            <Typography
-              component="div"
-              // @ts-ignore
+            <HoverableText 
+              name={item?.name}
+              maxLines={2}
               variant="body8"
-              title={item?.name}
-              sx={{
-                fontWeight: 700,
-                // fontSize: { xs: '22px', sm: '24px', md: '36px' },
-                // lineHeight: { xs: '28px', sm: '32px', md: '44px' },
-                lineHeight: 1.5,
-                display: '-webkit-box',
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                textTransform: 'capitalize',
-              }}
-            >
-              <SpeakableText>{item?.name}</SpeakableText>
-            </Typography>
+              component="div"
+              fontWeight={700}
+              textTransform="capitalize"
+            />
             <ExpandableText
               text={item?.description}
               maxLines={2}

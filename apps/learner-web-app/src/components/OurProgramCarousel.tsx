@@ -397,6 +397,10 @@ const OurProgramCarousel = () => {
                                     window.localStorage
                                   ) {
                                     localStorage.setItem(
+                                      'landingPage',
+                                      program?.params?.uiConfig?.landingPage
+                                    );
+                                    localStorage.setItem(
                                       'userProgram',
                                       program?.name
                                     );

@@ -305,9 +305,11 @@ const Batch = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
+          title="Edit Batch"
         >
           <Image src={editIcon} alt="" />
         </Box>
@@ -329,9 +331,11 @@ const Batch = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+             justifyContent: 'center',
             padding: '10px',
           }}
+          title="Delete Batch"
         >
           {' '}
           <Image src={deleteIcon} alt="" />
@@ -346,7 +350,7 @@ const Batch = () => {
           filters: {
             cohortId: row?.cohortId,
             status: ['active'],
-            role:'Learner',
+            role: 'Learner',
           },
         };
         const response = await fetchCohortMemberList(data);

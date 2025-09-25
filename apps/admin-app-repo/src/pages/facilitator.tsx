@@ -11,7 +11,10 @@ import {
   facilitatorSearchUISchema,
 } from '../constant/Forms/facilitatorSearch';
 import { Role, RoleId, Status } from '@/utils/app.constant';
-import { userList } from '@/services/UserList';
+import {
+  getUserDetailsInfo,
+  HierarchicalSearchUserList,
+} from '@/services/UserList';
 import {
   Box,
   Checkbox,
@@ -87,10 +90,10 @@ const Facilitator = () => {
   const [blockFieldId, setBlockFieldId] = useState('');
   const [districtFieldId, setDistrictFieldId] = useState('');
   const [villageFieldId, setVillageFieldId] = useState('');
-    const [archiveToActiveOpen, setArchiveToActiveOpen] = useState(false);
-  
+  const [archiveToActiveOpen, setArchiveToActiveOpen] = useState(false);
+
   // const [centerFieldId, setCenterFieldId] = useState('');
-     const formRef = useRef(null);
+  const formRef = useRef(null);
 
   const [userID, setUserId] = useState('');
   const [userData, setUserData] = useState({
@@ -107,11 +110,11 @@ const Facilitator = () => {
   const searchStoreKey = 'facilitator';
   const initialFormDataSearch =
     localStorage.getItem(searchStoreKey) &&
-    localStorage.getItem(searchStoreKey) != '{}'
+      localStorage.getItem(searchStoreKey) != '{}'
       ? JSON.parse(localStorage.getItem(searchStoreKey))
       : localStorage.getItem('stateId')
-      ? { state: [localStorage.getItem('stateId')] }
-      : {};
+        ? { state: [localStorage.getItem('stateId')] }
+        : {};
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -197,7 +200,25 @@ const Facilitator = () => {
       await searchData(formData, 0);
     }
   };
-
+  const HierarchicalSearchUserListCustom = async (data) => {
+    const { role, tenantId, ...filteredFilters } = data.filters;
+    const newData = {
+      ...data,
+      filters: filteredFilters,
+    };
+    return await HierarchicalSearchUserList({
+      ...newData,
+      role: [Role.TEACHER],
+      customfields: [
+        'state',
+        'district',
+        'block',
+        'village',
+        'main_subject',
+        'subject_taught',
+      ],
+    });
+  };
   const searchData = async (formData, newPage) => {
     if (formData) {
       formData = Object.fromEntries(
@@ -223,7 +244,7 @@ const Facilitator = () => {
         setPageOffset,
         setCurrentPage,
         setResponse,
-        userList,
+        HierarchicalSearchUserListCustom,
         staticSort
       );
     }
@@ -235,9 +256,8 @@ const Facilitator = () => {
       keys: ['firstName', 'middleName', 'lastName'],
       label: 'Facilitator Name',
       render: (row) =>
-        `${transformLabel(row.firstName) || ''} ${
-          transformLabel(row.middleName) || ''
-        } ${transformLabel(row.lastName) || ''}`.trim(),
+        `${transformLabel(row.firstName) || ''} ${transformLabel(row.middleName) || ''
+          } ${transformLabel(row.lastName) || ''}`.trim(),
     },
     {
       keys: ['age'],
@@ -258,83 +278,78 @@ const Facilitator = () => {
       keys: ['STATE', 'DISTRICT', 'BLOCK'],
       label: 'State, District, Block',
       render: (row: any) => {
-        const state =
-          transformLabel(
-            row.customFields.find(
-              (field: { label: string }) => field.label === 'STATE'
-            )?.selectedValues?.[0]?.value
-          ) || '';
-        const district =
-          transformLabel(
-            row.customFields.find(
-              (field: { label: string }) => field.label === 'DISTRICT'
-            )?.selectedValues?.[0]?.value
-          ) || '';
-        const block =
-          transformLabel(
-            row.customFields.find(
-              (field: { label: string }) => field.label === 'BLOCK'
-            )?.selectedValues?.[0]?.value
-          ) || '';
-        return `${state == '' ? '' : `${state}`}${
-          district == '' ? '' : `, ${district}`
-        }${block == '' ? '' : `, ${block}`}`;
+        const state = transformLabel(row?.customfield?.state) || '';
+        const district = transformLabel(row?.customfield?.district) || '';
+        const block = transformLabel(row?.customfield?.block) || '';
+        return `${state == '' ? '' : `${state}`}${district == '' ? '' : `, ${district}`
+          }${block == '' ? '' : `, ${block}`}`;
       },
     },
     {
       key: 'village',
       label: 'Village',
-      render: (row) =>
-        transformLabel(
-          row.customFields
-            .find((field) => field.label === 'VILLAGE')
-            ?.selectedValues.map((item) => item.value)
-            .join(', ')
-        ) || '-',
+      render: (row) => transformLabel(row?.customfield?.village) || '-',
     },
     {
       key: 'center',
       label: 'Center',
       render: (row) => {
-        let centerArray = row.customFields.find(
-          (field) => field.label === 'CENTER'
-        )?.selectedValues;
-        return (
-          <>
-            {centerArray && (
-              <>
-                {centerArray.map((centerId) => (
-                  <>
-                    <CenterLabel parentId={centerId} />,{' '}
-                  </>
-                ))}
-              </>
-            )}
-          </>
-        );
+        // let centerArray = row?.customfield?.find(
+        //   (field) => field.label === 'CENTER'
+        // )?.selectedValues
+        // return (
+        //   <>
+        //     {centerArray && (
+        //       <>
+        //         {centerArray.map((centerId) => (
+        //           <>
+        //             <CenterLabel parentId={centerId} />,{' '}
+        //           </>
+        //         ))}
+        //       </>
+        //     )}
+        //   </>
+        // );
+        const centers =
+          row.cohortData
+            ?.filter(
+              (c: any) =>
+                c.centerStatus === 'active' &&
+                c.cohortMember?.status === 'active'
+            )
+            .map((c: any) => transformLabel(c.centerName))
+            .filter(Boolean) || [];
+
+        return centers.join(', ');
+      },
+    },
+    {
+      key: 'batch',
+      label: 'Batch',
+      render: (row) => {
+        // console.log('BacthRow', row?.cohortData)
+        const batches =
+          row.cohortData
+            ?.filter(
+              (c: any) =>
+                c.batchStatus === 'active' &&
+                c.cohortMember?.status === 'active'
+            )
+            .map((c: any) => transformLabel(c.batchName))
+            .filter(Boolean) || [];
+
+        return batches.join(', ');
       },
     },
     {
       key: 'mysubject',
       label: 'Main Subjects',
-      render: (row) =>
-        transformLabel(
-          row.customFields
-            .find((field) => field.label === 'MY_MAIN_SUBJECTS')
-            ?.selectedValues.map((item) => item.value)
-            .join(', ')
-        ) || '-',
+      render: (row) => transformLabel(row?.customfield?.main_subject) || '-',
     },
     {
       key: 'subjectteach',
       label: 'Subjects Teach',
-      render: (row) =>
-        transformLabel(
-          row.customFields
-            .find((field) => field.label === 'SUBJECTS_I_TEACH')
-            ?.selectedValues.map((item) => item.value)
-            .join(', ')
-        ) || '-',
+      render: (row) => transformLabel(row?.customfield?.subject_taught) || '-',
     },
     {
       key: 'status',
@@ -419,83 +434,82 @@ const Facilitator = () => {
     }
   };
 
-   const archiveToactive = async () => {
+  const archiveToactive = async () => {
+    try {
+      let membershipIds = null;
+
+      // Attempt to get the cohort list
       try {
-        let membershipIds = null;
-  
-        // Attempt to get the cohort list
-        try {
-          const userCohortResp = await getCohortList(userID);
-          if (userCohortResp?.result?.length) {
-            membershipIds = userCohortResp?.result?.map(
-              (item) => item.cohortMembershipId
-            );
-          } else {
-            console.warn('No cohort data found for the user.');
-          }
-        } catch (error) {
-          console.error('Failed to fetch cohort list:', error);
+        const userCohortResp = await getCohortList(userID);
+        if (userCohortResp?.result?.length) {
+          membershipIds = userCohortResp?.result?.map(
+            (item) => item.cohortMembershipId
+          );
+        } else {
+          console.warn('No cohort data found for the user.');
         }
-  
-        // Attempt to update cohort member status only if we got a valid membershipId
-        if (membershipIds && Array.isArray(membershipIds)) {
-          for (const membershipId of membershipIds) {
-            try {
-              const updateResponse = await updateCohortMemberStatus({
-                memberStatus: 'active',
-             //   statusReason: reason,
-                membershipId,
-              });
-  
-              if (updateResponse?.responseCode !== 200) {
-                console.error(
-                  `Failed to archive user with membershipId ${membershipId}:`,
-                  updateResponse
-                );
-              } else {
-                console.log(
-                  `User with membershipId ${membershipId} successfully archived.`
-                );
-              }
-            } catch (error) {
+      } catch (error) {
+        console.error('Failed to fetch cohort list:', error);
+      }
+
+      // Attempt to update cohort member status only if we got a valid membershipId
+      if (membershipIds && Array.isArray(membershipIds)) {
+        for (const membershipId of membershipIds) {
+          try {
+            const updateResponse = await updateCohortMemberStatus({
+              memberStatus: 'active',
+              //   statusReason: reason,
+              membershipId,
+            });
+
+            if (updateResponse?.responseCode !== 200) {
               console.error(
-                `Error archiving user with membershipId ${membershipId}:`,
-                error
+                `Failed to archive user with membershipId ${membershipId}:`,
+                updateResponse
+              );
+            } else {
+              console.log(
+                `User with membershipId ${membershipId} successfully archived.`
               );
             }
+          } catch (error) {
+            console.error(
+              `Error archiving user with membershipId ${membershipId}:`,
+              error
+            );
           }
         }
-  
-        // Always attempt to delete the user
-        console.log('Proceeding to self-delete...');
-        const resp = await deleteUser(userID, {
-          userData: { status: 'active' },
-        });
-                          showToastMessage(t("LEARNERS.ACTIVATE_USER_SUCCESS"), "success");
-  
-  
-        if (resp?.responseCode === 200) {
-          // setResponse((prev) => ({
-          //   ...prev,
-          //   result: {
-          //     ...prev?.result,
-          //     getUserDetails: prev?.result?.getUserDetails?.filter(
-          //       (item) => item?.userId !== userID
-          //     ),
-          //   },
-          // }));
-          searchData(prefilledFormData, currentPage);
-          
-          console.log('learner successfully aactive.');
-        } else {
-          console.error('Failed to archive team leader:', resp);
-        }
-  
-        return resp;
-      } catch (error) {
-        console.error('Error updating team leader:', error);
       }
-    };
+
+      // Always attempt to delete the user
+      console.log('Proceeding to self-delete...');
+      const resp = await deleteUser(userID, {
+        userData: { status: 'active' },
+      });
+      showToastMessage(t('LEARNERS.ACTIVATE_USER_SUCCESS'), 'success');
+
+      if (resp?.responseCode === 200) {
+        // setResponse((prev) => ({
+        //   ...prev,
+        //   result: {
+        //     ...prev?.result,
+        //     getUserDetails: prev?.result?.getUserDetails?.filter(
+        //       (item) => item?.userId !== userID
+        //     ),
+        //   },
+        // }));
+        searchData(prefilledFormData, currentPage);
+
+        console.log('learner successfully aactive.');
+      } else {
+        console.error('Failed to archive team leader:', resp);
+      }
+
+      return resp;
+    } catch (error) {
+      console.error('Error updating team leader:', error);
+    }
+  };
 
   // Define actions
   const actions = [
@@ -507,19 +521,36 @@ const Facilitator = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
+          title="Edit Facilitator"
         >
           <Image src={editIcon} alt="" />
         </Box>
       ),
-      callback: (row) => {
-        // console.log('row:', row);
+      callback: async (row) => {
+        console.log('row:', row);
+        //extract id from row and make api call for user/read
+
         // console.log('AddSchema', addSchema);
         // console.log('AddUISchema', addUiSchema);
+        const selectedUserId = row?.userId;
+        const selectedUserDetails = await getUserDetailsInfo(
+          selectedUserId,
+          true
+        );
+        // console.log('selectedUserDetails:', selectedUserDetails);
+        const updatedUserDetails = {
+          ...selectedUserDetails,
+          userData: {
+            ...selectedUserDetails.userData,
+            mobile: String(selectedUserDetails.userData.mobile),
+          },
+        };
 
-        let tempFormData = extractMatchingKeys(row, addSchema);
+        let tempFormData = extractMatchingKeys(updatedUserDetails?.userData, addSchema);
         // console.log('tempFormData', tempFormData);
         setPrefilledAddFormData(tempFormData);
         setIsEdit(true);
@@ -538,16 +569,25 @@ const Facilitator = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
+          title="Delete Facilitator"
         >
           {' '}
           <Image src={deleteIcon} alt="" />{' '}
         </Box>
       ),
       callback: async (row) => {
-        const findVillage = row?.customFields.find((item) => {
+        const selectedUserId = row?.userId;
+        const selectedUserDetails = await getUserDetailsInfo(
+          selectedUserId,
+          true
+        );
+        // console.log('selectedUserDetails:', selectedUserDetails);
+
+        const findVillage = selectedUserDetails?.userData?.customFields.find((item) => {
           if (item.label === 'VILLAGE' || item.label === 'BLOCK') {
             return item;
           }
@@ -588,9 +628,11 @@ const Facilitator = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
+          title="Reassign Facilitator"
         >
           <Image src={apartment} alt="" />
         </Box>
@@ -601,7 +643,14 @@ const Facilitator = () => {
         // console.log('AddUISchema', addUiSchema);
         let batchList = await fetchUserData(row?.userId);
         console.log('######## batchList', batchList);
-        let tempFormData = extractMatchingKeys(row, addSchema);
+        const selectedUserId = row?.userId;
+        const selectedUserDetails = await getUserDetailsInfo(
+          selectedUserId,
+          true
+        );
+        // console.log('selectedUserDetails:', selectedUserDetails);
+
+        let tempFormData = extractMatchingKeys(selectedUserDetails?.userData, addSchema);
         tempFormData = {
           ...tempFormData,
           batch: batchList,
@@ -616,46 +665,53 @@ const Facilitator = () => {
       },
       show: (row) => row.status !== 'archived',
     },
-     {
-          icon: (
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                cursor: 'pointer',
-                backgroundColor: 'rgb(227, 234, 240)',
-                padding: '10px',
-              }}
-            >
-              {' '}
-              <Image src={restoreIcon} alt="" />{' '}
-            </Box>
-          ),
-          callback: async (row) => {
-            const findVillage = row?.customFields.find((item) => {
-              if (item.label === 'VILLAGE') {
-                return item;
-              }
-            });
-    
-            // console.log('row:', row?.customFields[2].selectedValues[0].value);
-            setEditableUserId(row?.userId);
-    
-            setArchiveToActiveOpen(true);
-    
-            setUserId(row?.userId);
-    
-            setUserData({
-              firstName: row?.firstName || '',
-              lastName: row?.lastName || '',
-              village: findVillage?.selectedValues?.[0]?.value || '',
-            });
-            // setReason('');
-            // setChecked(false);
-          },
-          show: (row) => row.status !== 'active',
-        }
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
+            padding: '10px',
+          }}
+          title="Reactivate Facilitator"
+        >
+          {' '}
+          <Image src={restoreIcon} alt="" />{' '}
+        </Box>
+      ),
+      callback: async (row) => {
+        const selectedUserId = row?.userId;
+        const selectedUserDetails = await getUserDetailsInfo(
+          selectedUserId,
+          true
+        );
+        const findVillage = selectedUserDetails?.userData?.customFields.find((item) => {
+          if (item.label === 'VILLAGE') {
+            return item;
+          }
+        });
+
+        // console.log('row:', row?.customFields[2].selectedValues[0].value);
+        setEditableUserId(row?.userId);
+
+        setArchiveToActiveOpen(true);
+
+        setUserId(row?.userId);
+
+        setUserData({
+          firstName: row?.firstName || '',
+          lastName: row?.lastName || '',
+          village: findVillage?.selectedValues?.[0]?.value || '',
+        });
+        // setReason('');
+        // setChecked(false);
+      },
+      show: (row) => row.status !== 'active',
+    },
   ];
 
   // Pagination handlers
@@ -738,7 +794,7 @@ const Facilitator = () => {
           )
         )}
         <Box mt={4} sx={{ display: 'flex', justifyContent: 'end' }}>
-            <ResetFiltersButton
+          <ResetFiltersButton
             searchStoreKey="facilitator"
             formRef={formRef}
             SubmitaFunction={SubmitaFunction}
@@ -777,8 +833,8 @@ const Facilitator = () => {
             isEdit
               ? t('FACILITATORS.EDIT_FACILITATOR')
               : isReassign
-              ? t('FACILITATORS.RE_ASSIGN_facilitator')
-              : t('FACILITATORS.NEW_FACILITATOR')
+                ? t('FACILITATORS.RE_ASSIGN_facilitator')
+                : t('FACILITATORS.NEW_FACILITATOR')
           }
         >
           <FacilitatorForm
@@ -885,28 +941,31 @@ const Facilitator = () => {
         title={t('COMMON.ACTIVATE_USER')}
         primary={t('COMMON.ACTIVATE')}
         secondary={t('COMMON.CANCEL')}
-        reason={"yes"}
+        reason={'yes'}
         onClickPrimary={archiveToactive}
       >
         <Box
-                sx={{
-                  border: '1px solid #ddd',
-                  borderRadius: 2,
-                  mb: 2,
-                  p: 1,
-                }}
-              >
-                <Typography>
-                  { userData.firstName } { userData.lastName } {t("FORM.WAS_BELONG_TO")}
-                </Typography>
-                <TextField fullWidth value={userData.village} disabled sx={{ mt: 1 }} />
-              </Box>
-         <Typography fontWeight="bold">
-                   {t("FORM.CONFIRM_TO_ACTIVATE")}  
-
-                </Typography>
-
- </ConfirmationPopup>
+          sx={{
+            border: '1px solid #ddd',
+            borderRadius: 2,
+            mb: 2,
+            p: 1,
+          }}
+        >
+          <Typography>
+            {userData.firstName} {userData.lastName} {t('FORM.WAS_BELONG_TO')}
+          </Typography>
+          <TextField
+            fullWidth
+            value={userData.village}
+            disabled
+            sx={{ mt: 1 }}
+          />
+        </Box>
+        <Typography fontWeight="bold">
+          {t('FORM.CONFIRM_TO_ACTIVATE')}
+        </Typography>
+      </ConfirmationPopup>
     </>
   );
 };

@@ -76,11 +76,11 @@ const Centers = () => {
   const searchStoreKey = 'centers';
   const initialFormDataSearch =
     localStorage.getItem(searchStoreKey) &&
-    localStorage.getItem(searchStoreKey) != '{}'
+      localStorage.getItem(searchStoreKey) != '{}'
       ? JSON.parse(localStorage.getItem(searchStoreKey))
       : localStorage.getItem('stateId')
-      ? { state: [localStorage.getItem('stateId')] }
-      : {};
+        ? { state: [localStorage.getItem('stateId')] }
+        : {};
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -417,9 +417,11 @@ const Centers = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
+          title="Google Map Link"
         >
           <MapIcon />
         </Box>
@@ -438,20 +440,20 @@ const Centers = () => {
     },
     {
       icon: (
-        <Tooltip title={t('View Batches')} placement="top">
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              cursor: 'pointer',
-              backgroundColor: 'rgb(227, 234, 240)',
-              padding: '10px',
-            }}
-          >
-            <Image src={'/images/centers.svg'} alt="" width={24} height={24} />
-          </Box>
-        </Tooltip>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
+            padding: '10px',
+          }}
+          title="View Batch"
+        >
+          <Image src={'/images/centers.svg'} alt="" width={24} height={24} />
+        </Box>
       ),
       callback: async (row: any) => {
         setSelectedCenter(row);
@@ -467,9 +469,11 @@ const Centers = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
+          title="Edit Center"
         >
           <Image src={editIcon} alt="" />
         </Box>
@@ -492,9 +496,11 @@ const Centers = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
+          title="Delete Center"
         >
           {' '}
           <Image src={deleteIcon} alt="" />
@@ -655,7 +661,7 @@ const Centers = () => {
         {response != null ? (
           <>
             {response &&
-            response?.result?.results?.cohortDetails?.length > 0 ? (
+              response?.result?.results?.cohortDetails?.length > 0 ? (
               <Box sx={{ mt: 1 }}>
                 <PaginatedTable
                   count={response?.result?.count}

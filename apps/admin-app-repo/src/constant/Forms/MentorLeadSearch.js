@@ -35,7 +35,7 @@ export const MentorLeadSearchSchema = {
       //for multiselect
       uniqueItems: true,
       isMultiSelect: true,
-      maxSelections: 1000,
+      maxSelection: 1000,
     },
     district: {
       type: 'array',
@@ -65,7 +65,7 @@ export const MentorLeadSearchSchema = {
       //for multiselect
       uniqueItems: true,
       isMultiSelect: true,
-      maxSelections: 1000,
+      maxSelection: 1000,
     },
 
     name: {

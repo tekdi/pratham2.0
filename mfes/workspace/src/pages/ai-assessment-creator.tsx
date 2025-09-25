@@ -209,7 +209,7 @@ const AIAssessmentCreator: React.FC = () => {
   const fetchData = async (data: any) => {
     let response: any = '';
     try {
-      response = await createQuestionSet(tenantConfig?.COLLECTION_FRAMEWORK);
+      response = await createQuestionSet(tenantConfig?.QUESTION_SET_FRAMEWORK);
 
       // Create the attributions array as per the API requirement
       // const attributions = [

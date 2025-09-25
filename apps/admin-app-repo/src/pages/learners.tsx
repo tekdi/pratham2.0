@@ -11,7 +11,11 @@ import {
   learnerSearchUISchema,
 } from '../constant/Forms/LearnerSearch';
 import { Role, RoleId, Status } from '@/utils/app.constant';
-import { userList } from '@/services/UserList';
+// import { userList } from '@/services/UserList';
+import {
+  getUserDetailsInfo,
+  HierarchicalSearchUserList,
+} from '@/services/UserList';
 import {
   Box,
   Checkbox,
@@ -101,16 +105,16 @@ const Learner = () => {
   const initialFormData = localStorage.getItem('stateId')
     ? { state: [localStorage.getItem('stateId')] }
     : {};
-     const formRef = useRef(null);
+  const formRef = useRef(null);
 
   const searchStoreKey = 'learner';
   const initialFormDataSearch =
     localStorage.getItem(searchStoreKey) &&
-    localStorage.getItem(searchStoreKey) != '{}'
+      localStorage.getItem(searchStoreKey) != '{}'
       ? JSON.parse(localStorage.getItem(searchStoreKey))
       : localStorage.getItem('stateId')
-      ? { state: [localStorage.getItem('stateId')] }
-      : {};
+        ? { state: [localStorage.getItem('stateId')] }
+        : {};
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -216,6 +220,27 @@ const Learner = () => {
     }
   };
 
+  const HierarchicalSearchUserListCustom = async (data) => {
+    const { role, tenantId, ...filteredFilters } = data.filters;
+    const newData = {
+      ...data,
+      filters: filteredFilters,
+    };
+    return await HierarchicalSearchUserList({
+      ...newData,
+      role: [Role.LEARNERS],
+      customfields: [
+        'state',
+        'district',
+        'block',
+        'village',
+        'guardian_name',
+        'guardian_relation',
+        'parent_phone'
+      ],
+    });
+  };
+
   const searchData = async (formData, newPage) => {
     if (formData) {
       formData = Object.fromEntries(
@@ -240,7 +265,7 @@ const Learner = () => {
         setPageOffset,
         setCurrentPage,
         setResponse,
-        userList,
+        HierarchicalSearchUserListCustom,
         staticSort
       );
     }
@@ -252,9 +277,8 @@ const Learner = () => {
       keys: ['firstName', 'middleName', 'lastName'],
       label: 'Leaner Name',
       render: (row) =>
-        `${transformLabel(row.firstName) || ''} ${
-          transformLabel(row.middleName) || ''
-        } ${transformLabel(row.lastName) || ''}`.trim(),
+        `${transformLabel(row.firstName) || ''} ${transformLabel(row.middleName) || ''
+          } ${transformLabel(row.lastName) || ''}`.trim(),
     },
     {
       keys: ['age'],
@@ -270,26 +294,10 @@ const Learner = () => {
       keys: ['guardian'],
       label: 'Guardian Details',
       render: (row: any) => {
-        const NAME_OF_GUARDIAN =
-          transformLabel(
-            row.customFields.find(
-              (field: { label: string }) => field.label === 'NAME_OF_GUARDIAN'
-            )?.selectedValues?.[0]
-          ) || '';
-        const RELATION_WITH_GUARDIAN =
-          transformLabel(
-            row.customFields.find(
-              (field: { label: string }) =>
-                field.label === 'RELATION_WITH_GUARDIAN'
-            )?.selectedValues?.[0]
-          ) || '';
-        const PARENT_GUARDIAN_PHONE_NO =
-          transformLabel(
-            row.customFields.find(
-              (field: { label: string }) =>
-                field.label === 'PARENT_GUARDIAN_PHONE_NO'
-            )?.selectedValues?.[0]
-          ) || '';
+        const NAME_OF_GUARDIAN = transformLabel(row?.customfield?.guardian_name) || '';
+        const RELATION_WITH_GUARDIAN = transformLabel(row?.customfield?.guardian_relation) || '';
+        const PARENT_GUARDIAN_PHONE_NO = transformLabel(row?.customfield?.parent_phone) || '';
+
         const values = [
           NAME_OF_GUARDIAN,
           RELATION_WITH_GUARDIAN,
@@ -313,49 +321,56 @@ const Learner = () => {
       keys: ['STATE', 'DISTRICT', 'BLOCK', 'VILLAGE'],
       label: 'State, District, Block, Village',
       render: (row: any) => {
-        const state =
-          transformLabel(
-            row.customFields.find(
-              (field: { label: string }) => field.label === 'STATE'
-            )?.selectedValues?.[0]?.value
-          ) || '';
-        const district =
-          transformLabel(
-            row.customFields.find(
-              (field: { label: string }) => field.label === 'DISTRICT'
-            )?.selectedValues?.[0]?.value
-          ) || '';
-        const block =
-          transformLabel(
-            row.customFields.find(
-              (field: { label: string }) => field.label === 'BLOCK'
-            )?.selectedValues?.[0]?.value
-          ) || '';
-        const village =
-          transformLabel(
-            row.customFields.find(
-              (field: { label: string }) => field.label === 'VILLAGE'
-            )?.selectedValues?.[0]?.value
-          ) || '';
-        return `${state == '' ? '' : `${state}`}${
-          district == '' ? '' : `, ${district}`
-        }${block == '' ? '' : `, ${block}`}${
-          village == '' ? '' : `, ${village}`
-        }`;
+        const state = transformLabel(row?.customfield?.state) || '';
+        const district = transformLabel(row?.customfield?.district) || '';
+        const block = transformLabel(row?.customfield?.block) || '';
+        const village = transformLabel(row?.customfield?.village) || '';
+        return `${state == '' ? '' : `${state}`}${district == '' ? '' : `, ${district}`
+          }${block == '' ? '' : `, ${block}`}${village == '' ? '' : `, ${village}`
+          }`;
       },
     },
     {
       key: 'center',
       label: 'Center',
       render: (row) => {
-        return (
-          <CenterLabel
-            parentId={
-              row.customFields.find((field) => field.label === 'CENTER')
-                ?.selectedValues?.[0]
-            }
-          />
-        );
+        // return (
+        //   <CenterLabel
+        //     parentId={
+        //       row.customFields.find((field) => field.label === 'CENTER')
+        //         ?.selectedValues?.[0]
+        //     }
+        //   />
+        // );
+        const centers =
+          row.cohortData
+            ?.filter(
+              (c: any) =>
+                c.centerStatus === 'active' &&
+                c.cohortMember?.status === 'active'
+            )
+            .map((c: any) => transformLabel(c.centerName))
+            .filter(Boolean) || [];
+
+        return centers.join(', ');
+      },
+    },
+    {
+      key: 'batch',
+      label: 'Batch',
+      render: (row) => {
+        // console.log('BacthRow', row?.cohortData)
+        const batches =
+          row.cohortData
+            ?.filter(
+              (c: any) =>
+                c.batchStatus === 'active' &&
+                c.cohortMember?.status === 'active'
+            )
+            .map((c: any) => transformLabel(c.batchName))
+            .filter(Boolean) || [];
+
+        return batches.join(', ');
       },
     },
     {
@@ -440,7 +455,7 @@ const Learner = () => {
       console.error('Error updating team leader:', error);
     }
   };
-   const archiveToactive = async () => {
+  const archiveToactive = async () => {
     try {
       let membershipIds = null;
 
@@ -464,7 +479,7 @@ const Learner = () => {
           try {
             const updateResponse = await updateCohortMemberStatus({
               memberStatus: 'active',
-           //   statusReason: reason,
+              //   statusReason: reason,
               membershipId,
             });
 
@@ -492,7 +507,7 @@ const Learner = () => {
       const resp = await deleteUser(userID, {
         userData: { status: 'active' },
       });
-                        showToastMessage(t("LEARNERS.ACTIVATE_USER_SUCCESS"), "success");
+      showToastMessage(t("LEARNERS.ACTIVATE_USER_SUCCESS"), "success");
 
 
       if (resp?.responseCode === 200) {
@@ -506,7 +521,7 @@ const Learner = () => {
         //   },
         // }));
         searchData(prefilledFormData, currentPage);
-        
+
         console.log('learner successfully aactive.');
       } else {
         console.error('Failed to archive team leader:', resp);
@@ -548,8 +563,8 @@ const Learner = () => {
     //   },
     //   show: (row) => row.status !== 'archived',
     // },
-   
-     {
+
+    {
       icon: (
         <Box
           sx={{
@@ -557,16 +572,26 @@ const Learner = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
+          title="Delete Learner"
         >
           {' '}
           <Image src={deleteIcon} alt="" />{' '}
         </Box>
       ),
       callback: async (row) => {
-        const findVillage = row?.customFields.find((item) => {
+        console.log('row:', row);
+        const selectedUserId = row?.userId;
+        const selectedUserDetails = await getUserDetailsInfo(
+          selectedUserId,
+          true
+        );
+        // console.log('selectedUserDetails:', selectedUserDetails);
+
+        const findVillage = selectedUserDetails?.userData?.customFields.find((item) => {
           if (item.label === 'VILLAGE') {
             return item;
           }
@@ -589,7 +614,7 @@ const Learner = () => {
       },
       show: (row) => row.status !== 'archived',
     },
-       {
+    {
       icon: (
         <Box
           sx={{
@@ -597,16 +622,23 @@ const Learner = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
+          title="Reactivate Learner"
         >
           {' '}
           <Image src={restoreIcon} alt="" />{' '}
         </Box>
       ),
       callback: async (row) => {
-        const findVillage = row?.customFields.find((item) => {
+        const selectedUserId = row?.userId;
+        const selectedUserDetails = await getUserDetailsInfo(
+          selectedUserId,
+          true
+        );
+        const findVillage = selectedUserDetails?.userData?.customFields.find((item) => {
           if (item.label === 'VILLAGE') {
             return item;
           }
@@ -740,7 +772,7 @@ const Learner = () => {
           )
         )}
         <Box mt={4} sx={{ display: 'flex', justifyContent: 'end' }}>
-            <ResetFiltersButton
+          <ResetFiltersButton
             searchStoreKey="learner"
             formRef={formRef}
             SubmitaFunction={SubmitaFunction}
@@ -780,8 +812,8 @@ const Learner = () => {
             isEdit
               ? t('LEARNERS.EDIT_LEARNER')
               : isReassign
-              ? t('LEARNERS.RE_ASSIGN_LEARNER')
-              : t('LEARNERS.NEW_LEARNER')
+                ? t('LEARNERS.RE_ASSIGN_LEARNER')
+                : t('LEARNERS.NEW_LEARNER')
           }
         >
           <AddEditUser
@@ -825,7 +857,7 @@ const Learner = () => {
 
         {response != null ? (
           <Box mt={4}>
-            {response && response?.result?.getUserDetails ? (
+            {response && response?.result?.totalCount > 0 ? (
               <Box sx={{ mt: 1 }}>
                 <PaginatedTable
                   count={response?.result?.totalCount}
@@ -866,7 +898,7 @@ const Learner = () => {
         reason={reason}
         onClickPrimary={userDelete}
       >
-       
+
         <DeleteDetails
           firstName={userData.firstName}
           lastName={userData.lastName}
@@ -877,7 +909,7 @@ const Learner = () => {
           setReason={setReason}
         />
       </ConfirmationPopup>
-        <ConfirmationPopup
+      <ConfirmationPopup
         checked={true}
         open={archiveToActiveOpen}
         onClose={() => setArchiveToActiveOpen(false)}
@@ -888,24 +920,24 @@ const Learner = () => {
         onClickPrimary={archiveToactive}
       >
         <Box
-                sx={{
-                  border: '1px solid #ddd',
-                  borderRadius: 2,
-                  mb: 2,
-                  p: 1,
-                }}
-              >
-                <Typography>
-                  { userData.firstName } { userData.lastName } {t("FORM.WAS_BELONG_TO")}
-                </Typography>
-                <TextField fullWidth value={userData.village} disabled sx={{ mt: 1 }} />
-              </Box>
-         <Typography fontWeight="bold">
-                   {t("FORM.CONFIRM_TO_ACTIVATE")}  
+          sx={{
+            border: '1px solid #ddd',
+            borderRadius: 2,
+            mb: 2,
+            p: 1,
+          }}
+        >
+          <Typography>
+            {userData.firstName} {userData.lastName} {t("FORM.WAS_BELONG_TO")}
+          </Typography>
+          <TextField fullWidth value={userData.village} disabled sx={{ mt: 1 }} />
+        </Box>
+        <Typography fontWeight="bold">
+          {t("FORM.CONFIRM_TO_ACTIVATE")}
 
-                </Typography>
+        </Typography>
 
- </ConfirmationPopup>
+      </ConfirmationPopup>
     </>
   );
 };

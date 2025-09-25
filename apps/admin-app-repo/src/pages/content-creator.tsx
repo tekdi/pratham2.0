@@ -36,8 +36,8 @@ import restoreIcon from '../../public/images/restore_user.svg';
 import { showToastMessage } from '@/components/Toastify';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 const ContentCreator = () => {
-    const [archiveToActiveOpen, setArchiveToActiveOpen] = useState(false);
-  
+  const [archiveToActiveOpen, setArchiveToActiveOpen] = useState(false);
+
   const theme = useTheme<any>();
   const [isLoading, setIsLoading] = useState(false);
   const [schema, setSchema] = useState(ContentCreatorSearchSchema);
@@ -60,15 +60,15 @@ const ContentCreator = () => {
   const { t, i18n } = useTranslation();
 
   const searchStoreKey = 'contentCreator';
-         const formRef = useRef(null);
-    
+  const formRef = useRef(null);
+
   const initialFormDataSearch =
     localStorage.getItem(searchStoreKey) &&
-    localStorage.getItem(searchStoreKey) != '{}'
+      localStorage.getItem(searchStoreKey) != '{}'
       ? JSON.parse(localStorage.getItem(searchStoreKey))
       : localStorage.getItem('stateId')
-      ? { state: [localStorage.getItem('stateId')] }
-      : {};
+        ? { state: [localStorage.getItem('stateId')] }
+        : {};
 
   const storedUserData = JSON.parse(localStorage.getItem('adminInfo') || '{}');
 
@@ -150,9 +150,8 @@ const ContentCreator = () => {
       keys: ['firstName', 'middleName', 'lastName'],
       label: 'Content Creator Name',
       render: (row: any) =>
-        `${row.firstName || ''} ${row.middleName || ''} ${
-          row.lastName || ''
-        }`.trim(),
+        `${row.firstName || ''} ${row.middleName || ''} ${row.lastName || ''
+          }`.trim(),
     },
     {
       key: 'status',
@@ -274,9 +273,11 @@ const ContentCreator = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
+          title="Edit Content Creator"
         >
           <Image src={editIcon} alt="" />
         </Box>
@@ -303,9 +304,11 @@ const ContentCreator = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
+          title="Delete Content Creator"
         >
           {' '}
           <Image src={deleteIcon} alt="" />
@@ -334,9 +337,11 @@ const ContentCreator = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
+          title="Reactivate Content Creator"
         >
           {' '}
           <Image src={restoreIcon} alt="" />
@@ -378,7 +383,7 @@ const ContentCreator = () => {
   const handleCloseModal = () => {
     setOpenModal(false);
   };
- 
+
 
   const archiveToactive = async () => {
     try {
@@ -436,13 +441,13 @@ const ContentCreator = () => {
               SubmitaFunction={SubmitaFunction}
               isCallSubmitInHandle={true}
               prefilledFormData={prefilledFormData || {}}
-                            ref={formRef}
+              ref={formRef}
 
             />
           )
         )}
         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }} mt={4}>
-           <ResetFiltersButton
+          <ResetFiltersButton
             searchStoreKey="contentCreator"
             formRef={formRef}
             SubmitaFunction={SubmitaFunction}
@@ -556,24 +561,24 @@ const ContentCreator = () => {
         onClickPrimary={archiveToactive}
       >
         <Box
-                sx={{
-                  border: '1px solid #ddd',
-                  borderRadius: 2,
-                  mb: 2,
-                  p: 1,
-                }}
-              >
-                <Typography>
-                  { firstName } { lastName } {t("FORM.WAS_BELONG_TO")}
-                </Typography>
-                <TextField fullWidth value={state} disabled sx={{ mt: 1 }} />
-              </Box>
-         <Typography fontWeight="bold">
-                   {t("FORM.CONFIRM_TO_ACTIVATE")}  
+          sx={{
+            border: '1px solid #ddd',
+            borderRadius: 2,
+            mb: 2,
+            p: 1,
+          }}
+        >
+          <Typography>
+            {firstName} {lastName} {t("FORM.WAS_BELONG_TO")}
+          </Typography>
+          <TextField fullWidth value={state} disabled sx={{ mt: 1 }} />
+        </Box>
+        <Typography fontWeight="bold">
+          {t("FORM.CONFIRM_TO_ACTIVATE")}
 
-                </Typography>
+        </Typography>
 
- </ConfirmationPopup>
+      </ConfirmationPopup>
     </>
   );
 };

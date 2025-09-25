@@ -14,13 +14,18 @@ const InProgress: React.FC = () => {
   const router = useRouter();
 
   const onBackClick = () => {
-    const tenantName = localStorage.getItem('userProgram') || '';
-    if (tenantName === TenantName.YOUTHNET) {
-      router.push('/content');
-    } else if (tenantName === TenantName.CAMP_TO_CLUB) {
-      router.push('/courses-contents');
-    } else if (tenantName === TenantName.PRAGYANPATH) {
-      router.push('/courses-contents');
+      const landingPage = localStorage.getItem('landingPage') || '';
+    // if (tenantName === TenantName.YOUTHNET) {
+    //   router.push('/content');
+    // } else if (tenantName === TenantName.CAMP_TO_CLUB) {
+    //   router.push('/courses-contents');
+    // } else if (tenantName === TenantName.PRAGYANPATH) {
+    //   router.push('/courses-contents');
+    // } else {
+    //   router.push('/content');
+    // }
+    if (landingPage) {
+      router.push(landingPage);
     } else {
       router.push('/content');
     }

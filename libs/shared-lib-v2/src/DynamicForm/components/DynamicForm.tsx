@@ -569,7 +569,7 @@ console.log('formUiSchema', formUiSchema);
     if (isInitialCompleted === true) {
       // setFormData;
       //fix for auto submit and render
-      if (Object.keys(prefilledFormData).length === 0) {
+      if (!prefilledFormData || Object.keys(prefilledFormData).length === 0) {
         if (type !== 'centers') prefilledFormData = { test: 'test' };
         else prefilledFormData = { type: 'COHORT' };
       }

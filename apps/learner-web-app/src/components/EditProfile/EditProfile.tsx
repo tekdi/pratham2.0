@@ -266,13 +266,24 @@ const [responseFormData, setResponseFormData] = useState<any>({});
     typeof window !== 'undefined'
       ? JSON.parse(localStorage.getItem('uiConfig') || '{}')
       : {};
- const hasBothContentCoursetab = uiConfig?.showContent?.includes("courses") && uiConfig?.showContent?.includes("contents");
+//  const hasBothContentCoursetab = uiConfig?.showContent?.includes("courses") && uiConfig?.showContent?.includes("contents");
               
-                if (hasBothContentCoursetab) {
-                  router.push('/courses-contents');
-                }
-                 else
-                router.push('/content');      }
+//                 if (hasBothContentCoursetab) {
+//                   router.push('/courses-contents');
+//                 }
+//                  else
+//                 router.push('/content');     
+              
+const landingPage = localStorage.getItem('landingPage') || '';
+
+if (landingPage) {
+  router.push(landingPage);
+} else {
+  router.push('/content');
+}
+              }
+
+
       
     }
 
