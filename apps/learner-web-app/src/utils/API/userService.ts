@@ -132,7 +132,7 @@ export const updateUser = async (
   const apiUrl: string = API_ENDPOINTS.userUpdate(userId);
 
   try {
-    const response = await patch(apiUrl, { userData, customFields });
+    const response = await patch(apiUrl, { userData, customFields }, {tenantid: localStorage.getItem('tenantId')});
     return response;
   } catch (error) {
     console.error('error in fetching user details', error);
@@ -147,7 +147,7 @@ export const getUserDetails = async (
   // apiUrl = fieldValue ? `${apiUrl}?fieldvalue=true` : apiUrl;
 
   try {
-    const response = await get(apiUrl);
+    const response = await get(apiUrl, {tenantid: localStorage.getItem('tenantId')});
     return response?.data;
   } catch (error) {
     console.error('error in fetching user details', error);
