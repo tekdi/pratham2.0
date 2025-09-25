@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState, useEffect , useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import DynamicForm from '@/components/DynamicForm/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
@@ -38,8 +38,8 @@ import { getCohortList } from '@/services/GetCohortList';
 import { updateCohortMemberStatus } from '@/services/CohortService/cohortService';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 const ContentReviewer = () => {
-    const [archiveToActiveOpen, setArchiveToActiveOpen] = useState(false);
-  
+  const [archiveToActiveOpen, setArchiveToActiveOpen] = useState(false);
+
   const theme = useTheme<any>();
   const [isLoading, setIsLoading] = useState(false);
   const [schema, setSchema] = useState(ContentReviewerSearchSchema);
@@ -61,16 +61,16 @@ const ContentReviewer = () => {
   const [lastName, setLastName] = useState('');
   const { t, i18n } = useTranslation();
   const storedUserData = JSON.parse(localStorage.getItem('adminInfo') || '{}');
-   const formRef = useRef(null);
-    
+  const formRef = useRef(null);
+
   const searchStoreKey = 'contentReviewer';
   const initialFormDataSearch =
     localStorage.getItem(searchStoreKey) &&
-    localStorage.getItem(searchStoreKey) != '{}'
+      localStorage.getItem(searchStoreKey) != '{}'
       ? JSON.parse(localStorage.getItem(searchStoreKey))
       : localStorage.getItem('stateId')
-      ? { state: [localStorage.getItem('stateId')] }
-      : {};
+        ? { state: [localStorage.getItem('stateId')] }
+        : {};
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -163,9 +163,8 @@ const ContentReviewer = () => {
       keys: ['firstName', 'middleName', 'lastName'],
       label: 'Content Reviewer Name',
       render: (row: any) =>
-        `${row.firstName || ''} ${row.middleName || ''} ${
-          row.lastName || ''
-        }`.trim(),
+        `${row.firstName || ''} ${row.middleName || ''} ${row.lastName || ''
+          }`.trim(),
     },
     {
       key: 'status',
@@ -288,9 +287,11 @@ const ContentReviewer = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
+          title="Edit Content Reviewer"
         >
           <Image src={editIcon} alt="" />
         </Box>
@@ -317,9 +318,11 @@ const ContentReviewer = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
+          title="Delete Content Reviewer"
         >
           {' '}
           <Image src={deleteIcon} alt="" />
@@ -348,9 +351,11 @@ const ContentReviewer = () => {
             flexDirection: 'column',
             alignItems: 'center',
             cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
             padding: '10px',
           }}
+          title="Reactivate Content Reviewer"
         >
           {' '}
           <Image src={restoreIcon} alt="" />
@@ -439,13 +444,13 @@ const ContentReviewer = () => {
               SubmitaFunction={SubmitaFunction}
               isCallSubmitInHandle={true}
               prefilledFormData={prefilledFormData || {}}
-               ref={formRef}
+              ref={formRef}
 
             />
           )
         )}
         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }} mt={4}>
-            <ResetFiltersButton
+          <ResetFiltersButton
             searchStoreKey="contentReviewer"
             formRef={formRef}
             SubmitaFunction={SubmitaFunction}
@@ -559,24 +564,24 @@ const ContentReviewer = () => {
         onClickPrimary={archiveToactive}
       >
         <Box
-                sx={{
-                  border: '1px solid #ddd',
-                  borderRadius: 2,
-                  mb: 2,
-                  p: 1,
-                }}
-              >
-                <Typography>
-                  { firstName } { lastName } {t("FORM.WAS_BELONG_TO")}
-                </Typography>
-                <TextField fullWidth value={state} disabled sx={{ mt: 1 }} />
-              </Box>
-         <Typography fontWeight="bold">
-                   {t("FORM.CONFIRM_TO_ACTIVATE")}  
+          sx={{
+            border: '1px solid #ddd',
+            borderRadius: 2,
+            mb: 2,
+            p: 1,
+          }}
+        >
+          <Typography>
+            {firstName} {lastName} {t("FORM.WAS_BELONG_TO")}
+          </Typography>
+          <TextField fullWidth value={state} disabled sx={{ mt: 1 }} />
+        </Box>
+        <Typography fontWeight="bold">
+          {t("FORM.CONFIRM_TO_ACTIVATE")}
 
-                </Typography>
+        </Typography>
 
- </ConfirmationPopup>
+      </ConfirmationPopup>
 
     </>
   );

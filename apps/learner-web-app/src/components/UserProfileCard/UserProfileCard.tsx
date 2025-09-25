@@ -56,7 +56,7 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
   const options = [
     // t('LEARNER_APP.USER_PROFILE_CARD.EDIT_PROFILE'),
     // t('LEARNER_APP.USER_PROFILE_CARD.CHANGE_USERNAME'),
-    t('LEARNER_APP.USER_PROFILE_CARD.CHANGE_PASSWORD'),
+    // t('LEARNER_APP.USER_PROFILE_CARD.CHANGE_PASSWORD'),
     t('LEARNER_APP.USER_PROFILE_CARD.PRIVACY_GUIDELINES'),
     t('LEARNER_APP.USER_PROFILE_CARD.CONSENT_FORM'),
     t('COMMON.FAQS'),
@@ -64,6 +64,10 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
   ];
   if (storedConfig?.isEditProfile) {
     options.push(t('LEARNER_APP.USER_PROFILE_CARD.EDIT_PROFILE'));
+  }
+  if(!storedConfig?.restrictChangePassword)
+  {
+    options.push(t('LEARNER_APP.USER_PROFILE_CARD.CHANGE_PASSWORD'));
   }
   const isBelow18 = (dob: string): boolean => {
     const birthDate = new Date(dob);
@@ -164,7 +168,7 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
     username,
     customFields = [],
   } = userData;
-  console.log('customFields', customFields);
+  console.log('userData==========>', userData);
   if (typeof window !== 'undefined' && mobile) {
     localStorage.setItem('usermobile', mobile);
   }
@@ -331,7 +335,8 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
           maxWidth: { maxWidth },
         }}
       >
-        {!isUnderEighteen(dob) ? (
+        {!isUnderEighteen(dob)  ? ( 
+          ((mobile !== '-' && mobile)|| (phoneOwnership !== '-' && tenantName !== TenantName.CAMP_TO_CLUB && phoneOwnership !== 'No'))&&
           <>
             <Typography sx={sectionTitleStyle}>
               {t('LEARNER_APP.USER_PROFILE_CARD.CONTACT_INFORMATION')}
@@ -345,7 +350,7 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
           </Box> */}
 
               <Grid container spacing={1.5}>
-                {mobile !== '-' && (
+                {mobile !== '-' && mobile &&  (
                   <Grid item xs={6}>
                     <Typography sx={labelStyle}>
                       {t('LEARNER_APP.USER_PROFILE_CARD.PHONE_NUMBER')}
@@ -437,86 +442,98 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
           </>
         )}
 
-        <Typography sx={sectionTitleStyle}>
-          {t('LEARNER_APP.USER_PROFILE_CARD.PERSONAL_INFORMATION')}
-        </Typography>
-        <Box sx={sectionCardStyle}>
-          <Grid container spacing={1.5}>
-            {gender !== '-' && (
-              <Grid item xs={6}>
-                <Typography sx={labelStyle}>
-                  {t('LEARNER_APP.USER_PROFILE_CARD.GENDER')}
-                </Typography>
-                <Typography sx={valueStyle}>{toPascalCase(gender)}</Typography>
-              </Grid>
-            )}
-            {ptmName !== '-' && (
-              <Grid item xs={3}>
-                <Typography sx={labelStyle}>
-                  {t('LEARNER_APP.USER_PROFILE_CARD.PTM_NAME')}
-                </Typography>
-                <Typography sx={valueStyle}>{toPascalCase(ptmName)}</Typography>
-              </Grid>
-            )}
-            {dob !== '-' && dob && (
-              <Grid item xs={6}>
-                <Typography sx={labelStyle}>
-                  {t('LEARNER_APP.USER_PROFILE_CARD.DOB')}
-                </Typography>
-                <Typography sx={valueStyle}>
-                  {new Date(dob).toLocaleDateString('en-GB', {
-                    day: '2-digit',
-                    month: 'short',
-                    year: 'numeric',
-                  })}
-                </Typography>
-              </Grid>
-            )}
+{(
+          (gender !== '-' && gender) ||
+          (ptmName !== '-') ||
+          (dob !== '-' && dob) ||
+          (maritalStatus !== '-') ||
+          (motherName !== '-') ||
+          (qualification !== '-' && tenantName !== TenantName.CAMP_TO_CLUB) ||
+          ([state, district, block, village].filter(Boolean).join(', ') !== '-, -, -, -')
+        ) && (
+          <>
+            <Typography sx={sectionTitleStyle}>
+              {t('LEARNER_APP.USER_PROFILE_CARD.PERSONAL_INFORMATION')}
+            </Typography>
+            <Box sx={sectionCardStyle}>
+              <Grid container spacing={1.5}>
+                {gender !== '-' && gender && (
+                  <Grid item xs={6}>
+                    <Typography sx={labelStyle}>
+                      {t('LEARNER_APP.USER_PROFILE_CARD.GENDER')}
+                    </Typography>
+                    <Typography sx={valueStyle}>{toPascalCase(gender)}</Typography>
+                  </Grid>
+                )}
+                {ptmName !== '-' && (
+                  <Grid item xs={3}>
+                    <Typography sx={labelStyle}>
+                      {t('LEARNER_APP.USER_PROFILE_CARD.PTM_NAME')}
+                    </Typography>
+                    <Typography sx={valueStyle}>{toPascalCase(ptmName)}</Typography>
+                  </Grid>
+                )}
+                {dob !== '-' && dob && (
+                  <Grid item xs={6}>
+                    <Typography sx={labelStyle}>
+                      {t('LEARNER_APP.USER_PROFILE_CARD.DOB')}
+                    </Typography>
+                    <Typography sx={valueStyle}>
+                      {new Date(dob).toLocaleDateString('en-GB', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric',
+                      })}
+                    </Typography>
+                  </Grid>
+                )}
 
-            {maritalStatus !== '-' && (
-              <Grid item xs={6}>
-                <Typography sx={labelStyle}>
-                  {t('LEARNER_APP.USER_PROFILE_CARD.MARITAL_STATUS')}
-                </Typography>
-                <Typography sx={valueStyle}>
-                  {toPascalCase(maritalStatus)}
-                </Typography>
-              </Grid>
-            )}
-            {motherName !== '-' && (
-              <Grid item xs={6}>
-                <Typography sx={labelStyle}>
-                  {t('LEARNER_APP.USER_PROFILE_CARD.MOTHER_NAME')}
-                </Typography>
-                <Typography sx={valueStyle}>
-                  {toPascalCase(motherName)}
-                </Typography>
-              </Grid>
-            )}
+                {maritalStatus !== '-' && (
+                  <Grid item xs={6}>
+                    <Typography sx={labelStyle}>
+                      {t('LEARNER_APP.USER_PROFILE_CARD.MARITAL_STATUS')}
+                    </Typography>
+                    <Typography sx={valueStyle}>
+                      {toPascalCase(maritalStatus)}
+                    </Typography>
+                  </Grid>
+                )}
+                {motherName !== '-' && (
+                  <Grid item xs={6}>
+                    <Typography sx={labelStyle}>
+                      {t('LEARNER_APP.USER_PROFILE_CARD.MOTHER_NAME')}
+                    </Typography>
+                    <Typography sx={valueStyle}>
+                      {toPascalCase(motherName)}
+                    </Typography>
+                  </Grid>
+                )}
 
-            {qualification !== '-' && tenantName !== TenantName.CAMP_TO_CLUB && (
-              <Grid item xs={6}>
-                <Typography sx={labelStyle}>
-                  {t('LEARNER_APP.USER_PROFILE_CARD.HIGHEST_QUALIFICATION')}
-                </Typography>
-                <Typography sx={valueStyle}>
-                  {t(`FORM.${qualification}`, { defaultValue: qualification })}
-                </Typography>
+                {qualification !== '-' && tenantName !== TenantName.CAMP_TO_CLUB && (
+                  <Grid item xs={6}>
+                    <Typography sx={labelStyle}>
+                      {t('LEARNER_APP.USER_PROFILE_CARD.HIGHEST_QUALIFICATION')}
+                    </Typography>
+                    <Typography sx={valueStyle}>
+                      {t(`FORM.${qualification}`, { defaultValue: qualification })}
+                    </Typography>
+                  </Grid>
+                )}
+                {[state, district, block, village].filter(Boolean).join(', ') !==
+                  '-, -, -, -' && (
+                  <Grid item xs={12}>
+                    <Typography sx={labelStyle}>
+                      {t('LEARNER_APP.USER_PROFILE_CARD.LOCATION')}
+                    </Typography>
+                    <Typography sx={valueStyle}>
+                      {[state, district, block, village].filter(Boolean).join(', ')}
+                    </Typography>
+                  </Grid>
+                )}
               </Grid>
-            )}
-            {[state, district, block, village].filter(Boolean).join(', ') !==
-              '-, -, -, -' && (
-              <Grid item xs={12}>
-                <Typography sx={labelStyle}>
-                  {t('LEARNER_APP.USER_PROFILE_CARD.LOCATION')}
-                </Typography>
-                <Typography sx={valueStyle}>
-                  {[state, district, block, village].filter(Boolean).join(', ')}
-                </Typography>
-              </Grid>
-            )}
-          </Grid>
-        </Box>
+            </Box>
+          </>
+        )}
 
         {priorTraining !== '-' && currentWork !== '-' && futureWork !== '-' && (
           <>
