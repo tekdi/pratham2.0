@@ -51,6 +51,7 @@ import MinimizeIcon from '@mui/icons-material/Minimize';
 import { toPascalCase } from '../../../../utils/Helper';
 import UploadFiles from '../../../../components/UploadFiles/UploadFiles';
 import CloseIcon from '@mui/icons-material/Close';
+import QuestionMarksManualUpdate from '../../../../components/assessment/QuestionMarksManualUpdate';
 interface ScoreDetail {
   questionId: string | null;
   pass: string;
@@ -654,7 +655,7 @@ const AssessmentDetails = () => {
       setEditScore(parsedData.score.toString());
       setEditSuggestion(
         parsedData.suggestion ||
-        (question.resValue ? JSON.parse(question.resValue).AI_suggestion : '')
+          (question.resValue ? JSON.parse(question.resValue).AI_suggestion : '')
       );
     } else {
       setEditScore(question.score.toString());
@@ -1155,12 +1156,15 @@ const AssessmentDetails = () => {
                       }}
                     >
                       {assessmentData?.fileUrls &&
-                        assessmentData.fileUrls.length > 0 ? (
+                      assessmentData.fileUrls.length > 0 ? (
                         <>
-                          {`${assessmentData.fileUrls.length} ${assessmentData.fileUrls.length === 1 ? "image" : "images"
-                            } uploaded`}
+                          {`${assessmentData.fileUrls.length} ${
+                            assessmentData.fileUrls.length === 1
+                              ? 'image'
+                              : 'images'
+                          } uploaded`}
                           <Button
-                            variant="outlined"
+                            variant="contained"
                             size="small"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -1170,11 +1174,14 @@ const AssessmentDetails = () => {
                               ml: 1,
                               textTransform: 'none',
                               borderRadius: '8px',
-                              fontWeight: 500,
+                              fontWeight: 600,
                               fontSize: '14px',
                               height: '32px',
                               padding: '2px 8px',
                               display: { xs: 'inline-flex', md: 'none' },
+                              backgroundColor: '#FFC107',
+                              color: '#1F1B13',
+                              '&:hover': { backgroundColor: '#FFB300' },
                             }}
                           >
                             View
@@ -1184,28 +1191,31 @@ const AssessmentDetails = () => {
                             'Awaiting Your Approval',
                             'AI Pending',
                           ].includes(assessmentData?.status || '') && (
-                              <>
-                                <Button
-                                  variant="outlined"
-                                  size="small"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleReUpload();
-                                  }}
-                                  sx={{
-                                    ml: 1,
-                                    textTransform: 'none',
-                                    borderRadius: '8px',
-                                    fontWeight: 500,
-                                    fontSize: '14px',
-                                    height: '32px',
-                                    padding: '2px 8px',
-                                  }}
-                                >
-                                  Re-upload
-                                </Button>
-                              </>
-                            )}
+                            <>
+                              <Button
+                                variant="contained"
+                                size="small"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleReUpload();
+                                }}
+                                sx={{
+                                  ml: 1,
+                                  textTransform: 'none',
+                                  borderRadius: '8px',
+                                  fontWeight: 600,
+                                  fontSize: '14px',
+                                  height: '32px',
+                                  padding: '2px 8px',
+                                  backgroundColor: '#FFC107',
+                                  color: '#1F1B13',
+                                  '&:hover': { backgroundColor: '#FFB300' },
+                                }}
+                              >
+                                Re-upload
+                              </Button>
+                            </>
+                          )}
                         </>
                       ) : (
                         'No images uploaded'
@@ -1232,7 +1242,7 @@ const AssessmentDetails = () => {
                 <Box sx={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
                   {!assessmentTrackingData ? (
                     assessmentData?.status === 'AI Pending' ||
-                      assessmentData?.status === 'Approved' ? (
+                    assessmentData?.status === 'Approved' ? (
                       isDesktop ? (
                         <Box sx={{ height: '100%', overflow: 'auto' }}>
                           <UploadFiles
@@ -1258,16 +1268,7 @@ const AssessmentDetails = () => {
                         </Typography>
                       </Box>
                     )
-                  ) : (
-                    <AnswerSheet
-                      assessmentTrackingData={assessmentTrackingData}
-                      onApprove={handleApproveClick}
-                      onScoreEdit={handleScoreClick}
-                      isApproved={assessmentData?.status === 'Approved'}
-                      questionNumberingMap={questionNumberingMap}
-                      sectionMapping={sectionMapping}
-                    />
-                  )}
+                  ) : null}
                 </Box>
               </Box>
             </>
@@ -1285,7 +1286,7 @@ const AssessmentDetails = () => {
                 bgcolor: '#FFFFFF',
               }}
             >
-              <Typography
+              {/* <Typography
                 sx={{
                   color: '#635E57',
                   fontSize: { xs: '14px', md: '16px' },
@@ -1293,7 +1294,11 @@ const AssessmentDetails = () => {
                 }}
               >
                 Question Paper UI coming soon
-              </Typography>
+              </Typography> */}
+              <QuestionMarksManualUpdate
+                assessmentDoId={assessmentId}
+                userId={assessmentId}
+              />
             </Box>
           </Grid>
         </Grid>

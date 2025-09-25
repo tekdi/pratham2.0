@@ -193,6 +193,7 @@ export const getDoIdForAssessmentDetails = async ({
         assessmentType: filters.assessmentType,
         status: ['Live'],
         primaryCategory: ['Practice Question Set'],
+        ...(filters?.evaluationType && { evaluationType: filters.evaluationType})
       },
     },
   };
@@ -308,6 +309,7 @@ export const getOfflineAssessmentStatus = async (data: {
   // const apiUrl = `https://e49a1216cbca.ngrok-free.app/interface/v1/tracking/assessment/offline-assessment-status`;
   try {
     const response = await post(apiUrl, data);
+    // console.log('offline assessment status response', response?.data);
     return response?.data;
   } catch (error) {
     console.error('Error in getting offline assessment status:', error);
