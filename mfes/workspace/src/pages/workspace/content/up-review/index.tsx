@@ -13,7 +13,12 @@ import {
   CircularProgress,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { getContent } from '@workspace/services/ContentService';
+import {
+  getContent,
+  getfilterList,
+  getPosFrameworkList,
+  getMediaFilterList,
+} from '@workspace/services/ContentService';
 import SearchBox from '../../../../components/SearchBox';
 import PaginationComponent from '@workspace/components/PaginationComponent';
 import NoDataFound from '@workspace/components/NoDataFound';
@@ -27,6 +32,7 @@ import { timeAgo } from '@workspace/utils/Helper';
 import useSharedStore from '../../../../../../shared-store';
 import useTenantConfig from '@workspace/hooks/useTenantConfig';
 import WorkspaceHeader from '@workspace/components/WorkspaceHeader';
+import DynamicMultiFilter from '../../../../components/DynamicMultiFilter';
 const columns = [
   {
     key: 'title_and_description',
@@ -85,7 +91,11 @@ const UpForReviewPage = () => {
   const [sortBy, setSortBy] = useState('');
   useEffect(() => {
     setSortBy(sort?.toString() || 'Modified On');
-  }, [sort]); const [searchTerm, setSearchTerm] = useState('');
+  }, [sort]); 
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedNames, setSelectedNames] = useState<Record<string, string[]>>(
+    {}
+  );
   const [contentList, setContentList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [contentDeleted, setContentDeleted] = useState(false);
@@ -169,7 +179,9 @@ const UpForReviewPage = () => {
           primaryCategory,
           sort_by,
           tenantConfig?.CHANNEL_ID,
-          contentType
+          contentType,
+          undefined,
+          selectedNames
         );
         const contentList = (response?.content || []).concat(
           response?.QuestionSet || []
@@ -191,7 +203,63 @@ const UpForReviewPage = () => {
     fetchContentAPI,
     contentDeleted,
     page,
+    selectedNames,
   ]);
+
+  // Add state for dynamic filter
+  const [readData, setReadData] = useState<any[]>([]);
+  const [posFrameworkData, setPosFrameworkData] = useState<any>(null);
+  const [selectedFilters, setSelectedFilters] = useState<{
+    [key: string]: string[];
+  }>({});
+
+  // Mock fetch for readData and posFrameworkData (replace with real API calls)
+  useEffect(() => {
+    const fetchReadData = async () => {
+      const response = await getfilterList();
+      const posFrameworkData = await getPosFrameworkList();
+      const mediaFilterList = await getMediaFilterList();
+
+      const convertedArray = mediaFilterList?.range.map((item: any) => ({
+        name: item.label,
+        value: item.identifier,
+      }));
+      mediaFilterList.range = convertedArray;
+
+      response.push(mediaFilterList);
+      setReadData(response);
+
+      setPosFrameworkData(posFrameworkData);
+    };
+
+    fetchReadData();
+  }, []);
+
+  // Restore filters only for up-review
+  useEffect(() => {
+    if (router.query && router.asPath.includes('up-review')) {
+      const savedFilters = localStorage.getItem('upReviewFilters');
+      const savedSelectedNames = localStorage.getItem(
+        'upReviewSelectedNames'
+      );
+      if (savedFilters) setSelectedFilters(JSON.parse(savedFilters));
+      if (savedSelectedNames) setSelectedNames(JSON.parse(savedSelectedNames));
+    }
+  }, [router.asPath]);
+
+  // Save filters only for up-review
+  useEffect(() => {
+    if (router.asPath.includes('up-review')) {
+      localStorage.setItem(
+        'upReviewFilters',
+        JSON.stringify(selectedFilters)
+      );
+      localStorage.setItem(
+        'upReviewSelectedNames',
+        JSON.stringify(selectedNames)
+      );
+    }
+  }, [selectedFilters, selectedNames, router.asPath]);
 
   return (
     <>
@@ -226,6 +294,16 @@ const UpForReviewPage = () => {
                 onFilterChange={handleFilterChange}
                 onSortChange={handleSortChange}
               />
+              <Box m={3}>
+                <DynamicMultiFilter
+                  readData={readData}
+                  posFrameworkData={posFrameworkData}
+                  selectedFilters={selectedFilters}
+                  onChange={setSelectedFilters}
+                  onSelectedNamesChange={setSelectedNames}
+                  isProgramFilter={false}
+                />
+              </Box>
             </Box>
 
             {/* {loading ? (

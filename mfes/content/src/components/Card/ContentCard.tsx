@@ -47,6 +47,7 @@ const ContentCard = ({
       _card={_card} isWrap={false}>
       <CommonCard
         title={(item?.name || '').trim()}
+        courseType={item?.courseType}
         // image={
         //   item?.posterImage && item?.posterImage !== 'undefined'
         //     ? item?.posterImage
