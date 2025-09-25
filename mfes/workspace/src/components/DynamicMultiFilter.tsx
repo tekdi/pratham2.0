@@ -26,6 +26,7 @@ interface DynamicMultiFilterProps {
   selectedFilters: { [key: string]: string[] };
   onChange: (filters: { [key: string]: string[] }) => void;
   onSelectedNamesChange?: (selectedNames: Record<string, string[]>) => void; // <-- new
+  isProgramFilter?:boolean
 }
 
 // Helper to get field definition
@@ -182,6 +183,7 @@ const DynamicMultiFilter: React.FC<DynamicMultiFilterProps> = ({
   selectedFilters,
   onChange,
   onSelectedNamesChange,
+  isProgramFilter=true
 }) => {
   console.log("readData",readData)
   console.log("posFrameworkData",posFrameworkData)
@@ -359,7 +361,13 @@ const DynamicMultiFilter: React.FC<DynamicMultiFilterProps> = ({
         );
       })()}
       {/* Other range-based filters */}
-      {filterCodes.filter((code) => !['domain', 'subDomain', 'subject'].includes(code)).map((code) => {
+      {filterCodes.filter((code) => {
+        const excludedCodes = ['domain', 'subDomain', 'subject'];
+        if (!isProgramFilter) {
+          excludedCodes.push('program');
+        }
+        return !excludedCodes.includes(code);
+      }).map((code) => {
         const field = getField(readData, code);
         if (!field || !field.visible || !field.range) return null;
         // Normalize options for range

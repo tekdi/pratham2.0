@@ -124,7 +124,9 @@ const AddEditUser = ({
           'class',
           'marital_status',
           'phone_type_available',
-          'own_phone_check',
+        //  'own_phone_check',
+
+          'ownphonecheck',
           'parent_phone',
           'preferred_mode_of_learning',
           'drop_out_reason',
@@ -156,8 +158,21 @@ const AddEditUser = ({
       keysToRemove.forEach((key) => delete isEditUiSchema[key]);
       //also remove from required if present
       isEditSchema.required = isEditSchema.required.filter(
-        (key) => !keysToRemove.includes(key)
+        (key: any) => !keysToRemove.includes(key)
       );
+      
+      // Disable name fields and username for learner editing
+      if (type === 'learner' && isEdit) {
+        const fieldsToDisable = ['firstName', 'middleName', 'lastName', 'username'];
+        fieldsToDisable.forEach((fieldName) => {
+          if (isEditUiSchema[fieldName]) {
+            isEditUiSchema[fieldName] = {
+              ...isEditUiSchema[fieldName],
+              'ui:disabled': true,
+            };
+          }
+        });
+      }
        // console.log('isEditSchema', JSON.stringify(isEditSchema));
     } 
     
@@ -228,14 +243,15 @@ const AddEditUser = ({
         'class',
         'marital_status',
         'phone_type_accessible',
-        'own_phone_check',
+       // 'own_phone_check',
+        'ownphonecheck',
 
         'password',
         'confirm_password',
         'program',
       ];
 
-      // Filter only existing keys from the object
+      // Filter only existing keys from the object - this will automatically exclude fields that were removed
       const updatedOrder = desiredOrder.filter((key) => key in isEditUiSchema);
 
       // Optionally, include any extra keys that were not in your desired list but exist in uiSchema
