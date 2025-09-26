@@ -5,7 +5,6 @@ import { StatusIcon } from '../CommonCollapse';
 import Description from './Description';
 // Array of default images from courseDefaultImages folder
 const courseDefaultImages = [
-  'Thumbnail_1_202405270759453576 (1).png',
   'Plastic_Literacy__202010271637124816.png',
   'Hickory_Dickory.png',
   'Science_202010131204476645.png',
