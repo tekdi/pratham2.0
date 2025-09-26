@@ -14,11 +14,46 @@ const CustomDateWidget = ({
   label,
   rawErrors = [],
   uiSchema = {}, // <-- include uiSchema
+  schema = {},
 }: any) => {
-  const { minValue, maxValue } = options;
   const { t } = useTranslation();
+  console.log('CustomDateWidget===========>', schema);
+  schema={
+    "type": "string",
+    "title": "Date of Birth",
+    "coreField": 1,
+    "fieldId": null,
+    "field_type": "date",
+    "minValue": 0,
+    "maxValue": 14,
+    "maxLength": 14,
+    "format": "date"
+}
 
   const isDisabled = uiSchema?.['ui:disabled'] === true;
+
+  // Convert age values to actual dates
+  const getDateFromAge = (ageInYears: number) => {
+    if (typeof ageInYears === 'number') {
+      return dayjs().subtract(ageInYears, 'years');
+    }
+    return null;
+  };
+
+  // Get validation data directly from schema
+  const schemaMaxValue = schema.maxValue; // 14 (maximum age allowed)
+  const schemaMinValue = schema.minValue; // 0 (minimum age allowed)
+
+  console.log('Schema maxValue:', schemaMaxValue, 'Schema minValue:', schemaMinValue);
+
+  // Calculate min and max dates based on age constraints
+  // maxValue (e.g., 14) = maximum age allowed = minimum birth date (14 years ago)
+  // minValue (e.g., 0) = minimum age allowed = maximum birth date (today)
+  const minDate = schemaMaxValue !== undefined ? getDateFromAge(schemaMaxValue) : undefined; // 14 years ago (oldest birth date)
+  const maxDate = schemaMinValue !== undefined ? getDateFromAge(schemaMinValue) : undefined; // today (youngest birth date)
+
+  console.log('Calculated minDate:', minDate?.format('YYYY-MM-DD'));
+  console.log('Calculated maxDate:', maxDate?.format('YYYY-MM-DD'));
 
   const initialValue =
     typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}$/)
@@ -75,8 +110,8 @@ const CustomDateWidget = ({
         })}`}
         value={selectedDate || null}
         onChange={handleDateChange}
-        minDate={minValue ? dayjs(minValue, 'YYYY-MM-DD') : undefined}
-        maxDate={maxValue ? dayjs(maxValue, 'YYYY-MM-DD') : undefined}
+        minDate={minDate}
+        maxDate={maxDate}
         format="DD-MM-YYYY"
         slotProps={{
           textField: {
