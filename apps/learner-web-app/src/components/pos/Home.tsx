@@ -14,6 +14,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { SearchButton } from '@learner/components/pos/SearchButton';
 import { ContentSearch, getfilterList } from '@learner/utils/API/contentService';
+import { staticFilterContent } from '@shared-lib-v2/utils/AuthService';
 
 const Content = dynamic(() => import('@Content'), {
   ssr: false,
@@ -78,13 +79,13 @@ const Page = () => {
           gamesCountResult,
           audiosCountResult,
           otherFormatsCountResult,
-          filterListResponse
+        //  filterListResponse
         ] = await Promise.all([
           getContentCountByMimeType(mimeTypeCategories.videos),
           getContentCountByMimeType(mimeTypeCategories.games),
           getContentCountByMimeType(mimeTypeCategories.audios),
           getContentCountByMimeType(mimeTypeCategories.otherFormats),
-          getfilterList()
+         // getfilterList()
         ]);
 
         // Set all counts
@@ -94,10 +95,19 @@ const Page = () => {
         setOtherFormatsCount(otherFormatsCountResult);
 
         // Handle language count
-        console.log('response======>', filterListResponse);
-        const contentLangField = filterListResponse.find((field: any) => field.code === "contentLanguage");
-        const contentLangCount = contentLangField?.range?.length || 0;
-        setLanguagesCount(contentLangCount);
+        // console.log('response======>', filterListResponse);
+        const instantFramework = localStorage.getItem('channelId') ?? '';
+      const staticResp = await staticFilterContent({ instantFramework });  
+      console.log('staticResp======>', staticResp?.objectCategoryDefinition?.forms?.create?.properties);
+      const data = staticResp?.objectCategoryDefinition?.forms?.create?.properties;
+      const contentLanguageField = data
+  .flatMap((section: any) => section.fields)
+  .find((field: any) => field.code === "contentLanguage");
+
+const rangeLength = contentLanguageField?.range?.length || 0;
+        //     const contentLangField = filterListResponse.find((field: any) => field.code === "contentLanguage");
+        // const contentLangCount = contentLangField?.range?.length || 0;
+        setLanguagesCount(rangeLength);
 
         // Calculate and set total resources
         const total = videosCountResult + gamesCountResult + audiosCountResult + otherFormatsCountResult;
@@ -108,7 +118,7 @@ const Page = () => {
           games: gamesCountResult,
           audios: audiosCountResult,
           otherFormats: otherFormatsCountResult,
-          languages: contentLangCount,
+          languages: rangeLength,
           total: total
         });
 
@@ -239,7 +249,7 @@ const Page = () => {
                 // position: 'relative',
                 zIndex: 1000,
                 '@media (min-width: 900px)': {
-                  marginLeft: '-120px',
+                  //marginLeft: '-120px',
                 },
               }}
             >
@@ -296,7 +306,7 @@ const Page = () => {
                 mt: 1,
               }}
             >
-              <SpeakableText>In 15 languages</SpeakableText>
+              <SpeakableText>In {languagesCount} languages</SpeakableText>
             </Typography>
 
             <Typography
@@ -315,7 +325,7 @@ const Page = () => {
             >
               <SpeakableText>
                 Pratham Open School offers free, downloadable videos, games,
-                reading material and stories in 15 languages for ages 1 to 18+,
+                reading material and stories in {languagesCount} languages for ages 1 to 18+,
                 designed to support self-led learning and group learning through
                 activities and projects.
               </SpeakableText>
@@ -434,7 +444,7 @@ const Page = () => {
               { value: videosCount, label: 'Videos' },
               // { value: 1700, label: 'Stories' },
               { value: gamesCount, label: 'Games' },
-              { value: audiosCount, label: 'Audios' },
+              // { value: audiosCount, label: 'Audios' },
               { value: otherFormatsCount, label: 'Other Formats' },
               { value: languagesCount, label: 'Languages' },
             ].map((item, idx) => (
