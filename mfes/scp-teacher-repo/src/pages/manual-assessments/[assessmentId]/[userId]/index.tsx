@@ -27,6 +27,7 @@ import {
   getOfflineAssessmentStatus,
   updateAssessmentScore,
   hierarchyContent,
+  searchAssessment,
 } from '../../../../services/AssesmentService';
 import {
   UploadOptionsPopup,
@@ -236,6 +237,7 @@ const AssessmentDetails = () => {
   const [editLoading, setEditLoading] = useState(false);
   const [assessmentTrackingData, setAssessmentTrackingData] =
     useState<AssessmentTrackingData | null>();
+  const [assessmentStatusData, setAssessmentStatusData] = useState<any>([]);
 
   // Hierarchy data for question numbering
   const [hierarchyData, setHierarchyData] = useState<any>(null);
@@ -269,7 +271,6 @@ const AssessmentDetails = () => {
   // Sample uploaded images data
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const previousUploadedImagesRef = useRef<UploadedImage[] | null>(null);
-
   // Upload Options Popup handlers
   const handleUploadInfoClick = () => {
     const hasImages =
@@ -587,6 +588,27 @@ const AssessmentDetails = () => {
   };
 
   useEffect(() => {
+    const fetchUserAssessmentStatus = async () => {
+      try {
+        if (typeof userId !== 'string' || typeof assessmentId !== 'string') {
+          return;
+        }
+        const statusResponse = await searchAssessment({
+          userId: userId,
+          courseId: assessmentId,
+          unitId: assessmentId,
+          contentId: assessmentId,
+        });
+        setAssessmentStatusData(statusResponse[0]?.score_details || []);
+        // console.log('statusResponse[0]?.assessments || []', statusResponse[0]?.score_details || []);
+      } catch (error) {
+        console.error('Failed to fetch assessment status:', error);
+      }
+    };
+    fetchUserAssessmentStatus();
+  }, [userId, assessmentId]);
+
+  useEffect(() => {
     const fetchAssessmentData = async () => {
       if (assessmentId && userId) {
         try {
@@ -642,28 +664,6 @@ const AssessmentDetails = () => {
 
   const handleBack = () => {
     router.back();
-  };
-
-  const handleScoreClick = (question: ScoreDetail) => {
-    setSelectedQuestion(question);
-    // Check if there's a saved score and suggestion in localStorage
-    const savedData = localStorage.getItem(
-      `tracking_${userId}_${question.questionId}`
-    );
-    if (savedData) {
-      const parsedData = JSON.parse(savedData);
-      setEditScore(parsedData.score.toString());
-      setEditSuggestion(
-        parsedData.suggestion ||
-          (question.resValue ? JSON.parse(question.resValue).AI_suggestion : '')
-      );
-    } else {
-      setEditScore(question.score.toString());
-      setEditSuggestion(
-        question.resValue ? JSON.parse(question.resValue).AI_suggestion : ''
-      );
-    }
-    setIsEditModalOpen(true);
   };
 
   const handleCloseSnackbar = () => {
@@ -1156,13 +1156,12 @@ const AssessmentDetails = () => {
                       }}
                     >
                       {assessmentData?.fileUrls &&
-                      assessmentData.fileUrls.length > 0 ? (
+                        assessmentData.fileUrls.length > 0 ? (
                         <>
-                          {`${assessmentData.fileUrls.length} ${
-                            assessmentData.fileUrls.length === 1
-                              ? 'image'
-                              : 'images'
-                          } uploaded`}
+                          {`${assessmentData.fileUrls.length} ${assessmentData.fileUrls.length === 1
+                            ? 'image'
+                            : 'images'
+                            } uploaded`}
                           <Button
                             variant="contained"
                             size="small"
@@ -1191,31 +1190,31 @@ const AssessmentDetails = () => {
                             'Awaiting Your Approval',
                             'AI Pending',
                           ].includes(assessmentData?.status || '') && (
-                            <>
-                              <Button
-                                variant="contained"
-                                size="small"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleReUpload();
-                                }}
-                                sx={{
-                                  ml: 1,
-                                  textTransform: 'none',
-                                  borderRadius: '8px',
-                                  fontWeight: 600,
-                                  fontSize: '14px',
-                                  height: '32px',
-                                  padding: '2px 8px',
-                                  backgroundColor: '#FFC107',
-                                  color: '#1F1B13',
-                                  '&:hover': { backgroundColor: '#FFB300' },
-                                }}
-                              >
-                                Re-upload
-                              </Button>
-                            </>
-                          )}
+                              <>
+                                <Button
+                                  variant="contained"
+                                  size="small"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleReUpload();
+                                  }}
+                                  sx={{
+                                    ml: 1,
+                                    textTransform: 'none',
+                                    borderRadius: '8px',
+                                    fontWeight: 600,
+                                    fontSize: '14px',
+                                    height: '32px',
+                                    padding: '2px 8px',
+                                    backgroundColor: '#FFC107',
+                                    color: '#1F1B13',
+                                    '&:hover': { backgroundColor: '#FFB300' },
+                                  }}
+                                >
+                                  Re-upload
+                                </Button>
+                              </>
+                            )}
                         </>
                       ) : (
                         'No images uploaded'
@@ -1242,7 +1241,7 @@ const AssessmentDetails = () => {
                 <Box sx={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
                   {!assessmentTrackingData ? (
                     assessmentData?.status === 'AI Pending' ||
-                    assessmentData?.status === 'Approved' ? (
+                      assessmentData?.status === 'Approved' ? (
                       isDesktop ? (
                         <Box sx={{ height: '100%', overflow: 'auto' }}>
                           <UploadFiles
@@ -1297,7 +1296,8 @@ const AssessmentDetails = () => {
               </Typography> */}
               <QuestionMarksManualUpdate
                 assessmentDoId={assessmentId}
-                userId={assessmentId}
+                userId={userId}
+                assessmentStatusData={assessmentStatusData}
               />
             </Box>
           </Grid>

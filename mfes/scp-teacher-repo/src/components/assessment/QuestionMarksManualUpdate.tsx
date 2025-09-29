@@ -2,14 +2,19 @@ import axios from 'axios';
 import { AnyARecord } from 'dns';
 import React, { useEffect, useMemo, useState } from 'react';
 import Button from '@mui/material/Button';
+import { createAssessmentTracking, updateAssessmentScore } from '@/services/AssesmentService';
+import { useTranslation } from 'next-i18next';
+
 export interface QuestionMarksManualUpdateProps {
   assessmentDoId: any;
   userId: any;
+  assessmentStatusData: any;
 }
 
 const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
   assessmentDoId,
   userId,
+  assessmentStatusData
 }) => {
   const [do_id, set_do_id] = useState<any>(assessmentDoId);
 
@@ -28,6 +33,8 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
 
   //temp variable
   const [list_temp_load, set_list_temp_load] = useState<any[]>([]);
+  const { t } = useTranslation();
+
   useEffect(() => {
     const getDoIdAndDownload = async () => {
       set_status('Getting DO ID');
@@ -253,8 +260,8 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
           answer:
             typeof correctValue !== 'undefined'
               ? (typeof opt?.value === 'number'
-                  ? opt.value
-                  : opt?.value?.value) === correctValue
+                ? opt.value
+                : opt?.value?.value) === correctValue
               : false,
           value: {
             body: opt?.label ?? opt?.value?.body ?? '',
@@ -371,7 +378,7 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
     [sectionTotals]
   );
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!content_details?.sections || !api_index_map?.sections) return;
     // Build assessmentSummary with scores from entered marks
     let totalMaxScore = 0;
@@ -414,6 +421,21 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
 
     set_submitPayload(payload);
     console.log('FORM_SUBMIT_RESULT', payload);
+    try {
+      if (!assessmentStatusData || assessmentStatusData.length === 0) {
+        const response = await createAssessmentTracking(payload);
+        console.log("API success create:", response);
+      } else {
+        const updatePayload = {
+          ...payload,
+          submitedBy: 'Manual',
+        };
+        const response = await updateAssessmentScore(updatePayload);
+        console.log("API success update:", response);
+      }
+    } catch (error) {
+      console.error("API error while creating assessment tracking:", error);
+    }
   };
   //network call
   const API_URL = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;
@@ -674,7 +696,9 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
                 '&:hover': { backgroundColor: '#FFB300' },
               }}
             >
-              Submit Marks
+              {assessmentStatusData && assessmentStatusData.length > 0
+                ? t('ASSESSMENTS.UPDATE_MARKS')
+                : t('ASSESSMENTS.SUBMIT_MARKS')}
             </Button>
           </div>
 

@@ -746,7 +746,9 @@
     "NO_LEARNERS_FOUND": "No learners found matching your search.",
     "MANUAL_ASSESSMENT": "Manual Assessment",
     "MANUAL_ASSESSMENT_LIST": "Manual Assessment List",
-    "UNDER_EVALUATION": "Under Evaluation"
+    "UNDER_EVALUATION": "Under Evaluation",
+    "UPDATE_MARKS": "Update Marks",
+    "SUBMIT_MARKS": "Submit Marks"
   },
   "BOARD_ENROLMENT": {
     "BOARD_ENROLLMENT": "Board Enrollment",
