@@ -41,8 +41,8 @@ const AssessmentList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [classId, setClassId] = useState('');
   const [availableAssessmentTypes, setAvailableAssessmentTypes] = useState<
-    string[]
-  >([]);
+    string[] | null
+  >(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -53,10 +53,7 @@ const AssessmentList = () => {
   const [centerData, setCenterData] = useState<{
     board: string;
     state: string;
-  }>({
-    board: '',
-    state: '',
-  });
+  } | null>(null);
   const [assessmentType, setAssessmentType] = useState<string>('pre');
   const [selectedSortOption, setSelectedSortOption] = useState<{
     sortByKey: string;
@@ -100,6 +97,7 @@ const AssessmentList = () => {
     if (classId && cohortsData?.length) {
       const cohort = cohortsData.find((item: any) => item.cohortId === classId);
       if (!cohort?.customField) {
+        setCenterData(null);
         return;
       }
       const selectedState =
@@ -113,6 +111,14 @@ const AssessmentList = () => {
       setCenterData({ state: selectedState, board: selectedBoard });
     }
   }, [classId, cohortsData]);
+
+  // Reset assessment type and related lists when class changes
+  useEffect(() => {
+    setAvailableAssessmentTypes(null);
+    console.log('availableAssessmentTypes');
+    setFilteredAssessments([]);
+    setAssessmentType('pre');
+  }, [classId]);
 
   // Ensure default selection: pick first available type if current isn't present
   useEffect(() => {
@@ -135,13 +141,14 @@ const AssessmentList = () => {
         board: [selectedBoard],
         status: ['Live'],
         primaryCategory: ['Practice Question Set'],
-        evaluationType: ['offline'],
+        // evaluationType: ['offline'],
       };
       try {
         if (filters) {
           setIsLoading(true);
           setAssessmentList([]);
           setFilteredAssessments([]);
+          setAvailableAssessmentTypes(null);
 
           const searchResults = await getOfflineAssessmentDetails({ filters });
 
@@ -208,13 +215,13 @@ const AssessmentList = () => {
     };
 
     // Fetch when board info is available
-    if (centerData?.board) {
+    if (centerData && centerData?.board) {
       getDoIdForAssessmentReport(centerData.state, centerData.board);
     } else {
       // If no board data, ensure loading is false
       setIsLoading(false);
     }
-  }, [centerData.board, centerData.state, t]);
+  }, [centerData, t, cohortsData, classId]);
 
   // Safety mechanism to reset loading state if it gets stuck
   useEffect(() => {
@@ -426,44 +433,48 @@ const AssessmentList = () => {
             </Box>
           </Box>
         </Grid>
-        <Grid item xs={12} md={6}>
-          <Box sx={{ mt: 2, px: '20px', width: '100%' }}>
-            <FormControl sx={{ marginTop: '24px' }} fullWidth>
-              <InputLabel
-                style={{
-                  color: theme?.palette?.warning['A200'],
-                  background: theme?.palette?.warning['A400'],
-                  paddingLeft: '2px',
-                  paddingRight: '2px',
-                }}
-                id="assessment-type-select-label"
-              >
-                {t('ASSESSMENTS.ASSESSMENT_TYPE')}
-              </InputLabel>
-              <Select
-                labelId="assessment-type-select-label"
-                id="assessment-type-select"
-                label={t('ASSESSMENTS.ASSESSMENT_TYPE')}
-                style={{
-                  borderRadius: '4px',
-                }}
-                value={assessmentType}
-                onChange={(e) => handleAssessmentTypeChange(e.target.value)}
-                disabled={availableAssessmentTypes.length === 1}
-              >
-                {availableAssessmentTypes.map((type) => (
-                  <MenuItem
-                    key={type}
-                    value={type}
-                    style={{ textAlign: 'right' }}
-                  >
-                    {getAssessmentTypeLabel(type)}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
-        </Grid>
+        {availableAssessmentTypes && availableAssessmentTypes?.length > 0 ? (
+          <Grid item xs={12} md={6}>
+            <Box sx={{ mt: 2, px: '20px', width: '100%' }}>
+              <FormControl sx={{ marginTop: '24px' }} fullWidth>
+                <InputLabel
+                  style={{
+                    color: theme?.palette?.warning['A200'],
+                    background: theme?.palette?.warning['A400'],
+                    paddingLeft: '2px',
+                    paddingRight: '2px',
+                  }}
+                  id="assessment-type-select-label"
+                >
+                  {t('ASSESSMENTS.ASSESSMENT_TYPE')}
+                </InputLabel>
+                <Select
+                  labelId="assessment-type-select-label"
+                  id="assessment-type-select"
+                  label={t('ASSESSMENTS.ASSESSMENT_TYPE')}
+                  style={{
+                    borderRadius: '4px',
+                  }}
+                  value={assessmentType}
+                  onChange={(e) => handleAssessmentTypeChange(e.target.value)}
+                  disabled={availableAssessmentTypes.length === 1}
+                >
+                  {availableAssessmentTypes.map((type) => (
+                    <MenuItem
+                      key={type}
+                      value={type}
+                      style={{ textAlign: 'right' }}
+                    >
+                      {getAssessmentTypeLabel(type)}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+          </Grid>
+        ) : (
+          <>No Assessment Type Found</>
+        )}
       </Grid>
 
       {isLoading && (

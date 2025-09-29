@@ -2,8 +2,12 @@ import axios from 'axios';
 import { AnyARecord } from 'dns';
 import React, { useEffect, useMemo, useState } from 'react';
 import Button from '@mui/material/Button';
-import { createAssessmentTracking, updateAssessmentScore } from '../../services/AssesmentService';
+import {
+  createAssessmentTracking,
+  updateAssessmentScore,
+} from '../../services/AssesmentService';
 import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/router';
 
 export interface QuestionMarksManualUpdateProps {
   assessmentDoId: any;
@@ -14,8 +18,9 @@ export interface QuestionMarksManualUpdateProps {
 const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
   assessmentDoId,
   userId,
-  assessmentStatusData
+  assessmentStatusData,
 }) => {
+  const router = useRouter();
   const [do_id, set_do_id] = useState<any>(assessmentDoId);
 
   //data fetch variable
@@ -260,8 +265,8 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
           answer:
             typeof correctValue !== 'undefined'
               ? (typeof opt?.value === 'number'
-                ? opt.value
-                : opt?.value?.value) === correctValue
+                  ? opt.value
+                  : opt?.value?.value) === correctValue
               : false,
           value: {
             body: opt?.label ?? opt?.value?.body ?? '',
@@ -303,14 +308,41 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
     return { uiModel: ui, apiIndex };
   };
 
-  // initialize form state when content_details available
+  // initialize form state when content_details/api_index_map available
   useEffect(() => {
-    if (!content_details?.sections) return;
+    if (!content_details?.sections || !api_index_map?.sections) return;
     const nextMarksBySection: Record<string, number[]> = {};
     const nextSelected: Record<string, number | null> = {};
+
+    // Build a quick lookup for scores from assessmentStatusData using sectionId + questionId
+    const statusList = Array.isArray(assessmentStatusData)
+      ? assessmentStatusData
+      : [];
+    const scoreBySectionQuestion: Record<string, number> = {};
+    statusList.forEach((rec: any) => {
+      if (rec?.sectionId && rec?.questionId) {
+        const scoreNum = Number(rec?.score ?? 0);
+        scoreBySectionQuestion[`${rec.sectionId}::${rec.questionId}`] =
+          Number.isFinite(scoreNum) ? scoreNum : 0;
+      }
+    });
+
     content_details.sections.forEach((section: any, si: number) => {
-      nextMarksBySection[String(si)] = section.questions.map(() => 0);
-      section.questions.forEach((q: any, qi: number) => {
+      const apiSection = api_index_map?.sections?.[si];
+      const sectionId = apiSection?.sectionId;
+      nextMarksBySection[String(si)] = (section.questions || []).map(
+        (_q: any, qi: number) => {
+          const questionId = apiSection?.data?.[qi]?.item?.id;
+          if (sectionId && questionId) {
+            const key = `${sectionId}::${questionId}`;
+            const score = scoreBySectionQuestion[key];
+            if (typeof score !== 'undefined') return score;
+          }
+          return 0;
+        }
+      );
+
+      (section.questions || []).forEach((q: any, qi: number) => {
         const key = `${si}_${qi}`;
         // For MCQ type (has options), default to null (unselected)
         if (q?.options && Array.isArray(q.options)) {
@@ -320,7 +352,7 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
     });
     set_marksBySection(nextMarksBySection);
     set_selectedOptions(nextSelected);
-  }, [content_details]);
+  }, [content_details, api_index_map, assessmentStatusData]);
 
   const handleOptionChange = (
     sectionIndex: number,
@@ -424,17 +456,19 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
     try {
       if (!assessmentStatusData || assessmentStatusData.length === 0) {
         const response = await createAssessmentTracking(payload);
-        console.log("API success create:", response);
+        // console.log('API success create:', response);
+        router.reload();
       } else {
         const updatePayload = {
           ...payload,
           submitedBy: 'Manual',
         };
         const response = await updateAssessmentScore(updatePayload);
-        console.log("API success update:", response);
+        // console.log('API success update:', response);
+        router.reload();
       }
     } catch (error) {
-      console.error("API error while creating assessment tracking:", error);
+      console.error('API error while creating assessment tracking:', error);
     }
   };
   //network call
