@@ -38,6 +38,7 @@ import surveyForm from '../assets/images/surveyForm.svg';
 import { useDirection } from '../hooks/useDirection';
 import GroupsIcon from '@mui/icons-material/Groups';
 import { YOUTHNET_USER_ROLE } from './youthNet/tempConfigs';
+import EditNoteIcon from '@mui/icons-material/EditNote';
 interface DrawerProps {
   toggleDrawer?: (open: boolean) => () => void;
   open: boolean;
@@ -206,6 +207,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
   const isVillagesAndYouths = router.pathname.includes('/youthboard/villages');
   const isSurveys = router.pathname.includes('/youthboard/surveys');
   const isFaq = router.pathname.includes('/faqs');
+  const isManualAssessment = router.pathname.includes('/manual-assessments');
 
   return (
     <Drawer
@@ -668,8 +670,49 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               >
                 {t('ASSESSMENTS.AI_ASSESSMENT')}
               </Button>
+              <Button
+                // className="fs-14 joyride-step-10"
+                sx={{
+                  width: '100%',
+                  display: 'flex',
+                  justifyContent: 'flex-start',
+                  background: isManualAssessment
+                    ? theme.palette.primary.main
+                    : 'transparent',
+
+                  padding: isManualAssessment
+                    ? '16px 18px !important'
+                    : '0px 18px !important',
+                  color: isManualAssessment
+                    ? '#2E1500'
+                    : theme.palette.warning.A200,
+                  fontWeight: isManualAssessment ? '600' : 500,
+                  '&:hover': {
+                    background: isManualAssessment
+                      ? theme.palette.primary.main
+                      : 'transparent',
+                  },
+                  marginTop: '15px',
+                  gap: '10px',
+                }}
+                startIcon={
+                  // <Image
+                  //   src={aiAssessment}
+                  //   alt="Assessment Icon"
+                  //   width={24}
+                  //   height={24}
+                  // />
+                  <EditNoteIcon/>
+                }
+                onClick={() => {
+                  router.push(`/manual-assessments`);
+                }}
+              >
+                {t('ASSESSMENTS.MANUAL_ASSESSMENT')}
+              </Button>
             </Box>
           )}
+          
         {isActiveYear && !tenantName && (
           <Box sx={{ marginTop: '18px' }} className="joyride-step-11">
             <Button

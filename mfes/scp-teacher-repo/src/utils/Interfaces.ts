@@ -317,6 +317,7 @@ export interface GetDoIdServiceParam {
     subject?: string | string[];
     assessmentType?: string | string[];
     state?: string;
+    evaluationType?: string | string[];
   };
 }
 
