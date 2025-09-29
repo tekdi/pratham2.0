@@ -486,7 +486,7 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
 
   const isAttendanceOverview = pathname === '/attendance-overview';
   const isAssessment =
-    pathname === '/assessments' || pathname === '/ai-assessments';
+    pathname === '/assessments' || pathname === '/ai-assessments' || pathname === '/manual-assessments';
   const dashboard = pathname === '/dashboard';
   const isCoursePlanner = pathname === '/curriculum-planner';
   const isAttendanceHistory = pathname === '/attendance-history';
