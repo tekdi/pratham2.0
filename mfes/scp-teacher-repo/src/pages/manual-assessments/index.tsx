@@ -221,7 +221,7 @@ const AssessmentList = () => {
       // If no board data, ensure loading is false
       setIsLoading(false);
     }
-  }, [centerData, t, cohortsData, classId]);
+  }, [centerData, t]);
 
   // Safety mechanism to reset loading state if it gets stuck
   useEffect(() => {
@@ -473,7 +473,10 @@ const AssessmentList = () => {
             </Box>
           </Grid>
         ) : (
-          <>No Assessment Type Found</>
+          <Grid item xs={12} md={6}>
+            <Box sx={{ mt: 7, px: '20px', width: '100%' }}>
+              <Typography>No Assessment Type Found</Typography></Box>
+          </Grid>
         )}
       </Grid>
 
