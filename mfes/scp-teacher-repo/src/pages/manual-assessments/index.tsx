@@ -141,7 +141,7 @@ const AssessmentList = () => {
         board: [selectedBoard],
         status: ['Live'],
         primaryCategory: ['Practice Question Set'],
-        // evaluationType: ['offline'],
+        evaluationType: ['offline'],
       };
       try {
         if (filters) {
