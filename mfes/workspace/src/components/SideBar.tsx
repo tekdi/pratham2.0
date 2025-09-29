@@ -126,6 +126,31 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
       localStorage.removeItem('contentLibraryFilters');
       localStorage.removeItem('contentLibrarySelectedNames');
     }
+    
+    // Clear filter retention if navigating away from discover-contents
+    if (key !== 'discover-contents') {
+      localStorage.removeItem('discoverContentsFilters');
+      localStorage.removeItem('discoverContentsSelectedNames');
+    }
+    
+    // Clear filter retention if navigating away from allContents
+    if (key !== 'allContents') {
+      localStorage.removeItem('allContentsFilters');
+      localStorage.removeItem('allContentsSelectedNames');
+    }
+    
+    // Clear filter retention if navigating away from draft
+    if (key !== 'draft') {
+      localStorage.removeItem('draftFilters');
+      localStorage.removeItem('draftSelectedNames');
+    }
+    
+    // Clear filter retention if navigating away from up-review
+    if (key !== 'up-review') {
+      localStorage.removeItem('upReviewFilters');
+      localStorage.removeItem('upReviewSelectedNames');
+    }
+    
     router.push(`/workspace/content/${key}`);
     localStorage.setItem('selectedFilters', JSON.stringify([]));
     onSelect(key);
@@ -190,7 +215,7 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
         justifyContent="space-between"
         paddingTop={'1rem'}
       >
-        {userRole === Role.CENTRAL_ADMIN&& (
+        {userRole === Role.CENTRAL_ADMIN || (userRole === Role.CCTA && isSCP) && (
           <Box display="flex" alignItems="center">
             <ListItemIcon>
               <IconButton onClick={goBack}>
