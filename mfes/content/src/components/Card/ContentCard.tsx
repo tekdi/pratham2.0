@@ -25,17 +25,20 @@ const courseDefaultImages = [
   'Assistant_Electrician.png'
 ];
 
+// Function to get random default image
 const getRandomDefaultImage = () => {
   const randomIndex = Math.floor(Math.random() * courseDefaultImages.length);
-  return `/courseDefaultImages/${courseDefaultImages[randomIndex]}`;
+  return `/images/courseDefaultImages/${courseDefaultImages[randomIndex]}`;
 };
 
 // Function to get default image based on conditions
 const getDefaultImage = (default_img?: string) => {
-  const userProgram = localStorage.getItem('userProgram');
-  
-  if (userProgram === 'Open School') {
-    return getRandomDefaultImage();
+  if (typeof window !== 'undefined') {
+    const userProgram = localStorage.getItem('userProgram');
+    
+    if (userProgram === 'Open School') {
+      return getRandomDefaultImage();
+    }
   }
   
   return default_img ?? `${AppConst.BASEPATH}/assests/images/image_ver.png`;
