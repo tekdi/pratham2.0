@@ -1058,7 +1058,7 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
         // }}
         >
           {/* Hiding button for edit learner until edit functionality is developed */}
-          {/* {isActiveYear && (
+          {isActiveYear && (
             <Button
               sx={{
                 fontSize: '14px',
@@ -1092,7 +1092,7 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
                 <CreateOutlinedIcon sx={{ fontSize: '14px' }} />
               </Box>
             </Button>
-          )} */}
+          )}
 
           {openAddLearnerModal && (
             <div>
