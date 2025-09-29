@@ -45,7 +45,8 @@ const Page = () => {
       const baseFilter = {
         "status": ["live"],
         "primaryCategory": ["Learning Resource", "Practice Question Set"],
-        "channel": "pos-channel"
+        "channel": "pos-channel",
+        "program": ["Open School"]
       };
       
       const filter = {
