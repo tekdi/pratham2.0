@@ -168,6 +168,7 @@ const Assessments = () => {
         status: ['Live'],
         assessmentType: getAssessmentType(assessmentType),
         primaryCategory: ['Practice Question Set'],
+        evaluationType: ['online'],
       };
       try {
         // if (stateName) {

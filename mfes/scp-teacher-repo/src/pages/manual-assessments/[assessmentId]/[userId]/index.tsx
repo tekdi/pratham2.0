@@ -1,14 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Header from '../../../../components/Header';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import {
   Box,
+  Grid,
   Typography,
   IconButton,
   TextField,
   CircularProgress,
   Snackbar,
   Alert,
+  Dialog,
+  DialogContent,
+  useMediaQuery,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
@@ -23,6 +27,7 @@ import {
   getOfflineAssessmentStatus,
   updateAssessmentScore,
   hierarchyContent,
+  searchAssessment,
 } from '../../../../services/AssesmentService';
 import {
   UploadOptionsPopup,
@@ -30,6 +35,7 @@ import {
 } from '../../../../components/assessment';
 import { getUserDetails } from '../../../../services/ProfileService';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
+import Button from '@mui/material/Button';
 import {
   getStatusIcon,
   getStatusLabel,
@@ -43,6 +49,10 @@ import AnswerSheet, {
   AssessmentTrackingData,
 } from '../../../../components/assessment/AnswerSheet';
 import MinimizeIcon from '@mui/icons-material/Minimize';
+import { toPascalCase } from '../../../../utils/Helper';
+import UploadFiles from '../../../../components/UploadFiles/UploadFiles';
+import CloseIcon from '@mui/icons-material/Close';
+import QuestionMarksManualUpdate from '../../../../components/assessment/QuestionMarksManualUpdate';
 interface ScoreDetail {
   questionId: string | null;
   pass: string;
@@ -213,6 +223,7 @@ const formatAnswerForDisplay = (
 
 const AssessmentDetails = () => {
   const theme = useTheme();
+  const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
   const { t } = useTranslation();
   const router = useRouter();
   const { assessmentId, userId } = router.query;
@@ -226,6 +237,7 @@ const AssessmentDetails = () => {
   const [editLoading, setEditLoading] = useState(false);
   const [assessmentTrackingData, setAssessmentTrackingData] =
     useState<AssessmentTrackingData | null>();
+  const [assessmentStatusData, setAssessmentStatusData] = useState<any>([]);
 
   // Hierarchy data for question numbering
   const [hierarchyData, setHierarchyData] = useState<any>(null);
@@ -239,6 +251,7 @@ const AssessmentDetails = () => {
   // Upload Options Popup state
   const [uploadPopupOpen, setUploadPopupOpen] = useState(false);
   const [isReUploadMode, setIsReUploadMode] = useState(false);
+  const [uploadViewerOpen, setUploadViewerOpen] = useState(false);
   const [userDetails, setUserDetails] = useState<any>({
     name: '',
     lastName: '',
@@ -257,27 +270,24 @@ const AssessmentDetails = () => {
 
   // Sample uploaded images data
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
-
+  const previousUploadedImagesRef = useRef<UploadedImage[] | null>(null);
   // Upload Options Popup handlers
   const handleUploadInfoClick = () => {
-    if (
-      assessmentData?.status === 'AI Pending' ||
-      assessmentData?.status === 'Approved'
-    ) {
-      // setSnackbar({
-      //   open: true,
-      //   message: 'Please wait for the AI to process the assessment.',
-      //   severity: 'error',
-      // });
-      router.push(`/ai-assessments/${assessmentId}/${userId}/upload-files`);
-    } else if (assessmentData?.status === 'AI Processed') {
-      router.push(`/ai-assessments/${assessmentId}/${userId}/upload-files`);
-    } else {
-      setUploadPopupOpen(true);
+    const hasImages =
+      (assessmentData?.fileUrls?.length || 0) > 0 || uploadedImages.length > 0;
+    if (hasImages) {
+      setUploadViewerOpen(true);
+      return;
     }
+    setUploadPopupOpen(true);
   };
 
   const handleCloseUploadPopup = () => {
+    // If re-upload was cancelled without submission, restore previous images
+    if (isReUploadMode && previousUploadedImagesRef.current) {
+      setUploadedImages(previousUploadedImagesRef.current);
+      previousUploadedImagesRef.current = null;
+    }
     setUploadPopupOpen(false);
     setIsReUploadMode(false);
   };
@@ -285,6 +295,7 @@ const AssessmentDetails = () => {
   // New handler for re-upload that clears existing images
   const handleReUpload = () => {
     // Clear the uploadedImages state to provide a fresh start
+    previousUploadedImagesRef.current = uploadedImages;
     setUploadedImages([]);
     setIsReUploadMode(true);
     setUploadPopupOpen(true);
@@ -577,6 +588,27 @@ const AssessmentDetails = () => {
   };
 
   useEffect(() => {
+    const fetchUserAssessmentStatus = async () => {
+      try {
+        if (typeof userId !== 'string' || typeof assessmentId !== 'string') {
+          return;
+        }
+        const statusResponse = await searchAssessment({
+          userId: userId,
+          courseId: assessmentId,
+          unitId: assessmentId,
+          contentId: assessmentId,
+        });
+        setAssessmentStatusData(statusResponse[0]?.score_details || []);
+        // console.log('statusResponse[0]?.assessments || []', statusResponse[0]?.score_details || []);
+      } catch (error) {
+        console.error('Failed to fetch assessment status:', error);
+      }
+    };
+    fetchUserAssessmentStatus();
+  }, [userId, assessmentId]);
+
+  useEffect(() => {
     const fetchAssessmentData = async () => {
       if (assessmentId && userId) {
         try {
@@ -632,28 +664,6 @@ const AssessmentDetails = () => {
 
   const handleBack = () => {
     router.back();
-  };
-
-  const handleScoreClick = (question: ScoreDetail) => {
-    setSelectedQuestion(question);
-    // Check if there's a saved score and suggestion in localStorage
-    const savedData = localStorage.getItem(
-      `tracking_${userId}_${question.questionId}`
-    );
-    if (savedData) {
-      const parsedData = JSON.parse(savedData);
-      setEditScore(parsedData.score.toString());
-      setEditSuggestion(
-        parsedData.suggestion ||
-        (question.resValue ? JSON.parse(question.resValue).AI_suggestion : '')
-      );
-    } else {
-      setEditScore(question.score.toString());
-      setEditSuggestion(
-        question.resValue ? JSON.parse(question.resValue).AI_suggestion : ''
-      );
-    }
-    setIsEditModalOpen(true);
   };
 
   const handleCloseSnackbar = () => {
@@ -963,6 +973,7 @@ const AssessmentDetails = () => {
       }
       // Reset re-upload mode
       setIsReUploadMode(false);
+      previousUploadedImagesRef.current = null;
     }
     await fetchOfflineAssessmentData(true);
   };
@@ -982,7 +993,14 @@ const AssessmentDetails = () => {
   }
 
   return (
-    <div>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100vh',
+        overflow: 'hidden',
+      }}
+    >
       <Header />
 
       <Box
@@ -1030,7 +1048,8 @@ const AssessmentDetails = () => {
               fontWeight: 400,
             }}
           >
-            {userDetails.name} {userDetails.lastName}
+            {toPascalCase(userDetails?.name)}{' '}
+            {toPascalCase(userDetails?.lastName)}
           </Typography>
           <Typography
             sx={{
@@ -1041,12 +1060,22 @@ const AssessmentDetails = () => {
               letterSpacing: '0.71%',
             }}
           >
-            {assessmentName}
+            {toPascalCase(assessmentName)}
           </Typography>
         </Box>
       </Box>
 
-      <Box sx={{ mx: '16px', my: '16px' }}>
+      <Box
+        sx={{
+          mx: '16px',
+          my: '16px',
+          display: 'flex',
+          flexDirection: 'column',
+          flex: 1,
+          minHeight: 0,
+          overflow: 'hidden',
+        }}
+      >
         {/* Assessment Status */}
         <Box
           sx={{
@@ -1085,205 +1114,195 @@ const AssessmentDetails = () => {
           )}
         </Box>
 
-        {/* Images Info */}
-        <Box
-          onClick={handleUploadInfoClick}
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            border: '1px solid #DBDBDB',
-            borderRadius: '12px',
-            p: { xs: 2, md: 2 },
-            mb: { xs: 2, md: 2 },
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            '&:hover': {
-              borderColor: theme.palette.primary.main,
-              backgroundColor: '#f5f5f5',
-              transform: 'translateY(-1px)',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            },
-          }}
+        {/* Two-column layout: Left - existing content, Right - question paper placeholder */}
+        <Grid
+          container
+          spacing={2}
+          sx={{ flex: 1, minHeight: 0, overflow: 'hidden' }}
         >
-          <Box>
-            <Typography
-              sx={{
-                color: '#635E57',
-                fontSize: { xs: '14px', md: '16px' },
-                fontWeight: 400,
-                letterSpacing: '0.1px',
-              }}
-            >
-              {assessmentData?.fileUrls &&
-                assessmentData.fileUrls.length > 0 ? (
-                <>
-                  {`${assessmentData.fileUrls.length} images uploaded `}
-                  <span
-                    style={{
-                      color: '#1976d2',
-                      textDecoration: 'underline',
-                      cursor: 'pointer',
-                      fontWeight: 500,
-                      marginLeft: '8px',
+          <Grid item xs={12} md={6}>
+            {/* Left column */}
+            <>
+              {/* Images Info */}
+              <Box
+                onClick={!isDesktop ? handleUploadInfoClick : undefined}
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  border: '1px solid #DBDBDB',
+                  borderRadius: '12px',
+                  p: { xs: 2, md: 2 },
+                  mb: { xs: 2, md: 1 },
+                  cursor: isDesktop ? 'default' : 'pointer',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    borderColor: theme.palette.primary.main,
+                    backgroundColor: '#f5f5f5',
+                    transform: 'translateY(-1px)',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  },
+                }}
+              >
+                <Box mb={0.1}>
+                  <Box>
+                    <Typography
+                      sx={{
+                        color: '#635E57',
+                        fontSize: { xs: '14px', md: '16px' },
+                        fontWeight: 400,
+                        letterSpacing: '0.1px',
+                      }}
+                    >
+                      {assessmentData?.fileUrls &&
+                        assessmentData.fileUrls.length > 0 ? (
+                        <>
+                          {`${assessmentData.fileUrls.length} ${assessmentData.fileUrls.length === 1
+                            ? 'image'
+                            : 'images'
+                            } uploaded`}
+                          <Button
+                            variant="contained"
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleUploadInfoClick();
+                            }}
+                            sx={{
+                              ml: 1,
+                              textTransform: 'none',
+                              borderRadius: '8px',
+                              fontWeight: 600,
+                              fontSize: '14px',
+                              height: '32px',
+                              padding: '2px 8px',
+                              display: { xs: 'inline-flex', md: 'none' },
+                              backgroundColor: '#FFC107',
+                              color: '#1F1B13',
+                              '&:hover': { backgroundColor: '#FFB300' },
+                            }}
+                          >
+                            View
+                          </Button>
+                          {[
+                            'AI Processed',
+                            'Awaiting Your Approval',
+                            'AI Pending',
+                          ].includes(assessmentData?.status || '') && (
+                              <>
+                                <Button
+                                  variant="contained"
+                                  size="small"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleReUpload();
+                                  }}
+                                  sx={{
+                                    ml: 1,
+                                    textTransform: 'none',
+                                    borderRadius: '8px',
+                                    fontWeight: 600,
+                                    fontSize: '14px',
+                                    height: '32px',
+                                    padding: '2px 8px',
+                                    backgroundColor: '#FFC107',
+                                    color: '#1F1B13',
+                                    '&:hover': { backgroundColor: '#FFB300' },
+                                  }}
+                                >
+                                  Re-upload
+                                </Button>
+                              </>
+                            )}
+                        </>
+                      ) : (
+                        'No images uploaded'
+                      )}
+                    </Typography>
+                  </Box>
+                  <IconButton
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleReUpload();
                     }}
-                    onClick={handleUploadInfoClick}
+                    sx={{
+                      color: '#1F1B13',
+                      p: 0,
+                      '& .MuiSvgIcon-root': {
+                        fontSize: { xs: 24, md: 28 },
+                      },
+                    }}
                   >
-                    View
-                  </span>
-                  {[
-                    'AI Processed',
-                    'Awaiting Your Approval',
-                    'AI Pending',
-                  ].includes(assessmentData?.status || '') && (
-                      <>
-                        <span style={{ margin: '0 8px', color: '#bdbdbd' }}>
-                          |
-                        </span>
-                        <span
-                          style={{
-                            color: '#1976d2',
-                            textDecoration: 'underline',
-                            cursor: 'pointer',
-                            fontWeight: 500,
-                          }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleReUpload();
-                          }}
-                        >
-                          Re-upload
-                        </span>
-                      </>
-                    )}
-                </>
-              ) : (
-                'No images uploaded'
-              )}
-            </Typography>
-          </Box>
-          <IconButton
-            sx={{
-              color: '#1F1B13',
-              p: 0,
-              '& .MuiSvgIcon-root': {
-                fontSize: { xs: 24, md: 28 },
-              },
-            }}
-          >
-            {!assessmentData?.status ? (
-              <FileUploadIcon />
-            ) : (
-              <ArrowForwardIcon />
-            )}
-          </IconButton>
-        </Box>
-      </Box>
-
-      {!assessmentTrackingData ? (
-        assessmentData?.status === 'AI Pending' ||
-          assessmentData?.status === 'Approved' ? (
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              minHeight: '200px',
-              gap: 2,
-              padding: '20px',
-              textAlign: 'center',
-            }}
-          >
-            <Typography
-              variant="h6"
+                    {!assessmentData?.status ? <FileUploadIcon /> : null}
+                  </IconButton>
+                </Box>
+                {/* Main content */}
+                <Box sx={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
+                  {!assessmentTrackingData ? (
+                    assessmentData?.status === 'AI Pending' ||
+                      assessmentData?.status === 'Approved' ? (
+                      isDesktop ? (
+                        <Box sx={{ height: '100%', overflow: 'auto' }}>
+                          <UploadFiles
+                            images={uploadedImages.map((img) => ({
+                              id: img.id,
+                              url: img.url,
+                              name: img.name,
+                            }))}
+                          />
+                        </Box>
+                      ) : null
+                    ) : (
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          minHeight: '200px',
+                        }}
+                      >
+                        <Typography>
+                          No answer sheet has been submitted yet
+                        </Typography>
+                      </Box>
+                    )
+                  ) : null}
+                </Box>
+              </Box>
+            </>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            {/* Right column - Question Paper placeholder */}
+            <Box
               sx={{
-                color: '#1F1B13',
-                fontSize: { xs: '18px', md: '20px' },
-                fontWeight: 500,
-                marginBottom: '16px',
+                border: '1px solid #DBDBDB',
+                borderRadius: '12px',
+                p: { xs: 2, md: 2 },
+                height: 'fit-content',
+                position: { md: 'sticky' },
+                top: { md: 16 },
+                bgcolor: '#FFFFFF',
               }}
             >
-              Your answer sheets have been successfully uploaded
-            </Typography>
-            <Typography
-              variant="h6"
-              sx={{
-                color: '#1F1B13',
-                fontSize: { xs: '16px', md: '18px' },
-                fontWeight: 400,
-                marginBottom: '8px',
-              }}
-            >
-              What's happening now:
-            </Typography>
-            <Box sx={{ textAlign: 'left', width: '100%', maxWidth: '400px' }}>
-              <Typography
+              {/* <Typography
                 sx={{
-                  color: '#1F1B13',
+                  color: '#635E57',
                   fontSize: { xs: '14px', md: '16px' },
-                  fontWeight: 400,
-                  marginBottom: '8px',
-                  display: 'flex',
-                  '&:before': {
-                    content: '"•"',
-                    marginRight: '8px',
-                  },
+                  fontWeight: 500,
                 }}
               >
-                Answers are being scanned and digitized
-              </Typography>
-
-              <Typography
-                sx={{
-                  color: '#1F1B13',
-                  fontSize: { xs: '14px', md: '16px' },
-                  fontWeight: 400,
-                  marginBottom: '16px',
-                  display: 'flex',
-                  '&:before': {
-                    content: '"•"',
-                    marginRight: '8px',
-                  },
-                }}
-              >
-                Question-wise feedback and an overall score will be available in
-                24 hours
-              </Typography>
+                Question Paper UI coming soon
+              </Typography> */}
+              <QuestionMarksManualUpdate
+                assessmentDoId={assessmentId}
+                userId={userId}
+                assessmentStatusData={assessmentStatusData}
+              />
             </Box>
-            {/* <Typography
-              sx={{
-                color: '#1F1B13',
-                fontSize: { xs: '14px', md: '16px' },
-                fontWeight: 400,
-                marginTop: '8px',
-              }}
-            >
-              You'll be notified once the results are ready.
-            </Typography> */}
-          </Box>
-        ) : (
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              minHeight: '200px',
-            }}
-          >
-            <Typography>No answer sheet has been submitted yet</Typography>
-          </Box>
-        )
-      ) : (
-        <AnswerSheet
-          assessmentTrackingData={assessmentTrackingData}
-          onApprove={handleApproveClick}
-          onScoreEdit={handleScoreClick}
-          isApproved={assessmentData?.status === 'Approved'}
-          questionNumberingMap={questionNumberingMap}
-          sectionMapping={sectionMapping}
-        />
-      )}
+          </Grid>
+        </Grid>
+      </Box>
 
       {/* Edit Modal */}
       <GenericModal
@@ -1371,6 +1390,35 @@ const AssessmentDetails = () => {
         // title="Are you sure you want to approve Marks?"
         message="Be sure to review the answers and make any necessary changes to the marks before approving the final scores."
       />
+      {/* Upload Files Viewer Popup */}
+      <Dialog
+        open={uploadViewerOpen}
+        onClose={() => setUploadViewerOpen(false)}
+        fullWidth
+        maxWidth="lg"
+        PaperProps={{ sx: { height: { xs: '80vh', md: '80vh' } } }}
+      >
+        <DialogContent sx={{ p: 0, height: { xs: '80vh', md: '80vh' } }}>
+          <Box sx={{ position: 'relative', width: '100%', height: '100%' }}>
+            <IconButton
+              aria-label="Close"
+              onClick={() => setUploadViewerOpen(false)}
+              sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}
+            >
+              <CloseIcon />
+            </IconButton>
+            <Box sx={{ width: '100%', height: '100%', pt: 6 }}>
+              <UploadFiles
+                images={uploadedImages.map((img) => ({
+                  id: img.id,
+                  url: img.url,
+                  name: img.name,
+                }))}
+              />
+            </Box>
+          </Box>
+        </DialogContent>
+      </Dialog>
       {/* Upload Options Popup */}
       <UploadOptionsPopup
         isOpen={uploadPopupOpen}
@@ -1403,7 +1451,7 @@ const AssessmentDetails = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
-    </div>
+    </Box>
   );
 };
 
