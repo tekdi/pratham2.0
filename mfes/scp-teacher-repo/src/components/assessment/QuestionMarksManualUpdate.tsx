@@ -31,6 +31,9 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
   const [marksBySection, set_marksBySection] = useState<
     Record<string, number[]>
   >({});
+  const [marksTextBySection, set_marksTextBySection] = useState<
+    Record<string, string[]>
+  >({});
   const [selectedOptions, set_selectedOptions] = useState<
     Record<string, number | null>
   >({});
@@ -312,6 +315,7 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
   useEffect(() => {
     if (!content_details?.sections || !api_index_map?.sections) return;
     const nextMarksBySection: Record<string, number[]> = {};
+    const nextMarksTextBySection: Record<string, string[]> = {};
     const nextSelected: Record<string, number | null> = {};
 
     // Build a quick lookup for scores from assessmentStatusData using sectionId + questionId
@@ -330,7 +334,7 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
     content_details.sections.forEach((section: any, si: number) => {
       const apiSection = api_index_map?.sections?.[si];
       const sectionId = apiSection?.sectionId;
-      nextMarksBySection[String(si)] = (section.questions || []).map(
+      const numericArr: number[] = (section.questions || []).map(
         (_q: any, qi: number) => {
           const questionId = apiSection?.data?.[qi]?.item?.id;
           if (sectionId && questionId) {
@@ -340,6 +344,10 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
           }
           return 0;
         }
+      );
+      nextMarksBySection[String(si)] = numericArr;
+      nextMarksTextBySection[String(si)] = numericArr.map((n) =>
+        Number(n) === 0 ? '0' : String(n)
       );
 
       (section.questions || []).forEach((q: any, qi: number) => {
@@ -351,8 +359,79 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
       });
     });
     set_marksBySection(nextMarksBySection);
+    set_marksTextBySection(nextMarksTextBySection);
     set_selectedOptions(nextSelected);
   }, [content_details, api_index_map, assessmentStatusData]);
+
+  const handleMarksTextChange = (
+    sectionIndex: number,
+    questionIndex: number,
+    textValue: string
+  ) => {
+    const max =
+      content_details?.sections?.[sectionIndex]?.questions?.[questionIndex]
+        ?.maxScore || 0;
+    const onlyDigits = (textValue || '').replace(/[^0-9]/g, '');
+    if (onlyDigits === '') {
+      set_marksTextBySection((prev) => {
+        const arr = [...(prev[String(sectionIndex)] || [])];
+        arr[questionIndex] = '';
+        return { ...prev, [String(sectionIndex)]: arr };
+      });
+      set_marksBySection((prev) => {
+        const arr = [...(prev[String(sectionIndex)] || [])];
+        arr[questionIndex] = 0;
+        return { ...prev, [String(sectionIndex)]: arr };
+      });
+      return;
+    }
+    // Normalize leading zeros: "000" -> "0", "0012" -> "12"
+    let normalized = onlyDigits.replace(/^0+/, '');
+    if (normalized === '') normalized = '0';
+    const parsed = Number(normalized);
+    if (!Number.isFinite(parsed)) return;
+    // Reject values above max: keep previous valid value unchanged
+    if (parsed > max) return;
+    set_marksTextBySection((prev) => {
+      const arr = [...(prev[String(sectionIndex)] || [])];
+      arr[questionIndex] = normalized;
+      return { ...prev, [String(sectionIndex)]: arr };
+    });
+    set_marksBySection((prev) => {
+      const arr = [...(prev[String(sectionIndex)] || [])];
+      arr[questionIndex] = parsed;
+      return { ...prev, [String(sectionIndex)]: arr };
+    });
+  };
+
+  const handleMarksBlur = (sectionIndex: number, questionIndex: number) => {
+    const max =
+      content_details?.sections?.[sectionIndex]?.questions?.[questionIndex]
+        ?.maxScore || 0;
+    const text =
+      marksTextBySection[String(sectionIndex)]?.[questionIndex] ?? '';
+    if (text === '') {
+      // keep UI empty but ensure numeric is 0
+      set_marksBySection((prev) => {
+        const arr = [...(prev[String(sectionIndex)] || [])];
+        arr[questionIndex] = 0;
+        return { ...prev, [String(sectionIndex)]: arr };
+      });
+      return;
+    }
+    const num = Number(text);
+    const safe = Number.isFinite(num) ? Math.max(0, Math.min(num, max)) : 0;
+    set_marksBySection((prev) => {
+      const arr = [...(prev[String(sectionIndex)] || [])];
+      arr[questionIndex] = safe;
+      return { ...prev, [String(sectionIndex)]: arr };
+    });
+    set_marksTextBySection((prev) => {
+      const arr = [...(prev[String(sectionIndex)] || [])];
+      arr[questionIndex] = safe === 0 ? '0' : String(safe);
+      return { ...prev, [String(sectionIndex)]: arr };
+    });
+  };
 
   const handleOptionChange = (
     sectionIndex: number,
@@ -381,6 +460,15 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
     questionIndex: number,
     value: string
   ) => {
+    // Allow empty string during typing
+    if (value === '') {
+      set_marksBySection((prev) => {
+        const arr = [...(prev[String(sectionIndex)] || [])];
+        arr[questionIndex] = 0;
+        return { ...prev, [String(sectionIndex)]: arr };
+      });
+      return;
+    }
     const num = Number(value);
     const max =
       content_details?.sections?.[sectionIndex]?.questions?.[questionIndex]
@@ -687,13 +775,27 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
                     >
                       <label style={{ fontWeight: 500 }}>Marks:</label>
                       <input
-                        type="number"
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
                         min={0}
                         max={q.maxScore}
-                        value={marksBySection[String(si)]?.[qi] ?? 0}
-                        onChange={(e) =>
-                          handleMarksChange(si, qi, e.target.value)
+                        value={
+                          (marksTextBySection[String(si)]?.[qi] ?? '') !== ''
+                            ? marksTextBySection[String(si)]?.[qi]
+                            : ''
                         }
+                        placeholder={String(
+                          marksBySection[String(si)]?.[qi] ?? 0
+                        )}
+                        onChange={(e) => {
+                          const onlyDigits = e.target.value.replace(
+                            /[^0-9]/g,
+                            ''
+                          );
+                          handleMarksTextChange(si, qi, onlyDigits);
+                        }}
+                        onBlur={() => handleMarksBlur(si, qi)}
                         style={{ width: 80 }}
                       />
                       <span>/ {q.maxScore}</span>
