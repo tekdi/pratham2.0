@@ -2,7 +2,7 @@ import axios from 'axios';
 import { AnyARecord } from 'dns';
 import React, { useEffect, useMemo, useState } from 'react';
 import Button from '@mui/material/Button';
-import { createAssessmentTracking, updateAssessmentScore } from '@/services/AssesmentService';
+import { createAssessmentTracking, updateAssessmentScore } from '../../services/AssesmentService';
 import { useTranslation } from 'next-i18next';
 
 export interface QuestionMarksManualUpdateProps {
@@ -701,19 +701,6 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
                 : t('ASSESSMENTS.SUBMIT_MARKS')}
             </Button>
           </div>
-
-          {submitPayload && (
-            <pre
-              style={{
-                marginTop: 12,
-                background: '#f7f7f7',
-                padding: 12,
-                borderRadius: 6,
-              }}
-            >
-              {JSON.stringify(submitPayload, null, 2)}
-            </pre>
-          )}
         </div>
       )}
     </div>
