@@ -18,11 +18,16 @@ import Header from '@learner/components/Header/Header';
 import Image from 'next/image';
 import welcomeGIF from '../../../public/images/welcome.gif';
 import { getUserId } from '@learner/utils/API/LoginService';
-import { getUserDetails, profileComplitionCheck } from '@learner/utils/API/userService';
+import {
+  getUserDetails,
+  profileComplitionCheck,
+} from '@learner/utils/API/userService';
 import { getAcademicYear } from '@learner/utils/API/AcademicYearService';
 import { telemetryFactory } from '@shared-lib-v2/DynamicForm/utils/telemetry';
 import { logEvent } from '@learner/utils/googleAnalytics';
 import SwitchAccountDialog from '@shared-lib-v2/SwitchAccount/SwitchAccount';
+import Loader from '@learner/components/Loader/Loader';
+import { useTranslation } from '@shared-lib';
 
 interface SSOAuthParams {
   accessToken: string;
@@ -63,10 +68,12 @@ const checkmarkAnimation = keyframes`
 const SSOContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { t } = useTranslation();
   const [processing, setProcessing] = useState(true);
   const [success, setSuccess] = useState(false);
   const [hasAuthenticated, setHasAuthenticated] = useState(false); // Prevent duplicate calls
   const authenticationRef = useRef(false); // Additional safeguard with useRef
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     // Prevent duplicate authentication calls using both state and ref
@@ -133,7 +140,8 @@ const SSOContent = () => {
               router.push(landingPage);
             } else {
               router.push('/content');
-            }          }, 1500);
+            }
+          }, 1500);
         } else {
           throw new Error(response?.data?.message || 'Authentication failed');
         }
@@ -183,16 +191,19 @@ const SSOContent = () => {
       console.log('userResponse', userResponse);
       localStorage.setItem('userId', userResponse?.userId);
       localStorage.setItem('tenantId', userResponse?.tenantData[0]?.tenantId);
-localStorage.setItem('firstName', userResponse?.firstName);
+      localStorage.setItem('firstName', userResponse?.firstName);
       setTimeout(async () => {
         const res = await getUserDetails(userResponse?.userId, true);
         console.log('response=========>', res?.result);
-        
+
         // Store custom fields in localStorage
         if (res?.result?.userData?.customFields) {
           res.result.userData.customFields.forEach((field: any) => {
             const { label, selectedValues } = field;
-            localStorage.setItem(FilterKey[label as keyof typeof FilterKey], JSON.stringify(selectedValues));
+            localStorage.setItem(
+              FilterKey[label as keyof typeof FilterKey],
+              JSON.stringify(selectedValues)
+            );
 
             // Map the label to the corresponding FilterKey and store in localStorage
             // switch (label) {
@@ -214,7 +225,8 @@ localStorage.setItem('firstName', userResponse?.firstName);
         }
         const uiConfig = userResponse?.tenantData[0]?.params?.uiConfig;
         console.log('uiConfig', uiConfig);
-        const landingPage = userResponse?.tenantData[0]?.params?.uiConfig?.landingPage;
+        const landingPage =
+          userResponse?.tenantData[0]?.params?.uiConfig?.landingPage;
         localStorage.setItem('landingPage', landingPage);
 
         localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
@@ -233,7 +245,7 @@ localStorage.setItem('firstName', userResponse?.firstName);
     roleName: string
   ) => {
     setSwitchDialogOpen(false);
-
+    setLoading(true);
     // Set the state values
     setTenantId(tenantId);
     setTenantName(tenantName);
@@ -327,6 +339,7 @@ localStorage.setItem('firstName', userResponse?.firstName);
         telemetryFactory.interact(telemetryInteract);
       }
     }
+    setLoading(false);
   };
 
   return (
@@ -478,6 +491,9 @@ localStorage.setItem('firstName', userResponse?.firstName);
         callbackFunction={callBackSwitchDialog}
         authResponse={userResponse?.tenantData}
       />
+      {loading && (
+        <Loader showBackdrop={true} loadingText={t('COMMON.LOADING')} />
+      )}
     </Box>
   );
 };

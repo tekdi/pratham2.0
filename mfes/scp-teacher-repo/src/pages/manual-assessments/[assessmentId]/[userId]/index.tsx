@@ -1145,7 +1145,18 @@ const AssessmentDetails = () => {
                   },
                 }}
               >
-                <Box mb={0.1}>
+                <Box
+                  mb={0.1}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleReUpload();
+                  }}
+                >
                   <Box>
                     <Typography
                       sx={{
@@ -1195,8 +1206,8 @@ const AssessmentDetails = () => {
                                   variant="contained"
                                   size="small"
                                   onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleReUpload();
+                                    // e.stopPropagation();
+                                    // handleReUpload();
                                   }}
                                   sx={{
                                     ml: 1,
@@ -1209,6 +1220,7 @@ const AssessmentDetails = () => {
                                     backgroundColor: '#FFC107',
                                     color: '#1F1B13',
                                     '&:hover': { backgroundColor: '#FFB300' },
+                                    mb: 1
                                   }}
                                 >
                                   Re-upload
@@ -1234,7 +1246,8 @@ const AssessmentDetails = () => {
                       },
                     }}
                   >
-                    {!assessmentData?.status ? <FileUploadIcon /> : null}
+                    <FileUploadIcon />
+                    {/* {!assessmentData?.status ? <FileUploadIcon /> : null} */}
                   </IconButton>
                 </Box>
                 {/* Main content */}
@@ -1259,7 +1272,7 @@ const AssessmentDetails = () => {
                           display: 'flex',
                           justifyContent: 'center',
                           alignItems: 'center',
-                          minHeight: '200px',
+                          minHeight: 0,
                         }}
                       >
                         <Typography>
