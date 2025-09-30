@@ -10,6 +10,8 @@ import { getAcademicYear } from '../services/AcademicYearService';
 import router from 'next/router';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { RoleNames } from '../utils/app.constant';
+import { useTranslation } from 'next-i18next';
+import Loader from '@shared-lib-v2/DynamicForm/components/Loader';
 
 import SwitchAccountDialog from '@shared-lib-v2/SwitchAccount/SwitchAccount';
 
@@ -18,6 +20,7 @@ const Login = dynamic(() => import('@login'), {
 });
 
 const LoginComponent = () => {
+  const { t } = useTranslation();
   const setUserId = manageUserStore((state) => state.setUserId);
   const setUserRole = useStore(
     (state: { setUserRole: any }) => state.setUserRole
@@ -90,6 +93,7 @@ const LoginComponent = () => {
   const [tenantName, setTenantName] = useState<string>('');
   const [roleId, setRoleId] = useState<string>('');
   const [roleName, setRoleName] = useState<string>('');
+  const [loading, setLoading] = useState(false);
 
   const handleLoginSuccess = async (receivedToken: any) => {
     const userId = receivedToken?.userId;
@@ -108,6 +112,7 @@ const LoginComponent = () => {
     roleName: string
   ) => {
     setSwitchDialogOpen(false);
+    setLoading(true);
 
     // Set the state values
     setTenantId(tenantId);
@@ -243,6 +248,7 @@ const LoginComponent = () => {
         else router.push('/unauthorized');
       }
     }
+    setLoading(false);
   };
 
   return (
@@ -254,6 +260,9 @@ const LoginComponent = () => {
         callbackFunction={callBackSwitchDialog}
         authResponse={receivedToken?.tenantData}
       />
+      {loading && (
+        <Loader showBackdrop={true} loadingText={t('COMMON.LOADING')} />
+      )}
     </>
   );
 };

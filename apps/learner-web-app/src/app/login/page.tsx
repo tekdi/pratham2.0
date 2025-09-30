@@ -12,6 +12,7 @@ import { useMediaQuery, useTheme } from '@mui/material';
 import { useTranslation } from '@shared-lib';
 import { getAcademicYear } from '@learner/utils/API/AcademicYearService';
 import { preserveLocalStorage } from '@learner/utils/helper';
+import Loader from '@learner/components/Loader/Loader';
 import { getDeviceId } from '@shared-lib-v2/DynamicForm/utils/Helper';
 import { profileComplitionCheck } from '@learner/utils/API/userService';
 import { telemetryFactory } from '@shared-lib-v2/DynamicForm/utils/telemetry';
@@ -159,6 +160,7 @@ const WelcomeMessage = () => {
 };
 
 const LoginPage = () => {
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -282,6 +284,7 @@ const LoginPage = () => {
     roleName: string
   ) => {
     setSwitchDialogOpen(false);
+    setLoading(true);
 
     // Set the state values
     setTenantId(tenantId);
@@ -311,7 +314,6 @@ const LoginPage = () => {
         console.log('uiConfig', uiConfig);
         const landingPage = tenantData?.params?.uiConfig?.landingPage;
         localStorage.setItem('landingPage', landingPage);
-
 
         localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
 
@@ -377,6 +379,7 @@ const LoginPage = () => {
         telemetryFactory.interact(telemetryInteract);
       }
     }
+    setLoading(false);
   };
 
   return (
@@ -466,6 +469,9 @@ const LoginPage = () => {
         callbackFunction={callBackSwitchDialog}
         authResponse={userResponse?.tenantData}
       />
+      {loading && (
+        <Loader showBackdrop={true} loadingText={t('COMMON.LOADING')} />
+      )}
     </Suspense>
   );
 };
