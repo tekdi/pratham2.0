@@ -475,7 +475,8 @@ const AssessmentList = () => {
         ) : (
           <Grid item xs={12} md={6}>
             <Box sx={{ mt: 7, px: '20px', width: '100%' }}>
-              <Typography>No Assessment Type Found</Typography></Box>
+              <Typography>{t('ASSESSMENTS.NO_ASSESSMENT_TYPE_FOUND')}</Typography>
+            </Box>
           </Grid>
         )}
       </Grid>
@@ -541,9 +542,13 @@ const AssessmentList = () => {
                 minWidth: '200px',
               }}
             >
-              {`${filteredAssessments.length} ${t(
-                'ASSESSMENTS.ASSESSMENTS_FOUND'
-              )}`}
+              {filteredAssessments.length === 1
+                ? t('ASSESSMENTS.ASSESSMENTS_FOUND', {
+                  count: filteredAssessments.length,
+                })
+                : t('ASSESSMENTS.ASSESSMENTS_FOUND_PLURAL', {
+                  count: filteredAssessments.length,
+                })}
             </Typography>
             {/* <Button
               onClick={handleOpenModal}
