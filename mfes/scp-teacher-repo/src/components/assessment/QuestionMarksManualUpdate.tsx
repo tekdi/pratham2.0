@@ -2,6 +2,7 @@ import axios from 'axios';
 import { AnyARecord } from 'dns';
 import React, { useEffect, useMemo, useState } from 'react';
 import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
 import {
   createAssessmentTracking,
   updateAssessmentScore,
@@ -38,6 +39,7 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
     Record<string, number | null>
   >({});
   const [submitPayload, set_submitPayload] = useState<any>(null);
+  const [isSubmitting, set_isSubmitting] = useState<boolean>(false);
 
   //temp variable
   const [list_temp_load, set_list_temp_load] = useState<any[]>([]);
@@ -542,9 +544,14 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
     set_submitPayload(payload);
     console.log('FORM_SUBMIT_RESULT', payload);
     try {
+      set_isSubmitting(true);
       if (!assessmentStatusData || assessmentStatusData.length === 0) {
         const response = await createAssessmentTracking(payload);
-        // console.log('API success create:', response);
+        const updatePayload = {
+          ...payload,
+          submitedBy: 'Manual',
+        };
+        await updateAssessmentScore(updatePayload);
         router.reload();
       } else {
         const updatePayload = {
@@ -557,6 +564,7 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
       }
     } catch (error) {
       console.error('API error while creating assessment tracking:', error);
+      set_isSubmitting(false);
     }
   };
   //network call
@@ -831,10 +839,26 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
                 color: '#1F1B13',
                 '&:hover': { backgroundColor: '#FFB300' },
               }}
+              disabled={isSubmitting}
             >
-              {assessmentStatusData && assessmentStatusData.length > 0
-                ? t('ASSESSMENTS.UPDATE_MARKS')
-                : t('ASSESSMENTS.SUBMIT_MARKS')}
+              {isSubmitting ? (
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8,
+                  }}
+                >
+                  <CircularProgress size={18} color="inherit" />
+                  {assessmentStatusData && assessmentStatusData.length > 0
+                    ? t('ASSESSMENTS.UPDATING')
+                    : t('ASSESSMENTS.SUBMITTING')}
+                </span>
+              ) : assessmentStatusData && assessmentStatusData.length > 0 ? (
+                t('ASSESSMENTS.UPDATE_MARKS')
+              ) : (
+                t('ASSESSMENTS.SUBMIT_MARKS')
+              )}
             </Button>
           </div>
         </div>
