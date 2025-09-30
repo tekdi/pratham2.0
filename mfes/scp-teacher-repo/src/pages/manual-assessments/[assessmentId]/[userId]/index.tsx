@@ -1152,6 +1152,10 @@ const AssessmentDetails = () => {
                     alignItems: 'center',
                     justifyContent: 'space-between',
                   }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleReUpload();
+                  }}
                 >
                   <Box>
                     <Typography
@@ -1166,8 +1170,8 @@ const AssessmentDetails = () => {
                         assessmentData.fileUrls.length > 0 ? (
                         <>
                           {`${assessmentData.fileUrls.length} ${assessmentData.fileUrls.length === 1
-                              ? 'image'
-                              : 'images'
+                            ? 'image'
+                            : 'images'
                             } uploaded`}
                           <Button
                             variant="contained"
@@ -1202,8 +1206,8 @@ const AssessmentDetails = () => {
                                   variant="contained"
                                   size="small"
                                   onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleReUpload();
+                                    // e.stopPropagation();
+                                    // handleReUpload();
                                   }}
                                   sx={{
                                     ml: 1,
@@ -1216,6 +1220,7 @@ const AssessmentDetails = () => {
                                     backgroundColor: '#FFC107',
                                     color: '#1F1B13',
                                     '&:hover': { backgroundColor: '#FFB300' },
+                                    mb: 1
                                   }}
                                 >
                                   Re-upload
@@ -1241,7 +1246,8 @@ const AssessmentDetails = () => {
                       },
                     }}
                   >
-                    {!assessmentData?.status ? <FileUploadIcon /> : null}
+                    <FileUploadIcon />
+                    {/* {!assessmentData?.status ? <FileUploadIcon /> : null} */}
                   </IconButton>
                 </Box>
                 {/* Main content */}

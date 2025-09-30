@@ -508,6 +508,7 @@ const RegisterUser = () => {
     selectedRoleName: string
   ) => {
     setSwitchDialogOpen(false);
+    setLoading(true)
     try {
       if (userResponse) {
         const token = localStorage.getItem('token') || '';
@@ -559,14 +560,15 @@ const RegisterUser = () => {
           // }
           const landingPage = localStorage.getItem('landingPage') || '';
 
-        if (landingPage) {
-          router.push(landingPage);
-        } else {
-          router.push('/content');
-        }
+          if (landingPage) {
+            router.push(landingPage);
+          } else {
+            router.push('/content');
+          }
         }
       }
     } catch (e) { }
+    setLoading(false)
   };
   //   const handleLogin = async () => {
   //     if (formData.email) {

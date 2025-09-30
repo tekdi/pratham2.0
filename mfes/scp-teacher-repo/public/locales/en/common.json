@@ -708,7 +708,7 @@
     "NO_DATA_FOUND": "No data found",
     "SEARCH_STUDENT": "Search student",
     "NO_ASSESSMENTS_FOUND": "No assessments found",
-    "ASSESSMENTS_FOUND": "assessments found",
+    "ASSESSMENTS_FOUND": "{{count}} assessment found",
     "ASSESSMENT_STATUS": "Assessment Status",
     "NOT_STARTED": "Not Started",
     "IN_PROGRESS": "In Progress",
@@ -748,7 +748,9 @@
     "MANUAL_ASSESSMENT_LIST": "Manual Assessment List",
     "UNDER_EVALUATION": "Under Evaluation",
     "UPDATE_MARKS": "Update Marks",
-    "SUBMIT_MARKS": "Submit Marks"
+    "SUBMIT_MARKS": "Submit Marks",
+    "ASSESSMENTS_FOUND_PLURAL": "{{count}} assessments found",
+    "NO_ASSESSMENT_TYPE_FOUND":"No Assessment Type Found"
   },
   "BOARD_ENROLMENT": {
     "BOARD_ENROLLMENT": "Board Enrollment",
