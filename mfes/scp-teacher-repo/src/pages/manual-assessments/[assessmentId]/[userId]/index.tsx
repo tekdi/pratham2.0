@@ -1145,7 +1145,14 @@ const AssessmentDetails = () => {
                   },
                 }}
               >
-                <Box mb={0.1}>
+                <Box
+                  mb={0.1}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
                   <Box>
                     <Typography
                       sx={{
@@ -1156,12 +1163,13 @@ const AssessmentDetails = () => {
                       }}
                     >
                       {assessmentData?.fileUrls &&
-                        assessmentData.fileUrls.length > 0 ? (
+                      assessmentData.fileUrls.length > 0 ? (
                         <>
-                          {`${assessmentData.fileUrls.length} ${assessmentData.fileUrls.length === 1
-                            ? 'image'
-                            : 'images'
-                            } uploaded`}
+                          {`${assessmentData.fileUrls.length} ${
+                            assessmentData.fileUrls.length === 1
+                              ? 'image'
+                              : 'images'
+                          } uploaded`}
                           <Button
                             variant="contained"
                             size="small"
@@ -1190,31 +1198,31 @@ const AssessmentDetails = () => {
                             'Awaiting Your Approval',
                             'AI Pending',
                           ].includes(assessmentData?.status || '') && (
-                              <>
-                                <Button
-                                  variant="contained"
-                                  size="small"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleReUpload();
-                                  }}
-                                  sx={{
-                                    ml: 1,
-                                    textTransform: 'none',
-                                    borderRadius: '8px',
-                                    fontWeight: 600,
-                                    fontSize: '14px',
-                                    height: '32px',
-                                    padding: '2px 8px',
-                                    backgroundColor: '#FFC107',
-                                    color: '#1F1B13',
-                                    '&:hover': { backgroundColor: '#FFB300' },
-                                  }}
-                                >
-                                  Re-upload
-                                </Button>
-                              </>
-                            )}
+                            <>
+                              <Button
+                                variant="contained"
+                                size="small"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleReUpload();
+                                }}
+                                sx={{
+                                  ml: 1,
+                                  textTransform: 'none',
+                                  borderRadius: '8px',
+                                  fontWeight: 600,
+                                  fontSize: '14px',
+                                  height: '32px',
+                                  padding: '2px 8px',
+                                  backgroundColor: '#FFC107',
+                                  color: '#1F1B13',
+                                  '&:hover': { backgroundColor: '#FFB300' },
+                                }}
+                              >
+                                Re-upload
+                              </Button>
+                            </>
+                          )}
                         </>
                       ) : (
                         'No images uploaded'
@@ -1241,7 +1249,7 @@ const AssessmentDetails = () => {
                 <Box sx={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
                   {!assessmentTrackingData ? (
                     assessmentData?.status === 'AI Pending' ||
-                      assessmentData?.status === 'Approved' ? (
+                    assessmentData?.status === 'Approved' ? (
                       isDesktop ? (
                         <Box sx={{ height: '100%', overflow: 'auto' }}>
                           <UploadFiles
