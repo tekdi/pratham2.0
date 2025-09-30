@@ -215,7 +215,7 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
         justifyContent="space-between"
         paddingTop={'1rem'}
       >
-        {userRole === Role.CENTRAL_ADMIN&& (
+        {userRole === Role.CENTRAL_ADMIN || (userRole === Role.CCTA && isSCP) && (
           <Box display="flex" alignItems="center">
             <ListItemIcon>
               <IconButton onClick={goBack}>
