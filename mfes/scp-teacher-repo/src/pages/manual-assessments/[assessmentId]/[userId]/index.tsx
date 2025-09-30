@@ -1145,7 +1145,14 @@ const AssessmentDetails = () => {
                   },
                 }}
               >
-                <Box mb={0.1}>
+                <Box
+                  mb={0.1}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
                   <Box>
                     <Typography
                       sx={{
@@ -1159,8 +1166,8 @@ const AssessmentDetails = () => {
                         assessmentData.fileUrls.length > 0 ? (
                         <>
                           {`${assessmentData.fileUrls.length} ${assessmentData.fileUrls.length === 1
-                            ? 'image'
-                            : 'images'
+                              ? 'image'
+                              : 'images'
                             } uploaded`}
                           <Button
                             variant="contained"
@@ -1259,7 +1266,7 @@ const AssessmentDetails = () => {
                           display: 'flex',
                           justifyContent: 'center',
                           alignItems: 'center',
-                          minHeight: '200px',
+                          minHeight: 0,
                         }}
                       >
                         <Typography>
