@@ -25,19 +25,31 @@ const courseDefaultImages = [
   'Assistant_Electrician.png'
 ];
 
-// Function to get random default image
-const getRandomDefaultImage = () => {
-  const randomIndex = Math.floor(Math.random() * courseDefaultImages.length);
-  return `/images/courseDefaultImages/${courseDefaultImages[randomIndex]}`;
+// Simple hash function to convert string to number
+const hashString = (str: string): number => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash);
+};
+
+// Function to get consistent random default image based on identifier
+const getRandomDefaultImage = (identifier: string) => {
+  const hash = hashString(identifier);
+  const index = hash % courseDefaultImages.length;
+  return `/images/courseDefaultImages/${courseDefaultImages[index]}`;
 };
 
 // Function to get default image based on conditions
-const getDefaultImage = (default_img?: string) => {
+const getDefaultImage = (default_img?: string, identifier?: string) => {
   if (typeof window !== 'undefined') {
     const userProgram = localStorage.getItem('userProgram');
     
-    if (userProgram === 'Open School') {
-      return getRandomDefaultImage();
+    if (userProgram === 'Open School' && identifier) {
+      return getRandomDefaultImage(identifier);
     }
   }
   
@@ -93,7 +105,7 @@ const ContentCard = ({
     ? item.posterImage
     : item?.appIcon
       ? item.appIcon
-      : getDefaultImage(default_img)
+      : getDefaultImage(default_img, item?.identifier || item?.name)
 }
         content={item?.description ? item?.description : <Description />}
         actions={
