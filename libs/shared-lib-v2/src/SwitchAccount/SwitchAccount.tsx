@@ -557,7 +557,7 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
         ) : (
           <Typography variant="body2" color="error" sx={{ fontWeight: 600 }}>
             {t('COMMON.UNAUTHORIZED', {
-              defaultValue: 'You are not authorise to access this site',
+              defaultValue: 'You are not authorized to access this site',
             })}
           </Typography>
         )}
