@@ -319,6 +319,7 @@ const LearnerManage = ({
               isReassign || isEditProfile ? userId : editableUserId
             }
             UpdateSuccessCallback={() => {
+              onLearnerAdded();
               setOpenModal(false);
             }}
             extraFields={extraFields}
