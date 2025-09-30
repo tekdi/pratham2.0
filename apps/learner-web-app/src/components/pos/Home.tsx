@@ -219,7 +219,7 @@ const rangeLength = contentLanguageField?.range?.length || 0;
       <Grid container spacing={4}>
         <Grid item xs={12} md={6}>
           <Image
-            src="/images/home-page-banner.png"
+            src="/images/Tab with childrens 7.png"
             alt="Happy children learning together"
             layout="responsive"
             width={1000}
