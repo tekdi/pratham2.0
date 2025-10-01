@@ -134,6 +134,7 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
     cohortMembershipId: any;
     customFields: any;
   } | null>(null);
+  console.log('userDetails', userDetails);
   const [center, setCenter] = useState<any>(null);
   const [batchName, setBatchName] = useState<string>('');
   const [batchNames, setBatchNames] = useState<string[]>([]);
@@ -169,6 +170,10 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
 
   const handleCloseAddLearnerModal = () => {
     setOpenAddLearnerModal(false);
+    // Force a small delay to ensure state is reset
+    setTimeout(() => {
+      setReload((prev) => !prev);
+    }, 100);
   };
 
   const mapFields = (formFields: any, response: any) => {
@@ -497,64 +502,111 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
     'CENTER',
     'BATCH',
   ];
+console.log('uniqueFields', uniqueFields);
+let learnerDetailsByOrder = [...uniqueFields]
+  ?.map((field, idx) => {
+    // Ensure default order if missing
+    if (field.order === undefined) field.order = idx;
+    return field;
+  })
+  .sort((a, b) => {
+    const aIdx = specialFieldsOrder.indexOf((a.label || '').toUpperCase());
+    const bIdx = specialFieldsOrder.indexOf((b.label || '').toUpperCase());
 
-  const learnerDetailsByOrder = [...uniqueFields]
-    ?.map((field, idx) => {
-      // If not already set, assign a default order
-      if (field.order === undefined) field.order = idx;
-      return field;
-    })
-    .sort((a, b) => {
-      const aIdx = specialFieldsOrder.indexOf((a.label || '').toUpperCase());
-      const bIdx = specialFieldsOrder.indexOf((b.label || '').toUpperCase());
-
-      if (aIdx === -1 && bIdx === -1) {
-        // Neither is a special field: sort by order
-        return (a.order ?? 0) - (b.order ?? 0);
-      }
-      if (aIdx === -1) return -1; // a comes before b
-      if (bIdx === -1) return 1;  // b comes before a
-      // Both are special fields: sort by their order in specialFieldsOrder
-      return aIdx - bIdx;
-    })
-    ?.filter((field) => (field.order ?? 0) <= 12 || specialFieldsOrder.includes((field.label || '').toUpperCase()))
-    ?.map((field) => {
-      const getSelectedOption = (field: any) => {
-        return (
-          field?.options?.find(
-            (option: any) =>
-              option?.value ===
-              (typeof field?.value === 'string'
-                ? field.value
-                : field?.value?.[0])
-          ) || '-'
-        );
-      };
-
-      if (
-        field.type === 'drop_down' ||
-        field.type === 'radio' ||
-        field.type === 'dropdown' ||
-        (field.type === 'Radio' && field.options && field.value?.length)
-      ) {
-        const selectedOption = getSelectedOption(field);
-        return {
-          ...field,
-          displayValue:
-            selectedOption !== '-'
-              ? selectedOption.label
-              : field?.value
-              ? translateString(t, field?.value)
-              : '-',
-        };
-      }
+    if (aIdx === -1 && bIdx === -1) {
+      // Neither in specialFieldsOrder → sort by numeric order
+      return (a.order ?? 0) - (b.order ?? 0);
+    }
+    if (aIdx === -1) return -1;
+    if (bIdx === -1) return 1;
+    return aIdx - bIdx; // both special → follow specialFieldsOrder
+  })
+  .filter((field) => {
+    // ✅ Keep all fields if they have either value or selectedValues
+    const hasValue =
+      field.value !== undefined ||
+      (Array.isArray(field.selectedValues) && field.selectedValues.length > 0);
+    return hasValue;
+  })
+  ?.map((field) => {
+    // Handle dropdown / radio
+    if (
+      field.type === 'drop_down' ||
+      field.type === 'radio' ||
+      field.type === 'dropdown' ||
+      (field.type === 'Radio' && (field.options || field.selectedValues))
+    ) {
+      const selectedOption =
+        field?.options?.find(
+          (option: any) =>
+            option?.value ===
+            (typeof field?.value === 'string'
+              ? field.value
+              : field?.value?.[0])
+        ) ||
+        field?.selectedValues?.[0] ||
+        '-';
 
       return {
         ...field,
-        displayValue: field?.value ? toPascalCase(field?.value) : '-',
+        displayValue:
+          selectedOption !== '-'
+            ? selectedOption.label || selectedOption.value || selectedOption
+            : field?.value
+            ? translateString(t, field?.value)
+            : '-',
       };
-    });
+    }
 
+    // Handle text fields (FATHER_NAME, MOTHER_NAME, etc.)
+    if (field.type === 'text') {
+      const val =
+        field?.value ||
+        (Array.isArray(field?.selectedValues)
+          ? field?.selectedValues?.[0]
+          : undefined) ||
+        '-';
+      return {
+        ...field,
+        displayValue: val ? toPascalCase(val) : '-',
+      };
+    }
+
+    // Default fallback for other field types
+    return {
+      ...field,
+      displayValue: field?.value || '-',
+    };
+  });
+
+/**
+ * 🔑 Apply family member rule
+ */
+const familyField = learnerDetailsByOrder.find(
+  (f) => f.label?.toUpperCase() === 'FAMILY_MEMBER_DETAILS'
+);
+
+if (familyField?.displayValue) {
+  const role = familyField.displayValue.toLowerCase();
+  const removeSet = new Set<string>();
+
+  if (role === 'father') {
+    removeSet.add('SPOUSE_NAME').add('MOTHER_NAME');
+  } else if (role === 'spouse') {
+    removeSet.add('FATHER_NAME').add('MOTHER_NAME');
+  } else if (role === 'mother') {
+    removeSet.add('SPOUSE_NAME').add('FATHER_NAME');
+  }
+
+  learnerDetailsByOrder = learnerDetailsByOrder.filter(
+    (f) => !removeSet.has(f.label?.toUpperCase())
+  );
+}
+
+
+
+
+  console.log('learnerDetailsByOrder', learnerDetailsByOrder);
   //------ Test Report API Integration------
 
   // const handleChangeTest = (event: SelectChangeEvent) => {
@@ -779,6 +831,8 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
 
   const handleLearnerDelete = () => {
     setIsLearnerDeleted(true);
+    router.push(`/centers/${cohortId}?tab=2`);
+
   };
 
   useEffect(() => {
@@ -1058,7 +1112,7 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
         // }}
         >
           {/* Hiding button for edit learner until edit functionality is developed */}
-          {/* {isActiveYear && (
+          {isActiveYear && (
             <Button
               sx={{
                 fontSize: '14px',
@@ -1092,7 +1146,7 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
                 <CreateOutlinedIcon sx={{ fontSize: '14px' }} />
               </Box>
             </Button>
-          )} */}
+          )}
 
           {openAddLearnerModal && (
             <div>
@@ -1107,8 +1161,10 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
                 learnerUserName={selectedUserUserName}
               /> */}
               <LearnerManage
+                key={`learner-manage-${reload}`}
                 open={openAddLearnerModal}
                 onClose={handleCloseAddLearnerModal}
+                onLearnerAdded={handleReload}
                 isReassign={false}
                 customFields={userData}
                 userId={userId}
