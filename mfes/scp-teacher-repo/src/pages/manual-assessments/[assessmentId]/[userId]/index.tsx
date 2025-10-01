@@ -28,6 +28,7 @@ import {
   updateAssessmentScore,
   hierarchyContent,
   searchAssessment,
+  getAssessmentStatus,
 } from '../../../../services/AssesmentService';
 import {
   UploadOptionsPopup,
@@ -257,6 +258,7 @@ const AssessmentDetails = () => {
     lastName: '',
   });
   const [assessmentName, setAssessmentName] = useState<any>('');
+  const [userAssessmentStatus, setUserAssessmentStatus] = useState<any>(null);
 
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
@@ -373,6 +375,36 @@ const AssessmentDetails = () => {
               : [],
           };
           setAssessmentData(sanitizedData);
+          if (sanitizedData) {
+            try {
+              const userDataAssessmentStatus = await getAssessmentStatus({
+                userId: [userId as string],
+                courseId: [assessmentId as string],
+                unitId: [assessmentId as string],
+                contentId: [assessmentId as string],
+              });
+              // console.log('userData>>>>>:', userDataAssessmentStatus);
+
+              // clone first element safely
+              let status = userDataAssessmentStatus[0]?.status || "Not Started";
+
+              // apply Image_Uploaded override
+              if (
+                sanitizedData?.fileUrls?.length > 0 &&
+                status !== "Completed"
+              ) {
+                status = "Image_Uploaded";
+              }
+
+              // update state only once
+              setUserAssessmentStatus(status);
+
+            } catch (error) {
+              console.error("Error fetching assessment status:", error);
+              setUserAssessmentStatus("Not Started");
+            }
+          }
+
 
           if (showSuccessMessage) {
             setSnackbar({
@@ -1085,10 +1117,10 @@ const AssessmentDetails = () => {
             pb: 2,
           }}
         >
-          {assessmentData?.status ? (
+          {userAssessmentStatus ? (
             <>
               {getStatusIcon(
-                mapAnswerSheetStatusToInternalStatus(assessmentData.status)
+                mapAnswerSheetStatusToInternalStatus(userAssessmentStatus)
               )}
               <Typography
                 sx={{
@@ -1097,7 +1129,7 @@ const AssessmentDetails = () => {
                   fontWeight: 400,
                 }}
               >
-                {getStatusLabel(assessmentData.status)}
+                {getStatusLabel(userAssessmentStatus)}
               </Typography>
             </>
           ) : (
