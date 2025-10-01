@@ -390,13 +390,13 @@ const AssessmentDetails: React.FC = () => {
 
         const updatedUserData = Array.isArray(userData)
           ? userData.map((u: any) => {
-              const hasImages = Boolean(imageFlagByUserId.get(u?.userId));
-              const isCompleted = u?.status === 'Completed';
-              if (hasImages && !isCompleted) {
-                return { ...u, status: 'Image_Uploaded' };
-              }
-              return u;
-            })
+            const hasImages = Boolean(imageFlagByUserId.get(u?.userId));
+            const isCompleted = u?.status === 'Completed';
+            if (hasImages && !isCompleted) {
+              return { ...u, status: 'Image_Uploaded' };
+            }
+            return u;
+          })
           : userData;
 
         // Directly use cohortResponse data without complex mapping
@@ -531,7 +531,7 @@ const AssessmentDetails: React.FC = () => {
 
       showToastMessage(
         t('ASSESSMENTS.DOWNLOAD_SUCCESS') ||
-          'Question paper downloaded successfully',
+        'Question paper downloaded successfully',
         'success'
       );
       setShowDownloadPopup(false);
@@ -566,11 +566,9 @@ const AssessmentDetails: React.FC = () => {
       case 'completed':
         return t('AI.MARKS_APPROVED');
       case 'awaiting_approval':
-        return t('AI.AWAITING_YOUR_APPROVAL');
+        return t('ASSESSMENTS.IMAGE_UPLOADED');
       case 'not_started':
         return t('AI.NOT_SUBMITTED');
-      case 'in_progress':
-        return t('AI.UNDER_AI_EVALUATION');
       case 'name_asc':
         return t('AI.NAME_A_TO_Z');
       case 'name_desc':
@@ -592,8 +590,6 @@ const AssessmentDetails: React.FC = () => {
           score: score || 125,
           maxScore: maxScore || assessmentData?.maxScore || 130,
         });
-      case 'in_progress':
-        return t('AI.UNDER_AI_EVALUATION');
       case 'awaiting_approval':
         return t('AI.AWAITING_YOUR_APPROVAL');
       case 'not_started':
@@ -632,16 +628,11 @@ const AssessmentDetails: React.FC = () => {
           mapAnswerSheetStatusToInternalStatus(l.answerSheetStatus) ===
           'not_started'
       ).length,
-      in_progress: learnerList.filter(
+      awaiting_approval: learnerList.filter(
         (l) =>
           mapAnswerSheetStatusToInternalStatus(l.answerSheetStatus) ===
           'awaiting_approval'
       ).length,
-      // awaiting_approval: learnerList.filter(
-      //   (l) =>
-      //     mapAnswerSheetStatusToInternalStatus(l.answerSheetStatus) ===
-      //     'awaiting_approval'
-      // ).length,
 
       completed: learnerList.filter(
         (l) =>
@@ -655,13 +646,9 @@ const AssessmentDetails: React.FC = () => {
         label: 'Not Submitted',
       },
       {
-        count: counts.in_progress,
+        count: counts.awaiting_approval,
         label: t('ASSESSMENTS.IMAGE_UPLOADED'),
       },
-      // {
-      //   count: counts.awaiting_approval,
-      //   label: t('AI.AWAITING_YOUR_APPROVAL'),
-      // },
       {
         count: counts.completed,
         label: t('AI.MARKS_APPROVED'),
@@ -965,9 +952,9 @@ const AssessmentDetails: React.FC = () => {
                         mapAnswerSheetStatusToInternalStatus(
                           learner.answerSheetStatus
                         ) === 'awaiting_approval' ||
-                        mapAnswerSheetStatusToInternalStatus(
-                          learner.answerSheetStatus
-                        ) === 'completed'
+                          mapAnswerSheetStatusToInternalStatus(
+                            learner.answerSheetStatus
+                          ) === 'completed'
                           ? '80px'
                           : '64px',
                       transition: 'all 0.2s ease-in-out',
@@ -1297,44 +1284,14 @@ const AssessmentDetails: React.FC = () => {
                       }}
                     >
                       <Typography sx={{ fontSize: '14px', color: '#1F1B13' }}>
-                        {t('AI.AWAITING_YOUR_APPROVAL')}
+                        {t('ASSESSMENTS.IMAGE_UPLOADED')}
                       </Typography>
                       <Typography sx={{ fontSize: '14px', color: '#7C766F' }}>
                         (
                         {getStatusCounts().find(
                           (item) =>
-                            item.label === t('AI.AWAITING_YOUR_APPROVAL')
-                        )?.count || 0}
-                      </Typography>
-                    </Box>
-                  }
-                  sx={{
-                    mx: 0,
-                    width: '100%',
-                    '& .MuiFormControlLabel-label': { width: '100%' },
-                  }}
-                />
-
-                <FormControlLabel
-                  value="in_progress"
-                  control={<Radio size="small" sx={{ color: '#4D4639' }} />}
-                  label={
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        width: '100%',
-                      }}
-                    >
-                      <Typography sx={{ fontSize: '14px', color: '#1F1B13' }}>
-                        {t('AI.UNDER_AI_EVALUATION')}
-                      </Typography>
-                      <Typography sx={{ fontSize: '14px', color: '#7C766F' }}>
-                        (
-                        {getStatusCounts().find(
-                          (item) => item.label === t('AI.UNDER_AI_EVALUATION')
-                        )?.count || 0}
-                        )
+                            item.label === t('ASSESSMENTS.IMAGE_UPLOADED')
+                        )?.count || 0})
                       </Typography>
                     </Box>
                   }
