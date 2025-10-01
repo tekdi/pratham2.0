@@ -279,13 +279,17 @@ export const getOptionsByCategory = (frameworks: any, categoryCode: string) => {
   );
 
   return (
-    category?.terms?.map((term: any) => ({
-      name: term.name,
-      code: term.code,
-      associations: term.associations,
-    })) || []
+    category?.terms
+      ?.filter((term: any) => term.status !== "Retired") // ✅ exclude retired
+      .map((term: any) => ({
+        name: term.name,
+        code: term.code,
+        status: term.status,
+        associations: term.associations,
+      })) || []
   );
 };
+
 
 interface Association {
   identifier: string;
