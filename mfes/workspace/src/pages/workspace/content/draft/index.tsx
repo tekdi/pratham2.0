@@ -13,7 +13,12 @@ import {
   CircularProgress,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { getContent } from '@workspace/services/ContentService';
+import {
+  getContent,
+  getfilterList,
+  getPosFrameworkList,
+  getMediaFilterList,
+} from '@workspace/services/ContentService';
 import SearchBox from '../../../../components/SearchBox';
 import PaginationComponent from '@workspace/components/PaginationComponent';
 import NoDataFound from '@workspace/components/NoDataFound';
@@ -27,6 +32,7 @@ import { timeAgo } from '@workspace/utils/Helper';
 import useSharedStore from '../../../../../../shared-store';
 import useTenantConfig from '@workspace/hooks/useTenantConfig';
 import WorkspaceHeader from '@workspace/components/WorkspaceHeader';
+import DynamicMultiFilter from '../../../../components/DynamicMultiFilter';
 
 const columns = [
   {
@@ -63,6 +69,9 @@ const DraftPage = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedNames, setSelectedNames] = useState<Record<string, string[]>>(
+    {}
+  );
   // const filterOption: string[] = router.query.filterOptions
   //   ? JSON.parse(router.query.filterOptions as string)
   //   : [];
@@ -170,7 +179,10 @@ const DraftPage = () => {
           offset,
           primaryCategory,
           sort_by,
-          tenantConfig?.CHANNEL_ID
+          tenantConfig?.CHANNEL_ID,
+          undefined,
+          undefined,
+          selectedNames
         );
         const contentList = (response?.content || []).concat(
           response?.QuestionSet || []
@@ -192,7 +204,63 @@ const DraftPage = () => {
     contentDeleted,
     fetchContentAPI,
     page,
+    selectedNames,
   ]);
+
+  // Add state for dynamic filter
+  const [readData, setReadData] = useState<any[]>([]);
+  const [posFrameworkData, setPosFrameworkData] = useState<any>(null);
+  const [selectedFilters, setSelectedFilters] = useState<{
+    [key: string]: string[];
+  }>({});
+
+  // Mock fetch for readData and posFrameworkData (replace with real API calls)
+  useEffect(() => {
+    const fetchReadData = async () => {
+      const response = await getfilterList();
+      const posFrameworkData = await getPosFrameworkList();
+      const mediaFilterList = await getMediaFilterList();
+
+      const convertedArray = mediaFilterList?.range.map((item: any) => ({
+        name: item.label,
+        value: item.identifier,
+      }));
+      mediaFilterList.range = convertedArray;
+
+      response.push(mediaFilterList);
+      setReadData(response);
+
+      setPosFrameworkData(posFrameworkData);
+    };
+
+    fetchReadData();
+  }, []);
+
+  // Restore filters only for draft
+  useEffect(() => {
+    if (router.query && router.asPath.includes('draft')) {
+      const savedFilters = localStorage.getItem('draftFilters');
+      const savedSelectedNames = localStorage.getItem(
+        'draftSelectedNames'
+      );
+      if (savedFilters) setSelectedFilters(JSON.parse(savedFilters));
+      if (savedSelectedNames) setSelectedNames(JSON.parse(savedSelectedNames));
+    }
+  }, [router.asPath]);
+
+  // Save filters only for draft
+  useEffect(() => {
+    if (router.asPath.includes('draft')) {
+      localStorage.setItem(
+        'draftFilters',
+        JSON.stringify(selectedFilters)
+      );
+      localStorage.setItem(
+        'draftSelectedNames',
+        JSON.stringify(selectedNames)
+      );
+    }
+  }, [selectedFilters, selectedNames, router.asPath]);
 
   return (
     <>
@@ -227,6 +295,16 @@ const DraftPage = () => {
                 onFilterChange={handleFilterChange}
                 onSortChange={handleSortChange}
               />
+              <Box m={3}>
+                <DynamicMultiFilter
+                  readData={readData}
+                  posFrameworkData={posFrameworkData}
+                  selectedFilters={selectedFilters}
+                  onChange={setSelectedFilters}
+                  onSelectedNamesChange={setSelectedNames}
+                  isProgramFilter={false}
+                />
+              </Box>
             </Box>
             {loading ? (
               <Box display="flex" justifyContent="center" my={5}>
