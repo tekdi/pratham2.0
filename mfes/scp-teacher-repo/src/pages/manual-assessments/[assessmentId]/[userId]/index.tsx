@@ -1192,6 +1192,7 @@ const AssessmentDetails = () => {
                               backgroundColor: '#FFC107',
                               color: '#1F1B13',
                               '&:hover': { backgroundColor: '#FFB300' },
+                              mb: 1
                             }}
                           >
                             View
