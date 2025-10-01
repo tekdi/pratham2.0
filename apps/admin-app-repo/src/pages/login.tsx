@@ -534,6 +534,7 @@ const LoginPage = () => {
     roleName: string
   ) => {
     setSwitchDialogOpen(false);
+    setLoading(true)
 
     // Set the state values
     setTenantId(tenantId);
@@ -573,6 +574,7 @@ const LoginPage = () => {
     }
 
     await fetchUserDetail();
+    setLoading(false)
   };
 
   const fetchTenantInfo = async () => {
@@ -726,7 +728,7 @@ const LoginPage = () => {
                 alignItems={'center'}
                 justifyContent={'center'}
                 zIndex={99}
-                // sx={{ margin: '5px 10px 25px', }}
+              // sx={{ margin: '5px 10px 25px', }}
               >
                 <Box
                   sx={{
@@ -848,9 +850,8 @@ const LoginPage = () => {
                       logEvent({
                         action: 'remember-me-button-clicked',
                         category: 'Login Page',
-                        label: `Remember Me ${
-                          rememberMe ? 'Checked' : 'Unchecked'
-                        }`,
+                        label: `Remember Me ${rememberMe ? 'Checked' : 'Unchecked'
+                          }`,
                       });
                     }}
                     sx={{
