@@ -744,7 +744,7 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
                         dangerouslySetInnerHTML={{ __html: q.questionTitle }}
                       />
                     </div>
-                    {String(section?.sectionTitle || '').toLowerCase() !==
+                    {api_index_map?.sections?.[si]?.data?.[qi]?.item?.type !==
                       'mcq' &&
                       q?.options &&
                       Array.isArray(q.options) &&
