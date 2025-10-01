@@ -63,7 +63,7 @@ interface LearnerData {
   mobile?: string;
   cohortMembershipId?: string;
   customField?: any[];
-  answerSheetStatus: 'AI Pending' | 'AI Processed' | 'Approved';
+  answerSheetStatus: 'Not_Started' | 'Image_Uploaded' | 'Completed';
 }
 
 interface AssessmentData {
@@ -94,14 +94,14 @@ type SortOption =
 
 // Status mapping for labels
 const statusMapping = {
-  'AI Pending': 'Under Evaluation',
-  'AI Processed': 'Awaiting Your Approval',
-  Approved: 'Marks Approved',
+  Not_Started: 'Not Started',
+  Image_Uploaded: 'Image Uploaded',
+  Completed: 'Marks Approved',
 };
 
 // Helper function to get display label from answerSheetStatus
 export const getStatusLabel = (
-  answerSheetStatus: 'AI Pending' | 'AI Processed' | 'Approved'
+  answerSheetStatus: 'Not_Started' | 'Image_Uploaded' | 'Completed'
 ): string => {
   return statusMapping[answerSheetStatus] || 'Not Submitted';
 };
@@ -123,14 +123,14 @@ export const getStatusIcon = (status: string) => {
 
 // Helper function to map answerSheetStatus to internal status for filtering/sorting
 export const mapAnswerSheetStatusToInternalStatus = (
-  answerSheetStatus: 'AI Pending' | 'AI Processed' | 'Approved'
+  answerSheetStatus: 'Not_Started' | 'Image_Uploaded' | 'Completed'
 ): 'completed' | 'in_progress' | 'not_started' | 'awaiting_approval' => {
   switch (answerSheetStatus) {
-    case 'Approved':
+    case 'Completed':
       return 'completed';
-    case 'AI Pending':
-      return 'in_progress';
-    case 'AI Processed':
+    case 'Not_Started':
+      return 'not_started';
+    case 'Image_Uploaded':
       return 'awaiting_approval';
     default:
       return 'not_started';
@@ -231,15 +231,15 @@ const AssessmentDetails: React.FC = () => {
         filtered.sort((a, b) => {
           const orderA =
             statusOrder[
-            mapAnswerSheetStatusToInternalStatus(
-              a.answerSheetStatus
-            ) as keyof typeof statusOrder
+              mapAnswerSheetStatusToInternalStatus(
+                a.answerSheetStatus
+              ) as keyof typeof statusOrder
             ] || 5;
           const orderB =
             statusOrder[
-            mapAnswerSheetStatusToInternalStatus(
-              b.answerSheetStatus
-            ) as keyof typeof statusOrder
+              mapAnswerSheetStatusToInternalStatus(
+                b.answerSheetStatus
+              ) as keyof typeof statusOrder
             ] || 5;
           return orderA - orderB;
         });
@@ -361,31 +361,68 @@ const AssessmentDetails: React.FC = () => {
       const cohortResponse = await getMyCohortMemberList({ filters });
 
       if (cohortResponse?.result?.userDetails) {
-        const userData = await getOfflineAssessmentStatus({
+        const ImageUploadedFlag = await getOfflineAssessmentStatus({
           userIds: cohortResponse.result.userDetails.map(
             (user: any) => user.userId
           ),
           questionSetId: assessmentId as string,
         });
+        console.log('ImageUploadedFlag', ImageUploadedFlag);
+        const userData = await getAssessmentStatus({
+          userId: cohortResponse.result.userDetails.map(
+            (user: any) => user.userId
+          ),
+          courseId: [assessmentId as string],
+          unitId: [assessmentId as string],
+          contentId: [assessmentId as string],
+        });
+
+        console.log('userData>>>>>:', userData);
+
+        // Build an updated userData list where status is set to 'imageUploaded'
+        // for users having non-empty fileUrls in ImageUploadedFlag
+        const imageFlagByUserId: Map<string, boolean> = new Map(
+          (ImageUploadedFlag?.result || []).map((r: any) => [
+            r?.userId,
+            Array.isArray(r?.fileUrls) && r.fileUrls.length > 0,
+          ])
+        );
+
+        const updatedUserData = Array.isArray(userData)
+          ? userData.map((u: any) => {
+              const hasImages = Boolean(imageFlagByUserId.get(u?.userId));
+              const isCompleted = u?.status === 'Completed';
+              if (hasImages && !isCompleted) {
+                return { ...u, status: 'Image_Uploaded' };
+              }
+              return u;
+            })
+          : userData;
 
         // Directly use cohortResponse data without complex mapping
-        const learners = cohortResponse.result.userDetails.map((user: any) => {
-          const matchingUserData = userData.result?.find(
-            (data: any) => data.userId === user.userId
-          );
+        const learners = cohortResponse?.result?.userDetails?.map(
+          (user: any) => {
+            const matchingUserData = updatedUserData?.find(
+              (data: any) => data.userId === user.userId
+            );
 
-          return {
-            ...user,
-            learnerId: user.userId,
-            name:
-              [user.firstName, user.middleName, user.lastName]
-                .filter(Boolean)
-                .join(' ') ||
-              user.username ||
-              'Unknown Learner',
-            answerSheetStatus: matchingUserData?.status,
-          };
-        });
+            return {
+              ...user,
+              learnerId: user.userId,
+              name:
+                [user.firstName, user.middleName, user.lastName]
+                  .filter(Boolean)
+                  .join(' ') ||
+                user.username ||
+                'Unknown Learner',
+              answerSheetStatus: matchingUserData?.status || 'Not_Started',
+              percentage: matchingUserData?.percentage || 0,
+              assessments: matchingUserData?.assessments || [],
+            };
+          }
+        );
+
+        console.log('learners:', learners);
 
         // Fetch assessment status for all learners in a single call
         try {
@@ -494,7 +531,7 @@ const AssessmentDetails: React.FC = () => {
 
       showToastMessage(
         t('ASSESSMENTS.DOWNLOAD_SUCCESS') ||
-        'Question paper downloaded successfully',
+          'Question paper downloaded successfully',
         'success'
       );
       setShowDownloadPopup(false);
@@ -598,7 +635,7 @@ const AssessmentDetails: React.FC = () => {
       in_progress: learnerList.filter(
         (l) =>
           mapAnswerSheetStatusToInternalStatus(l.answerSheetStatus) ===
-          'in_progress'
+          'awaiting_approval'
       ).length,
       // awaiting_approval: learnerList.filter(
       //   (l) =>
@@ -619,7 +656,7 @@ const AssessmentDetails: React.FC = () => {
       },
       {
         count: counts.in_progress,
-        label: t('ASSESSMENTS.UNDER_EVALUATION'),
+        label: t('ASSESSMENTS.IMAGE_UPLOADED'),
       },
       // {
       //   count: counts.awaiting_approval,
@@ -928,9 +965,9 @@ const AssessmentDetails: React.FC = () => {
                         mapAnswerSheetStatusToInternalStatus(
                           learner.answerSheetStatus
                         ) === 'awaiting_approval' ||
-                          mapAnswerSheetStatusToInternalStatus(
-                            learner.answerSheetStatus
-                          ) === 'completed'
+                        mapAnswerSheetStatusToInternalStatus(
+                          learner.answerSheetStatus
+                        ) === 'completed'
                           ? '80px'
                           : '64px',
                       transition: 'all 0.2s ease-in-out',
