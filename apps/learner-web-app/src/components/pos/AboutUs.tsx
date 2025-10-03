@@ -236,7 +236,7 @@ const AboutUsPage = () => {
               width: 'fit-content',
             }}
           >
-            {/* <Typography
+            <Typography
               variant={mediaMD ? 'h1' : 'body9'}
               component="h2"
               sx={{
@@ -263,9 +263,8 @@ const AboutUsPage = () => {
             }}
           >
             <SpeakableText>
-              Any subtext, if required can be displayed to give more information
             </SpeakableText>
-          </Typography> */}
+          </Typography>
 
           <Box sx={{ mt: 6 }}>
             <Learning
