@@ -247,7 +247,7 @@ const AboutUsPage = () => {
                 color: '#1F1B13',
               }}
             >
-              <SpeakableText></SpeakableText>
+              <SpeakableText>Our 3 Pillars</SpeakableText>
             </Typography>
           </Box>
           <Typography
