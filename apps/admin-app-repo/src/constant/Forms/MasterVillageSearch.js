@@ -112,7 +112,7 @@ export const MasterVillageUISchema = {
   },
 
   district: {
-    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': {
       multiple: true,
       uniqueItems: true,
@@ -120,7 +120,7 @@ export const MasterVillageUISchema = {
   },
 
   block: {
-    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': {
       multiple: true,
       uniqueItems: true,
