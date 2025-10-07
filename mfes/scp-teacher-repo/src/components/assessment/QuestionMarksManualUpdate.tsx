@@ -214,6 +214,35 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
     }
   };
 
+  const addInlineStylesToImgTags = (html: string): string => {
+    if (typeof html !== 'string' || html.trim() === '') return html;
+    try {
+      return html.replace(/<img\b[^>]*>/gi, (imgTag: string) => {
+        // If style attribute exists, append our constraints; otherwise add a new style attribute
+        if (/style\s*=\s*(['"]).*?\1/i.test(imgTag)) {
+          return imgTag.replace(
+            /style\s*=\s*(['"])(.*?)\1/i,
+            (_match, quote, value) => {
+              const trimmed = String(value || '').trim();
+              const needsSemicolon =
+                trimmed.length > 0 && !trimmed.endsWith(';');
+              const appended = `${trimmed}${
+                needsSemicolon ? ';' : ''
+              } max-width:100%; height:auto; object-fit:contain;`;
+              return `style=${quote}${appended}${quote}`;
+            }
+          );
+        }
+        return imgTag.replace(
+          />$/,
+          ' style="max-width:100%; height:auto; object-fit:contain;">'
+        );
+      });
+    } catch (_e) {
+      return html;
+    }
+  };
+
   //common function
   const findObjectByIdentifier = (array: any, identifier: any) => {
     return array.find((item: any) => item.identifier === identifier);
@@ -727,89 +756,118 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
                 </div>
               </div>
               <div>
-                {section.questions?.map((q: any, qi: number) => (
-                  <div
-                    key={qi}
-                    style={{
-                      borderTop: '1px dashed #eee',
-                      paddingTop: 8,
-                      marginTop: 8,
-                    }}
-                  >
-                    <div style={{ marginBottom: 6 }}>
-                      <div style={{ fontWeight: 600 }}>
-                        Q{qi + 1} (Max {q.maxScore})
-                      </div>
-                      <div
-                        dangerouslySetInnerHTML={{ __html: q.questionTitle }}
-                      />
-                    </div>
-                    {api_index_map?.sections?.[si]?.data?.[qi]?.item?.type !==
-                      'mcq' &&
-                      q?.options &&
-                      Array.isArray(q.options) &&
-                      q.options.length > 0 && (
-                        <div style={{ marginBottom: 8 }}>
-                          {q.options.map((opt: any, oi: number) => (
-                            <label
-                              key={oi}
-                              style={{ display: 'block', cursor: 'pointer' }}
-                            >
-                              <input
-                                type="radio"
-                                name={`mcq_${si}_${qi}`}
-                                checked={selectedOptions[`${si}_${qi}`] === oi}
-                                onChange={() =>
-                                  handleOptionChange(
-                                    si,
-                                    qi,
-                                    oi,
-                                    typeof opt?.value === 'number'
-                                      ? opt.value
-                                      : undefined
-                                  )
-                                }
-                                style={{ marginRight: 6 }}
-                              />
-                              <span
-                                dangerouslySetInnerHTML={{ __html: opt.label }}
-                              />
-                            </label>
-                          ))}
-                        </div>
-                      )}
+                {section.questions?.map((q: any, qi: number) => {
+                  const hasImage =
+                    typeof q?.questionTitle === 'string' &&
+                    /<img\b/i.test(q.questionTitle);
+                  const questionHtml = hasImage
+                    ? addInlineStylesToImgTags(q.questionTitle)
+                    : q.questionTitle;
+                  return (
                     <div
-                      style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+                      key={qi}
+                      style={{
+                        borderTop: '1px dashed #eee',
+                        paddingTop: 8,
+                        marginTop: 8,
+                      }}
                     >
-                      <label style={{ fontWeight: 500 }}>Marks:</label>
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        pattern="[0-9]*"
-                        min={0}
-                        max={q.maxScore}
-                        value={
-                          (marksTextBySection[String(si)]?.[qi] ?? '') !== ''
-                            ? marksTextBySection[String(si)]?.[qi]
-                            : ''
-                        }
-                        placeholder={String(
-                          marksBySection[String(si)]?.[qi] ?? 0
+                      <div style={{ marginBottom: 6 }}>
+                        <div style={{ fontWeight: 600 }}>
+                          Q{qi + 1} (Max {q.maxScore})
+                        </div>
+                        <div
+                          style={
+                            hasImage
+                              ? {
+                                  width: '100%',
+                                  height: 260,
+                                  overflow: 'auto',
+                                  border: '1px solid #eee',
+                                  borderRadius: 8,
+                                  padding: 8,
+                                  background: '#fff',
+                                }
+                              : undefined
+                          }
+                          dangerouslySetInnerHTML={{ __html: questionHtml }}
+                        />
+                      </div>
+                      {api_index_map?.sections?.[si]?.data?.[qi]?.item?.type !==
+                        'mcq' &&
+                        q?.options &&
+                        Array.isArray(q.options) &&
+                        q.options.length > 0 && (
+                          <div style={{ marginBottom: 8 }}>
+                            {q.options.map((opt: any, oi: number) => (
+                              <label
+                                key={oi}
+                                style={{ display: 'block', cursor: 'pointer' }}
+                              >
+                                <input
+                                  type="radio"
+                                  name={`mcq_${si}_${qi}`}
+                                  checked={
+                                    selectedOptions[`${si}_${qi}`] === oi
+                                  }
+                                  onChange={() =>
+                                    handleOptionChange(
+                                      si,
+                                      qi,
+                                      oi,
+                                      typeof opt?.value === 'number'
+                                        ? opt.value
+                                        : undefined
+                                    )
+                                  }
+                                  style={{ marginRight: 6 }}
+                                />
+                                <span
+                                  dangerouslySetInnerHTML={{
+                                    __html: opt.label,
+                                  }}
+                                />
+                              </label>
+                            ))}
+                          </div>
                         )}
-                        onChange={(e) => {
-                          const onlyDigits = e.target.value.replace(
-                            /[^0-9]/g,
-                            ''
-                          );
-                          handleMarksTextChange(si, qi, onlyDigits);
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 8,
                         }}
-                        onBlur={() => handleMarksBlur(si, qi)}
-                        style={{ width: 80 }}
-                      />
-                      <span>/ {q.maxScore}</span>
+                      >
+                        <label style={{ fontWeight: 500 }}>Marks:</label>
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          min={0}
+                          max={q.maxScore}
+                          value={
+                            (marksTextBySection[String(si)]?.[qi] ?? '') !== ''
+                              ? marksTextBySection[String(si)]?.[qi]
+                              : ''
+                          }
+                          placeholder={String(
+                            marksBySection[String(si)]?.[qi] ?? 0
+                          )}
+                          onChange={(e) => {
+                            const onlyDigits = e.target.value.replace(
+                              /[^0-9]/g,
+                              ''
+                            );
+                            handleMarksTextChange(si, qi, onlyDigits);
+                          }}
+                          onBlur={() => handleMarksBlur(si, qi)}
+                          style={{ width: 80 }}
+                        />
+                        <span>/ {q.maxScore}</span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           ))}
