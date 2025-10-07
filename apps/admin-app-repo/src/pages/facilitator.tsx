@@ -510,7 +510,7 @@ const Facilitator = () => {
       console.error('Error updating team leader:', error);
     }
   };
-
+console.log('response?.result?.getUserDetails',response?.result?.getUserDetails)
   // Define actions
   const actions = [
     {
@@ -580,12 +580,13 @@ const Facilitator = () => {
         </Box>
       ),
       callback: async (row) => {
+        console.log('row.cohortData:', row.cohortData); // Check what data is available
+        
         const selectedUserId = row?.userId;
-        const selectedUserDetails = await getUserDetailsInfo(
-          selectedUserId,
-          true
-        );
-        // console.log('selectedUserDetails:', selectedUserDetails);
+        const selectedUserDetails = await getUserDetailsInfo(selectedUserId, true);
+        const cohortResponse = await getCohortList(selectedUserId);
+        console.log('cohortResponse:', cohortResponse);
+        const centerNames = [...new Set(row.cohortData.map(item => item.centerName))];
 
         const findVillage = selectedUserDetails?.userData?.customFields.find((item) => {
           if (item.label === 'VILLAGE' || item.label === 'BLOCK') {
@@ -593,8 +594,22 @@ const Facilitator = () => {
           }
         });
 
-        // setVillage(findVillage?.selectedValues[0]?.value);
-        // console.log('row:', row?.customFields[2].selectedValues[0].value);
+        // Option 1: Get village from cohortData if available
+        const villagesFromCohort = row.cohortData
+          ?.filter((c: any) => c.cohortMember?.status === 'active')
+          .map((c: any) => c.villageName || c.village) // adjust property name as per your data
+          .filter(Boolean);
+
+        setUserData({
+          firstName: row?.firstName || '',
+          lastName: row?.lastName || '',
+          village: centerNames.length!==0 ?centerNames :"-"  ,
+        });
+        setOpen(true);
+        setUserId(row?.userId);
+        setReason('');
+        setChecked(false);
+
         // setEditableUserId(row?.userId);
         // const memberStatus = Status.ARCHIVED;
         // const statusReason = '';
@@ -607,16 +622,6 @@ const Facilitator = () => {
         // });
         // setPrefilledFormData({});
         // searchData(prefilledFormData, currentPage);
-        setOpen(true);
-        setUserId(row?.userId);
-        setReason('');
-        setChecked(false);
-
-        setUserData({
-          firstName: row?.firstName || '',
-          lastName: row?.lastName || '',
-          village: findVillage?.selectedValues?.[0]?.value || '',
-        });
       },
       show: (row) => row.status !== 'archived',
     },

@@ -235,15 +235,15 @@ export const learnerSearchUISchema = {
     'district',
     'block',
     // 'village',
-    "center",
-    "batch",
+    'center',
+    'batch',
     'name',
     'sortBy',
     'status',
   ],
 
   state: {
-    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': {
       multiple: true,
       uniqueItems: true,
@@ -252,7 +252,7 @@ export const learnerSearchUISchema = {
   },
 
   district: {
-    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': {
       multiple: true,
       uniqueItems: true,
@@ -260,7 +260,7 @@ export const learnerSearchUISchema = {
   },
 
   block: {
-    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': {
       multiple: true,
       uniqueItems: true,
@@ -268,7 +268,7 @@ export const learnerSearchUISchema = {
   },
 
   // village: {
-  //   'ui:widget': 'CustomMultiSelectWidget',
+  //   'ui:widget': 'AutoCompleteMultiSelectWidget',
   //   'ui:options': {
   //     multiple: true,
   //     uniqueItems: true,
@@ -276,7 +276,7 @@ export const learnerSearchUISchema = {
   // },
 
   center: {
-    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': {
       multiple: true,
       uniqueItems: true,
@@ -284,13 +284,13 @@ export const learnerSearchUISchema = {
   },
 
   batch: {
-    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': {
       multiple: true,
       uniqueItems: true,
     },
   },
-  
+
   firstName: {
     'ui:widget': 'SearchTextFieldWidget',
   },
