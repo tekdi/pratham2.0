@@ -781,8 +781,6 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
                             hasImage
                               ? {
                                   width: '100%',
-                                  height: 260,
-                                  overflow: 'auto',
                                   border: '1px solid #eee',
                                   borderRadius: 8,
                                   padding: 8,
