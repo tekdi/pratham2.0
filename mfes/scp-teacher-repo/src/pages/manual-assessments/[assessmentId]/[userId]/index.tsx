@@ -1222,16 +1222,16 @@ const AssessmentDetails = () => {
                               backgroundColor: '#FFC107',
                               color: '#1F1B13',
                               '&:hover': { backgroundColor: '#FFB300' },
-                              mb: 1
+                              mb: 1,
                             }}
                           >
-                            View
+                            {t('ASSESSMENTS.VIEW')}
                           </Button>
                           {[
                             'AI Processed',
                             'Awaiting Your Approval',
                             'AI Pending',
-                            'Approved'
+                            'Approved',
                           ].includes(assessmentData?.status || '') && (
                               <>
                                 <Button
@@ -1252,10 +1252,10 @@ const AssessmentDetails = () => {
                                     backgroundColor: '#FFC107',
                                     color: '#1F1B13',
                                     '&:hover': { backgroundColor: '#FFB300' },
-                                    mb: 1
+                                    mb: 1,
                                   }}
                                 >
-                                  Re-upload
+                                  {t('ASSESSMENTS.REUPLOAD')}
                                 </Button>
                               </>
                             )}
@@ -1276,6 +1276,7 @@ const AssessmentDetails = () => {
                       '& .MuiSvgIcon-root': {
                         fontSize: { xs: 24, md: 28 },
                       },
+                      mb: 1,
                     }}
                   >
                     <FileUploadIcon />
@@ -1286,7 +1287,7 @@ const AssessmentDetails = () => {
                 <Box sx={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
                   {!assessmentTrackingData ? (
                     assessmentData?.status === 'AI Pending' ||
-                    assessmentData?.status === 'Approved' ? null : (
+                      assessmentData?.status === 'Approved' ? null : (
                       <Box
                         sx={{
                           display: 'flex',

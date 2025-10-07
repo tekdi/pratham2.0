@@ -751,7 +751,9 @@
     "SUBMIT_MARKS": "Submit Marks",
     "ASSESSMENTS_FOUND_PLURAL": "{{count}} assessments found",
     "NO_ASSESSMENT_TYPE_FOUND":"No Assessment Type Found",
-    "IMAGE_UPLOADED": "Image Uploaded"
+    "IMAGE_UPLOADED": "Image Uploaded",
+    "VIEW": "View",
+    "REUPLOAD": "Re-upload"
   },
   "BOARD_ENROLMENT": {
     "BOARD_ENROLLMENT": "Board Enrollment",
