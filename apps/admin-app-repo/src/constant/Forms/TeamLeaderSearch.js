@@ -120,7 +120,7 @@ export const TeamLeaderSearchUISchema = {
   'ui:order': ['state', 'district', 'block', 'name', 'sortBy', 'status'],
 
   state: {
-    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': {
       multiple: true,
       uniqueItems: true,
@@ -129,7 +129,7 @@ export const TeamLeaderSearchUISchema = {
   },
 
   district: {
-    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': {
       multiple: true,
       uniqueItems: true,
@@ -137,7 +137,7 @@ export const TeamLeaderSearchUISchema = {
   },
 
   block: {
-    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': {
       multiple: true,
       uniqueItems: true,
