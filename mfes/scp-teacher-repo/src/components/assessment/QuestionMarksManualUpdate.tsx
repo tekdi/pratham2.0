@@ -1,8 +1,13 @@
 import axios from 'axios';
 import { AnyARecord } from 'dns';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import ZoomInIcon from '@mui/icons-material/ZoomIn';
+import ZoomOutIcon from '@mui/icons-material/ZoomOut';
+import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
 import {
   createAssessmentTracking,
   updateAssessmentScore,
@@ -40,6 +45,31 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
   >({});
   const [submitPayload, set_submitPayload] = useState<any>(null);
   const [isSubmitting, set_isSubmitting] = useState<boolean>(false);
+  const [zoomImageSrc, set_zoomImageSrc] = useState<string | null>(null);
+  const fullScreenContainerRef = useRef<HTMLDivElement | null>(null);
+  const [zoomScale, set_zoomScale] = useState<number>(1);
+  const [panX, set_panX] = useState<number>(0);
+  const [panY, set_panY] = useState<number>(0);
+  const isPanningRef = useRef<boolean>(false);
+  const lastPointRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const pinchRef = useRef<{
+    active: boolean;
+    initialDistance: number;
+    initialScale: number;
+  }>({
+    active: false,
+    initialDistance: 0,
+    initialScale: 1,
+  });
+
+  useEffect(() => {
+    // Reset zoom state when opening/closing fullscreen view
+    if (zoomImageSrc) {
+      set_zoomScale(1);
+      set_panX(0);
+      set_panY(0);
+    }
+  }, [zoomImageSrc]);
 
   //temp variable
   const [list_temp_load, set_list_temp_load] = useState<any[]>([]);
@@ -228,19 +258,27 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
                 trimmed.length > 0 && !trimmed.endsWith(';');
               const appended = `${trimmed}${
                 needsSemicolon ? ';' : ''
-              } max-width:100%; height:auto; object-fit:contain;`;
+              } max-width:100%; height:auto; object-fit:contain; width:auto; max-height:320px; cursor:zoom-in;`;
               return `style=${quote}${appended}${quote}`;
             }
           );
         }
         return imgTag.replace(
           />$/,
-          ' style="max-width:100%; height:auto; object-fit:contain;">'
+          ' style="max-width:100%; height:auto; object-fit:contain; width:auto; max-height:320px; cursor:zoom-in;">'
         );
       });
     } catch (_e) {
       return html;
     }
+  };
+
+  const extractImageSrcs = (html: string): string[] => {
+    if (typeof html !== 'string') return [];
+    const matches = Array.from(
+      html.matchAll(/<img[^>]+src=['\"]([^'\"]+)['\"][^>]*>/gi)
+    );
+    return matches.map((m: any) => (m && m[1]) || '').filter(Boolean);
   };
 
   //common function
@@ -785,11 +823,41 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
                                   borderRadius: 8,
                                   padding: 8,
                                   background: '#fff',
+                                  marginTop: '0px',
+                                  position: 'relative',
                                 }
                               : undefined
                           }
-                          dangerouslySetInnerHTML={{ __html: questionHtml }}
-                        />
+                        >
+                          <div
+                            dangerouslySetInnerHTML={{ __html: questionHtml }}
+                          />
+                          {hasImage && (
+                            <IconButton
+                              aria-label="Zoom image"
+                              onClick={() => {
+                                const srcs = extractImageSrcs(q.questionTitle);
+                                const src = srcs[0] ?? null;
+                                set_zoomImageSrc(src);
+                                const el: any = fullScreenContainerRef.current;
+                                if (src && el && el.requestFullscreen) {
+                                  el.requestFullscreen().catch(() => {});
+                                }
+                              }}
+                              sx={{
+                                position: 'absolute',
+                                top: 6,
+                                right: 6,
+                                bgcolor: 'rgba(255,255,255,0.9)',
+                                boxShadow: 1,
+                                '&:hover': { bgcolor: 'rgba(255,255,255,1)' },
+                              }}
+                              size="small"
+                            >
+                              <ZoomInIcon fontSize="small" />
+                            </IconButton>
+                          )}
+                        </div>
                       </div>
                       {api_index_map?.sections?.[si]?.data?.[qi]?.item?.type !==
                         'mcq' &&
@@ -919,6 +987,185 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
           </div>
         </div>
       )}
+      <div
+        ref={fullScreenContainerRef}
+        style={{
+          position: 'fixed',
+          left: 0,
+          top: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: '#000',
+          zIndex: 1300,
+          display: zoomImageSrc ? 'block' : 'none',
+        }}
+        onWheel={(e) => {
+          if (!zoomImageSrc) return;
+          e.preventDefault();
+          const delta = e.deltaY;
+          set_zoomScale((prev) => {
+            const next = Math.min(
+              6,
+              Math.max(1, prev + (delta > 0 ? -0.2 : 0.2))
+            );
+            return Number.isFinite(next) ? next : prev;
+          });
+        }}
+        onMouseDown={(e) => {
+          if (!zoomImageSrc || zoomScale <= 1) return;
+          isPanningRef.current = true;
+          lastPointRef.current = { x: e.clientX, y: e.clientY };
+        }}
+        onMouseMove={(e) => {
+          if (!isPanningRef.current) return;
+          const dx = e.clientX - lastPointRef.current.x;
+          const dy = e.clientY - lastPointRef.current.y;
+          lastPointRef.current = { x: e.clientX, y: e.clientY };
+          set_panX((p) => p + dx);
+          set_panY((p) => p + dy);
+        }}
+        onMouseUp={() => {
+          isPanningRef.current = false;
+        }}
+        onMouseLeave={() => {
+          isPanningRef.current = false;
+        }}
+        onTouchStart={(e) => {
+          if (!zoomImageSrc) return;
+          if (e.touches.length === 2) {
+            pinchRef.current.active = true;
+            const t1 = e.touches.item(0);
+            const t2 = e.touches.item(1);
+            if (!t1 || !t2) return;
+            const dist = Math.hypot(
+              t2.clientX - t1.clientX,
+              t2.clientY - t1.clientY
+            );
+            pinchRef.current.initialDistance = dist;
+            pinchRef.current.initialScale = zoomScale;
+          } else if (e.touches.length === 1 && zoomScale > 1) {
+            isPanningRef.current = true;
+            const t = e.touches.item(0);
+            if (!t) return;
+            lastPointRef.current = { x: t.clientX, y: t.clientY };
+          }
+        }}
+        onTouchMove={(e) => {
+          if (!zoomImageSrc) return;
+          if (pinchRef.current.active && e.touches.length === 2) {
+            e.preventDefault();
+            const t1 = e.touches.item(0);
+            const t2 = e.touches.item(1);
+            if (!t1 || !t2) return;
+            const dist = Math.hypot(
+              t2.clientX - t1.clientX,
+              t2.clientY - t1.clientY
+            );
+            const scaleFactor = dist / (pinchRef.current.initialDistance || 1);
+            const next = Math.min(
+              6,
+              Math.max(1, pinchRef.current.initialScale * scaleFactor)
+            );
+            set_zoomScale(Number.isFinite(next) ? next : 1);
+          } else if (isPanningRef.current && e.touches.length === 1) {
+            const t = e.touches.item(0);
+            if (!t) return;
+            const dx = t.clientX - lastPointRef.current.x;
+            const dy = t.clientY - lastPointRef.current.y;
+            lastPointRef.current = { x: t.clientX, y: t.clientY };
+            set_panX((p) => p + dx);
+            set_panY((p) => p + dy);
+          }
+        }}
+        onTouchEnd={() => {
+          pinchRef.current.active = false;
+          isPanningRef.current = false;
+        }}
+      >
+        <IconButton
+          aria-label="Close"
+          onClick={() => {
+            set_zoomImageSrc(null);
+            const doc: any = document;
+            if (doc.fullscreenElement && doc.exitFullscreen) {
+              doc.exitFullscreen().catch(() => {});
+            }
+          }}
+          sx={{
+            position: 'absolute',
+            top: 12,
+            right: 12,
+            zIndex: 1,
+            bgcolor: 'rgba(255,255,255,0.2)',
+          }}
+        >
+          <CloseIcon sx={{ color: '#fff' }} />
+        </IconButton>
+        {zoomImageSrc && (
+          <img
+            src={zoomImageSrc}
+            alt="Zoomed"
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: `translate(-50%, -50%) translate(${panX}px, ${panY}px) scale(${zoomScale})`,
+              transformOrigin: 'center center',
+              maxWidth: '100vw',
+              maxHeight: '100vh',
+              objectFit: 'contain',
+              cursor: zoomScale > 1 ? 'grab' : 'default',
+            }}
+            draggable={false}
+          />
+        )}
+
+        {zoomImageSrc && (
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 16,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              display: 'flex',
+              gap: 8,
+              background: 'rgba(0,0,0,0.4)',
+              padding: 8,
+              borderRadius: 8,
+            }}
+          >
+            <IconButton
+              aria-label="Zoom out"
+              onClick={() =>
+                set_zoomScale((z) => Math.max(1, +(z - 0.25).toFixed(2)))
+              }
+              sx={{ bgcolor: 'rgba(255,255,255,0.85)' }}
+            >
+              <ZoomOutIcon />
+            </IconButton>
+            <IconButton
+              aria-label="Reset"
+              onClick={() => {
+                set_zoomScale(1);
+                set_panX(0);
+                set_panY(0);
+              }}
+              sx={{ bgcolor: 'rgba(255,255,255,0.85)' }}
+            >
+              <CenterFocusStrongIcon />
+            </IconButton>
+            <IconButton
+              aria-label="Zoom in"
+              onClick={() =>
+                set_zoomScale((z) => Math.min(6, +(z + 0.25).toFixed(2)))
+              }
+              sx={{ bgcolor: 'rgba(255,255,255,0.85)' }}
+            >
+              <ZoomInIcon />
+            </IconButton>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
