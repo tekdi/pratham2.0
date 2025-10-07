@@ -59,3 +59,5 @@ apps/admin-app-repo/build/
 #add below for generic editor
 mfes/workspace/public/content-plugins/
 mfes/workspace/public/generic-editor/
+.cursor/rules/nx-rules.mdc
+.github/instructions/nx.instructions.md
