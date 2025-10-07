@@ -750,7 +750,10 @@
     "UPDATE_MARKS": "Update Marks",
     "SUBMIT_MARKS": "Submit Marks",
     "ASSESSMENTS_FOUND_PLURAL": "{{count}} assessments found",
-    "NO_ASSESSMENT_TYPE_FOUND":"No Assessment Type Found"
+    "NO_ASSESSMENT_TYPE_FOUND":"No Assessment Type Found",
+    "IMAGE_UPLOADED": "Image Uploaded",
+    "VIEW": "View",
+    "REUPLOAD": "Re-upload"
   },
   "BOARD_ENROLMENT": {
     "BOARD_ENROLLMENT": "Board Enrollment",

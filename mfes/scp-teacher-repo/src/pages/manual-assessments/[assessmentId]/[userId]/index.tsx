@@ -12,7 +12,6 @@ import {
   Alert,
   Dialog,
   DialogContent,
-  useMediaQuery,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
@@ -28,6 +27,7 @@ import {
   updateAssessmentScore,
   hierarchyContent,
   searchAssessment,
+  getAssessmentStatus,
 } from '../../../../services/AssesmentService';
 import {
   UploadOptionsPopup,
@@ -223,7 +223,6 @@ const formatAnswerForDisplay = (
 
 const AssessmentDetails = () => {
   const theme = useTheme();
-  const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
   const { t } = useTranslation();
   const router = useRouter();
   const { assessmentId, userId } = router.query;
@@ -257,6 +256,7 @@ const AssessmentDetails = () => {
     lastName: '',
   });
   const [assessmentName, setAssessmentName] = useState<any>('');
+  const [userAssessmentStatus, setUserAssessmentStatus] = useState<any>(null);
 
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
@@ -373,6 +373,36 @@ const AssessmentDetails = () => {
               : [],
           };
           setAssessmentData(sanitizedData);
+          if (sanitizedData) {
+            try {
+              const userDataAssessmentStatus = await getAssessmentStatus({
+                userId: [userId as string],
+                courseId: [assessmentId as string],
+                unitId: [assessmentId as string],
+                contentId: [assessmentId as string],
+              });
+              // console.log('userData>>>>>:', userDataAssessmentStatus);
+
+              // clone first element safely
+              let status = userDataAssessmentStatus[0]?.status || "Not Started";
+
+              // apply Image_Uploaded override
+              if (
+                sanitizedData?.fileUrls?.length > 0 &&
+                status !== "Completed"
+              ) {
+                status = "Image_Uploaded";
+              }
+
+              // update state only once
+              setUserAssessmentStatus(status);
+
+            } catch (error) {
+              console.error("Error fetching assessment status:", error);
+              setUserAssessmentStatus("Not Started");
+            }
+          }
+
 
           if (showSuccessMessage) {
             setSnackbar({
@@ -1085,10 +1115,10 @@ const AssessmentDetails = () => {
             pb: 2,
           }}
         >
-          {assessmentData?.status ? (
+          {userAssessmentStatus ? (
             <>
               {getStatusIcon(
-                mapAnswerSheetStatusToInternalStatus(assessmentData.status)
+                mapAnswerSheetStatusToInternalStatus(userAssessmentStatus)
               )}
               <Typography
                 sx={{
@@ -1097,7 +1127,7 @@ const AssessmentDetails = () => {
                   fontWeight: 400,
                 }}
               >
-                {getStatusLabel(assessmentData.status)}
+                {getStatusLabel(userAssessmentStatus)}
               </Typography>
             </>
           ) : (
@@ -1120,12 +1150,12 @@ const AssessmentDetails = () => {
           spacing={2}
           sx={{ flex: 1, minHeight: 0, overflow: 'hidden' }}
         >
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={12}>
             {/* Left column */}
             <>
               {/* Images Info */}
               <Box
-                onClick={!isDesktop ? handleUploadInfoClick : undefined}
+                onClick={handleUploadInfoClick}
                 sx={{
                   display: 'flex',
                   flexDirection: 'column',
@@ -1135,7 +1165,7 @@ const AssessmentDetails = () => {
                   borderRadius: '12px',
                   p: { xs: 2, md: 2 },
                   mb: { xs: 2, md: 1 },
-                  cursor: isDesktop ? 'default' : 'pointer',
+                  cursor: 'pointer',
                   transition: 'all 0.2s ease',
                   '&:hover': {
                     borderColor: theme.palette.primary.main,
@@ -1188,18 +1218,20 @@ const AssessmentDetails = () => {
                               fontSize: '14px',
                               height: '32px',
                               padding: '2px 8px',
-                              display: { xs: 'inline-flex', md: 'none' },
+                              display: 'inline-flex',
                               backgroundColor: '#FFC107',
                               color: '#1F1B13',
                               '&:hover': { backgroundColor: '#FFB300' },
+                              mb: 1,
                             }}
                           >
-                            View
+                            {t('ASSESSMENTS.VIEW')}
                           </Button>
                           {[
                             'AI Processed',
                             'Awaiting Your Approval',
                             'AI Pending',
+                            'Approved',
                           ].includes(assessmentData?.status || '') && (
                               <>
                                 <Button
@@ -1220,10 +1252,10 @@ const AssessmentDetails = () => {
                                     backgroundColor: '#FFC107',
                                     color: '#1F1B13',
                                     '&:hover': { backgroundColor: '#FFB300' },
-                                    mb: 1
+                                    mb: 1,
                                   }}
                                 >
-                                  Re-upload
+                                  {t('ASSESSMENTS.REUPLOAD')}
                                 </Button>
                               </>
                             )}
@@ -1244,6 +1276,7 @@ const AssessmentDetails = () => {
                       '& .MuiSvgIcon-root': {
                         fontSize: { xs: 24, md: 28 },
                       },
+                      mb: 1,
                     }}
                   >
                     <FileUploadIcon />
@@ -1254,19 +1287,7 @@ const AssessmentDetails = () => {
                 <Box sx={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
                   {!assessmentTrackingData ? (
                     assessmentData?.status === 'AI Pending' ||
-                      assessmentData?.status === 'Approved' ? (
-                      isDesktop ? (
-                        <Box sx={{ height: '100%', overflow: 'auto' }}>
-                          <UploadFiles
-                            images={uploadedImages.map((img) => ({
-                              id: img.id,
-                              url: img.url,
-                              name: img.name,
-                            }))}
-                          />
-                        </Box>
-                      ) : null
-                    ) : (
+                      assessmentData?.status === 'Approved' ? null : (
                       <Box
                         sx={{
                           display: 'flex',
@@ -1285,7 +1306,7 @@ const AssessmentDetails = () => {
               </Box>
             </>
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={12}>
             {/* Right column - Question Paper placeholder */}
             <Box
               sx={{
@@ -1293,8 +1314,7 @@ const AssessmentDetails = () => {
                 borderRadius: '12px',
                 p: { xs: 2, md: 2 },
                 height: 'fit-content',
-                position: { md: 'sticky' },
-                top: { md: 16 },
+                position: 'static',
                 bgcolor: '#FFFFFF',
               }}
             >

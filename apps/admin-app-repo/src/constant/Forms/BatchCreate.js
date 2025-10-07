@@ -26,8 +26,7 @@ export const BatchCreateSchema = {
         },
         payload: {
           code: 'board',
-          fetchUrl:
-            `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/api/framework/v1/read/scp-framework`,
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/api/framework/v1/read/scp-framework`,
         },
         callType: 'initial',
       },
@@ -58,8 +57,7 @@ export const BatchCreateSchema = {
         },
         payload: {
           code: 'board',
-          fetchUrl:
-            `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/api/framework/v1/read/scp-framework`,
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/api/framework/v1/read/scp-framework`,
           findcode: 'medium',
           selectedvalue: '**',
         },
@@ -93,8 +91,7 @@ export const BatchCreateSchema = {
         },
         payload: {
           code: 'medium',
-          fetchUrl:
-            `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/api/framework/v1/read/scp-framework`,
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/api/framework/v1/read/scp-framework`,
           findcode: 'gradeLevel',
           selectedvalue: '**',
         },
@@ -104,59 +101,48 @@ export const BatchCreateSchema = {
     },
 
     name: {
-      type: "string",
-      title: "Batch Name",
+      type: 'string',
+      title: 'Batch Name',
       coreField: 1,
       fieldId: null,
-      field_type: "text",
-      pattern: "^[a-zA-Z][a-zA-Z ]*[a-zA-Z]$"
+      field_type: 'text',
+      pattern: '^[a-zA-Z][a-zA-Z ]*[a-zA-Z]$',
     },
   },
-  required: [
-    "board",
-    "medium",
-    "grade",
-    "name"
-  ]
+  required: ['board', 'medium', 'grade', 'name'],
 };
 
-
 export const BatchCreateUISchema = {
-  'ui:order': [
-    'board',
-    'medium',
-    'grade',
-    'name',
-  ],
+  'ui:order': ['board', 'medium', 'grade', 'name'],
   board: {
-    "ui:widget": "CustomMultiSelectWidget",
-    "ui:options": {
-        multiple: true,
-        uniqueItems: true,
-        hideError: false
-    }
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
+    'ui:options': {
+      multiple: true,
+      uniqueItems: true,
+      hideError: false,
+    },
   },
   medium: {
-    "ui:widget": "CustomMultiSelectWidget",
-    "ui:options": {
-        multiple: true,
-        uniqueItems: true,
-        hideError: false
-    }
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
+    'ui:options': {
+      multiple: true,
+      uniqueItems: true,
+      hideError: false,
+    },
   },
   grade: {
-    "ui:widget": "CustomMultiSelectWidget",
-    "ui:options": {
-        multiple: true,
-        uniqueItems: true,
-        hideError: false
-    }
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
+    'ui:options': {
+      multiple: true,
+      uniqueItems: true,
+      hideError: false,
+    },
   },
   name: {
-  "ui:widget": "CustomTextFieldWidget",
-  "ui:options": {
+    'ui:widget': 'CustomTextFieldWidget',
+    'ui:options': {
       validateOnBlur: true,
-      hideError: true
-    }
+      hideError: true,
+    },
   },
 };

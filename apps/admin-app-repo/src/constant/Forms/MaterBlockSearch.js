@@ -83,7 +83,7 @@ export const MasterBlocksUISchema = {
   },
 
   district: {
-    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': {
       multiple: true,
       uniqueItems: true,

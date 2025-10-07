@@ -319,6 +319,7 @@ const LearnerManage = ({
               isReassign || isEditProfile ? userId : editableUserId
             }
             UpdateSuccessCallback={() => {
+              onClose();
               onLearnerAdded();
               setOpenModal(false);
             }}
