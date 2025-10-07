@@ -56,7 +56,7 @@ const AboutUsPage = () => {
                 color: isColorInverted ? '#FFF' : '#fff',
               }}
             >
-              <SpeakableText>About Us</SpeakableText>
+              <SpeakableText></SpeakableText>
             </Typography>
             <Typography
               variant={mediaMD ? 'h1' : 'body6'}
@@ -68,7 +68,6 @@ const AboutUsPage = () => {
               }}
             >
               <SpeakableText>
-                One liner - Highlight POS as a Pradigi Product
               </SpeakableText>
             </Typography>
           </Box>
@@ -248,7 +247,7 @@ const AboutUsPage = () => {
                 color: '#1F1B13',
               }}
             >
-              <SpeakableText>Title Here About 3 Pillars</SpeakableText>
+              <SpeakableText>Our 3 Pillars</SpeakableText>
             </Typography>
           </Box>
           <Typography
@@ -264,7 +263,6 @@ const AboutUsPage = () => {
             }}
           >
             <SpeakableText>
-              Any subtext, if required can be displayed to give more information
             </SpeakableText>
           </Typography>
 

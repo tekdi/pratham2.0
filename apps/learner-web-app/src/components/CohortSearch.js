@@ -1,5 +1,3 @@
-
-
 export const CohortSearchSchema = {
   type: 'object',
   properties: {
@@ -8,21 +6,20 @@ export const CohortSearchSchema = {
       title: 'State',
       items: {
         type: 'string',
-        enum:  ['Select'],
-        enumNames:  ['Select'],
+        enum: ['Select'],
+        enumNames: ['Select'],
       },
-      api:
-        {
-              url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
-              method: 'POST',
-              payload: { fieldName: 'state', sort: ['state_name', 'asc'] },
-              options: {
-                optionObj: 'result.values',
-                label: 'label',
-                value: 'value',
-              },
-              callType: 'initial',
-            },
+      api: {
+        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
+        method: 'POST',
+        payload: { fieldName: 'state', sort: ['state_name', 'asc'] },
+        options: {
+          optionObj: 'result.values',
+          label: 'label',
+          value: 'value',
+        },
+        callType: 'initial',
+      },
       //for multiselect
       uniqueItems: true,
       isMultiSelect: true,
@@ -41,8 +38,7 @@ export const CohortSearchSchema = {
         method: 'POST',
         payload: {
           fieldName: 'district',
-          controllingfieldfk:
-            '**',
+          controllingfieldfk: '**',
           sort: ['district_name', 'asc'],
         },
         options: {
@@ -50,8 +46,8 @@ export const CohortSearchSchema = {
           label: 'label',
           value: 'value',
         },
-        callType:   'dependent',
-        dependent: 'state'  
+        callType: 'dependent',
+        dependent: 'state',
       },
       //for multiselect
       uniqueItems: true,
@@ -148,16 +144,15 @@ export const CohortSearchUISchema = {
   ],
 
   state: {
-    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': {
       multiple: true,
       uniqueItems: true,
     },
-     
   },
 
   district: {
-    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': {
       multiple: true,
       uniqueItems: true,
@@ -165,7 +160,7 @@ export const CohortSearchUISchema = {
   },
 
   block: {
-    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': {
       multiple: true,
       uniqueItems: true,
@@ -173,7 +168,7 @@ export const CohortSearchUISchema = {
   },
 
   village: {
-    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': {
       multiple: true,
       uniqueItems: true,

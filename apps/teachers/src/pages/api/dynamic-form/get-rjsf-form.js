@@ -176,7 +176,7 @@ function generateSchemaAndUISchema(fields) {
             ? //? 'checkboxes'
               'CustomCheckboxWidget'
             : schemaField?.isMultiSelect === true
-            ? 'CustomMultiSelectWidget'
+            ? 'AutoCompleteMultiSelectWidget'
             : 'CustomSingleSelectWidget',
         'ui:options': {
           multiple: schemaField?.isMultiSelect === true ? true : false,

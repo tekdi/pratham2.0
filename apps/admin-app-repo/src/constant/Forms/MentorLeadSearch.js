@@ -92,7 +92,7 @@ export const MentorLeadSearchUISchema = {
   'ui:order': ['state', 'district', 'name', 'sortBy', 'status'],
 
   state: {
-    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': {
       multiple: true,
       uniqueItems: true,
@@ -101,7 +101,7 @@ export const MentorLeadSearchUISchema = {
   },
 
   district: {
-    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': {
       multiple: true,
       uniqueItems: true,
