@@ -96,7 +96,8 @@ const LoginPage = () => {
                 role?.tenantData[0]?.tenantName !=
                 TenantName.SECOND_CHANCE_PROGRAM
               ) {
-                router.push('/workspace');
+                // router.push('/workspace');
+                router.push('/faqs');
               } else {
                 router.push('/course-planner', undefined, { locale: locale });
               }
@@ -311,8 +312,10 @@ const LoginPage = () => {
             const { locale } = router;
             // To do :- hardcoding to be removed
             if (tenantData?.tenantName != TenantName.SECOND_CHANCE_PROGRAM) {
-              window.location.href = '/workspace';
-              router.push('/workspace');
+              // window.location.href = '/workspace';
+              // router.push('/workspace');
+              window.location.href = '/faqs';
+              router.push('/faqs');
             } else {
               window.location.href = '/course-planner';
               if (locale) {
@@ -396,8 +399,10 @@ const LoginPage = () => {
                   if (
                     tenantData?.tenantName != TenantName.SECOND_CHANCE_PROGRAM
                   ) {
-                    window.location.href = '/workspace';
-                    router.push('/workspace');
+                    // window.location.href = '/workspace';
+                    // router.push('/workspace');
+                    window.location.href = '/faqs';
+                    router.push('/faqs');
                   } else {
                     window.location.href = '/course-planner';
                     if (locale) {
