@@ -54,6 +54,7 @@ const AutoCompleteMultiSelectWidget = ({
 
   // Filter options based on search input
   const [inputValue, setInputValue] = useState('');
+  const [open, setOpen] = useState(false);
 
   const filteredOptions = useMemo(() => {
     if (!inputValue) return optionsList;
@@ -69,6 +70,11 @@ const AutoCompleteMultiSelectWidget = ({
       const limitedValue = newValue.slice(0, maxSelections);
       const values = limitedValue.map((option) => option.value);
       onChange(values.length > 0 ? values : []);
+
+      // Close dropdown only if max selections reached
+      if (values.length >= maxSelections) {
+        setTimeout(() => setOpen(false), 100);
+      }
     } else {
       onChange([]);
     }
@@ -82,13 +88,23 @@ const AutoCompleteMultiSelectWidget = ({
   const handleSelectAll = () => {
     if (selectedValues.length === optionsList.length) {
       onChange([]);
+      // Keep dropdown open when deselecting all
     } else {
       const allValues = optionsList.map((option) => option.value);
       onChange(allValues.slice(0, maxSelections));
+      // Close dropdown after selecting all (when max selections reached)
+      if (allValues.length >= maxSelections) {
+        setTimeout(() => setOpen(false), 100);
+      }
     }
   };
 
   const isAllSelected = selectedValues.length === optionsList.length;
+
+  // Limit the number of visible chips to prevent size increase
+  const maxVisibleChips = 2;
+  const visibleChips = selectedOptions.slice(0, maxVisibleChips);
+  const remainingCount = selectedOptions.length - maxVisibleChips;
 
   return (
     <FormControl
@@ -105,20 +121,38 @@ const AutoCompleteMultiSelectWidget = ({
         onChange={handleChange}
         onInputChange={handleInputChange}
         inputValue={inputValue}
+        open={open}
+        onOpen={() => setOpen(true)}
+        onClose={() => setOpen(false)}
         getOptionLabel={(option) => option.label}
         isOptionEqualToValue={(option, value) => option.value === value.value}
         disabled={isDisabled}
-        disableCloseOnSelect
-        renderTags={(value, getTagProps) =>
-          value.map((option, index) => (
-            <Chip
-              variant="outlined"
-              label={option.label}
-              {...getTagProps({ index })}
-              key={option.value}
-            />
-          ))
-        }
+        disableCloseOnSelect={true}
+        renderTags={(value, getTagProps) => (
+          <>
+            {visibleChips.map((option, index) => (
+              <Chip
+                variant="outlined"
+                label={option.label}
+                {...getTagProps({ index })}
+                key={option.value}
+              />
+            ))}
+            {remainingCount > 0 && (
+              <Chip
+                variant="outlined"
+                label={`+${remainingCount} more`}
+                style={{
+                  backgroundColor: '#f5f5f5',
+                  color: '#666',
+                  cursor: 'default',
+                }}
+                onDelete={undefined}
+                key="remaining-count"
+              />
+            )}
+          </>
+        )}
         renderOption={(props, option, { selected }) => (
           <li {...props} key={option.value}>
             <Checkbox
@@ -133,20 +167,23 @@ const AutoCompleteMultiSelectWidget = ({
         renderInput={(params) => (
           <TextField
             {...params}
-            label={label}
+            label={`${t(`FORM.${label}`, { defaultValue: label })} ${
+              required && selectedOptions.length !== 0 ? '*' : ''
+            }`}
             placeholder={
               selectedOptions.length === 0
                 ? `Type to search ${label?.toLowerCase() || 'options'}...`
                 : ''
             }
             error={rawErrors.length > 0}
-            helperText={
-              rawErrors.length > 0
-                ? rawErrors[0]
-                : maxSelections < enumOptions.length
-                ? `Select up to ${maxSelections} options`
-                : undefined
-            }
+            // helperText={
+            //   rawErrors.length > 0
+            //     ? rawErrors[0]
+            //     : maxSelections < enumOptions.length
+            //     ? `Select up to ${maxSelections} options`
+            //     : undefined
+            // }
+            required={required && selectedOptions.length === 0}
           />
         )}
         ListboxProps={{

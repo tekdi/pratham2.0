@@ -48,7 +48,7 @@ export const ContentReviewerUISchema = {
   'ui:order': ['state', 'name', 'sortBy', 'status'],
 
   state: {
-    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': {
       multiple: true,
       uniqueItems: true,
