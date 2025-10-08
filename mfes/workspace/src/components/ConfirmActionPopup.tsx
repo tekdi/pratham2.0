@@ -147,6 +147,7 @@ const ConfirmActionPopup: React.FC<ConfirmActionPopupProps> = ({
               {usabilityOptions.map((option) => (
                 <FormControlLabel
                   key={option}
+                  sx={{ alignItems: 'flex-start', m: 0.5 }}
                   control={
                     <Checkbox
                       checked={checkedItems.includes(option)}
@@ -154,6 +155,7 @@ const ConfirmActionPopup: React.FC<ConfirmActionPopupProps> = ({
                       sx={{
                         color: 'black',
                         '&.Mui-checked': { color: 'black' },
+                        py: 0.5,
                       }}
                     />
                   }
@@ -176,6 +178,7 @@ const ConfirmActionPopup: React.FC<ConfirmActionPopupProps> = ({
               {contentDetailsOptions.map((option) => (
                 <FormControlLabel
                   key={option}
+                  sx={{ alignItems: 'flex-start', m: 0.5 }}
                   control={
                     <Checkbox
                       checked={checkedItems.includes(option)}
@@ -183,6 +186,7 @@ const ConfirmActionPopup: React.FC<ConfirmActionPopupProps> = ({
                       sx={{
                         color: 'black',
                         '&.Mui-checked': { color: 'black' },
+                        py: 0.5,
                       }}
                     />
                   }
