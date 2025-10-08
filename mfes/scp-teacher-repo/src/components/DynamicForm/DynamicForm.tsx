@@ -9,6 +9,7 @@ import { TextField, Container, Typography } from '@mui/material';
 import { useTranslation } from 'next-i18next';
 import _ from 'lodash'; // Lodash for deep comparison
 import CustomMultiSelectWidget from './RJSFWidget/CustomMultiSelectWidget';
+import AutoCompleteMultiSelectWidget from './RJSFWidget/AutoCompleteMultiSelectWidget';
 import CustomCheckboxWidget from './RJSFWidget/CustomCheckboxWidget';
 import CustomDateWidget from './RJSFWidget/CustomDateWidget';
 import SearchTextFieldWidget from './RJSFWidget/SearchTextFieldWidget';
@@ -101,6 +102,7 @@ const DynamicForm = ({
 
   const widgets = {
     CustomMultiSelectWidget,
+    AutoCompleteMultiSelectWidget,
     CustomCheckboxWidget,
     CustomDateWidget,
     SearchTextFieldWidget,

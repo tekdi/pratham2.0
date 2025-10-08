@@ -13,9 +13,12 @@ const CustomDateWidget = ({
   required,
   label,
   rawErrors = [],
+  uiSchema = {}, // <-- include uiSchema
 }: any) => {
   const { minValue, maxValue } = options;
   const { t } = useTranslation();
+
+  const isDisabled = uiSchema?.['ui:disabled'] === true;
 
   const initialValue =
     typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}$/)
@@ -48,11 +51,28 @@ const CustomDateWidget = ({
   const errorText = rawErrors?.length > 0 ? rawErrors[0] : '';
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <>
+     <input
+        value={value ?? ''}
+        required={required}
+        onChange={() => {}}
+        tabIndex={-1}
+        style={{
+          height: 1,
+          padding: 0,
+          border: 0,
+          ...(value && { visibility: 'hidden' }),
+        }}
+        aria-hidden="true"
+                marginTop="50px"
+
+      />
+    <LocalizationProvider dateAdapter={AdapterDayjs} required={required}>
       <DatePicker
+        disabled={isDisabled}
         label={`${t(`FORM.${label}`, {
           defaultValue: label,
-        })} ${required ? '*' : ''}`}
+        })}`}
         value={selectedDate || null}
         onChange={handleDateChange}
         minDate={minValue ? dayjs(minValue, 'YYYY-MM-DD') : undefined}
@@ -62,12 +82,30 @@ const CustomDateWidget = ({
           textField: {
             fullWidth: true,
             variant: 'outlined',
-            error: rawErrors.length > 0,
+            // error: rawErrors.length > 0,
             // helperText: errorText,
+            required,
+            inputProps: {
+              readOnly: true,
+            },
+            onClick: (event: any) => {
+              event.preventDefault();
+            },
+            onKeyDown: (event: any) => {
+              event.preventDefault();
+            },
+            onInput: (event: any) => {
+              event.preventDefault();
+            }
           },
         }}
+        required={required}
       />
+      
     </LocalizationProvider>
+    {/* Hidden text input to force native validation */}
+     
+    </>
   );
 };
 
