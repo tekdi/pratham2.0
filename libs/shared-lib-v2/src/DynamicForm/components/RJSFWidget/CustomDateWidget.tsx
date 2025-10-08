@@ -84,7 +84,19 @@ const CustomDateWidget = ({
             variant: 'outlined',
             // error: rawErrors.length > 0,
             // helperText: errorText,
-            required
+            required,
+            inputProps: {
+              readOnly: true,
+            },
+            onClick: (event: any) => {
+              event.preventDefault();
+            },
+            onKeyDown: (event: any) => {
+              event.preventDefault();
+            },
+            onInput: (event: any) => {
+              event.preventDefault();
+            }
           },
         }}
         required={required}
