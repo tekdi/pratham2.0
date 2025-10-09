@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React, { useState, useEffect } from 'react';
-import { TextField } from '@mui/material';
+import { TextField, IconButton } from '@mui/material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { CalendarToday } from '@mui/icons-material';
@@ -14,12 +14,22 @@ const CustomDateWidget = ({
   required,
   label,
   rawErrors = [],
-  uiSchema = {}, // <-- include uiSchema
+  uiSchema = {},
 }: any) => {
   const { minValue, maxValue } = options;
   const { t } = useTranslation();
 
   const isDisabled = uiSchema?.['ui:disabled'] === true;
+
+  const [isMobile, setIsMobile] = useState(false);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const initialValue =
     typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}$/)
@@ -49,19 +59,22 @@ const CustomDateWidget = ({
     }
   };
 
-  // Filter out 'is a required property' messages
-  const displayErrors = rawErrors?.filter(
+  const handleCalendarIconClick = () => setIsCalendarOpen(true);
+  const handleCalendarClose = () => setIsCalendarOpen(false);
+
+  const displayErrors = rawErrors.filter(
     (error) => !error.toLowerCase().includes('required')
-  ) || [];
-  
-  const errorText = displayErrors.length > 0 ? displayErrors[0] : '';
+  );
+  const errorText = displayErrors?.[0] || '';
+  const hasError =
+    displayErrors && displayErrors.length > 0 && errorText.trim() !== '';
 
   return (
-    <>
-     <input
+    <LocalizationProvider dateAdapter={AdapterDayjs} required={required}>
+       <input
         value={value ?? ''}
         required={required}
-        onChange={() => { /* no-op */ }}
+        onChange={() => {}}
         tabIndex={-1}
         style={{
           height: 1,
@@ -73,55 +86,80 @@ const CustomDateWidget = ({
                 marginTop="50px"
 
       />
-    <LocalizationProvider dateAdapter={AdapterDayjs} required={required}>
-      <DatePicker
-        disabled={isDisabled}
-        label={`${t(`FORM.${label}`, {
-          defaultValue: label,
-        })}`}
-        value={selectedDate || null}
-        onChange={handleDateChange}
-        minDate={minValue ? dayjs(minValue, 'YYYY-MM-DD') : undefined}
-        maxDate={maxValue ? dayjs(maxValue, 'YYYY-MM-DD') : undefined}
-        format="DD-MM-YYYY"
-        openTo="day"
-        views={['year', 'month', 'day']}
-        slotProps={{
-          textField: {
-            fullWidth: true,
-            variant: 'outlined',
-            error: displayErrors.length > 0,
-            helperText: errorText,
-            required,
-            inputProps: {
+      {isMobile ? (
+        <>
+          {/* Mobile TextField with calendar icon */}
+          <TextField
+            disabled={isDisabled}
+            label={`${t(`FORM.${label}`, { defaultValue: label })}`}
+            value={selectedDate ? selectedDate.format('DD-MM-YYYY') : ''}
+            fullWidth
+            variant="outlined"
+            required={required}
+            InputProps={{
               readOnly: true,
-            },
-            InputProps: {
-              endAdornment: <CalendarToday />,
-            },
-          },
-          popper: {
-            placement: 'bottom-start',
-            modifiers: [
-              {
-                name: 'preventOverflow',
-                options: {
-                  boundary: 'viewport',
-                },
+              endAdornment: (
+                <IconButton
+                  onClick={handleCalendarIconClick}
+                  disabled={isDisabled}
+                  edge="end"
+                  size="small"
+                >
+                  <CalendarToday />
+                </IconButton>
+              ),
+            }}
+            onClick={!isDisabled ? handleCalendarIconClick : undefined}
+            error={hasError}
+            helperText={hasError ? errorText : ''}
+          />
+
+          {/* Mobile DatePicker popup */}
+          {isCalendarOpen && (
+            <DatePicker
+              open
+              onClose={handleCalendarClose}
+              disabled={isDisabled}
+              value={selectedDate || null}
+              onChange={(date) => {
+                handleDateChange(date);
+                handleCalendarClose();
+              }}
+              minDate={minValue ? dayjs(minValue, 'YYYY-MM-DD') : undefined}
+              maxDate={maxValue ? dayjs(maxValue, 'YYYY-MM-DD') : undefined}
+              format="DD-MM-YYYY"
+              slotProps={{ popper: { placement: 'bottom-start' } }}
+              renderInput={() => null}
+            />
+          )}
+        </>
+      ) : (
+        // Desktop DatePicker
+        <DatePicker
+          disabled={isDisabled}
+          label={`${t(`FORM.${label}`, { defaultValue: label })}`}
+          value={selectedDate || null}
+          onChange={handleDateChange}
+          minDate={minValue ? dayjs(minValue, 'YYYY-MM-DD') : undefined}
+          maxDate={maxValue ? dayjs(maxValue, 'YYYY-MM-DD') : undefined}
+          format="DD-MM-YYYY"
+          slotProps={{
+            textField: {
+              fullWidth: true,
+              variant: 'outlined',
+              error: hasError,
+              helperText: hasError ? errorText : '',
+              required,
+              inputProps: {
+                readOnly: true, // prevent manual typing
               },
-            ],
-          },
-          actionBar: {
-            actions: ['clear', 'today', 'cancel', 'accept'],
-          },
-        }}
-        required={required}
-      />
-      
+              onKeyDown: (e) => e.preventDefault(), // block keyboard typing
+            },
+          }}
+          required={required}
+        />
+      )}
     </LocalizationProvider>
-    {/* Hidden text input to force native validation */}
-     
-    </>
   );
 };
 
