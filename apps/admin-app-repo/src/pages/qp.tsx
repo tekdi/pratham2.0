@@ -535,7 +535,7 @@ const QuestionPaperPDF = ({ data }: any) => {
                             src={imageQuestionUrl}
                             // src={clslogo}
                             style={{
-                              width: 150, // adjust as needed
+                              width: 800, // adjust as needed
                               // height: 50,
                               // borderRadius: 0,
                             }}
@@ -571,7 +571,7 @@ const QuestionPaperPDF = ({ data }: any) => {
                                   src={imageUrl}
                                   // src={clslogo}
                                   style={{
-                                    width: 50, // adjust as needed
+                                    width: 250, // adjust as needed
                                     // height: 50,
                                     // borderRadius: 0,
                                   }}
