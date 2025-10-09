@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { TextField } from '@mui/material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import { CalendarToday } from '@mui/icons-material';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 
@@ -48,14 +49,19 @@ const CustomDateWidget = ({
     }
   };
 
-  const errorText = rawErrors?.length > 0 ? rawErrors[0] : '';
+  // Filter out 'is a required property' messages
+  const displayErrors = rawErrors?.filter(
+    (error) => !error.toLowerCase().includes('required')
+  ) || [];
+  
+  const errorText = displayErrors.length > 0 ? displayErrors[0] : '';
 
   return (
     <>
      <input
         value={value ?? ''}
         required={required}
-        onChange={() => {}}
+        onChange={() => { /* no-op */ }}
         tabIndex={-1}
         style={{
           height: 1,
@@ -78,25 +84,35 @@ const CustomDateWidget = ({
         minDate={minValue ? dayjs(minValue, 'YYYY-MM-DD') : undefined}
         maxDate={maxValue ? dayjs(maxValue, 'YYYY-MM-DD') : undefined}
         format="DD-MM-YYYY"
+        openTo="day"
+        views={['year', 'month', 'day']}
         slotProps={{
           textField: {
             fullWidth: true,
             variant: 'outlined',
-            // error: rawErrors.length > 0,
-            // helperText: errorText,
+            error: displayErrors.length > 0,
+            helperText: errorText,
             required,
             inputProps: {
               readOnly: true,
             },
-            onClick: (event: any) => {
-              event.preventDefault();
+            InputProps: {
+              endAdornment: <CalendarToday />,
             },
-            onKeyDown: (event: any) => {
-              event.preventDefault();
-            },
-            onInput: (event: any) => {
-              event.preventDefault();
-            }
+          },
+          popper: {
+            placement: 'bottom-start',
+            modifiers: [
+              {
+                name: 'preventOverflow',
+                options: {
+                  boundary: 'viewport',
+                },
+              },
+            ],
+          },
+          actionBar: {
+            actions: ['clear', 'today', 'cancel', 'accept'],
           },
         }}
         required={required}
