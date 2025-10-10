@@ -96,39 +96,39 @@ const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
 
 
         {state === 'loader' &&(
-        <>
-          <Box sx={{ mb: 3 }}>
-            <CheckCircleOutlineOutlinedIcon
-              sx={{ fontSize: 40, color: '#019722' }}
-            />
-          </Box>
-          <Typography
-            sx={{
-              ...poppinsFont,
-              fontWeight: 400,
-              fontSize: 22,
-              color: '#1F1B13',
-              textAlign: 'center',
-              mb: 2,
-            }}
-          >
-            Questions generated successfully!
-          </Typography>
-          <Typography
-            sx={{
-              ...poppinsFont,
-              fontWeight: 400,
-              fontSize: 16,
-              color: '#635E57',
-              mb: 4,
-              textAlign: 'center',
-              maxWidth: 600,
-              lineHeight: 1.5,
-            }}
-          >
-            You can head to the editor and review the questions.
-          </Typography>
-        </>
+          <>
+            <Box sx={{ mb: 3 }}>
+              <CheckCircleOutlineOutlinedIcon
+                sx={{ fontSize: 40, color: '#019722' }}
+              />
+            </Box>
+            <Typography
+              sx={{
+                ...poppinsFont,
+                fontWeight: 400,
+                fontSize: 22,
+                color: '#1F1B13',
+                textAlign: 'center',
+                mb: 2,
+              }}
+            >
+              Questions generated successfully!
+            </Typography>
+            <Typography
+              sx={{
+                ...poppinsFont,
+                fontWeight: 400,
+                fontSize: 16,
+                color: '#635E57',
+                mb: 4,
+                textAlign: 'center',
+                maxWidth: 600,
+                lineHeight: 1.5,
+              }}
+            >
+              You can head to the editor and review the questions.
+            </Typography>
+          </>
         )}
 
         {/* Loader State */}
@@ -229,7 +229,7 @@ const AIGenerationDialog: React.FC<AIGenerationDialogProps> = ({
           </>
         )}
         {/* Sub-message and Footer Button for all states */}
-        {state !== 'failed' && (
+        {state !== 'failed' && state !== 'processing' && (
           <Box
             sx={{
               width: '100%',

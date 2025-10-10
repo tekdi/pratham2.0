@@ -1,14 +1,15 @@
 import CloseIcon from '@mui/icons-material/Close';
 import {
-    Box,
-    Button,
-    Checkbox,
-    Divider,
-    Grid,
-    IconButton,
-    Modal,
-    TextField,
-    Typography
+  Box,
+  Button,
+  Checkbox,
+  Divider,
+  Grid,
+  IconButton,
+  Modal,
+  TextField,
+  Typography,
+  FormControlLabel,
 } from '@mui/material';
 import { getFormFields } from '@workspace/services/ContentService';
 import { Publish } from '@workspace/utils/app.constant';
@@ -85,7 +86,7 @@ const ConfirmActionPopup: React.FC<ConfirmActionPopupProps> = ({
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
-        width: 550,
+        width: 720,
         bgcolor: 'background.paper',
         boxShadow: 24,
         borderRadius:'16px'
@@ -95,23 +96,24 @@ const ConfirmActionPopup: React.FC<ConfirmActionPopupProps> = ({
             <Box sx={style}>
                 <Box
                     sx={{
-                        color: 'black',
+                        color: 'white',
+                        bgcolor: '#024f9d',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        padding:"16px 16px 10px"
+                        padding:"1px 16px 1px"
                     }}
                 >
                     <Typography variant="h6" sx={{
                         margin: 0,
                         fontFamily: 'inherit',
                         lineHeight: '24px',
-                        fontWeight: 500,
+                        fontWeight: 800,
                         fontSize: '16px',
                     }}>
                         {actionType === Publish.PUBLISH ? 'Confirm Publish Action' : 'Confirm Reject Action'}
                     </Typography>
-                    <IconButton onClick={handleClose} sx={{ color: 'black' }}>
+                    <IconButton onClick={handleClose} sx={{ color: 'white' }}>
                         <CloseIcon />
                     </IconButton>
                 </Box>
@@ -124,64 +126,74 @@ const ConfirmActionPopup: React.FC<ConfirmActionPopupProps> = ({
                     overflowY: 'auto',
                     overflowX: 'hidden',
                 }}>
-                    <Typography gutterBottom >
-                        {actionType === 'publish'
-                            ? `Please confirm that ALL the following items are verified (by ticking the checkboxes) before you can ${actionType}.`
+                    <Typography gutterBottom sx={{ fontSize: '14px', fontWeight: 800, lineHeight: 1.2 }}>
+                        {actionType === Publish.PUBLISH
+                            ? `Please confirm that ALL the following items are verified (by ticking the check-boxes) before you can ${actionType}.`
                             : 'Please select the reason(s) for rejection by ticking the checkboxes below and provide a comment to proceed with rejecting the action:'}
                     </Typography>
 
-                    <Grid container spacing={2} mt={2}>
-                        <Grid item xs={6}>
-                            <Typography
-                                sx={{
-                                    fontSize: '14px',
-                                    fontWeight: 500,
-                                    mb: 1,
-                                    marginLeft: '10px'
-                                }}
-                                variant="h6"
-                            >
-                                Usability
-                            </Typography>
-                            {usabilityOptions.map((option) => (
-                                <Grid container spacing={2}>
-                                    <Grid xs={2} item>
-                                        <Checkbox
-                                            checked={checkedItems.includes(option)}
-                                            onChange={() => handleCheckboxChange(option)}
-                                            sx={{ color: 'black', '&.Mui-checked': { color: 'black' } }}
-                                        />
-                                    </Grid>
-                                    <Grid xs={10} item>
-                                        <Box sx={{marginTop:'8px', marginLeft:'6px'}}>{option}</Box>
-                                    </Grid>
-                                </Grid>
-                            ))}
-                        </Grid>
-                        <Grid item xs={6}>
-                            <Typography sx={{
-                                fontSize: '14px',
-                                fontWeight: '500',
-                                mb:1,
-                                marginLeft: '10px'
-                            }} variant="h6">Content Details</Typography>
-                            {contentDetailsOptions.map((option) => (
-                                <Grid container spacing={2}>
-                                    <Grid xs={2} item>
-                                        <Checkbox
-                                            checked={checkedItems.includes(option)}
-                                            onChange={() => handleCheckboxChange(option)}
-                                            sx={{ color: 'black', '&.Mui-checked': { color: 'black' } }}
-                                        />
-                                    
-                                    </Grid>
-                                    <Grid xs={10} item>
-                                        <Box sx={{marginTop:'8px', marginLeft:'6px'}}>{option}</Box>
-                                    </Grid>
-                                </Grid>
-                            ))}
-                        </Grid>
-                    </Grid>
+          <Grid container spacing={2} mt={2}>
+            <Grid item xs={6}>
+              <Typography
+                sx={{
+                  fontSize: '14px',
+                  fontWeight: 800,
+                  mb: 1,
+                  marginLeft: '10px',
+                }}
+              >
+                Content Details
+              </Typography>
+              {contentDetailsOptions.map((option) => (
+                <FormControlLabel
+                  key={option}
+                  sx={{ alignItems: 'flex-start', m: 0.5, '& .MuiFormControlLabel-label': { fontSize: '12px', lineHeight: 1.2, marginTop: '5px' } }}
+                  control={
+                    <Checkbox
+                      checked={checkedItems.includes(option)}
+                      onChange={() => handleCheckboxChange(option)}
+                      sx={{
+                        color: '#024f9d',
+                        '&.Mui-checked': { color: '#024f9d' },
+                        py: 0.5,
+                      }}
+                    />
+                  }
+                  label={option}
+                />
+              ))}
+            </Grid>
+            <Grid item xs={6}>
+              <Typography
+                sx={{
+                  fontSize: '14px',
+                  fontWeight: 800,
+                  mb: 1,
+                  marginLeft: '10px',
+                }}
+              >
+                Usability
+              </Typography>
+              {usabilityOptions.map((option) => (
+                <FormControlLabel
+                  key={option}
+                  sx={{ alignItems: 'flex-start', m: 0.5, '& .MuiFormControlLabel-label': { fontSize: '12px', lineHeight: 1.2, marginTop: '5px' }}}                  
+                  control={
+                    <Checkbox
+                      checked={checkedItems.includes(option)}
+                      onChange={() => handleCheckboxChange(option)}
+                      sx={{
+                        color: '#024f9d',
+                        '&.Mui-checked': { color: '#024f9d' },
+                        py: 0.5,
+                      }}
+                    />
+                  }
+                  label={option}
+                />
+              ))}
+            </Grid>
+          </Grid>
 
                     {actionType === 'reject' && (
                         <TextField
@@ -207,8 +219,7 @@ const ConfirmActionPopup: React.FC<ConfirmActionPopupProps> = ({
                     <Button
                         onClick={handleConfirm}
                         variant="contained"
-                        color="primary"
-                        sx={{ minWidth: 120, textTransform: 'capitalize', borderRadius: '50px', ml: 2 }}
+                        sx={{ minWidth: 120, textTransform: 'capitalize', borderRadius: '50px', ml: 2,color: 'white', backgroundColor: '#024f9d','&:hover': {backgroundColor: '#013b75'} }}
                         disabled={(comment === '' && actionType === Publish.REJECT ) || (actionType === Publish.PUBLISH  && !allChecked)}
                     >
                         {actionType === Publish.PUBLISH ? 'Publish' : 'Reject'}
