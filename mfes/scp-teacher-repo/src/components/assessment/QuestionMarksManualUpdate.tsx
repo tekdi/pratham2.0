@@ -832,6 +832,19 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
                           }
                         >
                           <div
+                            onClick={(e) => {
+                              if (!hasImage) return;
+                              const t = e.target as HTMLElement | null;
+                              if (t && t.tagName === 'IMG') {
+                                const srcs = extractImageSrcs(q.questionTitle);
+                                const src = srcs[0] ?? null;
+                                set_zoomImageSrc(src);
+                                const el: any = fullScreenContainerRef.current;
+                                if (src && el && el.requestFullscreen) {
+                                  el.requestFullscreen().catch(() => {});
+                                }
+                              }
+                            }}
                             dangerouslySetInnerHTML={{ __html: questionHtml }}
                           />
                           {hasImage && (
