@@ -818,10 +818,12 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
                           style={
                             hasImage
                               ? {
-                                  width: '100%',
+                                  width: 'fit-content',
+                                  display: 'inline-block',
                                   border: '1px solid #eee',
                                   borderRadius: 8,
                                   padding: 8,
+                                  paddingRight: 0,
                                   background: '#fff',
                                   marginTop: '0px',
                                   position: 'relative',
@@ -846,15 +848,16 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
                               }}
                               sx={{
                                 position: 'absolute',
-                                top: 6,
-                                right: 6,
+                                top: '20%',
+                                right: 0,
+                                transform: 'translateY(-50%)',
                                 bgcolor: 'rgba(255,255,255,0.9)',
                                 boxShadow: 1,
                                 '&:hover': { bgcolor: 'rgba(255,255,255,1)' },
                               }}
                               size="small"
                             >
-                              <ZoomInIcon fontSize="small" />
+                              <ZoomInIcon fontSize="medium" />
                             </IconButton>
                           )}
                         </div>
