@@ -340,6 +340,7 @@ export default function Content(props: Readonly<ContentProps>) {
     async (
       resultData: ImportedContentSearchResponse[]
     ): Promise<TrackDataItem[]> => {
+      console.log('resultData=====>>>>>>', resultData);
       if (!resultData.length) return [];
 
       try {
@@ -350,36 +351,88 @@ export default function Content(props: Readonly<ContentProps>) {
 
         if (!userId || !courseList.length) return [];
         const userIdArray = userId.split(',').filter(Boolean);
-        const [courseTrackData, certificates] = await Promise.all([
-          trackingData(userIdArray, courseList),
-          getUserCertificates({
-            userId: userId,
-            courseId: courseList,
-            limit: localFilters.limit,
-            offset: localFilters.offset,
-          }),
-        ]);
+        
+        // Fetch certificates first (don't wait for trackingData as it's delayed)
+        const certificates = await getUserCertificates({
+          userId: userId,
+          courseId: courseList,
+          limit: localFilters.limit,
+          offset: localFilters.offset,
+        });
 
-        if (!courseTrackData?.data) return [];
+        // Fetch tracking data asynchronously without blocking
+        const trackingPromise = trackingData(userIdArray, courseList);
+        if (trackingPromise) {
+          trackingPromise.then((courseTrackData) => {
+            if (!courseTrackData?.data) return;
 
-        const userTrackData =
-          courseTrackData.data.find((course: any) => course.userId === userId)
-            ?.course ?? [];
+            const userTrackData =
+              courseTrackData.data.find((course: any) => course.userId === userId)
+                ?.course ?? [];
 
-        return userTrackData.map((item: any) => ({
-          ...item,
-          ...calculateTrackDataItem(
-            item,
-            resultData.find(
-              (subItem) => item.courseId === subItem.identifier
-            ) ?? {}
-          ),
-          enrolled: Boolean(
-            certificates.result.data.find(
-              (cert: any) => cert.courseId === item.courseId
-            )?.status === 'enrolled'
-          ),
-        }));
+            const updatedTrackData = userTrackData.map((item: any) => {
+              const certificate = certificates?.result?.data?.find(
+                (cert: any) => cert.courseId === item.courseId
+              );
+              const certificateStatus = certificate?.status;
+              
+              const trackDataItem = calculateTrackDataItem(
+                item,
+                resultData.find(
+                  (subItem) => item.courseId === subItem.identifier
+                ) ?? {}
+              );
+              
+              // Normalize and map certificate status
+            //  let finalStatus = trackDataItem.status; // Default to progress-based status
+              
+              // if (certificateStatus) {
+              //   // Map certificate status values to standardized status
+              //   if (certificateStatus === 'viewCertificate') {
+              //     finalStatus = 'completed';
+              //   } else if (certificateStatus === 'inprogress' || certificateStatus === 'in-progress') {
+              //     finalStatus = 'in progress';
+              //   } else if (certificateStatus === 'completed') {
+              //     finalStatus = 'completed';
+              //   } else if (certificateStatus === 'enrolled') {
+              //     // If only enrolled but no progress, check if there's progress data
+              //     finalStatus = trackDataItem.status || 'not started';
+              //   } else {
+              //     // For any other certificate status, use it as-is
+              //     finalStatus = certificateStatus;
+              //   }
+              // }
+              
+              return {
+                ...item,
+                ...trackDataItem,
+               // status: finalStatus,
+                enrolled: certificateStatus === 'enrolled',
+              };
+            });
+
+            // Update track data state when tracking data arrives
+            setTrackData((prev) => {
+              // If offset is 0, replace all data, otherwise append
+              if (localFilters.offset === 0) {
+                return updatedTrackData;
+              } else {
+                // For load more, merge with existing data
+                const existingIds = new Set(prev.map((p: any) => p.courseId));
+                const newItems = updatedTrackData.filter(
+                  (item: any) => !existingIds.has(item.courseId)
+                );
+                return [...prev, ...newItems];
+              }
+            });
+          })
+          .catch((error) => {
+            console.error('Error fetching track data:', error);
+          });
+        }
+
+        // Return empty array initially - tracking data will be updated asynchronously
+        return [];
       } catch (error) {
         console.error('Error fetching track data:', error);
         return [];
@@ -403,7 +456,7 @@ export default function Content(props: Readonly<ContentProps>) {
       )
         return;
 
-      setIsLoading(true);
+     setIsLoading(true);
       try {
         const response = await fetchAllContent(localFilters);
         if (!response || !isMounted) return;
@@ -411,15 +464,17 @@ export default function Content(props: Readonly<ContentProps>) {
           ...(response.content ?? []),
           ...(response?.QuestionSet ?? []),
         ];
-        const userTrackData = await fetchDataTrack(newContentData);
-        console.log('userTrackData', userTrackData);
+        
+        // Trigger async tracking data fetch (doesn't block UI)
+        fetchDataTrack(newContentData);
+        
         if (!isMounted) return;
         if (localFilters.offset === 0) {
           setContentData(newContentData);
-          setTrackData(userTrackData);
+          setTrackData([]); // Reset trackData, will be updated asynchronously
         } else {
           setContentData((prev) => [...(prev ?? []), ...newContentData]);
-          setTrackData((prev) => [...prev, ...userTrackData]);
+          // trackData will be updated asynchronously by fetchDataTrack
         }
 
         setHasMoreData(
