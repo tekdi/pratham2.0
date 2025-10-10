@@ -153,8 +153,8 @@ const ConfirmActionPopup: React.FC<ConfirmActionPopupProps> = ({
                       checked={checkedItems.includes(option)}
                       onChange={() => handleCheckboxChange(option)}
                       sx={{
-                        color: 'black',
-                        '&.Mui-checked': { color: 'black' },
+                        color: '#024f9d',
+                        '&.Mui-checked': { color: '#024f9d' },
                         py: 0.5,
                       }}
                     />
@@ -183,8 +183,8 @@ const ConfirmActionPopup: React.FC<ConfirmActionPopupProps> = ({
                       checked={checkedItems.includes(option)}
                       onChange={() => handleCheckboxChange(option)}
                       sx={{
-                        color: 'black',
-                        '&.Mui-checked': { color: 'black' },
+                        color: '#024f9d',
+                        '&.Mui-checked': { color: '#024f9d' },
                         py: 0.5,
                       }}
                     />
