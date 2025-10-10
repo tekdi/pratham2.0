@@ -381,6 +381,7 @@ const AIAssessmentCreator: React.FC = () => {
         //added for evaluationType
         evaluationType: 'ai',
         gradeLevel: ['Grade 10'],
+        program: ['Second Chance'],
       },
     };
     try {
