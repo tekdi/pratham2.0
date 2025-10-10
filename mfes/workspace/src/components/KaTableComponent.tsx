@@ -143,47 +143,47 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
     } else if (tableTitle === 'submitted') {
       content.contentType === 'Course'
         ? router.push({
-          pathname: `/course-hierarchy/${identifier}`,
-          query: { identifier, isReadOnly: true, previousPage: 'submitted' },
-        })
+            pathname: `/course-hierarchy/${identifier}`,
+            query: { identifier, isReadOnly: true, previousPage: 'submitted' },
+          })
         : router.push({
-          pathname: `/workspace/content/review`,
-          query: { identifier },
-        });
+            pathname: `/workspace/content/review`,
+            query: { identifier },
+          });
     } else if (tableTitle === 'all-content' && mode === 'review') {
       content.contentType === 'Course'
         ? router.push({
-          pathname: `/course-hierarchy/${identifier}`,
-          query: {
-            identifier,
-            isReadOnly: true,
-            previousPage: 'allContents',
-          },
-        })
+            pathname: `/course-hierarchy/${identifier}`,
+            query: {
+              identifier,
+              isReadOnly: true,
+              previousPage: 'allContents',
+            },
+          })
         : router.push({
-          pathname: `/workspace/content/review`,
-          query: { identifier, isReadOnly: true, isAllContents: true },
-        });
+            pathname: `/workspace/content/review`,
+            query: { identifier, isReadOnly: true, isAllContents: true },
+          });
     } else if (tableTitle === 'discover-contents') {
       content.contentType === 'Course'
         ? router.push({
-          pathname: `/course-hierarchy/${identifier}`,
-          query: { identifier, previousPage: 'discover-contents' },
-        })
+            pathname: `/course-hierarchy/${identifier}`,
+            query: { identifier, previousPage: 'discover-contents' },
+          })
         : router.push({
-          pathname: `/workspace/content/review`,
-          query: { identifier, isDiscoverContent: true },
-        });
+            pathname: `/workspace/content/review`,
+            query: { identifier, isDiscoverContent: true },
+          });
     } else if (tableTitle === 'content-library') {
       content.contentType === 'Course'
         ? router.push({
-          pathname: `/course-hierarchy/${identifier}`,
-          query: { identifier, previousPage: 'content-library' },
-        })
+            pathname: `/course-hierarchy/${identifier}`,
+            query: { identifier, previousPage: 'content-library' },
+          })
         : router.push({
-          pathname: `/workspace/content/review`,
-          query: { identifier, isContentLibrary: true },
-        });
+            pathname: `/workspace/content/review`,
+            query: { identifier, isContentLibrary: true },
+          });
     } else if (
       content?.mimeType &&
       MIME_TYPE.GENERIC_MIME_TYPE.includes(content?.mimeType)
@@ -211,14 +211,14 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
         columns={
           selectable
             ? [
-              {
-                key: '__select__',
-                title: '',
-                dataType: DataType.Boolean,
-                style: { width: 40 },
-              },
-              ...columns,
-            ]
+                {
+                  key: '__select__',
+                  title: '',
+                  dataType: DataType.Boolean,
+                  style: { width: 40 },
+                },
+                ...columns,
+              ]
             : columns
         }
         data={data}
@@ -227,25 +227,25 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
         childComponents={{
           cell: selectable
             ? {
-              content: (props) => {
-                if (props.column.key === '__select__') {
-                  return (
-                    <Checkbox
-                      checked={selected.includes(props.rowData.identifier)}
-                      disabled={
-                        !selected.includes(props.rowData.identifier) &&
-                        selected.length >= 3
-                      }
-                      onChange={() =>
-                        onSelect && onSelect(props.rowData.identifier)
-                      }
-                      size="small"
-                    />
-                  );
-                }
-                return undefined;
-              },
-            }
+                content: (props) => {
+                  if (props.column.key === '__select__') {
+                    return (
+                      <Checkbox
+                        checked={selected.includes(props.rowData.identifier)}
+                        disabled={
+                          !selected.includes(props.rowData.identifier) &&
+                          selected.length >= 3
+                        }
+                        onChange={() =>
+                          onSelect && onSelect(props.rowData.identifier)
+                        }
+                        size="small"
+                      />
+                    );
+                  }
+                  return undefined;
+                },
+              }
             : undefined,
           cellText: {
             content: (props) => {
@@ -269,9 +269,21 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
                       style={{
                         display: 'flex',
                         alignItems: 'center',
-                        cursor: selectable ? 'default' : 'pointer',
+                        cursor: selectable
+                          ? 'default'
+                          : props?.rowData?.aiStatus === 'FAILED'
+                          ? 'not-allowed'
+                          : 'pointer',
                       }}
-                      onClick={() => !selectable && openEditor(props.rowData)}
+                      onClick={() => {
+                        if (props?.rowData?.aiStatus === 'FAILED') {
+                          window.alert(
+                            'The AI Assessment you are trying to create has been failed. Please try creating a new assessment.'
+                          );
+                        } else {
+                          !selectable && openEditor(props.rowData);
+                        }
+                      }}
                     >
                       <Grid container alignItems="center" spacing={1}>
                         <Grid item xs={3} md={3} lg={3} xl={2}>
