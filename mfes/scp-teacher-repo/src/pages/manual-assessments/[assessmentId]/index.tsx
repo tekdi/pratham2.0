@@ -767,7 +767,7 @@ const AssessmentDetails: React.FC = () => {
             }}
           />
           <Box sx={{ display: 'flex', gap: 2 }}>
-            <Button
+            {/* <Button
               variant="contained"
               color="primary"
               endIcon={<DownloadIcon />}
@@ -788,7 +788,7 @@ const AssessmentDetails: React.FC = () => {
               }}
             >
               {t('AI.SAMPLE_QUESTION_AND_ANSWER_PAPER')}
-            </Button>
+            </Button> */}
             {/* Download PDF Card */}
             {assessmentData?.hasLongShortAnswers && (
               <Button
