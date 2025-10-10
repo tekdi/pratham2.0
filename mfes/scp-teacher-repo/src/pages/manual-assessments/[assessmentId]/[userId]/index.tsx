@@ -1187,22 +1187,37 @@ const AssessmentDetails = () => {
                     handleReUpload();
                   }}
                 >
-                  <Box>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: { xs: 0.5, md: 1 },
+                      flexWrap: 'nowrap',
+                      minWidth: 0,
+                      overflow: 'hidden',
+                    }}
+                  >
                     <Typography
                       sx={{
                         color: '#635E57',
-                        fontSize: { xs: '14px', md: '16px' },
+                        fontSize: { xs: '12px', md: '16px' },
                         fontWeight: 400,
                         letterSpacing: '0.1px',
+                        whiteSpace: 'nowrap',
                       }}
                     >
                       {assessmentData?.fileUrls &&
-                        assessmentData.fileUrls.length > 0 ? (
+                      assessmentData.fileUrls.length > 0
+                        ? `${assessmentData.fileUrls.length} ${
+                            assessmentData.fileUrls.length === 1
+                              ? 'image'
+                              : 'images'
+                          } uploaded`
+                        : 'No images uploaded'}
+                    </Typography>
+                    {assessmentData?.fileUrls &&
+                      assessmentData.fileUrls.length > 0 && (
                         <>
-                          {`${assessmentData.fileUrls.length} ${assessmentData.fileUrls.length === 1
-                            ? 'image'
-                            : 'images'
-                            } uploaded`}
                           <Button
                             variant="contained"
                             size="small"
@@ -1211,18 +1226,16 @@ const AssessmentDetails = () => {
                               handleUploadInfoClick();
                             }}
                             sx={{
-                              ml: 1,
+                              ml: 0,
                               textTransform: 'none',
                               borderRadius: '8px',
                               fontWeight: 600,
-                              fontSize: '14px',
-                              height: '32px',
-                              padding: '2px 8px',
-                              display: 'inline-flex',
+                              fontSize: { xs: '12px', md: '14px' },
+                              height: { xs: '28px', md: '32px' },
+                              px: { xs: 1, md: 1.5 },
                               backgroundColor: '#FFC107',
                               color: '#1F1B13',
                               '&:hover': { backgroundColor: '#FFB300' },
-                              mb: 1,
                             }}
                           >
                             {t('ASSESSMENTS.VIEW')}
@@ -1233,37 +1246,31 @@ const AssessmentDetails = () => {
                             'AI Pending',
                             'Approved',
                           ].includes(assessmentData?.status || '') && (
-                              <>
-                                <Button
-                                  variant="contained"
-                                  size="small"
-                                  onClick={(e) => {
-                                    // e.stopPropagation();
-                                    // handleReUpload();
-                                  }}
-                                  sx={{
-                                    ml: 1,
-                                    textTransform: 'none',
-                                    borderRadius: '8px',
-                                    fontWeight: 600,
-                                    fontSize: '14px',
-                                    height: '32px',
-                                    padding: '2px 8px',
-                                    backgroundColor: '#FFC107',
-                                    color: '#1F1B13',
-                                    '&:hover': { backgroundColor: '#FFB300' },
-                                    mb: 1,
-                                  }}
-                                >
-                                  {t('ASSESSMENTS.REUPLOAD')}
-                                </Button>
-                              </>
-                            )}
+                            <Button
+                              variant="contained"
+                              size="small"
+                              onClick={(e) => {
+                                // e.stopPropagation();
+                                // handleReUpload();
+                              }}
+                              sx={{
+                                ml: 0,
+                                textTransform: 'none',
+                                borderRadius: '8px',
+                                fontWeight: 600,
+                                fontSize: { xs: '12px', md: '14px' },
+                                height: { xs: '28px', md: '32px' },
+                                px: { xs: 1, md: 1.5 },
+                                backgroundColor: '#FFC107',
+                                color: '#1F1B13',
+                                '&:hover': { backgroundColor: '#FFB300' },
+                              }}
+                            >
+                              {t('ASSESSMENTS.REUPLOAD')}
+                            </Button>
+                          )}
                         </>
-                      ) : (
-                        'No images uploaded'
                       )}
-                    </Typography>
                   </Box>
                   <IconButton
                     onClick={(e) => {
@@ -1274,9 +1281,9 @@ const AssessmentDetails = () => {
                       color: '#1F1B13',
                       p: 0,
                       '& .MuiSvgIcon-root': {
-                        fontSize: { xs: 24, md: 28 },
+                        fontSize: { xs: 22, md: 28 },
                       },
-                      mb: 1,
+                      mb: 0,
                     }}
                   >
                     <FileUploadIcon />
