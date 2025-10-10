@@ -1,14 +1,15 @@
 import CloseIcon from '@mui/icons-material/Close';
 import {
-    Box,
-    Button,
-    Checkbox,
-    Divider,
-    Grid,
-    IconButton,
-    Modal,
-    TextField,
-    Typography
+  Box,
+  Button,
+  Checkbox,
+  Divider,
+  Grid,
+  IconButton,
+  Modal,
+  TextField,
+  Typography,
+  FormControlLabel,
 } from '@mui/material';
 import { getFormFields } from '@workspace/services/ContentService';
 import { Publish } from '@workspace/utils/app.constant';
@@ -130,58 +131,70 @@ const ConfirmActionPopup: React.FC<ConfirmActionPopupProps> = ({
                             : 'Please select the reason(s) for rejection by ticking the checkboxes below and provide a comment to proceed with rejecting the action:'}
                     </Typography>
 
-                    <Grid container spacing={2} mt={2}>
-                        <Grid item xs={6}>
-                            <Typography
-                                sx={{
-                                    fontSize: '14px',
-                                    fontWeight: 500,
-                                    mb: 1,
-                                    marginLeft: '10px'
-                                }}
-                                variant="h6"
-                            >
-                                Usability
-                            </Typography>
-                            {usabilityOptions.map((option) => (
-                                <Grid container spacing={2}>
-                                    <Grid xs={2} item>
-                                        <Checkbox
-                                            checked={checkedItems.includes(option)}
-                                            onChange={() => handleCheckboxChange(option)}
-                                            sx={{ color: 'black', '&.Mui-checked': { color: 'black' } }}
-                                        />
-                                    </Grid>
-                                    <Grid xs={10} item>
-                                        <Box sx={{marginTop:'8px', marginLeft:'6px'}}>{option}</Box>
-                                    </Grid>
-                                </Grid>
-                            ))}
-                        </Grid>
-                        <Grid item xs={6}>
-                            <Typography sx={{
-                                fontSize: '14px',
-                                fontWeight: '500',
-                                mb:1,
-                                marginLeft: '10px'
-                            }} variant="h6">Content Details</Typography>
-                            {contentDetailsOptions.map((option) => (
-                                <Grid container spacing={2}>
-                                    <Grid xs={2} item>
-                                        <Checkbox
-                                            checked={checkedItems.includes(option)}
-                                            onChange={() => handleCheckboxChange(option)}
-                                            sx={{ color: 'black', '&.Mui-checked': { color: 'black' } }}
-                                        />
-                                    
-                                    </Grid>
-                                    <Grid xs={10} item>
-                                        <Box sx={{marginTop:'8px', marginLeft:'6px'}}>{option}</Box>
-                                    </Grid>
-                                </Grid>
-                            ))}
-                        </Grid>
-                    </Grid>
+          <Grid container spacing={2} mt={2}>
+            <Grid item xs={6}>
+              <Typography
+                sx={{
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  mb: 1,
+                  marginLeft: '10px',
+                }}
+                variant="h6"
+              >
+                Usability
+              </Typography>
+              {usabilityOptions.map((option) => (
+                <FormControlLabel
+                  key={option}
+                  sx={{ alignItems: 'flex-start', m: 0.5 }}
+                  control={
+                    <Checkbox
+                      checked={checkedItems.includes(option)}
+                      onChange={() => handleCheckboxChange(option)}
+                      sx={{
+                        color: 'black',
+                        '&.Mui-checked': { color: 'black' },
+                        py: 0.5,
+                      }}
+                    />
+                  }
+                  label={option}
+                />
+              ))}
+            </Grid>
+            <Grid item xs={6}>
+              <Typography
+                sx={{
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  mb: 1,
+                  marginLeft: '10px',
+                }}
+                variant="h6"
+              >
+                Content Details
+              </Typography>
+              {contentDetailsOptions.map((option) => (
+                <FormControlLabel
+                  key={option}
+                  sx={{ alignItems: 'flex-start', m: 0.5 }}
+                  control={
+                    <Checkbox
+                      checked={checkedItems.includes(option)}
+                      onChange={() => handleCheckboxChange(option)}
+                      sx={{
+                        color: 'black',
+                        '&.Mui-checked': { color: 'black' },
+                        py: 0.5,
+                      }}
+                    />
+                  }
+                  label={option}
+                />
+              ))}
+            </Grid>
+          </Grid>
 
                     {actionType === 'reject' && (
                         <TextField
