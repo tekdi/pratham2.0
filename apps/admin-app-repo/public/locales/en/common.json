@@ -316,7 +316,7 @@
   },
   "COURSE_PLANNER": {
     "LEARNERS_PREREQISITE": "Learners Prepare-requisites",
-    "NO_DATA_PRE": "No data available for Learners Practice-requisites",
+    "NO_DATA_PRE": "No data available for Learners Prepare-requisites",
     "LEARNERS_POSTREQISITE": "Learners Practice-requisites",
     "NO_DATA_POST": "No data available for Learners Practice-requisites",
     "FACILITATORS": "Facilitators Requisites",
