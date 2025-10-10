@@ -340,6 +340,7 @@ export default function Content(props: Readonly<ContentProps>) {
     async (
       resultData: ImportedContentSearchResponse[]
     ): Promise<TrackDataItem[]> => {
+      console.log('resultData=====>>>>>>', resultData);
       if (!resultData.length) return [];
 
       try {
@@ -366,20 +367,46 @@ export default function Content(props: Readonly<ContentProps>) {
           courseTrackData.data.find((course: any) => course.userId === userId)
             ?.course ?? [];
 
-        return userTrackData.map((item: any) => ({
-          ...item,
-          ...calculateTrackDataItem(
+        return userTrackData.map((item: any) => {
+          const certificate = certificates.result.data.find(
+            (cert: any) => cert.courseId === item.courseId
+          );
+          const certificateStatus = certificate?.status;
+          
+          const trackDataItem = calculateTrackDataItem(
             item,
             resultData.find(
               (subItem) => item.courseId === subItem.identifier
             ) ?? {}
-          ),
-          enrolled: Boolean(
-            certificates.result.data.find(
-              (cert: any) => cert.courseId === item.courseId
-            )?.status === 'enrolled'
-          ),
-        }));
+          );
+          
+          // Normalize and map certificate status
+          let finalStatus = trackDataItem.status; // Default to progress-based status
+          
+          if (certificateStatus) {
+            // Map certificate status values to standardized status
+            if (certificateStatus === 'viewCertificate') {
+              finalStatus = 'completed';
+            } else if (certificateStatus === 'inprogress' || certificateStatus === 'in-progress') {
+              finalStatus = 'in progress';
+            } else if (certificateStatus === 'completed') {
+              finalStatus = 'completed';
+            } else if (certificateStatus === 'enrolled') {
+              // If only enrolled but no progress, check if there's progress data
+              finalStatus = trackDataItem.status || 'not started';
+            } else {
+              // For any other certificate status, use it as-is
+              finalStatus = certificateStatus;
+            }
+          }
+          
+          return {
+            ...item,
+            ...trackDataItem,
+            status: finalStatus,
+            enrolled: certificateStatus === 'enrolled',
+          };
+        });
       } catch (error) {
         console.error('Error fetching track data:', error);
         return [];
