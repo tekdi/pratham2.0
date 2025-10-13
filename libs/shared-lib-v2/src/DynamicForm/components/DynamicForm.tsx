@@ -9,6 +9,7 @@ import { TextField, Container, Typography } from '@mui/material';
 import { Layout as SharedLayout } from '@shared-lib';
 import _ from 'lodash'; // Lodash for deep comparison
 import CustomMultiSelectWidget from './RJSFWidget/CustomMultiSelectWidget';
+import AutoCompleteMultiSelectWidget from './RJSFWidget/AutoCompleteMultiSelectWidget';
 import CustomCheckboxWidget from './RJSFWidget/CustomCheckboxWidget';
 import CustomDateWidget from './RJSFWidget/CustomDateWidget';
 import SearchTextFieldWidget from './RJSFWidget/SearchTextFieldWidget';
@@ -35,14 +36,14 @@ const DynamicForm = ({
   extraFields,
   hideSubmit,
   type,
-  isCompleteProfile=false,
-  isReassign=false,
-  createNew=true,
+  isCompleteProfile = false,
+  isReassign = false,
+  createNew = true,
   forEditedschema,
-  mobileAddUiSchema={},
-  mobileSchema={},
-  parentDataAddUiSchema={},
-  parentDataSchema={},
+  mobileAddUiSchema = {},
+  mobileSchema = {},
+  parentDataAddUiSchema = {},
+  parentDataSchema = {},
 }: any) => {
   console.log('forEditedschema', forEditedschema);
   const { t } = useTranslation();
@@ -57,26 +58,26 @@ const DynamicForm = ({
 
   const getInitialFormData = () => {
     console.log('prefilledFormData dob', prefilledFormData);
-    
+
     // Handle case where prefilledFormData is null or undefined
     if (!prefilledFormData) {
       return {};
     }
-    
+
     let cleaned = { ...prefilledFormData };
-    
+
     if (!prefilledFormData.class) {
       console.log('prefilledFormData class', prefilledFormData);
       delete cleaned.class;
     }
-    
+
     if (!prefilledFormData.marital_status) {
       delete cleaned.marital_status;
     }
-    if(!prefilledFormData.dob) {
-      delete cleaned.dob
+    if (!prefilledFormData.dob) {
+      delete cleaned.dob;
     }
-  
+
     // Remove family member fields if family_member_details is not provided
     if (!prefilledFormData.family_member_details) {
       if (!prefilledFormData.mother_name) {
@@ -90,7 +91,7 @@ const DynamicForm = ({
       }
       delete cleaned.family_member_details;
     }
-    
+
     return cleaned;
   };
 
@@ -126,17 +127,24 @@ const DynamicForm = ({
     return uiSchema;
   };
   // Initialize state based on createNewLearner flag
-  const [formSchema, setFormSchema] = useState(createNew ? schema : getInitialSchema());
-  const [formUiSchemaOriginal, setFormUiSchemaOriginal] = useState(createNew  ? uiSchema : getInitialUiSchema());
-  const [formUiSchema, setFormUiSchema] = useState(createNew ? uiSchema : getInitialUiSchema());
-  const [formData, setFormData] = useState(createNew  ? prefilledFormData : getInitialFormData());
-  
-console.log('formUiSchema', formUiSchema);
+  const [formSchema, setFormSchema] = useState(
+    createNew ? schema : getInitialSchema()
+  );
+  const [formUiSchemaOriginal, setFormUiSchemaOriginal] = useState(
+    createNew ? uiSchema : getInitialUiSchema()
+  );
+  const [formUiSchema, setFormUiSchema] = useState(
+    createNew ? uiSchema : getInitialUiSchema()
+  );
+  const [formData, setFormData] = useState(
+    createNew ? prefilledFormData : getInitialFormData()
+  );
+
+  console.log('formUiSchema', formUiSchema);
 
   //custom validation on formData for learner fields hide on dob
   useEffect(() => {
-    if (type == 'learner'  && !isReassign) {
-     
+    if (type == 'learner' && !isReassign) {
       let uischema = { ...formUiSchema };
 
       if (Object.keys(mobileAddUiSchema).length > 0) {
@@ -159,22 +167,25 @@ console.log('formUiSchema', formUiSchema);
       let schemaa = { ...formSchema, properties: { ...formSchema.properties } };
 
       if (Object.keys(mobileSchema).length > 0) {
-        mobileSchema.title = t("phone_number");
+        mobileSchema.title = t('phone_number');
         schemaa.properties.mobile = mobileSchema;
       }
 
       // Handle parent data schema fields
       if (Object.keys(parentDataSchema).length > 0) {
         if (parentDataSchema.parent_phone) {
-          parentDataSchema.parent_phone.title = t("PARENT_GUARDIAN_PHONE_NO");
+          parentDataSchema.parent_phone.title = t('PARENT_GUARDIAN_PHONE_NO');
           schemaa.properties.parent_phone = parentDataSchema.parent_phone;
         }
         if (parentDataSchema.guardian_relation) {
-          parentDataSchema.guardian_relation.title = t("RELATION_WITH_GUARDIAN");
-          schemaa.properties.guardian_relation = parentDataSchema.guardian_relation;
+          parentDataSchema.guardian_relation.title = t(
+            'RELATION_WITH_GUARDIAN'
+          );
+          schemaa.properties.guardian_relation =
+            parentDataSchema.guardian_relation;
         }
         if (parentDataSchema.guardian_name) {
-          parentDataSchema.guardian_name.title = t("NAME_OF_GUARDIAN");
+          parentDataSchema.guardian_name.title = t('NAME_OF_GUARDIAN');
           schemaa.properties.guardian_name = parentDataSchema.guardian_name;
         }
       }
@@ -182,7 +193,7 @@ console.log('formUiSchema', formUiSchema);
       setFormSchema(schemaa);
       setFormUiSchema(uischema);
       // ...existing code...
-      let requiredKeys = ['parent_phone', "guardian_relation" , "guardian_name"];
+      let requiredKeys = ['parent_phone', 'guardian_relation', 'guardian_name'];
       let requiredKeys2 = ['mobile'];
       console.log('formDatadynamicform', formData.family_member_details);
       console.log('updatedUiSchema------', formUiSchema);
@@ -200,8 +211,7 @@ console.log('formUiSchema', formUiSchema);
             // Merge only missing items from required2 into required1 guardian details
             requiredKeys.forEach((item) => {
               if (!requiredArray.includes(item)) {
-                if(item==="parent_phone")
-                  requiredArray.push(item);
+                if (item === 'parent_phone') requiredArray.push(item);
               }
             });
 
@@ -238,7 +248,7 @@ console.log('formUiSchema', formUiSchema);
             delete formData?.parent_phone;
             delete formData?.guardian_relation;
             delete formData?.guardian_name;
-            
+
             // remove from required
             requiredArray = requiredArray.filter(
               (key) => !requiredKeys.includes(key)
@@ -279,8 +289,7 @@ console.log('formUiSchema', formUiSchema);
           oldFormSchema.required = requiredArray;
           setFormSchema(oldFormSchema);
           setFormUiSchema(oldFormUiSchema);
-          if(isCompleteProfile)
-          setFormUiSchemaOriginal(oldFormUiSchema);
+          if (isCompleteProfile) setFormUiSchemaOriginal(oldFormUiSchema);
         }
       } else {
         //initially hide all
@@ -321,7 +330,7 @@ console.log('formUiSchema', formUiSchema);
         oldFormSchema.required = requiredArray;
         setFormSchema(oldFormSchema);
         setFormUiSchema(oldFormUiSchema);
-      //  setFormUiSchemaOriginal(oldFormUiSchema);
+        //  setFormUiSchemaOriginal(oldFormUiSchema);
       }
 
       if (!formData.family_member_details) {
@@ -333,7 +342,7 @@ console.log('formUiSchema', formUiSchema);
           delete updatedUiSchema.spouse_name;
           return updatedUiSchema;
         });
-          setFormUiSchemaOriginal((prevUiSchema) => {
+        setFormUiSchemaOriginal((prevUiSchema) => {
           const updatedUiSchema = { ...prevUiSchema };
           delete updatedUiSchema.mother_name;
           delete updatedUiSchema.father_name;
@@ -358,7 +367,6 @@ console.log('formUiSchema', formUiSchema);
           }
           return updatedSchema;
         });
-      
       } else {
         // Helper to add a field
         const addField = (fieldKey, title) => {
@@ -372,7 +380,7 @@ console.log('formUiSchema', formUiSchema);
               },
             },
           }));
-           setFormUiSchemaOriginal((prevUiSchema) => ({
+          setFormUiSchemaOriginal((prevUiSchema) => ({
             ...prevUiSchema,
             [fieldKey]: {
               'ui:widget': 'CustomTextFieldWidget',
@@ -382,7 +390,6 @@ console.log('formUiSchema', formUiSchema);
               },
             },
           }));
-
 
           setFormSchema((prevSchema) => {
             const updatedSchema = { ...prevSchema };
@@ -556,6 +563,7 @@ console.log('formUiSchema', formUiSchema);
 
   const widgets = {
     CustomMultiSelectWidget,
+    AutoCompleteMultiSelectWidget,
     CustomCheckboxWidget,
     CustomDateWidget,
     SearchTextFieldWidget,
@@ -998,7 +1006,9 @@ console.log('formUiSchema', formUiSchema);
                           } else {
                             updatedProperties[fieldKey] = {
                               ...updatedProperties[fieldKey],
-                              enum: data?.map((item) => item?.[value].toString()),
+                              enum: data?.map((item) =>
+                                item?.[value].toString()
+                              ),
                               enumNames: data?.map((item) =>
                                 transformLabel(item?.[label].toString())
                               ),
@@ -1513,32 +1523,32 @@ console.log('formUiSchema', formUiSchema);
   const prevNameRef = useRef({ firstName: '', lastName: '' });
 
   const handleFirstLastNameBlur = async (id: any, value: any) => {
-  if (
-    formData?.firstName !== undefined &&
-    formData?.lastName !== undefined &&
-    type === 'learner'
-  ) {
-    // Only update if firstName or lastName changed
     if (
-      formData.firstName !== prevNameRef.current.firstName ||
-      formData.lastName !== prevNameRef.current.lastName
+      formData?.firstName !== undefined &&
+      formData?.lastName !== undefined &&
+      type === 'learner'
     ) {
-      const randomTwoDigit = Math.floor(10 + Math.random() * 90);
-      const newUserName = `${formData.firstName}${formData.lastName}${randomTwoDigit}`;
-      if (formData.username !== newUserName) {
-        setFormData({
-          ...formData,
-          username: newUserName,
-        });
+      // Only update if firstName or lastName changed
+      if (
+        formData.firstName !== prevNameRef.current.firstName ||
+        formData.lastName !== prevNameRef.current.lastName
+      ) {
+        const randomTwoDigit = Math.floor(10 + Math.random() * 90);
+        const newUserName = `${formData.firstName}${formData.lastName}${randomTwoDigit}`;
+        if (formData.username !== newUserName) {
+          setFormData({
+            ...formData,
+            username: newUserName,
+          });
+        }
+        // Update the ref to current values
+        prevNameRef.current = {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+        };
       }
-      // Update the ref to current values
-      prevNameRef.current = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-      };
     }
-  }
-};
+  };
   const handleSubmit = ({ formData }: { formData: any }) => {
     console.log('########### issue debug formData', formData);
 
@@ -1569,18 +1579,21 @@ console.log('formUiSchema', formUiSchema);
       schema: any,
       extraFields: Record<string, any> = {} // Optional root-level custom fields
     ) {
-// schema=forEditedschema
-if(schema.properties.family_member_details)
-{
-schema.properties = {
-  ...schema.properties,
-  ...(forEditedschema?.father_name && { father_name: forEditedschema.father_name }),
-  ...(forEditedschema?.mother_name && { mother_name: forEditedschema.mother_name }),
-  ...(forEditedschema?.spouse_name && { spouse_name: forEditedschema.spouse_name }),
-};
-
-
-}
+      // schema=forEditedschema
+      if (schema.properties.family_member_details) {
+        schema.properties = {
+          ...schema.properties,
+          ...(forEditedschema?.father_name && {
+            father_name: forEditedschema.father_name,
+          }),
+          ...(forEditedschema?.mother_name && {
+            mother_name: forEditedschema.mother_name,
+          }),
+          ...(forEditedschema?.spouse_name && {
+            spouse_name: forEditedschema.spouse_name,
+          }),
+        };
+      }
 
       const transformedData: Record<string, any> = {
         ...extraFields, // Add optional root-level custom fields dynamically

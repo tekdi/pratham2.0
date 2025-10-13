@@ -301,6 +301,7 @@ const OurProgramCarousel = () => {
                             window.localStorage
                           ) {
                             localStorage.setItem('userProgram', program?.name);
+                            localStorage.setItem('landingPage',program?.params?.uiConfig?.landingPage);
                           }
 
                           router.push(

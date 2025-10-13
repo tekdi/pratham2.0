@@ -104,6 +104,7 @@ function AssessmentsDetails() {
         status: ['Live'],
         assessmentType: getAssessmentType(assessmentType),
         primaryCategory: ['Practice Question Set'],
+        evaluationType: ['online'],
       };
       try {
         if (stateName) {
@@ -310,7 +311,7 @@ function AssessmentsDetails() {
   const handleAssessmentTypeChange = (newType: string) => {
     setAssessmentType(newType);
     const queryParams = { ...router.query };
-     if (newType === 'post') {
+    if (newType === 'post') {
       queryParams.assessmentType = 'post';
     } else if (newType === 'other') {
       queryParams.assessmentType = 'other';
@@ -324,12 +325,12 @@ function AssessmentsDetails() {
   };
 
   useEffect(() => {
-  setAssessmentType(
+    setAssessmentType(
       router.query.assessmentType === 'post'
         ? 'post'
         : router.query.assessmentType === 'other'
-        ? 'other'
-        : 'pre'
+          ? 'other'
+          : 'pre'
     );
   }, [router.query.type]);
 

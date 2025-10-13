@@ -224,13 +224,13 @@ const AIAssessmentCreator: React.FC = () => {
       //   {
       //     name: 'questionsDetails',
       //     value: data?.questionsDetails || [],
-      //   }, 
+      //   },
       // ];
 
       // Prepare metadata with attributions
       const metadata = {
         ...(data?.metadata || {}),
-        
+
         // attributions,
       };
 
@@ -378,13 +378,19 @@ const AIAssessmentCreator: React.FC = () => {
         name: formData?.metadata?.name,
         description: formData?.metadata?.description,
         assessmentType: formData?.metadata?.assessmentType,
+        //added for evaluationType
+        evaluationType: 'ai',
         gradeLevel: ['Grade 10'],
+        program: ['Second Chance'],
       },
     };
     try {
       const identifier = await fetchData(newFormData);
       if (identifier) {
         handleAIGeneration({ newFormData, identifier, token });
+      } else {
+        setAIDialogState('failed');
+        setErrorMessage('Something went wrong in AI assessment');
       }
     } catch (error) {
       console.error('Error creating question set:', error);

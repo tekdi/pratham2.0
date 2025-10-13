@@ -32,6 +32,7 @@ export interface ContentItem {
   posterImage: string;
   leafNodes?: [{}];
   children: [{}];
+  courseType?: string;
 }
 
 interface CommonCardProps {
@@ -51,6 +52,7 @@ interface CommonCardProps {
   type: string;
   onClick?: (e: any) => void;
   _card?: any;
+  courseType?: string;
 }
 
 interface StatuPorps {
@@ -95,6 +97,7 @@ export const CommonCard: React.FC<CommonCardProps> = ({
   type,
   onClick,
   _card,
+  courseType,
 }) => {
   const [statusBar, setStatusBar] = React.useState<StatuPorps>();
   const { t } = useTranslation();
@@ -266,6 +269,19 @@ export const CommonCard: React.FC<CommonCardProps> = ({
                 content
               )}
             </Typography>
+            {/* <Typography
+      sx={{
+        fontFamily: "Poppins, sans-serif",
+        fontWeight: 400,
+        fontStyle: "normal",
+        fontSize: "15.4px",
+        lineHeight: "23.09px",
+        letterSpacing: "0.48px",
+        textTransform: "uppercase",
+      }}
+    >
+      {courseType}
+    </Typography> */}
           </CardContent>
         )}
       </Box>
@@ -274,6 +290,34 @@ export const CommonCard: React.FC<CommonCardProps> = ({
         <CardActions sx={{ p: 2, pt: '14px' }}>
           <SpeakableText>{actions}</SpeakableText>
         </CardActions>
+      )}
+
+      {/* Add courseType at the bottom right, outside CardContent */}
+      {(Array.isArray(courseType) && courseType.includes("Mandatory") && !courseType.includes("Optional")) && (
+        <Box
+          sx={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            px: 2,
+            pb: 2,
+          }}
+        >
+          <Typography
+            sx={{
+              fontFamily: "Poppins, sans-serif",
+              fontWeight: 400,
+              fontStyle: "normal",
+              fontSize: "15.4px",
+              lineHeight: "23.09px",
+              letterSpacing: "0.48px",
+              textTransform: "uppercase",
+              color: '#969088',
+            }}
+          >
+            {courseType}
+          </Typography>
+        </Box>
       )}
     </Card>
   );
@@ -285,9 +329,16 @@ export const StatusBar: React.FC<StatuPorps> = ({
   type,
   _card,
 }) => {
+  console.log('status===>', status);
   const { t } = useTranslation();
 
   const theme = useTheme();
+  
+  // Don't render StatusBar if status is undefined or empty
+  if (!status || status.trim() === '') {
+    return null;
+  }
+  
   return (
     <Box
       sx={{
