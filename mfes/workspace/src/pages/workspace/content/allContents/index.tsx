@@ -132,6 +132,7 @@ const AllContentsPage = () => {
   const fetchContentAPI = useSharedStore((state: any) => state.fetchContentAPI);
   const [debouncedSearchTerm, setDebouncedSearchTerm] =
     useState<string>(searchTerm);
+  const prevSearchTermRef = useRef(debouncedSearchTerm);
   const [totalCount, setTotalCount] = useState(0);
   const [showHeader, setShowHeader] = useState<boolean | null>(null);
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -237,13 +238,19 @@ const AllContentsPage = () => {
         const sort_by = {
           lastUpdatedOn: order,
         };
-        let offset = debouncedSearchTerm !== '' ? 0 : page * LIMIT;
-        if (prevFilterRef.current !== filter) {
-          offset = 0;
+        
+        // Reset page to 0 when search term or filter changes
+        if (prevSearchTermRef.current !== debouncedSearchTerm) {
           setPage(0);
-
+          prevSearchTermRef.current = debouncedSearchTerm;
+        }
+        
+        if (prevFilterRef.current !== filter) {
+          setPage(0);
           prevFilterRef.current = filter;
         }
+        
+        const offset = page * LIMIT;
         console.log('seraching', debouncedSearchTerm);
         const response = await getContent(
           status,
@@ -257,6 +264,7 @@ const AllContentsPage = () => {
           undefined,
           selectedNames
         );
+        console.log('response===>', response);
         const contentList = (response?.content || []).concat(
           response?.QuestionSet || []
         );
@@ -289,6 +297,7 @@ const AllContentsPage = () => {
       primaryCategory: item.primaryCategory,
       lastUpdatedOn: timeAgo(item.lastUpdatedOn),
       status: item.status,
+      prevStatus: item.prevStatus, // Add prevStatus field
       identifier: item.identifier,
       mimeType: item.mimeType,
       mode: item.mode,

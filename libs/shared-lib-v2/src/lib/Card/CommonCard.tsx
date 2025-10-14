@@ -329,9 +329,16 @@ export const StatusBar: React.FC<StatuPorps> = ({
   type,
   _card,
 }) => {
+  console.log('status===>', status);
   const { t } = useTranslation();
 
   const theme = useTheme();
+  
+  // Don't render StatusBar if status is undefined or empty
+  if (!status || status.trim() === '') {
+    return null;
+  }
+  
   return (
     <Box
       sx={{
