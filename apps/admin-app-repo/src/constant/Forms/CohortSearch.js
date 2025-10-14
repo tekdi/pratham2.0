@@ -157,7 +157,7 @@ export const CohortSearchUISchema = {
   ],
 
   state: {
-    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': {
       multiple: true,
       uniqueItems: true,
@@ -166,7 +166,7 @@ export const CohortSearchUISchema = {
   },
 
   district: {
-    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': {
       multiple: true,
       uniqueItems: true,
@@ -174,7 +174,7 @@ export const CohortSearchUISchema = {
   },
 
   block: {
-    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': {
       multiple: true,
       uniqueItems: true,
@@ -182,7 +182,7 @@ export const CohortSearchUISchema = {
   },
 
   village: {
-    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': {
       multiple: true,
       uniqueItems: true,

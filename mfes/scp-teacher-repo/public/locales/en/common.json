@@ -326,10 +326,12 @@
     "AT_REQUIRED_LETTER": "At least one letter or underscore is required",
     "ENTER_NUMBER": "Please enter a number",
     "ENTER_CHARACTER": "Please enter at least one character",
-    "CONTACT_NUMBER": "Contact Number",
+    "CONTACT_NUMBER": "Phone Number",
     "ENROLLMENT_NUMBER": "User Name",
     "SELECT_OPTION": "Select Option",
-    "HINDI": "Hindi"
+    "HINDI": "Hindi",
+    "MOCK_TEST": "Mock Test",
+    "UNIT_TEST": "Unit Test"
   },
   "FIELDS": {
     "DESIGNATION": "Designation",
@@ -706,7 +708,7 @@
     "NO_DATA_FOUND": "No data found",
     "SEARCH_STUDENT": "Search student",
     "NO_ASSESSMENTS_FOUND": "No assessments found",
-    "ASSESSMENTS_FOUND": "assessments found",
+    "ASSESSMENTS_FOUND": "{{count}} assessment found",
     "ASSESSMENT_STATUS": "Assessment Status",
     "NOT_STARTED": "Not Started",
     "IN_PROGRESS": "In Progress",
@@ -741,7 +743,17 @@
     "UPLOADED_ON": "Uploaded on: {{date}}",
     "SORT_BY_STATUS": "Sort by Status",
     "LEARNERS_COUNT": "{{count}} of {{total}} Learners",
-    "NO_LEARNERS_FOUND": "No learners found matching your search."
+    "NO_LEARNERS_FOUND": "No learners found matching your search.",
+    "MANUAL_ASSESSMENT": "Manual Assessment",
+    "MANUAL_ASSESSMENT_LIST": "Manual Assessment List",
+    "UNDER_EVALUATION": "Under Evaluation",
+    "UPDATE_MARKS": "Update Marks",
+    "SUBMIT_MARKS": "Submit Marks",
+    "ASSESSMENTS_FOUND_PLURAL": "{{count}} assessments found",
+    "NO_ASSESSMENT_TYPE_FOUND":"No Assessment Type Found",
+    "IMAGE_UPLOADED": "Image Uploaded",
+    "VIEW": "View",
+    "REUPLOAD": "Reupload"
   },
   "BOARD_ENROLMENT": {
     "BOARD_ENROLLMENT": "Board Enrollment",

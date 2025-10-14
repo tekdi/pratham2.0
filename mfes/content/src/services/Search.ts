@@ -240,6 +240,7 @@ export const CommonContentSearch = async ({
           'trackable',
           'children',
           'leafNodes',
+          'courseType'
         ],
         query,
         limit,

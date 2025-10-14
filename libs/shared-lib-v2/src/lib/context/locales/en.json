@@ -145,6 +145,7 @@
     "Job family": "Job family",
     "Group Membership": "Group Membership",
     "PSU": "PSU",
+    "UNAUTHORIZED":"You are not authorized to access this site",
 
     "STATUS": {
       "completed": "Completed",

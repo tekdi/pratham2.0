@@ -3,6 +3,58 @@ import { CommonCard, ContentItem } from '@shared-lib';
 import AppConst from '../../utils/AppConst/AppConst';
 import { StatusIcon } from '../CommonCollapse';
 import Description from './Description';
+// Array of default images from courseDefaultImages folder
+const courseDefaultImages = [
+  'Plastic_Literacy__202010271637124816.png',
+  'Hickory_Dickory.png',
+  'Science_202010131204476645.png',
+  'Thumbnail_1_202405270759453576.png',
+  'hn_meribilli.png',
+  'बलगत_हद_Thumbnail.png',
+  'hi_Ek_thi_Kamala_Title.png',
+  'ENGINE_ENGINE.png',
+  'DSC_2387_202007031404597526.jpg',
+  'Electrical_Level_2_202009221151328179.png',
+  'gas_cuttingPOS-01_202204120101419308_202503030400408351.png',
+  'Food__Beverage_Service_Thumbnail.png',
+  'Intervew-2_202204061102557202.jpg',
+  'electrical_arc_welding_POS_202204120059399830_202503030359185963.png',
+  'Electric_level_1_202009221150594061.png',
+  'Housekeeping_Thumbnail.png',
+  'Food_Production_Thumbnail.png',
+  'Assistant_Electrician.png'
+];
+
+// Simple hash function to convert string to number
+const hashString = (str: string): number => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash);
+};
+
+// Function to get consistent random default image based on identifier
+const getRandomDefaultImage = (identifier: string) => {
+  const hash = hashString(identifier);
+  const index = hash % courseDefaultImages.length;
+  return `/images/courseDefaultImages/${courseDefaultImages[index]}`;
+};
+
+// Function to get default image based on conditions
+const getDefaultImage = (default_img?: string, identifier?: string) => {
+  if (typeof window !== 'undefined') {
+    const userProgram = localStorage.getItem('userProgram');
+    
+    if (userProgram === 'Open School' && identifier) {
+      return getRandomDefaultImage(identifier);
+    }
+  }
+  
+  return default_img ?? `${AppConst.BASEPATH}/assests/images/image_ver.png`;
+};
 
 const ContentCard = ({
   item,
@@ -47,17 +99,13 @@ const ContentCard = ({
       _card={_card} isWrap={false}>
       <CommonCard
         title={(item?.name || '').trim()}
-        // image={
-        //   item?.posterImage && item?.posterImage !== 'undefined'
-        //     ? item?.posterImage
-        //     : default_img ?? `${AppConst.BASEPATH}/assests/images/image_ver.png`
-        // }
-         image={
+        courseType={item?.courseType}
+        image={
   item?.posterImage
     ? item.posterImage
     : item?.appIcon
       ? item.appIcon
-      : default_img ?? `${AppConst.BASEPATH}/assests/images/image_ver.png`
+      : getDefaultImage(default_img, item?.identifier || item?.name)
 }
         content={item?.description ? item?.description : <Description />}
         actions={

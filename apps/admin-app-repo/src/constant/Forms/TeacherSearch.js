@@ -143,7 +143,7 @@ export const TeacherSearchUISchema = {
   'ui:order': ['state', 'district', 'block', 'village', 'name', 'sortBy'],
 
   state: {
-    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': {
       multiple: true,
       uniqueItems: true,
@@ -152,7 +152,7 @@ export const TeacherSearchUISchema = {
   },
 
   district: {
-    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': {
       multiple: true,
       uniqueItems: true,
@@ -164,7 +164,7 @@ export const TeacherSearchUISchema = {
   },
 
   village: {
-    'ui:widget': 'CustomMultiSelectWidget',
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': {
       multiple: true,
       uniqueItems: true,
