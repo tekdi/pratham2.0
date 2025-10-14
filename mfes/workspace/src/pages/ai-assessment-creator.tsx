@@ -388,6 +388,9 @@ const AIAssessmentCreator: React.FC = () => {
       const identifier = await fetchData(newFormData);
       if (identifier) {
         handleAIGeneration({ newFormData, identifier, token });
+      } else {
+        setAIDialogState('failed');
+        setErrorMessage('Something went wrong in AI assessment');
       }
     } catch (error) {
       console.error('Error creating question set:', error);

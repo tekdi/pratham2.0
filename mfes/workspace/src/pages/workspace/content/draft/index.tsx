@@ -104,6 +104,7 @@ const DraftPage = () => {
 
   const [debouncedSearchTerm, setDebouncedSearchTerm] =
     useState<string>(searchTerm);
+  const prevSearchTermRef = useRef(debouncedSearchTerm);
 
   useEffect(() => {
     const headerValue = localStorage.getItem('showHeader');
@@ -162,14 +163,21 @@ const DraftPage = () => {
         if (!tenantConfig) return;
         setLoading(true);
         const query = debouncedSearchTerm || '';
-        let offset = debouncedSearchTerm !== '' ? 0 : page * LIMIT;
 
         const primaryCategory = filter.length ? filter : [];
+        
+        // Reset page to 0 when search term or filter changes
+        if (prevSearchTermRef.current !== debouncedSearchTerm) {
+          setPage(0);
+          prevSearchTermRef.current = debouncedSearchTerm;
+        }
+        
         if (prevFilterRef.current !== filter) {
-          offset = 0;
           setPage(0);
           prevFilterRef.current = filter;
         }
+        
+        const offset = page * LIMIT;
         const order = sortBy === 'Created On' ? 'asc' : 'desc';
         const sort_by = { lastUpdatedOn: order };
         const response = await getContent(
