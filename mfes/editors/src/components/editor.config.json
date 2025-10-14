@@ -110,7 +110,10 @@
             ],
             "timeDiff": -0.295,
             "primaryCategories": [
-                "Learning Resource"
+                "Learning Resource",
+                "Story",
+                "Interactive",
+                "Activity"
             ],
             "uid": "",
             "etags": {
