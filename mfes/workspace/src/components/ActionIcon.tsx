@@ -21,7 +21,8 @@ const ActionIcon: React.FC<ActionCellProps> = ({
   };
 
   // Hide delete button if prevStatus is "Live" and status is "Draft"
-  const shouldHideDelete = rowData?.prevStatus === "Live" && rowData?.status === "Draft";
+  console.log("rowData====>", rowData);
+  const shouldHideDelete = rowData?.prevStatus === "Live" && (rowData?.status === "Draft" || rowData?.status === "Review");
 
   if (shouldHideDelete) {
     return null; // Don't render anything if delete should be hidden
