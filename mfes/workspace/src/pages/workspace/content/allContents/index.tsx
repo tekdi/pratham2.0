@@ -264,6 +264,7 @@ const AllContentsPage = () => {
           undefined,
           selectedNames
         );
+        console.log('response===>', response);
         const contentList = (response?.content || []).concat(
           response?.QuestionSet || []
         );
@@ -296,6 +297,7 @@ const AllContentsPage = () => {
       primaryCategory: item.primaryCategory,
       lastUpdatedOn: timeAgo(item.lastUpdatedOn),
       status: item.status,
+      prevStatus: item.prevStatus, // Add prevStatus field
       identifier: item.identifier,
       mimeType: item.mimeType,
       mode: item.mode,
