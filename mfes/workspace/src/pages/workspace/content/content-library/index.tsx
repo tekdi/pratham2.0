@@ -117,6 +117,7 @@ const ContentsPage = () => {
   const fetchContentAPI = useSharedStore((state: any) => state.fetchContentAPI);
   const [debouncedSearchTerm, setDebouncedSearchTerm] =
     useState<string>(searchTerm);
+  const prevSearchTermRef = useRef(debouncedSearchTerm);
   const [totalCount, setTotalCount] = useState(0);
   const stateQuery: string =
     typeof router.query.state === 'string' ? router.query.state : 'All';
@@ -187,13 +188,19 @@ const ContentsPage = () => {
         const sort_by = {
           lastUpdatedOn: order,
         };
-        let offset = debouncedSearchTerm !== '' ? 0 : page * LIMIT;
-        if (prevFilterRef.current !== filter) {
-          offset = 0;
+        
+        // Reset page to 0 when search term or filter changes
+        if (prevSearchTermRef.current !== debouncedSearchTerm) {
           setPage(0);
-
+          prevSearchTermRef.current = debouncedSearchTerm;
+        }
+        
+        if (prevFilterRef.current !== filter) {
+          setPage(0);
           prevFilterRef.current = filter;
         }
+        
+        const offset = page * LIMIT;
         const contentType = 'content-library';
 
         const response = await getContent(

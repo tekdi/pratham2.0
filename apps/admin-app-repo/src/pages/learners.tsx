@@ -376,7 +376,7 @@ const Learner = () => {
     {
       key: 'status',
       label: 'Status',
-      render: (row: any) => transformLabel(row.status),
+      render: (row: any) => transformLabel(row?.cohortData?.[0]?.cohortMember?.status),
       getStyle: (row) => ({ color: row.status === 'active' ? 'green' : 'red' }),
     },
   ];
@@ -612,7 +612,7 @@ const Learner = () => {
         setReason('');
         setChecked(false);
       },
-      show: (row) => row.status !== 'archived',
+      show: (row) => row?.cohortData?.[0]?.cohortMember?.status !== 'archived',
     },
     {
       icon: (
@@ -659,7 +659,7 @@ const Learner = () => {
         // setReason('');
         // setChecked(false);
       },
-      show: (row) => row.status !== 'active',
+      show: (row) => row?.cohortData?.[0]?.cohortMember?.status !== 'active',
     },
     // {
     //   icon: (

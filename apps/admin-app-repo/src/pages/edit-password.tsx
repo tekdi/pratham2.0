@@ -50,7 +50,8 @@ const EditForgotPassword = () => {
     {
       // To do :- hardcoding to be removed
       if(storedUserData?.tenantData[0]?.tenantName != TenantName.SECOND_CHANCE_PROGRAM ) {
-        router.push("/workspace");
+        // router.push("/workspace");
+        router.push('/faqs');
       } else {
         if (locale) 
           router.push("/course-planner", undefined, { locale: locale });
