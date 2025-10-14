@@ -114,6 +114,7 @@ const PublishPage = () => {
       contentType: staticFilter,
       lastUpdatedOn: timeAgo(item.lastUpdatedOn),
       status: item.status,
+      prevStatus: item.prevStatus,
       identifier: item.identifier,
       mimeType: item.mimeType,
       mode: item.mode,
