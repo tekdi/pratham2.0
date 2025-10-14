@@ -29,6 +29,7 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
+import DownloadIcon from '@mui/icons-material/Download';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { useTranslation } from 'next-i18next';
@@ -207,6 +208,105 @@ const ImportCsv = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+  const handleUploadCSVDownload= () => {
+
+  
+    // Function to flatten tasks recursively
+    const flattenTasks = (taskList: any[]): any[] => {
+      let result: any[] = [];
+      taskList.forEach((task) => {
+        result.push(task);
+        if (task.children && task.children.length > 0) {
+          result = result.concat(flattenTasks(task.children));
+        }
+      });
+      return result;
+    };
+  
+    // Flatten all tasks
+    const allTasks = flattenTasks(userProjectDetails);
+    
+    if (allTasks.length === 0) {
+      alert('No data to export');
+      return;
+    }
+  
+    // Find max number of learning resources
+    const maxLearningResources = Math.max(
+      ...allTasks.map(task => task.learningResources?.length || 0)
+    );
+  
+    // Build header
+    const baseHeaders = ['name', 'externalId', 'type', 'hasAParentTask', 'parentTaskId'];
+    const learningResourceHeaders: string[] = [];
+    
+    for (let i = 1; i <= maxLearningResources; i++) {
+      learningResourceHeaders.push(
+        `learningResources${i}-name`,
+        `learningResources${i}-type`,
+        `learningResources${i}-id`
+      );
+    }
+    
+    const headers = [...baseHeaders, ...learningResourceHeaders, 'startDate', 'endDate'];
+  
+    // Helper function to escape CSV values
+    const escapeCSV = (value: any): string => {
+      if (value === null || value === undefined) return '';
+      const stringValue = String(value);
+      if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+        return `"${stringValue.replace(/"/g, '""')}"`;
+      }
+      return stringValue;
+    };
+  
+    // Convert tasks to CSV rows
+    const csvRows = allTasks.map((task) => {
+      const row: any = {
+        name: task.name || '',
+        externalId: task.externalId || '',
+        type: task.type || '',
+        hasAParentTask: task.metaInformation?.hasAParentTask || '',
+        parentTaskId: task.metaInformation?.parentTaskId || '',
+        startDate: task.metaInformation?.startDate || '',
+        endDate: task.metaInformation?.endDate || ''
+      };
+  
+      // Add learning resources
+      if (task.learningResources && task.learningResources.length > 0) {
+        task.learningResources.forEach((lr: any, index: number) => {
+          const num = index + 1;
+          row[`learningResources${num}-name`] = lr.name || '';
+          row[`learningResources${num}-type`] = lr.type || '';
+          row[`learningResources${num}-id`] = lr.id || '';
+        });
+      }
+  
+      // Fill in empty learning resource columns
+      for (let i = (task.learningResources?.length || 0) + 1; i <= maxLearningResources; i++) {
+        row[`learningResources${i}-name`] = '';
+        row[`learningResources${i}-type`] = '';
+        row[`learningResources${i}-id`] = '';
+      }
+  
+      return headers.map(header => escapeCSV(row[header])).join(',');
+    });
+  
+    // Combine header and rows
+    const csv = [headers.join(','), ...csvRows].join('\n');
+  
+    // Create blob and download
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${subject}_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const handleUpload = async () => {
@@ -516,6 +616,22 @@ const ImportCsv = () => {
               {t('COURSE_PLANNER.ADD_NEW_TOPIC')}
             </Button>
           )}
+
+
+{userProjectDetails?.length > 0 && (<Button
+                variant="contained"
+                startIcon={<DownloadIcon />}
+                onClick={handleUploadCSVDownload}
+                sx={{
+                  textTransform: 'none',
+                ////  backgroundColor: '#1976d2',
+                  '&:hover': {
+                   // backgroundColor: '#1565c0',
+                  }
+                }}
+              >
+                {t('COURSE_PLANNER.DOWNLOAD_CSV')}
+              </Button>)}
           {/* <Button
             sx={{
               borderRadius: '8px',
