@@ -358,7 +358,7 @@ export const updateQuestionSet = async ({ identifier, ...metadata }: any) => {
         },
         hierarchy: {
           [identifier]: {
-            name: 'Untitled QuestionSet',
+            name: metadata?.name,
             children: [],
             root: true,
           },
