@@ -149,9 +149,10 @@ export const ContentSearch = async ({
           ...filters,
           status: ['live'],
           primaryCategory:
-            type?.toLowerCase() === 'course'
+            type?.toLowerCase() === 'course' || type?.toLowerCase() === 'self'
               ? ['Course']
-              : ['Learning Resource', 'Practice Question Set'],
+              : type?.toLowerCase() === 'for children'?['Activity', 'Story']:['Learning Resource', 'Practice Question Set'],
+         
           channel: localStorage.getItem('channelId'),
         },
         fields: [

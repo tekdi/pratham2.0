@@ -119,7 +119,7 @@ export const CommonCard: React.FC<CommonCardProps> = ({
                     ? t('COMMON.STATUS.enrolled_not_started')
                     : t('COMMON.STATUS.not_started'),
           };
-          if (type === 'Course' || type==='Job family' || type==='PSU' || type==='Group Membership') {
+          if (type === 'Course' || type==='Job family' || type==='PSU' || type==='Group Membership'|| type==='self') {
             if (!_card?.isHideProgress) {
               setStatusBar({
                 ...newObj,
@@ -343,7 +343,7 @@ export const StatusBar: React.FC<StatuPorps> = ({
     <Box
       sx={{
         position: 'absolute',
-        ...(type === 'Course' || type==='Job family' || type==='PSU' || type==='Group Membership' ? { top: 0 } : { bottom: 0 }),
+        ...(type === 'Course' || type==='Job family' || type==='PSU' || type==='Group Membership'|| type==='self' ? { top: 0 } : { bottom: 0 }),
         width: '100%',
         display: 'flex',
         alignItems: 'center',
@@ -353,8 +353,8 @@ export const StatusBar: React.FC<StatuPorps> = ({
       <Box
         sx={{
           width: '100%',
-          pl: type === 'Course'|| type==='Job family' || type==='PSU' || type==='Group Membership' ? '6px' : '0',
-          pr: type === 'Course'|| type==='Job family' || type==='PSU' || type==='Group Membership' ? '6px' : '0',
+          pl: type === 'Course'|| type==='Job family' || type==='PSU' || type==='Group Membership'|| type==='self' ? '6px' : '0',
+          pr: type === 'Course'|| type==='Job family' || type==='PSU' || type==='Group Membership'|| type==='self' ? '6px' : '0',
           py: '6px',
           fontSize: '14px',
           lineHeight: '20px',
@@ -376,7 +376,7 @@ export const StatusBar: React.FC<StatuPorps> = ({
           gap: '8px',
         }}
       >
-        {type === 'Course' || type==='Job family' || type==='PSU' || type==='Group Membership' ? (
+        {type === 'Course' || type==='Job family' || type==='PSU' || type==='Group Membership'|| type==='self' ? (
           _card?.isHideProgress ? (
             <StatusIcon status={status ?? ''} />
           ) : (
