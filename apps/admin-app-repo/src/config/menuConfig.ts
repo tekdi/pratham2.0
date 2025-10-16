@@ -404,7 +404,7 @@ export const MENU_CONFIG = {
       title: 'SIDEBAR.WORKSPACE',
       icon: '/images/dashboard.svg',
       link: '/workspace',
-      roles: [Role.CENTRAL_ADMIN],
+      roles: [Role.CCTA, Role.SCTA, Role.CENTRAL_ADMIN],
     },
     manageNotificationTemplates: {
       title: 'SIDEBAR.MANAGE_NOTIFICATION',
