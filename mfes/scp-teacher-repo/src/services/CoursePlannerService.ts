@@ -144,8 +144,9 @@ export const UserStatusDetails = async ({
 
 export const fetchCourseIdFromSolution = async (
   solutionId: string,
-  cohortId: string
-): Promise<boolean> => {
+  cohortId: string,
+  acl:any 
+): Promise<any> => {
   try {
     const solutionResponse = await getSolutionDetails({
       id: solutionId,
@@ -153,17 +154,19 @@ export const fetchCourseIdFromSolution = async (
     });
 
     const externalId = solutionResponse?.result?.externalId;
-    await getUserProjectTemplate({
+    let response =await getUserProjectTemplate({
       templateId: externalId,
       solutionId,
       role: Role.TEACHER,
-      cohortId,
+      entityId: cohortId,
+      acl
     });
 
-    return true;
+    return response;
   } catch (error) {
     console.error('Error fetching solution details:', error);
-    throw error;
+    // throw error;
+    return null;
   }
 };
 
