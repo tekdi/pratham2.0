@@ -40,6 +40,7 @@ export const PrimaryCategoryValue = [
   'Practice Question Set',
   'Teacher Resource',
   'Activity',
+  'Story',
 
   'Content Playlist',
   'Digital Textbook',

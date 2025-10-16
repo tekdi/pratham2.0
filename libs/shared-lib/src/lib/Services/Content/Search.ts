@@ -138,6 +138,7 @@ const data = {
         'Exam Question',
         'Question paper',
         'Activity',
+        'Story',
       ],
     },
   },

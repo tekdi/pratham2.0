@@ -151,7 +151,7 @@ export const ContentSearch = async ({
           primaryCategory:
             type?.toLowerCase() === 'course' || type?.toLowerCase() === 'self'
               ? ['Course']
-              : type?.toLowerCase() === 'for children'?['Activity']:['Learning Resource', 'Practice Question Set'],
+              : type?.toLowerCase() === 'for children'?['Activity', 'Story']:['Learning Resource', 'Practice Question Set'],
          
           channel: localStorage.getItem('channelId'),
         },
