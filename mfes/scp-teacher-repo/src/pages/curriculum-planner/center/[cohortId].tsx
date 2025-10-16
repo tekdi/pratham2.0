@@ -108,6 +108,8 @@ const CoursePlannerDetail = () => {
         medium: tStore?.medium,
         entityId: cohortId,
       });
+      let courseData = response?.result?.data?.[0];
+      let courseId = courseData?._id;
 
       // Retry without entityId if empty
       if (
@@ -121,23 +123,15 @@ const CoursePlannerDetail = () => {
           courseType: tStore?.type,
           medium: tStore?.medium,
         });
+        if (
+          !Array.isArray(response?.result?.data) ||
+          response?.result?.data.length === 0
+        ) {
+          setLoading(false);
+          return;
+        }
+        courseId = await fetchCourseIdFromSolution(response?.result?.data?.[0]?.solutionId);
       }
-
-      if (
-        !Array.isArray(response?.result?.data) ||
-        response?.result?.data.length === 0
-      ) {
-        setLoading(false);
-        return;
-      }
-
-      const courseData = response?.result?.data[0];
-      let courseId = courseData._id;
-
-      if (!courseId) {
-        courseId = await fetchCourseIdFromSolution(courseData?.solutionId);
-      }
-
       await fetchAndSetUserProjectDetails(courseId);
     } catch (error) {
       console.error('Error fetching course planner:', error);
