@@ -137,6 +137,7 @@ const data = {
         'Course Unit',
         'Exam Question',
         'Question paper',
+        'Activity',
       ],
     },
   },

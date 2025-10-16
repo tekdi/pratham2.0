@@ -33,12 +33,20 @@ export const StatusOptions = ["Live", "Review" ,  "Draft", "All"];
 export const LIMIT = 10;
 
 export const PrimaryCategoryValue = [
-  "Course",
-  "eTextbook",
-  "Explanation Content",
-  "Learning Resource",
-  "Practice Question Set",
-  "Teacher Resource"
+  'Course',
+  'eTextbook',
+  'Explanation Content',
+  'Learning Resource',
+  'Practice Question Set',
+  'Teacher Resource',
+  'Activity',
+
+  'Content Playlist',
+  'Digital Textbook',
+  'Question paper',
+  'Course Assessment',
+
+  'Exam Question',
 ];
 
 export const TENANT_DATA = {

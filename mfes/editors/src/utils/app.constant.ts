@@ -33,5 +33,6 @@ export const PrimaryCategoryValue = [
   "Explanation Content",
   "Learning Resource",
   "Practice Question Set",
-  "Teacher Resource"
+  "Teacher Resource",
+  "Activity",
 ];

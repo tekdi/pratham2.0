@@ -73,8 +73,10 @@ const getReqBodyWithStatus = (
       JSON.parse(localStorage.getItem('PrimaryCategory') as string) ||
       PrimaryCategoryValue;
   }
+  console.log('primaryCategory', primaryCategory);
+  console.log('PrimaryCategoryValue', PrimaryCategoryValue);
   primaryCategory =
-    primaryCategory.length === 0 ? PrimaryCategory : primaryCategory;
+    primaryCategory.length === 0 ? PrimaryCategoryValue : primaryCategory;
   // Merge custom filters into filters object
   const extraFilters = filters ? { ...filters } : {};
   console.log('extraFilters', extraFilters);
