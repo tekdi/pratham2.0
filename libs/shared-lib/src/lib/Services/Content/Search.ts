@@ -139,6 +139,7 @@ const data = {
         'Question paper',
         'Activity',
         'Story',
+        'Interactive'
       ],
     },
   },
