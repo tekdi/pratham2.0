@@ -139,10 +139,10 @@ const MyComponent: React.FC = () => {
           </Box>
           {(() => {
             // Find indices of 'courses' and 'self' in storedConfig.showContent
-            const coursesIndex = storedConfig.showContent?.findIndex((item: string) => 
+            const coursesIndex = storedConfig?.showContent?.findIndex((item: string) => 
               item.toLowerCase() === 'courses'
             );
-            const selfIndex = storedConfig.showContent?.findIndex((item: string) => 
+            const selfIndex = storedConfig?.showContent?.findIndex((item: string) => 
               item.toLowerCase() === 'self'
             );
             
@@ -150,6 +150,8 @@ const MyComponent: React.FC = () => {
             const shouldShowInProgress = 
               // tab === null || 
               // tab === undefined || 
+             ( storedConfig?.showContent?.[0]===  'courses' && (tab === null || tab === undefined))||
+              ( storedConfig?.showContent?.[0]===  'self' && (tab === null || tab === undefined))||
               (coursesIndex !== -1 && tab === coursesIndex.toString()) ||
               (selfIndex !== -1 && tab === selfIndex.toString());
               
