@@ -221,6 +221,7 @@ const ContentDetails = (props: ContentDetailsProps) => {
                     letterSpacing: '0.5px',
                     color: '#4D4639',
                     textTransform: 'capitalize',
+                    textAlign: 'justify',
                   }}
                   fontWeight={400}
                 >
@@ -302,6 +303,7 @@ const ContentDetails = (props: ContentDetailsProps) => {
                                     // lineHeight: '24px',
                                     letterSpacing: '0.5px',
                                     color: '#4D4639',
+                                    textAlign: 'justify',
                                   }}
                                 >
                                   <SpeakableText>

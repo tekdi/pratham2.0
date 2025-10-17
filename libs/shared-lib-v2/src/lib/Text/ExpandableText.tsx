@@ -104,6 +104,7 @@ export const ExpandableText: React.FC<ExpandableTextProps> = memo(
             color: '#1F1B13',
             whiteSpace: 'pre-wrap',
             fontWeight: '400',
+            textAlign: 'justify',
             // Use line-clamp when not expanded and truncation is needed
             ...(needsTruncation &&
               !isExpanded && {
