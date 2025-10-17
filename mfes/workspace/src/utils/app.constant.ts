@@ -41,6 +41,7 @@ export const PrimaryCategoryValue = [
   'Teacher Resource',
   'Activity',
   'Story',
+  'Interactive',
 
   'Content Playlist',
   'Digital Textbook',
