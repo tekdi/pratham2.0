@@ -150,6 +150,8 @@ const MyComponent: React.FC = () => {
             const shouldShowInProgress = 
               // tab === null || 
               // tab === undefined || 
+             ( storedConfig.showContent[0]===  'courses' && (tab === null || tab === undefined))||
+              ( storedConfig.showContent[0]===  'self' && (tab === null || tab === undefined))||
               (coursesIndex !== -1 && tab === coursesIndex.toString()) ||
               (selfIndex !== -1 && tab === selfIndex.toString());
               
