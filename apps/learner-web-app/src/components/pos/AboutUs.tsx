@@ -46,6 +46,37 @@ const AboutUsPage = () => {
             alignItems: 'center',
           }}
         >
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Typography
+              variant={mediaMD ? 'h1' : 'body7'}
+              component="h1"
+              sx={{
+                fontWeight: 700,
+                textAlign: 'center',
+                color: '#fff',
+                mb: 1,
+              }}
+            >
+              <SpeakableText>
+                About Us
+              </SpeakableText>
+            </Typography>
+            <Typography
+              variant={mediaMD ? 'h2' : 'h1'}
+              component="h2"
+              sx={{
+                fontWeight: 900,
+                textAlign: 'center',
+                color: '#FDBE16',
+                mb: 2,
+                maxWidth: '1500px',
+                lineHeight: 1.8,
+              }}
+            >
+              <SpeakableText>
+              Pratham Open School offers free, downloadable videos, games, reading material and stories in 15 languages for ages 1 to 18+, designed to support self-led learning and group learning through activities and projects.              </SpeakableText>
+            </Typography>
+          </Box>
           <Box>
             <Typography
               variant={mediaMD ? 'h2' : 'body8'}
@@ -106,6 +137,7 @@ const AboutUsPage = () => {
                   letterSpacing: '0.5px',
                   color: '#1F1B13',
                   mt: 2,
+                  textAlign: 'justify',
                 }}
               >
                 <SpeakableText>
@@ -144,6 +176,7 @@ const AboutUsPage = () => {
                   letterSpacing: '0.5px',
                   color: '#1F1B13',
                   mt: 1,
+                  textAlign: 'justify',
                 }}
               >
                 <SpeakableText>
@@ -182,6 +215,7 @@ const AboutUsPage = () => {
                   letterSpacing: '0.5px',
                   color: '#1F1B13',
                   mt: 1,
+                  textAlign: 'justify',
                 }}
               >
                 <SpeakableText>
@@ -314,7 +348,7 @@ const AboutUsPage = () => {
               // fontSize: '22px',
               // lineHeight: '32px',
               letterSpacing: '0px',
-              textAlign: 'center',
+              textAlign: 'justify',
               color: '#635E57',
               mt: 2,
             }}
