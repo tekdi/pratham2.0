@@ -148,8 +148,8 @@ const MyComponent: React.FC = () => {
             
             // Show InProgressContent if tab matches either index or if tab is null/undefined
             const shouldShowInProgress = 
-              tab === null || 
-              tab === undefined || 
+              // tab === null || 
+              // tab === undefined || 
               (coursesIndex !== -1 && tab === coursesIndex.toString()) ||
               (selfIndex !== -1 && tab === selfIndex.toString());
               
