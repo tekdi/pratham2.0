@@ -431,7 +431,7 @@ const Brand = () => {
         target="_blank"
         rel="noopener noreferrer"
       >
-        <Image
+        {/* <Image
           src={
             isColorInverted
               ? '/images/pradigi-white.png'
@@ -441,7 +441,7 @@ const Brand = () => {
           width={94}
           height={32}
           style={{ height: '32px', cursor: 'pointer' }}
-        />
+        /> */}
       </a>
     </Box>
   );

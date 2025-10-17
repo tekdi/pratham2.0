@@ -179,9 +179,20 @@ const Sidebar = ({
         sx: {
           width: '284px',
           border: '0 !important',
+          zIndex: 1300, // Ensure it appears above other content
         },
       }}
       variant="temporary"
+      ModalProps={{
+        keepMounted: true, // Better open performance on mobile
+      }}
+      sx={{
+        display: { xs: 'block', lg: 'none' },
+        '& .MuiDrawer-paper': {
+          boxSizing: 'border-box',
+          width: '284px',
+        },
+      }}
     >
       {SidebarContent}
     </Drawer>

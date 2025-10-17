@@ -77,6 +77,7 @@ const MoreWayCarousel = () => {
                         // lineHeight: '24px',
                         color: '#1F1B13',
                         mt: 2,
+                        textAlign: 'justify',
                       }}
                     >
                       <SpeakableText>{slide.description}</SpeakableText>

@@ -99,25 +99,52 @@ const SessionCardFooter: React.FC<SessionCardFooterProps> = ({
           item?.metadata?.courseType &&
           item?.metadata?.subject
         ) {
-          const response = await fetchTargetedSolutions();
+          let response = await fetchTargetedSolutions(true);
 
-          if (response?.result?.data == '') {
-            setTopicList([]);
-            return;
-          }
+          let courseData = response?.result?.data?.[0];
+          let courseId = courseData?._id;
 
-          let courseData = response?.result?.data[0];
-          let courseId = courseData._id;
 
-          if (!courseId) {
-            await fetchCourseIdFromSolution(
-              courseData?.solutionId,
-              cohortId as string
+          if (
+            Array.isArray(response?.result?.data) &&
+            response?.result?.data.length === 0
+          ) {
+
+            response = await fetchTargetedSolutions(false);
+            if (
+              !Array.isArray(response?.result?.data) ||
+              response?.result?.data.length === 0
+            ) {
+              setTopicList([]);
+              return;
+            }
+
+            response = await fetchCourseIdFromSolution(response?.result?.data?.[0]?.solutionId, cohortId as string,
+              {
+                visibility: 'SCOPE',
+                users: [],
+                medium: dashboard ? CohortBMG?.medium : medium,
+                class: dashboard ? CohortBMG?.grade : grade,
+                board: dashboard ? CohortBMG?.board : board,
+                courseType: item?.metadata?.courseType,
+                subject: item?.metadata?.subject,
+              }
             );
-            const response = await fetchTargetedSolutions();
             courseData = response?.result?.data[0];
             courseId = courseData._id;
           }
+
+          // let courseData = response?.result?.data[0];
+          // let courseId = courseData._id;
+
+          // if (!courseId) {
+          //   await fetchCourseIdFromSolution(
+          //     courseData?.solutionId,
+          //     cohortId as string
+          //   );
+          //   courseData = response?.result?.data[0];
+          //   courseId = courseData._id;
+          // }
 
           const res = await getUserProjectDetails({
             id: courseId,
@@ -231,7 +258,7 @@ const SessionCardFooter: React.FC<SessionCardFooterProps> = ({
     setSelectedSubtopics([]);
   };
 
-  const fetchTargetedSolutions = async () => {
+  const fetchTargetedSolutions = async (isEntity: boolean) => {
     const response = await getTargetedSolutions({
       // state: state,
       medium: dashboard ? CohortBMG?.medium : medium,
@@ -239,7 +266,7 @@ const SessionCardFooter: React.FC<SessionCardFooterProps> = ({
       board: dashboard ? CohortBMG?.board : board,
       courseType: item?.metadata?.courseType,
       subject: item?.metadata?.subject,
-      entityId: cohortId,
+      ...(isEntity && { entityId: cohortId }),
     });
     return response;
   };

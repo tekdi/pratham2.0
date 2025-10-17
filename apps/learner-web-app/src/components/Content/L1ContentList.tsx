@@ -137,7 +137,26 @@ const MyComponent: React.FC = () => {
               {t('COMMON.WELCOME')}, {localStorage.getItem('firstName')}!
             </Typography>
           </Box>
-          {(tab == '0' || tab === null) && <InProgressContent />}
+          {(() => {
+            // Find indices of 'courses' and 'self' in storedConfig.showContent
+            const coursesIndex = storedConfig?.showContent?.findIndex((item: string) => 
+              item.toLowerCase() === 'courses'
+            );
+            const selfIndex = storedConfig?.showContent?.findIndex((item: string) => 
+              item.toLowerCase() === 'self'
+            );
+            
+            // Show InProgressContent if tab matches either index or if tab is null/undefined
+            const shouldShowInProgress = 
+              // tab === null || 
+              // tab === undefined || 
+             ( storedConfig?.showContent?.[0]===  'courses' && (tab === null || tab === undefined))||
+              ( storedConfig?.showContent?.[0]===  'self' && (tab === null || tab === undefined))||
+              (coursesIndex !== -1 && tab === coursesIndex.toString()) ||
+              (selfIndex !== -1 && tab === selfIndex.toString());
+              
+            return shouldShowInProgress && <InProgressContent />;
+          })()}
 
           {localStorage.getItem('userProgram') === TenantName.YOUTHNET && (
             <Grid container>
@@ -194,7 +213,7 @@ const MyComponent: React.FC = () => {
                   storedConfig.showContent.includes('courses') &&
                   storedConfig.showContent.includes('contents')
                   ? { contentTabs: ['courses', 'content'] }
-                  : {}),
+                  : { contentTabs: storedConfig.showContent?.map((item: string) => item.toLowerCase()) }),
 
                 staticFilter: {
                   program:
