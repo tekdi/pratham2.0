@@ -304,6 +304,7 @@ const Learning = ({
                         color: '#7C766F',
                         fontFamily: 'Poppins',
                         mb: '8px',
+                        textAlign: 'justify',
                       }}
                     >
                       <SpeakableText>
@@ -339,6 +340,7 @@ const Learning = ({
                               fontWeight: 400,
                               color: '#7C766F',
                               fontFamily: 'Poppins',
+                              textAlign: 'justify',
                             }}
                           >
                             <SpeakableText>{desc}</SpeakableText>
@@ -354,6 +356,7 @@ const Learning = ({
                       fontWeight: 400,
                       color: '#7C766F',
                       fontFamily: 'Poppins',
+                      textAlign: 'justify',
                     }}
                   >
                     <SpeakableText>{descriptions[index]}</SpeakableText>
