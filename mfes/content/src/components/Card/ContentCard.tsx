@@ -109,7 +109,7 @@ const ContentCard = ({
 }
         content={item?.description ? item?.description : <Description />}
         actions={
-          type !== 'Course' || type!=='Job family' || type!=='PSU' || type!=='Group Membership' && (
+          type !== 'Course' || type!=='Job family' || type!=='PSU' || type!=='Group Membership'  || type!=='self' && (
             <StatusIcon
               showMimeTypeIcon
               mimeType={item?.mimeType}
@@ -134,7 +134,7 @@ const ContentCard = ({
         onClick={(e: any) => handleCardClick(item, e)}
         _card={{
           _contentParentText: {
-            sx: { height: type !== 'Course' ? '156px' : '172px' },
+            sx: { height: type !== 'Course' || type!=='self' ? '156px' : '172px' },
           },
           ..._card,
         }}

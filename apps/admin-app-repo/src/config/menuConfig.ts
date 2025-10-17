@@ -115,7 +115,7 @@ export const MENU_CONFIG = {
       title: 'SIDEBAR.TAXONOMY_EDITOR',
       icon: '/images/taxonomy.svg',
       link: '/taxonomy-manager',
-      roles: [Role.CCTA, Role.SCTA, Role.CENTRAL_ADMIN],
+      roles: [ Role.CENTRAL_ADMIN],
     },
     faqs: {
       title: 'SIDEBAR.FAQS',
@@ -126,6 +126,7 @@ export const MENU_CONFIG = {
         Role.CENTRAL_ADMIN,
         Role.CCTA,
         Role.SCTA,
+
         // Role.CENTRAL_ADMIN, // check
       ],
     },
@@ -245,7 +246,7 @@ export const MENU_CONFIG = {
       title: 'SIDEBAR.TAXONOMY_EDITOR',
       icon: '/images/taxonomy.svg',
       link: '/taxonomy-manager',
-      roles: [Role.CCTA, Role.SCTA, Role.CENTRAL_ADMIN],
+      roles: [ Role.CENTRAL_ADMIN],
     },
   },
   [TenantName.POS]: {
@@ -296,7 +297,7 @@ export const MENU_CONFIG = {
       title: 'SIDEBAR.TAXONOMY_EDITOR',
       icon: '/images/taxonomy.svg',
       link: '/taxonomy-manager',
-      roles: [Role.CCTA, Role.SCTA, Role.CENTRAL_ADMIN],
+      roles: [ Role.CENTRAL_ADMIN],
     },
     faqs: {
       title: 'SIDEBAR.FAQS',
@@ -328,7 +329,25 @@ export const MENU_CONFIG = {
       title: 'SIDEBAR.TAXONOMY_EDITOR',
       icon: '/images/taxonomy.svg',
       link: '/taxonomy-manager',
-      roles: [Role.CCTA, Role.SCTA, Role.CENTRAL_ADMIN],
+      roles: [ Role.CENTRAL_ADMIN],
+    },
+    faqs: {
+      title: 'SIDEBAR.FAQS',
+      icon: '/images/live_help.png',
+      link: '/faqs',
+      roles: [
+        Role.ADMIN,
+        Role.CENTRAL_ADMIN,
+        Role.CCTA,
+        Role.SCTA,
+        
+      ],
+    },
+    supportRequest: {
+      title: 'SIDEBAR.SUPPORT_REQUEST',
+      icon: '/images/Support.svg',
+      link: '/support-request',
+      roles: [Role.ADMIN, Role.CENTRAL_ADMIN, Role.CCTA, Role.SCTA],
     },
   },
   [TenantName.CAMP_TO_CLUB]: {
@@ -385,7 +404,7 @@ export const MENU_CONFIG = {
       title: 'SIDEBAR.WORKSPACE',
       icon: '/images/dashboard.svg',
       link: '/workspace',
-      roles: [Role.CENTRAL_ADMIN],
+      roles: [Role.CENTRAL_ADMIN,  Role.CCTA, Role.SCTA],
     },
     manageNotificationTemplates: {
       title: 'SIDEBAR.MANAGE_NOTIFICATION',
@@ -397,14 +416,14 @@ export const MENU_CONFIG = {
       title: 'SIDEBAR.SUPPORT_REQUEST',
       icon: '/images/Support.svg',
       link: '/support-request',
-      roles: [Role.CENTRAL_ADMIN],
+      roles: [Role.ADMIN, Role.CENTRAL_ADMIN, Role.CCTA, Role.SCTA],
     },
    
     faqs: {
       title: 'SIDEBAR.FAQS',
       icon: '/images/live_help.png',
       link: '/faqs',
-      roles: [Role.CENTRAL_ADMIN],
+      roles: [Role.ADMIN, Role.CENTRAL_ADMIN, Role.CCTA, Role.SCTA],
     },
    
   },

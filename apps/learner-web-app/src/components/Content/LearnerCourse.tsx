@@ -367,7 +367,7 @@ export default memo(function LearnerCourse({
             <Box>
               <Content
                 isShowLayout={false}
-                contentTabs={['Course']}
+                contentTabs={_content?.contentTabs || ['Course']}
                 showFilter={false}
                 showSearch={false}
                 showHelpDesk={false}

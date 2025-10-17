@@ -204,6 +204,9 @@ const SSOContent = () => {
               FilterKey[label as keyof typeof FilterKey],
               JSON.stringify(selectedValues)
             );
+            if(label === 'EMP_GROUP') {
+              localStorage.setItem(FilterKey.GROUP_MEMBERSHIP, JSON.stringify(selectedValues));
+            }
 
             // Map the label to the corresponding FilterKey and store in localStorage
             // switch (label) {

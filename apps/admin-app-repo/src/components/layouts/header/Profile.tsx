@@ -246,51 +246,40 @@ const Profile = () => {
         }}
       >
         <Box display="flex" alignItems="center" color="#bdbdbd">
-          {/*<Avatar sx={{ width: 32, height: 32, mr: 1 }} />
-           <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              // ml: 1,
-              '@media (max-width: 600px)': {
-                display: 'none',
-              },
-            }}
-          >
-            <Typography
-              variant="body1"
-              fontWeight="400"
-              sx={{
-                ml: 1,
-                color: 'black',
-                maxWidth: '200px',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                fontSize: '16px',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {t('COMMON.HI', { name: firstLetterInUpperCase(userName ?? '') })}
-            </Typography>
-            
-          </Box> */}
-          <Avatar sx={{ width: 32, height: 32, mr: 1 }} />
+          <Avatar 
+            sx={{ 
+              width: { xs: 28, sm: 32 }, 
+              height: { xs: 28, sm: 32 }, 
+              mr: { xs: 0.5, sm: 1 } 
+            }} 
+          />
           <Typography
             variant="body1"
             sx={{
-              ml: 1,
+              ml: { xs: 0.5, sm: 1 },
               color: 'black',
-              maxWidth: '200px',
+              maxWidth: { xs: '80px', sm: '120px', md: '200px' }, // Responsive max width
               overflow: 'hidden',
               textOverflow: 'ellipsis',
-              fontSize: '16px',
+              fontSize: { xs: '12px', sm: '14px', md: '16px' }, // Responsive font size
               whiteSpace: 'nowrap',
+              display: { xs: 'none', sm: 'block' }, // Hide on extra small screens
             }}
           >
             {userName}
           </Typography>
-          <IconButton size="small">
-            <ArrowDropDownIcon />
+          <IconButton 
+            size="small"
+            sx={{
+              padding: { xs: '2px', sm: '4px' }, // Smaller padding on mobile
+              marginLeft: { xs: '2px', sm: '4px' },
+            }}
+          >
+            <ArrowDropDownIcon 
+              sx={{ 
+                fontSize: { xs: '18px', sm: '20px' } // Responsive icon size
+              }} 
+            />
           </IconButton>
         </Box>
       </Button>

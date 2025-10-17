@@ -315,10 +315,10 @@
     "SEARCHBAR_PLACEHOLDER": "Search Center.."
   },
   "COURSE_PLANNER": {
-    "LEARNERS_PREREQISITE": "Learners Pre-requisites",
-    "NO_DATA_PRE": "No data available for Learners Pre-requisites",
-    "LEARNERS_POSTREQISITE": "Learners Post-requisites",
-    "NO_DATA_POST": "No data available for Learners Post-requisites",
+    "LEARNERS_PREREQISITE": "Learners Prepare",
+    "NO_DATA_PRE": "No data available for Learners Prepare",
+    "LEARNERS_POSTREQISITE": "Learners Practice",
+    "NO_DATA_POST": "No data available for Learners Practice",
     "FACILITATORS": "Facilitators Requisites",
     "NO_DATA": "No data available for Facilitators Requisites",
     "DOWNLOAD_SAMPLE_CSV": "Download Sample CSV",
@@ -355,7 +355,9 @@
     "ADD_NEW_TOPIC": "Add New Topic",
     "DELETE_PLANNER": "Delete Planner",
     "CSV_TEMPLATE": "CSV Template",
-    "NEW_TOPIC": "New Topic"
+    "NEW_TOPIC": "New Topic",
+    "DOWNLOAD_CSV": "Download Uploaded CSV"
+
   },
   "MASTER": {
     "STATE": "States",

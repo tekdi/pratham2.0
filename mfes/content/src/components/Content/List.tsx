@@ -1,4 +1,4 @@
-'use client';
+  'use client';
 
 import React, {
   useCallback,
@@ -47,6 +47,8 @@ const SUPPORTED_MIME_TYPES = [
 const DEFAULT_TABS = [
   { label: 'Courses', type: 'Course' },
   { label: 'Content', type: 'Learning Resource' },
+  { label: 'For Children', type: 'for children' },
+  { label: 'Self', type: 'self' },
 ];
 
 // Custom hook to get current breakpoint
@@ -238,13 +240,21 @@ export default function Content(props: Readonly<ContentProps>) {
       );
       setCurrentLimit(dynamicLimit);
 
+      const filteredTabs = DEFAULT_TABS.filter((tab) =>
+        config?.contentTabs?.length
+          ? config.contentTabs.includes(tab.label.toLowerCase())
+          : true
+      );
+      
+    
+      // Use filtered tabs for initial type setting
+      const safeTabIndex = Math.min(savedTab, filteredTabs.length - 1);
+      const initialType = filteredTabs[safeTabIndex]?.type || 'Course';
+
       if (savedFilters) {
         setLocalFilters({
           ...(config?.filters ?? {}),
-          type:
-            props?.contentTabs?.length === 1
-              ? props.contentTabs[savedTab]
-              : DEFAULT_TABS[savedTab].type,
+          type: initialType,
           ...savedFilters,
           loadOld: true,
         });
@@ -252,23 +262,14 @@ export default function Content(props: Readonly<ContentProps>) {
         setLocalFilters((prev) => ({
           ...prev,
           ...(config?.filters ?? {}),
-          type:
-            props?.contentTabs?.length === 1
-              ? props.contentTabs[savedTab]
-              : DEFAULT_TABS[savedTab].type,
+          type: initialType,
           limit: (config?.filters as any)?.limit || dynamicLimit, // Use explicit limit if provided, otherwise dynamic limit
           offset: 0, // Start with offset 0
           loadOld: false,
         }));
       }
-
-      setTabs(
-        DEFAULT_TABS.filter((tab) =>
-          config?.contentTabs?.length
-            ? config.contentTabs.includes(tab.label.toLowerCase())
-            : true
-        )
-      );
+      
+      setTabs(filteredTabs);
       setTabValue(savedTab);
       setIsPageLoading(false);
     };

@@ -79,6 +79,7 @@ const PublishPage = () => {
   const fetchContentAPI = useSharedStore((state: any) => state.fetchContentAPI);
   const [debouncedSearchTerm, setDebouncedSearchTerm] =
     useState<string>(searchTerm);
+  const prevSearchTermRef = useRef(debouncedSearchTerm);
 
   const prevFilterRef = useRef(filter);
 
@@ -151,15 +152,21 @@ const PublishPage = () => {
         if (!tenantConfig) return;
         setLoading(true);
         const query = debouncedSearchTerm || '';
-        let offset = debouncedSearchTerm !== '' ? 0 : page * LIMIT;
 
         const primaryCategory = filter.length ? filter : [];
-        if (prevFilterRef.current !== filter) {
-          offset = 0;
+        
+        // Reset page to 0 when search term or filter changes
+        if (prevSearchTermRef.current !== debouncedSearchTerm) {
           setPage(0);
-
+          prevSearchTermRef.current = debouncedSearchTerm;
+        }
+        
+        if (prevFilterRef.current !== filter) {
+          setPage(0);
           prevFilterRef.current = filter;
         }
+        
+        const offset = page * LIMIT;
         const order = sortBy === 'Created On' ? 'asc' : 'desc';
         const sort_by = { lastUpdatedOn: order };
         const response = await getContent(

@@ -120,10 +120,15 @@ const SearchBox: React.FC<SearchBarProps> = ({
         response?.channel?.collectionPrimaryCategories;
       const contentPrimaryCategories =
         response?.channel?.contentPrimaryCategories;
+        const additionalCategories =
+        response?.channel?.additionalCategories;
+
 
       const PrimaryCategory = [
         ...collectionPrimaryCategories,
         ...contentPrimaryCategories,
+        ...additionalCategories,
+
       ];
       setPrimaryCategory(PrimaryCategory || []);
       localStorage.setItem('PrimaryCategory', JSON.stringify(PrimaryCategory));
@@ -301,6 +306,21 @@ const SearchBox: React.FC<SearchBarProps> = ({
                 onChange={handleFilterChange}
                 input={<OutlinedInput label="Filter By" />}
                 renderValue={(selected) => (selected as string[]).join(', ')}
+                MenuProps={{
+                  anchorOrigin: {
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                  },
+                  transformOrigin: {
+                    vertical: 'top',
+                    horizontal: 'left',
+                  },
+                  PaperProps: {
+                    style: {
+                      maxHeight: 300,
+                    },
+                  },
+                }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     '&.Mui-focused fieldset': { borderColor: '#000' },
