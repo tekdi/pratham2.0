@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { WidgetProps } from '@rjsf/utils';
 import {
   Box,
@@ -10,102 +10,56 @@ import {
   IconButton,
   Typography,
   Divider,
+  CircularProgress,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import axios from 'axios';
 import { useTranslation } from 'libs/shared-lib-v2/src/lib/context/LanguageContext';
 
-// Mock data for States, Districts, and Blocks
-const mockData = {
-  states: [
-    { id: 1, name: 'Maharashtra' },
-    { id: 2, name: 'Karnataka' },
-    { id: 3, name: 'Tamil Nadu' },
-    { id: 4, name: 'Gujarat' },
-    { id: 5, name: 'Delhi' },
-  ],
-  districts: {
-    1: [
-      { id: 101, name: 'Mumbai', stateId: 1 },
-      { id: 102, name: 'Pune', stateId: 1 },
-      { id: 103, name: 'Nagpur', stateId: 1 },
-      { id: 104, name: 'Aurangabad', stateId: 1 },
-    ],
-    2: [
-      { id: 201, name: 'Bangalore', stateId: 2 },
-      { id: 202, name: 'Mysore', stateId: 2 },
-      { id: 203, name: 'Hubli', stateId: 2 },
-    ],
-    3: [
-      { id: 301, name: 'Chennai', stateId: 3 },
-      { id: 302, name: 'Coimbatore', stateId: 3 },
-    ],
-    4: [
-      { id: 401, name: 'Ahmedabad', stateId: 4 },
-      { id: 402, name: 'Surat', stateId: 4 },
-    ],
-    5: [
-      { id: 501, name: 'Central Delhi', stateId: 5 },
-      { id: 502, name: 'New Delhi', stateId: 5 },
-    ],
-  },
-  blocks: {
-    101: [
-      { id: 1001, name: 'Andheri', districtId: 101 },
-      { id: 1002, name: 'Bandra', districtId: 101 },
-      { id: 1003, name: 'Kandivali', districtId: 101 },
-    ],
-    102: [
-      { id: 2001, name: 'Hinjewadi', districtId: 102 },
-      { id: 2002, name: 'Viman Nagar', districtId: 102 },
-      { id: 2003, name: 'Hadapsar', districtId: 102 },
-    ],
-    103: [
-      { id: 3001, name: 'Ramnagar', districtId: 103 },
-      { id: 3002, name: 'Wadi', districtId: 103 },
-    ],
-    104: [
-      { id: 4001, name: 'Jalna Road', districtId: 104 },
-      { id: 4002, name: 'Badre', districtId: 104 },
-    ],
-    201: [
-      { id: 5001, name: 'HSR Layout', districtId: 201 },
-      { id: 5002, name: 'Whitefield', districtId: 201 },
-      { id: 5003, name: 'MG Road', districtId: 201 },
-    ],
-    202: [
-      { id: 6001, name: 'Chamarajapuram', districtId: 202 },
-      { id: 6002, name: 'Vijayanagar', districtId: 202 },
-    ],
-    203: [
-      { id: 7001, name: 'Keshav Nagar', districtId: 203 },
-      { id: 7002, name: 'Durgadbail', districtId: 203 },
-    ],
-    301: [
-      { id: 8001, name: 'T Nagar', districtId: 301 },
-      { id: 8002, name: 'Adyar', districtId: 301 },
-    ],
-    302: [
-      { id: 9001, name: 'RS Puram', districtId: 302 },
-      { id: 9002, name: 'Kovaipudur', districtId: 302 },
-    ],
-    401: [
-      { id: 11001, name: 'Navrangpura', districtId: 401 },
-      { id: 11002, name: 'Vastrapur', districtId: 401 },
-    ],
-    402: [
-      { id: 12001, name: 'Varachha', districtId: 402 },
-      { id: 12002, name: 'Katargam', districtId: 402 },
-    ],
-    501: [
-      { id: 13001, name: 'Connaught Place', districtId: 501 },
-      { id: 13002, name: 'Karol Bagh', districtId: 501 },
-    ],
-    502: [
-      { id: 14001, name: 'Dwarka', districtId: 502 },
-      { id: 14002, name: 'Saket', districtId: 502 },
-    ],
-  },
+// API configuration
+const API_BASE_URL = process.env.NEXT_PUBLIC_MIDDLEWARE_URL || '';
+
+const getNestedValue = (obj: any, path: string) => {
+  if (!path) return obj;
+  return path.split('.').reduce((acc, key) => acc && acc[key], obj);
 };
+
+// Helper function to replace ** with actual value in nested objects
+const replacePlaceholder = (obj: any, replacement: any): any => {
+  if (typeof obj === 'object' && obj !== null) {
+    if (Array.isArray(obj)) {
+      return obj.map((item) => replacePlaceholder(item, replacement));
+    } else {
+      const replaced = { ...obj };
+      for (const key in replaced) {
+        if (replaced[key] === '**') {
+          replaced[key] = [replacement];
+        } else if (typeof replaced[key] === 'object') {
+          replaced[key] = replacePlaceholder(replaced[key], replacement);
+        }
+      }
+      return replaced;
+    }
+  }
+  return obj;
+};
+
+interface StateData {
+  id: number;
+  name: string;
+}
+
+interface DistrictData {
+  id: number;
+  name: string;
+  stateId: number;
+}
+
+interface BlockData {
+  id: number;
+  name: string;
+  districtId: number;
+}
 
 interface SelectedDistrict {
   districtId: number;
@@ -119,6 +73,48 @@ interface SelectedState {
   districts: SelectedDistrict[];
 }
 
+// API configuration constants (moved outside component to prevent recreation on each render)
+const STATE_API_CONFIG = {
+  url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
+  method: 'POST',
+  payload: { fieldName: 'state', sort: ['state_name', 'asc'] },
+  options: {
+    optionObj: 'result.values',
+    label: 'label',
+    value: 'value',
+  },
+};
+
+const DISTRICT_API_CONFIG = {
+  url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
+  method: 'POST',
+  payload: {
+    fieldName: 'district',
+    controllingfieldfk: '**',
+    sort: ['district_name', 'asc'],
+  },
+  options: {
+    optionObj: 'result.values',
+    label: 'label',
+    value: 'value',
+  },
+};
+
+const BLOCK_API_CONFIG = {
+  url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
+  method: 'POST',
+  payload: {
+    fieldName: 'block',
+    controllingfieldfk: '**',
+    sort: ['block_name', 'asc'],
+  },
+  options: {
+    optionObj: 'result.values',
+    label: 'label',
+    value: 'value',
+  },
+};
+
 const CachmentAreaWidget = ({
   id,
   label,
@@ -128,6 +124,9 @@ const CachmentAreaWidget = ({
   readonly,
   onChange,
   rawErrors = [],
+  schema,
+  uiSchema,
+  options,
 }: WidgetProps) => {
   const { t } = useTranslation();
   const [selectedStates, setSelectedStates] = useState<SelectedState[]>(
@@ -138,17 +137,148 @@ const CachmentAreaWidget = ({
     [stateId: number]: number;
   }>({});
 
+  // API data states
+  const [states, setStates] = useState<StateData[]>([]);
+  const [districts, setDistricts] = useState<{
+    [stateId: number]: DistrictData[];
+  }>({});
+  const [blocks, setBlocks] = useState<{ [districtId: number]: BlockData[] }>(
+    {}
+  );
+  const [loadingStates, setLoadingStates] = useState(true);
+  const [loadingDistricts, setLoadingDistricts] = useState<{
+    [stateId: number]: boolean;
+  }>({});
+
   // Get available states (not yet selected)
-  const availableStates = mockData.states.filter(
+  const availableStates = states.filter(
     (state) => !selectedStates.some((selected) => selected.stateId === state.id)
   );
 
-  const handleStateSelect = (event: any) => {
+  // Fetch states from API
+  useEffect(() => {
+    const fetchStates = async () => {
+      try {
+        setLoadingStates(true);
+        const headers = {
+          'Content-Type': 'application/json',
+          tenantId: localStorage.getItem('tenantId') || '',
+          Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+          academicyearid: localStorage.getItem('academicYearId') || '',
+        };
+
+        const response = await axios.post(
+          STATE_API_CONFIG.url,
+          STATE_API_CONFIG.payload || {},
+          { headers }
+        );
+
+        const statesData = getNestedValue(
+          response.data,
+          STATE_API_CONFIG.options?.optionObj || 'result.values'
+        );
+        if (statesData && Array.isArray(statesData)) {
+          const formattedStates = statesData.map((state: any) => ({
+            id: Number(state[STATE_API_CONFIG.options?.value || 'value']),
+            name: state[STATE_API_CONFIG.options?.label || 'label'],
+          }));
+          setStates(formattedStates);
+        }
+      } catch (error) {
+        console.error('Error fetching states:', error);
+      } finally {
+        setLoadingStates(false);
+      }
+    };
+
+    fetchStates();
+  }, []); // Empty dependency array - only run once on mount
+
+  // Fetch districts when a state is selected
+  const fetchDistrictsForState = async (stateId: number) => {
+    if (districts[stateId]) return; // Already loaded
+
+    try {
+      setLoadingDistricts((prev) => ({ ...prev, [stateId]: true }));
+      const headers = {
+        'Content-Type': 'application/json',
+        tenantId: localStorage.getItem('tenantId') || '',
+        Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+        academicyearid: localStorage.getItem('academicYearId') || '',
+      };
+
+      // Replace ** with stateId in payload
+      const payload = replacePlaceholder(
+        DISTRICT_API_CONFIG.payload || {},
+        stateId
+      );
+
+      const response = await axios.post(DISTRICT_API_CONFIG.url, payload, {
+        headers,
+      });
+
+      const districtsData = getNestedValue(
+        response.data,
+        DISTRICT_API_CONFIG.options?.optionObj || 'result.values'
+      );
+      if (districtsData && Array.isArray(districtsData)) {
+        const formattedDistricts = districtsData.map((district: any) => ({
+          id: Number(district[DISTRICT_API_CONFIG.options?.value || 'value']),
+          name: district[DISTRICT_API_CONFIG.options?.label || 'label'],
+          stateId: stateId,
+        }));
+        setDistricts((prev) => ({ ...prev, [stateId]: formattedDistricts }));
+      }
+    } catch (error) {
+      console.error('Error fetching districts:', error);
+    } finally {
+      setLoadingDistricts((prev) => ({ ...prev, [stateId]: false }));
+    }
+  };
+
+  // Fetch blocks when a district is selected
+  const fetchBlocksForDistrict = async (districtId: number) => {
+    if (blocks[districtId]) return; // Already loaded
+
+    try {
+      const headers = {
+        'Content-Type': 'application/json',
+        tenantId: localStorage.getItem('tenantId') || '',
+        Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+        academicyearid: localStorage.getItem('academicYearId') || '',
+      };
+
+      // Replace ** with districtId in payload
+      const payload = replacePlaceholder(
+        BLOCK_API_CONFIG.payload || {},
+        districtId
+      );
+
+      const response = await axios.post(BLOCK_API_CONFIG.url, payload, {
+        headers,
+      });
+
+      const blocksData = getNestedValue(
+        response.data,
+        BLOCK_API_CONFIG.options?.optionObj || 'result.values'
+      );
+      if (blocksData && Array.isArray(blocksData)) {
+        const formattedBlocks = blocksData.map((block: any) => ({
+          id: Number(block[BLOCK_API_CONFIG.options?.value || 'value']),
+          name: block[BLOCK_API_CONFIG.options?.label || 'label'],
+          districtId: districtId,
+        }));
+        setBlocks((prev) => ({ ...prev, [districtId]: formattedBlocks }));
+      }
+    } catch (error) {
+      console.error('Error fetching blocks:', error);
+    }
+  };
+
+  const handleStateSelect = async (event: any) => {
     const selectedStateId = event.target.value;
     if (selectedStateId) {
-      const selectedState = mockData.states.find(
-        (s) => s.id === selectedStateId
-      );
+      const selectedState = states.find((s) => s.id === selectedStateId);
       if (selectedState) {
         const newState: SelectedState = {
           stateId: selectedState.id,
@@ -159,15 +289,16 @@ const CachmentAreaWidget = ({
         setSelectedStates(updatedStates);
         setStateSelectValue('');
         onChange(updatedStates);
+
+        // Fetch districts for this state
+        await fetchDistrictsForState(selectedState.id);
       }
     }
   };
 
-  const handleDistrictSelect = (stateId: number, districtId: number) => {
+  const handleDistrictSelect = async (stateId: number, districtId: number) => {
     if (districtId) {
-      const district = mockData.districts[stateId]?.find(
-        (d) => d.id === districtId
-      );
+      const district = districts[stateId]?.find((d) => d.id === districtId);
       if (district) {
         const updatedStates = selectedStates.map((state) => {
           if (state.stateId === stateId) {
@@ -193,6 +324,9 @@ const CachmentAreaWidget = ({
         setSelectedStates(updatedStates);
         setDistrictSelectValues({ ...districtSelectValues, [stateId]: '' });
         onChange(updatedStates);
+
+        // Fetch blocks for this district
+        await fetchBlocksForDistrict(district.id);
       }
     }
   };
@@ -272,13 +406,15 @@ const CachmentAreaWidget = ({
     const state = selectedStates.find((s) => s.stateId === stateId);
     if (!state) return [];
     const selectedDistrictIds = state.districts.map((d) => d.districtId);
-    return mockData.districts[stateId]?.filter(
-      (district) => !selectedDistrictIds.includes(district.id)
+    return (
+      districts[stateId]?.filter(
+        (district) => !selectedDistrictIds.includes(district.id)
+      ) || []
     );
   };
 
   const getAvailableBlocks = (stateId: number, districtId: number) => {
-    const allBlocks = mockData.blocks[districtId] || [];
+    const allBlocks = blocks[districtId] || [];
     const selectedBlockIds = getSelectedBlocksForDistrict(stateId, districtId);
     return allBlocks.filter((block) => !selectedBlockIds.includes(block.id));
   };
@@ -307,32 +443,52 @@ const CachmentAreaWidget = ({
       )}
 
       {/* State Selection */}
-      {availableStates.length > 0 && (
-        <FormControl fullWidth size="small" sx={{ mb: 2 }}>
-          <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-            {label} {required && '*'}
+      {loadingStates ? (
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            mb: 2,
+          }}
+        >
+          <CircularProgress size={24} />
+          <Typography variant="caption" sx={{ ml: 2 }}>
+            Loading states...
           </Typography>
-          <Select
-            value={stateSelectValue}
-            onChange={handleStateSelect}
-            displayEmpty
-            disabled={disabled || readonly}
-            size="small"
-            sx={{ backgroundColor: 'white' }}
-          >
-            <MenuItem value="">
-              <em>Select State</em>
-            </MenuItem>
-            {availableStates.map((state) => (
-              <MenuItem key={state.id} value={state.id}>
-                {state.name}
+        </Box>
+      ) : (
+        availableStates.length > 0 && (
+          <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+            <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+              {label} {required && '*'}
+            </Typography>
+            <Select
+              value={stateSelectValue}
+              onChange={handleStateSelect}
+              displayEmpty
+              disabled={disabled || readonly}
+              size="small"
+              sx={{ backgroundColor: 'white' }}
+            >
+              <MenuItem value="">
+                <em>Select State</em>
               </MenuItem>
-            ))}
-          </Select>
-          <Typography variant="caption" color="textSecondary" sx={{ mt: 0.5 }}>
-            Select a state to start
-          </Typography>
-        </FormControl>
+              {availableStates.map((state) => (
+                <MenuItem key={state.id} value={state.id}>
+                  {state.name}
+                </MenuItem>
+              ))}
+            </Select>
+            <Typography
+              variant="caption"
+              color="textSecondary"
+              sx={{ mt: 0.5 }}
+            >
+              Select a state to start
+            </Typography>
+          </FormControl>
+        )
       )}
       {availableStates.length === 0 && selectedStates.length > 0 && (
         <Box
@@ -475,7 +631,7 @@ const CachmentAreaWidget = ({
                   state.stateId,
                   district.districtId
                 ).map((blockId) => {
-                  const block = mockData.blocks[district.districtId]?.find(
+                  const block = blocks[district.districtId]?.find(
                     (b) => b.id === blockId
                   );
                   return block ? (
@@ -548,6 +704,26 @@ const CachmentAreaWidget = ({
           {/* District Selection Dropdown */}
           {(() => {
             const availableDistricts = getAvailableDistricts(state.stateId);
+            const isLoading = loadingDistricts[state.stateId];
+
+            if (isLoading) {
+              return (
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    mt: 2,
+                    justifyContent: 'center',
+                  }}
+                >
+                  <CircularProgress size={20} />
+                  <Typography variant="caption" sx={{ ml: 2, color: '#666' }}>
+                    Loading districts...
+                  </Typography>
+                </Box>
+              );
+            }
+
             return availableDistricts.length > 0 ? (
               <FormControl fullWidth size="small" sx={{ mt: 2 }}>
                 <Typography
