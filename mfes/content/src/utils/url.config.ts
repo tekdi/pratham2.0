@@ -12,4 +12,11 @@ export const URL_CONFIG = {
     COMPOSITE_SEARCH: '/action/composite/v3/search',
     CONTENT_HIERARCHY: '/action/content/v3/hierarchy',
   },
+   TenantName: {
+    SECOND_CHANCE_PROGRAM : 'Second Chance Program',
+    YOUTHNET : 'Vocational Training',
+    POS :'Open School',
+    PRAGYANPATH : 'Pragyanpath',
+    CAMP_TO_CLUB :'Camp to Club'
+  }
 };
