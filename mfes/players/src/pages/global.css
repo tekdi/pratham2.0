@@ -123,3 +123,23 @@ pre {
 .underline-links-enabled .MuiButton-root[href] {
   text-decoration: underline !important;
 }
+
+/* Image styles */
+.img-jk figure img {
+  width: 70px !important;
+  height: 50px !important;
+  object-fit: cover;
+}
+.img-jk p {
+  margin: 0px !important;
+}
+.img-jk figure {
+  position: relative !important;
+  margin: 0px !important;
+}
+.img-jk {
+  text-align: left !important;
+  height: 50px !important;
+  display: flex;
+  align-items: center;
+}
