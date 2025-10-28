@@ -55,6 +55,7 @@ import { toPascalCase } from '../../utils/helper';
 import UploadFiles from '../../components/UploadFiles/UploadFiles';
 import CloseIcon from '@mui/icons-material/Close';
 import QuestionMarksManualUpdate from '../../components/assessment/QuestionMarksManualUpdate';
+import { showToastMessage } from '@shared-lib-v2/DynamicForm/components/Toastify';
 interface ScoreDetail {
   questionId: string | null;
   pass: string;
@@ -243,7 +244,9 @@ const AssessmentDetails = () => {
   const [assessmentTrackingData, setAssessmentTrackingData] =
     useState<AssessmentTrackingData | null>();
   const [assessmentStatusData, setAssessmentStatusData] = useState<ScoreDetail[]>([]);
+  const [assessmentStatus, setAssessmentStatus] = useState<string>('');
 
+console.log('assessmentStatusData>>>>>:', assessmentStatusData);
   // Hierarchy data for question numbering
   const [, setHierarchyData] = useState<any>(null);
   const [, setQuestionNumberingMap] = useState<
@@ -366,6 +369,8 @@ const AssessmentDetails = () => {
       });
 
       if (userData?.result?.length > 0) {
+      //  console.log('userData>>>>>:', userData.result);
+        setAssessmentStatus(userData.result[0].status);
         // Find the assessment data for the current user
         const currentUserData = userData.result.find(
           (item: OfflineAssessmentData) => item.userId === userId
@@ -999,7 +1004,49 @@ const AssessmentDetails = () => {
   const handleRefreshAssessmentData = async () => {
     await fetchOfflineAssessmentData(true);
   };
+  const handleDownloadQuestionPaper = async () => {
+    try {
+     // setDownloading(true);
+      // Simulate download delay
+      /*await new Promise((resolve) => setTimeout(resolve, 2000));
 
+      // Create download link
+      const element = document.createElement('a');
+      element.href =
+        'data:text/plain;charset=utf-8,' +
+        encodeURIComponent('Sample Assessment Question Paper Content');
+      element.download = `${
+        assessmentData?.title?.replace(/\s+/g, '_').toLowerCase() ||
+        'assessment'
+      }.pdf`;
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);*/
+
+      const downloadUrl =
+        process.env.NEXT_PUBLIC_ADMIN_SBPLAYER?.replace('sbplayer', '') +
+        '/qp?do_id=' +
+        assessmentId;
+      const newWindow = window.open(
+        downloadUrl,
+        '_blank',
+        'noopener,noreferrer'
+      );
+      if (newWindow) newWindow.focus();
+
+      showToastMessage(
+        t('ASSESSMENTS.DOWNLOAD_SUCCESS') ||
+        'Question paper downloaded successfully',
+        'success'
+      );
+      //setShowDownloadPopup(false);
+    } catch (error) {
+      console.error('Error downloading question paper:', error);
+      showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
+    } finally {
+     // setDownloading(false);
+    }
+  };
   const handleSubmissionSuccess = async () => {
     if (isReUploadMode) {
       // In re-upload mode, update the assessmentData with the new uploaded images
@@ -1107,7 +1154,7 @@ const AssessmentDetails = () => {
       <Box
         sx={{
           mx: '16px',
-          my: '16px',
+          my: '8px',
           display: 'flex',
           flexDirection: 'column',
           flex: 1,
@@ -1121,7 +1168,7 @@ const AssessmentDetails = () => {
             display: 'flex',
             alignItems: 'center',
             gap: 2,
-            pb: 2,
+            pb: 1,
           }}
         >
           {userAssessmentStatus ? (
@@ -1155,8 +1202,8 @@ const AssessmentDetails = () => {
 
         {/* Two-column layout: Left - existing content, Right - question paper placeholder */}
         <Grid
-          container
-          spacing={2}
+        //  container
+          spacing={1}
           sx={{ flex: 1, minHeight: 0, overflow: 'hidden' }}
         >
           <Grid item xs={12} md={12}>
@@ -1173,7 +1220,7 @@ const AssessmentDetails = () => {
                   border: '1px solid #DBDBDB',
                   borderRadius: '12px',
                   p: { xs: 2, md: 2 },
-                  mb: { xs: 2, md: 1 },
+                  mb: 0,
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
                   '&:hover': {
@@ -1185,7 +1232,7 @@ const AssessmentDetails = () => {
                 }}
               >
                 <Box
-                  mb={0.1}
+                  mb={0}
                   sx={{
                     display: 'flex',
                     alignItems: 'center',
@@ -1322,34 +1369,13 @@ const AssessmentDetails = () => {
               </Box>
             </>
           </Grid>
-          {/* <Box sx={{ display: 'flex', gap: 2 }}> */}
-            {/* <Button
-              variant="contained"
-              color="primary"
-              endIcon={<DownloadIcon />}
-              sx={{
-                flex: 1,
-                color: '#4D4639 ',
-                borderRadius: '8px',
-                fontWeight: 500,
-                textTransform: 'none',
-              }}
-              onClick={() => {
-                const link = document.createElement('a');
-                link.href = '/document/Sample_answer_sheet_format.pdf';
-                link.download = 'Sample_answer_sheet_format.pdf';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-              }}
-            >
-              {t('AI.SAMPLE_QUESTION_AND_ANSWER_PAPER')}
-            </Button> */}
-            {/* Download PDF Card */}
+       
             { (
+              
               <Button
                 variant="contained"
                 color="primary"
+                
                 startIcon={
                   <PictureAsPdfIcon
                     sx={{ color: '#D32F2F', width: 24, height: 24 }}
@@ -1370,6 +1396,7 @@ const AssessmentDetails = () => {
                   textTransform: 'none',
                   backgroundColor: '#ECE6F0',
                   border: '1px solid #D0C5B4',
+                  marginTop: 4,
                   cursor: 'pointer',
                   '&:hover': {
                     backgroundColor: '#E1D5E7',
@@ -1377,19 +1404,19 @@ const AssessmentDetails = () => {
                 }}
                 // onClick={() => setShowDownloadPopup(true)}
                 // onClick={handleDownloadQuestionPaper}
-               // onClick={handleDownloadQuestionPaper}
+                onClick={handleDownloadQuestionPaper}
               >
                 {t('AI.DOWNLOAD_QUESTION_PAPER')}.pdf
               </Button>
             )}
           {/* </Box> */}
-          <Grid item xs={12} md={12}>
+          { assessmentStatus === 'Approved' && (<Grid item xs={12} md={12} sx={{ mt: 4 }}>
             {/* Right column - Question Paper placeholder */}
             <Box
               sx={{
                 border: '1px solid #DBDBDB',
                 borderRadius: '12px',
-                p: { xs: 2, md: 2 },
+                p: { xs: 1, md: 1.5 },
                 height: 'fit-content',
                 position: 'static',
                 bgcolor: '#FFFFFF',
@@ -1412,7 +1439,7 @@ const AssessmentDetails = () => {
                 assessmentStatusData={assessmentStatusData}
               />
             </Box>
-          </Grid>
+          </Grid>)}
         </Grid>
       </Box>
 
