@@ -12,8 +12,8 @@ import {
   Alert,
   Dialog,
   DialogContent,
+  Container,
 } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
 import { useTranslation } from '@shared-lib';
 import KeyboardBackspaceOutlinedIcon from '@mui/icons-material/KeyboardBackspaceOutlined';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -226,7 +226,6 @@ const formatAnswerForDisplay = (
 };
 
 const AssessmentDetails = () => {
-  const theme = useTheme();
   const { t } = useTranslation();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -1085,6 +1084,21 @@ console.log('assessmentStatusData>>>>>:', assessmentStatusData);
         flexDirection: 'column',
         minHeight: '100vh',
         overflow: 'hidden',
+        background: 'linear-gradient(135deg, #FFF8E1 0%, #F5F5F5 100%)',
+        position: 'relative',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundImage: `
+            radial-gradient(circle at 25% 25%, rgba(255, 193, 7, 0.08) 0%, transparent 50%),
+            radial-gradient(circle at 75% 75%, rgba(26, 26, 26, 0.05) 0%, transparent 50%)
+          `,
+          pointerEvents: 'none',
+        },
       }}
     >
       {/* <Header /> */}
@@ -1093,258 +1107,368 @@ console.log('assessmentStatusData>>>>>:', assessmentStatusData);
         component="header"
         sx={{
           width: '100%',
-          margin: '0 auto',
-          display: 'flex',
-          alignItems: 'center',
-          padding: { xs: '12px 12px 8px 4px', md: '16px 24px 12px 16px' },
-          bgcolor: '#FFFFFF',
+          background: '#FFFFFF',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+          borderBottom: '1px solid rgba(0,0,0,0.08)',
         }}
       >
-        <IconButton
-          onClick={handleBack}
-          sx={{
-            width: '48px',
-            height: '48px',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            '& .MuiSvgIcon-root': {
-              color: '#4D4639',
-              width: '24px',
-              height: '24px',
-            },
-          }}
-        >
-          <KeyboardBackspaceOutlinedIcon />
-        </IconButton>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            padding: '12px 0 0',
-            flex: 1,
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{
-              color: '#4D4639',
-              fontSize: { xs: '22px', md: '24px' },
-              lineHeight: 1.27,
-              fontWeight: 400,
-            }}
-          >
-            {toPascalCase(userDetails?.name)}{' '}
-            {toPascalCase(userDetails?.lastName)}
-          </Typography>
-          <Typography
-            sx={{
-              color: '#7C766F',
-              fontSize: { xs: '14px', md: '16px' },
-              lineHeight: 1.43,
-              fontWeight: 500,
-              letterSpacing: '0.71%',
-            }}
-          >
-            {toPascalCase(assessmentName)}
-          </Typography>
-        </Box>
-      </Box>
-
-      <Box
-        sx={{
-          mx: '16px',
-          my: '8px',
-          display: 'flex',
-          flexDirection: 'column',
-          flex: 1,
-          minHeight: 0,
-          overflow: 'hidden',
-        }}
-      >
-        {/* Assessment Status */}
-        <Box
+        <Container
+          maxWidth="xl"
           sx={{
             display: 'flex',
             alignItems: 'center',
-            gap: 2,
-            pb: 1,
+            padding: { xs: '8px 16px 8px 8px', md: '10px 24px 10px 12px' },
           }}
         >
-          {userAssessmentStatus ? (
-            <>
-              {getStatusIcon(
-                mapAnswerSheetStatusToInternalStatus(userAssessmentStatus)
-              )}
-              <Typography
-                sx={{
-                  color: '#1F1B13',
-                  fontSize: { xs: '14px', md: '16px' },
-                  fontWeight: 400,
-                }}
-              >
-                {getStatusLabel(userAssessmentStatus)}
-              </Typography>
-            </>
-          ) : (
+          <IconButton
+            onClick={handleBack}
+            sx={{
+              width: '40px',
+              height: '40px',
+              backgroundColor: '#F5F5F5',
+              borderRadius: '12px',
+              border: '1px solid rgba(0,0,0,0.08)',
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                backgroundColor: '#FFC107',
+                transform: 'translateY(-1px)',
+                boxShadow: '0 4px 12px rgba(255,193,7,0.3)',
+                '& .MuiSvgIcon-root': {
+                  color: '#1A1A1A',
+                },
+              },
+              '& .MuiSvgIcon-root': {
+                color: '#424242',
+                width: '20px',
+                height: '20px',
+              },
+            }}
+          >
+            <KeyboardBackspaceOutlinedIcon />
+          </IconButton>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              padding: '0 0 0 16px',
+              flex: 1,
+            }}
+          >
             <Typography
+              variant="h5"
               sx={{
-                color: '#1F1B13',
-                fontSize: { xs: '14px', md: '16px' },
-                fontWeight: 400,
+                color: '#1A1A1A',
+                fontSize: { xs: '18px', md: '20px' },
+                lineHeight: 1.3,
+                fontWeight: 600,
+                mb: 0.25,
               }}
             >
-              <MinimizeIcon />
-              Not Submitted
+              {toPascalCase(userDetails?.name)}{' '}
+              {toPascalCase(userDetails?.lastName)}
             </Typography>
-          )}
+            <Typography
+              sx={{
+                color: '#666666',
+                fontSize: { xs: '14px', md: '15px' },
+                lineHeight: 1.4,
+                fontWeight: 500,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+              }}
+            >
+              <Box
+                sx={{
+                  width: '4px',
+                  height: '4px',
+                  borderRadius: '50%',
+                  backgroundColor: '#FFC107',
+                  boxShadow: '0 0 4px rgba(255,193,7,0.6)',
+                }}
+              />
+              {toPascalCase(assessmentName)}
+            </Typography>
+          </Box>
+        </Container>
+      </Box>
+
+      <Container
+        maxWidth="xl"
+        sx={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          px: { xs: 2, sm: 3, md: 4 },
+          py: { xs: 1, md: 2 },
+          minHeight: 0,
+          overflow: 'hidden',
+          position: 'relative',
+          zIndex: 1,
+        }}
+      >
+        {/* Professional Status Card */}
+        <Box
+          sx={{
+            background: 'linear-gradient(135deg, #FFFDE7 0%, #FFF8E1 100%)',
+            borderRadius: '12px',
+            p: { xs: 1, md: 1.25 },
+            mb: { xs: 1, md: 1.5 },
+            border: '1px solid rgba(255,193,7,0.3)',
+            boxShadow: '0 2px 8px rgba(255,193,7,0.08)',
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1.5,
+            }}
+          >
+            <Box
+              sx={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: userAssessmentStatus === 'Completed'
+                  ? 'linear-gradient(135deg, #FFC107, #FFB300)'
+                  : userAssessmentStatus === 'Image_Uploaded'
+                  ? 'linear-gradient(135deg, #FFC107, #FF9800)'
+                  : 'linear-gradient(135deg, #424242, #1A1A1A)',
+                boxShadow: '0 1px 4px rgba(255,193,7,0.2)',
+              }}
+            >
+              {userAssessmentStatus ? (
+                React.cloneElement(getStatusIcon(
+                  mapAnswerSheetStatusToInternalStatus(userAssessmentStatus)
+                ), { 
+                  sx: { 
+                    color: '#FFFFFF', 
+                    fontSize: '16px',
+                  } 
+                })
+              ) : (
+                <MinimizeIcon sx={{ color: '#FFFFFF', fontSize: '16px' }} />
+              )}
+            </Box>
+            <Box sx={{ flex: 1 }}>
+              <Typography
+                sx={{
+                  color: '#1A202C',
+                  fontSize: { xs: '14px', md: '16px' },
+                  fontWeight: 600,
+                  mb: 0.1,
+                }}
+              >
+                Assessment Status
+              </Typography>
+              <Typography
+                sx={{
+                  color: '#4A5568',
+                  fontSize: { xs: '12px', md: '13px' },
+                  fontWeight: 500,
+                }}
+              >
+                {userAssessmentStatus ? getStatusLabel(userAssessmentStatus) : 'Not Submitted'}
+              </Typography>
+            </Box>
+          
+          </Box>
         </Box>
 
-        {/* Two-column layout: Left - existing content, Right - question paper placeholder */}
+        {/* Main content layout */}
         <Grid
-        //  container
-          spacing={1}
-          sx={{ flex: 1, minHeight: 0, overflow: 'hidden' }}
+          container
+          spacing={{ xs: 2, md: 3 }}
+          sx={{ 
+            flex: 1, 
+            minHeight: 0, 
+            overflow: 'hidden',
+            justifyContent: 'center',
+            alignItems: 'flex-start',
+          }}
         >
-          <Grid item xs={12} md={12}>
-            {/* Left column */}
-            <>
-              {/* Images Info */}
+          <Grid item xs={12}>
+            {/* Main content section */}
+            <Box sx={{ width: '100%', maxWidth: '100%' }}>
+              {/* Professional Image Upload Card */}
               <Box
-                onClick={handleUploadInfoClick}
                 sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  border: '1px solid #DBDBDB',
-                  borderRadius: '12px',
-                  p: { xs: 2, md: 2 },
+                  background: 'linear-gradient(135deg, #ffffff 0%, #fffef7 100%)',
+                  border: '1px solid rgba(255, 193, 7, 0.2)',
+                  borderRadius: '24px',
+                  p: { xs: 3, md: 4 },
                   mb: 0,
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  '&:hover': {
-                    borderColor: theme.palette.primary.main,
-                    backgroundColor: '#f5f5f5',
-                    transform: 'translateY(-1px)',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                  },
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  boxShadow: '0 10px 40px rgba(255,193,7,0.08)',
                 }}
               >
                 <Box
-                  mb={0}
                   sx={{
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleReUpload();
+                    position: 'relative',
+                    zIndex: 1,
                   }}
                 >
                   <Box
                     sx={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: { xs: 0.5, md: 1 },
-                      flexWrap: 'nowrap',
-                      minWidth: 0,
-                      overflow: 'hidden',
+                      gap: { xs: 1.5, md: 2 },
+                      flex: 1,
                     }}
                   >
-                    <Typography
+                    {/* Status Icon */}
+                    <Box
                       sx={{
-                        color: '#635E57',
-                        fontSize: { xs: '12px', md: '16px' },
-                        fontWeight: 400,
-                        letterSpacing: '0.1px',
-                        whiteSpace: 'nowrap',
+                        width: { xs: '48px', md: '52px' },
+                        height: { xs: '48px', md: '52px' },
+                        borderRadius: '14px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: (assessmentData?.fileUrls?.length || 0) > 0
+                          ? 'linear-gradient(135deg, #FFC107, #FFB300)'
+                          : 'linear-gradient(135deg, #FFFDE7, #FFF8E1)',
+                        boxShadow: '0 4px 16px rgba(255,193,7,0.15)',
+                        border: (assessmentData?.fileUrls?.length || 0) > 0 ? 'none' : '2px solid rgba(255,193,7,0.3)',
                       }}
                     >
-                      {assessmentData?.fileUrls &&
-                      assessmentData.fileUrls.length > 0
-                        ? `${assessmentData.fileUrls.length} ${
-                            assessmentData.fileUrls.length === 1
-                              ? 'image'
-                              : 'images'
-                          } uploaded`
-                        : 'No images uploaded'}
-                    </Typography>
-                    {assessmentData?.fileUrls &&
-                      assessmentData.fileUrls.length > 0 && (
-                        <>
-                          <Button
-                            variant="contained"
-                            size="small"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleUploadInfoClick();
-                            }}
-                            sx={{
-                              ml: 0,
-                              textTransform: 'none',
-                              borderRadius: '8px',
-                              fontWeight: 600,
-                              fontSize: { xs: '12px', md: '14px' },
-                              height: { xs: '28px', md: '32px' },
-                              px: { xs: 1, md: 1.5 },
-                              backgroundColor: '#FFC107',
-                              color: '#1F1B13',
-                              '&:hover': { backgroundColor: '#FFB300' },
-                            }}
-                          >
-                            {t('ASSESSMENTS.VIEW')}
-                          </Button>
-                          {[
-                            'AI Processed',
-                            'Awaiting Your Approval',
-                            'AI Pending',
-                            'Approved',
-                          ].includes(assessmentData?.status || '') && (
+                      <FileUploadIcon 
+                        sx={{ 
+                          color: (assessmentData?.fileUrls?.length || 0) > 0 ? '#FFFFFF' : '#FFC107', 
+                          fontSize: { xs: '24px', md: '26px' },
+                        }} 
+                      />
+                    </Box>
+
+                    {/* Content */}
+                    <Box sx={{ flex: 1 }}>
+                      <Typography
+                        sx={{
+                          color: '#1A202C',
+                          fontSize: { xs: '16px', md: '18px' },
+                          fontWeight: 600,
+                          mb: 0.25,
+                        }}
+                      >
+                        Assessment Images
+                      </Typography>
+                      <Typography
+                        sx={{
+                          color: '#4A5568',
+                          fontSize: { xs: '13px', md: '14px' },
+                          fontWeight: 500,
+                          mb: 1.5,
+                        }}
+                      >
+                        {assessmentData?.fileUrls &&
+                        assessmentData.fileUrls.length > 0
+                          ? `${assessmentData.fileUrls.length} ${
+                              assessmentData.fileUrls.length === 1
+                                ? 'image'
+                                : 'images'
+                            } uploaded successfully`
+                          : 'Upload your assessment images using the button below'}
+                      </Typography>
+
+                      {/* Action Buttons */}
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          gap: 1.5,
+                          flexWrap: 'wrap',
+                        }}
+                      >
+                        {assessmentData?.fileUrls &&
+                        assessmentData.fileUrls.length > 0 ? (
+                          <>
                             <Button
                               variant="contained"
-                              size="small"
-                              onClick={(e) => {
-                                // e.stopPropagation();
-                                // handleReUpload();
-                              }}
+                              onClick={() => setUploadViewerOpen(true)}
                               sx={{
-                                ml: 0,
                                 textTransform: 'none',
-                                borderRadius: '8px',
+                                borderRadius: '10px',
                                 fontWeight: 600,
-                                fontSize: { xs: '12px', md: '14px' },
-                                height: { xs: '28px', md: '32px' },
-                                px: { xs: 1, md: 1.5 },
-                                backgroundColor: '#FFC107',
-                                color: '#1F1B13',
-                                '&:hover': { backgroundColor: '#FFB300' },
+                                fontSize: { xs: '12px', md: '13px' },
+                                px: { xs: 1.5, md: 2 },
+                                py: { xs: 0.5, md: 0.75 },
+                                background: 'linear-gradient(135deg, #FFC107, #FFB300)',
+                                color: '#1A1A1A',
+                                boxShadow: '0 2px 8px rgba(255, 193, 7, 0.25)',
+                                '&:hover': {
+                                  background: 'linear-gradient(135deg, #FFB300, #FF9800)',
+                                  transform: 'translateY(-1px)',
+                                  boxShadow: '0 4px 12px rgba(255, 193, 7, 0.35)',
+                                },
                               }}
                             >
-                              {t('ASSESSMENTS.REUPLOAD')}
+                              View Images
                             </Button>
-                          )}
-                        </>
-                      )}
+                            {[
+                              'AI Processed',
+                              'Awaiting Your Approval',
+                              'AI Pending',
+                              'Approved',
+                            ].includes(assessmentData?.status || '') && (
+                              <Button
+                                variant="outlined"
+                                onClick={handleReUpload}
+                                sx={{
+                                  textTransform: 'none',
+                                  borderRadius: '10px',
+                                  fontWeight: 600,
+                                  fontSize: { xs: '12px', md: '13px' },
+                                  px: { xs: 1.5, md: 2 },
+                                  py: { xs: 0.5, md: 0.75 },
+                                  borderColor: 'rgba(255, 193, 7, 0.4)',
+                                  color: '#1A1A1A',
+                                  backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                                  '&:hover': {
+                                    borderColor: '#FFC107',
+                                    backgroundColor: 'rgba(255, 193, 7, 0.2)',
+                                    transform: 'translateY(-1px)',
+                                  },
+                                }}
+                              >
+                                Re-upload
+                              </Button>
+                            )}
+                          </>
+                        ) : (
+                          <Button
+                            variant="contained"
+                            onClick={() => setUploadPopupOpen(true)}
+                            sx={{
+                              textTransform: 'none',
+                              borderRadius: '10px',
+                              fontWeight: 600,
+                              fontSize: { xs: '12px', md: '13px' },
+                              px: { xs: 1.5, md: 2 },
+                              py: { xs: 0.5, md: 0.75 },
+                              background: 'linear-gradient(135deg, #FFC107, #FFB300)',
+                              color: '#1A1A1A',
+                              boxShadow: '0 2px 8px rgba(255, 193, 7, 0.25)',
+                              '&:hover': {
+                                background: 'linear-gradient(135deg, #FFB300, #FF9800)',
+                                transform: 'translateY(-1px)',
+                                boxShadow: '0 4px 12px rgba(255, 193, 7, 0.35)',
+                              },
+                            }}
+                          >
+                            Upload Images
+                          </Button>
+                        )}
+                      </Box>
+                    </Box>
                   </Box>
-                  <IconButton
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleReUpload();
-                    }}
-                    sx={{
-                      color: '#1F1B13',
-                      p: 0,
-                      '& .MuiSvgIcon-root': {
-                        fontSize: { xs: 22, md: 28 },
-                      },
-                      mb: 0,
-                    }}
-                  >
-                    <FileUploadIcon />
-                    {/* {!assessmentData?.status ? <FileUploadIcon /> : null} */}
-                  </IconButton>
                 </Box>
                 {/* Main content */}
                 <Box sx={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
@@ -1366,82 +1490,117 @@ console.log('assessmentStatusData>>>>>:', assessmentStatusData);
                     )
                   ) : null}
                 </Box>
+
+                {/* Professional Download Card */}
+                <Box
+                  sx={{
+                    mt: { xs: 2, md: 3 },
+                    maxWidth: { xs: '100%', md: '400px' },
+                    mx: 'auto',
+                    backgroundColor: '#ECE6F0',
+                    borderRadius: '16px',
+                    p: { xs: 1.5, md: 2 },
+                    position: 'relative',
+                    overflow: 'hidden',
+                    boxShadow: '0 4px 16px rgba(236, 230, 240, 0.4)',
+                    border: '1px solid rgba(236, 230, 240, 0.6)',
+                  }}
+                >
+                  <Box
+                    onClick={handleDownloadQuestionPaper}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: { xs: 1.5, md: 2 },
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      '&:hover': {
+                        transform: 'translateY(-1px)',
+                      },
+                    }}
+                  >
+                    <PictureAsPdfIcon
+                      sx={{ 
+                        color: '#D32F2F', 
+                        fontSize: { xs: '24px', md: '28px' },
+                      }}
+                    />
+                    <Typography
+                      sx={{
+                        color: '#1A1A1A',
+                        fontSize: { xs: '16px', md: '16px' },
+                        fontWeight: 500,
+                        flex: 1,
+                      }}
+                    >
+                      Download Question Paper.pdf
+                    </Typography>
+                    <DownloadIcon
+                      sx={{
+                        color: '#666666',
+                        fontSize: { xs: '20px', md: '24px' },
+                      }}
+                    />
+                  </Box>
+                </Box>
+
+                {/* Professional Manual Assessment Section */}
+                {assessmentStatus === 'Approved' && (
+                  <Box
+                    sx={{
+                      mt: { xs: 3, md: 4 },
+                      background: 'linear-gradient(135deg, #ffffff 0%, #fffef7 100%)',
+                      border: '1px solid rgba(255, 193, 7, 0.2)',
+                      borderRadius: '24px',
+                      p: { xs: 3, md: 4 },
+                      boxShadow: '0 10px 40px rgba(255,193,7,0.08)',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: '4px',
+                        background: 'linear-gradient(90deg, #FFC107, #FFB300)',
+                      },
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        color: '#1A202C',
+                        fontSize: { xs: '20px', md: '24px' },
+                        fontWeight: 700,
+                        mb: { xs: 2, md: 3 },
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 2,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: '8px',
+                          height: '8px',
+                          borderRadius: '50%',
+                          backgroundColor: '#FFC107',
+                          boxShadow: '0 0 12px rgba(255,193,7,0.8)',
+                        }}
+                      />
+                      Manual Assessment Review
+                    </Typography>
+                    <QuestionMarksManualUpdate
+                      assessmentDoId={assessmentId}
+                      userId={userId}
+                      assessmentStatusData={assessmentStatusData}
+                    />
+                  </Box>
+                )}
               </Box>
-            </>
-          </Grid>
-       
-            { (
-              
-              <Button
-                variant="contained"
-                color="primary"
-                
-                startIcon={
-                  <PictureAsPdfIcon
-                    sx={{ color: '#D32F2F', width: 24, height: 24 }}
-                  />
-                }
-                endIcon={<DownloadIcon sx={{ color: '#4D4639' }} />}
-                sx={{
-                  width: 'auto',
-                  maxWidth: '250px',
-                  height: '60px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  margin: '0 auto',
-                  color: '#4D4639 ',
-                  borderRadius: '8px',
-                  fontWeight: 500,
-                  textTransform: 'none',
-                  backgroundColor: '#ECE6F0',
-                  border: '1px solid #D0C5B4',
-                  marginTop: 4,
-                  cursor: 'pointer',
-                  '&:hover': {
-                    backgroundColor: '#E1D5E7',
-                  },
-                }}
-                // onClick={() => setShowDownloadPopup(true)}
-                // onClick={handleDownloadQuestionPaper}
-                onClick={handleDownloadQuestionPaper}
-              >
-                {t('AI.DOWNLOAD_QUESTION_PAPER')}.pdf
-              </Button>
-            )}
-          {/* </Box> */}
-          { assessmentStatus === 'Approved' && (<Grid item xs={12} md={12} sx={{ mt: 4 }}>
-            {/* Right column - Question Paper placeholder */}
-            <Box
-              sx={{
-                border: '1px solid #DBDBDB',
-                borderRadius: '12px',
-                p: { xs: 1, md: 1.5 },
-                height: 'fit-content',
-                position: 'static',
-                bgcolor: '#FFFFFF',
-              }}
-            >
-              {/* <Typography
-                sx={{
-                  color: '#635E57',
-                  fontSize: { xs: '14px', md: '16px' },
-                  fontWeight: 500,
-                }}
-              >
-                Question Paper UI coming soon
-              </Typography> */}
-              
-              
-              <QuestionMarksManualUpdate
-                assessmentDoId={assessmentId}
-                userId={userId}
-                assessmentStatusData={assessmentStatusData}
-              />
             </Box>
-          </Grid>)}
+          </Grid>
         </Grid>
-      </Box>
+      </Container>
 
       {/* Edit Modal */}
       <GenericModal
