@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense, useCallback } from 'react';
 // import Header from '../../../components/themantic/header/Header';
 import {
   Box,
@@ -29,7 +29,6 @@ import {
   updateAssessmentScore,
   hierarchyContent,
   searchAssessment,
-  getAssessmentStatus,
 } from '../../utils/API/AssesmentService';
 import {
   UploadOptionsPopup,
@@ -283,15 +282,6 @@ console.log('assessmentStatusData>>>>>:', assessmentStatusData);
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const previousUploadedImagesRef = useRef<UploadedImage[] | null>(null);
   // Upload Options Popup handlers
-  const handleUploadInfoClick = () => {
-    const hasImages =
-      (assessmentData?.fileUrls?.length || 0) > 0 || uploadedImages.length > 0;
-    if (hasImages) {
-      setUploadViewerOpen(true);
-      return;
-    }
-    setUploadPopupOpen(true);
-  };
 
   const handleCloseUploadPopup = () => {
     // If re-upload was cancelled without submission, restore previous images
@@ -360,7 +350,7 @@ console.log('assessmentStatusData>>>>>:', assessmentStatusData);
     }
   }, [assessmentData]);
 
-  const fetchOfflineAssessmentData = async (showSuccessMessage = false) => {
+  const fetchOfflineAssessmentData = useCallback(async (showSuccessMessage = false) => {
     try {
       const userData = await getOfflineAssessmentStatus({
         userIds: [userId as string],
@@ -628,7 +618,7 @@ console.log('assessmentStatusData>>>>>:', assessmentStatusData);
       }
       throw error;
     }
-  };
+  }, [userId, assessmentId]);
 
   useEffect(() => {
     const fetchUserAssessmentStatus = async () => {
@@ -703,7 +693,7 @@ console.log('assessmentStatusData>>>>>:', assessmentStatusData);
     };
 
     fetchAssessmentData();
-  }, [assessmentId, userId]);
+  }, [assessmentId, userId, fetchOfflineAssessmentData]);
 
   const handleBack = () => {
     router.back();
@@ -1773,4 +1763,24 @@ export async function getStaticPaths() {
 //   };
 // }
 
-export default AssessmentDetails;
+// Wrapper component with Suspense boundary
+const AssessmentDetailsWithSuspense = () => {
+  return (
+    <Suspense fallback={
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '100vh',
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    }>
+      <AssessmentDetails />
+    </Suspense>
+  );
+};
+
+export default AssessmentDetailsWithSuspense;
