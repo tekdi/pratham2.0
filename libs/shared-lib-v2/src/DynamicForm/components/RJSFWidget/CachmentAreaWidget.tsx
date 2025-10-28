@@ -61,10 +61,15 @@ interface BlockData {
   districtId: number;
 }
 
+interface SelectedBlock {
+  id: number;
+  name: string;
+}
+
 interface SelectedDistrict {
   districtId: number;
   districtName: string;
-  blocks: number[];
+  blocks: SelectedBlock[];
 }
 
 interface SelectedState {
@@ -340,10 +345,25 @@ const CachmentAreaWidget = ({
       if (state.stateId === stateId) {
         const updatedDistricts = state.districts.map((district) => {
           if (district.districtId === districtId) {
-            const updatedBlocks = district.blocks.includes(blockId)
-              ? district.blocks
-              : [...district.blocks, blockId];
-            return { ...district, blocks: updatedBlocks };
+            // Check if block is already selected
+            const isBlockSelected = district.blocks.some(
+              (block) => block.id === blockId
+            );
+            if (!isBlockSelected) {
+              // Find the block data to get both ID and name
+              const blockData = blocks[districtId]?.find(
+                (block) => block.id === blockId
+              );
+              if (blockData) {
+                const newBlock: SelectedBlock = {
+                  id: blockData.id,
+                  name: blockData.name,
+                };
+                const updatedBlocks = [...district.blocks, newBlock];
+                return { ...district, blocks: updatedBlocks };
+              }
+            }
+            return district;
           }
           return district;
         });
@@ -366,7 +386,7 @@ const CachmentAreaWidget = ({
           if (district.districtId === districtId) {
             return {
               ...district,
-              blocks: district.blocks.filter((id) => id !== blockId),
+              blocks: district.blocks.filter((block) => block.id !== blockId),
             };
           }
           return district;
@@ -415,7 +435,8 @@ const CachmentAreaWidget = ({
 
   const getAvailableBlocks = (stateId: number, districtId: number) => {
     const allBlocks = blocks[districtId] || [];
-    const selectedBlockIds = getSelectedBlocksForDistrict(stateId, districtId);
+    const selectedBlocks = getSelectedBlocksForDistrict(stateId, districtId);
+    const selectedBlockIds = selectedBlocks.map((block) => block.id);
     return allBlocks.filter((block) => !selectedBlockIds.includes(block.id));
   };
 
@@ -630,27 +651,22 @@ const CachmentAreaWidget = ({
                 {getSelectedBlocksForDistrict(
                   state.stateId,
                   district.districtId
-                ).map((blockId) => {
-                  const block = blocks[district.districtId]?.find(
-                    (b) => b.id === blockId
-                  );
-                  return block ? (
-                    <Chip
-                      key={blockId}
-                      label={block.name}
-                      onDelete={() =>
-                        handleRemoveBlock(
-                          state.stateId,
-                          district.districtId,
-                          blockId
-                        )
-                      }
-                      deleteIcon={<CloseIcon />}
-                      sx={{ backgroundColor: '#e3f2fd', color: '#1976d2' }}
-                      disabled={disabled || readonly}
-                    />
-                  ) : null;
-                })}
+                ).map((block) => (
+                  <Chip
+                    key={block.id}
+                    label={block.name}
+                    onDelete={() =>
+                      handleRemoveBlock(
+                        state.stateId,
+                        district.districtId,
+                        block.id
+                      )
+                    }
+                    deleteIcon={<CloseIcon />}
+                    sx={{ backgroundColor: '#e3f2fd', color: '#1976d2' }}
+                    disabled={disabled || readonly}
+                  />
+                ))}
               </Box>
 
               {/* Available Blocks Dropdown */}
