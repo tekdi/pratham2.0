@@ -74,13 +74,127 @@ const Centers = () => {
     ? { state: [localStorage.getItem('stateId')] }
     : {};
   const searchStoreKey = 'centers';
+  const cachmentData = [
+    {
+      stateId: 28,
+      stateName: 'Andhra Pradesh',
+      districts: [
+        {
+          districtId: 681,
+          districtName: 'Anakapalli',
+          blocks: [
+            {
+              id: 7705,
+              name: 'Anakapalle',
+            },
+            {
+              id: 7707,
+              name: 'Cheedikada',
+            },
+            {
+              id: 7724,
+              name: 'Rolugunta',
+            },
+            {
+              id: 7712,
+              name: 'K.Kotapadu',
+            },
+          ],
+        },
+        {
+          districtId: 663,
+          districtName: 'Anantapur - 1',
+          blocks: [
+            {
+              id: 7049,
+              name: 'BUKKAPATNAM',
+            },
+            {
+              id: 7052,
+              name: 'NARPALA',
+            },
+            {
+              id: 7051,
+              name: 'NALLAMADA',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      stateId: 10,
+      stateName: 'Bihar',
+      districts: [
+        {
+          districtId: 222,
+          districtName: 'Begusarai',
+          blocks: [],
+        },
+        {
+          districtId: 235,
+          districtName: 'Aurangabad',
+          blocks: [
+            {
+              id: 1922,
+              name: 'Aurangabad',
+            },
+            {
+              id: 1917,
+              name: 'Daudnagar',
+            },
+            {
+              id: 1926,
+              name: 'Deo',
+            },
+            {
+              id: 1919,
+              name: 'Goh',
+            },
+            {
+              id: 1923,
+              name: 'Barun',
+            },
+            {
+              id: 1918,
+              name: 'Haspura',
+            },
+            {
+              id: 1925,
+              name: 'Kutumba',
+            },
+            {
+              id: 1927,
+              name: 'Madanpur',
+            },
+            {
+              id: 1924,
+              name: 'Nabinagar',
+            },
+            {
+              id: 1921,
+              name: 'Obra',
+            },
+            {
+              id: 1920,
+              name: 'Rafiganj',
+            },
+          ],
+        },
+        {
+          districtId: 231,
+          districtName: 'Bhojpur',
+          blocks: [],
+        },
+      ],
+    },
+  ];
   const initialFormDataSearch =
     localStorage.getItem(searchStoreKey) &&
-      localStorage.getItem(searchStoreKey) != '{}'
+    localStorage.getItem(searchStoreKey) != '{}'
       ? JSON.parse(localStorage.getItem(searchStoreKey))
       : localStorage.getItem('stateId')
-        ? { state: [localStorage.getItem('stateId')] }
-        : {};
+      ? { state: [localStorage.getItem('stateId')], cachmentArea: cachmentData }
+      : { cachmentArea: cachmentData };
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -661,7 +775,7 @@ const Centers = () => {
         {response != null ? (
           <>
             {response &&
-              response?.result?.results?.cohortDetails?.length > 0 ? (
+            response?.result?.results?.cohortDetails?.length > 0 ? (
               <Box sx={{ mt: 1 }}>
                 <PaginatedTable
                   count={response?.result?.count}
@@ -694,8 +808,8 @@ const Centers = () => {
           open={openBatchModal}
           onClose={() => setOpenBatchModal(false)}
           showFooter={false}
-          modalTitle={t("CENTERS.BATCHES_FOR_CENTER", {
-            centerName: transformLabel(selectedCenter?.name || "")
+          modalTitle={t('CENTERS.BATCHES_FOR_CENTER', {
+            centerName: transformLabel(selectedCenter?.name || ''),
           })}
           isFullwidth={true}
         >

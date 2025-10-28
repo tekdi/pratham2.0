@@ -199,6 +199,35 @@ const CachmentAreaWidget = ({
     fetchStates();
   }, []); // Empty dependency array - only run once on mount
 
+  // Handle initial data - fetch districts and blocks for pre-selected data
+  useEffect(() => {
+    const handleInitialData = async () => {
+      if (selectedStates.length > 0) {
+        for (const state of selectedStates) {
+          // Fetch districts for this state
+          await fetchDistrictsForState(state.stateId);
+
+          // Fetch blocks for each district
+          for (const district of state.districts) {
+            await fetchBlocksForDistrict(district.districtId);
+          }
+        }
+      }
+    };
+
+    // Only run if states are loaded and we have initial data
+    if (states.length > 0 && selectedStates.length > 0) {
+      handleInitialData();
+    }
+  }, [states, selectedStates]);
+
+  // Handle value prop changes (e.g., form reset, external updates)
+  useEffect(() => {
+    if (value && JSON.stringify(value) !== JSON.stringify(selectedStates)) {
+      setSelectedStates(value);
+    }
+  }, [value]);
+
   // Fetch districts when a state is selected
   const fetchDistrictsForState = async (stateId: number) => {
     if (districts[stateId]) return; // Already loaded
