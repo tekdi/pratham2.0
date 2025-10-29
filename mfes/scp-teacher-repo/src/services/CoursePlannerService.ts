@@ -90,7 +90,7 @@ export const getUserProjectTemplate = async ({
   solutionId,
   role,
   entityId,
-  acl
+  acl,
 }: GetUserProjectTemplateParams): Promise<any> => {
   const apiUrl: string = `${process.env.NEXT_PUBLIC_COURSE_PLANNER_API_URL}/userProjects/details?templateId=${templateId}&solutionId=${solutionId}`;
 
@@ -106,7 +106,7 @@ export const getUserProjectTemplate = async ({
     //   scope: {}
     // },
     entityId,
-    acl
+    acl,
   };
 
   try {
@@ -145,7 +145,7 @@ export const UserStatusDetails = async ({
 export const fetchCourseIdFromSolution = async (
   solutionId: string,
   cohortId: string,
-  acl:any 
+  acl: any
 ): Promise<any> => {
   try {
     const solutionResponse = await getSolutionDetails({
@@ -154,15 +154,23 @@ export const fetchCourseIdFromSolution = async (
     });
 
     const externalId = solutionResponse?.result?.externalId;
-    let response =await getUserProjectTemplate({
+    await getUserProjectTemplate({
       templateId: externalId,
       solutionId,
       role: Role.TEACHER,
       entityId: cohortId,
-      acl
+      acl,
+    });
+    const updatedResponse = await getTargetedSolutions({
+      subject: acl?.subject,
+      class: acl?.class,
+      board: acl?.board,
+      courseType: acl?.courseType,
+      medium: acl?.medium,
+      entityId: cohortId,
     });
 
-    return response;
+    return updatedResponse;
   } catch (error) {
     console.error('Error fetching solution details:', error);
     // throw error;
