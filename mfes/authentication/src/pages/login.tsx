@@ -26,6 +26,8 @@ import config from '../../config.json';
 import ReactGA from 'react-ga4';
 import { Snackbar, Alert } from "@mui/material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import { Telemetry } from '../utils/app.constant';
+import { telemetryFactory } from '../utils/telemetry';
 
 
 type LoginPageProps = {
@@ -52,7 +54,21 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
   const passwordRef = useRef<HTMLInputElement>(null);
   const loginButtonRef = useRef<HTMLButtonElement>(null);
-
+  const telemetryOnSubmit = () => {
+    const telemetryInteract = {
+      context: {
+        env: 'sign-in',
+        cdata: [],
+      },
+      edata: {
+        id: 'login-success',
+        type: Telemetry.CLICK,
+        subtype: '',
+        pageid: 'sign-in',
+      },
+    };
+    telemetryFactory.interact(telemetryInteract);
+  };
   useEffect(() => {
     if (typeof window !== 'undefined' && window.localStorage) {
       let lang;
@@ -104,6 +120,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
             const userResponse = await getUserId();
 
+            telemetryOnSubmit();
             if (onLoginSuccess) {
               onLoginSuccess(userResponse);
               setLoading(false)
