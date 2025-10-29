@@ -36,6 +36,7 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
         localStorage.setItem('channelId', tenantInfo.channelId);
         localStorage.setItem('tenantId', tenantInfo.tenantId);
         localStorage.setItem('userProgram', tenantInfo.name);
+        localStorage.setItem('uiConfig', JSON.stringify(tenantInfo?.params?.uiConfig || {}));
         localStorage.setItem(
           'collectionFramework',
           tenantInfo.collectionFramework
