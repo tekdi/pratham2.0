@@ -34,7 +34,7 @@ const telemetryConfig = {
     (typeof window !== 'undefined' && localStorage.getItem('userName')) ||
     'Anonymous',
   sid: generateUUID(),
-  batchsize: 3,
+  batchsize: 1,
   mode: '',
   host: hostURL,
   endpoint: '/v1/telemetry',
