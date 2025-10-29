@@ -72,6 +72,7 @@ export const DaysOfWeek = {
 };
 
 export const Program = ['Second Chance'];
+export const loggedInProgram =  ['Vocational Training'];
 
 export const tenantId =
   typeof window !== 'undefined' && localStorage.getItem('tenantId');
