@@ -36,6 +36,8 @@ import { useDirection } from '../hooks/useDirection';
 import GroupsIcon from '@mui/icons-material/Groups';
 import { YOUTHNET_USER_ROLE } from './youthNet/tempConfigs';
 import { Role } from '../utils/app.constant';
+import EditNoteIcon from '@mui/icons-material/EditNote';
+
 interface DrawerProps {
   toggleDrawer?: (open: boolean) => () => void;
   open: boolean;
@@ -180,6 +182,11 @@ const MenuDrawer: React.FC<DrawerProps> = ({
     router.push('/observation');
   };
 
+  const navigateToManualAssessments = () => {
+    closeDrawer();
+    router.push('/manual-assessments');
+  };
+
   const isDashboard = [
     '/dashboard',
     '/',
@@ -200,6 +207,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
   const isSupportRequest = router.pathname.includes('/support-request');
   const isVillagesAndYouths = router.pathname.includes('/villages');
   const isSurveys = router.pathname.includes('/surveys');
+  const isManualAssessments = router.pathname.includes('/manual-assessments');
 
   return (
     <Drawer
@@ -421,9 +429,9 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 router.push(`/villages`);
               }}
             >
-             {typeof window !== 'undefined' && window.localStorage.getItem('role') === Role.LEAD
-  ? t('DASHBOARD.USERS_&_VILLAGES')
-  : t('DASHBOARD.VILLAGES_AND_YOUTH')}
+              {typeof window !== 'undefined' && window.localStorage.getItem('role') === Role.LEAD
+                ? t('DASHBOARD.USERS_&_VILLAGES')
+                : t('DASHBOARD.VILLAGES_AND_YOUTH')}
             </Button>
 
             <Button
@@ -461,6 +469,36 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               }}
             >
               {t('SURVEYS.SURVEYS')}
+            </Button>
+
+            <Button
+              className="fs-14"
+              sx={{
+                gap: '10px',
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'flex-start',
+                background: isManualAssessments
+                  ? theme.palette.primary.main
+                  : 'transparent',
+                padding: isManualAssessments
+                  ? '16px 18px !important'
+                  : '0px 18px !important',
+                marginTop: '25px',
+                color: isManualAssessments ? '#2E1500' : theme.palette.warning.A200,
+                fontWeight: isManualAssessments ? '600' : 500,
+                '&:hover': {
+                  background: isManualAssessments
+                    ? theme.palette.primary.main
+                    : 'transparent',
+                },
+              }}
+              startIcon={
+                <EditNoteIcon sx={{ fontSize: '24px !important' }} />
+              }
+              onClick={navigateToManualAssessments}
+            >
+              {t('ASSESSMENTS.MANUAL_ASSESSMENT')}
             </Button>
 
             <Box sx={{ marginTop: '18px' }} className="joyride-step-12">
