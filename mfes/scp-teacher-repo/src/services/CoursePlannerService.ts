@@ -154,7 +154,7 @@ export const fetchCourseIdFromSolution = async (
     });
 
     const externalId = solutionResponse?.result?.externalId;
-    let response =await getUserProjectTemplate({
+    await getUserProjectTemplate({
       templateId: externalId,
       solutionId,
       role: Role.TEACHER,
@@ -162,9 +162,18 @@ export const fetchCourseIdFromSolution = async (
       acl
     });
 
-    return response;
+      const updatedResponse = await getTargetedSolutions({
+            subject: acl?.subject,
+            class: acl?.class,
+            board: acl?.board,
+            courseType: acl?.courseType,
+            medium: acl?.medium,
+            entityId: cohortId,
+          });
+
+    return updatedResponse;
   } catch (error) {
-    console.error('Error fetching solution details:', error);
+    console.error('Error fetching solution details service:', error);
     // throw error;
     return null;
   }
