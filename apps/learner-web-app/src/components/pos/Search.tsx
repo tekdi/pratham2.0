@@ -16,7 +16,10 @@ const SearchPage = () => {
   const [searchValue, setSearchValue] = React.useState('');
   const [submitText, setSubmitText] = React.useState('');
   const searchParams = useSearchParams();
-
+  const storedConfig =
+  typeof window !== 'undefined'
+    ? JSON.parse(localStorage.getItem('uiConfig') || '{}')
+    : {};
   React.useEffect(() => {
     const queryParam = searchParams?.get('q') || '';
     setSearchValue(queryParam);
@@ -44,6 +47,8 @@ const SearchPage = () => {
         filters={{
           query: submitText,
         }}
+        contentTabs={storedConfig.showContent}
+
         isShowLayout={false}
         showFilter={false}
         showSearch={false}
