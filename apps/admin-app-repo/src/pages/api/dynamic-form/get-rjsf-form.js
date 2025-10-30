@@ -231,7 +231,15 @@ function generateSchemaAndUISchema(fields) {
     } else if (type === 'dateTime') {
       schemaField.format = 'date-time';
       uiSchema[name] = { 'ui:widget': 'dateTime' };
-    } else {
+    }
+    else if (type === 'json') {
+      if(name === 'cachment_area') {
+        uiSchema[name] = { 'ui:widget': 'CachmentAreaWidget' };
+      } else {
+        uiSchema[name] = { 'ui:widget': 'CustomTextFieldWidget' };
+      }
+    }
+    else {
       uiSchema[name] = {
         'ui:widget': 'CustomTextFieldWidget',
         'ui:options': { validateOnBlur: true, hideError: true },

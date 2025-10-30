@@ -10,15 +10,6 @@ const userRole =
 export const CohortSearchSchema = {
   type: 'object',
   properties: {
-    cachmentArea: {
-      type: 'array',
-      title: 'Cachment Area',
-      items: {
-        type: 'string',
-        enum: ['Select'],
-        enumNames: ['Select'],
-      },
-    },
     state: {
       type: 'array',
       title: 'State',
@@ -164,10 +155,6 @@ export const CohortSearchUISchema = {
     'sortBy',
     'status',
   ],
-
-  cachmentArea: {
-    'ui:widget': 'CachmentAreaWidget',
-  },
 
   state: {
     'ui:widget': 'AutoCompleteMultiSelectWidget',
