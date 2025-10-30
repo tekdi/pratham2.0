@@ -225,12 +225,14 @@ const formatAnswerForDisplay = (
 };
 
 const AssessmentDetails = () => {
+  console.log('🚀 AssessmentDetails component rendering');
   const { t } = useTranslation();
   const router = useRouter();
   const searchParams = useSearchParams();
   
   // Get parameters from URL search params
   const assessmentId = searchParams.get('assessmentId')
+  const parentId = searchParams.get('parentId')
   const userId = searchParams.get('userId') 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedQuestion] = useState<ScoreDetail | null>(null);
@@ -267,6 +269,7 @@ console.log('assessmentStatusData>>>>>:', assessmentStatusData);
   });
   const [assessmentName, setAssessmentName] = useState<string>('');
   const [userAssessmentStatus, setUserAssessmentStatus] = useState<string | null>(null);
+  const [foundChild, setFoundChild] = useState<any>(undefined); // Course hierarchy child data
 
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
@@ -355,6 +358,7 @@ console.log('assessmentStatusData>>>>>:', assessmentStatusData);
       const userData = await getOfflineAssessmentStatus({
         userIds: [userId as string],
         questionSetId: assessmentId as string,
+        parentId: parentId as string,
       });
 
       if (userData?.result?.length > 0) {
@@ -380,10 +384,11 @@ console.log('assessmentStatusData>>>>>:', assessmentStatusData);
             try {
               const userDataAssessmentStatus = await searchAssessment({
                 userId: userId as string,
-                courseId: assessmentId as string,
-                unitId: assessmentId as string,
+                courseId: parentId as string,
+                unitId: foundChild?.parent ? foundChild.parent : (assessmentId as string),
                 contentId: assessmentId as string,
               });
+              console.log('🔍 searchAssessment payload - unitId:', foundChild?.parent ? foundChild.parent : assessmentId);
               // console.log('userData>>>>>:', userDataAssessmentStatus);
 
               // clone first element safely
@@ -531,9 +536,10 @@ console.log('assessmentStatusData>>>>>:', assessmentStatusData);
               const response = await getAssessmentTracking({
                 userId: userId as string,
                 contentId: assessmentId as string,
-                courseId: assessmentId as string,
-                unitId: assessmentId as string,
+                courseId: parentId as string,
+                unitId: foundChild?.parent ? foundChild.parent : [],
               });
+              console.log('🔍 getAssessmentTracking payload - unitId:', foundChild?.parent ? foundChild.parent : assessmentId);
               if (response?.data?.length > 0) {
                 // Find the latest assessment data by comparing timestamps
                 const latestAssessment = response.data.reduce(
@@ -618,18 +624,18 @@ console.log('assessmentStatusData>>>>>:', assessmentStatusData);
       }
       throw error;
     }
-  }, [userId, assessmentId]);
+  }, [userId, assessmentId, parentId, foundChild]);
 
   useEffect(() => {
     const fetchUserAssessmentStatus = async () => {
       try {
-        if (typeof userId !== 'string' || typeof assessmentId !== 'string') {
+        if (typeof userId !== 'string' || typeof assessmentId !== 'string' || typeof parentId !== 'string' || typeof foundChild !== 'object') {
           return;
         }
         const statusResponse = await searchAssessment({
           userId: userId,
-          courseId: assessmentId,
-          unitId: assessmentId,
+          courseId: parentId as string,
+          unitId: foundChild?.parent ? foundChild.parent : [],
           contentId: assessmentId,
         });
         setAssessmentStatusData(statusResponse[0]?.score_details || []);
@@ -639,11 +645,58 @@ console.log('assessmentStatusData>>>>>:', assessmentStatusData);
       }
     };
     fetchUserAssessmentStatus();
-  }, [userId, assessmentId]);
+  }, [userId, assessmentId, parentId, foundChild]);
 
+  // First useEffect: Fetch foundChild data
   useEffect(() => {
+    console.log('🔄 First useEffect: Fetching course hierarchy');
+    const fetchCourseHierarchy = async () => {
+      if (assessmentId && parentId) {
+        try {
+          const courseResponse = await getAssessmentDetails(parentId as string);
+          let tempFoundChild = null;
+
+          for (const item of courseResponse?.children || []) {
+            if (item.children && item.children.length > 0) {
+              for (const child of item.children) {
+                if (child.identifier === assessmentId) {
+                  tempFoundChild = child;
+                  break;
+                }
+              }
+            }
+            if (tempFoundChild) break; // stop after finding one
+          }
+          
+          console.log('tempFoundChild:', tempFoundChild?.parent);
+          console.log('Course Details Response:', courseResponse?.children);
+          
+          if (!tempFoundChild?.parent) {
+            console.warn('⚠️ foundChild.parent not found, falling back to assessmentId as unitId');
+          }
+          
+          console.log('Using unitId:', tempFoundChild?.parent ? tempFoundChild.parent : assessmentId);
+          
+          // Update the component state (null if not found, object if found)
+          setFoundChild(tempFoundChild);
+        } catch (error) {
+          console.error('Error fetching course hierarchy:', error);
+          setFoundChild(null);
+        }
+      } else if (!parentId) {
+        // If no parentId, set foundChild to null to avoid waiting
+        setFoundChild(null);
+      }
+    };
+
+    fetchCourseHierarchy();
+  }, [assessmentId, parentId]);
+
+  // Second useEffect: Fetch assessment data after foundChild is determined
+  useEffect(() => {
+    console.log('🔄 Second useEffect: Fetching assessment data, foundChild:', foundChild?.parent);
     const fetchAssessmentData = async () => {
-      if (assessmentId && userId) {
+      if (assessmentId && userId && foundChild !== undefined) {
         try {
           if (assessmentId) {
             const response1 = await getAssessmentDetails(
@@ -693,7 +746,7 @@ console.log('assessmentStatusData>>>>>:', assessmentStatusData);
     };
 
     fetchAssessmentData();
-  }, [assessmentId, userId, fetchOfflineAssessmentData]);
+  }, [assessmentId, userId, foundChild, fetchOfflineAssessmentData]);
 
   const handleBack = () => {
     router.back();
@@ -957,9 +1010,10 @@ console.log('assessmentStatusData>>>>>:', assessmentStatusData);
       const response = await getAssessmentTracking({
         userId: userId as string,
         contentId: assessmentId as string,
-        courseId: assessmentId as string,
-        unitId: assessmentId as string,
+        courseId: parentId as string,
+        unitId: foundChild?.parent ? foundChild.parent : [],
       });
+      console.log('🔍 handleRefreshAssessmentData - unitId:', foundChild?.parent ? foundChild.parent : assessmentId);
 
       if (response?.data?.length > 0) {
         setAssessmentTrackingData(response.data[0]);
@@ -1722,6 +1776,7 @@ console.log('assessmentStatusData>>>>>:', assessmentStatusData);
         onSubmissionSuccess={handleSubmissionSuccess}
         isReUploadMode={isReUploadMode}
         setAssessmentTrackingData={setAssessmentTrackingData}
+        parentId={parentId as string}
       />
 
       {/* Snackbar for feedback */}

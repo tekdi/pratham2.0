@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-// import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import {
   Modal,
   Box,
@@ -18,14 +18,13 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { UploadOptionsPopupProps, UploadedImage } from './types';
 import Camera from './Camera';
 import ImageViewer from './ImageViewer';
-import { answerSheetSubmissions } from '../../utils/API/AssesmentService';
+import { answerSheetSubmissions } from '../../services/AssesmentService';
 import {
   uploadFileToS3,
   dataUrlToFile,
-} from '../../utils/API/FileUploadService';
+} from '../../services/FileUploadService';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
-import { useTranslation } from '@shared-lib';
 
 const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
   isOpen,
@@ -36,9 +35,9 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
   userId,
   questionSetId,
   identifier,
-  onSubmissionSuccess,
-  setAssessmentTrackingData,
   parentId,
+  onSubmissionSuccess,
+  setAssessmentTrackingData
 }) => {
   const { t } = useTranslation();
   const [isCameraOpen, setIsCameraOpen] = useState(false);
@@ -227,10 +226,10 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
       await answerSheetSubmissions({
         userId,
         questionSetId,
+        parentId,
         identifier,
         fileUrls,
         createdBy: currentUserId,
-        parentId,
       });
 
       showToast('Answer sheet submitted successfully!', 'success');
@@ -681,4 +680,3 @@ const UploadOptionsPopup: React.FC<UploadOptionsPopupProps> = ({
 };
 
 export default UploadOptionsPopup;
-

@@ -304,6 +304,7 @@ export const updateAssessmentScore = async (
 export const getOfflineAssessmentStatus = async (data: {
   userIds: string[];
   questionSetId: string;
+  parentId?: string | null;
 }) => {
   const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/assessment/offline-assessment-status`;
   // const apiUrl = `https://e49a1216cbca.ngrok-free.app/interface/v1/tracking/assessment/offline-assessment-status`;

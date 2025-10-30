@@ -300,7 +300,7 @@ export default function Details(props: DetailsProps) {
       console.log('subItem?.program?.[0]=====>', subItem?.program?.[0]);
       const userId = getUserId(props?._config?.userIdLocalstorageName);
       const userIdString = Array.isArray(userId) ? userId[0] : userId;
-      router.push(`/manual-assessment?assessmentId=${subItem?.identifier}&userId=${userIdString}`);
+      router.push(`/manual-assessment?assessmentId=${subItem?.identifier}&userId=${userIdString}&parentId=${identifier}`);
       return;
      }
 

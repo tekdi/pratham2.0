@@ -21,4 +21,3 @@ export interface UploadedImage {
   size?: number;
   uploadedAt: string;
 }
-

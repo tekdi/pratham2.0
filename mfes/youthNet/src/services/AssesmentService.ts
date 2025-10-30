@@ -1,6 +1,13 @@
-import { get, post } from './RestClient';
-import { URL_CONFIG } from '../app.constant';
-import API_ENDPOINTS from './EndUrls';
+import {
+  AssessmentListParam,
+  GetDoIdServiceParam,
+  IAssessmentStatusOptions,
+  ISearchAssessment,
+} from '../utils/Interfaces';
+// import { get, post } from './RestClient';
+import { URL_CONFIG } from '../utils/url.config';
+import API_ENDPOINTS from '../utils/API/APIEndpoints';
+import { post , get} from '@shared-lib';
 
 interface IAssessmentItemParam {
   answer: boolean;
@@ -129,19 +136,21 @@ export interface AssessmentRecord {
   submitedBy: string;
 }
 
-interface IAssessmentStatusOptions {
-  userId: string[];
-  courseId: string[];
-  unitId: string[];
-  contentId: string[];
-}
+export const getAssessmentList = async ({
+  sort,
+  pagination,
+  filters,
+}: AssessmentListParam): Promise<any> => {
+  const apiUrl: string = API_ENDPOINTS.assessmentList;
+  try {
+    const response = await post(apiUrl, { pagination, filters, sort });
+    return response?.data;
+  } catch (error) {
+    console.error('error in getting Assessment List Service list', error);
 
-interface ISearchAssessment {
-  userId: string;
-  courseId: string;
-  unitId: string;
-  contentId: string;
-}
+    return error;
+  }
+};
 
 export const getAssessmentDetails = async (doId: string) => {
   try {
@@ -150,6 +159,13 @@ export const getAssessmentDetails = async (doId: string) => {
     if (!searchApiUrl) {
       throw new Error('Search API URL environment variable is not configured');
     }
+    // Axios request configuration
+    // const config: AxiosRequestConfig = {
+    //   method: 'get',
+    //   maxBodyLength: Infinity,
+    //   url: `${searchApiUrl}/api/course/v1/hierarchy/${doId}`,
+    //   params: params,
+    // };
 
     // Execute the request
     const response = await get(
@@ -165,6 +181,33 @@ export const getAssessmentDetails = async (doId: string) => {
   }
 };
 
+export const getDoIdForAssessmentDetails = async ({
+  filters,
+}: GetDoIdServiceParam): Promise<any> => {
+  const apiUrl = `${URL_CONFIG.API.COMPOSITE_SEARCH}`;
+  const data = {
+    request: {
+      filters: {
+        program: filters.program,
+        board: filters.board,
+        // state: filters.state,
+        assessmentType: filters.assessmentType,
+        status: ['Live'],
+        primaryCategory: ['Practice Question Set'],
+        ...(filters?.evaluationType && { evaluationType: filters.evaluationType})
+      },
+    },
+  };
+
+  try {
+    const response = await post(apiUrl, data);
+    return response?.data;
+  } catch (error) {
+    console.error('Error in getDoIdForAssessmentDetails Service', error);
+    return error;
+  }
+};
+
 // answer sheet submissions
 export const answerSheetSubmissions = async ({
   userId,
@@ -176,12 +219,14 @@ export const answerSheetSubmissions = async ({
 }: {
   userId: string;
   questionSetId: string;
+  parentId?: string;
   identifier: string;
   fileUrls: string[];
   createdBy: string;
-  parentId?: string;
+
 }) => {
   const apiURL = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/answer-sheet-submissions/create`;
+  // const apiURL = `https://e49a1216cbca.ngrok-free.app/interface/v1/tracking/answer-sheet-submissions/create`;
 
   try {
     const response = await post(apiURL, {
@@ -200,7 +245,7 @@ export const answerSheetSubmissions = async ({
 };
 
 export const getAssessmentStatus = async (body: IAssessmentStatusOptions) => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/assessment/search`;
+  const apiUrl: string = API_ENDPOINTS.assessmentSearchStatus;
   try {
     const response = await post(apiUrl, body);
     return response?.data?.data;
@@ -212,7 +257,7 @@ export const getAssessmentStatus = async (body: IAssessmentStatusOptions) => {
 };
 
 export const searchAssessment = async (body: ISearchAssessment) => {
-  const apiUrl: string = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/assessment/search`;
+  const apiUrl: string = API_ENDPOINTS.assessmentSearch;
   try {
     const response = await post(apiUrl, body);
     return response?.data?.data;
@@ -224,7 +269,7 @@ export const searchAssessment = async (body: ISearchAssessment) => {
 };
 
 export const getAssessmentTracking = async (params: ISearchAssessment) => {
-  const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/assessment/search`;
+  const apiUrl = API_ENDPOINTS.assessmentSearch;
   try {
     const response = await post(apiUrl, params);
     return response?.data;
@@ -267,8 +312,10 @@ export const getOfflineAssessmentStatus = async (data: {
   parentId?: string | null;
 }) => {
   const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/assessment/offline-assessment-status`;
+  // const apiUrl = `https://e49a1216cbca.ngrok-free.app/interface/v1/tracking/assessment/offline-assessment-status`;
   try {
     const response = await post(apiUrl, data);
+    // console.log('offline assessment status response', response?.data);
     return response?.data;
   } catch (error) {
     console.error('Error in getting offline assessment status:', error);
@@ -289,11 +336,91 @@ export const searchAiAssessment = async (data: {
   }
 };
 
+export const getOfflineAssessmentDetails = async ({
+  filters,
+}: GetDoIdServiceParam): Promise<any> => {
+  const apiUrl = `${URL_CONFIG.API.COMPOSITE_SEARCH}`;
+
+  // Build filters dynamically
+  const requestFilters: any = {
+    program: filters.program,
+    board: filters.board,
+    status: ['Live'],
+    primaryCategory: ['Practice Question Set'],
+  };
+
+  // Optional filters
+  if (filters.assessmentType) {
+    requestFilters.assessmentType = filters.assessmentType;
+  }
+
+  if (filters.evaluationType) {
+    requestFilters.evaluationType = filters.evaluationType;
+  }
+
+  const data = {
+    request: {
+      filters: requestFilters,
+    },
+  };
+
+  try {
+    const response1 = await post(apiUrl, data);
+
+    // 🚀 If evaluationType is provided, return directly without extra API call
+    if (filters.evaluationType) {
+      return {
+        result: {
+          ...response1?.data?.result,
+        },
+        responseCode: response1?.data?.responseCode,
+      };
+    }
+
+    // ✅ Default behavior (when evaluationType not provided)
+    const response = await searchAiAssessment({
+      question_set_id: response1?.data?.result?.QuestionSet?.map(
+        (item: any) => item.identifier
+      ),
+    });
+
+    const QuestionSet = response1?.data?.result?.QuestionSet?.filter(
+      (item: any) =>
+        response.data.find(
+          (sub: any) => item.identifier === sub.question_set_id
+        )
+    );
+
+    return {
+      result: {
+        ...response1?.data?.result,
+        QuestionSet,
+        count: QuestionSet.length,
+      },
+      responseCode: response1?.data?.responseCode,
+    };
+  } catch (error) {
+    console.error('Error in getDoIdForAssessmentDetails Service', error);
+    return error;
+  }
+};
+
 const API_URL = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;
 export const hierarchyContent = async (content_do_id: string) => {
+  // console.log({ content_do_id });
   const url = `${API_URL}/action/questionset/v2/hierarchy/` + content_do_id;
 
   let api_response = null;
+
+  let config = {
+    method: 'get',
+    maxBodyLength: Infinity,
+    url: url,
+    headers: {
+      accept: '*/*',
+      'Content-Type': 'application/json',
+    },
+  };
 
   try {
     const response = await fetch(url, {
@@ -316,4 +443,3 @@ export const hierarchyContent = async (content_do_id: string) => {
     return null;
   }
 };
-

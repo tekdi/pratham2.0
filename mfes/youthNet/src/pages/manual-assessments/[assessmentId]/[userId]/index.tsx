@@ -18,7 +18,6 @@ import { useTranslation } from 'next-i18next';
 import KeyboardBackspaceOutlinedIcon from '@mui/icons-material/KeyboardBackspaceOutlined';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useRouter } from 'next/router';
-import GenericModal from '../../../../components/GenericModal';
 import ConfirmationModal from '../../../../components/ConfirmationModal';
 import {
   getAssessmentDetails,
@@ -53,6 +52,8 @@ import { toPascalCase } from '../../../../utils/Helper';
 import UploadFiles from '../../../../components/UploadFiles/UploadFiles';
 import CloseIcon from '@mui/icons-material/Close';
 import QuestionMarksManualUpdate from '../../../../components/assessment/QuestionMarksManualUpdate';
+import GenericModal from '../../../../components/GenericModal';
+
 interface ScoreDetail {
   questionId: string | null;
   pass: string;
@@ -225,7 +226,7 @@ const AssessmentDetails = () => {
   const theme = useTheme();
   const { t } = useTranslation();
   const router = useRouter();
-  const { assessmentId, userId } = router.query;
+  const { assessmentId, userId, parentId , unitId} = router.query;
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState<any>(null);
@@ -354,6 +355,7 @@ const AssessmentDetails = () => {
       const userData = await getOfflineAssessmentStatus({
         userIds: [userId as string],
         questionSetId: assessmentId as string,
+        parentId: parentId as string,
       });
 
       if (userData?.result?.length > 0) {
@@ -377,11 +379,11 @@ const AssessmentDetails = () => {
             try {
               const userDataAssessmentStatus = await getAssessmentStatus({
                 userId: [userId as string],
-                courseId: [assessmentId as string],
-                unitId: [assessmentId as string],
+                courseId: [parentId as string],
+                unitId: [unitId as string],
                 contentId: [assessmentId as string],
               });
-              // console.log('userData>>>>>:', userDataAssessmentStatus);
+              console.log('unitId>>>>>:', unitId);
 
               // clone first element safely
               let status = userDataAssessmentStatus[0]?.status || "Not Started";
@@ -492,7 +494,7 @@ const AssessmentDetails = () => {
                           : item.score;
 
                         // Update resValue with saved suggestion if available
-                        let updatedResValue = { ...item.resvalues[0] };
+                        const updatedResValue = { ...item.resvalues[0] };
                         if (savedData) {
                           const parsedSavedData = JSON.parse(savedData);
                           if (parsedSavedData.suggestion) {
@@ -528,8 +530,8 @@ const AssessmentDetails = () => {
               const response = await getAssessmentTracking({
                 userId: userId as string,
                 contentId: assessmentId as string,
-                courseId: assessmentId as string,
-                unitId: assessmentId as string,
+                courseId: parentId as string,
+                unitId: unitId as string,
               });
               if (response?.data?.length > 0) {
                 // Find the latest assessment data by comparing timestamps
@@ -568,7 +570,7 @@ const AssessmentDetails = () => {
                           const savedScore = parsedSavedData.score;
 
                           // Update resValue with saved suggestion if available
-                          let updatedResValue = detail.resValue
+                          const updatedResValue = detail.resValue
                             ? JSON.parse(detail.resValue)
                             : {};
                           if (parsedSavedData.suggestion) {
@@ -625,8 +627,8 @@ const AssessmentDetails = () => {
         }
         const statusResponse = await searchAssessment({
           userId: userId,
-          courseId: assessmentId,
-          unitId: assessmentId,
+          courseId: parentId as string,
+          unitId: unitId as string,
           contentId: assessmentId,
         });
         setAssessmentStatusData(statusResponse[0]?.score_details || []);
@@ -636,11 +638,11 @@ const AssessmentDetails = () => {
       }
     };
     fetchUserAssessmentStatus();
-  }, [userId, assessmentId]);
+  }, [userId, assessmentId, unitId , parentId]);
 
   useEffect(() => {
     const fetchAssessmentData = async () => {
-      if (assessmentId && userId) {
+      if (assessmentId && userId && unitId && parentId) {
         try {
           if (assessmentId) {
             const response1 = await getAssessmentDetails(
@@ -690,7 +692,7 @@ const AssessmentDetails = () => {
     };
 
     fetchAssessmentData();
-  }, [assessmentId, userId]);
+  }, [assessmentId, userId, unitId, parentId]);
 
   const handleBack = () => {
     router.back();
@@ -954,8 +956,8 @@ const AssessmentDetails = () => {
       const response = await getAssessmentTracking({
         userId: userId as string,
         contentId: assessmentId as string,
-        courseId: assessmentId as string,
-        unitId: assessmentId as string,
+        courseId: parentId as string,
+        unitId: unitId as string,
       });
 
       if (response?.data?.length > 0) {
@@ -1338,6 +1340,8 @@ const AssessmentDetails = () => {
                 assessmentDoId={assessmentId}
                 userId={userId}
                 assessmentStatusData={assessmentStatusData}
+                parentId={parentId}
+                unitId={unitId}
               />
             </Box>
           </Grid>
@@ -1464,6 +1468,7 @@ const AssessmentDetails = () => {
         isOpen={uploadPopupOpen}
         onClose={handleCloseUploadPopup}
         uploadedImages={uploadedImages}
+        parentId={parentId as string}
         onImageUpload={handleImageUpload}
         onImageRemove={handleImageRemove}
         userId={typeof userId === 'string' ? userId : undefined}
