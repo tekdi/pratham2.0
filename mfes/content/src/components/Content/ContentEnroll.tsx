@@ -53,7 +53,15 @@ const ContentDetails = (props: ContentDetailsProps) => {
   useEffect(() => {
     const fetchContentDetails = async () => {
       try {
-        const result = await hierarchyAPI(identifier as string);
+        const result = await hierarchyAPI(identifier as string)as any;
+
+console.log('result=======>', result?.program);
+
+        if (!result?.program?.includes(localStorage.getItem('userProgram')))
+        {
+          router.push('/unauthorized');
+          return;
+        }
         const userId = getUserId(props?._config?.userIdLocalstorageName);
         setCheckLocalAuth(checkAuth(Boolean(userId)));
         if (props?._config?.isEnrollmentRequired !== false) {
