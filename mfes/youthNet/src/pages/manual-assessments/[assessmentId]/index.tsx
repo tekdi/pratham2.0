@@ -42,8 +42,8 @@ import {
   getAssessmentDetails,
   getOfflineAssessmentStatus,
 } from '../../../services/AssesmentService';
-import { getMyCohortMemberList } from '../../../services/MyClassDetailsService';
-import { AssessmentStatus } from '../../../utils/app.constant';
+import { fetchUserList } from '../../../services/youthNet/Dashboard/UserServices';
+import { AssessmentStatus, Role, Status } from '../../../utils/app.constant';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { toPascalCase } from '../../../utils/Helper';
 
@@ -140,7 +140,7 @@ export const mapAnswerSheetStatusToInternalStatus = (
 const AssessmentDetails: React.FC = () => {
   const { t } = useTranslation();
   const router = useRouter();
-  const { assessmentId, cohortId } = router.query;
+  const { assessmentId, cohortId , villageId, blockId, parentId } = router.query;
 
   // State management
   const [loading, setLoading] = useState(true);
@@ -157,14 +157,21 @@ const AssessmentDetails: React.FC = () => {
   // Sort functionality state
   const [showSortPopup, setShowSortPopup] = useState(false);
   const [sortOption, setSortOption] = useState<SortOption>('all');
+  const [foundChild, setFoundChild] = useState<any>(undefined); // undefined initially, null when search completes but nothing found
 
-  // Fetch assessment data and learner list
+  // Fetch assessment data first, then learner data
   useEffect(() => {
-    if (assessmentId && cohortId) {
+    if (assessmentId && villageId) {
       fetchAssessmentData();
+    }
+  }, [assessmentId, villageId]);
+
+  // Fetch learner data after foundChild is set (either to a value or null)
+  useEffect(() => {
+    if (assessmentId && villageId && foundChild !== undefined) {
       fetchLearnerData();
     }
-  }, [assessmentId, cohortId]);
+  }, [assessmentId, villageId, foundChild]);
 
   // Filter and sort learners based on search and sort options
   useEffect(() => {
@@ -257,6 +264,32 @@ const AssessmentDetails: React.FC = () => {
 
       // Use getAssessmentDetails with assessmentId as doId
       const response = await getAssessmentDetails(assessmentId as string);
+      const courseResponse = await getAssessmentDetails(parentId as string);
+      let tempFoundChild = null;
+
+      for (const item of  courseResponse?.children || []) {
+        if (item.children && item.children.length > 0) {
+          for (const child of item.children) {
+            if (child.identifier === assessmentId) {
+              tempFoundChild = child;
+              break;
+            }
+          }
+        }
+        if (tempFoundChild) break; // stop after finding one
+      }
+      console.log('tempFoundChild:', tempFoundChild?.parent);
+      // Update the component state (null if not found, object if found)
+      setFoundChild(tempFoundChild);
+
+        console.log('foundChild:', tempFoundChild?.parent);
+        console.log('Course Details Response:', courseResponse?.children);
+        
+        if (!tempFoundChild?.parent) {
+          console.warn('⚠️ foundChild.parent not found, falling back to assessmentId as unitId');
+        }
+        
+        console.log('Using unitId:', tempFoundChild?.parent ? tempFoundChild.parent : assessmentId);
       console.log('Assessment Details Response:', response);
 
       if (response) {
@@ -356,26 +389,38 @@ const AssessmentDetails: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      // Use getMyCohortMemberList to fetch learners
-      const filters = { cohortId: cohortId as string };
-      const cohortResponse = await getMyCohortMemberList({ filters });
+      // Use fetchUserList to fetch learners from selected village (similar to villages page)
+      const filters = {
+        village: [villageId as string],
+        role: Role.LEARNER,
+        status: [Status.ACTIVE],
+      };
+      const userListResponse = await fetchUserList({ filters });
 
-      if (cohortResponse?.result?.userDetails) {
+      if (userListResponse?.getUserDetails) {
         const ImageUploadedFlag = await getOfflineAssessmentStatus({
-          userIds: cohortResponse.result.userDetails.map(
+          userIds: userListResponse.getUserDetails.map(
             (user: any) => user.userId
           ),
           questionSetId: assessmentId as string,
+          parentId: parentId as string,
         });
         console.log('ImageUploadedFlag', ImageUploadedFlag);
-        const userData = await getAssessmentStatus({
-          userId: cohortResponse.result.userDetails.map(
+        
+        const assessmentStatusPayload = {
+          userId: userListResponse.getUserDetails.map(
             (user: any) => user.userId
           ),
-          courseId: [assessmentId as string],
-          unitId: [assessmentId as string],
+          courseId: [parentId as string],
+          unitId: foundChild?.parent ? [foundChild.parent] : [assessmentId as string],
           contentId: [assessmentId as string],
-        });
+        };
+        
+        // Note: foundChild state is now available since fetchLearnerData is called after fetchAssessmentData completes
+        console.log('🔍 foundChild state at payload time:', foundChild?.parent);
+        console.log('🔍 Using unitId:', foundChild?.parent ? foundChild.parent : assessmentId);
+        console.log('🔍 getAssessmentStatus payload:', assessmentStatusPayload);
+        const userData = await getAssessmentStatus(assessmentStatusPayload);
 
         console.log('userData>>>>>:', userData);
 
@@ -399,8 +444,8 @@ const AssessmentDetails: React.FC = () => {
           })
           : userData;
 
-        // Directly use cohortResponse data without complex mapping
-        const learners = cohortResponse?.result?.userDetails?.map(
+        // Directly use fetchUserList response data without complex mapping
+        const learners = userListResponse?.getUserDetails?.map(
           (user: any) => {
             const matchingUserData = updatedUserData?.find(
               (data: any) => data.userId === user.userId
@@ -429,12 +474,18 @@ const AssessmentDetails: React.FC = () => {
           const allUserIds = learners.map(
             (learner: LearnerData) => learner.userId
           );
-          const statusResponse = await getAssessmentStatus({
+          
+          const secondStatusPayload = {
             userId: allUserIds,
-            courseId: [assessmentId as string],
-            unitId: [assessmentId as string],
+            courseId: [parentId as string],
+            unitId: foundChild?.parent ? [foundChild.parent] : [assessmentId as string],
             contentId: [assessmentId as string],
-          });
+          };
+          
+          // Note: By this point, foundChild state should be updated since it's a separate async operation
+          console.log('🔍 foundChild state in second call:', foundChild?.parent);
+          console.log('🔍 Second getAssessmentStatus payload:', secondStatusPayload);
+          const statusResponse = await getAssessmentStatus(secondStatusPayload);
 
           console.log('Assessment Status Response:', statusResponse);
 
@@ -472,7 +523,7 @@ const AssessmentDetails: React.FC = () => {
       }
     } catch (error) {
       console.error('Error fetching learner data:', error);
-      setError('Failed to load learner data');
+      //setError('Failed to load learner data');
       showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
     } finally {
       setLoading(false);
@@ -502,41 +553,52 @@ const AssessmentDetails: React.FC = () => {
   const handleDownloadQuestionPaper = async () => {
     try {
       setDownloading(true);
-      // Simulate download delay
-      /*await new Promise((resolve) => setTimeout(resolve, 2000));
+      
+      // Debug: Check environment variable
+      console.log('🔍 NEXT_PUBLIC_ADMIN_SBPLAYER:', process.env.NEXT_PUBLIC_ADMIN_SBPLAYER);
+      console.log('🔍 assessmentId:', assessmentId);
+      
+      if (!process.env.NEXT_PUBLIC_ADMIN_SBPLAYER) {
+        console.error('❌ NEXT_PUBLIC_ADMIN_SBPLAYER environment variable is not set');
+        showToastMessage('Configuration error: Download URL not configured', 'error');
+        return;
+      }
+      
+      if (!assessmentId) {
+        console.error('❌ assessmentId is missing');
+        showToastMessage('Error: Assessment ID is missing', 'error');
+        return;
+      }
 
-      // Create download link
-      const element = document.createElement('a');
-      element.href =
-        'data:text/plain;charset=utf-8,' +
-        encodeURIComponent('Sample Assessment Question Paper Content');
-      element.download = `${
-        assessmentData?.title?.replace(/\s+/g, '_').toLowerCase() ||
-        'assessment'
-      }.pdf`;
-      document.body.appendChild(element);
-      element.click();
-      document.body.removeChild(element);*/
-
-      const downloadUrl =
-        process.env.NEXT_PUBLIC_ADMIN_SBPLAYER?.replace('sbplayer', '') +
-        '/qp?do_id=' +
-        assessmentId;
+      const baseUrl = process.env.NEXT_PUBLIC_ADMIN_SBPLAYER.replace('sbplayer', '');
+      const downloadUrl = `${baseUrl}/qp?do_id=${assessmentId}`;
+      
+      console.log('🔍 Constructed download URL:', downloadUrl);
+      
+      // Try to open the URL
       const newWindow = window.open(
         downloadUrl,
         '_blank',
         'noopener,noreferrer'
       );
-      if (newWindow) newWindow.focus();
+      
+      if (!newWindow) {
+        console.error('❌ Failed to open new window - popup might be blocked');
+       // showToastMessage('Unable to open download window. Please check popup settings.', 'error');
+      //  return;
+      }
+      
+      //newWindow.focus();
+      console.log('✅ Download window opened successfully');
 
       showToastMessage(
         t('ASSESSMENTS.DOWNLOAD_SUCCESS') ||
-        'Question paper downloaded successfully',
+        'Question paper download initiated',
         'success'
       );
       setShowDownloadPopup(false);
     } catch (error) {
-      console.error('Error downloading question paper:', error);
+      console.error('💥 Error downloading question paper:', error);
       showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
     } finally {
       setDownloading(false);
@@ -657,7 +719,7 @@ const AssessmentDetails: React.FC = () => {
   };
 
   const handleLearnerClick = (learnerId: string) => {
-    router.push(`/manual-assessments/${assessmentId}/${learnerId}`);
+    router.push(`/manual-assessments/${assessmentId}/${learnerId}?parentId=${parentId}&unitId=${foundChild?.parent}`);
   };
 
   if (loading) {

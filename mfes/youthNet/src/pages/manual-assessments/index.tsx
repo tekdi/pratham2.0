@@ -6,13 +6,15 @@ import Loader from '../../components/Loader';
 import SearchBar from '../../components/Searchbar';
 import { showToastMessage } from '../../components/Toastify';
 import NoDataFound from '../../components/common/NoDataFound';
-import { getOfflineAssessmentDetails } from '../../services/AssesmentService/AssesmentService';
+import { compositeSearch, getOfflineAssessmentDetails } from '../../services/AssesmentService/AssesmentService';
 import { ICohort } from '../../utils/Interfaces';
 import ArrowDropDownSharpIcon from '@mui/icons-material/ArrowDropDownSharp';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Box,
-  Button,
   FormControl,
   Grid,
   InputLabel,
@@ -24,12 +26,14 @@ import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
-import { loggedInProgram } from '../../utils/app.config';
+import { useCallback, useEffect, useState } from 'react';
 import { toPascalCase } from '../../utils/Helper';
 import Dropdown from '../../components/youthNet/DropDown';
 import { getStateBlockDistrictList } from '../../services/youthNet/Dashboard/VillageServices';
 import { cohortHierarchy } from '../../utils/app.constant';
+import { DROPDOWN_NAME, YOUTHNET_USER_ROLE } from '../../components/youthNet/tempConfigs';
+import { getLoggedInUserRole } from '../../utils/Helper';
+import { loggedInProgram } from '../../utils/app.config';
 
 const AssessmentList = () => {
   const theme = useTheme<any>();
@@ -41,7 +45,9 @@ const AssessmentList = () => {
   const [assessmentList, setAssessmentList] = useState([]);
   const [filteredAssessments, setFilteredAssessments] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [classId, setClassId] = useState('');
+  const [villageId, setVillageId] = useState('');
+  const [blockId, setBlockId] = useState('');
+
   const [availableAssessmentTypes, setAvailableAssessmentTypes] = useState<
     string[] | null
   >(null);
@@ -73,6 +79,14 @@ const AssessmentList = () => {
   const [selectedStateValue, setSelectedStateValue] = useState<any>('');
   const [selectedDistrictValue, setSelectedDistrictValue] = useState<any>('');
   const [selectedBlockValue, setSelectedBlockValue] = useState<any>('');
+  const [villageList, setVillageList] = useState<any>([]);
+  const [selectedVillageValue, setSelectedVillageValue] = useState<any>('');
+
+  // Course accordion state
+  const [courseData, setCourseData] = useState<any[]>([]);
+  const [filteredCourseData, setFilteredCourseData] = useState<any[]>([]);
+  const [expandedAccordions, setExpandedAccordions] = useState<Set<string>>(new Set());
+  const [courseAssessments, setCourseAssessments] = useState<{ [courseId: string]: any[] }>({});
 
   const { query } = router;
 
@@ -101,67 +115,132 @@ const AssessmentList = () => {
   }, [query.type]);
 
   // Extract center data from cohorts (following /assessments/index.tsx pattern)
+  // useEffect(() => {
+  //   if (classId && cohortsData?.length) {
+  //     const cohort = cohortsData.find((item: any) => item.cohortId === classId);
+  //     if (!cohort?.customField) {
+  //       setCenterData(null);
+  //       return;
+  //     }
+  //     const selectedState =
+  //       cohort.customField.find((item: any) => item.label === 'STATE')
+  //         ?.selectedValues?.[0]?.value || '';
+
+  //     const selectedBoard =
+  //       cohort.customField.find((item: any) => item.label === 'BOARD')
+  //         ?.selectedValues?.[0] || '';
+
+  //     setCenterData({ state: selectedState, board: selectedBoard });
+  //   }
+  // }, [classId, cohortsData]);
+
+  // Initialize district and block dropdown data (role-based, mirroring villages page)
   useEffect(() => {
-    if (classId && cohortsData?.length) {
-      const cohort = cohortsData.find((item: any) => item.cohortId === classId);
-      if (!cohort?.customField) {
-        setCenterData(null);
-        return;
-      }
-      const selectedState =
-        cohort.customField.find((item: any) => item.label === 'STATE')
-          ?.selectedValues?.[0]?.value || '';
+    // Only initialize district/block data for LEAD role
+    if (YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole()) {
+      try {
+        const userDataString = localStorage.getItem('userData');
+        const userData: any = userDataString ? JSON.parse(userDataString) : null;
+        const stateResult = userData?.customFields?.find(
+          (item: any) => item.label === cohortHierarchy.STATE
+        );
+        setSelectedStateValue(stateResult?.selectedValues?.[0]?.id);
 
-      const selectedBoard =
-        cohort.customField.find((item: any) => item.label === 'BOARD')
-          ?.selectedValues?.[0] || '';
+        const districtResult = userData?.customFields?.find(
+          (item: any) => item.label === cohortHierarchy.DISTRICT
+        );
+        const transformedDistricts = districtResult?.selectedValues?.map(
+          (item: any) => ({ id: item?.id, name: item?.value })
+        );
+        setDistrictData(transformedDistricts);
+        const firstDistrictId = transformedDistricts?.[0]?.id;
+        setSelectedDistrictValue(firstDistrictId);
 
-      setCenterData({ state: selectedState, board: selectedBoard });
-    }
-  }, [classId, cohortsData]);
-
-  // Initialize district and block dropdown data (mirroring villages page)
-  useEffect(() => {
-    try {
-      const userDataString = localStorage.getItem('userData');
-      const userData: any = userDataString ? JSON.parse(userDataString) : null;
-      const stateResult = userData?.customFields?.find(
-        (item: any) => item.label === cohortHierarchy.STATE
-      );
-      setSelectedStateValue(stateResult?.selectedValues?.[0]?.id);
-
-      const districtResult = userData?.customFields?.find(
-        (item: any) => item.label === cohortHierarchy.DISTRICT
-      );
-      const transformedDistricts = districtResult?.selectedValues?.map(
-        (item: any) => ({ id: item?.id, name: item?.value })
-      );
-      setDistrictData(transformedDistricts);
-      const firstDistrictId = transformedDistricts?.[0]?.id;
-      setSelectedDistrictValue(firstDistrictId);
-
-      if (firstDistrictId) {
-        const controllingfieldfk = [firstDistrictId?.toString()];
-        const fieldName = 'block';
-        getStateBlockDistrictList({ controllingfieldfk, fieldName })
-          .then((blockResponce: any) => {
-            const transformedBlockData = blockResponce?.result?.values?.map(
-              (item: any) => ({ id: item?.value, name: item?.label })
-            );
-            setBlockData(transformedBlockData);
-            setSelectedBlockValue(transformedBlockData?.[0]?.id || '');
-          })
-          .catch((e: any) => {
-            console.error('Error fetching block data:', e);
-            setBlockData([]);
-          });
-      } else {
+        if (firstDistrictId) {
+          const controllingfieldfk = [firstDistrictId?.toString()];
+          const fieldName = 'block';
+          getStateBlockDistrictList({ controllingfieldfk, fieldName })
+            .then((blockResponce: any) => {
+              const transformedBlockData = blockResponce?.result?.values?.map(
+                (item: any) => ({ id: item?.value, name: item?.label })
+              );
+              setBlockData(transformedBlockData);
+              const firstBlockId = transformedBlockData?.[0]?.id || '';
+              setSelectedBlockValue(firstBlockId);
+              setBlockId(firstBlockId);
+            })
+            .catch((e: any) => {
+              console.error('Error fetching block data:', e);
+              setBlockData([]);
+            });
+        } else {
+          setBlockData([]);
+        }
+      } catch (e) {
+        console.error('Error initializing district/block data:', e);
+        setDistrictData([]);
         setBlockData([]);
       }
-    } catch (e) {
-      console.error('Error initializing district/block data:', e);
-      setDistrictData([]);
-      setBlockData([]);
+    }
+  }, []);
+
+  // Village list fetching logic (role-based, following villages page pattern)
+  useEffect(() => {
+    const getVillageList = async () => {
+      try {
+        if (YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole()) {
+          // For INSTRUCTOR role: get villages from localStorage (logged user's block villages)
+          const villageDataString = localStorage.getItem('villageData');
+          const villageData: any = villageDataString
+            ? JSON.parse(villageDataString)
+            : null;
+          setVillageList(villageData || []);
+          if (villageData && villageData.length > 0) {
+            setSelectedVillageValue(villageData[0]?.Id);
+            setVillageId(villageData[0]?.Id);
+          }
+        } else if (YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() && selectedBlockValue !== '') {
+          // For LEAD role: fetch villages based on selected block
+          const controllingfieldfk = [selectedBlockValue?.toString()];
+          const fieldName = 'village';
+          const villageResponce = await getStateBlockDistrictList({
+            controllingfieldfk,
+            fieldName,
+          });
+
+          const transformedVillageData = villageResponce?.result?.values?.map(
+            (item: any) => ({
+              Id: item?.value,
+              name: item?.label,
+            })
+          );
+          setVillageList(transformedVillageData || []);
+          if (transformedVillageData && transformedVillageData.length > 0) {
+            setSelectedVillageValue(transformedVillageData[0]?.Id);
+            setVillageId(transformedVillageData[0]?.Id);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching village data:', error);
+        setVillageList([]);
+      }
+    };
+
+    getVillageList();
+  }, [selectedBlockValue]);
+
+  // Initialize villages on page load for INSTRUCTOR role
+  useEffect(() => {
+    if (YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole()) {
+      const villageDataString = localStorage.getItem('villageData');
+      const villageData: any = villageDataString
+        ? JSON.parse(villageDataString)
+        : null;
+      if (villageData && villageData.length > 0) {
+        setVillageList(villageData);
+        setSelectedVillageValue(villageData[0]?.Id);
+        setVillageId(villageData[0]?.Id);
+      }
     }
   }, []);
 
@@ -188,11 +267,11 @@ const AssessmentList = () => {
   // Get assessment data (following /assessments/index.tsx pattern)
   useEffect(() => {
     const getDoIdForAssessmentReport = async (
-      selectedState: string,
-      selectedBoard: string
+     
     ) => {
       const filters = {
-        program: loggedInProgram,
+         program:  loggedInProgram,
+      //  program:  ["Second Chance"],
         // board: [selectedBoard],
         status: ['Live'],
         primaryCategory: ['Practice Question Set'],
@@ -234,6 +313,21 @@ const AssessmentList = () => {
                 );
                 setAvailableAssessmentTypes(uniqueTypes as string[]);
                 const term = searchTerm.trim().toLowerCase();
+                console.log('assessmentData', assessmentData);
+                const identifiers = assessmentData.map((item: any) => item.identifier);
+
+        const courseListFilters = {
+        program:  loggedInProgram,
+       // program:  ["Second Chance"],
+
+        // board: [selectedBoard],
+        status: ['Live'],
+        primaryCategory: ['Course'],
+        // evaluationType: ['offline'],
+        leafNodes: identifiers,
+      };
+      console.log('assessmentData', assessmentData);
+      
                 const initialFiltered = assessmentData.filter(
                   (assessment: any) => {
                     const matchesType =
@@ -246,7 +340,51 @@ const AssessmentList = () => {
                     return subject.includes(term) || description.includes(term);
                   }
                 );
+
+                console.log('initialFiltered', initialFiltered);
                 setFilteredAssessments(initialFiltered);
+                const fileds=["name",
+            "appIcon",
+            "description",
+            "posterImage",
+            "mimeType",
+            "identifier",
+            "resourceType",
+            "primaryCategory",
+            "contentType",
+            "trackable",
+            "children",
+            "leafNodes"];
+                const courseListResponse = await compositeSearch({ filters: courseListFilters, fields: fileds });
+      
+      // Set default appIcon if not present
+      if (courseListResponse?.result?.content?.length > 0) {
+        courseListResponse.result.content.forEach((course: any) => {
+          if (!course.appIcon) {
+            course.appIcon = "/youthnet/images/decorationBg.png";
+          }
+        });
+      }
+      
+      console.log('courseListResponse', courseListResponse);
+      
+      // Store course data
+      const courses = courseListResponse?.result?.content || [];
+      setCourseData(courses);
+      // Initialize filtered course data (will be properly filtered by useEffect)
+      
+      // Create mapping between courses and their assessments with assessment type filtering
+      const courseAssessmentMapping: { [courseId: string]: any[] } = {};
+      courses.forEach((course: any) => {
+        const courseAssessmentList = assessmentData.filter((assessment: any) => {
+          const matchesLeafNode = course.leafNodes && course.leafNodes.includes(assessment.identifier);
+          const matchesType = assessment.assessmentType === assessmentType;
+          return matchesLeafNode && matchesType;
+        });
+        courseAssessmentMapping[course.identifier] = courseAssessmentList;
+      });
+      setCourseAssessments(courseAssessmentMapping);
+
               } else {
                 setAssessmentList([]);
                 setFilteredAssessments([]);
@@ -268,14 +406,14 @@ const AssessmentList = () => {
         setIsLoading(false);
       }
     };
+    getDoIdForAssessmentReport();
 
     // Fetch when board info is available
-    if (centerData && centerData?.board) {
-      getDoIdForAssessmentReport(centerData.state, centerData.board);
-    } else {
-      // If no board data, ensure loading is false
-      setIsLoading(false);
-    }
+    // if (centerData && centerData?.board) {
+    // } else {
+    //   // If no board data, ensure loading is false
+    //   setIsLoading(false);
+    // }
   }, [centerData, t]);
 
   // Safety mechanism to reset loading state if it gets stuck
@@ -292,27 +430,20 @@ const AssessmentList = () => {
   }, [loading]);
 
   // Reset loading state when classId is available (following /assessments/index.tsx pattern)
-  useEffect(() => {
-    if (classId) {
-      setTimeout(() => {
-        setLoading(false);
-      }, 0);
-    }
-  }, [classId]);
+  // useEffect(() => {
+  //   if (classId) {
+  //     setTimeout(() => {
+  //       setLoading(false);
+  //     }, 0);
+  //   }
+  // }, [classId]);
 
   // Search functionality
   const handleSearch = (newSearchTerm: string) => {
     setSearchTerm(newSearchTerm);
-    const term = newSearchTerm.trim().toLowerCase();
-    const filtered = assessmentList.filter((assessment: any) => {
-      const matchesType = assessment.assessmentType === assessmentType;
-      if (!matchesType) return false;
-      if (term === '') return true;
-      const subject = assessment.subject?.toLowerCase() || '';
-      const description = assessment.description?.toLowerCase() || '';
-      return subject.includes(term) || description.includes(term);
-    });
-    setFilteredAssessments(filtered);
+    if (courseData.length > 0 && assessmentList.length > 0) {
+      recalculateCourseAssessments(assessmentList, assessmentType, newSearchTerm);
+    }
   };
 
   // Sort modal handlers
@@ -336,16 +467,11 @@ const AssessmentList = () => {
     router.push({ pathname: router.pathname, query: queryParams }, undefined, {
       shallow: true,
     });
-    const term = searchTerm.trim().toLowerCase();
-    const filtered = assessmentList.filter((assessment: any) => {
-      const matchesType = assessment.assessmentType === newType;
-      if (!matchesType) return false;
-      if (term === '') return true;
-      const subject = assessment.subject?.toLowerCase() || '';
-      const description = assessment.description?.toLowerCase() || '';
-      return subject.includes(term) || description.includes(term);
-    });
-    setFilteredAssessments(filtered);
+    
+    // Recalculate course assessments with new assessment type
+    if (courseData.length > 0 && assessmentList.length > 0) {
+      recalculateCourseAssessments(assessmentList, newType, searchTerm);
+    }
   };
 
   const getAssessmentTypeLabel = (type: string) => {
@@ -408,10 +534,13 @@ const AssessmentList = () => {
   };
 
   // Assessment card click handler
-  const handleAssessmentDetails = (identifier: string, subject: string) => {
-    // Navigate to assessment details page with assessmentId, cohortId, and subject
-    if (identifier && classId) {
-      const navigationUrl = `/manual-assessments/${identifier}?cohortId=${classId}&subject=${encodeURIComponent(
+  const handleAssessmentDetails = (identifier: string, subject: string, parentId?: string) => {
+    console.log('villageId', villageId);
+    console.log('villageIdblockId', blockId);
+    console.log('parentId (courseId)', parentId);
+    // Navigate to assessment details page with assessmentId, cohortId, parentId, and subject
+    if (identifier ) {
+      const navigationUrl = `/manual-assessments/${identifier}?villageId=${villageId}&blockId=${blockId}&parentId=${parentId || ''}&subject=${encodeURIComponent(
         subject
       )}`;
       router.push(navigationUrl);
@@ -419,6 +548,47 @@ const AssessmentList = () => {
       showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
     }
   };
+
+  // Function to recalculate course assessments based on current filters
+  const recalculateCourseAssessments = useCallback((assessmentData: any[], selectedAssessmentType: string, searchTerm = '') => {
+    const courseAssessmentMapping: { [courseId: string]: any[] } = {};
+    const filteredCourses: any[] = [];
+    const term = searchTerm.trim().toLowerCase();
+    
+    courseData.forEach((course: any) => {
+      const courseAssessmentList = assessmentData.filter((assessment: any) => {
+        const matchesLeafNode = course.leafNodes && course.leafNodes.includes(assessment.identifier);
+        const matchesType = assessment.assessmentType === selectedAssessmentType;
+        
+        // Apply search filter if search term exists
+        if (term !== '') {
+          const subject = assessment.subject?.toLowerCase() || '';
+          const description = assessment.description?.toLowerCase() || '';
+          const matchesSearch = subject.includes(term) || description.includes(term);
+          return matchesLeafNode && matchesType && matchesSearch;
+        }
+        
+        return matchesLeafNode && matchesType;
+      });
+      
+      courseAssessmentMapping[course.identifier] = courseAssessmentList;
+      
+      // Only include courses that have at least one matching assessment
+      if (courseAssessmentList.length > 0) {
+        filteredCourses.push(course);
+      }
+    });
+    
+    setCourseAssessments(courseAssessmentMapping);
+    setFilteredCourseData(filteredCourses);
+  }, [courseData]);
+
+  // Recalculate course assessments when core data changes
+  useEffect(() => {
+    if (courseData.length > 0 && assessmentList.length > 0) {
+      recalculateCourseAssessments(assessmentList, assessmentType, searchTerm);
+    }
+  }, [courseData, assessmentList, assessmentType, searchTerm, recalculateCourseAssessments]);
 
   // Route change cleanup
   useEffect(() => {
@@ -435,6 +605,19 @@ const AssessmentList = () => {
       router.events.off('routeChangeStart', handleRouteChange);
     };
   }, [router]);
+
+  // Accordion handlers
+  const handleAccordionChange = (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+    setExpandedAccordions(prev => {
+      const newSet = new Set(prev);
+      if (isExpanded) {
+        newSet.add(panel);
+      } else {
+        newSet.delete(panel);
+      }
+      return newSet;
+    });
+  };
 
   return (
     <>
@@ -462,117 +645,135 @@ const AssessmentList = () => {
 
       <SearchBar onSearch={handleSearch} placeholder={t('COMMON.SEARCH')} />
 
-      {/* Dropdown section - matching main assessments page layout */}
-      <Grid container>
-        <Grid item xs={12} md={6}>
-          <Box sx={{ mt: 2, px: '20px', width: '100%' }}>
-            <Box className="w-100 d-md-flex">
-              <Box
-                sx={{
-                  width: '50%',
-                  mr: '20px',
-                }}
-              >
-                {districtData ? (
-                  <Dropdown
-                    name={districtData?.DISTRICT_NAME}
-                    values={districtData}
-                    defaultValue={districtData?.[0]?.id}
-                    onSelect={(value) => console.log('Selected:', value)}
-                    label={t('YOUTHNET_USERS_AND_VILLAGES.DISTRICTS')}
-                  />
-                ) : (
-                  <Loader showBackdrop={true} />
-                )}
-              </Box>
-              <Box
-                sx={{
-                  width: '50%',
-                }}
-              >
-                {blockData ? (
-                  <Dropdown
-                    name={blockData?.BLOCK_NAME}
-                    values={blockData}
-                    defaultValue={selectedBlockValue}
-                    onSelect={(value) => setSelectedBlockValue(value)}
-                    label={t('YOUTHNET_USERS_AND_VILLAGES.BLOCKS')}
-                  />
-                ) : (
-                  <Loader showBackdrop={true} />
-                )}
-              </Box>
+      {/* Dropdown section - role-based layout following villages page pattern */}
+      <Box sx={{ px: '20px', mt: 2 }}>
+        <Grid container spacing={2}>
+          {/* District & Block Dropdowns - Only show for LEAD role */}
+          {YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() && (
+            <>
+              {/* District Dropdown */}
+              {/* <Grid item xs={12} sm={6} md={3}>
+                <Box sx={{ width: '100%' }}>
+                  {districtData ? (
+                    <Dropdown
+                      name={districtData?.DISTRICT_NAME}
+                      values={districtData}
+                      defaultValue={districtData?.[0]?.id}
+                      onSelect={(value) => {
+                        setSelectedDistrictValue(value);
+                        console.log('District selected:', value);
+                      }}
+                      label={t('YOUTHNET_USERS_AND_VILLAGES.DISTRICTS')}
+                    />
+                  ) : (
+                    <Loader showBackdrop={false} />
+                  )}
+                </Box>
+              </Grid> */}
 
-              {/* <CohortSelectionSection
-                classId={classId}
-                setClassId={setClassId}
-                userId={userId}
-                setUserId={setUserId}
-                isAuthenticated={isAuthenticated}
-                setIsAuthenticated={setIsAuthenticated}
-                loading={loading}
-                setLoading={setLoading}
-                cohortsData={cohortsData}
-                setCohortsData={setCohortsData}
-                manipulatedCohortData={manipulatedCohortData}
-                setManipulatedCohortData={setManipulatedCohortData}
-                isManipulationRequired={false}
-                isCustomFieldRequired={true}
-                showFloatingLabel={true}
-                showDisabledDropDown={true}
-              /> */}
+              {/* Block Dropdown */}
+              <Grid item xs={12} sm={6} md={3}>
+                <Box sx={{ width: '100%' }}>
+                  {blockData ? (
+                    <Dropdown
+                      name={blockData?.BLOCK_NAME}
+                      values={blockData}
+                      defaultValue={selectedBlockValue}
+                      onSelect={(value) => {
+                        setSelectedBlockValue(value);
+                        setBlockId(value);
+                        console.log('Block selected:', value);
+                      }}
+                      label={t('YOUTHNET_USERS_AND_VILLAGES.BLOCKS')}
+                    />
+                  ) : (
+                    <Loader showBackdrop={false} />
+                  )}
+                </Box>
+              </Grid>
+            </>
+          )}
+
+          {/* Village Dropdown - Always show but data source depends on role */}
+          <Grid item xs={12} sm={6} md={YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole() ? 6 : 3}>
+            <Box sx={{ width: '100%' }}>
+              {villageList?.length > 0 ? (
+                <Dropdown
+                  name={DROPDOWN_NAME}
+                  values={villageList.map((item: any) =>
+                    Array.isArray(item)
+                      ? item.map(({ Id, name }) => ({ id: Id, name }))
+                      : { id: item.Id, name: item.name }
+                  )}
+                  defaultValue={selectedVillageValue}
+                  onSelect={(value) => {
+                    console.log('Village selected:', value);
+                    setSelectedVillageValue(value);
+                    setVillageId(value);
+                  }}
+                  label={t('YOUTHNET_USERS_AND_VILLAGES.VILLAGES')}
+                />
+              ) : (YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() && selectedBlockValue && villageList?.length === 0) ? (
+                <Typography sx={{ fontSize: '14px', mt: 2 }}>
+                  {t('YOUTHNET_USERS_AND_VILLAGES.NO_VILLAGES_FOUND')}
+                </Typography>
+              ) : (
+                <Loader showBackdrop={false} />
+              )}
             </Box>
-          </Box>
+          </Grid>
+
+          {/* Assessment Type Dropdown - Always show */}
+          {availableAssessmentTypes && availableAssessmentTypes?.length > 0 ? (
+            <Grid item xs={12} sm={6} md={YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole() ? 6 : 3}>
+              <Box sx={{ width: '100%' }}>
+                <FormControl fullWidth>
+                  <InputLabel
+                    style={{
+                      color: theme?.palette?.warning['A200'],
+                      background: theme?.palette?.warning['A400'],
+                      paddingLeft: '2px',
+                      paddingRight: '2px',
+                    }}
+                    id="assessment-type-select-label"
+                  >
+                    {t('ASSESSMENTS.ASSESSMENT_TYPE')}
+                  </InputLabel>
+                  <Select
+                    labelId="assessment-type-select-label"
+                    id="assessment-type-select"
+                    label={t('ASSESSMENTS.ASSESSMENT_TYPE')}
+                    style={{
+                      borderRadius: '4px',
+                    }}
+                    value={assessmentType}
+                    onChange={(e) => handleAssessmentTypeChange(e.target.value)}
+                    disabled={availableAssessmentTypes.length === 1}
+                  >
+                    {availableAssessmentTypes.map((type) => (
+                      <MenuItem
+                        key={type}
+                        value={type}
+                        style={{ textAlign: 'right' }}
+                      >
+                        {getAssessmentTypeLabel(type)}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
+            </Grid>
+          ) : (
+            <Grid item xs={12} sm={6} md={YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole() ? 6 : 3}>
+              <Box sx={{ width: '100%', mt: 2 }}>
+                <Typography sx={{ fontSize: '14px' }}>
+                  {t('ASSESSMENTS.NO_ASSESSMENT_TYPE_FOUND')}
+                </Typography>
+              </Box>
+            </Grid>
+          )}
         </Grid>
-        {availableAssessmentTypes && availableAssessmentTypes?.length > 0 ? (
-          <Grid item xs={12} md={6}>
-            <Box sx={{ mt: 2, px: '20px', width: '100%' }}>
-              <FormControl sx={{ marginTop: '24px' }} fullWidth>
-                <InputLabel
-                  style={{
-                    color: theme?.palette?.warning['A200'],
-                    background: theme?.palette?.warning['A400'],
-                    paddingLeft: '2px',
-                    paddingRight: '2px',
-                  }}
-                  id="assessment-type-select-label"
-                >
-                  {t('ASSESSMENTS.ASSESSMENT_TYPE')}
-                </InputLabel>
-                <Select
-                  labelId="assessment-type-select-label"
-                  id="assessment-type-select"
-                  label={t('ASSESSMENTS.ASSESSMENT_TYPE')}
-                  style={{
-                    borderRadius: '4px',
-                  }}
-                  value={assessmentType}
-                  onChange={(e) => handleAssessmentTypeChange(e.target.value)}
-                  disabled={availableAssessmentTypes.length === 1}
-                >
-                  {availableAssessmentTypes.map((type) => (
-                    <MenuItem
-                      key={type}
-                      value={type}
-                      style={{ textAlign: 'right' }}
-                    >
-                      {getAssessmentTypeLabel(type)}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Box>
-          </Grid>
-        ) : (
-          <Grid item xs={12} md={6}>
-            <Box sx={{ mt: 7, px: '20px', width: '100%' }}>
-              <Typography>
-                {t('ASSESSMENTS.NO_ASSESSMENT_TYPE_FOUND')}
-              </Typography>
-            </Box>
-          </Grid>
-        )}
-      </Grid>
+      </Box>
 
       {isLoading && (
         <Box
@@ -589,11 +790,36 @@ const AssessmentList = () => {
       )}
 
       {!isLoading &&
-        (!assessmentList?.length || !filteredAssessments?.length) &&
-        centerData?.board && <NoDataFound />}
+        (!assessmentList?.length || !filteredCourseData?.length) &&
+        centerData?.board && (
+          <>
+            {/* Show different message if courses exist but none match filters */}
+            {courseData?.length > 0 && filteredCourseData?.length === 0 ? (
+              <Box
+                sx={{
+                  background: theme.palette.action.selected,
+                  py: 1,
+                  borderRadius: 2,
+                  mx: '20px',
+                  mt: 2,
+                  p: 2,
+                }}
+              >
+                <Typography variant="h6" sx={{ textAlign: 'center' }}>
+                  {searchTerm ? 
+                    t('COMMON.NO_COURSES_MATCH_SEARCH', { searchTerm }) || `No courses match your search "${searchTerm}" for the selected assessment type` :
+                    t('COMMON.NO_COURSES_FOR_ASSESSMENT_TYPE') || `No courses available for the selected assessment type`
+                  }
+                </Typography>
+              </Box>
+            ) : (
+              <NoDataFound />
+            )}
+          </>
+        )}
 
       {!isLoading &&
-        (!assessmentList?.length || !filteredAssessments?.length) &&
+        (!assessmentList?.length || !filteredCourseData?.length) &&
         !centerData?.board && (
           <Box
             sx={{
@@ -606,14 +832,14 @@ const AssessmentList = () => {
             }}
           >
             <Typography variant="h6" sx={{ textAlign: 'center' }}>
-              {t('COMMON.NO_ASSIGNED_BOARDS')}
+              {t('COMMON.NO_ASSIGNED_COURSES')}
             </Typography>
           </Box>
         )}
 
-      {!isLoading && filteredAssessments?.length > 0 && (
+      {!isLoading && filteredCourseData?.length > 0 && (
         <>
-          {/* Results count and sort section */}
+          {/* Results count section */}
           <Box
             sx={{
               mt: 2,
@@ -635,134 +861,223 @@ const AssessmentList = () => {
                 minWidth: '200px',
               }}
             >
-              {filteredAssessments.length === 1
-                ? t('ASSESSMENTS.ASSESSMENTS_FOUND', {
-                  count: filteredAssessments.length,
-                })
-                : t('ASSESSMENTS.ASSESSMENTS_FOUND_PLURAL', {
-                  count: filteredAssessments.length,
-                })}
+              {filteredCourseData.length === 1
+                ? t('COMMON.COURSES_FOUND', {
+                  count: filteredCourseData.length,
+                }) || `${filteredCourseData.length} Course Found`
+                : t('COMMON.COURSES_FOUND_PLURAL', {
+                  count: filteredCourseData.length,
+                }) || `${filteredCourseData.length} Courses Found`}
             </Typography>
-            {/* <Button
-              onClick={handleOpenModal}
-              sx={{
-                color: theme.palette.warning.A200,
-                borderRadius: '10px',
-                fontSize: '14px',
-                borderColor: theme.palette.warning.A200,
-                '&:hover': {
-                  borderColor: theme.palette.warning.A200,
-                  backgroundColor: theme.palette.warning.A400,
-                },
-                flex: '0 0 auto',
-              }}
-              endIcon={<ArrowDropDownSharpIcon />}
-              size="small"
-              variant="outlined"
-            >
-              {t('COMMON.SORT_BY')}
-            </Button> */}
           </Box>
 
-          {/* Assessment cards grid */}
+          {/* Course accordion cards */}
           <Box
             sx={{
-              background: '#FBF4E4',
-              padding: '20px',
               mx: '20px',
-              borderRadius: '8px',
+              mb: 2,
             }}
           >
-            <Grid container spacing={{ xs: 2, sm: 2, md: 3 }}>
-              {filteredAssessments?.map((assessment: any) => (
-                <Grid
-                  item
-                  xs={12}
-                  sm={6}
-                  md={6}
-                  lg={4}
-                  xl={3}
-                  key={assessment.identifier}
+            {filteredCourseData.map((course: any) => (
+              <Accordion
+                key={course.identifier}
+                expanded={expandedAccordions.has(course.identifier)}
+                onChange={handleAccordionChange(course.identifier)}
+                sx={{
+                  mb: 2,
+                  borderRadius: '8px!important',
+                  border: `1px solid ${theme.palette.warning['A100']}`,
+                  '&:before': {
+                    display: 'none',
+                  },
+                  '&.Mui-expanded': {
+                    margin: '0 0 16px 0',
+                  },
+                }}
+              >
+                <AccordionSummary
+                  expandIcon={<ArrowDropDownSharpIcon />}
+                  sx={{
+                    background: theme.palette.warning['A400'],
+                    borderRadius: '8px',
+                    '&.Mui-expanded': {
+                      borderBottomLeftRadius: 0,
+                      borderBottomRightRadius: 0,
+                    },
+                    minHeight: '80px',
+                    '& .MuiAccordionSummary-content': {
+                      alignItems: 'center',
+                      gap: 2,
+                    },
+                  }}
                 >
-                  <Box
-                    sx={{
-                      border: `1px solid ${theme.palette.warning['A100']}`,
-                      background: theme.palette.warning['A400'],
-                      padding: '16px',
-                      borderRadius: '8px',
-                      cursor: 'pointer',
-                      height: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      transition: 'all 0.2s ease-in-out',
-                      '&:hover': {
-                        transform: 'translateY(-2px)',
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                        borderColor: theme.palette.warning['A200'],
-                      },
-                    }}
-                    onClick={() =>
-                      handleAssessmentDetails(
-                        assessment?.identifier,
-                        assessment?.subject
-                      )
-                    }
-                  >
+                  {/* Course Icon */}
+                  {course.appIcon && (
+                    <Box
+                      component="img"
+                      src={course.appIcon}
+                      alt={course.name}
+                      sx={{
+                        width: 60,
+                        height: 60,
+                        borderRadius: '8px',
+                        objectFit: 'cover',
+                        border: `2px solid ${theme.palette.warning['A200']}`,
+                      }}
+                    />
+                  )}
+                  
+                  {/* Course Details */}
+                  <Box sx={{ flex: 1 }}>
                     <Typography
                       sx={{
-                        fontSize: '16px',
-                        fontWeight: '500',
+                        fontSize: '18px',
+                        fontWeight: '600',
                         color: theme.palette.warning['300'],
-                        mb: 1,
+                        mb: 0.5,
                         lineHeight: 1.3,
+                      }}
+                    >
+                      {toPascalCase(course.name)}
+                    </Typography>
+                    <Typography
+                      sx={{
+                        fontSize: '14px',
+                        color: theme.palette.warning['400'],
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         display: '-webkit-box',
                         WebkitLineClamp: 2,
                         WebkitBoxOrient: 'vertical',
                       }}
-                      title={assessment?.subject}
                     >
-                      {toPascalCase(assessment?.subject)}
+                      {course.description || 'No description available'}
                     </Typography>
-                    <Box
+                    <Typography
                       sx={{
-                        display: 'flex',
-                        gap: '8px',
-                        alignItems: 'center',
-                        flexWrap: 'wrap',
-                        mt: 'auto',
+                        fontSize: '12px',
+                        color: theme.palette.warning['300'],
+                        mt: 0.5,
+                        fontWeight: '500',
                       }}
                     >
-                      <Typography
-                        sx={{
-                          fontSize: '12px',
-                          fontWeight: '500',
-                          color: theme.palette.warning['300'],
-                        }}
-                      >
-                        {assessment?.gradeLevel || '--'}
-                      </Typography>
-                      <FiberManualRecordIcon
-                        sx={{
-                          fontSize: '8px',
-                          color: theme.palette.warning['400'],
-                        }}
-                      />
-                      <Typography
-                        sx={{
-                          fontSize: '12px',
-                          fontWeight: '500',
-                          color: theme.palette.warning['400'],
-                        }}
-                      >
-                        {toPascalCase(assessment?.board) || '--'}
-                      </Typography>
-                    </Box>
+                      {courseAssessments[course.identifier]?.length || 0} Assessment{courseAssessments[course.identifier]?.length !== 1 ? 's' : ''}
+                    </Typography>
                   </Box>
-                </Grid>
-              ))}
-            </Grid>
+                </AccordionSummary>
+                
+                <AccordionDetails
+                  sx={{
+                    background: '#FBF4E4',
+                    padding: '20px',
+                  }}
+                >
+                  {courseAssessments[course.identifier]?.length > 0 ? (
+                    <Grid container spacing={{ xs: 2, sm: 2, md: 3 }}>
+                      {courseAssessments[course.identifier].map((assessment: any) => (
+                        <Grid
+                          item
+                          xs={12}
+                          sm={6}
+                          md={6}
+                          lg={4}
+                          xl={3}
+                          key={assessment.identifier}
+                        >
+                          <Box
+                            sx={{
+                              border: `1px solid ${theme.palette.warning['A100']}`,
+                              background: theme.palette.warning['A400'],
+                              padding: '16px',
+                              borderRadius: '8px',
+                              cursor: 'pointer',
+                              height: '100%',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              transition: 'all 0.2s ease-in-out',
+                              '&:hover': {
+                                transform: 'translateY(-2px)',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                borderColor: theme.palette.warning['A200'],
+                              },
+                            }}
+                            onClick={() =>
+                              handleAssessmentDetails(
+                                assessment?.identifier,
+                                assessment?.subject,
+                                course?.identifier
+                              )
+                            }
+                          >
+                            <Typography
+                              sx={{
+                                fontSize: '16px',
+                                fontWeight: '500',
+                                color: theme.palette.warning['300'],
+                                mb: 1,
+                                lineHeight: 1.3,
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                              }}
+                              title={assessment?.subject}
+                            >
+                              {toPascalCase(assessment?.subject)}
+                            </Typography>
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                gap: '8px',
+                                alignItems: 'center',
+                                flexWrap: 'wrap',
+                                mt: 'auto',
+                              }}
+                            >
+                              <Typography
+                                sx={{
+                                  fontSize: '12px',
+                                  fontWeight: '500',
+                                  color: theme.palette.warning['300'],
+                                }}
+                              >
+                                {assessment?.gradeLevel || '--'}
+                              </Typography>
+                              <FiberManualRecordIcon
+                                sx={{
+                                  fontSize: '8px',
+                                  color: theme.palette.warning['400'],
+                                }}
+                              />
+                              <Typography
+                                sx={{
+                                  fontSize: '12px',
+                                  fontWeight: '500',
+                                  color: theme.palette.warning['400'],
+                                }}
+                              >
+                                {toPascalCase(assessment?.board) || '--'}
+                              </Typography>
+                            </Box>
+                          </Box>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  ) : (
+                    <Typography
+                      sx={{
+                        textAlign: 'center',
+                        color: theme.palette.warning['400'],
+                        fontStyle: 'italic',
+                      }}
+                    >
+                      No assessments available for this course
+                    </Typography>
+                  )}
+                </AccordionDetails>
+              </Accordion>
+            ))}
           </Box>
         </>
       )}

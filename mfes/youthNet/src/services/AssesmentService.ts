@@ -4,9 +4,10 @@ import {
   IAssessmentStatusOptions,
   ISearchAssessment,
 } from '../utils/Interfaces';
-import { get, post } from './RestClient';
+// import { get, post } from './RestClient';
 import { URL_CONFIG } from '../utils/url.config';
 import API_ENDPOINTS from '../utils/API/APIEndpoints';
+import { post , get} from '@shared-lib';
 
 interface IAssessmentItemParam {
   answer: boolean;
@@ -214,12 +215,15 @@ export const answerSheetSubmissions = async ({
   identifier,
   fileUrls,
   createdBy,
+  parentId,
 }: {
   userId: string;
   questionSetId: string;
+  parentId?: string;
   identifier: string;
   fileUrls: string[];
   createdBy: string;
+
 }) => {
   const apiURL = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/answer-sheet-submissions/create`;
   // const apiURL = `https://e49a1216cbca.ngrok-free.app/interface/v1/tracking/answer-sheet-submissions/create`;
@@ -231,6 +235,7 @@ export const answerSheetSubmissions = async ({
       identifier,
       fileUrls,
       createdBy,
+      parentId,
     });
     return response?.data;
   } catch (error) {
@@ -397,6 +402,81 @@ export const getOfflineAssessmentDetails = async ({
   } catch (error) {
     console.error('Error in getDoIdForAssessmentDetails Service', error);
     return error;
+  }
+};
+
+export const createContentTracking = async ({
+  userId,
+  contentId,
+  courseId,
+  unitId,
+  totalScore,
+}: {
+  userId: string;
+  contentId: string;
+  courseId: string;
+  unitId: string;
+  totalScore: number;
+}) => {
+  const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/content/create`;
+  
+  const payload = {
+    userId,
+    contentId,
+    courseId,
+    unitId,
+    contentType: "COLLECTION",
+    contentMime: "application/vnd.ekstep.content-collection",
+    lastAccessOn: new Date().toISOString(),
+    detailsObject: [
+      {
+        eid: "START",
+        edata: {
+          type: "content",
+          mode: "play",
+          pageid: "",
+          duration: 10
+        },
+        identifier: contentId,
+        contentType: "quml"
+      },
+      {
+        eid: "END",
+        edata: {
+          type: "content",
+          mode: "play",
+          pageid: "sunbird-player-Endpage",
+          summary: [
+            {
+              progress: 100
+            },
+            {
+              totalNoofQuestions: 0
+            },
+            {
+              visitedQuestions: 0
+            },
+            {
+              endpageseen: true
+            },
+            {
+              score: totalScore
+            }
+          ],
+          duration: 10
+        },
+        identifier: contentId,
+        contentType: "quml"
+      }
+    ]
+  };
+
+  try {
+    const response = await post(apiUrl, payload);
+    return response?.data;
+  } catch (error) {
+    console.error('Error in creating content tracking:', error);
+    throw error;
   }
 };
 

@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
-import Header from '../../../../components/Header';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+'use client';
+import React, { useState, useEffect, useRef, Suspense, useCallback } from 'react';
+// import Header from '../../../components/themantic/header/Header';
 import {
   Box,
   Grid,
@@ -12,13 +12,16 @@ import {
   Alert,
   Dialog,
   DialogContent,
+  Container,
 } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import { useTranslation } from 'next-i18next';
+import { useTranslation } from '@shared-lib';
 import KeyboardBackspaceOutlinedIcon from '@mui/icons-material/KeyboardBackspaceOutlined';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { useRouter } from 'next/router';
-import ConfirmationModal from '../../../../components/ConfirmationModal';
+import { useRouter, useSearchParams } from 'next/navigation';
+import GenericModal from '../../components/GenericModal/GenericModal';
+import ConfirmationModal from '../../components/ConfirmationModal/ConfirmationModal';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import DownloadIcon from '@mui/icons-material/Download';
+
 import {
   getAssessmentDetails,
   getAssessmentTracking,
@@ -26,34 +29,32 @@ import {
   updateAssessmentScore,
   hierarchyContent,
   searchAssessment,
-  getAssessmentStatus,
-} from '../../../../services/AssesmentService';
+} from '../../utils/API/AssesmentService';
 import {
   UploadOptionsPopup,
   UploadedImage,
-} from '../../../../components/assessment';
-import { getUserDetails } from '../../../../services/ProfileService';
+} from '../../components/assessment';
+import { getUserDetails } from '../../utils/API/ProfileService';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import Button from '@mui/material/Button';
 import {
   getStatusIcon,
   getStatusLabel,
   mapAnswerSheetStatusToInternalStatus,
-} from '../index';
+} from './index';
 import {
   createQuestionNumberingMap,
   createSectionMapping,
-} from '../../../../utils/questionNumbering';
-import AnswerSheet, {
+} from '../../utils/questionNumbering';
+import {
   AssessmentTrackingData,
-} from '../../../../components/assessment/AnswerSheet';
+} from '../../components/assessment/AnswerSheet';
 import MinimizeIcon from '@mui/icons-material/Minimize';
-import { toPascalCase } from '../../../../utils/Helper';
-import UploadFiles from '../../../../components/UploadFiles/UploadFiles';
+import { toPascalCase } from '../../utils/helper';
+import UploadFiles from '../../components/UploadFiles/UploadFiles';
 import CloseIcon from '@mui/icons-material/Close';
-import QuestionMarksManualUpdate from '../../../../components/assessment/QuestionMarksManualUpdate';
-import GenericModal from '../../../../components/GenericModal';
-
+import QuestionMarksManualUpdate from '../../components/assessment/QuestionMarksManualUpdate';
+import { showToastMessage } from '@shared-lib-v2/DynamicForm/components/Toastify';
 interface ScoreDetail {
   questionId: string | null;
   pass: string;
@@ -71,18 +72,18 @@ interface AssessmentSummaryItem {
     title: string;
     type: string;
     maxscore: number;
-    params: any[];
-    sectionId: string;
+  params: unknown[];
+  sectionId: string;
   };
   index: number;
   pass: string;
   score: number;
-  resvalues: Array<{
-    label?: string;
-    value: any;
-    selected: boolean;
-    AI_suggestion: string;
-  }>;
+    resvalues: Array<{
+      label?: string;
+      value: unknown;
+      selected: boolean;
+      AI_suggestion: string;
+    }>;
   duration: number;
   sectionName: string;
 }
@@ -127,7 +128,7 @@ interface AssessmentRecord {
       duration: number;
       score: number;
       resvalues: Array<{
-        value: any;
+        value: unknown;
         selected: boolean;
         AI_suggestion: string;
       }>;
@@ -146,6 +147,7 @@ interface OfflineAssessmentData {
   status: 'AI Pending' | 'AI Processed' | 'Approved';
   fileUrls: string[];
   records: AssessmentRecord[];
+  hasLongShortAnswers?: boolean;
   // Add other properties as needed based on API response
 }
 
@@ -223,13 +225,17 @@ const formatAnswerForDisplay = (
 };
 
 const AssessmentDetails = () => {
-  const theme = useTheme();
+  console.log('🚀 AssessmentDetails component rendering');
   const { t } = useTranslation();
   const router = useRouter();
-  const { assessmentId, userId, parentId , unitId} = router.query;
-
+  const searchParams = useSearchParams();
+  
+  // Get parameters from URL search params
+  const assessmentId = searchParams.get('assessmentId')
+  const parentId = searchParams.get('parentId')
+  const userId = searchParams.get('userId') 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedQuestion, setSelectedQuestion] = useState<any>(null);
+  const [selectedQuestion] = useState<ScoreDetail | null>(null);
   const [editScore, setEditScore] = useState<string>('');
   const [editSuggestion, setEditSuggestion] = useState<string>('');
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
@@ -237,14 +243,16 @@ const AssessmentDetails = () => {
   const [editLoading, setEditLoading] = useState(false);
   const [assessmentTrackingData, setAssessmentTrackingData] =
     useState<AssessmentTrackingData | null>();
-  const [assessmentStatusData, setAssessmentStatusData] = useState<any>([]);
+  const [assessmentStatusData, setAssessmentStatusData] = useState<ScoreDetail[]>([]);
+  const [assessmentStatus, setAssessmentStatus] = useState<string>('');
 
+console.log('assessmentStatusData>>>>>:', assessmentStatusData);
   // Hierarchy data for question numbering
-  const [hierarchyData, setHierarchyData] = useState<any>(null);
-  const [questionNumberingMap, setQuestionNumberingMap] = useState<
+  const [, setHierarchyData] = useState<any>(null);
+  const [, setQuestionNumberingMap] = useState<
     Record<string, string>
   >({});
-  const [sectionMapping, setSectionMapping] = useState<Record<string, string>>(
+  const [, setSectionMapping] = useState<Record<string, string>>(
     {}
   );
 
@@ -252,12 +260,16 @@ const AssessmentDetails = () => {
   const [uploadPopupOpen, setUploadPopupOpen] = useState(false);
   const [isReUploadMode, setIsReUploadMode] = useState(false);
   const [uploadViewerOpen, setUploadViewerOpen] = useState(false);
-  const [userDetails, setUserDetails] = useState<any>({
+  const [userDetails, setUserDetails] = useState<{
+    name: string;
+    lastName: string;
+  }>({
     name: '',
     lastName: '',
   });
-  const [assessmentName, setAssessmentName] = useState<any>('');
-  const [userAssessmentStatus, setUserAssessmentStatus] = useState<any>(null);
+  const [assessmentName, setAssessmentName] = useState<string>('');
+  const [userAssessmentStatus, setUserAssessmentStatus] = useState<string | null>(null);
+  const [foundChild, setFoundChild] = useState<any>(undefined); // Course hierarchy child data
 
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
@@ -273,15 +285,6 @@ const AssessmentDetails = () => {
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const previousUploadedImagesRef = useRef<UploadedImage[] | null>(null);
   // Upload Options Popup handlers
-  const handleUploadInfoClick = () => {
-    const hasImages =
-      (assessmentData?.fileUrls?.length || 0) > 0 || uploadedImages.length > 0;
-    if (hasImages) {
-      setUploadViewerOpen(true);
-      return;
-    }
-    setUploadPopupOpen(true);
-  };
 
   const handleCloseUploadPopup = () => {
     // If re-upload was cancelled without submission, restore previous images
@@ -350,7 +353,7 @@ const AssessmentDetails = () => {
     }
   }, [assessmentData]);
 
-  const fetchOfflineAssessmentData = async (showSuccessMessage = false) => {
+  const fetchOfflineAssessmentData = useCallback(async (showSuccessMessage = false) => {
     try {
       const userData = await getOfflineAssessmentStatus({
         userIds: [userId as string],
@@ -359,6 +362,8 @@ const AssessmentDetails = () => {
       });
 
       if (userData?.result?.length > 0) {
+      //  console.log('userData>>>>>:', userData.result);
+        setAssessmentStatus(userData.result[0].status);
         // Find the assessment data for the current user
         const currentUserData = userData.result.find(
           (item: OfflineAssessmentData) => item.userId === userId
@@ -377,13 +382,14 @@ const AssessmentDetails = () => {
           setAssessmentData(sanitizedData);
           if (sanitizedData) {
             try {
-              const userDataAssessmentStatus = await getAssessmentStatus({
-                userId: [userId as string],
-                courseId: [parentId as string],
-                unitId: [unitId as string],
-                contentId: [assessmentId as string],
+              const userDataAssessmentStatus = await searchAssessment({
+                userId: userId as string,
+                courseId: parentId as string,
+                unitId: foundChild?.parent ? foundChild.parent : (assessmentId as string),
+                contentId: assessmentId as string,
               });
-              console.log('unitId>>>>>:', unitId);
+              console.log('🔍 searchAssessment payload - unitId:', foundChild?.parent ? foundChild.parent : assessmentId);
+              // console.log('userData>>>>>:', userDataAssessmentStatus);
 
               // clone first element safely
               let status = userDataAssessmentStatus[0]?.status || "Not Started";
@@ -520,7 +526,7 @@ const AssessmentDetails = () => {
 
               // Recalculate total score based on localStorage values
               transformedData.totalScore = transformedData.score_details.reduce(
-                (total, detail) => total + detail.score,
+                (total: number, detail: ScoreDetail) => total + detail.score,
                 0
               );
 
@@ -531,8 +537,9 @@ const AssessmentDetails = () => {
                 userId: userId as string,
                 contentId: assessmentId as string,
                 courseId: parentId as string,
-                unitId: unitId as string,
+                unitId: foundChild?.parent ? foundChild.parent : [],
               });
+              console.log('🔍 getAssessmentTracking payload - unitId:', foundChild?.parent ? foundChild.parent : assessmentId);
               if (response?.data?.length > 0) {
                 // Find the latest assessment data by comparing timestamps
                 const latestAssessment = response.data.reduce(
@@ -617,18 +624,18 @@ const AssessmentDetails = () => {
       }
       throw error;
     }
-  };
+  }, [userId, assessmentId, parentId, foundChild]);
 
   useEffect(() => {
     const fetchUserAssessmentStatus = async () => {
       try {
-        if (typeof userId !== 'string' || typeof assessmentId !== 'string') {
+        if (typeof userId !== 'string' || typeof assessmentId !== 'string' || typeof parentId !== 'string' || typeof foundChild !== 'object') {
           return;
         }
         const statusResponse = await searchAssessment({
           userId: userId,
           courseId: parentId as string,
-          unitId: unitId as string,
+          unitId: foundChild?.parent ? foundChild.parent : [],
           contentId: assessmentId,
         });
         setAssessmentStatusData(statusResponse[0]?.score_details || []);
@@ -638,11 +645,58 @@ const AssessmentDetails = () => {
       }
     };
     fetchUserAssessmentStatus();
-  }, [userId, assessmentId, unitId , parentId]);
+  }, [userId, assessmentId, parentId, foundChild]);
 
+  // First useEffect: Fetch foundChild data
   useEffect(() => {
+    console.log('🔄 First useEffect: Fetching course hierarchy');
+    const fetchCourseHierarchy = async () => {
+      if (assessmentId && parentId) {
+        try {
+          const courseResponse = await getAssessmentDetails(parentId as string);
+          let tempFoundChild = null;
+
+          for (const item of courseResponse?.children || []) {
+            if (item.children && item.children.length > 0) {
+              for (const child of item.children) {
+                if (child.identifier === assessmentId) {
+                  tempFoundChild = child;
+                  break;
+                }
+              }
+            }
+            if (tempFoundChild) break; // stop after finding one
+          }
+          
+          console.log('tempFoundChild:', tempFoundChild?.parent);
+          console.log('Course Details Response:', courseResponse?.children);
+          
+          if (!tempFoundChild?.parent) {
+            console.warn('⚠️ foundChild.parent not found, falling back to assessmentId as unitId');
+          }
+          
+          console.log('Using unitId:', tempFoundChild?.parent ? tempFoundChild.parent : assessmentId);
+          
+          // Update the component state (null if not found, object if found)
+          setFoundChild(tempFoundChild);
+        } catch (error) {
+          console.error('Error fetching course hierarchy:', error);
+          setFoundChild(null);
+        }
+      } else if (!parentId) {
+        // If no parentId, set foundChild to null to avoid waiting
+        setFoundChild(null);
+      }
+    };
+
+    fetchCourseHierarchy();
+  }, [assessmentId, parentId]);
+
+  // Second useEffect: Fetch assessment data after foundChild is determined
+  useEffect(() => {
+    console.log('🔄 Second useEffect: Fetching assessment data, foundChild:', foundChild?.parent);
     const fetchAssessmentData = async () => {
-      if (assessmentId && userId && unitId && parentId) {
+      if (assessmentId && userId && foundChild !== undefined) {
         try {
           if (assessmentId) {
             const response1 = await getAssessmentDetails(
@@ -692,7 +746,7 @@ const AssessmentDetails = () => {
     };
 
     fetchAssessmentData();
-  }, [assessmentId, userId, unitId, parentId]);
+  }, [assessmentId, userId, foundChild, fetchOfflineAssessmentData]);
 
   const handleBack = () => {
     router.back();
@@ -746,7 +800,7 @@ const AssessmentDetails = () => {
 
         // Update local state without API call
         const updatedLocalScoreDetails =
-          assessmentTrackingData.score_details.map((detail) => {
+          assessmentTrackingData.score_details.map((detail: ScoreDetail) => {
             if (detail.questionId === selectedQuestion.questionId) {
               const updatedResValue = {
                 ...JSON.parse(detail.resValue),
@@ -764,7 +818,7 @@ const AssessmentDetails = () => {
 
         // Calculate new total score by summing all scores
         const newTotalScore = updatedLocalScoreDetails.reduce(
-          (total, detail) => total + detail.score,
+          (total: number, detail: ScoreDetail) => total + detail.score,
           0
         );
 
@@ -785,7 +839,7 @@ const AssessmentDetails = () => {
 
       // For other statuses, proceed with API call
       const updatedAssessmentSummary = assessmentTrackingData.score_details.map(
-        (detail) => {
+        (detail: ScoreDetail) => {
           const resValue = detail.resValue ? JSON.parse(detail.resValue) : {};
           if (detail.questionId === selectedQuestion.questionId) {
             resValue.AI_suggestion = editSuggestion;
@@ -845,7 +899,7 @@ const AssessmentDetails = () => {
 
       // Update local state
       const updatedApiScoreDetails = assessmentTrackingData.score_details.map(
-        (detail) => {
+        (detail: ScoreDetail) => {
           if (detail === selectedQuestion) {
             return {
               ...detail,
@@ -881,9 +935,9 @@ const AssessmentDetails = () => {
     }
   };
 
-  const handleApproveClick = () => {
-    setIsConfirmModalOpen(true);
-  };
+  // const handleApproveClick = () => {
+  //   setIsConfirmModalOpen(true);
+  // };
 
   const handleConfirmApprove = async () => {
     if (!assessmentTrackingData) return;
@@ -893,7 +947,7 @@ const AssessmentDetails = () => {
 
       // Create payload with all current scores including any edited ones from localStorage
       const updatedAssessmentSummary = assessmentTrackingData.score_details.map(
-        (detail) => {
+        (detail: ScoreDetail) => {
           // Check if there's an edited score in localStorage
           const savedData = localStorage.getItem(
             `tracking_${userId}_${detail.questionId}`
@@ -935,7 +989,7 @@ const AssessmentDetails = () => {
         timeSpent: parseInt(assessmentTrackingData.timeSpent),
         totalMaxScore: assessmentTrackingData.totalMaxScore,
         totalScore: assessmentTrackingData.score_details.reduce(
-          (total, detail) => {
+          (total: number, detail: ScoreDetail) => {
             const savedData = localStorage.getItem(
               `tracking_${userId}_${detail.questionId}`
             );
@@ -957,8 +1011,9 @@ const AssessmentDetails = () => {
         userId: userId as string,
         contentId: assessmentId as string,
         courseId: parentId as string,
-        unitId: unitId as string,
+        unitId: foundChild?.parent ? foundChild.parent : [],
       });
+      console.log('🔍 handleRefreshAssessmentData - unitId:', foundChild?.parent ? foundChild.parent : assessmentId);
 
       if (response?.data?.length > 0) {
         setAssessmentTrackingData(response.data[0]);
@@ -971,7 +1026,7 @@ const AssessmentDetails = () => {
       });
 
       // Clear localStorage after approval
-      assessmentTrackingData.score_details.forEach((detail) => {
+      assessmentTrackingData.score_details.forEach((detail: ScoreDetail) => {
         localStorage.removeItem(`tracking_${userId}_${detail.questionId}`);
       });
 
@@ -992,7 +1047,49 @@ const AssessmentDetails = () => {
   const handleRefreshAssessmentData = async () => {
     await fetchOfflineAssessmentData(true);
   };
+  const handleDownloadQuestionPaper = async () => {
+    try {
+     // setDownloading(true);
+      // Simulate download delay
+      /*await new Promise((resolve) => setTimeout(resolve, 2000));
 
+      // Create download link
+      const element = document.createElement('a');
+      element.href =
+        'data:text/plain;charset=utf-8,' +
+        encodeURIComponent('Sample Assessment Question Paper Content');
+      element.download = `${
+        assessmentData?.title?.replace(/\s+/g, '_').toLowerCase() ||
+        'assessment'
+      }.pdf`;
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);*/
+
+      const downloadUrl =
+        process.env.NEXT_PUBLIC_ADMIN_SBPLAYER?.replace('sbplayer', '') +
+        '/qp?do_id=' +
+        assessmentId;
+      const newWindow = window.open(
+        downloadUrl,
+        '_blank',
+        'noopener,noreferrer'
+      );
+      if (newWindow) newWindow.focus();
+
+      showToastMessage(
+        t('ASSESSMENTS.DOWNLOAD_SUCCESS') ||
+        'Question paper downloaded successfully',
+        'success'
+      );
+      //setShowDownloadPopup(false);
+    } catch (error) {
+      console.error('Error downloading question paper:', error);
+      showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
+    } finally {
+     // setDownloading(false);
+    }
+  };
   const handleSubmissionSuccess = async () => {
     if (isReUploadMode) {
       // In re-upload mode, update the assessmentData with the new uploaded images
@@ -1031,266 +1128,391 @@ const AssessmentDetails = () => {
         flexDirection: 'column',
         minHeight: '100vh',
         overflow: 'hidden',
+        background: 'linear-gradient(135deg, #FFF8E1 0%, #F5F5F5 100%)',
+        position: 'relative',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundImage: `
+            radial-gradient(circle at 25% 25%, rgba(255, 193, 7, 0.08) 0%, transparent 50%),
+            radial-gradient(circle at 75% 75%, rgba(26, 26, 26, 0.05) 0%, transparent 50%)
+          `,
+          pointerEvents: 'none',
+        },
       }}
     >
-      <Header />
+      {/* <Header /> */}
 
       <Box
         component="header"
         sx={{
           width: '100%',
-          margin: '0 auto',
-          display: 'flex',
-          alignItems: 'center',
-          padding: { xs: '12px 12px 8px 4px', md: '16px 24px 12px 16px' },
-          bgcolor: '#FFFFFF',
+          background: '#FFFFFF',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+          borderBottom: '1px solid rgba(0,0,0,0.08)',
         }}
       >
-        <IconButton
-          onClick={handleBack}
-          sx={{
-            width: '48px',
-            height: '48px',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            '& .MuiSvgIcon-root': {
-              color: '#4D4639',
-              width: '24px',
-              height: '24px',
-            },
-          }}
-        >
-          <KeyboardBackspaceOutlinedIcon />
-        </IconButton>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            padding: '12px 0 0',
-            flex: 1,
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{
-              color: '#4D4639',
-              fontSize: { xs: '22px', md: '24px' },
-              lineHeight: 1.27,
-              fontWeight: 400,
-            }}
-          >
-            {toPascalCase(userDetails?.name)}{' '}
-            {toPascalCase(userDetails?.lastName)}
-          </Typography>
-          <Typography
-            sx={{
-              color: '#7C766F',
-              fontSize: { xs: '14px', md: '16px' },
-              lineHeight: 1.43,
-              fontWeight: 500,
-              letterSpacing: '0.71%',
-            }}
-          >
-            {toPascalCase(assessmentName)}
-          </Typography>
-        </Box>
-      </Box>
-
-      <Box
-        sx={{
-          mx: '16px',
-          my: '16px',
-          display: 'flex',
-          flexDirection: 'column',
-          flex: 1,
-          minHeight: 0,
-          overflow: 'hidden',
-        }}
-      >
-        {/* Assessment Status */}
-        <Box
+        <Container
+          maxWidth="xl"
           sx={{
             display: 'flex',
             alignItems: 'center',
-            gap: 2,
-            pb: 2,
+            padding: { xs: '8px 16px 8px 8px', md: '10px 24px 10px 12px' },
           }}
         >
-          {userAssessmentStatus ? (
-            <>
-              {getStatusIcon(
-                mapAnswerSheetStatusToInternalStatus(userAssessmentStatus)
-              )}
-              <Typography
-                sx={{
-                  color: '#1F1B13',
-                  fontSize: { xs: '14px', md: '16px' },
-                  fontWeight: 400,
-                }}
-              >
-                {getStatusLabel(userAssessmentStatus)}
-              </Typography>
-            </>
-          ) : (
+          <IconButton
+            onClick={handleBack}
+            sx={{
+              width: '40px',
+              height: '40px',
+              backgroundColor: '#F5F5F5',
+              borderRadius: '12px',
+              border: '1px solid rgba(0,0,0,0.08)',
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                backgroundColor: '#FFC107',
+                transform: 'translateY(-1px)',
+                boxShadow: '0 4px 12px rgba(255,193,7,0.3)',
+                '& .MuiSvgIcon-root': {
+                  color: '#1A1A1A',
+                },
+              },
+              '& .MuiSvgIcon-root': {
+                color: '#424242',
+                width: '20px',
+                height: '20px',
+              },
+            }}
+          >
+            <KeyboardBackspaceOutlinedIcon />
+          </IconButton>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              padding: '0 0 0 16px',
+              flex: 1,
+            }}
+          >
             <Typography
+              variant="h5"
               sx={{
-                color: '#1F1B13',
-                fontSize: { xs: '14px', md: '16px' },
-                fontWeight: 400,
+                color: '#1A1A1A',
+                fontSize: { xs: '18px', md: '20px' },
+                lineHeight: 1.3,
+                fontWeight: 600,
+                mb: 0.25,
               }}
             >
-              <MinimizeIcon />
-              Not Submitted
+              {toPascalCase(userDetails?.name)}{' '}
+              {toPascalCase(userDetails?.lastName)}
             </Typography>
-          )}
+            <Typography
+              sx={{
+                color: '#666666',
+                fontSize: { xs: '14px', md: '15px' },
+                lineHeight: 1.4,
+                fontWeight: 500,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+              }}
+            >
+              <Box
+                sx={{
+                  width: '4px',
+                  height: '4px',
+                  borderRadius: '50%',
+                  backgroundColor: '#FFC107',
+                  boxShadow: '0 0 4px rgba(255,193,7,0.6)',
+                }}
+              />
+              {toPascalCase(assessmentName)}
+            </Typography>
+          </Box>
+        </Container>
+      </Box>
+
+      <Container
+        maxWidth="xl"
+        sx={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          px: { xs: 2, sm: 3, md: 4 },
+          py: { xs: 1, md: 2 },
+          minHeight: 0,
+          overflow: 'hidden',
+          position: 'relative',
+          zIndex: 1,
+        }}
+      >
+        {/* Professional Status Card */}
+        <Box
+          sx={{
+            background: 'linear-gradient(135deg, #FFFDE7 0%, #FFF8E1 100%)',
+            borderRadius: '12px',
+            p: { xs: 1, md: 1.25 },
+            mb: { xs: 1, md: 1.5 },
+            border: '1px solid rgba(255,193,7,0.3)',
+            boxShadow: '0 2px 8px rgba(255,193,7,0.08)',
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1.5,
+            }}
+          >
+            <Box
+              sx={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: userAssessmentStatus === 'Completed'
+                  ? 'linear-gradient(135deg, #FFC107, #FFB300)'
+                  : userAssessmentStatus === 'Image_Uploaded'
+                  ? 'linear-gradient(135deg, #FFC107, #FF9800)'
+                  : 'linear-gradient(135deg, #424242, #1A1A1A)',
+                boxShadow: '0 1px 4px rgba(255,193,7,0.2)',
+              }}
+            >
+              {userAssessmentStatus ? (
+                React.cloneElement(getStatusIcon(
+                  mapAnswerSheetStatusToInternalStatus(userAssessmentStatus)
+                ), { 
+                  sx: { 
+                    color: '#FFFFFF', 
+                    fontSize: '16px',
+                  } 
+                })
+              ) : (
+                <MinimizeIcon sx={{ color: '#FFFFFF', fontSize: '16px' }} />
+              )}
+            </Box>
+            <Box sx={{ flex: 1 }}>
+              <Typography
+                sx={{
+                  color: '#1A202C',
+                  fontSize: { xs: '14px', md: '16px' },
+                  fontWeight: 600,
+                  mb: 0.1,
+                }}
+              >
+                Assessment Status
+              </Typography>
+              <Typography
+                sx={{
+                  color: '#4A5568',
+                  fontSize: { xs: '12px', md: '13px' },
+                  fontWeight: 500,
+                }}
+              >
+                {userAssessmentStatus ? getStatusLabel(userAssessmentStatus) : 'Not Submitted'}
+              </Typography>
+            </Box>
+          
+          </Box>
         </Box>
 
-        {/* Two-column layout: Left - existing content, Right - question paper placeholder */}
+        {/* Main content layout */}
         <Grid
           container
-          spacing={2}
-          sx={{ flex: 1, minHeight: 0, overflow: 'hidden' }}
+          spacing={{ xs: 2, md: 3 }}
+          sx={{ 
+            flex: 1, 
+            minHeight: 0, 
+            overflow: 'hidden',
+            justifyContent: 'center',
+            alignItems: 'flex-start',
+          }}
         >
-          <Grid item xs={12} md={12}>
-            {/* Left column */}
-            <>
-              {/* Images Info */}
+          <Grid item xs={12}>
+            {/* Main content section */}
+            <Box sx={{ width: '100%', maxWidth: '100%' }}>
+              {/* Professional Image Upload Card */}
               <Box
-                onClick={handleUploadInfoClick}
                 sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  border: '1px solid #DBDBDB',
-                  borderRadius: '12px',
-                  p: { xs: 2, md: 2 },
-                  mb: { xs: 2, md: 1 },
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  '&:hover': {
-                    borderColor: theme.palette.primary.main,
-                    backgroundColor: '#f5f5f5',
-                    transform: 'translateY(-1px)',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                  },
+                  background: 'linear-gradient(135deg, #ffffff 0%, #fffef7 100%)',
+                  border: '1px solid rgba(255, 193, 7, 0.2)',
+                  borderRadius: '24px',
+                  p: { xs: 3, md: 4 },
+                  mb: 0,
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  boxShadow: '0 10px 40px rgba(255,193,7,0.08)',
                 }}
               >
                 <Box
-                  mb={0.1}
                   sx={{
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleReUpload();
+                    position: 'relative',
+                    zIndex: 1,
                   }}
                 >
                   <Box
                     sx={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: { xs: 0.5, md: 1 },
-                      flexWrap: 'nowrap',
-                      minWidth: 0,
-                      overflow: 'hidden',
+                      gap: { xs: 1.5, md: 2 },
+                      flex: 1,
                     }}
                   >
-                    <Typography
+                    {/* Status Icon */}
+                    <Box
                       sx={{
-                        color: '#635E57',
-                        fontSize: { xs: '12px', md: '16px' },
-                        fontWeight: 400,
-                        letterSpacing: '0.1px',
-                        whiteSpace: 'nowrap',
+                        width: { xs: '48px', md: '52px' },
+                        height: { xs: '48px', md: '52px' },
+                        borderRadius: '14px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: (assessmentData?.fileUrls?.length || 0) > 0
+                          ? 'linear-gradient(135deg, #FFC107, #FFB300)'
+                          : 'linear-gradient(135deg, #FFFDE7, #FFF8E1)',
+                        boxShadow: '0 4px 16px rgba(255,193,7,0.15)',
+                        border: (assessmentData?.fileUrls?.length || 0) > 0 ? 'none' : '2px solid rgba(255,193,7,0.3)',
                       }}
                     >
-                      {assessmentData?.fileUrls &&
-                      assessmentData.fileUrls.length > 0
-                        ? `${assessmentData.fileUrls.length} ${
-                            assessmentData.fileUrls.length === 1
-                              ? 'image'
-                              : 'images'
-                          } uploaded`
-                        : 'No images uploaded'}
-                    </Typography>
-                    {assessmentData?.fileUrls &&
-                      assessmentData.fileUrls.length > 0 && (
-                        <>
-                          <Button
-                            variant="contained"
-                            size="small"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleUploadInfoClick();
-                            }}
-                            sx={{
-                              ml: 0,
-                              textTransform: 'none',
-                              borderRadius: '8px',
-                              fontWeight: 600,
-                              fontSize: { xs: '12px', md: '14px' },
-                              height: { xs: '28px', md: '32px' },
-                              px: { xs: 1, md: 1.5 },
-                              backgroundColor: '#FFC107',
-                              color: '#1F1B13',
-                              '&:hover': { backgroundColor: '#FFB300' },
-                            }}
-                          >
-                            {t('ASSESSMENTS.VIEW')}
-                          </Button>
-                          {[
-                            'AI Processed',
-                            'Awaiting Your Approval',
-                            'AI Pending',
-                            'Approved',
-                          ].includes(assessmentData?.status || '') && (
+                      <FileUploadIcon 
+                        sx={{ 
+                          color: (assessmentData?.fileUrls?.length || 0) > 0 ? '#FFFFFF' : '#FFC107', 
+                          fontSize: { xs: '24px', md: '26px' },
+                        }} 
+                      />
+                    </Box>
+
+                    {/* Content */}
+                    <Box sx={{ flex: 1 }}>
+                      <Typography
+                        sx={{
+                          color: '#1A202C',
+                          fontSize: { xs: '16px', md: '18px' },
+                          fontWeight: 600,
+                          mb: 0.25,
+                        }}
+                      >
+                        Assessment Images
+                      </Typography>
+                      <Typography
+                        sx={{
+                          color: '#4A5568',
+                          fontSize: { xs: '13px', md: '14px' },
+                          fontWeight: 500,
+                          mb: 1.5,
+                        }}
+                      >
+                        {assessmentData?.fileUrls &&
+                        assessmentData.fileUrls.length > 0
+                          ? `${assessmentData.fileUrls.length} ${
+                              assessmentData.fileUrls.length === 1
+                                ? 'image'
+                                : 'images'
+                            } uploaded successfully`
+                          : 'Upload your assessment images using the button below'}
+                      </Typography>
+
+                      {/* Action Buttons */}
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          gap: 1.5,
+                          flexWrap: 'wrap',
+                        }}
+                      >
+                        {assessmentData?.fileUrls &&
+                        assessmentData.fileUrls.length > 0 ? (
+                          <>
                             <Button
                               variant="contained"
-                              size="small"
-                              onClick={(e) => {
-                                // e.stopPropagation();
-                                // handleReUpload();
-                              }}
+                              onClick={() => setUploadViewerOpen(true)}
                               sx={{
-                                ml: 0,
                                 textTransform: 'none',
-                                borderRadius: '8px',
+                                borderRadius: '10px',
                                 fontWeight: 600,
-                                fontSize: { xs: '12px', md: '14px' },
-                                height: { xs: '28px', md: '32px' },
-                                px: { xs: 1, md: 1.5 },
-                                backgroundColor: '#FFC107',
-                                color: '#1F1B13',
-                                '&:hover': { backgroundColor: '#FFB300' },
+                                fontSize: { xs: '12px', md: '13px' },
+                                px: { xs: 1.5, md: 2 },
+                                py: { xs: 0.5, md: 0.75 },
+                                background: 'linear-gradient(135deg, #FFC107, #FFB300)',
+                                color: '#1A1A1A',
+                                boxShadow: '0 2px 8px rgba(255, 193, 7, 0.25)',
+                                '&:hover': {
+                                  background: 'linear-gradient(135deg, #FFB300, #FF9800)',
+                                  transform: 'translateY(-1px)',
+                                  boxShadow: '0 4px 12px rgba(255, 193, 7, 0.35)',
+                                },
                               }}
                             >
-                              {t('ASSESSMENTS.REUPLOAD')}
+                              View Images
                             </Button>
-                          )}
-                        </>
-                      )}
+                            {[
+                              'AI Processed',
+                              'Awaiting Your Approval',
+                              'AI Pending',
+                              'Approved',
+                            ].includes(assessmentData?.status || '') && (
+                              <Button
+                                variant="outlined"
+                                onClick={handleReUpload}
+                                sx={{
+                                  textTransform: 'none',
+                                  borderRadius: '10px',
+                                  fontWeight: 600,
+                                  fontSize: { xs: '12px', md: '13px' },
+                                  px: { xs: 1.5, md: 2 },
+                                  py: { xs: 0.5, md: 0.75 },
+                                  borderColor: 'rgba(255, 193, 7, 0.4)',
+                                  color: '#1A1A1A',
+                                  backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                                  '&:hover': {
+                                    borderColor: '#FFC107',
+                                    backgroundColor: 'rgba(255, 193, 7, 0.2)',
+                                    transform: 'translateY(-1px)',
+                                  },
+                                }}
+                              >
+                                Re-upload
+                              </Button>
+                            )}
+                          </>
+                        ) : (
+                          <Button
+                            variant="contained"
+                            onClick={() => setUploadPopupOpen(true)}
+                            sx={{
+                              textTransform: 'none',
+                              borderRadius: '10px',
+                              fontWeight: 600,
+                              fontSize: { xs: '12px', md: '13px' },
+                              px: { xs: 1.5, md: 2 },
+                              py: { xs: 0.5, md: 0.75 },
+                              background: 'linear-gradient(135deg, #FFC107, #FFB300)',
+                              color: '#1A1A1A',
+                              boxShadow: '0 2px 8px rgba(255, 193, 7, 0.25)',
+                              '&:hover': {
+                                background: 'linear-gradient(135deg, #FFB300, #FF9800)',
+                                transform: 'translateY(-1px)',
+                                boxShadow: '0 4px 12px rgba(255, 193, 7, 0.35)',
+                              },
+                            }}
+                          >
+                            Upload Images
+                          </Button>
+                        )}
+                      </Box>
+                    </Box>
                   </Box>
-                  <IconButton
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleReUpload();
-                    }}
-                    sx={{
-                      color: '#1F1B13',
-                      p: 0,
-                      '& .MuiSvgIcon-root': {
-                        fontSize: { xs: 22, md: 28 },
-                      },
-                      mb: 0,
-                    }}
-                  >
-                    <FileUploadIcon />
-                    {/* {!assessmentData?.status ? <FileUploadIcon /> : null} */}
-                  </IconButton>
                 </Box>
                 {/* Main content */}
                 <Box sx={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
@@ -1312,41 +1534,117 @@ const AssessmentDetails = () => {
                     )
                   ) : null}
                 </Box>
+
+                {/* Professional Download Card */}
+                <Box
+                  sx={{
+                    mt: { xs: 2, md: 3 },
+                    maxWidth: { xs: '100%', md: '400px' },
+                    mx: 'auto',
+                    backgroundColor: '#ECE6F0',
+                    borderRadius: '16px',
+                    p: { xs: 1.5, md: 2 },
+                    position: 'relative',
+                    overflow: 'hidden',
+                    boxShadow: '0 4px 16px rgba(236, 230, 240, 0.4)',
+                    border: '1px solid rgba(236, 230, 240, 0.6)',
+                  }}
+                >
+                  <Box
+                    onClick={handleDownloadQuestionPaper}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: { xs: 1.5, md: 2 },
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      '&:hover': {
+                        transform: 'translateY(-1px)',
+                      },
+                    }}
+                  >
+                    <PictureAsPdfIcon
+                      sx={{ 
+                        color: '#D32F2F', 
+                        fontSize: { xs: '24px', md: '28px' },
+                      }}
+                    />
+                    <Typography
+                      sx={{
+                        color: '#1A1A1A',
+                        fontSize: { xs: '16px', md: '16px' },
+                        fontWeight: 500,
+                        flex: 1,
+                      }}
+                    >
+                      Download Question Paper.pdf
+                    </Typography>
+                    <DownloadIcon
+                      sx={{
+                        color: '#666666',
+                        fontSize: { xs: '20px', md: '24px' },
+                      }}
+                    />
+                  </Box>
+                </Box>
+
+                {/* Professional Manual Assessment Section */}
+                {assessmentStatus === 'Approved' && (
+                  <Box
+                    sx={{
+                      mt: { xs: 3, md: 4 },
+                      background: 'linear-gradient(135deg, #ffffff 0%, #fffef7 100%)',
+                      border: '1px solid rgba(255, 193, 7, 0.2)',
+                      borderRadius: '24px',
+                      p: { xs: 3, md: 4 },
+                      boxShadow: '0 10px 40px rgba(255,193,7,0.08)',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: '4px',
+                        background: 'linear-gradient(90deg, #FFC107, #FFB300)',
+                      },
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        color: '#1A202C',
+                        fontSize: { xs: '20px', md: '24px' },
+                        fontWeight: 700,
+                        mb: { xs: 2, md: 3 },
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 2,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: '8px',
+                          height: '8px',
+                          borderRadius: '50%',
+                          backgroundColor: '#FFC107',
+                          boxShadow: '0 0 12px rgba(255,193,7,0.8)',
+                        }}
+                      />
+                      Manual Assessment Review
+                    </Typography>
+                    <QuestionMarksManualUpdate
+                      assessmentDoId={assessmentId}
+                      userId={userId}
+                      assessmentStatusData={assessmentStatusData}
+                    />
+                  </Box>
+                )}
               </Box>
-            </>
-          </Grid>
-          <Grid item xs={12} md={12}>
-            {/* Right column - Question Paper placeholder */}
-            <Box
-              sx={{
-                border: '1px solid #DBDBDB',
-                borderRadius: '12px',
-                p: { xs: 2, md: 2 },
-                height: 'fit-content',
-                position: 'static',
-                bgcolor: '#FFFFFF',
-              }}
-            >
-              {/* <Typography
-                sx={{
-                  color: '#635E57',
-                  fontSize: { xs: '14px', md: '16px' },
-                  fontWeight: 500,
-                }}
-              >
-                Question Paper UI coming soon
-              </Typography> */}
-              <QuestionMarksManualUpdate
-                assessmentDoId={assessmentId}
-                userId={userId}
-                assessmentStatusData={assessmentStatusData}
-                parentId={parentId}
-                unitId={unitId}
-              />
             </Box>
           </Grid>
         </Grid>
-      </Box>
+      </Container>
 
       {/* Edit Modal */}
       <GenericModal
@@ -1468,7 +1766,6 @@ const AssessmentDetails = () => {
         isOpen={uploadPopupOpen}
         onClose={handleCloseUploadPopup}
         uploadedImages={uploadedImages}
-        parentId={parentId as string}
         onImageUpload={handleImageUpload}
         onImageRemove={handleImageRemove}
         userId={typeof userId === 'string' ? userId : undefined}
@@ -1479,6 +1776,7 @@ const AssessmentDetails = () => {
         onSubmissionSuccess={handleSubmissionSuccess}
         isReUploadMode={isReUploadMode}
         setAssessmentTrackingData={setAssessmentTrackingData}
+        parentId={parentId as string}
       />
 
       {/* Snackbar for feedback */}
@@ -1507,18 +1805,37 @@ export async function getStaticPaths() {
   };
 }
 
-export async function getStaticProps({
-  params,
-  locale,
-}: {
-  params: any;
-  locale: string;
-}) {
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, ['common'])),
-    },
-  };
-}
+// export async function getStaticProps({
+//   locale,
+// }: {
+//   params: { assessmentId: string; userId: string };
+//   locale: string;
+// }) {
+//   return {
+//     props: {
+//       ...(await serverSideTranslations(locale, ['common'])),
+//     },
+//   };
+// }
 
-export default AssessmentDetails;
+// Wrapper component with Suspense boundary
+const AssessmentDetailsWithSuspense = () => {
+  return (
+    <Suspense fallback={
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '100vh',
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    }>
+      <AssessmentDetails />
+    </Suspense>
+  );
+};
+
+export default AssessmentDetailsWithSuspense;

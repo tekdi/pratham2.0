@@ -91,6 +91,7 @@ export interface CohortListParam {
 export interface CohortMemberList {
   limit?: number;
   page?: number;
+  offset?:number
   filters: {
     cohortId: string;
     role?: string;
@@ -317,7 +318,25 @@ export interface GetDoIdServiceParam {
     assessmentType?: string | string[];
     state?: string;
     evaluationType?: string | string[];
+    leafNodes?: string | string[];
   };
+}
+
+export interface CompositeSearchParam {
+  filters: {
+    program?: string | string[];
+    se_domains?: string | string[];
+    status?: string | string[];
+    primaryCategory?: string | string[];
+    channel?: string;
+    leafNodes?: string | string[];
+    board?: string[];
+    subject?: string | string[];
+    assessmentType?: string | string[];
+    state?: string;
+    evaluationType?: string | string[];
+  };
+  fields?: string[];
 }
 
 export interface CustomField {
