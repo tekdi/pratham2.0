@@ -10,6 +10,7 @@ import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
 import {
   createAssessmentTracking,
+  createContentTracking,
   updateAssessmentScore,
 } from '../../services/AssesmentService';
 import { useTranslation } from 'next-i18next';
@@ -637,6 +638,15 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
         // console.log('API success update:', response);
         router.reload();
       }
+
+      const result = await createContentTracking({
+        userId: userId,
+        contentId: do_id, 
+        courseId: parentId,
+        unitId: unitId,
+        totalScore: totalScore
+      });
+
     } catch (error) {
       console.error('API error while creating assessment tracking:', error);
       set_isSubmitting(false);

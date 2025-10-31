@@ -270,7 +270,8 @@ const AssessmentList = () => {
      
     ) => {
       const filters = {
-        program:  loggedInProgram,
+         program:  loggedInProgram,
+      //  program:  ["Second Chance"],
         // board: [selectedBoard],
         status: ['Live'],
         primaryCategory: ['Practice Question Set'],
@@ -317,6 +318,8 @@ const AssessmentList = () => {
 
         const courseListFilters = {
         program:  loggedInProgram,
+       // program:  ["Second Chance"],
+
         // board: [selectedBoard],
         status: ['Live'],
         primaryCategory: ['Course'],
@@ -358,7 +361,7 @@ const AssessmentList = () => {
       if (courseListResponse?.result?.content?.length > 0) {
         courseListResponse.result.content.forEach((course: any) => {
           if (!course.appIcon) {
-            course.appIcon = "https://prod-knowlg-inquiry-cluster.s3-ap-south-1.amazonaws.com/content/assets/do_21440433475719168011846/596479.thumb.png";
+            course.appIcon = "/youthnet/images/decorationBg.png";
           }
         });
       }

@@ -405,6 +405,81 @@ export const getOfflineAssessmentDetails = async ({
   }
 };
 
+export const createContentTracking = async ({
+  userId,
+  contentId,
+  courseId,
+  unitId,
+  totalScore,
+}: {
+  userId: string;
+  contentId: string;
+  courseId: string;
+  unitId: string;
+  totalScore: number;
+}) => {
+  const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/content/create`;
+  
+  const payload = {
+    userId,
+    contentId,
+    courseId,
+    unitId,
+    contentType: "COLLECTION",
+    contentMime: "application/vnd.ekstep.content-collection",
+    lastAccessOn: new Date().toISOString(),
+    detailsObject: [
+      {
+        eid: "START",
+        edata: {
+          type: "content",
+          mode: "play",
+          pageid: "",
+          duration: 10
+        },
+        identifier: contentId,
+        contentType: "quml"
+      },
+      {
+        eid: "END",
+        edata: {
+          type: "content",
+          mode: "play",
+          pageid: "sunbird-player-Endpage",
+          summary: [
+            {
+              progress: 100
+            },
+            {
+              totalNoofQuestions: 0
+            },
+            {
+              visitedQuestions: 0
+            },
+            {
+              endpageseen: true
+            },
+            {
+              score: totalScore
+            }
+          ],
+          duration: 10
+        },
+        identifier: contentId,
+        contentType: "quml"
+      }
+    ]
+  };
+
+  try {
+    const response = await post(apiUrl, payload);
+    return response?.data;
+  } catch (error) {
+    console.error('Error in creating content tracking:', error);
+    throw error;
+  }
+};
+
 const API_URL = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;
 export const hierarchyContent = async (content_do_id: string) => {
   // console.log({ content_do_id });
