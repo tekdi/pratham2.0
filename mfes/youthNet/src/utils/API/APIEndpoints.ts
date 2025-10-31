@@ -10,6 +10,11 @@ const API_ENDPOINTS = {
   userList: `${baseurl}/user/list`,
   fieldOptionsRead: `${baseurl}/fields/options/read`,
   accountCreate: `${baseurl}/account/create`, 
+  assessmentList: `${baseurl}/tracking/assessment/list`,
+
+  cohortMemberList: `${baseurl}/cohortmember/list`,
+  assessmentSearchStatus: `${baseurl}/tracking/assessment/search/status`,
+  assessmentSearch: `${baseurl}/tracking/assessment/search`,
 
 
 
