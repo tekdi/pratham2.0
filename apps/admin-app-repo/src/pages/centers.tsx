@@ -76,11 +76,11 @@ const Centers = () => {
   const searchStoreKey = 'centers';
   const initialFormDataSearch =
     localStorage.getItem(searchStoreKey) &&
-      localStorage.getItem(searchStoreKey) != '{}'
+    localStorage.getItem(searchStoreKey) != '{}'
       ? JSON.parse(localStorage.getItem(searchStoreKey))
       : localStorage.getItem('stateId')
-        ? { state: [localStorage.getItem('stateId')] }
-        : {};
+      ? { state: [localStorage.getItem('stateId')] }
+      : {};
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -661,7 +661,7 @@ const Centers = () => {
         {response != null ? (
           <>
             {response &&
-              response?.result?.results?.cohortDetails?.length > 0 ? (
+            response?.result?.results?.cohortDetails?.length > 0 ? (
               <Box sx={{ mt: 1 }}>
                 <PaginatedTable
                   count={response?.result?.count}
@@ -694,8 +694,8 @@ const Centers = () => {
           open={openBatchModal}
           onClose={() => setOpenBatchModal(false)}
           showFooter={false}
-          modalTitle={t("CENTERS.BATCHES_FOR_CENTER", {
-            centerName: transformLabel(selectedCenter?.name || "")
+          modalTitle={t('CENTERS.BATCHES_FOR_CENTER', {
+            centerName: transformLabel(selectedCenter?.name || ''),
           })}
           isFullwidth={true}
         >
