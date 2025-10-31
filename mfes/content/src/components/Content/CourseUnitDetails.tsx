@@ -296,7 +296,7 @@ export default function Details(props: DetailsProps) {
 
     console.log('subItem?.evaluationType=====>', subItem?.evaluationType);
     console.log('subItem?.program=====>', subItem?.program );
-     if( subItem?.assessmentType==='Unit Test' && subItem?.evaluationType==='offline'){
+     if( subItem?.evaluationType==='offline'){
       console.log('subItem?.program?.[0]=====>', subItem?.program?.[0]);
       const userId = getUserId(props?._config?.userIdLocalstorageName);
       const userIdString = Array.isArray(userId) ? userId[0] : userId;
