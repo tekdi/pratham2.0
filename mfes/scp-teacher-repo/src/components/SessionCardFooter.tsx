@@ -131,7 +131,7 @@ const SessionCardFooter: React.FC<SessionCardFooterProps> = ({
               }
             );
             courseData = response?.result?.data[0];
-            courseId = courseData._id;
+            courseId = courseData?._id;
           }
 
           // let courseData = response?.result?.data[0];
