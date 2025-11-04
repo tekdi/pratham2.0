@@ -78,6 +78,16 @@ const DeleteDetails: React.FC<DeleteDetailsProps> = ({
               control={<Radio />}
               label={t("COMMON.DUPLICATED_USER")}
             />
+            <FormControlLabel
+              value="Resigned from Company"
+              control={<Radio />}
+              label={t("COMMON.RESIGNED_FROM_COMPANY")}
+            />
+            <FormControlLabel
+              value="Moved to Different Role"
+              control={<Radio />}
+              label={t("COMMON.MOVED_TO_DIFFERENT_ROLE")}
+            />
           </RadioGroup>
         </FormControl>
       )}
