@@ -61,7 +61,7 @@ const columns = [
     key: 'lastUpdatedOn',
     title: 'LAST MODIFIED',
     dataType: DataType.String,
-    width: '100px',
+    width: '180px',
   },
   {
     key: 'contentAction',
