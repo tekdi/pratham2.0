@@ -56,6 +56,15 @@ const App = ({
   useEffect(() => {
     const fetch = async () => {
       const response = await fetchContent(identifier);
+      const rt = await hierarchyAPI(identifier as string) as any;
+
+      console.log('response=======>', rt?.program);
+      if (!rt?.program?.includes(localStorage.getItem('userProgram')))
+      {
+        router.push('/unauthorized');
+        return;
+      }
+      
       const response2 = await ContentSearch({
         filters: {
           identifier: [identifier]

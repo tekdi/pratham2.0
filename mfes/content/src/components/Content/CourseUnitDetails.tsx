@@ -74,7 +74,13 @@ export default function Details(props: DetailsProps) {
       try {
         const resultHierarchyCourse = await hierarchyAPI(identifier, {
           mode: 'edit',
-        });
+        }) as any;
+        console.log('resultHierarchyCourse=======>', resultHierarchyCourse?.program);
+        if (!resultHierarchyCourse?.program?.includes(localStorage.getItem('userProgram')))
+        {
+          router.push('/unauthorized');
+          return;
+        }
         let resultHierarchy = resultHierarchyCourse;
         console.log('resultHierarchyCourse', resultHierarchyCourse);
         
