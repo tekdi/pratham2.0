@@ -76,7 +76,7 @@ export default function Details(props: DetailsProps) {
           mode: 'edit',
         }) as any;
         console.log('resultHierarchyCourse=======>', resultHierarchyCourse?.program);
-        if (!resultHierarchyCourse?.program?.includes(localStorage.getItem('userProgram')))
+        if (!resultHierarchyCourse?.program?.includes(localStorage.getItem('userProgram')) && !resultHierarchyCourse.program.includes('Open School'))
         {
           router.push('/unauthorized');
           return;
