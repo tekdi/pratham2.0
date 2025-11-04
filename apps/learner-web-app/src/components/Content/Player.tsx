@@ -59,7 +59,7 @@ const App = ({
       const rt = await hierarchyAPI(identifier as string) as any;
 
       console.log('response=======>', rt?.program);
-      if (!rt?.program?.includes(localStorage.getItem('userProgram')))
+      if (!rt?.program?.includes(localStorage.getItem('userProgram')) && !rt.program.includes('Open School'))
       {
         router.push('/unauthorized');
         return;

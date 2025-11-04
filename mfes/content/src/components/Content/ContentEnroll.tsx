@@ -57,7 +57,7 @@ const ContentDetails = (props: ContentDetailsProps) => {
 
 console.log('result=======>', result?.program);
 
-        if (!result?.program?.includes(localStorage.getItem('userProgram')))
+        if (!result?.program?.includes(localStorage.getItem('userProgram')) && !result.program.includes('Open School'))
         {
           router.push('/unauthorized');
           return;
