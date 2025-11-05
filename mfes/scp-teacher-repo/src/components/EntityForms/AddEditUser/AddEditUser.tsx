@@ -129,7 +129,7 @@ const AddEditUser = ({
          // 'ownphonecheck',
         //  'parent_phone',
          // 'preferred_mode_of_learning',
-          'drop_out_reason',
+          //'drop_out_reason',
          // 'work_domain',
         //  'what_do_you_want_to_become',
          // 'guardian_name',
