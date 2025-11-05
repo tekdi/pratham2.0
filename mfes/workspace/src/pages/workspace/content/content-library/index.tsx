@@ -27,7 +27,7 @@ const columns = [
     key: 'title_and_description',
     title: 'TITLE & DESCRIPTION',
     dataType: DataType.String,
-    width: '350px',
+    width: '450px',
   },
   {
     key: 'create-by',
