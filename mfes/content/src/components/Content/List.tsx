@@ -301,15 +301,30 @@ export default function Content(props: Readonly<ContentProps>) {
         ? filter.offset + filter.limit
         : filter.limit;
       const adjustedOffset = filter.loadOld ? 0 : filter.offset;
+      let resultResponse;
+      if(props.onTotalCountChange)
+      {
+        resultResponse = await ContentSearch({
+          ...filter,
+          offset: adjustedOffset,
+          limit: adjustedLimit,
+          signal: controller.signal,
+          noPrimaryCategory: true,
+        });
+      }
+      else{
+        resultResponse = await ContentSearch({
+          ...filter,
+          offset: adjustedOffset,
+          limit: adjustedLimit,
+          signal: controller.signal,
+        });
 
-      const resultResponse = await ContentSearch({
-        ...filter,
-        offset: adjustedOffset,
-        limit: adjustedLimit,
-        signal: controller.signal,
-      });
+      }
+      
 
       if (resultResponse?.result?.count) {
+
         setTotalCount(resultResponse?.result?.count);
         if(props.setTotalResources)
         {
