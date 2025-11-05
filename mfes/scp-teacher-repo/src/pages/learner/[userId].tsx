@@ -1221,6 +1221,11 @@ if (familyField?.displayValue) {
                   displayValue = batchNames.map((name) => toPascalCase(name)).join(', ');
                 }
 
+                // Skip rendering if displayValue is empty string
+                if (displayValue === '') {
+                  return null;
+                }
+
                 const labelText = item.label
                   ? t(`FORM.${item?.label?.toUpperCase()}`, item?.label)
                   : item?.label;
