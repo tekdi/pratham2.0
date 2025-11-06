@@ -57,12 +57,16 @@ const App = ({
     const fetch = async () => {
       const response = await fetchContent(identifier);
       const rt = await hierarchyAPI(identifier as string) as any;
+      const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+      const isThematicPath = currentPath.includes('/themantic');
+      if(!isThematicPath) {
 
       console.log('response=======>', rt?.program);
       if (!rt?.program?.includes(localStorage.getItem('userProgram')) && !rt.program.includes('Open School'))
       {
         router.push('/unauthorized');
         return;
+      }
       }
       
       const response2 = await ContentSearch({

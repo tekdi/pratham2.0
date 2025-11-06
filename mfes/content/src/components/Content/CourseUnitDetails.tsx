@@ -75,11 +75,15 @@ export default function Details(props: DetailsProps) {
         const resultHierarchyCourse = await hierarchyAPI(identifier, {
           mode: 'edit',
         }) as any;
+        const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+        const isThematicPath = currentPath.includes('/themantic');
+        if(!isThematicPath) {
         console.log('resultHierarchyCourse=======>', resultHierarchyCourse?.program);
-        if (!resultHierarchyCourse?.program?.includes(localStorage.getItem('userProgram')) && !resultHierarchyCourse.program.includes('Open School'))
-        {
-          router.push('/unauthorized');
-          return;
+          if (!resultHierarchyCourse?.program?.includes(localStorage.getItem('userProgram')) && !resultHierarchyCourse.program.includes('Open School'))
+          {
+            router.push('/unauthorized');
+            return;
+          }
         }
         let resultHierarchy = resultHierarchyCourse;
         console.log('resultHierarchyCourse', resultHierarchyCourse);
