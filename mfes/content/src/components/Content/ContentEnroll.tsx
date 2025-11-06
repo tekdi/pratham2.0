@@ -56,12 +56,19 @@ const ContentDetails = (props: ContentDetailsProps) => {
         const result = await hierarchyAPI(identifier as string)as any;
 
 console.log('result=======>', result?.program);
+const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+console.log('currentPath=======>', currentPath);
+const isThematicPath = currentPath.includes('/themantic');
+console.log('isThematicPath=======>', isThematicPath);
+
+if(!isThematicPath) {
 
         if (!result?.program?.includes(localStorage.getItem('userProgram')) && !result.program.includes('Open School'))
         {
           router.push('/unauthorized');
           return;
         }
+      }
         const userId = getUserId(props?._config?.userIdLocalstorageName);
         setCheckLocalAuth(checkAuth(Boolean(userId)));
         if (props?._config?.isEnrollmentRequired !== false) {

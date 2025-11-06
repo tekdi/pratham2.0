@@ -222,7 +222,7 @@ const DynamicMultiFilter: React.FC<DynamicMultiFilterProps> = ({
 
   // Handle change and reset dependents recursively
   const handleChange = (code: string, value: string[]) => {
-    let newFilters = { ...selectedFilters, [code]: value };
+    const newFilters = { ...selectedFilters, [code]: value };
     // Reset all fields listed in this field's depends array (backend style)
     const resetDependents = (changedCode: string) => {
       const field = readData.find(f => f.code === changedCode);
@@ -254,8 +254,8 @@ const DynamicMultiFilter: React.FC<DynamicMultiFilterProps> = ({
     placeholder?: string,
     disabled?: boolean
   ) => (
-    <Grid item xs={12} sm={6} md={4} lg={3} key={code} sx={{ paddingRight: { xs: '0px', sm: '4px' }, paddingBottom: '16px' }}>
-      <FormControl sx={{ width: { xs: '100%', lg: '350px' }, margin: 0 }} disabled={disabled}>
+    <Grid item xs={12} sm={6} md={4} lg={3} key={code}>
+      <FormControl fullWidth disabled={disabled}>
         <InputLabel sx={{ color: '#000000DB', fontSize: '14px', top: '-7px', '&.MuiInputLabel-shrink': { top: 0 } }}>{label}</InputLabel>
         <Select
           multiple
@@ -335,7 +335,7 @@ const DynamicMultiFilter: React.FC<DynamicMultiFilterProps> = ({
 
   // Render all fields dynamically
   return (
-    <Grid container>
+    <Grid container spacing={2}>
       {/* Domain */}
       {(() => {
         const field = getField(readData, 'domain');
