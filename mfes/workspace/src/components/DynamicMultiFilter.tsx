@@ -57,7 +57,7 @@ const getOptions = (
     // Find the posFrameworkData object for this field
     const posObj = getPosDataByCode(posFrameworkData, field.code);
     if (!posObj) return [];
-    let options: any[] = [];
+    const options: any[] = [];
     // For each dependency, get selected values
     field.depends.forEach((dep) => {
       const depPosObj = getPosDataByCode(posFrameworkData, dep);
@@ -254,9 +254,9 @@ const DynamicMultiFilter: React.FC<DynamicMultiFilterProps> = ({
     placeholder?: string,
     disabled?: boolean
   ) => (
-    <Grid item xs={12} sm={6} md={4} key={code}>
-      <FormControl sx={{ width: '100%', mt: 2 }} disabled={disabled}>
-        <InputLabel sx={{ color: '#000000DB' }}>{label}</InputLabel>
+    <Grid item xs={12} sm={6} md={4} lg={3} key={code} sx={{ paddingRight: { xs: '0px', sm: '4px' }, paddingBottom: '16px' }}>
+      <FormControl sx={{ width: { xs: '100%', lg: '350px' }, margin: 0 }} disabled={disabled}>
+        <InputLabel sx={{ color: '#000000DB', fontSize: '14px', top: '-7px', '&.MuiInputLabel-shrink': { top: 0 } }}>{label}</InputLabel>
         <Select
           multiple
           value={selectedFilters[code] || []}
@@ -278,11 +278,17 @@ const DynamicMultiFilter: React.FC<DynamicMultiFilterProps> = ({
           sx={{
             '& .MuiOutlinedInput-root': {
               '&.Mui-focused fieldset': { borderColor: '#000' },
+              minHeight: '48px',
             },
             '& .MuiSelect-select': {
-              height: '20px',
+              height: '18px',
               display: 'flex',
               alignItems: 'center',
+              padding: '10px 14px',
+              fontSize: '14px',
+            },
+            '& .MuiInputBase-root': {
+              minHeight: '48px',
             },
           }}
         >
@@ -292,19 +298,28 @@ const DynamicMultiFilter: React.FC<DynamicMultiFilterProps> = ({
               value={option.code || option.key || option.value || option.name}
               sx={{
                 color: '#000',
+                padding: '6px 16px',
+                minHeight: '36px',
+                fontSize: '14px',
                 '& .MuiCheckbox-root': {
                   color: '#000',
                   '&.Mui-checked, &.MuiCheckbox-indeterminate': {
                     color: '#000',
                   },
                 },
-                '& .MuiSvgIcon-root': { fontSize: '20px' },
+                '& .MuiSvgIcon-root': { fontSize: '16px' },
+                '& .MuiListItemText-root': {
+                  '& .MuiTypography-root': {
+                    fontSize: '14px',
+                  },
+                },
               }}
             >
               <Checkbox
                 checked={(selectedFilters[code] || []).indexOf((option.code || option.key || option.value || option.name) ?? '') > -1}
                 sx={{
                   color: '#000',
+                  padding: '6px',
                   '&.Mui-checked, &.MuiCheckbox-indeterminate': {
                     color: '#000',
                   },
@@ -320,7 +335,7 @@ const DynamicMultiFilter: React.FC<DynamicMultiFilterProps> = ({
 
   // Render all fields dynamically
   return (
-    <Grid container spacing={2}>
+    <Grid container>
       {/* Domain */}
       {(() => {
         const field = getField(readData, 'domain');

@@ -412,7 +412,7 @@ const rangeLength = contentLanguageField?.range?.length || 0;
             }}
           >
 <SpeakableText>
-  {totalResources}
+  {videosCount+gamesCount+otherFormatsCount}
 </SpeakableText>
           </Typography>
           <Typography
