@@ -24,6 +24,7 @@ import AppConst from '@content-mfes/utils/AppConst/AppConst';
 import { checkAuth, getUserId } from '@shared-lib-v2/utils/AuthService';
 import { getUserId as getUserIdLocal } from '@content-mfes/services/LoginService';
 import BreadCrumb from '../BreadCrumb';
+import { TenantName } from '@shared-lib-v2/utils/app.constant';
 
 interface DetailsProps {
   isShowLayout?: any;
@@ -300,6 +301,19 @@ export default function Details(props: DetailsProps) {
   ]);
 
   const handleItemClick = (subItem: any) => {
+    console.log('subItem=====>', subItem);
+    console.log('subItem?.assessmentType=====>', subItem?.assessmentType);
+
+    console.log('subItem?.evaluationType=====>', subItem?.evaluationType);
+    console.log('subItem?.program=====>', subItem?.program );
+     if( subItem?.evaluationType==='offline'){
+      console.log('subItem?.program?.[0]=====>', subItem?.program?.[0]);
+      const userId = getUserId(props?._config?.userIdLocalstorageName);
+      const userIdString = Array.isArray(userId) ? userId[0] : userId;
+      router.push(`/manual-assessment?assessmentId=${subItem?.identifier}&userId=${userIdString}&parentId=${identifier}`);
+      return;
+     }
+
     if (props?._config?.handleCardClick) {
       props?._config.handleCardClick?.(subItem);
     } else {
