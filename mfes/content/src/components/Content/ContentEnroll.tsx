@@ -59,9 +59,10 @@ console.log('result=======>', result?.program);
 const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
 console.log('currentPath=======>', currentPath);
 const isThematicPath = currentPath.includes('/themantic');
+const isPosPath = currentPath.includes('/pos');
 console.log('isThematicPath=======>', isThematicPath);
 
-if(!isThematicPath) {
+if(!isThematicPath && !isPosPath) {
 
         if (!result?.program?.includes(localStorage.getItem('userProgram')) && !result.program.includes('Open School'))
         {
@@ -225,7 +226,7 @@ if(!isThematicPath) {
                 width: { sx: '100%', sm: '90%', md: '85%' },
               }}
             >
-              <Box>
+              {/* <Box>
                 <Typography
                   variant="body1"
                   component="div"
@@ -244,7 +245,7 @@ if(!isThematicPath) {
                     {contentDetails?.description ?? 'No description available'}
                   </SpeakableText>
                 </Typography>
-              </Box>
+              </Box> */}
               <Box
                 sx={{
                   display: 'flex',

@@ -77,7 +77,8 @@ export default function Details(props: DetailsProps) {
         }) as any;
         const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
         const isThematicPath = currentPath.includes('/themantic');
-        if(!isThematicPath) {
+        const isPosPath = currentPath.includes('/pos');
+        if(!isThematicPath && !isPosPath) {
         console.log('resultHierarchyCourse=======>', resultHierarchyCourse?.program);
           if (!resultHierarchyCourse?.program?.includes(localStorage.getItem('userProgram')) && !resultHierarchyCourse.program.includes('Open School'))
           {

@@ -59,7 +59,9 @@ const App = ({
       const rt = await hierarchyAPI(identifier as string) as any;
       const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
       const isThematicPath = currentPath.includes('/themantic');
-      if(!isThematicPath) {
+      const isPosPath = currentPath.includes('/pos');
+
+      if(!isThematicPath && !isPosPath) {
 
       console.log('response=======>', rt?.program);
       if (!rt?.program?.includes(localStorage.getItem('userProgram')) && !rt.program.includes('Open School'))
