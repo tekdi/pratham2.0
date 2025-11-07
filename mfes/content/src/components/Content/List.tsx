@@ -30,6 +30,7 @@ import LayoutPage from '@content-mfes/components/LayoutPage';
 import { getUserCertificates } from '@content-mfes/services/Certificate';
 import { getUserId } from '@shared-lib-v2/utils/AuthService';
 import { telemetryFactory } from '@shared-lib-v2/DynamicForm/utils/telemetry';
+import { TenantName } from '@shared-lib-v2/utils/app.constant';
 
 // Constants
 const SUPPORTED_MIME_TYPES = [
@@ -157,7 +158,7 @@ export default function Content(props: Readonly<ContentProps>) {
   const [propData, setPropData] = useState<ContentProps>();
   const [currentLimit, setCurrentLimit] = useState<number>(LIMIT);
   const abortControllerRef = useRef<AbortController | null>(null);
-
+ 
   // Session keys
   const sessionKeys = {
     filters: `${props?.pageName}_savedFilters`,
@@ -302,6 +303,12 @@ export default function Content(props: Readonly<ContentProps>) {
         : filter.limit;
       const adjustedOffset = filter.loadOld ? 0 : filter.offset;
       let resultResponse;
+      if((props.filters as any)?.filters?.program===TenantName.CREATIVITY_CLUB){
+        if (!filter.filters) {
+          filter.filters = {};
+        }
+        (filter.filters as any).primaryCategory = ['Course'];
+      }
       if(props.onTotalCountChange)
       {
         resultResponse = await ContentSearch({
