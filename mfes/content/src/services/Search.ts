@@ -150,9 +150,10 @@ export const ContentSearch = async ({
       status: ['live'],
       channel: localStorage.getItem('channelId'),
     };
+   // console.log('filtersObject====>', filtersObject?.primaryCategory);
 
-    // Only add primaryCategory if noPrimaryCategory is false
-    if (!noPrimaryCategory) {
+    // Only add primaryCategory if noPrimaryCategory is false and primaryCategory is not already set
+    if (!noPrimaryCategory && !filtersObject.primaryCategory) {
       filtersObject.primaryCategory =
         type?.toLowerCase() === 'course' || type?.toLowerCase() === 'self'
           ? ['Course']
