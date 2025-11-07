@@ -56,7 +56,7 @@ const App = ({
   useEffect(() => {
     const fetch = async () => {
       const response = await fetchContent(identifier);
-      const rt = await hierarchyAPI(identifier as string) as any;
+      const rt = await hierarchyAPI(courseId as string) as any;
       const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
       const isThematicPath = currentPath.includes('/themantic');
       const isPosPath = currentPath.includes('/pos');

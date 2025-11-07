@@ -72,7 +72,7 @@ export default function Details(props: DetailsProps) {
   useEffect(() => {
     const getDetails = async (identifier: string) => {
       try {
-        const resultHierarchyCourse = await hierarchyAPI(identifier, {
+        const resultHierarchyCourse = await hierarchyAPI(courseId as string, {
           mode: 'edit',
         }) as any;
         const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
