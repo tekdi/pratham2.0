@@ -192,10 +192,10 @@ const SSOContent = () => {
       localStorage.setItem('userId', userResponse?.userId);
       localStorage.setItem('tenantId', userResponse?.tenantData[0]?.tenantId);
       localStorage.setItem('firstName', userResponse?.firstName);
-      localStorage.setItem('roleId', userResponse?.roleId);
-      localStorage.setItem('roleName', userResponse?.roleName);
-      localStorage.setItem('tenantName', userResponse?.tenantName);
-      localStorage.setItem('tenantData', JSON.stringify(userResponse?.tenantData));
+     // localStorage.setItem('roleId', userResponse?.roleId);
+     // localStorage.setItem('roleName', userResponse?.roleName);
+     // localStorage.setItem('tenantName', userResponse?.tenantName);
+     // localStorage.setItem('tenantData', JSON.stringify(userResponse?.tenantData));
      // localStorage.setItem('userData', JSON.stringify(userResponse?.userData));
       setTimeout(async () => {
         const res = await getUserDetails(userResponse?.userId, true);
@@ -271,6 +271,10 @@ const SSOContent = () => {
         localStorage.setItem('templtateId', tenantData.templateId);
         localStorage.setItem('userIdName', userResponse?.username);
         localStorage.setItem('firstName', userResponse?.firstName || '');
+        localStorage.setItem('roleId', roleId);
+        localStorage.setItem('roleName', roleName);
+        localStorage.setItem('tenantName', tenantName);
+        localStorage.setItem('tenantId', tenantId);
 
         const uiConfig = tenantData?.params?.uiConfig;
 
@@ -323,13 +327,14 @@ const SSOContent = () => {
         // } else if (tenantName === TenantName.PRAGYANPATH) {
         //   router.push('/courses-contents');
         // }
-        const landingPage = localStorage.getItem('landingPage') || '';
+        // const landingPage = localStorage.getItem('landingPage') || '';
 
-        if (landingPage) {
-          router.push(landingPage);
-        } else {
-          router.push('/content');
-        }
+        // if (landingPage) {
+        //   router.push(landingPage);
+        // } else {
+        //   router.push('/content');
+        // }
+        router.push('/manager-dashboard');
       } else {
         console.log("Authentication failed - invalid user role");
         showToastMessage('Authentication failed - invalid user role', 'error');
