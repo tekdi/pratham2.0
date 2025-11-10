@@ -61,7 +61,7 @@ const App = ({
       const isThematicPath = currentPath.includes('/themantic');
       const isPosPath = currentPath.includes('/pos');
 
-      if(!isThematicPath && !isPosPath) {
+      if(!isThematicPath && !isPosPath && rt?.program) {
 
       console.log('response=======>', rt?.program);
       if (!rt?.program?.includes(localStorage.getItem('userProgram')) && !rt.program.includes('Open School'))
