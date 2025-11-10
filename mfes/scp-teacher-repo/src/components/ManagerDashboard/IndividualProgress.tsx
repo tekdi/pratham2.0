@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -16,12 +16,11 @@ import {
   Stack,
   Button,
   Tooltip,
+  Pagination,
 } from '@mui/material';
 import {
   Search as SearchIcon,
   FilterList as FilterListIcon,
-  Add as AddIcon,
-  AccessTime as AccessTimeIcon,
   ArrowForward as ArrowForwardIcon,
 } from '@mui/icons-material';
 import AssignCourseModal from './AssignCourseModal';
@@ -47,13 +46,31 @@ interface EmployeeProgress {
 
 interface IndividualProgressProps {
   data: EmployeeProgress[];
+  currentPage: number;
+  totalPages: number;
+  totalEmployees: number;
+  onPageChange: (page: number) => void;
+  onSearch: (query: string) => void;
 }
 
-const IndividualProgress: React.FC<IndividualProgressProps> = ({ data }) => {
+const IndividualProgress: React.FC<IndividualProgressProps> = ({ 
+  data, 
+  currentPage, 
+  totalPages, 
+  totalEmployees, 
+  onPageChange,
+  onSearch
+}) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedEmployees, setSelectedEmployees] = useState<string[]>([]);
   const [assignModalOpen, setAssignModalOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<{ id: string; name: string } | null>(null);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Clear selected employees when data changes (pagination)
+  useEffect(() => {
+    setSelectedEmployees([]);
+  }, [data]);
 
   const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
@@ -69,14 +86,33 @@ const IndividualProgress: React.FC<IndividualProgressProps> = ({ data }) => {
     );
   };
 
-  const filteredData = data.filter((employee) =>
-    employee.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Handle search input change with debounce
+  const handleSearchChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const query = event.target.value;
+    setSearchTerm(query);
+    
+    // Clear previous timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    
+    // Set new timeout for debounced search
+    searchTimeoutRef.current = setTimeout(() => {
+      onSearch(query);
+    }, 500);
+  }, [onSearch]);
 
-  const handleOpenAssignModal = (employee: EmployeeProgress) => {
-    setSelectedEmployee({ id: employee.id, name: employee.name });
-    setAssignModalOpen(true);
-  };
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Use data directly since filtering is handled by API
+  const filteredData = data;
 
   const handleCloseAssignModal = () => {
     setAssignModalOpen(false);
@@ -184,7 +220,7 @@ const IndividualProgress: React.FC<IndividualProgressProps> = ({ data }) => {
             placeholder="Search employee.."
             size="small"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={handleSearchChange}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -238,7 +274,7 @@ const IndividualProgress: React.FC<IndividualProgressProps> = ({ data }) => {
                 />
               </TableCell>
               <TableCell sx={{ fontWeight: 600 }}>Employee</TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>Department</TableCell>
+              {/* <TableCell sx={{ fontWeight: 600 }}>Department</TableCell> */}
               <TableCell sx={{ fontWeight: 600 }}>Mandatory Courses</TableCell>
               <TableCell sx={{ fontWeight: 600 }}>Non-Mandatory Courses</TableCell>
               <TableCell sx={{ fontWeight: 600 }}>Actions</TableCell>
@@ -283,9 +319,9 @@ const IndividualProgress: React.FC<IndividualProgressProps> = ({ data }) => {
                     </Box>
                   </Stack>
                 </TableCell>
-                <TableCell>
+                {/* <TableCell>
                   <Typography variant="body2">{employee.department}</Typography>
-                </TableCell>
+                </TableCell> */}
                 <TableCell sx={{ minWidth: 200 }}>
                   {renderProgressBar(
                     employee.mandatoryCourses.completed,
@@ -306,7 +342,7 @@ const IndividualProgress: React.FC<IndividualProgressProps> = ({ data }) => {
                 </TableCell>
                 <TableCell>
                   <Stack direction="row" spacing={1}>
-                    <Tooltip 
+                    {/* <Tooltip 
                       title="Assign Course" 
                       arrow
                       componentsProps={{
@@ -360,7 +396,7 @@ const IndividualProgress: React.FC<IndividualProgressProps> = ({ data }) => {
                       >
                         <AccessTimeIcon fontSize="small" sx={{ color: '#c2185b' }} />
                       </IconButton>
-                    </Tooltip>
+                    </Tooltip> */}
                     <IconButton size="small">
                       <ArrowForwardIcon fontSize="small" />
                     </IconButton>
@@ -371,6 +407,31 @@ const IndividualProgress: React.FC<IndividualProgressProps> = ({ data }) => {
           </TableBody>
         </Table>
       </TableContainer>
+
+      {/* Pagination Controls */}
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          mt: 2, 
+          px: 2 
+        }}
+      >
+        <Typography variant="body2" color="text.secondary">
+          Showing {((currentPage - 1) * 10) + 1}-{Math.min(currentPage * 10, totalEmployees)} of {totalEmployees} employees
+        </Typography>
+        
+        <Pagination
+          count={totalPages}
+          page={currentPage}
+          onChange={(event, page) => onPageChange(page)}
+          color="primary"
+          shape="rounded"
+          showFirstButton
+          showLastButton
+        />
+      </Box>
 
       <AssignCourseModal
         open={assignModalOpen}

@@ -14,7 +14,7 @@ import Header from '../../components/Header';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { fetchCourses } from '../../services/PlayerService';
 import { fetchUserCertificateStatus } from '../../services/TrackingService';
-import { getAssessmentStatus } from '../../services/AssesmentService';
+import { fetchUserList } from '../../services/ManageUser';
 
 
 const ManagerDashboard = () => {
@@ -60,14 +60,103 @@ const ManagerDashboard = () => {
   const [individualProgressData, setIndividualProgressData] = useState<EmployeeProgress[]>([]);
 
   const [totalEmployees, setTotalEmployees] = useState(0);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const [totalPages, setTotalPages] = useState(0);
+  
+  // Search state
+  const [searchQuery, setSearchQuery] = useState('');
 
-  // Simulate API call with dummy data
+  // Function to fetch individual progress data with pagination and search
+  const fetchIndividualProgressData = async (page = 1, search = '') => {
+    try {
+      const managerUserId = localStorage.getItem('managrUserId');
+      if (managerUserId) {
+        const offset = (page - 1) * itemsPerPage;
+        
+        // Build filters object
+        const filters: any = {
+          emp_manager: managerUserId
+        };
+        
+        // Add name filter if search query exists
+        if (search.trim()) {
+          filters.name = search.trim();
+        }
+        
+        const apiResponse = await fetchUserList({
+          limit: itemsPerPage,
+          offset: offset,
+          filters: filters,
+        });
+        
+        console.log('individualProgressData', apiResponse?.getUserDetails);
+        console.log('totalCount', apiResponse?.totalCount);
+        
+        // Transform API data to EmployeeProgress format
+        const transformedProgressData: EmployeeProgress[] = apiResponse?.getUserDetails?.map((user: any) => ({
+          id: user.userId,
+          name: user.name || `${user.firstName} ${user.lastName}`.trim(),
+          role: user.role,
+          department: '', // Remove department as requested
+          mandatoryCourses: {
+            completed: 0,
+            inProgress: 0, 
+            overdue: 0,
+            total: 0
+          },
+          nonMandatoryCourses: {
+            completed: 0,
+            inProgress: 0,
+            notEnrolled: 0, 
+            total: 0
+          }
+        })) || [];
+        
+        // Note: Fetch certificate status if needed for individual progress calculation
+        // const userCertificateStatus = await fetchUserCertificateStatus(
+        //   transformedProgressData.map((item: any) => item.id), 
+        //   transformedProgressData.map((item: any) => item.courseId)
+        // );
+        
+        console.log('transformedProgressData', transformedProgressData);
+        setIndividualProgressData(transformedProgressData);
+        setTotalEmployees(apiResponse?.totalCount || 0);
+        setTotalPages(Math.ceil((apiResponse?.totalCount || 0) / itemsPerPage));
+      } else {
+        console.warn('No manager user ID found in localStorage');
+        setIndividualProgressData([]);
+        setTotalEmployees(0);
+        setTotalPages(0);
+      }
+    } catch (error) {
+      console.error('Error fetching individual progress data:', error);
+      setIndividualProgressData([]);
+      setTotalEmployees(0);
+      setTotalPages(0);
+    }
+  };
+
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    fetchIndividualProgressData(page, searchQuery);
+  };
+
+  // Handle search - reset to page 1 when search changes
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    setCurrentPage(1); // Reset to first page
+    fetchIndividualProgressData(1, query); // Fetch with search and page 1
+  };
+
+  // Fetch dashboard data on component mount
   useEffect(() => {
     const fetchDashboardData = async () => {
-      // Simulate API delay for non-course data
-    //  await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Dummy data - Replace this with actual API calls
+      // Variable to store employee user IDs for use across try blocks
+      let employeeUserIds: string[] = [];
     
 
       const dummyCourseAchievementData = {
@@ -127,16 +216,6 @@ const ManagerDashboard = () => {
           'Last 90 days',
         ],
       };
-const employeeData =[{
-  id: '47b46af0-6447-4348-bef9-7cf12c67b22a',
-  name: 'Rahul Somshekhar',
-  role: 'Facilitator',
-  department: 'Teaching',
-  // mandatoryCourses: { completed: 3, inProgress: 8, overdue: 2, total: 15 },
-  // nonMandatoryCourses: { completed: 5, inProgress: 3, notEnrolled: 8, total: 20 },
-
-},
-]
 
       try {
         const mandatoryCourses = await fetchCourses({
@@ -166,11 +245,29 @@ const employeeData =[{
         console.log('mandatoryCourses', mandatoryCourses);
         const mandatoryIdentifiers = mandatoryCourses.map((item: any) => item.identifier);
         const optionalIdentifiers = optionalCourses.map((item: any) => item.identifier);
-        const employeeUserIds = employeeData.map((item: any) => item.id);
+        const userId = localStorage.getItem('managrUserId');
+        let employeeDataResponse: any = [];
+        if(userId) {
+           employeeDataResponse = await fetchUserList({
+           
+            filters: {emp_manager:userId},
+          });
+          console.log('employeeDataResponse', employeeDataResponse);
+           employeeUserIds = employeeDataResponse?.getUserDetails?.map((item: any) => item.userId);
+        }
+        console.log('employeeUserIds', employeeUserIds);
+        // Check if tenantId is available before calling certificate status APIs
+        const tenantId = localStorage.getItem('tenantId');
+        let userMandatoryCertificateStatus = { data: [] };
+        let userOptionalCertificateStatus = { data: [] };
         
-        const userMandatoryCertificateStatus = await fetchUserCertificateStatus(employeeUserIds, mandatoryIdentifiers);
-        const userOptionalCertificateStatus = await fetchUserCertificateStatus(employeeUserIds, optionalIdentifiers);
-                console.log('userMandatoryCertificateStatus', userMandatoryCertificateStatus);
+        if (tenantId) {
+          userMandatoryCertificateStatus = await fetchUserCertificateStatus(employeeUserIds, mandatoryIdentifiers);
+          userOptionalCertificateStatus = await fetchUserCertificateStatus(employeeUserIds, optionalIdentifiers);
+          console.log('userMandatoryCertificateStatus', userMandatoryCertificateStatus);
+        } else {
+          console.warn('TenantId not found in localStorage, skipping certificate status API calls');
+        }
 
         const filteredMandatory = userMandatoryCertificateStatus.data
           .map((item: any) => {
@@ -227,76 +324,10 @@ const employeeData =[{
         setCourseDataLoading(false);
       }
 
-      const dummyIndividualProgressData: EmployeeProgress[] = [
-        {
-          id: '1',
-          name: 'Rahul Somshekhar',
-          role: 'Facilitator',
-          department: 'Teaching',
-          mandatoryCourses: { completed: 3, inProgress: 8, overdue: 2, total: 15 },
-          nonMandatoryCourses: { completed: 5, inProgress: 3, notEnrolled: 8, total: 20 },
-        },
-        {
-          id: '2',
-          name: 'Rahul Somshekhar',
-          role: 'Facilitator',
-          department: 'Teaching',
-          mandatoryCourses: { completed: 4, inProgress: 8, overdue: 1, total: 15 },
-          nonMandatoryCourses: { completed: 6, inProgress: 2, notEnrolled: 8, total: 20 },
-        },
-        {
-          id: '3',
-          name: 'Rahul Somshekhar',
-          role: 'Facilitator',
-          department: 'Teaching',
-          mandatoryCourses: { completed: 3, inProgress: 8, overdue: 2, total: 15 },
-          nonMandatoryCourses: { completed: 5, inProgress: 3, notEnrolled: 8, total: 20 },
-        },
-        {
-          id: '4',
-          name: 'Rahul Somshekhar',
-          role: 'Facilitator',
-          department: 'Teaching',
-          mandatoryCourses: { completed: 3, inProgress: 8, overdue: 2, total: 15 },
-          nonMandatoryCourses: { completed: 5, inProgress: 3, notEnrolled: 8, total: 20 },
-        },
-        {
-          id: '5',
-          name: 'Rahul Somshekhar',
-          role: 'Facilitator',
-          department: 'Teaching',
-          mandatoryCourses: { completed: 3, inProgress: 8, overdue: 2, total: 15 },
-          nonMandatoryCourses: { completed: 5, inProgress: 3, notEnrolled: 8, total: 20 },
-        },
-        {
-          id: '6',
-          name: 'Rahul Somshekhar',
-          role: 'Facilitator',
-          department: 'Teaching',
-          mandatoryCourses: { completed: 3, inProgress: 8, overdue: 2, total: 15 },
-          nonMandatoryCourses: { completed: 5, inProgress: 3, notEnrolled: 8, total: 20 },
-        },
-        {
-          id: '7',
-          name: 'Rahul Somshekhar',
-          role: 'Facilitator',
-          department: 'Teaching',
-          mandatoryCourses: { completed: 3, inProgress: 8, overdue: 2, total: 15 },
-          nonMandatoryCourses: { completed: 5, inProgress: 3, notEnrolled: 8, total: 20 },
-        },
-        {
-          id: '8',
-          name: 'Rahul Somshekhar',
-          role: 'Facilitator',
-          department: 'Teaching',
-          mandatoryCourses: { completed: 3, inProgress: 8, overdue: 2, total: 15 },
-          nonMandatoryCourses: { completed: 5, inProgress: 3, notEnrolled: 8, total: 20 },
-        },
-      ];
 
-      try{
-      //  const courseAchievementData = await fetchCourseAchievementData();
-      const questionSets = await fetchCourses({
+      try {
+        // Fetch assessment/question sets data
+        const questionSets = await fetchCourses({
         filters: {
           status: [
             "Live"
@@ -314,12 +345,19 @@ const employeeData =[{
       });
       const questionSetIdentifiers = questionSets.map((item: any) => item.identifier);
       console.log('questionSets', questionSetIdentifiers);
-      const userDataAssessmentStatus = await getAssessmentStatus({
-        userId: employeeData.map((item: any) => item.id),
-       
-        contentId: questionSetIdentifiers
-      });
-      console.log('userDataAssessmentStatus', userDataAssessmentStatus);
+      
+        // Check if tenantId is available before calling assessment status API
+        const tenantId = localStorage.getItem('tenantId');
+        if (tenantId && employeeUserIds.length > 0) {
+          // TODO: Implement assessment status tracking
+          // const userDataAssessmentStatus = await getAssessmentStatus({
+          //   userId: employeeUserIds,
+          //   contentId: questionSetIdentifiers
+          // });
+          // console.log('userDataAssessmentStatus', userDataAssessmentStatus);
+        } else {
+          console.warn('TenantId not found in localStorage, skipping assessment status API call');
+        }
       } catch (error) {
         console.error('Error fetching course achievement data:', error);
       }
@@ -327,8 +365,9 @@ const employeeData =[{
       // Set all data
       setCourseAchievementData(dummyCourseAchievementData);
       setTopPerformersData(dummyTopPerformersData);
-      setIndividualProgressData(dummyIndividualProgressData);
-      setTotalEmployees(56);
+      
+      // Fetch individual progress data with pagination
+      fetchIndividualProgressData(1, '');
     };
 
     fetchDashboardData();
@@ -424,8 +463,15 @@ const employeeData =[{
           </Grid>
 
           {/* Individual Progress Table */}
-          <Grid item xs={12} sx={{ mt: 2 }}>
-            <IndividualProgress data={individualProgressData} />
+          <Grid item xs={12} sx={{ mt: 2, mb: 2 }}>
+            <IndividualProgress 
+              data={individualProgressData}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalEmployees={totalEmployees}
+              onPageChange={handlePageChange}
+              onSearch={handleSearch}
+            />
           </Grid>
         </Grid>
       </Container>

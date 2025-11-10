@@ -82,7 +82,9 @@ const SSOContent = () => {
     const env = searchParams.get('env');
     const accessToken = searchParams.get('accesstoken');
     const userId = searchParams.get('USER_ID');
-
+     if(userId) {
+     localStorage.setItem('managrUserId', userId);
+     }
     // Only proceed if we have search params and at least one of the required parameters
     if (!hasSearchParams || (!env && !accessToken && !userId)) {
       console.log('Waiting for search parameters to be loaded...');
@@ -144,7 +146,7 @@ const SSOContent = () => {
            
               router.push('/manager-dashboard');
             
-          }, 1500);
+          }, 3000);
         } else {
           throw new Error(response?.data?.message || 'Authentication failed');
         }
@@ -189,9 +191,19 @@ const SSOContent = () => {
 
       const userResponse = await getUserId();
       console.log('userResponse', userResponse);
-      localStorage.setItem('userId', userResponse?.userId);
-      localStorage.setItem('tenantId', userResponse?.tenantData[0]?.tenantId);
-      localStorage.setItem('firstName', userResponse?.firstName);
+        localStorage.setItem('userId', userResponse?.userId);
+        // Safely set tenantId with fallback - try userResponse first, then URL param
+        const tenantIdFromResponse = userResponse?.tenantData?.[0]?.tenantId;
+        const tenantIdFromUrl = searchParams.get('tenantid');
+        const finalTenantId = tenantIdFromResponse || tenantIdFromUrl;
+        
+        if (finalTenantId) {
+          localStorage.setItem('tenantId', finalTenantId);
+          console.log('TenantId stored:', finalTenantId);
+        } else {
+          console.warn('No tenantId available from response or URL parameters');
+        }
+        localStorage.setItem('firstName', userResponse?.firstName);
      // localStorage.setItem('roleId', userResponse?.roleId);
      // localStorage.setItem('roleName', userResponse?.roleName);
      // localStorage.setItem('tenantName', userResponse?.tenantName);
@@ -268,7 +280,7 @@ const SSOContent = () => {
           (tenant: any) => tenant.tenantId === tenantId
         );
         localStorage.setItem('userId', userResponse?.userId);
-        localStorage.setItem('templtateId', tenantData.templateId);
+        localStorage.setItem('templtateId', tenantData?.templateId || '');
         localStorage.setItem('userIdName', userResponse?.username);
         localStorage.setItem('firstName', userResponse?.firstName || '');
         localStorage.setItem('roleId', roleId);
@@ -280,7 +292,7 @@ const SSOContent = () => {
 
         localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
 
-        localStorage.setItem('tenantId', tenantId);
+        // localStorage.setItem('tenantId', tenantId);
         localStorage.setItem('userProgram', tenantName);
         //await profileComplitionCheck();
         if (tenantName === TenantName.YOUTHNET) {
@@ -334,8 +346,11 @@ const SSOContent = () => {
         // } else {
         //   router.push('/content');
         // }
-        router.push('/manager-dashboard');
-      } else {
+        setTimeout(() => {
+           
+          router.push('/manager-dashboard');
+        
+      }, 3000);      } else {
         console.log("Authentication failed - invalid user role");
         showToastMessage('Authentication failed - invalid user role', 'error');
         const telemetryInteract = {
