@@ -316,7 +316,7 @@ export default function Content(props: Readonly<ContentProps>) {
           offset: adjustedOffset,
           limit: adjustedLimit,
           signal: controller.signal,
-          noPrimaryCategory: true,
+          primaryCategory: ['Course'],
         });
       }
       else{

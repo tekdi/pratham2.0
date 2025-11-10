@@ -62,7 +62,7 @@ const isThematicPath = currentPath.includes('/themantic');
 const isPosPath = currentPath.includes('/pos');
 console.log('isThematicPath=======>', isThematicPath);
 
-if(!isThematicPath && !isPosPath) {
+if(!isThematicPath && !isPosPath && result?.program) {
 
         if (!result?.program?.includes(localStorage.getItem('userProgram')) && !result.program.includes('Open School'))
         {
@@ -84,7 +84,7 @@ if(!isThematicPath && !isPosPath) {
                 'inprogress',
                 'completed',
                 'viewCertificate',
-              ].includes(data?.result?.status)
+              ].includes?.(data?.result?.status)
             ) {
               if (props?.getIfEnrolled) {
                 props?.getIfEnrolled(
