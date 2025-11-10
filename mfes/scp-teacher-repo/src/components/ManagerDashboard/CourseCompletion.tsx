@@ -8,64 +8,59 @@ import {
   Tooltip,
 } from 'recharts';
 import { useTheme } from '@mui/material/styles';
-import { CourseData } from './types';
-
 interface ChartDataItem {
   name: string;
   value: number;
   color: string;
 }
-
-interface CourseCompletionProps {
-  mandatoryCourses: CourseData;
-  nonMandatoryCourses: CourseData;
+interface CourseStatus {
+  userId: string;
+  courseId: string;
+  status: 'completed' | 'inprogress';
 }
-
+interface CourseCompletionProps {
+  mandatoryCourses: CourseStatus[];
+  nonMandatoryCourses: CourseStatus[];
+}
 const CourseCompletion: React.FC<CourseCompletionProps> = ({
   mandatoryCourses,
   nonMandatoryCourses,
 }) => {
   const theme = useTheme();
-
-  const prepareMandatoryData = (): ChartDataItem[] => [
-    {
-      name: 'Completed',
-      value: mandatoryCourses.completed,
-      color: '#4caf50',
-    },
-    {
-      name: 'In Progress',
-      value: mandatoryCourses.inProgress,
-      color: '#ffc107',
-    },
-    {
-      name: 'Overdue',
-      value: mandatoryCourses.overdue,
-      color: '#f44336',
-    },
-  ];
-
-  const prepareNonMandatoryData = (): ChartDataItem[] => [
-    {
-      name: 'Completed',
-      value: nonMandatoryCourses.completed,
-      color: '#4caf50',
-    },
-    {
-      name: 'In Progress',
-      value: nonMandatoryCourses.inProgress,
-      color: '#ffc107',
-    },
-    {
-      name: 'Overdue',
-      value: nonMandatoryCourses.overdue,
-      color: '#f44336',
-    },
-  ];
-
+  const prepareMandatoryData = (): ChartDataItem[] => {
+    const completed = mandatoryCourses.filter(course => course.status === 'completed').length;
+    const inProgress = mandatoryCourses.filter(course => course.status === 'inprogress').length;
+    return [
+      {
+        name: 'Completed',
+        value: completed,
+        color: '#4CAF50',
+      },
+      {
+        name: 'In Progress',
+        value: inProgress,
+        color: '#FFC107',
+      },
+    ];
+  };
+  const prepareNonMandatoryData = (): ChartDataItem[] => {
+    const completed = nonMandatoryCourses.filter(course => course.status === 'completed').length;
+    const inProgress = nonMandatoryCourses.filter(course => course.status === 'inprogress').length;
+    return [
+      {
+        name: 'Completed',
+        value: completed,
+        color: '#4CAF50',
+      },
+      {
+        name: 'In Progress',
+        value: inProgress,
+        color: '#FFC107',
+      },
+    ];
+  };
   const renderDonutChart = (data: ChartDataItem[], title: string) => {
     const backgroundData = [{ value: 100 }];
-    
     return (
       <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <Typography variant="body2" fontWeight={500} color="text.secondary" gutterBottom sx={{ mb: { xs: 1, sm: 2 }, fontSize: { xs: '0.875rem', sm: '0.875rem' } }}>
@@ -84,7 +79,7 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
                   dataKey="value"
                   startAngle={0}
                   endAngle={360}
-                  fill="#e0e0e0"
+                  fill="#E0E0E0"
                 />
                 <Pie
                   data={data}
@@ -113,12 +108,11 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
                 width: '80px',
               }}
             >
-              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '9px', textTransform: 'uppercase', lineHeight: 1.2 }}>
+              {/* <Typography variant="caption" color="text.secondary" sx={{ fontSize: '9px', textTransform: 'uppercase', lineHeight: 1.2 }}>
                 NO. OF EMPLOYEES
-              </Typography>
+              </Typography> */}
             </Box>
           </Box>
-          
           <Stack spacing={1} sx={{ flex: 1 }}>
             {data.map((item, index) => (
               <Stack
@@ -154,9 +148,8 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
       </Box>
     );
   };
-
   return (
-    <Paper elevation={0} sx={{ p: { xs: 1.5, sm: 2 }, border: '1px solid #e0e0e0', borderRadius: 2 }}>
+    <Paper elevation={0} sx={{ p: { xs: 1.5, sm: 2 }, border: '1px solid #E0E0E0', borderRadius: 2 }}>
       <Typography variant="subtitle1" fontWeight={600} gutterBottom sx={{ fontSize: { xs: '1rem', sm: '1.125rem' } }}>
         Course Completion
       </Typography>
@@ -167,5 +160,4 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
     </Paper>
   );
 };
-
 export default CourseCompletion;

@@ -114,15 +114,30 @@ const TopPerformers: React.FC<TopPerformersProps> = ({
         </FormControl>
       </Box>
 
-      <Stack spacing={1.5}>
+      <Box>
         {currentUsers.length > 0 ? (
-          currentUsers.map((user) => <UserCard key={user.id} user={user} />)
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+            {Array.from({ length: Math.ceil(currentUsers.length / 2) }, (_, rowIndex) => (
+              <Box key={rowIndex} sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
+                <Box sx={{ flex: 1 }}>
+                  {currentUsers[rowIndex * 2] && (
+                    <UserCard user={currentUsers[rowIndex * 2]} />
+                  )}
+                </Box>
+                <Box sx={{ flex: 1 }}>
+                  {currentUsers[rowIndex * 2 + 1] && (
+                    <UserCard user={currentUsers[rowIndex * 2 + 1]} />
+                  )}
+                </Box>
+              </Box>
+            ))}
+          </Box>
         ) : (
           <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ py: 2 }}>
             No users found for this category
           </Typography>
         )}
-      </Stack>
+      </Box>
     </Paper>
   );
 };

@@ -76,3 +76,49 @@ export const getQumlData = async (identifier: any) => {
     throw error;
   }
 };
+
+export const fetchCourses = async (filters: any = {}) => {
+  try {
+    const options = {
+      request: {
+        // filters: {
+        //   primaryCategory: ["Course"],
+        //   courseType: ["Mandatory"],
+        //   status: ["live"],
+        //   channel: "pragyanpath",
+        //   ...additionalFilters
+        // },
+        ...filters,
+        fields: [
+          "name",
+          "appIcon",
+          "description",
+          "posterImage",
+          "mimeType",
+          "identifier",
+          "resourceType",
+          "primaryCategory",
+          "contentType",
+          "trackable",
+          "children",
+          "leafNodes",
+          "courseType"
+        ]
+      }
+    };
+
+    const response = await axios.post(URL_CONFIG.API.COMPOSITE_SEARCH, options);
+    const result = response?.data?.result;
+    
+    if (response?.data?.result?.QuestionSet?.length) {
+      const contents = result?.content ? [...result.content, ...result.QuestionSet] : [...result.QuestionSet];
+      result.content = contents;
+    }
+
+    return result?.content || [];
+  } catch (error) {
+    console.error('Error fetching mandatory courses:', error);
+    throw error;
+  }
+};
+

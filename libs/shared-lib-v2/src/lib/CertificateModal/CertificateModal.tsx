@@ -244,30 +244,136 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
       // }
     }
   };
+  const detectBrowser = () => {
+    const userAgent = navigator.userAgent.toLowerCase();
+    return {
+      isIOS: /iphone|ipad|ipod/.test(userAgent),
+      isSafari: /safari/.test(userAgent) && !/chrome/.test(userAgent),
+      isAndroid: /android/.test(userAgent),
+      isChrome: /chrome/.test(userAgent),
+      isMobile: /mobile|android|touch|webos|iphone|ipad|ipod/.test(userAgent)
+    };
+  };
+
+  const downloadForDesktop = async (blob: Blob) => {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `certificate_${certificateId}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  };
+
+  const downloadForMobile = async (blob: Blob) => {
+    const browser = detectBrowser();
+    
+    // For iOS Safari - open in new tab since download attribute doesn't work
+    if (browser.isIOS || browser.isSafari) {
+      const url = window.URL.createObjectURL(blob);
+      const newWindow = window.open(url, '_blank');
+      
+      if (!newWindow) {
+        // Fallback: show instructions to user
+        alert('Please long-press the certificate and select "Save to Files" or "Share" to download');
+        window.location.href = url;
+      }
+      
+      // Clean up after a delay
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+      }, 5000);
+      
+      return;
+    }
+
+    // For Android Chrome - try direct download first
+    if (browser.isAndroid && browser.isChrome) {
+      try {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `certificate_${certificateId}.pdf`;
+        
+        // Ensure the link is visible and clickable
+        a.style.display = 'block';
+        a.style.visibility = 'visible';
+        
+        document.body.appendChild(a);
+        
+        // Use setTimeout to ensure the click happens after the element is added
+        setTimeout(() => {
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+        }, 100);
+        
+        return;
+      } catch (error) {
+        console.log('Direct download failed, trying alternative method:', error);
+      }
+    }
+
+    // Fallback for other mobile browsers - use Web Share API if available
+    if (navigator.share) {
+      try {
+        const file = new File([blob], `certificate_${certificateId}.pdf`, {
+          type: 'application/pdf',
+        });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: 'Certificate of Completion',
+            text: 'Your certificate is ready to download',
+            files: [file],
+          });
+          return;
+        }
+      } catch (error) {
+        console.log('Web Share API failed:', error);
+      }
+    }
+
+    // Final fallback - open blob URL in new tab/window
+    const url = window.URL.createObjectURL(blob);
+    const newWindow = window.open(url, '_blank');
+    
+    if (!newWindow) {
+      // If popup is blocked, navigate to the blob URL
+      window.location.href = url;
+    }
+    
+    // Show user instructions
+    setTimeout(() => {
+      alert('Certificate opened in new tab/window. Please use your browser\'s download or share options to save it.');
+      window.URL.revokeObjectURL(url);
+    }, 1000);
+  };
+
   const onDownloadCertificate = async () => {
     try {
-        if (typeof window !== 'undefined'){
-       const windowUrl = window.location.pathname;
-      const cleanedUrl = windowUrl.replace(/^\//, '');
-      const env = cleanedUrl.split('/')[0];
-     const telemetryInteract = {
-        context: {
-          env: env,
-          cdata: [],
+      if (typeof window !== 'undefined') {
+        const windowUrl = window.location.pathname;
+        const cleanedUrl = windowUrl.replace(/^\//, '');
+        const env = cleanedUrl.split('/')[0];
+        const telemetryInteract = {
+          context: {
+            env: env,
+            cdata: [],
+          },
+          edata: {
+            id: 'clicked on download certificate:',
+            type: "CLICK",
+            subtype: '',
+            pageid: cleanedUrl,
+            program: localStorage.getItem('userProgram') || '',
+            certificateId: certificateId,
+          },
+        };
+        telemetryFactory.interact(telemetryInteract);
+      }
 
-        },
-        edata: {
-          id: 'clicked on download certificate:' ,
-          type: "CLICK",
-          subtype: '',
-          pageid: cleanedUrl,
-                    program: localStorage.getItem('userProgram') || '',
-                    certificateId: certificateId,
-
-        },
-      };
-      telemetryFactory.interact(telemetryInteract);
-    }
       const response = await downloadCertificate({
         credentialId: certificateId,
         templateId: localStorage.getItem('templtateId') || '',
@@ -279,17 +385,14 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
 
       const blob = new Blob([response], { type: 'application/pdf' });
 
-      const url = window.URL.createObjectURL(blob);
+      // Use different download strategies based on device
+      if (deviceType === 'mobile') {
+        await downloadForMobile(blob);
+      } else {
+        await downloadForDesktop(blob);
+      }
 
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `certificate_${certificateId}.pdf`; // Set filename
-      document.body.appendChild(a);
-      a.click();
-
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-      //  showToastMessage(
+      // showToastMessage(
       //   t('CERTIFICATES.DOWNLOAD_CERTIFICATE_SUCCESSFULLY'),
       //   'success'
       // );

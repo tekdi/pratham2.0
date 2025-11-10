@@ -325,8 +325,11 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
   const handleTenantSelect = (tenant: TenantData) => {
     setSelectedTenant(tenant);
     const roles = tenant?.roles ?? [];
+    console.log("roles", roles);
     if (roles.length === 1) {
-      const role = roles[0];
+      const role = roles.find((r) => r.roleName === 'Lead');
+
+      if(role) {  
       setSelectedRole(role);
       // Auto-confirm when only one role exists for the selected tenant
       callbackFunction(
@@ -335,6 +338,7 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
         role.roleId,
         role.roleName
       );
+    }
       onClose();
       return;
     } else {

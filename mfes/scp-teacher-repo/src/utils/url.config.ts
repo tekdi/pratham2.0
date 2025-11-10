@@ -13,5 +13,6 @@ export const URL_CONFIG = {
     QUESTIONSET_READ: baseurl + '/action/questionset/v2/read/',
     COMPOSITE_SEARCH: baseurl + '/action/composite/v3/search',
     CONTENT_HIERARCHY: baseurl + '/action/content/v3/hierarchy',
+    USER_CERTIFICATE_STATUS_SEARCH: 'tracking/user_certificate/status/search',
   },
 };
