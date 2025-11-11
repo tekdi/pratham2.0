@@ -49,7 +49,6 @@ export interface ExpandableCourseSectionProps {
   title: string;
   count: number;
   courses: EmployeeCourse[];
-  defaultExpanded?: boolean;
 }
 
 export interface CourseCardProps {

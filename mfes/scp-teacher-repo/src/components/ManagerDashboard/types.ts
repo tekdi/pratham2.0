@@ -58,15 +58,20 @@ export interface EmployeeProgress {
   mandatoryCourses: {
     completed: number;
     inProgress: number;
-    overdue: number;
+    notStarted: number;
     total: number;
   };
   nonMandatoryCourses: {
     completed: number;
     inProgress: number;
-    notEnrolled: number;
+    notStarted: number;
     total: number;
   };
+  // Course identifiers arrays
+  mandatoryInProgressIdentifiers?: string[];
+  optionalInProgressIdentifiers?: string[];
+  mandatoryCompletedIdentifiers?: string[];
+  optionalCompletedIdentifiers?: string[];
 }
 
 // API Response types

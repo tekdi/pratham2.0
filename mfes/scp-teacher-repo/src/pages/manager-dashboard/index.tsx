@@ -22,6 +22,10 @@ const ManagerDashboard = () => {
   const [mandatoryCertificateData, setMandatoryCertificateData] = useState<any[]>([]);
   const [optionalCertificateData, setOptionalCertificateData] = useState<any[]>([]);
   const [courseDataLoading, setCourseDataLoading] = useState(true);
+  
+  // Store course identifiers for use in individual progress calculation
+  const [mandatoryIdentifiers, setMandatoryIdentifiers] = useState<string[]>([]);
+  const [optionalIdentifiers, setOptionalIdentifiers] = useState<string[]>([]);
 
   const [courseAllocationData, setCourseAllocationData] = useState({
     mandatory: 0,
@@ -70,7 +74,7 @@ const ManagerDashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   // Function to fetch individual progress data with pagination and search
-  const fetchIndividualProgressData = async (page = 1, search = '') => {
+  const fetchIndividualProgressData = async (page = 1, search = '', mandatoryIds: string[] = [], optionalIds: string[] = []) => {
     try {
       const managerUserId = localStorage.getItem('managrUserId');
       if (managerUserId) {
@@ -94,34 +98,146 @@ const ManagerDashboard = () => {
         
         console.log('individualProgressData', apiResponse?.getUserDetails);
         console.log('totalCount', apiResponse?.totalCount);
+        const currentEmployeeIds = apiResponse?.getUserDetails?.map((item: any) => item.userId);
         
-        // Transform API data to EmployeeProgress format
-        const transformedProgressData: EmployeeProgress[] = apiResponse?.getUserDetails?.map((user: any) => ({
-          id: user.userId,
-          name: user.name || `${user.firstName} ${user.lastName}`.trim(),
-          role: user.role,
-          department: '', // Remove department as requested
-          mandatoryCourses: {
-            completed: 0,
-            inProgress: 0, 
-            overdue: 0,
-            total: 0
-          },
-          nonMandatoryCourses: {
-            completed: 0,
-            inProgress: 0,
-            notEnrolled: 0, 
-            total: 0
+        // Fetch certificate status for current employees if course identifiers are available
+        let userMandatoryCertificateStatus = { data: [] };
+        let userOptionalCertificateStatus = { data: [] };
+        // Use parameters if provided, otherwise fall back to state
+        const activeMandatoryIds = mandatoryIds.length > 0 ? mandatoryIds : mandatoryIdentifiers;
+        const activeOptionalIds = optionalIds.length > 0 ? optionalIds : optionalIdentifiers;
+        
+        console.log('activeMandatoryIds', activeMandatoryIds);
+        console.log('activeOptionalIds', activeOptionalIds);
+        console.log('currentEmployeeIds', currentEmployeeIds);
+        
+        if (activeMandatoryIds.length > 0 && activeOptionalIds.length > 0 && currentEmployeeIds.length > 0) {
+          try {
+            [userMandatoryCertificateStatus, userOptionalCertificateStatus] = await Promise.all([
+              fetchUserCertificateStatus(currentEmployeeIds, activeMandatoryIds),
+              fetchUserCertificateStatus(currentEmployeeIds, activeOptionalIds)
+            ]);
+            console.log('Individual Progress - userMandatoryCertificateStatus', userMandatoryCertificateStatus);
+            console.log('Individual Progress - userOptionalCertificateStatus', userOptionalCertificateStatus);
+          } catch (error) {
+            console.error('Error fetching certificate status for individual progress:', error);
           }
-        })) || [];
+        }
+
+        // Process certificate status data for easier lookup
+        const mandatoryStatusMap = new Map();
+        const optionalStatusMap = new Map();
+
+        // Process mandatory certificate status
+        userMandatoryCertificateStatus.data?.forEach((item: any) => {
+          if (!mandatoryStatusMap.has(item.userId)) {
+            mandatoryStatusMap.set(item.userId, {
+              completed: 0,
+              inProgress: 0,
+              notStarted: 0,
+              total: 0,
+              completedIdentifiers: [],
+              inProgressIdentifiers: [],
+              notStartedIdentifiers: []
+            });
+          }
+          
+          const userStats = mandatoryStatusMap.get(item.userId);
+          userStats.total++;
+          
+          if (item.status === "viewCertificate" || item.status === "completed") {
+            userStats.completed++;
+            userStats.completedIdentifiers.push(item.courseId);
+          } else if (item.status === "inprogress") {
+            userStats.inProgress++;
+            userStats.inProgressIdentifiers.push(item.courseId);
+          } else if (item.status === "enrolled") {
+            userStats.notStarted++;
+            userStats.notStartedIdentifiers.push(item.courseId);
+          }
+        });
+
+        // Process optional certificate status
+        userOptionalCertificateStatus.data?.forEach((item: any) => {
+          if (!optionalStatusMap.has(item.userId)) {
+            optionalStatusMap.set(item.userId, {
+              completed: 0,
+              inProgress: 0,
+              notStarted: 0,
+              total: 0,
+              completedIdentifiers: [],
+              inProgressIdentifiers: [],
+              notStartedIdentifiers: []
+            });
+          }
+          
+          const userStats = optionalStatusMap.get(item.userId);
+          userStats.total++;
+          
+          if (item.status === "viewCertificate" || item.status === "completed") {
+            userStats.completed++;
+            userStats.completedIdentifiers.push(item.courseId);
+          } else if (item.status === "inprogress") {
+            userStats.inProgress++;
+            userStats.inProgressIdentifiers.push(item.courseId);
+          } else if (item.status === "enrolled") {
+            userStats.notStarted++;
+            userStats.notStartedIdentifiers.push(item.courseId);
+          }
+        });
         
-        // Note: Fetch certificate status if needed for individual progress calculation
-        // const userCertificateStatus = await fetchUserCertificateStatus(
-        //   transformedProgressData.map((item: any) => item.id), 
-        //   transformedProgressData.map((item: any) => item.courseId)
-        // );
+        // Transform API data to EmployeeProgress format with calculated progress
+        const transformedProgressData: EmployeeProgress[] = apiResponse?.getUserDetails?.map((user: any) => {
+          const mandatoryStats = mandatoryStatusMap.get(user.userId) || { 
+            completed: 0, 
+            inProgress: 0, 
+            notStarted: 0, 
+            total: 0,
+            completedIdentifiers: [],
+            inProgressIdentifiers: [],
+            notStartedIdentifiers: []
+          };
+          const optionalStats = optionalStatusMap.get(user.userId) || { 
+            completed: 0, 
+            inProgress: 0, 
+            notStarted: 0, 
+            total: 0,
+            completedIdentifiers: [],
+            inProgressIdentifiers: [],
+            notStartedIdentifiers: []
+          };
+          
+          // Calculate not started courses = courses with "enrolled" status + courses not in API response
+          const mandatoryNotStarted = mandatoryStats.notStarted + Math.max(0, activeMandatoryIds.length - mandatoryStats.total);
+          const optionalNotStarted = optionalStats.notStarted + Math.max(0, activeOptionalIds.length - optionalStats.total);
+          
+          return {
+            id: user.userId,
+            name: user.name || `${user.firstName} ${user.lastName}`.trim(),
+            role: user.role,
+            department: '', // Remove department as requested
+            mandatoryCourses: {
+              completed: mandatoryStats.completed,
+              inProgress: mandatoryStats.inProgress, 
+              notStarted: mandatoryNotStarted,
+              total: activeMandatoryIds.length // Total available mandatory courses
+            },
+            nonMandatoryCourses: {
+              completed: optionalStats.completed,
+              inProgress: optionalStats.inProgress,
+              notStarted: optionalNotStarted, 
+              total: activeOptionalIds.length // Total available optional courses
+            },
+            // Add the requested course identifiers
+            mandatoryInProgressIdentifiers: mandatoryStats.inProgressIdentifiers || [],
+            optionalInProgressIdentifiers: optionalStats.inProgressIdentifiers || [],
+            mandatoryCompletedIdentifiers: mandatoryStats.completedIdentifiers || [],
+            optionalCompletedIdentifiers: optionalStats.completedIdentifiers || []
+          };
+        }) || [];
+
         
-        console.log('transformedProgressData', transformedProgressData);
+        console.log('transformedProgressData with calculated progress', transformedProgressData);
         setIndividualProgressData(transformedProgressData);
         setTotalEmployees(apiResponse?.totalCount || 0);
         setTotalPages(Math.ceil((apiResponse?.totalCount || 0) / itemsPerPage));
@@ -142,21 +258,23 @@ const ManagerDashboard = () => {
   // Handle page change
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    fetchIndividualProgressData(page, searchQuery);
+    fetchIndividualProgressData(page, searchQuery, mandatoryIdentifiers, optionalIdentifiers);
   };
 
   // Handle search - reset to page 1 when search changes
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     setCurrentPage(1); // Reset to first page
-    fetchIndividualProgressData(1, query); // Fetch with search and page 1
+    fetchIndividualProgressData(1, query, mandatoryIdentifiers, optionalIdentifiers); // Fetch with search and page 1
   };
 
   // Fetch dashboard data on component mount
   useEffect(() => {
     const fetchDashboardData = async () => {
-      // Variable to store employee user IDs for use across try blocks
+      // Variables to store employee user IDs and course identifiers for use across try blocks
       let employeeUserIds: string[] = [];
+      let mandatoryIds: string[] = [];
+      let optionalIds: string[] = [];
     
 
       const dummyCourseAchievementData = {
@@ -243,8 +361,16 @@ const ManagerDashboard = () => {
         };
 
         console.log('mandatoryCourses', mandatoryCourses);
-        const mandatoryIdentifiers = mandatoryCourses.map((item: any) => item.identifier);
-        const optionalIdentifiers = optionalCourses.map((item: any) => item.identifier);
+        mandatoryIds = mandatoryCourses.map((item: any) => item.identifier);
+        optionalIds = optionalCourses.map((item: any) => item.identifier);
+        
+        // Store identifiers in state for use in individual progress calculation
+        setMandatoryIdentifiers(mandatoryIds);
+        setOptionalIdentifiers(optionalIds);
+        
+        // Store course IDs in localStorage for use in employee-details page
+        localStorage.setItem('mandatoryCourseIds', JSON.stringify(mandatoryIds));
+        localStorage.setItem('optionalCourseIds', JSON.stringify(optionalIds));
         const userId = localStorage.getItem('managrUserId');
         let employeeDataResponse: any = [];
         if(userId) {
@@ -262,8 +388,8 @@ const ManagerDashboard = () => {
         let userOptionalCertificateStatus = { data: [] };
         
         if (tenantId) {
-          userMandatoryCertificateStatus = await fetchUserCertificateStatus(employeeUserIds, mandatoryIdentifiers);
-          userOptionalCertificateStatus = await fetchUserCertificateStatus(employeeUserIds, optionalIdentifiers);
+          userMandatoryCertificateStatus = await fetchUserCertificateStatus(employeeUserIds, mandatoryIds);
+          userOptionalCertificateStatus = await fetchUserCertificateStatus(employeeUserIds, optionalIds);
           console.log('userMandatoryCertificateStatus', userMandatoryCertificateStatus);
         } else {
           console.warn('TenantId not found in localStorage, skipping certificate status API calls');
@@ -366,8 +492,8 @@ const ManagerDashboard = () => {
       setCourseAchievementData(dummyCourseAchievementData);
       setTopPerformersData(dummyTopPerformersData);
       
-      // Fetch individual progress data with pagination
-      fetchIndividualProgressData(1, '');
+      // Fetch individual progress data with pagination - pass the course identifiers
+      fetchIndividualProgressData(1, '', mandatoryIds || [], optionalIds || []);
     };
 
     fetchDashboardData();

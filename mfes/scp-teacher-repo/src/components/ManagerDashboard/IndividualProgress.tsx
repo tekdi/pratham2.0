@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useRouter } from 'next/router';
 import {
   Box,
   Typography,
@@ -24,25 +25,8 @@ import {
   ArrowForward as ArrowForwardIcon,
 } from '@mui/icons-material';
 import AssignCourseModal from './AssignCourseModal';
-
-interface EmployeeProgress {
-  id: string;
-  name: string;
-  role: string;
-  department: string;
-  mandatoryCourses: {
-    completed: number;
-    inProgress: number;
-    overdue: number;
-    total: number;
-  };
-  nonMandatoryCourses: {
-    completed: number;
-    inProgress: number;
-    notEnrolled: number;
-    total: number;
-  };
-}
+import { EmployeeProgress } from './types';
+import { setData } from '@shared-lib-v2/utils/DataClient';
 
 interface IndividualProgressProps {
   data: EmployeeProgress[];
@@ -51,6 +35,8 @@ interface IndividualProgressProps {
   totalEmployees: number;
   onPageChange: (page: number) => void;
   onSearch: (query: string) => void;
+ 
+  
 }
 
 const IndividualProgress: React.FC<IndividualProgressProps> = ({ 
@@ -59,8 +45,10 @@ const IndividualProgress: React.FC<IndividualProgressProps> = ({
   totalPages, 
   totalEmployees, 
   onPageChange,
-  onSearch
+  onSearch,
+  
 }) => {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedEmployees, setSelectedEmployees] = useState<string[]>([]);
   const [assignModalOpen, setAssignModalOpen] = useState(false);
@@ -113,7 +101,7 @@ const IndividualProgress: React.FC<IndividualProgressProps> = ({
 
   // Use data directly since filtering is handled by API
   const filteredData = data;
-
+console.log('filteredData', filteredData);
   const handleCloseAssignModal = () => {
     setAssignModalOpen(false);
     setSelectedEmployee(null);
@@ -123,20 +111,41 @@ const IndividualProgress: React.FC<IndividualProgressProps> = ({
     console.log('Assigning courses:', courseIds, 'to employee:', selectedEmployee);
   };
 
+  const handleViewEmployeeDetails = async (userId: string) => {
+    try {
+      // Find the employee data
+      const employee = data.find(emp => emp.id === userId);
+      
+      if (employee) {
+        // Store course identifiers in IndexedDB
+        await setData('mandatoryInProgressIdentifiers', employee.mandatoryInProgressIdentifiers || []);
+        await setData('optionalInProgressIdentifiers', employee.optionalInProgressIdentifiers || []);
+        await setData('mandatoryCompletedIdentifiers', employee.mandatoryCompletedIdentifiers || []);
+        await setData('optionalCompletedIdentifiers', employee.optionalCompletedIdentifiers || []);
+        
+        console.log('Course identifiers stored in IndexedDB for employee:', userId);
+      }
+      
+      // Navigate to employee details page
+      router.push(`/employee-details?userId=${userId}`);
+    } catch (error) {
+      console.error('Error storing course identifiers in IndexedDB:', error);
+      // Still navigate even if storage fails
+      router.push(`/employee-details?userId=${userId}`);
+    }
+  };
+
   const renderProgressBar = (
     completed: number,
     inProgress: number,
     overdueOrNotEnrolled: number,
-    total: number,
-    isMandatory: boolean
+    total: number
   ) => {
     const completedPercent = (completed / total) * 100;
     const inProgressPercent = (inProgress / total) * 100;
     const overduePercent = (overdueOrNotEnrolled / total) * 100;
 
-    const tooltipContent = isMandatory
-      ? `In Progress: ${inProgress}`
-      : `Not Enrolled: ${overdueOrNotEnrolled}`;
+    const tooltipContent = `Not Started: ${overdueOrNotEnrolled}`;
 
     return (
       <Tooltip 
@@ -187,7 +196,7 @@ const IndividualProgress: React.FC<IndividualProgressProps> = ({
             <Box
               sx={{
                 width: `${overduePercent}%`,
-                backgroundColor: isMandatory ? '#f44336' : '#e0e0e0',
+                backgroundColor: '#e0e0e0', // Light gray for both not started and not enrolled
               }}
             />
           )}
@@ -326,18 +335,16 @@ const IndividualProgress: React.FC<IndividualProgressProps> = ({
                   {renderProgressBar(
                     employee.mandatoryCourses.completed,
                     employee.mandatoryCourses.inProgress,
-                    employee.mandatoryCourses.overdue,
-                    employee.mandatoryCourses.total,
-                    true
+                    employee.mandatoryCourses.notStarted,
+                    employee.mandatoryCourses.total
                   )}
                 </TableCell>
                 <TableCell sx={{ minWidth: 200 }}>
                   {renderProgressBar(
                     employee.nonMandatoryCourses.completed,
                     employee.nonMandatoryCourses.inProgress,
-                    employee.nonMandatoryCourses.notEnrolled,
-                    employee.nonMandatoryCourses.total,
-                    false
+                    employee.nonMandatoryCourses.notStarted,
+                    employee.nonMandatoryCourses.total
                   )}
                 </TableCell>
                 <TableCell>
@@ -397,9 +404,34 @@ const IndividualProgress: React.FC<IndividualProgressProps> = ({
                         <AccessTimeIcon fontSize="small" sx={{ color: '#c2185b' }} />
                       </IconButton>
                     </Tooltip> */}
-                    <IconButton size="small">
-                      <ArrowForwardIcon fontSize="small" />
-                    </IconButton>
+                    <Tooltip 
+                      title="View Employee Details" 
+                      arrow
+                      componentsProps={{
+                        tooltip: {
+                          sx: {
+                            backgroundColor: '#F8EFE7',
+                            color: '#333',
+                            boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.15)',
+                            borderRadius: 1,
+                            '& .MuiTooltip-arrow': {
+                              color: '#F8EFE7',
+                            },
+                          },
+                        },
+                      }}
+                    >
+                      <IconButton 
+                        size="small"
+                        onClick={() => handleViewEmployeeDetails(employee.id)}
+                        sx={{
+                          backgroundColor: '#e3f2fd',
+                          '&:hover': { backgroundColor: '#bbdefb' },
+                        }}
+                      >
+                        <ArrowForwardIcon fontSize="small" sx={{ color: '#1976d2' }} />
+                      </IconButton>
+                    </Tooltip>
                   </Stack>
                 </TableCell>
               </TableRow>
@@ -442,5 +474,7 @@ const IndividualProgress: React.FC<IndividualProgressProps> = ({
     </Box>
   );
 };
+
+
 
 export default IndividualProgress;

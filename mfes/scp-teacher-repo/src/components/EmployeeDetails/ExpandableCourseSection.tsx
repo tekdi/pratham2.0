@@ -15,9 +15,8 @@ const ExpandableCourseSection: React.FC<ExpandableCourseSectionProps> = ({
   title,
   count,
   courses,
-  defaultExpanded = false,
 }) => {
-  const [expanded, setExpanded] = useState(defaultExpanded);
+  const [expanded, setExpanded] = useState(true);
 
   const handleChange = () => {
     setExpanded(!expanded);
@@ -50,9 +49,8 @@ const ExpandableCourseSection: React.FC<ExpandableCourseSectionProps> = ({
         sx={{
           backgroundColor: getBackgroundColor(),
           borderRadius: 0,
-          px: 3,
-          py: 1.5,
-          minHeight: 56,
+          // px: 3,
+          // py: 1.5,
           '&.Mui-expanded': {
             minHeight: 56,
           },
