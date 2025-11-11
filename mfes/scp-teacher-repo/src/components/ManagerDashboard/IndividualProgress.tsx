@@ -145,7 +145,43 @@ console.log('filteredData', filteredData);
     const inProgressPercent = (inProgress / total) * 100;
     const overduePercent = (overdueOrNotEnrolled / total) * 100;
 
-    const tooltipContent = `Not Started: ${overdueOrNotEnrolled}`;
+    const tooltipContent = (
+      <Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
+          <Box sx={{ 
+            width: 12, 
+            height: 12, 
+            backgroundColor: '#4caf50', 
+            borderRadius: '50%', 
+            mr: 1 
+          }} />
+          <span>Completed: {completed} ({completedPercent.toFixed(1)}%)</span>
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
+          <Box sx={{ 
+            width: 12, 
+            height: 12, 
+            backgroundColor: '#ffc107', 
+            borderRadius: '50%', 
+            mr: 1 
+          }} />
+          <span>In Progress: {inProgress} ({inProgressPercent.toFixed(1)}%)</span>
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Box sx={{ 
+            width: 12, 
+            height: 12, 
+            backgroundColor: '#e0e0e0', 
+            borderRadius: '50%', 
+            mr: 1 
+          }} />
+          <span>Not Started: {overdueOrNotEnrolled} ({overduePercent.toFixed(1)}%)</span>
+        </Box>
+        <Box sx={{ mt: 1, pt: 1, borderTop: '1px solid #ddd', fontSize: '0.85em', fontWeight: 600 }}>
+          Total: {total} courses
+        </Box>
+      </Box>
+    );
 
     return (
       <Tooltip 
@@ -159,6 +195,7 @@ console.log('filteredData', filteredData);
               color: '#333',
               boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.15)',
               borderRadius: 1,
+              maxWidth: 250,
               '& .MuiTooltip-arrow': {
                 color: '#F8EFE7',
               },

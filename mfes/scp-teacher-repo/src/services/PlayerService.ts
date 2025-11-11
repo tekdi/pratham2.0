@@ -122,3 +122,14 @@ export const fetchCourses = async (filters: any = {}) => {
   }
 };
 
+export const getCourseHierarchy = async (identifier: any) => {
+  try {
+    const API_URL = `${URL_CONFIG.API.COURSE_HIERARCHY_API}${identifier}`;
+    const response = await axios.get(API_URL);
+    return response?.data?.result?.content || response?.data?.result;
+  } catch (error) {
+    console.error('Error fetching content:', error);
+    throw error;
+  }
+};
+

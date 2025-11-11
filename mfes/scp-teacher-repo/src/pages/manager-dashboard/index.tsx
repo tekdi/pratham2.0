@@ -12,7 +12,7 @@ import {
 } from '../../components/ManagerDashboard';
 import Header from '../../components/Header';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { fetchCourses } from '../../services/PlayerService';
+import { fetchCourses, getCourseHierarchy, getHierarchy } from '../../services/PlayerService';
 import { fetchUserCertificateStatus } from '../../services/TrackingService';
 import { fetchUserList } from '../../services/ManageUser';
 
@@ -22,6 +22,7 @@ const ManagerDashboard = () => {
   const [mandatoryCertificateData, setMandatoryCertificateData] = useState<any[]>([]);
   const [optionalCertificateData, setOptionalCertificateData] = useState<any[]>([]);
   const [courseDataLoading, setCourseDataLoading] = useState(true);
+  console.log('mandatoryCertificateData', mandatoryCertificateData);
   
   // Store course identifiers for use in individual progress calculation
   const [mandatoryIdentifiers, setMandatoryIdentifiers] = useState<string[]>([]);
@@ -72,6 +73,42 @@ const ManagerDashboard = () => {
   
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Extract completed course IDs without storing in state
+  useEffect(() => {
+    // Check if arrays are not empty
+    if (mandatoryCertificateData.length > 0 || optionalCertificateData.length > 0) {
+      // Find completed course IDs from mandatory courses
+      const completedMandatoryCourseIds = mandatoryCertificateData
+        .filter(course => course.status === 'completed')
+        .map(course => course.courseId);
+      
+      // Find completed course IDs from optional courses  
+      const completedOptionalCourseIds = optionalCertificateData
+        .filter(course => course.status === 'completed')
+        .map(course => course.courseId);
+      
+      // Log the completed course IDs (since we're not storing them)
+      console.log('Completed Mandatory Course IDs:', completedMandatoryCourseIds);
+      console.log('Completed Optional Course IDs:', completedOptionalCourseIds);
+      console.log('All Completed Course IDs:', [...completedMandatoryCourseIds, ...completedOptionalCourseIds]);
+
+      // Call getHierarchy for each completed course ID
+      const allCompletedCourseIds = [...completedMandatoryCourseIds, ...completedOptionalCourseIds];
+      allCompletedCourseIds.forEach(async (courseId) => {
+        try {
+          const hierarchyResponse = await getCourseHierarchy(courseId);
+          console.log(`Hierarchy response for course ${courseId}:`, hierarchyResponse);
+        } catch (error) {
+          console.error(`Error fetching hierarchy for course ${courseId}:`, error);
+        }
+      });
+
+      
+
+      
+    }
+  }, [mandatoryCertificateData, optionalCertificateData]);
 
   // Function to fetch individual progress data with pagination and search
   const fetchIndividualProgressData = async (page = 1, search = '', mandatoryIds: string[] = [], optionalIds: string[] = []) => {
@@ -474,7 +511,7 @@ const ManagerDashboard = () => {
       
         // Check if tenantId is available before calling assessment status API
         const tenantId = localStorage.getItem('tenantId');
-        if (tenantId && employeeUserIds.length > 0) {
+        if ( employeeUserIds.length > 0) {
           // TODO: Implement assessment status tracking
           // const userDataAssessmentStatus = await getAssessmentStatus({
           //   userId: employeeUserIds,
@@ -542,6 +579,7 @@ const ManagerDashboard = () => {
                     nonMandatoryCourses={optionalCertificateData}
                   />
                 )}
+
               </Grid>
               <Grid item xs={12}>
                 <CourseAchievement

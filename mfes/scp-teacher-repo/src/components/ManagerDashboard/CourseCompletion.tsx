@@ -66,8 +66,8 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
         <Typography variant="body2" fontWeight={500} color="text.secondary" gutterBottom sx={{ mb: { xs: 1, sm: 2 }, fontSize: { xs: '0.875rem', sm: '0.875rem' } }}>
           {title}
         </Typography>
-        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'center', gap: { xs: 1.5, sm: 2 } }}>
-          <Box sx={{ position: 'relative', height: { xs: 120, sm: 150 }, width: { xs: 120, sm: 150 }, flexShrink: 0 }}>
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row', lg: 'row' }, alignItems: 'center', gap: { xs: 1.5, sm: 2, lg: 1.5 } }}>
+          <Box sx={{ position: 'relative', height: { xs: 120, sm: 150, lg: 130, xl: 150 }, width: { xs: 120, sm: 150, lg: 130, xl: 150 }, flexShrink: 0 }}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -136,7 +136,7 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
                   sx={{
                     textDecoration: 'underline',
                     color: theme.palette.primary.main,
-                    fontSize: '13px',
+                    fontSize: { xs: '12px', sm: '13px', lg: '12px', xl: '13px' },
                   }}
                 >
                   {item.name} : {item.value}
@@ -153,7 +153,7 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
       <Typography variant="subtitle1" fontWeight={600} gutterBottom sx={{ fontSize: { xs: '1rem', sm: '1.125rem' } }}>
         Course Completion
       </Typography>
-      <Stack direction={{ xs: 'column', md: 'row' }} spacing={{ xs: 2, md: 3 }} sx={{ mt: 2 }}>
+      <Stack direction={{ xs: 'column', sm: 'column', lg: 'row', xl: 'row' }} spacing={{ xs: 2, sm: 2, lg: 2.5, xl: 3 }} sx={{ mt: 2 }}>
         {renderDonutChart(prepareMandatoryData(), 'Mandatory Courses')}
         {renderDonutChart(prepareNonMandatoryData(), 'Non Mandatory Courses')}
       </Stack>

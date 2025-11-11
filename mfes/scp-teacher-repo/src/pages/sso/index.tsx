@@ -24,6 +24,7 @@ import { logEvent } from '@/utils/googleAnalytics';
 import SwitchAccountDialog from '@shared-lib-v2/SwitchAccount/SwitchAccount';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 interface SSOAuthParams {
   accessToken: string;
@@ -283,6 +284,10 @@ const SSOContent = () => {
         localStorage.setItem('templtateId', tenantData?.templateId || '');
         localStorage.setItem('userIdName', userResponse?.username);
         localStorage.setItem('firstName', userResponse?.firstName || '');
+        localStorage.setItem('userName', userResponse?.firstName);
+        localStorage.setItem('userData', JSON.stringify(userResponse));
+
+
         localStorage.setItem('roleId', roleId);
         localStorage.setItem('roleName', roleName);
         localStorage.setItem('tenantName', tenantName);
@@ -376,7 +381,7 @@ const SSOContent = () => {
         flexDirection: 'column',
       }}
     >
-      <Header />
+      {/* <Header /> */}
 
       <Container
         maxWidth="sm"
@@ -553,5 +558,11 @@ const SSOPage = () => {
     </Suspense>
   );
 };
-
+export async function getStaticProps({ locale }: any) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common'])),
+    },
+  };
+}
 export default SSOPage;
