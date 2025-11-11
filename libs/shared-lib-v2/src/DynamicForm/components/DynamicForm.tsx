@@ -17,6 +17,7 @@ import CustomSingleSelectWidget from './RJSFWidget/CustomSingleSelectWidget';
 import CustomRadioWidget from './RJSFWidget/CustomRadioWidget';
 import CustomTextFieldWidget from './RJSFWidget/CustomTextFieldWidget';
 import CustomFileUpload from './RJSFWidget/CustomFileUpload';
+import CustomCenterListWidget from './RJSFWidget/CustomCenterListWidget';
 import {
   calculateAgeFromDate,
   toPascalCase,
@@ -571,6 +572,7 @@ const DynamicForm = ({
     CustomRadioWidget,
     CustomTextFieldWidget,
     CustomFileUpload,
+    CustomCenterListWidget,
   };
 
   useEffect(() => {
