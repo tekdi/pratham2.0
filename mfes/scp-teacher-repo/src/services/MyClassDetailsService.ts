@@ -152,3 +152,18 @@ export const deleteUser = async (
     return error;
   }
 };
+
+export const updateUserTenantStatus = async (
+  userId: string,
+  tenantId: string,
+  status: 'active' | 'archived' | 'inactive' | string // extendable
+): Promise<any> => {
+  const apiUrl: string = API_ENDPOINTS.userTenantStatus(userId, tenantId);
+  try {
+    const response = await patch(apiUrl, { status });
+    return response?.data;
+  } catch (error) {
+    console.error('error in updating user tenant status', error);
+    throw error;
+  }
+};

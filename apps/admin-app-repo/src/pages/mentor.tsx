@@ -33,7 +33,7 @@ import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
-import { deleteUser } from '@/services/UserService';
+import { updateUserTenantStatus } from '@/services/UserService';
 import { transformLabel } from '@/utils/Helper';
 import { getCohortList } from '@/services/GetCohortList';
 import { useTheme } from '@mui/material/styles';
@@ -295,9 +295,7 @@ const Mentor = () => {
 
       // Always attempt to delete the user
       console.log('Proceeding to self-delete...');
-      const resp = await deleteUser(userID, {
-        userData: { reason: reason, status: 'archived' },
-      });
+      const resp = await updateUserTenantStatus(userID, tenantId, 'archived');
 
       if (resp?.responseCode === 200) {
         setResponse((prev) => ({
@@ -368,10 +366,8 @@ const Mentor = () => {
 
       // Always attempt to delete the user
       console.log('Proceeding to self-delete...');
-      const resp = await deleteUser(userID, {
-        userData: { status: 'active' },
-      });
-                        showToastMessage(t("LEARNERS.ACTIVATE_USER_SUCCESS"), "success");
+      const resp = await updateUserTenantStatus(userID, tenantId, 'active');
+      showToastMessage(t("LEARNERS.ACTIVATE_USER_SUCCESS"), "success");
 
 
       if (resp?.responseCode === 200) {
