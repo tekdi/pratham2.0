@@ -172,7 +172,7 @@ export const fetchCourseIdFromSolution = async (
 
     return updatedResponse;
   } catch (error) {
-    console.error('Error fetching solution details:', error);
+    console.error('Error fetching solution details service:', error);
     // throw error;
     return null;
   }

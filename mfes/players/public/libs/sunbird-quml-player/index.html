@@ -218,7 +218,8 @@
               //scoreDetails = JSON.stringify(newFormatData);
               scoreDetails = newFormatData;
 
-              const secondsString = localStorage.getItem("totalDuration");
+              // const secondsString = localStorage.getItem("totalDuration");
+              const secondsString = telemetry?.edata?.timespent;
               const seconds = Number(secondsString);
 
               try {
