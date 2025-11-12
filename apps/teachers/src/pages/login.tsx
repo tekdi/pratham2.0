@@ -259,6 +259,7 @@ const LoginComponent = () => {
         onClose={() => setSwitchDialogOpen(false)}
         callbackFunction={callBackSwitchDialog}
         authResponse={receivedToken?.tenantData}
+        isLeadRole={true}
       />
       {loading && (
         <Loader showBackdrop={true} loadingText={t('COMMON.LOADING')} />

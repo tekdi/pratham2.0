@@ -80,6 +80,7 @@ interface SwitchAccountDialogProps {
     roleName: string
   ) => void;
   authResponse: TenantData[];
+  isLeadRole?: boolean;
 }
 
 const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
@@ -87,6 +88,7 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
   onClose,
   callbackFunction,
   authResponse,
+  isLeadRole = false,
 }) => {
   const { t, language, setLanguage } = useTranslation();
   const theme = useTheme();
@@ -326,8 +328,13 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
     setSelectedTenant(tenant);
     const roles = tenant?.roles ?? [];
     console.log("roles", roles);
-    if (roles.length === 1) {
-      const role = roles.find((r) => r.roleName === 'Lead');
+    if (roles.length >=1) {
+      let role;
+      if(isLeadRole) {
+      role = roles.find((r) => r.roleName === 'Lead');
+      } else {
+        role=roles[0];
+      }
 
       if(role) {  
       setSelectedRole(role);
