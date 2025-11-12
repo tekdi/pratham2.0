@@ -7,8 +7,15 @@ export const getTenantInfo = async (): Promise<any> => {
 
   try {
     const response = await axios.get(apiUrl);
-
-    return response?.data;
+    const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+    const matchingTenants =
+      response?.data?.result?.filter((tenant: any) =>
+        tenant?.params?.uiConfig?.enable_domain?.includes(currentOrigin)
+      ) || [];
+    const programsData =
+      matchingTenants.flatMap((t: any) => t?.children || []) || [];
+      console.log("programsData", programsData)
+    return { result: programsData };
   } catch (error) {
     console.error('Error in fetching tenant info', error);
     throw null;
