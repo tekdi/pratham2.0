@@ -48,6 +48,18 @@ const IndividualProgress: React.FC<IndividualProgressProps> = ({
   onSearch,
   
 }) => {
+  // Function to get initials from name (First + Last name initials)
+  const getInitials = (name: string) => {
+    const nameParts = name.trim().split(' ').filter(part => part.length > 0);
+    if (nameParts.length === 0) return 'U';
+    if (nameParts.length === 1) return nameParts[0].charAt(0).toUpperCase();
+    
+    // Take first letter of first name and first letter of last name
+    const firstInitial = nameParts[0].charAt(0).toUpperCase();
+    const lastInitial = nameParts[nameParts.length - 1].charAt(0).toUpperCase();
+    
+    return firstInitial + lastInitial;
+  };
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedEmployees, setSelectedEmployees] = useState<string[]>([]);
@@ -309,7 +321,7 @@ console.log('filteredData', filteredData);
         <Table sx={{ minWidth: { xs: 800, md: '100%' } }}>
           <TableHead>
             <TableRow sx={{ backgroundColor: '#F8EFE7' }}>
-              <TableCell padding="checkbox">
+              {/* <TableCell padding="checkbox">
                 <Checkbox
                   checked={selectedEmployees.length === data.length}
                   indeterminate={
@@ -318,7 +330,7 @@ console.log('filteredData', filteredData);
                   }
                   onChange={handleSelectAll}
                 />
-              </TableCell>
+              </TableCell> */}
               <TableCell sx={{ fontWeight: 600 }}>Employee</TableCell>
               {/* <TableCell sx={{ fontWeight: 600 }}>Department</TableCell> */}
               <TableCell sx={{ fontWeight: 600 }}>Mandatory Courses</TableCell>
@@ -334,12 +346,12 @@ console.log('filteredData', filteredData);
                   '&:hover': { backgroundColor: '#f9f9f9' },
                 }}
               >
-                <TableCell padding="checkbox">
+                {/* <TableCell padding="checkbox">
                   <Checkbox
                     checked={selectedEmployees.includes(employee.id)}
                     onChange={() => handleSelectEmployee(employee.id)}
                   />
-                </TableCell>
+                </TableCell> */}
                 <TableCell>
                   <Stack direction="row" spacing={1.5} alignItems="center">
                     <Avatar
@@ -351,15 +363,41 @@ console.log('filteredData', filteredData);
                         border: '2px solid #e0e0e0',
                         fontWeight: 600,
                         fontSize: '14px',
+                        flexShrink: 0
                       }}
                     >
-                      {employee.name.substring(0, 2).toUpperCase()}
+                      {getInitials(employee.name)}
                     </Avatar>
-                    <Box>
-                      <Typography variant="body2" fontWeight={600}>
+                    <Box sx={{ 
+                      flex: 1, 
+                      minWidth: 0,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'center'
+                    }}>
+                      <Typography 
+                        variant="body2" 
+                        fontWeight={600}
+                        sx={{
+                          lineHeight: 1.3,
+                          mb: 0.25,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}
+                      >
                         {employee.name}
                       </Typography>
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography 
+                        variant="caption" 
+                        color="text.secondary"
+                        sx={{
+                          lineHeight: 1.2,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}
+                      >
                         {employee.role}
                       </Typography>
                     </Box>

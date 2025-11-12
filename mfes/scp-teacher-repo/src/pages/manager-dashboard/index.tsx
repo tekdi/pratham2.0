@@ -15,7 +15,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { fetchCourses, getCourseHierarchy } from '../../services/PlayerService';
 import { fetchUserCertificateStatus } from '../../services/TrackingService';
 import { fetchUserList } from '../../services/ManageUser';
-import { getAssessmentStatus, getAssessmentTracking } from '../../services/AssesmentService';
+import { getAssessmentStatus } from '../../services/AssesmentService';
 
 
 const ManagerDashboard = () => {
@@ -29,7 +29,7 @@ const ManagerDashboard = () => {
   const [mandatoryIdentifiers, setMandatoryIdentifiers] = useState<string[]>([]);
   const [optionalIdentifiers, setOptionalIdentifiers] = useState<string[]>([]);
   const[employeeUserIds, setEmployeeUserIds] = useState<string[]>([]);
-
+const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
   const [courseAllocationData, setCourseAllocationData] = useState({
     mandatory: 0,
     nonMandatory: 0,
@@ -55,13 +55,9 @@ const ManagerDashboard = () => {
   });
 
   const [topPerformersData, setTopPerformersData] = useState<{
-    categories: string[];
     usersData: { [key: string]: User[] };
-    dateOptions: string[];
   }>({
-    categories: [],
     usersData: {},
-    dateOptions: [],
   });
 
   const [individualProgressData, setIndividualProgressData] = useState<EmployeeProgress[]>([]);
@@ -75,6 +71,39 @@ const ManagerDashboard = () => {
   
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Function to find top 5 performers from assessment data
+  const findTopPerformers = (assessmentData: any[]): string[] => {
+    const userPerformance: { userId: string; avgPercentage: number }[] = [];
+    
+    assessmentData.forEach((user) => {
+      // Check if user has assessments array
+      if (user.userId && user.assessments && Array.isArray(user.assessments) && user.assessments.length > 0) {
+        // Calculate average percentage for this user across all assessments
+        const totalPercentage = user.assessments.reduce((sum: number, assessment: any) => {
+          return sum + (assessment.percentage || 0);
+        }, 0);
+        
+        const avgPercentage = totalPercentage / user.assessments.length;
+        
+        userPerformance.push({
+          userId: user.userId,
+          avgPercentage: avgPercentage
+        });
+      }
+    });
+    
+    // Sort by average percentage in descending order and get top 5
+    const top5Performers = userPerformance
+      .sort((a, b) => b.avgPercentage - a.avgPercentage)
+      .slice(0, 5)
+      .map(performer => performer.userId);
+    
+    console.log('User Performance Data:', userPerformance);
+    console.log('Top 5 Performers (UserIds):', top5Performers);
+    
+    return top5Performers;
+  };
 
   // Function to extract structured data with courseId, unitIds, and contentIds
   const extractStructuredCourseData = (courseId: string, hierarchyChildren: any[]) => {
@@ -122,7 +151,7 @@ const ManagerDashboard = () => {
   // Extract completed course IDs without storing in state
   useEffect(() => {
     // Check if arrays are not empty
-    if ((mandatoryCertificateData.length > 0 || optionalCertificateData.length > 0) && employeeUserIds.length > 0) {
+    if ((mandatoryCertificateData.length > 0 || optionalCertificateData.length > 0) && employeeUserIds.length > 0 && employeeDataResponse.length > 0) {
       // Find completed course IDs from mandatory courses
       const completedMandatoryCourseIds = mandatoryCertificateData
         .filter(course => course.status === 'completed')
@@ -189,17 +218,50 @@ const ManagerDashboard = () => {
         });
         
         console.log('Assessment tracking data:', assessmentdata);
-        return allStructuredData;
+        
+        // Find top 5 performers from assessment data
+        const topPerformerUserIds = findTopPerformers(assessmentdata?.data || assessmentdata || []);
+        console.log('topPerformerUserIds', topPerformerUserIds);
+        console.log('employeeDataResponse', employeeDataResponse);
+        
+        // Filter employee data by top performer user IDs
+        const topPerformerEmployees = employeeDataResponse.filter((employee: any) => 
+          topPerformerUserIds.includes(employee.userId)
+        );
+        
+        // Create TopPerformers data structure
+        const topPerformersDataStructure = {
+          usersData: {
+            '5 Highest Course Completing Users': topPerformerEmployees.map((employee: any) => ({
+              id: employee.userId,
+              name: employee.name || `${employee.firstName} ${employee.lastName}`.trim(),
+              role: 'Learner'
+            }))
+          }
+        };
+        
+        console.log('topPerformerEmployees', topPerformerEmployees);
+        console.log('topPerformersDataStructure', topPerformersDataStructure);
+        
+        // Set the top performers data
+        setTopPerformersData(topPerformersDataStructure);
+        
+        return { allStructuredData, topPerformerUserIds };
       };
       
-      // Call the function to get all structured course data
-      getAllStructuredCourseData();
+      // Call the function to get all structured course data and top performers
+      getAllStructuredCourseData().then((result) => {
+        console.log('Final Result:', result);
+        console.log('Top 5 Performer User IDs:', result?.topPerformerUserIds);
+      }).catch((error) => {
+        console.error('Error processing structured course data:', error);
+      });
 
       
 
       
     }
-  }, [mandatoryCertificateData, optionalCertificateData, employeeUserIds]);
+  }, [mandatoryCertificateData, optionalCertificateData, employeeUserIds, employeeDataResponse]);
 
   // Function to fetch individual progress data with pagination and search
   const fetchIndividualProgressData = async (page = 1, search = '', mandatoryIds: string[] = [], optionalIds: string[] = []) => {
@@ -420,48 +482,39 @@ const ManagerDashboard = () => {
         },
       };
 
-      const dummyTopPerformersData = {
-        categories: [
-          '5 Highest Course Completing Users',
-          '5 Lowest Course Completing Users',
-          'Most Active Users',
-          'Least Active Users',
-        ],
-        usersData: {
-          '5 Highest Course Completing Users': [
-            { id: '1', name: 'Rahul Somshekhar', role: 'Facilitator' },
-            { id: '2', name: 'Rahul Somshekhar', role: 'Facilitator' },
-            { id: '3', name: 'Rahul Somshekhar', role: 'Facilitator' },
-            { id: '4', name: 'Rahul Somshekhar', role: 'Facilitator' },
-            { id: '5', name: 'Rahul Somshekhar', role: 'Facilitator' },
-            { id: '6', name: 'Rahul Somshekhar', role: 'Facilitator' },
-          ]
-          // '5 Lowest Course Completing Users': [
-          //   { id: '1', name: 'Priya Sharma', role: 'Teacher' },
-          //   { id: '2', name: 'Amit Patel', role: 'Teacher' },
-          //   { id: '3', name: 'Sneha Reddy', role: 'Facilitator' },
-          //   { id: '4', name: 'Vikram Singh', role: 'Teacher' },
-          //   { id: '5', name: 'Anjali Mehta', role: 'Facilitator' },
-          // ],
-          // 'Most Active Users': [
-          //   { id: '1', name: 'Karan Verma', role: 'Facilitator' },
-          //   { id: '2', name: 'Divya Nair', role: 'Teacher' },
-          //   { id: '3', name: 'Rohit Kumar', role: 'Facilitator' },
-          //   { id: '4', name: 'Pooja Gupta', role: 'Teacher' },
-          // ],
-          // 'Least Active Users': [
-          //   { id: '1', name: 'Sanjay Desai', role: 'Teacher' },
-          //   { id: '2', name: 'Meera Iyer', role: 'Facilitator' },
-          //   { id: '3', name: 'Arjun Rao', role: 'Teacher' },
-          // ],
-        },
-        dateOptions: [
-          'As of today, 5th Sep',
-          'Last 7 days',
-          'Last 30 days',
-          'Last 90 days',
-        ],
-      };
+      // const dummyTopPerformersData = {
+      //   // categories: [
+      //   //   '5 Highest Course Completing Users',
+      //   // ],
+      //   usersData: {
+      //     '5 Highest Course Completing Users': [
+      //       { id: '1', name: 'Rahul Somshekhar', role: 'Facilitator' },
+      //       { id: '2', name: 'Rahul Somshekhar', role: 'Facilitator' },
+      //       { id: '3', name: 'Rahul Somshekhar', role: 'Facilitator' },
+      //       { id: '4', name: 'Rahul Somshekhar', role: 'Facilitator' },
+      //       { id: '5', name: 'Rahul Somshekhar', role: 'Facilitator' },
+      //       { id: '6', name: 'Rahul Somshekhar', role: 'Facilitator' },
+      //     ]
+      //     // '5 Lowest Course Completing Users': [
+      //     //   { id: '1', name: 'Priya Sharma', role: 'Teacher' },
+      //     //   { id: '2', name: 'Amit Patel', role: 'Teacher' },
+      //     //   { id: '3', name: 'Sneha Reddy', role: 'Facilitator' },
+      //     //   { id: '4', name: 'Vikram Singh', role: 'Teacher' },
+      //     //   { id: '5', name: 'Anjali Mehta', role: 'Facilitator' },
+      //     // ],
+      //     // 'Most Active Users': [
+      //     //   { id: '1', name: 'Karan Verma', role: 'Facilitator' },
+      //     //   { id: '2', name: 'Divya Nair', role: 'Teacher' },
+      //     //   { id: '3', name: 'Rohit Kumar', role: 'Facilitator' },
+      //     //   { id: '4', name: 'Pooja Gupta', role: 'Teacher' },
+      //     // ],
+      //     // 'Least Active Users': [
+      //     //   { id: '1', name: 'Sanjay Desai', role: 'Teacher' },
+      //     //   { id: '2', name: 'Meera Iyer', role: 'Facilitator' },
+      //     //   { id: '3', name: 'Arjun Rao', role: 'Teacher' },
+      //     // ],
+      //   },
+      // };
 
       try {
         const mandatoryCourses = await fetchCourses({
@@ -507,6 +560,7 @@ const ManagerDashboard = () => {
             filters: {emp_manager:userId},
           });
           console.log('employeeDataResponse', employeeDataResponse);
+          setEmployeeDataResponse(employeeDataResponse?.getUserDetails || []);
            employeeUserIds = employeeDataResponse?.getUserDetails?.map((item: any) => item.userId);
            setEmployeeUserIds(employeeUserIds);
         }
@@ -619,7 +673,13 @@ const ManagerDashboard = () => {
 
       // Set all data
       setCourseAchievementData(dummyCourseAchievementData);
-      setTopPerformersData(dummyTopPerformersData);
+      
+      // Initialize empty top performers data (will be populated after assessment processing)
+      // setTopPerformersData({
+      //   usersData: {
+      //     '5 Highest Course Completing Users': []
+      //   }
+      // });
       
       // Fetch individual progress data with pagination - pass the course identifiers
       fetchIndividualProgressData(1, '', mandatoryIds || [], optionalIds || []);
@@ -710,9 +770,7 @@ const ManagerDashboard = () => {
               </Grid>
               <Grid item xs={12}>
                 <TopPerformers
-                  categories={topPerformersData.categories}
                   usersData={topPerformersData.usersData}
-                  dateOptions={topPerformersData.dateOptions}
                 />
               </Grid>
             </Grid>

@@ -472,14 +472,18 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                   >
                     <Button
                       fullWidth
-                      variant="contained"
+                      variant="outlined"
                       color="primary"
                       type="button"
                       sx={{
                         borderRadius: 50,
-                        backgroundColor: '#FDBE16',
+                        backgroundColor: 'transparent',
+                        borderColor: '#1976d2',
+                        color: '#1976d2',
                         '&:hover': {
-                          backgroundColor: '#FDBE16',
+                          backgroundColor: 'transparent',
+                          borderColor: '#1565c0',
+                          color: '#1565c0',
                         },
                         '@media (min-width: 900px)': {
                           width: '50%',
