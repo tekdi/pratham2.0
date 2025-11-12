@@ -78,7 +78,7 @@ export const Footer: React.FC = () => {
             <Grid item>
               <Typography
                 variant="body1"
-                sx={{ fontWeight: 400, color: '#1F1B13' }}
+                sx={{ fontWeight: 400, color: '#1F1B13', textAlign: 'justify' }}
               >
                 <SpeakableText>
                   {t(`

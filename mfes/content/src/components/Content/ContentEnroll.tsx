@@ -53,7 +53,23 @@ const ContentDetails = (props: ContentDetailsProps) => {
   useEffect(() => {
     const fetchContentDetails = async () => {
       try {
-        const result = await hierarchyAPI(identifier as string);
+        const result = await hierarchyAPI(identifier as string)as any;
+
+console.log('result=======>', result?.program);
+const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+console.log('currentPath=======>', currentPath);
+const isThematicPath = currentPath.includes('/themantic');
+const isPosPath = currentPath.includes('/pos');
+console.log('isThematicPath=======>', isThematicPath);
+
+if(!isThematicPath && !isPosPath && result?.program) {
+
+        if (!result?.program?.includes(localStorage.getItem('userProgram')) && !result.program.includes('Open School'))
+        {
+          router.push('/unauthorized');
+          return;
+        }
+      }
         const userId = getUserId(props?._config?.userIdLocalstorageName);
         setCheckLocalAuth(checkAuth(Boolean(userId)));
         if (props?._config?.isEnrollmentRequired !== false) {
@@ -68,7 +84,7 @@ const ContentDetails = (props: ContentDetailsProps) => {
                 'inprogress',
                 'completed',
                 'viewCertificate',
-              ].includes(data?.result?.status)
+              ].includes?.(data?.result?.status)
             ) {
               if (props?.getIfEnrolled) {
                 props?.getIfEnrolled(
@@ -210,7 +226,7 @@ const ContentDetails = (props: ContentDetailsProps) => {
                 width: { sx: '100%', sm: '90%', md: '85%' },
               }}
             >
-              <Box>
+              {/* <Box>
                 <Typography
                   variant="body1"
                   component="div"
@@ -221,6 +237,7 @@ const ContentDetails = (props: ContentDetailsProps) => {
                     letterSpacing: '0.5px',
                     color: '#4D4639',
                     textTransform: 'capitalize',
+                    textAlign: 'justify',
                   }}
                   fontWeight={400}
                 >
@@ -228,7 +245,7 @@ const ContentDetails = (props: ContentDetailsProps) => {
                     {contentDetails?.description ?? 'No description available'}
                   </SpeakableText>
                 </Typography>
-              </Box>
+              </Box> */}
               <Box
                 sx={{
                   display: 'flex',
@@ -302,6 +319,7 @@ const ContentDetails = (props: ContentDetailsProps) => {
                                     // lineHeight: '24px',
                                     letterSpacing: '0.5px',
                                     color: '#4D4639',
+                                    textAlign: 'justify',
                                   }}
                                 >
                                   <SpeakableText>

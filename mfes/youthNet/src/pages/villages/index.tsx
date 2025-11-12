@@ -312,6 +312,7 @@ const Index = () => {
         };
 
         const result = await fetchUserList({ filters });
+        console.log('result', result);
         if (result.getUserDetails) {
           const transformedYouthData = result?.getUserDetails.map(
             (user: any) => {

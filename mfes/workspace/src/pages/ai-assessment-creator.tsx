@@ -172,6 +172,7 @@ const AIAssessmentCreator: React.FC = () => {
   const [aiStatus, setAIStatus] = useState<string | null>(null);
   const [aiDialogParams, setAIDialogParams] = useState<any>(null); // for retry
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoadingAPI, setIsLoadingAPI] = useState(false); // Loading state for API calls
   const router = useRouter();
 
   useEffect(() => {
@@ -209,7 +210,7 @@ const AIAssessmentCreator: React.FC = () => {
   const fetchData = async (data: any) => {
     let response: any = '';
     try {
-      response = await createQuestionSet(tenantConfig?.QUESTION_SET_FRAMEWORK);
+      response = await createQuestionSet(tenantConfig?.QUESTION_SET_FRAMEWORK,data?.metadata?.name);
 
       // Create the attributions array as per the API requirement
       // const attributions = [
@@ -265,7 +266,6 @@ const AIAssessmentCreator: React.FC = () => {
     setAIDialogState('loader');
     setAIStatus(null);
     setErrorMessage(null);
-    setShowAIDialog(true);
 
     try {
       // 1. Call AI generation API
@@ -275,7 +275,10 @@ const AIAssessmentCreator: React.FC = () => {
         token,
       });
 
-      // 2. Poll for status (sendToAi logic)
+      // 2. Only show AI dialog after successful API calls
+      setShowAIDialog(true);
+
+      // 3. Poll for status (sendToAi logic)
       // let prog = 0;
       // let lastStatus: string | null = null;
       // const interval = setInterval(async () => {
@@ -314,6 +317,7 @@ const AIAssessmentCreator: React.FC = () => {
         error?.response?.data?.params?.errmsg ||
           'Something went wrong in AI assessment'
       );
+      setShowAIDialog(true); // Show dialog even on error to display error message
       console.error('Error creating AI question set:', error);
     }
   };
@@ -343,62 +347,79 @@ const AIAssessmentCreator: React.FC = () => {
   const handleSubmit = async (formData: any) => {
     const token = localStorage.getItem('token');
     if (!token) throw new Error('No token found');
-    // Convert dropdown-single array values to single string
-    const formattedData = {};
-    const onlyFieldsNew =
-      tenantConfig?.COLLECTION_FRAMEWORK === 'scp-framework'
-        ? onlyFields1
-        : onlyFields;
-    onlyFieldsNew.forEach((key: string) => {
-      let newKey = key;
-      if (key.startsWith('se_') && key.endsWith('s')) {
-        newKey = key.slice(3, -1); // Remove 'se_' prefix and 's' suffix
-      }
-      if (
-        inputType?.[key as keyof typeof inputType] === 'dropdown-single' &&
-        Array.isArray(formData?.metadata?.[key]) &&
-        !['se_subDomains'].includes(key)
-      ) {
-        (formattedData as Record<string, string>)[newKey] =
-          formData?.metadata?.[key][0] || '';
-      } else {
-        (formattedData as Record<string, any>)[newKey] =
-          formData?.metadata?.[key];
-      }
-      if (key.startsWith('se_') && key.endsWith('s')) {
-        delete (formattedData as Record<string, any>)[key];
-      }
-    });
-    const newFormData = {
-      ...formData,
-      framework: tenantConfig?.COLLECTION_FRAMEWORK,
-      channel: tenantConfig?.CHANNEL_ID,
-      metadata: {
-        ...formattedData,
-        name: formData?.metadata?.name,
-        description: formData?.metadata?.description,
-        assessmentType: formData?.metadata?.assessmentType,
-        //added for evaluationType
-        evaluationType: 'ai',
-        gradeLevel: ['Grade 10'],
-        program: ['Second Chance'],
-      },
-    };
+    
+    // Start loading state
+    setIsLoadingAPI(true);
+    
     try {
+      // Convert dropdown-single array values to single string
+      const formattedData = {};
+      const onlyFieldsNew =
+        tenantConfig?.COLLECTION_FRAMEWORK === 'scp-framework'
+          ? onlyFields1
+          : onlyFields;
+      onlyFieldsNew.forEach((key: string) => {
+        let newKey = key;
+        if (key.startsWith('se_') && key.endsWith('s')) {
+          newKey = key.slice(3, -1); // Remove 'se_' prefix and 's' suffix
+        }
+        if (
+          inputType?.[key as keyof typeof inputType] === 'dropdown-single' &&
+          Array.isArray(formData?.metadata?.[key]) &&
+          !['se_subDomains'].includes(key)
+        ) {
+          (formattedData as Record<string, string>)[newKey] =
+            formData?.metadata?.[key][0] || '';
+        } else {
+          (formattedData as Record<string, any>)[newKey] =
+            formData?.metadata?.[key];
+        }
+        if (key.startsWith('se_') && key.endsWith('s')) {
+          delete (formattedData as Record<string, any>)[key];
+        }
+      });
+      const newFormData = {
+        ...formData,
+        framework: tenantConfig?.COLLECTION_FRAMEWORK,
+        channel: tenantConfig?.CHANNEL_ID,
+        metadata: {
+          ...formattedData,
+          name: formData?.metadata?.name,
+          description: formData?.metadata?.description,
+          assessmentType: formData?.metadata?.assessmentType,
+          //added for evaluationType
+          evaluationType: 'ai',
+          gradeLevel: ['Grade 10'],
+          program: ['Second Chance'],
+        },
+      };
+      
       const identifier = await fetchData(newFormData);
       if (identifier) {
-        handleAIGeneration({ newFormData, identifier, token });
+        await handleAIGeneration({ newFormData, identifier, token });
       } else {
         setAIDialogState('failed');
         setErrorMessage('Something went wrong in AI assessment');
+        setShowAIDialog(true);
       }
     } catch (error) {
       console.error('Error creating question set:', error);
+      setAIDialogState('failed');
+      setErrorMessage('Something went wrong in AI assessment');
+      setShowAIDialog(true);
+    } finally {
+      // Stop loading state
+      setIsLoadingAPI(false);
     }
   };
 
   if (Object.keys(staticFilter).length === 0) {
     return <Loader showBackdrop loadingText="Loading..." />;
+  }
+
+  // Show loader during API calls
+  if (isLoadingAPI) {
+    return <Loader showBackdrop loadingText="Creating assessment..." />;
   }
 
   let stepContent: React.ReactElement | null = null;

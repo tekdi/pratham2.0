@@ -33,7 +33,7 @@ const columns = [
     key: 'title_and_description',
     title: 'TITLE & DESCRIPTION',
     dataType: DataType.String,
-    width: '350px',
+    width: '450px',
   },
   {
     key: 'create-by',
@@ -61,7 +61,7 @@ const columns = [
     key: 'lastUpdatedOn',
     title: 'LAST MODIFIED',
     dataType: DataType.String,
-    width: '100px',
+    width: '180px',
   },
   {
     key: 'contentAction',
@@ -111,6 +111,7 @@ const ContentsPage = () => {
   const fetchContentAPI = useSharedStore((state: any) => state.fetchContentAPI);
   const [debouncedSearchTerm, setDebouncedSearchTerm] =
     useState<string>(searchTerm);
+  const prevSearchTermRef = useRef(debouncedSearchTerm);
   const [totalCount, setTotalCount] = useState(0);
   const stateQuery: string =
     typeof router.query.state === 'string' ? router.query.state : 'All';
@@ -177,13 +178,19 @@ const ContentsPage = () => {
         const sort_by = {
           lastUpdatedOn: order,
         };
-        let offset = debouncedSearchTerm !== '' ? 0 : page * LIMIT;
-        if (prevFilterRef.current !== filter) {
-          offset = 0;
+        
+        // Reset page to 0 when search term or filter changes
+        if (prevSearchTermRef.current !== debouncedSearchTerm) {
           setPage(0);
-
+          prevSearchTermRef.current = debouncedSearchTerm;
+        }
+        
+        if (prevFilterRef.current !== filter) {
+          setPage(0);
           prevFilterRef.current = filter;
         }
+        
+        const offset = page * LIMIT;
         const contentType = 'discover-contents';
 
         const response = await getContent(

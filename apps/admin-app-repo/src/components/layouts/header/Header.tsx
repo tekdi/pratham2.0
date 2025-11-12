@@ -109,7 +109,8 @@ const Header = ({
         storedUserData?.tenantData[0]?.tenantName !=
         TenantName.SECOND_CHANCE_PROGRAM
       ) {
-        router.push('/workspace');
+        // router.push('/workspace');
+        router.push('/faqs');
       } else {
         if (locale)
           router.push('/course-planner', undefined, { locale: locale });
@@ -196,19 +197,13 @@ const Header = ({
   };
   return (
     <AppBar sx={sx} position={position} elevation={0} className={customClass}>
-      <Toolbar sx={{ gap: '15px' }}>
-        <Typography
-          variant="h2"
-          sx={{
-            color: '#635E57',
-            marginRight: '10px',
-            fontSize: '22px',
-            fontWeight: 400,
-            '@media (max-width: 900px)': { paddingLeft: '34px' },
-          }}
-        >
-          Admin
-        </Typography>
+      <Toolbar 
+        sx={{ 
+          gap: { xs: '8px', sm: '12px', md: '15px' }, // Responsive gap
+          paddingX: { xs: '8px', sm: '16px' }, // Responsive horizontal padding
+          minHeight: { xs: '56px', sm: '64px' }, // Responsive toolbar height
+        }}
+      >
         <IconButton
           size="large"
           color="inherit"
@@ -216,18 +211,42 @@ const Header = ({
           onClick={toggleMobileSidebar}
           sx={{
             display: {
-              color: theme.palette.warning['A400'],
               lg: 'none',
               xs: 'flex',
-              '@media (max-width: 600px)': {
-                padding: '0px',
-              },
+            },
+            color: '#333333', // Dark color for better visibility
+            marginRight: '12px',
+            padding: '8px',
+            backgroundColor: 'rgba(255, 255, 255, 0.1)', // Subtle background for contrast
+            '&:hover': {
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              color: '#000000',
+            },
+            '@media (max-width: 600px)': {
+              padding: '4px',
+              marginRight: '8px',
             },
           }}
         >
-          {/* {showIcon === false ? "" : <FeatherIcon icon="menu" size="20" />} */}
-          <MenuIcon />
+          <MenuIcon sx={{ fontSize: '24px' }} />
         </IconButton>
+        <Typography
+          variant="h2"
+          sx={{
+            color: '#635E57',
+            marginRight: '10px',
+            fontSize: '22px',
+            fontWeight: 400,
+            '@media (max-width: 900px)': { 
+              fontSize: '20px',
+            },
+            '@media (max-width: 600px)': { 
+              fontSize: '18px',
+            },
+          }}
+        >
+          Admin
+        </Typography>
         {/* ------------------------------------------- */}
         {/* Search Dropdown */}
         {/* ------------------------------------------- */}
@@ -242,8 +261,13 @@ const Header = ({
         {(typeof window !== 'undefined' && localStorage.getItem('academicYearId')) &&(userRole !== Role.CCTA &&
           userRole !== Role.SCTA &&
           userRole !== '') && (
-            <Box sx={{ flexBasis: '20%' }}>
-              {/* <FormControl className="drawer-select" sx={{ width: '100%' }}> */}
+            <Box 
+              sx={{ 
+                flexBasis: { xs: '35%', sm: '25%', md: '20%' }, // Responsive width
+                minWidth: { xs: '120px', sm: '150px' }, // Minimum width
+                marginRight: { xs: '8px', sm: '12px' }, // Responsive margin
+              }}
+            >
               <Select
                 onChange={handleSelectChange}
                 value={selectedSessionId}
@@ -251,54 +275,52 @@ const Header = ({
                 displayEmpty
                 sx={{
                   borderRadius: '0.5rem',
-                  // color: theme.palette.warning['200'],
                   width: '100%',
                   marginBottom: '0rem',
-                  height: '30px',
+                  height: { xs: '28px', sm: '30px' }, // Responsive height
                   color: '#fff',
                   border: '1px solid #fff',
+                  fontSize: { xs: '12px', sm: '14px' }, // Responsive font size
                   '& .MuiSvgIcon-root': {
                     color: 'black',
+                  },
+                  '& .MuiSelect-select': {
+                    padding: { xs: '4px 8px', sm: '6px 12px' }, // Responsive padding
                   },
                 }}
               >
                   {academicYearList.map(({ id, session }) => (
                   <MenuItem key={id} value={id}>
-<span style={{ color: 'black' }}>{session}</span>
+<span style={{ color: 'black', fontSize: '14px' }}>{session}</span>
                   </MenuItem>
                 ))}
               </Select>
-              {/* </FormControl> */}
             </Box>
           )}
 
         <Box
           sx={{
             display: 'flex',
-            // gap:"10px",
             backgroundColor: '#bdbdbd',
-            padding: '5px',
+            padding: { xs: '3px', sm: '5px' }, // Responsive padding
             alignItems: 'center',
             justifyContent: 'center',
-            height: '20px',
-            width: '35px',
+            height: { xs: '24px', sm: '20px' }, // Responsive height
+            width: { xs: '30px', sm: '35px' }, // Responsive width
             borderRadius: '10px',
             cursor: 'pointer',
+            marginRight: { xs: '6px', sm: '8px' }, // Responsive margin
+            marginLeft: { xs: '6px', sm: '0px' }, // Add left margin on mobile
           }}
           onClick={handleClick}
         >
-          {/* <IconButton
-            aria-label="more"
-            id="long-button"
-            aria-controls={open ? "long-menu" : undefined}
-            aria-expanded={open ? "true" : undefined}
-            aria-haspopup="true"
-            onClick={handleClick}
-          >
-            <TranslateIcon />
-
-          </IconButton> */}
-          <Image src={deleteIcon} alt="" width={22} />
+          <Image 
+            src={deleteIcon} 
+            alt="" 
+            width={18} 
+            height={18}
+            style={{ maxWidth: '100%', height: 'auto' }}
+          />
         </Box>
         <Menu
           id="long-menu"

@@ -246,7 +246,7 @@ const rangeLength = contentLanguageField?.range?.length || 0;
                 // fontSize: '72px',
                 lineHeight: '110%',
                 letterSpacing: '0%',
-                color: '#1F1B13',
+                color: '#FDBE16',
                 // position: 'relative',
                 zIndex: 1000,
                 '@media (min-width: 900px)': {
@@ -307,7 +307,9 @@ const rangeLength = contentLanguageField?.range?.length || 0;
                 mt: 1,
               }}
             >
-              <SpeakableText>In {languagesCount} languages</SpeakableText>
+              {/* <SpeakableText>In {languagesCount} languages</SpeakableText> */}
+              <SpeakableText>In 15 languages</SpeakableText>
+
             </Typography>
 
             <Typography
@@ -322,11 +324,12 @@ const rangeLength = contentLanguageField?.range?.length || 0;
                 letterSpacing: '0.5px',
                 color: '#1F1B13',
                 mt: 3,
+                textAlign: 'justify',
               }}
             >
               <SpeakableText>
                 Pratham Open School offers free, downloadable videos, games,
-                reading material and stories in {languagesCount} languages for ages 1 to 18+,
+                reading material and stories in 15 languages for ages 1 to 18+,
                 designed to support self-led learning and group learning through
                 activities and projects.
               </SpeakableText>
@@ -409,7 +412,7 @@ const rangeLength = contentLanguageField?.range?.length || 0;
             }}
           >
 <SpeakableText>
-  {totalResources}
+  {videosCount+gamesCount+otherFormatsCount}
 </SpeakableText>
           </Typography>
           <Typography
@@ -447,7 +450,7 @@ const rangeLength = contentLanguageField?.range?.length || 0;
               { value: gamesCount, label: 'Games' },
               // { value: audiosCount, label: 'Audios' },
               { value: otherFormatsCount, label: 'Other Formats' },
-              { value: languagesCount, label: 'Languages' },
+              { value: 15, label: 'Languages' },
             ].map((item, idx) => (
               <Grid
                 item

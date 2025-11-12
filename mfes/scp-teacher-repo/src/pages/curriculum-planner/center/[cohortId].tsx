@@ -108,6 +108,8 @@ const CoursePlannerDetail = () => {
         medium: tStore?.medium,
         entityId: cohortId,
       });
+      let courseData = response?.result?.data?.[0];
+      let courseId = courseData?._id;
 
       // Retry without entityId if empty
       if (
@@ -121,23 +123,15 @@ const CoursePlannerDetail = () => {
           courseType: tStore?.type,
           medium: tStore?.medium,
         });
+        if (
+          !Array.isArray(response?.result?.data) ||
+          response?.result?.data.length === 0
+        ) {
+          setLoading(false);
+          return;
+        }
+        courseId = await fetchCourseIdFromSolution(response?.result?.data?.[0]?.solutionId);
       }
-
-      if (
-        !Array.isArray(response?.result?.data) ||
-        response?.result?.data.length === 0
-      ) {
-        setLoading(false);
-        return;
-      }
-
-      const courseData = response?.result?.data[0];
-      let courseId = courseData._id;
-
-      if (!courseId) {
-        courseId = await fetchCourseIdFromSolution(courseData?.solutionId);
-      }
-
       await fetchAndSetUserProjectDetails(courseId);
     } catch (error) {
       console.error('Error fetching course planner:', error);
@@ -275,19 +269,19 @@ const CoursePlannerDetail = () => {
 
   const toggleDrawer =
     (open: boolean, selectedCount: number = 0) =>
-    (event?: React.KeyboardEvent | React.MouseEvent) => {
-      if (
-        event &&
-        event.type === 'keydown' &&
-        ((event as React.KeyboardEvent).key === 'Tab' ||
-          (event as React.KeyboardEvent).key === 'Shift')
-      ) {
-        return;
-      }
-      setDrawerState({ ...drawerState, bottom: open });
-      setIsDrawerOpen(open);
-      setSelectedCount(selectedCount);
-    };
+      (event?: React.KeyboardEvent | React.MouseEvent) => {
+        if (
+          event &&
+          event.type === 'keydown' &&
+          ((event as React.KeyboardEvent).key === 'Tab' ||
+            (event as React.KeyboardEvent).key === 'Shift')
+        ) {
+          return;
+        }
+        setDrawerState({ ...drawerState, bottom: open });
+        setIsDrawerOpen(open);
+        setSelectedCount(selectedCount);
+      };
 
   const handleCloseModel = () => {
     setModalOpen(false);
@@ -771,8 +765,8 @@ const CoursePlannerDetail = () => {
                                         )
                                           ? '#FF9800'
                                           : isStatusCompleted(subTopic._id)
-                                          ? '#4CAF50'
-                                          : '#7C766e',
+                                            ? '#4CAF50'
+                                            : '#7C766e',
                                         cursor: isStatusCompleted(subTopic._id)
                                           ? 'default'
                                           : 'pointer',
@@ -802,16 +796,15 @@ const CoursePlannerDetail = () => {
                                     );
                                     router.push(`/topic-detail-view`);
                                   }}
-                                  // onClick={() => {
-                                  //   // router.push(`/topic-detail-view`);
-                                  // }}
+                                // onClick={() => {
+                                //   // router.push(`/topic-detail-view`);
+                                // }}
                                 >
                                   <Box
                                     sx={{ fontSize: '12px', fontWeight: '500' }}
                                   >
-                                    {`${
-                                      subTopic?.learningResources?.length
-                                    } ${t('COURSE_PLANNER.RESOURCES')}`}
+                                    {`${subTopic?.learningResources?.length
+                                      } ${t('COURSE_PLANNER.RESOURCES')}`}
                                   </Box>
                                   <ArrowForwardIcon sx={{ fontSize: '16px' }} />
                                 </Box>
