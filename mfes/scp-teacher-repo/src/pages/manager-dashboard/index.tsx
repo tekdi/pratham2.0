@@ -12,9 +12,10 @@ import {
 } from '../../components/ManagerDashboard';
 import Header from '../../components/Header';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { fetchCourses, getCourseHierarchy, getHierarchy } from '../../services/PlayerService';
+import { fetchCourses, getCourseHierarchy } from '../../services/PlayerService';
 import { fetchUserCertificateStatus } from '../../services/TrackingService';
 import { fetchUserList } from '../../services/ManageUser';
+import { getAssessmentStatus, getAssessmentTracking } from '../../services/AssesmentService';
 
 
 const ManagerDashboard = () => {
@@ -27,6 +28,7 @@ const ManagerDashboard = () => {
   // Store course identifiers for use in individual progress calculation
   const [mandatoryIdentifiers, setMandatoryIdentifiers] = useState<string[]>([]);
   const [optionalIdentifiers, setOptionalIdentifiers] = useState<string[]>([]);
+  const[employeeUserIds, setEmployeeUserIds] = useState<string[]>([]);
 
   const [courseAllocationData, setCourseAllocationData] = useState({
     mandatory: 0,
@@ -74,10 +76,53 @@ const ManagerDashboard = () => {
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Function to extract structured data with courseId, unitIds, and contentIds
+  const extractStructuredCourseData = (courseId: string, hierarchyChildren: any[]) => {
+    const courseData = {
+      courseId: courseId,
+      units: [] as Array<{unitId: string, contentIds: string[]}>
+    };
+    
+    // Function to recursively find Practice Question Sets within children
+    const findPracticeQuestionSets = (children: any[]): string[] => {
+      const contentIds: string[] = [];
+      children?.forEach((child) => {
+        if (child.primaryCategory === "Practice Question Set") {
+          contentIds.push(child.identifier);
+        } else if (child.children && child.children.length > 0) {
+          // Recursively search deeper levels
+          const nestedContentIds = findPracticeQuestionSets(child.children);
+          contentIds.push(...nestedContentIds);
+        }
+      });
+      return contentIds;
+    };
+    
+    // Look for Course Units in the hierarchy
+    const processCourseUnits = (objects: any[]) => {
+      objects?.forEach((obj) => {
+        if (obj.primaryCategory === "Course Unit") {
+          // Found a Course Unit, get its contentIds
+          const contentIds = findPracticeQuestionSets(obj.children || []);
+          courseData.units.push({
+            unitId: obj.identifier,
+            contentIds: contentIds
+          });
+        } else if (obj.children && obj.children.length > 0) {
+          // Continue searching for Course Units in children
+          processCourseUnits(obj.children);
+        }
+      });
+    };
+    
+    processCourseUnits(hierarchyChildren);
+    return courseData;
+  };
+
   // Extract completed course IDs without storing in state
   useEffect(() => {
     // Check if arrays are not empty
-    if (mandatoryCertificateData.length > 0 || optionalCertificateData.length > 0) {
+    if ((mandatoryCertificateData.length > 0 || optionalCertificateData.length > 0) && employeeUserIds.length > 0) {
       // Find completed course IDs from mandatory courses
       const completedMandatoryCourseIds = mandatoryCertificateData
         .filter(course => course.status === 'completed')
@@ -91,24 +136,70 @@ const ManagerDashboard = () => {
       // Log the completed course IDs (since we're not storing them)
       console.log('Completed Mandatory Course IDs:', completedMandatoryCourseIds);
       console.log('Completed Optional Course IDs:', completedOptionalCourseIds);
-      console.log('All Completed Course IDs:', [...completedMandatoryCourseIds, ...completedOptionalCourseIds]);
+      console.log('All Completed Course IDs (with duplicates):', [...completedMandatoryCourseIds, ...completedOptionalCourseIds]);
 
-      // Call getHierarchy for each completed course ID
-      const allCompletedCourseIds = [...completedMandatoryCourseIds, ...completedOptionalCourseIds];
-      allCompletedCourseIds.forEach(async (courseId) => {
-        try {
-          const hierarchyResponse = await getCourseHierarchy(courseId);
-          console.log(`Hierarchy response for course ${courseId}:`, hierarchyResponse);
-        } catch (error) {
-          console.error(`Error fetching hierarchy for course ${courseId}:`, error);
-        }
-      });
+      // Call getCourseHierarchy for each completed course ID and extract structured data
+      // Remove duplicate course IDs using Set and Array.from
+      const allCompletedCourseIds = Array.from(new Set([...completedMandatoryCourseIds, ...completedOptionalCourseIds]));
+      console.log('Unique Completed Course IDs (duplicates removed):', allCompletedCourseIds);
+      
+      // Collect structured course data from all completed courses
+      const getAllStructuredCourseData = async () => {
+        const allStructuredData: Array<{courseId: string, units: Array<{unitId: string, contentIds: string[]}> }> = [];
+        
+        const promises = allCompletedCourseIds.map(async (courseId) => {
+          try {
+            const hierarchyResponse = await getCourseHierarchy(courseId);
+            console.log(`Hierarchy response for course ${courseId}:`, hierarchyResponse?.children);
+            
+            // Extract structured data (courseId, unitIds, contentIds)
+            const structuredData = extractStructuredCourseData(courseId, hierarchyResponse?.children || []);
+            console.log(`Structured data for course ${courseId}:`, structuredData);
+            
+            return structuredData;
+          } catch (error) {
+            console.error(`Error fetching hierarchy for course ${courseId}:`, error);
+            return { courseId: courseId, units: [] };
+          }
+        });
+        
+        const allResults = await Promise.all(promises);
+        allStructuredData.push(...allResults);
+        
+        console.log('All structured course data from completed courses:', allStructuredData);
+        
+        // Extract all unit IDs from structured data
+        const allUnitIds = allStructuredData.flatMap(course => 
+          course.units.map(unit => unit.unitId)
+        );
+        
+        // Extract all content IDs from structured data
+        const allContentIds = allStructuredData.flatMap(course => 
+          course.units.flatMap(unit => unit.contentIds)
+        );
+        
+        console.log('All Unit IDs extracted:', allUnitIds);
+        console.log('All Content IDs extracted:', allContentIds);
+        
+        const assessmentdata = await getAssessmentStatus({
+          userId: employeeUserIds,
+          contentId: allContentIds,
+          courseId: allCompletedCourseIds,
+          unitId: allUnitIds,
+        });
+        
+        console.log('Assessment tracking data:', assessmentdata);
+        return allStructuredData;
+      };
+      
+      // Call the function to get all structured course data
+      getAllStructuredCourseData();
 
       
 
       
     }
-  }, [mandatoryCertificateData, optionalCertificateData]);
+  }, [mandatoryCertificateData, optionalCertificateData, employeeUserIds]);
 
   // Function to fetch individual progress data with pagination and search
   const fetchIndividualProgressData = async (page = 1, search = '', mandatoryIds: string[] = [], optionalIds: string[] = []) => {
@@ -344,25 +435,25 @@ const ManagerDashboard = () => {
             { id: '4', name: 'Rahul Somshekhar', role: 'Facilitator' },
             { id: '5', name: 'Rahul Somshekhar', role: 'Facilitator' },
             { id: '6', name: 'Rahul Somshekhar', role: 'Facilitator' },
-          ],
-          '5 Lowest Course Completing Users': [
-            { id: '1', name: 'Priya Sharma', role: 'Teacher' },
-            { id: '2', name: 'Amit Patel', role: 'Teacher' },
-            { id: '3', name: 'Sneha Reddy', role: 'Facilitator' },
-            { id: '4', name: 'Vikram Singh', role: 'Teacher' },
-            { id: '5', name: 'Anjali Mehta', role: 'Facilitator' },
-          ],
-          'Most Active Users': [
-            { id: '1', name: 'Karan Verma', role: 'Facilitator' },
-            { id: '2', name: 'Divya Nair', role: 'Teacher' },
-            { id: '3', name: 'Rohit Kumar', role: 'Facilitator' },
-            { id: '4', name: 'Pooja Gupta', role: 'Teacher' },
-          ],
-          'Least Active Users': [
-            { id: '1', name: 'Sanjay Desai', role: 'Teacher' },
-            { id: '2', name: 'Meera Iyer', role: 'Facilitator' },
-            { id: '3', name: 'Arjun Rao', role: 'Teacher' },
-          ],
+          ]
+          // '5 Lowest Course Completing Users': [
+          //   { id: '1', name: 'Priya Sharma', role: 'Teacher' },
+          //   { id: '2', name: 'Amit Patel', role: 'Teacher' },
+          //   { id: '3', name: 'Sneha Reddy', role: 'Facilitator' },
+          //   { id: '4', name: 'Vikram Singh', role: 'Teacher' },
+          //   { id: '5', name: 'Anjali Mehta', role: 'Facilitator' },
+          // ],
+          // 'Most Active Users': [
+          //   { id: '1', name: 'Karan Verma', role: 'Facilitator' },
+          //   { id: '2', name: 'Divya Nair', role: 'Teacher' },
+          //   { id: '3', name: 'Rohit Kumar', role: 'Facilitator' },
+          //   { id: '4', name: 'Pooja Gupta', role: 'Teacher' },
+          // ],
+          // 'Least Active Users': [
+          //   { id: '1', name: 'Sanjay Desai', role: 'Teacher' },
+          //   { id: '2', name: 'Meera Iyer', role: 'Facilitator' },
+          //   { id: '3', name: 'Arjun Rao', role: 'Teacher' },
+          // ],
         },
         dateOptions: [
           'As of today, 5th Sep',
@@ -417,6 +508,7 @@ const ManagerDashboard = () => {
           });
           console.log('employeeDataResponse', employeeDataResponse);
            employeeUserIds = employeeDataResponse?.getUserDetails?.map((item: any) => item.userId);
+           setEmployeeUserIds(employeeUserIds);
         }
         console.log('employeeUserIds', employeeUserIds);
         // Check if tenantId is available before calling certificate status APIs
