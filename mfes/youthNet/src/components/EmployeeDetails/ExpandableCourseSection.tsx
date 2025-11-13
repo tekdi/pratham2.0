@@ -15,8 +15,9 @@ const ExpandableCourseSection: React.FC<ExpandableCourseSectionProps> = ({
   title,
   count,
   courses,
+  defaultExpanded = false,
 }) => {
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(defaultExpanded);
 
   const handleChange = () => {
     setExpanded(!expanded);

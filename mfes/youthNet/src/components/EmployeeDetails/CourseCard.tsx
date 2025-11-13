@@ -85,7 +85,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
         </Typography>
 
         {/* Preview Certificate Button */}
-        {course.certificateUrl && (
+        {/* {course.certificateUrl && (
           <Button
             variant="text"
             size="small"
@@ -103,7 +103,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
           >
             Preview Certificate
           </Button>
-        )}
+        )} */}
       </CardContent>
     </Card>
   );

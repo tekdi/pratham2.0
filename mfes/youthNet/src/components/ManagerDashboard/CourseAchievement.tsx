@@ -24,25 +24,46 @@ const CourseAchievement: React.FC<CourseAchievementProps> = ({
   mandatoryCourses,
   nonMandatoryCourses,
 }) => {
+  // Map both naming conventions
+  const getMandatoryValue = (key: 'completed100' | 'completed70to99' | 'completed50to69' | 'completedBelow50') => {
+    if (mandatoryCourses[key] !== undefined) return mandatoryCourses[key]!;
+    // Fallback to alternative naming
+    if (key === 'completed100') return mandatoryCourses.above40 || 0;
+    if (key === 'completed70to99') return mandatoryCourses.between60and90 || 0;
+    if (key === 'completed50to69') return mandatoryCourses.between40and60 || 0;
+    if (key === 'completedBelow50') return mandatoryCourses.below90 || 0;
+    return 0;
+  };
+
+  const getNonMandatoryValue = (key: 'completed100' | 'completed70to99' | 'completed50to69' | 'completedBelow50') => {
+    if (nonMandatoryCourses[key] !== undefined) return nonMandatoryCourses[key]!;
+    // Fallback to alternative naming
+    if (key === 'completed100') return nonMandatoryCourses.above40 || 0;
+    if (key === 'completed70to99') return nonMandatoryCourses.between60and90 || 0;
+    if (key === 'completed50to69') return nonMandatoryCourses.between40and60 || 0;
+    if (key === 'completedBelow50') return nonMandatoryCourses.below90 || 0;
+    return 0;
+  };
+
   const prepareMandatoryData = (): ChartDataItem[] => [
     {
       name: '100% Completed',
-      value: mandatoryCourses.completed100,
+      value: getMandatoryValue('completed100'),
       color: '#4caf50',
     },
     {
       name: '70-99% Completed',
-      value: mandatoryCourses.completed70to99,
+      value: getMandatoryValue('completed70to99'),
       color: '#2196f3',
     },
     {
       name: '50-69% Completed',
-      value: mandatoryCourses.completed50to69,
+      value: getMandatoryValue('completed50to69'),
       color: '#ff9800',
     },
     {
       name: '< 50% Completed',
-      value: mandatoryCourses.completedBelow50,
+      value: getMandatoryValue('completedBelow50'),
       color: '#f44336',
     },
   ];
@@ -50,22 +71,22 @@ const CourseAchievement: React.FC<CourseAchievementProps> = ({
   const prepareNonMandatoryData = (): ChartDataItem[] => [
     {
       name: '100% Completed',
-      value: nonMandatoryCourses.completed100,
+      value: getNonMandatoryValue('completed100'),
       color: '#4caf50',
     },
     {
       name: '70-99% Completed',
-      value: nonMandatoryCourses.completed70to99,
+      value: getNonMandatoryValue('completed70to99'),
       color: '#2196f3',
     },
     {
       name: '50-69% Completed',
-      value: nonMandatoryCourses.completed50to69,
+      value: getNonMandatoryValue('completed50to69'),
       color: '#ff9800',
     },
     {
       name: '< 50% Completed',
-      value: nonMandatoryCourses.completedBelow50,
+      value: getNonMandatoryValue('completedBelow50'),
       color: '#f44336',
     },
   ];
@@ -161,3 +182,4 @@ const CourseAchievement: React.FC<CourseAchievementProps> = ({
 };
 
 export default CourseAchievement;
+

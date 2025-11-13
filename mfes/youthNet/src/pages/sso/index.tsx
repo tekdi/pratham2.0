@@ -11,20 +11,19 @@ import {
   keyframes,
 } from '@mui/material';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { post } from '@/services/RestClient';
-import { RoleId, TenantName, FilterKey } from '@/utils/app.constant';
-import { showToastMessage } from '@/components/Toastify';
-import Header from '@/components/Header';
+import { post } from '@shared-lib';
+import { RoleId, TenantName, FilterKey } from '../../utils/app.constant';
+import { showToastMessage } from '../../components/Toastify';
 import Image from 'next/image';
-import welcomeGIF from '../../../public/images/welcome.gif';
-import { getUserId, getUserDetails, profileComplitionCheck } from '@/services/ProfileService';
-import { getAcademicYear } from '@/services/AcademicYearService';
-import { telemetryFactory } from '@/utils/telemetry';
-import { logEvent } from '@/utils/googleAnalytics';
+import { getUserId, getUserDetails } from '../../services/ProfileService';
+import { getAcademicYear } from '../../services/AcademicYearService';
+import { telemetryFactory } from '../../utils/telemetry';
+import { logEvent } from '../../utils/googleAnalytics';
 import SwitchAccountDialog from '@shared-lib-v2/SwitchAccount/SwitchAccount';
-import Loader from '@/components/Loader';
+import Loader from '../../components/Loader';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import welcomeGIF from '../../../public/images/welcome.gif';
 
 interface SSOAuthParams {
   accessToken: string;
@@ -205,11 +204,6 @@ const SSOContent = () => {
           console.warn('No tenantId available from response or URL parameters');
         }
         localStorage.setItem('firstName', userResponse?.firstName);
-     // localStorage.setItem('roleId', userResponse?.roleId);
-     // localStorage.setItem('roleName', userResponse?.roleName);
-     // localStorage.setItem('tenantName', userResponse?.tenantName);
-     // localStorage.setItem('tenantData', JSON.stringify(userResponse?.tenantData));
-     // localStorage.setItem('userData', JSON.stringify(userResponse?.userData));
       setTimeout(async () => {
         const res = await getUserDetails(userResponse?.userId, true);
         console.log('response=========>', res?.result);
@@ -217,38 +211,11 @@ const SSOContent = () => {
         // Store custom fields in localStorage
         if (res?.result?.userData?.customFields) {
           res.result.userData.customFields.forEach((field: any) => {
-            // const { label, selectedValues } = field;
-            // localStorage.setItem(
-            //   FilterKey[label as keyof typeof FilterKey],
-            //   JSON.stringify(selectedValues)
-            // );
-            // if(label === 'EMP_GROUP') {
-            //   localStorage.setItem(FilterKey.GROUP_MEMBERSHIP, JSON.stringify(selectedValues));
-            // }
-
-            // Map the label to the corresponding FilterKey and store in localStorage
-            // switch (label) {
-            //   case 'GROUP_MEMBERSHIP':
-            //     localStorage.setItem(FilterKey.GROUP_MEMBERSHIP, selectedValues);
-            //     break;
-            //   case 'JOB_FAMILY':
-            //     localStorage.setItem(FilterKey.JOB_FAMILY, selectedValues);
-            //     break;
-            //   case 'PSU':
-            //     localStorage.setItem(FilterKey.PSU, selectedValues);
-            //     break;
-            //   default:
-            //     // For any other custom fields, store them as is
-            //     localStorage.setItem(label, selectedValues);
-            //     break;
-            // }
+            // Custom fields handling can be added here if needed
           });
         }
         const uiConfig = userResponse?.tenantData[0]?.params?.uiConfig;
         console.log('uiConfig', uiConfig);
-        // const landingPage =
-        //   userResponse?.tenantData[0]?.params?.uiConfig?.landingPage;
-        // localStorage.setItem('landingPage', landingPage);
 
         localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
 
@@ -268,8 +235,6 @@ const SSOContent = () => {
     console.log("callBackSwitchDialog", tenantId, tenantName, roleId, roleName);
     setSwitchDialogOpen(false);
     setLoading(true);
-
-    // const userResponse = await getUserId();
 
     if (userResponse) {
       const token =
@@ -297,9 +262,7 @@ const SSOContent = () => {
 
         localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
 
-        // localStorage.setItem('tenantId', tenantId);
         localStorage.setItem('userProgram', tenantName);
-        //await profileComplitionCheck();
         if (tenantName === TenantName.YOUTHNET) {
           const academicYearResponse = await getAcademicYear();
           if (academicYearResponse[0]?.id) {
@@ -337,20 +300,6 @@ const SSOContent = () => {
           category: 'SSO ERP',
           label: 'Login Button Clicked',
         });
-        // if (tenantName === TenantName.YOUTHNET) {
-        //   router.push('/content');
-        // } else if (tenantName === TenantName.CAMP_TO_CLUB) {
-        //   router.push('/courses-contents');
-        // } else if (tenantName === TenantName.PRAGYANPATH) {
-        //   router.push('/courses-contents');
-        // }
-        // const landingPage = localStorage.getItem('landingPage') || '';
-
-        // if (landingPage) {
-        //   router.push(landingPage);
-        // } else {
-        //   router.push('/content');
-        // }
         setTimeout(() => {
            
           router.push('/manager-dashboard');
@@ -381,8 +330,6 @@ const SSOContent = () => {
         flexDirection: 'column',
       }}
     >
-      {/* <Header /> */}
-
       <Container
         maxWidth="sm"
         sx={{ flex: 1, display: 'flex', alignItems: 'center', py: 4 }}
@@ -402,7 +349,7 @@ const SSOContent = () => {
               alignItems="center"
               gap={4}
             >
-              {/* Animated GIF */}
+              {/* Animated GIF - Using placeholder since welcome.gif doesn't exist */}
               <Fade in={true}>
                 <Box>
                   <Image
@@ -520,6 +467,7 @@ const SSOContent = () => {
         onClose={() => setSwitchDialogOpen(false)}
         callbackFunction={callBackSwitchDialog}
         authResponse={userResponse?.tenantData}
+        // isLeadRole={true}
       />
       {loading && (
         <Loader showBackdrop={true} loadingText={t('COMMON.LOADING')} />
@@ -566,3 +514,4 @@ export async function getStaticProps({ locale }: any) {
   };
 }
 export default SSOPage;
+

@@ -127,7 +127,7 @@ const EmployeeDetailsPage = () => {
             description: course.description,
             image: (course.appIcon) 
               ? course.appIcon 
-              : '/scp-teacher-repo/images/image_ver.png'
+              : '/youthnet/images/image_ver.png'
           }));
         
         const optionalInProgressCourses = CoursesData
@@ -138,7 +138,7 @@ const EmployeeDetailsPage = () => {
             description: course.description,
             image: (course.appIcon ) 
               ? course.appIcon 
-              : '/scp-teacher-repo/images/image_ver.png'
+              : '/youthnet/images/image_ver.png'
           }));
         
         const mandatoryCompletedCourses = CoursesData
@@ -150,8 +150,8 @@ const EmployeeDetailsPage = () => {
             completedDate: null, // null as requested
             image: (course.appIcon ) 
               ? course.appIcon 
-              : '/scp-teacher-repo/images/image_ver.png',
-            certificateUrl: `https://example.com/certificate/${course.identifier}` // placeholder
+              : '/youthnet/images/image_ver.png',
+            //certificateUrl: `https://example.com/certificate/${course.identifier}` // placeholder
           }));
         
         const optionalCompletedCourses = CoursesData
@@ -163,8 +163,8 @@ const EmployeeDetailsPage = () => {
             completedDate: null, // null as requested
             image: (course.appIcon) 
               ? course.appIcon 
-              : '/scp-teacher-repo/images/image_ver.png',
-            certificateUrl: `https://example.com/certificate/${course.identifier}` // placeholder
+              : '/youthnet/images/image_ver.png',
+            //certificateUrl: `https://example.com/certificate/${course.identifier}` // placeholder
           }));
 
         console.log('Filtered and Transformed Course Data:');

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   Dialog,
@@ -80,7 +81,6 @@ interface SwitchAccountDialogProps {
     roleName: string
   ) => void;
   authResponse: TenantData[];
-  isLeadRole?: boolean;
 }
 
 const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
@@ -88,7 +88,6 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
   onClose,
   callbackFunction,
   authResponse,
-  isLeadRole = false,
 }) => {
   const { t, language, setLanguage } = useTranslation();
   const theme = useTheme();
@@ -327,16 +326,8 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
   const handleTenantSelect = (tenant: TenantData) => {
     setSelectedTenant(tenant);
     const roles = tenant?.roles ?? [];
-    console.log("roles", roles);
-    if (roles.length >=1) {
-      let role;
-      if(isLeadRole) {
-      role = roles.find((r) => r.roleName === 'Lead');
-      } else {
-        role = roles.find((r) => r.roleName === 'Learner');
-      }
-
-      if(role) {  
+    if (roles.length === 1) {
+      const role = roles[0];
       setSelectedRole(role);
       // Auto-confirm when only one role exists for the selected tenant
       callbackFunction(
@@ -345,7 +336,6 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
         role.roleId,
         role.roleName
       );
-    }
       onClose();
       return;
     } else {

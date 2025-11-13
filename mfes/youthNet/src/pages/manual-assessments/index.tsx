@@ -165,9 +165,19 @@ const AssessmentList = () => {
                 (item: any) => ({ id: item?.value, name: item?.label })
               );
               setBlockData(transformedBlockData);
-              const firstBlockId = transformedBlockData?.[0]?.id || '';
-              setSelectedBlockValue(firstBlockId);
-              setBlockId(firstBlockId);
+              
+              // Use blockId from query params if available, otherwise use first block
+              const blockIdFromQuery = query.blockId && typeof query.blockId === 'string' ? query.blockId : null;
+              const blockExists = blockIdFromQuery && transformedBlockData?.some((b: any) => String(b.id) === String(blockIdFromQuery));
+              
+              if (blockExists) {
+                setSelectedBlockValue(blockIdFromQuery);
+                setBlockId(blockIdFromQuery);
+              } else {
+                const firstBlockId = transformedBlockData?.[0]?.id || '';
+                setSelectedBlockValue(firstBlockId);
+                setBlockId(firstBlockId);
+              }
             })
             .catch((e: any) => {
               console.error('Error fetching block data:', e);
@@ -182,7 +192,7 @@ const AssessmentList = () => {
         setBlockData([]);
       }
     }
-  }, []);
+  }, [query.blockId]);
 
   // Village list fetching logic (role-based, following villages page pattern)
   useEffect(() => {
@@ -196,8 +206,17 @@ const AssessmentList = () => {
             : null;
           setVillageList(villageData || []);
           if (villageData && villageData.length > 0) {
-            setSelectedVillageValue(villageData[0]?.Id);
-            setVillageId(villageData[0]?.Id);
+            // Use villageId from query params if available, otherwise use first village
+            const villageIdFromQuery = query.villageId && typeof query.villageId === 'string' ? query.villageId : null;
+            const villageExists = villageIdFromQuery && villageData?.some((v: any) => String(v.Id) === String(villageIdFromQuery));
+            
+            if (villageExists) {
+              setSelectedVillageValue(villageIdFromQuery);
+              setVillageId(villageIdFromQuery);
+            } else {
+              setSelectedVillageValue(villageData[0]?.Id);
+              setVillageId(villageData[0]?.Id);
+            }
           }
         } else if (YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() && selectedBlockValue !== '') {
           // For LEAD role: fetch villages based on selected block
@@ -216,8 +235,17 @@ const AssessmentList = () => {
           );
           setVillageList(transformedVillageData || []);
           if (transformedVillageData && transformedVillageData.length > 0) {
-            setSelectedVillageValue(transformedVillageData[0]?.Id);
-            setVillageId(transformedVillageData[0]?.Id);
+            // Use villageId from query params if available, otherwise use first village
+            const villageIdFromQuery = query.villageId && typeof query.villageId === 'string' ? query.villageId : null;
+            const villageExists = villageIdFromQuery && transformedVillageData?.some((v: any) => String(v.Id) === String(villageIdFromQuery));
+            
+            if (villageExists) {
+              setSelectedVillageValue(villageIdFromQuery);
+              setVillageId(villageIdFromQuery);
+            } else {
+              setSelectedVillageValue(transformedVillageData[0]?.Id);
+              setVillageId(transformedVillageData[0]?.Id);
+            }
           }
         }
       } catch (error) {
@@ -227,7 +255,7 @@ const AssessmentList = () => {
     };
 
     getVillageList();
-  }, [selectedBlockValue]);
+  }, [selectedBlockValue, query.villageId]);
 
   // Initialize villages on page load for INSTRUCTOR role
   useEffect(() => {
@@ -238,11 +266,21 @@ const AssessmentList = () => {
         : null;
       if (villageData && villageData.length > 0) {
         setVillageList(villageData);
-        setSelectedVillageValue(villageData[0]?.Id);
-        setVillageId(villageData[0]?.Id);
+        
+        // Use villageId from query params if available, otherwise use first village
+        const villageIdFromQuery = query.villageId && typeof query.villageId === 'string' ? query.villageId : null;
+        const villageExists = villageIdFromQuery && villageData?.some((v: any) => String(v.Id) === String(villageIdFromQuery));
+        
+        if (villageExists) {
+          setSelectedVillageValue(villageIdFromQuery);
+          setVillageId(villageIdFromQuery);
+        } else {
+          setSelectedVillageValue(villageData[0]?.Id);
+          setVillageId(villageData[0]?.Id);
+        }
       }
     }
-  }, []);
+  }, [query.villageId]);
 
   // Reset assessment type and related lists when class changes
   useEffect(() => {
@@ -539,10 +577,11 @@ const AssessmentList = () => {
     console.log('villageIdblockId', blockId);
     console.log('parentId (courseId)', parentId);
     // Navigate to assessment details page with assessmentId, cohortId, parentId, and subject
+    // Include filter values in query params for retention when navigating back
     if (identifier ) {
       const navigationUrl = `/manual-assessments/${identifier}?villageId=${villageId}&blockId=${blockId}&parentId=${parentId || ''}&subject=${encodeURIComponent(
         subject
-      )}`;
+      )}&type=${assessmentType}`;
       router.push(navigationUrl);
     } else {
       showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');

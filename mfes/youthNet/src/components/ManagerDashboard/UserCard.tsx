@@ -45,3 +45,4 @@ const UserCard: React.FC<UserCardProps> = ({ user, avatarText }) => {
 };
 
 export default UserCard;
+

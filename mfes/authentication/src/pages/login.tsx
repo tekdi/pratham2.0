@@ -516,7 +516,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                           typeof window !== 'undefined'
                             ? window.location.origin
                             : '';
-                        const callbackUrl = `${currentBaseUrl}/scp-teacher-repo/sso?env=newton`;
+                        const callbackUrl = `${currentBaseUrl}/youthnet/sso?env=newton`;
                         const encodedCallbackUrl = callbackUrl;
                         // encodeURIComponent(callbackUrl);
                         

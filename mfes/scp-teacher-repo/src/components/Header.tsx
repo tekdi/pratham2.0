@@ -83,7 +83,10 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
     if (pathname !== `/user-profile/${userId}`) {
       if (tenant?.toLowerCase() === TENANT_DATA.YOUTHNET?.toLowerCase()) {
         router.push(`/youthboard/user-profile/${userId}`);
-      } else {
+      } else if (
+        tenant?.toLowerCase() ===
+        TENANT_DATA.SECOND_CHANCE_PROGRAM?.toLowerCase()
+      ) {
         router.push(`/user-profile/${userId}`);
       }
       logEvent({

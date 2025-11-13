@@ -482,40 +482,6 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
         },
       };
 
-      // const dummyTopPerformersData = {
-      //   // categories: [
-      //   //   '5 Highest Course Completing Users',
-      //   // ],
-      //   usersData: {
-      //     '5 Highest Course Completing Users': [
-      //       { id: '1', name: 'Rahul Somshekhar', role: 'Facilitator' },
-      //       { id: '2', name: 'Rahul Somshekhar', role: 'Facilitator' },
-      //       { id: '3', name: 'Rahul Somshekhar', role: 'Facilitator' },
-      //       { id: '4', name: 'Rahul Somshekhar', role: 'Facilitator' },
-      //       { id: '5', name: 'Rahul Somshekhar', role: 'Facilitator' },
-      //       { id: '6', name: 'Rahul Somshekhar', role: 'Facilitator' },
-      //     ]
-      //     // '5 Lowest Course Completing Users': [
-      //     //   { id: '1', name: 'Priya Sharma', role: 'Teacher' },
-      //     //   { id: '2', name: 'Amit Patel', role: 'Teacher' },
-      //     //   { id: '3', name: 'Sneha Reddy', role: 'Facilitator' },
-      //     //   { id: '4', name: 'Vikram Singh', role: 'Teacher' },
-      //     //   { id: '5', name: 'Anjali Mehta', role: 'Facilitator' },
-      //     // ],
-      //     // 'Most Active Users': [
-      //     //   { id: '1', name: 'Karan Verma', role: 'Facilitator' },
-      //     //   { id: '2', name: 'Divya Nair', role: 'Teacher' },
-      //     //   { id: '3', name: 'Rohit Kumar', role: 'Facilitator' },
-      //     //   { id: '4', name: 'Pooja Gupta', role: 'Teacher' },
-      //     // ],
-      //     // 'Least Active Users': [
-      //     //   { id: '1', name: 'Sanjay Desai', role: 'Teacher' },
-      //     //   { id: '2', name: 'Meera Iyer', role: 'Facilitator' },
-      //     //   { id: '3', name: 'Arjun Rao', role: 'Teacher' },
-      //     // ],
-      //   },
-      // };
-
       try {
         const mandatoryCourses = await fetchCourses({
           filters: {
@@ -637,21 +603,14 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
       try {
         // Fetch assessment/question sets data
         const questionSets = await fetchCourses({
-        filters: {
-          status: [
-            "Live"
-        ],
-        primaryCategory: [
-            "Practice Question Set"
-        ],
-        channel: "pragyanpath",
-        program: [
-            "Pragyanpath"
-            ],
+          filters: {
+            status: ["Live"],
+            primaryCategory: ["Practice Question Set"],
+            channel: "pragyanpath",
+            program: ["Pragyanpath"],
             courseType: ["Mandatory"]
-
-        },
-      });
+          },
+        });
       const questionSetIdentifiers = questionSets.map((item: any) => item.identifier);
       console.log('questionSets', questionSetIdentifiers);
       
@@ -672,14 +631,7 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
       }
 
       // Set all data
-      setCourseAchievementData(dummyCourseAchievementData);
-      
-      // Initialize empty top performers data (will be populated after assessment processing)
-      // setTopPerformersData({
-      //   usersData: {
-      //     '5 Highest Course Completing Users': []
-      //   }
-      // });
+     // setCourseAchievementData(dummyCourseAchievementData);
       
       // Fetch individual progress data with pagination - pass the course identifiers
       fetchIndividualProgressData(1, '', mandatoryIds || [], optionalIds || []);
@@ -801,5 +753,4 @@ export async function getStaticProps({ locale }: any) {
   };
 }
 export default ManagerDashboard;
-
 

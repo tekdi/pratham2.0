@@ -93,3 +93,4 @@ const CourseAllocation: React.FC<CourseAllocationProps> = ({
 };
 
 export default CourseAllocation;
+

@@ -553,3 +553,4 @@ console.log('filteredData', filteredData);
 
 
 export default IndividualProgress;
+

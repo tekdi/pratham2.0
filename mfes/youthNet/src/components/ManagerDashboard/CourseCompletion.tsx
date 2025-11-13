@@ -161,3 +161,4 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
   );
 };
 export default CourseCompletion;
+

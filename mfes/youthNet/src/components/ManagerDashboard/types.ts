@@ -22,6 +22,11 @@ export interface AchievementData {
   between40and60: number;
   between60and90: number;
   below90: number;
+  // Alternative naming used in CourseAchievement component
+  completed100?: number;
+  completed70to99?: number;
+  completed50to69?: number;
+  completedBelow50?: number;
 }
 
 export interface CourseAchievementData {

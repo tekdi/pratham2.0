@@ -5,6 +5,7 @@ import {
   Typography,
   Grid,
   Box,
+  Button,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
@@ -62,17 +63,8 @@ const Profile: React.FC<ProfileDetailsProps> = ({
   const { t } = useTranslation();
   const theme = useTheme<any>();
 
-  // Helper function to check if a value should be displayed
-  const shouldDisplayValue = (value: any): boolean => {
-    if (value === null || value === undefined) return false;
-    if (typeof value === 'string') {
-      return value.trim() !== '' && value.trim() !== '-';
-    }
-    if (Array.isArray(value)) {
-      return value.length > 0;
-    }
-    return true;
-  };
+  // Extract IDs of "MY_MAIN_SUBJECTS" for matching
+  const mainSubjectIds = new Set(myMainSubjects.map((subject) => subject.id));
 
   return (
     <Card
@@ -85,68 +77,62 @@ const Profile: React.FC<ProfileDetailsProps> = ({
     >
       <CardContent>
         <Grid container spacing={2}>
-          {shouldDisplayValue(designation) && (
-            <Grid item xs={12} md={12} lg={6}>
+          <Grid item xs={12} md={12} lg={6}>
+            <Typography
+              color={theme.palette.warning['500']}
+              sx={{ fontSize: '12px', fontWeight: 600, wordWrap: 'break-word' }}
+            >
+              {t('SCP_PROFILE.DESIGNATION')}
+            </Typography>
+            <Typography
+              color={theme.palette.warning['A200']}
+              sx={{ fontSize: '16px', fontWeight: 400, wordWrap: 'break-word' }}
+            >
+              {designation}
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12} md={12} lg={6}>
+            <>
               <Typography
                 color={theme.palette.warning['500']}
-                sx={{ fontSize: '12px', fontWeight: 600, wordWrap: 'break-word' }}
+                sx={{
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  wordWrap: 'break-word',
+                }}
               >
-                {t('SCP_PROFILE.DESIGNATION')}
+                {t('SCP_PROFILE.USERNAME')}
               </Typography>
               <Typography
                 color={theme.palette.warning['A200']}
-                sx={{ fontSize: '16px', fontWeight: 400, wordWrap: 'break-word' }}
-              >
-                {designation}
-              </Typography>
-            </Grid>
-          )}
-
-          {shouldDisplayValue(userName) && (
-            <Grid item xs={12} md={12} lg={6}>
-              <>
-                <Typography
-                  color={theme.palette.warning['500']}
-                  sx={{
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    wordWrap: 'break-word',
-                  }}
-                >
-                  {t('SCP_PROFILE.USERNAME')}
-                </Typography>
-                <Typography
-                  color={theme.palette.warning['A200']}
-                  sx={{
-                    fontSize: '16px',
-                    fontWeight: 400,
-                    wordWrap: 'break-word',
-                  }}
-                  gutterBottom
-                >
-                  {userName}
-                </Typography>
-              </>
-            </Grid>
-          )}
-
-          {shouldDisplayValue(emailId) && (
-            <Grid item xs={12} md={12} lg={6}>
-              <Typography
-                color={theme.palette.warning['500']}
-                sx={{ fontSize: '12px', fontWeight: 600, wordWrap: 'break-word' }}
-              >
-                {t('SCP_PROFILE.EMAIL_ID')}
-              </Typography>
-              <Typography
-                color={theme.palette.warning['A200']}
-                sx={{ fontSize: '16px', fontWeight: 400, wordWrap: 'break-word' }}
+                sx={{
+                  fontSize: '16px',
+                  fontWeight: 400,
+                  wordWrap: 'break-word',
+                }}
                 gutterBottom
               >
-                {emailId}
+                {userName}
               </Typography>
-            </Grid>
-          )}
+            </>
+          </Grid>
+
+          <Grid item xs={12} md={12} lg={6}>
+            <Typography
+              color={theme.palette.warning['500']}
+              sx={{ fontSize: '12px', fontWeight: 600, wordWrap: 'break-word' }}
+            >
+              {t('SCP_PROFILE.EMAIL_ID')}
+            </Typography>
+            <Typography
+              color={theme.palette.warning['A200']}
+              sx={{ fontSize: '16px', fontWeight: 400, wordWrap: 'break-word' }}
+              gutterBottom
+            >
+              {emailId}
+            </Typography>
+          </Grid>
 
           {/* <Grid item xs={12} md={12} lg={6}>
             <Typography
@@ -168,69 +154,63 @@ const Profile: React.FC<ProfileDetailsProps> = ({
             </Typography>
           </Grid> */}
 
-          {shouldDisplayValue(phoneNumber) && (
-            <Grid item xs={12} md={12} lg={6}>
-              <Typography
-                color={theme.palette.warning['500']}
-                sx={{
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  mt: 2,
-                  wordWrap: 'break-word',
-                }}
-              >
-                {t('SCP_PROFILE.PHONE_NUMBER')}
-              </Typography>
-              <Typography
-                color={theme.palette.warning['A200']}
-                sx={{ fontSize: '16px', fontWeight: 400, wordWrap: 'break-word' }}
-              >
-                {phoneNumber}
-              </Typography>
-            </Grid>
-          )}
-          {shouldDisplayValue(gender) && (
-            <Grid item xs={12} md={12} lg={6}>
-              <Typography
-                color={theme.palette.warning['500']}
-                sx={{
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  mt: 2,
-                  wordWrap: 'break-word',
-                }}
-              >
-                {t('SCP_PROFILE.GENDER')}
-              </Typography>
-              <Typography color={theme.palette.warning['A200']}>
-                {gender}
-              </Typography>
-            </Grid>
-          )}
-          {shouldDisplayValue(dob) && (
-            <Grid item xs={12} md={12} lg={6}>
-              <Typography
-                color={theme.palette.warning['500']}
-                sx={{
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  mt: 2,
-                  wordWrap: 'break-word',
-                }}
-              >
-                {t('SCP_PROFILE.DOB')}
-              </Typography>
-              <Typography
-                sx={{ fontSize: '16px', fontWeight: 400, wordWrap: 'break-word' }}
-              >
-                {dob}
-              </Typography>
-            </Grid>
-          )}
+          <Grid item xs={12} md={12} lg={6}>
+            <Typography
+              color={theme.palette.warning['500']}
+              sx={{
+                fontSize: '12px',
+                fontWeight: 600,
+                mt: 2,
+                wordWrap: 'break-word',
+              }}
+            >
+              {t('SCP_PROFILE.PHONE_NUMBER')}
+            </Typography>
+            <Typography
+              color={theme.palette.warning['A200']}
+              sx={{ fontSize: '16px', fontWeight: 400, wordWrap: 'break-word' }}
+            >
+              {phoneNumber}
+            </Typography>
+          </Grid>
+          <Grid item xs={12} md={12} lg={6}>
+            <Typography
+              color={theme.palette.warning['500']}
+              sx={{
+                fontSize: '12px',
+                fontWeight: 600,
+                mt: 2,
+                wordWrap: 'break-word',
+              }}
+            >
+              {t('SCP_PROFILE.GENDER')}
+            </Typography>
+            <Typography color={theme.palette.warning['A200']}>
+              {gender}
+            </Typography>
+          </Grid>
+          <Grid item xs={12} md={12} lg={6}>
+            <Typography
+              color={theme.palette.warning['500']}
+              sx={{
+                fontSize: '12px',
+                fontWeight: 600,
+                mt: 2,
+                wordWrap: 'break-word',
+              }}
+            >
+              {t('SCP_PROFILE.DOB')}
+            </Typography>
+            <Typography
+              sx={{ fontSize: '16px', fontWeight: 400, wordWrap: 'break-word' }}
+            >
+              {dob}
+            </Typography>
+          </Grid>
         </Grid>
 
         {/* Subjects I Teach Section */}
-        {designation !== Role.TEAM_LEADER && shouldDisplayValue(subjectsITeach) && (
+        {designation !== Role.TEAM_LEADER ? (
           <Box mt={4}>
             <Typography
               variant="h6"
@@ -269,11 +249,12 @@ const Profile: React.FC<ProfileDetailsProps> = ({
                   </Box>
                 );
               })}
+              
             </Box>
           </Box>
-        )}
+        ) : null}
         {/* My Main Subjects Section */}
-        {designation !== Role.TEAM_LEADER && shouldDisplayValue(myMainSubjects) && (
+        {designation !== Role.TEAM_LEADER ? (
           <Box mt={4}>
             <Typography
               variant="h6"
@@ -315,7 +296,7 @@ const Profile: React.FC<ProfileDetailsProps> = ({
               })}
             </Box>
           </Box>
-        )}
+        ) : null}
       </CardContent>
     </Card>
   );
