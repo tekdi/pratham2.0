@@ -7,6 +7,8 @@ import {
   Grid,
   CircularProgress,
 } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import { post } from '@/services/RestClient';
 import { showToastMessage } from '@/components/Toastify';
 import { transformLabel } from '@/utils/Helper';
@@ -32,6 +34,7 @@ const EmailSearchUser: React.FC<EmailSearchUserProps> = ({
 }) => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  const [userRow, setUserRow] = useState<any>(null);
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [isUserLoaded, setIsUserLoaded] = useState(false);
@@ -66,6 +69,8 @@ const EmailSearchUser: React.FC<EmailSearchUserProps> = ({
         response?.data?.result?.user
       ) {
         const user = response.data.result.user;
+
+        setUserRow(user);
 
         // Extract user details
         const extractedUserId = user.userId;
@@ -204,6 +209,13 @@ const EmailSearchUser: React.FC<EmailSearchUserProps> = ({
           onClick={isUserLoaded ? handleChangeUser : fetchUserByEmail}
           disabled={loading}
           sx={{ minWidth: '150px', height: '56px' }}
+          startIcon={
+            loading ? null : isUserLoaded ? (
+              <ChangeCircleIcon />
+            ) : (
+              <SearchIcon />
+            )
+          }
         >
           {loading ? (
             <CircularProgress size={24} color="inherit" />
@@ -225,10 +237,7 @@ const EmailSearchUser: React.FC<EmailSearchUserProps> = ({
             backgroundColor: '#f9f9f9',
           }}
         >
-          <Typography
-            variant="h1"
-            sx={{ mb: 2,  color: '#000000' }}
-          >
+          <Typography variant="h1" sx={{ mb: 2, color: '#000000' }}>
             User Details
           </Typography>
           <Grid container spacing={2}>
