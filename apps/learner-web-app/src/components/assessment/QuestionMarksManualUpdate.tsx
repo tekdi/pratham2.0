@@ -944,7 +944,8 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
                             handleMarksTextChange(si, qi, onlyDigits);
                           }}
                           onBlur={() => handleMarksBlur(si, qi)}
-                          style={{ width: 80 }}
+                          readOnly
+                          style={{ width: 15 }}
                         />
                         <span>/ {q.maxScore}</span>
                       </div>

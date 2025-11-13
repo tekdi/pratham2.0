@@ -1252,7 +1252,7 @@ console.log('assessmentStatusData>>>>>:', assessmentStatusData);
         }}
       >
         {/* Professional Status Card */}
-        <Box
+        {/* <Box
           sx={{
             background: 'linear-gradient(135deg, #FFFDE7 0%, #FFF8E1 100%)',
             borderRadius: '12px',
@@ -1321,7 +1321,7 @@ console.log('assessmentStatusData>>>>>:', assessmentStatusData);
             </Box>
           
           </Box>
-        </Box>
+        </Box> */}
 
         {/* Main content layout */}
         <Grid
@@ -1356,9 +1356,11 @@ console.log('assessmentStatusData>>>>>:', assessmentStatusData);
                   sx={{
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'space-between',
+                    gap: 0,
                     position: 'relative',
                     zIndex: 1,
+                    flexWrap: { xs: 'wrap', md: 'nowrap' },
+                    overflow: { xs: 'visible', md: 'visible' },
                   }}
                 >
                   <Box
@@ -1366,7 +1368,6 @@ console.log('assessmentStatusData>>>>>:', assessmentStatusData);
                       display: 'flex',
                       alignItems: 'center',
                       gap: { xs: 1.5, md: 2 },
-                      flex: 1,
                     }}
                   >
                     {/* Status Icon */}
@@ -1513,7 +1514,88 @@ console.log('assessmentStatusData>>>>>:', assessmentStatusData);
                       </Box>
                     </Box>
                   </Box>
+
+                  {/* Download Question Paper Button */}
+                  <Box
+                    onClick={handleDownloadQuestionPaper}
+                    sx={{
+                      backgroundColor: '#ECE6F0',
+                      borderRadius: { xs: '12px', md: '24px 24px 24px 24px' },
+                      p: { xs: 1.5, md: 2 },
+                      display: 'flex',
+                      flexDirection: { xs: 'column', md: 'row' },
+                      mt: { xs: 2, md: 0 },
+
+                      ml: { xs: 1.5, md: '30px' },
+                      mr: { xs: 0, md: 0 },
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: { xs: 0.5, md: 1.5 },
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      border: { xs: '1px solid rgba(236, 230, 240, 0.6)', md: '1px solid rgba(236, 230, 240, 0.6)' },
+                      borderLeft: { xs: '1px solid rgba(236, 230, 240, 0.6)', md: 'none' },
+                      borderTopLeftRadius: 0,
+                      borderBottomLeftRadius: 0,
+                      boxShadow: '0 4px 16px rgba(236, 230, 240, 0.4)',
+                      flexShrink: { xs: 1, md: 0 },
+                      minWidth: { xs: 0, md: 'auto' },
+                      maxWidth: { xs: '100%', md: 'none' },
+                      width: { xs: 'auto', md: 'auto' },
+                      '&:hover': {
+                        transform: 'translateY(-1px)',
+                        boxShadow: '0 4px 12px rgba(236, 230, 240, 0.5)',
+                      },
+                    }}
+                  >
+                    {/* Icons wrapper - only on mobile */}
+                    <Box
+                      sx={{
+                        display: { xs: 'flex', md: 'contents' },
+                        alignItems: 'center',
+                        gap: { xs: 0.5, md: 0 },
+                      }}
+                    >
+                      <PictureAsPdfIcon
+                        sx={{ 
+                          color: '#D32F2F', 
+                          fontSize: { xs: '20px', md: '24px' },
+                        }}
+                      />
+                      <DownloadIcon
+                        sx={{
+                          color: '#666666',
+                          fontSize: { xs: '18px', md: '20px' },
+                          display: { xs: 'block', md: 'none' },
+                        }}
+                      />
+                    </Box>
+                    <Typography
+                      sx={{
+                        color: '#1A1A1A',
+                        fontSize: { xs: '11px', md: '14px' },
+                        fontWeight: 500,
+                        textAlign: 'center',
+                        whiteSpace: { xs: 'normal', md: 'nowrap' },
+                        lineHeight: { xs: 1.2, md: 1.5 },
+                        wordBreak: { xs: 'break-word', md: 'normal' },
+                        overflowWrap: { xs: 'break-word', md: 'normal' },
+                        maxWidth: { xs: '100%', md: 'none' },
+                      }}
+                    >
+                      Download Question Paper.pdf
+                    </Typography>
+                    {/* Download icon for desktop only */}
+                    <DownloadIcon
+                      sx={{
+                        color: '#666666',
+                        fontSize: { xs: '18px', md: '20px' },
+                        display: { xs: 'none', md: 'block' },
+                      }}
+                    />
+                  </Box>
                 </Box>
+
                 {/* Main content */}
                 <Box sx={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
                   {!assessmentTrackingData ? (
@@ -1534,59 +1616,7 @@ console.log('assessmentStatusData>>>>>:', assessmentStatusData);
                     )
                   ) : null}
                 </Box>
-
-                {/* Professional Download Card */}
-                <Box
-                  sx={{
-                    mt: { xs: 2, md: 3 },
-                    maxWidth: { xs: '100%', md: '400px' },
-                    mx: 'auto',
-                    backgroundColor: '#ECE6F0',
-                    borderRadius: '16px',
-                    p: { xs: 1.5, md: 2 },
-                    position: 'relative',
-                    overflow: 'hidden',
-                    boxShadow: '0 4px 16px rgba(236, 230, 240, 0.4)',
-                    border: '1px solid rgba(236, 230, 240, 0.6)',
-                  }}
-                >
-                  <Box
-                    onClick={handleDownloadQuestionPaper}
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: { xs: 1.5, md: 2 },
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                      '&:hover': {
-                        transform: 'translateY(-1px)',
-                      },
-                    }}
-                  >
-                    <PictureAsPdfIcon
-                      sx={{ 
-                        color: '#D32F2F', 
-                        fontSize: { xs: '24px', md: '28px' },
-                      }}
-                    />
-                    <Typography
-                      sx={{
-                        color: '#1A1A1A',
-                        fontSize: { xs: '16px', md: '16px' },
-                        fontWeight: 500,
-                        flex: 1,
-                      }}
-                    >
-                      Download Question Paper.pdf
-                    </Typography>
-                    <DownloadIcon
-                      sx={{
-                        color: '#666666',
-                        fontSize: { xs: '20px', md: '24px' },
-                      }}
-                    />
-                  </Box>
-                </Box>
+              </Box>
 
                 {/* Professional Manual Assessment Section */}
                 {assessmentStatus === 'Approved' && (
@@ -1640,7 +1670,6 @@ console.log('assessmentStatusData>>>>>:', assessmentStatusData);
                     />
                   </Box>
                 )}
-              </Box>
             </Box>
           </Grid>
         </Grid>

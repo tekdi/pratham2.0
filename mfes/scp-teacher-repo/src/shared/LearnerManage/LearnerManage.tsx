@@ -44,6 +44,8 @@ const LearnerManage = ({
   const [isLoading, setIsLoading] = useState(false);
   const [addSchema, setAddSchema] = useState(null);
   const [addEditSchema, setAddEditSchema] = useState(null);
+  const [parentData, setParentData] = useState([]);
+
   const [addEditUiSchema, setAddEditUiSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
   const [prefilledAddFormData, setPrefilledAddFormData] = useState<any>(null);
@@ -181,7 +183,23 @@ const LearnerManage = ({
       }
       if (isEditProfile) {
         const user = await getUserDetails(userId, true);
-        // console.log('##### user', user);
+        const targetLabels = [
+          "RELATION_WITH_GUARDIAN",
+          "PARENT_GUARDIAN_PHONE_NO",
+          "NAME_OF_GUARDIAN"
+        ];
+        
+        // Step 1: Find matching fieldIds
+        const fieldIds = user?.result?.userData?.customFields?.filter(item => targetLabels.includes(item.label))
+          .map(item => item.fieldId);
+        
+
+         console.log('##### user', user?.result?.userData?.customFields);
+         const result = fieldIds?.map(id => ({
+          fieldId: id,
+          value: ""
+        }));
+        setParentData(result);
         let tempFormData = extractMatchingKeys(
           user?.result?.userData,
           alterSchema
@@ -339,6 +357,7 @@ const LearnerManage = ({
             villageFieldId={villageFieldId}
             hideSubmit={true}
             type={'learner'}
+            parentData={parentData}
           />
         </SimpleModal>
       )}
