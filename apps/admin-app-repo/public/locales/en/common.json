@@ -163,8 +163,10 @@
     "NO_STATE_LEAD_FOUND": "No State Lead Found",
     "FAQS": "FAQ's",
     "RESET_FILTERS": "Reset Filters",
-        "ACTIVATE_USER": "Activate User",
-    "ACTIVATE": "Activate"
+    "ACTIVATE_USER": "Activate User",
+    "ACTIVATE": "Activate",
+    "RESIGNED_FROM_COMPANY": "Resigned from the company",
+    "MOVED_TO_DIFFERENT_ROLE":"Moved to a different role"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",

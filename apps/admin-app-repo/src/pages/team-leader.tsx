@@ -699,6 +699,7 @@ const TeamLeader = () => {
           setChecked={setChecked}
           reason={reason}
           setReason={setReason}
+          isForFacilitator={true}
         />
       </ConfirmationPopup>
       <ConfirmationPopup
