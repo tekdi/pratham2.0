@@ -53,23 +53,7 @@ const ContentDetails = (props: ContentDetailsProps) => {
   useEffect(() => {
     const fetchContentDetails = async () => {
       try {
-        const result = await hierarchyAPI(identifier as string)as any;
-
-console.log('result=======>', result?.program);
-const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
-console.log('currentPath=======>', currentPath);
-const isThematicPath = currentPath.includes('/themantic');
-const isPosPath = currentPath.includes('/pos');
-console.log('isThematicPath=======>', isThematicPath);
-
-if(!isThematicPath && !isPosPath && result?.program) {
-
-        if (!result?.program?.includes(localStorage.getItem('userProgram')) && !result.program.includes('Open School'))
-        {
-          router.push('/unauthorized');
-          return;
-        }
-      }
+        const result = await hierarchyAPI(identifier as string);
         const userId = getUserId(props?._config?.userIdLocalstorageName);
         setCheckLocalAuth(checkAuth(Boolean(userId)));
         if (props?._config?.isEnrollmentRequired !== false) {
@@ -84,7 +68,7 @@ if(!isThematicPath && !isPosPath && result?.program) {
                 'inprogress',
                 'completed',
                 'viewCertificate',
-              ].includes?.(data?.result?.status)
+              ].includes(data?.result?.status)
             ) {
               if (props?.getIfEnrolled) {
                 props?.getIfEnrolled(
@@ -226,7 +210,7 @@ if(!isThematicPath && !isPosPath && result?.program) {
                 width: { sx: '100%', sm: '90%', md: '85%' },
               }}
             >
-              {/* <Box>
+              <Box>
                 <Typography
                   variant="body1"
                   component="div"
@@ -245,7 +229,7 @@ if(!isThematicPath && !isPosPath && result?.program) {
                     {contentDetails?.description ?? 'No description available'}
                   </SpeakableText>
                 </Typography>
-              </Box> */}
+              </Box>
               <Box
                 sx={{
                   display: 'flex',

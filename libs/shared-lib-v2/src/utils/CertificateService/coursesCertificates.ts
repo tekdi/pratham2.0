@@ -159,12 +159,7 @@ export const checkCriteriaForCertificate = async (reqBody: any) => {
               // Check if all assessments have percentage >= 40%
               const allPassed = assessments.every((assessment: any) => {
                 const percentage = parseFloat(assessment.percentage);
-                //percentage comparison from program specific configuration
-                let percentageComparision = 40;
-                if(tenantId === '914ca990-9b45-4385-a06b-05054f35d0b9'){
-                  percentageComparision = 80;
-                }
-                return percentage >= percentageComparision;
+                return percentage >= 40;
               });
 
               criteriaCompleted = allPassed;

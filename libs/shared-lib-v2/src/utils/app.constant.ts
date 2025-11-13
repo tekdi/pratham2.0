@@ -277,5 +277,4 @@ export enum TenantName {
   POS = 'Open School',
   PRAGYANPATH = 'Pragyanpath',
   CAMP_TO_CLUB = 'Camp to Club',
-  CREATIVITY_CLUB = 'Creativity Club',
 }

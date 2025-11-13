@@ -164,11 +164,7 @@
     "NO_ASSIGNED_BOARDS": "No assigned Board for selected Center",
     "NO_ASSIGNED_COURSES": "No assigned Courses for selected Assessment Type",
     "HIGHT-TO_LOW": "High to low",
-    "INPROGRESS": "Continue Previous Submission",
-    "COURSES_FOUND": "{{count}} Course Found",
-    "COURSES_FOUND_PLURAL": "{{count}} Courses Found",
-    "ASSESSMENT_TYPE_FOUND": "{{count}} Assessment Type Found",
-    "ASSESSMENT_TYPE_FOUND_PLURAL": "{{count}} Assessment Types Found"
+    "INPROGRESS": "Continue Previous Submission"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
