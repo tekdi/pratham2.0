@@ -76,11 +76,16 @@ const MenuDrawer: React.FC<DrawerProps> = ({
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.localStorage) {
-      const isYouthUser = localStorage.getItem('tenantName');
-      if (isYouthUser == TENANT_DATA.YOUTHNET) {
-        setTenantName(isYouthUser);
+      const storedTenantName = localStorage.getItem('tenantName');
+      
+      // Always set tenantName to one of the three tenant types
+      if (storedTenantName === TENANT_DATA.YOUTHNET) {
+        setTenantName(TENANT_DATA.YOUTHNET);
+      } else if (storedTenantName === TENANT_DATA.PRAGYANPATH) {
+        setTenantName(TENANT_DATA.PRAGYANPATH);
       } else {
-        setTenantName('');
+        // Default to SECOND_CHANCE_PROGRAM for all other cases
+        setTenantName(TENANT_DATA.SECOND_CHANCE_PROGRAM);
       }
     }
   }, []);
@@ -291,7 +296,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               </Select>
             </FormControl>
           </Box>
-          {!tenantName && (
+          {tenantName === TENANT_DATA.SECOND_CHANCE_PROGRAM && (
             <Box sx={{ flexBasis: '70%' }} className="joyride-step-6">
               <FormControl className="drawer-select" sx={{ width: '100%' }}>
                 <Select
@@ -325,15 +330,15 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               </FormControl>
             </Box>
           )}
-          {tenantName && (
+          {/* {tenantName && (
             <Box>
               <Typography sx={{ fontSize: '12px' }}>
                 (Development in progress)
               </Typography>
             </Box>
-          )}
+          )} */}
         </Box>
-        {isActiveYear && !tenantName && (
+        {isActiveYear && tenantName === TENANT_DATA.SECOND_CHANCE_PROGRAM && (
           <Box>
             <Button
               className="fs-14"
@@ -366,7 +371,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
             </Button>
           </Box>
         )}
-        {tenantName && (
+        {tenantName === TENANT_DATA.YOUTHNET && (
           <Box>
             <Button
               className="fs-14"
@@ -471,7 +476,45 @@ const MenuDrawer: React.FC<DrawerProps> = ({
             </Button>
           </Box>
         )}
-        {!tenantName && (
+        
+        {/* PRAGYANPATH - Only shows manager-dashboard */}
+        {tenantName === TENANT_DATA.PRAGYANPATH && (
+          <Box>
+            <Button
+              className="fs-14"
+              sx={{
+                gap: '10px',
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'flex-start',
+                background: router.pathname === '/manager-dashboard'
+                  ? theme.palette.primary.main
+                  : 'transparent',
+                padding: router.pathname === '/manager-dashboard'
+                  ? '16px 18px !important'
+                  : '0px 18px !important',
+                marginTop: '25px',
+                color: router.pathname === '/manager-dashboard' ? '#2E1500' : theme.palette.warning.A200,
+                fontWeight: router.pathname === '/manager-dashboard' ? '600' : 500,
+                '&:hover': {
+                  background: router.pathname === '/manager-dashboard'
+                    ? theme.palette.primary.main
+                    : 'transparent',
+                },
+              }}
+              startIcon={
+                <DashboardOutlinedIcon sx={{ fontSize: '24px !important' }} />
+              }
+              onClick={() => {
+                router.push('/manager-dashboard');
+              }}
+            >
+              Manager Dashboard
+            </Button>
+          </Box>
+        )}
+        
+        {tenantName === TENANT_DATA.SECOND_CHANCE_PROGRAM && (
           <Box sx={{ marginTop: '18px' }}>
             <Button
               className="fs-14 joyride-step-7"
@@ -511,7 +554,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
             </Button>
           </Box>
         )}
-        {!tenantName && (
+        {tenantName === TENANT_DATA.SECOND_CHANCE_PROGRAM && (
           <Box sx={{ marginTop: '18px' }} className="joyride-step-8">
             <Button
               className="fs-14"
@@ -549,7 +592,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
             </Button>
           </Box>
         )}
-        {isActiveYear && !tenantName && (
+        {isActiveYear && tenantName === TENANT_DATA.SECOND_CHANCE_PROGRAM && (
           <Box sx={{ marginTop: '18px' }}>
             <Button
               className="fs-14 joyride-step-9"
@@ -592,7 +635,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
         )}
         {!isEliminatedFromBuild('Assessments', 'feature') &&
           isActiveYear &&
-          !tenantName && (
+          tenantName === TENANT_DATA.SECOND_CHANCE_PROGRAM && (
             <Box sx={{ marginTop: '18px' }}>
               <Button
                 className="fs-14 joyride-step-10"
@@ -713,7 +756,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
             </Box>
           )}
           
-        {isActiveYear && !tenantName && (
+        {isActiveYear && tenantName === TENANT_DATA.SECOND_CHANCE_PROGRAM && (
           <Box sx={{ marginTop: '18px' }} className="joyride-step-11">
             <Button
               className="fs-14 joyride-step-8"
@@ -776,7 +819,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
             {t('COMMON.FAQS')}
           </Button>
         </Box>
-        {isActiveYear && !tenantName && (
+        {isActiveYear && tenantName === TENANT_DATA.SECOND_CHANCE_PROGRAM && (
           <Box sx={{ marginTop: '18px' }} className="joyride-step-12">
             <Button
               className="fs-14"
@@ -818,7 +861,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
             </Button>
           </Box>
         )}
-        {isActiveYear && !tenantName && (
+        {isActiveYear && tenantName === TENANT_DATA.SECOND_CHANCE_PROGRAM && (
           <Box sx={{ marginTop: '18px' }}>
             <Button
               className="fs-14"
