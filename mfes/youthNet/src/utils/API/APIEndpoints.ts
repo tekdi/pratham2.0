@@ -16,6 +16,8 @@ const API_ENDPOINTS = {
   assessmentSearchStatus: `${baseurl}/tracking/assessment/search/status`,
   assessmentSearch: `${baseurl}/tracking/assessment/search`,
   userCertificateStatusSearch: `${baseurl}/tracking/user_certificate/status/search`,
+  contentSearchStatus: `${baseurl}/tracking/content/search/status`,
+  contentCreate: `${baseurl}/tracking/content/create`,
 
 
 
