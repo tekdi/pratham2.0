@@ -238,7 +238,7 @@ export default memo(function LearnerCourse({
                 },
               },
             }}
-            onlyLanguage={localStorage.getItem('userProgram') === TenantName.CAMP_TO_CLUB ? true : false}
+            onlyLanguage={typeof window !== 'undefined' && window.localStorage && localStorage.getItem('userProgram') === TenantName.CAMP_TO_CLUB ? true : false}
           />
           <Box
             sx={{
@@ -275,7 +275,7 @@ export default memo(function LearnerCourse({
             handleFilterChange={handleFilterChange}
             onlyFields={_content?.onlyFields ?? []}
             isOpenColapsed={_content?.isOpenColapsed ?? []}        
-            onlyLanguage={localStorage.getItem('userProgram') === TenantName.CAMP_TO_CLUB ? true : false}
+            onlyLanguage={typeof window !== 'undefined' && window.localStorage && localStorage.getItem('userProgram') === TenantName.CAMP_TO_CLUB ? true : false}
 
           />
         </Box>
