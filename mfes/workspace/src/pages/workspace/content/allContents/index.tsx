@@ -132,7 +132,6 @@ const AllContentsPage = () => {
   const fetchContentAPI = useSharedStore((state: any) => state.fetchContentAPI);
   const [debouncedSearchTerm, setDebouncedSearchTerm] =
     useState<string>(searchTerm);
-  const prevSearchTermRef = useRef(debouncedSearchTerm);
   const [totalCount, setTotalCount] = useState(0);
   const [showHeader, setShowHeader] = useState<boolean | null>(null);
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -238,19 +237,13 @@ const AllContentsPage = () => {
         const sort_by = {
           lastUpdatedOn: order,
         };
-        
-        // Reset page to 0 when search term or filter changes
-        if (prevSearchTermRef.current !== debouncedSearchTerm) {
-          setPage(0);
-          prevSearchTermRef.current = debouncedSearchTerm;
-        }
-        
+        let offset = debouncedSearchTerm !== '' ? 0 : page * LIMIT;
         if (prevFilterRef.current !== filter) {
+          offset = 0;
           setPage(0);
+
           prevFilterRef.current = filter;
         }
-        
-        const offset = page * LIMIT;
         console.log('seraching', debouncedSearchTerm);
         const response = await getContent(
           status,
@@ -264,10 +257,21 @@ const AllContentsPage = () => {
           undefined,
           selectedNames
         );
-        console.log('response===>', response);
-        const contentList = (response?.content || []).concat(
-          response?.QuestionSet || []
-        );
+        // Combine content and QuestionSet arrays while avoiding duplicates
+        const allContent = [
+          ...(response?.content || []),
+          ...(response?.QuestionSet || [])
+        ];
+        
+        // Deduplicate based on identifier to avoid showing same content twice
+        const contentMap = new Map();
+        allContent.forEach(item => {
+          if (item?.identifier && !contentMap.has(item.identifier)) {
+            contentMap.set(item.identifier, item);
+          }
+        });
+        
+        const contentList = Array.from(contentMap.values());
         setContentList(contentList);
         setTotalCount(response?.count);
         setLoading(false);
@@ -297,7 +301,6 @@ const AllContentsPage = () => {
       primaryCategory: item.primaryCategory,
       lastUpdatedOn: timeAgo(item.lastUpdatedOn),
       status: item.status,
-      prevStatus: item.prevStatus, // Add prevStatus field
       identifier: item.identifier,
       mimeType: item.mimeType,
       mode: item.mode,
