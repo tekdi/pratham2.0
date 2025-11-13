@@ -120,7 +120,7 @@ const BLOCK_API_CONFIG = {
   },
 };
 
-const CachmentAreaWidget = ({
+const CatchmentAreaWidget = ({
   id,
   label,
   value,
@@ -814,4 +814,4 @@ const CachmentAreaWidget = ({
   );
 };
 
-export default CachmentAreaWidget;
+export default CatchmentAreaWidget;
