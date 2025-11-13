@@ -168,7 +168,10 @@ const TeamLeader = () => {
 
   const userDelete = async () => {
     try {
-      const resp = await updateUserTenantStatus(userID, tenantId, 'archived');
+      const resp = await updateUserTenantStatus(userID, tenantId, {
+        reason: reason,
+        status: 'archived',
+      });
       if (resp?.responseCode === 200) {
         // setResponse((prev) => ({
         //   ...prev, // Preserve other properties in `prev`
@@ -239,7 +242,9 @@ const TeamLeader = () => {
 
       // Always attempt to delete the user
       console.log('Proceeding to self-delete...');
-      const resp = await updateUserTenantStatus(userID, tenantId, 'active');
+      const resp = await updateUserTenantStatus(userID, tenantId, {
+        status: 'active'
+      });
       showToastMessage(t("LEARNERS.ACTIVATE_USER_SUCCESS"), "success");
 
 
@@ -343,8 +348,8 @@ const TeamLeader = () => {
     {
       key: 'status',
       label: 'Status',
-      render: (row: any) => transformLabel(row.status),
-      getStyle: (row) => ({ color: row.status === 'active' ? 'green' : 'red' }),
+      render: (row: any) => transformLabel(row.tenantStatus),
+      getStyle: (row) => ({ color: row.tenantStatus === 'active' ? 'green' : 'red' }),
     },
   ];
 
@@ -379,7 +384,7 @@ const TeamLeader = () => {
         setEditableUserId(row?.userId);
         handleOpenModal();
       },
-      show: (row) => row.status !== 'archived',
+      show: (row) => row.tenantStatus !== 'archived',
     },
     {
       icon: (
@@ -414,7 +419,7 @@ const TeamLeader = () => {
         setReason('');
         setChecked(false);
       },
-      show: (row) => row.status !== 'archived',
+      show: (row) => row.tenantStatus !== 'archived',
     },
     {
       icon: (
@@ -445,7 +450,7 @@ const TeamLeader = () => {
         setEditableUserId(row?.userId);
         handleOpenModal();
       },
-      show: (row) => row.status !== 'archived',
+      show: (row) => row.tenantStatus !== 'archived',
     },
     {
       icon: (
@@ -491,7 +496,7 @@ const TeamLeader = () => {
         // setReason('');
         // setChecked(false);
       },
-      show: (row) => row.status !== 'active',
+      show: (row) => row.tenantStatus !== 'active',
     }
   ];
 

@@ -172,9 +172,9 @@ const StateLead = () => {
     {
       key: 'status',
       label: 'Status',
-      render: (row: any) => transformLabel(row.status),
+      render: (row: any) => transformLabel(row.tenantStatus),
       getStyle: (row: any) => ({
-        color: row.status === 'active' ? 'green' : 'red',
+        color: row.tenantStatus === 'active' ? 'green' : 'red',
       }),
     },
     {
@@ -191,7 +191,9 @@ const StateLead = () => {
 
   const archiveToactive = async () => {
     try {
-      const resp = await updateUserTenantStatus(editableUserId, tenantId, 'active');
+      const resp = await updateUserTenantStatus(editableUserId, tenantId, {
+        status: 'active'
+      });
       setArchiveToActiveOpen(false);
       searchData(prefilledFormData, currentPage);
 
@@ -231,7 +233,7 @@ const StateLead = () => {
         setEditableUserId(row?.userId);
         handleOpenModal();
       },
-      show: (row) => row.status !== 'archived',
+      show: (row) => row.tenantStatus !== 'archived',
     },
     {
       icon: (
@@ -255,12 +257,14 @@ const StateLead = () => {
         console.log('row:', row);
         setEditableUserId(row?.userId);
         const userId = row?.userId;
-        const response = await updateUserTenantStatus(userId, tenantId, 'archived');
+        const response = await updateUserTenantStatus(userId, tenantId, {
+          status: 'archived'
+        });
         setPrefilledFormData({});
         searchData(prefilledFormData, currentPage);
         setOpenModal(false);
       },
-      show: (row) => row.status !== 'archived',
+      show: (row) => row.tenantStatus !== 'archived',
     },
 
     {
@@ -297,7 +301,7 @@ const StateLead = () => {
         setArchiveToActiveOpen(true);
         setPrefilledFormData({});
       },
-      show: (row) => row.status !== 'active',
+      show: (row) => row.tenantStatus !== 'active',
     }
   ];
 

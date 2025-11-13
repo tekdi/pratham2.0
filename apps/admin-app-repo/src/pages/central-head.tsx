@@ -212,8 +212,8 @@ const MentorLead = () => {
     {
       key: 'status',
       label: 'Status',
-      render: (row: any) => transformLabel(row.status),
-      getStyle: (row) => ({ color: row.status === 'active' ? 'green' : 'red' }),
+      render: (row: any) => transformLabel(row.tenantStatus),
+      getStyle: (row) => ({ color: row.tenantStatus === 'active' ? 'green' : 'red' }),
     },
     {
       keys: ['gender'],
@@ -296,7 +296,10 @@ const MentorLead = () => {
 
       // Always attempt to delete the user
       console.log('Proceeding to self-delete...');
-      const resp = await updateUserTenantStatus(userID, tenantId, 'archived');
+      const resp = await updateUserTenantStatus(userID, tenantId, {
+        reason: reason,
+        status: 'archived',
+      });
 
       if (resp?.responseCode === 200) {
         setResponse((prev) => ({
@@ -308,6 +311,7 @@ const MentorLead = () => {
             ),
           },
         }));
+        searchData(prefilledFormData, currentPage);
         console.log('Team leader successfully archived.');
       } else {
         console.error('Failed to archive team leader:', resp);
@@ -367,7 +371,9 @@ const MentorLead = () => {
 
       // Always attempt to delete the user
       console.log('Proceeding to self-delete...');
-      const resp = await updateUserTenantStatus(userID, tenantId, 'active');
+      const resp = await updateUserTenantStatus(userID, tenantId, {
+        status: 'active',
+      });
       showToastMessage(t('LEARNERS.ACTIVATE_USER_SUCCESS'), 'success');
 
       if (resp?.responseCode === 200) {
@@ -422,6 +428,7 @@ const MentorLead = () => {
         handleOpenModal();
         setIsReassign(false);
       },
+      show: (row) => row.tenantStatus !== 'archived'
     },
     {
       icon: (
@@ -470,7 +477,7 @@ const MentorLead = () => {
           village: findVillage?.selectedValues?.[0]?.value || '',
         });
       },
-                     show: (row) => row.status !== 'archived'
+                     show: (row) => row.tenantStatus !== 'archived'
 
     },
     {
@@ -500,7 +507,7 @@ const MentorLead = () => {
         setEditableUserId(row?.userId);
         handleOpenModal();
       },
-      show: (row) => row.status !== 'archived',
+      show: (row) => row.tenantStatus !== 'archived',
     },
     {
       icon: (
@@ -540,7 +547,7 @@ const MentorLead = () => {
         // setReason('');
         // setChecked(false);
       },
-      show: (row) => row.status !== 'active',
+      show: (row) => row.tenantStatus !== 'active',
         }
   ];
 

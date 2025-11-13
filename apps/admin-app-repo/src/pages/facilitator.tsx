@@ -110,11 +110,11 @@ const Facilitator = () => {
   const searchStoreKey = 'facilitator';
   const initialFormDataSearch =
     localStorage.getItem(searchStoreKey) &&
-      localStorage.getItem(searchStoreKey) != '{}'
+    localStorage.getItem(searchStoreKey) != '{}'
       ? JSON.parse(localStorage.getItem(searchStoreKey))
       : localStorage.getItem('stateId')
-        ? { state: [localStorage.getItem('stateId')] }
-        : {};
+      ? { state: [localStorage.getItem('stateId')] }
+      : {};
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -257,7 +257,7 @@ const Facilitator = () => {
       label: 'Facilitator Name',
       render: (row) =>
         `${transformLabel(row.firstName) || ''} ${transformLabel(row.middleName) || ''
-          } ${transformLabel(row.lastName) || ''}`.trim(),
+        } ${transformLabel(row.lastName) || ''}`.trim(),
     },
     {
       keys: ['age'],
@@ -282,7 +282,7 @@ const Facilitator = () => {
         const district = transformLabel(row?.customfield?.district) || '';
         const block = transformLabel(row?.customfield?.block) || '';
         return `${state == '' ? '' : `${state}`}${district == '' ? '' : `, ${district}`
-          }${block == '' ? '' : `, ${block}`}`;
+        }${block == '' ? '' : `, ${block}`}`;
       },
     },
     {
@@ -408,7 +408,10 @@ const Facilitator = () => {
 
       // Always attempt to delete the user
       console.log('Proceeding to self-delete...');
-      const resp = await updateUserTenantStatus(userID, tenantId, 'archived');
+      const resp = await updateUserTenantStatus(userID, tenantId, {
+        reason: reason,
+        status: 'archived',
+      });
 
       if (resp?.responseCode === 200) {
         // setResponse((prev) => ({
@@ -481,7 +484,9 @@ const Facilitator = () => {
 
       // Always attempt to delete the user
       console.log('Proceeding to self-delete...');
-      const resp = await updateUserTenantStatus(userID, tenantId, 'active');
+      const resp = await updateUserTenantStatus(userID, tenantId, {
+        status: 'active',
+      });
       showToastMessage(t('LEARNERS.ACTIVATE_USER_SUCCESS'), 'success');
 
       if (resp?.responseCode === 200) {
@@ -577,7 +582,7 @@ console.log('response?.result?.getUserDetails',response?.result?.getUserDetails)
       ),
       callback: async (row) => {
         console.log('row.cohortData:', row.cohortData); // Check what data is available
-        
+
         const selectedUserId = row?.userId;
         const selectedUserDetails = await getUserDetailsInfo(selectedUserId, true);
         const cohortResponse = await getCohortList(selectedUserId);
@@ -585,9 +590,9 @@ console.log('response?.result?.getUserDetails',response?.result?.getUserDetails)
         const centerNames = [...new Set(row.cohortData.map(item => item.centerName))];
 
         const findVillage = selectedUserDetails?.userData?.customFields.find((item) => {
-          if (item.label === 'VILLAGE' || item.label === 'BLOCK') {
-            return item;
-          }
+            if (item.label === 'VILLAGE' || item.label === 'BLOCK') {
+              return item;
+            }
         });
 
         // Option 1: Get village from cohortData if available
@@ -691,9 +696,9 @@ console.log('response?.result?.getUserDetails',response?.result?.getUserDetails)
           true
         );
         const findVillage = selectedUserDetails?.userData?.customFields.find((item) => {
-          if (item.label === 'VILLAGE') {
-            return item;
-          }
+            if (item.label === 'VILLAGE') {
+              return item;
+            }
         });
 
         // console.log('row:', row?.customFields[2].selectedValues[0].value);
@@ -834,8 +839,8 @@ console.log('response?.result?.getUserDetails',response?.result?.getUserDetails)
             isEdit
               ? t('FACILITATORS.EDIT_FACILITATOR')
               : isReassign
-                ? t('FACILITATORS.RE_ASSIGN_facilitator')
-                : t('FACILITATORS.NEW_FACILITATOR')
+              ? t('FACILITATORS.RE_ASSIGN_facilitator')
+              : t('FACILITATORS.NEW_FACILITATOR')
           }
         >
           <FacilitatorForm

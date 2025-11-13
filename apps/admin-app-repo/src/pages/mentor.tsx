@@ -193,9 +193,9 @@ const Mentor = () => {
     {
       key: 'status',
       label: 'Status',
-      render: (row: any) => transformLabel(row.status),
+      render: (row: any) => transformLabel(row.tenantStatus),
       getStyle: (row: any) => ({
-        color: row.status === 'active' ? 'green' : 'red',
+        color: row.tenantStatus === 'active' ? 'green' : 'red',
       }),
     },
     {
@@ -295,7 +295,10 @@ const Mentor = () => {
 
       // Always attempt to delete the user
       console.log('Proceeding to self-delete...');
-      const resp = await updateUserTenantStatus(userID, tenantId, 'archived');
+      const resp = await updateUserTenantStatus(userID, tenantId, {
+        reason: reason,
+        status: 'archived',
+      });
 
       if (resp?.responseCode === 200) {
         setResponse((prev) => ({
@@ -307,6 +310,7 @@ const Mentor = () => {
             ),
           },
         }));
+        searchData(prefilledFormData, currentPage);
         console.log('Team leader successfully archived.');
       } else {
         console.error('Failed to archive team leader:', resp);
@@ -366,7 +370,9 @@ const Mentor = () => {
 
       // Always attempt to delete the user
       console.log('Proceeding to self-delete...');
-      const resp = await updateUserTenantStatus(userID, tenantId, 'active');
+      const resp = await updateUserTenantStatus(userID, tenantId, {
+        status: 'active',
+      });
       showToastMessage(t("LEARNERS.ACTIVATE_USER_SUCCESS"), "success");
 
 
@@ -422,6 +428,7 @@ const Mentor = () => {
         setEditableUserId(row?.userId);
         handleOpenModal();
       },
+      show: (row) => row.tenantStatus !== 'archived'
     },
     {
       icon: (
@@ -454,7 +461,7 @@ const Mentor = () => {
           village: findVillage?.selectedValues?.[0]?.value || '',
         });
       },
-               show: (row) => row.status !== 'archived'
+               show: (row) => row.tenantStatus !== 'archived'
 
     },
     {
@@ -532,7 +539,7 @@ const Mentor = () => {
         setEditableUserId(row?.userId);
         handleOpenModal();
       },
-      show: (row) => row.status !== 'archived',
+      show: (row) => row.tenantStatus !== 'archived',
     },
      {
           icon: (
@@ -572,7 +579,7 @@ const Mentor = () => {
             // setReason('');
             // setChecked(false);
           },
-          show: (row) => row.status !== 'active',
+          show: (row) => row.tenantStatus !== 'active',
         }
   ];
 

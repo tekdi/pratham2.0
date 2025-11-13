@@ -95,7 +95,9 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
           showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
           return;
         }
-        const resp = await updateUserTenantStatus(userId, resolvedTenantId, 'archived');
+        const resp = await updateUserTenantStatus(userId, resolvedTenantId, {
+          status: 'archived'
+        });
         showToastMessage(t('COMMON.USER_DELETED_PERMANENTLY'), 'success');
       }
     }

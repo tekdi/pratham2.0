@@ -179,9 +179,9 @@ const Youth = () => {
     {
       key: 'status',
       label: 'Status',
-      render: (row: any) => transformLabel(row.status),
+      render: (row: any) => transformLabel(row.tenantStatus),
       getStyle: (row: any) => ({
-        color: row.status === 'active' ? 'green' : 'red',
+        color: row.tenantStatus === 'active' ? 'green' : 'red',
       }),
     },
     {
@@ -282,7 +282,10 @@ const Youth = () => {
 
       // Always attempt to delete the user
       console.log('Proceeding to self-delete...');
-      const resp = await updateUserTenantStatus(userID, tenantId, 'archived');
+      const resp = await updateUserTenantStatus(userID, tenantId, {
+        status: 'archived',
+        reason: reason,
+      });
 
       if (resp?.responseCode === 200) {
         setResponse((prev) => ({
@@ -294,6 +297,7 @@ const Youth = () => {
             ),
           },
         }));
+        searchData(prefilledFormData, currentPage);
         console.log('Team leader successfully archived.');
       } else {
         console.error('Failed to archive team leader:', resp);
@@ -399,7 +403,9 @@ const Youth = () => {
 
       // Always attempt to delete the user
       console.log('Proceeding to self-delete...');
-      const resp = await updateUserTenantStatus(userID, tenantId, 'active');
+      const resp = await updateUserTenantStatus(userID, tenantId, {
+        status: 'active',
+      });
       showToastMessage(t("LEARNERS.ACTIVATE_USER_SUCCESS"), "success");
 
       if (resp?.responseCode === 200) {
@@ -453,6 +459,7 @@ const Youth = () => {
         setEditableUserId(row?.userId);
         handleOpenModal();
       },
+      show: (row) => row.tenantStatus !== 'archived'
     },
     {
       icon: (
@@ -499,7 +506,7 @@ const Youth = () => {
           village: findVillage?.selectedValues?.[0]?.value || '',
         });
       },
-         show: (row) => row.status !== 'archived'
+         show: (row) => row.tenantStatus !== 'archived'
     },
     {
       icon: (
@@ -536,6 +543,7 @@ const Youth = () => {
 
         return !isVolunteer;
       },
+      show: (row) => row.tenantStatus !== 'archived'
     },
     {
       icon: (
@@ -611,7 +619,7 @@ const Youth = () => {
             // setReason('');
             // setChecked(false);
           },
-          show: (row) => row.status !== 'active',
+          show: (row) => row.tenantStatus !== 'active',
         }
   ];
 

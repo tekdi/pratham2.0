@@ -430,8 +430,10 @@ const Learner = () => {
 
       // Always attempt to delete the user
       console.log('Proceeding to self-delete...');
-      const resp = await updateUserTenantStatus(userID, tenantId, 'archived');
-
+      const resp = await updateUserTenantStatus(userID, tenantId, {
+        reason: reason,
+        status: 'archived',
+      });
       if (resp?.responseCode === 200) {
         // setResponse((prev) => ({
         //   ...prev,
@@ -502,7 +504,9 @@ const Learner = () => {
 
       // Always attempt to delete the user
       console.log('Proceeding to self-delete...');
-      const resp = await updateUserTenantStatus(userID, tenantId, 'active');
+      const resp = await updateUserTenantStatus(userID, tenantId, {
+        status: 'active',
+      });
       showToastMessage(t("LEARNERS.ACTIVATE_USER_SUCCESS"), "success");
 
 
