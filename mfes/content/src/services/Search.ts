@@ -124,14 +124,12 @@ export const ContentSearch = async ({
   filters,
   limit = 5,
   offset = 0,
-  noPrimaryCategory = false,
 }: {
   type: string;
   query?: string;
   filters?: object;
   limit?: number;
   offset?: number;
-  noPrimaryCategory?: boolean;
 }): Promise<ContentResponse> => {
   try {
     // Ensure the environment variable is defined
@@ -141,30 +139,22 @@ export const ContentSearch = async ({
     }
     // Axios request configuration
 
-    const filtersObject: any = {
-      // identifier: 'do_114228944942358528173',
-      // identifier: 'do_1141652605790289921389',
-      //need below after login user channel for dynamic load content
-      // channel: '0135656861912678406',
-      ...filters,
-      status: ['live'],
-      channel: localStorage.getItem('channelId'),
-    };
-   // console.log('filtersObject====>', filtersObject?.primaryCategory);
-
-    // Only add primaryCategory if noPrimaryCategory is false and primaryCategory is not already set
-    if (!noPrimaryCategory && !filtersObject.primaryCategory) {
-      filtersObject.primaryCategory =
-        type?.toLowerCase() === 'course' || type?.toLowerCase() === 'self'
-          ? ['Course']
-          : type?.toLowerCase() === 'for children'
-          ? ['Activity', 'Story']
-          : ['Learning Resource', 'Practice Question Set'];
-    }
-
     const data = {
       request: {
-        filters: filtersObject,
+        filters: {
+          // identifier: 'do_114228944942358528173',
+          // identifier: 'do_1141652605790289921389',
+          //need below after login user channel for dynamic load content
+          // channel: '0135656861912678406',
+          ...filters,
+          status: ['live'],
+          primaryCategory:
+            type?.toLowerCase() === 'course' || type?.toLowerCase() === 'self'
+              ? ['Course']
+              : type?.toLowerCase() === 'for children'?['Activity', 'Story']:['Learning Resource', 'Practice Question Set'],
+         
+          channel: localStorage.getItem('channelId'),
+        },
         fields: [
           'name',
           'appIcon',

@@ -47,7 +47,7 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
   const theme = useTheme<any>();
   const reasons = [
     { value: "Incorrect Data Entry", label: t("COMMON.INCORRECT_DATA_ENTRY") },
-    { value: "Duplicated User", label: t("COMMON.DUPLICATED_USER") }
+    { value: "Duplicated User", label: t("COMMON.DUPLICATED_USER") },
   ];
   const [checkedCohortDeletion, setCheckedCohortDeletion] = useState<boolean>(centers === "-" ? true : false);
 

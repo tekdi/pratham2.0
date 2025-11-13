@@ -27,7 +27,7 @@ const columns = [
     key: 'title_and_description',
     title: 'TITLE & DESCRIPTION',
     dataType: DataType.String,
-    width: '450px',
+    width: '350px',
   },
   {
     key: 'create-by',
@@ -55,7 +55,7 @@ const columns = [
     key: 'lastUpdatedOn',
     title: 'LAST MODIFIED',
     dataType: DataType.String,
-    width: '180px',
+    width: '100px',
   },
   {
     key: 'contentAction',

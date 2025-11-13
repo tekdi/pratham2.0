@@ -44,8 +44,7 @@ export enum TenantName {
   POS = 'Open School',
   PRAGYANPATH = 'Pragyanpath',
   CAMP_TO_CLUB = 'Camp to Club',
- LEARNING_AND_DEVELOPMENT ="Learning and Development",
- CREATIVITY_CLUB ="Creativity Club"
+ LEARNING_AND_DEVELOPMENT ="Learning and Development"
 
 }
 export enum FilterKey {
