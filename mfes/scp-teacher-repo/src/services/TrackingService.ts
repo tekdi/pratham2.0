@@ -40,20 +40,3 @@ export const createContentTracking = async (reqBody: ContentCreate) => {
     throw error;
   }
 };
-export const fetchUserCertificateStatus = async (userIds: string[], courseIds: string[]) => {
-  try {
-    const API_URL = `${API_ENDPOINTS.userCertificateStatusSearch}`;
-    const data = {
-      filters: {
-        userId: userIds,
-        courseId: courseIds
-      }
-    };
-
-    const response = await post(API_URL, data);
-    return response?.data?.result || response?.data;
-  } catch (error) {
-    console.error('Error fetching user certificate status:', error);
-    throw error;
-  }
-};
