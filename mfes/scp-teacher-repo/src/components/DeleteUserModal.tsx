@@ -1,5 +1,5 @@
 import { updateFacilitator } from '@/services/ManageUser';
-import { deleteUser, updateCohortMemberStatus } from '@/services/MyClassDetailsService';
+import { updateCohortMemberStatus, updateUserTenantStatus } from '@/services/MyClassDetailsService';
 import manageUserStore from '@/store/manageUserStore';
 import { Role, Status } from '@/utils/app.constant';
 import { fetchAttendanceStats } from '@/utils/helperAttendanceStatApi';
@@ -49,6 +49,7 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
 
 
   const [selectedValue, setSelectedValue] = useState('');
+  const tenantId = localStorage.getItem('tenantId');
   // const [otherReason, setOtherReason] = useState('');
 
   const reasons = [
@@ -89,9 +90,14 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
           statusReason,
           membershipId,
         });
-           const resp = await deleteUser(userId, {
-                userData: { reason: statusReason, status: 'archived' },
-              });
+        const resolvedTenantId = tenantId ?? localStorage.getItem('tenantId');
+        if (!resolvedTenantId) {
+          showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
+          return;
+        }
+        const resp = await updateUserTenantStatus(userId, resolvedTenantId, {
+          status: 'archived'
+        });
         showToastMessage(t('COMMON.USER_DELETED_PERMANENTLY'), 'success');
       }
     }
