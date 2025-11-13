@@ -19,7 +19,7 @@ const GoogleAnalyticsTracker = () => {
          let windowUrl = window.location.pathname;
     let cleanedUrl = windowUrl.replace(/^\//, '');
     console.log('Cleaned URL:', cleanedUrl);
-      if(cleanedUrl.startsWith('themantic')) {
+      if(window.location.href.includes('experimentoindia')) {
         console.log('Initializing GA for Themantic');
         initGA(`${process.env.NEXT_PUBLIC_MEASUREMENT_ID_THEMATIC}`);
       }

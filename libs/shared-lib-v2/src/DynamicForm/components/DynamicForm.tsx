@@ -117,30 +117,96 @@ const DynamicForm = ({
   };
 
   const getInitialUiSchema = () => {
+    let initialUiSchema = uiSchema;
+    
     if (!prefilledFormData || !prefilledFormData.family_member_details) {
       const cleanedUiSchema = { ...uiSchema };
       delete cleanedUiSchema.mother_name;
       delete cleanedUiSchema.father_name;
       delete cleanedUiSchema.spouse_name;
-      return cleanedUiSchema;
+      initialUiSchema = cleanedUiSchema;
     }
-    return uiSchema;
+    
+    // Add note to lastName field in initial uiSchema
+    if (initialUiSchema.lastName && !initialUiSchema.lastName['ui:options']?.note) {
+      initialUiSchema = {
+        ...initialUiSchema,
+        lastName: {
+          ...initialUiSchema.lastName,
+          'ui:options': {
+            ...(initialUiSchema.lastName['ui:options'] || {}),
+            note: 'If you do not have a last name, please enter your first name again or use a single dot (.) in this field',
+          },
+        },
+      };
+    }
+    
+    return initialUiSchema;
   };
   // Initialize state based on createNewLearner flag
   const [formSchema, setFormSchema] = useState(
     createNew ? schema : getInitialSchema()
   );
+  // Helper to add lastName note to uiSchema
+  const addLastNameNote = (uischema: any) => {
+    if (uischema?.lastName && !uischema.lastName['ui:options']?.note) {
+      return {
+        ...uischema,
+        lastName: {
+          ...uischema.lastName,
+          'ui:options': {
+            ...(uischema.lastName['ui:options'] || {}),
+            note: 'If you do not have a last name, please enter your first name again or use a single dot (.) in this field',
+          },
+        },
+      };
+    }
+    return uischema;
+  };
+
   const [formUiSchemaOriginal, setFormUiSchemaOriginal] = useState(
-    createNew ? uiSchema : getInitialUiSchema()
+    createNew ? addLastNameNote(uiSchema) : getInitialUiSchema()
   );
   const [formUiSchema, setFormUiSchema] = useState(
-    createNew ? uiSchema : getInitialUiSchema()
+    createNew ? addLastNameNote(uiSchema) : getInitialUiSchema()
   );
   const [formData, setFormData] = useState(
     createNew ? prefilledFormData : getInitialFormData()
   );
 
   console.log('formUiSchema', formUiSchema);
+
+  // Add note for lastName field - applies to all forms
+  useEffect(() => {
+    if (formUiSchema?.lastName) {
+      const currentNote = formUiSchema.lastName['ui:options']?.note;
+      if (!currentNote) {
+        console.log('Adding note to lastName field', formUiSchema.lastName);
+        setFormUiSchema((prevUiSchema) => {
+          // Check again to avoid unnecessary updates
+          if (prevUiSchema?.lastName && !prevUiSchema.lastName['ui:options']?.note) {
+            const updatedUiSchema = {
+              ...prevUiSchema,
+              lastName: {
+                ...prevUiSchema.lastName,
+                'ui:options': {
+                  ...(prevUiSchema.lastName['ui:options'] || {}),
+                  note: 'If you do not have a last name, please enter your first name again or use a single dot (.) in this field',
+                },
+              },
+            };
+            console.log('Updated uiSchema with note:', updatedUiSchema.lastName);
+            return updatedUiSchema;
+          }
+          return prevUiSchema;
+        });
+      } else {
+        console.log('lastName note already exists:', currentNote);
+      }
+    } else {
+      console.log('lastName field not found in formUiSchema');
+    }
+  }, [formUiSchema]);
 
   //custom validation on formData for learner fields hide on dob
   useEffect(() => {
