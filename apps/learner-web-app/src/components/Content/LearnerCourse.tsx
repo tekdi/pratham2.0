@@ -7,6 +7,7 @@ import SearchComponent from './SearchComponent';
 import FilterComponent from './FilterComponent';
 import { gredientStyle } from '@learner/utils/style';
 import { logEvent } from '@learner/utils/googleAnalytics';
+import { TenantName } from '@learner/utils/app.constant';
 
 interface LearnerCourseProps {
   title?: string;
@@ -237,6 +238,7 @@ export default memo(function LearnerCourse({
                 },
               },
             }}
+            onlyLanguage={localStorage.getItem('userProgram') === TenantName.CAMP_TO_CLUB ? true : false}
           />
           <Box
             sx={{
@@ -272,7 +274,9 @@ export default memo(function LearnerCourse({
             filterState={filterState}
             handleFilterChange={handleFilterChange}
             onlyFields={_content?.onlyFields ?? []}
-            isOpenColapsed={_content?.isOpenColapsed ?? []}
+            isOpenColapsed={_content?.isOpenColapsed ?? []}        
+            onlyLanguage={localStorage.getItem('userProgram') === TenantName.CAMP_TO_CLUB ? true : false}
+
           />
         </Box>
         <Box flex={127}>
