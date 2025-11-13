@@ -333,7 +333,7 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
       if(isLeadRole) {
       role = roles.find((r) => r.roleName === 'Lead');
       } else {
-        role=roles[0];
+        role = roles.find((r) => r.roleName === 'Learner');
       }
 
       if(role) {  
