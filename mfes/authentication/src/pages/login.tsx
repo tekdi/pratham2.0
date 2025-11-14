@@ -172,6 +172,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
   return (
     <Box sx={{ overflowY: 'auto', background: theme.palette.warning['A400'] }}>
+      
       <Box
         display="flex"
         flexDirection="column"
@@ -472,6 +473,82 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                       }}
                     >
                       {t('LOGIN_PAGE.LOGIN')}
+                    </Button>
+                  </Box>
+                  
+                  {/* SSO Login Buttons */}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: 1,
+                      width: '100%',
+                      mt: 2,
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Button
+                      fullWidth
+                      variant="outlined"
+                      color="primary"
+                      type="button"
+                      sx={{
+                        borderRadius: 50,
+                        backgroundColor: 'transparent',
+                        borderColor: '#1976d2',
+                        color: '#1976d2',
+                        '&:hover': {
+                          backgroundColor: 'transparent',
+                          borderColor: '#1565c0',
+                          color: '#1565c0',
+                        },
+                        '@media (min-width: 900px)': {
+                          width: '50%',
+                        },
+                      }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        // Get SSO option from ssoOptions if available, otherwise use defaults
+                         
+                        // Construct SSO URL with callback parameters
+                        const currentBaseUrl =
+                          typeof window !== 'undefined'
+                            ? window.location.origin
+                            : '';
+                        const callbackUrl = `${currentBaseUrl}/youthnet/sso?env=newton`;
+                        const encodedCallbackUrl = callbackUrl;
+                        // encodeURIComponent(callbackUrl);
+                        
+                        // Get SSO URL from ssoOption, environment variable
+                        const ssoBaseUrl = "https://prathamerp.org/Config/OAuthLogin/PRATHAM";
+                        
+                        // Debug logging
+                     
+                        
+                        // if (!ssoBaseUrl) {
+                        //   console.error('SSO URL not configured');
+                        //   alert('SSO URL not configured. Please check your configuration.');
+                        //   return;
+                        // }
+                        
+                        // if (!tenantId) {
+                        //   console.error('Tenant ID not found');
+                        //   alert('Tenant ID not found. Please ensure tenant ID is set.');
+                        //   return;
+                        // }
+                        
+                        // Construct SSO URL - use ? if no existing query params, otherwise use &
+                        const hasQueryParams = ssoBaseUrl.includes('?');
+                        const ssoUrl = `${ssoBaseUrl}${hasQueryParams ? '&' : '?'}callbackurl=${encodedCallbackUrl}`;
+                        
+                        console.log('Redirecting to SSO URL:', ssoUrl);
+
+                        // Open SSO URL in new tab (matching OurProgramCarousel behavior)
+                        window.open(ssoUrl, '_blank');
+                      }}
+                    >
+                     {t('Login with Newton ERP') || 'Login with ERP'}
                     </Button>
                   </Box>
                 </Box>

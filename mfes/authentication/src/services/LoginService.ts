@@ -112,3 +112,14 @@ export const getUserId = async (): Promise<any> => {
     throw error;
   }
 };
+
+export const getTenantInfo = async (): Promise<any> => {
+  const apiUrl: string = API_ENDPOINTS.program;
+  try {
+    const response = await axios.get(apiUrl);
+    return response?.data;
+  } catch (error) {
+    console.error('Error in fetching tenant info', error);
+    throw null;
+  }
+};

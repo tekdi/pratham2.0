@@ -75,10 +75,15 @@ const MenuDrawer: React.FC<DrawerProps> = ({
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.localStorage) {
-      const isYouthUser = localStorage.getItem('tenantName');
-      if (isYouthUser == TENANT_DATA.YOUTHNET) {
-        setTenantName(isYouthUser);
+      const storedTenantName = localStorage.getItem('tenantName');
+      
+      // Always set tenantName to one of the tenant types
+      if (storedTenantName === TENANT_DATA.YOUTHNET) {
+        setTenantName(TENANT_DATA.YOUTHNET);
+      } else if (storedTenantName === TENANT_DATA.PRAGYANPATH) {
+        setTenantName(TENANT_DATA.PRAGYANPATH);
       } else {
+        // Default to empty for all other cases
         setTenantName('');
       }
     }
@@ -208,6 +213,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
   const isVillagesAndYouths = router.pathname.includes('/villages');
   const isSurveys = router.pathname.includes('/surveys');
   const isManualAssessments = router.pathname.includes('/manual-assessments');
+  const isManagerDashboard = router.pathname === '/manager-dashboard';
 
   return (
     <Drawer
@@ -367,7 +373,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
           </Box>
         )}
 
-        {tenantName && (
+        {tenantName === TENANT_DATA.YOUTHNET && (
           <Box>
             <Button
               className="fs-14"
@@ -541,6 +547,43 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 {t('COMMON.SUPPORT_REQUEST')}
               </Button>
             </Box>
+          </Box>
+        )}
+        
+        {/* PRAGYANPATH - Only shows manager-dashboard */}
+        {tenantName === TENANT_DATA.PRAGYANPATH && (
+          <Box>
+            <Button
+              className="fs-14"
+              sx={{
+                gap: '10px',
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'flex-start',
+                background: isManagerDashboard
+                  ? theme.palette.primary.main
+                  : 'transparent',
+                padding: isManagerDashboard
+                  ? '16px 18px !important'
+                  : '0px 18px !important',
+                marginTop: '25px',
+                color: isManagerDashboard ? '#2E1500' : theme.palette.warning.A200,
+                fontWeight: isManagerDashboard ? '600' : 500,
+                '&:hover': {
+                  background: isManagerDashboard
+                    ? theme.palette.primary.main
+                    : 'transparent',
+                },
+              }}
+              startIcon={
+                <DashboardOutlinedIcon sx={{ fontSize: '24px !important' }} />
+              }
+              onClick={() => {
+                router.push('/manager-dashboard');
+              }}
+            >
+              Manager Dashboard
+            </Button>
           </Box>
         )}
         {!tenantName && (
