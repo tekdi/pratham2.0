@@ -357,8 +357,8 @@
     "ADD_NEW_TOPIC": "Add New Topic",
     "DELETE_PLANNER": "Delete Planner",
     "CSV_TEMPLATE": "CSV Template",
-    "NEW_TOPIC": "New Topic",
-    "DOWNLOAD_CSV": "Download Uploaded CSV"
+    "NEW_TOPIC": "New Topic"
+   
 
   },
   "MASTER": {
