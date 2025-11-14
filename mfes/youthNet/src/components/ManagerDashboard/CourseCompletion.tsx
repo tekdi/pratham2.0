@@ -125,7 +125,7 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
                 direction="row"
                 alignItems="center"
                 spacing={1}
-                sx={{ cursor: 'pointer' }}
+               // sx={{ cursor: 'pointer' }}
               >
                 <Box
                   sx={{
@@ -139,9 +139,10 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
                 <Typography
                   variant="body2"
                   sx={{
-                    textDecoration: 'underline',
+                  //  textDecoration: 'underline',
                     color: theme.palette.primary.main,
                     fontSize: { xs: '12px', sm: '13px', lg: '12px', xl: '13px' },
+                    // cursor: 'none',
                   }}
                 >
                   {item.name} : {item.value}
