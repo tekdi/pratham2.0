@@ -13,9 +13,15 @@ import { post } from '@/services/RestClient';
 import { showToastMessage } from '@/components/Toastify';
 import { transformLabel } from '@/utils/Helper';
 import { API_ENDPOINTS } from '@/utils/API/APIEndpoints';
+import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
 
+import { useTranslation } from 'react-i18next';
+import { extractMatchingKeys } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 interface EmailSearchUserProps {
   onUserSelected?: (userId: string) => void;
+  onUserDetails: (userUpdatedDetails: any) => void;
+  schema: any;
+  uiSchema: any;
 }
 
 interface UserDetails {
@@ -31,7 +37,12 @@ interface UserDetails {
 
 const EmailSearchUser: React.FC<EmailSearchUserProps> = ({
   onUserSelected,
+  onUserDetails,
+  schema,
+  uiSchema,
 }) => {
+  const { t } = useTranslation();
+
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [userRow, setUserRow] = useState<any>(null);
@@ -71,6 +82,8 @@ const EmailSearchUser: React.FC<EmailSearchUserProps> = ({
         const user = response.data.result.user;
 
         setUserRow(user);
+        let tempFormData = extractMatchingKeys(user, schema);
+        setPrefilledFormData(tempFormData);
 
         // Extract user details
         const extractedUserId = user.userId;
@@ -181,6 +194,20 @@ const EmailSearchUser: React.FC<EmailSearchUserProps> = ({
     }
   };
 
+  //dynamci form for update user details
+  const [prefilledFormData, setPrefilledFormData] = useState(
+    {}
+  );
+  const [alteredSchema, setAlteredSchema] = useState<any>(schema);
+  const [alteredUiSchema, setAlteredUiSchema] = useState<any>(uiSchema);
+
+  const FormSubmitFunction = async (formData: any, payload: any) => {
+    console.log(formData, 'formdata');
+    console.log('########## debug username', payload);
+    console.log('########## debug formdata', formData);
+    setPrefilledFormData(formData);
+  };
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
       <Typography variant="body1" color="text.secondary">
@@ -237,88 +264,23 @@ const EmailSearchUser: React.FC<EmailSearchUserProps> = ({
             backgroundColor: '#f9f9f9',
           }}
         >
-          <Typography variant="h1" sx={{ mb: 2, color: '#000000' }}>
-            User Details
-          </Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body2" color="text.secondary">
-                Name
-              </Typography>
-              <Typography
-                variant="body1"
-                sx={{ fontWeight: 'medium', mt: 0.5 }}
-              >
-                {userDetails.name || 'N/A'}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body2" color="text.secondary">
-                Date of Birth
-              </Typography>
-              <Typography
-                variant="body1"
-                sx={{ fontWeight: 'medium', mt: 0.5 }}
-              >
-                {formatDate(userDetails.dob)}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body2" color="text.secondary">
-                Mobile Number
-              </Typography>
-              <Typography
-                variant="body1"
-                sx={{ fontWeight: 'medium', mt: 0.5 }}
-              >
-                {userDetails.mobile || 'N/A'}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body2" color="text.secondary">
-                User State
-              </Typography>
-              <Typography
-                variant="body1"
-                sx={{ fontWeight: 'medium', mt: 0.5 }}
-              >
-                {transformLabel(userDetails.state) || 'N/A'}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body2" color="text.secondary">
-                User District
-              </Typography>
-              <Typography
-                variant="body1"
-                sx={{ fontWeight: 'medium', mt: 0.5 }}
-              >
-                {transformLabel(userDetails.district) || 'N/A'}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body2" color="text.secondary">
-                Block
-              </Typography>
-              <Typography
-                variant="body1"
-                sx={{ fontWeight: 'medium', mt: 0.5 }}
-              >
-                {transformLabel(userDetails.block) || 'N/A'}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body2" color="text.secondary">
-                Village
-              </Typography>
-              <Typography
-                variant="body1"
-                sx={{ fontWeight: 'medium', mt: 0.5 }}
-              >
-                {transformLabel(userDetails.village) || 'N/A'}
-              </Typography>
-            </Grid>
-          </Grid>
+        <Typography variant="h1" sx={{ mb: 2, color: '#000000' }}>
+          User Details
+        </Typography>
+          <DynamicForm
+            schema={alteredSchema}
+            uiSchema={alteredUiSchema}
+            t={t}
+            FormSubmitFunction={FormSubmitFunction}
+            prefilledFormData={prefilledFormData}
+            hideSubmit={true}
+            extraFields={[]}
+            type={''}
+            isCallSubmitInHandle={true}
+            SubmitaFunction={FormSubmitFunction}
+          />
+          <Box sx={{marginTop: 2}}>
+          </Box>
         </Box>
       )}
     </Box>

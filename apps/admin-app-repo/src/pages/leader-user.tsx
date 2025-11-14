@@ -122,31 +122,39 @@ const LeaderUser = () => {
   useEffect(() => {
     // Fetch form schema from API and set it in state.
     const fetchData = async () => {
-      setAddSchema({
-        type: 'object',
-        properties: {
-          centerList: {
-            type: 'array',
-            title: 'Center List',
-            items: {
-              type: 'string',
-              enum: ['Select'],
-              enumNames: ['Select'],
-            },
+      const responseForm = await fetchForm([
+        {
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.teamLead.context}&contextType=${FormContext.teamLead.contextType}`,
+          header: {},
+        },
+        {
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.teamLead.context}&contextType=${FormContext.teamLead.contextType}`,
+          header: {
+            tenantid: localStorage.getItem('tenantId'),
           },
         },
-      });
-      setAddUiSchema({
-        'ui:order': ['centerList'],
+      ]);
+      // console.log('responseForm', responseForm);
+      let alterSchema = responseForm?.schema;
+      let alterUISchema = responseForm?.uiSchema;
+      if (alterUISchema?.firstName) {
+        alterUISchema.firstName['ui:disabled'] = true;
+      }
+      if (alterUISchema?.lastName) {
+        alterUISchema.lastName['ui:disabled'] = true;
+      }
+      if (alterUISchema?.dob) {
+        alterUISchema.dob['ui:disabled'] = true;
+      }
+      if (alterUISchema?.email) {
+        alterUISchema.email['ui:disabled'] = true;
+      }
+      if (alterUISchema?.mobile) {
+        alterUISchema.mobile['ui:disabled'] = true;
+      }
 
-        centerList: {
-          'ui:widget': 'CustomCenterListWidget',
-          'ui:options': {
-            multiple: true,
-            uniqueItems: true,
-          },
-        },
-      });
+      setAddSchema(alterSchema);
+      setAddUiSchema(alterUISchema);
     };
     fetchData();
     setRoleID(RoleId.TEAM_LEADER);
@@ -558,6 +566,7 @@ const LeaderUser = () => {
   >(null);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [isMappingInProgress, setIsMappingInProgress] = useState(false);
+  const [userDetails, setUserDetails] = useState<any>(null);
 
   return (
     <>
@@ -690,6 +699,7 @@ const LeaderUser = () => {
           setMapModalOpen(false);
           setSelectedCenterId(null); // Reset center selection when dialog closes
           setSelectedUserId(null); // Reset user selection when dialog closes
+          setUserDetails(null);
         }}
         maxWidth={false}
         fullWidth={true}
@@ -730,6 +740,11 @@ const LeaderUser = () => {
                 setSelectedUserId(userId || null);
                 console.log('Selected User ID:', userId);
               }}
+              onUserDetails={(userDetails) => {
+                setUserDetails(userDetails);
+              }}
+              schema={addSchema}
+              uiSchema={addUiSchema}
             />
           </Box>
           <hr />
@@ -750,6 +765,7 @@ const LeaderUser = () => {
             color="primary"
             fullWidth
             onClick={async () => {
+              document.getElementById('dynamicform-submit-button')?.click();
               if (selectedUserId && selectedCenterId) {
                 setIsMappingInProgress(true);
                 try {
@@ -819,6 +835,8 @@ const LeaderUser = () => {
             disabled={
               !selectedUserId || !selectedCenterId || isMappingInProgress
             }
+            form="map-user-form"
+                  type="submit"
           >
             {t('Map as Team Lead')}
           </Button>
