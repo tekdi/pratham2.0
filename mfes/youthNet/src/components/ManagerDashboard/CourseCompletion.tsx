@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Paper, Stack } from '@mui/material';
+import { Box, Typography, Paper, Stack, useMediaQuery } from '@mui/material';
 import {
   PieChart,
   Pie,
@@ -27,6 +27,7 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
   nonMandatoryCourses,
 }) => {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const prepareMandatoryData = (): ChartDataItem[] => {
     const completed = mandatoryCourses.filter(course => course.status === 'completed').length;
     const inProgress = mandatoryCourses.filter(course => course.status === 'inprogress').length;
@@ -61,6 +62,10 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
   };
   const renderDonutChart = (data: ChartDataItem[], title: string) => {
     const backgroundData = [{ value: 100 }];
+    // Responsive radius values: smaller for mobile, original for desktop
+    const innerRadius = isMobile ? 38 : 48;
+    const outerRadius = isMobile ? 55 : 68;
+    
     return (
       <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <Typography variant="body2" fontWeight={500} color="text.secondary" gutterBottom sx={{ mb: { xs: 1, sm: 2 }, fontSize: { xs: '0.875rem', sm: '0.875rem' } }}>
@@ -74,8 +79,8 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
                   data={backgroundData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={48}
-                  outerRadius={68}
+                  innerRadius={innerRadius}
+                  outerRadius={outerRadius}
                   dataKey="value"
                   startAngle={0}
                   endAngle={360}
@@ -85,8 +90,8 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
                   data={data}
                   cx="50%"
                   cy="50%"
-                  innerRadius={48}
-                  outerRadius={68}
+                  innerRadius={innerRadius}
+                  outerRadius={outerRadius}
                   dataKey="value"
                   startAngle={90}
                   endAngle={-270}
@@ -105,7 +110,7 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
                 textAlign: 'center',
-                width: '80px',
+                width: { xs: '60px', sm: '80px' },
               }}
             >
               {/* <Typography variant="caption" color="text.secondary" sx={{ fontSize: '9px', textTransform: 'uppercase', lineHeight: 1.2 }}>
@@ -120,7 +125,7 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
                 direction="row"
                 alignItems="center"
                 spacing={1}
-                sx={{ cursor: 'pointer' }}
+               // sx={{ cursor: 'pointer' }}
               >
                 <Box
                   sx={{
@@ -134,9 +139,10 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
                 <Typography
                   variant="body2"
                   sx={{
-                    textDecoration: 'underline',
+                  //  textDecoration: 'underline',
                     color: theme.palette.primary.main,
                     fontSize: { xs: '12px', sm: '13px', lg: '12px', xl: '13px' },
+                    // cursor: 'none',
                   }}
                 >
                   {item.name} : {item.value}

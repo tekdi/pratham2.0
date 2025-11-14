@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Card, CardContent, CardMedia, Typography, Button, Stack } from '@mui/material';
+import { Box, Card, CardContent, CardMedia, Typography, Button, Stack, Tooltip } from '@mui/material';
 import { ArrowForward } from '@mui/icons-material';
 import { CourseCardProps } from './types';
 
@@ -51,22 +51,25 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
 
       {/* Course Content */}
       <CardContent sx={{ flex: 1, p: 2, display: 'flex', flexDirection: 'column' }}>
-        <Typography
-          variant="subtitle2"
-          fontWeight={600}
-          gutterBottom
-          sx={{
-            mb: 1,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            minHeight: '2.8em',
-          }}
-        >
-          {course.title}
-        </Typography>
+        <Tooltip title={course.title} arrow>
+          <Typography
+            variant="subtitle2"
+            fontWeight={600}
+            gutterBottom
+            sx={{
+              mb: 1,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              minHeight: '2.8em',
+              cursor: 'default',
+            }}
+          >
+            {course.title}
+          </Typography>
+        </Tooltip>
         
         <Typography
           variant="caption"
