@@ -12,6 +12,7 @@ const FilterComponent: React.FC<{
   onlyFields?: string[];
   isOpenColapsed?: boolean | any[];
   _config?: any;
+  onlyLanguage?: boolean;
 }> = ({
   filterState,
   staticFilter,
@@ -20,6 +21,7 @@ const FilterComponent: React.FC<{
   onlyFields,
   isOpenColapsed,
   _config,
+  onlyLanguage=false,
 }) => {
   const { t } = useTranslation();
   const [filterCount, setFilterCount] = useState<any>();
@@ -65,6 +67,9 @@ if (typeof window !== 'undefined') {
     if (Array.isArray(newVal)) return !arraysEqual(prevVal, newVal);
     return prevVal !== newVal;
   };
+
+  // When onlyLanguage is true, only show contentLanguage field
+  const effectiveOnlyFields = onlyLanguage ? ['contentLanguage'] : onlyFields;
 
   const memoizedFilterForm = useMemo(
     () => (
@@ -133,7 +138,7 @@ if (typeof window !== 'undefined') {
 
           handleFilterChange(newFilterState);
         }}
-        onlyFields={onlyFields}
+        onlyFields={effectiveOnlyFields}
         isOpenColapsed={isOpenColapsed}
         filterFramework={filterFramework}
         orginalFormData={filterState?.filters ?? {}}
@@ -145,10 +150,11 @@ if (typeof window !== 'undefined') {
       filterFramework,
       isOpenColapsed,
       staticFilter,
-      onlyFields,
+      effectiveOnlyFields,
       filterState,
       _config,
       checkboxStyle,
+      onlyLanguage,
     ]
   );
 

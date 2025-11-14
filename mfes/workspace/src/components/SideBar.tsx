@@ -165,10 +165,12 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
     if (typeof window !== 'undefined' && window.localStorage) {
       const userInfo = JSON.parse(localStorage.getItem('adminInfo') || '{}');
       console.log('userInfo', userInfo);
-      if (userInfo?.role === Role.SCTA || userInfo?.role === Role.CCTA) {
+      if ((userInfo?.role === Role.SCTA || userInfo?.role === Role.CCTA) && isSCP) {
         // router.push("/course-planner");
         window.parent.location.href = `${route}course-planner`;
-      } else window.parent.location.href = `${route}`;
+      }  else        window.parent.location.href = `${route}faqs`;
+
+
     }
   };
 
@@ -215,7 +217,7 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
         justifyContent="space-between"
         paddingTop={'1rem'}
       >
-        {userRole === Role.CENTRAL_ADMIN || (userRole === Role.CCTA && isSCP) && (
+        { (
           <Box display="flex" alignItems="center">
             <ListItemIcon>
               <IconButton onClick={goBack}>

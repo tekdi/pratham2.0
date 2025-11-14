@@ -462,9 +462,7 @@ const AssessmentList = () => {
                 minWidth: '200px',
               }}
             >
-              {`${filteredAssessments.length} ${t(
-                'ASSESSMENTS.ASSESSMENTS_FOUND'
-              )}`}
+              {`${t('ASSESSMENTS.ASSESSMENTS_FOUND', { count: filteredAssessments.length })}`}
             </Typography>
             <Button
               onClick={handleOpenModal}

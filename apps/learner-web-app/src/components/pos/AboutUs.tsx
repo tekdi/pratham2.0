@@ -46,6 +46,37 @@ const AboutUsPage = () => {
             alignItems: 'center',
           }}
         >
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Typography
+              variant={mediaMD ? 'h1' : 'body7'}
+              component="h1"
+              sx={{
+                fontWeight: 700,
+                textAlign: 'center',
+                color: '#fff',
+                mb: 1,
+              }}
+            >
+              <SpeakableText>
+                About Us
+              </SpeakableText>
+            </Typography>
+            <Typography
+              variant={mediaMD ? 'h2' : 'h1'}
+              component="h2"
+              sx={{
+                fontWeight: 900,
+                textAlign: 'center',
+                color: '#FDBE16',
+                mb: 2,
+                maxWidth: '1500px',
+                lineHeight: 1.8,
+              }}
+            >
+              <SpeakableText>
+              Pratham Open School offers free, downloadable videos, games, reading material and stories in 15 languages for ages 1 to 18+, designed to support self-led learning and group learning through activities and projects.              </SpeakableText>
+            </Typography>
+          </Box>
           <Box>
             <Typography
               variant={mediaMD ? 'h2' : 'body8'}
@@ -56,7 +87,7 @@ const AboutUsPage = () => {
                 color: isColorInverted ? '#FFF' : '#fff',
               }}
             >
-              <SpeakableText>About Us</SpeakableText>
+              <SpeakableText></SpeakableText>
             </Typography>
             <Typography
               variant={mediaMD ? 'h1' : 'body6'}
@@ -68,7 +99,6 @@ const AboutUsPage = () => {
               }}
             >
               <SpeakableText>
-                One liner - Highlight POS as a Pradigi Product
               </SpeakableText>
             </Typography>
           </Box>
@@ -107,6 +137,7 @@ const AboutUsPage = () => {
                   letterSpacing: '0.5px',
                   color: '#1F1B13',
                   mt: 2,
+                  textAlign: 'justify',
                 }}
               >
                 <SpeakableText>
@@ -145,6 +176,7 @@ const AboutUsPage = () => {
                   letterSpacing: '0.5px',
                   color: '#1F1B13',
                   mt: 1,
+                  textAlign: 'justify',
                 }}
               >
                 <SpeakableText>
@@ -183,6 +215,7 @@ const AboutUsPage = () => {
                   letterSpacing: '0.5px',
                   color: '#1F1B13',
                   mt: 1,
+                  textAlign: 'justify',
                 }}
               >
                 <SpeakableText>
@@ -230,26 +263,28 @@ const AboutUsPage = () => {
         >
           <Box
             sx={{
-              background: '#FDBE16',
+             // background: '#FDBE16',
               padding: '4px 8px',
               borderRadius: '10px',
               margin: '22px auto 0',
               width: 'fit-content',
             }}
           >
-            <Typography
-              variant={mediaMD ? 'h1' : 'body9'}
-              component="h2"
-              sx={{
-                fontFamily: 'Poppins',
-                fontWeight: 600,
-                letterSpacing: '0px',
-                textAlign: 'center',
-                color: '#1F1B13',
-              }}
-            >
-              <SpeakableText>Title Here About 3 Pillars</SpeakableText>
-            </Typography>
+           <Typography
+          variant={mediaMD ? 'h1' : 'body6'}
+          component="h3"
+          sx={{
+            fontFamily: 'Poppins',
+            fontWeight: 700,
+            // fontSize: '36px',
+            lineHeight: '64px',
+            letterSpacing: '-0.25px',
+            color: '#1F1B13',
+            textAlign: 'center',
+          }}
+        >
+          <SpeakableText>Our Learning Pillars</SpeakableText>
+        </Typography>
           </Box>
           <Typography
             variant={mediaMD ? 'h3' : 'h1'}
@@ -264,7 +299,6 @@ const AboutUsPage = () => {
             }}
           >
             <SpeakableText>
-              Any subtext, if required can be displayed to give more information
             </SpeakableText>
           </Typography>
 
@@ -316,7 +350,7 @@ const AboutUsPage = () => {
               // fontSize: '22px',
               // lineHeight: '32px',
               letterSpacing: '0px',
-              textAlign: 'center',
+              textAlign: 'justify',
               color: '#635E57',
               mt: 2,
             }}

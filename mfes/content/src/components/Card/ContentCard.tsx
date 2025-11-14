@@ -37,24 +37,24 @@ const hashString = (str: string): number => {
 };
 
 // Function to get consistent random default image based on identifier
-const getRandomDefaultImage = (identifier: string) => {
-  const hash = hashString(identifier);
-  const index = hash % courseDefaultImages.length;
-  return `/images/courseDefaultImages/${courseDefaultImages[index]}`;
-};
+// const getRandomDefaultImage = (identifier: string) => {
+//   const hash = hashString(identifier);
+//   const index = hash % courseDefaultImages.length;
+//   return `/images/courseDefaultImages/${courseDefaultImages[index]}`;
+// };
 
-// Function to get default image based on conditions
-const getDefaultImage = (default_img?: string, identifier?: string) => {
-  if (typeof window !== 'undefined') {
-    const userProgram = localStorage.getItem('userProgram');
+// // Function to get default image based on conditions
+// const getDefaultImage = (default_img?: string, identifier?: string) => {
+//   if (typeof window !== 'undefined') {
+//     const userProgram = localStorage.getItem('userProgram');
     
-    if (userProgram === 'Open School' && identifier) {
-      return getRandomDefaultImage(identifier);
-    }
-  }
+//     if (userProgram === 'Open School' && identifier) {
+//       return getRandomDefaultImage(identifier);
+//     }
+//   }
   
-  return default_img ?? `${AppConst.BASEPATH}/assests/images/image_ver.png`;
-};
+//   return default_img ?? `${AppConst.BASEPATH}/assests/images/image_ver.png`;
+// };
 
 const ContentCard = ({
   item,
@@ -101,15 +101,15 @@ const ContentCard = ({
         title={(item?.name || '').trim()}
         courseType={item?.courseType}
         image={
-  item?.posterImage
-    ? item.posterImage
-    : item?.appIcon
-      ? item.appIcon
-      : getDefaultImage(default_img, item?.identifier || item?.name)
-}
+        item?.posterImage
+          ? item.posterImage
+          : item?.appIcon
+            ? item.appIcon
+            : default_img ?? `${AppConst.BASEPATH}/assests/images/image_ver.png`
+      }
         content={item?.description ? item?.description : <Description />}
         actions={
-          type !== 'Course' || type!=='Job family' || type!=='PSU' || type!=='Group Membership' && (
+          type !== 'Course' || type!=='Job family' || type!=='PSU' || type!=='Group Membership'  || type!=='self' && (
             <StatusIcon
               showMimeTypeIcon
               mimeType={item?.mimeType}
@@ -134,7 +134,7 @@ const ContentCard = ({
         onClick={(e: any) => handleCardClick(item, e)}
         _card={{
           _contentParentText: {
-            sx: { height: type !== 'Course' ? '156px' : '172px' },
+            sx: { height: type !== 'Course' || type!=='self' ? '156px' : '172px' },
           },
           ..._card,
         }}

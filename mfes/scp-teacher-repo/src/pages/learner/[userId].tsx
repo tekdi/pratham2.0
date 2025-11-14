@@ -170,6 +170,10 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
 
   const handleCloseAddLearnerModal = () => {
     setOpenAddLearnerModal(false);
+    // Force a small delay to ensure state is reset
+    setTimeout(() => {
+      setReload((prev) => !prev);
+    }, 100);
   };
 
   const mapFields = (formFields: any, response: any) => {
@@ -1157,6 +1161,7 @@ if (familyField?.displayValue) {
                 learnerUserName={selectedUserUserName}
               /> */}
               <LearnerManage
+                key={`learner-manage-${reload}`}
                 open={openAddLearnerModal}
                 onClose={handleCloseAddLearnerModal}
                 onLearnerAdded={handleReload}
@@ -1214,6 +1219,11 @@ if (familyField?.displayValue) {
                 }
                 if (item.label?.toUpperCase() === 'BATCH') {
                   displayValue = batchNames.map((name) => toPascalCase(name)).join(', ');
+                }
+
+                // Skip rendering if displayValue is empty string
+                if (displayValue === '') {
+                  return null;
                 }
 
                 const labelText = item.label

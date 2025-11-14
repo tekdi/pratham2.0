@@ -257,9 +257,21 @@ const AllContentsPage = () => {
           undefined,
           selectedNames
         );
-        const contentList = (response?.content || []).concat(
-          response?.QuestionSet || []
-        );
+        // Combine content and QuestionSet arrays while avoiding duplicates
+        const allContent = [
+          ...(response?.content || []),
+          ...(response?.QuestionSet || [])
+        ];
+        
+        // Deduplicate based on identifier to avoid showing same content twice
+        const contentMap = new Map();
+        allContent.forEach(item => {
+          if (item?.identifier && !contentMap.has(item.identifier)) {
+            contentMap.set(item.identifier, item);
+          }
+        });
+        
+        const contentList = Array.from(contentMap.values());
         setContentList(contentList);
         setTotalCount(response?.count);
         setLoading(false);

@@ -39,7 +39,6 @@ const nextConfig = {
   transpilePackages: ['@shared-lib-v2/*'],
 
   trailingSlash: false,
-  reactStrictMode: true,
   i18n: nextI18nextConfig.i18n,
   distDir: 'build',
   images: {

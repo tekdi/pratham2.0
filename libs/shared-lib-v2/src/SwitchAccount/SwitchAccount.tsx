@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   Dialog,
@@ -190,6 +191,7 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
           inputRoles: (t.roles ?? []).map((r) => r.roleId),
         })),
       });
+      // console.log('tenants', tenants);
       return tenants;
     }
 
@@ -204,6 +206,11 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
       };
     });
 
+    // Remove tenants where no roles remain after filtering
+    const nonEmptyTenants = filteredTenants.filter(
+      (t) => (t.roles ?? []).length > 0
+    );
+
     console.log('SwitchAccount role filter', {
       allowedRoleIds,
       host,
@@ -213,9 +220,14 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
         inputRoles: (t.roles ?? []).map((r) => r.roleId),
         filteredRoles: (filteredTenants[idx].roles ?? []).map((r) => r.roleId),
       })),
+      finalTenants: nonEmptyTenants.map((t) => ({
+        tenantId: t.tenantId,
+        tenantName: t.tenantName,
+        filteredRoles: (t.roles ?? []).map((r) => r.roleId),
+      })),
     });
 
-    return filteredTenants;
+    return nonEmptyTenants;
   }, [authResponse, allowedRoleIds]);
 
   useEffect(() => {
@@ -310,7 +322,6 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
     }
     // }, [open, visibleTenants, callbackFunction, onClose]);
   }, [open]);
-
 
   const handleTenantSelect = (tenant: TenantData) => {
     setSelectedTenant(tenant);

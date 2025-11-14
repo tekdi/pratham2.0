@@ -629,22 +629,23 @@ export const sortSessionsByTime = (sessionsArray: any) => {
 };
 
 // Helper function to get options by category
+
 export const getOptionsByCategory = (frameworks: any, categoryCode: string) => {
   // Find the category by code
-  const category = frameworks?.categories?.find(
-    (category: any) => category?.code === categoryCode
+  const category = frameworks.categories.find(
+    (category: any) => category.code === categoryCode
   );
 
-  // Return the mapped terms
-  return category?.terms?.filter((term: any) => {
-    if (term.status === 'Live') {
-      return {
-        name: term?.name,
-        code: term?.code,
-        associations: term?.associations,
-      };
-    }
-  });
+  return (
+    category?.terms
+      ?.filter((term: any) => term.status !== "retired") // ✅ exclude retired
+      .map((term: any) => ({
+        name: term.name,
+        code: term.code,
+        status: term.status,
+        associations: term.associations,
+      })) || []
+  );
 };
 
 interface Association {
@@ -960,7 +961,7 @@ export const getUserFullName = (user?: {
   } else {
     if (typeof window !== 'undefined' && window.localStorage) {
       userData = localStorage.getItem('userData');
-      userData = JSON.parse(userData || '{}');
+      userData = JSON.parse?.(userData || '{}');
     }
   }
 

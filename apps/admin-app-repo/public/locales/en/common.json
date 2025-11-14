@@ -163,8 +163,10 @@
     "NO_STATE_LEAD_FOUND": "No State Lead Found",
     "FAQS": "FAQ's",
     "RESET_FILTERS": "Reset Filters",
-        "ACTIVATE_USER": "Activate User",
-    "ACTIVATE": "Activate"
+    "ACTIVATE_USER": "Activate User",
+    "ACTIVATE": "Activate",
+    "RESIGNED_FROM_COMPANY": "Resigned from the company",
+    "MOVED_TO_DIFFERENT_ROLE":"Moved to a different role"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -315,10 +317,10 @@
     "SEARCHBAR_PLACEHOLDER": "Search Center.."
   },
   "COURSE_PLANNER": {
-    "LEARNERS_PREREQISITE": "Learners Pre-requisites",
-    "NO_DATA_PRE": "No data available for Learners Pre-requisites",
-    "LEARNERS_POSTREQISITE": "Learners Post-requisites",
-    "NO_DATA_POST": "No data available for Learners Post-requisites",
+    "LEARNERS_PREREQISITE": "Learners Prepare",
+    "NO_DATA_PRE": "No data available for Learners Prepare",
+    "LEARNERS_POSTREQISITE": "Learners Practice",
+    "NO_DATA_POST": "No data available for Learners Practice",
     "FACILITATORS": "Facilitators Requisites",
     "NO_DATA": "No data available for Facilitators Requisites",
     "DOWNLOAD_SAMPLE_CSV": "Download Sample CSV",
