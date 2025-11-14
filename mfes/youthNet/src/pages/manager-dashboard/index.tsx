@@ -645,87 +645,74 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
     <Box>
         <Header />
       </Box>
-    <Box sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh', p: 2 }}>
-      <Container maxWidth="xl">
+    <Box sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh', p: { xs: 1, sm: 2 } }}>
+      <Container maxWidth="xl" sx={{ px: { xs: 1, sm: 2 } }}>
         {/* Header */}
         <Box sx={{ mb: 2 }}>
           <Typography variant="h5" fontWeight={600} display="inline">
             Team Learning Overview
           </Typography>
-          <Typography variant="body2" color="text.secondary" display="inline" sx={{ ml: 2 }}>
+          <Typography variant="body2" color="text.secondary" display="inline" sx={{ ml: { xs: 1, sm: 2 } }}>
             Total Employees : {totalEmployees}
           </Typography>
         </Box>
 
         {/* Dashboard Grid */}
-        <Grid container spacing={2}>
-          {/* Left Column: Course Completion and Course Achievement */}
-          <Grid item xs={12} md={7}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                {courseDataLoading ? (
-                  <Box 
-                    sx={{ 
-                      display: 'flex', 
-                      justifyContent: 'center', 
-                      alignItems: 'center', 
-                      minHeight: '300px',
-                      border: '1px solid #e0e0e0',
-                      borderRadius: 2,
-                      backgroundColor: 'white'
-                    }}
-                  >
-                    <Typography variant="h6">Loading Course Completion Data...</Typography>
-                  </Box>
-                ) : (
-                  <CourseCompletion
-                    mandatoryCourses={mandatoryCertificateData}
-                    nonMandatoryCourses={optionalCertificateData}
-                  />
-                )}
-
-              </Grid>
-              <Grid item xs={12}>
-                <CourseAchievement
-                  mandatoryCourses={courseAchievementData.mandatoryCourses}
-                  nonMandatoryCourses={courseAchievementData.nonMandatoryCourses}
-                />
-              </Grid>
-            </Grid>
+        <Grid container spacing={{ xs: 1.5, sm: 2 }}>
+          {/* Course Completion */}
+          <Grid item xs={12} md={6}>
+            {courseDataLoading ? (
+              <Box 
+                sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'center', 
+                  alignItems: 'center', 
+                  minHeight: '300px',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: 2,
+                  backgroundColor: 'white'
+                }}
+              >
+                <Typography variant="h6">Loading Course Completion Data...</Typography>
+              </Box>
+            ) : (
+              <CourseCompletion
+                mandatoryCourses={mandatoryCertificateData}
+                nonMandatoryCourses={optionalCertificateData}
+              />
+            )}
           </Grid>
 
-          {/* Right Column: Course Allocation and Top Performers */}
-          <Grid item xs={12} md={5}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                {courseDataLoading ? (
-                  <Box 
-                    sx={{ 
-                      display: 'flex', 
-                      justifyContent: 'center', 
-                      alignItems: 'center', 
-                      minHeight: '200px',
-                      border: '1px solid #e0e0e0',
-                      borderRadius: 2,
-                      backgroundColor: 'white'
-                    }}
-                  >
-                    <Typography variant="h6">Loading Course Allocation Data...</Typography>
-                  </Box>
-                ) : (
-                  <CourseAllocation
-                    mandatory={courseAllocationData.mandatory}
-                    nonMandatory={courseAllocationData.nonMandatory}
-                    total={courseAllocationData.total}
-                  />
-                )}
-              </Grid>
-              <Grid item xs={12}>
-                <TopPerformers
-                  usersData={topPerformersData.usersData}
-                />
-              </Grid>
-            </Grid>
+          {/* Course Allocation */}
+          <Grid item xs={12} md={6}>
+            {courseDataLoading ? (
+              <Box 
+                sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'center', 
+                  alignItems: 'center', 
+                  minHeight: '200px',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: 2,
+                  backgroundColor: 'white'
+                }}
+              >
+                <Typography variant="h6">Loading Course Allocation Data...</Typography>
+              </Box>
+            ) : (
+              <CourseAllocation
+                mandatory={courseAllocationData.mandatory}
+                nonMandatory={courseAllocationData.nonMandatory}
+                total={courseAllocationData.total}
+              />
+            )}
+          </Grid>
+
+          {/* Top Performers */}
+          <Grid item xs={12}>
+            <TopPerformers
+              usersData={topPerformersData.usersData}
+            />
           </Grid>
 
           {/* Individual Progress Table */}
