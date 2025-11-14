@@ -52,13 +52,14 @@ type UserAccount = {
 const RegisterationFlow = () => {
   const searchParams = useSearchParams();
   const newAccount = searchParams.get('newAccount');
-  const tenantId = searchParams.get('tenantId');
+  // const tenantId = searchParams.get('tenantId');
   const { t } = useTranslation();
 
   // let formData: any = {};
   const [usernames, setUsernames] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [invalidLinkModal, setInvalidLinkModal] = useState(false);
+  const tenantId = searchParams.get('tenantId');
 
   const [accountExistModal, setAccountExistModal] = useState<boolean>(false);
   const [usernamePasswordForm, setUsernamePasswordForm] =
@@ -271,7 +272,7 @@ const RegisterationFlow = () => {
         const payloadData = JSON.parse(
           localStorage.getItem('localPayload') || '{}'
         );
-        const tenantData = [{ roleId: RoleId.STUDENT}];
+        const tenantData = [{ roleId: RoleId.STUDENT, tenantId: tenantId }];
 
         //delete mobile or guardian detail from dob
         let updated_payload = payload;
@@ -552,7 +553,7 @@ const RegisterationFlow = () => {
           }
 
           document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
-
+          router.push('/program');
           // const hasBothContentCoursetab =
           //   uiConfig?.showContent?.includes('courses') &&
           //   uiConfig?.showContent?.includes('contents');
@@ -561,13 +562,13 @@ const RegisterationFlow = () => {
           // } else {
           //   router.push('/content');
           // }
-          const landingPage = localStorage.getItem('landingPage') || '';
+          // const landingPage = localStorage.getItem('landingPage') || '';
 
-          if (landingPage) {
-            router.push(landingPage);
-          } else {
-            router.push('/content');
-          }
+          // if (landingPage) {
+          //   router.push(landingPage);
+          // } else {
+          //   router.push('/content');
+          // }
         }
       }
     } catch (e) { }
