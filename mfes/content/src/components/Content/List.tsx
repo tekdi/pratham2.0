@@ -303,12 +303,12 @@ export default function Content(props: Readonly<ContentProps>) {
         : filter.limit;
       const adjustedOffset = filter.loadOld ? 0 : filter.offset;
       let resultResponse;
-      if((props.filters as any)?.filters?.program===TenantName.CREATIVITY_CLUB){
-        if (!filter.filters) {
-          filter.filters = {};
-        }
-        (filter.filters as any).primaryCategory = ['Course'];
-      }
+      // if((props.filters as any)?.filters?.program===TenantName.CREATIVITY_CLUB){
+      //   if (!filter.filters) {
+      //     filter.filters = {};
+      //   }
+      //   (filter.filters as any).primaryCategory = ['Course'];
+      // }
       if(props.onTotalCountChange)
       {
         resultResponse = await ContentSearch({
