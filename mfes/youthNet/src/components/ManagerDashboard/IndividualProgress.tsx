@@ -388,7 +388,7 @@ console.log('filteredData', filteredData);
                       >
                         {employee.name}
                       </Typography>
-                      <Typography 
+                      {/* <Typography 
                         variant="caption" 
                         color="text.secondary"
                         sx={{
@@ -399,7 +399,7 @@ console.log('filteredData', filteredData);
                         }}
                       >
                         {employee.role}
-                      </Typography>
+                      </Typography> */}
                     </Box>
                   </Stack>
                 </TableCell>
