@@ -51,7 +51,7 @@ export const V2PlayerConfig: PlayerConfig = {
     ],
     sideMenu: {
       showShare: false,
-      showDownload: true,
+      showDownload: false,
       showExit: true,
       showPrint: false,
       showReplay: true,
@@ -107,7 +107,7 @@ export const V1PlayerConfig: PlayerConfig = {
     ],
     sideMenu: {
       showShare: true,
-      showDownload: true,
+      showDownload: false,
       showExit: true,
     },
     enableTelemetryValidation: false,
