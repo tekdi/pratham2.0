@@ -39,7 +39,7 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useMemo, useState } from 'react';
 import KaTableComponent from '../components/KaTableComponent';
 import Loader from '../components/Loader';
-import { deleteUser } from '../services/UserService';
+import { updateUserTenantStatus } from '../services/UserService';
 import { getCohortList } from '../services/GetCohortList';
 import {
   cohortMemberList,
@@ -123,6 +123,7 @@ const UserTable: React.FC<UserTableProps> = ({
   const [centerMembershipIdList, setCenterMembershipIdList] = React.useState<
     string[]
   >([]);
+  const [tenantId, setTenantId] = useState('');
   const router = useRouter();
   const store = useStore();
   const isActiveYear = store.isActiveYearSelected;
@@ -217,6 +218,10 @@ const UserTable: React.FC<UserTableProps> = ({
   const [userId, setUserId] = useState();
 
   const [submitValue, setSubmitValue] = useState<boolean>(false);
+
+  useEffect(() => {
+    setTenantId(localStorage.getItem('tenantId') || '');
+  }, []);
 
   const reassignButtonStatus = useSubmittedButtonStore(
     (state: any) => state.reassignButtonStatus
@@ -1459,14 +1464,10 @@ const UserTable: React.FC<UserTableProps> = ({
 
   const handleDeleteUser = async (category: string) => {
     try {
-      const userId = selectedUserId;
-      const userData = {
-        userData: {
-          reason: selectedReason,
-          status: 'archived',
-        },
-      };
-      const cohortDeletionResponse = await deleteUser(userId, userData);
+      const cohortDeletionResponse = await updateUserTenantStatus(selectedUserId, tenantId, {
+        status: 'archived',
+        reason: selectedReason,
+      });
       if (cohortDeletionResponse) {
         deleteUserState ? setDeleteUserState(false) : setDeleteUserState(true);
       }
