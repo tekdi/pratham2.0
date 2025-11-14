@@ -15,10 +15,7 @@ const API_ENDPOINTS = {
   cohortMemberList: `${baseurl}/cohortmember/list`,
   assessmentSearchStatus: `${baseurl}/tracking/assessment/search/status`,
   assessmentSearch: `${baseurl}/tracking/assessment/search`,
-
-
-
-
+  userTenantStatus: (userId: string, tenantId: string) =>`${baseurl}/user-tenant/status?userId=${userId}&tenantId=${tenantId}`
 };
 
 export default API_ENDPOINTS;
