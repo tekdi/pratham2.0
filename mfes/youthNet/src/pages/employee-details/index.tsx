@@ -232,7 +232,7 @@ const EmployeeDetailsPage = () => {
         let userMandatoryCertificateStatus = { data: [] };
         let userOptionalCertificateStatus = { data: [] };
         
-        if (tenantId && mandatoryIds.length > 0 && optionalIds.length > 0) {
+        if (tenantId &&( mandatoryIds.length > 0 || optionalIds.length > 0)) {
           [userMandatoryCertificateStatus, userOptionalCertificateStatus] = await Promise.all([
             fetchUserCertificateStatus([userId], mandatoryIds),
             fetchUserCertificateStatus([userId], optionalIds)
