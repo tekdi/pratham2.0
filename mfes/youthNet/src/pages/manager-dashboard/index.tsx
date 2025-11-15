@@ -172,6 +172,17 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
       const allCompletedCourseIds = Array.from(new Set([...completedMandatoryCourseIds, ...completedOptionalCourseIds]));
       console.log('Unique Completed Course IDs (duplicates removed):', allCompletedCourseIds);
       
+      // If no completed courses, set empty top performers data and return
+      if (allCompletedCourseIds.length === 0) {
+        console.log('No completed courses found, setting empty top performers data');
+        setTopPerformersData({
+          usersData: {
+            '5 Highest Course Completing Users': []
+          }
+        });
+        return;
+      }
+      
       // Collect structured course data from all completed courses
       const getAllStructuredCourseData = async () => {
         const allStructuredData: Array<{courseId: string, units: Array<{unitId: string, contentIds: string[]}> }> = [];
@@ -288,7 +299,11 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
         
         console.log('individualProgressData', apiResponse?.getUserDetails);
         console.log('totalCount', apiResponse?.totalCount);
-        const currentEmployeeIds = apiResponse?.getUserDetails?.map((item: any) => item.userId);
+        // Handle empty array or undefined getUserDetails
+        const userDetails = apiResponse?.getUserDetails || [];
+        const currentEmployeeIds = userDetails.length > 0 
+          ? userDetails.map((item: any) => item.userId) 
+          : [];
         
         // Fetch certificate status for current employees if course identifiers are available
         let userMandatoryCertificateStatus = { data: [] };
@@ -377,7 +392,8 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
         });
         
         // Transform API data to EmployeeProgress format with calculated progress
-        const transformedProgressData: EmployeeProgress[] = apiResponse?.getUserDetails?.map((user: any) => {
+        const transformedProgressData: EmployeeProgress[] = userDetails.length > 0 
+          ? userDetails.map((user: any) => {
           const mandatoryStats = mandatoryStatusMap.get(user.userId) || { 
             completed: 0, 
             inProgress: 0, 
@@ -424,7 +440,8 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
             mandatoryCompletedIdentifiers: mandatoryStats.completedIdentifiers || [],
             optionalCompletedIdentifiers: optionalStats.completedIdentifiers || []
           };
-        }) || [];
+        })
+          : [];
 
         
         console.log('transformedProgressData with calculated progress', transformedProgressData);
@@ -526,9 +543,14 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
             filters: {emp_manager:userId},
           });
           console.log('employeeDataResponse', employeeDataResponse);
-          setEmployeeDataResponse(employeeDataResponse?.getUserDetails || []);
-           employeeUserIds = employeeDataResponse?.getUserDetails?.map((item: any) => item.userId);
-           setEmployeeUserIds(employeeUserIds);
+          
+          // Handle empty array or undefined getUserDetails
+          const employeeDetails = employeeDataResponse?.getUserDetails || [];
+          setEmployeeDataResponse(employeeDetails);
+          employeeUserIds = employeeDetails.length > 0 
+            ? employeeDetails.map((item: any) => item.userId) 
+            : [];
+          setEmployeeUserIds(employeeUserIds);
         }
         console.log('employeeUserIds', employeeUserIds);
         // Check if tenantId is available before calling certificate status APIs
