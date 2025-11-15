@@ -210,7 +210,7 @@ const SSOContent = () => {
 
            // Map the label to the corresponding FilterKey and store in localStorage
             switch (label) {
-              case 'GROUP_MEMBERSHIP':
+              case 'EMP_GROUP':
                 localStorage.setItem(FilterKey.GROUP_MEMBERSHIP, JSON.stringify(selectedValues));
                 break;
               case 'JOB_FAMILY':
