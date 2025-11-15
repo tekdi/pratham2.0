@@ -316,7 +316,7 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
         console.log('activeOptionalIds', activeOptionalIds);
         console.log('currentEmployeeIds', currentEmployeeIds);
         
-        if (activeMandatoryIds.length > 0 && activeOptionalIds.length > 0 && currentEmployeeIds.length > 0) {
+        if ((activeMandatoryIds.length > 0 || activeOptionalIds.length > 0 )&& currentEmployeeIds.length > 0) {
           try {
             [userMandatoryCertificateStatus, userOptionalCertificateStatus] = await Promise.all([
               fetchUserCertificateStatus(currentEmployeeIds, activeMandatoryIds),
@@ -332,7 +332,6 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
         // Process certificate status data for easier lookup
         const mandatoryStatusMap = new Map();
         const optionalStatusMap = new Map();
-
         // Process mandatory certificate status
         userMandatoryCertificateStatus.data?.forEach((item: any) => {
           if (!mandatoryStatusMap.has(item.userId)) {
