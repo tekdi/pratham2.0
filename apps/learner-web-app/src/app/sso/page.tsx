@@ -195,7 +195,10 @@ const SSOContent = () => {
       setTimeout(async () => {
         const res = await getUserDetails(userResponse?.userId, true);
         console.log('response=========>', res?.result);
-
+        localStorage.setItem(FilterKey.GROUP_MEMBERSHIP, JSON.stringify(["NA"]));
+        localStorage.setItem(FilterKey.JOB_FAMILY, JSON.stringify(["NA"]));
+        localStorage.setItem(FilterKey.PSU, JSON.stringify(["NA"]));
+        
         // Store custom fields in localStorage
         if (res?.result?.userData?.customFields) {
           res.result.userData.customFields.forEach((field: any) => {
@@ -204,28 +207,41 @@ const SSOContent = () => {
             //   FilterKey[label as keyof typeof FilterKey],
             //   JSON.stringify(selectedValues)
             // );
-            // if(label === 'EMP_GROUP') {
-            //   localStorage.setItem(FilterKey.GROUP_MEMBERSHIP, JSON.stringify(selectedValues));
-            // }
-
-           // Map the label to the corresponding FilterKey and store in localStorage
-            switch (label) {
-              case 'EMP_GROUP':
-                localStorage.setItem(FilterKey.GROUP_MEMBERSHIP, JSON.stringify(selectedValues));
-                break;
-              case 'JOB_FAMILY':
-                localStorage.setItem(FilterKey.JOB_FAMILY, JSON.stringify(selectedValues));
-                break;
-              case 'PSU':
-                localStorage.setItem(FilterKey.PSU, JSON.stringify(selectedValues));
-                break;
-              default:
-                // For any other custom fields, store them as is
-                localStorage.setItem(FilterKey.GROUP_MEMBERSHIP, JSON.stringify(["NA"]));
-                localStorage.setItem(FilterKey.JOB_FAMILY, JSON.stringify(["NA"]));
-                localStorage.setItem(FilterKey.PSU, JSON.stringify(["NA"]));
-                break;
+            if(label === 'EMP_GROUP') {
+              localStorage.setItem(FilterKey.GROUP_MEMBERSHIP, JSON.stringify(selectedValues));
             }
+            
+            if(label === 'JOB_FAMILY') {
+              localStorage.setItem(FilterKey.JOB_FAMILY, JSON.stringify(selectedValues));
+            }
+           
+            if(label === 'PSU') {
+              localStorage.setItem(FilterKey.PSU, JSON.stringify(selectedValues));
+            }
+           
+  
+           // Map the label to the corresponding FilterKey and store in localStorage
+            // switch (label) {
+            //   case 'EMP_GROUP':
+            //     localStorage.setItem(FilterKey.GROUP_MEMBERSHIP, JSON.stringify(selectedValues));
+            //     break;
+            //   case 'JOB_FAMILY':
+            //     localStorage.setItem(FilterKey.JOB_FAMILY, JSON.stringify(selectedValues));
+            //     break;
+            //   case 'PSU':
+            //     localStorage.setItem(FilterKey.PSU, JSON.stringify(selectedValues));
+            //     break;
+            //   default:
+            //     // For any other custom fields, store them as is
+            //     {
+            //       console.log("helloooooo")
+            //       localStorage.setItem(FilterKey.GROUP_MEMBERSHIP, JSON.stringify(["NA"]));
+            //       localStorage.setItem(FilterKey.JOB_FAMILY, JSON.stringify(["NA"]));
+            //       localStorage.setItem(FilterKey.PSU, JSON.stringify(["NA"]));
+            //     }
+             
+            //     break;
+            // }
           });
         }
         const uiConfig = userResponse?.tenantData[0]?.params?.uiConfig;
