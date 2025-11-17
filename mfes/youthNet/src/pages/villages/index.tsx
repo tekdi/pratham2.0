@@ -58,7 +58,7 @@ import {
   getVillageUserCounts,
   filterSchema,
 } from '../../utils/Helper';
-import { fetchUserList } from '../../services/youthNet/Dashboard/UserServices';
+import { fetchUserList, updateUserTenantStatus } from '../../services/youthNet/Dashboard/UserServices';
 import {
   cohortHierarchy,
   Role,
@@ -80,7 +80,6 @@ import {
   fetchForm,
 } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import { RoleId } from '@/utils/app.constant';
-import { deleteUser } from 'mfes/youthNet/src/services/youthNet/Dashboard/UserServices';
 
 const Index = () => {
   const { isRTL } = useDirection();
@@ -980,8 +979,9 @@ const Index = () => {
   const handleDeleteMentor = async () => {
     try {
       // 1. Delete user
-      const resp = await deleteUser(selectedMentor.Id, {
-        userData: { reason: selectedValue, status: 'archived' },
+      const resp = await updateUserTenantStatus(selectedMentor?.Id, tenantId, {
+        status: 'archived',
+        reason: selectedValue,
       });
       // 2. Update UI
       if (resp?.responseCode === 200 || resp?.responseCode === 'OK') {
