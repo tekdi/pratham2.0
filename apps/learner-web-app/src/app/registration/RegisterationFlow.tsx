@@ -553,7 +553,7 @@ const RegisterationFlow = () => {
           }
 
           document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
-          router.push('/program');
+          router.push('/programs');
           // const hasBothContentCoursetab =
           //   uiConfig?.showContent?.includes('courses') &&
           //   uiConfig?.showContent?.includes('contents');
