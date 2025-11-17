@@ -307,7 +307,7 @@ const Index = () => {
         const filters = {
           village: [selectedVillageValue],
           role: Role.LEARNER,
-          status: [Status.ACTIVE],
+          tenantStatus: [Status.ACTIVE],
         };
 
         const result = await fetchUserList({ filters });
@@ -391,7 +391,7 @@ const Index = () => {
         const filters = {
           district: [selectedDistrictValue],
           role: Role.INSTRUCTOR,
-          status: [Status.ACTIVE],
+          tenantStatus: [Status.ACTIVE],
         };
         const result = await fetchUserList({ filters });
         const transformedMentorData = result?.getUserDetails.map(
@@ -514,7 +514,7 @@ const Index = () => {
         const filters = {
           block: blockIds,
           role: Role.LEARNER,
-          status: [Status.ACTIVE],
+          tenantStatus: [Status.ACTIVE],
         };
 
         const result = await fetchUserList({ filters });
