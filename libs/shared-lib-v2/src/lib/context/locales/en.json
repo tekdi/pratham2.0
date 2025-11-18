@@ -148,7 +148,7 @@
     "UNAUTHORIZED":"You are not authorized to access this site",
     "For Children": "For Children",
     "Self": "Self",
-
+     "FINISH_ENROLL": "Finish Enroll",
     "STATUS": {
       "completed": "Completed",
       "in_progress": "In Progress",
@@ -177,7 +177,8 @@
       "COMPLETE_PROFILE_TITLE": "Complete Your Profile",
       "BACKGROUND_HELP_TEXT": "Help us with your background & other details",
       "INVALID_LINK": "Invalid Link",
-      "FUTURE_WORK": "What do you want to become?"
+      "FUTURE_WORK": "What do you want to become?",
+      "ENROLL_IN_TO": "Enroll in to"
     },
     "COMMON": {
       "L1_COURSES": "L1 Courses",
@@ -235,7 +236,9 @@
       "Login with Newton ERP": "Login with Newton ERP",
       "DISCOVER_LEARNING_OPPORTUNITIES":"Discover learning opportunities and sign up for programs that match your goals",
       "ENROLL": "Enroll",
-      "ACCESS_PROGRAM": "Access Program"
+      "ENROLLING": "Enrolling...",
+      "ACCESS_PROGRAM": "Access Program",
+      "ACCESSING_PROGRAM": "Accessing Program..."
     },
     "LOGIN": {
       "welcome_title": "Welcome to Pratham myLearning!",

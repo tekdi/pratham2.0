@@ -20,7 +20,12 @@ import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Swiper as SwiperClass } from 'swiper/types';
 import { useTranslation } from '@shared-lib';
-import { getUserDetails } from '@learner/utils/API/userService';
+import { getUserDetails, profileComplitionCheck } from '@learner/utils/API/userService';
+import SimpleModal from '@learner/components/SimpleModal/SimpleModal';
+import SignupSuccess from '@learner/components/SignupSuccess /SignupSuccess ';
+import { getAcademicYear } from '@learner/utils/API/AcademicYearService';
+import { TenantName } from '@learner/utils/app.constant';
+import { logEvent } from '@learner/utils/googleAnalytics';
 
 interface Program {
   ordering: number;
@@ -42,12 +47,21 @@ interface Program {
   }[];
 }
 
-const EnrollProgramCarousel = ({ userId }: { userId?: string | null } = {}) => {
+const EnrollProgramCarousel = ({ 
+  userId, 
+  isExplorePrograms = false 
+}: { 
+  userId?: string | null;
+  isExplorePrograms?: boolean;
+} = {}) => {
   const { t } = useTranslation();
   const router = useRouter();
   const [activeSlide, setActiveSlide] = useState<number>(0);
   const [programs, setPrograms] = useState<Program[]>([]);
   const [tenantId, setTenantId] = useState('');
+  const [signupSuccessModal, setSignupSuccessModal] = useState(false);
+  const [loadingProgram, setLoadingProgram] = useState<{ id: string; action: 'enrolling' | 'accessing' } | null>(null);
+  const [enrolledProgram, setEnrolledProgram] = useState<Program | null>(null);
 
   const handleSlideChange = (swiper: SwiperClass) => {
     setActiveSlide(swiper.realIndex);
@@ -65,20 +79,35 @@ const EnrollProgramCarousel = ({ userId }: { userId?: string | null } = {}) => {
             program?.params?.uiConfig?.sso?.length > 0
         );
         // console.log('visiblePrograms', visiblePrograms);
-        if(userId){
-            const data=await getUserDetails(userId, true);
+        
+        // If it's Explore Programs tab, exclude enrolled programs
+        if (isExplorePrograms) {
+          if (userId) {
+            // Fetch user's enrolled programs to exclude them from explore programs
+            const data = await getUserDetails(userId, true);
             console.log('data=====>', data?.result?.userData?.tenantData);
-            const tenantData = data?.result?.userData?.tenantData;
-           // setPrograms(visiblePrograms || []);
-           const filterIds = tenantData.map((item: any) => item.tenantId);
-           const filteredPrograms = programsData?.filter((program: any) => filterIds.includes(program.tenantId));
-           setPrograms(filteredPrograms || []);
-  
-        }
-        else{
-            console.log('visiblePrograms=====>', visiblePrograms);
+            const tenantData = data?.result?.userData?.tenantData || [];
+            const enrolledTenantIds = tenantData.map((item: any) => item.tenantId);
+            // Filter out programs that user is already enrolled in
+            const explorePrograms = visiblePrograms?.filter(
+              (program: any) => !enrolledTenantIds.includes(program.tenantId)
+            );
+            setPrograms(explorePrograms || []);
+          } else {
+            // If no userId, show all visible programs
             setPrograms(visiblePrograms || []);
-
+          }
+        } else if (userId) {
+          // For My Programs tab, show only enrolled programs
+          const data = await getUserDetails(userId, true);
+          console.log('data=====>', data?.result?.userData?.tenantData);
+          const tenantData = data?.result?.userData?.tenantData;
+          const filterIds = tenantData.map((item: any) => item.tenantId);
+          const filteredPrograms = programsData?.filter((program: any) => filterIds.includes(program.tenantId));
+          setPrograms(filteredPrograms || []);
+        } else {
+          console.log('visiblePrograms=====>', visiblePrograms);
+          setPrograms(visiblePrograms || []);
         }
         const tenantIds = res?.result?.map((item: any) => item.tenantId);
         setTenantId(tenantIds);
@@ -88,17 +117,277 @@ const EnrollProgramCarousel = ({ userId }: { userId?: string | null } = {}) => {
     };
 
     fetchTenantInfo();
-  }, [userId]);
+  }, [userId, isExplorePrograms]);
+
+  const handleProgramSwitch = async (program: Program) => {
+    if (!userId) {
+      router.push('/login');
+      return;
+    }
+
+    try {
+      const storedUserId = localStorage.getItem('userId');
+      const token = localStorage.getItem('token');
+
+      if (!storedUserId || !token) {
+        console.error('UserId or token not found in localStorage');
+        router.push('/login');
+        return;
+      }
+
+      // Get user details to find tenant data
+      const userResponse = await getUserDetails(storedUserId, true);
+      const tenantData = userResponse?.result?.userData?.tenantData?.find(
+        (tenant: any) => tenant.tenantId === program.tenantId
+      );
+
+      if (!tenantData) {
+        console.error('Tenant data not found for this program');
+        return;
+      }
+
+      // Check if user has Learner role
+      const roles = tenantData?.roles || [];
+      const hasLearnerRole = roles.some((role: any) => role?.roleName === 'Learner');
+      if (!hasLearnerRole && roles.length > 0) {
+        console.error('User does not have Learner role for this program');
+        return;
+      }
+
+      // Set all localStorage values for the selected program
+      localStorage.setItem('userId', storedUserId);
+      localStorage.setItem('templtateId', tenantData?.templateId);
+      localStorage.setItem('userIdName', userResponse?.result?.userData?.username);
+      localStorage.setItem('firstName', userResponse?.result?.userData?.firstName || '');
+
+      const tenantId = tenantData?.tenantId;
+      const tenantName = tenantData?.tenantName;
+      const uiConfig = tenantData?.params?.uiConfig;
+      const landingPage = tenantData?.params?.uiConfig?.landingPage;
+
+      localStorage.setItem('landingPage', landingPage);
+      localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
+      localStorage.setItem('tenantId', tenantId);
+      localStorage.setItem('userProgram', tenantName);
+
+      // Set channel and collection framework
+      const channelId = tenantData?.channelId;
+      if (channelId) {
+        localStorage.setItem('channelId', channelId);
+      }
+
+      const collectionFramework = tenantData?.collectionFramework;
+      if (collectionFramework) {
+        localStorage.setItem('collectionFramework', collectionFramework);
+      }
+
+      // Set cookie
+      document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
+
+      // Check profile completion
+      await profileComplitionCheck();
+
+      // Handle academic year for YOUTHNET
+      if (tenantName === TenantName.YOUTHNET) {
+        const academicYearResponse = await getAcademicYear();
+        if (academicYearResponse?.[0]?.id) {
+          localStorage.setItem('academicYearId', academicYearResponse[0].id);
+        }
+      }
+
+      // Log analytics event
+      logEvent({
+        action: 'switch-program-from-card',
+        category: 'Programs Page',
+        label: 'Program Card Clicked',
+      });
+
+      // Navigate to landing page to avoid unauthorized issues
+      router.push(landingPage || '/home');
+    } catch (error) {
+      console.error('Failed to switch program:', error);
+    }
+  };
+
+  const handleAccessProgram = async (program: Program) => {
+    if (!userId) {
+      // If no userId, redirect to login
+      router.push('/login');
+      return;
+    }
+
+    try {
+      setLoadingProgram({ id: program.tenantId, action: 'accessing' });
+      const storedUserId = localStorage.getItem('userId');
+      const token = localStorage.getItem('token');
+
+      if (!storedUserId || !token) {
+        console.error('UserId or token not found in localStorage');
+        router.push('/login');
+        return;
+      }
+
+      // Get user details to find tenant data
+      const userResponse = await getUserDetails(storedUserId, true);
+      const tenantData = userResponse?.result?.userData?.tenantData?.find(
+        (tenant: any) => tenant.tenantId === program.tenantId
+      );
+
+      if (!tenantData) {
+        console.error('Tenant data not found for this program');
+        return;
+      }
+
+      // Check if user has Learner role (for MY_PROGRAMS, user should already be enrolled)
+      const roles = tenantData?.roles || [];
+      console.log('roles=====>', roles);
+      const hasLearnerRole = roles.some((role: any) => role?.roleName === 'Learner');
+      console.log('hasLearnerRole=====>', hasLearnerRole);
+      if (!hasLearnerRole && roles.length > 0) {
+        console.error('User does not have Learner role for this program');
+        return;
+      }
+
+      // Set localStorage values similar to callBackSwitchDialog
+      localStorage.setItem('userId', storedUserId);
+      localStorage.setItem('templtateId', tenantData?.templateId);
+      localStorage.setItem('userIdName', userResponse?.result?.userData?.username);
+      localStorage.setItem('firstName', userResponse?.result?.userData?.firstName || '');
+
+      const tenantId = tenantData?.tenantId;
+      const tenantName = tenantData?.tenantName;
+      const uiConfig = tenantData?.params?.uiConfig;
+      const landingPage = tenantData?.params?.uiConfig?.landingPage;
+
+      localStorage.setItem('landingPage', landingPage);
+      localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
+      localStorage.setItem('tenantId', tenantId);
+      localStorage.setItem('userProgram', tenantName);
+
+      // Check profile completion
+      await profileComplitionCheck();
+
+      // Handle academic year for YOUTHNET
+      if (tenantName === TenantName.YOUTHNET) {
+        const academicYearResponse = await getAcademicYear();
+        if (academicYearResponse?.[0]?.id) {
+          localStorage.setItem('academicYearId', academicYearResponse[0].id);
+        }
+      }
+
+      // Set channel and collection framework
+      const channelId = tenantData?.channelId;
+      localStorage.setItem('channelId', channelId);
+
+      const collectionFramework = tenantData?.collectionFramework;
+      localStorage.setItem('collectionFramework', collectionFramework);
+
+      // Set cookie
+      document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
+
+      // Log analytics event
+      logEvent({
+        action: 'access-program-from-my-programs',
+        category: 'Programs Page',
+        label: 'Access Program Button Clicked',
+      });
+      console.log('enrolledProgram=====>', enrolledProgram);
+      // Redirect to landing page
+      if(enrolledProgram){
+        router.push(enrolledProgram?.params?.uiConfig?.landingPage || '/home');
+      }
+      router.push(landingPage || '/home');
+    } catch (error) {
+      console.error('Failed to access program:', error);
+      // You can add error handling/toast notification here
+    } finally {
+      setLoadingProgram(null);
+    }
+  };
+
+  const handleEnroll = async (program: Program) => {
+    if (!userId || !isExplorePrograms) {
+      // If no userId or not explore programs tab, redirect to registration
+      if (typeof window !== 'undefined' && window.localStorage) {
+        localStorage.setItem('userProgram', program?.name);
+      }
+      router.push('/registration?tenantId=' + program?.tenantId);
+      return;
+    }
+
+    try {
+      setLoadingProgram({ id: program.tenantId, action: 'enrolling' });
+      const storedUserId = localStorage.getItem('userId');
+
+      if (!storedUserId) {
+        console.error('UserId not found in localStorage');
+        return;
+      }
+
+      // Store program information for EditProfile page
+      if (typeof window !== 'undefined' && window.localStorage) {
+        // Store tenantId temporarily for EditProfile to fetch correct form schema
+        const currentTenantId = localStorage.getItem('tenantId');
+        localStorage.setItem('previousTenantId', currentTenantId || '');
+        localStorage.setItem('tenantId', program.tenantId);
+        localStorage.setItem('userProgram', program?.name);
+        
+        // Store uiConfig if available
+        if (program?.params?.uiConfig) {
+          localStorage.setItem('uiConfig', JSON.stringify(program.params.uiConfig));
+        }
+        
+        // Store landing page if available
+        if (program?.params?.uiConfig?.landingPage) {
+          localStorage.setItem('landingPage', program.params.uiConfig.landingPage);
+        }
+
+        // Store enrolled program data for the profile completion page
+        localStorage.setItem('enrolledProgramData', JSON.stringify({
+          tenantId: program.tenantId,
+          name: program.name,
+          params: program.params,
+        }));
+      }
+
+      // Navigate to enrollment profile completion page
+      router.push('/enroll-profile-completion');
+    } catch (error) {
+      console.error('Failed to enroll in program:', error);
+      // You can add error handling/toast notification here
+    } finally {
+      setLoadingProgram(null);
+    }
+  };
+
+  const onCloseSignupSuccessModal = () => {
+    setSignupSuccessModal(false);
+    setEnrolledProgram(null); // Clear enrolled program when modal is closed
+  };
+
+  const onSigin = async () => {
+    setSignupSuccessModal(false);
+    
+    // If there's an enrolled program, sign in to it
+    if (enrolledProgram) {
+      await handleAccessProgram(enrolledProgram);
+      setEnrolledProgram(null); // Clear the enrolled program
+    } else {
+      // Fallback to home if no program is stored
+      router.push('/home');
+    }
+  };
+
 
   return (
-    <Container maxWidth="xl"
-    sx={{
-        pl: { xs: 1, sm: 2, md: 4 }, // responsive left padding
-        pr: { xs: 1, sm: 2, md: 0 },
-        ml: { xs: 0, sm: 2, md: 8 }, // only large screens get margin-left
+    <Container 
+      maxWidth="xl"
+      sx={{
+        px: { xs: 2, sm: 3, md: 2 },
+        mx: 'auto',
       }}
     >
-      <Box sx={{ my: 6 }}>
+      <Box sx={{ my: { xs: 3, sm: 4, md: 3 } }}>
         {/* <Typography
           variant="h5"
           component="h2"
@@ -114,24 +403,37 @@ const EnrollProgramCarousel = ({ userId }: { userId?: string | null } = {}) => {
           {t('LEARNER_APP.HOME.OUR_PROGRAMS')}
         </Typography> */}
 
-        <Grid container spacing={2}>
+        <Grid container spacing={{ xs: 2, sm: 2, md: 2 }}>
           {programs?.map((program) => (
-            <Grid item xs={12} md={4} key={program?.ordering}>
+            <Grid item xs={12} sm={6} md={4} key={program?.ordering}>
               <SwiperSlide>
                 <Card
+                  onClick={() => {
+                    // If it's My Programs tab (not explore), make card clickable to switch program
+                    if (!isExplorePrograms && userId) {
+                      handleProgramSwitch(program);
+                    }
+                  }}
                   sx={{
                     maxWidth: '100%',
-                    height: '400px',
+                    height: { xs: 'auto', sm: '400px' },
+                    minHeight: { xs: '350px', sm: '400px' },
                     display: 'flex',
                     flexDirection: 'column',
                     borderRadius: 2,
                     overflow: 'hidden',
                     boxShadow: 3,
+                    cursor: !isExplorePrograms && userId ? 'pointer' : 'default',
+                    transition: 'transform 0.2s, box-shadow 0.2s',
+                    '&:hover': !isExplorePrograms && userId ? {
+                      transform: 'translateY(-4px)',
+                      boxShadow: 6,
+                    } : {},
                   }}
                 >
                   <Box
                     sx={{
-                      p: 2,
+                      p: { xs: 1.5, sm: 2 },
                       backgroundColor: '#FFDEA1',
                       textAlign: 'center',
                     }}
@@ -140,7 +442,7 @@ const EnrollProgramCarousel = ({ userId }: { userId?: string | null } = {}) => {
                       variant="h6"
                       sx={{
                         fontWeight: 500,
-                        fontSize: '18px',
+                        fontSize: { xs: '16px', sm: '18px' },
                         color: '#1F1B13',
                       }}
                       component="div"
@@ -156,6 +458,7 @@ const EnrollProgramCarousel = ({ userId }: { userId?: string | null } = {}) => {
                       display: 'flex',
                       flexDirection: 'column',
                       justifyContent: 'flex-start',
+                      minHeight: 0,
                     }}
                   >
                     <Box sx={{ position: 'relative' }}>
@@ -189,8 +492,8 @@ const EnrollProgramCarousel = ({ userId }: { userId?: string | null } = {}) => {
                             >
                               <Box
                                 sx={{
-                                  margin: '10px',
-                                  height: '200px',
+                                  margin: { xs: '8px', sm: '10px' },
+                                  height: { xs: '180px', sm: '200px' },
                                   display: 'flex',
                                   justifyContent: 'center',
                                 }}
@@ -296,40 +599,48 @@ const EnrollProgramCarousel = ({ userId }: { userId?: string | null } = {}) => {
                   </Box>
 
                   <CardActions
-                    sx={
-                      {
-                        // justifyContent: 'center',
-                        // p: 2,
-                        // mt: 'auto',
-                      }
-                    }
+                    sx={{
+                      p: { xs: 1.5, sm: 2 },
+                      pt: { xs: 1, sm: 2 },
+                      mt: 'auto',
+                      pb: { xs: 1.5, sm: 2 },
+                    }}
                   >
-                    {program?.params?.uiConfig?.showSignup === true  && (
+                    {program?.params?.uiConfig?.showSignup === true && (
                       <Button
                         fullWidth
                         variant="contained"
                         color="primary"
+                        disabled={loadingProgram?.id === program.tenantId}
                         sx={{
                           borderRadius: 50,
                           backgroundColor: '#FDBE16',
+                          fontSize: { xs: '14px', sm: '16px' },
+                          py: { xs: 1, sm: 1.5 },
                           '&:hover': {
                             backgroundColor: '#FDBE16',
                           },
                         }}
-                        onClick={() => {
-                          if (
-                            typeof window !== 'undefined' &&
-                            window.localStorage
-                          ) {
-                            localStorage.setItem('userProgram', program?.name);
+                        onClick={(e) => {
+                          // Prevent card click when button is clicked
+                          e.stopPropagation();
+                          // If userId exists and it's not explore programs tab, call handleAccessProgram
+                          if (userId && !isExplorePrograms) {
+                            handleAccessProgram(program);
+                          } else {
+                            handleEnroll(program);
                           }
-
-                          router.push(
-                            '/registration?tenantId=' + program?.tenantId
-                          );
                         }}
                       >
-                        {userId ? t('LEARNER_APP.HOME.ACCESS_PROGRAM') : t('LEARNER_APP.HOME.ENROLL')}
+                        {loadingProgram?.id === program.tenantId
+                          ? loadingProgram.action === 'accessing'
+                            ? t('LEARNER_APP.HOME.ACCESSING_PROGRAM') || 'Accessing Program...'
+                            : t('LEARNER_APP.HOME.ENROLLING') || 'Enrolling...'
+                          : userId && isExplorePrograms
+                          ? t('LEARNER_APP.HOME.ENROLL')
+                          : userId
+                          ? t('LEARNER_APP.HOME.ACCESS_PROGRAM')
+                          : t('LEARNER_APP.HOME.ENROLL')}
                       </Button>
                     )}
                    
@@ -340,6 +651,18 @@ const EnrollProgramCarousel = ({ userId }: { userId?: string | null } = {}) => {
           ))}
         </Grid>
       </Box>
+
+      <SimpleModal
+        open={signupSuccessModal}
+        onClose={onCloseSignupSuccessModal}
+        showFooter={true}
+        primaryText={'Start learning'}
+        primaryActionHandler={onSigin}
+      >
+        <Box p="10px">
+          <SignupSuccess />
+        </Box>
+      </SimpleModal>
     </Container>
   );
 };

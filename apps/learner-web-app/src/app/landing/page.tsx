@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Header from '@learner/components/Header/Header';
-import { getTenantInfo } from '@learner/utils/API/ProgramService';
+import { getTenantInfo, getPrathamTenantId } from '@learner/utils/API/ProgramService';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import 'swiper/css';
@@ -62,8 +62,21 @@ export default function LandingPage() {
     fetchPrograms();
   }, []);
 
-  const handleGetStarted = () => {
-    router.push('/registration?tenantId=e39447df-069d-4ccf-b92c-576f70b350f3 ');
+  const handleGetStarted = async () => {
+    try {
+      const tenantId = await getPrathamTenantId();
+      if (tenantId) {
+        router.push(`/registration?tenantId=${tenantId}`);
+      } else {
+        console.error('Failed to get tenant ID');
+        // Fallback: redirect without tenantId or show error
+        router.push('/registration');
+      }
+    } catch (error) {
+      console.error('Error fetching tenant ID:', error);
+      // Fallback: redirect without tenantId
+      router.push('/registration');
+    }
   };
 
   const handleLogin = () => {

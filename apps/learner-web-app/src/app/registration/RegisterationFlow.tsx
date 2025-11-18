@@ -866,7 +866,7 @@ const RegisterationFlow = () => {
         open={signupSuccessModal}
         onClose={onCloseSignupSuccessModal}
         showFooter={true}
-        primaryText={'Start learning'}
+        primaryText={'Start Exploring'}
         primaryActionHandler={onSigin}
       >
         <Box p="10px">
