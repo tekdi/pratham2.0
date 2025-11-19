@@ -70,19 +70,19 @@ const renderWordWrappedText = (
 // Create styles
 const styles = StyleSheet.create({
   page: {
-    padding: 30,
+    padding: 20,
     fontFamily: 'Helvetica',
-    fontSize: 9,
+    fontSize: 8,
     color: '#333333',
     lineHeight: 1.3,
   },
   header: {
-    marginBottom: 12,
+    marginBottom: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     borderBottom: '1px solid #E0E0E0',
-    paddingBottom: 6,
+    paddingBottom: 3,
   },
   headerLeft: {
     flexDirection: 'column',
@@ -92,14 +92,14 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   title: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
     color: '#1A8825', // Primary green
     marginBottom: 2,
     fontFamily: 'Helvetica',
   },
   subtitle: {
-    fontSize: 10,
+    fontSize: 9,
     color: '#666666',
     fontFamily: 'Helvetica',
     marginTop:3
@@ -118,41 +118,41 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   infoText: {
-    fontSize: 8,
+    fontSize: 7,
     marginBottom: 1,
     color: '#4B5563',
     fontFamily: 'Helvetica',
   },
   infoValue: {
-    fontSize: 9,
+    fontSize: 8,
     fontWeight: 'bold',
     color: '#111827',
     fontFamily: 'Helvetica',
   },
   section: {
-    marginBottom: 10,
+    marginBottom: 1,
   },
   sectionTitle: {
-    fontSize: 11,
+    fontSize: 9,
     fontWeight: 'bold',
     color: '#111827',
-    marginBottom: 6,
-    paddingBottom: 2,
-    borderBottom: '2px solid #E5E7EB',
+    marginBottom: 2,
+    paddingBottom: 1,
+    borderBottom: '1px solid #E5E7EB',
     fontFamily: 'Helvetica',
   },
   questionContainer: {
-    marginBottom: 10,
-    paddingBottom: 10,
+    marginBottom: 2,
+    paddingBottom: 4,
     borderBottom: '1px solid #F3F4F6',
   },
   questionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 6,
+    marginBottom: 2,
   },
   questionText: {
-    fontSize: 9.5,
+    fontSize: 8.5,
     color: '#1F2937',
     flex: 1,
     marginRight: 8,
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   questionTextUnicode: {
-    fontSize: 9.5,
+    fontSize: 8.5,
     color: '#1F2937',
     flex: 1,
     marginRight: 8,
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
     paddingVertical: 1,
     paddingHorizontal: 4,
     borderRadius: 4,
-    fontSize: 8,
+    fontSize: 7,
     fontWeight: 'bold',
     fontFamily: 'Helvetica',
     minWidth: 28,
@@ -182,14 +182,14 @@ const styles = StyleSheet.create({
   scoreBadgeFail: { backgroundColor: '#FEE2E2', color: '#DC2626' },
   
   contentBox: {
-    marginTop: 3,
-    padding: 6,
+    marginTop: 2,
+    padding: 4,
     backgroundColor: '#F9FAFB',
     borderRadius: 4,
-    borderLeft: '3px solid #D1D5DB',
+    borderLeft: '2px solid #D1D5DB',
   },
   answerLabel: {
-    fontSize: 8,
+    fontSize: 7,
     fontWeight: 'bold',
     color: '#6B7280',
     marginBottom: 1,
@@ -197,24 +197,24 @@ const styles = StyleSheet.create({
     fontFamily: 'Helvetica',
   },
   answerText: {
-    fontSize: 9,
+    fontSize: 8,
     color: '#374151',
     fontFamily: 'Helvetica',
   },
   answerTextUnicode: {
-    fontSize: 9,
+    fontSize: 8,
     color: '#374151',
     fontFamily: 'UnicodeFont',
   },
   explanationBox: {
-    marginTop: 5,
-    padding: 6,
+    marginTop: 3,
+    padding: 4,
     backgroundColor: '#EFF6FF',
     borderRadius: 4,
-    borderLeft: '3px solid #3B82F6',
+    borderLeft: '2px solid #3B82F6',
   },
   explanationLabel: {
-    fontSize: 8,
+    fontSize: 7,
     fontWeight: 'bold',
     color: '#2563EB',
     marginBottom: 1,
@@ -222,12 +222,12 @@ const styles = StyleSheet.create({
     fontFamily: 'Helvetica',
   },
   explanationText: {
-    fontSize: 9,
+    fontSize: 8,
     color: '#1E40AF',
     fontFamily: 'Helvetica',
   },
   explanationTextUnicode: {
-    fontSize: 9,
+    fontSize: 8,
     color: '#1E40AF',
     fontFamily: 'UnicodeFont',
   },
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   footerText: {
-    fontSize: 8,
+    fontSize: 7,
     color: '#9CA3AF',
     fontFamily: 'Helvetica',
   },
@@ -408,9 +408,9 @@ const AssessmentResultPDF: React.FC<AssessmentResultPDFProps> = ({
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <Text style={styles.title}>
+            {/* <Text style={styles.title}>
               {titleOverride || 'AI Assessment Report'}
-            </Text>
+            </Text> */}
             <Text style={styles.subtitle}>{assessmentName}</Text>
           </View>
           <View style={styles.headerRight}>
