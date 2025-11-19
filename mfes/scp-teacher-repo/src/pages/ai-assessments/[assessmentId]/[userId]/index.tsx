@@ -9,19 +9,14 @@ import {
   CircularProgress,
   Snackbar,
   Alert,
-  Button,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
 import KeyboardBackspaceOutlinedIcon from '@mui/icons-material/KeyboardBackspaceOutlined';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import DownloadIcon from '@mui/icons-material/Download';
 import { useRouter } from 'next/router';
 import GenericModal from '../../../../components/GenericModal';
 import ConfirmationModal from '../../../../components/ConfirmationModal';
-import { pdf } from '@react-pdf/renderer';
-// @ts-expect-error - file-saver doesn't have TypeScript definitions
-import { saveAs } from 'file-saver';
 import {
   getAssessmentDetails,
   getAssessmentTracking,
@@ -47,7 +42,6 @@ import {
 import AnswerSheet, {
   AssessmentTrackingData,
 } from '../../../../components/assessment/AnswerSheet';
-import AssessmentResultPDF from '../../../../components/assessment/AssessmentResultPDF';
 import MinimizeIcon from '@mui/icons-material/Minimize';
 interface ScoreDetail {
   questionId: string | null;
@@ -261,8 +255,6 @@ const AssessmentDetails = () => {
     severity: 'success',
   });
 
-  const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
-
   // Sample uploaded images data
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
 
@@ -459,7 +451,7 @@ const AssessmentDetails = () => {
                           : item.score;
 
                         // Update resValue with saved suggestion if available
-                        const updatedResValue = { ...item.resvalues[0] };
+                        let updatedResValue = { ...item.resvalues[0] };
                         if (savedData) {
                           const parsedSavedData = JSON.parse(savedData);
                           if (parsedSavedData.suggestion) {
@@ -535,7 +527,7 @@ const AssessmentDetails = () => {
                           const savedScore = parsedSavedData.score;
 
                           // Update resValue with saved suggestion if available
-                          const updatedResValue = detail.resValue
+                          let updatedResValue = detail.resValue
                             ? JSON.parse(detail.resValue)
                             : {};
                           if (parsedSavedData.suggestion) {
@@ -959,57 +951,6 @@ const AssessmentDetails = () => {
     await fetchOfflineAssessmentData(true);
   };
 
-  const handleDownloadPDF = async () => {
-    if (!assessmentTrackingData || !userDetails || !assessmentName) {
-      setSnackbar({
-        open: true,
-        message: 'Assessment data not available for download',
-        severity: 'error',
-      });
-      return;
-    }
-
-    try {
-      setIsDownloadingPDF(true);
-
-      const userName = `${userDetails.name} ${userDetails.lastName}`.trim();
-
-      // Generate PDF blob
-      const blob = await pdf(
-        <AssessmentResultPDF
-          assessmentTrackingData={assessmentTrackingData}
-          userName={userName}
-          assessmentName={assessmentName}
-          questionNumberingMap={questionNumberingMap}
-          sectionMapping={sectionMapping}
-        />
-      ).toBlob();
-
-      // Generate filename with user name and assessment name
-      const sanitizedUserName = userName.replace(/[^a-zA-Z0-9]/g, '_');
-      const sanitizedAssessmentName = assessmentName.replace(/[^a-zA-Z0-9]/g, '_');
-      const filename = `Assessment_Result_${sanitizedUserName}_${sanitizedAssessmentName}_${new Date().toISOString().split('T')[0]}.pdf`;
-
-      // Download the PDF
-      saveAs(blob, filename);
-
-      setSnackbar({
-        open: true,
-        message: 'PDF downloaded successfully',
-        severity: 'success',
-      });
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      setSnackbar({
-        open: true,
-        message: 'Failed to generate PDF. Please try again.',
-        severity: 'error',
-      });
-    } finally {
-      setIsDownloadingPDF(false);
-    }
-  };
-
   const handleSubmissionSuccess = async () => {
     if (isReUploadMode) {
       // In re-upload mode, update the assessmentData with the new uploaded images
@@ -1111,28 +1052,15 @@ const AssessmentDetails = () => {
           sx={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
             gap: 2,
             pb: 2,
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            {assessmentData?.status ? (
-              <>
-                {getStatusIcon(
-                  mapAnswerSheetStatusToInternalStatus(assessmentData.status)
-                )}
-                <Typography
-                  sx={{
-                    color: '#1F1B13',
-                    fontSize: { xs: '14px', md: '16px' },
-                    fontWeight: 400,
-                  }}
-                >
-                  {getStatusLabel(assessmentData.status)}
-                </Typography>
-              </>
-            ) : (
+          {assessmentData?.status ? (
+            <>
+              {getStatusIcon(
+                mapAnswerSheetStatusToInternalStatus(assessmentData.status)
+              )}
               <Typography
                 sx={{
                   color: '#1F1B13',
@@ -1140,41 +1068,21 @@ const AssessmentDetails = () => {
                   fontWeight: 400,
                 }}
               >
-                <MinimizeIcon />
-                Not Submitted
+                {getStatusLabel(assessmentData.status)}
               </Typography>
-            )}
-          </Box>
-
-          {/* Download PDF Button - Only show when Approved */}
-          {assessmentData?.status === 'Approved' &&
-            assessmentTrackingData && (
-              <Button
-                variant="contained"
-                startIcon={<DownloadIcon />}
-                onClick={handleDownloadPDF}
-                disabled={isDownloadingPDF}
-                sx={{
-                  bgcolor: '#1A8825',
-                  color: '#FFFFFF',
-                  textTransform: 'none',
-                  borderRadius: '8px',
-                  px: 2,
-                  py: 1,
-                  fontSize: '14px',
-                  fontWeight: 500,
-                  '&:hover': {
-                    bgcolor: '#15701A',
-                  },
-                  '&:disabled': {
-                    bgcolor: '#cccccc',
-                    color: '#666666',
-                  },
-                }}
-              >
-                {isDownloadingPDF ? 'Downloading...' : 'Download Result PDF'}
-              </Button>
-            )}
+            </>
+          ) : (
+            <Typography
+              sx={{
+                color: '#1F1B13',
+                fontSize: { xs: '14px', md: '16px' },
+                fontWeight: 400,
+              }}
+            >
+              <MinimizeIcon />
+              Not Submitted
+            </Typography>
+          )}
         </Box>
 
         {/* Images Info */}
