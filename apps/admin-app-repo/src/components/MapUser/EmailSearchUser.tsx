@@ -203,9 +203,60 @@ const EmailSearchUser: React.FC<EmailSearchUserProps> = ({
 
   const FormSubmitFunction = async (formData: any, payload: any) => {
     console.log(formData, 'formdata');
-    console.log('########## debug username', payload);
+    console.log('########## debug payload', payload);
     console.log('########## debug formdata', formData);
     setPrefilledFormData(formData);
+    // convert to payload
+    // console.log('######### filteredData', JSON.stringify(filteredData));
+    const cleanedData = Object.fromEntries(
+      Object.entries(formData).filter(
+        ([_, value]) => !Array.isArray(value) || value.length > 0
+      )
+    );
+    //step-2 : Validate the form data
+    function transformFormData(
+      formData: Record<string, any>,
+      schema: any,
+      extraFields: Record<string, any> = {} // Optional root-level custom fields
+    ) {
+
+      const transformedData: Record<string, any> = {
+        ...extraFields, // Add optional root-level custom fields dynamically
+        customFields: [],
+      };
+
+      for (const key in formData) {
+        if (schema.properties[key]) {
+          const fieldSchema = schema.properties[key];
+
+          if (fieldSchema.coreField === 0 && fieldSchema.fieldId) {
+            // Use fieldId for custom fields
+            transformedData.customFields.push({
+              fieldId: fieldSchema.fieldId,
+              value: formData[key] || '',
+            });
+          } else {
+            // Use the field name for core fields
+            transformedData[key] = formData[key] || '';
+          }
+        }
+      }
+
+      return transformedData;
+    }
+
+    // Optional extra root-level fields
+    // Extra Field for cohort creation
+
+    const transformedFormData = transformFormData(
+      cleanedData,
+      schema,
+      {}
+    );
+
+    console.log('########## debug transformedFormData', transformedFormData);
+
+    onUserDetails(transformedFormData);
   };
 
   return (

@@ -64,6 +64,8 @@ import { showToastMessage } from '@/components/Toastify';
 import CenterListWidget from '@/components/MapUser/CenterListWidget';
 import EmailSearchUser from '@/components/MapUser/EmailSearchUser';
 import { API_ENDPOINTS } from '@/utils/API/APIEndpoints';
+import { updateUser } from '@/services/CreateUserService';
+import { splitUserData } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 
 const LeaderUser = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -366,149 +368,149 @@ const LeaderUser = () => {
 
   // Define actions
   const actions = [
-    {
-      icon: (
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            cursor: 'pointer',
-            // backgroundColor: 'rgb(227, 234, 240)',
-            justifyContent: 'center',
-            padding: '10px',
-          }}
-          title="Edit Team Leader"
-        >
-          <Image src={editIcon} alt="" />
-        </Box>
-      ),
-      callback: (row) => {
-        // console.log('row:', row);
-        // console.log('AddSchema', addSchema);
-        // console.log('AddUISchema', addUiSchema);
+    // {
+    //   icon: (
+    //     <Box
+    //       sx={{
+    //         display: 'flex',
+    //         flexDirection: 'column',
+    //         alignItems: 'center',
+    //         cursor: 'pointer',
+    //         // backgroundColor: 'rgb(227, 234, 240)',
+    //         justifyContent: 'center',
+    //         padding: '10px',
+    //       }}
+    //       title="Edit Team Leader"
+    //     >
+    //       <Image src={editIcon} alt="" />
+    //     </Box>
+    //   ),
+    //   callback: (row) => {
+    //     // console.log('row:', row);
+    //     // console.log('AddSchema', addSchema);
+    //     // console.log('AddUISchema', addUiSchema);
 
-        let tempFormData = extractMatchingKeys(row, addSchema);
-        setPrefilledAddFormData(tempFormData);
-        setIsEdit(true);
-        setIsReassign(false);
-        setEditableUserId(row?.userId);
-        handleOpenModal();
-      },
-      show: (row) => row.status !== 'archived',
-    },
-    {
-      icon: (
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            cursor: 'pointer',
-            // backgroundColor: 'rgb(227, 234, 240)',
-            justifyContent: 'center',
-            padding: '10px',
-          }}
-          title="Delete Team Leader"
-        >
-          {' '}
-          <Image src={deleteIcon} alt="" />{' '}
-        </Box>
-      ),
-      callback: async (row) => {
-        const findVillage = row?.customFields.find((item) => {
-          if (item.label === 'BLOCK') {
-            return item;
-          }
-        });
+    //     let tempFormData = extractMatchingKeys(row, addSchema);
+    //     setPrefilledAddFormData(tempFormData);
+    //     setIsEdit(true);
+    //     setIsReassign(false);
+    //     setEditableUserId(row?.userId);
+    //     handleOpenModal();
+    //   },
+    //   show: (row) => row.status !== 'archived',
+    // },
+    // {
+    //   icon: (
+    //     <Box
+    //       sx={{
+    //         display: 'flex',
+    //         flexDirection: 'column',
+    //         alignItems: 'center',
+    //         cursor: 'pointer',
+    //         // backgroundColor: 'rgb(227, 234, 240)',
+    //         justifyContent: 'center',
+    //         padding: '10px',
+    //       }}
+    //       title="Delete Team Leader"
+    //     >
+    //       {' '}
+    //       <Image src={deleteIcon} alt="" />{' '}
+    //     </Box>
+    //   ),
+    //   callback: async (row) => {
+    //     const findVillage = row?.customFields.find((item) => {
+    //       if (item.label === 'BLOCK') {
+    //         return item;
+    //       }
+    //     });
 
-        setVillage(findVillage?.selectedValues[0]?.value);
-        setUserId(row?.userId);
-        setOpen(true);
-        setFirstName(row?.firstName);
-        setLastName(row?.lastName);
-        setReason('');
-        setChecked(false);
-      },
-      show: (row) => row.status !== 'archived',
-    },
-    {
-      icon: (
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            cursor: 'pointer',
-            // backgroundColor: 'rgb(227, 234, 240)',
-            justifyContent: 'center',
-            padding: '10px',
-          }}
-          title="Reassign Team Leader"
-        >
-          <Image src={apartment} alt="" />
-        </Box>
-      ),
-      callback: (row) => {
-        // console.log('row:', row);
-        // console.log('AddSchema', addSchema);
-        // console.log('AddUISchema', addUiSchema);
+    //     setVillage(findVillage?.selectedValues[0]?.value);
+    //     setUserId(row?.userId);
+    //     setOpen(true);
+    //     setFirstName(row?.firstName);
+    //     setLastName(row?.lastName);
+    //     setReason('');
+    //     setChecked(false);
+    //   },
+    //   show: (row) => row.status !== 'archived',
+    // },
+    // {
+    //   icon: (
+    //     <Box
+    //       sx={{
+    //         display: 'flex',
+    //         flexDirection: 'column',
+    //         alignItems: 'center',
+    //         cursor: 'pointer',
+    //         // backgroundColor: 'rgb(227, 234, 240)',
+    //         justifyContent: 'center',
+    //         padding: '10px',
+    //       }}
+    //       title="Reassign Team Leader"
+    //     >
+    //       <Image src={apartment} alt="" />
+    //     </Box>
+    //   ),
+    //   callback: (row) => {
+    //     // console.log('row:', row);
+    //     // console.log('AddSchema', addSchema);
+    //     // console.log('AddUISchema', addUiSchema);
 
-        let tempFormData = extractMatchingKeys(row, addSchema);
-        setPrefilledAddFormData(tempFormData);
-        setIsEdit(false);
-        setIsReassign(true);
-        setEditableUserId(row?.userId);
-        handleOpenModal();
-      },
-      show: (row) => row.status !== 'archived',
-    },
-    {
-      icon: (
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            cursor: 'pointer',
-            // backgroundColor: 'rgb(227, 234, 240)',
-            justifyContent: 'center',
-            padding: '10px',
-          }}
-          title="Reactivate Team Leader"
-        >
-          {' '}
-          <Image src={restoreIcon} alt="" />{' '}
-        </Box>
-      ),
-      callback: async (row) => {
-        const findVillage = row?.customFields.find((item) => {
-          if (item.label === 'VILLAGE') {
-            return item;
-          }
-        });
+    //     let tempFormData = extractMatchingKeys(row, addSchema);
+    //     setPrefilledAddFormData(tempFormData);
+    //     setIsEdit(false);
+    //     setIsReassign(true);
+    //     setEditableUserId(row?.userId);
+    //     handleOpenModal();
+    //   },
+    //   show: (row) => row.status !== 'archived',
+    // },
+    // {
+    //   icon: (
+    //     <Box
+    //       sx={{
+    //         display: 'flex',
+    //         flexDirection: 'column',
+    //         alignItems: 'center',
+    //         cursor: 'pointer',
+    //         // backgroundColor: 'rgb(227, 234, 240)',
+    //         justifyContent: 'center',
+    //         padding: '10px',
+    //       }}
+    //       title="Reactivate Team Leader"
+    //     >
+    //       {' '}
+    //       <Image src={restoreIcon} alt="" />{' '}
+    //     </Box>
+    //   ),
+    //   callback: async (row) => {
+    //     const findVillage = row?.customFields.find((item) => {
+    //       if (item.label === 'VILLAGE') {
+    //         return item;
+    //       }
+    //     });
 
-        // console.log('row:', row?.customFields[2].selectedValues[0].value);
-        setEditableUserId(row?.userId);
+    //     // console.log('row:', row?.customFields[2].selectedValues[0].value);
+    //     setEditableUserId(row?.userId);
 
-        setArchiveToActiveOpen(true);
+    //     setArchiveToActiveOpen(true);
 
-        setUserId(row?.userId);
-        const findVillagename = row?.customFields.find((item) => {
-          if (item.label === 'BLOCK') {
-            return item;
-          }
-        });
-        setVillage(findVillagename?.selectedValues[0]?.value);
-        setUserId(row?.userId);
-        setFirstName(row?.firstName);
-        setLastName(row?.lastName);
+    //     setUserId(row?.userId);
+    //     const findVillagename = row?.customFields.find((item) => {
+    //       if (item.label === 'BLOCK') {
+    //         return item;
+    //       }
+    //     });
+    //     setVillage(findVillagename?.selectedValues[0]?.value);
+    //     setUserId(row?.userId);
+    //     setFirstName(row?.firstName);
+    //     setLastName(row?.lastName);
 
-        // setReason('');
-        // setChecked(false);
-      },
-      show: (row) => row.status !== 'active',
-    },
+    //     // setReason('');
+    //     // setChecked(false);
+    //   },
+    //   show: (row) => row.status !== 'active',
+    // },
   ];
 
   // Pagination handlers
@@ -741,6 +743,7 @@ const LeaderUser = () => {
                 console.log('Selected User ID:', userId);
               }}
               onUserDetails={(userDetails) => {
+                console.log('############# userDetails', userDetails);
                 setUserDetails(userDetails);
               }}
               schema={addSchema}
@@ -765,10 +768,32 @@ const LeaderUser = () => {
             color="primary"
             fullWidth
             onClick={async () => {
-              document.getElementById('dynamicform-submit-button')?.click();
               if (selectedUserId && selectedCenterId) {
                 setIsMappingInProgress(true);
                 try {
+
+                  const { userData, customFields } = splitUserData(userDetails);
+                  
+                  delete userData.email;
+
+                  const object = {
+                    userData: userData,
+                    customFields: customFields,
+                  };
+
+                  //update user details
+                  const updateUserResponse = await updateUser(selectedUserId, object);
+                  // console.log('updatedResponse', updateUserResponse);
+        
+                  if (
+                    updateUserResponse &&
+                    updateUserResponse?.data?.params?.err === null
+                  ) {
+                    // getNotification(editableUserId, profileUpdateNotificationKey);
+                    showToastMessage(t('TEAM_LEADERS.TEAM_LEADER_UPDATED_SUCCESSFULLY'), 'success');
+                    // telemetryCallbacks(telemetryUpdateKey);
+        
+                    //map user to tenant
                   // Ensure selectedCenterId is a string (handle array case)
                   const cohortId = Array.isArray(selectedCenterId)
                     ? selectedCenterId[0]
@@ -797,8 +822,7 @@ const LeaderUser = () => {
                     response?.status === 200
                   ) {
                     showToastMessage(
-                      t('TEAM_LEADERS.TEAM_LEADER_MAPPED_SUCCESSFULLY') ||
-                        'Team Lead mapped successfully',
+                      t('TEAM_LEADERS.TEAM_LEADER_CREATED_SUCCESSFULLY'),
                       'success'
                     );
                     // Close dialog
@@ -810,17 +834,20 @@ const LeaderUser = () => {
                   } else {
                     showToastMessage(
                       response?.data?.params?.errmsg ||
-                        t('TEAM_LEADERS.FAILED_TO_MAP_TEAM_LEADER') ||
-                        'Failed to map team lead',
+                        t('TEAM_LEADERS.NOT_ABLE_CREATE_TEAM_LEADER'),
                       'error'
                     );
                   }
+                  } else {
+                    // console.error('Error update user:', error);
+                    showToastMessage(t('TEAM_LEADERS.NOT_ABLE_UPDATE_TEAM_LEADER'), 'error');
+                  }
+
                 } catch (error) {
                   console.error('Error creating cohort member:', error);
                   showToastMessage(
                     error?.response?.data?.params?.errmsg ||
-                      t('TEAM_LEADERS.FAILED_TO_MAP_TEAM_LEADER') ||
-                      'Failed to map team lead',
+                      t('TEAM_LEADERS.NOT_ABLE_CREATE_TEAM_LEADER'),
                     'error'
                   );
                 } finally {

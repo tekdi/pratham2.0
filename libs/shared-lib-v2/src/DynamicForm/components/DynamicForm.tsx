@@ -1787,7 +1787,6 @@ const DynamicForm = ({
           <button
             type="submit"
             style={{ display: hideSubmit ? 'none' : 'block' }}
-            id={"dynamicform-submit-button"}
           >
             Submit
           </button>
