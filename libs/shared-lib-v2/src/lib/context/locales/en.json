@@ -822,6 +822,7 @@
     "NO_ASSESSMENT_TYPE_FOUND":"No Assessment Type Found",
     "IMAGE_UPLOADED": "Image Uploaded",
     "VIEW": "View",
-    "REUPLOAD": "Reupload"
+    "REUPLOAD": "Reupload",
+    "FORMAT_JPG_SIZE_MB_UP_TO_IMAGES": "* Format: jpg, jpeg. Size: {{mb}} MB Up to {{count}} images"
   }
 }
