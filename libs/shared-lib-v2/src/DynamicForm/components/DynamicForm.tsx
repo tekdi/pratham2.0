@@ -1547,6 +1547,14 @@ const DynamicForm = ({
         }
       }
 
+      // Protect username from being updated if it's disabled
+      // Preserve the existing username value if username field is disabled
+      const isUsernameDisabled = formUiSchema?.username?.['ui:disabled'] === true;
+      if (isUsernameDisabled && prevFormData.current?.username) {
+        // Keep the existing username value when username field is disabled
+        formData.username = prevFormData.current.username;
+      }
+      
       prevFormData.current = formData;
       // console.log('Form data changed:', formData);
       // live error
@@ -1589,16 +1597,40 @@ const DynamicForm = ({
   const prevNameRef = useRef({ firstName: '', lastName: '' });
 
   const handleFirstLastNameBlur = async (id: any, value: any) => {
+    // Extract field name from id (RJSF uses formats like "root_firstName", "root.lastName", or just "firstName")
+    // Handle different ID formats: "root_firstName", "root.firstName", "firstName", etc.
+    let fieldName = '';
+    if (id) {
+      // Remove "root_" prefix if present
+      fieldName = id.replace(/^root[_.]/, '').replace(/^root/, '');
+      // Handle nested paths like "root.firstName" -> "firstName"
+      const parts = fieldName.split('.');
+      fieldName = parts[parts.length - 1];
+    }
+    
+    // Only proceed if the blurred field is firstName or lastName
+    if (fieldName !== 'firstName' && fieldName !== 'lastName') {
+      return;
+    }
+
     if (
       formData?.firstName !== undefined &&
       formData?.lastName !== undefined &&
       type === 'learner'
     ) {
-      // Only update if firstName or lastName changed
-      if (
-        formData.firstName !== prevNameRef.current.firstName ||
-        formData.lastName !== prevNameRef.current.lastName
-      ) {
+     // Check if username field is disabled - don't update if disabled
+      const isUsernameDisabled = formUiSchema?.username?.['ui:disabled'] === true;
+      
+      if (isUsernameDisabled) {
+        // Username is disabled, don't update it
+        return;
+      }
+
+      // Only update if firstName or lastName actually changed
+      const firstNameChanged = formData.firstName !== prevNameRef.current.firstName;
+      const lastNameChanged = formData.lastName !== prevNameRef.current.lastName;
+      
+      if (firstNameChanged || lastNameChanged) {
         const randomTwoDigit = Math.floor(10 + Math.random() * 90);
         const newUserName = `${formData.firstName}${formData.lastName}${randomTwoDigit}`;
         if (formData.username !== newUserName) {
