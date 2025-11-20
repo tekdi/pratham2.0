@@ -61,6 +61,10 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
   const [userData, setuserData] = useState<any>({});
 const [responseFormData, setResponseFormData] = useState<any>({});
   const localPayload = JSON.parse(localStorage.getItem('localPayload') || '{}');
+  const uiConfig =
+    typeof window !== 'undefined'
+      ? JSON.parse(localStorage.getItem('uiConfig') || '{}')
+      : {};
 
   //formData.email = 'a@tekditechnologies.com';
 
@@ -368,6 +372,22 @@ if (landingPage) {
                 ? t('LEARNER_APP.EDIT_PROFILE.COMPLETE_PROFILE_TITLE')
                 : t('LEARNER_APP.EDIT_PROFILE.TITLE')}
             </Typography>
+
+
+           {enrolledProgram && typeof window !== 'undefined' && window.localStorage  && uiConfig.registrationdescription && (<Typography
+              sx={{
+                fontFamily: 'Poppins, sans-serif',
+                fontWeight: 400,
+                fontSize: '16px',
+                lineHeight: '24px',
+                letterSpacing: '0.5px',
+                textAlign: 'center',
+                p: '5px',
+              }}
+            >
+              {uiConfig?.registrationdescription}
+            </Typography>)
+}
           </Box>
           <Box
             sx={{
