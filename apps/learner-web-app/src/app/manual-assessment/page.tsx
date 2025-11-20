@@ -1806,6 +1806,7 @@ console.log('assessmentStatusData>>>>>:', assessmentStatusData);
         isReUploadMode={isReUploadMode}
         setAssessmentTrackingData={setAssessmentTrackingData}
         parentId={parentId as string}
+        customMaxImages={10}
       />
 
       {/* Snackbar for feedback */}
