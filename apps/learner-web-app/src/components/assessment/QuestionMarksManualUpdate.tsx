@@ -945,7 +945,7 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
                           }}
                           onBlur={() => handleMarksBlur(si, qi)}
                           readOnly
-                          style={{ width: 15 }}
+                          style={{ width: 25 }}
                         />
                         <span>/ {q.maxScore}</span>
                       </div>
