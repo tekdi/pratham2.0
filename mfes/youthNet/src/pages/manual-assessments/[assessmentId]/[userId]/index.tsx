@@ -1479,6 +1479,7 @@ const AssessmentDetails = () => {
         onSubmissionSuccess={handleSubmissionSuccess}
         isReUploadMode={isReUploadMode}
         setAssessmentTrackingData={setAssessmentTrackingData}
+        customMaxImages={10}
       />
 
       {/* Snackbar for feedback */}
