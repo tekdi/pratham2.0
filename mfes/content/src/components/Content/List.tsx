@@ -341,12 +341,12 @@ export default function Content(props: Readonly<ContentProps>) {
         // filter.primaryCategory = [
         //     'Learning Resource','Practice Question Set','Activity','Story'];
         console.log("filter====>" , filter);
-
        const resultResponse2 = await ContentSearch({
           ...filter,
           offset: adjustedOffset,
           limit: adjustedLimit,
           signal: controller.signal,
+          thematicCount: true,
           primaryCategory: [
             'Learning Resource','Practice Question Set','Activity','Story' ,'Interactive'],
         });
