@@ -16,7 +16,7 @@ import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
 import { Button } from '@mui/material';
 import SimpleModal from '@/components/SimpleModal';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { deleteUser } from '@/services/UserService';
+import { updateUserTenantStatus } from '@/services/UserService';
 import editIcon from '../../public/images/editIcon.svg';
 import deleteIcon from '../../public/images/deleteIcon.svg';
 import Image from 'next/image';
@@ -54,6 +54,7 @@ const ContentCreator = () => {
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [isEdit, setIsEdit] = useState(false);
   const [editableUserId, setEditableUserId] = useState('');
+  const [tenantId, setTenantId] = useState('');
   const [state, setState] = useState("");
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -64,11 +65,11 @@ const ContentCreator = () => {
 
   const initialFormDataSearch =
     localStorage.getItem(searchStoreKey) &&
-      localStorage.getItem(searchStoreKey) != '{}'
+    localStorage.getItem(searchStoreKey) != '{}'
       ? JSON.parse(localStorage.getItem(searchStoreKey))
       : localStorage.getItem('stateId')
-        ? { state: [localStorage.getItem('stateId')] }
-        : {};
+      ? { state: [localStorage.getItem('stateId')] }
+      : {};
 
   const storedUserData = JSON.parse(localStorage.getItem('adminInfo') || '{}');
 
@@ -99,6 +100,7 @@ const ContentCreator = () => {
 
     setPrefilledAddFormData(initialFormDataSearch);
     fetchData();
+    setTenantId(localStorage.getItem('tenantId'));
   }, []);
 
   const updatedUiSchema = {
@@ -151,14 +153,14 @@ const ContentCreator = () => {
       label: 'Content Creator Name',
       render: (row: any) =>
         `${row.firstName || ''} ${row.middleName || ''} ${row.lastName || ''
-          }`.trim(),
+        }`.trim(),
     },
     {
       key: 'status',
       label: 'Status',
-      render: (row: any) => transformLabel(row.status),
+      render: (row: any) => transformLabel(row.tenantStatus),
       getStyle: (row: any) => ({
-        color: row.status === 'active' ? 'green' : 'red',
+        color: row.tenantStatus === 'active' ? 'green' : 'red',
       }),
     },
     {
@@ -294,7 +296,7 @@ const ContentCreator = () => {
         setEditableUserId(row?.userId);
         handleOpenModal();
       },
-      show: (row) => row.status !== 'archived',
+      show: (row) => row.tenantStatus !== 'archived',
     },
     {
       icon: (
@@ -318,16 +320,14 @@ const ContentCreator = () => {
         console.log('row:', row);
         setEditableUserId(row?.userId);
         const userId = row?.userId;
-        const response = await deleteUser(userId, {
-          userData: {
-            status: Status.ARCHIVED,
-          },
+        const response = await updateUserTenantStatus(userId, tenantId, {
+          status: 'archived'
         });
         setPrefilledFormData({});
         searchData(prefilledFormData, currentPage);
         setOpenModal(false);
       },
-      show: (row) => row.status !== 'archived',
+      show: (row) => row.tenantStatus !== 'archived',
     },
     {
       icon: (
@@ -363,8 +363,8 @@ const ContentCreator = () => {
         setArchiveToActiveOpen(true);
         setPrefilledFormData({});
       },
-      show: (row) => row.status !== 'active',
-    }
+      show: (row) => row.tenantStatus !== 'active',
+    },
   ];
 
   // Pagination handlers
@@ -384,12 +384,12 @@ const ContentCreator = () => {
     setOpenModal(false);
   };
 
-
   const archiveToactive = async () => {
     try {
-      const resp = await deleteUser(editableUserId, {
-        userData: { status: 'active' },
+      const resp = await updateUserTenantStatus(editableUserId, tenantId, {
+        status: 'active'
       });
+      searchData(prefilledFormData, currentPage);
       showToastMessage(t('LEARNERS.ACTIVATE_USER_SUCCESS'), 'success');
     } catch (error) {
       console.error('Error updating team leader:', error);
