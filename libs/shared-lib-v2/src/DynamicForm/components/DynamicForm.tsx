@@ -117,30 +117,96 @@ const DynamicForm = ({
   };
 
   const getInitialUiSchema = () => {
+    let initialUiSchema = uiSchema;
+    
     if (!prefilledFormData || !prefilledFormData.family_member_details) {
       const cleanedUiSchema = { ...uiSchema };
       delete cleanedUiSchema.mother_name;
       delete cleanedUiSchema.father_name;
       delete cleanedUiSchema.spouse_name;
-      return cleanedUiSchema;
+      initialUiSchema = cleanedUiSchema;
     }
-    return uiSchema;
+    
+    // Add note to lastName field in initial uiSchema
+    if (initialUiSchema.lastName && !initialUiSchema.lastName['ui:options']?.note) {
+      initialUiSchema = {
+        ...initialUiSchema,
+        lastName: {
+          ...initialUiSchema.lastName,
+          'ui:options': {
+            ...(initialUiSchema.lastName['ui:options'] || {}),
+            note: 'If you do not have a last name, please enter your first name again or use a single dot (.) in this field',
+          },
+        },
+      };
+    }
+    
+    return initialUiSchema;
   };
   // Initialize state based on createNewLearner flag
   const [formSchema, setFormSchema] = useState(
     createNew ? schema : getInitialSchema()
   );
+  // Helper to add lastName note to uiSchema
+  const addLastNameNote = (uischema: any) => {
+    if (uischema?.lastName && !uischema.lastName['ui:options']?.note) {
+      return {
+        ...uischema,
+        lastName: {
+          ...uischema.lastName,
+          'ui:options': {
+            ...(uischema.lastName['ui:options'] || {}),
+            note: 'If you do not have a last name, please enter your first name again or use a single dot (.) in this field',
+          },
+        },
+      };
+    }
+    return uischema;
+  };
+
   const [formUiSchemaOriginal, setFormUiSchemaOriginal] = useState(
-    createNew ? uiSchema : getInitialUiSchema()
+    createNew ? addLastNameNote(uiSchema) : getInitialUiSchema()
   );
   const [formUiSchema, setFormUiSchema] = useState(
-    createNew ? uiSchema : getInitialUiSchema()
+    createNew ? addLastNameNote(uiSchema) : getInitialUiSchema()
   );
   const [formData, setFormData] = useState(
     createNew ? prefilledFormData : getInitialFormData()
   );
 
   console.log('formUiSchema', formUiSchema);
+
+  // Add note for lastName field - applies to all forms
+  useEffect(() => {
+    if (formUiSchema?.lastName) {
+      const currentNote = formUiSchema.lastName['ui:options']?.note;
+      if (!currentNote) {
+        console.log('Adding note to lastName field', formUiSchema.lastName);
+        setFormUiSchema((prevUiSchema) => {
+          // Check again to avoid unnecessary updates
+          if (prevUiSchema?.lastName && !prevUiSchema.lastName['ui:options']?.note) {
+            const updatedUiSchema = {
+              ...prevUiSchema,
+              lastName: {
+                ...prevUiSchema.lastName,
+                'ui:options': {
+                  ...(prevUiSchema.lastName['ui:options'] || {}),
+                  note: 'If you do not have a last name, please enter your first name again or use a single dot (.) in this field',
+                },
+              },
+            };
+            console.log('Updated uiSchema with note:', updatedUiSchema.lastName);
+            return updatedUiSchema;
+          }
+          return prevUiSchema;
+        });
+      } else {
+        console.log('lastName note already exists:', currentNote);
+      }
+    } else {
+      console.log('lastName field not found in formUiSchema');
+    }
+  }, [formUiSchema]);
 
   //custom validation on formData for learner fields hide on dob
   useEffect(() => {
@@ -1481,6 +1547,14 @@ const DynamicForm = ({
         }
       }
 
+      // Protect username from being updated if it's disabled
+      // Preserve the existing username value if username field is disabled
+      const isUsernameDisabled = formUiSchema?.username?.['ui:disabled'] === true;
+      if (isUsernameDisabled && prevFormData.current?.username) {
+        // Keep the existing username value when username field is disabled
+        formData.username = prevFormData.current.username;
+      }
+      
       prevFormData.current = formData;
       // console.log('Form data changed:', formData);
       // live error
@@ -1523,16 +1597,40 @@ const DynamicForm = ({
   const prevNameRef = useRef({ firstName: '', lastName: '' });
 
   const handleFirstLastNameBlur = async (id: any, value: any) => {
+    // Extract field name from id (RJSF uses formats like "root_firstName", "root.lastName", or just "firstName")
+    // Handle different ID formats: "root_firstName", "root.firstName", "firstName", etc.
+    let fieldName = '';
+    if (id) {
+      // Remove "root_" prefix if present
+      fieldName = id.replace(/^root[_.]/, '').replace(/^root/, '');
+      // Handle nested paths like "root.firstName" -> "firstName"
+      const parts = fieldName.split('.');
+      fieldName = parts[parts.length - 1];
+    }
+    
+    // Only proceed if the blurred field is firstName or lastName
+    if (fieldName !== 'firstName' && fieldName !== 'lastName') {
+      return;
+    }
+
     if (
       formData?.firstName !== undefined &&
       formData?.lastName !== undefined &&
       type === 'learner'
     ) {
-      // Only update if firstName or lastName changed
-      if (
-        formData.firstName !== prevNameRef.current.firstName ||
-        formData.lastName !== prevNameRef.current.lastName
-      ) {
+     // Check if username field is disabled - don't update if disabled
+      const isUsernameDisabled = formUiSchema?.username?.['ui:disabled'] === true;
+      
+      if (isUsernameDisabled) {
+        // Username is disabled, don't update it
+        return;
+      }
+
+      // Only update if firstName or lastName actually changed
+      const firstNameChanged = formData.firstName !== prevNameRef.current.firstName;
+      const lastNameChanged = formData.lastName !== prevNameRef.current.lastName;
+      
+      if (firstNameChanged || lastNameChanged) {
         const randomTwoDigit = Math.floor(10 + Math.random() * 90);
         const newUserName = `${formData.firstName}${formData.lastName}${randomTwoDigit}`;
         if (formData.username !== newUserName) {

@@ -18,10 +18,23 @@ export interface userListParam {
     fromDate?: string;
     toDate?: string;
     village?: string[];
+    emp_manager?: string;
+    name?: string;
   };
   fields?: any;
   sort?: object;
   offset?: number;
+}
+
+export interface UsersByManagerParam {
+  limit?: number;
+  filters: {
+    emp_manager: string;
+    [key: string]: any;
+  };
+  sort?: [string, string];
+  offset?: number;
+  fields?: any;
 }
 
 export const getFacilitatorList = async ({
@@ -110,3 +123,5 @@ export const fetchUserList = async ({
     }
   }
 };
+
+
