@@ -201,6 +201,7 @@ export enum ResourceType {
   LEARNER_PRE_REQUISITE = 'prerequisite',
   LEARNER_POST_REQUISITE = 'postrequisite',
   FACILITATOR_REQUISITE = 'facilitator-requisite',
+  DURING_COURSE = 'during',
 }
 
 import { StaticImageData } from 'next/image'; // Import StaticImageData for type safety with images

@@ -81,7 +81,7 @@ const Index = () => {
       const districtId = result?.selectedValues?.[0]?.id;
       const filters = {
         role: Role?.INSTRUCTOR,
-        status: [Status.ACTIVE],
+        tenantStatus: [Status.ACTIVE],
         district: [districtId],
       };
       const responce = await fetchUserList({ filters });
