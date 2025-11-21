@@ -107,7 +107,7 @@ export const TeamLeaderSearchSchema = {
       enum: ['asc', 'desc'],
       enumNames: ['A-Z', 'Z-A'],
     },
-    status: {
+    tenantStatus: {
       type: 'string',
       title: 'Status',
       enum: ['active', 'archived'],
@@ -117,7 +117,7 @@ export const TeamLeaderSearchSchema = {
 };
 
 export const TeamLeaderSearchUISchema = {
-  'ui:order': ['state', 'district', 'block', 'name', 'sortBy', 'status'],
+  'ui:order': ['state', 'district', 'block', 'name', 'sortBy', 'tenantStatus'],
 
   state: {
     'ui:widget': 'AutoCompleteMultiSelectWidget',
@@ -152,7 +152,7 @@ export const TeamLeaderSearchUISchema = {
     'ui:widget': 'select',
   },
 
-  status: {
+  tenantStatus: {
     'ui:widget': 'select',
   },
 };

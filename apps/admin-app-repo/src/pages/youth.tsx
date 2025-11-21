@@ -34,7 +34,7 @@ import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
-import { deleteUser, editEditUser } from '@/services/UserService';
+import { editEditUser, updateUserTenantStatus } from '@/services/UserService';
 import { transformLabel } from '@/utils/Helper';
 import { getCohortList } from '@/services/GetCohortList';
 import { useTheme } from '@mui/material/styles';
@@ -179,9 +179,9 @@ const Youth = () => {
     {
       key: 'status',
       label: 'Status',
-      render: (row: any) => transformLabel(row.status),
+      render: (row: any) => transformLabel(row.tenantStatus),
       getStyle: (row: any) => ({
-        color: row.status === 'active' ? 'green' : 'red',
+        color: row.tenantStatus === 'active' ? 'green' : 'red',
       }),
     },
     {
@@ -282,8 +282,9 @@ const Youth = () => {
 
       // Always attempt to delete the user
       console.log('Proceeding to self-delete...');
-      const resp = await deleteUser(userID, {
-        userData: { reason: reason, status: 'archived' },
+      const resp = await updateUserTenantStatus(userID, tenantId, {
+        status: 'archived',
+        reason: reason,
       });
 
       if (resp?.responseCode === 200) {
@@ -296,6 +297,7 @@ const Youth = () => {
             ),
           },
         }));
+        searchData(prefilledFormData, currentPage);
         console.log('Team leader successfully archived.');
       } else {
         console.error('Failed to archive team leader:', resp);
@@ -401,11 +403,10 @@ const Youth = () => {
 
       // Always attempt to delete the user
       console.log('Proceeding to self-delete...');
-      const resp = await deleteUser(userID, {
-        userData: { status: 'active' },
+      const resp = await updateUserTenantStatus(userID, tenantId, {
+        status: 'active',
       });
-                        showToastMessage(t("LEARNERS.ACTIVATE_USER_SUCCESS"), "success");
-
+      showToastMessage(t("LEARNERS.ACTIVATE_USER_SUCCESS"), "success");
 
       if (resp?.responseCode === 200) {
         // setResponse((prev) => ({
@@ -458,6 +459,7 @@ const Youth = () => {
         setEditableUserId(row?.userId);
         handleOpenModal();
       },
+      show: (row) => row.tenantStatus !== 'archived'
     },
     {
       icon: (
@@ -504,7 +506,7 @@ const Youth = () => {
           village: findVillage?.selectedValues?.[0]?.value || '',
         });
       },
-         show: (row) => row.status !== 'archived'
+         show: (row) => row.tenantStatus !== 'archived'
     },
     {
       icon: (
@@ -541,6 +543,7 @@ const Youth = () => {
 
         return !isVolunteer;
       },
+      show: (row) => row.tenantStatus !== 'archived'
     },
     {
       icon: (
@@ -616,7 +619,7 @@ const Youth = () => {
             // setReason('');
             // setChecked(false);
           },
-          show: (row) => row.status !== 'active',
+          show: (row) => row.tenantStatus !== 'active',
         }
   ];
 

@@ -199,7 +199,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
             district: districtIds,
             block: blockIds,
             role: Role.TEACHER,
-            status: [Status.ACTIVE],
+            tenantStatus: [Status.ACTIVE],
             tenantId: tenantId,
           };
           const fields = ['age'];

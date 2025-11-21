@@ -11,7 +11,7 @@ export interface userListParam {
   //  page: number;
   filters: {
     role?: string;
-    status?: string[];
+    tenantStatus?: string[];
     states?: string;
     district?: string[];
     block?: string[];
