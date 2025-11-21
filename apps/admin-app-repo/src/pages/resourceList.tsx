@@ -13,6 +13,7 @@ const ResourceList = () => {
   const [learnersPreReq, setLearnersPreReq] = useState<any[]>([]);
   const [learnersPostReq, setLearnersPostReq] = useState<any[]>([]);
   const [facilitatorsPreReq, setFacilitatorsPreReq] = useState<any[]>([]);
+  const [duringCourse, setDuringCourse] = useState<any[]>([]);
 
   const tstore = taxonomyStore();
   const { t } = useTranslation();
@@ -85,6 +86,9 @@ function reorderByIdentifiers(dataArray: any, idOrder: any) {
         let facilitatorsRequisite = contents?.filter(
           (item: any) => item.type === ResourceType.FACILITATOR_REQUISITE
         );
+        let duringCourse = contents?.filter(
+          (item: any) => item.type === ResourceType.DURING_COURSE
+        );
 
 const groupedIds: any = {};
 
@@ -113,6 +117,10 @@ if(result?.postRequisite)
 {
    postRequisite = reorderByIdentifiers(postRequisite, result?.postRequisite);
 }
+if(result?.duringCourse)
+{
+   duringCourse = reorderByIdentifiers(duringCourse, result?.duringCourse);
+}
 console.log('preRequisiteIdsresult',result);
 console.log('preRequisite', preRequisite);
 console.log('preRequisitefetchedLearningResources', fetchedLearningResources);
@@ -120,6 +128,7 @@ console.log('preRequisitefetchedLearningResources', fetchedLearningResources);
         setLearnersPreReq(preRequisite);
         setLearnersPostReq(postRequisite);
         setFacilitatorsPreReq(facilitatorsRequisite);
+        setDuringCourse(duringCourse);
       }
     };
 
@@ -177,6 +186,30 @@ console.log('preRequisitefetchedLearningResources', fetchedLearningResources);
         {learnersPostReq?.length > 0 ? (
           <Grid container spacing={2} sx={{ mb: 4 }}>
             {learnersPostReq.map((item, index) => (
+              <Grid xs={12} md={4} lg={3} item key={index}>
+                <ResourceCard
+                  title={item.name}
+                  // type={item.app}
+                  resource={item.contentType}
+                  appIcon={item?.appIcon}
+                  identifier={item.identifier}
+                  mimeType={item.mimeType}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        ) : (
+          <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+            {t('COURSE_PLANNER.NO_DATA_POST')}
+          </Typography>
+        )}
+
+<Typography variant="h4" fontWeight={500} mb={2}>
+          {t('COURSE_PLANNER.DURING_COURSE')}
+        </Typography>
+        {duringCourse?.length > 0 ? (
+          <Grid container spacing={2} sx={{ mb: 4 }}>
+            {duringCourse.map((item, index) => (
               <Grid xs={12} md={4} lg={3} item key={index}>
                 <ResourceCard
                   title={item.name}

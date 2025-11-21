@@ -165,7 +165,15 @@ const AssessmentList = () => {
                 (item: any) => ({ id: item?.value, name: item?.label })
               );
               setBlockData(transformedBlockData);
-              const firstBlockId = transformedBlockData?.[0]?.id || '';
+              let firstBlockId = transformedBlockData?.[0]?.id || '';
+              if (
+                router.query.blockId &&
+                transformedBlockData?.some(
+                  (b: any) => String(b.id) === String(router.query.blockId)
+                )
+              ) {
+                firstBlockId = router.query.blockId;
+              }
               setSelectedBlockValue(firstBlockId);
               setBlockId(firstBlockId);
             })
@@ -182,7 +190,7 @@ const AssessmentList = () => {
         setBlockData([]);
       }
     }
-  }, []);
+  }, [router.isReady, router.query.blockId]);
 
   // Village list fetching logic (role-based, following villages page pattern)
   useEffect(() => {
@@ -196,8 +204,17 @@ const AssessmentList = () => {
             : null;
           setVillageList(villageData || []);
           if (villageData && villageData.length > 0) {
-            setSelectedVillageValue(villageData[0]?.Id);
-            setVillageId(villageData[0]?.Id);
+            let firstVillageId = villageData[0]?.Id;
+            if (
+              router.query.villageId &&
+              villageData.some(
+                (v: any) => String(v.Id) === String(router.query.villageId)
+              )
+            ) {
+              firstVillageId = router.query.villageId;
+            }
+            setSelectedVillageValue(firstVillageId);
+            setVillageId(firstVillageId);
           }
         } else if (YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() && selectedBlockValue !== '') {
           // For LEAD role: fetch villages based on selected block
@@ -216,8 +233,17 @@ const AssessmentList = () => {
           );
           setVillageList(transformedVillageData || []);
           if (transformedVillageData && transformedVillageData.length > 0) {
-            setSelectedVillageValue(transformedVillageData[0]?.Id);
-            setVillageId(transformedVillageData[0]?.Id);
+            let firstVillageId = transformedVillageData[0]?.Id;
+            if (
+              router.query.villageId &&
+              transformedVillageData.some(
+                (v: any) => String(v.Id) === String(router.query.villageId)
+              )
+            ) {
+              firstVillageId = router.query.villageId;
+            }
+            setSelectedVillageValue(firstVillageId);
+            setVillageId(firstVillageId);
           }
         }
       } catch (error) {
@@ -227,10 +253,11 @@ const AssessmentList = () => {
     };
 
     getVillageList();
-  }, [selectedBlockValue]);
+  }, [selectedBlockValue, router.query.villageId]);
 
   // Initialize villages on page load for INSTRUCTOR role
   useEffect(() => {
+    if (!router.isReady) return;
     if (YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole()) {
       const villageDataString = localStorage.getItem('villageData');
       const villageData: any = villageDataString
@@ -238,11 +265,20 @@ const AssessmentList = () => {
         : null;
       if (villageData && villageData.length > 0) {
         setVillageList(villageData);
-        setSelectedVillageValue(villageData[0]?.Id);
-        setVillageId(villageData[0]?.Id);
+        let firstVillageId = villageData[0]?.Id;
+        if (
+          router.query.villageId &&
+          villageData.some(
+            (v: any) => String(v.Id) === String(router.query.villageId)
+          )
+        ) {
+          firstVillageId = router.query.villageId;
+        }
+        setSelectedVillageValue(firstVillageId);
+        setVillageId(firstVillageId);
       }
     }
-  }, []);
+  }, [router.isReady, router.query.villageId]);
 
   // Reset assessment type and related lists when class changes
   useEffect(() => {
@@ -682,6 +718,13 @@ const AssessmentList = () => {
                       onSelect={(value) => {
                         setSelectedBlockValue(value);
                         setBlockId(value);
+                        const { villageId, ...rest } = router.query;
+                        const newQuery = { ...rest, blockId: value };
+                        router.push(
+                          { pathname: router.pathname, query: newQuery },
+                          undefined,
+                          { shallow: true }
+                        );
                         console.log('Block selected:', value);
                       }}
                       label={t('YOUTHNET_USERS_AND_VILLAGES.BLOCKS')}
@@ -710,6 +753,12 @@ const AssessmentList = () => {
                     console.log('Village selected:', value);
                     setSelectedVillageValue(value);
                     setVillageId(value);
+                    const newQuery = { ...router.query, villageId: value };
+                    router.push(
+                      { pathname: router.pathname, query: newQuery },
+                      undefined,
+                      { shallow: true }
+                    );
                   }}
                   label={t('YOUTHNET_USERS_AND_VILLAGES.VILLAGES')}
                 />
