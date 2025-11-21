@@ -77,7 +77,7 @@ type UserDetails = {
 };
 type FilterDetails = {
   role: any;
-  status?: any;
+  tenantStatus?: any;
   districts?: any;
   states?: any;
   blocks?: any;
@@ -300,7 +300,7 @@ const UserTable: React.FC<UserTableProps> = ({
 
   const [filters, setFilters] = useState<FilterDetails>({
     role: role,
-    status: [statusValue],
+    tenantStatus: [statusValue],
   });
 
   const handleChange = (event: SelectChangeEvent<typeof pageSize>) => {
@@ -387,16 +387,16 @@ const UserTable: React.FC<UserTableProps> = ({
     setSelectedState(selected);
 
     if (selected[0] === '' || selected[0] === t('COMMON.ALL_STATES')) {
-      if (filters.status) setFilters({ status: [filters.status], role: role });
+      if (filters.tenantStatus) setFilters({ tenantStatus: [filters.tenantStatus], role: role });
       else setFilters({ role: role });
     } else {
       const stateCodes = code?.join(',');
       setSelectedStateCode(stateCodes);
-      if (filters.status)
+      if (filters.tenantStatus)
         setFilters({
           states: stateCodes,
           role: role,
-          status: filters.status,
+          tenantStatus: filters.tenantStatus,
         });
       else setFilters({ states: stateCodes, role: role });
     }
@@ -410,20 +410,20 @@ const UserTable: React.FC<UserTableProps> = ({
     if (newValue === Status.ACTIVE) {
       setFilters((prevFilters) => ({
         ...prevFilters,
-        status: [Status.ACTIVE],
+        tenantStatus: [Status.ACTIVE],
       }));
       setIsArchived(false);
     } else if (newValue === Status.ARCHIVED) {
       setFilters((prevFilters) => ({
         ...prevFilters,
-        status: [Status.ARCHIVED],
+        tenantStatus: [Status.ARCHIVED],
       }));
       setIsArchived(true);
     } else {
       setIsArchived(false);
 
       setFilters((prevFilters) => {
-        const { status, ...restFilters } = prevFilters;
+        const { tenantStatus, ...restFilters } = prevFilters;
         return {
           ...restFilters,
         };
@@ -469,11 +469,11 @@ const UserTable: React.FC<UserTableProps> = ({
 
     setSelectedDistrictStore(selected[0]);
     if (selected[0] === '' || selected[0] === t('COMMON.ALL_DISTRICTS')) {
-      if (filters.status) {
+      if (filters.tenantStatus) {
         setFilters({
           states: selectedStateCode,
           role: role,
-          status: filters.status,
+          tenantStatus: filters.tenantStatus,
         });
       } else {
         setFilters({
@@ -502,12 +502,12 @@ const UserTable: React.FC<UserTableProps> = ({
       });
       const districts = code?.join(',');
       setSelectedDistrictCode(districts);
-      if (filters.status) {
+      if (filters.tenantStatus) {
         setFilters({
           states: selectedStateCode,
           districts: districts,
           role: role,
-          status: filters.status,
+          tenantStatus: filters.tenantStatus,
         });
       } else {
         setFilters({
@@ -546,12 +546,12 @@ const UserTable: React.FC<UserTableProps> = ({
           district: selectedDistrictCode,
         },
       });
-      if (filters.status) {
+      if (filters.tenantStatus) {
         setFilters({
           states: selectedStateCode,
           districts: selectedDistrictCode,
           role: role,
-          status: filters.status,
+          tenantStatus: filters.tenantStatus,
         });
       } else {
         setFilters({
@@ -572,13 +572,13 @@ const UserTable: React.FC<UserTableProps> = ({
       });
       const blocks = code?.join(',');
       setSelectedBlockCode(blocks);
-      if (filters.status) {
+      if (filters.tenantStatus) {
         setFilters({
           states: selectedStateCode,
           districts: selectedDistrictCode,
           blocks: blocks,
           role: role,
-          status: filters.status,
+          tenantStatus: filters.tenantStatus,
         });
       } else {
         setFilters({
@@ -620,13 +620,13 @@ const UserTable: React.FC<UserTableProps> = ({
     if (selected[0] === '' || selected[0] === t('COMMON.ALL_CENTERS')) {
       setEnableCenterFilter(false);
       setSelectedCenterCode([]);
-      if (filters.status) {
+      if (filters.tenantStatus) {
         setFilters({
           states: selectedStateCode,
           districts: selectedDistrictCode,
           blocks: selectedBlockCode,
           role: role,
-          status: filters.status,
+          tenantStatus: filters.tenantStatus,
         });
       } else {
         setFilters({
@@ -645,7 +645,7 @@ const UserTable: React.FC<UserTableProps> = ({
         // blocks: blocks,
         cohortId: code[0],
         role: role,
-        status: [statusValue],
+        tenantStatus: [statusValue],
       });
     }
   };
@@ -1250,7 +1250,7 @@ const UserTable: React.FC<UserTableProps> = ({
                 setFilters({
                   states: stateField.code,
                   role: role,
-                  status: [statusValue],
+                  tenantStatus: [statusValue],
                 });
               } else {
                 if (
@@ -1264,7 +1264,7 @@ const UserTable: React.FC<UserTableProps> = ({
                     districts: selectedDistrictCode,
                     //  blocks:selectedBlockCode,
                     role: role,
-                    status: [statusValue],
+                    tenantStatus: [statusValue],
                   });
                 }
                 if (
@@ -1278,7 +1278,7 @@ const UserTable: React.FC<UserTableProps> = ({
                     districts: selectedDistrictCode,
                     blocks: selectedBlockCode,
                     role: role,
-                    status: [statusValue],
+                    tenantStatus: [statusValue],
                   });
                 }
               }
@@ -1318,7 +1318,7 @@ const UserTable: React.FC<UserTableProps> = ({
               // blocks: blocks,
               cohortId: selectedCenterCode[0],
               role: role,
-              status: [statusValue],
+              tenantStatus: [statusValue],
             });
           }
         } else {

@@ -67,7 +67,7 @@ export const searchListData = async (
     // status: [Status.ACTIVE],
     ...Object.entries(restFormData).reduce((acc, [key, value]) => {
       if (value !== undefined && value !== '') {
-        if (key === 'status') {
+        if (key === 'tenantStatus' || key === 'status') {
           acc[key] = [value];
         } else if (key === 'name' && typeof value === 'string') {
           acc[key] = value.trimEnd();
