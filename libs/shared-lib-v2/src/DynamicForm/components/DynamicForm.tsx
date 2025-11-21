@@ -17,6 +17,8 @@ import CustomSingleSelectWidget from './RJSFWidget/CustomSingleSelectWidget';
 import CustomRadioWidget from './RJSFWidget/CustomRadioWidget';
 import CustomTextFieldWidget from './RJSFWidget/CustomTextFieldWidget';
 import CustomFileUpload from './RJSFWidget/CustomFileUpload';
+import CatchmentAreaWidget from './RJSFWidget/CatchmentAreaWidget';
+
 import {
   calculateAgeFromDate,
   toPascalCase,
@@ -729,6 +731,8 @@ const DynamicForm = ({
     CustomRadioWidget,
     CustomTextFieldWidget,
     CustomFileUpload,
+    //custom widget
+    CatchmentAreaWidget,
   };
 
   // Custom field for Guardian Information Note
@@ -1962,8 +1966,11 @@ const DynamicForm = ({
     if (!submitted) {
       updatedError = updatedError.filter((error) => error.name !== 'pattern');
     }
+    return updatedError.filter(
+      (err) => !err.property.startsWith(".catchment_area")
+    );
     // console.log('########### issue debug updatedError 123 ', JSON.stringify(updatedError));
-    return updatedError;
+    // return updatedError;
   };
 
   return (
