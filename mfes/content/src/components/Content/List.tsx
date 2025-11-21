@@ -348,7 +348,7 @@ export default function Content(props: Readonly<ContentProps>) {
           limit: adjustedLimit,
           signal: controller.signal,
           primaryCategory: [
-            'Learning Resource','Practice Question Set','Activity','Story'],
+            'Learning Resource','Practice Question Set','Activity','Story' ,'Interactive'],
         });
 
         setTotalCount(resultResponse2?.result?.count);
