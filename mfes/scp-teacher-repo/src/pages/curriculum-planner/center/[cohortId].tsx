@@ -215,6 +215,7 @@ const CoursePlannerDetail = () => {
       const userProjectDetailsResponse = await getUserProjectDetails({
         id: courseId,
       });
+      console.log('userProjectDetailsResponse', userProjectDetailsResponse);
       setUserProjectDetails(userProjectDetailsResponse?.result);
       setLoading(false);
     } catch (error) {
