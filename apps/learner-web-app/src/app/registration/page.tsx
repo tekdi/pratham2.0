@@ -6,6 +6,7 @@ import { Suspense } from 'react';
 import RegisterUser from './RegisterUser';
 import Layout from '../../components/Layout';
 import Header from '@learner/components/Header/Header';
+import RegisterationFlow from './RegisterationFlow';
 
 type UserAccount = {
   name: string;
@@ -14,7 +15,7 @@ type UserAccount = {
 const registrationPage = () => {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <RegisterUser />
+      <RegisterationFlow />
     </Suspense>
   );
 };
