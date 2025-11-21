@@ -125,6 +125,7 @@ export const ContentSearch = async ({
   limit = 5,
   offset = 0,
   noPrimaryCategory = false,
+  thematicCount = false,
   primaryCategory,
 }: {
   type: string;
@@ -134,8 +135,10 @@ export const ContentSearch = async ({
   offset?: number;
   noPrimaryCategory?: boolean;
   primaryCategory?: string[];
+  thematicCount?:boolean;
 }): Promise<ContentResponse> => {
   try {
+    console.log('filters====>' , filters);
     // Ensure the environment variable is defined
     const searchApiUrl = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;
     if (!searchApiUrl) {
@@ -152,7 +155,7 @@ export const ContentSearch = async ({
       status: ['live'],
       channel: localStorage.getItem('channelId'),
     };
-    if(primaryCategory){
+    if(primaryCategory && thematicCount){
       filtersObject.primaryCategory = primaryCategory;
     }
     console.log('filtersObject====>' , filters);
