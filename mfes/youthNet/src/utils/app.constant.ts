@@ -155,6 +155,21 @@ export enum RoleId {
   ADMIN = '4a3493aa-a4f7-4e2b-b141-f213084b5599',
 }
 
+export enum TenantName {
+  SECOND_CHANCE_PROGRAM = 'Second Chance Program',
+  YOUTHNET = 'Vocational Training',
+  POS = 'Open School',
+  PRAGYANPATH = 'Pragyanpath',
+  CAMP_TO_CLUB = 'Camp to Club',
+  LEARNING_AND_DEVELOPMENT = 'Learning and Development',
+}
+
+export enum FilterKey {
+  GROUP_MEMBERSHIP = 'groupMembership',
+  JOB_FAMILY = 'jobFamily',
+  PSU = 'psu',
+}
+
 export enum Pagination {
   ITEMS_PER_PAGE = 10,
   MAX_ITEMS = 50,

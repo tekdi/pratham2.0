@@ -117,6 +117,16 @@ function generateSchemaAndUISchema(fields) {
       schemaField.uniqueItems = validation.isMultiSelect;
       schemaField.type = 'array';
     }
+    //custom validation json to array
+    if (name === 'catchment_area') {
+      schemaField.type = 'array';
+      schemaField.field_type = 'text';
+      schemaField.items = {
+        type: 'string',
+        enum: ['Select'],
+        enumNames: ['Select'],
+      };
+    }
     if (validation?.isRequired) {
       schemaField.isRequired = validation.isRequired;
       isRequired = validation.isRequired;
@@ -231,6 +241,18 @@ function generateSchemaAndUISchema(fields) {
     } else if (type === 'dateTime') {
       schemaField.format = 'date-time';
       uiSchema[name] = { 'ui:widget': 'dateTime' };
+    } else if (type === 'json') {
+      if (name === 'catchment_area') {
+        uiSchema[name] = {
+          'ui:widget': 'CatchmentAreaWidget',
+          'ui:options': {
+            hideError: true, // ✅ hides automatic error rendering
+            skipValidation: true,
+          },
+        };
+      } else {
+        uiSchema[name] = { 'ui:widget': 'CustomTextFieldWidget' };
+      }
     } else {
       uiSchema[name] = {
         'ui:widget': 'CustomTextFieldWidget',

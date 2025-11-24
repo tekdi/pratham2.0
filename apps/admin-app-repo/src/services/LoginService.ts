@@ -87,7 +87,32 @@ export const getTenantInfo = async (): Promise<any> => {
   const apiUrl = API_ENDPOINTS.program;
   try {
     const response = await axios.get(apiUrl);
-    return response?.data;
+    const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+    const matchingTenants =
+      response?.data?.result?.filter((tenant: any) =>
+        tenant?.params?.uiConfig?.enable_domain?.includes(currentOrigin)
+      ) || [];
+    const programsData =
+      matchingTenants.flatMap((t: any) => t?.children || []) || [];
+    console.log("programsData", programsData)
+    return { result: programsData };
+  } catch (error) {
+    console.error('Error in fetching tenant info', error);
+    throw null;
+  }
+};
+
+export const getPrathamTenantId = async (): Promise<any> => {
+  const apiUrl = API_ENDPOINTS.program;
+  try {
+    const response = await axios.get(apiUrl);
+    const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+    const matchingTenants =
+      response?.data?.result?.filter((tenant: any) =>
+        tenant?.params?.uiConfig?.enable_domain?.includes(currentOrigin)
+      ) || [];
+      return matchingTenants[0]?.tenantId;
+  
   } catch (error) {
     console.error('Error in fetching tenant info', error);
     throw null;

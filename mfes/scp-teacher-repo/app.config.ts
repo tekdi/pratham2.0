@@ -74,14 +74,12 @@ export const DaysOfWeek = {
 
 export const Program = ['Second Chance'];
 
-export const tenantId =
-  typeof window !== 'undefined' && localStorage.getItem('tenantId');
-
-if (!tenantId && typeof window !== 'undefined') {
-  console.warn(
-    'NEXT_PUBLIC_TENANT_ID is not set in the environment variables.'
-  );
-}
+export const getTenantId = (): string | null => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('tenantId');
+  }
+  return null;
+};
 
 export const frameworkId = process.env.NEXT_PUBLIC_FRAMEWORK_ID || '';
 if (!frameworkId) {
