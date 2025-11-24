@@ -79,8 +79,46 @@ export default function LandingPage() {
     }
   };
 
-  const handleLogin = () => {
-    router.push('/login');
+    const handleLogin = () => {
+      router.push('/login');
+    };
+
+  const handlePragyanpath = () => {
+    const program = programs.find((p) =>
+      p.name.toLowerCase().includes('pragyanpath')
+    );
+    if (program) {
+      if (program?.params?.uiConfig?.sso?.length > 0) {
+        const ssoOption = program?.params?.uiConfig?.sso?.find((option: any) => {
+          const currentDomain =
+            typeof window !== 'undefined' ? window.location.origin : '';
+          return option?.enable_domain?.includes(currentDomain);
+        });
+
+        if (ssoOption) {
+          if (typeof window !== 'undefined' && window.localStorage) {
+            localStorage.setItem(
+              'landingPage',
+              program?.params?.uiConfig?.landingPage
+            );
+            localStorage.setItem('userProgram', program?.name);
+            const uiConfig = program?.params?.uiConfig || {};
+            localStorage.setItem('uiConfig', JSON.stringify(uiConfig));
+          }
+          // Construct SSO URL with callback parameters
+          const currentBaseUrl =
+            typeof window !== 'undefined' ? window.location.origin : '';
+          const callbackUrl = `${currentBaseUrl}/sso?env=newton&tenantid=${program?.tenantId}`;
+          const encodedCallbackUrl = callbackUrl;
+          // encodeURIComponent(callbackUrl);
+          // roleId
+          const ssoUrl = `${ssoOption?.url}?callbackurl=${encodedCallbackUrl}`;
+
+          // Open SSO URL in new tab
+          window.open(ssoUrl, '_blank');
+        }
+      }
+    }
   };
 
   const aboutPrathamText =
@@ -191,15 +229,53 @@ export default function LandingPage() {
                   variant="body2"
                   sx={{
                     color: '#fff',
-                    cursor: 'pointer',
-                    textDecoration: 'underline',
-                    '&:hover': {
-                      textDecoration: 'none',
-                    },
+                    display: 'inline',
                   }}
-                  onClick={handleLogin}
                 >
-                  Already signed up? Click here to login
+                  Already signed up?{' '}
+                  <Typography
+                    component="span"
+                    variant="body2"
+                    sx={{
+                      color: '#fff',
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                      '&:hover': {
+                        textDecoration: 'none',
+                      },
+                    }}
+                    onClick={handleLogin}
+                  >
+                    Click here
+                  </Typography>
+                  {' '}to login
+                </Typography>
+              </Box>
+              <Box sx={{ mt: 1 }}>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: '#fff',
+                    display: 'inline',
+                  }}
+                >
+                  Are you a Pratham Employee?{' '}
+                  <Typography
+                    component="span"
+                    variant="body2"
+                    sx={{
+                      color: '#fff',
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                      '&:hover': {
+                        textDecoration: 'none',
+                      },
+                    }}
+                    onClick={handlePragyanpath}
+                  >
+                  Click here 
+                  </Typography>
+                  {' '}to get access to Pragyanpath
                 </Typography>
               </Box>
             </Box>
@@ -209,41 +285,30 @@ export default function LandingPage() {
         {/* About Pratham Section */}
         <Container maxWidth="xl" disableGutters sx={{ my: { xs: 3, md: 4 }, px: { xs: 2, md: 3 } }}>
           <Grid container spacing={4} alignItems="center">
-            <Grid item xs={12} md={6}>
-              <Box
-                sx={{
-                  position: 'relative',
-                  width: '100%',
-                  height: { xs: '300px', md: '400px' },
-                  borderRadius: '8px',
-                  overflow: 'hidden',
-                }}
-              >
-                <Image
-                  src="/images/about-banner.png"
-                  alt="We offer opportunities"
-                  fill
-                  style={{
-                    objectFit: 'cover',
-                  }}
-                />
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                    color: '#fff',
-                    p: 2,
-                  }}
-                >
-                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                    We offer opportunities
-                  </Typography>
-                </Box>
-              </Box>
-            </Grid>
+          <Grid item xs={12} md={5}>
+                  <Box
+                    sx={{
+                      position: 'relative',
+                      width: '100%',
+                      height: 450,
+                      borderRadius: '24px',
+                      overflow: 'hidden',
+                    //  marginTop: '80px',
+                    }}
+                  >
+                    <iframe
+                      width="100%"
+                      height="100%"
+                      src="https://www.youtube.com/embed/GHDXLXVgH-E?si=96TpyN_qbCfF2V4T"
+                      title="YouTube video player"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      referrerPolicy="strict-origin-when-cross-origin"
+                      allowFullScreen
+                      style={{ borderRadius: '24px' }}
+                    ></iframe>
+                  </Box>
+                </Grid>
             <Grid item xs={12} md={6}>
               <Typography
                 variant="h4"

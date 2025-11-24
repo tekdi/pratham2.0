@@ -285,6 +285,8 @@ const SSOContent = () => {
           (tenant: any) => tenant.tenantId === tenantId
         );
         localStorage.setItem('userId', userResponse?.userId);
+        localStorage.setItem('roleId', roleId);
+
         localStorage.setItem('templtateId', tenantData.templateId);
         localStorage.setItem('userIdName', userResponse?.username);
         localStorage.setItem('firstName', userResponse?.firstName || '');

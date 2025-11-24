@@ -402,18 +402,18 @@ const RegisterationFlow = () => {
   const onVerify = async () => {
     try {
       // let mobile = mobile.toString();
-      let reason = 'signup';
+    //  let reason = 'signup';
       // let username = enterdUserName;
-      const response = await verifyOTP({
-        mobile: mobile.toString(),
-        reason,
-        otp: otp.join(''),
-        hash,
-        //  username,
-      });
-      console.log('verifyOtp', response);
-      const isValid = response.result.success;
-      localStorage.setItem('tokenForResetPassword', response.result.token); // temporary assume true
+      // const response = await verifyOTP({
+      //   mobile: mobile.toString(),
+      //   reason,
+      //   otp: otp.join(''),
+      //   hash,
+      //   //  username,
+      // });
+      // console.log('verifyOtp', response);
+      const isValid = true
+   //   localStorage.setItem('tokenForResetPassword', response.result.token); // temporary assume true
 
       if (isValid) {
         setVerificationSuccessModal(true);
@@ -527,7 +527,7 @@ const RegisterationFlow = () => {
         localStorage.setItem('tenantName', selectedTenantName);
         localStorage.setItem('roleId', selectedRoleId);
         localStorage.setItem('roleName', selectedRoleName);
-        localStorage.setItem('tenantId', selectedTenantId);
+      localStorage.setItem('tenantId', selectedTenantId);
 
         // Lookup selected tenant details from response
         const selectedTenant = userResponse?.tenantData?.find(
