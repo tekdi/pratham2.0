@@ -541,7 +541,8 @@
     "DATE_OF_BIRTH": "Date of Birth",
     "TEST_BELONG_TO": "test belongs to below center",
          "WAS_BELONG_TO": "was archived in the below location",
-    "CONFIRM_TO_ACTIVATE":"Are you sure you want to activate this user again?"
+    "CONFIRM_TO_ACTIVATE":"Are you sure you want to activate this user again?",
+    "CATCHMENT_AREA": "Catchment Area"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "Invalid Input.",
@@ -747,6 +748,7 @@
   "REMOTE": "Remote",
   "IS_VOLUNTEER": "Is Volunteer",
   "middle_name": "Middle Name",
+  "CATCHMENT_AREA": "Catchment Area",
   "CONTENT_CREATORS": {
     "SEARCHBAR_PLACEHOLDER": "Search content creator..",
     "NEW_CONTENT_CREATOR": "New Content Creator",
