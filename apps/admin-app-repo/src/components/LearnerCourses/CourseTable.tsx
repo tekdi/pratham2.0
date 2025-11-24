@@ -207,7 +207,7 @@ const CourseTable: React.FC = () => {
         let response;
         if (searchKeyword !== '')
           response = await courseWiseLernerList({ limit, offset, filters });
-        else response = await courseWiseLernerList({ offset, filters });
+        else response = await courseWiseLernerList({ limit,offset, filters });
         const totalCount = response.count;
         setPageCount(Math.ceil(totalCount / pageLimit));
 
