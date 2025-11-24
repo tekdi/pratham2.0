@@ -449,30 +449,68 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
     const max =
       content_details?.sections?.[sectionIndex]?.questions?.[questionIndex]
         ?.maxScore || 0;
-    const onlyDigits = (textValue || '').replace(/[^0-9]/g, '');
-    if (onlyDigits === '') {
+
+    // Allow only digits and single decimal point
+    const filtered = (textValue || '').replace(/[^0-9.]/g, '');
+
+    // Handle empty input
+    if (filtered === '' || filtered === '.') {
       set_marksTextBySection((prev) => {
         const arr = [...(prev[String(sectionIndex)] || [])];
-        arr[questionIndex] = '';
+        arr[questionIndex] = filtered;
         return { ...prev, [String(sectionIndex)]: arr };
       });
+      if (filtered === '') {
+        set_marksBySection((prev) => {
+          const arr = [...(prev[String(sectionIndex)] || [])];
+          arr[questionIndex] = 0;
+          return { ...prev, [String(sectionIndex)]: arr };
+        });
+      }
+      return;
+    }
+
+    // Prevent multiple decimal points
+    const decimalCount = (filtered.match(/\./g) || []).length;
+    if (decimalCount > 1) return;
+
+    // If input ends with a dot, allow it during typing
+    if (filtered.endsWith('.')) {
+      const beforeDot = filtered.slice(0, -1);
+      const numBeforeDot = Number(beforeDot);
+      // Don't allow if the number before dot already exceeds max
+      if (Number.isFinite(numBeforeDot) && numBeforeDot > max) return;
+
+      set_marksTextBySection((prev) => {
+        const arr = [...(prev[String(sectionIndex)] || [])];
+        arr[questionIndex] = filtered;
+        return { ...prev, [String(sectionIndex)]: arr };
+      });
+      // Update numeric value to the integer part while user is typing decimal
       set_marksBySection((prev) => {
         const arr = [...(prev[String(sectionIndex)] || [])];
-        arr[questionIndex] = 0;
+        arr[questionIndex] = numBeforeDot;
         return { ...prev, [String(sectionIndex)]: arr };
       });
       return;
     }
-    // Normalize leading zeros: "000" -> "0", "0012" -> "12"
-    let normalized = onlyDigits.replace(/^0+/, '');
-    if (normalized === '') normalized = '0';
-    const parsed = Number(normalized);
+
+    const parsed = Number(filtered);
     if (!Number.isFinite(parsed)) return;
-    // Reject values above max: keep previous valid value unchanged
+
+    // Validation: Only allow whole numbers or numbers ending with .5
+    const isValid =
+      /^(\d+\.5|\d+)$/.test(filtered) ||
+      filtered === '0.5' ||
+      filtered === '.5';
+    if (!isValid) return; // Reject invalid decimals like 0.1, 0.2, 1.3, etc.
+
+    // Reject values above max
     if (parsed > max) return;
+
     set_marksTextBySection((prev) => {
       const arr = [...(prev[String(sectionIndex)] || [])];
-      arr[questionIndex] = normalized;
+      arr[questionIndex] = filtered;
       return { ...prev, [String(sectionIndex)]: arr };
     });
     set_marksBySection((prev) => {
@@ -486,19 +524,53 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
     const max =
       content_details?.sections?.[sectionIndex]?.questions?.[questionIndex]
         ?.maxScore || 0;
-    const text =
-      marksTextBySection[String(sectionIndex)]?.[questionIndex] ?? '';
-    if (text === '') {
-      // keep UI empty but ensure numeric is 0
+    let text = marksTextBySection[String(sectionIndex)]?.[questionIndex] ?? '';
+
+    // Handle empty or just dot
+    if (text === '' || text === '.') {
       set_marksBySection((prev) => {
         const arr = [...(prev[String(sectionIndex)] || [])];
         arr[questionIndex] = 0;
         return { ...prev, [String(sectionIndex)]: arr };
       });
+      set_marksTextBySection((prev) => {
+        const arr = [...(prev[String(sectionIndex)] || [])];
+        arr[questionIndex] = '';
+        return { ...prev, [String(sectionIndex)]: arr };
+      });
       return;
     }
+
+    // Handle incomplete input like "2." - convert to whole number
+    if (text.endsWith('.')) {
+      text = text.slice(0, -1);
+    }
+
+    // Normalize ".5" to "0.5"
+    if (text === '.5') {
+      text = '0.5';
+    }
+
     const num = Number(text);
-    const safe = Number.isFinite(num) ? Math.max(0, Math.min(num, max)) : 0;
+
+    // Validate: must be finite, within range, and either whole number or .5 decimal
+    const isValidFormat = /^(\d+\.5|\d+)$/.test(text);
+    if (!Number.isFinite(num) || !isValidFormat) {
+      // Revert to previous valid value (0)
+      set_marksBySection((prev) => {
+        const arr = [...(prev[String(sectionIndex)] || [])];
+        arr[questionIndex] = 0;
+        return { ...prev, [String(sectionIndex)]: arr };
+      });
+      set_marksTextBySection((prev) => {
+        const arr = [...(prev[String(sectionIndex)] || [])];
+        arr[questionIndex] = '0';
+        return { ...prev, [String(sectionIndex)]: arr };
+      });
+      return;
+    }
+
+    const safe = Math.max(0, Math.min(num, max));
     set_marksBySection((prev) => {
       const arr = [...(prev[String(sectionIndex)] || [])];
       arr[questionIndex] = safe;
@@ -641,12 +713,11 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
 
       const result = await createContentTracking({
         userId: userId,
-        contentId: do_id, 
+        contentId: do_id,
         courseId: parentId,
         unitId: unitId,
-        totalScore: totalScore
+        totalScore: totalScore,
       });
-
     } catch (error) {
       console.error('API error while creating assessment tracking:', error);
       set_isSubmitting(false);
@@ -941,8 +1012,7 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
                         <label style={{ fontWeight: 500 }}>Marks:</label>
                         <input
                           type="text"
-                          inputMode="numeric"
-                          pattern="[0-9]*"
+                          inputMode="decimal"
                           min={0}
                           max={q.maxScore}
                           value={
@@ -954,11 +1024,7 @@ const QuestionMarksManualUpdate: React.FC<QuestionMarksManualUpdateProps> = ({
                             marksBySection[String(si)]?.[qi] ?? 0
                           )}
                           onChange={(e) => {
-                            const onlyDigits = e.target.value.replace(
-                              /[^0-9]/g,
-                              ''
-                            );
-                            handleMarksTextChange(si, qi, onlyDigits);
+                            handleMarksTextChange(si, qi, e.target.value);
                           }}
                           onBlur={() => handleMarksBlur(si, qi)}
                           style={{ width: 80 }}

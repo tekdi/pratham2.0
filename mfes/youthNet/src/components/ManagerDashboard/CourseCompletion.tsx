@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Paper, Stack } from '@mui/material';
+import { Box, Typography, Paper, Stack, useMediaQuery } from '@mui/material';
 import {
   PieChart,
   Pie,
@@ -27,6 +27,7 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
   nonMandatoryCourses,
 }) => {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const prepareMandatoryData = (): ChartDataItem[] => {
     const completed = mandatoryCourses.filter(course => course.status === 'completed').length;
     const inProgress = mandatoryCourses.filter(course => course.status === 'inprogress').length;
@@ -61,21 +62,25 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
   };
   const renderDonutChart = (data: ChartDataItem[], title: string) => {
     const backgroundData = [{ value: 100 }];
+    // Responsive radius values: smaller for mobile, original for desktop
+    const innerRadius = isMobile ? 38 : 48;
+    const outerRadius = isMobile ? 55 : 68;
+    
     return (
-      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <Typography variant="body2" fontWeight={500} color="text.secondary" gutterBottom sx={{ mb: { xs: 1, sm: 2 }, fontSize: { xs: '0.875rem', sm: '0.875rem' } }}>
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, maxWidth: '100%' }}>
+        <Typography variant="body2" fontWeight={500} color="text.secondary" gutterBottom sx={{ mb: { xs: 1, sm: 2 }, fontSize: { xs: '0.875rem', sm: '0.875rem' }, flexShrink: 0 }}>
           {title}
         </Typography>
-        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row', lg: 'row' }, alignItems: 'center', gap: { xs: 1.5, sm: 2, lg: 1.5 } }}>
-          <Box sx={{ position: 'relative', height: { xs: 120, sm: 150, lg: 130, xl: 150 }, width: { xs: 120, sm: 150, lg: 130, xl: 150 }, flexShrink: 0 }}>
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row', lg: 'row' }, alignItems: 'center', gap: { xs: 1.5, sm: 2, lg: 1.5 }, width: '100%', minWidth: 0, flex: 1 }}>
+          <Box sx={{ position: 'relative', height: { xs: 120, sm: 150, lg: 130, xl: 140 }, width: { xs: 120, sm: 150, lg: 130, xl: 140 }, flexShrink: 0 }}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={backgroundData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={48}
-                  outerRadius={68}
+                  innerRadius={innerRadius}
+                  outerRadius={outerRadius}
                   dataKey="value"
                   startAngle={0}
                   endAngle={360}
@@ -85,8 +90,8 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
                   data={data}
                   cx="50%"
                   cy="50%"
-                  innerRadius={48}
-                  outerRadius={68}
+                  innerRadius={innerRadius}
+                  outerRadius={outerRadius}
                   dataKey="value"
                   startAngle={90}
                   endAngle={-270}
@@ -105,7 +110,7 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
                 textAlign: 'center',
-                width: '80px',
+                width: { xs: '60px', sm: '80px' },
               }}
             >
               {/* <Typography variant="caption" color="text.secondary" sx={{ fontSize: '9px', textTransform: 'uppercase', lineHeight: 1.2 }}>
@@ -113,14 +118,14 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
               </Typography> */}
             </Box>
           </Box>
-          <Stack spacing={1} sx={{ flex: 1 }}>
+          <Stack spacing={1} sx={{ flex: 1, minWidth: 0 }}>
             {data.map((item, index) => (
               <Stack
                 key={index}
                 direction="row"
                 alignItems="center"
                 spacing={1}
-                sx={{ cursor: 'pointer' }}
+                sx={{ minWidth: 0 }}
               >
                 <Box
                   sx={{
@@ -134,9 +139,10 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
                 <Typography
                   variant="body2"
                   sx={{
-                    textDecoration: 'underline',
                     color: theme.palette.primary.main,
                     fontSize: { xs: '12px', sm: '13px', lg: '12px', xl: '13px' },
+                    minWidth: 0,
+                    wordBreak: 'break-word'
                   }}
                 >
                   {item.name} : {item.value}
@@ -149,11 +155,26 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
     );
   };
   return (
-    <Paper elevation={0} sx={{ p: { xs: 1.5, sm: 2 }, border: '1px solid #E0E0E0', borderRadius: 2 }}>
-      <Typography variant="subtitle1" fontWeight={600} gutterBottom sx={{ fontSize: { xs: '1rem', sm: '1.125rem' } }}>
+    <Paper elevation={0} sx={{ p: { xs: 1.5, sm: 2 }, border: '1px solid #E0E0E0', borderRadius: 2, height: '100%', display: 'flex', flexDirection: 'column', overflowX: 'hidden', overflowY: 'visible' }}>
+      <Typography variant="subtitle1" fontWeight={600} gutterBottom sx={{ fontSize: { xs: '1rem', sm: '1.125rem' }, flexShrink: 0 }}>
         Course Completion
       </Typography>
-      <Stack direction={{ xs: 'column', sm: 'column', lg: 'row', xl: 'row' }} spacing={{ xs: 2, sm: 2, lg: 2.5, xl: 3 }} sx={{ mt: 2 }}>
+      <Stack 
+        direction={{ xs: 'column', sm: 'column', lg: 'row', xl: 'row' }} 
+        spacing={{ xs: 2, sm: 2, lg: 2, xl: 2.5 }} 
+        sx={{ 
+          mt: 2,
+          flex: 1,
+          minHeight: 0,
+          width: '100%',
+          alignItems: { xs: 'stretch', sm: 'stretch', lg: 'flex-start', xl: 'flex-start' },
+          '& > *': {
+            flex: { lg: '1 1 auto', xl: '1 1 auto' },
+            minWidth: 0,
+            maxWidth: { lg: 'calc(50% - 4px)', xl: 'calc(50% - 5px)' }
+          }
+        }}
+      >
         {renderDonutChart(prepareMandatoryData(), 'Mandatory Courses')}
         {renderDonutChart(prepareNonMandatoryData(), 'Non Mandatory Courses')}
       </Stack>

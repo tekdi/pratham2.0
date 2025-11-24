@@ -125,6 +125,8 @@ export const ContentSearch = async ({
   limit = 5,
   offset = 0,
   noPrimaryCategory = false,
+  thematicCount = false,
+  primaryCategory,
 }: {
   type: string;
   query?: string;
@@ -132,8 +134,11 @@ export const ContentSearch = async ({
   limit?: number;
   offset?: number;
   noPrimaryCategory?: boolean;
+  primaryCategory?: string[];
+  thematicCount?:boolean;
 }): Promise<ContentResponse> => {
   try {
+    console.log('filters====>' , filters);
     // Ensure the environment variable is defined
     const searchApiUrl = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;
     if (!searchApiUrl) {
@@ -150,7 +155,10 @@ export const ContentSearch = async ({
       status: ['live'],
       channel: localStorage.getItem('channelId'),
     };
-   // console.log('filtersObject====>', filtersObject?.primaryCategory);
+    if(primaryCategory && thematicCount){
+      filtersObject.primaryCategory = primaryCategory;
+    }
+    console.log('filtersObject====>' , filters);
 
     // Only add primaryCategory if noPrimaryCategory is false and primaryCategory is not already set
     if (!noPrimaryCategory && !filtersObject.primaryCategory) {
@@ -161,6 +169,7 @@ export const ContentSearch = async ({
           ? ['Activity', 'Story']
           : ['Learning Resource', 'Practice Question Set'];
     }
+   // console.log('filtersObject====>', filtersObject);
 
     const data = {
       request: {
