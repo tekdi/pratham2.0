@@ -17,6 +17,7 @@ import CustomSingleSelectWidget from './RJSFWidget/CustomSingleSelectWidget';
 import CustomRadioWidget from './RJSFWidget/CustomRadioWidget';
 import CustomTextFieldWidget from './RJSFWidget/CustomTextFieldWidget';
 import CustomFileUpload from './RJSFWidget/CustomFileUpload';
+import CustomCenterListWidget from './RJSFWidget/CustomCenterListWidget';
 import CatchmentAreaWidget from './RJSFWidget/CatchmentAreaWidget';
 
 import {
@@ -731,6 +732,7 @@ const DynamicForm = ({
     CustomRadioWidget,
     CustomTextFieldWidget,
     CustomFileUpload,
+    CustomCenterListWidget,
     //custom widget
     CatchmentAreaWidget,
   };
@@ -1674,7 +1676,7 @@ const DynamicForm = ({
         // Keep the existing username value when username field is disabled
         formData.username = prevFormData.current.username;
       }
-      
+
       prevFormData.current = formData;
       // console.log('Form data changed:', formData);
       // live error
