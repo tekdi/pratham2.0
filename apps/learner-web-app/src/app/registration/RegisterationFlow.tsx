@@ -527,7 +527,7 @@ const RegisterationFlow = () => {
         localStorage.setItem('tenantName', selectedTenantName);
         localStorage.setItem('roleId', selectedRoleId);
         localStorage.setItem('roleName', selectedRoleName);
-        localStorage.setItem('tenantId', selectedTenantId);
+      localStorage.setItem('tenantId', selectedTenantId);
 
         // Lookup selected tenant details from response
         const selectedTenant = userResponse?.tenantData?.find(
