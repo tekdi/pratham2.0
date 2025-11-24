@@ -30,7 +30,6 @@ import LayoutPage from '@content-mfes/components/LayoutPage';
 import { getUserCertificates } from '@content-mfes/services/Certificate';
 import { getUserId } from '@shared-lib-v2/utils/AuthService';
 import { telemetryFactory } from '@shared-lib-v2/DynamicForm/utils/telemetry';
-import { TenantName } from '@shared-lib-v2/utils/app.constant';
 
 // Constants
 const SUPPORTED_MIME_TYPES = [
@@ -158,7 +157,7 @@ export default function Content(props: Readonly<ContentProps>) {
   const [propData, setPropData] = useState<ContentProps>();
   const [currentLimit, setCurrentLimit] = useState<number>(LIMIT);
   const abortControllerRef = useRef<AbortController | null>(null);
- 
+
   // Session keys
   const sessionKeys = {
     filters: `${props?.pageName}_savedFilters`,
@@ -302,63 +301,22 @@ export default function Content(props: Readonly<ContentProps>) {
         ? filter.offset + filter.limit
         : filter.limit;
       const adjustedOffset = filter.loadOld ? 0 : filter.offset;
-      let resultResponse;
-      // if((props.filters as any)?.filters?.program===TenantName.CREATIVITY_CLUB){
-      //   if (!filter.filters) {
-      //     filter.filters = {};
-      //   }
-      //   (filter.filters as any).primaryCategory = ['Course'];
-      // }
-      if(props.onTotalCountChange)
-      {
-        //console.log("hellooo")
-        // filter.primaryCategory = [
-        //     'Learning Resource','Practice Question Set','Activity','Story'];
-        console.log("filter====>" , filter);
 
-        resultResponse = await ContentSearch({
-          ...filter,
-          offset: adjustedOffset,
-          limit: adjustedLimit,
-          signal: controller.signal,
-          primaryCategory: ['Course'],
-        });
-      }
-      else{        
+      const resultResponse = await ContentSearch({
+        ...filter,
+        offset: adjustedOffset,
+        limit: adjustedLimit,
+        signal: controller.signal,
+      });
 
-        resultResponse = await ContentSearch({
-          ...filter,
-          offset: adjustedOffset,
-          limit: adjustedLimit,
-          signal: controller.signal,
-        });
-
-      }
-      
-
-      if(props.onTotalCountChange) {
-         console.log("hellooo")
-        // filter.primaryCategory = [
-        //     'Learning Resource','Practice Question Set','Activity','Story'];
-        console.log("filter====>" , filter);
-       const resultResponse2 = await ContentSearch({
-          ...filter,
-          offset: adjustedOffset,
-          limit: adjustedLimit,
-          signal: controller.signal,
-          thematicCount: true,
-          primaryCategory: [
-            'Learning Resource','Practice Question Set','Activity','Story' ,'Interactive'],
-        });
-
-        setTotalCount(resultResponse2?.result?.count);
-      }
-        if(props.setTotalResources && resultResponse?.result?.count)
+      if (resultResponse?.result?.count) {
+        setTotalCount(resultResponse?.result?.count);
+        if(props.setTotalResources)
         {
           props.setTotalResources(resultResponse?.result?.count);
         }
      
-      
+      }
 
       const response = resultResponse?.result;
       if (props?._config?.getContentData) {

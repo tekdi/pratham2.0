@@ -362,7 +362,7 @@ export const genericEditorReviewFormResponse = {
                         ],
                         "placeholder": "Content Language",
                         "renderingHints": {},
-                        "required": true,
+                        "required": false,
                         "visible": true
                     },
                     {

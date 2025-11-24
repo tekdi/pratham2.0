@@ -223,6 +223,7 @@ const Profile: React.FC<ProfileDetailsProps> = ({
               {t('SCP_PROFILE.SUBJECTS_I_TEACH')}
             </Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+              '{' '}
               {subjectsITeach.map((subject) => {
                 // const isHighlighted = mainSubjectIds.has(subject.id);
                 return (
@@ -249,7 +250,7 @@ const Profile: React.FC<ProfileDetailsProps> = ({
                   </Box>
                 );
               })}
-              
+              '
             </Box>
           </Box>
         ) : null}

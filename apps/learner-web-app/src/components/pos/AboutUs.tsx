@@ -263,28 +263,26 @@ const AboutUsPage = () => {
         >
           <Box
             sx={{
-             // background: '#FDBE16',
+              background: '#FDBE16',
               padding: '4px 8px',
               borderRadius: '10px',
               margin: '22px auto 0',
               width: 'fit-content',
             }}
           >
-           <Typography
-          variant={mediaMD ? 'h1' : 'body6'}
-          component="h3"
-          sx={{
-            fontFamily: 'Poppins',
-            fontWeight: 700,
-            // fontSize: '36px',
-            lineHeight: '64px',
-            letterSpacing: '-0.25px',
-            color: '#1F1B13',
-            textAlign: 'center',
-          }}
-        >
-          <SpeakableText>Our Learning Pillars</SpeakableText>
-        </Typography>
+            <Typography
+              variant={mediaMD ? 'h1' : 'body9'}
+              component="h2"
+              sx={{
+                fontFamily: 'Poppins',
+                fontWeight: 600,
+                letterSpacing: '0px',
+                textAlign: 'center',
+                color: '#1F1B13',
+              }}
+            >
+              <SpeakableText>Our 3 Pillars</SpeakableText>
+            </Typography>
           </Box>
           <Typography
             variant={mediaMD ? 'h3' : 'h1'}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Card, CardContent, Typography, Grid } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
@@ -45,17 +45,6 @@ const Profile: React.FC<ProfileDetailsProps> = ({
 }) => {
   const { t } = useTranslation();
   const theme = useTheme<any>();
-  const [userProgram, setUserProgram] = useState<string | null>(null);
-  
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      const program = localStorage.getItem('userProgram');
-      setUserProgram(program);
-    }
-  }, []);
-  
-  const isPragyanpath = userProgram === 'Pragyanpath';
-  
   console.log('designation', designation);
   return (
     <Card
@@ -247,7 +236,7 @@ const Profile: React.FC<ProfileDetailsProps> = ({
 
         {/* Location Fields - Separate Display */}
         <Grid container spacing={2}>
-          {!isPragyanpath && state && (
+          {state && (
             <Grid item xs={6}>
               <Typography
                 color={theme.palette.warning['500']}
@@ -265,7 +254,7 @@ const Profile: React.FC<ProfileDetailsProps> = ({
             </Grid>
           )}
           
-          {!isPragyanpath && district && (
+          {district && (
             <Grid item xs={6}>
               <Typography
                 color={theme.palette.warning['500']}
@@ -283,7 +272,7 @@ const Profile: React.FC<ProfileDetailsProps> = ({
             </Grid>
           )}
           
-          {!isPragyanpath && block && designation !== Role.LEAD && (
+          {block && designation !== Role.LEAD && (
             <Grid item xs={6}>
               <Typography
                 color={theme.palette.warning['500']}
