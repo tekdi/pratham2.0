@@ -12,7 +12,7 @@ import {
   TeamLeaderSearchUISchema,
 } from '../constant/Forms/TeamLeaderSearch';
 import { Role, RoleId, Status } from '@/utils/app.constant';
-import { HierarchicalSearchUserList, userList } from '@/services/UserList';
+import { userList } from '@/services/UserList';
 import {
   Box,
   Checkbox,
@@ -178,18 +178,6 @@ const LeaderUser = () => {
       await searchData(formData, 0);
     }
   };
-  const HierarchicalSearchUserListCustom = async (data) => {
-    const { role, tenantId, ...filteredFilters } = data.filters;
-    const newData = {
-      ...data,
-      filters: filteredFilters,
-    };
-    return await HierarchicalSearchUserList({
-      ...newData,
-      role: [Role.TEAM_LEADER],
-      customfields: ['state', 'district', 'block', 'village'],
-    });
-  };
 
   const userDelete = async () => {
     try {
@@ -317,7 +305,7 @@ const LeaderUser = () => {
         setPageOffset,
         setCurrentPage,
         setResponse,
-        HierarchicalSearchUserListCustom,
+        userList,
         staticSort
       );
     }
@@ -347,9 +335,24 @@ const LeaderUser = () => {
       keys: ['STATE', 'DISTRICT', 'BLOCK'],
       label: 'State, District, Block',
       render: (row: any) => {
-        const state = transformLabel(row?.customfield?.state) || '';
-        const district = transformLabel(row?.customfield?.district) || '';
-        const block = transformLabel(row?.customfield?.block) || '';
+        const state =
+          transformLabel(
+            row.customFields.find(
+              (field: { label: string }) => field.label === 'STATE'
+            )?.selectedValues?.[0]?.value
+          ) || '';
+        const district =
+          transformLabel(
+            row.customFields.find(
+              (field: { label: string }) => field.label === 'DISTRICT'
+            )?.selectedValues?.[0]?.value
+          ) || '';
+        const block =
+          transformLabel(
+            row.customFields.find(
+              (field: { label: string }) => field.label === 'BLOCK'
+            )?.selectedValues?.[0]?.value
+          ) || '';
         return `${state == '' ? '' : `${state}`}${
           district == '' ? '' : `, ${district}`
         }${block == '' ? '' : `, ${block}`}`;
@@ -386,6 +389,7 @@ const LeaderUser = () => {
     //     // console.log('row:', row);
     //     // console.log('AddSchema', addSchema);
     //     // console.log('AddUISchema', addUiSchema);
+
     //     let tempFormData = extractMatchingKeys(row, addSchema);
     //     setPrefilledAddFormData(tempFormData);
     //     setIsEdit(true);
@@ -419,6 +423,7 @@ const LeaderUser = () => {
     //         return item;
     //       }
     //     });
+
     //     setVillage(findVillage?.selectedValues[0]?.value);
     //     setUserId(row?.userId);
     //     setOpen(true);
@@ -450,6 +455,7 @@ const LeaderUser = () => {
     //     // console.log('row:', row);
     //     // console.log('AddSchema', addSchema);
     //     // console.log('AddUISchema', addUiSchema);
+
     //     let tempFormData = extractMatchingKeys(row, addSchema);
     //     setPrefilledAddFormData(tempFormData);
     //     setIsEdit(false);
@@ -483,9 +489,12 @@ const LeaderUser = () => {
     //         return item;
     //       }
     //     });
+
     //     // console.log('row:', row?.customFields[2].selectedValues[0].value);
     //     setEditableUserId(row?.userId);
+
     //     setArchiveToActiveOpen(true);
+
     //     setUserId(row?.userId);
     //     const findVillagename = row?.customFields.find((item) => {
     //       if (item.label === 'BLOCK') {
@@ -496,6 +505,7 @@ const LeaderUser = () => {
     //     setUserId(row?.userId);
     //     setFirstName(row?.firstName);
     //     setLastName(row?.lastName);
+
     //     // setReason('');
     //     // setChecked(false);
     //   },
@@ -596,8 +606,6 @@ const LeaderUser = () => {
               width: '200px',
             }}
             onClick={() => {
-              setSelectedUserId(null);
-              setUserDetails(null);
               setMapModalOpen(true);
             }}
           >
@@ -763,8 +771,9 @@ const LeaderUser = () => {
               if (selectedUserId && selectedCenterId) {
                 setIsMappingInProgress(true);
                 try {
-                  const { userData, customFields } = splitUserData(userDetails);
 
+                  const { userData, customFields } = splitUserData(userDetails);
+                  
                   delete userData.email;
 
                   const object = {
@@ -773,78 +782,67 @@ const LeaderUser = () => {
                   };
 
                   //update user details
-                  const updateUserResponse = await updateUser(
-                    selectedUserId,
-                    object
-                  );
+                  const updateUserResponse = await updateUser(selectedUserId, object);
                   // console.log('updatedResponse', updateUserResponse);
-
+        
                   if (
                     updateUserResponse &&
                     updateUserResponse?.data?.params?.err === null
                   ) {
                     // getNotification(editableUserId, profileUpdateNotificationKey);
+                    showToastMessage(t('TEAM_LEADERS.TEAM_LEADER_UPDATED_SUCCESSFULLY'), 'success');
+                    // telemetryCallbacks(telemetryUpdateKey);
+        
+                    //map user to tenant
+                  // Ensure selectedCenterId is a string (handle array case)
+                  const cohortId = Array.isArray(selectedCenterId)
+                    ? selectedCenterId[0]
+                    : selectedCenterId;
+
+                  console.log('Creating with User ID:', selectedUserId);
+                  console.log('Creating with Center ID (cohortId):', cohortId);
+
+                  // Call the cohortmember/create API
+                  const response = await axiosInstance.post(
+                    `${API_ENDPOINTS.cohortMemberCreate}`,
+                    {
+                      cohortId: cohortId,
+                      userId: selectedUserId,
+                    },
+                    {
+                      headers: {
+                        accept: '*/*',
+                        'Content-Type': 'application/json',
+                      },
+                    }
+                  );
+
+                  if (
+                    response?.data?.responseCode === 200 ||
+                    response?.status === 200
+                  ) {
                     showToastMessage(
-                      t('TEAM_LEADERS.TEAM_LEADER_UPDATED_SUCCESSFULLY'),
+                      t('TEAM_LEADERS.TEAM_LEADER_CREATED_SUCCESSFULLY'),
                       'success'
                     );
-                    // telemetryCallbacks(telemetryUpdateKey);
-
-                    //map user to tenant
-                    // Ensure selectedCenterId is a string (handle array case)
-                    const cohortId = Array.isArray(selectedCenterId)
-                      ? selectedCenterId[0]
-                      : selectedCenterId;
-
-                    console.log('Creating with User ID:', selectedUserId);
-                    console.log(
-                      'Creating with Center ID (cohortId):',
-                      cohortId
-                    );
-
-                    // Call the cohortmember/create API
-                    const response = await axiosInstance.post(
-                      `${API_ENDPOINTS.cohortMemberCreate}`,
-                      {
-                        cohortId: cohortId,
-                        userId: selectedUserId,
-                      },
-                      {
-                        headers: {
-                          accept: '*/*',
-                          'Content-Type': 'application/json',
-                        },
-                      }
-                    );
-
-                    if (
-                      response?.data?.responseCode === 200 ||
-                      response?.status === 200
-                    ) {
-                      showToastMessage(
-                        t('TEAM_LEADERS.TEAM_LEADER_CREATED_SUCCESSFULLY'),
-                        'success'
-                      );
-                      // Close dialog
-                      setMapModalOpen(false);
-                      setSelectedCenterId(null);
-                      setSelectedUserId(null);
-                      // Refresh the data
-                      searchData(prefilledFormData, 0);
-                    } else {
-                      showToastMessage(
-                        response?.data?.params?.errmsg ||
-                          t('TEAM_LEADERS.NOT_ABLE_CREATE_TEAM_LEADER'),
-                        'error'
-                      );
-                    }
+                    // Close dialog
+                    setMapModalOpen(false);
+                    setSelectedCenterId(null);
+                    setSelectedUserId(null);
+                    // Refresh the data
+                    searchData(prefilledFormData, 0);
                   } else {
-                    // console.error('Error update user:', error);
                     showToastMessage(
-                      t('TEAM_LEADERS.NOT_ABLE_UPDATE_TEAM_LEADER'),
+                      response?.data?.params?.errmsg ||
+                        t('TEAM_LEADERS.NOT_ABLE_CREATE_TEAM_LEADER'),
                       'error'
                     );
                   }
+                  } else {
+                    // console.error('Error update user:', error);
+                    showToastMessage(t('TEAM_LEADERS.NOT_ABLE_UPDATE_TEAM_LEADER'), 'error');
+                  }
+
                 } catch (error) {
                   console.error('Error creating cohort member:', error);
                   showToastMessage(
@@ -865,7 +863,7 @@ const LeaderUser = () => {
               !selectedUserId || !selectedCenterId || isMappingInProgress
             }
             form="map-user-form"
-            type="submit"
+                  type="submit"
           >
             {t('Map as Team Lead')}
           </Button>

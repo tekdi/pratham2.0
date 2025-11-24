@@ -410,7 +410,6 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
                 if (props?.rowData?.creator || props?.rowData?.author)
                   return (
                     <Typography
-                      className="one-line-text"
                       sx={{ fontSize: '14px', fontWeight: 500 }}
                       variant="body2"
                       color={'#987100'}
@@ -421,7 +420,6 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
                 else
                   return (
                     <Typography
-                      className="one-line-text"
                       sx={{ fontSize: '14px', fontWeight: 500 }}
                       variant="body2"
                       color={'#987100'}

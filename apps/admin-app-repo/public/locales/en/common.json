@@ -163,10 +163,8 @@
     "NO_STATE_LEAD_FOUND": "No State Lead Found",
     "FAQS": "FAQ's",
     "RESET_FILTERS": "Reset Filters",
-    "ACTIVATE_USER": "Activate User",
-    "ACTIVATE": "Activate",
-    "RESIGNED_FROM_COMPANY": "Resigned from the company",
-    "MOVED_TO_DIFFERENT_ROLE":"Moved to a different role"
+        "ACTIVATE_USER": "Activate User",
+    "ACTIVATE": "Activate"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -357,8 +355,8 @@
     "ADD_NEW_TOPIC": "Add New Topic",
     "DELETE_PLANNER": "Delete Planner",
     "CSV_TEMPLATE": "CSV Template",
-    "NEW_TOPIC": "New Topic"
-   
+    "NEW_TOPIC": "New Topic",
+    "DOWNLOAD_CSV": "Download Uploaded CSV"
 
   },
   "MASTER": {

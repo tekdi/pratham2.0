@@ -1,9 +1,8 @@
 import axios from 'axios';
 import { refresh } from './LoginService';
-import { getTenantId } from '../../app.config';
+import { tenantId } from '../../app.config';
 
 const instance = axios.create();
-console.log('tenantId=====>', getTenantId());
 
 const refreshToken = async () => {
   const refresh_token = localStorage.getItem('refreshToken');
@@ -38,7 +37,7 @@ instance.interceptors.request.use(
     }
     // config.headers.tenantid = '4783a636-1191-487a-8b09-55eca51b5036';
     // config.headers.tenantid = 'fbe108db-e236-48a7-8230-80d34c370800';
-    config.headers.tenantid = getTenantId();
+    config.headers.tenantid = tenantId;
     return config;
   },
   (error) => {

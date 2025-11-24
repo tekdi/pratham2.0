@@ -134,7 +134,6 @@
     "SKILLING_CENTERS": "Skilling Centers",
     "SKILLING_CENTERS_NEAR_YOU": "Skilling Center Near You",
     "RETURN_TO_LOGIN": "Return to Login",
-    "GO_TO_HOME":"Go to Home",
     "YOU_DONT_HAVE_PERMISSION_TO_ACCESS_THIS_PAGE": "You don't have access to this page",
     "ACCESS_DENIED": "Access Denied",
     "WELCOME": "Welcome",
@@ -149,7 +148,7 @@
     "UNAUTHORIZED":"You are not authorized to access this site",
     "For Children": "For Children",
     "Self": "Self",
-     "FINISH_ENROLL": "Finish Enroll",
+
     "STATUS": {
       "completed": "Completed",
       "in_progress": "In Progress",
@@ -178,8 +177,7 @@
       "COMPLETE_PROFILE_TITLE": "Complete Your Profile",
       "BACKGROUND_HELP_TEXT": "Help us with your background & other details",
       "INVALID_LINK": "Invalid Link",
-      "FUTURE_WORK": "What do you want to become?",
-      "ENROLL_IN_TO": "Enroll in to"
+      "FUTURE_WORK": "What do you want to become?"
     },
     "COMMON": {
       "L1_COURSES": "L1 Courses",
@@ -199,8 +197,7 @@
       "LOADING": "Loading..",
       "SKILLING_CENTERS": "Skilling Centers",
       "HOME": "Home",
-      "KNOWLEDGE_BANK": "Knowledge Bank",
-      "REACHOUT_TO_MENTOR": "Reach out to your mentor"
+      "KNOWLEDGE_BANK": "Knowledge Bank"
 
     },
     "COURSE": {
@@ -234,12 +231,7 @@
       "OUR_PROGRAMS": "Our Programs",
       "SIGN_UP": "Sign Up",
       "SIGN_IN": "Sign In",
-      "Login with Newton ERP": "Login with Newton ERP",
-      "DISCOVER_LEARNING_OPPORTUNITIES":"Discover learning opportunities and sign up for programs that match your goals",
-      "ENROLL": "Enroll",
-      "ENROLLING": "Enrolling...",
-      "ACCESS_PROGRAM": "Access Program",
-      "ACCESSING_PROGRAM": "Accessing Program..."
+      "Login with Newton ERP": "Login with Newton ERP"
     },
     "LOGIN": {
       "welcome_title": "Welcome to Pratham myLearning!",
@@ -366,9 +358,7 @@
       "CLICK_HERE_TO_LOGIN": "Click here to login",
       "TELL_US_ABOUT_YOURSELF": "1/2 Tell us about yourself",
       "CONTINUE": "Continue",
-      "INVALID_LINK": "Invalid Link",
-      "GET_STARTED_WITH_YOUR_LEARNING_JOURNEY_NOW": "Get Started With Your Learning Journey Now!",
-      "CREATE_ACCOUNT_TO_PROGRAMS":"Create your account to explore and access all our learning programs, Anytime"
+      "INVALID_LINK": "Invalid Link"
     },
     "RESET_PASSWORD_FORM": {
       "OLD_PASSWORD": "Old Password",
@@ -409,10 +399,6 @@
       "ERROR_GENERAL": "An error occurred during SSO authentication",
       "ERROR_MISSING_PARAMS": "Missing required parameters",
       "ERROR_AUTH_FAILED": "Authentication failed"
-    },
-    "PROGRAMS": {
-      "EXPLORE_PROGRAMS": "Explore Programs",
-      "MY_PROGRAMS": "My Programs"
     }
   },
   "Login with Newton ERP": "Login with Newton ERP",
@@ -516,7 +502,6 @@
   "family_member_details": "Family Member Details",
   "SPOUSE_NAME": "Spouse Name",
   "FATHER_NAME": "Father Name",
-  "GUARDIAN_INFORMATION_NOTE": "Guardian Information - This section should be filled up by a parent or guardian",
   "FORGOT_PASSWORD": {
     "TITLE": "Trouble with logging in?",
     "SUBTITLE": "No worries, we’ll help you get back to your account",
@@ -836,7 +821,6 @@
     "NO_ASSESSMENT_TYPE_FOUND":"No Assessment Type Found",
     "IMAGE_UPLOADED": "Image Uploaded",
     "VIEW": "View",
-    "REUPLOAD": "Reupload",
-    "FORMAT_JPG_SIZE_MB_UP_TO_IMAGES": "* Format: jpg, jpeg. Size: {{mb}} MB Up to {{count}} images"
+    "REUPLOAD": "Reupload"
   }
 }

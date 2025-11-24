@@ -319,28 +319,6 @@ export const MENU_CONFIG = {
     },
   },
   [TenantName.PRAGYANPATH]: {
-    manageUsers: {
-      title: 'SIDEBAR.MANAGE_USERS',
-      icon: '/images/group.svg',
-      roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
-      subMenu: [
-        {
-          title: 'SIDEBAR.LEARNERS',
-          link: '/youth',
-          roles: [Role.ADMIN, Role.CENTRAL_ADMIN], // yet to come
-        },
-        {
-          title: 'SIDEBAR.CONTENT_CREATOR',
-          link: '/content-creator',
-          roles: [Role.CENTRAL_ADMIN],
-        },
-        {
-          title: 'SIDEBAR.CONTENT_REVIEWER',
-          link: '/content-reviewer',
-          roles: [Role.CENTRAL_ADMIN],
-        }
-      ],
-    },
     workspace: {
       title: 'SIDEBAR.WORKSPACE',
       icon: '/images/dashboard.svg',

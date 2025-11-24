@@ -7,15 +7,8 @@ export const getTenantInfo = async (): Promise<any> => {
 
   try {
     const response = await axios.get(apiUrl);
-    const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
-    const matchingTenants =
-      response?.data?.result?.filter((tenant: any) =>
-        tenant?.params?.uiConfig?.enable_domain?.includes(currentOrigin)
-      ) || [];
-    const programsData =
-      matchingTenants.flatMap((t: any) => t?.children || []) || [];
-      console.log("programsData", programsData)
-    return { result: programsData };
+
+    return response?.data;
   } catch (error) {
     console.error('Error in fetching tenant info', error);
     throw null;
@@ -33,21 +26,5 @@ export const FetchDoIds = async (userId: any[]): Promise<any> => {
   } catch (error) {
     console.error('error in login', error);
     throw error;
-  }
-};
-
-export const getPrathamTenantId = async (): Promise<string | null> => {
-  const apiUrl = API_ENDPOINTS.program;
-  try {
-    const response = await axios.get(apiUrl);
-    const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
-    const matchingTenants =
-      response?.data?.result?.filter((tenant: any) =>
-        tenant?.params?.uiConfig?.enable_domain?.includes(currentOrigin)
-      ) || [];
-    return matchingTenants[0]?.tenantId || null;
-  } catch (error) {
-    console.error('Error in fetching tenant info', error);
-    return null;
   }
 };
