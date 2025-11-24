@@ -308,6 +308,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         child: [
           { code: 'Vocational Training', name: TenantName.YOUTHNET },
           { name: 'Second Chance', code: 'SCP' },
+          { name: 'Creativity Club', code: 'Creativity Club' },
         ].map((item: any) => ({
           title: item?.name,
           to: () => {

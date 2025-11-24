@@ -961,7 +961,7 @@ export const getUserFullName = (user?: {
   } else {
     if (typeof window !== 'undefined' && window.localStorage) {
       userData = localStorage.getItem('userData');
-      userData = JSON.parse(userData || '{}');
+      userData = JSON.parse?.(userData || '{}');
     }
   }
 

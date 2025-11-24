@@ -164,7 +164,11 @@
     "NO_ASSIGNED_BOARDS": "No assigned Board for selected Center",
     "NO_ASSIGNED_COURSES": "No assigned Courses for selected Assessment Type",
     "HIGHT-TO_LOW": "High to low",
-    "INPROGRESS": "Continue Previous Submission"
+    "INPROGRESS": "Continue Previous Submission",
+    "COURSES_FOUND": "{{count}} Course Found",
+    "COURSES_FOUND_PLURAL": "{{count}} Courses Found",
+    "ASSESSMENT_TYPE_FOUND": "{{count}} Assessment Type Found",
+    "ASSESSMENT_TYPE_FOUND_PLURAL": "{{count}} Assessment Types Found"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -645,29 +649,6 @@
     "NO_RESOURCES_FOUND": "No resources found",
     "INVALID_RESOURCE": "Invalid Resource"
   },
-  "ASSESSMENTS": {
-    "ASSESSMENTS": "Assessments",
-    "CENTER": "Center",
-    "ASSESSMENT_TYPE": "Assessment Type",
-    "COMPLETED_THE_ASSESSMENT": "learners completed all the assigned assessments",
-    "SUBMITTED_ON": "Submitted On",
-    "CORRECT_ANSWER": "correct answers",
-    "NO_DATA_FOUND": "No data found",
-    "SEARCH_STUDENT": "Search student",
-    "NO_ASSESSMENTS_FOUND": "No assessments found",
-    "ASSESSMENT_STATUS": "Assessment Status",
-    "NOT_STARTED": "Not Started",
-    "IN_PROGRESS": "In Progress",
-    "COMPLETED": "Completed",
-    "MARKS_OBTAINED": "Marks Obtained",
-    "OVERALL_SCORE": "Overall Score",
-    "ASSESSMENT_NOT_STARTED_YET": "Assessment not started yet",
-    "NUMBER_OUT_OF_COMPLETED": "{{completedCount}} out of {{totalCount}} completed",
-    "NO_SUBTOPIC_SELECTED": "No Subtopic selected",
-    "NO_SUBJECT_FOUND": "No Subject found",
-    "NO_ASSIGNED": "No assigned",
-    "OUT_OF": "Out of"
-  },
   "BOARD_ENROLMENT": {
     "BOARD_ENROLLMENT": "Board Enrollment",
     "BOARD_SELECTION": "Board Selection",
@@ -982,7 +963,8 @@
     "NO_ASSESSMENT_TYPE_FOUND":"No Assessment Type Found",
     "IMAGE_UPLOADED": "Image Uploaded",
     "VIEW": "View",
-    "REUPLOAD": "Reupload"
+    "REUPLOAD": "Reupload",
+    "FORMAT_JPG_SIZE_MB_UP_TO_IMAGES": "* Format: jpg, jpeg. Size: {{mb}} MB Up to {{count}} images"
   },
   "UNIT_NAME": "Unit Name",
   "TYPE_OF_CENTER": "Type Of Center",

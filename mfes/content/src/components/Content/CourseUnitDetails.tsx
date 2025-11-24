@@ -73,9 +73,20 @@ export default function Details(props: DetailsProps) {
   useEffect(() => {
     const getDetails = async (identifier: string) => {
       try {
-        const resultHierarchyCourse = await hierarchyAPI(identifier, {
+        const resultHierarchyCourse = await hierarchyAPI(courseId as string, {
           mode: 'edit',
-        });
+        }) as any;
+        const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+        const isThematicPath = currentPath.includes('/themantic');
+        const isPosPath = currentPath.includes('/pos');
+        if(!isThematicPath && !isPosPath && resultHierarchyCourse?.program) {
+        console.log('resultHierarchyCourse=======>', resultHierarchyCourse?.program);
+          if (!resultHierarchyCourse?.program?.includes(localStorage.getItem('userProgram')) && !resultHierarchyCourse.program.includes('Open School'))
+          {
+            router.push('/unauthorized');
+            return;
+          }
+        }
         let resultHierarchy = resultHierarchyCourse;
         console.log('resultHierarchyCourse', resultHierarchyCourse);
         

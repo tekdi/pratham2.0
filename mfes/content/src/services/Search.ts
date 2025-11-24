@@ -124,14 +124,21 @@ export const ContentSearch = async ({
   filters,
   limit = 5,
   offset = 0,
+  noPrimaryCategory = false,
+  thematicCount = false,
+  primaryCategory,
 }: {
   type: string;
   query?: string;
   filters?: object;
   limit?: number;
   offset?: number;
+  noPrimaryCategory?: boolean;
+  primaryCategory?: string[];
+  thematicCount?:boolean;
 }): Promise<ContentResponse> => {
   try {
+    console.log('filters====>' , filters);
     // Ensure the environment variable is defined
     const searchApiUrl = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;
     if (!searchApiUrl) {
@@ -139,22 +146,34 @@ export const ContentSearch = async ({
     }
     // Axios request configuration
 
+    const filtersObject: any = {
+      // identifier: 'do_114228944942358528173',
+      // identifier: 'do_1141652605790289921389',
+      //need below after login user channel for dynamic load content
+      // channel: '0135656861912678406',
+      ...filters,
+      status: ['live'],
+      channel: localStorage.getItem('channelId'),
+    };
+    if(primaryCategory && thematicCount){
+      filtersObject.primaryCategory = primaryCategory;
+    }
+    console.log('filtersObject====>' , filters);
+
+    // Only add primaryCategory if noPrimaryCategory is false and primaryCategory is not already set
+    if (!noPrimaryCategory && !filtersObject.primaryCategory) {
+      filtersObject.primaryCategory =
+        type?.toLowerCase() === 'course' || type?.toLowerCase() === 'self'
+          ? ['Course']
+          : type?.toLowerCase() === 'for children'
+          ? ['Activity', 'Story']
+          : ['Learning Resource', 'Practice Question Set'];
+    }
+   // console.log('filtersObject====>', filtersObject);
+
     const data = {
       request: {
-        filters: {
-          // identifier: 'do_114228944942358528173',
-          // identifier: 'do_1141652605790289921389',
-          //need below after login user channel for dynamic load content
-          // channel: '0135656861912678406',
-          ...filters,
-          status: ['live'],
-          primaryCategory:
-            type?.toLowerCase() === 'course' || type?.toLowerCase() === 'self'
-              ? ['Course']
-              : type?.toLowerCase() === 'for children'?['Activity', 'Story']:['Learning Resource', 'Practice Question Set'],
-         
-          channel: localStorage.getItem('channelId'),
-        },
+        filters: filtersObject,
         fields: [
           'name',
           'appIcon',
