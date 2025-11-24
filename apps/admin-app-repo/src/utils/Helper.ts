@@ -837,3 +837,44 @@ export const isStateDifferent = (
   // Check if every original state exists in current states
   return !originalStates.every((state) => currentStates.includes(state));
 };
+
+const flattenObject = (obj: any, parentKey = "", res: any = {}): any => {
+  for (let key in obj) {
+    if (
+      typeof obj[key] === "object" &&
+      obj[key] !== null &&
+      !Array.isArray(obj[key])
+    ) {
+      flattenObject(obj[key], parentKey ? `${parentKey}.${key}` : key, res);
+    } else {
+      res[parentKey ? `${parentKey}.${key}` : key] = obj[key];
+    }
+  }
+  return res;
+};
+
+// Recursive task extractor (handles children + learningResources)
+export const extractTasks = (tasks: any[], parentId: string | null = null): any[] => {
+  let rows: any[] = [];
+
+  tasks.forEach((task) => {
+    let flatTask = flattenObject(task);
+    flatTask.parentId = parentId;
+    rows.push(flatTask);
+
+    // learning resources
+    if (task.learningResources?.length) {
+      task.learningResources.forEach((lr: any) => {
+        let lrRow = { ...flatTask, ...flattenObject(lr, "learningResource") };
+        rows.push(lrRow);
+      });
+    }
+
+    // recurse into children
+    if (task.children?.length) {
+      rows = rows.concat(extractTasks(task.children, task._id));
+    }
+  });
+
+  return rows;
+};
