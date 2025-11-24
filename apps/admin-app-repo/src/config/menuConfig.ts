@@ -21,7 +21,7 @@ export const MENU_CONFIG = {
       subMenu: [
         {
           title: 'SIDEBAR.TEAM_LEADERS',
-          link: '/leader-user',
+          link: '/team-leader',
           roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
         {
@@ -151,7 +151,7 @@ export const MENU_CONFIG = {
       subMenu: [
         {
           title: 'SIDEBAR.MENTOR_LEADER',
-          link: '/leader-user',
+          link: '/central-head',
           roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
         {
