@@ -53,8 +53,7 @@ const API_ENDPOINTS = {
   userReadWithField: (userId: string | string[]) => `${baseurl}/user/read/${userId}?fieldvalue=false`,
   contentSearchStatus: `${baseurl}/tracking/content/search/status`,
   contentCreate: `${baseurl}/tracking/content/create`,
-  updateCohortUser: (userId: string | string[])=>`${baseurl}/user/v1/cohort/update/${userId}`,
-  userCertificateStatusSearch: `${baseurl}/tracking/user_certificate/status/search`
+  updateCohortUser: (userId: string | string[])=>`${baseurl}/user/v1/cohort/update/${userId}`
 };
 
 export default API_ENDPOINTS;

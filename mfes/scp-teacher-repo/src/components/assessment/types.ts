@@ -10,7 +10,6 @@ export interface UploadOptionsPopupProps {
   onSubmissionSuccess?: () => void;
   isReUploadMode?: boolean;
   setAssessmentTrackingData?: (data: any) => void;
-  customMaxImages?: number;
 }
 
 export interface UploadedImage {

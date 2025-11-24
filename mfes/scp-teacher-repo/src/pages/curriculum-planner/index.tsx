@@ -244,7 +244,6 @@ const CoursePlanner = () => {
         const matchMedium = getMedium.find(
           (item: any) => item.name === mediumNew
         );
-        console.log('matchMedium', matchMedium);
         console.log(matchMedium);
         const getGrades = getOptionsByCategory(frameworks, 'gradeLevel');
         const matchGrade = getGrades.find(
@@ -285,13 +284,10 @@ const CoursePlanner = () => {
               (assoc: any) =>
                 getSubjects.map((item: any) => assoc.code === item?.code)
             );
-            const data=subjectAssociations?.filter(
-              (subject: any) => subject?.status !== "Retired"
-            );
             return {
               courseTypeName: courseType?.name,
               courseType: courseType?.code,
-              subjects: data?.map(
+              subjects: subjectAssociations?.map(
                 (subject: any) => subject?.name
               ),
             };

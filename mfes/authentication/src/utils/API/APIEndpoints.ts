@@ -10,7 +10,6 @@ const API_ENDPOINTS = {
   resetPassword: `${baseurl}/user/reset-password`,
   forgotPassword: `${baseurl}/user/forgot-password`,
   passwordResetLink: `${baseurl}/user/password-reset-link`,
-  program: `${baseurl}/tenant/read`,
 
 };
 

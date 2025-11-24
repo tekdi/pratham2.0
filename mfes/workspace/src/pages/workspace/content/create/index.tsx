@@ -126,7 +126,7 @@ const CreatePage = () => {
         tenantConfig?.QUESTION_SET_FRAMEWORK,
         name
       );
-
+      
       console.log('Question set created successfully:', response);
       const identifier = response?.result?.identifier;
       router.push({
@@ -281,8 +281,8 @@ const CreatePage = () => {
               value={modalName}
               onChange={(e) => {
                 const value = e.target.value;
-                // Allow letters (all languages), combining marks, numbers, spaces, and select punctuation: & ( ) _ - : ; ? , .
-                if (/^[\p{L}\p{M}\p{N} &()_\-:;?,.]*$/u.test(value)) {
+                // Allow letters, numbers, spaces, and select punctuation: & ( ) _ - : ; ? , .
+                if (/^[a-zA-Z0-9 &()_\-:;?,.]*$/.test(value)) {
                   setModalName(value);
                   if (modalNameError) setModalNameError('');
                 } else {

@@ -503,7 +503,6 @@ const Brand = ({
               <SpeakableText>{name}</SpeakableText>
             </Typography>
           )}
-          {_box?.children}
         </>
       )}
     </Box>

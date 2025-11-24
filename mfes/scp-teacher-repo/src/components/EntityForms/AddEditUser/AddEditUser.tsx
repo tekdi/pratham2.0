@@ -55,9 +55,8 @@ const AddEditUser = ({
   hideSubmit,
   setButtonShow,
   isSteeper,
-  parentData=[]
 }) => {
-  console.log("parentData=======>", parentData)
+  console.log("editPrefilledFormData", editPrefilledFormData)
   const [isLoading, setIsLoading] = useState(false);
   const [showAssignmentScreen, setShowAssignmentScreen] =
     useState<boolean>(false);
@@ -130,12 +129,12 @@ const AddEditUser = ({
          // 'ownphonecheck',
         //  'parent_phone',
          // 'preferred_mode_of_learning',
-          //'drop_out_reason',
+          'drop_out_reason',
          // 'work_domain',
         //  'what_do_you_want_to_become',
          // 'guardian_name',
          // 'guardian_relation',
-         // 'dob',
+          'dob',
         ];
       } else {
         keysToRemove = [
@@ -268,20 +267,7 @@ const AddEditUser = ({
     setAlteredSchema(isEditSchema);
     setAlteredUiSchema(isEditUiSchema);
   }, [isEdit, isReassign]);
-  const isBelow18 = (dob: any) => {
-    const birthDate = new Date(dob);
-    const today = new Date();
-  
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-  
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-  
-    return age < 18;
-  };
-  
+
   const FormSubmitFunction = async (formData: any, payload: any) => {
     setPrefilledFormData(formData);
     console.log(formData, 'formdata');
@@ -327,10 +313,6 @@ const AddEditUser = ({
             userData: userData,
             customFields: customFields,
           };
-          if(!isBelow18(userData?.dob)){
-            object.customFields=[...parentData,...customFields]
-          }
-          console.log('object===>', object);
           const updateUserResponse = await updateUser(editableUserId, object);
           // console.log('updatedResponse', updateUserResponse);
 

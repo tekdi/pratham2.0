@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { getTenantId } from '../../app.config';
+import { tenantId } from '../../app.config';
 import API_ENDPOINTS from '@/utils/API/APIEndpoints';
 
 export const getFormRead = async (
@@ -23,7 +23,7 @@ export const getFormRead = async (
         },
         headers: {
           Authorization: `Bearer ${token}`,
-          tenantId: getTenantId(),
+          ...{ tenantId },
         },
       });
       const sortedFields = response?.data?.result.fields?.sort(

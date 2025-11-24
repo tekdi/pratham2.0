@@ -5,7 +5,7 @@ import { Box, Typography, Button, Paper } from '@mui/material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import Image from 'next/image';
 import tada from '../../../public/images/tada.gif';
-const SignupSuccess = ({withProgramName = false}: {withProgramName?: boolean}) => {
+const SignupSuccess = () => {
   return (
     <Box
       display="flex"
@@ -35,7 +35,7 @@ const SignupSuccess = ({withProgramName = false}: {withProgramName?: boolean}) =
       >
         Hurray!
       </Typography>
-     {typeof window !== 'undefined' &&  window.localStorage  && (
+     {typeof window !== 'undefined' &&  window.localStorage && window.localStorage.getItem('userProgram') && (
   <Typography
     sx={{
       fontWeight: 200,
@@ -47,7 +47,7 @@ const SignupSuccess = ({withProgramName = false}: {withProgramName?: boolean}) =
       mb: 3,
     }}
   >
-    {withProgramName ? `You have successfully signed up for ${localStorage.getItem('userProgram')}.` : 'Great job!You have taken the first step in your learning journey with Pratham'}
+    You’ve successfully signed up for {localStorage.getItem('userProgram')}.
   </Typography>
 )}
 

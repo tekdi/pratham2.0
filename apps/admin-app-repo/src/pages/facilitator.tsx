@@ -937,7 +937,6 @@ console.log('response?.result?.getUserDetails',response?.result?.getUserDetails)
           setChecked={setChecked}
           reason={reason}
           setReason={setReason}
-          isForFacilitator={true}
         />
       </ConfirmationPopup>
       <ConfirmationPopup

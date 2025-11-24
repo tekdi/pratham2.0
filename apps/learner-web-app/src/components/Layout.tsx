@@ -12,13 +12,11 @@ import {
   Home,
   AssignmentOutlined,
   Logout,
-  KeyboardArrowDown,
 } from '@mui/icons-material';
 import { useRouter, usePathname } from 'next/navigation';
 import { Box, useMediaQuery, useTheme } from '@mui/material';
 import ProfileMenu from './ProfileMenu/ProfileMenu';
 import ConfirmationModal from './ConfirmationModal/ConfirmationModal';
-import ProgramSwitchModal from './ProgramSwitchModal/ProgramSwitchModal';
 import { checkAuth } from '@shared-lib-v2/utils/AuthService';
 import MuiThemeProvider from '@learner/assets/theme/MuiThemeProvider';
 import { TenantName } from '../utils/app.constant';
@@ -143,7 +141,6 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
   );
   const [anchorEl, setAnchorEl] = useState<any>(null);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
-  const [programSwitchAnchorEl, setProgramSwitchAnchorEl] = useState<HTMLElement | null>(null);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -246,10 +243,29 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
               ? localStorage.getItem('userProgram') ?? ''
               : '',
           _box: {
-            onClick: (event: React.MouseEvent<HTMLElement>) => {
-              // Open program switch dropdown instead of navigating
-              setProgramSwitchAnchorEl(event.currentTarget);
-            },
+            onClick: () =>
+              {
+        //         const tenantName = localStorage.getItem('userProgram') || '';
+        //         if(tenantName=== TenantName.YOUTHNET) {
+        //   router.push('/content');
+        // }
+        // else if (tenantName===TenantName.CAMP_TO_CLUB)
+        // {
+        //   router.push('/courses-contents');
+        // }
+        // else if(tenantName===TenantName.PRAGYANPATH)
+        // {
+        //   router.push('/courses-contents');
+        // }
+        const landingPage = localStorage.getItem('landingPage') || '';
+
+        if (landingPage) {
+          router.push(landingPage);
+        } else {
+          router.push('/content');
+        }
+             },
+
             sx: {
               cursor: 'pointer',
               display: 'flex',
@@ -262,15 +278,6 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
               lineHeight: '28px',
               textAlign: 'center',
             },
-            children: (
-              <KeyboardArrowDown
-                sx={{
-                  fontSize: '20px',
-                  color: '#000',
-                  ml: 0.5,
-                }}
-              />
-            ),
           },
         },
         navLinks: defaultNavLinks,
@@ -302,12 +309,6 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
         }}
         handleCloseModal={handleCloseModel}
         modalOpen={modalOpen}
-      />
-      <ProgramSwitchModal
-        open={Boolean(programSwitchAnchorEl)}
-        anchorEl={programSwitchAnchorEl}
-        onClose={() => setProgramSwitchAnchorEl(null)}
-        onSignOut={handleLogoutModal}
       />
     </Layout>
   );
