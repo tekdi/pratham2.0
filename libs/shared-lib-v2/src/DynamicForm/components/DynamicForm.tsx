@@ -4,7 +4,7 @@ import Form from '@rjsf/mui';
 import validator from '@rjsf/validator-ajv8';
 import axios from 'axios';
 import Grid from '@mui/material/Grid';
-import { Box, Alert } from '@mui/material';
+import { Box } from '@mui/material';
 import { TextField, Container, Typography } from '@mui/material';
 import { Layout as SharedLayout } from '@shared-lib';
 import _ from 'lodash'; // Lodash for deep comparison
@@ -24,7 +24,6 @@ import {
 } from '../utils/Helper';
 import { CustomObjectFieldTemplate } from './FormTemplate/ObjectFieldTemplate';
 import { useTranslation } from '../../lib/context/LanguageContext';
-import SecurityIcon from '@mui/icons-material/Security';
 
 // import { useTranslation } from '@shared-lib'; // Updated import
 const DynamicForm = ({
@@ -209,29 +208,6 @@ const DynamicForm = ({
     }
   }, [formUiSchema]);
 
-  // Helper function to reorder fields in UI schema
-  const reorderUiSchemaFields = (uiSchema: any, moveField: any, afterField: any) => {
-    if (!uiSchema['ui:order']) {
-      return uiSchema;
-    }
-    const order = [...uiSchema['ui:order']];
-    const filteredOrder = order.filter((item) => item !== moveField);
-    const index = filteredOrder.indexOf(afterField);
-    
-    if (index !== -1) {
-      filteredOrder.splice(index + 1, 0, moveField);
-    }
-
-    return {
-      ...uiSchema,
-      'ui:order': filteredOrder,
-    };
-  };
-
-  // Store original mobile field configuration
-  const originalMobileSchemaRef = useRef(null);
-  const originalMobileUiSchemaRef = useRef(null);
-
   //custom validation on formData for learner fields hide on dob
   useEffect(() => {
     if (type == 'learner' && !isReassign) {
@@ -280,14 +256,6 @@ const DynamicForm = ({
         }
       }
 
-      // Store original mobile field configuration
-      if (schemaa.properties.mobile && !originalMobileSchemaRef.current) {
-        originalMobileSchemaRef.current = { ...schemaa.properties.mobile };
-      }
-      if (uischema.mobile && !originalMobileUiSchemaRef.current) {
-        originalMobileUiSchemaRef.current = { ...uischema.mobile };
-      }
-
       setFormSchema(schemaa);
       setFormUiSchema(uischema);
       // ...existing code...
@@ -320,54 +288,28 @@ const DynamicForm = ({
 
             //set ui schema show
             const updatedUiSchema = { ...oldFormUiSchema };
-            
-            // Add guardian information field to schema as a display-only field
-            updatedUiSchema['guardian_info_note'] = {
-              'ui:field': 'GuardianInfoField',
-              'ui:options': {
-                grid: { xs: 12, sm: 12, md: 12 }
-              }
-            };
-            
-            // Clone each key's config and set widget to 'CustomTextFieldWidget' with full width
+            // Clone each key's config and set widget to 'hidden'
             requiredKeys.forEach((key) => {
               if (updatedUiSchema.hasOwnProperty(key)) {
                 updatedUiSchema[key] = {
                   ...updatedUiSchema[key],
                   'ui:widget': 'CustomTextFieldWidget',
-                  'ui:options': {
-                    ...updatedUiSchema[key]?.['ui:options'],
-                    grid: { xs: 12, sm: 12, md: 12 } // Full width for guardian fields
-                  }
                 };
               }
             });
 
-            //hide mobile - remove from schema completely
+            //hide mobile
+            // Clone each key's config and set widget to 'hidden'
             requiredKeys2.forEach((key) => {
-              delete updatedUiSchema[key];
-              if (oldFormSchema.properties && oldFormSchema.properties[key]) {
-                delete oldFormSchema.properties[key];
+              if (updatedUiSchema.hasOwnProperty(key)) {
+                updatedUiSchema[key] = {
+                  ...updatedUiSchema[key],
+                  // 'ui:widget': 'hidden',
+                  'ui:disabled': true,
+                };
               }
             });
-            
-            // Add guardian info note to schema
-            oldFormSchema.properties = {
-              ...oldFormSchema.properties,
-              guardian_info_note: {
-                type: 'string',
-                title: '',
-              }
-            };
-            
-            // Reorder guardian fields to appear right after DOB
-            let reorderedUiSchema = updatedUiSchema;
-            reorderedUiSchema = reorderUiSchemaFields(reorderedUiSchema, 'guardian_info_note', 'dob');
-            reorderedUiSchema = reorderUiSchemaFields(reorderedUiSchema, 'guardian_name', 'guardian_info_note');
-            reorderedUiSchema = reorderUiSchemaFields(reorderedUiSchema, 'guardian_relation', 'guardian_name');
-            reorderedUiSchema = reorderUiSchemaFields(reorderedUiSchema, 'parent_phone', 'guardian_relation');
-            
-            oldFormUiSchema = reorderedUiSchema;
+            oldFormUiSchema = updatedUiSchema;
           } else {
             delete formData?.parent_phone;
             delete formData?.guardian_relation;
@@ -397,47 +339,16 @@ const DynamicForm = ({
               }
             });
 
-            //show mobile - add back to schema if not present
+            //show mobile
+            // Clone each key's config and set widget to 'CustomTextFieldWidget'
             requiredKeys2.forEach((key) => {
-              // Add mobile field back to schema using stored original configuration
-              if (!oldFormSchema.properties[key] && key === 'mobile') {
-                if (originalMobileSchemaRef.current) {
-                  oldFormSchema.properties[key] = { 
-                    ...originalMobileSchemaRef.current,
-                    title: t('phone_number') // Ensure translated title
-                  };
-                } else if (Object.keys(mobileSchema).length > 0) {
-                  oldFormSchema.properties[key] = { 
-                    ...mobileSchema,
-                    title: t('phone_number') // Ensure translated title
-                  };
-                }
-              }
-              
-              // Add mobile field back to UI schema using stored original configuration
-              if (!updatedUiSchema[key] && key === 'mobile') {
-                if (originalMobileUiSchemaRef.current) {
-                  updatedUiSchema[key] = { ...originalMobileUiSchemaRef.current };
-                } else if (Object.keys(mobileAddUiSchema).length > 0) {
-                  updatedUiSchema[key] = { ...mobileAddUiSchema };
-                } else {
-                  updatedUiSchema[key] = {
-                    'ui:widget': 'CustomTextFieldWidget',
-                  };
-                }
-              } else if (updatedUiSchema[key]) {
+              if (updatedUiSchema.hasOwnProperty(key)) {
                 updatedUiSchema[key] = {
                   ...updatedUiSchema[key],
                   'ui:widget': 'CustomTextFieldWidget',
                 };
               }
             });
-            
-            // Remove guardian info note from schema and UI schema
-            delete updatedUiSchema['guardian_info_note'];
-            if (oldFormSchema.properties && oldFormSchema.properties.guardian_info_note) {
-              delete oldFormSchema.properties.guardian_info_note;
-            }
 
             oldFormUiSchema = updatedUiSchema;
           }
@@ -472,17 +383,14 @@ const DynamicForm = ({
           }
         });
         requiredKeys2.forEach((key) => {
-          delete updatedUiSchema[key];
-          if (oldFormSchema.properties && oldFormSchema.properties[key]) {
-            delete oldFormSchema.properties[key];
+          if (updatedUiSchema.hasOwnProperty(key)) {
+            updatedUiSchema[key] = {
+              ...updatedUiSchema[key],
+              // 'ui:widget': 'hidden',
+              'ui:disabled': true,
+            };
           }
         });
-        
-        // Remove guardian info note from schema and UI schema initially
-        delete updatedUiSchema['guardian_info_note'];
-        if (oldFormSchema.properties && oldFormSchema.properties.guardian_info_note) {
-          delete oldFormSchema.properties.guardian_info_note;
-        }
 
         oldFormUiSchema = updatedUiSchema;
         oldFormSchema.required = requiredArray;
@@ -729,30 +637,6 @@ const DynamicForm = ({
     CustomRadioWidget,
     CustomTextFieldWidget,
     CustomFileUpload,
-  };
-
-  // Custom field for Guardian Information Note
-  const GuardianInfoField = () => {
-    return (
-      <Alert 
-        icon={<SecurityIcon />} 
-        severity="info"
-        sx={{
-          backgroundColor: '#E3F2FD',
-          color: '#1E3A8A',
-          mb: 2,
-          '& .MuiAlert-icon': {
-            color: '#1E3A8A'
-          }
-        }}
-      >
-        {t('GUARDIAN_INFORMATION_NOTE')}
-      </Alert>
-    );
-  };
-
-  const customFields = {
-    GuardianInfoField,
   };
 
   useEffect(() => {
@@ -1777,9 +1661,6 @@ const DynamicForm = ({
           });
         }
       });
-      
-      // Remove guardian info note field from submission
-      delete updatedFormData.guardian_info_note;
 
       return updatedFormData;
     }
@@ -1995,7 +1876,6 @@ const DynamicForm = ({
           customValidate={customValidate} // Dynamic Validation
           transformErrors={transformErrors} // ✅ Suppress default pattern errors
           widgets={widgets}
-          fields={customFields}
           id="dynamic-form-id"
           // template
           templates={{ ObjectFieldTemplate: CustomObjectFieldTemplate }}
@@ -2036,7 +1916,6 @@ const DynamicForm = ({
                 customValidate={customValidate} // Dynamic Validation
                 transformErrors={transformErrors} // ✅ Suppress default pattern errors
                 widgets={widgets}
-                fields={customFields}
               >
                 {!isCallSubmitInHandle ? null : (
                   <button type="submit" style={{ display: 'none' }}>
