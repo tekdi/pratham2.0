@@ -128,7 +128,7 @@ const CreateAccountForm = ({
         }}
       >
         <Typography variant="h1" fontWeight="bold" gutterBottom>
-          Sign Up for {tenantName}
+        {`${t('LEARNER_APP.REGISTRATION.GET_STARTED_WITH_YOUR_LEARNING_JOURNEY_NOW')} `}
         </Typography>
 
         <Typography
@@ -142,11 +142,12 @@ const CreateAccountForm = ({
             p: '5px',
           }}
         >
-          Get vocational training to land
+          {/* Get vocational training to land
           <Box component="br" sx={{ display: { xs: 'block', sm: 'none' } }} />
           an entry level job with 2 months of
           <Box component="br" sx={{ display: { xs: 'block', sm: 'none' } }} />
-          training
+          training */}
+          {t('LEARNER_APP.REGISTRATION.CREATE_ACCOUNT_TO_PROGRAMS')}
         </Typography>
 
         <Typography

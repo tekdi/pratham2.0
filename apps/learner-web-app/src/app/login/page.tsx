@@ -304,6 +304,7 @@ const LoginPage = () => {
 
       if (roleName === 'Learner') {
         localStorage.setItem('userId', userResponse?.userId);
+        localStorage.setItem('roleId', roleId);
         localStorage.setItem('templtateId', tenantData?.templateId);
         localStorage.setItem('userIdName', userResponse?.username);
         localStorage.setItem('firstName', userResponse?.firstName || '');
@@ -364,7 +365,7 @@ const LoginPage = () => {
           // } else if (tenantName === TenantName.PRAGYANPATH) {
           //   router.push('/courses-contents');
           // }
-          router.push(landingPage);
+          router.push('/programs');
         }
       } else {
         showToastMessage('Username or password not correct', 'error');
