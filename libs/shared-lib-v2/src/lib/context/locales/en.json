@@ -68,6 +68,7 @@
   "PHONE_TYPE_ACCESSIBLE": "Type of Phone Accessible",
   "WHAT_IS_YOUR_PRIMARY_WORK": "What is your primary work?",
   "UNEMPLOYED_HOUSEWIFE_DOMESTIC_WORK": "Unemployed, Housewife or Domestic Work",
+  "CATCHMENT_AREA": "Catchment Area",
   "SURVEYS": {
     "SURVEYS": "Surveys",
     "ACTIVE_SURVEYS": "Active Surveys",
@@ -675,7 +676,8 @@
     "GRADE_9": "Grade 9",
     "GRADE_10": "Grade 10",
     "GRADE_11": "Grade 11",
-    "GRADE_12": "Grade 12"
+    "GRADE_12": "Grade 12",
+    "CATCHMENT_AREA": "Catchment Area"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "Invalid Input.",
