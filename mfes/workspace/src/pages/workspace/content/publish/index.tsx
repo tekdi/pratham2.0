@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import Layout from '../../../../components/Layout';
 import { Typography, Box, CircularProgress } from '@mui/material';
@@ -41,7 +42,7 @@ const columns = [
     dataType: DataType.String,
     width: '180px',
   },
-  { key: 'action', title: 'ACTION', dataType: DataType.String, width: '140px' },
+  { key: 'action', title: 'ACTION', dataType: DataType.String, width: '200px' },
 ];
 const PublishPage = () => {
   const tenantConfig = useTenantConfig();
@@ -104,7 +105,7 @@ const PublishPage = () => {
       name: item?.name,
       description: item?.description,
       language: item.contentLanguage ? item.contentLanguage : item?.language,
-
+      lastPublishedBy: item.lastPublishedBy,
       contentType: item.primaryCategory,
       lastUpdatedOn: timeAgo(item.lastUpdatedOn),
       status: item.status,
