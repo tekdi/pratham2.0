@@ -603,6 +603,27 @@ export const getPosFrameworkList = async (): Promise<any> => {
     return error;
   }
 };
+
+export const unpublishContent = async (identifier: string, userId: string) => {
+  const baseurl = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;
+  const apiURL = `${baseurl}/collection/v4/unlisted/publish/${identifier}`;
+  const reqBody = {
+    request: {
+      content: {
+        lastPublishedBy: userId,
+      },
+    },
+  };
+
+  try {
+    const response = await post(apiURL, reqBody);
+    return response?.data;
+  } catch (error) {
+    console.error('Error unpublishing content:', error);
+    throw error;
+  }
+};
+
 export const getMediaFilterList = async (): Promise<any> => {
   const baseurl = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;
 
