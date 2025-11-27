@@ -83,6 +83,7 @@ export const ContentSearch = async ({
         },
         fields: fields || [
           'name',
+          'englishName',
           'appIcon',
           'description',
           'posterImage',
