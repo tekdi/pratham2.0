@@ -300,6 +300,7 @@ const AllContentsPage = () => {
       name: item.name,
       primaryCategory: item.primaryCategory,
       lastUpdatedOn: timeAgo(item.lastUpdatedOn),
+      lastUpdatedBy: item.lastUpdatedBy,
       status: item.status,
       identifier: item.identifier,
       mimeType: item.mimeType,
