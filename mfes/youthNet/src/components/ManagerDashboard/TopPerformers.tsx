@@ -236,7 +236,7 @@ const TopPerformers: React.FC<TopPerformersProps> = ({
                   >
                     {user.name}
                   </Typography>
-                  <Typography
+                  {/* <Typography
                     variant="caption"
                     sx={{
                       fontSize: '12px',
@@ -248,7 +248,7 @@ const TopPerformers: React.FC<TopPerformersProps> = ({
                     }}
                   >
                     {user.role}
-                  </Typography>
+                  </Typography> */}
                 </Box>
               </Box>
             ))}

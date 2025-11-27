@@ -190,13 +190,19 @@ const SSOContent = () => {
       }
 
       const userResponse = await getUserId();
-      console.log('userResponse', userResponse);
         localStorage.setItem('userId', userResponse?.userId);
         // Safely set tenantId with fallback - try userResponse first, then URL param
         const tenantIdFromResponse = userResponse?.tenantData?.[0]?.tenantId;
         const tenantIdFromUrl = searchParams.get('tenantid');
         const finalTenantId = tenantIdFromResponse || tenantIdFromUrl;
-        
+
+        const hasLead = userResponse?.tenantData[0]?.roles.some((role: any) =>
+          role.roleName.toLowerCase().includes("lead")
+        );
+        if(!hasLead) {
+          window.location.href = '/unauthorized';
+        //  router.push('/unauthorized');
+        }
         if (finalTenantId) {
           localStorage.setItem('tenantId', finalTenantId);
           console.log('TenantId stored:', finalTenantId);
