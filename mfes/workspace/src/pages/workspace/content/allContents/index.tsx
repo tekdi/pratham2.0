@@ -298,8 +298,10 @@ const AllContentsPage = () => {
       language: item.contentLanguage ? item.contentLanguage : item?.language,
 
       name: item.name,
+      englishName: item?.englishName,
       primaryCategory: item.primaryCategory,
       lastUpdatedOn: timeAgo(item.lastUpdatedOn),
+      lastUpdatedBy: item.lastUpdatedBy,
       status: item.status,
       identifier: item.identifier,
       mimeType: item.mimeType,
