@@ -103,6 +103,7 @@ const PublishPage = () => {
       image: item?.appIcon,
 
       name: item?.name,
+      englishName: item?.englishName,
       description: item?.description,
       language: item.contentLanguage ? item.contentLanguage : item?.language,
       lastPublishedBy: item.lastPublishedBy,
