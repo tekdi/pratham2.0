@@ -471,22 +471,24 @@ const AssessmentResultPDF: React.FC<AssessmentResultPDFProps> = ({
                   </View>
 
                   {/* Answer */}
-                  {parsedResponse.response &&
-                    parsedResponse.response !== 'No response available' && (
-                      <View style={styles.contentBox}>
-                        <Text style={styles.answerLabel}>Student Answer</Text>
-                        {renderWordWrappedText(
-                          parsedResponse.response,
-                          styles.answerText,
-                          styles.answerTextUnicode
-                        )}
-                      </View>
+                  <View style={styles.contentBox}>
+                    <Text style={styles.answerLabel}>Student Answer</Text>
+                    {parsedResponse.response &&
+                    parsedResponse.response !== 'No response available' ? (
+                      renderWordWrappedText(
+                        parsedResponse.response,
+                        styles.answerText,
+                        styles.answerTextUnicode
+                      )
+                    ) : (
+                      <Text style={styles.answerText}>No response found</Text>
                     )}
+                  </View>
 
                   {/* AI Suggestion */}
                   {parsedResponse.aiSuggestion && (
                     <View style={styles.explanationBox}>
-                      <Text style={styles.explanationLabel}>AI Explanation</Text>
+                      <Text style={styles.explanationLabel}>Explanation</Text>
                       {renderWordWrappedText(
                         parsedResponse.aiSuggestion,
                         styles.explanationText,
