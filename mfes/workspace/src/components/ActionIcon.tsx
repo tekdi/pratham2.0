@@ -3,6 +3,8 @@ import { Box, Typography, Tooltip, useTheme } from "@mui/material";
 import DeleteConfirmation from "./DeleteConfirmation";
 import UnpublishedIcon from '@mui/icons-material/Unpublished';
 import PublishIcon from '@mui/icons-material/Publish';
+import { Role } from "@workspace/utils/app.constant";
+import { getLocalStoredUserRole } from "@workspace/services/LocalStorageService";
 
 interface ActionCellProps {
   rowData?: any;
@@ -60,7 +62,7 @@ const ActionIcon: React.FC<ActionCellProps> = ({
         </Box>
       </Tooltip>
 
-      {rowData?.status === 'Live' && (
+      {rowData?.status === 'Live' &&  getLocalStoredUserRole()!==Role.SCTA&& (
         <Tooltip title="Unpublish">
           <Box
             onClick={() => {
@@ -81,7 +83,7 @@ const ActionIcon: React.FC<ActionCellProps> = ({
         </Tooltip>
       )}
 
-      {rowData?.status === 'Unlisted' && (
+      {rowData?.status === 'Unlisted' && getLocalStoredUserRole()!==Role.SCTA && (
         <Tooltip title="Publish">
           <Box
             onClick={() => {
