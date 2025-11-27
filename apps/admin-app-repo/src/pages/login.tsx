@@ -324,6 +324,12 @@ const LoginPage = () => {
                 });
               } else router.push('/course-planner');
             }
+          } else if (
+            userInfo?.role === Role.CENTRAL_ADMIN &&
+            tenantData?.tenantName == TenantName.PRAGYANPATH
+          ) {
+            window.location.href = '/youth';
+            router.push('/youth');
           } else {
             //window.location.href = "/centers";
             const { locale } = router;
@@ -367,7 +373,7 @@ const LoginPage = () => {
               ) {
                 window.location.href = '/central-head';
                 router.push('/central-head');
-              }
+              } 
             }
           }
         } else {
@@ -733,7 +739,7 @@ const LoginPage = () => {
                 alignItems={'center'}
                 justifyContent={'center'}
                 zIndex={99}
-              // sx={{ margin: '5px 10px 25px', }}
+                // sx={{ margin: '5px 10px 25px', }}
               >
                 <Box
                   sx={{
@@ -856,7 +862,7 @@ const LoginPage = () => {
                         action: 'remember-me-button-clicked',
                         category: 'Login Page',
                         label: `Remember Me ${rememberMe ? 'Checked' : 'Unchecked'
-                          }`,
+                        }`,
                       });
                     }}
                     sx={{

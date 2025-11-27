@@ -45,7 +45,17 @@ const Unauthorized = () => {
       >
         {t("COMMON.YOU_DONT_HAVE_PERMISSION_TO_ACCESS_THIS_PAGE")}
       </Typography>
-
+      <Typography
+          sx={{ cursor: "pointer" }}
+          onClick={() => {
+            localStorage.clear();
+            // router.push("/login");
+            router.push("/");
+          }}
+          color={"secondary"}
+        >
+          {t("COMMON.GO_TO_HOME")}
+        </Typography>
       
         <Typography
           sx={{ cursor: "pointer" }}

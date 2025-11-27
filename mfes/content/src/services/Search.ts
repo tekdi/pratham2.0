@@ -65,6 +65,7 @@ export interface ContentSearchResponse {
   size?: number;
   lastPublishedOn?: string;
   name?: string;
+  englishName?: string;
   attributions?: string[];
   targetBoardIds?: string[];
   status?: string;
@@ -125,6 +126,8 @@ export const ContentSearch = async ({
   limit = 5,
   offset = 0,
   noPrimaryCategory = false,
+  thematicCount = false,
+  primaryCategory,
 }: {
   type: string;
   query?: string;
@@ -132,8 +135,11 @@ export const ContentSearch = async ({
   limit?: number;
   offset?: number;
   noPrimaryCategory?: boolean;
+  primaryCategory?: string[];
+  thematicCount?:boolean;
 }): Promise<ContentResponse> => {
   try {
+    console.log('filters====>' , filters);
     // Ensure the environment variable is defined
     const searchApiUrl = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;
     if (!searchApiUrl) {
@@ -150,7 +156,11 @@ export const ContentSearch = async ({
       status: ['live'],
       channel: localStorage.getItem('channelId'),
     };
-   // console.log('filtersObject====>', filtersObject?.primaryCategory);
+    // console.log('filtersObject====>', filtersObject?.primaryCategory);
+    if(primaryCategory && thematicCount){
+      filtersObject.primaryCategory = primaryCategory;
+    }
+    console.log('filtersObject====>' , filters);
 
     // Only add primaryCategory if noPrimaryCategory is false and primaryCategory is not already set
     if (!noPrimaryCategory && !filtersObject.primaryCategory) {
@@ -161,12 +171,14 @@ export const ContentSearch = async ({
           ? ['Activity', 'Story']
           : ['Learning Resource', 'Practice Question Set'];
     }
+   // console.log('filtersObject====>', filtersObject);
 
     const data = {
       request: {
         filters: filtersObject,
         fields: [
           'name',
+          'englishName',
           'appIcon',
           'description',
           'posterImage',
@@ -232,14 +244,15 @@ export const CommonContentSearch = async ({
           // identifier: 'do_1141652605790289921389',
           //need below after login user channel for dynamic load content
           // channel: '0135656861912678406',
-          primaryCategory:['Course'],
+          primaryCategory: ['Course'],
           ...filters,
           status: ['live'],
-        
+
           channel: localStorage.getItem('channelId'),
         },
         fields: [
           'name',
+          'englishName',
           'appIcon',
           'description',
           'posterImage',
@@ -251,7 +264,7 @@ export const CommonContentSearch = async ({
           'trackable',
           'children',
           'leafNodes',
-          'courseType'
+          'courseType',
         ],
         query,
         limit,
@@ -272,4 +285,3 @@ export const CommonContentSearch = async ({
     throw error;
   }
 };
-

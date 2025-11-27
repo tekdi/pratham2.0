@@ -303,7 +303,7 @@ console.log('filteredData', filteredData);
               },
             }}
           />
-          <Button
+          {/* <Button
             variant="outlined"
             sx={{ 
               textTransform: 'none',
@@ -313,7 +313,7 @@ console.log('filteredData', filteredData);
           >
             <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>Filters</Box>
             <FilterListIcon sx={{ display: { xs: 'inline', sm: 'none' } }} />
-          </Button>
+          </Button> */}
         </Stack>
       </Stack>
 
@@ -388,7 +388,7 @@ console.log('filteredData', filteredData);
                       >
                         {employee.name}
                       </Typography>
-                      <Typography 
+                      {/* <Typography 
                         variant="caption" 
                         color="text.secondary"
                         sx={{
@@ -399,7 +399,7 @@ console.log('filteredData', filteredData);
                         }}
                       >
                         {employee.role}
-                      </Typography>
+                      </Typography> */}
                     </Box>
                   </Stack>
                 </TableCell>

@@ -21,6 +21,7 @@ import { useTranslation } from '../context/LanguageContext';
 
 export interface ContentItem {
   name: string;
+  englishName?: string;
   gradeLevel: string[];
   language: string[];
   artifactUrl: string;
@@ -37,6 +38,7 @@ export interface ContentItem {
 
 interface CommonCardProps {
   title: string;
+  englishTitle?: string;
   avatarLetter?: string;
   avatarColor?: string;
   subheader?: string;
@@ -84,6 +86,7 @@ export const CommonCard: React.FC<CommonCardProps> = ({
   avatarLetter,
   avatarColor = red[500],
   title,
+  englishTitle,
   subheader,
   image,
   imageAlt,
@@ -114,12 +117,18 @@ export const CommonCard: React.FC<CommonCardProps> = ({
               result?.status?.toLowerCase() === 'completed'
                 ? t('COMMON.STATUS.completed')
                 : result?.status?.toLowerCase() === 'in progress'
-                  ? t('COMMON.STATUS.in_progress')
-                  : result?.enrolled === true
-                    ? t('COMMON.STATUS.enrolled_not_started')
-                    : t('COMMON.STATUS.not_started'),
+                ? t('COMMON.STATUS.in_progress')
+                : result?.enrolled === true
+                ? t('COMMON.STATUS.enrolled_not_started')
+                : t('COMMON.STATUS.not_started'),
           };
-          if (type === 'Course' || type==='Job family' || type==='PSU' || type==='Group Membership'|| type==='self') {
+          if (
+            type === 'Course' ||
+            type === 'Job family' ||
+            type === 'PSU' ||
+            type === 'Group Membership' ||
+            type === 'self'
+          ) {
             if (!_card?.isHideProgress) {
               setStatusBar({
                 ...newObj,
@@ -234,6 +243,27 @@ export const CommonCard: React.FC<CommonCardProps> = ({
             >
               <SpeakableText>{title}</SpeakableText>
             </Typography>
+            {englishTitle && (
+              <Typography
+                variant="body1"
+                component="div"
+                title={englishTitle}
+                sx={{
+                  fontWeight: 500,
+                  // fontSize: '16px',
+                  // lineHeight: '24px',
+                  whiteSpace: 'wrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  display: '-webkit-box',
+                  WebkitBoxOrient: 'vertical',
+                  textTransform: 'capitalize',
+                  WebkitLineClamp: 2,
+                }}
+              >
+                <SpeakableText>{englishTitle}</SpeakableText>
+              </Typography>
+            )}
           </CardContent>
         )}
         {content && (
@@ -293,32 +323,34 @@ export const CommonCard: React.FC<CommonCardProps> = ({
       )}
 
       {/* Add courseType at the bottom right, outside CardContent */}
-      {(Array.isArray(courseType) && courseType.includes("Mandatory") && !courseType.includes("Optional")) && (
-        <Box
-          sx={{
-            width: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            px: 2,
-            pb: 2,
-          }}
-        >
-          <Typography
+      {Array.isArray(courseType) &&
+        courseType.includes('Mandatory') &&
+        !courseType.includes('Optional') && (
+          <Box
             sx={{
-              fontFamily: "Poppins, sans-serif",
-              fontWeight: 400,
-              fontStyle: "normal",
-              fontSize: "15.4px",
-              lineHeight: "23.09px",
-              letterSpacing: "0.48px",
-              textTransform: "uppercase",
-              color: '#969088',
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              px: 2,
+              pb: 2,
             }}
           >
-            {courseType}
-          </Typography>
-        </Box>
-      )}
+            <Typography
+              sx={{
+                fontFamily: 'Poppins, sans-serif',
+                fontWeight: 400,
+                fontStyle: 'normal',
+                fontSize: '15.4px',
+                lineHeight: '23.09px',
+                letterSpacing: '0.48px',
+                textTransform: 'uppercase',
+                color: '#969088',
+              }}
+            >
+              {courseType}
+            </Typography>
+          </Box>
+        )}
     </Card>
   );
 };
@@ -333,17 +365,23 @@ export const StatusBar: React.FC<StatuPorps> = ({
   const { t } = useTranslation();
 
   const theme = useTheme();
-  
+
   // Don't render StatusBar if status is undefined or empty
   if (!status || status.trim() === '') {
     return null;
   }
-  
+
   return (
     <Box
       sx={{
         position: 'absolute',
-        ...(type === 'Course' || type==='Job family' || type==='PSU' || type==='Group Membership'|| type==='self' ? { top: 0 } : { bottom: 0 }),
+        ...(type === 'Course' ||
+        type === 'Job family' ||
+        type === 'PSU' ||
+        type === 'Group Membership' ||
+        type === 'self'
+          ? { top: 0 }
+          : { bottom: 0 }),
         width: '100%',
         display: 'flex',
         alignItems: 'center',
@@ -353,8 +391,22 @@ export const StatusBar: React.FC<StatuPorps> = ({
       <Box
         sx={{
           width: '100%',
-          pl: type === 'Course'|| type==='Job family' || type==='PSU' || type==='Group Membership'|| type==='self' ? '6px' : '0',
-          pr: type === 'Course'|| type==='Job family' || type==='PSU' || type==='Group Membership'|| type==='self' ? '6px' : '0',
+          pl:
+            type === 'Course' ||
+            type === 'Job family' ||
+            type === 'PSU' ||
+            type === 'Group Membership' ||
+            type === 'self'
+              ? '6px'
+              : '0',
+          pr:
+            type === 'Course' ||
+            type === 'Job family' ||
+            type === 'PSU' ||
+            type === 'Group Membership' ||
+            type === 'self'
+              ? '6px'
+              : '0',
           py: '6px',
           fontSize: '14px',
           lineHeight: '20px',
@@ -376,7 +428,11 @@ export const StatusBar: React.FC<StatuPorps> = ({
           gap: '8px',
         }}
       >
-        {type === 'Course' || type==='Job family' || type==='PSU' || type==='Group Membership'|| type==='self' ? (
+        {type === 'Course' ||
+        type === 'Job family' ||
+        type === 'PSU' ||
+        type === 'Group Membership' ||
+        type === 'self' ? (
           _card?.isHideProgress ? (
             <StatusIcon status={status ?? ''} />
           ) : (
@@ -427,16 +483,16 @@ export const StatusBar: React.FC<StatuPorps> = ({
               typeof trackProgress === 'number'
                 ? trackProgress
                 : [
-                  t('COMMON.STATUS.completed').toLowerCase(),
-                  'completed',
-                ].includes(status?.toLowerCase() || '')
-                  ? 100
-                  : [
+                    t('COMMON.STATUS.completed').toLowerCase(),
+                    'completed',
+                  ].includes(status?.toLowerCase() || '')
+                ? 100
+                : [
                     t('COMMON.STATUS.in_progress').toLowerCase(),
                     'in progress',
                   ].includes(status?.toLowerCase() || '')
-                    ? 50
-                    : 0
+                ? 50
+                : 0
             }
           />
         )}
