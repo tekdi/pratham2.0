@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
   page: {
     padding: 20,
     fontFamily: 'Helvetica',
-    fontSize: 8,
+    fontSize: 10,
     color: '#333333',
     lineHeight: 1.3,
   },
@@ -92,14 +92,14 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   title: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#1A8825', // Primary green
     marginBottom: 2,
     fontFamily: 'Helvetica',
   },
   subtitle: {
-    fontSize: 9,
+    fontSize: 11,
     color: '#666666',
     fontFamily: 'Helvetica',
     marginTop:3
@@ -118,13 +118,13 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   infoText: {
-    fontSize: 7,
+    fontSize: 9,
     marginBottom: 1,
     color: '#4B5563',
     fontFamily: 'Helvetica',
   },
   infoValue: {
-    fontSize: 8,
+    fontSize: 10,
     fontWeight: 'bold',
     color: '#111827',
     fontFamily: 'Helvetica',
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     marginBottom: 1,
   },
   sectionTitle: {
-    fontSize: 9,
+    fontSize: 11,
     fontWeight: 'bold',
     color: '#111827',
     marginBottom: 2,
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   questionText: {
-    fontSize: 8.5,
+    fontSize: 10.5,
     color: '#1F2937',
     flex: 1,
     marginRight: 8,
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   questionTextUnicode: {
-    fontSize: 8.5,
+    fontSize: 10.5,
     color: '#1F2937',
     flex: 1,
     marginRight: 8,
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
     paddingVertical: 1,
     paddingHorizontal: 4,
     borderRadius: 4,
-    fontSize: 7,
+    fontSize: 9,
     fontWeight: 'bold',
     fontFamily: 'Helvetica',
     minWidth: 28,
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     borderLeft: '2px solid #D1D5DB',
   },
   answerLabel: {
-    fontSize: 7,
+    fontSize: 9,
     fontWeight: 'bold',
     color: '#6B7280',
     marginBottom: 1,
@@ -197,12 +197,12 @@ const styles = StyleSheet.create({
     fontFamily: 'Helvetica',
   },
   answerText: {
-    fontSize: 8,
+    fontSize: 10,
     color: '#374151',
     fontFamily: 'Helvetica',
   },
   answerTextUnicode: {
-    fontSize: 8,
+    fontSize: 10,
     color: '#374151',
     fontFamily: 'UnicodeFont',
   },
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     borderLeft: '2px solid #3B82F6',
   },
   explanationLabel: {
-    fontSize: 7,
+    fontSize: 9,
     fontWeight: 'bold',
     color: '#2563EB',
     marginBottom: 1,
@@ -222,12 +222,12 @@ const styles = StyleSheet.create({
     fontFamily: 'Helvetica',
   },
   explanationText: {
-    fontSize: 8,
+    fontSize: 10,
     color: '#1E40AF',
     fontFamily: 'Helvetica',
   },
   explanationTextUnicode: {
-    fontSize: 8,
+    fontSize: 10,
     color: '#1E40AF',
     fontFamily: 'UnicodeFont',
   },
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   footerText: {
-    fontSize: 7,
+    fontSize: 9,
     color: '#9CA3AF',
     fontFamily: 'Helvetica',
   },
