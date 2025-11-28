@@ -392,7 +392,15 @@ const App = ({
         />
         {item?.content?.artifactUrl &&
           isDownloadableMimeType(item?.content?.mimeType || mimeType) && (
-            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
+            <Box
+              sx={{
+                my: 3,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                minHeight: '60px',
+              }}
+            >
               <Button
                 variant="contained"
                 onClick={handleDownloadButtonClick}
