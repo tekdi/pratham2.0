@@ -537,6 +537,18 @@ const App = ({
             margin: 0,
             maxHeight: '100vh',
           },
+        }}  
+        PaperProps={{
+          sx: {
+            width: {
+              xs: '100%',
+              sm: '80%',
+              md: '60%',
+              lg: '50%',
+            },
+            maxWidth: '100%',
+            maxHeight: '100vh',
+          },
         }}
       >
         <DialogTitle
