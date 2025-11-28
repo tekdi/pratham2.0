@@ -479,7 +479,7 @@ const Footer = () => {
             <Typography component="p" sx={{ mb: 2 }}>
               In case you wish to delete/update your personal data, please contact   Pratham&apos;s
               authorized person i.e. the DPO (
-              <Link href="mailto:dataprotectionofficer@pratham.org" target="_blank" sx={{ color: 'primary.main' }}>
+              <Link href="mailto:dataprotectionofficer@pratham.org" target="_blank" sx={{ color: '#1976d2', textDecorationColor: '#1976d2' }}>
                 dataprotectionofficer@pratham.org
               </Link>
               ). After the receipt of
@@ -508,7 +508,7 @@ const Footer = () => {
             </Typography>
             <Typography component="p" sx={{ mb: 1 }}>
               Email:{' '}
-              <Link href="mailto:dataprotectionofficer@pratham.org" target="_blank" sx={{ color: 'primary.main' }}>
+              <Link href="mailto:dataprotectionofficer@pratham.org" target="_blank" sx={{ color: '#1976d2', textDecorationColor: '#1976d2' }}>
                 dataprotectionofficer@pratham.org
               </Link>
             </Typography>
