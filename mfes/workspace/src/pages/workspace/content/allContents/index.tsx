@@ -81,7 +81,7 @@ const columns = [
     key: 'contentAction',
     title: 'ACTION',
     dataType: DataType.String,
-    width: '140px',
+    width: '220px',
   },
 ];
 const AllContentsPage = () => {
@@ -301,6 +301,7 @@ const AllContentsPage = () => {
       englishName: item?.englishName,
       primaryCategory: item.primaryCategory,
       lastUpdatedOn: timeAgo(item.lastUpdatedOn),
+      lastUpdatedBy: item.lastUpdatedBy,
       status: item.status,
       identifier: item.identifier,
       mimeType: item.mimeType,

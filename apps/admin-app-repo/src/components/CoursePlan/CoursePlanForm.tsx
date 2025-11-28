@@ -287,7 +287,7 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
           if (response) {
             showSnackbar({
               text: t(`Sub Topic has been successfully deleted`),
-              bgColor: '#BA1A1A',
+              bgColor: '#019722',
               textColor: '#fff',
               icon: <CheckCircleOutlineOutlinedIcon />, //ErrorOutlinedIcon
             });
@@ -1017,6 +1017,9 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
                                   </option>
                                   <option value="facilitator-requisite">
                                     {t('Facilitator-requisite')}
+                                  </option>
+                                  <option value="during">
+                                    {t('During')}
                                   </option>
                                 </Select>
                               </FormControl>

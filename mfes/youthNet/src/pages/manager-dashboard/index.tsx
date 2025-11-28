@@ -172,6 +172,17 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
       const allCompletedCourseIds = Array.from(new Set([...completedMandatoryCourseIds, ...completedOptionalCourseIds]));
       console.log('Unique Completed Course IDs (duplicates removed):', allCompletedCourseIds);
       
+      // If no completed courses, set empty top performers data and return
+      if (allCompletedCourseIds.length === 0) {
+        console.log('No completed courses found, setting empty top performers data');
+        setTopPerformersData({
+          usersData: {
+            '5 Highest Course Completing Users': []
+          }
+        });
+        return;
+      }
+      
       // Collect structured course data from all completed courses
       const getAllStructuredCourseData = async () => {
         const allStructuredData: Array<{courseId: string, units: Array<{unitId: string, contentIds: string[]}> }> = [];
@@ -288,7 +299,11 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
         
         console.log('individualProgressData', apiResponse?.getUserDetails);
         console.log('totalCount', apiResponse?.totalCount);
-        const currentEmployeeIds = apiResponse?.getUserDetails?.map((item: any) => item.userId);
+        // Handle empty array or undefined getUserDetails
+        const userDetails = apiResponse?.getUserDetails || [];
+        const currentEmployeeIds = userDetails.length > 0 
+          ? userDetails.map((item: any) => item.userId) 
+          : [];
         
         // Fetch certificate status for current employees if course identifiers are available
         let userMandatoryCertificateStatus = { data: [] };
@@ -301,7 +316,7 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
         console.log('activeOptionalIds', activeOptionalIds);
         console.log('currentEmployeeIds', currentEmployeeIds);
         
-        if (activeMandatoryIds.length > 0 && activeOptionalIds.length > 0 && currentEmployeeIds.length > 0) {
+        if ((activeMandatoryIds.length > 0 || activeOptionalIds.length > 0 )&& currentEmployeeIds.length > 0) {
           try {
             [userMandatoryCertificateStatus, userOptionalCertificateStatus] = await Promise.all([
               fetchUserCertificateStatus(currentEmployeeIds, activeMandatoryIds),
@@ -317,7 +332,6 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
         // Process certificate status data for easier lookup
         const mandatoryStatusMap = new Map();
         const optionalStatusMap = new Map();
-
         // Process mandatory certificate status
         userMandatoryCertificateStatus.data?.forEach((item: any) => {
           if (!mandatoryStatusMap.has(item.userId)) {
@@ -377,7 +391,8 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
         });
         
         // Transform API data to EmployeeProgress format with calculated progress
-        const transformedProgressData: EmployeeProgress[] = apiResponse?.getUserDetails?.map((user: any) => {
+        const transformedProgressData: EmployeeProgress[] = userDetails.length > 0 
+          ? userDetails.map((user: any) => {
           const mandatoryStats = mandatoryStatusMap.get(user.userId) || { 
             completed: 0, 
             inProgress: 0, 
@@ -424,7 +439,8 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
             mandatoryCompletedIdentifiers: mandatoryStats.completedIdentifiers || [],
             optionalCompletedIdentifiers: optionalStats.completedIdentifiers || []
           };
-        }) || [];
+        })
+          : [];
 
         
         console.log('transformedProgressData with calculated progress', transformedProgressData);
@@ -526,9 +542,14 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
             filters: {emp_manager:userId},
           });
           console.log('employeeDataResponse', employeeDataResponse);
-          setEmployeeDataResponse(employeeDataResponse?.getUserDetails || []);
-           employeeUserIds = employeeDataResponse?.getUserDetails?.map((item: any) => item.userId);
-           setEmployeeUserIds(employeeUserIds);
+          
+          // Handle empty array or undefined getUserDetails
+          const employeeDetails = employeeDataResponse?.getUserDetails || [];
+          setEmployeeDataResponse(employeeDetails);
+          employeeUserIds = employeeDetails.length > 0 
+            ? employeeDetails.map((item: any) => item.userId) 
+            : [];
+          setEmployeeUserIds(employeeUserIds);
         }
         console.log('employeeUserIds', employeeUserIds);
         // Check if tenantId is available before calling certificate status APIs
@@ -645,87 +666,74 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
     <Box>
         <Header />
       </Box>
-    <Box sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh', p: 2 }}>
-      <Container maxWidth="xl">
+    <Box sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh', p: { xs: 1, sm: 2 } }}>
+      <Container maxWidth="xl" sx={{ px: { xs: 1, sm: 2 } }}>
         {/* Header */}
         <Box sx={{ mb: 2 }}>
           <Typography variant="h5" fontWeight={600} display="inline">
             Team Learning Overview
           </Typography>
-          <Typography variant="body2" color="text.secondary" display="inline" sx={{ ml: 2 }}>
+          <Typography variant="body2" color="text.secondary" display="inline" sx={{ ml: { xs: 1, sm: 2 } }}>
             Total Employees : {totalEmployees}
           </Typography>
         </Box>
 
         {/* Dashboard Grid */}
-        <Grid container spacing={2}>
-          {/* Left Column: Course Completion and Course Achievement */}
-          <Grid item xs={12} md={7}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                {courseDataLoading ? (
-                  <Box 
-                    sx={{ 
-                      display: 'flex', 
-                      justifyContent: 'center', 
-                      alignItems: 'center', 
-                      minHeight: '300px',
-                      border: '1px solid #e0e0e0',
-                      borderRadius: 2,
-                      backgroundColor: 'white'
-                    }}
-                  >
-                    <Typography variant="h6">Loading Course Completion Data...</Typography>
-                  </Box>
-                ) : (
-                  <CourseCompletion
-                    mandatoryCourses={mandatoryCertificateData}
-                    nonMandatoryCourses={optionalCertificateData}
-                  />
-                )}
-
-              </Grid>
-              <Grid item xs={12}>
-                <CourseAchievement
-                  mandatoryCourses={courseAchievementData.mandatoryCourses}
-                  nonMandatoryCourses={courseAchievementData.nonMandatoryCourses}
-                />
-              </Grid>
-            </Grid>
+        <Grid container spacing={{ xs: 1.5, sm: 2 }}>
+          {/* Course Completion */}
+          <Grid item xs={12} md={6}>
+            {courseDataLoading ? (
+              <Box 
+                sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'center', 
+                  alignItems: 'center', 
+                  minHeight: '300px',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: 2,
+                  backgroundColor: 'white'
+                }}
+              >
+                <Typography variant="h6">Loading Course Completion Data...</Typography>
+              </Box>
+            ) : (
+              <CourseCompletion
+                mandatoryCourses={mandatoryCertificateData}
+                nonMandatoryCourses={optionalCertificateData}
+              />
+            )}
           </Grid>
 
-          {/* Right Column: Course Allocation and Top Performers */}
-          <Grid item xs={12} md={5}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                {courseDataLoading ? (
-                  <Box 
-                    sx={{ 
-                      display: 'flex', 
-                      justifyContent: 'center', 
-                      alignItems: 'center', 
-                      minHeight: '200px',
-                      border: '1px solid #e0e0e0',
-                      borderRadius: 2,
-                      backgroundColor: 'white'
-                    }}
-                  >
-                    <Typography variant="h6">Loading Course Allocation Data...</Typography>
-                  </Box>
-                ) : (
-                  <CourseAllocation
-                    mandatory={courseAllocationData.mandatory}
-                    nonMandatory={courseAllocationData.nonMandatory}
-                    total={courseAllocationData.total}
-                  />
-                )}
-              </Grid>
-              <Grid item xs={12}>
-                <TopPerformers
-                  usersData={topPerformersData.usersData}
-                />
-              </Grid>
-            </Grid>
+          {/* Course Allocation */}
+          <Grid item xs={12} md={6}>
+            {courseDataLoading ? (
+              <Box 
+                sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'center', 
+                  alignItems: 'center', 
+                  minHeight: '200px',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: 2,
+                  backgroundColor: 'white'
+                }}
+              >
+                <Typography variant="h6">Loading Course Allocation Data...</Typography>
+              </Box>
+            ) : (
+              <CourseAllocation
+                mandatory={courseAllocationData.mandatory}
+                nonMandatory={courseAllocationData.nonMandatory}
+                total={courseAllocationData.total}
+              />
+            )}
+          </Grid>
+
+          {/* Top Performers */}
+          <Grid item xs={12}>
+            <TopPerformers
+              usersData={topPerformersData.usersData}
+            />
           </Grid>
 
           {/* Individual Progress Table */}
