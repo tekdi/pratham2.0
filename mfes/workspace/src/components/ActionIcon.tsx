@@ -62,7 +62,7 @@ const ActionIcon: React.FC<ActionCellProps> = ({
         </Box>
       </Tooltip>
 
-      {rowData?.status === 'Live' &&  getLocalStoredUserRole()!==Role.SCTA&& (
+      {/* {rowData?.status === 'Live' &&  getLocalStoredUserRole()!==Role.SCTA&& (
         <Tooltip title="Unpublish">
           <Box
             onClick={() => {
@@ -102,7 +102,7 @@ const ActionIcon: React.FC<ActionCellProps> = ({
             <PublishIcon sx={{ color: 'green' }} />
           </Box>
         </Tooltip>
-      )}
+      )} */}
 
       <DeleteConfirmation
         open={open}
