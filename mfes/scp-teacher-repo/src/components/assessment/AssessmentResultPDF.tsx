@@ -481,7 +481,7 @@ const AssessmentResultPDF: React.FC<AssessmentResultPDFProps> = ({
                         styles.answerTextUnicode
                       )
                     ) : (
-                      <Text style={styles.answerText}>No response found</Text>
+                      <Text style={styles.answerText}>No response available</Text>
                     )}
                   </View>
 
