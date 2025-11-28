@@ -79,7 +79,7 @@ export const MentorLeadSearchSchema = {
       enum: ['asc', 'desc'],
       enumNames: ['A-Z', 'Z-A'],
     },
-    status: {
+    tenantStatus: {
       type: 'string',
       title: 'Status',
       enum: ['active', 'archived'],
@@ -89,7 +89,7 @@ export const MentorLeadSearchSchema = {
 };
 
 export const MentorLeadSearchUISchema = {
-  'ui:order': ['state', 'district', 'name', 'sortBy', 'status'],
+  'ui:order': ['state', 'district', 'name', 'sortBy', 'tenantStatus'],
 
   state: {
     'ui:widget': 'AutoCompleteMultiSelectWidget',
@@ -116,7 +116,7 @@ export const MentorLeadSearchUISchema = {
     'ui:widget': 'select',
   },
 
-  status: {
+  tenantStatus: {
     'ui:widget': 'select',
   },
 };

@@ -64,7 +64,7 @@ const columns = [
     key: 'create-by',
     title: 'CREATED BY',
     dataType: DataType.String,
-    width: '100px',
+    width: '180px',
   },
   { key: 'action', title: 'ACTION', dataType: DataType.String, width: '100px' },
 ];
@@ -123,10 +123,16 @@ const UpForReviewPage = () => {
     };
   }, [searchTerm]);
   useEffect(() => {
-    const filteredArray = contentList.map((item: any) => ({
+    const sortedContentList = [...contentList].sort((a: any, b: any) => {
+      return (
+        new Date(b.lastUpdatedOn).getTime() - new Date(a.lastUpdatedOn).getTime()
+      );
+    });
+    const filteredArray = sortedContentList.map((item: any) => ({
       image: item?.appIcon,
 
       name: item?.name,
+      englishName: item?.englishName,
       description: item?.description,
       language: item.contentLanguage ? item.contentLanguage : item?.language,
 

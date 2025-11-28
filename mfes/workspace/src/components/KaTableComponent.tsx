@@ -346,6 +346,19 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
                               >
                                 {props.rowData.name}
                               </Typography>
+                              {props?.rowData?.englishName && (
+                              <Typography
+                                variant="body1"
+                                sx={{
+                                  fontWeight: 500,
+                                  color: '#1F1B13',
+                                  fontSize: '14px',
+                                }}
+                                className="one-line-text"
+                              >
+                                {props?.rowData?.englishName}
+                              </Typography>
+                              )}
                             </div>
                             <div>
                               <Typography
@@ -410,6 +423,7 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
                 if (props?.rowData?.creator || props?.rowData?.author)
                   return (
                     <Typography
+                      className="one-line-text"
                       sx={{ fontSize: '14px', fontWeight: 500 }}
                       variant="body2"
                       color={'#987100'}
@@ -420,6 +434,7 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
                 else
                   return (
                     <Typography
+                      className="one-line-text"
                       sx={{ fontSize: '14px', fontWeight: 500 }}
                       variant="body2"
                       color={'#987100'}

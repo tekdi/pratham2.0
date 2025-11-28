@@ -36,6 +36,7 @@ import {
 import { getUserDetails } from '../../../../services/ProfileService';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import Button from '@mui/material/Button';
+import DownloadIcon from '@mui/icons-material/Download';
 import {
   getStatusIcon,
   getStatusLabel,
@@ -53,6 +54,10 @@ import { toPascalCase } from '../../../../utils/Helper';
 import UploadFiles from '../../../../components/UploadFiles/UploadFiles';
 import CloseIcon from '@mui/icons-material/Close';
 import QuestionMarksManualUpdate from '../../../../components/assessment/QuestionMarksManualUpdate';
+import { pdf } from '@react-pdf/renderer';
+// @ts-expect-error - file-saver doesn't have TypeScript definitions
+import { saveAs } from 'file-saver';
+import ManualAssessmentResultPDF from '../../../../components/assessment/ManualAssessmentResultPDF';
 interface ScoreDetail {
   questionId: string | null;
   pass: string;
@@ -271,6 +276,7 @@ const AssessmentDetails = () => {
   // Sample uploaded images data
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const previousUploadedImagesRef = useRef<UploadedImage[] | null>(null);
+  const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
   // Upload Options Popup handlers
   const handleUploadInfoClick = () => {
     const hasImages =
@@ -991,6 +997,60 @@ const AssessmentDetails = () => {
     await fetchOfflineAssessmentData(true);
   };
 
+  const handleDownloadPDF = async () => {
+    if (!assessmentTrackingData || !assessmentName) {
+      setSnackbar({
+        open: true,
+        message: 'Assessment data not available for download',
+        severity: 'error',
+      });
+      return;
+    }
+
+    try {
+      setIsDownloadingPDF(true);
+      const userName = `${toPascalCase(userDetails?.name || '')} ${toPascalCase(
+        userDetails?.lastName || ''
+      )}`.trim();
+
+      const blob = await pdf(
+        <ManualAssessmentResultPDF
+          assessmentTrackingData={assessmentTrackingData}
+          userName={userName || 'Student'}
+          assessmentName={toPascalCase(assessmentName)}
+          questionNumberingMap={questionNumberingMap}
+          sectionMapping={sectionMapping}
+        />
+      ).toBlob();
+
+      const sanitizedUserName =
+        (userName && userName.replace(/[^a-zA-Z0-9]/g, '_')) || 'Student';
+      const sanitizedAssessmentName = toPascalCase(assessmentName).replace(
+        /[^a-zA-Z0-9]/g,
+        '_'
+      );
+      const filename = `Assessment_Result_${sanitizedUserName}_${sanitizedAssessmentName}_${new Date()
+        .toISOString()
+        .split('T')[0]}.pdf`;
+
+      saveAs(blob, filename);
+      setSnackbar({
+        open: true,
+        message: 'PDF downloaded successfully',
+        severity: 'success',
+      });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      setSnackbar({
+        open: true,
+        message: 'Failed to generate PDF. Please try again.',
+        severity: 'error',
+      });
+    } finally {
+      setIsDownloadingPDF(false);
+    }
+  };
+
   const handleSubmissionSuccess = async () => {
     if (isReUploadMode) {
       // In re-upload mode, update the assessmentData with the new uploaded images
@@ -1106,20 +1166,34 @@ const AssessmentDetails = () => {
           overflow: 'hidden',
         }}
       >
-        {/* Assessment Status */}
+        {/* Assessment Status + Actions */}
         <Box
           sx={{
             display: 'flex',
-            alignItems: 'center',
+            alignItems: { xs: 'flex-start', md: 'center' },
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
             gap: 2,
             pb: 2,
           }}
         >
-          {userAssessmentStatus ? (
-            <>
-              {getStatusIcon(
-                mapAnswerSheetStatusToInternalStatus(userAssessmentStatus)
-              )}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            {userAssessmentStatus ? (
+              <>
+                {getStatusIcon(
+                  mapAnswerSheetStatusToInternalStatus(userAssessmentStatus)
+                )}
+                <Typography
+                  sx={{
+                    color: '#1F1B13',
+                    fontSize: { xs: '14px', md: '16px' },
+                    fontWeight: 400,
+                  }}
+                >
+                  {getStatusLabel(userAssessmentStatus)}
+                </Typography>
+              </>
+            ) : (
               <Typography
                 sx={{
                   color: '#1F1B13',
@@ -1127,21 +1201,40 @@ const AssessmentDetails = () => {
                   fontWeight: 400,
                 }}
               >
-                {getStatusLabel(userAssessmentStatus)}
+                <MinimizeIcon />
+                Not Submitted
               </Typography>
-            </>
-          ) : (
-            <Typography
-              sx={{
-                color: '#1F1B13',
-                fontSize: { xs: '14px', md: '16px' },
-                fontWeight: 400,
-              }}
-            >
-              <MinimizeIcon />
-              Not Submitted
-            </Typography>
-          )}
+            )}
+          </Box>
+          {assessmentTrackingData &&
+            (assessmentData?.status === 'Approved' ||
+              userAssessmentStatus === 'Completed') && (
+              <Button
+                variant="contained"
+                startIcon={<DownloadIcon />}
+                onClick={handleDownloadPDF}
+                disabled={isDownloadingPDF}
+                sx={{
+                  bgcolor: '#1A8825',
+                  color: '#FFFFFF',
+                  textTransform: 'none',
+                  borderRadius: '8px',
+                  px: 2,
+                  py: 1,
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  '&:hover': {
+                    bgcolor: '#15701A',
+                  },
+                  '&:disabled': {
+                    bgcolor: '#cccccc',
+                    color: '#666666',
+                  },
+                }}
+              >
+                {isDownloadingPDF ? 'Preparing PDF...' : 'Download Result PDF'}
+              </Button>
+            )}
         </Box>
 
         {/* Two-column layout: Left - existing content, Right - question paper placeholder */}
@@ -1474,6 +1567,7 @@ const AssessmentDetails = () => {
         onSubmissionSuccess={handleSubmissionSuccess}
         isReUploadMode={isReUploadMode}
         setAssessmentTrackingData={setAssessmentTrackingData}
+        customMaxImages={10}
       />
 
       {/* Snackbar for feedback */}
