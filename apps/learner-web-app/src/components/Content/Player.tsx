@@ -392,7 +392,15 @@ const App = ({
         />
         {item?.content?.artifactUrl &&
           isDownloadableMimeType(item?.content?.mimeType || mimeType) && (
-            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
+            <Box
+              sx={{
+                my: 3,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                minHeight: '60px',
+              }}
+            >
               <Button
                 variant="contained"
                 onClick={handleDownloadButtonClick}
@@ -527,6 +535,18 @@ const App = ({
         sx={{
           '& .MuiDialog-paper': {
             margin: 0,
+            maxHeight: '100vh',
+          },
+        }}  
+        PaperProps={{
+          sx: {
+            width: {
+              xs: '100%',
+              sm: '80%',
+              md: '60%',
+              lg: '50%',
+            },
+            maxWidth: '100%',
             maxHeight: '100vh',
           },
         }}
