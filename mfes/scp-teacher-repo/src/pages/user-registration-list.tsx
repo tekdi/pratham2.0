@@ -2,20 +2,28 @@ import React, { useState } from 'react';
 import { Box, Grid, Typography, TextField, InputAdornment } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import Header from '@/components/Header';
-import RegistrationPieChart from '@/components/UserRegistration/RegistrationPieChart';
-import RegistrationTabs from '@/components/UserRegistration/RegistrationTabs';
-import UserCard from '@/components/UserRegistration/UserCard';
-import BottomActionBar from '@/components/UserRegistration/BottomActionBar';
-import { userList } from '@/components/UserRegistration/dummyData';
+import Header from '../components/Header';
+import RegistrationPieChart from '../components/UserRegistration/RegistrationPieChart';
+import RegistrationTabs from '../components/UserRegistration/RegistrationTabs';
+import UserCard from '../components/UserRegistration/UserCard';
+import BottomActionBar from '../components/UserRegistration/BottomActionBar';
+import AssignBatchModal from '../components/UserRegistration/AssignBatchModal';
+import AssignBatchSuccessModal from '../components/UserRegistration/AssignBatchSuccessModal';
+import MoreOptionsBottomSheet from '../components/UserRegistration/MoreOptionsBottomSheet';
+import { userList } from '../components/UserRegistration/dummyData';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import withRole from '@/components/withRole';
+import withRole from '../components/withRole';
 import { TENANT_DATA } from '../../app.config';
 
 const UserRegistrationList = () => {
   const [tabValue, setTabValue] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUsers, setSelectedUsers] = useState<Set<number>>(new Set());
+  const [assignBatchModalOpen, setAssignBatchModalOpen] = useState(false);
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
+  const [selectedBatchName, setSelectedBatchName] = useState('');
+  const [moreOptionsOpen, setMoreOptionsOpen] = useState(false);
+  const [users, setUsers] = useState([...userList]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -42,14 +50,52 @@ const UserRegistrationList = () => {
   };
 
   const handleAssignBatch = () => {
-    // TODO: Implement assign batch functionality
-    console.log('Assign batch for users:', Array.from(selectedUsers));
+    setAssignBatchModalOpen(true);
+  };
+
+  const handleAssignBatchSubmit = (data: { mode: string; center: string; batch: string }) => {
+    // Close assign batch modal
+    setAssignBatchModalOpen(false);
+    // Set batch name for success modal
+    setSelectedBatchName(data.batch);
+    // Open success modal
+    setSuccessModalOpen(true);
+    // Clear selections
+    setSelectedUsers(new Set());
+  };
+
+  const handleCallLogUpdate = (userId: number, callLog: { date: string; note: string }) => {
+    setUsers((prevUsers) =>
+      prevUsers.map((user) =>
+        user.id === userId
+          ? {
+              ...user,
+              callLogs: [...user.callLogs, { date: callLog.date, status: 'Logged', note: callLog.note }],
+            }
+          : user
+      )
+    );
   };
 
   const handleMoreOptions = () => {
-    // TODO: Implement more options menu
-    console.log('More options clicked');
+    setMoreOptionsOpen(true);
   };
+
+  const handleNotInterested = () => {
+    // TODO: Implement not interested action
+    console.log('Not interested for learners:', Array.from(selectedUsers));
+    setSelectedUsers(new Set());
+  };
+
+  const handleMayJoinNextYear = () => {
+    // TODO: Implement may join next year action
+    console.log('May join next year for learners:', Array.from(selectedUsers));
+    setSelectedUsers(new Set());
+  };
+
+  const selectedLearnerNames = users
+    .filter((user) => selectedUsers.has(user.id))
+    .map((user) => user.name);
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#FBF4E4', pb: selectedUsers.size > 0 ? '80px' : 0, overflowX: 'hidden' }}>
@@ -120,12 +166,13 @@ const UserRegistrationList = () => {
         )}
 
         <Box sx={{ mt: 2 }}>
-            {userList.map((user) => (
+            {users.map((user) => (
                 <UserCard 
                     key={user.id} 
                     user={user}
                     isSelected={selectedUsers.has(user.id)}
                     onSelectChange={handleUserSelect}
+                    onCallLogUpdate={handleCallLogUpdate}
                 />
             ))}
         </Box>
@@ -137,6 +184,30 @@ const UserRegistrationList = () => {
         onCancel={handleCancel}
         onAssignBatch={handleAssignBatch}
         onMoreOptions={handleMoreOptions}
+      />
+
+      {/* Assign Batch Modal */}
+      <AssignBatchModal
+        open={assignBatchModalOpen}
+        onClose={() => setAssignBatchModalOpen(false)}
+        selectedLearners={selectedLearnerNames}
+        onAssign={handleAssignBatchSubmit}
+      />
+
+      {/* Success Modal */}
+      <AssignBatchSuccessModal
+        open={successModalOpen}
+        onClose={() => setSuccessModalOpen(false)}
+        batchName={selectedBatchName}
+      />
+
+      {/* More Options Bottom Sheet */}
+      <MoreOptionsBottomSheet
+        open={moreOptionsOpen}
+        onClose={() => setMoreOptionsOpen(false)}
+        selectedCount={selectedUsers.size}
+        onNotInterested={handleNotInterested}
+        onMayJoinNextYear={handleMayJoinNextYear}
       />
     </Box>
   );
@@ -151,5 +222,3 @@ export async function getStaticProps({ locale }: any) {
 }
 
 export default withRole(TENANT_DATA.SECOND_CHANCE_PROGRAM)(UserRegistrationList);
-
-

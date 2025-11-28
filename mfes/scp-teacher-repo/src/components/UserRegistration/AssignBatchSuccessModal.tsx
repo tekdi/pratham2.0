@@ -110,7 +110,7 @@ const AssignBatchSuccessModal: React.FC<AssignBatchSuccessModalProps> = ({
               color: '#1E1B16',
               fontWeight: 600,
               fontSize: '16px',
-              borderRadius: '8px',
+              borderRadius: '100px',
               py: 1.5,
               textTransform: 'none',
               '&:hover': {

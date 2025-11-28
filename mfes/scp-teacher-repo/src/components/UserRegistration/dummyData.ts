@@ -18,7 +18,7 @@ export const userList = [
     ],
     isNew: true,
     preTestStatus: 'pending',
-    modeType: 'in-person'
+    modeType: 'in-person' as 'in-person' | 'remote'
   },
   {
     id: 2,
@@ -37,7 +37,7 @@ export const userList = [
     callLogs: [],
     isNew: false,
     preTestStatus: 'completed',
-    modeType: 'in-person'
+    modeType: 'in-person' as 'in-person' | 'remote'
   },
   {
     id: 3,
@@ -56,6 +56,6 @@ export const userList = [
     callLogs: [],
     isNew: false,
     preTestStatus: 'completed',
-    modeType: 'remote'
+    modeType: 'remote' as 'in-person' | 'remote'
   },
 ];
