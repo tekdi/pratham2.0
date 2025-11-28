@@ -29,7 +29,7 @@ const Menuitems = [
     subOptions: [
       {
         title: 'SIDEBAR.TEAM_LEADERS',
-        href: ['/leader-user'],
+        href: ['/user-leader'],
       },
       {
         title: 'SIDEBAR.FACILITATORS',
@@ -39,7 +39,7 @@ const Menuitems = [
         title: 'SIDEBAR.LEARNERS',
         href: ['/learners'],
       },
-       {
+      {
         title: 'SIDEBAR.MENTOR',
         href: ['/mentor'],
       },
@@ -74,7 +74,6 @@ const Menuitems = [
         title: 'Village',
         href: ['/village'],
       },
-     
     ],
   },
   {
@@ -124,7 +123,9 @@ export const getFilteredMenuItems = () => {
     }
 
     if (userInfo?.role === Role.SCTA || userInfo?.role === Role.CCTA) {
-      if (userInfo?.tenantData[0]?.tenantName != TenantName.SECOND_CHANCE_PROGRAM) {
+      if (
+        userInfo?.tenantData[0]?.tenantName != TenantName.SECOND_CHANCE_PROGRAM
+      ) {
         return Menuitems.filter((item) => item.title === 'SIDEBAR.WORKSPACE');
       }
       // For SCTA and CCTA, show only Course Planner and Workspace
@@ -136,55 +137,60 @@ export const getFilteredMenuItems = () => {
       );
     }
 
-if (
-  userInfo?.role === Role.ADMIN &&
-  userInfo?.tenantData[0]?.tenantName === TenantName.YOUTHNET
-) {
-  return Menuitems.filter(
-    (item) =>
-      item.title === 'SIDEBAR.MANAGE_USERS' ||
-    item.title === 'SIDEBAR.SUPPORT_REQUEST' ||
-      item.title === 'SIDEBAR.SUPPORT_REQUEST' ||
-       item.title === 'SIDEBAR.CERTIFICATE_ISSUANCE' || 
-         item.title === 'MASTER.MASTER'
-  ).map((item) => {
-    if (item.title === 'SIDEBAR.MANAGE_USERS' && item.subOptions) {
-      return {
-        ...item,
-        subOptions: item.subOptions.filter(
-          (subItem) =>
-            subItem.title === 'SIDEBAR.MENTOR' ||
-            subItem.title === 'SIDEBAR.MENTOR_LEADER'
-        ),
-      };
+    if (
+      userInfo?.role === Role.ADMIN &&
+      userInfo?.tenantData[0]?.tenantName === TenantName.YOUTHNET
+    ) {
+      return Menuitems.filter(
+        (item) =>
+          item.title === 'SIDEBAR.MANAGE_USERS' ||
+          item.title === 'SIDEBAR.SUPPORT_REQUEST' ||
+          item.title === 'SIDEBAR.SUPPORT_REQUEST' ||
+          item.title === 'SIDEBAR.CERTIFICATE_ISSUANCE' ||
+          item.title === 'MASTER.MASTER'
+      )
+        .map((item) => {
+          if (item.title === 'SIDEBAR.MANAGE_USERS' && item.subOptions) {
+            return {
+              ...item,
+              subOptions: item.subOptions.filter(
+                (subItem) =>
+                  subItem.title === 'SIDEBAR.MENTOR' ||
+                  subItem.title === 'SIDEBAR.MENTOR_LEADER'
+              ),
+            };
+          }
+          return item;
+        })
+        .filter((item) => item.subOptions?.length || !item.subOptions);
     }
-    return item;
-  }).filter((item) => item.subOptions?.length || !item.subOptions);
-}
 
-if (
-  userInfo?.role === Role.ADMIN &&
-  userInfo?.tenantData[0]?.tenantName === TenantName.SECOND_CHANCE_PROGRAM
-) {
-  return Menuitems.map((item) => {
-    if (item.title === 'SIDEBAR.MANAGE_USERS' && item.subOptions) {
-      return {
-        ...item,
-        subOptions: item.subOptions.filter(
-          (subItem) =>
-            subItem.title === 'SIDEBAR.TEAM_LEADERS' ||
-            subItem.title === 'SIDEBAR.FACILITATORS' || 
-            subItem.title === 'SIDEBAR.LEARNERS'
-          
-        ),
-      };
+    if (
+      userInfo?.role === Role.ADMIN &&
+      userInfo?.tenantData[0]?.tenantName === TenantName.SECOND_CHANCE_PROGRAM
+    ) {
+      return Menuitems.map((item) => {
+        if (item.title === 'SIDEBAR.MANAGE_USERS' && item.subOptions) {
+          return {
+            ...item,
+            subOptions: item.subOptions.filter(
+              (subItem) =>
+                subItem.title === 'SIDEBAR.TEAM_LEADERS' ||
+                subItem.title === 'SIDEBAR.FACILITATORS' ||
+                subItem.title === 'SIDEBAR.LEARNERS'
+            ),
+          };
+        }
+        return item;
+      }).filter(
+        (item) =>
+          item.title === 'SIDEBAR.MANAGE_USERS' ||
+          item.title === 'SIDEBAR.SUPPORT_REQUEST' ||
+          item.title === 'SIDEBAR.CENTERS' ||
+          item.title === 'SIDEBAR.CERTIFICATE_ISSUANCE' ||
+          item.title === 'MASTER.MASTER'
+      );
     }
-    return item;
-  }).filter((item) => item.title === 'SIDEBAR.MANAGE_USERS' || item.title === 'SIDEBAR.SUPPORT_REQUEST' ||  item.title === 'SIDEBAR.CENTERS' ||  item.title === 'SIDEBAR.CERTIFICATE_ISSUANCE' ||  item.title === 'MASTER.MASTER' );
-}
-
-
-
 
     if (
       userInfo?.role === Role.ADMIN &&
@@ -210,7 +216,7 @@ if (
           item.title !== 'SIDEBAR.COURSE_PLANNER' &&
           item.title !== 'SIDEBAR.WORKSPACE' &&
           item.title !== 'SIDEBAR.CENTERS' &&
-          item.title !== 'SIDEBAR.MANAGE_USERS' && 
+          item.title !== 'SIDEBAR.MANAGE_USERS' &&
           item.title !== 'SIDEBAR.CERTIFICATE_ISSUANCE'
       );
     }

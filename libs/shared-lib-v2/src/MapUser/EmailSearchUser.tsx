@@ -10,9 +10,9 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import { post } from '@/services/RestClient';
-import { showToastMessage } from '@/components/Toastify';
+import { showToastMessage } from '@shared-lib-v2/DynamicForm/components/Toastify';
 import { transformLabel } from '@/utils/Helper';
-import { API_ENDPOINTS } from '@/utils/API/APIEndpoints';
+import { API_ENDPOINTS } from '@shared-lib-v2/utils/API/EndUrls';
 import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
 
 import { useTranslation } from 'react-i18next';
@@ -22,6 +22,10 @@ interface EmailSearchUserProps {
   onUserDetails: (userUpdatedDetails: any) => void;
   schema: any;
   uiSchema: any;
+  prefilledState: any;
+  onPrefilledStateChange: (prefilledState: any) => void;
+  roleId: string;
+  tenantId: string;
 }
 
 interface UserDetails {
@@ -40,15 +44,23 @@ const EmailSearchUser: React.FC<EmailSearchUserProps> = ({
   onUserDetails,
   schema,
   uiSchema,
+  prefilledState,
+  onPrefilledStateChange,
+  roleId,
+  tenantId,
 }) => {
   const { t } = useTranslation();
 
-  const [email, setEmail] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [userRow, setUserRow] = useState<any>(null);
-  const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [isUserLoaded, setIsUserLoaded] = useState(false);
+  const [email, setEmail] = useState(prefilledState?.email || '');
+  const [loading, setLoading] = useState(prefilledState?.loading || false);
+  const [userDetails, setUserDetails] = useState<UserDetails | null>(
+    prefilledState?.userDetails || null
+  );
+  const [isUserLoaded, setIsUserLoaded] = useState(
+    prefilledState?.isUserLoaded || false
+  );
+  const [validationError, setValidationError] = useState<string | null>(null);
+  const [canProceed, setCanProceed] = useState<boolean>(true);
 
   const fetchUserByEmail = async () => {
     if (!email || !email.trim()) {
@@ -64,6 +76,8 @@ const EmailSearchUser: React.FC<EmailSearchUserProps> = ({
     }
 
     setLoading(true);
+    setValidationError(null);
+    setCanProceed(true);
     try {
       const apiUrl = API_ENDPOINTS.usersHierarchyView;
 
@@ -81,7 +95,63 @@ const EmailSearchUser: React.FC<EmailSearchUserProps> = ({
       ) {
         const user = response.data.result.user;
 
-        setUserRow(user);
+        // Validate tenant and role
+        const tenantData = user.tenantData || [];
+        const matchedTenant = tenantData.find(
+          (tenant: any) => tenant.tenantId === tenantId
+        );
+
+        if (matchedTenant) {
+          const tenantStatus = matchedTenant.tenantStatus?.toLowerCase();
+          const roleData = matchedTenant.roleData || [];
+          const isRolePresent = roleData.some(
+            (role: any) => role.roleId === roleId
+          );
+
+          // Case 1: Tenant is inactive or archived
+          if (tenantStatus === 'inactive' || tenantStatus === 'archived') {
+            setLoading(false);
+            setValidationError('Already deleted user cannot be mapped');
+            setCanProceed(false);
+            setUserDetails(null);
+            setIsUserLoaded(false);
+            showToastMessage('Already deleted user cannot be mapped', 'error');
+            if (onUserSelected) {
+              onUserSelected('');
+            }
+            return;
+          }
+
+          // Case 2: Tenant is active and role is already present
+          if (tenantStatus === 'active' && isRolePresent) {
+            setLoading(false);
+            setValidationError(
+              'User is already mapped to this role. Please use reassign option'
+            );
+            setCanProceed(false);
+            setUserDetails(null);
+            setIsUserLoaded(false);
+            showToastMessage(
+              'User is already mapped to this role. Please use reassign option',
+              'error'
+            );
+            if (onUserSelected) {
+              onUserSelected('');
+            }
+            return;
+          }
+
+          // Case 3: Tenant is active and role is not present - proceed normally
+          if (tenantStatus === 'active' && !isRolePresent) {
+            setValidationError(null);
+            setCanProceed(true);
+          }
+        } else {
+          // Tenant not found in user's tenantData - proceed normally
+          setValidationError(null);
+          setCanProceed(true);
+        }
+
         let tempFormData = extractMatchingKeys(user, schema);
         setPrefilledFormData(tempFormData);
 
@@ -129,27 +199,29 @@ const EmailSearchUser: React.FC<EmailSearchUserProps> = ({
         const block = getFieldValue(blockField);
         const village = getFieldValue(villageField);
 
-        const details: UserDetails = {
-          userId: extractedUserId,
-          name: name,
-          dob: dob,
-          mobile: mobile,
-          state: state,
-          district: district,
-          block: block,
-          village: village,
-        };
+        // Only proceed if validation passed
+        if (canProceed) {
+          const details: UserDetails = {
+            userId: extractedUserId,
+            name: name,
+            dob: dob,
+            mobile: mobile,
+            state: state,
+            district: district,
+            block: block,
+            village: village,
+          };
 
-        setUserDetails(details);
-        setUserId(extractedUserId);
-        setIsUserLoaded(true);
+          setUserDetails(details);
+          setIsUserLoaded(true);
 
-        // Call callback with userId
-        if (onUserSelected) {
-          onUserSelected(extractedUserId);
+          // Call callback with userId
+          if (onUserSelected) {
+            onUserSelected(extractedUserId);
+          }
+
+          showToastMessage('User details fetched successfully', 'success');
         }
-
-        showToastMessage('User details fetched successfully', 'success');
       } else {
         showToastMessage('User not found with this email address', 'error');
         resetUserData();
@@ -168,8 +240,9 @@ const EmailSearchUser: React.FC<EmailSearchUserProps> = ({
 
   const resetUserData = () => {
     setUserDetails(null);
-    setUserId(null);
     setIsUserLoaded(false);
+    setValidationError(null);
+    setCanProceed(true);
     if (onUserSelected) {
       onUserSelected('');
     }
@@ -196,67 +269,24 @@ const EmailSearchUser: React.FC<EmailSearchUserProps> = ({
 
   //dynamci form for update user details
   const [prefilledFormData, setPrefilledFormData] = useState(
-    {}
+    prefilledState?.prefilledFormData || {}
   );
   const [alteredSchema, setAlteredSchema] = useState<any>(schema);
   const [alteredUiSchema, setAlteredUiSchema] = useState<any>(uiSchema);
 
   const FormSubmitFunction = async (formData: any, payload: any) => {
-    console.log(formData, 'formdata');
+    // console.log(formData, 'formdata');
     console.log('########## debug payload', payload);
     console.log('########## debug formdata', formData);
     setPrefilledFormData(formData);
-    // convert to payload
-    // console.log('######### filteredData', JSON.stringify(filteredData));
-    const cleanedData = Object.fromEntries(
-      Object.entries(formData).filter(
-        ([_, value]) => !Array.isArray(value) || value.length > 0
-      )
-    );
-    //step-2 : Validate the form data
-    function transformFormData(
-      formData: Record<string, any>,
-      schema: any,
-      extraFields: Record<string, any> = {} // Optional root-level custom fields
-    ) {
-
-      const transformedData: Record<string, any> = {
-        ...extraFields, // Add optional root-level custom fields dynamically
-        customFields: [],
-      };
-
-      for (const key in formData) {
-        if (schema.properties[key]) {
-          const fieldSchema = schema.properties[key];
-
-          if (fieldSchema.coreField === 0 && fieldSchema.fieldId) {
-            // Use fieldId for custom fields
-            transformedData.customFields.push({
-              fieldId: fieldSchema.fieldId,
-              value: formData[key] || '',
-            });
-          } else {
-            // Use the field name for core fields
-            transformedData[key] = formData[key] || '';
-          }
-        }
-      }
-
-      return transformedData;
-    }
-
-    // Optional extra root-level fields
-    // Extra Field for cohort creation
-
-    const transformedFormData = transformFormData(
-      cleanedData,
-      schema,
-      {}
-    );
-
-    console.log('########## debug transformedFormData', transformedFormData);
-
-    onUserDetails(transformedFormData);
+    onUserDetails(payload);
+    onPrefilledStateChange({
+      email: email,
+      loading: loading,
+      prefilledFormData: formData,
+      userDetails: payload,
+      isUserLoaded: isUserLoaded,
+    });
   };
 
   return (
@@ -305,34 +335,47 @@ const EmailSearchUser: React.FC<EmailSearchUserProps> = ({
         </Button>
       </Box>
 
-      {/* User Details Section */}
-      {isUserLoaded && userDetails && (
+      {/* Validation Error Section */}
+      {validationError && (
         <Box
           sx={{
-            border: '1px solid #e0e0e0',
+            border: '1px solid #f44336',
             borderRadius: 2,
-            p: 3,
-            backgroundColor: '#f9f9f9',
+            p: 2,
+            backgroundColor: '#ffebee',
           }}
         >
-        <Typography variant="h1" sx={{ mb: 2, color: '#000000' }}>
-          User Details
-        </Typography>
-          <DynamicForm
-            schema={alteredSchema}
-            uiSchema={alteredUiSchema}
-            t={t}
-            FormSubmitFunction={FormSubmitFunction}
-            prefilledFormData={prefilledFormData}
-            hideSubmit={true}
-            extraFields={[]}
-            type={''}
-            isCallSubmitInHandle={true}
-            SubmitaFunction={FormSubmitFunction}
-          />
-          <Box sx={{marginTop: 2}}>
-          </Box>
+          <Typography variant="body1" sx={{ color: '#d32f2f' }}>
+            {validationError}
+          </Typography>
         </Box>
+      )}
+
+      {/* User Details Section */}
+      {isUserLoaded && userDetails && canProceed && (
+        <>
+          <Box
+            sx={{
+              border: '1px solid #e0e0e0',
+              borderRadius: 2,
+              p: 3,
+              backgroundColor: '#f9f9f9',
+            }}
+          >
+            <Typography variant="h1" sx={{ mb: 2, color: '#000000' }}>
+              User Details
+            </Typography>
+            <DynamicForm
+              schema={alteredSchema}
+              uiSchema={alteredUiSchema}
+              FormSubmitFunction={FormSubmitFunction}
+              prefilledFormData={prefilledFormData}
+              hideSubmit={true}
+              type={''}
+            />
+            {/* <Box sx={{ marginTop: 2 }}></Box> */}
+          </Box>
+        </>
       )}
     </Box>
   );

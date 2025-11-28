@@ -122,7 +122,7 @@ const DynamicForm = ({
 
   const getInitialUiSchema = () => {
     let initialUiSchema = uiSchema;
-    
+
     if (!prefilledFormData || !prefilledFormData.family_member_details) {
       const cleanedUiSchema = { ...uiSchema };
       delete cleanedUiSchema.mother_name;
@@ -130,9 +130,12 @@ const DynamicForm = ({
       delete cleanedUiSchema.spouse_name;
       initialUiSchema = cleanedUiSchema;
     }
-    
+
     // Add note to lastName field in initial uiSchema
-    if (initialUiSchema.lastName && !initialUiSchema.lastName['ui:options']?.note) {
+    if (
+      initialUiSchema.lastName &&
+      !initialUiSchema.lastName['ui:options']?.note
+    ) {
       initialUiSchema = {
         ...initialUiSchema,
         lastName: {
@@ -144,7 +147,7 @@ const DynamicForm = ({
         },
       };
     }
-    
+
     return initialUiSchema;
   };
   // Initialize state based on createNewLearner flag
@@ -188,7 +191,10 @@ const DynamicForm = ({
         console.log('Adding note to lastName field', formUiSchema.lastName);
         setFormUiSchema((prevUiSchema) => {
           // Check again to avoid unnecessary updates
-          if (prevUiSchema?.lastName && !prevUiSchema.lastName['ui:options']?.note) {
+          if (
+            prevUiSchema?.lastName &&
+            !prevUiSchema.lastName['ui:options']?.note
+          ) {
             const updatedUiSchema = {
               ...prevUiSchema,
               lastName: {
@@ -199,7 +205,10 @@ const DynamicForm = ({
                 },
               },
             };
-            console.log('Updated uiSchema with note:', updatedUiSchema.lastName);
+            console.log(
+              'Updated uiSchema with note:',
+              updatedUiSchema.lastName
+            );
             return updatedUiSchema;
           }
           return prevUiSchema;
@@ -213,14 +222,18 @@ const DynamicForm = ({
   }, [formUiSchema]);
 
   // Helper function to reorder fields in UI schema
-  const reorderUiSchemaFields = (uiSchema: any, moveField: any, afterField: any) => {
+  const reorderUiSchemaFields = (
+    uiSchema: any,
+    moveField: any,
+    afterField: any
+  ) => {
     if (!uiSchema['ui:order']) {
       return uiSchema;
     }
     const order = [...uiSchema['ui:order']];
     const filteredOrder = order.filter((item) => item !== moveField);
     const index = filteredOrder.indexOf(afterField);
-    
+
     if (index !== -1) {
       filteredOrder.splice(index + 1, 0, moveField);
     }
@@ -323,15 +336,15 @@ const DynamicForm = ({
 
             //set ui schema show
             const updatedUiSchema = { ...oldFormUiSchema };
-            
+
             // Add guardian information field to schema as a display-only field
             updatedUiSchema['guardian_info_note'] = {
               'ui:field': 'GuardianInfoField',
               'ui:options': {
-                grid: { xs: 12, sm: 12, md: 12 }
-              }
+                grid: { xs: 12, sm: 12, md: 12 },
+              },
             };
-            
+
             // Clone each key's config and set widget to 'CustomTextFieldWidget' with full width
             requiredKeys.forEach((key) => {
               if (updatedUiSchema.hasOwnProperty(key)) {
@@ -340,8 +353,8 @@ const DynamicForm = ({
                   'ui:widget': 'CustomTextFieldWidget',
                   'ui:options': {
                     ...updatedUiSchema[key]?.['ui:options'],
-                    grid: { xs: 12, sm: 12, md: 12 } // Full width for guardian fields
-                  }
+                    grid: { xs: 12, sm: 12, md: 12 }, // Full width for guardian fields
+                  },
                 };
               }
             });
@@ -353,23 +366,39 @@ const DynamicForm = ({
                 delete oldFormSchema.properties[key];
               }
             });
-            
+
             // Add guardian info note to schema
             oldFormSchema.properties = {
               ...oldFormSchema.properties,
               guardian_info_note: {
                 type: 'string',
                 title: '',
-              }
+              },
             };
-            
+
             // Reorder guardian fields to appear right after DOB
             let reorderedUiSchema = updatedUiSchema;
-            reorderedUiSchema = reorderUiSchemaFields(reorderedUiSchema, 'guardian_info_note', 'dob');
-            reorderedUiSchema = reorderUiSchemaFields(reorderedUiSchema, 'guardian_name', 'guardian_info_note');
-            reorderedUiSchema = reorderUiSchemaFields(reorderedUiSchema, 'guardian_relation', 'guardian_name');
-            reorderedUiSchema = reorderUiSchemaFields(reorderedUiSchema, 'parent_phone', 'guardian_relation');
-            
+            reorderedUiSchema = reorderUiSchemaFields(
+              reorderedUiSchema,
+              'guardian_info_note',
+              'dob'
+            );
+            reorderedUiSchema = reorderUiSchemaFields(
+              reorderedUiSchema,
+              'guardian_name',
+              'guardian_info_note'
+            );
+            reorderedUiSchema = reorderUiSchemaFields(
+              reorderedUiSchema,
+              'guardian_relation',
+              'guardian_name'
+            );
+            reorderedUiSchema = reorderUiSchemaFields(
+              reorderedUiSchema,
+              'parent_phone',
+              'guardian_relation'
+            );
+
             oldFormUiSchema = reorderedUiSchema;
           } else {
             delete formData?.parent_phone;
@@ -405,22 +434,24 @@ const DynamicForm = ({
               // Add mobile field back to schema using stored original configuration
               if (!oldFormSchema.properties[key] && key === 'mobile') {
                 if (originalMobileSchemaRef.current) {
-                  oldFormSchema.properties[key] = { 
+                  oldFormSchema.properties[key] = {
                     ...originalMobileSchemaRef.current,
-                    title: t('phone_number') // Ensure translated title
+                    title: t('phone_number'), // Ensure translated title
                   };
                 } else if (Object.keys(mobileSchema).length > 0) {
-                  oldFormSchema.properties[key] = { 
+                  oldFormSchema.properties[key] = {
                     ...mobileSchema,
-                    title: t('phone_number') // Ensure translated title
+                    title: t('phone_number'), // Ensure translated title
                   };
                 }
               }
-              
+
               // Add mobile field back to UI schema using stored original configuration
               if (!updatedUiSchema[key] && key === 'mobile') {
                 if (originalMobileUiSchemaRef.current) {
-                  updatedUiSchema[key] = { ...originalMobileUiSchemaRef.current };
+                  updatedUiSchema[key] = {
+                    ...originalMobileUiSchemaRef.current,
+                  };
                 } else if (Object.keys(mobileAddUiSchema).length > 0) {
                   updatedUiSchema[key] = { ...mobileAddUiSchema };
                 } else {
@@ -435,10 +466,13 @@ const DynamicForm = ({
                 };
               }
             });
-            
+
             // Remove guardian info note from schema and UI schema
             delete updatedUiSchema['guardian_info_note'];
-            if (oldFormSchema.properties && oldFormSchema.properties.guardian_info_note) {
+            if (
+              oldFormSchema.properties &&
+              oldFormSchema.properties.guardian_info_note
+            ) {
               delete oldFormSchema.properties.guardian_info_note;
             }
 
@@ -480,10 +514,13 @@ const DynamicForm = ({
             delete oldFormSchema.properties[key];
           }
         });
-        
+
         // Remove guardian info note from schema and UI schema initially
         delete updatedUiSchema['guardian_info_note'];
-        if (oldFormSchema.properties && oldFormSchema.properties.guardian_info_note) {
+        if (
+          oldFormSchema.properties &&
+          oldFormSchema.properties.guardian_info_note
+        ) {
           delete oldFormSchema.properties.guardian_info_note;
         }
 
@@ -740,16 +777,16 @@ const DynamicForm = ({
   // Custom field for Guardian Information Note
   const GuardianInfoField = () => {
     return (
-      <Alert 
-        icon={<SecurityIcon />} 
+      <Alert
+        icon={<SecurityIcon />}
         severity="info"
         sx={{
           backgroundColor: '#E3F2FD',
           color: '#1E3A8A',
           mb: 2,
           '& .MuiAlert-icon': {
-            color: '#1E3A8A'
-          }
+            color: '#1E3A8A',
+          },
         }}
       >
         {t('GUARDIAN_INFORMATION_NOTE')}
@@ -1671,7 +1708,8 @@ const DynamicForm = ({
 
       // Protect username from being updated if it's disabled
       // Preserve the existing username value if username field is disabled
-      const isUsernameDisabled = formUiSchema?.username?.['ui:disabled'] === true;
+      const isUsernameDisabled =
+        formUiSchema?.username?.['ui:disabled'] === true;
       if (isUsernameDisabled && prevFormData.current?.username) {
         // Keep the existing username value when username field is disabled
         formData.username = prevFormData.current.username;
@@ -1729,7 +1767,7 @@ const DynamicForm = ({
       const parts = fieldName.split('.');
       fieldName = parts[parts.length - 1];
     }
-    
+
     // Only proceed if the blurred field is firstName or lastName
     if (fieldName !== 'firstName' && fieldName !== 'lastName') {
       return;
@@ -1740,18 +1778,21 @@ const DynamicForm = ({
       formData?.lastName !== undefined &&
       type === 'learner'
     ) {
-     // Check if username field is disabled - don't update if disabled
-      const isUsernameDisabled = formUiSchema?.username?.['ui:disabled'] === true;
-      
+      // Check if username field is disabled - don't update if disabled
+      const isUsernameDisabled =
+        formUiSchema?.username?.['ui:disabled'] === true;
+
       if (isUsernameDisabled) {
         // Username is disabled, don't update it
         return;
       }
 
       // Only update if firstName or lastName actually changed
-      const firstNameChanged = formData.firstName !== prevNameRef.current.firstName;
-      const lastNameChanged = formData.lastName !== prevNameRef.current.lastName;
-      
+      const firstNameChanged =
+        formData.firstName !== prevNameRef.current.firstName;
+      const lastNameChanged =
+        formData.lastName !== prevNameRef.current.lastName;
+
       if (firstNameChanged || lastNameChanged) {
         const randomTwoDigit = Math.floor(10 + Math.random() * 90);
         const newUserName = `${formData.firstName}${formData.lastName}${randomTwoDigit}`;
@@ -1783,7 +1824,7 @@ const DynamicForm = ({
           });
         }
       });
-      
+
       // Remove guardian info note field from submission
       delete updatedFormData.guardian_info_note;
 
@@ -1969,7 +2010,7 @@ const DynamicForm = ({
       updatedError = updatedError.filter((error) => error.name !== 'pattern');
     }
     return updatedError.filter(
-      (err) => !err.property.startsWith(".catchment_area")
+      (err) => !err?.property?.startsWith?.('.catchment_area')
     );
     // console.log('########### issue debug updatedError 123 ', JSON.stringify(updatedError));
     // return updatedError;
