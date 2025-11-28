@@ -10,6 +10,7 @@ import BottomActionBar from '../components/UserRegistration/BottomActionBar';
 import AssignBatchModal from '../components/UserRegistration/AssignBatchModal';
 import AssignBatchSuccessModal from '../components/UserRegistration/AssignBatchSuccessModal';
 import MoreOptionsBottomSheet from '../components/UserRegistration/MoreOptionsBottomSheet';
+import LocationDropdowns from '../components/UserRegistration/LocationDropdowns';
 import { userList } from '../components/UserRegistration/dummyData';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import withRole from '../components/withRole';
@@ -93,6 +94,16 @@ const UserRegistrationList = () => {
     setSelectedUsers(new Set());
   };
 
+  const handleLocationChange = (location: {
+    states?: number[];
+    districts?: number[];
+    blocks?: number[];
+    villages?: number[];
+  }) => {
+    // TODO: Implement location-based filtering
+    console.log('Location changed:', location);
+  };
+
   const selectedLearnerNames = users
     .filter((user) => selectedUsers.has(user.id))
     .map((user) => user.name);
@@ -111,6 +122,11 @@ const UserRegistrationList = () => {
         <RegistrationPieChart />
         
         <RegistrationTabs value={tabValue} onChange={handleTabChange} />
+        
+        {/* Location Dropdowns */}
+        <Box sx={{   mb: 2, borderRadius: '8px' }}>
+          <LocationDropdowns onLocationChange={handleLocationChange} />
+        </Box>
         
         {/* Search and Filter Row */}
         <Grid container spacing={2} sx={{ mb: 2 }} alignItems="center">
