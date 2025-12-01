@@ -43,6 +43,7 @@ export const API_ENDPOINTS = {
   actionObject : `${baseurl}/action/object/category/definition/v1/read?fields=objectMetadata,forms,name,label`,
   program: `${baseurl}/tenant/read`,
   hierarchialSearch: `${baseurl}/user/hierarchical-search`,
+  userTenantStatus: (userId: string, tenantId: string) =>`${baseurl}/user-tenant/status?userId=${userId}&tenantId=${tenantId}`,
   usersHierarchyView: `${baseurl}/user/users-hierarchy-view`,
 };
 

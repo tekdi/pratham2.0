@@ -358,8 +358,8 @@
     "DELETE_PLANNER": "Delete Planner",
     "CSV_TEMPLATE": "CSV Template",
     "NEW_TOPIC": "New Topic",
-        "DOWNLOAD_CSV": "Download Uploaded CSV"
-   
+    "DOWNLOAD_CSV": "Download Uploaded CSV",
+    "DURING_COURSE": "During Course"
 
   },
   "MASTER": {

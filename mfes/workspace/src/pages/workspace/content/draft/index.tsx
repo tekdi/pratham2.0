@@ -126,6 +126,7 @@ const DraftPage = () => {
       image: item?.appIcon,
 
       name: item?.name,
+      englishName: item?.englishName,
       description: item?.description,
 
       contentType: item.primaryCategory,

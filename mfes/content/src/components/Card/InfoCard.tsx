@@ -86,8 +86,8 @@ const InfoCard: React.FC<InfoCardProps> = ({
             item?.posterImage
               ? item.posterImage
               : item?.appIcon
-                ? item.appIcon
-                : _infoCard?.default_img
+              ? item.appIcon
+              : _infoCard?.default_img
           }
           alt={item?.name}
         />
@@ -132,7 +132,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
                 />
               </Box>
             )}
-            <HoverableText 
+            <HoverableText
               name={item?.name}
               maxLines={2}
               variant="body8"
@@ -140,6 +140,19 @@ const InfoCard: React.FC<InfoCardProps> = ({
               fontWeight={700}
               textTransform="capitalize"
             />
+            {item?.englishName && (
+              <Typography
+                variant="body1"
+                component="div"
+                sx={{
+                  fontWeight: 500,
+                  textTransform: 'capitalize',
+                  color: '#49454F',
+                }}
+              >
+                <SpeakableText>{item.englishName}</SpeakableText>
+              </Typography>
+            )}
             <ExpandableText
               text={item?.description}
               maxLines={2}
@@ -198,13 +211,13 @@ const InfoCard: React.FC<InfoCardProps> = ({
                         {t('LEARNER_APP.COURSE.STARTED_ON')}:{' '}
                         {item?.startedOn
                           ? new Intl.DateTimeFormat('en-GB', {
-                            day: '2-digit',
-                            month: 'short',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: true,
-                          }).format(new Date(item.startedOn))
+                              day: '2-digit',
+                              month: 'short',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              hour12: true,
+                            }).format(new Date(item.startedOn))
                           : ' - '}
                       </SpeakableText>
                       {/* {JSON.stringify(_infoCard?.isShowStatus || {})} */}
