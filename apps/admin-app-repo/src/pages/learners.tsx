@@ -592,7 +592,10 @@ const Learner = () => {
     //     setEditableUserId(row?.userId);
     //     handleOpenModal();
     //   },
-    //   show: (row) => row.status !== 'archived',
+      // show: (row) => row?.cohortData?.some(
+      //   (cohort) =>
+      //     cohort?.cohortMember?.status === 'active'
+      // ),
     // },
 
     {
@@ -747,7 +750,10 @@ const Learner = () => {
     //     setEditableUserId(row?.userId);
     //     handleOpenModal();
     //   },
-    //   show: (row) => row.status !== 'archived',
+      // show: (row) => row?.cohortData?.some(
+      //   (cohort) =>
+      //     cohort?.cohortMember?.status === 'active'
+      // ),
     // },
   ];
 
