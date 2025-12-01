@@ -37,7 +37,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import SimpleModal from '@/components/SimpleModal';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { updateCohortMemberStatus } from '@/services/CohortService/cohortService';
+import { bulkCreateCohortMembers, updateCohortMemberStatus } from '@/services/CohortService/cohortService';
 import editIcon from '../../public/images/editIcon.svg';
 import apartment from '../../public/images/apartment.svg';
 import deleteIcon from '../../public/images/deleteIcon.svg';
@@ -870,11 +870,11 @@ const UserLeader = () => {
                       customFields: customFields,
                       userData: userData,
                     });
-                    // console.log('updatedResponse', updateUserResponse);
+                    console.log('######### updatedResponse', updateUserResponse);
 
                     if (
                       updateUserResponse &&
-                      updateUserResponse?.data?.params?.err === null
+                      updateUserResponse?.params?.err === null
                     ) {
                       // getNotification(editableUserId, profileUpdateNotificationKey);
                       showToastMessage(
@@ -896,21 +896,14 @@ const UserLeader = () => {
                       );
 
                       // Call the cohortmember/create API
-                      const response = await axiosInstance.post(
-                        `${API_ENDPOINTS.cohortMemberCreate}`,
-                        {
-                          cohortId: cohortId,
-                          userId: selectedUserId,
-                        },
-                        {
-                          headers: {
-                            accept: '*/*',
-                            'Content-Type': 'application/json',
-                          },
-                        }
-                      );
+                      const response = await bulkCreateCohortMembers({
+                        userId: [selectedUserId],
+                        cohortId: [cohortId],
+                        removeCohortId: [],
+                      });
 
                       if (
+                        response?.responseCode === 200 ||
                         response?.data?.responseCode === 200 ||
                         response?.status === 200
                       ) {

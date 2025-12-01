@@ -300,7 +300,11 @@ const EmailSearchUser: React.FC<EmailSearchUserProps> = ({
           fullWidth
           label="Enter user email address"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            //bug fx for double button click
+            setIsUserLoaded(false);
+            setEmail(e.target.value);
+          }}
           disabled={isUserLoaded}
           variant="outlined"
           type="email"
