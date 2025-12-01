@@ -65,6 +65,7 @@ import FacilitatorForm from '@/components/DynamicForm/FacilitatorForm/Facilitato
 import CenterLabel from '@/components/Centerlabel';
 import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
 import { showToastMessage } from '@/components/Toastify';
+import { getOverallStatus } from '@shared-lib-v2/utils/helper';
 
 const Facilitator = () => {
   const theme = useTheme<any>();
@@ -100,6 +101,7 @@ const Facilitator = () => {
     firstName: '',
     lastName: '',
     village: '',
+    center: '',
   });
 
   const { t, i18n } = useTranslation();
@@ -310,7 +312,7 @@ const Facilitator = () => {
         //     )}
         //   </>
         // );
-        const centers =
+        let centers =
           row.cohortData
             ?.filter(
               (c: any) =>
@@ -319,7 +321,17 @@ const Facilitator = () => {
             )
             .map((c: any) => transformLabel(c.centerName))
             .filter(Boolean) || [];
-
+        if (centers.length === 0) {
+          centers =
+            row.cohortData
+              ?.filter(
+                (c: any) =>
+                  c.centerStatus === 'active' &&
+                  c.cohortMember?.status === 'archived'
+              )
+              .map((c: any) => transformLabel(c.centerName))
+              .filter(Boolean) || [];
+        }
         return centers.join(', ');
       },
     },
@@ -328,7 +340,7 @@ const Facilitator = () => {
       label: 'Batch',
       render: (row) => {
         // console.log('BacthRow', row?.cohortData)
-        const batches =
+        let batches =
           row.cohortData
             ?.filter(
               (c: any) =>
@@ -338,7 +350,18 @@ const Facilitator = () => {
             .map((c: any) => transformLabel(c.batchName))
             .filter(Boolean) || [];
 
-        return batches.join(', ');
+        if (batches.length === 0) {
+          batches =
+            row.cohortData
+              ?.filter(
+                (c: any) =>
+                  c.batchStatus === 'active' &&
+                  c.cohortMember?.status === 'archived'
+              )
+              .map((c: any) => transformLabel(c.batchName))
+              .filter(Boolean) || [];
+        }
+        return batches.join(', ');   
       },
     },
     {
@@ -354,8 +377,8 @@ const Facilitator = () => {
     {
       key: 'status',
       label: 'Status',
-      render: (row: any) => transformLabel(row.status),
-      getStyle: (row) => ({ color: row.status === 'active' ? 'green' : 'red' }),
+      render: (row: any) => transformLabel(getOverallStatus(row?.cohortData)),
+      getStyle: (row) => ({ color: getOverallStatus(row?.cohortData) === 'active' ? 'green' : 'red' }),
     },
   ];
 
@@ -367,9 +390,9 @@ const Facilitator = () => {
       try {
         const userCohortResp = await getCohortList(userID);
         if (userCohortResp?.result?.length) {
-          membershipIds = userCohortResp?.result?.map(
-            (item) => item.cohortMembershipId
-          );
+          membershipIds = userCohortResp?.result
+              ?.filter((c: any) => c.cohortMemberStatus === 'active')
+              ?.map((c: any) => c.cohortMembershipId) || [];
         } else {
           console.warn('No cohort data found for the user.');
         }
@@ -443,9 +466,9 @@ const Facilitator = () => {
       try {
         const userCohortResp = await getCohortList(userID);
         if (userCohortResp?.result?.length) {
-          membershipIds = userCohortResp?.result?.map(
-            (item) => item.cohortMembershipId
-          );
+          membershipIds = userCohortResp?.result
+              ?.filter((c: any) => c.cohortMemberStatus === 'archived')
+              ?.map((c: any) => c.cohortMembershipId) || [];
         } else {
           console.warn('No cohort data found for the user.');
         }
@@ -560,7 +583,10 @@ console.log('response?.result?.getUserDetails',response?.result?.getUserDetails)
         setEditableUserId(row?.userId);
         handleOpenModal();
       },
-      show: (row) => row.status !== 'archived',
+      show: (row) => row.cohortData?.some(
+        (cohort) =>
+          cohort?.cohortMember?.status === 'active'
+      ),
     },
     {
       icon: (
@@ -605,6 +631,11 @@ console.log('response?.result?.getUserDetails',response?.result?.getUserDetails)
           firstName: row?.firstName || '',
           lastName: row?.lastName || '',
           village: centerNames.length!==0 ?centerNames :"-"  ,
+          center:
+          row?.cohortData
+            ?.filter((cohort) => cohort?.cohortMember?.status === 'archived')
+            ?.map((cohort) => cohort?.centerName)
+            ?.join(', ') || '',
         });
         setOpen(true);
         setUserId(row?.userId);
@@ -624,7 +655,10 @@ console.log('response?.result?.getUserDetails',response?.result?.getUserDetails)
         // setPrefilledFormData({});
         // searchData(prefilledFormData, currentPage);
       },
-      show: (row) => row.status !== 'archived',
+      show: (row) => row.cohortData?.some(
+        (cohort) =>
+          cohort?.cohortMember?.status === 'active'
+      ),
     },
     {
       icon: (
@@ -669,7 +703,10 @@ console.log('response?.result?.getUserDetails',response?.result?.getUserDetails)
         setEditableUserId(row?.userId);
         handleOpenModal();
       },
-      show: (row) => row.status !== 'archived',
+      show: (row) => row.cohortData?.some(
+        (cohort) =>
+          cohort?.cohortMember?.status === 'active'
+      ),
     },
     {
       icon: (
@@ -712,11 +749,18 @@ console.log('response?.result?.getUserDetails',response?.result?.getUserDetails)
           firstName: row?.firstName || '',
           lastName: row?.lastName || '',
           village: findVillage?.selectedValues?.[0]?.value || '',
+          center:
+          row?.cohortData
+            ?.filter((cohort) => cohort?.cohortMember?.status === 'archived')
+            ?.map((cohort) => cohort?.centerName)
+            ?.join(', ') || '',
         });
         // setReason('');
         // setChecked(false);
       },
-      show: (row) => row.status !== 'active',
+      show: (row) => row.cohortData?.some(
+        (cohort) =>
+          cohort?.cohortMember?.status === 'archived')
     },
   ];
 
@@ -934,6 +978,7 @@ console.log('response?.result?.getUserDetails',response?.result?.getUserDetails)
           firstName={userData.firstName}
           lastName={userData.lastName}
           village={userData.village}
+          center={userData.center}
           checked={checked}
           setChecked={setChecked}
           reason={reason}
@@ -960,7 +1005,7 @@ console.log('response?.result?.getUserDetails',response?.result?.getUserDetails)
           }}
         >
           <Typography>
-            {userData.firstName} {userData.lastName} {t('FORM.WAS_BELONG_TO')}
+            {userData.firstName} {userData.lastName} {t('FORM.BELONG_TO')}
           </Typography>
           <TextField
             fullWidth
