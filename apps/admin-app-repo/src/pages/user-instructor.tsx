@@ -1,24 +1,30 @@
 // @ts-nocheck
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Form from '@rjsf/mui';
 import validator from '@rjsf/validator-ajv8';
 import axios from 'axios';
-import axiosInstance from '@/services/Interceptor';
-import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
+import DynamicForm from '@/components/DynamicForm/DynamicForm';
 import { enhanceUiSchemaWithGrid } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
 import {
-  TeamLeaderSearchSchema,
-  TeamLeaderSearchUISchema,
-} from '../constant/Forms/TeamLeaderSearch';
+  facilitatorSearchSchema,
+  facilitatorSearchUISchema,
+} from '../constant/Forms/facilitatorSearch';
 import { Role, RoleId, Status } from '@/utils/app.constant';
-import { HierarchicalSearchUserList, userList } from '@/services/UserList';
+import {
+  getUserDetailsInfo,
+  HierarchicalSearchUserList,
+} from '@/services/UserList';
 import {
   Box,
   Checkbox,
+  FormControl,
   FormControlLabel,
+  FormLabel,
   Grid,
+  Radio,
+  RadioGroup,
   TextField,
   Typography,
   Dialog,
@@ -26,21 +32,25 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
-  Button,
 } from '@mui/material';
-import { debounce, set } from 'lodash';
+import { debounce, forEach } from 'lodash';
 import { Numbers } from '@mui/icons-material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import CloseIcon from '@mui/icons-material/Close';
+import { Button } from '@mui/material';
 import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import SimpleModal from '@/components/SimpleModal';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { bulkCreateCohortMembers, updateCohortMemberStatus } from '@/services/CohortService/cohortService';
+import { updateCohortMemberStatus } from '@/services/CohortService/cohortService';
 import editIcon from '../../public/images/editIcon.svg';
-import apartment from '../../public/images/apartment.svg';
 import deleteIcon from '../../public/images/deleteIcon.svg';
+import restoreIcon from '../../public/images/restore_user.svg';
+import CloseIcon from '@mui/icons-material/Close';
+import CenterListWidget from '@shared-lib-v2/MapUser/CenterListWidget';
+import EmailSearchUser from '@shared-lib-v2/MapUser/EmailSearchUser';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
 import Image from 'next/image';
 import {
   extractMatchingKeys,
@@ -52,28 +62,25 @@ import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
 import { deleteUser } from '@/services/UserService';
 import {
-  calculateAge,
-  calculateAgeFromDate,
   transformLabel,
+  fetchUserData,
+  calculateAgeFromDate,
 } from '@/utils/Helper';
+import { getCohortList } from '@/services/GetCohortList';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import apartment from '../../public/images/apartment.svg';
 import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
+import FacilitatorForm from '@/components/DynamicForm/FacilitatorForm/FacilitatorForm';
+import CenterLabel from '@/components/Centerlabel';
 import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
-import restoreIcon from '../../public/images/restore_user.svg';
 import { showToastMessage } from '@/components/Toastify';
-import CenterListWidget from '@shared-lib-v2/MapUser/CenterListWidget';
-import EmailSearchUser from '@shared-lib-v2/MapUser/EmailSearchUser';
-import { API_ENDPOINTS } from '@/utils/API/APIEndpoints';
-import { updateUser } from '@/services/CreateUserService';
-import { splitUserData } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
-import { enrollUserTenant } from '@shared-lib-v2/MapUser/MapService';
 
-const UserLeader = () => {
+const Facilitator = () => {
+  const theme = useTheme<any>();
   const [isLoading, setIsLoading] = useState(false);
-  const [schema, setSchema] = useState(TeamLeaderSearchSchema);
-  const [uiSchema, setUiSchema] = useState(TeamLeaderSearchUISchema);
+  const [schema, setSchema] = useState(facilitatorSearchSchema);
+  const [uiSchema, setUiSchema] = useState(facilitatorSearchUISchema);
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
   const [prefilledState, setPrefilledState] = useState({});
@@ -87,33 +94,41 @@ const UserLeader = () => {
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [isEdit, setIsEdit] = useState(false);
   const [isReassign, setIsReassign] = useState(false);
-  const [archiveToActiveOpen, setArchiveToActiveOpen] = useState(false);
-
   const [editableUserId, setEditableUserId] = useState('');
   const [roleId, setRoleID] = useState('');
+  const [tenantId, setTenantId] = useState('');
+  const [memberShipID, setMemberShipID] = useState('');
   const [blockFieldId, setBlockFieldId] = useState('');
   const [districtFieldId, setDistrictFieldId] = useState('');
+  const [villageFieldId, setVillageFieldId] = useState('');
+  const [archiveToActiveOpen, setArchiveToActiveOpen] = useState(false);
 
-  const [tenantId, setTenantId] = useState('');
   const [open, setOpen] = useState(false);
   const [checked, setChecked] = useState(false);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [village, setVillage] = useState('');
   const [reason, setReason] = useState('');
+
+  // const [centerFieldId, setCenterFieldId] = useState('');
+
   const [userID, setUserId] = useState('');
+  const [userData, setUserData] = useState({
+    firstName: '',
+    lastName: '',
+    village: '',
+  });
 
   const { t, i18n } = useTranslation();
-  const theme = useTheme<any>();
   const formRef = useRef(null);
 
   const [formStep, setFormStep] = useState(0);
 
   const initialFormData = localStorage.getItem('stateId')
-    ? { state: [localStorage.getItem('stateId')] }
-    : {};
+    ? { state: [localStorage.getItem('stateId')], designation: 'facilitator' }
+    : { designation: 'facilitator' };
 
-  const searchStoreKey = 'teamLeader';
+  const searchStoreKey = 'facilitator';
   const initialFormDataSearch =
     localStorage.getItem(searchStoreKey) &&
     localStorage.getItem(searchStoreKey) != '{}'
@@ -132,11 +147,11 @@ const UserLeader = () => {
     const fetchData = async () => {
       const responseForm = await fetchForm([
         {
-          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.teamLead.context}&contextType=${FormContext.teamLead.contextType}`,
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.facilitator.context}&contextType=${FormContext.facilitator.contextType}`,
           header: {},
         },
         {
-          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.teamLead.context}&contextType=${FormContext.teamLead.contextType}`,
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.facilitator.context}&contextType=${FormContext.facilitator.contextType}`,
           header: {
             tenantid: localStorage.getItem('tenantId'),
           },
@@ -161,6 +176,17 @@ const UserLeader = () => {
         alterUISchema.mobile['ui:disabled'] = true;
       }
 
+      //designation is not editable
+      if (alterUISchema?.designation) {
+        alterUISchema = {
+          ...alterUISchema,
+          designation: {
+            ...alterUISchema.designation,
+            'ui:disabled': true,
+          },
+        };
+      }
+
       //bug fix for bakcend multiple times same fields in both form
       let requiredArray = alterSchema?.required;
       if (Array.isArray(requiredArray)) {
@@ -179,7 +205,7 @@ const UserLeader = () => {
       setAddUiSchema(alterUISchema);
     };
     fetchData();
-    setRoleID(RoleId.TEAM_LEADER);
+    setRoleID(RoleId.TEACHER);
     setTenantId(localStorage.getItem('tenantId'));
   }, []);
 
@@ -189,8 +215,9 @@ const UserLeader = () => {
       norender: true, // Hide submit button if isHide is true
     },
   };
+
   const SubmitaFunction = async (formData: any) => {
-    // console.log('###### debug issue formData', formData);
+    // console.log("###### debug issue formData", formData)
     if (Object.keys(formData).length > 0) {
       setPrefilledFormData(formData);
       //set prefilled search data on refresh
@@ -206,21 +233,217 @@ const UserLeader = () => {
     };
     return await HierarchicalSearchUserList({
       ...newData,
-      role: [Role.TEAM_LEADER],
-      customfields: ['state', 'district', 'block', 'village'],
+      role: [Role.TEACHER],
+      customfields: [
+        'state',
+        'district',
+        'block',
+        'village',
+        'main_subject',
+        'subject_taught',
+      ],
     });
   };
+  const searchData = async (formData, newPage) => {
+    if (formData) {
+      formData = Object.fromEntries(
+        Object.entries(formData).filter(
+          ([_, value]) => !Array.isArray(value) || value.length > 0
+        )
+      );
+
+      const staticFilter = {
+        role: 'Instructor',
+        tenantId: localStorage.getItem('tenantId'),
+      };
+      if (localStorage.getItem('roleName') === Role.ADMIN) {
+        staticFilter.state = [localStorage.getItem('stateId')];
+      }
+      const { sortBy } = formData;
+      const staticSort = ['firstName', sortBy || 'asc'];
+      await searchListData(
+        formData,
+        newPage,
+        staticFilter,
+        pageLimit,
+        setPageOffset,
+        setCurrentPage,
+        setResponse,
+        HierarchicalSearchUserListCustom,
+        staticSort
+      );
+    }
+  };
+
+  // Define table columns
+  const columns = [
+    {
+      keys: ['firstName', 'middleName', 'lastName'],
+      label: 'Facilitator Name',
+      render: (row) =>
+        `${transformLabel(row.firstName) || ''} ${
+          transformLabel(row.middleName) || ''
+        } ${transformLabel(row.lastName) || ''}`.trim(),
+    },
+    {
+      keys: ['age'],
+      label: 'Age',
+      render: (row) => calculateAgeFromDate(row.dob) || '',
+    },
+    {
+      keys: ['gender'],
+      label: 'Gender',
+      render: (row) => transformLabel(row.gender) || '',
+    },
+    {
+      keys: ['mobile'],
+      label: 'Mobile',
+      render: (row) => transformLabel(row.mobile) || '',
+    },
+    {
+      keys: ['STATE', 'DISTRICT', 'BLOCK'],
+      label: 'State, District, Block',
+      render: (row: any) => {
+        const state = transformLabel(row?.customfield?.state) || '';
+        const district = transformLabel(row?.customfield?.district) || '';
+        const block = transformLabel(row?.customfield?.block) || '';
+        return `${state == '' ? '' : `${state}`}${
+          district == '' ? '' : `, ${district}`
+        }${block == '' ? '' : `, ${block}`}`;
+      },
+    },
+    {
+      key: 'village',
+      label: 'Village',
+      render: (row) => transformLabel(row?.customfield?.village) || '-',
+    },
+    {
+      key: 'center',
+      label: 'Center',
+      render: (row) => {
+        // let centerArray = row?.customfield?.find(
+        //   (field) => field.label === 'CENTER'
+        // )?.selectedValues
+        // return (
+        //   <>
+        //     {centerArray && (
+        //       <>
+        //         {centerArray.map((centerId) => (
+        //           <>
+        //             <CenterLabel parentId={centerId} />,{' '}
+        //           </>
+        //         ))}
+        //       </>
+        //     )}
+        //   </>
+        // );
+        const centers =
+          row.cohortData
+            ?.filter(
+              (c: any) =>
+                c.centerStatus === 'active' &&
+                c.cohortMember?.status === 'active'
+            )
+            .map((c: any) => transformLabel(c.centerName))
+            .filter(Boolean) || [];
+
+        return centers.join(', ');
+      },
+    },
+    {
+      key: 'batch',
+      label: 'Batch',
+      render: (row) => {
+        // console.log('BacthRow', row?.cohortData)
+        const batches =
+          row.cohortData
+            ?.filter(
+              (c: any) =>
+                c.batchStatus === 'active' &&
+                c.cohortMember?.status === 'active'
+            )
+            .map((c: any) => transformLabel(c.batchName))
+            .filter(Boolean) || [];
+
+        return batches.join(', ');
+      },
+    },
+    {
+      key: 'mysubject',
+      label: 'Main Subjects',
+      render: (row) => transformLabel(row?.customfield?.main_subject) || '-',
+    },
+    {
+      key: 'subjectteach',
+      label: 'Subjects Teach',
+      render: (row) => transformLabel(row?.customfield?.subject_taught) || '-',
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      render: (row: any) => transformLabel(row.status),
+      getStyle: (row) => ({ color: row.status === 'active' ? 'green' : 'red' }),
+    },
+  ];
 
   const userDelete = async () => {
     try {
+      let membershipIds = null;
+
+      // Attempt to get the cohort list
+      try {
+        const userCohortResp = await getCohortList(userID);
+        if (userCohortResp?.result?.length) {
+          membershipIds = userCohortResp?.result?.map(
+            (item) => item.cohortMembershipId
+          );
+        } else {
+          console.warn('No cohort data found for the user.');
+        }
+      } catch (error) {
+        console.error('Failed to fetch cohort list:', error);
+      }
+
+      // Attempt to update cohort member status only if we got a valid membershipId
+      if (membershipIds && Array.isArray(membershipIds)) {
+        for (const membershipId of membershipIds) {
+          try {
+            const updateResponse = await updateCohortMemberStatus({
+              memberStatus: 'archived',
+              statusReason: reason,
+              membershipId,
+            });
+
+            if (updateResponse?.responseCode !== 200) {
+              console.error(
+                `Failed to archive user with membershipId ${membershipId}:`,
+                updateResponse
+              );
+            } else {
+              console.log(
+                `User with membershipId ${membershipId} successfully archived.`
+              );
+            }
+          } catch (error) {
+            console.error(
+              `Error archiving user with membershipId ${membershipId}:`,
+              error
+            );
+          }
+        }
+      }
+
+      // Always attempt to delete the user
+      console.log('Proceeding to self-delete...');
       const resp = await deleteUser(userID, {
         userData: { reason: reason, status: 'archived' },
       });
+
       if (resp?.responseCode === 200) {
         // setResponse((prev) => ({
-        //   ...prev, // Preserve other properties in `prev`
+        //   ...prev,
         //   result: {
-        //     ...prev?.result, // Preserve other properties in `result`
+        //     ...prev?.result,
         //     getUserDetails: prev?.result?.getUserDetails?.filter(
         //       (item) => item?.userId !== userID
         //     ),
@@ -237,6 +460,7 @@ const UserLeader = () => {
       console.error('Error updating team leader:', error);
     }
   };
+
   const archiveToactive = async () => {
     try {
       let membershipIds = null;
@@ -313,76 +537,10 @@ const UserLeader = () => {
       console.error('Error updating team leader:', error);
     }
   };
-  const searchData = async (formData, newPage) => {
-    if (formData) {
-      formData = Object.fromEntries(
-        Object.entries(formData).filter(
-          ([_, value]) => !Array.isArray(value) || value.length > 0
-        )
-      );
-      const staticFilter = {
-        role: 'Lead',
-        tenantId: localStorage.getItem('tenantId'),
-      };
-      if (localStorage.getItem('roleName') === Role.ADMIN) {
-        staticFilter.state = [localStorage.getItem('stateId')];
-      }
-      const { sortBy } = formData;
-      const staticSort = ['firstName', sortBy || 'asc'];
-      await searchListData(
-        formData,
-        newPage,
-        staticFilter,
-        pageLimit,
-        setPageOffset,
-        setCurrentPage,
-        setResponse,
-        HierarchicalSearchUserListCustom,
-        staticSort
-      );
-    }
-  };
-
-  // Define table columns
-  const columns = [
-    {
-      keys: ['firstName', 'middleName', 'lastName'],
-      label: 'Team Lead Name',
-      render: (row) =>
-        `${transformLabel(row.firstName) || ''} ${
-          transformLabel(row.middleName) || ''
-        } ${transformLabel(row.lastName) || ''}`.trim(),
-    },
-    {
-      keys: ['age'],
-      label: 'Age',
-      render: (row) => calculateAgeFromDate(row.dob) || '',
-    },
-    {
-      keys: ['gender'],
-      label: 'Gender',
-      render: (row) => transformLabel(row.gender) || '',
-    },
-    {
-      keys: ['STATE', 'DISTRICT', 'BLOCK'],
-      label: 'State, District, Block',
-      render: (row: any) => {
-        const state = transformLabel(row?.customfield?.state) || '';
-        const district = transformLabel(row?.customfield?.district) || '';
-        const block = transformLabel(row?.customfield?.block) || '';
-        return `${state == '' ? '' : `${state}`}${
-          district == '' ? '' : `, ${district}`
-        }${block == '' ? '' : `, ${block}`}`;
-      },
-    },
-    {
-      key: 'status',
-      label: 'Status',
-      render: (row: any) => transformLabel(row.status),
-      getStyle: (row) => ({ color: row.status === 'active' ? 'green' : 'red' }),
-    },
-  ];
-
+  console.log(
+    'response?.result?.getUserDetails',
+    response?.result?.getUserDetails
+  );
   // Define actions
   const actions = [
     // {
@@ -397,19 +555,35 @@ const UserLeader = () => {
     //         justifyContent: 'center',
     //         padding: '10px',
     //       }}
-    //       title="Edit Team Leader"
+    //       title="Edit Facilitator"
     //     >
     //       <Image src={editIcon} alt="" />
     //     </Box>
     //   ),
-    //   callback: (row) => {
-    //     // console.log('row:', row);
+    //   callback: async (row) => {
+    //     console.log('row:', row);
+    //     //extract id from row and make api call for user/read
     //     // console.log('AddSchema', addSchema);
     //     // console.log('AddUISchema', addUiSchema);
-    //     let tempFormData = extractMatchingKeys(row, addSchema);
+    //     const selectedUserId = row?.userId;
+    //     const selectedUserDetails = await getUserDetailsInfo(
+    //       selectedUserId,
+    //       true
+    //     );
+    //     // console.log('selectedUserDetails:', selectedUserDetails);
+    //     const updatedUserDetails = {
+    //       ...selectedUserDetails,
+    //       userData: {
+    //         ...selectedUserDetails.userData,
+    //         mobile: String(selectedUserDetails.userData.mobile),
+    //       },
+    //     };
+    //     let tempFormData = extractMatchingKeys(updatedUserDetails?.userData, addSchema);
+    //     // console.log('tempFormData', tempFormData);
     //     setPrefilledAddFormData(tempFormData);
     //     setIsEdit(true);
     //     setIsReassign(false);
+    //     setButtonShow(true);
     //     setEditableUserId(row?.userId);
     //     handleOpenModal();
     //   },
@@ -427,25 +601,49 @@ const UserLeader = () => {
     //         justifyContent: 'center',
     //         padding: '10px',
     //       }}
-    //       title="Delete Team Leader"
+    //       title="Delete Facilitator"
     //     >
     //       {' '}
     //       <Image src={deleteIcon} alt="" />{' '}
     //     </Box>
     //   ),
     //   callback: async (row) => {
-    //     const findVillage = row?.customFields.find((item) => {
-    //       if (item.label === 'BLOCK') {
+    //     console.log('row.cohortData:', row.cohortData); // Check what data is available
+    //     const selectedUserId = row?.userId;
+    //     const selectedUserDetails = await getUserDetailsInfo(selectedUserId, true);
+    //     const cohortResponse = await getCohortList(selectedUserId);
+    //     console.log('cohortResponse:', cohortResponse);
+    //     const centerNames = [...new Set(row.cohortData.map(item => item.centerName))];
+    //     const findVillage = selectedUserDetails?.userData?.customFields.find((item) => {
+    //       if (item.label === 'VILLAGE' || item.label === 'BLOCK') {
     //         return item;
     //       }
     //     });
-    //     setVillage(findVillage?.selectedValues[0]?.value);
-    //     setUserId(row?.userId);
+    //     // Option 1: Get village from cohortData if available
+    //     const villagesFromCohort = row.cohortData
+    //       ?.filter((c: any) => c.cohortMember?.status === 'active')
+    //       .map((c: any) => c.villageName || c.village) // adjust property name as per your data
+    //       .filter(Boolean);
+    //     setUserData({
+    //       firstName: row?.firstName || '',
+    //       lastName: row?.lastName || '',
+    //       village: centerNames.length!==0 ?centerNames :"-"  ,
+    //     });
     //     setOpen(true);
-    //     setFirstName(row?.firstName);
-    //     setLastName(row?.lastName);
+    //     setUserId(row?.userId);
     //     setReason('');
     //     setChecked(false);
+    //     // setEditableUserId(row?.userId);
+    //     // const memberStatus = Status.ARCHIVED;
+    //     // const statusReason = '';
+    //     // const membershipId = row?.userId;
+    //     // const response = await updateCohortMemberStatus({
+    //     //   memberStatus,
+    //     //   statusReason,
+    //     //   membershipId,
+    //     // });
+    //     // setPrefilledFormData({});
+    //     // searchData(prefilledFormData, currentPage);
     //   },
     //   show: (row) => row.status !== 'archived',
     // },
@@ -461,19 +659,33 @@ const UserLeader = () => {
     //         justifyContent: 'center',
     //         padding: '10px',
     //       }}
-    //       title="Reassign Team Leader"
+    //       title="Reassign Facilitator"
     //     >
     //       <Image src={apartment} alt="" />
     //     </Box>
     //   ),
-    //   callback: (row) => {
-    //     // console.log('row:', row);
+    //   callback: async (row) => {
+    //     console.log('row:', row);
     //     // console.log('AddSchema', addSchema);
     //     // console.log('AddUISchema', addUiSchema);
-    //     let tempFormData = extractMatchingKeys(row, addSchema);
+    //     let batchList = await fetchUserData(row?.userId);
+    //     console.log('######## batchList', batchList);
+    //     const selectedUserId = row?.userId;
+    //     const selectedUserDetails = await getUserDetailsInfo(
+    //       selectedUserId,
+    //       true
+    //     );
+    //     // console.log('selectedUserDetails:', selectedUserDetails);
+    //     let tempFormData = extractMatchingKeys(selectedUserDetails?.userData, addSchema);
+    //     tempFormData = {
+    //       ...tempFormData,
+    //       batch: batchList,
+    //     };
+    //     console.log(tempFormData, ' tempFormData');
     //     setPrefilledAddFormData(tempFormData);
     //     setIsEdit(false);
     //     setIsReassign(true);
+    //     setButtonShow(true);
     //     setEditableUserId(row?.userId);
     //     handleOpenModal();
     //   },
@@ -491,14 +703,19 @@ const UserLeader = () => {
     //         justifyContent: 'center',
     //         padding: '10px',
     //       }}
-    //       title="Reactivate Team Leader"
+    //       title="Reactivate Facilitator"
     //     >
     //       {' '}
     //       <Image src={restoreIcon} alt="" />{' '}
     //     </Box>
     //   ),
     //   callback: async (row) => {
-    //     const findVillage = row?.customFields.find((item) => {
+    //     const selectedUserId = row?.userId;
+    //     const selectedUserDetails = await getUserDetailsInfo(
+    //       selectedUserId,
+    //       true
+    //     );
+    //     const findVillage = selectedUserDetails?.userData?.customFields.find((item) => {
     //       if (item.label === 'VILLAGE') {
     //         return item;
     //       }
@@ -507,15 +724,11 @@ const UserLeader = () => {
     //     setEditableUserId(row?.userId);
     //     setArchiveToActiveOpen(true);
     //     setUserId(row?.userId);
-    //     const findVillagename = row?.customFields.find((item) => {
-    //       if (item.label === 'BLOCK') {
-    //         return item;
-    //       }
+    //     setUserData({
+    //       firstName: row?.firstName || '',
+    //       lastName: row?.lastName || '',
+    //       village: findVillage?.selectedValues?.[0]?.value || '',
     //     });
-    //     setVillage(findVillagename?.selectedValues[0]?.value);
-    //     setUserId(row?.userId);
-    //     setFirstName(row?.firstName);
-    //     setLastName(row?.lastName);
     //     // setReason('');
     //     // setChecked(false);
     //   },
@@ -551,21 +764,24 @@ const UserLeader = () => {
         roleId: roleId,
       },
     ],
-    username: 'scpTeamLead',
+    username: 'scpFacilitator',
     password: Math.floor(10000 + Math.random() * 90000),
   };
-  const successUpdateMessage = 'TEAM_LEADERS.TEAM_LEADER_UPDATED_SUCCESSFULLY';
-  const telemetryUpdateKey = 'scp-team-lead-updated-successfully';
-  const failureUpdateMessage = 'TEAM_LEADERS.NOT_ABLE_UPDATE_TEAM_LEADER';
-  const successCreateMessage = 'TEAM_LEADERS.TEAM_LEADER_CREATED_SUCCESSFULLY';
-  const telemetryCreateKey = 'scp-team-lead-created-successfully';
-  const failureCreateMessage = 'TEAM_LEADERS.NOT_ABLE_CREATE_TEAM_LEADER';
-  const notificationKey = 'onTeamLeaderCreated';
-  const notificationMessage = 'TEAM_LEADERS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
+  const successUpdateMessage = 'FACILITATORS.FACILITATOR_UPDATED_SUCCESSFULLY';
+  const telemetryUpdateKey = 'scp-facilitator-updated-successfully';
+  const failureUpdateMessage = 'COMMON.NOT_ABLE_UPDATE_FACILITATOR';
+  const successCreateMessage = 'FACILITATORS.FACILITATOR_CREATED_SUCCESSFULLY';
+  const telemetryCreateKey = 'SCP-Facilitator-created-successfully';
+  const failureCreateMessage = 'COMMON.NOT_ABLE_CREATE_FACILITATOR';
+  const notificationKey = 'onFacilitatorCreated';
+  const notificationMessage = 'FACILITATORS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
-  const blockReassignmentNotificationKey = 'TL_BLOCK_REASSIGNMENT';
-  const profileUpdateNotificationKey = 'TL_PROFILE_UPDATE';
-  const districtUpdateNotificationKey = 'TL_DISTRICT_UPDATE';
+  const blockReassignmentNotificationKey = 'FACILITATOR_BLOCK_UPDATE';
+  const profileUpdateNotificationKey = 'FACILITATOR_PROFILE_UPDATE';
+  const centerUpdateNotificationKey = 'FACILITATOR_CENTER_UPDATE';
+
+  // console.log(response?.result?.getUserDetails , "shreyas");
+  // response;
 
   useEffect(() => {
     setPrefilledFormData(initialFormDataSearch);
@@ -580,6 +796,12 @@ const UserLeader = () => {
   const [isMappingInProgress, setIsMappingInProgress] = useState(false);
   const [userDetails, setUserDetails] = useState<any>(null);
 
+  const [buttonShow, setButtonShowState] = useState(true);
+
+  const setButtonShow = (status) => {
+    console.log('########## changed', status);
+    setButtonShowState(status);
+  };
   return (
     <>
       <Box display={'flex'} flexDirection={'column'} gap={2}>
@@ -589,18 +811,18 @@ const UserLeader = () => {
           schema &&
           uiSchema && (
             <DynamicForm
-              ref={formRef}
               schema={schema}
               uiSchema={updatedUiSchema}
               SubmitaFunction={SubmitaFunction}
               isCallSubmitInHandle={true}
               prefilledFormData={prefilledFormData}
+              ref={formRef}
             />
           )
         )}
         <Box mt={4} sx={{ display: 'flex', justifyContent: 'end' }}>
           <ResetFiltersButton
-            searchStoreKey="teamLeader"
+            searchStoreKey="facilitator"
             formRef={formRef}
             SubmitaFunction={SubmitaFunction}
             setPrefilledFormData={setPrefilledFormData}
@@ -623,9 +845,67 @@ const UserLeader = () => {
               setMapModalOpen(true);
             }}
           >
-            {t('COMMON.ADD_NEW')}
+            {t('COMMON.ADD_NEW')}{' '}
           </Button>
         </Box>
+
+        {/* <SimpleModal
+          open={openModal}
+          onClose={handleCloseModal}
+          showFooter={buttonShow}
+          primaryText={isEdit ? t('Update') : t('Next')}
+          id="dynamic-form-id"
+          modalTitle={
+            isEdit
+              ? t('FACILITATORS.EDIT_FACILITATOR')
+              : isReassign
+                ? t('FACILITATORS.RE_ASSIGN_facilitator')
+                : t('FACILITATORS.NEW_FACILITATOR')
+          }
+        >
+          <FacilitatorForm
+            t={t}
+            SuccessCallback={() => {
+              setPrefilledFormData(initialFormDataSearch);
+              searchData(initialFormDataSearch, 0);
+              setOpenModal(false);
+            }}
+            schema={addSchema}
+            uiSchema={addUiSchema}
+            editPrefilledFormData={prefilledAddFormData}
+            isEdit={isEdit}
+            isReassign={isReassign}
+            // isExtraFields={true}
+            editableUserId={editableUserId}
+            UpdateSuccessCallback={() => {
+              setPrefilledFormData(prefilledFormData);
+              searchData(prefilledFormData, currentPage);
+              setOpenModal(false);
+            }}
+            extraFields={extraFields}
+            extraFieldsUpdate={extraFieldsUpdate}
+            successUpdateMessage={successUpdateMessage}
+            telemetryUpdateKey={telemetryUpdateKey}
+            failureUpdateMessage={failureUpdateMessage}
+            successCreateMessage={successCreateMessage}
+            telemetryCreateKey={telemetryCreateKey}
+            failureCreateMessage={failureCreateMessage}
+            notificationKey={notificationKey}
+            notificationMessage={notificationMessage}
+            notificationContext={notificationContext}
+            // blockFieldId={blockFieldId}
+            // districtFieldId={districtFieldId}
+            // villageFieldId={villageFieldId}
+            // // centerFieldId={centerFieldId}
+            type="facilitator"
+            hideSubmit={true}
+            setButtonShow={setButtonShow}
+            // isSteeper={true}
+            blockReassignmentNotificationKey={blockReassignmentNotificationKey}
+            profileUpdateNotificationKey={profileUpdateNotificationKey}
+            centerUpdateNotificationKey={centerUpdateNotificationKey}
+          />
+        </SimpleModal> */}
 
         {response != null ? (
           <>
@@ -650,7 +930,7 @@ const UserLeader = () => {
                 height="20vh"
               >
                 <Typography marginTop="10px" textAlign={'center'}>
-                  {t('TEAM_LEADERS.NO_TEAM_LEADER_FOUND')}
+                  {t('COMMON.NO_FACILITATOR_FOUND')}
                 </Typography>
               </Box>
             )}
@@ -671,13 +951,14 @@ const UserLeader = () => {
         onClickPrimary={userDelete}
       >
         <DeleteDetails
-          firstName={firstName}
-          lastName={lastName}
-          village={village}
+          firstName={userData.firstName}
+          lastName={userData.lastName}
+          village={userData.village}
           checked={checked}
           setChecked={setChecked}
           reason={reason}
           setReason={setReason}
+          isForFacilitator={true}
         />
       </ConfirmationPopup>
       <ConfirmationPopup
@@ -699,9 +980,14 @@ const UserLeader = () => {
           }}
         >
           <Typography>
-            {firstName} {lastName} {t('FORM.WAS_BELONG_TO')}
+            {userData.firstName} {userData.lastName} {t('FORM.WAS_BELONG_TO')}
           </Typography>
-          <TextField fullWidth value={village} disabled sx={{ mt: 1 }} />
+          <TextField
+            fullWidth
+            value={userData.village}
+            disabled
+            sx={{ mt: 1 }}
+          />
         </Box>
         <Typography fontWeight="bold">
           {t('FORM.CONFIRM_TO_ACTIVATE')}
@@ -766,7 +1052,7 @@ const UserLeader = () => {
             <Typography variant="h1" component="div"></Typography>
           )}
           <Typography variant="h1" component="div">
-            {t('Map User as Lead')}
+            {t('Map User as Instructor')}
           </Typography>
           <IconButton
             aria-label="close"
@@ -799,7 +1085,7 @@ const UserLeader = () => {
                 }}
                 roleId={roleId}
                 tenantId={tenantId}
-                type="leader"
+                type="instructor"
               />
             </Box>
           )}
@@ -871,17 +1157,17 @@ const UserLeader = () => {
                       customFields: customFields,
                       userData: userData,
                     });
-                    console.log('######### updatedResponse', updateUserResponse);
+                    console.log(
+                      '######### updatedResponse',
+                      updateUserResponse
+                    );
 
                     if (
                       updateUserResponse &&
                       updateUserResponse?.params?.err === null
                     ) {
                       // getNotification(editableUserId, profileUpdateNotificationKey);
-                      showToastMessage(
-                        t(successUpdateMessage),
-                        'success'
-                      );
+                      showToastMessage(t(successUpdateMessage), 'success');
                       // telemetryCallbacks(telemetryUpdateKey);
 
                       //map user to tenant
@@ -908,10 +1194,7 @@ const UserLeader = () => {
                         response?.data?.responseCode === 201 ||
                         response?.status === 201
                       ) {
-                        showToastMessage(
-                          t(successCreateMessage),
-                          'success'
-                        );
+                        showToastMessage(t(successCreateMessage), 'success');
                         // Close dialog
                         setMapModalOpen(false);
                         setSelectedCenterId(null);
@@ -927,10 +1210,7 @@ const UserLeader = () => {
                       }
                     } else {
                       // console.error('Error update user:', error);
-                      showToastMessage(
-                        t(failureUpdateMessage),
-                        'error'
-                      );
+                      showToastMessage(t(failureUpdateMessage), 'error');
                     }
                   } catch (error) {
                     console.error('Error creating cohort member:', error);
@@ -968,4 +1248,4 @@ export async function getStaticProps({ locale }: any) {
   };
 }
 
-export default UserLeader;
+export default Facilitator;

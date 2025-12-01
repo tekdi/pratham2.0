@@ -26,6 +26,7 @@ interface EmailSearchUserProps {
   onPrefilledStateChange: (prefilledState: any) => void;
   roleId: string;
   tenantId: string;
+  type: string;
 }
 
 interface UserDetails {
@@ -48,6 +49,7 @@ const EmailSearchUser: React.FC<EmailSearchUserProps> = ({
   onPrefilledStateChange,
   roleId,
   tenantId,
+  type,
 }) => {
   const { t } = useTranslation();
 
@@ -153,7 +155,10 @@ const EmailSearchUser: React.FC<EmailSearchUserProps> = ({
         }
 
         let tempFormData = extractMatchingKeys(user, schema);
-        setPrefilledFormData(tempFormData);
+        setPrefilledFormData({
+          ...tempFormData,
+          ...(type == 'instructor' ? { designation: 'facilitator' } : {}),
+        });
 
         // Extract user details
         const extractedUserId = user.userId;
@@ -238,13 +243,25 @@ const EmailSearchUser: React.FC<EmailSearchUserProps> = ({
     }
   };
 
-  const resetUserData = () => {
+  const resetUserData = (newEmail?: string) => {
+    const emailToUse = newEmail !== undefined ? newEmail : email;
     setUserDetails(null);
     setIsUserLoaded(false);
     setValidationError(null);
     setCanProceed(true);
+    setPrefilledFormData({});
     if (onUserSelected) {
       onUserSelected('');
+    }
+    // Reset parent component's prefilled state to ensure consistency
+    if (onPrefilledStateChange) {
+      onPrefilledStateChange({
+        email: emailToUse,
+        loading: false,
+        prefilledFormData: {},
+        userDetails: null,
+        isUserLoaded: false,
+      });
     }
   };
 
@@ -301,9 +318,18 @@ const EmailSearchUser: React.FC<EmailSearchUserProps> = ({
           label="Enter user email address"
           value={email}
           onChange={(e) => {
-            //bug fx for double button click
-            setIsUserLoaded(false);
-            setEmail(e.target.value);
+            const newEmail = e.target.value;
+            setEmail(newEmail);
+            // Reset all state when email changes to fix double-click issue after failed search
+            // This ensures clean state for the next search attempt
+            if (
+              isUserLoaded ||
+              userDetails ||
+              validationError ||
+              (prefilledFormData && Object.keys(prefilledFormData).length > 0)
+            ) {
+              resetUserData(newEmail);
+            }
           }}
           disabled={isUserLoaded}
           variant="outlined"

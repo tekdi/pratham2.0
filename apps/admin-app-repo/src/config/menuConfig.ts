@@ -26,7 +26,7 @@ export const MENU_CONFIG = {
         },
         {
           title: 'SIDEBAR.FACILITATORS',
-          link: '/facilitator',
+          link: '/user-instructor',
           roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
         {
@@ -47,7 +47,7 @@ export const MENU_CONFIG = {
         {
           title: 'SIDEBAR.STATE_LEAD',
 
-          link: '/state-lead',
+          link: '/user-state-lead',
           roles: [Role.CENTRAL_ADMIN],
         },
       ],
@@ -176,7 +176,7 @@ export const MENU_CONFIG = {
         },
         {
           title: 'SIDEBAR.STATE_LEAD',
-          link: '/state-lead',
+          link: '/user-state-lead',
           roles: [Role.CENTRAL_ADMIN],
         },
       ],
@@ -282,7 +282,7 @@ export const MENU_CONFIG = {
         },
         {
           title: 'SIDEBAR.STATE_LEAD',
-          link: '/state-lead',
+          link: '/user-state-lead',
           roles: [Role.CENTRAL_ADMIN],
         },
       ],
