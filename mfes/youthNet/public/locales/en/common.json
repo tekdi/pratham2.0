@@ -1015,7 +1015,8 @@
   "FEMALE": "Female",
   "TRANSGENDER": "Transgender",
   "phone_number": "Phone Number",
-  "first_name": "First Name"
+  "first_name": "First Name",
+  "CATCHMENT_AREA": "Catchment Area"
 }
 
 

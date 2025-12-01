@@ -68,6 +68,7 @@
   "PHONE_TYPE_ACCESSIBLE": "Type of Phone Accessible",
   "WHAT_IS_YOUR_PRIMARY_WORK": "What is your primary work?",
   "UNEMPLOYED_HOUSEWIFE_DOMESTIC_WORK": "Unemployed, Housewife or Domestic Work",
+  "CATCHMENT_AREA": "Catchment Area",
   "SURVEYS": {
     "SURVEYS": "Surveys",
     "ACTIVE_SURVEYS": "Active Surveys",
@@ -149,7 +150,7 @@
     "UNAUTHORIZED":"You are not authorized to access this site",
     "For Children": "For Children",
     "Self": "Self",
-
+     "FINISH_ENROLL": "Finish Enroll",
     "STATUS": {
       "completed": "Completed",
       "in_progress": "In Progress",
@@ -178,7 +179,8 @@
       "COMPLETE_PROFILE_TITLE": "Complete Your Profile",
       "BACKGROUND_HELP_TEXT": "Help us with your background & other details",
       "INVALID_LINK": "Invalid Link",
-      "FUTURE_WORK": "What do you want to become?"
+      "FUTURE_WORK": "What do you want to become?",
+      "ENROLL_IN_TO": "Enroll in to"
     },
     "COMMON": {
       "L1_COURSES": "L1 Courses",
@@ -233,7 +235,12 @@
       "OUR_PROGRAMS": "Our Programs",
       "SIGN_UP": "Sign Up",
       "SIGN_IN": "Sign In",
-      "Login with Newton ERP": "Login with Newton ERP"
+      "Login with Newton ERP": "Login with Newton ERP",
+      "DISCOVER_LEARNING_OPPORTUNITIES":"Discover learning opportunities and sign up for programs that match your goals",
+      "ENROLL": "Enroll",
+      "ENROLLING": "Enrolling...",
+      "ACCESS_PROGRAM": "Access Program",
+      "ACCESSING_PROGRAM": "Accessing Program..."
     },
     "LOGIN": {
       "welcome_title": "Welcome to Pratham myLearning!",
@@ -360,7 +367,9 @@
       "CLICK_HERE_TO_LOGIN": "Click here to login",
       "TELL_US_ABOUT_YOURSELF": "1/2 Tell us about yourself",
       "CONTINUE": "Continue",
-      "INVALID_LINK": "Invalid Link"
+      "INVALID_LINK": "Invalid Link",
+      "GET_STARTED_WITH_YOUR_LEARNING_JOURNEY_NOW": "Get Started With Your Learning Journey Now!",
+      "CREATE_ACCOUNT_TO_PROGRAMS":"Create your account to explore and access all our learning programs, Anytime"
     },
     "RESET_PASSWORD_FORM": {
       "OLD_PASSWORD": "Old Password",
@@ -401,6 +410,10 @@
       "ERROR_GENERAL": "An error occurred during SSO authentication",
       "ERROR_MISSING_PARAMS": "Missing required parameters",
       "ERROR_AUTH_FAILED": "Authentication failed"
+    },
+    "PROGRAMS": {
+      "EXPLORE_PROGRAMS": "Explore Programs",
+      "MY_PROGRAMS": "My Programs"
     }
   },
   "Login with Newton ERP": "Login with Newton ERP",
@@ -504,6 +517,7 @@
   "family_member_details": "Family Member Details",
   "SPOUSE_NAME": "Spouse Name",
   "FATHER_NAME": "Father Name",
+  "GUARDIAN_INFORMATION_NOTE": "Guardian Information - This section should be filled up by a parent or guardian",
   "FORGOT_PASSWORD": {
     "TITLE": "Trouble with logging in?",
     "SUBTITLE": "No worries, we’ll help you get back to your account",
@@ -677,7 +691,8 @@
     "GRADE_9": "Grade 9",
     "GRADE_10": "Grade 10",
     "GRADE_11": "Grade 11",
-    "GRADE_12": "Grade 12"
+    "GRADE_12": "Grade 12",
+    "CATCHMENT_AREA": "Catchment Area"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "Invalid Input.",

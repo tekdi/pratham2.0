@@ -878,8 +878,3 @@ export const extractTasks = (tasks: any[], parentId: string | null = null): any[
 
   return rows;
 };
-
-// API handler
-
-
-
