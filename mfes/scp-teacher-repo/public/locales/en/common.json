@@ -93,7 +93,7 @@
     "LEARNER_REMOVED": "Learner has been removed",
     "DROPPED_OUT": "Dropped Out",
     "DELETE_USER": "Delete User Permanently",
-    "DELETE_USER_FROM_CENTER": "Delete user from Center",
+    "DELETE_USER_FROM_CENTER": "Delete user from Center as well as SCP",
     "DELETE_USER_WITH_REASON": "Delete User",
     "USER_DELETED_PERMANENTLY": "User successfully deleted!",
     "CANNOT_REASSIGN_TODAY_ATTENDANCE_MARKED": "Cannot re-assign learner as attendance has already been marked for today",

@@ -16,6 +16,7 @@ interface DeleteDetailsProps {
   firstName: string;
   lastName: string;
   village: string;
+  center?: string;
   checked: boolean;
   setChecked: (checked: boolean) => void;
   reason: string;
@@ -27,6 +28,7 @@ const DeleteDetails: React.FC<DeleteDetailsProps> = ({
   firstName,
   lastName,
   village,
+  center,
   checked,
   setChecked,
   reason,
@@ -45,9 +47,9 @@ const DeleteDetails: React.FC<DeleteDetailsProps> = ({
         }}
       >
         <Typography fontWeight="bold">
-          { firstName } { lastName } {t("FORM.TEST_BELONG_TO")}
+          { firstName } { lastName } {center? t("FORM.BELONG_TO"): t("FORM.TEST_BELONG_TO")}
         </Typography>
-        <TextField fullWidth value={village} disabled sx={{ mt: 1 }} />
+        <TextField fullWidth value={center? center: village} disabled sx={{ mt: 1 }} />
       </Box>
 
       <FormControlLabel
