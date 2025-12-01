@@ -47,7 +47,7 @@ const DeleteDetails: React.FC<DeleteDetailsProps> = ({
         }}
       >
         <Typography fontWeight="bold">
-          { firstName } { lastName } {center? t("FORM.BELONG_TO"): t("FORM.TEST_BELONG_TO")}
+          { firstName } { lastName } {center? t("FORM.BELONG_TO"): t("FORM.WAS_BELONG_TO")}
         </Typography>
         <TextField fullWidth value={center? center: village} disabled sx={{ mt: 1 }} />
       </Box>

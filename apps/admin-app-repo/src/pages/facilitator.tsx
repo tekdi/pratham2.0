@@ -1009,7 +1009,7 @@ console.log('response?.result?.getUserDetails',response?.result?.getUserDetails)
           </Typography>
           <TextField
             fullWidth
-            value={userData.village}
+            value={userData.center}
             disabled
             sx={{ mt: 1 }}
           />
