@@ -48,9 +48,15 @@ const Unauthorized = () => {
       <Typography
           sx={{ cursor: "pointer" }}
           onClick={() => {
-            localStorage.clear();
-            // router.push("/login");
-            router.push("/");
+            if(typeof window !== 'undefined' && localStorage.getItem("landingPage") ) {
+            router.push(localStorage.getItem("landingPage") || "/");
+            }
+            else{
+              if(typeof window !== 'undefined') {
+                localStorage.clear()
+              }
+              router.push("/");
+            }
           }}
           color={"secondary"}
         >
@@ -60,7 +66,9 @@ const Unauthorized = () => {
         <Typography
           sx={{ cursor: "pointer" }}
           onClick={() => {
-            localStorage.clear();
+            if(typeof window !== 'undefined') {
+              localStorage.clear();
+            }
             // router.push("/login");
             router.push("/login");
           }}
