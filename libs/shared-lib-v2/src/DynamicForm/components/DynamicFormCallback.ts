@@ -117,7 +117,7 @@ export const extractMatchingKeys = (row: any, schema: any) => {
     ) {
       if (typeof selectedValues[0] === 'object') {
         try {
-        return selectedValues.map((item) => item.id.toString() ?? item); // handles missing `id`
+          return selectedValues.map((item) => item.id.toString() ?? item); // handles missing `id`
         } catch (error) {
           return selectedValues;
         }
@@ -268,4 +268,22 @@ export const notificationCallback = async (
   } else {
     showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
   }
+};
+
+export const enhanceUiSchemaWithGrid = (uiSchema: any): any => {
+  const enhancedSchema = { ...uiSchema };
+
+  Object.keys(enhancedSchema).forEach((fieldKey) => {
+    if (typeof enhancedSchema[fieldKey] === 'object') {
+      // Ensure ui:options exists
+      if (!enhancedSchema[fieldKey]['ui:options']) {
+        enhancedSchema[fieldKey]['ui:options'] = {};
+      }
+
+      // Push grid option
+      enhancedSchema[fieldKey]['ui:options'].grid = { xs: 12, sm: 12, md: 6 };
+    }
+  });
+
+  return enhancedSchema;
 };
