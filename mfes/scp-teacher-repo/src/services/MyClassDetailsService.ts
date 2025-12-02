@@ -55,7 +55,7 @@ export const getMyCohortMemberList = async ({
   filters,
   includeArchived = false,
 }: CohortMemberList & { includeArchived?: boolean }): Promise<any> => {
-  const statusFilters = [Status.DROPOUT, Status.ACTIVE];
+  const statusFilters = [Status.DROPOUT, Status.ACTIVE, "reassigned"];
   if (includeArchived) {
     statusFilters.push(Status.ARCHIVED);
   }
