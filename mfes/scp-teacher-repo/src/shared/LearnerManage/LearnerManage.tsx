@@ -184,20 +184,20 @@ const LearnerManage = ({
       if (isEditProfile) {
         const user = await getUserDetails(userId, true);
         const targetLabels = [
-          "RELATION_WITH_GUARDIAN",
-          "PARENT_GUARDIAN_PHONE_NO",
-          "NAME_OF_GUARDIAN"
+          'RELATION_WITH_GUARDIAN',
+          'PARENT_GUARDIAN_PHONE_NO',
+          'NAME_OF_GUARDIAN',
         ];
-        
-        // Step 1: Find matching fieldIds
-        const fieldIds = user?.result?.userData?.customFields?.filter(item => targetLabels.includes(item.label))
-          .map(item => item.fieldId);
-        
 
-         console.log('##### user', user?.result?.userData?.customFields);
-         const result = fieldIds?.map(id => ({
+        // Step 1: Find matching fieldIds
+        const fieldIds = user?.result?.userData?.customFields
+          ?.filter((item) => targetLabels.includes(item.label))
+          .map((item) => item.fieldId);
+
+        console.log('##### user', user?.result?.userData?.customFields);
+        const result = fieldIds?.map((id) => ({
           fieldId: id,
-          value: ""
+          value: '',
         }));
         setParentData(result);
         let tempFormData = extractMatchingKeys(
@@ -324,7 +324,9 @@ const LearnerManage = ({
           <AddEditUser
             SuccessCallback={() => {
               onClose();
-              onLearnerAdded();
+              if (typeof onLearnerAdded === 'function') {
+                onLearnerAdded();
+              }
               setOpenModal(false);
             }}
             schema={isEditProfile ? addEditSchema : addSchema}
@@ -338,7 +340,9 @@ const LearnerManage = ({
             }
             UpdateSuccessCallback={() => {
               onClose();
-              onLearnerAdded();
+              if (typeof onLearnerAdded === 'function') {
+                onLearnerAdded();
+              }
               setOpenModal(false);
             }}
             extraFields={extraFields}
