@@ -126,7 +126,7 @@ export const ContentSearch = async ({
   limit = 5,
   offset = 0,
   noPrimaryCategory = false,
-  thematicCount = false,
+  isPrimaryCategory = false,
   primaryCategory,
 }: {
   type: string;
@@ -136,7 +136,7 @@ export const ContentSearch = async ({
   offset?: number;
   noPrimaryCategory?: boolean;
   primaryCategory?: string[];
-  thematicCount?:boolean;
+  isPrimaryCategory?:boolean;
 }): Promise<ContentResponse> => {
   try {
     console.log('filters====>' , filters);
@@ -157,7 +157,7 @@ export const ContentSearch = async ({
       channel: localStorage.getItem('channelId'),
     };
     // console.log('filtersObject====>', filtersObject?.primaryCategory);
-    if(primaryCategory && thematicCount){
+    if(primaryCategory && isPrimaryCategory){
       filtersObject.primaryCategory = primaryCategory;
     }
     console.log('filtersObject====>' , filters);

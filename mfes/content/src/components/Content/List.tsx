@@ -324,7 +324,20 @@ export default function Content(props: Readonly<ContentProps>) {
           primaryCategory: ['Course'],
         });
       }
-      else{        
+      else{    
+        const program = searchParams.get('program');
+        if(program)
+        {
+          resultResponse = await ContentSearch({
+            ...filter,
+            offset: adjustedOffset,
+            limit: adjustedLimit,
+            signal: controller.signal,
+            isPrimaryCategory: true,
+            primaryCategory: [
+              'Learning Resource','Practice Question Set','Activity','Story' ,'Interactive']
+          });        }
+        else{
 
         resultResponse = await ContentSearch({
           ...filter,
@@ -332,7 +345,7 @@ export default function Content(props: Readonly<ContentProps>) {
           limit: adjustedLimit,
           signal: controller.signal,
         });
-
+      }
       }
       
 
@@ -346,7 +359,7 @@ export default function Content(props: Readonly<ContentProps>) {
           offset: adjustedOffset,
           limit: adjustedLimit,
           signal: controller.signal,
-          thematicCount: true,
+          isPrimaryCategory: true,
           primaryCategory: [
             'Learning Resource','Practice Question Set','Activity','Story' ,'Interactive'],
         });
