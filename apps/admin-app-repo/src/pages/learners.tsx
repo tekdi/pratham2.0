@@ -63,6 +63,7 @@ import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 import CenterLabel from '@/components/Centerlabel';
 import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
 import { showToastMessage } from '@/components/Toastify';
+import { getOverallStatus } from '@shared-lib-v2/utils/helper';
 
 const Learner = () => {
   const theme = useTheme<any>();
@@ -94,6 +95,7 @@ const Learner = () => {
     firstName: '',
     lastName: '',
     village: '',
+    center: '',
   });
   const [reason, setReason] = useState('');
   const [memberShipID, setMemberShipID] = useState('');
@@ -342,17 +344,31 @@ const Learner = () => {
         //     }
         //   />
         // );
-        const centers =
-          row.cohortData
-            ?.filter(
-              (c: any) =>
-                c.centerStatus === 'active' &&
-                c.cohortMember?.status === 'active'
-            )
-            .map((c: any) => transformLabel(c.centerName))
-            .filter(Boolean) || [];
+        let centers =
+        row.cohortData
+          ?.filter(
+            (c: any) =>
+              c.centerStatus === 'active' &&
+              c.cohortMember?.status === 'active'
+          )
+          .map((c: any) => transformLabel(c.centerName))
+          .filter(Boolean) || [];
 
-        return centers.join(', ');
+          // If no active centers → fallback to archived
+          if (centers.length === 0) {
+            centers =
+              row.cohortData
+                ?.filter(
+                  (c: any) =>
+                    c.centerStatus === 'active' &&
+                    c.cohortMember?.status === 'archived' || c.cohortMember?.status === 'dropout'
+                )
+                .map((c: any) => transformLabel(c.centerName))
+                .filter(Boolean) || [];
+          }
+
+          return centers.join(', ');
+
       },
     },
     {
@@ -360,24 +376,38 @@ const Learner = () => {
       label: 'Batch',
       render: (row) => {
         // console.log('BacthRow', row?.cohortData)
-        const batches =
-          row.cohortData
-            ?.filter(
-              (c: any) =>
-                c.batchStatus === 'active' &&
-                c.cohortMember?.status === 'active'
-            )
-            .map((c: any) => transformLabel(c.batchName))
-            .filter(Boolean) || [];
+        let batches =
+        row.cohortData
+          ?.filter(
+            (c: any) =>
+              c.batchStatus === 'active' &&
+              c.cohortMember?.status === 'active'
+          )
+          .map((c: any) => transformLabel(c.batchName))
+          .filter(Boolean) || [];
 
-        return batches.join(', ');
+          // If no active batches → fallback to archived
+          if (batches.length === 0) {
+            batches =
+              row.cohortData
+                ?.filter(
+                  (c: any) =>
+                    c.batchStatus === 'active' &&
+                    c.cohortMember?.status === 'archived' || c.cohortMember?.status === 'dropout'
+                )
+                .map((c: any) => transformLabel(c.batchName))
+                .filter(Boolean) || [];
+          }
+
+          return batches.join(', ');
+
       },
     },
     {
       key: 'status',
       label: 'Status',
-      render: (row: any) => transformLabel(row?.cohortData?.[0]?.cohortMember?.status),
-      getStyle: (row) => ({ color: row.status === 'active' ? 'green' : 'red' }),
+      render: (row: any) => transformLabel(getOverallStatus(row?.cohortData)),
+      getStyle: (row) => ({ color: getOverallStatus(row?.cohortData) === 'active' ? 'green' : 'red' }),
     },
   ];
 
@@ -389,9 +419,10 @@ const Learner = () => {
       try {
         const userCohortResp = await getCohortList(userID);
         if (userCohortResp?.result?.length) {
-          membershipIds = userCohortResp?.result?.map(
-            (item) => item.cohortMembershipId
-          );
+          membershipIds = userCohortResp?.result
+              ?.filter((c: any) => c.cohortMemberStatus === 'active')
+              ?.map((c: any) => c.cohortMembershipId) || [];
+
         } else {
           console.warn('No cohort data found for the user.');
         }
@@ -463,9 +494,9 @@ const Learner = () => {
       try {
         const userCohortResp = await getCohortList(userID);
         if (userCohortResp?.result?.length) {
-          membershipIds = userCohortResp?.result?.map(
-            (item) => item.cohortMembershipId
-          );
+          membershipIds = userCohortResp?.result
+              ?.filter((c: any) => c.cohortMemberStatus === 'archived')
+              ?.map((c: any) => c.cohortMembershipId) || [];
         } else {
           console.warn('No cohort data found for the user.');
         }
@@ -561,7 +592,10 @@ const Learner = () => {
     //     setEditableUserId(row?.userId);
     //     handleOpenModal();
     //   },
-    //   show: (row) => row.status !== 'archived',
+      // show: (row) => row?.cohortData?.some(
+      //   (cohort) =>
+      //     cohort?.cohortMember?.status === 'active'
+      // ),
     // },
 
     {
@@ -608,11 +642,19 @@ const Learner = () => {
           firstName: row?.firstName || '',
           lastName: row?.lastName || '',
           village: findVillage?.selectedValues?.[0]?.value || '',
+          center:
+          row?.cohortData
+            ?.filter((cohort) => cohort?.cohortMember?.status === 'active')
+            ?.map((cohort) => cohort?.centerName)
+            ?.join(', ') || '',
         });
         setReason('');
         setChecked(false);
       },
-      show: (row) => row?.cohortData?.[0]?.cohortMember?.status !== 'archived',
+      show: (row) => row?.cohortData?.some(
+        (cohort) =>
+          cohort?.cohortMember?.status === 'active'
+      )
     },
     {
       icon: (
@@ -655,11 +697,18 @@ const Learner = () => {
           firstName: row?.firstName || '',
           lastName: row?.lastName || '',
           village: findVillage?.selectedValues?.[0]?.value || '',
+          center: 
+          row?.cohortData
+            ?.filter((cohort) => cohort?.cohortMember?.status === 'archived')
+            ?.map((cohort) => cohort?.centerName)
+            ?.join(', ') || '',
         });
-        // setReason('');
+        // setReason('');'
         // setChecked(false);
       },
-      show: (row) => row?.cohortData?.[0]?.cohortMember?.status !== 'active',
+      show: (row) => row?.cohortData?.some(
+        (cohort) =>
+          cohort?.cohortMember?.status === 'archived')
     },
     // {
     //   icon: (
@@ -701,7 +750,10 @@ const Learner = () => {
     //     setEditableUserId(row?.userId);
     //     handleOpenModal();
     //   },
-    //   show: (row) => row.status !== 'archived',
+      // show: (row) => row?.cohortData?.some(
+      //   (cohort) =>
+      //     cohort?.cohortMember?.status === 'active'
+      // ),
     // },
   ];
 
@@ -903,6 +955,7 @@ const Learner = () => {
           firstName={userData.firstName}
           lastName={userData.lastName}
           village={userData.village}
+          center={userData.center}
           checked={checked}
           setChecked={setChecked}
           reason={reason}
@@ -928,9 +981,9 @@ const Learner = () => {
           }}
         >
           <Typography>
-            {userData.firstName} {userData.lastName} {t("FORM.WAS_BELONG_TO")}
+            {userData.firstName} {userData.lastName} {t("FORM.BELONG_TO")}
           </Typography>
-          <TextField fullWidth value={userData.village} disabled sx={{ mt: 1 }} />
+          <TextField fullWidth value={userData.center} disabled sx={{ mt: 1 }} />
         </Box>
         <Typography fontWeight="bold">
           {t("FORM.CONFIRM_TO_ACTIVATE")}
