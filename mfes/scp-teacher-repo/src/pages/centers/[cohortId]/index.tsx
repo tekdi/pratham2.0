@@ -369,7 +369,7 @@ const CohortPage = () => {
           });
           if (learnerResponse?.result?.userDetails) {
             setCohortLearnerListCount(
-              learnerResponse?.result?.userDetails.length
+              learnerResponse?.result?.userDetails.filter((user: any) => user.status !== "reassigned").length
             );
           } else {
             setCohortLearnerListCount(0);
