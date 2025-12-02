@@ -20,9 +20,9 @@ const RegistrationPieChart = () => {
 
   return (
     <Box sx={{ width: '100%', bgcolor: '#FFF8F2', borderRadius: 2, p: 2, mb: 2, boxShadow: '0px 2px 4px rgba(0,0,0,0.1)' }}>
-      <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>
+      {/* <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>
         Learner Registrations
-      </Typography>
+      </Typography> */}
       <Box sx={{ height: 200, display: 'flex', flexDirection: 'row'}}>
         <ResponsiveContainer width="40%" height="100%">
             <PieChart>

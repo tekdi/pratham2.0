@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Box, Grid, Typography, TextField, InputAdornment } from '@mui/material';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Box, Grid, Typography, TextField, InputAdornment, Pagination, CircularProgress } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import Header from '../components/Header';
@@ -11,30 +11,229 @@ import AssignBatchModal from '../components/UserRegistration/AssignBatchModal';
 import AssignBatchSuccessModal from '../components/UserRegistration/AssignBatchSuccessModal';
 import MoreOptionsBottomSheet from '../components/UserRegistration/MoreOptionsBottomSheet';
 import LocationDropdowns from '../components/UserRegistration/LocationDropdowns';
-import { userList } from '../components/UserRegistration/dummyData';
+import { fetchUserList } from '../services/ManageUser';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import withRole from '../components/withRole';
 import { TENANT_DATA } from '../../app.config';
 
+interface LocationFilters {
+  states?: number[];
+  districts?: number[];
+  blocks?: number[];
+  villages?: number[];
+}
+
 const UserRegistrationList = () => {
-  const [tabValue, setTabValue] = useState(0);
+  const [tabValue, setTabValue] = useState('pending');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedUsers, setSelectedUsers] = useState<Set<number>>(new Set());
+  const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
   const [assignBatchModalOpen, setAssignBatchModalOpen] = useState(false);
   const [successModalOpen, setSuccessModalOpen] = useState(false);
   const [selectedBatchName, setSelectedBatchName] = useState('');
   const [moreOptionsOpen, setMoreOptionsOpen] = useState(false);
-  const [users, setUsers] = useState([...userList]);
+  const [users, setUsers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [locationFilters, setLocationFilters] = useState<LocationFilters>({});
+  const limit: number = 5;
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  // Transform API response to match UserCard format
+  const transformUserData = (apiUser: any): any => {
+    // Extract location from customFields
+    const stateField = apiUser.customFields?.find((field: any) => field.label === 'STATE');
+    const districtField = apiUser.customFields?.find((field: any) => field.label === 'DISTRICT');
+    const blockField = apiUser.customFields?.find((field: any) => field.label === 'BLOCK');
+    const villageField = apiUser.customFields?.find((field: any) => field.label === 'VILLAGE');
+    const modeField = apiUser.customFields?.find((field: any) => field.label === 'WHAT_IS_YOUR_PREFERRED_MODE_OF_LEARNING');
+
+    const state = stateField?.selectedValues?.[0]?.value || '';
+    const district = districtField?.selectedValues?.[0]?.value || '';
+    const block = blockField?.selectedValues?.[0]?.value || '';
+    const village = villageField?.selectedValues?.[0]?.value || '';
+    const modeType = modeField?.selectedValues?.[0]?.value === 'remote' ? 'remote' : 'in-person';
+    const inPersonMode = modeType === 'remote' ? 'Remote mode' : 'In person mode';
+
+    // Format date
+    const registeredOn = apiUser.createdAt 
+      ? new Date(apiUser.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+      : '';
+    
+    const birthDate = apiUser.dob 
+      ? new Date(apiUser.dob).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+      : '';
+
+    // Generate numeric ID for display (using enrollmentId if available, otherwise hash of userId)
+    let numericId: number;
+    if (apiUser.enrollmentId) {
+      const enrollmentNum = parseInt(apiUser.enrollmentId.replace('LMP-', ''), 10);
+      if (!isNaN(enrollmentNum)) {
+        numericId = enrollmentNum;
+      } else {
+        // Fallback: create hash from userId
+        let hash = 0;
+        for (let i = 0; i < apiUser.userId.length; i++) {
+          const char = apiUser.userId.charCodeAt(i);
+          hash = ((hash << 5) - hash) + char;
+          hash = hash & hash;
+        }
+        numericId = Math.abs(hash);
+      }
+    } else {
+      // Create hash from userId
+      let hash = 0;
+      for (let i = 0; i < apiUser.userId.length; i++) {
+        const char = apiUser.userId.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+      }
+      numericId = Math.abs(hash);
+    }
+
+    return {
+      id: numericId,
+      name: apiUser.name || `${apiUser.firstName || ''} ${apiUser.middleName || ''} ${apiUser.lastName || ''}`.trim(),
+      registeredOn,
+      inPersonMode,
+      location: {
+        state,
+        district,
+        block,
+        village,
+      },
+      phoneNumber: apiUser.mobile || '',
+      email: apiUser.email || '',
+      birthDate,
+      callLogs: [],
+      isNew: apiUser.tenantStatus === 'pending',
+      preTestStatus: apiUser.tenantStatus === 'pending' ? 'pending' : 'completed',
+      modeType,
+      userId: apiUser.userId,
+      enrollmentId: apiUser.enrollmentId,
+    };
+  };
+
+  // Fetch users from API
+  const fetchUsers = useCallback(async (page: number = 1, tab: string, location: LocationFilters) => {
+    setLoading(true);
+    try {
+      const tenantId = localStorage.getItem('tenantId');
+      if (!tenantId) {
+        console.error('TenantId not found in localStorage');
+        setLoading(false);
+        return;
+      }
+
+      const offset = (page - 1) * limit;
+      
+      // Build filters based on tab value
+      const filters: any = {
+        role: 'Learner',
+        tenantId,
+      };
+
+      // Add tab-specific filters
+      if (tab === 'pending') {
+        filters.tenantStatus = ['pending'];
+      } else if (tab === 'archived') {
+        filters.interested_to_join = 'no';
+      } else if (tab === 'upcoming') {
+        filters.interested_to_join = 'yes';
+      }
+
+      // Add location filters only if they are selected
+      if (location.states && location.states.length > 0) {
+        filters.state = location.states;
+      }
+      if (location.districts && location.districts.length > 0) {
+        filters.district = location.districts;
+      }
+      if (location.blocks && location.blocks.length > 0) {
+        filters.block = location.blocks;
+      }
+      if (location.villages && location.villages.length > 0) {
+        filters.village = location.villages;
+      }
+
+      const response = await fetchUserList({
+        limit,
+        offset,
+        filters,
+      });
+
+      if (response && response.getUserDetails) {
+        const transformedUsers = response.getUserDetails.map(transformUserData);
+        setUsers(transformedUsers);
+        setTotalCount(response.totalCount || 0);
+      } else {
+        setUsers([]);
+        setTotalCount(0);
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      setUsers([]);
+      setTotalCount(0);
+    } finally {
+      setLoading(false);
+    }
+  }, [limit]);
+
+  // Initial fetch on mount
+  useEffect(() => {
+    fetchUsers(1, tabValue, locationFilters);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Use ref to track previous values and prevent unnecessary calls
+  const prevTabRef = useRef(tabValue);
+  const prevLocationRef = useRef<string>(JSON.stringify(locationFilters));
+  const prevPageRef = useRef(currentPage);
+  const isMounted = useRef(false);
+
+  // Fetch users when tab, location, or page changes (skip initial mount)
+  useEffect(() => {
+    if (!isMounted.current) {
+      isMounted.current = true;
+      prevTabRef.current = tabValue;
+      prevLocationRef.current = JSON.stringify(locationFilters);
+      prevPageRef.current = currentPage;
+      return;
+    }
+
+    const tabChanged = prevTabRef.current !== tabValue;
+    const locationChanged = prevLocationRef.current !== JSON.stringify(locationFilters);
+    const pageChanged = prevPageRef.current !== currentPage;
+
+    // Only fetch if something actually changed
+    if (tabChanged || locationChanged || pageChanged) {
+      if (tabChanged || locationChanged) {
+        setCurrentPage(1);
+        prevPageRef.current = 1;
+        fetchUsers(1, tabValue, locationFilters);
+      } else if (pageChanged) {
+        fetchUsers(currentPage, tabValue, locationFilters);
+      }
+
+      // Update refs
+      prevTabRef.current = tabValue;
+      prevLocationRef.current = JSON.stringify(locationFilters);
+      prevPageRef.current = currentPage;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tabValue, locationFilters, currentPage]);
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
+    console.log('handleTabChange', newValue);
     setTabValue(newValue);
+    setCurrentPage(1);
+    setSelectedUsers(new Set());
   };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
   };
 
-  const handleUserSelect = (userId: number, selected: boolean) => {
+  const handleUserSelect = (userId: string, selected: boolean) => {
     setSelectedUsers((prev) => {
       const newSet = new Set(prev);
       if (selected) {
@@ -65,10 +264,10 @@ const UserRegistrationList = () => {
     setSelectedUsers(new Set());
   };
 
-  const handleCallLogUpdate = (userId: number, callLog: { date: string; note: string }) => {
+  const handleCallLogUpdate = (userId: string, callLog: { date: string; note: string }) => {
     setUsers((prevUsers) =>
       prevUsers.map((user) =>
-        user.id === userId
+        user.userId === userId
           ? {
               ...user,
               callLogs: [...user.callLogs, { date: callLog.date, status: 'Logged', note: callLog.note }],
@@ -94,18 +293,19 @@ const UserRegistrationList = () => {
     setSelectedUsers(new Set());
   };
 
-  const handleLocationChange = (location: {
-    states?: number[];
-    districts?: number[];
-    blocks?: number[];
-    villages?: number[];
-  }) => {
-    // TODO: Implement location-based filtering
-    console.log('Location changed:', location);
+  const handleLocationChange = useCallback((location: LocationFilters) => {
+    setLocationFilters(location);
+    setCurrentPage(1);
+    setSelectedUsers(new Set());
+  }, []);
+
+  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    setCurrentPage(value);
+    setSelectedUsers(new Set());
   };
 
   const selectedLearnerNames = users
-    .filter((user) => selectedUsers.has(user.id))
+    .filter((user) => selectedUsers.has(user.userId))
     .map((user) => user.name);
 
   return (
@@ -118,15 +318,19 @@ const UserRegistrationList = () => {
         // width: '100%',
         // boxSizing: 'border-box'
       }}>
+        {/* Location Dropdowns */}
+        <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>
+        Learner Registrations
+      </Typography>
+        <Box sx={{   mb: 2, borderRadius: '8px', mt:"20px" }}>
+          <LocationDropdowns onLocationChange={handleLocationChange} />
+        </Box>
         
         <RegistrationPieChart />
         
         <RegistrationTabs value={tabValue} onChange={handleTabChange} />
         
-        {/* Location Dropdowns */}
-        <Box sx={{   mb: 2, borderRadius: '8px' }}>
-          <LocationDropdowns onLocationChange={handleLocationChange} />
-        </Box>
+      
         
         {/* Search and Filter Row */}
         <Grid container spacing={2} sx={{ mb: 2 }} alignItems="center">
@@ -182,15 +386,96 @@ const UserRegistrationList = () => {
         )}
 
         <Box sx={{ mt: 2 }}>
-            {users.map((user) => (
-                <UserCard 
-                    key={user.id} 
-                    user={user}
-                    isSelected={selectedUsers.has(user.id)}
-                    onSelectChange={handleUserSelect}
-                    onCallLogUpdate={handleCallLogUpdate}
-                />
-            ))}
+            {loading ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
+                    <CircularProgress />
+                </Box>
+            ) : users.length === 0 ? (
+                <Box sx={{ textAlign: 'center', py: 4 }}>
+                    <Typography sx={{ color: '#7C766F', fontSize: '16px' }}>
+                        No learners found
+                    </Typography>
+                </Box>
+            ) : (
+                <>
+                    {users.map((user) => (
+                        <UserCard 
+                            key={user.userId} 
+                            user={user}
+                            isSelected={selectedUsers.has(user.userId)}
+                            onSelectChange={handleUserSelect}
+                            onCallLogUpdate={handleCallLogUpdate}
+                        />
+                    ))}
+                    {/* Pagination Section */}
+                    <Box sx={{ 
+                        display: 'flex', 
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        justifyContent: 'space-between', 
+                        alignItems: 'center',
+                        mt: 4, 
+                        mb: 2,
+                        gap: 2
+                    }}>
+                        {/* Page Info */}
+                        <Typography sx={{ 
+                            color: '#7C766F', 
+                            fontSize: '14px',
+                            fontWeight: 500
+                        }}>
+                            {totalCount > 0 ? (
+                                <>
+                                    Showing {(currentPage - 1) * limit + 1} - {Math.min(currentPage * limit, totalCount)} of {totalCount} learners
+                                    {Math.ceil(totalCount / limit) === 1 && ' (Single Page)'}
+                                </>
+                            ) : (
+                                'No records found'
+                            )}
+                        </Typography>
+                        
+                        {/* Pagination Controls */}
+                        {totalCount > 0 && (
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                <Pagination
+                                    count={Math.max(1, Math.ceil(totalCount / limit))}
+                                    page={currentPage}
+                                    onChange={handlePageChange}
+                                    color="primary"
+                                    size="medium"
+                                    showFirstButton
+                                    showLastButton
+                                    siblingCount={1}
+                                    boundaryCount={1}
+                                    sx={{
+                                        '& .MuiPaginationItem-root': {
+                                            color: '#1E1B16',
+                                            fontSize: '14px',
+                                            fontWeight: 500,
+                                            '&:hover': {
+                                                backgroundColor: '#F5F5F5',
+                                            },
+                                            '&.Mui-disabled': {
+                                                opacity: 0.5,
+                                            },
+                                        },
+                                        '& .Mui-selected': {
+                                            backgroundColor: '#FDBE16 !important',
+                                            color: '#1E1B16 !important',
+                                            fontWeight: 600,
+                                            '&:hover': {
+                                                backgroundColor: '#FDBE16 !important',
+                                            },
+                                        },
+                                        '& .MuiPaginationItem-ellipsis': {
+                                            color: '#7C766F',
+                                        },
+                                    }}
+                                />
+                            </Box>
+                        )}
+                    </Box>
+                </>
+            )}
         </Box>
       </Box>
 

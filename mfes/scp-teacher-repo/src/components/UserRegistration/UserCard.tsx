@@ -40,10 +40,10 @@ interface User {
 }
 
 interface UserCardProps {
-  user: User;
+  user: User & { userId?: string };
   isSelected?: boolean;
-  onSelectChange?: (userId: number, selected: boolean) => void;
-  onCallLogUpdate?: (userId: number, callLog: { date: string; note: string }) => void;
+  onSelectChange?: (userId: string, selected: boolean) => void;
+  onCallLogUpdate?: (userId: string, callLog: { date: string; note: string }) => void;
 }
 
 const UserCard: React.FC<UserCardProps> = ({ user, isSelected = false, onSelectChange, onCallLogUpdate }) => {
@@ -51,8 +51,8 @@ const UserCard: React.FC<UserCardProps> = ({ user, isSelected = false, onSelectC
   const [callLogModalOpen, setCallLogModalOpen] = useState(false);
 
   const handleCallLogSave = (data: { date: string; note: string }) => {
-    if (onCallLogUpdate) {
-      onCallLogUpdate(user.id, data);
+    if (onCallLogUpdate && user.userId) {
+      onCallLogUpdate(user.userId, data);
     }
     setCallLogModalOpen(false);
   };
@@ -72,7 +72,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, isSelected = false, onSelectC
             <Grid item>
               <Checkbox 
                 checked={isSelected}
-                onChange={(e) => onSelectChange?.(user.id, e.target.checked)}
+                onChange={(e) => onSelectChange?.(user.userId || String(user.id), e.target.checked)}
                 sx={{ p: 0.5, '&.Mui-checked': { color: '#1E1B16' } }} 
               />
             </Grid>

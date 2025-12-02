@@ -3,8 +3,8 @@ import { Box, Tabs, Tab } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 interface RegistrationTabsProps {
-  value: number;
-  onChange: (event: React.SyntheticEvent, newValue: number) => void;
+  value: string;
+  onChange: (event: React.SyntheticEvent, newValue: string) => void;
 }
 
 const RegistrationTabs: React.FC<RegistrationTabsProps> = ({ value, onChange }) => {
@@ -35,10 +35,10 @@ const RegistrationTabs: React.FC<RegistrationTabsProps> = ({ value, onChange }) 
             }
         }}
       >
-        <Tab label="Action Pending" />
+        <Tab label="Action Pending" value="pending" />
         {/* Skip Assigned */}
-        <Tab label="Archived" />
-        <Tab label="Upcoming" />
+        <Tab label="Archived" value="archived" />
+        <Tab label="Upcoming" value="upcoming" />
       </Tabs>
     </Box>
   );
