@@ -544,7 +544,8 @@
     "DATE_OF_BIRTH": "Date of Birth",
     "TEST_BELONG_TO": "test belongs to below center",
          "WAS_BELONG_TO": "was archived in the below location",
-    "CONFIRM_TO_ACTIVATE":"Are you sure you want to activate this user again?"
+    "CONFIRM_TO_ACTIVATE":"Are you sure you want to activate this user again?",
+    "BELONG_TO": "belongs to below center"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "Invalid Input.",
