@@ -62,7 +62,9 @@ const CohortLearnerList: React.FC<CohortLearnerListProp> = ({
           const resp = response?.result?.userDetails;
 
           if (resp) {
-            const userDetails = resp.map((user: any) => {
+            // Filter out reassigned users
+            const filteredResp = resp.filter((user: any) => user.status !== "reassigned");
+            const userDetails = filteredResp.map((user: any) => {
               const ageField = user.customField.find(
                 (field: { label: string }) => field.label === 'AGE'
               );

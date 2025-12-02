@@ -275,7 +275,7 @@ const UserAttendanceHistory = () => {
                 const currentDate = new Date(selectedDate);
                 currentDate.setHours(0, 0, 0, 0);
                 if (
-                  member.memberStatus === Status.ARCHIVED &&
+                  (member.memberStatus === Status.ARCHIVED || member.memberStatus === "reassigned") &&
                   updatedAt <= currentDate
                 ) {
                   return false;
