@@ -22,7 +22,7 @@ import {
   updateCohortUpdate,
   updateReassignUser,
 } from '@/services/CohortService/cohortService';
-import { RoleId , TENANT_DATA} from '@/utils/app.constant';
+import { RoleId, TENANT_DATA } from '@/utils/app.constant';
 import _ from 'lodash';
 import { fetchAttendanceStats } from '@/utils/helperAttendanceStatApi';
 const AddEditUser = ({
@@ -55,9 +55,9 @@ const AddEditUser = ({
   hideSubmit,
   setButtonShow,
   isSteeper,
-  parentData=[]
+  parentData = [],
 }) => {
-  console.log("parentData=======>", parentData)
+  console.log('parentData=======>', parentData);
   const [isLoading, setIsLoading] = useState(false);
   const [showAssignmentScreen, setShowAssignmentScreen] =
     useState<boolean>(false);
@@ -122,20 +122,20 @@ const AddEditUser = ({
           'grade',
           'center',
           'program',
-        //  'class',
-         // 'marital_status',
-         // 'phone_type_available',
-        //  'own_phone_check',
+          //  'class',
+          // 'marital_status',
+          // 'phone_type_available',
+          //  'own_phone_check',
 
-         // 'ownphonecheck',
-        //  'parent_phone',
-         // 'preferred_mode_of_learning',
+          // 'ownphonecheck',
+          //  'parent_phone',
+          // 'preferred_mode_of_learning',
           //'drop_out_reason',
-         // 'work_domain',
-        //  'what_do_you_want_to_become',
-         // 'guardian_name',
-         // 'guardian_relation',
-         // 'dob',
+          // 'work_domain',
+          //  'what_do_you_want_to_become',
+          // 'guardian_name',
+          // 'guardian_relation',
+          // 'dob',
         ];
       } else {
         keysToRemove = [
@@ -161,10 +161,15 @@ const AddEditUser = ({
       isEditSchema.required = isEditSchema.required.filter(
         (key: any) => !keysToRemove.includes(key)
       );
-      
+
       // Disable name fields and username for learner editing
       if (type === 'learner' && isEdit) {
-        const fieldsToDisable = ['firstName', 'middleName', 'lastName', 'username'];
+        const fieldsToDisable = [
+          'firstName',
+          'middleName',
+          'lastName',
+          'username',
+        ];
         fieldsToDisable.forEach((fieldName) => {
           if (isEditUiSchema[fieldName]) {
             isEditUiSchema[fieldName] = {
@@ -174,10 +179,8 @@ const AddEditUser = ({
           }
         });
       }
-       // console.log('isEditSchema', JSON.stringify(isEditSchema));
-    } 
-    
-    else if (isReassign) {
+      // console.log('isEditSchema', JSON.stringify(isEditSchema));
+    } else if (isReassign) {
       let originalRequired = isEditSchema.required;
       const keysToHave = [
         'state',
@@ -230,10 +233,10 @@ const AddEditUser = ({
         'middleName',
         'lastName',
         'username',
-       
+
         'gender',
         'dob',
-         'mobile',
+        'mobile',
         'guardian_name',
         'guardian_relation',
         'parent_phone',
@@ -244,7 +247,7 @@ const AddEditUser = ({
         'class',
         'marital_status',
         'phone_type_accessible',
-       // 'own_phone_check',
+        // 'own_phone_check',
         'ownphonecheck',
 
         'password',
@@ -271,17 +274,20 @@ const AddEditUser = ({
   const isBelow18 = (dob: any) => {
     const birthDate = new Date(dob);
     const today = new Date();
-  
+
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-  
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
       age--;
     }
-  
+
     return age < 18;
   };
-  
+
   const FormSubmitFunction = async (formData: any, payload: any) => {
     setPrefilledFormData(formData);
     console.log(formData, 'formdata');
@@ -327,8 +333,8 @@ const AddEditUser = ({
             userData: userData,
             customFields: customFields,
           };
-          if(!isBelow18(userData?.dob)){
-            object.customFields=[...parentData,...customFields]
+          if (!isBelow18(userData?.dob)) {
+            object.customFields = [...parentData, ...customFields];
           }
           console.log('object===>', object);
           const updateUserResponse = await updateUser(editableUserId, object);
@@ -341,7 +347,9 @@ const AddEditUser = ({
             showToastMessage(t(successUpdateMessage), 'success');
             telemetryCallbacks(telemetryUpdateKey);
 
-            UpdateSuccessCallback();
+            if (typeof UpdateSuccessCallback === 'function') {
+              UpdateSuccessCallback();
+            }
             // localStorage.removeItem('BMGSData');
           } else {
             // console.error('Error update user:', error);
@@ -363,7 +371,9 @@ const AddEditUser = ({
           showToastMessage(t(successUpdateMessage), 'success');
           telemetryCallbacks(telemetryUpdateKey);
 
-          UpdateSuccessCallback();
+          if (typeof UpdateSuccessCallback === 'function') {
+            UpdateSuccessCallback();
+          }
         } else {
           // console.error('Error update user:', error);
           showToastMessage(t(failureUpdateMessage), 'error');
@@ -413,7 +423,9 @@ const AddEditUser = ({
             }
             showToastMessage(t(successUpdateMessage), 'success');
             telemetryCallbacks(telemetryUpdateKey);
-            UpdateSuccessCallback();
+            if (typeof UpdateSuccessCallback === 'function') {
+              UpdateSuccessCallback();
+            }
           } else {
             // console.error('Error reassigning user:', error);
             showToastMessage(t(failureUpdateMessage), 'error');
@@ -471,7 +483,9 @@ const AddEditUser = ({
             showToastMessage(t(successCreateMessage), 'success');
 
             telemetryCallbacks(telemetryCreateKey);
-            SuccessCallback();
+            if (typeof SuccessCallback === 'function') {
+              SuccessCallback();
+            }
 
             // Send Notification with credentials to user
             try {
@@ -509,7 +523,9 @@ const AddEditUser = ({
           if (centerCreation) {
             showToastMessage(t(successCreateMessage), 'success');
             telemetryCallbacks(telemetryCreateKey);
-            SuccessCallback();
+            if (typeof SuccessCallback === 'function') {
+              SuccessCallback();
+            }
           } else {
             showToastMessage(t(failureCreateMessage), 'error');
           }
@@ -540,7 +556,9 @@ const AddEditUser = ({
     setShowAssignmentScreen(false);
     // setButtonShow(true)
     setFormData({});
-    SuccessCallback();
+    if (typeof SuccessCallback === 'function') {
+      SuccessCallback();
+    }
   };
   return (
     // <>
