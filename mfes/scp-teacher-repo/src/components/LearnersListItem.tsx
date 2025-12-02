@@ -707,14 +707,20 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
                   ),
                   name: 'delete-User',
                 },
-              ].filter(
-                (option) =>
+              ].filter((option) => {
+                // If isDropout is true, only show unmark-drop-out option
+                if (isDropout) {
+                  return option.name === 'unmark-drop-out';
+                }
+                // Otherwise, apply existing filter logic
+                return (
                   (type === Role.STUDENT ||
                     (option.name !== 'mark-drop-out' &&
                       option.name !== 'unmark-drop-out')) &&
                   (!(isFromProfile || isDropout) ||
                     option.name !== 'reassign-centers')
-              )
+                );
+              })
             : [
                 // Only TL will see this option
                 ...(loggedInUserRole === Role.TEAM_LEADER
@@ -750,14 +756,20 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
                   ),
                   name: 'delete-User',
                 },
-              ].filter(
-                (option) =>
+              ].filter((option) => {
+                // If isDropout is true, only show unmark-drop-out option
+                if (isDropout) {
+                  return option.name === 'unmark-drop-out';
+                }
+                // Otherwise, apply existing filter logic
+                return (
                   (type === Role.STUDENT ||
                     (option.name !== 'mark-drop-out' &&
                       option.name !== 'unmark-drop-out')) &&
                   (!(isFromProfile || isDropout) ||
                     option.name !== 'reassign-centers')
-              )
+                );
+              })
         }
         renderCustomContent={renderCustomContent}
       />
