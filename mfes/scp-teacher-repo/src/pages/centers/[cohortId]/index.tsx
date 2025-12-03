@@ -184,6 +184,7 @@ const CohortPage = () => {
   const [state, setState] = React.useState<string>();
   const [clickedBox, setClickedBox] = useState<string | null>(null);
   const [isLearnerAdded, setIsLearnerAdded] = useState(false);
+  const [isLearnerReassigned, setIsLearnerReassigned] = useState(false);
   const [createEvent, setCreateEvent] = useState(false);
   const [eventCreated, setEventCreated] = useState(false);
   const [onEditEvent, setOnEditEvent] = useState(false);
@@ -1146,6 +1147,7 @@ const CohortPage = () => {
                 reloadState={reloadState}
                 setReloadState={setReloadState}
                 isLearnerAdded={isLearnerAdded}
+                isLearnerReassigned={isLearnerReassigned}
               />
             </Box>
             {openAddLearnerModal && (
