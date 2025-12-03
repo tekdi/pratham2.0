@@ -105,17 +105,40 @@ const CohortLearnerList: React.FC<CohortLearnerListProp> = ({
     getCohortMemberList();
   }, [cohortId, reloadState, isLearnerAdded, isLearnerDeleted]);
 
+  // Reapply search filter when userData changes
+  useEffect(() => {
+    if (userData) {
+      const query = searchTerm.toLowerCase().trim();
+      if (!query) {
+        setFilteredData(userData);
+      } else {
+        const filtered = userData.filter(
+          (data) =>
+            data?.name?.toLowerCase()?.includes(query) ||
+            data?.enrollmentNumber?.toLowerCase()?.includes(query)
+        );
+        setFilteredData(filtered);
+      }
+    }
+  }, [userData, searchTerm]);
+
   const handleLearnerDelete = () => {
     setIsLearnerDeleted(true);
   };
   const handleSearch = (searchTerm: string) => {
-    // const query = event.target.value.toLowerCase();
-    // setSearchQuery(query);
+    setSearchTerm(searchTerm);
+    const query = searchTerm.toLowerCase().trim();
+
+    if (!query) {
+      // If search is empty, show all data
+      setFilteredData(userData);
+      return;
+    }
 
     const filtered = userData?.filter(
       (data) =>
-        data?.name?.toLowerCase()?.includes(searchTerm) ||
-        data?.enrollmentNumber?.toLowerCase()?.includes(searchTerm)
+        data?.name?.toLowerCase()?.includes(query) ||
+        data?.enrollmentNumber?.toLowerCase()?.includes(query)
     );
     setFilteredData(filtered);
   };
@@ -127,7 +150,7 @@ const CohortLearnerList: React.FC<CohortLearnerListProp> = ({
         <Loader showBackdrop={true} loadingText={t('COMMON.LOADING')} />
       ) : (
         <>
-          {filteredData?.length ? (
+          {userData?.length ? (
             <SearchBar
               onSearch={handleSearch}
               value={searchTerm}
