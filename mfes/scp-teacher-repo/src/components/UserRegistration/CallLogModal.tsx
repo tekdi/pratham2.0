@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import { Box, Modal, Typography, Button, IconButton, TextField, InputAdornment, useTheme } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, Modal, Typography, Button, IconButton, TextField, useTheme } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { modalStyles } from '../../styles/modalStyles';
 
 interface CallLogModalProps {
@@ -22,8 +21,17 @@ const CallLogModal: React.FC<CallLogModalProps> = ({
   initialNote,
 }) => {
   const theme = useTheme<any>();
-  const [date, setDate] = useState(initialDate || '');
+  const today = new Date().toISOString().split('T')[0];
+  const [date, setDate] = useState(initialDate || today);
   const [note, setNote] = useState(initialNote || '');
+
+  useEffect(() => {
+    if (open) {
+      setDate(initialDate || today);
+      setNote(initialNote || '');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const handleSave = () => {
     if (date && note) {
@@ -87,15 +95,11 @@ const CallLogModal: React.FC<CallLogModalProps> = ({
             </Typography>
             <TextField
               fullWidth
+              type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              placeholder="18 Mar, 2025"
               InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <CalendarTodayIcon sx={{ color: '#0D599E', cursor: 'pointer' }} />
-                  </InputAdornment>
-                ),
+                disableUnderline: true,
               }}
               sx={{
                 '& .MuiOutlinedInput-root': {

@@ -15,13 +15,7 @@ import { fetchUserList } from '../services/ManageUser';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import withRole from '../components/withRole';
 import { TENANT_DATA } from '../../app.config';
-
-interface LocationFilters {
-  states?: number[];
-  districts?: number[];
-  blocks?: number[];
-  villages?: number[];
-}
+import { LocationFilters } from '../components/UserRegistration/types';
 
 const UserRegistrationList = () => {
   const [tabValue, setTabValue] = useState('pending');
@@ -36,9 +30,28 @@ const UserRegistrationList = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [locationFilters, setLocationFilters] = useState<LocationFilters>({});
-  const limit: number = 5;
+  const limit = 5;
+
+  const hasLocationFilters =
+    Boolean(locationFilters.states?.length) &&
+    Boolean(locationFilters.districts?.length) &&
+    Boolean(locationFilters.blocks?.length) &&
+    Boolean(locationFilters.villages?.length);
 
   // Transform API response to match UserCard format
+  const parseCallLogEntry = (
+    value: unknown
+  ): { date?: string; textValue?: string } | null => {
+    if (typeof value === 'string') {
+      try {
+        return JSON.parse(value);
+      } catch {
+        return null;
+      }
+    }
+    return typeof value === 'object' ? value : null;
+  };
+
   const transformUserData = (apiUser: any): any => {
     // Extract location from customFields
     const stateField = apiUser.customFields?.find((field: any) => field.label === 'STATE');
@@ -46,6 +59,7 @@ const UserRegistrationList = () => {
     const blockField = apiUser.customFields?.find((field: any) => field.label === 'BLOCK');
     const villageField = apiUser.customFields?.find((field: any) => field.label === 'VILLAGE');
     const modeField = apiUser.customFields?.find((field: any) => field.label === 'WHAT_IS_YOUR_PREFERRED_MODE_OF_LEARNING');
+    const callLogsField = apiUser.customFields?.find((field: any) => field.label === 'CALL_LOGS');
 
     const state = stateField?.selectedValues?.[0]?.value || '';
     const district = districtField?.selectedValues?.[0]?.value || '';
@@ -104,7 +118,21 @@ const UserRegistrationList = () => {
       phoneNumber: apiUser.mobile || '',
       email: apiUser.email || '',
       birthDate,
-      callLogs: [],
+      callLogs:
+        Array.isArray(callLogsField?.selectedValues) && callLogsField.selectedValues.length > 0
+          ? callLogsField.selectedValues
+              .map((value: unknown) => parseCallLogEntry(value))
+              .filter(
+                (entry: { date?: string; textValue?: string } | null): entry is {
+                  date?: string;
+                  textValue?: string;
+                } => Boolean(entry)
+              )
+              .map((entry: { date?: string; textValue?: string }) => ({
+                date: entry.date || '',
+                note: entry.textValue || '',
+              }))
+          : [],
       isNew: apiUser.tenantStatus === 'pending',
       preTestStatus: apiUser.tenantStatus === 'pending' ? 'pending' : 'completed',
       modeType,
@@ -114,7 +142,8 @@ const UserRegistrationList = () => {
   };
 
   // Fetch users from API
-  const fetchUsers = useCallback(async (page: number = 1, tab: string, location: LocationFilters) => {
+  const fetchUsers = useCallback(
+    async (page: number = 1, tab: string, location: LocationFilters, searchTerm: string = '') => {
     setLoading(true);
     try {
       const tenantId = localStorage.getItem('tenantId');
@@ -154,6 +183,9 @@ const UserRegistrationList = () => {
       if (location.villages && location.villages.length > 0) {
         filters.village = location.villages;
       }
+      if (searchTerm.trim()) {
+        filters.name = searchTerm.trim();
+      }
 
       const response = await fetchUserList({
         limit,
@@ -178,49 +210,65 @@ const UserRegistrationList = () => {
     }
   }, [limit]);
 
-  // Initial fetch on mount
+  // Initial fetch once location filters are populated
   useEffect(() => {
-    fetchUsers(1, tabValue, locationFilters);
+    if (!hasLocationFilters || isMounted.current) {
+      return;
+    }
+    fetchUsers(1, tabValue, locationFilters, searchQuery);
+    isMounted.current = true;
+    prevTabRef.current = tabValue;
+    prevLocationRef.current = JSON.stringify(locationFilters);
+    prevPageRef.current = 1;
+    prevSearchRef.current = searchQuery;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [hasLocationFilters, searchQuery]);
 
   // Use ref to track previous values and prevent unnecessary calls
   const prevTabRef = useRef(tabValue);
   const prevLocationRef = useRef<string>(JSON.stringify(locationFilters));
   const prevPageRef = useRef(currentPage);
+  const prevSearchRef = useRef(searchQuery);
   const isMounted = useRef(false);
 
   // Fetch users when tab, location, or page changes (skip initial mount)
   useEffect(() => {
+    if (!hasLocationFilters) {
+      return;
+    }
+
     if (!isMounted.current) {
       isMounted.current = true;
       prevTabRef.current = tabValue;
       prevLocationRef.current = JSON.stringify(locationFilters);
       prevPageRef.current = currentPage;
+      prevSearchRef.current = searchQuery;
       return;
     }
 
     const tabChanged = prevTabRef.current !== tabValue;
     const locationChanged = prevLocationRef.current !== JSON.stringify(locationFilters);
     const pageChanged = prevPageRef.current !== currentPage;
+    const searchChanged = prevSearchRef.current !== searchQuery;
 
     // Only fetch if something actually changed
-    if (tabChanged || locationChanged || pageChanged) {
-      if (tabChanged || locationChanged) {
+    if (tabChanged || locationChanged || searchChanged || pageChanged) {
+      if (tabChanged || locationChanged || searchChanged) {
         setCurrentPage(1);
         prevPageRef.current = 1;
-        fetchUsers(1, tabValue, locationFilters);
+        fetchUsers(1, tabValue, locationFilters, searchQuery);
       } else if (pageChanged) {
-        fetchUsers(currentPage, tabValue, locationFilters);
+        fetchUsers(currentPage, tabValue, locationFilters, searchQuery);
       }
 
       // Update refs
       prevTabRef.current = tabValue;
       prevLocationRef.current = JSON.stringify(locationFilters);
       prevPageRef.current = currentPage;
+      prevSearchRef.current = searchQuery;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tabValue, locationFilters, currentPage]);
+  }, [tabValue, locationFilters, currentPage, hasLocationFilters, searchQuery]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
     console.log('handleTabChange', newValue);
@@ -253,24 +301,41 @@ const UserRegistrationList = () => {
     setAssignBatchModalOpen(true);
   };
 
-  const handleAssignBatchSubmit = (data: { mode: string; center: string; batch: string }) => {
+  const handleAssignBatchSubmit = (data: { mode: string; center: string; batchId: string; batchName: string }) => {
     // Close assign batch modal
     setAssignBatchModalOpen(false);
     // Set batch name for success modal
-    setSelectedBatchName(data.batch);
+    setSelectedBatchName(data.batchName);
     // Open success modal
     setSuccessModalOpen(true);
     // Clear selections
     setSelectedUsers(new Set());
   };
 
-  const handleCallLogUpdate = (userId: string, callLog: { date: string; note: string }) => {
+  const handleCallLogUpdate = (
+    userId: string,
+    callLog: { date: string; note: string },
+    editIndex?: number
+  ) => {
     setUsers((prevUsers) =>
       prevUsers.map((user) =>
         user.userId === userId
           ? {
               ...user,
-              callLogs: [...user.callLogs, { date: callLog.date, status: 'Logged', note: callLog.note }],
+              callLogs:
+                typeof editIndex === 'number' &&
+                editIndex >= 0 &&
+                editIndex < user.callLogs.length
+                  ? user.callLogs.map((log: { date?: string; note?: string }, index: number) =>
+                      index === editIndex
+                        ? {
+                            ...log,
+                            date: callLog.date,
+                            note: callLog.note,
+                          }
+                        : log
+                    )
+                  : [...user.callLogs, { date: callLog.date, status: 'Logged', note: callLog.note }],
             }
           : user
       )
@@ -492,13 +557,18 @@ const UserRegistrationList = () => {
         open={assignBatchModalOpen}
         onClose={() => setAssignBatchModalOpen(false)}
         selectedLearners={selectedLearnerNames}
+        selectedLearnerIds={Array.from(selectedUsers)}
         onAssign={handleAssignBatchSubmit}
+        locationFilters={locationFilters}
       />
 
       {/* Success Modal */}
       <AssignBatchSuccessModal
         open={successModalOpen}
-        onClose={() => setSuccessModalOpen(false)}
+        onClose={() => {
+          setSuccessModalOpen(false);
+          fetchUsers(currentPage, tabValue, locationFilters);
+        }}
         batchName={selectedBatchName}
       />
 

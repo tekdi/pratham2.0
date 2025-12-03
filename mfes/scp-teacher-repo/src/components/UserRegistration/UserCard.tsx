@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useRouter } from 'next/router';
 import { Box, Grid, Checkbox, Button, Chip, Typography } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CallOutlinedIcon from '@mui/icons-material/CallOutlined';
@@ -12,6 +13,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import CallLogModal from './CallLogModal';
+import { editEditUser } from '../../services/ProfileService';
 
 interface CallLog {
   date: string;
@@ -43,18 +45,59 @@ interface UserCardProps {
   user: User & { userId?: string };
   isSelected?: boolean;
   onSelectChange?: (userId: string, selected: boolean) => void;
-  onCallLogUpdate?: (userId: string, callLog: { date: string; note: string }) => void;
+  onCallLogUpdate?: (
+    userId: string,
+    callLog: { date: string; note: string },
+    editIndex?: number
+  ) => void;
 }
 
 const UserCard: React.FC<UserCardProps> = ({ user, isSelected = false, onSelectChange, onCallLogUpdate }) => {
   const [expanded, setExpanded] = useState(false);
   const [callLogModalOpen, setCallLogModalOpen] = useState(false);
+  const [editingCallLog, setEditingCallLog] = useState<{ date: string; note: string } | null>(null);
+  const [editingCallLogIndex, setEditingCallLogIndex] = useState<number | null>(null);
+  const router = useRouter();
 
-  const handleCallLogSave = (data: { date: string; note: string }) => {
-    if (onCallLogUpdate && user.userId) {
-      onCallLogUpdate(user.userId, data);
+  const handleCallLogSave = async (data: { date: string; note: string }) => {
+    if (!user.userId) {
+      setCallLogModalOpen(false);
+      return;
     }
-    setCallLogModalOpen(false);
+
+    const existingValues = user.callLogs.map((log) => ({
+      date: log.date || '',
+      textValue: log.note || '',
+    }));
+
+    const updatedValues = editingCallLog
+      ? existingValues.map((entry) =>
+          entry.date === editingCallLog.date && entry.textValue === editingCallLog.note
+            ? { date: data.date, textValue: data.note }
+            : entry
+        )
+      : [...existingValues, { date: data.date, textValue: data.note }];
+
+    const userDetails = {
+      userData: {},
+      customFields: [
+        {
+          fieldId: '186df59d-2876-4c2f-a123-9fec12d3d18a',
+          value: updatedValues,
+        },
+      ],
+    };
+
+    try {
+      await editEditUser(user.userId, userDetails);
+      if (onCallLogUpdate) {
+        onCallLogUpdate(user.userId, data, editingCallLogIndex ?? undefined);
+      }
+    } catch (error) {
+      console.error('Error updating call log custom field:', error);
+    } finally {
+      setCallLogModalOpen(false);
+    }
   };
 
   return (
@@ -79,7 +122,22 @@ const UserCard: React.FC<UserCardProps> = ({ user, isSelected = false, onSelectC
             <Grid item xs>
                {/* Name and Date Row */}
                <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#2E65F3', textDecoration: 'underline', cursor: 'pointer', mr: 1, fontSize: '16px' }}>
+                  <Typography
+                    variant="subtitle1"
+                    sx={{
+                      fontWeight: 600,
+                      color: '#2E65F3',
+                      textDecoration: 'underline',
+                      cursor: 'pointer',
+                      mr: 1,
+                      fontSize: '16px',
+                    }}
+                    onClick={() => {
+                      if (user.userId) {
+                        router.push(`/learner/${user.userId}`);
+                      }
+                    }}
+                  >
                     {user.name}
                   </Typography>
                   {user.isNew && (
@@ -179,7 +237,11 @@ const UserCard: React.FC<UserCardProps> = ({ user, isSelected = false, onSelectC
                   <Button 
                       variant="outlined" 
                       startIcon={<AddIcCallOutlinedIcon />}
-                      onClick={() => setCallLogModalOpen(true)}
+                      onClick={() => {
+                        setEditingCallLog(null);
+                        setEditingCallLogIndex(null);
+                        setCallLogModalOpen(true);
+                      }}
                       sx={{ 
                           borderRadius: '100px', 
                           borderColor: '#1E1B16', 
@@ -198,7 +260,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, isSelected = false, onSelectC
               <Box>
                   <Typography variant="caption" sx={{ color: '#7C766F', fontSize: '12px', mb: 0.5, display: 'block' }}>Call Logs</Typography>
                   {user.callLogs.length > 0 ? (
-                          user.callLogs.map((log, index) => (
+                          user.callLogs.map((log: CallLog, index: number) => (
                           <Box key={index} sx={{ mb: 1 }}>
                               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                   <Box sx={{ flex: 1 }}>
@@ -212,7 +274,12 @@ const UserCard: React.FC<UserCardProps> = ({ user, isSelected = false, onSelectC
                                           cursor: 'pointer',
                                           ml: 1,
                                           mt: 0.5
-                                      }} 
+                                      }}
+                                      onClick={() => {
+                                        setEditingCallLog({ date: log.date || '', note: log.note || '' });
+                                        setEditingCallLogIndex(index);
+                                        setCallLogModalOpen(true);
+                                      }}
                                   />
                               </Box>
                           </Box>
@@ -229,9 +296,17 @@ const UserCard: React.FC<UserCardProps> = ({ user, isSelected = false, onSelectC
       {/* Call Log Modal */}
       <CallLogModal
         open={callLogModalOpen}
-        onClose={() => setCallLogModalOpen(false)}
+        onClose={() => {
+          setCallLogModalOpen(false);
+          setEditingCallLog(null);
+        }}
         learnerName={user.name}
-        onSave={handleCallLogSave}
+        onSave={(data) => {
+          handleCallLogSave(data);
+          setEditingCallLog(null);
+        }}
+        initialDate={editingCallLog?.date}
+        initialNote={editingCallLog?.note}
       />
     </>
   );

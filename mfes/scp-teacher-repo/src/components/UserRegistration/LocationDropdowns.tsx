@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Box, Select, MenuItem, InputLabel, Checkbox, ListItemText, Grid, FormControl } from '@mui/material';
 import { getFieldOptions } from '../../services/MasterDataService';
 
 interface LocationOption {
-  value: number;
+  value: number | string;
   label: string;
   [key: string]: any;
 }
@@ -17,21 +17,111 @@ interface LocationDropdownsProps {
   }) => void;
 }
 
+type StoredLocationFilters = {
+  states?: (number | string)[];
+  districts?: (number | string)[];
+  blocks?: (number | string)[];
+  villages?: (number | string)[];
+};
+
 const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange }) => {
   const [states, setStates] = useState<LocationOption[]>([]);
   const [districts, setDistricts] = useState<LocationOption[]>([]);
   const [blocks, setBlocks] = useState<LocationOption[]>([]);
   const [villages, setVillages] = useState<LocationOption[]>([]);
 
-  const [selectedStates, setSelectedStates] = useState<number[]>([]);
-  const [selectedDistricts, setSelectedDistricts] = useState<number[]>([]);
-  const [selectedBlocks, setSelectedBlocks] = useState<number[]>([]);
-  const [selectedVillages, setSelectedVillages] = useState<number[]>([]);
+  const [selectedStates, setSelectedStates] = useState<(number | string)[]>([]);
+  const [selectedDistricts, setSelectedDistricts] = useState<(number | string)[]>([]);
+  const [selectedBlocks, setSelectedBlocks] = useState<(number | string)[]>([]);
+  const [selectedVillages, setSelectedVillages] = useState<(number | string)[]>([]);
 
   const [loadingStates, setLoadingStates] = useState(false);
   const [loadingDistricts, setLoadingDistricts] = useState(false);
   const [loadingBlocks, setLoadingBlocks] = useState(false);
   const [loadingVillages, setLoadingVillages] = useState(false);
+
+  const storedLocationRef = useRef<StoredLocationFilters>({});
+  const defaultsAppliedRef = useRef({
+    states: false,
+    districts: false,
+    blocks: false,
+    villages: false,
+  });
+  const [isStoredLocationLoaded, setIsStoredLocationLoaded] = useState(false);
+
+  const parseCustomFieldSelections = (field: any): (number | string)[] | undefined => {
+    if (!field?.selectedValues?.length) return undefined;
+    const selections = field.selectedValues
+      .map((valueItem: any) => {
+        if (valueItem?.id !== undefined && valueItem?.id !== null) {
+          const parsedId = Number(valueItem.id);
+          if (!Number.isNaN(parsedId)) {
+            return parsedId;
+          }
+        }
+        if (valueItem?.value !== undefined && valueItem?.value !== null) {
+          return valueItem.value;
+        }
+        return undefined;
+      })
+      .filter((val: number | string | undefined): val is number | string => val !== undefined);
+
+    return selections.length > 0 ? selections : undefined;
+  };
+
+  const getMatchingOptionValues = (
+    options: LocationOption[],
+    storedValues?: (number | string)[]
+  ): (number | string)[] => {
+    if (!storedValues || storedValues.length === 0) {
+      return [];
+    }
+    const matched: (number | string)[] = [];
+    storedValues.forEach((storedValue) => {
+      const option = options.find(
+        (opt) => opt.value === storedValue || opt.label === storedValue
+      );
+      if (option && !matched.includes(option.value)) {
+        matched.push(option.value);
+      }
+    });
+    return matched;
+  };
+
+  // Parse stored location filters from localStorage once on mount
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    try {
+      const storedValue = localStorage.getItem('userdata');
+      if (!storedValue) {
+        setIsStoredLocationLoaded(true);
+        return;
+      }
+
+      const parsedUserData = JSON.parse(storedValue);
+      const customFields = parsedUserData?.customFields;
+      if (!customFields) {
+        setIsStoredLocationLoaded(true);
+        return;
+      }
+
+      const getFieldByLabel = (label: string) =>
+        customFields.find((field: any) => field.label === label);
+
+      storedLocationRef.current = {
+        states: parseCustomFieldSelections(getFieldByLabel('STATE')),
+        districts: parseCustomFieldSelections(getFieldByLabel('DISTRICT')),
+        blocks: parseCustomFieldSelections(getFieldByLabel('BLOCK')),
+        villages: parseCustomFieldSelections(getFieldByLabel('VILLAGE')),
+      };
+    } catch (error) {
+      console.error('Error reading stored location filters:', error);
+    } finally {
+      setIsStoredLocationLoaded(true);
+    }
+  }, []);
 
   // Fetch states on mount
   useEffect(() => {
@@ -58,6 +148,19 @@ const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange 
 
     fetchStates();
   }, []);
+
+  useEffect(() => {
+    if (!isStoredLocationLoaded || defaultsAppliedRef.current.states || states.length === 0) {
+      return;
+    }
+
+    const storedMatches = getMatchingOptionValues(states, storedLocationRef.current.states);
+    const newSelection =
+      storedMatches.length > 0 ? storedMatches : [states[0].value];
+
+    setSelectedStates(newSelection);
+    defaultsAppliedRef.current.states = true;
+  }, [isStoredLocationLoaded, states]);
 
   // Fetch districts when states are selected
   useEffect(() => {
@@ -111,6 +214,19 @@ const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange 
     }
   }, [selectedStates]);
 
+  useEffect(() => {
+    if (!isStoredLocationLoaded || defaultsAppliedRef.current.districts || districts.length === 0) {
+      return;
+    }
+
+    const storedMatches = getMatchingOptionValues(districts, storedLocationRef.current.districts);
+    const newSelection =
+      storedMatches.length > 0 ? storedMatches : [districts[0].value];
+
+    setSelectedDistricts(newSelection);
+    defaultsAppliedRef.current.districts = true;
+  }, [districts, isStoredLocationLoaded]);
+
   // Fetch blocks when districts are selected
   useEffect(() => {
     if (selectedDistricts.length > 0) {
@@ -159,6 +275,19 @@ const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange 
     }
   }, [selectedDistricts]);
 
+  useEffect(() => {
+    if (!isStoredLocationLoaded || defaultsAppliedRef.current.blocks || blocks.length === 0) {
+      return;
+    }
+
+    const storedMatches = getMatchingOptionValues(blocks, storedLocationRef.current.blocks);
+    const newSelection =
+      storedMatches.length > 0 ? storedMatches : [blocks[0].value];
+
+    setSelectedBlocks(newSelection);
+    defaultsAppliedRef.current.blocks = true;
+  }, [blocks, isStoredLocationLoaded]);
+
   // Fetch villages when blocks are selected
   useEffect(() => {
     if (selectedBlocks.length > 0) {
@@ -202,6 +331,19 @@ const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange 
       setSelectedVillages([]);
     }
   }, [selectedBlocks]);
+
+  useEffect(() => {
+    if (!isStoredLocationLoaded || defaultsAppliedRef.current.villages || villages.length === 0) {
+      return;
+    }
+
+    const storedMatches = getMatchingOptionValues(villages, storedLocationRef.current.villages);
+    const newSelection =
+      storedMatches.length > 0 ? storedMatches : [villages[0].value];
+
+    setSelectedVillages(newSelection);
+    defaultsAppliedRef.current.villages = true;
+  }, [villages, isStoredLocationLoaded]);
 
   // Notify parent component when location changes
   useEffect(() => {

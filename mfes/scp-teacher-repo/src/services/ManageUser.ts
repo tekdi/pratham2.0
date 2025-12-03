@@ -128,4 +128,19 @@ export const fetchUserList = async ({
   }
 };
 
+export const updateUserTenantStatus = async (
+  userId: string,
+  tenantId: string,
+  status: string
+): Promise<any> => {
+  const apiUrl = `${API_ENDPOINTS.userTenantStatus}?userId=${userId}&tenantId=${tenantId}`;
+  try {
+    const response = await patch(apiUrl, { status });
+    return response?.data;
+  } catch (error) {
+    console.error('Error in updating user tenant status', error);
+    throw error;
+  }
+};
+
 

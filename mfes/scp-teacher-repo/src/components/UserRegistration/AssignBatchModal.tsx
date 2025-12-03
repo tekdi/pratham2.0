@@ -1,14 +1,19 @@
-import React, { useState } from 'react';
-import { Box, Modal, Typography, Button, IconButton, Radio, RadioGroup, FormControlLabel, FormControl, Select, MenuItem, InputLabel, TextField, useTheme } from '@mui/material';
+import { useState, useEffect, useMemo } from 'react';
+import { Box, Modal, Typography, Button, IconButton, Radio, RadioGroup, FormControlLabel, FormControl, Select, MenuItem, InputLabel, useTheme } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { modalStyles } from '../../styles/modalStyles';
+import { getCohortList, bulkCreateCohortMembers } from '../../services/CohortService/cohortService';
+import { updateUserTenantStatus } from '../../services/ManageUser';
+import { showToastMessage } from '../Toastify';
+import { LocationFilters } from './types';
 
 interface AssignBatchModalProps {
   open: boolean;
   onClose: () => void;
   selectedLearners: string[];
-  onAssign: (data: { mode: string; center: string; batch: string }) => void;
+  onAssign: (data: { mode: string; center: string; batchId: string; batchName: string }) => void;
+  locationFilters: LocationFilters;
+  selectedLearnerIds: string[];
 }
 
 const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
@@ -16,17 +21,192 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
   onClose,
   selectedLearners,
   onAssign,
+  locationFilters,
+  selectedLearnerIds,
 }) => {
   const theme = useTheme<any>();
   const [mode, setMode] = useState('in-person');
   const [center, setCenter] = useState('');
   const [batch, setBatch] = useState('');
+  const [centers, setCenters] = useState<Array<{ label: string; value: string }>>([]);
+  const [batches, setBatches] = useState<Array<{ label: string; value: string }>>([]);
+  const [loadingCenters, setLoadingCenters] = useState(false);
+  const [loadingBatches, setLoadingBatches] = useState(false);
+  const [isAssigning, setIsAssigning] = useState(false);
+  const [selectedBatchName, setSelectedBatchName] = useState('');
 
-  const handleAssign = () => {
-    if (center && batch) {
-      onAssign({ mode, center, batch });
+  const handleAssign = async () => {
+    if (!center || !batch || selectedLearnerIds.length === 0) {
+      return;
+    }
+
+    const tenantId = typeof window !== 'undefined' ? localStorage.getItem('tenantId') : null;
+    if (!tenantId) {
+      console.error('tenantId not found in localStorage');
+      return;
+    }
+
+    setIsAssigning(true);
+    try {
+      await Promise.all(
+        selectedLearnerIds.map((userId) =>
+          updateUserTenantStatus(userId, tenantId, 'active')
+        )
+      );
+
+      await bulkCreateCohortMembers({
+        userId: selectedLearnerIds,
+        cohortId: [batch],
+      });
+
+      onAssign({ mode, center, batchId: batch, batchName: selectedBatchName || '' });
+    } catch (error) {
+      showToastMessage('Something went wrong while assigning the batch.', 'error');
+      console.error('Error while assigning batch:', error);
+    } finally {
+      setIsAssigning(false);
     }
   };
+
+  const locationKey = useMemo(
+    () =>
+      JSON.stringify([
+        locationFilters.states,
+        locationFilters.districts,
+        locationFilters.blocks,
+        locationFilters.villages,
+      ]),
+    [locationFilters]
+  );
+
+  const hasLocationSelection =
+    Boolean(locationFilters.states?.length) &&
+    Boolean(locationFilters.districts?.length) &&
+    Boolean(locationFilters.blocks?.length) &&
+    Boolean(locationFilters.villages?.length);
+
+  const buildCenterFilters = () => {
+    const filters: Record<string, string[] | string> = {
+      type: 'COHORT',
+      status: ['active'],
+    };
+
+    const addFilter = (key: string, values?: (string | number)[]) => {
+      if (values && values.length > 0) {
+        filters[key] = values.map((value) => String(value));
+      }
+    };
+
+    addFilter('state', locationFilters.states);
+    addFilter('district', locationFilters.districts);
+    addFilter('block', locationFilters.blocks);
+    addFilter('village', locationFilters.villages);
+
+    return filters;
+  };
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    if (!hasLocationSelection) {
+      setCenters([]);
+      setCenter('');
+      setBatches([]);
+      setBatch('');
+      return;
+    }
+
+    const fetchCenters = async () => {
+      setLoadingCenters(true);
+      try {
+        const response = await getCohortList({
+          limit: 200,
+          offset: 0,
+          sort: ['name', 'asc'],
+          filters: buildCenterFilters(),
+        });
+
+        const cohortDetails = response?.results?.cohortDetails ?? [];
+        const centerOptions = cohortDetails.map((cohort: any) => ({
+          label: cohort.name || 'Unnamed center',
+          value: cohort.cohortId,
+        }));
+
+        setCenters(centerOptions);
+
+        const centerStillValid = centerOptions.some((option) => option.value === center);
+        if (!centerStillValid) {
+          const nextCenter = centerOptions[0]?.value ?? '';
+          setCenter(nextCenter);
+          setBatch('');
+          setBatches([]);
+        }
+      } catch (error) {
+        console.error('Error fetching centers:', error);
+        setCenters([]);
+        setCenter('');
+        setBatch('');
+        setBatches([]);
+      } finally {
+        setLoadingCenters(false);
+      }
+    };
+
+    fetchCenters();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, locationKey]);
+
+  useEffect(() => {
+    if (!center) {
+      setBatches([]);
+      setBatch('');
+      return;
+    }
+
+    const fetchBatches = async () => {
+      setLoadingBatches(true);
+      try {
+        const response = await getCohortList({
+          limit: 200,
+          offset: 0,
+          sort: ['name', 'asc'],
+          filters: {
+            parentId: [center],
+            type: 'BATCH',
+            status: ['active'],
+          },
+        });
+
+        const cohortDetails = response?.results?.cohortDetails ?? [];
+        const batchOptions = cohortDetails.map((cohort: any) => ({
+          label: cohort.name || 'Unnamed batch',
+          value: cohort.cohortId,
+        }));
+
+        setBatches(batchOptions);
+        if (batchOptions.length > 0) {
+          const nextBatch =
+            batchOptions.some((option) => option.value === batch) ? batch : batchOptions[0].value;
+          setBatch(nextBatch);
+          const batchLabel = batchOptions.find((option) => option.value === nextBatch)?.label || '';
+          setSelectedBatchName(batchLabel);
+        } else {
+          setBatch('');
+          setSelectedBatchName('');
+        }
+      } catch (error) {
+        console.error('Error fetching batches:', error);
+        setBatches([]);
+        setBatch('');
+      } finally {
+        setLoadingBatches(false);
+      }
+    };
+
+    fetchBatches();
+  }, [center]);
 
   return (
     <Modal
@@ -94,7 +274,7 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
           </Box>
 
           {/* Mode of Learning */}
-          <Box sx={{ mb: 3 }}>
+          {/* <Box sx={{ mb: 3 }}>
             <Typography
               variant="caption"
               sx={{ fontSize: '12px', color: '#7C766F', display: 'block', mb: 1.5 }}
@@ -122,7 +302,7 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
                 />
               </RadioGroup>
             </FormControl>
-          </Box>
+          </Box> */}
 
           {/* Center Dropdown */}
           <Box sx={{ mb: 3 }}>
@@ -148,12 +328,36 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
                   py: 1.5,
                 },
               }}
+              disabled={!hasLocationSelection || loadingCenters}
+              MenuProps={{
+                anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
+                transformOrigin: { vertical: 'top', horizontal: 'left' },
+                PaperProps: {
+                  sx: {
+                    maxHeight: '220px',
+                  },
+                },
+              }}
             >
+            {loadingCenters ? (
               <MenuItem value="" disabled>
-                Select
+                Loading centers...
               </MenuItem>
-              <MenuItem value="center1">Center 1</MenuItem>
-              <MenuItem value="center2">Center 2</MenuItem>
+            ) : !hasLocationSelection ? (
+              <MenuItem value="" disabled>
+                Set location filters first
+              </MenuItem>
+            ) : centers.length === 0 ? (
+              <MenuItem value="" disabled>
+                No centers available
+              </MenuItem>
+            ) : (
+              centers.map((centerOption) => (
+                <MenuItem key={centerOption.value} value={centerOption.value}>
+                  {centerOption.label}
+                </MenuItem>
+              ))
+            )}
             </Select>
           </Box>
 
@@ -173,7 +377,12 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
             <Select
               fullWidth
               value={batch}
-              onChange={(e) => setBatch(e.target.value)}
+              onChange={(e) => {
+                const selectedValue = e.target.value;
+                setBatch(selectedValue);
+                const batchLabel = batches.find((option) => option.value === selectedValue)?.label;
+                setSelectedBatchName(batchLabel || '');
+              }}
               displayEmpty
               sx={{
                 borderRadius: '8px',
@@ -181,24 +390,54 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
                   py: 1.5,
                 },
               }}
+              disabled={!center || loadingBatches}
+              MenuProps={{
+                anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
+                transformOrigin: { vertical: 'top', horizontal: 'left' },
+                PaperProps: {
+                  sx: {
+                    maxHeight: '220px',
+                  },
+                },
+              }}
             >
-              <MenuItem value="" disabled>
-                Select
-              </MenuItem>
-              <MenuItem value="batch1">Batch 1</MenuItem>
-              <MenuItem value="batch2">Batch 2</MenuItem>
+              {loadingBatches ? (
+                <MenuItem value="" disabled>
+                  Loading batches...
+                </MenuItem>
+              ) : !center ? (
+                <MenuItem value="" disabled>
+                  Select center first
+                </MenuItem>
+              ) : batches.length === 0 ? (
+                <MenuItem value="" disabled>
+                  No batches available
+                </MenuItem>
+              ) : (
+                batches.map((batchOption) => (
+                  <MenuItem key={batchOption.value} value={batchOption.value}>
+                    {batchOption.label}
+                  </MenuItem>
+                ))
+              )}
             </Select>
           </Box>
         </Box>
 
         {/* Footer */}
         <Box sx={{ p: 2, borderTop: '1px solid #e0e0e0' }}>
-          <Button
-            fullWidth
-            variant="contained"
-            onClick={handleAssign}
-            disabled={!center || !batch}
-            sx={{
+            <Button
+              fullWidth
+              variant="contained"
+              onClick={handleAssign}
+              disabled={
+                !center ||
+                !batch ||
+                loadingCenters ||
+                loadingBatches ||
+                isAssigning
+              }
+              sx={{
               bgcolor: '#FDBE16',
               color: '#1E1B16',
               fontWeight: 600,
