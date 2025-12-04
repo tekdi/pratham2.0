@@ -24,6 +24,7 @@ interface CohortLearnerListProp {
   reloadState: boolean;
   setReloadState: React.Dispatch<React.SetStateAction<boolean>>;
   isLearnerAdded: boolean;
+  isLearnerReassigned?: boolean;
 }
 
 const CohortLearnerList: React.FC<CohortLearnerListProp> = ({
@@ -31,6 +32,7 @@ const CohortLearnerList: React.FC<CohortLearnerListProp> = ({
   reloadState,
   setReloadState,
   isLearnerAdded,
+  isLearnerReassigned,
 }) => {
   const [loading, setLoading] = React.useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -103,7 +105,13 @@ const CohortLearnerList: React.FC<CohortLearnerListProp> = ({
       }
     };
     getCohortMemberList();
-  }, [cohortId, reloadState, isLearnerAdded, isLearnerDeleted]);
+  }, [
+    cohortId,
+    reloadState,
+    isLearnerAdded,
+    isLearnerDeleted,
+    isLearnerReassigned,
+  ]);
 
   // Reapply search filter when userData changes
   useEffect(() => {
@@ -125,7 +133,7 @@ const CohortLearnerList: React.FC<CohortLearnerListProp> = ({
   const handleLearnerDelete = () => {
     setIsLearnerDeleted(true);
   };
-  const handleSearch = (searchTerm: string) => {
+    const handleSearch = (searchTerm: string) => {
     setSearchTerm(searchTerm);
     const query = searchTerm.toLowerCase().trim();
 
