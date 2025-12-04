@@ -255,7 +255,16 @@ const [responseFormData, setResponseFormData] = useState<any>({});
     }
     console.log('payload', payload);
     const { userData, customFields } = splitUserData(payload);
-
+const data= {
+  fieldId:
+   'f8dc1d5f-9b2b-412e-a22a-351bd8f14963',
+  value: 'pending'
+}
+const storedUiConfig = JSON.parse(localStorage.getItem('uiConfig') || '{}');
+      const userTenantStatus = storedUiConfig?.isTenantPendingStatus;
+if(enrolledProgram && userTenantStatus){
+  customFields.push(data);
+}
     const parentPhoneField = customFields.find(
       (field: any) => field.value === formData.parent_phone
     );

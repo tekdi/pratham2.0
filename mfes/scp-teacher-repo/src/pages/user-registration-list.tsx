@@ -12,6 +12,7 @@ import AssignBatchSuccessModal from '../components/UserRegistration/AssignBatchS
 import MoreOptionsBottomSheet from '../components/UserRegistration/MoreOptionsBottomSheet';
 import LocationDropdowns from '../components/UserRegistration/LocationDropdowns';
 import { fetchUserList } from '../services/ManageUser';
+import { editEditUser } from '../services/ProfileService';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import withRole from '../components/withRole';
 import { TENANT_DATA } from '../../app.config';
@@ -30,6 +31,7 @@ const UserRegistrationList = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [locationFilters, setLocationFilters] = useState<LocationFilters>({});
+  const [chartTrigger, setChartTrigger] = useState(false);
   const limit = 5;
 
   const hasLocationFilters =
@@ -142,8 +144,13 @@ const UserRegistrationList = () => {
   };
 
   // Fetch users from API
+  const getSearchTerm = () => {
+    const normalized = searchQuery.trim();
+    return normalized.length >= 3 ? normalized : '';
+  };
+
   const fetchUsers = useCallback(
-    async (page: number = 1, tab: string, location: LocationFilters, searchTerm: string = '') => {
+    async (page = 1, tab: string, location: LocationFilters, searchTerm = '') => {
     setLoading(true);
     try {
       const tenantId = localStorage.getItem('tenantId');
@@ -159,13 +166,15 @@ const UserRegistrationList = () => {
       const filters: any = {
         role: 'Learner',
         tenantId,
+        tenantStatus: ['pending'],
       };
 
       // Add tab-specific filters
       if (tab === 'pending') {
-        filters.tenantStatus = ['pending'];
+        filters.interested_to_join = 'pending';
       } else if (tab === 'archived') {
         filters.interested_to_join = 'no';
+
       } else if (tab === 'upcoming') {
         filters.interested_to_join = 'yes';
       }
@@ -183,8 +192,8 @@ const UserRegistrationList = () => {
       if (location.villages && location.villages.length > 0) {
         filters.village = location.villages;
       }
-      if (searchTerm.trim()) {
-        filters.name = searchTerm.trim();
+      if (searchTerm) {
+        filters.name = searchTerm;
       }
 
       const response = await fetchUserList({
@@ -215,7 +224,7 @@ const UserRegistrationList = () => {
     if (!hasLocationFilters || isMounted.current) {
       return;
     }
-    fetchUsers(1, tabValue, locationFilters, searchQuery);
+    fetchUsers(1, tabValue, locationFilters, getSearchTerm());
     isMounted.current = true;
     prevTabRef.current = tabValue;
     prevLocationRef.current = JSON.stringify(locationFilters);
@@ -237,6 +246,9 @@ const UserRegistrationList = () => {
       return;
     }
 
+    const normalizedSearch = searchQuery.trim();
+    const isSearchShort = normalizedSearch.length > 0 && normalizedSearch.length < 3;
+
     if (!isMounted.current) {
       isMounted.current = true;
       prevTabRef.current = tabValue;
@@ -251,17 +263,22 @@ const UserRegistrationList = () => {
     const pageChanged = prevPageRef.current !== currentPage;
     const searchChanged = prevSearchRef.current !== searchQuery;
 
-    // Only fetch if something actually changed
-    if (tabChanged || locationChanged || searchChanged || pageChanged) {
+    // Skip fetch if only search changed and it is too short
+    if (searchChanged && isSearchShort && !tabChanged && !locationChanged && !pageChanged) {
+      prevSearchRef.current = searchQuery;
+      return;
+    }
+
+    const shouldFetch = tabChanged || locationChanged || searchChanged || pageChanged;
+    if (shouldFetch) {
       if (tabChanged || locationChanged || searchChanged) {
         setCurrentPage(1);
         prevPageRef.current = 1;
-        fetchUsers(1, tabValue, locationFilters, searchQuery);
+        fetchUsers(1, tabValue, locationFilters, getSearchTerm());
       } else if (pageChanged) {
-        fetchUsers(currentPage, tabValue, locationFilters, searchQuery);
+        fetchUsers(currentPage, tabValue, locationFilters, getSearchTerm());
       }
 
-      // Update refs
       prevTabRef.current = tabValue;
       prevLocationRef.current = JSON.stringify(locationFilters);
       prevPageRef.current = currentPage;
@@ -346,16 +363,61 @@ const UserRegistrationList = () => {
     setMoreOptionsOpen(true);
   };
 
-  const handleNotInterested = () => {
+  const handleNotInterested = async() => {
     // TODO: Implement not interested action
-    console.log('Not interested for learners:', Array.from(selectedUsers));
-    setSelectedUsers(new Set());
+    const learnerIds = Array.from(selectedUsers);
+    if (learnerIds.length === 0) {
+      return;
+    }
+
+    const userDetails = {
+      userData: {},
+      customFields: [
+        {
+          fieldId: 'f8dc1d5f-9b2b-412e-a22a-351bd8f14963',
+          value: 'no',
+        },
+      ],
+    };
+
+    try {
+      await Promise.all(learnerIds.map((userId) => editEditUser(userId, userDetails)));
+    } catch (error) {
+      console.error('Error updating may join next year', error);
+    } finally {
+      setSelectedUsers(new Set());
+      setMoreOptionsOpen(false);
+      setChartTrigger(prev => !prev);
+      fetchUsers(currentPage, tabValue, locationFilters, getSearchTerm());
+    }
   };
 
-  const handleMayJoinNextYear = () => {
-    // TODO: Implement may join next year action
-    console.log('May join next year for learners:', Array.from(selectedUsers));
-    setSelectedUsers(new Set());
+  const handleMayJoinNextYear = async () => {
+    const learnerIds = Array.from(selectedUsers);
+    if (learnerIds.length === 0) {
+      return;
+    }
+
+    const userDetails = {
+      userData: {},
+      customFields: [
+        {
+          fieldId: 'f8dc1d5f-9b2b-412e-a22a-351bd8f14963',
+          value: 'yes',
+        },
+      ],
+    };
+
+    try {
+      await Promise.all(learnerIds.map((userId) => editEditUser(userId, userDetails)));
+    } catch (error) {
+      console.error('Error updating may join next year', error);
+    } finally {
+      setSelectedUsers(new Set());
+      setMoreOptionsOpen(false);
+      setChartTrigger(prev => !prev);
+      fetchUsers(currentPage, tabValue, locationFilters, getSearchTerm());
+    }
   };
 
   const handleLocationChange = useCallback((location: LocationFilters) => {
@@ -391,7 +453,7 @@ const UserRegistrationList = () => {
           <LocationDropdowns onLocationChange={handleLocationChange} />
         </Box>
         
-        <RegistrationPieChart />
+        <RegistrationPieChart locationFilters={locationFilters} triggerFetch={chartTrigger} />
         
         <RegistrationTabs value={tabValue} onChange={handleTabChange} />
         
@@ -424,7 +486,7 @@ const UserRegistrationList = () => {
                     }}
                 />
             </Grid>
-            <Grid item xs={4} sm={3}>
+            {/* <Grid item xs={4} sm={3}>
                 <Box sx={{ 
                     bgcolor: '#fff', 
                     borderRadius: '100px', 
@@ -438,7 +500,7 @@ const UserRegistrationList = () => {
                      <Typography sx={{ fontSize: '14px', color: '#1E1B16', fontWeight: 500 }}>Filter by</Typography>
                      <FilterListIcon sx={{ color: '#1E1B16', fontSize: 20 }} />
                 </Box>
-            </Grid>
+            </Grid> */}
         </Grid>
         
         {/* Action Banner */}
@@ -550,6 +612,7 @@ const UserRegistrationList = () => {
         onCancel={handleCancel}
         onAssignBatch={handleAssignBatch}
         onMoreOptions={handleMoreOptions}
+        showMoreOptions={tabValue === 'pending'}
       />
 
       {/* Assign Batch Modal */}
@@ -567,7 +630,8 @@ const UserRegistrationList = () => {
         open={successModalOpen}
         onClose={() => {
           setSuccessModalOpen(false);
-          fetchUsers(currentPage, tabValue, locationFilters);
+          setChartTrigger(prev => !prev);
+          fetchUsers(currentPage, tabValue, locationFilters, getSearchTerm());
         }}
         batchName={selectedBatchName}
       />

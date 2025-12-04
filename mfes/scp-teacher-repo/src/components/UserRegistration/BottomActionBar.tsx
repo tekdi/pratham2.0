@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Button, IconButton } from '@mui/material';
+import { Box, Button, IconButton } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 interface BottomActionBarProps {
@@ -7,13 +7,15 @@ interface BottomActionBarProps {
   onCancel: () => void;
   onAssignBatch: () => void;
   onMoreOptions?: () => void;
+  showMoreOptions?: boolean;
 }
 
 const BottomActionBar: React.FC<BottomActionBarProps> = ({ 
   selectedCount, 
   onCancel, 
   onAssignBatch,
-  onMoreOptions 
+  onMoreOptions,
+  showMoreOptions = true
 }) => {
   if (selectedCount === 0) return null;
 
@@ -93,16 +95,18 @@ const BottomActionBar: React.FC<BottomActionBarProps> = ({
         >
           Assign Batch
         </Button>
-        <IconButton
-          onClick={onMoreOptions}
-          sx={{
-            color: '#fff',
-            p: 1,
-            flexShrink: 0,
-          }}
-        >
-          <MoreVertIcon />
-        </IconButton>
+        {showMoreOptions && (
+          <IconButton
+            onClick={onMoreOptions}
+            sx={{
+              color: '#fff',
+              p: 1,
+              flexShrink: 0,
+            }}
+          >
+            <MoreVertIcon />
+          </IconButton>
+        )}
       </Box>
     </Box>
   );

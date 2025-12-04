@@ -134,24 +134,24 @@ const UserCard: React.FC<UserCardProps> = ({ user, isSelected = false, onSelectC
                     }}
                     onClick={() => {
                       if (user.userId) {
-                        router.push(`/learner/${user.userId}`);
+                        router.push(`/learner/${user.userId}?source=user-registration`);
                       }
                     }}
                   >
                     {user.name}
                   </Typography>
-                  {user.isNew && (
+                  {/* {user.isNew && (
                       <Typography component="span" sx={{ color: '#2E7D32', fontWeight: 'bold', fontSize: '10px', bgcolor: '#E8F5E9', px: 0.5, borderRadius: '4px' }}>
                           NEW
                       </Typography>
-                  )}
+                  )} */}
                </Box>
                <Typography variant="caption" display="block" sx={{ color: '#7C766F', fontSize: '12px', mt: 0.5 }}>
                   Registered on {user.registeredOn}
                </Typography>
 
                {/* Tags Row */}
-               <Box sx={{ display: 'flex', gap: 1, my: 1, flexWrap: 'wrap' }}>
+               {/* <Box sx={{ display: 'flex', gap: 1, my: 1, flexWrap: 'wrap' }}>
                   <Chip 
                       icon={user.modeType === 'remote' ? <PlayCircleOutlineIcon style={{fontSize: 16}}/> : <BusinessOutlinedIcon style={{fontSize: 16}}/>} 
                       label={user.inPersonMode} 
@@ -175,12 +175,12 @@ const UserCard: React.FC<UserCardProps> = ({ user, isSelected = false, onSelectC
                           />
                       )
                   )}
-               </Box>
+               </Box> */}
 
                {/* Location Row */}
-               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
-                  <LocationOnOutlinedIcon sx={{ fontSize: 16, color: '#4A4640' }} />
-                  <Typography variant="body2" sx={{ fontSize: '12px', color: '#4A4640' }}>
+               <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5, mb: 1 }}>
+                  <LocationOnOutlinedIcon sx={{ fontSize: 16, color: '#4A4640', mt: 0.2 }} />
+                  <Typography variant="body2" sx={{ fontSize: '12px', color: '#4A4640', lineHeight: 1.3 }}>
                        {[user.location.village, user.location.block, user.location.district, user.location.state].filter(Boolean).join(', ')}
                   </Typography>
                </Box>
@@ -188,16 +188,16 @@ const UserCard: React.FC<UserCardProps> = ({ user, isSelected = false, onSelectC
               {/* Expanded Info Section (Phone, Email, DOB) - Shown when expanded */}
               {expanded && (
                   <Box sx={{ mt: 1, mb: 1 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                          <CallOutlinedIcon sx={{ fontSize: 16, color: '#4A4640' }} />
+               <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5, mb: 1 }}>
+               <CallOutlinedIcon sx={{ fontSize: 16, color: '#4A4640' }} />
                           <Typography variant="body2" sx={{ fontSize: '14px', color: '#1E1B16' }}>{user.phoneNumber}</Typography>
                       </Box>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                          <EmailOutlinedIcon sx={{ fontSize: 16, color: '#4A4640' }} />
+                     { user.email &&(<Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5, mb: 1 }}>
+                      <EmailOutlinedIcon sx={{ fontSize: 16, color: '#4A4640' }} />
                           <Typography variant="body2" sx={{ fontSize: '14px', color: '#1E1B16', wordBreak: 'break-all' }}>{user.email}</Typography>
-                      </Box>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <CakeOutlinedIcon sx={{ fontSize: 16, color: '#4A4640' }} />
+                      </Box>)}
+                      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5, mb: 1 }}>
+                      <CakeOutlinedIcon sx={{ fontSize: 16, color: '#4A4640' }} />
                           <Typography variant="body2" sx={{ fontSize: '14px', color: '#1E1B16' }}>{user.birthDate}</Typography>
                       </Box>
                   </Box>
@@ -217,7 +217,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, isSelected = false, onSelectC
           {/* Buttons & Logs Section - Always Visible */}
           <Box sx={{ mt: 2 }}>
                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-                  <Button 
+                  {/* <Button 
                       variant="outlined" 
                       startIcon={<CallOutlinedIcon />}
                       sx={{ 
@@ -232,7 +232,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, isSelected = false, onSelectC
                       }}
                   >
                       Call
-                  </Button>
+                  </Button> */}
                   
                   <Button 
                       variant="outlined" 

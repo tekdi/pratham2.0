@@ -6,6 +6,7 @@ import { getCohortList, bulkCreateCohortMembers } from '../../services/CohortSer
 import { updateUserTenantStatus } from '../../services/ManageUser';
 import { showToastMessage } from '../Toastify';
 import { LocationFilters } from './types';
+import { editEditUser } from '@/services/ProfileService';
 
 interface AssignBatchModalProps {
   open: boolean;
@@ -51,6 +52,21 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
       await Promise.all(
         selectedLearnerIds.map((userId) =>
           updateUserTenantStatus(userId, tenantId, 'active')
+        )
+      );
+      const userDetails = {
+        userData: {},
+        customFields: [
+          {
+            fieldId:
+             'f8dc1d5f-9b2b-412e-a22a-351bd8f14963',
+            value: 'joined',
+          },
+        ],
+      };
+      await Promise.all(
+        selectedLearnerIds.map((userId) =>
+          editEditUser(userId, userDetails)
         )
       );
 
@@ -104,7 +120,21 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
 
     return filters;
   };
+  function getField(customFields, label) {
+    const field = customFields.find(f => f.label === label);
+    if (!field) return null;
+  
+    // If selectedValues is an array of objects → return object.value
+    // If selectedValues is array of strings → return string
+    const val = field.selectedValues?.[0];
+    return typeof val === "object" ? val.value : val;
+  }
 
+  const capitalizeFirstChar = (str: string) => {
+    if (!str) return str;
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
+  
   useEffect(() => {
     if (!open) {
       return;
@@ -129,14 +159,20 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
         });
 
         const cohortDetails = response?.results?.cohortDetails ?? [];
-        const centerOptions = cohortDetails.map((cohort: any) => ({
-          label: cohort.name || 'Unnamed center',
-          value: cohort.cohortId,
-        }));
+        console.log('cohortDetails', cohortDetails);
+        const centerOptions = cohortDetails.map((cohort: any) => {
+          const cf = cohort.customFields;
+        
+          return {
+            label: `${capitalizeFirstChar(cohort.name)} (${capitalizeFirstChar(getField(cf, "TYPE_OF_CENTER"))})`,
+            value: cohort.cohortId,
+          };
+        });
+        
 
         setCenters(centerOptions);
 
-        const centerStillValid = centerOptions.some((option) => option.value === center);
+        const centerStillValid = centerOptions.some((option : any) => option.value === center);
         if (!centerStillValid) {
           const nextCenter = centerOptions[0]?.value ?? '';
           setCenter(nextCenter);
@@ -181,7 +217,7 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
 
         const cohortDetails = response?.results?.cohortDetails ?? [];
         const batchOptions = cohortDetails.map((cohort: any) => ({
-          label: cohort.name || 'Unnamed batch',
+          label: capitalizeFirstChar(cohort.name) || 'Unnamed batch',
           value: cohort.cohortId,
         }));
 

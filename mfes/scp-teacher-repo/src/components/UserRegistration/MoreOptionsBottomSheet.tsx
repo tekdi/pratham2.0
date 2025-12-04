@@ -71,7 +71,7 @@ const MoreOptionsBottomSheet: React.FC<MoreOptionsBottomSheetProps> = ({
           <ListItemButton
             onClick={() => {
               onNotInterested?.();
-              onClose();
+              // onClose(); // Let the handler close it
             }}
             sx={{
               px: 2,
@@ -97,7 +97,7 @@ const MoreOptionsBottomSheet: React.FC<MoreOptionsBottomSheetProps> = ({
                     fontSize: 14,
                     color: '#4A4640',
                     top: '-4px',
-                    right: '-4px',
+                    right: '-6px',
                     bgcolor: '#fff',
                     borderRadius: '50%',
                   }}
@@ -120,7 +120,7 @@ const MoreOptionsBottomSheet: React.FC<MoreOptionsBottomSheetProps> = ({
           <ListItemButton
             onClick={() => {
               onMayJoinNextYear?.();
-              onClose();
+              // onClose(); // Let the handler close it
             }}
             sx={{
               px: 2,
@@ -146,7 +146,7 @@ const MoreOptionsBottomSheet: React.FC<MoreOptionsBottomSheetProps> = ({
                     fontSize: 14,
                     color: '#4A4640',
                     top: '-4px',
-                    right: '-4px',
+                    right: '-6px',
                     bgcolor: '#fff',
                     borderRadius: '50%',
                   }}

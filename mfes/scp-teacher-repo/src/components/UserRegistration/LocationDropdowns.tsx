@@ -156,7 +156,7 @@ const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange 
 
     const storedMatches = getMatchingOptionValues(states, storedLocationRef.current.states);
     const newSelection =
-      storedMatches.length > 0 ? storedMatches : [states[0].value];
+      storedMatches.length > 0 ? storedMatches : (states[0] ? [states[0].value] : []);
 
     setSelectedStates(newSelection);
     defaultsAppliedRef.current.states = true;
@@ -173,6 +173,9 @@ const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange 
         setSelectedDistricts([]);
         setSelectedBlocks([]);
         setSelectedVillages([]);
+        defaultsAppliedRef.current.districts = false;
+        defaultsAppliedRef.current.blocks = false;
+        defaultsAppliedRef.current.villages = false;
         try {
           // Fetch districts for all selected states
           const allDistricts: LocationOption[] = [];
@@ -220,8 +223,10 @@ const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange 
     }
 
     const storedMatches = getMatchingOptionValues(districts, storedLocationRef.current.districts);
+    // If we have stored matches, use them.
+    // Otherwise, if this is a "fresh" load (user changed state manually), default to first district.
     const newSelection =
-      storedMatches.length > 0 ? storedMatches : [districts[0].value];
+      storedMatches.length > 0 ? storedMatches : (districts[0] ? [districts[0].value] : []);
 
     setSelectedDistricts(newSelection);
     defaultsAppliedRef.current.districts = true;
@@ -236,6 +241,8 @@ const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange 
         setVillages([]);
         setSelectedBlocks([]);
         setSelectedVillages([]);
+        defaultsAppliedRef.current.blocks = false;
+        defaultsAppliedRef.current.villages = false;
         try {
           // Fetch blocks for all selected districts
           const allBlocks: LocationOption[] = [];
@@ -282,7 +289,7 @@ const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange 
 
     const storedMatches = getMatchingOptionValues(blocks, storedLocationRef.current.blocks);
     const newSelection =
-      storedMatches.length > 0 ? storedMatches : [blocks[0].value];
+      storedMatches.length > 0 ? storedMatches : (blocks[0] ? [blocks[0].value] : []);
 
     setSelectedBlocks(newSelection);
     defaultsAppliedRef.current.blocks = true;
@@ -295,6 +302,7 @@ const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange 
         setLoadingVillages(true);
         setVillages([]);
         setSelectedVillages([]);
+        defaultsAppliedRef.current.villages = false;
         try {
           // Fetch villages for all selected blocks
           const allVillages: LocationOption[] = [];
@@ -339,7 +347,7 @@ const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange 
 
     const storedMatches = getMatchingOptionValues(villages, storedLocationRef.current.villages);
     const newSelection =
-      storedMatches.length > 0 ? storedMatches : [villages[0].value];
+      storedMatches.length > 0 ? storedMatches : (villages[0] ? [villages[0].value] : []);
 
     setSelectedVillages(newSelection);
     defaultsAppliedRef.current.villages = true;
@@ -349,15 +357,15 @@ const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange 
   useEffect(() => {
     if (onLocationChange) {
       onLocationChange({
-        states: selectedStates.length > 0 ? selectedStates : undefined,
-        districts: selectedDistricts.length > 0 ? selectedDistricts : undefined,
-        blocks: selectedBlocks.length > 0 ? selectedBlocks : undefined,
-        villages: selectedVillages.length > 0 ? selectedVillages : undefined,
+        states: selectedStates.length > 0 ? (selectedStates as number[]) : undefined,
+        districts: selectedDistricts.length > 0 ? (selectedDistricts as number[]) : undefined,
+        blocks: selectedBlocks.length > 0 ? (selectedBlocks as number[]) : undefined,
+        villages: selectedVillages.length > 0 ? (selectedVillages as number[]) : undefined,
       });
     }
   }, [selectedStates, selectedDistricts, selectedBlocks, selectedVillages, onLocationChange]);
 
-  const renderValue = (selected: number[], options: LocationOption[]) => {
+  const renderValue = (selected: (number | string)[], options: LocationOption[]) => {
     if (selected.length === 0) {
       return 'Select';
     }
@@ -390,10 +398,10 @@ const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange 
               value={selectedStates}
               onChange={(e) => {
                 const value = e.target.value;
-                setSelectedStates(typeof value === 'string' ? [] : value as number[]);
+                setSelectedStates(typeof value === 'string' ? [] : value as (number | string)[]);
               }}
               disabled={loadingStates}
-              renderValue={(selected) => renderValue(selected as number[], states)}
+              renderValue={(selected) => renderValue(selected as (number | string)[], states)}
               sx={{
                 borderRadius: '8px',
                 '& .MuiSelect-select': {
@@ -450,10 +458,10 @@ const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange 
               value={selectedDistricts}
               onChange={(e) => {
                 const value = e.target.value;
-                setSelectedDistricts(typeof value === 'string' ? [] : value as number[]);
+                setSelectedDistricts(typeof value === 'string' ? [] : value as (number | string)[]);
               }}
               disabled={selectedStates.length === 0 || loadingDistricts}
-              renderValue={(selected) => renderValue(selected as number[], districts)}
+              renderValue={(selected) => renderValue(selected as (number | string)[], districts)}
               sx={{
                 borderRadius: '8px',
                 '& .MuiSelect-select': {
@@ -514,10 +522,10 @@ const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange 
               value={selectedBlocks}
               onChange={(e) => {
                 const value = e.target.value;
-                setSelectedBlocks(typeof value === 'string' ? [] : value as number[]);
+                setSelectedBlocks(typeof value === 'string' ? [] : value as (number | string)[]);
               }}
               disabled={selectedDistricts.length === 0 || loadingBlocks}
-              renderValue={(selected) => renderValue(selected as number[], blocks)}
+              renderValue={(selected) => renderValue(selected as (number | string)[], blocks)}
               sx={{
                 borderRadius: '8px',
                 '& .MuiSelect-select': {
@@ -578,10 +586,10 @@ const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange 
               value={selectedVillages}
               onChange={(e) => {
                 const value = e.target.value;
-                setSelectedVillages(typeof value === 'string' ? [] : value as number[]);
+                setSelectedVillages(typeof value === 'string' ? [] : value as (number | string)[]);
               }}
               disabled={selectedBlocks.length === 0 || loadingVillages}
-              renderValue={(selected) => renderValue(selected as number[], villages)}
+              renderValue={(selected) => renderValue(selected as (number | string)[], villages)}
               sx={{
                 borderRadius: '8px',
                 '& .MuiSelect-select': {

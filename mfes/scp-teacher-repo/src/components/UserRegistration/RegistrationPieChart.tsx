@@ -1,19 +1,100 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
+import { fetchUserList } from '../../services/ManageUser';
+import { LocationFilters } from './types';
 
-const RegistrationPieChart = () => {
-  const data = [
-    { name: 'Action Pending', value: 4, color: '#B0B0B0' }, // Grey
-    { name: 'Batch Assigned', value: 5, color: '#8A2BE2' }, // Purple
-    { name: 'Archived/Not Interested', value: 10, color: '#FF4500' }, // Orange
-    { name: 'May join upcoming year', value: 5, color: '#FFD700' }, // Yellow
+interface RegistrationPieChartProps {
+  locationFilters: LocationFilters;
+  triggerFetch?: boolean;
+}
+
+const RegistrationPieChart: React.FC<RegistrationPieChartProps> = ({ locationFilters, triggerFetch }) => {
+  const [counts, setCounts] = useState({ pending: 0, archived: 0, mayJoin: 0 });
+  
+  const totalCount = counts.pending + counts.archived + counts.mayJoin;
+  const isEmpty = totalCount === 0;
+  
+  // Use actual data or empty state data
+  const data = isEmpty 
+    ? [{ name: 'No Data', value: 1, color: '#E0E0E0' }]
+    : [
+        { name: 'Action Pending', value: counts.pending, color: '#9C27B0' },
+        { name: 'Archived/Not Interested', value: counts.archived, color: '#FF4500' },
+        { name: 'May join upcoming year', value: counts.mayJoin, color: '#FFD700' },
+      ];
+  
+  // Legend data always shows actual categories
+  const legendData = [
+    { name: 'Action Pending', value: counts.pending, color: '#9C27B0' },
+    { name: 'Archived/Not Interested', value: counts.archived, color: '#FF4500' },
+    { name: 'May join upcoming year', value: counts.mayJoin, color: '#FFD700' },
   ];
 
-  const renderLegendText = (value: string, entry: any) => {
+  const hasLocationFilters =
+    Boolean(locationFilters.states?.length) &&
+    Boolean(locationFilters.districts?.length) &&
+    Boolean(locationFilters.blocks?.length) &&
+    Boolean(locationFilters.villages?.length);
+
+  const buildFilters = (overrides: Record<string, any> = {}) => {
+    const filters: Record<string, any> = {
+      role: 'Learner',
+      ...overrides,
+    };
+    if (locationFilters.states?.length) {
+      filters.state = locationFilters.states;
+    }
+    if (locationFilters.districts?.length) {
+      filters.district = locationFilters.districts;
+    }
+    if (locationFilters.blocks?.length) {
+      filters.block = locationFilters.blocks;
+    }
+    if (locationFilters.villages?.length) {
+      filters.village = locationFilters.villages;
+    }
+    return filters;
+  };
+
+  const fetchCount = async (filters: Record<string, any>) => {
+    const response = await fetchUserList({ limit: 1, offset: 0, filters });
+    return response?.totalCount || 0;
+  };
+
+  useEffect(() => {
+    if (!hasLocationFilters) {
+      return;
+    }
+
+    const fetchCounts = async () => {
+      try {
+        const pendingFilters = buildFilters({ tenantStatus: ['pending'], interested_to_join: 'pending' });
+        const archivedFilters = buildFilters({ tenantStatus: ['pending'], interested_to_join: 'no' });
+        const mayJoinFilters = buildFilters({ tenantStatus: ['pending'], interested_to_join: 'yes' });
+
+        const [pending, archived, mayJoin] = await Promise.all([
+          fetchCount(pendingFilters),
+          fetchCount(archivedFilters),
+          fetchCount(mayJoinFilters),
+        ]);
+
+        setCounts({ pending, archived, mayJoin });
+      } catch (error) {
+        console.error('Error fetching pie counts', error);
+      }
+    };
+
+    fetchCounts();
+  }, [hasLocationFilters, locationFilters.states, locationFilters.districts, locationFilters.blocks, locationFilters.villages, triggerFetch]);
+
+  const renderLegendText = (
+    value: string,
+    entry: { payload?: { value?: number } }
+  ) => {
     return (
       <span style={{ color: '#000', fontWeight: 400, fontSize: '12px' }}>
-        {value} ({entry.payload.value})
+        {value} ({entry.payload?.value ?? 0})
       </span>
     );
   };
@@ -36,7 +117,7 @@ const RegistrationPieChart = () => {
                 dataKey="value"
                 stroke="none"
             >
-                {data.map((entry, index) => (
+                {data.map((entry: { color: string }, index: number) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
             </Pie>
@@ -55,7 +136,11 @@ const RegistrationPieChart = () => {
                         wrapperStyle={{ fontSize: '12px' }}
                     />
                     {/* Hidden Pie just to render legend correctly without data duplication visual */}
-                    <Pie data={data} dataKey="value" cx={-1000} cy={-1000} /> 
+                    <Pie data={legendData} dataKey="value" cx={-1000} cy={-1000}>
+                        {legendData.map((entry: { color: string }, index: number) => (
+                            <Cell key={`cell-legend-${index}`} fill={entry.color} />
+                        ))}
+                    </Pie>
                 </PieChart>
             </ResponsiveContainer>
         </Box>
