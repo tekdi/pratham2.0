@@ -339,6 +339,9 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
   const handleCloseCentersModal = () => {
     setOpenCentersModal(false);
   };
+  const handleLearnerReassigned = () => {
+    setReloadState(!reloadState);
+  };
 
   // const handleAssignCenters = async (selectedCenters: any) => {
   //   setOpenCentersModal(false);
@@ -825,6 +828,7 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
           onClose={handleCloseCentersModal}
           isReassign={true}
           customFields={customFields}
+          onLearnerReassigned={handleLearnerReassigned}
           userId={userId}
         />
       )}
