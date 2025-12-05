@@ -2,12 +2,8 @@
 
 import React, { Suspense, useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import HomeCards from '@learner/app/themantic/HomeCards/HomeCards';
 import {
   Box,
-  Container,
-  Card,
-  CardContent,
   Typography,
   Divider,
 } from '@mui/material';
@@ -102,7 +98,7 @@ const List: React.FC<ListProps> = ({
                     pageName="Course"
                     onTotalCountChange={handleTotalCountChange}
                     filters={{
-                      limit: 3,
+                      limit: 4,
                       filters: {
                         program: 'Experimento India',
                         contentLanguage: [selectedFilter || 'English'],
@@ -113,9 +109,9 @@ const List: React.FC<ListProps> = ({
                       _grid: {
                         xs: 12,
                         sm: 6,
-                        md: 4,
-                        lg: 4,
-                        xl: 4,
+                        md: 3,
+                        lg: 3,
+                        xl: 3,
                       },
                       _containerGrid: {
                         spacing: { xs: 6, sm: 6, md: 6 },
@@ -174,12 +170,19 @@ const List: React.FC<ListProps> = ({
             </Box>
             <Box
               sx={{
+                position: 'relative',
                 '& .css-4oqe9z': {
                   display: 'none !important',
                   marginBottom: '0 !important',
                 },
                 '& .css-17kujh3': {
                   overflowY: 'unset !important',
+                },
+                '& .swiper': {
+                  paddingBottom: '20px',
+                },
+                '& .swiper-slide': {
+                  height: 'auto',
                 },
               }}
             >
@@ -190,7 +193,7 @@ const List: React.FC<ListProps> = ({
                 pageName="content"
                 onTotalCountChange={handleTotalCountChange}
                 filters={{
-                  limit: 3,
+                  limit: 8,
                   sort_by: { lastUpdatedOn: 'desc' },
                   filters: {
                     program: 'Experimento India',
@@ -199,15 +202,21 @@ const List: React.FC<ListProps> = ({
                 }}
                 _config={{
                   contentBaseUrl: '/themantic',
-                  _grid: {
-                    xs: 12,
-                    sm: 6,
-                    md: 4,
-                    lg: 4,
-                    xl: 4,
+                  isShowInCarousel: true,
+                  isHideNavigation: false,
+                  _subBox: {
+                    sx: {
+                      position: 'relative',
+                      px: { xs: 0, md: 4 },
+                    },
                   },
-                  _containerGrid: {
-                    spacing: { xs: 6, sm: 6, md: 6 },
+                  _carousel: {
+                    autoplay: {
+                      delay: 3000,
+                      disableOnInteraction: false,
+                      pauseOnMouseEnter: true,
+                    },
+                    loop: true,
                   },
                   default_img: '/images/image_ver.png',
                   _card: {
@@ -229,9 +238,12 @@ export default List;
 export const mainCourseCard = (props: any) => (
   <CardComponent
     {...props}
-    titleFontSize="24px"
+    titleFontSize="16px"
     fontWeight={600}
-    minHeight="317px"
+    minHeight="286px"
+    isExplore={false}
+    textTransform="uppercase"
+    titleColor="black"
   />
 );
 

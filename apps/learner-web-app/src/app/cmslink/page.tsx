@@ -124,8 +124,8 @@ export default function CmsLinkPage() {
 
     const targetUrl =
       contentType === 'course'
-        ? `/content-details/${identifier}?activeLink=/courses-contents`
-        : `/player/${identifier}?activeLink=/courses-contents?tab=1`;
+        ? `/content-details/${identifier}?activeLink=${localStorage.getItem('landingPage')}`
+        : `/player/${identifier}?activeLink=${localStorage.getItem('landingPage')}?tab=1`;
 
     if (targetUrl) {
       router.push(targetUrl);
