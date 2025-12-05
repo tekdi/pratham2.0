@@ -6,6 +6,7 @@ import {
   Box,
   Typography,
   Divider,
+  Tooltip,
 } from '@mui/material';
 import Layout from '../layout/Layout';
 import SubHeader from '../subHeader/SubHeader';
@@ -333,30 +334,31 @@ export const CardComponent = ({
         </Box>
 
         {/* Title */}
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: finalFontWeight || 400,
-            textAlign: 'center',
-            fontSize: finalTitleFontSize || '16px',
-            letterSpacing: '1px',
-            mt: 0.3,
-            mb: 0.3,
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            color: finalTitleColor || '#212529',
-            px: '16px',
-            textTransform: finalTextTransform || 'uppercase',
-            minHeight: '42px',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}
-        >
-          {item.name || item.title || 'Untitled'}
-        </Typography>
+        <Tooltip title={item.name || item.title || 'Untitled'} arrow>
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: finalFontWeight || 400,
+              textAlign: 'center',
+              fontSize: finalTitleFontSize || '16px',
+              letterSpacing: '1px',
+              mt: 0.3,
+              mb: 0.3,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              color: finalTitleColor || '#212529',
+              px: '16px',
+              textTransform: finalTextTransform || 'uppercase',
+              minHeight: '42px',
+              wordBreak: 'break-word',
+            }}
+          >
+            {item.name || item.title || 'Untitled'}
+          </Typography>
+        </Tooltip>
 
         {/* Explore Button */}
 
