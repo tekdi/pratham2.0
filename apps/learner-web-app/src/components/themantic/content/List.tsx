@@ -115,7 +115,7 @@ const List: React.FC<ListProps> = ({
                         xl: 3,
                       },
                       _containerGrid: {
-                        spacing: { xs: 6, sm: 6, md: 6 },
+                        spacing: { xs: 2, sm: 2, md: 3 },
                       },
                       default_img: '/images/image_ver.png',
                       _card: {
