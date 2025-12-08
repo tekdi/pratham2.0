@@ -149,6 +149,8 @@ const DesktopBar = ({
           return (
             <Button
               key={index}
+              component={typeof link.to === 'string' ? 'a' : 'button'}
+              href={typeof link.to === 'string' ? link.to : undefined}
               // @ts-ignore
               variant={
                 link.variant ??
@@ -158,8 +160,8 @@ const DesktopBar = ({
               onClick={
                 typeof link.to === 'string'
                   ? undefined
-                  : (link.to as (
-                      event: React.MouseEvent<HTMLAnchorElement>
+                  : ((link.to as unknown) as (
+                      event: React.MouseEvent<HTMLButtonElement>
                     ) => void)
               }
             >
