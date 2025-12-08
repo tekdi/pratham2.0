@@ -31,14 +31,26 @@ const EnrollProfileCompletionInner = () => {
       }
 
       const program = JSON.parse(enrolledProgramData);
-
+      const storedUiConfig = JSON.parse(localStorage.getItem('uiConfig') || '{}');
+      const userTenantStatus = storedUiConfig?.isTenantPendingStatus;
+      console.log('userTenantStatus', userTenantStatus);
+      if(userTenantStatus){
+        console.log('enrolling user to tenant');
+        await enrollUserTenant({
+          userId: storedUserId,
+          tenantId: program.tenantId,
+          roleId: storedRoleId,
+          userTenantStatus: 'pending',
+        });
+      }
+      else{
       // Enroll user to tenant
       await enrollUserTenant({
         userId: storedUserId,
         tenantId: program.tenantId,
         roleId: storedRoleId,
       });
-
+    }
       // Get user details to find tenant data
       const userResponse = await getUserDetails(storedUserId, true);
       const tenantData = userResponse?.result?.userData?.tenantData?.find(
