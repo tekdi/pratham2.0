@@ -401,7 +401,7 @@ const RegisterationFlow = () => {
   };
   const onVerify = async () => {
     try {
-      // let mobile = mobile.toString();
+      //let mobile = mobile.toString();
       let reason = 'signup';
       // let username = enterdUserName;
       const response = await verifyOTP({
@@ -411,7 +411,7 @@ const RegisterationFlow = () => {
         hash,
         //  username,
       });
-      console.log('verifyOtp', response);
+     console.log('verifyOtp', response);
       const isValid = response.result.success;
       localStorage.setItem('tokenForResetPassword', response.result.token); // temporary assume true
 

@@ -16,6 +16,7 @@ const API_ENDPOINTS = {
   resetPassword: `${baseurl}/user/reset-password`,
   fieldOptionsRead: `${baseurl}/fields/options/read`,
   cohortSearch: `${baseurl}/cohort/search`,
+  userTenantStatus: `${baseurl}/user-tenant/status`,
   fieldOptionDelete: (type: string, option: string) => `${baseurl}/fields/options/delete/${type}?option=${option}`,
   fieldUpdate: (fieldId: string) => `${baseurl}/fields/update/${fieldId}`,
   cohortUpdate: (cohortId: string) => `${baseurl}/cohort/update/${cohortId}`,
