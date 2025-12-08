@@ -249,6 +249,7 @@ const rangeLength = contentLanguageField?.range?.length || 0;
                 color: '#FDBE16',
                 // position: 'relative',
                 zIndex: 1000,
+                mt: { xs: 4, md: 0 },
                 '@media (min-width: 900px)': {
                   //marginLeft: '-120px',
                 },
