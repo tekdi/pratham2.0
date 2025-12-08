@@ -2,14 +2,11 @@
 
 import React, { Suspense, useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import HomeCards from '@learner/app/themantic/HomeCards/HomeCards';
 import {
   Box,
-  Container,
-  Card,
-  CardContent,
   Typography,
   Divider,
+  Tooltip,
 } from '@mui/material';
 import Layout from '../layout/Layout';
 import SubHeader from '../subHeader/SubHeader';
@@ -102,7 +99,7 @@ const List: React.FC<ListProps> = ({
                     pageName="Course"
                     onTotalCountChange={handleTotalCountChange}
                     filters={{
-                      limit: 3,
+                      limit: 4,
                       filters: {
                         program: 'Experimento India',
                         contentLanguage: [selectedFilter || 'English'],
@@ -113,12 +110,12 @@ const List: React.FC<ListProps> = ({
                       _grid: {
                         xs: 12,
                         sm: 6,
-                        md: 4,
-                        lg: 4,
-                        xl: 4,
+                        md: 3,
+                        lg: 3,
+                        xl: 3,
                       },
                       _containerGrid: {
-                        spacing: { xs: 6, sm: 6, md: 6 },
+                        spacing: { xs: 2, sm: 2, md: 3 },
                       },
                       default_img: '/images/image_ver.png',
                       _card: {
@@ -174,12 +171,19 @@ const List: React.FC<ListProps> = ({
             </Box>
             <Box
               sx={{
+                position: 'relative',
                 '& .css-4oqe9z': {
                   display: 'none !important',
                   marginBottom: '0 !important',
                 },
                 '& .css-17kujh3': {
                   overflowY: 'unset !important',
+                },
+                '& .swiper': {
+                  paddingBottom: '20px',
+                },
+                '& .swiper-slide': {
+                  height: 'auto',
                 },
               }}
             >
@@ -190,7 +194,7 @@ const List: React.FC<ListProps> = ({
                 pageName="content"
                 onTotalCountChange={handleTotalCountChange}
                 filters={{
-                  limit: 3,
+                  limit: 8,
                   sort_by: { lastUpdatedOn: 'desc' },
                   filters: {
                     program: 'Experimento India',
@@ -199,15 +203,21 @@ const List: React.FC<ListProps> = ({
                 }}
                 _config={{
                   contentBaseUrl: '/themantic',
-                  _grid: {
-                    xs: 12,
-                    sm: 6,
-                    md: 4,
-                    lg: 4,
-                    xl: 4,
+                  isShowInCarousel: true,
+                  isHideNavigation: false,
+                  _subBox: {
+                    sx: {
+                      position: 'relative',
+                      px: { xs: 0, md: 4 },
+                    },
                   },
-                  _containerGrid: {
-                    spacing: { xs: 6, sm: 6, md: 6 },
+                  _carousel: {
+                    autoplay: {
+                      delay: 3000,
+                      disableOnInteraction: false,
+                      pauseOnMouseEnter: true,
+                    },
+                    loop: true,
                   },
                   default_img: '/images/image_ver.png',
                   _card: {
@@ -229,9 +239,12 @@ export default List;
 export const mainCourseCard = (props: any) => (
   <CardComponent
     {...props}
-    titleFontSize="24px"
+    titleFontSize="16px"
     fontWeight={600}
-    minHeight="317px"
+    minHeight="286px"
+    isExplore={false}
+    textTransform="uppercase"
+    titleColor="black"
   />
 );
 
@@ -321,30 +334,31 @@ export const CardComponent = ({
         </Box>
 
         {/* Title */}
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: finalFontWeight || 400,
-            textAlign: 'center',
-            fontSize: finalTitleFontSize || '16px',
-            letterSpacing: '1px',
-            mt: 0.3,
-            mb: 0.3,
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            color: finalTitleColor || '#212529',
-            px: '16px',
-            textTransform: finalTextTransform || 'uppercase',
-            minHeight: '42px',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}
-        >
-          {item.name || item.title || 'Untitled'}
-        </Typography>
+        <Tooltip title={item.name || item.title || 'Untitled'} arrow>
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: finalFontWeight || 400,
+              textAlign: 'center',
+              fontSize: finalTitleFontSize || '16px',
+              letterSpacing: '1px',
+              mt: 0.3,
+              mb: 0.3,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              color: finalTitleColor || '#212529',
+              px: '16px',
+              textTransform: finalTextTransform || 'uppercase',
+              minHeight: '42px',
+              wordBreak: 'break-word',
+            }}
+          >
+            {item.name || item.title || 'Untitled'}
+          </Typography>
+        </Tooltip>
 
         {/* Explore Button */}
 
