@@ -7,14 +7,13 @@ import UserProfileCard from '@learner/components/UserProfileCard/UserProfileCard
 import CourseCertificateCard from '@learner/components/CourseCertificateCard/CourseCertificateCard';
 import { courseWiseLernerList } from '@shared-lib-v2/utils/CertificateService/coursesCertificates';
 import { CertificateModal, get } from '@shared-lib';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { checkAuth } from '@shared-lib-v2/utils/AuthService';
 import InfoIcon from '@mui/icons-material/Info';
 
 import { baseurl } from '@learner/utils/API/EndUrls';
 import { Info } from '@mui/icons-material';
 import { showToastMessage } from '@learner/components/ToastComponent/Toastify';
-import { usePageViewCount } from '@learner/hooks/usePageViewCount';
 type FilterDetails = {
   status?: string[];
   tenantId?: string;
@@ -22,9 +21,7 @@ type FilterDetails = {
 };
 const ProfilePage = () => {
   const router = useRouter();
-  const pathname = usePathname();
- const tenantName = (typeof window !== 'undefined' && localStorage.getItem('userProgram')) || '';
- const { pageViews, loading, error } = usePageViewCount(pathname);
+ const tenantName =      (typeof window !== 'undefined' && localStorage.getItem('userProgram')) || '';
 
   const [filters] = useState<FilterDetails>({
     status: [ 'viewCertificate'],
@@ -56,7 +53,7 @@ const ProfilePage = () => {
       console.error('Error fetching certificate data:', error);
     }
   };
-console.log('pageViews', pageViews);
+
   useEffect(() => {
     const fetchCertificateData = async () => {
       try {
