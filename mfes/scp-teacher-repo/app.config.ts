@@ -81,9 +81,6 @@ export const getTenantId = (): string | null => {
   return null;
 };
 
-export const tenantId =
-  typeof window !== 'undefined' ? localStorage.getItem('tenantId') : null;
-
 export const frameworkId = process.env.NEXT_PUBLIC_FRAMEWORK_ID || '';
 if (!frameworkId) {
   console.warn(
