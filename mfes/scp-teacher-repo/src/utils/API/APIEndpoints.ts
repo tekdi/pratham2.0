@@ -1,3 +1,4 @@
+//@ts-nocheck
 const baseurl = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;
 
 const API_ENDPOINTS = {
