@@ -47,6 +47,10 @@ const Menuitems = [
         title: 'SIDEBAR.MENTOR_LEADER',
         href: ['/central-head'],
       },
+      {
+        title: 'SIDEBAR.MOBILIZER',
+        href: ['/user-mobilizer'],
+      }
     ],
   },
   {
@@ -156,7 +160,8 @@ export const getFilteredMenuItems = () => {
               subOptions: item.subOptions.filter(
                 (subItem) =>
                   subItem.title === 'SIDEBAR.MENTOR' ||
-                  subItem.title === 'SIDEBAR.MENTOR_LEADER'
+                  subItem.title === 'SIDEBAR.MENTOR_LEADER' ||
+                  subItem.title === 'SIDEBAR.MOBILIZER'
               ),
             };
           }

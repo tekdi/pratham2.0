@@ -15,7 +15,7 @@ import { transformLabel } from '@/utils/Helper';
 import { API_ENDPOINTS } from '@shared-lib-v2/utils/API/EndUrls';
 import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
 
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '../lib/context/LanguageContext';
 import { extractMatchingKeys } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 interface EmailSearchUserProps {
   onUserSelected?: (userId: string) => void;
@@ -49,7 +49,7 @@ const EmailSearchUser: React.FC<EmailSearchUserProps> = ({
   onPrefilledStateChange,
   roleId,
   tenantId,
-  type,
+  type
 }) => {
   const { t } = useTranslation();
 
@@ -309,7 +309,7 @@ const EmailSearchUser: React.FC<EmailSearchUserProps> = ({
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
       <Typography variant="body1" color="text.secondary">
-        Search for an existing user by email and allocate a center to them
+        {t('COMMON.SEARCH_USER_BY_EMAIL_DESCRIPTION')}
       </Typography>
       {/* Email Input Section */}
       <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
@@ -358,9 +358,9 @@ const EmailSearchUser: React.FC<EmailSearchUserProps> = ({
           {loading ? (
             <CircularProgress size={24} color="inherit" />
           ) : isUserLoaded ? (
-            'Change User'
+            t('COMMON.CHANGE_USER')
           ) : (
-            'Fetch User'
+            t('COMMON.FETCH_USER')
           )}
         </Button>
       </Box>
