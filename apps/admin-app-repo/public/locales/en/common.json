@@ -168,7 +168,8 @@
     "RESIGNED_FROM_COMPANY": "Resigned from the company",
     "MOVED_TO_DIFFERENT_ROLE": "Moved to a different role",
     "NO_MOBILIZER_FOUND": "No Mobilizer Found",
-    "MAP": "Map"
+    "MAP": "Map",
+    "NEXT": "Next"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",

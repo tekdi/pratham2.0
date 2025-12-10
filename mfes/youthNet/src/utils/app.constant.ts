@@ -66,6 +66,7 @@ export enum Role {
   LEARNER = 'Learner',
   INSTRUCTOR = 'Instructor',
   LEAD = 'Lead',
+  MOBILIZER = 'Mobilizer',
 }
 
 export enum Status {

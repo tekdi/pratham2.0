@@ -136,14 +136,11 @@ function generateSchemaAndUISchema(fields) {
         enumNames: ['Select'],
       };
     }
-    // Set working_village to array type - it will be populated with village IDs
+    // Set working_village to string type - it will be populated with comma-separated village IDs
     // Allow null for empty state
     if (name === 'working_village') {
-      schemaField.type = ['array', 'null'];
+      schemaField.type = 'string';
       schemaField.field_type = 'text';
-      schemaField.items = {
-        type: 'string',
-      };
     }
     if (validation?.isRequired) {
       schemaField.isRequired = validation.isRequired;

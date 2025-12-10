@@ -54,6 +54,7 @@ import {
 } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import { enrollUserTenant } from '@shared-lib-v2/MapUser/MapService';
 import axios from 'axios';
+import { bulkCreateCohortMembers } from '@/services/CohortService/cohortService';
 
 const Mobilizer = () => {
   const [archiveToActiveOpen, setArchiveToActiveOpen] = useState(false);
@@ -984,120 +985,158 @@ const Mobilizer = () => {
                 onUserDetails={async (userDetails) => {
                   console.log('############# userDetails', userDetails);
                   setUserDetails(userDetails);
-                  window.alert('userDetails'+userDetails);
-                window.alert('selectedUserId'+selectedUserId);
-                if (selectedUserId && userDetails) {
-                  // Validate that villages are selected for EVERY block in working_location
-                  const validationResult =
-                    validateVillagesSelected(userDetails);
-                  console.log(
-                    '############# validationResult',
-                    validationResult
-                  );
-                  if (!validationResult.isValid) {
-                    const missingCount = validationResult.missingBlocks.length;
-                    let errorMessage = '';
+                  window.alert('userDetails' + userDetails);
+                  window.alert('selectedUserId' + selectedUserId);
+                  if (selectedUserId && userDetails) {
+                    // Validate that villages are selected for EVERY block in working_location
+                    const validationResult =
+                      validateVillagesSelected(userDetails);
+                    console.log(
+                      '############# validationResult',
+                      validationResult
+                    );
+                    if (!validationResult.isValid) {
+                      const missingCount =
+                        validationResult.missingBlocks.length;
+                      let errorMessage = '';
 
-                    if (missingCount > 0) {
-                      // Show first few missing blocks in the error message
-                      const firstFew = validationResult.missingBlocks
-                        .slice(0, 3)
-                        .map(
-                          (block) =>
-                            `${block.blockName} (${block.districtName}, ${block.stateName})`
-                        )
-                        .join(', ');
+                      if (missingCount > 0) {
+                        // Show first few missing blocks in the error message
+                        const firstFew = validationResult.missingBlocks
+                          .slice(0, 3)
+                          .map(
+                            (block) =>
+                              `${block.blockName} (${block.districtName}, ${block.stateName})`
+                          )
+                          .join(', ');
 
-                      if (missingCount > 3) {
-                        errorMessage = t(
-                          'MOBILIZER.WORKING_LOCATION_REQUIRED_MISSING_VILLAGES',
-                          {
-                            blocks: firstFew,
-                            count: missingCount - 3,
-                          }
-                        );
+                        if (missingCount > 3) {
+                          errorMessage = t(
+                            'MOBILIZER.WORKING_LOCATION_REQUIRED_MISSING_VILLAGES',
+                            {
+                              blocks: firstFew,
+                              count: missingCount - 3,
+                            }
+                          );
+                        } else {
+                          errorMessage = t(
+                            'MOBILIZER.WORKING_LOCATION_REQUIRED_MISSING_VILLAGES_SINGLE',
+                            {
+                              blocks: firstFew,
+                            }
+                          );
+                        }
+                      } else if (validationResult.isWorkingLocationMissing) {
+                        // working_location itself is missing or invalid
+                        errorMessage = t('MOBILIZER.WORKING_LOCATION_REQUIRED');
                       } else {
+                        // No missing blocks but validation failed - this shouldn't happen, but handle it
                         errorMessage = t(
-                          'MOBILIZER.WORKING_LOCATION_REQUIRED_MISSING_VILLAGES_SINGLE',
-                          {
-                            blocks: firstFew,
-                          }
+                          'MOBILIZER.WORKING_LOCATION_REQUIRED_AT_LEAST_ONE'
                         );
                       }
-                    } else if (validationResult.isWorkingLocationMissing) {
-                      // working_location itself is missing or invalid
-                      errorMessage = t('MOBILIZER.WORKING_LOCATION_REQUIRED');
-                    } else {
-                      // No missing blocks but validation failed - this shouldn't happen, but handle it
-                      errorMessage = t(
-                        'MOBILIZER.WORKING_LOCATION_REQUIRED_AT_LEAST_ONE'
+
+                      showToastMessage(errorMessage, 'error');
+                      return;
+                    }
+
+                    setIsMappingInProgress(true);
+                    try {
+                      const { userData, customFields } =
+                        splitUserData(userDetails);
+
+                      delete userData.email;
+
+                      const object = {
+                        userData: userData,
+                        customField: customFields,
+                      };
+
+                      //update user details
+                      const updateUserResponse = await enrollUserTenant({
+                        userId: selectedUserId,
+                        tenantId: tenantId,
+                        roleId: roleId,
+                        customField: customFields,
+                        userData: userData,
+                      });
+                      console.log(
+                        '######### updatedResponse',
+                        updateUserResponse
                       );
+
+                      if (
+                        updateUserResponse &&
+                        updateUserResponse?.params?.err === null
+                      ) {
+                        // Ensure selectedCenterId is a string (handle array case)
+                        const cohortId = Array.isArray(selectedCenterId)
+                          ? selectedCenterId[0]
+                          : selectedCenterId;
+
+                        // Call bulkCreateCohortMembers to map user to center
+                        if (cohortId && selectedUserId) {
+                          try {
+                            const cohortMemberResponse =
+                              await bulkCreateCohortMembers({
+                                userId: [selectedUserId],
+                                cohortId: [cohortId],
+                              });
+
+                            if (
+                              cohortMemberResponse?.responseCode === 201 ||
+                              cohortMemberResponse?.params?.err === null
+                            ) {
+                              console.log(
+                                'Successfully mapped user to center:',
+                                cohortMemberResponse
+                              );
+                            } else {
+                              console.error(
+                                'Error mapping user to center:',
+                                cohortMemberResponse
+                              );
+                            }
+                          } catch (cohortError) {
+                            console.error(
+                              'Error in bulkCreateCohortMembers:',
+                              cohortError
+                            );
+                            // Don't fail the entire flow if cohort mapping fails
+                          }
+                        }
+
+                        showToastMessage(t(successUpdateMessage), 'success');
+
+                        // Close dialog
+                        setMapModalOpen(false);
+                        setSelectedCenterId(null);
+                        setSelectedUserId(null);
+                        setCohortResponse(null);
+                        setCatchmentAreaData(null);
+                        setSelectedBlockId(null);
+                        setFormStep(0);
+                        // Refresh the data
+                        searchData(prefilledFormData, 0);
+                      } else {
+                        showToastMessage(t(failureUpdateMessage), 'error');
+                      }
+                    } catch (error) {
+                      console.error('Error creating cohort member:', error);
+                      showToastMessage(
+                        error?.response?.data?.params?.errmsg ||
+                          t(failureCreateMessage),
+                        'error'
+                      );
+                    } finally {
+                      setIsMappingInProgress(false);
                     }
-
-                    showToastMessage(errorMessage, 'error');
-                    return;
-                  }
-
-                  setIsMappingInProgress(true);
-                  try {
-                    const { userData, customFields } =
-                      splitUserData(userDetails);
-
-                    delete userData.email;
-
-                    const object = {
-                      userData: userData,
-                      customField: customFields,
-                    };
-
-                    //update user details
-                    const updateUserResponse = await enrollUserTenant({
-                      userId: selectedUserId,
-                      tenantId: tenantId,
-                      roleId: roleId,
-                      customField: customFields,
-                      userData: userData,
-                    });
-                    console.log(
-                      '######### updatedResponse',
-                      updateUserResponse
-                    );
-
-                    if (
-                      updateUserResponse &&
-                      updateUserResponse?.params?.err === null
-                    ) {
-                      showToastMessage(t(successUpdateMessage), 'success');
-
-                      // Close dialog
-                      setMapModalOpen(false);
-                      setSelectedCenterId(null);
-                      setSelectedUserId(null);
-                      setCohortResponse(null);
-                      setCatchmentAreaData(null);
-                      setSelectedBlockId(null);
-                      setFormStep(0);
-                      // Refresh the data
-                      searchData(prefilledFormData, 0);
-                    } else {
-                      showToastMessage(t(failureUpdateMessage), 'error');
-                    }
-                  } catch (error) {
-                    console.error('Error creating cohort member:', error);
+                  } else if (!selectedUserId) {
                     showToastMessage(
-                      error?.response?.data?.params?.errmsg ||
-                        t(failureCreateMessage),
+                      t('MOBILIZER.PLEASE_SEARCH_AND_SELECT_USER'),
                       'error'
                     );
-                  } finally {
-                    setIsMappingInProgress(false);
                   }
-                } else if (!selectedUserId) {
-                  showToastMessage(
-                    t('MOBILIZER.PLEASE_SEARCH_AND_SELECT_USER'),
-                    'error'
-                  );
-                }
                 }}
                 schema={addSchema}
                 uiSchema={addUiSchema}
@@ -1135,7 +1174,10 @@ const Mobilizer = () => {
               onClick={() => {
                 if (selectedCenterId) {
                   setFormStep(1);
-                  localStorage.setItem('workingLocationCenterId', selectedCenterId);
+                  localStorage.setItem(
+                    'workingLocationCenterId',
+                    selectedCenterId
+                  );
                 } else {
                   showToastMessage('Please select a center', 'error');
                 }
@@ -1153,7 +1195,7 @@ const Mobilizer = () => {
               form="dynamic-form-id"
               type="submit"
               // onClick={async () => {
-                
+
               // }}
             >
               {t('COMMON.MAP')}

@@ -170,7 +170,8 @@
     "COURSES_FOUND": "{{count}} Course Found",
     "COURSES_FOUND_PLURAL": "{{count}} Courses Found",
     "ASSESSMENT_TYPE_FOUND": "{{count}} Assessment Type Found",
-    "ASSESSMENT_TYPE_FOUND_PLURAL": "{{count}} Assessment Types Found"
+    "ASSESSMENT_TYPE_FOUND_PLURAL": "{{count}} Assessment Types Found",
+    "NEXT": "Next"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -985,7 +986,8 @@
     "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES": "Working location is required. Please select villages for all blocks. Missing villages in: {{blocks}} and {{count}} more block(s).",
     "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES_SINGLE": "Working location is required. Please select villages for all blocks. Missing villages in: {{blocks}}.",
     "WORKING_LOCATION_REQUIRED_AT_LEAST_ONE": "Working location is required. Please select at least one village in all blocks.",
-    "MOBILIZER_NAME": "Mobilizer Name"
+    "MOBILIZER_NAME": "Mobilizer Name",
+    "NO_MOBILIZER_FOUND": "No Mobilizer Found"
   },
   "UNIT_NAME": "Unit Name",
   "TYPE_OF_CENTER": "Type Of Center",
