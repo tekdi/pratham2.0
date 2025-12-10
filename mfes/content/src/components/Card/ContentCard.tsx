@@ -87,6 +87,7 @@ const ContentCard = ({
           _card={_card}
           handleCardClick={handleCardClick}
           trackData={trackData}
+          englishTitle={item?.englishName}
         />
       </CardWrap>
     );

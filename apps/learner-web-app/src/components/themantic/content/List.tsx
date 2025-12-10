@@ -218,6 +218,7 @@ const List: React.FC<ListProps> = ({
                     },
                   },
                   _carousel: {
+                    slidesPerView: 1,
                     autoplay: {
                       delay: 3000,
                       disableOnInteraction: false,
@@ -266,6 +267,7 @@ export const mainCourseCard = (props: any) => (
     isExplore={false}
     textTransform="uppercase"
     titleColor="black"
+    maxTitleLines={1}
   />
 );
 
@@ -278,6 +280,7 @@ export const cardHideExplore = (props: any) => (
     textTransform="uppercase"
     fontWeight={600}
     titleColor="black"
+    maxTitleLines={2}
   />
 );
 export const CardComponent = ({
@@ -291,6 +294,8 @@ export const CardComponent = ({
   textTransform,
   titleColor,
   _card,
+  englishTitle,
+  maxTitleLines = 2,
 }: {
   item: any;
   default_img: any;
@@ -302,6 +307,8 @@ export const CardComponent = ({
   textTransform?: string;
   titleColor?: string;
   _card?: any;
+  englishTitle?: string;
+  maxTitleLines?: number;
 }) => {
   // Extract styling props from _card object if they exist
   const finalTitleFontSize = titleFontSize || _card?.titleFontSize;
@@ -309,6 +316,7 @@ export const CardComponent = ({
   const finalMinHeight = minHeight || _card?.minHeight;
   const finalTextTransform = textTransform || _card?.textTransform;
   const finalTitleColor = titleColor || _card?.titleColor;
+  const finalMaxTitleLines = maxTitleLines || _card?.maxTitleLines || 2;
   const onClick = (id: string) => {
     if (handleCardClick) {
       handleCardClick(id);
@@ -366,18 +374,44 @@ export const CardComponent = ({
               mt: 0.3,
               mb: 0.3,
               display: '-webkit-box',
-              WebkitLineClamp: 2,
+              WebkitLineClamp: finalMaxTitleLines,
               WebkitBoxOrient: 'vertical',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               color: finalTitleColor || '#212529',
               px: '16px',
               textTransform: finalTextTransform || 'uppercase',
-              minHeight: '42px',
+              minHeight: finalMaxTitleLines === 1 ? '28px' : '42px',
               wordBreak: 'break-word',
             }}
           >
             {item.name || item.title || 'Untitled'}
+          </Typography>
+        </Tooltip>
+
+        <Tooltip title={englishTitle || ''} arrow>
+          <Typography
+            variant="body1"
+            sx={{
+              fontWeight: 500,
+              textAlign: 'center',
+              // fontSize: '14px',
+              letterSpacing: '0.5px',
+              display: '-webkit-box',
+              WebkitLineClamp: finalMaxTitleLines,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              color: finalTitleColor || '#212529',
+              px: '16px',
+              textTransform: 'capitalize',
+              wordBreak: 'break-word',
+              mb: 2,
+              minHeight: finalMaxTitleLines === 1 ? '28px' : '42px',
+              visibility: englishTitle ? 'visible' : 'hidden',
+            }}
+          >
+            {englishTitle || 'Placeholder'}
           </Typography>
         </Tooltip>
 
