@@ -19,6 +19,7 @@ import CustomTextFieldWidget from './RJSFWidget/CustomTextFieldWidget';
 import CustomFileUpload from './RJSFWidget/CustomFileUpload';
 import CustomCenterListWidget from './RJSFWidget/CustomCenterListWidget';
 import CatchmentAreaWidget from './RJSFWidget/CatchmentAreaWidget';
+import WorkingLocationWidget from './RJSFWidget/WorkingLocationWidget';
 
 import {
   calculateAgeFromDate,
@@ -28,6 +29,7 @@ import {
 import { CustomObjectFieldTemplate } from './FormTemplate/ObjectFieldTemplate';
 import { useTranslation } from '../../lib/context/LanguageContext';
 import SecurityIcon from '@mui/icons-material/Security';
+import { showToastMessage } from './Toastify';
 
 // import { useTranslation } from '@shared-lib'; // Updated import
 const DynamicForm = ({
@@ -772,6 +774,7 @@ const DynamicForm = ({
     CustomCenterListWidget,
     //custom widget
     CatchmentAreaWidget,
+    WorkingLocationWidget,
   };
 
   // Custom field for Guardian Information Note
@@ -1007,6 +1010,39 @@ const DynamicForm = ({
     return Object.entries(schema.properties)
       .filter(([_, value]) => value.api && value.api.callType === callType)
       .map(([key, value]) => ({ key, ...value }));
+  };
+
+  // Function to extract village IDs from working_location data structure
+  const extractVillageIdsFromWorkingLocation = (
+    workingLocation: any
+  ): string[] | null => {
+    if (!workingLocation || !Array.isArray(workingLocation)) {
+      return null;
+    }
+
+    const villageIds: string[] = [];
+
+    // Iterate through all states -> districts -> blocks -> villages
+    for (const state of workingLocation) {
+      if (state.districts && Array.isArray(state.districts)) {
+        for (const district of state.districts) {
+          if (district.blocks && Array.isArray(district.blocks)) {
+            for (const block of district.blocks) {
+              if (block.villages && Array.isArray(block.villages)) {
+                for (const village of block.villages) {
+                  if (village.id) {
+                    villageIds.push(String(village.id));
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Return null if no villages found, otherwise return array of IDs
+    return villageIds.length > 0 ? villageIds : null;
   };
 
   const renderPrefilledForm = () => {
@@ -1325,6 +1361,16 @@ const DynamicForm = ({
       // Call the function
       fetchDependentApis();
 
+      // Sync working_village with working_location if present in prefilled data
+      if (temp_prefilled_form?.working_location !== undefined) {
+        const villageIds = extractVillageIdsFromWorkingLocation(
+          temp_prefilled_form?.working_location
+        );
+        // Convert array to comma-separated string for backend
+        temp_prefilled_form.working_village =
+          villageIds && villageIds.length > 0 ? villageIds.join(', ') : null;
+      }
+
       //setFormData
       setFormData(temp_prefilled_form);
 
@@ -1500,6 +1546,16 @@ const DynamicForm = ({
     formData: any;
     errors: any;
   }) => {
+    // Sync working_village with working_location changes
+    if (formData?.working_location !== undefined) {
+      const villageIds = extractVillageIdsFromWorkingLocation(
+        formData.working_location
+      );
+      // Convert array to comma-separated string for backend
+      formData.working_village =
+        villageIds && villageIds.length > 0 ? villageIds.join(',') : null;
+    }
+
     // const changedField = Object.keys(formData).find(
     //   (key) => formData[key] !== prevFormData.current[key]
     // );
@@ -1936,38 +1992,43 @@ const DynamicForm = ({
       const field = formSchema.properties[key];
       const value = formData[key];
 
-      // Ensure errors[key] is defined
-      if (!errors[key]) {
-        errors[key] = {};
-      }
-      // ✅ Clear error if field is empty or invalid
-      if (!value || value === '' || value === null || value === undefined) {
-        if (errors[key]?.__errors) {
-          console.log('####### field', field);
-          console.log('####### value', value);
-          console.log('####### key', key);
-          errors[key].__errors = []; // ✅ Clear existing errors
+      // Skip clearing errors for working_village - it's handled by custom validation
+      if (key === 'working_village') {
+        // Don't clear working_village errors here, let custom validation handle it
+      } else {
+        // Ensure errors[key] is defined
+        if (!errors[key]) {
+          errors[key] = {};
         }
-        delete errors[key]; // ✅ Completely remove errors if empty
-      } else if (field.pattern) {
-        // ✅ Validate pattern only if the field has a value
-        const patternRegex = new RegExp(field.pattern);
-        if (!patternRegex.test(value)) {
-          const errorMessage =
-            t(patternErrorMessages?.[field.pattern]) ||
-            `Invalid format for ${field.title || key}.`;
-
-          // ✅ Add only if pattern does not match
-          if (!errors[key].__errors) {
-            errors[key].__errors = [];
-          }
-          errors[key].__errors = [errorMessage];
-        } else {
-          // ✅ Clear errors if pattern matches
+        // ✅ Clear error if field is empty or invalid
+        if (!value || value === '' || value === null || value === undefined) {
           if (errors[key]?.__errors) {
-            errors[key].__errors = [];
+            console.log('####### field', field);
+            console.log('####### value', value);
+            console.log('####### key', key);
+            errors[key].__errors = []; // ✅ Clear existing errors
           }
-          delete errors[key]; // ✅ Remove errors if valid
+          delete errors[key]; // ✅ Completely remove errors if empty
+        } else if (field.pattern) {
+          // ✅ Validate pattern only if the field has a value
+          const patternRegex = new RegExp(field.pattern);
+          if (!patternRegex.test(value)) {
+            const errorMessage =
+              t(patternErrorMessages?.[field.pattern]) ||
+              `Invalid format for ${field.title || key}.`;
+
+            // ✅ Add only if pattern does not match
+            if (!errors[key].__errors) {
+              errors[key].__errors = [];
+            }
+            errors[key].__errors = [errorMessage];
+          } else {
+            // ✅ Clear errors if pattern matches
+            if (errors[key]?.__errors) {
+              errors[key].__errors = [];
+            }
+            delete errors[key]; // ✅ Remove errors if valid
+          }
         }
       }
     });
@@ -2009,8 +2070,13 @@ const DynamicForm = ({
     if (!submitted) {
       updatedError = updatedError.filter((error) => error.name !== 'pattern');
     }
+    // Filter errors for UI display, but keep working_village errors for onSubmit handler
+    // Note: transformErrors affects UI display, but onSubmit receives original errors
     return updatedError.filter(
-      (err) => !err?.property?.startsWith?.('.catchment_area')
+      (err) =>
+        !err?.property?.startsWith?.('.catchment_area') &&
+        !err?.property?.startsWith?.('.working_location')
+      // Don't filter working_village errors - we need them in onSubmit for toast
     );
     // console.log('########### issue debug updatedError 123 ', JSON.stringify(updatedError));
     // return updatedError;
@@ -2029,9 +2095,9 @@ const DynamicForm = ({
           // onSubmit={handleSubmit}
           onSubmit={({ formData, errors }) => {
             // console.log("########### issue debug SUBMIT", formData);
-            // console.log("########### issue debug ERRORS", errors); // 👈 this will be empty if validation passed
+            // console.log("########### issue debug ERRORS", errors);
             if (errors.length > 0) {
-              // Block submission if needed
+              // Block submission if there are validation errors
               return;
             }
             handleSubmit({ formData });

@@ -63,6 +63,8 @@
     "YES": "Yes",
     "REVIEW_ATTENDANCE": "Review Attendance",
     "ADD_NEW": "Add New",
+    "ADD_MOBILIZER": "Add Mobilizer",
+    "MAP": "Map",
     "ADD": "ADD",
     "ADD_CENTER": "Add Centers to your view",
     "REMOVE_FROM_CENTER": "Remove From Center",
@@ -168,7 +170,8 @@
     "COURSES_FOUND": "{{count}} Course Found",
     "COURSES_FOUND_PLURAL": "{{count}} Courses Found",
     "ASSESSMENT_TYPE_FOUND": "{{count}} Assessment Type Found",
-    "ASSESSMENT_TYPE_FOUND_PLURAL": "{{count}} Assessment Types Found"
+    "ASSESSMENT_TYPE_FOUND_PLURAL": "{{count}} Assessment Types Found",
+    "NEXT": "Next"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -966,6 +969,26 @@
     "REUPLOAD": "Reupload",
     "FORMAT_JPG_SIZE_MB_UP_TO_IMAGES": "* Format: jpg, jpeg. Size: {{mb}} MB Up to {{count}} images"
   },
+  "MOBILIZER": {
+    "ACTIVATE_USER_SUCCESS": "User has been successfully activated",
+    "MOBILIZER_UPDATED_SUCCESSFULLY": "Mobilizer has been successfully updated!",
+    "NOT_ABLE_UPDATE_MOBILIZER": "Not able to update Mobilizer",
+    "MOBILIZER_CREATED_SUCCESSFULLY": "Mobilizer has been successfully created!",
+    "NOT_ABLE_CREATE_MOBILIZER": "Not able to create Mobilizer",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "Mobilizer is created, credentials will be sent soon",
+    "MAP_USER_AS_LEAD": "Map User as Lead",
+    "MAP_USER_AS_MOBILIZER": "Map User as Mobilizer",
+    "PLEASE_SEARCH_AND_SELECT_USER": "Please search and select a user",
+    "UNKNOWN_STATE": "Unknown State",
+    "UNKNOWN_DISTRICT": "Unknown District",
+    "UNKNOWN_BLOCK": "Unknown Block",
+    "WORKING_LOCATION_REQUIRED": "Working location is required. Please select villages for all blocks.",
+    "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES": "Working location is required. Please select villages for all blocks. Missing villages in: {{blocks}} and {{count}} more block(s).",
+    "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES_SINGLE": "Working location is required. Please select villages for all blocks. Missing villages in: {{blocks}}.",
+    "WORKING_LOCATION_REQUIRED_AT_LEAST_ONE": "Working location is required. Please select at least one village in all blocks.",
+    "MOBILIZER_NAME": "Mobilizer Name",
+    "NO_MOBILIZER_FOUND": "No Mobilizer Found"
+  },
   "UNIT_NAME": "Unit Name",
   "TYPE_OF_CENTER": "Type Of Center",
   "GOOGLE MAP_LINK": "Google Map Link",
@@ -1015,8 +1038,7 @@
   "FEMALE": "Female",
   "TRANSGENDER": "Transgender",
   "phone_number": "Phone Number",
-  "first_name": "First Name"
+  "first_name": "First Name",
+  "WORKING_LOCATION": "Working Location",
+  "CATCHMENT_AREA": "Catchment Area"
 }
-
-
-

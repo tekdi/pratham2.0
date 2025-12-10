@@ -179,6 +179,11 @@ export const MENU_CONFIG = {
           link: '/user-state-lead',
           roles: [Role.CENTRAL_ADMIN],
         },
+        {
+          title: 'SIDEBAR.MOBILIZER',
+          link: '/user-mobilizer',
+          roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
+        },
       ],
     },
     master: {

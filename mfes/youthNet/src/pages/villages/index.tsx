@@ -5,7 +5,12 @@ import {
   Box,
   Button,
   Divider,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
   Grid,
+  IconButton,
   Radio,
   Tab,
   Tabs,
@@ -45,6 +50,7 @@ import {
 } from '../../services/youthNet/Dashboard/VillageServices';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import AddIcon from '@mui/icons-material/Add';
+import CloseIcon from '@mui/icons-material/Close';
 import SimpleModal from '../../components/SimpleModal';
 import Surveys from '../../components/youthNet/Surveys';
 import { useDirection } from '../../hooks/useDirection';
@@ -78,9 +84,14 @@ import { FormContext } from '@shared-lib-v2/DynamicForm/components/DynamicFormCo
 import {
   extractMatchingKeys,
   fetchForm,
+  enhanceUiSchemaWithGrid,
+  splitUserData,
 } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import { RoleId } from '@/utils/app.constant';
 import { deleteUser } from 'mfes/youthNet/src/services/youthNet/Dashboard/UserServices';
+import EmailSearchUser from '@shared-lib-v2/MapUser/EmailSearchUser';
+import { enrollUserTenant } from '@shared-lib-v2/MapUser/MapService';
+import { bulkCreateCohortMembers } from '../../services/CohortService';
 
 const Index = () => {
   const { isRTL } = useDirection();
@@ -143,6 +154,19 @@ const Index = () => {
   const [selectedMentorId, setSelectedMentorId] = useState('');
   const [districtData, setDistrictData] = useState<any>(null);
   const [blockData, setBlockData] = useState<any>(null);
+
+  // Mobilizer modal state
+  const [mapModalOpen, setMapModalOpen] = useState(false);
+  const [mobilizerFormStep, setMobilizerFormStep] = useState(0);
+  const [selectedMobilizerUserId, setSelectedMobilizerUserId] = useState<
+    string | null
+  >(null);
+  const [mobilizerUserDetails, setMobilizerUserDetails] = useState<any>(null);
+  const [isMobilizerMappingInProgress, setIsMobilizerMappingInProgress] =
+    useState(false);
+  const [mobilizerPrefilledState, setMobilizerPrefilledState] = useState({});
+  const [mobilizerAddSchema, setMobilizerAddSchema] = useState(null);
+  const [mobilizerAddUiSchema, setMobilizerAddUiSchema] = useState(null);
 
   const [selectedValue, setSelectedValue] = useState<any>();
   const [selectedBlockValue, setSelectedBlockValue] = useState<any>(
@@ -486,6 +510,59 @@ const Index = () => {
     setTenantId(localStorage.getItem('tenantId') || '');
     fetchData();
   }, [selectedStateValue, selectedDistrictValue]);
+
+  // Fetch mobilizer form schema
+  useEffect(() => {
+    const fetchMobilizerForm = async () => {
+      const mobilizerFormContext = {
+        context: 'USERS',
+        contextType: 'MOBILIZER',
+      };
+      const responseForm = await fetchForm([
+        {
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${mobilizerFormContext.context}&contextType=${mobilizerFormContext.contextType}`,
+          header: {},
+        },
+        {
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${mobilizerFormContext.context}&contextType=${mobilizerFormContext.contextType}`,
+          header: {
+            tenantid: localStorage.getItem('tenantId'),
+          },
+        },
+      ]);
+      let alterSchema = responseForm?.schema;
+      let alterUISchema = responseForm?.uiSchema;
+      if (alterUISchema?.firstName) {
+        alterUISchema.firstName['ui:disabled'] = true;
+      }
+      if (alterUISchema?.lastName) {
+        alterUISchema.lastName['ui:disabled'] = true;
+      }
+      if (alterUISchema?.dob) {
+        alterUISchema.dob['ui:disabled'] = true;
+      }
+      if (alterUISchema?.email) {
+        alterUISchema.email['ui:disabled'] = true;
+      }
+      if (alterUISchema?.mobile) {
+        alterUISchema.mobile['ui:disabled'] = true;
+      }
+
+      // Remove duplicates from requiredArray
+      let requiredArray = alterSchema?.required;
+      if (Array.isArray(requiredArray)) {
+        requiredArray = Array.from(new Set(requiredArray));
+      }
+      alterSchema.required = requiredArray;
+
+      // Set 2 grid layout
+      alterUISchema = enhanceUiSchemaWithGrid(alterUISchema);
+
+      setMobilizerAddSchema(alterSchema);
+      setMobilizerAddUiSchema(alterUISchema);
+    };
+    fetchMobilizerForm();
+  }, []);
 
   const handleLocationClick = (Id: any, name: any) => {
     console.log(selectedBlockValue);
@@ -891,8 +968,11 @@ const Index = () => {
   };
 
   // Get current selected user from filteredyouthList
-  const selectedUser = filteredyouthList.find((user: any) => user.Id === selectedToggledUserId);
-  const isCurrentUserVolunteer = selectedUser?.isVolunteer === VolunteerField.YES;
+  const selectedUser = filteredyouthList.find(
+    (user: any) => user.Id === selectedToggledUserId
+  );
+  const isCurrentUserVolunteer =
+    selectedUser?.isVolunteer === VolunteerField.YES;
 
   const buttons = [
     // Show mark button for non-volunteers, unmark button for volunteers
@@ -900,12 +980,14 @@ const Index = () => {
       ? {
           label: t('YOUTHNET_DASHBOARD.UNMARK_AS_VOLUNTEER'),
           icon: <SwapHorizIcon />,
-          onClick: () => handleButtonClick(BOTTOM_DRAWER_CONSTANTS.UNMARK_VOLUNTEER),
+          onClick: () =>
+            handleButtonClick(BOTTOM_DRAWER_CONSTANTS.UNMARK_VOLUNTEER),
         }
       : {
           label: t('YOUTHNET_USERS_AND_VILLAGES.MARK_AS_VOLUNTEER'),
           icon: <SwapHorizIcon />,
-          onClick: () => handleButtonClick(BOTTOM_DRAWER_CONSTANTS.MARK_VOLUNTEER),
+          onClick: () =>
+            handleButtonClick(BOTTOM_DRAWER_CONSTANTS.MARK_VOLUNTEER),
         },
   ];
 
@@ -969,6 +1051,115 @@ const Index = () => {
     });
     // setIsReassign(false);
     // setEditableUserId('');
+  };
+
+  // Function to validate villages selected in working_location for mobilizer
+  const validateMobilizerVillagesSelected = (
+    userDetails: any
+  ): {
+    isValid: boolean;
+    missingBlocks: Array<{
+      stateName: string;
+      districtName: string;
+      blockName: string;
+    }>;
+    isWorkingLocationMissing?: boolean;
+  } => {
+    const missingBlocks: Array<{
+      stateName: string;
+      districtName: string;
+      blockName: string;
+    }> = [];
+
+    let workingLocation = userDetails?.working_location;
+
+    if (
+      !workingLocation &&
+      userDetails?.customFields &&
+      Array.isArray(userDetails.customFields)
+    ) {
+      const workingLocationField = userDetails.customFields.find(
+        (field: any) => {
+          if (
+            field.value &&
+            Array.isArray(field.value) &&
+            field.value.length > 0
+          ) {
+            const firstItem = field.value[0];
+            return (
+              firstItem &&
+              typeof firstItem === 'object' &&
+              'stateId' in firstItem &&
+              'stateName' in firstItem &&
+              'districts' in firstItem
+            );
+          }
+          return false;
+        }
+      );
+      if (workingLocationField?.value) {
+        workingLocation = workingLocationField.value;
+      }
+    }
+
+    if (!workingLocation) {
+      return {
+        isValid: false,
+        missingBlocks: [],
+        isWorkingLocationMissing: true,
+      };
+    }
+    if (!Array.isArray(workingLocation) || workingLocation.length === 0) {
+      return {
+        isValid: false,
+        missingBlocks: [],
+        isWorkingLocationMissing: true,
+      };
+    }
+
+    let totalBlocks = 0;
+    let blocksWithVillages = 0;
+
+    for (const state of workingLocation) {
+      if (state.districts && Array.isArray(state.districts)) {
+        for (const district of state.districts) {
+          if (district.blocks && Array.isArray(district.blocks)) {
+            for (const block of district.blocks) {
+              totalBlocks++;
+
+              const hasVillages =
+                block.villages &&
+                Array.isArray(block.villages) &&
+                block.villages.length > 0;
+
+              if (hasVillages) {
+                blocksWithVillages++;
+              } else {
+                missingBlocks.push({
+                  stateName: state.stateName || t('MOBILIZER.UNKNOWN_STATE'),
+                  districtName:
+                    district.districtName || t('MOBILIZER.UNKNOWN_DISTRICT'),
+                  blockName: block.name || t('MOBILIZER.UNKNOWN_BLOCK'),
+                });
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return {
+      isValid: missingBlocks.length === 0,
+      missingBlocks,
+    };
+  };
+
+  const handleOpenMobilizerModal = () => {
+    setMobilizerPrefilledState({});
+    setMobilizerFormStep(0);
+    setSelectedMobilizerUserId(null);
+    setMobilizerUserDetails(null);
+    setMapModalOpen(true);
   };
 
   const handleNext = () => {
@@ -1115,6 +1306,7 @@ const Index = () => {
               ml={'10px'}
               display={'flex'}
               justifyContent={'flex-end'}
+              gap={2}
             >
               <Button
                 sx={{
@@ -1137,6 +1329,24 @@ const Index = () => {
                 }}
               >
                 {t('COMMON.ADD_NEW')}
+              </Button>
+              <Button
+                sx={{
+                  border: `1px solid ${theme.palette.error.contrastText}`,
+                  borderRadius: '100px',
+                  height: '40px',
+                  width: '10rem',
+                  color: theme.palette.error.contrastText,
+                  '& .MuiButton-endIcon': {
+                    marginLeft: isRTL ? '0px !important' : '8px !important',
+                    marginRight: isRTL ? '8px !important' : '-2px !important',
+                  },
+                }}
+                className="text-1E"
+                endIcon={<AddIcon />}
+                onClick={handleOpenMobilizerModal}
+              >
+                {t('COMMON.ADD_MOBILIZER')}
               </Button>
             </Box>
 
@@ -1314,6 +1524,255 @@ const Index = () => {
                 }
               />
             </SimpleModal>
+
+            {/* Mobilizer Map Modal Dialog */}
+            <Dialog
+              open={mapModalOpen}
+              onClose={(event, reason) => {
+                if (reason !== 'backdropClick') {
+                  setMapModalOpen(false);
+                  setSelectedMobilizerUserId(null);
+                  setMobilizerUserDetails(null);
+                }
+              }}
+              maxWidth={false}
+              fullWidth={true}
+              PaperProps={{
+                sx: {
+                  width: '100%',
+                  maxWidth: '100%',
+                  maxHeight: '100vh',
+                },
+              }}
+            >
+              <DialogTitle
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  borderBottom: '1px solid #eee',
+                  p: 2,
+                }}
+              >
+                <Typography variant="h1" component="div">
+                  {t('MOBILIZER.MAP_USER_AS_MOBILIZER')}
+                </Typography>
+                <IconButton
+                  aria-label="close"
+                  onClick={() => setMapModalOpen(false)}
+                  sx={{
+                    color: (theme) => theme.palette.grey[500],
+                  }}
+                >
+                  <CloseIcon />
+                </IconButton>
+              </DialogTitle>
+              <DialogContent sx={{ p: 3, overflowY: 'auto' }}>
+                {mobilizerFormStep === 0 && (
+                  <Box sx={{ mb: 3 }}>
+                    <EmailSearchUser
+                      getCatchmentAreaDetails={true}
+                      onUserSelected={(userId) => {
+                        setSelectedMobilizerUserId(userId || null);
+                        console.log('Selected User ID:', userId);
+                      }}
+                      onUserDetails={async (userDetails) => {
+                        console.log('############# userDetails', userDetails);
+                        setMobilizerUserDetails(userDetails);
+
+                        if (selectedMobilizerUserId) {
+                          const validationResult =
+                            validateMobilizerVillagesSelected(userDetails);
+                          console.log(
+                            '############# validationResult',
+                            validationResult
+                          );
+                          if (!validationResult.isValid) {
+                            const missingCount =
+                              validationResult.missingBlocks.length;
+                            let errorMessage = '';
+
+                            if (missingCount > 0) {
+                              const firstFew = validationResult.missingBlocks
+                                .slice(0, 3)
+                                .map(
+                                  (block) =>
+                                    `${block.blockName} (${block.districtName}, ${block.stateName})`
+                                )
+                                .join(', ');
+
+                              if (missingCount > 3) {
+                                errorMessage = t(
+                                  'MOBILIZER.WORKING_LOCATION_REQUIRED_MISSING_VILLAGES',
+                                  {
+                                    blocks: firstFew,
+                                    count: missingCount - 3,
+                                  }
+                                );
+                              } else {
+                                errorMessage = t(
+                                  'MOBILIZER.WORKING_LOCATION_REQUIRED_MISSING_VILLAGES_SINGLE',
+                                  {
+                                    blocks: firstFew,
+                                  }
+                                );
+                              }
+                            } else if (
+                              validationResult.isWorkingLocationMissing
+                            ) {
+                              errorMessage = t(
+                                'MOBILIZER.WORKING_LOCATION_REQUIRED'
+                              );
+                            } else {
+                              errorMessage = t(
+                                'MOBILIZER.WORKING_LOCATION_REQUIRED_AT_LEAST_ONE'
+                              );
+                            }
+
+                            showToastMessage(errorMessage, 'error');
+                            return;
+                          }
+
+                          setIsMobilizerMappingInProgress(true);
+                          try {
+                            const { userData, customFields } =
+                              splitUserData(userDetails);
+
+                            delete userData.email;
+
+                            const mobilizerRoleId =
+                              'a4694781-65c1-4b92-8ff1-ad490ab6d140'; // RoleId.MOBILIZER
+
+                            const updateUserResponse = await enrollUserTenant({
+                              userId: selectedMobilizerUserId,
+                              tenantId: tenantId,
+                              roleId: mobilizerRoleId,
+                              customField: customFields,
+                              userData: userData,
+                            });
+                            console.log(
+                              '######### updatedResponse',
+                              updateUserResponse
+                            );
+
+                            if (
+                              updateUserResponse &&
+                              updateUserResponse?.params?.err === null
+                            ) {
+                              // Get center ID from localStorage (set when cohort data is loaded)
+                              const workingLocationCenterId =
+                                localStorage.getItem('workingLocationCenterId');
+
+                              // Call bulkCreateCohortMembers to map user to center
+                              if (
+                                workingLocationCenterId &&
+                                selectedMobilizerUserId
+                              ) {
+                                try {
+                                  const cohortMemberResponse =
+                                    await bulkCreateCohortMembers({
+                                      userId: [selectedMobilizerUserId],
+                                      cohortId: [workingLocationCenterId],
+                                    });
+
+                                  if (
+                                    cohortMemberResponse?.responseCode ===
+                                      201 ||
+                                    cohortMemberResponse?.params?.err === null
+                                  ) {
+                                    console.log(
+                                      'Successfully mapped user to center:',
+                                      cohortMemberResponse
+                                    );
+                                  } else {
+                                    console.error(
+                                      'Error mapping user to center:',
+                                      cohortMemberResponse
+                                    );
+                                  }
+                                } catch (cohortError) {
+                                  console.error(
+                                    'Error in bulkCreateCohortMembers:',
+                                    cohortError
+                                  );
+                                  // Don't fail the entire flow if cohort mapping fails
+                                }
+                              }
+
+                              showToastMessage(
+                                t('MOBILIZER.MOBILIZER_CREATED_SUCCESSFULLY'),
+                                'success'
+                              );
+
+                              setMapModalOpen(false);
+                              setSelectedMobilizerUserId(null);
+                              setMobilizerUserDetails(null);
+                            } else {
+                              showToastMessage(
+                                t('MOBILIZER.NOT_ABLE_CREATE_MOBILIZER'),
+                                'error'
+                              );
+                            }
+                          } catch (error) {
+                            console.error('Error creating mobilizer:', error);
+                            showToastMessage(
+                              error?.response?.data?.params?.errmsg ||
+                                t('MOBILIZER.NOT_ABLE_CREATE_MOBILIZER'),
+                              'error'
+                            );
+                          } finally {
+                            setIsMobilizerMappingInProgress(false);
+                          }
+                        } else if (!selectedMobilizerUserId) {
+                          showToastMessage(
+                            t('MOBILIZER.PLEASE_SEARCH_AND_SELECT_USER'),
+                            'error'
+                          );
+                        }
+                      }}
+                      schema={mobilizerAddSchema}
+                      uiSchema={mobilizerAddUiSchema}
+                      prefilledState={mobilizerPrefilledState}
+                      onPrefilledStateChange={(prefilledState) => {
+                        setMobilizerPrefilledState(prefilledState || {});
+                      }}
+                      roleId={'a4694781-65c1-4b92-8ff1-ad490ab6d140'} // RoleId.MOBILIZER
+                      tenantId={tenantId}
+                      type="leader"
+                    />
+                  </Box>
+                )}
+              </DialogContent>
+              <DialogActions sx={{ p: 2, borderTop: '1px solid #eee' }}>
+                {mobilizerFormStep === 0 && (
+                  <Button
+                    sx={{
+                      backgroundColor: '#FFC107',
+                      color: '#000',
+                      fontFamily: 'Poppins',
+                      fontWeight: 500,
+                      fontSize: '14px',
+                      height: '40px',
+                      lineHeight: '20px',
+                      letterSpacing: '0.1px',
+                      textAlign: 'center',
+                      verticalAlign: 'middle',
+                      '&:hover': {
+                        backgroundColor: '#ffb300',
+                      },
+                      width: '100%',
+                    }}
+                    disabled={
+                      !selectedMobilizerUserId || isMobilizerMappingInProgress
+                    }
+                    form="dynamic-form-id"
+                    type="submit"
+                  >
+                    {t('COMMON.MAP')}
+                  </Button>
+                )}
+              </DialogActions>
+            </Dialog>
           </>
         )}
       </Box>
