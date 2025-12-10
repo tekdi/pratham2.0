@@ -6,56 +6,58 @@ import serviceAccount from "../../../../../service-account";
 
 const PROPERTY_ID = (process.env.GOOGLE_ANALYTICS_PROPERTY_ID || "496861567").replace(/['"]/g, '');
 
-if (!process.env.GOOGLE_ANALYTICS_PROPERTY_ID) {
-  console.warn("GOOGLE_ANALYTICS_PROPERTY_ID is not set, using default.");
-}
+// Lazy initialization function - only called when route is accessed, not at build time
+function getAnalyticsClient(): BetaAnalyticsDataClient {
+  if (!process.env.GOOGLE_ANALYTICS_PROPERTY_ID) {
+    console.warn("GOOGLE_ANALYTICS_PROPERTY_ID is not set, using default.");
+  }
 
-// Validate service account credentials
-if (!serviceAccount.client_email || !serviceAccount.private_key) {
-  console.error("Service account validation failed:", {
-    hasClientEmail: !!serviceAccount.client_email,
-    hasPrivateKey: !!serviceAccount.private_key,
-    privateKeyLength: serviceAccount.private_key?.length,
-    privateKeyPreview: serviceAccount.private_key?.substring(0, 50),
+  // Validate service account credentials
+  if (!serviceAccount.client_email || !serviceAccount.private_key) {
+    console.error("Service account validation failed:", {
+      hasClientEmail: !!serviceAccount.client_email,
+      hasPrivateKey: !!serviceAccount.private_key,
+      privateKeyLength: serviceAccount.private_key?.length,
+      privateKeyPreview: serviceAccount.private_key?.substring(0, 50),
+    });
+    throw new Error(
+      "Missing GOOGLE_CLIENT_EMAIL or GOOGLE_PRIVATE_KEY environment variables."
+    );
+  }
+
+  // Validate private key format
+  if (!serviceAccount.private_key.includes("BEGIN PRIVATE KEY") && 
+      !serviceAccount.private_key.includes("BEGIN RSA PRIVATE KEY")) {
+    console.error("Private key format validation failed:", {
+      keyPreview: serviceAccount.private_key.substring(0, 100),
+    });
+    throw new Error("Invalid private key format. Key must be in PEM format.");
+  }
+
+  // Debug log for key format (safely)
+  const keyLines = serviceAccount.private_key.split('\n');
+  console.log('Private key format check:', {
+    lineCount: keyLines.length,
+    hasHeader: keyLines[0]?.includes('BEGIN PRIVATE KEY'),
+    hasFooter: keyLines[keyLines.length - 1]?.includes('END PRIVATE KEY'),
+    firstLineLength: keyLines[0]?.length,
+    secondLineLength: keyLines[1]?.length, // Should be body content
   });
-  throw new Error(
-    "Missing GOOGLE_CLIENT_EMAIL or GOOGLE_PRIVATE_KEY environment variables."
-  );
-}
 
-// Validate private key format
-if (!serviceAccount.private_key.includes("BEGIN PRIVATE KEY") && 
-    !serviceAccount.private_key.includes("BEGIN RSA PRIVATE KEY")) {
-  console.error("Private key format validation failed:", {
-    keyPreview: serviceAccount.private_key.substring(0, 100),
-  });
-  throw new Error("Invalid private key format. Key must be in PEM format.");
-}
-
-// Debug log for key format (safely)
-const keyLines = serviceAccount.private_key.split('\n');
-console.log('Private key format check:', {
-  lineCount: keyLines.length,
-  hasHeader: keyLines[0]?.includes('BEGIN PRIVATE KEY'),
-  hasFooter: keyLines[keyLines.length - 1]?.includes('END PRIVATE KEY'),
-  firstLineLength: keyLines[0]?.length,
-  secondLineLength: keyLines[1]?.length, // Should be body content
-});
-
-let analyticsDataClient: BetaAnalyticsDataClient;
-try {
-  analyticsDataClient = new BetaAnalyticsDataClient({
-    credentials: {
-      client_email: serviceAccount.client_email,
-      private_key: serviceAccount.private_key,
-    },
-    projectId: serviceAccount.project_id,
-  });
-} catch (error) {
-  console.error("Failed to initialize AnalyticsDataClient:", error);
-  throw new Error(
-    `Failed to initialize Google Analytics client: ${error instanceof Error ? error.message : "Unknown error"}`
-  );
+  try {
+    return new BetaAnalyticsDataClient({
+      credentials: {
+        client_email: serviceAccount.client_email,
+        private_key: serviceAccount.private_key,
+      },
+      projectId: serviceAccount.project_id,
+    });
+  } catch (error) {
+    console.error("Failed to initialize AnalyticsDataClient:", error);
+    throw new Error(
+      `Failed to initialize Google Analytics client: ${error instanceof Error ? error.message : "Unknown error"}`
+    );
+  }
 }
 
 export const dynamic = "force-dynamic";
@@ -103,6 +105,7 @@ export async function GET(request: NextRequest) {
       endDate = end;
     }
 
+    const analyticsDataClient = getAnalyticsClient();
     const [report] = await analyticsDataClient.runReport({
       property: `properties/${PROPERTY_ID}`,
       //dimensions: [{ name: "pagePath" }],
