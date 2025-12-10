@@ -10,6 +10,8 @@ import {
 } from '@mui/material';
 import Layout from '../layout/Layout';
 import SubHeader from '../subHeader/SubHeader';
+import { usePageViewCount } from '@learner/hooks/usePageViewCount';
+import { usePathname } from 'next/navigation';
 
 // Dynamic import of Content component with SSR disabled
 const Content = dynamic(() => import('@Content'), {
@@ -32,6 +34,9 @@ const List: React.FC<ListProps> = ({
   // title = 'Content List',
   className = '',
 }) => {
+  const pathname = usePathname();
+ const { pageViews, loading, error } = usePageViewCount(pathname);
+
   const [totalCount, setTotalCount] = useState<number>(0);
   const [selectedFilter, setSelectedFilter] = useState<any>('');
 
@@ -124,6 +129,7 @@ const List: React.FC<ListProps> = ({
                     }}
                     hasMoreData={false}
                   />
+                
                 </Box>
               </Box>
             </Suspense>
@@ -227,7 +233,22 @@ const List: React.FC<ListProps> = ({
                 hasMoreData={false}
               />
             </Box>
+           
           </Box>
+        {pageViews && <Box sx={{ 
+          fontSize: '16px', 
+          color: '#363d47', 
+          fontWeight: 500, 
+          textAlign: 'center', 
+          mt: 4, 
+          p: 2, 
+          backgroundColor: 'rgba(255, 255, 255, 0.9)', 
+          borderRadius: '8px',
+          width: 'fit-content',
+          mx: 'auto'
+        }}>
+         Total Visitors: {pageViews}
+        </Box>}
         </Box>
       </Box>
     </Layout>
