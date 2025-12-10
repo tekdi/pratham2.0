@@ -23,8 +23,9 @@ export function usePageViewCount(path: string | null | undefined) {
 
       try {
         const response = await fetch(
-          `/api/analytics/pageviews?path=${encodeURIComponent(path)}`
+          `${process.env.NEXT_PUBLIC_LEARNER_SBPLAYER?.replace("/sbplayer", "")}/api/analytics/pageviews?path=${encodeURIComponent(path)}`
         );
+        
          
         const data: PageViewResponse = await response.json();
 
