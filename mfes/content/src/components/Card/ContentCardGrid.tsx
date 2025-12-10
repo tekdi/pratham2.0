@@ -175,6 +175,7 @@ console.log("props.contentData",props.contentData)
             lg={3}
             xl={2.4}
             {..._grid}
+            sx={{ display: 'flex', ...(_grid?.sx ?? {}) }}
           >
             <ContentCard
               item={item}
