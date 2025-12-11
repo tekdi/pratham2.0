@@ -36,7 +36,7 @@ const List: React.FC<ListProps> = ({
 }) => {
   const pathname = usePathname();
   console.log(pathname, 'pathname');
- const { pageViews, loading, error } = usePageViewCount(pathname);
+ const { pageViews, loading, error } = usePageViewCount("/");
  const { pageViews: pageViewsCount, loading: loadingCount, error: errorCount } = usePageViewCount("/themantic");
 
 
