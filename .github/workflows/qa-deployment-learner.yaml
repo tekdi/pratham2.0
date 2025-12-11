@@ -54,7 +54,7 @@ jobs:
             if [ -f .env ]; then
             rm .env
             fi
-            echo "${{ secrets.QA_PLP_ENV }}" > .env
+            printf '%s' "${{ secrets.QA_PLP_ENV }}" > .env
             ls -ltra
             docker stop qa-plp-learner || true
             docker system prune -af || true
