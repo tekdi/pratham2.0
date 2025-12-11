@@ -35,7 +35,10 @@ const List: React.FC<ListProps> = ({
   className = '',
 }) => {
   const pathname = usePathname();
- const { pageViews, loading, error } = usePageViewCount(pathname);
+  console.log(pathname, 'pathname');
+ const { pageViews, loading, error } = usePageViewCount("/");
+ const { pageViews: pageViewsCount, loading: loadingCount, error: errorCount } = usePageViewCount("/themantic");
+
 
   const [totalCount, setTotalCount] = useState<number>(0);
   const [selectedFilter, setSelectedFilter] = useState<any>('');
@@ -236,7 +239,7 @@ const List: React.FC<ListProps> = ({
             </Box>
            
           </Box>
-        {pageViews && <Box sx={{ 
+        {pageViews && pageViewsCount && <Box sx={{ 
           fontSize: '16px', 
           color: '#363d47', 
           fontWeight: 500, 
@@ -248,7 +251,7 @@ const List: React.FC<ListProps> = ({
           width: 'fit-content',
           mx: 'auto'
         }}>
-         Total Visitors: {pageViews}
+         Total Visitors: {pageViews+pageViewsCount}
         </Box>}
         </Box>
       </Box>
