@@ -51,7 +51,8 @@ const DynamicForm = ({
   parentDataAddUiSchema = {},
   parentDataSchema = {},
 }: any) => {
-  console.log('forEditedschema', forEditedschema);
+  console.log('schema=======>', schema);
+  console.log('uiSchema=======>', uiSchema);
   const { t } = useTranslation();
   const hasPrefilled = useRef(false);
   const [submitted, setSubmitted] = useState(false);

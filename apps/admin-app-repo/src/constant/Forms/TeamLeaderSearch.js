@@ -371,7 +371,7 @@ export const TeamLeaderSearchSchema = {
       enum: ['asc', 'desc'],
       enumNames: ['A-Z', 'Z-A'],
     },
-    status: {
+    tenantStatus: {
       type: 'string',
       title: 'Status',
       enum: ['active', 'archived'],
@@ -390,7 +390,7 @@ export const TeamLeaderSearchUISchema = {
     'batch',
     'name',
     'sortBy',
-    'status',
+    'tenantStatus',
   ],
 
   state: {
@@ -450,7 +450,7 @@ export const TeamLeaderSearchUISchema = {
     'ui:widget': 'select',
   },
 
-  status: {
+  tenantStatus: {
     'ui:widget': 'select',
   },
 };

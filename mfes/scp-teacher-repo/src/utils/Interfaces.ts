@@ -95,7 +95,7 @@ export interface CohortMemberList {
   filters: {
     cohortId: string;
     role?: string;
-    status?: string[];
+    tenantStatus?: string[];
     name?: string | undefined;
     firstName?: string;
   };

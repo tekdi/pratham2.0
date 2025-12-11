@@ -91,7 +91,7 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
   const theme = useTheme<any>();
   const today = new Date();
   const router = useRouter();
-  const { userId }: any = router.query;
+  const { userId , source }: any = router.query;
   const store = useStore();
   const isActiveYear = store.isActiveYearSelected;
   const [selectedUserEmail, setSelectedUserEmail] = useState('');
@@ -967,7 +967,7 @@ if (familyField?.displayValue) {
         </Grid>
       </Grid>
 
-      {isActiveYear && (
+      {isActiveYear && source !== 'user-registration' && (
         <Box>
           <Box padding={'22px 18px'} className="linerGradient br-md-8">
             <Box

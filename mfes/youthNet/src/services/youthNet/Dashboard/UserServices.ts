@@ -23,7 +23,7 @@ export interface userListParam {
   //  page: number;
   filters: {
     role?: string;
-    status?: string[];
+    tenantStatus?: string[];
     states?: string;
     district?: string[];
     block?: string[];
@@ -102,7 +102,7 @@ export const getYouthDataByDate = async (
   try {
     const filters = {
       role: Role.LEARNER,
-      status: [Status.ACTIVE],
+      tenantStatus: [Status.ACTIVE],
       fromDate: fromDate.toLocaleDateString('en-CA').split('T')[0],
       toDate: toDate.toLocaleDateString('en-CA').split('T')[0],
       village: villageId,
@@ -198,6 +198,21 @@ export const deleteUser = async (
     return response?.data;
   } catch (error) {
     console.error('error in deleting user', error);
+    return error;
+  }
+};
+
+export const updateUserTenantStatus = async (
+  userId: string,
+  tenantId: string,
+  userDetails?: object
+): Promise<any> => {
+  const apiUrl: string = API_ENDPOINTS.userTenantStatus(userId, tenantId);
+  try {
+    const response = await patch(apiUrl, userDetails);
+    return response?.data;
+  } catch (error) {
+    console.error('error in updating user tenant status', error);
     return error;
   }
 };

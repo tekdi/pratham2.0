@@ -109,6 +109,16 @@ const [responseFormData, setResponseFormData] = useState<any>({});
             },
           },
         ]);
+
+        const responseFormForEnroll: any = await fetchForm([
+         
+          {
+            fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.learner.context}&contextType=${FormContext.learner.contextType}`,
+            header: {
+              tenantid: localStorage.getItem('tenantId'),
+            },
+          },
+        ]);
         const responseFormCopy = JSON.parse(JSON.stringify(responseForm));
         setResponseFormData(responseFormCopy);
         console.log('responseForm===>', responseFormCopy?.schema);
@@ -141,11 +151,15 @@ const [responseFormData, setResponseFormData] = useState<any>({});
             responseForm?.schema,
             useInfo?.result?.userData
           );
+          const updatedSchemaForEnroll = getMissingFields(
+            responseFormForEnroll?.schema,
+            useInfo?.result?.userData
+          );
           console.log(updatedSchema);
 
           setUserFormData(mappedData);
           //unit name is missing from required so handled from frotnend
-          let alterSchema = completeProfile
+          let alterSchema = uponEnrollCompletion?updatedSchemaForEnroll:completeProfile
             ? updatedSchema
             : responseForm?.schema;
           let alterUISchema = responseForm?.uiSchema;
@@ -241,7 +255,16 @@ const [responseFormData, setResponseFormData] = useState<any>({});
     }
     console.log('payload', payload);
     const { userData, customFields } = splitUserData(payload);
-
+const data= {
+  fieldId:
+   'f8dc1d5f-9b2b-412e-a22a-351bd8f14963',
+  value: 'pending'
+}
+const storedUiConfig = JSON.parse(localStorage.getItem('uiConfig') || '{}');
+      const userTenantStatus = storedUiConfig?.isTenantPendingStatus;
+if(enrolledProgram && userTenantStatus){
+  customFields.push(data);
+}
     const parentPhoneField = customFields.find(
       (field: any) => field.value === formData.parent_phone
     );

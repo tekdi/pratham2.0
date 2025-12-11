@@ -1,3 +1,4 @@
+//@ts-nocheck
 const baseurl = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;
 
 const API_ENDPOINTS = {
@@ -16,6 +17,7 @@ const API_ENDPOINTS = {
   resetPassword: `${baseurl}/user/reset-password`,
   fieldOptionsRead: `${baseurl}/fields/options/read`,
   cohortSearch: `${baseurl}/cohort/search`,
+  userTenantStatus: `${baseurl}/user-tenant/status`,
   fieldOptionDelete: (type: string, option: string) => `${baseurl}/fields/options/delete/${type}?option=${option}`,
   fieldUpdate: (fieldId: string) => `${baseurl}/fields/update/${fieldId}`,
   cohortUpdate: (cohortId: string) => `${baseurl}/cohort/update/${cohortId}`,
@@ -54,6 +56,7 @@ const API_ENDPOINTS = {
   contentSearchStatus: `${baseurl}/tracking/content/search/status`,
   contentCreate: `${baseurl}/tracking/content/create`,
   updateCohortUser: (userId: string | string[])=>`${baseurl}/user/v1/cohort/update/${userId}`,
+  userTenantStatus: (userId: string, tenantId: string) =>`${baseurl}/user-tenant/status?userId=${userId}&tenantId=${tenantId}`,
   userCertificateStatusSearch: `${baseurl}/tracking/user_certificate/status/search`
 };
 

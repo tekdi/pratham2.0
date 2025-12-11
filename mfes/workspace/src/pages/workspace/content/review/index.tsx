@@ -338,7 +338,7 @@ const ReviewContentSubmissions = () => {
                       fontSize: "16px",
                     }}
                   >
-                    {contentDetails.name}
+                    {contentDetails?.name || '-'}
                   </Box>
                 </Box>
 
@@ -360,7 +360,29 @@ const ReviewContentSubmissions = () => {
                       fontSize: "16px",
                     }}
                   >
-                    {contentDetails.creator}
+                    {contentDetails?.creator || '-'}
+                  </Box>
+                </Box>
+
+                <Box sx={{ mb: 2, padding: ' 0 16px' }}>
+                  <Box
+                    sx={{
+                      fontWeight: "600",
+                      color: "#969088",
+                      fontSize: "12px",
+                      mb: "4px",
+                    }}
+                  >
+                    Program:
+                  </Box>
+                  <Box
+                    sx={{
+                      fontWeight: "400",
+                      color: "#4D4639",
+                      fontSize: "16px",
+                    }}
+                  >
+                    {Array.isArray(contentDetails.program)? contentDetails.program.join(", "): contentDetails.program}
                   </Box>
                 </Box>
 
@@ -382,7 +404,7 @@ const ReviewContentSubmissions = () => {
                       fontSize: "16px",
                     }}
                   >
-                    {contentDetails.description}
+                    {contentDetails?.description || 'No description available'}
                   </Box>
                 </Box>
 
@@ -404,7 +426,7 @@ const ReviewContentSubmissions = () => {
                       fontSize: "16px",
                     }}
                   >
-                    {contentDetails.primaryCategory}
+                    {contentDetails?.primaryCategory || '-'}
                   </Box>
                 </Box>
 
@@ -426,7 +448,7 @@ const ReviewContentSubmissions = () => {
                       fontSize: "16px",
                     }}
                   >
-                    {formatDate(contentDetails.createdOn)}
+                    {formatDate(contentDetails?.createdOn || '-')}
                   </Box>
                 </Box>
 
@@ -448,7 +470,7 @@ const ReviewContentSubmissions = () => {
                       fontSize: "16px",
                     }}
                   >
-                    {formatDate(contentDetails.lastUpdatedOn)}
+                    {formatDate(contentDetails?.lastUpdatedOn || '-')}
                   </Box>
                 </Box>
               </Box>
