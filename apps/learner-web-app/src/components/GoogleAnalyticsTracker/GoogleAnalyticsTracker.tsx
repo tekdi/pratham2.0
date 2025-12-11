@@ -28,8 +28,14 @@ const GoogleAnalyticsTracker = () => {
       window.GA_INITIALIZED = true;
     }
   }
+  console.log(pathname, 'pathname');
+  if(pathname.includes('themantic')) {
+    console.log('Initializing GA for Themantic');
+    logPageView(`/`);
+  }
+  else {
     logPageView(pathname);
-  
+  }
   }, [pathname]);
 
   return null;
