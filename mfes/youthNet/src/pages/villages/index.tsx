@@ -572,59 +572,6 @@ const Index = () => {
     };
     if (value === 3 && selectedVillageValue !== '') getYouthData();
   }, [value, selectedVillageValue]);
-  // Move getMentorData to component scope so it can be called from callbacks
-  const getMentorData = async () => {
-    try {
-      if (selectedDistrictValue !== '' && value === 1) {
-        setLoading(true);
-        const filters = {
-          district: [selectedDistrictValue],
-          role: Role.INSTRUCTOR,
-          status: [Status.ACTIVE],
-        };
-        const result = await fetchUserList({ filters });
-        const transformedMentorData = result?.getUserDetails.map(
-          (user: any) => {
-            let name = user.firstName || '';
-            const villageField = user?.customFields?.find(
-              (field: any) => field.label === cohortHierarchy.VILLAGE
-            );
-            const blockField = user?.customFields?.find(
-              (field: any) => field.label === cohortHierarchy.BLOCK
-            );
-            const blockValues = blockField?.selectedValues.map(
-              (block: any) => block.value
-            );
-
-            if (user.lastName) {
-              name += ` ${user.lastName}`;
-            }
-            return {
-              Id: user.userId,
-              name: name.trim(),
-              //  dob:user?.dob ,
-              firstName: user?.firstName,
-              villageCount: villageField?.selectedValues.length,
-              lastName: user?.lastName,
-              blockNames: blockValues,
-              showMore: true,
-              customFields: user?.customFields,
-            };
-          }
-        );
-        const ascending = [...transformedMentorData].sort((a, b) =>
-          a.name.localeCompare(b.name)
-        );
-        setMentorList(ascending);
-        setFilteredmentorList(ascending);
-        setMentorCount(transformedMentorData.length);
-      }
-    } catch (e) {
-      console.log(e);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const getMobilizersList = async () => {
     try {
@@ -654,7 +601,7 @@ const Index = () => {
               name: name.trim(),
               firstName: user?.firstName,
               lastName: user?.lastName,
-              showMore: true,
+              // showMore: true,
               customFields: user?.customFields,
             };
           });
