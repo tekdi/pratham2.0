@@ -16,7 +16,7 @@ jobs:
 
       # Step 2: Create a .env file
       - name: Create .env file
-        run: echo "${{ secrets.QA_PLP_ENV }}" > .env && ls -ltra
+        run: echo "${{ secrets.QA_PLP_ENV }}" | sed 's/\\n/\n/g' > .env && ls -ltra
 
       # Step 4: Build and tag the Docker image
       - name: Build Docker image
