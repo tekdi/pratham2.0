@@ -29,7 +29,7 @@ const GoogleAnalyticsTracker = () => {
     }
   }
   console.log(pathname, 'pathname');
-  if(pathname.includes('themantic')) {
+  if(pathname =="/themantic") {
     console.log('Initializing GA for Themantic');
     logPageView(`/`);
   }
