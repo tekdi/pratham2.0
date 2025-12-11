@@ -16,9 +16,7 @@ jobs:
 
       # Step 2: Create a .env file
       - name: Create .env file
-        run: |
-          printf '%b' "${{ secrets.QA_PLP_ENV }}" > .env
-          ls -ltra
+        run: echo "${{ secrets.QA_PLP_ENV }}" > .env && ls -ltra
 
       # Step 4: Build and tag the Docker image
       - name: Build Docker image
@@ -54,7 +52,7 @@ jobs:
             if [ -f .env ]; then
             rm .env
             fi
-            printf '%b' "${{ secrets.QA_PLP_ENV }}" > .env
+            echo "${{ secrets.QA_PLP_ENV }}" > .env
             ls -ltra
             docker stop qa-plp-learner || true
             docker system prune -af || true
