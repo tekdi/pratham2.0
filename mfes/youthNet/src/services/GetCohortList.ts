@@ -1,5 +1,6 @@
+import { get } from '@shared-lib';
 import API_ENDPOINTS from '../utils/API/APIEndpoints';
-import { get } from './RestClient';
+
 export const getCohortList = async (
   userId: string | string[],
   children?: boolean,
@@ -10,7 +11,7 @@ export const getCohortList = async (
     const response = await get(apiUrl);
     return response?.data;
   } catch (error) {
-    console.error('error in fetching user details', error);
+    console.error('error in fetching cohort list', error);
     return error;
   }
 };

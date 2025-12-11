@@ -5,6 +5,7 @@ import validator from '@rjsf/validator-ajv8';
 import axios from 'axios';
 import axiosInstance from '@/services/Interceptor';
 import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
+import { enhanceUiSchemaWithGrid } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
 import {
@@ -36,7 +37,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import SimpleModal from '@/components/SimpleModal';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { updateCohortMemberStatus } from '@/services/CohortService/cohortService';
+import { bulkCreateCohortMembers, updateCohortMemberStatus } from '@/services/CohortService/cohortService';
 import editIcon from '../../public/images/editIcon.svg';
 import apartment from '../../public/images/apartment.svg';
 import deleteIcon from '../../public/images/deleteIcon.svg';
@@ -57,22 +58,25 @@ import {
 } from '@/utils/Helper';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
 import restoreIcon from '../../public/images/restore_user.svg';
 import { showToastMessage } from '@/components/Toastify';
-import CenterListWidget from '@/components/MapUser/CenterListWidget';
-import EmailSearchUser from '@/components/MapUser/EmailSearchUser';
+import CenterListWidget from '@shared-lib-v2/MapUser/CenterListWidget';
+import EmailSearchUser from '@shared-lib-v2/MapUser/EmailSearchUser';
 import { API_ENDPOINTS } from '@/utils/API/APIEndpoints';
 import { updateUser } from '@/services/CreateUserService';
 import { splitUserData } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
+import { enrollUserTenant } from '@shared-lib-v2/MapUser/MapService';
 
-const LeaderUser = () => {
+const UserLeader = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [schema, setSchema] = useState(TeamLeaderSearchSchema);
   const [uiSchema, setUiSchema] = useState(TeamLeaderSearchUISchema);
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
+  const [prefilledState, setPrefilledState] = useState({});
   const [prefilledAddFormData, setPrefilledAddFormData] = useState({});
   const [pageLimit, setPageLimit] = useState<number>(10);
   const [pageOffset, setPageOffset] = useState<number>(0);
@@ -102,6 +106,8 @@ const LeaderUser = () => {
   const { t, i18n } = useTranslation();
   const theme = useTheme<any>();
   const formRef = useRef(null);
+
+  const [formStep, setFormStep] = useState(0);
 
   const initialFormData = localStorage.getItem('stateId')
     ? { state: [localStorage.getItem('stateId')] }
@@ -154,6 +160,20 @@ const LeaderUser = () => {
       if (alterUISchema?.mobile) {
         alterUISchema.mobile['ui:disabled'] = true;
       }
+
+      //bug fix for bakcend multiple times same fields in both form
+      let requiredArray = alterSchema?.required;
+      if (Array.isArray(requiredArray)) {
+        // Remove duplicates from requiredArray
+        requiredArray = Array.from(new Set(requiredArray));
+      }
+      alterSchema.required = requiredArray;
+
+      //set 2 grid layout
+      alterUISchema = enhanceUiSchemaWithGrid(alterUISchema);
+
+      console.log('############# debugschema alterUISchema', alterUISchema);
+      console.log('############# debugschema alterSchema', alterSchema);
 
       setAddSchema(alterSchema);
       setAddUiSchema(alterUISchema);
@@ -596,6 +616,8 @@ const LeaderUser = () => {
               width: '200px',
             }}
             onClick={() => {
+              setPrefilledState({});
+              setFormStep(0);
               setSelectedUserId(null);
               setUserDetails(null);
               setMapModalOpen(true);
@@ -689,19 +711,22 @@ const LeaderUser = () => {
       {/* Map Modal Dialog */}
       <Dialog
         open={mapModalOpen}
-        onClose={() => {
-          setMapModalOpen(false);
-          setSelectedCenterId(null); // Reset center selection when dialog closes
-          setSelectedUserId(null); // Reset user selection when dialog closes
-          setUserDetails(null);
+        onClose={(event, reason) => {
+          // Prevent closing on backdrop click
+          if (reason !== 'backdropClick') {
+            setMapModalOpen(false);
+            setSelectedCenterId(null); // Reset center selection when dialog closes
+            setSelectedUserId(null); // Reset user selection when dialog closes
+            setUserDetails(null);
+          }
         }}
         maxWidth={false}
         fullWidth={true}
         PaperProps={{
           sx: {
-            width: '90%',
-            maxWidth: '1200px',
-            maxHeight: '90vh',
+            width: '100%',
+            maxWidth: '100%',
+            maxHeight: '100vh',
           },
         }}
       >
@@ -714,8 +739,34 @@ const LeaderUser = () => {
             p: 2,
           }}
         >
+          {formStep === 1 ? (
+            <Button
+              sx={{
+                backgroundColor: '#FFC107',
+                color: '#000',
+                fontFamily: 'Poppins',
+                fontWeight: 500,
+                fontSize: '14px',
+                height: '40px',
+                lineHeight: '20px',
+                letterSpacing: '0.1px',
+                textAlign: 'center',
+                verticalAlign: 'middle',
+                '&:hover': {
+                  backgroundColor: '#ffb300',
+                },
+                p: 2,
+              }}
+              startIcon={<ArrowBackIcon />}
+              onClick={() => setFormStep(0)}
+            >
+              {t('COMMON.BACK')}
+            </Button>
+          ) : (
+            <Typography variant="h1" component="div"></Typography>
+          )}
           <Typography variant="h1" component="div">
-            {t('Map User as Team Lead')}
+            {t('Map User as Lead')}
           </Typography>
           <IconButton
             aria-label="close"
@@ -728,147 +779,182 @@ const LeaderUser = () => {
           </IconButton>
         </DialogTitle>
         <DialogContent sx={{ p: 3, overflowY: 'auto' }}>
-          <Box sx={{ mb: 3 }}>
-            <EmailSearchUser
-              onUserSelected={(userId) => {
-                setSelectedUserId(userId || null);
-                console.log('Selected User ID:', userId);
-              }}
-              onUserDetails={(userDetails) => {
-                console.log('############# userDetails', userDetails);
-                setUserDetails(userDetails);
-              }}
-              schema={addSchema}
-              uiSchema={addUiSchema}
-            />
-          </Box>
-          <hr />
-          <CenterListWidget
-            value={selectedCenterId}
-            onChange={(centerId) => {
-              setSelectedCenterId(centerId);
-              console.log('Selected Center ID:', centerId);
-            }}
-            label="Select Center"
-            required={true}
-            multiple={false}
-          />
+          {formStep === 0 && (
+            <Box sx={{ mb: 3 }}>
+              <EmailSearchUser
+                onUserSelected={(userId) => {
+                  setSelectedUserId(userId || null);
+                  console.log('Selected User ID:', userId);
+                }}
+                onUserDetails={(userDetails) => {
+                  console.log('############# userDetails', userDetails);
+                  setUserDetails(userDetails);
+                  setFormStep(1);
+                }}
+                schema={addSchema}
+                uiSchema={addUiSchema}
+                prefilledState={prefilledState}
+                onPrefilledStateChange={(prefilledState) => {
+                  setPrefilledState(prefilledState || {});
+                }}
+                roleId={roleId}
+                tenantId={tenantId}
+                type="leader"
+              />
+            </Box>
+          )}
+          {formStep === 1 && (
+            <Box sx={{ mb: 3 }}>
+              <CenterListWidget
+                value={selectedCenterId}
+                onChange={(centerId) => {
+                  setSelectedCenterId(centerId);
+                  console.log('Selected Center ID:', centerId);
+                }}
+                label="Select Center"
+                required={true}
+                multiple={false}
+              />
+            </Box>
+          )}
         </DialogContent>
         <DialogActions sx={{ p: 2, borderTop: '1px solid #eee' }}>
-          <Button
-            variant="contained"
-            color="primary"
-            fullWidth
-            onClick={async () => {
-              if (selectedUserId && selectedCenterId) {
-                setIsMappingInProgress(true);
-                try {
-                  const { userData, customFields } = splitUserData(userDetails);
+          {formStep === 0 && (
+            <Button
+              sx={{
+                backgroundColor: '#FFC107',
+                color: '#000',
+                fontFamily: 'Poppins',
+                fontWeight: 500,
+                fontSize: '14px',
+                height: '40px',
+                lineHeight: '20px',
+                letterSpacing: '0.1px',
+                textAlign: 'center',
+                verticalAlign: 'middle',
+                '&:hover': {
+                  backgroundColor: '#ffb300',
+                },
+                width: '100%',
+              }}
+              disabled={!selectedUserId || isMappingInProgress}
+              form="dynamic-form-id"
+              type="submit"
+            >
+              {t('COMMON.NEXT')}
+            </Button>
+          )}
+          {formStep === 1 && (
+            <Button
+              variant="contained"
+              color="primary"
+              fullWidth
+              onClick={async () => {
+                if (selectedUserId && selectedCenterId) {
+                  setIsMappingInProgress(true);
+                  try {
+                    const { userData, customFields } =
+                      splitUserData(userDetails);
 
-                  delete userData.email;
+                    delete userData.email;
 
-                  const object = {
-                    userData: userData,
-                    customFields: customFields,
-                  };
+                    const object = {
+                      userData: userData,
+                      customFields: customFields,
+                    };
 
-                  //update user details
-                  const updateUserResponse = await updateUser(
-                    selectedUserId,
-                    object
-                  );
-                  // console.log('updatedResponse', updateUserResponse);
-
-                  if (
-                    updateUserResponse &&
-                    updateUserResponse?.data?.params?.err === null
-                  ) {
-                    // getNotification(editableUserId, profileUpdateNotificationKey);
-                    showToastMessage(
-                      t('TEAM_LEADERS.TEAM_LEADER_UPDATED_SUCCESSFULLY'),
-                      'success'
-                    );
-                    // telemetryCallbacks(telemetryUpdateKey);
-
-                    //map user to tenant
-                    // Ensure selectedCenterId is a string (handle array case)
-                    const cohortId = Array.isArray(selectedCenterId)
-                      ? selectedCenterId[0]
-                      : selectedCenterId;
-
-                    console.log('Creating with User ID:', selectedUserId);
-                    console.log(
-                      'Creating with Center ID (cohortId):',
-                      cohortId
-                    );
-
-                    // Call the cohortmember/create API
-                    const response = await axiosInstance.post(
-                      `${API_ENDPOINTS.cohortMemberCreate}`,
-                      {
-                        cohortId: cohortId,
-                        userId: selectedUserId,
-                      },
-                      {
-                        headers: {
-                          accept: '*/*',
-                          'Content-Type': 'application/json',
-                        },
-                      }
-                    );
+                    //update user details
+                    const updateUserResponse = await enrollUserTenant({
+                      userId: selectedUserId,
+                      tenantId: tenantId,
+                      roleId: roleId,
+                      customFields: customFields,
+                      userData: userData,
+                    });
+                    console.log('######### updatedResponse', updateUserResponse);
 
                     if (
-                      response?.data?.responseCode === 200 ||
-                      response?.status === 200
+                      updateUserResponse &&
+                      updateUserResponse?.params?.err === null
                     ) {
+                      // getNotification(editableUserId, profileUpdateNotificationKey);
                       showToastMessage(
-                        t('TEAM_LEADERS.TEAM_LEADER_CREATED_SUCCESSFULLY'),
+                        t(successUpdateMessage),
                         'success'
                       );
-                      // Close dialog
-                      setMapModalOpen(false);
-                      setSelectedCenterId(null);
-                      setSelectedUserId(null);
-                      // Refresh the data
-                      searchData(prefilledFormData, 0);
+                      // telemetryCallbacks(telemetryUpdateKey);
+
+                      //map user to tenant
+                      // Ensure selectedCenterId is a string (handle array case)
+                      const cohortId = Array.isArray(selectedCenterId)
+                        ? selectedCenterId[0]
+                        : selectedCenterId;
+
+                      console.log('Creating with User ID:', selectedUserId);
+                      console.log(
+                        'Creating with Center ID (cohortId):',
+                        cohortId
+                      );
+
+                      // Call the cohortmember/create API
+                      const response = await bulkCreateCohortMembers({
+                        userId: [selectedUserId],
+                        cohortId: [cohortId],
+                        // removeCohortId: [],
+                      });
+
+                      if (
+                        response?.responseCode === 201 ||
+                        response?.data?.responseCode === 201 ||
+                        response?.status === 201
+                      ) {
+                        showToastMessage(
+                          t(successCreateMessage),
+                          'success'
+                        );
+                        // Close dialog
+                        setMapModalOpen(false);
+                        setSelectedCenterId(null);
+                        setSelectedUserId(null);
+                        // Refresh the data
+                        searchData(prefilledFormData, 0);
+                      } else {
+                        showToastMessage(
+                          response?.data?.params?.errmsg ||
+                            t(failureCreateMessage),
+                          'error'
+                        );
+                      }
                     } else {
+                      // console.error('Error update user:', error);
                       showToastMessage(
-                        response?.data?.params?.errmsg ||
-                          t('TEAM_LEADERS.NOT_ABLE_CREATE_TEAM_LEADER'),
+                        t(failureUpdateMessage),
                         'error'
                       );
                     }
-                  } else {
-                    // console.error('Error update user:', error);
+                  } catch (error) {
+                    console.error('Error creating cohort member:', error);
                     showToastMessage(
-                      t('TEAM_LEADERS.NOT_ABLE_UPDATE_TEAM_LEADER'),
+                      error?.response?.data?.params?.errmsg ||
+                        t(failureCreateMessage),
                       'error'
                     );
+                  } finally {
+                    setIsMappingInProgress(false);
                   }
-                } catch (error) {
-                  console.error('Error creating cohort member:', error);
-                  showToastMessage(
-                    error?.response?.data?.params?.errmsg ||
-                      t('TEAM_LEADERS.NOT_ABLE_CREATE_TEAM_LEADER'),
-                    'error'
-                  );
-                } finally {
-                  setIsMappingInProgress(false);
+                } else if (!selectedUserId) {
+                  showToastMessage('Please search and select a user', 'error');
+                } else {
+                  showToastMessage('Please select a center', 'error');
                 }
-              } else if (!selectedUserId) {
-                showToastMessage('Please search and select a user', 'error');
-              } else {
-                showToastMessage('Please select a center', 'error');
+              }}
+              disabled={
+                !selectedUserId || !selectedCenterId || isMappingInProgress
               }
-            }}
-            disabled={
-              !selectedUserId || !selectedCenterId || isMappingInProgress
-            }
-            form="map-user-form"
-            type="submit"
-          >
-            {t('Map as Team Lead')}
-          </Button>
+            >
+              {t('Map as Team Lead')}
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
     </>
@@ -882,4 +968,4 @@ export async function getStaticProps({ locale }: any) {
   };
 }
 
-export default LeaderUser;
+export default UserLeader;
