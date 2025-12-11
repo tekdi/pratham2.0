@@ -1,4 +1,4 @@
-import { post } from '@/services/RestClient';
+import { post } from '../DynamicForm/services/RestClient';
 import { API_ENDPOINTS } from '@shared-lib-v2/utils/API/EndUrls';
 
 export const enrollUserTenant = async ({
