@@ -263,3 +263,33 @@ export const fetchStateOptions = async (data: any) => {
     console.error('Error fetching state options:', error);
   }
 };
+export const getFieldOptions = async ({
+  controllingfieldfk,
+  fieldName,
+  limit,
+  offset,
+  optionName,
+  sort,
+}: StateListParam): Promise<any> => {
+  const apiUrl = API_ENDPOINTS.fieldOptionsRead;
+
+  const requestBody: StateListParam = {
+    fieldName,
+    limit,
+    offset,
+    sort,
+  };
+  if (controllingfieldfk) {
+    requestBody.controllingfieldfk = controllingfieldfk;
+  }
+  if (optionName) {
+    requestBody.optionName = optionName;
+  }
+  try {
+    const response = await post(apiUrl, requestBody);
+    return response?.data;
+  } catch (error) {
+    console.error('Error in fetching state, block, and district list', error);
+    throw error;
+  }
+};

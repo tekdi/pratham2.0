@@ -1,3 +1,4 @@
+//@ts-nocheck
 import {
   AssignCentersToFacilitatorListParam,
   FacilitatorDeleteUserData,
@@ -11,15 +12,19 @@ export interface userListParam {
   //  page: number;
   filters: {
     role?: string;
-    status?: string[];
+    tenantStatus?: string[];
     states?: string;
-    district?: string[];
-    block?: string[];
+    district?: (string | number)[];
+    block?: (string | number)[];
     fromDate?: string;
     toDate?: string;
-    village?: string[];
+    village?: (string | number)[];
     emp_manager?: string;
     name?: string;
+    tenantId?: string;
+    tenantStatus?: string[];
+    interested_to_join?: string;
+    state?: (string | number)[];
   };
   fields?: any;
   sort?: object;
@@ -121,6 +126,21 @@ export const fetchUserList = async ({
     } else {
       console.error('Network or unknown error:', error);
     }
+  }
+};
+
+export const updateUserTenantStatus = async (
+  userId: string,
+  tenantId: string,
+  status: string
+): Promise<any> => {
+  const apiUrl = `${API_ENDPOINTS.userTenantStatus}?userId=${userId}&tenantId=${tenantId}`;
+  try {
+    const response = await patch(apiUrl, { status });
+    return response?.data;
+  } catch (error) {
+    console.error('Error in updating user tenant status', error);
+    throw error;
   }
 };
 

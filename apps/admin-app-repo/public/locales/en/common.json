@@ -361,7 +361,9 @@
     "DELETE_PLANNER": "Delete Planner",
     "CSV_TEMPLATE": "CSV Template",
     "NEW_TOPIC": "New Topic",
-    "DOWNLOAD_CSV": "Download Uploaded CSV"
+    "DOWNLOAD_CSV": "Download Uploaded CSV",
+    "DURING_COURSE": "During Course"
+
   },
   "MASTER": {
     "STATE": "States",
@@ -754,6 +756,7 @@
   "REMOTE": "Remote",
   "IS_VOLUNTEER": "Is Volunteer",
   "middle_name": "Middle Name",
+  "CATCHMENT_AREA": "Catchment Area",
   "CONTENT_CREATORS": {
     "SEARCHBAR_PLACEHOLDER": "Search content creator..",
     "NEW_CONTENT_CREATOR": "New Content Creator",
