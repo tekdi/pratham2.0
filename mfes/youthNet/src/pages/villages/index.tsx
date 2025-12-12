@@ -745,7 +745,7 @@ const Index = () => {
         let userDataString = localStorage.getItem('userData');
         let userData: any = userDataString ? JSON.parse(userDataString) : null;
         let blockIds: any;
-        if (YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole()) {
+        if (YOUTHNET_USER_ROLE.MOBILIZER === getLoggedInUserRole()) {
           const blockResult = userData?.customFields?.find(
             (item: any) => item.label === 'BLOCK'
           );
@@ -784,7 +784,7 @@ const Index = () => {
   useEffect(() => {
     const getVillageList = async () => {
       try {
-        if (YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole()) {
+        if (YOUTHNET_USER_ROLE.MOBILIZER === getLoggedInUserRole()) {
           let villageDataString = localStorage.getItem('villageData');
           let villageData: any = villageDataString
             ? JSON.parse(villageDataString)
@@ -793,7 +793,7 @@ const Index = () => {
           if (selectedBlockValue === blockId) {
             setSelectedVillageValue(villageId);
           } else {
-            if (YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole())
+            if (YOUTHNET_USER_ROLE.MOBILIZER === getLoggedInUserRole())
               setSelectedVillageValue(villageId);
             else setSelectedVillageValue(villageData[0]?.Id);
           }
@@ -819,7 +819,7 @@ const Index = () => {
           if (selectedBlockValue === blockId) {
             setSelectedVillageValue(villageId);
           } else {
-            if (YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole())
+            if (YOUTHNET_USER_ROLE.MOBILIZER === getLoggedInUserRole())
               setSelectedVillageValue(villageId);
             else setSelectedVillageValue(transformedVillageData[0]?.Id);
           }
