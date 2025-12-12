@@ -234,7 +234,28 @@ const [responseFormData, setResponseFormData] = useState<any>({});
       delete payload.email;
     }
     console.log('payload', payload);
-    const { userData, customFields } = splitUserData(payload);
+    const { userData, customFields = [] } = splitUserData(payload);
+
+    // Ensure "WHAT PROGRAM ARE YOU PART OF" is explicitly sent even when empty
+    const programSchema =
+      responseFormData?.schema?.properties?.what_program_are_you_part_of;
+    const programFieldId = programSchema?.fieldId;
+    
+    const programFieldIndex = customFields.findIndex(
+      (field: any) =>
+        field?.fieldId === programFieldId ||
+        field?.label === 'WHAT PROGRAM ARE YOU PART OF'
+    );
+
+    if (programFieldIndex === -1) {
+      customFields.push({
+        fieldId: programFieldId,
+      
+        value: [],
+      });
+    } else if (!Array.isArray(customFields[programFieldIndex].selectedValues)) {
+      customFields[programFieldIndex].selectedValues = [];
+    }
 
     const parentPhoneField = customFields.find(
       (field: any) => field.value === formData.parent_phone
