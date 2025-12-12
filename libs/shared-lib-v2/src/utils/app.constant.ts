@@ -132,6 +132,7 @@ export enum RoleId {
   CONTENT_CREATOR = '45b8b0d7-e5c6-4f3f-a7bf-70f86e9357ce',
   CONTENT_REVIEWER = '2dc13fcc-29c4-42c1-b125-82d3dcaa4b42',
   CENTRAL_LEAD = '3873fc80-0940-4598-9c25-8af2590305e7',
+  MOBILIZER = 'a4694781-65c1-4b92-8ff1-ad490ab6d140',
 }
 
 export enum Pagination {
@@ -277,4 +278,5 @@ export enum TenantName {
   POS = 'Open School',
   PRAGYANPATH = 'Pragyanpath',
   CAMP_TO_CLUB = 'Camp to Club',
+  CREATIVITY_CLUB = 'Creativity Club',
 }

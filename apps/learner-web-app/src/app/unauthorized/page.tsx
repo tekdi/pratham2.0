@@ -45,12 +45,30 @@ const Unauthorized = () => {
       >
         {t("COMMON.YOU_DONT_HAVE_PERMISSION_TO_ACCESS_THIS_PAGE")}
       </Typography>
-
+      <Typography
+          sx={{ cursor: "pointer" }}
+          onClick={() => {
+            if(typeof window !== 'undefined' && localStorage.getItem("landingPage") ) {
+            router.push(localStorage.getItem("landingPage") || "/");
+            }
+            else{
+              if(typeof window !== 'undefined') {
+                localStorage.clear()
+              }
+              router.push("/");
+            }
+          }}
+          color={"secondary"}
+        >
+          {t("COMMON.GO_TO_HOME")}
+        </Typography>
       
         <Typography
           sx={{ cursor: "pointer" }}
           onClick={() => {
-            localStorage.clear();
+            if(typeof window !== 'undefined') {
+              localStorage.clear();
+            }
             // router.push("/login");
             router.push("/login");
           }}

@@ -40,7 +40,7 @@ function Logout() {
       // Specify the keys you want to keep
       preserveLocalStorage();
     }
-    router.replace('/login');
+    router.replace('/');
   }, []);
 
   return <Loader isLoading={true} />;

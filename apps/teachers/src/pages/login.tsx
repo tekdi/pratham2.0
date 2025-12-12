@@ -182,7 +182,8 @@ const LoginComponent = () => {
       if (
         tenant?.toLocaleLowerCase() ===
           TENANT_DATA?.SECOND_CHANCE_PROGRAM?.toLowerCase() ||
-        tenant?.toLocaleLowerCase() === TENANT_DATA?.PRATHAM_SCP?.toLowerCase()
+        tenant?.toLocaleLowerCase() === TENANT_DATA?.PRATHAM_SCP?.toLowerCase() ||
+        tenant?.toLocaleLowerCase() === TENANT_DATA?.YOUTHNET?.toLowerCase()
       ) {
         const userDetails = await getUserDetails(userId, true);
         console.log(userDetails);
@@ -231,8 +232,10 @@ const LoginComponent = () => {
             }
           }
 
-          if (activeSessionId) {
+          if (activeSessionId && tenant?.toLocaleLowerCase() === TENANT_DATA?.SECOND_CHANCE_PROGRAM?.toLowerCase()) {
             router.push('/teacher');
+          }else if (tenant?.toLocaleLowerCase() === TENANT_DATA?.YOUTHNET?.toLowerCase()){
+            router.push('/youth');
           }
           console.log('userDetails', userDetails);
         }

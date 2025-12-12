@@ -271,6 +271,7 @@ const ObservationDetails = () => {
           }
         }
       } catch (error) {
+        
         console.error('Error fetching cohort list:', error);
       }
     };
@@ -303,7 +304,7 @@ const ObservationDetails = () => {
     if (entity !== ObservationEntityType.CENTER) {
       result = Data.map((user) => {
         const submission =
-          fetchEntityResponse.find((sub) => sub._id === user.userId) || {};
+          fetchEntityResponse?.find((sub) => sub._id === user.userId) || {};
         return {
           name: user.name,
           _id: user.userId,
@@ -318,7 +319,7 @@ const ObservationDetails = () => {
       result =
         myCohortListForCenter?.map((cohort) => {
           const submission =
-            fetchEntityResponse.find((sub) => sub._id === cohort.cohortId) ||
+            fetchEntityResponse?.find((sub) => sub._id === cohort.cohortId) ||
             {};
           return {
             name: cohort?.name,
@@ -771,7 +772,7 @@ const ObservationDetails = () => {
                   mx: '11px',
                 }}
               >
-                {loading ? (
+                {loading || !observationId || observationId === '' ? (
                   <Box mx="auto">
                     <Loader
                       showBackdrop={false}

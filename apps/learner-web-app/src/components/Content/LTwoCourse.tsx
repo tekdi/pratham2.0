@@ -140,10 +140,7 @@ const LTwoCourse: React.FC = () => {
         'Error in handleSubmit:',
         response?.data?.message?.join('') ?? error
       );
-      showToastMessage(
-        `Error in handleSubmit: ${response?.data?.message?.join('') ?? error}`,
-        'error'
-      );
+      showToastMessage(t('LEARNER_APP.COMMON.REACHOUT_TO_MENTOR'), 'error');
       // Handle error appropriately
     }
   };

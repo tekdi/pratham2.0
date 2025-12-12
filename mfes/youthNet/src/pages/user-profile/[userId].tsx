@@ -25,7 +25,7 @@ import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
 import { FormContext } from '@shared-lib-v2/DynamicForm/components/DynamicFormConstant';
 import { fetchForm } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import SimpleModal from '../../components/SimpleModal';
-import { showToastMessage } from '@/components/Toastify';
+import { showToastMessage } from '../../components/Toastify';
 
 const UserId = () => {
   const { t } = useTranslation();
@@ -39,6 +39,8 @@ const UserId = () => {
   const { tab, blockId, villageId } = router.query;
 
   const [uiSchema, setUiSchema] = useState(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [userProgram, setUserProgram] = useState<string | null>(null);
   const [user, setUser] = React.useState<{
     userRole: string | null;
     userID: string | null;
@@ -72,6 +74,14 @@ const UserId = () => {
     userName: null,
     joinedOn: null,
   });
+
+  // Get current user ID and userProgram from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      setCurrentUserId(localStorage.getItem('userId'));
+      setUserProgram(localStorage.getItem('userProgram'));
+    }
+  }, []);
   const handleOpenEditModal = () => {
     setEditModal(true);
   };
@@ -95,7 +105,10 @@ const UserId = () => {
   }
   useEffect(() => {
     const fetchData = async () => {
+      if (typeof window === 'undefined' || !window.localStorage) return;
+      
       try {
+        const tenantId = localStorage.getItem('tenantId');
         const responseForm: any = await fetchForm([
           {
             fetchUrl: `${
@@ -111,7 +124,7 @@ const UserId = () => {
             }/form/read?context=${
               FormContext.mentor.context
             }&contextType=${user?.userRole?.toUpperCase()}`,
-            header: { tenantid: localStorage.getItem('tenantId') },
+            header: { tenantid: tenantId },
           },
         ]);
         console.log('responseForm', responseForm);
@@ -154,9 +167,13 @@ const UserId = () => {
       }
       // setSdbvFieldData(extractedFields);
     };
-    if (userId === localStorage.getItem('userId') && user?.userRole)
-      fetchData();
-  }, [user]);
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const storedUserId = localStorage.getItem('userId');
+      if (userId === storedUserId && user?.userRole) {
+        fetchData();
+      }
+    }
+  }, [user, userId]);
   const onClose = () => {
     setEditModal(false);
   };
@@ -170,14 +187,16 @@ const UserId = () => {
       }
       if (userId) {
         const updateUserResponse = await updateUser(userId.toString(), object);
-        let userlocalData = localStorage.getItem('userData');
-        let userData = userlocalData ? JSON.parse(userlocalData) : {};
-        // let userlocalData = JSON.parse(localStorage.getItem("userData")) || {};
+        if (typeof window !== 'undefined' && window.localStorage) {
+          const userlocalData = localStorage.getItem('userData');
+          const userData = userlocalData ? JSON.parse(userlocalData) : {};
+          // let userlocalData = JSON.parse(localStorage.getItem("userData")) || {};
 
-        // Merge existing data with updated values
-        Object.assign(userData, formData);
-        console.log(userData);
-        localStorage.setItem('userData', JSON.stringify(userData));
+          // Merge existing data with updated values
+          const updatedUserData = { ...userData, ...formData };
+          console.log(updatedUserData);
+          localStorage.setItem('userData', JSON.stringify(updatedUserData));
+        }
 
         showToastMessage(t('PROFILE.PROFILE_UPDATE_SUCCESSFULLY'), 'success');
         setEditModal(false);
@@ -243,7 +262,7 @@ const UserId = () => {
           phone: userData?.mobile || '',
           gender: userData?.gender || '',
           userRole:
-            toPascalCase(userData?.tenantData?.[0]?.roles?.[0]?.roleName) ||
+           localStorage.getItem('roleName') || toPascalCase(userData?.tenantData?.[0]?.roles?.[0]?.roleName) ||
             toPascalCase(role),
           dob: formattedDOBDate || '',
           district: getFieldValue('DISTRICT'),
@@ -267,7 +286,7 @@ const UserId = () => {
         <Box ml={2}>
           <BackHeader
             headingOne={
-              userId === localStorage.getItem('userId')
+              userId === currentUserId
                 ? t('YOUTHNET_PROFILE.MY_PROFILE')
                 : user.firstName
                 ? user.lastName
@@ -276,7 +295,7 @@ const UserId = () => {
                 : ''
             }
             showBackButton={
-              userId === localStorage.getItem('userId') ? false : true
+              userId === currentUserId ? false : true
             }
             onBackClick={() => {
               if (tab) {
@@ -292,7 +311,8 @@ const UserId = () => {
             }}
           />
         </Box>
-        {userId === localStorage.getItem('userId') && (
+        {/* TODO: Add edit profile button */}
+        {/* {userId === currentUserId && userProgram !== 'Pragyanpath' && (
           <Box
             sx={{
               marginLeft: '30%',
@@ -332,7 +352,7 @@ const UserId = () => {
               </Box>
             </Button>
           </Box>
-        )}
+        )} */}
         {/* <Box ml={2}>
         {' '}
         <Typography
@@ -370,7 +390,7 @@ const UserId = () => {
             {t('YOUTHNET_PROFILE.PROFILE_DETAILS')}
           </Typography>
           <Profile
-            fullName={`${user.firstName} ${user.lastName}` || ''}
+            fullName={user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : (user.firstName || user.lastName || '')}
             emailId={user.email || '-'}
             designation={user.userRole || '-'}
             mentorId={user.userID || ''}
@@ -430,4 +450,4 @@ export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
   };
 };
 
-export default withRole(TENANT_DATA.YOUTHNET)(UserId);
+export default  UserId

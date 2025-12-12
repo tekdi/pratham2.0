@@ -117,7 +117,7 @@ const LoginPage = () => {
               role?.role === Role.ADMIN &&
               role?.tenantData[0]?.tenantName == TenantName.YOUTHNET
             ) {
-              router.push('/central-head');
+              router.push('/user-leader');
             }
           }
         } else {
@@ -144,7 +144,7 @@ const LoginPage = () => {
                 role?.role === Role.ADMIN) &&
               role?.tenantData[0]?.tenantName == TenantName.YOUTHNET
             ) {
-              router.push('/central-head');
+              router.push('/user-leader');
             }
           }
         }
@@ -324,6 +324,12 @@ const LoginPage = () => {
                 });
               } else router.push('/course-planner');
             }
+          } else if (
+            userInfo?.role === Role.CENTRAL_ADMIN &&
+            tenantData?.tenantName == TenantName.PRAGYANPATH
+          ) {
+            window.location.href = '/youth';
+            router.push('/youth');
           } else {
             //window.location.href = "/centers";
             const { locale } = router;
@@ -345,8 +351,8 @@ const LoginPage = () => {
                 (Role.CENTRAL_ADMIN &&
                   tenantData?.tenantName == TenantName.YOUTHNET)
               ) {
-                window.location.href = '/central-head';
-                router.push('/central-head', undefined, { locale: locale });
+                window.location.href = '/user-leader';
+                router.push('/user-leader', undefined, { locale: locale });
               }
             } else {
               if (
@@ -365,9 +371,9 @@ const LoginPage = () => {
                 userInfo?.role === Role.ADMIN &&
                 tenantData?.tenantName == TenantName.YOUTHNET
               ) {
-                window.location.href = '/central-head';
-                router.push('/central-head');
-              }
+                window.location.href = '/user-leader';
+                router.push('/user-leader');
+              } 
             }
           }
         } else {
@@ -432,8 +438,8 @@ const LoginPage = () => {
                       (Role.CENTRAL_ADMIN &&
                         tenantData?.tenantName == TenantName.YOUTHNET)
                     ) {
-                      window.location.href = '/central-head';
-                      router.push('/central-head', undefined, {
+                      window.location.href = '/user-leader';
+                      router.push('/user-leader', undefined, {
                         locale: locale,
                       });
                     }
@@ -454,8 +460,8 @@ const LoginPage = () => {
                       userInfo?.role === Role.ADMIN &&
                       userInfo?.tenantData[0]?.tenantName == TenantName.YOUTHNET
                     ) {
-                      window.location.href = '/central-head';
-                      router.push('/central-head');
+                      window.location.href = '/user-leader';
+                      router.push('/user-leader');
                     }
                   }
                 }
@@ -733,7 +739,7 @@ const LoginPage = () => {
                 alignItems={'center'}
                 justifyContent={'center'}
                 zIndex={99}
-              // sx={{ margin: '5px 10px 25px', }}
+                // sx={{ margin: '5px 10px 25px', }}
               >
                 <Box
                   sx={{
@@ -856,7 +862,7 @@ const LoginPage = () => {
                         action: 'remember-me-button-clicked',
                         category: 'Login Page',
                         label: `Remember Me ${rememberMe ? 'Checked' : 'Unchecked'
-                          }`,
+                        }`,
                       });
                     }}
                     sx={{

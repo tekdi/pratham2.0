@@ -112,12 +112,14 @@ export enum RoleId {
   CONTENT_CREATOR = '45b8b0d7-e5c6-4f3f-a7bf-70f86e9357ce',
   CONTENT_REVIEWER = '2dc13fcc-29c4-42c1-b125-82d3dcaa4b42',
   STATE_LEAD = '4a3493aa-a4f7-4e2b-b141-f213084b5599',
+  MOBILIZER = 'a4694781-65c1-4b92-8ff1-ad490ab6d140',
 }
 
 export enum RoleName {
   CONTENT_CREATOR = 'Content creator',
   CONTENT_REVIEWER = 'Content reviewer',
   STATE_LEAD = 'State Lead',
+  MOBILIZER = 'Mobilizer',
 }
 
 export enum DataKey {
@@ -201,6 +203,7 @@ export enum ResourceType {
   LEARNER_PRE_REQUISITE = 'prerequisite',
   LEARNER_POST_REQUISITE = 'postrequisite',
   FACILITATOR_REQUISITE = 'facilitator-requisite',
+  DURING_COURSE = 'during',
 }
 
 import { StaticImageData } from 'next/image'; // Import StaticImageData for type safety with images

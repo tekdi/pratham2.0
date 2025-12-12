@@ -52,6 +52,7 @@ const CertificatesPage = () => {
               <CommonCard
                 minheight="100%"
                 title={(item?.name || '').trim()}
+                englishTitle={item?.englishName}
                 image={
                   item?.posterImage && item?.posterImage !== 'undefined'
                     ? item?.posterImage

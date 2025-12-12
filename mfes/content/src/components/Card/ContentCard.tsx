@@ -37,24 +37,24 @@ const hashString = (str: string): number => {
 };
 
 // Function to get consistent random default image based on identifier
-const getRandomDefaultImage = (identifier: string) => {
-  const hash = hashString(identifier);
-  const index = hash % courseDefaultImages.length;
-  return `/images/courseDefaultImages/${courseDefaultImages[index]}`;
-};
+// const getRandomDefaultImage = (identifier: string) => {
+//   const hash = hashString(identifier);
+//   const index = hash % courseDefaultImages.length;
+//   return `/images/courseDefaultImages/${courseDefaultImages[index]}`;
+// };
 
-// Function to get default image based on conditions
-const getDefaultImage = (default_img?: string, identifier?: string) => {
-  if (typeof window !== 'undefined') {
-    const userProgram = localStorage.getItem('userProgram');
-    
-    if (userProgram === 'Open School' && identifier) {
-      return getRandomDefaultImage(identifier);
-    }
-  }
-  
-  return default_img ?? `${AppConst.BASEPATH}/assests/images/image_ver.png`;
-};
+// // Function to get default image based on conditions
+// const getDefaultImage = (default_img?: string, identifier?: string) => {
+//   if (typeof window !== 'undefined') {
+//     const userProgram = localStorage.getItem('userProgram');
+
+//     if (userProgram === 'Open School' && identifier) {
+//       return getRandomDefaultImage(identifier);
+//     }
+//   }
+
+//   return default_img ?? `${AppConst.BASEPATH}/assests/images/image_ver.png`;
+// };
 
 const ContentCard = ({
   item,
@@ -94,19 +94,20 @@ const ContentCard = ({
   console.log('ContentCard: No cardComponent found in _card', item);
   return (
     <CardWrap
-      // isWrap={isWrap && type === 'Course'} 
+      // isWrap={isWrap && type === 'Course'}
 
       _card={_card} isWrap={false}>
       <CommonCard
         title={(item?.name || '').trim()}
+        englishTitle={item?.englishName}
         courseType={item?.courseType}
         image={
-  item?.posterImage
-    ? item.posterImage
-    : item?.appIcon
-      ? item.appIcon
-      : getDefaultImage(default_img, item?.identifier || item?.name)
-}
+          item?.posterImage
+            ? item.posterImage
+            : item?.appIcon
+            ? item.appIcon
+            : default_img ?? `${AppConst.BASEPATH}/assests/images/image_ver.png`
+        }
         content={item?.description ? item?.description : <Description />}
         actions={
           type !== 'Course' || type!=='Job family' || type!=='PSU' || type!=='Group Membership'  || type!=='self' && (

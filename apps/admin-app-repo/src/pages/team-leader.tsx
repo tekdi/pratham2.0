@@ -42,7 +42,7 @@ import {
 import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
-import { deleteUser } from '@/services/UserService';
+import { updateUserTenantStatus } from '@/services/UserService';
 import {
   calculateAge,
   calculateAgeFromDate,
@@ -168,8 +168,9 @@ const TeamLeader = () => {
 
   const userDelete = async () => {
     try {
-      const resp = await deleteUser(userID, {
-        userData: { reason: reason, status: 'archived' },
+      const resp = await updateUserTenantStatus(userID, tenantId, {
+        reason: reason,
+        status: 'archived',
       });
       if (resp?.responseCode === 200) {
         // setResponse((prev) => ({
@@ -241,8 +242,8 @@ const TeamLeader = () => {
 
       // Always attempt to delete the user
       console.log('Proceeding to self-delete...');
-      const resp = await deleteUser(userID, {
-        userData: { status: 'active' },
+      const resp = await updateUserTenantStatus(userID, tenantId, {
+        status: 'active'
       });
       showToastMessage(t("LEARNERS.ACTIVATE_USER_SUCCESS"), "success");
 
@@ -347,8 +348,8 @@ const TeamLeader = () => {
     {
       key: 'status',
       label: 'Status',
-      render: (row: any) => transformLabel(row.status),
-      getStyle: (row) => ({ color: row.status === 'active' ? 'green' : 'red' }),
+      render: (row: any) => transformLabel(row.tenantStatus),
+      getStyle: (row) => ({ color: row.tenantStatus === 'active' ? 'green' : 'red' }),
     },
   ];
 
@@ -383,7 +384,7 @@ const TeamLeader = () => {
         setEditableUserId(row?.userId);
         handleOpenModal();
       },
-      show: (row) => row.status !== 'archived',
+      show: (row) => row.tenantStatus !== 'archived',
     },
     {
       icon: (
@@ -418,7 +419,7 @@ const TeamLeader = () => {
         setReason('');
         setChecked(false);
       },
-      show: (row) => row.status !== 'archived',
+      show: (row) => row.tenantStatus !== 'archived',
     },
     {
       icon: (
@@ -449,7 +450,7 @@ const TeamLeader = () => {
         setEditableUserId(row?.userId);
         handleOpenModal();
       },
-      show: (row) => row.status !== 'archived',
+      show: (row) => row.tenantStatus !== 'archived',
     },
     {
       icon: (
@@ -495,7 +496,7 @@ const TeamLeader = () => {
         // setReason('');
         // setChecked(false);
       },
-      show: (row) => row.status !== 'active',
+      show: (row) => row.tenantStatus !== 'active',
     }
   ];
 
@@ -699,6 +700,7 @@ const TeamLeader = () => {
           setChecked={setChecked}
           reason={reason}
           setReason={setReason}
+          isForFacilitator={true}
         />
       </ConfirmationPopup>
       <ConfirmationPopup

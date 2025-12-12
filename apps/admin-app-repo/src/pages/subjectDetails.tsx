@@ -121,6 +121,7 @@ const SubjectDetails = () => {
     if (subjects) {
       try {
         const parsedData = JSON.parse(subjects)?.sort();
+        console.log('parsedData', parsedData);
         setSubject(parsedData);
       } catch (error) {
         console.error("Failed to parse subjects from localStorage:", error);
@@ -283,16 +284,21 @@ const SubjectDetails = () => {
               (assoc: any) =>
                 getSubjects.map((item: any) => assoc.code === item?.code)
             );
-
+console.log('subjectAssociations', subjectAssociations);
+const data=subjectAssociations?.filter(
+  (subject: any) => subject?.status !== "Retired"
+);
+console.log('data', data);
             return {
               courseTypeName: courseType?.name,
               courseType: courseType?.code,
-              subjects: subjectAssociations?.map(
+              subjects: data?.map(
                 (subject: any) => subject?.name
               ),
             };
           }
         );
+        console.log('courseSubjectLists', courseSubjectLists);
         const matchedCourse = courseSubjectLists.find(
           (course: any) => course.courseTypeName === type
         );
@@ -300,7 +306,7 @@ const SubjectDetails = () => {
         const matchingSubjects = matchedCourse
           ? matchedCourse.subjects.sort()
           : [];
-
+console.log('matchingSubjects', matchingSubjects);
         setSubject(matchingSubjects);
         localStorage.setItem(
           "overallCommonSubjects",

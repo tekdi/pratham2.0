@@ -58,6 +58,20 @@ export const genericEditorSaveFormResponse = {
                         "visible": true
                     },
                     {
+                        "code": "englishName",
+                        "dataType": "text",
+                        "description": "Title of the content in English",
+                        "editable": true,
+                        "index": 2,
+                        "inputType": "text",
+                        "label": "Title in English",
+                        "name": "Title in English",
+                        "placeholder": "Enter Title in English",
+                        "renderingHints": {},
+                        "required": false,
+                        "visible": true
+                    },
+                    {
                         "code": "keywords",
                         "dataType": "list",
                         "description": "Keywords for the content",
@@ -123,6 +137,20 @@ export const genericEditorReviewFormResponse = {
                         "label": "Title",
                         "name": "Title",
                         "placeholder": "Enter Title",
+                        "renderingHints": {},
+                        "required": false,
+                        "visible": true
+                    },
+                    {
+                        "code": "englishName",
+                        "dataType": "text",
+                        "description": "Title of the content in English",
+                        "editable": true,
+                        "index": 2,
+                        "inputType": "text",
+                        "label": "Title in English",
+                        "name": "Title in English",
+                        "placeholder": "Enter Title in English",
                         "renderingHints": {},
                         "required": false,
                         "visible": true
@@ -362,7 +390,7 @@ export const genericEditorReviewFormResponse = {
                         ],
                         "placeholder": "Content Language",
                         "renderingHints": {},
-                        "required": false,
+                        "required": true,
                         "visible": true
                     },
                     {

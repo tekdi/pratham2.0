@@ -110,7 +110,7 @@ const Centers = () => {
       //unit name is missing from required so handled from frotnend
       let alterSchema = responseForm?.schema;
       let requiredArray = alterSchema?.required;
-      const mustRequired = ['name', 'state', 'district', 'block', 'village'];
+      const mustRequired = ['name', 'state', 'district', 'block', 'village','catchment_area'];
       if (storedProgram === TenantName.SECOND_CHANCE_PROGRAM) {
         mustRequired.push('center_type', 'board', 'medium', 'grade');
       }
