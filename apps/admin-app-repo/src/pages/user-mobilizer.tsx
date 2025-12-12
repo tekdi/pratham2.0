@@ -205,6 +205,10 @@ const Mobilizer = () => {
   const [userDetails, setUserDetails] = useState<any>(null);
   const [cohortResponse, setCohortResponse] = useState<any>(null); // Store full cohort/search API response
   const [catchmentAreaData, setCatchmentAreaData] = useState<any>(null); // Store extracted CATCHMENT_AREA data
+  const [selectedStateId, setSelectedStateId] = useState<string | null>(null); // Track selected state
+  const [selectedDistrictId, setSelectedDistrictId] = useState<string | null>(
+    null
+  ); // Track selected district
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null); // Track selected block
 
   // Function to check if villages are selected in working_location
@@ -734,6 +738,8 @@ const Mobilizer = () => {
               setSelectedCenterId(null);
               setCohortResponse(null);
               setCatchmentAreaData(null);
+              setSelectedStateId(null);
+              setSelectedDistrictId(null);
               setSelectedBlockId(null);
               setMapModalOpen(true);
             }}
@@ -859,6 +865,8 @@ const Mobilizer = () => {
             setUserDetails(null);
             setCohortResponse(null);
             setCatchmentAreaData(null);
+            setSelectedStateId(null);
+            setSelectedDistrictId(null);
             setSelectedBlockId(null);
             setFormStep(0);
           }
@@ -905,7 +913,7 @@ const Mobilizer = () => {
                 setFormStep(0);
                 setSelectedUserId(null);
                 setUserDetails(null);
-                // Keep center selection and catchment area data when going back
+                // Keep center selection, state, district, block, and catchment area data when going back
               }}
             >
               {t('COMMON.BACK')}
@@ -926,6 +934,8 @@ const Mobilizer = () => {
               setUserDetails(null);
               setCohortResponse(null);
               setCatchmentAreaData(null);
+              setSelectedStateId(null);
+              setSelectedDistrictId(null);
               setSelectedBlockId(null);
             }}
             sx={{
@@ -948,6 +958,8 @@ const Mobilizer = () => {
                   console.log('Selected Center ID:', centerIdStr);
 
                   // Extract CATCHMENT_AREA when center is selected
+                  // Note: CenterListWidget will handle fetching center details and
+                  // calling onStateChange, onDistrictChange, onBlockChange callbacks
                   if (centerIdStr) {
                     extractCatchmentAreaFromCenter(centerIdStr);
                   } else {
@@ -957,12 +969,36 @@ const Mobilizer = () => {
                 label="Select Center"
                 required={true}
                 multiple={false}
+                initialState={selectedStateId || undefined}
+                initialDistrict={selectedDistrictId || undefined}
+                initialBlock={selectedBlockId || undefined}
+                onStateChange={(stateId) => {
+                  console.log('State changed to:', stateId);
+                  setSelectedStateId(stateId);
+                  // Clear dependent selections when state changes
+                  if (!stateId) {
+                    setSelectedDistrictId(null);
+                    setSelectedBlockId(null);
+                    setSelectedCenterId(null);
+                    setCatchmentAreaData(null);
+                  }
+                }}
+                onDistrictChange={(districtId) => {
+                  console.log('District changed to:', districtId);
+                  setSelectedDistrictId(districtId);
+                  // Clear dependent selections when district changes
+                  if (!districtId) {
+                    setSelectedBlockId(null);
+                    setSelectedCenterId(null);
+                    setCatchmentAreaData(null);
+                  }
+                }}
                 onBlockChange={(blockId) => {
-                  // Handle block change - fetch cohort list and clear previous selections
+                  // Handle block change - fetch cohort list
+                  // Note: CenterListWidget's handleBlockChange already clears center selection
+                  // when user manually changes block, so we don't need to clear it here
                   console.log('Block changed to:', blockId);
                   setSelectedBlockId(blockId);
-                  setSelectedCenterId(null);
-                  setCatchmentAreaData(null);
 
                   if (blockId) {
                     fetchCohortListByBlock(blockId);
@@ -1114,6 +1150,8 @@ const Mobilizer = () => {
                         setSelectedUserId(null);
                         setCohortResponse(null);
                         setCatchmentAreaData(null);
+                        setSelectedStateId(null);
+                        setSelectedDistrictId(null);
                         setSelectedBlockId(null);
                         setFormStep(0);
                         // Refresh the data
