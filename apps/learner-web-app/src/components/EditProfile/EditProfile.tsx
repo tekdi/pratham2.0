@@ -248,11 +248,12 @@ const [responseFormData, setResponseFormData] = useState<any>({});
     );
 
     if (programFieldIndex === -1) {
+      if(programFieldId) {
       customFields.push({
         fieldId: programFieldId,
-      
-        value: [],
-      });
+          value: [],
+        });
+      }
     } else if (!Array.isArray(customFields[programFieldIndex].selectedValues)) {
       customFields[programFieldIndex].selectedValues = [];
     }
