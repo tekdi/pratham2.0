@@ -985,8 +985,8 @@ const Mobilizer = () => {
                 onUserDetails={async (userDetails) => {
                   console.log('############# userDetails', userDetails);
                   setUserDetails(userDetails);
-                  window.alert('userDetails' + userDetails);
-                  window.alert('selectedUserId' + selectedUserId);
+                  // window.alert('userDetails' + userDetails);
+                  // window.alert('selectedUserId' + selectedUserId);
                   if (selectedUserId && userDetails) {
                     // Validate that villages are selected for EVERY block in working_location
                     const validationResult =
