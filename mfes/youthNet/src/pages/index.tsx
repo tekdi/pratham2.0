@@ -157,12 +157,13 @@ const Index = () => {
     const getYouthData = async (userId: any) => {
       try {
         const villages = await getVillages(userId);
-        console.log(villages);
+        // console.log('villages#######',villages);
 
+        //for mobilizer
         if (userId === localStorage.getItem('userId')) {
-          const updatedData = villages?.map(({ id, value }: any) => ({
+          const updatedData = villages?.map(({ id, name }: any) => ({
             Id: id,
-            name: value,
+            name: name,
           }));
 
           localStorage.setItem('villageData', JSON.stringify(updatedData));
@@ -260,7 +261,7 @@ const Index = () => {
       }
       // setUserData(data);
     };
-    if (YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole())
+    if (YOUTHNET_USER_ROLE.MOBILIZER === getLoggedInUserRole())
       getYouthData(localStorage.getItem('userId'));
     if (
       YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() &&

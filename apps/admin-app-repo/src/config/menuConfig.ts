@@ -154,11 +154,11 @@ export const MENU_CONFIG = {
           link: '/user-leader',
           roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
-        {
-          title: 'SIDEBAR.MENTOR',
-          link: '/mentor',
-          roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
-        },
+        // {
+        //   title: 'SIDEBAR.MENTOR',
+        //   link: '/mentor',
+        //   roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
+        // },
         {
           title: 'SIDEBAR.YOUTH',
           link: '/youth',
@@ -260,11 +260,11 @@ export const MENU_CONFIG = {
       icon: '/images/group.svg',
       roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
       subMenu: [
-        {
-          title: 'SIDEBAR.MENTOR',
-          link: '/mentor',
-          roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
-        },
+        // {
+        //   title: 'SIDEBAR.MENTOR',
+        //   link: '/mentor',
+        //   roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
+        // },
         {
           title: 'SIDEBAR.MENTOR_LEADER',
           link: '/mentor-leader',

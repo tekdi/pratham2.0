@@ -181,7 +181,7 @@ const Index = () => {
     blockId ? blockId : ''
   );
   const [selectedVillageValue, setSelectedVillageValue] = useState<any>(
-    villageId ? villageId : ''
+    villageId ? Array.isArray(villageId) ? villageId : [villageId] : []
   );
   const [selectedDistrictValue, setSelectedDistrictValue] = useState<any>('');
   const [selectedStateValue, setSelectedStateValue] = useState<any>('');
@@ -494,7 +494,7 @@ const Index = () => {
       try {
         setLoading(true);
         const filters = {
-          village: [selectedVillageValue],
+          village: Array.isArray(selectedVillageValue) ? selectedVillageValue : [selectedVillageValue],
           role: Role.LEARNER,
           tenantStatus: [Status.ACTIVE],
         };
@@ -570,7 +570,7 @@ const Index = () => {
         setLoading(false);
       }
     };
-    if (value === 3 && selectedVillageValue !== '') getYouthData();
+    if (value === 3 && selectedVillageValue?.length > 0) getYouthData();
   }, [value, selectedVillageValue]);
 
   const getMobilizersList = async () => {
@@ -745,7 +745,7 @@ const Index = () => {
         let userDataString = localStorage.getItem('userData');
         let userData: any = userDataString ? JSON.parse(userDataString) : null;
         let blockIds: any;
-        if (YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole()) {
+        if (YOUTHNET_USER_ROLE.MOBILIZER === getLoggedInUserRole()) {
           const blockResult = userData?.customFields?.find(
             (item: any) => item.label === 'BLOCK'
           );
@@ -784,16 +784,17 @@ const Index = () => {
   useEffect(() => {
     const getVillageList = async () => {
       try {
-        if (YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole()) {
+        if (YOUTHNET_USER_ROLE.MOBILIZER === getLoggedInUserRole()) {
           let villageDataString = localStorage.getItem('villageData');
           let villageData: any = villageDataString
             ? JSON.parse(villageDataString)
             : null;
           setVillageList(villageData);
+          console.log('villageData', villageData);
           if (selectedBlockValue === blockId) {
             setSelectedVillageValue(villageId);
           } else {
-            if (YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole())
+            if (YOUTHNET_USER_ROLE.MOBILIZER === getLoggedInUserRole())
               setSelectedVillageValue(villageId);
             else setSelectedVillageValue(villageData[0]?.Id);
           }
@@ -819,7 +820,7 @@ const Index = () => {
           if (selectedBlockValue === blockId) {
             setSelectedVillageValue(villageId);
           } else {
-            if (YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole())
+            if (YOUTHNET_USER_ROLE.MOBILIZER === getLoggedInUserRole())
               setSelectedVillageValue(villageId);
             else setSelectedVillageValue(transformedVillageData[0]?.Id);
           }
@@ -858,7 +859,7 @@ const Index = () => {
       query: {
         tab: value,
         blockId: selectedBlockValue,
-        villageId: selectedVillageValue,
+        villageId: Array.isArray(selectedVillageValue) ? selectedVillageValue : [selectedVillageValue],
       },
     });
   };
@@ -1361,7 +1362,7 @@ const Index = () => {
       villageList.length > 0 &&
       !selectedVillageValue
     ) {
-      setSelectedVillageValue(villageList[0].Id);
+      setSelectedVillageValue(villageList?.map((village: any) => village.Id));
     }
   }, [value, villageList, selectedVillageValue]);
 
