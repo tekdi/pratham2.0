@@ -39,10 +39,10 @@ const Menuitems = [
         title: 'SIDEBAR.LEARNERS',
         href: ['/learners'],
       },
-      {
-        title: 'SIDEBAR.MENTOR',
-        href: ['/mentor'],
-      },
+      // {
+      //   title: 'SIDEBAR.MENTOR',
+      //   href: ['/mentor'],
+      // },
       {
         title: 'SIDEBAR.MENTOR_LEADER',
         href: ['/central-head'],
