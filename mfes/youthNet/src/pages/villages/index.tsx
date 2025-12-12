@@ -181,7 +181,7 @@ const Index = () => {
     blockId ? blockId : ''
   );
   const [selectedVillageValue, setSelectedVillageValue] = useState<any>(
-    villageId ? villageId : ''
+    villageId ? Array.isArray(villageId) ? villageId : [villageId] : []
   );
   const [selectedDistrictValue, setSelectedDistrictValue] = useState<any>('');
   const [selectedStateValue, setSelectedStateValue] = useState<any>('');
@@ -494,7 +494,7 @@ const Index = () => {
       try {
         setLoading(true);
         const filters = {
-          village: [selectedVillageValue],
+          village: Array.isArray(selectedVillageValue) ? selectedVillageValue : [selectedVillageValue],
           role: Role.LEARNER,
           tenantStatus: [Status.ACTIVE],
         };
@@ -570,7 +570,7 @@ const Index = () => {
         setLoading(false);
       }
     };
-    if (value === 3 && selectedVillageValue !== '') getYouthData();
+    if (value === 3 && selectedVillageValue?.length > 0) getYouthData();
   }, [value, selectedVillageValue]);
 
   const getMobilizersList = async () => {
@@ -790,6 +790,7 @@ const Index = () => {
             ? JSON.parse(villageDataString)
             : null;
           setVillageList(villageData);
+          console.log('villageData', villageData);
           if (selectedBlockValue === blockId) {
             setSelectedVillageValue(villageId);
           } else {
@@ -858,7 +859,7 @@ const Index = () => {
       query: {
         tab: value,
         blockId: selectedBlockValue,
-        villageId: selectedVillageValue,
+        villageId: Array.isArray(selectedVillageValue) ? selectedVillageValue : [selectedVillageValue],
       },
     });
   };
@@ -1361,7 +1362,7 @@ const Index = () => {
       villageList.length > 0 &&
       !selectedVillageValue
     ) {
-      setSelectedVillageValue(villageList[0].Id);
+      setSelectedVillageValue(villageList?.map((village: any) => village.Id));
     }
   }, [value, villageList, selectedVillageValue]);
 
