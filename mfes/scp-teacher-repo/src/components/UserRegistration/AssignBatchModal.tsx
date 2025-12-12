@@ -2,7 +2,9 @@ import { useState, useEffect, useMemo } from 'react';
 import { Box, Modal, Typography, Button, IconButton, Radio, RadioGroup, FormControlLabel, FormControl, Select, MenuItem, InputLabel, useTheme } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { modalStyles } from '../../styles/modalStyles';
-import { getCohortList, bulkCreateCohortMembers } from '../../services/CohortService/cohortService';
+import { getCohortList as getCohortListService, bulkCreateCohortMembers } from '../../services/CohortService/cohortService';
+import { getCohortList as getCohortListWithChildren } from '../../services/CohortServices';
+
 import { updateUserTenantStatus } from '../../services/ManageUser';
 import { showToastMessage } from '../Toastify';
 import { LocationFilters } from './types';
@@ -101,7 +103,7 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
     Boolean(locationFilters.blocks?.length) &&
     Boolean(locationFilters.villages?.length);
 
-  const buildCenterFilters = () => {
+  const buildCenterFilters = async() => {
     const filters: Record<string, string[] | string> = {
       type: 'COHORT',
       status: ['active'],
@@ -112,11 +114,38 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
         filters[key] = values.map((value) => String(value));
       }
     };
-
-    addFilter('state', locationFilters.states);
-    addFilter('district', locationFilters.districts);
-    addFilter('block', locationFilters.blocks);
-    addFilter('village', locationFilters.villages);
+    let response: any;
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const userId = localStorage.getItem('userId');
+      if (userId) {
+       response = await getCohortListWithChildren(userId, {
+          customField: 'true',
+        });
+        console.log('response', response[0]?.customField);
+        // setCenters(response.map((cohort: any) => ({
+        //   label: `${capitalizeFirstChar(cohort.name)} (${capitalizeFirstChar(getField(cohort.customFields, "TYPE_OF_CENTER"))})`,
+        //   value: cohort.cohortId,
+        // })));
+      }}
+      const getSelectedId = (label: any, data: any) => {
+        const field = data.find(item => item.label === label);
+        const selected = field?.selectedValues?.[0];
+      
+        return typeof selected === "object" ? selected.id : null;
+      };
+      // console.log('getSelectedId', getSelectedId('STATE', response[0]?.customField));
+      // console.log('getSelectedId', getSelectedId('DISTRICT', response[0]?.customField));
+      // console.log('getSelectedId', getSelectedId('BLOCK', response[0]?.customField));
+      // console.log('getSelectedId', getSelectedId('VILLAGE', response[0]?.customField));
+      // console.log('locationFilters.states', locationFilters.states);
+      // console.log('locationFilters.districts', locationFilters.districts);
+      // console.log('locationFilters.blocks', locationFilters.blocks);
+      // console.log('locationFilters.villages', locationFilters.villages);
+    addFilter('state', [getSelectedId('STATE', response[0]?.customField)]);
+    addFilter('district',[getSelectedId('DISTRICT', response[0]?.customField)]);
+    addFilter('block',[getSelectedId('BLOCK', response[0]?.customField)]);
+    addFilter('village',[getSelectedId('VILLAGE', response[0]?.customField)]);
+    console.log('filters=====>', filters);
 
     return filters;
   };
@@ -151,11 +180,11 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
     const fetchCenters = async () => {
       setLoadingCenters(true);
       try {
-        const response = await getCohortList({
+        const response = await getCohortListService({
           limit: 200,
           offset: 0,
           sort: ['name', 'asc'],
-          filters: buildCenterFilters(),
+          filters: await buildCenterFilters(),
         });
 
         const cohortDetails = response?.results?.cohortDetails ?? [];
@@ -169,7 +198,6 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
           };
         });
         
-
         setCenters(centerOptions);
 
         const centerStillValid = centerOptions.some((option : any) => option.value === center);
@@ -204,7 +232,7 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
     const fetchBatches = async () => {
       setLoadingBatches(true);
       try {
-        const response = await getCohortList({
+        const response = await getCohortListService({
           limit: 200,
           offset: 0,
           sort: ['name', 'asc'],

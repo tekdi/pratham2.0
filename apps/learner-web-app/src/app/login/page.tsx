@@ -274,7 +274,7 @@ const LoginPage = () => {
 
       setUserResponse(userResponse);
 
-      setSwitchDialogOpen(true);
+     // setSwitchDialogOpen(true);
     }
   };
   const callBackSwitchDialog = async (
