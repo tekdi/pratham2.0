@@ -442,7 +442,10 @@ const WorkingLocationWidget = ({
       // Replace ** with blockId in payload (village API expects array)
       const payload = {
         ...VILLAGE_API_CONFIG.payload,
-        centerId: typeof window !== 'undefined' ? localStorage.getItem('workingLocationCenterId') : '',
+        centerId:
+          typeof window !== 'undefined'
+            ? localStorage.getItem('workingLocationCenterId')
+            : '',
         findKeyword: blockId,
       };
 
@@ -752,6 +755,30 @@ const WorkingLocationWidget = ({
     );
   };
 
+  // Check if any villages are selected across all states/districts/blocks
+  const hasSelectedVillages = () => {
+    return selectedStates.some((state) =>
+      state.districts.some((district) =>
+        district.blocks.some((block) => block.villages.length > 0)
+      )
+    );
+  };
+
+  // Get a string representation of selected villages for the hidden input
+  const getSelectedVillagesString = () => {
+    const allSelectedVillages: string[] = [];
+    selectedStates.forEach((state) => {
+      state.districts.forEach((district) => {
+        district.blocks.forEach((block) => {
+          block.villages.forEach((village) => {
+            allSelectedVillages.push(village.name);
+          });
+        });
+      });
+    });
+    return allSelectedVillages.join(', ');
+  };
+
   return (
     <Box sx={{ mb: 3 }}>
       {rawErrors.length > 0 && (
@@ -850,6 +877,21 @@ const WorkingLocationWidget = ({
           </Typography>
         </Box>
       )}
+
+      {/* Hidden text input to force native validation */}
+      <input
+        value={hasSelectedVillages() ? getSelectedVillagesString() : ''}
+        required={required}
+        onChange={() => {}}
+        tabIndex={-1}
+        style={{
+          height: 1,
+          padding: 0,
+          border: 0,
+          ...(hasSelectedVillages() && { visibility: 'hidden' }),
+        }}
+        aria-hidden="true"
+      />
 
       {/* Selected States Display */}
       {selectedStates.map((state) => (
@@ -1217,6 +1259,7 @@ const WorkingLocationWidget = ({
           })()}
         </Box>
       ))}
+      
     </Box>
   );
 };
