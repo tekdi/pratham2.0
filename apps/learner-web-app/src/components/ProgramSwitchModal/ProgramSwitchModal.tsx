@@ -99,6 +99,8 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
 
   const handleProgramSwitch = async (program: TenantData) => {
     try {
+      localStorage.removeItem('learnerCourseFilters')
+
       const userId = localStorage.getItem('userId');
       const token = localStorage.getItem('token');
 
@@ -185,6 +187,7 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
   };
 
   const handleShowAllPrograms = () => {
+    localStorage.removeItem('learnerCourseFilters')
     onClose();
     router.push('/programs');
   };

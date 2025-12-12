@@ -25,6 +25,8 @@ type StoredLocationFilters = {
 };
 
 const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange }) => {
+  const LOCATION_STORAGE_KEY = 'selectedLocationFilters';
+
   const [states, setStates] = useState<LocationOption[]>([]);
   const [districts, setDistricts] = useState<LocationOption[]>([]);
   const [blocks, setBlocks] = useState<LocationOption[]>([]);
@@ -69,6 +71,18 @@ const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange 
     return selections.length > 0 ? selections : undefined;
   };
 
+  const parseStoredFilters = (value: unknown): (number | string)[] | undefined => {
+    if (!Array.isArray(value)) return undefined;
+    const parsedValues = value
+      .map((item) => {
+        if (item === null || item === undefined) return undefined;
+        const numeric = Number(item);
+        return Number.isNaN(numeric) ? String(item) : numeric;
+      })
+      .filter((val): val is number | string => val !== undefined);
+    return parsedValues.length > 0 ? parsedValues : undefined;
+  };
+
   const getMatchingOptionValues = (
     options: LocationOption[],
     storedValues?: (number | string)[]
@@ -94,6 +108,19 @@ const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange 
       return;
     }
     try {
+      const savedFiltersRaw = localStorage.getItem(LOCATION_STORAGE_KEY);
+      if (savedFiltersRaw) {
+        const parsed = JSON.parse(savedFiltersRaw);
+        storedLocationRef.current = {
+          states: parseStoredFilters(parsed.states),
+          districts: parseStoredFilters(parsed.districts),
+          blocks: parseStoredFilters(parsed.blocks),
+          villages: parseStoredFilters(parsed.villages),
+        };
+        setIsStoredLocationLoaded(true);
+        return;
+      }
+
       const storedValue = localStorage.getItem('userdata');
       if (!storedValue) {
         setIsStoredLocationLoaded(true);
@@ -364,6 +391,18 @@ const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange 
       });
     }
   }, [selectedStates, selectedDistricts, selectedBlocks, selectedVillages, onLocationChange]);
+
+  // Persist current location selections so they survive modal close/page reloads
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const payload: StoredLocationFilters = {
+      states: selectedStates,
+      districts: selectedDistricts,
+      blocks: selectedBlocks,
+      villages: selectedVillages,
+    };
+    localStorage.setItem(LOCATION_STORAGE_KEY, JSON.stringify(payload));
+  }, [selectedStates, selectedDistricts, selectedBlocks, selectedVillages]);
 
   const renderValue = (selected: (number | string)[], options: LocationOption[]) => {
     if (selected.length === 0) {
