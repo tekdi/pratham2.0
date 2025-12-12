@@ -134,7 +134,23 @@ export const updateUserTenantStatus = async (
   tenantId: string,
   status: string
 ): Promise<any> => {
-  const apiUrl = `${API_ENDPOINTS.userTenantStatus}?userId=${userId}&tenantId=${tenantId}`;
+  // API endpoint was a function in some older bundles; handle both shapes
+  const userTenantEndpoint = API_ENDPOINTS.userTenantStatus as
+    | string
+    | ((u: string, t: string) => string);
+
+  const apiUrl =
+    typeof userTenantEndpoint === 'function'
+      ? userTenantEndpoint(userId, tenantId)
+      : `${userTenantEndpoint}?userId=${userId}&tenantId=${tenantId}`;
+  
+  // Validate URL is a proper absolute URL, not JavaScript code or relative path
+  if (!apiUrl || typeof apiUrl !== 'string' || !apiUrl.startsWith('http://') && !apiUrl.startsWith('https://')) {
+    const errorMsg = `Invalid API URL: ${apiUrl}. Check NEXT_PUBLIC_MIDDLEWARE_URL environment variable.`;
+    console.error(errorMsg);
+    throw new Error(errorMsg);
+  }
+  
   try {
     const response = await patch(apiUrl, { status });
     return response?.data;
