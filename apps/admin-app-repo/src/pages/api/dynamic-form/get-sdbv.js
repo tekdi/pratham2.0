@@ -135,8 +135,51 @@ export default async function handler(req, res) {
               }
             }
           }
+//default empty then give district block list
+          if (result.length === 0) {
+            try {
+              const config = {
+                method: 'post',
+                maxBodyLength: Infinity,
+                url: SDBVSearchUrl,
+                headers: {
+                  Accept: 'application/json, text/plain, */*',
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${authToken}`,
+                  tenantId: tenantId,
+                },
+                data: {
+                  fieldName: searchType === 'district' ? 'district' : 'block',
+                  controllingfieldfk: [parseInt(findKeyword)],
+                  sort: searchType === 'district' ? ['district_name', 'asc'] : ['block_name', 'asc'],
+                },
+              };
+    
+              const response = await axios.request(config);
+    
+              if (
+                response.data &&
+                response.data.result &&
+                response.data.result.values
+              ) {
+                const result = response.data.result.values.map((value) => ({
+                  id: searchType === 'district' ? value.district_id : value.block_id,
+                  name: searchType === 'district' ? value.district_name : value.block_name,
+                }));
+    
+                return res.status(200).json({ result });
+              } else {
+                return res.status(200).json({ result: [] });
+              }
+            } catch (error) {
+              console.error('Error fetching village data:', error);
+              return res.status(500).json({ error: error.message });
+            }
+          }
+          else{
 
-          return res.status(200).json({ result });
+            return res.status(200).json({ result });
+          }
         } catch (error) {
           console.error('Error fetching cohort data:', error);
           return res.status(500).json({ error: error.message });

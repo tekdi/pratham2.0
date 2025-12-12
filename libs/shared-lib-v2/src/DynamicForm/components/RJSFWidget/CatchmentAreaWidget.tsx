@@ -480,6 +480,16 @@ const CatchmentAreaWidget = ({
     return district.blocks;
   };
 
+  // Check if any states are selected
+  const hasSelectedStates = () => {
+    return selectedStates.length > 0;
+  };
+
+  // Get a string representation of selected states for the hidden input
+  const getSelectedStatesString = () => {
+    return selectedStates.map((state) => state.stateName).join(', ');
+  };
+
   return (
     <Box sx={{ mb: 3 }}>
       {rawErrors.length > 0 && (
@@ -491,7 +501,6 @@ const CatchmentAreaWidget = ({
           {rawErrors[0]}
         </Typography>
       )}
-
       {/* State Selection */}
       {loadingStates ? (
         <Box
@@ -540,6 +549,20 @@ const CatchmentAreaWidget = ({
           </FormControl>
         )
       )}
+      {/* Hidden text input to force native validation */}
+      <input
+        value={hasSelectedStates() ? getSelectedStatesString() : ''}
+        required={required}
+        onChange={() => {}}
+        tabIndex={-1}
+        style={{
+          height: 1,
+          padding: 0,
+          border: 0,
+          ...(hasSelectedStates() && { visibility: 'hidden' }),
+        }}
+        aria-hidden="true"
+      />
       {availableStates.length === 0 && selectedStates.length > 0 && (
         <Box
           sx={{
