@@ -19,10 +19,11 @@ const getSelectedValueName = (fields: any, label: any) => {
   if (field && field.selectedValues && field.selectedValues.length > 0) {
     return field.selectedValues[0]; // Return the first selected value
   }
+
   return null;
 };
 export const mapUserData = (userData: any) => {
-  console.log(userData, 'userData');
+  console.log(userData, 'userData===>');
   try {
     const getSelectedValue = (label: any) =>
       userData.customFields
@@ -66,6 +67,9 @@ export const mapUserData = (userData: any) => {
       // is_volunteer: getSingleTextValue('IS_VOLUNTEER'),
       drop_out_reason:
         getSelectedValue('REASON_FOR_DROP_OUT_FROM_SCHOOL') || [], // array
+      // Keep program dropdown empty on edit; user should select explicitly
+      what_program_are_you_part_of: getSelectedValue('WHAT PROGRAM ARE YOU PART OF') || [],
+    //  what_program_are_you_part_of: [],
       work_domain:
         getSelectedValue(
           'WHAT_IS_YOUR_PRIMARY_WORK'

@@ -677,7 +677,22 @@
     "GRADE_9": "Grade 9",
     "GRADE_10": "Grade 10",
     "GRADE_11": "Grade 11",
-    "GRADE_12": "Grade 12"
+    "GRADE_12": "Grade 12",
+    "hamara_gaon": "hamara gaon",
+    "smile_program": "smile program",
+    "pratham_read_india_initiative_rii": "pratham readindia initiative rii",
+    "government_partnership": "government partnership",
+    "summer_camp_volunteer": "summer camp volunteer",
+    "HAMARA_GAON": "Hamara Gaon",
+    "SMILE_PROGRAM": "Smile Program",
+    "PRATHAM_READ_INDIA_INITIATIVE_RII": "Pratham Read India Initiative RII",
+    "GOVERNMENT_PARTNERSHIP": "Government Partnership",
+    "SUMMER_CAMP_VOLUNTEER": "Summer Camp Volunteer",
+    "WHAT_PROGRAM_ARE_YOU_PART_OF": "What Program Are You Part Of",
+    "WHAT PROGRAM ARE YOU PART OF": "What Program Are You Part Of"
+    
+    
+
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "Invalid Input.",
