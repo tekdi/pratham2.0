@@ -459,7 +459,7 @@ const Centers = () => {
         setSelectedCenter(row);
         setOpenBatchModal(true);
       },
-      show: (row) => storedProgram === TenantName.SECOND_CHANCE_PROGRAM,
+      show: (row) => row.status !== 'archived',
     },
     {
       icon: (
