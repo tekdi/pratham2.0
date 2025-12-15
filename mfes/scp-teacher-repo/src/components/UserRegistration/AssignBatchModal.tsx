@@ -8,7 +8,8 @@ import { getCohortList as getCohortListWithChildren , getCohortData} from '../..
 import { updateUserTenantStatus } from '../../services/ManageUser';
 import { showToastMessage } from '../Toastify';
 import { LocationFilters } from './types';
-import { editEditUser } from '@/services/ProfileService';
+import { editEditUser } from '../../services/ProfileService';
+import { Role } from '../../utils/app.constant';
 
 interface AssignBatchModalProps {
   open: boolean;
@@ -32,11 +33,14 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
   const [center, setCenter] = useState('');
   const [batch, setBatch] = useState('');
   const [centers, setCenters] = useState<Array<{ label: string; value: string }>>([]);
-  const [batches, setBatches] = useState<Array<{ label: string; value: string }>>([]);
+  const [batches, setBatches] = useState<Array<{ label: string; value: string; parentId?: string }>>([]);
   const [loadingCenters, setLoadingCenters] = useState(false);
   const [loadingBatches, setLoadingBatches] = useState(false);
   const [isAssigning, setIsAssigning] = useState(false);
   const [selectedBatchName, setSelectedBatchName] = useState('');
+  
+  // Check if user is a Teacher
+  const isTeacher = typeof window !== 'undefined' && localStorage.getItem('role') === Role.TEACHER;
 
   const handleAssign = async () => {
     if (!center || !batch || selectedLearnerIds.length === 0) {
@@ -180,35 +184,49 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
     const fetchCenters = async () => {
       setLoadingCenters(true);
       try {
-        // const response = await getCohortListService({
-        //   limit: 200,
-        //   offset: 0,
-        //   sort: ['name', 'asc'],
-        //   filters: await buildCenterFilters(),
-        // });
-        // console.log('response=====>', response);
-const responseData = await getCohortData(localStorage.getItem('userId') || '');
-const data = responseData?.result ?? [];
-console.log('responseData=====>', data);
-        // const cohortDetails = response?.results?.cohortDetails ?? [];
-        // console.log('cohortDetails', cohortDetails);
+        const responseData = await getCohortData(localStorage.getItem('userId') || '');
+        const data = responseData?.result ?? [];
+        console.log('responseData=====>', data);
+        
         const centerOptions = data.map((cohort: any) => {
           const cf = cohort.customField;
         
           return {
-            label: `${capitalizeFirstChar(cohort.cohortName)} (${capitalizeFirstChar(getField(cf, "TYPE_OF_CENTER"))})`,
+            label: isTeacher?`${capitalizeFirstChar(cohort.cohortName)}`:`${capitalizeFirstChar(cohort.cohortName)} (${capitalizeFirstChar(getField(cf, "TYPE_OF_CENTER"))})`,
             value: cohort.cohortId,
           };
         });
         
         setCenters(centerOptions);
 
-        const centerStillValid = centerOptions.some((option : any) => option.value === center);
-        if (!centerStillValid) {
-          const nextCenter = centerOptions[0]?.value ?? '';
-          setCenter(nextCenter);
-          setBatch('');
-          setBatches([]);
+        // For Teachers, show center options directly in the Batch dropdown
+        if (isTeacher) {
+          // Set centers as batch options for teachers
+          setBatches(centerOptions.map((c: { label: string; value: string }) => ({
+            label: c.label,
+            value: c.value,
+            parentId: c.value, // Center ID itself
+          })));
+          
+          if (centerOptions.length > 0) {
+            const firstCenter = centerOptions[0];
+            setBatch(firstCenter.value);
+            setSelectedBatchName(firstCenter.label);
+            setCenter(firstCenter.value);
+          } else {
+            setBatches([]);
+            setBatch('');
+            setCenter('');
+          }
+        } else {
+          // For non-teachers, use the regular flow with center dropdown
+          const centerStillValid = centerOptions.some((option : any) => option.value === center);
+          if (!centerStillValid) {
+            const nextCenter = centerOptions[0]?.value ?? '';
+            setCenter(nextCenter);
+            setBatch('');
+            setBatches([]);
+          }
         }
       } catch (error) {
         console.error('Error fetching centers:', error);
@@ -223,9 +241,14 @@ console.log('responseData=====>', data);
 
     fetchCenters();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, locationKey]);
+  }, [open, locationKey, isTeacher]);
 
   useEffect(() => {
+    // Skip batch fetching for teachers since they see centers in batch dropdown
+    if (isTeacher) {
+      return;
+    }
+    
     if (!center) {
       setBatches([]);
       setBatch('');
@@ -273,7 +296,7 @@ console.log('responseData=====>', data);
     };
 
     fetchBatches();
-  }, [center]);
+  }, [center, isTeacher]);
 
   return (
     <Modal
@@ -371,64 +394,66 @@ console.log('responseData=====>', data);
             </FormControl>
           </Box> */}
 
-          {/* Center Dropdown */}
-          <Box sx={{ mb: 3 }}>
-            <InputLabel
-              sx={{
-                fontSize: '12px',
-                color: '#7C766F',
-                mb: 1,
-                transform: 'none',
-                position: 'static',
-              }}
-            >
-              Center
-            </InputLabel>
-            <Select
-              fullWidth
-              value={center}
-              onChange={(e) => setCenter(e.target.value)}
-              displayEmpty
-              sx={{
-                borderRadius: '8px',
-                '& .MuiSelect-select': {
-                  py: 1.5,
-                },
-              }}
-              disabled={!hasLocationSelection || loadingCenters}
-              MenuProps={{
-                anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
-                transformOrigin: { vertical: 'top', horizontal: 'left' },
-                PaperProps: {
-                  sx: {
-                    maxHeight: '220px',
+          {/* Center Dropdown - Hidden for Teachers */}
+          {!isTeacher && (
+            <Box sx={{ mb: 3 }}>
+              <InputLabel
+                sx={{
+                  fontSize: '12px',
+                  color: '#7C766F',
+                  mb: 1,
+                  transform: 'none',
+                  position: 'static',
+                }}
+              >
+                Center
+              </InputLabel>
+              <Select
+                fullWidth
+                value={center}
+                onChange={(e) => setCenter(e.target.value)}
+                displayEmpty
+                sx={{
+                  borderRadius: '8px',
+                  '& .MuiSelect-select': {
+                    py: 1.5,
                   },
-                },
-              }}
-            >
-            {loadingCenters ? (
-              <MenuItem value="" disabled>
-                Loading centers...
-              </MenuItem>
-            ) : !hasLocationSelection ? (
-              <MenuItem value="" disabled>
-                Set location filters first
-              </MenuItem>
-            ) : centers.length === 0 ? (
-              <MenuItem value="" disabled>
-                No centers available
-              </MenuItem>
-            ) : (
-              centers.map((centerOption) => (
-                <MenuItem key={centerOption.value} value={centerOption.value}>
-                  {centerOption.label}
+                }}
+                disabled={!hasLocationSelection || loadingCenters}
+                MenuProps={{
+                  anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
+                  transformOrigin: { vertical: 'top', horizontal: 'left' },
+                  PaperProps: {
+                    sx: {
+                      maxHeight: '220px',
+                    },
+                  },
+                }}
+              >
+              {loadingCenters ? (
+                <MenuItem value="" disabled>
+                  Loading centers...
                 </MenuItem>
-              ))
-            )}
-            </Select>
-          </Box>
+              ) : !hasLocationSelection ? (
+                <MenuItem value="" disabled>
+                  Set location filters first
+                </MenuItem>
+              ) : centers.length === 0 ? (
+                <MenuItem value="" disabled>
+                  No centers available
+                </MenuItem>
+              ) : (
+                centers.map((centerOption) => (
+                  <MenuItem key={centerOption.value} value={centerOption.value}>
+                    {centerOption.label}
+                  </MenuItem>
+                ))
+              )}
+              </Select>
+            </Box>
+          )}
 
-          {/* Batch Dropdown */}
+          {/* Batch Dropdown - Shows Centers for Teachers */}
           <Box sx={{ mb: 2 }}>
             <InputLabel
               sx={{
@@ -439,7 +464,7 @@ console.log('responseData=====>', data);
                 position: 'static',
               }}
             >
-              Batch
+              {isTeacher ? 'Batch' : 'Batch'}
             </InputLabel>
             <Select
               fullWidth
@@ -447,8 +472,12 @@ console.log('responseData=====>', data);
               onChange={(e) => {
                 const selectedValue = e.target.value;
                 setBatch(selectedValue);
-                const batchLabel = batches.find((option) => option.value === selectedValue)?.label;
-                setSelectedBatchName(batchLabel || '');
+                const selectedBatch = batches.find((option) => option.value === selectedValue);
+                setSelectedBatchName(selectedBatch?.label || '');
+                // For teachers, set center to the selected value (since they're selecting centers)
+                if (isTeacher) {
+                  setCenter(selectedValue);
+                }
               }}
               displayEmpty
               sx={{
@@ -457,7 +486,7 @@ console.log('responseData=====>', data);
                   py: 1.5,
                 },
               }}
-              disabled={!center || loadingBatches}
+              disabled={isTeacher ? loadingCenters : (!center || loadingBatches)}
               MenuProps={{
                 anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
                 transformOrigin: { vertical: 'top', horizontal: 'left' },
@@ -468,24 +497,48 @@ console.log('responseData=====>', data);
                 },
               }}
             >
-              {loadingBatches ? (
-                <MenuItem value="" disabled>
-                  Loading batches...
-                </MenuItem>
-              ) : !center ? (
-                <MenuItem value="" disabled>
-                  Select center first
-                </MenuItem>
-              ) : batches.length === 0 ? (
-                <MenuItem value="" disabled>
-                  No batches available
-                </MenuItem>
-              ) : (
-                batches.map((batchOption) => (
-                  <MenuItem key={batchOption.value} value={batchOption.value}>
-                    {batchOption.label}
+              {isTeacher ? (
+                // For Teachers - show center options
+                loadingCenters ? (
+                  <MenuItem value="" disabled>
+                    Loading centers...
                   </MenuItem>
-                ))
+                ) : !hasLocationSelection ? (
+                  <MenuItem value="" disabled>
+                    Set location filters first
+                  </MenuItem>
+                ) : batches.length === 0 ? (
+                  <MenuItem value="" disabled>
+                    No centers available
+                  </MenuItem>
+                ) : (
+                  batches.map((batchOption) => (
+                    <MenuItem key={batchOption.value} value={batchOption.value}>
+                      {batchOption.label}
+                    </MenuItem>
+                  ))
+                )
+              ) : (
+                // For non-Teachers - show batches for selected center
+                loadingBatches ? (
+                  <MenuItem value="" disabled>
+                    Loading batches...
+                  </MenuItem>
+                ) : !center ? (
+                  <MenuItem value="" disabled>
+                    Select center first
+                  </MenuItem>
+                ) : batches.length === 0 ? (
+                  <MenuItem value="" disabled>
+                    No batches available
+                  </MenuItem>
+                ) : (
+                  batches.map((batchOption) => (
+                    <MenuItem key={batchOption.value} value={batchOption.value}>
+                      {batchOption.label}
+                    </MenuItem>
+                  ))
+                )
               )}
             </Select>
           </Box>
