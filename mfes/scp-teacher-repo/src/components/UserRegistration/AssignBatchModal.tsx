@@ -3,7 +3,7 @@ import { Box, Modal, Typography, Button, IconButton, Radio, RadioGroup, FormCont
 import CloseIcon from '@mui/icons-material/Close';
 import { modalStyles } from '../../styles/modalStyles';
 import { getCohortList as getCohortListService, bulkCreateCohortMembers } from '../../services/CohortService/cohortService';
-import { getCohortList as getCohortListWithChildren } from '../../services/CohortServices';
+import { getCohortList as getCohortListWithChildren , getCohortData} from '../../services/CohortServices';
 
 import { updateUserTenantStatus } from '../../services/ManageUser';
 import { showToastMessage } from '../Toastify';
@@ -103,52 +103,52 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
     Boolean(locationFilters.blocks?.length) &&
     Boolean(locationFilters.villages?.length);
 
-  const buildCenterFilters = async() => {
-    const filters: Record<string, string[] | string> = {
-      type: 'COHORT',
-      status: ['active'],
-    };
+  // const buildCenterFilters = async() => {
+  //   const filters: Record<string, string[] | string> = {
+  //     type: 'COHORT',
+  //     status: ['active'],
+  //   };
 
-    const addFilter = (key: string, values?: (string | number)[]) => {
-      if (values && values.length > 0) {
-        filters[key] = values.map((value) => String(value));
-      }
-    };
-    let response: any;
-    if (typeof window !== 'undefined' && window.localStorage) {
-      const userId = localStorage.getItem('userId');
-      if (userId) {
-       response = await getCohortListWithChildren(userId, {
-          customField: 'true',
-        });
-        console.log('response', response[0]?.customField);
-        // setCenters(response.map((cohort: any) => ({
-        //   label: `${capitalizeFirstChar(cohort.name)} (${capitalizeFirstChar(getField(cohort.customFields, "TYPE_OF_CENTER"))})`,
-        //   value: cohort.cohortId,
-        // })));
-      }}
-      const getSelectedId = (label: any, data: any) => {
-        const field = data.find(item => item.label === label);
-        const selected = field?.selectedValues?.[0];
+  //   const addFilter = (key: string, values?: (string | number)[]) => {
+  //     if (values && values.length > 0) {
+  //       filters[key] = values.map((value) => String(value));
+  //     }
+  //   };
+  //   let response: any;
+  //   if (typeof window !== 'undefined' && window.localStorage) {
+  //     const userId = localStorage.getItem('userId');
+  //     if (userId) {
+  //      response = await getCohortListWithChildren(userId, {
+  //         customField: 'true',
+  //       });
+  //       console.log('response', response[0]?.customField);
+  //       // setCenters(response.map((cohort: any) => ({
+  //       //   label: `${capitalizeFirstChar(cohort.name)} (${capitalizeFirstChar(getField(cohort.customFields, "TYPE_OF_CENTER"))})`,
+  //       //   value: cohort.cohortId,
+  //       // })));
+  //     }}
+  //     const getSelectedId = (label: any, data: any) => {
+  //       const field = data.find(item => item.label === label);
+  //       const selected = field?.selectedValues?.[0];
       
-        return typeof selected === "object" ? selected.id : null;
-      };
-      // console.log('getSelectedId', getSelectedId('STATE', response[0]?.customField));
-      // console.log('getSelectedId', getSelectedId('DISTRICT', response[0]?.customField));
-      // console.log('getSelectedId', getSelectedId('BLOCK', response[0]?.customField));
-      // console.log('getSelectedId', getSelectedId('VILLAGE', response[0]?.customField));
-      // console.log('locationFilters.states', locationFilters.states);
-      // console.log('locationFilters.districts', locationFilters.districts);
-      // console.log('locationFilters.blocks', locationFilters.blocks);
-      // console.log('locationFilters.villages', locationFilters.villages);
-    addFilter('state', [getSelectedId('STATE', response[0]?.customField)]);
-    addFilter('district',[getSelectedId('DISTRICT', response[0]?.customField)]);
-    addFilter('block',[getSelectedId('BLOCK', response[0]?.customField)]);
-    addFilter('village',[getSelectedId('VILLAGE', response[0]?.customField)]);
-    console.log('filters=====>', filters);
+  //       return typeof selected === "object" ? selected.id : null;
+  //     };
+  //     // console.log('getSelectedId', getSelectedId('STATE', response[0]?.customField));
+  //     // console.log('getSelectedId', getSelectedId('DISTRICT', response[0]?.customField));
+  //     // console.log('getSelectedId', getSelectedId('BLOCK', response[0]?.customField));
+  //     // console.log('getSelectedId', getSelectedId('VILLAGE', response[0]?.customField));
+  //     // console.log('locationFilters.states', locationFilters.states);
+  //     // console.log('locationFilters.districts', locationFilters.districts);
+  //     // console.log('locationFilters.blocks', locationFilters.blocks);
+  //     // console.log('locationFilters.villages', locationFilters.villages);
+  //   addFilter('state', [getSelectedId('STATE', response[0]?.customField)]);
+  //   addFilter('district',[getSelectedId('DISTRICT', response[0]?.customField)]);
+  //   addFilter('block',[getSelectedId('BLOCK', response[0]?.customField)]);
+  //   addFilter('village',[getSelectedId('VILLAGE', response[0]?.customField)]);
+  //   console.log('filters=====>', filters);
 
-    return filters;
-  };
+  //   return filters;
+  // };
   function getField(customFields, label) {
     const field = customFields.find(f => f.label === label);
     if (!field) return null;
@@ -180,20 +180,23 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
     const fetchCenters = async () => {
       setLoadingCenters(true);
       try {
-        const response = await getCohortListService({
-          limit: 200,
-          offset: 0,
-          sort: ['name', 'asc'],
-          filters: await buildCenterFilters(),
-        });
-
-        const cohortDetails = response?.results?.cohortDetails ?? [];
-        console.log('cohortDetails', cohortDetails);
-        const centerOptions = cohortDetails.map((cohort: any) => {
-          const cf = cohort.customFields;
+        // const response = await getCohortListService({
+        //   limit: 200,
+        //   offset: 0,
+        //   sort: ['name', 'asc'],
+        //   filters: await buildCenterFilters(),
+        // });
+        // console.log('response=====>', response);
+const responseData = await getCohortData(localStorage.getItem('userId') || '');
+const data = responseData?.result ?? [];
+console.log('responseData=====>', data);
+        // const cohortDetails = response?.results?.cohortDetails ?? [];
+        // console.log('cohortDetails', cohortDetails);
+        const centerOptions = data.map((cohort: any) => {
+          const cf = cohort.customField;
         
           return {
-            label: `${capitalizeFirstChar(cohort.name)} (${capitalizeFirstChar(getField(cf, "TYPE_OF_CENTER"))})`,
+            label: `${capitalizeFirstChar(cohort.cohortName)} (${capitalizeFirstChar(getField(cf, "TYPE_OF_CENTER"))})`,
             value: cohort.cohortId,
           };
         });
