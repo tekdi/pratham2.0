@@ -142,7 +142,7 @@ const StateLead = () => {
       );
       const staticFilter = {
         role: RoleName.STATE_LEAD,
-        tenantId: storedUserData.tenantData[0].tenantId,
+        // tenantId: storedUserData.tenantData[0].tenantId,
       };
       const { sortBy } = formData;
       const staticSort = ['firstName', sortBy || 'asc'];
