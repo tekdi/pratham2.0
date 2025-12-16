@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Box, Select, MenuItem, InputLabel, Checkbox, ListItemText, Grid, FormControl } from '@mui/material';
 import { getFieldOptions } from '../../services/MasterDataService';
+import { getCohortData } from '../../services/CohortServices';
 
 interface LocationOption {
   value: number | string;
@@ -41,6 +42,19 @@ const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange 
   const [loadingDistricts, setLoadingDistricts] = useState(false);
   const [loadingBlocks, setLoadingBlocks] = useState(false);
   const [loadingVillages, setLoadingVillages] = useState(false);
+
+  // Add state to store location IDs from user data
+  const [userLocationIds, setUserLocationIds] = useState<{
+    stateId: number | null;
+    districtId: number | null;
+    blockId: number | null;
+    villageId: number | null;
+  }>({
+    stateId: null,
+    districtId: null,
+    blockId: null,
+    villageId: null,
+  });
 
   const storedLocationRef = useRef<StoredLocationFilters>({});
   const defaultsAppliedRef = useRef({
@@ -149,11 +163,30 @@ const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange 
       setIsStoredLocationLoaded(true);
     }
   }, []);
-
+  function getLocationIds(fields: any[]) {
+    const getByLabel = (label: string) =>
+      fields.find((f: any) => f.label === label)?.selectedValues?.[0];
+  
+    return {
+      stateId: getByLabel("STATE")?.id ?? null,
+      districtId: getByLabel("DISTRICT")?.id ?? null,
+      blockId: getByLabel("BLOCK")?.id ?? null,
+      villageId: getByLabel("VILLAGE")?.id ?? null,
+    };
+  }
+  
   // Fetch states on mount
   useEffect(() => {
     const fetchStates = async () => {
-      setLoadingStates(true);
+      const data = await getCohortData(localStorage.getItem('userId') || '');
+      const userData = data?.result || {};
+      console.log('userData=====>', userData[0]?.customField);
+      const locationIds = getLocationIds(userData[0]?.customField);
+      console.log('locationIds=====>', locationIds);
+      
+      // Store the location IDs for default selection
+      setUserLocationIds(locationIds);
+     
       try {
         const response = await getFieldOptions({
           fieldName: 'state',
@@ -176,18 +209,34 @@ const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange 
     fetchStates();
   }, []);
 
+ 
+
+
   useEffect(() => {
     if (!isStoredLocationLoaded || defaultsAppliedRef.current.states || states.length === 0) {
       return;
     }
 
     const storedMatches = getMatchingOptionValues(states, storedLocationRef.current.states);
-    const newSelection =
-      storedMatches.length > 0 ? storedMatches : (states[0] ? [states[0].value] : []);
+    let newSelection: (number | string)[] = [];
+
+    if (storedMatches.length > 0) {
+      // Use stored matches from localStorage
+      newSelection = storedMatches;
+    } else if (userLocationIds.stateId) {
+      // Try to match with user's location ID
+      const matchedState = states.find(state => state.value === userLocationIds.stateId);
+      newSelection = matchedState ? [matchedState.value] : [];
+    }
+    
+    // Fallback to first option if no match found
+    if (newSelection.length === 0 && states[0]) {
+      newSelection = [states[0].value];
+    }
 
     setSelectedStates(newSelection);
     defaultsAppliedRef.current.states = true;
-  }, [isStoredLocationLoaded, states]);
+  }, [isStoredLocationLoaded, states, userLocationIds.stateId]);
 
   // Fetch districts when states are selected
   useEffect(() => {
@@ -250,14 +299,25 @@ const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange 
     }
 
     const storedMatches = getMatchingOptionValues(districts, storedLocationRef.current.districts);
-    // If we have stored matches, use them.
-    // Otherwise, if this is a "fresh" load (user changed state manually), default to first district.
-    const newSelection =
-      storedMatches.length > 0 ? storedMatches : (districts[0] ? [districts[0].value] : []);
+    let newSelection: (number | string)[] = [];
+
+    if (storedMatches.length > 0) {
+      // Use stored matches from localStorage
+      newSelection = storedMatches;
+    } else if (userLocationIds.districtId) {
+      // Try to match with user's location ID
+      const matchedDistrict = districts.find(district => district.value === userLocationIds.districtId);
+      newSelection = matchedDistrict ? [matchedDistrict.value] : [];
+    }
+    
+    // Fallback to first option if no match found
+    if (newSelection.length === 0 && districts[0]) {
+      newSelection = [districts[0].value];
+    }
 
     setSelectedDistricts(newSelection);
     defaultsAppliedRef.current.districts = true;
-  }, [districts, isStoredLocationLoaded]);
+  }, [districts, isStoredLocationLoaded, userLocationIds.districtId]);
 
   // Fetch blocks when districts are selected
   useEffect(() => {
@@ -315,12 +375,25 @@ const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange 
     }
 
     const storedMatches = getMatchingOptionValues(blocks, storedLocationRef.current.blocks);
-    const newSelection =
-      storedMatches.length > 0 ? storedMatches : (blocks[0] ? [blocks[0].value] : []);
+    let newSelection: (number | string)[] = [];
+
+    if (storedMatches.length > 0) {
+      // Use stored matches from localStorage
+      newSelection = storedMatches;
+    } else if (userLocationIds.blockId) {
+      // Try to match with user's location ID
+      const matchedBlock = blocks.find(block => block.value === userLocationIds.blockId);
+      newSelection = matchedBlock ? [matchedBlock.value] : [];
+    }
+    
+    // Fallback to first option if no match found
+    if (newSelection.length === 0 && blocks[0]) {
+      newSelection = [blocks[0].value];
+    }
 
     setSelectedBlocks(newSelection);
     defaultsAppliedRef.current.blocks = true;
-  }, [blocks, isStoredLocationLoaded]);
+  }, [blocks, isStoredLocationLoaded, userLocationIds.blockId]);
 
   // Fetch villages when blocks are selected
   useEffect(() => {
@@ -373,12 +446,25 @@ const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange 
     }
 
     const storedMatches = getMatchingOptionValues(villages, storedLocationRef.current.villages);
-    const newSelection =
-      storedMatches.length > 0 ? storedMatches : (villages[0] ? [villages[0].value] : []);
+    let newSelection: (number | string)[] = [];
+
+    if (storedMatches.length > 0) {
+      // Use stored matches from localStorage
+      newSelection = storedMatches;
+    } else if (userLocationIds.villageId) {
+      // Try to match with user's location ID
+      const matchedVillage = villages.find(village => village.value === userLocationIds.villageId);
+      newSelection = matchedVillage ? [matchedVillage.value] : [];
+    }
+    
+    // Fallback to first option if no match found
+    if (newSelection.length === 0 && villages[0]) {
+      newSelection = [villages[0].value];
+    }
 
     setSelectedVillages(newSelection);
     defaultsAppliedRef.current.villages = true;
-  }, [villages, isStoredLocationLoaded]);
+  }, [villages, isStoredLocationLoaded, userLocationIds.villageId]);
 
   // Notify parent component when location changes
   useEffect(() => {

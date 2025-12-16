@@ -94,19 +94,28 @@ const CallLogModal: React.FC<CallLogModalProps> = ({
               Date of Call
             </Typography>
             <TextField
-              fullWidth
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              InputProps={{
-                disableUnderline: true,
-              }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: '8px',
-                },
-              }}
-            />
+  fullWidth
+  type="date"
+  value={date}
+  onChange={(e) => setDate(e.target.value)}
+  inputProps={{
+    max: today, // ⛔ prevent future dates
+  }}
+  InputProps={{
+    disableUnderline: true,
+  }}
+  sx={{
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '8px',
+    },
+    '& input::-webkit-calendar-picker-indicator': {
+      cursor: 'pointer',
+    },
+  }}
+/>
+
+
+
           </Box>
 
           {/* Note */}
