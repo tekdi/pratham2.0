@@ -22,6 +22,7 @@ import {
 import { useParams, useRouter } from 'next/navigation';
 import { ContentSearch } from '@learner/utils/API/contentService';
 import { checkAuth } from '@shared-lib-v2/utils/AuthService';
+import { isDownloadContentEnabled } from '@shared-lib-v2/SwitchAccount/DownloadContent.config';
 import {
   ExpandableText,
   findCourseUnitPath,
@@ -391,7 +392,8 @@ const App = ({
           {..._config?.player}
         />
         {item?.content?.artifactUrl &&
-          isDownloadableMimeType(item?.content?.mimeType || mimeType) && (
+          isDownloadableMimeType(item?.content?.mimeType || mimeType) &&
+          isDownloadContentEnabled() && (
             <Box
               sx={{
                 my: 3,
@@ -537,7 +539,7 @@ const App = ({
             margin: 0,
             maxHeight: '100vh',
           },
-        }}  
+        }}
         PaperProps={{
           sx: {
             width: {
