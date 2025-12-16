@@ -65,6 +65,7 @@ export interface ContentSearchResponse {
   size?: number;
   lastPublishedOn?: string;
   name?: string;
+  englishName?: string;
   attributions?: string[];
   targetBoardIds?: string[];
   status?: string;
@@ -155,6 +156,7 @@ export const ContentSearch = async ({
       status: ['live'],
       channel: localStorage.getItem('channelId'),
     };
+    // console.log('filtersObject====>', filtersObject?.primaryCategory);
     if(primaryCategory && thematicCount){
       filtersObject.primaryCategory = primaryCategory;
     }
@@ -176,6 +178,7 @@ export const ContentSearch = async ({
         filters: filtersObject,
         fields: [
           'name',
+          'englishName',
           'appIcon',
           'description',
           'posterImage',
@@ -241,14 +244,15 @@ export const CommonContentSearch = async ({
           // identifier: 'do_1141652605790289921389',
           //need below after login user channel for dynamic load content
           // channel: '0135656861912678406',
-          primaryCategory:['Course'],
+          primaryCategory: ['Course'],
           ...filters,
           status: ['live'],
-        
+
           channel: localStorage.getItem('channelId'),
         },
         fields: [
           'name',
+          'englishName',
           'appIcon',
           'description',
           'posterImage',
@@ -260,7 +264,7 @@ export const CommonContentSearch = async ({
           'trackable',
           'children',
           'leafNodes',
-          'courseType'
+          'courseType',
         ],
         query,
         limit,
@@ -281,4 +285,3 @@ export const CommonContentSearch = async ({
     throw error;
   }
 };
-

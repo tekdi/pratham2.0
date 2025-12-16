@@ -311,7 +311,8 @@ const UserId = () => {
             }}
           />
         </Box>
-        {userId === currentUserId && userProgram !== 'Pragyanpath' && (
+        {/* TODO: Add edit profile button */}
+        {/* {userId === currentUserId && userProgram !== 'Pragyanpath' && (
           <Box
             sx={{
               marginLeft: '30%',
@@ -351,7 +352,7 @@ const UserId = () => {
               </Box>
             </Button>
           </Box>
-        )}
+        )} */}
         {/* <Box ml={2}>
         {' '}
         <Typography

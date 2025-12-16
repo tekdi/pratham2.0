@@ -23,7 +23,7 @@ export interface userListParam {
   //  page: number;
   filters: {
     role?: string;
-    status?: string[];
+    tenantStatus?: string[];
     states?: string;
     district?: string[];
     block?: string[];
@@ -102,7 +102,7 @@ export const getYouthDataByDate = async (
   try {
     const filters = {
       role: Role.LEARNER,
-      status: [Status.ACTIVE],
+      tenantStatus: [Status.ACTIVE],
       fromDate: fromDate.toLocaleDateString('en-CA').split('T')[0],
       toDate: toDate.toLocaleDateString('en-CA').split('T')[0],
       village: villageId,
@@ -114,18 +114,53 @@ export const getYouthDataByDate = async (
   } catch (error) {}
 };
 
+// Helper function to extract all villages from WORKING_LOCATION structure
+const extractVillagesFromWorkingLocation = (
+  workingLocationField: any
+): any[] => {
+  if (
+    !workingLocationField?.selectedValues ||
+    !Array.isArray(workingLocationField.selectedValues)
+  ) {
+    return [];
+  }
+
+  const allVillages: any[] = [];
+
+  // Iterate through all states
+  workingLocationField.selectedValues.forEach((state: any) => {
+    if (state.districts && Array.isArray(state.districts)) {
+      // Iterate through all districts in the state
+      state.districts.forEach((district: any) => {
+        if (district.blocks && Array.isArray(district.blocks)) {
+          // Iterate through all blocks in the district
+          district.blocks.forEach((block: any) => {
+            if (block.villages && Array.isArray(block.villages)) {
+              // Add all villages from this block
+              allVillages.push(...block.villages);
+            }
+          });
+        }
+      });
+    }
+  });
+
+  return allVillages;
+};
+
 export const getVillages = async (userId: any) => {
   try {
     const storedUserId = localStorage.getItem('userId');
     let userDataString = localStorage.getItem('userData');
     let userData: any = userDataString ? JSON.parse(userDataString) : null;
 
+    // for mobilizer
     if (userData && userId === storedUserId && userData.customFields) {
       // If cached userData exists and matches stored userId, return villages
-      const villageResult = userData.customFields.find(
-        (item: any) => item.label === 'VILLAGE'
+      const workingLocationResult = userData.customFields.find(
+        (item: any) => item.label === 'WORKING_LOCATION'
       );
-      return villageResult?.selectedValues;
+      return extractVillagesFromWorkingLocation(workingLocationResult);
     }
 
     let selectedMentorDataString = localStorage.getItem('selectedmentorData');
@@ -135,7 +170,7 @@ export const getVillages = async (userId: any) => {
       ? JSON.parse(selectedMentorDataString)
       : null;
 
-    if (selectedMentorData && selectedMentorData.userId == userId) {
+    if (selectedMentorData && selectedMentorData.userId === userId) {
       // If selected mentor data matches, use it
       userData = selectedMentorData;
     } else {
@@ -147,16 +182,17 @@ export const getVillages = async (userId: any) => {
       localStorage.setItem('selectedmentorData', JSON.stringify(userData));
       localStorage.setItem('selectedmentorId', userId);
 
+      // for mobilizer
       if (userId === storedUserId) {
         userData.customFields = data.userData.customFields;
         localStorage.setItem('userData', JSON.stringify(userData));
       }
     }
 
-    const villageResult = userData?.customFields?.find(
-      (item: any) => item.label === 'VILLAGE'
+    const workingLocationResult = userData?.customFields?.find(
+      (item: any) => item.label === 'WORKING_LOCATION'
     );
-    return villageResult?.selectedValues;
+    return extractVillagesFromWorkingLocation(workingLocationResult);
   } catch (error) {
     console.error('Error fetching villages:', error);
     return null;
@@ -198,6 +234,21 @@ export const deleteUser = async (
     return response?.data;
   } catch (error) {
     console.error('error in deleting user', error);
+    return error;
+  }
+};
+
+export const updateUserTenantStatus = async (
+  userId: string,
+  tenantId: string,
+  userDetails?: object
+): Promise<any> => {
+  const apiUrl: string = API_ENDPOINTS.userTenantStatus(userId, tenantId);
+  try {
+    const response = await patch(apiUrl, userDetails);
+    return response?.data;
+  } catch (error) {
+    console.error('error in updating user tenant status', error);
     return error;
   }
 };

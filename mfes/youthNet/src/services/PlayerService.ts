@@ -25,25 +25,28 @@ export const fetchBulkContents = async (identifiers: string[]) => {
           identifier: identifiers,
         },
         fields: [
-            "name",
-            "appIcon",
-            "medium",
-            "subject",
-            "resourceType",
-            "contentType",
-            "organisation",
-            "topic",
-            "mimeType",
-            "trackable",
-            "gradeLevel"
+          'name',
+          'englishName',
+          'appIcon',
+          'medium',
+          'subject',
+          'resourceType',
+          'contentType',
+          'organisation',
+          'topic',
+          'mimeType',
+          'trackable',
+          'gradeLevel',
         ],
-      }
-    }
+      },
+    };
     const response = await axios.post(URL_CONFIG.API.COMPOSITE_SEARCH, options);
     const result = response?.data?.result;
     if (response?.data?.result?.QuestionSet?.length) {
       // result.content = [...result.content, ...result.QuestionSet];
-      const contents = result?.content ? [...result.content, ...result.QuestionSet] : [...result.QuestionSet]
+      const contents = result?.content
+        ? [...result.content, ...result.QuestionSet]
+        : [...result.QuestionSet];
       result.content = contents;
     }
 
@@ -90,28 +93,31 @@ export const fetchCourses = async (filters: any = {}) => {
         // },
         ...filters,
         fields: [
-          "name",
-          "appIcon",
-          "description",
-          "posterImage",
-          "mimeType",
-          "identifier",
-          "resourceType",
-          "primaryCategory",
-          "contentType",
-          "trackable",
-          "children",
-          "leafNodes",
-          "courseType"
-        ]
-      }
+          'name',
+          'englishName',
+          'appIcon',
+          'description',
+          'posterImage',
+          'mimeType',
+          'identifier',
+          'resourceType',
+          'primaryCategory',
+          'contentType',
+          'trackable',
+          'children',
+          'leafNodes',
+          'courseType',
+        ],
+      },
     };
 
     const response = await axios.post(URL_CONFIG.API.COMPOSITE_SEARCH, options);
     const result = response?.data?.result;
-    
+
     if (response?.data?.result?.QuestionSet?.length) {
-      const contents = result?.content ? [...result.content, ...result.QuestionSet] : [...result.QuestionSet];
+      const contents = result?.content
+        ? [...result.content, ...result.QuestionSet]
+        : [...result.QuestionSet];
       result.content = contents;
     }
 
@@ -132,4 +138,3 @@ export const getCourseHierarchy = async (identifier: any) => {
     throw error;
   }
 };
-

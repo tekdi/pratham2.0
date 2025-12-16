@@ -166,7 +166,10 @@
     "ACTIVATE_USER": "Activate User",
     "ACTIVATE": "Activate",
     "RESIGNED_FROM_COMPANY": "Resigned from the company",
-    "MOVED_TO_DIFFERENT_ROLE":"Moved to a different role"
+    "MOVED_TO_DIFFERENT_ROLE": "Moved to a different role",
+    "NO_MOBILIZER_FOUND": "No Mobilizer Found",
+    "MAP": "Map",
+    "NEXT": "Next"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -242,7 +245,8 @@
     "PROGRAMS": "Programs",
     "SKILLING_CENTERS": "Skilling Centers",
     "CURRICULUM_PLANNER": "Curriculum Planner",
-    "BATCH": "Batch"
+    "BATCH": "Batch",
+    "MOBILIZER": "Mobilizer"
   },
   "FACILITATORS": {
     "STATE": "State",
@@ -278,8 +282,7 @@
     "EDIT_LEARNER": "Edit Learner",
     "NO_LEARNERS_FOUND": "No Learners Found",
     "RE_ASSIGN_LEARNER": "Re-assign Learner",
-               "ACTIVATE_USER_SUCCESS": "User has been successfully activated"
-
+    "ACTIVATE_USER_SUCCESS": "User has been successfully activated"
   },
   "MENTOR_LEADERS": {
     "SEARCHBAR_PLACEHOLDER": "Search Center Heads..",
@@ -358,8 +361,8 @@
     "DELETE_PLANNER": "Delete Planner",
     "CSV_TEMPLATE": "CSV Template",
     "NEW_TOPIC": "New Topic",
-        "DOWNLOAD_CSV": "Download Uploaded CSV"
-   
+    "DOWNLOAD_CSV": "Download Uploaded CSV",
+    "DURING_COURSE": "During Course"
 
   },
   "MASTER": {
@@ -383,7 +386,6 @@
     "BLOCK_CODE": "Block Code",
     "CODE": "Code",
     "MASTER": "Master"
-    
   },
   "CENTERS": {
     "CENTER": "center",
@@ -543,8 +545,10 @@
     "MOTHER_NAME": "Mother Name",
     "DATE_OF_BIRTH": "Date of Birth",
     "TEST_BELONG_TO": "test belongs to below center",
-         "WAS_BELONG_TO": "was archived in the below location",
-    "CONFIRM_TO_ACTIVATE":"Are you sure you want to activate this user again?"
+    "WAS_BELONG_TO": "was archived in the below location",
+    "CONFIRM_TO_ACTIVATE": "Are you sure you want to activate this user again?",
+    "WORKING_LOCATION": "Working Location",
+    "CATCHMENT_AREA": "Catchment Area"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "Invalid Input.",
@@ -599,7 +603,9 @@
     "COURSE_STATUS": "Course Status",
     "ISSUED_DATE": "Issued Date",
     "USER_ID": "User Id",
-    "COURSE_ID": "Course Id"
+    "COURSE_ID": "Course Id",
+    "LOCATION": "Location (State / District / Block / Village)",
+    "WORKING_VILLAGE": "Working Village"
   },
   "WORKSPACE": {
     "EDITOR_WORKSPACE": "Editor Workspace",
@@ -750,6 +756,7 @@
   "REMOTE": "Remote",
   "IS_VOLUNTEER": "Is Volunteer",
   "middle_name": "Middle Name",
+  "CATCHMENT_AREA": "Catchment Area",
   "CONTENT_CREATORS": {
     "SEARCHBAR_PLACEHOLDER": "Search content creator..",
     "NEW_CONTENT_CREATOR": "New Content Creator",
@@ -843,5 +850,24 @@
     "DO_YOU_WANT_TO_UNMARK_AS_VOLUNTEER": "Do you want to unmark as a volunteer",
     "UNMARK_AS_VOLUNTEER_SUCCESSFULLY": "Unmarked as volunteer successfully",
     "UNMARK_AS_VOLUNTEER_FAILED": "Failed to unmark as volunteer"
+  },
+  "MOBILIZER": {
+    "ACTIVATE_USER_SUCCESS": "User has been successfully activated",
+    "MOBILIZER_UPDATED_SUCCESSFULLY": "Mobilizer has been successfully updated!",
+    "NOT_ABLE_UPDATE_MOBILIZER": "Not able to update Mobilizer",
+    "MOBILIZER_CREATED_SUCCESSFULLY": "Mobilizer has been successfully created!",
+    "NOT_ABLE_CREATE_MOBILIZER": "Not able to create Mobilizer",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "Mobilizer is created, credentials will be sent soon",
+    "MAP_USER_AS_LEAD": "Map User as Lead",
+    "MAP_USER_AS_MOBILIZER": "Map User as Mobilizer",
+    "PLEASE_SEARCH_AND_SELECT_USER": "Please search and select a user",
+    "UNKNOWN_STATE": "Unknown State",
+    "UNKNOWN_DISTRICT": "Unknown District",
+    "UNKNOWN_BLOCK": "Unknown Block",
+    "WORKING_LOCATION_REQUIRED": "Working location is required. Please select villages for all blocks.",
+    "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES": "Working location is required. Please select villages for all blocks. Missing villages in: {{blocks}} and {{count}} more block(s).",
+    "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES_SINGLE": "Working location is required. Please select villages for all blocks. Missing villages in: {{blocks}}.",
+    "WORKING_LOCATION_REQUIRED_AT_LEAST_ONE": "Working location is required. Please select at least one village in all blocks.",
+    "MOBILIZER_NAME": "Mobilizer Name"
   }
 }
