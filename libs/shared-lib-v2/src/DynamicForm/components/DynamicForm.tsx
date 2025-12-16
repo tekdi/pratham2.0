@@ -381,27 +381,26 @@ const DynamicForm = ({
 
             // Reorder guardian fields to appear right after DOB
             let reorderedUiSchema = updatedUiSchema;
-            reorderedUiSchema = reorderUiSchemaFields(
-              reorderedUiSchema,
-              'guardian_info_note',
-              'dob'
-            );
-            reorderedUiSchema = reorderUiSchemaFields(
-              reorderedUiSchema,
-              'guardian_name',
-              'guardian_info_note'
-            );
-            reorderedUiSchema = reorderUiSchemaFields(
-              reorderedUiSchema,
-              'guardian_relation',
-              'guardian_name'
-            );
-            reorderedUiSchema = reorderUiSchemaFields(
-              reorderedUiSchema,
-              'parent_phone',
-              'guardian_relation'
-            );
-
+            
+            // Ensure ui:order exists and add guardian_info_note to it if not present
+            if (!reorderedUiSchema['ui:order']) {
+              reorderedUiSchema['ui:order'] = Object.keys(oldFormSchema.properties);
+            }
+            
+            // Only add guardian_info_note to ui:order if it's not already there
+            if (!reorderedUiSchema['ui:order'].includes('guardian_info_note')) {
+              const dobIndex = reorderedUiSchema['ui:order'].indexOf('dob');
+              if (dobIndex !== -1) {
+                reorderedUiSchema['ui:order'].splice(dobIndex + 1, 0, 'guardian_info_note');
+              } else {
+                reorderedUiSchema['ui:order'].push('guardian_info_note');
+              }
+            }
+            
+            reorderedUiSchema = reorderUiSchemaFields(reorderedUiSchema, 'guardian_name', 'guardian_info_note');
+            reorderedUiSchema = reorderUiSchemaFields(reorderedUiSchema, 'guardian_relation', 'guardian_name');
+            reorderedUiSchema = reorderUiSchemaFields(reorderedUiSchema, 'parent_phone', 'guardian_relation');
+            
             oldFormUiSchema = reorderedUiSchema;
           } else {
             delete formData?.parent_phone;
