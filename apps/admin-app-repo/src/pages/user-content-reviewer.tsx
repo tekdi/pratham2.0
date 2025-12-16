@@ -4,9 +4,9 @@ import DynamicForm from '@/components/DynamicForm/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
 import {
-  StateLeadSearchSchema,
-  StateLeadUISchema,
-} from '../constant/Forms/StateLeadSearch';
+  ContentReviewerSearchSchema,
+  ContentReviewerUISchema,
+} from '../constant/Forms/ContentReviewerSearch';
 import CloseIcon from '@mui/icons-material/Close';
 
 import { RoleId, RoleName, Status, TenantName } from '@/utils/app.constant';
@@ -52,13 +52,13 @@ import {
 } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import { enrollUserTenant } from '@shared-lib-v2/MapUser/MapService';
 
-const StateLead = () => {
+const ContentReviewer = () => {
   const [archiveToActiveOpen, setArchiveToActiveOpen] = useState(false);
 
   const theme = useTheme<any>();
   const [isLoading, setIsLoading] = useState(false);
-  const [schema, setSchema] = useState(StateLeadSearchSchema);
-  const [uiSchema, setUiSchema] = useState(StateLeadUISchema);
+  const [schema, setSchema] = useState(ContentReviewerSearchSchema);
+  const [uiSchema, setUiSchema] = useState(ContentReviewerUISchema);
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
   const [prefilledState, setPrefilledState] = useState({});
@@ -83,7 +83,7 @@ const StateLead = () => {
   const [checked, setChecked] = useState(false);
   const [userID, setUserId] = useState('');
 
-  const searchStoreKey = 'stateLead';
+  const searchStoreKey = 'contentReviewer';
   const initialFormDataSearch =
     localStorage.getItem(searchStoreKey) &&
     localStorage.getItem(searchStoreKey) != '{}'
@@ -95,11 +95,11 @@ const StateLead = () => {
   const storedUserData = JSON.parse(localStorage.getItem('adminInfo') || '{}');
 
   console.log(
-    '########### type state lead process.env.NEXT_PUBLIC_TEACHER_SBPLAYER',
+    '########### type Content Reviewer process.env.NEXT_PUBLIC_TEACHER_SBPLAYER',
     process.env.NEXT_PUBLIC_TEACHER_SBPLAYER
   );
   console.log(
-    '########### type state lead process.env.NEXT_PUBLIC_ADMIN_SBPLAYER',
+    '########### type Content Reviewer process.env.NEXT_PUBLIC_ADMIN_SBPLAYER',
     process.env.NEXT_PUBLIC_ADMIN_SBPLAYER
   );
   let cleanedUrl = process.env.NEXT_PUBLIC_ADMIN_SBPLAYER?.replace(
@@ -120,11 +120,11 @@ const StateLead = () => {
     const fetchData = async () => {
       const responseForm = await fetchForm([
         {
-          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.stateLead.context}&contextType=${FormContext.stateLead.contextType}`,
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.contentReviewer.context}&contextType=${FormContext.contentReviewer.contextType}`,
           header: {},
         },
         {
-          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.stateLead.context}&contextType=${FormContext.stateLead.contextType}`,
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.contentReviewer.context}&contextType=${FormContext.contentReviewer.contextType}`,
           header: {
             tenantid: TenantService.getTenantId(),
           },
@@ -171,7 +171,7 @@ const StateLead = () => {
     setPrefilledAddFormData(initialFormDataSearch);
     fetchData();
 
-    setRoleID(RoleId.STATE_LEAD);
+    setRoleID(RoleId.CONTENT_REVIEWER);
     setTenantId(localStorage.getItem('tenantId'));
   }, []);
 
@@ -208,7 +208,7 @@ const StateLead = () => {
         )
       );
       const staticFilter = {
-        role: RoleName.STATE_LEAD,
+        role: RoleName.CONTENT_REVIEWER,
         tenantId: storedUserData.tenantData[0].tenantId,
       };
       const { sortBy } = formData;
@@ -231,18 +231,17 @@ const StateLead = () => {
   let columns = [
     {
       keys: ['firstName', 'middleName', 'lastName'],
-      label: 'State Lead Name',
+      label: 'Content Reviewer Name',
       render: (row: any) =>
-        `${row.firstName || ''} ${row.middleName || ''} ${
-          row.lastName || ''
+        `${row.firstName || ''} ${row.middleName || ''} ${row.lastName || ''
         }`.trim(),
     },
     {
       key: 'status',
       label: 'Status',
-      render: (row: any) => transformLabel(row.status),
+      render: (row: any) => transformLabel(row.tenantStatus),
       getStyle: (row: any) => ({
-        color: row.status === 'active' ? 'green' : 'red',
+        color: row.tenantStatus === 'active' ? 'green' : 'red',
       }),
     },
     {
@@ -256,6 +255,95 @@ const StateLead = () => {
       },
     },
   ];
+  const scpCustomColumns = [
+    {
+      key: 'BOARD',
+      label: 'Board',
+      render: (row) => {
+        const board =
+          row.customFields
+            .find((field) => field.label === 'BOARD')
+            ?.selectedValues.join(', ') || '-';
+        return `${board}`;
+      },
+    },
+    {
+      key: 'MEDIUM',
+      label: 'Medium',
+      render: (row) => {
+        const medium =
+          row.customFields
+            .find((field) => field.label === 'MEDIUM')
+            ?.selectedValues.join(', ') || '-';
+        return `${medium}`;
+      },
+    },
+    {
+      key: 'GRADE',
+      label: 'Grade',
+      render: (row) => {
+        const grade =
+          row.customFields
+            .find((field) => field.label === 'GRADE')
+            ?.selectedValues.join(', ') || '-';
+        return `${grade}`;
+      },
+    },
+    {
+      key: 'SUBJECT',
+      label: 'Subject',
+      render: (row) => {
+        const subject =
+          row.customFields
+            .find((field) => field.label === 'SUBJECT')
+            ?.selectedValues.join(', ') || '-';
+        return `${subject}`;
+      },
+    },
+  ];
+
+  const youthnetCustomColumns = [
+    {
+      key: 'DOMAIN',
+      label: 'Domain',
+      render: (row) => {
+        const domain =
+          row.customFields
+            .find((field) => field.label === 'DOMAIN')
+            ?.selectedValues.join(', ') || '-';
+        return `${domain}`;
+      },
+    },
+    {
+      key: 'SUB DOMAIN',
+      label: 'Sub Domain',
+      render: (row) => {
+        const subDomain =
+          row.customFields
+            .find((field) => field.label === 'SUB DOMAIN')
+            ?.selectedValues.join(', ') || '-';
+        return `${subDomain}`;
+      },
+    },
+    {
+      key: 'STREAM',
+      label: 'Stream',
+      render: (row) => {
+        const stream =
+          row.customFields
+            .find((field) => field.label === 'STREAM')
+            ?.selectedValues.join(', ') || '-';
+        return `${stream}`;
+      },
+    },
+  ];
+  if (
+    storedUserData.tenantData[0].tenantName === TenantName.SECOND_CHANCE_PROGRAM
+  ) {
+    columns = [...columns, ...scpCustomColumns];
+  } else if (storedUserData.tenantData[0].tenantName === TenantName.YOUTHNET) {
+    columns = [...columns, ...youthnetCustomColumns];
+  }
 
   const archiveToactive = async () => {
     try {
@@ -284,7 +372,7 @@ const StateLead = () => {
     //         justifyContent: 'center',
     //         padding: '10px',
     //       }}
-    //       title="Edit State Lead"
+    //       title="Edit Content Reviewer"
     //     >
     //       <Image src={editIcon} alt="" />
     //     </Box>
@@ -293,6 +381,7 @@ const StateLead = () => {
     //     console.log('row:', row);
     //     console.log('AddSchema', addSchema);
     //     console.log('AddUISchema', addUiSchema);
+
     //     let tempFormData = extractMatchingKeys(row, addSchema);
     //     console.log('tempFormData', tempFormData);
     //     setPrefilledAddFormData(tempFormData);
@@ -300,7 +389,7 @@ const StateLead = () => {
     //     setEditableUserId(row?.userId);
     //     handleOpenModal();
     //   },
-    //   show: (row) => row.status !== 'archived',
+    //   show: (row) => row.tenantStatus !== 'archived',
     // },
     // {
     //   icon: (
@@ -314,7 +403,7 @@ const StateLead = () => {
     //         justifyContent: 'center',
     //         padding: '10px',
     //       }}
-    //       title="Delete State Lead"
+    //       title="Delete Content Reviewer"
     //     >
     //       {' '}
     //       <Image src={deleteIcon} alt="" />
@@ -324,16 +413,14 @@ const StateLead = () => {
     //     console.log('row:', row);
     //     setEditableUserId(row?.userId);
     //     const userId = row?.userId;
-    //     const response = await deleteUser(userId, {
-    //       userData: {
-    //         status: Status.ARCHIVED,
-    //       },
+    //     const response = await updateUserTenantStatus(userId, tenantId, {
+    //       status: 'archived'
     //     });
     //     setPrefilledFormData({});
     //     searchData(prefilledFormData, currentPage);
     //     setOpenModal(false);
     //   },
-    //   show: (row) => row.status !== 'archived',
+    //   show: (row) => row.tenantStatus !== 'archived',
     // },
     // {
     //   icon: (
@@ -347,7 +434,7 @@ const StateLead = () => {
     //         justifyContent: 'center',
     //         padding: '10px',
     //       }}
-    //       title="Reactivate State Lead"
+    //       title="Reactivate Content Reviewer"
     //     >
     //       {' '}
     //       <Image src={restoreIcon} alt="" />
@@ -369,8 +456,8 @@ const StateLead = () => {
     //     setArchiveToActiveOpen(true);
     //     setPrefilledFormData({});
     //   },
-    //   show: (row) => row.status !== 'active',
-    // }
+    //   show: (row) => row.tenantStatus !== 'active',
+    // },
   ];
 
   // Pagination handlers
@@ -398,23 +485,27 @@ const StateLead = () => {
     tenantCohortRoleMapping: [
       {
         tenantId: TenantService.getTenantId(),
-        roleId: RoleId.STATE_LEAD,
+        roleId: RoleId.CONTENT_REVIEWER,
       },
     ],
     password: Math.floor(10000 + Math.random() * 90000),
   };
-  const successUpdateMessage = 'STATE_LEADS.STATE_LEAD_UPDATED_SUCCESSFULLY';
-  const telemetryUpdateKey = 'content-creator-updated-successfully';
-  const failureUpdateMessage = 'STATE_LEADS.NOT_ABLE_UPDATE_STATE_LEAD';
-  const successCreateMessage = 'STATE_LEADS.STATE_LEAD_CREATED_SUCCESSFULLY';
-  const telemetryCreateKey = 'content-creator-created-successfully';
-  const failureCreateMessage = 'STATE_LEADS.NOT_ABLE_CREATE_STATE_LEAD';
-  // const notificationKey = 'onStateLeadCreate';
+  const successUpdateMessage =
+    'CONTENT_REVIEWERS.CONTENT_REVIEWER_UPDATED_SUCCESSFULLY';
+  const telemetryUpdateKey = 'content-reviewer-updated-successfully';
+  const failureUpdateMessage =
+    'CONTENT_REVIEWERS.NOT_ABLE_UPDATE_CONTENT_REVIEWER';
+  const successCreateMessage =
+    'CONTENT_REVIEWERS.CONTENT_REVIEWER_CREATED_SUCCESSFULLY';
+  const telemetryCreateKey = 'content-reviewer-created-successfully';
+  const failureCreateMessage =
+    'CONTENT_REVIEWERS.NOT_ABLE_CREATE_CONTENT_REVIEWER';
   const notificationKey =
     storedUserData.tenantData[0].tenantName === TenantName.SECOND_CHANCE_PROGRAM
-      ? 'onScpStateLeadCreate'
-      : 'onYouthnetStateLeadCreate';
-  const notificationMessage = 'STATE_LEADS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
+      ? 'onScpContentReviewerCreate'
+      : 'onYouthnetContentReviewerCreate';
+  const notificationMessage =
+    'CONTENT_REVIEWERS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
   useEffect(() => {
     setPrefilledFormData(initialFormDataSearch);
@@ -439,7 +530,7 @@ const StateLead = () => {
         )}
         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }} mt={4}>
           <ResetFiltersButton
-            searchStoreKey="stateLead"
+            searchStoreKey="contentReviewer"
             formRef={formRef}
             SubmitaFunction={SubmitaFunction}
             setPrefilledFormData={setPrefilledFormData}
@@ -466,7 +557,7 @@ const StateLead = () => {
           </Button>
         </Box>
 
-        {/* <SimpleModal
+        {/* SimpleModal
           open={openModal}
           onClose={handleCloseModal}
           showFooter={true}
@@ -474,8 +565,8 @@ const StateLead = () => {
           id="dynamic-form-id"
           modalTitle={
             isEdit
-              ? t('STATE_LEADS.UPDATE_STATE_LEAD')
-              : t('STATE_LEADS.NEW_STATE_LEAD')
+              ? t('CONTENT_REVIEWERS.UPDATE_CONTENT_REVIEWER')
+              : t('CONTENT_REVIEWERS.NEW_CONTENT_REVIEWER')
           }
         >
           <AddEditUser
@@ -506,7 +597,7 @@ const StateLead = () => {
             notificationMessage={notificationMessage}
             notificationContext={notificationContext}
             hideSubmit={true}
-            type={'state-lead'}
+            type={'content-reviewer'}
           />
         </SimpleModal> */}
 
@@ -533,7 +624,7 @@ const StateLead = () => {
                 height="20vh"
               >
                 <Typography marginTop="10px" textAlign={'center'}>
-                  {t('COMMON.NO_STATE_LEAD_FOUND')}
+                  {t('COMMON.NO_CONTENT_REVIEWER_FOUND')}
                 </Typography>
               </Box>
             )}
@@ -603,7 +694,7 @@ const StateLead = () => {
           }}
         >
           <Typography variant="h1" component="div">
-            {t('Map User as State Lead')}
+            {t('Map User as Content Reviewer')}
           </Typography>
           <IconButton
             aria-label="close"
@@ -743,4 +834,4 @@ export async function getStaticProps({ locale }: any) {
   };
 }
 
-export default StateLead;
+export default ContentReviewer;
