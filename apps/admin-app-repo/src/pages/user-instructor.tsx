@@ -1232,7 +1232,7 @@ const Facilitator = () => {
                 !selectedUserId || !selectedCenterId || isMappingInProgress
               }
             >
-              {t('Map as Team Lead')}
+              {t('Map as Instructor')}
             </Button>
           )}
         </DialogActions>

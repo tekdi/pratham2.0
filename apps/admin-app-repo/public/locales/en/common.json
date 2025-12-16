@@ -363,7 +363,6 @@
     "NEW_TOPIC": "New Topic",
     "DOWNLOAD_CSV": "Download Uploaded CSV",
     "DURING_COURSE": "During Course"
-
   },
   "MASTER": {
     "STATE": "States",
@@ -708,6 +707,7 @@
     "SELECTED_VILLAGE_COUNT": "Selected village count : {{totalVillageCount}}"
   },
   "WHATS_YOUR_GENDER": "Gender",
+  "WORKING_STATE": "Working State",
   "first_name": "First Name",
   "last_name": "Last Name",
   "phone_number": "Phone Number",
