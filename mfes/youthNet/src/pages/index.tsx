@@ -318,6 +318,8 @@ const Index = () => {
               defaultValue={userData?.[0]?.id}
               onSelect={(value) => {
                 localStorage.setItem('selectedMentoruserId', value);
+                localStorage.setItem('selectedMentorId', value);
+                localStorage.setItem('selectedMentorData', JSON.stringify(userData.find((user: any) => user.id === value)));
                 setSelectedMentorId(value);
               }}
             />

@@ -220,7 +220,7 @@ const UserId = () => {
         userData = JSON.parse(localStorage.getItem('userData') || '{}');
       } else if (userId) {
         const data = await getUserDetails(userId, true);
-        // console.log('data', data);
+        console.log('data>>>>', data);
         userData = data?.userData || {};
       }
 
@@ -316,6 +316,51 @@ const UserId = () => {
           formattedDOBDate = date.toLocaleDateString('en-GB', options);
         }
 
+        // Function to extract role based on tenant matching
+        const getRoleFromTenant = () => {
+          const tenantName = localStorage.getItem('tenantName');
+          if (!tenantName || !userData?.tenantData) {
+            return null;
+          }
+
+          // Find the tenant that matches the tenantName from localStorage
+          const matchedTenant = userData.tenantData.find(
+            (tenant: any) => tenant?.tenantName === tenantName
+          );
+
+          if (!matchedTenant || !matchedTenant.roles) {
+            return null;
+          }
+
+          // Filter roles to only include Mobilizer or Lead
+          const allowedRoles = matchedTenant.roles.filter((role: any) => {
+            const roleName = role?.roleName?.toLowerCase();
+            return roleName === 'mobilizer' || roleName === 'lead';
+          });
+
+          if (allowedRoles.length === 0) {
+            return null;
+          }
+
+          // Prefer Lead over Mobilizer if both exist
+          const leadRole = allowedRoles.find(
+            (role: any) => role?.roleName?.toLowerCase() === 'lead'
+          );
+          if (leadRole) {
+            return toPascalCase(leadRole.roleName);
+          }
+
+          // Otherwise use Mobilizer
+          const mobilizerRole = allowedRoles.find(
+            (role: any) => role?.roleName?.toLowerCase() === 'mobilizer'
+          );
+          if (mobilizerRole) {
+            return toPascalCase(mobilizerRole.roleName);
+          }
+
+          return null;
+        };
+
         setUser({
           firstName: toPascalCase(userData?.firstName) || '',
           lastName: toPascalCase(userData?.lastName) || '',
@@ -327,8 +372,14 @@ const UserId = () => {
           phone: userData?.mobile || '',
           gender: userData?.gender || '',
           userRole:
-           localStorage.getItem('roleName') || toPascalCase(userData?.tenantData?.[0]?.roles?.[0]?.roleName) ||
-            toPascalCase(role),
+            userId === localStorage.getItem('userId')
+              ? toPascalCase(role)
+              : (
+                  getRoleFromTenant() ||
+                  localStorage.getItem('roleName') ||
+                  toPascalCase(userData?.tenantData?.[0]?.roles?.[0]?.roleName) ||
+                  toPascalCase(role)
+                ),
           dob: formattedDOBDate || '',
           district: getFieldValue('DISTRICT'),
           block: getFieldValue('BLOCK'),
@@ -456,7 +507,11 @@ const UserId = () => {
             {t('YOUTHNET_PROFILE.PROFILE_DETAILS')}
           </Typography>
           <Profile
-            fullName={user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : (user.firstName || user.lastName || '')}
+            fullName={
+              user.firstName && user.lastName
+                ? `${user.firstName} ${user.lastName}`
+                : user.firstName || user.lastName || ''
+            }
             emailId={user.email || '-'}
             designation={user.userRole || '-'}
             mentorId={user.userID || ''}
@@ -481,7 +536,7 @@ const UserId = () => {
         open={editModal}
         onClose={onClose}
         showFooter={true}
-        modalTitle= {t('YOUTHNET_PROFILE.UPDATE_PROFILE')}
+        modalTitle={t('YOUTHNET_PROFILE.UPDATE_PROFILE')}
         //  handleNext={FormSubmitFunction}
         primaryText={'Submit'}
         id="dynamic-form-id"
