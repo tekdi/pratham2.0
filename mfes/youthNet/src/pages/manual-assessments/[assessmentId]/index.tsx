@@ -393,7 +393,7 @@ const AssessmentDetails: React.FC = () => {
       const filters = {
         village: [villageId as string],
         role: Role.LEARNER,
-        tenantStatus: [Status.ACTIVE],
+        status: [Status.ACTIVE],
       };
       const userListResponse = await fetchUserList({ filters });
 

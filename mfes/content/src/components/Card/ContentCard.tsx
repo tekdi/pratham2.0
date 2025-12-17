@@ -47,12 +47,12 @@ const hashString = (str: string): number => {
 // const getDefaultImage = (default_img?: string, identifier?: string) => {
 //   if (typeof window !== 'undefined') {
 //     const userProgram = localStorage.getItem('userProgram');
-
+    
 //     if (userProgram === 'Open School' && identifier) {
 //       return getRandomDefaultImage(identifier);
 //     }
 //   }
-
+  
 //   return default_img ?? `${AppConst.BASEPATH}/assests/images/image_ver.png`;
 // };
 
@@ -94,20 +94,19 @@ const ContentCard = ({
   console.log('ContentCard: No cardComponent found in _card', item);
   return (
     <CardWrap
-      // isWrap={isWrap && type === 'Course'}
+      // isWrap={isWrap && type === 'Course'} 
 
       _card={_card} isWrap={false}>
       <CommonCard
         title={(item?.name || '').trim()}
-        englishTitle={item?.englishName}
         courseType={item?.courseType}
         image={
-          item?.posterImage
-            ? item.posterImage
-            : item?.appIcon
+        item?.posterImage
+          ? item.posterImage
+          : item?.appIcon
             ? item.appIcon
             : default_img ?? `${AppConst.BASEPATH}/assests/images/image_ver.png`
-        }
+      }
         content={item?.description ? item?.description : <Description />}
         actions={
           type !== 'Course' || type!=='Job family' || type!=='PSU' || type!=='Group Membership'  || type!=='self' && (

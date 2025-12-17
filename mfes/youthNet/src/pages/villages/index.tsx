@@ -5,12 +5,7 @@ import {
   Box,
   Button,
   Divider,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Grid,
-  IconButton,
   Radio,
   Tab,
   Tabs,
@@ -50,7 +45,6 @@ import {
 } from '../../services/youthNet/Dashboard/VillageServices';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import AddIcon from '@mui/icons-material/Add';
-import CloseIcon from '@mui/icons-material/Close';
 import SimpleModal from '../../components/SimpleModal';
 import Surveys from '../../components/youthNet/Surveys';
 import { useDirection } from '../../hooks/useDirection';
@@ -64,7 +58,7 @@ import {
   getVillageUserCounts,
   filterSchema,
 } from '../../utils/Helper';
-import { fetchUserList, updateUserTenantStatus } from '../../services/youthNet/Dashboard/UserServices';
+import { fetchUserList } from '../../services/youthNet/Dashboard/UserServices';
 import {
   cohortHierarchy,
   Role,
@@ -72,7 +66,6 @@ import {
   Status,
   VolunteerField,
 } from '../../utils/app.constant';
-import { fetchCohortMemberList } from '../../services/MyClassDetailsService';
 import { editEditUser } from '../../services/ProfileService';
 import { showToastMessage } from '@/components/Toastify';
 import MentorAssignment from '../../components/youthNet/MentorForm/MentorAssignment';
@@ -85,14 +78,9 @@ import { FormContext } from '@shared-lib-v2/DynamicForm/components/DynamicFormCo
 import {
   extractMatchingKeys,
   fetchForm,
-  enhanceUiSchemaWithGrid,
-  splitUserData,
 } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import { RoleId } from '@/utils/app.constant';
 import { deleteUser } from 'mfes/youthNet/src/services/youthNet/Dashboard/UserServices';
-import EmailSearchUser from '@shared-lib-v2/MapUser/EmailSearchUser';
-import { enrollUserTenant } from '@shared-lib-v2/MapUser/MapService';
-import { bulkCreateCohortMembers } from '../../services/CohortService';
 
 const Index = () => {
   const { isRTL } = useDirection();
@@ -153,35 +141,15 @@ const Index = () => {
   const [filteredyouthList, setFilteredYouthList] = useState<any>([]);
   const [openDelete, setOpenDelete] = useState(false);
   const [selectedMentorId, setSelectedMentorId] = useState('');
-  const [stateData, setStateData] = useState<any>(null);
   const [districtData, setDistrictData] = useState<any>(null);
   const [blockData, setBlockData] = useState<any>(null);
-  const [allDistrictsByState, setAllDistrictsByState] = useState<
-    Record<number, any[]>
-  >({});
-  const [allBlocksByDistrict, setAllBlocksByDistrict] = useState<
-    Record<number, any[]>
-  >({});
-
-  // Mobilizer modal state
-  const [mapModalOpen, setMapModalOpen] = useState(false);
-  const [mobilizerFormStep, setMobilizerFormStep] = useState(0);
-  const [selectedMobilizerUserId, setSelectedMobilizerUserId] = useState<
-    string | null
-  >(null);
-  const [mobilizerUserDetails, setMobilizerUserDetails] = useState<any>(null);
-  const [isMobilizerMappingInProgress, setIsMobilizerMappingInProgress] =
-    useState(false);
-  const [mobilizerPrefilledState, setMobilizerPrefilledState] = useState({});
-  const [mobilizerAddSchema, setMobilizerAddSchema] = useState(null);
-  const [mobilizerAddUiSchema, setMobilizerAddUiSchema] = useState(null);
 
   const [selectedValue, setSelectedValue] = useState<any>();
   const [selectedBlockValue, setSelectedBlockValue] = useState<any>(
     blockId ? blockId : ''
   );
   const [selectedVillageValue, setSelectedVillageValue] = useState<any>(
-    villageId ? Array.isArray(villageId) ? villageId : [villageId] : []
+    villageId ? villageId : ''
   );
   const [selectedDistrictValue, setSelectedDistrictValue] = useState<any>('');
   const [selectedStateValue, setSelectedStateValue] = useState<any>('');
@@ -194,164 +162,46 @@ const Index = () => {
     sortOrder: '',
   });
 
-  // Helper function to extract states, districts and blocks from catchment_area
-  const getStatesDistrictsAndBlocksFromCatchmentArea = () => {
-    try {
-      const cohortDataString = localStorage.getItem('cohortData');
-      const cohortData: any[] = cohortDataString
-        ? JSON.parse(cohortDataString)
-        : [];
-      const workingLocationCenterId = localStorage.getItem(
-        'workingLocationCenterId'
-      );
-
-      // Find the cohort matching workingLocationCenterId, or use first active cohort
-      let selectedCohort = null;
-      if (workingLocationCenterId) {
-        selectedCohort = cohortData.find(
-          (cohort: any) => cohort.cohortId === workingLocationCenterId
-        );
-      }
-      if (!selectedCohort) {
-        selectedCohort = cohortData.find(
-          (cohort: any) =>
-            cohort.type === 'COHORT' &&
-            cohort.cohortMemberStatus?.toLowerCase() === 'active' &&
-            cohort.cohortStatus?.toLowerCase() === 'active'
-        );
-      }
-      if (!selectedCohort && cohortData.length > 0) {
-        selectedCohort = cohortData[0];
-      }
-
-      if (!selectedCohort || !selectedCohort.customField) {
-        return { states: [], districtsByState: {}, blocksByDistrict: {} };
-      }
-
-      // Find CATCHMENT_AREA field
-      const catchmentAreaField = selectedCohort.customField.find(
-        (field: any) => field.label === 'CATCHMENT_AREA'
-      );
-
-      if (!catchmentAreaField || !catchmentAreaField.selectedValues) {
-        return { states: [], districtsByState: {}, blocksByDistrict: {} };
-      }
-
-      const catchmentAreaArray = catchmentAreaField.selectedValues;
-      const states: any[] = [];
-      const stateMap = new Map();
-      const districtsByState: Record<number, any[]> = {};
-      const blocksByDistrict: Record<number, any[]> = {};
-
-      // Extract states, districts and blocks from catchment_area
-      // catchmentAreaField.selectedValues is an array of state objects
-      if (Array.isArray(catchmentAreaArray)) {
-        catchmentAreaArray.forEach((state: any) => {
-          // Add state if not already added
-          if (state.stateId && !stateMap.has(state.stateId)) {
-            states.push({
-              id: state.stateId,
-              name: state.stateName,
-            });
-            stateMap.set(state.stateId, true);
-            districtsByState[state.stateId] = [];
-          }
-
-          // Extract districts from this state
-          if (state.districts && Array.isArray(state.districts)) {
-            state.districts.forEach((district: any) => {
-              // Add district to state's districts list
-              if (
-                district.districtId &&
-                !districtsByState[state.stateId].find(
-                  (d: any) => d.id === district.districtId
-                )
-              ) {
-                districtsByState[state.stateId].push({
-                  id: district.districtId,
-                  name: district.districtName,
-                });
-                blocksByDistrict[district.districtId] = [];
-              }
-
-              // Extract blocks from this district
-              if (district.blocks && Array.isArray(district.blocks)) {
-                district.blocks.forEach((block: any) => {
-                  if (block.id) {
-                    blocksByDistrict[district.districtId].push({
-                      id: block.id,
-                      name: block.name,
-                    });
-                  }
-                });
-              }
-            });
-          }
-        });
-      }
-
-      return { states, districtsByState, blocksByDistrict };
-    } catch (error) {
-      console.error(
-        'Error extracting states, districts and blocks from catchment_area:',
-        error
-      );
-      return { states: [], districtsByState: {}, blocksByDistrict: {} };
-    }
-  };
-
   useEffect(() => {
     const getData = async () => {
       try {
-        // For tabs 2 and 3, get data from catchment_area
-        const { states, districtsByState, blocksByDistrict } =
-          getStatesDistrictsAndBlocksFromCatchmentArea();
+        let userDataString = localStorage.getItem('userData');
+        let userData: any = userDataString ? JSON.parse(userDataString) : null;
+        const stateResult = userData?.customFields?.find(
+          (item: any) => item.label === cohortHierarchy.STATE
+        );
+        setSelectedStateValue(stateResult?.selectedValues[0]?.id);
+        const districtResult = userData?.customFields?.find(
+          (item: any) => item.label === cohortHierarchy.DISTRICT
+        );
+        console.log(districtResult?.selectedValues);
+        const transformedData = districtResult?.selectedValues?.map(
+          (item: any) => ({
+            id: item?.id,
+            name: item?.value,
+          })
+        );
+        setDistrictData(transformedData);
+        setSelectedDistrictValue(transformedData?.[0]?.id);
+        const controllingfieldfk = [transformedData?.[0]?.id?.toString()];
+        const fieldName = 'block';
+        const blockResponce = await getStateBlockDistrictList({
+          controllingfieldfk,
+          fieldName,
+        });
+        console.log(blockResponce);
 
-        if (states.length > 0) {
-          setStateData(states);
-          const initialStateId = states[0]?.id;
-          setSelectedStateValue(initialStateId);
-
-          // Store districts by state and blocks by district mappings
-          setAllDistrictsByState(districtsByState);
-          setAllBlocksByDistrict(blocksByDistrict);
-
-          // Set districts for the first state
-          if (initialStateId && districtsByState[initialStateId]) {
-            const initialDistricts = districtsByState[initialStateId];
-            setDistrictData(initialDistricts);
-            const initialDistrictId = initialDistricts[0]?.id;
-            setSelectedDistrictValue(initialDistrictId);
-
-            // Set blocks for the first district
-            if (initialDistrictId && blocksByDistrict[initialDistrictId]) {
-              const initialBlocks = blocksByDistrict[initialDistrictId];
-              setBlockData(initialBlocks);
-              setSelectedBlockValue(blockId ? blockId : initialBlocks[0]?.id);
-            } else {
-              // Fallback to API if no blocks from catchment_area for this district
-              const controllingfieldfk = [initialDistrictId?.toString()];
-              const fieldName = 'block';
-              const blockResponce = await getStateBlockDistrictList({
-                controllingfieldfk,
-                fieldName,
-              });
-
-              const transformedBlockData = blockResponce?.result?.values?.map(
-                (item: any) => ({
-                  id: item?.value,
-                  name: item?.label,
-                })
-              );
-              setBlockData(transformedBlockData);
-              setSelectedBlockValue(
-                blockId ? blockId : transformedBlockData[0]?.id
-              );
-            }
-          }
-        }
+        const transformedBlockData = blockResponce?.result?.values?.map(
+          (item: any) => ({
+            id: item?.value,
+            name: item?.label,
+          })
+        );
+        setBlockData(transformedBlockData);
+        setSelectedBlockValue(blockId ? blockId : transformedBlockData[0]?.id);
       } catch (error) {
-        console.error('Error fetching state, district and block data:', error);
+        console.error('Error fetching district and block data:', error);
+        // setDistrictData([]);
         setBlockData([]);
       }
     };
@@ -359,63 +209,25 @@ const Index = () => {
   }, [blockId, villageId]);
 
   useEffect(() => {
-    // Initialize states, districts and blocks from catchment_area for tabs 2 and 3
-    const { states, districtsByState, blocksByDistrict } =
-      getStatesDistrictsAndBlocksFromCatchmentArea();
-
-    if (states.length > 0) {
-      setStateData(states);
-      const initialStateId = states[0]?.id;
-      setSelectedStateValue(initialStateId);
-
-      // Store districts by state and blocks by district mappings
-      setAllDistrictsByState(districtsByState);
-      setAllBlocksByDistrict(blocksByDistrict);
-
-      // Set districts for the first state
-      if (initialStateId && districtsByState[initialStateId]) {
-        const initialDistricts = districtsByState[initialStateId];
-        setDistrictData(initialDistricts);
-        const initialDistrictId = initialDistricts[0]?.id;
-        setSelectedDistrictValue(initialDistrictId);
-
-        // Set blocks for the first district
-        if (initialDistrictId && blocksByDistrict[initialDistrictId]) {
-          setBlockData(blocksByDistrict[initialDistrictId]);
-        }
-      }
-    }
+    let userDataString = localStorage.getItem('userData');
+    let userData: any = userDataString ? JSON.parse(userDataString) : null;
+    const stateResult = userData?.customFields?.find(
+      (item: any) => item.label === cohortHierarchy.STATE
+    );
+    setSelectedStateValue(stateResult?.selectedValues[0]?.id);
+    const districtResult = userData?.customFields?.find(
+      (item: any) => item.label === cohortHierarchy.DISTRICT
+    );
+    console.log(districtResult?.selectedValues);
+    const transformedData = districtResult?.selectedValues?.map(
+      (item: any) => ({
+        id: item?.id,
+        name: item?.value,
+      })
+    );
+    setDistrictData(transformedData);
+    setSelectedDistrictValue(transformedData?.[0]?.id);
   }, []);
-
-  // Update districts when state changes
-  useEffect(() => {
-    if (selectedStateValue && allDistrictsByState[selectedStateValue]) {
-      const districtsForState = allDistrictsByState[selectedStateValue];
-      setDistrictData(districtsForState);
-      // Reset selected district to first district of new state
-      if (districtsForState.length > 0) {
-        setSelectedDistrictValue(districtsForState[0]?.id);
-      } else {
-        setDistrictData([]);
-        setSelectedDistrictValue('');
-      }
-    }
-  }, [selectedStateValue, allDistrictsByState]);
-
-  // Update blocks when district changes
-  useEffect(() => {
-    if (selectedDistrictValue && allBlocksByDistrict[selectedDistrictValue]) {
-      const blocksForDistrict = allBlocksByDistrict[selectedDistrictValue];
-      setBlockData(blocksForDistrict);
-      // Reset selected block to first block of new district
-      if (blocksForDistrict.length > 0) {
-        setSelectedBlockValue(blocksForDistrict[0]?.id);
-      } else {
-        setBlockData([]);
-        setSelectedBlockValue('');
-      }
-    }
-  }, [selectedDistrictValue, allBlocksByDistrict]);
 
   useEffect(() => {
     try {
@@ -494,9 +306,9 @@ const Index = () => {
       try {
         setLoading(true);
         const filters = {
-          village: Array.isArray(selectedVillageValue) ? selectedVillageValue : [selectedVillageValue],
+          village: [selectedVillageValue],
           role: Role.LEARNER,
-          tenantStatus: [Status.ACTIVE],
+          status: [Status.ACTIVE],
         };
 
         const result = await fetchUserList({ filters });
@@ -570,53 +382,54 @@ const Index = () => {
         setLoading(false);
       }
     };
-    if (value === 3 && selectedVillageValue?.length > 0) getYouthData();
+    if (value === 3 && selectedVillageValue !== '') getYouthData();
   }, [value, selectedVillageValue]);
-
-  const getMobilizersList = async () => {
+  // Move getMentorData to component scope so it can be called from callbacks
+  const getMentorData = async () => {
     try {
-      if (value === 1) {
+      if (selectedDistrictValue !== '' && value === 1) {
         setLoading(true);
-        const workingLocationCenterId = localStorage.getItem(
-          'workingLocationCenterId'
-        );
-
-        if (workingLocationCenterId) {
-          const response = await fetchCohortMemberList({
-            filters: {
-              cohortId: workingLocationCenterId,
-              role: Role.MOBILIZER,
-              status: [Status.ACTIVE],
-            },
-          });
-
-          const userDetails = response?.result?.userDetails || [];
-          const transformedData = userDetails.map((user: any) => {
+        const filters = {
+          district: [selectedDistrictValue],
+          role: Role.INSTRUCTOR,
+          status: [Status.ACTIVE],
+        };
+        const result = await fetchUserList({ filters });
+        const transformedMentorData = result?.getUserDetails.map(
+          (user: any) => {
             let name = user.firstName || '';
+            const villageField = user?.customFields?.find(
+              (field: any) => field.label === cohortHierarchy.VILLAGE
+            );
+            const blockField = user?.customFields?.find(
+              (field: any) => field.label === cohortHierarchy.BLOCK
+            );
+            const blockValues = blockField?.selectedValues.map(
+              (block: any) => block.value
+            );
+
             if (user.lastName) {
               name += ` ${user.lastName}`;
             }
             return {
               Id: user.userId,
               name: name.trim(),
+              //  dob:user?.dob ,
               firstName: user?.firstName,
+              villageCount: villageField?.selectedValues.length,
               lastName: user?.lastName,
-              // showMore: true,
+              blockNames: blockValues,
+              showMore: true,
               customFields: user?.customFields,
             };
-          });
-
-          const ascending = [...transformedData].sort((a, b) =>
-            a.name.localeCompare(b.name)
-          );
-          setMentorList(ascending);
-          setFilteredmentorList(ascending);
-          setMentorCount(transformedData.length);
-        } else {
-          setMentorList([]);
-          setFilteredmentorList([]);
-          setMentorCount(0);
-        }
+          }
+        );
+        const ascending = [...transformedMentorData].sort((a, b) =>
+          a.name.localeCompare(b.name)
+        );
+        setMentorList(ascending);
+        setFilteredmentorList(ascending);
+        setMentorCount(transformedMentorData.length);
       }
     } catch (e) {
       console.log(e);
@@ -626,10 +439,8 @@ const Index = () => {
   };
 
   useEffect(() => {
-    if (value === 1) {
-      getMobilizersList();
-    }
-  }, [value, submittedButtonStatus]);
+    if (value === 1) getMentorData();
+  }, [selectedDistrictValue, value, submittedButtonStatus]);
 
   useEffect(() => {
     // Fetch form schema from API and set it in state.
@@ -676,59 +487,6 @@ const Index = () => {
     fetchData();
   }, [selectedStateValue, selectedDistrictValue]);
 
-  // Fetch mobilizer form schema
-  useEffect(() => {
-    const fetchMobilizerForm = async () => {
-      const mobilizerFormContext = {
-        context: 'USERS',
-        contextType: 'MOBILIZER',
-      };
-      const responseForm = await fetchForm([
-        {
-          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${mobilizerFormContext.context}&contextType=${mobilizerFormContext.contextType}`,
-          header: {},
-        },
-        {
-          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${mobilizerFormContext.context}&contextType=${mobilizerFormContext.contextType}`,
-          header: {
-            tenantid: localStorage.getItem('tenantId'),
-          },
-        },
-      ]);
-      let alterSchema = responseForm?.schema;
-      let alterUISchema = responseForm?.uiSchema;
-      if (alterUISchema?.firstName) {
-        alterUISchema.firstName['ui:disabled'] = true;
-      }
-      if (alterUISchema?.lastName) {
-        alterUISchema.lastName['ui:disabled'] = true;
-      }
-      if (alterUISchema?.dob) {
-        alterUISchema.dob['ui:disabled'] = true;
-      }
-      if (alterUISchema?.email) {
-        alterUISchema.email['ui:disabled'] = true;
-      }
-      if (alterUISchema?.mobile) {
-        alterUISchema.mobile['ui:disabled'] = true;
-      }
-
-      // Remove duplicates from requiredArray
-      let requiredArray = alterSchema?.required;
-      if (Array.isArray(requiredArray)) {
-        requiredArray = Array.from(new Set(requiredArray));
-      }
-      alterSchema.required = requiredArray;
-
-      // Set 2 grid layout
-      alterUISchema = enhanceUiSchemaWithGrid(alterUISchema);
-
-      setMobilizerAddSchema(alterSchema);
-      setMobilizerAddUiSchema(alterUISchema);
-    };
-    fetchMobilizerForm();
-  }, []);
-
   const handleLocationClick = (Id: any, name: any) => {
     console.log(selectedBlockValue);
 
@@ -745,7 +503,7 @@ const Index = () => {
         let userDataString = localStorage.getItem('userData');
         let userData: any = userDataString ? JSON.parse(userDataString) : null;
         let blockIds: any;
-        if (YOUTHNET_USER_ROLE.MOBILIZER === getLoggedInUserRole()) {
+        if (YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole()) {
           const blockResult = userData?.customFields?.find(
             (item: any) => item.label === 'BLOCK'
           );
@@ -757,7 +515,7 @@ const Index = () => {
         const filters = {
           block: blockIds,
           role: Role.LEARNER,
-          tenantStatus: [Status.ACTIVE],
+          status: [Status.ACTIVE],
         };
 
         const result = await fetchUserList({ filters });
@@ -784,17 +542,16 @@ const Index = () => {
   useEffect(() => {
     const getVillageList = async () => {
       try {
-        if (YOUTHNET_USER_ROLE.MOBILIZER === getLoggedInUserRole()) {
+        if (YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole()) {
           let villageDataString = localStorage.getItem('villageData');
           let villageData: any = villageDataString
             ? JSON.parse(villageDataString)
             : null;
           setVillageList(villageData);
-          console.log('villageData', villageData);
           if (selectedBlockValue === blockId) {
             setSelectedVillageValue(villageId);
           } else {
-            if (YOUTHNET_USER_ROLE.MOBILIZER === getLoggedInUserRole())
+            if (YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole())
               setSelectedVillageValue(villageId);
             else setSelectedVillageValue(villageData[0]?.Id);
           }
@@ -820,7 +577,7 @@ const Index = () => {
           if (selectedBlockValue === blockId) {
             setSelectedVillageValue(villageId);
           } else {
-            if (YOUTHNET_USER_ROLE.MOBILIZER === getLoggedInUserRole())
+            if (YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole())
               setSelectedVillageValue(villageId);
             else setSelectedVillageValue(transformedVillageData[0]?.Id);
           }
@@ -859,7 +616,7 @@ const Index = () => {
       query: {
         tab: value,
         blockId: selectedBlockValue,
-        villageId: Array.isArray(selectedVillageValue) ? selectedVillageValue : [selectedVillageValue],
+        villageId: selectedVillageValue,
       },
     });
   };
@@ -1134,11 +891,8 @@ const Index = () => {
   };
 
   // Get current selected user from filteredyouthList
-  const selectedUser = filteredyouthList.find(
-    (user: any) => user.Id === selectedToggledUserId
-  );
-  const isCurrentUserVolunteer =
-    selectedUser?.isVolunteer === VolunteerField.YES;
+  const selectedUser = filteredyouthList.find((user: any) => user.Id === selectedToggledUserId);
+  const isCurrentUserVolunteer = selectedUser?.isVolunteer === VolunteerField.YES;
 
   const buttons = [
     // Show mark button for non-volunteers, unmark button for volunteers
@@ -1146,14 +900,12 @@ const Index = () => {
       ? {
           label: t('YOUTHNET_DASHBOARD.UNMARK_AS_VOLUNTEER'),
           icon: <SwapHorizIcon />,
-          onClick: () =>
-            handleButtonClick(BOTTOM_DRAWER_CONSTANTS.UNMARK_VOLUNTEER),
+          onClick: () => handleButtonClick(BOTTOM_DRAWER_CONSTANTS.UNMARK_VOLUNTEER),
         }
       : {
           label: t('YOUTHNET_USERS_AND_VILLAGES.MARK_AS_VOLUNTEER'),
           icon: <SwapHorizIcon />,
-          onClick: () =>
-            handleButtonClick(BOTTOM_DRAWER_CONSTANTS.MARK_VOLUNTEER),
+          onClick: () => handleButtonClick(BOTTOM_DRAWER_CONSTANTS.MARK_VOLUNTEER),
         },
   ];
 
@@ -1219,115 +971,6 @@ const Index = () => {
     // setEditableUserId('');
   };
 
-  // Function to validate villages selected in working_location for mobilizer
-  const validateMobilizerVillagesSelected = (
-    userDetails: any
-  ): {
-    isValid: boolean;
-    missingBlocks: Array<{
-      stateName: string;
-      districtName: string;
-      blockName: string;
-    }>;
-    isWorkingLocationMissing?: boolean;
-  } => {
-    const missingBlocks: Array<{
-      stateName: string;
-      districtName: string;
-      blockName: string;
-    }> = [];
-
-    let workingLocation = userDetails?.working_location;
-
-    if (
-      !workingLocation &&
-      userDetails?.customFields &&
-      Array.isArray(userDetails.customFields)
-    ) {
-      const workingLocationField = userDetails.customFields.find(
-        (field: any) => {
-          if (
-            field.value &&
-            Array.isArray(field.value) &&
-            field.value.length > 0
-          ) {
-            const firstItem = field.value[0];
-            return (
-              firstItem &&
-              typeof firstItem === 'object' &&
-              'stateId' in firstItem &&
-              'stateName' in firstItem &&
-              'districts' in firstItem
-            );
-          }
-          return false;
-        }
-      );
-      if (workingLocationField?.value) {
-        workingLocation = workingLocationField.value;
-      }
-    }
-
-    if (!workingLocation) {
-      return {
-        isValid: false,
-        missingBlocks: [],
-        isWorkingLocationMissing: true,
-      };
-    }
-    if (!Array.isArray(workingLocation) || workingLocation.length === 0) {
-      return {
-        isValid: false,
-        missingBlocks: [],
-        isWorkingLocationMissing: true,
-      };
-    }
-
-    let totalBlocks = 0;
-    let blocksWithVillages = 0;
-
-    for (const state of workingLocation) {
-      if (state.districts && Array.isArray(state.districts)) {
-        for (const district of state.districts) {
-          if (district.blocks && Array.isArray(district.blocks)) {
-            for (const block of district.blocks) {
-              totalBlocks++;
-
-              const hasVillages =
-                block.villages &&
-                Array.isArray(block.villages) &&
-                block.villages.length > 0;
-
-              if (hasVillages) {
-                blocksWithVillages++;
-              } else {
-                missingBlocks.push({
-                  stateName: state.stateName || t('MOBILIZER.UNKNOWN_STATE'),
-                  districtName:
-                    district.districtName || t('MOBILIZER.UNKNOWN_DISTRICT'),
-                  blockName: block.name || t('MOBILIZER.UNKNOWN_BLOCK'),
-                });
-              }
-            }
-          }
-        }
-      }
-    }
-
-    return {
-      isValid: missingBlocks.length === 0,
-      missingBlocks,
-    };
-  };
-
-  const handleOpenMobilizerModal = () => {
-    setMobilizerPrefilledState({});
-    setMobilizerFormStep(0);
-    setSelectedMobilizerUserId(null);
-    setMobilizerUserDetails(null);
-    setMapModalOpen(true);
-  };
-
   const handleNext = () => {
     // setCount(count + 1)
     setCount((prev) => prev + 1);
@@ -1337,15 +980,14 @@ const Index = () => {
   const handleDeleteMentor = async () => {
     try {
       // 1. Delete user
-      const resp = await updateUserTenantStatus(selectedMentor?.Id, tenantId, {
-        status: 'archived',
-        reason: selectedValue,
+      const resp = await deleteUser(selectedMentor.Id, {
+        userData: { reason: selectedValue, status: 'archived' },
       });
       // 2. Update UI
       if (resp?.responseCode === 200 || resp?.responseCode === 'OK') {
         setOpenDelete(false);
         showToastMessage(t('MENTORS.MENTOR_DELETED_SUCCESSFULLY'), 'success');
-        await getMobilizersList();
+        await getMentorData();
       } else {
         showToastMessage(t('MENTORS.MENTOR_DELETE_FAIL'), 'error');
       }
@@ -1362,7 +1004,7 @@ const Index = () => {
       villageList.length > 0 &&
       !selectedVillageValue
     ) {
-      setSelectedVillageValue(villageList?.map((village: any) => village.Id));
+      setSelectedVillageValue(villageList[0].Id);
     }
   }, [value, villageList, selectedVillageValue]);
 
@@ -1406,7 +1048,7 @@ const Index = () => {
             }}
           >
             {YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() && (
-              <Tab value={1} label={t('MOBILIZER.MOBILIZER')} />
+              <Tab value={1} label={t('YOUTHNET_USERS_AND_VILLAGES.MENTORS')} />
             )}
 
             <Tab value={2} label={t('DASHBOARD.VILLAGES')} />
@@ -1423,19 +1065,47 @@ const Index = () => {
               flexDirection={'row'}
               alignItems={'center'}
               sx={{
+                p: '20px',
+              }}
+            >
+              <Box
+                sx={{
+                  width: '100%',
+                  // mr: '20px',
+                }}
+              >
+                {districtData ? (
+                  <Dropdown
+                    name={districtData?.DISTRICT_NAME}
+                    values={districtData}
+                    defaultValue={districtData[0]?.id}
+                    onSelect={(value) => console.log('Selected:', value)}
+                    label={t('YOUTHNET_USERS_AND_VILLAGES.DISTRICTS')}
+                  />
+                ) : (
+                  <Loader showBackdrop={true} />
+                )}
+              </Box>
+            </Box>
+
+            <Box
+              display={'flex'}
+              flexDirection={'row'}
+              alignItems={'center'}
+              sx={{
                 pr: '20px',
               }}
             >
               <SearchBar
                 onSearch={setSearchInput}
                 value={searchInput}
-                placeholder={t('MOBILIZER.SEARCH_MOBILIZERS')}
+                placeholder={t('YOUTHNET_USERS_AND_VILLAGES.SEARCH_MENTORS')}
                 fullWidth={true}
               />
               <SortBy
                 appliedFilters={appliedFilters}
                 setAppliedFilters={setAppliedFilters}
-                sortingContent={Role.MOBILIZER}
+                sortingContent={Role.INSTRUCTOR}
               />
             </Box>
 
@@ -1445,14 +1115,13 @@ const Index = () => {
               ml={'10px'}
               display={'flex'}
               justifyContent={'flex-end'}
-              gap={2}
             >
               <Button
                 sx={{
                   border: `1px solid ${theme.palette.error.contrastText}`,
                   borderRadius: '100px',
                   height: '40px',
-                  width: '10rem',
+                  width: '8rem',
                   color: theme.palette.error.contrastText,
                   '& .MuiButton-endIcon': {
                     marginLeft: isRTL ? '0px !important' : '8px !important',
@@ -1460,10 +1129,14 @@ const Index = () => {
                   },
                 }}
                 className="text-1E"
+                // onClick={handleOpenAddFaciModal}
                 endIcon={<AddIcon />}
-                onClick={handleOpenMobilizerModal}
+                onClick={() => {
+                  handleOpenNew();
+                  setIsReassign(false);
+                }}
               >
-                {t('COMMON.ADD_MOBILIZER')}
+                {t('COMMON.ADD_NEW')}
               </Button>
             </Box>
 
@@ -1477,7 +1150,7 @@ const Index = () => {
                   }}
                 >
                   {mentorCount} {''}
-                  {t('MOBILIZER.MOBILIZER')}
+                  {t('YOUTHNET_USERS_AND_VILLAGES.MENTORS')}
                 </Typography>
 
                 {/* <Box
@@ -1605,7 +1278,7 @@ const Index = () => {
                 SuccessCallback={async () => {
                   setPrefilledFormData({});
                   setOpenModal(false);
-                  await getMobilizersList();
+                  await getMentorData();
                 }}
                 schema={isReassign ? originalSchema : addSchema}
                 uiSchema={isReassign ? originalUiSchema : addUiSchema}
@@ -1615,7 +1288,7 @@ const Index = () => {
                 editableUserId={editableUserId}
                 UpdateSuccessCallback={async () => {
                   setOpenModal(false);
-                  await getMobilizersList();
+                  await getMentorData();
                 }}
                 extraFields={extraFields}
                 extraFieldsUpdate={extraFieldsUpdate}
@@ -1641,255 +1314,6 @@ const Index = () => {
                 }
               />
             </SimpleModal>
-
-            {/* Mobilizer Map Modal Dialog */}
-            <Dialog
-              open={mapModalOpen}
-              onClose={(event, reason) => {
-                if (reason !== 'backdropClick') {
-                  setMapModalOpen(false);
-                  setSelectedMobilizerUserId(null);
-                  setMobilizerUserDetails(null);
-                }
-              }}
-              maxWidth={false}
-              fullWidth={true}
-              PaperProps={{
-                sx: {
-                  width: '100%',
-                  maxWidth: '100%',
-                  maxHeight: '100vh',
-                },
-              }}
-            >
-              <DialogTitle
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  borderBottom: '1px solid #eee',
-                  p: 2,
-                }}
-              >
-                <Typography variant="h1" component="div">
-                  {t('MOBILIZER.MAP_USER_AS_MOBILIZER')}
-                </Typography>
-                <IconButton
-                  aria-label="close"
-                  onClick={() => setMapModalOpen(false)}
-                  sx={{
-                    color: (theme) => theme.palette.grey[500],
-                  }}
-                >
-                  <CloseIcon />
-                </IconButton>
-              </DialogTitle>
-              <DialogContent sx={{ p: 3, overflowY: 'auto' }}>
-                {mobilizerFormStep === 0 && (
-                  <Box sx={{ mb: 3 }}>
-                    <EmailSearchUser
-                      getCatchmentAreaDetails={true}
-                      onUserSelected={(userId) => {
-                        setSelectedMobilizerUserId(userId || null);
-                        console.log('Selected User ID:', userId);
-                      }}
-                      onUserDetails={async (userDetails) => {
-                        console.log('############# userDetails', userDetails);
-                        setMobilizerUserDetails(userDetails);
-
-                        if (selectedMobilizerUserId) {
-                          const validationResult =
-                            validateMobilizerVillagesSelected(userDetails);
-                          console.log(
-                            '############# validationResult',
-                            validationResult
-                          );
-                          if (!validationResult.isValid) {
-                            const missingCount =
-                              validationResult.missingBlocks.length;
-                            let errorMessage = '';
-
-                            if (missingCount > 0) {
-                              const firstFew = validationResult.missingBlocks
-                                .slice(0, 3)
-                                .map(
-                                  (block) =>
-                                    `${block.blockName} (${block.districtName}, ${block.stateName})`
-                                )
-                                .join(', ');
-
-                              if (missingCount > 3) {
-                                errorMessage = t(
-                                  'MOBILIZER.WORKING_LOCATION_REQUIRED_MISSING_VILLAGES',
-                                  {
-                                    blocks: firstFew,
-                                    count: missingCount - 3,
-                                  }
-                                );
-                              } else {
-                                errorMessage = t(
-                                  'MOBILIZER.WORKING_LOCATION_REQUIRED_MISSING_VILLAGES_SINGLE',
-                                  {
-                                    blocks: firstFew,
-                                  }
-                                );
-                              }
-                            } else if (
-                              validationResult.isWorkingLocationMissing
-                            ) {
-                              errorMessage = t(
-                                'MOBILIZER.WORKING_LOCATION_REQUIRED'
-                              );
-                            } else {
-                              errorMessage = t(
-                                'MOBILIZER.WORKING_LOCATION_REQUIRED_AT_LEAST_ONE'
-                              );
-                            }
-
-                            showToastMessage(errorMessage, 'error');
-                            return;
-                          }
-
-                          setIsMobilizerMappingInProgress(true);
-                          try {
-                            const { userData, customFields } =
-                              splitUserData(userDetails);
-
-                            delete userData.email;
-
-                            const mobilizerRoleId =
-                              'a4694781-65c1-4b92-8ff1-ad490ab6d140'; // RoleId.MOBILIZER
-
-                            const updateUserResponse = await enrollUserTenant({
-                              userId: selectedMobilizerUserId,
-                              tenantId: tenantId,
-                              roleId: mobilizerRoleId,
-                              customField: customFields,
-                              userData: userData,
-                            });
-                            console.log(
-                              '######### updatedResponse',
-                              updateUserResponse
-                            );
-
-                            if (
-                              updateUserResponse &&
-                              updateUserResponse?.params?.err === null
-                            ) {
-                              // Get center ID from localStorage (set when cohort data is loaded)
-                              const workingLocationCenterId =
-                                localStorage.getItem('workingLocationCenterId');
-
-                              // Call bulkCreateCohortMembers to map user to center
-                              if (
-                                workingLocationCenterId &&
-                                selectedMobilizerUserId
-                              ) {
-                                try {
-                                  const cohortMemberResponse =
-                                    await bulkCreateCohortMembers({
-                                      userId: [selectedMobilizerUserId],
-                                      cohortId: [workingLocationCenterId],
-                                    });
-
-                                  if (
-                                    cohortMemberResponse?.responseCode ===
-                                      201 ||
-                                    cohortMemberResponse?.params?.err === null
-                                  ) {
-                                    console.log(
-                                      'Successfully mapped user to center:',
-                                      cohortMemberResponse
-                                    );
-                                  } else {
-                                    console.error(
-                                      'Error mapping user to center:',
-                                      cohortMemberResponse
-                                    );
-                                  }
-                                } catch (cohortError) {
-                                  console.error(
-                                    'Error in bulkCreateCohortMembers:',
-                                    cohortError
-                                  );
-                                  // Don't fail the entire flow if cohort mapping fails
-                                }
-                              }
-
-                              showToastMessage(
-                                t('MOBILIZER.MOBILIZER_CREATED_SUCCESSFULLY'),
-                                'success'
-                              );
-
-                              setMapModalOpen(false);
-                              setSelectedMobilizerUserId(null);
-                              setMobilizerUserDetails(null);
-                            } else {
-                              showToastMessage(
-                                t('MOBILIZER.NOT_ABLE_CREATE_MOBILIZER'),
-                                'error'
-                              );
-                            }
-                          } catch (error) {
-                            console.error('Error creating mobilizer:', error);
-                            showToastMessage(
-                              error?.response?.data?.params?.errmsg ||
-                                t('MOBILIZER.NOT_ABLE_CREATE_MOBILIZER'),
-                              'error'
-                            );
-                          } finally {
-                            setIsMobilizerMappingInProgress(false);
-                          }
-                        } else if (!selectedMobilizerUserId) {
-                          showToastMessage(
-                            t('MOBILIZER.PLEASE_SEARCH_AND_SELECT_USER'),
-                            'error'
-                          );
-                        }
-                      }}
-                      schema={mobilizerAddSchema}
-                      uiSchema={mobilizerAddUiSchema}
-                      prefilledState={mobilizerPrefilledState}
-                      onPrefilledStateChange={(prefilledState) => {
-                        setMobilizerPrefilledState(prefilledState || {});
-                      }}
-                      roleId={'a4694781-65c1-4b92-8ff1-ad490ab6d140'} // RoleId.MOBILIZER
-                      tenantId={tenantId}
-                      type="leader"
-                    />
-                  </Box>
-                )}
-              </DialogContent>
-              <DialogActions sx={{ p: 2, borderTop: '1px solid #eee' }}>
-                {mobilizerFormStep === 0 && (
-                  <Button
-                    sx={{
-                      backgroundColor: '#FFC107',
-                      color: '#000',
-                      fontFamily: 'Poppins',
-                      fontWeight: 500,
-                      fontSize: '14px',
-                      height: '40px',
-                      lineHeight: '20px',
-                      letterSpacing: '0.1px',
-                      textAlign: 'center',
-                      verticalAlign: 'middle',
-                      '&:hover': {
-                        backgroundColor: '#ffb300',
-                      },
-                      width: '100%',
-                    }}
-                    disabled={
-                      !selectedMobilizerUserId || isMobilizerMappingInProgress
-                    }
-                    form="dynamic-form-id"
-                    type="submit"
-                  >
-                    {t('COMMON.MAP')}
-                  </Button>
-                )}
-              </DialogActions>
-            </Dialog>
           </>
         )}
       </Box>
@@ -1898,84 +1322,51 @@ const Index = () => {
         {value === 2 && (
           <>
             {YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() && (
-              <>
+              <Box
+                display={'flex'}
+                flexDirection={'row'}
+                sx={{
+                  p: '20px',
+                }}
+              >
                 <Box
-                  display={'flex'}
-                  flexDirection={'row'}
                   sx={{
-                    p: '20px 20px 0px 20px',
+                    width: '50%',
+                    mr: '20px',
                   }}
                 >
-                  <Box
-                    sx={{
-                      width: '50%',
-                      mr: '20px',
-                    }}
-                  >
-                    {stateData ? (
-                      <Dropdown
-                        name={stateData?.STATE_NAME}
-                        values={stateData}
-                        defaultValue={selectedStateValue || stateData?.[0]?.id}
-                        onSelect={(value) => {
-                          setSelectedStateValue(value);
-                        }}
-                        label={t('YOUTHNET_USERS_AND_VILLAGES.STATE')}
-                      />
-                    ) : (
-                      <Loader showBackdrop={true} />
-                    )}
-                  </Box>
-                  <Box
-                    sx={{
-                      width: '50%',
-                    }}
-                  >
-                    {districtData ? (
-                      <Dropdown
-                        name={districtData?.DISTRICT_NAME}
-                        values={districtData}
-                        defaultValue={
-                          selectedDistrictValue || districtData?.[0]?.id
-                        }
-                        onSelect={(value) => {
-                          setSelectedDistrictValue(value);
-                        }}
-                        label={t('YOUTHNET_USERS_AND_VILLAGES.DISTRICTS')}
-                      />
-                    ) : (
-                      <Loader showBackdrop={true} />
-                    )}
-                  </Box>
+                  {districtData ? (
+                    <Dropdown
+                      name={districtData?.DISTRICT_NAME}
+                      values={districtData}
+                      defaultValue={districtData?.[0]?.id}
+                      onSelect={(value) => console.log('Selected:', value)}
+                      label={t('YOUTHNET_USERS_AND_VILLAGES.DISTRICTS')}
+                    />
+                  ) : (
+                    <Loader showBackdrop={true} />
+                  )}
                 </Box>
                 <Box
-                  display={'flex'}
-                  flexDirection={'row'}
                   sx={{
-                    p: '20px 20px 20px 20px',
+                    width: '50%',
                   }}
                 >
-                  <Box
-                    sx={{
-                      width: '50%',
-                    }}
-                  >
-                    {blockData ? (
-                      <Dropdown
-                        name={blockData?.BLOCK_NAME}
-                        values={blockData}
-                        defaultValue={selectedBlockValue || blockData?.[0]?.id}
-                        onSelect={(value) => {
-                          setSelectedBlockValue(value);
-                        }}
-                        label={t('YOUTHNET_USERS_AND_VILLAGES.BLOCKS')}
-                      />
-                    ) : (
-                      <Loader showBackdrop={true} />
-                    )}
-                  </Box>
+                  {blockData ? (
+                    <Dropdown
+                      name={blockData?.BLOCK_NAME}
+                      values={blockData}
+                      defaultValue={selectedBlockValue}
+                      onSelect={(value) =>
+                        console.log('Selected:', setSelectedBlockValue(value))
+                      }
+                      label={t('YOUTHNET_USERS_AND_VILLAGES.BLOCKS')}
+                    />
+                  ) : (
+                    <Loader showBackdrop={true} />
+                  )}
                 </Box>
-              </>
+              </Box>
             )}
             <Box
               display={'flex'}
@@ -2099,106 +1490,73 @@ const Index = () => {
         {value === 3 && (
           <>
             {YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() && (
-              <>
+              <Box
+                display={'flex'}
+                flexDirection={'row'}
+                sx={{
+                  p: '20px 20px 0px 20px',
+                }}
+              >
                 <Box
-                  display={'flex'}
-                  flexDirection={'row'}
                   sx={{
-                    p: '20px 20px 0px 20px',
+                    width: '50%',
+                    mr: '20px',
                   }}
                 >
-                  <Box
-                    sx={{
-                      width: '50%',
-                      mr: '20px',
-                    }}
-                  >
-                    {stateData ? (
-                      <Dropdown
-                        name={stateData?.STATE_NAME}
-                        values={stateData}
-                        defaultValue={selectedStateValue || stateData?.[0]?.id}
-                        onSelect={(value) => {
-                          setSelectedStateValue(value);
-                        }}
-                        label={t('YOUTHNET_USERS_AND_VILLAGES.STATE')}
-                      />
-                    ) : (
-                      <Loader showBackdrop={true} />
-                    )}
-                  </Box>
-                  <Box
-                    sx={{
-                      width: '50%',
-                    }}
-                  >
-                    {districtData ? (
-                      <Dropdown
-                        name={districtData?.DISTRICT_NAME}
-                        values={districtData}
-                        defaultValue={
-                          selectedDistrictValue || districtData?.[0]?.id
-                        }
-                        onSelect={(value) => {
-                          setSelectedDistrictValue(value);
-                        }}
-                        label={t('YOUTHNET_USERS_AND_VILLAGES.DISTRICTS')}
-                      />
-                    ) : (
-                      <Loader showBackdrop={true} />
-                    )}
-                  </Box>
-                </Box>
-                <Box
-                  display={'flex'}
-                  flexDirection={'row'}
-                  sx={{
-                    p: '20px 20px 0px 20px',
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: '50%',
-                      mr: '20px',
-                    }}
-                  >
-                    {blockData ? (
-                      <Dropdown
-                        name={blockData?.BLOCK_NAME}
-                        values={blockData}
-                        defaultValue={selectedBlockValue || blockData?.[0]?.id}
-                        onSelect={(value) => {
-                          setSelectedBlockValue(value);
-                        }}
-                        label={t('YOUTHNET_USERS_AND_VILLAGES.BLOCKS')}
-                      />
-                    ) : (
-                      <Loader showBackdrop={true} />
-                    )}
-                  </Box>
-                  <Box
-                    sx={{
-                      width: '50%',
-                    }}
-                  >
+                  {districtData ? (
                     <Dropdown
-                      name={DROPDOWN_NAME}
-                      values={villageList.map((item: any) =>
-                        Array.isArray(item)
-                          ? item.map(({ Id, name }) => ({ id: Id, name }))
-                          : { id: item.Id, name: item.name }
-                      )}
-                      defaultValue={selectedVillageValue}
-                      onSelect={(value) => {
-                        console.log('Selected:', value);
-                        setSelectedVillageValue(value);
-                      }}
-                      label={t('YOUTHNET_USERS_AND_VILLAGES.VILLAGES')}
+                      name={districtData?.DISTRICT_NAME}
+                      values={districtData}
+                      defaultValue={districtData?.[0]?.id}
+                      onSelect={(value) => console.log('Selected:', value)}
+                      label={t('YOUTHNET_USERS_AND_VILLAGES.DISTRICTS')}
                     />
-                  </Box>
+                  ) : (
+                    <Loader showBackdrop={true} />
+                  )}
                 </Box>
-              </>
+                <Box
+                  sx={{
+                    width: '50%',
+                  }}
+                >
+                  {blockData ? (
+                    <Dropdown
+                      name={blockData?.BLOCK_NAME}
+                      values={blockData}
+                      defaultValue={selectedBlockValue}
+                      onSelect={(value) =>
+                        console.log('Selected:', setSelectedBlockValue(value))
+                      }
+                      label={t('YOUTHNET_USERS_AND_VILLAGES.BLOCKS')}
+                    />
+                  ) : (
+                    <Loader showBackdrop={true} />
+                  )}
+                </Box>
+              </Box>
             )}
+            <Box
+              sx={{
+                px: '20px',
+                mt: '15px',
+              }}
+            >
+              <Dropdown
+                name={DROPDOWN_NAME}
+                values={villageList.map((item: any) =>
+                  Array.isArray(item)
+                    ? item.map(({ Id, name }) => ({ id: Id, name }))
+                    : { id: item.Id, name: item.name }
+                )}
+                defaultValue={selectedVillageValue}
+                onSelect={(value) => {
+                  console.log('Selected:', value);
+                  setSelectedVillageValue(value);
+                }}
+                label={t('YOUTHNET_USERS_AND_VILLAGES.VILLAGES')}
+              />
+            </Box>
             <Box
               display={'flex'}
               flexDirection={'row'}

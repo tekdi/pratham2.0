@@ -44,7 +44,7 @@ import {
 import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
-import { updateUserTenantStatus } from '@/services/UserService';
+import { deleteUser } from '@/services/UserService';
 import {
   extractStateAndDistrictSchema,
   extractStateAndDistrictUiSchema,
@@ -86,9 +86,8 @@ const MentorLead = () => {
   const [lastName, setLastName] = useState('');
   const [village, setVillage] = useState('');
   const [userID, setUserId] = useState('');
-  const [archiveToActiveOpen, setArchiveToActiveOpen] = useState(false);
-  const [tenantId, setTenantId] = useState('');
-
+    const [archiveToActiveOpen, setArchiveToActiveOpen] = useState(false);
+  
   const [userData, setUserData] = useState({
     firstName: '',
     lastName: '',
@@ -153,7 +152,6 @@ const MentorLead = () => {
     setPrefilledAddFormData(initialFormData);
     setPrefilledFormData(initialFormDataSearch);
     fetchData();
-    setTenantId(localStorage.getItem('tenantId'));
   }, []);
 
   const updatedUiSchema = {
@@ -178,7 +176,7 @@ const MentorLead = () => {
     );
     const staticFilter = {
       role: 'Lead',
-      //   status: 'active',
+   //   status: 'active',
       tenantId: localStorage.getItem('tenantId'),
     };
     if (localStorage.getItem('roleName') === Role.ADMIN) {
@@ -212,8 +210,8 @@ const MentorLead = () => {
     {
       key: 'status',
       label: 'Status',
-      render: (row: any) => transformLabel(row.tenantStatus),
-      getStyle: (row) => ({ color: row.tenantStatus === 'active' ? 'green' : 'red' }),
+      render: (row: any) => transformLabel(row.status),
+      getStyle: (row) => ({ color: row.status === 'active' ? 'green' : 'red' }),
     },
     {
       keys: ['gender'],
@@ -296,9 +294,8 @@ const MentorLead = () => {
 
       // Always attempt to delete the user
       console.log('Proceeding to self-delete...');
-      const resp = await updateUserTenantStatus(userID, tenantId, {
-        reason: reason,
-        status: 'archived',
+      const resp = await deleteUser(userID, {
+        userData: { reason: reason, status: 'archived' },
       });
 
       if (resp?.responseCode === 200) {
@@ -311,7 +308,6 @@ const MentorLead = () => {
             ),
           },
         }));
-        searchData(prefilledFormData, currentPage);
         console.log('Team leader successfully archived.');
       } else {
         console.error('Failed to archive team leader:', resp);
@@ -322,7 +318,7 @@ const MentorLead = () => {
       console.error('Error updating team leader:', error);
     }
   };
-  const archiveToactive = async () => {
+ const archiveToactive = async () => {
     try {
       let membershipIds = null;
 
@@ -346,7 +342,7 @@ const MentorLead = () => {
           try {
             const updateResponse = await updateCohortMemberStatus({
               memberStatus: 'active',
-              //   statusReason: reason,
+           //   statusReason: reason,
               membershipId,
             });
 
@@ -371,10 +367,11 @@ const MentorLead = () => {
 
       // Always attempt to delete the user
       console.log('Proceeding to self-delete...');
-      const resp = await updateUserTenantStatus(userID, tenantId, {
-        status: 'active',
+      const resp = await deleteUser(userID, {
+        userData: { status: 'active' },
       });
-      showToastMessage(t('LEARNERS.ACTIVATE_USER_SUCCESS'), 'success');
+                        showToastMessage(t("LEARNERS.ACTIVATE_USER_SUCCESS"), "success");
+
 
       if (resp?.responseCode === 200) {
         // setResponse((prev) => ({
@@ -387,7 +384,7 @@ const MentorLead = () => {
         //   },
         // }));
         searchData(prefilledFormData, currentPage);
-
+        
         console.log('learner successfully aactive.');
       } else {
         console.error('Failed to archive team leader:', resp);
@@ -428,7 +425,6 @@ const MentorLead = () => {
         handleOpenModal();
         setIsReassign(false);
       },
-      show: (row) => row.tenantStatus !== 'archived'
     },
     {
       icon: (
@@ -477,7 +473,7 @@ const MentorLead = () => {
           village: findVillage?.selectedValues?.[0]?.value || '',
         });
       },
-                     show: (row) => row.tenantStatus !== 'archived'
+                     show: (row) => row.status !== 'archived'
 
     },
     {
@@ -507,47 +503,47 @@ const MentorLead = () => {
         setEditableUserId(row?.userId);
         handleOpenModal();
       },
-      show: (row) => row.tenantStatus !== 'archived',
+      show: (row) => row.status !== 'archived',
     },
-    {
-      icon: (
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            cursor: 'pointer',
-            backgroundColor: 'rgb(227, 234, 240)',
-            padding: '10px',
-          }}
-        >
-          {' '}
-          <Image src={restoreIcon} alt="" />{' '}
-        </Box>
-      ),
-      callback: async (row) => {
-        const findVillage = row?.customFields.find((item) => {
+     {
+          icon: (
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                cursor: 'pointer',
+                backgroundColor: 'rgb(227, 234, 240)',
+                padding: '10px',
+              }}
+            >
+              {' '}
+              <Image src={restoreIcon} alt="" />{' '}
+            </Box>
+          ),
+          callback: async (row) => {
+            const findVillage = row?.customFields.find((item) => {
           if (item.label === 'DISTRICT') {
             return item;
           }
         });
-
-        // console.log('row:', row?.customFields[2].selectedValues[0].value);
-        setEditableUserId(row?.userId);
-
-        setArchiveToActiveOpen(true);
-
-        setUserId(row?.userId);
-
-        setUserData({
-          firstName: row?.firstName || '',
-          lastName: row?.lastName || '',
-          village: findVillage?.selectedValues?.[0]?.value || '',
-        });
-        // setReason('');
-        // setChecked(false);
-      },
-      show: (row) => row.tenantStatus !== 'active',
+    
+            // console.log('row:', row?.customFields[2].selectedValues[0].value);
+            setEditableUserId(row?.userId);
+    
+            setArchiveToActiveOpen(true);
+    
+            setUserId(row?.userId);
+    
+            setUserData({
+              firstName: row?.firstName || '',
+              lastName: row?.lastName || '',
+              village: findVillage?.selectedValues?.[0]?.value || '',
+            });
+            // setReason('');
+            // setChecked(false);
+          },
+          show: (row) => row.status !== 'active',
         }
   ];
 
@@ -737,34 +733,34 @@ const MentorLead = () => {
         />
       </ConfirmationPopup>
       <ConfirmationPopup
-        checked={true}
-        open={archiveToActiveOpen}
-        onClose={() => setArchiveToActiveOpen(false)}
-        title={t('COMMON.ACTIVATE_USER')}
-        primary={t('COMMON.ACTIVATE')}
-        secondary={t('COMMON.CANCEL')}
+              checked={true}
+              open={archiveToActiveOpen}
+              onClose={() => setArchiveToActiveOpen(false)}
+              title={t('COMMON.ACTIVATE_USER')}
+              primary={t('COMMON.ACTIVATE')}
+              secondary={t('COMMON.CANCEL')}
               reason={"yes"}
-        onClickPrimary={archiveToactive}
-      >
-        <Box
-          sx={{
-            border: '1px solid #ddd',
-            borderRadius: 2,
-            mb: 2,
-            p: 1,
-          }}
-        >
-          <Typography>
+              onClickPrimary={archiveToactive}
+            >
+              <Box
+                      sx={{
+                        border: '1px solid #ddd',
+                        borderRadius: 2,
+                        mb: 2,
+                        p: 1,
+                      }}
+                    >
+                      <Typography>
                         { userData.firstName } { userData.lastName } {t("FORM.WAS_BELONG_TO")}
-          </Typography>
+                      </Typography>
                       <TextField fullWidth value={userData.village} disabled sx={{ mt: 1 }} />
-        </Box>
-        <Typography fontWeight="bold">
+                    </Box>
+               <Typography fontWeight="bold">
                          {t("FORM.CONFIRM_TO_ACTIVATE")}  
       
-        </Typography>
+                      </Typography>
       
-      </ConfirmationPopup>
+       </ConfirmationPopup>
     </>
   );
 };

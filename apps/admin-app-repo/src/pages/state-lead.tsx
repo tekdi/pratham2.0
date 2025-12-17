@@ -15,7 +15,7 @@ import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
 import { Button } from '@mui/material';
 import SimpleModal from '@/components/SimpleModal';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { updateUserTenantStatus } from '@/services/UserService';
+import { deleteUser } from '@/services/UserService';
 import editIcon from '../../public/images/editIcon.svg';
 import deleteIcon from '../../public/images/deleteIcon.svg';
 import Image from 'next/image';
@@ -58,7 +58,6 @@ const StateLead = () => {
   const [state, setState] = useState("");
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [tenantId, setTenantId] = useState('');
   const { t, i18n } = useTranslation();
   const formRef = useRef(null);
 
@@ -114,7 +113,6 @@ const StateLead = () => {
 
     setPrefilledAddFormData(initialFormDataSearch);
     fetchData();
-    setTenantId(localStorage.getItem('tenantId'));
   }, []);
 
   const updatedUiSchema = {
@@ -172,9 +170,9 @@ const StateLead = () => {
     {
       key: 'status',
       label: 'Status',
-      render: (row: any) => transformLabel(row.tenantStatus),
+      render: (row: any) => transformLabel(row.status),
       getStyle: (row: any) => ({
-        color: row.tenantStatus === 'active' ? 'green' : 'red',
+        color: row.status === 'active' ? 'green' : 'red',
       }),
     },
     {
@@ -191,8 +189,8 @@ const StateLead = () => {
 
   const archiveToactive = async () => {
     try {
-      const resp = await updateUserTenantStatus(editableUserId, tenantId, {
-        status: 'active'
+      const resp = await deleteUser(editableUserId, {
+        userData: { status: 'active' },
       });
       setArchiveToActiveOpen(false);
       searchData(prefilledFormData, currentPage);
@@ -233,7 +231,7 @@ const StateLead = () => {
         setEditableUserId(row?.userId);
         handleOpenModal();
       },
-      show: (row) => row.tenantStatus !== 'archived',
+      show: (row) => row.status !== 'archived',
     },
     {
       icon: (
@@ -257,14 +255,16 @@ const StateLead = () => {
         console.log('row:', row);
         setEditableUserId(row?.userId);
         const userId = row?.userId;
-        const response = await updateUserTenantStatus(userId, tenantId, {
-          status: 'archived'
+        const response = await deleteUser(userId, {
+          userData: {
+            status: Status.ARCHIVED,
+          },
         });
         setPrefilledFormData({});
         searchData(prefilledFormData, currentPage);
         setOpenModal(false);
       },
-      show: (row) => row.tenantStatus !== 'archived',
+      show: (row) => row.status !== 'archived',
     },
 
     {
@@ -301,7 +301,7 @@ const StateLead = () => {
         setArchiveToActiveOpen(true);
         setPrefilledFormData({});
       },
-      show: (row) => row.tenantStatus !== 'active',
+      show: (row) => row.status !== 'active',
     }
   ];
 

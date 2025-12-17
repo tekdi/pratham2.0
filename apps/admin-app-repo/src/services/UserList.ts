@@ -6,7 +6,7 @@ export interface userListParam {
   //  page: number;
   filters: {
     role?: string;
-    tenantStatus?: string;
+    status?: string;
     states?: string;
     districts?: string;
     blocks?: string;

@@ -136,7 +136,7 @@ export const YouthSearchSchema = {
       enum: ['asc', 'desc'],
       enumNames: ['A-Z', 'Z-A'],
     },
-    tenantStatus: {
+    status: {
       type: 'string',
       title: 'Status',
       enum: ['active', 'archived'],
@@ -153,7 +153,7 @@ export const YouthSearchUISchema = {
     'village',
     'name',
     'sortBy',
-    'tenantStatus',
+    'status',
   ],
 
   state: {
@@ -197,7 +197,7 @@ export const YouthSearchUISchema = {
     'ui:widget': 'select',
   },
 
-  tenantStatus: {
+  status: {
     'ui:widget': 'select',
   },
 };

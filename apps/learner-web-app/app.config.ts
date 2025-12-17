@@ -12,12 +12,3 @@ if (!jotFormId) {
     'NEXT_PUBLIC_JOTFORM_ID is not set in the environment variables.'
   );
 }
-
-// JotForm ID for content download form
-export const CONTENT_DOWNLOAD_JOTFORM_ID =
-  process.env.NEXT_PUBLIC_CONTENT_DOWNLOAD_JOTFORM_ID || '';
-if (!CONTENT_DOWNLOAD_JOTFORM_ID) {
-  console.warn(
-    'NEXT_PUBLIC_CONTENT_DOWNLOAD_JOTFORM_ID is not set in the environment variables.'
-  );
-}

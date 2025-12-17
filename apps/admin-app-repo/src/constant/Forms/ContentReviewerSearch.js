@@ -35,7 +35,7 @@ export const ContentReviewerSearchSchema = {
       enum: ['asc', 'desc'],
       enumNames: ['A-Z', 'Z-A'],
     },
-    tenantStatus: {
+    status: {
       type: 'string',
       title: 'Status',
       enum: ['active', 'archived'],
@@ -45,7 +45,7 @@ export const ContentReviewerSearchSchema = {
 };
 
 export const ContentReviewerUISchema = {
-  'ui:order': ['state', 'name', 'sortBy', 'tenantStatus'],
+  'ui:order': ['state', 'name', 'sortBy', 'status'],
 
   state: {
     'ui:widget': 'AutoCompleteMultiSelectWidget',
@@ -63,7 +63,7 @@ export const ContentReviewerUISchema = {
     'ui:widget': 'select',
   },
 
-  tenantStatus: {
+  status: {
     'ui:widget': 'select',
   },
 };

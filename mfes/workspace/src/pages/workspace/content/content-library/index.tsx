@@ -243,7 +243,6 @@ const ContentsPage = () => {
       image: item?.appIcon,
       contentType: item.primaryCategory,
       name: item.name,
-      englishName: item?.englishName,
       primaryCategory: item.primaryCategory,
       language: item.contentLanguage ? item.contentLanguage : item?.language,
 

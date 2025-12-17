@@ -42,9 +42,6 @@ export const FormContext = {
   youth: {
     context: 'USERS',
     contextType: 'Learner'
-  },
-  mobilizer: {
-    context: 'USERS',
-    contextType: 'MOBILIZER'
   }
+
 };

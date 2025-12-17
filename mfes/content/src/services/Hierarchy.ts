@@ -64,7 +64,6 @@ interface ContentSearchResponse {
   size?: number;
   lastPublishedOn?: string;
   name?: string;
-  englishName?: string;
   attributions?: string[];
   targetBoardIds?: string[];
   status?: string;

@@ -136,7 +136,7 @@ export const MentorSearchSchema = {
       enum: ['asc', 'desc'],
       enumNames: ['A-Z', 'Z-A'],
     },
-    tenantStatus: {
+    status: {
       type: 'string',
       title: 'Status',
       enum: ['active', 'archived'],
@@ -153,7 +153,7 @@ export const MentorSearchUISchema = {
     'village',
     'name',
     'sortBy',
-    'tenantStatus',
+    'status',
   ],
 
   state: {
@@ -197,7 +197,7 @@ export const MentorSearchUISchema = {
     'ui:widget': 'select',
   },
 
-  tenantStatus: {
+  status: {
     'ui:widget': 'select',
     // 'ui:disabled': true,
   },

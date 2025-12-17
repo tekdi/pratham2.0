@@ -196,7 +196,7 @@ const AssessmentList = () => {
   useEffect(() => {
     const getVillageList = async () => {
       try {
-        if (YOUTHNET_USER_ROLE.MOBILIZER === getLoggedInUserRole()) {
+        if (YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole()) {
           // For INSTRUCTOR role: get villages from localStorage (logged user's block villages)
           const villageDataString = localStorage.getItem('villageData');
           const villageData: any = villageDataString
@@ -258,7 +258,7 @@ const AssessmentList = () => {
   // Initialize villages on page load for INSTRUCTOR role
   useEffect(() => {
     if (!router.isReady) return;
-    if (YOUTHNET_USER_ROLE.MOBILIZER === getLoggedInUserRole()) {
+    if (YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole()) {
       const villageDataString = localStorage.getItem('villageData');
       const villageData: any = villageDataString
         ? JSON.parse(villageDataString)
@@ -738,7 +738,7 @@ const AssessmentList = () => {
           )}
 
           {/* Village Dropdown - Always show but data source depends on role */}
-          <Grid item xs={12} sm={6} md={YOUTHNET_USER_ROLE.MOBILIZER === getLoggedInUserRole() ? 6 : 3}>
+          <Grid item xs={12} sm={6} md={YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole() ? 6 : 3}>
             <Box sx={{ width: '100%' }}>
               {villageList?.length > 0 ? (
                 <Dropdown
@@ -774,7 +774,7 @@ const AssessmentList = () => {
 
           {/* Assessment Type Dropdown - Always show */}
           {availableAssessmentTypes && availableAssessmentTypes?.length > 0 ? (
-            <Grid item xs={12} sm={6} md={YOUTHNET_USER_ROLE.MOBILIZER === getLoggedInUserRole() ? 6 : 3}>
+            <Grid item xs={12} sm={6} md={YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole() ? 6 : 3}>
               <Box sx={{ width: '100%' }}>
                 <FormControl fullWidth>
                   <InputLabel
@@ -813,7 +813,7 @@ const AssessmentList = () => {
               </Box>
             </Grid>
           ) : (
-            <Grid item xs={12} sm={6} md={YOUTHNET_USER_ROLE.MOBILIZER === getLoggedInUserRole() ? 6 : 3}>
+            <Grid item xs={12} sm={6} md={YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole() ? 6 : 3}>
               <Box sx={{ width: '100%', mt: 2 }}>
                 <Typography sx={{ fontSize: '14px' }}>
                   {t('ASSESSMENTS.NO_ASSESSMENT_TYPE_FOUND')}

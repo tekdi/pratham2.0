@@ -35,7 +35,7 @@ export const StateLeadSearchSchema = {
       enum: ['asc', 'desc'],
       enumNames: ['A-Z', 'Z-A'],
     },
-    tenantStatus: {
+    status: {
       type: 'string',
       title: 'Status',
       enum: ['active', 'archived'],
@@ -45,7 +45,7 @@ export const StateLeadSearchSchema = {
 };
 
 export const StateLeadUISchema = {
-  'ui:order': ['state', 'name', 'sortBy', 'tenantStatus'],
+  'ui:order': ['state', 'name', 'sortBy', 'status'],
 
   state: {
     'ui:widget': 'AutoCompleteMultiSelectWidget',

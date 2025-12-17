@@ -208,7 +208,6 @@ export enum ResourcesType {
   POSTREQUSITE = 'postrequisite',
   OTHER = 'other',
   NONE = 'none',
-  DURING_COURSE = 'during',
 }
 export const FeesStepBoards = ['NIOS'];
 

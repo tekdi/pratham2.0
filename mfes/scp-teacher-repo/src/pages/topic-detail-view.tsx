@@ -21,8 +21,6 @@ const TopicDetailView = () => {
   const { t } = useTranslation();
   const { isRTL } = useDirection();
   const store = useCourseStore();
-  console.log('store', store);
-  console.log('store?.resources', store?.resources);
 
   const getLearningResources = (type: string) => {
     if (store?.resources?.length) {
@@ -189,13 +187,6 @@ const TopicDetailView = () => {
               title={t('CENTER_SESSION.POST_REQUISITES')}
               type={ResourcesType.POSTREQUSITE}
               resources={getLearningResources(ResourcesType.POSTREQUSITE)}
-            />
-            <CourseAccordion
-              expanded={expanded.includes('panel3')}
-              onChange={toggleAccordion('panel3')}
-              title={t('CENTER_SESSION.DURING_COURSE')}
-              type={ResourcesType.DURING_COURSE}
-              resources={getLearningResources(ResourcesType.DURING_COURSE)}
             />
           </Box>
         )}

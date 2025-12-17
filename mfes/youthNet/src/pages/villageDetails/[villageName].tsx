@@ -49,7 +49,7 @@ const VillageDetails = () => {
         if (id) {
           filters = {
             role: Role.LEARNER,
-            tenantStatus: [Status.ACTIVE],
+            status: [Status.ACTIVE],
             village: [id.toString()],
           };
         }

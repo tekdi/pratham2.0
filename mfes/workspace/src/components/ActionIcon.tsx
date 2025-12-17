@@ -1,10 +1,6 @@
 import React, { useState } from "react";
 import { Box, Typography, Tooltip, useTheme } from "@mui/material";
 import DeleteConfirmation from "./DeleteConfirmation";
-import UnpublishedIcon from '@mui/icons-material/Unpublished';
-import PublishIcon from '@mui/icons-material/Publish';
-import { Role } from "@workspace/utils/app.constant";
-import { getLocalStoredUserRole } from "@workspace/services/LocalStorageService";
 
 interface ActionCellProps {
   rowData?: any;
@@ -16,13 +12,11 @@ const ActionIcon: React.FC<ActionCellProps> = ({
 }) => {
   const theme = useTheme<any>();
   const [open, setOpen] = useState(false);
-  const [actionType, setActionType] = useState<string>('delete');
 
   const handleClose = () => {
     setOpen(false);
   };
-  const handleOpen = (type: string) => {
-    setActionType(type);
+  const handleOpen = () => {
     setOpen(true);
   };
 
@@ -43,72 +37,30 @@ const ActionIcon: React.FC<ActionCellProps> = ({
         alignItems: "center",
       }}
     >
-      <Tooltip title="Delete">
+      <Tooltip title={"Delete"}>
         <Box
           onClick={() => {
             console.log(rowData);
-            handleOpen('delete');
+
+            handleOpen();
           }}
           sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            cursor: 'pointer',
-            backgroundColor: '#F8EFE7',
-            p: '10px',
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            cursor: "pointer",
+            backgroundColor: "#F8EFE7",
+            p: "10px",
           }}
         >
-          <img src={'/delete.png'} height="20px" alt="Image" />
+          <img src={"/delete.png"} height="20px" alt="Image" />
         </Box>
       </Tooltip>
-
-      {/* {rowData?.status === 'Live' &&  getLocalStoredUserRole()!==Role.SCTA&& (
-        <Tooltip title="Unpublish">
-          <Box
-            onClick={() => {
-              console.log(rowData);
-              handleOpen('unpublish');
-            }}
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              cursor: 'pointer',
-              backgroundColor: '#F8EFE7',
-              p: '10px',
-            }}
-          >
-            <UnpublishedIcon sx={{ color: 'red' }} />
-          </Box>
-        </Tooltip>
-      )}
-
-      {rowData?.status === 'Unlisted' && getLocalStoredUserRole()!==Role.SCTA && (
-        <Tooltip title="Publish">
-          <Box
-            onClick={() => {
-              console.log(rowData);
-              handleOpen('publish');
-            }}
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              cursor: 'pointer',
-              backgroundColor: '#F8EFE7',
-              p: '10px',
-            }}
-          >
-            <PublishIcon sx={{ color: 'green' }} />
-          </Box>
-        </Tooltip>
-      )} */}
 
       <DeleteConfirmation
         open={open}
         handleClose={handleClose}
         rowData={rowData}
-        actionType={actionType}
       />
     </Box>
   );

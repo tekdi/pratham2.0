@@ -27,7 +27,6 @@ export const fetchBulkContents = async (identifiers: string[]) => {
         },
         fields: [
           'name',
-          'englishName',
           'appIcon',
           'medium',
           'subject',

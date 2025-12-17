@@ -62,7 +62,7 @@ export default function PosPage() {
             "Second Chance": `The ${TenantName.SECOND_CHANCE_PROGRAM} by Pratham is a powerful initiative that helps young girls and women who dropped out of school complete their Grade 10 education. By bringing learning closer to home and offering the support they need, the program breaks barriers like early marriage, household responsibilities, and lack of access. It opens doors to higher education, skills training, and better job opportunities, giving women a real shot at a brighter future.`,
             'Vocational Training':
               'Pratham\'s Vocational Skilling Program, launched in 2005, empowers youth from underprivileged backgrounds by equipping them with practical, job-ready skills. With a presence across India, it opens doors to employment in over 10 key sectors, supported by affiliations like NSDC. In response to changing times, the program evolved into a Hybrid Skilling model, blending digital tools with training to help young people thrive in a post-pandemic world.',
-              "Creativity Club": `Pratham’s Creativity Club Program engages children (ages 10-14) and youth (ages 14+) across diverse domains such as STEM, visual and performing arts, environment, and sports. The program fosters essential 21st-century skills such as creativity, problem-solving, communication, and collaboration. Through its 'all-some-few' approach, the program provides tailored opportunities that match individual interests, supported by digital and social infrastructure.'`,
+              "Creativity Club": `The ${TenantName.CREATIVITY_CLUB}`,
 
           },
         },

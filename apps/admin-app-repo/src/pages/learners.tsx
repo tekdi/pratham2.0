@@ -47,7 +47,7 @@ import {
 import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
-import { updateUserTenantStatus } from '@/services/UserService';
+import { deleteUser } from '@/services/UserService';
 import {
   calculateAgeFromDate,
   fetchUserData,
@@ -430,10 +430,10 @@ const Learner = () => {
 
       // Always attempt to delete the user
       console.log('Proceeding to self-delete...');
-      const resp = await updateUserTenantStatus(userID, tenantId, {
-        reason: reason,
-        status: 'archived',
+      const resp = await deleteUser(userID, {
+        userData: { reason: reason, status: 'archived' },
       });
+
       if (resp?.responseCode === 200) {
         // setResponse((prev) => ({
         //   ...prev,
@@ -504,8 +504,8 @@ const Learner = () => {
 
       // Always attempt to delete the user
       console.log('Proceeding to self-delete...');
-      const resp = await updateUserTenantStatus(userID, tenantId, {
-        status: 'active',
+      const resp = await deleteUser(userID, {
+        userData: { status: 'active' },
       });
       showToastMessage(t("LEARNERS.ACTIVATE_USER_SUCCESS"), "success");
 

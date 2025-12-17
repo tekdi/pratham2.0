@@ -57,7 +57,6 @@ const API_ENDPOINTS = {
   contentSearchStatus: `${baseurl}/tracking/content/search/status`,
   contentCreate: `${baseurl}/tracking/content/create`,
   updateCohortUser: (userId: string | string[])=>`${baseurl}/user/v1/cohort/update/${userId}`,
-  userTenantStatus: (userId: string, tenantId: string) =>`${baseurl}/user-tenant/status?userId=${userId}&tenantId=${tenantId}`,
   userCertificateStatusSearch: `${baseurl}/tracking/user_certificate/status/search`
 };
 

@@ -35,7 +35,7 @@ export const hierarchyAPI = async (doId: string, params?: object) => {
 export const fetchContent = async (identifier: any) => {
   try {
     const API_URL = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/api/content/v1/read/${identifier}`;
-    const FIELDS = 'description,name,appIcon,posterImage,artifactUrl,mimeType';
+    const FIELDS = 'description,name,appIcon,posterImage';
     const LICENSE_DETAILS = 'name,description,url';
     const MODE = 'edit';
     const response = await get(
@@ -83,7 +83,6 @@ export const ContentSearch = async ({
         },
         fields: fields || [
           'name',
-          'englishName',
           'appIcon',
           'description',
           'posterImage',

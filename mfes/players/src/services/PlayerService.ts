@@ -29,7 +29,6 @@ export const fetchBulkContents = async (identifiers: string[]) => {
         },
         fields: [
           'name',
-          'englishName',
           'appIcon',
           'medium',
           'subject',
@@ -89,8 +88,7 @@ export const getQumlData = async (identifier: any) => {
 export const createContentTracking = async (reqBody: ContentCreate) => {
   const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/content/create`;
   try {
-    const tenantId =
-      typeof window !== 'undefined' ? localStorage.getItem('tenantId') : null;
+    const tenantId = typeof window !== "undefined" ? localStorage.getItem("tenantId") : null;
 
     const response = await axios.post(apiUrl, reqBody, {
       headers: {
@@ -152,8 +150,7 @@ export const createAssessmentTracking = async ({
       };
       const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/assessment/create`;
 
-      const tenantId =
-        typeof window !== 'undefined' ? localStorage.getItem('tenantId') : null;
+      const tenantId = typeof window !== "undefined" ? localStorage.getItem("tenantId") : null;
 
       const response = await axios.post(apiUrl, data, {
         headers: {
@@ -170,8 +167,7 @@ export const createAssessmentTracking = async ({
 
 const fetchCertificateStatus = async ({ userId, courseId }: any) => {
   try {
-    const tenantId =
-      typeof window !== 'undefined' ? localStorage.getItem('tenantId') : null;
+    const tenantId = typeof window !== "undefined" ? localStorage.getItem("tenantId") : null;
 
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/user_certificate/status/get`,
@@ -211,14 +207,13 @@ export const updateCOurseAndIssueCertificate = async ({
   };
 
   try {
-    const tenantId =
-      typeof window !== 'undefined' ? localStorage.getItem('tenantId') : null;
+const tenantId = typeof window !== "undefined" ? localStorage.getItem("tenantId") : null;
 
-    const headers = {
-      ...(tenantId && { tenantid: tenantId }),
-    };
+const headers = {
+  ...(tenantId && { tenantid: tenantId }),
+};
 
-    const response = await axios.post(apiUrl, data, { headers });
+const response = await axios.post(apiUrl, data, { headers });
     const courseStatus = calculateCourseStatus({
       statusData: response?.data?.data?.[0]?.course?.[0],
       allCourseIds: course.leafNodes ?? [],
@@ -347,8 +342,7 @@ export const updateUserCourseStatus = async ({
 }) => {
   const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/user_certificate/status/update`;
   try {
-    const tenantId =
-      typeof window !== 'undefined' ? localStorage.getItem('tenantId') : null;
+    const tenantId = typeof window !== "undefined" ? localStorage.getItem("tenantId") : null;
 
     const response = await axios.post(
       apiUrl,
@@ -377,8 +371,7 @@ export const checkCriteriaForCertificate = async (reqBody: any) => {
   const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/api/course/v1/hierarchy/${courseId}`;
 
   try {
-    const tenantId =
-      typeof window !== 'undefined' ? localStorage.getItem('tenantId') : null;
+    const tenantId = typeof window !== "undefined" ? localStorage.getItem("tenantId") : null;
 
     const response = await axios.get(apiUrl, {
       headers: {
@@ -505,8 +498,7 @@ export const checkCriteriaForCertificate = async (reqBody: any) => {
 export const issueCertificate = async (reqBody: any) => {
   const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/certificate/issue`;
   try {
-    const tenantId =
-      typeof window !== 'undefined' ? localStorage.getItem('tenantId') : null;
+    const tenantId = typeof window !== "undefined" ? localStorage.getItem("tenantId") : null;
 
     const response = await axios.post(apiUrl, reqBody, {
       headers: {

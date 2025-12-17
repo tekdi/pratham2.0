@@ -77,7 +77,7 @@ const volunteerList = () => {
         const filters = {
           village: ids,
           role: Role.LEARNER,
-          tenantStatus: [Status.ACTIVE],
+          status: [Status.ACTIVE],
           is_volunteer: 'yes',
         };
 

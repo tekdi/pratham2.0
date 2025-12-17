@@ -1018,9 +1018,6 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
                                   <option value="facilitator-requisite">
                                     {t('Facilitator-requisite')}
                                   </option>
-                                  <option value="during">
-                                    {t('During')}
-                                  </option>
                                 </Select>
                               </FormControl>
                             </Grid>

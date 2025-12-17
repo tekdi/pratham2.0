@@ -21,12 +21,12 @@ export const MENU_CONFIG = {
       subMenu: [
         {
           title: 'SIDEBAR.TEAM_LEADERS',
-          link: '/user-leader',
+          link: '/team-leader',
           roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
         {
           title: 'SIDEBAR.FACILITATORS',
-          link: '/user-instructor',
+          link: '/facilitator',
           roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
         {
@@ -47,7 +47,7 @@ export const MENU_CONFIG = {
         {
           title: 'SIDEBAR.STATE_LEAD',
 
-          link: '/user-state-lead',
+          link: '/state-lead',
           roles: [Role.CENTRAL_ADMIN],
         },
       ],
@@ -115,7 +115,7 @@ export const MENU_CONFIG = {
       title: 'SIDEBAR.TAXONOMY_EDITOR',
       icon: '/images/taxonomy.svg',
       link: '/taxonomy-manager',
-      roles: [Role.CENTRAL_ADMIN],
+      roles: [ Role.CENTRAL_ADMIN],
     },
     faqs: {
       title: 'SIDEBAR.FAQS',
@@ -151,14 +151,14 @@ export const MENU_CONFIG = {
       subMenu: [
         {
           title: 'SIDEBAR.MENTOR_LEADER',
-          link: '/user-leader',
+          link: '/central-head',
           roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
-        // {
-        //   title: 'SIDEBAR.MENTOR',
-        //   link: '/mentor',
-        //   roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
-        // },
+        {
+          title:  'SIDEBAR.MENTOR',
+          link: '/mentor',
+          roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
+        },
         {
           title: 'SIDEBAR.YOUTH',
           link: '/youth',
@@ -176,13 +176,8 @@ export const MENU_CONFIG = {
         },
         {
           title: 'SIDEBAR.STATE_LEAD',
-          link: '/user-state-lead',
+          link: '/state-lead',
           roles: [Role.CENTRAL_ADMIN],
-        },
-        {
-          title: 'SIDEBAR.MOBILIZER',
-          link: '/user-mobilizer',
-          roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
       ],
     },
@@ -251,7 +246,7 @@ export const MENU_CONFIG = {
       title: 'SIDEBAR.TAXONOMY_EDITOR',
       icon: '/images/taxonomy.svg',
       link: '/taxonomy-manager',
-      roles: [Role.CENTRAL_ADMIN],
+      roles: [ Role.CENTRAL_ADMIN],
     },
   },
   [TenantName.POS]: {
@@ -260,11 +255,11 @@ export const MENU_CONFIG = {
       icon: '/images/group.svg',
       roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
       subMenu: [
-        // {
-        //   title: 'SIDEBAR.MENTOR',
-        //   link: '/mentor',
-        //   roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
-        // },
+        {
+          title: 'SIDEBAR.MENTOR',
+          link: '/mentor',
+          roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
+        },
         {
           title: 'SIDEBAR.MENTOR_LEADER',
           link: '/mentor-leader',
@@ -287,7 +282,7 @@ export const MENU_CONFIG = {
         },
         {
           title: 'SIDEBAR.STATE_LEAD',
-          link: '/user-state-lead',
+          link: '/state-lead',
           roles: [Role.CENTRAL_ADMIN],
         },
       ],
@@ -302,7 +297,7 @@ export const MENU_CONFIG = {
       title: 'SIDEBAR.TAXONOMY_EDITOR',
       icon: '/images/taxonomy.svg',
       link: '/taxonomy-manager',
-      roles: [Role.CENTRAL_ADMIN],
+      roles: [ Role.CENTRAL_ADMIN],
     },
     faqs: {
       title: 'SIDEBAR.FAQS',
@@ -343,7 +338,7 @@ export const MENU_CONFIG = {
           title: 'SIDEBAR.CONTENT_REVIEWER',
           link: '/content-reviewer',
           roles: [Role.CENTRAL_ADMIN],
-        },
+        }
       ],
     },
     workspace: {
@@ -356,13 +351,19 @@ export const MENU_CONFIG = {
       title: 'SIDEBAR.TAXONOMY_EDITOR',
       icon: '/images/taxonomy.svg',
       link: '/taxonomy-manager',
-      roles: [Role.CENTRAL_ADMIN],
+      roles: [ Role.CENTRAL_ADMIN],
     },
     faqs: {
       title: 'SIDEBAR.FAQS',
       icon: '/images/live_help.png',
       link: '/faqs',
-      roles: [Role.ADMIN, Role.CENTRAL_ADMIN, Role.CCTA, Role.SCTA],
+      roles: [
+        Role.ADMIN,
+        Role.CENTRAL_ADMIN,
+        Role.CCTA,
+        Role.SCTA,
+        
+      ],
     },
     supportRequest: {
       title: 'SIDEBAR.SUPPORT_REQUEST',
@@ -372,7 +373,7 @@ export const MENU_CONFIG = {
     },
   },
   [TenantName.CAMP_TO_CLUB]: {
-    manageUsers: {
+     manageUsers: {
       title: 'SIDEBAR.MANAGE_USERS',
       icon: '/images/group.svg',
       roles: [Role.CENTRAL_ADMIN],
@@ -394,7 +395,7 @@ export const MENU_CONFIG = {
         },
       ],
     },
-    master: {
+     master: {
       title: 'SIDEBAR.MASTER',
       icon: '/images/database.svg',
       roles: [Role.CENTRAL_ADMIN],
@@ -425,7 +426,7 @@ export const MENU_CONFIG = {
       title: 'SIDEBAR.WORKSPACE',
       icon: '/images/dashboard.svg',
       link: '/workspace',
-      roles: [Role.CENTRAL_ADMIN, Role.CCTA, Role.SCTA],
+      roles: [Role.CENTRAL_ADMIN,  Role.CCTA, Role.SCTA],
     },
     manageNotificationTemplates: {
       title: 'SIDEBAR.MANAGE_NOTIFICATION',
@@ -439,12 +440,13 @@ export const MENU_CONFIG = {
       link: '/support-request',
       roles: [Role.ADMIN, Role.CENTRAL_ADMIN, Role.CCTA, Role.SCTA],
     },
-
+   
     faqs: {
       title: 'SIDEBAR.FAQS',
       icon: '/images/live_help.png',
       link: '/faqs',
       roles: [Role.ADMIN, Role.CENTRAL_ADMIN, Role.CCTA, Role.SCTA],
     },
+   
   },
 };

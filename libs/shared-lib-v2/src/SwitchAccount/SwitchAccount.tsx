@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   Dialog,
@@ -22,8 +23,6 @@ import {
   Avatar,
   CircularProgress,
   useTheme,
-  Snackbar,
-  Alert,
 } from '@mui/material';
 import {
   ArrowBack,
@@ -44,7 +43,6 @@ interface Role {
 interface TenantData {
   tenantName: string;
   tenantId: string;
-  tenantStatus?: string;
   templateId: string;
   contentFramework: string | null;
   collectionFramework: string | null;
@@ -98,7 +96,6 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [loading, setLoading] = useState(false);
   const [isLanguageReady, setIsLanguageReady] = useState(true);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   const host = useMemo(() => {
     if (typeof window !== 'undefined') {
@@ -180,12 +177,6 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
 
   const visibleTenants: TenantData[] = useMemo(() => {
     const tenants = authResponse ?? [];
-
-    // Filter out archived tenants
-    const activeTenants = tenants.filter(
-      (tenant) => tenant?.tenantStatus?.toLowerCase() !== 'archived'
-    );
-
     // If no host mapping found, do not filter roles
     if (
       !allowedRoleIds ||
@@ -194,17 +185,17 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
       console.log('SwitchAccount role filter', {
         note: 'No host mapping found, using backend roles as-is',
         host,
-        tenants: activeTenants.map((t) => ({
+        tenants: tenants.map((t) => ({
           tenantId: t.tenantId,
           tenantName: t.tenantName,
           inputRoles: (t.roles ?? []).map((r) => r.roleId),
         })),
       });
-      // console.log('tenants', activeTenants);
-      return activeTenants;
+      // console.log('tenants', tenants);
+      return tenants;
     }
 
-    const filteredTenants = activeTenants.map((tenant) => {
+    const filteredTenants = tenants.map((tenant) => {
       const inputRoles = tenant?.roles ?? [];
       const filteredRoles = inputRoles.filter((r) =>
         (allowedRoleIds as string[]).includes(r.roleId)
@@ -223,11 +214,11 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
     console.log('SwitchAccount role filter', {
       allowedRoleIds,
       host,
-      tenants: activeTenants.map((t, idx) => ({
+      tenants: tenants.map((t, idx) => ({
         tenantId: t.tenantId,
         tenantName: t.tenantName,
         inputRoles: (t.roles ?? []).map((r) => r.roleId),
-        filteredRoles: (filteredTenants[idx]?.roles ?? []).map((r) => r.roleId),
+        filteredRoles: (filteredTenants[idx].roles ?? []).map((r) => r.roleId),
       })),
       finalTenants: nonEmptyTenants.map((t) => ({
         tenantId: t.tenantId,
@@ -237,19 +228,14 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
     });
 
     return nonEmptyTenants;
-  }, [authResponse, allowedRoleIds, host]);
+  }, [authResponse, allowedRoleIds]);
 
   useEffect(() => {
-    if (!open) {
-      // Reset snackbar when dialog closes
-      setSnackbarOpen(false);
-      return;
-    }
+    if (!open) return;
 
     setActiveStep(0);
     setSelectedTenant(null);
     setSelectedRole(null);
-    setSnackbarOpen(false);
 
     // Immediate language sync on dialog open to avoid late reflection
     if (typeof window !== 'undefined') {
@@ -305,29 +291,13 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
     return () => window.clearInterval(intervalId);
   }, [open, language, setLanguage]);
 
-  // Check if there are no active tenants and handle accordingly
+  // Auto-select or bypass based on tenant/role counts (uses filtered roles)
   useEffect(() => {
     if (!open) return;
 
     const tenants = visibleTenants ?? [];
-
-    // If no tenants available, close dialog and show error snackbar
-    if (tenants.length === 0) {
-      onClose();
-      // Show snackbar after dialog closes (increased timeout to ensure dialog is fully closed)
-      setTimeout(() => {
-        setSnackbarOpen(true);
-      }, 300);
-      return;
-    }
-
     if (tenants.length === 1) {
       const tenant = tenants[0];
-      // Skip if tenant is archived
-      if (tenant?.tenantStatus?.toLowerCase() === 'archived') {
-        return;
-      }
-
       const roles = tenant?.roles ?? [];
       if (roles.length === 1) {
         // Single tenant & single role: confirm and close
@@ -351,14 +321,9 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
       setActiveStep(0);
     }
     // }, [open, visibleTenants, callbackFunction, onClose]);
-  }, [open, visibleTenants, callbackFunction, onClose]);
+  }, [open]);
 
   const handleTenantSelect = (tenant: TenantData) => {
-    // Prevent selection of archived tenants
-    if (tenant?.tenantStatus?.toLowerCase() === 'archived') {
-      return;
-    }
-
     setSelectedTenant(tenant);
     const roles = tenant?.roles ?? [];
     if (roles.length === 1) {
@@ -393,11 +358,6 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
 
   const handleConfirm = () => {
     if (selectedTenant && selectedRole) {
-      // Prevent confirmation if tenant is archived
-      if (selectedTenant?.tenantStatus?.toLowerCase() === 'archived') {
-        return;
-      }
-
       // Call the callback function with the 4 required parameters
       callbackFunction(
         selectedTenant.tenantId,
@@ -617,133 +577,111 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
   );
 
   return (
-    <>
-      <Dialog
-        open={open}
-        onClose={onClose}
-        maxWidth={false}
-        fullWidth
-        scroll="paper"
-        PaperProps={{
-          sx: {
-            borderRadius: 2,
-            boxShadow: 6,
-            m: { xs: 1, sm: 2, md: 3 },
-            width: {
-              xs: 'calc(100vw - 16px)',
-              sm: 'calc(100vw - 32px)',
-              md: 'calc(100vw - 48px)',
-            },
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth={false}
+      fullWidth
+      scroll="paper"
+      PaperProps={{
+        sx: {
+          borderRadius: 2,
+          boxShadow: 6,
+          m: { xs: 1, sm: 2, md: 3 },
+          width: {
+            xs: 'calc(100vw - 16px)',
+            sm: 'calc(100vw - 32px)',
+            md: 'calc(100vw - 48px)',
+          },
+          height: {
+            xs: 'calc(100vh - 16px)',
+            sm: 'calc(100vh - 32px)',
+            md: 'calc(100vh - 48px)',
+          },
+          maxWidth: 'none',
+        },
+      }}
+    >
+      {!isLanguageReady ? (
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
             height: {
               xs: 'calc(100vh - 16px)',
               sm: 'calc(100vh - 32px)',
               md: 'calc(100vh - 48px)',
             },
-            maxWidth: 'none',
-          },
-        }}
-      >
-        {!isLanguageReady ? (
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: {
-                xs: 'calc(100vh - 16px)',
-                sm: 'calc(100vh - 32px)',
-                md: 'calc(100vh - 48px)',
-              },
-            }}
-          >
-            <CircularProgress />
-          </Box>
-        ) : (
-          <Box key={language}>
-            <DialogTitle sx={{ pb: 1 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Person color="primary" />
-                <Typography
-                  variant="h1"
-                  fontWeight={700}
-                  color={theme.palette.text.primary}
-                  mt={2}
-                >
-                  {t('SWITCH_ACCOUNT.TITLE', {
-                    defaultValue: 'Select Account',
-                  })}
-                </Typography>
-              </Box>
-              <Stepper
-                activeStep={activeStep}
-                sx={{
-                  mt: 2,
-                  '.MuiStepLabel-label': {
-                    fontWeight: 600,
-                    fontSize: '1.25rem',
-                  },
-                }}
-              >
-                {steps.map((label) => (
-                  <Step key={label}>
-                    <StepLabel>{label}</StepLabel>
-                  </Step>
-                ))}
-              </Stepper>
-            </DialogTitle>
-
-            <Divider />
-
-            <DialogContent sx={{ py: 3 }}>
-              {activeStep === 0 && renderTenantSelection()}
-              {activeStep === 1 && renderRoleSelection()}
-            </DialogContent>
-
-            <Divider />
-
-            <DialogActions sx={{ p: 2, gap: 1.5 }}>
-              {activeStep === 1 && (
-                <Button
-                  onClick={handleBack}
-                  color="inherit"
-                  startIcon={<ArrowBack />}
-                >
-                  {t('COMMON.BACK', { defaultValue: 'Back' })}
-                </Button>
-              )}
-              <Button onClick={onClose} color="inherit">
-                {t('COMMON.CANCEL', { defaultValue: 'Cancel' })}
-              </Button>
-              <Button
-                onClick={handleConfirm}
-                variant="contained"
-                size="large"
-                disabled={!selectedTenant || !selectedRole}
-              >
-                {t('SWITCH_ACCOUNT.CONFIRM_SELECTION', {
-                  defaultValue: 'Confirm Selection',
-                })}
-              </Button>
-            </DialogActions>
-          </Box>
-        )}
-      </Dialog>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={() => setSnackbarOpen(false)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        sx={{ zIndex: 9999 }}
-      >
-        <Alert
-          onClose={() => setSnackbarOpen(false)}
-          severity="error"
-          sx={{ width: '100%' }}
+          }}
         >
-          You are not authorised to access this site contact your admin
-        </Alert>
-      </Snackbar>
-    </>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <Box key={language}>
+          <DialogTitle sx={{ pb: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Person color="primary" />
+              <Typography
+                variant="h1"
+                fontWeight={700}
+                color={theme.palette.text.primary}
+                mt={2}
+              >
+                {t('SWITCH_ACCOUNT.TITLE', { defaultValue: 'Select Account' })}
+              </Typography>
+            </Box>
+            <Stepper
+              activeStep={activeStep}
+              sx={{
+                mt: 2,
+                '.MuiStepLabel-label': { fontWeight: 600, fontSize: '1.25rem' },
+              }}
+            >
+              {steps.map((label) => (
+                <Step key={label}>
+                  <StepLabel>{label}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+          </DialogTitle>
+
+          <Divider />
+
+          <DialogContent sx={{ py: 3 }}>
+            {activeStep === 0 && renderTenantSelection()}
+            {activeStep === 1 && renderRoleSelection()}
+          </DialogContent>
+
+          <Divider />
+
+          <DialogActions sx={{ p: 2, gap: 1.5 }}>
+            {activeStep === 1 && (
+              <Button
+                onClick={handleBack}
+                color="inherit"
+                startIcon={<ArrowBack />}
+              >
+                {t('COMMON.BACK', { defaultValue: 'Back' })}
+              </Button>
+            )}
+            <Button onClick={onClose} color="inherit">
+              {t('COMMON.CANCEL', { defaultValue: 'Cancel' })}
+            </Button>
+            <Button
+              onClick={handleConfirm}
+              variant="contained"
+              size="large"
+              disabled={!selectedTenant || !selectedRole}
+            >
+              {t('SWITCH_ACCOUNT.CONFIRM_SELECTION', {
+                defaultValue: 'Confirm Selection',
+              })}
+            </Button>
+          </DialogActions>
+        </Box>
+      )}
+    </Dialog>
   );
 };
 
