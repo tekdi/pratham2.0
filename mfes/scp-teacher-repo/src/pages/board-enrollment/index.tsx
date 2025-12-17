@@ -251,6 +251,12 @@ const BoardEnrollment = () => {
     return members.filter((entry: any) => {
       const createdAtDate = new Date(entry.createdAt);
       createdAtDate.setHours(0, 0, 0, 0);
+      const updatedAtDate = new Date(entry.updatedAt);
+      updatedAtDate.setHours(0, 0, 0, 0);
+
+      if (entry.status === 'reassigned' && updatedAtDate <= today) {
+        return false;
+      }
       return createdAtDate <= today;
     });
   };
