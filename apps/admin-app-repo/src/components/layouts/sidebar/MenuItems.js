@@ -48,7 +48,7 @@ const Menuitems = [
         href: ['/central-head'],
       },
       {
-        title: 'SIDEBAR.MOBILIZER',
+        title: 'SIDEBAR.MENTOR',
         href: ['/user-mobilizer'],
       }
     ],

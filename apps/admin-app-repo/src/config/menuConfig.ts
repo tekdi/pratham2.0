@@ -180,7 +180,7 @@ export const MENU_CONFIG = {
           roles: [Role.CENTRAL_ADMIN],
         },
         {
-          title: 'SIDEBAR.MOBILIZER',
+          title: 'SIDEBAR.MENTOR',
           link: '/user-mobilizer',
           roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },

@@ -313,7 +313,7 @@ const Index = () => {
         >
           {userData && userData?.length > 0 ? (
             <Dropdown
-              name={'Mobilizer'}
+              name={t('MOBILIZER.MOBILIZER')}
               values={userData}
               defaultValue={userData?.[0]?.id}
               onSelect={(value) => {

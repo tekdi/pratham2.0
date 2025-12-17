@@ -140,7 +140,7 @@ export const MobilizerSearchSchema = {
     },
     name: {
       type: 'string',
-      title: 'Search Mobilizer',
+      title: 'Search Mentor',
     },
     sortBy: {
       type: 'string',
