@@ -318,6 +318,48 @@ export const TeamLeaderSearchSchema = {
       isMultiSelect: true,
       maxSelection: 1000,
     },
+    batch: {
+      type: 'array',
+      title: 'FORM.BATCH',
+      items: {
+        type: 'string',
+        enum: ['Select'],
+        enumNames: ['Select'],
+      },
+      // coreField: 1,
+      //fieldId: null,
+      field_type: 'drop_down',
+      // enum: ['Select'],
+      // enumNames: ['Select'],
+      api: {
+        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/cohort/search`,
+        header: {
+          tenantId: '**',
+          Authorization: '**',
+          academicyearid: '**',
+        },
+        method: 'POST',
+        options: {
+          label: 'name',
+          value: 'cohortId',
+          optionObj: 'result.results.cohortDetails',
+        },
+        payload: {
+          limit: 200,
+          offset: 0,
+          filters: {
+            type: 'BATCH',
+            status: ['active'],
+            parentId: '**',
+          },
+        },
+        callType: 'dependent',
+        dependent: 'center',
+      },
+      uniqueItems: true,
+      isMultiSelect: true,
+      maxSelection: 1000,
+    },
     name: {
       type: 'string',
       title: 'Search Leader User',
@@ -345,6 +387,7 @@ export const TeamLeaderSearchUISchema = {
     'block',
     // 'village',
     'center',
+    'batch',
     'name',
     'sortBy',
     'tenantStatus',
@@ -384,6 +427,14 @@ export const TeamLeaderSearchUISchema = {
   // },
 
   center: {
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
+    'ui:options': {
+      multiple: true,
+      uniqueItems: true,
+    },
+  },
+
+  batch: {
     'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': {
       multiple: true,

@@ -603,7 +603,7 @@ const StateLead = () => {
           }}
         >
           <Typography variant="h1" component="div">
-            {t('Map User as State Lead')}
+            {t('Map User as Lead')}
           </Typography>
           <IconButton
             aria-label="close"
