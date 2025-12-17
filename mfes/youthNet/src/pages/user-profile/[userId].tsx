@@ -57,6 +57,7 @@ const UserId = () => {
     village?: string | null;
     userName?: string | null;
     joinedOn?: string | null;
+    workingVillages?: string | null;
   }>({
     userRole: null,
     userID: null,
@@ -73,6 +74,7 @@ const UserId = () => {
     middleName: null,
     userName: null,
     joinedOn: null,
+    workingVillages: null,
   });
 
   // Get current user ID and userProgram from localStorage on mount
@@ -106,7 +108,7 @@ const UserId = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (typeof window === 'undefined' || !window.localStorage) return;
-      
+
       try {
         const tenantId = localStorage.getItem('tenantId');
         const responseForm: any = await fetchForm([
@@ -218,25 +220,88 @@ const UserId = () => {
         userData = JSON.parse(localStorage.getItem('userData') || '{}');
       } else if (userId) {
         const data = await getUserDetails(userId, true);
+        // console.log('data', data);
         userData = data?.userData || {};
       }
 
       if (userData) {
         const getFieldValue = (label: string) => {
-          const field = userData?.customFields?.find((item: any) => item.label === label);
+          const field = userData?.customFields?.find(
+            (item: any) => item.label === label
+          );
           const selectedValues = field?.selectedValues;
-          
+
           if (!selectedValues || selectedValues.length === 0) {
             return '';
           }
-          
+
           if (selectedValues.length === 1) {
             return toPascalCase(selectedValues[0]?.value || '');
           }
-          
+
           // If multiple values, return all values as array or concatenated string
-          return selectedValues.map((item: any) => toPascalCase(item?.value || '')).join(', ');
+          return selectedValues
+            .map((item: any) => toPascalCase(item?.value || ''))
+            .join(', ');
         };
+
+        // Function to extract working village names
+        const getWorkingVillages = () => {
+          const workingVillageField = userData?.customFields?.find(
+            (item: any) => item.label === 'WORKING_VILLAGE'
+          );
+          const workingLocationField = userData?.customFields?.find(
+            (item: any) => item.label === 'WORKING_LOCATION'
+          );
+
+          if (!workingVillageField || !workingLocationField) {
+            return '';
+          }
+
+          // Get village IDs from WORKING_VILLAGE field
+          const villageIdsString = workingVillageField?.selectedValues?.[0];
+          if (!villageIdsString) {
+            return '';
+          }
+
+          // Split comma-separated IDs
+          const villageIds = villageIdsString
+            .split(',')
+            .map((id: string) => id.trim());
+
+          // Get working location data - handle both single object and array
+          const workingLocationDataArray =
+            workingLocationField?.selectedValues || [];
+          if (workingLocationDataArray.length === 0) {
+            return '';
+          }
+
+          // Extract all village names from the nested structure
+          const villageNames: string[] = [];
+
+          // Iterate through all state objects in selectedValues
+          workingLocationDataArray.forEach((workingLocationData: any) => {
+            // The structure has districts directly in each state object
+            if (workingLocationData.districts) {
+              workingLocationData.districts.forEach((district: any) => {
+                if (district.blocks) {
+                  district.blocks.forEach((block: any) => {
+                    if (block.villages) {
+                      block.villages.forEach((village: any) => {
+                        if (villageIds.includes(String(village.id))) {
+                          villageNames.push(village.name);
+                        }
+                      });
+                    }
+                  });
+                }
+              });
+            }
+          });
+
+          return villageNames.map((name) => toPascalCase(name)).join(', ');
+        };
+
         let date;
         let formattedDOBDate;
         if (userData.dob) {
@@ -269,6 +334,7 @@ const UserId = () => {
           block: getFieldValue('BLOCK'),
           state: getFieldValue('STATE'),
           village: getFieldValue('VILLAGE'),
+          workingVillages: getWorkingVillages(),
         });
       }
     };
@@ -407,6 +473,7 @@ const UserId = () => {
             joinedOn={user.joinedOn || null}
             firstName={user.firstName || ''}
             lastName={user.lastName || ''}
+            workingVillages={user.workingVillages || null}
           />
         </Box>
       </Box>
@@ -450,4 +517,4 @@ export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
   };
 };
 
-export default  UserId
+export default UserId;

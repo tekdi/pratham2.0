@@ -784,7 +784,8 @@
     "MIDDLE_NAME": "Middle Name",
     "LAST_NAME": "Last Name",
     "USERNAME": "Username",
-    "UPDATE_PROFILE": "Update Profile"
+    "UPDATE_PROFILE": "Update Profile",
+    "WORKING_VILLAGES": "Working Villages"
   },
   "YOUTHNET_USERS_AND_VILLAGES": {
     "MENTORS": "Mentors",
