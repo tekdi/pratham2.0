@@ -36,12 +36,12 @@ export const MENU_CONFIG = {
         },
         {
           title: 'SIDEBAR.CONTENT_CREATOR',
-          link: '/content-creator',
+          link: '/user-content-creator',
           roles: [Role.CENTRAL_ADMIN],
         },
         {
           title: 'SIDEBAR.CONTENT_REVIEWER',
-          link: '/content-reviewer',
+          link: '/user-content-reviewer',
           roles: [Role.CENTRAL_ADMIN],
         },
         {
@@ -166,12 +166,12 @@ export const MENU_CONFIG = {
         },
         {
           title: 'SIDEBAR.CONTENT_CREATOR',
-          link: '/content-creator',
+          link: '/user-content-creator',
           roles: [Role.CENTRAL_ADMIN],
         },
         {
           title: 'SIDEBAR.CONTENT_REVIEWER',
-          link: '/content-reviewer',
+          link: '/user-content-reviewer',
           roles: [Role.CENTRAL_ADMIN],
         },
         {
@@ -277,12 +277,12 @@ export const MENU_CONFIG = {
         },
         {
           title: 'SIDEBAR.CONTENT_CREATOR',
-          link: '/content-creator',
+          link: '/user-content-creator',
           roles: [Role.CENTRAL_ADMIN],
         },
         {
           title: 'SIDEBAR.CONTENT_REVIEWER',
-          link: '/content-reviewer',
+          link: '/user-content-reviewer',
           roles: [Role.CENTRAL_ADMIN],
         },
         {
@@ -336,12 +336,12 @@ export const MENU_CONFIG = {
         },
         {
           title: 'SIDEBAR.CONTENT_CREATOR',
-          link: '/content-creator',
+          link: '/user-content-creator',
           roles: [Role.CENTRAL_ADMIN],
         },
         {
           title: 'SIDEBAR.CONTENT_REVIEWER',
-          link: '/content-reviewer',
+          link: '/user-content-reviewer',
           roles: [Role.CENTRAL_ADMIN],
         },
       ],
@@ -384,12 +384,12 @@ export const MENU_CONFIG = {
         },
         {
           title: 'SIDEBAR.CONTENT_CREATOR',
-          link: '/content-creator',
+          link: '/user-content-creator',
           roles: [Role.CENTRAL_ADMIN],
         },
         {
           title: 'SIDEBAR.CONTENT_REVIEWER',
-          link: '/content-reviewer',
+          link: '/user-content-reviewer',
           roles: [Role.CENTRAL_ADMIN],
         },
       ],
