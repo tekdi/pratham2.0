@@ -23,6 +23,7 @@ interface SimpleModalProps {
   onClose: () => void;
   modalTitle: string;
   isFullwidth?: boolean;
+  modalWidth?: string;
   id?: any;
 }
 
@@ -38,6 +39,7 @@ const SimpleModal: React.FC<SimpleModalProps> = ({
   children,
   modalTitle,
   isFullwidth = true,
+  modalWidth = '40%',
   id = '',
 }) => {
   const theme = useTheme<any>();
@@ -51,8 +53,8 @@ const SimpleModal: React.FC<SimpleModalProps> = ({
     top: isFullwidth ? 0 : '50%',
     left: isFullwidth ? 0 : '50%',
     transform: isFullwidth ? 'none' : 'translate(-50%, -50%)',
-    width: isFullwidth ? '100vw' : '40%',
-    maxWidth: isFullwidth ? '100vw' : '40%',
+    width: isFullwidth ? '100vw' : modalWidth,
+    maxWidth: isFullwidth ? '100vw' : modalWidth,
     height: isFullwidth ? '100vh' : 'auto',
     maxHeight: isFullwidth ? '100vh' : '80vh',
     backgroundColor: 'rgb(255, 255, 255)',

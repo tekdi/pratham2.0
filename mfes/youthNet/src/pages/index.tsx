@@ -313,11 +313,13 @@ const Index = () => {
         >
           {userData && userData?.length > 0 ? (
             <Dropdown
-              name={'Mobilizer'}
+              name={t('MOBILIZER.MOBILIZER')}
               values={userData}
               defaultValue={userData?.[0]?.id}
               onSelect={(value) => {
                 localStorage.setItem('selectedMentoruserId', value);
+                localStorage.setItem('selectedMentorId', value);
+                localStorage.setItem('selectedMentorData', JSON.stringify(userData.find((user: any) => user.id === value)));
                 setSelectedMentorId(value);
               }}
             />

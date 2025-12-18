@@ -39,10 +39,19 @@ const AutoCompleteMultiSelectWidget = ({
   const optionsList = useMemo(() => {
     return enumOptions
       .filter((option) => option.value !== 'Select')
-      .map((option) => ({
-        value: option.value,
-        label: t(`FORM.${option.label}`, { defaultValue: option.label }),
-      }));
+      .map((option) => {
+        const translatedLabel = t(`FORM.${option.label}`, {
+          defaultValue: option.label,
+        });
+        const capitalizedLabel =
+          translatedLabel.charAt(0).toUpperCase() +
+          translatedLabel.slice(1).toLowerCase();
+        return {
+          value: option.value,
+          label: capitalizedLabel,
+        };
+      })
+      .sort((a, b) => a.label.localeCompare(b.label));
   }, [enumOptions, t]);
 
   // Get selected options based on current values

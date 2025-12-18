@@ -18,6 +18,7 @@ import {
   extractMatchingKeys,
   fetchForm,
   searchListData,
+  enhanceUiSchemaWithGrid,
 } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import { FormContext } from '@shared-lib-v2/DynamicForm/components/DynamicFormConstant';
 import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
@@ -110,7 +111,14 @@ const Centers = () => {
       //unit name is missing from required so handled from frotnend
       let alterSchema = responseForm?.schema;
       let requiredArray = alterSchema?.required;
-      const mustRequired = ['name', 'state', 'district', 'block', 'village','catchment_area'];
+      const mustRequired = [
+        'name',
+        'state',
+        'district',
+        'block',
+        'village',
+        'catchment_area',
+      ];
       if (storedProgram === TenantName.SECOND_CHANCE_PROGRAM) {
         mustRequired.push('center_type', 'board', 'medium', 'grade');
       }
@@ -150,7 +158,12 @@ const Centers = () => {
       // }
 
       setAddSchema(alterSchema);
-      setAddUiSchema(responseForm?.uiSchema);
+
+      //set 2 grid layout
+      let alterUISchema = responseForm?.uiSchema;
+      alterUISchema = enhanceUiSchemaWithGrid(alterUISchema);
+
+      setAddUiSchema(alterUISchema);
 
       // Uncomment for remote center changes
       // // console.log('####1:', alterSchema);
@@ -627,6 +640,8 @@ const Centers = () => {
           modalTitle={
             isEdit ? t('COMMON.UPDATE_CENTER') : t('CENTERS.NEW_CENTER')
           }
+          isFullwidth={false}
+          modalWidth="90%"
         >
           <AddEditUser
             SuccessCallback={() => {

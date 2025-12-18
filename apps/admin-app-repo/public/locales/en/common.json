@@ -167,7 +167,7 @@
     "ACTIVATE": "Activate",
     "RESIGNED_FROM_COMPANY": "Resigned from the company",
     "MOVED_TO_DIFFERENT_ROLE": "Moved to a different role",
-    "NO_MOBILIZER_FOUND": "No Mobilizer Found",
+    "NO_MOBILIZER_FOUND": "No Mentor Found",
     "MAP": "Map",
     "NEXT": "Next"
   },
@@ -246,7 +246,7 @@
     "SKILLING_CENTERS": "Skilling Centers",
     "CURRICULUM_PLANNER": "Curriculum Planner",
     "BATCH": "Batch",
-    "MOBILIZER": "Mobilizer"
+    "MOBILIZER": "Mentor"
   },
   "FACILITATORS": {
     "STATE": "State",
@@ -480,7 +480,7 @@
     "EMAIL": "Email",
     "YEAR_OF_JOINING_SCP": "Year of joining SCP",
     "ASSIGN_CENTERS": "Assign Centers",
-    "TYPE_OF_COHORT": "Type Of Center",
+    "TYPE_OF_COHORT": "Type of Center",
     "UNIT_NAME": "Unit Name",
     "SUBJECTS_I_TEACH": "Subject I Teach",
     "MY_MAIN_SUBJECTS": "Main subjects",
@@ -720,7 +720,7 @@
   "dob": "DOB",
   "email": "Email",
   "UNIT_NAME": "Unit Name",
-  "TYPE_OF_CENTER": "Type Of Center",
+  "TYPE_OF_CENTER": "Type of Center",
   "MY_MAIN_SUBJECTS": "Main subjects",
   "LIFE_SKILLS": "Life Skills",
   "ENGLISH": "English",
@@ -853,13 +853,13 @@
   },
   "MOBILIZER": {
     "ACTIVATE_USER_SUCCESS": "User has been successfully activated",
-    "MOBILIZER_UPDATED_SUCCESSFULLY": "Mobilizer has been successfully updated!",
-    "NOT_ABLE_UPDATE_MOBILIZER": "Not able to update Mobilizer",
-    "MOBILIZER_CREATED_SUCCESSFULLY": "Mobilizer has been successfully created!",
-    "NOT_ABLE_CREATE_MOBILIZER": "Not able to create Mobilizer",
-    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "Mobilizer is created, credentials will be sent soon",
+    "MOBILIZER_UPDATED_SUCCESSFULLY": "Mentor has been successfully updated!",
+    "NOT_ABLE_UPDATE_MOBILIZER": "Not able to update Mentor",
+    "MOBILIZER_CREATED_SUCCESSFULLY": "Mentor has been successfully created!",
+    "NOT_ABLE_CREATE_MOBILIZER": "Not able to create Mentor",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "Mentor is created, credentials will be sent soon",
     "MAP_USER_AS_LEAD": "Map User as Lead",
-    "MAP_USER_AS_MOBILIZER": "Map User as Mobilizer",
+    "MAP_USER_AS_MOBILIZER": "Map User as Mentor",
     "PLEASE_SEARCH_AND_SELECT_USER": "Please search and select a user",
     "UNKNOWN_STATE": "Unknown State",
     "UNKNOWN_DISTRICT": "Unknown District",
@@ -868,6 +868,6 @@
     "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES": "Working location is required. Please select villages for all blocks. Missing villages in: {{blocks}} and {{count}} more block(s).",
     "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES_SINGLE": "Working location is required. Please select villages for all blocks. Missing villages in: {{blocks}}.",
     "WORKING_LOCATION_REQUIRED_AT_LEAST_ONE": "Working location is required. Please select at least one village in all blocks.",
-    "MOBILIZER_NAME": "Mobilizer Name"
+    "MOBILIZER_NAME": "Mentor Name"
   }
 }

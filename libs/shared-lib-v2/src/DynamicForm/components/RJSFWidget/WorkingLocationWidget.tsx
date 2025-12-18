@@ -919,14 +919,14 @@ const WorkingLocationWidget = ({
                 label="State"
                 size="small"
                 sx={{
-                  backgroundColor: '#1976d2',
-                  color: 'white',
+                  backgroundColor: '#FFC107',
+                  color: '#000000',
                   fontWeight: 600,
                 }}
               />
               <Typography
                 variant="h6"
-                sx={{ fontWeight: 600, color: '#1976d2', fontSize: '1.15rem' }}
+                sx={{ fontWeight: 600, color: '#000000', fontSize: '1rem' }}
               >
                 {state.stateName}
               </Typography>
@@ -947,7 +947,7 @@ const WorkingLocationWidget = ({
             <Box
               key={district.districtId}
               sx={{
-                borderLeft: '3px solid #4caf50',
+                borderLeft: '3px solid #e0e0e0',
                 pl: 2,
                 mb: 2,
                 pt: 1,
@@ -969,14 +969,18 @@ const WorkingLocationWidget = ({
                     label="District"
                     size="small"
                     sx={{
-                      backgroundColor: '#4caf50',
-                      color: 'white',
+                      backgroundColor: '#FFC107',
+                      color: '#000000',
                       fontWeight: 600,
                     }}
                   />
                   <Typography
                     variant="subtitle1"
-                    sx={{ fontWeight: 600, fontSize: '1.15rem' }}
+                    sx={{
+                      fontWeight: 600,
+                      color: '#000000',
+                      fontSize: '0.875rem',
+                    }}
                   >
                     {district.districtName}
                   </Typography>
@@ -1001,13 +1005,13 @@ const WorkingLocationWidget = ({
                 <Box
                   key={block.id}
                   sx={{
-                    borderLeft: '3px solid #ff9800',
+                    borderLeft: '3px solid #e0e0e0',
                     pl: 2,
                     mb: 2,
                     mt: 2,
                     pt: 1,
                     pb: 1,
-                    backgroundColor: '#fffbf0',
+                    backgroundColor: 'white',
                   }}
                 >
                   {/* Block Header */}
@@ -1024,14 +1028,18 @@ const WorkingLocationWidget = ({
                         label="Block"
                         size="small"
                         sx={{
-                          backgroundColor: '#ff9800',
-                          color: 'white',
+                          backgroundColor: '#FFC107',
+                          color: '#000000',
                           fontWeight: 600,
                         }}
                       />
                       <Typography
                         variant="subtitle2"
-                        sx={{ fontWeight: 600, fontSize: '1rem' }}
+                        sx={{
+                          fontWeight: 600,
+                          color: '#000000',
+                          fontSize: '0.75rem',
+                        }}
                       >
                         {block.name}
                       </Typography>
@@ -1058,15 +1066,21 @@ const WorkingLocationWidget = ({
                     district.districtId,
                     block.id
                   ).length > 0 && (
-                    <Box sx={{ mb: 1 }}>
+                    <Box
+                      sx={{
+                        mb: 1,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                      }}
+                    >
                       <Chip
-                        label="Selected Villages"
+                        label="Village"
                         size="small"
                         sx={{
-                          backgroundColor: '#f3e5f5',
-                          color: '#7b1fa2',
+                          backgroundColor: '#FFC107',
+                          color: '#000000',
                           fontWeight: 600,
-                          mb: 1,
                         }}
                       />
                     </Box>
@@ -1091,7 +1105,14 @@ const WorkingLocationWidget = ({
                           )
                         }
                         deleteIcon={<CloseIcon />}
-                        sx={{ backgroundColor: '#f3e5f5', color: '#7b1fa2' }}
+                        sx={{
+                          backgroundColor: '#FFC107',
+                          color: '#000000',
+                          fontSize: '0.6rem',
+                          '& .MuiChip-label': {
+                            fontSize: '0.75rem',
+                          },
+                        }}
                         disabled={disabled || readonly}
                       />
                     ))}
@@ -1259,7 +1280,6 @@ const WorkingLocationWidget = ({
           })()}
         </Box>
       ))}
-      
     </Box>
   );
 };

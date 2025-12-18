@@ -1406,7 +1406,7 @@ const Index = () => {
             }}
           >
             {YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() && (
-              <Tab value={1} label={t('MOBILIZER.MOBILIZER')} />
+              <Tab value={1} label={t('YOUTHNET_USERS_AND_VILLAGES.MENTORS')} />
             )}
 
             <Tab value={2} label={t('DASHBOARD.VILLAGES')} />
@@ -1477,7 +1477,7 @@ const Index = () => {
                   }}
                 >
                   {mentorCount} {''}
-                  {t('MOBILIZER.MOBILIZER')}
+                  {t('YOUTHNET_USERS_AND_VILLAGES.MENTORS')}
                 </Typography>
 
                 {/* <Box
