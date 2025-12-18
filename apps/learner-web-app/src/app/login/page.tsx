@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Suspense, useEffect, useState } from 'react';
+import React, { Suspense, useCallback, useEffect, useState } from 'react';
 import { Box, Grid, Typography } from '@mui/material';
 import dynamic from 'next/dynamic';
 import WelcomeScreen from '@learner/components/WelcomeComponent/WelcomeScreen';
@@ -8,7 +8,6 @@ import Header from '@learner/components/Header/Header';
 import { getUserId, login } from '@learner/utils/API/LoginService';
 import { showToastMessage } from '@learner/components/ToastComponent/Toastify';
 import { useRouter } from 'next/navigation';
-import { useMediaQuery, useTheme } from '@mui/material';
 import { useTranslation } from '@shared-lib';
 import { getAcademicYear } from '@learner/utils/API/AcademicYearService';
 import { preserveLocalStorage } from '@learner/utils/helper';
@@ -22,8 +21,6 @@ import prathamQRCode from '../../../public/images/prathamQR.png';
 import welcomeGIF from '../../../public/images/welcome.gif';
 import { logEvent } from '@learner/utils/googleAnalytics';
 import { TenantName } from '../../utils/app.constant';
-
-import SwitchAccountDialog from '@shared-lib-v2/SwitchAccount/SwitchAccount';
 
 const Login = dynamic(
   () => import('@login/Components/LoginComponent/LoginComponent'),
@@ -162,12 +159,118 @@ const WelcomeMessage = () => {
 const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const handleAddAccount = () => {
     router.push('/');
   };
   const { t } = useTranslation();
+
+  const [tenantId, setTenantId] = useState<string>('');
+  const [tenantName, setTenantName] = useState<string>('');
+  const [roleId, setRoleId] = useState<string>('');
+  const [roleName, setRoleName] = useState<string>('');
+
+  const handleSuccessfulLogin = useCallback(
+    async (
+      response: { access_token: string; refresh_token?: string | null },
+      data: { remember: boolean }
+    ) => {
+    if (typeof window === 'undefined' || !window.localStorage) {
+      return;
+    }
+
+    setLoading(true);
+
+    const token = response.access_token;
+    const refreshToken = response?.refresh_token ?? '';
+    localStorage.setItem('token', token);
+    data?.remember
+      ? localStorage.setItem('refreshToken', refreshToken)
+      : localStorage.removeItem('refreshToken');
+
+    const userResponse = await getUserId();
+
+    // Prefer the first tenant/role combination returned from the API.
+    const tenantData = userResponse?.tenantData?.[0];
+    const selectedTenantId = tenantData?.tenantId;
+    const selectedTenantName = tenantData?.tenantName;
+    const selectedRoleId = tenantData?.roleId || '';
+    const selectedRoleName = tenantData?.roleName || 'Learner';
+
+    setTenantId(selectedTenantId || '');
+    setTenantName(selectedTenantName || '');
+    setRoleId(selectedRoleId);
+    setRoleName(selectedRoleName);
+
+    if (tenantData && selectedRoleName === 'Learner') {
+      localStorage.setItem('userId', userResponse?.userId);
+      localStorage.setItem('roleId', selectedRoleId);
+      localStorage.setItem('templtateId', tenantData?.templateId);
+      localStorage.setItem('userIdName', userResponse?.username);
+      localStorage.setItem('firstName', userResponse?.firstName || '');
+
+      const uiConfig = tenantData?.params?.uiConfig;
+      const landingPage = tenantData?.params?.uiConfig?.landingPage;
+      localStorage.setItem('landingPage', landingPage);
+      localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
+
+      localStorage.setItem('tenantId', selectedTenantId || '');
+      localStorage.setItem('userProgram', selectedTenantName || '');
+      await profileComplitionCheck();
+      if (selectedTenantName === TenantName.YOUTHNET) {
+        const academicYearResponse = await getAcademicYear();
+        if (academicYearResponse[0]?.id) {
+          localStorage.setItem('academicYearId', academicYearResponse[0]?.id);
+        }
+      }
+      const telemetryInteract = {
+        context: { env: 'sign-in', cdata: [] },
+        edata: {
+          id: 'login-success',
+          type: 'CLICK',
+          pageid: 'sign-in',
+          uid: userResponse?.userId || 'Anonymous',
+        },
+      };
+      telemetryFactory.interact(telemetryInteract);
+
+      const channelId = tenantData?.channelId;
+      localStorage.setItem('channelId', channelId);
+
+      const collectionFramework = tenantData?.collectionFramework;
+      localStorage.setItem('collectionFramework', collectionFramework);
+
+      document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
+      const query = new URLSearchParams(window.location.search);
+      const redirectUrl = query.get('redirectUrl');
+      const activeLink = query.get('activeLink');
+      logEvent({
+        action: 'successfully-login-in-learner-app',
+        category: 'Login Page',
+        label: 'Login Button Clicked',
+      });
+      if (redirectUrl && redirectUrl.startsWith('/')) {
+        router.push(
+          `${redirectUrl}${activeLink ? `?activeLink=${activeLink}` : ''}`
+        );
+      } else {
+        router.push('/programs');
+      }
+    } else {
+      showToastMessage('Username or password not correct', 'error');
+      const telemetryInteract = {
+        context: { env: 'sign-in', cdata: [] },
+        edata: {
+          id: 'login-failed',
+          type: 'CLICK',
+          pageid: 'sign-in',
+        },
+      };
+      telemetryFactory.interact(telemetryInteract);
+    }
+    setLoading(false);
+  },
+  [router]
+);
 
   useEffect(() => {
     const init = async () => {
@@ -181,10 +284,10 @@ const LoginPage = () => {
           const response = {
             result: {
               access_token,
-              refresh_token,
+              refresh_token: refresh_token || undefined,
             },
           };
-          handleSuccessfulLogin(response?.result, { remember: false }, router);
+          handleSuccessfulLogin(response?.result, { remember: false });
         }
         if (!localStorage.getItem('did')) {
           const visitorId = await getDeviceId();
@@ -199,7 +302,7 @@ const LoginPage = () => {
       }
     };
     init();
-  }, []);
+  }, [handleSuccessfulLogin]);
 
   const handleForgotPassword = () => {
     localStorage.setItem('redirectionRoute', '/login');
@@ -217,7 +320,7 @@ const LoginPage = () => {
     try {
       const response = await login({ username, password });
       if (response?.result?.access_token) {
-        handleSuccessfulLogin(response?.result, data, router);
+        handleSuccessfulLogin(response?.result, data);
       } else {
         showToastMessage(
           t('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT'),
@@ -234,7 +337,7 @@ const LoginPage = () => {
         telemetryFactory.interact(telemetryInteract);
       }
       // setLoading(false);
-    } catch (error: any) {
+    } catch {
       //   setLoading(false);
       const errorMessage = t('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT');
       showToastMessage(errorMessage, 'error');
@@ -248,138 +351,6 @@ const LoginPage = () => {
       };
       telemetryFactory.interact(telemetryInteract);
     }
-  };
-
-  const [switchDialogOpen, setSwitchDialogOpen] = useState(false);
-  const [userResponse, setUserResponse] = useState<any>(null);
-  const [tenantId, setTenantId] = useState<string>('');
-  const [tenantName, setTenantName] = useState<string>('');
-  const [roleId, setRoleId] = useState<string>('');
-  const [roleName, setRoleName] = useState<string>('');
-
-  const handleSuccessfulLogin = async (
-    response: any,
-    data: { remember: boolean },
-    router: any
-  ) => {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      const token = response.access_token;
-      const refreshToken = response?.refresh_token;
-      localStorage.setItem('token', token);
-      data?.remember
-        ? localStorage.setItem('refreshToken', refreshToken)
-        : localStorage.removeItem('refreshToken');
-
-      const userResponse = await getUserId();
-
-      setUserResponse(userResponse);
-
-      setSwitchDialogOpen(true);
-    }
-  };
-  const callBackSwitchDialog = async (
-    tenantId: string,
-    tenantName: string,
-    roleId: string,
-    roleName: string
-  ) => {
-    setSwitchDialogOpen(false);
-    setLoading(true);
-
-    // Set the state values
-    setTenantId(tenantId);
-    setTenantName(tenantName);
-    setRoleId(roleId);
-    setRoleName(roleName);
-
-    const token =
-      typeof window !== 'undefined' && window.localStorage
-        ? localStorage.getItem('token')
-        : '';
-
-    if (userResponse) {
-      const tenantData = userResponse?.tenantData?.find(
-        (tenant: any) => tenant.tenantId === tenantId
-      );
-
-      if (roleName === 'Learner') {
-        localStorage.setItem('userId', userResponse?.userId);
-        localStorage.setItem('templtateId', tenantData?.templateId);
-        localStorage.setItem('userIdName', userResponse?.username);
-        localStorage.setItem('firstName', userResponse?.firstName || '');
-
-        const tenantId = tenantData?.tenantId;
-        const tenantName = tenantData?.tenantName;
-        const uiConfig = tenantData?.params?.uiConfig;
-        console.log('uiConfig', uiConfig);
-        const landingPage = tenantData?.params?.uiConfig?.landingPage;
-        localStorage.setItem('landingPage', landingPage);
-
-        localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
-
-        localStorage.setItem('tenantId', tenantId);
-        localStorage.setItem('userProgram', tenantName);
-        await profileComplitionCheck();
-        if (tenantName === TenantName.YOUTHNET) {
-          const academicYearResponse = await getAcademicYear();
-          if (academicYearResponse[0]?.id) {
-            localStorage.setItem('academicYearId', academicYearResponse[0]?.id);
-          }
-        }
-        const telemetryInteract = {
-          context: { env: 'sign-in', cdata: [] },
-          edata: {
-            id: 'login-success',
-            type: 'CLICK',
-            pageid: 'sign-in',
-            uid: userResponse?.userId || 'Anonymous',
-          },
-        };
-        telemetryFactory.interact(telemetryInteract);
-
-        const channelId = tenantData?.channelId;
-        localStorage.setItem('channelId', channelId);
-
-        const collectionFramework = tenantData?.collectionFramework;
-        localStorage.setItem('collectionFramework', collectionFramework);
-
-        document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
-        const query = new URLSearchParams(window.location.search);
-        const redirectUrl = query.get('redirectUrl');
-        const activeLink = query.get('activeLink');
-        logEvent({
-          action: 'successfully-login-in-learner-app',
-          category: 'Login Page',
-          label: 'Login Button Clicked',
-        });
-        if (redirectUrl && redirectUrl.startsWith('/')) {
-          router.push(
-            `${redirectUrl}${activeLink ? `?activeLink=${activeLink}` : ''}`
-          );
-        } else {
-          // if (tenantName === TenantName.YOUTHNET) {
-          //   router.push('/content');
-          // } else if (tenantName === TenantName.CAMP_TO_CLUB) {
-          //   router.push('/courses-contents');
-          // } else if (tenantName === TenantName.PRAGYANPATH) {
-          //   router.push('/courses-contents');
-          // }
-          router.push(landingPage);
-        }
-      } else {
-        showToastMessage('Username or password not correct', 'error');
-        const telemetryInteract = {
-          context: { env: 'sign-in', cdata: [] },
-          edata: {
-            id: 'login-failed',
-            type: 'CLICK',
-            pageid: 'sign-in',
-          },
-        };
-        telemetryFactory.interact(telemetryInteract);
-      }
-    }
-    setLoading(false);
   };
 
   return (
@@ -463,12 +434,12 @@ const LoginPage = () => {
           </Box>
         </Box>
       </Box>
-      <SwitchAccountDialog
+      {/* <SwitchAccountDialog
         open={switchDialogOpen}
         onClose={() => setSwitchDialogOpen(false)}
         callbackFunction={callBackSwitchDialog}
         authResponse={userResponse?.tenantData}
-      />
+      /> */}
       {loading && (
         <Loader showBackdrop={true} loadingText={t('COMMON.LOADING')} />
       )}

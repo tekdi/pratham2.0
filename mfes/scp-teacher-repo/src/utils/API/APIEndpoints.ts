@@ -1,3 +1,4 @@
+//@ts-nocheck
 const baseurl = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;
 
 const API_ENDPOINTS = {
@@ -16,6 +17,7 @@ const API_ENDPOINTS = {
   resetPassword: `${baseurl}/user/reset-password`,
   fieldOptionsRead: `${baseurl}/fields/options/read`,
   cohortSearch: `${baseurl}/cohort/search`,
+  userTenantStatus: `${baseurl}/user-tenant/status`,
   fieldOptionDelete: (type: string, option: string) => `${baseurl}/fields/options/delete/${type}?option=${option}`,
   fieldUpdate: (fieldId: string) => `${baseurl}/fields/update/${fieldId}`,
   cohortUpdate: (cohortId: string) => `${baseurl}/cohort/update/${cohortId}`,
@@ -30,7 +32,8 @@ const API_ENDPOINTS = {
   userRead: (userId: string | string[], fieldValue?: boolean) => 
   fieldValue !== undefined 
     ? `${baseurl}/user/read/${userId}?fieldvalue=${fieldValue}`
-    : `${baseurl}/user/read/${userId}`,  suggestUsername: `${baseurl}/user/suggestUsername`,
+    : `${baseurl}/user/read/${userId}`,  
+    suggestUsername: `${baseurl}/user/suggestUsername`,
   cohortUpdateUser: (userId: string | string[]) => `${baseurl}/cohort/update/${userId}`,
   formReadWithContext: (context: string, contextType: string) => `${baseurl}/form/read?context=${context}&contextType=${contextType}`,
   cohortCreate: `${baseurl}/cohort/create`,
