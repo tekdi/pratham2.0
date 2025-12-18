@@ -371,38 +371,6 @@ const MenuDrawer: React.FC<DrawerProps> = ({
             >
               {t('DASHBOARD.DASHBOARD')}
             </Button>
-            <Button
-              className="fs-14"
-              sx={{
-                gap: '10px',
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'flex-start',
-                background: isUserRegistration
-                  ? theme.palette.primary.main
-                  : 'transparent',
-                padding: isUserRegistration
-                  ? '16px 18px !important'
-                  : '0px 18px !important',
-                marginTop: '15px',
-                color: isUserRegistration ? '#2E1500' : theme.palette.warning.A200,
-                fontWeight: isUserRegistration ? '600' : 500,
-                '&:hover': {
-                  background: isUserRegistration
-                    ? theme.palette.primary.main
-                    : 'transparent',
-                },
-              }}
-              startIcon={
-                <PersonAddIcon sx={{ fontSize: '24px !important' }} />
-              }
-              onClick={() => {
-                closeDrawer();
-                router.push('/user-registration-list');
-              }}
-            >
-              Learner Registrations
-            </Button>
           </Box>
         )}
         {tenantName === TENANT_DATA.YOUTHNET && (
@@ -822,6 +790,38 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               }}
             >
               {t('BOARD_ENROLMENT.BOARD_ENROLLMENT')}
+            </Button>
+            <Button
+              className="fs-14"
+              sx={{
+                gap: '10px',
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'flex-start',
+                background: isUserRegistration
+                  ? theme.palette.primary.main
+                  : 'transparent',
+                padding: isUserRegistration
+                  ? '16px 18px !important'
+                  : '0px 18px !important',
+                marginTop: '15px',
+                color: isUserRegistration ? '#2E1500' : theme.palette.warning.A200,
+                fontWeight: isUserRegistration ? '600' : 500,
+                '&:hover': {
+                  background: isUserRegistration
+                    ? theme.palette.primary.main
+                    : 'transparent',
+                },
+              }}
+              startIcon={
+                <PersonAddIcon sx={{ fontSize: '24px !important' }} />
+              }
+              onClick={() => {
+                closeDrawer();
+                router.push('/user-registration-list');
+              }}
+            >
+              Learner Registrations
             </Button>
           </Box>
         )}

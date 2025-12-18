@@ -239,7 +239,8 @@
       "ENROLL": "Enroll",
       "ENROLLING": "Enrolling...",
       "ACCESS_PROGRAM": "Access Program",
-      "ACCESSING_PROGRAM": "Accessing Program..."
+      "ACCESSING_PROGRAM": "Accessing Program...",
+      "NO_REGISTERED_PROGRAMS": "You haven't registered for any program."
     },
     "LOGIN": {
       "welcome_title": "Welcome to Pratham myLearning!",
