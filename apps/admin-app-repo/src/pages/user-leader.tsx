@@ -952,7 +952,7 @@ const UserLeader = () => {
                 !selectedUserId || !selectedCenterId || isMappingInProgress
               }
             >
-              {t('Map as Team Lead')}
+              {t('COMMON.MAP')}
             </Button>
           )}
         </DialogActions>
