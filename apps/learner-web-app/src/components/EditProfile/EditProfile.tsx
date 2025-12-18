@@ -44,9 +44,11 @@ type UserAccount = {
 };
 interface EditProfileProps {
   completeProfile: boolean;
+  enrolledProgram?: boolean;
+  uponEnrollCompletion?: () => void;
 }
 
-const EditProfile = ({ completeProfile }: EditProfileProps) => {
+const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }: EditProfileProps) => {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
 
@@ -59,6 +61,10 @@ const EditProfile = ({ completeProfile }: EditProfileProps) => {
   const [userData, setuserData] = useState<any>({});
 const [responseFormData, setResponseFormData] = useState<any>({});
   const localPayload = JSON.parse(localStorage.getItem('localPayload') || '{}');
+    const uiConfig =
+    typeof window !== 'undefined'
+    ? JSON.parse(localStorage.getItem('uiConfig') || '{}')
+    : {};
 
   //formData.email = 'a@tekditechnologies.com';
 
@@ -280,8 +286,14 @@ const [responseFormData, setResponseFormData] = useState<any>({});
       if (
         updateUserResponse &&
         updateUserResponse?.data?.params?.err === null
+        && !enrolledProgram
       ) {
         showToastMessage('Profile Updated succeessfully', 'success');
+      }
+      if(enrolledProgram){
+        uponEnrollCompletion?.();
+        // Don't redirect here - let the callback handle navigation after showing modal
+        return;
       }
       if (completeProfile) {
           const uiConfig =
@@ -376,12 +388,27 @@ if (landingPage) {
                 textAlign: 'center',
               }}
             >
-              {t(
-                completeProfile
-                  ? 'LEARNER_APP.EDIT_PROFILE.COMPLETE_PROFILE_TITLE'
-                  : 'LEARNER_APP.EDIT_PROFILE.TITLE'
-              )}
+              {enrolledProgram && typeof window !== 'undefined' && window.localStorage && localStorage.getItem('userProgram')
+                ? `${t('LEARNER_APP.EDIT_PROFILE.ENROLL_IN_TO')} ${localStorage.getItem('userProgram')}`
+                : completeProfile
+                ? t('LEARNER_APP.EDIT_PROFILE.COMPLETE_PROFILE_TITLE')
+                : t('LEARNER_APP.EDIT_PROFILE.TITLE')}
             </Typography>
+
+            {enrolledProgram && typeof window !== 'undefined' && window.localStorage && uiConfig.registrationdescription && (<Typography
+             sx={{
+              fontFamily: 'Poppins, sans-serif',
+              fontWeight: 400,
+              fontSize: '16px',
+              lineHeight: '24px',
+              letterSpacing: '0.5px',
+              textAlign: 'center',
+              p: '5px',
+            }}
+          >
+            {uiConfig?.registrationdescription}
+          </Typography>)
+}
           </Box>
           <Box
             sx={{
@@ -397,7 +424,7 @@ if (landingPage) {
               p: '40px',
             }}
           >
-            {completeProfile && (
+            {completeProfile && !enrolledProgram && (
               <Box display="flex" alignItems="center" gap={1} mb={2}>
                 <Image src={face} alt="Step Icon" />
                 <Typography fontWeight={600}>
@@ -405,6 +432,14 @@ if (landingPage) {
                 </Typography>
               </Box>
             )}
+            {enrolledProgram && typeof window !== 'undefined' && window.localStorage && localStorage.getItem('userProgram') && (
+              <Box display="flex" alignItems="center" gap={1} mb={2}>
+              <Image src={face} alt="Step Icon" />
+              <Typography fontWeight={600}>
+              Great that you’ve joined {localStorage.getItem('userProgram')}!<br />
+              Let’s begin this exciting journey together. Help us with a few additional details                </Typography>
+            </Box>
+          )}
             {addSchema && addUiSchema && (
               <DynamicForm
                 schema={addSchema}
@@ -435,7 +470,7 @@ if (landingPage) {
               form="dynamic-form-id"
               type="submit"
             >
-              {t('COMMON.SUBMIT')}
+              { enrolledProgram ? t('COMMON.FINISH_ENROLL') : t('COMMON.SUBMIT')}
             </Button>
           </Box>
         </>
