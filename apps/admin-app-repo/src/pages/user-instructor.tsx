@@ -47,7 +47,7 @@ import editIcon from '../../public/images/editIcon.svg';
 import deleteIcon from '../../public/images/deleteIcon.svg';
 import restoreIcon from '../../public/images/restore_user.svg';
 import CloseIcon from '@mui/icons-material/Close';
-import CenterListWidget from '@shared-lib-v2/MapUser/CenterListWidget';
+import BatchListWidget from '@shared-lib-v2/MapUser/BatchListWidget';
 import EmailSearchUser from '@shared-lib-v2/MapUser/EmailSearchUser';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
@@ -1091,7 +1091,7 @@ const Facilitator = () => {
           )}
           {formStep === 1 && (
             <Box sx={{ mb: 3 }}>
-              <CenterListWidget
+              <BatchListWidget
                 value={selectedCenterId}
                 onChange={(centerId) => {
                   setSelectedCenterId(centerId);
