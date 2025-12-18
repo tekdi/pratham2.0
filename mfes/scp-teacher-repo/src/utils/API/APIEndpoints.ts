@@ -32,7 +32,8 @@ const API_ENDPOINTS = {
   userRead: (userId: string | string[], fieldValue?: boolean) => 
   fieldValue !== undefined 
     ? `${baseurl}/user/read/${userId}?fieldvalue=${fieldValue}`
-    : `${baseurl}/user/read/${userId}`,  suggestUsername: `${baseurl}/user/suggestUsername`,
+    : `${baseurl}/user/read/${userId}`,  
+    suggestUsername: `${baseurl}/user/suggestUsername`,
   cohortUpdateUser: (userId: string | string[]) => `${baseurl}/cohort/update/${userId}`,
   formReadWithContext: (context: string, contextType: string) => `${baseurl}/form/read?context=${context}&contextType=${contextType}`,
   cohortCreate: `${baseurl}/cohort/create`,
