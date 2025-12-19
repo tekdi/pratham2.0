@@ -141,11 +141,12 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
     [locationFilters]
   );
 
-  const hasLocationSelection =
-    Boolean(locationFilters.states?.length) &&
-    Boolean(locationFilters.districts?.length) &&
-    Boolean(locationFilters.blocks?.length) &&
-    Boolean(locationFilters.villages?.length);
+  const hasLocationSelection = true;
+  //bug fix for location atatch to center dropdown
+    // Boolean(locationFilters.states?.length) &&
+    // Boolean(locationFilters.districts?.length) &&
+    // Boolean(locationFilters.blocks?.length) &&
+    // Boolean(locationFilters.villages?.length);
 
   // const buildCenterFilters = async() => {
   //   const filters: Record<string, string[] | string> = {
