@@ -174,103 +174,115 @@ const LoginPage = () => {
       response: { access_token: string; refresh_token?: string | null },
       data: { remember: boolean }
     ) => {
-    if (typeof window === 'undefined' || !window.localStorage) {
-      return;
-    }
-
-    setLoading(true);
-
-    const token = response.access_token;
-    const refreshToken = response?.refresh_token ?? '';
-    localStorage.setItem('token', token);
-    data?.remember
-      ? localStorage.setItem('refreshToken', refreshToken)
-      : localStorage.removeItem('refreshToken');
-
-    const userResponse = await getUserId();
-
-    // Prefer the first tenant/role combination returned from the API.
-    const tenantData = userResponse?.tenantData?.[0];
-    const selectedTenantId = tenantData?.tenantId;
-    const selectedTenantName = tenantData?.tenantName;
-    const selectedRoleId = tenantData?.roleId || '';
-    const selectedRoleName = tenantData?.roleName || 'Learner';
-
-    setTenantId(selectedTenantId || '');
-    setTenantName(selectedTenantName || '');
-    setRoleId(selectedRoleId);
-    setRoleName(selectedRoleName);
-
-    if (tenantData && selectedRoleName === 'Learner') {
-      localStorage.setItem('userId', userResponse?.userId);
-      localStorage.setItem('roleId', selectedRoleId);
-      localStorage.setItem('templtateId', tenantData?.templateId);
-      localStorage.setItem('userIdName', userResponse?.username);
-      localStorage.setItem('firstName', userResponse?.firstName || '');
-
-      const uiConfig = tenantData?.params?.uiConfig;
-      const landingPage = tenantData?.params?.uiConfig?.landingPage;
-      localStorage.setItem('landingPage', landingPage);
-      localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
-
-      localStorage.setItem('tenantId', selectedTenantId || '');
-      localStorage.setItem('userProgram', selectedTenantName || '');
-      await profileComplitionCheck();
-      if (selectedTenantName === TenantName.YOUTHNET) {
-        const academicYearResponse = await getAcademicYear();
-        if (academicYearResponse[0]?.id) {
-          localStorage.setItem('academicYearId', academicYearResponse[0]?.id);
-        }
+      if (typeof window === 'undefined' || !window.localStorage) {
+        return;
       }
-      const telemetryInteract = {
-        context: { env: 'sign-in', cdata: [] },
-        edata: {
-          id: 'login-success',
-          type: 'CLICK',
-          pageid: 'sign-in',
-          uid: userResponse?.userId || 'Anonymous',
-        },
-      };
-      telemetryFactory.interact(telemetryInteract);
 
-      const channelId = tenantData?.channelId;
-      localStorage.setItem('channelId', channelId);
+      setLoading(true);
 
-      const collectionFramework = tenantData?.collectionFramework;
-      localStorage.setItem('collectionFramework', collectionFramework);
+      const token = response.access_token;
+      const refreshToken = response?.refresh_token ?? '';
+      localStorage.setItem('token', token);
+      data?.remember
+        ? localStorage.setItem('refreshToken', refreshToken)
+        : localStorage.removeItem('refreshToken');
 
-      document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
-      const query = new URLSearchParams(window.location.search);
-      const redirectUrl = query.get('redirectUrl');
-      const activeLink = query.get('activeLink');
-      logEvent({
-        action: 'successfully-login-in-learner-app',
-        category: 'Login Page',
-        label: 'Login Button Clicked',
-      });
-      if (redirectUrl && redirectUrl.startsWith('/')) {
-        router.push(
-          `${redirectUrl}${activeLink ? `?activeLink=${activeLink}` : ''}`
+      const userResponse = await getUserId();
+
+      // Find tenantData with active status and Learner role
+      //bug fix for roleid empty issue
+      const tenantData = userResponse?.tenantData?.find((tenant: any) => {
+        return (
+          tenant?.tenantStatus === 'active' &&
+          tenant?.roles?.some((role: any) => role?.roleName === 'Learner')
         );
+      });
+
+      // Extract role information from the matching tenant
+      const learnerRole = tenantData?.roles?.find(
+        (role: any) => role?.roleName === 'Learner'
+      );
+
+      const selectedTenantId = tenantData?.tenantId;
+      const selectedTenantName = tenantData?.tenantName;
+      const selectedRoleId = learnerRole?.roleId || '';
+      const selectedRoleName = learnerRole?.roleName || 'Learner';
+
+      setTenantId(selectedTenantId || '');
+      setTenantName(selectedTenantName || '');
+      setRoleId(selectedRoleId);
+      setRoleName(selectedRoleName);
+
+      if (tenantData && selectedRoleName === 'Learner') {
+        localStorage.setItem('userId', userResponse?.userId);
+        localStorage.setItem('roleId', selectedRoleId);
+        localStorage.setItem('templtateId', tenantData?.templateId);
+        localStorage.setItem('userIdName', userResponse?.username);
+        localStorage.setItem('firstName', userResponse?.firstName || '');
+
+        const uiConfig = tenantData?.params?.uiConfig;
+        const landingPage = tenantData?.params?.uiConfig?.landingPage;
+        localStorage.setItem('landingPage', landingPage);
+        localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
+
+        localStorage.setItem('tenantId', selectedTenantId || '');
+        localStorage.setItem('userProgram', selectedTenantName || '');
+        await profileComplitionCheck();
+        if (selectedTenantName === TenantName.YOUTHNET) {
+          const academicYearResponse = await getAcademicYear();
+          if (academicYearResponse[0]?.id) {
+            localStorage.setItem('academicYearId', academicYearResponse[0]?.id);
+          }
+        }
+        const telemetryInteract = {
+          context: { env: 'sign-in', cdata: [] },
+          edata: {
+            id: 'login-success',
+            type: 'CLICK',
+            pageid: 'sign-in',
+            uid: userResponse?.userId || 'Anonymous',
+          },
+        };
+        telemetryFactory.interact(telemetryInteract);
+
+        const channelId = tenantData?.channelId;
+        localStorage.setItem('channelId', channelId);
+
+        const collectionFramework = tenantData?.collectionFramework;
+        localStorage.setItem('collectionFramework', collectionFramework);
+
+        document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
+        const query = new URLSearchParams(window.location.search);
+        const redirectUrl = query.get('redirectUrl');
+        const activeLink = query.get('activeLink');
+        logEvent({
+          action: 'successfully-login-in-learner-app',
+          category: 'Login Page',
+          label: 'Login Button Clicked',
+        });
+        if (redirectUrl && redirectUrl.startsWith('/')) {
+          router.push(
+            `${redirectUrl}${activeLink ? `?activeLink=${activeLink}` : ''}`
+          );
+        } else {
+          router.push('/programs');
+        }
       } else {
-        router.push('/programs');
+        showToastMessage('Username or password not correct', 'error');
+        const telemetryInteract = {
+          context: { env: 'sign-in', cdata: [] },
+          edata: {
+            id: 'login-failed',
+            type: 'CLICK',
+            pageid: 'sign-in',
+          },
+        };
+        telemetryFactory.interact(telemetryInteract);
       }
-    } else {
-      showToastMessage('Username or password not correct', 'error');
-      const telemetryInteract = {
-        context: { env: 'sign-in', cdata: [] },
-        edata: {
-          id: 'login-failed',
-          type: 'CLICK',
-          pageid: 'sign-in',
-        },
-      };
-      telemetryFactory.interact(telemetryInteract);
-    }
-    setLoading(false);
-  },
-  [router]
-);
+      setLoading(false);
+    },
+    [router]
+  );
 
   useEffect(() => {
     const init = async () => {
