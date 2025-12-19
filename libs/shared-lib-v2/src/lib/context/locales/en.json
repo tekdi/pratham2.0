@@ -208,8 +208,9 @@
       "STARTED_ON": "Started on",
       "GET_STARTED": "Get Started with L1 Courses",
       "GET_STARTED_CLUB_COURSES": "Get Started with Camp to Club Courses/Contents",
-      "EXPLORE_MORE_COURSES":"Explore More Courses",
-      "EXPLORE_ADDITIONAL_RESOURCES":"Explore Additional Resources & Materials",
+      "EXPLORE_MORE_COURSES": "Explore More Courses",
+      "EXPLORE_ADDITIONAL_RESOURCES": "Explore Additional Resources & Materials",
+      "SECOND_CHANCE_REGISTRATION_MESSAGE": "Thank you for registering for the second chance program. Our team will get in touch with you soon. Till then, you can explore the courses available.",
 
       "FILTER_BY": "Filter by",
       "CLEAR_FILTER": "Clear Filter",
@@ -704,9 +705,6 @@
     "SUMMER_CAMP_VOLUNTEER": "Summer Camp Volunteer",
     "WHAT_PROGRAM_ARE_YOU_PART_OF": "What Program Are You Part Of",
     "WHAT PROGRAM ARE YOU PART OF": "What Program Are You Part Of"
-    
-    
-
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "Invalid Input.",
@@ -732,10 +730,9 @@
   },
   "Assessment Score": "Assessment Score",
   "FILTER_KEY": {
-     "GROUP_MEMBERSHIP": "groupMembership",
-      "JOB_FAMILY": "jobFamily",
-      "PSU":"psu"
-
+    "GROUP_MEMBERSHIP": "groupMembership",
+    "JOB_FAMILY": "jobFamily",
+    "PSU": "psu"
   },
   "AI": {
     "ASSESSMENT_DETAILS": "Assessment Details",

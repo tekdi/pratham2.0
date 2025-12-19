@@ -22,6 +22,7 @@ import { profileComplitionCheck } from '@learner/utils/API/userService';
 import { usePathname } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import InfoIcon from '@mui/icons-material/Info';
 import { TenantName } from '../../utils/app.constant';
 import CommonLearnerCourse from './CommonLearnerCourse';
 
@@ -116,33 +117,73 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
       )}
       {isLogin && (
         <>
-         { !notab && <Box
-            sx={{
-              height: 24,
-              display: 'flex',
-              alignItems: 'center',
-              py: '36px',
-              px: '34px',
-              bgcolor: '#fff',
-            }}
-          >
-            <Typography
-              variant="body1"
-              component="h2"
-              gutterBottom
+          {typeof window !== 'undefined' &&
+            localStorage.getItem('userProgram') ===
+              TenantName.SECOND_CHANCE_PROGRAM && (
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: '#F5F6FA',
+                  p: { xs: 2, md: 4 },
+                  mb: 3,
+                  borderRadius: 2,
+                  gap: 1,
+                }}
+              >
+                <InfoIcon
+                  sx={{
+                    fontSize: { xs: '28px', md: '36px' },
+                    color: '#FDBE16',
+                    flexShrink: 0,
+                  }}
+                />
+                <Typography
+                  variant="h5"
+                  sx={{
+                    textAlign: 'center',
+                    color: '#1F1B13',
+                    fontWeight: 600,
+                    fontSize: { xs: '12px', md: '16px' },
+                    lineHeight: { xs: '18px', md: '24px' },
+                    maxWidth: '650px',
+                  }}
+                >
+                  {t('LEARNER_APP.COURSE.SECOND_CHANCE_REGISTRATION_MESSAGE')}
+                </Typography>
+              </Box>
+            )}
+          {!notab && (
+            <Box
               sx={{
-                fontWeight: 500,
-                color: '#1F1B13',
-                textTransform: 'capitalize',
+                height: 24,
+                display: 'flex',
+                alignItems: 'center',
+                py: '36px',
+                px: '34px',
+                bgcolor: '#fff',
               }}
             >
-              <span role="img" aria-label="wave">
-                👋 {' '}
-              </span>
-              {t('COMMON.WELCOME')}, {localStorage.getItem('firstName')}!
-            </Typography>
-          </Box>}
-          { !notab && <InProgressContent />}
+              <Typography
+                variant="body1"
+                component="h2"
+                gutterBottom
+                sx={{
+                  fontWeight: 500,
+                  color: '#1F1B13',
+                  textTransform: 'capitalize',
+                }}
+              >
+                <span role="img" aria-label="wave">
+                  👋{' '}
+                </span>
+                {t('COMMON.WELCOME')}, {localStorage.getItem('firstName')}!
+              </Typography>
+            </Box>
+          )}
+          {!notab && <InProgressContent />}
 
           {localStorage.getItem('userProgram') === TenantName.YOUTHNET && (
             <Grid container>
@@ -167,9 +208,10 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
         <Grid item xs={12}>
           {filter && (
             <CommonLearnerCourse
-              title={ notab? 'LEARNER_APP.COURSE.EXPLORE_ADDITIONAL_RESOURCES' :
-                'LEARNER_APP.COURSE.EXPLORE_MORE_COURSES'
-                  
+              title={
+                notab
+                  ? 'LEARNER_APP.COURSE.EXPLORE_ADDITIONAL_RESOURCES'
+                  : 'LEARNER_APP.COURSE.EXPLORE_MORE_COURSES'
               }
               _content={{
                 pageName: 'L1_Content',
@@ -186,26 +228,31 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
                 //   'se_subjects',
                 // ],
                 filters: {
-                  ...(filter.filters?.domain ? {} : {
-                    se_domains:
-                      typeof filter.filters?.domain === 'string'
-                        ? [filter.filters?.domain]
-                        : filter.filters?.domain,
-                  }),
+                  ...(filter.filters?.domain
+                    ? {}
+                    : {
+                        se_domains:
+                          typeof filter.filters?.domain === 'string'
+                            ? [filter.filters?.domain]
+                            : filter.filters?.domain,
+                      }),
                 },
                 // 🎯 Dynamic content tabs based on stored configuration
                 ...(() => {
                   // If notab prop is true, hide all tabs
                   if (notab) {
-                    return { 
-                      contentTabs: ['no-tabs-please'] // Pass non-existent tab label to result in empty tabs array
+                    return {
+                      contentTabs: ['no-tabs-please'], // Pass non-existent tab label to result in empty tabs array
                     };
                   }
-                  
-                  if (!Array.isArray(storedConfig.showContent) || storedConfig.showContent.length === 0) {
+
+                  if (
+                    !Array.isArray(storedConfig.showContent) ||
+                    storedConfig.showContent.length === 0
+                  ) {
                     return {}; // No configuration, show all tabs
                   }
-                  
+
                   // Pass the full objects with label and filterKey
                   const configTabs = storedConfig.showContent;
                   console.log('🎯 Setting contentTabs to:', configTabs);
@@ -217,12 +264,14 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
                     typeof filter.filters?.program === 'string'
                       ? [filter.filters?.program]
                       : filter.filters?.program,
-                  ...(filter.filters?.domain ? {
-                    se_domains:
-                      typeof filter.filters?.domain === 'string'
-                        ? [filter.filters?.domain]
-                        : filter.filters?.domain,
-                  } : {}),
+                  ...(filter.filters?.domain
+                    ? {
+                        se_domains:
+                          typeof filter.filters?.domain === 'string'
+                            ? [filter.filters?.domain]
+                            : filter.filters?.domain,
+                      }
+                    : {}),
                 },
               }}
             />
@@ -246,11 +295,11 @@ const InProgressContent: React.FC = () => {
     <Grid
       container
       style={gredientStyle}
-      sx={{ 
+      sx={{
         px: { xs: 0, sm: 0, md: 4 },
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
         borderRadius: '8px',
-        mb: 2
+        mb: 2,
       }}
       {...(isShow ? {} : { sx: { display: 'none' } })}
     >
@@ -318,15 +367,15 @@ const InProgressContent: React.FC = () => {
               sx={
                 !isMdUp
                   ? {
-                    color: theme.palette.secondary.main,
-                    minWidth: '100px',
-                    fontWeight: 500,
-                    fontSize: '14px',
-                    lineHeight: '20px',
-                    letterSpacing: '0.1px',
-                    textAlign: 'center',
-                    verticalAlign: 'middle',
-                  }
+                      color: theme.palette.secondary.main,
+                      minWidth: '100px',
+                      fontWeight: 500,
+                      fontSize: '14px',
+                      lineHeight: '20px',
+                      letterSpacing: '0.1px',
+                      textAlign: 'center',
+                      verticalAlign: 'middle',
+                    }
                   : {}
               }
               endIcon={<ArrowForwardIcon />}
@@ -347,7 +396,7 @@ const InProgressContent: React.FC = () => {
             _subBox: { px: { xs: 2, sm: 2, md: 0 } },
             _carousel: { spaceBetween: isMdUp ? 16 : 8 },
           }}
-        //  pageName="Inprogress"
+          //  pageName="Inprogress"
         />
       </Grid>
     </Grid>
