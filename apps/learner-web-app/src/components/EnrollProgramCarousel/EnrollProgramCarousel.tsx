@@ -78,8 +78,9 @@ const EnrollProgramCarousel = ({
         const programsData = res?.result || [];
         const visiblePrograms = programsData?.filter(
           (program: any) =>
-            (program?.params?.uiConfig?.showProgram === true  && program?.params?.uiConfig?.showSignup === true)||
-            program?.params?.uiConfig?.sso?.length > 0
+            (program?.params?.uiConfig?.showProgram === true  && program?.params?.uiConfig?.showSignup === true)
+          //below code show pragyanpath program in explore programs tab
+          // || program?.params?.uiConfig?.sso?.length > 0
         );
         // console.log('visiblePrograms', visiblePrograms);
         

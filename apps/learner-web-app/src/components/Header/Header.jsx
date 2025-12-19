@@ -21,6 +21,15 @@ const Header = () => {
     setLanguage(newLang);
   };
 
+  const PLPDomain = [
+    'localhost:3003',
+    'dev-plp.prathamdigital.org',
+    'qa-plp.prathamdigital.org',
+    'plp.prathamdigital.org',
+  ];
+  
+  // const isPLPDomain = typeof window !== 'undefined' && PLPDomain.includes(window.location.hostname);
+
   return (
     <Box
       display="flex"
@@ -32,7 +41,13 @@ const Header = () => {
       bgcolor="#fff"
     >
       {/* Logo */}
-      <Box display="flex" alignItems="center" gap={2} onClick={() => router.push('/')} style={{ cursor: 'pointer' }}>
+      <Box
+        display="flex"
+        alignItems="center"
+        gap={2}
+        onClick={() => router.push('/')}
+        style={{ cursor: 'pointer' }}
+      >
         <Image src={appLogo} alt="Pratham Logo" width={200} height={40} />
       </Box>
 
