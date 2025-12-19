@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import {
   LayoutProps,
   Layout,
-  KeyboardArrowDown,
   useTranslation,
   DrawerItemProp,
 } from '@shared-lib';
@@ -13,6 +12,7 @@ import {
   Home,
   AssignmentOutlined,
   Logout,
+  KeyboardArrowDown,
 } from '@mui/icons-material';
 import { useRouter, usePathname } from 'next/navigation';
 import { Box, useMediaQuery, useTheme } from '@mui/material';
