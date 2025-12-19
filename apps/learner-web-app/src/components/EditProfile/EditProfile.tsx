@@ -255,6 +255,17 @@ const [responseFormData, setResponseFormData] = useState<any>({});
     }
     console.log('payload', payload);
     const { userData, customFields = [] } = splitUserData(payload);
+    //custom field hardcoded for pending status
+    const data= {
+      fieldId:
+       'f8dc1d5f-9b2b-412e-a22a-351bd8f14963',
+      value: 'pending'
+    }
+    const storedUiConfig = JSON.parse(localStorage.getItem('uiConfig') || '{}');
+      const userTenantStatus = storedUiConfig?.isTenantPendingStatus;
+if(enrolledProgram && userTenantStatus){
+  customFields.push(data);
+}
 
     // Ensure "WHAT PROGRAM ARE YOU PART OF" is explicitly sent even when empty
     const programSchema =
