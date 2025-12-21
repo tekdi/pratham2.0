@@ -66,7 +66,7 @@ function ProgramsContent() {
 
   return (
     <>
-      <Header />
+      <Header isShowLogout={true} />
 
       <Box
         display="flex"

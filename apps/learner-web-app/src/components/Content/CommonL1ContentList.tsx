@@ -7,6 +7,7 @@ import {
   Button,
   Grid,
   Typography,
+  Link,
   useMediaQuery,
   useTheme,
 } from '@mui/material';
@@ -140,19 +141,68 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
                     flexShrink: 0,
                   }}
                 />
-                <Typography
-                  variant="h5"
+                <Box
                   sx={{
-                    textAlign: 'center',
-                    color: '#1F1B13',
-                    fontWeight: 600,
-                    fontSize: { xs: '12px', md: '16px' },
-                    lineHeight: { xs: '18px', md: '24px' },
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 1,
                     maxWidth: '650px',
                   }}
                 >
-                  {t('LEARNER_APP.COURSE.SECOND_CHANCE_REGISTRATION_MESSAGE')}
-                </Typography>
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      textAlign: 'center',
+                      color: '#1F1B13',
+                      fontWeight: 600,
+                      fontSize: { xs: '12px', md: '16px' },
+                      lineHeight: { xs: '18px', md: '24px' },
+                    }}
+                  >
+                    {t('LEARNER_APP.COURSE.SECOND_CHANCE_REGISTRATION_MESSAGE')}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      textAlign: 'center',
+                      color: '#1F1B13',
+                      fontWeight: 400,
+                      fontSize: { xs: '11px', md: '14px' },
+                      lineHeight: { xs: '16px', md: '20px' },
+                    }}
+                  >
+                    {t('LEARNER_APP.COURSE.PLAYSTORE_DOWNLOAD_MESSAGE')
+                      .split('{playStoreLink}')
+                      .map((part, index, array) => {
+                        if (index === array.length - 1) {
+                          return (
+                            <React.Fragment key={index}>{part}</React.Fragment>
+                          );
+                        }
+                        return (
+                          <React.Fragment key={index}>
+                            {part}
+                            <Link
+                              href="https://play.google.com/store/apps/details?id=com.pratham.learning"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              sx={{
+                                color: '#FDBE16',
+                                textDecoration: 'underline',
+                                fontWeight: 500,
+                                '&:hover': {
+                                  color: '#fdbe16',
+                                  textDecoration: 'underline',
+                                },
+                              }}
+                            >
+                              Play Store
+                            </Link>
+                          </React.Fragment>
+                        );
+                      })}
+                  </Typography>
+                </Box>
               </Box>
             )}
           {!notab && (
